@@ -1,6 +1,5 @@
 const { openCheckout } = require('../../checkout');
 const { makePreferences } = require('../../actions/preferences');
-const { delay, visible } = require('../../util');
 const {
   assertHomePage,
   fillUserDetails,
@@ -12,10 +11,10 @@ const {
   verifyLowDowntime,
 } = require('../../actions/common');
 
-describe('Netbanking tests', () => {
-  test('perform netbaking transaction', async () => {
+describe('Netbanking tests', () => {
+  test('perform keyless netbaking transaction', async () => {
     const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+      order_id: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
       personalization: false,
     };

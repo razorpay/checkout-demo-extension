@@ -7,7 +7,7 @@ class PuppeteerEnvironment extends NodeEnvironment {
     const browser = await puppeteer.launch({
       executablePath: process.env.CHROME_BIN || '/usr/bin/chromium',
       args: ['--no-sandbox'],
-      headless: true, //isProd,
+      headless: isProd,
       // devtools: true,
     });
     const pages = await browser.pages();
