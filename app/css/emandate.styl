@@ -1,5 +1,69 @@
 @require 'common';
 
+#form-emandate-auth-selection {
+  box-sizing: border-box;
+  padding: 12px;
+}
+
+#emandate-bank {
+  border: 1px solid #E6E7E8;
+  padding: 14px 22px 14px 42px;
+  position: relative;
+
+  .bank-icon {
+    top: 23px;
+    left: 14px;
+    margin: 0;
+  }
+
+  .bank-name {
+    font-size: 14px;
+  }
+
+  .btn-change-bank {
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .btn-change-bank {
+    position: absolute;
+    line-height: 46px;
+    right: 0;
+    top: 0;
+    padding: 0 12px;
+    padding-right: 24px;
+    cursor: pointer;
+
+    &:after{
+      content: "\e601";
+      position: absolute;
+      font-size: 22px;
+      right: 8px;
+      top: 0;
+      margin-top: -2px;
+    }
+  }
+}
+
+#emandate-options {
+  .auth-option.disabled {
+    color: #80859B;
+    background: #efefef;
+    cursor: not-allowed;
+
+    .desc {
+      display: none;
+    }
+
+    &:hover label {
+      background: #efefef;
+    }
+    .theme {
+      color: #80859B;
+    }
+  }
+}
+
 #emandate-inner {
   .bank-icon {
     width: 18px;
