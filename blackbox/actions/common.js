@@ -1,4 +1,9 @@
 const { delay, visible } = require('../util');
+const { readFileSync } = require('fs');
+
+contents = String(
+  readFileSync(__dirname + '/../fixtures/mockSuccessandFailPage.html')
+);
 
 module.exports = {
   handleFeeBearer,
@@ -22,9 +27,35 @@ module.exports = {
   verifyPartialAmount,
   verifyErrorMessage,
   failRequestwithErrorMessage,
+  enterCardDetails,
+  handleCardValidation,
+  handleMockFailureDialog,
+  retryCardTransaction,
+  handleCardValidationWithCallback,
+  verifyHighDowntime,
+  verifyLowDowntime,
+  expectMockSuccessWithCallback,
+  expectMockFailureWithCallback,
+  handleMockSuccessDialog,
 };
 
+async function enterCardDetails(context) {
+  const cardNum = await context.page.waitForSelector('#card_number');
+  await cardNum.type('4111111111111111');
+  await context.expectRequest(req => {});
+  await context.respondJSON({
+    recurring: false,
+    iframe: true,
+    http_status_code: 200,
+  });
+  await context.page.type('#card_expiry', '12/55');
+  await context.page.type('#card_name', 'SakshiJain');
+  await context.page.type('#card_cvv', '112');
+  //   await delay(10000);
+}
+
 async function verifyErrorMessage(context, expectedErrorMeassage) {
+  await delay(800);
   const messageDiv = await context.page.waitForSelector('#fd-t');
   const messageText = await context.page.evaluate(
     messageDiv => messageDiv.textContent,
@@ -60,8 +91,67 @@ async function validateHelpMessage(context, message) {
 }
 
 async function submit(context) {
-  await delay(200);
-  await context.page.click('#footer');
+  await delay(300);
+  context.page.click('#footer');
+  await delay(1000);
+}
+
+async function handleCardValidation(context) {
+  await context.expectRequest();
+  await context.respondJSON({
+    type: 'first',
+    request: {
+      url:
+        'https://api.razorpay.com/v1/gateway/mocksharp/payment?key_id=rzp_test_1DP5mmOlF5G5ag&action=authorize&amount=5100&method=card&payment_id=DLXKaJEF1T1KxC&callback_url=https%3A%2F%2Fapi.razorpay.com%2Fv1%2Fpayments%2Fpay_DLXKaJEF1T1KxC%2Fcallback%2F10b9b52d2b5974f35acfec916f3785eab0c98325%2Frzp_test_1DP5mmOlF5G5ag&recurring=0&card_number=eyJpdiI6ImdnUm9BbnZucTRMU09VWiswMHQ1WFE9PSIsInZhbHVlIjoiSkpwZjJOd2htQlcza2dzYnNiRjJFb3ZqUlVaNGw4WEtLWDgyOVVxYnN4ST0iLCJtYWMiOiIxZDg2YTBlYWY3MGEyNzE5NWQ1NzNhNTRiMjc4ZTZhZTFlYTQxNDUyNWU1NjkzOTNlYTEzYjljZmM0YWY1NGIyIn0%3D&encrypt=1',
+      method: 'get',
+      content: [],
+    },
+    payment_id: 'pay_DLXKaJEF1T1KxC',
+    amount: '\u20b9 51',
+    image: 'https://cdn.razorpay.com/logos/D3JjREAG8erHB7_medium.jpg',
+  });
+  await delay(1000);
+}
+
+async function handleCardValidationWithCallback(context) {
+  await context.expectRequest();
+  await context.respondPlain(contents);
+}
+
+async function handleMockFailureDialog(context) {
+  await delay(300);
+  const popup = await context.popup();
+  const popupPage = await popup.page();
+  const failButton = await popupPage.$('.danger');
+  await failButton.click();
+  await delay(800);
+}
+
+async function handleMockSuccessDialog(context) {
+  const popup = await context.popup();
+  const popupPage = await popup.page();
+  const passButton = await popupPage.$('.success');
+  await passButton.click();
+  await delay(800);
+}
+
+async function expectMockFailureWithCallback(context) {
+  await context.page.waitForNavigation();
+  const failButton = await context.page.$('.danger');
+  await failButton.click();
+  const req = await context.expectRequest();
+  expect(req.body).toContain('Payment+failed');
+  expect(req.body).not.toEqual('razorpay_payment_id=pay_123465');
+  await context.respondPlain('11');
+}
+
+async function expectMockSuccessWithCallback(context) {
+  await context.page.waitForNavigation();
+  const passButton = await context.page.$('.success');
+  await passButton.click();
+  const req = await context.expectRequest();
+  expect(req.body).toEqual('razorpay_payment_id=pay_123465');
+  await context.respondPlain('11');
 }
 
 async function handleValidationRequest(context, passOrFail) {
@@ -81,6 +171,12 @@ async function failRequestwithErrorMessage(context, errorMessage) {
 async function retryWalletTransaction(context) {
   const retryButton = await context.page.waitForSelector('#otp-action');
   await retryButton.click();
+}
+
+async function retryCardTransaction(context) {
+  const retryButton = await context.page.$('#fd-hide');
+  await retryButton.click();
+  await delay(500);
 }
 
 async function assertWalletPage(context) {
@@ -152,6 +248,25 @@ async function selectBank(context, bank) {
   await context.page.select('#bank-select', bank);
 }
 
+async function verifyHighDowntime(context, bank) {
+  const toolTip = await context.page.waitForSelector('.downtime .tooltip');
+  const toolTipText = await context.page.evaluate(
+    toolTip => toolTip.textContent,
+    toolTip
+  );
+  expect(toolTipText).toContain(bank);
+}
+
+async function verifyLowDowntime(context, bank) {
+  const warningDiv = await context.page.waitForSelector('.downtime-callout');
+  // console.log(warningDiv);
+  const warningText = await context.page.evaluate(
+    warningDiv => warningDiv.textContent,
+    warningDiv
+  );
+  expect(warningText).toContain(bank);
+}
+
 async function typeOTPandSubmit(context) {
   await typeOTP(context);
   await delay(1200);
@@ -163,10 +278,10 @@ async function typeOTP(context) {
 }
 
 async function verifyTimeout(context, paymentMode) {
-  if (paymentMode == 'netbanking') {
-    await delay(5000);
+  if (paymentMode == 'netbanking' || paymentMode == 'card') {
+    await delay(2000);
     expect(await context.page.$('#fd-hide')).not.toEqual(null);
-    await delay(5000);
+    await delay(8000);
     expect(await context.page.$('#fd-hide')).toEqual(null);
   } else if (paymentMode == 'wallet') {
     await delay(5000);

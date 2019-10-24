@@ -13,17 +13,16 @@ const {
 } = require('../../actions/common');
 
 describe('Netbanking tests', () => {
-  test('perform netbaking transaction with contact optional', async () => {
+  test('perform keyless netbaking transaction', async () => {
     const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+      order_id: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
       personalization: false,
     };
-    const preferences = makePreferences({ optional: ['contact'] });
+    const preferences = makePreferences();
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, false);
-
+    await fillUserDetails(context, true);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'netbanking');
     await assertNetbankingPage(context);

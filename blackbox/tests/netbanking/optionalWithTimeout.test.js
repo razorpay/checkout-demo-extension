@@ -8,8 +8,8 @@ const {
   selectBank,
   assertNetbankingPage,
   submit,
-  failRequestwithErrorMessage,
-  verifyErrorMessage,
+  handleValidationRequest,
+  verifyTimeout,
 } = require('../../actions/common');
 
 describe('Netbanking tests', () => {
@@ -18,6 +18,7 @@ describe('Netbanking tests', () => {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
       personalization: false,
+      timeout: 10,
     };
     const preferences = makePreferences({ optional: ['contact'] });
     const context = await openCheckout({ page, options, preferences });
@@ -30,8 +31,7 @@ describe('Netbanking tests', () => {
     await selectBank(context, 'SBIN');
     await submit(context);
 
-    const expectedErrorMeassage = 'Payment failed';
-    await failRequestwithErrorMessage(context, expectedErrorMeassage);
-    await verifyErrorMessage(context, expectedErrorMeassage);
+    await handleValidationRequest(context, 'fail');
+    await verifyTimeout(context, 'netbanking');
   });
 });
