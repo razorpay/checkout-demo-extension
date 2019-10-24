@@ -57,7 +57,7 @@ async function enterCardDetails(context) {
 async function verifyErrorMessage(context, expectedErrorMeassage) {
   await delay(800);
   const messageDiv = await context.page.waitForSelector('#fd-t');
-  messageText = await context.page.evaluate(
+  let messageText = await context.page.evaluate(
     messageDiv => messageDiv.textContent,
     messageDiv
   );
@@ -128,8 +128,8 @@ async function handleCardValidationWithCallback(context) {
 
 async function handleMockFailureDialog(context) {
   await delay(300);
-  popup = await context.popup();
-  popupPage = await popup.page();
+  let popup = await context.popup();
+  let popupPage = await popup.page();
   if (popup == null || popupPage == null) {
     await delay(400);
     popup = await context.popup();
