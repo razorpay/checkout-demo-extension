@@ -30,7 +30,7 @@
   import GooglePayCollect from './GooglePayCollect.svelte';
   import GooglePayOmnichannel from './GooglePayOmnichannel.svelte';
   import NextOption from 'templates/views/ui/options/NextOption.svelte';
-  import Screen from 'templates/layouts/Screen.svelte';
+  import Screen from 'templates/layouts/Screen/index.svelte';
 
   // Props
   export let selectedApp = undefined;

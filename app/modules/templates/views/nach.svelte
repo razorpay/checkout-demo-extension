@@ -17,7 +17,7 @@
   import DocumentIllustration from 'templates/illustrations/nach/Document.svelte/';
   import Note from 'templates/views/ui/Note.svelte';
   import Tab from 'templates/tabs/Tab.svelte';
-  import Screen from 'templates/layouts/Screen.svelte';
+  import Screen from 'templates/layouts/Screen/index.svelte';
 
   let abortUploadRequest = () => {};
   let uploaded = false;

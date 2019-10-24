@@ -8,7 +8,7 @@
   import GridItem from 'templates/tabs/netbanking/GridItem.svelte';
   import Callout from 'templates/views/ui/Callout.svelte';
   import DowntimeCallout from 'templates/views/ui/DowntimeCallout.svelte';
-  import Screen from 'templates/layouts/Screen.svelte';
+  import Screen from 'templates/layouts/Screen/index.svelte';
 
   // Utils imports
   import Razorpay from 'common/Razorpay';
