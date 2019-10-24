@@ -57,10 +57,18 @@ async function enterCardDetails(context) {
 async function verifyErrorMessage(context, expectedErrorMeassage) {
   await delay(800);
   const messageDiv = await context.page.waitForSelector('#fd-t');
-  const messageText = await context.page.evaluate(
+  messageText = await context.page.evaluate(
     messageDiv => messageDiv.textContent,
     messageDiv
   );
+  if (messageText == 'Your payment is being processed') {
+    await delay(800);
+    const messageDiv = await context.page.waitForSelector('#fd-t');
+    messageText = await context.page.evaluate(
+      messageDiv => messageDiv.textContent,
+      messageDiv
+    );
+  }
   expect(messageText).toEqual(expectedErrorMeassage);
 }
 async function verifyPartialAmount(context, amount) {
