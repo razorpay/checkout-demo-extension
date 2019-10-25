@@ -277,27 +277,34 @@ export const listInstruments = customer => {
 /**
  * Appends the data from the selected instrument to the payment creation
  * payload.
+ * @param {Object} paymentData
+ * @param {Object} instrument
+ *
+ * @returns {Boolean} added?
  */
-export const handleInstrument = (data, instrument) => {
-  var gotSome = false;
+export function addInstrumentToPaymentData(paymentData, instrument) {
+  let added = false;
+
+  // Sanity check
   if (!instrument) {
-    return gotSome;
+    return added;
   }
 
   let propsToExtract = INSTRUMENT_PROPS[instrument.method];
 
+  // No props present that can be extracted
   if (!propsToExtract) {
-    return gotSome;
+    return added;
   }
 
   propsToExtract = ['method'].concat(propsToExtract);
 
-  _Arr.loop(propsToExtract, key => {
-    if (typeof instrument[key] !== 'undefined') {
-      data[key] = instrument[key];
-      gotSome = true;
+  _Arr.loop(propsToExtract, prop => {
+    if (!_.isUndefined(instrument[prop])) {
+      paymentData[prop] = instrument[prop];
+      added = true;
     }
   });
 
-  return gotSome;
-};
+  return added;
+}

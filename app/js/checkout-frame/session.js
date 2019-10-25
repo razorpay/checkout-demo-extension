@@ -5859,7 +5859,10 @@ Session.prototype = {
 
     if (!this.screen && this.methodsList && this.p13n) {
       var selectedInstrument = this.methodsList.getSelectedInstrument();
-      this.doneByP13n = P13n.handleInstrument(data, selectedInstrument);
+      this.doneByP13n = P13n.addInstrumentToPaymentData(
+        data,
+        selectedInstrument
+      );
 
       /* TODO: the following code is the hack for ftx, fix it properly */
       if (this.doneByP13n) {
