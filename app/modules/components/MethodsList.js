@@ -5,10 +5,8 @@ import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { isMobile } from 'common/useragent';
 import { AVAILABLE_METHODS } from 'common/constants';
-import {
-  filterInstrumentsForAvailableMethods,
-  _createInstrumentForImmediateUse,
-} from 'checkoutframe/personalization';
+import { _createInstrumentForImmediateUse } from 'checkoutframe/personalization';
+import { filterInstrumentsForAvailableMethods } from 'checkoutframe/personalization/filters';
 import { getSession } from 'sessionmanager';
 
 /**
