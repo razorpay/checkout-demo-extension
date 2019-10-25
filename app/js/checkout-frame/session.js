@@ -3679,6 +3679,15 @@ Session.prototype = {
    * @param {string} tab
    */
   renderOffers: function(tab) {
+    /**
+     * Going to the OTP screen resets the offers
+     * Prevent that by not rendering offers there
+     * and aborting early.
+     */
+    if (this.screen === 'otp' || tab === 'otp') {
+      return this.offers.display(false);
+    }
+
     // EMI plans should have the same offers as EMI
     // TODO: Fix for Cardless EMI
     if (tab === 'emiplans') {
