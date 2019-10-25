@@ -2670,80 +2670,6 @@ Session.prototype = {
     }
   },
 
-  /**
-   * Asks for second factor of confirmation for UPI intent.
-   */
-  askUPI2FPermission: function(packageName) {
-    var self = this;
-    var app = discreet.UPIUtils.getAppByPackageName(packageName);
-    var UPISecondFactorConsent = {};
-
-    try {
-      UPISecondFactorConsent = JSON.parse(
-        StorageBridge.getString('rzp_upi_2f_consent')
-      );
-    } catch (readErr) {}
-
-    var hide = function() {
-      Analytics.track('upi:2f:consent:dismiss', {
-        type: AnalyticsTypes.BEHAV,
-        data: {
-          package_name: packageName,
-          consent: false,
-        },
-      });
-    };
-
-    Analytics.track('upi:2f:consent', {
-      type: AnalyticsTypes.RENDER,
-      data: {
-        package_name: packageName,
-      },
-    });
-
-    Confirm.show({
-      position: 'middle',
-      message:
-        'To make a UPI payment, you need to have a UPI ID linked to your bank account.',
-      heading:
-        'Are you registered for UPI on ' +
-        (app.name || app.app_name || 'this app') +
-        '?',
-      layout: 'rtl',
-      positiveBtnTxt: 'Yes, Proceed',
-      negativeBtnTxt: 'No, Go Back',
-      onHide: hide,
-      onNegativeClick: hide,
-      onPositiveClick: function() {
-        UPISecondFactorConsent[packageName] = true;
-        self.shouldAskUPI2FPermission = false;
-
-        try {
-          StorageBridge.setString(
-            'rzp_upi_2f_consent',
-            JSON.stringify(UPISecondFactorConsent)
-          );
-        } catch (saveErr) {}
-
-        Analytics.track('upi:2f:consent:agree', {
-          type: AnalyticsTypes.BEHAV,
-          data: {
-            package_name: packageName,
-            consent: true,
-          },
-        });
-
-        // Show overlay manually because it gets hidden.
-        var $overlay = $('#overlay');
-        setTimeout(function() {
-          $overlay.css('display', 'block');
-          $overlay.addClass(shownClass);
-        }, 300);
-
-        self.preSubmit.call(self);
-      },
-    });
-  },
   fixLandscapeBug: function() {
     function shiftUp() {
       $(this.el.querySelector('#footer'))
@@ -3153,23 +3079,6 @@ Session.prototype = {
   },
 
   onUpiAppSelect: function(packageName) {
-    var UPISecondFactorConsent = {};
-
-    try {
-      UPISecondFactorConsent = JSON.parse(
-        StorageBridge.getString('rzp_upi_2f_consent')
-      );
-    } catch (readErr) {}
-
-    if (
-      discreet.UPIUtils.isSecondFactorApp(packageName) &&
-      !UPISecondFactorConsent[packageName]
-    ) {
-      this.shouldAskUPI2FPermission = true;
-    } else {
-      this.shouldAskUPI2FPermission = false;
-    }
-
     $('#body').toggleClass('sub', packageName);
 
     Analytics.track('upi:app:select', {
@@ -5928,10 +5837,6 @@ Session.prototype = {
 
     // If there's a package name, the flow is intent.
     if (data.upi_app) {
-      if (this.shouldAskUPI2FPermission) {
-        this.askUPI2FPermission(data.upi_app);
-        return;
-      }
       data['_[flow]'] = 'intent';
       data['_[app]'] = data.upi_app;
     }
