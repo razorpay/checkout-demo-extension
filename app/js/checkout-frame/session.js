@@ -3446,16 +3446,37 @@ Session.prototype = {
 
           if (this.isValid() && shouldUseP13n) {
             instruments =
-              P13n.listInstruments(self.getCustomer(this.value)) || [];
+              P13n.getInstruments(self.getCustomer(this.value)) || [];
 
             if (instruments.length) {
-              Analytics.track('p13:instruments:fetch', {
+              Analytics.setMeta('p13n', true);
+
+              // Determine the number of instruments to be shown
+              var listOfInstrumentsToBeShown = isMobile() ? 3 : 2;
+              var _preferredMethods = {};
+
+              /**
+               * Preprending method name with an underscore
+               * because Lumberjack will delete a key called `card`.
+               * It won't delete `_card` though.
+               */
+              _Arr.loop(
+                instruments.slice(0, listOfInstrumentsToBeShown),
+                function(instrument) {
+                  _preferredMethods[`_${instrument.method}`] = true;
+                }
+              );
+
+              Analytics.track('p13n:instruments:list', {
                 data: {
                   length: instruments.length,
+                  shown: Math.min(
+                    instruments.length,
+                    listOfInstrumentsToBeShown
+                  ),
+                  methods: _preferredMethods,
                 },
               });
-
-              Analytics.setMeta('p13n', true);
 
               /**
                * If the number of payment methods available

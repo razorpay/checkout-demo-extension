@@ -3,7 +3,6 @@
 import { getCustomer } from 'checkoutframe/customer';
 import Track from 'tracker';
 import Analytics from 'analytics';
-import { isMobile } from 'common/useragent';
 import { filterInstruments } from './filters';
 import { hashFnv32a, set, get } from './utils';
 
@@ -212,27 +211,31 @@ export const recordSuccess = customer => {
  * Lists the most preffered payment modes for the user in a sorted order
  * @return {[type]} [description]
  */
-export const listInstruments = customer => {
+export const getInstruments = customer => {
+  // Get instruments for all customers
   let instrumentList = _Obj.parse(get(PREFERRED_INSTRUMENTS));
+
   if (!instrumentList) {
     return;
   }
+  // Get instrument for current customer
+  let instruments = instrumentList[hashFnv32a(customer.contact)];
 
-  let currentCustomer = instrumentList[hashFnv32a(customer.contact)];
-
-  if (!currentCustomer) {
+  if (!instruments) {
     return;
   }
 
-  currentCustomer = filterInstruments({
-    instruments: currentCustomer,
+  // Filter out the list
+  instruments = filterInstruments({
+    instruments,
   });
 
-  _Arr.loop(currentCustomer, item => {
-    let timeSincePayment = _.now() - item.timestamp;
+  // Add score for each instrument
+  _Arr.loop(instruments, instrument => {
+    let timeSincePayment = _.now() - instrument.timestamp;
     let tsScore = Math.exp(-TS_HALFLIFE * timeSincePayment);
-    let countScore = 1 - Math.exp(-COUNT_HALFLIFE * item.frequency);
-    let C = ~~item.success * 2 - 1;
+    let countScore = 1 - Math.exp(-COUNT_HALFLIFE * instrument.frequency);
+    let C = ~~instrument.success * 2 - 1;
 
     /*
      * Simplified form for:
@@ -242,36 +245,16 @@ export const listInstruments = customer => {
      *   score = 0.3 * tsScore + 0.7 * countScore
      */
 
-    item.score =
+    instrument.score =
       (tsScore + countScore) / 2.0 + 0.2 * C * (tsScore - countScore);
   });
 
-  _Arr.sort(currentCustomer, (a, b) =>
+  // Sort instruments by their score
+  _Arr.sort(instruments, (a, b) =>
     a.score > b.score ? -1 : ~~(a.score < b.score)
   );
 
-  const listOfInstrumentsToBeShown = isMobile() ? 3 : 2;
-  const preferredMethods = {};
-
-  /**
-   * Preprending method name with an underscore
-   * because Lumberjack will delete a key called `card`.
-   * It won't delete `_card` though.
-   */
-  _Arr.loop(
-    currentCustomer.slice(0, listOfInstrumentsToBeShown),
-    instrument => (preferredMethods[`_${instrument.method}`] = true)
-  );
-
-  Analytics.track('p13n:instruments:list', {
-    data: {
-      length: currentCustomer.length,
-      shown: Math.min(currentCustomer.length, listOfInstrumentsToBeShown),
-      methods: preferredMethods,
-    },
-  });
-
-  return currentCustomer;
+  return instruments;
 };
 
 /**
