@@ -1,6 +1,5 @@
 const { openCheckout } = require('../../checkout');
 const { makePreferences } = require('../../actions/preferences');
-const { delay, visible } = require('../../util');
 const {
   assertHomePage,
   fillUserDetails,
@@ -8,17 +7,18 @@ const {
   selectPaymentMethod,
   selectBank,
   assertNetbankingPage,
-  verifyHighDowntime,
   verifyLowDowntime,
+  verifyHighDowntime,
 } = require('../../actions/common');
 
-describe('Netbanking tests', () => {
-  test('perform netbaking transaction', async () => {
+describe('Netbanking tests', () => {
+  test('perform netbanking transaction with fee bearer', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 200,
+      amount: 600,
       personalization: false,
     };
+
     const preferences = makePreferences({
       payment_downtime: {
         entity: 'collection',

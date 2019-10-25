@@ -1,6 +1,6 @@
 const { openCheckout } = require('../../checkout');
 const { makePreferences } = require('../../actions/preferences');
-const { delay, visible } = require('../../util');
+const { delay } = require('../../util');
 const {
   assertHomePage,
   fillUserDetails,
@@ -10,15 +10,18 @@ const {
   assertNetbankingPage,
   verifyHighDowntime,
   verifyLowDowntime,
+  verifyTimeout,
 } = require('../../actions/common');
 
-describe('Netbanking tests', () => {
-  test('perform netbaking transaction', async () => {
+describe('Netbanking tests', () => {
+  test('perform netbaking transaction with timeout enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
       personalization: false,
+      timeout: 10,
     };
+
     const preferences = makePreferences({
       payment_downtime: {
         entity: 'collection',
@@ -66,5 +69,6 @@ describe('Netbanking tests', () => {
     await verifyHighDowntime(context, 'ICICI Bank');
     await selectBank(context, 'HDFC');
     await verifyLowDowntime(context, 'HDFC Bank');
+    await verifyTimeout(context, 'netbanking');
   });
 });

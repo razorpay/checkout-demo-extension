@@ -68,7 +68,7 @@
     "husky": "^1.0.0-rc.14",
     "prettier": "^1.18.2",
     "prettier-plugin-svelte": "^0.7.0",
-    "pretty-quick": "^1.11.1"
+    "pretty-quick": "^2.0.0"
   },
   "husky": {
     "hooks": {

@@ -57,10 +57,18 @@ async function enterCardDetails(context) {
 async function verifyErrorMessage(context, expectedErrorMeassage) {
   await delay(800);
   const messageDiv = await context.page.waitForSelector('#fd-t');
-  const messageText = await context.page.evaluate(
+  let messageText = await context.page.evaluate(
     messageDiv => messageDiv.textContent,
     messageDiv
   );
+  if (messageText == 'Your payment is being processed') {
+    await delay(800);
+    const messageDiv = await context.page.waitForSelector('#fd-t');
+    messageText = await context.page.evaluate(
+      messageDiv => messageDiv.textContent,
+      messageDiv
+    );
+  }
   expect(messageText).toEqual(expectedErrorMeassage);
 }
 async function verifyPartialAmount(context, amount) {
@@ -120,16 +128,27 @@ async function handleCardValidationWithCallback(context) {
 
 async function handleMockFailureDialog(context) {
   await delay(300);
-  const popup = await context.popup();
-  const popupPage = await popup.page();
+  let popup = await context.popup();
+  let popupPage = await popup.page();
+  if (popup == null || popupPage == null) {
+    await delay(400);
+    popup = await context.popup();
+    popupPage = await popup.page();
+  }
   const failButton = await popupPage.$('.danger');
   await failButton.click();
   await delay(800);
 }
 
 async function handleMockSuccessDialog(context) {
-  const popup = await context.popup();
-  const popupPage = await popup.page();
+  await delay(300);
+  let popup = await context.popup();
+  let popupPage = await popup.page();
+  if (popup == null || popupPage == null) {
+    await delay(400);
+    popup = await context.popup();
+    popupPage = await popup.page();
+  }
   const passButton = await popupPage.$('.success');
   await passButton.click();
   await delay(800);
@@ -174,7 +193,7 @@ async function retryWalletTransaction(context) {
 }
 
 async function retryCardTransaction(context) {
-  const retryButton = await context.page.$('#fd-hide');
+  const retryButton = await context.page.waitForSelector('#fd-hide');
   await retryButton.click();
   await delay(500);
 }
