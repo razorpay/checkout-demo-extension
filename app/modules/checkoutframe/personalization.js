@@ -333,9 +333,14 @@ export const listInstruments = customer => {
   const listOfInstrumentsToBeShown = isMobile() ? 3 : 2;
   const preferredMethods = {};
 
+  /**
+   * Preprending method name with an underscore
+   * because Lumberjack will delete a key called `card`.
+   * It won't delete `_card` though.
+   */
   _Arr.loop(
     currentCustomer.slice(0, listOfInstrumentsToBeShown),
-    instrument => (preferredMethods[instrument.method] = true)
+    instrument => (preferredMethods[`_${instrument.method}`] = true)
   );
 
   Analytics.track('p13n:instruments:list', {
