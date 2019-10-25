@@ -20,6 +20,7 @@
   import { getMethodPrefix } from 'checkoutframe/paymentmethods';
   import CheckoutStore from 'checkoutstore';
   import PreferencesStore from 'checkoutstore/preferences';
+  import { hasAnyInstrumentsOnDevice } from 'checkoutframe/personalization';
 
   // Props
   export let instruments = [];
@@ -88,12 +89,16 @@
       session.hasOffers &&
       _Arr.any(session.eligibleOffers, offer => offer.homescreen);
 
-    let shouldDisableP13n =
-      !session.get('personalization') ||
+    // P13n is supressed due to UI reasons
+    let p13nSupressed =
       hasOffersOnHomescreen ||
       session.methods.count === 1 ||
       CheckoutStore.get().optional.contact ||
-      CheckoutStore.get().isPartialPayment ||
+      CheckoutStore.get().isPartialPayment;
+
+    let shouldDisableP13n =
+      !session.get('personalization') ||
+      p13nSupressed ||
       session.tpvBank ||
       session.upiTpv ||
       session.multiTpv ||
@@ -115,6 +120,12 @@
     } else {
       disableP13n = false;
       session.p13n = true;
+    }
+
+    if (p13nSupressed && hasAnyInstrumentsOnDevice()) {
+      Analytics.setMeta('p13nsupressed', true);
+    } else {
+      Analytics.removeMeta('p13nsupressed');
     }
   });
 
