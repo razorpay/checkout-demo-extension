@@ -7,12 +7,16 @@ const {
   selectPaymentMethod,
   enterCardDetails,
   submit,
+  selectEMIPlanWithoutOffer,
+  verifyEMIPlansWithoutOffers,
+  handleEMIValidation,
+  handleMockSuccessDialog,
 } = require('../../actions/common');
 
 describe('Card tests', () => {
   test('perform card transaction', async () => {
     const options = {
-      order_id: 'rzp_test_1DP5mmOlF5G5ag',
+      key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 500000,
       personalization: false,
     };
@@ -26,5 +30,10 @@ describe('Card tests', () => {
     await selectPaymentMethod(context, 'emi');
     await enterCardDetails(context);
     await submit(context);
+    await verifyEMIPlansWithoutOffers(context, '6');
+    await selectEMIPlanWithoutOffer(context, '2');
+    await submit(context);
+    await handleEMIValidation(context);
+    await handleMockSuccessDialog(context);
   });
 });

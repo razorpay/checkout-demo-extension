@@ -9,8 +9,9 @@ const {
   submit,
   selectEMIPlanWithoutOffer,
   verifyEMIPlansWithoutOffers,
-  handleEMIValidation,
-  handleMockSuccessDialog,
+  verifyTimeout,
+  handlePartialPayment,
+  verifyPartialAmount,
 } = require('../../actions/common');
 
 describe('Card tests', () => {
@@ -19,19 +20,29 @@ describe('Card tests', () => {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 500000,
       personalization: false,
+      timeout: 10,
     };
-    const preferences = makePreferences();
+    const preferences = makePreferences({
+      order: {
+        amount: 300000,
+        amount_due: 300000,
+        amount_paid: 0,
+        currency: 'INR',
+        first_payment_min_amount: null,
+        partial_payment: true,
+      },
+    });
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true);
+    await handlePartialPayment(context, '3000');
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'emi');
     await enterCardDetails(context);
     await submit(context);
     await verifyEMIPlansWithoutOffers(context, '6');
     await selectEMIPlanWithoutOffer(context, '2');
-    await submit(context);
-    await handleEMIValidation(context);
-    await handleMockSuccessDialog(context);
+    await verifyPartialAmount(context, '₹ 3,000');
+    await verifyTimeout(context, 'emi');
   });
 });

@@ -9,6 +9,12 @@ const {
   enterCardDetails,
   selectOffer,
   verifyOfferApplied,
+  setPreferenceForOffer,
+  submit,
+  verifyEMIPlansWithOffers,
+  selectEMIPlanWithOffer,
+  handleMockSuccessDialog,
+  handleEMIValidation,
 } = require('../../actions/common');
 
 describe('Card tests', () => {
@@ -92,13 +98,7 @@ describe('Card tests', () => {
         },
       ],
     });
-
-    preferences.methods.emi_options.ICIC[0].subvention = 'merchant';
-    preferences.methods.emi_options.ICIC[1].subvention = 'merchant';
-
-    preferences.methods.emi_options.ICIC[0].offer_id = 'offer_DWcdgbZjWPlmou';
-    preferences.methods.emi_options.ICIC[1].offer_id = 'offer_DWcdgbZjWPlmou';
-
+    await setPreferenceForOffer(preferences);
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true);
@@ -108,5 +108,11 @@ describe('Card tests', () => {
     await viewOffers(context);
     await selectOffer(context, '6');
     await verifyOfferApplied(context);
+    await submit(context);
+    await verifyEMIPlansWithOffers(context, '2');
+    await selectEMIPlanWithOffer(context, '2');
+    await submit(context);
+    await handleEMIValidation(context);
+    await handleMockSuccessDialog(context);
   });
 });

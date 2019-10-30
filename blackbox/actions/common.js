@@ -40,23 +40,64 @@ module.exports = {
   viewOffers,
   selectOffer,
   verifyOfferApplied,
+  setPreferenceForOffer,
+  verifyEMIPlansWithOffers,
+  selectEMIPlanWithOffer,
+  verifyEMIPlansWithoutOffers,
+  selectEMIPlanWithoutOffer,
+  handleEMIValidation,
 };
+
+async function verifyEMIPlansWithOffers(context, offerNumber) {
+  for (var i = 1; i <= offerNumber; i++) {
+    const currentElement = await context.page.$eval(
+      '.expandable-card.expandable-card--has-badge:nth-of-type(' + i + ')',
+      visible
+    );
+    expect(currentElement).toEqual(true);
+  }
+}
+
+async function selectEMIPlanWithOffer(context, offerNumber) {
+  await context.page.click(
+    '.expandable-card.expandable-card--has-badge:nth-of-type(' +
+      offerNumber +
+      ')'
+  );
+}
+
+async function verifyEMIPlansWithoutOffers(context, offerNumber) {
+  for (var i = 1; i <= offerNumber; i++) {
+    const currentElement = await context.page.$eval(
+      '.expandable-card:nth-of-type(' + i + ')',
+      visible
+    );
+    expect(currentElement).toEqual(true);
+  }
+}
+
+async function selectEMIPlanWithoutOffer(context, offerNumber) {
+  await context.page.click('.expandable-card:nth-of-type(' + offerNumber + ')');
+}
 
 async function viewOffers(context) {
   await context.page.click('.offers-title');
-  // class="offers-title"selected-offer
 }
 
 async function selectOffer(context, offernumber) {
   await context.page.click('.offer.item:nth-of-type(' + offernumber + ')');
   await context.page.click('button[class = "button apply-offer"]');
-  // await delay(40000);
-  // selected-offer
+}
+
+async function setPreferenceForOffer(preferences) {
+  preferences.methods.emi_options.ICIC[0].subvention = 'merchant';
+  preferences.methods.emi_options.ICIC[1].subvention = 'merchant';
+  preferences.methods.emi_options.ICIC[0].offer_id = 'offer_DWcdgbZjWPlmou';
+  preferences.methods.emi_options.ICIC[1].offer_id = 'offer_DWcdgbZjWPlmou';
 }
 
 async function verifyOfferApplied(context) {
   expect(await context.page.$eval('.selected-offer', visible)).toEqual(true);
-  await delay(40000);
 }
 
 async function enterCardDetails(context) {
@@ -121,10 +162,26 @@ async function submit(context) {
   await delay(300);
   context.page.click('#footer');
   await delay(1000);
-  await delay(40000);
 }
 
 async function handleCardValidation(context) {
+  await context.expectRequest();
+  await context.respondJSON({
+    type: 'first',
+    request: {
+      url:
+        'https://api.razorpay.com/v1/gateway/mocksharp/payment?key_id=rzp_test_1DP5mmOlF5G5ag&action=authorize&amount=5100&method=card&payment_id=DLXKaJEF1T1KxC&callback_url=https%3A%2F%2Fapi.razorpay.com%2Fv1%2Fpayments%2Fpay_DLXKaJEF1T1KxC%2Fcallback%2F10b9b52d2b5974f35acfec916f3785eab0c98325%2Frzp_test_1DP5mmOlF5G5ag&recurring=0&card_number=eyJpdiI6ImdnUm9BbnZucTRMU09VWiswMHQ1WFE9PSIsInZhbHVlIjoiSkpwZjJOd2htQlcza2dzYnNiRjJFb3ZqUlVaNGw4WEtLWDgyOVVxYnN4ST0iLCJtYWMiOiIxZDg2YTBlYWY3MGEyNzE5NWQ1NzNhNTRiMjc4ZTZhZTFlYTQxNDUyNWU1NjkzOTNlYTEzYjljZmM0YWY1NGIyIn0%3D&encrypt=1',
+      method: 'get',
+      content: [],
+    },
+    payment_id: 'pay_DLXKaJEF1T1KxC',
+    amount: '\u20b9 51',
+    image: 'https://cdn.razorpay.com/logos/D3JjREAG8erHB7_medium.jpg',
+  });
+  await delay(1000);
+}
+
+async function handleEMIValidation(context) {
   await context.expectRequest();
   await context.respondJSON({
     type: 'first',
@@ -317,7 +374,11 @@ async function typeOTP(context) {
 }
 
 async function verifyTimeout(context, paymentMode) {
-  if (paymentMode == 'netbanking' || paymentMode == 'card') {
+  if (
+    paymentMode == 'netbanking' ||
+    paymentMode == 'card' ||
+    paymentMode == 'emi'
+  ) {
     await delay(2000);
     expect(await context.page.$('#fd-hide')).not.toEqual(null);
     await delay(8000);

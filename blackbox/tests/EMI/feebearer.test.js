@@ -11,6 +11,7 @@ const {
   verifyEMIPlansWithoutOffers,
   handleEMIValidation,
   handleMockSuccessDialog,
+  handleFeeBearer,
 } = require('../../actions/common');
 
 describe('Card tests', () => {
@@ -20,7 +21,7 @@ describe('Card tests', () => {
       amount: 500000,
       personalization: false,
     };
-    const preferences = makePreferences();
+    const preferences = makePreferences({ fee_bearer: true });
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true);
@@ -31,6 +32,7 @@ describe('Card tests', () => {
     await verifyEMIPlansWithoutOffers(context, '6');
     await selectEMIPlanWithoutOffer(context, '2');
     await submit(context);
+    await handleFeeBearer(context, page);
     await handleEMIValidation(context);
     await handleMockSuccessDialog(context);
   });

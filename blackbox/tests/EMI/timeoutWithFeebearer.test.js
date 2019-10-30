@@ -9,8 +9,8 @@ const {
   submit,
   selectEMIPlanWithoutOffer,
   verifyEMIPlansWithoutOffers,
-  handleEMIValidation,
-  handleMockSuccessDialog,
+  verifyTimeout,
+  handleFeeBearer,
 } = require('../../actions/common');
 
 describe('Card tests', () => {
@@ -19,8 +19,9 @@ describe('Card tests', () => {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 500000,
       personalization: false,
+      timeout: 10,
     };
-    const preferences = makePreferences();
+    const preferences = makePreferences({ fee_bearer: true });
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true);
@@ -31,7 +32,7 @@ describe('Card tests', () => {
     await verifyEMIPlansWithoutOffers(context, '6');
     await selectEMIPlanWithoutOffer(context, '2');
     await submit(context);
-    await handleEMIValidation(context);
-    await handleMockSuccessDialog(context);
+    await handleFeeBearer(context, page);
+    await verifyTimeout(context, 'emi');
   });
 });
