@@ -92,11 +92,13 @@ describe('Card tests', () => {
         },
       ],
     });
+
     preferences.methods.emi_options.ICIC[0].subvention = 'merchant';
     preferences.methods.emi_options.ICIC[1].subvention = 'merchant';
 
     preferences.methods.emi_options.ICIC[0].offer_id = 'offer_DWcdgbZjWPlmou';
     preferences.methods.emi_options.ICIC[1].offer_id = 'offer_DWcdgbZjWPlmou';
+
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true);

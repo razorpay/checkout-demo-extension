@@ -16,7 +16,7 @@ describe('Card tests', () => {
       amount: 500000,
       personalization: false,
     };
-    const preferences = makePreferences({ emi_subvention: 'customer' });
+    const preferences = makePreferences();
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true);

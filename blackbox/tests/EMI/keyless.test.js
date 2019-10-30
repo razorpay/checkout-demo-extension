@@ -18,7 +18,6 @@ describe('Card tests', () => {
     };
     const preferences = makePreferences({
       optional: ['contact'],
-      emi_subvention: 'customer',
     });
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
