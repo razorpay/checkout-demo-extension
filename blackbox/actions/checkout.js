@@ -1,3 +1,4 @@
+const querystring = require('querystring');
 const { readFileSync } = require('fs');
 const { cdnUrl, lumberjackUrl } = require('../const');
 const { interceptor } = require('../util');
@@ -15,22 +16,23 @@ const fontContent = readFileSync('app/fonts/lato.woff2');
 
 function checkoutRequestHandler(request) {
   const url = request.url();
-  switch (url) {
-    case checkoutPublic:
-      return request.respond({ body: htmlContent });
-    case checkoutCss:
-      return request.respond({ body: cssContent });
-    case checkoutJs:
-      return request.respond({ body: jsContent });
-    case checkoutFont:
-      return request.respond({
-        body: fontContent,
-        headers: { 'Access-Control-Allow-Origin': '*' },
-      });
-    default:
-      throw new Error(
-        `unexpected resource URL while loading checkout-public: ${url}`
-      );
+  if (url.startsWith(checkoutPublic)) {
+    return request.respond({ body: htmlContent });
+  } else if (url.endsWith('favicon.ico')) {
+    return request.respond({ status: 204 });
+  } else if (url === checkoutCss) {
+    return request.respond({ body: cssContent });
+  } else if (url === checkoutJs) {
+    return request.respond({ body: jsContent });
+  } else if (url === checkoutFont) {
+    return request.respond({
+      body: fontContent,
+      headers: { 'Access-Control-Allow-Origin': '*' },
+    });
+  } else {
+    throw new Error(
+      `unexpected resource URL while loading checkout-public: ${url}`
+    );
   }
 }
 
@@ -71,23 +73,23 @@ async function passOptions({ page, options }) {
 
 let interceptorOptions;
 module.exports = {
-  async openCheckout({ page, options, preferences }) {
+  async openCheckout({ page, options, preferences, params }) {
+    let checkoutUrl = checkoutPublic;
+    if (params) checkoutUrl += '?' + querystring.stringify(params);
     if (interceptorOptions) {
-      // turn off the interceptor
-      interceptorOptions.toggle();
+      interceptorOptions.disableInterceptor();
       page.removeListener('request', cdnRequestHandler);
     } else {
       await page.setRequestInterception(true);
     }
 
     page.on('request', checkoutRequestHandler);
-    await page.goto(checkoutPublic);
+    await page.goto(checkoutUrl);
     page.removeListener('request', checkoutRequestHandler);
     page.on('request', cdnRequestHandler);
 
     if (interceptorOptions) {
-      // turn on interceptor
-      interceptorOptions.toggle();
+      interceptorOptions.enableInterceptor();
     } else {
       interceptorOptions = interceptor(page);
     }
@@ -105,6 +107,11 @@ module.exports = {
           default:
             return targets[targets.length - 1];
         }
+      },
+      async callbackPage(response) {
+        const req = await interceptorOptions.expectRequest();
+        expect(req.raw.isNavigationRequest()).toBe(true);
+        expect(req.method).toBe('POST');
       },
     };
 
