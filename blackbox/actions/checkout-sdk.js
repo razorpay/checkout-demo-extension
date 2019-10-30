@@ -1,6 +1,6 @@
 const { openCheckout } = require('./checkout');
 
-async function openSdkCheckout({ page, options, preferences }) {
+async function openSdkCheckout({ page, options, preferences, apps }) {
   let paymentResult = null;
   let resolver = null;
 
@@ -11,6 +11,7 @@ async function openSdkCheckout({ page, options, preferences }) {
         page,
         options,
         preferences,
+        apps,
         params: {
           'error.description': data.error.description,
         },
@@ -32,7 +33,7 @@ async function openSdkCheckout({ page, options, preferences }) {
     };
   });
 
-  const context = await openCheckout({ page, options, preferences });
+  const context = await openCheckout({ page, options, preferences, apps });
 
   const returnObj = {
     ...context,

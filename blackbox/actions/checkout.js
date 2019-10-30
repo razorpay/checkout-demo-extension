@@ -67,13 +67,9 @@ async function passMessage(page, message) {
   await page.evaluate(message => handleMessage(message), message);
 }
 
-async function passOptions({ page, options }) {
-  await passMessage(page, { options });
-}
-
 let interceptorOptions;
 module.exports = {
-  async openCheckout({ page, options, preferences, params }) {
+  async openCheckout({ page, options, preferences, params, apps }) {
     let checkoutUrl = checkoutPublic;
     if (params) checkoutUrl += '?' + querystring.stringify(params);
     if (interceptorOptions) {
@@ -115,7 +111,11 @@ module.exports = {
       },
     };
 
-    if (options) await passOptions(returnObj);
+    if (options) {
+      const message = { options };
+      if (apps) message.upi_intents_data = apps;
+      await passMessage(page, message);
+    }
     if (preferences) await sendPreferences(returnObj);
 
     return returnObj;
