@@ -47,8 +47,8 @@ async function viewOffers(context) {
   // class="offers-title"selected-offer
 }
 
-async function selectOffer(context) {
-  await context.page.click('.offer-name.left-align');
+async function selectOffer(context, offernumber) {
+  await context.page.click('.offer.item:nth-of-type(' + offernumber + ')');
   await context.page.click('button[class = "button apply-offer"]');
   // await delay(40000);
   // selected-offer

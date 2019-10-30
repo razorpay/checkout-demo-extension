@@ -19,8 +19,6 @@ describe('Card tests', () => {
       personalization: false,
     };
     const preferences = makePreferences({
-      emi_subvention: 'merchant',
-      offer_id: 'offer_DWcdgbZjWPlmou',
       offers: [
         {
           id: 'offer_DWcU6U9B3jV8Aa',
@@ -94,6 +92,11 @@ describe('Card tests', () => {
         },
       ],
     });
+    preferences.methods.emi_options.ICIC[0].subvention = 'merchant';
+    preferences.methods.emi_options.ICIC[1].subvention = 'merchant';
+
+    preferences.methods.emi_options.ICIC[0].offer_id = 'offer_DWcdgbZjWPlmou';
+    preferences.methods.emi_options.ICIC[1].offer_id = 'offer_DWcdgbZjWPlmou';
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true);
@@ -101,7 +104,7 @@ describe('Card tests', () => {
     await selectPaymentMethod(context, 'emi');
     await enterCardDetails(context);
     await viewOffers(context);
-    await selectOffer(context);
+    await selectOffer(context, '6');
     await verifyOfferApplied(context);
   });
 });
