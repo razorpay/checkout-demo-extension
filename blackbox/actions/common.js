@@ -37,11 +37,31 @@ module.exports = {
   expectMockSuccessWithCallback,
   expectMockFailureWithCallback,
   handleMockSuccessDialog,
+  viewOffers,
+  selectOffer,
+  verifyOfferApplied,
 };
+
+async function viewOffers(context) {
+  await context.page.click('.offers-title');
+  // class="offers-title"selected-offer
+}
+
+async function selectOffer(context) {
+  await context.page.click('.offer-name.left-align');
+  await context.page.click('button[class = "button apply-offer"]');
+  // await delay(40000);
+  // selected-offer
+}
+
+async function verifyOfferApplied(context) {
+  expect(await context.page.$eval('.selected-offer', visible)).toEqual(true);
+  await delay(40000);
+}
 
 async function enterCardDetails(context) {
   const cardNum = await context.page.waitForSelector('#card_number');
-  await cardNum.type('4111111111111111');
+  await cardNum.type('5241 9333 8074 0001');
   await context.expectRequest(req => {});
   await context.respondJSON({
     recurring: false,
@@ -51,7 +71,6 @@ async function enterCardDetails(context) {
   await context.page.type('#card_expiry', '12/55');
   await context.page.type('#card_name', 'SakshiJain');
   await context.page.type('#card_cvv', '112');
-  //   await delay(10000);
 }
 
 async function verifyErrorMessage(context, expectedErrorMeassage) {
@@ -102,6 +121,7 @@ async function submit(context) {
   await delay(300);
   context.page.click('#footer');
   await delay(1000);
+  await delay(40000);
 }
 
 async function handleCardValidation(context) {

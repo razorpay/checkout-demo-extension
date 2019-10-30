@@ -51,6 +51,9 @@ module.exports = {
     return {
       options: {},
       methods: {
+        emi_subvention: 'merchant',
+        offer_id: 'offer_DWcdgbZjWPlmou',
+        emi: true,
         ...card,
         wallet,
         netbanking,
