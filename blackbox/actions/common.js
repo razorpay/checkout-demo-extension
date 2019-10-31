@@ -37,7 +37,58 @@ module.exports = {
   expectMockSuccessWithCallback,
   expectMockFailureWithCallback,
   handleMockSuccessDialog,
+  selectUPIMethod,
+  enterUPIAccount,
+  handleUPIAccountValidation,
+  respondToUPIAjax,
+  respondToUPIPaymentStatus,
 };
+
+async function respondToUPIAjax(context) {
+  const req = await context.expectRequest();
+  expect(req.url).toContain('create/ajax');
+  await context.respondJSON({
+    type: 'async',
+    version: 1,
+    payment_id: 'pay_DaaBCIH1rZXZg5',
+    gateway:
+      'eyJpdiI6IjdzTEZcLzUzUVN5dHBORHlZRFc2TVh3PT0iLCJ2YWx1ZSI6IldXeDdpWVFTSWhLbThLOWtXancrNEhRRkl0ZE5peDNDSDJnMUJTVmg4THc9IiwibWFjIjoiMGVhYjFhMDAyYzczNDlkMTI0OGFiMDRjMGJlZDVjZTA5MjM0YTcyNjI0ODQ1MzExMWViZjVjY2QxMGUwZDZmYiJ9',
+    data: null,
+    request: {
+      url:
+        'https://api.razorpay.com/v1/payments/pay_DaaBCIH1rZXZg5/status?key_id=rzp_test_1DP5mmOlF5G5ag',
+      method: 'GET',
+    },
+  });
+}
+
+async function respondToUPIPaymentStatus(context) {
+  const req = await context.expectRequest();
+  expect(req.url).toContain('status?key_id');
+  await context.respondJSON({
+    razorpay_payment_id: 'pay_DaaBCIH1rZXZg5',
+    http_status_code: 200,
+  });
+}
+
+async function handleUPIAccountValidation(context, vpa) {
+  const req = await context.expectRequest();
+  expect(req.url).toContain('validate/account');
+  await context.respondJSON({ vpa: vpa, success: true, customer_name: null });
+  await delay(1000);
+}
+
+async function selectUPIMethod(context, UPIMethod) {
+  const upibutton = await context.page.$x(
+    '//*[contains(@class,"ref-text") and text() = "' + UPIMethod + '"]'
+  );
+  await upibutton[0].click();
+}
+
+async function enterUPIAccount(context, UPIAccountId) {
+  const vpaField = await context.page.waitForSelector('#vpa');
+  await vpaField.type(UPIAccountId);
+}
 
 async function enterCardDetails(context) {
   const cardNum = await context.page.waitForSelector('#card_number');
@@ -174,7 +225,7 @@ async function expectMockSuccessWithCallback(context) {
 }
 
 async function handleValidationRequest(context, passOrFail) {
-  await context.expectRequest(req => {});
+  const req = await context.expectRequest();
   if (passOrFail == 'fail') {
     await context.failRequest({ error: 'failed' });
   } else if (passOrFail == 'pass') {

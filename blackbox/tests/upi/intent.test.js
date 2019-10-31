@@ -36,7 +36,11 @@ describe('Basic upi payment', () => {
     await page.click('.option');
     await submit(context);
 
-    await context.expectRequest(req => {});
+    const reqorg = await context.expectRequest();
+    expect(reqorg.url).toEqual(
+      'https://api.razorpay.com/v1/payments/create/ajax'
+    );
+    expect(reqorg.method).toEqual('POST');
     await context.respondJSON({
       data: {
         intent_url:
