@@ -16,8 +16,8 @@ const {
   handleFeeBearer,
 } = require('../../actions/common');
 
-describe('Card tests', () => {
-  test('perform card transaction', async () => {
+describe('EMI tests', () => {
+  test('perform EMI transaction with partial payments and feebearer enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 500000,
