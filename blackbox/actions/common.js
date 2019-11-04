@@ -393,9 +393,9 @@ async function verifyTimeout(context, paymentMode) {
     paymentMode == 'card' ||
     paymentMode == 'upi'
   ) {
-    await delay(2000);
+    await delay(1000);
     expect(await context.page.$('#fd-hide')).not.toEqual(null);
-    await delay(8000);
+    await delay(10000);
     expect(await context.page.$('#fd-hide')).toEqual(null);
   } else if (paymentMode == 'wallet') {
     await delay(5000);
