@@ -90,7 +90,7 @@
       _Arr.any(session.eligibleOffers, offer => offer.homescreen);
 
     // P13n is supressed due to UI reasons
-    let p13nSupressed =
+    const p13nSuppressed =
       hasOffersOnHomescreen ||
       session.methods.count === 1 ||
       CheckoutStore.get().optional.contact ||
@@ -98,7 +98,7 @@
 
     let shouldDisableP13n =
       !session.get('personalization') ||
-      p13nSupressed ||
+      p13nSuppressed ||
       session.tpvBank ||
       session.upiTpv ||
       session.multiTpv ||
@@ -122,10 +122,10 @@
       session.p13n = true;
     }
 
-    if (p13nSupressed && hasAnyInstrumentsOnDevice()) {
-      Analytics.setMeta('p13nsupressed', true);
+    if (p13nSuppressed && hasAnyInstrumentsOnDevice()) {
+      Analytics.setMeta('p13nsuppressed', true);
     } else {
-      Analytics.removeMeta('p13nsupressed');
+      Analytics.removeMeta('p13nsuppressed');
     }
   });
 
