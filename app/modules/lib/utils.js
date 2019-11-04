@@ -55,3 +55,15 @@ function bringIntoView(el) {
 
   return el;
 }
+
+const map = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#x27;',
+  '/': '&#x2F;',
+};
+export function sanitizeHtmlEntities(string) {
+  return string.replace(/[&<>"'/]/g, match => map[match]);
+}
