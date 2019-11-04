@@ -42,7 +42,45 @@ module.exports = {
   handleUPIAccountValidation,
   respondToUPIAjax,
   respondToUPIPaymentStatus,
+  respondAndVerifyIntentRequest,
+  selectUPIApp,
 };
+
+async function selectUPIApp(context, AppNumber) {
+  await context.page.click('.option:nth-of-type(' + AppNumber + ')');
+}
+
+async function respondAndVerifyIntentRequest(context) {
+  const reqorg = await context.expectRequest();
+  expect(reqorg.url).toEqual(
+    'https://api.razorpay.com/v1/payments/create/ajax'
+  );
+  expect(reqorg.method).toEqual('POST');
+  await context.respondJSON({
+    data: {
+      intent_url:
+        'upi://pay?pa=upi@razopay&pn=RBLBank&tr=4kHrR0CI9jEazLO&tn=razorpay&am=1&cu=INR&mc=5411',
+    },
+    payment_id: 'pay_DaFKujjV6Ajr7W',
+    request: {
+      method: 'GET',
+      url:
+        'https://api.razorpay.com/v1/payments/pay_DaFKujjV6Ajr7W/status?key_id=rzp_test_1DP5mmOlF5G5ag',
+    },
+    type: 'intent',
+  });
+  await delay(100);
+  await page.evaluate(() => upiIntentResponse({ response: { txnId: '123' } }));
+  await delay(100);
+
+  const successResult = { razorpay_payment_id: 'pay_DaFKujjV6Ajr7W' };
+  const req = await context.expectRequest();
+  await context.respondPlain(
+    `${req.params.callback}(${JSON.stringify(successResult)})`
+  );
+  const result = await context.getResult();
+  expect(result).toMatchObject(successResult);
+}
 
 async function respondToUPIAjax(context) {
   const req = await context.expectRequest();
@@ -134,6 +172,8 @@ async function verifyPartialAmount(context, amount) {
 async function handlePartialPayment(context, amount) {
   const makePartialCheckBox = await context.page.waitForSelector('.checkbox');
   await makePartialCheckBox.click();
+  // await makePartialCheckBox.click();
+  // await makePartialCheckBox.click();
   const amountValue = await context.page.waitForSelector('#amount-value');
   await amountValue.type(amount);
   const nextButton = await context.page.waitForSelector('#next-button');
@@ -348,7 +388,11 @@ async function typeOTP(context) {
 }
 
 async function verifyTimeout(context, paymentMode) {
-  if (paymentMode == 'netbanking' || paymentMode == 'card') {
+  if (
+    paymentMode == 'netbanking' ||
+    paymentMode == 'card' ||
+    paymentMode == 'upi'
+  ) {
     await delay(2000);
     expect(await context.page.$('#fd-hide')).not.toEqual(null);
     await delay(8000);

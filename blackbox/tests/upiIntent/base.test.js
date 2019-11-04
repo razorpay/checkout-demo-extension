@@ -1,22 +1,13 @@
-const { openCheckout } = require('../../actions/checkout');
+const { openSdkCheckout } = require('../../actions/checkout-sdk');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
-  selectWallet,
-  assertWalletPage,
   submit,
-  typeOTPandSubmit,
-  handleOtpVerification,
-  handleValidationRequest,
-  retryWalletTransaction,
-  selectUPIMethod,
-  enterUPIAccount,
-  handleUPIAccountValidation,
-  respondToUPIAjax,
-  respondToUPIPaymentStatus,
+  respondAndVerifyIntentRequest,
+  selectUPIApp,
 } = require('../../actions/common');
 
 describe('Basic upi payment', () => {
@@ -28,16 +19,18 @@ describe('Basic upi payment', () => {
     };
     const preferences = makePreferences();
     preferences.methods.upi = true;
-    const context = await openCheckout({ page, options, preferences });
+    const context = await openSdkCheckout({
+      page,
+      options,
+      preferences,
+      apps: [{ package_name: 'in.org.npci.upiapp', app_name: 'BHIM' }],
+    });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIMethod(context, 'BHIM');
-    await enterUPIAccount(context, 'BHIM');
+    await selectUPIApp(context, '1');
     await submit(context);
-    await handleUPIAccountValidation(context, 'BHIM@upi');
-    await respondToUPIAjax(context);
-    await respondToUPIPaymentStatus(context);
+    await respondAndVerifyIntentRequest(context);
   });
 });
