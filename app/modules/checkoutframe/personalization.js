@@ -109,6 +109,19 @@ const filterInstruments = instruments => {
 };
 
 /**
+ * Does this device have any instruments at all?
+ *
+ * @returns {boolean}
+ */
+export function hasAnyInstrumentsOnDevice() {
+  try {
+    return _Obj.keys(_Obj.parse(get(PREFERRED_INSTRUMENTS)) || {}).length > 0;
+  } catch (err) {
+    return false;
+  }
+}
+
+/**
  * Creates an instrument.
  * Only used to create PayPal instrument at runtime.
  * Not ready yet to be used everywhere.
