@@ -1,7 +1,8 @@
 `
-var bank_account = _.prefill.bank_account;
-var bank_name = _.prefill.bank_name;
-var bank_ifsc = _.prefill.bank_ifsc;
+var html = function(html){return html && html.replace(/<[^>]*>?/g, "")};
+var bank_account = html(_.prefill.bank_account);
+var bank_name = html(_.prefill.bank_name);
+var bank_ifsc = html(_.prefill.bank_ifsc);
 var ifsc_pattern = '^[a-zA-Z]{4}[a-zA-Z0-9]{7}$';
 var bank = _.prefill.bank;
 

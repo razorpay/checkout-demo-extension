@@ -1,6 +1,7 @@
 import { displayAmount } from 'common/currency';
 import css from './popup.styl';
 import { cancelMsg } from 'common/strings';
+import { sanitizeHtmlEntities } from 'lib/utils';
 
 const cancelError = _Obj.stringify(_.rzpError(cancelMsg));
 
@@ -9,7 +10,9 @@ export default function popupTemplate(_) {
   var method = _.data && _.data.method === 'wallet' ? 'wallet' : 'bank';
   var color = get('theme.color') || '#3594E2';
   var highlightColor = _.r.themeMeta.highlightColor;
-  var title = get('name') || get('description') || 'Redirecting...';
+  var title =
+    get('name') || get('description') || 'Redirecting...'
+    |> sanitizeHtmlEntities;
   var amount = displayAmount(
     _.r,
     _.data && _.data.amount,
@@ -19,11 +22,14 @@ export default function popupTemplate(_) {
     _.data && _.data.method === 'emandate' ? 'display: none;' : '';
 
   var image = get('image');
-  image = image ? `<div id="logo"><img src="${image}"/></div>` : '';
+  image = image
+    ? `<div id="logo"><img src="${image.replace(/"/g, '')}"/></div>`
+    : '';
 
   var message =
     _.message ||
-    'Please wait while we redirect you to your ' + method + ' page.';
+      'Please wait while we redirect you to your ' + method + ' page.'
+    |> sanitizeHtmlEntities;
 
   return `<!doctype html><html style="height:100%;width:100%;"><head>
 <title>Processing, Please Wait...</title>
