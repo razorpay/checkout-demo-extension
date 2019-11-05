@@ -6275,10 +6275,13 @@ Session.prototype = {
           return that.showLoadError('Waiting for payment confirmation.');
         }
 
-        /* Otherwise it's directpay */
-        that.showLoadError(
-          "Please accept the request from Razorpay's VPA on your UPI app"
-        );
+        if (that.isOmnichannel()) {
+          that.showOmnichannelLoader(that.getOmnichannelMessage());
+        } else {
+          that.showLoadError(
+            "Please accept the request from Razorpay's VPA on your UPI app"
+          );
+        }
       });
     } else {
       if (!this.headless) {
