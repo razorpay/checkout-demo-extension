@@ -358,23 +358,23 @@ async function selectBank(context, bank) {
   await context.page.select('#bank-select', bank);
 }
 
-async function verifyHighDowntime(context, bank) {
+async function verifyHighDowntime(context, message) {
   const toolTip = await context.page.waitForSelector('.downtime .tooltip');
   const toolTipText = await context.page.evaluate(
     toolTip => toolTip.textContent,
     toolTip
   );
-  expect(toolTipText).toContain(bank);
+  expect(toolTipText).toContain(message);
 }
 
-async function verifyLowDowntime(context, bank) {
+async function verifyLowDowntime(context, message) {
   const warningDiv = await context.page.waitForSelector('.downtime-callout');
   // console.log(warningDiv);
   const warningText = await context.page.evaluate(
     warningDiv => warningDiv.textContent,
     warningDiv
   );
-  expect(warningText).toContain(bank);
+  expect(warningText).toContain(message);
 }
 
 async function typeOTPandSubmit(context) {
