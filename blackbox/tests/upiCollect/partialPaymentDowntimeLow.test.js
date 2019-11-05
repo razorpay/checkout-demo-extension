@@ -17,7 +17,7 @@ const {
 } = require('../../actions/common');
 
 describe('Basic upi payment', () => {
-  test('Perform upi collect transaction with partial payments enabled', async () => {
+  test('Verify UPI downtime - Low with partial payments enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 30000,

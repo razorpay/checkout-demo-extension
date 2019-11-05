@@ -5,17 +5,18 @@ const {
   fillUserDetails,
   assertPaymentMethods,
   verifyHighDowntime,
+  verifyTimeout,
 } = require('../../actions/common');
 
 describe('Basic upi payment', () => {
-  test('Verify UPI downtime - High with contact optional', async () => {
+  test('Verify UPI downtime - High with timeout enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
       personalization: false,
+      timeout: 10,
     };
     const preferences = makePreferences({
-      optional: ['contact'],
       payment_downtime: {
         entity: 'collection',
         count: 1,
@@ -38,11 +39,12 @@ describe('Basic upi payment', () => {
     preferences.methods.upi = true;
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, false);
+    await fillUserDetails(context, true);
     await assertPaymentMethods(context);
     await verifyHighDowntime(
       context,
       'UPI is facing temporary issues right now. Please select another method.'
     );
+    await verifyTimeout(context, 'upi');
   });
 });

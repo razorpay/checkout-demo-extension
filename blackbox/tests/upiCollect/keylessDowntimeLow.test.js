@@ -1,6 +1,5 @@
 const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
-const { delay, visible } = require('../../util');
 const {
   assertHomePage,
   fillUserDetails,
