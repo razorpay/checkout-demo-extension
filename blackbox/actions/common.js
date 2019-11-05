@@ -44,6 +44,15 @@ module.exports = {
   respondToUPIPaymentStatus,
   respondAndVerifyIntentRequest,
   selectUPIApp,
+  viewOffers,
+  selectOffer,
+  verifyOfferApplied,
+  setPreferenceForOffer,
+  verifyEMIPlansWithOffers,
+  selectEMIPlanWithOffer,
+  verifyEMIPlansWithoutOffers,
+  selectEMIPlanWithoutOffer,
+  handleEMIValidation,
 };
 
 async function selectUPIApp(context, AppNumber) {
@@ -131,9 +140,67 @@ async function enterUPIAccount(context, UPIAccountId) {
   await vpaField.type(UPIAccountId);
 }
 
+async function verifyEMIPlansWithOffers(context, offerNumber) {
+  // await delay(40000);
+  for (var i = 1; i <= offerNumber; i++) {
+    const currentElement = await context.page.$eval(
+      '.emi-plans-list .expandable-card.expandable-card--has-badge:nth-of-type(' +
+        i +
+        ')',
+      visible
+    );
+    expect(currentElement).toEqual(true);
+  }
+}
+
+async function selectEMIPlanWithOffer(context, offerNumber) {
+  await context.page.click(
+    '.emi-plans-list .expandable-card.expandable-card--has-badge:nth-of-type(' +
+      offerNumber +
+      ')'
+  );
+}
+
+async function verifyEMIPlansWithoutOffers(context, offerNumber) {
+  for (var i = 1; i <= offerNumber; i++) {
+    const currentElement = await context.page.$eval(
+      '.emi-plans-list .expandable-card:nth-of-type(' + i + ')',
+      visible
+    );
+    expect(currentElement).toEqual(true);
+  }
+}
+
+async function selectEMIPlanWithoutOffer(context, offerNumber) {
+  await context.page.click(
+    '.emi-plans-list .expandable-card:nth-of-type(' + offerNumber + ')'
+  );
+}
+
+async function viewOffers(context) {
+  await context.page.click('.offers-title');
+}
+
+async function selectOffer(context, offernumber) {
+  await context.page.click('.offer.item:nth-of-type(' + offernumber + ')');
+  await context.page.click('button[class = "button apply-offer"]');
+}
+
+async function setPreferenceForOffer(preferences) {
+  preferences.methods.emi_options.ICIC[0].subvention = 'merchant';
+  preferences.methods.emi_options.ICIC[1].subvention = 'merchant';
+  preferences.methods.emi_options.ICIC[0].offer_id = 'offer_DWcdgbZjWPlmou';
+  preferences.methods.emi_options.ICIC[1].offer_id = 'offer_DWcdgbZjWPlmou';
+  return preferences;
+}
+
+async function verifyOfferApplied(context) {
+  expect(await context.page.$eval('.selected-offer', visible)).toEqual(true);
+}
+
 async function enterCardDetails(context) {
   const cardNum = await context.page.waitForSelector('#card_number');
-  await cardNum.type('4111111111111111');
+  await cardNum.type('5241 9333 8074 0001');
   await context.expectRequest(req => {});
   await context.respondJSON({
     recurring: false,
@@ -143,7 +210,6 @@ async function enterCardDetails(context) {
   await context.page.type('#card_expiry', '12/55');
   await context.page.type('#card_name', 'SakshiJain');
   await context.page.type('#card_cvv', '112');
-  //   await delay(10000);
 }
 
 async function verifyErrorMessage(context, expectedErrorMeassage) {
@@ -203,6 +269,23 @@ async function submit(context) {
 async function handleCardValidation(context) {
   const req = await context.expectRequest();
   expect(req.url).toContain('create/ajax');
+  await context.respondJSON({
+    type: 'first',
+    request: {
+      url:
+        'https://api.razorpay.com/v1/gateway/mocksharp/payment?key_id=rzp_test_1DP5mmOlF5G5ag&action=authorize&amount=5100&method=card&payment_id=DLXKaJEF1T1KxC&callback_url=https%3A%2F%2Fapi.razorpay.com%2Fv1%2Fpayments%2Fpay_DLXKaJEF1T1KxC%2Fcallback%2F10b9b52d2b5974f35acfec916f3785eab0c98325%2Frzp_test_1DP5mmOlF5G5ag&recurring=0&card_number=eyJpdiI6ImdnUm9BbnZucTRMU09VWiswMHQ1WFE9PSIsInZhbHVlIjoiSkpwZjJOd2htQlcza2dzYnNiRjJFb3ZqUlVaNGw4WEtLWDgyOVVxYnN4ST0iLCJtYWMiOiIxZDg2YTBlYWY3MGEyNzE5NWQ1NzNhNTRiMjc4ZTZhZTFlYTQxNDUyNWU1NjkzOTNlYTEzYjljZmM0YWY1NGIyIn0%3D&encrypt=1',
+      method: 'get',
+      content: [],
+    },
+    payment_id: 'pay_DLXKaJEF1T1KxC',
+    amount: '\u20b9 51',
+    image: 'https://cdn.razorpay.com/logos/D3JjREAG8erHB7_medium.jpg',
+  });
+  await delay(1000);
+}
+
+async function handleEMIValidation(context) {
+  await context.expectRequest();
   await context.respondJSON({
     type: 'first',
     request: {
@@ -400,7 +483,8 @@ async function verifyTimeout(context, paymentMode) {
   if (
     paymentMode == 'netbanking' ||
     paymentMode == 'card' ||
-    paymentMode == 'upi'
+    paymentMode == 'upi' ||
+    paymentMode == 'emi'
   ) {
     await delay(1000);
     expect(await context.page.$('#fd-hide')).not.toEqual(null);
