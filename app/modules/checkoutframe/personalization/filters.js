@@ -90,16 +90,13 @@ const SANITY_FILTERS = {
  * @returns {Array} filtered instruments
  */
 export function filterInstrumentsForSanity(instruments) {
-  return (
-    instruments
-    |> _Arr.filter(instrument => {
-      if (SANITY_FILTERS[instrument.method]) {
-        return SANITY_FILTERS[method](instrument);
-      }
+  return _Arr.filter(instruments, instrument => {
+    if (SANITY_FILTERS[instrument.method]) {
+      return SANITY_FILTERS[instrument.method](instrument);
+    }
 
-      return true;
-    })
-  );
+    return true;
+  });
 }
 
 /**
@@ -113,26 +110,23 @@ export function filterInstrumentsForDowntime(instruments) {
     disable: { methods: disabledMethods = [], banks: disabledBanks = [] },
   } = DowntimesStore.get();
 
-  return (
-    instruments
-    |> _Arr.filter(instrument => {
-      // Remove instruments for which there is a downtime
-      if (_Arr.contains(disabledMethods, instrument.method)) {
-        return false;
-      }
+  return _Arr.filter(instruments, instrument => {
+    // Remove instruments for which there is a downtime
+    if (_Arr.contains(disabledMethods, instrument.method)) {
+      return false;
+    }
 
-      switch (instrument.method) {
-        case 'netbanking':
-          // If the instrument is netbanking, remove it if it has a severe downtime
-          if (_Arr.contains(disabledBanks, instrument.bank)) {
-            return false;
-          }
-          break;
-      }
+    switch (instrument.method) {
+      case 'netbanking':
+        // If the instrument is netbanking, remove it if it has a severe downtime
+        if (_Arr.contains(disabledBanks, instrument.bank)) {
+          return false;
+        }
+        break;
+    }
 
-      return true;
-    })
-  );
+    return true;
+  });
 }
 
 /**
@@ -145,7 +139,7 @@ export function filterInstrumentsForDowntime(instruments) {
  *
  * @returns {Array} filtered instruments
  */
-export function filterInsturments({ instruments }) {
+export function filterInstruments({ instruments }) {
   return (
     instruments |> filterInstrumentsForSanity |> filterInstrumentsForDowntime
   );
