@@ -6927,13 +6927,13 @@ Session.prototype = {
     return getCustomer.apply(null, arguments);
   },
   isOmnichannel: function() {
-    var isOmni =
+    return (
       this.preferences.features &&
       this.preferences.features.google_pay_omnichannel &&
       this.upiTab &&
-      this.upiTab.selectedApp === 'gpay';
-
-    return isOmni;
+      this.upiTab.selectedApp === 'gpay' &&
+      this.upiTab.omnichannelType === 'phone'
+    );
   },
 
   /**
