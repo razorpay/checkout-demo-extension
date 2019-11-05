@@ -49,9 +49,12 @@ module.exports = {
 };
 
 async function verifyEMIPlansWithOffers(context, offerNumber) {
+  // await delay(40000);
   for (var i = 1; i <= offerNumber; i++) {
     const currentElement = await context.page.$eval(
-      '.expandable-card.expandable-card--has-badge:nth-of-type(' + i + ')',
+      '.emi-plans-list .expandable-card.expandable-card--has-badge:nth-of-type(' +
+        i +
+        ')',
       visible
     );
     expect(currentElement).toEqual(true);
@@ -60,7 +63,7 @@ async function verifyEMIPlansWithOffers(context, offerNumber) {
 
 async function selectEMIPlanWithOffer(context, offerNumber) {
   await context.page.click(
-    '.expandable-card.expandable-card--has-badge:nth-of-type(' +
+    '.emi-plans-list .expandable-card.expandable-card--has-badge:nth-of-type(' +
       offerNumber +
       ')'
   );
@@ -69,7 +72,7 @@ async function selectEMIPlanWithOffer(context, offerNumber) {
 async function verifyEMIPlansWithoutOffers(context, offerNumber) {
   for (var i = 1; i <= offerNumber; i++) {
     const currentElement = await context.page.$eval(
-      '.expandable-card:nth-of-type(' + i + ')',
+      '.emi-plans-list .expandable-card:nth-of-type(' + i + ')',
       visible
     );
     expect(currentElement).toEqual(true);
@@ -77,7 +80,9 @@ async function verifyEMIPlansWithoutOffers(context, offerNumber) {
 }
 
 async function selectEMIPlanWithoutOffer(context, offerNumber) {
-  await context.page.click('.expandable-card:nth-of-type(' + offerNumber + ')');
+  await context.page.click(
+    '.emi-plans-list .expandable-card:nth-of-type(' + offerNumber + ')'
+  );
 }
 
 async function viewOffers(context) {
@@ -94,6 +99,7 @@ async function setPreferenceForOffer(preferences) {
   preferences.methods.emi_options.ICIC[1].subvention = 'merchant';
   preferences.methods.emi_options.ICIC[0].offer_id = 'offer_DWcdgbZjWPlmou';
   preferences.methods.emi_options.ICIC[1].offer_id = 'offer_DWcdgbZjWPlmou';
+  return preferences;
 }
 
 async function verifyOfferApplied(context) {
