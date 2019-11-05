@@ -1,3 +1,5 @@
+const PREFERRED_INSTRUMENTS = 'rzp_preffered_instruments';
+
 /**
  * Calculate a 32 bit FNV-1a hash
  * Found here: https://gist.github.com/vaiorabbit/5657561
@@ -26,16 +28,41 @@ export function hashFnv32a(str = '', asString = true, seed = 0xdeadc0de) {
   return hval >>> 0;
 }
 
-export function set(key, data) {
+/**
+ * Set in p13n storage
+ * @param {Object} data
+ */
+export function set(data) {
   try {
-    global.localStorage.setItem(key, data);
+    global.localStorage.setItem(PREFERRED_INSTRUMENTS, _Obj.stringify(data));
   } catch (e) {}
 }
 
-export function get(key) {
+/**
+ * Returns blob from p13n storage
+ *
+ * @returns {Array}
+ */
+export function get() {
   try {
-    return global.localStorage.getItem(key);
+    const data = global.localStorage.getItem(PREFERRED_INSTRUMENTS);
+
+    if (data === '[]') {
+      return '{}';
+    }
   } catch (e) {}
 
-  return '[]';
+  return '{}';
+}
+
+/**
+ * Returns a list of all instruments in storage.
+ *
+ * @returns {Array}
+ */
+export function getAllInstruments() {
+  // Get instruments for all customers
+  const instrumentsList = _Obj.parse(get(PREFERRED_INSTRUMENTS));
+
+  return instrumentsList || {};
 }

@@ -4,9 +4,7 @@ import { getCustomer } from 'checkoutframe/customer';
 import Track from 'tracker';
 import Analytics from 'analytics';
 import { filterInstruments } from './filters';
-import { hashFnv32a, set, get } from './utils';
-
-const PREFERRED_INSTRUMENTS = 'rzp_preffered_instruments';
+import { hashFnv32a, set, getAllInstruments } from './utils';
 
 /* halflife for timestamp, 5 days in ms */
 const TS_HALFLIFE = Math.log(2) / (5 * 86400000);
@@ -25,18 +23,20 @@ const INSTRUMENT_PROPS = {
 let currentUid = null;
 
 /**
- * Creates an instrument.
- * Only used to create PayPal instrument at runtime.
- * Not ready yet to be used everywhere.
+ * Returns extracted details for p13n
+ * from a payment payload.
+ * @param {Object} payment Payment payload
+ * @param {Customer} customer Instance of customer
+ * @param {Object} extra Extra details
+ *
+ * @returns {Object}
  */
-export function _createInstrumentForImmediateUse(data, extraData) {
-  let methodData = {
-    frequency: 1,
-    id: Track.makeUid(),
-    success: false,
-    timestamp: _.now(),
-  };
-  let extractable = INSTRUMENT_PROPS[data.method];
+function getExtractedDetails(payment, customer, extra = {}) {
+  const { upi_intents_data = [] } = extra;
+
+  const details = {};
+
+  let extractable = INSTRUMENT_PROPS[payment.method];
 
   if (!extractable) {
     return;
@@ -49,52 +49,8 @@ export function _createInstrumentForImmediateUse(data, extraData) {
   extractable.push('method');
 
   _Arr.loop(extractable, item => {
-    if (typeof data[item] !== 'undefined') {
-      methodData[item] = data[item];
-    }
-  });
-
-  if (data.upi_app) {
-    let app = _Arr.find(
-      extraData.upi_intents_data,
-      app => app.package_name === data.upi_app
-    );
-    methodData.app_name = app.app_name;
-    methodData.app_icon = app.app_icon;
-  }
-
-  return methodData;
-}
-
-/**
- * Used to add the instrument to the list of user's instruments along with
- * other metadata
- * @param  {Object} data payment creation data
- */
-export const processInstrument = (data, extraData) => {
-  let methodData = {};
-  let extractable = INSTRUMENT_PROPS[data.method];
-  let instrumentList = _Obj.parse(get(PREFERRED_INSTRUMENTS)) || {};
-  let customer = getCustomer(data.contact);
-  let hashedContact = hashFnv32a(customer.contact);
-
-  instrumentList[hashedContact] = instrumentList[hashedContact] || [];
-  let currentCustomer = instrumentList[hashedContact];
-
-  if (!extractable) {
-    currentUid = null;
-    return;
-  }
-
-  if (!_.isArray(extractable)) {
-    extractable = [extractable];
-  }
-
-  extractable.push('method');
-
-  _Arr.loop(extractable, item => {
-    if (typeof data[item] !== 'undefined') {
-      methodData[item] = data[item];
+    if (typeof payment[item] !== 'undefined') {
+      details[item] = payment[item];
     }
   });
 
@@ -104,12 +60,12 @@ export const processInstrument = (data, extraData) => {
    *
    * Unset card object if payment not made via saved card
    */
-  if (_Arr.contains(['card', 'emi'], data.method)) {
-    methodData.method = 'card';
-    if (data.token) {
+  if (_Arr.contains(['card', 'emi'], payment.method)) {
+    details.method = 'card';
+    if (payment.token) {
       if (customer) {
         let cards = (customer.tokens || {}).items || [];
-        let token = _Arr.find(cards, card => card.token === methodData.token);
+        let token = _Arr.find(cards, card => card.token === details.token);
 
         if (!token) {
           return;
@@ -117,34 +73,91 @@ export const processInstrument = (data, extraData) => {
 
         let cardDetails = token.card;
 
-        methodData.token_id = token.id;
-        delete methodData.token;
+        details.token_id = token.id;
+        delete details.token;
 
         _Arr.loop(['type', 'issuer', 'network'], key => {
           if (cardDetails[key]) {
-            methodData[key] = cardDetails[key];
+            details[key] = cardDetails[key];
           }
         });
       }
     } else {
-      methodData = {};
+      return;
     }
   }
 
-  if (data.upi_app) {
+  if (payment.upi_app) {
     let app = _Arr.find(
-      extraData.upi_intents_data,
-      app => app.package_name === data.upi_app
+      upi_intents_data,
+      app => app.package_name === payment.upi_app
     );
-    methodData.app_name = app.app_name;
-    methodData.app_icon = app.app_icon;
+    details.app_name = app.app_name;
+    details.app_icon = app.app_icon;
   }
 
-  let instrument = _Arr.find(currentCustomer, item => {
+  return details;
+}
+
+/**
+ * Creates an instrument from the extracted payload
+ * @param {Object} extracted Extracted details from payment payload
+ *
+ * @retuns {Objects}
+ */
+function createInstrumentFromExtracted(extracted) {
+  // Extend with defaults and return
+  return _Obj.extend(
+    {
+      frequency: 0,
+      id: Track.makeUid(),
+      success: false,
+      timestamp: _.now(),
+    },
+    extracted
+  );
+}
+
+/**
+ * Creates an instrument from the payment.
+ * @param {Object} payment Payment payload
+ * @param {Customer} customer Instance of customer
+ * @param {Object} extra Extra details
+ *
+ * @returns {Object}
+ */
+export function createInstrumentFromPayment(payment, customer, extra) {
+  const extracted = getExtractedDetails(payment, customer, extra);
+
+  if (!extracted) {
+    return;
+  }
+
+  return createInstrumentFromExtracted(extracted);
+}
+
+/**
+ * Returns an instrument matching the payload.
+ * If one doesn't exist, creates a new instrument.
+ * @param {Array<Object>} instruments List of all instruments for the customer
+ * @param {Object} payment Payment payload
+ * @param {Customer} customer Instance of customer
+ * @param {Object} extra Extra data
+ *
+ * @returns {Object} instrument
+ */
+function getOrCreateInstrument(instruments, payment, customer, extra) {
+  const extracted = getExtractedDetails(payment, customer, extra);
+
+  if (!extracted) {
+    return;
+  }
+
+  const existing = _Arr.find(instruments, item => {
     let same = true;
 
-    _Obj.loop(extractable, key => {
-      if (item[key] !== methodData[key]) {
+    _Obj.loop(extracted, (val, key) => {
+      if (item[key] !== val) {
         same = false;
       }
     });
@@ -152,85 +165,116 @@ export const processInstrument = (data, extraData) => {
     return same;
   });
 
-  if (instrument) {
-    instrument.timestamp = _.now();
-    instrument.frequency++;
-
-    currentUid = instrument.id;
-  } else if (_Obj.keys(methodData).length) {
-    methodData.timestamp = _.now();
-    methodData.success = false;
-    methodData.frequency = 1;
-    methodData.id = Track.makeUid();
-
-    currentUid = methodData.id;
-    currentCustomer.push(methodData);
-  } else {
-    currentUid = null;
+  if (existing) {
+    return existing;
   }
 
-  set(PREFERRED_INSTRUMENTS, _Obj.stringify(instrumentList));
-};
+  return createInstrumentFromExtracted(extracted);
+}
+
+/**
+ * Used to add the instrument to the list of user's instruments
+ * along with other metadata.
+ * @param {Object} payment Payment payload
+ * @param {Object} extra Extra data
+ *
+ * @returns {Object} instrument
+ */
+export function processInstrument(payment, extra) {
+  const customer = getCustomer(payment.contact);
+  const instrumentsList = getAllInstrumentsForCustomer(customer);
+  const instrument = getOrCreateInstrument(
+    instrumentsList,
+    payment,
+    customer,
+    extra
+  );
+
+  if (!instrument) {
+    return;
+  }
+
+  instrument.timestamp = _.now();
+  instrument.frequency++;
+
+  updateInstrumentForCustomer(instrument, customer);
+
+  return instrument;
+}
 
 /* record success for the current payment method */
-export const recordSuccess = customer => {
-  let instrumentList = _Obj.parse(get(PREFERRED_INSTRUMENTS));
-  if (!currentUid || !instrumentList) {
+export const recordSuccess = (instrument, customer) => {
+  if (!instrument || !customer) {
     return;
   }
 
-  let currentCustomer = instrumentList[hashFnv32a(customer.contact)];
-  if (!currentCustomer) {
-    return;
-  }
+  instrument.success = true;
 
-  let instrument = _Arr.find(currentCustomer, item => {
-    if (item.id === currentUid) {
-      return true;
-    }
-
-    return false;
+  Analytics.track('p13n:instrument:success', {
+    data: {
+      instrument,
+    },
   });
 
-  if (instrument) {
-    instrument.success = true;
-
-    Analytics.track('p13n:instrument:success', {
-      data: {
-        instrument,
-      },
-    });
-  }
-
-  currentUid = null;
-
-  set(PREFERRED_INSTRUMENTS, _Obj.stringify(instrumentList));
+  updateInstrumentForCustomer(instrument, customer);
 };
 
-function getAllInstrumentsForCustomer({ contact }) {
+/**
+ * Updates the list of instruments in storage for the given customer.
+ * @param {Array<Object>} instruments List of instruments for the contact
+ * @param {Object} customer
+ *
+ * @returns {Array<Object>} instruments
+ */
+function updateInstrumentForCustomer(instrument, customer) {
+  const { contact } = customer;
+
   // Get instruments for all customers
-  const instrumentList = _Obj.parse(get(PREFERRED_INSTRUMENTS));
+  const instrumentsList = getAllInstruments();
+  const instruments = getAllInstrumentsForCustomer(customer);
 
-  if (!instrumentList) {
-    return [];
+  const existing = _Arr.find(
+    instruments,
+    _instrument => _instrument.id === instrument.id
+  );
+
+  if (!existing) {
+    instruments.push(instrument);
   }
 
-  // Get instrument for contact
-  const instruments = instrumentList[hashFnv32a(contact)];
+  instrumentsList[hashFnv32a(contact)] = instruments;
 
-  if (!instruments) {
-    return [];
-  }
+  set(instrumentsList);
 
   return instruments;
 }
 
 /**
- * Lists the most preffered payment modes for the user in a sorted order
- * @return {[type]} [description]
+ * Returns a list of all instruments for the customer.
+ * @param {Object} customer
+ *
+ * @return {Array<Object>}
+ */
+export function getAllInstrumentsForCustomer(customer) {
+  const { contact } = customer;
+
+  // Get instruments for all customers
+  const instrumentsList = getAllInstruments();
+
+  // Get instrument for contact
+  const instruments = instrumentsList[hashFnv32a(contact)] || [];
+
+  return instruments;
+}
+
+/**
+ * Returns the list of preferred payment modes for the user in a sorted order
+ * @param {Object} customer
+ *
+ * @returns {Array<Object>}
  */
 export const getInstrumentsForCustomer = customer => {
-  let instruments = getAllInstruments(customer);
+  let instruments = getAllInstrumentsForCustomer(customer);
 
   // Filter out the list
   instruments = filterInstruments({
@@ -265,14 +309,14 @@ export const getInstrumentsForCustomer = customer => {
 };
 
 /**
- * Appends the data from the selected instrument to the payment creation
- * payload.
- * @param {Object} paymentData
- * @param {Object} instrument
+ * Appends the data from the selected instrument
+ * to the payment creation payload.
+ * @param {Object} payment Payment payload
+ * @param {Object} instrument Instrument
  *
  * @returns {Boolean} added?
  */
-export function addInstrumentToPaymentData(paymentData, instrument) {
+export function addInstrumentToPaymentData(payment, instrument) {
   let added = false;
 
   // Sanity check
@@ -291,7 +335,7 @@ export function addInstrumentToPaymentData(paymentData, instrument) {
 
   _Arr.loop(propsToExtract, prop => {
     if (!_.isUndefined(instrument[prop])) {
-      paymentData[prop] = instrument[prop];
+      payment[prop] = instrument[prop];
       added = true;
     }
   });

@@ -988,7 +988,12 @@ function debounceAskOTP(view, msg, shouldLimitResend, screenProps) {
 // this === Session
 function successHandler(response) {
   if (this.p13n) {
-    P13n.recordSuccess(this.customer || this.getCustomer(this.payload.contact));
+    var p13nInstrument =
+      this.methodsList.getSelectedInstrument() || this.p13nInstrument;
+    P13n.recordSuccess(
+      p13nInstrument,
+      this.customer || this.getCustomer(this.payload.contact)
+    );
   }
 
   this.clearRequest();
@@ -3464,7 +3469,7 @@ Session.prototype = {
               _Arr.loop(
                 instruments.slice(0, listOfInstrumentsToBeShown),
                 function(instrument) {
-                  _preferredMethods[`_${instrument.method}`] = true;
+                  _preferredMethods['_' + instrument.method] = true;
                 }
               );
 
@@ -6189,7 +6194,7 @@ Session.prototype = {
     }
 
     if (this.p13n) {
-      P13n.processInstrument(data, this);
+      this.p13nInstrument = P13n.processInstrument(data, this);
     }
 
     if (this.isPayout) {

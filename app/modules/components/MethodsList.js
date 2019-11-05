@@ -5,7 +5,7 @@ import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { isMobile } from 'common/useragent';
 import { AVAILABLE_METHODS } from 'common/constants';
-import { _createInstrumentForImmediateUse } from 'checkoutframe/personalization';
+import { createInstrumentFromPayment } from 'checkoutframe/personalization';
 import { filterInstrumentsForAvailableMethods } from 'checkoutframe/personalization/filters';
 import { getSession } from 'sessionmanager';
 
@@ -151,7 +151,7 @@ export default class MethodsList {
     let noOfInstrumentsToShow = 2;
     if (isMobile()) {
       /**
-       * We want to show 3 insturments on mobile devices, since we have more height.
+       * We want to show 3 instruments on mobile devices, since we have more height.
        * But, to show 3 instruments, we need to have at least 590px worth of height.
        * Otherwise the Pay button will overlap the "Other Methods" button.
        *
@@ -194,7 +194,7 @@ export default class MethodsList {
       props.instruments =
         props.instruments
         |> _Arr.insertAt(
-          _createInstrumentForImmediateUse({
+          createInstrumentFromPayment({
             method: 'paypal',
           }),
           noOfInstrumentsToShow - 1
