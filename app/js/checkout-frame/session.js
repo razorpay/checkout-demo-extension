@@ -6049,7 +6049,7 @@ Session.prototype = {
         '<img src="' + walletObj.logo + '" height="' + walletObj.h + '">';
       this.commenceOTP(wallet + ' account', true);
     } else if (this.isOmnichannel()) {
-      this.showOmnichannelLoader(strings.OmnichannelNotification);
+      this.showOmnichannelLoader(strings.gpay_omnichannel);
     } else if (!this.isPayout) {
       this.showLoadError();
     } else {
