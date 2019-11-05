@@ -5053,6 +5053,19 @@ Session.prototype = {
     this.showLoadError(text, false);
   },
 
+  /**
+   * Get the message to be shown in the omnichannel loader.
+   * @return {string}
+   */
+  getOmnichannelMessage: function() {
+    return (
+      'Please accept the request of ' +
+      this.formatAmountWithCurrency(this.get('amount')) +
+      ' in your Google Pay app linked with ' +
+      this.customer.contact
+    );
+  },
+
   showLoadError: function(text, error) {
     if (this.headless && this.screen === 'card') {
       return;
