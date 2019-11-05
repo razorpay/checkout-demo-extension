@@ -5611,11 +5611,7 @@ Session.prototype = {
           return;
         }
 
-        if (
-          this.preferences.features &&
-          this.preferences.features.google_pay_omnichannel &&
-          this.upiTab.selectedApp === 'gpay'
-        ) {
+        if (this.isOmnichannel()) {
           $('.omnichannel').show();
         } else {
           $('.omnichannel').hide();
