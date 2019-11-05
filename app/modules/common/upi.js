@@ -13,6 +13,10 @@ const UPI_APPS = {
       app_name: 'Google Pay (Tez)',
       package_name: GOOGLE_PAY_PACKAGE_NAME,
       app_icon: 'https://cdn.razorpay.com/checkout/gpay.png',
+      /**
+       * Call CheckoutBridge to verify that the user is registered on the app
+       * and only display if they are.
+       */
       verify_registration: true,
     },
     {
