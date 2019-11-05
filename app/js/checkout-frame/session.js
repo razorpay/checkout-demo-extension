@@ -3446,7 +3446,8 @@ Session.prototype = {
 
           if (this.isValid() && shouldUseP13n) {
             instruments =
-              P13n.getInstruments(self.getCustomer(this.value)) || [];
+              P13n.getInstrumentsForCustomer(self.getCustomer(this.value)) ||
+              [];
 
             if (instruments.length) {
               Analytics.setMeta('p13n', true);

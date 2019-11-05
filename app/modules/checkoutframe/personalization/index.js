@@ -207,23 +207,30 @@ export const recordSuccess = customer => {
   set(PREFERRED_INSTRUMENTS, _Obj.stringify(instrumentList));
 };
 
+function getAllInstrumentsForCustomer({ contact }) {
+  // Get instruments for all customers
+  const instrumentList = _Obj.parse(get(PREFERRED_INSTRUMENTS));
+
+  if (!instrumentList) {
+    return [];
+  }
+
+  // Get instrument for contact
+  const instruments = instrumentList[hashFnv32a(contact)];
+
+  if (!instruments) {
+    return [];
+  }
+
+  return instruments;
+}
+
 /**
  * Lists the most preffered payment modes for the user in a sorted order
  * @return {[type]} [description]
  */
-export const getInstruments = customer => {
-  // Get instruments for all customers
-  let instrumentList = _Obj.parse(get(PREFERRED_INSTRUMENTS));
-
-  if (!instrumentList) {
-    return;
-  }
-  // Get instrument for current customer
-  let instruments = instrumentList[hashFnv32a(customer.contact)];
-
-  if (!instruments) {
-    return;
-  }
+export const getInstrumentsForCustomer = customer => {
+  let instruments = getAllInstruments(customer);
 
   // Filter out the list
   instruments = filterInstruments({
