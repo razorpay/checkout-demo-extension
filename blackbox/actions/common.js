@@ -75,6 +75,7 @@ async function respondAndVerifyIntentRequest(context) {
 
   const successResult = { razorpay_payment_id: 'pay_DaFKujjV6Ajr7W' };
   const req = await context.expectRequest();
+  expect(req.url).toContain('status?key_id');
   await context.respondPlain(
     `${req.params.callback}(${JSON.stringify(successResult)})`
   );
@@ -101,12 +102,14 @@ async function respondToUPIAjax(context) {
 }
 
 async function respondToUPIPaymentStatus(context) {
+  const successResult = { razorpay_payment_id: 'pay_DaFKujjV6Ajr7W' };
   const req = await context.expectRequest();
   expect(req.url).toContain('status?key_id');
-  await context.respondJSON({
-    razorpay_payment_id: 'pay_DaaBCIH1rZXZg5',
-    http_status_code: 200,
-  });
+  await context.respondPlain(
+    `${req.params.callback}(${JSON.stringify(successResult)})`
+  );
+  await delay(500);
+  expect(await context.page.$('#modal-inner')).toEqual(null);
 }
 
 async function handleUPIAccountValidation(context, vpa) {
@@ -198,7 +201,8 @@ async function submit(context) {
 }
 
 async function handleCardValidation(context) {
-  await context.expectRequest();
+  const req = await context.expectRequest();
+  expect(req.url).toContain('create/ajax');
   await context.respondJSON({
     type: 'first',
     request: {
@@ -215,7 +219,8 @@ async function handleCardValidation(context) {
 }
 
 async function handleCardValidationWithCallback(context) {
-  await context.expectRequest();
+  const req = await context.expectRequest();
+  expect(req.url).toContain('create/checkout');
   await context.respondPlain(contents);
 }
 
@@ -269,7 +274,7 @@ async function expectMockSuccessWithCallback(context) {
 }
 
 async function handleValidationRequest(context, passOrFail) {
-  const req = await context.expectRequest();
+  await context.expectRequest();
   if (passOrFail == 'fail') {
     await context.failRequest({ error: 'failed' });
   } else if (passOrFail == 'pass') {
@@ -410,7 +415,8 @@ async function verifyTimeout(context, paymentMode) {
 }
 
 async function handleOtpVerification(context) {
-  await context.expectRequest();
+  const req = await context.expectRequest();
+  expect(req.url).toContain('create/ajax');
   await context.respondJSON({
     type: 'otp',
     request: {
