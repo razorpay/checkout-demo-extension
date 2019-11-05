@@ -10,17 +10,14 @@ const UPI_APPS = {
    */
   preferred: [
     {
-      package_name: 'in.org.npci.upiapp',
-    },
-    {
-      package_name: 'com.phonepe.app',
-      app_icon: 'https://cdn.razorpay.com/checkout/phonepe.png',
-    },
-    {
       app_name: 'Google Pay (Tez)',
       package_name: GOOGLE_PAY_PACKAGE_NAME,
       app_icon: 'https://cdn.razorpay.com/checkout/gpay.png',
       verify_registration: true,
+    },
+    {
+      package_name: 'com.phonepe.app',
+      app_icon: 'https://cdn.razorpay.com/checkout/phonepe.png',
     },
     {
       name: 'PayTM',
@@ -28,17 +25,20 @@ const UPI_APPS = {
       package_name: 'net.one97.paytm',
     },
     {
-      name: 'WhatsApp Business',
-      app_name: 'WhatsApp Business UPI',
-      package_name: 'com.whatsapp.w4b',
+      package_name: 'in.org.npci.upiapp',
     },
   ],
 
   /**
    * Whitelisted apps.
-   * Should not contain any apps that are mentioned in preferred or secondfactor.
+   * Should not contain any apps that are mentioned in preferred.
    */
   whitelist: [
+    {
+      name: 'WhatsApp Business',
+      app_name: 'WhatsApp Business UPI',
+      package_name: 'com.whatsapp.w4b',
+    },
     {
       package_name: 'com.csam.icici.bank.imobile',
     },
@@ -352,8 +352,10 @@ export const isPreferredApp = packageName =>
   doesAppExist(packageName, UPI_APPS.preferred);
 export const isWhitelistedApp = packageName =>
   doesAppExist(packageName, UPI_APPS.whitelist);
+
 export const isBlacklistedApp = packageName =>
   doesAppExist(packageName, UPI_APPS.blacklist);
+
 export const isUsableApp = packageName =>
   doesAppExist(packageName, getUsableApps());
 
