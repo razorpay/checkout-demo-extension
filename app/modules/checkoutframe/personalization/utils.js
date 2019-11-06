@@ -41,28 +41,32 @@ export function set(data) {
 /**
  * Returns blob from p13n storage
  *
- * @returns {Array}
+ * @returns {Object}
  */
-export function get() {
-  try {
-    const data = global.localStorage.getItem(PREFERRED_INSTRUMENTS);
+function get() {
+  let data;
 
-    if (data === '[]') {
-      return '{}';
+  try {
+    data = _Obj.parse(global.localStorage.getItem(PREFERRED_INSTRUMENTS));
+
+    if (_.isArray(data)) {
+      data = {};
     }
   } catch (e) {}
 
-  return '{}';
+  if (_.isNonNullObject(data)) {
+    return data;
+  }
+
+  return {};
 }
 
 /**
  * Returns a list of all instruments in storage.
  *
- * @returns {Array}
+ * @returns {Object}
  */
 export function getAllInstruments() {
   // Get instruments for all customers
-  const instrumentsList = _Obj.parse(get(PREFERRED_INSTRUMENTS));
-
-  return instrumentsList || {};
+  return get();
 }
