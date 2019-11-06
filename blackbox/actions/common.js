@@ -92,8 +92,9 @@ async function respondAndVerifyIntentRequest(context) {
   expect(result).toMatchObject(successResult);
 }
 
-async function respondToUPIAjax(context) {
+async function respondToUPIAjax(context, offerId) {
   const req = await context.expectRequest();
+  if (offerId != '') expect(req.body).toContain(offerId);
   expect(req.url).toContain('create/ajax');
   await context.respondJSON({
     type: 'async',
@@ -241,7 +242,9 @@ async function verifyPartialAmount(context, amount) {
 }
 
 async function handlePartialPayment(context, amount) {
-  const makePartialCheckBox = await context.page.waitForSelector('.checkbox');
+  const makePartialCheckBox = await context.page.waitForSelector(
+    '#partial-radio'
+  );
   await makePartialCheckBox.click();
   await makePartialCheckBox.click();
   await makePartialCheckBox.click();

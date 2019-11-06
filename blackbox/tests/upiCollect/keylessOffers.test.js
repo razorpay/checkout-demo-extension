@@ -1,5 +1,6 @@
 const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
+const { delay, visible } = require('../../util');
 const {
   assertHomePage,
   fillUserDetails,
@@ -11,18 +12,43 @@ const {
   handleUPIAccountValidation,
   respondToUPIAjax,
   respondToUPIPaymentStatus,
-  handleFeeBearer,
+  selectOffer,
+  verifyOfferApplied,
+  setPreferenceForOffer,
+  viewOffers,
 } = require('../../actions/common');
 
 describe('Basic upi payment', () => {
-  test('Perform keyless upi collect transaction with customer feebearer enabled', async () => {
+  test('Perform keyless upi collect transaction with offers applied', async () => {
     const options = {
       order_id: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
       personalization: false,
     };
-    const preferences = makePreferences({ fee_bearer: true });
+    const preferences = makePreferences({
+      offers: [
+        {
+          id: 'offer_Dcad1sICBaV2wI',
+          name: 'UPI Offer Name',
+          payment_method: 'upi',
+          display_text: 'UPI Offer Display Text',
+        },
+        {
+          id: 'offer_DcaetTeD4Gjcma',
+          name: 'UPI Offer Name 2',
+          payment_method: 'upi',
+          display_text: 'UPI Offer Display Text 2',
+        },
+        {
+          id: 'offer_DcafkxTAseGAtT',
+          name: 'UPI Offer Name 3',
+          payment_method: 'upi',
+          display_text: 'UPI Offer Display Text 3',
+        },
+      ],
+    });
     preferences.methods.upi = true;
+    await setPreferenceForOffer(preferences);
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true);
@@ -30,10 +56,12 @@ describe('Basic upi payment', () => {
     await selectPaymentMethod(context, 'upi');
     await selectUPIMethod(context, 'BHIM');
     await enterUPIAccount(context, 'BHIM');
+    await viewOffers(context);
+    await selectOffer(context, '1');
+    await verifyOfferApplied(context);
     await submit(context);
     await handleUPIAccountValidation(context, 'BHIM@upi');
-    await handleFeeBearer(context, page);
-    await respondToUPIAjax(context, '');
+    await respondToUPIAjax(context, 'offer_id=' + preferences.offers[0].id);
     await respondToUPIPaymentStatus(context);
   });
 });

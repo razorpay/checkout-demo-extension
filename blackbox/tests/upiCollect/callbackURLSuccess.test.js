@@ -35,7 +35,7 @@ describe.skip('Basic upi payment', () => {
     await enterUPIAccount(context, 'BHIM');
     await submit(context);
     await handleUPIAccountValidation(context, 'BHIM@upi');
-    await respondToUPIAjax(context);
+    await respondToUPIAjax(context, '');
     await respondToUPIPaymentStatus(context);
     await handleCardValidationWithCallback(context);
     await expectMockSuccessWithCallback(context);
