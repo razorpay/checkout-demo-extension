@@ -59,11 +59,12 @@ async function selectUPIApp(context, AppNumber) {
   await context.page.click('.option:nth-of-type(' + AppNumber + ')');
 }
 
-async function respondAndVerifyIntentRequest(context) {
+async function respondAndVerifyIntentRequest(context, offerId) {
   const reqorg = await context.expectRequest();
   expect(reqorg.url).toEqual(
     'https://api.razorpay.com/v1/payments/create/ajax'
   );
+  if (offerId != '') expect(reqorg.body).toContain(offerId);
   expect(reqorg.method).toEqual('POST');
   await context.respondJSON({
     data: {
@@ -254,6 +255,7 @@ async function handlePartialPayment(context, amount) {
   await nextButton.click();
   await delay(200);
 }
+
 async function validateHelpMessage(context, message) {
   const helpElement = await context.page.$('.help');
   const text = await context.page.evaluate(

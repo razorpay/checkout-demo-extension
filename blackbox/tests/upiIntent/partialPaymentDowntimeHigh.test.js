@@ -4,24 +4,18 @@ const {
   assertHomePage,
   fillUserDetails,
   assertPaymentMethods,
-  selectPaymentMethod,
-  submit,
-  respondAndVerifyIntentRequest,
-  handleFeeBearer,
-  selectUPIApp,
+  verifyHighDowntime,
   handlePartialPayment,
-  verifyPartialAmount,
 } = require('../../actions/common');
 
 describe('Basic upi payment', () => {
-  test('Perform upi intent transaction with feebearer enabled', async () => {
+  test('Verify UPI intent downtime - High with partial payments enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
       personalization: false,
     };
     const preferences = makePreferences({
-      fee_bearer: true,
       order: {
         amount: 100,
         amount_due: 100,
@@ -29,6 +23,24 @@ describe('Basic upi payment', () => {
         currency: 'INR',
         first_payment_min_amount: null,
         partial_payment: true,
+      },
+      payment_downtime: {
+        entity: 'collection',
+        count: 1,
+        items: [
+          {
+            id: 'down_DEW7D9S10PEsl1',
+            entity: 'payment.downtime',
+            method: 'upi',
+            begin: 1567686386,
+            end: null,
+            status: 'started',
+            scheduled: false,
+            severity: 'high',
+            created_at: 1567686387,
+            updated_at: 1567686387,
+          },
+        ],
       },
     });
     preferences.methods.upi = true;
@@ -42,11 +54,9 @@ describe('Basic upi payment', () => {
     await fillUserDetails(context, true);
     await handlePartialPayment(context, '1');
     await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'upi');
-    await selectUPIApp(context, '1');
-    await verifyPartialAmount(context, '₹ 1');
-    await submit(context);
-    await handleFeeBearer(context, page);
-    await respondAndVerifyIntentRequest(context, '');
+    await verifyHighDowntime(
+      context,
+      'UPI is facing temporary issues right now. Please select another method.'
+    );
   });
 });
