@@ -17,8 +17,7 @@
   import DocumentIllustration from 'templates/illustrations/nach/Document.svelte/';
   import Note from 'templates/views/ui/Note.svelte';
   import Tab from 'templates/tabs/Tab.svelte';
-  import Screen from 'templates/layouts/Screen/index.svelte';
-  import PrimaryScreen from 'templates/layouts/Screen/Primary.svelte';
+  import Screen from 'templates/layouts/Screen.svelte';
 
   let abortUploadRequest = () => {};
   let uploaded = false;
@@ -258,7 +257,7 @@
 
 <Tab method="nach" overrideMethodCheck="true" pad={false}>
   <Screen>
-    <PrimaryScreen>
+    <div slot="main">
       <input
         type="file"
         bind:this={file}
@@ -292,6 +291,6 @@
           </ol>
         </Note>
       {/if}
-    </PrimaryScreen>
+    </div>
   </Screen>
 </Tab>

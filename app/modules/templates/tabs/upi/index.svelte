@@ -30,9 +30,7 @@
   import GooglePayCollect from './GooglePayCollect.svelte';
   import GooglePayOmnichannel from './GooglePayOmnichannel.svelte';
   import NextOption from 'templates/views/ui/options/NextOption.svelte';
-  import Screen from 'templates/layouts/Screen/index.svelte';
-  import PrimaryScreen from 'templates/layouts/Screen/Primary.svelte';
-  import BottomScreen from 'templates/layouts/Screen/Bottom.svelte';
+  import Screen from 'templates/layouts/Screen.svelte';
 
   // Props
   export let selectedApp = undefined;
@@ -466,7 +464,7 @@
 
 <Tab method="upi" {down} pad={false}>
   <Screen>
-    <PrimaryScreen>
+    <div slot="main">
       {#if intent}
         <UpiIntent
           bind:this={intentView}
@@ -533,15 +531,15 @@
           </NextOption>
         </div>
       {/if}
-    </PrimaryScreen>
+    </div>
 
-    <BottomScreen>
+    <div slot="bottom">
       {#if down || disabled}
         <DowntimeCallout isHighSeverity={disabled}>
           <strong>UPI</strong>
           is experiencing low success rates.
         </DowntimeCallout>
       {/if}
-    </BottomScreen>
+    </div>
   </Screen>
 </Tab>

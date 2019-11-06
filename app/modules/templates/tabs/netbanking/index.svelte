@@ -8,9 +8,7 @@
   import GridItem from 'templates/tabs/netbanking/GridItem.svelte';
   import Callout from 'templates/views/ui/Callout.svelte';
   import DowntimeCallout from 'templates/views/ui/DowntimeCallout.svelte';
-  import Screen from 'templates/layouts/Screen/index.svelte';
-  import PrimaryScreen from 'templates/layouts/Screen/Primary.svelte';
-  import BottomScreen from 'templates/layouts/Screen/Bottom.svelte';
+  import Screen from 'templates/layouts/Screen.svelte';
 
   // Utils imports
   import Razorpay from 'common/Razorpay';
@@ -195,8 +193,8 @@
   pad={false}
   overrideMethodCheck
   hasMessage={selectedBankHasDowntime}>
-  <Screen>
-    <PrimaryScreen pad={false}>
+  <Screen pad={false}>
+    <div slot="main">
       <div id="netb-banks" class="clear grid count-3">
         {#each netbanks as { name, code }}
           <GridItem
@@ -263,9 +261,9 @@
           </div>
         </div>
       {/if}
-    </PrimaryScreen>
+    </div>
 
-    <BottomScreen>
+    <div slot="bottom">
       <!-- Show recurring message for recurring payments -->
       {#if recurring}
         <Callout>
@@ -286,7 +284,7 @@
           {/if}
         </DowntimeCallout>
       {/if}
-    </BottomScreen>
+    </div>
 
   </Screen>
 </Tab>
