@@ -115,6 +115,33 @@
     return _Arr.contains(downtimes.disable.banks, code);
   }
 
+  $: showCorporateRadio =
+    !recurring && hasMultipleOptions(selectedBankCode, banks);
+  $: corporateSelected = isCorporateCode(selectedBankCode);
+  $: maxGridCount = recurring ? 3 : 6;
+  $: banksArr = _Arr.map(_Obj.entries(banks), entry => ({
+    code: entry[0],
+    name: entry[1],
+    downtime: downtimes[entry[0]],
+  }));
+  $: invalid = method !== 'emandate' && !selectedBankCode;
+  $: netbanks = getPreferredBanks(banks, bankOptions).slice(0, maxGridCount);
+  $: selectedBankDisabled =
+    method === 'netbanking' &&
+    _Arr.contains(downtimes.disable.banks, selectedBankCode);
+  $: selectedBankWarn =
+    method === 'netbanking' &&
+    _Arr.contains(downtimes.warn.banks, selectedBankCode);
+  $: selectedBankHasDowntime = selectedBankDisabled || selectedBankWarn;
+
+  $: {
+    const selected = corporateSelected;
+
+    if (showCorporateRadio) {
+      setTimeout(() => radioContainer.scrollIntoView(), 300);
+    }
+  }
+
   $: {
     const bankCode = selectedBankCode;
 
@@ -138,33 +165,6 @@
       setPayButtonVisibility();
     }
   }
-
-  $: {
-    const selected = corporateSelected;
-
-    if (showCorporateRadio) {
-      setTimeout(() => radioContainer.scrollIntoView(), 300);
-    }
-  }
-
-  $: showCorporateRadio =
-    !recurring && hasMultipleOptions(selectedBankCode, banks);
-  $: corporateSelected = isCorporateCode(selectedBankCode);
-  $: maxGridCount = recurring ? 3 : 6;
-  $: banksArr = _Arr.map(_Obj.entries(banks), entry => ({
-    code: entry[0],
-    name: entry[1],
-    downtime: downtimes[entry[0]],
-  }));
-  $: invalid = method !== 'emandate' && !selectedBankCode;
-  $: netbanks = getPreferredBanks(banks, bankOptions).slice(0, maxGridCount);
-  $: selectedBankDisabled =
-    method === 'netbanking' &&
-    _Arr.contains(downtimes.disable.banks, selectedBankCode);
-  $: selectedBankWarn =
-    method === 'netbanking' &&
-    _Arr.contains(downtimes.warn.banks, selectedBankCode);
-  $: selectedBankHasDowntime = selectedBankDisabled || selectedBankWarn;
 </script>
 
 <style>
