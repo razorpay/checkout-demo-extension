@@ -51,6 +51,8 @@ module.exports = {
     return {
       options: {},
       methods: {
+        emi: true,
+        emi_subvention: 'customer',
         ...card,
         wallet,
         netbanking,

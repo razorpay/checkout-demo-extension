@@ -1,5 +1,5 @@
 const base = location.protocol + '//' + location.hostname + ':' + location.port;
-const test_key = rzp_test_1DP5mmOlF5G5ag;
+const test_key = 'rzp_test_1DP5mmOlF5G5ag';
 Razorpay = {
   config: {
     key_id: 'rzp_test_1DP5mmOlF5G5ag',

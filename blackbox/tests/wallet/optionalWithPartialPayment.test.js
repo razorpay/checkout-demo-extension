@@ -1,4 +1,4 @@
-const { openCheckout } = require('../../checkout');
+const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
