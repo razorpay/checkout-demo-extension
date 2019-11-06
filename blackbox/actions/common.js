@@ -53,6 +53,13 @@ module.exports = {
   verifyEMIPlansWithoutOffers,
   selectEMIPlanWithoutOffer,
   handleEMIValidation,
+  selectUPIMethod,
+  enterUPIAccount,
+  handleUPIAccountValidation,
+  respondToUPIAjax,
+  respondToUPIPaymentStatus,
+  respondAndVerifyIntentRequest,
+  selectUPIApp,
 };
 
 async function selectUPIApp(context, AppNumber) {
@@ -248,6 +255,8 @@ async function handlePartialPayment(context, amount) {
   await makePartialCheckBox.click();
   await makePartialCheckBox.click();
   await makePartialCheckBox.click();
+  await makePartialCheckBox.click();
+  await makePartialCheckBox.click();
   const amountValue = await context.page.waitForSelector('#amount-value');
   await amountValue.type(amount);
   const nextButton = await context.page.waitForSelector('#next-button');
@@ -360,7 +369,7 @@ async function expectMockSuccessWithCallback(context) {
 }
 
 async function handleValidationRequest(context, passOrFail) {
-  await context.expectRequest();
+  const req = await context.expectRequest();
   if (passOrFail == 'fail') {
     await context.failRequest({ error: 'failed' });
   } else if (passOrFail == 'pass') {
@@ -369,7 +378,7 @@ async function handleValidationRequest(context, passOrFail) {
 }
 
 async function failRequestwithErrorMessage(context, errorMessage) {
-  await context.expectRequest(req => {});
+  await context.expectRequest();
   await context.failRequest({ error: errorMessage });
 }
 
