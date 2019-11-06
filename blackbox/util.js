@@ -15,9 +15,14 @@ module.exports = {
    * @return {Object} containg operations to perform on intercepted request
    */
   interceptor(page, pattern) {
+    let interceptorEnabled = true;
     let resolver;
     let currentRequest = null;
-    let interceptorEnabled = true;
+
+    const returnObj = {
+      disableInterceptor: () => (interceptorEnabled = null),
+      enableInterceptor: () => (interceptorEnabled = true),
+    };
 
     function shouldIgnore(interceptedRequest) {
       const url = interceptedRequest.url();
@@ -45,7 +50,17 @@ module.exports = {
       }
     }
 
-    async function expectRequest() {
+    function reset() {
+      currentRequest = resolver = null;
+    }
+
+    async function respond(response) {
+      await waitForRequest();
+      currentRequest.respond(response);
+      reset();
+    }
+
+    returnObj.expectRequest = async () => {
       await waitForRequest();
       const url = currentRequest.url();
       const parsedURL = URL.parse(url);
@@ -56,41 +71,30 @@ module.exports = {
         url,
         URL: parsedURL,
         params: querystring.parse(parsedURL.query),
+        raw: currentRequest,
       };
-    }
+    };
 
-    function reset() {
-      currentRequest = resolver = null;
-    }
+    returnObj.respondPlain = body => respond({ body });
 
-    function toggle() {
-      interceptorEnabled = !interceptorEnabled;
-    }
-
-    async function respond(response) {
-      await waitForRequest();
-      currentRequest.respond(response);
-      reset();
-    }
-
-    function failRequest(body) {
-      return respond({
-        status: 400,
-        body: JSON.stringify(body),
-      });
-    }
-
-    function respondJSON(body) {
-      return respond({
+    returnObj.respondJSON = body =>
+      respond({
         contentType: 'application/json',
         body: JSON.stringify(body),
       });
-    }
 
-    function respondPlain(body) {
-      return respond({ body });
-    }
+    returnObj.respondHTML = body =>
+      respond({
+        contentType: 'text/html',
+        body,
+      });
 
-    return { toggle, expectRequest, respondJSON, respondPlain, failRequest };
+    returnObj.failRequest = body =>
+      respond({
+        status: 400,
+        body: JSON.stringify(body),
+      });
+
+    return returnObj;
   },
 };

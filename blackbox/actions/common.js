@@ -46,7 +46,96 @@ module.exports = {
   verifyEMIPlansWithoutOffers,
   selectEMIPlanWithoutOffer,
   handleEMIValidation,
+  selectUPIMethod,
+  enterUPIAccount,
+  handleUPIAccountValidation,
+  respondToUPIAjax,
+  respondToUPIPaymentStatus,
+  respondAndVerifyIntentRequest,
+  selectUPIApp,
 };
+
+async function selectUPIApp(context, AppNumber) {
+  await context.page.click('.option:nth-of-type(' + AppNumber + ')');
+}
+
+async function respondAndVerifyIntentRequest(context) {
+  const reqorg = await context.expectRequest();
+  expect(reqorg.url).toEqual(
+    'https://api.razorpay.com/v1/payments/create/ajax'
+  );
+  expect(reqorg.method).toEqual('POST');
+  await context.respondJSON({
+    data: {
+      intent_url:
+        'upi://pay?pa=upi@razopay&pn=RBLBank&tr=4kHrR0CI9jEazLO&tn=razorpay&am=1&cu=INR&mc=5411',
+    },
+    payment_id: 'pay_DaFKujjV6Ajr7W',
+    request: {
+      method: 'GET',
+      url:
+        'https://api.razorpay.com/v1/payments/pay_DaFKujjV6Ajr7W/status?key_id=rzp_test_1DP5mmOlF5G5ag',
+    },
+    type: 'intent',
+  });
+  await delay(100);
+  await page.evaluate(() => upiIntentResponse({ response: { txnId: '123' } }));
+  await delay(100);
+
+  const successResult = { razorpay_payment_id: 'pay_DaFKujjV6Ajr7W' };
+  const req = await context.expectRequest();
+  await context.respondPlain(
+    `${req.params.callback}(${JSON.stringify(successResult)})`
+  );
+  const result = await context.getResult();
+  expect(result).toMatchObject(successResult);
+}
+
+async function respondToUPIAjax(context) {
+  const req = await context.expectRequest();
+  expect(req.url).toContain('create/ajax');
+  await context.respondJSON({
+    type: 'async',
+    version: 1,
+    payment_id: 'pay_DaaBCIH1rZXZg5',
+    gateway:
+      'eyJpdiI6IjdzTEZcLzUzUVN5dHBORHlZRFc2TVh3PT0iLCJ2YWx1ZSI6IldXeDdpWVFTSWhLbThLOWtXancrNEhRRkl0ZE5peDNDSDJnMUJTVmg4THc9IiwibWFjIjoiMGVhYjFhMDAyYzczNDlkMTI0OGFiMDRjMGJlZDVjZTA5MjM0YTcyNjI0ODQ1MzExMWViZjVjY2QxMGUwZDZmYiJ9',
+    data: null,
+    request: {
+      url:
+        'https://api.razorpay.com/v1/payments/pay_DaaBCIH1rZXZg5/status?key_id=rzp_test_1DP5mmOlF5G5ag',
+      method: 'GET',
+    },
+  });
+}
+
+async function respondToUPIPaymentStatus(context) {
+  const req = await context.expectRequest();
+  expect(req.url).toContain('status?key_id');
+  await context.respondJSON({
+    razorpay_payment_id: 'pay_DaaBCIH1rZXZg5',
+    http_status_code: 200,
+  });
+}
+
+async function handleUPIAccountValidation(context, vpa) {
+  const req = await context.expectRequest();
+  expect(req.url).toContain('validate/account');
+  await context.respondJSON({ vpa: vpa, success: true, customer_name: null });
+  await delay(1000);
+}
+
+async function selectUPIMethod(context, UPIMethod) {
+  const upibutton = await context.page.$x(
+    '//*[contains(@class,"ref-text") and text() = "' + UPIMethod + '"]'
+  );
+  await upibutton[0].click();
+}
+
+async function enterUPIAccount(context, UPIAccountId) {
+  const vpaField = await context.page.waitForSelector('#vpa');
+  await vpaField.type(UPIAccountId);
+}
 
 async function verifyEMIPlansWithOffers(context, offerNumber) {
   // await delay(40000);
@@ -148,6 +237,8 @@ async function verifyPartialAmount(context, amount) {
 
 async function handlePartialPayment(context, amount) {
   const makePartialCheckBox = await context.page.waitForSelector('.checkbox');
+  await makePartialCheckBox.click();
+  await makePartialCheckBox.click();
   await makePartialCheckBox.click();
   const amountValue = await context.page.waitForSelector('#amount-value');
   await amountValue.type(amount);
@@ -257,7 +348,7 @@ async function expectMockSuccessWithCallback(context) {
 }
 
 async function handleValidationRequest(context, passOrFail) {
-  await context.expectRequest(req => {});
+  const req = await context.expectRequest();
   if (passOrFail == 'fail') {
     await context.failRequest({ error: 'failed' });
   } else if (passOrFail == 'pass') {
@@ -383,11 +474,12 @@ async function verifyTimeout(context, paymentMode) {
   if (
     paymentMode == 'netbanking' ||
     paymentMode == 'card' ||
+    paymentMode == 'upi' ||
     paymentMode == 'emi'
   ) {
     await delay(2000);
     expect(await context.page.$('#fd-hide')).not.toEqual(null);
-    await delay(8000);
+    await delay(10000);
     expect(await context.page.$('#fd-hide')).toEqual(null);
   } else if (paymentMode == 'wallet') {
     await delay(5000);
