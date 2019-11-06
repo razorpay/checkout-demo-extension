@@ -140,9 +140,6 @@ const UPI_APPS = {
       package_name: 'com.dbs.in.digitalbank',
     },
     {
-      package_name: 'com.mobikwik_new',
-    },
-    {
       package_name: 'com.rblbank.mobank',
     },
     {
@@ -205,6 +202,9 @@ const UPI_APPS = {
     },
     {
       package_name: 'com.angelbroking.angelwealth',
+    },
+    {
+      package_name: 'com.mobikwik_new',
     },
   ],
 };

@@ -1,6 +1,7 @@
 const NodeEnvironment = require('jest-environment-node');
 const puppeteer = require('puppeteer-core');
 const isProd = process.env.NODE_ENV === 'production';
+const { delay } = require('./util');
 
 class PuppeteerEnvironment extends NodeEnvironment {
   async setup() {
@@ -12,6 +13,7 @@ class PuppeteerEnvironment extends NodeEnvironment {
     });
     const pages = await browser.pages();
     this.global.page = pages[0];
+    this.global.delay = delay;
   }
 
   async teardown() {

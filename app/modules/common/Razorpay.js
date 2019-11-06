@@ -2,6 +2,8 @@ import Analytics from 'analytics';
 import Eventer from 'eventer';
 import Track from 'tracker';
 import CheckoutOptions, { flatten, RazorpayDefaults } from 'common/options';
+import * as AnalyticsTypes from 'analytics-types';
+
 import {
   supportedCurrencies,
   displayCurrencies,
@@ -146,10 +148,19 @@ var razorpayPayment = (Razorpay.payment = {
   },
 
   getPrefs: function(data, callback) {
+    const prefsApiTimer = _.timer();
+    Analytics.track('prefs:start', {
+      type: AnalyticsTypes.METRIC,
+    });
+
     return fetch({
       url: _.appendParamsToUrl(makeUrl('preferences'), data),
 
       callback: function(response) {
+        Analytics.track('prefs:end', {
+          type: AnalyticsTypes.METRIC,
+          data: { time: prefsApiTimer() },
+        });
         if (response.xhr && response.xhr.status === 0) {
           return getPrefsJsonp(data, callback);
         }

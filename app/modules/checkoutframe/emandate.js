@@ -93,11 +93,25 @@ emandateView.prototype = {
     }
 
     this.on('click', '.auth-option.netbanking', () => {
+      Analytics.track('emandate:auth_type:select', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          auth_type: 'netbanking',
+        },
+      });
+
       this.setAuthType('netbanking');
       this.showTab('emandate-details');
     });
 
     this.on('click', '.auth-option.debitcard', () => {
+      Analytics.track('emandate:auth_type:select', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          auth_type: 'debitcard',
+        },
+      });
+
       this.setAuthType('debitcard');
       this.showTab('emandate-details');
     });
@@ -260,6 +274,13 @@ emandateView.prototype = {
   },
 
   back: function() {
+    Analytics.track('emandate:back', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        auth_type: this.authType,
+      },
+    });
+
     this.history.pop();
     if (this.history.length === 0) {
       _El.removeClass(_Doc.querySelector('#container'), 'emandate-extra');
