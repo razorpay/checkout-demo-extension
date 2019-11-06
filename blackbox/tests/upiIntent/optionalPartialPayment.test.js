@@ -13,7 +13,7 @@ const {
 } = require('../../actions/common');
 
 describe('Basic upi payment', () => {
-  test('Perform upi intent transaction with contact optional', async () => {
+  test('Perform upi intent transaction with contact optional and partial payments enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,

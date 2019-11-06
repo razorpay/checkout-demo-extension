@@ -53,6 +53,13 @@ module.exports = {
   verifyEMIPlansWithoutOffers,
   selectEMIPlanWithoutOffer,
   handleEMIValidation,
+  selectUPIMethod,
+  enterUPIAccount,
+  handleUPIAccountValidation,
+  respondToUPIAjax,
+  respondToUPIPaymentStatus,
+  respondAndVerifyIntentRequest,
+  selectUPIApp,
 };
 
 async function selectUPIApp(context, AppNumber) {
@@ -246,6 +253,8 @@ async function handlePartialPayment(context, amount) {
   const makePartialCheckBox = await context.page.waitForSelector(
     '#partial-radio'
   );
+  await makePartialCheckBox.click();
+  await makePartialCheckBox.click();
   await makePartialCheckBox.click();
   await makePartialCheckBox.click();
   await makePartialCheckBox.click();
