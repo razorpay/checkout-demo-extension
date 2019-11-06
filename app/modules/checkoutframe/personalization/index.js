@@ -20,8 +20,6 @@ const INSTRUMENT_PROPS = {
   paypal: [],
 };
 
-let currentUid = null;
-
 /**
  * Returns extracted details for p13n
  * from a payment payload.
@@ -29,7 +27,7 @@ let currentUid = null;
  * @param {Customer} customer Instance of customer
  * @param {Object} extra Extra details
  *
- * @returns {Object}
+ * @returns {Object|undefined}
  */
 function getExtractedDetails(payment, customer, extra = {}) {
   const { upi_intents_data = [] } = extra;
@@ -103,7 +101,7 @@ function getExtractedDetails(payment, customer, extra = {}) {
  * Creates an instrument from the extracted payload
  * @param {Object} extracted Extracted details from payment payload
  *
- * @retuns {Objects}
+ * @returns {Object}
  */
 function createInstrumentFromExtracted(extracted) {
   // Extend with defaults and return
@@ -124,7 +122,7 @@ function createInstrumentFromExtracted(extracted) {
  * @param {Customer} customer Instance of customer
  * @param {Object} extra Extra details
  *
- * @returns {Object}
+ * @returns {Object|undefined}
  */
 export function createInstrumentFromPayment(payment, customer, extra) {
   const extracted = getExtractedDetails(payment, customer, extra);
@@ -144,7 +142,7 @@ export function createInstrumentFromPayment(payment, customer, extra) {
  * @param {Customer} customer Instance of customer
  * @param {Object} extra Extra data
  *
- * @returns {Object} instrument
+ * @returns {Object|undefined} instrument
  */
 function getOrCreateInstrument(instruments, payment, customer, extra) {
   const extracted = getExtractedDetails(payment, customer, extra);
@@ -178,7 +176,7 @@ function getOrCreateInstrument(instruments, payment, customer, extra) {
  * @param {Object} payment Payment payload
  * @param {Object} extra Extra data
  *
- * @returns {Object} instrument
+ * @returns {Object|undefined} instrument
  */
 export function processInstrument(payment, extra) {
   const customer = getCustomer(payment.contact);
@@ -202,7 +200,11 @@ export function processInstrument(payment, extra) {
   return instrument;
 }
 
-/* record success for the current payment method */
+/**
+ * Records success for the instrument and updates it in storage.
+ * @param {Object} instrument Instrument to record success of
+ * @param {Customer} customer
+ */
 export const recordSuccess = (instrument, customer) => {
   if (!instrument || !customer) {
     return;
