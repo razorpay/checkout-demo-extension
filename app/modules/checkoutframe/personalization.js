@@ -466,3 +466,13 @@ export function filterInstrumentsForAvailableMethods(
 
   return allowed;
 }
+
+/**
+ * Tracks the number of p13n contacts present in storage.
+ */
+export function trackNumberOfP13nContacts() {
+  Analytics.setMeta(
+    'p13nUsers',
+    _Obj.keys((PREFERRED_INSTRUMENTS |> get |> _Obj.parse) || {}).length
+  );
+}
