@@ -789,6 +789,7 @@ function elfShowOTP(otp, sender, bank) {
 }
 
 function askOTP(view, text, shouldLimitResend, screenProps) {
+  console.log('this is ask otp' + view + text);
   if (!screenProps) {
     screenProps = {};
   }
@@ -1551,6 +1552,23 @@ Session.prototype = {
     }
   },
 
+  setSvelteCardTab: function() {
+    // any applicable this.methods?
+    this.svelteCardTab = new discreet.CardTab({
+      target: gel('card-svelte-wrap'),
+      props: {
+        emiOptions: this.emi_options,
+        customer: this.customer,
+        remember: this.get('remember_customer'),
+        otpView: this.otpView,
+        wantsSkip: this.wants_skip,
+        commenceOTP: this.commenceOTP,
+        recurring: this.recurring,
+        askOTP: askOTP,
+      },
+    }); /* TODO fill props */
+  },
+
   setSvelteComponents: function() {
     this.setHomeTab();
     this.setNetbankingTab();
@@ -1563,6 +1581,7 @@ Session.prototype = {
     this.setPayoutsScreen();
     this.setNach();
     this.setBankTransfer();
+    this.setSvelteCardTab();
   },
 
   showTimer: function(cb) {
@@ -3787,19 +3806,23 @@ Session.prototype = {
       this.bankTransferView.onShown();
     }
 
+    if (tab === 'card') {
+      this.svelteCardTab.onShown();
+    }
+
     if (!tab && this.multiTpv) {
       $('#body').addClass('sub');
     }
   },
 
   showCardTab: function(tab) {
-    this.otpView.updateScreen({
-      maxlength: 6,
-    });
+    // this.otpView.updateScreen({
+    //   maxlength: 6,
+    // });
 
-    onSixDigits.call(this, {
-      target: gel('card_number'),
-    });
+    // onSixDigits.call(this, {
+    //   target: gel('card_number'),
+    // });
 
     var self = this;
     var customer = self.customer;
@@ -3815,34 +3838,34 @@ Session.prototype = {
       skipText: 'Skip Saved Cards',
     });
 
-    if (!customer.logged && !this.wants_skip) {
-      self.commenceOTP('saved cards', true);
-      customer.checkStatus(function() {
-        /**
-         * 1. If this is a recurring payment and customer doesn't have saved cards,
-         *    create and ask for OTP.
-         * 2. If customer has saved cards and is not logged in, ask for OTP.
-         * 3. If customer doesn't have saved cards, show cards screen.
-         */
-        if (self.recurring && !customer.saved && !customer.logged) {
-          self.customer.createOTP(function() {
-            askOTP(
-              self.otpView,
-              'Enter OTP sent on ' +
-                getPhone() +
-                '<br>to save your card for future payments',
-              true
-            );
-          });
-        } else if (customer.saved && !customer.logged) {
-          askOTP(self.otpView, undefined, true);
-        } else {
-          self.showCards();
-        }
-      });
-    } else {
-      self.showCards();
-    }
+    // if (!customer.logged && !this.wants_skip) {
+    //   self.commenceOTP('saved cards', true);
+    //   customer.checkStatus(function() {
+    //     /**
+    //      * 1. If this is a recurring payment and customer doesn't have saved cards,
+    //      *    create and ask for OTP.
+    //      * 2. If customer has saved cards and is not logged in, ask for OTP.
+    //      * 3. If customer doesn't have saved cards, show cards screen.
+    //      */
+    //     if (self.recurring && !customer.saved && !customer.logged) {
+    //       self.customer.createOTP(function() {
+    //         askOTP(
+    //           self.otpView,
+    //           'Enter OTP sent on ' +
+    //             getPhone() +
+    //             '<br>to save your card for future payments',
+    //           true
+    //         );
+    //       });
+    //     } else if (customer.saved && !customer.logged) {
+    //       askOTP(self.otpView, undefined, true);
+    //     } else {
+    //       self.showCards();
+    //     }
+    //   });
+    // } else {
+    //   self.showCards();
+    // }
   },
 
   showCards: function() {
@@ -5401,6 +5424,10 @@ Session.prototype = {
       shouldContinue = this.bankTransferView.shouldSubmit();
     }
 
+    if (this.tab === 'card') {
+      shouldContinue = this.svelteCardTab.shouldSubmit();
+    }
+
     if (!shouldContinue) {
       return;
     }
@@ -6028,6 +6055,10 @@ Session.prototype = {
         this.netbankingTab.$destroy();
       }
 
+      if (this.svelteCardTab) {
+        this.svelteCardTab.$destroy();
+      }
+
       if (this.upiTab) {
         this.upiTab.$destroy();
       }
@@ -6076,7 +6107,7 @@ Session.prototype = {
 
       this.tab = this.screen = '';
       this.modal = this.emi = this.el = this.card = null;
-      this.upiTab = this.otpView = this.netbankingTab = null;
+      this.upiTab = this.otpView = this.netbankingTab = this.svelteCardTab = null;
       this.payoutsView = this.payoutsAccountView = null;
       this.savedCardsView = this.feeBearerView = this.payLaterView = null;
       this.nachScreen = null;
