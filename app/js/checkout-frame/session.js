@@ -5061,8 +5061,8 @@ Session.prototype = {
     return (
       'Please accept the request of ' +
       this.formatAmountWithCurrency(this.get('amount')) +
-      ' in your Google Pay app linked with ' +
-      this.customer.contact
+      ' in your Google Pay app linked with +91' +
+      this.payload.contact
     );
   },
 
