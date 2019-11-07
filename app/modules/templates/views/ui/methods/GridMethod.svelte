@@ -43,7 +43,7 @@
       <span class="downtime">
         <Tooltip
           bindTo="#payment-options"
-          class="downtime-tooltip"
+          className="downtime-tooltip"
           align={['top']}>
           {downMessage}
         </Tooltip>
