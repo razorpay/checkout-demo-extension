@@ -5053,6 +5053,19 @@ Session.prototype = {
     this.showLoadError(text, false);
   },
 
+  /**
+   * Get the message to be shown in the omnichannel loader.
+   * @return {string}
+   */
+  getOmnichannelMessage: function() {
+    return (
+      'Please accept the request of ' +
+      this.formatAmountWithCurrency(this.get('amount')) +
+      ' in your Google Pay app linked with +91' +
+      this.payload.contact
+    );
+  },
+
   showLoadError: function(text, error) {
     if (this.headless && this.screen === 'card') {
       return;
@@ -5611,11 +5624,7 @@ Session.prototype = {
           return;
         }
 
-        if (
-          this.preferences.features &&
-          this.preferences.features.google_pay_omnichannel &&
-          this.upiTab.selectedApp === 'gpay'
-        ) {
+        if (this.isOmnichannel()) {
           $('.omnichannel').show();
         } else {
           $('.omnichannel').hide();
@@ -6053,7 +6062,7 @@ Session.prototype = {
         '<img src="' + walletObj.logo + '" height="' + walletObj.h + '">';
       this.commenceOTP(wallet + ' account', true);
     } else if (this.isOmnichannel()) {
-      this.showOmnichannelLoader(strings.OmnichannelNotification);
+      this.showOmnichannelLoader(strings.gpay_omnichannel);
     } else if (!this.isPayout) {
       this.showLoadError();
     } else {
@@ -6266,10 +6275,13 @@ Session.prototype = {
           return that.showLoadError('Waiting for payment confirmation.');
         }
 
-        /* Otherwise it's directpay */
-        that.showLoadError(
-          "Please accept the request from Razorpay's VPA on your UPI app"
-        );
+        if (that.isOmnichannel()) {
+          that.showOmnichannelLoader(that.getOmnichannelMessage());
+        } else {
+          that.showLoadError(
+            "Please accept the request from Razorpay's VPA on your UPI app"
+          );
+        }
       });
     } else {
       if (!this.headless) {
@@ -6927,13 +6939,13 @@ Session.prototype = {
     return getCustomer.apply(null, arguments);
   },
   isOmnichannel: function() {
-    var isOmni =
+    return (
       this.preferences.features &&
       this.preferences.features.google_pay_omnichannel &&
       this.upiTab &&
-      this.upiTab.selectedApp === 'gpay';
-
-    return isOmni;
+      this.upiTab.selectedApp === 'gpay' &&
+      this.upiTab.omnichannelType === 'phone'
+    );
   },
 
   /**
