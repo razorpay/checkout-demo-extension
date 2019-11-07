@@ -37,6 +37,13 @@ module.exports = {
   expectMockSuccessWithCallback,
   expectMockFailureWithCallback,
   handleMockSuccessDialog,
+  selectUPIMethod,
+  enterUPIAccount,
+  handleUPIAccountValidation,
+  respondToUPIAjax,
+  respondToUPIPaymentStatus,
+  respondAndVerifyIntentRequest,
+  selectUPIApp,
   viewOffers,
   selectOffer,
   verifyOfferApplied,
@@ -84,6 +91,7 @@ async function respondAndVerifyIntentRequest(context) {
 
   const successResult = { razorpay_payment_id: 'pay_DaFKujjV6Ajr7W' };
   const req = await context.expectRequest();
+  expect(req.url).toContain('status?key_id');
   await context.respondPlain(
     `${req.params.callback}(${JSON.stringify(successResult)})`
   );
@@ -91,8 +99,9 @@ async function respondAndVerifyIntentRequest(context) {
   expect(result).toMatchObject(successResult);
 }
 
-async function respondToUPIAjax(context) {
+async function respondToUPIAjax(context, offerId) {
   const req = await context.expectRequest();
+  if (offerId != '') expect(req.body).toContain(offerId);
   expect(req.url).toContain('create/ajax');
   await context.respondJSON({
     type: 'async',
@@ -110,12 +119,14 @@ async function respondToUPIAjax(context) {
 }
 
 async function respondToUPIPaymentStatus(context) {
+  const successResult = { razorpay_payment_id: 'pay_DaFKujjV6Ajr7W' };
   const req = await context.expectRequest();
   expect(req.url).toContain('status?key_id');
-  await context.respondJSON({
-    razorpay_payment_id: 'pay_DaaBCIH1rZXZg5',
-    http_status_code: 200,
-  });
+  await context.respondPlain(
+    `${req.params.callback}(${JSON.stringify(successResult)})`
+  );
+  await delay(500);
+  expect(await context.page.$('#modal-inner')).toEqual(null);
 }
 
 async function handleUPIAccountValidation(context, vpa) {
@@ -216,13 +227,15 @@ async function verifyErrorMessage(context, expectedErrorMeassage) {
     messageDiv => messageDiv.textContent,
     messageDiv
   );
-  if (messageText == 'Your payment is being processed') {
-    await delay(800);
-    const messageDiv = await context.page.waitForSelector('#fd-t');
-    messageText = await context.page.evaluate(
-      messageDiv => messageDiv.textContent,
-      messageDiv
-    );
+  for (let retrycount = 0; retrycount < 5; retrycount++) {
+    if (messageText.includes('Your payment is being processed')) {
+      await delay(800);
+      const messageDiv = await context.page.waitForSelector('#fd-t');
+      messageText = await context.page.evaluate(
+        messageDiv => messageDiv.textContent,
+        messageDiv
+      );
+    } else if (messageText == expectedErrorMeassage) break;
   }
   expect(messageText).toEqual(expectedErrorMeassage);
 }
@@ -236,10 +249,15 @@ async function verifyPartialAmount(context, amount) {
 }
 
 async function handlePartialPayment(context, amount) {
-  const makePartialCheckBox = await context.page.waitForSelector('.checkbox');
+  const makePartialCheckBox = await context.page.waitForSelector(
+    '#partial-radio'
+  );
   await makePartialCheckBox.click();
   await makePartialCheckBox.click();
   await makePartialCheckBox.click();
+  await delay(300);
+  // await makePartialCheckBox.click();
+  // await makePartialCheckBox.click();
   const amountValue = await context.page.waitForSelector('#amount-value');
   await amountValue.type(amount);
   const nextButton = await context.page.waitForSelector('#next-button');
@@ -262,7 +280,8 @@ async function submit(context) {
 }
 
 async function handleCardValidation(context) {
-  await context.expectRequest();
+  const req = await context.expectRequest();
+  expect(req.url).toContain('create/ajax');
   await context.respondJSON({
     type: 'first',
     request: {
@@ -296,18 +315,20 @@ async function handleEMIValidation(context) {
 }
 
 async function handleCardValidationWithCallback(context) {
-  await context.expectRequest();
+  const req = await context.expectRequest();
+  expect(req.url).toContain('create/checkout');
   await context.respondPlain(contents);
 }
 
 async function handleMockFailureDialog(context) {
-  await delay(300);
   let popup = await context.popup();
   let popupPage = await popup.page();
-  if (popup == null || popupPage == null) {
-    await delay(400);
-    popup = await context.popup();
-    popupPage = await popup.page();
+  for (let retrycount = 0; retrycount < 7; retrycount++) {
+    if (popup == null || popupPage == null) {
+      await delay(400);
+      popup = await context.popup();
+      popupPage = await popup.page();
+    } else break;
   }
   const failButton = await popupPage.$('.danger');
   await failButton.click();
@@ -357,7 +378,7 @@ async function handleValidationRequest(context, passOrFail) {
 }
 
 async function failRequestwithErrorMessage(context, errorMessage) {
-  await context.expectRequest(req => {});
+  await context.expectRequest();
   await context.failRequest({ error: errorMessage });
 }
 
@@ -441,23 +462,23 @@ async function selectBank(context, bank) {
   await context.page.select('#bank-select', bank);
 }
 
-async function verifyHighDowntime(context, bank) {
+async function verifyHighDowntime(context, message) {
   const toolTip = await context.page.waitForSelector('.downtime .tooltip');
   const toolTipText = await context.page.evaluate(
     toolTip => toolTip.textContent,
     toolTip
   );
-  expect(toolTipText).toContain(bank);
+  expect(toolTipText).toContain(message);
 }
 
-async function verifyLowDowntime(context, bank) {
+async function verifyLowDowntime(context, message) {
   const warningDiv = await context.page.waitForSelector('.downtime-callout');
   // console.log(warningDiv);
   const warningText = await context.page.evaluate(
     warningDiv => warningDiv.textContent,
     warningDiv
   );
-  expect(warningText).toContain(bank);
+  expect(warningText).toContain(message);
 }
 
 async function typeOTPandSubmit(context) {
@@ -477,7 +498,7 @@ async function verifyTimeout(context, paymentMode) {
     paymentMode == 'upi' ||
     paymentMode == 'emi'
   ) {
-    await delay(2000);
+    await delay(1000);
     expect(await context.page.$('#fd-hide')).not.toEqual(null);
     await delay(10000);
     expect(await context.page.$('#fd-hide')).toEqual(null);
@@ -490,7 +511,8 @@ async function verifyTimeout(context, paymentMode) {
 }
 
 async function handleOtpVerification(context) {
-  await context.expectRequest();
+  const req = await context.expectRequest();
+  expect(req.url).toContain('create/ajax');
   await context.respondJSON({
     type: 'otp',
     request: {

@@ -11,16 +11,17 @@ const {
   handleUPIAccountValidation,
   respondToUPIAjax,
   respondToUPIPaymentStatus,
+  handleFeeBearer,
 } = require('../../actions/common');
 
 describe('Basic upi payment', () => {
-  test('Perform upi collect transaction', async () => {
+  test('Perform keyless upi collect transaction with customer feebearer enabled', async () => {
     const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+      order_id: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
       personalization: false,
     };
-    const preferences = makePreferences();
+    const preferences = makePreferences({ fee_bearer: true });
     preferences.methods.upi = true;
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
@@ -31,7 +32,8 @@ describe('Basic upi payment', () => {
     await enterUPIAccount(context, 'BHIM');
     await submit(context);
     await handleUPIAccountValidation(context, 'BHIM@upi');
-    await respondToUPIAjax(context);
+    await handleFeeBearer(context, page);
+    await respondToUPIAjax(context, '');
     await respondToUPIPaymentStatus(context);
   });
 });
