@@ -321,10 +321,9 @@ async function handleCardValidationWithCallback(context) {
 }
 
 async function handleMockFailureDialog(context) {
-  await delay(300);
   let popup = await context.popup();
   let popupPage = await popup.page();
-  for (let retrycount = 0; retrycount < 5; retrycount++) {
+  for (let retrycount = 0; retrycount < 7; retrycount++) {
     if (popup == null || popupPage == null) {
       await delay(400);
       popup = await context.popup();
