@@ -256,8 +256,9 @@ async function handlePartialPayment(context, amount) {
   await makePartialCheckBox.click();
   await makePartialCheckBox.click();
   await makePartialCheckBox.click();
-  await makePartialCheckBox.click();
-  await makePartialCheckBox.click();
+  await delay(300);
+  // await makePartialCheckBox.click();
+  // await makePartialCheckBox.click();
   const amountValue = await context.page.waitForSelector('#amount-value');
   await amountValue.type(amount);
   const nextButton = await context.page.waitForSelector('#next-button');
@@ -322,10 +323,9 @@ async function handleCardValidationWithCallback(context) {
 }
 
 async function handleMockFailureDialog(context) {
-  await delay(300);
   let popup = await context.popup();
   let popupPage = await popup.page();
-  for (let retrycount = 0; retrycount < 5; retrycount++) {
+  for (let retrycount = 0; retrycount < 7; retrycount++) {
     if (popup == null || popupPage == null) {
       await delay(400);
       popup = await context.popup();
@@ -380,7 +380,7 @@ async function handleValidationRequest(context, passOrFail) {
 }
 
 async function failRequestwithErrorMessage(context, errorMessage) {
-  await context.expectRequest(req => {});
+  await context.expectRequest();
   await context.failRequest({ error: errorMessage });
 }
 
