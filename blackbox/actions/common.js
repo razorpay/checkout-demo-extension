@@ -255,8 +255,9 @@ async function handlePartialPayment(context, amount) {
   await makePartialCheckBox.click();
   await makePartialCheckBox.click();
   await makePartialCheckBox.click();
-  await makePartialCheckBox.click();
-  await makePartialCheckBox.click();
+  await delay(300);
+  // await makePartialCheckBox.click();
+  // await makePartialCheckBox.click();
   const amountValue = await context.page.waitForSelector('#amount-value');
   await amountValue.type(amount);
   const nextButton = await context.page.waitForSelector('#next-button');
