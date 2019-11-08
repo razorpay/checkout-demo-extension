@@ -233,16 +233,18 @@ function updateInstrumentForCustomer(instrument, customer) {
 
   // Get instruments for all customers
   const instrumentsList = getAllInstruments();
-  const instruments = getAllInstrumentsForCustomer(customer);
+  let instruments = getAllInstrumentsForCustomer(customer);
 
   const existing = _Arr.find(
     instruments,
     _instrument => _instrument.id === instrument.id
   );
 
-  if (!existing) {
-    instruments.push(instrument);
+  // Replace existing instrument with new one
+  if (existing) {
+    instruments = _Arr.remove(instruments, existing);
   }
+  instruments.push(instrument);
 
   instrumentsList[hashFnv32a(contact)] = instruments;
 
