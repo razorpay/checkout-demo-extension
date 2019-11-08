@@ -60,6 +60,9 @@ module.exports = {
   respondToUPIPaymentStatus,
   respondAndVerifyIntentRequest,
   selectUPIApp,
+  verifyDiscountPaybleAmount,
+  verifyDiscountText,
+  verifyDiscountAmountInBanner,
 };
 
 async function selectUPIApp(context, AppNumber) {
@@ -207,9 +210,37 @@ async function verifyOfferApplied(context) {
   expect(await context.page.$eval('.selected-offer', visible)).toEqual(true);
 }
 
-async function enterCardDetails(context) {
+async function verifyDiscountAmountInBanner(context, expectedDiscountAmount) {
+  const discount = await context.page.waitForSelector('#amount > .discount');
+  let discountAmount = await context.page.evaluate(
+    discount => discount.textContent,
+    discount
+  );
+  expect(discountAmount).toEqual(expectedDiscountAmount);
+}
+
+async function verifyDiscountPaybleAmount(context, expectedDiscountAmount) {
+  const discount = await context.page.waitForSelector('.pay-btn .discount');
+  let discountAmount = await context.page.evaluate(
+    discount => discount.textContent,
+    discount
+  );
+  expect(discountAmount).toEqual(expectedDiscountAmount);
+}
+
+async function verifyDiscountText(context, expectedDiscountAmount) {
+  const discount = await context.page.waitForSelector('.discount-text');
+  let discountAmount = await context.page.evaluate(
+    discount => discount.textContent,
+    discount
+  );
+  expect(discountAmount).toEqual(expectedDiscountAmount);
+}
+
+async function enterCardDetails(context, cardType) {
   const cardNum = await context.page.waitForSelector('#card_number');
-  await cardNum.type('5241 9333 8074 0001');
+  if (cardType == undefined) await cardNum.type('5241 9333 8074 0001');
+  else if (cardType == 'VISA') await cardNum.type('4111 1111 1111 1111');
   await context.expectRequest(req => {});
   await context.respondJSON({
     recurring: false,
