@@ -281,6 +281,7 @@ async function verifyPartialAmount(context, amount) {
 }
 
 async function handlePartialPayment(context, amount) {
+  await delay(300);
   const makePartialCheckBox = await context.page.waitForSelector(
     '#partial-radio'
   );
@@ -292,6 +293,7 @@ async function handlePartialPayment(context, amount) {
   // await makePartialCheckBox.click();
   const amountValue = await context.page.waitForSelector('#amount-value');
   await amountValue.type(amount);
+  await delay(300);
   const nextButton = await context.page.waitForSelector('#next-button');
   await nextButton.click();
   await delay(200);
