@@ -3,6 +3,7 @@ const { readFileSync } = require('fs');
 const { cdnUrl, lumberjackUrl } = require('../const');
 const { interceptor } = require('../util');
 const { sendPreferences } = require('../actions/preferences');
+testCount = 0;
 
 const checkoutPublic = 'https://api.razorpay.com/v1/checkout/public';
 const checkoutCss = 'https://checkout.razorpay.com/v1/css/checkout.css';
@@ -92,6 +93,7 @@ module.exports = {
 
     const returnObj = {
       page,
+      testCount,
       options,
       preferences,
       ...interceptorOptions,

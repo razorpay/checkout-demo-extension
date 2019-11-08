@@ -286,9 +286,10 @@ async function handlePartialPayment(context, amount) {
     '#partial-radio'
   );
   await makePartialCheckBox.click();
-  await makePartialCheckBox.click();
-  await makePartialCheckBox.click();
-  await delay(300);
+  // await delay(800);
+  // await makePartialCheckBox.click();
+  // await makePartialCheckBox.click();
+  // await delay(800);
   // await makePartialCheckBox.click();
   // await makePartialCheckBox.click();
   const amountValue = await context.page.waitForSelector('#amount-value');
@@ -480,6 +481,14 @@ async function fillUserDetails(context, isContactRequired) {
 }
 
 async function assertPaymentMethods(context) {
+  //   context.testCount++;
+  //   console.log(context.testCount);
+  //   await context.page.screenshot({
+  //     path: '/Users/sakshijain/Desktop/Test_1/'+ context.testCount + '.jpg',
+  //     fullpage: true,
+  //     type: 'jpeg'
+  // });
+  await delay(300);
   expect(await context.page.$eval('[tab=netbanking]', visible)).toEqual(true);
   expect(await context.page.$eval('[tab=wallet]', visible)).toEqual(true);
   expect(await context.page.$eval('[tab=card]', visible)).toEqual(true);
