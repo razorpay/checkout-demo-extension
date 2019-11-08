@@ -987,11 +987,9 @@ function debounceAskOTP(view, msg, shouldLimitResend, screenProps) {
 
 // this === Session
 function successHandler(response) {
-  if (this.p13n) {
-    var p13nInstrument =
-      this.methodsList.getSelectedInstrument() || this.p13nInstrument;
+  if (this.p13n && this.p13nInstrument) {
     P13n.recordSuccess(
-      p13nInstrument,
+      this.p13nInstrument,
       this.customer || this.getCustomer(this.payload.contact)
     );
   }
