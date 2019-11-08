@@ -59,7 +59,6 @@ import * as OTPScreenStore from 'checkoutstore/screens/otp';
 
 import QRScreen from 'templates/views/qr.svelte';
 import BankTransferScreen from 'templates/views/bank_transfer.svelte';
-import MagicView from 'checkoutframe/magic';
 import UpiTab from 'templates/tabs/upi/index.svelte';
 import emiOptionsView from 'templates/screens/cardlessemi.svelte';
 import emiScreenView from 'templates/screens/emiscreen.svelte';
@@ -155,7 +154,6 @@ export default {
   BankTransferScreen,
   getFullBankLogo,
 
-  MagicView,
   UpiTab,
   NetbankingTab,
   NachScreen,

@@ -237,8 +237,6 @@ export default function Track(r, event, data, immediately) {
       externalWallets
       |> _Arr.reduce((acc, wallet) => acc |> _Obj.setProp(wallet, true), {});
 
-    addMagicProps(r, properties);
-
     if (_uid) {
       properties.local_order_id = _uid;
     }
@@ -255,28 +253,6 @@ export default function Track(r, event, data, immediately) {
       flushEvents();
     }
   });
-}
-
-function addMagicProps(r, properties) {
-  var payment = r._payment;
-
-  if (payment) {
-    if (payment.payment_id) {
-      properties.payment_id = payment.payment_id;
-    }
-
-    if (payment |> _Obj.hasOwnProp('magicPossible')) {
-      properties.magic_possible = payment.magicPossible;
-    }
-
-    if (payment |> _Obj.hasOwnProp('isMagicPayment')) {
-      properties.magic_attempted = payment.isMagicPayment;
-    }
-
-    if (payment |> _Obj.hasOwnProp('magicCoproto')) {
-      properties.magic_coproto = payment.magicCoproto;
-    }
-  }
 }
 
 Track.dispatchPendingEvents = r => {
