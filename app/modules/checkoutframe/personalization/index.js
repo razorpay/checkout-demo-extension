@@ -272,15 +272,20 @@ export function getAllInstrumentsForCustomer(customer) {
 /**
  * Returns the list of preferred payment modes for the user in a sorted order
  * @param {Object} customer
+ * @param {Object} extra
+ *  @prop {Object} methods
  *
  * @returns {Array<Object>}
  */
-export const getInstrumentsForCustomer = customer => {
+export const getInstrumentsForCustomer = (customer, extra = {}) => {
+  const { methods } = extra;
+
   let instruments = getAllInstrumentsForCustomer(customer);
 
   // Filter out the list
   instruments = filterInstruments({
     instruments,
+    methods,
   });
 
   // Add score for each instrument

@@ -136,11 +136,19 @@ export function filterInstrumentsForDowntime(instruments) {
  *
  * @param {Object} params
  *  @prop {Array} instruments
+ *  @prop {Object} methods
  *
  * @returns {Array} filtered instruments
  */
-export function filterInstruments({ instruments }) {
+export function filterInstruments({ instruments, methods }) {
+  const filteredByMethods = filterInstrumentsForAvailableMethods(
+    instruments,
+    methods
+  );
+
   return (
-    instruments |> filterInstrumentsForSanity |> filterInstrumentsForDowntime
+    filteredByMethods
+    |> filterInstrumentsForSanity
+    |> filterInstrumentsForDowntime
   );
 }

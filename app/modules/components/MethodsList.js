@@ -6,7 +6,6 @@ import * as AnalyticsTypes from 'analytics-types';
 import { isMobile } from 'common/useragent';
 import { AVAILABLE_METHODS } from 'common/constants';
 import { createInstrumentFromPayment } from 'checkoutframe/personalization';
-import { filterInstrumentsForAvailableMethods } from 'checkoutframe/personalization/filters';
 import { getSession } from 'sessionmanager';
 
 /**
@@ -168,12 +167,6 @@ export default class MethodsList {
         noOfInstrumentsToShow = 1;
       }
     }
-
-    /* Only allow for available methods */
-    props.instruments = filterInstrumentsForAvailableMethods(
-      props.instruments,
-      session.methods
-    );
 
     /**
      * For international + paypal,

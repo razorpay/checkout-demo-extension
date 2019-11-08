@@ -3453,7 +3453,10 @@ Session.prototype = {
 
           if (this.isValid() && shouldUseP13n) {
             instruments = P13n.getInstrumentsForCustomer(
-              self.getCustomer(this.value)
+              self.getCustomer(this.value),
+              {
+                methods: self.methods,
+              }
             );
 
             if (instruments.length) {
