@@ -397,10 +397,6 @@
 </script>
 
 <style>
-  :global(#form-upi[down='true']) {
-    padding-bottom: 37px;
-  }
-
   .legend {
     padding: 12px 0 8px 12px;
   }
@@ -468,78 +464,82 @@
 
 <Tab method="upi" {down} pad={false}>
   <Screen>
-    {#if intent}
-      <UpiIntent
-        bind:this={intentView}
-        apps={intentApps}
-        {selectedApp}
-        {showRecommendedUPIApp} />
-    {:else if selectedApp === undefined || isGPaySelected}
-      <div class="legend left">Select a UPI app</div>
-      <Grid items={topUpiApps} on:select={onUpiAppSelection} />
-    {:else}
-      <div class="legend left">Selected UPI app</div>
-      <Card>
-        <span class="ref-iconwrap">
-          <Icon icon={selectedAppData.icon} alt={selectedAppData.text} />
-        </span>
-        <span>{selectedAppData.text}</span>
-        <div class="ref-changebtn" on:click={onUpiAppSelection}>change</div>
-      </Card>
-      {#if selectedApp === 'gpay'}
-        {#if useOmnichannel}
-          <GooglePayOmnichannel
-            error={retryOmnichannel}
+    <div slot="main">
+      {#if intent}
+        <UpiIntent
+          bind:this={intentView}
+          apps={intentApps}
+          {selectedApp}
+          {showRecommendedUPIApp} />
+      {:else if selectedApp === undefined || isGPaySelected}
+        <div class="legend left">Select a UPI app</div>
+        <Grid items={topUpiApps} on:select={onUpiAppSelection} />
+      {:else}
+        <div class="legend left">Selected UPI app</div>
+        <Card>
+          <span class="ref-iconwrap">
+            <Icon icon={selectedAppData.icon} alt={selectedAppData.text} />
+          </span>
+          <span>{selectedAppData.text}</span>
+          <div class="ref-changebtn" on:click={onUpiAppSelection}>change</div>
+        </Card>
+        {#if selectedApp === 'gpay'}
+          {#if useOmnichannel}
+            <GooglePayOmnichannel
+              error={retryOmnichannel}
+              focusOnCreate={true}
+              {isFirst}
+              retry={retryOmnichannel}
+              selected={omnichannelType === 'phone'}
+              on:blur={trackOmnichannelEntry}
+              on:select={setOmnichannelType}
+              bind:this={omnichannelField} />
+          {/if}
+          {#if retryOmnichannel || !useOmnichannel}
+            <GooglePayCollect
+              focusOnCreate={!retryOmnichannel}
+              {pspHandle}
+              retry={retryOmnichannel}
+              selected={omnichannelType === 'vpa'}
+              on:blur={trackVpaEntry}
+              on:handleChange={trackHandleSelection}
+              on:select={setOmnichannelType}
+              bind:this={vpaField} />
+          {/if}
+        {:else}
+          <Collect
+            appId={selectedAppData.id}
             focusOnCreate={true}
-            {isFirst}
-            retry={retryOmnichannel}
-            selected={omnichannelType === 'phone'}
-            on:blur={trackOmnichannelEntry}
-            on:select={setOmnichannelType}
-            bind:this={omnichannelField} />
-        {/if}
-        {#if retryOmnichannel || !useOmnichannel}
-          <GooglePayCollect
-            focusOnCreate={!retryOmnichannel}
             {pspHandle}
-            retry={retryOmnichannel}
-            selected={omnichannelType === 'vpa'}
+            {selectedApp}
+            {vpa}
             on:blur={trackVpaEntry}
-            on:handleChange={trackHandleSelection}
-            on:select={setOmnichannelType}
             bind:this={vpaField} />
         {/if}
-      {:else}
-        <Collect
-          appId={selectedAppData.id}
-          focusOnCreate={true}
-          {pspHandle}
-          {selectedApp}
-          {vpa}
-          on:blur={trackVpaEntry}
-          bind:this={vpaField} />
       {/if}
-    {/if}
 
-    {#if shouldShowQr}
-      <div class="legend left">Or, Pay using QR</div>
-      <div class="options" id="showQr">
-        <NextOption
-          icon={qrIcon}
-          tabindex="0"
-          attributes={{ role: 'button', 'aria-label': 'Show QR Code - Scan the QR code using your UPI app' }}
-          on:select={selectQrMethod}>
-          <div>Show QR Code</div>
-          <div class="desc">Scan the QR code using your UPI app</div>
-        </NextOption>
-      </div>
-    {/if}
+      {#if shouldShowQr}
+        <div class="legend left">Or, Pay using QR</div>
+        <div class="options" id="showQr">
+          <NextOption
+            icon={qrIcon}
+            tabindex="0"
+            attributes={{ role: 'button', 'aria-label': 'Show QR Code - Scan the QR code using your UPI app' }}
+            on:select={selectQrMethod}>
+            <div>Show QR Code</div>
+            <div class="desc">Scan the QR code using your UPI app</div>
+          </NextOption>
+        </div>
+      {/if}
+    </div>
+
+    <div slot="bottom">
+      {#if down || disabled}
+        <DowntimeCallout isHighSeverity={disabled}>
+          <strong>UPI</strong>
+          is experiencing low success rates.
+        </DowntimeCallout>
+      {/if}
+    </div>
   </Screen>
-
-  {#if down || disabled}
-    <DowntimeCallout isHighSeverity={disabled}>
-      <strong>UPI</strong>
-      is experiencing low success rates.
-    </DowntimeCallout>
-  {/if}
 </Tab>
