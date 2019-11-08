@@ -1,5 +1,10 @@
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
+- [Setup Instructions](#setup-instructions)
+- [Testing](#testing)
+- [Keys](#keys)
+- [Adding/removing new BINs for EMI Banks](#adding/removing-new-bins-for-emi-banks)
+
 # Setup Instructions
 
 1. Copy `app/index.sample.html` -> `app/index.html`
@@ -13,9 +18,10 @@
 
 - Install chrome/chromium and set `CHROME_BIN` env var to chrome executable.
 - `npm test` to run unit tests, make production build and run blackbox tests.
-- `node blackbox` to run all blackbox tests in headless mode.
-- `node blackbox ${test}` to just run a particular test without headless.
-  - e.g. `node blackbox card`
+- `npm run jest` to run all blackbox tests.
+- `npm run jest blackbox/${path to test}` to run a particular test.
+  - eg. npm run jest blackbox/tests/card/offers.test.js
+- Set `headless` to true in [`jest-environment.js`](blackbox/jest-environment.js) to run future tests in headless mode.
 
 Unit Tests are located in `test/unit` folder. `blackbox/sites` folder contains blackbox tests.
 
