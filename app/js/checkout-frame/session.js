@@ -1446,6 +1446,7 @@ Session.prototype = {
 
         this.renderOffers(this.screen);
 
+        // For portals, this tracking snippet is present in the Svelte component of Offer Portal.
         $offersContainer.on('click', function(e) {
           $offersTitle = $offersTitle || this.querySelector('.offers-title');
 
