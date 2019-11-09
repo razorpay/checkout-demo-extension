@@ -75,18 +75,18 @@ $mobile-view() {
     }
 
     &.has-offers {
-      #offers-container {
+      .offers-container {
         bottom: 0;
       }
 
       &[screen] {
-        #offers-container {
+        .offers-container {
           bottom: -($topbarh);
         }
       }
 
       &.sub {
-        #offers-container {
+        .offers-container {
           bottom: $footerh - $topbarh;
         }
       }
@@ -114,7 +114,7 @@ $mobile-view() {
   // :not(.sub) ensures we're not overriding the position for when .sub is present
   #container.one-method,
   &#container.one-method {
-    #modal #body.has-offers:not([screen]):not(.sub) #offers-container {
+    #modal #body.has-offers:not([screen]):not(.sub) .offers-container {
       bottom: $footerh;
     }
   }
