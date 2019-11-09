@@ -31,6 +31,7 @@
   import GooglePayOmnichannel from './GooglePayOmnichannel.svelte';
   import NextOption from 'templates/views/ui/options/NextOption.svelte';
   import Screen from 'templates/layouts/Screen.svelte';
+  import OffersPortal from 'templates/views/OffersPortal.svelte';
 
   // Props
   export let selectedApp = undefined;
@@ -540,6 +541,8 @@
           is experiencing low success rates.
         </DowntimeCallout>
       {/if}
+
+      <OffersPortal />
     </div>
   </Screen>
 </Tab>
