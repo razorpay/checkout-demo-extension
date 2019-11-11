@@ -63,6 +63,7 @@ module.exports = {
   verifyDiscountPaybleAmount,
   verifyDiscountText,
   verifyDiscountAmountInBanner,
+  passRequestNetbanking,
 };
 
 async function selectUPIApp(context, AppNumber) {
@@ -330,7 +331,7 @@ async function handleCardValidation(context) {
     amount: '\u20b9 51',
     image: 'https://cdn.razorpay.com/logos/D3JjREAG8erHB7_medium.jpg',
   });
-  await delay(1000);
+  await delay(1100);
 }
 
 async function handleEMIValidation(context) {
@@ -380,7 +381,11 @@ async function handleMockSuccessDialog(context) {
     popup = await context.popup();
     popupPage = await popup.page();
   }
-  const passButton = await popupPage.$('.success');
+  let passButton = await popupPage.$('.success');
+  if (passButton == null) {
+    await delay(400);
+    passButton = await popupPage.$('.success');
+  }
   await passButton.click();
   await delay(800);
 }
@@ -416,6 +421,37 @@ async function handleValidationRequest(context, passOrFail) {
 async function failRequestwithErrorMessage(context, errorMessage) {
   await context.expectRequest();
   await context.failRequest({ error: errorMessage });
+}
+
+async function passRequestNetbanking(context) {
+  const successResult = { razorpay_payment_id: 'pay_DaFKujjV6Ajr7W' };
+  const req = await context.expectRequest();
+  //expect(req.url).toContain('status?key_id');
+  context.respondJSON({
+    type: 'first',
+    request: {
+      url:
+        'https://api-web.func.razorpay.in/v1/gateway/mocksharp/payment?key_id=rzp_test_csiPFCSLbrdDCO',
+      method: 'post',
+      content: {
+        action: 'authorize',
+        amount: 105,
+        method: 'netbanking',
+        payment_id: 'DewgcLMrzDlVRg',
+        callback_url:
+          'https://api-web.func.razorpay.in/v1/payments/pay_DewgcLMrzDlVRg/callback/c736f6c7af6f597606344637cbe802c7ebac24ca/rzp_test_csiPFCSLbrdDCO',
+        recurring: 0,
+      },
+    },
+    version: 1,
+    payment_id: 'pay_DewgcLMrzDlVRg',
+    gateway:
+      'eyJpdiI6IjJLaG5PSnF0NUV6TVJRdkRnajc1UFE9PSIsInZhbHVlIjoiczdQZEUrMGN2NFFneTJkQmJuUFwvb3hsUmpxdG1NNTUzaXpRaytpN0J2RDQ9IiwibWFjIjoiMzAzMTU2MmQwNzA0OWU1NjQ2OGI3MjNkOGQyNDAxZTM1MzA0YmFkZDQwNWFlODAyYTg1OGNiZTIwODgwYmI5ZSJ9',
+    amount: '\u20b9 1.05',
+    image: null,
+    magic: false,
+  });
+  await delay(500);
 }
 
 async function retryWalletTransaction(context) {
@@ -638,5 +674,5 @@ async function handleFeeBearer(context) {
     '//*[@class="btn" and text() = "Continue"]'
   );
   await continueButton[0].click();
-  // await delay(200);
+  await delay(200);
 }

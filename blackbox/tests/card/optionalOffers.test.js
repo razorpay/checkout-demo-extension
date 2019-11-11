@@ -21,13 +21,14 @@ const {
 } = require('../../actions/common');
 
 describe('Card tests', () => {
-  test('perform card transaction with offers applied', async () => {
+  test('perform card transaction with offers applied with contact optional', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 1000,
       personalization: false,
     };
     const preferences = makePreferences({
+      optional: ['contact'],
       offers: [
         {
           original_amount: 200000,
@@ -59,7 +60,7 @@ describe('Card tests', () => {
     });
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
+    await fillUserDetails(context, false);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
     await enterCardDetails(context, 'VISA');
