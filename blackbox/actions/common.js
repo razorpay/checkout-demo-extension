@@ -60,17 +60,21 @@ module.exports = {
   respondToUPIPaymentStatus,
   respondAndVerifyIntentRequest,
   selectUPIApp,
+  verifyDiscountPaybleAmount,
+  verifyDiscountText,
+  verifyDiscountAmountInBanner,
 };
 
 async function selectUPIApp(context, AppNumber) {
   await context.page.click('.option:nth-of-type(' + AppNumber + ')');
 }
 
-async function respondAndVerifyIntentRequest(context) {
+async function respondAndVerifyIntentRequest(context, offerId) {
   const reqorg = await context.expectRequest();
   expect(reqorg.url).toEqual(
     'https://api.razorpay.com/v1/payments/create/ajax'
   );
+  if (offerId != '') expect(reqorg.body).toContain(offerId);
   expect(reqorg.method).toEqual('POST');
   await context.respondJSON({
     data: {
@@ -206,9 +210,37 @@ async function verifyOfferApplied(context) {
   expect(await context.page.$eval('.selected-offer', visible)).toEqual(true);
 }
 
-async function enterCardDetails(context) {
+async function verifyDiscountAmountInBanner(context, expectedDiscountAmount) {
+  const discount = await context.page.waitForSelector('#amount > .discount');
+  let discountAmount = await context.page.evaluate(
+    discount => discount.textContent,
+    discount
+  );
+  expect(discountAmount).toEqual(expectedDiscountAmount);
+}
+
+async function verifyDiscountPaybleAmount(context, expectedDiscountAmount) {
+  const discount = await context.page.waitForSelector('.pay-btn .discount');
+  let discountAmount = await context.page.evaluate(
+    discount => discount.textContent,
+    discount
+  );
+  expect(discountAmount).toEqual(expectedDiscountAmount);
+}
+
+async function verifyDiscountText(context, expectedDiscountAmount) {
+  const discount = await context.page.waitForSelector('.discount-text');
+  let discountAmount = await context.page.evaluate(
+    discount => discount.textContent,
+    discount
+  );
+  expect(discountAmount).toEqual(expectedDiscountAmount);
+}
+
+async function enterCardDetails(context, cardType) {
   const cardNum = await context.page.waitForSelector('#card_number');
-  await cardNum.type('5241 9333 8074 0001');
+  if (cardType == undefined) await cardNum.type('5241 9333 8074 0001');
+  else if (cardType == 'VISA') await cardNum.type('4111 1111 1111 1111');
   await context.expectRequest(req => {});
   await context.respondJSON({
     recurring: false,
@@ -249,21 +281,25 @@ async function verifyPartialAmount(context, amount) {
 }
 
 async function handlePartialPayment(context, amount) {
+  await delay(300);
   const makePartialCheckBox = await context.page.waitForSelector(
     '#partial-radio'
   );
   await makePartialCheckBox.click();
-  await makePartialCheckBox.click();
-  await makePartialCheckBox.click();
-  await delay(300);
+  // await delay(800);
+  // await makePartialCheckBox.click();
+  // await makePartialCheckBox.click();
+  // await delay(800);
   // await makePartialCheckBox.click();
   // await makePartialCheckBox.click();
   const amountValue = await context.page.waitForSelector('#amount-value');
   await amountValue.type(amount);
+  await delay(300);
   const nextButton = await context.page.waitForSelector('#next-button');
   await nextButton.click();
   await delay(200);
 }
+
 async function validateHelpMessage(context, message) {
   const helpElement = await context.page.$('.help');
   const text = await context.page.evaluate(
@@ -369,7 +405,7 @@ async function expectMockSuccessWithCallback(context) {
 }
 
 async function handleValidationRequest(context, passOrFail) {
-  const req = await context.expectRequest();
+  await context.expectRequest();
   if (passOrFail == 'fail') {
     await context.failRequest({ error: 'failed' });
   } else if (passOrFail == 'pass') {
@@ -445,6 +481,14 @@ async function fillUserDetails(context, isContactRequired) {
 }
 
 async function assertPaymentMethods(context) {
+  //   context.testCount++;
+  //   console.log(context.testCount);
+  //   await context.page.screenshot({
+  //     path: '/Users/sakshijain/Desktop/Test_1/'+ context.testCount + '.jpg',
+  //     fullpage: true,
+  //     type: 'jpeg'
+  // });
+  await delay(300);
   expect(await context.page.$eval('[tab=netbanking]', visible)).toEqual(true);
   expect(await context.page.$eval('[tab=wallet]', visible)).toEqual(true);
   expect(await context.page.$eval('[tab=card]', visible)).toEqual(true);

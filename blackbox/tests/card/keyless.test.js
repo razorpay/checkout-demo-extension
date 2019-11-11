@@ -36,6 +36,6 @@ describe('Card tests', () => {
     await submit(context);
 
     await handleCardValidation(context);
-    await handleMockFailureDialog(context);
+    await handleMockSuccessDialog(context);
   });
 });

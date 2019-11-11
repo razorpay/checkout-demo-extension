@@ -4,15 +4,11 @@ const {
   assertHomePage,
   fillUserDetails,
   assertPaymentMethods,
-  selectPaymentMethod,
-  submit,
-  respondAndVerifyIntentRequest,
-  handleFeeBearer,
-  selectUPIApp,
+  verifyHighDowntime,
 } = require('../../actions/common');
 
 describe('Basic upi payment', () => {
-  test('Perform upi intent transaction with feebearer and contact optional enabled', async () => {
+  test('Verify UPI intent downtime - High with customer feebearer enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
@@ -20,7 +16,24 @@ describe('Basic upi payment', () => {
     };
     const preferences = makePreferences({
       fee_bearer: true,
-      optional: ['contact'],
+      payment_downtime: {
+        entity: 'collection',
+        count: 1,
+        items: [
+          {
+            id: 'down_DEW7D9S10PEsl1',
+            entity: 'payment.downtime',
+            method: 'upi',
+            begin: 1567686386,
+            end: null,
+            status: 'started',
+            scheduled: false,
+            severity: 'high',
+            created_at: 1567686387,
+            updated_at: 1567686387,
+          },
+        ],
+      },
     });
     preferences.methods.upi = true;
     const context = await openSdkCheckout({
@@ -30,12 +43,11 @@ describe('Basic upi payment', () => {
       apps: [{ package_name: 'in.org.npci.upiapp', app_name: 'BHIM' }],
     });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, false);
+    await fillUserDetails(context, true);
     await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'upi');
-    await selectUPIApp(context, '1');
-    await submit(context);
-    await handleFeeBearer(context, page);
-    await respondAndVerifyIntentRequest(context, '');
+    await verifyHighDowntime(
+      context,
+      'UPI is facing temporary issues right now. Please select another method.'
+    );
   });
 });
