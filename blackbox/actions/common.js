@@ -1,109 +1,47 @@
 const { delay, visible } = require('../util');
 const { readFileSync } = require('fs');
-// remove destructuring and spread out imported object in modular export
-const {
-  verifyEMIPlansWithOffers,
-  selectEMIPlanWithOffer,
-  verifyEMIPlansWithoutOffers,
-  selectEMIPlanWithoutOffer,
-  handleEMIValidation,
-} = require('./emi-actions');
-const {
-  assertHomePage,
-  fillUserDetails,
-  assertPaymentMethods,
-  selectPaymentMethod,
-} = require('./home-page-actions');
-const { assertNetbankingPage } = require('./netbanking-actions');
-const {
-  verifyPartialAmount,
-  handlePartialPayment,
-} = require('./partial-payment-actions');
-const {
-  typeOTP,
-  typeOTPandSubmit,
-  handleOtpVerification,
-} = require('./otp-actions');
-const { handleFeeBearer } = require('./feebearer-actions');
-const {
-  selectUPIMethod,
-  enterUPIAccount,
-  handleUPIAccountValidation,
-  respondToUPIAjax,
-  respondToUPIPaymentStatus,
-  selectUPIApp,
-} = require('./upi-actions');
-const {
-  viewOffers,
-  selectOffer,
-  verifyOfferApplied,
-  setPreferenceForOffer,
-} = require('./offers-actions');
-const {
-  enterCardDetails,
-  handleCardValidation,
-  handleCardValidationWithCallback,
-} = require('./card-actions');
+const emiActions = require('./emi-actions');
+const homepageActions = require('./home-page-actions');
+const netBankingActions = require('./netbanking-actions');
+const partialPaymentActions = require('./partial-payment-actions');
+const otpActions = require('./otp-actions');
+const feebearerActions = require('./feebearer-actions');
+const upiActions = require('./upi-actions');
+const offerActions = require('./offers-actions');
+const cardActions = require('./card-actions');
 
 contents = String(
   readFileSync(__dirname + '/../fixtures/mockSuccessandFailPage.html')
 );
 
 module.exports = {
-  handleFeeBearer,
-  assertHomePage,
-  fillUserDetails,
-  assertPaymentMethods,
-  selectPaymentMethod,
-  selectWallet,
-  selectBank,
+  ...offerActions,
+  ...otpActions,
+  ...emiActions,
+  ...homepageActions,
+  ...upiActions,
+  ...cardActions,
+  ...netBankingActions,
+  ...partialPaymentActions,
+  ...feebearerActions,
   assertWalletPage,
-  assertNetbankingPage,
-  submit,
-  handleOtpVerification,
-  typeOTPandSubmit,
-  handleValidationRequest,
-  retryWalletTransaction,
-  typeOTP,
-  verifyTimeout,
-  validateHelpMessage,
-  handlePartialPayment,
-  verifyPartialAmount,
-  verifyErrorMessage,
+  expectMockFailureWithCallback,
+  expectMockSuccessWithCallback,
   failRequestwithErrorMessage,
-  enterCardDetails,
-  handleCardValidation,
   handleMockFailureDialog,
+  handleMockSuccessDialog,
+  handleValidationRequest,
+  respondAndVerifyIntentRequest,
   retryCardTransaction,
-  handleCardValidationWithCallback,
+  retryWalletTransaction,
+  selectBank,
+  selectWallet,
+  submit,
+  verifyErrorMessage,
+  validateHelpMessage,
+  verifyTimeout,
   verifyHighDowntime,
   verifyLowDowntime,
-  expectMockSuccessWithCallback,
-  expectMockFailureWithCallback,
-  handleMockSuccessDialog,
-  selectUPIMethod,
-  enterUPIAccount,
-  handleUPIAccountValidation,
-  respondToUPIAjax,
-  respondToUPIPaymentStatus,
-  respondAndVerifyIntentRequest,
-  selectUPIApp,
-  viewOffers,
-  selectOffer,
-  verifyOfferApplied,
-  setPreferenceForOffer,
-  verifyEMIPlansWithOffers,
-  selectEMIPlanWithOffer,
-  verifyEMIPlansWithoutOffers,
-  selectEMIPlanWithoutOffer,
-  handleEMIValidation,
-  selectUPIMethod,
-  enterUPIAccount,
-  handleUPIAccountValidation,
-  respondToUPIAjax,
-  respondToUPIPaymentStatus,
-  respondAndVerifyIntentRequest,
-  selectUPIApp,
 };
 
 async function respondAndVerifyIntentRequest(context) {
