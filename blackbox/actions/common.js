@@ -1,5 +1,6 @@
 const { delay, visible } = require('../util');
 const { readFileSync } = require('fs');
+// remove destructuring and spread out imported object in modular export
 const {
   verifyEMIPlansWithOffers,
   selectEMIPlanWithOffer,
@@ -14,6 +15,15 @@ const {
   selectPaymentMethod,
 } = require('./home-page-actions');
 const { assertNetbankingPage } = require('./netbanking-actions');
+const {
+  verifyPartialAmount,
+  handlePartialPayment,
+} = require('./partial-payment-actions');
+const {
+  typeOTP,
+  typeOTPandSubmit,
+  handleOtpVerification,
+} = require('./otp-actions');
 const { handleFeeBearer } = require('./feebearer-actions');
 const {
   selectUPIMethod,
@@ -148,31 +158,7 @@ async function verifyErrorMessage(context, expectedErrorMeassage) {
   }
   expect(messageText).toEqual(expectedErrorMeassage);
 }
-async function verifyPartialAmount(context, amount) {
-  const orignalAmount = await context.page.waitForSelector('.original-amount');
-  const otpAmount = await context.page.evaluate(
-    orignalAmount => orignalAmount.textContent,
-    orignalAmount
-  );
-  expect(otpAmount).toEqual(amount);
-}
 
-async function handlePartialPayment(context, amount) {
-  const makePartialCheckBox = await context.page.waitForSelector(
-    '#partial-radio'
-  );
-  await makePartialCheckBox.click();
-  await makePartialCheckBox.click();
-  await makePartialCheckBox.click();
-  await delay(300);
-  // await makePartialCheckBox.click();
-  // await makePartialCheckBox.click();
-  const amountValue = await context.page.waitForSelector('#amount-value');
-  await amountValue.type(amount);
-  const nextButton = await context.page.waitForSelector('#next-button');
-  await nextButton.click();
-  await delay(200);
-}
 async function validateHelpMessage(context, message) {
   const helpElement = await context.page.$('.help');
   const text = await context.page.evaluate(
@@ -303,16 +289,6 @@ async function verifyLowDowntime(context, message) {
   expect(warningText).toContain(message);
 }
 
-async function typeOTPandSubmit(context) {
-  await typeOTP(context);
-  await delay(1200);
-  await context.page.click('.otp-btn');
-}
-async function typeOTP(context) {
-  await delay(800);
-  await context.page.type('#otp', '5555');
-}
-
 async function verifyTimeout(context, paymentMode) {
   if (
     paymentMode == 'netbanking' ||
@@ -330,24 +306,4 @@ async function verifyTimeout(context, paymentMode) {
     await delay(7000);
     expect(await context.page.$('.otp-btn')).toEqual(null);
   }
-}
-
-async function handleOtpVerification(context) {
-  const req = await context.expectRequest();
-  expect(req.url).toContain('create/ajax');
-  await context.respondJSON({
-    type: 'otp',
-    request: {
-      url:
-        'https://api.razorpay.com/v1/payments/pay_DLbzHmbxvcpY9o/otp_submit/a393006fdb3d80bd41d199010375f4da5ea718da?key_id=rzp_test_1DP5mmOlF5G5ag',
-      method: 'post',
-      content: { next: ['resend_otp'] },
-    },
-    payment_id: 'pay_DLbzHmbxvcpY9o',
-    contact: '+919999999999',
-    amount: '51.00',
-    formatted_amount: '\u20b9 51',
-    wallet: 'freecharge',
-    merchant: 'RBL Bank',
-  });
 }
