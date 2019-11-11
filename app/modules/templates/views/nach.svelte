@@ -11,6 +11,7 @@
     getValidityError,
     uploadDocument,
   } from 'checkoutframe/nach';
+  import { updateCta } from 'checkoutstore/cta';
 
   // UI imports
   import Attachment from 'templates/views/ui/Attachment.svelte';
@@ -32,10 +33,9 @@
   $: view = file ? 'confirm' : 'upload';
   $: {
     if (file) {
-      const CTA = _Doc.querySelector('#footer .attach-nach-form');
       const text = file ? 'Submit' : 'Upload NACH form';
 
-      _El.setContents(CTA, text);
+      updateCta(text);
     }
   }
 
@@ -58,13 +58,7 @@
    * Session calls this method when it switches to "nach" tab
    */
   export function onShown() {
-    const footerButtons = {
-      attachNachForm: _Doc.querySelector('#footer .attach-nach-form'),
-      pay: _Doc.querySelector('#footer .pay-btn'),
-    };
-
-    _El.addClass(footerButtons.pay, 'invisible');
-    _El.removeClass(footerButtons.attachNachForm, 'invisible');
+    updateCta('Upload NACH Form');
   }
 
   /**
@@ -73,13 +67,7 @@
    * @returns {boolean} will tab handle back
    */
   export function onBack() {
-    const footerButtons = {
-      attachNachForm: _Doc.querySelector('#footer .attach-nach-form'),
-      pay: _Doc.querySelector('#footer .pay-btn'),
-    };
-
-    _El.addClass(footerButtons.attachNachForm, 'invisible');
-    _El.removeClass(footerButtons.pay, 'invisible');
+    session.showAmountInFooter();
 
     return false;
   }

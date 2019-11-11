@@ -7,6 +7,7 @@
   import { getSession } from 'sessionmanager';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
+  import { updateCta } from 'checkoutstore/cta';
 
   // UI imports
   import AsyncLoading from 'templates/views/ui/AsyncLoading.svelte';
@@ -22,11 +23,6 @@
   export let neftDetails = null;
 
   const session = getSession();
-  const footerButtons = {
-    copyDetails: _Doc.querySelector('#footer .bank-transfer-copy-details'),
-    pay: _Doc.querySelector('#footer .pay-btn'),
-    body: _Doc.querySelector('#body'),
-  };
 
   function init() {
     if (data !== null) {
@@ -99,14 +95,13 @@
   }
 
   function showCopyButton(show, text) {
+    const body = _Doc.querySelector('#body');
+
     if (show) {
-      _El.addClass(footerButtons.pay, 'invisible');
-      _El.addClass(footerButtons.body, 'sub');
-      _El.removeClass(footerButtons.copyDetails, 'invisible');
-      _El.setContents(footerButtons.copyDetails, text);
+      _El.addClass(body, 'sub');
+      updateCta(text);
     } else {
-      _El.addClass(footerButtons.copyDetails, 'invisible');
-      _El.removeClass(footerButtons.pay, 'invisible');
+      session.showAmountInFooter();
     }
   }
 </script>
