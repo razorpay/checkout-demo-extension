@@ -1,5 +1,39 @@
 const { delay, visible } = require('../util');
 const { readFileSync } = require('fs');
+const {
+  verifyEMIPlansWithOffers,
+  selectEMIPlanWithOffer,
+  verifyEMIPlansWithoutOffers,
+  selectEMIPlanWithoutOffer,
+  handleEMIValidation,
+} = require('./emi-actions');
+const {
+  assertHomePage,
+  fillUserDetails,
+  assertPaymentMethods,
+  selectPaymentMethod,
+} = require('./home-page-actions');
+const { assertNetbankingPage } = require('./netbanking-actions');
+const { handleFeeBearer } = require('./feebearer-actions');
+const {
+  selectUPIMethod,
+  enterUPIAccount,
+  handleUPIAccountValidation,
+  respondToUPIAjax,
+  respondToUPIPaymentStatus,
+  selectUPIApp,
+} = require('./upi-actions');
+const {
+  viewOffers,
+  selectOffer,
+  verifyOfferApplied,
+  setPreferenceForOffer,
+} = require('./offers-actions');
+const {
+  enterCardDetails,
+  handleCardValidation,
+  handleCardValidationWithCallback,
+} = require('./card-actions');
 
 contents = String(
   readFileSync(__dirname + '/../fixtures/mockSuccessandFailPage.html')
@@ -62,10 +96,6 @@ module.exports = {
   selectUPIApp,
 };
 
-async function selectUPIApp(context, AppNumber) {
-  await context.page.click('.option:nth-of-type(' + AppNumber + ')');
-}
-
 async function respondAndVerifyIntentRequest(context) {
   const reqorg = await context.expectRequest();
   expect(reqorg.url).toEqual(
@@ -97,127 +127,6 @@ async function respondAndVerifyIntentRequest(context) {
   );
   const result = await context.getResult();
   expect(result).toMatchObject(successResult);
-}
-
-async function respondToUPIAjax(context, offerId) {
-  const req = await context.expectRequest();
-  if (offerId != '') expect(req.body).toContain(offerId);
-  expect(req.url).toContain('create/ajax');
-  await context.respondJSON({
-    type: 'async',
-    version: 1,
-    payment_id: 'pay_DaaBCIH1rZXZg5',
-    gateway:
-      'eyJpdiI6IjdzTEZcLzUzUVN5dHBORHlZRFc2TVh3PT0iLCJ2YWx1ZSI6IldXeDdpWVFTSWhLbThLOWtXancrNEhRRkl0ZE5peDNDSDJnMUJTVmg4THc9IiwibWFjIjoiMGVhYjFhMDAyYzczNDlkMTI0OGFiMDRjMGJlZDVjZTA5MjM0YTcyNjI0ODQ1MzExMWViZjVjY2QxMGUwZDZmYiJ9',
-    data: null,
-    request: {
-      url:
-        'https://api.razorpay.com/v1/payments/pay_DaaBCIH1rZXZg5/status?key_id=rzp_test_1DP5mmOlF5G5ag',
-      method: 'GET',
-    },
-  });
-}
-
-async function respondToUPIPaymentStatus(context) {
-  const successResult = { razorpay_payment_id: 'pay_DaFKujjV6Ajr7W' };
-  const req = await context.expectRequest();
-  expect(req.url).toContain('status?key_id');
-  await context.respondPlain(
-    `${req.params.callback}(${JSON.stringify(successResult)})`
-  );
-  await delay(500);
-  expect(await context.page.$('#modal-inner')).toEqual(null);
-}
-
-async function handleUPIAccountValidation(context, vpa) {
-  const req = await context.expectRequest();
-  expect(req.url).toContain('validate/account');
-  await context.respondJSON({ vpa: vpa, success: true, customer_name: null });
-  await delay(1000);
-}
-
-async function selectUPIMethod(context, UPIMethod) {
-  const upibutton = await context.page.$x(
-    '//*[contains(@class,"ref-text") and text() = "' + UPIMethod + '"]'
-  );
-  await upibutton[0].click();
-}
-
-async function enterUPIAccount(context, UPIAccountId) {
-  const vpaField = await context.page.waitForSelector('#vpa');
-  await vpaField.type(UPIAccountId);
-}
-
-async function verifyEMIPlansWithOffers(context, offerNumber) {
-  // await delay(40000);
-  for (var i = 1; i <= offerNumber; i++) {
-    const currentElement = await context.page.$eval(
-      '.emi-plans-list .expandable-card.expandable-card--has-badge:nth-of-type(' +
-        i +
-        ')',
-      visible
-    );
-    expect(currentElement).toEqual(true);
-  }
-}
-
-async function selectEMIPlanWithOffer(context, offerNumber) {
-  await context.page.click(
-    '.emi-plans-list .expandable-card.expandable-card--has-badge:nth-of-type(' +
-      offerNumber +
-      ')'
-  );
-}
-
-async function verifyEMIPlansWithoutOffers(context, offerNumber) {
-  for (var i = 1; i <= offerNumber; i++) {
-    const currentElement = await context.page.$eval(
-      '.emi-plans-list .expandable-card:nth-of-type(' + i + ')',
-      visible
-    );
-    expect(currentElement).toEqual(true);
-  }
-}
-
-async function selectEMIPlanWithoutOffer(context, offerNumber) {
-  await context.page.click(
-    '.emi-plans-list .expandable-card:nth-of-type(' + offerNumber + ')'
-  );
-}
-
-async function viewOffers(context) {
-  await context.page.click('.offers-title');
-}
-
-async function selectOffer(context, offernumber) {
-  await context.page.click('.offer.item:nth-of-type(' + offernumber + ')');
-  await context.page.click('button[class = "button apply-offer"]');
-}
-
-async function setPreferenceForOffer(preferences) {
-  preferences.methods.emi_options.ICIC[0].subvention = 'merchant';
-  preferences.methods.emi_options.ICIC[1].subvention = 'merchant';
-  preferences.methods.emi_options.ICIC[0].offer_id = 'offer_DWcdgbZjWPlmou';
-  preferences.methods.emi_options.ICIC[1].offer_id = 'offer_DWcdgbZjWPlmou';
-  return preferences;
-}
-
-async function verifyOfferApplied(context) {
-  expect(await context.page.$eval('.selected-offer', visible)).toEqual(true);
-}
-
-async function enterCardDetails(context) {
-  const cardNum = await context.page.waitForSelector('#card_number');
-  await cardNum.type('5241 9333 8074 0001');
-  await context.expectRequest(req => {});
-  await context.respondJSON({
-    recurring: false,
-    iframe: true,
-    http_status_code: 200,
-  });
-  await context.page.type('#card_expiry', '12/55');
-  await context.page.type('#card_name', 'SakshiJain');
-  await context.page.type('#card_cvv', '112');
 }
 
 async function verifyErrorMessage(context, expectedErrorMeassage) {
@@ -277,47 +186,6 @@ async function submit(context) {
   await delay(300);
   context.page.click('#footer');
   await delay(1000);
-}
-
-async function handleCardValidation(context) {
-  const req = await context.expectRequest();
-  expect(req.url).toContain('create/ajax');
-  await context.respondJSON({
-    type: 'first',
-    request: {
-      url:
-        'https://api.razorpay.com/v1/gateway/mocksharp/payment?key_id=rzp_test_1DP5mmOlF5G5ag&action=authorize&amount=5100&method=card&payment_id=DLXKaJEF1T1KxC&callback_url=https%3A%2F%2Fapi.razorpay.com%2Fv1%2Fpayments%2Fpay_DLXKaJEF1T1KxC%2Fcallback%2F10b9b52d2b5974f35acfec916f3785eab0c98325%2Frzp_test_1DP5mmOlF5G5ag&recurring=0&card_number=eyJpdiI6ImdnUm9BbnZucTRMU09VWiswMHQ1WFE9PSIsInZhbHVlIjoiSkpwZjJOd2htQlcza2dzYnNiRjJFb3ZqUlVaNGw4WEtLWDgyOVVxYnN4ST0iLCJtYWMiOiIxZDg2YTBlYWY3MGEyNzE5NWQ1NzNhNTRiMjc4ZTZhZTFlYTQxNDUyNWU1NjkzOTNlYTEzYjljZmM0YWY1NGIyIn0%3D&encrypt=1',
-      method: 'get',
-      content: [],
-    },
-    payment_id: 'pay_DLXKaJEF1T1KxC',
-    amount: '\u20b9 51',
-    image: 'https://cdn.razorpay.com/logos/D3JjREAG8erHB7_medium.jpg',
-  });
-  await delay(1000);
-}
-
-async function handleEMIValidation(context) {
-  await context.expectRequest();
-  await context.respondJSON({
-    type: 'first',
-    request: {
-      url:
-        'https://api.razorpay.com/v1/gateway/mocksharp/payment?key_id=rzp_test_1DP5mmOlF5G5ag&action=authorize&amount=5100&method=card&payment_id=DLXKaJEF1T1KxC&callback_url=https%3A%2F%2Fapi.razorpay.com%2Fv1%2Fpayments%2Fpay_DLXKaJEF1T1KxC%2Fcallback%2F10b9b52d2b5974f35acfec916f3785eab0c98325%2Frzp_test_1DP5mmOlF5G5ag&recurring=0&card_number=eyJpdiI6ImdnUm9BbnZucTRMU09VWiswMHQ1WFE9PSIsInZhbHVlIjoiSkpwZjJOd2htQlcza2dzYnNiRjJFb3ZqUlVaNGw4WEtLWDgyOVVxYnN4ST0iLCJtYWMiOiIxZDg2YTBlYWY3MGEyNzE5NWQ1NzNhNTRiMjc4ZTZhZTFlYTQxNDUyNWU1NjkzOTNlYTEzYjljZmM0YWY1NGIyIn0%3D&encrypt=1',
-      method: 'get',
-      content: [],
-    },
-    payment_id: 'pay_DLXKaJEF1T1KxC',
-    amount: '\u20b9 51',
-    image: 'https://cdn.razorpay.com/logos/D3JjREAG8erHB7_medium.jpg',
-  });
-  await delay(1000);
-}
-
-async function handleCardValidationWithCallback(context) {
-  const req = await context.expectRequest();
-  expect(req.url).toContain('create/checkout');
-  await context.respondPlain(contents);
 }
 
 async function handleMockFailureDialog(context) {
@@ -408,52 +276,6 @@ async function assertWalletPage(context) {
   ).toEqual(true);
 }
 
-async function assertNetbankingPage(context) {
-  expect(
-    await context.page.$eval('label[for=bank-radio-SBIN]', visible)
-  ).toEqual(true);
-  expect(
-    await context.page.$eval('label[for=bank-radio-HDFC]', visible)
-  ).toEqual(true);
-  expect(
-    await context.page.$eval('label[for=bank-radio-ICIC]', visible)
-  ).toEqual(true);
-  expect(
-    await context.page.$eval('label[for=bank-radio-UTIB]', visible)
-  ).toEqual(true);
-  expect(
-    await context.page.$eval('label[for=bank-radio-KKBK]', visible)
-  ).toEqual(true);
-  expect(
-    await context.page.$eval('label[for=bank-radio-YESB]', visible)
-  ).toEqual(true);
-}
-
-async function assertHomePage(context, contactExists, emailExists) {
-  expect(await context.page.$eval('[name=contact]', visible)).toEqual(
-    contactExists
-  );
-  expect(await context.page.$eval('[name=email]', visible)).toEqual(
-    emailExists
-  );
-}
-
-async function fillUserDetails(context, isContactRequired) {
-  if (isContactRequired)
-    await context.page.type('[name=contact]', '9999988888');
-  await context.page.type('[name=email]', 'pro@rzp.com');
-}
-
-async function assertPaymentMethods(context) {
-  expect(await context.page.$eval('[tab=netbanking]', visible)).toEqual(true);
-  expect(await context.page.$eval('[tab=wallet]', visible)).toEqual(true);
-  expect(await context.page.$eval('[tab=card]', visible)).toEqual(true);
-}
-
-async function selectPaymentMethod(context, method) {
-  await context.page.click('[tab=' + method + ']');
-}
-
 async function selectWallet(context, walletName) {
   await context.page.click('label[for=wallet-radio-' + walletName + ']');
 }
@@ -528,71 +350,4 @@ async function handleOtpVerification(context) {
     wallet: 'freecharge',
     merchant: 'RBL Bank',
   });
-}
-async function handleFeeBearer(context) {
-  let req = await context.expectRequest();
-  expect(req.method).toEqual('POST');
-  await context.respondJSON({
-    input: {
-      contact: '9999988888',
-      email: 'pro@rzp.com',
-      amount: 62054,
-      method: 'netbanking',
-      bank: 'IDFB',
-      currency: 'INR',
-      _: {
-        shield: {
-          fhash: 'b8d153db696c383755848673264644e61927c1d3',
-          tz: '330',
-        },
-        checkout_id: 'DLwoGw9hp2q2L1',
-        referer: 'https://api.razorpay.com/test/layout.php',
-        library: 'checkoutjs',
-        platform: 'browser',
-      },
-      fee: 2054,
-    },
-    display: {
-      originalAmount: 600,
-      original_amount: 600,
-      fees: 20.54,
-      razorpay_fee: 17.4,
-      tax: 3.14,
-      amount: 620.54,
-    },
-  });
-  const feeAmount11 = await context.page.$$('.fee-amount');
-  feeAmount = feeAmount11[0];
-  expectedfeeAmount1 = '₹ 600';
-  const feeAmount1 = await context.page.evaluate(
-    feeAmount => feeAmount.textContent,
-    feeAmount
-  );
-  expect(feeAmount1).toEqual(expectedfeeAmount1);
-  feeAmount = feeAmount11[1];
-  expectedfeeAmount1 = '₹ 17.40';
-  const feeAmount2 = await context.page.evaluate(
-    feeAmount => feeAmount.textContent,
-    feeAmount
-  );
-  expect(feeAmount2).toEqual(expectedfeeAmount1);
-  feeAmount = feeAmount11[2];
-  expectedfeeAmount1 = '₹ 3.14';
-  const feeAmount3 = await context.page.evaluate(
-    feeAmount => feeAmount.textContent,
-    feeAmount
-  );
-  expect(feeAmount3).toEqual(expectedfeeAmount1);
-  feeAmount = feeAmount11[3];
-  expectedfeeAmount1 = '₹ 620.54';
-  const feeAmount4 = await context.page.evaluate(
-    feeAmount => feeAmount.textContent,
-    feeAmount
-  );
-  expect(feeAmount4).toEqual(expectedfeeAmount1);
-  const continueButton = await context.page.$x(
-    '//*[@class="btn" and text() = "Continue"]'
-  );
-  await continueButton[0].click();
-  // await delay(200);
 }
