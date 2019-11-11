@@ -36,7 +36,8 @@ var preferences = window.preferences,
   CardlessEmi = discreet.CardlessEmi,
   PayLater = discreet.PayLater,
   PayLaterView = discreet.PayLaterView,
-  OtpService = discreet.OtpService;
+  OtpService = discreet.OtpService,
+  updateCta = discreet.updateCta;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -1061,22 +1062,26 @@ Session.prototype = {
 
     return discreet.Currency.formatAmount(amount, displayCurrency || currency);
   },
+
   formatAmountWithCurrency: function(amount) {
-    var discountAmount = amount,
-      discountFigure = this.formatAmount(discountAmount),
-      displayCurrency = this.r.get('display_currency'),
-      currency = this.r.get('currency');
+    var amountFigure = this.formatAmount(amount);
+    var displayCurrency = this.r.get('display_currency');
+    var currency = this.r.get('currency');
 
     if (displayCurrency) {
       // TODO: handle display_amount case as in modal.jst
-      discountAmount =
-        discreet.currencies[displayCurrency] + ' ' + discountAmount;
+      amount = discreet.currencies[displayCurrency] + ' ' + amountFigure;
     } else {
-      discountAmount = discreet.currencies[currency] + ' ' + discountFigure;
+      amount = discreet.currencies[currency] + ' ' + amountFigure;
     }
 
-    return discountAmount;
+    return amount;
   },
+
+  updateAmountInFooter: function() {
+    updateCta('PAY ' + discreet.Currency.displayAmount(this.r));
+  },
+
   // so that accessing this.data would not produce error
   data: emo,
   params: emo,
@@ -1460,6 +1465,7 @@ Session.prototype = {
 
     this.setTpvBanks();
     this.getEl();
+    this.updateAmountInFooter();
     this.setMethodsList();
     this.setFormatting();
     this.setSvelteComponents();
@@ -7229,6 +7235,20 @@ Session.prototype = {
       }
 
       var preferences = response;
+      preferences.offers = [
+        {
+          id: 'offer_DcafkxTAseGAtT',
+          name: 'Netbanking Dummy Offer',
+          payment_method: 'netbanking',
+          display_text: 'Netbanking Dummy Offer',
+        },
+        {
+          id: 'offer_DcafkxTAseGAtX',
+          name: 'UPI Dummy Offer',
+          payment_method: 'upi',
+          display_text: 'UPI Dummy Offer',
+        },
+      ];
 
       var validation = self.setPreferences(preferences);
 
