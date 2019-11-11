@@ -24,6 +24,7 @@
     getCorporateOption,
     isCorporateCode,
   } from 'common/bank';
+  import { hideCta, showCtaWithDefaultText } from 'checkoutstore/cta';
 
   // Props
   export let selectedBankCode = '';
@@ -98,9 +99,9 @@
   export function setPayButtonVisibility() {
     // Hide pay button if the selected bank is disabled
     if (selectedBankDisabled) {
-      session.body.removeClass('sub');
+      hideCta();
     } else if (active) {
-      session.body.addClass('sub');
+      showCtaWithDefaultText();
     }
   }
 

@@ -37,7 +37,7 @@ var preferences = window.preferences,
   PayLater = discreet.PayLater,
   PayLaterView = discreet.PayLaterView,
   OtpService = discreet.OtpService,
-  updateCta = discreet.updateCta;
+  Cta = discreet.Cta;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -257,37 +257,25 @@ function setEmiPlansCta(screen, tab) {
     type = 'confirm-account';
   }
 
-  var classes = [
-    '.select-plan-btn',
-    '.view-plans-btn',
-    '.pay-btn',
-    '.enter-card-details',
-    '.confirm-account',
-  ];
-
-  each(classes, function(index, className) {
-    $(className).addClass('invisible');
-  });
-
   switch (type) {
     case 'pay':
-      $('.pay-btn').removeClass('invisible');
+      Cta.setAppropriateCtaText();
       break;
 
     case 'show':
-      $('.view-plans-btn').removeClass('invisible');
+      Cta.updateCta('View EMI Plans');
       break;
 
     case 'select':
-      $('.select-plan-btn').removeClass('invisible');
+      Cta.updateCta('Select EMI Plan');
       break;
 
     case 'emi':
-      $('.enter-card-details').removeClass('invisible');
+      Cta.updateCta('Enter Card Details');
       break;
 
     case 'confirm-account':
-      $('.confirm-account').removeClass('invisible');
+      Cta.updateCta('Confirm Account');
       break;
   }
 }
@@ -1078,10 +1066,6 @@ Session.prototype = {
     return amount;
   },
 
-  updateAmountInFooter: function() {
-    updateCta('PAY ' + discreet.Currency.displayAmount(this.r));
-  },
-
   // so that accessing this.data would not produce error
   data: emo,
   params: emo,
@@ -1465,13 +1449,13 @@ Session.prototype = {
 
     this.setTpvBanks();
     this.getEl();
-    this.updateAmountInFooter();
     this.setMethodsList();
     this.setFormatting();
     this.setSvelteComponents();
     this.fillData();
     this.setEMI();
     this.improvisePaymentOptions();
+    Cta.setAppropriateCtaText();
     this.setModal();
     this.completePendingPayment();
     this.bindEvents();
@@ -2291,14 +2275,6 @@ Session.prototype = {
 
   setOneMethod: function(methodName) {
     this.oneMethod = methodName;
-    var el = document.createElement('span');
-    el.className = 'proceed-btn';
-    if (this.get('amount')) {
-      el.innerHTML = 'Pay by ' + tab_titles[methodName];
-    } else {
-      el.innerHTML = 'Authenticate';
-    }
-    $('#footer').append(el);
 
     $(this.el).addClass('one-method');
     $('.payment-option').addClass('submit-button button');
@@ -5118,12 +5094,12 @@ Session.prototype = {
     invoke(
       function() {
         if (this.screen === 'otp' && (this.tab !== 'card' || !this.payload)) {
-          $('#footer').addClass('otp');
+          Cta.updateCta('Verify');
         }
       },
       this,
       null,
-      300
+      200
     );
 
     if (text) {
@@ -7235,20 +7211,6 @@ Session.prototype = {
       }
 
       var preferences = response;
-      preferences.offers = [
-        {
-          id: 'offer_DcafkxTAseGAtT',
-          name: 'Netbanking Dummy Offer',
-          payment_method: 'netbanking',
-          display_text: 'Netbanking Dummy Offer',
-        },
-        {
-          id: 'offer_DcafkxTAseGAtX',
-          name: 'UPI Dummy Offer',
-          payment_method: 'upi',
-          display_text: 'UPI Dummy Offer',
-        },
-      ];
 
       var validation = self.setPreferences(preferences);
 

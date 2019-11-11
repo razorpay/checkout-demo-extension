@@ -7,7 +7,7 @@
   import { getSession } from 'sessionmanager';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import { updateCta } from 'checkoutstore/cta';
+  import { showCtaWithText, showCtaWithDefaultText } from 'checkoutstore/cta';
 
   // UI imports
   import AsyncLoading from 'templates/views/ui/AsyncLoading.svelte';
@@ -95,13 +95,10 @@
   }
 
   function showCopyButton(show, text) {
-    const body = _Doc.querySelector('#body');
-
     if (show) {
-      _El.addClass(body, 'sub');
-      updateCta(text);
+      showCtaWithText(text);
     } else {
-      session.showAmountInFooter();
+      showCtaWithDefaultText();
     }
   }
 </script>

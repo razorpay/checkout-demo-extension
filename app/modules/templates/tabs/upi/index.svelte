@@ -17,6 +17,7 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { Formatter } from 'formatter';
+  import { hideCta, showCtaWithDefaultText } from 'checkoutstore/cta';
 
   // UI imports
   import UpiIntent from './UpiIntent.svelte';
@@ -151,9 +152,9 @@
     if (session.tab === 'upi' || session.tab === 'gpay') {
       /* TODO: bad practice, remove asap */
       if (selectedApp === undefined || isGPaySelected) {
-        _El.removeClass(_Doc.querySelector('#body'), 'sub');
+        hideCta();
       } else {
-        _El.addClass(_Doc.querySelector('#body'), 'sub');
+        showCtaWithDefaultText();
       }
     }
   }
