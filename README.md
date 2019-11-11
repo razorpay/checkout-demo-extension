@@ -16,11 +16,11 @@
 
 # Testing
 
-- Install chrome/chromium and set `CHROME_BIN` env var to chrome executable.
+- Install chrome/chromium and set `CHROME_BIN` env var to chrome executable by including it in .bash_profile ( if not present already ).
 - `npm test` to run unit tests, make production build and run blackbox tests.
 - `npm run jest` to run all blackbox tests.
-- `npm run jest blackbox/${path to test}` to run a particular test.
-  - eg. npm run jest blackbox/tests/card/offers.test.js
+- `npm run jest blackbox/${path to test} --testTimeout=${time in ms}` to run a particular test.
+  - eg. npm run jest blackbox/tests/card/offers.test.js --testTimeout=30000
 - Set `headless` to true in [`jest-environment.js`](blackbox/jest-environment.js) to run future tests in headless mode.
 
 Unit Tests are located in `test/unit` folder. `blackbox/sites` folder contains blackbox tests.
