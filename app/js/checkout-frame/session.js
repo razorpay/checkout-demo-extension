@@ -1473,7 +1473,7 @@ Session.prototype = {
         'amount' in forcedOffer &&
         forcedOffer.amount !== forcedOffer.original_amount
       ) {
-        this.showDiscount(forcedOffer);
+        this.showDiscount();
         Analytics.track('offers:forced_with_discount', {
           data: forcedOffer,
         });
@@ -3079,13 +3079,6 @@ Session.prototype = {
     });
   },
 
-  /**
-   * Sets text of the Pay button.
-   */
-  setPayButtonText: function(text) {
-    $('.pay-btn').html(text);
-  },
-
   focus: function(e) {
     $(e.target.parentNode).addClass('focused');
     setTimeout(function() {
@@ -3680,7 +3673,7 @@ Session.prototype = {
 
     // Show discount if needed
     if (offer.original_amount > offer.amount) {
-      this.showDiscount(offer);
+      this.showDiscount();
     }
 
     var savedCards =
@@ -3817,22 +3810,25 @@ Session.prototype = {
 
   /**
    * Show the discount amount.
-   * @param {Offer} offer
    */
-  showDiscount: function(offer) {
+  showDiscount: function() {
+    var offer = this.getAppliedOffer();
+
+    if (!offer) {
+      return;
+    }
+
     $('#content').addClass('has-discount');
 
     var discountAmount = this.formatAmountWithCurrency(offer.amount);
 
     //TODO: optimise queries
     $('#amount .discount')[0].innerHTML = discountAmount;
-    $('#footer .discount')[0].innerHTML = discountAmount;
   },
   hideDiscount: function() {
     $('#content').removeClass('has-discount');
     //TODO: optimise queries
     $('#amount .discount').html('');
-    $('#footer .discount').html('');
   },
   back: function(confirmedCancel) {
     var tab = '';

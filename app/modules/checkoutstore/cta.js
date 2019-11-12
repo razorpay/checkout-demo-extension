@@ -27,7 +27,10 @@ export function showAmountInCta() {
   if (!session.get('amount')) {
     updateCta('Authenticate');
   } else {
-    updateCta('PAY ' + displayAmount(session.r));
+    const offer = session.getAppliedOffer();
+    const amount = (offer && offer.amount) || session.get('amount');
+
+    updateCta('PAY ' + displayAmount(session.r, amount));
   }
 }
 
