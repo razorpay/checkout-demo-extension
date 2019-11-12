@@ -15,7 +15,7 @@
   import Tab from 'templates/tabs/Tab.svelte';
   import SavedCards from 'templates/screens/savedcards.svelte';
 
-  var session = new getSession();
+  const session = getSession();
   // Props
   export let loading = true;
   export let data = null;
@@ -29,9 +29,9 @@
   export let neftDetails = null;
   const cardType = _Doc.querySelector('#elem-card .cardtype[cardtype]');
   var nocvvCheck = _Doc.querySelector('#nocvv');
-  var { customer } = session; // Move this to watcher.
 
-  var showSavedCards = false;
+  $: showSavedCards = false;
+  $: customer = session.customer;
   var transformedTokens = null;
 
   //   //computed
@@ -66,7 +66,7 @@
     var sixDigits = val.length > 5;
     var trimmedVal = val.replace(/[\ ]/g, '');
 
-    //   _Doc.querySelector(el.parentNode).toggleClass('six', sixDigits); // TODo
+    _El.toggleClass(el.parentNode, 'six');
 
     if (sixDigits) {
       if (isMaestro) {
@@ -169,13 +169,14 @@
     }
   }
 
-  function showCards() {
+  export function showCards() {
     console.log('this is showcards');
     setSavedCards();
     session.setScreen('card');
   }
 
   function setSavedCards() {
+    let { customer } = session;
     var tokens = customer && customer.tokens && customer.tokens.count;
     var cardTab = _Doc.querySelector('#form-card');
     var delegator = session.delegator;
@@ -225,7 +226,7 @@
     }
 
     var selectableSavedCard = getSelectableSavedCardElement(
-      this.tab,
+      'card', //hardcoding for now
       this.selectedSavedCardToken
     );
 
@@ -237,7 +238,7 @@
 
     session.toggleSavedCards(!!tokens);
 
-    toggleClassById('form-card', 'has-cards', tokens); //TODO: pure functions
+    _El.toggleClass(_Doc.querySelector('#form-card'), 'has-cards'); //TODO: pure functions
 
     each(_Doc.querySelectorAll('.saved-cvv'), function(i, input) {
       delegator.add('number', input);
@@ -252,19 +253,6 @@
   //     showCopyButton(false, '');
   //     return false;
   //   }
-
-  function toggleClassById(elem, className, condition) {
-    let element = _Doc.querySelector('#elem');
-
-    if (arguments.length === 1) {
-      condition = !element.classList.contains(className);
-    }
-    if (condition) {
-      _El.addClass(element, className);
-    } else {
-      _El.removeClass(element, className);
-    }
-  }
 
   function getSelectableSavedCardElement(tab, token) {
     var selectors = {
@@ -319,8 +307,157 @@
 </script>
 
 <Tab method="card">
-  <div>this is card tab</div>
+
+  <div id="show-saved-cards" class="text-btn left-card">Use saved cards</div>
   {#if showSavedCards}
-    <SavedCards cards={transformedTokens} on:viewPlans={viewPlans} />
+    <div id="saved-cards-container">
+      <SavedCards cards={transformedTokens} on:viewPlans={viewPlans} />
+    </div>
   {/if}
+  <div id="show-add-card" class="text-btn left-card">Add another card</div>
+  <div class="pad">
+    <div id="add-card-container">
+      <div class="card-fields">
+        <div class="elem-wrap two-third">
+          <div
+            class="elem elem-card {session.recurring ? 'recurring' : ''}
+            "
+            id="elem-card">
+            <div class="cardtype" />
+            <label>Card Number</label>
+            <i>&#xe605;</i>
+            <span class="help">Please enter a valid card number</span>
+            <span class="help amex-error">
+              Amex cards are not supported for this transaction
+            </span>
+            <span class="help recurring-card-error">
+              Card does not support automatic recurring payments
+            </span>
+            <input
+              class="input"
+              type="tel"
+              id="card_number"
+              name="card[number]"
+              autocomplete="off"
+              maxlength="19"
+              value="" />
+          </div>
+        </div>
+        <div class="elem-wrap third">
+          <div class="elem elem-expiry">
+            <label>Expiry</label>
+            <i>&#xe606;</i>
+            <input
+              class="input"
+              type="{session.isMobile() ? 'tel' : ''}
+              "
+              id="card_expiry"
+              name="card[expiry]"
+              placeholder="MM / YY"
+              maxlength="7"
+              value={session.get('prefill.card[expiry]')} />
+          </div>
+        </div>
+        <div class="elem-wrap two-third">
+          <div
+            class="elem elem-name {session.get('prefill.name') && session.get('readonly.name') ? 'name_readonly' : ''}">
+            <span class="help">Please enter name on your card</span>
+            <label>Card Holder's Name</label>
+            <i>&#xe602;</i>
+            <input
+              class="input"
+              type="text"
+              id="card_name"
+              name="card[name]"
+              required
+              value={session.get('prefill.name')}
+              pattern="^[a-zA-Z. 0-9'-]{(1, 100)}$" />
+          </div>
+        </div>
+        <div class="elem-wrap third">
+          <div class="elem elem-cvv mature">
+            <label>CVV</label>
+            <i>&#xe604;</i>
+            <input
+              class="input cvv-input"
+              type="tel"
+              id="card_cvv"
+              inputmode="numeric"
+              name="card[cvv]"
+              maxlength="3"
+              required
+              pattern="[0-9]{3}"
+              value={session.get('prefill.card[cvv]')} />
+            <div class="help" />
+          </div>
+        </div>
+      </div>
+      <div class="clear" />
+      <div class="double">
+        {#if !session.recurring && session.get('remember_customer')}
+          <label class="first" id="should-save-card" for="save" tabIndex="0">
+            <input
+              type="checkbox"
+              class="checkbox--square"
+              id="save"
+              name="save"
+              value="1"
+              checked />
+            <span class="checkbox" />
+            Remember Card
+          </label>
+        {/if}
+        <div class="second">
+          <span id="view-emi-plans" class="link">
+            <a>View all EMI Plans</a>
+          </span>
+        </div>
+        <div class="clear" />
+      </div>
+      <label id="nocvv-check" for="nocvv">
+        <input type="checkbox" class="checkbox--square" id="nocvv" disabled />
+        <span class="checkbox" />
+        My Maestro Card doesn't have Expiry/CVV
+      </label>
+      <div class="flow-selection-container">
+        <label>Complete Payment Using</label>
+        <div class="flow input-radio">
+          <input
+            type="radio"
+            name="auth_type"
+            id="flow-3ds"
+            value="c3ds"
+            checked />
+          <label for="flow-3ds">
+            <div class="radio-display" />
+            <div class="label-content">OTP / Password</div>
+          </label>
+        </div>
+
+        <div class="flow input-radio">
+          <input type="radio" name="auth_type" id="flow-pin" value="pin" />
+          <label for="flow-pin">
+            <div class="radio-display" />
+            <div class="label-content">ATM PIN</div>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+  {#if session.recurring}
+    <div id="recurring-message" class="pad recurring-message">
+      <span>&#x2139;</span>
+      `? !_.subscription`
+      {#if session.subscription}
+        Future payments on this card will be charged automatically.
+        {#if session.subscription && session.subscription.type === 0}
+          The charge is to enable subscription on this card and it will be
+          refunded.
+        {/if}
+        This card will be linked to the subscription and future payments will be
+        charged automatically.
+      {/if}
+    </div>
+  {/if}
+
 </Tab>

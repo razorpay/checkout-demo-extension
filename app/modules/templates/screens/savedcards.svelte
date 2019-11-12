@@ -12,6 +12,8 @@
       on.viewPlans(event);
     }
   }
+
+  console.log(cards);
 </script>
 
 {#each cards as card (card.id)}

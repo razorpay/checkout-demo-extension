@@ -2686,7 +2686,7 @@ Session.prototype = {
           $(cvvField).css('display', 'block');
         }
       });
-    }
+    } //TODO: visit this again
     this.on('click', '#top-right', function() {
       $('#top-right').addClass('focus');
       var self = this;
@@ -3780,6 +3780,7 @@ Session.prototype = {
     }
 
     if (tab === 'card' || (tab === 'emi' && this.screen !== 'emi')) {
+      console.log('happening');
       this.showCardTab(tab);
 
       setEmiPlansCta(this.screen, tab);
@@ -3866,6 +3867,8 @@ Session.prototype = {
     // } else {
     //   self.showCards();
     // }
+    // self.showCards();
+    this.svelteCardTab.showCards();
   },
 
   showCards: function() {
@@ -5009,7 +5012,6 @@ Session.prototype = {
       };
       this.commenceOTP('Verifying OTP...');
     }
-
     this.customer.submitOTP(submitPayload, bind(callback, this), queryParams);
   },
 
