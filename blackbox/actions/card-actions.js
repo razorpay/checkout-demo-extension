@@ -38,8 +38,15 @@ async function enterCardDetails(context) {
   await context.page.type('#card_cvv', '112');
 }
 
+async function retryCardTransaction(context) {
+  const retryButton = await context.page.waitForSelector('#fd-hide');
+  await retryButton.click();
+  await delay(500);
+}
+
 module.exports = {
   enterCardDetails,
   handleCardValidation,
   handleCardValidationWithCallback,
+  retryCardTransaction,
 };
