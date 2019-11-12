@@ -65,7 +65,17 @@ module.exports = {
   verifyDiscountText,
   verifyDiscountAmountInBanner,
   passRequestNetbanking,
+  verifyAutoSelectBankTPV,
 };
+
+async function verifyAutoSelectBankTPV(context, bank) {
+  const autoSelectbank = await context.page.waitForSelector('.bank-name');
+  const autoSelectbankName = await context.page.evaluate(
+    autoSelectbank => autoSelectbank.textContent,
+    autoSelectbank
+  );
+  expect(autoSelectbankName).toContain(bank);
+}
 
 async function selectUPIApp(context, AppNumber) {
   await context.page.click('.option:nth-of-type(' + AppNumber + ')');
