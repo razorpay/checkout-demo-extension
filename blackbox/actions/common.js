@@ -74,7 +74,7 @@ async function respondAndVerifyIntentRequest(context, offerId) {
   expect(reqorg.url).toEqual(
     'https://api.razorpay.com/v1/payments/create/ajax'
   );
-  if (offerId != '') expect(reqorg.body).toContain(offerId);
+  if (offerId) expect(reqorg.body).toContain(offerId);
   expect(reqorg.method).toEqual('POST');
   await context.respondJSON({
     data: {
