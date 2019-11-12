@@ -15,7 +15,7 @@ const {
   retryWalletTransaction,
 } = require('../../actions/common');
 
-describe('Basic ZestMoney payment', () => {
+describe.skip('Basic ZestMoney payment', () => {
   test('Perform ZestMoney transaction', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
