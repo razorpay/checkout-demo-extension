@@ -1,9 +1,11 @@
 <script>
+  // UI imports
   import Tab from 'templates/tabs/Tab.svelte';
   import Screen from 'templates/layouts/Screen.svelte';
   import Field from 'templates/views/ui/Field.svelte';
   import PartialPaymentOptions from 'templates/views/partialpaymentoptions.svelte';
   import RadioOption from 'templates/views/ui/options/RadioOption.svelte';
+  import NewMethodsList from 'templates/views/ui/methods/NewMethodsList.svelte';
 
   export let getStore;
   export let session;
@@ -45,6 +47,12 @@
   const name_readonly = o('readonly.name') && prefill_name;
 
   const accountName = o('prefill.bank_account[name]');
+
+  let view = 'details';
+
+  export function showMethods() {
+    view = 'methods';
+  }
 </script>
 
 <style>
@@ -73,12 +81,22 @@
       top: 2px;
     }
   }
+
+  .home-methods {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
 </style>
 
-<!-- TODO: use Screen and Tab -->
 <Tab method="common" overrideMethodCheck={true} shown={true} pad={false}>
   <Screen pad={false}>
     <div slot="main" class="screen-main">
+      {#if view === 'methods'}
+        <div class="home-methods">
+          <NewMethodsList />
+        </div>
+      {/if}
+
       <div
         class="elem-wrap"
         class:invisible={contact_hidden}

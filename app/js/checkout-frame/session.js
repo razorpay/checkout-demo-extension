@@ -1557,14 +1557,6 @@ Session.prototype = {
     }
   },
 
-  setMethodsTab: function() {
-    if (this.newHomeScreen) {
-      this.methodsTab = new discreet.MethodsTab({
-        target: gel('methods-screen-wrap'),
-      });
-    }
-  },
-
   setNetbankingTab: function() {
     var method;
 
@@ -1605,7 +1597,6 @@ Session.prototype = {
 
   setSvelteComponents: function() {
     this.setHomeTab();
-    this.setMethodsTab();
     this.setNetbankingTab();
     this.setEmandate();
     this.setCardlessEmi();
@@ -5404,7 +5395,7 @@ Session.prototype = {
     if (!screen && this.newHomeScreen) {
       if (this.checkCommonValid()) {
         // switch to methods tab
-        this.switchTab('methods');
+        this.homeTab.showMethods();
       }
     }
 
