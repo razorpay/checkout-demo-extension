@@ -31,7 +31,7 @@ describe('Card tests', () => {
     await selectPaymentMethod(context, 'card');
     await enterCardDetails(context);
     await submit(context);
-    await handleFeeBearer(context, page);
+    await handleFeeBearer(context);
     await handleCardValidation(context);
     await handleMockFailureDialog(context);
     await verifyErrorMessage(context, 'The payment has already been processed');

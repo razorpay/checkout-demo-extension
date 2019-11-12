@@ -32,7 +32,7 @@ describe('EMI tests', () => {
     await verifyEMIPlansWithoutOffers(context, '6');
     await selectEMIPlanWithoutOffer(context, '2');
     await submit(context);
-    await handleFeeBearer(context, page);
+    await handleFeeBearer(context);
     await verifyTimeout(context, 'emi');
   });
 });

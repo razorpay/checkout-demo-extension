@@ -60,7 +60,7 @@ describe('Basic upi payment', () => {
     await selectOffer(context, '1');
     await verifyOfferApplied(context);
     await submit(context);
-    await handleFeeBearer(context, page);
+    await handleFeeBearer(context);
     await respondAndVerifyIntentRequest(
       context,
       'offer_id=' + preferences.offers[0].id

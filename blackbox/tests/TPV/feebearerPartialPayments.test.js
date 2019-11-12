@@ -3,34 +3,30 @@ const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
-  assertPaymentMethods,
-  selectPaymentMethod,
+  verifyAutoSelectBankTPV,
   submit,
-  enterCardDetails,
-  handleCardValidation,
-  handleMockFailureDialog,
-  verifyErrorMessage,
-  retryCardTransaction,
-  verifyPartialAmount,
-  handlePartialPayment,
-  handleFeeBearer,
+  passRequestNetbanking,
   handleMockSuccessDialog,
+  handleFeeBearer,
+  handlePartialPayment,
+  verifyPartialAmount,
 } = require('../../actions/common');
-
-describe('Card tests', () => {
-  test('perform card transaction with partial payments and feebearer enabled', async () => {
+describe('Third Party Verification test', () => {
+  test('Perform Third Party Verification transaction with customer feebearer and Partial Payments enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 20000,
+      amount: 200,
       personalization: false,
     };
     const preferences = makePreferences({
       fee_bearer: true,
       order: {
         amount: 20000,
+        currency: 'INR',
+        account_unmber: '1234567891234567',
+        bank: 'SBIN',
         amount_due: 20000,
         amount_paid: 0,
-        currency: 'INR',
         first_payment_min_amount: null,
         partial_payment: true,
       },
@@ -39,20 +35,11 @@ describe('Card tests', () => {
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true);
     await handlePartialPayment(context, '100');
-    await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'card');
-    await enterCardDetails(context);
+    await verifyAutoSelectBankTPV(context, 'State Bank of India');
     await verifyPartialAmount(context, '₹ 100');
     await submit(context);
     await handleFeeBearer(context);
-    await handleCardValidation(context);
-    await handleMockFailureDialog(context);
-    await verifyErrorMessage(context, 'The payment has already been processed');
-    await retryCardTransaction(context);
-    await verifyPartialAmount(context, '₹ 100');
-    await submit(context);
-    await handleFeeBearer(context);
-    await handleCardValidation(context);
+    await passRequestNetbanking(context);
     await handleMockSuccessDialog(context);
   });
 });

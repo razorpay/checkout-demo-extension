@@ -31,7 +31,7 @@ describe('Netbanking tests', () => {
     await assertNetbankingPage(context);
     await selectBank(context, 'SBIN');
     await submit(context);
-    await handleFeeBearer(context, page);
+    await handleFeeBearer(context);
     await handleCardValidationWithCallback(context);
     await expectMockSuccessWithCallback(context);
   });

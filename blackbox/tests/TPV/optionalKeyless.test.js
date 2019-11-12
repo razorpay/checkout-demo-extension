@@ -9,9 +9,9 @@ const {
   handleMockSuccessDialog,
 } = require('../../actions/common');
 describe('Third Party Verification test', () => {
-  test('Perform Third Party Verification transaction with contact optional', async () => {
+  test('Perform Keyless Third Party Verification transaction with contact optional', async () => {
     const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+      order_id: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
       personalization: false,
     };

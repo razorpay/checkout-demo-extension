@@ -1,19 +1,12 @@
 const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
 const {
-  assertHomePage,
-  fillUserDetails,
-  assertPaymentMethods,
-  selectPaymentMethod,
-  submit,
-  enterCardDetails,
   handleCardValidationWithCallback,
   expectMockSuccessWithCallback,
-  handleFeeBearer,
 } = require('../../actions/common');
 
-describe('Card tests', () => {
-  test('perform successful card transaction with callback URL and FeeBearer enabled', async () => {
+describe('Third Party Verification test', () => {
+  test('Perform Third Party Verification transaction with callback url', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
@@ -21,15 +14,16 @@ describe('Card tests', () => {
       callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
       redirect: true,
     };
-    const preferences = makePreferences({ fee_bearer: true });
+    const preferences = makePreferences({
+      fee_bearer: true,
+      order: {
+        amount: 20000,
+        currency: 'INR',
+        account_unmber: '1234567891234567',
+        bank: 'SBIN',
+      },
+    });
     const context = await openCheckout({ page, options, preferences });
-    await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
-    await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'card');
-    await enterCardDetails(context);
-    await submit(context);
-    await handleFeeBearer(context);
     await handleCardValidationWithCallback(context);
     await expectMockSuccessWithCallback(context);
   });

@@ -592,7 +592,8 @@ async function verifyTimeout(context, paymentMode) {
     paymentMode == 'netbanking' ||
     paymentMode == 'card' ||
     paymentMode == 'upi' ||
-    paymentMode == 'emi'
+    paymentMode == 'emi' ||
+    paymentMode == 'tpv'
   ) {
     await delay(1000);
     expect(await context.page.$('#fd-hide')).not.toEqual(null);
@@ -626,7 +627,7 @@ async function handleOtpVerification(context, walletissuer) {
     merchant: 'RBL Bank',
   });
 }
-async function handleFeeBearer(context) {
+async function handleFeeBearer(context, pressContinue) {
   let req = await context.expectRequest();
   expect(req.method).toEqual('POST');
   await context.respondJSON({
@@ -690,6 +691,6 @@ async function handleFeeBearer(context) {
   const continueButton = await context.page.$x(
     '//*[@class="btn" and text() = "Continue"]'
   );
-  await continueButton[0].click();
+  if (pressContinue != false) await continueButton[0].click();
   await delay(200);
 }

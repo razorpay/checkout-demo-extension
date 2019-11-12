@@ -54,7 +54,7 @@ describe('Basic upi payment', () => {
     await enterUPIAccount(context, 'BHIM');
     await submit(context);
     await handleUPIAccountValidation(context, 'BHIM@upi');
-    await handleFeeBearer(context, page);
+    await handleFeeBearer(context);
     await respondToUPIAjax(context, '');
     await respondToUPIPaymentStatus(context);
   });

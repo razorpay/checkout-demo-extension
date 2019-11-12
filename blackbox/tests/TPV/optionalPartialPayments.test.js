@@ -7,12 +7,14 @@ const {
   submit,
   passRequestNetbanking,
   handleMockSuccessDialog,
+  handlePartialPayment,
+  verifyPartialAmount,
 } = require('../../actions/common');
 describe('Third Party Verification test', () => {
-  test('Perform Third Party Verification transaction with contact optional', async () => {
+  test('Perform Third Party Verification transaction with Partial Payments enabled and contact optional', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 200,
+      amount: 20000,
       personalization: false,
     };
     const preferences = makePreferences({
@@ -22,12 +24,18 @@ describe('Third Party Verification test', () => {
         currency: 'INR',
         account_unmber: '1234567891234567',
         bank: 'SBIN',
+        amount_due: 20000,
+        amount_paid: 0,
+        first_payment_min_amount: null,
+        partial_payment: true,
       },
     });
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, false);
+    await handlePartialPayment(context, '100');
     await verifyAutoSelectBankTPV(context, 'State Bank of India');
+    await verifyPartialAmount(context, '₹ 100');
     await submit(context);
     await passRequestNetbanking(context);
     await handleMockSuccessDialog(context);
