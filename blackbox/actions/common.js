@@ -463,7 +463,7 @@ async function verifyLowDowntime(context, bank) {
 async function typeOTPandSubmit(context) {
   await typeOTP(context);
   await delay(1200);
-  await context.page.click('.otp-btn');
+  await context.page.click('#footer');
 }
 async function typeOTP(context) {
   await delay(800);
@@ -483,9 +483,9 @@ async function verifyTimeout(context, paymentMode) {
     expect(await context.page.$('#fd-hide')).toEqual(null);
   } else if (paymentMode == 'wallet') {
     await delay(5000);
-    expect(await context.page.$('.otp-btn')).not.toEqual(null);
+    expect(await context.page.$('#footer')).not.toEqual(null);
     await delay(7000);
-    expect(await context.page.$('.otp-btn')).toEqual(null);
+    expect(await context.page.$('#footer')).toEqual(null);
   }
 }
 
