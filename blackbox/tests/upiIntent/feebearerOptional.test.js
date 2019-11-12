@@ -36,6 +36,6 @@ describe('Basic upi payment', () => {
     await selectUPIApp(context, '1');
     await submit(context);
     await handleFeeBearer(context, page);
-    await respondAndVerifyIntentRequest(context, '');
+    await respondAndVerifyIntentRequest(context);
   });
 });

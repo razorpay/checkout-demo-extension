@@ -58,7 +58,6 @@ module.exports = {
   handleUPIAccountValidation,
   respondToUPIAjax,
   respondToUPIPaymentStatus,
-  respondAndVerifyIntentRequest,
   selectUPIApp,
   verifyDiscountPaybleAmount,
   verifyDiscountText,
