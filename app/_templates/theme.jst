@@ -206,3 +206,32 @@ svg.offer-icon path {
 .expandable-card--expanded {
   border-color: `=highlightColor`;
 }
+
+
+/** Start: Styles for borders for a list of items */
+
+.border-list > *:first-child {
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+}
+
+.border-list > *:last-child {
+  border-bottom-right-radius: 2px;
+  border-bottom-left-radius: 2px;
+}
+
+.border-list > *:hover,
+.border-list > *:focus {
+  border-color: `=highlightColor`;
+}
+
+.border-list > *:not(:last-child) {
+  border-bottom: none;
+}
+
+.border-list > *:hover + *,
+.border-list > *:focus + * {
+  border-top-color: `=highlightColor`;
+}
+
+/** End */
