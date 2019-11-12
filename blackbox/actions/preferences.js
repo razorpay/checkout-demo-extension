@@ -52,6 +52,7 @@ module.exports = {
       options: {},
       methods: {
         emi: true,
+        cardless_emi: true,
         emi_subvention: 'customer',
         ...card,
         wallet,
