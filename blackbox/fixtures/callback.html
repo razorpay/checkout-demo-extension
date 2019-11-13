@@ -98,26 +98,6 @@
 
       var s = 'razorpay_payment_id' in data;
       data = JSON.stringify(data);
-      if (window.CheckoutBridge) {
-        if (typeof CheckoutBridge.oncomplete == 'function') {
-          function onComplete() { CheckoutBridge.oncomplete(data); }
-          setTimeout(onComplete, 30);
-          setTimeout(function () {
-            g('delayed-prompt').classList.add('show-early');
-          }, 500);
-          setTimeout(function () {
-            g('delayed-prompt').classList.add('show-late');
-            g('delayed-prompt').classList.remove('show-early');
-          }, 2000);
-          g('proceed-btn').onclick = onComplete;
-        }
-      } else {
-        document.cookie =
-          'onComplete=' + data + ';expires=Fri, 31 Dec 9999 23:59:59 GMT;path=/';
-        try {
-          localStorage.setItem('onComplete', data);
-        } catch (e) {}
-      }
 
       var iosCheckoutBridgeNew = ((window.webkit || {}).messageHandlers || {})
         .CheckoutBridge;
