@@ -1531,6 +1531,27 @@ Session.prototype = {
     }
   },
 
+  setHomeTab: function() {
+    if (this.newHomeScreen) {
+      this.homeTab = new discreet.HomeTab({
+        target: gel('home-screen-wrap'),
+        props: {
+          session: this,
+          getStore: getStore,
+          methods: this.methods,
+        },
+      });
+    }
+  },
+
+  setMethodsTab: function() {
+    if (this.newHomeScreen) {
+      this.methodsTab = new discreet.MethodsTab({
+        target: gel('methods-screen-wrap'),
+      });
+    }
+  },
+
   setNetbankingTab: function() {
     var method;
 
