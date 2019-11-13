@@ -38,10 +38,10 @@
 
   export function getVpa() {
     const vpa = vpaField.getValue();
-    if (isVpaValid(vpa)) {
+    if (isVpaValid(vpa) || !pspHandle) {
       return vpa;
     }
-    return `${vpaField.getValue()}@${pspHandle}`;
+    return `${vpa}@${pspHandle}`;
   }
 
   export function blur() {
