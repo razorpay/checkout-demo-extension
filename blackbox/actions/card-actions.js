@@ -24,9 +24,10 @@ async function handleCardValidationWithCallback(context) {
   await context.respondPlain(contents);
 }
 
-async function enterCardDetails(context) {
+async function enterCardDetails(context, cardType) {
   const cardNum = await context.page.waitForSelector('#card_number');
-  await cardNum.type('5241 9333 8074 0001');
+  if (cardType == undefined) await cardNum.type('5241 9333 8074 0001');
+  else if (cardType == 'VISA') await cardNum.type('4111 1111 1111 1111');
   await context.expectRequest(req => {});
   await context.respondJSON({
     recurring: false,

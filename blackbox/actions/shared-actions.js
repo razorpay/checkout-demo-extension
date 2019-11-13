@@ -117,7 +117,7 @@ async function expectMockSuccessWithCallback(context) {
 }
 
 async function handleValidationRequest(context, passOrFail) {
-  const req = await context.expectRequest();
+  await context.expectRequest();
   if (passOrFail == 'fail') {
     await context.failRequest({ error: 'failed' });
   } else if (passOrFail == 'pass') {
