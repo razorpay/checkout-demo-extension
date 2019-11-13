@@ -6,13 +6,13 @@
 
   // Props
   export let selected = false;
-  export let data;
+  export let data = {};
   export let reverse = false;
   export let icon = null;
   export let iconPlaceholder = '';
   export let showRadio = true;
-  export let name;
-  export let value;
+  export let name = '';
+  export let value = '';
 
   // Computed
   export let classes;
@@ -22,6 +22,10 @@
 
     if (selected) {
       allClasses.push('selected');
+    }
+
+    if (icon || iconPlaceholder) {
+      classes.push('has-icon');
     }
 
     classes = allClasses;
