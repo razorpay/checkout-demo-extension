@@ -8,26 +8,39 @@ const {
   submit,
   respondAndVerifyIntentRequest,
   selectUPIApp,
-  handlePartialPayment,
-  verifyPartialAmount,
+  selectOffer,
+  verifyOfferApplied,
+  viewOffers,
 } = require('../../actions/common');
 
-describe.skip('Basic upi payment', () => {
-  test('Perform upi intent transaction with partial payments enabled', async () => {
+describe('Basic upi payment', () => {
+  test('Perform keyless upi intent transaction with offers applied', async () => {
     const options = {
       order_id: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
       personalization: false,
     };
     const preferences = makePreferences({
-      order: {
-        amount: 100,
-        amount_due: 100,
-        amount_paid: 0,
-        currency: 'INR',
-        first_payment_min_amount: null,
-        partial_payment: true,
-      },
+      offers: [
+        {
+          id: 'offer_Dcad1sICBaV2wI',
+          name: 'UPI Offer Name',
+          payment_method: 'upi',
+          display_text: 'UPI Offer Display Text',
+        },
+        {
+          id: 'offer_DcaetTeD4Gjcma',
+          name: 'UPI Offer Name 2',
+          payment_method: 'upi',
+          display_text: 'UPI Offer Display Text 2',
+        },
+        {
+          id: 'offer_DcafkxTAseGAtT',
+          name: 'UPI Offer Name 3',
+          payment_method: 'upi',
+          display_text: 'UPI Offer Display Text 3',
+        },
+      ],
     });
     preferences.methods.upi = true;
     const context = await openSdkCheckout({
@@ -38,12 +51,16 @@ describe.skip('Basic upi payment', () => {
     });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true);
-    await handlePartialPayment(context, '1');
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await selectUPIApp(context, '1');
-    await verifyPartialAmount(context, '₹ 1');
+    await viewOffers(context);
+    await selectOffer(context, '1');
+    await verifyOfferApplied(context);
     await submit(context);
-    await respondAndVerifyIntentRequest(context);
+    await respondAndVerifyIntentRequest(
+      context,
+      'offer_id=' + preferences.offers[0].id
+    );
   });
 });

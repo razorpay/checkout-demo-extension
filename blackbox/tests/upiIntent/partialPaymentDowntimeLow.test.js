@@ -5,24 +5,43 @@ const {
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
-  verifyTimeout,
+  submit,
+  respondAndVerifyIntentRequest,
   selectUPIApp,
   handlePartialPayment,
   verifyPartialAmount,
+  verifyLowDowntime,
 } = require('../../actions/common');
 
-describe('Basic upi payment', () => {
-  test('Perform upi intent transaction with partial payments and timeout enabled', async () => {
+describe.skip('Basic upi payment', () => {
+  test('Verify UPI intent downtime - Low with partial payments enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
       personalization: false,
-      timeout: 10,
     };
     const preferences = makePreferences({
+      payment_downtime: {
+        entity: 'collection',
+        count: 1,
+        items: [
+          {
+            id: 'down_DEW7D9S10PEsl1',
+            entity: 'payment.downtime',
+            method: 'upi',
+            begin: 1567686386,
+            end: null,
+            status: 'started',
+            scheduled: false,
+            severity: 'low',
+            created_at: 1567686387,
+            updated_at: 1567686387,
+          },
+        ],
+      },
       order: {
-        amount: 200,
-        amount_due: 200,
+        amount: 100,
+        amount_due: 100,
         amount_paid: 0,
         currency: 'INR',
         first_payment_min_amount: null,
@@ -41,8 +60,10 @@ describe('Basic upi payment', () => {
     await handlePartialPayment(context, '1');
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
+    await verifyLowDowntime(context, 'UPI');
     await selectUPIApp(context, '1');
     await verifyPartialAmount(context, '₹ 1');
-    await verifyTimeout(context, 'upi');
+    await submit(context);
+    await respondAndVerifyIntentRequest(context);
   });
 });

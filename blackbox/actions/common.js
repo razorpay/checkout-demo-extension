@@ -29,4 +29,34 @@ module.exports = {
   ...downtimeTimoutActions,
   ...walletActions,
   ...sharedActions,
+  verifyDiscountPaybleAmount,
+  verifyDiscountText,
+  verifyDiscountAmountInBanner,
 };
+
+async function verifyDiscountAmountInBanner(context, expectedDiscountAmount) {
+  const discount = await context.page.waitForSelector('#amount > .discount');
+  let discountAmount = await context.page.evaluate(
+    discount => discount.textContent,
+    discount
+  );
+  expect(discountAmount).toEqual(expectedDiscountAmount);
+}
+
+async function verifyDiscountPaybleAmount(context, expectedDiscountAmount) {
+  const discount = await context.page.waitForSelector('.pay-btn .discount');
+  let discountAmount = await context.page.evaluate(
+    discount => discount.textContent,
+    discount
+  );
+  expect(discountAmount).toEqual(expectedDiscountAmount);
+}
+
+async function verifyDiscountText(context, expectedDiscountAmount) {
+  const discount = await context.page.waitForSelector('.discount-text');
+  let discountAmount = await context.page.evaluate(
+    discount => discount.textContent,
+    discount
+  );
+  expect(discountAmount).toEqual(expectedDiscountAmount);
+}
