@@ -1,9 +1,9 @@
 <script>
   // Props
-  export let method = null;
-  export let icon = null;
-  export let title = null;
-  export let subtitle = null;
+  export let method = null; // Name of the method
+  export let icon = null; // Override: icon. Picked from method if not overridden.
+  export let title = null; // Override: title. Picked from method if not overridden.
+  export let subtitle = null; // Override: subtitle. Picked from method if not overridden.
 
   // UI imports
   import SlottedOption from 'templates/views/ui/options/Slotted/Option.svelte';
