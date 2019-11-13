@@ -33,7 +33,13 @@ module.exports = {
   verifyDiscountText,
   verifyDiscountAmountInBanner,
   passRequestNetbanking,
+  retryPayzappWalletTransaction,
 };
+
+async function retryPayzappWalletTransaction(context) {
+  const retryButton = await context.page.waitForSelector('#fd-hide');
+  await retryButton.click();
+}
 
 async function passRequestNetbanking(context) {
   const successResult = { razorpay_payment_id: 'pay_DaFKujjV6Ajr7W' };
