@@ -1,0 +1,166 @@
+<script>
+  // UI imports
+  import Field from 'templates/views/ui/Field.svelte';
+  import SlottedRadioOption from 'templates/views/ui/options/Slotted/RadioOption.svelte';
+
+  // Utils imports
+  import { findCodeByNetworkName } from 'common/card';
+  import { getSession } from 'sessionmanager';
+  import PreferencesStore from 'checkoutstore/preferences';
+  import { getIcon as getNetworkIcon } from 'icons/network';
+
+  // Props
+  export let instrument = {}; // P13n instrument
+  export let name; // Name of the input
+  export let customer = {}; // Current customer
+
+  const session = getSession();
+
+  function trimText(text, till) {
+    if (!_.isString(text)) {
+      return text;
+    }
+
+    if (text.length - 3 <= till) {
+      return text;
+    }
+
+    return `${text.substring(0, till - 3)}...`;
+  }
+
+  /**
+   * Turns word into capital-case
+   * @param {string} word
+   *
+   * @returns {string}
+   */
+  function capitalizeWord(word) {
+    if (word.length) {
+      return `${word[0].toUpperCase()}${word.slice(1)}`;
+    }
+
+    return word;
+  }
+
+  function getBankText(card, loggedIn) {
+    const banks = PreferencesStore.get().methods.netbanking;
+    const bank = banks[card.issuer] || '';
+    const bankText = trimText(bank.replace(/ Bank$/, ''), card.type ? 14 : 19);
+
+    if (loggedIn) {
+      return `${bank ? `${bankText} ` : ''}${capitalizeWord(
+        card.type || ''
+      )} card - ${card.last4}`;
+    } else {
+      return `Use your${bank ? ` ${bankText}` : ''} ${capitalizeWord(
+        card.type || ''
+      )} card`;
+    }
+  }
+
+  function getIcon(card) {
+    if (card && card.network && card.network !== 'unknown') {
+      return getNetworkIcon(findCodeByNetworkName(card.network));
+    } else {
+      return session.themeMeta.icons.card;
+    }
+  }
+
+  let text;
+  let icon;
+  let hasCvv = false;
+  let cvvLength = 3;
+  let savedCards;
+
+  $: savedCards = _Obj.getSafely(customer, 'tokens.items', []);
+  $: savedCard = _Arr.find(savedCards, card => card.id === instrument.token_id);
+  $: {
+    if (customer) {
+      // We don't know anytihng about the card. User is logged out.
+      if (!savedCard && !instrument.issuer) {
+        text = 'Use your saved cards';
+        icon = '&#xe715';
+        hasCvv = false;
+      }
+      // We know stuff about the card. User is logged out.
+      else if (!savedCard && instrument.issuer) {
+        text = getBankText(instrument, false);
+        icon = getIcon(instrument);
+        hasCvv = false;
+      }
+      // User is logged in
+      else {
+        const card = savedCard.card || {};
+        const networkCode = findCodeByNetworkName(card.network);
+
+        text = getBankText(card, true);
+        icon = getIcon(card);
+
+        cvvLength = networkCode === 'amex' ? 4 : 3;
+        hasCvv = true;
+      }
+    } else {
+      text = `Use your saved cards`;
+      icon = getIcon();
+      hasCvv = false;
+    }
+  }
+</script>
+
+<style>
+  :global(.card-instrument) {
+    padding: 12px 16px;
+  }
+
+  /* Icon styles */
+  i {
+    display: flex;
+    margin-right: 8px;
+    width: 22px;
+    text-align: center;
+  }
+
+  i :global(svg) {
+    width: 100%;
+    max-height: 16px;
+  }
+
+  i :global(i) {
+    width: 100%;
+    margin: 0;
+  }
+
+  /* Content styles */
+  div[slot='title'] {
+    font-size: 1rem;
+    line-height: 1rem;
+
+    color: #363636;
+  }
+</style>
+
+<SlottedRadioOption
+  {name}
+  value={instrument.id}
+  radio={false}
+  className="card-instrument"
+  on:click>
+  <i slot="icon">
+    {@html icon}
+  </i>
+  <div slot="title">{text}</div>
+
+  <div slot="extra">
+    {#if hasCvv}
+      <Field
+        type="cvv"
+        name="cvv"
+        placeholder="CVV"
+        maxlength="3"
+        required={true}
+        formatter={{ type: 'number' }} />
+    {:else}
+      <div>Arrow</div>
+    {/if}
+  </div>
+</SlottedRadioOption>
