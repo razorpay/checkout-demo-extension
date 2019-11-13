@@ -1408,9 +1408,9 @@ Session.prototype = {
     this.setExperiments();
     this.setTpvBanks();
     this.getEl();
+    this.setSvelteComponents();
     this.setMethodsList();
     this.setFormatting();
-    this.setSvelteComponents();
     this.fillData();
     this.setEMI();
     this.improvisePaymentOptions();
