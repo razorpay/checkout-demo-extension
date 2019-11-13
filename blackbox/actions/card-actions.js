@@ -1,6 +1,9 @@
 const { delay } = require('../util');
 
-async function handleCardValidation(context, { coproto = 'first' }) {
+async function handleCardValidation(
+  context,
+  { coproto, urlShouldContain } = {}
+) {
   const req = await context.expectRequest();
   expect(req.url).toContain('create/ajax');
   await context.respondJSON({
