@@ -229,6 +229,10 @@ function setEmiPlansCta(screen, tab) {
     case 'confirm-account':
       Cta.updateCta('Confirm Account');
       break;
+
+    case 'proceed':
+      $('.proceed').removeClass('invisible');
+      break;
   }
 }
 
@@ -1420,6 +1424,10 @@ Session.prototype = {
     this.completePendingPayment();
     this.bindEvents();
     this.setEmiScreen();
+
+    // TODO: see if this can be done in a better way
+    setEmiPlansCta('', '');
+
     Hacks.initPostRenderHacks();
 
     errorHandler.call(this, this.params);
