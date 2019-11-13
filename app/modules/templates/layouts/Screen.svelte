@@ -24,6 +24,7 @@
   }
 
   .screen-bottom {
+    z-index: 1000;
     flex-shrink: 0;
   }
 
