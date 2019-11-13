@@ -8,8 +8,11 @@
   export let type = 'text';
   export let name;
   export let value = null;
+  export let readonly = false;
   export let required = false;
   export let autocomplete = 'off';
+  export let icon = null;
+  export let label = '';
   export let placeholder = '';
   export let pattern = '.*';
   export let formatter = null;
@@ -65,8 +68,11 @@
 </script>
 
 <style>
+  /*
+   * TODO: standardize / fix padding
+   */
   div:not(.help) {
-    padding: 4px 0;
+    /*padding: 4px 0;*/
     input {
       opacity: 1;
       width: 100%;
@@ -74,7 +80,12 @@
   }
 </style>
 
-<div bind:this={wrap} class="elem">
+<div bind:this={wrap} class="elem" class:readonly>
+  {#if icon}
+    <i>
+      {@html icon}
+    </i>
+  {/if}
   <input
     class="input"
     bind:this={input}
@@ -86,10 +97,14 @@
     {autocomplete}
     {placeholder}
     {pattern}
+    {readonly}
     use:formatterAction={formatter}
     on:focus
     on:blur
     class:no-refresh={!refresh} />
+  {#if label}
+    <label>{label}</label>
+  {/if}
   {#if helpText}
     <div class="help">{helpText}</div>
   {/if}
