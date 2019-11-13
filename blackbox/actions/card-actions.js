@@ -16,16 +16,20 @@ async function handleCardValidation(context) {
   });
 }
 
-async function enterCardDetails(context, cardType) {
+async function enterCardDetails(context, { cardType, nativeOtp = false }) {
   const cardNum = await context.page.waitForSelector('#card_number');
   if (cardType == undefined) await cardNum.type('5241 9333 8074 0001');
   else if (cardType == 'VISA') await cardNum.type('4111 1111 1111 1111');
   await context.expectRequest(req => {});
-  await context.respondJSON({
+  const flows = {
     recurring: false,
     iframe: true,
     http_status_code: 200,
-  });
+  };
+  if (nativeOtp) {
+    flows.otp = true;
+  }
+  await context.respondJSON(flows);
   await context.page.type('#card_expiry', '12/55');
   await context.page.type('#card_name', 'SakshiJain');
   await context.page.type('#card_cvv', '112');
