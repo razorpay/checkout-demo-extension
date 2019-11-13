@@ -44,6 +44,6 @@ describe.skip('Basic upi payment', () => {
     await selectUPIApp(context, '1');
     await verifyPartialAmount(context, '₹ 1');
     await submit(context);
-    await respondAndVerifyIntentRequest(context, '');
+    await respondAndVerifyIntentRequest(context);
   });
 });

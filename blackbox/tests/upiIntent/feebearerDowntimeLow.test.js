@@ -54,7 +54,7 @@ describe('Basic upi payment', () => {
     await verifyLowDowntime(context, 'UPI');
     await selectUPIApp(context, '1');
     await submit(context);
-    await handleFeeBearer(context);
-    await respondAndVerifyIntentRequest(context, '');
+    await handleFeeBearer(context, page);
+    await respondAndVerifyIntentRequest(context);
   });
 });

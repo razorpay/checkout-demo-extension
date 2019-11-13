@@ -70,6 +70,6 @@ describe.skip('Basic upi payment', () => {
     await selectOffer(context, '1');
     await verifyOfferApplied(context);
     await submit(context);
-    await respondAndVerifyIntentRequest(context, '');
+    await respondAndVerifyIntentRequest(context);
   });
 });
