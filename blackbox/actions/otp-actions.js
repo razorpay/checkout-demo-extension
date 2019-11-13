@@ -30,8 +30,64 @@ async function typeOTP(context) {
   await context.page.type('#otp', '5555');
 }
 
+async function verifyOTP(context, passOrFail) {
+  const req = await context.expectRequest();
+  if (passOrFail == 'fail') {
+    await context.failRequest({
+      error: {
+        code: 'BAD_REQUEST_ERROR',
+        description: 'Payment processing failed because of incorrect OTP',
+        action: 'RETRY',
+      },
+    });
+  } else if (passOrFail == 'pass') {
+    await context.respondJSON({ razorpay_payment_id: 'pay_123' });
+  }
+}
+
+async function resendOTP(context) {
+  const resendOTPButton = await context.page.$('#otp-resend');
+  await resendOTPButton.click();
+  await context.expectRequest();
+  await context.respondJSON({
+    type: 'otp',
+    request: {
+      method: 'direct',
+      content: '<html></html>',
+    },
+    version: 1,
+    payment_id: 'pay_DevaXGbxgAKHE9',
+    next: ['otp_submit'],
+    gateway: 'eyJpdiI6InZyajhcLzFyZnppVEhtRkJHN0dKN',
+    submit_url:
+      'https://api.razorpay.com/v1/gateway/mocksharp/payment/otp_submit/c8aafb01f805301c93f9607c0e02679b01d479ff?key_id=rzp_live_ILgsfZCZoFIKMb',
+    resend_url:
+      'https://api.razorpay.com/v1/gateway/mocksharp/payment/otp/resend',
+    metadata: {
+      issuer: 'HDFC',
+      network: 'MC',
+      last4: '9275',
+      iin: '512967',
+    },
+    redirect:
+      'https://api.razorpay.com/v1/gateway/mocksharp/payment/authentication/redirect?key_id=rzp_live_ILgsfZCZoFIKMb',
+    submit_url_private:
+      'https://api.razorpay.com/v1/gateway/mocksharp/payment/otp/submit',
+    resend_url_private:
+      'https://api.razorpay.com/v1/gateway/mocksharp/payment/otp/resend',
+  });
+}
+
+async function goToBankPage(context) {
+  const goToBank = await context.page.waitForSelector('#otp-sec');
+  await goToBank.click();
+}
+
 module.exports = {
   typeOTP,
   typeOTPandSubmit,
   handleOtpVerification,
+  verifyOTP,
+  resendOTP,
+  goToBankPage,
 };
