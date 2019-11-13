@@ -13,7 +13,7 @@ const {
   handleMockSuccessDialog,
 } = require('../../actions/common');
 
-describe('Netbanking tests', () => {
+describe.skip('Netbanking tests', () => {
   test('perform netbaking transaction', async () => {
     const options = {
       order_id: 'order_DfNAO0KJCH5WNY',
