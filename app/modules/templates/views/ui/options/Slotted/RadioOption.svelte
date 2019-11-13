@@ -16,7 +16,7 @@
     const _classes = ['slotted'];
 
     if (!radio) {
-      _classes.push('invisible');
+      _classes.push('hidden');
     }
 
     radioClasses = _classes.join(' ');
