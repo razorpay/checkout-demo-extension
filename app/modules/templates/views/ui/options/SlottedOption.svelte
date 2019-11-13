@@ -12,7 +12,7 @@
     border: 1px solid #e6e7e8;
     display: block;
     width: 100%;
-    text-align: left;
+    text-align: start;
     transition: border-color 0.15s linear;
   }
 
