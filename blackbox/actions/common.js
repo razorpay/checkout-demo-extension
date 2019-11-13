@@ -75,6 +75,13 @@ async function verifyAutoSelectBankTPV(context, bank) {
     autoSelectbank
   );
   expect(autoSelectbankName).toContain(bank);
+  const accountDiv = await context.page.waitForSelector('.account-details');
+  const accountNumber = await context.page.evaluate(
+    accountDiv => accountDiv.textContent,
+    accountDiv
+  );
+  expect(accountNumber).toContain(context.preferences.order.account_number);
+  expect(autoSelectbankName).toContain(bank);
 }
 
 async function selectUPIApp(context, AppNumber) {

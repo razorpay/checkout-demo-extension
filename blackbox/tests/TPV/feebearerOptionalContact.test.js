@@ -22,7 +22,7 @@ describe('Third Party Verification test', () => {
       order: {
         amount: 20000,
         currency: 'INR',
-        account_unmber: '1234567891234567',
+        account_number: '1234567891234567',
         bank: 'SBIN',
       },
     });
