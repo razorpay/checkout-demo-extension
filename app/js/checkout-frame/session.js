@@ -1142,6 +1142,10 @@ Session.prototype = {
     return classes.join(' ');
   },
 
+  setExperiments: function() {
+    this.newHomeScreen = true;
+  },
+
   getEl: function() {
     var r = this.r;
     if (!this.el) {
