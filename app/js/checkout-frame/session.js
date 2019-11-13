@@ -1407,6 +1407,7 @@ Session.prototype = {
 
     this.setExperiments();
     this.setTpvBanks();
+    this.setExperiments();
     this.getEl();
     this.setSvelteComponents();
     this.setMethodsList();
@@ -1511,7 +1512,7 @@ Session.prototype = {
   },
 
   setMethodsList: function() {
-    if (!this.methodsList) {
+    if (!this.methodsList && !this.newHomeScreen) {
       this.methodsList = new discreet.MethodsList({
         target: '#methods-list',
         props: {
@@ -1595,6 +1596,8 @@ Session.prototype = {
   },
 
   setSvelteComponents: function() {
+    this.setHomeTab();
+    this.setMethodsTab();
     this.setNetbankingTab();
     this.setEmandate();
     this.setCardlessEmi();
@@ -2572,7 +2575,11 @@ Session.prototype = {
       this.setPaymentMethods(this.preferences);
       this.render({ forceRender: true });
     }
-    $(this.el).addClass('show-methods');
+    if (!this.newHomeScreen) {
+      $(this.el).addClass('show-methods');
+    } else {
+      // TODO: switch to new methods screen
+    }
     SessionStore.set({ screen: '' });
     if (this.methods.count >= 4) {
       $(this.el).addClass('long');
@@ -3308,12 +3315,16 @@ Session.prototype = {
             }
           }
 
-          self.methodsList.set({
-            instruments: instruments,
-            customer: self.getCustomer(this.value),
-            tpvBank: this.tpvBank,
-            animate: true,
-          });
+          // TODO verify
+          if (!self.newHomeScreen) {
+            self.methodsList &&
+              self.methodsList.set({
+                instruments: instruments,
+                customer: self.getCustomer(this.value),
+                tpvBank: this.tpvBank,
+                animate: true,
+              });
+          }
         });
 
       _El.on('blur', function() {
@@ -3437,7 +3448,11 @@ Session.prototype = {
     $('#body').attr('screen', screen);
     makeHidden('.screen.' + shownClass);
 
-    if (screen && !(this.isPayout && screen === 'payouts')) {
+    if (
+      screen &&
+      !(this.isPayout && screen === 'payouts') &&
+      screen !== 'methods'
+    ) {
       makeVisible('#topbar');
       $('.elem-email').addClass('mature');
       $('.elem-contact').addClass('mature');
@@ -5366,11 +5381,23 @@ Session.prototype = {
 
     if (
       !this.tab &&
+      !this.newHomeScreen &&
       !this.order &&
       !this.p13n &&
       !(this.oneMethod && this.oneMethod === 'paypal')
     ) {
       return;
+    }
+
+    /**
+     * The CTA for home screen is visible only on the new design. If it was
+     * clicked, switch to the new payment methods screen.
+     */
+    if (!screen && this.newHomeScreen) {
+      if (this.checkCommonValid()) {
+        // switch to methods tab
+        this.switchTab('methods');
+      }
     }
 
     if (screen === 'otp') {
