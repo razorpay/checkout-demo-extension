@@ -3779,7 +3779,7 @@ Session.prototype = {
       send_ecod_link.call(this);
     }
 
-    if (tab === 'card' || (tab === 'emi' && this.screen !== 'emi')) {
+    if (tab === 'emi' && this.screen !== 'emi') {
       console.log('happening');
       this.showCardTab(tab);
 
@@ -5140,7 +5140,10 @@ Session.prototype = {
         }
       }
     } else if (screen) {
-      if (screen === 'card') {
+      if (tab === 'card' && screen === 'card') {
+        this.svelteCardTab.preSubmit();
+      } else if (screen === 'card') {
+        // This is kept intact so as to not mess any unknown existing flow
         var formattingDelegator = this.delegator;
 
         // Do not proceed with amex cards if amex is disabled for merchant
