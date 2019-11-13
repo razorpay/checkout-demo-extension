@@ -19,9 +19,11 @@
   export let refresh = true;
   export let helpText = '';
   export let maxlength = null;
+  export let inputmode = null;
 
   // Computed
   export let identifier;
+  export let _type;
 
   // Refs
   export let wrap = null;
@@ -49,6 +51,8 @@
   }
 
   $: identifier = id ? id : `id_${Track.makeUid()}`;
+  $: inputType = type === 'cvv' ? 'tel' : type;
+  $: inputmode = type === 'cvv' ? 'numeric' : inputmode;
 
   export function focus() {
     input.focus();
@@ -90,8 +94,9 @@
     class="input"
     bind:this={input}
     id={identifier}
-    {type}
+    type={inputType}
     {name}
+    {inputmode}
     {value}
     {required}
     {autocomplete}
@@ -101,7 +106,8 @@
     use:formatterAction={formatter}
     on:focus
     on:blur
-    class:no-refresh={!refresh} />
+    class:no-refresh={!refresh}
+    class:cvv-input={type === 'cvv'} />
   {#if label}
     <label>{label}</label>
   {/if}
