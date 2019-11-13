@@ -1,23 +1,15 @@
 const NodeEnvironment = require('jest-environment-node');
 const puppeteer = require('puppeteer-core');
-const isProd = process.env.NODE_ENV === 'production';
+const DIR = require('./tmpdir');
+const { readFileSync } = require('fs');
 const { delay } = require('./util');
 
 class PuppeteerEnvironment extends NodeEnvironment {
   async setup() {
-    const browser = await puppeteer.launch({
-      executablePath: process.env.CHROME_BIN || '/usr/bin/chromium',
-      args: ['--no-sandbox'],
-      headless: isProd,
-      // devtools: true,
-    });
-    const pages = await browser.pages();
-    this.global.page = pages[0];
+    const browserWSEndpoint = readFileSync(DIR + '/wsEndpoint', 'utf8');
+    const browser = await puppeteer.connect({ browserWSEndpoint });
+    this.global.page = await browser.newPage();
     this.global.delay = delay;
-  }
-
-  async teardown() {
-    await this.global.page.browser().close();
   }
 }
 
