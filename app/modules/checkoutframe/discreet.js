@@ -65,6 +65,8 @@ import emiOptionsView from 'templates/screens/cardlessemi.svelte';
 import emiScreenView from 'templates/screens/emiscreen.svelte';
 import SavedCardsView from 'templates/screens/savedcards.svelte';
 import PayLaterView from 'templates/screens/paylater.svelte';
+import HomeTab from 'templates/tabs/home.svelte';
+import MethodsTab from 'templates/tabs/methods.svelte';
 import NetbankingTab from 'templates/tabs/netbanking/index.svelte';
 import NachScreen from 'templates/views/nach.svelte';
 
@@ -157,6 +159,8 @@ export default {
   BankTransferScreen,
   getFullBankLogo,
 
+  HomeTab,
+  MethodsTab,
   UpiTab,
   NetbankingTab,
   NachScreen,
