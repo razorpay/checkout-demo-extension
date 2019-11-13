@@ -115,6 +115,33 @@
     return _Arr.contains(downtimes.disable.banks, code);
   }
 
+  $: showCorporateRadio =
+    !recurring && hasMultipleOptions(selectedBankCode, banks);
+  $: corporateSelected = isCorporateCode(selectedBankCode);
+  $: maxGridCount = recurring ? 3 : 6;
+  $: banksArr = _Arr.map(_Obj.entries(banks), entry => ({
+    code: entry[0],
+    name: entry[1],
+    downtime: downtimes[entry[0]],
+  }));
+  $: invalid = method !== 'emandate' && !selectedBankCode;
+  $: netbanks = getPreferredBanks(banks, bankOptions).slice(0, maxGridCount);
+  $: selectedBankDisabled =
+    method === 'netbanking' &&
+    _Arr.contains(downtimes.disable.banks, selectedBankCode);
+  $: selectedBankWarn =
+    method === 'netbanking' &&
+    _Arr.contains(downtimes.warn.banks, selectedBankCode);
+  $: selectedBankHasDowntime = selectedBankDisabled || selectedBankWarn;
+
+  $: {
+    const selected = corporateSelected;
+
+    if (showCorporateRadio) {
+      setTimeout(() => radioContainer.scrollIntoView(), 300);
+    }
+  }
+
   $: {
     const bankCode = selectedBankCode;
 
@@ -138,33 +165,6 @@
       setPayButtonVisibility();
     }
   }
-
-  $: {
-    const selected = corporateSelected;
-
-    if (showCorporateRadio) {
-      setTimeout(() => radioContainer.scrollIntoView(), 300);
-    }
-  }
-
-  $: showCorporateRadio =
-    !recurring && hasMultipleOptions(selectedBankCode, banks);
-  $: corporateSelected = isCorporateCode(selectedBankCode);
-  $: maxGridCount = recurring ? 3 : 6;
-  $: banksArr = _Arr.map(_Obj.entries(banks), entry => ({
-    code: entry[0],
-    name: entry[1],
-    downtime: downtimes[entry[0]],
-  }));
-  $: invalid = method !== 'emandate' && !selectedBankCode;
-  $: netbanks = getPreferredBanks(banks, bankOptions).slice(0, maxGridCount);
-  $: selectedBankDisabled =
-    method === 'netbanking' &&
-    _Arr.contains(downtimes.disable.banks, selectedBankCode);
-  $: selectedBankWarn =
-    method === 'netbanking' &&
-    _Arr.contains(downtimes.warn.banks, selectedBankCode);
-  $: selectedBankHasDowntime = selectedBankDisabled || selectedBankWarn;
 </script>
 
 <style>
@@ -194,93 +194,97 @@
   overrideMethodCheck
   hasMessage={selectedBankHasDowntime}>
   <Screen pad={false}>
-    <div id="netb-banks" class="clear grid count-3">
-      {#each netbanks as { name, code }}
-        <GridItem
-          {name}
-          {code}
-          fullName={banks[code]}
-          disabled={isBankDisabled(code)}
-          bind:group={selectedBankCode} />
-      {/each}
-    </div>
-
-    <div class="elem-wrap pad">
-      <div id="nb-elem" class="elem select" class:invalid>
-        <i class="select-arrow"></i>
-        <div class="help">Please select a bank</div>
-        <select
-          id="bank-select"
-          name="bank"
-          required
-          class="input no-refresh no-validate"
-          pattern="[\w]+"
-          bind:value={selectedBankCode}
-          use:focus
-          use:blur
-          use:input>
-          <option value="">Select a different Bank</option>
-          {#each banksArr as bank}
-            <option value={bank.code}>{bank.name}</option>
-          {/each}
-        </select>
+    <div slot="main">
+      <div id="netb-banks" class="clear grid count-3">
+        {#each netbanks as { name, code }}
+          <GridItem
+            {name}
+            {code}
+            fullName={banks[code]}
+            disabled={isBankDisabled(code)}
+            bind:group={selectedBankCode} />
+        {/each}
       </div>
-    </div>
 
-    {#if showCorporateRadio}
-      <div
-        class="pad ref-radiocontainer"
-        bind:this={radioContainer}
-        transition:fade={{ duration: 100 }}
-        class:scrollFix={selectedBankHasDowntime}>
-        <label>Complete Payment Using</label>
-        <div class="input-radio">
-          <input
-            type="radio"
-            id="nb_type_retail"
-            value="retail"
-            checked={!corporateSelected}
-            on:click={setRetailOption} />
-          <label for="nb_type_retail">
-            <div class="radio-display" />
-            <div class="label-content">Retail</div>
-          </label>
-        </div>
-        <div class="input-radio">
-          <input
-            type="radio"
-            id="nb_type_corporate"
-            value="corporate"
-            checked={corporateSelected}
-            on:click={setCorporateOption} />
-          <label for="nb_type_corporate">
-            <div class="radio-display" />
-            <div class="label-content">Corporate</div>
-          </label>
+      <div class="elem-wrap pad">
+        <div id="nb-elem" class="elem select" class:invalid>
+          <i class="select-arrow"></i>
+          <div class="help">Please select a bank</div>
+          <select
+            id="bank-select"
+            name="bank"
+            required
+            class="input no-refresh no-validate"
+            pattern="[\w]+"
+            bind:value={selectedBankCode}
+            use:focus
+            use:blur
+            use:input>
+            <option value="">Select a different Bank</option>
+            {#each banksArr as bank}
+              <option value={bank.code}>{bank.name}</option>
+            {/each}
+          </select>
         </div>
       </div>
-    {/if}
-  </Screen>
 
-  <!-- Show recurring message for recurring payments -->
-  {#if recurring}
-    <Callout>
-      Future payments from your bank account will be charged automatically.
-    </Callout>
-  {/if}
-
-  <!-- Show downtime message if the selected bank is down -->
-  {#if selectedBankHasDowntime}
-    <DowntimeCallout isHighSeverity={selectedBankDisabled}>
-      {#if selectedBankDisabled}
-        <strong>{banks[selectedBankCode]}</strong>
-        accounts are temporarily unavailable right now. Please select another
-        bank.
-      {:else}
-        <strong>{banks[selectedBankCode]}</strong>
-        accounts are experiencing low success rates.
+      {#if showCorporateRadio}
+        <div
+          class="pad ref-radiocontainer"
+          bind:this={radioContainer}
+          transition:fade={{ duration: 100 }}
+          class:scrollFix={selectedBankHasDowntime}>
+          <label>Complete Payment Using</label>
+          <div class="input-radio">
+            <input
+              type="radio"
+              id="nb_type_retail"
+              value="retail"
+              checked={!corporateSelected}
+              on:click={setRetailOption} />
+            <label for="nb_type_retail">
+              <div class="radio-display" />
+              <div class="label-content">Retail</div>
+            </label>
+          </div>
+          <div class="input-radio">
+            <input
+              type="radio"
+              id="nb_type_corporate"
+              value="corporate"
+              checked={corporateSelected}
+              on:click={setCorporateOption} />
+            <label for="nb_type_corporate">
+              <div class="radio-display" />
+              <div class="label-content">Corporate</div>
+            </label>
+          </div>
+        </div>
       {/if}
-    </DowntimeCallout>
-  {/if}
+    </div>
 
+    <div slot="bottom">
+      <!-- Show recurring message for recurring payments -->
+      {#if recurring}
+        <Callout>
+          Future payments from your bank account will be charged automatically.
+        </Callout>
+      {/if}
+
+      <!-- Show downtime message if the selected bank is down -->
+      {#if selectedBankHasDowntime}
+        <DowntimeCallout isHighSeverity={selectedBankDisabled}>
+          {#if selectedBankDisabled}
+            <strong>{banks[selectedBankCode]}</strong>
+            accounts are temporarily unavailable right now. Please select
+            another bank.
+          {:else}
+            <strong>{banks[selectedBankCode]}</strong>
+            accounts are experiencing low success rates.
+          {/if}
+        </DowntimeCallout>
+      {/if}
+    </div>
+
+  </Screen>
 </Tab>

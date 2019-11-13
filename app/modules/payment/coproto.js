@@ -30,7 +30,6 @@ export const processPaymentCreate = function(response) {
   var r = payment.r;
 
   payment.payment_id = response.payment_id;
-  payment.magicCoproto = response.magic || false;
 
   Track(r, 'ajax_response', response);
 
@@ -82,39 +81,12 @@ var responseTypes = {
     var direct = request.method === 'direct';
     var content = request.content;
     var popup = this.popup;
-    var coprotoMagic = fullResponse.magic ? fullResponse.magic : false;
 
     if (this.data && this.data.wallet === 'amazonpay') {
       request.content = {};
     }
 
-    if (this.isMagicPayment) {
-      if (coprotoMagic) {
-        this.emit('magic.init');
-      }
-
-      var popupOptions = {
-        focus: !coprotoMagic,
-        magic: coprotoMagic,
-        otpelf: true,
-      };
-
-      if (direct) {
-        popupOptions.content = content;
-      } else {
-        var url =
-          "javascript: submitForm('" +
-          request.url +
-          "', " +
-          _Obj.stringify(request.content) +
-          ", '" +
-          request.method +
-          "')";
-        popupOptions.url = url;
-      }
-
-      global.CheckoutBridge.invokePopup(_Obj.stringify(popupOptions));
-    } else if (popup) {
+    if (popup) {
       if (this.iframe) {
         popup.show();
       }
@@ -137,18 +109,6 @@ var responseTypes = {
         }
       });
     } else {
-      if (this.sdk_popup) {
-        return global.CheckoutBridge.invokePopup(
-          _Obj.stringify({
-            focus: true,
-            magic: false,
-            otpelf: true,
-            url: `javascript: submitForm('${request.url}', ${_Obj.stringify(
-              request.content
-            )}, '${request.method}')`,
-          })
-        );
-      }
       this.checkRedirect();
     }
   },
@@ -319,40 +279,3 @@ var responseTypes = {
     return responseTypes.first.call(this, request, fullResponse);
   },
 };
-
-function mwebIntent(payment, ra, fullResponse) {
-  // Start Timeout
-  var drawerTimeout = setTimeout(() => {
-    /**
-     * If upi app selection drawer not happened (technically,
-     * checkout is not blurred until 3 sec)
-     */
-    this.emit('cancel', {
-      '_[method]': 'upi',
-      '_[flow]': 'intent',
-      '_[reason]': 'UPI_INTENT_WEB_NO_APPS',
-    });
-    this.emit('upi.noapp');
-  }, 3000);
-
-  var blurHandler = () => {
-    /**
-     * If upi app selection drawer opened before 3 sec, clear timeout
-     */
-    clearTimeout(drawerTimeout);
-    this.emit('upi.selectapp');
-  };
-
-  var focHandler = () => {
-    this.emit('upi.pending', { flow: 'upi-intent' });
-
-    global.removeEventListener('blur', blurHandler);
-    global.removeEventListener('focus', focHandler);
-    ra();
-  };
-
-  global.addEventListener('blur', blurHandler);
-  global.addEventListener('focus', focHandler);
-
-  global.location = fullResponse.data.intent_url;
-}

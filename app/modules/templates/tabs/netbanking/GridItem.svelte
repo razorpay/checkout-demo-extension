@@ -47,7 +47,7 @@
       <span class="downtime">
         <Tooltip
           bindTo="#form-netbanking"
-          class="downtime-tooltip"
+          className="downtime-tooltip"
           align={['bottom']}>
           {fullName} accounts are facing temporary issues right now. Please
           select another bank.

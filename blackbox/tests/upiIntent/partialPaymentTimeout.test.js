@@ -21,8 +21,8 @@ describe('Basic upi payment', () => {
     };
     const preferences = makePreferences({
       order: {
-        amount: 100,
-        amount_due: 100,
+        amount: 200,
+        amount_due: 200,
         amount_paid: 0,
         currency: 'INR',
         first_payment_min_amount: null,
