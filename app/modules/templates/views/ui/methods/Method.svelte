@@ -6,7 +6,7 @@
   export let subtitle = null;
 
   // UI imports
-  import SlottedOption from 'templates/views/ui/options/SlottedOption.svelte';
+  import SlottedOption from 'templates/views/ui/options/Slotted/Option.svelte';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
