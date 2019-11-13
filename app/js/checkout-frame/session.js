@@ -990,7 +990,12 @@ function Session(message) {
 
 Session.prototype = {
   shouldUseNativeOTP: function() {
-    return this.get('nativeotp') && this.r.isLiveMode();
+    return (
+      this.get('nativeotp') &&
+      this.get('callback_url') &&
+      this.get('redirect') &&
+      this.r.isLiveMode()
+    );
   },
 
   getDecimalAmount: getDecimalAmount,
@@ -5904,8 +5909,6 @@ Session.prototype = {
         });
 
         request.nativeotp = true;
-        request.iframe = true;
-        Analytics.track('iframe:attempt');
       }
     }
 
