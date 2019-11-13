@@ -16,7 +16,7 @@ async function handleCardValidation(context, { coproto = 'first' }) {
   });
 }
 
-async function enterCardDetails(context, { cardType, nativeOtp = false }) {
+async function enterCardDetails(context, { cardType, nativeOtp = false } = {}) {
   const cardNum = await context.page.waitForSelector('#card_number');
   if (cardType == undefined) await cardNum.type('5241 9333 8074 0001');
   else if (cardType == 'VISA') await cardNum.type('4111 1111 1111 1111');
