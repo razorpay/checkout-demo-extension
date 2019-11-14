@@ -1,41 +1,45 @@
-const { openSdkCheckout } = require('../../actions/checkout-sdk');
+const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
   assertPaymentMethods,
-  selectPaymentMethod,
+  selectFromDropDown,
   submit,
-  respondAndVerifyIntentRequest,
-  selectUPIApp,
+  respondToUPIAjax,
+  handleFeeBearer,
+  enterUPIAccount,
+  selectGooglePay,
+  selectPaymentMethod,
+  handleUPIAccountValidation,
+  respondToUPIPaymentStatus,
 } = require('../../actions/common');
 
-describe('Basic GooglePay payment', () => {
-  test('Perform keyless GooglePay transaction with contact optional', async () => {
+describe('Optional Keyless GooglePay Payment', () => {
+  test('Perform GooglePay transaction with keyless and optional contact', async () => {
     const options = {
       order_id: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 200,
+      amount: 60000,
       personalization: false,
     };
     const preferences = makePreferences({ optional: ['contact'] });
     preferences.methods.upi = true;
-    const context = await openSdkCheckout({
+    const context = await openCheckout({
       page,
       options,
       preferences,
-      apps: [
-        {
-          package_name: 'com.google.android.apps.nbu.paisa.user',
-          app_name: 'Google Pay (Tez)',
-        },
-      ],
     });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, false);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIApp(context, '1');
+    //await delay(1000);
+    await selectGooglePay(context, 'Google Pay');
+    await enterUPIAccount(context, 'scbaala');
+    await selectFromDropDown(context, 'okhdfcbank');
     await submit(context);
-    await respondAndVerifyIntentRequest(context);
+    await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
+    await respondToUPIAjax(context, '');
+    await respondToUPIPaymentStatus(context);
   });
 });

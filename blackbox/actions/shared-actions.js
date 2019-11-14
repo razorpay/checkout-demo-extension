@@ -112,6 +112,33 @@ async function selectBank(context, bank) {
   await context.page.select('#bank-select', bank);
 }
 
+async function responseVerificationForUPICollect(context) {
+  const reqorg = await context.expectRequest();
+  expect(reqorg.url).toEqual(
+    'https://api.razorpay.com/v1/payments/create/ajax'
+  );
+  expect(reqorg.method).toEqual('POST');
+  await context.respondJSON({
+    data: null,
+    payment_id: 'pay_DaFKujjV6Ajr7W',
+    request: {
+      method: 'GET',
+      url:
+        'https://api.razorpay.com/v1/payments/pay_DaFKujjV6Ajr7W/status?key_id=rzp_test_1DP5mmOlF5G5ag',
+    },
+    type: 'async',
+  });
+
+  const successResult = { razorpay_payment_id: 'pay_DaFKujjV6Ajr7W' };
+  const req = await context.expectRequest();
+  expect(req.url).toContain('status?key_id');
+  await context.respondPlain(
+    `${req.params.callback}(${JSON.stringify(successResult)})`
+  );
+  const result = await context.getResult();
+  expect(result).toMatchObject(successResult);
+}
+
 module.exports = {
   handleMockFailureDialog,
   handleMockSuccessDialog,
@@ -123,4 +150,5 @@ module.exports = {
   verifyErrorMessage,
   submit,
   respondAndVerifyIntentRequest,
+  responseVerificationForUPICollect,
 };
