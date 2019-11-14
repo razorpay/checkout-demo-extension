@@ -177,11 +177,6 @@
     margin-bottom: 18px;
   }
 
-  /* Add extra space at the bottom to prevent callout message from overlapping radios */
-  .ref-radiocontainer.scrollFix {
-    margin-bottom: 36px;
-  }
-
   .input-radio:first-of-type {
     margin-top: 4px;
   }
@@ -232,8 +227,7 @@
         <div
           class="pad ref-radiocontainer"
           bind:this={radioContainer}
-          transition:fade={{ duration: 100 }}
-          class:scrollFix={selectedBankHasDowntime}>
+          transition:fade={{ duration: 100 }}>
           <label>Complete Payment Using</label>
           <div class="input-radio">
             <input
