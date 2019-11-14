@@ -95,6 +95,13 @@
   }
 </script>
 
+<style>
+  span {
+    display: inline-block;
+    transform: rotate(180deg);
+  }
+</style>
+
 <SlottedRadioOption
   {name}
   value={instrument.id}
@@ -116,7 +123,7 @@
         required={true}
         formatter={{ type: 'number' }} />
     {:else}
-      <div>Arrow</div>
+      <span class="theme-highlight-color">&#xe604;</span>
     {/if}
   </div>
 </SlottedRadioOption>
