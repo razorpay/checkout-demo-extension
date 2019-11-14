@@ -6,29 +6,36 @@ const {
   assertPaymentMethods,
   selectPaymentMethod,
   submit,
-  enterCardDetails,
+  handleCustomerCardStatusRequest,
+  typeOTPandSubmit,
+  respondSavedCards,
+  selectSavedCardAndTypeCvv,
   handleCardValidationWithCallback,
-  expectMockFailureWithCallback,
+  expectMockSuccessWithCallback,
 } = require('../../actions/common');
 
-describe('Card tests', () => {
-  test('perform failed card transaction with callback URL', async () => {
+describe('Saved Card tests', () => {
+  test('Perform keyless saved card transaction with callback URL enabled', async () => {
     const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+      order_id: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
-      personalization: false,
+      personalization: true,
+      remember_customer: true,
       callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
       redirect: true,
     };
     const preferences = makePreferences();
-    const context = await openCheckout({ page, options, preferences });
+    let context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
-    await enterCardDetails(context);
+    await handleCustomerCardStatusRequest(context);
+    await typeOTPandSubmit(context);
+    await respondSavedCards(context);
+    await selectSavedCardAndTypeCvv(context);
     await submit(context);
     await handleCardValidationWithCallback(context);
-    await expectMockFailureWithCallback(context);
+    await expectMockSuccessWithCallback(context);
   });
 });

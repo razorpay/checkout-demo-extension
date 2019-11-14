@@ -15,7 +15,7 @@ const {
   handleMockFailureDialog,
 } = require('../../actions/common');
 
-describe('Card tests', () => {
+describe.skip('Card tests', () => {
   test('perform card transaction with customer feebearer enabled and contact optional', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',

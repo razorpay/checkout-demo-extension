@@ -2,9 +2,9 @@ const querystring = require('querystring');
 const { readFileSync } = require('fs');
 const { cdnUrl, lumberjackUrl } = require('../const');
 const { interceptor } = require('../util');
-const { computed } = require('../actions/options');
-const { sendPreferences } = require('../actions/preferences');
-testCount = 0;
+const { computed } = require('./options');
+const { callbackHtml } = require('./callback');
+const { sendPreferences } = require('./preferences');
 
 const checkoutPublic = 'https://api.razorpay.com/v1/checkout/public';
 const checkoutCss = 'https://checkout.razorpay.com/v1/css/checkout.css';
@@ -92,21 +92,26 @@ module.exports = {
       interceptorOptions = interceptor(page);
     }
 
+    const pageTarget = page.target();
     const returnObj = {
       page,
-      testCount,
       options,
       preferences,
       ...computed(options, preferences),
       ...interceptorOptions,
-      popup() {
-        const targets = page.browserContext().targets();
-        switch (targets.length) {
-          case 1:
-            throw new Error('No popup is open');
-          default:
-            return targets[targets.length - 1];
-        }
+      async popup() {
+        const target = await page
+          .browser()
+          .waitForTarget(t => t.opener() === pageTarget);
+        const popupPage = await target.page();
+        return {
+          page: popupPage,
+          async callback(response) {
+            await popupPage.goto(
+              'data:text/html,' + encodeURIComponent(callbackHtml(response))
+            );
+          },
+        };
       },
       async callbackPage(response) {
         const req = await interceptorOptions.expectRequest();

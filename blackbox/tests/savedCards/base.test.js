@@ -14,8 +14,8 @@ const {
   selectSavedCardAndTypeCvv,
 } = require('../../actions/common');
 
-describe('Card tests', () => {
-  test('perform card transaction', async () => {
+describe('Saved Card tests', () => {
+  test('Perform saved card transaction', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,

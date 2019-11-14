@@ -14,7 +14,7 @@ const {
   handleFeeBearer,
 } = require('../../actions/common');
 
-describe('EMI tests', () => {
+describe.skip('EMI tests', () => {
   test('perform EMI transaction with Feebearer enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',

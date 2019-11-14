@@ -11,6 +11,6 @@ describe('Wallet payment', () => {
     };
     const preferences = makePreferences({ optional: ['contact', 'email'] });
     const context = await openCheckout({ page, options, preferences });
-    await assertHomePage(context, false, false);
+    await assertHomePage(context);
   });
 });

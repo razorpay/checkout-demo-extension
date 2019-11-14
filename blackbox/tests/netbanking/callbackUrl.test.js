@@ -5,17 +5,14 @@ const {
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
-  selectWallet,
-  assertWalletPage,
+  selectBank,
+  assertNetbankingPage,
   submit,
-  handleOtpVerification,
-  typeOTPandSubmit,
-  handleCardValidationWithCallback,
-  expectMockFailureWithCallback,
+  expectRedirectWithCallback,
 } = require('../../actions/common');
 
-describe.skip('Basic wallet payment', () => {
-  test('Perform wallet transaction', async () => {
+describe('Netbanking tests', () => {
+  test('perform netbaking transaction with callback url', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
@@ -28,13 +25,13 @@ describe.skip('Basic wallet payment', () => {
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true);
     await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'wallet');
-    await assertWalletPage(context);
-    await selectWallet(context, 'freecharge');
+    await selectPaymentMethod(context, 'netbanking');
+    await assertNetbankingPage(context);
+    await selectBank(context, 'SBIN');
     await submit(context);
-    await handleOtpVerification(context);
-    await typeOTPandSubmit(context);
-    await handleCardValidationWithCallback(context);
-    await expectMockFailureWithCallback(context);
+    await expectRedirectWithCallback(context, {
+      method: 'netbanking',
+      bank: 'SBIN',
+    });
   });
 });
