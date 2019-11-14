@@ -12,7 +12,7 @@ const {
   handleFeeBearer,
 } = require('../../actions/common');
 
-describe('Basic upi payment', () => {
+describe.skip('Basic upi payment', () => {
   test('Verify UPI intent downtime - Low with customer feebearer enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',

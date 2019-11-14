@@ -111,12 +111,6 @@
           }, 2000);
           g('proceed-btn').onclick = onComplete;
         }
-      } else {
-        document.cookie =
-          'onComplete=' + data + ';expires=Fri, 31 Dec 9999 23:59:59 GMT;path=/';
-        try {
-          localStorage.setItem('onComplete', data);
-        } catch (e) {}
       }
 
       var iosCheckoutBridgeNew = ((window.webkit || {}).messageHandlers || {})

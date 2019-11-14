@@ -11,8 +11,7 @@ const {
   handleUPIAccountValidation,
   respondToUPIAjax,
   respondToUPIPaymentStatus,
-  handleCardValidationWithCallback,
-  expectMockSuccessWithCallback,
+  expectRedirectWithCallback,
 } = require('../../actions/common');
 
 describe.skip('Basic upi payment', () => {
@@ -37,7 +36,6 @@ describe.skip('Basic upi payment', () => {
     await handleUPIAccountValidation(context, 'BHIM@upi');
     await respondToUPIAjax(context, '');
     await respondToUPIPaymentStatus(context);
-    await handleCardValidationWithCallback(context);
-    await expectMockSuccessWithCallback(context);
+    await expectRedirectWithCallback(context, { method: 'upi' });
   });
 });

@@ -12,7 +12,7 @@ const {
   verifyTimeout,
 } = require('../../actions/common');
 
-describe('EMI tests', () => {
+describe.skip('EMI tests', () => {
   test('perform keyless EMI transaction with timeout enabled', async () => {
     const options = {
       order_id: 'rzp_test_1DP5mmOlF5G5ag',
