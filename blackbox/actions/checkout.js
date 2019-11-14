@@ -2,6 +2,7 @@ const querystring = require('querystring');
 const { readFileSync } = require('fs');
 const { cdnUrl, lumberjackUrl } = require('../const');
 const { interceptor } = require('../util');
+const { computed } = require('../actions/options');
 const { sendPreferences } = require('../actions/preferences');
 testCount = 0;
 
@@ -96,6 +97,7 @@ module.exports = {
       testCount,
       options,
       preferences,
+      ...computed(options, preferences),
       ...interceptorOptions,
       popup() {
         const targets = page.browserContext().targets();
