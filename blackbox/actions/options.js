@@ -6,6 +6,7 @@ module.exports = {
       key: 'rzp_live_' + randomId(),
       amount: 50 * randomRange(2, 100),
       personalization: false,
+      ...overrides,
     };
   },
 

@@ -93,6 +93,7 @@ async function expectRedirectWithCallback(context, fields) {
   );
 
   expect(body.callback_url).toEqual(context.options.callback_url);
+  await context.respondPlain('');
 }
 
 async function handleValidationRequest(context, passOrFail) {
