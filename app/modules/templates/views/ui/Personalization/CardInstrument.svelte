@@ -107,43 +107,11 @@
   }
 </script>
 
-<style>
-  :global(.card-instrument) {
-    padding: 12px 16px;
-  }
-
-  /* Icon styles */
-  i {
-    display: flex;
-    margin-right: 8px;
-    width: 22px;
-    text-align: center;
-  }
-
-  i :global(svg) {
-    width: 100%;
-    max-height: 16px;
-  }
-
-  i :global(i) {
-    width: 100%;
-    margin: 0;
-  }
-
-  /* Content styles */
-  div[slot='title'] {
-    font-size: 1rem;
-    line-height: 1rem;
-
-    color: #363636;
-  }
-</style>
-
 <SlottedRadioOption
   {name}
   value={instrument.id}
   radio={false}
-  className="card-instrument"
+  className="p13n-instrument"
   on:click>
   <i slot="icon">
     {@html icon}
