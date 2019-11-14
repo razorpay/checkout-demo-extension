@@ -14,7 +14,7 @@ const {
   verifyDiscountPaybleAmount,
   verifyDiscountText,
   verifyDiscountAmountInBanner,
-  validateHelpMessage,
+  handleWalletPopUp,
 } = require('../../actions/common');
 
 describe('Basic wallet payment', () => {
@@ -61,7 +61,6 @@ describe('Basic wallet payment', () => {
     await verifyDiscountAmountInBanner(context, '₹ 1,980');
     await verifyDiscountText(context, 'You save ₹ 20');
     await submit(context);
-
-    await validateHelpMessage(context, 'The contact field is required.');
+    await handleWalletPopUp(context);
   });
 });
