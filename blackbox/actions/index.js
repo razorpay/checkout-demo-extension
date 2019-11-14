@@ -3,17 +3,19 @@ const { makeOptions } = require('./options');
 const { openCheckout } = require('./checkout');
 
 const getDataUpdatedForKeyless = d => {
+  let options = {
+    ...d.options,
+    ...{
+      order_id: 'rzp_test_1DP5mmOlF5G5ag',
+      amount: 200,
+      personalization: false,
+    },
+  };
+  delete options.key;
   return {
     ...d,
     title: d.title + ' - keyless',
-    options: {
-      ...d.options,
-      ...{
-        order_id: 'rzp_test_1DP5mmOlF5G5ag',
-        amount: 200,
-        personalization: false,
-      },
-    },
+    options,
   };
 };
 
@@ -33,12 +35,12 @@ const getTestData = (
   } = {}
 ) => {
   let tests = [];
-  prefernecesLoggedIn = makePreferencesLogged(preferences);
+  preferencesLoggedIn = makePreferencesLogged(preferences);
   preferences = makePreferences(preferences);
   options = makeOptions(options);
   if (loggedIn) {
     let loggedInData = {
-      preferences,
+      preferences: preferencesLoggedIn,
       title: title + ' - when logged in',
       options,
     };
@@ -47,7 +49,7 @@ const getTestData = (
   }
   if (anon) {
     let anonymousUserData = {
-      preferences: prefernecesLoggedIn,
+      preferences,
       title: title + ' - with anonymous user',
       options,
     };
