@@ -12,23 +12,53 @@ const {
   respondToUPIAjax,
   handleUPIAccountValidation,
   respondToUPIPaymentStatus,
+  setPreferenceForOffer,
 } = require('../../actions/common');
-describe('Basic GooglePay payment', () => {
-  test('Perform GooglePay transaction', async () => {
+
+describe('Offers with contact optional GooglePay payment', () => {
+  test('Perform Offers GooglePay transaction with optional contact enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 60000,
       personalization: false,
+      method: [
+        {
+          upi: true,
+        },
+      ],
     };
-    const preferences = makePreferences();
+    const preferences = makePreferences({
+      optional: ['contact'],
+      offers: [
+        {
+          id: 'offer_Dcad1sICBaV2wI',
+          name: 'UPI Offer Name',
+          payment_method: 'upi',
+          display_text: 'UPI Offer Display Text',
+        },
+        {
+          id: 'offer_DcaetTeD4Gjcma',
+          name: 'UPI Offer Name 2',
+          payment_method: 'upi',
+          display_text: 'UPI Offer Display Text 2',
+        },
+        {
+          id: 'offer_DcafkxTAseGAtT',
+          name: 'UPI Offer Name 3',
+          payment_method: 'upi',
+          display_text: 'UPI Offer Display Text 3',
+        },
+      ],
+    });
     preferences.methods.upi = true;
     const context = await openCheckout({
       page,
       options,
       preferences,
     });
+    await setPreferenceForOffer(preferences);
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
+    await fillUserDetails(context, false);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await selectGooglePay(context, 'Google Pay');

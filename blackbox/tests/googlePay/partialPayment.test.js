@@ -5,35 +5,50 @@ const {
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
-  selectGooglePay,
-  enterUPIAccount,
-  selectFromDropDown,
   submit,
-  respondToUPIAjax,
   handleUPIAccountValidation,
+  selectFromDropDown,
+  selectGooglePay,
+  handlePartialPayment,
+  verifyPartialAmount,
+  enterUPIAccount,
+  respondToUPIAjax,
   respondToUPIPaymentStatus,
 } = require('../../actions/common');
-describe('Basic GooglePay payment', () => {
-  test('Perform GooglePay transaction', async () => {
+
+describe('Partial GooglePay payment', () => {
+  test('Perform GooglePay transaction with partial payments enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 60000,
+      amount: 200,
       personalization: false,
     };
-    const preferences = makePreferences();
+    const preferences = makePreferences({
+      order: {
+        amount: 10000,
+        amount_due: 10000,
+        amount_paid: 0,
+        currency: 'INR',
+        first_payment_min_amount: null,
+        partial_payment: true,
+      },
+    });
     preferences.methods.upi = true;
     const context = await openCheckout({
       page,
       options,
       preferences,
+      //apps: [{ package_name: 'com.google.android.apps.nbu.paisa.user', app_name: 'Google Pay (Tez)' }],
     });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true);
+    await handlePartialPayment(context, '1');
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await selectGooglePay(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
     await selectFromDropDown(context, 'okhdfcbank');
+    await verifyPartialAmount(context, '₹ 1');
     await submit(context);
     await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
     await respondToUPIAjax(context, '');

@@ -6,27 +6,29 @@ const {
   assertPaymentMethods,
   selectPaymentMethod,
   selectGooglePay,
+  submit,
   enterUPIAccount,
   selectFromDropDown,
-  submit,
-  respondToUPIAjax,
   handleUPIAccountValidation,
+  respondToUPIAjax,
   respondToUPIPaymentStatus,
+  handleCardValidationWithCallback,
+  expectMockSuccessWithCallback,
 } = require('../../actions/common');
-describe('Basic GooglePay payment', () => {
-  test('Perform GooglePay transaction', async () => {
+
+describe.skip('CallBack Url with Google Pay', () => {
+  test('Perform CallBack Url with Google Pay', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 60000,
+      amount: 200,
       personalization: false,
+      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
+      redirect: true,
     };
     const preferences = makePreferences();
     preferences.methods.upi = true;
-    const context = await openCheckout({
-      page,
-      options,
-      preferences,
-    });
+
+    const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true);
     await assertPaymentMethods(context);
@@ -38,5 +40,7 @@ describe('Basic GooglePay payment', () => {
     await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
     await respondToUPIAjax(context, '');
     await respondToUPIPaymentStatus(context);
+    await handleCardValidationWithCallback(context);
+    await expectMockSuccessWithCallback(context);
   });
 });

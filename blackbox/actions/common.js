@@ -32,6 +32,7 @@ module.exports = {
   verifyDiscountPaybleAmount,
   verifyDiscountText,
   verifyDiscountAmountInBanner,
+  selectFromDropDown,
 };
 
 async function verifyDiscountAmountInBanner(context, expectedDiscountAmount) {
@@ -59,4 +60,8 @@ async function verifyDiscountText(context, expectedDiscountAmount) {
     discount
   );
   expect(discountAmount).toEqual(expectedDiscountAmount);
+}
+
+async function selectFromDropDown(context, valuetoBeSelected) {
+  await page.select('select[name="gpay_bank"]', valuetoBeSelected);
 }

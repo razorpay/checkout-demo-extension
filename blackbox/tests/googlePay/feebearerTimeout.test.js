@@ -1,28 +1,29 @@
-const { openCheckout } = require('../../actions/checkout');
+const { openSdkCheckout } = require('../../actions/checkout-sdk');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
+  submit,
+  verifyTimeout,
+  handleFeeBearer,
   selectGooglePay,
   enterUPIAccount,
   selectFromDropDown,
-  submit,
-  respondToUPIAjax,
-  handleUPIAccountValidation,
-  respondToUPIPaymentStatus,
 } = require('../../actions/common');
-describe('Basic GooglePay payment', () => {
-  test('Perform GooglePay transaction', async () => {
+
+describe.skip('Basic GooglePay payment', () => {
+  test('Perform GooglePay transaction with feebearer and timeout enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 60000,
       personalization: false,
+      timeout: 10,
     };
-    const preferences = makePreferences();
+    const preferences = makePreferences({ fee_bearer: true });
     preferences.methods.upi = true;
-    const context = await openCheckout({
+    const context = await openSdkCheckout({
       page,
       options,
       preferences,
@@ -35,8 +36,7 @@ describe('Basic GooglePay payment', () => {
     await enterUPIAccount(context, 'scbaala');
     await selectFromDropDown(context, 'okhdfcbank');
     await submit(context);
-    await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
-    await respondToUPIAjax(context, '');
-    await respondToUPIPaymentStatus(context);
+    await handleFeeBearer(context, page);
+    await verifyTimeout(context, 'upi');
   });
 });
