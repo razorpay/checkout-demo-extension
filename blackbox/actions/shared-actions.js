@@ -35,7 +35,6 @@ async function respondAndVerifyIntentRequest(context) {
 }
 
 async function verifyErrorMessage(context, expectedErrorMeassage) {
-  await delay(800);
   const messageDiv = await context.page.waitForSelector('#fd-t');
   let messageText = await context.page.evaluate(
     messageDiv => messageDiv.textContent,
@@ -64,9 +63,8 @@ async function validateHelpMessage(context, message) {
 }
 
 async function submit(context) {
-  await delay(300);
+  await delay(200);
   context.page.click('#footer');
-  await delay(1000);
 }
 
 async function handleMockFailureDialog(context) {

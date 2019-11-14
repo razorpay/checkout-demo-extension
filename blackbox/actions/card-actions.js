@@ -14,7 +14,6 @@ async function handleCardValidation(context) {
     amount: '\u20b9 51',
     image: 'https://cdn.razorpay.com/logos/D3JjREAG8erHB7_medium.jpg',
   });
-  await delay(1000);
 }
 
 async function enterCardDetails(context, cardType) {
@@ -35,7 +34,6 @@ async function enterCardDetails(context, cardType) {
 async function retryCardTransaction(context) {
   const retryButton = await context.page.waitForSelector('#fd-hide');
   await retryButton.click();
-  await delay(500);
 }
 
 module.exports = {

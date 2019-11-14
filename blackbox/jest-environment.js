@@ -11,6 +11,10 @@ class PuppeteerEnvironment extends NodeEnvironment {
     this.global.page = await browser.newPage();
     this.global.delay = delay;
   }
+
+  async teardown() {
+    await this.global.page.close();
+  }
 }
 
 module.exports = PuppeteerEnvironment;
