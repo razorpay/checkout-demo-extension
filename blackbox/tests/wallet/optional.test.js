@@ -11,7 +11,7 @@ const {
   validateHelpMessage,
 } = require('../../actions/common');
 
-describe('Wallet payment', () => {
+describe.skip('Wallet payment', () => {
   test('Perform wallet transaction with contact as optional', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
