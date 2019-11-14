@@ -11,7 +11,7 @@ const {
   respondToUPIAjax,
 } = require('../../actions/common');
 
-describe('Basic QR Code payment', () => {
+describe.skip('Basic QR Code payment', () => {
   test('Perform QR Code transaction', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
