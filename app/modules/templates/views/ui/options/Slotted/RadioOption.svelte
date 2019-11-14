@@ -43,7 +43,7 @@
   }
 </style>
 
-<button class={className} class:selected on:click>
+<button class={className} class:selected on:click type="button">
   <Stack horizontal {reverse}>
     <slot name="icon" />
     <div>
