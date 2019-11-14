@@ -64,6 +64,7 @@ async function validateHelpMessage(context, message) {
 
 async function submit(context) {
   await delay(200);
+  // do not use await as it will cause issues with all cases of redirection
   context.page.click('#footer');
 }
 
