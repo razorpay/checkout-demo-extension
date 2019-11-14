@@ -100,6 +100,13 @@
     display: inline-block;
     transform: rotate(180deg);
   }
+
+  div[slot='extra'] {
+    :global(.elem .input) {
+      padding: 0;
+      width: 2rem;
+    }
+  }
 </style>
 
 <SlottedRadioOption
