@@ -16,18 +16,6 @@
 
   const session = getSession();
 
-  function trimText(text, till) {
-    if (!_.isString(text)) {
-      return text;
-    }
-
-    if (text.length - 3 <= till) {
-      return text;
-    }
-
-    return `${text.substring(0, till - 3)}...`;
-  }
-
   /**
    * Turns word into capital-case
    * @param {string} word
@@ -45,7 +33,7 @@
   function getBankText(card, loggedIn) {
     const banks = PreferencesStore.get().methods.netbanking;
     const bank = banks[card.issuer] || '';
-    const bankText = trimText(bank.replace(/ Bank$/, ''), card.type ? 14 : 19);
+    const bankText = bank.replace(/ Bank$/, '');
 
     if (loggedIn) {
       return `${bank ? `${bankText} ` : ''}${capitalizeWord(
