@@ -1,4 +1,5 @@
 const { delay } = require('../util');
+const querystring = require('querystring');
 
 async function respondAndVerifyIntentRequest(context) {
   const reqorg = await context.expectRequest();
@@ -34,7 +35,6 @@ async function respondAndVerifyIntentRequest(context) {
 }
 
 async function verifyErrorMessage(context, expectedErrorMeassage) {
-  await delay(800);
   const messageDiv = await context.page.waitForSelector('#fd-t');
   let messageText = await context.page.evaluate(
     messageDiv => messageDiv.textContent,
@@ -63,57 +63,35 @@ async function validateHelpMessage(context, message) {
 }
 
 async function submit(context) {
-  await delay(300);
+  await delay(200);
   context.page.click('#footer');
-  await delay(1000);
 }
 
 async function handleMockFailureDialog(context) {
   let popup = await context.popup();
-  let popupPage = await popup.page();
-  for (let retrycount = 0; retrycount < 7; retrycount++) {
-    if (popup == null || popupPage == null) {
-      await delay(400);
-      popup = await context.popup();
-      popupPage = await popup.page();
-    } else break;
-  }
-  const failButton = await popupPage.$('.danger');
-  await failButton.click();
-  await delay(800);
+  await popup.callback({
+    error: {
+      description: 'The payment has already been processed',
+    },
+  });
 }
 
 async function handleMockSuccessDialog(context) {
-  await delay(300);
   let popup = await context.popup();
-  let popupPage = await popup.page();
-  if (popup == null || popupPage == null) {
-    await delay(400);
-    popup = await context.popup();
-    popupPage = await popup.page();
-  }
-  const passButton = await popupPage.$('.success');
-  await passButton.click();
-  await delay(800);
+  await popup.callback({ razorpay_payment_id: 'pay_123465' });
 }
 
-async function expectMockFailureWithCallback(context) {
-  await context.page.waitForNavigation();
-  const failButton = await context.page.$('.danger');
-  await failButton.click();
-  const req = await context.expectRequest();
-  expect(req.body).toContain('Payment+failed');
-  expect(req.body).not.toEqual('razorpay_payment_id=pay_123465');
-  await context.respondPlain('11');
-}
+async function expectRedirectWithCallback(context, fields) {
+  const request = await context.expectRequest();
+  const body = querystring.parse(request.body);
+  const apiUrl = 'https://api.razorpay.com/v1/payments/create/';
+  expect(request.method).toEqual('POST');
+  if (fields) expect(body).toMatchObject(fields);
+  expect(request.url).toEqual(
+    apiUrl + (context.preferences.fees ? 'fees' : 'checkout')
+  );
 
-async function expectMockSuccessWithCallback(context) {
-  await context.page.waitForNavigation();
-  const passButton = await context.page.$('.success');
-  await passButton.click();
-  const req = await context.expectRequest();
-  expect(req.body).toEqual('razorpay_payment_id=pay_123465');
-  await context.respondPlain('11');
+  expect(body.callback_url).toEqual(context.options.callback_url);
 }
 
 async function handleValidationRequest(context, passOrFail) {
@@ -140,8 +118,7 @@ module.exports = {
   handleValidationRequest,
   failRequestwithErrorMessage,
   selectBank,
-  expectMockFailureWithCallback,
-  expectMockSuccessWithCallback,
+  expectRedirectWithCallback,
   validateHelpMessage,
   verifyErrorMessage,
   submit,
