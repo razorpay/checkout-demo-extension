@@ -43,8 +43,8 @@
   let banksArr;
   let invalid;
   let netbanks;
-  let selectedBankDisabled;
-  let selectedBankWarn;
+  let selectedBankHasSevereDowntime;
+  let selectedBankHasLowDowntime;
   let selectedBankHasDowntime;
 
   // Refs
@@ -104,13 +104,14 @@
   }));
   $: invalid = method !== 'emandate' && !selectedBankCode;
   $: netbanks = getPreferredBanks(banks, bankOptions).slice(0, maxGridCount);
-  $: selectedBankDisabled =
+  $: selectedBankHasSevereDowntime =
     method === 'netbanking' &&
-    _Arr.contains(downtimes.disable.banks, selectedBankCode);
-  $: selectedBankWarn =
+    _Arr.contains(downtimes.high.banks, selectedBankCode);
+  $: selectedBankHasLowDowntime =
     method === 'netbanking' &&
-    _Arr.contains(downtimes.warn.banks, selectedBankCode);
-  $: selectedBankHasDowntime = selectedBankDisabled || selectedBankWarn;
+    _Arr.contains(downtimes.low.banks, selectedBankCode);
+  $: selectedBankHasDowntime =
+    selectedBankHasSevereDowntime || selectedBankHasLowDowntime;
 
   $: {
     const selected = corporateSelected;
@@ -243,8 +244,8 @@
 
       <!-- Show downtime message if the selected bank is down -->
       {#if selectedBankHasDowntime}
-        <DowntimeCallout isHighSeverity={selectedBankDisabled}>
-          {#if selectedBankDisabled}
+        <DowntimeCallout severe={selectedBankHasSevereDowntime}>
+          {#if selectedBankHasSevereDowntime}
             <strong>{banks[selectedBankCode]}</strong>
             accounts are temporarily unavailable right now. Please select
             another bank.
