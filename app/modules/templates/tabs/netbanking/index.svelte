@@ -68,12 +68,10 @@
 
   export function onShown() {
     active = true;
-    setPayButtonVisibility();
   }
 
   export function onBack() {
     active = false;
-    setPayButtonVisibility();
   }
 
   export function setRetailOption() {
@@ -93,26 +91,6 @@
 
   export function deselectBank() {
     selectedBankCode = '';
-  }
-
-  export function setPayButtonVisibility() {
-    // Hide pay button if the selected bank is disabled
-    if (selectedBankDisabled) {
-      session.body.removeClass('sub');
-    } else if (active) {
-      session.body.addClass('sub');
-    }
-  }
-
-  /**
-   * Called from session to determine if it should submit when 'Pay' is clicked
-   */
-  export function shouldSubmit() {
-    return !selectedBankDisabled;
-  }
-
-  function isBankDisabled(code) {
-    return _Arr.contains(downtimes.disable.banks, code);
   }
 
   $: showCorporateRadio =
@@ -162,7 +140,6 @@
           code: bankCode,
         },
       });
-      setPayButtonVisibility();
     }
   }
 </script>
@@ -196,7 +173,6 @@
             {name}
             {code}
             fullName={banks[code]}
-            disabled={isBankDisabled(code)}
             bind:group={selectedBankCode} />
         {/each}
       </div>
