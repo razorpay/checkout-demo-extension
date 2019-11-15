@@ -1,22 +1,23 @@
-const { makePreferences } = require('../../actions/preferences');
 const { openCheckout } = require('../../actions/checkout');
-
+const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
-  selectUPIApp,
-  respondToUPIPaymentStatus,
-  respondToUPIAjax,
+  verifyTimeout,
+  selectGooglePay,
+  enterUPIAccount,
+  selectFromDropDown,
 } = require('../../actions/common');
 
-describe('Basic QR Code payment', () => {
-  test('Perform QR Code transaction', async () => {
+describe('Timeout GooglePay payment', () => {
+  test('Perform GooglePay transaction with timeout enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 20000,
+      amount: 60000,
       personalization: false,
+      timeout: 10,
     };
     const preferences = makePreferences();
     preferences.methods.upi = true;
@@ -29,8 +30,9 @@ describe('Basic QR Code payment', () => {
     await fillUserDetails(context, true);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIApp(context, '1');
-    await respondToUPIAjax(context, '');
-    await respondToUPIPaymentStatus(context);
+    await selectGooglePay(context, 'Google Pay');
+    await enterUPIAccount(context, 'scbaala');
+    await selectFromDropDown(context, 'okhdfcbank');
+    await verifyTimeout(context, 'upi');
   });
 });
