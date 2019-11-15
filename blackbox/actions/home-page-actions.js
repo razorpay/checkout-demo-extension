@@ -23,17 +23,16 @@ async function assertHomePage(context) {
 }
 
 async function fillUserDetails(context) {
-  if (!context.prefilledContact && !context.isContactEmailOptional) {
+  if (!context.prefilledContact && !context.isContactOptional) {
     await context.page.type('#contact', randomContact());
   }
 
-  if (!context.prefilledEmail && !context.isContactEmailOptional) {
+  if (!context.prefilledEmail && !context.isEmailOptional) {
     await context.page.type('#email', randomEmail());
   }
 }
 
 async function assertPaymentMethods(context) {
-  await delay(300);
   expect(await context.page.$eval('[tab=netbanking]', visible)).toEqual(true);
   expect(await context.page.$eval('[tab=wallet]', visible)).toEqual(true);
   expect(await context.page.$eval('[tab=card]', visible)).toEqual(true);
