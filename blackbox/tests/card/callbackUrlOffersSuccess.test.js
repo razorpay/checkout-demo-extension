@@ -7,8 +7,7 @@ const {
   selectPaymentMethod,
   submit,
   enterCardDetails,
-  handleCardValidationWithCallback,
-  expectMockSuccessWithCallback,
+  expectRedirectWithCallback,
   viewOffers,
   selectOffer,
   verifyOfferApplied,
@@ -69,7 +68,6 @@ describe('Card tests', () => {
     await verifyDiscountAmountInBanner(context, '₹ 1,980');
     await verifyDiscountText(context, 'You save ₹ 20');
     await submit(context);
-    await handleCardValidationWithCallback(context);
-    await expectMockSuccessWithCallback(context);
+    await expectRedirectWithCallback(context, { method: 'card' });
   });
 });
