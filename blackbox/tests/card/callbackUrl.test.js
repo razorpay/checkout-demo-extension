@@ -20,20 +20,9 @@ describe.each(
       callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
       redirect: true,
     },
-    // loggedIn:false,
-    // keyless: false
   })
 )('Card tests', ({ preferences, title, options }) => {
   test(title, async () => {
-    // const options = {
-    //   key: 'rzp_test_1DP5mmOlF5G5ag',
-    //   amount: 200,
-    //   personalization: false,
-    //   callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
-    //   redirect: true,
-    // };
-    // const preferences = makePreferences();
-    console.log(options, preferences);
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true);
@@ -42,6 +31,5 @@ describe.each(
     await enterCardDetails(context);
     await submit(context);
     await expectRedirectWithCallback(context, { method: 'card' });
-    // await delay(1000)
   });
 });
