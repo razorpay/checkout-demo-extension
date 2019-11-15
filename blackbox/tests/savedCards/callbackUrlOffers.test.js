@@ -10,8 +10,7 @@ const {
   typeOTPandSubmit,
   respondSavedCards,
   selectSavedCardAndTypeCvv,
-  handleCardValidationWithCallback,
-  expectMockSuccessWithCallback,
+  expectRedirectWithCallback,
   viewOffers,
   selectOffer,
   verifyOfferApplied,
@@ -76,7 +75,6 @@ describe('Saved Card tests', () => {
     await verifyDiscountText(context, 'You save ₹ 20');
     await selectSavedCardAndTypeCvv(context);
     await submit(context);
-    await handleCardValidationWithCallback(context);
-    await expectMockSuccessWithCallback(context);
+    await expectRedirectWithCallback(context, { method: 'card' });
   });
 });

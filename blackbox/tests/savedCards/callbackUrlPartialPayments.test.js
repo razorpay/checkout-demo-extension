@@ -10,8 +10,7 @@ const {
   typeOTPandSubmit,
   respondSavedCards,
   selectSavedCardAndTypeCvv,
-  handleCardValidationWithCallback,
-  expectMockSuccessWithCallback,
+  expectRedirectWithCallback,
   handlePartialPayment,
   verifyPartialAmount,
 } = require('../../actions/common');
@@ -48,7 +47,6 @@ describe('Saved Card tests', () => {
     await verifyPartialAmount(context, '₹ 100');
     await selectSavedCardAndTypeCvv(context);
     await submit(context);
-    await handleCardValidationWithCallback(context);
-    await expectMockSuccessWithCallback(context);
+    await expectRedirectWithCallback(context, { method: 'card' });
   });
 });

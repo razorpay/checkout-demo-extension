@@ -10,12 +10,11 @@ const {
   typeOTPandSubmit,
   respondSavedCards,
   selectSavedCardAndTypeCvv,
-  handleCardValidationWithCallback,
-  expectMockSuccessWithCallback,
+  expectRedirectWithCallback,
 } = require('../../actions/common');
 
 describe('Saved Card tests', () => {
-  test('Perform saved card transaction with callback URL enabled', async () => {
+  test('Perform saved card transaction with callback URL enabled and contact optional', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
@@ -24,10 +23,10 @@ describe('Saved Card tests', () => {
       callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
       redirect: true,
     };
-    const preferences = makePreferences();
+    const preferences = makePreferences({ optional: ['contact'] });
     let context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
+    await fillUserDetails(context, false);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
     await handleCustomerCardStatusRequest(context);
@@ -35,7 +34,6 @@ describe('Saved Card tests', () => {
     await respondSavedCards(context);
     await selectSavedCardAndTypeCvv(context);
     await submit(context);
-    await handleCardValidationWithCallback(context);
-    await expectMockSuccessWithCallback(context);
+    await expectRedirectWithCallback(context, { method: 'card' });
   });
 });

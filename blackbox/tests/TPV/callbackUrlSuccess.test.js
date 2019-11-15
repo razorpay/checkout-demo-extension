@@ -1,9 +1,6 @@
 const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
-const {
-  handleCardValidationWithCallback,
-  expectMockSuccessWithCallback,
-} = require('../../actions/common');
+const { expectRedirectWithCallback } = require('../../actions/common');
 
 describe('Third Party Verification test', () => {
   test('Perform Third Party Verification transaction with callback url', async () => {
@@ -23,7 +20,9 @@ describe('Third Party Verification test', () => {
       },
     });
     const context = await openCheckout({ page, options, preferences });
-    await handleCardValidationWithCallback(context);
-    await expectMockSuccessWithCallback(context);
+    await expectRedirectWithCallback(context, {
+      method: 'netbanking',
+      bank: 'SBIN',
+    });
   });
 });

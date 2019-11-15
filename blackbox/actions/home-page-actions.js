@@ -33,6 +33,7 @@ async function fillUserDetails(context) {
 }
 
 async function assertPaymentMethods(context) {
+  await context.page.waitForSelector('[tab=netbanking]');
   expect(await context.page.$eval('[tab=netbanking]', visible)).toEqual(true);
   expect(await context.page.$eval('[tab=wallet]', visible)).toEqual(true);
   expect(await context.page.$eval('[tab=card]', visible)).toEqual(true);

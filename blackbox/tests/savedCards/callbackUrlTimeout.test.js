@@ -10,14 +10,13 @@ const {
   typeOTPandSubmit,
   respondSavedCards,
   selectSavedCardAndTypeCvv,
-  handleCardValidationWithCallback,
-  expectMockSuccessWithCallback,
+  expectRedirectWithCallback,
 } = require('../../actions/common');
 
 describe('Saved Card tests', () => {
-  test('Perform keyless saved card transaction with callback URL enabled', async () => {
+  test('Perform saved card transaction with callback URL enabled', async () => {
     const options = {
-      order_id: 'rzp_test_1DP5mmOlF5G5ag',
+      key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
       personalization: true,
       remember_customer: true,
@@ -35,7 +34,6 @@ describe('Saved Card tests', () => {
     await respondSavedCards(context);
     await selectSavedCardAndTypeCvv(context);
     await submit(context);
-    await handleCardValidationWithCallback(context);
-    await expectMockSuccessWithCallback(context);
+    await expectRedirectWithCallback(context, { method: 'card' });
   });
 });
