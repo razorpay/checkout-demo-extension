@@ -1,17 +1,21 @@
-const { openSdkCheckout } = require('../../actions/checkout-sdk');
+const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
   assertPaymentMethods,
-  selectPaymentMethod,
+  selectFromDropDown,
   submit,
-  respondAndVerifyIntentRequest,
+  respondToUPIAjax,
   handleFeeBearer,
-  selectUPIApp,
+  enterUPIAccount,
+  selectGooglePay,
+  selectPaymentMethod,
+  handleUPIAccountValidation,
+  respondToUPIPaymentStatus,
 } = require('../../actions/common');
 
-describe('Basic GooglePay Payment', () => {
+describe('Feebearer GooglePay Payment', () => {
   test('Perform GooglePay transaction with feebearer enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -20,24 +24,22 @@ describe('Basic GooglePay Payment', () => {
     };
     const preferences = makePreferences({ fee_bearer: true });
     preferences.methods.upi = true;
-    const context = await openSdkCheckout({
+    const context = await openCheckout({
       page,
       options,
       preferences,
-      apps: [
-        {
-          package_name: 'com.google.android.apps.nbu.paisa.user',
-          app_name: 'Google Pay (Tez)',
-        },
-      ],
     });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIApp(context, '1');
+    await selectGooglePay(context, 'Google Pay');
+    await enterUPIAccount(context, 'scbaala');
+    await selectFromDropDown(context, 'okhdfcbank');
     await submit(context);
+    await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
     await handleFeeBearer(context, page);
-    await respondAndVerifyIntentRequest(context);
+    await respondToUPIAjax(context, '');
+    await respondToUPIPaymentStatus(context);
   });
 });

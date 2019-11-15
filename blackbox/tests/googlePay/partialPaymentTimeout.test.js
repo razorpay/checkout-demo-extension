@@ -1,18 +1,20 @@
-const { openSdkCheckout } = require('../../actions/checkout-sdk');
+const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
-  verifyTimeout,
-  selectUPIApp,
+  selectFromDropDown,
+  selectGooglePay,
   handlePartialPayment,
   verifyPartialAmount,
+  enterUPIAccount,
+  verifyTimeout,
 } = require('../../actions/common');
 
-describe.skip('Basic GooglePay payment', () => {
-  test('Perform GooglePay transaction with partial payments and timeout enabled', async () => {
+describe('Partial Timeout GooglePay payment', () => {
+  test('Perform GooglePay transaction with partial payments with timeout enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
@@ -21,8 +23,8 @@ describe.skip('Basic GooglePay payment', () => {
     };
     const preferences = makePreferences({
       order: {
-        amount: 100,
-        amount_due: 100,
+        amount: 10000,
+        amount_due: 10000,
         amount_paid: 0,
         currency: 'INR',
         first_payment_min_amount: null,
@@ -30,23 +32,19 @@ describe.skip('Basic GooglePay payment', () => {
       },
     });
     preferences.methods.upi = true;
-    const context = await openSdkCheckout({
+    const context = await openCheckout({
       page,
       options,
       preferences,
-      apps: [
-        {
-          package_name: 'com.google.android.apps.nbu.paisa.user',
-          app_name: 'Google Pay (Tez)',
-        },
-      ],
     });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true);
     await handlePartialPayment(context, '1');
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIApp(context, '1');
+    await selectGooglePay(context, 'Google Pay');
+    await enterUPIAccount(context, 'scbaala');
+    await selectFromDropDown(context, 'okhdfcbank');
     await verifyPartialAmount(context, '₹ 1');
     await verifyTimeout(context, 'upi');
   });
