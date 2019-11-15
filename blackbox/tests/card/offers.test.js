@@ -1,5 +1,6 @@
 const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
+const { getTestData } = require('../../actions');
 const {
   assertHomePage,
   fillUserDetails,
@@ -20,14 +21,12 @@ const {
   verifyDiscountAmountInBanner,
 } = require('../../actions/common');
 
-describe('Card tests', () => {
-  test('perform card transaction', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+describe.each(
+  getTestData('perform failed card transaction with offers applied', {
+    options: {
       amount: 1000,
-      personalization: false,
-    };
-    const preferences = makePreferences({
+    },
+    preferences: {
       offers: [
         {
           original_amount: 200000,
@@ -56,7 +55,10 @@ describe('Card tests', () => {
           display_text: 'Master Card Offer - 20% off',
         },
       ],
-    });
+    },
+  })
+)('Card tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true);
