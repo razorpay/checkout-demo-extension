@@ -4,12 +4,12 @@ const { openCheckout } = require('./checkout');
 
 const getDataUpdatedForKeyless = d => {
   let options = {
-    ...d.options,
     ...{
-      order_id: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
       personalization: false,
     },
+    ...d.options,
+    order_id: 'rzp_test_1DP5mmOlF5G5ag',
   };
   delete options.key;
   return {
