@@ -1,5 +1,11 @@
-const { openCheckout } = require('../../actions/checkout');
-const { makePreferences } = require('../../actions/preferences');
+const {
+  makePreferences,
+  makeOptions,
+  openCheckout,
+  makePreferencesLogged,
+  getTestData,
+} = require('../../actions');
+
 const {
   assertHomePage,
   fillUserDetails,
@@ -14,28 +20,30 @@ const {
   handleMockSuccessDialog,
 } = require('../../actions/common');
 
-describe('Card tests', () => {
-  test('perform card transaction', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 200,
-      personalization: false,
-    };
-    const preferences = makePreferences();
-    const context = await openCheckout({ page, options, preferences });
-    await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
-    await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'card');
-    await enterCardDetails(context);
-    await submit(context);
-    await handleCardValidation(context);
-    await handleMockFailureDialog(context);
-    await verifyErrorMessage(context, 'The payment has already been processed');
-    await retryCardTransaction(context);
-    await submit(context);
+describe.each(getTestData('perform card transaction'))(
+  'Card tests',
+  ({ preferences, title }) => {
+    test(title, async () => {
+      const options = makeOptions();
+      const context = await openCheckout({ page, options, preferences });
+      await assertHomePage(context);
+      await fillUserDetails(context);
 
-    await handleCardValidation(context);
-    await handleMockSuccessDialog(context);
-  });
-});
+      await assertPaymentMethods(context);
+      await selectPaymentMethod(context, 'card');
+      await enterCardDetails(context);
+      await submit(context);
+      await handleCardValidation(context);
+      await handleMockFailureDialog(context);
+      await verifyErrorMessage(
+        context,
+        'The payment has already been processed'
+      );
+      await retryCardTransaction(context);
+      await submit(context);
+
+      await handleCardValidation(context);
+      await handleMockSuccessDialog(context);
+    });
+  }
+);

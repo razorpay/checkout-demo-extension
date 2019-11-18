@@ -14,7 +14,7 @@ const {
   handleFeeBearer,
 } = require('../../actions/common');
 
-describe('Basic upi payment', () => {
+describe.skip('Basic upi payment', () => {
   test('Perform keyless upi collect transaction with customer feebearer enabled', async () => {
     const options = {
       order_id: 'rzp_test_1DP5mmOlF5G5ag',

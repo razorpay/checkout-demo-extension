@@ -44,8 +44,8 @@
   let banksArr;
   let invalid;
   let netbanks;
-  let selectedBankDisabled;
-  let selectedBankWarn;
+  let selectedBankHasSevereDowntime;
+  let selectedBankHasLowDowntime;
   let selectedBankHasDowntime;
 
   // Refs
@@ -69,12 +69,10 @@
 
   export function onShown() {
     active = true;
-    setPayButtonVisibility();
   }
 
   export function onBack() {
     active = false;
-    setPayButtonVisibility();
   }
 
   export function setRetailOption() {
@@ -96,26 +94,6 @@
     selectedBankCode = '';
   }
 
-  export function setPayButtonVisibility() {
-    // Hide pay button if the selected bank is disabled
-    if (selectedBankDisabled) {
-      session.body.removeClass('sub');
-    } else if (active) {
-      session.body.addClass('sub');
-    }
-  }
-
-  /**
-   * Called from session to determine if it should submit when 'Pay' is clicked
-   */
-  export function shouldSubmit() {
-    return !selectedBankDisabled;
-  }
-
-  function isBankDisabled(code) {
-    return _Arr.contains(downtimes.disable.banks, code);
-  }
-
   $: showCorporateRadio =
     !recurring && hasMultipleOptions(selectedBankCode, banks);
   $: corporateSelected = isCorporateCode(selectedBankCode);
@@ -127,13 +105,14 @@
   }));
   $: invalid = method !== 'emandate' && !selectedBankCode;
   $: netbanks = getPreferredBanks(banks, bankOptions).slice(0, maxGridCount);
-  $: selectedBankDisabled =
+  $: selectedBankHasSevereDowntime =
     method === 'netbanking' &&
-    _Arr.contains(downtimes.disable.banks, selectedBankCode);
-  $: selectedBankWarn =
+    _Arr.contains(downtimes.high.banks, selectedBankCode);
+  $: selectedBankHasLowDowntime =
     method === 'netbanking' &&
-    _Arr.contains(downtimes.warn.banks, selectedBankCode);
-  $: selectedBankHasDowntime = selectedBankDisabled || selectedBankWarn;
+    _Arr.contains(downtimes.low.banks, selectedBankCode);
+  $: selectedBankHasDowntime =
+    selectedBankHasSevereDowntime || selectedBankHasLowDowntime;
 
   $: {
     const selected = corporateSelected;
@@ -163,7 +142,6 @@
           code: bankCode,
         },
       });
-      setPayButtonVisibility();
     }
   }
 </script>
@@ -176,11 +154,6 @@
   .ref-radiocontainer {
     margin-top: -6px;
     margin-bottom: 18px;
-  }
-
-  /* Add extra space at the bottom to prevent callout message from overlapping radios */
-  .ref-radiocontainer.scrollFix {
-    margin-bottom: 36px;
   }
 
   .input-radio:first-of-type {
@@ -202,7 +175,6 @@
             {name}
             {code}
             fullName={banks[code]}
-            disabled={isBankDisabled(code)}
             bind:group={selectedBankCode} />
         {/each}
       </div>
@@ -233,8 +205,7 @@
         <div
           class="pad ref-radiocontainer"
           bind:this={radioContainer}
-          transition:fade={{ duration: 100 }}
-          class:scrollFix={selectedBankHasDowntime}>
+          transition:fade={{ duration: 100 }}>
           <label>Complete Payment Using</label>
           <div class="input-radio">
             <input
@@ -274,8 +245,8 @@
 
       <!-- Show downtime message if the selected bank is down -->
       {#if selectedBankHasDowntime}
-        <DowntimeCallout isHighSeverity={selectedBankDisabled}>
-          {#if selectedBankDisabled}
+        <DowntimeCallout severe={selectedBankHasSevereDowntime}>
+          {#if selectedBankHasSevereDowntime}
             <strong>{banks[selectedBankCode]}</strong>
             accounts are temporarily unavailable right now. Please select
             another bank.

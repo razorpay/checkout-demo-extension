@@ -4,10 +4,59 @@ const querystring = require('querystring');
 
 const { testDir, cdnUrl, lumberjackUrl } = require('./const');
 
-module.exports = {
+const chrup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const chrlow = 'abcdefghijklmnopqrstuvwxyz';
+const chrnum = '0123456789';
+const chrsp = '!@#$%^&*()';
+
+const randomRange = (min, max) =>
+  min + Math.floor((1 + max - min) * Math.random());
+const randomString = set => (length = 14) =>
+  Array.apply(null, { length })
+    .map(_ => randomItem(set))
+    .join('');
+
+const randomLengthString = set => (min = 3, max = 8) =>
+  Array.apply(null, { length: module.exports.randomRange(min, max) })
+    .map(_ => randomItem(chrlow))
+    .join('');
+
+const randomItem = set => set[randomRange(0, set.length - 1)];
+
+const randomEmail = () => {
+  const randomFunc = randomLengthString(chrlow);
+  return randomFunc(6, 12) + '@' + randomFunc(3, 8) + '.' + randomFunc(2, 3);
+};
+
+const randomName = () => {
+  return (
+    randomItem(chrup) +
+    randomString(chrlow)(4, 12) +
+    ' ' +
+    randomItem(chrup) +
+    randomString(chrlow)(4, 12)
+  );
+};
+
+const util = (module.exports = {
   delay: ms => new Promise(resolve => setTimeout(resolve, ms)),
 
   visible: el => !!el.getBoundingClientRect().width,
+
+  chrlow,
+  chrup,
+  chrnum,
+  chrsp,
+  randomRange,
+  randomName,
+  randomEmail,
+  randomName,
+  randomContact: () => '+91' + String(randomRange(8000000000, 9999999999)),
+  randomString,
+  randomLengthString,
+  randomId: randomString(chrlow + chrup + chrnum),
+  randomBool: () => randomItem([true, false]),
+  randomItem,
 
   /**
    * @param  {Page} puppeteer page to intercept requests on
@@ -97,4 +146,4 @@ module.exports = {
 
     return returnObj;
   },
-};
+});
