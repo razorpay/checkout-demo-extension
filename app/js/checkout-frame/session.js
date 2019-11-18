@@ -854,7 +854,7 @@ function askOTP(view, text, shouldLimitResend, screenProps) {
   if (!text) {
     if (thisSession.tab === 'card' || thisSession.tab === 'emi') {
       if (thisSession.headless) {
-        Analytics.track('headless:otp:ask');
+        Analytics.track('native_otp:otp:ask');
         text = 'Enter OTP to complete the payment';
         if (isNonNullObject(origText)) {
           if (origText.metadata) {
@@ -896,7 +896,7 @@ function askOTP(view, text, shouldLimitResend, screenProps) {
               thisSession.hideTimer();
               thisSession.back(true);
               setTimeout(function() {
-                Analytics.track('headless:timeout');
+                Analytics.track('native_otp:timeout');
                 thisSession.showLoadError(
                   'Payment was not completed on time',
                   1
@@ -2480,7 +2480,7 @@ Session.prototype = {
   secAction: function() {
     if (this.headless && this.r._payment) {
       if (!this.get('timeout')) {
-        Analytics.track('headless:gotobank', {
+        Analytics.track('native_otp:gotobank', {
           type: AnalyticsTypes.BEHAV,
           immediately: true,
         });
@@ -5902,7 +5902,7 @@ Session.prototype = {
 
       if (shouldUseNativeOTP) {
         this.headless = true;
-        Analytics.track('headless:attempt');
+        Analytics.track('native_otp:attempt');
         this.setScreen('otp');
         this.r.on('payment.otp.required', function(data) {
           askOTP(that.otpView, data);
