@@ -76,14 +76,17 @@ let currentUid = null;
  */
 const filterInstruments = instruments => {
   const {
-    high: { methods: methodsToDisable = [] },
+    high: {
+      methods: methodsWithHighDowntime = [],
+      banks: banksWithHighDowntime = [],
+    },
   } = DowntimesStore.get();
 
   return (
     instruments
     |> _Arr.filter(instrument => {
       // Remove instruments for which there is a high severity downtime
-      if (_Arr.contains(methodsToDisable, instrument.method)) {
+      if (_Arr.contains(methodsWithHighDowntime, instrument.method)) {
         return false;
       }
 
@@ -93,6 +96,13 @@ const filterInstruments = instruments => {
             if (!VPA_REGEX.test(instrument.vpa)) {
               return false;
             }
+          }
+          break;
+
+        case 'netbanking':
+          // If the instrument is netbanking, remove it if it has a severe downtime
+          if (_Arr.contains(banksWithHighDowntime, instrument.bank)) {
+            return false;
           }
           break;
       }
