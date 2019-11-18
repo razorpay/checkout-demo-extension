@@ -9,10 +9,11 @@ const {
   fillEmandateBankDetails,
   respondToUPIAjax,
   respondToUPIPaymentStatus,
+  handleFeeBearer,
 } = require('../../actions/common');
 
 describe('Netbanking tests', () => {
-  test('perform emandate transaction', async () => {
+  test('perform emandate transaction with customer feebearer enabled', async () => {
     const options = {
       order_id: 'order_DfNAO0KJCH5WNY',
       amount: 0,
@@ -23,6 +24,7 @@ describe('Netbanking tests', () => {
       },
     };
     const preferences = makePreferences({
+      fee_bearer: true,
       order: {
         amount: 0,
         currency: 'INR',
@@ -40,6 +42,7 @@ describe('Netbanking tests', () => {
     await selectEmandateNetbanking(context);
     await fillEmandateBankDetails(context);
     await submit(context);
+    await handleFeeBearer(context);
     await respondToUPIAjax(context);
     await respondToUPIPaymentStatus(context);
   });

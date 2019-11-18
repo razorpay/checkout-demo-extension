@@ -6,7 +6,8 @@ async function selectUPIApp(context, AppNumber) {
 
 async function respondToUPIAjax(context, offerId) {
   const req = await context.expectRequest();
-  if (offerId != '') expect(req.body).toContain(offerId);
+  if (offerId != '' && offerId != undefined)
+    expect(req.body).toContain(offerId);
   expect(req.url).toContain('create/ajax');
   await context.respondJSON({
     type: 'async',
