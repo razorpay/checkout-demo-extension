@@ -5,5 +5,5 @@ module.exports = {
   globalTeardown: './blackbox/teardown',
   testEnvironment: './blackbox/jest-environment',
   testTimeout: 60 * 1000 * (isProd ? 1 : 10),
-  maxWorkers: 10,
+  maxWorkers: 4,
 };
