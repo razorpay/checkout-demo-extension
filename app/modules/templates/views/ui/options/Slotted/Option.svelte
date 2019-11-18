@@ -18,15 +18,17 @@
 
   div {
     flex-grow: 1;
+    overflow: hidden;
   }
 </style>
 
-<button type="button" class={className}>
+<button type="button" class={className} on:click>
   <Stack horizontal>
     <slot name="icon" />
     <div>
       <slot name="title" />
       <slot name="subtitle" />
     </div>
+    <slot name="extra" />
   </Stack>
 </button>
