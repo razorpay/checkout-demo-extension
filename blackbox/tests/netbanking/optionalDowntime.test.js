@@ -64,7 +64,8 @@ describe('Netbanking tests', () => {
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'netbanking');
     await assertNetbankingPage(context);
-    await verifyHighDowntime(context, 'ICICI Bank');
+    await selectBank(context, 'ICIC');
+    await verifyLowDowntime(context, 'ICICI Bank');
     await selectBank(context, 'HDFC');
     await verifyLowDowntime(context, 'HDFC Bank');
   });
