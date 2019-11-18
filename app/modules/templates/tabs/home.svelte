@@ -5,7 +5,10 @@
   import Field from 'templates/views/ui/Field.svelte';
   import PartialPaymentOptions from 'templates/views/partialpaymentoptions.svelte';
   import RadioOption from 'templates/views/ui/options/RadioOption.svelte';
+  import SlottedOption from 'templates/views/ui/options/Slotted/Option.svelte';
   import NewMethodsList from 'templates/views/ui/methods/NewMethodsList.svelte';
+
+  import { slide, fly } from 'svelte/transition';
 
   export let getStore;
   export let session;
@@ -49,9 +52,15 @@
   const accountName = o('prefill.bank_account[name]');
 
   let view = 'details';
+  let contact = prefill_contact || ''; // TODO: Move to store
+  let email = prefill_email || ''; // TODO: Move to store
 
   export function showMethods() {
     view = 'methods';
+  }
+
+  function hideMethods() {
+    view = 'details';
   }
 </script>
 
@@ -86,50 +95,113 @@
     padding-left: 12px;
     padding-right: 12px;
   }
+
+  .home-details {
+    margin: 12px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .home-details :global(button) {
+    padding: 12px 16px;
+    line-height: 18px;
+  }
+
+  .home-details .theme-highlight-color {
+    transform: rotate(180deg);
+  }
+
+  .home-details div[slot='title'] {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .home-details span:first-child {
+    font-size: 15px;
+    color: #363636;
+  }
+
+  .home-details span:last-child {
+    font-size: 12px;
+    color: #757575;
+    margin-left: 8px;
+    padding-left: 8px;
+    border-left: solid 1px #757575;
+  }
 </style>
 
 <Tab method="common" overrideMethodCheck={true} shown={true} pad={false}>
   <Screen pad={false}>
     <div slot="main" class="screen-main">
+      {#if view === 'details'}
+        <div transition:slide={{ duration: 400 }}>
+          <div
+            class="elem-wrap"
+            class:invisible={contact_hidden}
+            class:filled={contact.length}
+            id="elem-wrap-contact">
+            <Field
+              id="contact"
+              name="contact"
+              type="tel"
+              value={contact}
+              required={!optional.contact}
+              pattern={CONTACT_REGEX}
+              readonly={contact_readonly}
+              label="Phone"
+              icon="&#xe607;"
+              on:input={e => (contact = e.target.value)}
+              helpText="Please enter a valid contact number" />
+          </div>
+          <div
+            class="elem-wrap"
+            class:invisible={email_hidden}
+            class:filled={email.length}
+            id="elem-wrap-email">
+            <!-- TODO: add (optional) to label if email is optional -->
+            <Field
+              id="email"
+              name="email"
+              type="email"
+              value={email}
+              required={!optional.email}
+              pattern={EMAIL_REGEX}
+              readonly={email_readonly}
+              label="Email"
+              icon="&#xe603;"
+              on:input={e => (email = e.target.value)}
+              helpText="Please enter a valid email. Example: you@example.com" />
+          </div>
+        </div>
+      {/if}
+
       {#if view === 'methods'}
-        <div class="home-methods">
+        <div
+          class="home-details border-list"
+          transition:slide={{ duration: 400 }}>
+          <SlottedOption on:click={hideMethods}>
+            <div slot="title">
+              {#if contact}
+                <span>{contact}</span>
+              {/if}
+              {#if email}
+                <span>{email}</span>
+              {/if}
+            </div>
+            <div slot="extra" class="theme-highlight-color">&#xe604;</div>
+          </SlottedOption>
+        </div>
+
+        <div
+          class="home-methods"
+          in:fly={{ delay: 300, duration: 400 }}
+          out:fly={{ duration: 400 }}>
           <NewMethodsList />
         </div>
       {/if}
 
-      <div
-        class="elem-wrap"
-        class:invisible={contact_hidden}
-        id="elem-wrap-contact">
-        <Field
-          id="contact"
-          name="contact"
-          type="tel"
-          value={prefill_contact}
-          required={!optional.contact}
-          pattern={CONTACT_REGEX}
-          readonly={contact_readonly}
-          label="Phone"
-          icon="&#xe607;"
-          helpText="Please enter a valid contact number" />
-      </div>
-      <div
-        class="elem-wrap"
-        class:invisible={email_hidden}
-        id="elem-wrap-email">
-        <!-- TODO: add (optional) to label if email is optional -->
-        <Field
-          id="email"
-          name="email"
-          type="email"
-          value={prefill_email}
-          required={!optional.email}
-          pattern={EMAIL_REGEX}
-          readonly={email_readonly}
-          label="Email"
-          icon="&#xe603;"
-          helpText="Please enter a valid email. Example: you@example.com" />
-      </div>
       {#if order.partial_payment}
         <div class="partial-payment-block">
           <PartialPaymentOptions />
