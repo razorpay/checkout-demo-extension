@@ -106,6 +106,7 @@
     use:formatterAction={formatter}
     on:focus
     on:blur
+    on:input
     class:no-refresh={!refresh}
     class:cvv-input={type === 'cvv'} />
   {#if label}
