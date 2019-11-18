@@ -3,12 +3,12 @@
   import Callout from 'templates/views/ui/Callout.svelte';
 
   // Props
-  export let isHighSeverity = false;
+  export let severe = false;
 
   // Computed
   let calloutType;
 
-  $: calloutType = isHighSeverity ? 'error' : 'warning';
+  $: calloutType = severe ? 'error' : 'warning';
 </script>
 
 <Callout type={calloutType} classes={['downtime-callout']} showIcon={false}>

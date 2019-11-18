@@ -50,8 +50,8 @@
 
     const downtimes = DowntimesStore.get();
 
-    down = _Arr.contains(downtimes.warn.methods, 'qr');
-    disabled = _Arr.contains(downtimes.disable.methods, 'qr');
+    down = _Arr.contains(downtimes.low.methods, 'qr');
+    disabled = _Arr.contains(downtimes.high.methods, 'qr');
   }
 
   function handleResponse({ data }) {
@@ -218,7 +218,7 @@
   {/if}
 
   {#if down || disabled}
-    <DowntimeCallout isHighSeverity={disabled}>
+    <DowntimeCallout severe={disabled}>
       <strong>UPI QR</strong>
       is experiencing low success rates.
     </DowntimeCallout>

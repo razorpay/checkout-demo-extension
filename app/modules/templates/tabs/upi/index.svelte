@@ -175,8 +175,8 @@
 
     const downtimes = DowntimesStore.get();
 
-    down = _Arr.contains(downtimes.warn.methods, 'upi');
-    disabled = _Arr.contains(downtimes.disable.methods, 'upi');
+    down = _Arr.contains(downtimes.low.methods, 'upi');
+    disabled = _Arr.contains(downtimes.high.methods, 'upi');
 
     qrEnabled = session.methods.qr;
     qrIcon = session.themeMeta.icons.qr;
@@ -535,7 +535,7 @@
 
     <div slot="bottom">
       {#if down || disabled}
-        <DowntimeCallout isHighSeverity={disabled}>
+        <DowntimeCallout severe={disabled}>
           <strong>UPI</strong>
           is experiencing low success rates.
         </DowntimeCallout>
