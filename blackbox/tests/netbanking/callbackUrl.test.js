@@ -8,8 +8,7 @@ const {
   selectBank,
   assertNetbankingPage,
   submit,
-  handleCardValidationWithCallback,
-  expectMockFailureWithCallback,
+  expectRedirectWithCallback,
 } = require('../../actions/common');
 
 describe('Netbanking tests', () => {
@@ -30,7 +29,9 @@ describe('Netbanking tests', () => {
     await assertNetbankingPage(context);
     await selectBank(context, 'SBIN');
     await submit(context);
-    await handleCardValidationWithCallback(context);
-    await expectMockFailureWithCallback(context);
+    await expectRedirectWithCallback(context, {
+      method: 'netbanking',
+      bank: 'SBIN',
+    });
   });
 });

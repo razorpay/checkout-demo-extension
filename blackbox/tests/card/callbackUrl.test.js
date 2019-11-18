@@ -5,15 +5,13 @@ const {
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
-  selectBank,
-  assertNetbankingPage,
   submit,
-  handleCardValidationWithCallback,
-  expectMockSuccessWithCallback,
+  enterCardDetails,
+  expectRedirectWithCallback,
 } = require('../../actions/common');
 
-describe('Netbanking tests', () => {
-  test('perform netbaking transaction with callback url', async () => {
+describe('Card tests', () => {
+  test('perform failed card transaction with callback URL', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
@@ -26,11 +24,9 @@ describe('Netbanking tests', () => {
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true);
     await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'netbanking');
-    await assertNetbankingPage(context);
-    await selectBank(context, 'SBIN');
+    await selectPaymentMethod(context, 'card');
+    await enterCardDetails(context);
     await submit(context);
-    await handleCardValidationWithCallback(context);
-    await expectMockSuccessWithCallback(context);
+    await expectRedirectWithCallback(context, { method: 'card' });
   });
 });

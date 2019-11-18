@@ -18,4 +18,5 @@ async function callbackPage(context, response) {
 
 module.exports = {
   callbackPage,
+  callbackHtml,
 };

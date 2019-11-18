@@ -67,55 +67,6 @@ var strings = {
 
 var fontTimeout;
 
-/* this === session */
-function handleRelayFn(relayObj) {
-  var self = this;
-
-  if (
-    !(relayObj && relayObj.action) ||
-    !(this instanceof Session && this.magicView)
-  ) {
-    return;
-  }
-
-  var trackingObj = clone(relayObj);
-
-  if (trackingObj.action === 'otp_parsed' && trackingObj.data) {
-    if (typeof trackingObj.data.otp === 'string') {
-      trackingObj.data.otp = trackingObj.data.otp.replace(/\d/g, '0');
-    }
-  }
-
-  this.magicView.track(trackingObj.action, trackingObj);
-
-  switch (relayObj.action) {
-    case 'page_resolved':
-      this.magicView.pageResolved(relayObj.data);
-      break;
-
-    case 'otp_parsed':
-      this.magicView.otpParsed(relayObj.data);
-      break;
-
-    case 'page_unload':
-      this.magicView.pageUnload(relayObj.data);
-      break;
-
-    case 'otp_resent':
-      if (relayObj.data) {
-        break;
-      }
-    /* falls through */
-    case 'abort_magic':
-    /* falls through */
-    case 'error_message':
-    /* falls through */
-    default:
-      this.magicView.showPaymentPage();
-      break;
-  }
-}
-
 /**
  * Temp stores for Cardless EMI & PayLater.
  * Will move to Svelte Store upon migration.
@@ -694,9 +645,6 @@ function errorHandler(response) {
 
   this.clearRequest();
 
-  /* don't attempt magic if failed for the first time */
-  this.magic = false;
-
   Analytics.track('error', {
     data: response,
   });
@@ -762,10 +710,6 @@ function errorHandler(response) {
     }
   }
 
-  if (/^magic*/.test(this.screen)) {
-    this.switchTab('card');
-  }
-
   if (this.tab || message !== discreet.cancelMsg) {
     if (message && message.indexOf('OFFER_MISMATCH') === 0) {
       // show offers UI error only when offers ui is initialized
@@ -821,9 +765,6 @@ function cancelHandler(response) {
     return;
   }
 
-  /* don't attempt magic if failed for the first time */
-  this.magic = false;
-
   Analytics.setMeta('payment.cancelled', true);
   this.markHeadlessFailed();
 
@@ -869,7 +810,6 @@ function askOTP(view, text, shouldLimitResend, screenProps) {
   var origText = text; // ಠ_ಠ
   var qpmap = getQueryParams();
   var thisSession = SessionManager.getSession();
-  var isMagicPayment = ((thisSession.r || {})._payment || {}).isMagicPayment;
 
   // Track if OTP was invalid
   if (origText === discreet.wrongOtpMsg) {
@@ -913,7 +853,7 @@ function askOTP(view, text, shouldLimitResend, screenProps) {
 
   if (!text) {
     if (thisSession.tab === 'card' || thisSession.tab === 'emi') {
-      if (thisSession.headless || isMagicPayment) {
+      if (thisSession.headless) {
         Analytics.track('headless:otp:ask');
         text = 'Enter OTP to complete the payment';
         if (isNonNullObject(origText)) {
@@ -1640,15 +1580,13 @@ Session.prototype = {
   },
 
   showTimer: function(cb) {
-    var isMagicPayment = ((this.r || {})._payment || {}).isMagicPayment;
-
     this.hideTimer();
     var timeLeft = this.closeAt - now();
     var timeoutEl = $('#timeout').show()[0];
     $('#body').addClass('has-timeout');
     var timerFn = updateTimer(timeoutEl, this.closeAt);
     timerFn();
-    if ((this.headless || isMagicPayment) && !this.get('timeout')) {
+    if (this.headless && !this.get('timeout')) {
       qs('#form-otp').insertBefore(timeoutEl, qs('#otp-sec-outer'));
     } else if (isMobile()) {
       var modalEl = gel('modal');
@@ -2240,35 +2178,6 @@ Session.prototype = {
     }
   },
 
-  setMagic: function() {
-    if (!this.magicView && this.magic) {
-      var MagicView = discreet.MagicView;
-      $(this.el).addClass('magic');
-      this.magicView = new MagicView(this);
-      this.magicView.setTimeout(Constants.TIMEOUT_MAGIC_NO_ACTION, {
-        timeout: Constants.TIMEOUT_MAGIC_NO_ACTION,
-        type: 'magic_no_action',
-      });
-    }
-
-    if (this.magicView) {
-      this.magicView.resendCount = 0;
-    }
-    $('#magic-wrapper').removeClass('hide-resend');
-  },
-
-  destroyMagic: function() {
-    if (this.magicView) {
-      $(this.el).removeClass('magic');
-      this.magicView.$destroy();
-      delete this.magicView;
-    }
-
-    if (this.get('redirect')) {
-      $('#error-message .link').hide();
-    }
-  },
-
   setModal: function() {
     if (!this.modal) {
       var self = this;
@@ -2431,16 +2340,6 @@ Session.prototype = {
     if (this.r._payment || this.isResumedPayment) {
       if (confirmedCancel === true) {
         return this.clearRequest();
-      } else if (this.r._payment && this.r._payment.isMagicPayment) {
-        return Confirm.show({
-          message: discreet.confirmCancelMsg,
-          heading: 'Cancel Payment?',
-          positiveBtnTxt: 'Yes, cancel',
-          negativeBtnTxt: 'No',
-          onPositiveClick: function() {
-            self.hideErrorMessage(true);
-          },
-        });
       }
 
       if (confirmClose()) {
@@ -2512,12 +2411,6 @@ Session.prototype = {
   },
 
   resendOTP: function() {
-    var isMagicPayment = this.r._payment && this.r._payment.isMagicPayment;
-
-    if (isMagicPayment) {
-      return this.magicView.resendOtp();
-    }
-
     var otpProvider;
     var paymentExists = Boolean(this.r._payment);
     var isCardlessEmiPayment =
@@ -2583,13 +2476,6 @@ Session.prototype = {
   },
 
   secAction: function() {
-    var isMagicPayment = ((this.r || {})._payment || {}).isMagicPayment;
-
-    if (isMagicPayment) {
-      this.hideTimer();
-      return this.magicView.cancelMagic();
-    }
-
     if (this.headless && this.r._payment) {
       if (!this.get('timeout')) {
         Analytics.track('headless:gotobank', {
@@ -2675,80 +2561,6 @@ Session.prototype = {
     }
   },
 
-  /**
-   * Asks for second factor of confirmation for UPI intent.
-   */
-  askUPI2FPermission: function(packageName) {
-    var self = this;
-    var app = discreet.UPIUtils.getAppByPackageName(packageName);
-    var UPISecondFactorConsent = {};
-
-    try {
-      UPISecondFactorConsent = JSON.parse(
-        StorageBridge.getString('rzp_upi_2f_consent')
-      );
-    } catch (readErr) {}
-
-    var hide = function() {
-      Analytics.track('upi:2f:consent:dismiss', {
-        type: AnalyticsTypes.BEHAV,
-        data: {
-          package_name: packageName,
-          consent: false,
-        },
-      });
-    };
-
-    Analytics.track('upi:2f:consent', {
-      type: AnalyticsTypes.RENDER,
-      data: {
-        package_name: packageName,
-      },
-    });
-
-    Confirm.show({
-      position: 'middle',
-      message:
-        'To make a UPI payment, you need to have a UPI ID linked to your bank account.',
-      heading:
-        'Are you registered for UPI on ' +
-        (app.name || app.app_name || 'this app') +
-        '?',
-      layout: 'rtl',
-      positiveBtnTxt: 'Yes, Proceed',
-      negativeBtnTxt: 'No, Go Back',
-      onHide: hide,
-      onNegativeClick: hide,
-      onPositiveClick: function() {
-        UPISecondFactorConsent[packageName] = true;
-        self.shouldAskUPI2FPermission = false;
-
-        try {
-          StorageBridge.setString(
-            'rzp_upi_2f_consent',
-            JSON.stringify(UPISecondFactorConsent)
-          );
-        } catch (saveErr) {}
-
-        Analytics.track('upi:2f:consent:agree', {
-          type: AnalyticsTypes.BEHAV,
-          data: {
-            package_name: packageName,
-            consent: true,
-          },
-        });
-
-        // Show overlay manually because it gets hidden.
-        var $overlay = $('#overlay');
-        setTimeout(function() {
-          $overlay.css('display', 'block');
-          $overlay.addClass(shownClass);
-        }, 300);
-
-        self.preSubmit.call(self);
-      },
-    });
-  },
   fixLandscapeBug: function() {
     function shiftUp() {
       $(this.el.querySelector('#footer'))
@@ -3158,23 +2970,6 @@ Session.prototype = {
   },
 
   onUpiAppSelect: function(packageName) {
-    var UPISecondFactorConsent = {};
-
-    try {
-      UPISecondFactorConsent = JSON.parse(
-        StorageBridge.getString('rzp_upi_2f_consent')
-      );
-    } catch (readErr) {}
-
-    if (
-      discreet.UPIUtils.isSecondFactorApp(packageName) &&
-      !UPISecondFactorConsent[packageName]
-    ) {
-      this.shouldAskUPI2FPermission = true;
-    } else {
-      this.shouldAskUPI2FPermission = false;
-    }
-
     $('#body').toggleClass('sub', packageName);
 
     Analytics.track('upi:app:select', {
@@ -3573,8 +3368,6 @@ Session.prototype = {
           ? tab_titles[this.tab]
           : tab_titles[this.cardTab || screen];
 
-      screenTitle = /^magic/.test(screen) ? tab_titles.card : screenTitle;
-
       if (screen === 'upi' && this.isPayout) {
         screenTitle = tab_titles.payout_upi;
       }
@@ -3656,8 +3449,6 @@ Session.prototype = {
       screen === 'paylater' ||
       screen === 'qr' ||
       (screen === 'wallet' && !$('.wallet :checked')[0]) ||
-      (screen === 'magic-choice' &&
-        !$('#form-magic-choice .item :checked')[0]) ||
       screen === 'bank_transfer'
     ) {
       showPaybtn = false;
@@ -3993,8 +3784,6 @@ Session.prototype = {
       });
     };
 
-    var isMagicPayment = ((this.r || {})._payment || {}).isMagicPayment;
-
     if (this.get('ecod')) {
       $('#footer').hide();
       $('#wallets input:checked').prop('checked', false);
@@ -4007,9 +3796,7 @@ Session.prototype = {
       tab = thisTab;
     } else if (
       (thisTab === 'qr' && this.r._payment) ||
-      (this.headless && payment) ||
-      ((thisTab === 'card' || thisTab === 'emi') &&
-        (/^magic/.test(this.screen) || isMagicPayment))
+      (this.headless && payment)
     ) {
       if (confirmedCancel === true) {
         if (thisTab === 'qr') {
@@ -5172,6 +4959,19 @@ Session.prototype = {
     this.showLoadError(text, false);
   },
 
+  /**
+   * Get the message to be shown in the omnichannel loader.
+   * @return {string}
+   */
+  getOmnichannelMessage: function() {
+    return (
+      'Please accept the request of ' +
+      this.formatAmountWithCurrency(this.get('amount')) +
+      ' in your Google Pay app linked with +91' +
+      this.payload.contact
+    );
+  },
+
   showLoadError: function(text, error) {
     if (this.headless && this.screen === 'card') {
       return;
@@ -5463,8 +5263,6 @@ Session.prototype = {
       this.r.emit('payment.cancel', extra);
     }
 
-    this.destroyMagic();
-
     if (this.payload && this.payload.method === 'cardless_emi') {
       this.resetCardlessEmiStoreForProvider(this.payload.provider);
     }
@@ -5526,7 +5324,6 @@ Session.prototype = {
     preventDefault(e);
     var screen = this.screen;
     var tab = this.tab;
-    var isMagicPayment = ((this.r || {})._payment || {}).isMagicPayment;
 
     if (
       !this.tab &&
@@ -5534,13 +5331,6 @@ Session.prototype = {
       !this.p13n &&
       !(this.oneMethod && this.oneMethod === 'paypal')
     ) {
-      return;
-    }
-
-    if (/^magic/.test(screen) || isMagicPayment) {
-      var magicData = {};
-      fillData('#form-' + screen, magicData);
-      this.magicView.submit(screen, magicData);
       return;
     }
 
@@ -5730,11 +5520,7 @@ Session.prototype = {
           return;
         }
 
-        if (
-          this.preferences.features &&
-          this.preferences.features.google_pay_omnichannel &&
-          this.upiTab.selectedApp === 'gpay'
-        ) {
+        if (this.isOmnichannel()) {
           $('.omnichannel').show();
         } else {
           $('.omnichannel').hide();
@@ -5865,10 +5651,6 @@ Session.prototype = {
       shouldContinue = this.nachScreen.shouldSubmit();
     }
 
-    if (this.tab === 'netbanking') {
-      shouldContinue = this.netbankingTab.shouldSubmit();
-    }
-
     if (this.tab === 'bank_transfer') {
       shouldContinue = this.bankTransferView.shouldSubmit();
     }
@@ -5880,8 +5662,6 @@ Session.prototype = {
     var session = this;
     var request = {
       feesRedirect: preferences.fee_bearer && !('fee' in data),
-      sdk_popup: this.sdk_popup,
-      magic: this.magic,
       optional: getStore('optional'),
       external: {},
       paused: this.get().paused,
@@ -5961,10 +5741,6 @@ Session.prototype = {
 
     // If there's a package name, the flow is intent.
     if (data.upi_app) {
-      if (this.shouldAskUPI2FPermission) {
-        this.askUPI2FPermission(data.upi_app);
-        return;
-      }
       data['_[flow]'] = 'intent';
       data['_[app]'] = data.upi_app;
     }
@@ -6179,7 +5955,7 @@ Session.prototype = {
         '<img src="' + walletObj.logo + '" height="' + walletObj.h + '">';
       this.commenceOTP(wallet + ' account', true);
     } else if (this.isOmnichannel()) {
-      this.showOmnichannelLoader(strings.OmnichannelNotification);
+      this.showOmnichannelLoader(strings.gpay_omnichannel);
     } else if (!this.isPayout) {
       this.showLoadError();
     } else {
@@ -6268,30 +6044,6 @@ Session.prototype = {
     this.attemptCount++;
 
     var sub_link = $('#error-message .link');
-
-    if (this.r._payment && this.r._payment.isMagicPayment) {
-      window.handleRelay = handleRelayFn.bind(this);
-    }
-
-    payment.on('payment.magic.init', function() {
-      that.setMagic();
-      that.magicView.track('init');
-      that.showLoadError('Please wait while we fetch your transaction details');
-
-      if (that.r._payment && that.r._payment.isMagicPayment) {
-        sub_link.html('View bank page');
-        sub_link[0].style = '';
-        sub_link.on('click', function() {
-          if (that.magicView) {
-            that.magicView.track('user_cancel');
-            that.magicView.showPaymentPage({
-              otpelf: true,
-              magic: false,
-            });
-          }
-        });
-      }
-    });
 
     var iosCheckoutBridgeNew = Bridge.getNewIosBridge();
 
@@ -6392,10 +6144,13 @@ Session.prototype = {
           return that.showLoadError('Waiting for payment confirmation.');
         }
 
-        /* Otherwise it's directpay */
-        that.showLoadError(
-          "Please accept the request from Razorpay's VPA on your UPI app"
-        );
+        if (that.isOmnichannel()) {
+          that.showOmnichannelLoader(that.getOmnichannelMessage());
+        } else {
+          that.showLoadError(
+            "Please accept the request from Razorpay's VPA on your UPI app"
+          );
+        }
       });
     } else {
       if (!this.headless) {
@@ -7053,13 +6808,13 @@ Session.prototype = {
     return getCustomer.apply(null, arguments);
   },
   isOmnichannel: function() {
-    var isOmni =
+    return (
       this.preferences.features &&
       this.preferences.features.google_pay_omnichannel &&
       this.upiTab &&
-      this.upiTab.selectedApp === 'gpay';
-
-    return isOmni;
+      this.upiTab.selectedApp === 'gpay' &&
+      this.upiTab.omnichannelType === 'phone'
+    );
   },
 
   /**
@@ -7119,9 +6874,6 @@ Session.prototype = {
       invoice = (this.invoice = preferences.invoice),
       subscription = (this.subscription = preferences.subscription),
       options = preferences.options;
-
-    /* Set magic from preferences */
-    this.magic = false; //this.magic && preferences.magic;
 
     /* set empty customer in case of local card saving */
     if (preferences.global === false) {

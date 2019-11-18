@@ -10,42 +10,39 @@ const UPI_APPS = {
    */
   preferred: [
     {
-      package_name: 'in.org.npci.upiapp',
+      app_name: 'Google Pay (Tez)',
+      package_name: GOOGLE_PAY_PACKAGE_NAME,
+      app_icon: 'https://cdn.razorpay.com/checkout/gpay.png',
+      /**
+       * Call CheckoutBridge to verify that the user is registered on the app
+       * and only display if they are.
+       */
+      verify_registration: true,
     },
     {
       package_name: 'com.phonepe.app',
       app_icon: 'https://cdn.razorpay.com/checkout/phonepe.png',
     },
     {
-      app_name: 'Google Pay (Tez)',
-      package_name: GOOGLE_PAY_PACKAGE_NAME,
-      app_icon: 'https://cdn.razorpay.com/checkout/gpay.png',
-      verify_registration: true,
-    },
-  ],
-
-  /**
-   * Apps for which we should have a second factor of confirmation,
-   * because these apps are very common but the user might not be registered for UPI on these apps.
-   */
-  secondfactor: [
-    {
       name: 'PayTM',
       app_name: 'PayTM UPI',
       package_name: 'net.one97.paytm',
     },
     {
-      name: 'WhatsApp Business',
-      app_name: 'WhatsApp Business UPI',
-      package_name: 'com.whatsapp.w4b',
+      package_name: 'in.org.npci.upiapp',
     },
   ],
 
   /**
    * Whitelisted apps.
-   * Should not contain any apps that are mentioned in preferred or secondfactor.
+   * Should not contain any apps that are mentioned in preferred.
    */
   whitelist: [
+    {
+      name: 'WhatsApp Business',
+      app_name: 'WhatsApp Business UPI',
+      package_name: 'com.whatsapp.w4b',
+    },
     {
       package_name: 'com.csam.icici.bank.imobile',
     },
@@ -212,7 +209,7 @@ const UPI_APPS = {
 /**
  * Order of apps.
  */
-const UPI_APPS_ORDER = ['preferred', 'secondfactor', 'whitelist'];
+const UPI_APPS_ORDER = ['preferred', 'whitelist'];
 
 export const otherAppsIcon =
   'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNCA4aDRWNEg0djR6bTYgMTJoNHYtNGgtNHY0em0tNiAwaDR2LTRINHY0em0wLTZoNHYtNEg0djR6bTYgMGg0di00aC00djR6bTYtMTB2NGg0VjRoLTR6bS02IDRoNFY0aC00djR6bTYgNmg0di00aC00djR6bTAgNmg0di00aC00djR6IiBmaWxsPSIjYjBiMGIwIi8+PHBhdGggZD0iTTAgMGgyNHYyNEgweiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==';
@@ -357,12 +354,12 @@ export const getAllApps = () => {
 
 export const isPreferredApp = packageName =>
   doesAppExist(packageName, UPI_APPS.preferred);
-export const isSecondFactorApp = packageName =>
-  doesAppExist(packageName, UPI_APPS.secondfactor);
 export const isWhitelistedApp = packageName =>
   doesAppExist(packageName, UPI_APPS.whitelist);
+
 export const isBlacklistedApp = packageName =>
   doesAppExist(packageName, UPI_APPS.blacklist);
+
 export const isUsableApp = packageName =>
   doesAppExist(packageName, getUsableApps());
 

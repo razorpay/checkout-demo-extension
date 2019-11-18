@@ -11,7 +11,7 @@ const {
   verifyPartialAmount,
 } = require('../../actions/common');
 
-describe('Basic upi payment', () => {
+describe.skip('Basic upi payment', () => {
   test('Perform upi intent transaction with partial payments and timeout enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -21,8 +21,8 @@ describe('Basic upi payment', () => {
     };
     const preferences = makePreferences({
       order: {
-        amount: 100,
-        amount_due: 100,
+        amount: 200,
+        amount_due: 200,
         amount_paid: 0,
         currency: 'INR',
         first_payment_min_amount: null,

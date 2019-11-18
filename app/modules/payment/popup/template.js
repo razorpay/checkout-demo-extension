@@ -77,33 +77,6 @@ setTimeout(function(){
     }
   };
 },1e4)
-${_.sdk_popup &&
-  `function submitForm(action, data, method) {
-  if (method === 'get') { return window.location = action }
-  var form = document.forms[0];
-  form.setAttribute('action', action);
-  if (method) { form.setAttribute('method', method) }
-  if (data) { form.innerHTML = deserialize(data) }
-  form.submit()
-}
-function deserialize(data, key) {
-  if (typeof data === 'object' && data !== null) {
-    var str = '';
-    for (name in data) {
-      if (!data.hasOwnProperty(name)) {
-        return;
-      }
-      value = data[name];
-      if (key) {
-        name = key + '[' + name + ']';
-      }
-      str += deserialize(value, name);
-    }
-
-    return str;
-  }
-  return '<input type="hidden" name="' + key + '" value="' + data + '">';
-}`}
 </script>
 <form></form>
 </body>
