@@ -130,5 +130,88 @@ module.exports = {
     return returnObj;
   },
 
+  async openCheckoutForPersonalization({
+    page,
+    options,
+    preferences,
+    params,
+    method,
+    apps,
+  }) {
+    let checkoutUrl = checkoutPublic;
+
+    if (params) checkoutUrl += '?' + querystring.stringify(params);
+    if (interceptorOptions) {
+      interceptorOptions.disableInterceptor();
+      page.removeListener('request', cdnRequestHandler);
+    } else {
+      await page.setRequestInterception(true);
+    }
+
+    page.on('request', checkoutRequestHandler);
+    await page.goto(checkoutUrl);
+
+    await page.evaluate(method => {
+      localStorage.setItem(
+        'rzp_preffered_instruments',
+        {
+          UPI:
+            '{"4d184816":[{"_[flow]":"directpay","vpa":"dsd@okhdfcbank","method":"upi","timestamp":1574063491481,"success":true,"frequency":2,"id":"Dhix6Bqn8w7td4"},{"_[flow]":"directpay","vpa":"dfs@okicici","method":"upi","timestamp":1574066575053,"success":true,"frequency":1,"id":"Dhjpz3w1RIGMJ1"}]}',
+          Netbanking:
+            '{"732ab5a9":[{"bank":"HDFC","method":"netbanking","timestamp":1574062745851,"success":true,"frequency":2,"id":"Dhh86QTueOpyWX"}],"4c184683":[{"bank":"HDFC","method":"netbanking","timestamp":1574072395307,"success":true,"frequency":1,"id":"DhlUS88dTUwBC5"}]}',
+          QR:
+            '{"4b1844f0":[{"_[flow]":"intent","_[upiqr]":"1","method":"upi","timestamp":1574079022916,"success":true,"frequency":2,"id":"DhnN8SggG8Ihdy"}]}',
+          Wallet:
+            '{"51184e62":[{"wallet":"freecharge","method":"wallet","timestamp":1574081911355,"success":true,"frequency":1,"id":"DhoBzK59KicZni"}]}',
+        }[method]
+      );
+    }, method);
+    page.removeListener('request', checkoutRequestHandler);
+    page.on('request', cdnRequestHandler);
+
+    if (interceptorOptions) {
+      interceptorOptions.enableInterceptor();
+    } else {
+      interceptorOptions = interceptor(page);
+    }
+
+    const pageTarget = page.target();
+    const returnObj = {
+      page,
+      options,
+      preferences,
+      ...computed(options, preferences),
+      ...interceptorOptions,
+      async popup() {
+        const target = await page
+          .browser()
+          .waitForTarget(t => t.opener() === pageTarget);
+        const popupPage = await target.page();
+        return {
+          page: popupPage,
+          async callback(response) {
+            await popupPage.goto(
+              'data:text/html,' + encodeURIComponent(callbackHtml(response))
+            );
+          },
+        };
+      },
+      async callbackPage(response) {
+        const req = await interceptorOptions.expectRequest();
+        expect(req.raw.isNavigationRequest()).toBe(true);
+        expect(req.method).toBe('POST');
+      },
+    };
+
+    if (options) {
+      const message = { options };
+      if (apps) message.upi_intents_data = apps;
+      await passMessage(page, message);
+    }
+    if (preferences) await sendPreferences(returnObj);
+
+    return returnObj;
+  },
+
   cdnUrl,
 };

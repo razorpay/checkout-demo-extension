@@ -22,9 +22,11 @@ async function assertHomePage(context) {
   expect(await $email.evaluate(el => el.value)).toEqual(context.prefilledEmail);
 }
 
-async function fillUserDetails(context) {
+async function fillUserDetails(context, placeHolder, number) {
+  //placeHolder is used to handle true value
+
   if (!context.prefilledContact && !context.isContactOptional) {
-    await context.page.type('#contact', randomContact());
+    await context.page.type('#contact', number || randomContact());
   }
 
   if (!context.prefilledEmail && !context.isEmailOptional) {
@@ -38,6 +40,20 @@ async function assertPaymentMethods(context) {
   expect(await context.page.$eval('[tab=card]', visible)).toEqual(true);
 }
 
+async function assertPaymentMethodsPersonalization(context) {
+  const text = await page.evaluate(() =>
+    Array.from(
+      document.querySelectorAll('.option-title'),
+      element => element.textContent
+    )
+  );
+  await delay(2000);
+  const apiOption = await context.page.$x(
+    '//div[contains(@class, "option radio-option")]'
+  );
+  await apiOption[0].click();
+}
+
 async function selectPaymentMethod(context, method) {
   await context.page.click('[tab=' + method + ']');
 }
@@ -47,4 +63,5 @@ module.exports = {
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
+  assertPaymentMethodsPersonalization,
 };
