@@ -196,7 +196,7 @@
 
         <div
           class="home-methods"
-          in:fly={{ delay: 300, duration: 400 }}
+          in:fly={{ delay: 100, duration: 400 }}
           out:fly={{ duration: 400 }}>
           <NewMethodsList />
         </div>
