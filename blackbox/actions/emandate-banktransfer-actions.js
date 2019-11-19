@@ -12,6 +12,10 @@ async function verifyEmandateBank(context) {
 }
 
 async function selectEmandateNetbanking(context) {
+  await context.page.waitFor('#emandate-options > .auth-option', {
+    timeout: 2000,
+    visible: true,
+  });
   const netbanking = await context.page.waitForSelector(
     '#emandate-options > .auth-option'
   );
