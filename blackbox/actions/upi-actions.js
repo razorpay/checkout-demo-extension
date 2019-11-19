@@ -30,7 +30,10 @@ async function respondToUPIPaymentStatus(context) {
   await context.respondPlain(
     `${req.params.callback}(${JSON.stringify(successResult)})`
   );
-  await delay(500);
+  await context.page.waitFor('#modal-inner', {
+    timeout: 2000,
+    hidden: true,
+  });
   expect(await context.page.$('#modal-inner')).toEqual(null);
 }
 
