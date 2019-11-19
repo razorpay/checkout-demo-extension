@@ -1,4 +1,7 @@
 <script>
+  // Svelte importrs
+  import { createEventDispatcher } from 'svelte';
+
   // Props
   export let method = null; // Name of the method
   export let icon = null; // Override: icon. Picked from method if not overridden.
@@ -16,11 +19,19 @@
   } from 'checkoutframe/paymentmethods';
 
   const session = getSession();
+  const dispatch = createEventDispatcher();
 
   // Items to display
   const _icon = icon || session.themeMeta.icons[method];
   const _title = title || getMethodNameForPaymentOption(method, { session });
   const _subtitle = subtitle || getMethodDescription(method, { session });
+
+  function select(event) {
+    dispatch('select', {
+      down: false, // TODO
+      method,
+    });
+  }
 </script>
 
 <style>
@@ -60,7 +71,7 @@
   }
 </style>
 
-<SlottedOption className="new-method">
+<SlottedOption className="new-method" on:click={select}>
   <i slot="icon">
     {@html _icon}
   </i>

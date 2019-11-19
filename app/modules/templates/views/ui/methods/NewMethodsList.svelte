@@ -8,6 +8,8 @@
   import { getSession } from 'sessionmanager';
   import { isMobile } from 'common/useragent';
   import { doesAppExist } from 'common/upi';
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
 
   const session = getSession();
   let visibleMethods = [];
@@ -260,6 +262,21 @@
 
   setMethods(session.methods);
   setInstruments();
+
+  function selectMethod(event) {
+    Analytics.track('p13:method:select', {
+      type: AnalyticsTypes.BEHAV,
+      data: event.detail,
+    });
+
+    const { down, method } = event.detail;
+
+    if (down) {
+      return;
+    }
+
+    session.switchTab(method);
+  }
 </script>
 
 <style>
@@ -288,6 +305,6 @@
 
 <div class="methods-container border-list">
   {#each visibleMethods as method}
-    <Method {method} />
+    <Method {method} on:select={selectMethod} />
   {/each}
 </div>
