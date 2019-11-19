@@ -70,6 +70,7 @@ async function submit(context) {
     timeout: 2000,
     visible: true,
   });
+  await delay(300);
   context.page.click('#footer');
 }
 
