@@ -10,6 +10,8 @@
 
   import { slide, fly } from 'svelte/transition';
 
+  import { contact, email } from 'checkoutstore/screens/home';
+
   export let getStore;
   export let session;
   export let methods;
@@ -52,8 +54,9 @@
   const accountName = o('prefill.bank_account[name]');
 
   let view = 'details';
-  let contact = prefill_contact || ''; // TODO: Move to store
-  let email = prefill_email || ''; // TODO: Move to store
+
+  $contact = prefill_contact || '';
+  $email = prefill_email || '';
 
   export function showMethods() {
     view = 'methods';
@@ -153,38 +156,38 @@
           <div
             class="elem-wrap"
             class:invisible={contact_hidden}
-            class:filled={contact.length}
+            class:filled={$contact.length}
             id="elem-wrap-contact">
             <Field
               id="contact"
               name="contact"
               type="tel"
-              value={contact}
+              value={$contact}
               required={!optional.contact}
               pattern={CONTACT_REGEX}
               readonly={contact_readonly}
               label="Phone"
               icon="&#xe607;"
-              on:input={e => (contact = e.target.value)}
+              on:input={e => ($contact = e.target.value)}
               helpText="Please enter a valid contact number" />
           </div>
           <div
             class="elem-wrap"
             class:invisible={email_hidden}
-            class:filled={email.length}
+            class:filled={$email.length}
             id="elem-wrap-email">
             <!-- TODO: add (optional) to label if email is optional -->
             <Field
               id="email"
               name="email"
               type="email"
-              value={email}
+              value={$email}
               required={!optional.email}
               pattern={EMAIL_REGEX}
               readonly={email_readonly}
               label="Email"
               icon="&#xe603;"
-              on:input={e => (email = e.target.value)}
+              on:input={e => ($email = e.target.value)}
               helpText="Please enter a valid email. Example: you@example.com" />
           </div>
         </div>
@@ -196,11 +199,11 @@
           transition:slide={{ duration: 400 }}>
           <SlottedOption on:click={hideMethods}>
             <div slot="title">
-              {#if contact}
-                <span>{contact}</span>
+              {#if $contact}
+                <span>{$contact}</span>
               {/if}
-              {#if email}
-                <span>{email}</span>
+              {#if $email}
+                <span>{$email}</span>
               {/if}
             </div>
             <div slot="extra" class="theme-highlight-color">

@@ -57,6 +57,7 @@ import SessionStore from 'checkoutstore/session';
 import DowntimesStore from 'checkoutstore/downtimes';
 import * as OTPScreenStore from 'checkoutstore/screens/otp';
 import * as Cta from 'checkoutstore/cta';
+import * as HomeScreenStore from 'checkoutstore/screens/home';
 
 import QRScreen from 'templates/views/qr.svelte';
 import BankTransferScreen from 'templates/views/bank_transfer.svelte';
@@ -130,6 +131,7 @@ export default {
   DowntimesStore,
   SessionStore,
   OTPScreenStore,
+  HomeScreenStore,
   Cta,
 
   getQueryParams: _.getQueryParams,

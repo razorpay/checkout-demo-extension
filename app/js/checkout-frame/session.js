@@ -37,6 +37,9 @@ var preferences = window.preferences,
   PayLater = discreet.PayLater,
   PayLaterView = discreet.PayLaterView,
   OtpService = discreet.OtpService,
+  storeGetter = discreet.storeGetter,
+  HomeScreenStore = discreet.HomeScreenStore;
+  OtpService = discreet.OtpService,
   Cta = discreet.Cta;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
@@ -785,7 +788,13 @@ function cancelHandler(response) {
 }
 
 function getPhone() {
-  return gel('contact').value;
+  var el = gel('contact');
+
+  if (el) {
+    return el.value;
+  } else {
+    return storeGetter(HomeScreenStore.contact);
+  }
 }
 
 function setOtpText(view, text) {
@@ -5179,7 +5188,7 @@ Session.prototype = {
     });
 
     this.showLoadError('Verifying OTP');
-    var otp = discreet.storeGetter(discreet.OTPScreenStore.otp);
+    var otp = storeGetter(discreet.OTPScreenStore.otp);
 
     if (this.tab === 'wallet' || this.headless) {
       return this.r.submitOTP(otp);
