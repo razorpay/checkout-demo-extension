@@ -108,8 +108,21 @@
     line-height: 18px;
   }
 
-  .home-details .theme-highlight-color {
-    transform: rotate(180deg);
+  .home-details div[slot='extra'] span:first-child {
+    margin: 2px 4px 0;
+    font-size: 1.2em;
+  }
+
+  .home-details div[slot='extra'] span:last-child {
+    transform: rotate(-90deg);
+  }
+
+  .home-details div[slot='extra'] span {
+    display: block;
+  }
+
+  .home-details div[slot='extra'] {
+    display: flex;
   }
 
   .home-details div[slot='title'] {
@@ -118,12 +131,12 @@
     white-space: nowrap;
   }
 
-  .home-details span:first-child {
+  .home-details div[slot='title'] span:first-child {
     font-size: 15px;
     color: #363636;
   }
 
-  .home-details span:last-child {
+  .home-details div[slot='title'] span:last-child {
     font-size: 12px;
     color: #757575;
     margin-left: 8px;
@@ -190,7 +203,10 @@
                 <span>{email}</span>
               {/if}
             </div>
-            <div slot="extra" class="theme-highlight-color">&#xe604;</div>
+            <div slot="extra" class="theme-highlight-color">
+              <span>Edit</span>
+              <span>&#xe604;</span>
+            </div>
           </SlottedOption>
         </div>
 
