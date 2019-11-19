@@ -12,7 +12,7 @@ const {
 } = require('../../actions/common');
 
 describe('Netbanking tests', () => {
-  test('perform emandate transaction with callback Url enabled', async () => {
+  test('perform emandate transaction with callback Url and contact optional enabled', async () => {
     const options = {
       order_id: 'order_DfNAO0KJCH5WNY',
       amount: 0,
