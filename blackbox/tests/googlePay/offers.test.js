@@ -5,14 +5,17 @@ const {
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
-  selectGooglePay,
+  selectUPIIDFromDropDown,
   enterUPIAccount,
-  selectFromDropDown,
+  selectUPIApplication,
   submit,
   respondToUPIAjax,
   handleUPIAccountValidation,
   respondToUPIPaymentStatus,
   setPreferenceForOffer,
+  viewOffers,
+  selectOffer,
+  verifyOfferApplied,
 } = require('../../actions/common');
 
 describe('Offers GooglePay payment', () => {
@@ -55,9 +58,12 @@ describe('Offers GooglePay payment', () => {
     await fillUserDetails(context, true);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectGooglePay(context, 'Google Pay');
+    await selectUPIApplication(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
-    await selectFromDropDown(context, 'okhdfcbank');
+    await selectUPIIDFromDropDown(context, 'okhdfcbank', 'gpay_bank');
+    await viewOffers(context);
+    await selectOffer(context, '1');
+    await verifyOfferApplied(context);
     await submit(context);
     await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
     await respondToUPIAjax(context, '');

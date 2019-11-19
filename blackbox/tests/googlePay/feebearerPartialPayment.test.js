@@ -8,13 +8,11 @@ const {
   assertPaymentMethods,
   selectPaymentMethod,
   submit,
-  respondAndVerifyIntentRequest,
   handleFeeBearer,
-  selectUPIApp,
   handlePartialPayment,
   verifyPartialAmount,
-  selectGooglePay,
-  selectFromDropDown,
+  selectUPIIDFromDropDown,
+  selectUPIApplication,
   enterUPIAccount,
   handleUPIAccountValidation,
   respondToUPIAjax,
@@ -25,15 +23,15 @@ describe('Feebearer with partial GooglePay payment', () => {
   test('Perform GooglePay transaction with feebearer and partial payments enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 60000,
+      amount: 30000,
       personalization: false,
     };
     const preferences = makePreferences({
       fee_bearer: true,
       order: {
-        amount: 10000,
-        amount_due: 100000,
-        amount_paid: 60000,
+        amount: 20000,
+        amount_due: 20000,
+        amount_paid: 0,
         currency: 'INR',
         first_payment_min_amount: null,
         partial_payment: true,
@@ -47,13 +45,13 @@ describe('Feebearer with partial GooglePay payment', () => {
     });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true);
-    await handlePartialPayment(context, '600');
+    await handlePartialPayment(context, '100');
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectGooglePay(context, 'Google Pay');
+    await selectUPIApplication(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
-    await selectFromDropDown(context, 'okhdfcbank');
-    await verifyPartialAmount(context, '₹ 600');
+    await selectUPIIDFromDropDown(context, 'okhdfcbank', 'gpay_bank');
+    await verifyPartialAmount(context, '₹ 100');
     await submit(context);
     await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
     await handleFeeBearer(context, page);

@@ -8,14 +8,17 @@ const {
   selectPaymentMethod,
   submit,
   handleUPIAccountValidation,
-  selectFromDropDown,
-  selectGooglePay,
+  viewOffers,
+  selectOffer,
+  verifyOfferApplied,
   handlePartialPayment,
   verifyPartialAmount,
   enterUPIAccount,
   respondToUPIAjax,
   respondToUPIPaymentStatus,
   setPreferenceForOffer,
+  selectUPIIDFromDropDown,
+  selectUPIApplication,
 } = require('../../actions/common');
 
 describe.skip('Offers with Partial GooglePay payment', () => {
@@ -68,9 +71,12 @@ describe.skip('Offers with Partial GooglePay payment', () => {
     await handlePartialPayment(context, '1');
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectGooglePay(context, 'Google Pay');
+    await selectUPIApplication(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
-    await selectFromDropDown(context, 'okhdfcbank');
+    await selectUPIIDFromDropDown(context, 'okhdfcbank', 'gpay_bank');
+    await viewOffers(context);
+    await selectOffer(context, '1');
+    await verifyOfferApplied(context);
     await verifyPartialAmount(context, '₹ 1');
     await submit(context);
     await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');

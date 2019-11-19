@@ -5,10 +5,10 @@ const {
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
-  selectGooglePay,
+  selectUPIApplication,
   submit,
   enterUPIAccount,
-  selectFromDropDown,
+  selectUPIIDFromDropDown,
   handleUPIAccountValidation,
   respondToUPIAjax,
   respondToUPIPaymentStatus,
@@ -33,9 +33,9 @@ describe.skip('CallBack Url with Google Pay', () => {
     await fillUserDetails(context, true);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectGooglePay(context, 'Google Pay');
+    await selectUPIApplication(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
-    await selectFromDropDown(context, 'okhdfcbank');
+    await selectUPIIDFromDropDown(context, 'okhdfcbank', 'gpay_bank');
     await submit(context);
     await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
     await respondToUPIAjax(context, '');

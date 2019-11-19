@@ -1,4 +1,4 @@
-const { openSdkCheckout } = require('../../actions/checkout-sdk');
+const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
@@ -19,7 +19,7 @@ describe.skip('Basic GooglePay payment', () => {
     };
     const preferences = makePreferences();
     preferences.methods.upi = true;
-    const context = await openSdkCheckout({
+    const context = await openCheckout({
       page,
       options,
       preferences,

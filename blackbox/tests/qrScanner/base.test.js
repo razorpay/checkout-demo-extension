@@ -7,14 +7,14 @@ const {
   assertPaymentMethods,
   selectPaymentMethod,
   selectUPIApp,
-  respondToUPIPaymentStatus,
-  respondToUPIAjax,
+  validateQRImage,
+  respondToQRAjax,
 } = require('../../actions/common');
 
 describe('Basic QR Code payment', () => {
   test('Perform QR Code transaction', async () => {
     const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+      key: 'rzp_live_ILgsfZCZoFIKMb',
       amount: 20000,
       personalization: false,
     };
@@ -30,7 +30,7 @@ describe('Basic QR Code payment', () => {
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await selectUPIApp(context, '1');
-    await respondToUPIAjax(context, '');
-    await respondToUPIPaymentStatus(context);
+    await respondToQRAjax(context, '');
+    await validateQRImage(context);
   });
 });
