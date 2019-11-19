@@ -28,7 +28,7 @@ describe('Netbanking tests', () => {
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'bank_transfer');
     await returnVirtualAccounts(context);
-    await delay(30000);
+    // await delay(30000);
     // await assertNetbankingPage(context);
     // await selectBank(context, 'SBIN');
     // await submit(context);
