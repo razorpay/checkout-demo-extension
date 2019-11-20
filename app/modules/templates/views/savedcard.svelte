@@ -1,6 +1,6 @@
 <script>
   // Svelte imports
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, afterUpdate } from 'svelte';
 
   // Utils imports
   import Analytics from 'analytics';
@@ -16,6 +16,7 @@
   export let plans;
   export let token;
   export let cvvDigits;
+  export let selected;
 
   // Computed
   export let attributes;
@@ -59,7 +60,12 @@
   }
 </script>
 
-<div class="saved-card" tabIndex="0" {...attributes}>
+<div
+  class="saved-card "
+  class:checked={selected}
+  on:click
+  tabIndex="0"
+  {...attributes}>
   <div class="help up">EMI is not available on this card</div>
   <div class="cardtype" cardtype={card.networkCode} />
   <div class="saved-inner">

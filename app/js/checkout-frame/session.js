@@ -789,7 +789,6 @@ function elfShowOTP(otp, sender, bank) {
 }
 
 function askOTP(view, text, shouldLimitResend, screenProps) {
-  console.log('this is ask otp' + view + text);
   if (!screenProps) {
     screenProps = {};
   }
@@ -2667,8 +2666,8 @@ Session.prototype = {
       }
 
       // saved cards events
-      this.click('#show-add-card', this.toggleSavedCards);
-      this.click('#show-saved-cards', this.toggleSavedCards);
+      // this.click('#show-add-card', this.toggleSavedCards);
+      // this.click('#show-saved-cards', this.toggleSavedCards);
       this.on(
         'click',
         '#saved-cards-container',
@@ -3780,9 +3779,7 @@ Session.prototype = {
     }
 
     if (tab === 'emi' && this.screen !== 'emi') {
-      console.log('happening');
       this.showCardTab(tab);
-
       setEmiPlansCta(this.screen, tab);
     } else {
       this.setScreen(tab);
@@ -3817,13 +3814,13 @@ Session.prototype = {
   },
 
   showCardTab: function(tab) {
-    // this.otpView.updateScreen({
-    //   maxlength: 6,
-    // });
+    this.otpView.updateScreen({
+      maxlength: 6,
+    });
 
-    // onSixDigits.call(this, {
-    //   target: gel('card_number'),
-    // });
+    onSixDigits.call(this, {
+      target: gel('card_number'),
+    });
 
     var self = this;
     var customer = self.customer;
@@ -3839,36 +3836,34 @@ Session.prototype = {
       skipText: 'Skip Saved Cards',
     });
 
-    // if (!customer.logged && !this.wants_skip) {
-    //   self.commenceOTP('saved cards', true);
-    //   customer.checkStatus(function() {
-    //     /**
-    //      * 1. If this is a recurring payment and customer doesn't have saved cards,
-    //      *    create and ask for OTP.
-    //      * 2. If customer has saved cards and is not logged in, ask for OTP.
-    //      * 3. If customer doesn't have saved cards, show cards screen.
-    //      */
-    //     if (self.recurring && !customer.saved && !customer.logged) {
-    //       self.customer.createOTP(function() {
-    //         askOTP(
-    //           self.otpView,
-    //           'Enter OTP sent on ' +
-    //             getPhone() +
-    //             '<br>to save your card for future payments',
-    //           true
-    //         );
-    //       });
-    //     } else if (customer.saved && !customer.logged) {
-    //       askOTP(self.otpView, undefined, true);
-    //     } else {
-    //       self.showCards();
-    //     }
-    //   });
-    // } else {
-    //   self.showCards();
-    // }
-    // self.showCards();
-    this.svelteCardTab.showCards();
+    if (!customer.logged && !this.wants_skip) {
+      self.commenceOTP('saved cards', true);
+      customer.checkStatus(function() {
+        /**
+         * 1. If this is a recurring payment and customer doesn't have saved cards,
+         *    create and ask for OTP.
+         * 2. If customer has saved cards and is not logged in, ask for OTP.
+         * 3. If customer doesn't have saved cards, show cards screen.
+         */
+        if (self.recurring && !customer.saved && !customer.logged) {
+          self.customer.createOTP(function() {
+            askOTP(
+              self.otpView,
+              'Enter OTP sent on ' +
+                getPhone() +
+                '<br>to save your card for future payments',
+              true
+            );
+          });
+        } else if (customer.saved && !customer.logged) {
+          askOTP(self.otpView, undefined, true);
+        } else {
+          self.showCards();
+        }
+      });
+    } else {
+      self.showCards();
+    }
   },
 
   showCards: function() {
@@ -5140,9 +5135,7 @@ Session.prototype = {
         }
       }
     } else if (screen) {
-      if (tab === 'card' && screen === 'card') {
-        this.svelteCardTab.preSubmit();
-      } else if (screen === 'card') {
+      if (screen === 'card') {
         // This is kept intact so as to not mess any unknown existing flow
         var formattingDelegator = this.delegator;
 
@@ -5155,7 +5148,7 @@ Session.prototype = {
           return this.showLoadError('AMEX cards are not supported', true);
         }
         var nocvv_el = $('#nocvv-check [type=checkbox]')[0];
-        if (!this.savedCardScreen) {
+        if (1) {
           // handling add new card screen
           formattingDelegator.card.format();
           formattingDelegator.expiry.format();
@@ -5430,7 +5423,7 @@ Session.prototype = {
     }
 
     if (this.tab === 'card') {
-      shouldContinue = this.svelteCardTab.shouldSubmit();
+      // shouldContinue = this.svelteCardTab.shouldSubmit();
     }
 
     if (!shouldContinue) {

@@ -16,43 +16,31 @@
   import SavedCards from 'templates/screens/savedcards.svelte';
 
   const session = getSession();
+
   // Props
   export let loading = true;
   export let data = null;
   export let error = null;
   export let emiOptions = null;
-  export let remember = null;
   export let otpView = null;
-  export let commenceOTP = null;
 
   // Refs
-  export let neftDetails = null;
   const cardType = _Doc.querySelector('#elem-card .cardtype[cardtype]');
   var nocvvCheck = _Doc.querySelector('#nocvv');
+  var remember = false;
 
   $: showSavedCardsScreen = false;
   $: showSavedCards = false;
   $: customer = session.customer;
   var transformedTokens = null;
 
-  //   //computed
-  // TODO Move bindevents line no 2940
-
-  //   const footerButtons = {
-  //     copyDetails: _Doc.querySelector('#footer .bank-transfer-copy-details'),
-  //     pay: _Doc.querySelector('#footer .pay-btn'),
-  //     body: _Doc.querySelector('#body'),
-  //   };
-
   function toggleNoCvv(show) {
     // Display or hide the nocvv checkbox
-    //   nocvvCheck.toggleClass(shownClass, show); TODO
     nocvvCheck.disabled = !show;
   }
 
   function noCvvToggle() {
     var shouldHideExpiryCVV = nocvvCheck.checked && !nocvvCheck.disabled;
-    //   _Doc.querySelector('#form-card').toggleClass('nocvv', shouldHideExpiryCVV);
   }
 
   function onSixDigits(e) {
@@ -95,13 +83,6 @@
       _Doc.querySelector('#emi_duration').value = '';
     }
 
-    //   showAppropriateEmiDetailsForNewCard( // Rajat, ask how to port this
-    //     this.tab,
-    //     emiObj,
-    //     trimmedVal.length,
-    //     this.methods
-    //   );
-
     if (trimmedVal.length >= 6) {
       var emiBankChangeEvent;
       if (typeof Event === 'function') {
@@ -125,12 +106,14 @@
   }
 
   export function onShown() {
+    session.setFormatting();
     let { customer } = session;
     session.otpView.updateScreen({
       maxlength: 6,
     });
     onSixDigits.call(this);
-    const remember = session.get('remember_customer');
+    remember = session.get('remember_customer');
+
     if (!remember) {
       // Rajat
       return session.setScreen('card');
@@ -171,7 +154,6 @@
   }
 
   export function showCards() {
-    console.log('this is showcards');
     setSavedCards();
     session.setScreen('card');
   }
@@ -237,7 +219,7 @@
 
     session.savedCardScreen = tokens;
 
-    session.toggleSavedCards(!!tokens);
+    toggleSavedCards(!!tokens);
 
     _El.toggleClass(_Doc.querySelector('#form-card'), 'has-cards'); //TODO: pure functions
 
@@ -246,16 +228,8 @@
     });
   }
 
-  //   function setScreen(){
-
-  //   }
-
-  //   export function onBack() {
-  //     showCopyButton(false, '');
-  //     return false;
-  //   }
-
   function getSelectableSavedCardElement(tab, token) {
+    // TODO: Remove this
     var selectors = {
       checked: '.saved-card.checked',
       saved: '.saved-card',
@@ -286,15 +260,7 @@
     return elem;
   }
 
-  export function shouldSubmit() {
-    alert(2);
-    // copyToClipboard('.neft-details', neftDetails.innerText);
-    // Analytics.track('bank_transfer:copy:click', {
-    //   type: AnalyticsTypes.BEHAV,
-    // });
-    // showCopyButton(true, 'COPIED');
-    // return false;
-  }
+  export function shouldSubmit() {}
 
   export function toggleSavedCards(value) {
     showSavedCards = value;
@@ -365,7 +331,7 @@
   }
 </script>
 
-<Tab method="card">
+<Tab method="card" pad={false}>
 
   {#if showSavedCards}
     <div id="saved-cards-container">

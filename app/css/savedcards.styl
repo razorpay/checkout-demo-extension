@@ -12,7 +12,7 @@ $savedcontainerh = 220px;
 $cardpl = 70px;
 
 .left-card {
-  display: none;
+  // display: none;
   padding: 0 20px 0 $cardpl;
   height: $cardHeights['default'];
   left: 0;
@@ -30,48 +30,21 @@ $cardpl = 70px;
   line-height: $cardHeights['default'];
   // display: none;
   cursor: pointer;
-  position: absolute;
+  // position: absolute;
   transition: 0.2s;
   transition-delay: 0.15s;
   z-index: 1;
 }
 
-#should-save-card {
-  display: none;
-}
 
 #savedcards-recurring-message{
   display: none;
 }
+
+
 #form-card {
   .saved-card {
-    pointer-events: none;
-  }
-  &:not(.saved-cards) {
-    #saved-cards-container {
-      margin-bottom: -8px;
-    }
-  }
-  &.saved-cards {
-    #elem-emi {
-      display: none;
-    }
-    #show-saved-cards {
-      transition-delay: 0s;
-      opacity: 0;
       pointer-events: none;
-    }
-    #show-add-card {
-      opacity: 1;
-    }
-
-    .maestro-cvv {
-      display: block;
-      font-size: 13px;
-      line-height: 32px;
-    }
-
-    .saved-card {
       height: $cardHeights['emi'];
       max-height: $cardHeights['default'];
       overflow: hidden;
@@ -103,16 +76,40 @@ $cardpl = 70px;
         }
       }
     }
-    .saved-inner,
+  .saved-inner,
     .saved-outer {
       opacity: 1;
     }
+  &:not(.saved-cards) {
+    #saved-cards-container {
+      margin-bottom: -8px;
+    }
+  }
+    #elem-emi {
+      display: none;
+    }
+    #show-saved-cards {
+      transition-delay: 0s;
+      // opacity: 0;
+      pointer-events: inherit;
+    }
+    #show-add-card {
+      opacity: 1;
+    }
+
+    .maestro-cvv {
+      display: block;
+      font-size: 13px;
+      line-height: 32px;
+    }
+
+    
+   
     .cardtype {
       transform: none;
     }
     #add-card-container {
       height: 55px;
-      opacity: 0;
       transform: translateY(-10px);
       z-index: 0;
     }
@@ -131,7 +128,6 @@ $cardpl = 70px;
     #show-saved-cards {
       display: block;
     }
-  }
 }
 
 .saved-card:last-child:not(:first-child) .cardtype {
@@ -340,16 +336,21 @@ $cardpl = 70px;
   z-index: 10;
 }
 
-.save-enabled {
-  .left-card,
+
+.left-card,
   #should-save-card {
     display: block;
   }
+// .save-enabled {
+//   .left-card,
+//   #should-save-card {
+//     display: block;
+//   }
 
-  #add-card-container {
-    height: 196px;
-  }
-}
+//   #add-card-container {
+//     height: 196px;
+//   }
+// }
 
 .cardtype::before, .networkicon {
   content: '';
@@ -529,7 +530,4 @@ $cardpl = 70px;
           .emi-plans-info-container
             margin-bottom: 12px;
 
-.tab-content
-  &:not(.saved-cards)
-    .saved-card
-      height: 0px !important;
+
