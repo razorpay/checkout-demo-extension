@@ -38,10 +38,6 @@
       '_[upiqr]': '1',
     });
 
-    if (session.p13n) {
-      processInstrument(paymentData);
-    }
-
     if (session.preferences.fee_bearer) {
       view = 'fee';
     } else {
@@ -50,8 +46,8 @@
 
     const downtimes = DowntimesStore.get();
 
-    down = _Arr.contains(downtimes.warn.methods, 'qr');
-    disabled = _Arr.contains(downtimes.disable.methods, 'qr');
+    down = _Arr.contains(downtimes.low.methods, 'qr');
+    disabled = _Arr.contains(downtimes.high.methods, 'qr');
   }
 
   function handleResponse({ data }) {
@@ -93,8 +89,8 @@
     view = 'qr';
     loading = true;
 
-    if (session.methodsList) {
-      processInstrument(paymentData);
+    if (session.p13n) {
+      session.p13nInstrument = processInstrument(paymentData);
     }
 
     /**
@@ -218,7 +214,7 @@
   {/if}
 
   {#if down || disabled}
-    <DowntimeCallout isHighSeverity={disabled}>
+    <DowntimeCallout severe={disabled}>
       <strong>UPI QR</strong>
       is experiencing low success rates.
     </DowntimeCallout>

@@ -17,12 +17,6 @@
   $: methodSupported = overrideMethodCheck || session.methods[method];
 </script>
 
-<style>
-  .hasMessage {
-    padding-bottom: 56px;
-  }
-</style>
-
 {#if methodSupported}
   <div
     {down}

@@ -29,7 +29,7 @@
     let retMethods = [];
 
     const downtimes = DowntimesStore.get() || {};
-    const down = downtimes.disable.methods || [];
+    const down = downtimes.high.methods || [];
 
     if (o('theme.debit_card')) {
       AVAIL_METHODS = _Arr.remove(AVAIL_METHODS, 'card');
