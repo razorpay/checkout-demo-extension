@@ -7,8 +7,9 @@ const {
   selectPaymentMethod,
   submit,
   enterCardDetails,
-  handleCardValidation,
+  handleCardValidationForNativeOTP,
   handleMockSuccessDialog,
+  handleBankRequest,
   typeOTPandSubmit,
   verifyOTP,
   resendOTP,
@@ -32,7 +33,7 @@ describe('Card tests', () => {
     await selectPaymentMethod(context, 'card');
     await enterCardDetails(context, { nativeOtp: true });
     await submit(context);
-    await handleCardValidation(context, { coproto: 'otp' });
+    await handleCardValidationForNativeOTP(context, { coproto: 'otp' });
     await typeOTPandSubmit(context);
     await verifyOTP(context, 'fail');
     await resendOTP(context);
@@ -56,9 +57,8 @@ describe('Card tests', () => {
     await selectPaymentMethod(context, 'card');
     await enterCardDetails(context, { nativeOtp: true });
     await submit(context);
-    await handleCardValidation(context);
-    const req = await context.expectRequest();
-    expect(req.url).toContain('localhost:9008');
+    await handleCardValidationForNativeOTP(context);
+    await handleBankRequest(context);
   });
 
   test('perform card transaction with native otp flow - go to bank', async () => {
@@ -77,7 +77,7 @@ describe('Card tests', () => {
     await selectPaymentMethod(context, 'card');
     await enterCardDetails(context, { nativeOtp: true });
     await submit(context);
-    await handleCardValidation(context, { coproto: 'otp' });
+    await handleCardValidationForNativeOTP(context, { coproto: 'otp' });
     await goToBankPage(context);
     await handleMockSuccessDialog(context);
   });
@@ -96,7 +96,9 @@ describe('Card tests', () => {
     await selectPaymentMethod(context, 'card');
     await enterCardDetails(context, { nativeOtp: true });
     await submit(context);
-    await handleCardValidation(context, { urlShouldContain: 'create/ajax' });
+    await handleCardValidationForNativeOTP(context, {
+      urlShouldContain: 'create/ajax',
+    });
     await handleMockSuccessDialog(context);
   });
 });
