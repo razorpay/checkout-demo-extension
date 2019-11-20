@@ -276,11 +276,12 @@ export function getAllInstrumentsForCustomer(customer) {
  * @param {Object} customer
  * @param {Object} extra
  *  @prop {Object} methods
+ *  @prop {Array} upiApps List of UPI apps on the device
  *
  * @returns {Array<Object>}
  */
 export const getInstrumentsForCustomer = (customer, extra = {}) => {
-  const { methods } = extra;
+  const { methods, upiApps } = extra;
 
   let instruments = getAllInstrumentsForCustomer(customer);
 
@@ -288,6 +289,7 @@ export const getInstrumentsForCustomer = (customer, extra = {}) => {
   instruments = filterInstruments({
     instruments,
     methods,
+    upiApps,
   });
 
   // Add score for each instrument

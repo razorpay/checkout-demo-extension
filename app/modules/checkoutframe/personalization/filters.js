@@ -1,4 +1,5 @@
 import { VPA_REGEX } from 'common/constants';
+import { doesAppExist } from 'common/upi';
 import DowntimesStore from 'checkoutstore/downtimes';
 
 /**
@@ -133,6 +134,27 @@ export function filterInstrumentsForDowntime(instruments) {
 }
 
 /**
+ * Returns the list of instruments filtered for available UPI apps
+ * @param {Array} instruments List of instruments
+ * @param {Array} apps List of UPI apps
+ *
+ * @returns {Array}
+ */
+function filterInstrumentsByAvailableUpiApps(instruments, apps) {
+  return _Arr.filter(instruments, instrument => {
+    if (instrument.method === 'upi' && instrument['_[flow]'] === 'intent') {
+      if (doesAppExist(instrument.upi_app, apps)) {
+        return true;
+      }
+
+      return false;
+    }
+
+    return true;
+  });
+}
+
+/**
  * Filters instruments for
  * - Sanity
  * - Downtime
@@ -140,18 +162,19 @@ export function filterInstrumentsForDowntime(instruments) {
  * @param {Object} params
  *  @prop {Array} instruments
  *  @prop {Object} methods
+ *  @prop {Array} upiApps List of UPI apps on the device
  *
  * @returns {Array} filtered instruments
  */
-export function filterInstruments({ instruments, methods }) {
-  const filteredByMethods = filterInstrumentsForAvailableMethods(
-    instruments,
-    methods
-  );
+export function filterInstruments({ instruments, methods, upiApps = [] }) {
+  let filtered = filterInstrumentsForAvailableMethods(instruments, methods);
+
+  filtered = filterInstrumentsByAvailableUpiApps(filtered, upiApps);
 
   return (
-    filteredByMethods
+    filtered
     |> filterInstrumentsForSanity
+    |> filterInstrumentsByAvailableUpiApps
     |> filterInstrumentsForDowntime
   );
 }
