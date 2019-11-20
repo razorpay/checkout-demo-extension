@@ -111,6 +111,15 @@
     line-height: 18px;
   }
 
+  /* Styles for "Edit v" button */
+  .home-details div[slot='extra'] {
+    display: flex;
+  }
+
+  .home-details div[slot='extra'] span {
+    display: block;
+  }
+
   .home-details div[slot='extra'] span:first-child {
     margin: 2px 4px 0;
     font-size: 1.2em;
@@ -118,14 +127,6 @@
 
   .home-details div[slot='extra'] span:last-child {
     transform: rotate(-90deg);
-  }
-
-  .home-details div[slot='extra'] span {
-    display: block;
-  }
-
-  .home-details div[slot='extra'] {
-    display: flex;
   }
 
   .home-details div[slot='title'] {
