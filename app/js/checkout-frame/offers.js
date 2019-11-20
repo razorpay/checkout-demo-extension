@@ -271,7 +271,7 @@ function initOffers(
      * @param {Boolean} shouldDisplay
      */
     display: function display(shouldDisplay) {
-      var isAttached = !!$el.parentElement;
+      var isAttached = document.body.contains($el.parentElement);
 
       if (!shouldDisplay) {
         shouldShowOfferList = false;
