@@ -1,11 +1,10 @@
+var dummyDiv = document.createElement('div');
 var selectedClass = ' selected',
   appliedClass = ' applied',
   discountClass = ' has-discount',
   singleOfferClass = 'single-offer';
 
 var createNode = function(html) {
-  var dummyDiv = document.createElement('div');
-
   dummyDiv.innerHTML = html;
   return dummyDiv.firstChild;
 };
