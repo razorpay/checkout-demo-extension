@@ -32,7 +32,7 @@
   }
 </style>
 
-<div class="screen">
+<div class="screen screen-comp">
   <div class="screen-main" class:pad>
     <slot name="main" />
   </div>
