@@ -18,16 +18,18 @@ const {
   verifyDiscountPaybleAmount,
   verifyDiscountText,
   verifyDiscountAmountInBanner,
+  handleFeeBearer,
 } = require('../../actions/common');
 
 describe('Card tests', () => {
-  test('perform card transaction with offers applied', async () => {
+  test('perform card transaction with offers and customer feebearer applied', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 1000,
       personalization: false,
     };
     const preferences = makePreferences({
+      fee_bearer: true,
       offers: [
         {
           original_amount: 200000,
@@ -70,6 +72,7 @@ describe('Card tests', () => {
     await verifyDiscountAmountInBanner(context, '₹ 1,980');
     await verifyDiscountText(context, 'You save ₹ 20');
     await submit(context);
+    await handleFeeBearer(context);
     await handleCardValidation(context);
     await handleMockFailureDialog(context);
     await verifyErrorMessage(context, 'The payment has already been processed');
@@ -79,7 +82,8 @@ describe('Card tests', () => {
     await verifyDiscountPaybleAmount(context, '₹ 1,980');
     await verifyDiscountAmountInBanner(context, '₹ 1,980');
     await verifyDiscountText(context, 'You save ₹ 20'),
-      await handleCardValidation(context);
+      await handleFeeBearer(context);
+    await handleCardValidation(context);
     await handleMockSuccessDialog(context);
   });
 });

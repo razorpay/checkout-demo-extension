@@ -7,11 +7,7 @@ const {
   selectPaymentMethod,
   submit,
   enterCardDetails,
-  handleCardValidation,
-  handleMockFailureDialog,
-  verifyErrorMessage,
-  retryCardTransaction,
-  handleMockSuccessDialog,
+  expectRedirectWithCallback,
   viewOffers,
   selectOffer,
   verifyOfferApplied,
@@ -21,11 +17,13 @@ const {
 } = require('../../actions/common');
 
 describe('Card tests', () => {
-  test('perform card transaction with offers applied', async () => {
+  test('perform successful card transaction with callback URL', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 1000,
+      amount: 200,
       personalization: false,
+      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
+      redirect: true,
     };
     const preferences = makePreferences({
       offers: [
@@ -62,7 +60,7 @@ describe('Card tests', () => {
     await fillUserDetails(context, true);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
-    await enterCardDetails(context, 'VISA');
+    await enterCardDetails(context);
     await viewOffers(context);
     await selectOffer(context, '1');
     await verifyOfferApplied(context);
@@ -70,16 +68,6 @@ describe('Card tests', () => {
     await verifyDiscountAmountInBanner(context, '₹ 1,980');
     await verifyDiscountText(context, 'You save ₹ 20');
     await submit(context);
-    await handleCardValidation(context);
-    await handleMockFailureDialog(context);
-    await verifyErrorMessage(context, 'The payment has already been processed');
-    await retryCardTransaction(context);
-    await submit(context);
-    await verifyOfferApplied(context);
-    await verifyDiscountPaybleAmount(context, '₹ 1,980');
-    await verifyDiscountAmountInBanner(context, '₹ 1,980');
-    await verifyDiscountText(context, 'You save ₹ 20'),
-      await handleCardValidation(context);
-    await handleMockSuccessDialog(context);
+    await expectRedirectWithCallback(context, { method: 'card' });
   });
 });

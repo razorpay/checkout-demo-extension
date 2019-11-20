@@ -11,7 +11,7 @@ const {
   handleMockFailureDialog,
   verifyErrorMessage,
   retryCardTransaction,
-  handleMockSuccessDialog,
+  verifyTimeout,
   viewOffers,
   selectOffer,
   verifyOfferApplied,
@@ -21,11 +21,12 @@ const {
 } = require('../../actions/common');
 
 describe('Card tests', () => {
-  test('perform card transaction with offers applied', async () => {
+  test('perform card transaction with offers applied and timeout enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 1000,
       personalization: false,
+      timeout: 10,
     };
     const preferences = makePreferences({
       offers: [
@@ -74,12 +75,6 @@ describe('Card tests', () => {
     await handleMockFailureDialog(context);
     await verifyErrorMessage(context, 'The payment has already been processed');
     await retryCardTransaction(context);
-    await submit(context);
-    await verifyOfferApplied(context);
-    await verifyDiscountPaybleAmount(context, '₹ 1,980');
-    await verifyDiscountAmountInBanner(context, '₹ 1,980');
-    await verifyDiscountText(context, 'You save ₹ 20'),
-      await handleCardValidation(context);
-    await handleMockSuccessDialog(context);
+    await verifyTimeout(context, 'card');
   });
 });

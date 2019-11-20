@@ -33,7 +33,45 @@ module.exports = {
   verifyDiscountText,
   verifyDiscountAmountInBanner,
   selectUPIIDFromDropDown,
+  passRequestNetbanking,
+  retryPayzappWalletTransaction,
 };
+
+async function retryPayzappWalletTransaction(context) {
+  const retryButton = await context.page.waitForSelector('#fd-hide');
+  await retryButton.click();
+}
+
+async function passRequestNetbanking(context) {
+  const successResult = { razorpay_payment_id: 'pay_DaFKujjV6Ajr7W' };
+  const req = await context.expectRequest();
+  //expect(req.url).toContain('status?key_id');
+  context.respondJSON({
+    type: 'first',
+    request: {
+      url:
+        'https://api-web.func.razorpay.in/v1/gateway/mocksharp/payment?key_id=rzp_test_csiPFCSLbrdDCO',
+      method: 'post',
+      content: {
+        action: 'authorize',
+        amount: 105,
+        method: 'netbanking',
+        payment_id: 'DewgcLMrzDlVRg',
+        callback_url:
+          'https://api-web.func.razorpay.in/v1/payments/pay_DewgcLMrzDlVRg/callback/c736f6c7af6f597606344637cbe802c7ebac24ca/rzp_test_csiPFCSLbrdDCO',
+        recurring: 0,
+      },
+    },
+    version: 1,
+    payment_id: 'pay_DewgcLMrzDlVRg',
+    gateway:
+      'eyJpdiI6IjJLaG5PSnF0NUV6TVJRdkRnajc1UFE9PSIsInZhbHVlIjoiczdQZEUrMGN2NFFneTJkQmJuUFwvb3hsUmpxdG1NNTUzaXpRaytpN0J2RDQ9IiwibWFjIjoiMzAzMTU2MmQwNzA0OWU1NjQ2OGI3MjNkOGQyNDAxZTM1MzA0YmFkZDQwNWFlODAyYTg1OGNiZTIwODgwYmI5ZSJ9',
+    amount: '\u20b9 1.05',
+    image: null,
+    magic: false,
+  });
+  await delay(500);
+}
 
 async function verifyDiscountAmountInBanner(context, expectedDiscountAmount) {
   const discount = await context.page.waitForSelector('#amount > .discount');

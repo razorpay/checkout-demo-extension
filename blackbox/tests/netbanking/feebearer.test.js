@@ -8,8 +8,8 @@ const {
   selectBank,
   assertNetbankingPage,
   submit,
-  failRequestwithErrorMessage,
-  verifyErrorMessage,
+  passRequestNetbanking,
+  handleMockSuccessDialog,
   handleFeeBearer,
 } = require('../../actions/common');
 
@@ -32,11 +32,7 @@ describe.skip('Netbanking tests', () => {
     await submit(context);
 
     await handleFeeBearer(context, page);
-
-    await context.popup();
-
-    const expectedErrorMeassage = 'Payment failed';
-    await failRequestwithErrorMessage(context, expectedErrorMeassage);
-    await verifyErrorMessage(context, expectedErrorMeassage);
+    await passRequestNetbanking(context);
+    await handleMockSuccessDialog(context);
   });
 });
