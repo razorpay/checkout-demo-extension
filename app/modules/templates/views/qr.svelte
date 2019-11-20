@@ -38,10 +38,6 @@
       '_[upiqr]': '1',
     });
 
-    if (session.p13n) {
-      processInstrument(paymentData);
-    }
-
     if (session.preferences.fee_bearer) {
       view = 'fee';
     } else {
@@ -93,8 +89,8 @@
     view = 'qr';
     loading = true;
 
-    if (session.methodsList) {
-      processInstrument(paymentData);
+    if (session.p13n) {
+      session.p13nInstrument = processInstrument(paymentData);
     }
 
     /**

@@ -927,8 +927,11 @@ function debounceAskOTP(view, msg, shouldLimitResend, screenProps) {
 
 // this === Session
 function successHandler(response) {
-  if (this.p13n) {
-    P13n.recordSuccess(this.customer || this.getCustomer(this.payload.contact));
+  if (this.p13n && this.p13nInstrument) {
+    P13n.recordSuccess(
+      this.p13nInstrument,
+      this.customer || this.getCustomer(this.payload.contact)
+    );
   }
 
   this.clearRequest();
@@ -3242,17 +3245,42 @@ Session.prototype = {
           var shouldUseP13n = self.p13n;
 
           if (this.isValid() && shouldUseP13n) {
-            instruments =
-              P13n.listInstruments(self.getCustomer(this.value)) || [];
+            instruments = P13n.getInstrumentsForCustomer(
+              self.getCustomer(this.value),
+              {
+                methods: self.methods,
+              }
+            );
 
             if (instruments.length) {
-              Analytics.track('p13:instruments:fetch', {
+              Analytics.setMeta('p13n', true);
+
+              // Determine the number of instruments to be shown
+              var listOfInstrumentsToBeShown = isMobile() ? 3 : 2;
+              var _preferredMethods = {};
+
+              /**
+               * Preprending method name with an underscore
+               * because Lumberjack will delete a key called `card`.
+               * It won't delete `_card` though.
+               */
+              _Arr.loop(
+                instruments.slice(0, listOfInstrumentsToBeShown),
+                function(instrument) {
+                  _preferredMethods['_' + instrument.method] = true;
+                }
+              );
+
+              Analytics.track('p13n:instruments:list', {
                 data: {
                   length: instruments.length,
+                  shown: Math.min(
+                    instruments.length,
+                    listOfInstrumentsToBeShown
+                  ),
+                  methods: _preferredMethods,
                 },
               });
-
-              Analytics.setMeta('p13n', true);
 
               /**
                * If the number of payment methods available
@@ -5641,7 +5669,10 @@ Session.prototype = {
 
     if (!this.screen && this.methodsList && this.p13n) {
       var selectedInstrument = this.methodsList.getSelectedInstrument();
-      this.doneByP13n = P13n.handleInstrument(data, selectedInstrument);
+      this.doneByP13n = P13n.addInstrumentToPaymentData(
+        data,
+        selectedInstrument
+      );
 
       /* TODO: the following code is the hack for ftx, fix it properly */
       if (this.doneByP13n) {
@@ -5942,7 +5973,7 @@ Session.prototype = {
     }
 
     if (this.p13n) {
-      P13n.processInstrument(data, this);
+      this.p13nInstrument = P13n.processInstrument(data, this);
     }
 
     if (this.isPayout) {
