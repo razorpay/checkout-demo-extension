@@ -1,6 +1,6 @@
 const { delay } = require('../util');
 
-async function handleOtpVerification(context, walletissuer) {
+async function handleOtpVerification(context, walletissuer = 'freecharge') {
   if (walletissuer == undefined) walletissuer = 'freecharge';
   const req = await context.expectRequest();
   expect(req.url).toContain('create/ajax');
