@@ -11,8 +11,8 @@ const {
   selectUPIApp,
 } = require('../../actions/common');
 
-describe('Basic upi payment', () => {
-  test('Perform keyless upi intent transaction with feebearer enabled', async () => {
+describe.skip('Basic upi payment', () => {
+  test('Perform upi intent transaction with feebearer enabled', async () => {
     const options = {
       order_id: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,

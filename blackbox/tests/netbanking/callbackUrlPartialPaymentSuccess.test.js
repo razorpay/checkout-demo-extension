@@ -10,8 +10,7 @@ const {
   assertNetbankingPage,
   submit,
   verifyPartialAmount,
-  handleCardValidationWithCallback,
-  expectMockSuccessWithCallback,
+  expectRedirectWithCallback,
 } = require('../../actions/common');
 
 describe('Netbanking tests', () => {
@@ -43,7 +42,9 @@ describe('Netbanking tests', () => {
     await selectBank(context, 'SBIN');
     await verifyPartialAmount(context, '₹ 100');
     await submit(context);
-    await handleCardValidationWithCallback(context);
-    await expectMockSuccessWithCallback(context);
+    await expectRedirectWithCallback(context, {
+      method: 'netbanking',
+      bank: 'SBIN',
+    });
   });
 });

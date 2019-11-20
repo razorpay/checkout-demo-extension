@@ -1,10 +1,24 @@
-const { interceptor } = require('../util');
+const {
+  interceptor,
+  chrnum,
+  randomBool,
+  randomItem,
+  randomEmail,
+  randomContact,
+  randomId,
+  randomName,
+  randomString,
+} = require('../util');
 
 const netbanking = require('../data/banks.json');
 const wallet = require('../data/wallets.json');
 const recurring = require('../data/recurring.json');
 const emi_options = require('../data/emi.json');
 const card = require('../data/cards.json');
+
+const cardNetworks = ['MasterCard', 'Visa'];
+
+const cardTypes = ['credit', 'debit'];
 
 const preferencesParams = [
   'currency',
@@ -45,21 +59,48 @@ async function sendPreferences({
   await respondJSON(preferences);
 }
 
+function makePreferences(overrides) {
+  return {
+    options: {},
+    methods: {
+      emi: true,
+      emi_subvention: 'customer',
+      ...card,
+      wallet,
+      netbanking,
+      emi_options,
+      recurring,
+    },
+    ...overrides,
+  };
+}
+
 module.exports = {
   sendPreferences,
-  makePreferences(overrides) {
+  makePreferences,
+
+  makePreferencesLogged(overrides) {
     return {
-      options: {},
-      methods: {
-        emi: true,
-        emi_subvention: 'customer',
-        ...card,
-        wallet,
-        netbanking,
-        emi_options,
-        recurring,
+      ...makePreferences(overrides),
+      customer: {
+        email: randomEmail(),
+        contact: randomContact(),
+        tokens: {
+          items: [
+            {
+              token: 'token_' + randomId(),
+              card: {
+                name: randomName(),
+                last4: randomString(chrnum)(4),
+                network: randomItem(cardNetworks),
+                type: randomItem(cardTypes),
+                issuer: randomItem(Object.keys(netbanking)),
+                international: randomBool(),
+              },
+            },
+          ],
+        },
       },
-      ...overrides,
     };
   },
 };

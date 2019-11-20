@@ -13,7 +13,7 @@ const {
   handleFeeBearer,
 } = require('../../actions/common');
 
-describe('Netbanking tests', () => {
+describe.skip('Netbanking tests', () => {
   test('perform netbanking transaction with fee bearer', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -33,7 +33,7 @@ describe('Netbanking tests', () => {
 
     await handleFeeBearer(context, page);
 
-    context.popup();
+    await context.popup();
 
     const expectedErrorMeassage = 'Payment failed';
     await failRequestwithErrorMessage(context, expectedErrorMeassage);

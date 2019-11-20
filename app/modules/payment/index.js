@@ -147,28 +147,13 @@ export default function Payment(data, params = {}, r) {
 
   this._time = _.now();
 
-  this.sdk_popup = params.sdk_popup;
-  this.magic = params.magic;
   this.optional = params.optional || {};
 
   params.feesRedirect = params.fees || params.feesRedirect; // params.fees has to be present for backward compatibility
 
-  this.isMagicPayment =
-    this.sdk_popup &&
-    this.magic &&
-    /^(card|emi)$/.test(data.method) &&
-    !params.feesRedirect;
-
-  this.magicPossible = this.isMagicPayment;
-
   const external = params.external || {};
   this.isExternalAmazonPayPayment = external.amazonpay;
   this.isExternalGooglePayPayment = external.gpay;
-
-  // If this is a magic payment, set auth_type=3ds in order to not use api-based-otpelf.
-  if (data && typeof data.auth_type === 'undefined' && this.isMagicPayment) {
-    data.auth_type = '3ds';
-  }
 
   // track data, params. we only track first 6 digits of card number, and remove cvv,expiry.
   trackNewPayment(data, params, r);
@@ -305,28 +290,6 @@ Payment.prototype = {
     this.r.off('payment');
   },
 
-  checkSdkPopup: function() {
-    var data = this.data;
-
-    if (this.sdk_popup) {
-      window.onpaymentcancel = _Func.bind(onPaymentCancel, this);
-    }
-
-    if (this.isMagicPayment) {
-      Analytics.track('magic_open_popup', {
-        r: this.r,
-      });
-      window.CheckoutBridge.invokePopup(
-        _Obj.stringify({
-          content: encodeURIComponent(popupTemplate(this)),
-          focus: false,
-        })
-      );
-
-      return true;
-    }
-  },
-
   checkRedirect: function() {
     var getOption = this.r.get;
 
@@ -382,7 +345,7 @@ Payment.prototype = {
     }
 
     // redirect if specified
-    if (!this.checkSdkPopup() && this.checkRedirect()) {
+    if (this.checkRedirect()) {
       return;
     }
 
@@ -394,7 +357,7 @@ Payment.prototype = {
     }
 
     // adding listeners
-    if ((isRazorpayFrame() && !this.avoidPopup) || this.isMagicPayment) {
+    if (isRazorpayFrame() && !this.avoidPopup) {
       setCompleteHandler();
     }
     this.offmessage = global |> _El.on('message', _Func.bind(onMessage, this));
@@ -465,12 +428,6 @@ Payment.prototype = {
 
     this.r._payment = null;
 
-    if (this.sdk_popup) {
-      window.onpaymentcancel = null;
-    }
-    if (this.isMagicPayment) {
-      window.handleRelay = null;
-    }
     if (this.ajax) {
       this.ajax.abort();
     }

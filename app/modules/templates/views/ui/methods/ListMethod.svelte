@@ -47,7 +47,7 @@
     <span class="downtime">
       <Tooltip
         bindTo="#list-options"
-        class="downtime-tooltip"
+        className="downtime-tooltip"
         align={['top', 'right']}>
         {downMessage}
       </Tooltip>
