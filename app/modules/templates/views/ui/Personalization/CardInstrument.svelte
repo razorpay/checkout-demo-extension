@@ -17,31 +17,17 @@
 
   const session = getSession();
 
-  /**
-   * Turns word into capital-case
-   * @param {string} word
-   *
-   * @returns {string}
-   */
-  function capitalizeWord(word) {
-    if (word.length) {
-      return `${word[0].toUpperCase()}${word.slice(1)}`;
-    }
-
-    return word;
-  }
-
   function getBankText(card, loggedIn) {
     const banks = PreferencesStore.get().methods.netbanking;
     const bank = banks[card.issuer] || '';
     const bankText = bank.replace(/ Bank$/, '');
 
     if (loggedIn) {
-      return `${bank ? `${bankText} ` : ''}${capitalizeWord(
+      return `${bank ? `${bankText} ` : ''}${_Str.toTitleCase(
         card.type || ''
       )} card - ${card.last4}`;
     } else {
-      return `Use your${bank ? ` ${bankText}` : ''} ${capitalizeWord(
+      return `Use your${bank ? ` ${bankText}` : ''} ${_Str.toTitleCase(
         card.type || ''
       )} card`;
     }
