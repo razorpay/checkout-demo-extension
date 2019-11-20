@@ -790,6 +790,7 @@ function cancelHandler(response) {
 function getPhone() {
   var el = gel('contact');
 
+  // TOREMOVE: Homescreen
   if (el) {
     return el.value;
   } else {
