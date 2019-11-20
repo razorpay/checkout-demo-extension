@@ -3,35 +3,32 @@ const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
-  assertPaymentMethods,
-  selectPaymentMethod,
-  selectBank,
-  assertNetbankingPage,
+  verifyAutoSelectBankTPV,
   submit,
   passRequestNetbanking,
   handleMockSuccessDialog,
-  handleFeeBearer,
 } = require('../../actions/common');
-
-describe.skip('Netbanking tests', () => {
-  test('perform netbanking transaction with fee bearer', async () => {
+describe('Third Party Verification test', () => {
+  test('Perform Third Party Verification transaction with contact optional', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 600,
+      amount: 200,
       personalization: false,
     };
-
-    const preferences = makePreferences({ fee_bearer: true });
+    const preferences = makePreferences({
+      optional: ['contact'],
+      order: {
+        amount: 20000,
+        currency: 'INR',
+        account_number: '1234567891234567',
+        bank: 'SBIN',
+      },
+    });
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
-    await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'netbanking');
-    await assertNetbankingPage(context);
-    await selectBank(context, 'SBIN');
+    await fillUserDetails(context, false);
+    await verifyAutoSelectBankTPV(context, 'State Bank of India');
     await submit(context);
-
-    await handleFeeBearer(context);
     await passRequestNetbanking(context);
     await handleMockSuccessDialog(context);
   });

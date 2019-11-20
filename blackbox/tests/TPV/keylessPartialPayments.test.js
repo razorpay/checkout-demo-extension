@@ -3,32 +3,28 @@ const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
-  assertPaymentMethods,
-  selectPaymentMethod,
-  assertNetbankingPage,
-  selectBank,
+  verifyAutoSelectBankTPV,
   submit,
-  handlePartialPayment,
-  verifyPartialAmount,
   passRequestNetbanking,
   handleMockSuccessDialog,
-  handleFeeBearer,
+  handlePartialPayment,
+  verifyPartialAmount,
 } = require('../../actions/common');
-
-describe.skip('Netbanking tests', () => {
-  test('perform netbanking transaction with partial payments and feebearer enabled', async () => {
+describe('Third Party Verification test', () => {
+  test('Perform Keyless Third Party Verification transaction with Partial Payments enabled', async () => {
     const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+      order_id: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 20000,
       personalization: false,
     };
     const preferences = makePreferences({
-      fee_bearer: true,
       order: {
         amount: 20000,
+        currency: 'INR',
+        account_number: '1234567891234567',
+        bank: 'SBIN',
         amount_due: 20000,
         amount_paid: 0,
-        currency: 'INR',
         first_payment_min_amount: null,
         partial_payment: true,
       },
@@ -37,15 +33,9 @@ describe.skip('Netbanking tests', () => {
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true);
     await handlePartialPayment(context, '100');
-    await assertPaymentMethods(context);
-
-    await selectPaymentMethod(context, 'netbanking');
-    await assertNetbankingPage(context);
-    await selectBank(context, 'SBIN');
+    await verifyAutoSelectBankTPV(context, 'State Bank of India');
     await verifyPartialAmount(context, '₹ 100');
     await submit(context);
-
-    await handleFeeBearer(context);
     await passRequestNetbanking(context);
     await handleMockSuccessDialog(context);
   });

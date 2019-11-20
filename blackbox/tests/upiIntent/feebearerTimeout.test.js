@@ -33,7 +33,7 @@ describe.skip('Basic upi payment', () => {
     await selectPaymentMethod(context, 'upi');
     await selectUPIApp(context, '1');
     await submit(context);
-    await handleFeeBearer(context, page);
+    await handleFeeBearer(context);
     await verifyTimeout(context, 'upi');
   });
 });

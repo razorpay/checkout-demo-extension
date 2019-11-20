@@ -3,33 +3,30 @@ const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
-  assertPaymentMethods,
-  selectPaymentMethod,
-  enterCardDetails,
+  verifyAutoSelectBankTPV,
   submit,
-  selectEMIPlanWithoutOffer,
-  verifyEMIPlansWithoutOffers,
-  handleEMIValidation,
+  passRequestNetbanking,
   handleMockSuccessDialog,
+  handleFeeBearer,
   handlePartialPayment,
   verifyPartialAmount,
-  handleFeeBearer,
 } = require('../../actions/common');
-
-describe.skip('EMI tests', () => {
-  test('perform EMI transaction with partial payments and feebearer enabled', async () => {
+describe('Third Party Verification test', () => {
+  test('Perform Third Party Verification transaction with customer feebearer and Partial Payments enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 500000,
+      amount: 200,
       personalization: false,
     };
     const preferences = makePreferences({
       fee_bearer: true,
       order: {
-        amount: 300000,
-        amount_due: 300000,
-        amount_paid: 0,
+        amount: 20000,
         currency: 'INR',
+        account_number: '1234567891234567',
+        bank: 'SBIN',
+        amount_due: 20000,
+        amount_paid: 0,
         first_payment_min_amount: null,
         partial_payment: true,
       },
@@ -37,17 +34,12 @@ describe.skip('EMI tests', () => {
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true);
-    await handlePartialPayment(context, '3000');
-    await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'emi');
-    await enterCardDetails(context);
-    await submit(context);
-    await verifyEMIPlansWithoutOffers(context, '6');
-    await selectEMIPlanWithoutOffer(context, '2');
-    await verifyPartialAmount(context, '₹ 3,000');
+    await handlePartialPayment(context, '100');
+    await verifyAutoSelectBankTPV(context, 'State Bank of India');
+    await verifyPartialAmount(context, '₹ 100');
     await submit(context);
     await handleFeeBearer(context);
-    await handleEMIValidation(context);
+    await passRequestNetbanking(context);
     await handleMockSuccessDialog(context);
   });
 });
