@@ -47,32 +47,31 @@ const METHOD_FILTERS = {
  *
  * @returns {Array}
  */
-export function filterInstrumentsForAvailableMethods(
-  instruments,
-  availableMethods
-) {
-  // TODO: Move Downtime logic to this function
+export const filterInstrumentsForAvailableMethods = _.curry2(
+  (instruments, availableMethods) => {
+    // TODO: Move Downtime logic to this function
 
-  const allowed = _Arr.filter(instruments, instrument => {
-    let { method } = instrument;
+    const allowed = _Arr.filter(instruments, instrument => {
+      let { method } = instrument;
 
-    if (instrument['_[upiqr]']) {
-      method = 'qr';
-    }
-
-    if (availableMethods[method]) {
-      if (METHOD_FILTERS[method]) {
-        return METHOD_FILTERS[method](instrument, availableMethods);
+      if (instrument['_[upiqr]']) {
+        method = 'qr';
       }
 
-      return true;
-    }
+      if (availableMethods[method]) {
+        if (METHOD_FILTERS[method]) {
+          return METHOD_FILTERS[method](instrument, availableMethods);
+        }
 
-    return false;
-  });
+        return true;
+      }
 
-  return allowed;
-}
+      return false;
+    });
+
+    return allowed;
+  }
+);
 
 const SANITY_FILTERS = {
   upi: instrument => {
@@ -140,7 +139,7 @@ export function filterInstrumentsForDowntime(instruments) {
  *
  * @returns {Array}
  */
-function filterInstrumentsByAvailableUpiApps(instruments, apps) {
+const filterInstrumentsByAvailableUpiApps = _.curry2((instruments, apps) => {
   return _Arr.filter(instruments, instrument => {
     if (instrument.method === 'upi' && instrument['_[flow]'] === 'intent') {
       if (doesAppExist(instrument.upi_app, apps)) {
@@ -152,7 +151,7 @@ function filterInstrumentsByAvailableUpiApps(instruments, apps) {
 
     return true;
   });
-}
+});
 
 /**
  * Filters instruments for
@@ -167,14 +166,11 @@ function filterInstrumentsByAvailableUpiApps(instruments, apps) {
  * @returns {Array} filtered instruments
  */
 export function filterInstruments({ instruments, methods, upiApps = [] }) {
-  let filtered = filterInstrumentsForAvailableMethods(instruments, methods);
-
-  filtered = filterInstrumentsByAvailableUpiApps(filtered, upiApps);
-
   return (
-    filtered
+    instruments
+    |> filterInstrumentsForAvailableMethods(methods)
+    |> filterInstrumentsByAvailableUpiApps(upiApps)
     |> filterInstrumentsForSanity
-    |> filterInstrumentsByAvailableUpiApps
     |> filterInstrumentsForDowntime
   );
 }
