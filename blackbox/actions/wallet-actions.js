@@ -27,7 +27,6 @@ async function selectWallet(context, walletName) {
 async function handleWalletPopUp(context) {
   await delay(200);
   let popup = await context.popup();
-  // console.log(popup);
   let popupPage = await popup.page;
   const ContactField = await popupPage.waitForSelector('[name = contact]');
   const contactNum = randomContact();
