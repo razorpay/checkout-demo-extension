@@ -17,6 +17,7 @@
     getMethodNameForPaymentOption,
     getMethodDescription,
   } from 'checkoutframe/paymentmethods';
+  import DowntimesStore from 'checkoutstore/downtimes';
 
   const session = getSession();
   const dispatch = createEventDispatcher();
@@ -27,8 +28,11 @@
   const _subtitle = subtitle || getMethodDescription(method, { session });
 
   function select(event) {
+    const downtimes = DowntimesStore.get();
+    const down = downtimes.high.methods || [];
+
     dispatch('select', {
-      down: false, // TODO
+      down: _Arr.contains(down, method),
       method,
     });
   }
