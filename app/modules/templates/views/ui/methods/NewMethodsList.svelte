@@ -55,9 +55,9 @@
   }
 
   function setInstruments() {
-    let customer = session.getCustomer($contact);
+    const customer = session.getCustomer($contact);
 
-    let instruments = getInstrumentsForCustomer(customer, {
+    const instruments = getInstrumentsForCustomer(customer, {
       methods: session.methods,
       upiApps: session.upi_intents_data,
     });
