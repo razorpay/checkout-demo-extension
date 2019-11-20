@@ -14,7 +14,7 @@
   import { getInstrumentsForCustomer } from 'checkoutframe/personalization';
 
   // Store
-  import { contact } from 'checkoutstore/screens/home';
+  import { contact, selectedInstrumentId } from 'checkoutstore/screens/home';
 
   const session = getSession();
   let visibleMethods = [];
@@ -64,7 +64,7 @@
 
     visibleInstruments = instruments.slice(0, 3);
 
-    if (selectedInstrumentId) {
+    if ($selectedInstrumentId) {
       const selected = _Arr.find(
         visibleInstruments,
         instrument => instrument.id === selectedInstrumentId
@@ -76,14 +76,12 @@
     }
   }
 
-  let selectedInstrumentId;
-
   function selectP13nInstrument(instrument) {
-    selectedInstrumentId = instrument.id;
+    $selectedInstrumentId = instrument.id;
   }
 
   function deselectInstrument() {
-    selectedInstrumentId = null;
+    $selectedInstrumentId = null;
   }
 
   setMethods(session.methods);
@@ -117,13 +115,13 @@
       <CardInstrument
         name="p13n"
         {instrument}
-        selected={instrument.id === selectedInstrumentId}
+        selected={instrument.id === $selectedInstrumentId}
         on:click={() => selectP13nInstrument(instrument)} />
     {:else}
       <Instrument
         name="p13n"
         {instrument}
-        selected={instrument.id === selectedInstrumentId}
+        selected={instrument.id === $selectedInstrumentId}
         on:click={() => selectP13nInstrument(instrument)} />
     {/if}
   {/each}
