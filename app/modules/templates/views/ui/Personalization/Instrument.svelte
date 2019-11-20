@@ -2,6 +2,7 @@
   // UI imports
   import Field from 'templates/views/ui/Field.svelte';
   import SlottedRadioOption from 'templates/views/ui/options/Slotted/RadioOption.svelte';
+  import Icon from 'templates/views/ui/Icon.svelte';
 
   // Utils imports
   import { findCodeByNetworkName } from 'common/card';
@@ -83,11 +84,7 @@
   className="p13n-instrument"
   on:click>
   <i slot="icon">
-    {#if typeof icon === 'string' && icon.indexOf('http') === 0}
-      <img src={icon} {alt} />
-    {:else}
-      {@html icon}
-    {/if}
+    <Icon {icon} {alt} />
   </i>
   <div slot="title">{text}</div>
 </SlottedRadioOption>
