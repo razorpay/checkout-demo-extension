@@ -3,20 +3,24 @@ const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
+  assertPersonalizationPage,
   assertPaymentMethodsPersonalization,
+  selectBank,
+  assertNetbankingPage,
   submit,
   passRequestNetbanking,
   handleMockSuccessDialog,
-  assertPersonalizationPage,
+  handleFeeBearer,
 } = require('../../actions/common');
 
-describe('Basic Netbanking with Personalization', () => {
-  test('Perform Netbanking with Personalization transaction', async () => {
+describe('Netbanking tests', () => {
+  test('perform netbanking transaction with Personalization and fee bearer', async () => {
     const options = {
-      key: 'rzp_test_VwsqHDsQPoVQi6',
+      key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 60000,
     };
-    const preferences = makePreferences();
+
+    const preferences = makePreferences({ fee_bearer: true });
     const context = await openCheckoutForPersonalization({
       page,
       options,
@@ -28,6 +32,8 @@ describe('Basic Netbanking with Personalization', () => {
     await assertPersonalizationPage(context, 'Netbanking');
     await assertPaymentMethodsPersonalization(context);
     await submit(context);
+
+    await handleFeeBearer(context, page);
     await passRequestNetbanking(context);
     await handleMockSuccessDialog(context);
   });

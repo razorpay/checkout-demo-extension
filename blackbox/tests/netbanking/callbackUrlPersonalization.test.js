@@ -3,18 +3,19 @@ const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
+  assertPersonalizationPage,
   assertPaymentMethodsPersonalization,
   submit,
-  passRequestNetbanking,
-  handleMockSuccessDialog,
-  assertPersonalizationPage,
+  expectRedirectWithCallback,
 } = require('../../actions/common');
 
-describe('Basic Netbanking with Personalization', () => {
-  test('Perform Netbanking with Personalization transaction', async () => {
+describe('Netbanking Personalization tests', () => {
+  test('perform netbaking transaction with Personalization and callback url', async () => {
     const options = {
       key: 'rzp_test_VwsqHDsQPoVQi6',
-      amount: 60000,
+      amount: 200,
+      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
+      redirect: true,
     };
     const preferences = makePreferences();
     const context = await openCheckoutForPersonalization({
@@ -28,7 +29,9 @@ describe('Basic Netbanking with Personalization', () => {
     await assertPersonalizationPage(context, 'Netbanking');
     await assertPaymentMethodsPersonalization(context);
     await submit(context);
-    await passRequestNetbanking(context);
-    await handleMockSuccessDialog(context);
+    await expectRedirectWithCallback(context, {
+      method: 'netbanking',
+      bank: 'HDFC',
+    });
   });
 });

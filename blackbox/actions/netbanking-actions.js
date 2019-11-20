@@ -21,6 +21,15 @@ async function assertNetbankingPage(context) {
   ).toEqual(true);
 }
 
+async function assertNetbankingPageForPersonalization(context) {
+  expect(
+    await context.page.waitForXPath(
+      '//*[contains(text(), "Netbanking") and @class="option-title"]'
+    )
+  ).not.toBeNull();
+}
+
 module.exports = {
   assertNetbankingPage,
+  assertNetbankingPageForPersonalization,
 };
