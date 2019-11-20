@@ -6853,6 +6853,10 @@ Session.prototype = {
       if (order.bank) {
         options['prefill.bank'] = order.bank;
       }
+
+      if (order.auth_type) {
+        options['prefill.auth_type'] = order.auth_type;
+      }
     }
   },
 
