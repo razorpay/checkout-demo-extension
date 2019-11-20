@@ -23,7 +23,6 @@
 
   // Computed
   export let identifier;
-  let _type;
 
   // Refs
   export let wrap = null;
