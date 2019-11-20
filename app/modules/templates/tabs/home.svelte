@@ -207,7 +207,7 @@
                 <span>{$email}</span>
               {/if}
             </div>
-            <div slot="extra" class="theme-highlight-color">
+            <div slot="extra" class="theme-highlight-color" aria-label="Edit">
               <span>Edit</span>
               <span>&#xe604;</span>
             </div>
