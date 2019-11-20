@@ -15,7 +15,7 @@
 <style>
   :global(.has-offers) .offers-portal {
     display: block !important;
-    position: unset;
+    position: static;
     transform: none !important;
     bottom: unset;
   }
