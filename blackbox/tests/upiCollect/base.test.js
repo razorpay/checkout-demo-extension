@@ -5,36 +5,33 @@ const {
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
-  selectWallet,
-  assertWalletPage,
   submit,
-  handleOtpVerification,
-  typeOTPandSubmit,
-  handleCardValidationWithCallback,
-  expectMockFailureWithCallback,
+  selectUPIMethod,
+  enterUPIAccount,
+  handleUPIAccountValidation,
+  respondToUPIAjax,
+  respondToUPIPaymentStatus,
 } = require('../../actions/common');
 
-describe.skip('Basic wallet payment', () => {
-  test('Perform wallet transaction', async () => {
+describe('Basic upi payment', () => {
+  test('Perform upi collect transaction', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
       personalization: false,
-      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
-      redirect: true,
     };
     const preferences = makePreferences();
+    preferences.methods.upi = true;
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true);
     await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'wallet');
-    await assertWalletPage(context);
-    await selectWallet(context, 'freecharge');
+    await selectPaymentMethod(context, 'upi');
+    await selectUPIMethod(context, 'BHIM');
+    await enterUPIAccount(context, 'BHIM');
     await submit(context);
-    await handleOtpVerification(context);
-    await typeOTPandSubmit(context);
-    await handleCardValidationWithCallback(context);
-    await expectMockFailureWithCallback(context);
+    await handleUPIAccountValidation(context, 'BHIM@upi');
+    await respondToUPIAjax(context, '');
+    await respondToUPIPaymentStatus(context);
   });
 });

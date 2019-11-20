@@ -7,8 +7,7 @@ const {
   selectPaymentMethod,
   submit,
   enterCardDetails,
-  handleCardValidationWithCallback,
-  expectMockSuccessWithCallback,
+  expectRedirectWithCallback,
 } = require('../../actions/common');
 
 describe('Card tests', () => {
@@ -28,7 +27,6 @@ describe('Card tests', () => {
     await selectPaymentMethod(context, 'card');
     await enterCardDetails(context);
     await submit(context);
-    await handleCardValidationWithCallback(context);
-    await expectMockSuccessWithCallback(context);
+    await expectRedirectWithCallback(context, { method: 'card' });
   });
 });

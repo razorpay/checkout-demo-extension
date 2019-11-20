@@ -16,7 +16,9 @@ const {
   handleMockSuccessDialog,
 } = require('../../actions/common');
 
-describe.skip('Card tests', () => {
+const querystring = require('querystring');
+
+describe('Card tests', () => {
   test('perform card transaction', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -35,24 +37,10 @@ describe.skip('Card tests', () => {
     await enterCardDetails(context);
     await submit(context);
 
-    const errorMessage = 'payment failed because this is a test';
-    await callbackPage(context, { error: { description: errorMessage } });
-
-    await delay(1000);
-    // TODO put error message check here
-    // expect(page.$('fd-t'));
-    await page.click('#fd-hide');
-
-    await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
-    await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'card');
-    await enterCardDetails(context);
-    await submit(context);
-
-    const successResult = { razorpay_payment_id: 'pay_Successful' };
-    await callbackPage(context, successResult);
-    const result = await context.getResult();
-    expect(result).toMatchObject(successResult);
+    // TODO make this versatile
+    const req = await context.expectRequest();
+    expect(req.raw.isNavigationRequest()).toBe(true);
+    expect(req.method).toBe('POST');
+    expect(querystring.parse(req.body)).toMatchObject({ method: 'card' });
   });
 });

@@ -48,13 +48,7 @@ const optionsTransformer = {
   },
 
   addFeatures: (o, message) => {
-    const features = [
-      'sdk_popup',
-      'magic',
-      'activity_recreated',
-      'embedded',
-      'params',
-    ];
+    const features = ['activity_recreated', 'embedded', 'params'];
     const options = message.options;
 
     _Obj.loop(features, feature => {

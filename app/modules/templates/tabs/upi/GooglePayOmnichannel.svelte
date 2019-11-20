@@ -24,6 +24,9 @@
   const dispatch = createEventDispatcher();
   const session = getSession();
 
+  // Computed
+  const amount = session.formatAmountWithCurrency(session.get('amount'));
+
   onMount(() => {
     const customer = session.customer;
 
@@ -114,7 +117,8 @@
     </p>
   {:else}
     <p class="info">
-      You will receive a notification from Razorpay, in the Google Pay app.
+      You will get a request of {amount} in your Google Pay app linked with this
+      mobile number.
     </p>
   {/if}
 {/if}

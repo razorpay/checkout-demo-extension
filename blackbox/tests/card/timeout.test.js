@@ -14,7 +14,7 @@ const {
   verifyTimeout,
 } = require('../../actions/common');
 
-describe('Card tests', () => {
+describe.skip('Card tests', () => {
   test('perform card transaction with timeout enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
