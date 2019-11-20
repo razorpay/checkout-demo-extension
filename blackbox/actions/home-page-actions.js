@@ -1,4 +1,4 @@
-const { visible, randomContact, randomEmail } = require('../util');
+const { visible, randomContact, randomEmail, delay } = require('../util');
 const { readFileSync } = require('fs');
 
 contents = String(

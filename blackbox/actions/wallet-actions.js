@@ -25,7 +25,7 @@ async function selectWallet(context, walletName) {
 }
 
 async function handleWalletPopUp(context) {
-  await delay(500);
+  await delay(200);
   let popup = await context.popup();
   let popupPage = await popup.page;
   const ContactField = await popupPage.waitForSelector('[name = contact]');
