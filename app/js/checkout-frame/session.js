@@ -38,8 +38,7 @@ var preferences = window.preferences,
   PayLaterView = discreet.PayLaterView,
   OtpService = discreet.OtpService,
   storeGetter = discreet.storeGetter,
-  HomeScreenStore = discreet.HomeScreenStore;
-  OtpService = discreet.OtpService,
+  HomeScreenStore = discreet.HomeScreenStore,
   Cta = discreet.Cta;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
@@ -212,6 +211,10 @@ function setEmiPlansCta(screen, tab) {
     type = 'confirm-account';
   }
 
+  if (screen === '' && session.newHomeScreen) {
+    type = 'proceed';
+  }
+
   switch (type) {
     case 'pay':
       Cta.setAppropriateCtaText();
@@ -234,7 +237,7 @@ function setEmiPlansCta(screen, tab) {
       break;
 
     case 'proceed':
-      $('.proceed').removeClass('invisible');
+      Cta.updateCta('Proceed');
       break;
   }
 }
