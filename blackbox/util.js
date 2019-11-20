@@ -132,6 +132,12 @@ const util = (module.exports = {
         body: JSON.stringify(body),
       });
 
+    returnObj.respondJSONP = body =>
+      respond({
+        contentType: 'text/javascript; charset=UTF-8',
+        body: `Razorpay.jsonp0(${JSON.stringify(body)})`,
+      });
+
     returnObj.respondHTML = body =>
       respond({
         contentType: 'text/html',
