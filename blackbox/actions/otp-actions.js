@@ -1,6 +1,6 @@
 const { delay } = require('../util');
 
-async function handleOtpVerification(context) {
+async function handleOtpVerification(context, walletissuer = 'freecharge') {
   const req = await context.expectRequest();
   expect(req.url).toContain('create/ajax');
   await context.respondJSON({
@@ -15,7 +15,7 @@ async function handleOtpVerification(context) {
     contact: '+919999999999',
     amount: '51.00',
     formatted_amount: '\u20b9 51',
-    wallet: 'freecharge',
+    wallet: walletissuer,
     merchant: 'RBL Bank',
   });
 }

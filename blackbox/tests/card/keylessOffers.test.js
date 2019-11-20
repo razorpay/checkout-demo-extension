@@ -21,9 +21,9 @@ const {
 } = require('../../actions/common');
 
 describe('Card tests', () => {
-  test('perform card transaction with offers applied', async () => {
+  test('perform keyless card transaction with offers applied', async () => {
     const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+      order_id: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 1000,
       personalization: false,
     };

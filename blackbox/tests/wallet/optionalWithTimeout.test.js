@@ -29,8 +29,6 @@ describe.skip('Wallet payment', () => {
     await selectPaymentMethod(context, 'wallet');
     await assertWalletPage(context);
     await selectWallet(context, 'freecharge');
-    await submit(context);
-    await validateHelpMessage(context, 'The contact field is required.');
     await verifyTimeout(context, 'wallet');
   });
 });
