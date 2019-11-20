@@ -32,7 +32,7 @@ describe.skip('EMI tests', () => {
     await verifyEMIPlansWithoutOffers(context, '6');
     await selectEMIPlanWithoutOffer(context, '2');
     await submit(context);
-    await handleFeeBearer(context, page);
+    await handleFeeBearer(context);
     await handleEMIValidation(context);
     await handleMockSuccessDialog(context);
   });
