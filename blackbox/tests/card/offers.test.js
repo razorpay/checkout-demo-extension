@@ -21,7 +21,7 @@ const {
 } = require('../../actions/common');
 
 describe('Card tests', () => {
-  test('perform card transaction', async () => {
+  test('perform card transaction with offers applied', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 1000,
@@ -68,7 +68,8 @@ describe('Card tests', () => {
     await verifyOfferApplied(context);
     await verifyDiscountPaybleAmount(context, '₹ 1,980');
     await verifyDiscountAmountInBanner(context, '₹ 1,980');
-    await verifyDiscountText(context, 'You save ₹ 20'), await submit(context);
+    await verifyDiscountText(context, 'You save ₹ 20');
+    await submit(context);
     await handleCardValidation(context);
     await handleMockFailureDialog(context);
     await verifyErrorMessage(context, 'The payment has already been processed');

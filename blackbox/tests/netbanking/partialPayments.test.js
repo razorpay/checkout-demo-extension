@@ -10,8 +10,8 @@ const {
   submit,
   handlePartialPayment,
   verifyPartialAmount,
-  failRequestwithErrorMessage,
-  verifyErrorMessage,
+  passRequestNetbanking,
+  handleMockSuccessDialog,
 } = require('../../actions/common');
 
 describe('Netbanking tests', () => {
@@ -42,9 +42,7 @@ describe('Netbanking tests', () => {
     await selectBank(context, 'SBIN');
     await verifyPartialAmount(context, '₹ 100');
     await submit(context);
-
-    const expectedErrorMeassage = 'Payment failed';
-    await failRequestwithErrorMessage(context, expectedErrorMeassage);
-    await verifyErrorMessage(context, expectedErrorMeassage);
+    await passRequestNetbanking(context);
+    await handleMockSuccessDialog(context);
   });
 });
