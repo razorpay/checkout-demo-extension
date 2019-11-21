@@ -44,6 +44,7 @@ var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
 var shouldFixFixed = /iPhone/.test(ua);
 var ua_iPhone = shouldFixFixed;
 var isIE = /MSIE |Trident\//.test(ua);
+var DEMO_MERCHANT_KEY = 'rzp_live_ILgsfZCZoFIKMb';
 
 function getStore(prop) {
   return Store.get()[prop];
@@ -843,7 +844,7 @@ function askOTP(view, text, shouldLimitResend, screenProps) {
   if (!text) {
     if (thisSession.tab === 'card' || thisSession.tab === 'emi') {
       if (thisSession.headless) {
-        Analytics.track('headless:otp:ask');
+        Analytics.track('native_otp:otp:ask');
         text = 'Enter OTP to complete the payment';
         if (isNonNullObject(origText)) {
           if (origText.metadata) {
@@ -885,7 +886,7 @@ function askOTP(view, text, shouldLimitResend, screenProps) {
               thisSession.hideTimer();
               thisSession.back(true);
               setTimeout(function() {
-                Analytics.track('headless:timeout');
+                Analytics.track('native_otp:timeout');
                 thisSession.showLoadError(
                   'Payment was not completed on time',
                   1
@@ -982,7 +983,16 @@ function Session(message) {
 
 Session.prototype = {
   shouldUseNativeOTP: function() {
-    return this.get('nativeotp') && this.r.isLiveMode();
+    // For demo merchant, if the flow is present, we want to use Native OTP without checking for network.
+    var isDemoMerchant = this.get('key') === DEMO_MERCHANT_KEY;
+
+    var redirectModeWithNativeOtp =
+      this.get('nativeotp') &&
+      this.get('callback_url') &&
+      this.get('redirect') &&
+      this.r.isLiveMode();
+
+    return isDemoMerchant || redirectModeWithNativeOtp;
   },
 
   getDecimalAmount: getDecimalAmount,
@@ -1439,6 +1449,7 @@ Session.prototype = {
 
         this.renderOffers(this.screen);
 
+        // For portals, this tracking snippet is present in the Svelte component of Offer Portal.
         $offersContainer.on('click', function(e) {
           $offersTitle = $offersTitle || this.querySelector('.offers-title');
 
@@ -2460,7 +2471,7 @@ Session.prototype = {
   secAction: function() {
     if (this.headless && this.r._payment) {
       if (!this.get('timeout')) {
-        Analytics.track('headless:gotobank', {
+        Analytics.track('native_otp:gotobank', {
           type: AnalyticsTypes.BEHAV,
           immediately: true,
         });
@@ -3567,7 +3578,30 @@ Session.prototype = {
       }
     }
 
-    $('#body').toggleClass('has-offers', this.offers.numVisibleOffers > 0);
+    /**
+     * On some screens, there might be an offers portal available.
+     * We render the Offers strip inside that portal.
+     *
+     * If a portal is available, use that portal.
+     * Otherwise, fall back to the default container.
+     */
+    var usingPortal = false;
+    var offersPortal = _Doc.querySelector(
+      this.getActiveForm() + ' .offers-portal'
+    );
+    var offersContainer = _Doc.querySelector('#offers-container');
+    var hasOffers = this.offers.numVisibleOffers > 0;
+
+    usingPortal = Boolean(offersPortal);
+
+    if (usingPortal) {
+      offersContainer = offersPortal;
+    }
+
+    this.offers.updateContainerRef(offersContainer);
+
+    $('#body').toggleClass('has-offers', hasOffers);
+    $('#body').toggleClass('using-offers-portal', usingPortal);
   },
 
   /**
@@ -5887,8 +5921,7 @@ Session.prototype = {
           this.nativeotp &&
           discreet.Flows.shouldUseNativeOtpForCardPayment(
             data,
-            this.transformedTokens,
-            this.get('key')
+            this.transformedTokens
           )
         ) {
           shouldUseNativeOTP = true;
@@ -5906,15 +5939,19 @@ Session.prototype = {
 
       if (shouldUseNativeOTP) {
         this.headless = true;
-        Analytics.track('headless:attempt');
+        Analytics.track('native_otp:attempt');
         this.setScreen('otp');
         this.r.on('payment.otp.required', function(data) {
           askOTP(that.otpView, data);
         });
 
         request.nativeotp = true;
-        request.iframe = true;
-        Analytics.track('iframe:attempt');
+
+        // Only demo merchant supports iframe for now.
+        if (this.get('key') === DEMO_MERCHANT_KEY) {
+          request.iframe = true;
+          Analytics.track('iframe:attempt');
+        }
       }
     }
 
@@ -6830,6 +6867,10 @@ Session.prototype = {
 
       if (order.bank) {
         options['prefill.bank'] = order.bank;
+      }
+
+      if (order.auth_type) {
+        options['prefill.auth_type'] = order.auth_type;
       }
     }
   },

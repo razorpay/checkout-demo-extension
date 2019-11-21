@@ -14,7 +14,7 @@ const {
   handleFeeBearer,
 } = require('../../actions/common');
 
-describe.skip('EMI tests', () => {
+describe('EMI tests', () => {
   test('perform keyless EMI transaction with Feebearer enabled', async () => {
     const options = {
       order_id: 'rzp_test_1DP5mmOlF5G5ag',
@@ -32,7 +32,7 @@ describe.skip('EMI tests', () => {
     await verifyEMIPlansWithoutOffers(context, '6');
     await selectEMIPlanWithoutOffer(context, '2');
     await submit(context);
-    await handleFeeBearer(context, page);
+    await handleFeeBearer(context);
     await handleEMIValidation(context);
     await handleMockSuccessDialog(context);
   });

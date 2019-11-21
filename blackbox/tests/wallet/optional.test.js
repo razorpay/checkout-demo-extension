@@ -8,10 +8,10 @@ const {
   selectWallet,
   assertWalletPage,
   submit,
-  validateHelpMessage,
+  handleWalletPopUp,
 } = require('../../actions/common');
 
-describe.skip('Wallet payment', () => {
+describe('Wallet payment', () => {
   test('Perform wallet transaction with contact as optional', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -26,8 +26,8 @@ describe.skip('Wallet payment', () => {
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'wallet');
     await assertWalletPage(context);
-    await selectWallet(context, 'freecharge');
+    await selectWallet(context, 'payzapp');
     await submit(context);
-    await validateHelpMessage(context, 'The contact field is required.');
+    await handleWalletPopUp(context);
   });
 });

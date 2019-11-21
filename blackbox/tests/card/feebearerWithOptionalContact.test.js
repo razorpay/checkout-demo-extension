@@ -15,7 +15,7 @@ const {
   handleMockFailureDialog,
 } = require('../../actions/common');
 
-describe.skip('Card tests', () => {
+describe('Card tests', () => {
   test('perform card transaction with customer feebearer enabled and contact optional', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -33,13 +33,13 @@ describe.skip('Card tests', () => {
     await selectPaymentMethod(context, 'card');
     await enterCardDetails(context);
     await submit(context);
-    await handleFeeBearer(context, page);
+    await handleFeeBearer(context);
     await handleCardValidation(context);
     await handleMockFailureDialog(context);
     // await verifyErrorMessage(context, 'The payment has already been processed');
     await retryCardTransaction(context);
     await submit(context);
-    await handleFeeBearer(context, page);
+    await handleFeeBearer(context);
     await handleCardValidation(context);
     await handleMockSuccessDialog(context);
   });

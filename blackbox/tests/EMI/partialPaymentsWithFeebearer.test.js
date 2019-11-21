@@ -16,7 +16,7 @@ const {
   handleFeeBearer,
 } = require('../../actions/common');
 
-describe.skip('EMI tests', () => {
+describe('EMI tests', () => {
   test('perform EMI transaction with partial payments and feebearer enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -46,7 +46,7 @@ describe.skip('EMI tests', () => {
     await selectEMIPlanWithoutOffer(context, '2');
     await verifyPartialAmount(context, '₹ 3,000');
     await submit(context);
-    await handleFeeBearer(context, page);
+    await handleFeeBearer(context);
     await handleEMIValidation(context);
     await handleMockSuccessDialog(context);
   });

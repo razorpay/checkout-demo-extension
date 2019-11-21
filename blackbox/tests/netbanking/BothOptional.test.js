@@ -7,7 +7,8 @@ const {
   assertNetbankingPage,
   selectBank,
   submit,
-  handleValidationRequest,
+  passRequestNetbanking,
+  handleMockSuccessDialog,
 } = require('../../actions/common');
 
 describe('Netbanking tests', () => {
@@ -25,6 +26,7 @@ describe('Netbanking tests', () => {
     await assertNetbankingPage(context);
     await selectBank(context, 'SBIN');
     await submit(context);
-    await handleValidationRequest(context, 'fail');
+    await passRequestNetbanking(context);
+    await handleMockSuccessDialog(context);
   });
 });

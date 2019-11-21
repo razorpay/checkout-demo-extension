@@ -113,6 +113,6 @@ export const AVAILABLE_METHODS = [
 ];
 
 /* VPA regex, copied from API */
-export const VPA_REGEX = /^[a-z0-9][a-z0-9.-]{2,}@[a-zA-Z]+$/;
+export const VPA_REGEX = /^[a-z0-9][a-z0-9.-]{2,}@[a-z]+$/i;
 
 export const NO_PAYMENT_ADAPTER_ERROR = 'Payment Adapter does not exist.';

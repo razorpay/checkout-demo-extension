@@ -995,7 +995,7 @@ $outline = #ddd;
   border-radius: 3px;
 }
 
-#offers-container {
+.offers-container {
   display: none;
   width: 100%;
   position: absolute;
@@ -1296,12 +1296,18 @@ $outline = #ddd;
     float: right;
   }
 
-  #offers-container {
+  &.using-offers-portal {
+    #offers-container {
+      display: none;
+    }  
+  }
+
+  .offers-container {
     /* need 99 z-index due to pay button in card screen */
     z-index: 99;
   }
 
-  #offers-container {
+  .offers-container {
     bottom: -($topbarh) + 2px;
     display: block;
     background-color: #fff;
@@ -1313,7 +1319,7 @@ $outline = #ddd;
   }
 
   &[screen] {
-    #offers-container {
+    .offers-container {
       transform: translate(0, -100%);
       margin-top: 0;
       border-radius: 0;
@@ -1328,7 +1334,7 @@ $outline = #ddd;
   }
 
   .tab-content {
-    &#form-wallet, &#form-card, &#form-upi {
+    &#form-wallet, &#form-card {
       bottom: $topbarh;
     }
 
@@ -1798,7 +1804,6 @@ $outline = #ddd;
         border-top: 1px solid $bc;
       }
     }
-
     .auth-option.item {
       i {
         width: 27px;

@@ -1,6 +1,6 @@
 <script>
   // Refs
-  let file;
+  let fileInput;
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -29,6 +29,8 @@
 
   // Computed
   let view;
+
+  let file;
 
   $: view = file ? 'confirm' : 'upload';
   $: {
@@ -105,7 +107,7 @@
    * Removes the file
    */
   function removeFile() {
-    file.value = '';
+    fileInput.value = '';
 
     let event;
     if (typeof global.Event === 'function') {
@@ -115,7 +117,7 @@
       event.initEvent('change', true, true);
     }
 
-    file.dispatchEvent(event);
+    fileInput.dispatchEvent(event);
   }
 
   /**
@@ -143,7 +145,7 @@
           upload();
         } else {
           // Select file
-          file.click();
+          fileInput.click();
           return false;
         }
       }
@@ -248,7 +250,7 @@
     <div slot="main">
       <input
         type="file"
-        bind:this={file}
+        bind:this={fileInput}
         class="hidden"
         on:change={selectFile}
         accept={ALLOWED_EXTS.join(',')} />
