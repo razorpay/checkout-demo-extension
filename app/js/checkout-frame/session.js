@@ -3031,6 +3031,10 @@ Session.prototype = {
   },
 
   focus: function(e) {
+    if (_El.hasClass(e.target, 'no-focus')) {
+      return;
+    }
+
     $(e.target.parentNode).addClass('focused');
     setTimeout(function() {
       $(e.target).scrollIntoView();
@@ -3041,6 +3045,10 @@ Session.prototype = {
   },
 
   blur: function(e) {
+    if (_El.hasClass(e.target, 'no-blur')) {
+      return;
+    }
+
     $(e.target.parentNode)
       .removeClass('focused')
       .addClass('mature');
