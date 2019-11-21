@@ -14,7 +14,7 @@ function getBlackhole() {
   if (!blackhole) {
     blackhole = document.createElement('div');
 
-    blackhole.id = 'blackhole';
+    blackhole.setAttribute('id', 'blackhole');
     blackhole.classList.add('hidden');
 
     document.body.appendChild(blackhole);
