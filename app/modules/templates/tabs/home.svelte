@@ -9,6 +9,7 @@
   import NewMethodsList from 'templates/views/ui/methods/NewMethodsList.svelte';
   import Icon from 'templates/views/ui/Icon.svelte';
   import OffersPortal from 'templates/views/OffersPortal.svelte';
+  import Address from 'templates/views/address.svelte';
 
   // Svelte imports
   import { onMount } from 'svelte';
@@ -18,6 +19,9 @@
   import {
     contact,
     email,
+    address,
+    pincode,
+    state,
     selectedInstrumentId,
   } from 'checkoutstore/screens/home';
 
@@ -54,7 +58,7 @@
   const order = session.order || {};
   const cardOffer = session.cardOffer;
 
-  const address = o('address');
+  const showAddress = o('address');
   const bank = session.tpvBank || {};
 
   const icons = session.themeMeta.icons;
@@ -540,6 +544,116 @@
               helpText="Please enter a valid email. Example: you@example.com" />
           </div>
         </div>
+        {#if order.partial_payment}
+          <div class="partial-payment-block">
+            <PartialPaymentOptions />
+          </div>
+        {/if}
+        {#if showAddress && !order.partial_payment}
+          <Address
+            bind:address={$address}
+            bind:pincode={$pincode}
+            bind:state={$state}
+            states={entries(session.states)} />
+        {/if}
+        {#if session.multiTpv}
+          <!-- TODO: move to separate component -->
+          <div class="multi-tpv input-radio centered">
+            <div class="multi-tpv-header">Pay Using</div>
+            <input
+              checked
+              type="radio"
+              name="method"
+              id="multitpv-netb"
+              value="netbanking" />
+            <label for="multitpv-netb">
+              <i>
+                <img src="https://cdn.razorpay.com/bank/{bank.code}.gif" />
+              </i>
+              <div class="radio-display" />
+              <div class="label-content">A/C: {bank.account_number}</div>
+              <span>{bank.name}</span>
+            </label>
+            <input type="radio" name="method" id="multitpv-upi" value="upi" />
+            <label for="multitpv-upi">
+              <i>
+                {@html icons.upi}
+              </i>
+              <div class="radio-display" />
+              <div class="label-content">UPI Payment</div>
+              <span>{bank.name} Account {bank.account_number}</span>
+            </label>
+          </div>
+        {:else if session.tpvBank}
+          <!-- TODO: move to separate component -->
+          <div class="customer-bank-details">
+            <div class="bank-name">
+              {#if bank.logo}
+                <img src={bank.logo} />
+              {/if}
+              {#if bank.name}{bank.name}{:else}Bank Details{/if}
+            </div>
+            {#if bank.account_number}
+              <div class="account-details clearfix">
+                <div>Account Number</div>
+                <div>{bank.account_number}</div>
+              </div>
+            {/if}
+            {#if accountName}
+              <div class="account-details clearfix">
+                <div>Customer Name</div>
+                <div>{accountName}</div>
+              </div>
+            {/if}
+            {#if contactEmailOptional && bank.ifsc}
+              <div class="account-details clearfix">
+                <div>IFSC code</div>
+                <div class="text-uppercase">{bank.ifsc}</div>
+              </div>
+            {/if}
+          </div>
+        {/if}
+        <!-- TODO: move condition to computed/prop -->
+        {#if session.recurring && session.tab !== 'emandate' && session.methods.count === 1 && methods.card}
+          <!-- TODO: use Callout -->
+          <div class="pad recurring-message">
+            <span>&#x2139;</span>
+            {#if o('subscription_id')}
+              {#if methods.debit_card && methods.credit_card}
+                Subscription payments are supported on Visa and Mastercard
+                Credit Cards from all Banks and Debit Cards from ICICI, Kotak,
+                Citibank and Canara Bank.
+              {:else if methods.debit_card}
+                Subscription payments are only supported on Visa and Mastercard
+                Debit Cards from ICICI, Kotak, Citibank and Canara Bank.
+              {:else}
+                Subscription payments are only supported on Mastercard and Visa
+                Credit Cards.
+              {/if}
+            {:else if methods.debit_card && methods.credit_card}
+              Visa and Mastercard Credit Cards from all Banks and Debit Cards
+              from ICICI, Kotak, Citibank and Canara Bank are supported for this
+              payment.
+            {:else if methods.debit_card}
+              Only Visa and Mastercard Debit Cards from ICICI, Kotak, Citibank
+              and Canara Bank are supported for this payment.
+            {:else}
+              Only Visa and Mastercard Credit Cards are supported for this
+              payment.
+            {/if}
+          </div>
+        {/if}
+        <!-- TODO: move to separate component -->
+        {#if cardOffer}
+          <div class="pad" id="card-offer">
+            {#if cardOffer.name}
+              <div class="text-btn">
+                <strong>{cardOffer.name}</strong>
+              </div>
+            {/if}
+            {#if cardOffer.display_text}{cardOffer.display_text}{/if}
+          </div>
+        {/if}
       {/if}
 
       {#if view === 'methods'}
@@ -577,153 +691,7 @@
             on:selectMethod={selectMethod} />
         </div>
       {/if}
-
-      {#if order.partial_payment}
-        <div class="partial-payment-block">
-          <PartialPaymentOptions />
-        </div>
-      {/if}
-      <!-- TODO move to separate component -->
-      {#if address && !order.partial_payment}
-        <div class="elem-wrap" id="elem-wrap-address">
-          <!-- TODO: use field -->
-          <div class="elem elem-address">
-            <div class="help">Address should be atleast 10 characters long</div>
-            <label>Address</label>
-            <textarea
-              class="input"
-              name="address"
-              type="text"
-              id="address"
-              required
-              pattern="[\s\S]{10}"
-              maxlength="200"
-              rows="2" />
-          </div>
-        </div>
-        <div class="elem-wrap">
-          <!-- TODO: use field -->
-          <div class="elem">
-            <div class="help">Enter 6 digit pincode</div>
-            <label>PIN Code</label>
-            <input
-              class="input"
-              required
-              pattern="^\d{6}$"
-              maxlength="6"
-              id="pincode" />
-          </div>
-        </div>
-        <div class="elem-wrap">
-          <div class="elem select elem-state">
-            <div class="help">Select a value from list of states</div>
-            <i class="select-arrow">&#xe601;</i>
-            <select class="input" required id="state">
-              <option value="">Select State</option>
-              {#each entries(session.states) as [code, text]}
-                <option value={code}>{text}</option>
-              {/each}
-            </select>
-          </div>
-        </div>
-      {/if}
-      {#if session.multiTpv}
-        <!-- TODO: move to separate component -->
-        <div class="multi-tpv input-radio centered">
-          <div class="multi-tpv-header">Pay Using</div>
-          <input
-            checked
-            type="radio"
-            name="method"
-            id="multitpv-netb"
-            value="netbanking" />
-          <label for="multitpv-netb">
-            <i>
-              <img src="https://cdn.razorpay.com/bank/{bank.code}.gif" />
-            </i>
-            <div class="radio-display" />
-            <div class="label-content">A/C: {bank.account_number}</div>
-            <span>{bank.name}</span>
-          </label>
-          <input type="radio" name="method" id="multitpv-upi" value="upi" />
-          <label for="multitpv-upi">
-            <i>
-              {@html icons.upi}
-            </i>
-            <div class="radio-display" />
-            <div class="label-content">UPI Payment</div>
-            <span>{bank.name} Account {bank.account_number}</span>
-          </label>
-        </div>
-      {:else if session.tpvBank}
-        <!-- TODO: move to separate component -->
-        <div class="customer-bank-details">
-          <div class="bank-name">
-            {#if bank.logo}
-              <img src={bank.logo} />
-            {/if}
-            {#if bank.name}{bank.name}{:else}Bank Details{/if}
-          </div>
-          {#if bank.account_number}
-            <div class="account-details clearfix">
-              <div>Account Number</div>
-              <div>{bank.account_number}</div>
-            </div>
-          {/if}
-          {#if accountName}
-            <div class="account-details clearfix">
-              <div>Customer Name</div>
-              <div>{accountName}</div>
-            </div>
-          {/if}
-          {#if contactEmailOptional && bank.ifsc}
-            <div class="account-details clearfix">
-              <div>IFSC code</div>
-              <div class="text-uppercase">{bank.ifsc}</div>
-            </div>
-          {/if}
-        </div>
-      {/if}
     </div>
-    <!-- TODO: move condition to computed/prop -->
-    {#if session.recurring && session.tab !== 'emandate' && session.methods.count === 1 && methods.card}
-      <!-- TODO: use Callout -->
-      <div class="pad recurring-message">
-        <span>&#x2139;</span>
-        {#if o('subscription_id')}
-          {#if methods.debit_card && methods.credit_card}
-            Subscription payments are supported on Visa and Mastercard Credit
-            Cards from all Banks and Debit Cards from ICICI, Kotak, Citibank and
-            Canara Bank.
-          {:else if methods.debit_card}
-            Subscription payments are only supported on Visa and Mastercard
-            Debit Cards from ICICI, Kotak, Citibank and Canara Bank.
-          {:else}
-            Subscription payments are only supported on Mastercard and Visa
-            Credit Cards.
-          {/if}
-        {:else if methods.debit_card && methods.credit_card}
-          Visa and Mastercard Credit Cards from all Banks and Debit Cards from
-          ICICI, Kotak, Citibank and Canara Bank are supported for this payment.
-        {:else if methods.debit_card}
-          Only Visa and Mastercard Debit Cards from ICICI, Kotak, Citibank and
-          Canara Bank are supported for this payment.
-        {:else}
-          Only Visa and Mastercard Credit Cards are supported for this payment.
-        {/if}
-      </div>
-    {/if}
-    <!-- TODO: move to separate component -->
-    {#if cardOffer}
-      <div class="pad" id="card-offer">
-        {#if cardOffer.name}
-          <div class="text-btn">
-            <strong>{cardOffer.name}</strong>
-          </div>
-        {/if}
-        {#if cardOffer.display_text}{cardOffer.display_text}{/if}
-      </div>
-    {/if}
 
     <div slot="bottom">
       {#if view !== 'methods'}
