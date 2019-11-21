@@ -88,9 +88,10 @@
         method => method === session.oneMethod
       );
 
-      const hasP13nInstruments = false; // TODO
+      const canUseP13n =
+        shouldUseP13n() && getInstruments().length && singleMethod;
 
-      return Boolean(singleMethod);
+      return canUseP13n;
     }
 
     return true;
@@ -167,7 +168,6 @@
   let instruments;
   $: {
     if (view === 'methods') {
-      debugger;
       personalization = shouldUseP13n();
 
       if (personalization) {

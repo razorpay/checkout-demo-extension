@@ -5372,18 +5372,36 @@ Session.prototype = {
     if (storeScreen === 'amount') {
       return this.extraNext();
     }
+
     if (this.oneMethod && !this.tab) {
-      setTimeout(function() {
-        window.scrollTo(0, 100);
-      });
+      // Is the user on the new UI and on the methods screen in that UI?
+      var onNewMethodsUi =
+        this.newHomeScreen && !this.homeTab.onMethodsScreen();
 
       /**
-       * PayPal as a one-method submits
-       * directly from the homescreen.
-       * Do not switch the tab for it.
+       * If the user is on the new UI,
+       * we need to check if the user
+       * can directly go ahead to the
+       * method.
+       * If the user can, we should let them.
        */
-      if (this.oneMethod !== 'paypal') {
-        return this.switchTab(this.oneMethod);
+
+      var shouldStopFromGoingToMethod =
+        onNewMethodsUi && this.homeTab.shouldShowMethodsScreen();
+
+      if (!shouldStopFromGoingToMethod) {
+        setTimeout(function() {
+          window.scrollTo(0, 100);
+        });
+
+        /**
+         * PayPal as a one-method submits
+         * directly from the homescreen.
+         * Do not switch the tab for it.
+         */
+        if (this.oneMethod !== 'paypal') {
+          return this.switchTab(this.oneMethod);
+        }
       }
     }
 
@@ -5408,7 +5426,7 @@ Session.prototype = {
     if (!screen && this.newHomeScreen) {
       if (this.checkCommonValid()) {
         // switch to methods tab
-        this.homeTab.showMethods();
+        return this.homeTab.showMethods();
       }
     }
 
