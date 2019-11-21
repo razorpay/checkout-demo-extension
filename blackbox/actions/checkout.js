@@ -31,6 +31,8 @@ function checkoutRequestHandler(request) {
       body: fontContent,
       headers: { 'Access-Control-Allow-Origin': '*' },
     });
+  } else if (url.startsWith('https://lumberjack.razorpay.com')) {
+    return request.respond({ status: 200 });
   } else {
     throw new Error(
       `unexpected resource URL while loading checkout-public: ${url}`

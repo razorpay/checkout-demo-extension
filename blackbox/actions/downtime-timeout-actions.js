@@ -24,7 +24,8 @@ async function verifyTimeout(context, paymentMode) {
     paymentMode == 'netbanking' ||
     paymentMode == 'card' ||
     paymentMode == 'upi' ||
-    paymentMode == 'emi'
+    paymentMode == 'emi' ||
+    paymentMode == 'tpv'
   ) {
     await delay(1000);
     expect(await context.page.$('#fd-hide')).not.toEqual(null);

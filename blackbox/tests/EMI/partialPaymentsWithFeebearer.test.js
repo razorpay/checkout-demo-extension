@@ -46,7 +46,7 @@ describe.skip('EMI tests', () => {
     await selectEMIPlanWithoutOffer(context, '2');
     await verifyPartialAmount(context, '₹ 3,000');
     await submit(context);
-    await handleFeeBearer(context, page);
+    await handleFeeBearer(context);
     await handleEMIValidation(context);
     await handleMockSuccessDialog(context);
   });

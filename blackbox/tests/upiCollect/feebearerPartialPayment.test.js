@@ -46,7 +46,7 @@ describe.skip('Basic upi payment', () => {
     await verifyPartialAmount(context, '₹ 100');
     await submit(context);
     await handleUPIAccountValidation(context, 'BHIM@upi');
-    await handleFeeBearer(context, page);
+    await handleFeeBearer(context);
     await respondToUPIAjax(context, '');
     await respondToUPIPaymentStatus(context);
   });
