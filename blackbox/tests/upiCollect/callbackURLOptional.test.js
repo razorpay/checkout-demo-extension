@@ -9,13 +9,11 @@ const {
   selectUPIMethod,
   enterUPIAccount,
   handleUPIAccountValidation,
-  respondToUPIAjax,
-  respondToUPIPaymentStatus,
   expectRedirectWithCallback,
 } = require('../../actions/common');
 
-describe.skip('Basic upi payment', () => {
-  test('Perform upi collect transaction', async () => {
+describe('Basic upi payment', () => {
+  test('Perform upi collect transaction with callbackURL and contact optional', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
@@ -23,19 +21,17 @@ describe.skip('Basic upi payment', () => {
       callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
       redirect: true,
     };
-    const preferences = makePreferences();
+    const preferences = makePreferences({ optional: ['contact'] });
     preferences.methods.upi = true;
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
+    await fillUserDetails(context, false);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await selectUPIMethod(context, 'BHIM');
     await enterUPIAccount(context, 'BHIM');
     await submit(context);
     await handleUPIAccountValidation(context, 'BHIM@upi');
-    await respondToUPIAjax(context, '');
-    await respondToUPIPaymentStatus(context);
     await expectRedirectWithCallback(context, { method: 'upi' });
   });
 });

@@ -87,9 +87,11 @@ async function expectRedirectWithCallback(context, fields) {
   const apiUrl = 'https://api.razorpay.com/v1/payments/create/';
   expect(request.method).toEqual('POST');
   if (fields) expect(body).toMatchObject(fields);
-  expect(request.url).toEqual(
-    apiUrl + (context.preferences.fees ? 'fees' : 'checkout')
-  );
+  let apiSuffix = '';
+  if (context.preferences.fees) apiSuffix = 'fees';
+  else if (context.preferences.methods.upi) apiSuffix = 'ajax';
+  else apiSuffix = 'checkout';
+  expect(request.url).toEqual(apiUrl + apiSuffix);
 
   expect(body.callback_url).toEqual(context.options.callback_url);
 }
