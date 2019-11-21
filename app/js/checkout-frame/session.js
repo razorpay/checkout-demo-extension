@@ -1459,6 +1459,7 @@ Session.prototype = {
 
         this.renderOffers(this.screen);
 
+        // For portals, this tracking snippet is present in the Svelte component of Offer Portal.
         $offersContainer.on('click', function(e) {
           $offersTitle = $offersTitle || this.querySelector('.offers-title');
 
@@ -3602,7 +3603,30 @@ Session.prototype = {
       }
     }
 
-    $('#body').toggleClass('has-offers', this.offers.numVisibleOffers > 0);
+    /**
+     * On some screens, there might be an offers portal available.
+     * We render the Offers strip inside that portal.
+     *
+     * If a portal is available, use that portal.
+     * Otherwise, fall back to the default container.
+     */
+    var usingPortal = false;
+    var offersPortal = _Doc.querySelector(
+      this.getActiveForm() + ' .offers-portal'
+    );
+    var offersContainer = _Doc.querySelector('#offers-container');
+    var hasOffers = this.offers.numVisibleOffers > 0;
+
+    usingPortal = Boolean(offersPortal);
+
+    if (usingPortal) {
+      offersContainer = offersPortal;
+    }
+
+    this.offers.updateContainerRef(offersContainer);
+
+    $('#body').toggleClass('has-offers', hasOffers);
+    $('#body').toggleClass('using-offers-portal', usingPortal);
   },
 
   /**

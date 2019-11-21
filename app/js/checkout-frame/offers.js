@@ -266,6 +266,12 @@ function initOffers(
       this.display(visibleOffers.length !== 0);
     },
 
+    updateContainerRef: function(newContainer) {
+      newContainer.appendChild($el);
+
+      $container = newContainer;
+    },
+
     /**
      * Display or hide Offers based on the param passed
      * @param {Boolean} shouldDisplay
