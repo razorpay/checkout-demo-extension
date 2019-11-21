@@ -9,33 +9,32 @@ const {
   submit,
   enterCardDetails,
   handleCardValidationForNativeOTP,
-  typeOTPandSubmit,
-  verifyOTP,
-  resendOTP,
 } = require('../../actions/common');
 
 describe('Card tests', () => {
-  test('perform card transaction with native otp flow', async () => {
+  test('perform card transaction with native otp flow - type first response', async () => {
     const options = {
       key: 'rzp_live_ILgsfZCZoFIKMbnativeotp',
       amount: 200,
       personalization: false,
-      callback_url: 'https://google.com',
+      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
       redirect: true,
     };
     const preferences = makePreferences({ mode: 'live' });
-    const context = await openCheckout({ page, options, preferences });
+    const context = await openSdkCheckout({ page, options, preferences });
     await assertHomePage(context);
     await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
     await enterCardDetails(context, { nativeOtp: true });
     await submit(context);
-    await handleCardValidationForNativeOTP(context, { coproto: 'otp' });
-    await typeOTPandSubmit(context);
-    await verifyOTP(context, 'fail');
-    await resendOTP(context);
-    await typeOTPandSubmit(context);
-    await verifyOTP(context, 'pass');
+    await handleCardValidationForNativeOTP(context);
+
+    const result = JSON.parse(await context.getResult());
+    expect(result).toEqual({
+      url: 'https://api.razorpay.com/bank',
+      method: 'get',
+      content: [],
+    });
   });
 });
