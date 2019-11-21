@@ -84,6 +84,12 @@ export function input(node, condition = true) {
   }
   node.addEventListener('input', onInput);
 
+  if (node.value) {
+    onInput({
+      target: node,
+    });
+  }
+
   return {
     destroy: () => node.removeEventListener('input', onInput),
   };
