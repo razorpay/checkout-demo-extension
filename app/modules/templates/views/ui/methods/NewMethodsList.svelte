@@ -1,4 +1,8 @@
 <script>
+  // Props
+  export let personalization = false;
+  export let instruments = [];
+
   // UI imports
   import Method from 'templates/views/ui/methods/Method.svelte';
   import CardInstrument from 'templates/views/ui/Personalization/CardInstrument.svelte';
@@ -54,19 +58,10 @@
     visibleMethods = available;
   }
 
-  function setInstruments() {
-    const customer = session.getCustomer($contact);
-
-    const instruments = getInstrumentsForCustomer(customer, {
-      methods: session.methods,
-      upiApps: session.upi_intents_data,
-    });
-
-    visibleInstruments = instruments.slice(0, 3);
-
+  $: {
     if ($selectedInstrumentId) {
       const selected = _Arr.find(
-        visibleInstruments,
+        instruments || [],
         instrument => instrument.id === selectedInstrumentId
       );
 
@@ -85,7 +80,6 @@
   }
 
   setMethods(session.methods);
-  setInstruments();
 
   function selectMethod(event) {
     Analytics.track('p13:method:select', {
@@ -109,23 +103,25 @@
   }
 </style>
 
-<div class="border-list">
-  {#each visibleInstruments as instrument, index (instrument.id)}
-    {#if instrument.method === 'card'}
-      <CardInstrument
-        name="p13n"
-        {instrument}
-        selected={instrument.id === $selectedInstrumentId}
-        on:click={() => selectP13nInstrument(instrument)} />
-    {:else}
-      <Instrument
-        name="p13n"
-        {instrument}
-        selected={instrument.id === $selectedInstrumentId}
-        on:click={() => selectP13nInstrument(instrument)} />
-    {/if}
-  {/each}
-</div>
+{#if personalization}
+  <div class="border-list">
+    {#each visibleInstruments as instrument, index (instrument.id)}
+      {#if instrument.method === 'card'}
+        <CardInstrument
+          name="p13n"
+          {instrument}
+          selected={instrument.id === $selectedInstrumentId}
+          on:click={() => selectP13nInstrument(instrument)} />
+      {:else}
+        <Instrument
+          name="p13n"
+          {instrument}
+          selected={instrument.id === $selectedInstrumentId}
+          on:click={() => selectP13nInstrument(instrument)} />
+      {/if}
+    {/each}
+  </div>
+{/if}
 
 <div class="methods-container border-list">
   {#each visibleMethods as method}

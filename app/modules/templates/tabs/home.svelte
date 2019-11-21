@@ -8,12 +8,21 @@
   import SlottedOption from 'templates/views/ui/options/Slotted/Option.svelte';
   import NewMethodsList from 'templates/views/ui/methods/NewMethodsList.svelte';
 
+  // Svelte imports
   import { slide, fly } from 'svelte/transition';
 
+  // Store
   import { contact, email } from 'checkoutstore/screens/home';
 
+  // Utils imports
+  import { getSession } from 'sessionmanager';
+  import CheckoutStore from 'checkoutstore';
+  import { getInstrumentsForCustomer } from 'checkoutframe/personalization';
+
+  const session = getSession();
+
+  // Props
   export let getStore;
-  export let session;
   export let methods;
 
   const attr = attr => attr.replace(/"/g, '');
@@ -64,6 +73,109 @@
 
   function hideMethods() {
     view = 'details';
+  }
+
+  export function onMethodsScreen() {
+    return view === 'methods';
+  }
+
+  export function shouldShowMethodsScreen() {
+    if (session.oneMethod) {
+      const singleMethodsWithP13n = ['wallet', 'netbanking', 'upi'];
+
+      const singleMethod = _Arr.find(
+        singleMethodsWithP13n,
+        method => method === session.oneMethod
+      );
+
+      const hasP13nInstruments = false; // TODO
+
+      return Boolean(singleMethod);
+    }
+
+    return true;
+  }
+
+  function getInstruments() {
+    const customer = session.getCustomer($contact);
+
+    const instruments = getInstrumentsForCustomer(customer, {
+      methods: session.methods,
+      upiApps: session.upi_intents_data,
+    });
+
+    return instruments.slice(0, 3);
+  }
+
+  function shouldUseP13n() {
+    // Merchant has asked to disable
+    if (session.get().personalization === false) {
+      return false;
+    }
+
+    // International + PayPal
+
+    // Offers
+    const hasOffersOnHomescreen =
+      session.hasOffers &&
+      _Arr.any(session.eligibleOffers, offer => offer.homescreen);
+    if (hasOffersOnHomescreen) {
+      return false;
+    }
+
+    // Missing contact
+    if (!$contact || !$contact.length) {
+      return false;
+    }
+
+    // Partial Payment
+    if (CheckoutStore.get().isPartialPayment) {
+      return false;
+    }
+
+    // Single method
+    if (session.methods.count === 1) {
+      return false;
+    }
+
+    // TPV bank
+    // TPV UPI
+    // Multi TPV
+    if (session.tpvBank || session.upiTpv || session.multiTpv) {
+      return false;
+    }
+
+    /**
+     * We're currently not allowing
+     * local customers to use p13n.
+     * But we should, after filtering out
+     * all saved cards.
+     */
+    if (session.local) {
+      return false;
+    }
+
+    // Payouts cannot use p13n
+    if (session.isPayout) {
+      return false;
+    }
+
+    return true;
+  }
+
+  let personalization;
+  let instruments;
+  $: {
+    if (view === 'methods') {
+      debugger;
+      personalization = shouldUseP13n();
+
+      if (personalization) {
+        instruments = getInstruments();
+      } else {
+        instruments = false;
+      }
+    }
   }
 </script>
 
@@ -218,7 +330,7 @@
           class="home-methods"
           in:fly={{ delay: 100, duration: 400 }}
           out:fly={{ duration: 400 }}>
-          <NewMethodsList />
+          <NewMethodsList {personalization} {instruments} />
         </div>
       {/if}
 
