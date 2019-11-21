@@ -185,7 +185,7 @@
             id="bank-select"
             name="bank"
             required
-            class="input no-refresh no-validate"
+            class="input no-refresh no-validate no-focus no-blur"
             pattern="[\w]+"
             bind:value={selectedBankCode}
             use:focus
