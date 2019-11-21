@@ -993,12 +993,16 @@ function Session(message) {
 
 Session.prototype = {
   shouldUseNativeOTP: function() {
-    return (
+    // For demo merchant, if the flow is present, we want to use Native OTP without checking for network.
+    var isDemoMerchant = this.get('key') === 'rzp_live_ILgsfZCZoFIKMb';
+
+    var redirectModeWithNativeOtp =
       this.get('nativeotp') &&
       this.get('callback_url') &&
       this.get('redirect') &&
-      this.r.isLiveMode()
-    );
+      this.r.isLiveMode();
+
+    return isDemoMerchant || redirectModeWithNativeOtp;
   },
 
   getDecimalAmount: getDecimalAmount,
@@ -5914,8 +5918,7 @@ Session.prototype = {
           this.nativeotp &&
           discreet.Flows.shouldUseNativeOtpForCardPayment(
             data,
-            this.transformedTokens,
-            this.get('key')
+            this.transformedTokens
           )
         ) {
           shouldUseNativeOTP = true;
