@@ -43,6 +43,7 @@ var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
 var shouldFixFixed = /iPhone/.test(ua);
 var ua_iPhone = shouldFixFixed;
 var isIE = /MSIE |Trident\//.test(ua);
+var DEMO_MERCHANT_KEY = 'rzp_live_ILgsfZCZoFIKMb';
 
 function getStore(prop) {
   return Store.get()[prop];
@@ -994,7 +995,7 @@ function Session(message) {
 Session.prototype = {
   shouldUseNativeOTP: function() {
     // For demo merchant, if the flow is present, we want to use Native OTP without checking for network.
-    var isDemoMerchant = this.get('key') === 'rzp_live_ILgsfZCZoFIKMb';
+    var isDemoMerchant = this.get('key') === DEMO_MERCHANT_KEY;
 
     var redirectModeWithNativeOtp =
       this.get('nativeotp') &&
@@ -5944,7 +5945,8 @@ Session.prototype = {
 
         request.nativeotp = true;
 
-        if (this.get('key') === 'rzp_live_ILgsfZCZoFIKMb') {
+        // Only demo merchant supports iframe for now.
+        if (this.get('key') === DEMO_MERCHANT_KEY) {
           request.iframe = true;
           Analytics.track('iframe:attempt');
         }
