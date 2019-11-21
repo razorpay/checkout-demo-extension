@@ -15,7 +15,7 @@ const {
   respondToUPIPaymentStatus,
 } = require('../../actions/common');
 
-describe('Feebearer and Personalization GooglePay Payment', () => {
+describe.skip('Feebearer and Personalization GooglePay Payment', () => {
   test('Perform GooglePay transaction with feebearer and Personalization enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',

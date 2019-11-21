@@ -9,7 +9,7 @@ const {
   respondToUPIPaymentStatus,
 } = require('../../actions/common');
 
-describe('Basic QR Scanner with Personalization', () => {
+describe.skip('Basic QR Scanner with Personalization', () => {
   test('Perform QR Scanner with Personalization transaction', async () => {
     const options = {
       key: 'rzp_test_VwsqHDsQPoVQi6',

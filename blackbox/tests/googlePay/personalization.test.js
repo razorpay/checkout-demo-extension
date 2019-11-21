@@ -10,7 +10,7 @@ const {
   respondToUPIPaymentStatus,
 } = require('../../actions/common');
 
-describe('Basic GooglePay payment', () => {
+describe.skip('Basic GooglePay payment', () => {
   test('Perform GooglePay transaction', async () => {
     const options = {
       key: 'rzp_test_VwsqHDsQPoVQi6',

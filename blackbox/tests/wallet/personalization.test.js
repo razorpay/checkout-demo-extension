@@ -10,7 +10,7 @@ const {
   handleValidationRequest,
 } = require('../../actions/common');
 
-describe('Wallet with Personalization  payment', () => {
+describe.skip('Wallet with Personalization  payment', () => {
   test('Perform Wallet with Personalization transaction', async () => {
     const options = {
       key: 'rzp_test_VwsqHDsQPoVQi6',

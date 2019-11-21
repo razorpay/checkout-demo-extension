@@ -9,7 +9,7 @@ const {
   verifyErrorMessage,
 } = require('../../actions/common');
 
-describe('Basic Netbanking with Personalization', () => {
+describe.skip('Basic Netbanking with Personalization', () => {
   test('Perform Netbanking with Personalization transaction', async () => {
     const options = {
       key: 'rzp_test_VwsqHDsQPoVQi6',

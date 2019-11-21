@@ -15,7 +15,7 @@ const {
   selectUPIIDFromDropDown,
 } = require('../../actions/common');
 
-describe('GooglePay Downtime payment', () => {
+describe.skip('GooglePay Downtime payment', () => {
   test('VerifyGooglePay Downtime - Low', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
