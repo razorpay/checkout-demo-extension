@@ -3,6 +3,13 @@
   import { getSession } from 'sessionmanager';
   import Track from 'tracker';
 
+  // Actions
+  import {
+    focus as focusAction,
+    blur as blurAction,
+    input as inputAction,
+  } from 'actions/input';
+
   // Props
   export let id = '';
   export let type = 'text';
@@ -17,6 +24,9 @@
   export let pattern = '.*';
   export let formatter = null;
   export let refresh = true;
+  export let handleFocus = false;
+  export let handleBlur = false;
+  export let handleInput = false;
   export let helpText = '';
   export let maxlength = null;
   export let inputmode = null;
@@ -103,10 +113,16 @@
     {pattern}
     {readonly}
     use:formatterAction={formatter}
+    use:focusAction={handleFocus}
+    use:blurAction={handleBlur}
+    use:inputAction={handleInput}
     on:focus
     on:blur
     on:input
     class:no-refresh={!refresh}
+    class:no-focus={handleFocus}
+    class:no-blur={handleBlur}
+    class:no-input={handleInput}
     class:cvv-input={type === 'cvv'} />
   {#if label}
     <label>{label}</label>
