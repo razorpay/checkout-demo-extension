@@ -9,21 +9,17 @@ const {
   submit,
   enterCardDetails,
   handleCardValidationForNativeOTP,
-  typeOTPandSubmit,
-  verifyOTP,
-  resendOTP,
+  handleMockSuccessDialog,
 } = require('../../actions/common');
 
 describe('Card tests', () => {
-  test('perform card transaction with native otp flow', async () => {
+  test('avoid native otp flow in non-redirect mode', async () => {
     const options = {
       key: 'rzp_live_ILgsfZCZoFIKMbnativeotp',
       amount: 200,
       personalization: false,
-      callback_url: 'https://google.com',
-      redirect: true,
     };
-    const preferences = makePreferences({ mode: 'live' });
+    const preferences = makePreferences();
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context);
     await fillUserDetails(context);
@@ -31,11 +27,9 @@ describe('Card tests', () => {
     await selectPaymentMethod(context, 'card');
     await enterCardDetails(context, { nativeOtp: true });
     await submit(context);
-    await handleCardValidationForNativeOTP(context, { coproto: 'otp' });
-    await typeOTPandSubmit(context);
-    await verifyOTP(context, 'fail');
-    await resendOTP(context);
-    await typeOTPandSubmit(context);
-    await verifyOTP(context, 'pass');
+    await handleCardValidationForNativeOTP(context, {
+      urlShouldContain: 'create/ajax',
+    });
+    await handleMockSuccessDialog(context);
   });
 });
