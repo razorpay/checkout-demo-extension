@@ -63,7 +63,7 @@ describe('Card tests', () => {
     await fillUserDetails(context, false);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
-    await enterCardDetails(context, 'VISA');
+    await enterCardDetails(context, { cardTye: 'VISA' });
     await viewOffers(context);
     await selectOffer(context, '1');
     await verifyOfferApplied(context);

@@ -1,12 +1,34 @@
-var dummyDiv = document.createElement('div');
 var selectedClass = ' selected',
   appliedClass = ' applied',
   discountClass = ' has-discount',
   singleOfferClass = 'single-offer';
 
+/**
+ * Get an element onto which things can be dumped
+ *
+ * @returns {Element}
+ */
+function getBlackhole() {
+  var blackhole = document.querySelector('#blackhole');
+
+  if (!blackhole) {
+    blackhole = document.createElement('div');
+
+    blackhole.setAttribute('id', 'blackhole');
+    blackhole.classList.add('hidden');
+
+    document.body.appendChild(blackhole);
+  }
+
+  return blackhole;
+}
+
 var createNode = function(html) {
+  var dummyDiv = document.createElement('div');
+
   dummyDiv.innerHTML = html;
-  return dummyDiv.firstChild;
+
+  return dummyDiv.firstElementChild || dummyDiv.firstChild;
 };
 
 /**
@@ -206,7 +228,19 @@ function initOffers(
     applyFilter: function applyFilter(criteria) {
       var criteriaKeys = Object.keys(criteria || {});
 
-      $offersList.innerHTML = '';
+      /**
+       * Clear elements from $offersList
+       *
+       * We're not setting innerHTML directly
+       * because that destroys innerHTML
+       * of the children too, on IE.
+       * https://stackoverflow.com/questions/25167593/why-does-ie-discard-the-innerhtml-children-of-a-dom-element-after-dom-changes
+       */
+      var _children = Array.from($offersList.childNodes);
+
+      each(_children, function(_index, _child) {
+        getBlackhole().appendChild(_child);
+      });
 
       // If there's a criteria, filter
       if (criteriaKeys.length > 0) {
@@ -243,7 +277,7 @@ function initOffers(
      * @param {Boolean} shouldDisplay
      */
     display: function display(shouldDisplay) {
-      var isAttached = !!$el.parentElement;
+      var isAttached = document.body.contains($el.parentElement);
 
       if (!shouldDisplay) {
         shouldShowOfferList = false;

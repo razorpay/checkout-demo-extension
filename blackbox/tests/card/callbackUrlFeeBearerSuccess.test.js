@@ -11,7 +11,7 @@ const {
   handleFeeBearer,
 } = require('../../actions/common');
 
-describe.skip('Card tests', () => {
+describe('Card tests', () => {
   test('perform successful card transaction with callback URL and FeeBearer enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
