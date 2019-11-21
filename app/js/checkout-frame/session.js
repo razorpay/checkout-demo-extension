@@ -5943,6 +5943,11 @@ Session.prototype = {
         });
 
         request.nativeotp = true;
+
+        if (this.get('key') === 'rzp_live_ILgsfZCZoFIKMb') {
+          request.iframe = true;
+          Analytics.track('iframe:attempt');
+        }
       }
     }
 
