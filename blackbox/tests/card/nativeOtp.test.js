@@ -27,8 +27,8 @@ describe('Card tests', () => {
     };
     const preferences = makePreferences({ mode: 'live' });
     const context = await openCheckout({ page, options, preferences });
-    await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
+    await assertHomePage(context);
+    await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
     await enterCardDetails(context, { nativeOtp: true });
@@ -51,8 +51,8 @@ describe('Card tests', () => {
     };
     const preferences = makePreferences({ mode: 'live' });
     const context = await openCheckout({ page, options, preferences });
-    await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
+    await assertHomePage(context);
+    await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
     await enterCardDetails(context, { nativeOtp: true });
@@ -71,8 +71,8 @@ describe('Card tests', () => {
     };
     const preferences = makePreferences({ mode: 'live' });
     const context = await openCheckout({ page, options, preferences });
-    await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
+    await assertHomePage(context);
+    await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
     await enterCardDetails(context, { nativeOtp: true });
@@ -90,8 +90,8 @@ describe('Card tests', () => {
     };
     const preferences = makePreferences();
     const context = await openCheckout({ page, options, preferences });
-    await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
+    await assertHomePage(context);
+    await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
     await enterCardDetails(context, { nativeOtp: true });
