@@ -56,7 +56,10 @@ function onInput(event) {
   _El.keepClass(parent, 'invalid', !valid);
 }
 
-export function focus(node) {
+export function focus(node, condition = true) {
+  if (!condition) {
+    return;
+  }
   node.addEventListener('focus', onFocus);
 
   return {
@@ -64,7 +67,10 @@ export function focus(node) {
   };
 }
 
-export function blur(node) {
+export function blur(node, condition = true) {
+  if (!condition) {
+    return;
+  }
   node.addEventListener('blur', onBlur);
 
   return {
@@ -72,10 +78,13 @@ export function blur(node) {
   };
 }
 
-export function input(node) {
+export function input(node, condition = true) {
+  if (!condition) {
+    return;
+  }
   node.addEventListener('input', onInput);
 
   return {
-    destroy: () => node.removeEventListener('blur', onInput),
+    destroy: () => node.removeEventListener('input', onInput),
   };
 }
