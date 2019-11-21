@@ -183,6 +183,7 @@ export default function Payment(data, params = {}, r) {
 
   /**
    * Avoid Popup if:
+   * - This is a native OTP request
    * - Payment is made by Payment Request API (`params.gpay` or `params.tez` here)
    * - UPI QR or UPI is chosen inside checkout form
    * - PowerWallet is chosen & contact details are provided inside checkout form
@@ -190,7 +191,9 @@ export default function Payment(data, params = {}, r) {
    * Enforce Popup if:
    * - Merchant is on customer fee bearer model
    */
-  if (this.gpay) {
+  if (this.nativeotp) {
+    avoidPopup = true;
+  } else if (this.gpay) {
     avoidPopup = true;
   } else if (isRazorpayFrame()) {
     /**

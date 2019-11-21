@@ -76,18 +76,7 @@ export function shouldUseNativeOtpForCardPayment(paymentData, tokens, key) {
     return true;
   }
 
-  let validNetwork = false;
-
-  if (flowPresent) {
-    validNetwork = isCardNetworkInPaymentOneOf(
-      paymentData,
-      [CardNetworks.mastercard, CardNetworks.visa],
-      tokens
-    );
-  }
-
-  // return flowPresent && validNetwork;
-  return false;
+  return flowPresent;
 }
 
 /**
