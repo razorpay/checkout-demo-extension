@@ -2201,6 +2201,7 @@ Session.prototype = {
 
     $(this.el).addClass('one-method');
     $('.payment-option').addClass('submit-button button');
+    Cta.setAppropriateCtaText();
   },
 
   improvisePaymentOptions: function() {
