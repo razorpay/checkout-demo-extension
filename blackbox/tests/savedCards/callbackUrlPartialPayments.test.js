@@ -37,7 +37,7 @@ describe('Saved Card tests', () => {
     });
     let context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
+    await fillUserDetails(context);
     await handlePartialPayment(context, '100');
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');

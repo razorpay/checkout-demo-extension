@@ -8,20 +8,20 @@ const {
   selectWallet,
   assertWalletPage,
   submit,
-  typeOTPandSubmit,
-  handleOtpVerification,
-  handleValidationRequest,
-  retryWalletTransaction,
+  expectRedirectWithCallback,
+  handleFeeBearer,
 } = require('../../actions/common');
 
 describe('Basic wallet payment', () => {
-  test('Perform wallet transaction', async () => {
+  test('Perform wallet transaction with callbackURL and customer feebearer enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
       personalization: false,
+      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
+      redirect: true,
     };
-    const preferences = makePreferences();
+    const preferences = makePreferences({ fee_bearer: true });
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
@@ -30,16 +30,10 @@ describe('Basic wallet payment', () => {
     await assertWalletPage(context);
     await selectWallet(context, 'freecharge');
     await submit(context);
-    await handleOtpVerification(context);
-    await typeOTPandSubmit(context);
-
-    await handleValidationRequest(context, 'fail');
-    await retryWalletTransaction(context);
-
-    await submit(context);
-    await handleOtpVerification(context);
-    await typeOTPandSubmit(context);
-
-    await handleValidationRequest(context, 'pass');
+    await handleFeeBearer(context);
+    await expectRedirectWithCallback(context, {
+      method: 'wallet',
+      wallet: 'freecharge',
+    });
   });
 });
