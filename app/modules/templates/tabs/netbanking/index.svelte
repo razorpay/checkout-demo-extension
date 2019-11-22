@@ -25,7 +25,6 @@
     getCorporateOption,
     isCorporateCode,
   } from 'common/bank';
-  import { hideCta, showCtaWithDefaultText } from 'checkoutstore/cta';
 
   // Props
   export let selectedBankCode = '';
