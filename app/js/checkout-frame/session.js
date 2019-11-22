@@ -3768,11 +3768,13 @@ Session.prototype = {
 
     //TODO: optimise queries
     $('#amount .discount')[0].innerHTML = discountAmount;
+    Cta.showAmountInCta();
   },
   hideDiscount: function() {
     $('#content').removeClass('has-discount');
     //TODO: optimise queries
     $('#amount .discount').html('');
+    Cta.showAmountInCta();
   },
   back: function(confirmedCancel) {
     var tab = '';
