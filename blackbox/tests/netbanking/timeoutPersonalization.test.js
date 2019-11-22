@@ -1,4 +1,6 @@
-const { openCheckoutForPersonalization } = require('../../actions/checkout');
+const {
+  openCheckoutForPersonalization,
+} = require('../../actions/checkout-personalization');
 const { makePreferences } = require('../../actions/preferences');
 const { delay } = require('../../util');
 const {
