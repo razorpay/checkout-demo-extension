@@ -13,7 +13,7 @@
     display: block;
     width: 100%;
     text-align: start;
-    transition: border-color 0.15s linear;
+    transition: all 0.15s linear;
   }
 
   div {
