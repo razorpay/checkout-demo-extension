@@ -4390,8 +4390,6 @@ Session.prototype = {
 
               self.processOffersOnEmiPlanSelection(plan);
 
-              $('.select-plan-btn').addClass('invisible');
-
               self.preSubmit();
             },
 
@@ -4484,7 +4482,6 @@ Session.prototype = {
               if (savedCvv) {
                 self.preSubmit();
               } else {
-                $('.select-plan-btn').addClass('invisible');
                 self.switchTab('emi');
                 self.setScreen('card');
                 self.toggleSavedCards(true);
