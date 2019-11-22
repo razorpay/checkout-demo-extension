@@ -6,25 +6,18 @@ contents = String(
 );
 
 async function assertHomePage(context) {
-  // await delay(10000);
-  if (!context.prefilledContact && !context.isContactOptional) {
-    const $contact = await context.page.$('#contact');
-    expect(await $contact.isIntersectingViewport()).toEqual(
-      !context.isContactEmailOptional
-    );
-    expect(await $contact.evaluate(el => el.value)).toEqual(
-      context.prefilledContact
-    );
-  }
-  if (!context.prefilledEmail && !context.isEmailOptional) {
-    const $email = await context.page.$('#email');
-    expect(await $email.isIntersectingViewport()).toEqual(
-      !context.isContactEmailOptional
-    );
-    expect(await $email.evaluate(el => el.value)).toEqual(
-      context.prefilledEmail
-    );
-  }
+  const $contact = await context.page.$('#contact');
+  expect(await $contact.isIntersectingViewport()).toEqual(
+    !context.isContactEmailOptional
+  );
+  expect(await $contact.evaluate(el => el.value)).toEqual(
+    context.prefilledContact
+  );
+  const $email = await context.page.$('#email');
+  expect(await $email.isIntersectingViewport()).toEqual(
+    !context.isContactEmailOptional
+  );
+  expect(await $email.evaluate(el => el.value)).toEqual(context.prefilledEmail);
 }
 
 async function fillUserDetails(context) {

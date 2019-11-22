@@ -25,14 +25,12 @@ module.exports = {
       isContactEmailOptional,
 
       prefilledContact:
-        (!isContactEmailOptional &&
-          (preferences.customer && preferences.customer.contact)) ||
+        (preferences.customer && preferences.customer.contact) ||
         (options.prefill && options.prefill.contact) ||
         '',
 
       prefilledEmail:
-        (!isContactEmailOptional &&
-          (preferences.customer && preferences.customer.email)) ||
+        (preferences.customer && preferences.customer.email) ||
         (options.prefill && options.prefill.email) ||
         '',
     };
