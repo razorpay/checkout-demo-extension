@@ -1,4 +1,4 @@
-const { visible, randomContact, randomEmail } = require('../util');
+const { visible, randomContact, randomEmail, delay } = require('../util');
 const { readFileSync } = require('fs');
 
 contents = String(
@@ -32,6 +32,7 @@ async function fillUserDetails(context, number) {
 }
 
 async function assertPaymentMethods(context) {
+  await context.page.waitForSelector('[tab=netbanking]');
   expect(await context.page.$eval('[tab=netbanking]', visible)).toEqual(true);
   expect(await context.page.$eval('[tab=wallet]', visible)).toEqual(true);
   expect(await context.page.$eval('[tab=card]', visible)).toEqual(true);

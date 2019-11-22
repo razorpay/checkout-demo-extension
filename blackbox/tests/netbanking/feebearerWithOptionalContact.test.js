@@ -34,7 +34,7 @@ describe.skip('Netbanking tests', () => {
     await selectBank(context, 'SBIN');
     await submit(context);
 
-    await handleFeeBearer(context, page);
+    await handleFeeBearer(context);
     await passRequestNetbanking(context);
     await handleMockSuccessDialog(context);
   });

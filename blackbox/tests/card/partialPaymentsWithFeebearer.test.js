@@ -44,14 +44,14 @@ describe.skip('Card tests', () => {
     await enterCardDetails(context);
     await verifyPartialAmount(context, '₹ 100');
     await submit(context);
-    await handleFeeBearer(context, page);
+    await handleFeeBearer(context);
     await handleCardValidation(context);
     await handleMockFailureDialog(context);
     await verifyErrorMessage(context, 'The payment has already been processed');
     await retryCardTransaction(context);
     await verifyPartialAmount(context, '₹ 100');
     await submit(context);
-    await handleFeeBearer(context, page);
+    await handleFeeBearer(context);
     await handleCardValidation(context);
     await handleMockSuccessDialog(context);
   });

@@ -45,7 +45,7 @@ describe.skip('Netbanking tests', () => {
     await verifyPartialAmount(context, '₹ 100');
     await submit(context);
 
-    await handleFeeBearer(context, page);
+    await handleFeeBearer(context);
     await passRequestNetbanking(context);
     await handleMockSuccessDialog(context);
   });

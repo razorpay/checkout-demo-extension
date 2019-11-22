@@ -64,7 +64,7 @@ describe('Netbanking tests', () => {
     await verifyDiscountText(context, 'You save ₹ 20');
     await submit(context);
 
-    await handleFeeBearer(context, page);
+    await handleFeeBearer(context);
     await passRequestNetbanking(context);
     await handleMockSuccessDialog(context);
   });

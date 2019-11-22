@@ -1,4 +1,5 @@
 const { readFileSync } = require('fs');
+const { delay } = require('../util');
 const emiActions = require('./emi-actions');
 const homepageActions = require('./home-page-actions');
 const netBankingActions = require('./netbanking-actions');
@@ -36,8 +37,25 @@ module.exports = {
   verifyDiscountAmountInBanner,
   selectUPIIDFromDropDown,
   passRequestNetbanking,
+  verifyAutoSelectBankTPV,
   retryPayzappWalletTransaction,
 };
+
+async function verifyAutoSelectBankTPV(context, bank) {
+  const autoSelectbank = await context.page.waitForSelector('.bank-name');
+  const autoSelectbankName = await context.page.evaluate(
+    autoSelectbank => autoSelectbank.textContent,
+    autoSelectbank
+  );
+  expect(autoSelectbankName).toContain(bank);
+  const accountDiv = await context.page.waitForSelector('.account-details');
+  const accountNumber = await context.page.evaluate(
+    accountDiv => accountDiv.textContent,
+    accountDiv
+  );
+  expect(accountNumber).toContain(context.preferences.order.account_number);
+  expect(autoSelectbankName).toContain(bank);
+}
 
 async function retryPayzappWalletTransaction(context) {
   const retryButton = await context.page.waitForSelector('#fd-hide');

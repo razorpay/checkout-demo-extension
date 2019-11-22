@@ -854,7 +854,7 @@ function askOTP(view, text, shouldLimitResend, screenProps) {
   if (!text) {
     if (thisSession.tab === 'card' || thisSession.tab === 'emi') {
       if (thisSession.headless) {
-        Analytics.track('headless:otp:ask');
+        Analytics.track('native_otp:otp:ask');
         text = 'Enter OTP to complete the payment';
         if (isNonNullObject(origText)) {
           if (origText.metadata) {
@@ -896,7 +896,7 @@ function askOTP(view, text, shouldLimitResend, screenProps) {
               thisSession.hideTimer();
               thisSession.back(true);
               setTimeout(function() {
-                Analytics.track('headless:timeout');
+                Analytics.track('native_otp:timeout');
                 thisSession.showLoadError(
                   'Payment was not completed on time',
                   1
@@ -993,7 +993,12 @@ function Session(message) {
 
 Session.prototype = {
   shouldUseNativeOTP: function() {
-    return this.get('nativeotp') && this.r.isLiveMode();
+    return (
+      this.get('nativeotp') &&
+      this.get('callback_url') &&
+      this.get('redirect') &&
+      this.r.isLiveMode()
+    );
   },
 
   getDecimalAmount: getDecimalAmount,
@@ -2478,7 +2483,7 @@ Session.prototype = {
   secAction: function() {
     if (this.headless && this.r._payment) {
       if (!this.get('timeout')) {
-        Analytics.track('headless:gotobank', {
+        Analytics.track('native_otp:gotobank', {
           type: AnalyticsTypes.BEHAV,
           immediately: true,
         });
@@ -5928,15 +5933,13 @@ Session.prototype = {
 
       if (shouldUseNativeOTP) {
         this.headless = true;
-        Analytics.track('headless:attempt');
+        Analytics.track('native_otp:attempt');
         this.setScreen('otp');
         this.r.on('payment.otp.required', function(data) {
           askOTP(that.otpView, data);
         });
 
         request.nativeotp = true;
-        request.iframe = true;
-        Analytics.track('iframe:attempt');
       }
     }
 
@@ -6852,6 +6855,10 @@ Session.prototype = {
 
       if (order.bank) {
         options['prefill.bank'] = order.bank;
+      }
+
+      if (order.auth_type) {
+        options['prefill.auth_type'] = order.auth_type;
       }
     }
   },
