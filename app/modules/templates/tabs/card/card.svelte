@@ -8,6 +8,8 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getSavedCards } from 'common/token';
+  import Field from 'templates/views/ui/Field.svelte';
+  import * as Card from 'common/card';
 
   // UI imports
   import AsyncLoading from 'templates/views/ui/AsyncLoading.svelte';
@@ -23,10 +25,12 @@
   export let error = null;
   export let emiOptions = null;
   export let otpView = null;
+  let cardNumber = null;
 
   // Refs
   const cardType = _Doc.querySelector('#elem-card .cardtype[cardtype]');
   var nocvvCheck = _Doc.querySelector('#nocvv');
+
   var remember = false;
 
   $: showSavedCardsScreen = false;
@@ -329,6 +333,36 @@
     });
     session.showEmiPlans('saved')(event.detail);
   }
+
+  function handleCardNumber() {
+    var el_card = _Doc.querySelector('#card_number');
+    var el_expiry = _Doc.querySelector('#card_expiry');
+    var el_cvv = _Doc.querySelector('#card_cvv');
+    var el_name = _Doc.querySelector('#card_name');
+
+    var type = Card.getCardType(cardNumber.getValue());
+
+    // update cvv element
+    var cvvlen = type !== 'amex' ? 3 : 4;
+    el_cvv.maxLength = cvvlen;
+    el_cvv.pattern = '^[0-9]{' + cvvlen + '}$';
+    // _Doc.querySelector(el_cvv)
+    //   .toggleClass('amex', type === 'amex')
+    //   .toggleClass('maestro', type === 'maestro');
+
+    if (!preferences.methods.amex && type === 'amex') {
+      _Doc.querySelector('#elem-card').addClass('noamex');
+    } else {
+      _Doc.querySelector('#elem-card').removeClass('noamex');
+    }
+
+    self.input(el_cvv);
+
+    // card icon element
+    this.el.parentNode
+      .querySelector('.cardtype')
+      .setAttribute('cardtype', type);
+  }
 </script>
 
 <Tab method="card" pad={false}>
@@ -368,29 +402,38 @@
               <span class="help recurring-card-error">
                 Card does not support automatic recurring payments
               </span>
-              <input
-                class="input"
-                type="tel"
+              <Field
+                formatter={{ type: 'card', on: { input: handleCardNumber, change: handleCardNumber } }}
+                helpText="Please enter your card number"
                 id="card_number"
                 name="card[number]"
+                required={true}
+                type="tel"
+                class="input"
                 autocomplete="off"
-                maxlength="19"
-                value="" />
+                maxlength={19}
+                value={''}
+                bind:this={cardNumber}
+                on:input
+                on:change />
             </div>
           </div>
           <div class="elem-wrap third">
             <div class="elem elem-expiry">
               <label>Expiry</label>
               <i>&#xe606;</i>
-              <input
-                class="input"
-                type="{session.isMobile() ? 'tel' : ''}
-                "
+              <Field
+                formatter={{ type: 'expiry' }}
+                helpText="Please enter your expiry"
                 id="card_expiry"
                 name="card[expiry]"
                 placeholder="MM / YY"
-                maxlength="7"
-                value={session.get('prefill.card[expiry]')} />
+                required={true}
+                type={session.isMobile() ? 'tel' : ''}
+                class="input"
+                maxlength={7}
+                value={session.get('prefill.card[expiry]')}
+                on:blur />
             </div>
           </div>
           <div class="elem-wrap two-third">
@@ -399,30 +442,35 @@
               <span class="help">Please enter name on your card</span>
               <label>Card Holder's Name</label>
               <i>&#xe602;</i>
-              <input
-                class="input"
-                type="text"
+              <Field
+                formatter={{ type: 'card' }}
+                helpText="Please enter name on your card"
                 id="card_name"
                 name="card[name]"
-                required
+                pattern="^[a-zA-Z. 0-9'-]{(1, 100)}$"
+                required={true}
+                type="text"
+                class="input"
                 value={session.get('prefill.name')}
-                pattern="^[a-zA-Z. 0-9'-]{(1, 100)}$" />
+                on:blur />
             </div>
           </div>
           <div class="elem-wrap third">
             <div class="elem elem-cvv mature">
               <label>CVV</label>
               <i>&#xe604;</i>
-              <input
-                class="input cvv-input"
-                type="tel"
+              <Field
+                formatter={{ type: 'number' }}
+                helpText="Please enter your cvv"
                 id="card_cvv"
-                inputmode="numeric"
                 name="card[cvv]"
-                maxlength="3"
-                required
                 pattern="[0-9]{3}"
-                value={session.get('prefill.card[cvv]')} />
+                required={true}
+                type="tel"
+                class="input"
+                maxlength={3}
+                value={session.get('prefill.card[cvv]')}
+                on:blur />
               <div class="help" />
             </div>
           </div>
