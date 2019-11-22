@@ -7,7 +7,7 @@ import {
 } from 'common/upi';
 import { androidBrowser } from 'common/useragent';
 import Track from 'tracker';
-import { RazorpayConfig } from 'common/Razorpay';
+import Razorpay from 'common/Razorpay';
 import Analytics from 'analytics';
 import { getSession } from 'sessionmanager';
 
@@ -97,12 +97,12 @@ var responseTypes = {
       // Most gateways block iframe.
       // The only option left now is to redirect.
       if (this.r.get('redirect') && this.r.get('callback_url')) {
-        _Doc.redirect({
-          url: request.url,
-          content: request.content,
-          method: request.method,
-          target: this.r.get('target'),
+        Razorpay.sendMessage({
+          event: 'redirect',
+          data: request,
         });
+
+        return;
       } else {
         // ಠ_ಠ - Should not reach here.
         Analytics.track('native_otp:error', {

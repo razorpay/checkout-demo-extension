@@ -41,7 +41,7 @@ async function handleUPIAccountValidation(context, vpa) {
   const req = await context.expectRequest();
   expect(req.url).toContain('validate/account');
   await context.respondJSON({ vpa: vpa, success: true, customer_name: null });
-  await delay(1000);
+  // await delay(1000);
 }
 
 async function selectUPIMethod(context, UPIMethod) {
