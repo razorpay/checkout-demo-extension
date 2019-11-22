@@ -33,9 +33,9 @@ async function verifyTimeout(context, paymentMode) {
     expect(await context.page.$('#fd-hide')).toEqual(null);
   } else if (paymentMode == 'wallet') {
     await delay(5000);
-    expect(await context.page.$('.otp-btn')).not.toEqual(null);
+    expect(await context.page.$('#footer')).not.toEqual(null);
     await delay(7000);
-    expect(await context.page.$('.otp-btn')).toEqual(null);
+    expect(await context.page.$('#footer')).toEqual(null);
   }
 }
 

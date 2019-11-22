@@ -3,6 +3,7 @@ import * as AnalyticsTypes from 'analytics-types';
 import { getCheckoutBridge } from 'bridge';
 import * as Curtain from 'components/curtain';
 import { getSession } from 'sessionmanager';
+import { hideCta, showCtaWithDefaultText } from 'checkoutstore/cta';
 
 /* global templates, fillData */
 
@@ -246,9 +247,9 @@ emandateView.prototype = {
     this.session.setScreen(screen);
 
     if (screen !== 'emandate-details') {
-      this.session.body.removeClass('sub');
+      hideCta();
     } else {
-      this.session.body.addClass('sub');
+      showCtaWithDefaultText();
     }
   },
 
