@@ -64,13 +64,14 @@ describe.each(
     await fillUserDetails(context, true);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
-    await enterCardDetails(context, 'VISA');
+    await enterCardDetails(context, { cardType: 'VISA' });
     await viewOffers(context);
     await selectOffer(context, '1');
     await verifyOfferApplied(context);
     await verifyDiscountPaybleAmount(context, '₹ 1,980');
     await verifyDiscountAmountInBanner(context, '₹ 1,980');
-    await verifyDiscountText(context, 'You save ₹ 20'), await submit(context);
+    await verifyDiscountText(context, 'You save ₹ 20');
+    await submit(context);
     await handleCardValidation(context);
     await handleMockFailureDialog(context);
     await verifyErrorMessage(context, 'The payment has already been processed');

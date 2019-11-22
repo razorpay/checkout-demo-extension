@@ -32,7 +32,7 @@ describe.skip('Netbanking tests', () => {
     await assertNetbankingPage(context);
     await selectBank(context, 'SBIN');
     await submit(context);
-    await handleFeeBearer(context, page);
+    await handleFeeBearer(context);
     await handleValidationRequest(context, 'fail');
     await verifyTimeout(context, 'netbanking');
   });

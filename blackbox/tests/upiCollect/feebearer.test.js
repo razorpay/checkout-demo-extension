@@ -14,7 +14,7 @@ const {
   handleFeeBearer,
 } = require('../../actions/common');
 
-describe.skip('Basic upi payment', () => {
+describe('Basic upi payment', () => {
   test('Perform upi collect transaction with customer feebearer enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -32,7 +32,7 @@ describe.skip('Basic upi payment', () => {
     await enterUPIAccount(context, 'BHIM');
     await submit(context);
     await handleUPIAccountValidation(context, 'BHIM@upi');
-    await handleFeeBearer(context, page);
+    await handleFeeBearer(context);
     await respondToUPIAjax(context, '');
     await respondToUPIPaymentStatus(context);
   });

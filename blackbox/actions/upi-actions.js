@@ -30,7 +30,10 @@ async function respondToUPIPaymentStatus(context) {
   await context.respondPlain(
     `${req.params.callback}(${JSON.stringify(successResult)})`
   );
-  await delay(500);
+  await context.page.waitFor('#modal-inner', {
+    timeout: 2000,
+    hidden: true,
+  });
   expect(await context.page.$('#modal-inner')).toEqual(null);
 }
 
@@ -38,7 +41,7 @@ async function handleUPIAccountValidation(context, vpa) {
   const req = await context.expectRequest();
   expect(req.url).toContain('validate/account');
   await context.respondJSON({ vpa: vpa, success: true, customer_name: null });
-  await delay(1000);
+  // await delay(1000);
 }
 
 async function selectUPIMethod(context, UPIMethod) {

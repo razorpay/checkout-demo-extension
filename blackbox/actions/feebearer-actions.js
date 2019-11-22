@@ -1,6 +1,6 @@
 const { visible } = require('../util');
 
-async function handleFeeBearer(context) {
+async function handleFeeBearer(context, pressContinue) {
   let req = await context.expectRequest();
   expect(req.method).toEqual('POST');
   await context.respondJSON({
@@ -64,7 +64,7 @@ async function handleFeeBearer(context) {
   const continueButton = await context.page.$x(
     '//*[@class="btn" and text() = "Continue"]'
   );
-  await continueButton[0].click();
+  if (pressContinue != false) await continueButton[0].click();
   // await delay(200);
 }
 
