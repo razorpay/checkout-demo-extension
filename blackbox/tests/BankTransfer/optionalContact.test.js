@@ -11,13 +11,13 @@ const {
 } = require('../../actions/common');
 
 describe('Bank transfer tests', () => {
-  test('perform bank transfer transaction', async () => {
+  test('perform bank transfer transaction with contact optional', async () => {
     const options = {
       order_id: 'order_DhheFqhhT2RMur',
       amount: 200000,
       personalization: false,
     };
-    const preferences = makePreferences();
+    const preferences = makePreferences({ optional: ['contact'] });
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
