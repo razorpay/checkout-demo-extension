@@ -9,6 +9,7 @@
   import Callout from 'templates/views/ui/Callout.svelte';
   import DowntimeCallout from 'templates/views/ui/DowntimeCallout.svelte';
   import Screen from 'templates/layouts/Screen.svelte';
+  import OffersPortal from 'templates/views/OffersPortal.svelte';
 
   // Utils imports
   import Razorpay from 'common/Razorpay';
@@ -255,6 +256,8 @@
           {/if}
         </DowntimeCallout>
       {/if}
+
+      <OffersPortal />
     </div>
 
   </Screen>

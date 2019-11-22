@@ -1,4 +1,5 @@
 const { openCheckout } = require('../../actions/checkout');
+const { openSdkCheckout } = require('../../actions/checkout-sdk');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
@@ -7,28 +8,28 @@ const {
   selectPaymentMethod,
   submit,
   enterCardDetails,
-  expectRedirectWithCallback,
-  handleFeeBearer,
+  handleCardValidationForNativeOTP,
+  handleMockSuccessDialog,
 } = require('../../actions/common');
 
-describe('Card tests', () => {
-  test('perform successful card transaction with callback URL and FeeBearer enabled', async () => {
+describe('Card tests', () => {
+  test('avoid native otp flow in non-redirect mode', async () => {
     const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+      key: 'rzp_live_ILgsfZCZoFIKMbnativeotp',
       amount: 200,
       personalization: false,
-      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
-      redirect: true,
     };
-    const preferences = makePreferences({ fee_bearer: true });
+    const preferences = makePreferences();
     const context = await openCheckout({ page, options, preferences });
-    await assertHomePage(context, true, true);
+    await assertHomePage(context);
     await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
-    await enterCardDetails(context);
+    await enterCardDetails(context, { nativeOtp: true });
     await submit(context);
-    await handleFeeBearer(context, page);
-    await expectRedirectWithCallback(context, { method: 'card' });
+    await handleCardValidationForNativeOTP(context, {
+      urlShouldContain: 'create/ajax',
+    });
+    await handleMockSuccessDialog(context);
   });
 });

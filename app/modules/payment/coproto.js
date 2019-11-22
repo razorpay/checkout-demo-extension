@@ -7,7 +7,7 @@ import {
 } from 'common/upi';
 import { androidBrowser } from 'common/useragent';
 import Track from 'tracker';
-import { RazorpayConfig } from 'common/Razorpay';
+import Razorpay from 'common/Razorpay';
 import Analytics from 'analytics';
 import { getSession } from 'sessionmanager';
 
@@ -86,7 +86,32 @@ var responseTypes = {
       request.content = {};
     }
 
-    if (popup) {
+    if (this.nativeotp) {
+      Analytics.track('native_otp:error', {
+        error: {
+          message: 'TYPE_FIRST',
+        },
+      });
+      // We were expecting `type: 'otp'` response from API (to ask OTP on checkout),
+      // API sent `type: 'first'` response, can't open popup now.
+      // Most gateways block iframe.
+      // The only option left now is to redirect.
+      if (this.r.get('redirect') && this.r.get('callback_url')) {
+        Razorpay.sendMessage({
+          event: 'redirect',
+          data: request,
+        });
+
+        return;
+      } else {
+        // ಠ_ಠ - Should not reach here.
+        Analytics.track('native_otp:error', {
+          error: {
+            message: 'REDIRECT_PARAMS_MISSING',
+          },
+        });
+      }
+    } else if (popup) {
       if (this.iframe) {
         popup.show();
       }

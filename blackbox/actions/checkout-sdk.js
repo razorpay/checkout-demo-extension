@@ -25,10 +25,18 @@ async function openSdkCheckout({ page, options, preferences, apps }) {
     }
   });
 
+  await page.exposeFunction('__CheckoutBridge_onredirect', async data => {
+    resolver && resolver(data);
+  });
+
   await page.evaluateOnNewDocument(() => {
     window.CheckoutBridge = {
       oncomplete(data) {
         __CheckoutBridge_oncomplete(data);
+      },
+
+      onredirect(data) {
+        __CheckoutBridge_onredirect(data);
       },
     };
   });

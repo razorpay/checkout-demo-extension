@@ -11,7 +11,7 @@ const {
   selectUPIApp,
 } = require('../../actions/common');
 
-describe.skip('Basic upi payment', () => {
+describe('Basic upi payment', () => {
   test('Perform upi intent transaction with feebearer and contact optional enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
