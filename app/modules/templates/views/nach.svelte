@@ -11,7 +11,7 @@
     getValidityError,
     uploadDocument,
   } from 'checkoutframe/nach';
-  import { updateCta } from 'checkoutstore/cta';
+  import { updateCta, showAmountInCta } from 'checkoutstore/cta';
 
   // UI imports
   import Attachment from 'templates/views/ui/Attachment.svelte';
@@ -69,7 +69,7 @@
    * @returns {boolean} will tab handle back
    */
   export function onBack() {
-    session.showAmountInFooter();
+    showAmountInCta();
 
     return false;
   }
