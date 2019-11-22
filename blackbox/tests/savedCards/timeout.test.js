@@ -5,9 +5,7 @@ const {
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
-  submit,
-  handleCardValidation,
-  handleMockSuccessDialog,
+  verifyTimeout,
   handleCustomerCardStatusRequest,
   typeOTPandSubmit,
   respondSavedCards,
@@ -21,6 +19,7 @@ describe('Saved Card tests', () => {
       amount: 200,
       personalization: true,
       remember_customer: true,
+      timeout: 10,
     };
     const preferences = makePreferences();
     let context = await openCheckout({ page, options, preferences });
@@ -32,9 +31,6 @@ describe('Saved Card tests', () => {
     await typeOTPandSubmit(context);
     await respondSavedCards(context);
     await selectSavedCardAndTypeCvv(context);
-    await submit(context);
-
-    await handleCardValidation(context);
-    await handleMockSuccessDialog(context);
+    await verifyTimeout(context, 'card');
   });
 });
