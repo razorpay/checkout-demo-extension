@@ -82,12 +82,11 @@ export function isCtaShown() {
  * @param {string} text
  */
 export function showCtaWithText(text) {
-  if (text) {
-    updateCta(text);
-  } else {
-    setAppropriateCtaText();
+  if (!text) {
+    return;
   }
 
+  updateCta(text);
   showCta();
 }
 
@@ -95,5 +94,6 @@ export function showCtaWithText(text) {
  * Shows the CTA with appropriate text.
  */
 export function showCtaWithDefaultText() {
-  showCtaWithText();
+  setAppropriateCtaText();
+  showCta();
 }
