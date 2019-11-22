@@ -41,7 +41,7 @@ describe('Partial GooglePay payment', () => {
       //apps: [{ package_name: 'com.google.android.apps.nbu.paisa.user', app_name: 'Google Pay (Tez)' }],
     });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
+    await fillUserDetails(context);
     await handlePartialPayment(context, '1');
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');

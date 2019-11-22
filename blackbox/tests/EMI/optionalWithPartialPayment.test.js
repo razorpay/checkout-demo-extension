@@ -35,7 +35,7 @@ describe('EMI tests', () => {
     });
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, false);
+    await fillUserDetails(context);
     await handlePartialPayment(context, '3000');
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'emi');

@@ -32,7 +32,7 @@ describe.skip('Netbanking tests', () => {
     const context = await openCheckout({ page, options, preferences });
     await delay(30000);
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
+    await fillUserDetails(context);
     await delay(30000);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'netbanking');

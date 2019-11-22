@@ -31,7 +31,7 @@ describe.skip('Basic GooglePay payment', () => {
       ],
     });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, false);
+    await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await selectUPIApp(context, '1');

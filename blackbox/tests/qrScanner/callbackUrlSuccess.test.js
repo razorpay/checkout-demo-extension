@@ -27,7 +27,7 @@ describe.skip('QR Code Test Case for callback URL', () => {
     preferences.methods.upi = true;
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
+    await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await enterCardDetails(context);

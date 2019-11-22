@@ -41,7 +41,7 @@ describe('Optional Partial GooglePay payment', () => {
       preferences,
     });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, false);
+    await fillUserDetails(context);
     await handlePartialPayment(context, '1');
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');

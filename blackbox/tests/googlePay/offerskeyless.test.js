@@ -60,7 +60,7 @@ describe('Keyless Offers GooglePay payment', () => {
     });
     await setPreferenceForOffer(preferences);
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
+    await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await selectUPIApplication(context, 'Google Pay');

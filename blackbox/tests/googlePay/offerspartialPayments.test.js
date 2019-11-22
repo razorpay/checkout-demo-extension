@@ -67,7 +67,7 @@ describe.skip('Offers with Partial GooglePay payment', () => {
     });
     await setPreferenceForOffer(preferences);
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
+    await fillUserDetails(context);
     await handlePartialPayment(context, '1');
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
