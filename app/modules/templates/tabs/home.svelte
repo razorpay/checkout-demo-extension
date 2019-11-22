@@ -512,7 +512,8 @@
     </div>
 
     <div slot="bottom">
-      {#if view === 'details'}
+      <!-- TODO: move to computed -->
+      {#if view === 'details' && !session.multiTpv && !session.tpvBank && !order.partial_payment}
         <div class="secured-message">
           <i>
             <svg
