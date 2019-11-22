@@ -72,7 +72,6 @@ async function respondToQRPaymentStatus(context) {
   await context.respondPlain(
     `${req.params.callback}(${JSON.stringify(successResult)})`
   );
-  await delay(500);
   expect(await context.page.$('#modal-inner')).toEqual(null);
 }
 
@@ -98,6 +97,10 @@ async function enterUPIAccount(context, UPIAccountId) {
 async function validateQRImage(context) {
   expect(await context.page.$eval('[alt=QR]', visible)).toEqual(true);
 }
+
+async function selectUPIIDFromDropDown(context, valuetoBeSelected, AppName) {
+  await page.select('select[name="' + AppName + '"]', valuetoBeSelected);
+}
 module.exports = {
   selectUPIMethod,
   enterUPIAccount,
@@ -109,4 +112,5 @@ module.exports = {
   respondToQRAjax,
   respondToQRPaymentStatus,
   validateQRImage,
+  selectUPIIDFromDropDown,
 };

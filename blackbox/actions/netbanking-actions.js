@@ -20,16 +20,6 @@ async function assertNetbankingPage(context) {
     await context.page.$eval('label[for=bank-radio-YESB]', visible)
   ).toEqual(true);
 }
-
-async function assertNetbankingPageForPersonalization(context) {
-  expect(
-    await context.page.waitForXPath(
-      '//*[contains(text(), "Netbanking") and @class="option-title"]'
-    )
-  ).not.toBeNull();
-}
-
 module.exports = {
   assertNetbankingPage,
-  assertNetbankingPageForPersonalization,
 };

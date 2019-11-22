@@ -35,7 +35,6 @@ module.exports = {
   verifyDiscountPaybleAmount,
   verifyDiscountText,
   verifyDiscountAmountInBanner,
-  selectUPIIDFromDropDown,
   passRequestNetbanking,
   verifyAutoSelectBankTPV,
   retryPayzappWalletTransaction,
@@ -118,8 +117,4 @@ async function verifyDiscountText(context, expectedDiscountAmount) {
     discount
   );
   expect(discountAmount).toEqual(expectedDiscountAmount);
-}
-
-async function selectUPIIDFromDropDown(context, valuetoBeSelected, AppName) {
-  await page.select('select[name="' + AppName + '"]', valuetoBeSelected);
 }
