@@ -89,7 +89,13 @@ async function expectRedirectWithCallback(context, fields) {
   if (fields) expect(body).toMatchObject(fields);
   let apiSuffix = '';
   if (context.preferences.fees) apiSuffix = 'fees';
-  else if (context.preferences.methods.upi || fields.method == 'wallet')
+  else if (
+    context.preferences.methods.upi ||
+    (fields.method == 'wallet' &&
+      !context.prefilledContact &&
+      !context.isContactOptional &&
+      !context.preferences.offers)
+  )
     apiSuffix = 'ajax';
   else apiSuffix = 'checkout';
   expect(request.url).toEqual(apiUrl + apiSuffix);
