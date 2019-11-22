@@ -104,7 +104,7 @@
 </style>
 
 {#if personalization}
-  <div class="border-list">
+  <div role="list" class="border-list">
     {#each visibleInstruments as instrument, index (instrument.id)}
       {#if instrument.method === 'card'}
         <CardInstrument
@@ -123,7 +123,7 @@
   </div>
 {/if}
 
-<div class="methods-container border-list">
+<div role="list" class="methods-container border-list">
   {#each visibleMethods as method}
     <Method {method} on:select={selectMethod} />
   {/each}

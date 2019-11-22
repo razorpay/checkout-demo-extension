@@ -43,7 +43,13 @@
   }
 </style>
 
-<button class={className} class:selected on:click type="button">
+<button
+  class={className}
+  class:hoverbg={true}
+  class:selected
+  on:click
+  type="button"
+  role="listitem">
   <Stack horizontal {reverse}>
     <slot name="icon" />
     <div>

@@ -22,7 +22,12 @@
   }
 </style>
 
-<button type="button" class={className} on:click>
+<button
+  type="button"
+  class={className}
+  class:hoverbg={true}
+  role="listitem"
+  on:click>
   <Stack horizontal>
     <slot name="icon" />
     <div>
