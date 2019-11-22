@@ -2,6 +2,9 @@
   import Field from 'templates/views/ui/Field.svelte';
   import PartialPaymentOptions from 'templates/views/partialpaymentoptions.svelte';
   import Address from 'templates/views/address.svelte';
+  import MultiTpvOptions from 'templates/views/ui/MultiTpvOptions.svelte';
+  import TpvBank from 'templates/views/ui/TpvBank.svelte';
+  import CardOffer from 'templates/views/ui/CardOffer.svelte';
 
   import {
     contact,
@@ -14,9 +17,6 @@
   import { slide } from 'svelte/transition';
 
   const entries = _Obj.entries;
-
-  const CONTACT_REGEX = '^\\+?[0-9]{8,15}$';
-  const EMAIL_REGEX = '^[^@\\s]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)+$';
 
   export let getStore;
   export let session;
@@ -43,6 +43,11 @@
 
   const contactEmailOptional = getStore('contactEmailOptional');
 
+  const CONTACT_REGEX = optional.contact ? '.*' : '^\\+?[0-9]{8,15}$';
+  const EMAIL_REGEX = optional.email
+    ? '.*'
+    : '^[^@\\s]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)+$';
+
   $contact = prefill_contact || '';
   $email = prefill_email || '';
 </script>
@@ -54,10 +59,6 @@
 
   .partial-payment-block {
     padding: 0 12px 24px 12px;
-  }
-
-  .multi-tpv {
-    padding: 0 24px;
   }
 </style>
 
@@ -108,69 +109,11 @@
     states={entries(session.states)} />
 {/if}
 {#if session.multiTpv}
-  <!-- TODO: move to separate component -->
-  <div class="multi-tpv input-radio centered">
-    <div class="multi-tpv-header">Pay Using</div>
-    <input
-      checked
-      type="radio"
-      name="method"
-      id="multitpv-netb"
-      value="netbanking" />
-    <label for="multitpv-netb">
-      <i>
-        <img src="https://cdn.razorpay.com/bank/{bank.code}.gif" />
-      </i>
-      <div class="radio-display" />
-      <div class="label-content">A/C: {bank.account_number}</div>
-      <span>{bank.name}</span>
-    </label>
-    <input type="radio" name="method" id="multitpv-upi" value="upi" />
-    <label for="multitpv-upi">
-      <i>
-        {@html icons.upi}
-      </i>
-      <div class="radio-display" />
-      <div class="label-content">UPI Payment</div>
-      <span>{bank.name} Account {bank.account_number}</span>
-    </label>
-  </div>
+  <MultiTpvOptions {bank} {icons} />
 {:else if session.tpvBank}
-  <!-- TODO: move to separate component -->
-  <div class="customer-bank-details">
-    <div class="bank-name">
-      {#if bank.logo}
-        <img src={bank.logo} />
-      {/if}
-      {#if bank.name}{bank.name}{:else}Bank Details{/if}
-    </div>
-    {#if bank.account_number}
-      <div class="account-details clearfix">
-        <div>Account Number</div>
-        <div>{bank.account_number}</div>
-      </div>
-    {/if}
-    {#if accountName}
-      <div class="account-details clearfix">
-        <div>Customer Name</div>
-        <div>{accountName}</div>
-      </div>
-    {/if}
-    {#if contactEmailOptional && bank.ifsc}
-      <div class="account-details clearfix">
-        <div>IFSC code</div>
-        <div class="text-uppercase">{bank.ifsc}</div>
-      </div>
-    {/if}
-  </div>
+  <TpvBank {bank} {accountName} showIfsc={contactEmailOptional} />
 {/if}
+
 {#if cardOffer}
-  <div class="pad" id="card-offer">
-    {#if cardOffer.name}
-      <div class="text-btn">
-        <strong>{cardOffer.name}</strong>
-      </div>
-    {/if}
-    {#if cardOffer.display_text}{cardOffer.display_text}{/if}
-  </div>
+  <CardOffer offer={cardOffer} />
 {/if}
