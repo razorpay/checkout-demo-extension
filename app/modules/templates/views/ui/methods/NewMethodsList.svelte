@@ -22,7 +22,6 @@
 
   const session = getSession();
   let visibleMethods = [];
-  let visibleInstruments = [];
 
   function filterMethods(methods) {
     return _Arr.filter(AVAILABLE_METHODS, method => {
@@ -105,7 +104,7 @@
 
 {#if personalization}
   <div role="list" class="border-list">
-    {#each visibleInstruments as instrument, index (instrument.id)}
+    {#each instruments as instrument, index (instrument.id)}
       {#if instrument.method === 'card'}
         <CardInstrument
           name="p13n"
