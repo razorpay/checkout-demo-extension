@@ -61,20 +61,12 @@ function getFlowsForPayment(paymentData, tokens = []) {
  *
  * @param {Object} paymentData Data that will be used for payment creation
  * @param {Array} tokens List of tokens
- * @param {string} key Merchant's key
  *
  * @return {Boolean}
  */
-export function shouldUseNativeOtpForCardPayment(paymentData, tokens, key) {
-  const isDemoMerchant = key === 'rzp_live_ILgsfZCZoFIKMb';
-
+export function shouldUseNativeOtpForCardPayment(paymentData, tokens) {
   const flowPresent =
     getFlowsForPayment(paymentData, tokens) |> isFlowApplicable(Flows.OTP);
-
-  // For demo merchant, if the flow is present, we want to use Native OTP without checking for network.
-  if (isDemoMerchant && flowPresent) {
-    return true;
-  }
 
   return flowPresent;
 }

@@ -12,25 +12,39 @@ const {
   typeOTPandSubmit,
   respondSavedCards,
   selectSavedCardAndTypeCvv,
+  handlePartialPayment,
+  verifyPartialAmount,
 } = require('../../actions/common');
 
 describe('Saved Card tests', () => {
-  test('Perform saved card transaction', async () => {
+  test('Perform saved card transaction with partial payments and contact optional enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
       personalization: true,
       remember_customer: true,
     };
-    const preferences = makePreferences();
+    const preferences = makePreferences({
+      optional: ['contact'],
+      order: {
+        amount: 20000,
+        amount_due: 20000,
+        amount_paid: 0,
+        currency: 'INR',
+        first_payment_min_amount: null,
+        partial_payment: true,
+      },
+    });
     let context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
+    await fillUserDetails(context, false);
+    await handlePartialPayment(context, '100');
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
     await handleCustomerCardStatusRequest(context);
     await typeOTPandSubmit(context);
     await respondSavedCards(context);
+    await verifyPartialAmount(context, '₹ 100');
     await selectSavedCardAndTypeCvv(context);
     await submit(context);
 

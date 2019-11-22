@@ -6,29 +6,34 @@ const {
   assertPaymentMethods,
   selectPaymentMethod,
   submit,
-  enterCardDetails,
+  handleCustomerCardStatusRequest,
+  typeOTPandSubmit,
+  respondSavedCards,
+  selectSavedCardAndTypeCvv,
   expectRedirectWithCallback,
-  handleFeeBearer,
 } = require('../../actions/common');
 
-describe('Card tests', () => {
-  test('perform successful card transaction with callback URL and FeeBearer enabled', async () => {
+describe('Saved Card tests', () => {
+  test('Perform keyless saved card transaction with callback URL enabled', async () => {
     const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+      order_id: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
-      personalization: false,
+      personalization: true,
+      remember_customer: true,
       callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
       redirect: true,
     };
-    const preferences = makePreferences({ fee_bearer: true });
-    const context = await openCheckout({ page, options, preferences });
+    const preferences = makePreferences();
+    let context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context);
+    await fillUserDetails(context, true);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
-    await enterCardDetails(context);
+    await handleCustomerCardStatusRequest(context);
+    await typeOTPandSubmit(context);
+    await respondSavedCards(context);
+    await selectSavedCardAndTypeCvv(context);
     await submit(context);
-    await handleFeeBearer(context, page);
     await expectRedirectWithCallback(context, { method: 'card' });
   });
 });

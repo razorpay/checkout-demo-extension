@@ -14,18 +14,18 @@ const {
   selectSavedCardAndTypeCvv,
 } = require('../../actions/common');
 
-describe('Saved Card tests', () => {
-  test('Perform saved card transaction', async () => {
+describe('SavedCard tests', () => {
+  test('Perform saved card transaction with contact optional', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
       personalization: true,
       remember_customer: true,
     };
-    const preferences = makePreferences();
+    const preferences = makePreferences({ optional: ['contact'] });
     let context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
+    await fillUserDetails(context, false);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
     await handleCustomerCardStatusRequest(context);

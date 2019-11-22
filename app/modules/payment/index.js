@@ -505,9 +505,24 @@ Payment.prototype = {
   },
 
   gotoBank: function() {
+    // For redirect mode where we do not have a popup, redirect using POST
     if (!this.popup) {
-      this.makePopup();
+      if (this.iframe) {
+        this.makePopup();
+      } else {
+        Razorpay.sendMessage({
+          event: 'redirect',
+          data: {
+            url: this.gotoBankUrl,
+            method: 'post',
+            content: null,
+          },
+        });
+
+        return;
+      }
     }
+
     const isIframe = this.popup instanceof Iframe;
     if (isIframe) {
       this.popup.write(popupTemplate(this));

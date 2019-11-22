@@ -9,13 +9,11 @@ const {
   submit,
   enterCardDetails,
   handleCardValidationForNativeOTP,
-  typeOTPandSubmit,
-  verifyOTP,
-  resendOTP,
+  goToBankPage,
 } = require('../../actions/common');
 
 describe('Card tests', () => {
-  test('perform card transaction with native otp flow', async () => {
+  test('perform card transaction with native otp flow - go to bank', async () => {
     const options = {
       key: 'rzp_live_ILgsfZCZoFIKMbnativeotp',
       amount: 200,
@@ -24,7 +22,7 @@ describe('Card tests', () => {
       redirect: true,
     };
     const preferences = makePreferences({ mode: 'live' });
-    const context = await openCheckout({ page, options, preferences });
+    const context = await openSdkCheckout({ page, options, preferences });
     await assertHomePage(context);
     await fillUserDetails(context);
     await assertPaymentMethods(context);
@@ -32,10 +30,13 @@ describe('Card tests', () => {
     await enterCardDetails(context, { nativeOtp: true });
     await submit(context);
     await handleCardValidationForNativeOTP(context, { coproto: 'otp' });
-    await typeOTPandSubmit(context);
-    await verifyOTP(context, 'fail');
-    await resendOTP(context);
-    await typeOTPandSubmit(context);
-    await verifyOTP(context, 'pass');
+    await goToBankPage(context);
+
+    const result = JSON.parse(await context.getResult());
+    expect(result).toEqual({
+      url: 'http://localhost:9008',
+      method: 'post',
+      content: null,
+    });
   });
 });
