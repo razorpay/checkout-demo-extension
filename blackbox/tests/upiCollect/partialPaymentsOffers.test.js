@@ -61,7 +61,7 @@ describe.skip('Basic upi payment', () => {
     await setPreferenceForOffer(preferences);
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
+    await fillUserDetails(context);
     await delay(20000);
     await handlePartialPayment(context, '100');
     await delay(10000);

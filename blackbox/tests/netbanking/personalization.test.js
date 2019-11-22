@@ -1,13 +1,15 @@
-const { openCheckoutForPersonalization } = require('../../actions/checkout');
+const {
+  openCheckoutForPersonalization,
+} = require('../../actions/checkout-personalization');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
-  assertPaymentMethodsPersonalization,
+  verifyPaymentMethodText,
   submit,
   passRequestNetbanking,
   handleMockSuccessDialog,
-  assertPersonalizationPage,
+  paymentMethodsSelection,
 } = require('../../actions/common');
 
 describe('Basic Netbanking with Personalization', () => {
@@ -24,9 +26,13 @@ describe('Basic Netbanking with Personalization', () => {
       method: 'Netbanking',
     });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true, '8888888882');
-    await assertPersonalizationPage(context, 'Netbanking');
-    await assertPaymentMethodsPersonalization(context);
+    await fillUserDetails(context, '8888888882');
+    await verifyPaymentMethodText(
+      context,
+      'Netbanking',
+      'Netbanking - HDFC Bank'
+    );
+    await paymentMethodsSelection(context);
     await submit(context);
     await passRequestNetbanking(context);
     await handleMockSuccessDialog(context);

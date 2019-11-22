@@ -3,10 +3,8 @@ const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
-  assertPersonalizationPage,
-  assertPaymentMethodsPersonalization,
-  selectBank,
-  assertNetbankingPage,
+  verifyPaymentMethodText,
+  paymentMethodsSelection,
   submit,
   passRequestNetbanking,
   handleMockSuccessDialog,
@@ -28,11 +26,14 @@ describe('Netbanking tests', () => {
       method: 'Netbanking',
     });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true, '8888888882');
-    await assertPersonalizationPage(context, 'Netbanking');
-    await assertPaymentMethodsPersonalization(context);
+    await fillUserDetails(context, '8888888882');
+    await verifyPaymentMethodText(
+      context,
+      'Netbanking',
+      'Netbanking - HDFC Bank'
+    );
+    await paymentMethodsSelection(context);
     await submit(context);
-
     await handleFeeBearer(context, page);
     await passRequestNetbanking(context);
     await handleMockSuccessDialog(context);

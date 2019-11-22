@@ -25,7 +25,7 @@ describe.skip('Basic ZestMoney payment', () => {
     const preferences = makePreferences();
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
+    await fillUserDetails(context);
     await delay(40000);
     // await assertPaymentMethods(context);
     // await selectPaymentMethod(context, 'wallet');

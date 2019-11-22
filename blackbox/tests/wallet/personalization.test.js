@@ -3,11 +3,12 @@ const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
-  assertPaymentMethodsPersonalization,
+  verifyPaymentMethodText,
   submit,
   handleOtpVerification,
   typeOTPandSubmit,
   handleValidationRequest,
+  paymentMethodsSelection,
 } = require('../../actions/common');
 
 describe('Wallet with Personalization  payment', () => {
@@ -25,9 +26,9 @@ describe('Wallet with Personalization  payment', () => {
       method: 'Wallet',
     });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true, '8888888885');
-    await assertPaymentMethodsPersonalization(context);
-    await delay(1000);
+    await fillUserDetails(context, '8888888885');
+    await verifyPaymentMethodText(context, 'Wallet', 'Wallet - Freecharge');
+    await paymentMethodsSelection(context);
     await submit(context);
     await handleOtpVerification(context);
     await typeOTPandSubmit(context);

@@ -64,7 +64,7 @@ describe('Basic upi payment', () => {
       apps: [{ package_name: 'in.org.npci.upiapp', app_name: 'BHIM' }],
     });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
+    await fillUserDetails(context);
     await viewOffers(context);
     await selectOffer(context, '1');
     await verifyOfferApplied(context);

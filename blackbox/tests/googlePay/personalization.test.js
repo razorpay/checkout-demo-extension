@@ -1,13 +1,16 @@
-const { openCheckoutForPersonalization } = require('../../actions/checkout');
+const {
+  openCheckoutForPersonalization,
+} = require('../../actions/checkout-personalization');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
-  assertPaymentMethodsPersonalization,
+  verifyPaymentMethodText,
   submit,
   respondToUPIAjax,
   handleUPIAccountValidation,
   respondToUPIPaymentStatus,
+  paymentMethodsSelection,
 } = require('../../actions/common');
 
 describe('Basic GooglePay payment', () => {
@@ -25,9 +28,9 @@ describe('Basic GooglePay payment', () => {
       method: 'UPI',
     });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true, '8888888881');
-    await assertPaymentMethodsPersonalization(context);
-    await delay(1000);
+    await fillUserDetails(context, '8888888881');
+    await verifyPaymentMethodText(context, 'UPI', 'UPI - dsd@okhdfcbank');
+    await paymentMethodsSelection(context);
     await submit(context);
     await handleUPIAccountValidation(context, 'dsd@okhdfcbank');
     await respondToUPIAjax(context, '');
