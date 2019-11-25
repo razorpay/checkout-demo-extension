@@ -67,7 +67,7 @@ async function respondToFundAccountsRequest(context, instrumentType) {
       account_type: 'bank_account',
       bank_account: {
         ifsc: ifscCode,
-        bank_name: 'ICICI Bank',
+        bank_name: bankName,
         name: accountHolderName,
         notes: [],
         account_number: accountNum,
