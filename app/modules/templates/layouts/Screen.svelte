@@ -28,7 +28,7 @@
     flex-shrink: 0;
   }
 
-  .screen-bottom:not(:empty) {
+  .screen-bottom > :global([slot='bottom']:not(:empty)) {
     box-shadow: 0px -6px 26px -17px rgba(0, 0, 0, 0.75);
   }
 </style>
