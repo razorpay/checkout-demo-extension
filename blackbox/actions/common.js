@@ -102,12 +102,19 @@ async function verifyDiscountAmountInBanner(context, expectedDiscountAmount) {
 }
 
 async function verifyDiscountPaybleAmount(context, expectedDiscountAmount) {
-  const discount = await context.page.waitForSelector('.pay-btn .discount');
-  let discountAmount = await context.page.evaluate(
-    discount => discount.textContent,
-    discount
+  const footer = await context.page.waitForSelector('#footer');
+  let footerText = await context.page.evaluate(
+    footer => footer.textContent,
+    footer
   );
-  expect(discountAmount).toEqual(expectedDiscountAmount);
+
+  footerText = footerText.trim();
+
+  const footerEndsWithDiscountAmount = footerText.endsWith(
+    expectedDiscountAmount
+  );
+
+  expect(footerEndsWithDiscountAmount).toEqual(true);
 }
 
 async function verifyDiscountText(context, expectedDiscountAmount) {
