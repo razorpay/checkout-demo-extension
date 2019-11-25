@@ -794,7 +794,13 @@ function getPhone() {
 }
 
 function getEmail() {
-  return storeGetter(HomeScreenStore.email);
+  var el = gel('email');
+
+  if (el) {
+    return el.value;
+  } else {
+    return storeGetter(HomeScreenStore.email);
+  }
 }
 
 function setOtpText(view, text) {
@@ -2578,8 +2584,8 @@ Session.prototype = {
       options.amount = parseInt(
         (amountValue * 100).toFixed(currencyConfig.decimals)
       );
-      options['prefill.contact'] = gel('contact').value;
-      options['prefill.email'] = gel('email').value;
+      options['prefill.contact'] = getPhone();
+      options['prefill.email'] = getEmail();
       this.setPaymentMethods(this.preferences);
       this.render({ forceRender: true });
     }
@@ -5260,7 +5266,7 @@ Session.prototype = {
 
     var submitPayload = {
       otp: otp,
-      email: gel('email').value,
+      email: getEmail(),
     };
 
     if (this.tab === 'cardless_emi') {
