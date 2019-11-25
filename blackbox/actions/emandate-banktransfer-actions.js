@@ -1,4 +1,6 @@
-const { visible, randomContact, delay } = require('../util');
+const accountNum = '1112220014911928';
+const ifscCode = 'RAZR0000001';
+const accountHolderName = 'Sakshi Jain';
 
 async function verifyEmandateBank(context) {
   const messageDiv = await context.page.waitForSelector(
@@ -23,11 +25,8 @@ async function selectEmandateNetbanking(context) {
 }
 
 async function fillEmandateBankDetails(context) {
-  await context.page.type(
-    '[name="bank_account[account_number]"]',
-    '1112220014911928'
-  );
-  await context.page.type('[name="bank_account[ifsc]"]', 'RAZR0000001');
+  await context.page.type('[name="bank_account[account_number]"]', accountNum);
+  await context.page.type('[name="bank_account[ifsc]"]', ifscCode);
   await context.page.type('[name="bank_account[name]"]', 'Sakshi Jain');
 }
 
@@ -35,7 +34,7 @@ async function returnVirtualAccounts(context) {
   await context.expectRequest();
   await context.respondJSON({
     id: 'va_DhhfICdHxgXszs',
-    name: 'Umang Galaiya',
+    name: accountHolderName,
     entity: 'virtual_account',
     status: 'active',
     description: null,
@@ -47,11 +46,11 @@ async function returnVirtualAccounts(context) {
       {
         id: 'ba_DhhfIKkKi1oWyp',
         entity: 'bank_account',
-        ifsc: 'RAZR0000001',
+        ifsc: ifscCode,
         bank_name: null,
-        name: 'Umang Galaiya',
+        name: accountHolderName,
         notes: [],
-        account_number: '1112220014911928',
+        account_number: accountNum,
       },
     ],
     close_by: null,
@@ -60,9 +59,39 @@ async function returnVirtualAccounts(context) {
   });
 }
 
+async function verifyNeftDetails(context) {
+  const messageDiv = await context.page.waitForSelector('.neft-details');
+  let messageText = await context.page.evaluate(
+    messageDiv => messageDiv.textContent,
+    messageDiv
+  );
+  expect(messageText).toEqual(
+    'Account: ' +
+      accountNum +
+      ' IFSC: ' +
+      ifscCode +
+      ' Beneficiary Name: ' +
+      accountHolderName +
+      ' Amount Expected: ₹ 2,000 '
+  );
+}
+
+async function verifyRoundOffAlertMessage(context) {
+  const messageDiv = await context.page.waitForSelector('.callout.warning');
+  let messageText = await context.page.evaluate(
+    messageDiv => messageDiv.textContent,
+    messageDiv
+  );
+  expect(messageText).toContain(
+    'Do not round-off the amount. Transfer the exact amount for the payment'
+  );
+}
+
 module.exports = {
   verifyEmandateBank,
   selectEmandateNetbanking,
   fillEmandateBankDetails,
   returnVirtualAccounts,
+  verifyNeftDetails,
+  verifyRoundOffAlertMessage,
 };
