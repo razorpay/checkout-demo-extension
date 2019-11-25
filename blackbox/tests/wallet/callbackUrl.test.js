@@ -8,13 +8,11 @@ const {
   selectWallet,
   assertWalletPage,
   submit,
-  handleOtpVerification,
-  typeOTPandSubmit,
   expectRedirectWithCallback,
 } = require('../../actions/common');
 
-describe.skip('Basic wallet payment', () => {
-  test('Perform wallet transaction', async () => {
+describe('Basic wallet payment', () => {
+  test('Perform wallet transaction with callbackURL enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
@@ -25,14 +23,12 @@ describe.skip('Basic wallet payment', () => {
     const preferences = makePreferences();
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
+    await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'wallet');
     await assertWalletPage(context);
     await selectWallet(context, 'freecharge');
     await submit(context);
-    await handleOtpVerification(context);
-    await typeOTPandSubmit(context);
     await expectRedirectWithCallback(context, {
       method: 'wallet',
       wallet: 'freecharge',

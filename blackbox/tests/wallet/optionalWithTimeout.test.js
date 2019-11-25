@@ -23,7 +23,7 @@ describe.skip('Wallet payment', () => {
     const preferences = makePreferences({ optional: ['contact'] });
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, false);
+    await fillUserDetails(context);
 
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'wallet');

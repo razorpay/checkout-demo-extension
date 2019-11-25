@@ -20,7 +20,7 @@ const {
   verifyHighDowntime,
 } = require('../../actions/common');
 
-describe.skip('Netbanking tests', () => {
+describe('Netbanking tests', () => {
   test('perform netbaking transaction with offers applied', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -87,11 +87,11 @@ describe.skip('Netbanking tests', () => {
     });
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
+    await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'netbanking');
     await assertNetbankingPage(context);
-    await verifyHighDowntime(context, 'ICICI Bank');
+    // await verifyHighDowntime(context, 'ICICI Bank');
     await selectBank(context, 'HDFC');
     await verifyLowDowntime(context, 'HDFC Bank');
     await viewOffers(context);
