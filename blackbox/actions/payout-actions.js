@@ -28,40 +28,40 @@ async function verifyPayoutInstruments(context) {
 }
 
 async function selectInstrument(context, instrumentNumber) {
-  const Instrument = await context.page.$x(
+  const instrument = await context.page.$x(
     '//div[contains(@class, "radio-option")]//div[contains(@class,"instrument-name")]'
   );
-  await Instrument[instrumentNumber - 1].click();
+  await instrument[instrumentNumber - 1].click();
 }
 
-async function addInstrument(context, vpaOrBank) {
-  const Instrument = await context.page.$x(
+async function addInstrument(context, instrumentType) {
+  const instrument = await context.page.$x(
     '//div[contains(@class, "option next-option")]'
   );
-  switch (vpaOrBank) {
+  switch (instrumentType) {
     case 'VPA':
-      await Instrument[0].click();
+      await instrument[0].click();
       break;
     case 'Bank':
-      await Instrument[1].click();
+      await instrument[1].click();
       break;
     default:
       break;
   }
 }
 
-async function respondToFundAccountsRequest(context, upiIdOrBank) {
+async function respondToFundAccountsRequest(context, instrumentType) {
   const request = await context.expectRequest();
   expect(request.method).toEqual('POST');
   expect(request.url).toContain('fund_accounts/public?key_id=');
-  if (upiIdOrBank != 'Bank') {
-    const UPI = upiIdOrBank + '@upi';
+  if (instrumentType != 'Bank') {
+    const UPI = instrumentType + '@upi';
     await context.respondJSON({
       id: 'fa_DkRsNMXJ95i4Sf',
       account_type: 'vpa',
       vpa: { address: UPI },
     });
-  } else if (upiIdOrBank == 'Bank')
+  } else if (instrumentType == 'Bank')
     await context.respondJSON({
       id: 'fa_DkSvNzU47AqV5h',
       account_type: 'bank_account',
