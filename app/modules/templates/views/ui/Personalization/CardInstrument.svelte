@@ -115,7 +115,7 @@
         type="cvv"
         name="cvv"
         placeholder="CVV"
-        maxlength="3"
+        maxlength={cvvLength}
         required={true}
         formatter={{ type: 'number' }} />
     {:else}

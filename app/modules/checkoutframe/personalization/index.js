@@ -324,10 +324,11 @@ export const getInstrumentsForCustomer = (customer, extra = {}) => {
  * to the payment creation payload.
  * @param {Object} payment Payment payload
  * @param {Object} instrument Instrument
+ * @param {Array} customer Customer
  *
  * @returns {Boolean} added?
  */
-export function addInstrumentToPaymentData(payment, instrument) {
+export function addInstrumentToPaymentData(payment, instrument, customer) {
   let added = false;
 
   // Sanity check
@@ -350,6 +351,20 @@ export function addInstrumentToPaymentData(payment, instrument) {
       added = true;
     }
   });
+
+  if (payment.method === 'card' || payment.method === 'emi') {
+    if (customer && customer.tokens && customer.tokens.items) {
+      const token = _Arr.find(
+        customer.tokens.items,
+        token => token.id === instrument.token_id
+      );
+
+      if (token) {
+        payment.token = token.token;
+        added = true;
+      }
+    }
+  }
 
   return added;
 }

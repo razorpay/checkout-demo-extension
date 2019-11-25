@@ -15,7 +15,6 @@
   // Props
   export let instrument = {}; // P13n instrument
   export let name; // Name of the input
-  export let customer = {}; // Current customer
   export let selected = false; // Whether or not this instrument is selected
 
   const session = getSession();

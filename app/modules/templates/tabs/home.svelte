@@ -9,16 +9,26 @@
   import NewMethodsList from 'templates/views/ui/methods/NewMethodsList.svelte';
 
   // Svelte imports
+  import { onMount } from 'svelte';
   import { slide, fly } from 'svelte/transition';
 
   // Store
-  import { contact, email } from 'checkoutstore/screens/home';
+  import {
+    contact,
+    email,
+    selectedInstrumentId,
+  } from 'checkoutstore/screens/home';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
   import CheckoutStore from 'checkoutstore';
   import { getInstrumentsForCustomer } from 'checkoutframe/personalization';
-  import { hideCta, showCta } from 'checkoutstore/cta';
+  import {
+    hideCta,
+    showCta,
+    showCtaWithText,
+    showCtaWithDefaultText,
+  } from 'checkoutstore/cta';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
 
@@ -72,6 +82,8 @@
 
   export function showMethods() {
     view = 'methods';
+
+    onShown();
   }
 
   function hideMethods() {
@@ -82,6 +94,12 @@
     }
 
     view = 'details';
+
+    setDetailsCta();
+  }
+
+  function setDetailsCta() {
+    showCtaWithText('Proceed');
   }
 
   /**
@@ -206,21 +224,33 @@
     }
   }
 
-  export function onShown() {
-    if (view === 'methods') {
-      hideCta();
+  $: {
+    if (personalization) {
+      Analytics.setMeta('p13n', true);
+      session.p13n = true;
     } else {
-      showCta();
+      Analytics.removeMeta('p13n');
+      session.p13n = false;
     }
   }
 
-  $: {
+  export function onShown() {
     if (view === 'methods') {
-      hideCta();
+      if ($selectedInstrumentId) {
+        showCtaWithDefaultText();
+      } else {
+        hideCta();
+      }
     } else {
-      showCta();
+      setDetailsCta();
     }
   }
+
+  onMount(() => {
+    if (session.tab === '') {
+      onShown();
+    }
+  });
 
   /**
    * Determines where a user should be if
@@ -339,6 +369,16 @@
     } else {
       session.switchTab(method);
     }
+  }
+
+  export function getSelectedInstrument() {
+    return (
+      instruments &&
+      _Arr.find(
+        instruments,
+        instrument => instrument.id === $selectedInstrumentId
+      )
+    );
   }
 </script>
 
@@ -497,6 +537,7 @@
           <NewMethodsList
             {personalization}
             {instruments}
+            customer={session.getCustomer($contact)}
             on:selectMethod={selectMethod} />
         </div>
       {/if}

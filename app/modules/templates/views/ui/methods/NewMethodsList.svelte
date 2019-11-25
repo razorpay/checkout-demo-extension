@@ -5,6 +5,7 @@
   // Props
   export let personalization = false;
   export let instruments = [];
+  export let customer = {};
 
   // UI imports
   import Method from 'templates/views/ui/methods/Method.svelte';
@@ -17,6 +18,7 @@
   import { isMobile } from 'common/useragent';
   import { doesAppExist } from 'common/upi';
   import { getInstrumentsForCustomer } from 'checkoutframe/personalization';
+  import { showCtaWithDefaultText, hideCta } from 'checkoutstore/cta';
 
   // Store
   import { contact, selectedInstrumentId } from 'checkoutstore/screens/home';
@@ -63,7 +65,7 @@
     if ($selectedInstrumentId) {
       const selected = _Arr.find(
         instruments || [],
-        instrument => instrument.id === selectedInstrumentId
+        instrument => instrument.id === $selectedInstrumentId
       );
 
       if (!selected) {
@@ -74,10 +76,24 @@
 
   function selectP13nInstrument(instrument) {
     $selectedInstrumentId = instrument.id;
+    showCtaWithDefaultText();
+
+    setTimeout(() => {
+      // Focus on the input field
+      // TODO: Figure out a better way to do this
+      const extraInput = _Doc.querySelector(
+        '#instruments-list > .selected input.input'
+      );
+
+      if (extraInput) {
+        extraInput.focus();
+      }
+    });
   }
 
   function deselectInstrument() {
     $selectedInstrumentId = null;
+    hideCta();
   }
 
   setMethods(session.methods);
@@ -94,12 +110,13 @@
 </style>
 
 {#if personalization}
-  <div role="list" class="border-list">
+  <div role="list" class="border-list" id="instruments-list">
     {#each instruments as instrument, index (instrument.id)}
       {#if instrument.method === 'card'}
         <CardInstrument
           name="p13n"
           {instrument}
+          {customer}
           selected={instrument.id === $selectedInstrumentId}
           on:click={() => selectP13nInstrument(instrument)} />
       {:else}

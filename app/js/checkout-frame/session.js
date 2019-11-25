@@ -211,10 +211,6 @@ function setEmiPlansCta(screen, tab) {
     type = 'confirm-account';
   }
 
-  if (screen === '' && session.newHomeScreen) {
-    type = 'proceed';
-  }
-
   switch (type) {
     case 'pay':
       Cta.setAppropriateCtaText();
@@ -234,10 +230,6 @@ function setEmiPlansCta(screen, tab) {
 
     case 'confirm-account':
       Cta.updateCta('Confirm Account');
-      break;
-
-    case 'proceed':
-      Cta.updateCta('Proceed');
       break;
   }
 }
@@ -799,6 +791,10 @@ function getPhone() {
   } else {
     return storeGetter(HomeScreenStore.contact);
   }
+}
+
+function getEmail() {
+  return storeGetter(HomeScreenStore.email);
 }
 
 function setOtpText(view, text) {
@@ -3272,63 +3268,64 @@ Session.prototype = {
       delegator.contact = delegator
         .add('phone', contactEl)
         .on('change', function() {
-          var instruments = [];
           self.input(this.el);
-
-          var shouldUseP13n = self.p13n;
-
-          if (this.isValid() && shouldUseP13n) {
-            instruments = P13n.getInstrumentsForCustomer(
-              self.getCustomer(this.value),
-              {
-                methods: self.methods,
-              }
-            );
-
-            if (instruments.length) {
-              Analytics.setMeta('p13n', true);
-
-              // Determine the number of instruments to be shown
-              var listOfInstrumentsToBeShown = isMobile() ? 3 : 2;
-              var _preferredMethods = {};
-
-              /**
-               * Preprending method name with an underscore
-               * because Lumberjack will delete a key called `card`.
-               * It won't delete `_card` though.
-               */
-              _Arr.loop(
-                instruments.slice(0, listOfInstrumentsToBeShown),
-                function(instrument) {
-                  _preferredMethods['_' + instrument.method] = true;
-                }
-              );
-
-              Analytics.track('p13n:instruments:list', {
-                data: {
-                  length: instruments.length,
-                  shown: Math.min(
-                    instruments.length,
-                    listOfInstrumentsToBeShown
-                  ),
-                  methods: _preferredMethods,
-                },
-              });
-
-              /**
-               * If the number of payment methods available
-               * are few, the container may not be long
-               * already.
-               *
-               * Make the container long if we are going
-               * to use p13n.
-               */
-              makeContainerLong();
-            }
-          }
 
           // TODO verify
           if (!self.newHomeScreen) {
+            var instruments = [];
+
+            var shouldUseP13n = self.p13n;
+
+            if (this.isValid() && shouldUseP13n) {
+              instruments = P13n.getInstrumentsForCustomer(
+                self.getCustomer(this.value),
+                {
+                  methods: self.methods,
+                }
+              );
+
+              if (instruments.length) {
+                Analytics.setMeta('p13n', true);
+
+                // Determine the number of instruments to be shown
+                var listOfInstrumentsToBeShown = isMobile() ? 3 : 2;
+                var _preferredMethods = {};
+
+                /**
+                 * Preprending method name with an underscore
+                 * because Lumberjack will delete a key called `card`.
+                 * It won't delete `_card` though.
+                 */
+                _Arr.loop(
+                  instruments.slice(0, listOfInstrumentsToBeShown),
+                  function(instrument) {
+                    _preferredMethods['_' + instrument.method] = true;
+                  }
+                );
+
+                Analytics.track('p13n:instruments:list', {
+                  data: {
+                    length: instruments.length,
+                    shown: Math.min(
+                      instruments.length,
+                      listOfInstrumentsToBeShown
+                    ),
+                    methods: _preferredMethods,
+                  },
+                });
+
+                /**
+                 * If the number of payment methods available
+                 * are few, the container may not be long
+                 * already.
+                 *
+                 * Make the container long if we are going
+                 * to use p13n.
+                 */
+                makeContainerLong();
+              }
+            }
+
             self.methodsList &&
               self.methodsList.set({
                 instruments: instruments,
@@ -4134,8 +4131,9 @@ Session.prototype = {
       }
     }
 
-    if (!tab && this.methodsList && this.p13n) {
-      var selectedInstrument = this.methodsList.getSelectedInstrument();
+    if (!tab) {
+      var selectedInstrument = this.getSelectedP13nInstrument();
+
       if (selectedInstrument) {
         $('#body').addClass('sub');
       }
@@ -4906,6 +4904,12 @@ Session.prototype = {
 
     fillData('#pad-common', data);
 
+    if (this.newHomeScreen) {
+      data.contact = getPhone();
+      data.email = getEmail();
+      // TODO: data.address, etc.
+    }
+
     var prefillEmail = this.get('prefill.email');
     var prefillContact = this.get('prefill.contact');
 
@@ -5431,8 +5435,10 @@ Session.prototype = {
      */
     if (!screen && this.newHomeScreen) {
       if (this.checkCommonValid()) {
-        // switch to methods tab
-        return this.homeTab.next();
+        // switch to methods tab'
+        if (!this.homeTab.onMethodsScreen()) {
+          return this.homeTab.next();
+        }
       }
     }
 
@@ -5637,31 +5643,40 @@ Session.prototype = {
         return;
       }
 
-      /*
-       * - If there's no method in methods-list, then dont' let it pass
-       * - If even 1 method is in the list and none of them is selected don't
-       *   let it pass.
-       */
-      if (!$('#methods-list .option')[0]) {
-        return;
-      } else if (!$('#methods-list .option.selected')[0]) {
+      var selectedInstrument = this.getSelectedP13nInstrument();
+
+      if (!selectedInstrument) {
         return;
       }
 
-      var selectedInstrument = this.methodsList.getSelectedInstrument();
       if (selectedInstrument && selectedInstrument.method === 'card') {
         /*
          * Add cvv to data from the currently selected method (p13n)
          * TODO: figure out a better way to do this.
          */
-        var $cvvEl = $('#methods-list .option.selected .cvv-input');
+        if (this.newHomeScreen) {
+          var $cvvEl = _Doc.querySelector(
+            '#instruments-list > .selected input.input'
+          );
 
-        if ($cvvEl) {
-          if ($cvvEl.val().length === selectedInstrument.cvvDigits) {
-            data['card[cvv]'] = $cvvEl.val();
-          } else {
-            $cvvEl.focus();
-            return this.shake();
+          if ($cvvEl) {
+            if ($cvvEl.value.length === $cvvEl.maxLength) {
+              data['card[cvv]'] = $cvvEl.value;
+            } else {
+              $cvvEl.focus();
+              return this.shake();
+            }
+          }
+        } else {
+          var $cvvEl = $('#methods-list .option.selected .cvv-input');
+
+          if ($cvvEl) {
+            if ($cvvEl.val().length === selectedInstrument.cvvDigits) {
+              data['card[cvv]'] = $cvvEl.val();
+            } else {
+              $cvvEl.focus();
+              return this.shake();
+            }
           }
         }
       }
@@ -5672,6 +5687,18 @@ Session.prototype = {
     }
 
     this.submit();
+  },
+
+  getSelectedP13nInstrument: function() {
+    if (!this.p13n) {
+      return;
+    }
+
+    if (this.newHomeScreen) {
+      return this.homeTab.getSelectedInstrument();
+    } else if (this.methodsList) {
+      return this.methodsList.getSelectedInstrument();
+    }
   },
 
   verifyVpaAndContinue: function(data, params) {
@@ -5769,23 +5796,29 @@ Session.prototype = {
       paused: this.get().paused,
     };
 
-    if (!this.screen && this.methodsList && this.p13n) {
-      var selectedInstrument = this.methodsList.getSelectedInstrument();
-      this.doneByP13n = P13n.addInstrumentToPaymentData(
-        data,
-        selectedInstrument
-      );
+    if (!this.screen) {
+      var selectedInstrument = this.getSelectedP13nInstrument();
 
-      /* TODO: the following code is the hack for ftx, fix it properly */
-      if (this.doneByP13n) {
-        Analytics.setMeta('doneByP13n', true);
-        if (['card', 'emi', 'wallet'].indexOf(selectedInstrument.method) > -1) {
-          this.switchTab(selectedInstrument.method);
-        } else if (
-          selectedInstrument.method === 'upi' &&
-          selectedInstrument['_[upiqr]'] === '1'
-        ) {
-          return this.switchTab('qr');
+      if (selectedInstrument) {
+        this.doneByP13n = P13n.addInstrumentToPaymentData(
+          data,
+          selectedInstrument,
+          this.getCustomer(getPhone())
+        );
+
+        /* TODO: the following code is the hack for ftx (2018), fix it properly */
+        if (this.doneByP13n) {
+          Analytics.setMeta('doneByP13n', true);
+          if (
+            ['card', 'emi', 'wallet'].indexOf(selectedInstrument.method) > -1
+          ) {
+            this.switchTab(selectedInstrument.method);
+          } else if (
+            selectedInstrument.method === 'upi' &&
+            selectedInstrument['_[upiqr]'] === '1'
+          ) {
+            return this.switchTab('qr');
+          }
         }
       }
     }
