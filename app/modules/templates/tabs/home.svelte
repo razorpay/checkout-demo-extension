@@ -142,14 +142,20 @@
   }
 
   function getInstruments() {
-    const customer = session.getCustomer($contact);
+    const _customer = session.getCustomer($contact);
 
-    const instruments = getInstrumentsForCustomer(customer, {
+    const instruments = getInstrumentsForCustomer(_customer, {
       methods: session.methods,
       upiApps: session.upi_intents_data,
     });
 
     return instruments.slice(0, 3);
+  }
+
+  export function updateCustomer() {
+    customer = session.getCustomer($contact);
+
+    instruments = getInstruments();
   }
 
   function shouldUseP13n() {
@@ -211,6 +217,7 @@
 
   let personalization;
   let instruments;
+  let customer;
 
   $: {
     if (view === 'methods') {
@@ -537,7 +544,7 @@
           <NewMethodsList
             {personalization}
             {instruments}
-            customer={session.getCustomer($contact)}
+            {customer}
             on:selectMethod={selectMethod} />
         </div>
       {/if}

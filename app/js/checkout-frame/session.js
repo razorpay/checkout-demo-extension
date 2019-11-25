@@ -2841,6 +2841,10 @@ Session.prototype = {
             self.setSavedCards();
             $('#top-right').removeClass('logged');
             customer.logout(e.target.parentNode.firstChild === e.target);
+
+            if (this.newHomeScreen) {
+              this.homeTab.updateCustomer();
+            }
           }
           container_listener();
           $('#top-right').removeClass('focus');
