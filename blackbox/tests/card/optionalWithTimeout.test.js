@@ -25,7 +25,7 @@ describe.skip('Card tests', () => {
     const preferences = makePreferences({ optional: ['contact'] });
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, false);
+    await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
     await enterCardDetails(context);
