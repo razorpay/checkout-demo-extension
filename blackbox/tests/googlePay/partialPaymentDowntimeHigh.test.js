@@ -12,7 +12,7 @@ describe('GooglePay partial payment downtime', () => {
   test('Verify GooglePay partial payment downtime - High with partial payments enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 30000,
+      amount: 20000,
       personalization: false,
     };
     const preferences = makePreferences({

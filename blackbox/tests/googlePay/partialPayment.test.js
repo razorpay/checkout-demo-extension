@@ -7,7 +7,7 @@ const {
   selectPaymentMethod,
   submit,
   handleUPIAccountValidation,
-  selectUPIIDFromDropDown,
+  selectBankNameFromDropDown,
   selectUPIApplication,
   handlePartialPayment,
   verifyPartialAmount,
@@ -20,7 +20,7 @@ describe('Partial GooglePay payment', () => {
   test('Perform GooglePay transaction with partial payments enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 200,
+      amount: 10000,
       personalization: false,
     };
     const preferences = makePreferences({
@@ -38,7 +38,6 @@ describe('Partial GooglePay payment', () => {
       page,
       options,
       preferences,
-      //apps: [{ package_name: 'com.google.android.apps.nbu.paisa.user', app_name: 'Google Pay (Tez)' }],
     });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
@@ -47,7 +46,7 @@ describe('Partial GooglePay payment', () => {
     await selectPaymentMethod(context, 'upi');
     await selectUPIApplication(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
-    await selectUPIIDFromDropDown(context, 'okhdfcbank', 'gpay_bank');
+    await selectBankNameFromDropDown('okhdfcbank');
     await verifyPartialAmount(context, '₹ 1');
     await submit(context);
     await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');

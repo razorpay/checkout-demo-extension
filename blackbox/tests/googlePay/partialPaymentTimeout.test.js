@@ -5,7 +5,7 @@ const {
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
-  selectUPIIDFromDropDown,
+  selectBankNameFromDropDown,
   selectUPIApplication,
   handlePartialPayment,
   verifyPartialAmount,
@@ -13,11 +13,11 @@ const {
   verifyTimeout,
 } = require('../../actions/common');
 
-describe.skip('Partial Timeout GooglePay payment', () => {
+describe('Partial Timeout GooglePay payment', () => {
   test('Perform GooglePay transaction with partial payments with timeout enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 200,
+      amount: 10000,
       personalization: false,
       timeout: 10,
     };
@@ -44,7 +44,7 @@ describe.skip('Partial Timeout GooglePay payment', () => {
     await selectPaymentMethod(context, 'upi');
     await selectUPIApplication(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
-    await selectUPIIDFromDropDown(context, 'okhdfcbank', 'gpay_bank');
+    await selectBankNameFromDropDown('okhdfcbank');
     await verifyPartialAmount(context, '₹ 1');
     await verifyTimeout(context, 'upi');
   });

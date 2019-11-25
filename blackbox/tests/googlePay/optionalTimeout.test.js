@@ -23,12 +23,6 @@ describe.skip('Basic GooglePay payment', () => {
       page,
       options,
       preferences,
-      apps: [
-        {
-          package_name: 'com.google.android.apps.nbu.paisa.user',
-          app_name: 'Google Pay (Tez)',
-        },
-      ],
     });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);

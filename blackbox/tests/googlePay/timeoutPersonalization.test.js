@@ -8,7 +8,7 @@ const {
   verifyTimeout,
   selectUPIApplication,
   enterUPIAccount,
-  selectUPIIDFromDropDown,
+  selectBankNameFromDropDown,
 } = require('../../actions/common');
 
 describe.skip('Timeout GooglePay payment', () => {

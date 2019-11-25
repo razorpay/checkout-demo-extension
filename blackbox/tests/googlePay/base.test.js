@@ -7,7 +7,7 @@ const {
   selectPaymentMethod,
   selectUPIApplication,
   enterUPIAccount,
-  selectUPIIDFromDropDown,
+  selectBankNameFromDropDown,
   submit,
   respondToUPIAjax,
   handleUPIAccountValidation,
@@ -33,7 +33,7 @@ describe('Basic GooglePay payment', () => {
     await selectPaymentMethod(context, 'upi');
     await selectUPIApplication(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
-    await selectUPIIDFromDropDown(context, 'okhdfcbank', 'gpay_bank');
+    await selectBankNameFromDropDown('okhdfcbank');
     await submit(context);
     await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
     await respondToUPIAjax(context, '');

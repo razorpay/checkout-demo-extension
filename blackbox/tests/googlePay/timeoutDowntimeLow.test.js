@@ -9,7 +9,7 @@ const {
   selectUPIApplication,
   enterUPIAccount,
   verifyTimeout,
-  selectUPIIDFromDropDown,
+  selectBankNameFromDropDown,
 } = require('../../actions/common');
 
 describe('Basic GooglePay payment', () => {
@@ -49,7 +49,7 @@ describe('Basic GooglePay payment', () => {
     await verifyLowDowntime(context, 'UPI');
     await selectUPIApplication(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
-    await selectUPIIDFromDropDown(context, 'okhdfcbank', 'gpay_bank');
+    await selectBankNameFromDropDown('okhdfcbank');
     await verifyTimeout(context, 'upi');
   });
 });

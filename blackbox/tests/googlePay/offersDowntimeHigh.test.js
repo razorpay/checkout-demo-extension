@@ -10,6 +10,9 @@ const {
   verifyOfferApplied,
   setPreferenceForOffer,
   viewOffers,
+  verifyDiscountPaybleAmount,
+  verifyDiscountAmountInBanner,
+  verifyDiscountText,
 } = require('../../actions/common');
 
 describe('Basic GooglePay payment', () => {
@@ -40,22 +43,22 @@ describe('Basic GooglePay payment', () => {
       },
       offers: [
         {
-          id: 'offer_Dcad1sICBaV2wI',
-          name: 'UPI Offer Name',
-          payment_method: 'upi',
-          display_text: 'UPI Offer Display Text',
+          original_amount: 200000,
+          amount: 198000,
+          id: 'offer_DeyaOUCgXd49pt',
+          name: 'UPI_GPay_1',
+          payment_method: 'netbanking',
+          issuer: 'GooglePay',
+          display_text: 'Rs. 20 off on GooglePay',
         },
         {
-          id: 'offer_DcaetTeD4Gjcma',
-          name: 'UPI Offer Name 2',
+          original_amount: 200000,
+          amount: 198000,
+          id: 'offer_DeycnL6DJueSQ6',
+          name: 'UPI_PayTM_2',
           payment_method: 'upi',
-          display_text: 'UPI Offer Display Text 2',
-        },
-        {
-          id: 'offer_DcafkxTAseGAtT',
-          name: 'UPI Offer Name 3',
-          payment_method: 'upi',
-          display_text: 'UPI Offer Display Text 3',
+          issuer: 'PayTM',
+          display_text: 'Rs. 20 off on PayTM',
         },
       ],
     });
@@ -68,6 +71,9 @@ describe('Basic GooglePay payment', () => {
     await viewOffers(context);
     await selectOffer(context, '1');
     await verifyOfferApplied(context);
+    await verifyDiscountPaybleAmount(context, '₹ 1,980');
+    await verifyDiscountAmountInBanner(context, '₹ 1,980');
+    await verifyDiscountText(context, 'You save ₹ 20');
     await verifyHighDowntime(
       context,
       'UPI is facing temporary issues right now. Please select another method.'

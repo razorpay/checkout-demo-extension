@@ -13,7 +13,7 @@ const {
   respondToUPIPaymentStatus,
   handleFeeBearer,
   verifyLowDowntime,
-  selectUPIIDFromDropDown,
+  selectBankNameFromDropDown,
 } = require('../../actions/common');
 
 describe('GooglePay Downtime payment', () => {
@@ -53,7 +53,7 @@ describe('GooglePay Downtime payment', () => {
     await verifyLowDowntime(context, 'UPI');
     await selectUPIApplication(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
-    await selectUPIIDFromDropDown(context, 'okhdfcbank', 'gpay_bank');
+    await selectBankNameFromDropDown('okhdfcbank');
     await submit(context);
     await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
     await handleFeeBearer(context, page);

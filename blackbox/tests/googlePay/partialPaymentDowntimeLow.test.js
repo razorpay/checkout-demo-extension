@@ -6,7 +6,7 @@ const {
   assertPaymentMethods,
   selectPaymentMethod,
   submit,
-  selectUPIIDFromDropDown,
+  selectBankNameFromDropDown,
   enterUPIAccount,
   handleUPIAccountValidation,
   respondToUPIAjax,
@@ -62,7 +62,7 @@ describe('GooglePay partial payment downtime', () => {
     await verifyLowDowntime(context, 'UPI');
     await selectUPIApplication(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
-    await selectUPIIDFromDropDown(context, 'okhdfcbank', 'gpay_bank');
+    await selectBankNameFromDropDown('okhdfcbank');
     await verifyPartialAmount(context, '₹ 100');
     await submit(context);
     await handleUPIAccountValidation(context, 'BHIM@upi');

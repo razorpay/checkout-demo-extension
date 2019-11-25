@@ -13,36 +13,39 @@ const {
   verifyOfferApplied,
   setPreferenceForOffer,
   viewOffers,
-  selectUPIIDFromDropDown,
+  selectBankNameFromDropDown,
+  verifyDiscountPaybleAmount,
+  verifyDiscountAmountInBanner,
+  verifyDiscountText,
 } = require('../../actions/common');
 
 describe('Basic upi payment', () => {
   test('Perform upi collect transaction with offers applied and timeout enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 200,
+      amount: 200000,
       personalization: false,
       timeout: 10,
     };
     const preferences = makePreferences({
       offers: [
         {
-          id: 'offer_Dcad1sICBaV2wI',
-          name: 'UPI Offer Name',
-          payment_method: 'upi',
-          display_text: 'UPI Offer Display Text',
+          original_amount: 200000,
+          amount: 198000,
+          id: 'offer_DeyaOUCgXd49pt',
+          name: 'UPI_GPay_1',
+          payment_method: 'netbanking',
+          issuer: 'GooglePay',
+          display_text: 'Rs. 20 off on GooglePay',
         },
         {
-          id: 'offer_DcaetTeD4Gjcma',
-          name: 'UPI Offer Name 2',
+          original_amount: 200000,
+          amount: 198000,
+          id: 'offer_DeycnL6DJueSQ6',
+          name: 'UPI_PayTM_2',
           payment_method: 'upi',
-          display_text: 'UPI Offer Display Text 2',
-        },
-        {
-          id: 'offer_DcafkxTAseGAtT',
-          name: 'UPI Offer Name 3',
-          payment_method: 'upi',
-          display_text: 'UPI Offer Display Text 3',
+          issuer: 'PayTM',
+          display_text: 'Rs. 20 off on PayTM',
         },
       ],
     });
@@ -55,10 +58,13 @@ describe('Basic upi payment', () => {
     await selectPaymentMethod(context, 'upi');
     await selectUPIApplication(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
-    await selectUPIIDFromDropDown(context, 'okhdfcbank', 'gpay_bank');
+    await selectBankNameFromDropDown('okhdfcbank');
     await viewOffers(context);
     await selectOffer(context, '1');
     await verifyOfferApplied(context);
+    await verifyDiscountPaybleAmount(context, '₹ 1,980');
+    await verifyDiscountAmountInBanner(context, '₹ 1,980');
+    await verifyDiscountText(context, 'You save ₹ 20');
     await verifyTimeout(context, 'upi');
   });
 });

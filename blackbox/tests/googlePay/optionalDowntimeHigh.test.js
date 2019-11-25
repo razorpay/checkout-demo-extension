@@ -7,8 +7,8 @@ const {
   verifyHighDowntime,
 } = require('../../actions/common');
 
-describe('GooglePay Optional Conatct Downtime payment', () => {
-  test('Verify GooglePay Optional Conatct Downtime - High with contact optional', async () => {
+describe('GooglePay Optional Contact Downtime payment', () => {
+  test('Verify GooglePay Optional Contact Downtime - High with contact optional', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,

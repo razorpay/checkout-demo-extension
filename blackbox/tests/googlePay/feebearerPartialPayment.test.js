@@ -1,4 +1,3 @@
-const { openSdkCheckout } = require('../../actions/checkout-sdk');
 const { makePreferences } = require('../../actions/preferences');
 const { openCheckout } = require('../../actions/checkout');
 
@@ -11,7 +10,7 @@ const {
   handleFeeBearer,
   handlePartialPayment,
   verifyPartialAmount,
-  selectUPIIDFromDropDown,
+  selectBankNameFromDropDown,
   selectUPIApplication,
   enterUPIAccount,
   handleUPIAccountValidation,
@@ -23,7 +22,7 @@ describe('Feebearer with partial GooglePay payment', () => {
   test('Perform GooglePay transaction with feebearer and partial payments enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 30000,
+      amount: 20000,
       personalization: false,
     };
     const preferences = makePreferences({
@@ -50,7 +49,7 @@ describe('Feebearer with partial GooglePay payment', () => {
     await selectPaymentMethod(context, 'upi');
     await selectUPIApplication(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
-    await selectUPIIDFromDropDown(context, 'okhdfcbank', 'gpay_bank');
+    await selectBankNameFromDropDown('okhdfcbank');
     await verifyPartialAmount(context, '₹ 100');
     await submit(context);
     await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');

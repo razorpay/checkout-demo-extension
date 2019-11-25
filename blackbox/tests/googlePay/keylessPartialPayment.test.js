@@ -7,7 +7,7 @@ const {
   selectPaymentMethod,
   submit,
   handleUPIAccountValidation,
-  selectUPIIDFromDropDown,
+  selectBankNameFromDropDown,
   selectUPIApplication,
   handlePartialPayment,
   verifyPartialAmount,
@@ -20,7 +20,7 @@ describe('Keyless Partial GooglePay payment', () => {
   test('Perform GooglePay transaction with keyless partial payments enabled', async () => {
     const options = {
       order_id: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 200,
+      amount: 10000,
       personalization: false,
     };
     const preferences = makePreferences({
@@ -46,7 +46,7 @@ describe('Keyless Partial GooglePay payment', () => {
     await selectPaymentMethod(context, 'upi');
     await selectUPIApplication(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
-    await selectUPIIDFromDropDown(context, 'okhdfcbank', 'gpay_bank');
+    await selectBankNameFromDropDown('okhdfcbank');
     await verifyPartialAmount(context, '₹ 1');
     await submit(context);
     await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');

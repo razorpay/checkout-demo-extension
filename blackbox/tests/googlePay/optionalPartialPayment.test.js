@@ -7,7 +7,7 @@ const {
   selectPaymentMethod,
   submit,
   handleUPIAccountValidation,
-  selectUPIIDFromDropDown,
+  selectBankNameFromDropDown,
   selectUPIApplication,
   handlePartialPayment,
   verifyPartialAmount,
@@ -47,7 +47,7 @@ describe('Optional Partial GooglePay payment', () => {
     await selectPaymentMethod(context, 'upi');
     await selectUPIApplication(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
-    await selectUPIIDFromDropDown(context, 'okhdfcbank', 'gpay_bank');
+    await selectBankNameFromDropDown('okhdfcbank');
     await verifyPartialAmount(context, '₹ 1');
     await submit(context);
     await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');

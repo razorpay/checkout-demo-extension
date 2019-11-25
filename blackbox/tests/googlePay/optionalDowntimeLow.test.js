@@ -7,7 +7,7 @@ const {
   verifyLowDowntime,
   selectPaymentMethod,
   submit,
-  selectUPIIDFromDropDown,
+  selectBankNameFromDropDown,
   enterUPIAccount,
   handleUPIAccountValidation,
   respondToUPIAjax,
@@ -15,8 +15,8 @@ const {
   selectUPIApplication,
 } = require('../../actions/common');
 
-describe('Basic GooglePay Optional Conatct Downtime', () => {
-  test('Verify GooglePay Optional Conatct Downtime - Low with contact optional', async () => {
+describe('Basic GooglePay Optional Contact Downtime', () => {
+  test('Verify GooglePay Optional Contact Downtime - Low with contact optional', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
@@ -52,7 +52,7 @@ describe('Basic GooglePay Optional Conatct Downtime', () => {
     await verifyLowDowntime(context, 'UPI');
     await selectUPIApplication(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
-    await selectUPIIDFromDropDown(context, 'okhdfcbank', 'gpay_bank');
+    await selectBankNameFromDropDown('okhdfcbank');
     await submit(context);
     await handleUPIAccountValidation(context, 'BHIM@upi');
     await respondToUPIAjax(context, '');

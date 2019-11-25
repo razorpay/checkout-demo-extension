@@ -98,6 +98,11 @@ async function enterUPIAccount(context, UPIAccountId) {
 async function validateQRImage(context) {
   expect(await context.page.$eval('[alt=QR]', visible)).toEqual(true);
 }
+
+async function selectBankNameFromDropDown(valuetoBeSelected) {
+  await page.select('select[name="gpay_bank"]', valuetoBeSelected);
+}
+
 module.exports = {
   selectUPIMethod,
   enterUPIAccount,
@@ -109,4 +114,5 @@ module.exports = {
   respondToQRAjax,
   respondToQRPaymentStatus,
   validateQRImage,
+  selectBankNameFromDropDown,
 };
