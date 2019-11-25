@@ -32,14 +32,14 @@
 
   const showAddress = session.get('address');
 
-  const prefill_email = session.get('prefill.email');
-  const prefill_contact = session.get('prefill.contact');
+  const prefilledEmail = session.get('prefill.email');
+  const prefilledContact = session.get('prefill.contact');
 
-  const contact_readonly = session.get('readonly.contact') && prefill_contact;
-  const email_readonly = session.get('readonly.email') && prefill_email;
+  const isContactReadonly = session.get('readonly.contact') && prefilledContact;
+  const isEmailReadonly = session.get('readonly.email') && prefilledEmail;
 
-  const contact_hidden = session.get('hidden.contact') && optional.contact;
-  const email_hidden = session.get('hidden.email') && optional.email;
+  const isContactHidden = session.get('hidden.contact') && optional.contact;
+  const isEmailHidden = session.get('hidden.email') && optional.email;
 
   const contactEmailOptional = getStore('contactEmailOptional');
 
@@ -48,8 +48,8 @@
     ? '.*'
     : '^[^@\\s]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)+$';
 
-  $contact = prefill_contact || '';
-  $email = prefill_email || '';
+  $contact = prefilledContact || '';
+  $email = prefilledEmail || '';
 </script>
 
 <style>
@@ -65,7 +65,7 @@
 <div transition:slide={{ duration: 400 }}>
   <div
     class="elem-wrap"
-    class:invisible={contact_hidden}
+    class:invisible={isContactHidden}
     id="elem-wrap-contact">
     <Field
       id="contact"
@@ -74,13 +74,13 @@
       value={$contact}
       required={!optional.contact}
       pattern={CONTACT_REGEX}
-      readonly={contact_readonly}
+      readonly={isContactReadonly}
       label="Phone"
       icon="&#xe607;"
       on:input={e => ($contact = e.target.value)}
       helpText="Please enter a valid contact number" />
   </div>
-  <div class="elem-wrap" class:invisible={email_hidden} id="elem-wrap-email">
+  <div class="elem-wrap" class:invisible={isEmailHidden} id="elem-wrap-email">
     <!-- TODO: add (optional) to label if email is optional -->
     <Field
       id="email"
@@ -89,18 +89,20 @@
       value={$email}
       required={!optional.email}
       pattern={EMAIL_REGEX}
-      readonly={email_readonly}
+      readonly={isEmailReadonly}
       label="Email"
       icon="&#xe603;"
       on:input={e => ($email = e.target.value)}
       helpText="Please enter a valid email. Example: you@example.com" />
   </div>
 </div>
+
 {#if order.partial_payment}
   <div class="partial-payment-block">
     <PartialPaymentOptions />
   </div>
 {/if}
+
 {#if showAddress && !order.partial_payment}
   <Address
     bind:address={$address}
@@ -108,6 +110,7 @@
     bind:state={$state}
     states={entries(session.states)} />
 {/if}
+
 {#if session.multiTpv}
   <MultiTpvOptions {bank} {icons} />
 {:else if session.tpvBank}
