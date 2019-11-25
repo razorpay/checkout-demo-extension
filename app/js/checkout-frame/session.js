@@ -36,7 +36,8 @@ var preferences = window.preferences,
   CardlessEmi = discreet.CardlessEmi,
   PayLater = discreet.PayLater,
   PayLaterView = discreet.PayLaterView,
-  OtpService = discreet.OtpService;
+  OtpService = discreet.OtpService,
+  Cta = discreet.Cta;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -208,37 +209,25 @@ function setEmiPlansCta(screen, tab) {
     type = 'confirm-account';
   }
 
-  var classes = [
-    '.select-plan-btn',
-    '.view-plans-btn',
-    '.pay-btn',
-    '.enter-card-details',
-    '.confirm-account',
-  ];
-
-  each(classes, function(index, className) {
-    $(className).addClass('invisible');
-  });
-
   switch (type) {
     case 'pay':
-      $('.pay-btn').removeClass('invisible');
+      Cta.setAppropriateCtaText();
       break;
 
     case 'show':
-      $('.view-plans-btn').removeClass('invisible');
+      Cta.updateCta('View EMI Plans');
       break;
 
     case 'select':
-      $('.select-plan-btn').removeClass('invisible');
+      Cta.updateCta('Select EMI Plan');
       break;
 
     case 'emi':
-      $('.enter-card-details').removeClass('invisible');
+      Cta.updateCta('Enter Card Details');
       break;
 
     case 'confirm-account':
-      $('.confirm-account').removeClass('invisible');
+      Cta.updateCta('Confirm Account');
       break;
   }
 }
@@ -1014,22 +1003,22 @@ Session.prototype = {
 
     return discreet.Currency.formatAmount(amount, displayCurrency || currency);
   },
+
   formatAmountWithCurrency: function(amount) {
-    var discountAmount = amount,
-      discountFigure = this.formatAmount(discountAmount),
-      displayCurrency = this.r.get('display_currency'),
-      currency = this.r.get('currency');
+    var amountFigure = this.formatAmount(amount);
+    var displayCurrency = this.r.get('display_currency');
+    var currency = this.r.get('currency');
 
     if (displayCurrency) {
       // TODO: handle display_amount case as in modal.jst
-      discountAmount =
-        discreet.currencies[displayCurrency] + ' ' + discountAmount;
+      amount = discreet.currencies[displayCurrency] + ' ' + amount;
     } else {
-      discountAmount = discreet.currencies[currency] + ' ' + discountFigure;
+      amount = discreet.currencies[currency] + ' ' + amountFigure;
     }
 
-    return discountAmount;
+    return amount;
   },
+
   // so that accessing this.data would not produce error
   data: emo,
   params: emo,
@@ -1419,6 +1408,7 @@ Session.prototype = {
     this.fillData();
     this.setEMI();
     this.improvisePaymentOptions();
+    Cta.setAppropriateCtaText();
     this.setModal();
     this.completePendingPayment();
     this.bindEvents();
@@ -1436,7 +1426,7 @@ Session.prototype = {
         'amount' in forcedOffer &&
         forcedOffer.amount !== forcedOffer.original_amount
       ) {
-        this.showDiscount(forcedOffer);
+        this.showDiscount();
         Analytics.track('offers:forced_with_discount', {
           data: forcedOffer,
         });
@@ -2208,17 +2198,10 @@ Session.prototype = {
 
   setOneMethod: function(methodName) {
     this.oneMethod = methodName;
-    var el = document.createElement('span');
-    el.className = 'proceed-btn';
-    if (this.get('amount')) {
-      el.innerHTML = 'Pay by ' + tab_titles[methodName];
-    } else {
-      el.innerHTML = 'Authenticate';
-    }
-    $('#footer').append(el);
 
     $(this.el).addClass('one-method');
     $('.payment-option').addClass('submit-button button');
+    Cta.setAppropriateCtaText();
   },
 
   improvisePaymentOptions: function() {
@@ -2997,13 +2980,6 @@ Session.prototype = {
     });
   },
 
-  /**
-   * Sets text of the Pay button.
-   */
-  setPayButtonText: function(text) {
-    $('.pay-btn').html(text);
-  },
-
   focus: function(e) {
     $(e.target.parentNode).addClass('focused');
     setTimeout(function() {
@@ -3642,7 +3618,7 @@ Session.prototype = {
 
     // Show discount if needed
     if (offer.original_amount > offer.amount) {
-      this.showDiscount(offer);
+      this.showDiscount();
     }
 
     var savedCards =
@@ -3779,22 +3755,27 @@ Session.prototype = {
 
   /**
    * Show the discount amount.
-   * @param {Offer} offer
    */
-  showDiscount: function(offer) {
+  showDiscount: function() {
+    var offer = this.getAppliedOffer();
+
+    if (!offer) {
+      return;
+    }
+
     $('#content').addClass('has-discount');
 
     var discountAmount = this.formatAmountWithCurrency(offer.amount);
 
     //TODO: optimise queries
     $('#amount .discount')[0].innerHTML = discountAmount;
-    $('#footer .discount')[0].innerHTML = discountAmount;
+    Cta.showAmountInCta();
   },
   hideDiscount: function() {
     $('#content').removeClass('has-discount');
     //TODO: optimise queries
     $('#amount .discount').html('');
-    $('#footer .discount').html('');
+    Cta.showAmountInCta();
   },
   back: function(confirmedCancel) {
     var tab = '';
@@ -4410,8 +4391,6 @@ Session.prototype = {
 
               self.processOffersOnEmiPlanSelection(plan);
 
-              $('.select-plan-btn').addClass('invisible');
-
               self.preSubmit();
             },
 
@@ -4504,7 +4483,6 @@ Session.prototype = {
               if (savedCvv) {
                 self.preSubmit();
               } else {
-                $('.select-plan-btn').addClass('invisible');
                 self.switchTab('emi');
                 self.setScreen('card');
                 self.toggleSavedCards(true);
@@ -5065,12 +5043,12 @@ Session.prototype = {
     invoke(
       function() {
         if (this.screen === 'otp' && (this.tab !== 'card' || !this.payload)) {
-          $('#footer').addClass('otp');
+          Cta.updateCta('Verify');
         }
       },
       this,
       null,
-      300
+      200
     );
 
     if (text) {

@@ -1,4 +1,5 @@
 import { SHOWN_CLASS } from 'common/constants';
+import { isCtaShown } from 'checkoutstore/cta';
 /* global templates */
 
 const defaultOptions = {
@@ -75,11 +76,7 @@ export function show(options) {
   overlay
     |> _El.setStyle('display', 'block')
     |> _El.addClass(SHOWN_CLASS)
-    |> _El[
-      _El.hasClass(_Doc.querySelector('#body'), 'sub')
-        ? 'addClass'
-        : 'removeClass'
-    ]('sub');
+    |> _El.keepClass('sub', isCtaShown());
 
   _El.addClass(confirmationDialog, SHOWN_CLASS);
   _El.addClass(confirmationDialog, 'confirm-position-' + options.position);
