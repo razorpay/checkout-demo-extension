@@ -190,6 +190,7 @@
 
   let personalization;
   let instruments;
+
   $: {
     if (view === 'methods') {
       personalization = shouldUseP13n();
@@ -216,6 +217,106 @@
     } else {
       showCta();
     }
+  }
+
+  /**
+   * Determines where a user should be if
+   * they were landing on the homescreen as the first screen.
+   *
+   * @returns {string} view
+   */
+  function determineLandingView() {
+    const DETAILS = 'details';
+    const METHODS = 'methods';
+
+    const checkoutStore = CheckoutStore.get();
+
+    const partial = checkoutStore.isPartialPayment;
+    const optional = checkoutStore.contactEmailOptional;
+    const hidden = checkoutStore.contactEmailHidden;
+    const readonly = checkoutStore.contactEmailReadonly;
+    const address = false; // TODO
+
+    // TPV bank
+    // TPV UPI
+    // Multi TPV
+    if (session.tpvBank || session.upiTpv || session.multiTpv) {
+      return DETAILS;
+    }
+
+    if (partial) {
+      return DETAILS;
+    }
+
+    if (address) {
+      return DETAILS;
+    }
+
+    if (optional || hidden || readonly) {
+      return METHODS;
+    }
+
+    // Missing contact
+    if (!$contact || !$contact.length) {
+      return DETAILS;
+    }
+
+    // Update instruments
+    const _instruments = getInstruments();
+
+    if (session.oneMethod) {
+      if (
+        ['wallet', 'netbanking', 'upi'].contains(session.oneMethod) &&
+        _instruments.length > 0
+      ) {
+        return METHODS;
+      } else {
+        return DETAILS;
+      }
+    }
+
+    return METHODS;
+  }
+
+  view = determineLandingView();
+
+  export function next() {
+    const METHODS = 'methods';
+
+    // TPV UPI
+    if (session.upiTpv) {
+      session.switchTab('upi');
+      return;
+    }
+
+    // TPV bank
+    if (session.tpvBank) {
+      // TODO: Create payment
+      return;
+    }
+
+    // Multi TPV
+    if (session.multiTpv) {
+      // TODO: ???
+      return;
+    }
+
+    const _instruments = getInstruments();
+
+    if (session.oneMethod) {
+      if (
+        ['wallet', 'netbanking', 'upi'].contains(session.oneMethod) &&
+        _instruments.length > 0
+      ) {
+        showMethods();
+        return;
+      } else {
+        session.switchTab(session.oneMethod);
+        return;
+      }
+    }
+
+    showMethods();
   }
 </script>
 

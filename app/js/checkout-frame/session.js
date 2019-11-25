@@ -5432,7 +5432,7 @@ Session.prototype = {
     if (!screen && this.newHomeScreen) {
       if (this.checkCommonValid()) {
         // switch to methods tab
-        return this.homeTab.showMethods();
+        return this.homeTab.next();
       }
     }
 
