@@ -19,6 +19,8 @@
   import CheckoutStore from 'checkoutstore';
   import { getInstrumentsForCustomer } from 'checkoutframe/personalization';
   import { hideCta, showCta } from 'checkoutstore/cta';
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
 
   const session = getSession();
 
@@ -285,7 +287,7 @@
 
     // TPV UPI
     if (session.upiTpv) {
-      session.switchTab('upi');
+      selectMethod('upi');
       return;
     }
 
@@ -311,12 +313,31 @@
         showMethods();
         return;
       } else {
-        session.switchTab(session.oneMethod);
+        selectMethod(session.oneMethod);
         return;
       }
     }
 
     showMethods();
+  }
+
+  function selectMethod(event) {
+    Analytics.track('p13:method:select', {
+      type: AnalyticsTypes.BEHAV,
+      data: event.detail,
+    });
+
+    const { down, method } = event.detail;
+
+    if (down) {
+      return;
+    }
+
+    if (method === 'paypal') {
+      // TODO
+    } else {
+      session.switchTab(method);
+    }
   }
 </script>
 
@@ -472,7 +493,10 @@
           class="home-methods"
           in:fly={{ delay: 100, duration: 400, y: 100 }}
           out:fly={{ duration: 400, y: 100 }}>
-          <NewMethodsList {personalization} {instruments} />
+          <NewMethodsList
+            {personalization}
+            {instruments}
+            on:selectMethod={selectMethod} />
         </div>
       {/if}
 

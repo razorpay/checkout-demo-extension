@@ -1,4 +1,7 @@
 <script>
+  // Svelte imports
+  import { createEventDispatcher } from 'svelte';
+
   // Props
   export let personalization = false;
   export let instruments = [];
@@ -13,13 +16,12 @@
   import { getSession } from 'sessionmanager';
   import { isMobile } from 'common/useragent';
   import { doesAppExist } from 'common/upi';
-  import Analytics from 'analytics';
-  import * as AnalyticsTypes from 'analytics-types';
   import { getInstrumentsForCustomer } from 'checkoutframe/personalization';
 
   // Store
   import { contact, selectedInstrumentId } from 'checkoutstore/screens/home';
 
+  const dispatch = createEventDispatcher();
   const session = getSession();
   let visibleMethods = [];
 
@@ -81,18 +83,7 @@
   setMethods(session.methods);
 
   function selectMethod(event) {
-    Analytics.track('p13:method:select', {
-      type: AnalyticsTypes.BEHAV,
-      data: event.detail,
-    });
-
-    const { down, method } = event.detail;
-
-    if (down) {
-      return;
-    }
-
-    session.switchTab(method);
+    dispatch('selectMethod', event.detail);
   }
 </script>
 
