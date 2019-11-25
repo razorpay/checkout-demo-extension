@@ -1,8 +1,6 @@
 const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
-const { delay } = require('../../util');
 const {
-  verifyPayoutInstruments,
   enterBankAccountDetails,
   addInstrument,
   submit,

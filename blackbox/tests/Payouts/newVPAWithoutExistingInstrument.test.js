@@ -1,7 +1,6 @@
 const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
 const {
-  verifyPayoutInstruments,
   addInstrument,
   selectUPIMethod,
   submit,
@@ -26,7 +25,6 @@ describe('Payout tests', () => {
     });
     preferences.methods.upi = true;
     const context = await openCheckout({ page, options, preferences });
-    // await verifyPayoutInstruments(context);
     await addInstrument(context, 'VPA');
     await selectUPIMethod(context, 'BHIM');
     await enterUPIAccount(context, 'BHIM');
