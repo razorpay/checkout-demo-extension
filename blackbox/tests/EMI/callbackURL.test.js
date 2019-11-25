@@ -5,17 +5,18 @@ const {
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
-  selectWallet,
-  assertWalletPage,
+  enterCardDetails,
   submit,
+  selectEMIPlanWithoutOffer,
+  verifyEMIPlansWithoutOffers,
   expectRedirectWithCallback,
 } = require('../../actions/common');
 
-describe('Basic wallet payment', () => {
-  test('Perform wallet transaction with callbackURL enabled', async () => {
+describe('EMI tests', () => {
+  test('perform EMI transaction with callback URL', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 200,
+      amount: 500000,
       personalization: false,
       callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
       redirect: true,
@@ -25,13 +26,12 @@ describe('Basic wallet payment', () => {
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
     await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'wallet');
-    await assertWalletPage(context);
-    await selectWallet(context, 'freecharge');
+    await selectPaymentMethod(context, 'emi');
+    await enterCardDetails(context);
     await submit(context);
-    await expectRedirectWithCallback(context, {
-      method: 'wallet',
-      wallet: 'freecharge',
-    });
+    await verifyEMIPlansWithoutOffers(context, '6');
+    await selectEMIPlanWithoutOffer(context, '2');
+    await submit(context);
+    await expectRedirectWithCallback(context, { method: 'emi' });
   });
 });

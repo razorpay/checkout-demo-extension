@@ -7,6 +7,7 @@ import { isMobile } from 'common/useragent';
 import { AVAILABLE_METHODS } from 'common/constants';
 import { createInstrumentFromPayment } from 'checkoutframe/personalization';
 import { getSession } from 'sessionmanager';
+import { hideCta, showCtaWithDefaultText } from 'checkoutstore/cta';
 
 /**
  * Get the available methods.
@@ -86,7 +87,7 @@ export default class MethodsList {
 
   addListeners() {
     this.view.$on('select', event => {
-      _Doc.querySelector('#body') |> _El.addClass('sub');
+      showCtaWithDefaultText();
       this.selectedInstrument = event.detail;
     });
 
@@ -99,7 +100,7 @@ export default class MethodsList {
         type: AnalyticsTypes.BEHAV,
       });
 
-      _Doc.querySelector('#body') |> _El.removeClass('sub');
+      hideCta();
     });
 
     this.otherMethodsView.$on('hideMethods', () => {
@@ -112,7 +113,7 @@ export default class MethodsList {
       });
 
       if (this.view.selected) {
-        _Doc.querySelector('#body') |> _El.addClass('sub');
+        showCtaWithDefaultText();
       }
     });
 

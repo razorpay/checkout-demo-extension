@@ -10,7 +10,7 @@ async function selectUPIApplication(context, AppNumber) {
   await apiOption[0].click();
 }
 
-async function respondToUPIAjax(context, offerId) {
+async function respondToUPIAjax(context, offerId = '') {
   const req = await context.expectRequest();
   if (offerId != '') expect(req.body).toContain(offerId);
   expect(req.url).toContain('create/ajax');

@@ -1,6 +1,5 @@
 const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
-const { delay } = require('../../util');
 const {
   assertHomePage,
   fillUserDetails,
@@ -17,18 +16,20 @@ const {
 } = require('../../actions/common');
 
 describe('Saved Card tests', () => {
-  test('Perform saved card transaction with feebearer enabled', async () => {
+  test('Perform saved card transaction with feebearer and optional contact enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
       personalization: true,
       remember_customer: true,
     };
-    const preferences = makePreferences({ fee_bearer: true });
+    const preferences = makePreferences({
+      fee_bearer: true,
+      optional: ['contact'],
+    });
     let context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
-    // await delay(30000);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
     await handleCustomerCardStatusRequest(context);

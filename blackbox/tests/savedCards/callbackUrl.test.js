@@ -5,33 +5,35 @@ const {
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
-  selectWallet,
-  assertWalletPage,
   submit,
+  handleCustomerCardStatusRequest,
+  typeOTPandSubmit,
+  respondSavedCards,
+  selectSavedCardAndTypeCvv,
   expectRedirectWithCallback,
 } = require('../../actions/common');
 
-describe('Basic wallet payment', () => {
-  test('Perform wallet transaction with callbackURL enabled', async () => {
+describe('Saved Card tests', () => {
+  test('Perform saved card transaction with callback URL enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
-      personalization: false,
+      personalization: true,
+      remember_customer: true,
       callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
       redirect: true,
     };
     const preferences = makePreferences();
-    const context = await openCheckout({ page, options, preferences });
+    let context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
     await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'wallet');
-    await assertWalletPage(context);
-    await selectWallet(context, 'freecharge');
+    await selectPaymentMethod(context, 'card');
+    await handleCustomerCardStatusRequest(context);
+    await typeOTPandSubmit(context);
+    await respondSavedCards(context);
+    await selectSavedCardAndTypeCvv(context);
     await submit(context);
-    await expectRedirectWithCallback(context, {
-      method: 'wallet',
-      wallet: 'freecharge',
-    });
+    await expectRedirectWithCallback(context, { method: 'card' });
   });
 });

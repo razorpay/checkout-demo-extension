@@ -12,7 +12,7 @@ const {
 } = require('../../actions/common');
 
 describe('Basic wallet payment', () => {
-  test('Perform wallet transaction with callbackURL enabled', async () => {
+  test('Perform wallet transaction with callbackURL with contact optional enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
@@ -20,7 +20,7 @@ describe('Basic wallet payment', () => {
       callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
       redirect: true,
     };
-    const preferences = makePreferences();
+    const preferences = makePreferences({ optional: ['contact'] });
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
