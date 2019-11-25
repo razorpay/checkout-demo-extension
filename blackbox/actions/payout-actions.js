@@ -36,7 +36,7 @@ async function selectInstrument(context, instrumentNumber) {
 
 async function addInstrument(context, vpaOrBank) {
   const Instrument = await context.page.$x(
-    '//div[contains(@class, "instrument-add")]'
+    '//div[contains(@class, "option next-option")]'
   );
   switch (vpaOrBank) {
     case 'VPA':

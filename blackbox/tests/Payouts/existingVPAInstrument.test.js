@@ -1,6 +1,5 @@
 const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
-const { delay } = require('../../util');
 const {
   verifyPayoutInstruments,
   selectInstrument,
@@ -44,6 +43,5 @@ describe('Payout tests', () => {
     await verifyPayoutInstruments(context);
     await selectInstrument(context, 1);
     await submit(context);
-    await delay(3000);
   });
 });
