@@ -12,7 +12,7 @@ const {
 } = require('../../actions/common');
 
 describe('Netbanking tests', () => {
-  test('perform emandate transaction', async () => {
+  test('perform emandate transaction with optional contact', async () => {
     const options = {
       order_id: 'order_DfNAO0KJCH5WNY',
       amount: 0,
@@ -23,6 +23,7 @@ describe('Netbanking tests', () => {
       },
     };
     const preferences = makePreferences({
+      optional: ['contact'],
       order: {
         amount: 0,
         currency: 'INR',
@@ -33,7 +34,7 @@ describe('Netbanking tests', () => {
     });
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
+    await fillUserDetails(context, false);
 
     await submit(context);
     await verifyEmandateBank(context);
