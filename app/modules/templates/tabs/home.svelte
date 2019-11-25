@@ -82,6 +82,23 @@
     view = 'details';
   }
 
+  /**
+   * On mobile, hover is sticky and so
+   * the hover styles stay even after clicking a button.
+   *
+   * We add a class `touchfix` that removes the hover styles.
+   * We don't need to remove the class because the element
+   * will be unmounted.
+   *
+   * Cannot use Svelte class directive since that won't
+   * update a component that's being unmounted from the DOM.
+   */
+  function touchfix(node, { event = 'click' } = {}) {
+    node.addEventListener(event, () => {
+      _El.addClass(node, 'touchfix');
+    });
+  }
+
   export function onMethodsScreen() {
     return view === 'methods';
   }
@@ -331,6 +348,7 @@
 
       {#if view === 'methods'}
         <div
+          use:touchfix
           class="home-details border-list"
           transition:slide={{ duration: 400 }}>
           <SlottedOption on:click={hideMethods}>
