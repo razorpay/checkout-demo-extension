@@ -14,7 +14,7 @@ const {
   returnVirtualAccounts,
 } = require('../../actions/common');
 
-describe('Netbanking tests', () => {
+describe.skip('Netbanking tests', () => {
   test('perform netbaking transaction', async () => {
     const options = {
       order_id: 'order_DhheFqhhT2RMur',
