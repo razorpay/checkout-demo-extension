@@ -510,14 +510,21 @@ Payment.prototype = {
       if (this.iframe) {
         this.makePopup();
       } else {
-        Razorpay.sendMessage({
-          event: 'redirect',
-          data: {
-            url: this.gotoBankUrl,
-            method: 'post',
-            content: null,
-          },
-        });
+        // If we're in SDK and not in an iframe, redirect directly
+        if (global.CheckoutBridge) {
+          _Doc.submitForm(this.gotoBankUrl, null, 'post');
+        }
+        // Otherwise, use sendMessage
+        else {
+          Razorpay.sendMessage({
+            event: 'redirect',
+            data: {
+              url: this.gotoBankUrl,
+              method: 'post',
+              content: null,
+            },
+          });
+        }
 
         return;
       }
