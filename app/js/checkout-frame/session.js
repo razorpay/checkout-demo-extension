@@ -1428,9 +1428,9 @@ Session.prototype = {
     this.setTpvBanks();
     this.setExperiments();
     this.getEl();
-    this.setSvelteComponents();
     this.setMethodsList();
     this.setFormatting();
+    this.setSvelteComponents();
     this.fillData();
     this.setEMI();
     this.improvisePaymentOptions();
@@ -3994,7 +3994,13 @@ Session.prototype = {
    * @returns {boolean} valid
    */
   checkCommonValid: function() {
-    var valid = !this.checkInvalid('#pad-common');
+    var selector = '#pad-common';
+
+    if (this.newHomeScreen) {
+      selector = '#form-common';
+    }
+
+    var valid = !this.checkInvalid(selector);
 
     return valid;
   },
