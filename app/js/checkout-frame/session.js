@@ -1162,7 +1162,7 @@ Session.prototype = {
   },
 
   setExperiments: function() {
-    this.newHomeScreen = true;
+    this.newHomeScreen = false;
   },
 
   getEl: function() {
@@ -1563,9 +1563,7 @@ Session.prototype = {
       this.homeTab = new discreet.HomeTab({
         target: gel('home-screen-wrap'),
         props: {
-          session: this,
           getStore: getStore,
-          methods: this.methods,
         },
       });
     }
@@ -3191,6 +3189,8 @@ Session.prototype = {
       });
     }
 
+    //
+    // TODO: replicate in new home screen
     if (el_amount) {
       delegator.amount = delegator
         .add('amount', el_amount)
