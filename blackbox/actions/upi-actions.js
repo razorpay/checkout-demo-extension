@@ -45,8 +45,9 @@ async function handleUPIAccountValidation(context, vpa) {
 }
 
 async function selectUPIMethod(context, UPIMethod) {
+  await delay(500);
   const upibutton = await context.page.$x(
-    '//*[contains(@class,"ref-text") and text() = "' + UPIMethod + '"]'
+    '//div[contains(@class,"ref-text") and text() = "' + UPIMethod + '"]'
   );
   await upibutton[0].click();
 }
