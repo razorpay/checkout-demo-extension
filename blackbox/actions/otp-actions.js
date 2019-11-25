@@ -22,7 +22,7 @@ async function handleOtpVerification(context, walletissuer = 'freecharge') {
 
 async function typeOTPandSubmit(context) {
   await typeOTP(context);
-  await delay(1200);
+  // await delay(1200);
   await context.page.click('#footer');
 }
 async function typeOTP(context) {
