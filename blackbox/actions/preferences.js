@@ -65,7 +65,6 @@ function makePreferences(overrides) {
     methods: {
       emi: true,
       emi_subvention: 'customer',
-      bank_transfer: 'true',
       ...card,
       wallet,
       netbanking,

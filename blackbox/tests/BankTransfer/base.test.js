@@ -18,6 +18,7 @@ describe('Bank transfer tests', () => {
       personalization: false,
     };
     const preferences = makePreferences();
+    preferences.methods.bank_transfer = true;
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
