@@ -42,7 +42,10 @@ async function verifyErrorMessage(context, expectedErrorMeassage) {
   );
   for (let retrycount = 0; retrycount < 5; retrycount++) {
     if (messageText.includes('Your payment is being processed')) {
-      await delay(800);
+      await context.page.waitFor('#fd-t', {
+        timeout: 2000,
+        visible: true,
+      });
       const messageDiv = await context.page.waitForSelector('#fd-t');
       messageText = await context.page.evaluate(
         messageDiv => messageDiv.textContent,
@@ -63,7 +66,11 @@ async function validateHelpMessage(context, message) {
 }
 
 async function submit(context) {
-  await delay(200);
+  await context.page.waitFor('#footer', {
+    timeout: 2000,
+    visible: true,
+  });
+  await delay(300);
   context.page.click('#footer');
 }
 

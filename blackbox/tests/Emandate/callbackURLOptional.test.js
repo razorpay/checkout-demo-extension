@@ -1,5 +1,6 @@
 const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
+const { delay } = require('../../util');
 const {
   assertHomePage,
   fillUserDetails,
@@ -7,12 +8,11 @@ const {
   verifyEmandateBank,
   selectEmandateNetbanking,
   fillEmandateBankDetails,
-  respondToUPIAjax,
-  respondToUPIPaymentStatus,
+  expectRedirectWithCallback,
 } = require('../../actions/common');
 
 describe('Netbanking tests', () => {
-  test('perform emandate transaction', async () => {
+  test('perform emandate transaction with callback Url and contact optional enabled', async () => {
     const options = {
       order_id: 'order_DfNAO0KJCH5WNY',
       amount: 0,
@@ -21,8 +21,11 @@ describe('Netbanking tests', () => {
       prefill: {
         bank: 'HDFC',
       },
+      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
+      redirect: true,
     };
     const preferences = makePreferences({
+      optional: ['contact'],
       order: {
         amount: 0,
         currency: 'INR',
@@ -33,14 +36,16 @@ describe('Netbanking tests', () => {
     });
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
-
+    await fillUserDetails(context, false);
+    await delay(300);
     await submit(context);
     await verifyEmandateBank(context);
     await selectEmandateNetbanking(context);
     await fillEmandateBankDetails(context);
     await submit(context);
-    await respondToUPIAjax(context);
-    await respondToUPIPaymentStatus(context);
+    await expectRedirectWithCallback(context, {
+      method: 'emandate',
+      bank: 'HDFC',
+    });
   });
 });

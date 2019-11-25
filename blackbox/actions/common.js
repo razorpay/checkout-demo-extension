@@ -12,6 +12,7 @@ const cardActions = require('./card-actions');
 const downtimeTimoutActions = require('./downtime-timeout-actions');
 const walletActions = require('./wallet-actions');
 const sharedActions = require('./shared-actions');
+const emandateBanktransferActions = require('./emandate-banktransfer-actions');
 
 contents = String(
   readFileSync(__dirname + '/../fixtures/mockSuccessandFailPage.html')
@@ -30,6 +31,7 @@ module.exports = {
   ...downtimeTimoutActions,
   ...walletActions,
   ...sharedActions,
+  ...emandateBanktransferActions,
   verifyDiscountPaybleAmount,
   verifyDiscountText,
   verifyDiscountAmountInBanner,
