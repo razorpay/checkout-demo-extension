@@ -72,6 +72,12 @@
   }
 
   function hideMethods() {
+    const active = document.activeElement;
+
+    if (active) {
+      active.blur();
+    }
+
     view = 'details';
   }
 
