@@ -140,8 +140,6 @@
       return false;
     }
 
-    // International + PayPal
-
     // Offers
     const hasOffersOnHomescreen =
       session.hasOffers &&
@@ -161,7 +159,10 @@
     }
 
     // Single method
-    if (session.methods.count === 1) {
+    if (
+      session.oneMethod &&
+      !['wallet', 'netbanking', 'upi'].contains(session.oneMethod)
+    ) {
       return false;
     }
 
