@@ -70,7 +70,6 @@ function makePreferences(overrides) {
       netbanking,
       emi_options,
       recurring,
-      bank_transfer: true,
     },
     ...overrides,
   };
