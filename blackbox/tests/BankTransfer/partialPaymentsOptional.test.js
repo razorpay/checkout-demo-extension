@@ -30,8 +30,8 @@ describe('Bank transfer tests', () => {
         partial_payment: true,
       },
     });
-    const context = await openCheckout({ page, options, preferences });
     preferences.methods.bank_transfer = true;
+    const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
     await handlePartialPayment(context, '2000');
