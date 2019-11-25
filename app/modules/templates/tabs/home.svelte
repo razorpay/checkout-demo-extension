@@ -524,10 +524,7 @@
 
     <div slot="bottom">
       {#if view !== 'methods'}
-        <div
-          class="secured-message"
-          out:slide={{ duration: 100 }}
-          in:slide={{ delay: 400, duration: 100 }}>
+        <div class="secured-message" out:slide={{ duration: 100 }}>
           <i>
             <svg
               width="16"
