@@ -1,5 +1,5 @@
 <script>
-  import RadioOption from 'templates/views/ui/options/RadioOption.svelte';
+  import SlottedRadioOption from 'templates/views/ui/options/Slotted/RadioOption.svelte';
   import PartialPaymentAmountField from 'templates/views/ui/PartialPaymentAmountField.svelte';
 
   // Props
@@ -32,22 +32,28 @@
 </style>
 
 <div class="legend">Select a payment type</div>
-<div class="options flex options-no-margin">
-  <RadioOption
-    reverse={true}
+<div class="border-list">
+  <SlottedRadioOption
+    name="payment_type"
+    value="partial"
     selected={selected === 'partial'}
-    on:select={_ => handleRadioSelection('partial')}>
-    Pay full amount
-  </RadioOption>
-  <RadioOption
-    reverse={true}
+    reverse
+    on:click={_ => handleRadioSelection('partial')}>
+    <div slot="title">Pay full amount</div>
+  </SlottedRadioOption>
+  <SlottedRadioOption
+    name="payment_type"
+    value="full"
+    reverse
     selected={selected === 'full'}
-    on:select={_ => handleRadioSelection('full')}>
-    Make payment in parts
-    {#if expanded}
-      <PartialPaymentAmountField
-        maxAmount={100}
-        bind:this={partialAmountField} />
-    {/if}
-  </RadioOption>
+    on:click={_ => handleRadioSelection('full')}>
+    <div slot="title">Make payment in parts</div>
+    <div slot="subtitle">
+      {#if expanded}
+        <PartialPaymentAmountField
+          maxAmount={100}
+          bind:this={partialAmountField} />
+      {/if}
+    </div>
+  </SlottedRadioOption>
 </div>
