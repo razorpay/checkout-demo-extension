@@ -27,6 +27,7 @@ import { checkPaymentAdapter } from 'payment/adapters';
 import * as GPay from 'gpay';
 import Analytics from 'analytics';
 import { isProviderHeadless } from 'common/cardlessemi';
+import { hasCheckoutBridge } from 'bridge';
 
 /**
  * Tells if we're being executed from
@@ -511,7 +512,7 @@ Payment.prototype = {
         this.makePopup();
       } else {
         // If we're in SDK and not in an iframe, redirect directly
-        if (global.CheckoutBridge) {
+        if (hasCheckoutBridge()) {
           _Doc.submitForm(this.gotoBankUrl, null, 'post');
         }
         // Otherwise, use sendMessage
