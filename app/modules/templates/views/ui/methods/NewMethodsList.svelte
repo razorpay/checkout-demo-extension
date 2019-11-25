@@ -75,20 +75,38 @@
   }
 
   function selectP13nInstrument(instrument) {
-    $selectedInstrumentId = instrument.id;
-    showCtaWithDefaultText();
-
-    setTimeout(() => {
-      // Focus on the input field
-      // TODO: Figure out a better way to do this
-      const extraInput = _Doc.querySelector(
-        '#instruments-list > .selected input.input'
+    if (instrument.method === 'card') {
+      const tokens = _Obj.getSafely(customer, 'tokens.items', []);
+      const existing = _Arr.find(
+        tokens,
+        token => token.token_id === instrument.token_id
       );
 
-      if (extraInput) {
-        extraInput.focus();
+      if (existing) {
+        setTimeout(() => {
+          // Focus on the input field
+          // TODO: Figure out a better way to do this
+          const extraInput = _Doc.querySelector(
+            '#instruments-list > .selected input.input'
+          );
+
+          if (extraInput) {
+            extraInput.focus();
+          }
+        });
+      } else {
+        selectMethod({
+          detail: {
+            method: 'card',
+          },
+        });
+
+        return;
       }
-    });
+    }
+
+    $selectedInstrumentId = instrument.id;
+    showCtaWithDefaultText();
   }
 
   function deselectInstrument() {
