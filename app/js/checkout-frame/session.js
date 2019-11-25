@@ -4056,6 +4056,12 @@ Session.prototype = {
     Analytics.setMeta('tab', tab);
     Analytics.setMeta('timeSince.tab', discreet.timer());
 
+    if (tab === '') {
+      if (this.newHomeScreen) {
+        this.homeTab.onShown();
+      }
+    }
+
     if (tab) {
       this.switchTabAnalytics(tab);
 

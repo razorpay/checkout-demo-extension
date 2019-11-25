@@ -18,6 +18,7 @@
   import { getSession } from 'sessionmanager';
   import CheckoutStore from 'checkoutstore';
   import { getInstrumentsForCustomer } from 'checkoutframe/personalization';
+  import { hideCta, showCta } from 'checkoutstore/cta';
 
   const session = getSession();
 
@@ -181,6 +182,22 @@
       } else {
         instruments = false;
       }
+    }
+  }
+
+  export function onShown() {
+    if (view === 'methods') {
+      hideCta();
+    } else {
+      showCta();
+    }
+  }
+
+  $: {
+    if (view === 'methods') {
+      hideCta();
+    } else {
+      showCta();
     }
   }
 </script>
