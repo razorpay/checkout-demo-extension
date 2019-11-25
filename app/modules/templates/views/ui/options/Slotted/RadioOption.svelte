@@ -10,6 +10,7 @@
   export let selected = false;
   export let reverse = false;
   export let radio = true;
+  export let defaultStyles = true;
 
   let radioClasses;
   $: {
@@ -42,16 +43,33 @@
     position: unset;
     top: unset;
   }
+
+  .radio {
+    flex-grow: 0;
+    align-self: start;
+  }
+
+  .radio.reverse {
+    margin-right: 12px;
+  }
 </style>
 
-<button class={className} class:selected on:click type="button" role="listitem">
+<button
+  class={className}
+  class:slotted-radio={defaultStyles}
+  class:selected
+  on:click
+  type="button"
+  role="listitem">
   <Stack horizontal {reverse}>
     <slot name="icon" />
     <div>
       <slot name="title" />
       <slot name="subtitle" />
     </div>
-    <Radio {name} {value} checked={selected} classes={radioClasses} />
+    <div class="radio" class:reverse>
+      <Radio {name} {value} checked={selected} classes={radioClasses} />
+    </div>
     <slot name="extra" />
   </Stack>
 </button>
