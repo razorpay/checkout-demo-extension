@@ -165,21 +165,8 @@
       return false;
     }
 
-    // Offers
-    const hasOffersOnHomescreen =
-      session.hasOffers &&
-      _Arr.any(session.eligibleOffers, offer => offer.homescreen);
-    if (hasOffersOnHomescreen) {
-      return false;
-    }
-
     // Missing contact
     if (!$contact || !$contact.length) {
-      return false;
-    }
-
-    // Partial Payment
-    if (CheckoutStore.get().isPartialPayment) {
       return false;
     }
 
