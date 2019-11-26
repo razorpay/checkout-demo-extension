@@ -79,7 +79,7 @@
       const tokens = _Obj.getSafely(customer, 'tokens.items', []);
       const existing = _Arr.find(
         tokens,
-        token => token.token_id === instrument.token_id
+        token => token.id === instrument.token_id
       );
 
       if (existing) {
@@ -131,6 +131,7 @@
     line-height: 1rem;
     text-transform: uppercase;
     color: rgba(51, 51, 51, 0.6);
+    margin: 28px 12px 12px;
   }
 </style>
 
