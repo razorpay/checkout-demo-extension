@@ -60,7 +60,7 @@
   /* Content styles */
   div[slot='title'] {
     margin: 0;
-    font-weight: bold;
+    font-weight: 600;
     font-size: 1rem;
     line-height: 1.1rem;
     color: #4f4f4f;
