@@ -125,9 +125,17 @@
   .border-list {
     margin-bottom: 24px;
   }
+
+  h3 {
+    font-size: 0.8rem;
+    line-height: 1rem;
+    text-transform: uppercase;
+    color: rgba(51, 51, 51, 0.6);
+  }
 </style>
 
-{#if personalization}
+{#if personalization && instruments && instruments.length}
+  <h3>Preferred Payment Methods</h3>
   <div role="list" class="border-list" id="instruments-list">
     {#each instruments as instrument, index (instrument.id)}
       {#if instrument.method === 'card'}
@@ -148,6 +156,7 @@
   </div>
 {/if}
 
+<h3>All Payment Methods</h3>
 <div role="list" class="methods-container border-list">
   {#each visibleMethods as method}
     <Method {method} on:select={selectMethod} />
