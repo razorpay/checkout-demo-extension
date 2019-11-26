@@ -62,6 +62,13 @@
 
   let view = 'details';
 
+  const showSecuredByMessage =
+    view === 'details' &&
+    !session.multiTpv &&
+    !session.tpvBank &&
+    !order.partial_payment &&
+    !session.get('address');
+
   export function showMethods() {
     view = 'methods';
 
@@ -513,7 +520,7 @@
 
     <div slot="bottom">
       <!-- TODO: move to computed -->
-      {#if view === 'details' && !session.multiTpv && !session.tpvBank && !order.partial_payment}
+      {#if showSecuredByMessage}
         <div class="secured-message">
           <i>
             <svg
