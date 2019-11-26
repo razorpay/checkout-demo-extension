@@ -55,7 +55,7 @@ describe('Basic GooglePay Optional Contact Downtime', () => {
     await selectBankNameFromDropDown('okhdfcbank');
     await submit(context);
     await handleUPIAccountValidation(context, 'BHIM@upi');
-    await respondToUPIAjax(context, '');
+    await respondToUPIAjax(context);
     await respondToUPIPaymentStatus(context);
   });
 });

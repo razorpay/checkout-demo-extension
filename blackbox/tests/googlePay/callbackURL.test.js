@@ -4,31 +4,27 @@ const {
   assertHomePage,
   fillUserDetails,
   assertPaymentMethods,
-  selectBankNameFromDropDown,
-  submit,
-  respondToUPIAjax,
-  handleFeeBearer,
-  enterUPIAccount,
-  selectUPIApplication,
   selectPaymentMethod,
+  submit,
+  selectUPIApplication,
+  enterUPIAccount,
   handleUPIAccountValidation,
-  respondToUPIPaymentStatus,
+  expectRedirectWithCallback,
+  selectBankNameFromDropDown,
 } = require('../../actions/common');
 
-describe('Feebearer GooglePay Payment', () => {
-  test('Perform GooglePay transaction with feebearer enabled', async () => {
+describe('Basic GooglePay payment', () => {
+  test('Perform GooglePay collect transaction with callbackURL', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 60000,
+      amount: 200,
       personalization: false,
+      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
+      redirect: true,
     };
-    const preferences = makePreferences({ fee_bearer: true });
+    const preferences = makePreferences();
     preferences.methods.upi = true;
-    const context = await openCheckout({
-      page,
-      options,
-      preferences,
-    });
+    const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
     await assertPaymentMethods(context);
@@ -37,9 +33,7 @@ describe('Feebearer GooglePay Payment', () => {
     await enterUPIAccount(context, 'scbaala');
     await selectBankNameFromDropDown('okhdfcbank');
     await submit(context);
-    await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
-    await handleFeeBearer(context, page);
-    await respondToUPIAjax(context);
-    await respondToUPIPaymentStatus(context);
+    await handleUPIAccountValidation(context, 'scbaala@okhdfc');
+    await expectRedirectWithCallback(context, { method: 'upi' });
   });
 });
