@@ -987,10 +987,7 @@ Session.prototype = {
     var isDemoMerchant = this.get('key') === DEMO_MERCHANT_KEY;
 
     var redirectModeWithNativeOtp =
-      this.get('nativeotp') &&
-      this.get('callback_url') &&
-      this.get('redirect') &&
-      this.r.isLiveMode();
+      this.get('nativeotp') && this.get('redirect') && this.r.isLiveMode();
 
     return isDemoMerchant || redirectModeWithNativeOtp;
   },
