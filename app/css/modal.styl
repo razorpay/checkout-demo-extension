@@ -662,16 +662,6 @@ i {
         text-decoration: line-through;
       }
     }
-
-    #footer {
-      .original-amount {
-        display: none;
-      }
-
-      .discount {
-        display: inline-block;
-      }
-    }
   }
 }
 
@@ -695,12 +685,6 @@ i {
     background-image: linear-gradient(to bottom right, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.2));
   }
 
-  .discount {
-    display: none;
-  }
-}
-
-#footer {
   .discount {
     display: none;
   }
@@ -826,16 +810,6 @@ i {
     #form-fields {
       z-index: 2;
       background: transparent;
-    }
-  }
-
-  &[screen=otp] {
-    .otp-btn {
-      opacity: 1;
-    }
-
-    .pay-btn {
-      opacity: 0;
     }
   }
 }
@@ -1491,10 +1465,6 @@ $outline = #ddd;
     height: 100%;
     transition: 0.3s;
   }
-
-  .otp-btn {
-    opacity: 0;
-  }
 }
 
 .button {
@@ -1691,20 +1661,6 @@ $outline = #ddd;
 }
 
 #container.one-method {
-  .pay-btn {
-    display: none;
-  }
-
-  #body.sub {
-    .pay-btn {
-      display: block;
-    }
-
-    .proceed-btn {
-      display: none;
-    }
-  }
-
   #form-common {
     #form-fields .legend, #payment-options, #methods-list {
       display: none;
