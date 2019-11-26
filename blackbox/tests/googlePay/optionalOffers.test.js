@@ -27,11 +27,6 @@ describe('Offers with contact optional GooglePay payment', () => {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 60000,
       personalization: false,
-      method: [
-        {
-          upi: true,
-        },
-      ],
     };
     const preferences = makePreferences({
       optional: ['contact'],
