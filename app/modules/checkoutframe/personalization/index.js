@@ -352,7 +352,8 @@ export function addInstrumentToPaymentData(payment, instrument, customer) {
     }
   });
 
-  if (payment.method === 'card' || payment.method === 'emi') {
+  // Add token to saved card instrument
+  if (payment.method === 'card') {
     if (customer && customer.tokens && customer.tokens.items) {
       const token = _Arr.find(
         customer.tokens.items,
