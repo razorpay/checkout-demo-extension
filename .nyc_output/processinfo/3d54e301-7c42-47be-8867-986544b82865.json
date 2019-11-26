@@ -1,0 +1,18 @@
+{
+  "uuid": "3d54e301-7c42-47be-8867-986544b82865",
+  "parent": null,
+  "pid": 33699,
+  "argv": [
+    "/usr/local/Cellar/node/12.12.0/bin/node",
+    "/usr/local/bin/npm",
+    "run",
+    "test:unit"
+  ],
+  "execArgv": [],
+  "cwd": "/Users/baalamurugansc/Documents/Workspace/UI",
+  "time": 1573199696585,
+  "ppid": 33698,
+  "root": "41f3717f-4eb6-4ed8-827b-2045948123f2",
+  "coverageFilename": "/Users/baalamurugansc/Documents/Workspace/UI/.nyc_output/3d54e301-7c42-47be-8867-986544b82865.json",
+  "files": []
+}

@@ -1,0 +1,44 @@
+const { openCheckout } = require('../../actions/checkout');
+const { makePreferences } = require('../../actions/preferences');
+const {
+  assertHomePage,
+  fillUserDetails,
+  setPreferenceForOffer,
+  validateQRImage,
+  handleFeeBearer,
+  viewOffers,
+  selectOffer,
+  verifyOfferApplied,
+  selectUPIApp,
+  respondToQRAjax,
+  selectPaymentMethod,
+  assertPaymentMethods,
+} = require('../../actions/common');
+
+describe('Feebearer with optional contact QR Code Payment', () => {
+  test('Perform QR Code transaction with feebearer enabled and optional contact', async () => {
+    const options = {
+      key: 'rzp_test_BlUXikp98tvz4X',
+      amount: 60000,
+      personalization: false,
+    };
+    const preferences = makePreferences({
+      fee_bearer: true,
+      optional: ['contact'],
+    });
+    preferences.methods.upi = true;
+    const context = await openCheckout({
+      page,
+      options,
+      preferences,
+    });
+    await assertHomePage(context, true, true);
+    await fillUserDetails(context);
+    await assertPaymentMethods(context);
+    await selectPaymentMethod(context, 'upi');
+    await selectUPIApp(context, '1');
+    await handleFeeBearer(context, page);
+    await respondToQRAjax(context, '');
+    await validateQRImage(context);
+  });
+});
