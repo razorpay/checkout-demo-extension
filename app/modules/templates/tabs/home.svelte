@@ -87,7 +87,7 @@
     onShown();
   }
 
-  function hideMethods() {
+  export function hideMethods() {
     const active = document.activeElement;
 
     if (active) {
