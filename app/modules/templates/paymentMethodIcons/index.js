@@ -8,10 +8,11 @@ import qr from './qr';
 import paylater from './paylater';
 import paypal from './paypal';
 import bank_transfer from './bank_transfer';
+import contact from './contact';
 
 import { getAllMethods } from 'checkoutframe/paymentmethods';
 
-const availPaymentMethods = getAllMethods().concat(['othermethods']);
+const availPaymentMethods = getAllMethods().concat(['othermethods', 'contact']);
 
 function getIconFn(iconName) {
   switch (iconName) {
@@ -45,6 +46,9 @@ function getIconFn(iconName) {
 
     case 'bank_transfer':
       return bank_transfer;
+
+    case 'contact':
+      return contact;
   }
 }
 

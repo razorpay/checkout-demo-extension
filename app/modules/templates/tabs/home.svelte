@@ -7,6 +7,7 @@
   import RadioOption from 'templates/views/ui/options/RadioOption.svelte';
   import SlottedOption from 'templates/views/ui/options/Slotted/Option.svelte';
   import NewMethodsList from 'templates/views/ui/methods/NewMethodsList.svelte';
+  import Icon from 'templates/views/ui/Icon.svelte';
 
   // Svelte imports
   import { onMount } from 'svelte';
@@ -428,11 +429,6 @@
     text-overflow: ellipsis;
   }
 
-  .home-details :global(button) {
-    padding: 12px 16px;
-    line-height: 18px;
-  }
-
   /* Styles for "Edit v" button */
   .home-details div[slot='extra'] {
     display: flex;
@@ -458,12 +454,12 @@
   }
 
   .home-details div[slot='title'] span:first-child {
-    font-size: 15px;
+    font-size: 0.9rem;
     color: #363636;
   }
 
   .home-details div[slot='title'] span:last-child {
-    font-size: 12px;
+    font-size: 0.7rem;
     color: #757575;
     margin-left: 8px;
     padding-left: 8px;
@@ -521,7 +517,10 @@
           use:touchfix
           class="home-details border-list"
           transition:slide={{ duration: 400 }}>
-          <SlottedOption on:click={hideMethods}>
+          <SlottedOption on:click={hideMethods} className="instrument-strip">
+            <i slot="icon">
+              <Icon icon={icons.contact} />
+            </i>
             <div slot="title">
               {#if $contact}
                 <span>{$contact}</span>
