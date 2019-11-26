@@ -225,7 +225,7 @@
       personalization = shouldUseP13n();
 
       if (personalization) {
-        instruments = getInstruments();
+        updateCustomer();
       } else {
         instruments = false;
       }
