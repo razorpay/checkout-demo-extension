@@ -5393,35 +5393,18 @@ Session.prototype = {
       return this.extraNext();
     }
 
-    if (this.oneMethod && !this.tab) {
-      // Is the user on the new UI and on the methods screen in that UI?
-      var onNewMethodsUi =
-        this.newHomeScreen && !this.homeTab.onMethodsScreen();
+    if (this.oneMethod && !this.tab && !this.newHomeScreen) {
+      setTimeout(function() {
+        window.scrollTo(0, 100);
+      });
 
       /**
-       * If the user is on the new UI,
-       * we need to check if the user
-       * can directly go ahead to the
-       * method.
-       * If the user can, we should let them.
+       * PayPal as a one-method submits
+       * directly from the homescreen.
+       * Do not switch the tab for it.
        */
-
-      var shouldStopFromGoingToMethod =
-        onNewMethodsUi && this.homeTab.shouldShowMethodsScreen();
-
-      if (!shouldStopFromGoingToMethod) {
-        setTimeout(function() {
-          window.scrollTo(0, 100);
-        });
-
-        /**
-         * PayPal as a one-method submits
-         * directly from the homescreen.
-         * Do not switch the tab for it.
-         */
-        if (this.oneMethod !== 'paypal') {
-          return this.switchTab(this.oneMethod);
-        }
+      if (this.oneMethod !== 'paypal') {
+        return this.switchTab(this.oneMethod);
       }
     }
 
