@@ -30,7 +30,7 @@
   const accountName = session.get('prefill.bank_account[name]');
   const icons = session.themeMeta.icons;
 
-  const showAddress = session.get('address');
+  const showAddress = session.get('address') && !order.partial_payment;
 
   const prefilledEmail = session.get('prefill.email');
   const prefilledContact = session.get('prefill.contact');
@@ -99,11 +99,11 @@
 
 {#if order.partial_payment}
   <div class="partial-payment-block">
-    <PartialPaymentOptions />
+    <PartialPaymentOptions {order} />
   </div>
 {/if}
 
-{#if showAddress && !order.partial_payment}
+{#if showAddress}
   <Address
     bind:address={$address}
     bind:pincode={$pincode}

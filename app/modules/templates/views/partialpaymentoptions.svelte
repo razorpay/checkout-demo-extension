@@ -4,9 +4,15 @@
 
   // Props
   export let selected = null;
+  export let order = {};
+
+  const maxAmount = order.amount_due;
+  const minAmount = order.first_payment_min_amount;
+  const amountPaid = Number(order.amount_paid);
 
   // Computed
   let expanded = false;
+  let partialAmount = null;
 
   // Refs
   let partialAmountField = null;
@@ -14,18 +20,18 @@
   $: expanded = selected === 'full';
 
   function handleRadioSelection(type) {
-    selected = type;
-    if (type === 'full') {
+    if (selected !== type && type === 'full') {
       setTimeout(_ => {
         partialAmountField.focus();
       }, 200); // TODO: Fix this
     }
+    selected = type;
   }
 </script>
 
 <style>
   .legend {
-    margin: 0 !important; /* TODO: fix this */
+    margin: 0 !important;
     padding-left: 12px;
     padding-bottom: 20px;
   }
@@ -51,7 +57,10 @@
     <div slot="subtitle">
       {#if expanded}
         <PartialPaymentAmountField
-          maxAmount={100}
+          {maxAmount}
+          {minAmount}
+          {amountPaid}
+          bind:value={partialAmount}
           bind:this={partialAmountField} />
       {/if}
     </div>
