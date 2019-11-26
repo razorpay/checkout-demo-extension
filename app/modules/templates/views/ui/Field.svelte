@@ -63,6 +63,13 @@
   $: inputType = type === 'cvv' ? 'tel' : type;
   $: inputmode = type === 'cvv' ? 'numeric' : inputmode;
 
+  $: {
+    const _value = value;
+
+    // TODO add IE support
+    input && setTimeout(_ => input.dispatchEvent(new global.Event('input')));
+  }
+
   export function focus() {
     input.focus();
   }
