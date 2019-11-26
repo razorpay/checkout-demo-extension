@@ -253,11 +253,13 @@
 
     const checkoutStore = CheckoutStore.get();
 
-    const partial = checkoutStore.isPartialPayment;
-    const optional = checkoutStore.contactEmailOptional;
-    const hidden = checkoutStore.contactEmailHidden;
-    const readonly = checkoutStore.contactEmailReadonly;
-    const address = false; // TODO
+    const {
+      isPartialPayment: partial,
+      contactEmailOptional: optional,
+      contactEmailHidden: hidden,
+      contactEmailReadonly: readonly,
+      address,
+    } = checkoutStore;
 
     // TPV bank
     // TPV UPI
