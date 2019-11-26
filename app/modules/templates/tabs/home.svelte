@@ -124,23 +124,23 @@
     return view === 'methods';
   }
 
-  export function shouldShowMethodsScreen() {
-    if (session.oneMethod) {
-      const singleMethodsWithP13n = ['wallet', 'netbanking', 'upi'];
+  // export function shouldShowMethodsScreen() {
+  //   if (session.oneMethod) {
+  //     const singleMethodsWithP13n = ['wallet', 'netbanking', 'upi'];
 
-      const singleMethod = _Arr.find(
-        singleMethodsWithP13n,
-        method => method === session.oneMethod
-      );
+  //     const singleMethod = _Arr.find(
+  //       singleMethodsWithP13n,
+  //       method => method === session.oneMethod
+  //     );
 
-      const canUseP13n =
-        shouldUseP13n() && getInstruments().length && singleMethod;
+  //     const canUseP13n =
+  //       shouldUseP13n() && getInstruments().length && singleMethod;
 
-      return canUseP13n;
-    }
+  //     return canUseP13n;
+  //   }
 
-    return true;
-  }
+  //   return true;
+  // }
 
   function getInstruments() {
     const _customer = session.getCustomer($contact);
