@@ -278,6 +278,8 @@
       return METHODS;
     }
 
+    // TODO: What should we do in case of only one of email or contact is optional?
+
     // Missing contact
     if (!$contact || !$contact.length) {
       return DETAILS;
