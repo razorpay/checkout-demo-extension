@@ -99,7 +99,7 @@
     setDetailsCta();
   }
 
-  function setDetailsCta() {
+  export function setDetailsCta() {
     showCtaWithText('Proceed');
   }
 

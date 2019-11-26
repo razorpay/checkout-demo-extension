@@ -1242,6 +1242,8 @@ Session.prototype = {
 
     if (tab && !(this.order && this.order.bank) && this.methods[tab]) {
       this.switchTab(tab);
+    } else if (tab === '') {
+      this.switchTab(tab);
     }
 
     var prefilledWallet = this.get('prefill.wallet');
@@ -1439,9 +1441,6 @@ Session.prototype = {
     this.completePendingPayment();
     this.bindEvents();
     this.setEmiScreen();
-
-    // TODO: see if this can be done in a better way
-    setEmiPlansCta('', '');
 
     Hacks.initPostRenderHacks();
 
