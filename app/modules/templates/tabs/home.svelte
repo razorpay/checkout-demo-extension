@@ -254,12 +254,6 @@
     }
   }
 
-  onMount(() => {
-    if (session.tab === '') {
-      onShown();
-    }
-  });
-
   /**
    * Determines where a user should be if
    * they were landing on the homescreen as the first screen.
