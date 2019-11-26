@@ -3279,7 +3279,6 @@ Session.prototype = {
         .on('change', function() {
           self.input(this.el);
 
-          // TODO verify
           if (!self.newHomeScreen) {
             var instruments = [];
 
@@ -3466,11 +3465,7 @@ Session.prototype = {
     $('#body').attr('screen', screen);
     makeHidden('.screen.' + shownClass);
 
-    if (
-      screen &&
-      !(this.isPayout && screen === 'payouts') &&
-      screen !== 'methods'
-    ) {
+    if (screen && !(this.isPayout && screen === 'payouts')) {
       makeVisible('#topbar');
       $('.elem-email').addClass('mature');
       $('.elem-contact').addClass('mature');
