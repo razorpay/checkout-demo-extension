@@ -1,6 +1,7 @@
 <script>
   import SlottedRadioOption from 'templates/views/ui/options/Slotted/RadioOption.svelte';
-  import PartialPaymentAmountField from 'templates/views/ui/PartialPaymentAmountField.svelte';
+  import PartialPaymentAmountField from 'templates/views/ui/fields/PartialPaymentAmountField.svelte';
+  import { getSession } from 'sessionmanager';
 
   // Props
   export let selected = null;

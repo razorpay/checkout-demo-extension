@@ -60,6 +60,12 @@
     order.first_payment_min_amount
   );
 
+  const prefilledEmail = session.get('prefill.email');
+  const prefilledContact = session.get('prefill.contact');
+
+  $contact = prefilledContact || '';
+  $email = prefilledEmail || '';
+
   let view = 'details';
 
   const showSecuredByMessage =
@@ -519,7 +525,6 @@
     </div>
 
     <div slot="bottom">
-      <!-- TODO: move to computed -->
       {#if showSecuredByMessage}
         <div class="secured-message">
           <i>
