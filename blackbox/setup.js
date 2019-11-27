@@ -8,7 +8,7 @@ module.exports = async function() {
   const browser = await puppeteer.launch({
     executablePath: process.env.CHROME_BIN || '/usr/bin/chromium',
     args: ['--no-sandbox'],
-    headless: true,
+    headless: isProd,
     // devtools: true,
   });
   // store the browser instance so we can teardown it later
