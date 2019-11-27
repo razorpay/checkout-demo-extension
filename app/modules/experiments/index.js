@@ -27,7 +27,7 @@ export function getExperimentsFromStorage() {
  * @param {Object} experiments All experiments
  */
 function setExperimentsInStorage(experiments) {
-  if (_.isObject) {
+  if (_.isNonNullObject(experiments)) {
     try {
       experiments = _Obj.stringify(experiments);
       global.localStorage.setItem(STORAGE_KEY, experiments);
