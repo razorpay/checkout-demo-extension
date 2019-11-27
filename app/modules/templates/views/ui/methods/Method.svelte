@@ -11,6 +11,7 @@
 
   // UI imports
   import SlottedOption from 'templates/views/ui/options/Slotted/Option.svelte';
+  import Icon from 'templates/views/ui/Icon.svelte';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -24,14 +25,34 @@
   const session = getSession();
   const dispatch = createEventDispatcher();
 
-  const down =
-    downtime && _Arr.contains(DowntimesStore.get().high.methods, method);
+  const downtimes = DowntimesStore.get().high.methods;
+  let down = false;
+  if (downtime) {
+    if (/card$/.test(method)) {
+      down = _Arr.contains(downtimes, 'card');
+    } else if (method === 'gpay') {
+      down = _Arr.contains(downtimes, 'upi');
+    } else {
+      down = _Arr.contains(downtimes, method);
+    }
+  }
 
   // Items to display
-  const _icon = icon || session.themeMeta.icons[method];
   const _title = title || getMethodNameForPaymentOption(method, { session });
-  let _subtitle = subtitle || getMethodDescription(method, { session });
 
+  const icons = session.themeMeta.icons;
+  let _icon;
+  if (icon) {
+    _icon = icon;
+  } else {
+    if (/card$/.test(method)) {
+      _icon = icons['card'];
+    } else {
+      _icon = icons[method];
+    }
+  }
+
+  let _subtitle;
   if (subtitle) {
     _subtitle = subtitle;
   } else if (down) {
@@ -67,6 +88,10 @@
     text-align: center;
   }
 
+  i :global(.gpay-icon) {
+    margin-left: 0;
+  }
+
   i :global(svg) {
     height: 24px;
     width: auto;
@@ -92,7 +117,7 @@
 
 <SlottedOption className="new-method" on:click={select} disabled={down}>
   <i slot="icon">
-    {@html _icon}
+    <Icon icon={_icon} />
   </i>
   <div slot="title">{_title}</div>
   <div slot="subtitle">{_subtitle}</div>

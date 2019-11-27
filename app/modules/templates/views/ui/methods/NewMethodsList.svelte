@@ -58,6 +58,12 @@
 
     // TODO: Filter based on amount
 
+    // Separate out debit and credit cards
+    if (session.get('theme.debit_card')) {
+      available = _Arr.remove(available, 'card');
+      available = ['credit_card', 'debit_card'].concat(available);
+    }
+
     visibleMethods = available;
   }
 
