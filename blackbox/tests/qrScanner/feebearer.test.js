@@ -7,9 +7,8 @@ const {
   selectPaymentMethod,
   handleFeeBearer,
   selectUPIApp,
-  respondToQRAjax,
   validateQRImage,
-  respondToQRPaymentStatus,
+  responseToQRImage,
   respondToUPIAjax,
   respondToUPIPaymentStatus,
 } = require('../../actions/common');
@@ -17,7 +16,7 @@ const {
 describe('Basic QR Code Payment', () => {
   test('Perform QR Code transaction with feebearer enabled', async () => {
     const options = {
-      key: 'rzp_test_BlUXikp98tvz4X',
+      key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 60000,
       personalization: false,
     };
@@ -33,8 +32,10 @@ describe('Basic QR Code Payment', () => {
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await selectUPIApp(context, '1');
-    await handleFeeBearer(context, page);
-    await respondToQRAjax(context, '');
+    await handleFeeBearer(context);
+    await respondToUPIAjax(context, '', { method: 'intent' });
+    await responseToQRImage(context);
     await validateQRImage(context);
+    await respondToUPIPaymentStatus(context);
   });
 });
