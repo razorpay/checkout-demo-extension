@@ -7,6 +7,7 @@
   export let icon = null; // Override: icon. Picked from method if not overridden.
   export let title = null; // Override: title. Picked from method if not overridden.
   export let subtitle = null; // Override: subtitle. Picked from method if not overridden.
+  export let downtime = true; // Should we consider downtime?
 
   // UI imports
   import SlottedOption from 'templates/views/ui/options/Slotted/Option.svelte';
@@ -14,6 +15,7 @@
   // Utils imports
   import { getSession } from 'sessionmanager';
   import {
+    getMethodDowntimeDescription,
     getMethodNameForPaymentOption,
     getMethodDescription,
   } from 'checkoutframe/paymentmethods';
@@ -22,17 +24,26 @@
   const session = getSession();
   const dispatch = createEventDispatcher();
 
+  const down =
+    method === 'netbanking' ||
+    (downtime && _Arr.contains(DowntimesStore.get().high.methods, method));
+
   // Items to display
   const _icon = icon || session.themeMeta.icons[method];
   const _title = title || getMethodNameForPaymentOption(method, { session });
-  const _subtitle = subtitle || getMethodDescription(method, { session });
+  let _subtitle = subtitle || getMethodDescription(method, { session });
+
+  if (subtitle) {
+    _subtitle = subtitle;
+  } else if (down) {
+    _subtitle = getMethodDowntimeDescription(method);
+  } else {
+    _subtitle = getMethodDescription(method, { session });
+  }
 
   function select(event) {
-    const downtimes = DowntimesStore.get();
-    const down = downtimes.high.methods || [];
-
     dispatch('select', {
-      down: _Arr.contains(down, method),
+      down,
       method,
     });
   }
@@ -42,6 +53,11 @@
   /* Container styles */
   :global(.new-method) {
     padding: 16px;
+  }
+
+  :global(.new-method.down) {
+    cursor: not-allowed;
+    background-color: #f7f7f7;
   }
 
   /* Icon styles */
@@ -75,7 +91,7 @@
   }
 </style>
 
-<SlottedOption className="new-method" on:click={select}>
+<SlottedOption className="new-method" on:click={select} disabled={down}>
   <i slot="icon">
     {@html _icon}
   </i>
