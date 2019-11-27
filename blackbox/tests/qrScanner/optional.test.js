@@ -6,8 +6,10 @@ const {
   assertPaymentMethods,
   selectUPIApp,
   selectPaymentMethod,
-  respondToQRAjax,
+  respondToUPIAjax,
   validateQRImage,
+  responseWithQRImage,
+  respondToUPIPaymentStatus,
 } = require('../../actions/common');
 
 describe(' Perform QRCode Payment', () => {
@@ -29,7 +31,9 @@ describe(' Perform QRCode Payment', () => {
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await selectUPIApp(context, '1');
-    await respondToQRAjax(context, '');
+    await respondToUPIAjax(context, '', { method: 'intent' });
+    await responseWithQRImage(context);
     await validateQRImage(context);
+    await respondToUPIPaymentStatus(context);
   });
 });

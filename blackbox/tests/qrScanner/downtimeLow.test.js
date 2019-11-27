@@ -7,8 +7,10 @@ const {
   verifyLowDowntime,
   selectPaymentMethod,
   selectUPIApp,
-  respondToQRAjax,
+  respondToUPIAjax,
   validateQRImage,
+  responseWithQRImage,
+  respondToUPIPaymentStatus,
 } = require('../../actions/common');
 
 describe('QRCode Downtime payment', () => {
@@ -46,7 +48,9 @@ describe('QRCode Downtime payment', () => {
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await selectUPIApp(context, '1');
-    await respondToQRAjax(context, '');
+    await respondToUPIAjax(context, '', { method: 'intent' });
+    await responseWithQRImage(context);
     await validateQRImage(context);
+    await respondToUPIPaymentStatus(context);
   });
 });

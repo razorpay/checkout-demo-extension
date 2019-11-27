@@ -8,7 +8,7 @@ const {
   handleFeeBearer,
   selectUPIApp,
   validateQRImage,
-  responseToQRImage,
+  responseWithQRImage,
   respondToUPIAjax,
   respondToUPIPaymentStatus,
 } = require('../../actions/common');
@@ -34,7 +34,7 @@ describe('Basic QR Code Payment', () => {
     await selectUPIApp(context, '1');
     await handleFeeBearer(context);
     await respondToUPIAjax(context, '', { method: 'intent' });
-    await responseToQRImage(context);
+    await responseWithQRImage(context);
     await validateQRImage(context);
     await respondToUPIPaymentStatus(context);
   });

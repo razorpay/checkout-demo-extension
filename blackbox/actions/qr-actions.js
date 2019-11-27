@@ -7,7 +7,7 @@ async function validateQRImage(context) {
   expect(currentElement).toEqual(true);
 }
 
-async function responseToQRImage(context) {
+async function responseWithQRImage(context) {
   const req = await context.expectRequest();
   const encyptedURL = querystring.unescape(req.url);
   const url =
@@ -18,5 +18,5 @@ async function responseToQRImage(context) {
 
 module.exports = {
   validateQRImage,
-  responseToQRImage,
+  responseWithQRImage,
 };

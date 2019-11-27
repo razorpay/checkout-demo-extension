@@ -3,14 +3,12 @@ const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
-  setPreferenceForOffer,
+  responseWithQRImage,
   validateQRImage,
   handleFeeBearer,
-  viewOffers,
-  selectOffer,
-  verifyOfferApplied,
+  respondToUPIAjax,
+  respondToUPIPaymentStatus,
   selectUPIApp,
-  respondToQRAjax,
   selectPaymentMethod,
   assertPaymentMethods,
 } = require('../../actions/common');
@@ -38,7 +36,9 @@ describe('Feebearer with optional contact QR Code Payment', () => {
     await selectPaymentMethod(context, 'upi');
     await selectUPIApp(context, '1');
     await handleFeeBearer(context, page);
-    await respondToQRAjax(context, '');
+    await respondToUPIAjax(context, '', { method: 'intent' });
+    await responseWithQRImage(context);
     await validateQRImage(context);
+    await respondToUPIPaymentStatus(context);
   });
 });

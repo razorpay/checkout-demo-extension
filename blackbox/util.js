@@ -144,6 +144,12 @@ const util = (module.exports = {
         body,
       });
 
+    returnObj.respondImage = body =>
+      respond({
+        contentType: 'image/png',
+        body,
+      });
+
     returnObj.failRequest = body =>
       respond({
         status: 400,

@@ -4,14 +4,14 @@ const {
   assertHomePage,
   fillUserDetails,
   assertPaymentMethods,
-  selectUPIIDFromDropDown,
+  responseWithQRImage,
   submit,
   respondToUPIAjax,
   handleFeeBearer,
   enterUPIAccount,
   selectUPIApp,
   selectPaymentMethod,
-  respondToQRAjax,
+  respondToUPIPaymentStatus,
   validateQRImage,
 } = require('../../actions/common');
 
@@ -34,8 +34,10 @@ describe('Feebearer Keyless QR Code Payment', () => {
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await selectUPIApp(context, '1');
-    await handleFeeBearer(context, page);
-    await respondToQRAjax(context, '');
+    await handleFeeBearer(context);
+    await respondToUPIAjax(context, '', { method: 'intent' });
+    await responseWithQRImage(context);
     await validateQRImage(context);
+    await respondToUPIPaymentStatus(context);
   });
 });

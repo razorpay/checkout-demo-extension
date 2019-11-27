@@ -5,15 +5,13 @@ const {
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
-  submit,
-  selectUPIApplication,
-  enterUPIAccount,
-  handleUPIAccountValidation,
-  respondToQRAjax,
+  respondToUPIAjax,
+  responseWithQRImage,
   validateQRImage,
   handleFeeBearer,
   verifyLowDowntime,
   selectUPIApp,
+  respondToUPIPaymentStatus,
 } = require('../../actions/common');
 
 describe('QR Code Downtime payment', () => {
@@ -52,8 +50,10 @@ describe('QR Code Downtime payment', () => {
     await selectPaymentMethod(context, 'upi');
     await verifyLowDowntime(context, 'UPI');
     await selectUPIApp(context, '1');
-    await handleFeeBearer(context, page);
-    await respondToQRAjax(context, '');
+    await handleFeeBearer(context);
+    await respondToUPIAjax(context, '', { method: 'intent' });
+    await responseWithQRImage(context);
     await validateQRImage(context);
+    await respondToUPIPaymentStatus(context);
   });
 });
