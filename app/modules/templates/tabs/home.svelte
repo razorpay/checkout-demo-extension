@@ -262,6 +262,24 @@
       address,
     } = checkoutStore;
 
+    // If email and contact are prefilled, validate them
+    if (!optional && !hidden) {
+      const contactRegex = /^\+?[0-9]{8,15}$/;
+      const emailRegex = /^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/;
+
+      if ($contact && $contact.length) {
+        if (!contactRegex.test($contact)) {
+          return DETAILS;
+        }
+      }
+
+      if ($email && $email.length) {
+        if (!emailRegex.test($email)) {
+          return DETAILS;
+        }
+      }
+    }
+
     // TPV bank
     // TPV UPI
     // Multi TPV
