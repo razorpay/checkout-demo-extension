@@ -60,12 +60,6 @@ var activeStateColor = themeMeta.activeStateColor;
   background: `=hoverStateColor`;
 }
 
-.hoverbg:focus,
-.hoverbg:focus-within,
-.hoverbg:hover {
-  background-color: `=hoverStateColor`;
-}
-
 .theme-highlight-color,
 .options .next-option:after {
   color: `=highlightColor`;
@@ -232,6 +226,7 @@ svg.offer-icon path {
 .border-list > *:focus-within,
 .border-list > .selected {
   border-color: `=highlightColor`;
+  background-color: `=hoverStateColor`;
 }
 
 .border-list > *:not(:last-child) {

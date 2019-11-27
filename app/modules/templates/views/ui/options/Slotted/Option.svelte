@@ -32,13 +32,7 @@
   }
 </style>
 
-<button
-  type="button"
-  class={className}
-  class:hoverbg={!disabled}
-  role="listitem"
-  {disabled}
-  on:click>
+<button type="button" class={className} role="listitem" {disabled} on:click>
   <Stack horizontal>
     <slot name="icon" />
     <div>
