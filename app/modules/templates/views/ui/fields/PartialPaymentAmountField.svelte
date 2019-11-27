@@ -5,6 +5,7 @@
 
   export let maxAmount = null;
   export let minAmount = null;
+  export let minAmountLabel = null;
   export let amountPaid = null;
   export let value;
 
@@ -59,6 +60,10 @@
       margin-right: 8px;
     }
   }
+
+  .subtitle.subtitle--help {
+    margin-left: 0 !important;
+  }
 </style>
 
 <!-- TODO: format amount in helpText -->
@@ -87,8 +92,8 @@
       checked={valueInLower === minAmount} />
     <div class="checkbox inner-checkbox" for="minimum-amount-checkbox" />
     <label class="partial-label" for="minimum-amount-checkbox">
-      <!-- TODO: format amount -->
-      Minimum Amount Due (₹{minAmount / 100})
+      {#if minAmountLabel}{minAmountLabel}{:else}Minimum Amount Due{/if}
+      {session.formatAmountWithCurrency(minAmount)}
     </label>
   </div>
 {/if}
