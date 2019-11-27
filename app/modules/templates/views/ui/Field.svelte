@@ -66,8 +66,20 @@
   $: {
     const _value = value;
 
-    // TODO add IE support
-    input && setTimeout(_ => input.dispatchEvent(new global.Event('input')));
+    if (input) {
+      setTimeout(() => {
+        let event;
+
+        if (typeof global.Event === 'function') {
+          event = new global.Event('input');
+        } else {
+          event = document.createEvent('Event');
+          event.initEvent('input', true, true);
+        }
+
+        input.dispatchEvent(event);
+      });
+    }
   }
 
   export function focus() {
