@@ -118,7 +118,7 @@ async function respondSavedCards(context) {
             last4: '1111',
             network: 'Visa',
             type: 'debit',
-            issuer: null,
+            issuer: 'ICIC',
             international: false,
             emi: false,
             expiry_month: 12,

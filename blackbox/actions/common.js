@@ -12,8 +12,7 @@ const cardActions = require('./card-actions');
 const downtimeTimoutActions = require('./downtime-timeout-actions');
 const walletActions = require('./wallet-actions');
 const sharedActions = require('./shared-actions');
-const payoutActions = require('./payout-actions');
-const emandateBanktransferActions = require('./emandate-banktransfer-actions');
+const personalizationActions = require('./personalization-actions');
 
 contents = String(
   readFileSync(__dirname + '/../fixtures/mockSuccessandFailPage.html')
@@ -32,8 +31,7 @@ module.exports = {
   ...downtimeTimoutActions,
   ...walletActions,
   ...sharedActions,
-  ...payoutActions,
-  ...emandateBanktransferActions,
+  ...personalizationActions,
   verifyDiscountPaybleAmount,
   verifyDiscountText,
   verifyDiscountAmountInBanner,
@@ -104,19 +102,12 @@ async function verifyDiscountAmountInBanner(context, expectedDiscountAmount) {
 }
 
 async function verifyDiscountPaybleAmount(context, expectedDiscountAmount) {
-  const footer = await context.page.waitForSelector('#footer');
-  let footerText = await context.page.evaluate(
-    footer => footer.textContent,
-    footer
+  const discount = await context.page.waitForSelector('.pay-btn .discount');
+  let discountAmount = await context.page.evaluate(
+    discount => discount.textContent,
+    discount
   );
-
-  footerText = footerText.trim();
-
-  const footerEndsWithDiscountAmount = footerText.endsWith(
-    expectedDiscountAmount
-  );
-
-  expect(footerEndsWithDiscountAmount).toEqual(true);
+  expect(discountAmount).toEqual(expectedDiscountAmount);
 }
 
 async function verifyDiscountText(context, expectedDiscountAmount) {
