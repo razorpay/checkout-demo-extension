@@ -33,6 +33,7 @@
   } from 'checkoutstore/cta';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
+  import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
 
   const session = getSession();
 
@@ -101,7 +102,16 @@
   }
 
   export function setDetailsCta() {
-    showCtaWithText('Proceed');
+    if (session.oneMethod) {
+      showCtaWithText(
+        'Pay by ' +
+          getMethodNameForPaymentOption(session.oneMethod, {
+            session,
+          })
+      );
+    } else {
+      showCtaWithText('Proceed');
+    }
   }
 
   /**
@@ -311,7 +321,7 @@
 
     if (session.oneMethod) {
       if (
-        ['wallet', 'netbanking', 'upi'].contains(session.oneMethod) &&
+        _Arr.contains(['wallet', 'netbanking', 'upi'], session.oneMethod) &&
         _instruments.length > 0
       ) {
         return METHODS;
@@ -330,7 +340,11 @@
 
     // TPV UPI
     if (session.upiTpv) {
-      selectMethod('upi');
+      selectMethod({
+        detail: {
+          method: 'upi',
+        },
+      });
       return;
     }
 
@@ -350,13 +364,17 @@
 
     if (session.oneMethod) {
       if (
-        ['wallet', 'netbanking', 'upi'].contains(session.oneMethod) &&
+        _Arr.contains(['wallet', 'netbanking', 'upi'], session.oneMethod) &&
         _instruments.length > 0
       ) {
         showMethods();
         return;
       } else {
-        selectMethod(session.oneMethod);
+        selectMethod({
+          detail: {
+            method: session.oneMethod,
+          },
+        });
         return;
       }
     }

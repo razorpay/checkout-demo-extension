@@ -1432,10 +1432,10 @@ Session.prototype = {
     this.getEl();
     this.setMethodsList();
     this.setFormatting();
+    this.improvisePaymentOptions();
     this.setSvelteComponents();
     this.fillData();
     this.setEMI();
-    this.improvisePaymentOptions();
     Cta.setAppropriateCtaText();
     this.setModal();
     this.completePendingPayment();
@@ -2244,7 +2244,6 @@ Session.prototype = {
 
     $(this.el).addClass('one-method');
     $('.payment-option').addClass('submit-button button');
-    Cta.setAppropriateCtaText();
   },
 
   improvisePaymentOptions: function() {
