@@ -4,17 +4,30 @@ async function selectUPIApp(context, AppNumber) {
   await context.page.click('.option:nth-of-type(' + AppNumber + ')');
 }
 
-async function respondToUPIAjax(context, offerId = '') {
+async function respondToUPIAjax(context, { method } = {}, offerId = '') {
+  var dataValue,
+    typeValue = {};
   const req = await context.expectRequest();
   if (offerId != '') expect(req.body).toContain(offerId);
   expect(req.url).toContain('create/ajax');
+  if (method === 'qr') {
+    typeValue = 'intent';
+    dataValue = {
+      intent_url:
+        'upi://pay?pa=upi@razopay&pn=Razorpay&tr=1UIWQ1mLDGYBQbR&tn=razorpay&am=10.24&cu=INR&mc=5411',
+    };
+  } else {
+    typeValue = 'async';
+    dataValue = null;
+  }
+
   await context.respondJSON({
-    type: 'async',
+    type: typeValue,
     version: 1,
     payment_id: 'pay_DaaBCIH1rZXZg5',
     gateway:
-      'eyJpdiI6IjdzTEZcLzUzUVN5dHBORHlZRFc2TVh3PT0iLCJ2YWx1ZSI6IldXeDdpWVFTSWhLbThLOWtXancrNEhRRkl0ZE5peDNDSDJnMUJTVmg4THc9IiwibWFjIjoiMGVhYjFhMDAyYzczNDlkMTI0OGFiMDRjMGJlZDVjZTA5MjM0YTcyNjI0ODQ1MzExMWViZjVjY2QxMGUwZDZmYiJ9',
-    data: null,
+      'eyJpdiI6IlFOYUo1WEY1WWJmY1FHWURKdmpLeUE9PSIsInZhbHVlIjoiQlhXRTFNcXZKblhxSzJRYTBWK1pMc2VLM0owWUpLRk9JWTZXT04rZlJYRT0iLCJtYWMiOiIxZjk5Yjc5ZmRlZDFlNThmNWQ5ZTc3ZDdiMTMzYzU0ZmRiOTIxY2NlM2IxYjZlNjk5NDEzMGUzMzEzOTA1ZGEwIn0',
+    data: dataValue,
     request: {
       url:
         'https://api.razorpay.com/v1/payments/pay_DaaBCIH1rZXZg5/status?key_id=rzp_test_1DP5mmOlF5G5ag',
