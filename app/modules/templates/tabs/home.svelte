@@ -46,7 +46,7 @@
   const methods = session.methods;
   const icons = session.themeMeta.icons;
   const order = session.order || {};
-  const { isPartialPayment, prefill } = CheckoutStore.get().prefill;
+  const { isPartialPayment, prefill } = CheckoutStore.get();
 
   $contact = prefill.contact || '';
   $email = prefill.email || '';
