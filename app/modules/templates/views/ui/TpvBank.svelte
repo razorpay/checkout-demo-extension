@@ -13,7 +13,7 @@
 <div class="customer-bank-details">
   <div class="bank-name">
     {#if bank.image}
-      <img src={bank.image} />
+      <img src={bank.image} alt={bank.name} />
     {/if}
     {#if bank.name}{bank.name}{:else}Bank Details{/if}
   </div>

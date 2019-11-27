@@ -5446,9 +5446,11 @@ Session.prototype = {
      */
     if (!screen && this.newHomeScreen) {
       if (this.checkCommonValid()) {
-        // switch to methods tab'
+        // switch to methods tab
         if (this.homeTab.onDetailsScreen()) {
-          return this.homeTab.next();
+          if (this.homeTab.shouldShowNext()) {
+            return this.homeTab.next();
+          }
         }
       }
     }

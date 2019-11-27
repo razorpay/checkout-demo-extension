@@ -313,7 +313,7 @@
           },
         });
       } else if ($multiTpvOption === 'netbanking') {
-        // TODO: create payment
+        session.preSubmit();
       }
       return;
     }
@@ -373,6 +373,10 @@
     } else {
       session.switchTab(method);
     }
+  }
+
+  export function shouldShowNext() {
+    return !($multiTpvOption === 'netbanking' && session.multiTpv);
   }
 
   export function getSelectedInstrument() {
