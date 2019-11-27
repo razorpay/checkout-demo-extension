@@ -12,6 +12,7 @@ const cardActions = require('./card-actions');
 const downtimeTimoutActions = require('./downtime-timeout-actions');
 const walletActions = require('./wallet-actions');
 const sharedActions = require('./shared-actions');
+const emandateBanktransferActions = require('./emandate-banktransfer-actions');
 const personalizationActions = require('./personalization-actions');
 
 contents = String(
@@ -31,6 +32,7 @@ module.exports = {
   ...downtimeTimoutActions,
   ...walletActions,
   ...sharedActions,
+  ...emandateBanktransferActions,
   ...personalizationActions,
   verifyDiscountPaybleAmount,
   verifyDiscountText,
@@ -102,12 +104,19 @@ async function verifyDiscountAmountInBanner(context, expectedDiscountAmount) {
 }
 
 async function verifyDiscountPaybleAmount(context, expectedDiscountAmount) {
-  const discount = await context.page.waitForSelector('.pay-btn .discount');
-  let discountAmount = await context.page.evaluate(
-    discount => discount.textContent,
-    discount
+  const footer = await context.page.waitForSelector('#footer');
+  let footerText = await context.page.evaluate(
+    footer => footer.textContent,
+    footer
   );
-  expect(discountAmount).toEqual(expectedDiscountAmount);
+
+  footerText = footerText.trim();
+
+  const footerEndsWithDiscountAmount = footerText.endsWith(
+    expectedDiscountAmount
+  );
+
+  expect(footerEndsWithDiscountAmount).toEqual(true);
 }
 
 async function verifyDiscountText(context, expectedDiscountAmount) {
