@@ -1444,6 +1444,10 @@ Session.prototype = {
 
     Hacks.initPostRenderHacks();
 
+    if (this.newHomeScreen) {
+      makeContainerLong();
+    }
+
     errorHandler.call(this, this.params);
 
     var hasOffers = this.hasOffers,
