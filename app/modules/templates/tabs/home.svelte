@@ -25,6 +25,7 @@
     pincode,
     state,
     selectedInstrumentId,
+    multiTpvOption,
   } from 'checkoutstore/screens/home';
 
   // Utils imports
@@ -330,6 +331,20 @@
   view = determineLandingView();
 
   export function next() {
+    // Multi TPV
+    if (session.multiTpv) {
+      if ($multiTpvOption === 'upi') {
+        selectMethod({
+          detail: {
+            method: 'upi',
+          },
+        });
+      } else if ($multiTpvOption === 'netbanking') {
+        // TODO: create payment
+      }
+      return;
+    }
+
     // TPV UPI
     if (session.upiTpv) {
       selectMethod({
@@ -343,12 +358,6 @@
     // TPV bank
     if (session.tpvBank) {
       // TODO: Create payment
-      return;
-    }
-
-    // Multi TPV
-    if (session.multiTpv) {
-      // TODO: ???
       return;
     }
 

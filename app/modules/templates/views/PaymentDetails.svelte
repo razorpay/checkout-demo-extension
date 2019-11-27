@@ -15,6 +15,7 @@
     address,
     pincode,
     state,
+    multiTpvOption,
   } from 'checkoutstore/screens/home';
 
   // Transitions
@@ -76,7 +77,7 @@
 
 {#if session.multiTpv}
   <div class="multi-tpv-block" transition:slide={{ duration: 400 }}>
-    <MultiTpvOptions {bank} {icons} />
+    <MultiTpvOptions {bank} {icons} bind:selectedOption={$multiTpvOption} />
   </div>
 {:else if session.tpvBank}
   <div class="tpv-bank-block" transition:slide={{ duration: 400 }}>

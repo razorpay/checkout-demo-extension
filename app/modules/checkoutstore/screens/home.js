@@ -7,3 +7,5 @@ export const selectedInstrumentId = writable(null);
 export const address = writable('');
 export const pincode = writable('');
 export const state = writable('');
+
+export const multiTpvOption = writable('netbanking');
