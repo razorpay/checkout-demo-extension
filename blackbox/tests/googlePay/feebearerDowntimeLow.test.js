@@ -6,51 +6,57 @@ const {
   assertPaymentMethods,
   selectPaymentMethod,
   submit,
-  handleUPIAccountValidation,
-  selectBankNameFromGooglePayDropDown,
   selectUPIMethod,
-  handlePartialPayment,
-  verifyPartialAmount,
   enterUPIAccount,
+  handleUPIAccountValidation,
   respondToUPIAjax,
   respondToUPIPaymentStatus,
+  handleFeeBearer,
+  verifyLowDowntime,
+  selectBankNameFromGooglePayDropDown,
 } = require('../../actions/common');
 
-describe('Optional Partial GooglePay payment', () => {
-  test('Perform GooglePay transaction with partial payments enabled and optional contact', async () => {
+describe('GooglePay Downtime payment', () => {
+  test('Verify GooglePay Downtimepayment- Low with customer feebearer enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
       personalization: false,
     };
     const preferences = makePreferences({
-      optional: ['contact'],
-      order: {
-        amount: 10000,
-        amount_due: 10000,
-        amount_paid: 0,
-        currency: 'INR',
-        first_payment_min_amount: null,
-        partial_payment: true,
+      fee_bearer: true,
+      payment_downtime: {
+        entity: 'collection',
+        count: 1,
+        items: [
+          {
+            id: 'down_DEW7D9S10PEsl1',
+            entity: 'payment.downtime',
+            method: 'upi',
+            begin: 1567686386,
+            end: null,
+            status: 'started',
+            scheduled: false,
+            severity: 'low',
+            created_at: 1567686387,
+            updated_at: 1567686387,
+          },
+        ],
       },
     });
     preferences.methods.upi = true;
-    const context = await openCheckout({
-      page,
-      options,
-      preferences,
-    });
+    const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
-    await handlePartialPayment(context, '1');
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
+    await verifyLowDowntime(context, 'UPI');
     await selectUPIMethod(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
     await selectBankNameFromGooglePayDropDown(context, 'okhdfcbank');
-    await verifyPartialAmount(context, '₹ 1');
     await submit(context);
     await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
+    await handleFeeBearer(context, page);
     await respondToUPIAjax(context);
     await respondToUPIPaymentStatus(context);
   });

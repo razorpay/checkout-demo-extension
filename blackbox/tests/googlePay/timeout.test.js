@@ -6,9 +6,9 @@ const {
   assertPaymentMethods,
   selectPaymentMethod,
   verifyTimeout,
-  selectUPIApplication,
+  selectUPIMethod,
   enterUPIAccount,
-  selectUPIIDFromDropDown,
+  selectBankNameFromGooglePayDropDown,
 } = require('../../actions/common');
 
 describe('Timeout GooglePay payment', () => {
@@ -30,9 +30,9 @@ describe('Timeout GooglePay payment', () => {
     await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIApplication(context, 'Google Pay');
+    await selectUPIMethod(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
-    await selectUPIIDFromDropDown(context, 'okhdfcbank', 'gpay_bank');
+    await selectBankNameFromGooglePayDropDown(context, 'okhdfcbank');
     await verifyTimeout(context, 'upi');
   });
 });

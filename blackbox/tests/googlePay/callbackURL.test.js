@@ -5,19 +5,16 @@ const {
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
-  selectUPIApplication,
   submit,
+  selectUPIMethod,
   enterUPIAccount,
-  selectUPIIDFromDropDown,
   handleUPIAccountValidation,
-  respondToUPIAjax,
-  respondToUPIPaymentStatus,
-  handleCardValidationWithCallback,
-  expectMockSuccessWithCallback,
+  expectRedirectWithCallback,
+  selectBankNameFromGooglePayDropDown,
 } = require('../../actions/common');
 
-describe.skip('CallBack Url with Google Pay', () => {
-  test('Perform CallBack Url with Google Pay', async () => {
+describe('Basic GooglePay payment', () => {
+  test('Perform GooglePay collect transaction with callbackURL', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
@@ -27,20 +24,16 @@ describe.skip('CallBack Url with Google Pay', () => {
     };
     const preferences = makePreferences();
     preferences.methods.upi = true;
-
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIApplication(context, 'Google Pay');
+    await selectUPIMethod(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
-    await selectUPIIDFromDropDown(context, 'okhdfcbank', 'gpay_bank');
+    await selectBankNameFromGooglePayDropDown(context, 'okhdfcbank');
     await submit(context);
-    await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
-    await respondToUPIAjax(context, '');
-    await respondToUPIPaymentStatus(context);
-    await handleCardValidationWithCallback(context);
-    await expectMockSuccessWithCallback(context);
+    await handleUPIAccountValidation(context, 'scbaala@okhdfc');
+    await expectRedirectWithCallback(context, { method: 'upi' });
   });
 });

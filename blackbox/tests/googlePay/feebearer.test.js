@@ -4,12 +4,12 @@ const {
   assertHomePage,
   fillUserDetails,
   assertPaymentMethods,
-  selectUPIIDFromDropDown,
+  selectBankNameFromGooglePayDropDown,
   submit,
   respondToUPIAjax,
   handleFeeBearer,
   enterUPIAccount,
-  selectUPIApplication,
+  selectUPIMethod,
   selectPaymentMethod,
   handleUPIAccountValidation,
   respondToUPIPaymentStatus,
@@ -33,13 +33,13 @@ describe('Feebearer GooglePay Payment', () => {
     await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIApplication(context, 'Google Pay');
+    await selectUPIMethod(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
-    await selectUPIIDFromDropDown(context, 'okhdfcbank', 'gpay_bank');
+    await selectBankNameFromGooglePayDropDown(context, 'okhdfcbank');
     await submit(context);
     await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
     await handleFeeBearer(context, page);
-    await respondToUPIAjax(context, '');
+    await respondToUPIAjax(context);
     await respondToUPIPaymentStatus(context);
   });
 });

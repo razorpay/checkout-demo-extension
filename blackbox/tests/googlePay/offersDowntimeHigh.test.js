@@ -1,35 +1,46 @@
 const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
+const { delay, visible } = require('../../util');
 const {
   assertHomePage,
   fillUserDetails,
   assertPaymentMethods,
-  selectPaymentMethod,
-  selectUPIMethod,
-  enterUPIAccount,
-  selectBankNameFromGooglePayDropDown,
-  submit,
-  respondToUPIAjax,
-  handleUPIAccountValidation,
-  respondToUPIPaymentStatus,
-  setPreferenceForOffer,
-  viewOffers,
+  verifyHighDowntime,
   selectOffer,
   verifyOfferApplied,
+  setPreferenceForOffer,
+  viewOffers,
   verifyDiscountPaybleAmount,
   verifyDiscountAmountInBanner,
   verifyDiscountText,
 } = require('../../actions/common');
 
-describe('Offers with contact optional GooglePay payment', () => {
-  test('Perform Offers GooglePay transaction with optional contact enabled', async () => {
+describe('Basic GooglePay payment', () => {
+  test('Verify GooglePay downtime - high with offers applied', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 60000,
+      amount: 200,
       personalization: false,
     };
     const preferences = makePreferences({
-      optional: ['contact'],
+      payment_downtime: {
+        entity: 'collection',
+        count: 1,
+        items: [
+          {
+            id: 'down_DEW7D9S10PEsl1',
+            entity: 'payment.downtime',
+            method: 'upi',
+            begin: 1567686386,
+            end: null,
+            status: 'started',
+            scheduled: false,
+            severity: 'high',
+            created_at: 1567686387,
+            updated_at: 1567686387,
+          },
+        ],
+      },
       offers: [
         {
           original_amount: 200000,
@@ -52,28 +63,20 @@ describe('Offers with contact optional GooglePay payment', () => {
       ],
     });
     preferences.methods.upi = true;
-    const context = await openCheckout({
-      page,
-      options,
-      preferences,
-    });
     await setPreferenceForOffer(preferences);
+    const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
     await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'upi');
-    await selectUPIMethod(context, 'Google Pay');
-    await enterUPIAccount(context, 'scbaala');
-    await selectBankNameFromGooglePayDropDown(context, 'okhdfcbank');
     await viewOffers(context);
     await selectOffer(context, '1');
     await verifyOfferApplied(context);
     await verifyDiscountPaybleAmount(context, '₹ 1,980');
     // await verifyDiscountAmountInBanner(context, '₹ 1,980'); /* Issue reported CE-963*/
     await verifyDiscountText(context, 'You save ₹ 20');
-    await submit(context);
-    await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
-    await respondToUPIAjax(context);
-    await respondToUPIPaymentStatus(context);
+    await verifyHighDowntime(
+      context,
+      'UPI is facing temporary issues right now. Please select another method.'
+    );
   });
 });

@@ -6,10 +6,10 @@ const {
   assertPaymentMethods,
   selectPaymentMethod,
   verifyTimeout,
-  selectUPIApp,
+  selectUPIMethod,
 } = require('../../actions/common');
 
-describe.skip('Basic GooglePay payment', () => {
+describe('Basic GooglePay payment', () => {
   test('Perform GooglePay transaction with contact optional and timeout enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -23,18 +23,12 @@ describe.skip('Basic GooglePay payment', () => {
       page,
       options,
       preferences,
-      apps: [
-        {
-          package_name: 'com.google.android.apps.nbu.paisa.user',
-          app_name: 'Google Pay (Tez)',
-        },
-      ],
     });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIApp(context, '1');
+    await selectUPIMethod(context, 'Google Pay');
     await verifyTimeout(context, 'upi');
   });
 });

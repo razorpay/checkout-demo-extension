@@ -24,7 +24,7 @@ async function assertHomePage(context) {
 
 async function fillUserDetails(context, number) {
   if (!context.prefilledContact && !context.isContactOptional) {
-    await context.page.type('#contact', number || randomContact());
+    await context.page.type('#contact', randomContact());
   }
   if (!context.prefilledEmail && !context.isEmailOptional) {
     await context.page.type('#email', randomEmail());

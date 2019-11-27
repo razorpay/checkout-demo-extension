@@ -1,30 +1,24 @@
-const { openCheckout } = require('../../actions/checkout');
+const { openCheckoutForPersonalization } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
-  assertPaymentMethods,
-  selectPaymentMethod,
+  assertPaymentMethodsPersonalization,
   submit,
   handleUPIAccountValidation,
-  selectBankNameFromGooglePayDropDown,
-  selectUPIMethod,
   handlePartialPayment,
   verifyPartialAmount,
-  enterUPIAccount,
   respondToUPIAjax,
   respondToUPIPaymentStatus,
 } = require('../../actions/common');
 
-describe('Optional Partial GooglePay payment', () => {
-  test('Perform GooglePay transaction with partial payments enabled and optional contact', async () => {
+describe.skip('Partial GooglePay payment', () => {
+  test('Perform GooglePay transaction with partial payments enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
-      personalization: false,
     };
     const preferences = makePreferences({
-      optional: ['contact'],
       order: {
         amount: 10000,
         amount_due: 10000,
@@ -35,19 +29,17 @@ describe('Optional Partial GooglePay payment', () => {
       },
     });
     preferences.methods.upi = true;
-    const context = await openCheckout({
+    const context = await openCheckoutForPersonalization({
       page,
       options,
       preferences,
+      method: 'UPI',
     });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context);
+    await fillUserDetails(context, true, '8888888881');
+    await delay(1000);
+    await assertPaymentMethodsPersonalization(context);
     await handlePartialPayment(context, '1');
-    await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'upi');
-    await selectUPIMethod(context, 'Google Pay');
-    await enterUPIAccount(context, 'scbaala');
-    await selectBankNameFromGooglePayDropDown(context, 'okhdfcbank');
     await verifyPartialAmount(context, '₹ 1');
     await submit(context);
     await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');

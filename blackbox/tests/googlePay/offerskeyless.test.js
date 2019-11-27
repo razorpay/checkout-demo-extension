@@ -5,9 +5,9 @@ const {
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
-  selectUPIApplication,
+  selectUPIMethod,
   enterUPIAccount,
-  selectUPIIDFromDropDown,
+  selectBankNameFromGooglePayDropDown,
   submit,
   respondToUPIAjax,
   handleUPIAccountValidation,
@@ -16,6 +16,9 @@ const {
   viewOffers,
   selectOffer,
   verifyOfferApplied,
+  verifyDiscountText,
+  verifyDiscountAmountInBanner,
+  verifyDiscountPaybleAmount,
 } = require('../../actions/common');
 
 describe('Keyless Offers GooglePay payment', () => {
@@ -24,31 +27,26 @@ describe('Keyless Offers GooglePay payment', () => {
       order_id: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 60000,
       personalization: false,
-      method: [
-        {
-          upi: true,
-        },
-      ],
     };
     const preferences = makePreferences({
       offers: [
         {
-          id: 'offer_Dcad1sICBaV2wI',
-          name: 'UPI Offer Name',
-          payment_method: 'upi',
-          display_text: 'UPI Offer Display Text',
+          original_amount: 200000,
+          amount: 198000,
+          id: 'offer_DeyaOUCgXd49pt',
+          name: 'UPI_GPay_1',
+          payment_method: 'netbanking',
+          issuer: 'GooglePay',
+          display_text: 'Rs. 20 off on GooglePay',
         },
         {
-          id: 'offer_DcaetTeD4Gjcma',
-          name: 'UPI Offer Name 2',
+          original_amount: 200000,
+          amount: 198000,
+          id: 'offer_DeycnL6DJueSQ6',
+          name: 'UPI_PayTM_2',
           payment_method: 'upi',
-          display_text: 'UPI Offer Display Text 2',
-        },
-        {
-          id: 'offer_DcafkxTAseGAtT',
-          name: 'UPI Offer Name 3',
-          payment_method: 'upi',
-          display_text: 'UPI Offer Display Text 3',
+          issuer: 'PayTM',
+          display_text: 'Rs. 20 off on PayTM',
         },
       ],
     });
@@ -63,15 +61,18 @@ describe('Keyless Offers GooglePay payment', () => {
     await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIApplication(context, 'Google Pay');
+    await selectUPIMethod(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
-    await selectUPIIDFromDropDown(context, 'okhdfcbank', 'gpay_bank');
+    await selectBankNameFromGooglePayDropDown(context, 'okhdfcbank');
     await viewOffers(context);
     await selectOffer(context, '1');
     await verifyOfferApplied(context);
+    await verifyDiscountPaybleAmount(context, '₹ 1,980');
+    // await verifyDiscountAmountInBanner(context, '₹ 1,980'); /* Issue reported CE-963*/
+    await verifyDiscountText(context, 'You save ₹ 20');
     await submit(context);
     await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
-    await respondToUPIAjax(context, '');
+    await respondToUPIAjax(context);
     await respondToUPIPaymentStatus(context);
   });
 });

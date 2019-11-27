@@ -1,15 +1,13 @@
-const {
-  openCheckoutForPersonalization,
-} = require('../../actions/checkout-personalization');
+const { openCheckoutForPersonalization } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
-  verifyPaymentMethodText,
+  assertPaymentMethodsNetbanking,
   submit,
-  passRequestNetbanking,
-  handleMockSuccessDialog,
-  paymentMethodsSelection,
+  failRequestwithErrorMessage,
+  verifyErrorMessage,
+  handleFeeBearer,
 } = require('../../actions/common');
 
 describe.skip('Basic Netbanking with Personalization', () => {
@@ -18,7 +16,7 @@ describe.skip('Basic Netbanking with Personalization', () => {
       key: 'rzp_test_VwsqHDsQPoVQi6',
       amount: 60000,
     };
-    const preferences = makePreferences();
+    const preferences = makePreferences({ fee_bearer: true });
     const context = await openCheckoutForPersonalization({
       page,
       options,
@@ -26,15 +24,15 @@ describe.skip('Basic Netbanking with Personalization', () => {
       method: 'Netbanking',
     });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, '8888888882');
-    await verifyPaymentMethodText(
-      context,
-      'Netbanking',
-      'Netbanking - HDFC Bank'
-    );
-    await paymentMethodsSelection(context);
+    await fillUserDetails(context, true, '8888888882');
+    await assertPaymentMethodsNetbanking(context);
     await submit(context);
-    await passRequestNetbanking(context);
-    await handleMockSuccessDialog(context);
+    await handleFeeBearer(context, page);
+
+    await context.popup();
+
+    const expectedErrorMeassage = 'Payment failed';
+    await failRequestwithErrorMessage(context, expectedErrorMeassage);
+    await verifyErrorMessage(context, expectedErrorMeassage);
   });
 });

@@ -1,13 +1,7 @@
 const { delay, visible } = require('../util');
+
 async function selectUPIApp(context, AppNumber) {
   await context.page.click('.option:nth-of-type(' + AppNumber + ')');
-}
-
-async function selectUPIApplication(context, AppNumber) {
-  const apiOption = await context.page.$x(
-    '//div[contains(text(),"' + AppNumber + '")]'
-  );
-  await apiOption[0].click();
 }
 
 async function respondToUPIAjax(context, offerId = '') {
@@ -29,28 +23,6 @@ async function respondToUPIAjax(context, offerId = '') {
   });
 }
 
-async function respondToQRAjax(context, offerId) {
-  const req = await context.expectRequest();
-  if (offerId != '') expect(req.body).toContain(offerId);
-  expect(req.url).toContain('create/ajax');
-  await context.respondJSON({
-    type: 'intent',
-    version: 1,
-    payment_id: 'pay_DiAHr1NjHQJxcH',
-    gateway:
-      'eyJpdiI6IkdhRUdjaTJ6dXc0OUlhRU54QWxRbEE9PSIsInZhbHVlIjoiaTZ6ckZzc1d5OElncmIxZ3hCVVZudVZaWmJ3XC82TU9yMXB5K0ttcVVCaG02aGZlSHJwNCt4V29Hc3pBZWRxeHciLCJtYWMiOiJlZmE0NDM2ZDNkZTI5NDA1NGIxYjFiYmM1NDk4ZGNmNjM3ZmQ5N2NhNzYzYTk2MDlkZDRhNWRhZjZkMmMzOWI4In0',
-    data: {
-      intent_url:
-        'upi://pay?pa=razorpay.pg@hdfcbank&pn=Razorpay&tr=DiAHr1NjHQJxcH&tn=Razorpay&am=6000&cu=INR&mc=5411',
-    },
-    request: {
-      url:
-        'https://api.razorpay.com/v1/payments/pay_DiAHr1NjHQJxcH/status?key_id=rzp_live_ILgsfZCZoFIKMb',
-      method: 'GET',
-    },
-  });
-}
-
 async function respondToUPIPaymentStatus(context) {
   const successResult = { razorpay_payment_id: 'pay_DaFKujjV6Ajr7W' };
   const req = await context.expectRequest();
@@ -62,16 +34,6 @@ async function respondToUPIPaymentStatus(context) {
     timeout: 2000,
     hidden: true,
   });
-  expect(await context.page.$('#modal-inner')).toEqual(null);
-}
-
-async function respondToQRPaymentStatus(context) {
-  const successResult = { razorpay_payment_id: 'pay_DiAHr1NjHQJxcH' };
-  const req = await context.expectRequest();
-  expect(req.url).toContain('status?key_id');
-  await context.respondPlain(
-    `${req.params.callback}(${JSON.stringify(successResult)})`
-  );
   expect(await context.page.$('#modal-inner')).toEqual(null);
 }
 
@@ -94,23 +56,16 @@ async function enterUPIAccount(context, UPIAccountId) {
   await vpaField.type(UPIAccountId);
 }
 
-async function validateQRImage(context) {
-  expect(await context.page.$eval('[alt=QR]', visible)).toEqual(true);
+async function selectBankNameFromGooglePayDropDown(context, valuetoBeSelected) {
+  await context.page.select('select[name="gpay_bank"]', valuetoBeSelected);
 }
 
-async function selectUPIIDFromDropDown(context, valuetoBeSelected, AppName) {
-  await page.select('select[name="' + AppName + '"]', valuetoBeSelected);
-}
 module.exports = {
   selectUPIMethod,
   enterUPIAccount,
   handleUPIAccountValidation,
   respondToUPIAjax,
   respondToUPIPaymentStatus,
+  selectBankNameFromGooglePayDropDown,
   selectUPIApp,
-  selectUPIApplication,
-  respondToQRAjax,
-  respondToQRPaymentStatus,
-  validateQRImage,
-  selectUPIIDFromDropDown,
 };

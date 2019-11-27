@@ -1,5 +1,6 @@
 const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
+const { delay, visible } = require('../../util');
 const {
   assertHomePage,
   fillUserDetails,
@@ -7,29 +8,26 @@ const {
   selectPaymentMethod,
   selectUPIMethod,
   enterUPIAccount,
-  selectBankNameFromGooglePayDropDown,
-  submit,
-  respondToUPIAjax,
-  handleUPIAccountValidation,
-  respondToUPIPaymentStatus,
-  setPreferenceForOffer,
-  viewOffers,
+  verifyTimeout,
   selectOffer,
   verifyOfferApplied,
+  setPreferenceForOffer,
+  viewOffers,
+  selectBankNameFromGooglePayDropDown,
   verifyDiscountPaybleAmount,
   verifyDiscountAmountInBanner,
   verifyDiscountText,
 } = require('../../actions/common');
 
-describe('Offers with contact optional GooglePay payment', () => {
-  test('Perform Offers GooglePay transaction with optional contact enabled', async () => {
+describe('Basic upi payment', () => {
+  test('Perform upi collect transaction with offers applied and timeout enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 60000,
+      amount: 200000,
       personalization: false,
+      timeout: 10,
     };
     const preferences = makePreferences({
-      optional: ['contact'],
       offers: [
         {
           original_amount: 200000,
@@ -52,12 +50,8 @@ describe('Offers with contact optional GooglePay payment', () => {
       ],
     });
     preferences.methods.upi = true;
-    const context = await openCheckout({
-      page,
-      options,
-      preferences,
-    });
     await setPreferenceForOffer(preferences);
+    const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
     await assertPaymentMethods(context);
@@ -71,9 +65,6 @@ describe('Offers with contact optional GooglePay payment', () => {
     await verifyDiscountPaybleAmount(context, '₹ 1,980');
     // await verifyDiscountAmountInBanner(context, '₹ 1,980'); /* Issue reported CE-963*/
     await verifyDiscountText(context, 'You save ₹ 20');
-    await submit(context);
-    await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
-    await respondToUPIAjax(context);
-    await respondToUPIPaymentStatus(context);
+    await verifyTimeout(context, 'upi');
   });
 });
