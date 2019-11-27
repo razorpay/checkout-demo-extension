@@ -4,6 +4,7 @@
 
   // Props
   export let className = '';
+  export let disabled = false;
 </script>
 
 <style>
@@ -16,6 +17,14 @@
     transition: all 0.15s linear;
   }
 
+  button:disabled {
+    background-color: #f7f7f7;
+  }
+
+  button:disabled > :global(.stack > [slot='icon']) {
+    opacity: 0.3;
+  }
+
   div {
     flex-grow: 1;
     overflow: hidden;
@@ -25,8 +34,9 @@
 <button
   type="button"
   class={className}
-  class:hoverbg={true}
+  class:hoverbg={!disabled}
   role="listitem"
+  {disabled}
   on:click>
   <Stack horizontal>
     <slot name="icon" />
