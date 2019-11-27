@@ -7,7 +7,7 @@ const STORAGE_KEY = 'rzp_checkout_exp';
  *
  * @returns {Object}
  */
-function getExperimentsFromStorage() {
+export function getExperimentsFromStorage() {
   let data;
 
   try {
