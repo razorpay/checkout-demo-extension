@@ -6,7 +6,7 @@ const {
   assertPaymentMethods,
   selectPaymentMethod,
   verifyTimeout,
-  selectUPIApp,
+  selectUPIMethod,
 } = require('../../actions/common');
 
 describe('Basic GooglePay payment', () => {
@@ -28,7 +28,7 @@ describe('Basic GooglePay payment', () => {
     await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIApp(context, '1');
+    await selectUPIMethod(context, 'Google Pay');
     await verifyTimeout(context, 'upi');
   });
 });

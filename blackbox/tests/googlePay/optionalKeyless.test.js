@@ -4,11 +4,11 @@ const {
   assertHomePage,
   fillUserDetails,
   assertPaymentMethods,
-  selectUPIApplication,
+  selectUPIMethod,
   submit,
   respondToUPIAjax,
   enterUPIAccount,
-  selectBankNameFromDropDown,
+  selectBankNameFromGooglePayDropDown,
   selectPaymentMethod,
   handleUPIAccountValidation,
   respondToUPIPaymentStatus,
@@ -32,9 +32,9 @@ describe('Optional Keyless GooglePay Payment', () => {
     await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIApplication(context, 'Google Pay');
+    await selectUPIMethod(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
-    await selectBankNameFromDropDown('okhdfcbank');
+    await selectBankNameFromGooglePayDropDown(context, 'okhdfcbank');
     await submit(context);
     await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
     await respondToUPIAjax(context);

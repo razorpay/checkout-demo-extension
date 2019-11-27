@@ -6,11 +6,11 @@ const {
   assertPaymentMethods,
   selectPaymentMethod,
   submit,
-  selectUPIApplication,
+  selectUPIMethod,
   enterUPIAccount,
   handleUPIAccountValidation,
   expectRedirectWithCallback,
-  selectBankNameFromDropDown,
+  selectBankNameFromGooglePayDropDown,
 } = require('../../actions/common');
 
 describe('Basic GooglePay payment', () => {
@@ -29,9 +29,9 @@ describe('Basic GooglePay payment', () => {
     await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIApplication(context, 'Google Pay');
+    await selectUPIMethod(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
-    await selectBankNameFromDropDown('okhdfcbank');
+    await selectBankNameFromGooglePayDropDown(context, 'okhdfcbank');
     await submit(context);
     await handleUPIAccountValidation(context, 'scbaala@okhdfc');
     await expectRedirectWithCallback(context, { method: 'upi' });

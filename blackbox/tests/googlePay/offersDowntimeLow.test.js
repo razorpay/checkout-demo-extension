@@ -7,7 +7,7 @@ const {
   verifyLowDowntime,
   selectPaymentMethod,
   submit,
-  selectBankNameFromDropDown,
+  selectBankNameFromGooglePayDropDown,
   enterUPIAccount,
   handleUPIAccountValidation,
   respondToUPIAjax,
@@ -15,7 +15,7 @@ const {
   selectOffer,
   verifyOfferApplied,
   viewOffers,
-  selectUPIApplication,
+  selectUPIMethod,
   verifyDiscountPaybleAmount,
   verifyDiscountAmountInBanner,
   verifyDiscountText,
@@ -75,9 +75,9 @@ describe('GooglePay payment', () => {
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await verifyLowDowntime(context, 'UPI');
-    await selectUPIApplication(context, 'Google Pay');
+    await selectUPIMethod(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
-    await selectBankNameFromDropDown('okhdfcbank');
+    await selectBankNameFromGooglePayDropDown(context, 'okhdfcbank');
     await viewOffers(context);
     await selectOffer(context, '1');
     await verifyOfferApplied(context);

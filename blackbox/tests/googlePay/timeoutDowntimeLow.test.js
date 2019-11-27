@@ -6,10 +6,10 @@ const {
   assertPaymentMethods,
   verifyLowDowntime,
   selectPaymentMethod,
-  selectUPIApplication,
+  selectUPIMethod,
   enterUPIAccount,
   verifyTimeout,
-  selectBankNameFromDropDown,
+  selectBankNameFromGooglePayDropDown,
 } = require('../../actions/common');
 
 describe('Basic GooglePay payment', () => {
@@ -47,9 +47,9 @@ describe('Basic GooglePay payment', () => {
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await verifyLowDowntime(context, 'UPI');
-    await selectUPIApplication(context, 'Google Pay');
+    await selectUPIMethod(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
-    await selectBankNameFromDropDown('okhdfcbank');
+    await selectBankNameFromGooglePayDropDown(context, 'okhdfcbank');
     await verifyTimeout(context, 'upi');
   });
 });

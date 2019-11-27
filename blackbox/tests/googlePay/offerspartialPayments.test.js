@@ -17,8 +17,8 @@ const {
   respondToUPIAjax,
   respondToUPIPaymentStatus,
   setPreferenceForOffer,
-  selectBankNameFromDropDown,
-  selectUPIApplication,
+  selectBankNameFromGooglePayDropDown,
+  selectUPIMethod,
   verifyDiscountAmountInBanner,
   verifyDiscountText,
 } = require('../../actions/common');
@@ -72,9 +72,9 @@ describe.skip('Offers with Partial GooglePay payment', () => {
     await handlePartialPayment(context, '1');
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIApplication(context, 'Google Pay');
+    await selectUPIMethod(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
-    await selectBankNameFromDropDown('okhdfcbank');
+    await selectBankNameFromGooglePayDropDown(context, 'okhdfcbank');
     await viewOffers(context);
     await selectOffer(context, '1');
     await verifyOfferApplied(context);

@@ -6,33 +6,25 @@ const {
   assertPaymentMethods,
   selectPaymentMethod,
   submit,
-  selectBankNameFromGooglePayDropDown,
+  selectUPIMethod,
   enterUPIAccount,
   handleUPIAccountValidation,
-  respondToUPIAjax,
-  respondToUPIPaymentStatus,
-  handlePartialPayment,
-  verifyPartialAmount,
+  respondToQRAjax,
+  validateQRImage,
+  handleFeeBearer,
   verifyLowDowntime,
-  selectUPIMethod,
+  selectUPIApp,
 } = require('../../actions/common');
 
-describe('GooglePay partial payment downtime', () => {
-  test('Verify GooglePay partial payment downtime - Low with partial payments enabled', async () => {
+describe('QR Code Downtime payment', () => {
+  test('Verify QR Code Downtimepayment- Low with customer feebearer enabled', async () => {
     const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 30000,
+      key: 'rzp_test_BlUXikp98tvz4X',
+      amount: 60000,
       personalization: false,
     };
     const preferences = makePreferences({
-      order: {
-        amount: 20000,
-        amount_due: 20000,
-        amount_paid: 0,
-        currency: 'INR',
-        first_payment_min_amount: null,
-        partial_payment: true,
-      },
+      fee_bearer: true,
       payment_downtime: {
         entity: 'collection',
         count: 1,
@@ -56,17 +48,12 @@ describe('GooglePay partial payment downtime', () => {
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
-    await handlePartialPayment(context, '100');
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await verifyLowDowntime(context, 'UPI');
-    await selectUPIMethod(context, 'Google Pay');
-    await enterUPIAccount(context, 'scbaala');
-    await selectBankNameFromGooglePayDropDown(context, 'okhdfcbank');
-    await verifyPartialAmount(context, '₹ 100');
-    await submit(context);
-    await handleUPIAccountValidation(context, 'BHIM@upi');
-    await respondToUPIAjax(context);
-    await respondToUPIPaymentStatus(context);
+    await selectUPIApp(context, '1');
+    await handleFeeBearer(context, page);
+    await respondToQRAjax(context, '');
+    await validateQRImage(context);
   });
 });

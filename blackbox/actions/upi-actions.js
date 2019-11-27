@@ -1,14 +1,4 @@
 const { delay, visible } = require('../util');
-async function selectUPIApp(context, AppNumber) {
-  await context.page.click('.option:nth-of-type(' + AppNumber + ')');
-}
-
-async function selectUPIApplication(context, appName) {
-  const apiOption = await context.page.$x(
-    '//div[contains(text(),"' + appName + '")]'
-  );
-  await apiOption[0].click();
-}
 
 async function respondToUPIAjax(context, offerId = '') {
   const req = await context.expectRequest();
@@ -62,8 +52,8 @@ async function enterUPIAccount(context, UPIAccountId) {
   await vpaField.type(UPIAccountId);
 }
 
-async function selectBankNameFromDropDown(valuetoBeSelected) {
-  await page.select('select[name="gpay_bank"]', valuetoBeSelected);
+async function selectBankNameFromGooglePayDropDown(context, valuetoBeSelected) {
+  await context.page.select('select[name="gpay_bank"]', valuetoBeSelected);
 }
 
 module.exports = {
@@ -72,7 +62,5 @@ module.exports = {
   handleUPIAccountValidation,
   respondToUPIAjax,
   respondToUPIPaymentStatus,
-  selectUPIApp,
-  selectUPIApplication,
-  selectBankNameFromDropDown,
+  selectBankNameFromGooglePayDropDown,
 };

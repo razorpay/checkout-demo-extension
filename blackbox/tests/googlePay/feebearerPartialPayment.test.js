@@ -10,8 +10,8 @@ const {
   handleFeeBearer,
   handlePartialPayment,
   verifyPartialAmount,
-  selectBankNameFromDropDown,
-  selectUPIApplication,
+  selectBankNameFromGooglePayDropDown,
+  selectUPIMethod,
   enterUPIAccount,
   handleUPIAccountValidation,
   respondToUPIAjax,
@@ -47,9 +47,9 @@ describe('Feebearer with partial GooglePay payment', () => {
     await handlePartialPayment(context, '100');
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIApplication(context, 'Google Pay');
+    await selectUPIMethod(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
-    await selectBankNameFromDropDown('okhdfcbank');
+    await selectBankNameFromGooglePayDropDown(context, 'okhdfcbank');
     await verifyPartialAmount(context, '₹ 100');
     await submit(context);
     await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
