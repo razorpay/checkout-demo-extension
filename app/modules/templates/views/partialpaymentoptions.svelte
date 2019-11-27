@@ -36,6 +36,18 @@
     }
     selected = type;
   }
+
+  let partialPaymentRef;
+
+  $: {
+    if (selected === 'partial') {
+      setTimeout(() => {
+        if (partialPaymentRef) {
+          partialPaymentRef.scrollIntoView();
+        }
+      });
+    }
+  }
 </script>
 
 <style>
@@ -43,6 +55,10 @@
     margin: 0 !important;
     padding-left: 12px;
     padding-bottom: 20px;
+  }
+
+  div[slot='subtitle']:not(:empty) {
+    padding-bottom: 16px;
   }
 </style>
 
@@ -59,11 +75,12 @@
   <SlottedRadioOption
     name="payment_type"
     value="full"
+    align="top"
     reverse
     selected={selected === 'partial'}
     on:click={_ => handleRadioSelection('partial')}>
     <div slot="title">Make payment in parts</div>
-    <div slot="subtitle">
+    <div slot="subtitle" bind:this={partialPaymentRef}>
       {#if expanded}
         <PartialPaymentAmountField
           {maxAmount}

@@ -10,6 +10,7 @@
   export let selected = false;
   export let reverse = false;
   export let radio = true;
+  export let align = 'center';
   export let defaultStyles = true;
 
   let radioClasses;
@@ -46,6 +47,9 @@
 
   .radio {
     flex-grow: 0;
+  }
+
+  .radio.top {
     align-self: start;
   }
 
@@ -67,8 +71,13 @@
       <slot name="title" />
       <slot name="subtitle" />
     </div>
-    <div class="radio" class:reverse>
-      <Radio {name} {value} checked={selected} classes={radioClasses} />
+    <div class="radio" class:reverse class:top={align === 'top'}>
+      <Radio
+        {name}
+        {value}
+        checked={selected}
+        classes={radioClasses}
+        tabindex={-1} />
     </div>
     <slot name="extra" />
   </Stack>
