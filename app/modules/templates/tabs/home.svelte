@@ -259,36 +259,28 @@
 
     const {
       isPartialPayment: partial,
-      contactEmailOptional: optional,
+      contactEmailOptional,
       contactEmailHidden: hidden,
       contactEmailReadonly: readonly,
       address,
-      optional: optionalFields,
+      optional,
     } = checkoutStore;
 
     // If email and contact are prefilled, validate them
-    if (!optional && !hidden) {
+    if (!contactEmailOptional && !hidden) {
       const contactRegex = /^\+?[0-9]{8,15}$/;
       const emailRegex = /^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/;
 
       /**
        * For contact and email:
-       * - If length is 0, disallow if not optional
-       * - If length is > 0, validate
+       * - If optional, allow anything
+       * - If not optional, validate
        */
-      if (!$contact.length) {
-        if (!optionalFields.contact) {
-          return DETAILS;
-        }
-      } else if (!contactRegex.test($contact)) {
+      if (!optional.contact && !contactRegex.test($contact)) {
         return DETAILS;
       }
 
-      if (!$email.length) {
-        if (!optionalFields.email) {
-          return DETAILS;
-        }
-      } else if (!emailRegex.test($email)) {
+      if (!optional.email && !emailRegex.test($email)) {
         return DETAILS;
       }
     }
@@ -308,7 +300,7 @@
       return DETAILS;
     }
 
-    if (optional || hidden || readonly) {
+    if (contactEmailOptional || hidden || readonly) {
       return METHODS;
     }
 
@@ -489,28 +481,30 @@
         <PaymentDetails {getStore} {session} />
       {/if}
       {#if view === 'methods'}
-        <div
-          use:touchfix
-          class="home-details border-list"
-          transition:slide={{ duration: 400 }}>
-          <SlottedOption on:click={hideMethods} className="instrument-strip">
-            <i slot="icon">
-              <Icon icon={icons.contact} />
-            </i>
-            <div slot="title">
-              {#if $contact}
-                <span>{$contact}</span>
-              {/if}
-              {#if $email}
-                <span>{$email}</span>
-              {/if}
-            </div>
-            <div slot="extra" class="theme-highlight-color" aria-label="Edit">
-              <span>Edit</span>
-              <span>&#xe604;</span>
-            </div>
-          </SlottedOption>
-        </div>
+        {#if $contact || $email}
+          <div
+            use:touchfix
+            class="home-details border-list"
+            transition:slide={{ duration: 400 }}>
+            <SlottedOption on:click={hideMethods} className="instrument-strip">
+              <i slot="icon">
+                <Icon icon={icons.contact} />
+              </i>
+              <div slot="title">
+                {#if $contact}
+                  <span>{$contact}</span>
+                {/if}
+                {#if $email}
+                  <span>{$email}</span>
+                {/if}
+              </div>
+              <div slot="extra" class="theme-highlight-color" aria-label="Edit">
+                <span>Edit</span>
+                <span>&#xe604;</span>
+              </div>
+            </SlottedOption>
+          </div>
+        {/if}
 
         <div
           class="home-methods"
