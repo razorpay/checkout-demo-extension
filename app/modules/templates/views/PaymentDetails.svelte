@@ -54,7 +54,7 @@
   <EmailField bind:value={$email} />
 </div>
 
-{#if order.partial_payment}
+{#if isPartialPayment}
   <div class="partial-payment-block" transition:slide={{ duration: 400 }}>
     <PartialPaymentOptions {order} />
   </div>
