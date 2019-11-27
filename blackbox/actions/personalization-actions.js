@@ -25,7 +25,7 @@ async function verifyPaymentMethodText(context) {
   for (let j = 0; j < rzp['4d184816'].length; j++) {
     arrayofvpas.push('UPI - ' + rzp['4d184816'][j].vpa);
   }
-  await delay(1200);
+  await delay(1500);
   const paymentMethod = await context.page.$x('//div[@class="option-title"]');
   for (let i = 0; i < paymentMethod.length; i++) {
     const currentPaymentMethod = paymentMethod[0];
