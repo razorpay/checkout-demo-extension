@@ -117,6 +117,7 @@
         placeholder="CVV"
         maxlength={cvvLength}
         required={true}
+        tabindex={-1}
         formatter={{ type: 'number' }} />
     {:else}
       <span class="theme-highlight-color">&#xe604;</span>

@@ -3497,8 +3497,18 @@ Session.prototype = {
     var screenEl = '#form-' + (screen || 'common');
     makeVisible(screenEl);
 
-    if (!(screen === 'upi' && this.upi_intents_data)) {
-      invoke('focus', qs(screenEl + ' .invalid input'));
+    if (this.newHomeScreen) {
+      if (screen === '') {
+        if (this.homeTab.onDetailsScreen()) {
+          invoke('focus', qs(screenEl + ' .invalid input'));
+        }
+      } else {
+        invoke('focus', qs(screenEl + ' .invalid input'));
+      }
+    } else {
+      if (!(screen === 'upi' && this.upi_intents_data)) {
+        invoke('focus', qs(screenEl + ' .invalid input'));
+      }
     }
 
     var showPaybtn = screen;

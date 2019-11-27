@@ -33,6 +33,7 @@
   export let min = null;
   export let max = null;
   export let elemClasses = '';
+  export let tabindex = 0;
 
   // Computed
   export let identifier;
@@ -136,6 +137,7 @@
     {readonly}
     {min}
     {max}
+    {tabindex}
     use:formatterAction={formatter}
     use:focusAction={handleFocus}
     use:blurAction={handleBlur}
