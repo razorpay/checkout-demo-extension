@@ -66,8 +66,8 @@
   $: {
     const _value = value;
 
-    if (input) {
-      setTimeout(() => {
+    setTimeout(() => {
+      if (input) {
         let event;
 
         if (typeof global.Event === 'function') {
@@ -78,8 +78,8 @@
         }
 
         input.dispatchEvent(event);
-      });
-    }
+      }
+    });
   }
 
   export function focus() {
