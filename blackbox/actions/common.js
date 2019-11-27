@@ -13,6 +13,7 @@ const downtimeTimoutActions = require('./downtime-timeout-actions');
 const walletActions = require('./wallet-actions');
 const sharedActions = require('./shared-actions');
 const personalizationActions = require('./personalization-actions');
+const qrActions = require('./qr-actions');
 const emandateBanktransferActions = require('./emandate-banktransfer-actions');
 
 contents = String(
@@ -33,6 +34,7 @@ module.exports = {
   ...walletActions,
   ...sharedActions,
   ...personalizationActions,
+  ...qrActions,
   ...emandateBanktransferActions,
   verifyDiscountPaybleAmount,
   verifyDiscountText,
