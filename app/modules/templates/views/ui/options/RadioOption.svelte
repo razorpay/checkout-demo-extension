@@ -25,7 +25,7 @@
     }
 
     if (icon || iconPlaceholder) {
-      classes.push('has-icon');
+      allClasses.push('has-icon');
     }
 
     classes = allClasses;
