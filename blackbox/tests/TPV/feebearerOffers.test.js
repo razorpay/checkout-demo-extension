@@ -23,6 +23,7 @@ describe('Third Party Verification test', () => {
       personalization: false,
     };
     const preferences = makePreferences({
+      fee_bearer: true,
       order: {
         amount: 20000,
         currency: 'INR',
