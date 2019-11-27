@@ -49,6 +49,9 @@ function getIconFn(iconName) {
 
     case 'contact':
       return contact;
+
+    case 'gpay':
+      return () => '<i class="gpay-icon" />';
   }
 }
 
