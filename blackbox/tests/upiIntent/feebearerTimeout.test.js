@@ -28,7 +28,7 @@ describe.skip('Basic upi payment', () => {
       apps: [{ package_name: 'in.org.npci.upiapp', app_name: 'BHIM' }],
     });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
+    await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await selectUPIApp(context, '1');

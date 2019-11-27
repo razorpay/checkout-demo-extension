@@ -96,11 +96,8 @@ var responseTypes = {
       // API sent `type: 'first'` response, can't open popup now.
       // Most gateways block iframe.
       // The only option left now is to redirect.
-      if (this.r.get('redirect') && this.r.get('callback_url')) {
-        Razorpay.sendMessage({
-          event: 'redirect',
-          data: request,
-        });
+      if (this.r.get('redirect')) {
+        this.redirect(request);
 
         return;
       } else {
