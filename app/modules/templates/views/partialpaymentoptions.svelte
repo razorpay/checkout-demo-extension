@@ -1,10 +1,17 @@
 <script>
+  // UI Imports
   import SlottedRadioOption from 'templates/views/ui/options/Slotted/RadioOption.svelte';
   import PartialPaymentAmountField from 'templates/views/ui/fields/PartialPaymentAmountField.svelte';
+
+  // Store
+  import {
+    partialPaymentOption,
+    partialPaymentAmount,
+  } from 'checkoutstore/screens/home';
+
   import { getSession } from 'sessionmanager';
 
   // Props
-  export let selected = null;
   export let order = {};
 
   const session = getSession();
@@ -16,31 +23,30 @@
 
   // Computed
   let expanded = false;
-  let partialAmount = null;
 
   // Refs
   let partialAmountField = null;
 
-  $: expanded = selected === 'partial';
+  $: expanded = $partialPaymentOption === 'partial';
 
   function handleRadioSelection(type) {
-    if (selected !== type) {
+    if ($partialPaymentOption !== type) {
       if (type === 'partial') {
         setTimeout(_ => {
-          partialAmountField.focus();
+          partialAmountField && partialAmountField.focus();
         }, 200); // TODO: Fix this
       } else {
         // The user selected full amount, update the header to full amount.
         session.setAmount(maxAmount);
       }
     }
-    selected = type;
+    $partialPaymentOption = type;
   }
 
   let partialPaymentRef;
 
   $: {
-    if (selected === 'partial') {
+    if ($partialPaymentOption === 'partial') {
       setTimeout(() => {
         if (partialPaymentRef) {
           partialPaymentRef.scrollIntoView();
@@ -67,7 +73,7 @@
   <SlottedRadioOption
     name="payment_type"
     value="partial"
-    selected={selected === 'full'}
+    selected={$partialPaymentOption === 'full'}
     reverse
     on:click={_ => handleRadioSelection('full')}>
     <div slot="title">Pay full amount</div>
@@ -77,7 +83,7 @@
     value="full"
     align="top"
     reverse
-    selected={selected === 'partial'}
+    selected={$partialPaymentOption === 'partial'}
     on:click={_ => handleRadioSelection('partial')}>
     <div slot="title">Make payment in parts</div>
     <div slot="subtitle" bind:this={partialPaymentRef}>
@@ -87,7 +93,7 @@
           {minAmount}
           {amountPaid}
           {minAmountLabel}
-          bind:value={partialAmount}
+          bind:value={$partialPaymentAmount}
           bind:this={partialAmountField} />
       {/if}
     </div>
