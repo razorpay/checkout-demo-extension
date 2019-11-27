@@ -89,6 +89,8 @@
       )}`;
     }
   }
+
+  $: minAmountLabel = minAmountLabel || 'Minimum Amount Due';
 </script>
 
 <style>
@@ -136,8 +138,7 @@
       checked={valueInMinor === minAmount} />
     <div class="checkbox inner-checkbox" for="minimum-amount-checkbox" />
     <label class="partial-label" for="minimum-amount-checkbox">
-      {#if minAmountLabel}{minAmountLabel}{:else}Minimum Amount Due{/if}
-      {session.formatAmountWithCurrency(minAmount)}
+      {minAmountLabel} {session.formatAmountWithCurrency(minAmount)}
     </label>
   </div>
 {/if}
