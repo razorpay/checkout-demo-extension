@@ -4012,7 +4012,7 @@ Session.prototype = {
   checkCommonValid: function() {
     var selector = '#pad-common';
 
-    if (this.newHomeScreen && !this.homeTab.onMethodsScreen()) {
+    if (this.newHomeScreen && this.homeTab.onDetailsScreen()) {
       selector = '#form-common';
     }
 
@@ -5447,7 +5447,7 @@ Session.prototype = {
     if (!screen && this.newHomeScreen) {
       if (this.checkCommonValid()) {
         // switch to methods tab'
-        if (!this.homeTab.onMethodsScreen()) {
+        if (this.homeTab.onDetailsScreen()) {
           return this.homeTab.next();
         }
       }
