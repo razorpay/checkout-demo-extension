@@ -21,6 +21,7 @@ function CheckoutStore(base) {
     const optionalFieldsList = preferences.optional || [];
     const hiddenFields = {};
     const readonlyFields = {};
+    const prefill = {};
 
     if (optionalFieldsList) {
       optionalFields.contact = optionalFieldsList |> _Arr.contains('contact');
@@ -36,6 +37,12 @@ function CheckoutStore(base) {
     readonlyFields.email =
       session.get('readonly.email') && session.get('prefill.email');
 
+    prefill = {
+      contact: session.get('prefill.contact'),
+      email: session.get('prefill.email'),
+    };
+
+    storeState.prefill = prefill;
     storeState.optional = optionalFields;
     storeState.hidden = hiddenFields;
     storeState.readonly = readonlyFields;
