@@ -1,5 +1,9 @@
 const { delay, visible } = require('../util');
 
+async function selectUPIApp(context, AppNumber) {
+  await context.page.click('.option:nth-of-type(' + AppNumber + ')');
+}
+
 async function respondToUPIAjax(context, offerId = '') {
   const req = await context.expectRequest();
   if (offerId != '') expect(req.body).toContain(offerId);
@@ -63,4 +67,5 @@ module.exports = {
   respondToUPIAjax,
   respondToUPIPaymentStatus,
   selectBankNameFromGooglePayDropDown,
+  selectUPIApp,
 };
