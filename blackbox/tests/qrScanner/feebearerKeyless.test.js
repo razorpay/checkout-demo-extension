@@ -5,10 +5,8 @@ const {
   fillUserDetails,
   assertPaymentMethods,
   responseWithQRImage,
-  submit,
   respondToUPIAjax,
   handleFeeBearer,
-  enterUPIAccount,
   selectUPIApp,
   selectPaymentMethod,
   respondToUPIPaymentStatus,
@@ -35,7 +33,7 @@ describe('Feebearer Keyless QR Code Payment', () => {
     await selectPaymentMethod(context, 'upi');
     await selectUPIApp(context, '1');
     await handleFeeBearer(context);
-    await respondToUPIAjax(context, '', { method: 'intent' });
+    await respondToUPIAjax(context, { method: 'intent' });
     await responseWithQRImage(context);
     await validateQRImage(context);
     await respondToUPIPaymentStatus(context);

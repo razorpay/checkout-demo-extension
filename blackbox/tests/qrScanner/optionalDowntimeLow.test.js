@@ -49,7 +49,7 @@ describe('Basic QRCode Optional Contact Downtime', () => {
     await selectPaymentMethod(context, 'upi');
     await verifyLowDowntime(context, 'UPI');
     await selectUPIApp(context, '1');
-    await respondToUPIAjax(context, '', { method: 'intent' });
+    await respondToUPIAjax(context, { method: 'intent' });
     await responseWithQRImage(context);
     await validateQRImage(context);
     await respondToUPIPaymentStatus(context);

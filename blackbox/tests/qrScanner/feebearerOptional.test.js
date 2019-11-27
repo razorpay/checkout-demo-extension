@@ -36,7 +36,7 @@ describe('Feebearer with optional contact QR Code Payment', () => {
     await selectPaymentMethod(context, 'upi');
     await selectUPIApp(context, '1');
     await handleFeeBearer(context, page);
-    await respondToUPIAjax(context, '', { method: 'intent' });
+    await respondToUPIAjax(context, { method: 'intent' });
     await responseWithQRImage(context);
     await validateQRImage(context);
     await respondToUPIPaymentStatus(context);

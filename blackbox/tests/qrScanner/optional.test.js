@@ -31,7 +31,7 @@ describe(' Perform QRCode Payment', () => {
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await selectUPIApp(context, '1');
-    await respondToUPIAjax(context, '', { method: 'intent' });
+    await respondToUPIAjax(context, { method: 'intent' });
     await responseWithQRImage(context);
     await validateQRImage(context);
     await respondToUPIPaymentStatus(context);
