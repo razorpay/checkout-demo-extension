@@ -2570,25 +2570,30 @@ Session.prototype = {
     }
 
     var partialEl = gel('amount-value');
+
     if (partialEl) {
       var amountValue = partialEl.value;
       var options = this.get();
       var currency = this.get('currency');
       var currencyConfig = discreet.Currency.getCurrencyConfig(currency);
 
-      this.updateAmountInHeader(amountValue);
       options.amount = parseInt(
         (amountValue * 100).toFixed(currencyConfig.decimals)
       );
-      options['prefill.contact'] = getPhone();
-      options['prefill.email'] = getEmail();
       this.setPaymentMethods(this.preferences);
-      this.render({ forceRender: true });
+
+      if (!this.newHomeScreen) {
+        options['prefill.contact'] = getPhone();
+        options['prefill.email'] = getEmail();
+        this.render({ forceRender: true });
+      } else {
+        this.updateAmountInHeader(amountValue * 100);
+      }
     }
     if (!this.newHomeScreen) {
       $(this.el).addClass('show-methods');
     } else {
-      // TODO: switch to new methods screen
+      this.homeTab.showMethods();
     }
     SessionStore.set({ screen: '' });
 
@@ -2648,6 +2653,7 @@ Session.prototype = {
       gotoAmountScreen();
     });
 
+    // TOREMOVE: Remove once we migrate to the new home screen
     this.on('change', 'input[name=partial_payment]', function(e) {
       var parentEle = $('#amount-value').parent();
       var optionEle = $('.minimum-amount-select');
@@ -2658,8 +2664,7 @@ Session.prototype = {
         $('#amount-value').val(this.getDecimalAmount(amount));
         toggleInvalid(parentEle, true); // To unset 'invalid' class on 'partial amount input' field's parent
 
-        this.get().amount = amount;
-        this.updateAmountInHeader(amount);
+        this.setAmount(amount);
 
         var minAmountField = gel('minimum-amount-select');
 
@@ -3876,7 +3881,8 @@ Session.prototype = {
       tab = 'wallet';
     } else if (
       this.screen === 'otp' &&
-      (thisTab !== 'card' && thisTab !== 'emi')
+      thisTab !== 'card' &&
+      thisTab !== 'emi'
     ) {
       tab = thisTab;
     } else if (
@@ -7144,7 +7150,8 @@ Session.prototype = {
       order &&
       order.bank &&
       this.get('callback_url') &&
-      (order.method !== 'upi' && order.method !== 'emandate') // Should these just be a check for order.method=netbanking?
+      order.method !== 'upi' &&
+      order.method !== 'emandate' // Should these just be a check for order.method=netbanking?
     ) {
       session_options.redirect = true;
       this.tpvRedirect = true;
