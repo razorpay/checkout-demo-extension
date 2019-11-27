@@ -5413,7 +5413,12 @@ Session.prototype = {
     });
   },
 
-  preSubmit: function(e) {
+  /**
+   * Attempts a payment
+   * @param {Event} e
+   * @param {Object} payload Overridden payload
+   */
+  preSubmit: function(e, payload) {
     var session = this;
     var storeScreen = SessionStore.get().screen;
 
@@ -5470,7 +5475,13 @@ Session.prototype = {
     }
 
     this.refresh();
-    var data = (this.payload = this.getPayload());
+    var data = payload;
+
+    if (!data) {
+      data = this.getPayload();
+    }
+
+    this.payload = data;
 
     if (data.auth_type && data.auth_type === 'c3ds') {
       /**
@@ -5667,10 +5678,6 @@ Session.prototype = {
       }
 
       var selectedInstrument = this.getSelectedP13nInstrument();
-
-      if (!selectedInstrument) {
-        return;
-      }
 
       if (selectedInstrument && selectedInstrument.method === 'card') {
         /*

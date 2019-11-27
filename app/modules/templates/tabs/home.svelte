@@ -348,6 +348,11 @@
     const _instruments = getInstruments();
 
     if (session.oneMethod) {
+      if (session.oneMethod === 'paypal') {
+        createPaypalPayment();
+        return;
+      }
+
       if (
         _Arr.contains(['wallet', 'netbanking', 'upi'], session.oneMethod) &&
         _instruments.length > 0
@@ -367,6 +372,14 @@
     showMethods();
   }
 
+  function createPaypalPayment() {
+    const payload = session.getPayload();
+
+    payload.method = 'paypal';
+
+    session.preSubmit(null, payload);
+  }
+
   function selectMethod(event) {
     Analytics.track('p13:method:select', {
       type: AnalyticsTypes.BEHAV,
@@ -379,15 +392,25 @@
       return;
     }
 
+    $selectedInstrumentId = null;
+
     if (method === 'paypal') {
-      // TODO
+      createPaypalPayment();
     } else {
       session.switchTab(method);
     }
   }
 
   export function shouldShowNext() {
-    return !($multiTpvOption === 'netbanking' && session.multiTpv);
+    if (session.oneMethod === 'paypal') {
+      return false;
+    }
+
+    if ($multiTpvOption === 'netbanking' && session.multiTpv) {
+      return false;
+    }
+
+    return true;
   }
 
   export function getSelectedInstrument() {
