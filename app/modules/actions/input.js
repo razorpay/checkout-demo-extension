@@ -25,6 +25,36 @@ function onBlur(event) {
   }
 }
 
+/**
+ * Validates value with min and max present on the field
+ * @param {Element} el
+ *
+ * @returns {boolean}
+ */
+function validateOnMinMax(el) {
+  let min = parseFloat(_El.getAttribute(el, 'min'));
+  let max = parseFloat(_El.getAttribute(el, 'max'));
+  const parsed = parseFloat(el.value);
+
+  if (!isNaN(parsed) && (!isNaN(min) || !isNaN(max))) {
+    if (!isNaN(min)) {
+      if (parsed < min) {
+        return false;
+      }
+    }
+
+    if (!isNaN(max)) {
+      if (parsed > max) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  return true;
+}
+
 function onInput(event) {
   const el = event.target;
   const value = el.value;
@@ -52,6 +82,8 @@ function onInput(event) {
       valid = new RegExp(pattern).test(value);
     }
   }
+
+  valid = valid && validateOnMinMax(el);
 
   _El.keepClass(parent, 'invalid', !valid);
 }
