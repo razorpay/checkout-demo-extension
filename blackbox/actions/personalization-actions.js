@@ -1,4 +1,4 @@
-async function paymentMethodsSelection(context, optionNumber) {
+async function selectPersonalizationPaymentMethod(context, optionNumber) {
   const text = await page.evaluate(() =>
     Array.from(
       document.querySelectorAll('.option-title'),
@@ -11,7 +11,7 @@ async function paymentMethodsSelection(context, optionNumber) {
   await apiOption[optionNumber - 1].click();
 }
 
-async function verifyPaymentMethodText(context) {
+async function verifyPersonalizationPaymentMethodsText(context) {
   const localStorageData = await page.evaluate(() => {
     let json = {};
     for (let i = 0; i < localStorage.length; i++) {
@@ -33,9 +33,14 @@ async function verifyPaymentMethodText(context) {
       currentPaymentMethod => currentPaymentMethod.textContent,
       currentPaymentMethod
     );
-    expect(arrayofvpas).toEqual(
-      expect.arrayContaining([paymentMethodText.trim()])
-    );
+    if (context.preferences.payment_downtime.items.severity == 'high')
+      expect(arrayofvpas).not.toEqual(
+        expect.arrayContaining([paymentMethodText.trim()])
+      );
+    else
+      expect(arrayofvpas).toEqual(
+        expect.arrayContaining([paymentMethodText.trim()])
+      );
   }
 }
 
@@ -48,7 +53,7 @@ async function selectPersonalizedCard(context) {
 }
 
 module.exports = {
-  paymentMethodsSelection,
-  verifyPaymentMethodText,
+  selectPersonalizationPaymentMethod,
+  verifyPersonalizationPaymentMethodsText,
   selectPersonalizedCard,
 };

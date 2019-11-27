@@ -86,6 +86,10 @@ async function enterCardDetails(context, { cardType, nativeOtp = false } = {}) {
 }
 
 async function retryCardTransaction(context) {
+  await context.page.waitFor('#fd-hide', {
+    timeout: 2000,
+    visible: true,
+  });
   const retryButton = await context.page.waitForSelector('#fd-hide');
   await retryButton.click();
 }

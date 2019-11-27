@@ -103,7 +103,7 @@ module.exports = {
           QR:
             '{"4b1844f0":[{"_[flow]":"intent","_[upiqr]":"1","method":"upi","timestamp":1574079022916,"success":true,"frequency":2,"id":"DhnN8SggG8Ihdy"}]}',
           Card:
-            '{"05b236f8": [{"method": "card","token_id": "token_9AT28Pxxe0Npi9","type": "credit","issuer": "ICIC","network": "Visa","timestamp": 1574056926308,"success": true,"frequency": 1,"id": "Dhh671dR688OWQ"}]}',
+            '{"4d184816": [{"method": "card","token_id": "token_9AT28Pxxe0Npi9","type": "credit","issuer": "ICIC","network": "Visa","timestamp": 1574056926308,"success": true,"frequency": 1,"id": "Dhh671dR688OWQ"}]}',
           Wallet:
             '{"51184e62":[{"wallet":"freecharge","method":"wallet","timestamp":1574081911355,"success":true,"frequency":1,"id":"DhoBzK59KicZni"}]}',
         }[method]

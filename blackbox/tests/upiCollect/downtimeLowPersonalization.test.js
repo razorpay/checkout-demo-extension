@@ -1,5 +1,8 @@
-const { openCheckout } = require('../../actions/checkout');
+const {
+  openCheckoutForPersonalization,
+} = require('../../actions/checkout-personalization');
 const { makePreferences } = require('../../actions/preferences');
+const { delay } = require('../../util');
 const {
   assertHomePage,
   fillUserDetails,
@@ -12,14 +15,16 @@ const {
   handleUPIAccountValidation,
   respondToUPIAjax,
   respondToUPIPaymentStatus,
+  verifyPersonalizationPaymentMethodsText,
+  selectPersonalizationPaymentMethod,
 } = require('../../actions/common');
 
 describe('Basic upi payment', () => {
-  test('Verify UPI downtime - Low', async () => {
+  test('Verify UPI downtime - Low with personalization enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
-      personalization: false,
+      personalization: true,
     };
     const preferences = makePreferences({
       payment_downtime: {
@@ -42,16 +47,19 @@ describe('Basic upi payment', () => {
       },
     });
     preferences.methods.upi = true;
-    const context = await openCheckout({ page, options, preferences });
+    let context = await openCheckoutForPersonalization({
+      page,
+      options,
+      preferences,
+      method: 'UPI',
+    });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context);
-    await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'upi');
-    await verifyLowDowntime(context, 'UPI');
-    await selectUPIMethod(context, 'BHIM');
-    await enterUPIAccount(context, 'BHIM');
+    // await verifyLowDowntime(context, 'UPI');
+    await fillUserDetails(context, '8888888881');
+    await verifyPersonalizationPaymentMethodsText(context);
+    await selectPersonalizationPaymentMethod(context, 1);
     await submit(context);
-    await handleUPIAccountValidation(context, 'BHIM@upi');
+    await handleUPIAccountValidation(context, 'dsd@okhdfcbank');
     await respondToUPIAjax(context);
     await respondToUPIPaymentStatus(context);
   });

@@ -8,18 +8,17 @@ const {
   selectPersonalizedCard,
   submit,
   enterCardDetails,
-  handleCardValidation,
-  handleMockFailureDialog,
-  retryCardTransaction,
-  handleMockSuccessDialog,
+  expectRedirectWithCallback,
 } = require('../../actions/common');
 
 describe('Card tests', () => {
-  test('perform card transaction with personalization', async () => {
+  test('perform card transaction with personalization and callbackURL enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
       personalization: true,
+      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
+      redirect: true,
     };
     const preferences = makePreferences();
     let context = await openCheckoutForPersonalization({
@@ -33,13 +32,6 @@ describe('Card tests', () => {
     await selectPersonalizedCard(context);
     await enterCardDetails(context);
     await submit(context);
-    await handleCardValidation(context);
-    await handleMockFailureDialog(context);
-    // await verifyErrorMessage(context, 'The payment has already been processed');
-    await retryCardTransaction(context);
-    await submit(context);
-
-    await handleCardValidation(context);
-    await handleMockSuccessDialog(context);
+    await expectRedirectWithCallback(context, { method: 'card' });
   });
 });
