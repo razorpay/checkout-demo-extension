@@ -2591,12 +2591,20 @@ Session.prototype = {
       // TODO: switch to new methods screen
     }
     SessionStore.set({ screen: '' });
-    if (this.methods.count >= 4) {
-      $(this.el).addClass('long');
+
+    if (!this.newHomeScreen) {
+      if (this.methods.count >= 4) {
+        $(this.el).addClass('long');
+      }
+      if (this.methods.count >= 5) {
+        $(this.el).addClass('x-long');
+      }
     }
-    if (this.methods.count >= 5) {
-      $(this.el).addClass('x-long');
-    }
+  },
+
+  setAmount: function(amount) {
+    this.get().amount = amount;
+    this.updateAmountInHeader(amount);
   },
 
   fixLandscapeBug: function() {
