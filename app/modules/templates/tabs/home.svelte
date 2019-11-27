@@ -520,7 +520,7 @@
 
     <div slot="bottom">
       {#if showSecuredByMessage}
-        <div class="secured-message">
+        <div class="secured-message" out:slide={{ duration: 100 }}>
           <i>
             <svg
               width="16"
