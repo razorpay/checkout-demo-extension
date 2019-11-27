@@ -68,7 +68,8 @@
 
   let view = 'details';
 
-  const showSecuredByMessage =
+  let showSecuredByMessage;
+  $: showSecuredByMessage =
     view === 'details' &&
     !session.multiTpv &&
     !session.tpvBank &&
@@ -561,9 +562,9 @@
         <Callout>
           {#if session.get('subscription_id')}
             {#if methods.debit_card && methods.credit_card}
-              Subscription payments are supported on Visa and Mastercard
-              Credit Cards from all Banks and Debit Cards from ICICI, Kotak,
-              Citibank and Canara Bank.
+              Subscription payments are supported on Visa and Mastercard Credit
+              Cards from all Banks and Debit Cards from ICICI, Kotak, Citibank
+              and Canara Bank.
             {:else if methods.debit_card}
               Subscription payments are only supported on Visa and Mastercard
               Debit Cards from ICICI, Kotak, Citibank and Canara Bank.
@@ -572,12 +573,12 @@
               Credit Cards.
             {/if}
           {:else if methods.debit_card && methods.credit_card}
-            Visa and Mastercard Credit Cards from all Banks and Debit Cards
-            from ICICI, Kotak, Citibank and Canara Bank are supported for this
+            Visa and Mastercard Credit Cards from all Banks and Debit Cards from
+            ICICI, Kotak, Citibank and Canara Bank are supported for this
             payment.
           {:else if methods.debit_card}
-            Only Visa and Mastercard Debit Cards from ICICI, Kotak, Citibank
-            and Canara Bank are supported for this payment.
+            Only Visa and Mastercard Debit Cards from ICICI, Kotak, Citibank and
+            Canara Bank are supported for this payment.
           {:else}
             Only Visa and Mastercard Credit Cards are supported for this
             payment.
