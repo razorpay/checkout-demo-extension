@@ -25,8 +25,7 @@
   const dispatch = createEventDispatcher();
 
   const down =
-    method === 'netbanking' ||
-    (downtime && _Arr.contains(DowntimesStore.get().high.methods, method));
+    downtime && _Arr.contains(DowntimesStore.get().high.methods, method);
 
   // Items to display
   const _icon = icon || session.themeMeta.icons[method];
