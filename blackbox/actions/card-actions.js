@@ -50,7 +50,7 @@ async function handleCardValidationForNativeOTP(
       type: 'first',
       request: {
         url: 'https://api.razorpay.com/bank',
-        method: 'get',
+        method: 'post',
         content: [],
       },
       payment_id: 'pay_DLXKaJEF1T1KxC',

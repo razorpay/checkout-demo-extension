@@ -27,6 +27,7 @@ import { checkPaymentAdapter } from 'payment/adapters';
 import * as GPay from 'gpay';
 import Analytics from 'analytics';
 import { isProviderHeadless } from 'common/cardlessemi';
+import { hasCheckoutBridge } from 'bridge';
 
 /**
  * Tells if we're being executed from
@@ -504,21 +505,31 @@ Payment.prototype = {
     }
   },
 
+  redirect: function({ url, content, method = 'get' }) {
+    // If we're in SDK and not in an iframe, redirect directly
+    if (hasCheckoutBridge()) {
+      _Doc.submitForm(url, content, method);
+    }
+    // Otherwise, use sendMessage
+    else {
+      Razorpay.sendMessage({
+        event: 'redirect',
+        data: {
+          url,
+          method,
+          content,
+        },
+      });
+    }
+  },
+
   gotoBank: function() {
     // For redirect mode where we do not have a popup, redirect using POST
     if (!this.popup) {
       if (this.iframe) {
         this.makePopup();
       } else {
-        Razorpay.sendMessage({
-          event: 'redirect',
-          data: {
-            url: this.gotoBankUrl,
-            method: 'post',
-            content: null,
-          },
-        });
-
+        this.redirect({ url: this.gotoBankUrl, method: 'post' });
         return;
       }
     }
