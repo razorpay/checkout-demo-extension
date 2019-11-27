@@ -19,6 +19,7 @@
 
   button:disabled {
     background-color: #f7f7f7;
+    cursor: not-allowed;
   }
 
   button:disabled > :global(.stack > [slot='icon']) {

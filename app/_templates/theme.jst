@@ -227,7 +227,7 @@ svg.offer-icon path {
   border-bottom-left-radius: 2px;
 }
 
-.border-list:not(.touchfix) > *:hover,
+.border-list:not(.touchfix) > *:hover:not(:disabled),
 .border-list > *:focus,
 .border-list > *:focus-within,
 .border-list > .selected {
@@ -238,7 +238,7 @@ svg.offer-icon path {
   border-bottom: none;
 }
 
-.border-list:not(.touchfix) > *:hover + *,
+.border-list:not(.touchfix) > *:hover:not(:disabled) + *,
 .border-list > *:focus + *,
 .border-list > *:focus-within + *,
 .border-list > .selected + * {
