@@ -225,7 +225,7 @@
       if (personalization) {
         updateCustomer();
       } else {
-        instruments = false;
+        instruments = [];
       }
     }
   }
@@ -270,6 +270,7 @@
       contactEmailHidden: hidden,
       contactEmailReadonly: readonly,
       address,
+      optional: optionalFields,
     } = checkoutStore;
 
     // If email and contact are prefilled, validate them
@@ -277,16 +278,25 @@
       const contactRegex = /^\+?[0-9]{8,15}$/;
       const emailRegex = /^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/;
 
-      if ($contact && $contact.length) {
-        if (!contactRegex.test($contact)) {
+      /**
+       * For contact and email:
+       * - If length is 0, disallow if not optional
+       * - If length is > 0, validate
+       */
+      if (!$contact.length) {
+        if (!optionalFields.contact) {
           return DETAILS;
         }
+      } else if (!contactRegex.test($contact)) {
+        return DETAILS;
       }
 
-      if ($email && $email.length) {
-        if (!emailRegex.test($email)) {
+      if (!$email.length) {
+        if (!optionalFields.email) {
           return DETAILS;
         }
+      } else if (!emailRegex.test($email)) {
+        return DETAILS;
       }
     }
 
@@ -336,8 +346,6 @@
   view = determineLandingView();
 
   export function next() {
-    const METHODS = 'methods';
-
     // TPV UPI
     if (session.upiTpv) {
       selectMethod({
@@ -480,7 +488,7 @@
     color: #363636;
   }
 
-  .home-details div[slot='title'] span:last-child {
+  .home-details div[slot='title'] span:nth-child(2) {
     font-size: 0.7rem;
     color: #757575;
     margin-left: 8px;
