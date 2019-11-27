@@ -1,4 +1,4 @@
-async function paymentMethodsSelection(context) {
+async function selectPersonalizationPaymentMethod(context, optionNumber) {
   const text = await page.evaluate(() =>
     Array.from(
       document.querySelectorAll('.option-title'),
@@ -8,10 +8,18 @@ async function paymentMethodsSelection(context) {
   const apiOption = await context.page.$x(
     '//div[contains(@class, "option radio-option")]'
   );
-  await apiOption[0].click();
+  await apiOption[optionNumber - 1].click();
 }
 
-async function verifyPaymentMethodText(
+async function selectPersonalizedCard(context) {
+  await delay(1200);
+  const personalizedCard = await context.page.$x(
+    '//div[text() = "Use your ICICI Credit card"]'
+  );
+  await personalizedCard[0].click();
+}
+
+async function verifyPersonalizationPaymentMethodsText(
   context,
   typeName,
   expectedPaymentMethod
@@ -27,6 +35,7 @@ async function verifyPaymentMethodText(
 }
 
 module.exports = {
-  paymentMethodsSelection,
-  verifyPaymentMethodText,
+  selectPersonalizationPaymentMethod,
+  verifyPersonalizationPaymentMethodsText,
+  selectPersonalizedCard,
 };

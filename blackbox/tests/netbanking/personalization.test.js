@@ -5,14 +5,14 @@ const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
-  verifyPaymentMethodText,
+  verifyPersonalizationPaymentMethodsText,
   submit,
   passRequestNetbanking,
   handleMockSuccessDialog,
-  paymentMethodsSelection,
+  selectPersonalizationPaymentMethod,
 } = require('../../actions/common');
 
-describe.skip('Basic Netbanking with Personalization', () => {
+describe('Basic Netbanking with Personalization', () => {
   test('Perform Netbanking with Personalization transaction', async () => {
     const options = {
       key: 'rzp_test_VwsqHDsQPoVQi6',
@@ -26,13 +26,13 @@ describe.skip('Basic Netbanking with Personalization', () => {
       method: 'Netbanking',
     });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, '8888888882');
-    await verifyPaymentMethodText(
+    await fillUserDetails(context, '8888888885');
+    await verifyPersonalizationPaymentMethodsText(
       context,
       'Netbanking',
       'Netbanking - HDFC Bank'
     );
-    await paymentMethodsSelection(context);
+    await selectPersonalizationPaymentMethod(context, '1');
     await submit(context);
     await passRequestNetbanking(context);
     await handleMockSuccessDialog(context);

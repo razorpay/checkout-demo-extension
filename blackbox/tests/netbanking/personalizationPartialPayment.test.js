@@ -1,14 +1,18 @@
 //Not Implemented
-const { openCheckoutForPersonalization } = require('../../actions/checkout');
+const {
+  openCheckoutForPersonalization,
+} = require('../../actions/checkout-personalization');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
-  assertPaymentMethodsNetbanking,
+  verifyPersonalizationPaymentMethodsText,
   submit,
-  failRequestwithErrorMessage,
-  verifyErrorMessage,
+  selectPersonalizationPaymentMethod,
+  verifyPartialAmount,
   handlePartialPayment,
+  passRequestNetbanking,
+  handleMockSuccessDialog,
 } = require('../../actions/common');
 
 describe.skip('Netbanking tests', () => {
@@ -34,12 +38,17 @@ describe.skip('Netbanking tests', () => {
       method: 'Netbanking',
     });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true, '8888888882');
+    await fillUserDetails(context, '8888888885');
     await handlePartialPayment(context, '100');
-    await assertPaymentMethodsNetbanking(context);
+    await verifyPersonalizationPaymentMethodsText(
+      context,
+      'Netbanking',
+      'Netbanking - HDFC Bank'
+    );
+    await selectPersonalizationPaymentMethod(context, '1');
+    await verifyPartialAmount(context, '₹ 100');
     await submit(context);
-    const expectedErrorMeassage = 'Payment failed';
-    await failRequestwithErrorMessage(context, expectedErrorMeassage);
-    await verifyErrorMessage(context, expectedErrorMeassage);
+    await passRequestNetbanking(context);
+    await handleMockSuccessDialog(context);
   });
 });

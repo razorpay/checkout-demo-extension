@@ -5,15 +5,15 @@ const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
-  verifyPaymentMethodText,
+  verifyPersonalizationPaymentMethodsText,
   submit,
   handleOtpVerification,
   typeOTPandSubmit,
   handleValidationRequest,
-  paymentMethodsSelection,
+  selectPersonalizationPaymentMethod,
 } = require('../../actions/common');
 
-describe.skip('Wallet with Personalization  payment', () => {
+describe('Wallet with Personalization  payment', () => {
   test('Perform Wallet with Personalization transaction', async () => {
     const options = {
       key: 'rzp_test_VwsqHDsQPoVQi6',
@@ -29,8 +29,12 @@ describe.skip('Wallet with Personalization  payment', () => {
     });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, '8888888885');
-    await verifyPaymentMethodText(context, 'Wallet', 'Wallet - Freecharge');
-    await paymentMethodsSelection(context);
+    await verifyPersonalizationPaymentMethodsText(
+      context,
+      'Wallet',
+      'Wallet - Freecharge'
+    );
+    await selectPersonalizationPaymentMethod(context, '1');
     await submit(context);
     await handleOtpVerification(context);
     await typeOTPandSubmit(context);

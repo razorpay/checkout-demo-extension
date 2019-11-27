@@ -93,17 +93,27 @@ module.exports = {
     await page.goto(checkoutUrl);
 
     await page.evaluate(method => {
+      var hashKey = '51184e62';
+
       localStorage.setItem(
         'rzp_preffered_instruments',
         {
           UPI:
-            '{"4d184816":[{"_[flow]":"directpay","vpa":"dsd@okhdfcbank","method":"upi","timestamp":1574063491481,"success":true,"frequency":2,"id":"Dhix6Bqn8w7td4"},{"_[flow]":"directpay","vpa":"dfs@okicici","method":"upi","timestamp":1574066575053,"success":true,"frequency":1,"id":"Dhjpz3w1RIGMJ1"}]}',
+            '{"' +
+            hashKey +
+            '":[{"_[flow]":"directpay","vpa":"dsd@okhdfcbank","method":"upi","timestamp":1574063491481,"success":true,"frequency":2,"id":"Dhix6Bqn8w7td4"},{"_[flow]":"directpay","vpa":"dfs@okicici","method":"upi","timestamp":1574066575053,"success":true,"frequency":1,"id":"Dhjpz3w1RIGMJ1"}]}',
           Netbanking:
-            '{"732ab5a9":[{"bank":"HDFC","method":"netbanking","timestamp":1574062745851,"success":true,"frequency":2,"id":"Dhh86QTueOpyWX"}],"4c184683":[{"bank":"HDFC","method":"netbanking","timestamp":1574072395307,"success":true,"frequency":1,"id":"DhlUS88dTUwBC5"}]}',
+            '{"' +
+            hashKey +
+            '":[{"frequency":1,"id":"DlNeZ0iE2CQ1C8","success":false,"timestamp":1574861811284,"bank":"HDFC","method":"netbanking"}]}',
           QR:
-            '{"4b1844f0":[{"_[flow]":"intent","_[upiqr]":"1","method":"upi","timestamp":1574079022916,"success":true,"frequency":2,"id":"DhnN8SggG8Ihdy"}]}',
+            '{"' +
+            hashKey +
+            '":[{"frequency":1,"id":"DlNXu1xf7mVGP3","success":true,"timestamp":1574861432940,"_[flow]":"intent","_[upiqr]":"1","method":"upi"}]}',
           Wallet:
-            '{"51184e62":[{"wallet":"freecharge","method":"wallet","timestamp":1574081911355,"success":true,"frequency":1,"id":"DhoBzK59KicZni"}]}',
+            '{"' +
+            hashKey +
+            '":[{"wallet":"freecharge","method":"wallet","timestamp":1574081911355,"success":true,"frequency":1,"id":"DhoBzK59KicZni"}]}',
         }[method]
       );
     }, method);
