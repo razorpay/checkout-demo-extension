@@ -33,7 +33,10 @@ async function verifyPersonalizationPaymentMethodsText(context) {
       currentPaymentMethod => currentPaymentMethod.textContent,
       currentPaymentMethod
     );
-    if (context.preferences.payment_downtime.items.severity == 'high')
+    if (
+      context.preferences.payment_downtime &&
+      context.preferences.payment_downtime.items[0].severity == 'high'
+    )
       expect(arrayofvpas).not.toEqual(
         expect.arrayContaining([paymentMethodText.trim()])
       );

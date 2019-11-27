@@ -34,7 +34,7 @@ describe('Netbanking tests', () => {
     });
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, false);
+    await fillUserDetails(context);
 
     await submit(context);
     await verifyEmandateBank(context);
