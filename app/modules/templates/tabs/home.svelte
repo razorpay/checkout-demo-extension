@@ -82,6 +82,14 @@
   }
 
   export function setDetailsCta() {
+    if (isPartialPayment) {
+      // TODO: This hack should be removed and Next button should be removed too
+      _El.addClass(_Doc.querySelector('#container'), 'extra');
+      hideCta();
+
+      return;
+    }
+
     if (session.oneMethod) {
       showCtaWithText(
         'Pay by ' +
@@ -208,6 +216,9 @@
 
   export function onShown() {
     if (view === 'methods') {
+      // TODO: This hack should be removed and Next button should be removed
+      _El.removeClass(_Doc.querySelector('#container'), 'extra');
+
       if ($selectedInstrumentId) {
         showCtaWithDefaultText();
       } else {
