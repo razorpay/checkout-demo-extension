@@ -75,11 +75,6 @@
     padding: 16px;
   }
 
-  :global(.new-method.down) {
-    cursor: not-allowed;
-    background-color: #f7f7f7;
-  }
-
   /* Icon styles */
   i {
     display: flex;
