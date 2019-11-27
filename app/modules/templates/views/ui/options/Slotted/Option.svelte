@@ -14,7 +14,9 @@
     display: block;
     width: 100%;
     text-align: start;
-    transition: all 0.15s linear;
+    transition-duration: 0.15s;
+    transition-property: border, background;
+    transition-timing-function: linear;
   }
 
   button:disabled {
