@@ -43,29 +43,16 @@
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
 
   const session = getSession();
-
-  // Props
-
-  const attr = attr => attr.replace(/"/g, '');
-
-  const entries = _Obj.entries;
-
   const methods = session.methods;
   const icons = session.themeMeta.icons;
-
   const order = session.order || {};
-  const o = session.get;
+  const { isPartialPayment, prefill } = CheckoutStore.get().prefill;
 
-  const firstPaymentMinAmount = session.formatAmountWithCurrency(
-    order.first_payment_min_amount
-  );
+  $contact = prefill.contact || '';
+  $email = prefill.email || '';
 
-  const prefilledEmail = session.get('prefill.email');
-  const prefilledContact = session.get('prefill.contact');
-
-  $contact = prefilledContact || '';
-  $email = prefilledEmail || '';
-
+  // Prop that decides which view to show.
+  // Values: 'details', 'methods'
   let view = 'details';
 
   let showSecuredByMessage;
@@ -73,7 +60,7 @@
     view === 'details' &&
     !session.multiTpv &&
     !session.tpvBank &&
-    !order.partial_payment &&
+    !isPartialPayment &&
     !session.get('address');
 
   export function showMethods() {
@@ -128,23 +115,9 @@
     return view === 'methods';
   }
 
-  // export function shouldShowMethodsScreen() {
-  //   if (session.oneMethod) {
-  //     const singleMethodsWithP13n = ['wallet', 'netbanking', 'upi'];
-
-  //     const singleMethod = _Arr.find(
-  //       singleMethodsWithP13n,
-  //       method => method === session.oneMethod
-  //     );
-
-  //     const canUseP13n =
-  //       shouldUseP13n() && getInstruments().length && singleMethod;
-
-  //     return canUseP13n;
-  //   }
-
-  //   return true;
-  // }
+  export function onDetailsScreen() {
+    return view === 'details';
+  }
 
   function getInstruments() {
     const _customer = session.getCustomer($contact);

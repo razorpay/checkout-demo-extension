@@ -42,7 +42,7 @@ export function setAppropriateCtaText() {
 
   if (session.newHomeScreen) {
     if (session.tab === '') {
-      if (!session.homeTab.onMethodsScreen()) {
+      if (session.homeTab.onDetailsScreen()) {
         session.homeTab.setDetailsCta();
       }
     } else {
