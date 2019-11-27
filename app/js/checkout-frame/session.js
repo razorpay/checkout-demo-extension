@@ -3994,7 +3994,7 @@ Session.prototype = {
   checkCommonValid: function() {
     var selector = '#pad-common';
 
-    if (this.newHomeScreen) {
+    if (this.newHomeScreen && !this.homeTab.onMethodsScreen()) {
       selector = '#form-common';
     }
 
