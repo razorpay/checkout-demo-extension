@@ -1,5 +1,4 @@
 <script>
-  import { getSession } from 'sessionmanager';
   import { input, focus, blur } from 'actions/input';
 
   export let value;
