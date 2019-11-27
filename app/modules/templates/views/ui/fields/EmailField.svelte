@@ -1,19 +1,23 @@
 <script>
+  // Store
   import { email } from 'checkoutstore/screens/home';
-  import { getSession } from 'sessionmanager';
 
+  // UI imports
   import Field from 'templates/views/ui/Field.svelte';
 
-  // TODO: import this from somewhere
-  export let getStore;
+  // Props
   export let value;
 
-  const session = getSession();
-  const optional = getStore('optional');
+  // Utils
+  import CheckoutStore from 'checkoutstore';
 
-  const prefilledEmail = session.get('prefill.email');
-  const isEmailReadonly = session.get('readonly.email') && prefilledEmail;
-  const isEmailHidden = session.get('hidden.email') && optional.email;
+  const checkoutStore = CheckoutStore.get();
+
+  const { optional, prefill, readonly, hidden } = checkoutStore;
+
+  const prefilledEmail = prefill.email;
+  const isEmailReadonly = readonly.email && prefilledEmail;
+  const isEmailHidden = hidden.email && optional.email;
 
   const EMAIL_REGEX = optional.email
     ? '.*'

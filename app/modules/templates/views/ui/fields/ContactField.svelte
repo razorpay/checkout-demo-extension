@@ -1,19 +1,23 @@
 <script>
-  import { contact } from 'checkoutstore/screens/home';
-  import { getSession } from 'sessionmanager';
+  // Utils
+  import CheckoutStore from 'checkoutstore';
 
+  // Store
+  import { contact } from 'checkoutstore/screens/home';
+
+  // UI imports
   import Field from 'templates/views/ui/Field.svelte';
 
-  // TODO: import this from somewhere
-  export let getStore;
+  // Props
   export let value;
 
-  const session = getSession();
-  const optional = getStore('optional');
+  const checkoutStore = CheckoutStore.get();
 
-  const prefilledContact = session.get('prefill.contact');
-  const isContactReadonly = session.get('readonly.contact') && prefilledContact;
-  const isContactHidden = session.get('hidden.contact') && optional.contact;
+  const { optional, readonly, hidden, prefill } = checkoutStore;
+
+  const prefilledContact = prefill.contact;
+  const isContactReadonly = readonly.contact && prefilledContact;
+  const isContactHidden = hidden.contact && optional.contact;
 
   const CONTACT_REGEX = optional.contact ? '.*' : '^\\+?[0-9]{8,15}$';
 </script>

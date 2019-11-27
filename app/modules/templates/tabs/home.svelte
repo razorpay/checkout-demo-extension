@@ -44,7 +44,6 @@
   const session = getSession();
 
   // Props
-  export let getStore;
 
   const attr = attr => attr.replace(/"/g, '');
 
@@ -478,7 +477,7 @@
   <Screen pad={false}>
     <div slot="main" class="screen-main">
       {#if view === 'details'}
-        <PaymentDetails {getStore} {session} />
+        <PaymentDetails {session} />
       {/if}
       {#if view === 'methods'}
         {#if $contact || $email}

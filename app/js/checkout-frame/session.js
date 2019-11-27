@@ -1562,9 +1562,6 @@ Session.prototype = {
     if (this.newHomeScreen) {
       this.homeTab = new discreet.HomeTab({
         target: gel('home-screen-wrap'),
-        props: {
-          getStore: getStore,
-        },
       });
     }
   },

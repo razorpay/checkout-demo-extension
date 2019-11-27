@@ -1,13 +1,14 @@
 <script>
+  // UI imports
   import PartialPaymentOptions from 'templates/views/partialpaymentoptions.svelte';
   import Address from 'templates/views/address.svelte';
   import MultiTpvOptions from 'templates/views/ui/MultiTpvOptions.svelte';
   import TpvBank from 'templates/views/ui/TpvBank.svelte';
   import CardOffer from 'templates/views/ui/CardOffer.svelte';
-
   import ContactField from 'templates/views/ui/fields/ContactField.svelte';
   import EmailField from 'templates/views/ui/fields/EmailField.svelte';
 
+  // Store
   import {
     contact,
     email,
@@ -16,25 +17,27 @@
     state,
   } from 'checkoutstore/screens/home';
 
+  // Transitions
   import { slide } from 'svelte/transition';
+
+  // Utils imports
+  import CheckoutStore from 'checkoutstore';
 
   const entries = _Obj.entries;
 
-  export let getStore;
+  // Props
   export let session;
 
-  const methods = session.methods;
   const cardOffer = session.cardOffer;
-  const optional = getStore('optional');
   const order = session.order || {};
-
   const bank = session.tpvBank || {};
   const accountName = session.get('prefill.bank_account[name]');
   const icons = session.themeMeta.icons;
 
-  const showAddress = session.get('address') && !order.partial_payment;
+  const checkoutStore = CheckoutStore.get();
+  const { contactEmailOptional, isPartialPayment } = checkoutStore;
 
-  const contactEmailOptional = getStore('contactEmailOptional');
+  const showAddress = checkoutStore.address && !isPartialPayment;
 </script>
 
 <style>
@@ -47,8 +50,8 @@
 </style>
 
 <div class="details-block" transition:slide={{ duration: 400 }}>
-  <ContactField {getStore} bind:value={$contact} />
-  <EmailField {getStore} bind:value={$email} />
+  <ContactField bind:value={$contact} />
+  <EmailField bind:value={$email} />
 </div>
 
 {#if order.partial_payment}
