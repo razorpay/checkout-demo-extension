@@ -8,6 +8,7 @@
   import SlottedOption from 'templates/views/ui/options/Slotted/Option.svelte';
   import NewMethodsList from 'templates/views/ui/methods/NewMethodsList.svelte';
   import Icon from 'templates/views/ui/Icon.svelte';
+  import OffersPortal from 'templates/views/OffersPortal.svelte';
 
   // Svelte imports
   import { onMount } from 'svelte';
@@ -710,6 +711,8 @@
           This payment is secured by Razorpay.
         </div>
       {/if}
+
+      <OffersPortal />
     </div>
 
   </Screen>
