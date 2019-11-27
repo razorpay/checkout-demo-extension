@@ -30,6 +30,9 @@
   export let helpText = '';
   export let maxlength = null;
   export let inputmode = null;
+  export let min = null;
+  export let max = null;
+  export let elemClasses = '';
 
   // Computed
   export let identifier;
@@ -104,7 +107,7 @@
    * TODO: standardize / fix padding
    */
   div:not(.help) {
-    /*padding: 4px 0;*/
+    padding: 4px 0;
     input {
       opacity: 1;
       width: 100%;
@@ -112,7 +115,7 @@
   }
 </style>
 
-<div bind:this={wrap} class="elem" class:readonly>
+<div bind:this={wrap} class={`elem ${elemClasses}`} class:readonly>
   {#if icon}
     <i>
       {@html icon}
@@ -131,6 +134,8 @@
     {placeholder}
     {pattern}
     {readonly}
+    {min}
+    {max}
     use:formatterAction={formatter}
     use:focusAction={handleFocus}
     use:blurAction={handleBlur}
