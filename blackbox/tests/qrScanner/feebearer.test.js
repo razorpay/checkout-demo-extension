@@ -33,7 +33,7 @@ describe('Basic QR Code Payment', () => {
     await selectPaymentMethod(context, 'upi');
     await selectUPIApp(context, '1');
     await handleFeeBearer(context);
-    await respondToUPIAjax(context, { method: 'intent' });
+    await respondToUPIAjax(context, { method: 'qr' });
     await responseWithQRImage(context);
     await validateQRImage(context);
     await respondToUPIPaymentStatus(context);
