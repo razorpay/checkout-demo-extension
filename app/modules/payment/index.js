@@ -853,7 +853,7 @@ export function createFees(data, razorpayInstance, onSuccess, onError) {
   data = formatPayload(data, razorpayInstance);
 
   fetch.post({
-    url: makeUrl('payments/create/fees'),
+    url: makeUrl('payments/calculate/fees'),
     data,
     callback: function(response) {
       if (response.error) {
