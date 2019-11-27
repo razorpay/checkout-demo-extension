@@ -1,39 +1,39 @@
 <script>
+  import SlottedRadioOption from 'templates/views/ui/options/Slotted/RadioOption.svelte';
+  import Icon from 'templates/views/ui/Icon.svelte';
+
   export let bank;
   export let icons;
 
-  let selectedOption = '';
+  export let selectedOption = '';
+
+  function handleOptionSelection(option) {
+    selectedOption = option;
+  }
 </script>
 
-<style>
-  .multi-tpv {
-    padding: 0 24px;
-  }
-</style>
-
-<div class="multi-tpv input-radio centered">
-  <div class="multi-tpv-header">Pay Using</div>
-  <input
-    checked
-    type="radio"
+<div class="multi-tpv-header">Pay Using</div>
+<div class="border-list">
+  <SlottedRadioOption
     name="method"
-    id="multitpv-netb"
-    value="netbanking" />
-  <label for="multitpv-netb">
-    <i>
-      <img src="https://cdn.razorpay.com/bank/{bank.code}.gif" />
+    value="netbanking"
+    selected={selectedOption === 'netbanking'}
+    on:click={_ => handleOptionSelection('netbanking')}>
+    <i slot="icon">
+      <Icon icon="https://cdn.razorpay.com/bank/{bank.code}.gif" />
     </i>
-    <div class="radio-display" />
-    <div class="label-content">A/C: {bank.account_number}</div>
-    <span>{bank.name}</span>
-  </label>
-  <input type="radio" name="method" id="multitpv-upi" value="upi" />
-  <label for="multitpv-upi">
-    <i>
-      {@html icons.upi}
+    <div slot="title">A/C: {bank.account_number}</div>
+    <div slot="subtitle">{bank.name}</div>
+  </SlottedRadioOption>
+  <SlottedRadioOption
+    name="method"
+    value="upi"
+    selected={selectedOption === 'upi'}
+    on:click={_ => handleOptionSelection('upi')}>
+    <i slot="icon">
+      <Icon icon={icons.upi} />
     </i>
-    <div class="radio-display" />
-    <div class="label-content">UPI Payment</div>
-    <span>{bank.name} Account {bank.account_number}</span>
-  </label>
+    <div slot="title">UPI</div>
+    <div slot="subtitle">{bank.name} Account {bank.account_number}</div>
+  </SlottedRadioOption>
 </div>

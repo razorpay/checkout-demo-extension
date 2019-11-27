@@ -47,6 +47,10 @@
   .partial-payment-block {
     padding: 0 12px 12px 12px;
   }
+
+  .multi-tpv-block {
+    padding: 12px 24px;
+  }
 </style>
 
 <div class="details-block" transition:slide={{ duration: 400 }}>
