@@ -12,7 +12,7 @@
   }
 </script>
 
-<div class="multi-tpv-header">Pay Using</div>
+<h3 class="title">Pay Using</h3>
 <div class="border-list">
   <SlottedRadioOption
     name="method"

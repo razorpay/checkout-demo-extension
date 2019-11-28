@@ -68,7 +68,7 @@
   }
 </style>
 
-<div class="legend">Select a payment type</div>
+<h3 class="title">Select a payment type</h3>
 <div class="border-list">
   <SlottedRadioOption
     name="payment_type"
