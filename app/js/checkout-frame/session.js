@@ -3501,18 +3501,23 @@ Session.prototype = {
     var screenEl = '#form-' + (screen || 'common');
     makeVisible(screenEl);
 
-    if (this.newHomeScreen) {
-      if (screen === '') {
-        if (this.homeTab.onDetailsScreen()) {
+    /**
+     * On the new homescreen,
+     * we want to focus only if the user
+     * is on the details screen.
+     *
+     * Temp check, will be fixed when old homescreen is removed.
+     */
+    if (screen === '') {
+      if (this.newHomeScreen) {
+        if (this.homeTab && this.homeTab.onDetailsScreen()) {
           invoke('focus', qs(screenEl + ' .invalid input'));
         }
       } else {
         invoke('focus', qs(screenEl + ' .invalid input'));
       }
-    } else {
-      if (!(screen === 'upi' && this.upi_intents_data)) {
-        invoke('focus', qs(screenEl + ' .invalid input'));
-      }
+    } else if (!(screen === 'upi' && this.upi_intents_data)) {
+      invoke('focus', qs(screenEl + ' .invalid input'));
     }
 
     var showPaybtn = screen;
