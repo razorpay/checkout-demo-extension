@@ -5,8 +5,8 @@ const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
-  verifyPaymentMethodText,
-  paymentMethodsSelection,
+  verifyPersonalizationPaymentMethodsText,
+  selectPersonalizationPaymentMethod,
   submit,
   expectRedirectWithCallback,
 } = require('../../actions/common');
@@ -26,14 +26,15 @@ describe('Netbanking Personalization tests', () => {
       preferences,
       method: 'Netbanking',
     });
+
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, '8888888882');
-    await verifyPaymentMethodText(
+    await fillUserDetails(context, '8888888885');
+    await verifyPersonalizationPaymentMethodsText(
       context,
       'Netbanking',
       'Netbanking - HDFC Bank'
     );
-    await paymentMethodsSelection(context);
+    await selectPersonalizationPaymentMethod(context, '1');
     await submit(context);
     await expectRedirectWithCallback(context, {
       method: 'netbanking',

@@ -6,8 +6,8 @@ const { delay } = require('../../util');
 const {
   assertHomePage,
   fillUserDetails,
-  verifyPaymentMethodText,
-  paymentMethodsSelection,
+  verifyPersonalizationPaymentMethodsText,
+  selectPersonalizationPaymentMethod,
   submit,
   handleValidationRequest,
   verifyTimeout,
@@ -29,13 +29,13 @@ describe('Netbanking tests', () => {
       method: 'Netbanking',
     });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, '8888888882');
-    await verifyPaymentMethodText(
+    await fillUserDetails(context, '8888888885');
+    await verifyPersonalizationPaymentMethodsText(
       context,
       'Netbanking',
       'Netbanking - HDFC Bank'
     );
-    await paymentMethodsSelection(context);
+    await selectPersonalizationPaymentMethod(context, '1');
     await submit(context);
     await handleValidationRequest(context, 'fail');
     await verifyTimeout(context, 'netbanking');
