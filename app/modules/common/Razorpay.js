@@ -194,6 +194,31 @@ RazorProto.isLiveMode = function() {
   );
 };
 
+/**
+ * Used for calculating the fees for the payment.
+ * Resolves and rejects with a JSON.
+ * @param {payload} Object
+ *
+ * @returns {Promise}
+ */
+RazorProto.calculateFees = function(payload) {
+  return new Promise((resolve, reject) => {
+    payload = formatPayload(payload, this);
+
+    fetch.post({
+      url: makeUrl('payments/calculate/fees'),
+      data: payload,
+      callback: function(response) {
+        if (response.error) {
+          return reject(response);
+        } else {
+          return resolve(response);
+        }
+      },
+    });
+  });
+};
+
 function isValidAmount(amt, min = 100) {
   if (/[^0-9]/.test(amt)) {
     return false;
