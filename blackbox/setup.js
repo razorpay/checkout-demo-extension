@@ -7,7 +7,7 @@ const isProd = process.env.NODE_ENV === 'production';
 module.exports = async function() {
   const browser = await puppeteer.launch({
     executablePath: process.env.CHROME_BIN || '/usr/bin/chromium',
-    args: ['--no-sandbox'],
+    args: ['--no-sandbox', '--single-process'],
     headless: isProd,
     // devtools: true,
   });
