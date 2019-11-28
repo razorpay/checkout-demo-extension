@@ -149,7 +149,8 @@
           name="p13n"
           {instrument}
           selected={instrument.id === $selectedInstrumentId}
-          on:click={() => selectP13nInstrument(instrument)} />
+          on:click={() => selectP13nInstrument(instrument)}
+          on:submit />
       {/if}
     {/each}
   </div>

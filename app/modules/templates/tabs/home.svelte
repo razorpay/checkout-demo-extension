@@ -424,6 +424,10 @@
       )
     );
   }
+
+  function attemptPayment() {
+    session.preSubmit();
+  }
 </script>
 
 <style>
@@ -535,7 +539,8 @@
             {personalization}
             {instruments}
             {customer}
-            on:selectMethod={selectMethod} />
+            on:selectMethod={selectMethod}
+            on:submit={attemptPayment} />
         </div>
       {/if}
     </div>

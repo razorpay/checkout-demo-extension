@@ -1,4 +1,7 @@
 <script>
+  // Svelte imports
+  import { createEventDispatcher } from 'svelte';
+
   // UI imports
   import Field from 'templates/views/ui/Field.svelte';
   import SlottedRadioOption from 'templates/views/ui/options/Slotted/RadioOption.svelte';
@@ -18,6 +21,7 @@
   export let selected = false; // Whether or not this instrument is selected
 
   const session = getSession();
+  const dispatch = createEventDispatcher();
 
   let text;
   let icon;
@@ -74,6 +78,22 @@
         break;
     }
   }
+
+  /**
+   * If the instrument is selected, and the user
+   * presses enter, mark this as a submission
+   */
+  function attemptSubmit(event) {
+    if (!selected) {
+      return;
+    }
+
+    const code = _.getKeyFromEvent(event);
+
+    if (code === '13' || code === 13) {
+      dispatch('submit');
+    }
+  }
 </script>
 
 <SlottedRadioOption
@@ -81,7 +101,8 @@
   {selected}
   value={instrument.id}
   className="p13n-instrument"
-  on:click>
+  on:click
+  on:keydown={attemptSubmit}>
   <i slot="icon">
     <Icon {icon} {alt} />
   </i>

@@ -63,6 +63,7 @@
   class:slotted-radio={defaultStyles}
   class:selected
   on:click
+  on:keydown
   type="button"
   role="listitem">
   <Stack horizontal {reverse}>
