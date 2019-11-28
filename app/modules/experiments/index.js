@@ -41,7 +41,7 @@ function setExperimentsInStorage(experiments) {
  * Retrieves segment for a given experiment.
  * @param {string} experiment Experiment name
  *
- * @returns {x}
+ * @returns {*}
  */
 function getSegment(experiment) {
   const experiments = getExperimentsFromStorage();
