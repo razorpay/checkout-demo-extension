@@ -90,7 +90,9 @@
       return;
     }
 
-    if (session.oneMethod) {
+    if (!session.get('amount')) {
+      showCtaWithText('Authenticate');
+    } else if (session.oneMethod) {
       showCtaWithText(
         'Pay by ' +
           getMethodNameForPaymentOption(session.oneMethod, {
