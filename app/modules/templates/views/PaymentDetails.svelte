@@ -48,15 +48,21 @@
   .partial-payment-block {
     padding: 0 12px 12px 12px;
   }
-
   .multi-tpv-block {
     padding: 0 12px 12px;
+  }
+  .contact-field > :global(*) {
+    margin-bottom: 16px;
   }
 </style>
 
 <div class="details-block" transition:slide={{ duration: 400 }}>
-  <ContactField bind:value={$contact} />
-  <EmailField bind:value={$email} />
+  <div class="contact-field">
+    <ContactField bind:value={$contact} />
+  </div>
+  <div class="email-field">
+    <EmailField bind:value={$email} />
+  </div>
 </div>
 
 {#if isPartialPayment}
@@ -85,7 +91,6 @@
   </div>
 {/if}
 
-<!-- TODO: check if this can be removed -->
 {#if cardOffer}
   <CardOffer offer={cardOffer} />
 {/if}

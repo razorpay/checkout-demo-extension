@@ -22,12 +22,6 @@
   const CONTACT_REGEX = optional.contact ? '.*' : '^\\+?[0-9]{8,15}$';
 </script>
 
-<style>
-  div {
-    padding-bottom: 16px;
-  }
-</style>
-
 <div class:hidden={isContactHidden}>
   <Field
     id="contact"
