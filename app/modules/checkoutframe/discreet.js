@@ -1,10 +1,10 @@
 import 'entry/checkout-frame';
 import {
-  RazorpayConfig,
   makeAuthUrl,
   makePrefParams,
   validateOverrides,
 } from 'common/Razorpay';
+import RazorpayConfig from 'common/RazorpayConfig';
 
 import Track from 'tracker';
 import Analytics from 'analytics';

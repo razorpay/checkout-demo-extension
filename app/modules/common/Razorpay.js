@@ -3,6 +3,8 @@ import Eventer from 'eventer';
 import Track from 'tracker';
 import CheckoutOptions, { flatten, RazorpayDefaults } from 'common/options';
 import * as AnalyticsTypes from 'analytics-types';
+import { formatPayload } from 'payment/validator';
+import RazorpayConfig from 'common/RazorpayConfig';
 
 import {
   supportedCurrencies,
@@ -10,17 +12,6 @@ import {
   getCurrencyConfig,
   formatAmountWithSymbol,
 } from 'common/currency';
-
-export const RazorpayConfig = {
-  api: 'https://api.razorpay.com/',
-  version: 'v1/',
-  frameApi: '/',
-  cdn: 'https://cdn.razorpay.com/',
-};
-
-try {
-  _Obj.extend(RazorpayConfig, global.Razorpay.config);
-} catch (e) {}
 
 export function makeUrl(path = '') {
   return RazorpayConfig.api + RazorpayConfig.version + path;

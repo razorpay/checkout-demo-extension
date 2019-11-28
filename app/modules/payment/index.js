@@ -16,11 +16,8 @@ import Iframe from 'payment/iframe';
 import { formatPayment, formatPayload } from 'payment/validator';
 import { formatAmountWithSymbol } from 'common/currency';
 import { FormatDelegator } from 'formatter';
-import Razorpay, {
-  RazorpayConfig,
-  makeAuthUrl,
-  makeUrl,
-} from 'common/Razorpay';
+import Razorpay, { makeAuthUrl, makeUrl } from 'common/Razorpay';
+import RazorpayConfig from 'common/RazorpayConfig';
 import { internetExplorer, ajaxRouteNotSupported } from 'common/useragent';
 import { isPowerWallet } from 'common/wallet';
 import { checkPaymentAdapter } from 'payment/adapters';
