@@ -135,10 +135,6 @@
     max-height: 24px;
   }
 
-  /* :global(#body.sub) .screen-main.bottomShadow > .shadow-bottom {
-    bottom: 55px;
-  } */
-
   .grow.bottomShadow > .shadow-bottom {
     max-height: 24px;
   }
