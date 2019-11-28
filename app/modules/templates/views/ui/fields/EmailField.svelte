@@ -26,7 +26,7 @@
   const label = optional.email ? 'Email (Optional)' : 'Email';
 </script>
 
-<div class="elem-wrap" class:hidden={isEmailHidden} id="elem-wrap-email">
+<div class:hidden={isEmailHidden}>
   <Field
     id="email"
     name="email"
