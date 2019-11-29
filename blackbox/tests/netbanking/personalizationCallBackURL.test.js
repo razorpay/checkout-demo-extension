@@ -1,4 +1,3 @@
-//Not Implemented
 const {
   openCheckoutForPersonalization,
 } = require('../../actions/checkout-personalization');
@@ -8,29 +7,19 @@ const {
   fillUserDetails,
   verifyPersonalizationPaymentMethodsText,
   submit,
+  expectRedirectWithCallback,
   selectPersonalizationPaymentMethod,
-  verifyPartialAmount,
-  handlePartialPayment,
-  passRequestNetbanking,
-  handleMockSuccessDialog,
 } = require('../../actions/common');
 
-describe.skip('Netbanking tests', () => {
-  test('perform netbanking transaction with partial payments', async () => {
+describe('Basic Netbanking with Personalization', () => {
+  test('Perform Netbanking with Personalization and Callback URL transaction', async () => {
     const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 20000,
+      key: 'rzp_test_VwsqHDsQPoVQi6',
+      amount: 60000,
+      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
+      redirect: true,
     };
-    const preferences = makePreferences({
-      order: {
-        amount: 20000,
-        amount_due: 20000,
-        amount_paid: 0,
-        currency: 'INR',
-        first_payment_min_amount: null,
-        partial_payment: true,
-      },
-    });
+    const preferences = makePreferences();
     const context = await openCheckoutForPersonalization({
       page,
       options,
@@ -39,16 +28,16 @@ describe.skip('Netbanking tests', () => {
     });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, '8888888885');
-    await handlePartialPayment(context, '100');
     await verifyPersonalizationPaymentMethodsText(
       context,
       'Netbanking',
       'Netbanking - HDFC Bank'
     );
     await selectPersonalizationPaymentMethod(context, '1');
-    await verifyPartialAmount(context, '₹ 100');
     await submit(context);
-    await passRequestNetbanking(context);
-    await handleMockSuccessDialog(context);
+    await expectRedirectWithCallback(context, {
+      method: 'netbanking',
+      bank: 'HDFC',
+    });
   });
 });
