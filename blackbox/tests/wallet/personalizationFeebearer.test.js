@@ -45,6 +45,7 @@ describe('Wallet with Personalization payment', () => {
     await typeOTPandSubmit(context);
     await handleValidationRequest(context, 'fail');
     await retryWalletTransaction(context);
+    await delay(200);
     await selectWallet(context, 'freecharge');
     await submit(context);
     await handleFeeBearer(context);
