@@ -101,7 +101,7 @@ module.exports = {
           UPI:
             '{"' +
             hashKey +
-            '":[{"_[flow]":"directpay","vpa":"dsd@okhdfcbank","method":"upi","timestamp":1574063491481,"success":true,"frequency":2,"id":"Dhix6Bqn8w7td4"},{"_[flow]":"directpay","vpa":"dfs@okicici","method":"upi","timestamp":1574066575053,"success":true,"frequency":1,"id":"Dhjpz3w1RIGMJ1"}]}',
+            '":[{"frequency":1,"id":"Dm7W7dvCSWCsvd","success":false,"timestamp":1575023326082,"_[flow]":"directpay","vpa":"scbaala@okhdfcbank","method":"upi"}]}',
           Netbanking:
             '{"' +
             hashKey +
