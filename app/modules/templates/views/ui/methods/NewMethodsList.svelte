@@ -19,6 +19,8 @@
   import { doesAppExist } from 'common/upi';
   import { getInstrumentsForCustomer } from 'checkoutframe/personalization';
   import { showCtaWithDefaultText, hideCta } from 'checkoutstore/cta';
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
 
   // Store
   import { contact, selectedInstrumentId } from 'checkoutstore/screens/home';
