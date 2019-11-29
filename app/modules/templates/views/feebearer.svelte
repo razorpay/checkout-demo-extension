@@ -15,8 +15,6 @@
   export let feeBreakup = null;
   export let bearer = null;
   export let paymentData;
-  export let error = null;
-  export let on = {};
 
   const dispatch = createEventDispatcher();
   const session = getSession();
@@ -83,9 +81,7 @@
 
 <div class="fee-bearer">
   {#if loading}
-    <AsyncLoading>
-      Loading fees breakup...
-    </AsyncLoading>
+    <AsyncLoading>Loading fees breakup...</AsyncLoading>
   {:else if feeBreakup}
     <b>Fees Breakup</b>
     <br />

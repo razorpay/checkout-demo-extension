@@ -10,7 +10,6 @@
   export let retry = false;
   export let selected = true;
   export let pspHandle;
-  export let checked = false;
   export let focusOnCreate;
 
   // Refs
