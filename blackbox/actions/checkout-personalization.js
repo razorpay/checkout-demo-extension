@@ -109,7 +109,7 @@ module.exports = {
           QR:
             '{"' +
             hashKey +
-            '":[{"frequency":1,"id":"DlNXu1xf7mVGP3","success":true,"timestamp":1574861432940,"_[flow]":"intent","_[upiqr]":"1","method":"upi"}]}',
+            '":[{"frequency":1,"id":"Dm8vlphC1Q8pQJ","success":false,"timestamp":1575028304521,"_[flow]":"intent","_[upiqr]":"1","method":"upi"}]}',
           Wallet:
             '{"' +
             hashKey +

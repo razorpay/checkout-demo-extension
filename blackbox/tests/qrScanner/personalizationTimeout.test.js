@@ -7,10 +7,7 @@ const {
   fillUserDetails,
   verifyPersonalizationPaymentMethodsText,
   submit,
-  respondToUPIPaymentStatus,
-  respondToUPIAjax,
-  responseWithQRImage,
-  validateQRImage,
+  verifyTimeout,
   selectPersonalizationPaymentMethod,
 } = require('../../actions/common');
 
@@ -19,6 +16,7 @@ describe('QR Scanner with Personalization  payment', () => {
     const options = {
       key: 'rzp_test_VwsqHDsQPoVQi6',
       amount: 60000,
+      timeout: 5,
     };
     const preferences = makePreferences();
     preferences.methods.upi = true;
@@ -33,9 +31,6 @@ describe('QR Scanner with Personalization  payment', () => {
     await verifyPersonalizationPaymentMethodsText(context, 'QR', 'UPI QR');
     await selectPersonalizationPaymentMethod(context, '1');
     await submit(context);
-    await respondToUPIAjax(context, { method: 'qr' });
-    await responseWithQRImage(context);
-    await validateQRImage(context);
-    await respondToUPIPaymentStatus(context);
+    await verifyTimeout(context, 'upi');
   });
 });
