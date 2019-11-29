@@ -78,6 +78,20 @@ async function assertBasicDetailsScreen(context) {
   expect(await $email.evaluate(el => el.value)).toEqual(context.prefilledEmail);
 }
 
+async function assertMethodsScreen(context) {
+  const $form = await context.page.$('#form-common');
+  const methods = await $form.$('.methods-container');
+
+  expect(methods).not.toEqual(null);
+}
+
+async function assertMissingDetails(context) {
+  const $form = await context.page.$('#form-common');
+  const strip = await $form.$('.instrument-strip');
+
+  expect(strip).toEqual(null);
+}
+
 /**
  * Fill user contact and email
  */
@@ -93,10 +107,20 @@ async function fillUserDetails(context) {
     await context.page.type('#email', email);
   }
 
-  setState(context, {
+  const state = {
     contact,
     email,
-  });
+  };
+
+  if (context.isContactOptional) {
+    delete state.contact;
+  }
+
+  if (context.isEmailOptional) {
+    delete state.email;
+  }
+
+  setState(context, state);
 }
 
 /**
@@ -148,7 +172,12 @@ async function assertEditUserDetailsAndBack(context) {
 
   // TODO: Update details
 
-  await proceed(context);
+  if (context.state && context.state.partial) {
+    const nextButton = await context.page.waitForSelector('#next-button');
+    await nextButton.click();
+  } else {
+    await proceed(context);
+  }
   await assertUserDetails(context);
 }
 
@@ -188,6 +217,28 @@ async function selectPaymentMethod(context, method) {
   await methodButton.click();
 }
 
+/**
+ * Selects the option to pay partially
+ * and enters an amount
+ */
+async function handlePartialPayment(context, amount) {
+  const partialOptions = await context.page.$$('.partial-payment-block button');
+
+  const payPartially = partialOptions[1];
+
+  await payPartially.click();
+
+  setState(context, {
+    partial: true,
+  });
+
+  const amountValue = await context.page.waitForSelector('#amount-value');
+  await amountValue.type(amount);
+
+  const nextButton = await context.page.waitForSelector('#next-button');
+  await nextButton.click();
+}
+
 module.exports = {
   assertBasicDetailsScreen,
   fillUserDetails,
@@ -196,4 +247,7 @@ module.exports = {
   assertPaymentMethods,
   selectPaymentMethod,
   assertEditUserDetailsAndBack,
+  handlePartialPayment,
+  assertMethodsScreen,
+  assertMissingDetails,
 };
