@@ -316,11 +316,17 @@
 
     selectedApp = id;
 
-    if (isGPaySelected) {
-      return session.preSubmit();
-    }
+    /**
+     * Wait for `isGpaySelected` to be updated. It does not update synchronously when selectedApp is reassigned, hence
+     * the setTimeout.
+     */
+    setTimeout(function() {
+      if (isGPaySelected) {
+        return session.preSubmit();
+      }
 
-    focusVpa();
+      focusVpa();
+    });
   }
 
   export function focusVpa() {
