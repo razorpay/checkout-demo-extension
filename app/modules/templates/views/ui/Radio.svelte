@@ -19,6 +19,12 @@
   $: classesToApply = `input-radio ${classes}`;
 </script>
 
+<style>
+  label {
+    min-width: 18px;
+  }
+</style>
+
 <div class={classesToApply}>
   <input
     type="radio"
@@ -30,8 +36,10 @@
     {tabindex} />
   <label for={identifier}>
     <div class="radio-display" />
-    <div class="label-content">
-      {@html label}
-    </div>
+    {#if label}
+      <div class="label-content">
+        {@html label}
+      </div>
+    {/if}
   </label>
 </div>
