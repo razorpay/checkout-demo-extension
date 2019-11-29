@@ -390,7 +390,7 @@
     const _preferredMethods = _Arr.reduce(
       instruments,
       (acc, instrument) => {
-        acc['_' + instrument.method] = true;
+        acc[`_${instrument.method}`] = true;
         return acc;
       },
       {}
