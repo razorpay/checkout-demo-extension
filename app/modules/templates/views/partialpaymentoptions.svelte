@@ -11,6 +11,10 @@
 
   import { getSession } from 'sessionmanager';
 
+  // Utils
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
+
   // Props
   export let order = {};
 
@@ -28,6 +32,19 @@
   let partialAmountField = null;
 
   $: expanded = $partialPaymentOption === 'partial';
+
+  function trackPartialPaymentOptionClicked(data) {
+    Analytics.track('partial_payment:select', {
+      type: AnalyticsTypes.BEHAV,
+      data,
+    });
+  }
+
+  $: {
+    if ($partialPaymentOption) {
+      trackPartialPaymentOptionClicked({ type: $partialPaymentOption });
+    }
+  }
 
   function handleRadioSelection(type) {
     if ($partialPaymentOption !== type) {
