@@ -1102,7 +1102,7 @@ Session.prototype = {
       classes.push('partial');
     }
 
-    if (getStore('contactEmailOptional')) {
+    if (getStore('contactEmailOptional') && !this.newHomeScreen) {
       if (this.tpvBank) {
         classes.push('tpv-no-details');
       } else {
