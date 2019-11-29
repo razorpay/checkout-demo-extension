@@ -1,11 +1,29 @@
 <script>
+  // UI Imports
   import SlottedRadioOption from 'templates/views/ui/options/Slotted/RadioOption.svelte';
   import Icon from 'templates/views/ui/Icon.svelte';
 
+  // Utils
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
+
+  // Props
   export let bank;
   export let icons;
-
   export let selectedOption = '';
+
+  function trackTpvOptionSelected(data) {
+    Analytics.track('multi_tpv:select', {
+      type: AnalyticsTypes.BEHAV,
+      data,
+    });
+  }
+
+  $: {
+    if (selectedOption) {
+      trackTpvOptionSelected({ type: selectedOption });
+    }
+  }
 
   function handleOptionSelection(option) {
     selectedOption = option;
