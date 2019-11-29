@@ -504,21 +504,32 @@ Payment.prototype = {
     }
   },
 
+  redirect: function({ url, content, method = 'get' }) {
+    // If we're in SDK and not in an iframe, redirect directly
+    // Not using Bridge.hasCheckoutBridge since bridge.js imports session
+    if (global.CheckoutBridge) {
+      _Doc.submitForm(url, content, method);
+    }
+    // Otherwise, use sendMessage
+    else {
+      Razorpay.sendMessage({
+        event: 'redirect',
+        data: {
+          url,
+          method,
+          content,
+        },
+      });
+    }
+  },
+
   gotoBank: function() {
     // For redirect mode where we do not have a popup, redirect using POST
     if (!this.popup) {
       if (this.iframe) {
         this.makePopup();
       } else {
-        Razorpay.sendMessage({
-          event: 'redirect',
-          data: {
-            url: this.gotoBankUrl,
-            method: 'post',
-            content: null,
-          },
-        });
-
+        this.redirect({ url: this.gotoBankUrl, method: 'post' });
         return;
       }
     }

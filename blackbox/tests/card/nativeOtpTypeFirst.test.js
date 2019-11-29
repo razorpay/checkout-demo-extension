@@ -29,12 +29,9 @@ describe('Card tests', () => {
     await enterCardDetails(context, { nativeOtp: true });
     await submit(context);
     await handleCardValidationForNativeOTP(context);
-
-    const result = JSON.parse(await context.getResult());
-    expect(result).toEqual({
-      url: 'https://api.razorpay.com/bank',
-      method: 'get',
-      content: [],
-    });
+    const request = await context.expectRequest();
+    expect(request.url).toEqual('https://api.razorpay.com/bank');
+    expect(request.method.toLowerCase()).toEqual('post');
+    await context.respondHTML('');
   });
 });

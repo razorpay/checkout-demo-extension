@@ -36,7 +36,7 @@ describe('Basic upi payment', () => {
     preferences.methods.upi = true;
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, false);
+    await fillUserDetails(context);
     await handlePartialPayment(context, '100');
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');

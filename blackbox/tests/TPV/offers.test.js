@@ -51,7 +51,7 @@ describe('Third Party Verification test', () => {
     });
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
+    await fillUserDetails(context);
     await verifyAutoSelectBankTPV(context, 'State Bank of India');
     await viewOffers(context);
     await selectOffer(context, '1');

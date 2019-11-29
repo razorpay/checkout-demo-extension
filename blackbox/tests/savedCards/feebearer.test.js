@@ -16,8 +16,8 @@ const {
   handleFeeBearer,
 } = require('../../actions/common');
 
-describe('Card tests', () => {
-  test('perform card transaction', async () => {
+describe('Saved Card tests', () => {
+  test('Perform saved card transaction with feebearer enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
@@ -27,7 +27,7 @@ describe('Card tests', () => {
     const preferences = makePreferences({ fee_bearer: true });
     let context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true);
+    await fillUserDetails(context);
     // await delay(30000);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');

@@ -32,11 +32,9 @@ describe('Card tests', () => {
     await handleCardValidationForNativeOTP(context, { coproto: 'otp' });
     await goToBankPage(context);
 
-    const result = JSON.parse(await context.getResult());
-    expect(result).toEqual({
-      url: 'http://localhost:9008',
-      method: 'post',
-      content: null,
-    });
+    const request = await context.expectRequest();
+    expect(request.url).toEqual('http://localhost:9008/');
+    expect(request.method.toLowerCase()).toEqual('post');
+    await context.respondHTML('');
   });
 });

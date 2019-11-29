@@ -42,7 +42,10 @@ async function verifyErrorMessage(context, expectedErrorMeassage) {
   );
   for (let retrycount = 0; retrycount < 5; retrycount++) {
     if (messageText.includes('Your payment is being processed')) {
-      await delay(800);
+      await context.page.waitFor('#fd-t', {
+        timeout: 2000,
+        visible: true,
+      });
       const messageDiv = await context.page.waitForSelector('#fd-t');
       messageText = await context.page.evaluate(
         messageDiv => messageDiv.textContent,
@@ -63,8 +66,11 @@ async function validateHelpMessage(context, message) {
 }
 
 async function submit(context) {
-  await delay(200);
-  // do not use await as it will cause issues with all cases of redirection
+  await context.page.waitFor('#footer', {
+    timeout: 2000,
+    visible: true,
+  });
+  await delay(300);
   context.page.click('#footer');
 }
 
@@ -88,9 +94,18 @@ async function expectRedirectWithCallback(context, fields) {
   const apiUrl = 'https://api.razorpay.com/v1/payments/create/';
   expect(request.method).toEqual('POST');
   if (fields) expect(body).toMatchObject(fields);
-  expect(request.url).toEqual(
-    apiUrl + (context.preferences.fees ? 'fees' : 'checkout')
-  );
+  let apiSuffix = '';
+  if (context.preferences.fees) apiSuffix = 'fees';
+  else if (
+    context.preferences.methods.upi ||
+    (fields.method == 'wallet' &&
+      !context.prefilledContact &&
+      !context.isContactOptional &&
+      !context.preferences.offers)
+  )
+    apiSuffix = 'ajax';
+  else apiSuffix = 'checkout';
+  expect(request.url).toEqual(apiUrl + apiSuffix);
 
   expect(body.callback_url).toEqual(context.options.callback_url);
   await context.respondPlain('');
