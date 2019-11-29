@@ -44,6 +44,8 @@ export function setAppropriateCtaText() {
     if (session.tab === '') {
       if (session.homeTab.onDetailsScreen()) {
         session.homeTab.setDetailsCta();
+      } else {
+        showAmountInCta();
       }
     } else {
       showAmountInCta();
