@@ -141,15 +141,19 @@ export function filterInstrumentsForDowntime(instruments) {
  */
 const filterInstrumentsByAvailableUpiApps = _.curry2((instruments, apps) => {
   return _Arr.filter(instruments, instrument => {
-    if (instrument.method === 'upi' && instrument['_[flow]'] === 'intent') {
-      if (doesAppExist(instrument.upi_app, apps)) {
-        return true;
-      }
-
-      return false;
+    if (instrument.method !== 'upi') {
+      return true;
     }
 
-    return true;
+    if (instrument['_[flow]'] !== 'intent') {
+      return true;
+    }
+
+    if (instrument['_[upiqr]'] === '1') {
+      return true;
+    }
+
+    return doesAppExist(instrument.upi_app, apps);
   });
 });
 
