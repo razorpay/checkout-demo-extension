@@ -1161,10 +1161,6 @@ Session.prototype = {
     return classes.join(' ');
   },
 
-  setExperiments: function() {
-    this.newHomeScreen = false;
-  },
-
   getEl: function() {
     var r = this.r;
     if (!this.el) {
@@ -1397,6 +1393,8 @@ Session.prototype = {
   },
 
   setExperiments: function() {
+    this.newHomeScreen =
+      discreet.Experiments.getSegmentOrCreate('home_2019') === 1;
     discreet.Experiments.clearOldExperiments();
   },
 
@@ -1428,7 +1426,6 @@ Session.prototype = {
 
     this.setExperiments();
     this.setTpvBanks();
-    this.setExperiments();
     this.getEl();
     this.setMethodsList();
     this.setFormatting();
