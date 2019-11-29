@@ -110,7 +110,11 @@
   }
 </style>
 
-<SlottedOption className="new-method" on:click={select} disabled={down}>
+<SlottedOption
+  className="new-method"
+  on:click={select}
+  disabled={down}
+  attributes={{ method }}>
   <i slot="icon">
     <Icon icon={_icon} />
   </i>

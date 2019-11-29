@@ -5,6 +5,7 @@
   // Props
   export let className = '';
   export let disabled = false;
+  export let attributes = {}; // Extra attributes for the HTML element
 </script>
 
 <style>
@@ -34,7 +35,13 @@
   }
 </style>
 
-<button type="button" class={className} role="listitem" {disabled} on:click>
+<button
+  type="button"
+  class={className}
+  role="listitem"
+  {disabled}
+  on:click
+  {...attributes}>
   <Stack horizontal>
     <slot name="icon" />
     <div>
