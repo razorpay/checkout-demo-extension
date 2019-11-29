@@ -5,6 +5,7 @@ const { interceptor } = require('../util');
 const { computed } = require('./options');
 const { callbackHtml } = require('./callback');
 const { sendPreferences } = require('./preferences');
+const { setExperiments } = require('./experiments');
 
 const checkoutPublic = 'https://api.razorpay.com/v1/checkout/public';
 const checkoutCss = 'https://checkout.razorpay.com/v1/css/checkout.css';
@@ -73,7 +74,14 @@ async function passMessage(page, message) {
 
 let interceptorOptions;
 module.exports = {
-  async openCheckout({ page, options, preferences, params, apps }) {
+  async openCheckout({
+    page,
+    options,
+    preferences,
+    params,
+    apps,
+    experiments,
+  }) {
     let checkoutUrl = checkoutPublic;
     if (params) checkoutUrl += '?' + querystring.stringify(params);
     if (interceptorOptions) {
@@ -85,6 +93,9 @@ module.exports = {
 
     page.on('request', checkoutRequestHandler);
     await page.goto(checkoutUrl);
+
+    await setExperiments(page, experiments);
+
     page.removeListener('request', checkoutRequestHandler);
     page.on('request', cdnRequestHandler);
 
