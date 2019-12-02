@@ -6,7 +6,7 @@
 
 <style>
   .customer-bank-details {
-    padding: 0 24px;
+    padding: 24px;
   }
 </style>
 
