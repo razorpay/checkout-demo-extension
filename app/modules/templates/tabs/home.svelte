@@ -201,7 +201,7 @@
     // Single method
     if (
       session.oneMethod &&
-      !['wallet', 'netbanking', 'upi'].contains(session.oneMethod)
+      !_Arr.contains(['wallet', 'netbanking', 'upi'], session.oneMethod)
     ) {
       return false;
     }
