@@ -75,6 +75,35 @@
     onShown();
   }
 
+  export function canGoBack() {
+    if (!onMethodsScreen()) {
+      return false;
+    }
+
+    if (isPartialPayment) {
+      return true;
+    }
+
+    if (address) {
+      return true;
+    }
+
+    if (session.tpvBank) {
+      return true;
+    }
+
+    /**
+     * If contact and email are optional,
+     * there's nothing left on the details
+     * screen anymore.
+     */
+    if (contactEmailOptional) {
+      return false;
+    }
+
+    return true;
+  }
+
   export function hideMethods() {
     const active = document.activeElement;
 
