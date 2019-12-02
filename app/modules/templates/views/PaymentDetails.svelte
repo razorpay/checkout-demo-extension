@@ -36,7 +36,17 @@
   const icons = session.themeMeta.icons;
 
   const checkoutStore = CheckoutStore.get();
-  const { contactEmailOptional, isPartialPayment } = checkoutStore;
+  const {
+    contactEmailOptional,
+    isPartialPayment,
+    optional,
+    prefill,
+    readonly,
+    hidden,
+  } = checkoutStore;
+
+  const isEmailHidden = hidden.email && optional.email;
+  const isContactHidden = hidden.contact && optional.contact;
 
   const showAddress = checkoutStore.address && !isPartialPayment;
 </script>
@@ -57,12 +67,16 @@
 </style>
 
 <div class="details-block" transition:slide={{ duration: 400 }}>
-  <div class="contact-field">
-    <ContactField bind:value={$contact} />
-  </div>
-  <div class="email-field">
-    <EmailField bind:value={$email} />
-  </div>
+  {#if !isContactHidden}
+    <div class="contact-field">
+      <ContactField bind:value={$contact} />
+    </div>
+  {/if}
+  {#if !isEmailHidden}
+    <div class="email-field">
+      <EmailField bind:value={$email} />
+    </div>
+  {/if}
 </div>
 
 {#if isPartialPayment}
