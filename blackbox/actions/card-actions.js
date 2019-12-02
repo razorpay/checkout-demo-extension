@@ -85,7 +85,7 @@ async function enterCardDetails(context, { cardType, nativeOtp = false } = {}) {
   await context.page.type('#card_cvv', '112');
 }
 
-async function retryCardTransaction(context) {
+async function retryTransaction(context) {
   await context.page.waitFor('#fd-hide', {
     timeout: 2000,
     visible: true,
@@ -156,7 +156,7 @@ module.exports = {
   handleCardValidation,
   handleCardValidationForNativeOTP,
   handleBankRequest,
-  retryCardTransaction,
+  retryTransaction,
   handleCustomerCardStatusRequest,
   respondSavedCards,
   selectSavedCardAndTypeCvv,

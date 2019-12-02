@@ -6,22 +6,25 @@ const {
   assertPaymentMethods,
   selectPaymentMethod,
   selectUPIMethod,
-  enterUPIAccount,
-  selectBankNameFromGooglePayDropDown,
   submit,
   respondToUPIAjax,
-  handleUPIAccountValidation,
+  verifyOmnichannelPhoneNumber,
   respondToUPIPaymentStatus,
+  enterOmnichannelPhoneNumber,
 } = require('../../actions/common');
-describe('Basic GooglePay payment', () => {
-  test('Perform GooglePay transaction', async () => {
+describe('Basic Omnichannel payment', () => {
+  test('Perform Omnichannel transaction with contact optional', async () => {
     const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+      key: 'rzp_live_rFalxzSoQIEcFH',
       amount: 60000,
       personalization: false,
     };
-    const preferences = makePreferences();
+    const preferences = makePreferences({
+      features: { google_pay_omnichannel: true },
+      optional: ['contact'],
+    });
     preferences.methods.upi = true;
+    preferences.mode = 'live';
     const context = await openCheckout({
       page,
       options,
@@ -32,10 +35,9 @@ describe('Basic GooglePay payment', () => {
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await selectUPIMethod(context, 'Google Pay');
-    await enterUPIAccount(context, 'scbaala');
-    await selectBankNameFromGooglePayDropDown(context, 'okhdfcbank');
+    await verifyOmnichannelPhoneNumber(context);
+    await enterOmnichannelPhoneNumber(context);
     await submit(context);
-    await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
     await respondToUPIAjax(context);
     await respondToUPIPaymentStatus(context);
   });

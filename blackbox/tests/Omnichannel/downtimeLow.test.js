@@ -6,22 +6,42 @@ const {
   assertPaymentMethods,
   selectPaymentMethod,
   selectUPIMethod,
-  enterUPIAccount,
-  selectBankNameFromGooglePayDropDown,
   submit,
   respondToUPIAjax,
-  handleUPIAccountValidation,
+  verifyOmnichannelPhoneNumber,
   respondToUPIPaymentStatus,
+  verifyLowDowntime,
 } = require('../../actions/common');
-describe('Basic GooglePay payment', () => {
-  test('Perform GooglePay transaction', async () => {
+describe('Basic Omnichannel payment', () => {
+  test('Verify Omnichannel downtime - Low', async () => {
     const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+      key: 'rzp_live_rFalxzSoQIEcFH',
       amount: 60000,
       personalization: false,
     };
-    const preferences = makePreferences();
+    const preferences = makePreferences({
+      features: { google_pay_omnichannel: true },
+      payment_downtime: {
+        entity: 'collection',
+        count: 1,
+        items: [
+          {
+            id: 'down_DEW7D9S10PEsl1',
+            entity: 'payment.downtime',
+            method: 'upi',
+            begin: 1567686386,
+            end: null,
+            status: 'started',
+            scheduled: false,
+            severity: 'low',
+            created_at: 1567686387,
+            updated_at: 1567686387,
+          },
+        ],
+      },
+    });
     preferences.methods.upi = true;
+    preferences.mode = 'live';
     const context = await openCheckout({
       page,
       options,
@@ -31,11 +51,10 @@ describe('Basic GooglePay payment', () => {
     await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
+    await verifyLowDowntime(context, 'UPI');
     await selectUPIMethod(context, 'Google Pay');
-    await enterUPIAccount(context, 'scbaala');
-    await selectBankNameFromGooglePayDropDown(context, 'okhdfcbank');
+    await verifyOmnichannelPhoneNumber(context);
     await submit(context);
-    await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
     await respondToUPIAjax(context);
     await respondToUPIPaymentStatus(context);
   });

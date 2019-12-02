@@ -6,22 +6,33 @@ const {
   assertPaymentMethods,
   selectPaymentMethod,
   selectUPIMethod,
-  enterUPIAccount,
-  selectBankNameFromGooglePayDropDown,
   submit,
   respondToUPIAjax,
-  handleUPIAccountValidation,
+  verifyOmnichannelPhoneNumber,
   respondToUPIPaymentStatus,
+  handlePartialPayment,
+  verifyPartialAmount,
 } = require('../../actions/common');
-describe('Basic GooglePay payment', () => {
-  test('Perform GooglePay transaction', async () => {
+describe('Basic Omnichannel payment', () => {
+  test('Perform Omnichannel transaction with partial payments enabled', async () => {
     const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+      key: 'rzp_live_rFalxzSoQIEcFH',
       amount: 60000,
       personalization: false,
     };
-    const preferences = makePreferences();
+    const preferences = makePreferences({
+      features: { google_pay_omnichannel: true },
+      order: {
+        amount: 60000,
+        amount_due: 60000,
+        amount_paid: 0,
+        currency: 'INR',
+        first_payment_min_amount: null,
+        partial_payment: true,
+      },
+    });
     preferences.methods.upi = true;
+    preferences.mode = 'live';
     const context = await openCheckout({
       page,
       options,
@@ -29,13 +40,13 @@ describe('Basic GooglePay payment', () => {
     });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
+    await handlePartialPayment(context, '1');
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await selectUPIMethod(context, 'Google Pay');
-    await enterUPIAccount(context, 'scbaala');
-    await selectBankNameFromGooglePayDropDown(context, 'okhdfcbank');
+    await verifyOmnichannelPhoneNumber(context);
+    await verifyPartialAmount(context, '₹ 1');
     await submit(context);
-    await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
     await respondToUPIAjax(context);
     await respondToUPIPaymentStatus(context);
   });

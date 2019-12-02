@@ -1,4 +1,4 @@
-const { delay, visible } = require('../util');
+const { delay, randomContact } = require('../util');
 
 async function selectUPIApp(context, AppNumber) {
   await context.page.click('.option:nth-of-type(' + AppNumber + ')');
@@ -23,6 +23,17 @@ async function respondToUPIAjax(context, offerId = '') {
   });
 }
 
+async function respondToUPIAjaxWithFailure(context) {
+  const req = await context.expectRequest();
+  expect(req.url).toContain('create/ajax');
+  await context.respondJSON({
+    error: {
+      code: 'BAD_REQUEST_ERROR',
+      description: 'User not found with the given input',
+    },
+  });
+}
+
 async function respondToUPIPaymentStatus(context) {
   const successResult = { razorpay_payment_id: 'pay_DaFKujjV6Ajr7W' };
   const req = await context.expectRequest();
@@ -37,9 +48,14 @@ async function respondToUPIPaymentStatus(context) {
   expect(await context.page.$('#modal-inner')).toEqual(null);
 }
 
-async function handleUPIAccountValidation(context, vpa) {
+async function handleUPIAccountValidation(context, vpa, accountexists = true) {
   const req = await context.expectRequest();
-  expect(req.url).toContain('validate/account');
+  if (
+    accountexists &&
+    context.preferences.features.google_pay_omnichannel == true
+  )
+    expect(req.url).toContain('create/ajax');
+  else expect(req.url).toContain('validate/account');
   await context.respondJSON({ vpa: vpa, success: true, customer_name: null });
   // await delay(1000);
 }
@@ -61,6 +77,15 @@ async function selectBankNameFromGooglePayDropDown(context, valuetoBeSelected) {
   await context.page.select('select[name="gpay_bank"]', valuetoBeSelected);
 }
 
+async function verifyOmnichannelPhoneNumber(context) {
+  expect(await context.page.$('#phone')).not.toEqual(null);
+}
+
+async function enterOmnichannelPhoneNumber(context) {
+  const phoneField = await context.page.waitForSelector('#phone');
+  await phoneField.type(randomContact());
+}
+
 module.exports = {
   selectUPIMethod,
   enterUPIAccount,
@@ -69,4 +94,7 @@ module.exports = {
   respondToUPIPaymentStatus,
   selectBankNameFromGooglePayDropDown,
   selectUPIApp,
+  verifyOmnichannelPhoneNumber,
+  enterOmnichannelPhoneNumber,
+  respondToUPIAjaxWithFailure,
 };
