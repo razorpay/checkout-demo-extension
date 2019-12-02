@@ -39,6 +39,8 @@
   import * as AnalyticsTypes from 'analytics-types';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
 
+  const MAX_P13N_INSTRUMENTS = 3;
+
   const session = getSession();
   const methods = session.methods;
   const icons = session.themeMeta.icons;
@@ -165,21 +167,24 @@
   }
 
   function getInstruments() {
+    return getAllAvailableP13nInstruments().slice(0, MAX_P13N_INSTRUMENTS);
+  }
+
+  function getAllAvailableP13nInstruments() {
     const _customer = session.getCustomer($contact);
 
-    const instruments = getInstrumentsForCustomer(_customer, {
+    return getInstrumentsForCustomer(_customer, {
       methods: session.methods,
       upiApps: session.upi_intents_data,
     });
-
-    return instruments.slice(0, 3);
   }
 
   export function updateCustomer() {
     customer = session.getCustomer($contact);
 
-    instruments = getInstruments();
-    trackP13nInstruments(instruments);
+    const availableInstruments = getAllAvailableP13nInstruments();
+    instruments = availableInstruments.slice(0, MAX_P13N_INSTRUMENTS);
+    trackP13nInstruments(availableInstruments);
   }
 
   function shouldUseP13n() {
@@ -411,8 +416,10 @@
     if (instruments.length === 0) {
       return;
     }
+
+    const _instruments = instruments.slice(0, MAX_P13N_INSTRUMENTS);
     const _preferredMethods = _Arr.reduce(
-      instruments,
+      _instruments,
       (acc, instrument) => {
         acc[`_${instrument.method}`] = true;
         return acc;
@@ -423,7 +430,7 @@
     Analytics.track('p13n:intruments:list', {
       data: {
         length: instruments.length,
-        shown: instruments.length,
+        shown: Math.min(_instruments.length, MAX_P13N_INSTRUMENTS),
         methods: _preferredMethods,
       },
     });
