@@ -5,7 +5,7 @@ const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
-  verifyPersonalizationPaymentMethodsText,
+  verifyPersonalizationVPAText,
   verifyHighDowntime,
 } = require('../../actions/common');
 
@@ -46,7 +46,7 @@ describe('Basic upi payment', () => {
     await assertHomePage(context, true, true);
     await fillUserDetails(context, '8888888881');
     // await delay(30000);
-    await verifyPersonalizationPaymentMethodsText(context);
+    await verifyPersonalizationVPAText(context);
     await verifyHighDowntime(
       context,
       'UPI is facing temporary issues right now. Please select another method.'

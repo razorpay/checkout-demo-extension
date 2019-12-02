@@ -15,7 +15,7 @@ const {
   handleUPIAccountValidation,
   respondToUPIAjax,
   respondToUPIPaymentStatus,
-  verifyPersonalizationPaymentMethodsText,
+  verifyPersonalizationVPAText,
   selectPersonalizationPaymentMethod,
 } = require('../../actions/common');
 
@@ -56,7 +56,7 @@ describe('Basic upi payment', () => {
     await assertHomePage(context, true, true);
     // await verifyLowDowntime(context, 'UPI');
     await fillUserDetails(context, '8888888881');
-    await verifyPersonalizationPaymentMethodsText(context);
+    await verifyPersonalizationVPAText(context);
     await selectPersonalizationPaymentMethod(context, 1);
     await submit(context);
     await handleUPIAccountValidation(context, 'dsd@okhdfcbank');

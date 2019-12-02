@@ -11,7 +11,7 @@ async function selectPersonalizationPaymentMethod(context, optionNumber) {
   await apiOption[optionNumber - 1].click();
 }
 
-async function verifyPersonalizationPaymentMethodsText(context) {
+async function verifyPersonalizationVPAText(context) {
   const localStorageData = await page.evaluate(() => {
     let json = {};
     for (let i = 0; i < localStorage.length; i++) {
@@ -57,6 +57,6 @@ async function selectPersonalizedCard(context) {
 
 module.exports = {
   selectPersonalizationPaymentMethod,
-  verifyPersonalizationPaymentMethodsText,
+  verifyPersonalizationVPAText,
   selectPersonalizedCard,
 };
