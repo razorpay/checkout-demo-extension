@@ -17,7 +17,6 @@
 
   const prefilledEmail = prefill.email;
   const isEmailReadonly = readonly.email && prefilledEmail;
-  const isEmailHidden = hidden.email && optional.email;
 
   const EMAIL_REGEX = optional.email
     ? '.*'
@@ -26,7 +25,7 @@
   const label = optional.email ? 'Email (Optional)' : 'Email';
 </script>
 
-<div class:hidden={isEmailHidden}>
+<div>
   <Field
     id="email"
     name="email"

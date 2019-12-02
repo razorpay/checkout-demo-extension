@@ -17,12 +17,11 @@
 
   const prefilledContact = prefill.contact;
   const isContactReadonly = readonly.contact && prefilledContact;
-  const isContactHidden = hidden.contact && optional.contact;
 
   const CONTACT_REGEX = optional.contact ? '.*' : '^\\+?[0-9]{8,15}$';
 </script>
 
-<div class:hidden={isContactHidden}>
+<div>
   <Field
     id="contact"
     name="contact"
