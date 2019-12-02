@@ -25,6 +25,7 @@
     getCorporateOption,
     isCorporateCode,
   } from 'common/bank';
+  import { scrollIntoView } from 'lib/utils';
 
   // Props
   export let selectedBankCode = '';
@@ -116,7 +117,7 @@
     const selected = corporateSelected;
 
     if (showCorporateRadio) {
-      setTimeout(() => radioContainer.scrollIntoView(), 300);
+      setTimeout(() => scrollIntoView(radioContainer), 300);
     }
   }
 
