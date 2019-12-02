@@ -426,7 +426,7 @@ function backPressed(callback) {
     }
   } else {
     if (session.newHomeScreen) {
-      if (session.homeTab.onMethodsScreen()) {
+      if (session.homeTab.canGoBack()) {
         session.homeTab.hideMethods();
       } else if (CheckoutBridge && _.isFunction(CheckoutBridge[callback])) {
         CheckoutBridge[callback]();
