@@ -13,9 +13,7 @@ async function assertHomePage(context) {
   expect(await $contact.evaluate(el => el.value)).toEqual(
     context.prefilledContact
   );
-
   const $email = await context.page.$('#email');
-  const value = await $email.getProperty('value');
   expect(await $email.isIntersectingViewport()).toEqual(
     !context.isContactEmailOptional
   );

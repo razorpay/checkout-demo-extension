@@ -3,9 +3,6 @@
   import Field from 'templates/views/ui/Field.svelte';
   import Tab from 'templates/tabs/Tab.svelte';
 
-  // Props
-  export let confirmInvalid = false;
-
   // Refs
   export let accountNumberField = null;
   export let confirmAccountNumberField = null;

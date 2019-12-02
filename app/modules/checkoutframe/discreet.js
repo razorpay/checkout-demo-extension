@@ -74,6 +74,7 @@ import PayoutAccount from 'templates/screens/payout-account.svelte';
 import * as Hacks from 'checkoutframe/hacks';
 
 import { get as storeGetter } from 'svelte/store';
+import * as Experiments from 'experiments';
 
 export default {
   RazorpayConfig,
@@ -162,6 +163,7 @@ export default {
 
   Hacks,
   storeGetter,
+  Experiments,
 
   _Arr,
   _Doc,
