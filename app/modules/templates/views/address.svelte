@@ -16,6 +16,9 @@
   div.wrap {
     padding: 0 24px;
   }
+  #elem-wrap-address {
+    margin-top: 24px;
+  }
 </style>
 
 <div class="wrap">
