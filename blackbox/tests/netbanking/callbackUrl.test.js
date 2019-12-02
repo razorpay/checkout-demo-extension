@@ -11,7 +11,7 @@ const {
   expectRedirectWithCallback,
 } = require('../../actions/common');
 
-describe.skip('Netbanking tests', () => {
+describe('Netbanking tests', () => {
   test('perform netbaking transaction with callback url', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',

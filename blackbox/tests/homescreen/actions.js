@@ -65,7 +65,9 @@ async function find(array, evaluator) {
  * with contact and email fields
  */
 async function assertBasicDetailsScreen(context) {
-  const $form = await context.page.waitForSelector('#form-common');
+  const $form = await context.page.waitForSelector('#form-common', {
+    visible: true,
+  });
 
   const $contact = await $form.$('#contact');
 
@@ -79,14 +81,18 @@ async function assertBasicDetailsScreen(context) {
 }
 
 async function assertMethodsScreen(context) {
-  const $form = await context.page.waitForSelector('#form-common');
+  const $form = await context.page.waitForSelector('#form-common', {
+    visible: true,
+  });
   const methods = await $form.$('.methods-container');
 
   expect(methods).not.toEqual(null);
 }
 
 async function assertMissingDetails(context) {
-  const $form = await context.page.waitForSelector('#form-common');
+  const $form = await context.page.waitForSelector('#form-common', {
+    visible: true,
+  });
   const strip = await $form.$('.instrument-strip');
 
   expect(strip).toEqual(null);
@@ -127,7 +133,9 @@ async function fillUserDetails(context) {
  * Click on the CTA
  */
 async function proceed(context) {
-  const proceed = await context.page.waitForSelector('#footer');
+  const proceed = await context.page.waitForSelector('#footer', {
+    visible: true,
+  });
   await proceed.click();
 }
 
@@ -142,7 +150,10 @@ async function assertUserDetails(context) {
   const last = email;
 
   const strip = await context.page.waitForSelector(
-    '.instrument-strip [slot=title]'
+    '.instrument-strip [slot=title]',
+    {
+      visible: true,
+    }
   );
   const firstInPage = await innerText(
     context.page,
@@ -169,7 +180,10 @@ async function assertUserDetails(context) {
  */
 async function assertEditUserDetailsAndBack(context) {
   const strip = await context.page.waitForSelector(
-    '.instrument-strip [slot=title]'
+    '.instrument-strip [slot=title]',
+    {
+      visible: true,
+    }
   );
 
   await strip.click();
@@ -177,7 +191,9 @@ async function assertEditUserDetailsAndBack(context) {
   // TODO: Update details
 
   if (context.state && context.state.partial) {
-    const nextButton = await context.page.waitForSelector('#next-button');
+    const nextButton = await context.page.waitForSelector('#next-button', {
+      visible: true,
+    });
     await nextButton.click();
   } else {
     await delay(500);
@@ -190,7 +206,9 @@ async function assertEditUserDetailsAndBack(context) {
  * Returns all available method buttons
  */
 async function getMethodButtons(context) {
-  const list = await context.page.waitForSelector('.methods-container');
+  const list = await context.page.waitForSelector('.methods-container', {
+    visible: true,
+  });
   return Array.from(await list.$$('button.new-method'));
 }
 
@@ -211,7 +229,6 @@ async function assertPaymentMethods(context) {
  * Select a payment method
  */
 async function selectPaymentMethod(context, method) {
-  await delay(500);
   const buttons = await getMethodButtons(context);
 
   const methodButton = await find(buttons, async button => {
@@ -229,7 +246,10 @@ async function selectPaymentMethod(context, method) {
  */
 async function handlePartialPayment(context, amount) {
   const payPartially = await context.page.waitForSelector(
-    '.partial-payment-block button:nth-of-type(2)'
+    '.partial-payment-block button:nth-of-type(2)',
+    {
+      visible: true,
+    }
   );
 
   await payPartially.click();
@@ -238,10 +258,14 @@ async function handlePartialPayment(context, amount) {
     partial: true,
   });
 
-  const amountValue = await context.page.waitForSelector('#amount-value');
+  const amountValue = await context.page.waitForSelector('#amount-value', {
+    visible: true,
+  });
   await amountValue.type(amount);
 
-  const nextButton = await context.page.waitForSelector('#next-button');
+  const nextButton = await context.page.waitForSelector('#next-button', {
+    visible: true,
+  });
   await nextButton.click();
 }
 
