@@ -25,8 +25,6 @@ const {
 // Opener
 const { openCheckoutWithNewHomeScreen } = require('../open');
 
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
-
 describe('Card tests', () => {
   test('perform card transaction with partial payment enabled', async () => {
     const options = {

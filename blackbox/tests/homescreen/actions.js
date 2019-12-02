@@ -211,6 +211,7 @@ async function assertPaymentMethods(context) {
  * Select a payment method
  */
 async function selectPaymentMethod(context, method) {
+  await delay(500);
   const buttons = await getMethodButtons(context);
 
   const methodButton = await find(buttons, async button => {
