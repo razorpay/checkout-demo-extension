@@ -555,6 +555,10 @@
     padding-left: 8px;
     border-left: solid 1px #757575;
   }
+
+  .solidbg {
+    background: white;
+  }
 </style>
 
 <Tab method="common" overrideMethodCheck={true} shown={true} pad={false}>
@@ -564,41 +568,48 @@
         <PaymentDetails {session} />
       {/if}
       {#if view === 'methods'}
-        {#if ($contact || $email) && !contactEmailOptional}
-          <div
-            use:touchfix
-            class="home-details border-list"
-            transition:slide={{ duration: 400 }}>
-            <SlottedOption on:click={hideMethods} className="instrument-strip">
-              <i slot="icon">
-                <Icon icon={icons.contact} />
-              </i>
-              <div slot="title">
-                {#if $contact && !hidden.contact}
-                  <span>{$contact}</span>
-                {/if}
-                {#if $email && !hidden.email}
-                  <span>{$email}</span>
-                {/if}
-              </div>
-              <div slot="extra" class="theme-highlight-color" aria-label="Edit">
-                <span>Edit</span>
-                <span>&#xe604;</span>
-              </div>
-            </SlottedOption>
-          </div>
-        {/if}
+        <div class="solidbg" transition:slide={{ duration: 400 }}>
+          {#if ($contact || $email) && !contactEmailOptional}
+            <div
+              use:touchfix
+              class="home-details border-list"
+              transition:slide={{ duration: 400 }}>
+              <SlottedOption
+                on:click={hideMethods}
+                className="instrument-strip">
+                <i slot="icon">
+                  <Icon icon={icons.contact} />
+                </i>
+                <div slot="title">
+                  {#if $contact && !hidden.contact}
+                    <span>{$contact}</span>
+                  {/if}
+                  {#if $email && !hidden.email}
+                    <span>{$email}</span>
+                  {/if}
+                </div>
+                <div
+                  slot="extra"
+                  class="theme-highlight-color"
+                  aria-label="Edit">
+                  <span>Edit</span>
+                  <span>&#xe604;</span>
+                </div>
+              </SlottedOption>
+            </div>
+          {/if}
 
-        <div
-          class="home-methods"
-          in:fly={{ delay: 100, duration: 400, y: 100 }}
-          out:fly={{ duration: 400, y: 100 }}>
-          <NewMethodsList
-            {personalization}
-            {instruments}
-            {customer}
-            on:selectMethod={selectMethod}
-            on:submit={attemptPayment} />
+          <div
+            class="home-methods"
+            in:fly={{ delay: 100, duration: 400, y: 100 }}
+            out:fly={{ duration: 400, y: 100 }}>
+            <NewMethodsList
+              {personalization}
+              {instruments}
+              {customer}
+              on:selectMethod={selectMethod}
+              on:submit={attemptPayment} />
+          </div>
         </div>
       {/if}
     </div>

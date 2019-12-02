@@ -66,45 +66,47 @@
   }
 </style>
 
-<div class="details-block" transition:slide={{ duration: 400 }}>
-  {#if !isContactHidden}
-    <div class="contact-field">
-      <ContactField bind:value={$contact} />
+<div transition:slide={{ duration: 400 }}>
+  <div class="details-block">
+    {#if !isContactHidden}
+      <div class="contact-field">
+        <ContactField bind:value={$contact} />
+      </div>
+    {/if}
+    {#if !isEmailHidden}
+      <div class="email-field">
+        <EmailField bind:value={$email} />
+      </div>
+    {/if}
+  </div>
+
+  {#if isPartialPayment}
+    <div class="partial-payment-block">
+      <PartialPaymentOptions {order} />
     </div>
   {/if}
-  {#if !isEmailHidden}
-    <div class="email-field">
-      <EmailField bind:value={$email} />
+
+  {#if showAddress}
+    <div class="address-block">
+      <Address
+        bind:address={$address}
+        bind:pincode={$pincode}
+        bind:state={$state}
+        states={entries(session.states)} />
     </div>
+  {/if}
+
+  {#if session.multiTpv}
+    <div class="multi-tpv-block">
+      <MultiTpvOptions {bank} {icons} bind:selectedOption={$multiTpvOption} />
+    </div>
+  {:else if session.tpvBank}
+    <div class="tpv-bank-block">
+      <TpvBank {bank} {accountName} showIfsc={contactEmailOptional} />
+    </div>
+  {/if}
+
+  {#if cardOffer}
+    <CardOffer offer={cardOffer} />
   {/if}
 </div>
-
-{#if isPartialPayment}
-  <div class="partial-payment-block" transition:slide={{ duration: 400 }}>
-    <PartialPaymentOptions {order} />
-  </div>
-{/if}
-
-{#if showAddress}
-  <div class="address-block" transition:slide={{ duration: 400 }}>
-    <Address
-      bind:address={$address}
-      bind:pincode={$pincode}
-      bind:state={$state}
-      states={entries(session.states)} />
-  </div>
-{/if}
-
-{#if session.multiTpv}
-  <div class="multi-tpv-block" transition:slide={{ duration: 400 }}>
-    <MultiTpvOptions {bank} {icons} bind:selectedOption={$multiTpvOption} />
-  </div>
-{:else if session.tpvBank}
-  <div class="tpv-bank-block" transition:slide={{ duration: 400 }}>
-    <TpvBank {bank} {accountName} showIfsc={contactEmailOptional} />
-  </div>
-{/if}
-
-{#if cardOffer}
-  <CardOffer offer={cardOffer} />
-{/if}
