@@ -52,6 +52,7 @@ async function handleUPIAccountValidation(context, vpa, accountexists = true) {
   const req = await context.expectRequest();
   if (
     accountexists &&
+    context.preferences.features != null &&
     context.preferences.features.google_pay_omnichannel == true
   )
     expect(req.url).toContain('create/ajax');
