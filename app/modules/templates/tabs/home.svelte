@@ -339,7 +339,7 @@
 
     // TPV bank
     if (session.tpvBank) {
-      // TODO: Create payment
+      session.preSubmit();
       return;
     }
 
@@ -427,6 +427,10 @@
     }
 
     if ($multiTpvOption === 'netbanking' && session.multiTpv) {
+      return false;
+    }
+
+    if (!session.multiTpv && session.tpvBank) {
       return false;
     }
 
