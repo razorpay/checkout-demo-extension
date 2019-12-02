@@ -5880,13 +5880,23 @@ Session.prototype = {
     }
     delete data.app_token;
 
-    var $address = $('#address');
-
-    if ($address[0]) {
+    if (this.get('address') && !(this.order && this.order.partial_payment)) {
       var notes = (data.notes = clone(this.get('notes')) || {});
-      notes.address = $address.val();
-      notes.pincode = $('#pincode').val();
-      notes.state = $('#state').val();
+
+      if (!this.newHomeScreen) {
+        var $address = $('#address');
+
+        if ($address[0]) {
+          notes.address = $address.val();
+          notes.pincode = $('#pincode').val();
+          notes.state = $('#state').val();
+        }
+      } else {
+        notes.address = storeGetter(HomeScreenStore.address);
+        notes.pincode = storeGetter(HomeScreenStore.pincode);
+        notes.state = storeGetter(HomeScreenStore.state);
+      }
+
       if (Object.keys(notes).length > 15) {
         delete notes.pincode;
         delete notes.state;
