@@ -65,6 +65,10 @@ async function find(array, evaluator) {
  * with contact and email fields
  */
 async function assertBasicDetailsScreen(context) {
+  await context.page.waitForSelector('#form-common', {
+    visible: true,
+    timeout: 500,
+  });
   const $form = await context.page.$('#form-common');
 
   const $contact = await $form.$('#contact');
@@ -79,6 +83,11 @@ async function assertBasicDetailsScreen(context) {
 }
 
 async function assertMethodsScreen(context) {
+  await context.page.waitForSelector('#form-common', {
+    visible: true,
+    timeout: 500,
+  });
+
   const $form = await context.page.$('#form-common');
   const methods = await $form.$('.methods-container');
 
@@ -86,6 +95,11 @@ async function assertMethodsScreen(context) {
 }
 
 async function assertMissingDetails(context) {
+  await context.page.waitForSelector('#form-common', {
+    visible: true,
+    timeout: 500,
+  });
+
   const $form = await context.page.$('#form-common');
   const strip = await $form.$('.instrument-strip');
 
@@ -141,6 +155,10 @@ async function assertUserDetails(context) {
   const first = contact || email;
   const last = email;
 
+  await context.page.waitForSelector('.instrument-strip', {
+    visible: true,
+    timeout: 500,
+  });
   const strip = await context.page.$('.instrument-strip [slot=title]');
   const firstInPage = await innerText(
     context.page,
@@ -166,6 +184,11 @@ async function assertUserDetails(context) {
  * and returning keeps the behaviour intact
  */
 async function assertEditUserDetailsAndBack(context) {
+  await context.page.waitForSelector('.instrument-strip', {
+    visible: true,
+    timeout: 500,
+  });
+
   const strip = await context.page.$('.instrument-strip [slot=title]');
 
   await strip.click();
@@ -185,6 +208,11 @@ async function assertEditUserDetailsAndBack(context) {
  * Returns all available method buttons
  */
 async function getMethodButtons(context) {
+  await context.page.waitForSelector('.methods-container', {
+    visible: true,
+    timeout: 500,
+  });
+
   const list = await context.page.$('.methods-container');
   return Array.from(await list.$$('button.new-method'));
 }
@@ -222,6 +250,10 @@ async function selectPaymentMethod(context, method) {
  * and enters an amount
  */
 async function handlePartialPayment(context, amount) {
+  await context.page.waitForSelector('.partial-payment-block', {
+    visible: true,
+    timeout: 500,
+  });
   const partialOptions = await context.page.$$('.partial-payment-block button');
 
   const payPartially = partialOptions[1];
