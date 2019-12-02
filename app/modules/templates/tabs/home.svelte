@@ -144,6 +144,7 @@
     customer = session.getCustomer($contact);
 
     instruments = getInstruments();
+    trackP13nInstruments(instruments);
   }
 
   function shouldUseP13n() {
@@ -380,6 +381,28 @@
     payload.method = 'paypal';
 
     session.preSubmit(null, payload);
+  }
+
+  function trackP13nInstruments(instruments) {
+    if (instruments.length === 0) {
+      return;
+    }
+    const _preferredMethods = _Arr.reduce(
+      instruments,
+      (acc, instrument) => {
+        acc[`_${instrument.method}`] = true;
+        return acc;
+      },
+      {}
+    );
+
+    Analytics.track('p13n:intruments:list', {
+      data: {
+        length: instruments.length,
+        shown: instruments.length,
+        methods: _preferredMethods,
+      },
+    });
   }
 
   function selectMethod(event) {

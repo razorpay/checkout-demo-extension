@@ -19,6 +19,8 @@
   import { doesAppExist } from 'common/upi';
   import { getInstrumentsForCustomer } from 'checkoutframe/personalization';
   import { showCtaWithDefaultText, hideCta } from 'checkoutstore/cta';
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
 
   // Store
   import { contact, selectedInstrumentId } from 'checkoutstore/screens/home';
@@ -80,7 +82,19 @@
     }
   }
 
-  function selectP13nInstrument(instrument) {
+  function trackP13nInstrumentSelected(instrument, index) {
+    Analytics.track('p13:method:select', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        data: instrument,
+        index,
+      },
+    });
+  }
+
+  function selectP13nInstrument(instrument, index) {
+    trackP13nInstrumentSelected(instrument, index);
+
     if (instrument.method === 'card') {
       const tokens = _Obj.getSafely(customer, 'tokens.items', []);
       const existing = _Arr.find(
@@ -143,13 +157,13 @@
           {instrument}
           {customer}
           selected={instrument.id === $selectedInstrumentId}
-          on:click={() => selectP13nInstrument(instrument)} />
+          on:click={() => selectP13nInstrument(instrument, index)} />
       {:else}
         <Instrument
           name="p13n"
           {instrument}
           selected={instrument.id === $selectedInstrumentId}
-          on:click={() => selectP13nInstrument(instrument)}
+          on:click={() => selectP13nInstrument(instrument, index)}
           on:submit />
       {/if}
     {/each}
