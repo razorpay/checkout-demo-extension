@@ -21,9 +21,6 @@
   import {
     contact,
     email,
-    address,
-    pincode,
-    state,
     selectedInstrumentId,
     multiTpvOption,
   } from 'checkoutstore/screens/home';
@@ -46,7 +43,16 @@
   const methods = session.methods;
   const icons = session.themeMeta.icons;
   const order = session.order || {};
-  const { isPartialPayment, prefill } = CheckoutStore.get();
+  const {
+    isPartialPayment,
+    prefill,
+    contactEmailOptional,
+    contactEmailHidden,
+    contactEmailReadonly,
+    address,
+    optional,
+    hidden,
+  } = CheckoutStore.get();
 
   $contact = prefill.contact || '';
   $email = prefill.email || '';
@@ -242,19 +248,8 @@
     const DETAILS = 'details';
     const METHODS = 'methods';
 
-    const checkoutStore = CheckoutStore.get();
-
-    const {
-      isPartialPayment: partial,
-      contactEmailOptional,
-      contactEmailHidden: hidden,
-      contactEmailReadonly: readonly,
-      address,
-      optional,
-    } = checkoutStore;
-
     // If email and contact are prefilled, validate them
-    if (!contactEmailOptional && !hidden) {
+    if (!contactEmailOptional && !contactEmailHidden) {
       const contactRegex = /^\+?[0-9]{8,15}$/;
       const emailRegex = /^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/;
 
@@ -279,7 +274,7 @@
       return DETAILS;
     }
 
-    if (partial) {
+    if (isPartialPayment) {
       return DETAILS;
     }
 
@@ -287,7 +282,7 @@
       return DETAILS;
     }
 
-    if (contactEmailOptional || hidden || readonly) {
+    if (contactEmailOptional || contactEmailHidden || contactEmailReadonly) {
       return METHODS;
     }
 
@@ -529,7 +524,7 @@
         <PaymentDetails {session} />
       {/if}
       {#if view === 'methods'}
-        {#if $contact || $email}
+        {#if ($contact || $email) && !contactEmailOptional}
           <div
             use:touchfix
             class="home-details border-list"
@@ -539,10 +534,10 @@
                 <Icon icon={icons.contact} />
               </i>
               <div slot="title">
-                {#if $contact}
+                {#if $contact && !hidden.contact}
                   <span>{$contact}</span>
                 {/if}
-                {#if $email}
+                {#if $email && !hidden.email}
                   <span>{$email}</span>
                 {/if}
               </div>
