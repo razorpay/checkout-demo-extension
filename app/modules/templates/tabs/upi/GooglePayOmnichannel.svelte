@@ -15,8 +15,6 @@
   export let isFirst = true;
   export let contact = '';
   export let focusOnCreate = false;
-  export let retry = false;
-  export let checked = true;
 
   // Refs
   export let phoneField = null;

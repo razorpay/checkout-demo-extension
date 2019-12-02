@@ -987,10 +987,7 @@ Session.prototype = {
     var isDemoMerchant = this.get('key') === DEMO_MERCHANT_KEY;
 
     var redirectModeWithNativeOtp =
-      this.get('nativeotp') &&
-      this.get('callback_url') &&
-      this.get('redirect') &&
-      this.r.isLiveMode();
+      this.get('nativeotp') && this.get('redirect') && this.r.isLiveMode();
 
     return isDemoMerchant || redirectModeWithNativeOtp;
   },
@@ -1374,6 +1371,10 @@ Session.prototype = {
     });
   },
 
+  setExperiments: function() {
+    discreet.Experiments.clearOldExperiments();
+  },
+
   render: function(options) {
     var that = this;
 
@@ -1400,6 +1401,7 @@ Session.prototype = {
 
     this.isOpen = true;
 
+    this.setExperiments();
     this.setTpvBanks();
     this.getEl();
     this.setMethodsList();
