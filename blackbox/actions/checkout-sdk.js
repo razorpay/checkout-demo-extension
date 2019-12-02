@@ -17,6 +17,7 @@ async function openSdkCheckout({
         page,
         options,
         preferences,
+        experiments,
         apps,
         params: {
           'error.description': data.error.description,
