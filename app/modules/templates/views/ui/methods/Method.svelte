@@ -80,15 +80,18 @@
     display: flex;
     margin-right: 16px;
     width: 24px;
+    min-width: 24px;
     text-align: center;
   }
 
   i :global(.gpay-icon) {
     margin-left: 0;
+    flex: 1 1 0;
   }
 
   i :global(svg) {
     height: 24px;
+    flex: 1 1 0;
     width: auto;
   }
 

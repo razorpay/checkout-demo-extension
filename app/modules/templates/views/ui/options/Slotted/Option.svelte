@@ -6,6 +6,10 @@
   export let className = '';
   export let disabled = false;
   export let attributes = {}; // Extra attributes for the HTML element
+
+  $: {
+    disabled = disabled ? true : undefined;
+  }
 </script>
 
 <style>
@@ -14,6 +18,7 @@
     border: 1px solid #e6e7e8;
     display: block;
     width: 100%;
+    text-align: left;
     text-align: start;
     transition-duration: 0.15s;
     transition-property: border, background;
@@ -30,7 +35,6 @@
   }
 
   div {
-    flex-grow: 1;
     overflow: hidden;
   }
 </style>
