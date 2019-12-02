@@ -12,6 +12,7 @@
   import { getSession } from 'sessionmanager';
 
   // Utils
+  import { scrollIntoView } from 'lib/utils';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
 
@@ -66,7 +67,7 @@
     if ($partialPaymentOption === 'partial') {
       setTimeout(() => {
         if (partialPaymentRef) {
-          partialPaymentRef.scrollIntoView();
+          scrollIntoView(partialPaymentRef);
         }
       });
     }
