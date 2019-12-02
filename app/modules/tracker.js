@@ -1,3 +1,5 @@
+import { getExperimentsFromStorage } from 'experiments';
+
 const base62Chars =
   '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
@@ -240,6 +242,9 @@ export default function Track(r, event, data, immediately) {
     if (_uid) {
       properties.local_order_id = _uid;
     }
+
+    // Add current experiments
+    properties.experiments = getExperimentsFromStorage();
 
     pushToEventQ({
       event,

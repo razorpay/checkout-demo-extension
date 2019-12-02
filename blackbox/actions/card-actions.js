@@ -141,7 +141,7 @@ async function respondSavedCards(context) {
 }
 
 async function selectSavedCardAndTypeCvv(context) {
-  await delay(1000);
+  await delay(500);
   const SavedCard = await context.page.waitForSelector('.saved-inner');
   await SavedCard.click();
   await SavedCard.type('222');

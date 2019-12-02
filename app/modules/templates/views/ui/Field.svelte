@@ -15,8 +15,6 @@
   export let formatter = null;
   export let refresh = true;
   export let helpText = '';
-  export let invalid = false;
-  export let focused = false;
   export let maxlength = null;
 
   // Computed

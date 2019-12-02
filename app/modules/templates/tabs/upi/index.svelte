@@ -47,7 +47,6 @@
   export let vpa = '';
   export let qrIcon;
   export let tab = 'upi';
-  export let pattern = '.+';
   export let focused = false;
 
   // Refs
@@ -301,8 +300,6 @@
   export function onUpiAppSelection(event) {
     const id = event.detail.id;
 
-    let pattern = '';
-
     if (typeof id !== 'undefined') {
       /**
        * `id` is undefined when the user wants to switch app
@@ -319,11 +316,17 @@
 
     selectedApp = id;
 
-    if (isGPaySelected) {
-      return session.preSubmit();
-    }
+    /**
+     * Wait for `isGpaySelected` to be updated. It does not update synchronously when selectedApp is reassigned, hence
+     * the setTimeout.
+     */
+    setTimeout(function() {
+      if (isGPaySelected) {
+        return session.preSubmit();
+      }
 
-    focusVpa();
+      focusVpa();
+    });
   }
 
   export function focusVpa() {
