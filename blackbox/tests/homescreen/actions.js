@@ -1,4 +1,4 @@
-const { randomContact, randomEmail } = require('../../util');
+const { randomContact, randomEmail, delay } = require('../../util');
 
 /**
  * Sets the state in context
@@ -180,6 +180,7 @@ async function assertEditUserDetailsAndBack(context) {
     const nextButton = await context.page.waitForSelector('#next-button');
     await nextButton.click();
   } else {
+    await delay(500);
     await proceed(context);
   }
   await assertUserDetails(context);
