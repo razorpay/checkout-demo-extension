@@ -569,7 +569,7 @@
       {/if}
       {#if view === 'methods'}
         <div class="solidbg" transition:slide={{ duration: 400 }}>
-          {#if $contact || $email}
+          {#if ($contact || $email) && !contactEmailHidden}
             <div
               use:touchfix
               class="home-details border-list"
