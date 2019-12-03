@@ -90,7 +90,7 @@
     flex-shrink: 0;
   }
 
-  .screen-bottom > :global([slot='bottom']:not(:empty)) {
+  .screen-bottom:not(.noShadow) > :global([slot='bottom']:not(:empty)) {
     box-shadow: 0px -6px 26px -17px rgba(0, 0, 0, 0.75);
   }
 
@@ -153,7 +153,7 @@
     </div>
   </div>
 
-  <div class="screen-bottom">
+  <div class="screen-bottom" class:noShadow={bottomShadow}>
     <slot name="bottom" />
   </div>
 </div>
