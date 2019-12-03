@@ -75,12 +75,6 @@
 </script>
 
 <style>
-  .legend {
-    margin: 0 !important;
-    padding-left: 12px;
-    padding-bottom: 20px;
-  }
-
   div[slot='subtitle']:not(:empty) {
     padding-bottom: 16px;
   }

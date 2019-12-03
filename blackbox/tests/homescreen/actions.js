@@ -93,7 +93,7 @@ async function assertMissingDetails(context) {
   const $form = await context.page.waitForSelector('#form-common', {
     visible: true,
   });
-  const strip = await $form.$('.instrument-strip');
+  const strip = await $form.$('#user-details');
 
   expect(strip).toEqual(null);
 }
@@ -150,7 +150,7 @@ async function assertUserDetails(context) {
   const last = email;
 
   const strip = await context.page.waitForSelector(
-    '.instrument-strip [slot=title]',
+    '#user-details [slot=title]',
     {
       visible: true,
     }
@@ -180,7 +180,7 @@ async function assertUserDetails(context) {
  */
 async function assertEditUserDetailsAndBack(context) {
   const strip = await context.page.waitForSelector(
-    '.instrument-strip [slot=title]',
+    '#user-details [slot=title]',
     {
       visible: true,
     }
