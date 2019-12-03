@@ -41,6 +41,9 @@
   }
 
   button :global(.input-radio.slotted .radio-display) {
+    position: static;
+    top: 0;
+
     position: unset;
     top: unset;
   }
