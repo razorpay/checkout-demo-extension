@@ -2,7 +2,12 @@ const path = require('path');
 const URL = require('url');
 const querystring = require('querystring');
 
-const { testDir, cdnUrl, lumberjackUrl } = require('./const');
+const {
+  testDir,
+  cdnUrl,
+  lumberjackUrl,
+  zestMoneyLoanAgreementUrl,
+} = require('./const');
 
 const chrup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const chrlow = 'abcdefghijklmnopqrstuvwxyz';
@@ -80,7 +85,8 @@ const util = (module.exports = {
         url.endsWith('favicon.ico') ||
         url.startsWith('data') ||
         url.startsWith(cdnUrl) ||
-        url.startsWith(lumberjackUrl);
+        url.startsWith(lumberjackUrl) ||
+        url.includes(zestMoneyLoanAgreementUrl);
       if (ignoredUrl || (pattern && !pattern.test(url))) return true;
     }
 
