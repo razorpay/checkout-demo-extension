@@ -6,6 +6,7 @@ module.exports = {
       key: 'rzp_live_' + randomId(),
       amount: 50 * randomRange(2, 100),
       personalization: false,
+      ...overrides,
     };
   },
 
@@ -24,14 +25,12 @@ module.exports = {
       isContactEmailOptional,
 
       prefilledContact:
-        (!isContactEmailOptional &&
-          (preferences.customer && preferences.customer.contact)) ||
+        (preferences.customer && preferences.customer.contact) ||
         (options.prefill && options.prefill.contact) ||
         '',
 
       prefilledEmail:
-        (!isContactEmailOptional &&
-          (preferences.customer && preferences.customer.email)) ||
+        (preferences.customer && preferences.customer.email) ||
         (options.prefill && options.prefill.email) ||
         '',
     };

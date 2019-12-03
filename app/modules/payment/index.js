@@ -27,7 +27,6 @@ import { checkPaymentAdapter } from 'payment/adapters';
 import * as GPay from 'gpay';
 import Analytics from 'analytics';
 import { isProviderHeadless } from 'common/cardlessemi';
-import { hasCheckoutBridge } from 'bridge';
 
 /**
  * Tells if we're being executed from
@@ -507,7 +506,8 @@ Payment.prototype = {
 
   redirect: function({ url, content, method = 'get' }) {
     // If we're in SDK and not in an iframe, redirect directly
-    if (hasCheckoutBridge()) {
+    // Not using Bridge.hasCheckoutBridge since bridge.js imports session
+    if (global.CheckoutBridge) {
       _Doc.submitForm(url, content, method);
     }
     // Otherwise, use sendMessage

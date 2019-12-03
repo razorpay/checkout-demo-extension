@@ -33,8 +33,6 @@
   export let downtimes = {};
   export let method;
   export let bankOptions;
-  export let corporateOption = '';
-  export let retailOption = '';
   export let active = false;
 
   // Computed

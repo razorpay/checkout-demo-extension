@@ -1371,6 +1371,10 @@ Session.prototype = {
     });
   },
 
+  setExperiments: function() {
+    discreet.Experiments.clearOldExperiments();
+  },
+
   render: function(options) {
     var that = this;
 
@@ -1397,6 +1401,7 @@ Session.prototype = {
 
     this.isOpen = true;
 
+    this.setExperiments();
     this.setTpvBanks();
     this.getEl();
     this.setMethodsList();
@@ -3803,7 +3808,7 @@ Session.prototype = {
       tab = 'wallet';
     } else if (
       this.screen === 'otp' &&
-      (thisTab !== 'card' && thisTab !== 'emi')
+      thisTab !== 'card' && thisTab !== 'emi'
     ) {
       tab = thisTab;
     } else if (
@@ -7010,7 +7015,7 @@ Session.prototype = {
       order &&
       order.bank &&
       this.get('callback_url') &&
-      (order.method !== 'upi' && order.method !== 'emandate') // Should these just be a check for order.method=netbanking?
+      order.method !== 'upi' && order.method !== 'emandate' // Should these just be a check for order.method=netbanking?
     ) {
       session_options.redirect = true;
       this.tpvRedirect = true;
