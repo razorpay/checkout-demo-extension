@@ -12,17 +12,18 @@ const {
   handleCardlessEMIPaymentCreation,
   selectZestMoneyEMIPlan,
   submit,
-  verifyOfferApplied,
 } = require('../../actions/common');
 
 describe('Cardless EMI tests', () => {
-  test('perform Cardless EMI - ZestMoney transaction', async () => {
+  test('perform Cardless EMI - ZestMoney transaction with contact optional', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 500000,
       personalization: false,
     };
-    const preferences = makePreferences();
+    const preferences = makePreferences({
+      optional: ['contact'],
+    });
     preferences.methods.cardless_emi = {
       earlysalary: true,
       zestmoney: true,
@@ -38,7 +39,6 @@ describe('Cardless EMI tests', () => {
     await typeOTPandSubmit(context);
     await handleOtpVerificationForCardlessEMI(context);
     await selectZestMoneyEMIPlan(context, 1);
-    await verifyOfferApplied(context);
     await submit(context);
     await handleCardlessEMIPaymentCreation(context);
   });

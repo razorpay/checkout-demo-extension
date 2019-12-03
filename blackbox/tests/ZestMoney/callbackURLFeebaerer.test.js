@@ -9,20 +9,22 @@ const {
   handleCardlessEMIValidation,
   typeOTPandSubmit,
   handleOtpVerificationForCardlessEMI,
-  handleCardlessEMIPaymentCreation,
+  expectRedirectWithCallback,
   selectZestMoneyEMIPlan,
   submit,
-  verifyOfferApplied,
+  handleFeeBearer,
 } = require('../../actions/common');
 
 describe('Cardless EMI tests', () => {
-  test('perform Cardless EMI - ZestMoney transaction', async () => {
+  test('perform Cardless EMI - ZestMoney transaction with callbackURL and customer feebearer enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 500000,
       personalization: false,
+      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
+      redirect: true,
     };
-    const preferences = makePreferences();
+    const preferences = makePreferences({ fee_bearer: true });
     preferences.methods.cardless_emi = {
       earlysalary: true,
       zestmoney: true,
@@ -34,12 +36,13 @@ describe('Cardless EMI tests', () => {
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'cardless_emi');
     await selectCardlessEMIOption(context, 'ZestMoney');
+    await handleFeeBearer(context);
     await handleCardlessEMIValidation(context);
     await typeOTPandSubmit(context);
     await handleOtpVerificationForCardlessEMI(context);
     await selectZestMoneyEMIPlan(context, 1);
-    await verifyOfferApplied(context);
     await submit(context);
-    await handleCardlessEMIPaymentCreation(context);
+    await handleFeeBearer(context);
+    await expectRedirectWithCallback(context, { method: 'cardless_emi' });
   });
 });
