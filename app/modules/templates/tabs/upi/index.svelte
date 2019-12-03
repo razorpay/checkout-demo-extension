@@ -47,7 +47,6 @@
   export let vpa = '';
   export let qrIcon;
   export let tab = 'upi';
-  export let pattern = '.+';
   export let focused = false;
 
   // Refs
@@ -300,8 +299,6 @@
 
   export function onUpiAppSelection(event) {
     const id = event.detail.id;
-
-    let pattern = '';
 
     if (typeof id !== 'undefined') {
       /**

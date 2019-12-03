@@ -276,11 +276,12 @@ export function getAllInstrumentsForCustomer(customer) {
  * @param {Object} customer
  * @param {Object} extra
  *  @prop {Object} methods
+ *  @prop {Array} upiApps List of UPI apps on the device
  *
  * @returns {Array<Object>}
  */
 export const getInstrumentsForCustomer = (customer, extra = {}) => {
-  const { methods } = extra;
+  const { methods, upiApps } = extra;
 
   let instruments = getAllInstrumentsForCustomer(customer);
 
@@ -288,6 +289,7 @@ export const getInstrumentsForCustomer = (customer, extra = {}) => {
   instruments = filterInstruments({
     instruments,
     methods,
+    upiApps,
   });
 
   // Add score for each instrument
@@ -322,10 +324,11 @@ export const getInstrumentsForCustomer = (customer, extra = {}) => {
  * to the payment creation payload.
  * @param {Object} payment Payment payload
  * @param {Object} instrument Instrument
+ * @param {Array} customer Customer
  *
  * @returns {Boolean} added?
  */
-export function addInstrumentToPaymentData(payment, instrument) {
+export function addInstrumentToPaymentData(payment, instrument, customer) {
   let added = false;
 
   // Sanity check
@@ -348,6 +351,21 @@ export function addInstrumentToPaymentData(payment, instrument) {
       added = true;
     }
   });
+
+  // Add token to saved card instrument
+  if (payment.method === 'card') {
+    if (customer && customer.tokens && customer.tokens.items) {
+      const token = _Arr.find(
+        customer.tokens.items,
+        token => token.id === instrument.token_id
+      );
+
+      if (token) {
+        payment.token = token.token;
+        added = true;
+      }
+    }
+  }
 
   return added;
 }

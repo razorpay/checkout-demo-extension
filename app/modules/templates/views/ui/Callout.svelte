@@ -3,7 +3,6 @@
   export let classes = [];
   export let visible = true;
   export let showIcon = true;
-  export let icon = '&#x2139';
   export let type = 'warning';
 
   // Computed

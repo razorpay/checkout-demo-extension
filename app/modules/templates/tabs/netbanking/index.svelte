@@ -25,6 +25,7 @@
     getCorporateOption,
     isCorporateCode,
   } from 'common/bank';
+  import { scrollIntoView } from 'lib/utils';
 
   // Props
   export let selectedBankCode = '';
@@ -33,8 +34,6 @@
   export let downtimes = {};
   export let method;
   export let bankOptions;
-  export let corporateOption = '';
-  export let retailOption = '';
   export let active = false;
 
   // Computed
@@ -118,7 +117,7 @@
     const selected = corporateSelected;
 
     if (showCorporateRadio) {
-      setTimeout(() => radioContainer.scrollIntoView(), 300);
+      setTimeout(() => scrollIntoView(radioContainer), 300);
     }
   }
 
@@ -187,7 +186,7 @@
             id="bank-select"
             name="bank"
             required
-            class="input no-refresh no-validate"
+            class="input no-refresh no-validate no-focus no-blur"
             pattern="[\w]+"
             bind:value={selectedBankCode}
             use:focus
