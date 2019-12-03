@@ -19,6 +19,8 @@
   const isContactReadonly = readonly.contact && prefilledContact;
 
   const CONTACT_REGEX = optional.contact ? '.*' : '^\\+?[0-9]{8,15}$';
+
+  const label = optional.contact ? 'Phone (Optional)' : 'Phone';
 </script>
 
 <div>
@@ -29,7 +31,7 @@
     required={!optional.contact}
     pattern={CONTACT_REGEX}
     readonly={isContactReadonly}
-    label="Phone"
+    {label}
     icon="&#xe607;"
     on:input={e => ($contact = e.target.value)}
     bind:value
