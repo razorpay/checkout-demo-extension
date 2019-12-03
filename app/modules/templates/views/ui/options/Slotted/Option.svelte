@@ -5,6 +5,7 @@
   // Props
   export let className = '';
   export let disabled = false;
+  export let id;
   export let attributes = {}; // Extra attributes for the HTML element
 
   $: {
@@ -44,6 +45,7 @@
   class={className}
   role="listitem"
   {disabled}
+  {id}
   on:click
   {...attributes}>
   <Stack horizontal>
