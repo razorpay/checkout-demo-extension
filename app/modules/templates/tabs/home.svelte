@@ -95,11 +95,11 @@
     }
 
     /**
-     * If contact and email are optional,
+     * If contact and email are hidden,
      * there's nothing left on the details
      * screen anymore.
      */
-    if (contactEmailOptional) {
+    if (contactEmailHidden) {
       return false;
     }
 
