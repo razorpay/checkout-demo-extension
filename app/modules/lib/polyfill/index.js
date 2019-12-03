@@ -1,6 +1,7 @@
 import { internetExplorer } from 'common/useragent';
 import Analytics from 'analytics';
 import { getSession } from 'sessionmanager';
+import getOwnPropertyDescriptor from './getownpropertydescriptors';
 
 /* global DOMTokenList, CSSStyleSheet, Element, CharacterData, DocumentType, CSSStyleDeclaration */
 
@@ -131,6 +132,10 @@ overrideInsertRule();
   }
 })();
 
+if (!_.isFunction(Object.getOwnPropertyDescriptors)) {
+  Object.getOwnPropertyDescriptors = getOwnPropertyDescriptor;
+}
+
 import './native';
 import './customelements';
-import './getownpropertydescriptors';
+// import './getownpropertydescriptors';
