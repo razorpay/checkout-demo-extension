@@ -24,6 +24,7 @@
     selectedInstrumentId,
     multiTpvOption,
     partialPaymentAmount,
+    partialPaymentOption,
   } from 'checkoutstore/screens/home';
 
   // Utils imports
@@ -490,13 +491,13 @@
 
   let formattedPartialAmount;
   $: {
-    if ($partialPaymentAmount) {
-      formattedPartialAmount = session.formatAmountWithCurrencyInMinor(
-        $partialPaymentAmount
-      );
-    } else {
+    if ($partialPaymentOption === 'full') {
       formattedPartialAmount = session.formatAmountWithCurrency(
         session.get('amount')
+      );
+    } else {
+      formattedPartialAmount = session.formatAmountWithCurrencyInMinor(
+        $partialPaymentAmount
       );
     }
   }
@@ -632,9 +633,9 @@
                   <div slot="title">
                     <span>{formattedPartialAmount}</span>
                     <span>
-                      {#if $partialPaymentAmount}
-                        Paying in parts
-                      {:else}Paying full amount{/if}
+                      {#if $partialPaymentOption === 'full'}
+                        Paying full amount
+                      {:else}Paying in parts{/if}
                     </span>
                   </div>
                   <div
