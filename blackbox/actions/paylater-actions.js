@@ -1,0 +1,37 @@
+async function verifyPayLaterPaymentMode(context) {
+  const messageDiv = await context.page.waitForXPath(
+    '//div[@data-paylater="epaylater"]'
+  );
+  let messageText = await context.page.evaluate(
+    messageDiv => messageDiv.textContent,
+    messageDiv
+  );
+  messageText = messageText.trim();
+  expect(messageText).toEqual('ePayLater');
+}
+
+async function selectPayLaterPaymentMode(context) {
+  const paylater = await context.page.waitForXPath(
+    '//div[@data-paylater="epaylater"]'
+  );
+  await paylater.click();
+}
+
+async function verifyPayLaterOTP(context) {
+  const req = await context.expectRequest();
+  expect(req.url).toContain('otp/verify');
+  await context.respondJSON({
+    ott: '3007d85081c8fb',
+    success: 1,
+  });
+}
+async function respondToPayLater(context) {
+  await context.respondJSON({ razorpay_payment_id: 'pay_123' });
+}
+
+module.exports = {
+  verifyPayLaterPaymentMode,
+  selectPayLaterPaymentMode,
+  verifyPayLaterOTP,
+  respondToPayLater,
+};

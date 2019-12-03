@@ -37,7 +37,7 @@ describe.skip('Wallet tests', () => {
     await submit(context);
     await handleFeeBearer(context);
     await handleOtpVerification(context);
-    await typeOTPandSubmit(context);
+    await typeOTPandSubmit(context, '5555');
 
     await handleValidationRequest(context, 'fail');
     await retryWalletTransaction(context);
@@ -45,7 +45,7 @@ describe.skip('Wallet tests', () => {
     await submit(context);
     await handleFeeBearer(context);
     await handleOtpVerification(context);
-    await typeOTP(context);
+    await typeOTP(context, '5555');
     await verifyTimeout(context, 'wallet');
   });
 });

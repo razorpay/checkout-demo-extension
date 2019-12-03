@@ -5,28 +5,26 @@ const {
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
-  submit,
-  handleCardValidation,
-  handleMockSuccessDialog,
+  selectPayLaterPaymentMode,
+  verifyPayLaterPaymentMode,
   handleCustomerCardStatusRequest,
+  expectRedirectWithCallback,
+  verifyPayLaterOTP,
   typeOTPandSubmit,
-  respondSavedCards,
-  selectSavedCardAndTypeCvv,
   handlePartialPayment,
   verifyPartialAmount,
-  handleFeeBearer,
 } = require('../../actions/common');
 
-describe('Saved Card tests', () => {
-  test('Perform saved card transaction with partial payments and customer feebearer enabled', async () => {
+describe('ePayLater Test', () => {
+  test('perform ePayLater transaction with callback enabled and partial payment', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 200,
-      personalization: true,
-      remember_customer: true,
+      amount: 5000,
+      personalization: false,
+      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
+      redirect: true,
     };
     const preferences = makePreferences({
-      fee_bearer: true,
       order: {
         amount: 20000,
         amount_due: 20000,
@@ -36,20 +34,18 @@ describe('Saved Card tests', () => {
         partial_payment: true,
       },
     });
-    let context = await openCheckout({ page, options, preferences });
+    const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
     await handlePartialPayment(context, '100');
     await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'card');
-    await handleCustomerCardStatusRequest(context);
-    await typeOTPandSubmit(context, '5555');
-    await respondSavedCards(context);
     await verifyPartialAmount(context, '₹ 100');
-    await selectSavedCardAndTypeCvv(context);
-    await submit(context);
-    await handleFeeBearer(context);
-    await handleCardValidation(context);
-    await handleMockSuccessDialog(context);
+    await selectPaymentMethod(context, 'paylater');
+    await verifyPayLaterPaymentMode(context);
+    await selectPayLaterPaymentMode(context);
+    await handleCustomerCardStatusRequest(context);
+    await typeOTPandSubmit(context, '0007');
+    await verifyPayLaterOTP(context);
+    await expectRedirectWithCallback(context, { method: 'paylater' });
   });
 });

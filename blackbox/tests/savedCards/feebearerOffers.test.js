@@ -66,7 +66,7 @@ describe('Saved Card tests', () => {
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
     await handleCustomerCardStatusRequest(context);
-    await typeOTPandSubmit(context);
+    await typeOTPandSubmit(context, '5555');
     await respondSavedCards(context);
     await viewOffers(context);
     await selectOffer(context, '1');

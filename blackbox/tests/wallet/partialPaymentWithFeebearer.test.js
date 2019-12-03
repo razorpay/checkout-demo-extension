@@ -47,7 +47,7 @@ describe('Wallet tests', () => {
     await handleFeeBearer(context);
     await handleOtpVerification(context);
     await verifyPartialAmount(context, '₹ 100');
-    await typeOTPandSubmit(context);
+    await typeOTPandSubmit(context, '5555');
 
     await handleValidationRequest(context, 'fail');
     await retryWalletTransaction(context);
@@ -55,7 +55,7 @@ describe('Wallet tests', () => {
     await submit(context);
     await handleFeeBearer(context);
     await handleOtpVerification(context);
-    await typeOTPandSubmit(context);
+    await typeOTPandSubmit(context, '5555');
 
     await handleValidationRequest(context, 'pass');
   });

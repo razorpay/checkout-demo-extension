@@ -15,6 +15,7 @@ const sharedActions = require('./shared-actions');
 const payoutActions = require('./payout-actions');
 const qrActions = require('./qr-actions');
 const emandateBanktransferActions = require('./emandate-banktransfer-actions');
+const paylaterActions = require('./paylater-actions');
 
 contents = String(
   readFileSync(__dirname + '/../fixtures/mockSuccessandFailPage.html')
@@ -36,6 +37,7 @@ module.exports = {
   ...payoutActions,
   ...qrActions,
   ...emandateBanktransferActions,
+  ...paylaterActions,
   verifyDiscountPaybleAmount,
   verifyDiscountText,
   verifyDiscountAmountInBanner,

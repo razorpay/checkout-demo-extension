@@ -40,7 +40,7 @@ describe('Saved Card tests', () => {
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
     await handleCustomerCardStatusRequest(context);
-    await typeOTPandSubmit(context);
+    await typeOTPandSubmit(context, '5555');
     await respondSavedCards(context);
     await verifyPartialAmount(context, '₹ 100');
     await selectSavedCardAndTypeCvv(context);

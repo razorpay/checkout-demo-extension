@@ -36,14 +36,14 @@ describe.skip('Wallet tests', () => {
     await selectWallet(context, 'freecharge');
     await submit(context);
     await handleOtpVerification(context);
-    await typeOTPandSubmit(context);
+    await typeOTPandSubmit(context, '5555');
 
     await handleValidationRequest(context, 'fail');
     await retryWalletTransaction(context);
 
     await submit(context);
     await handleOtpVerification(context);
-    await typeOTP(context);
+    await typeOTP(context, '5555');
     await verifyTimeout(context, 'wallet');
   });
 });

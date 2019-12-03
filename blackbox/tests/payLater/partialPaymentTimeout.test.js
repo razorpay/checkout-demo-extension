@@ -5,24 +5,18 @@ const {
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
-  submit,
-  handleCardValidation,
-  handleMockSuccessDialog,
-  handleCustomerCardStatusRequest,
-  typeOTPandSubmit,
-  respondSavedCards,
-  selectSavedCardAndTypeCvv,
   handlePartialPayment,
+  verifyTimeout,
   verifyPartialAmount,
 } = require('../../actions/common');
 
-describe('Saved Card tests', () => {
-  test('Perform saved card transaction with partial payments enabled', async () => {
+describe('Perform ePayLater Test', () => {
+  test('perform ePayLater transaction with partial payment enabled and timeout', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 200,
-      personalization: true,
-      remember_customer: true,
+      amount: 20000,
+      personalization: false,
+      timeout: 10,
     };
     const preferences = makePreferences({
       order: {
@@ -34,20 +28,13 @@ describe('Saved Card tests', () => {
         partial_payment: true,
       },
     });
-    let context = await openCheckout({ page, options, preferences });
+    const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
     await handlePartialPayment(context, '100');
     await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'card');
-    await handleCustomerCardStatusRequest(context);
-    await typeOTPandSubmit(context, '5555');
-    await respondSavedCards(context);
     await verifyPartialAmount(context, '₹ 100');
-    await selectSavedCardAndTypeCvv(context);
-    await submit(context);
-
-    await handleCardValidation(context);
-    await handleMockSuccessDialog(context);
+    await selectPaymentMethod(context, 'paylater');
+    await verifyTimeout(context, 'paylater');
   });
 });

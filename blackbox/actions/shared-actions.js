@@ -98,6 +98,7 @@ async function expectRedirectWithCallback(context, fields) {
   if (context.preferences.fees) apiSuffix = 'fees';
   else if (
     context.preferences.methods.upi ||
+    fields.method == 'paylater' ||
     (fields.method == 'wallet' &&
       !context.prefilledContact &&
       !context.isContactOptional &&

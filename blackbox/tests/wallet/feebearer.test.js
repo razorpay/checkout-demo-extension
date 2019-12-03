@@ -36,14 +36,14 @@ describe('Wallet Transaction', () => {
     await handleFeeBearer(context);
 
     await handleOtpVerification(context);
-    await typeOTPandSubmit(context);
+    await typeOTPandSubmit(context, '5555');
 
     await handleValidationRequest(context, 'fail');
     await retryWalletTransaction(context);
     await submit(context);
     await handleFeeBearer(context);
     await handleOtpVerification(context);
-    await typeOTPandSubmit(context);
+    await typeOTPandSubmit(context, '5555');
 
     await handleValidationRequest(context, 'pass');
   });
