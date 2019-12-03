@@ -23,6 +23,7 @@
     email,
     selectedInstrumentId,
     multiTpvOption,
+    partialPaymentAmount,
   } from 'checkoutstore/screens/home';
 
   // Utils imports
@@ -486,6 +487,24 @@
   function attemptPayment() {
     session.preSubmit();
   }
+
+  let formattedPartialAmount;
+  $: {
+    if ($partialPaymentAmount) {
+      formattedPartialAmount = session.formatAmountWithCurrencyInMinor(
+        $partialPaymentAmount
+      );
+    } else {
+      formattedPartialAmount = session.formatAmountWithCurrency(
+        session.get('amount')
+      );
+    }
+  }
+
+  let showUserDetailsStrip;
+  $: {
+    showUserDetailsStrip = ($contact || $email) && !contactEmailHidden;
+  }
 </script>
 
 <style>
@@ -512,43 +531,47 @@
     padding-right: 12px;
   }
 
-  .home-details {
+  .details-container {
     margin: 12px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
   }
 
+  .details-container :global(.stack > div:nth-of-type(1)) {
+    flex-grow: 1;
+  }
+
   /* Styles for "Edit v" button */
-  .home-details div[slot='extra'] {
+  .details-container div[slot='extra'] {
     display: flex;
   }
 
-  .home-details div[slot='extra'] span {
+  .details-container div[slot='extra'] span {
     display: block;
   }
 
-  .home-details div[slot='extra'] span:first-child {
+  .details-container div[slot='extra'] span:first-child {
     margin: 2px 4px 0;
     font-size: 1.2em;
   }
 
-  .home-details div[slot='extra'] span:last-child {
+  .details-container div[slot='extra'] span:last-child {
     transform: rotate(-90deg);
   }
 
-  .home-details div[slot='title'] {
+  .details-container div[slot='title'] {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  .home-details div[slot='title'] span:first-child {
+  .details-container div[slot='title'] span:first-child {
     font-size: 0.9rem;
     color: #363636;
   }
 
-  .home-details div[slot='title'] span:nth-child(2) {
+  .details-container div[slot='title'] span:nth-child(2) {
     font-size: 0.7rem;
     color: #757575;
     margin-left: 8px;
@@ -569,35 +592,62 @@
       {/if}
       {#if view === 'methods'}
         <div class="solidbg" transition:slide={{ duration: 400 }}>
-          {#if ($contact || $email) && !contactEmailHidden}
+          {#if showUserDetailsStrip || isPartialPayment}
             <div
               use:touchfix
-              class="home-details border-list"
+              class="details-container border-list"
               transition:slide={{ duration: 400 }}>
-              <SlottedOption
-                on:click={hideMethods}
-                className="instrument-strip">
-                <i slot="icon">
-                  <Icon icon={icons.contact} />
-                </i>
-                <div slot="title">
-                  {#if $contact && !hidden.contact}
-                    <span>{$contact}</span>
-                  {/if}
-                  {#if $email && !hidden.email}
-                    <span>{$email}</span>
-                  {/if}
-                </div>
-                <div
-                  slot="extra"
-                  class="theme-highlight-color"
-                  aria-label={contactEmailReadonly ? '' : 'Edit'}>
-                  {#if !contactEmailReadonly}
-                    <span>Edit</span>
-                    <span>&#xe604;</span>
-                  {/if}
-                </div>
-              </SlottedOption>
+              {#if showUserDetailsStrip}
+                <SlottedOption
+                  on:click={hideMethods}
+                  className="instrument-strip"
+                  id="user-details">
+                  <i slot="icon">
+                    <Icon icon={icons.contact} />
+                  </i>
+                  <div slot="title">
+                    {#if $contact && !hidden.contact}
+                      <span>{$contact}</span>
+                    {/if}
+                    {#if $email && !hidden.email}
+                      <span>{$email}</span>
+                    {/if}
+                  </div>
+                  <div
+                    slot="extra"
+                    class="theme-highlight-color"
+                    aria-label={contactEmailReadonly ? '' : 'Edit'}>
+                    {#if !contactEmailReadonly}
+                      <span>Edit</span>
+                      <span>&#xe604;</span>
+                    {/if}
+                  </div>
+                </SlottedOption>
+              {/if}
+              {#if isPartialPayment}
+                <SlottedOption
+                  on:click={hideMethods}
+                  className="instrument-strip"
+                  id="partial-payment-details">
+                  <div slot="title">
+                    <span>{formattedPartialAmount}</span>
+                    <span>
+                      {#if $partialPaymentAmount}
+                        Paying in parts
+                      {:else}Paying full amount{/if}
+                    </span>
+                  </div>
+                  <div
+                    slot="extra"
+                    class="theme-highlight-color"
+                    aria-label={contactEmailReadonly ? '' : 'Edit'}>
+                    {#if !contactEmailReadonly}
+                      <span>Change amount</span>
+                      <span>&#xe604;</span>
+                    {/if}
+                  </div>
+                </SlottedOption>
+              {/if}
             </div>
           {/if}
 
