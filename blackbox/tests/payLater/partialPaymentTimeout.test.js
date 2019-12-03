@@ -26,6 +26,7 @@ describe('Perform ePayLater Test', () => {
         currency: 'INR',
         first_payment_min_amount: null,
         partial_payment: true,
+        timeout: 10,
       },
     });
     const context = await openCheckout({ page, options, preferences });

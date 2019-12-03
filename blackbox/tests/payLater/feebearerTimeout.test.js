@@ -14,6 +14,7 @@ describe('ePayLater Test', () => {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 600000,
       personalization: false,
+      timeout: 10,
     };
     const preferences = makePreferences({ fee_bearer: true });
     const context = await openCheckout({ page, options, preferences });
