@@ -1020,6 +1020,16 @@ Session.prototype = {
     return discreet.Currency.formatAmount(amount, displayCurrency || currency);
   },
 
+  formatAmountWithCurrencyInMinor: function(amount) {
+    var currency = this.get('currency');
+    var config = discreet.Currency.getCurrencyConfig(currency);
+    var multiplier = Math.pow(10, config.decimals);
+
+    var value = parseInt((amount * multiplier).toFixed(config.decimals));
+
+    return this.formatAmountWithCurrency(value);
+  },
+
   formatAmountWithCurrency: function(amount) {
     var amountFigure = this.formatAmount(amount);
     var displayCurrency = this.r.get('display_currency');
