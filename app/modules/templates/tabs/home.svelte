@@ -569,7 +569,7 @@
       {/if}
       {#if view === 'methods'}
         <div class="solidbg" transition:slide={{ duration: 400 }}>
-          {#if ($contact || $email) && !contactEmailOptional}
+          {#if $contact || $email}
             <div
               use:touchfix
               class="home-details border-list"
@@ -591,9 +591,11 @@
                 <div
                   slot="extra"
                   class="theme-highlight-color"
-                  aria-label="Edit">
-                  <span>Edit</span>
-                  <span>&#xe604;</span>
+                  aria-label={contactEmailReadonly ? '' : 'Edit'}>
+                  {#if !contactEmailReadonly}
+                    <span>Edit</span>
+                    <span>&#xe604;</span>
+                  {/if}
                 </div>
               </SlottedOption>
             </div>
