@@ -26,7 +26,11 @@ async function verifyPersonalizationVPAText(context) {
     arrayofvpas.push('UPI - ' + rzp['4d184816'][j].vpa);
   }
   await delay(1500);
-  const paymentMethod = await context.page.$x('//div[@class="option-title"]');
+  var paymentMethod = await context.page.$x('//div[@class="option-title"]');
+  if (paymentMethod == undefined) {
+    await delay(500);
+    paymentMethod = await context.page.$x('//div[@class="option-title"]');
+  }
   for (let i = 0; i < paymentMethod.length; i++) {
     const currentPaymentMethod = paymentMethod[0];
     let paymentMethodText = await context.page.evaluate(
