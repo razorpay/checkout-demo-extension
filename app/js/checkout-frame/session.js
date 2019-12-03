@@ -1371,6 +1371,10 @@ Session.prototype = {
     });
   },
 
+  setExperiments: function() {
+    discreet.Experiments.clearOldExperiments();
+  },
+
   render: function(options) {
     var that = this;
 
@@ -1397,6 +1401,7 @@ Session.prototype = {
 
     this.isOpen = true;
 
+    this.setExperiments();
     this.setTpvBanks();
     this.getEl();
     this.setMethodsList();

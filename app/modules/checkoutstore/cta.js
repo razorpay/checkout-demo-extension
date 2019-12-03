@@ -40,7 +40,9 @@ export function showAmountInCta() {
 export function setAppropriateCtaText() {
   const session = getSession();
 
-  if (session.oneMethod && session.tab === '') {
+  if (!session.get('amount')) {
+    updateCta('Authenticate');
+  } else if (session.oneMethod && session.tab === '') {
     updateCta('Pay by ' + TAB_TITLES[session.oneMethod]);
   } else {
     showAmountInCta();
