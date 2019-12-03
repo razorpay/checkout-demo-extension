@@ -1,10 +1,4 @@
 async function selectPersonalizationPaymentMethod(context, optionNumber) {
-  // const text = await page.evaluate(() =>
-  //   Array.from(
-  //     document.querySelectorAll('.option-title'),
-  //     element => element.textContent
-  //   )
-  // );
   var apiOption = await context.page.$x(
     '//div[contains(@class, "option radio-option")]'
   );
