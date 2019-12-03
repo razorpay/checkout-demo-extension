@@ -3808,7 +3808,7 @@ Session.prototype = {
       tab = 'wallet';
     } else if (
       this.screen === 'otp' &&
-      (thisTab !== 'card' && thisTab !== 'emi')
+      thisTab !== 'card' && thisTab !== 'emi'
     ) {
       tab = thisTab;
     } else if (
@@ -5361,6 +5361,14 @@ Session.prototype = {
        * API takes 3DS, which is the default anyway.
        */
       delete data.auth_type;
+    }
+
+    /**
+     * For Paper Nach, we need to send auth_type=physical
+     * for now.
+     */
+    if (data.method === 'nach' && !data.auth_type) {
+      data.auth_type = 'physical';
     }
 
     if (data.partial_payment) {
@@ -7015,7 +7023,7 @@ Session.prototype = {
       order &&
       order.bank &&
       this.get('callback_url') &&
-      (order.method !== 'upi' && order.method !== 'emandate') // Should these just be a check for order.method=netbanking?
+      order.method !== 'upi' && order.method !== 'emandate' // Should these just be a check for order.method=netbanking?
     ) {
       session_options.redirect = true;
       this.tpvRedirect = true;
