@@ -60,6 +60,7 @@ var activeStateColor = themeMeta.activeStateColor;
   background: `=hoverStateColor`;
 }
 
+.theme-highlight-color,
 .options .next-option:after {
   color: `=highlightColor`;
 }
@@ -206,3 +207,37 @@ svg.offer-icon path {
 .expandable-card--expanded {
   border-color: `=highlightColor`;
 }
+
+
+/** Start: Styles for borders for a list of items */
+
+.border-list > *:first-child {
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+}
+
+.border-list > *:last-child {
+  border-bottom-right-radius: 2px;
+  border-bottom-left-radius: 2px;
+}
+
+.border-list:not(.touchfix) > *:hover:not(:disabled),
+.border-list > *:focus,
+.border-list > *:focus-within,
+.border-list > .selected {
+  border-color: `=highlightColor`;
+  background-color: `=hoverStateColor`;
+}
+
+.border-list > *:not(:last-child) {
+  border-bottom: none;
+}
+
+.border-list:not(.touchfix) > *:hover:not(:disabled) + *,
+.border-list > *:focus + *,
+.border-list > *:focus-within + *,
+.border-list > .selected + * {
+  border-top-color: `=highlightColor`;
+}
+
+/** End */

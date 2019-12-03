@@ -133,3 +133,4 @@ overrideInsertRule();
 
 import './native';
 import './customelements';
+import './getownpropertydescriptors';

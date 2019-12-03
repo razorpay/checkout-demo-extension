@@ -7,6 +7,7 @@
   export let overrideMethodCheck = false;
   export let down = false;
   export let pad = true;
+  export let shown = false;
   export let hasMessage = false;
 
   // Computed
@@ -22,6 +23,7 @@
     {down}
     id="form-{method}"
     class="tab-content showable screen"
+    class:drishy={shown}
     class:pad
     class:hasMessage>
     <slot />

@@ -50,6 +50,8 @@
   </i>
 {:else if /^\./.test(iconToUse)}
   <div class={iconToUse.split('.').join(' ')} />
+{:else if /^<i .*\/>$/.test(iconToUse)}
+  {@html iconToUse}
 {:else}
   <img src={iconToUse} {alt} />
 {/if}
