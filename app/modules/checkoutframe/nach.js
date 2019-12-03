@@ -15,16 +15,6 @@ function hasValidExtension(filename, extensions) {
 }
 
 /**
- * Turns a word to capitalcase
- * @param {string} word
- *
- * @returns {string} Word
- */
-function capitalCase(word) {
-  return `${word.slice(0, 1).toUpperCase()}${word.slice(1).toLowerCase()}`;
-}
-
-/**
  * Turns an entity name to a group of words,
  * Splits by underscores and periods.
  * @param {string} word foo_bar.bar_baz
@@ -32,7 +22,7 @@ function capitalCase(word) {
  * @returns {string} Foo Bar Baz
  */
 function entityToWords(word) {
-  const words = _Arr.map(word.split(/_|\./g), capitalCase);
+  const words = _Arr.map(word.split(/_|\./g), _Str.toTitleCase);
 
   let prev;
 
