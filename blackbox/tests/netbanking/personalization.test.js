@@ -15,6 +15,7 @@ describe('Basic Netbanking with Personalization', () => {
     const options = {
       key: 'rzp_test_VwsqHDsQPoVQi6',
       amount: 60000,
+      personalization: true,
     };
     const preferences = makePreferences();
     const context = await openCheckout({
@@ -24,7 +25,7 @@ describe('Basic Netbanking with Personalization', () => {
       method: 'Netbanking',
     });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, '8888888885');
+    await fillUserDetails(context, '8888888881');
     await verifyPersonalizationPaymentMethodsText(
       context,
       'Netbanking',

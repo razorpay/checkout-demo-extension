@@ -1,6 +1,4 @@
-const {
-  openCheckoutForPersonalization,
-} = require('../../actions/checkout-personalization');
+const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
@@ -17,21 +15,22 @@ describe('Wallet with Personalization  payment', () => {
       key: 'rzp_test_VwsqHDsQPoVQi6',
       amount: 60000,
       timeout: 10,
+      personalization: true,
     };
     const preferences = makePreferences();
     preferences.methods.upi = true;
-    const context = await openCheckoutForPersonalization({
+    const context = await openCheckout({
       page,
       options,
       preferences,
       method: 'UPI',
     });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, '8888888885');
+    await fillUserDetails(context, '8888888881');
     await verifyPersonalizationPaymentMethodsText(
       context,
       'UPI',
-      'UPI - scbaala@okhdfcbank'
+      'UPI - dsd@okhdfcbank'
     );
     await selectPersonalizationPaymentMethod(context, '1');
     await submit(context);

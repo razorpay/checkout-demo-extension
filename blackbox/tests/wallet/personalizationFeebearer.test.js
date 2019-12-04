@@ -1,6 +1,4 @@
-const {
-  openCheckoutForPersonalization,
-} = require('../../actions/checkout-personalization');
+const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
@@ -13,7 +11,6 @@ const {
   selectPersonalizationPaymentMethod,
   handleFeeBearer,
   retryWalletTransaction,
-  typeOTP,
   selectWallet,
 } = require('../../actions/common');
 
@@ -22,17 +19,18 @@ describe('Wallet with Personalization payment', () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 60000,
+      personalization: true,
     };
     const preferences = makePreferences({ fee_bearer: true });
     preferences.methods.upi = true;
-    const context = await openCheckoutForPersonalization({
+    const context = await openCheckout({
       page,
       options,
       preferences,
       method: 'Wallet',
     });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, '8888888885');
+    await fillUserDetails(context, '8888888881');
     await verifyPersonalizationPaymentMethodsText(
       context,
       'Wallet',

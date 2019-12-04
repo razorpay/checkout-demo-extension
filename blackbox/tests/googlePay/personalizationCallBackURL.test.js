@@ -1,6 +1,4 @@
-const {
-  openCheckoutForPersonalization,
-} = require('../../actions/checkout-personalization');
+const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
@@ -19,25 +17,26 @@ describe('GooglePay with Personalization  payment', () => {
       amount: 60000,
       callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
       redirect: true,
+      personalization: true,
     };
     const preferences = makePreferences();
     preferences.methods.upi = true;
-    const context = await openCheckoutForPersonalization({
+    const context = await openCheckout({
       page,
       options,
       preferences,
       method: 'UPI',
     });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, '8888888885');
+    await fillUserDetails(context, '8888888881');
     await verifyPersonalizationPaymentMethodsText(
       context,
       'UPI',
-      'UPI - scbaala@okhdfcbank'
+      'UPI - dsd@okhdfcbank'
     );
     await selectPersonalizationPaymentMethod(context, '1');
     await submit(context);
-    await handleUPIAccountValidation(context, 'scbaala@okhdfc');
+    await handleUPIAccountValidation(context, 'dsd@okhdfcbank');
     await expectRedirectWithCallback(context, { method: 'upi' });
   });
 });

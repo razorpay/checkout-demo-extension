@@ -16,9 +16,9 @@ describe('Wallet with Personalization  payment', () => {
     const options = {
       key: 'rzp_test_VwsqHDsQPoVQi6',
       amount: 60000,
+      personalization: true,
     };
     const preferences = makePreferences();
-    preferences.methods.upi = true;
     const context = await openCheckout({
       page,
       options,
@@ -26,7 +26,7 @@ describe('Wallet with Personalization  payment', () => {
       method: 'Wallet',
     });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, '8888888885');
+    await fillUserDetails(context, '8888888881');
     await verifyPersonalizationPaymentMethodsText(
       context,
       'Wallet',
