@@ -1,6 +1,4 @@
-const {
-  openCheckoutForPersonalization,
-} = require('../../actions/checkout-personalization');
+const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
@@ -19,17 +17,18 @@ describe('QR Scanner with Personalization  payment', () => {
     const options = {
       order_id: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 60000,
+      personalization: true,
     };
     const preferences = makePreferences();
     preferences.methods.upi = true;
-    const context = await openCheckoutForPersonalization({
+    const context = await openCheckout({
       page,
       options,
       preferences,
       method: 'QR',
     });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, '8888888885');
+    await fillUserDetails(context, '8888888881');
     await verifyPersonalizationPaymentMethodsText(context, 'QR', 'UPI QR');
     await selectPersonalizationPaymentMethod(context, '1');
     await submit(context);
