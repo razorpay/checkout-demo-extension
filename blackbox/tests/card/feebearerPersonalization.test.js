@@ -1,6 +1,4 @@
-const {
-  openCheckoutForPersonalization,
-} = require('../../actions/checkout-personalization');
+const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
@@ -23,7 +21,7 @@ describe('Card tests', () => {
       personalization: true,
     };
     const preferences = makePreferences({ fee_bearer: true });
-    let context = await openCheckoutForPersonalization({
+    const context = await openCheckout({
       page,
       options,
       preferences,

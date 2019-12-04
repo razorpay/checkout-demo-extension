@@ -1,6 +1,4 @@
-const {
-  openCheckoutForPersonalization,
-} = require('../../actions/checkout-personalization');
+const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
@@ -37,7 +35,7 @@ describe('Basic upi payment', () => {
       },
     });
     preferences.methods.upi = true;
-    let context = await openCheckoutForPersonalization({
+    const context = await openCheckout({
       page,
       options,
       preferences,
