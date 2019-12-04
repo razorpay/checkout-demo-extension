@@ -9,6 +9,9 @@ const config = {
   epaylater: {
     name: 'ePayLater',
   },
+  getsimpl: {
+    name: 'Simpl',
+  },
 };
 
 /**
