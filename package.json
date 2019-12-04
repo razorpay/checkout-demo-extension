@@ -38,7 +38,8 @@
     "jest": "jest blackbox/tests --testTimeout=30000",
     "test": "npm run test:unit && npm run build && jest blackbox/tests --testTimeout=30000",
     "build": "$ rollup -c --environment prod && $ gulp && $ lintOutput app/js/generated/entry",
-    "start": "$ gulp watch"
+    "start": "$ gulp watch",
+    "clean": "$ ./scripts/clean.sh"
   },
   "bugs": {
     "url": "https://github.com/razorpay/checkout/issues"
