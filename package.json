@@ -66,6 +66,7 @@
   "private": true,
   "devDependencies": {
     "husky": "^1.0.0-rc.14",
+    "jest-circus": "^24.9.0",
     "prettier": "^1.18.2",
     "prettier-plugin-svelte": "^0.7.0",
     "pretty-quick": "^2.0.0"
