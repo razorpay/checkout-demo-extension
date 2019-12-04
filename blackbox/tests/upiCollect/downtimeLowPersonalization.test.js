@@ -19,7 +19,7 @@ const {
   selectPersonalizationPaymentMethod,
 } = require('../../actions/common');
 
-describe.skip('Basic upi payment', () => {
+describe('Basic upi payment', () => {
   test('Verify UPI downtime - Low with personalization enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
