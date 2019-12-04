@@ -7,7 +7,6 @@ contents = String(
 );
 
 async function verifyEMIPlansWithOffers(context, offerNumber) {
-  // await delay(40000);
   await context.page.waitForSelector(
     '.emi-plans-list .expandable-card.expandable-card--has-badge:nth-of-type(' +
       1 +
