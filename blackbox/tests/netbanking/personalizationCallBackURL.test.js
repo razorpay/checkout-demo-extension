@@ -1,24 +1,26 @@
-const { openCheckout } = require('../../actions/checkout');
+const {
+  openCheckoutForPersonalization,
+} = require('../../actions/checkout-personalization');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
   verifyPersonalizationPaymentMethodsText,
   submit,
-  passRequestNetbanking,
-  handleMockSuccessDialog,
-  handleFeeBearer,
+  expectRedirectWithCallback,
   selectPersonalizationPaymentMethod,
 } = require('../../actions/common');
 
 describe('Basic Netbanking with Personalization', () => {
-  test('Perform Netbanking with Personalization transaction', async () => {
+  test('Perform Netbanking with Personalization and Callback URL transaction', async () => {
     const options = {
       key: 'rzp_test_VwsqHDsQPoVQi6',
       amount: 60000,
+      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
+      redirect: true,
     };
-    const preferences = makePreferences({ fee_bearer: true });
-    const context = await openCheckout({
+    const preferences = makePreferences();
+    const context = await openCheckoutForPersonalization({
       page,
       options,
       preferences,
@@ -33,8 +35,9 @@ describe('Basic Netbanking with Personalization', () => {
     );
     await selectPersonalizationPaymentMethod(context, '1');
     await submit(context);
-    await handleFeeBearer(context);
-    await passRequestNetbanking(context);
-    await handleMockSuccessDialog(context);
+    await expectRedirectWithCallback(context, {
+      method: 'netbanking',
+      bank: 'HDFC',
+    });
   });
 });

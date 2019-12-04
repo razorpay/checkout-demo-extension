@@ -1,4 +1,6 @@
-const { openCheckout } = require('../../actions/checkout');
+const {
+  openCheckoutForPersonalization,
+} = require('../../actions/checkout-personalization');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
@@ -9,17 +11,21 @@ const {
   typeOTPandSubmit,
   handleValidationRequest,
   selectPersonalizationPaymentMethod,
+  handleFeeBearer,
+  retryWalletTransaction,
+  typeOTP,
+  selectWallet,
 } = require('../../actions/common');
 
-describe('Wallet with Personalization  payment', () => {
-  test('Perform Wallet with Personalization transaction', async () => {
+describe('Wallet with Personalization payment', () => {
+  test('Perform Wallet with Personalization and feebearer transaction', async () => {
     const options = {
-      key: 'rzp_test_VwsqHDsQPoVQi6',
+      key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 60000,
     };
-    const preferences = makePreferences();
+    const preferences = makePreferences({ fee_bearer: true });
     preferences.methods.upi = true;
-    const context = await openCheckout({
+    const context = await openCheckoutForPersonalization({
       page,
       options,
       preferences,
@@ -34,6 +40,15 @@ describe('Wallet with Personalization  payment', () => {
     );
     await selectPersonalizationPaymentMethod(context, '1');
     await submit(context);
+    await handleFeeBearer(context);
+    await handleOtpVerification(context);
+    await typeOTPandSubmit(context);
+    await handleValidationRequest(context, 'fail');
+    await retryWalletTransaction(context);
+    await delay(200);
+    await selectWallet(context, 'freecharge');
+    await submit(context);
+    await handleFeeBearer(context);
     await handleOtpVerification(context);
     await typeOTPandSubmit(context);
     await handleValidationRequest(context, 'pass');

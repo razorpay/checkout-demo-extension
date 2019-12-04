@@ -1,40 +1,40 @@
-const { openCheckout } = require('../../actions/checkout');
+const {
+  openCheckoutForPersonalization,
+} = require('../../actions/checkout-personalization');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
   verifyPersonalizationPaymentMethodsText,
   submit,
-  passRequestNetbanking,
-  handleMockSuccessDialog,
-  handleFeeBearer,
+  verifyTimeout,
   selectPersonalizationPaymentMethod,
 } = require('../../actions/common');
 
-describe('Basic Netbanking with Personalization', () => {
-  test('Perform Netbanking with Personalization transaction', async () => {
+describe('Wallet with Personalization  payment', () => {
+  test('Perform Wallet with Personalization transaction with timeout', async () => {
     const options = {
       key: 'rzp_test_VwsqHDsQPoVQi6',
       amount: 60000,
+      timeout: 10,
     };
-    const preferences = makePreferences({ fee_bearer: true });
-    const context = await openCheckout({
+    const preferences = makePreferences();
+    preferences.methods.upi = true;
+    const context = await openCheckoutForPersonalization({
       page,
       options,
       preferences,
-      method: 'Netbanking',
+      method: 'UPI',
     });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, '8888888885');
     await verifyPersonalizationPaymentMethodsText(
       context,
-      'Netbanking',
-      'Netbanking - HDFC Bank'
+      'UPI',
+      'UPI - scbaala@okhdfcbank'
     );
     await selectPersonalizationPaymentMethod(context, '1');
     await submit(context);
-    await handleFeeBearer(context);
-    await passRequestNetbanking(context);
-    await handleMockSuccessDialog(context);
+    await verifyTimeout(context, 'upi');
   });
 });

@@ -1,24 +1,28 @@
-const { openCheckout } = require('../../actions/checkout');
+const {
+  openCheckoutForPersonalization,
+} = require('../../actions/checkout-personalization');
 const { makePreferences } = require('../../actions/preferences');
+const { delay } = require('../../util');
 const {
   assertHomePage,
   fillUserDetails,
   verifyPersonalizationPaymentMethodsText,
-  submit,
-  passRequestNetbanking,
-  handleMockSuccessDialog,
-  handleFeeBearer,
   selectPersonalizationPaymentMethod,
+  submit,
+  handleValidationRequest,
+  verifyTimeout,
 } = require('../../actions/common');
 
-describe('Basic Netbanking with Personalization', () => {
-  test('Perform Netbanking with Personalization transaction', async () => {
+describe('Netbanking tests', () => {
+  test('perform netbaking transaction with Personalization and timeout enabled', async () => {
     const options = {
-      key: 'rzp_test_VwsqHDsQPoVQi6',
-      amount: 60000,
+      key: 'rzp_test_1DP5mmOlF5G5ag',
+      amount: 200,
+      timeout: 10,
     };
-    const preferences = makePreferences({ fee_bearer: true });
-    const context = await openCheckout({
+
+    const preferences = makePreferences();
+    const context = await openCheckoutForPersonalization({
       page,
       options,
       preferences,
@@ -33,8 +37,7 @@ describe('Basic Netbanking with Personalization', () => {
     );
     await selectPersonalizationPaymentMethod(context, '1');
     await submit(context);
-    await handleFeeBearer(context);
-    await passRequestNetbanking(context);
-    await handleMockSuccessDialog(context);
+    await handleValidationRequest(context, 'fail');
+    await verifyTimeout(context, 'netbanking');
   });
 });

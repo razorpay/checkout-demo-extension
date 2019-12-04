@@ -1,4 +1,6 @@
-const { openCheckout } = require('../../actions/checkout');
+const {
+  openCheckoutForPersonalization,
+} = require('../../actions/checkout-personalization');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
@@ -12,14 +14,14 @@ const {
 } = require('../../actions/common');
 
 describe('Wallet with Personalization  payment', () => {
-  test('Perform Wallet with Personalization transaction', async () => {
+  test('Perform Wallet with Personalization transaction with keyless transaction', async () => {
     const options = {
-      key: 'rzp_test_VwsqHDsQPoVQi6',
+      order_id: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 60000,
     };
     const preferences = makePreferences();
     preferences.methods.upi = true;
-    const context = await openCheckout({
+    const context = await openCheckoutForPersonalization({
       page,
       options,
       preferences,

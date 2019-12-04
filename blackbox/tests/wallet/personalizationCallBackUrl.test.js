@@ -1,25 +1,27 @@
-const { openCheckout } = require('../../actions/checkout');
+const {
+  openCheckoutForPersonalization,
+} = require('../../actions/checkout-personalization');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
   verifyPersonalizationPaymentMethodsText,
   submit,
-  handleOtpVerification,
-  typeOTPandSubmit,
-  handleValidationRequest,
+  expectRedirectWithCallback,
   selectPersonalizationPaymentMethod,
 } = require('../../actions/common');
 
 describe('Wallet with Personalization  payment', () => {
-  test('Perform Wallet with Personalization transaction', async () => {
+  test('Perform Wallet with Personalization transaction and Callback Url', async () => {
     const options = {
-      key: 'rzp_test_VwsqHDsQPoVQi6',
+      key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 60000,
+      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
+      redirect: true,
     };
     const preferences = makePreferences();
     preferences.methods.upi = true;
-    const context = await openCheckout({
+    const context = await openCheckoutForPersonalization({
       page,
       options,
       preferences,
@@ -34,8 +36,9 @@ describe('Wallet with Personalization  payment', () => {
     );
     await selectPersonalizationPaymentMethod(context, '1');
     await submit(context);
-    await handleOtpVerification(context);
-    await typeOTPandSubmit(context);
-    await handleValidationRequest(context, 'pass');
+    await expectRedirectWithCallback(context, {
+      method: 'wallet',
+      wallet: 'freecharge',
+    });
   });
 });

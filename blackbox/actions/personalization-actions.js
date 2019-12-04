@@ -65,8 +65,24 @@ async function selectPersonalizedCard(context) {
   await personalizedCard[0].click();
 }
 
+async function verifyPersonalizationPaymentMethodsText(
+  context,
+  typeName,
+  expectedPaymentMethod
+) {
+  const paymentMethod = await context.page.waitForXPath(
+    '//div[contains(text(), "' + typeName + '") and @class="option-title"]'
+  );
+  let paymentMethodText = await context.page.evaluate(
+    paymentMethod => paymentMethod.textContent,
+    paymentMethod
+  );
+  expect(paymentMethodText.trim()).toEqual(expectedPaymentMethod);
+}
+
 module.exports = {
   selectPersonalizationPaymentMethod,
   verifyPersonalizationVPAText,
   selectPersonalizedCard,
+  verifyPersonalizationPaymentMethodsText,
 };
