@@ -24,6 +24,9 @@
   export let data = null;
   export let error = null;
   let cardNumber = null;
+  /* 
+  global each Event invoke
+  */
 
   // Refs
   const cardType = _Doc.querySelector('#elem-card .cardtype[cardtype]');
@@ -55,7 +58,7 @@
 
     var isMaestro = /^maestro/.test(cardType);
     var sixDigits = val.length > 5;
-    var trimmedVal = val.replace(/[\ ]/g, '');
+    var trimmedVal = val.replace(/[ ]/g, '');
 
     _El.toggleClass(el.parentNode, 'six');
 
@@ -121,7 +124,7 @@
       return session.setScreen('card');
     }
 
-    tab_titles.otp = tab_titles.card; //Rajat, how is this working?
+    session.tab_titles.otp = session.tab_titles.card; //Rajat, how is this working?
     session.otpView.updateScreen({
       skipText: 'Skip Saved Cards',
     });
@@ -348,13 +351,13 @@
     //   .toggleClass('amex', type === 'amex')
     //   .toggleClass('maestro', type === 'maestro');
 
-    if (!preferences.methods.amex && type === 'amex') {
+    if (!session.preferences.methods.amex && type === 'amex') {
       _Doc.querySelector('#elem-card').addClass('noamex');
     } else {
       _Doc.querySelector('#elem-card').removeClass('noamex');
     }
 
-    self.input(el_cvv);
+    session.input(el_cvv);
 
     // card icon element
     this.el.parentNode
