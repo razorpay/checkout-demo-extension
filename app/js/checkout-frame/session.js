@@ -5479,7 +5479,7 @@ Session.prototype = {
       if (this.checkCommonValid()) {
         // switch to methods tab
         if (this.homeTab.onDetailsScreen()) {
-          if (this.homeTab.shouldShowNext()) {
+          if (this.homeTab.shouldGoNext()) {
             return this.homeTab.next();
           }
         }
