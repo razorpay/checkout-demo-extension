@@ -459,16 +459,24 @@
     }
   }
 
-  export function shouldShowNext() {
+  export function shouldGoNext() {
+    const multiTpv = session.multiTpv;
+    const onlyUpiTpv = session.upiTpv;
+    const onlyNetbankingTpv = session.tpvBank && !onlyUpiTpv;
+
     if (session.oneMethod === 'paypal') {
       return false;
     }
 
-    if ($multiTpvOption === 'netbanking' && session.multiTpv) {
-      return false;
+    if (multiTpv) {
+      if ($multiTpvOption === 'netbanking') {
+        return false;
+      } else {
+        return true;
+      }
     }
 
-    if (!session.multiTpv && session.tpvBank) {
+    if (onlyNetbankingTpv) {
       return false;
     }
 
