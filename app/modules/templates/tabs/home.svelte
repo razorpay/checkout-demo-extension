@@ -54,6 +54,11 @@
   const onlyNetbankingTpv = session.tpvBank && !onlyUpiTpv && !multiTpv;
   const isTpv = multiTpv || onlyUpiTpv || onlyNetbankingTpv;
 
+  // Offers
+  const hasOffersOnHomescreen =
+    session.hasOffers &&
+    _Arr.any(session.eligibleOffers, offer => offer.homescreen);
+
   const {
     isPartialPayment,
     prefill,
@@ -75,6 +80,7 @@
   let showSecuredByMessage;
   $: showSecuredByMessage =
     view === 'details' &&
+    !hasOffersOnHomescreen &&
     !session.multiTpv &&
     !session.tpvBank &&
     !isPartialPayment &&
