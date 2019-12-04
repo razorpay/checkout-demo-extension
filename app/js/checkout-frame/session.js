@@ -1552,20 +1552,9 @@ Session.prototype = {
   },
 
   setSvelteCardTab: function() {
-    // any applicable this.methods?
     this.svelteCardTab = new discreet.CardTab({
       target: gel('card-svelte-wrap'),
-      props: {
-        emiOptions: this.emi_options,
-        customer: this.customer,
-        remember: this.get('remember_customer'),
-        otpView: this.otpView,
-        wantsSkip: this.wants_skip,
-        commenceOTP: this.commenceOTP,
-        recurring: this.recurring,
-        askOTP: askOTP,
-      },
-    }); /* TODO fill props */
+    });
   },
 
   setSvelteComponents: function() {

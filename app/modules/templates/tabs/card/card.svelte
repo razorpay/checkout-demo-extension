@@ -23,8 +23,6 @@
   export let loading = true;
   export let data = null;
   export let error = null;
-  export let emiOptions = null;
-  export let otpView = null;
   let cardNumber = null;
 
   // Refs
@@ -49,7 +47,7 @@
 
   function onSixDigits(e) {
     const el = _Doc.querySelector('#card_number');
-    var emi_options = emiOptions; // Rajat: remove this later.
+    var emi_options = session.emi_options; // Rajat: remove this later.
     const cardType = _Doc.querySelector('#elem-card .cardtype[cardtype]');
     var nocvvCheck = _Doc.querySelector('nocvv');
     var emiObj;
@@ -138,7 +136,7 @@
          */
         if (session.recurring && !customer.saved && !customer.logged) {
           customer.createOTP(function() {
-            askOTP(
+            session.askOTP(
               session.otpView,
               'Enter OTP sent on ' +
                 session.getPhone() +
@@ -147,7 +145,7 @@
             );
           });
         } else if (customer.saved && !customer.logged) {
-          askOTP(otpView, undefined, true);
+          session.askOTP(session.otpView, undefined, true);
         } else {
           showCards();
         }
