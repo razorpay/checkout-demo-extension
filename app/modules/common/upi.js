@@ -216,22 +216,22 @@ export const otherAppsIcon =
 
 export const topUpiApps = [
   {
-    text: 'BHIM',
-    icon: 'https://cdn.razorpay.com/app/bhim.svg',
-    id: 'bhim',
-    psp: 'upi',
-  },
-  {
     text: 'Google Pay',
     icon: 'https://cdn.razorpay.com/app/googlepay.svg',
     id: 'gpay',
     psp: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],
   },
   {
-    text: 'Airtel',
-    icon: 'https://cdn.razorpay.com/app/airtel.svg',
-    id: 'airtel',
-    psp: 'airtel',
+    text: 'PhonePe',
+    icon: 'https://cdn.razorpay.com/app/phonepe.svg',
+    id: 'phonepe',
+    psp: 'ybl',
+  },
+  {
+    text: 'BHIM',
+    icon: 'https://cdn.razorpay.com/app/bhim.svg',
+    id: 'bhim',
+    psp: 'upi',
   },
   {
     text: 'Paytm',
@@ -240,10 +240,10 @@ export const topUpiApps = [
     psp: 'paytm',
   },
   {
-    text: 'PhonePe',
-    icon: 'https://cdn.razorpay.com/app/phonepe.svg',
-    id: 'phonepe',
-    psp: 'ybl',
+    text: 'Airtel',
+    icon: 'https://cdn.razorpay.com/app/airtel.svg',
+    id: 'airtel',
+    psp: 'airtel',
   },
   {
     text: 'Other Apps',
