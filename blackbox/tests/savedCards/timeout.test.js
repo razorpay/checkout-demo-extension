@@ -12,7 +12,7 @@ const {
   selectSavedCardAndTypeCvv,
 } = require('../../actions/common');
 
-describe('Saved Card tests', () => {
+describe.skip('Saved Card tests', () => {
   test('Perform saved card transaction with timeout', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
