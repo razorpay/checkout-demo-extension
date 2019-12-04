@@ -47,6 +47,18 @@
   const methods = session.methods;
   const icons = session.themeMeta.icons;
   const order = session.order || {};
+
+  // TPV
+  const multiTpv = session.multiTpv;
+  const onlyUpiTpv = session.upiTpv;
+  const onlyNetbankingTpv = session.tpvBank && !onlyUpiTpv && !multiTpv;
+  const isTpv = multiTpv || onlyUpiTpv || onlyNetbankingTpv;
+
+  // Offers
+  const hasOffersOnHomescreen =
+    session.hasOffers &&
+    _Arr.any(session.eligibleOffers, offer => offer.homescreen);
+
   const {
     isPartialPayment,
     prefill,
@@ -68,6 +80,7 @@
   let showSecuredByMessage;
   $: showSecuredByMessage =
     view === 'details' &&
+    !hasOffersOnHomescreen &&
     !session.multiTpv &&
     !session.tpvBank &&
     !isPartialPayment &&
@@ -138,8 +151,30 @@
             session,
           })
       );
+    } else if (isTpv) {
+      let _method;
+      if (onlyNetbankingTpv) {
+        _method = 'netbanking';
+      } else if (onlyUpiTpv) {
+        _method = 'upi';
+      } else if (multiTpv) {
+        _method = $multiTpvOption;
+      }
+
+      showCtaWithText(
+        'Pay by ' +
+          getMethodNameForPaymentOption(_method, {
+            session,
+          })
+      );
     } else {
       showCtaWithText('Proceed');
+    }
+  }
+
+  $: {
+    if ($multiTpvOption) {
+      setDetailsCta();
     }
   }
 
@@ -459,16 +494,20 @@
     }
   }
 
-  export function shouldShowNext() {
+  export function shouldGoNext() {
     if (session.oneMethod === 'paypal') {
       return false;
     }
 
-    if ($multiTpvOption === 'netbanking' && session.multiTpv) {
-      return false;
+    if (multiTpv) {
+      if ($multiTpvOption === 'netbanking') {
+        return false;
+      } else {
+        return true;
+      }
     }
 
-    if (!session.multiTpv && session.tpvBank) {
+    if (onlyNetbankingTpv) {
       return false;
     }
 
