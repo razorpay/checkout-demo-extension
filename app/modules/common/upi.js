@@ -228,10 +228,10 @@ export const topUpiApps = [
     psp: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],
   },
   {
-    text: 'WhatsApp',
-    icon: 'https://cdn.razorpay.com/app/whatsapp.svg',
-    id: 'whatsapp',
-    psp: 'icici',
+    text: 'Airtel',
+    icon: 'https://cdn.razorpay.com/app/airtel.svg',
+    id: 'airtel',
+    psp: 'airtel',
   },
   {
     text: 'Paytm',
