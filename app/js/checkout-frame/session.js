@@ -3544,7 +3544,11 @@ Session.prototype = {
       showPaybtn = Boolean(selectedInstrument);
     }
 
-    this.body.toggleClass('sub', showPaybtn);
+    if (screen === '' && this.newHomeScreen && this.homeTab) {
+      this.homeTab.onShown();
+    } else {
+      this.body.toggleClass('sub', showPaybtn);
+    }
 
     if (screen === 'upi') {
       var isIntentFlow = this.upiTab.intent;
@@ -3873,7 +3877,9 @@ Session.prototype = {
     $('#content').removeClass('has-discount');
     //TODO: optimise queries
     $('#amount .discount').html('');
-    Cta.showAmountInCta();
+    if (!(this.tab === '' && this.newHomeScreen)) {
+      Cta.showAmountInCta();
+    }
   },
   back: function(confirmedCancel) {
     var tab = '';
