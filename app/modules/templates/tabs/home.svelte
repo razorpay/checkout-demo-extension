@@ -327,6 +327,10 @@
     const DETAILS = 'details';
     const METHODS = 'methods';
 
+    if (session.emandate || session.nach) {
+      return DETAILS;
+    }
+
     // If email and contact are prefilled, validate them
     if (!contactEmailOptional && !contactEmailHidden) {
       const contactRegex = /^\+?[0-9]{8,15}$/;
