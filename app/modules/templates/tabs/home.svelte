@@ -90,6 +90,10 @@
     view = 'methods';
 
     onShown();
+
+    Analytics.track('home:methods:show', {
+      type: AnalyticsTypes.BEHAV,
+    });
   }
 
   export function canGoBack() {
@@ -131,6 +135,10 @@
     view = 'details';
 
     setDetailsCta();
+
+    Analytics.track('home:methods:hide', {
+      type: AnalyticsTypes.BEHAV,
+    });
   }
 
   export function setDetailsCta() {
@@ -382,6 +390,11 @@
   }
 
   view = determineLandingView();
+  Analytics.track('home:landing', {
+    data: {
+      view,
+    },
+  });
 
   export function next() {
     // Multi TPV
