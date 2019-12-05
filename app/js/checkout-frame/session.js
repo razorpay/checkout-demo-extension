@@ -6037,7 +6037,7 @@ Session.prototype = {
       delete data.contact;
     }
 
-    if (data.method === 'paylater') {
+    if (data.provider === 'epaylater') {
       if (data.contact) {
         if (!data.ott) {
           this.submitPayLater();
