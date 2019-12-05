@@ -19,7 +19,7 @@ const {
 describe('Basic Omnichannel payment', () => {
   test('Perform Omnichannel transaction with no wallet linked to current number', async () => {
     const options = {
-      key: 'rzp_live_rFalxzSoQIEcFH',
+      key: 'rzp_test_rFalxzSoQIEcFH',
       amount: 60000,
       personalization: false,
     };
@@ -27,7 +27,6 @@ describe('Basic Omnichannel payment', () => {
       features: { google_pay_omnichannel: true },
     });
     preferences.methods.upi = true;
-    preferences.mode = 'live';
     const context = await openCheckout({
       page,
       options,

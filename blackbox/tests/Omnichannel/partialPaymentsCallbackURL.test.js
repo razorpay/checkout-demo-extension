@@ -15,7 +15,7 @@ const {
 describe('Basic Omnichannel payment', () => {
   test('Perform Omnichannel transaction with partial payments and callbackURL enabled', async () => {
     const options = {
-      key: 'rzp_live_rFalxzSoQIEcFH',
+      key: 'rzp_test_rFalxzSoQIEcFH',
       amount: 60000,
       personalization: false,
       callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
@@ -33,7 +33,6 @@ describe('Basic Omnichannel payment', () => {
       },
     });
     preferences.methods.upi = true;
-    preferences.mode = 'live';
     const context = await openCheckout({
       page,
       options,

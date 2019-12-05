@@ -9,7 +9,7 @@ const {
 describe('Basic Omnichannel payment', () => {
   test('Verify Omnichannel downtime - High with customer feebearer enabled', async () => {
     const options = {
-      key: 'rzp_live_rFalxzSoQIEcFH',
+      key: 'rzp_test_rFalxzSoQIEcFH',
       amount: 60000,
       personalization: false,
     };
@@ -36,7 +36,6 @@ describe('Basic Omnichannel payment', () => {
       },
     });
     preferences.methods.upi = true;
-    preferences.mode = 'live';
     const context = await openCheckout({
       page,
       options,

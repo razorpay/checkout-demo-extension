@@ -16,7 +16,7 @@ const {
 describe('Basic Omnichannel payment', () => {
   test('Perform Omnichannel transaction with customer feebearer and contact optional enabled', async () => {
     const options = {
-      key: 'rzp_live_rFalxzSoQIEcFH',
+      key: 'rzp_test_rFalxzSoQIEcFH',
       amount: 60000,
       personalization: false,
     };
@@ -26,7 +26,6 @@ describe('Basic Omnichannel payment', () => {
       optional: ['contact'],
     });
     preferences.methods.upi = true;
-    preferences.mode = 'live';
     const context = await openCheckout({
       page,
       options,
