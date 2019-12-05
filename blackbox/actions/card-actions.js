@@ -85,15 +85,6 @@ async function enterCardDetails(context, { cardType, nativeOtp = false } = {}) {
   await context.page.type('#card_cvv', '112');
 }
 
-async function retryCardTransaction(context) {
-  await context.page.waitFor('#fd-hide', {
-    timeout: 2000,
-    visible: true,
-  });
-  const retryButton = await context.page.waitForSelector('#fd-hide');
-  await retryButton.click();
-}
-
 async function handleCustomerCardStatusRequest(context, cardType) {
   const req = await context.expectRequest();
   expect(req.url).toContain('customers/status');
@@ -156,7 +147,6 @@ module.exports = {
   handleCardValidation,
   handleCardValidationForNativeOTP,
   handleBankRequest,
-  retryCardTransaction,
   handleCustomerCardStatusRequest,
   respondSavedCards,
   selectSavedCardAndTypeCvv,

@@ -8,7 +8,7 @@
   import FeeBearer from 'templates/views/feebearer.svelte';
 
   // Utils imports
-  import { RazorpayConfig } from 'common/Razorpay';
+  import RazorpayConfig from 'common/RazorpayConfig';
   import { processInstrument } from 'checkoutframe/personalization';
   import DowntimesStore from 'checkoutstore/downtimes';
   import { getSession } from 'sessionmanager';

@@ -132,6 +132,15 @@ async function selectBank(context, bank) {
   await context.page.select('#bank-select', bank);
 }
 
+async function retryTransaction(context) {
+  await context.page.waitFor('#fd-hide', {
+    timeout: 2000,
+    visible: true,
+  });
+  const retryButton = await context.page.waitForSelector('#fd-hide');
+  await retryButton.click();
+}
+
 module.exports = {
   handleMockFailureDialog,
   handleMockSuccessDialog,
@@ -143,4 +152,5 @@ module.exports = {
   verifyErrorMessage,
   submit,
   respondAndVerifyIntentRequest,
+  retryTransaction,
 };

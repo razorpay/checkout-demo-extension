@@ -11,7 +11,7 @@ const {
   handleCardValidation,
   handleMockSuccessDialog,
   verifyErrorMessage,
-  retryCardTransaction,
+  retryTransaction,
   handleMockFailureDialog,
 } = require('../../actions/common');
 
@@ -30,7 +30,7 @@ describe.each(
     await handleCardValidation(context);
     await handleMockFailureDialog(context);
     await verifyErrorMessage(context, 'The payment has already been processed');
-    await retryCardTransaction(context);
+    await retryTransaction(context);
     await submit(context);
 
     await handleCardValidation(context);
