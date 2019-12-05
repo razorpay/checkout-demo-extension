@@ -12,7 +12,7 @@ const {
   handleCardValidation,
   handleMockFailureDialog,
   verifyErrorMessage,
-  retryCardTransaction,
+  retryTransaction,
   handleMockSuccessDialog,
 } = require('../../actions/common');
 

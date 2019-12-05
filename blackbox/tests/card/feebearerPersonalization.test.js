@@ -8,7 +8,7 @@ const {
   enterCardDetails,
   handleCardValidation,
   handleMockFailureDialog,
-  retryCardTransaction,
+  retryTransaction,
   handleMockSuccessDialog,
   handleFeeBearer,
 } = require('../../actions/common');
@@ -35,7 +35,7 @@ describe('Card tests', () => {
     await handleFeeBearer(context);
     await handleCardValidation(context);
     await handleMockFailureDialog(context);
-    await retryCardTransaction(context);
+    await retryTransaction(context);
     await submit(context);
     await handleFeeBearer(context);
     await handleCardValidation(context);
