@@ -416,17 +416,10 @@
     }
 
     /**
-     * If there are multiple methods,
-     * we take the user directly to the methods screen
-     * IF
-     * contact+email optional -> don't want user to do extra steps
-     * contact+email hidden -> fields wouldn't be shown to the user
-     * contact+email readonly -> user won't be able to edit the fields
+     * If there are multple methods
+     * and no validations have failed,
+     * we take the user to the methods screen.
      */
-    if (contactEmailOptional || contactEmailHidden || contactEmailReadonly) {
-      return METHODS;
-    }
-
     return METHODS;
   }
 
