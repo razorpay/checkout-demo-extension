@@ -1,13 +1,13 @@
 async function selectPersonalizationPaymentMethod(context, optionNumber) {
-  const text = await page.evaluate(() =>
-    Array.from(
-      document.querySelectorAll('.option-title'),
-      element => element.textContent
-    )
-  );
-  const apiOption = await context.page.$x(
+  var apiOption = await context.page.$x(
     '//div[contains(@class, "option radio-option")]'
   );
+  if (apiOption == undefined) {
+    await delay(800);
+    apiOption = await context.page.$x(
+      '//div[contains(@class, "option radio-option")]'
+    );
+  }
   await apiOption[optionNumber - 1].click();
 }
 
@@ -26,7 +26,11 @@ async function verifyPersonalizationVPAText(context) {
     arrayofvpas.push('UPI - ' + rzp['4d184816'][j].vpa);
   }
   await delay(1500);
-  const paymentMethod = await context.page.$x('//div[@class="option-title"]');
+  var paymentMethod = await context.page.$x('//div[@class="option-title"]');
+  if (paymentMethod == undefined) {
+    await delay(500);
+    paymentMethod = await context.page.$x('//div[@class="option-title"]');
+  }
   for (let i = 0; i < paymentMethod.length; i++) {
     const currentPaymentMethod = paymentMethod[0];
     let paymentMethodText = await context.page.evaluate(
@@ -49,9 +53,15 @@ async function verifyPersonalizationVPAText(context) {
 
 async function selectPersonalizedCard(context) {
   await delay(1200);
-  const personalizedCard = await context.page.$x(
+  var personalizedCard = await context.page.$x(
     '//div[text() = "Use your ICICI Credit card"]'
   );
+  if (personalizedCard == undefined) {
+    await delay(700);
+    personalizedCard = await context.page.$x(
+      '//div[text() = "Use your ICICI Credit card"]'
+    );
+  }
   await personalizedCard[0].click();
 }
 

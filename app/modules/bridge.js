@@ -425,13 +425,25 @@ function backPressed(callback) {
       session.back();
     }
   } else {
-    if (isP13nListOpen(session)) {
-      hideP13nList(session);
-    } else if (CheckoutBridge && _.isFunction(CheckoutBridge[callback])) {
-      CheckoutBridge[callback]();
+    if (session.newHomeScreen && session.homeTab) {
+      if (session.homeTab.canGoBack()) {
+        session.homeTab.hideMethods();
+      } else if (CheckoutBridge && _.isFunction(CheckoutBridge[callback])) {
+        CheckoutBridge[callback]();
+      } else {
+        if (session.get('theme.close_button')) {
+          closeModal();
+        }
+      }
     } else {
-      if (session.get('theme.close_button')) {
-        closeModal();
+      if (isP13nListOpen(session)) {
+        hideP13nList(session);
+      } else if (CheckoutBridge && _.isFunction(CheckoutBridge[callback])) {
+        CheckoutBridge[callback]();
+      } else {
+        if (session.get('theme.close_button')) {
+          closeModal();
+        }
       }
     }
   }

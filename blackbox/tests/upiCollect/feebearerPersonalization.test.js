@@ -1,6 +1,4 @@
-const {
-  openCheckoutForPersonalization,
-} = require('../../actions/checkout-personalization');
+const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
@@ -23,7 +21,7 @@ describe('Basic upi payment', () => {
     };
     const preferences = makePreferences({ fee_bearer: true });
     preferences.methods.upi = true;
-    let context = await openCheckoutForPersonalization({
+    const context = await openCheckout({
       page,
       options,
       preferences,
@@ -31,7 +29,7 @@ describe('Basic upi payment', () => {
     });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, '8888888881');
-    await verifyPersonalizationVPAText;
+    await verifyPersonalizationVPAText(context);
     await selectPersonalizationPaymentMethod(context, 1);
     await submit(context);
     await handleUPIAccountValidation(context, 'dsd@okhdfcbank');

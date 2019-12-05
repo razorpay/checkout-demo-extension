@@ -3,21 +3,37 @@
   import { getSession } from 'sessionmanager';
   import Track from 'tracker';
 
+  // Actions
+  import {
+    focus as focusAction,
+    blur as blurAction,
+    input as inputAction,
+  } from 'actions/input';
+
   // Props
   export let id = '';
   export let type = 'text';
   export let name;
   export let value = null;
+  export let readonly = false;
   export let required = false;
   export let autocomplete = 'off';
+  export let icon = null;
+  export let label = '';
   export let placeholder = '';
   export let pattern = '.*';
   export let formatter = null;
   export let refresh = true;
+  export let handleFocus = false;
+  export let handleBlur = false;
+  export let handleInput = false;
   export let helpText = '';
-  export let invalid = false;
-  export let focused = false;
   export let maxlength = null;
+  export let inputmode = null;
+  export let min = null;
+  export let max = null;
+  export let elemClasses = '';
+  export let tabindex = 0;
 
   // Computed
   export let identifier;
@@ -48,6 +64,27 @@
   }
 
   $: identifier = id ? id : `id_${Track.makeUid()}`;
+  $: inputType = type === 'cvv' ? 'tel' : type;
+  $: inputmode = type === 'cvv' ? 'numeric' : inputmode;
+
+  $: {
+    const _value = value;
+
+    setTimeout(() => {
+      if (input) {
+        let event;
+
+        if (typeof global.Event === 'function') {
+          event = new global.Event('input');
+        } else {
+          event = document.createEvent('Event');
+          event.initEvent('input', true, true);
+        }
+
+        input.dispatchEvent(event);
+      }
+    });
+  }
 
   export function focus() {
     input.focus();
@@ -67,6 +104,9 @@
 </script>
 
 <style>
+  /*
+   * TODO: standardize / fix padding
+   */
   div:not(.help) {
     padding: 4px 0;
     input {
@@ -76,22 +116,43 @@
   }
 </style>
 
-<div bind:this={wrap} class="elem">
+<div bind:this={wrap} class={`elem ${elemClasses}`} class:readonly>
+  {#if icon}
+    <i>
+      {@html icon}
+    </i>
+  {/if}
   <input
     class="input"
     bind:this={input}
     id={identifier}
-    {type}
+    type={inputType}
     {name}
+    {inputmode}
     {value}
     {required}
     {autocomplete}
     {placeholder}
     {pattern}
+    {readonly}
+    {min}
+    {max}
+    {tabindex}
     use:formatterAction={formatter}
+    use:focusAction={handleFocus}
+    use:blurAction={handleBlur}
+    use:inputAction={handleInput}
     on:focus
     on:blur
-    class:no-refresh={!refresh} />
+    on:input
+    class:no-refresh={!refresh}
+    class:no-focus={handleFocus}
+    class:no-blur={handleBlur}
+    class:no-input={handleInput}
+    class:cvv-input={type === 'cvv'} />
+  {#if label}
+    <label>{label}</label>
+  {/if}
   {#if helpText}
     <div class="help">{helpText}</div>
   {/if}

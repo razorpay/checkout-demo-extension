@@ -22,9 +22,8 @@ const {
 
 describe.each(getTestData('perform card transaction'))(
   'Card tests',
-  ({ preferences, title }) => {
+  ({ preferences, title, options }) => {
     test(title, async () => {
-      const options = makeOptions();
       const context = await openCheckout({ page, options, preferences });
       await assertHomePage(context);
       await fillUserDetails(context);

@@ -93,19 +93,84 @@ module.exports = {
     await page.goto(checkoutUrl);
 
     await page.evaluate(method => {
+      const hashKey = '4d184816';
+      var upiInstruments = {};
+      var netbankingInstruments = {};
+      var qrInstruments = {};
+      var cardInstruments = {};
+      var walletInstruments = {};
+      qrInstruments[hashKey] = [
+        {
+          '_[flow]': 'intent',
+          '_[upiqr]': '1',
+          method: 'upi',
+          timestamp: 1574079022916,
+          success: true,
+          frequency: 2,
+          id: 'DhnN8SggG8Ihdy',
+        },
+      ];
+      cardInstruments[hashKey] = [
+        {
+          method: 'card',
+          token_id: 'token_9AT28Pxxe0Npi9',
+          type: 'credit',
+          issuer: 'ICIC',
+          network: 'Visa',
+          timestamp: 1574056926308,
+          success: true,
+          frequency: 1,
+          id: 'Dhh671dR688OWQ',
+        },
+      ];
+      walletInstruments[hashKey] = [
+        {
+          wallet: 'freecharge',
+          method: 'wallet',
+          timestamp: 1574081911355,
+          success: true,
+          frequency: 1,
+          id: 'DhoBzK59KicZni',
+        },
+      ];
+      upiInstruments[hashKey] = [
+        {
+          '_[flow]': 'directpay',
+          vpa: 'dsd@okhdfcbank',
+          method: 'upi',
+          timestamp: 1574063491481,
+          success: true,
+          frequency: 2,
+          id: 'Dhix6Bqn8w7td4',
+        },
+        {
+          '_[flow]': 'directpay',
+          vpa: 'dfs@okicici',
+          method: 'upi',
+          timestamp: 1574066575053,
+          success: true,
+          frequency: 1,
+          id: 'Dhjpz3w1RIGMJ1',
+        },
+      ];
+      netbankingInstruments[hashKey] = [
+        {
+          bank: 'HDFC',
+          method: 'netbanking',
+          timestamp: 1574062745851,
+          success: true,
+          frequency: 2,
+          id: 'Dhh86QTueOpyWX',
+        },
+      ];
       localStorage.setItem(
         'rzp_preffered_instruments',
         {
-          UPI:
-            '{"4d184816":[{"_[flow]":"directpay","vpa":"dsd@okhdfcbank","method":"upi","timestamp":1574063491481,"success":true,"frequency":2,"id":"Dhix6Bqn8w7td4"},{"_[flow]":"directpay","vpa":"dfs@okicici","method":"upi","timestamp":1574066575053,"success":true,"frequency":1,"id":"Dhjpz3w1RIGMJ1"}]}',
-          Netbanking:
-            '{"732ab5a9":[{"bank":"HDFC","method":"netbanking","timestamp":1574062745851,"success":true,"frequency":2,"id":"Dhh86QTueOpyWX"}],"4c184683":[{"bank":"HDFC","method":"netbanking","timestamp":1574072395307,"success":true,"frequency":1,"id":"DhlUS88dTUwBC5"}]}',
-          QR:
-            '{"4b1844f0":[{"_[flow]":"intent","_[upiqr]":"1","method":"upi","timestamp":1574079022916,"success":true,"frequency":2,"id":"DhnN8SggG8Ihdy"}]}',
-          Card:
-            '{"4d184816": [{"method": "card","token_id": "token_9AT28Pxxe0Npi9","type": "credit","issuer": "ICIC","network": "Visa","timestamp": 1574056926308,"success": true,"frequency": 1,"id": "Dhh671dR688OWQ"}]}',
-          Wallet:
-            '{"51184e62":[{"wallet":"freecharge","method":"wallet","timestamp":1574081911355,"success":true,"frequency":1,"id":"DhoBzK59KicZni"}]}',
+          UPI: JSON.stringify(upiInstruments),
+          Netbanking: JSON.stringify(netbankingInstruments),
+          QR: JSON.stringify(qrInstruments),
+          Card: JSON.stringify(cardInstruments),
+          Wallet: JSON.stringify(walletInstruments),
         }[method]
       );
     }, method);

@@ -54,20 +54,6 @@
     return `${text.substring(0, till - 3)}...`;
   }
 
-  /**
-   * Turns word into capital-case
-   * @param {string} word
-   *
-   * @returns {string}
-   */
-  function capitalizeWord(word) {
-    if (word.length) {
-      return `${word[0].toUpperCase()}${word.slice(1)}`;
-    }
-
-    return word;
-  }
-
   onMount(() => {
     /**
      * Force p13n for international card+paypal
@@ -242,7 +228,7 @@
 
                 text = `Use your${
                   bankName ? ` ${bankText}` : ''
-                } ${capitalizeWord(instrument.type || '')} card`;
+                } ${_Str.toTitleCase(instrument.type || '')} card`;
 
                 if (instrument.network && instrument.network !== 'unknown') {
                   icon = `.networkicon.${findCodeByNetworkName(
@@ -265,7 +251,7 @@
                 bankName &&
                 trimText(bankName.replace(/ Bank$/, ''), card.type ? 14 : 19);
 
-              text = `${bankName ? `${bankText} ` : ''}${capitalizeWord(
+              text = `${bankName ? `${bankText} ` : ''}${_Str.toTitleCase(
                 card.type || ''
               )} card - ${card.last4}`;
 
