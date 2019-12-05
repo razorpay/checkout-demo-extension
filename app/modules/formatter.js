@@ -256,6 +256,18 @@ formatterProto.setValue = function(value) {
   this.value = value;
 };
 
+function dispatchInput(element) {
+  let event;
+  if (typeof global.Event === 'function') {
+    event = new global.Event('input');
+  } else {
+    event = document.createEvent('Event');
+    event.initEvent('input', true, true);
+  }
+
+  element.dispatchEvent(event);
+}
+
 formatterProto.oninput = function() {
   this.emit('change');
 };
@@ -363,6 +375,7 @@ formatterProto.run = function(values) {
 
   if (oldValue !== this.value) {
     this.oninput();
+    dispatchInput(this.el);
   }
 };
 

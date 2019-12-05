@@ -38,7 +38,8 @@
     "jest": "jest blackbox/tests --testTimeout=30000",
     "test": "npm run test:unit && npm run build && jest blackbox/tests --testTimeout=30000",
     "build": "$ rollup -c --environment prod && $ gulp && $ lintOutput app/js/generated/entry",
-    "start": "$ gulp watch"
+    "start": "$ gulp watch",
+    "clean": "$ ./scripts/clean.sh"
   },
   "bugs": {
     "url": "https://github.com/razorpay/checkout/issues"
@@ -66,6 +67,7 @@
   "private": true,
   "devDependencies": {
     "husky": "^1.0.0-rc.14",
+    "jest-circus": "^24.9.0",
     "prettier": "^1.18.2",
     "prettier-plugin-svelte": "^0.7.0",
     "pretty-quick": "^2.0.0"

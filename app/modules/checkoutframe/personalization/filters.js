@@ -1,4 +1,5 @@
 import { VPA_REGEX } from 'common/constants';
+import { doesAppExist } from 'common/upi';
 import DowntimesStore from 'checkoutstore/downtimes';
 
 /**
@@ -46,32 +47,31 @@ const METHOD_FILTERS = {
  *
  * @returns {Array}
  */
-export function filterInstrumentsForAvailableMethods(
-  instruments,
-  availableMethods
-) {
-  // TODO: Move Downtime logic to this function
+export const filterInstrumentsForAvailableMethods = _.curry2(
+  (instruments, availableMethods) => {
+    // TODO: Move Downtime logic to this function
 
-  const allowed = _Arr.filter(instruments, instrument => {
-    let { method } = instrument;
+    const allowed = _Arr.filter(instruments, instrument => {
+      let { method } = instrument;
 
-    if (instrument['_[upiqr]']) {
-      method = 'qr';
-    }
-
-    if (availableMethods[method]) {
-      if (METHOD_FILTERS[method]) {
-        return METHOD_FILTERS[method](instrument, availableMethods);
+      if (instrument['_[upiqr]']) {
+        method = 'qr';
       }
 
-      return true;
-    }
+      if (availableMethods[method]) {
+        if (METHOD_FILTERS[method]) {
+          return METHOD_FILTERS[method](instrument, availableMethods);
+        }
 
-    return false;
-  });
+        return true;
+      }
 
-  return allowed;
-}
+      return false;
+    });
+
+    return allowed;
+  }
+);
 
 const SANITY_FILTERS = {
   upi: instrument => {
@@ -133,6 +133,31 @@ export function filterInstrumentsForDowntime(instruments) {
 }
 
 /**
+ * Returns the list of instruments filtered for available UPI apps
+ * @param {Array} instruments List of instruments
+ * @param {Array} apps List of UPI apps
+ *
+ * @returns {Array}
+ */
+const filterInstrumentsByAvailableUpiApps = _.curry2((instruments, apps) => {
+  return _Arr.filter(instruments, instrument => {
+    if (instrument.method !== 'upi') {
+      return true;
+    }
+
+    if (instrument['_[flow]'] !== 'intent') {
+      return true;
+    }
+
+    if (instrument['_[upiqr]'] === '1') {
+      return true;
+    }
+
+    return doesAppExist(instrument.upi_app, apps);
+  });
+});
+
+/**
  * Filters instruments for
  * - Sanity
  * - Downtime
@@ -140,17 +165,15 @@ export function filterInstrumentsForDowntime(instruments) {
  * @param {Object} params
  *  @prop {Array} instruments
  *  @prop {Object} methods
+ *  @prop {Array} upiApps List of UPI apps on the device
  *
  * @returns {Array} filtered instruments
  */
-export function filterInstruments({ instruments, methods }) {
-  const filteredByMethods = filterInstrumentsForAvailableMethods(
-    instruments,
-    methods
-  );
-
+export function filterInstruments({ instruments, methods, upiApps = [] }) {
   return (
-    filteredByMethods
+    instruments
+    |> filterInstrumentsForAvailableMethods(methods)
+    |> filterInstrumentsByAvailableUpiApps(upiApps)
     |> filterInstrumentsForSanity
     |> filterInstrumentsForDowntime
   );

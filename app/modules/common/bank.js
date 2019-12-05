@@ -1,4 +1,4 @@
-import { RazorpayConfig } from 'common/Razorpay';
+import RazorpayConfig from 'common/RazorpayConfig';
 
 // const cdnUrl = '';
 const cdnUrl = RazorpayConfig.cdn;

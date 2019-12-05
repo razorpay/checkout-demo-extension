@@ -1,10 +1,10 @@
 import 'entry/checkout-frame';
 import {
-  RazorpayConfig,
   makeAuthUrl,
   makePrefParams,
   validateOverrides,
 } from 'common/Razorpay';
+import RazorpayConfig from 'common/RazorpayConfig';
 
 import Track from 'tracker';
 import Analytics from 'analytics';
@@ -57,6 +57,7 @@ import SessionStore from 'checkoutstore/session';
 import DowntimesStore from 'checkoutstore/downtimes';
 import * as OTPScreenStore from 'checkoutstore/screens/otp';
 import * as Cta from 'checkoutstore/cta';
+import * as HomeScreenStore from 'checkoutstore/screens/home';
 
 import QRScreen from 'templates/views/qr.svelte';
 import BankTransferScreen from 'templates/views/bank_transfer.svelte';
@@ -65,6 +66,7 @@ import emiOptionsView from 'templates/screens/cardlessemi.svelte';
 import emiScreenView from 'templates/screens/emiscreen.svelte';
 import SavedCardsView from 'templates/screens/savedcards.svelte';
 import PayLaterView from 'templates/screens/paylater.svelte';
+import HomeTab from 'templates/tabs/home.svelte';
 import NetbankingTab from 'templates/tabs/netbanking/index.svelte';
 import NachScreen from 'templates/views/nach.svelte';
 
@@ -129,6 +131,7 @@ export default {
   DowntimesStore,
   SessionStore,
   OTPScreenStore,
+  HomeScreenStore,
   Cta,
 
   getQueryParams: _.getQueryParams,
@@ -157,6 +160,7 @@ export default {
   BankTransferScreen,
   getFullBankLogo,
 
+  HomeTab,
   UpiTab,
   NetbankingTab,
   NachScreen,
