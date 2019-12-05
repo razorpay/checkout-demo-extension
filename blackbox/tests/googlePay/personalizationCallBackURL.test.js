@@ -3,7 +3,7 @@ const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
-  verifyPersonalizationPaymentMethodsText,
+  verifyPersonalizationText,
   submit,
   handleUPIAccountValidation,
   selectPersonalizationPaymentMethod,
@@ -29,11 +29,7 @@ describe('GooglePay with Personalization  payment', () => {
     });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, '8888888881');
-    await verifyPersonalizationPaymentMethodsText(
-      context,
-      'UPI',
-      'UPI - dsd@okhdfcbank'
-    );
+    await verifyPersonalizationText(context, 'upi');
     await selectPersonalizationPaymentMethod(context, '1');
     await submit(context);
     await handleUPIAccountValidation(context, 'dsd@okhdfcbank');

@@ -3,7 +3,7 @@ const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
-  verifyPersonalizationPaymentMethodsText,
+  verifyPersonalizationText,
   submit,
   respondToUPIPaymentStatus,
   respondToUPIAjax,
@@ -29,7 +29,7 @@ describe('QR Scanner with Personalization  payment', () => {
     });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, '8888888881');
-    await verifyPersonalizationPaymentMethodsText(context, 'QR', 'UPI QR');
+    await verifyPersonalizationText(context, 'qr');
     await selectPersonalizationPaymentMethod(context, '1');
     await submit(context);
     await respondToUPIAjax(context, { method: 'qr' });

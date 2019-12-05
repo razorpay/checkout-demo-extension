@@ -3,7 +3,7 @@ const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
-  verifyPersonalizationPaymentMethodsText,
+  verifyPersonalizationText,
   submit,
   passRequestNetbanking,
   handleMockSuccessDialog,
@@ -27,11 +27,7 @@ describe('Basic Netbanking with Personalization', () => {
     });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, '8888888881');
-    await verifyPersonalizationPaymentMethodsText(
-      context,
-      'Netbanking',
-      'Netbanking - HDFC Bank'
-    );
+    await verifyPersonalizationText(context, 'netbanking');
     await selectPersonalizationPaymentMethod(context, '1');
     await submit(context);
     await handleFeeBearer(context);

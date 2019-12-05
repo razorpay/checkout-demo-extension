@@ -3,7 +3,7 @@ const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
-  verifyPersonalizationPaymentMethodsText,
+  verifyPersonalizationText,
   submit,
   expectRedirectWithCallback,
   selectPersonalizationPaymentMethod,
@@ -28,11 +28,7 @@ describe('Wallet with Personalization  payment', () => {
     });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, '8888888881');
-    await verifyPersonalizationPaymentMethodsText(
-      context,
-      'Wallet',
-      'Wallet - Freecharge'
-    );
+    await verifyPersonalizationText(context, 'wallet');
     await selectPersonalizationPaymentMethod(context, '1');
     await submit(context);
     await expectRedirectWithCallback(context, {
