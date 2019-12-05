@@ -3,6 +3,8 @@ import Eventer from 'eventer';
 import Track from 'tracker';
 import CheckoutOptions, { flatten, RazorpayDefaults } from 'common/options';
 import * as AnalyticsTypes from 'analytics-types';
+import { formatPayload } from 'payment/validator';
+import RazorpayConfig from 'common/RazorpayConfig';
 
 import {
   supportedCurrencies,
@@ -10,17 +12,6 @@ import {
   getCurrencyConfig,
   formatAmountWithSymbol,
 } from 'common/currency';
-
-export const RazorpayConfig = {
-  api: 'https://api.razorpay.com/',
-  version: 'v1/',
-  frameApi: '/',
-  cdn: 'https://cdn.razorpay.com/',
-};
-
-try {
-  _Obj.extend(RazorpayConfig, global.Razorpay.config);
-} catch (e) {}
 
 export function makeUrl(path = '') {
   return RazorpayConfig.api + RazorpayConfig.version + path;
@@ -201,6 +192,31 @@ RazorProto.isLiveMode = function() {
     (!preferences && /^rzp_l/.test(this.get('key'))) ||
     (preferences && preferences.mode === 'live')
   );
+};
+
+/**
+ * Used for calculating the fees for the payment.
+ * Resolves and rejects with a JSON.
+ * @param {payload} Object
+ *
+ * @returns {Promise}
+ */
+RazorProto.calculateFees = function(payload) {
+  return new Promise((resolve, reject) => {
+    payload = formatPayload(payload, this);
+
+    fetch.post({
+      url: makeUrl('payments/calculate/fees'),
+      data: payload,
+      callback: function(response) {
+        if (response.error) {
+          return reject(response);
+        } else {
+          return resolve(response);
+        }
+      },
+    });
+  });
 };
 
 function isValidAmount(amt, min = 100) {

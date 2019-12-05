@@ -1,6 +1,4 @@
-const {
-  openCheckoutForPersonalization,
-} = require('../../actions/checkout-personalization');
+const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
@@ -10,7 +8,7 @@ const {
   enterCardDetails,
   handleCardValidation,
   handleMockFailureDialog,
-  retryCardTransaction,
+  retryTransaction,
   handleMockSuccessDialog,
 } = require('../../actions/common');
 
@@ -22,7 +20,7 @@ describe('Card tests', () => {
       personalization: true,
     };
     const preferences = makePreferences();
-    let context = await openCheckoutForPersonalization({
+    const context = await openCheckout({
       page,
       options,
       preferences,
@@ -36,7 +34,7 @@ describe('Card tests', () => {
     await handleCardValidation(context);
     await handleMockFailureDialog(context);
     // await verifyErrorMessage(context, 'The payment has already been processed');
-    await retryCardTransaction(context);
+    await retryTransaction(context);
     await submit(context);
 
     await handleCardValidation(context);

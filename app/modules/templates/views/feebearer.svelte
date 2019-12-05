@@ -6,7 +6,6 @@
   import AsyncLoading from 'templates/views/ui/AsyncLoading.svelte';
 
   // Utils imports
-  import { createFees } from 'payment';
   import { formatAmountWithSymbol } from 'common/currency';
   import { getSession } from 'sessionmanager';
 
@@ -40,7 +39,10 @@
 
     loading = true;
 
-    createFees(paymentData, session.r, onSuccess, onError);
+    session.r
+      .calculateFees(paymentData)
+      .then(onSuccess)
+      .catch(onError);
   }
 
   export function makeFeesTable(response) {

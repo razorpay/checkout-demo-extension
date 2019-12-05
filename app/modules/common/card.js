@@ -1,4 +1,4 @@
-import { RazorpayConfig } from 'common/Razorpay';
+import RazorpayConfig from 'common/RazorpayConfig';
 
 export const networks = {
   amex: 'American Express',

@@ -1,4 +1,4 @@
-import { RazorpayConfig } from 'common/Razorpay';
+import RazorpayConfig from 'common/RazorpayConfig';
 
 const cdnUrl = RazorpayConfig.cdn;
 
@@ -8,6 +8,9 @@ const sqPrefix = cdnUrl + 'paylater-sq/';
 const config = {
   epaylater: {
     name: 'ePayLater',
+  },
+  getsimpl: {
+    name: 'Simpl',
   },
 };
 
