@@ -4,7 +4,7 @@ const {
   selectWallet,
   assertWalletPage,
   submit,
-  typeOTPandSubmit,
+  verifyErrorMessage,
   handleOtpVerification,
   handleValidationRequest,
   retryWalletTransaction,
@@ -12,8 +12,8 @@ const {
 } = require('../../../actions/common');
 
 const {
-  assertBasicDetailsScreen,
-  fillUserDetails,
+  assertMethodsScreen,
+  assertMissingDetails,
   proceed,
   assertUserDetails,
   assertPaymentMethods,
@@ -34,23 +34,15 @@ describe.skip('Basic wallet payment', () => {
       options,
       preferences,
     });
-    // await assertBasicDetailsScreen(context);
-    // await fillUserDetails(context);
-    // await proceed(context);
-    // await assertUserDetails(context);
-    // await assertEditUserDetailsAndBack(context);
+    await assertMethodsScreen(context);
+    await assertMissingDetails(context);
+
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'wallet');
     await assertWalletPage(context);
     await selectWallet(context, 'freecharge');
     await submit(context);
-    await handleOtpVerification(context);
-    await typeOTPandSubmit(context);
-
-    await handleValidationRequest(context, 'fail');
-    await retryWalletTransaction(context);
-
-    await submit(context);
-    await handleWalletPopUp(context);
+    await context.popup();
+    await verifyErrorMessage(context, 'The email field is required.');
   });
 });
