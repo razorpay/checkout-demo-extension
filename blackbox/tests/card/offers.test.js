@@ -11,7 +11,7 @@ const {
   handleCardValidation,
   handleMockFailureDialog,
   verifyErrorMessage,
-  retryCardTransaction,
+  retryTransaction,
   handleMockSuccessDialog,
   viewOffers,
   selectOffer,
@@ -75,7 +75,7 @@ describe.each(
     await handleCardValidation(context);
     await handleMockFailureDialog(context);
     await verifyErrorMessage(context, 'The payment has already been processed');
-    await retryCardTransaction(context);
+    await retryTransaction(context);
     await submit(context);
     await verifyOfferApplied(context);
     await verifyDiscountPaybleAmount(context, '₹ 1,980');

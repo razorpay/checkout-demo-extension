@@ -85,11 +85,6 @@ async function enterCardDetails(context, { cardType, nativeOtp = false } = {}) {
   await context.page.type('#card_cvv', '112');
 }
 
-async function retryCardTransaction(context) {
-  const retryButton = await context.page.waitForSelector('#fd-hide');
-  await retryButton.click();
-}
-
 async function handleCustomerCardStatusRequest(context, cardType) {
   const req = await context.expectRequest();
   expect(req.url).toContain('customers/status');
@@ -118,7 +113,7 @@ async function respondSavedCards(context) {
             last4: '1111',
             network: 'Visa',
             type: 'debit',
-            issuer: null,
+            issuer: 'ICIC',
             international: false,
             emi: false,
             expiry_month: 12,
@@ -152,7 +147,6 @@ module.exports = {
   handleCardValidation,
   handleCardValidationForNativeOTP,
   handleBankRequest,
-  retryCardTransaction,
   handleCustomerCardStatusRequest,
   respondSavedCards,
   selectSavedCardAndTypeCvv,
