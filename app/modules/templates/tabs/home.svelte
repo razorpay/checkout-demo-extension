@@ -47,6 +47,18 @@
   const methods = session.methods;
   const icons = session.themeMeta.icons;
   const order = session.order || {};
+
+  // TPV
+  const multiTpv = session.multiTpv;
+  const onlyUpiTpv = session.upiTpv;
+  const onlyNetbankingTpv = session.tpvBank && !onlyUpiTpv && !multiTpv;
+  const isTpv = multiTpv || onlyUpiTpv || onlyNetbankingTpv;
+
+  // Offers
+  const hasOffersOnHomescreen =
+    session.hasOffers &&
+    _Arr.any(session.eligibleOffers, offer => offer.homescreen);
+
   const {
     isPartialPayment,
     prefill,
@@ -68,6 +80,7 @@
   let showSecuredByMessage;
   $: showSecuredByMessage =
     view === 'details' &&
+    !hasOffersOnHomescreen &&
     !session.multiTpv &&
     !session.tpvBank &&
     !isPartialPayment &&
@@ -77,6 +90,10 @@
     view = 'methods';
 
     onShown();
+
+    Analytics.track('home:methods:show', {
+      type: AnalyticsTypes.BEHAV,
+    });
   }
 
   export function canGoBack() {
@@ -118,6 +135,10 @@
     view = 'details';
 
     setDetailsCta();
+
+    Analytics.track('home:methods:hide', {
+      type: AnalyticsTypes.BEHAV,
+    });
   }
 
   export function setDetailsCta() {
@@ -138,8 +159,30 @@
             session,
           })
       );
+    } else if (isTpv) {
+      let _method;
+      if (onlyNetbankingTpv) {
+        _method = 'netbanking';
+      } else if (onlyUpiTpv) {
+        _method = 'upi';
+      } else if (multiTpv) {
+        _method = $multiTpvOption;
+      }
+
+      showCtaWithText(
+        'Pay by ' +
+          getMethodNameForPaymentOption(_method, {
+            session,
+          })
+      );
     } else {
       showCtaWithText('Proceed');
+    }
+  }
+
+  $: {
+    if ($multiTpvOption) {
+      setDetailsCta();
     }
   }
 
@@ -347,6 +390,11 @@
   }
 
   view = determineLandingView();
+  Analytics.track('home:landing', {
+    data: {
+      view,
+    },
+  });
 
   export function next() {
     // Multi TPV
@@ -439,7 +487,7 @@
   }
 
   function selectMethod(event) {
-    Analytics.track('p13:method:select', {
+    Analytics.track('payment_method:select', {
       type: AnalyticsTypes.BEHAV,
       data: event.detail,
     });
@@ -459,16 +507,20 @@
     }
   }
 
-  export function shouldShowNext() {
+  export function shouldGoNext() {
     if (session.oneMethod === 'paypal') {
       return false;
     }
 
-    if ($multiTpvOption === 'netbanking' && session.multiTpv) {
-      return false;
+    if (multiTpv) {
+      if ($multiTpvOption === 'netbanking') {
+        return false;
+      } else {
+        return true;
+      }
     }
 
-    if (!session.multiTpv && session.tpvBank) {
+    if (onlyNetbankingTpv) {
       return false;
     }
 

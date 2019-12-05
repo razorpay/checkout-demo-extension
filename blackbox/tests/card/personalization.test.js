@@ -1,39 +1,43 @@
-const { openCheckoutForPersonalization } = require('../../actions/checkout');
+const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
-  assertPaymentMethodsPersonalization,
+  selectPersonalizedCard,
   submit,
-  respondToUPIAjax,
-  respondToUPIPaymentStatus,
+  enterCardDetails,
+  handleCardValidation,
+  handleMockFailureDialog,
+  retryTransaction,
+  handleMockSuccessDialog,
 } = require('../../actions/common');
 
-describe.skip('Basic QR Scanner with Personalization', () => {
-  test('Perform QR Scanner with Personalization transaction', async () => {
+describe('Card tests', () => {
+  test('perform card transaction with personalization', async () => {
     const options = {
-      key: 'rzp_test_VwsqHDsQPoVQi6',
-      amount: 60000,
+      key: 'rzp_test_1DP5mmOlF5G5ag',
+      amount: 200,
+      personalization: true,
     };
     const preferences = makePreferences();
-    preferences.methods.upi = true;
-
-    const context = await openCheckoutForPersonalization({
+    const context = await openCheckout({
       page,
       options,
       preferences,
-      method: 'Cards',
+      method: 'Card',
     });
-
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true, '8888888885');
-    await assertPaymentMethodsPersonalization(context);
+    await fillUserDetails(context, '8888888881');
+    await selectPersonalizedCard(context);
+    await enterCardDetails(context);
     await submit(context);
-    console.log('submit done');
-    await respondToUPIAjax(context, '');
-    console.log('respondToUPIAjax done');
+    await handleCardValidation(context);
+    await handleMockFailureDialog(context);
+    // await verifyErrorMessage(context, 'The payment has already been processed');
+    await retryTransaction(context);
+    await submit(context);
 
-    await respondToUPIPaymentStatus(context);
-    console.log('respondToUPIAjax done');
+    await handleCardValidation(context);
+    await handleMockSuccessDialog(context);
   });
 });

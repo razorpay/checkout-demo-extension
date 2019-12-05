@@ -3544,7 +3544,11 @@ Session.prototype = {
       showPaybtn = Boolean(selectedInstrument);
     }
 
-    this.body.toggleClass('sub', showPaybtn);
+    if (screen === '' && this.newHomeScreen && this.homeTab) {
+      this.homeTab.onShown();
+    } else {
+      this.body.toggleClass('sub', showPaybtn);
+    }
 
     if (screen === 'upi') {
       var isIntentFlow = this.upiTab.intent;
@@ -3873,7 +3877,9 @@ Session.prototype = {
     $('#content').removeClass('has-discount');
     //TODO: optimise queries
     $('#amount .discount').html('');
-    Cta.showAmountInCta();
+    if (!(this.tab === '' && this.newHomeScreen)) {
+      Cta.showAmountInCta();
+    }
   },
   back: function(confirmedCancel) {
     var tab = '';
@@ -5479,7 +5485,7 @@ Session.prototype = {
       if (this.checkCommonValid()) {
         // switch to methods tab
         if (this.homeTab.onDetailsScreen()) {
-          if (this.homeTab.shouldShowNext()) {
+          if (this.homeTab.shouldGoNext()) {
             return this.homeTab.next();
           }
         }
@@ -6031,7 +6037,7 @@ Session.prototype = {
       delete data.contact;
     }
 
-    if (data.method === 'paylater') {
+    if (data.provider === 'epaylater') {
       if (data.contact) {
         if (!data.ott) {
           this.submitPayLater();
