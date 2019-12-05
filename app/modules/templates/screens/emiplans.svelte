@@ -1,85 +1,131 @@
-<div id="form-emiplans" class="tab-content showable screen pad vertical-pad">
-  <h3>Select an EMI Plan</h3>
+<script>
+  // UI imports
+  import Callout from 'templates/views/ui/Callout.svelte';
+  import EmiPlanCard from 'templates/tabs/emiplans/emiplancard.svelte';
 
-  <div class="emi-plans-list expandable-card-list">
-    {#each plans as plan, index}
-      <ExpandableCard
-        badge={plan.badge}
-        detail={plan.detail}
-        expanded={index === expanded}
-        title={plan.text}
+  // Props
+  export let actions;
+  export let branding = null;
+  export let expanded = -1;
+  export let plans;
+  export let amount;
+  export let provider = null;
+  export let on = {};
 
-        on:click="expand(index)"
-      />
-    {/each}
-  </div>
+  // Computed
+  export let showActions;
+  export let hasCallout;
 
-  <div
-    class="emi-plans-actions actionlink-container"
+  $: showActions = actions && _Obj.keys(actions).length;
 
-    class:hidden="!showActions"
-  >
-    {#if actions.viewAll}
-      <div class="actionlink theme-highlight" on:click="invoke('viewAll', event)">View all EMI Plans</div>
-    {/if}
-    {#if actions.payWithoutEmi}
-      <div class="actionlink theme-highlight" on:click="invoke('payWithoutEmi', event)">Pay without EMI</div>
-    {/if}
-  </div>
-  {#if actions.showAgreement && expanded >= 0}
-    <div class="callout drishy" on:click="invoke('viewAgreement', event)">
-      <span>&#x2139;</span>
-      By clicking on Pay, you agree to the terms of our&nbsp;
-      <span class="theme-highlight">Loan Agreement</span>
-    </div>
-  {/if}
-</div>
+  $: {
+    const hasBranding = Boolean(branding);
+    const hasAgreement = actions.showAgreement && expanded >= 0;
+
+    hasCallout = hasBranding || hasAgreement;
+  }
+
+  export function expand(index) {
+    expanded = index;
+
+    invoke('select', {
+      detail: plans[index],
+    });
+  }
+
+  export function invoke(type, event) {
+    if (on[type]) {
+      on[type](event);
+    }
+  }
+</script>
 
 <style>
   .actionlink-container {
     margin: 12px 0;
   }
+
+  :global(.emi-branding-callout) {
+    padding-left: 12px !important;
+    background: white !important;
+
+    img {
+      max-height: 24px;
+    }
+  }
+
+  .has-callout {
+    padding-bottom: 64px;
+  }
+
+  :global(.mobile) {
+    .has-callout {
+      padding-bottom: 120px;
+    }
+  }
+  .sanitized h3 {
+    text-transform: none;
+    color: black;
+  }
 </style>
 
-<script>
-  export default {
-    components: {
-      ExpandableCard: 'templates/views/ui/ExpandableCard.svelte',
-    },
+<div
+  id="form-emiplans"
+  class="tab-content showable screen pad vertical-pad"
+  class:has-callout={hasCallout}>
+  {#if plans.length}
+    <h3>Select an EMI Plan</h3>
+  {:else}
+    <div class="sanitized">
+      <h3>
+        There is a mismatch between the selected offer and entered card details.
+      </h3>
+      <h3>Please go back and select a different offer or card.</h3>
+    </div>
+  {/if}
 
-    computed: {
-      showActions: ({ actions }) => actions && _Obj.keys(actions).length,
-    },
+  <div class="emi-plans-list expandable-card-list">
+    {#each plans as plan, index}
+      <EmiPlanCard
+        {plan}
+        expanded={index === expanded}
+        {amount}
+        {provider}
+        on:click={() => expand(index)} />
+    {/each}
+  </div>
 
-    data: function () {
-      return {
-        expanded: -1,
-      };
-    },
+  <div
+    class="emi-plans-actions actionlink-container"
+    class:hidden={!showActions}>
+    {#if actions.viewAll}
+      <div
+        class="actionlink theme-highlight"
+        on:click={event => invoke('viewAll', event)}>
+        View all EMI Plans
+      </div>
+    {/if}
+    {#if actions.payWithoutEmi}
+      <div
+        class="actionlink theme-highlight"
+        on:click={event => invoke('payWithoutEmi', event)}>
+        Pay entire amount
+      </div>
+    {/if}
+  </div>
+  {#if actions.showAgreement && expanded >= 0}
+    <div
+      class="callout drishy"
+      on:click={event => invoke('viewAgreement', event)}>
+      <span>&#x2139;</span>
+      By clicking on Pay, you agree to the terms of our&nbsp;
+      <span class="theme-highlight">Loan Agreement</span>
+    </div>
+  {/if}
 
-    methods: {
-      expand: function (index) {
-        this.set({
-          expanded: index
-        });
-
-        const {
-          on = {},
-          plans
-        } = this.get();
-
-        this.invoke('select', plans[index]);
-      },
-
-      invoke: function (type, event) {
-        const {
-          on = {},
-        } = this.get();
-
-        if (on[type]) {
-          on[type](event);
-        }
-      },
-    },
-  }
-</script>
+  {#if branding}
+    <Callout classes={['emi-branding-callout']} showIcon={false}>
+      <img src={branding} alt={provider} />
+    </Callout>
+  {/if}
+</div>

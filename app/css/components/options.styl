@@ -4,8 +4,10 @@
   overflow: hidden;
   overflow-y: auto;
   background: #fff;
-  margin-left: -12px;
-  margin-right: -12px;
+
+  &:not(.options-no-margin)
+    margin-left: -12px;
+    margin-right: -12px;
 
   .option
     border: 1px solid #E6E7E8;
@@ -19,6 +21,7 @@
     cursor: pointer;
     text-align: left;
     position: relative;
+    transform: translate3d(0, 0, 0);
 
     .option-icon
       position: absolute;
@@ -56,18 +59,20 @@
 
       &:after
         content: '\e604';
-        transform: rotate(180deg);
         font-size: 10px;
         position: absolute;
         right: 16px;
-        top: 14px;
+        top: 50%;
+        transform: translateY(-50%) rotate(180deg);
+        margin-top: 0.2em;
 
       &.up-arrow::after
-        transform: rotate(90deg);
+        transform: translateY(-50%) rotate(90deg);
+        margin-top: 0;
 
       &.down-arrow::after
-        transform: rotate(270deg);
-        top: 10px;
+        transform: translateY(-50%) rotate(270deg);
+        margin-top: 0;
 
       .option-title,
       .option-arrow-text
@@ -108,3 +113,18 @@
         padding: 5px;
         width: 26px;
         border-bottom: 1px solid #ccc;
+
+    &.radio-option.reverse
+      padding-left: 16px;
+
+      &.has-icon
+        padding-right: 48px;
+
+      .option-icon
+        left: unset;
+        right: 14px;
+
+      .input-radio
+        float: left;
+        margin-top: -2px;
+        margin-right: 4px;

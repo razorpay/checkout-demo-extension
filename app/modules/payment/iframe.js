@@ -20,7 +20,11 @@ export default function Iframe(src, name, payment) {
     |> _El.addClass('payment-frame')
     |> _El.setContents(
       frameHtml(
-        displayAmount(payment.r, razorpayOptions.amount),
+        displayAmount(
+          payment.r,
+          razorpayOptions.amount,
+          razorpayOptions.currency
+        ),
         razorpayOptions.name || razorpayOptions.description
       )
     )

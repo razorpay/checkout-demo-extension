@@ -54,11 +54,17 @@ export const TAB_TITLES = {
   emandate: 'Bank Account',
   emi: 'EMI',
   emiplans: 'EMI Plans',
+  nach: 'NACH',
   netbanking: 'Netbanking',
-  qr: 'QR',
+  paylater: 'Pay Later',
+  paypal: 'PayPal',
+  qr: 'UPI QR',
   upi: 'UPI',
-  tez: 'Google Pay',
+  gpay: 'Google Pay',
   wallet: 'Wallet',
+  payout_account: 'Add Bank Account',
+  payout_upi: 'Add UPI ID',
+  bank_transfer: 'Bank Transfer',
 };
 
 /* .shown has display: none from iOS ad-blocker
@@ -77,7 +83,6 @@ export const cookieDisabled = !navigator.cookieEnabled;
 export const isIframe = global !== global.parent;
 export const ownerWindow = isIframe ? global.parent : global.opener;
 
-export const AMEX_EMI_MIN = 5000 * 100 - 1;
 export const EMI_HELP_TEXT =
   'EMI is available on HDFC, ICICI, RBL, Kotak, IndusInd, Yes Bank, ' +
   'Standard Chartered and Axis Bank Credit Cards. Enter your credit card ' +
@@ -85,12 +90,29 @@ export const EMI_HELP_TEXT =
 
 // Change this when running experiment 2 for Debit + Pin: Select ATM PIN by default.
 export const DEFAULT_AUTH_TYPE_RADIO = '3ds';
-export const TIMEOUT_MAGIC_NO_ACTION = 30000;
 
 export const STRINGS = {
   process: 'Your payment is being processed',
   redirect: 'Redirecting to Bank page',
 };
 
+/* Being used for filtering actual methods from methods object */
+export const AVAILABLE_METHODS = [
+  'card',
+  'netbanking',
+  'wallet',
+  'upi',
+  'gpay',
+  'emi',
+  'cardless_emi',
+  'qr',
+  'paylater',
+  'paypal',
+  'bank_transfer',
+  'nach',
+];
+
 /* VPA regex, copied from API */
-export const VPA_REGEX = /^[a-z0-9][a-z0-9.-]{2,}@[a-zA-Z]+$/;
+export const VPA_REGEX = /^[a-z0-9][a-z0-9.-]{2,}@[a-z]+$/i;
+
+export const NO_PAYMENT_ADAPTER_ERROR = 'Payment Adapter does not exist.';

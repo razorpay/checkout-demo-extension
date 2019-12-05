@@ -10,47 +10,39 @@ const UPI_APPS = {
    */
   preferred: [
     {
-      package_name: 'in.org.npci.upiapp',
+      app_name: 'Google Pay (Tez)',
+      package_name: GOOGLE_PAY_PACKAGE_NAME,
+      app_icon: 'https://cdn.razorpay.com/checkout/gpay.png',
+      /**
+       * Call CheckoutBridge to verify that the user is registered on the app
+       * and only display if they are.
+       */
+      verify_registration: true,
     },
     {
       package_name: 'com.phonepe.app',
       app_icon: 'https://cdn.razorpay.com/checkout/phonepe.png',
     },
     {
-      app_name: 'Google Pay (Tez)',
-      package_name: GOOGLE_PAY_PACKAGE_NAME,
-      app_icon: 'https://cdn.razorpay.com/checkout/gpay.png',
-    },
-  ],
-
-  /**
-   * Apps for which we should have a second factor of confirmation,
-   * because these apps are very common but the user might not be registered for UPI on these apps.
-   */
-  secondfactor: [
-    {
       name: 'PayTM',
       app_name: 'PayTM UPI',
       package_name: 'net.one97.paytm',
     },
     {
-      name: 'WhatsApp',
-      app_name: 'WhatsApp UPI',
-      package_name: 'com.whatsapp',
-      app_icon: 'https://cdn.razorpay.com/checkout/whatsapp.png',
-    },
-    {
-      name: 'WhatsApp Business',
-      app_name: 'WhatsApp Business UPI',
-      package_name: 'com.whatsapp.w4b',
+      package_name: 'in.org.npci.upiapp',
     },
   ],
 
   /**
    * Whitelisted apps.
-   * Should not contain any apps that are mentioned in preferred or secondfactor.
+   * Should not contain any apps that are mentioned in preferred.
    */
   whitelist: [
+    {
+      name: 'WhatsApp Business',
+      app_name: 'WhatsApp Business UPI',
+      package_name: 'com.whatsapp.w4b',
+    },
     {
       package_name: 'com.csam.icici.bank.imobile',
     },
@@ -160,8 +152,19 @@ const UPI_APPS = {
       package_name: 'com.SIBMobile',
     },
     {
-      package_name: 'com.truecaller',
-      verify_registration: true,
+      package_name: 'in.amazon.mShop.android.shopping',
+    },
+    {
+      package_name: 'com.mipay.wallet.in',
+    },
+    {
+      package_name: 'com.dreamplug.androidapp',
+    },
+    {
+      package_name: 'in.bajajfinservmarkets.app',
+    },
+    {
+      package_name: 'in.bajajfinservmarkets.app.uat',
     },
   ],
 
@@ -170,6 +173,12 @@ const UPI_APPS = {
    * Apps that listen for UPI intent but are evil.
    */
   blacklist: [
+    {
+      package_name: 'com.whatsapp',
+    },
+    {
+      package_name: 'com.truecaller',
+    },
     {
       package_name: 'com.olacabs.customer',
     },
@@ -200,11 +209,53 @@ const UPI_APPS = {
 /**
  * Order of apps.
  */
-const UPI_APPS_ORDER = ['preferred', 'secondfactor', 'whitelist'];
+const UPI_APPS_ORDER = ['preferred', 'whitelist'];
+
+export const otherAppsIcon =
+  'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNCA4aDRWNEg0djR6bTYgMTJoNHYtNGgtNHY0em0tNiAwaDR2LTRINHY0em0wLTZoNHYtNEg0djR6bTYgMGg0di00aC00djR6bTYtMTB2NGg0VjRoLTR6bS02IDRoNFY0aC00djR6bTYgNmg0di00aC00djR6bTAgNmg0di00aC00djR6IiBmaWxsPSIjYjBiMGIwIi8+PHBhdGggZD0iTTAgMGgyNHYyNEgweiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==';
+
+export const topUpiApps = [
+  {
+    text: 'Google Pay',
+    icon: 'https://cdn.razorpay.com/app/googlepay.svg',
+    id: 'gpay',
+    psp: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],
+  },
+  {
+    text: 'PhonePe',
+    icon: 'https://cdn.razorpay.com/app/phonepe.svg',
+    id: 'phonepe',
+    psp: 'ybl',
+  },
+  {
+    text: 'BHIM',
+    icon: 'https://cdn.razorpay.com/app/bhim.svg',
+    id: 'bhim',
+    psp: 'upi',
+  },
+  {
+    text: 'Paytm',
+    icon: 'https://cdn.razorpay.com/app/paytm.svg',
+    id: 'paytm',
+    psp: 'paytm',
+  },
+  {
+    text: 'Airtel',
+    icon: 'https://cdn.razorpay.com/app/airtel.svg',
+    id: 'airtel',
+    psp: 'airtel',
+  },
+  {
+    text: 'Other Apps',
+    icon: otherAppsIcon,
+    id: null,
+    psp: '',
+  },
+];
 
 /**
  * Parses the response from UPI Intent.
- * @param {Object} intentResponse Reponse from Intent.
+ * @param {Object} intentResponse Response from Intent.
  *
  * @return {Object}
  */
@@ -303,12 +354,12 @@ export const getAllApps = () => {
 
 export const isPreferredApp = packageName =>
   doesAppExist(packageName, UPI_APPS.preferred);
-export const isSecondFactorApp = packageName =>
-  doesAppExist(packageName, UPI_APPS.secondfactor);
 export const isWhitelistedApp = packageName =>
   doesAppExist(packageName, UPI_APPS.whitelist);
+
 export const isBlacklistedApp = packageName =>
   doesAppExist(packageName, UPI_APPS.blacklist);
+
 export const isUsableApp = packageName =>
   doesAppExist(packageName, getUsableApps());
 
@@ -453,4 +504,10 @@ export const trackAppImpressions = allApps => {
   if (_Arr.find(allApps, app => app.package_name === 'com.truecaller')) {
     Analytics.track('upi:app:truecaller:show');
   }
+};
+
+export const upiBackCancel = {
+  '_[method]': 'upi',
+  '_[flow]': 'intent',
+  '_[reason]': 'UPI_INTENT_BACK_BUTTON',
 };

@@ -1,10 +1,15 @@
-import * as Tez from 'tez';
+import * as GPay from 'gpay';
 import * as strings from 'common/strings';
-import { parseUPIIntentResponse, didUPIIntentSucceed } from 'common/upi';
+import {
+  parseUPIIntentResponse,
+  didUPIIntentSucceed,
+  upiBackCancel,
+} from 'common/upi';
 import { androidBrowser } from 'common/useragent';
 import Track from 'tracker';
-import { RazorpayConfig } from 'common/Razorpay';
+import Razorpay from 'common/Razorpay';
 import Analytics from 'analytics';
+import { getSession } from 'sessionmanager';
 
 export const processOtpResponse = function(response) {
   var error = response.error;
@@ -25,7 +30,6 @@ export const processPaymentCreate = function(response) {
   var r = payment.r;
 
   payment.payment_id = response.payment_id;
-  payment.magicCoproto = response.magic || false;
 
   Track(r, 'ajax_response', response);
 
@@ -65,42 +69,48 @@ export const processCoproto = function(response) {
 
 var responseTypes = {
   // this === payment
+
+  cardless_emi: function(request, fullResponse) {
+    this.emit('process', {
+      request,
+      response: fullResponse,
+    });
+  },
+
   first: function(request, fullResponse) {
+    if (request.method === 'redirect') {
+      request.method = 'post';
+    }
     var direct = request.method === 'direct';
     var content = request.content;
     var popup = this.popup;
-    var coprotoMagic = fullResponse.magic ? fullResponse.magic : false;
 
     if (this.data && this.data.wallet === 'amazonpay') {
       request.content = {};
     }
 
-    if (this.isMagicPayment) {
-      if (coprotoMagic) {
-        this.emit('magic.init');
-      }
+    if (this.nativeotp) {
+      Analytics.track('native_otp:error', {
+        error: {
+          message: 'TYPE_FIRST',
+        },
+      });
+      // We were expecting `type: 'otp'` response from API (to ask OTP on checkout),
+      // API sent `type: 'first'` response, can't open popup now.
+      // Most gateways block iframe.
+      // The only option left now is to redirect.
+      if (this.r.get('redirect')) {
+        this.redirect(request);
 
-      var popupOptions = {
-        focus: !coprotoMagic,
-        magic: coprotoMagic,
-        otpelf: true,
-      };
-
-      if (direct) {
-        popupOptions.content = content;
+        return;
       } else {
-        var url =
-          "javascript: submitForm('" +
-          request.url +
-          "', " +
-          _Obj.stringify(request.content) +
-          ", '" +
-          request.method +
-          "')";
-        popupOptions.url = url;
+        // ಠ_ಠ - Should not reach here.
+        Analytics.track('native_otp:error', {
+          error: {
+            message: 'REDIRECT_PARAMS_MISSING',
+          },
+        });
       }
-
-      global.CheckoutBridge.invokePopup(_Obj.stringify(popupOptions));
     } else if (popup) {
       if (this.iframe) {
         popup.show();
@@ -124,18 +134,6 @@ var responseTypes = {
         }
       });
     } else {
-      if (this.sdk_popup) {
-        return global.CheckoutBridge.invokePopup(
-          _Obj.stringify({
-            focus: true,
-            magic: false,
-            otpelf: true,
-            url: `javascript: submitForm('${request.url}', ${_Obj.stringify(
-              request.content
-            )}, '${request.method}')`,
-          })
-        );
-      }
       this.checkRedirect();
     }
   },
@@ -151,59 +149,84 @@ var responseTypes = {
     this.emit('upi.pending', fullResponse.data);
   },
 
-  tez: function(coprotoRequest, fullResponse) {
-    Tez.pay(
-      fullResponse.data,
-      instrument => {
-        Track(this.r, 'tez_pay_response', {
-          instrument,
-        });
+  gpay_inapp: function(request) {
+    this.ajax = fetch
+      .jsonp({
+        url: request.url,
+        callback: response => this.complete(response),
+      })
+      .till(response => response && response.status);
 
-        this.emit('upi.intent_response', {
-          response: instrument.details,
-        });
-      },
-      error => {
-        if (error.code) {
-          if (
-            [error.ABORT_ERR, error.NOT_SUPPORTED_ERR].indexOf(error.code) >= 0
-          ) {
-            this.emit('upi.intent_response', {});
-          }
-
-          // Since the method is not supported, remove it.
-          if (error.code === error.NOT_SUPPORTED_ERR) {
-            const tezRadio = _Doc.querySelector('#upi-tez');
-            const directPayRadio = _Doc.querySelector('#radio-directpay');
-
-            if (tezRadio) {
-              _El.setStyle(tezRadio, 'display', 'none');
-              tezRadio.checked = false;
-            }
-
-            if (directPayRadio) {
-              directPayRadio.checked = true;
-            }
-          }
-        }
-
-        Track(this.r, 'tez_error', error);
-      }
-    );
+    this.emit('upi.pending', { flow: 'upi-intent' });
   },
 
-  intent: function(request, fullResponse) {
-    var upiBackCancel = {
-      '_[method]': 'upi',
-      '_[flow]': 'intent',
-      '_[reason]': 'UPI_INTENT_BACK_BUTTON',
-    };
+  gpay: function(coprotoRequest, fullResponse, type = 'payment_request') {
+    if (type === 'payment_request') {
+      GPay.payWithPaymentRequestApi(
+        fullResponse.data,
+        instrument => {
+          Track(this.r, 'gpay_pay_response', {
+            instrument,
+          });
 
-    var ra = () =>
+          this.emit('upi.intent_response', {
+            response: instrument.details,
+          });
+        },
+        error => {
+          if (error.code) {
+            if (
+              [error.ABORT_ERR, error.NOT_SUPPORTED_ERR].indexOf(error.code) >=
+              0
+            ) {
+              this.emit('upi.intent_response', {});
+            }
+
+            // Since the method is not supported, remove it.
+            if (error.code === error.NOT_SUPPORTED_ERR) {
+              const session = getSession();
+
+              if (session && session.upiTab) {
+                session.upiTab.$set({
+                  useWebPaymentsApi: false,
+                  selectedApp: 'gpay',
+                });
+              }
+            }
+          }
+
+          Track(this.r, 'gpay_error', error);
+        }
+      );
+    } else if (type === 'microapp') {
+      GPay.payWithMicroapp(fullResponse.data.intent_url)
+        .then(response => {
+          Analytics.track('gpay_pay_response', {
+            data: response.paymentMethodData,
+          });
+          this.emit('upi.intent_success_response', response.paymentMethodData);
+        })
+        .catch(error => {
+          Analytics.track('gpay_error', {
+            data: error,
+          });
+          this.emit('cancel', upiBackCancel);
+        });
+    }
+  },
+  intent: function(request, fullResponse) {
+    var ra = ({ transactionReferenceId } = {}) =>
       fetch
         .jsonp({
           url: request.url,
-          callback: response => this.complete(response),
+          callback: response => {
+            // transactionReferenceId is required for Google Pay microapps payments
+            if (transactionReferenceId) {
+              response.transaction_reference = transactionReferenceId; // This is snake_case to maintain convention
+            }
+
+            this.complete(response);
+          },
         })
         .till(response => response && response.status);
 
@@ -213,7 +236,8 @@ var responseTypes = {
       if (data) {
         this.emit('upi.pending', { flow: 'upi-intent', response: data });
       }
-      this.ajax = ra();
+
+      this.ajax = ra(data);
     });
 
     this.on('upi.intent_response', data => {
@@ -234,9 +258,18 @@ var responseTypes = {
       } else {
         CheckoutBridge.callNativeIntent(intent_url);
       }
-    } else if (androidBrowser) {
-      if (this.tez) {
-        return responseTypes['tez'].call(this, request, fullResponse);
+    } else if (this.gpay) {
+      if (this.microapps && this.microapps.gpay) {
+        return responseTypes['gpay'].call(
+          this,
+          request,
+          fullResponse,
+          'microapp'
+        );
+      }
+
+      if (androidBrowser) {
+        return responseTypes['gpay'].call(this, request, fullResponse);
       }
     }
   },
@@ -257,44 +290,17 @@ var responseTypes = {
   },
 
   // prettier-ignore
-  'return': function(request) {
+  'return': function (request) {
     _Doc.redirect(request);
-  }
+  },
+
+  respawn: function(request, fullResponse) {
+    // If Cardless EMI, route the coproto
+    if (this.data && this.data.method === 'cardless_emi') {
+      return responseTypes.cardless_emi.call(this, request, fullResponse);
+    }
+
+    // By default, use first coproto.
+    return responseTypes.first.call(this, request, fullResponse);
+  },
 };
-
-function mwebIntent(payment, ra, fullResponse) {
-  // Start Timeout
-  var drawerTimeout = setTimeout(() => {
-    /**
-     * If upi app selection drawer not happened (technically,
-     * checkout is not blurred until 3 sec)
-     */
-    this.emit('cancel', {
-      '_[method]': 'upi',
-      '_[flow]': 'intent',
-      '_[reason]': 'UPI_INTENT_WEB_NO_APPS',
-    });
-    this.emit('upi.noapp');
-  }, 3000);
-
-  var blurHandler = () => {
-    /**
-     * If upi app selection drawer opened before 3 sec, clear timeout
-     */
-    clearTimeout(drawerTimeout);
-    this.emit('upi.selectapp');
-  };
-
-  var focHandler = () => {
-    this.emit('upi.pending', { flow: 'upi-intent' });
-
-    global.removeEventListener('blur', blurHandler);
-    global.removeEventListener('focus', focHandler);
-    ra();
-  };
-
-  global.addEventListener('blur', blurHandler);
-  global.addEventListener('focus', focHandler);
-
-  global.location = fullResponse.data.intent_url;
-}

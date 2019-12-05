@@ -138,6 +138,10 @@ function find(arr, predicate) {
 }
 
 function findBy(arr, prop, value) {
+  if (!arr) {
+    arr = [];
+  }
+
   return find(arr, function(item) {
     return item[prop] === value;
   });

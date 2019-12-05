@@ -1,8 +1,8 @@
 /* global templates, showOverlay, hideEmi, Event */
 import EmiView from 'templates/views/emi.svelte';
-import { AMEX_EMI_MIN } from 'common/constants';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
+import { getSession } from 'sessionmanager';
 
 const bankOverrides = {
   SBIN: {
@@ -28,21 +28,8 @@ function useBankOverrides(allBanks) {
   return banks;
 }
 
-function hideEMIDropdown() {
-  const body = _Doc.querySelector('#body');
-
-  if (body |> _El.hasClass('emi-focus')) {
-    body |> _El.removeClass('emi-focus');
-  }
-}
-
-function showEMIDropdown() {
-  const body = _Doc.querySelector('#body');
-
-  body |> _El.addClass('emi-focus');
-}
-
-export default function emiView(session) {
+export default function emiView() {
+  const session = getSession();
   const opts = session.emi_options;
 
   const amount = (opts.amount = session.get('amount')),
@@ -51,15 +38,14 @@ export default function emiView(session) {
 
   if (
     !(
-      amount > AMEX_EMI_MIN &&
+      opts.banks.AMEX &&
       (!session.isOfferApplicableOnIssuer('amex', offer) ||
-        discountedAmount > AMEX_EMI_MIN)
+        discountedAmount > opts.banks.AMEX.min_amount)
     )
   ) {
     delete opts.banks.AMEX;
   }
 
-  this.session = session;
   opts.discountedAmount = discountedAmount;
 
   this.opts = opts;
@@ -78,10 +64,9 @@ emiView.prototype = {
 
     this.view = new EmiView({
       target: wrap,
-      data: {
+      props: {
         banks,
         selected: defaultBank,
-        session: this.session,
       },
     });
 

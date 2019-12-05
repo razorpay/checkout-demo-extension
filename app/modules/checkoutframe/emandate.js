@@ -2,14 +2,19 @@ import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { getCheckoutBridge } from 'bridge';
 import * as Curtain from 'components/curtain';
+import { getSession } from 'sessionmanager';
+import { hideCta, showCtaWithDefaultText } from 'checkoutstore/cta';
 
 /* global templates, fillData */
 
 const emandateTabTitles = {
-  'emandate-netbanking': 'Netbanking',
+  'emandate-details': 'Account Details',
+  'emandate-auth-selection': 'Select Auth',
 };
 
-export default function emandateView(session) {
+export default function emandateView() {
+  const session = getSession();
+
   this.history = [];
   this.session = session;
 
@@ -25,6 +30,8 @@ export default function emandateView(session) {
     account_type: session.get('prefill.bank_account[account_type]'),
     /* bank_ifsc is the ifsc code for user's bank account */
     bank_ifsc: session.get('prefill.bank_account[ifsc]'),
+    /* auth_type that the merchant wants to enforce */
+    auth_type: session.get('prefill.auth_type'),
   };
 
   this.opts = {
@@ -77,6 +84,38 @@ emandateView.prototype = {
           }
         }
       });
+
+    if (!this.session.get('prefill.bank')) {
+      this.on('click', '#emandate-bank .btn-change-bank', () => {
+        this.session.netbankingTab.deselectBank();
+        this.setScreen('emandate');
+        this.history = ['emandate'];
+      });
+    }
+
+    this.on('click', '.auth-option.netbanking', () => {
+      Analytics.track('emandate:auth_type:select', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          auth_type: 'netbanking',
+        },
+      });
+
+      this.setAuthType('netbanking');
+      this.showTab('emandate-details');
+    });
+
+    this.on('click', '.auth-option.debitcard', () => {
+      Analytics.track('emandate:auth_type:select', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          auth_type: 'debitcard',
+        },
+      });
+
+      this.setAuthType('debitcard');
+      this.showTab('emandate-details');
+    });
   },
 
   track: function(name, data = {}, type) {
@@ -99,17 +138,42 @@ emandateView.prototype = {
     });
   },
 
-  determineLandingScreen: function() {
-    if (this.prefill.bank && this.banks[this.prefill.bank]) {
-      _Doc.querySelector('#bank-select').value = this.prefill.bank;
-      this.setBank(this.prefill.bank);
+  showLandingScreenIfApplicable: function(tab) {
+    const prefilledBank = this.prefill.bank;
+    const prefilledAuthType = this.prefill.auth_type;
 
-      return 'emandate-netbanking';
+    /**
+     * 'emandate' refers to the emandate landing screen. If the tab to be
+     * switched to is emandate i.e. the landing screen and bank is prefilled,
+     * we set the bank snd skip the bank selection screen.
+     */
+    if (tab === 'emandate' && this.prefill.bank && this.banks[prefilledBank]) {
+      this.session.netbankingTab.setSelectedBank(prefilledBank);
+      this.setBank(prefilledBank);
+
+      /**
+       * If auth_type is also prefilled and available, we set the auth type, skip
+       * the auth type screen as well and directly switch to the bank details
+       * form.
+       */
+      if (
+        this.prefill.auth_type &&
+        _Arr.contains(
+          this.getAvailableAuthTypes(prefilledBank),
+          prefilledAuthType
+        )
+      ) {
+        this.setAuthType(prefilledAuthType);
+        this.showTab('emandate-details');
+      } else {
+        this.showTab('emandate-auth-selection');
+      }
+      return true;
     }
     return false;
   },
 
-  getAuthTypes: function(bankCode) {
+  getAvailableAuthTypes: function(bankCode) {
     let authTypes = [];
     bankCode = bankCode || this.bank;
 
@@ -130,21 +194,47 @@ emandateView.prototype = {
   },
 
   setBank: function(bankCode) {
-    const netbanks = this.session.netbanks;
     const backgroundImage = `background-image: url(https://cdn.razorpay.com/bank/${bankCode}.gif)`;
 
     this.bank = bankCode;
 
-    const authTypes = this.getAuthTypes(bankCode);
+    const authTypes = this.getAvailableAuthTypes(bankCode);
+    this.setAvailableAuthTypesInView(authTypes);
 
     _Arr.loop(_Doc.querySelectorAll('#emandate-inner .bank-icon'), elem => {
       _El.setAttribute(elem, 'style', backgroundImage);
     });
+
+    _El.setContents(
+      _Doc.querySelector('#emandate-inner .bank-name'),
+      this.banks[bankCode]
+    );
+  },
+
+  setAuthType: function(authType) {
+    this.authType = authType;
+  },
+
+  getAuthType: function() {
+    return this.authType;
+  },
+
+  setAvailableAuthTypesInView: function(authTypes) {
+    _El.keepClass(
+      _Doc.querySelector('.auth-option.netbanking'),
+      'hidden',
+      !_Arr.contains(authTypes, 'netbanking')
+    );
+    _El.keepClass(
+      _Doc.querySelector('.auth-option.debitcard'),
+      'hidden',
+      !_Arr.contains(authTypes, 'debitcard')
+    );
   },
 
   showBankDetailsForm: function(bankCode) {
     this.setBank(bankCode);
-    this.showTab('emandate-netbanking');
+    this.showTab('emandate-auth-selection');
   },
 
   setTabTitles: function() {
@@ -156,23 +246,25 @@ emandateView.prototype = {
   setScreen: function(screen) {
     this.session.setScreen(screen);
 
-    if (screen === 'emandate') {
-      this.session.body.removeClass('sub');
+    if (screen !== 'emandate-details') {
+      hideCta();
     } else {
-      this.session.body.addClass('sub');
+      showCtaWithDefaultText();
     }
   },
 
   showTab: function(tab) {
-    const landingScreen = this.determineLandingScreen();
-
-    if (landingScreen) {
-      tab = landingScreen;
+    const landingScreenShown = this.showLandingScreenIfApplicable(tab);
+    if (landingScreenShown) {
+      return;
     }
+    const authTypes = this.getAvailableAuthTypes();
 
-    const authTypes = this.getAuthTypes();
-
-    if (tab === 'emandate-netbanking' && authTypes.indexOf('netbanking') < 0) {
+    // Proceed only if selected auth_type is available for the selected bank
+    if (
+      tab === 'emandate-details' &&
+      !_Arr.contains(authTypes, this.getAuthType())
+    ) {
       return false;
     }
 
@@ -183,6 +275,13 @@ emandateView.prototype = {
   },
 
   back: function() {
+    Analytics.track('emandate:back', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        auth_type: this.authType,
+      },
+    });
+
     this.history.pop();
     if (this.history.length === 0) {
       _El.removeClass(_Doc.querySelector('#container'), 'emandate-extra');
@@ -193,7 +292,7 @@ emandateView.prototype = {
     this.setScreen(newScreen);
 
     if (newScreen === 'emandate') {
-      this.session.deselectBank();
+      this.session.netbankingTab.deselectBank();
     }
 
     return true;
@@ -210,7 +309,7 @@ emandateView.prototype = {
     fillData(formSelector, data);
 
     if (!data['auth_type']) {
-      data['auth_type'] = 'netbanking';
+      data['auth_type'] = this.getAuthType();
     }
 
     this.session.submit();

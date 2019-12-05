@@ -1,45 +1,45 @@
-<Option
-  {data}
-  {type}
-
-  on:select="fire('select', event)"
->
-  {#if icon || iconPlaceholder}
-    <OptionIcon icon={icon} placeholder={iconPlaceholder} />
-  {/if}
-  <div class="option-title"><slot></slot></div>
-  {#if showRadio}
-    <Radio
-      checked={selected}
-      {name}
-      {value}
-    />
-  {/if}
-</Option>
-
 <script>
-  export default {
-    components: {
-      Option: 'templates/views/ui/options/Option.svelte',
-      OptionIcon: 'templates/views/ui/options/OptionIcon.svelte',
-      Radio: 'templates/views/ui/Radio.svelte',
-    },
+  // UI imports
+  import Option from 'templates/views/ui/options/Option.svelte';
+  import OptionIcon from 'templates/views/ui/options/OptionIcon.svelte';
+  import Radio from 'templates/views/ui/Radio.svelte';
 
-    computed: {
-      type: function({selected}) {
-        let activeClass = selected ? ' selected': '';
+  // Props
+  export let selected = false;
+  export let data = {};
+  export let reverse = false;
+  export let icon = null;
+  export let iconPlaceholder = '';
+  export let showRadio = true;
+  export let name = '';
+  export let value = '';
 
-        return `radio-option${activeClass}`;
-      }
-    },
+  // Computed
+  export let classes;
 
-    data: function () {
-      return {
-        icon: null,
-        showRadio: true,
-        selected: false,
-        iconPlaceholder: '',
-      };
-    },
+  $: {
+    const allClasses = [];
+
+    if (selected) {
+      allClasses.push('selected');
+    }
+
+    if (icon || iconPlaceholder) {
+      allClasses.push('has-icon');
+    }
+
+    classes = allClasses;
   }
 </script>
+
+<Option {data} {classes} {reverse} type="radio-option" on:select>
+  {#if icon || iconPlaceholder}
+    <OptionIcon {icon} placeholder={iconPlaceholder} />
+  {/if}
+  <div class="option-title">
+    <slot />
+  </div>
+  {#if showRadio}
+    <Radio checked={selected} {name} {value} />
+  {/if}
+</Option>

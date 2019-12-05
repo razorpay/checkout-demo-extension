@@ -1,3 +1,5 @@
+import { getExperimentsFromStorage } from 'experiments';
+
 const base62Chars =
   '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
@@ -60,14 +62,15 @@ function getCommonTrackingData(r) {
   };
 
   [
-    'integration',
-    'referer',
-    'library',
-    'platform',
-    'platform_version',
-    'os',
-    'os_version',
     'device',
+    'env',
+    'integration',
+    'library',
+    'os_version',
+    'os',
+    'platform_version',
+    'platform',
+    'referer',
   ]
     |> _Arr.loop(
       propName => props |> _Obj.setTruthyProp(propName, trackingProps[propName])
@@ -77,6 +80,7 @@ function getCommonTrackingData(r) {
 }
 
 const EVT_Q = [];
+let PENDING_EVT_Q = [];
 let EVT_CTX;
 
 const pushToEventQ = evt => EVT_Q.push(evt);
@@ -149,6 +153,10 @@ const FLUSH_INTERVAL = setInterval(() => {
  * @param {Boolean} immediately Whether to send this event immediately.
  */
 export default function Track(r, event, data, immediately) {
+  if (!r) {
+    PENDING_EVT_Q.push([event, data, immediately]);
+    return;
+  }
   if (!r.isLiveMode()) {
     return;
   }
@@ -170,7 +178,6 @@ export default function Track(r, event, data, immediately) {
     var options = {};
     var properties = {
       options,
-      es6: true,
     };
 
     if (data) {
@@ -190,6 +197,7 @@ export default function Track(r, event, data, immediately) {
       'display_amount',
       'redirect',
       'readonly',
+      'contact_id',
     ];
 
     _Obj.loop(r.get(), function(value, key) {
@@ -197,7 +205,7 @@ export default function Track(r, event, data, immediately) {
       var rootKey = keySplit[0];
       if (trackingOptions.indexOf(rootKey) !== -1) {
         if (keySplit.length > 1) {
-          if (!trackingOptions.hasOwnProperty(rootKey)) {
+          if (!options.hasOwnProperty(rootKey)) {
             options[rootKey] = {};
           }
           options[rootKey][keySplit[1]] = value;
@@ -207,17 +215,39 @@ export default function Track(r, event, data, immediately) {
       }
     });
 
+    // Mask prefilled card details
+    if (_Obj.hasProp(options, 'prefill')) {
+      _Arr.loop(['card[number]', 'card[cvv]', 'card[expiry]'], key => {
+        if (_Obj.hasProp(options.prefill, key)) {
+          options.prefill[key] = true;
+        }
+      });
+    }
+
     if (options.image && _.isBase64Image(options.image)) {
       options.image = 'base64';
     }
 
-    addMagicProps(r, properties);
+    const externalWallets = r.get('external.wallets') || [];
+
+    /**
+     * Lumberjack doesn't support arrays well, so convert `external.wallets`
+     * to object
+     */
+
+    options.external_wallets =
+      externalWallets
+      |> _Arr.reduce((acc, wallet) => acc |> _Obj.setProp(wallet, true), {});
 
     if (_uid) {
       properties.local_order_id = _uid;
     }
 
+    // Add build number
     properties.build_number = __BUILD_NUMBER__;
+
+    // Add current experiments
+    properties.experiments = getExperimentsFromStorage();
 
     pushToEventQ({
       event,
@@ -233,27 +263,15 @@ export default function Track(r, event, data, immediately) {
   });
 }
 
-function addMagicProps(r, properties) {
-  var payment = r._payment;
-
-  if (payment) {
-    if (payment.payment_id) {
-      properties.payment_id = payment.payment_id;
-    }
-
-    if (payment |> _Obj.hasOwnProp('magicPossible')) {
-      properties.magic_possible = payment.magicPossible;
-    }
-
-    if (payment |> _Obj.hasOwnProp('isMagicPayment')) {
-      properties.magic_attempted = payment.isMagicPayment;
-    }
-
-    if (payment |> _Obj.hasOwnProp('magicCoproto')) {
-      properties.magic_coproto = payment.magicCoproto;
-    }
+Track.dispatchPendingEvents = r => {
+  if (!r) {
+    return;
   }
-}
+  const track = Track.bind(Track, r);
+  PENDING_EVT_Q.splice(0, PENDING_EVT_Q.length).forEach(e => {
+    track.apply(Track, e);
+  });
+};
 
 Track.parseAnalyticsData = data => {
   if (!_.isNonNullObject(data)) {

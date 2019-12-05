@@ -2,11 +2,13 @@ import { RazorpayDefaults } from 'common/options';
 
 RazorpayDefaults.timeout = 0;
 RazorpayDefaults.name = '';
+RazorpayDefaults.partnership_logo = '';
 RazorpayDefaults.ecod = false;
 
 RazorpayDefaults.nativeotp = true;
 RazorpayDefaults.remember_customer = false;
 RazorpayDefaults.personalization = false;
+RazorpayDefaults.paused = false;
 
 RazorpayDefaults.min_amount_label = ''; // Added for RBL custom label while Partial Amount
 
@@ -19,6 +21,7 @@ RazorpayDefaults.method = {
   upi: true,
   upi_intent: null,
   qr: true,
+  bank_transfer: true,
 };
 
 RazorpayDefaults.prefill = {
@@ -65,6 +68,7 @@ RazorpayDefaults.modal = {
   escape: true,
   animation: true,
   backdropclose: false,
+  handleback: true,
 };
 
 RazorpayDefaults.external = {
@@ -83,4 +87,10 @@ RazorpayDefaults.theme = {
   hide_topbar: false,
   branding: '',
   debit_card: false,
+};
+
+RazorpayDefaults._ = {
+  integration: null, // Used for passing the integration mode. eg.: flutter, woocommerce
+  integration_version: null, // Used for passing the integration version. eg.: 1.0.2
+  integration_parent_version: null, // Used for passing the version of the platform eg.: Magento version for Magento integration
 };

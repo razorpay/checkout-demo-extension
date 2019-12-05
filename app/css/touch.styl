@@ -35,10 +35,26 @@ $mobile-view() {
 
   #form-netbanking {
     overflow-y: auto;
-    padding-bottom: $footerh;
   }
 
-  #container #modal #body {
+  // #container and &#container is needed because
+  // this function applies to a media query (root)
+  // as well as .mobile (ampersand)
+
+  #body.sub,
+  #container.one-method #body:not([tab]),
+  &#container.one-method #body:not([tab]) {
+    #curtain-container-parent {
+      bottom: $footerh;
+    }
+
+    .callout {
+      bottom: $footerh;
+    }
+  }
+
+  #container #modal #body,
+  &#container #modal #body {
     height: $bodyhmobile;
     height: calc(100% - 129px);
     height: calc(100vh - 129px);
@@ -58,23 +74,18 @@ $mobile-view() {
     }
 
     &.has-offers {
-
-      #offers-container {
-
+      .offers-container {
         bottom: 0;
       }
 
       &[screen] {
-
-        #offers-container {
-
+        .offers-container {
           bottom: -($topbarh);
         }
       }
 
       &.sub {
-
-        #offers-container {
+        .offers-container {
           bottom: $footerh - $topbarh;
         }
       }
@@ -87,9 +98,23 @@ $mobile-view() {
       }
 
       .offers-error {
-
-        height: $bodyhmobile + $footerh;
+        // bottom: $footerh;
+        bottom: 0;
+        // height: $bodyhmobile + $footerh;
+        height: 100vh;
       }
+    }
+  }
+
+  // For just one method, there is a CTA on the home screen
+  // But .sub is not present. So, we need to handle the offers strip position separately
+  // However, if there is .sub present on #body, it will be handled by itself
+  // :not([screen]) ensures this is the home screen
+  // :not(.sub) ensures we're not overriding the position for when .sub is present
+  #container.one-method,
+  &#container.one-method {
+    #modal #body.has-offers:not([screen]):not(.sub) .offers-container {
+      bottom: $footerh;
     }
   }
 
@@ -190,28 +215,12 @@ $mobile-view() {
     bottom: 70px;
   }
 
-  #quickpay-btn {
-    display: block;
-  }
-
-  [screen=card], [screen=emi] {
-    #quickpay-btn {
-      opacity: 1;
-      pointer-events: all;
-    }
-  }
-
   .close {
     font-size: 28px;
     line-height: 28px;
     padding: 6px 12px 12px;
   }
 
-  #body.sub, #container.one-method #body:not([tab]) {
-    #curtain-container-parent {
-      bottom: $footerh;
-    }
-  }
 
   .payment-frame {
     height: 100%;
@@ -224,8 +233,16 @@ $mobile-view() {
     transition: 0.3s bottom;
   }
 
+  #body.sub #form-payouts, #form-payout_account {
+    padding-bottom: $footerh
+  }
+
   #body.sub #form-otp #timeout {
     bottom: $footerh;
+  }
+
+  #body.sub .screen-comp {
+    padding-bottom: $footerh;
   }
 }
 

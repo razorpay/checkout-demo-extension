@@ -5,16 +5,14 @@ import upi from './upi';
 import wallet from './wallet';
 import othermethods from './othermethods';
 import qr from './qr';
+import paylater from './paylater';
+import paypal from './paypal';
+import bank_transfer from './bank_transfer';
+import contact from './contact';
 
-const availPaymentMethods = [
-  'card',
-  'emi',
-  'netbanking',
-  'upi',
-  'wallet',
-  'othermethods',
-  'qr',
-];
+import { getAllMethods } from 'checkoutframe/paymentmethods';
+
+const availPaymentMethods = getAllMethods().concat(['othermethods', 'contact']);
 
 function getIconFn(iconName) {
   switch (iconName) {
@@ -22,6 +20,7 @@ function getIconFn(iconName) {
       return card;
 
     case 'emi':
+    case 'cardless_emi':
       return emi;
 
     case 'netbanking':
@@ -38,6 +37,21 @@ function getIconFn(iconName) {
 
     case 'qr':
       return qr;
+
+    case 'paylater':
+      return paylater;
+
+    case 'paypal':
+      return paypal;
+
+    case 'bank_transfer':
+      return bank_transfer;
+
+    case 'contact':
+      return contact;
+
+    case 'gpay':
+      return () => '<i class="gpay-icon" />';
   }
 }
 

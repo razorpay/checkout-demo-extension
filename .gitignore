@@ -3,6 +3,7 @@
 /app/js/generated
 /app/modules/generated
 /app/templates
+/app/index.html
 /coverage
 
 # dependencies
@@ -16,3 +17,4 @@
 npm-debug.log
 /app/config.js
 /httpd.conf
+.idea

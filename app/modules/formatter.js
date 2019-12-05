@@ -166,7 +166,8 @@ Formatter.rules = {
         let currentTime = new Date();
         let currentYear = currentTime.getFullYear() - 2000;
         if (currentYear === yearValue) {
-          return parseInt(this.value.slice(0, 2), 10) >= currentTime.getMonth();
+          let currentMonth = parseInt(this.value.slice(0, 2), 10);
+          return currentMonth >= currentTime.getMonth() + 1;
         }
         return yearValue > currentYear;
       }
@@ -176,7 +177,7 @@ Formatter.rules = {
   number: {
     raw: function(value) {
       let returnVal = value.replace(/\D/g, '');
-      if (this.el.maxLength) {
+      if (this.el.maxLength > 0) {
         returnVal = _Str.slice(returnVal, 0, this.el.maxLength);
       }
       return returnVal;
@@ -210,8 +211,12 @@ Formatter.rules = {
       return returnVal;
     },
 
-    isValid: function() {
-      return /^\+?[0-9]{8,15}$/.test(this.value);
+    isValid: function(value) {
+      if (!value) {
+        value = this.value;
+      }
+
+      return /^\+?[0-9]{8,15}$/.test(value);
     },
   },
 };
@@ -250,6 +255,18 @@ formatterProto.raw = value => value.replace(/\D/g, '');
 formatterProto.setValue = function(value) {
   this.value = value;
 };
+
+function dispatchInput(element) {
+  let event;
+  if (typeof global.Event === 'function') {
+    event = new global.Event('input');
+  } else {
+    event = document.createEvent('Event');
+    event.initEvent('input', true, true);
+  }
+
+  element.dispatchEvent(event);
+}
 
 formatterProto.oninput = function() {
   this.emit('change');
@@ -358,6 +375,7 @@ formatterProto.run = function(values) {
 
   if (oldValue !== this.value) {
     this.oninput();
+    dispatchInput(this.el);
   }
 };
 

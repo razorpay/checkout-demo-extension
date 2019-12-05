@@ -1,4 +1,4 @@
-import { RazorpayConfig } from 'common/Razorpay';
+import RazorpayConfig from 'common/RazorpayConfig';
 
 export const networks = {
   amex: 'American Express',
@@ -69,7 +69,7 @@ const cardPatterns = [
   },
   {
     name: 'maestro16',
-    regex: /^50(81(25|26|59|92)|8227)|4(437|681)/,
+    regex: /^(50(81(25|26|59|92)|8227)|4(437|681))/,
   },
   {
     name: 'amex',

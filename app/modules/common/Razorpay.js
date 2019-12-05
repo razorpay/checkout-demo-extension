@@ -2,23 +2,16 @@ import Analytics from 'analytics';
 import Eventer from 'eventer';
 import Track from 'tracker';
 import CheckoutOptions, { flatten, RazorpayDefaults } from 'common/options';
+import * as AnalyticsTypes from 'analytics-types';
+import { formatPayload } from 'payment/validator';
+import RazorpayConfig from 'common/RazorpayConfig';
+
 import {
   supportedCurrencies,
   displayCurrencies,
   getCurrencyConfig,
   formatAmountWithSymbol,
 } from 'common/currency';
-
-export const RazorpayConfig = {
-  api: 'https://api.razorpay.com/',
-  version: 'v1/',
-  frameApi: '/',
-  cdn: 'https://cdn.razorpay.com/',
-};
-
-try {
-  _Obj.extend(RazorpayConfig, global.Razorpay.config);
-} catch (e) {}
 
 export function makeUrl(path = '') {
   return RazorpayConfig.api + RazorpayConfig.version + path;
@@ -29,7 +22,9 @@ const backendEntityIds = [
   'order_id',
   'invoice_id',
   'subscription_id',
+  'auth_link_id',
   'payment_link_id',
+  'contact_id',
 ];
 
 export function makeAuthUrl(r, url) {
@@ -144,10 +139,19 @@ var razorpayPayment = (Razorpay.payment = {
   },
 
   getPrefs: function(data, callback) {
+    const prefsApiTimer = _.timer();
+    Analytics.track('prefs:start', {
+      type: AnalyticsTypes.METRIC,
+    });
+
     return fetch({
       url: _.appendParamsToUrl(makeUrl('preferences'), data),
 
       callback: function(response) {
+        Analytics.track('prefs:end', {
+          type: AnalyticsTypes.METRIC,
+          data: { time: prefsApiTimer() },
+        });
         if (response.xhr && response.xhr.status === 0) {
           return getPrefsJsonp(data, callback);
         }
@@ -163,7 +167,7 @@ function base_configure(overrides) {
   }
 
   var options = new CheckoutOptions(overrides);
-  validateOverrides(options);
+  validateOverrides(options, ['amount']);
   setNotes(options);
   return options;
 }
@@ -190,6 +194,31 @@ RazorProto.isLiveMode = function() {
   );
 };
 
+/**
+ * Used for calculating the fees for the payment.
+ * Resolves and rejects with a JSON.
+ * @param {payload} Object
+ *
+ * @returns {Promise}
+ */
+RazorProto.calculateFees = function(payload) {
+  return new Promise((resolve, reject) => {
+    payload = formatPayload(payload, this);
+
+    fetch.post({
+      url: makeUrl('payments/calculate/fees'),
+      data: payload,
+      callback: function(response) {
+        if (response.error) {
+          return reject(response);
+        } else {
+          return resolve(response);
+        }
+      },
+    });
+  });
+};
+
 function isValidAmount(amt, min = 100) {
   if (/[^0-9]/.test(amt)) {
     return false;
@@ -203,10 +232,38 @@ export function makePrefParams(rzp) {
   if (rzp) {
     var getter = rzp.get;
     var params = {};
+
+    /**
+     * Set Key
+     */
     var key_id = getter('key');
     if (key_id) {
       params.key_id = key_id;
     }
+
+    /**
+     * Set the list of currencies.
+     *
+     * The first currency in the list should always
+     * be the currency for the payment.
+     * Any currency codes for which we need the
+     * config can start from index 1.
+     * This is needed because API will filter the
+     * gateways and send the available methods
+     * based on the payment currency, which it
+     * expects to always be at index 0.
+     */
+    const currency = [getter('currency')];
+
+    const display_currency = getter('display_currency');
+    const display_amount = getter('display_amount');
+
+    // Display currency is only valid when a display amount is present
+    if (display_currency && `${display_amount}`.length) {
+      currency.push(display_currency);
+    }
+
+    params.currency = currency;
 
     _Arr.loop(
       [
@@ -215,9 +272,11 @@ export function makePrefParams(rzp) {
         'invoice_id',
         'payment_link_id',
         'subscription_id',
+        'auth_link_id',
         'recurring',
         'subscription_card_change',
         'account_id',
+        'contact_id',
       ],
       function(key) {
         var value = getter(key);
@@ -300,18 +359,40 @@ export const optionValidations = {
       return '';
     }
   },
+
+  payout: function(payout, options) {
+    if (payout) {
+      if (!options.key) {
+        return 'key is required for a Payout';
+      }
+
+      if (!options.contact_id) {
+        return 'contact_id is required for a Payout';
+      }
+    }
+  },
 };
 
-function validateOverrides(options) {
+export function validateOverrides(options, skip = []) {
+  let valid = true;
+
   options = options.get();
+
   _Obj.loop(optionValidations, function(validation, key) {
+    if (_Arr.contains(skip, key)) {
+      return;
+    }
+
     if (key in options) {
       let errorMessage = validation(options[key], options);
       if (errorMessage) {
+        valid = false;
         _.throwMessage('Invalid ' + key + ' (' + errorMessage + ')');
       }
     }
   });
+
+  return valid;
 }
 
 Razorpay.configure = function(overrides) {

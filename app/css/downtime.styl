@@ -1,0 +1,69 @@
+$opacity = 0.3;
+$bg-color = #f7f7f7;
+
+#payment-options
+  overflow-x: hidden;
+
+.payment-option[down=true],
+.next-option[down=true],
+.netb-bank.item[down=true]
+  background-color: $bg-color;
+
+  i
+    &:first-child
+      opacity: $opacity;
+  .title
+    opacity: $opacity;
+  .desc
+    opacity: $opacity;
+
+  .downtime
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    border-radius: 50%;
+    background-color: #EF6767;
+    color: white;
+    text-align: center;
+    font-size: 8px;
+    line-height: 10px;
+    white-space: normal;
+    width: 10px;
+    height: 10px;
+
+    &::after
+      content: 'i';
+
+    .downtime-tooltip
+      font-size: 12px;
+      line-height: 16px;
+      width: 200px;
+      pointer-events: none;
+      text-align: left;
+
+.next-option[down=true]
+  svg,
+  &::after
+    opacity: $opacity;
+
+#container.no-details .payment-option[down=true],
+.next-option[down=true]
+  .title
+    vertical-align: middle;
+
+  .downtime
+    vertical-align: middle;
+    top: unset;
+    right: unset;
+    position: relative;
+    display: inline-block;
+    margin-left: 8px;
+
+    .downtime-tooltip
+      width: 180px;
+      padding: 8px;
+
+.callout.downtime-callout
+  text-align: left;
+  padding: 8px 16px;
+  bottom: 0;

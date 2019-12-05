@@ -8,7 +8,6 @@ var address = o('address');
 var method = _.methods;
 var cardOffer = _.cardOffer;
 var wallet = method.wallet;
-var banks = method.emandate || method.netbanking;
 var icons = _.themeMeta.icons;
 var freechargeWallet = findBy(wallet, 'name', 'freecharge') || {};
 var airtelmoneyWallet = findBy(wallet, 'name', 'airtelmoney') || {};
@@ -17,8 +16,9 @@ var olamoneyWallet = freqWallets.olamoney || {};
 var html = function(html){return html.replace(/<[^>]*>?/g, "")};
 var attr = function(attr){return attr.replace(/"/g,'')};
 var order = _.order || {};
+var preferences = _.preferences;
+var gpay_omnichannel = preferences.features && preferences.features.google_pay_omnichannel;
 var invoice = _.invoice;
-var walletsDesc = _.walletsDesc;
 
 var bank = _.tpvBank || {};
 var emi_options = _.emi_options;
@@ -44,14 +44,21 @@ var email_readonly = o('readonly.email') && prefill_email;
 var name_readonly = o('readonly.name') && prefill_name;
 
 var subscription_will_refund = _.subscription && (_.subscription.type === 0);
-var upi_intent = _.upi_intents_data && _.methods.upi_intent;
-var upi_apps = _.upi_intents_data;
+
+var emi_banks_csv = '';
+if(emi_options && emi_options.banks){
+   var emi_bank_names = [];
+   for(var bank_code in emi_options.banks){
+      emi_bank_names.push(emi_options.banks[bank_code].name);
+   }
+   emi_banks_csv = emi_bank_names.join(', ');
+}
 
 `
 <div id="container" class="mfix animations" tabIndex="0">
   <div id="backdrop"></div>
   <div id="timeout"></div>
-  <i id="powered-by"><a id="powered-link" href="https://razorpay.com?ref=org-in-chk" target="_blank">&#xe608;</a></i>
+  <i id="powered-by"><a id="powered-link" href="https://razorpay.com?ref=org-in-chk" target="_blank" tabindex="-1">&#xe608;</a></i>
   <div id="tnc-wrap"></div>
   <div id="modal" class="mchild">
     <div id="modal-inner">
@@ -61,6 +68,10 @@ var upi_apps = _.upi_intents_data;
       <div id="fee-wrap" class="overlay showable mfix"></div>
       <div id="options-wrap"></div>
       <div id="error-message" class="overlay showable">
+      <div class="omnichannel">
+        <img style="width:35px;" src="https://cdn.razorpay.com/app/googlepay.svg">
+        <div id="overlay-close" class="close">×</div>
+      </div>
         <div id="fd-t"></div>
         <div class="spin"><div></div></div>
         <div class="spin spin2"><div></div></div>
@@ -113,7 +124,7 @@ var upi_apps = _.upi_intents_data;
             </div>
           `?`
         </div>
-        <div id="body"`?_.tpvBank` class="sub"`?`>
+        <div id="body"`?_.tpvBank || _.newHomeScreen` class="sub"`?`>
           <div id="curtain">
             <div id="curtain-container-parent"></div>
             <div id="curtain-overlay"></div>
@@ -132,9 +143,10 @@ var upi_apps = _.upi_intents_data;
           </div>
           <form id="form" method="POST" novalidate autocomplete="off" onsubmit="return false">
             <div id="form-fields">
+              `?!_.newHomeScreen`
               <div id="form-common" class="showable drishy screen">
                 <div class="pad partial-payment-block" id="pad-common">
-                  <div class="elem-wrap`?contact_hidden` invisible`?`"><div class="elem elem-contact`?contact_readonly` readonly`?`">
+                  <div class="elem-wrap`?contact_hidden` invisible`?`" id="elem-wrap-contact"><div class="elem elem-contact`?contact_readonly` readonly`?`">
                     <i>&#xe607;</i>
                     <div class="help">Please enter a valid contact number</div>
                     <label>Phone</label>
@@ -150,7 +162,6 @@ var upi_apps = _.upi_intents_data;
                   `?contactEmailOptional`
                   <div class="legend">Select a payment type</div>
                   `?`
-
                   <div id='partial-list' class="list collapsable">
                     `?contactEmailOptional`
                     <div class="item">
@@ -166,10 +177,12 @@ var upi_apps = _.upi_intents_data;
                       <label for="partial-select-partial">
                         <span class="checkbox"></span>
                         Make payment in parts
-                        <div class="elem-wrap collapsable-content" id="elem-wrap-amount" style="height: 38px"><div class="elem elem-amount">
-                          <input class="input" name="amount" type="tel" id="amount-value" placeholder="Enter amount" value="`=_.getDecimalAmount(o('amount'))`">
-                          <div class="help">Please enter a valid amount (upto `=_.getDecimalAmount(order.amount_due)`)</div>
-                        </div></div>
+                        <div class="elem-wrap collapsable-content" id="elem-wrap-amount" style="height: 38px">
+                          <div class="elem elem-amount">
+                            <input class="input" name="amount" type="tel" id="amount-value" placeholder="Enter amount" value="`=_.getDecimalAmount(o('amount'))`">
+                            <div class="help">Please enter a valid amount (upto `=_.getDecimalAmount(order.amount_due)`)</div>
+                          </div>
+                        </div>
 
                         `?(order.partial_payment && !!order.first_payment_min_amount && Number(order.amount_paid) === 0)`
                           <div class="minimum-amount-select">
@@ -295,115 +308,15 @@ var upi_apps = _.upi_intents_data;
                   </div>
                 `?`
                 <div`?_.tpvBank` class="showable"`?`>
-                  <div class="legend">Select a payment method</div>
                   <div id="methods-list"></div>
                   <div id="other-methods"></div>
-                  <div id="payment-options" class="grid clear count-`=method.count`">
-                    `?method.card`
-                      `?o('theme.debit_card')`
-                      <div class="payment-option item" tab="credit_card">
-                        <label>
-                          <i>`=icons.card`</i>
-                          `=_.tab_titles.credit_card`
-                        </label>
-                      </div>
-                      <div class="payment-option item" tab="debit_card">
-                        <label>
-                          <i>`=icons.card`</i>
-                          `=_.tab_titles.debit_card`
-                        </label>
-                      </div>
-                      `??`
-                      <div class="payment-option item" tab="card">
-                        <label>
-                          <i>`=icons.card`</i>
-                          `=_.tab_titles.card`
-                          <span class="desc">
-                            `?_.recurring_card_text`
-                              `=_.recurring_card_text`
-                            `??`
-                              Mastercard, Visa`?!_.irctc`, RuPay, Maestro`?``?_.preferences.methods.amex`, Amex`?`
-                            `?`
-                          </span>
-                        </label>
-                      </div>
-                      `?`
-                    `?`
-                    `?method.netbanking`
-                    <div class="payment-option item" tab="netbanking">
-                      <label>
-                        <i>`=icons.netbanking`</i>
-                        `=_.tab_titles.netbanking`
-                        <span class="desc">All Indian banks</span>
-                      </label>
-                    </div>
-                    `?`
-                    `?method.emandate`
-                    <div class="payment-option item" tab="emandate">
-                      <label>
-                        <i>`=icons.netbanking`</i>
-                        `=_.tab_titles.emandate`
-                        <span class="desc">Pay with Netbanking</span>
-                      </label>
-                    </div>
-                    `?`
-                    `?wallet.length`
-                    <div class="payment-option item" tab="wallet">
-                      <label>
-                        <i>`=icons.wallet`</i>
-                        `=_.tab_titles.wallet`
-                        <span class="desc">`=walletsDesc`</span>
-                      </label>
-                    </div>
-                    `?`
-                    `?method.upi`
-                    <div class="payment-option item" tab="upi">
-                      <label>
-                        <i>`=icons.upi`</i>
-                        `=_.tab_titles.upi`
-                        <span class="desc">Instant payment using UPI App</span>
-                      </label>
-                    </div>
-                    `?`
-                    `?method.tez`
-                    <div class="payment-option item" tab="tez">
-                      <label>
-                        <i class="tez-icon"></i>
-                        `=_.tab_titles.tez`
-                        <span class="desc">Instant payment using Google Pay App</span>
-                      </label>
-                    </div>
-                    `?`
-                    `?method.emi || method.cardless_emi`
-                      <div class="payment-option item" tab="`?method.cardless_emi`cardless_emi`??`emi`?`">
-                        <label>
-                          <i>`=icons.emi`</i>
-                          `=_.tab_titles.emi`
-                          <span class="desc">
-                            `?method.cardless_emi && method.emi`
-                            Cards, ZestMoney, & More
-                            `??method.emi`
-                            EMI via Credit & Debit Cards
-                            `??method.cardless_emi`
-                            EMI via ZestMoney & More
-                            `?`
-                          </span>
-                        </label>
-                      </div>
-                    `?`
-                    `?method.qr`
-                      <div class="payment-option item" tab="qr">
-                        <label>
-                          <i>`=icons.qr`</i>
-                          `=_.tab_titles.qr`
-                          <span class="desc">Pay by scanning QR Code</span>
-                        </label>
-                      </div>
-                    `?`
-                  </div>
                   <div class="clear"></div>
                 </div>
               </div>
+              `??`
+                <div id="home-screen-wrap"></div>
+                <div id="methods-screen-wrap"></div>
+              `?`
               `?_.irctc`
                 <div class='recurring-message' style='right: 0;left: 0;border-radius:0 0 3px 3px'>
                       <span>&#x2139;</span>
@@ -417,7 +330,7 @@ var upi_apps = _.upi_intents_data;
                   <div id="show-add-card" class="text-btn left-card">Add another card</div>
                   `?method.card`
                     <div class="strip emi-plans-info-container emi-plans-trigger saved-card-pay-without-emi hidden emi-icon-single-card">
-                      <div class="emi-plans-text no-action">Pay without EMI<span class="count-text"></span></div>
+                      <div class="emi-plans-text no-action">Pay entire amount<span class="count-text"></span></div>
                       <div class="emi-plans-action theme-highlight"></div>
                     </div>
                   `?`
@@ -436,7 +349,7 @@ var upi_apps = _.upi_intents_data;
                       <div class="elem-wrap third"><div class="elem elem-expiry">
                         <label>Expiry</label>
                         <i>&#xe606;</i>
-                        <input class="input"`?_.isMobile` type="tel"`?` id="card_expiry" name="card[expiry]" placeholder="MM / YY" maxlength="7" value="`=attr(o('prefill.card[expiry]'))`">
+                        <input class="input"`?_.isMobile()` type="tel"`?` id="card_expiry" name="card[expiry]" placeholder="MM / YY" maxlength="7" value="`=attr(o('prefill.card[expiry]'))`">
                       </div></div>
                       <div class="elem-wrap two-third"><div class="elem elem-name `?name_readonly`readonly`?`">
                         <span class="help">Please enter name on your card</span>
@@ -470,11 +383,10 @@ var upi_apps = _.upi_intents_data;
                     <div id="elem-emi">
                       <div class="strip emi-plans-info-container emi-plans-trigger">
                         <div class="emi-plan-unavailable hidden emi-icon-multiple-cards">
-                          <span class="help">EMI is available on HDFC, ICICI, RBL, Kotak, IndusInd, Yes Bank, Standard Chartered and Axis Bank
-                            Credit Cards. Enter your credit card to avail.</span>
+                          <span class="help">EMI is available on `=emi_banks_csv ` cards. Enter your credit card to avail.</span>
                           <div class="emi-plans-text">EMI unavailable</div>
                           `?method.card`
-                          <div class="emi-plans-action theme-highlight">Pay without EMI</div>
+                          <div class="emi-plans-action theme-highlight">Pay entire amount</div>
                           `?`
                         </div>
                         <div class="emi-plan-selected hidden emi-icon-multiple-cards">
@@ -489,7 +401,7 @@ var upi_apps = _.upi_intents_data;
                         `?`
                         `?method.card`
                           <div class="emi-pay-without hidden emi-icon-single-card">
-                            <div class="emi-plans-text no-action">Pay without EMI<span class="count-text"></span></div>
+                            <div class="emi-plans-text no-action">Pay entire amount<span class="count-text"></span></div>
                             <div class="emi-plans-action theme-highlight"></div>
                           </div>
                         `?`
@@ -534,83 +446,7 @@ var upi_apps = _.upi_intents_data;
               `?method.emi && _.emi_options.banks['BAJAJ']`
                 <div class="tab-content showable screen" id="form-emi"></div>
               `?`
-              `?banks`
-                <div class="tab-content showable screen" id="form-netbanking">
-                  `var count = 0, max = 3, total = 0;`
-                  <div id="netb-banks" class="clear grid count-3">
-                    `
-                    for(var i in _.netbanks){
-                      var b = _.netbanks[i].code;
-
-                      if (!banks[b]) {
-                        continue;
-                      }
-                      total++;
-                      if (total > 6 || (_.recurring && total > 3)) {
-                        break;
-                      }
-                      if(count === 0){
-                        count = max - 3 + 1;
-                        max++;
-                      }
-                    `
-                      <div class="netb-bank item radio-item">
-                        <input class="bank-radio" id="bank-radio-`=b`" type="radio" name="bank" value="`=b`">
-                        <label for="bank-radio-`=b`" class="radio-label mfix">
-                          <div class="mchild l-`=count` item-inner">
-                            <img src="`=_.netbanks[i].logo`">
-                            <div>`=_.netbanks[i].name`</div>
-                          </div>
-                        </label>
-                      </div>
-                    `
-                    count = (count + 1) % max;
-                    }
-                    `
-                  </div>
-                    <div class="elem-wrap pad"><div id="nb-elem" class="elem select">
-                      <i class="select-arrow">&#xe601;</i>
-                      <div class="help">Please select a bank</div>
-                      <select id="bank-select" name="bank" required class="input" pattern="[\w]+">
-                        <option selected="selected" value="">Select a different Bank</option>
-                        `~banks:bank:bankname`
-                          <option value="`=bank`">`=bankname`</option>
-                        `~`
-                      </select>
-                    </div></div>
-                    <div class="nb-selection-container showable pad">
-                      <label>Complete Payment Using</label>
-                      <div class="input-radio">
-                        <input type="radio" id="nb_type_retail" value="retail" class="nb-type">
-                        <label for="nb_type_retail">
-                          <div class="radio-display"></div>
-                          <div class="label-content">Retail</div>
-                        </label>
-                      </div>
-
-                      <div class="input-radio">
-                        <input type="radio" id="nb_type_corporate" value="corporate" class="nb-type">
-                        <label for="nb_type_corporate">
-                          <div class="radio-display"></div>
-                          <div class="label-content">Corporate</div>
-                        </label>
-                      </div>
-                    </div>
-                    <div class="down">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="12" viewBox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-1.351 6.493c-.08-.801.55-1.493 1.351-1.493s1.431.692 1.351 1.493l-.801 8.01c-.029.282-.266.497-.55.497s-.521-.215-.55-.498l-.801-8.009zm1.351 12.757c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25z"/></svg>
-                      <span class="text">
-                      </span>
-                      is currently facing issues.
-                    </div>
-                    `?_.recurring`
-                      <div class="pad recurring-message">
-                        <span>&#x2139;</span>
-                        Future payments from your bank account will be charged automatically.
-                      </div>
-                    `?`
-                </div>
-              `?`
-              `?wallet.length || ecod`
+              `?(wallet && wallet.length) || ecod`
                 <div class="tab-content showable screen pad" id="form-wallet">
                   `?ecod`
                   <div class="legend" id="ecod-label">Select payment method</div>
@@ -674,12 +510,21 @@ var upi_apps = _.upi_intents_data;
                   </div>
                 </div>
               `?`
+              <div id="netbanking-svelte-wrap">
+              </div>
               <!-- UPI method -->
               <div id='upi-svelte-wrap'>
               </div>
+              <div id="nach-wrap"></div>
+              <div id='payouts-svelte-wrap'>
+              </div>
+              <div id='payout-account-svelte-wrap'>
+              </div>
               `?method.qr`
-                <div class="tab-content showable screen pad" id="form-qr">
-                </div>
+                <div class="tab-content showable screen pad" id="form-qr"></div>
+              `?`
+              `?method.bank_transfer`
+                <div id='bank-transfer-svelte-wrap'></div>
               `?`
               `?ecod && invoice`
                 <div class="tab-content showable screen pad" id="form-ecod">
@@ -699,10 +544,6 @@ var upi_apps = _.upi_intents_data;
               `?`
               <div id="otp-screen-wrapper"></div>
               <div id="emi-plan-screen-wrapper"></div>
-              `?_.magic`
-                <div id="magic-wrapper">
-                </div>
-              `?`
               `?method.emandate`
                 <div id="emandate-wrapper">
                 </div>
@@ -711,25 +552,15 @@ var upi_apps = _.upi_intents_data;
                 <div id="emi-options-wrapper">
                 </div>
               `?`
+              `?method.paylater`
+                <div id="paylater-wrapper">
+                </div>
+              `?`
             </div>
             <div id='next-button' class="submit-button">Next</div>
-            `?false`
-            <div id='quickpay-btn' class="list">
-              <input type="checkbox" name="quickpay" id="quickpay-check" checked>
-              <label for="quickpay-check">
-                <div class="checkbox"></div>
-                <div><b>Quick Pay:</b> Experience faster payments. SMS permissions required. Tap allow when asked.
-                </div>
-              </label>
-            </div>
-            `?`
-            <div id="offers-container"></div>
+            <div class="offers-container" id="offers-container"></div>
             <button id="footer" type="submit" class="button">
-              <span class="pay-btn">`?o('amount')`PAY &nbsp;<span class="original-amount">`=amount`</span><span class="discount"></span>`??`Authenticate`?`</span>
-              <span class="otp-btn">Verify</span>
-              <span class="view-plans-btn invisible">View EMI Plans</span>
-              <span class="select-plan-btn invisible">Select EMI Plan</span>
-              <span class="enter-card-details invisible">Enter Card Details</span>
+              <span></span>
             </button>
             `?o('theme.branding')`
               <img id="cob-rzp" src="https://cdn.razorpay.com/logo.svg">

@@ -1,37 +1,45 @@
-<div class={classes}>
+<script>
+  // Util imports
+  import Track from 'tracker';
+
+  // Props
+  export let id = '';
+  export let checked = false;
+  export let name = '';
+  export let value = '';
+  export let label = '';
+  export let classes = '';
+  export let tabindex = 0;
+
+  // Computed
+  export let identifier;
+  export let classesToApply;
+
+  $: identifier = id ? id : `id_${Track.makeUid()}`;
+  $: classesToApply = `input-radio ${classes}`;
+</script>
+
+<style>
+  label {
+    min-width: 18px;
+  }
+</style>
+
+<div class={classesToApply}>
   <input
     type="radio"
     id={identifier}
     {checked}
     {name}
     {value}
-
-    on:change="fire('change', event)"
-  >
+    on:change
+    {tabindex} />
   <label for={identifier}>
-    <div class="radio-display"></div>
-    <div class="label-content">{@html label}</div>
+    <div class="radio-display" />
+    {#if label}
+      <div class="label-content">
+        {@html label}
+      </div>
+    {/if}
   </label>
 </div>
-
-<script>
-  import Track from 'tracker.js';
-
-  export default {
-    data: function() {
-      return {
-        checked: false,
-        classes: '',
-        id: '',
-        name: '',
-        value: '',
-        label: '',
-      };
-    },
-
-    computed: {
-      identifier: ({ id }) => (id ? id : `id_${Track.makeUid()}`),
-      classes: ({ classes }) => `input-radio ${classes}`,
-    },
-  };
-</script>

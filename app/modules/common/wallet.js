@@ -1,4 +1,4 @@
-import { RazorpayConfig } from 'common/Razorpay';
+import RazorpayConfig from 'common/RazorpayConfig';
 
 const cdnUrl = RazorpayConfig.cdn;
 
@@ -19,6 +19,8 @@ const list = {
   citrus: ['Citrus Wallet', 32],
   // mpesa: ['Vodafone mPesa', 50],
   sbibuddy: ['SBI Buddy', 22],
+  phonepe: ['PhonePe', 20],
+  paypal: ['PayPal', 20],
 };
 
 const otpLengths = {
@@ -38,3 +40,32 @@ export const wallets = _Obj.map(list, (details, code) => ({
 
 export const isPowerWallet = code => wallets[code] && wallets[code].power;
 export const getWallet = code => wallets[code];
+
+const walletToIntent = {
+  phonepe: 'com.phonepe.app',
+};
+
+/**
+ * Returns the app corresponding to the wallet
+ * @param {string} wallet
+ *
+ * @returns {string}
+ */
+export const getPackageNameForWallet = wallet => walletToIntent[wallet];
+
+/**
+ * We want to turn some wallets into intent.
+ * @param {string} wallet Selected wallet
+ * @param {Array<Object>} apps List of available apps
+ *
+ * @returns {boolean}
+ */
+export const shouldTurnWalletToIntent = (wallet, apps = []) => {
+  const walletPackage = getPackageNameForWallet(wallet);
+
+  if (walletPackage) {
+    return _Arr.any(apps, app => app.package_name === walletPackage);
+  }
+
+  return false;
+};

@@ -1,6 +1,8 @@
 import getFingerprint from 'fingerprint';
 import { flattenProp } from 'common/options';
 import Track from 'tracker';
+import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi';
+import { getCardType, luhnCheck } from 'common/card';
 
 /* cotains mapping of sdk keys to shield key names */
 const sdkToShieldMap = {
@@ -34,16 +36,26 @@ export const setShieldParams = params => {
 
 export const formatPayment = function(payment) {
   let params =
-    ['feesRedirect', 'tez', 'avoidPopup']
+    ['feesRedirect', 'tez', 'gpay', 'avoidPopup']
     |> _Arr.reduce((allParams, param) => {
-      if (param in payment) {
+      if (payment |> _Obj.hasOwnProp(param)) {
         allParams[param] = payment[param];
       }
       return allParams;
     }, {});
 
   payment.data = formatPayload(payment.data, payment.r, params);
+  validateData(payment.data);
 };
+
+function validateData(data) {
+  const cardNum = data |> _Obj.getOwnProp('card[name]');
+  if (cardNum && luhnCheck(cardNum) && getCardType(cardNum)) {
+    _.throwMessage(
+      'Error in integration. Please contact Razorpay for assistance'
+    );
+  }
+}
 
 export const formatPayload = function(payload, razorpayInstance, params = {}) {
   var data = _Obj.clone(payload);
@@ -65,6 +77,7 @@ export const formatPayload = function(payload, razorpayInstance, params = {}) {
       'account_id',
       'notes',
       'subscription_id',
+      'auth_link_id',
       'payment_link_id',
       'customer_id',
       'recurring',
@@ -73,7 +86,7 @@ export const formatPayload = function(payload, razorpayInstance, params = {}) {
       'recurring_token.expire_by',
     ],
     field => {
-      if (!(field in data)) {
+      if (!(data |> _Obj.hasOwnProp(field))) {
         var val = getOption(field);
         if (val) {
           // send boolean value true as 1
@@ -97,15 +110,35 @@ export const formatPayload = function(payload, razorpayInstance, params = {}) {
     data['_[source]'] = 'checkoutjs';
   }
 
-  if (params.tez) {
-    if (!razorpayInstance.tezPossible) {
+  if (params.tez || params.gpay) {
+    if (
+      !(
+        razorpayInstance.paymentAdapters &&
+        (razorpayInstance.paymentAdapters.gpay ||
+          razorpayInstance.paymentAdapters['microapps.gpay'])
+      )
+    ) {
       return razorpayInstance.emit(
         'payment.error',
-        _.rzpError('Tez is not available')
+        _.rzpError('GPay is not available')
       );
     }
     data['_[flow]'] = 'intent';
+    data['_[app]'] = GOOGLE_PAY_PACKAGE_NAME;
   }
+
+  // Add integration details if present
+  const integrationKeys = [
+    'integration',
+    'integration_version',
+    'integration_parent_version',
+  ];
+  _Arr.loop(integrationKeys, key => {
+    const value = razorpayInstance.get(`_.${key}`);
+    if (value) {
+      data[`_[${key}]`] = value;
+    }
+  });
 
   let fingerprint = getFingerprint();
   if (fingerprint) {

@@ -16,21 +16,26 @@ import Iframe from 'payment/iframe';
 import { formatPayment, formatPayload } from 'payment/validator';
 import { formatAmountWithSymbol } from 'common/currency';
 import { FormatDelegator } from 'formatter';
-import Razorpay, {
-  RazorpayConfig,
-  makeAuthUrl,
-  makeUrl,
-} from 'common/Razorpay';
+import Razorpay, { makeAuthUrl, makeUrl } from 'common/Razorpay';
+import RazorpayConfig from 'common/RazorpayConfig';
 import { internetExplorer, ajaxRouteNotSupported } from 'common/useragent';
 import { isPowerWallet } from 'common/wallet';
-
-import * as Tez from 'tez';
+import { checkPaymentAdapter } from 'payment/adapters';
+import * as GPay from 'gpay';
 import Analytics from 'analytics';
+import { isProviderHeadless } from 'common/cardlessemi';
 
-const isRazorpayFrame = _Str.startsWith(
-  RazorpayConfig.api,
-  `${location.protocol}//${location.hostname}`
-);
+/**
+ * Tells if we're being executed from
+ * the same domain as the configured API
+ */
+const isRazorpayFrame = () => {
+  return _Str.startsWith(
+    RazorpayConfig.api,
+    `${location.protocol}//${location.hostname}`
+  );
+};
+
 const RAZORPAY_COLOR = '#528FF0';
 var pollingInterval;
 
@@ -139,24 +144,13 @@ export default function Payment(data, params = {}, r) {
 
   this._time = _.now();
 
-  this.sdk_popup = params.sdk_popup;
-  this.magic = params.magic;
   this.optional = params.optional || {};
 
-  this.isMagicPayment =
-    this.sdk_popup &&
-    this.magic &&
-    /^(card|emi)$/.test(data.method) &&
-    !params.feesRedirect;
+  params.feesRedirect = params.fees || params.feesRedirect; // params.fees has to be present for backward compatibility
 
-  this.magicPossible = this.isMagicPayment;
-
-  this.isAmazonpayPayment = params.amazonpay;
-
-  // If this is a magic payment, set auth_type=3ds in order to not use api-based-otpelf.
-  if (data && typeof data.auth_type === 'undefined' && this.isMagicPayment) {
-    data.auth_type = '3ds';
-  }
+  const external = params.external || {};
+  this.isExternalAmazonPayPayment = external.amazonpay;
+  this.isExternalGooglePayPayment = external.gpay;
 
   // track data, params. we only track first 6 digits of card number, and remove cvv,expiry.
   trackNewPayment(data, params, r);
@@ -174,35 +168,84 @@ export default function Payment(data, params = {}, r) {
   }
 
   this.feesRedirect = params.feesRedirect;
-  this.tez = params.tez;
+  this.microapps = params.microapps;
+  this.gpay =
+    params.gpay || params.tez || (this.microapps && this.microapps.gpay); // params.tez is legacy
+
+  if (this.microapps && this.microapps.gpay) {
+    Analytics.setMeta('microapps.gpay', true);
+  }
 
   var avoidPopup = false;
 
   /**
    * Avoid Popup if:
-   * - Payment is made by Payment Request API (`params.tez` here)
+   * - This is a native OTP request
+   * - Payment is made by Payment Request API (`params.gpay` or `params.tez` here)
    * - UPI QR or UPI is chosen inside checkout form
    * - PowerWallet is chosen & contact details are provided inside checkout form
    *
    * Enforce Popup if:
    * - Merchant is on customer fee bearer model
    */
-  if (params.tez) {
+  if (this.nativeotp) {
     avoidPopup = true;
-  } else if (isRazorpayFrame) {
+  } else if (this.gpay) {
+    avoidPopup = true;
+  } else if (isRazorpayFrame()) {
     /**
      * data needs to be present. absence of data = placeholder popup in
      * payment paused state
      */
     if (data) {
-      if (data.method === 'wallet' && isPowerWallet(data.wallet)) {
-        /* If contact or email are missing, we need to ask for it in popup */
-        if (data.contact && (this.optional.email || data.email)) {
+      if (data.method === 'wallet') {
+        if (isPowerWallet(data.wallet)) {
+          /* If contact or email are missing, we need to ask for it in popup */
+          if (data.contact && data.email) {
+            avoidPopup = true;
+          }
+        }
+
+        if (data['_[flow]'] === 'intent') {
           avoidPopup = true;
         }
       }
 
       if (data.method === 'upi') {
+        avoidPopup = true;
+      }
+
+      /**
+       * Show popup if:
+       * - Contact is missing
+       */
+      if (data.provider === 'epaylater' && data.contact) {
+        avoidPopup = true;
+      }
+
+      /**
+       * Show Popup for Cardless EMI, if
+       * - Contact is absent.
+       * - emi_duration is present but provider is not headless
+       */
+      if (data.method === 'cardless_emi') {
+        if (!data.contact) {
+          avoidPopup = false;
+        } else {
+          if (data.emi_duration) {
+            avoidPopup = isProviderHeadless(data.provider);
+          } else {
+            avoidPopup = true;
+          }
+        }
+      }
+
+      /**
+       * We do not want to show the popup
+       * if the user is trying to make a
+       * Paper Nach submission
+       */
+      if (data.method === 'nach') {
         avoidPopup = true;
       }
 
@@ -247,28 +290,6 @@ Payment.prototype = {
     this.r.off('payment');
   },
 
-  checkSdkPopup: function() {
-    var data = this.data;
-
-    if (this.sdk_popup) {
-      window.onpaymentcancel = _Func.bind(onPaymentCancel, this);
-    }
-
-    if (this.isMagicPayment) {
-      Analytics.track('magic_open_popup', {
-        r: this.r,
-      });
-      window.CheckoutBridge.invokePopup(
-        _Obj.stringify({
-          content: encodeURIComponent(popupTemplate(this)),
-          focus: false,
-        })
-      );
-
-      return true;
-    }
-  },
-
   checkRedirect: function() {
     var getOption = this.r.get;
 
@@ -280,7 +301,7 @@ Payment.prototype = {
         data.callback_url = callback_url;
       }
 
-      if (!this.avoidPopup || (data.method === 'upi' && !isRazorpayFrame)) {
+      if (!this.avoidPopup || (data.method === 'upi' && !isRazorpayFrame())) {
         _Doc.redirect({
           url: makeRedirectUrl(this.feesRedirect),
           content: data,
@@ -293,7 +314,12 @@ Payment.prototype = {
   },
 
   generate: function(data) {
-    this.data = _Obj.clone(data || this.data);
+    // Append `data` to `this.data`
+    this.data = _Obj.extend(
+      _Obj.clone(this.data || {}),
+      _Obj.clone(data || {})
+    );
+
     formatPayment(this);
 
     let setCompleteHandler = _ => {
@@ -303,11 +329,14 @@ Payment.prototype = {
         |> pollPaymentData;
     };
 
-    if (this.isAmazonpayPayment) {
+    const isExternalSDKPayment =
+      this.isExternalAmazonPayPayment || this.isExternalGooglePayPayment;
+
+    if (isExternalSDKPayment) {
       setCompleteHandler();
 
       return window.setTimeout(() => {
-        this.emit('amazonpay.process', this.data);
+        this.emit('externalsdk.process', this.data);
       }, 100);
     }
 
@@ -316,7 +345,7 @@ Payment.prototype = {
     }
 
     // redirect if specified
-    if (!this.checkSdkPopup() && this.checkRedirect()) {
+    if (this.checkRedirect()) {
       return;
     }
 
@@ -328,7 +357,7 @@ Payment.prototype = {
     }
 
     // adding listeners
-    if ((isRazorpayFrame && !this.avoidPopup) || this.isMagicPayment) {
+    if (isRazorpayFrame() && !this.avoidPopup) {
       setCompleteHandler();
     }
     this.offmessage = global |> _El.on('message', _Func.bind(onMessage, this));
@@ -350,7 +379,7 @@ Payment.prototype = {
       delete data._time;
     }
 
-    if (data.action === 'TOPUP') {
+    if (data.error && data.error.action === 'TOPUP') {
       return processOtpResponse.call(this, data);
     }
 
@@ -399,12 +428,6 @@ Payment.prototype = {
 
     this.r._payment = null;
 
-    if (this.sdk_popup) {
-      window.onpaymentcancel = null;
-    }
-    if (this.isMagicPayment) {
-      window.handleRelay = null;
-    }
     if (this.ajax) {
       this.ajax.abort();
     }
@@ -417,18 +440,23 @@ Payment.prototype = {
       return;
     }
 
-    // type: otp is not handled on razorpayjs
-    // which is sent for some of the wallets, unidentifiable from
-    // checkout side before making the payment
-    // so not making ajax call for any wallet
+    /**
+     * type: otp is not handled on razorpayjs
+     * which is sent for some of the wallets, unidentifiable from
+     * checkout side before making the payment
+     * so not making ajax call for power wallets
+     */
+    const popupForMethods = ['cardless_emi'];
+    const paymentThroughPowerWallet =
+      data.method === 'wallet' && isPowerWallet(data.wallet);
     if (
-      !isRazorpayFrame &&
-      _Arr.contains(['wallet', 'cardless_emi'], data.method)
+      !isRazorpayFrame() && // razorpay.js
+      (_Arr.contains(popupForMethods, data.method) || paymentThroughPowerWallet)
     ) {
       return;
     }
 
-    if (!this.avoidPopup && !isRazorpayFrame && data.method === 'upi') {
+    if (!this.avoidPopup && !isRazorpayFrame() && data.method === 'upi') {
       return;
     }
 
@@ -473,10 +501,36 @@ Payment.prototype = {
     }
   },
 
-  gotoBank: function() {
-    if (!this.popup) {
-      this.makePopup();
+  redirect: function({ url, content, method = 'get' }) {
+    // If we're in SDK and not in an iframe, redirect directly
+    // Not using Bridge.hasCheckoutBridge since bridge.js imports session
+    if (global.CheckoutBridge) {
+      _Doc.submitForm(url, content, method);
     }
+    // Otherwise, use sendMessage
+    else {
+      Razorpay.sendMessage({
+        event: 'redirect',
+        data: {
+          url,
+          method,
+          content,
+        },
+      });
+    }
+  },
+
+  gotoBank: function() {
+    // For redirect mode where we do not have a popup, redirect using POST
+    if (!this.popup) {
+      if (this.iframe) {
+        this.makePopup();
+      } else {
+        this.redirect({ url: this.gotoBankUrl, method: 'post' });
+        return;
+      }
+    }
+
     const isIframe = this.popup instanceof Iframe;
     if (isIframe) {
       this.popup.write(popupTemplate(this));
@@ -559,15 +613,34 @@ Razorpay.setFormatter = FormatDelegator;
 var razorpayProto = Razorpay.prototype;
 
 /**
- * Method to check if an Tez is installed on Device
+ * Method to check if a payment adapter is present.
+ * @param {String} adapter
+ * @param {Object} data
+ *
+ * @return {Promise}
+ */
+razorpayProto.checkPaymentAdapter = function(adapter, data) {
+  return checkPaymentAdapter(adapter, data).then(success => {
+    if (!this.paymentAdapters) {
+      this.paymentAdapters = {};
+    }
+
+    this.paymentAdapters[adapter] = true;
+
+    return Promise.resolve(success);
+  });
+};
+
+/**
+ * [LEGACY]
+ * Method to check if Tez is installed on Device
  * @param {Function} successCallback
  * @param {Function} errorCallback
  */
 razorpayProto.isTezAvailable = function(success, error) {
-  Tez.check(() => {
-    this.tezPossible = true;
-    success();
-  }, error);
+  this.checkPaymentAdapter('gpay')
+    .then(success)
+    .catch(error);
 };
 
 razorpayProto.postInit = function() {
@@ -591,6 +664,129 @@ razorpayProto.createPayment = function(data, params) {
 
   this._payment = this._payment || new Payment(data, params, this);
   return this;
+};
+
+/**
+ * Cache for attempted VPAs.
+ */
+let vpaCache = {};
+
+razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
+  const eventData = {
+    vpa,
+    timeout,
+  };
+
+  const url = makeAuthUrl(this, 'payments/validate/account');
+  const cachedVpaResponse = vpaCache[vpa];
+
+  if (cachedVpaResponse) {
+    const cachedEventData = _Obj.extend(
+      {
+        cache: true,
+      },
+      eventData
+    );
+
+    if (cachedVpaResponse.success) {
+      Analytics.track('validate:vpa:valid', {
+        data: cachedEventData,
+      });
+
+      return Promise.resolve(cachedVpaResponse);
+    } else {
+      Analytics.track('validate:vpa:invalid', {
+        data: cachedEventData,
+      });
+
+      return Promise.reject(cachedVpaResponse);
+    }
+  }
+
+  return new Promise((resolve, reject) => {
+    let timeoutId;
+    let responded = false;
+    const timer = _.timer();
+
+    Analytics.track('validate:vpa:init', {
+      data: eventData,
+    });
+
+    if (timeout) {
+      timeoutId = setTimeout(() => {
+        if (responded) {
+          return;
+        }
+
+        responded = true;
+        eventData.time = timer();
+
+        Analytics.track('validate:vpa:timeout', {
+          data: eventData,
+        });
+
+        resolve();
+      }, timeout);
+    }
+
+    const response = fetch.post({
+      url,
+      data: {
+        entity: 'vpa',
+        value: vpa,
+      },
+      callback: function(response) {
+        clearInterval(timeoutId);
+
+        // Track that we got a response
+        Analytics.track('validate:vpa:response', {
+          data: {
+            time: timer(),
+          },
+        });
+
+        if (responded) {
+          return;
+        }
+
+        responded = true;
+        eventData.time = timer();
+
+        /**
+         * Consider VPA to be invalid only if API says it is invalid
+         * response.error would exist even if it's a network error
+         */
+        const isVpaInvalid =
+          response.success === false ||
+          (response.error && response.error.field === 'vpa');
+
+        if (isVpaInvalid) {
+          vpaCache[vpa] = response;
+
+          Analytics.track('validate:vpa:invalid', {
+            data: eventData,
+          });
+
+          reject(response);
+        } else {
+          /**
+           * We can enter this flow for a failed n/w request as well
+           * as for a success
+           * but we should cache only if it is a success
+           */
+          if (response.success) {
+            vpaCache[vpa] = response;
+          }
+
+          Analytics.track('validate:vpa:valid', {
+            data: eventData,
+          });
+
+          resolve(response);
+        }
+      },
+    });
+  });
 };
 
 razorpayProto.focus = function() {
@@ -650,22 +846,6 @@ razorpayProto.topupWallet = function() {
   });
 };
 
-export function createFees(data, razorpayInstance, onSuccess, onError) {
-  data = formatPayload(data, razorpayInstance);
-
-  fetch.post({
-    url: makeUrl('payments/create/fees?key_id=' + razorpayInstance.get('key')),
-    data,
-    callback: function(response) {
-      if (response.error) {
-        return onError(response);
-      } else {
-        return onSuccess(response);
-      }
-    },
-  });
-}
-
 /**
  * Cache store for flows.
  */
@@ -688,8 +868,26 @@ export function getCardFlowsFromCache(cardNumber = '') {
 
   const iin = cardNumber.slice(0, 6);
 
-  return flowCache.card[iin];
+  const flows = flowCache.card[iin];
+
+  if (flows) {
+    Analytics.track('flows:card:fetch:success', {
+      data: {
+        iin,
+        cache: true,
+      },
+    });
+  }
+
+  return flows;
 }
+
+/**
+ * Store ongoing flow request*
+ */
+var ongoingFlowRequest = {
+  iin: {},
+};
 
 /**
  * Gets the flows associated with a card.
@@ -705,31 +903,57 @@ razorpayProto.getCardFlows = function(cardNumber = '', callback = _Func.noop) {
     return;
   }
 
-  // Check cache.
-  const fromCache = getCardFlowsFromCache(cardNumber);
+  const iin = cardNumber.slice(0, 6);
 
-  if (fromCache) {
-    callback(fromCache);
-    return;
+  let exitClosure = function() {
+    let promise = ongoingFlowRequest.iin[iin];
+    if (callback) {
+      promise.then(callback);
+      promise.catch(callback);
+    }
+    return promise;
+  };
+
+  if (ongoingFlowRequest.iin[iin]) {
+    return exitClosure();
   }
 
-  const iin = cardNumber.slice(0, 6);
-  let url = makeAuthUrl(this, 'payment/flows');
-
-  // append IIN and source as query to flows route
-  url = _.appendParamsToUrl(url, {
-    iin,
-    '_[source]': Track.props.library,
+  ongoingFlowRequest.iin[iin] = new Promise((resolve, reject) => {
+    let url = makeAuthUrl(this, 'payment/flows');
+    // append IIN and source as query to flows route
+    url = _.appendParamsToUrl(url, {
+      iin,
+      '_[source]': Track.props.library,
+    });
+    fetch.jsonp({
+      url,
+      callback: flows => {
+        if (flows.error) {
+          Analytics.track('flows:card:fetch:failure', {
+            data: {
+              iin,
+              error: flows.error,
+            },
+          });
+          return reject(flows.error);
+        }
+        // Add to cache.
+        flowCache.card[iin] = flows;
+        resolve(flows);
+        Analytics.track('flows:card:fetch:success', {
+          data: {
+            iin,
+            flows,
+          },
+        });
+      },
+    });
+    Analytics.track('flows:card:fetch:start', {
+      data: {
+        iin,
+      },
+    });
   });
 
-  fetch.jsonp({
-    url,
-    callback: flows => {
-      // Add to cache.
-      flowCache.card[iin] = flows;
-
-      // Invoke callback.
-      callback(flowCache.card[iin]);
-    },
-  });
+  return exitClosure();
 };

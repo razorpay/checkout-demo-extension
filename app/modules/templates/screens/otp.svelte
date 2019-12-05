@@ -1,112 +1,151 @@
-<div
-  id="form-otp"
-  class="tab-content showable screen"
-  class:loading="$screenData[SCREEN].loading"
->
-  <div id='otp-prompt'>{@html $screenData[SCREEN].text}</div>
+<script>
+  // Store imports
+  import {
+    action,
+    addFunds,
+    allowBack,
+    allowResend,
+    allowSkip,
+    loading,
+    maxlength,
+    otp,
+    skipText,
+    text,
+  } from 'checkoutstore/screens/otp';
 
-  {#if $screenData[SCREEN].addFunds}
-    <div
-      id="add-funds"
-      class="add-funds"
-    >
-      <div id="add-funds-action" class="btn" on:click="invoke('addFunds', event)">Add Funds</div>
+  // Utils imports
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
+  import { getSession } from 'sessionmanager';
+
+  // UI imports
+  import LinkButton from 'components/LinkButton.svelte';
+
+  // Props
+  export let on = {};
+
+  // Refs
+  export let input = null;
+
+  // Computed
+  export let inputWidth;
+  export let showInput;
+
+  const session = getSession();
+
+  $: {
+    /**
+     * Base width (Mandatory): 19px
+     * Each dash: 14px
+     * Each space between two dashes: 10px
+     *
+     * There are maxlength-1 spaces and maxlength dashes.
+     */
+
+    inputWidth = `${19 + ($maxlength - 1) * 10 + $maxlength * 14}px`;
+  }
+
+  $: {
+    const prevShowInput = showInput;
+
+    showInput = !($action || $loading);
+
+    if (showInput && !prevShowInput) {
+      input && input.focus();
+    }
+  }
+
+  export function invoke(type, event) {
+    const method = on[type];
+
+    if (method) {
+      method(event);
+    }
+  }
+
+  export function trackInput(event) {
+    if ($otp) {
+      Analytics.track('otp:input', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          wallet: session.tab === 'wallet',
+          headless: session.headless,
+        },
+      });
+    }
+  }
+</script>
+
+<div id="form-otp" class="tab-content showable screen" class:loading={$loading}>
+  <div id="otp-prompt">
+    {@html $text}
+  </div>
+
+  {#if $addFunds}
+    <div id="add-funds" class="add-funds">
+      <div
+        id="add-funds-action"
+        class="btn"
+        on:click={event => invoke('addFunds', event)}>
+        Add Funds
+      </div>
 
       <div class="text-center" style="margin-top: 20px;">
-        <a id="choose-payment-method" class="link" on:click="invoke('chooseMethod', event)">Try different payment method</a>
+        <LinkButton
+          id="choose-payment-method"
+          on:click={event => invoke('chooseMethod', event)}>
+          Try different payment method
+        </LinkButton>
       </div>
     </div>
   {/if}
 
   <div id="otp-section">
-    {#if $screenData[SCREEN].action}
-      <div id="otp-action" class="btn" on:click="invoke('retry', event)">Retry</div>
+    {#if $action}
+      <div
+        id="otp-action"
+        class="btn"
+        on:click={event => invoke('retry', event)}>
+        Retry
+      </div>
     {/if}
 
-    <div
-      id="otp-elem"
-      style="width: {inputWidth};"
-
-      class:hidden="!showInput"
-    >
+    <div id="otp-elem" style="width: {inputWidth};" class:hidden={!showInput}>
       <div class="help">Please enter the OTP</div>
-      <input ref:input type="tel" class="input" name="otp" id="otp" bind:value=$screenData[SCREEN].otp maxlength={$screenData[SCREEN].maxlength || 6} autocomplete="one-time-code" required>
+      <input
+        bind:this={input}
+        on:blur={trackInput}
+        type="tel"
+        class="input"
+        name="otp"
+        id="otp"
+        bind:value={$otp}
+        maxlength={$maxlength || 6}
+        autocomplete="one-time-code"
+        required />
     </div>
   </div>
 
-  <div class="spin"><div></div></div>
-  <div class="spin spin2"><div></div></div>
-    <div
-      id="otp-sec-outer"
-
-      class:hidden="!showInput"
-    >
-      {#if $screenData[SCREEN].allowResend}
-        <a id="otp-resend" class="link" on:click="invoke('resend', event)">Resend OTP</a>
-      {/if}
-      {#if $screenData[SCREEN].allowSkip}
-        <a id="otp-sec" class="link" on:click="invoke('secondary', event)">{$screenData[SCREEN].skipText || 'Skip Saved Cards'}</a>
-      {:elseif $screenData[SCREEN].allowBack}
-        <a id="otp-sec" class="link" on:click="invoke('secondary', event)">Go Back</a>
-      {/if}
-    </div>
+  <div class="spin">
+    <div />
+  </div>
+  <div class="spin spin2">
+    <div />
+  </div>
+  <div id="otp-sec-outer" class:hidden={!showInput}>
+    {#if $allowResend}
+      <LinkButton id="otp-resend" on:click={event => invoke('resend', event)}>
+        Resend OTP
+      </LinkButton>
+    {/if}
+    {#if $allowSkip}
+      <LinkButton id="otp-sec" on:click={event => invoke('secondary', event)}>
+        {$skipText}
+      </LinkButton>
+    {:else if $allowBack}
+      <LinkButton id="otp-sec" on:click={event => invoke('secondary', event)}>
+        Go Back
+      </LinkButton>
+    {/if}
+  </div>
 </div>
-
-<script>
-  export default {
-    computed: {
-      inputWidth: function ({ $screenData, SCREEN }) {
-        const {
-          maxlength
-        } = $screenData[SCREEN];
-
-        /**
-         * Base width (Mandatory): 19px
-         * Each dash: 14px
-         * Each space between two dashes: 10px
-         *
-         * There are maxlength-1 spaces and maxlength dashes.
-         */
-
-        return `${19 + (maxlength - 1) * 10 + maxlength * 14}px`;
-      },
-
-      showInput: function ({ $screenData, SCREEN }) {
-        const {
-          action,
-          loading
-        } = $screenData[SCREEN];
-
-        return !(action || loading);
-      },
-    },
-
-    data: function () {
-      return {
-        SCREEN: 'otp',
-
-        on: {}
-      };
-    },
-
-    onupdate ({ changed, current, previous }) {
-      if (changed.showInput === true) {
-        this.refs.input.focus();
-      }
-    },
-
-    methods: {
-      invoke: function (type, event) {
-        const {
-          on
-        } = this.get();
-
-        const method = on[type];
-
-        if (method) {
-          method(event);
-        }
-      },
-    },
-  }
-</script>

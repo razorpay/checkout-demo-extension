@@ -1,0 +1,36 @@
+const { openCheckout } = require('../../actions/checkout');
+const { makePreferences } = require('../../actions/preferences');
+const {
+  assertHomePage,
+  fillUserDetails,
+  verifyAutoSelectBankTPV,
+  submit,
+  verifyTimeout,
+  handleFeeBearer,
+} = require('../../actions/common');
+describe('Third Party Verification test', () => {
+  test('Perform Third Party Verification transaction with customer feebearer and timeout enabled', async () => {
+    const options = {
+      key: 'rzp_test_1DP5mmOlF5G5ag',
+      amount: 200,
+      personalization: false,
+      timeout: 10,
+    };
+    const preferences = makePreferences({
+      fee_bearer: true,
+      order: {
+        amount: 20000,
+        currency: 'INR',
+        account_number: '1234567891234567',
+        bank: 'SBIN',
+      },
+    });
+    const context = await openCheckout({ page, options, preferences });
+    await assertHomePage(context, true, true);
+    await fillUserDetails(context);
+    await verifyAutoSelectBankTPV(context, 'State Bank of India');
+    await submit(context);
+    await handleFeeBearer(context, false);
+    await verifyTimeout(context, 'tpv');
+  });
+});

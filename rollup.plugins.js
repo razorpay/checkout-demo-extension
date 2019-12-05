@@ -12,6 +12,7 @@ require('child_process').execSync('mkdir -p app/modules/generated');
 let injects = {
   global: ['generated/globals', 'global'],
   fetch: 'implicit/fetch',
+  Promise: ['implicit/promise'],
   _: ['implicit/_', '*'],
   _Arr: ['implicit/_Arr', '*'],
   _Str: ['implicit/_Str', '*'],
@@ -95,10 +96,12 @@ module.exports = [
     /* TODO: enable run-time checks when not in production */
     dev: false,
 
-    include: 'app/modules/**/*.html',
+    include: 'app/modules/**/*.svelte',
     css: css => {
       css.write('app/css/generated/svelte.styl');
     },
+
+    accessors: true,
   }),
 
   babel({

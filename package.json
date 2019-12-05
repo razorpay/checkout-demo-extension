@@ -14,6 +14,14 @@
       "email": "sm@razorpay.com"
     },
     {
+      "name": "Ankit",
+      "email": "ankit@razorpay.com"
+    },
+    {
+      "name": "Umang Galaiya",
+      "email": "umang.galaiya@razorpay.com"
+    },
+    {
       "name": "Selva Ganesh",
       "email": "selva.ganesh@razorpay.com"
     }
@@ -27,43 +35,46 @@
   },
   "scripts": {
     "test:unit": "./rollup.test.js | tap-difflet",
-    "test": "./rollup.test.js | tap-difflet; npm run build && node ./blackbox",
-    "build": "$ rollup -c --environment prod && gulp && lintOutput app/js/generated/entry",
-    "start": "$ rollup -cw & gulp watch; kill -9 $!"
+    "jest": "jest blackbox/tests --testTimeout=30000",
+    "test": "npm run test:unit && npm run build && jest blackbox/tests --testTimeout=30000",
+    "build": "$ rollup -c --environment prod && $ gulp && $ lintOutput app/js/generated/entry",
+    "start": "$ gulp watch",
+    "clean": "$ ./scripts/clean.sh"
   },
   "bugs": {
     "url": "https://github.com/razorpay/checkout/issues"
   },
   "dependencies": {
-    "chai": "^4.1.2",
     "chalk": "^2.4.1",
-    "fastify": "^1.11.2",
-    "fastify-formbody": "^2.0.1",
-    "fastify-static": "^0.14.0",
-    "fe": "git+https://github.com/razorpay/common-frontend-utils.git#b608915",
+    "fe": "git+https://github.com/razorpay/common-frontend-utils.git#e0a04b1",
     "gulp": "^4.0.0",
     "gulp-stylus": "^2.7.0",
     "gulp-usemin": "^0.3.29",
     "istanbul": "^0.4.5",
-    "jshint": "2.9.5",
+    "jest": "^24.9.0",
+    "jshint": "2.10.2",
     "jshint-stylish": "^2.2.1",
-    "puppeteer": "1.5.0",
+    "puppeteer-core": "^1.20.0",
     "rollup-plugin-coverage": "^0.1.4",
+    "rollup-plugin-svelte": "^5.1.0",
     "run-sequence": "^2.2.1",
+    "svelte": "^3.12.1",
     "tap-difflet": "^0.7.1",
-    "testdouble": "^3.8.1",
+    "testdouble": "^3.12.4",
     "through": "^2.3.8",
     "through2": "^2.0.3"
   },
-  "private": "true",
+  "private": true,
   "devDependencies": {
     "husky": "^1.0.0-rc.14",
-    "prettier": "^1.16.4",
-    "pretty-quick": "^1.6.0"
+    "jest-circus": "^24.9.0",
+    "prettier": "^1.18.2",
+    "prettier-plugin-svelte": "^0.7.0",
+    "pretty-quick": "^2.0.0"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "pretty-quick --staged"
+      "pre-commit": "pretty-quick --plugin-search-dir=. --staged"
     }
   }
 }

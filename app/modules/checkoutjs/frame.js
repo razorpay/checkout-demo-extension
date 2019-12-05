@@ -1,4 +1,5 @@
-import { RazorpayConfig, makeUrl, makePrefParams } from 'common/Razorpay';
+import { makeUrl, makePrefParams } from 'common/Razorpay';
+import RazorpayConfig from 'common/RazorpayConfig';
 import Track from 'tracker';
 import { iPhone, shouldRedirect } from 'common/useragent';
 import Analytics from 'analytics';
@@ -93,6 +94,7 @@ function sanitizeImage(options) {
 }
 
 function makeCheckoutUrl(rzp) {
+  const CANARY_PERCENTAGE = 0.05;
   var url = RazorpayConfig.frame;
 
   if (!url) {
@@ -104,6 +106,10 @@ function makeCheckoutUrl(rzp) {
     } else {
       url = _.appendParamsToUrl(url, urlParams);
     }
+  }
+
+  if (_.random() < CANARY_PERCENTAGE) {
+    url = _.appendParamsToUrl(url, { canary: 1 });
   }
 
   return url;
@@ -420,7 +426,7 @@ CheckoutFrame.prototype = {
   ondismiss: function(data) {
     this.close();
     let dismiss = this.rzp.get('modal.ondismiss');
-    if (_.isFunction) {
+    if (_.isFunction(dismiss)) {
       setTimeout(() => dismiss(data));
     }
   },

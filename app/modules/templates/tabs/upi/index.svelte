@@ -1,103 +1,412 @@
-<Tab method="upi">
-  {#if intent}
-    <UpiIntent
-      ref:intentView
-      apps={intentApps}
-      {selectedApp}
-      {showRecommendedUPIApp}
-    />
-  {:else}
-    {#if selectedApp === undefined || isTezSelected}
-      <div class="legend left">Select a UPI app</div>
-      <Grid items={topUpiApps}
-        on:select="onUpiAppSelection(event)"
-        selected={selectedApp}
-      />
-    {:else}
-      <div class="legend left">Selected UPI app</div>
-      <Card>
-        <span ref:iconWrap>
-          <Icon icon={selectedAppData.icon}/>
-        </span>
-        <span>
-          {selectedAppData.text}
-        </span>
-        <div ref:changeBtn on:click="onUpiAppSelection()">change</div>
-      </Card>
-      <div class="legend left" style="margin-top: 18px">
-        Enter your UPI ID
-      </div>
-      <Card selected={true} on:click="handleCardClick(event)">
-        {#if selectedApp === 'gpay'}
-          <div id="upi-tez">
-            <div class="elem-wrap collect-form">
-              <!-- TODO: remove all non svelte css for this -->
-              <Field
-                type="text"
-                name="vpa"
-                id='vpa'
-                ref:vpaField
-                placeholder="Enter UPI ID"
-                helpText="Please enter a valid handle"
-                pattern=".+"
-                required={true}
-                formatter={{
-                  type: 'vpa'
-                }}
-              />
-              <div class="elem at-separator">@</div>
-              <div class="elem">
-                <select
-                  required
-                  class="input"
-                  name="tez_bank"
-                  ref:googlePayPspHandle
-                  on:change="googlePayPspHandleChange(event)"
-                  bind:value="pspHandle">
-                  <option value="">Select Bank</option>
-                  <option value="okhdfcbank">okhdfcbank</option>
-                  <option value="okicici">okicici</option>
-                  <option value="oksbi">oksbi</option>
-                  <option value="okaxis">okaxis</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        {:else}
-          <div id='vpa-wrap' class={selectedAppData.id}>
-            <!-- TODO: use formatter for validation once all fields
-              are moved to `Field` -->
-            <Field
-              type="text"
-              name="vpa"
-              id="vpa"
-              ref:vpaField
-              placeholder={selectedApp ? "" : "Enter your UPI Address"}
-              helpText="Please enter a valid VPA of the form username@bank"
-              value={selectedApp === null ? vpa : ''}
-              pattern={pattern}
-              required={true}
-              formatter={{
-                type: 'vpa'
-              }}
-            />
-            {#if pspHandle}
-              <div ref:pspName>@{pspHandle}</div>
-            {/if}
-          </div>
-        {/if}
-      </Card>
-    {/if}
-  {/if}
-</Tab>
+<script>
+  // Svelte imports
+  import { onMount } from 'svelte';
+
+  // Util imports
+  import { getSession } from 'sessionmanager';
+  import * as GPay from 'gpay';
+  import * as Bridge from 'bridge';
+  import DowntimesStore from 'checkoutstore/downtimes';
+  import { VPA_REGEX } from 'common/constants';
+  import {
+    doesAppExist,
+    GOOGLE_PAY_PACKAGE_NAME,
+    topUpiApps,
+    otherAppsIcon,
+  } from 'common/upi';
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
+  import { Formatter } from 'formatter';
+  import { hideCta, showCtaWithDefaultText } from 'checkoutstore/cta';
+
+  // UI imports
+  import UpiIntent from './UpiIntent.svelte';
+  import Tab from 'templates/tabs/Tab.svelte';
+  import Grid from 'templates/views/ui/grid/Base.svelte';
+  import Card from 'templates/views/ui/Card.svelte';
+  import Field from 'templates/views/ui/Field.svelte';
+  import Icon from 'templates/views/ui/Icon.svelte';
+  import DowntimeCallout from 'templates/views/ui/DowntimeCallout.svelte';
+  import Collect from './Collect.svelte';
+  import GooglePayCollect from './GooglePayCollect.svelte';
+  import GooglePayOmnichannel from './GooglePayOmnichannel.svelte';
+  import NextOption from 'templates/views/ui/options/NextOption.svelte';
+  import Screen from 'templates/layouts/Screen.svelte';
+  import OffersPortal from 'templates/views/OffersPortal.svelte';
+
+  // Props
+  export let selectedApp = undefined;
+  export let preferIntent = true;
+  export let useWebPaymentsApi = false;
+  export let qrEnabled = false;
+  export let down = false;
+  export let useOmnichannel = false;
+  export let retryOmnichannel = false;
+  export let isFirst = true;
+  export let omnichannelType = 'phone';
+  export let vpa = '';
+  export let qrIcon;
+  export let tab = 'upi';
+  export let focused = false;
+
+  // Refs
+  export let intentView = null;
+  export let omnichannelField = null;
+  export let vpaField = null;
+
+  // Computed
+  export let selectedAppData = null;
+  export let intent;
+  export let isGPaySelected;
+  export let pspHandle;
+  export let shouldShowQr;
+  let disabled = false;
+
+  const session = getSession();
+  const {
+    all_upi_intents_data: allIntentApps,
+    upi_intents_data: intentApps,
+    isPayout,
+    showRecommendedUPIApp,
+  } = session;
+
+  function isVpaValid(vpa) {
+    return VPA_REGEX.test(vpa);
+  }
+
+  const checkGPay = session => {
+    const hasFeature =
+      session.preferences &&
+      session.preferences.features &&
+      session.preferences.features.google_pay;
+
+    /* disable Web payments API for fee_bearer for now */
+    if (session.preferences.fee_bearer) {
+      return Promise.reject();
+    }
+
+    // We're not using Web Payments API for Payouts
+    if (session.isPayout) {
+      return Promise.reject();
+    }
+
+    /* disable Web payments API for Android SDK as we have intent there */
+    if (Bridge.checkout.exists()) {
+      return Promise.reject();
+    }
+
+    /* disable it if it's not enabled for a specific merchant */
+    if (!hasFeature) {
+      return Promise.reject();
+    }
+
+    return session.r.checkPaymentAdapter('gpay');
+  };
+
+  const checkOmnichannel = session => {
+    const hasFeature =
+      session.preferences &&
+      session.preferences.features &&
+      session.preferences.features.google_pay_omnichannel;
+
+    // Do not use omnichannel for Payouts
+    if (session.isPayout) {
+      return false;
+    }
+
+    if (hasFeature) {
+      Analytics.track('omnichannel', {
+        type: AnalyticsTypes.RENDER,
+      });
+    }
+
+    return hasFeature;
+  };
+
+  $: selectedAppData = _Arr.find(topUpiApps, item => item.id === selectedApp);
+  $: intent = Boolean(
+    !isPayout && preferIntent && intentApps && _.lengthOf(intentApps) > 0
+  );
+  $: isGPaySelected = selectedApp === 'gpay' && useWebPaymentsApi;
+  $: pspHandle = selectedAppData ? selectedAppData.psp : '';
+  $: shouldShowQr =
+    qrEnabled && !selectedApp && selectedApp !== null && !isPayout;
+
+  $: {
+    if (tab) {
+      /**
+       * For separate Gpay tab, if it is intent app and app does not exist,
+       * fallback to older GPay UI
+       **/
+      if (selectedApp === 'gpay') {
+        if (tab === 'gpay') {
+          preferIntent = doesAppExist(GOOGLE_PAY_PACKAGE_NAME, intentApps);
+        } else if (tab === 'upi') {
+          preferIntent = true;
+        }
+      }
+    }
+  }
+
+  $: {
+    if (session.tab === 'upi' || session.tab === 'gpay') {
+      /* TODO: bad practice, remove asap */
+      if (selectedApp === undefined || isGPaySelected) {
+        hideCta();
+      } else {
+        showCtaWithDefaultText();
+      }
+    }
+  }
+
+  onMount(() => {
+    checkGPay(session)
+      /* Use Google Pay */
+      .then(() => (useWebPaymentsApi = true))
+      /* Don't use Google Pay */
+      .catch(() => (useWebPaymentsApi = false));
+
+    useOmnichannel = checkOmnichannel(session);
+
+    /* TODO: improve handling of `prefill.vpa` */
+    if (session.get('prefill.vpa')) {
+      selectedApp = null;
+      vpa = session.get('prefill.vpa');
+    }
+
+    const downtimes = DowntimesStore.get();
+
+    down = _Arr.contains(downtimes.low.methods, 'upi');
+    disabled = _Arr.contains(downtimes.high.methods, 'upi');
+
+    qrEnabled = session.methods.qr;
+    qrIcon = session.themeMeta.icons.qr;
+  });
+
+  export function selectQrMethod() {
+    Analytics.track('payment_method:select', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        method: 'qr',
+      },
+    });
+
+    session.switchTab('qr');
+  }
+
+  export function setOmnichannelType(event) {
+    const { type } = event.detail;
+
+    Analytics.track('omnichannel:type:select', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        type,
+      },
+    });
+
+    omnichannelType = type;
+  }
+
+  export function getPayload() {
+    /**
+     * getPayload is called when the users presses Pay.
+     *
+     * "blur" is not fired on vpaField input element
+     * if the form is submitted directly by pressing Enter.
+     *
+     * Hence, we try to force a blur in order to perform
+     * analytics tracking.
+     *
+     * "blur" is not fired in case the element is not
+     * already focused on, so this would be fine if the
+     * user decides to manually press the pay button.
+     */
+    if (vpaField) {
+      vpaField.blur();
+    }
+
+    let data = {};
+    if (intent) {
+      data = intentView.getPayload();
+    } else {
+      if (selectedApp && isGPaySelected) {
+        data = {
+          '_[flow]': 'gpay',
+        };
+      } else if (useOmnichannel && selectedApp === 'gpay') {
+        if (!retryOmnichannel) {
+          data['_[flow]'] = 'intent';
+          data.contact = omnichannelField.getPhone();
+          data.upi_provider = 'google_pay';
+        } else {
+          if (omnichannelType === 'vpa') {
+            data['_[flow]'] = 'directpay';
+            data.vpa = getFullVpa();
+          } else if (omnichannelType === 'phone') {
+            data['_[flow]'] = 'intent';
+            data.contact = omnichannelField.getPhone();
+            data.upi_provider = 'google_pay';
+          }
+        }
+      } else {
+        data = {
+          vpa: getFullVpa(),
+        };
+      }
+
+      /**
+       * TODO: discuss with vivek whether to continue sending
+       * directpay for collect requests
+       */
+      if (!data['_[flow]']) {
+        data['_[flow]'] = 'directpay';
+      }
+    }
+
+    data.method = 'upi';
+
+    return data;
+  }
+
+  export function setOmnichannelAsRetried() {
+    Analytics.track('omnichannel:retry:click', {
+      type: AnalyticsTypes.BEHAV,
+    });
+
+    retryOmnichannel = true;
+  }
+
+  export function onBack() {
+    // User has gone back, set isFirst as false
+    isFirst = false;
+
+    if (!intent) {
+      if (isGPaySelected) {
+        selectedApp = undefined;
+        return false;
+      }
+
+      if (selectedApp !== undefined) {
+        selectedApp = undefined;
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    return false;
+  }
+
+  export function onUpiAppSelection(event) {
+    const id = event.detail.id;
+
+    if (typeof id !== 'undefined') {
+      /**
+       * `id` is undefined when the user wants to switch app
+       * and it is null when the user select "other apps"
+       */
+      Analytics.track('upi:app:select', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          flow: 'collect',
+          app: id,
+        },
+      });
+    }
+
+    selectedApp = id;
+
+    /**
+     * Wait for `isGpaySelected` to be updated. It does not update synchronously when selectedApp is reassigned, hence
+     * the setTimeout.
+     */
+    setTimeout(function() {
+      if (isGPaySelected) {
+        return session.preSubmit();
+      }
+
+      focusVpa();
+    });
+  }
+
+  export function focusVpa() {
+    if (!focused && vpaField) {
+      if (useOmnichannel && selectedApp === 'gpay') {
+        omnichannelField.focus();
+      } else {
+        vpaField.focus();
+      }
+    }
+  }
+
+  export function getFullVpa() {
+    if (vpaField) {
+      return vpaField.getVpa();
+    }
+    return '';
+  }
+
+  export function trackVpaEntry() {
+    const vpa = getFullVpa();
+
+    if (!vpa) {
+      return;
+    }
+
+    const valid = isVpaValid(vpa);
+
+    Analytics.track('vpa:fill', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        app: selectedApp,
+        value: vpa,
+        valid,
+      },
+    });
+  }
+
+  export function trackHandleSelection(event) {
+    const handle = event.detail;
+
+    const vpa = vpaField.getVpa();
+
+    const valid = vpa ? isVpaValid(vpa) : false;
+
+    Analytics.track('vpa:handle:select', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        app: selectedApp,
+        value: vpa,
+        valid,
+        handle,
+      },
+    });
+  }
+
+  export function trackOmnichannelEntry() {
+    const contact = omnichannelField.getPhone();
+    let valid = false;
+
+    if (contact) {
+      valid = Formatter.rules.phone.isValid(contact);
+    }
+
+    Analytics.track('omnichannel:fill', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        valid,
+        value: omnichannelField.getPhone(),
+      },
+    });
+  }
+</script>
 
 <style>
   .legend {
-    margin: 12px 0 8px 0;
-    padding: 0;
+    padding: 12px 0 8px 12px;
   }
 
-  #vpa-wrap{
+  #vpa-wrap {
     &.phonepe :global(.elem) {
       padding-right: 44px;
     }
@@ -115,8 +424,7 @@
     }
   }
 
-
-  ref:changeBtn {
+  .ref-changebtn {
     position: absolute;
     top: 0;
     right: 4px;
@@ -124,11 +432,11 @@
     font-size: 12px;
     line-height: 47px;
     padding: 0 20px 0 30px;
-    color: #7B7F95;
+    color: #7b7f95;
     overflow: hidden;
     cursor: pointer;
 
-     &:after {
+    &:after {
       content: '\e604';
       transform: rotate(270deg);
       font-size: 8px;
@@ -136,19 +444,6 @@
       right: 8px;
       top: 0;
     }
-  }
-
-  ref:pspName {
-    color: #424242;
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    line-height: 40px;
-    z-index: 1;
-  }
-
-  #upi-tez {
-    display: block;
   }
 
   div :global(.input) {
@@ -161,7 +456,7 @@
     margin-right: 4px;
   }
 
-  ref:iconWrap {
+  .ref-iconwrap {
     width: 20px;
     height: @width;
   }
@@ -170,322 +465,88 @@
     height: 20px;
     width: 20px;
   }
-
 </style>
 
-<script>
-  import { getSession } from 'sessionmanager.js';
-  import * as Tez from 'tez.js';
-  import * as Bridge from 'bridge.js';
-  import { VPA_REGEX } from 'common/constants.js';
-  import { doesAppExist, GOOGLE_PAY_PACKAGE_NAME } from 'common/upi.js';
+<Tab method="upi" {down} pad={false}>
+  <Screen>
+    <div slot="main">
+      {#if intent}
+        <UpiIntent
+          bind:this={intentView}
+          apps={intentApps}
+          {selectedApp}
+          {showRecommendedUPIApp} />
+      {:else if selectedApp === undefined || isGPaySelected}
+        <div class="legend left">Select a UPI app</div>
+        <Grid items={topUpiApps} on:select={onUpiAppSelection} />
+      {:else}
+        <div class="legend left">Selected UPI app</div>
+        <Card>
+          <span class="ref-iconwrap">
+            <Icon icon={selectedAppData.icon} alt={selectedAppData.text} />
+          </span>
+          <span>{selectedAppData.text}</span>
+          <div class="ref-changebtn" on:click={onUpiAppSelection}>change</div>
+        </Card>
+        {#if selectedApp === 'gpay'}
+          {#if useOmnichannel}
+            <GooglePayOmnichannel
+              error={retryOmnichannel}
+              focusOnCreate={true}
+              {isFirst}
+              retry={retryOmnichannel}
+              selected={omnichannelType === 'phone'}
+              on:blur={trackOmnichannelEntry}
+              on:select={setOmnichannelType}
+              bind:this={omnichannelField} />
+          {/if}
+          {#if retryOmnichannel || !useOmnichannel}
+            <GooglePayCollect
+              focusOnCreate={!retryOmnichannel}
+              {pspHandle}
+              retry={retryOmnichannel}
+              selected={omnichannelType === 'vpa'}
+              on:blur={trackVpaEntry}
+              on:handleChange={trackHandleSelection}
+              on:select={setOmnichannelType}
+              bind:this={vpaField} />
+          {/if}
+        {:else}
+          <Collect
+            appId={selectedAppData.id}
+            focusOnCreate={true}
+            {pspHandle}
+            {selectedApp}
+            {vpa}
+            on:blur={trackVpaEntry}
+            bind:this={vpaField} />
+        {/if}
+      {/if}
 
-  const otherAppsIcon =
-    'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNCA4aDRWNEg0djR6bTYgMTJoNHYtNGgtNHY0em0tNiAwaDR2LTRINHY0em0wLTZoNHYtNEg0djR6bTYgMGg0di00aC00djR6bTYtMTB2NGg0VjRoLTR6bS02IDRoNFY0aC00djR6bTYgNmg0di00aC00djR6bTAgNmg0di00aC00djR6IiBmaWxsPSIjYjBiMGIwIi8+PHBhdGggZD0iTTAgMGgyNHYyNEgweiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==';
+      {#if shouldShowQr}
+        <div class="legend left">Or, Pay using QR</div>
+        <div class="options" id="showQr">
+          <NextOption
+            icon={qrIcon}
+            tabindex="0"
+            attributes={{ role: 'button', 'aria-label': 'Show QR Code - Scan the QR code using your UPI app' }}
+            on:select={selectQrMethod}>
+            <div>Show QR Code</div>
+            <div class="desc">Scan the QR code using your UPI app</div>
+          </NextOption>
+        </div>
+      {/if}
+    </div>
 
-  const topUpiApps = [
-    {
-      text: 'BHIM',
-      icon: 'https://cdn.razorpay.com/app/bhim.svg',
-      id: 'bhim',
-      psp: 'upi',
-    },
-    {
-      text: 'Google Pay',
-      icon: 'https://cdn.razorpay.com/app/googlepay.svg',
-      id: 'gpay',
-      psp: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],
-    },
-    {
-      text: 'WhatsApp',
-      icon: 'https://cdn.razorpay.com/app/whatsapp.svg',
-      id: 'whatsapp',
-      psp: 'icici',
-    },
-    {
-      text: 'Paytm',
-      icon: 'https://cdn.razorpay.com/app/paytm.svg',
-      id: 'paytm',
-      psp: 'paytm',
-    },
-    {
-      text: 'PhonePe',
-      icon: 'https://cdn.razorpay.com/app/phonepe.svg',
-      id: 'phonepe',
-      psp: 'ybl',
-    },
-    {
-      text: 'Other Apps',
-      icon: otherAppsIcon,
-      id: null,
-      psp: '',
-    },
-  ];
+    <div slot="bottom">
+      {#if down || disabled}
+        <DowntimeCallout severe={disabled}>
+          <strong>UPI</strong>
+          is experiencing low success rates.
+        </DowntimeCallout>
+      {/if}
 
-  const checkTez = function(
-    successCallback = () => {},
-    errorCallback = () => {}
-  ) {
-    var session = getSession();
-
-    var hasFeature =
-      session.preferences &&
-      session.preferences.features &&
-      session.preferences.features.google_pay;
-
-    /* disable Web payments API for fee_bearer for now */
-    if (session.preferences.fee_bearer) {
-      return errorCallback();
-    }
-
-    /* disable Web payments API for Android SDK as we have intent there */
-    if (Bridge.checkout.exists()) {
-      return errorCallback();
-    }
-
-    /* disable it if it's not enabled for a specific merchant */
-    if (!(hasFeature || Tez.checkKey(session.get('key')))) {
-      return errorCallback();
-    }
-
-    session.r.isTezAvailable(successCallback, errorCallback);
-  };
-
-  export default {
-    components: {
-      UpiIntent: './UpiIntent.svelte',
-      Tab: 'templates/tabs/Tab.svelte',
-      Grid: 'templates/views/ui/grid/Base.svelte',
-      Card: 'templates/views/ui/Card.svelte',
-      Field: 'templates/views/ui/Field.svelte',
-      Icon: 'templates/views/ui/Icon.svelte',
-    },
-
-    data() {
-      return {
-        vpa: '',
-        tab: 'upi',
-        topUpiApps,
-        otherAppsIcon,
-        pspHandle: '',
-        pattern: '.+',
-        preferIntent: true,
-        selectedApp: undefined,
-        useWebPaymentsApi: false,
-      };
-    },
-
-    computed: {
-      selectedAppData: ({ topUpiApps, selectedApp }) =>
-        _Arr.find(topUpiApps, item => item.id === selectedApp),
-
-      intentApps: data => getSession().upi_intents_data,
-
-      showRecommendedUPIApp: data => getSession().showRecommendedUPIApp,
-
-      intent: ({ preferIntent }) => {
-        let intentApps = getSession().upi_intents_data;
-        return preferIntent && intentApps && _.lengthOf(intentApps) > 0;
-      },
-
-      /* Will be true if Tez for web payments API is selected */
-      isTezSelected: ({ selectedApp, useWebPaymentsApi }) =>
-        selectedApp === 'gpay' && useWebPaymentsApi,
-    },
-
-    oncreate() {
-      const session = getSession();
-
-      checkTez(
-        /* Use Tez */
-        () => this.set({ useWebPaymentsApi: true }),
-        /* Don't use Tez */
-        () => this.set({ useWebPaymentsApi: false })
-      );
-
-      /* TODO: improve handling of `prefill.vpa` */
-      if (session.get('prefill.vpa')) {
-        this.set({
-          selectedApp: null,
-          vpa: session.get('prefill.vpa'),
-        });
-      }
-    },
-
-    onstate({ changed, current }) {
-      const session = getSession();
-
-      if (
-        changed.selectedApp &&
-        (session.tab === 'upi' || session.tab === 'tez')
-      ) {
-        /* TODO: bad practice, remove asap */
-        if (current.selectedApp === undefined || current.isTezSelected) {
-          _El.removeClass(_Doc.querySelector('#body'), 'sub');
-        } else {
-          _El.addClass(_Doc.querySelector('#body'), 'sub');
-        }
-      }
-
-      if (changed.tab) {
-        /**
-         * For separate Gpay tab, if it is intent app and app does not exist,
-         * fallback to older tez UI
-         **/
-        let { selectedApp, intent, tab, intentApps } = current;
-
-        if (selectedApp === 'gpay') {
-          if (tab === 'tez') {
-            this.set({ preferIntent: doesAppExist(
-              GOOGLE_PAY_PACKAGE_NAME,
-              intentApps
-            )});
-          } else if (tab === 'upi') {
-            this.set({ preferIntent: true });
-          }
-        }
-      }
-
-    },
-
-    methods: {
-      /**
-       * This function will be invoked externally via session on
-       * payment form submission
-       */
-      getPayload() {
-        const {
-          selectedApp,
-          intent,
-          pspHandle,
-          isTezSelected
-        } = this.get();
-
-        let vpa = '';
-        let data = {};
-
-        if (this.refs.vpaField) {
-          vpa = this.refs.vpaField.getValue();
-        }
-
-        if (intent) {
-          data = this.refs.intentView.getPayload();
-        } else {
-          if (selectedApp) {
-            if (isTezSelected) {
-              data = {
-                '_[flow]': 'tez',
-              };
-            } else {
-              let vpaToSubmit = vpa;
-
-              if (!VPA_REGEX.test(vpa)) {
-                vpaToSubmit = `${vpa}@${pspHandle}`;
-              }
-
-              data = {
-                vpa: vpaToSubmit,
-              };
-            }
-          } else {
-            data = {
-              vpa,
-            };
-          }
-
-          /**
-           * TODO: discuss with vivek whether to continue sending
-           * directpay for collect requests
-           */
-
-          if (!data['_[flow]']) {
-            data['_[flow]'] = 'directpay';
-          }
-        }
-
-        data.method = 'upi';
-
-        return data;
-      },
-
-      onBack() {
-        const {
-          intent,
-          selectedApp,
-          isTezSelected,
-        } = this.get();
-
-        if (!intent) {
-          if (isTezSelected) {
-            this.set({ selectedApp: undefined });
-            return false;
-          }
-
-          if (selectedApp !== undefined) {
-            this.set({ selectedApp: undefined });
-            return true;
-          } else {
-            return false;
-          }
-        }
-
-        return false;
-      },
-
-      onUpiAppSelection(id) {
-        const session = getSession();
-        let pattern = '';
-
-        this.set({ selectedApp: id });
-        const { selectedAppData, isTezSelected } = this.get();
-
-        if (isTezSelected) {
-          return session.preSubmit();
-        }
-
-        if (id === null) {
-          pattern = '.+@.+';
-        } else {
-          pattern = '.+';
-        }
-
-        this.set({
-          pspHandle: selectedAppData ? selectedAppData.psp : '',
-          pattern,
-        });
-
-        this.focusVpa();
-      },
-
-      /* VPA card specific code */
-      focusVpa(event) {
-        if (!this.get()['focused'] && this.refs.vpaField) {
-          this.refs.vpaField.focus();
-        }
-      },
-
-      /**
-       * Called when the UPI address card is clicked.
-       */
-      handleCardClick: function(event) {
-        const target = event && event.target;
-        const { googlePayPspHandle } = this.refs;
-
-        // Don't focus on VPA input if the dropdown elem was clicked.
-        if (target === googlePayPspHandle) {
-          return;
-        }
-
-        this.focusVpa(event);
-      },
-
-      /**
-       * Called when the Google Pay PSP is selected from the dropdown.
-       */
-      googlePayPspHandleChange(event) {
-        // TODO: Focus only if vpa is invalid.
-        this.focusVpa(event);
-      },
-    },
-  };
-</script>
+      <OffersPortal />
+    </div>
+  </Screen>
+</Tab>

@@ -48,13 +48,7 @@ const optionsTransformer = {
   },
 
   addFeatures: (o, message) => {
-    const features = [
-      'sdk_popup',
-      'magic',
-      'activity_recreated',
-      'embedded',
-      'params',
-    ];
+    const features = ['activity_recreated', 'embedded', 'params'];
     const options = message.options;
 
     _Obj.loop(features, feature => {
@@ -72,6 +66,7 @@ const optionsTransformer = {
   addExternalSdks: (o, message) => {
     if (_.isNonNullObject(message.external_sdks)) {
       o.hasAmazonpaySdk = message.external_sdks.amazonpay;
+      o.hasGooglePaySdk = message.external_sdks.googlepay;
     }
   },
 
@@ -175,10 +170,27 @@ export const handleMessage = function(message) {
     return;
   }
 
-  let transformedOptions = transformOptions(message);
-
   var id = message.id || Track.id;
   var session = SessionManager.getSession(id);
+
+  if (message.event === 'close') {
+    if (session) {
+      session.closeAndDismiss();
+    }
+    return;
+  }
+
+  /**
+   * Emit `payment.resume`
+   */
+  if (message.event === 'resume') {
+    if (session) {
+      session.r.emit('payment.resume', message.data);
+    }
+    return;
+  }
+
+  let transformedOptions = transformOptions(message);
   var options = message.options;
 
   setAnalyticsMeta(message);
@@ -207,11 +219,18 @@ export const handleMessage = function(message) {
 
   if (message.event === 'open' || options) {
     /* always fetch preferences, disregard backend printed one. */
-    session.fetchPrefs(preferences => {
-      session.showModal(preferences);
+    session.fetchPrefs(({ preferences, validation }) => {
+      const { error } = validation;
+
+      if (error) {
+        return Razorpay.sendMessage({
+          event: 'fault',
+          data: error,
+        });
+      } else {
+        session.showModal(preferences);
+      }
     });
-  } else if (message.event === 'close') {
-    session.hide();
   }
 
   try {

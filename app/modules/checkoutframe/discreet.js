@@ -1,11 +1,17 @@
 import 'entry/checkout-frame';
-import { RazorpayConfig, makeAuthUrl, makePrefParams } from 'common/Razorpay';
+import {
+  makeAuthUrl,
+  makePrefParams,
+  validateOverrides,
+} from 'common/Razorpay';
+import RazorpayConfig from 'common/RazorpayConfig';
 
 import Track from 'tracker';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import * as UPIUtils from 'common/upi';
-import * as Tez from 'tez';
+import * as EmiUtils from 'common/emi';
+import * as GPay from 'gpay';
 import * as Color from 'lib/color';
 import * as _PaymentMethodIcons from 'templates/paymentMethodIcons';
 import * as Confirm from 'confirm';
@@ -15,15 +21,11 @@ import * as OtpService from 'common/otpservice';
 import * as strings from 'common/strings';
 import * as UserAgent from 'common/useragent';
 import emiView from 'checkoutframe/emi';
-import FeeBearerView from 'checkoutframe/feebearer';
-import SavedCardsView from 'checkoutframe/savedcards';
+import FeeBearerView from 'templates/views/feebearer.svelte';
 import emandateView from 'checkoutframe/emandate';
-import emiOptionsView from 'checkoutframe/emioptions';
-import emiScreenView from 'checkoutframe/emiscreen';
 import emiPlansView from 'checkoutframe/emiplans';
 import otpView from 'checkoutframe/otp';
 import * as Curtain from 'components/curtain';
-import * as OptionsList from 'components/OptionsList';
 import { setShieldParams } from 'payment/validator';
 import * as P13n from 'checkoutframe/personalization';
 import MethodsList from 'components/MethodsList';
@@ -36,31 +38,59 @@ import * as Bank from 'common/bank';
 import * as Card from 'common/card';
 import * as Wallet from 'common/wallet';
 import * as CardlessEmi from 'common/cardlessemi';
+import * as PayLater from 'common/paylater';
 import * as Token from 'common/token';
 import * as SessionManager from 'sessionmanager';
 import * as Checkout from 'checkoutframe/index';
 import * as Offers from 'checkoutframe/offers';
 import * as Flows from 'checkoutframe/flows';
+import * as Downtimes from 'checkoutframe/downtimes';
+import * as Payouts from 'checkoutframe/payouts';
 import { initIframe } from 'checkoutframe/iframe';
 import * as Bridge from 'bridge';
 import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
-import Store from 'checkoutframe/store';
+import { Formatter } from 'formatter';
+
+import Store from 'checkoutstore';
+import PreferencesStore from 'checkoutstore/preferences';
+import SessionStore from 'checkoutstore/session';
+import DowntimesStore from 'checkoutstore/downtimes';
+import * as OTPScreenStore from 'checkoutstore/screens/otp';
+import * as Cta from 'checkoutstore/cta';
+import * as HomeScreenStore from 'checkoutstore/screens/home';
 
 import QRScreen from 'templates/views/qr.svelte';
-import MagicView from 'checkoutframe/magic';
+import BankTransferScreen from 'templates/views/bank_transfer.svelte';
 import UpiTab from 'templates/tabs/upi/index.svelte';
+import emiOptionsView from 'templates/screens/cardlessemi.svelte';
+import emiScreenView from 'templates/screens/emiscreen.svelte';
+import SavedCardsView from 'templates/screens/savedcards.svelte';
+import PayLaterView from 'templates/screens/paylater.svelte';
+import HomeTab from 'templates/tabs/home.svelte';
+import NetbankingTab from 'templates/tabs/netbanking/index.svelte';
+import NachScreen from 'templates/views/nach.svelte';
+
+import PayoutsInstruments from 'templates/screens/payout-instruments.svelte';
+import PayoutAccount from 'templates/screens/payout-account.svelte';
+
+import * as Hacks from 'checkoutframe/hacks';
+
+import { get as storeGetter } from 'svelte/store';
+import * as Experiments from 'experiments';
 
 export default {
   RazorpayConfig,
   makeAuthUrl,
+  validateOverrides,
   makePrefParams,
   fetch,
   Track,
   Analytics,
   AnalyticsTypes,
   UPIUtils,
+  EmiUtils,
   setShieldParams,
-  Tez,
+  GPay,
   Color,
   _PaymentMethodIcons,
   Confirm,
@@ -70,7 +100,10 @@ export default {
   getDecimalAmount: Currency.getDecimalAmount,
   currencies: Currency.displayCurrencies,
   error: _.rzpError,
+  Formatter,
+
   cancelMsg: strings.cancelMsg,
+  confirmCancelMsg: strings.confirmCancelMsg,
   wrongOtpMsg: strings.wrongOtp,
 
   initIframe,
@@ -80,16 +113,26 @@ export default {
   Card,
   Wallet,
   CardlessEmi,
+  PayLater,
   Token,
   SessionManager,
   Checkout,
   Bridge,
   P13n,
   MethodsList,
-  Store,
   UserAgent,
   Offers,
   Flows,
+  Downtimes,
+  Payouts,
+
+  Store,
+  PreferencesStore,
+  DowntimesStore,
+  SessionStore,
+  OTPScreenStore,
+  HomeScreenStore,
+  Cta,
 
   getQueryParams: _.getQueryParams,
 
@@ -105,15 +148,31 @@ export default {
   SavedCardsView,
 
   FeeBearerView,
+  PayoutsInstruments,
+  PayoutAccount,
 
   otpView,
+  PayLaterView,
   Curtain,
-  OptionsList,
   commonBanks,
   timer: _.timer,
   QRScreen,
+  BankTransferScreen,
   getFullBankLogo,
 
-  MagicView,
+  HomeTab,
   UpiTab,
+  NetbankingTab,
+  NachScreen,
+
+  Hacks,
+  storeGetter,
+  Experiments,
+
+  _Arr,
+  _Doc,
+  _El,
+  _Func,
+  _Obj,
+  _,
 };

@@ -1,6 +1,7 @@
 import { displayAmount } from 'common/currency';
 import css from './popup.styl';
 import { cancelMsg } from 'common/strings';
+import { sanitizeHtmlEntities } from 'lib/utils';
 
 const cancelError = _Obj.stringify(_.rzpError(cancelMsg));
 
@@ -9,15 +10,26 @@ export default function popupTemplate(_) {
   var method = _.data && _.data.method === 'wallet' ? 'wallet' : 'bank';
   var color = get('theme.color') || '#3594E2';
   var highlightColor = _.r.themeMeta.highlightColor;
-  var title = get('name') || get('description') || 'Redirecting...';
-  var amount = displayAmount(_.r, _.data && _.data.amount);
+  var title =
+    get('name') || get('description') || 'Redirecting...'
+    |> sanitizeHtmlEntities;
+  var amount = displayAmount(
+    _.r,
+    _.data && _.data.amount,
+    _.data && _.data.currency
+  );
+  var hideAmount =
+    _.data && _.data.method === 'emandate' ? 'display: none;' : '';
 
   var image = get('image');
-  image = image ? `<div id="logo"><img src="${image}"/></div>` : '';
+  image = image
+    ? `<div id="logo"><img src="${image.replace(/"/g, '')}"/></div>`
+    : '';
 
   var message =
     _.message ||
-    'Please wait while we redirect you to your ' + method + ' page.';
+      'Please wait while we redirect you to your ' + method + ' page.'
+    |> sanitizeHtmlEntities;
 
   return `<!doctype html><html style="height:100%;width:100%;"><head>
 <title>Processing, Please Wait...</title>
@@ -29,7 +41,7 @@ export default function popupTemplate(_) {
 </head><body><div id='bg'></div><div id='cntnt'>
 <div id="hdr">${image}
   <div id='name'>${title}</div>
-  <div id="amt">
+  <div id="amt" style="${hideAmount}">
     <div style="font-size:12px;color:#757575;line-height:15px;margin-bottom:5px;text-align:right">PAYING</div>
     <div style="font-size:20px;line-height:24px;">${amount}</div>
   </div>
@@ -65,33 +77,6 @@ setTimeout(function(){
     }
   };
 },1e4)
-${_.sdk_popup &&
-    `function submitForm(action, data, method) {
-  if (method === 'get') { return window.location = action }
-  var form = document.forms[0];
-  form.setAttribute('action', action);
-  if (method) { form.setAttribute('method', method) }
-  if (data) { form.innerHTML = deserialize(data) }
-  form.submit()
-}
-function deserialize(data, key) {
-  if (typeof data === 'object' && data !== null) {
-    var str = '';
-    for (name in data) {
-      if (!data.hasOwnProperty(name)) {
-        return;
-      }
-      value = data[name];
-      if (key) {
-        name = key + '[' + name + ']';
-      }
-      str += deserialize(value, name);
-    }
-
-    return str;
-  }
-  return '<input type="hidden" name="' + key + '" value="' + data + '">';
-}`}
 </script>
 <form></form>
 </body>

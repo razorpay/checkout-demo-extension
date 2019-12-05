@@ -1,3 +1,5 @@
+import Analytics from 'analytics';
+
 /**
  * Simple wrapper component around `window.open()`.
  * https://github.com/component/popup
@@ -110,20 +112,25 @@ Popup.prototype = {
   /**
    * Emits the "close" event.
    */
+  checkClose: function(forceClosed, timesInvoked = 0) {
+    if (timesInvoked > 20) {
+      return;
+    }
 
-  checkClose: function(forceClosed) {
     try {
       if (forceClosed || this.window.closed !== false) {
         // UC browser makes it undefined instead of true
         setTimeout(() => {
-          this.onClose();
+          if (this && typeof this.onClose === 'function') {
+            this.onClose();
+          }
         }, 100);
         this.close();
         return true;
       }
     } catch (e) {
       // UC throws error on accessing window if other domain
-      this.checkClose(true);
+      this.checkClose(true, timesInvoked + 1);
     }
   },
 };

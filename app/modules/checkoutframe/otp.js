@@ -1,24 +1,15 @@
 import OTPScreen from 'templates/screens/otp.svelte';
-import Store from 'checkoutframe/store';
+import * as OtpScreenStore from 'checkoutstore/screens/otp';
 
-const SCREEN = 'otp';
-
-export default function otpView({ on, target }) {
-  this.target = target;
-  this.on = on;
-
-  this.render();
+export default function otpView({ target, props }) {
+  this.render(target, props);
 }
 
 otpView.prototype = {
-  render() {
+  render(target, props) {
     this.view = new OTPScreen({
-      store: Store,
-      target: this.target,
-
-      data: {
-        on: this.on,
-      },
+      target,
+      props,
     });
   },
 
@@ -28,15 +19,15 @@ otpView.prototype = {
     });
   },
 
-  destroy() {
-    this.view.destroy();
+  $destroy() {
+    this.view.$destroy();
   },
 
-  updateScreen(updateProps) {
-    const screenData = Store.get().screenData;
-
-    screenData[SCREEN] = _Obj.extend(screenData[SCREEN], updateProps);
-
-    Store.set({ screenData });
+  updateScreen(props) {
+    _Obj.loop(props, (val, prop) => {
+      if (OtpScreenStore[prop]) {
+        OtpScreenStore[prop].set(val);
+      }
+    });
   },
 };
