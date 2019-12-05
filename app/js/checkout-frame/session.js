@@ -37,6 +37,8 @@ var preferences = window.preferences,
   PayLater = discreet.PayLater,
   PayLaterView = discreet.PayLaterView,
   OtpService = discreet.OtpService,
+  storeGetter = discreet.storeGetter,
+  HomeScreenStore = discreet.HomeScreenStore,
   Cta = discreet.Cta;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
@@ -781,7 +783,24 @@ function cancelHandler(response) {
 }
 
 function getPhone() {
-  return gel('contact').value;
+  var el = gel('contact');
+
+  // TOREMOVE: Homescreen
+  if (el) {
+    return el.value;
+  } else {
+    return storeGetter(HomeScreenStore.contact);
+  }
+}
+
+function getEmail() {
+  var el = gel('email');
+
+  if (el) {
+    return el.value;
+  } else {
+    return storeGetter(HomeScreenStore.email);
+  }
 }
 
 function setOtpText(view, text) {
@@ -1001,6 +1020,16 @@ Session.prototype = {
     return discreet.Currency.formatAmount(amount, displayCurrency || currency);
   },
 
+  formatAmountWithCurrencyInMinor: function(amount) {
+    var currency = this.get('currency');
+    var config = discreet.Currency.getCurrencyConfig(currency);
+    var multiplier = Math.pow(10, config.decimals);
+
+    var value = parseInt((amount * multiplier).toFixed(config.decimals));
+
+    return this.formatAmountWithCurrency(value);
+  },
+
   formatAmountWithCurrency: function(amount) {
     var amountFigure = this.formatAmount(amount);
     var displayCurrency = this.r.get('display_currency');
@@ -1083,7 +1112,7 @@ Session.prototype = {
       classes.push('partial');
     }
 
-    if (getStore('contactEmailOptional')) {
+    if (getStore('contactEmailOptional') && !this.newHomeScreen) {
       if (this.tpvBank) {
         classes.push('tpv-no-details');
       } else {
@@ -1218,6 +1247,8 @@ Session.prototype = {
     }
 
     if (tab && !(this.order && this.order.bank) && this.methods[tab]) {
+      this.switchTab(tab);
+    } else if (tab === '') {
       this.switchTab(tab);
     }
 
@@ -1372,6 +1403,8 @@ Session.prototype = {
   },
 
   setExperiments: function() {
+    this.newHomeScreen =
+      discreet.Experiments.getSegmentOrCreate('home_2019') === 1;
     discreet.Experiments.clearOldExperiments();
   },
 
@@ -1406,16 +1439,21 @@ Session.prototype = {
     this.getEl();
     this.setMethodsList();
     this.setFormatting();
+    this.improvisePaymentOptions();
     this.setSvelteComponents();
     this.fillData();
     this.setEMI();
-    this.improvisePaymentOptions();
     Cta.setAppropriateCtaText();
     this.setModal();
     this.completePendingPayment();
     this.bindEvents();
     this.setEmiScreen();
+
     Hacks.initPostRenderHacks();
+
+    if (this.newHomeScreen) {
+      makeContainerLong();
+    }
 
     errorHandler.call(this, this.params);
 
@@ -1507,7 +1545,7 @@ Session.prototype = {
   },
 
   setMethodsList: function() {
-    if (!this.methodsList) {
+    if (!this.methodsList && !this.newHomeScreen) {
       this.methodsList = new discreet.MethodsList({
         target: '#methods-list',
         props: {
@@ -1527,6 +1565,14 @@ Session.prototype = {
     if (this.methods.upi) {
       this.upiTab = new discreet.UpiTab({
         target: gel('upi-svelte-wrap'),
+      });
+    }
+  },
+
+  setHomeTab: function() {
+    if (this.newHomeScreen) {
+      this.homeTab = new discreet.HomeTab({
+        target: gel('home-screen-wrap'),
       });
     }
   },
@@ -1570,6 +1616,7 @@ Session.prototype = {
   },
 
   setSvelteComponents: function() {
+    this.setHomeTab();
     this.setNetbankingTab();
     this.setEmandate();
     this.setCardlessEmi();
@@ -2203,7 +2250,6 @@ Session.prototype = {
 
     $(this.el).addClass('one-method');
     $('.payment-option').addClass('submit-button button');
-    Cta.setAppropriateCtaText();
   },
 
   improvisePaymentOptions: function() {
@@ -2532,29 +2578,46 @@ Session.prototype = {
     }
 
     var partialEl = gel('amount-value');
+
     if (partialEl) {
       var amountValue = partialEl.value;
       var options = this.get();
       var currency = this.get('currency');
       var currencyConfig = discreet.Currency.getCurrencyConfig(currency);
 
-      this.updateAmountInHeader(amountValue);
       options.amount = parseInt(
         (amountValue * 100).toFixed(currencyConfig.decimals)
       );
-      options['prefill.contact'] = gel('contact').value;
-      options['prefill.email'] = gel('email').value;
       this.setPaymentMethods(this.preferences);
-      this.render({ forceRender: true });
+
+      if (!this.newHomeScreen) {
+        options['prefill.contact'] = getPhone();
+        options['prefill.email'] = getEmail();
+        this.render({ forceRender: true });
+      } else {
+        this.updateAmountInHeader(amountValue * 100);
+      }
     }
-    $(this.el).addClass('show-methods');
+    if (!this.newHomeScreen) {
+      $(this.el).addClass('show-methods');
+    } else {
+      this.homeTab.showMethods();
+    }
     SessionStore.set({ screen: '' });
-    if (this.methods.count >= 4) {
-      $(this.el).addClass('long');
+
+    if (!this.newHomeScreen) {
+      if (this.methods.count >= 4) {
+        $(this.el).addClass('long');
+      }
+      if (this.methods.count >= 5) {
+        $(this.el).addClass('x-long');
+      }
     }
-    if (this.methods.count >= 5) {
-      $(this.el).addClass('x-long');
-    }
+  },
+
+  setAmount: function(amount) {
+    this.get().amount = amount;
+    this.updateAmountInHeader(amount);
   },
 
   fixLandscapeBug: function() {
@@ -2598,6 +2661,7 @@ Session.prototype = {
       gotoAmountScreen();
     });
 
+    // TOREMOVE: Remove once we migrate to the new home screen
     this.on('change', 'input[name=partial_payment]', function(e) {
       var parentEle = $('#amount-value').parent();
       var optionEle = $('.minimum-amount-select');
@@ -2608,8 +2672,7 @@ Session.prototype = {
         $('#amount-value').val(this.getDecimalAmount(amount));
         toggleInvalid(parentEle, true); // To unset 'invalid' class on 'partial amount input' field's parent
 
-        this.get().amount = amount;
-        this.updateAmountInHeader(amount);
+        this.setAmount(amount);
 
         var minAmountField = gel('minimum-amount-select');
 
@@ -2795,6 +2858,10 @@ Session.prototype = {
             self.setSavedCards();
             $('#top-right').removeClass('logged');
             customer.logout(e.target.parentNode.firstChild === e.target);
+
+            if (this.newHomeScreen) {
+              this.homeTab.updateCustomer();
+            }
           }
           container_listener();
           $('#top-right').removeClass('focus');
@@ -2983,6 +3050,10 @@ Session.prototype = {
   },
 
   focus: function(e) {
+    if (_El.hasClass(e.target, 'no-focus')) {
+      return;
+    }
+
     $(e.target.parentNode).addClass('focused');
     setTimeout(function() {
       $(e.target).scrollIntoView();
@@ -2993,6 +3064,10 @@ Session.prototype = {
   },
 
   blur: function(e) {
+    if (_El.hasClass(e.target, 'no-blur')) {
+      return;
+    }
+
     $(e.target.parentNode)
       .removeClass('focused')
       .addClass('mature');
@@ -3135,6 +3210,8 @@ Session.prototype = {
       });
     }
 
+    //
+    // TODO: replicate in new home screen
     if (el_amount) {
       delegator.amount = delegator
         .add('amount', el_amount)
@@ -3228,67 +3305,71 @@ Session.prototype = {
       delegator.contact = delegator
         .add('phone', contactEl)
         .on('change', function() {
-          var instruments = [];
           self.input(this.el);
 
-          var shouldUseP13n = self.p13n;
+          if (!self.newHomeScreen) {
+            var instruments = [];
 
-          if (this.isValid() && shouldUseP13n) {
-            instruments = P13n.getInstrumentsForCustomer(
-              self.getCustomer(this.value),
-              {
-                methods: self.methods,
-              }
-            );
+            var shouldUseP13n = self.p13n;
 
-            if (instruments.length) {
-              Analytics.setMeta('p13n', true);
-
-              // Determine the number of instruments to be shown
-              var listOfInstrumentsToBeShown = isMobile() ? 3 : 2;
-              var _preferredMethods = {};
-
-              /**
-               * Preprending method name with an underscore
-               * because Lumberjack will delete a key called `card`.
-               * It won't delete `_card` though.
-               */
-              _Arr.loop(
-                instruments.slice(0, listOfInstrumentsToBeShown),
-                function(instrument) {
-                  _preferredMethods['_' + instrument.method] = true;
+            if (this.isValid() && shouldUseP13n) {
+              instruments = P13n.getInstrumentsForCustomer(
+                self.getCustomer(this.value),
+                {
+                  methods: self.methods,
                 }
               );
 
-              Analytics.track('p13n:instruments:list', {
-                data: {
-                  length: instruments.length,
-                  shown: Math.min(
-                    instruments.length,
-                    listOfInstrumentsToBeShown
-                  ),
-                  methods: _preferredMethods,
-                },
-              });
+              if (instruments.length) {
+                Analytics.setMeta('p13n', true);
 
-              /**
-               * If the number of payment methods available
-               * are few, the container may not be long
-               * already.
-               *
-               * Make the container long if we are going
-               * to use p13n.
-               */
-              makeContainerLong();
+                // Determine the number of instruments to be shown
+                var listOfInstrumentsToBeShown = isMobile() ? 3 : 2;
+                var _preferredMethods = {};
+
+                /**
+                 * Preprending method name with an underscore
+                 * because Lumberjack will delete a key called `card`.
+                 * It won't delete `_card` though.
+                 */
+                _Arr.loop(
+                  instruments.slice(0, listOfInstrumentsToBeShown),
+                  function(instrument) {
+                    _preferredMethods['_' + instrument.method] = true;
+                  }
+                );
+
+                Analytics.track('p13n:instruments:list', {
+                  data: {
+                    length: instruments.length,
+                    shown: Math.min(
+                      instruments.length,
+                      listOfInstrumentsToBeShown
+                    ),
+                    methods: _preferredMethods,
+                  },
+                });
+
+                /**
+                 * If the number of payment methods available
+                 * are few, the container may not be long
+                 * already.
+                 *
+                 * Make the container long if we are going
+                 * to use p13n.
+                 */
+                makeContainerLong();
+              }
             }
-          }
 
-          self.methodsList.set({
-            instruments: instruments,
-            customer: self.getCustomer(this.value),
-            tpvBank: this.tpvBank,
-            animate: true,
-          });
+            self.methodsList &&
+              self.methodsList.set({
+                instruments: instruments,
+                customer: self.getCustomer(this.value),
+                tpvBank: this.tpvBank,
+                animate: true,
+              });
+          }
         });
 
       _El.on('blur', function() {
@@ -3427,7 +3508,22 @@ Session.prototype = {
     var screenEl = '#form-' + (screen || 'common');
     makeVisible(screenEl);
 
-    if (!(screen === 'upi' && this.upi_intents_data)) {
+    /**
+     * On the new homescreen,
+     * we want to focus only if the user
+     * is on the details screen.
+     *
+     * Temp check, will be fixed when old homescreen is removed.
+     */
+    if (screen === '') {
+      if (this.newHomeScreen) {
+        if (this.homeTab && this.homeTab.onDetailsScreen()) {
+          invoke('focus', qs(screenEl + ' .invalid input'));
+        }
+      } else {
+        invoke('focus', qs(screenEl + ' .invalid input'));
+      }
+    } else if (!(screen === 'upi' && this.upi_intents_data)) {
       invoke('focus', qs(screenEl + ' .invalid input'));
     }
 
@@ -3448,7 +3544,11 @@ Session.prototype = {
       showPaybtn = Boolean(selectedInstrument);
     }
 
-    this.body.toggleClass('sub', showPaybtn);
+    if (screen === '' && this.newHomeScreen && this.homeTab) {
+      this.homeTab.onShown();
+    } else {
+      this.body.toggleClass('sub', showPaybtn);
+    }
 
     if (screen === 'upi') {
       var isIntentFlow = this.upiTab.intent;
@@ -3777,7 +3877,9 @@ Session.prototype = {
     $('#content').removeClass('has-discount');
     //TODO: optimise queries
     $('#amount .discount').html('');
-    Cta.showAmountInCta();
+    if (!(this.tab === '' && this.newHomeScreen)) {
+      Cta.showAmountInCta();
+    }
   },
   back: function(confirmedCancel) {
     var tab = '';
@@ -3808,7 +3910,8 @@ Session.prototype = {
       tab = 'wallet';
     } else if (
       this.screen === 'otp' &&
-      (thisTab !== 'card' && thisTab !== 'emi')
+      thisTab !== 'card' &&
+      thisTab !== 'emi'
     ) {
       tab = thisTab;
     } else if (
@@ -3939,7 +4042,13 @@ Session.prototype = {
    * @returns {boolean} valid
    */
   checkCommonValid: function() {
-    var valid = !this.checkInvalid('#pad-common');
+    var selector = '#pad-common';
+
+    if (this.newHomeScreen && this.homeTab.onDetailsScreen()) {
+      selector = '#form-common';
+    }
+
+    var valid = !this.checkInvalid(selector);
 
     return valid;
   },
@@ -4003,6 +4112,12 @@ Session.prototype = {
 
     Analytics.setMeta('tab', tab);
     Analytics.setMeta('timeSince.tab', discreet.timer());
+
+    if (tab === '') {
+      if (this.newHomeScreen) {
+        this.homeTab.onShown();
+      }
+    }
 
     if (tab) {
       this.switchTabAnalytics(tab);
@@ -4076,8 +4191,9 @@ Session.prototype = {
       }
     }
 
-    if (!tab && this.methodsList && this.p13n) {
-      var selectedInstrument = this.methodsList.getSelectedInstrument();
+    if (!tab) {
+      var selectedInstrument = this.getSelectedP13nInstrument();
+
       if (selectedInstrument) {
         $('#body').addClass('sub');
       }
@@ -4848,6 +4964,12 @@ Session.prototype = {
 
     fillData('#pad-common', data);
 
+    if (this.newHomeScreen) {
+      data.contact = getPhone();
+      data.email = getEmail();
+      // TODO: data.address, etc.
+    }
+
     var prefillEmail = this.get('prefill.email');
     var prefillContact = this.get('prefill.contact');
 
@@ -5140,7 +5262,7 @@ Session.prototype = {
     });
 
     this.showLoadError('Verifying OTP');
-    var otp = discreet.storeGetter(discreet.OTPScreenStore.otp);
+    var otp = storeGetter(discreet.OTPScreenStore.otp);
 
     if (this.tab === 'wallet' || this.headless) {
       return this.r.submitOTP(otp);
@@ -5198,7 +5320,7 @@ Session.prototype = {
 
     var submitPayload = {
       otp: otp,
-      email: gel('email').value,
+      email: getEmail(),
     };
 
     if (this.tab === 'cardless_emi') {
@@ -5313,14 +5435,20 @@ Session.prototype = {
     });
   },
 
-  preSubmit: function(e) {
+  /**
+   * Attempts a payment
+   * @param {Event} e
+   * @param {Object} payload Overridden payload
+   */
+  preSubmit: function(e, payload) {
     var session = this;
     var storeScreen = SessionStore.get().screen;
 
     if (storeScreen === 'amount') {
       return this.extraNext();
     }
-    if (this.oneMethod && !this.tab) {
+
+    if (this.oneMethod && !this.tab && !this.newHomeScreen) {
       setTimeout(function() {
         window.scrollTo(0, 100);
       });
@@ -5341,6 +5469,7 @@ Session.prototype = {
 
     if (
       !this.tab &&
+      !this.newHomeScreen &&
       !this.order &&
       !this.p13n &&
       !(this.oneMethod && this.oneMethod === 'paypal')
@@ -5348,12 +5477,33 @@ Session.prototype = {
       return;
     }
 
+    /**
+     * The CTA for home screen is visible only on the new design. If it was
+     * clicked, switch to the new payment methods screen.
+     */
+    if (!screen && this.newHomeScreen) {
+      if (this.checkCommonValid()) {
+        // switch to methods tab
+        if (this.homeTab.onDetailsScreen()) {
+          if (this.homeTab.shouldGoNext()) {
+            return this.homeTab.next();
+          }
+        }
+      }
+    }
+
     if (screen === 'otp') {
       return this.onOtpSubmit();
     }
 
     this.refresh();
-    var data = (this.payload = this.getPayload());
+    var data = payload;
+
+    if (!data) {
+      data = this.getPayload();
+    }
+
+    this.payload = data;
 
     if (data.auth_type && data.auth_type === 'c3ds') {
       /**
@@ -5549,31 +5699,36 @@ Session.prototype = {
         return;
       }
 
-      /*
-       * - If there's no method in methods-list, then dont' let it pass
-       * - If even 1 method is in the list and none of them is selected don't
-       *   let it pass.
-       */
-      if (!$('#methods-list .option')[0]) {
-        return;
-      } else if (!$('#methods-list .option.selected')[0]) {
-        return;
-      }
+      var selectedInstrument = this.getSelectedP13nInstrument();
 
-      var selectedInstrument = this.methodsList.getSelectedInstrument();
       if (selectedInstrument && selectedInstrument.method === 'card') {
         /*
          * Add cvv to data from the currently selected method (p13n)
          * TODO: figure out a better way to do this.
          */
-        var $cvvEl = $('#methods-list .option.selected .cvv-input');
+        if (this.newHomeScreen) {
+          var $cvvEl = _Doc.querySelector(
+            '#instruments-list > .selected input.input'
+          );
 
-        if ($cvvEl) {
-          if ($cvvEl.val().length === selectedInstrument.cvvDigits) {
-            data['card[cvv]'] = $cvvEl.val();
-          } else {
-            $cvvEl.focus();
-            return this.shake();
+          if ($cvvEl) {
+            if ($cvvEl.value.length === $cvvEl.maxLength) {
+              data['card[cvv]'] = $cvvEl.value;
+            } else {
+              $cvvEl.focus();
+              return this.shake();
+            }
+          }
+        } else {
+          var $cvvEl = $('#methods-list .option.selected .cvv-input');
+
+          if ($cvvEl) {
+            if ($cvvEl.val().length === selectedInstrument.cvvDigits) {
+              data['card[cvv]'] = $cvvEl.val();
+            } else {
+              $cvvEl.focus();
+              return this.shake();
+            }
           }
         }
       }
@@ -5584,6 +5739,18 @@ Session.prototype = {
     }
 
     this.submit();
+  },
+
+  getSelectedP13nInstrument: function() {
+    if (!this.p13n) {
+      return;
+    }
+
+    if (this.newHomeScreen) {
+      return this.homeTab.getSelectedInstrument();
+    } else if (this.methodsList) {
+      return this.methodsList.getSelectedInstrument();
+    }
   },
 
   verifyVpaAndContinue: function(data, params) {
@@ -5681,23 +5848,29 @@ Session.prototype = {
       paused: this.get().paused,
     };
 
-    if (!this.screen && this.methodsList && this.p13n) {
-      var selectedInstrument = this.methodsList.getSelectedInstrument();
-      this.doneByP13n = P13n.addInstrumentToPaymentData(
-        data,
-        selectedInstrument
-      );
+    if (!this.screen) {
+      var selectedInstrument = this.getSelectedP13nInstrument();
 
-      /* TODO: the following code is the hack for ftx, fix it properly */
-      if (this.doneByP13n) {
-        Analytics.setMeta('doneByP13n', true);
-        if (['card', 'emi', 'wallet'].indexOf(selectedInstrument.method) > -1) {
-          this.switchTab(selectedInstrument.method);
-        } else if (
-          selectedInstrument.method === 'upi' &&
-          selectedInstrument['_[upiqr]'] === '1'
-        ) {
-          return this.switchTab('qr');
+      if (selectedInstrument) {
+        this.doneByP13n = P13n.addInstrumentToPaymentData(
+          data,
+          selectedInstrument,
+          this.getCustomer(getPhone())
+        );
+
+        /* TODO: the following code is the hack for ftx (2018), fix it properly */
+        if (this.doneByP13n) {
+          Analytics.setMeta('doneByP13n', true);
+          if (
+            ['card', 'emi', 'wallet'].indexOf(selectedInstrument.method) > -1
+          ) {
+            this.switchTab(selectedInstrument.method);
+          } else if (
+            selectedInstrument.method === 'upi' &&
+            selectedInstrument['_[upiqr]'] === '1'
+          ) {
+            return this.switchTab('qr');
+          }
         }
       }
     }
@@ -5723,13 +5896,23 @@ Session.prototype = {
     }
     delete data.app_token;
 
-    var $address = $('#address');
-
-    if ($address[0]) {
+    if (this.get('address') && !(this.order && this.order.partial_payment)) {
       var notes = (data.notes = clone(this.get('notes')) || {});
-      notes.address = $address.val();
-      notes.pincode = $('#pincode').val();
-      notes.state = $('#state').val();
+
+      if (!this.newHomeScreen) {
+        var $address = $('#address');
+
+        if ($address[0]) {
+          notes.address = $address.val();
+          notes.pincode = $('#pincode').val();
+          notes.state = $('#state').val();
+        }
+      } else {
+        notes.address = storeGetter(HomeScreenStore.address);
+        notes.pincode = storeGetter(HomeScreenStore.pincode);
+        notes.state = storeGetter(HomeScreenStore.state);
+      }
+
       if (Object.keys(notes).length > 15) {
         delete notes.pincode;
         delete notes.state;
@@ -7015,7 +7198,8 @@ Session.prototype = {
       order &&
       order.bank &&
       this.get('callback_url') &&
-      (order.method !== 'upi' && order.method !== 'emandate') // Should these just be a check for order.method=netbanking?
+      order.method !== 'upi' &&
+      order.method !== 'emandate' // Should these just be a check for order.method=netbanking?
     ) {
       session_options.redirect = true;
       this.tpvRedirect = true;

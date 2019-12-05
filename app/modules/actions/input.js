@@ -25,6 +25,36 @@ function onBlur(event) {
   }
 }
 
+/**
+ * Validates value with min and max present on the field
+ * @param {Element} el
+ *
+ * @returns {boolean}
+ */
+function validateOnMinMax(el) {
+  let min = parseFloat(_El.getAttribute(el, 'min'));
+  let max = parseFloat(_El.getAttribute(el, 'max'));
+  const parsed = parseFloat(el.value);
+
+  if (!isNaN(parsed) && (!isNaN(min) || !isNaN(max))) {
+    if (!isNaN(min)) {
+      if (parsed < min) {
+        return false;
+      }
+    }
+
+    if (!isNaN(max)) {
+      if (parsed > max) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  return true;
+}
+
 function onInput(event) {
   const el = event.target;
   const value = el.value;
@@ -53,10 +83,15 @@ function onInput(event) {
     }
   }
 
+  valid = valid && validateOnMinMax(el);
+
   _El.keepClass(parent, 'invalid', !valid);
 }
 
-export function focus(node) {
+export function focus(node, condition = true) {
+  if (!condition) {
+    return;
+  }
   node.addEventListener('focus', onFocus);
 
   return {
@@ -64,7 +99,10 @@ export function focus(node) {
   };
 }
 
-export function blur(node) {
+export function blur(node, condition = true) {
+  if (!condition) {
+    return;
+  }
   node.addEventListener('blur', onBlur);
 
   return {
@@ -72,10 +110,19 @@ export function blur(node) {
   };
 }
 
-export function input(node) {
+export function input(node, condition = true) {
+  if (!condition) {
+    return;
+  }
   node.addEventListener('input', onInput);
 
+  if (node.value) {
+    onInput({
+      target: node,
+    });
+  }
+
   return {
-    destroy: () => node.removeEventListener('blur', onInput),
+    destroy: () => node.removeEventListener('input', onInput),
   };
 }

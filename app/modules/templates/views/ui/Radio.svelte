@@ -9,6 +9,7 @@
   export let value = '';
   export let label = '';
   export let classes = '';
+  export let tabindex = 0;
 
   // Computed
   export let identifier;
@@ -18,12 +19,27 @@
   $: classesToApply = `input-radio ${classes}`;
 </script>
 
+<style>
+  label {
+    min-width: 18px;
+  }
+</style>
+
 <div class={classesToApply}>
-  <input type="radio" id={identifier} {checked} {name} {value} on:change />
+  <input
+    type="radio"
+    id={identifier}
+    {checked}
+    {name}
+    {value}
+    on:change
+    {tabindex} />
   <label for={identifier}>
     <div class="radio-display" />
-    <div class="label-content">
-      {@html label}
-    </div>
+    {#if label}
+      <div class="label-content">
+        {@html label}
+      </div>
+    {/if}
   </label>
 </div>

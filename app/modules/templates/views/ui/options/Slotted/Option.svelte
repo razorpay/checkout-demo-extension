@@ -1,0 +1,59 @@
+<script>
+  // UI imports
+  import Stack from 'templates/layouts/Stack.svelte';
+
+  // Props
+  export let className = '';
+  export let disabled = false;
+  export let id;
+  export let attributes = {}; // Extra attributes for the HTML element
+
+  $: {
+    disabled = disabled ? true : undefined;
+  }
+</script>
+
+<style>
+  button {
+    background: #ffffff;
+    border: 1px solid #e6e7e8;
+    display: block;
+    width: 100%;
+    text-align: left;
+    text-align: start;
+    transition-duration: 0.15s;
+    transition-property: border, background;
+    transition-timing-function: linear;
+  }
+
+  button:disabled {
+    background-color: #f7f7f7;
+    cursor: not-allowed;
+  }
+
+  button:disabled > :global(.stack > [slot='icon']) {
+    opacity: 0.3;
+  }
+
+  div {
+    overflow: hidden;
+  }
+</style>
+
+<button
+  type="button"
+  class={className}
+  role="listitem"
+  {disabled}
+  {id}
+  on:click
+  {...attributes}>
+  <Stack horizontal>
+    <slot name="icon" />
+    <div>
+      <slot name="title" />
+      <slot name="subtitle" />
+    </div>
+    <slot name="extra" />
+  </Stack>
+</button>
