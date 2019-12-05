@@ -1,9 +1,11 @@
 const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
+const { delay } = require('../../util');
 const {
   assertHomePage,
   fillUserDetails,
   assertPaymentMethods,
+  verifyLowDowntime,
   selectPaymentMethod,
   submit,
   selectUPIMethod,
@@ -11,27 +13,18 @@ const {
   handleUPIAccountValidation,
   respondToUPIAjax,
   respondToUPIPaymentStatus,
-  handlePartialPayment,
-  verifyPartialAmount,
-  verifyLowDowntime,
+  verifyPersonalizationVPAText,
+  selectPersonalizationPaymentMethod,
 } = require('../../actions/common');
 
 describe('Basic upi payment', () => {
-  test('Verify UPI downtime - Low with partial payments enabled', async () => {
+  test('Verify UPI downtime - Low with personalization enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 30000,
-      personalization: false,
+      amount: 200,
+      personalization: true,
     };
     const preferences = makePreferences({
-      order: {
-        amount: 20000,
-        amount_due: 20000,
-        amount_paid: 0,
-        currency: 'INR',
-        first_payment_min_amount: null,
-        partial_payment: true,
-      },
       payment_downtime: {
         entity: 'collection',
         count: 1,
@@ -52,18 +45,19 @@ describe('Basic upi payment', () => {
       },
     });
     preferences.methods.upi = true;
-    const context = await openCheckout({ page, options, preferences });
+    const context = await openCheckout({
+      page,
+      options,
+      preferences,
+      method: 'UPI',
+    });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context);
-    await handlePartialPayment(context, '100');
-    await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'upi');
-    await verifyLowDowntime(context, 'UPI');
-    await selectUPIMethod(context, 'BHIM');
-    await enterUPIAccount(context, 'BHIM');
-    await verifyPartialAmount(context, '₹ 100');
+    // await verifyLowDowntime(context, 'UPI');
+    await fillUserDetails(context, '8888888881');
+    await verifyPersonalizationVPAText(context);
+    await selectPersonalizationPaymentMethod(context, 1);
     await submit(context);
-    await handleUPIAccountValidation(context, 'BHIM@upi');
+    await handleUPIAccountValidation(context, 'dsd@okhdfcbank');
     await respondToUPIAjax(context);
     await respondToUPIPaymentStatus(context);
   });

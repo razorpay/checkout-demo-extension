@@ -1,4 +1,4 @@
-const { openCheckoutForPersonalization } = require('../../actions/checkout');
+const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
@@ -18,7 +18,7 @@ describe.skip('Wallet with Personalization  payment', () => {
     };
     const preferences = makePreferences();
     preferences.methods.upi = true;
-    const context = await openCheckoutForPersonalization({
+    const context = await openCheckout({
       page,
       options,
       preferences,

@@ -3,23 +3,16 @@ const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
-  assertPaymentMethods,
-  verifyLowDowntime,
-  selectPaymentMethod,
-  submit,
-  selectUPIMethod,
-  enterUPIAccount,
-  handleUPIAccountValidation,
-  respondToUPIAjax,
-  respondToUPIPaymentStatus,
+  verifyPersonalizationVPAText,
+  verifyHighDowntime,
 } = require('../../actions/common');
 
 describe('Basic upi payment', () => {
-  test('Verify UPI downtime - Low', async () => {
+  test('Verify UPI downtime - High', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
-      personalization: false,
+      personalization: true,
     };
     const preferences = makePreferences({
       payment_downtime: {
@@ -34,7 +27,7 @@ describe('Basic upi payment', () => {
             end: null,
             status: 'started',
             scheduled: false,
-            severity: 'low',
+            severity: 'high',
             created_at: 1567686387,
             updated_at: 1567686387,
           },
@@ -42,17 +35,19 @@ describe('Basic upi payment', () => {
       },
     });
     preferences.methods.upi = true;
-    const context = await openCheckout({ page, options, preferences });
+    const context = await openCheckout({
+      page,
+      options,
+      preferences,
+      method: 'UPI',
+    });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context);
-    await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'upi');
-    await verifyLowDowntime(context, 'UPI');
-    await selectUPIMethod(context, 'BHIM');
-    await enterUPIAccount(context, 'BHIM');
-    await submit(context);
-    await handleUPIAccountValidation(context, 'BHIM@upi');
-    await respondToUPIAjax(context);
-    await respondToUPIPaymentStatus(context);
+    await fillUserDetails(context, '8888888881');
+    // await delay(30000);
+    await verifyPersonalizationVPAText(context);
+    await verifyHighDowntime(
+      context,
+      'UPI is facing temporary issues right now. Please select another method.'
+    );
   });
 });

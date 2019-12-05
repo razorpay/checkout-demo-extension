@@ -20,11 +20,10 @@ async function assertHomePage(context) {
   expect(await $email.evaluate(el => el.value)).toEqual(context.prefilledEmail);
 }
 
-async function fillUserDetails(context) {
+async function fillUserDetails(context, number) {
   if (!context.prefilledContact && !context.isContactOptional) {
-    await context.page.type('#contact', randomContact());
+    await context.page.type('#contact', number || randomContact());
   }
-
   if (!context.prefilledEmail && !context.isEmailOptional) {
     await context.page.type('#email', randomEmail());
   }
