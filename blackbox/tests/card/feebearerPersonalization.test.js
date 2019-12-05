@@ -10,16 +10,17 @@ const {
   handleMockFailureDialog,
   retryCardTransaction,
   handleMockSuccessDialog,
+  handleFeeBearer,
 } = require('../../actions/common');
 
 describe('Card tests', () => {
-  test('perform card transaction with personalization', async () => {
+  test('perform card transaction with personalization and customer feebearer enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
       personalization: true,
     };
-    const preferences = makePreferences();
+    const preferences = makePreferences({ fee_bearer: true });
     const context = await openCheckout({
       page,
       options,
@@ -31,12 +32,12 @@ describe('Card tests', () => {
     await selectPersonalizedCard(context);
     await enterCardDetails(context);
     await submit(context);
+    await handleFeeBearer(context);
     await handleCardValidation(context);
     await handleMockFailureDialog(context);
-    // await verifyErrorMessage(context, 'The payment has already been processed');
     await retryCardTransaction(context);
     await submit(context);
-
+    await handleFeeBearer(context);
     await handleCardValidation(context);
     await handleMockSuccessDialog(context);
   });
