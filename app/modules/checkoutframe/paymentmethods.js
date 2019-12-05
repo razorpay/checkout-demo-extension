@@ -215,7 +215,7 @@ export function getMethodNameForPaymentOption(method, { session }) {
  */
 export function getMethodDowntimeDescription(
   method,
-  { availableMethods, downMethods = [] }
+  { availableMethods = [], downMethods = [] } = {}
 ) {
   const prefix = getMethodPrefix(method);
   const pluralPrefix = /s$/i.test(prefix);

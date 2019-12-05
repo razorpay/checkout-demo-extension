@@ -1,5 +1,6 @@
 const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
+const { getTestData } = require('../../actions');
 const {
   assertHomePage,
   fillUserDetails,
@@ -17,14 +18,12 @@ const {
   handleEMIValidation,
 } = require('../../actions/common');
 
-describe('EMI tests', () => {
-  test('perform EMI transaction with No cost EMI offers applied', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+describe.each(
+  getTestData('perform EMI transaction with No cost EMI offers applied', {
+    options: {
       amount: 500000,
-      personalization: false,
-    };
-    const preferences = makePreferences({
+    },
+    preferences: {
       offers: [
         {
           id: 'offer_DWcU6U9B3jV8Aa',
@@ -97,7 +96,10 @@ describe('EMI tests', () => {
           emi_subvention: true,
         },
       ],
-    });
+    },
+  })
+)('EMI tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     await setPreferenceForOffer(preferences);
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);

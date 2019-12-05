@@ -6,7 +6,6 @@
   import AsyncLoading from 'templates/views/ui/AsyncLoading.svelte';
 
   // Utils imports
-  import { createFees } from 'payment';
   import { formatAmountWithSymbol } from 'common/currency';
   import { getSession } from 'sessionmanager';
 
@@ -15,8 +14,6 @@
   export let feeBreakup = null;
   export let bearer = null;
   export let paymentData;
-  export let error = null;
-  export let on = {};
 
   const dispatch = createEventDispatcher();
   const session = getSession();
@@ -42,7 +39,10 @@
 
     loading = true;
 
-    createFees(paymentData, session.r, onSuccess, onError);
+    session.r
+      .calculateFees(paymentData)
+      .then(onSuccess)
+      .catch(onError);
   }
 
   export function makeFeesTable(response) {
@@ -83,9 +83,7 @@
 
 <div class="fee-bearer">
   {#if loading}
-    <AsyncLoading>
-      Loading fees breakup...
-    </AsyncLoading>
+    <AsyncLoading>Loading fees breakup...</AsyncLoading>
   {:else if feeBreakup}
     <b>Fees Breakup</b>
     <br />

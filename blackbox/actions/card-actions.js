@@ -86,6 +86,10 @@ async function enterCardDetails(context, { cardType, nativeOtp = false } = {}) {
 }
 
 async function retryCardTransaction(context) {
+  await context.page.waitFor('#fd-hide', {
+    timeout: 2000,
+    visible: true,
+  });
   const retryButton = await context.page.waitForSelector('#fd-hide');
   await retryButton.click();
 }
@@ -118,7 +122,7 @@ async function respondSavedCards(context) {
             last4: '1111',
             network: 'Visa',
             type: 'debit',
-            issuer: null,
+            issuer: 'ICIC',
             international: false,
             emi: false,
             expiry_month: 12,
@@ -141,7 +145,7 @@ async function respondSavedCards(context) {
 }
 
 async function selectSavedCardAndTypeCvv(context) {
-  await delay(1000);
+  await delay(500);
   const SavedCard = await context.page.waitForSelector('.saved-inner');
   await SavedCard.click();
   await SavedCard.type('222');

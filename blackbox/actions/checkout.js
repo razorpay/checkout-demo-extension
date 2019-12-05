@@ -5,6 +5,7 @@ const { interceptor } = require('../util');
 const { computed } = require('./options');
 const { callbackHtml } = require('./callback');
 const { sendPreferences } = require('./preferences');
+const { setExperiments } = require('./experiments');
 
 const checkoutPublic = 'https://api.razorpay.com/v1/checkout/public';
 const checkoutCss = 'https://checkout.razorpay.com/v1/css/checkout.css';
@@ -73,7 +74,15 @@ async function passMessage(page, message) {
 
 let interceptorOptions;
 module.exports = {
-  async openCheckout({ page, options, preferences, params, apps }) {
+  async openCheckout({
+    page,
+    options,
+    preferences,
+    params,
+    apps,
+    experiments,
+    method,
+  }) {
     let checkoutUrl = checkoutPublic;
     if (params) checkoutUrl += '?' + querystring.stringify(params);
     if (interceptorOptions) {
@@ -85,6 +94,93 @@ module.exports = {
 
     page.on('request', checkoutRequestHandler);
     await page.goto(checkoutUrl);
+
+    await setExperiments(page, experiments);
+    if (method && options.personalization) {
+      await page.evaluate(method => {
+        const hashKey = '4d184816';
+        var upiInstruments = {};
+        var netbankingInstruments = {};
+        var qrInstruments = {};
+        var cardInstruments = {};
+        var walletInstruments = {};
+        qrInstruments[hashKey] = [
+          {
+            '_[flow]': 'intent',
+            '_[upiqr]': '1',
+            method: 'upi',
+            timestamp: 1574079022916,
+            success: true,
+            frequency: 2,
+            id: 'DhnN8SggG8Ihdy',
+          },
+        ];
+        cardInstruments[hashKey] = [
+          {
+            method: 'card',
+            token_id: 'token_9AT28Pxxe0Npi9',
+            type: 'credit',
+            issuer: 'ICIC',
+            network: 'Visa',
+            timestamp: 1574056926308,
+            success: true,
+            frequency: 1,
+            id: 'Dhh671dR688OWQ',
+          },
+        ];
+        walletInstruments[hashKey] = [
+          {
+            wallet: 'freecharge',
+            method: 'wallet',
+            timestamp: 1574081911355,
+            success: true,
+            frequency: 1,
+            id: 'DhoBzK59KicZni',
+          },
+        ];
+        upiInstruments[hashKey] = [
+          {
+            '_[flow]': 'directpay',
+            vpa: 'dsd@okhdfcbank',
+            method: 'upi',
+            timestamp: 1574063491481,
+            success: true,
+            frequency: 2,
+            id: 'Dhix6Bqn8w7td4',
+          },
+          {
+            '_[flow]': 'directpay',
+            vpa: 'dfs@okicici',
+            method: 'upi',
+            timestamp: 1574066575053,
+            success: true,
+            frequency: 1,
+            id: 'Dhjpz3w1RIGMJ1',
+          },
+        ];
+        netbankingInstruments[hashKey] = [
+          {
+            bank: 'HDFC',
+            method: 'netbanking',
+            timestamp: 1574062745851,
+            success: true,
+            frequency: 2,
+            id: 'Dhh86QTueOpyWX',
+          },
+        ];
+        localStorage.setItem(
+          'rzp_preffered_instruments',
+          {
+            UPI: JSON.stringify(upiInstruments),
+            Netbanking: JSON.stringify(netbankingInstruments),
+            QR: JSON.stringify(qrInstruments),
+            Card: JSON.stringify(cardInstruments),
+            Wallet: JSON.stringify(walletInstruments),
+          }[method]
+        );
+      }, method);
+    }
+
     page.removeListener('request', checkoutRequestHandler);
     page.on('request', cdnRequestHandler);
 
