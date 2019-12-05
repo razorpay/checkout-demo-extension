@@ -244,7 +244,7 @@ export default function Track(r, event, data, immediately) {
     }
 
     // Add build number
-    properties.build_number = __BUILD_NUMBER__;
+    properties.build_number = __BUILD_NUMBER__ || 0;
 
     // Add current experiments
     properties.experiments = getExperimentsFromStorage();
