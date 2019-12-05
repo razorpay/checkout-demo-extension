@@ -474,7 +474,7 @@
   }
 
   function selectMethod(event) {
-    Analytics.track('p13:method:select', {
+    Analytics.track('payment_method:select', {
       type: AnalyticsTypes.BEHAV,
       data: event.detail,
     });
