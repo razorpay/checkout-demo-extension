@@ -13,6 +13,10 @@ cta.subscribe(text => {
   }
 });
 
+export function getStore() {
+  return cta;
+}
+
 export function updateCta(text) {
   cta.set(text);
 }

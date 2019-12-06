@@ -1190,7 +1190,10 @@ Session.prototype = {
       }
       var div = document.createElement('div');
       var styleEl = this.renderCss();
-      div.innerHTML = templates.modal(this, getStore);
+      div.innerHTML = templates.modal(this, {
+        getStore,
+        cta: storeGetter(Cta.getStore()),
+      });
       this.el = div.firstChild;
       this.applyFont(this.el.querySelector('#powered-link'));
       document.body.appendChild(this.el);
