@@ -1,4 +1,4 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 const {
   selectWallet,
@@ -21,14 +21,19 @@ const {
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
-describe('Wallet Transaction', () => {
-  test('Perform wallet transaction with fee bearer', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+describe.each(
+  getTestData('Perform wallet transaction with fee bearer', {
+    loggedIn: false,
+    options: {
       amount: 60000,
       personalization: false,
-    };
-    const preferences = makePreferences({ fee_bearer: true });
+    },
+    preferences: {
+      fee_bearer: true,
+    },
+  })
+)('Wallet tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,

@@ -1,4 +1,4 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 const {
   selectWallet,
@@ -24,43 +24,49 @@ const {
   handlePartialPayment,
 } = require('../actions');
 
-describe('Wallet tests', () => {
-  test('Wallet payment with partial payment', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 200000,
-      personalization: false,
-    };
-    const preferences = makePreferences({
-      order: {
+describe.each(
+  getTestData(
+    'Perform wallet transaction with partial payments and Offers enabled',
+    {
+      loggedIn: false,
+      options: {
         amount: 200000,
-        amount_due: 200000,
-        amount_paid: 0,
-        currency: 'INR',
-        first_payment_min_amount: null,
-        partial_payment: true,
+        personalization: false,
       },
-      offers: [
-        {
-          original_amount: 200000,
-          amount: 198000,
-          id: 'offer_DfJLos7WHTOGB5',
-          name: 'Payzapp_Offer_3',
-          payment_method: 'wallet',
-          issuer: 'payzapp',
-          display_text: 'Payzapp - Rs. 10 off',
+      preferences: {
+        order: {
+          amount: 200000,
+          amount_due: 200000,
+          amount_paid: 0,
+          currency: 'INR',
+          first_payment_min_amount: null,
+          partial_payment: true,
         },
-        {
-          original_amount: 200000,
-          amount: 198000,
-          id: 'offer_DfJQsNytt7xVTe',
-          name: 'AmazonPay_Offer_1',
-          payment_method: 'wallet',
-          issuer: 'amazonpay',
-          display_text: '10% off with Amazon Pay',
-        },
-      ],
-    });
+        offers: [
+          {
+            original_amount: 200000,
+            amount: 198000,
+            id: 'offer_DfJLos7WHTOGB5',
+            name: 'Payzapp_Offer_3',
+            payment_method: 'wallet',
+            issuer: 'payzapp',
+            display_text: 'Payzapp - Rs. 10 off',
+          },
+          {
+            original_amount: 200000,
+            amount: 198000,
+            id: 'offer_DfJQsNytt7xVTe',
+            name: 'AmazonPay_Offer_1',
+            payment_method: 'wallet',
+            issuer: 'amazonpay',
+            display_text: '10% off with Amazon Pay',
+          },
+        ],
+      },
+    }
+  )
+)('Wallet tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,
