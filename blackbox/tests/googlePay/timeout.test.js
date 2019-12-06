@@ -11,7 +11,7 @@ const {
   selectBankNameFromGooglePayDropDown,
 } = require('../../actions/common');
 
-describe('Timeout GooglePay payment', () => {
+describe.skip('Timeout GooglePay payment', () => {
   test('Perform GooglePay transaction with timeout enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
