@@ -37,7 +37,7 @@ async function verifyPersonalizationText(context, paymentMode) {
           ' bank'
       );
     } else if (paymentMode === 'qr') {
-      paymentMethodArray.push('UPI QR');
+      paymentMethodArray.push('upi qr');
     }
   }
   await delay(1500);

@@ -10,8 +10,6 @@ const {
   handleValidationRequest,
   selectPersonalizationPaymentMethod,
   handleFeeBearer,
-  retryWalletTransaction,
-  selectWallet,
 } = require('../../actions/common');
 
 describe('Wallet with Personalization payment', () => {
@@ -33,14 +31,6 @@ describe('Wallet with Personalization payment', () => {
     await fillUserDetails(context, '8888888881');
     await verifyPersonalizationText(context, 'wallet');
     await selectPersonalizationPaymentMethod(context, '1');
-    await submit(context);
-    await handleFeeBearer(context);
-    await handleOtpVerification(context);
-    await typeOTPandSubmit(context);
-    await handleValidationRequest(context, 'fail');
-    await retryWalletTransaction(context);
-    await delay(200);
-    await selectWallet(context, 'freecharge');
     await submit(context);
     await handleFeeBearer(context);
     await handleOtpVerification(context);
