@@ -5,6 +5,7 @@ const { interceptor } = require('../util');
 const { computed } = require('./options');
 const { callbackHtml } = require('./callback');
 const { sendPreferences } = require('./preferences');
+const { setExperiments } = require('./experiments');
 
 const checkoutPublic = 'https://api.razorpay.com/v1/checkout/public';
 const checkoutCss = 'https://checkout.razorpay.com/v1/css/checkout.css';
@@ -78,6 +79,7 @@ module.exports = {
     params,
     method,
     apps,
+    experiments,
   }) {
     let checkoutUrl = checkoutPublic;
 
@@ -91,6 +93,7 @@ module.exports = {
 
     page.on('request', checkoutRequestHandler);
     await page.goto(checkoutUrl);
+    await setExperiments(page, experiments);
 
     await page.evaluate(method => {
       const hashKey = '4d184816';

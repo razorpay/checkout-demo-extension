@@ -65,7 +65,6 @@ async function handleFeeBearer(context, pressContinue) {
     '//*[@class="btn" and text() = "Continue"]'
   );
   if (pressContinue != false) await continueButton[0].click();
-  // await delay(200);
 }
 
 module.exports = {
