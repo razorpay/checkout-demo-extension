@@ -9,7 +9,7 @@ const {
   selectUPIMethod,
 } = require('../../actions/common');
 
-describe('Basic GooglePay payment', () => {
+describe.skip('Basic GooglePay payment', () => {
   test('Perform GooglePay transaction with timeout enabled', async () => {
     const options = {
       order_id: 'rzp_test_1DP5mmOlF5G5ag',
