@@ -36,7 +36,7 @@ describe.each(
     {
       loggedIn: false,
       options: {
-        amount: 200,
+        amount: 20000,
         personalization: false,
       },
       preferences: {

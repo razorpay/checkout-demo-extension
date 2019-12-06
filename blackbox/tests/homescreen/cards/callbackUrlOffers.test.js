@@ -31,7 +31,7 @@ describe.each(
     {
       loggedIn: false,
       options: {
-        amount: 200,
+        amount: 20000,
         personalization: false,
         callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
         redirect: true,

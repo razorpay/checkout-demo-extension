@@ -1,4 +1,4 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 const {
   selectBank,
@@ -15,14 +15,19 @@ const {
   assertMethodsScreen,
 } = require('../actions');
 
-describe('Netbanking tests', () => {
-  test('perform netbaking transaction with contact and email optional', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+describe.each(
+  getTestData('perform netbaking transaction with contact and email optional', {
+    loggedIn: false,
+    options: {
       amount: 200,
       personalization: false,
-    };
-    const preferences = makePreferences({ optional: ['contact', 'email'] });
+    },
+    preferences: {
+      optional: ['contact', 'email'],
+    },
+  })
+)('Netbanking tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,

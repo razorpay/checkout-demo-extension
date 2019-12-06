@@ -1,4 +1,4 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 const {
   selectBank,
@@ -17,16 +17,16 @@ const {
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
-describe('Netbanking tests', () => {
-  test('perform netbaking transaction with callback url and Downtime', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+describe.each(
+  getTestData('perform netbaking transaction with callback url and Downtime', {
+    loggedIn: false,
+    options: {
       amount: 200,
       personalization: false,
       callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
       redirect: true,
-    };
-    const preferences = makePreferences({
+    },
+    preferences: {
       payment_downtime: {
         entity: 'collection',
         count: 2,
@@ -63,7 +63,10 @@ describe('Netbanking tests', () => {
           },
         ],
       },
-    });
+    },
+  })
+)('Netbanking tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,

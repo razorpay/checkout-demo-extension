@@ -33,7 +33,7 @@ describe.each(
   getTestData('perform successful card transaction with Offers enabled', {
     loggedIn: false,
     options: {
-      amount: 200,
+      amount: 20000,
       personalization: false,
     },
     preferences: {
