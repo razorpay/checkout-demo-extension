@@ -1191,7 +1191,7 @@ Session.prototype = {
       var div = document.createElement('div');
       var styleEl = this.renderCss();
       div.innerHTML = templates.modal(this, {
-        getStore,
+        getStore: getStore,
         cta: storeGetter(Cta.getStore()),
       });
       this.el = div.firstChild;
