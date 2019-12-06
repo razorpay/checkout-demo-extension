@@ -1,4 +1,4 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 const {
   submit,
@@ -21,24 +21,30 @@ const {
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
-describe('Basic upi payment', () => {
-  test('Perform upi collect transaction with customer feebearer and pertial payments enabled', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 20000,
-      personalization: false,
-    };
-    const preferences = makePreferences({
-      fee_bearer: true,
-      order: {
+describe.each(
+  getTestData(
+    'Perform upi collect transaction with customer feebearer and pertial payments enabled',
+    {
+      loggedIn: false,
+      options: {
         amount: 20000,
-        amount_due: 20000,
-        amount_paid: 0,
-        currency: 'INR',
-        first_payment_min_amount: null,
-        partial_payment: true,
+        personalization: false,
       },
-    });
+      preferences: {
+        fee_bearer: true,
+        order: {
+          amount: 20000,
+          amount_due: 20000,
+          amount_paid: 0,
+          currency: 'INR',
+          first_payment_min_amount: null,
+          partial_payment: true,
+        },
+      },
+    }
+  )
+)('UPI tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
       page,

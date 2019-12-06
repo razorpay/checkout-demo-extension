@@ -1,4 +1,4 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 const {
   submit,
@@ -19,14 +19,16 @@ const {
   selectPersonalizationPaymentMethod,
 } = require('../actions');
 
-describe('Basic upi payment', () => {
-  test('Perform upi collect transaction with personalization enabled', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+describe.each(
+  getTestData('Perform upi collect transaction with personalization enabled', {
+    loggedIn: false,
+    options: {
       amount: 200,
       personalization: true,
-    };
-    const preferences = makePreferences();
+    },
+  })
+)('UPI tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
       page,

@@ -1,4 +1,4 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 
 const {
@@ -12,14 +12,14 @@ const {
   handlePartialPayment,
 } = require('../actions');
 
-describe('Basic upi payment', () => {
-  test('Verify UPI downtime - High with partial payments enabled', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 30000,
+describe.each(
+  getTestData('Verify UPI downtime - High with partial payments enabled', {
+    loggedIn: false,
+    options: {
+      amount: 20000,
       personalization: false,
-    };
-    const preferences = makePreferences({
+    },
+    preferences: {
       order: {
         amount: 20000,
         amount_due: 20000,
@@ -46,7 +46,10 @@ describe('Basic upi payment', () => {
           },
         ],
       },
-    });
+    },
+  })
+)('UPI tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
       page,

@@ -1,4 +1,4 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 const {
   submit,
@@ -25,43 +25,49 @@ const {
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
-describe('Basic upi payment', () => {
-  test('Perform upi collect transaction with callbackURL and offers applied', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 200000,
-      personalization: false,
-      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
-      redirect: true,
-    };
-    const preferences = makePreferences({
-      offers: [
-        {
-          original_amount: 200000,
-          amount: 199000,
-          id: 'offer_Dcad1sICBaV2wI',
-          name: 'UPI Offer Name',
-          payment_method: 'upi',
-          display_text: 'UPI Offer Display Text',
-        },
-        {
-          original_amount: 200000,
-          amount: 199000,
-          id: 'offer_DcaetTeD4Gjcma',
-          name: 'UPI Offer Name 2',
-          payment_method: 'upi',
-          display_text: 'UPI Offer Display Text 2',
-        },
-        {
-          original_amount: 200000,
-          amount: 199000,
-          id: 'offer_DcafkxTAseGAtT',
-          name: 'UPI Offer Name 3',
-          payment_method: 'upi',
-          display_text: 'UPI Offer Display Text 3',
-        },
-      ],
-    });
+describe.each(
+  getTestData(
+    'Perform upi collect transaction with callbackURL and offers applied',
+    {
+      loggedIn: false,
+      options: {
+        amount: 200000,
+        personalization: false,
+        callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
+        redirect: true,
+      },
+      preferences: {
+        offers: [
+          {
+            original_amount: 200000,
+            amount: 199000,
+            id: 'offer_Dcad1sICBaV2wI',
+            name: 'UPI Offer Name',
+            payment_method: 'upi',
+            display_text: 'UPI Offer Display Text',
+          },
+          {
+            original_amount: 200000,
+            amount: 199000,
+            id: 'offer_DcaetTeD4Gjcma',
+            name: 'UPI Offer Name 2',
+            payment_method: 'upi',
+            display_text: 'UPI Offer Display Text 2',
+          },
+          {
+            original_amount: 200000,
+            amount: 199000,
+            id: 'offer_DcafkxTAseGAtT',
+            name: 'UPI Offer Name 3',
+            payment_method: 'upi',
+            display_text: 'UPI Offer Display Text 3',
+          },
+        ],
+      },
+    }
+  )
+)('UPI tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     preferences.methods.upi = true;
     await setPreferenceForOffer(preferences);
     const context = await openCheckoutWithNewHomeScreen({

@@ -1,4 +1,4 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 const {
   submit,
@@ -26,14 +26,16 @@ const {
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
-describe('Basic upi payment', () => {
-  test('Verify UPI downtime - Low with offers applied', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+describe.each(
+  getTestData('Verify UPI downtime - Low with offers applied', {
+    loggedIn: false,
+    options: {
       amount: 200,
       personalization: false,
-    };
-    const preferences = makePreferences({
+      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
+      redirect: true,
+    },
+    preferences: {
       payment_downtime: {
         entity: 'collection',
         count: 1,
@@ -78,7 +80,10 @@ describe('Basic upi payment', () => {
           display_text: 'UPI Offer Display Text 3',
         },
       ],
-    });
+    },
+  })
+)('UPI tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
       page,

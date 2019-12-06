@@ -1,4 +1,4 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 
 const {
@@ -11,14 +11,14 @@ const {
   verifyHighDowntime,
 } = require('../actions');
 
-describe('Basic upi payment', () => {
-  test('Verify UPI downtime - High with contact optional', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+describe.each(
+  getTestData('Verify UPI downtime - High with contact optional', {
+    loggedIn: false,
+    options: {
       amount: 200,
       personalization: false,
-    };
-    const preferences = makePreferences({
+    },
+    preferences: {
       optional: ['contact'],
       payment_downtime: {
         entity: 'collection',
@@ -38,7 +38,10 @@ describe('Basic upi payment', () => {
           },
         ],
       },
-    });
+    },
+  })
+)('UPI tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
       page,

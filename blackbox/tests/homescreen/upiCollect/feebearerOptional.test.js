@@ -1,4 +1,4 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 const {
   submit,
@@ -20,17 +20,20 @@ const {
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
-describe('Basic upi payment', () => {
-  test('Perform upi collect transaction with customer feebearer and contact optional enabled', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+describe.each(
+  getTestData('Verify UPI downtime - Low with callbackURL enabled', {
+    loggedIn: false,
+    options: {
       amount: 200,
       personalization: false,
-    };
-    const preferences = makePreferences({
+    },
+    preferences: {
       fee_bearer: true,
       optional: ['contact'],
-    });
+    },
+  })
+)('UPI tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
       page,
