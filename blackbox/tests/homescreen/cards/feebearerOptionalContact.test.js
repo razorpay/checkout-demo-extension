@@ -1,4 +1,4 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const {
   submit,
   enterCardDetails,
@@ -6,7 +6,7 @@ const {
   handleMockSuccessDialog,
   verifyErrorMessage,
   retryTransaction,
-  verifyPartialAmount,
+  handleFeeBearer,
   handleMockFailureDialog,
 } = require('../../../actions/common');
 
@@ -19,29 +19,28 @@ const {
   assertPaymentMethods,
   selectPaymentMethod,
   assertEditUserDetailsAndBack,
-  handlePartialPayment,
 } = require('../actions');
 
 // Opener
 const { openCheckoutWithNewHomeScreen } = require('../open');
 
-describe('Card tests', () => {
-  test('perform keyless card transaction with partial payment enabled', async () => {
-    const options = {
-      order_id: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 20000,
-      personalization: false,
-    };
-    const preferences = makePreferences({
-      order: {
-        amount: 20000,
-        amount_due: 20000,
-        amount_paid: 0,
-        currency: 'INR',
-        first_payment_min_amount: null,
-        partial_payment: true,
+describe.each(
+  getTestData(
+    'perform successful card transaction with Optional Contact and FeeBearer enabled',
+    {
+      loggedIn: false,
+      options: {
+        amount: 200,
+        personalization: false,
       },
-    });
+      preferences: {
+        fee_bearer: true,
+        optional: ['contact'],
+      },
+    }
+  )
+)('Card tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,
@@ -52,11 +51,9 @@ describe('Card tests', () => {
     await assertBasicDetailsScreen(context);
 
     await fillUserDetails(context);
-
-    await handlePartialPayment(context, '100');
+    await proceed(context);
 
     await assertUserDetails(context);
-
     await assertEditUserDetailsAndBack(context);
 
     await assertPaymentMethods(context);
@@ -65,15 +62,14 @@ describe('Card tests', () => {
     // -------- OLD FLOW --------
 
     await enterCardDetails(context);
-    await verifyPartialAmount(context, '₹ 100');
     await submit(context);
+    await handleFeeBearer(context);
     await handleCardValidation(context);
     await handleMockFailureDialog(context);
-    await verifyErrorMessage(context, 'The payment has already been processed');
+    // await verifyErrorMessage(context, 'The payment has already been processed');
     await retryTransaction(context);
-    await verifyPartialAmount(context, '₹ 100');
     await submit(context);
-
+    await handleFeeBearer(context);
     await handleCardValidation(context);
     await handleMockSuccessDialog(context);
   });

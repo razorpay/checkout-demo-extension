@@ -1,5 +1,5 @@
 const { openCheckoutWithNewHomeScreen } = require('../open');
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const {
   selectPersonalizedCard,
   submit,
@@ -20,14 +20,22 @@ const {
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
-describe('Card tests', () => {
-  test('perform card transaction with personalization and customer feebearer enabled', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 200,
-      personalization: true,
-    };
-    const preferences = makePreferences({ fee_bearer: true });
+describe.each(
+  getTestData(
+    'perform successful card transaction with Personalization and FeeBearer enabled',
+    {
+      loggedIn: false,
+      options: {
+        amount: 200,
+        personalization: true,
+      },
+      preferences: {
+        fee_bearer: true,
+      },
+    }
+  )
+)('Card tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,

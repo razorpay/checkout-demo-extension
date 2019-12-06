@@ -1,4 +1,4 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const {
   submit,
   enterCardDetails,
@@ -29,44 +29,50 @@ const {
 // Opener
 const { openCheckoutWithNewHomeScreen } = require('../open');
 
-describe('Card tests', () => {
-  test('perform card transaction with offers applied with contact optional', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 1000,
-      personalization: false,
-    };
-    const preferences = makePreferences({
-      optional: ['contact'],
-      offers: [
-        {
-          original_amount: 200000,
-          amount: 198000,
-          id: 'offer_DdMaQ3KHyKxcDN',
-          name: 'Card Offer VISA',
-          payment_method: 'card',
-          payment_network: 'VISA',
-        },
-        {
-          original_amount: 200000,
-          amount: 199000,
-          id: 'offer_DdO7XZ0ILq4u8a',
-          name: 'Card Offer American Express',
-          payment_method: 'card',
-          payment_network: 'AMEX',
-          display_text: 'Bank Offer - American Express -15% off',
-        },
-        {
-          original_amount: 200000,
-          amount: 199000,
-          id: 'offer_DdOL4XeZosJh2t',
-          name: 'Card Offer - MasterCard 20',
-          payment_method: 'card',
-          payment_network: 'MC',
-          display_text: 'Master Card Offer - 20% off',
-        },
-      ],
-    });
+describe.each(
+  getTestData(
+    'perform card transaction with offers applied with contact optional',
+    {
+      loggedIn: false,
+      options: {
+        amount: 200,
+        personalization: false,
+      },
+      preferences: {
+        optional: ['contact'],
+        offers: [
+          {
+            original_amount: 200000,
+            amount: 198000,
+            id: 'offer_DdMaQ3KHyKxcDN',
+            name: 'Card Offer VISA',
+            payment_method: 'card',
+            payment_network: 'VISA',
+          },
+          {
+            original_amount: 200000,
+            amount: 199000,
+            id: 'offer_DdO7XZ0ILq4u8a',
+            name: 'Card Offer American Express',
+            payment_method: 'card',
+            payment_network: 'AMEX',
+            display_text: 'Bank Offer - American Express -15% off',
+          },
+          {
+            original_amount: 200000,
+            amount: 199000,
+            id: 'offer_DdOL4XeZosJh2t',
+            name: 'Card Offer - MasterCard 20',
+            payment_method: 'card',
+            payment_network: 'MC',
+            display_text: 'Master Card Offer - 20% off',
+          },
+        ],
+      },
+    }
+  )
+)('Card tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,

@@ -1,12 +1,8 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const {
   submit,
   enterCardDetails,
-  handleCardValidation,
-  handleMockSuccessDialog,
-  verifyErrorMessage,
-  retryTransaction,
-  handleMockFailureDialog,
+  expectRedirectWithCallback,
 } = require('../../../actions/common');
 
 // New imports
@@ -22,15 +18,24 @@ const {
 
 // Opener
 const { openCheckoutWithNewHomeScreen } = require('../open');
-
-describe('Card tests', () => {
-  test('perform keyless card transaction', async () => {
-    const options = {
-      order_id: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 200,
-      personalization: false,
-    };
-    const preferences = makePreferences();
+describe.each(
+  getTestData(
+    'perform successful card transaction with callback URL and contact optional enabled',
+    {
+      loggedIn: false,
+      options: {
+        amount: 200,
+        personalization: false,
+        callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
+        redirect: true,
+      },
+      preferences: {
+        optional: ['contact'],
+      },
+    }
+  )
+)('Card tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,
@@ -53,13 +58,6 @@ describe('Card tests', () => {
 
     await enterCardDetails(context);
     await submit(context);
-    await handleCardValidation(context);
-    await handleMockFailureDialog(context);
-    await verifyErrorMessage(context, 'The payment has already been processed');
-    await retryTransaction(context);
-    await submit(context);
-
-    await handleCardValidation(context);
-    await handleMockSuccessDialog(context);
+    await expectRedirectWithCallback(context, { method: 'card' });
   });
 });
