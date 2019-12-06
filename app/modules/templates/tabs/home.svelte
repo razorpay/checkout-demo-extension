@@ -327,54 +327,83 @@
     const DETAILS = 'details';
     const METHODS = 'methods';
 
-    // If email and contact are prefilled, validate them
-    if (!contactEmailOptional && !contactEmailHidden) {
+    /**
+     * Mark contact and email as invalid by default
+     */
+    let isContactValid = false;
+    let isEmailValid = false;
+
+    /**
+     * Mark optional fields as valid
+     */
+    if (optional.contact) {
+      isContactValid = true;
+    }
+    if (optional.email) {
+      isEmailValid = true;
+    }
+
+    /**
+     * If contact and email are mandatory, validate
+     */
+    if (!contactEmailOptional) {
       const contactRegex = /^\+?[0-9]{8,15}$/;
       const emailRegex = /^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/;
 
-      /**
-       * For contact and email:
-       * - If optional, allow anything
-       * - If not optional, validate
-       */
-      if (!optional.contact && !contactRegex.test($contact)) {
-        return DETAILS;
-      }
-
-      if (!optional.email && !emailRegex.test($email)) {
-        return DETAILS;
-      }
+      isContactValid = isContactValid || contactRegex.test($contact);
+      isEmailValid = isEmailValid || emailRegex.test($email);
     }
 
-    // TPV bank
-    // TPV UPI
-    // Multi TPV
+    /**
+     * If contact or email are invalid,
+     * we need to get them corrected.
+     */
+    if (!isContactValid || !isEmailValid) {
+      return DETAILS;
+    }
+
+    /**
+     * Need TPV selection from the details screen.
+     */
     if (session.tpvBank || session.upiTpv || session.multiTpv) {
       return DETAILS;
     }
 
+    /**
+     * Need partial payment details from the details screen.
+     */
     if (isPartialPayment) {
       return DETAILS;
     }
 
+    /**
+     * Need address from the details screen.
+     */
     if (address) {
       return DETAILS;
     }
 
-    if (contactEmailOptional || contactEmailHidden || contactEmailReadonly) {
-      return METHODS;
-    }
+    /**
+     * If contact exists, get the instruments
+     * for the user.
+     */
+    const doesContactExist = $contact && $contact.length;
+    const _instruments = doesContactExist ? getInstruments() : [];
 
-    // TODO: What should we do in case of only one of email or contact is optional?
-
-    // Missing contact
-    if (!$contact || !$contact.length) {
-      return DETAILS;
-    }
-
-    // Update instruments
-    const _instruments = getInstruments();
-
+    /**
+     * If there's just one method available,
+     * we want to land on the details screen.
+     *
+     * But, there's an exception:
+     *
+     * There are some instruments for which we want to show
+     * personalized methods.
+     *
+     * If an instrument on any of these methods exists,
+     * we take the user to the methods screen.
+     *
+     * Otherwise, we take the user to the details screen.
+     */
     if (session.oneMethod) {
       if (
         _Arr.contains(['wallet', 'netbanking', 'upi'], session.oneMethod) &&
@@ -386,6 +415,11 @@
       }
     }
 
+    /**
+     * If there are multple methods
+     * and no validations have failed,
+     * we take the user to the methods screen.
+     */
     return METHODS;
   }
 
@@ -477,7 +511,7 @@
       {}
     );
 
-    Analytics.track('p13n:intruments:list', {
+    Analytics.track('p13n:instruments:list', {
       data: {
         length: instruments.length,
         shown: Math.min(_instruments.length, MAX_P13N_INSTRUMENTS),

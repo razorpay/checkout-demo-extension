@@ -20,7 +20,7 @@ const {
   verifyDiscountAmountInBanner,
 } = require('../../actions/common');
 
-describe('Card tests', () => {
+describe.skip('Card tests', () => {
   test('perform card transaction with offers applied and timeout enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',

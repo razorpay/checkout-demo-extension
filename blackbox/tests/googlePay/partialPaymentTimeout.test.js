@@ -13,7 +13,7 @@ const {
   verifyTimeout,
 } = require('../../actions/common');
 
-describe('Partial Timeout GooglePay payment', () => {
+describe.skip('Partial Timeout GooglePay payment', () => {
   test('Perform GooglePay transaction with partial payments with timeout enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',

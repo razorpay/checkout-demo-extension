@@ -243,6 +243,10 @@ export default function Track(r, event, data, immediately) {
       properties.local_order_id = _uid;
     }
 
+    // Add build number
+    // eslint-disable-next-line no-undef
+    properties.build_number = __BUILD_NUMBER__ || 0;
+
     // Add current experiments
     properties.experiments = getExperimentsFromStorage();
 

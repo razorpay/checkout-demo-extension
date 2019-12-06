@@ -9,7 +9,7 @@
 
 <div class="async-loading loading">
   <div class="message">
-    <slot></slot>
+    <slot />
   </div>
   <div class="spin">
     <div />

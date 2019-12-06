@@ -8,7 +8,7 @@ const {
   verifyPartialAmount,
   verifyTimeout,
 } = require('../../actions/common');
-describe('Third Party Verification test', () => {
+describe.skip('Third Party Verification test', () => {
   test('Perform Third Party Verification transaction with Partial Payments and timeout enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
