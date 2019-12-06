@@ -12,7 +12,7 @@ const {
   verifyTimeout,
 } = require('../../actions/common');
 
-describe('SavedCard tests', () => {
+describe.skip('SavedCard tests', () => {
   test('Perform saved card transaction with contact optional and timeout enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',

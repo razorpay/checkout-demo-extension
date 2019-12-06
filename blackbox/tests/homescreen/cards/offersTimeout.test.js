@@ -5,7 +5,7 @@ const {
   handleCardValidation,
   handleMockFailureDialog,
   verifyErrorMessage,
-  retryCardTransaction,
+  retryTransaction,
   verifyTimeout,
   viewOffers,
   selectOffer,
@@ -29,7 +29,7 @@ const {
 // Opener
 const { openCheckoutWithNewHomeScreen } = require('../open');
 
-describe('Card tests', () => {
+describe.skip('Card tests', () => {
   test('perform card transaction with offers applied and timeout enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -98,7 +98,7 @@ describe('Card tests', () => {
     await handleCardValidation(context);
     await handleMockFailureDialog(context);
     await verifyErrorMessage(context, 'The payment has already been processed');
-    await retryCardTransaction(context);
+    await retryTransaction(context);
     await verifyTimeout(context, 'card');
   });
 });

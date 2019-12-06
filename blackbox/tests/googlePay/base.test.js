@@ -36,7 +36,7 @@ describe('Basic GooglePay payment', () => {
     await selectBankNameFromGooglePayDropDown(context, 'okhdfcbank');
     await submit(context);
     await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
-    await respondToUPIAjax(context, '');
+    await respondToUPIAjax(context);
     await respondToUPIPaymentStatus(context);
   });
 });

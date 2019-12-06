@@ -1,4 +1,5 @@
 import CurrentExperiments from './current';
+import BrowserStorage from 'browserstorage';
 
 const STORAGE_KEY = 'rzp_checkout_exp';
 
@@ -11,7 +12,7 @@ export function getExperimentsFromStorage() {
   let data;
 
   try {
-    data = global.localStorage.getItem(STORAGE_KEY) |> _Obj.parse;
+    data = BrowserStorage.getItem(STORAGE_KEY) |> _Obj.parse;
   } catch (err) {}
 
   // Make sure we return an object
@@ -30,7 +31,7 @@ function setExperimentsInStorage(experiments) {
   if (_.isNonNullObject(experiments)) {
     try {
       experiments = _Obj.stringify(experiments);
-      global.localStorage.setItem(STORAGE_KEY, experiments);
+      BrowserStorage.setItem(STORAGE_KEY, experiments);
     } catch (err) {
       return;
     }

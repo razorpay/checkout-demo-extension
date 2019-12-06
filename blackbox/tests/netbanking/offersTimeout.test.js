@@ -18,7 +18,7 @@ const {
   verifyTimeout,
 } = require('../../actions/common');
 
-describe('Netbanking tests', () => {
+describe.skip('Netbanking tests', () => {
   test('perform netbaking transaction with offers applied', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',

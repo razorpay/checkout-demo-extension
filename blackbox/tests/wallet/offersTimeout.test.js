@@ -19,7 +19,7 @@ const {
   verifyTimeout,
 } = require('../../actions/common');
 
-describe('Basic wallet payment', () => {
+describe.skip('Basic wallet payment', () => {
   test('Perform wallet transaction with offers applied', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
