@@ -59,6 +59,13 @@
     session.hasOffers &&
     _Arr.any(session.eligibleOffers, offer => offer.homescreen);
 
+  // Recurring callout
+  const showRecurringCallout =
+    session.recurring &&
+    session.tab !== 'emandate' &&
+    methods.count === 1 &&
+    methods.card;
+
   const {
     isPartialPayment,
     prefill,
@@ -81,6 +88,7 @@
   $: showSecuredByMessage =
     view === 'details' &&
     !hasOffersOnHomescreen &&
+    !showRecurringCallout &&
     !session.multiTpv &&
     !session.tpvBank &&
     !isPartialPayment &&
@@ -754,6 +762,36 @@
     </div>
 
     <div slot="bottom">
+      {#if showRecurringCallout}
+        <Callout>
+          {#if session.get('subscription_id')}
+            {#if methods.debit_card && methods.credit_card}
+              Subscription payments are supported on Visa and Mastercard Credit
+              Cards from all Banks and Debit Cards from ICICI, Kotak, Citibank
+              and Canara Bank.
+            {:else if methods.debit_card}
+              Subscription payments are only supported on Visa and Mastercard
+              Debit Cards from ICICI, Kotak, Citibank and Canara Bank.
+            {:else}
+              Subscription payments are only supported on Mastercard and Visa
+              Credit Cards.
+            {/if}
+          {:else if methods.debit_card && methods.credit_card}
+            Visa and Mastercard Credit Cards from all Banks and Debit Cards from
+            ICICI, Kotak, Citibank and Canara Bank are supported for this
+            payment.
+          {:else if methods.debit_card}
+            Only Visa and Mastercard Debit Cards from ICICI, Kotak, Citibank and
+            Canara Bank are supported for this payment.
+          {:else}
+            Only Visa and Mastercard Credit Cards are supported for this
+            payment.
+          {/if}
+        </Callout>
+      {/if}
+
+      <OffersPortal />
+
       {#if showSecuredByMessage}
         <div class="secured-message" out:slide={{ duration: 100 }}>
           <i>
@@ -782,36 +820,6 @@
           </i>
           This payment is secured by Razorpay.
         </div>
-      {/if}
-
-      <OffersPortal />
-
-      {#if session.recurring && session.tab !== 'emandate' && methods.count === 1 && methods.card}
-        <Callout>
-          {#if session.get('subscription_id')}
-            {#if methods.debit_card && methods.credit_card}
-              Subscription payments are supported on Visa and Mastercard Credit
-              Cards from all Banks and Debit Cards from ICICI, Kotak, Citibank
-              and Canara Bank.
-            {:else if methods.debit_card}
-              Subscription payments are only supported on Visa and Mastercard
-              Debit Cards from ICICI, Kotak, Citibank and Canara Bank.
-            {:else}
-              Subscription payments are only supported on Mastercard and Visa
-              Credit Cards.
-            {/if}
-          {:else if methods.debit_card && methods.credit_card}
-            Visa and Mastercard Credit Cards from all Banks and Debit Cards from
-            ICICI, Kotak, Citibank and Canara Bank are supported for this
-            payment.
-          {:else if methods.debit_card}
-            Only Visa and Mastercard Debit Cards from ICICI, Kotak, Citibank and
-            Canara Bank are supported for this payment.
-          {:else}
-            Only Visa and Mastercard Credit Cards are supported for this
-            payment.
-          {/if}
-        </Callout>
       {/if}
 
     </div>
