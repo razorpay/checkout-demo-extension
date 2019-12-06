@@ -32,7 +32,7 @@ describe('Saved Card tests', () => {
     await fillUserDetails(context, '8888888881');
     await selectPersonalizedCard(context);
     await handleCustomerCardStatusRequest(context);
-    await typeOTPandSubmit(context);
+    await typeOTPandSubmit(context, '5555');
     await respondSavedCards(context);
     await selectSavedCardAndTypeCvv(context);
     await submit(context);
