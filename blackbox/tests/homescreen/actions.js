@@ -1,4 +1,6 @@
 const { randomContact, randomEmail, delay } = require('../../util');
+const personalizationActions = require('./personalization-actions');
+const downtimeTimeoutActions = require('./downtime-actions');
 
 /**
  * Sets the state in context
@@ -281,4 +283,6 @@ module.exports = {
   handlePartialPayment,
   assertMethodsScreen,
   assertMissingDetails,
+  ...personalizationActions,
+  ...downtimeTimeoutActions,
 };

@@ -1,13 +1,12 @@
-const { openCheckoutWithNewHomeScreen } = require('../open');
 const { makePreferences } = require('../../../actions/preferences');
+const { openCheckoutWithNewHomeScreen } = require('../open');
 const {
-  selectPersonalizedCard,
   submit,
-  enterCardDetails,
-  handleCardValidation,
-  handleMockFailureDialog,
-  retryTransaction,
-  handleMockSuccessDialog,
+  selectUPIMethod,
+  enterUPIAccount,
+  handleUPIAccountValidation,
+  respondToUPIAjax,
+  respondToUPIPaymentStatus,
 } = require('../../../actions/common');
 
 const {
@@ -16,37 +15,36 @@ const {
   proceed,
   assertUserDetails,
   assertPaymentMethods,
+  selectPaymentMethod,
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
-describe('Card tests', () => {
-  test('perform card transaction with personalization', async () => {
+describe('Basic upi payment', () => {
+  test('Perform upi collect transaction', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
-      personalization: true,
+      personalization: false,
     };
     const preferences = makePreferences();
+    preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,
       preferences,
-      method: 'Card',
     });
     await assertBasicDetailsScreen(context);
-    await fillUserDetails(context, '8888888881');
+    await fillUserDetails(context);
     await proceed(context);
     await assertUserDetails(context);
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
-    await selectPersonalizedCard(context);
-    await enterCardDetails(context);
+    await selectPaymentMethod(context, 'upi');
+    await selectUPIMethod(context, 'BHIM');
+    await enterUPIAccount(context, 'BHIM');
     await submit(context);
-    await handleCardValidation(context);
-    await handleMockFailureDialog(context);
-    await retryTransaction(context);
-    await submit(context);
-    await handleCardValidation(context);
-    await handleMockSuccessDialog(context);
+    await handleUPIAccountValidation(context, 'BHIM@upi');
+    await respondToUPIAjax(context);
+    await respondToUPIPaymentStatus(context);
   });
 });
