@@ -9,7 +9,7 @@ const {
   selectPayLaterPaymentMode,
   verifyPayLaterPaymentMode,
   handleCustomerCardStatusRequest,
-  respondToPayLater,
+  handleValidationRequest,
   verifyPayLaterOTP,
   typeOTPandSubmit,
   verifyPartialAmount,
@@ -32,11 +32,12 @@ describe('Perform ePayLater Test', () => {
         partial_payment: true,
       },
     });
+    preferences.methods.paylater = { epaylater: true };
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
     await handlePartialPayment(context, '100');
-    await assertPaymentMethods(context);
+    await assertPaymentMethods(context, 'paylater');
     await verifyPartialAmount(context, '₹ 100');
     await selectPaymentMethod(context, 'paylater');
     await verifyPayLaterPaymentMode(context);
@@ -45,6 +46,6 @@ describe('Perform ePayLater Test', () => {
     await typeOTPandSubmit(context, '0007');
     await handleCustomerCardStatusRequest(context);
     await verifyPayLaterOTP(context);
-    await respondToPayLater(context);
+    await handleValidationRequest(context, 'pass');
   });
 });

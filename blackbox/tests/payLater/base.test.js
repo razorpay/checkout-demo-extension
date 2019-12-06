@@ -8,7 +8,7 @@ const {
   selectPayLaterPaymentMode,
   verifyPayLaterPaymentMode,
   handleCustomerCardStatusRequest,
-  respondToPayLater,
+  handleValidationRequest,
   verifyPayLaterOTP,
   typeOTPandSubmit,
 } = require('../../actions/common');
@@ -21,10 +21,11 @@ describe('ePayLater Test', () => {
       personalization: false,
     };
     const preferences = makePreferences();
+    preferences.methods.paylater = { epaylater: true };
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
-    await assertPaymentMethods(context);
+    await assertPaymentMethods(context, 'paylater');
     await selectPaymentMethod(context, 'paylater');
     await verifyPayLaterPaymentMode(context);
     await selectPayLaterPaymentMode(context);
@@ -32,6 +33,6 @@ describe('ePayLater Test', () => {
     await typeOTPandSubmit(context, '0007');
     await handleCustomerCardStatusRequest(context);
     await verifyPayLaterOTP(context);
-    await respondToPayLater(context);
+    await handleValidationRequest(context, 'pass');
   });
 });

@@ -8,7 +8,7 @@ const {
   selectPayLaterPaymentMode,
   verifyPayLaterPaymentMode,
   handleCustomerCardStatusRequest,
-  respondToPayLater,
+  handleValidationRequest,
   verifyPayLaterOTP,
   typeOTPandSubmit,
   handleFeeBearer,
@@ -22,10 +22,11 @@ describe('ePayLater Test', () => {
       personalization: false,
     };
     const preferences = makePreferences({ fee_bearer: true });
+    preferences.methods.paylater = { epaylater: true };
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
-    await assertPaymentMethods(context);
+    await assertPaymentMethods(context, 'paylater');
     await selectPaymentMethod(context, 'paylater');
     await verifyPayLaterPaymentMode(context);
     await selectPayLaterPaymentMode(context);
@@ -34,6 +35,6 @@ describe('ePayLater Test', () => {
     await handleCustomerCardStatusRequest(context);
     await verifyPayLaterOTP(context);
     await handleFeeBearer(context);
-    await respondToPayLater(context);
+    await handleValidationRequest(context, 'pass');
   });
 });

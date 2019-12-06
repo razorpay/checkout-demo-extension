@@ -222,7 +222,7 @@ async function assertPaymentMethods(context) {
     buttons.map(button => getAttribute(context.page, button, 'method'))
   );
 
-  expect(methods).toEqual(['card', 'netbanking', 'wallet', 'paylater']);
+  expect(methods).toEqual(['card', 'netbanking', 'wallet']);
 }
 
 /**

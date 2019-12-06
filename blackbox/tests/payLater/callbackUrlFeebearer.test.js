@@ -24,10 +24,11 @@ describe('ePayLater Test', () => {
       redirect: true,
     };
     const preferences = makePreferences({ fee_bearer: true });
+    preferences.methods.paylater = { epaylater: true };
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
-    await assertPaymentMethods(context);
+    await assertPaymentMethods(context, 'paylater');
     await selectPaymentMethod(context, 'paylater');
     await verifyPayLaterPaymentMode(context);
     await selectPayLaterPaymentMode(context);

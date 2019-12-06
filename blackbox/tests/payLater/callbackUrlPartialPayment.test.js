@@ -34,11 +34,12 @@ describe('ePayLater Test', () => {
         partial_payment: true,
       },
     });
+    preferences.methods.paylater = { epaylater: true };
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
     await handlePartialPayment(context, '100');
-    await assertPaymentMethods(context);
+    await assertPaymentMethods(context, 'paylater');
     await verifyPartialAmount(context, '₹ 100');
     await selectPaymentMethod(context, 'paylater');
     await verifyPayLaterPaymentMode(context);
