@@ -70,7 +70,7 @@ async function handleCardlessEMIValidation(context) {
     method: 'cardless_emi',
     request: {
       url:
-        'https://api.razorpay.com/v1/otp/verify?method=cardless_emi&provider=zestmoney&payment_id=pay_DnKu1wENm6Bqij&key_id=rzp_live_ILgsfZCZoFIKMb',
+        'https://api.razorpay.com/v1/otp/verify?method=cardless_emi&provider=zestmoney&payment_id=pay_DnKu1wENm6Bqij&key_id=rzp_test_ILgsfZCZoFIKMb',
       method: 'POST',
       content: {
         contact: '+919620875358',
@@ -98,12 +98,12 @@ async function handleCardlessEMIValidation(context) {
     merchant: 'Razorpay Software Private Limited',
     gateway:
       'eyJpdiI6IlByY0Z0TmVDQThLa1E3dTlhTU5XMkE9PSIsInZhbHVlIjoiKzRLRDBBd2czNDRPTW1pTEZ3TmErbHFwT0R1akdJaWRDYVU1QVFOaUVNSElRaTlEYnFVXC8zNmtDeWluYm9XbXYiLCJtYWMiOiJjZmQ5MmNhMzhiMTU5NTkzYTM4M2NkYjBlMDg3NzEzMTAzYzU2YzYyNDY1YjMzMWM2NzhjMGIwZjY4Nzc0MWI2In0=',
-    key_id: 'rzp_live_ILgsfZCZoFIKMb',
+    key_id: 'rzp_test_ILgsfZCZoFIKMb',
     version: '1',
     payment_create_url:
-      'https://api.razorpay.com/v1/payments?key_id=rzp_live_ILgsfZCZoFIKMb',
+      'https://api.razorpay.com/v1/payments?key_id=rzp_test_ILgsfZCZoFIKMb',
     resend_url:
-      'https://api.razorpay.com/v1/otp/create?key_id=rzp_live_ILgsfZCZoFIKMb',
+      'https://api.razorpay.com/v1/otp/create?key_id=rzp_test_ILgsfZCZoFIKMb',
     payment_id: 'pay_DnKu1wENm6Bqij',
   });
 }

@@ -15,7 +15,7 @@ const {
 } = require('../../actions/common');
 
 describe.skip('Cardless EMI tests', () => {
-  test('perform Cardless EMI - ZestMoney transaction with callbackURL', async () => {
+  test('perform Cardless EMI - ZestMoney transaction with callbackURL with contact Optional', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 500000,
