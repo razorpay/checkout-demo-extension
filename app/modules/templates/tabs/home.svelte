@@ -511,7 +511,7 @@
       {}
     );
 
-    Analytics.track('p13n:intruments:list', {
+    Analytics.track('p13n:instruments:list', {
       data: {
         length: instruments.length,
         shown: Math.min(_instruments.length, MAX_P13N_INSTRUMENTS),
