@@ -1251,7 +1251,7 @@ Session.prototype = {
 
     if (tab && !(this.order && this.order.bank) && this.methods[tab]) {
       this.switchTab(tab);
-    } else if (tab === '') {
+    } else if (tab === '' && this.newHomeScreen) {
       this.switchTab(tab);
     }
 
