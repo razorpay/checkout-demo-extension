@@ -136,7 +136,8 @@ function initOffers(
   onApplyOffer,
   onRemoveOffer,
   formatAmount,
-  $root
+  $root,
+  session
 ) {
   // Create offers strip and get references
   var $el = createNode(templates.offers()),
@@ -307,6 +308,10 @@ function initOffers(
      * Applies the selected offer.
      */
     applyOffer: function() {
+      if (!session.checkCommonValidAndTrackIfInvalid()) {
+        return;
+      }
+
       if (appliedOffer === selectedOffer) {
         return;
       }
@@ -479,11 +484,13 @@ function initOffers(
   $applyOffer.onclick = function() {
     var isOfferApplied = offers.applyOffer();
     toggleOfferList();
-    Analytics.track('offers:apply', {
-      type: AnalyticsTypes.BEHAV,
-      data: appliedOffer.data,
-    });
-    return isOfferApplied && onApplyOffer && onApplyOffer(appliedOffer);
+    if (isOfferApplied) {
+      Analytics.track('offers:apply', {
+        type: AnalyticsTypes.BEHAV,
+        data: appliedOffer.data,
+      });
+      return onApplyOffer && onApplyOffer(appliedOffer);
+    }
   };
 
   $root.addEventListener('click', function(e) {
