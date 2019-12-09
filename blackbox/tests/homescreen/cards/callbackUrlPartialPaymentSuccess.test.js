@@ -56,8 +56,8 @@ describe('Card tests', () => {
     await assertUserDetails(context);
 
     await assertEditUserDetailsAndBack(context);
-
-    await assertPaymentMethods(context);
+    const paymentMethods = ['card', 'netbanking', 'wallet'];
+    await assertPaymentMethods(context, paymentMethods);
     await selectPaymentMethod(context, 'card');
 
     // -------- OLD FLOW --------
