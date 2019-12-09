@@ -1,12 +1,13 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { makeOptions, getTestData } = require('../../../actions');
+
 const {
   submit,
-  enterCardDetails,
+  selectUPIMethod,
+  enterUPIAccount,
+  handleUPIAccountValidation,
   expectRedirectWithCallback,
-  handleFeeBearer,
+  selectBankNameFromGooglePayDropDown,
 } = require('../../../actions/common');
-
-// New imports
 const {
   assertBasicDetailsScreen,
   fillUserDetails,
@@ -17,11 +18,14 @@ const {
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
-// Opener
 const { openCheckoutWithNewHomeScreen } = require('../open');
 
-describe('Card tests', () => {
-  test('perform successful card transaction with callback URL and FeeBearer enabled', async () => {
+describe.each(
+  getTestData('Basic GooglePay payment', {
+    loggedIn: false,
+  })
+)('Perform GooglePay transaction', ({ preferences, title }) => {
+  test(title, async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
@@ -29,31 +33,25 @@ describe('Card tests', () => {
       callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
       redirect: true,
     };
-    const preferences = makePreferences({ fee_bearer: true });
+    preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,
       preferences,
     });
-
-    // Basic options with no prefill, we'll land on the details screen
     await assertBasicDetailsScreen(context);
-
     await fillUserDetails(context);
     await proceed(context);
-
     await assertUserDetails(context);
     await assertEditUserDetailsAndBack(context);
-
-    const paymentMethods = ['card', 'netbanking', 'wallet'];
+    const paymentMethods = ['card', 'netbanking', 'wallet', 'upi'];
     await assertPaymentMethods(context, paymentMethods);
-    await selectPaymentMethod(context, 'card');
-
-    // -------- OLD FLOW --------
-
-    await enterCardDetails(context);
+    await selectPaymentMethod(context, 'upi');
+    await selectUPIMethod(context, 'Google Pay');
+    await enterUPIAccount(context, 'scbaala');
+    await selectBankNameFromGooglePayDropDown(context, 'okhdfcbank');
     await submit(context);
-    await handleFeeBearer(context, page);
-    await expectRedirectWithCallback(context, { method: 'card' });
+    await handleUPIAccountValidation(context, 'scbaala@okhdfc');
+    await expectRedirectWithCallback(context, { method: 'upi' });
   });
 });
