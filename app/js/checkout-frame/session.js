@@ -1219,6 +1219,7 @@ Session.prototype = {
   },
 
   fillData: function() {
+    var self = this;
     var oldMethod = this.data.method;
     if (oldMethod) {
       this.wants_skip = true;
@@ -1307,6 +1308,7 @@ Session.prototype = {
           var val = data[name];
           if (el && val) {
             el.value = val;
+            self.input(el);
           }
         }
       );
