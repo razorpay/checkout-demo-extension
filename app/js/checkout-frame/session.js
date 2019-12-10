@@ -1562,17 +1562,16 @@ Session.prototype = {
 
   setSvelteComponents: function() {
     this.setHomeTab();
+    this.setSvelteCardTab();
     this.setNetbankingTab();
     this.setEmandate();
     this.setCardlessEmi();
     this.setPayLater();
-    this.setSavedCardsView();
     this.setOtpScreen();
     this.setUpiTab();
     this.setPayoutsScreen();
     this.setNach();
     this.setBankTransfer();
-    this.setSvelteCardTab();
   },
 
   showTimer: function(cb) {
