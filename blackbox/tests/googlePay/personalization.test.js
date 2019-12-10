@@ -5,33 +5,34 @@ const {
   fillUserDetails,
   verifyPersonalizationText,
   submit,
-  handleOtpVerification,
-  typeOTPandSubmit,
-  handleValidationRequest,
+  respondToUPIPaymentStatus,
+  respondToUPIAjax,
+  handleUPIAccountValidation,
   selectPersonalizationPaymentMethod,
 } = require('../../actions/common');
 
-describe('Wallet with Personalization  payment', () => {
-  test('Perform Wallet with Personalization transaction', async () => {
+describe('GooglePay with Personalization  payment', () => {
+  test('Perform GooglePay with Personalization transaction', async () => {
     const options = {
       key: 'rzp_test_VwsqHDsQPoVQi6',
       amount: 60000,
       personalization: true,
     };
     const preferences = makePreferences();
+    preferences.methods.upi = true;
     const context = await openCheckout({
       page,
       options,
       preferences,
-      method: 'Wallet',
+      method: 'UPI',
     });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, '8888888881');
-    await verifyPersonalizationText(context, 'wallet');
+    await verifyPersonalizationText(context, 'upi');
     await selectPersonalizationPaymentMethod(context, '1');
     await submit(context);
-    await handleOtpVerification(context);
-    await typeOTPandSubmit(context);
-    await handleValidationRequest(context, 'pass');
+    await handleUPIAccountValidation(context, 'dsd@okhdfcbank');
+    await respondToUPIAjax(context);
+    await respondToUPIPaymentStatus(context);
   });
 });
