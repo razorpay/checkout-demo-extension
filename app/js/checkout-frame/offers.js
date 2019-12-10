@@ -491,6 +491,7 @@ function initOffers(
       });
       return onApplyOffer && onApplyOffer(appliedOffer);
     }
+    return false;
   };
 
   $root.addEventListener('click', function(e) {
