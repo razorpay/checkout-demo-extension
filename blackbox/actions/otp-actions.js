@@ -20,10 +20,7 @@ async function handleOtpVerification(context, walletissuer = 'freecharge') {
   });
 }
 
-async function typeOTPandSubmit(context, otpValue) {
-  if (otpValue == '' || otpValue === undefined) {
-    otpValue = '5555';
-  }
+async function typeOTPandSubmit(context, otpValue = '5555') {
   await typeOTP(context, otpValue);
   await delay(500);
   const footer = await context.page.waitForSelector('#footer', {
