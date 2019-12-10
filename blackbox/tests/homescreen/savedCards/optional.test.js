@@ -22,7 +22,6 @@ const {
 
 describe.each(
   getTestData('Perform saved card transaction with contact optional', {
-    loggedIn: false,
     options: {
       amount: 200,
       personalization: true,

@@ -23,7 +23,6 @@ describe.each(
   getTestData(
     'perform netbaking transaction with partial payment and contact optional',
     {
-      loggedIn: false,
       options: {
         amount: 20000,
         personalization: false,

@@ -20,7 +20,6 @@ const {
 
 describe.each(
   getTestData('Perform upi collect transaction with callbackURL', {
-    loggedIn: false,
     options: {
       amount: 200,
       personalization: false,

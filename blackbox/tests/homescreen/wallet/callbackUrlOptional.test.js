@@ -21,7 +21,6 @@ describe.each(
   getTestData(
     'Perform wallet transaction with callbackURL with contact optional enabled',
     {
-      loggedIn: false,
       options: {
         amount: 200,
         personalization: false,

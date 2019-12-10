@@ -22,7 +22,6 @@ describe.each(
   getTestData(
     'perform netbaking transaction with feebearer and callback url enabled',
     {
-      loggedIn: false,
       options: {
         amount: 600,
         personalization: false,

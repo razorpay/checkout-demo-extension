@@ -31,7 +31,6 @@ describe.each(
   getTestData(
     'Perform upi collect transaction with offers and partial payments applied',
     {
-      loggedIn: false,
       options: {
         amount: 200000,
         personalization: false,

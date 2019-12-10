@@ -21,7 +21,6 @@ const {
 
 describe.each(
   getTestData('perform netbanking transaction with customer feebearer', {
-    loggedIn: false,
     options: {
       amount: 600,
       personalization: false,

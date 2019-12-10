@@ -21,17 +21,19 @@ const {
 } = require('../actions');
 
 describe.each(
-  getTestData('Verify UPI downtime - Low with callbackURL enabled', {
-    loggedIn: false,
-    options: {
-      amount: 200,
-      personalization: false,
-    },
-    preferences: {
-      fee_bearer: true,
-      optional: ['contact'],
-    },
-  })
+  getTestData(
+    'Verify UPI downtime - Low with callbackURLand customer feebearer enabled',
+    {
+      options: {
+        amount: 200,
+        personalization: false,
+      },
+      preferences: {
+        fee_bearer: true,
+        optional: ['contact'],
+      },
+    }
+  )
 )('UPI tests', ({ preferences, title, options }) => {
   test(title, async () => {
     preferences.methods.upi = true;

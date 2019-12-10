@@ -23,7 +23,6 @@ const {
 
 describe.each(
   getTestData('Perform wallet transaction with partial payments', {
-    loggedIn: false,
     options: {
       amount: 20000,
       personalization: false,

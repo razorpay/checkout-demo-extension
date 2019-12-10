@@ -24,7 +24,6 @@ describe.each(
   getTestData(
     'perform netbanking transaction with partial payments and feebearer enabled',
     {
-      loggedIn: false,
       options: {
         amount: 20000,
         personalization: false,

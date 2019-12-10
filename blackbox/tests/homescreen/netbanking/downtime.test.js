@@ -18,7 +18,6 @@ const {
 
 describe.each(
   getTestData('perform netbaking transaction with Downtime', {
-    loggedIn: false,
     options: {
       amount: 600,
       personalization: false,

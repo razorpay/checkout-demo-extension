@@ -20,7 +20,6 @@ describe.each(
   getTestData(
     'perform netbaking transaction with contact optional and Downtime',
     {
-      loggedIn: false,
       options: {
         amount: 200,
         personalization: false,

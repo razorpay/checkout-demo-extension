@@ -24,7 +24,6 @@ describe.each(
   getTestData(
     'Perform upi collect transaction with callbackURL and Partial Payments enabled',
     {
-      loggedIn: false,
       options: {
         amount: 200,
         personalization: false,

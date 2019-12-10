@@ -23,7 +23,6 @@ const {
 
 describe.each(
   getTestData('Perform saved card transaction with partial payments enabled', {
-    loggedIn: false,
     options: {
       amount: 200,
       personalization: true,

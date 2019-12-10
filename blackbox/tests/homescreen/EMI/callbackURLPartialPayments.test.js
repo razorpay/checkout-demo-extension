@@ -23,7 +23,6 @@ describe.each(
   getTestData(
     'Perform EMI transaction with partial payments and callback URL enabled',
     {
-      loggedIn: false,
       options: {
         amount: 500000,
         personalization: false,

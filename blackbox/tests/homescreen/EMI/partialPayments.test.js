@@ -22,7 +22,6 @@ const {
 
 describe.each(
   getTestData('perform EMI transaction with partial payments enabled', {
-    loggedIn: false,
     options: {
       amount: 500000,
       personalization: false,

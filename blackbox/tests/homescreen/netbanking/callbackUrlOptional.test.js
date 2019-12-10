@@ -21,7 +21,6 @@ describe.each(
   getTestData(
     'perform netbaking transaction with contact optional and callback url',
     {
-      loggedIn: false,
       options: {
         amount: 200,
         personalization: false,

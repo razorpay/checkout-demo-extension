@@ -23,9 +23,8 @@ const {
 
 describe.each(
   getTestData(
-    'Perform upi collect transaction with customer feebearer and pertial payments enabled',
+    'Perform upi collect transaction with customer feebearer and partial payments enabled',
     {
-      loggedIn: false,
       options: {
         amount: 20000,
         personalization: false,

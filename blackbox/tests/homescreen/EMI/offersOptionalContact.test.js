@@ -27,7 +27,6 @@ describe.each(
   getTestData(
     'Perform EMI transaction with No cost EMI offers applied and contact optional enabled',
     {
-      loggedIn: false,
       options: {
         amount: 500000,
         personalization: false,

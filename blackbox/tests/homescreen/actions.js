@@ -100,8 +100,12 @@ async function assertMissingDetails(context) {
     visible: true,
   });
   const strip = await $form.$('#user-details');
-
-  expect(strip).toEqual(null);
+  if (!context.preferences.customer) {
+    expect(strip).toEqual(null);
+  } else {
+    expect(strip).not.toEqual(null);
+    await assertEditUserDetailsAndBack(context);
+  }
 }
 
 /**
@@ -150,33 +154,35 @@ async function proceed(context) {
  * are the same as those entered.
  */
 async function assertUserDetails(context) {
-  const { contact, email } = context.state;
+  if (!context.preferences.customer) {
+    const { contact, email } = context.state;
 
-  const first = contact || email;
-  const last = email;
+    const first = contact || email;
+    const last = email;
 
-  const strip = await context.page.waitForSelector(
-    '#user-details [slot=title]',
-    {
-      visible: true,
+    const strip = await context.page.waitForSelector(
+      '#user-details [slot=title]',
+      {
+        visible: true,
+      }
+    );
+    const firstInPage = await innerText(
+      context.page,
+      await strip.$('span:first-child')
+    );
+    const lastInPage = await innerText(
+      context.page,
+      await strip.$('span:last-child')
+    );
+
+    if (!first && !last) {
+      expect(firstInPage).toEqual(undefined);
+      expect(lastInPage).toEqual(undefined);
+    } else if (first) {
+      expect(firstInPage).toEqual(first);
+    } else if (last) {
+      expect(lastInPage).toEqual(last);
     }
-  );
-  const firstInPage = await innerText(
-    context.page,
-    await strip.$('span:first-child')
-  );
-  const lastInPage = await innerText(
-    context.page,
-    await strip.$('span:last-child')
-  );
-
-  if (!first && !last) {
-    expect(firstInPage).toEqual(undefined);
-    expect(lastInPage).toEqual(undefined);
-  } else if (first) {
-    expect(firstInPage).toEqual(first);
-  } else if (last) {
-    expect(lastInPage).toEqual(last);
   }
 }
 

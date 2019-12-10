@@ -25,7 +25,6 @@ describe.each(
   getTestData(
     'Perform EMI transaction with partial payments and feebearer enabled',
     {
-      loggedIn: false,
       options: {
         amount: 500000,
         personalization: false,

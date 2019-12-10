@@ -23,7 +23,6 @@ describe.each(
   getTestData(
     'Perform EMI transaction with callback URL and customer feebearer enabled',
     {
-      loggedIn: false,
       options: {
         amount: 500000,
         personalization: false,

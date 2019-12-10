@@ -31,7 +31,6 @@ describe.each(
   getTestData(
     'Perform saved card transaction with offers applied and customer feebearer enabled',
     {
-      loggedIn: false,
       options: {
         amount: 200,
         personalization: true,

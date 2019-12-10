@@ -29,7 +29,6 @@ describe.each(
   getTestData(
     'Perform wallet transaction with offers applied and feebearer enabled',
     {
-      loggedIn: false,
       options: {
         amount: 200000,
         personalization: false,

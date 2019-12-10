@@ -21,7 +21,6 @@ const {
 
 describe.each(
   getTestData('Perform EMI transaction with contact optional', {
-    loggedIn: false,
     options: {
       amount: 500000,
       personalization: false,

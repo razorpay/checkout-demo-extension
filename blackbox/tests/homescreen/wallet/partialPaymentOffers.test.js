@@ -28,7 +28,6 @@ describe.each(
   getTestData(
     'Perform wallet transaction with partial payments and Offers enabled',
     {
-      loggedIn: false,
       options: {
         amount: 200000,
         personalization: false,

@@ -24,7 +24,6 @@ describe.each(
   getTestData(
     'perform EMI transaction with partial payments and optional contact enabled',
     {
-      loggedIn: false,
       options: {
         amount: 500000,
         personalization: false,
