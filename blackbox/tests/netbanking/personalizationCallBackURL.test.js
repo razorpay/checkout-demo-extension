@@ -5,17 +5,17 @@ const {
   fillUserDetails,
   verifyPersonalizationText,
   submit,
-  handleOtpVerification,
-  typeOTPandSubmit,
-  handleValidationRequest,
+  expectRedirectWithCallback,
   selectPersonalizationPaymentMethod,
 } = require('../../actions/common');
 
-describe('Wallet with Personalization  payment', () => {
-  test('Perform Wallet with Personalization transaction', async () => {
+describe('Basic Netbanking with Personalization', () => {
+  test('Perform Netbanking with Personalization and Callback URL transaction', async () => {
     const options = {
       key: 'rzp_test_VwsqHDsQPoVQi6',
       amount: 60000,
+      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
+      redirect: true,
       personalization: true,
     };
     const preferences = makePreferences();
@@ -23,15 +23,16 @@ describe('Wallet with Personalization  payment', () => {
       page,
       options,
       preferences,
-      method: 'Wallet',
+      method: 'Netbanking',
     });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, '8888888881');
-    await verifyPersonalizationText(context, 'wallet');
+    await verifyPersonalizationText(context, 'netbanking');
     await selectPersonalizationPaymentMethod(context, '1');
     await submit(context);
-    await handleOtpVerification(context);
-    await typeOTPandSubmit(context);
-    await handleValidationRequest(context, 'pass');
+    await expectRedirectWithCallback(context, {
+      method: 'netbanking',
+      bank: 'HDFC',
+    });
   });
 });
