@@ -308,7 +308,7 @@ function initOffers(
      * Applies the selected offer.
      */
     applyOffer: function() {
-      if (!session.checkCommonValidAndTrackIfInvalid()) {
+      if (session.tab === '' && !session.checkCommonValidAndTrackIfInvalid()) {
         return;
       }
 
