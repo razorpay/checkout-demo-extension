@@ -31,6 +31,7 @@ describe.each(
   getTestData(
     'Perform saved card transaction with partial payments and offers applied',
     {
+      loggedIn: false,
       options: {
         amount: 200,
         personalization: true,
