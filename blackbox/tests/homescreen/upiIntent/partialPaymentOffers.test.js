@@ -23,7 +23,7 @@ const {
   handlePartialPayment,
 } = require('../actions');
 
-describe.skip('Basic upi payment', () => {
+describe('Basic upi payment', () => {
   test('Perform upi intent transaction with partial payments enabled and offers applied', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
