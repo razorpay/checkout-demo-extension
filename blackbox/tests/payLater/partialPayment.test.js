@@ -37,7 +37,7 @@ describe('Perform ePayLater Test', () => {
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
     await handlePartialPayment(context, '100');
-    await assertPaymentMethods(context, 'paylater');
+    await assertPaymentMethods(context);
     await verifyPartialAmount(context, '₹ 100');
     await selectPaymentMethod(context, 'paylater');
     await verifyPayLaterPaymentMode(context);

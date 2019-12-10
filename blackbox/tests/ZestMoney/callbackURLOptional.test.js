@@ -38,7 +38,7 @@ describe.skip('Cardless EMI tests', () => {
     await selectPaymentMethod(context, 'cardless_emi');
     await selectCardlessEMIOption(context, 'ZestMoney');
     await handleCardlessEMIValidation(context);
-    await typeOTPandSubmit(context, '5555');
+    await typeOTPandSubmit(context);
     await handleOtpVerificationForCardlessEMI(context);
     await selectZestMoneyEMIPlan(context, 1);
     await submit(context);

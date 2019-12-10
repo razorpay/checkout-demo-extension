@@ -25,7 +25,7 @@ describe('ePayLater Test', () => {
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
-    await assertPaymentMethods(context, 'paylater');
+    await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'paylater');
     await verifyPayLaterPaymentMode(context);
     await selectPayLaterPaymentMode(context);

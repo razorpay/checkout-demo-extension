@@ -32,10 +32,10 @@ describe('Card tests', () => {
     await enterCardDetails(context, { nativeOtp: true });
     await submit(context);
     await handleCardValidationForNativeOTP(context, { coproto: 'otp' });
-    await typeOTPandSubmit(context, '5555');
+    await typeOTPandSubmit(context);
     await verifyOTP(context, 'fail');
     await resendOTP(context);
-    await typeOTPandSubmit(context, '5555');
+    await typeOTPandSubmit(context);
     await verifyOTP(context, 'pass');
   });
 });

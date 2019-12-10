@@ -28,7 +28,7 @@ describe.skip('SavedCard tests', () => {
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
     await handleCustomerCardStatusRequest(context);
-    await typeOTPandSubmit(context, '5555');
+    await typeOTPandSubmit(context);
     await respondSavedCards(context);
     await selectSavedCardAndTypeCvv(context);
     await verifyTimeout(context, 'card');

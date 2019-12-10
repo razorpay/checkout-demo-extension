@@ -30,7 +30,7 @@ describe.skip('Wallet with Personalization  payment', () => {
     await delay(1000);
     await submit(context);
     await handleOtpVerification(context);
-    await typeOTPandSubmit(context, '5555');
+    await typeOTPandSubmit(context);
     await handleValidationRequest(context, 'pass');
   });
 });

@@ -1,5 +1,6 @@
 const { visible, randomContact, randomEmail, delay } = require('../util');
 const { readFileSync } = require('fs');
+var stringify = require('util');
 
 contents = String(
   readFileSync(__dirname + '/../fixtures/mockSuccessandFailPage.html')
@@ -34,7 +35,11 @@ async function assertPaymentMethods(context, additionalMethod) {
   expect(await context.page.$eval('[tab=netbanking]', visible)).toEqual(true);
   expect(await context.page.$eval('[tab=wallet]', visible)).toEqual(true);
   expect(await context.page.$eval('[tab=card]', visible)).toEqual(true);
-  if (additionalMethod === 'paylater') {
+  if (typeof context.preferences.methods.paylater !== 'undefined')
+    var assertPayLaterMethod = stringify.inspect(
+      context.preferences.methods.paylater.epaylater
+    );
+  if (assertPayLaterMethod === 'true') {
     expect(await context.page.$eval('[tab=paylater]', visible)).toEqual(true);
   }
 }

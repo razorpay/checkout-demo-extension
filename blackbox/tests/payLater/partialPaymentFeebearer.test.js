@@ -17,7 +17,7 @@ const {
 } = require('../../actions/common');
 
 describe('Perform ePayLater Test', () => {
-  test('perform ePayLater transaction with partial payment enabled', async () => {
+  test('perform ePayLater transaction with partial payment and customer feebearer enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 20000,
@@ -39,7 +39,7 @@ describe('Perform ePayLater Test', () => {
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
     await handlePartialPayment(context, '100');
-    await assertPaymentMethods(context, 'paylater');
+    await assertPaymentMethods(context);
     await verifyPartialAmount(context, '₹ 100');
     await selectPaymentMethod(context, 'paylater');
     await verifyPayLaterPaymentMode(context);
