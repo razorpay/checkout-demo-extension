@@ -70,16 +70,20 @@ async function assertBasicDetailsScreen(context) {
   const $form = await context.page.waitForSelector('#form-common', {
     visible: true,
   });
+  if (!context.prefilledContact && !context.isContactOptional) {
+    const $contact = await $form.$('#contact');
 
-  const $contact = await $form.$('#contact');
+    expect(await $contact.evaluate(el => el.value)).toEqual(
+      context.prefilledContact
+    );
+  }
+  if (!context.prefilledEmail && !context.isEmailOptional) {
+    const $email = await $form.$('#email');
 
-  expect(await $contact.evaluate(el => el.value)).toEqual(
-    context.prefilledContact
-  );
-
-  const $email = await $form.$('#email');
-
-  expect(await $email.evaluate(el => el.value)).toEqual(context.prefilledEmail);
+    expect(await $email.evaluate(el => el.value)).toEqual(
+      context.prefilledEmail
+    );
+  }
 }
 
 async function assertMethodsScreen(context) {
