@@ -23,8 +23,7 @@
   export let loading = true;
   export let data = null;
   export let error = null;
-  let cardNumber = null;
-  /* 
+  /*
   global each Event invoke
   */
 
@@ -48,116 +47,6 @@
     var shouldHideExpiryCVV = nocvvCheck.checked && !nocvvCheck.disabled;
   }
 
-  function onSixDigits(e) {
-    const el = _Doc.querySelector('#card_number');
-    var emi_options = session.emi_options; // Rajat: remove this later.
-    const cardType = _Doc.querySelector('#elem-card .cardtype[cardtype]');
-    var nocvvCheck = _Doc.querySelector('nocvv');
-    var emiObj;
-    var val = el.value;
-
-    var isMaestro = /^maestro/.test(cardType);
-    var sixDigits = val.length > 5;
-    var trimmedVal = val.replace(/[ ]/g, '');
-
-    _El.toggleClass(el.parentNode, 'six');
-
-    if (sixDigits) {
-      if (isMaestro) {
-        if (nocvvCheck.disabled) {
-          toggleNoCvv(true);
-        }
-      } else {
-        each(emi_options.banks, function(bank, emiObjInner) {
-          if (emiObjInner.patt.test(val.replace(/ /g, ''))) {
-            emiObj = emiObjInner;
-          }
-        });
-
-        toggleNoCvv(false);
-      }
-    } else {
-      toggleNoCvv(false);
-    }
-
-    this.emiPlansForNewCard = emiObj;
-
-    if (emiObj) {
-      _Doc.querySelector('#expiry-cvv').removeClass('hidden'); //Rajat, convention for id of elements
-    } else {
-      _Doc.querySelector('#emi_duration').value = '';
-    }
-
-    if (trimmedVal.length >= 6) {
-      var emiBankChangeEvent;
-      if (typeof Event === 'function') {
-        emiBankChangeEvent = new Event('change');
-      } else {
-        emiBankChangeEvent = document.createEvent('Event');
-        emiBankChangeEvent.initEvent('change', true, true);
-      }
-    }
-
-    noCvvToggle();
-
-    var elem_emi = _Doc.querySelector('#elem-emi');
-    var hiddenClass = 'hidden';
-
-    if (isMaestro && sixDigits) {
-      elem_emi.addClass(hiddenClass);
-    } else if (elem_emi.classList.contains(hiddenClass)) {
-      invoke('removeClass', elem_emi, hiddenClass, 200);
-    }
-  }
-
-  export function onShown() {
-    session.setFormatting();
-    let { customer } = session;
-    session.otpView.updateScreen({
-      maxlength: 6,
-    });
-    onSixDigits.call(this);
-    remember = session.get('remember_customer');
-
-    if (!remember) {
-      // Rajat
-      return session.setScreen('card');
-    }
-
-    session.tab_titles.otp = session.tab_titles.card; //Rajat, how is this working?
-    session.otpView.updateScreen({
-      skipText: 'Skip Saved Cards',
-    });
-    if (!session.customer.logged && !session.wants_skip) {
-      session.commenceOTP('saved cards', true);
-      customer.checkStatus(function() {
-        /**
-         * 1. If this is a recurring payment and customer doesn't have saved cards,
-         *    create and ask for OTP.
-         * 2. If customer has saved cards and is not logged in, ask for OTP.
-         * 3. If customer doesn't have saved cards, show cards screen.
-         */
-        if (session.recurring && !customer.saved && !customer.logged) {
-          customer.createOTP(function() {
-            session.askOTP(
-              session.otpView,
-              'Enter OTP sent on ' +
-                session.getPhone() +
-                '<br>to save your card for future payments',
-              true
-            );
-          });
-        } else if (customer.saved && !customer.logged) {
-          session.askOTP(session.otpView, undefined, true);
-        } else {
-          showCards();
-        }
-      });
-    } else {
-      showCards();
-    }
-  }
-
   export function showCards() {
     setSavedCards();
     session.setScreen('card');
@@ -166,13 +55,6 @@
   function setSavedCards() {
     let { customer } = session;
     var tokens = customer && customer.tokens && customer.tokens.count;
-    var cardTab = _Doc.querySelector('#form-card');
-    var delegator = session.delegator;
-
-    if (!delegator) {
-      delegator = session.delegator = Razorpay.setFormatter(session.el);
-    }
-
     if (tokens) {
       var tokensList = customer.tokens;
       if (
@@ -333,36 +215,6 @@
       },
     });
     session.showEmiPlans('saved')(event.detail);
-  }
-
-  function handleCardNumber() {
-    var el_card = _Doc.querySelector('#card_number');
-    var el_expiry = _Doc.querySelector('#card_expiry');
-    var el_cvv = _Doc.querySelector('#card_cvv');
-    var el_name = _Doc.querySelector('#card_name');
-
-    var type = Card.getCardType(cardNumber.getValue());
-
-    // update cvv element
-    var cvvlen = type !== 'amex' ? 3 : 4;
-    el_cvv.maxLength = cvvlen;
-    el_cvv.pattern = '^[0-9]{' + cvvlen + '}$';
-    // _Doc.querySelector(el_cvv)
-    //   .toggleClass('amex', type === 'amex')
-    //   .toggleClass('maestro', type === 'maestro');
-
-    if (!session.preferences.methods.amex && type === 'amex') {
-      _Doc.querySelector('#elem-card').addClass('noamex');
-    } else {
-      _Doc.querySelector('#elem-card').removeClass('noamex');
-    }
-
-    session.input(el_cvv);
-
-    // card icon element
-    this.el.parentNode
-      .querySelector('.cardtype')
-      .setAttribute('cardtype', type);
   }
 </script>
 

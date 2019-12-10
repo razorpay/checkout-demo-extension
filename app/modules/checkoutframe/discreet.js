@@ -68,6 +68,7 @@ import HomeTab from 'templates/tabs/home.svelte';
 import NetbankingTab from 'templates/tabs/netbanking/index.svelte';
 import NachScreen from 'templates/views/nach.svelte';
 import CardTab from 'templates/tabs/card/card.svelte';
+// import CardTab from 'templates/tabs/card/card2.svelte';
 
 import PayoutsInstruments from 'templates/screens/payout-instruments.svelte';
 import PayoutAccount from 'templates/screens/payout-account.svelte';
