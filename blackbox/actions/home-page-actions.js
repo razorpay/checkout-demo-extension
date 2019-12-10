@@ -35,8 +35,8 @@ async function assertPaymentMethods(context) {
   expect(await context.page.$eval('[tab=wallet]', visible)).toEqual(true);
   expect(await context.page.$eval('[tab=card]', visible)).toEqual(true);
   if (
-    context.preferences.methods.paylater != 'undefined' &&
-    context.preferences.methods.paylater.epaylater == 'true'
+    context.preferences.methods.paylater !== undefined &&
+    context.preferences.methods.paylater.epaylater === true
   ) {
     expect(await context.page.$eval('[tab=paylater]', visible)).toEqual(true);
   }
