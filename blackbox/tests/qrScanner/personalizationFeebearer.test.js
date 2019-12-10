@@ -14,7 +14,7 @@ const {
 } = require('../../actions/common');
 
 describe('QR Scanner with Personalization  payment', () => {
-  test('Perform QR Scanner with Personalization transaction', async () => {
+  test('Perform QR Scanner with Personalization and customer feebearer transaction', async () => {
     const options = {
       key: 'rzp_test_VwsqHDsQPoVQi6',
       amount: 60000,

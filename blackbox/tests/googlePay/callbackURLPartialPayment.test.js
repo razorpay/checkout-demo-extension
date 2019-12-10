@@ -16,7 +16,7 @@ const {
 } = require('../../actions/common');
 
 describe('Basic GooglePay payment', () => {
-  test('Perform GooglePay collect transaction with callbackURL', async () => {
+  test('Perform GooglePay collect transaction with callbackURL and Partial Payment', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 10000,

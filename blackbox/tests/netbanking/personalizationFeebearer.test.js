@@ -12,7 +12,7 @@ const {
 } = require('../../actions/common');
 
 describe('Basic Netbanking with Personalization', () => {
-  test('Perform Netbanking with Personalization transaction', async () => {
+  test('Perform Netbanking with Personalization and customer feebearer transaction', async () => {
     const options = {
       key: 'rzp_test_VwsqHDsQPoVQi6',
       amount: 60000,
