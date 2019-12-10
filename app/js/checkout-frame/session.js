@@ -4548,7 +4548,8 @@ Session.prototype = {
 
   getActiveForm: function() {
     var form = this.tab || 'common';
-    if (form === 'card' || form === 'emi') {
+    // TODO: move this logic to cards Svelte component
+    if (form === 'emi') {
       var whichCardTab = 'add-card';
       if (this.savedCardScreen) {
         whichCardTab = 'saved-cards';
@@ -4605,7 +4606,7 @@ Session.prototype = {
       data.method = tab;
       var activeForm = this.getActiveForm();
 
-      if (activeForm !== '#form-upi') {
+      if (activeForm !== '#form-upi' && activeForm !== '#form-card') {
         fillData(activeForm, data);
       }
 
@@ -4617,6 +4618,7 @@ Session.prototype = {
       });
 
       if (this.screen === 'card') {
+        _Obj.extend(data, this.svelteCardTab.getPayload());
         if (this.savedCardScreen) {
           var $checkedCard = $('.saved-card.checked');
           if ($checkedCard[0]) {
@@ -5139,22 +5141,20 @@ Session.prototype = {
           return this.showLoadError('AMEX cards are not supported', true);
         }
         var nocvv_el = $('#nocvv-check [type=checkbox]')[0];
-        if (1) {
+        if (!this.savedCardScreen) {
           // handling add new card screen
-          formattingDelegator.card.format();
-          formattingDelegator.expiry.format();
-
+          // formattingDelegator.card.format();
+          // formattingDelegator.expiry.format();
           // if maestro card is active
-          if (nocvv_el.checked && !nocvv_el.disabled) {
-            $('.elem-expiry').removeClass('invalid');
-            $('.elem-cvv').removeClass('invalid');
-            data['card[cvv]'] = '000';
-
-            // explicitly remove, else it'll override month/year later
-            delete data['card[expiry]'];
-            data['card[expiry_month]'] = '12';
-            data['card[expiry_year]'] = '21';
-          }
+          // if (nocvv_el.checked && !nocvv_el.disabled) {
+          //   $('.elem-expiry').removeClass('invalid');
+          //   $('.elem-cvv').removeClass('invalid');
+          //   data['card[cvv]'] = '000';
+          // explicitly remove, else it'll override month/year later
+          // delete data['card[expiry]'];
+          // data['card[expiry_month]'] = '12';
+          // data['card[expiry_year]'] = '21';
+          // }
         } else {
           if (!data['card[cvv]']) {
             var checkedCard = $('.saved-card.checked');
