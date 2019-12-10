@@ -1,6 +1,5 @@
 const { visible, randomContact, randomEmail, delay } = require('../util');
 const { readFileSync } = require('fs');
-var stringify = require('util');
 
 contents = String(
   readFileSync(__dirname + '/../fixtures/mockSuccessandFailPage.html')
@@ -30,14 +29,14 @@ async function fillUserDetails(context, number) {
   }
 }
 
-async function assertPaymentMethods(context, additionalMethod) {
+async function assertPaymentMethods(context) {
   await context.page.waitForSelector('[tab=netbanking]');
   expect(await context.page.$eval('[tab=netbanking]', visible)).toEqual(true);
   expect(await context.page.$eval('[tab=wallet]', visible)).toEqual(true);
   expect(await context.page.$eval('[tab=card]', visible)).toEqual(true);
   if (
-    typeof context.preferences.methods.paylater !== 'undefined' &&
-    stringify.inspect(context.preferences.methods.paylater.epaylater) === 'true'
+    context.preferences.methods.paylater != 'undefined' &&
+    context.preferences.methods.paylater.epaylater == 'true'
   ) {
     expect(await context.page.$eval('[tab=paylater]', visible)).toEqual(true);
   }
