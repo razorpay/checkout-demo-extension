@@ -5,33 +5,34 @@ const {
   fillUserDetails,
   verifyPersonalizationText,
   submit,
-  handleOtpVerification,
-  typeOTPandSubmit,
-  handleValidationRequest,
+  handleUPIAccountValidation,
   selectPersonalizationPaymentMethod,
+  expectRedirectWithCallback,
 } = require('../../actions/common');
 
-describe('Wallet with Personalization  payment', () => {
-  test('Perform Wallet with Personalization transaction', async () => {
+describe('GooglePay with Personalization  payment', () => {
+  test('Perform GooglePay with Personalization and Callback Url transaction', async () => {
     const options = {
       key: 'rzp_test_VwsqHDsQPoVQi6',
       amount: 60000,
+      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
+      redirect: true,
       personalization: true,
     };
     const preferences = makePreferences();
+    preferences.methods.upi = true;
     const context = await openCheckout({
       page,
       options,
       preferences,
-      method: 'Wallet',
+      method: 'UPI',
     });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, '8888888881');
-    await verifyPersonalizationText(context, 'wallet');
+    await verifyPersonalizationText(context, 'upi');
     await selectPersonalizationPaymentMethod(context, '1');
     await submit(context);
-    await handleOtpVerification(context);
-    await typeOTPandSubmit(context);
-    await handleValidationRequest(context, 'pass');
+    await handleUPIAccountValidation(context, 'dsd@okhdfcbank');
+    await expectRedirectWithCallback(context, { method: 'upi' });
   });
 });
