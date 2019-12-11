@@ -212,7 +212,7 @@
               if (!tokenObj && !instrument.issuer) {
                 /* If we know nothing about the card and user logged out */
                 text = `Use your saved cards`;
-                icon = '&#xe715';
+                icon = '&#xe715;';
                 instrument.nextOption = true;
                 break;
               } else if (!tokenObj && instrument.issuer) {
