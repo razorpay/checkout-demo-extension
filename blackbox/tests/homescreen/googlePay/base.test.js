@@ -25,10 +25,13 @@ const { openCheckoutWithNewHomeScreen } = require('../open');
 describe.each(
   getTestData('Basic GooglePay payment', {
     loggedIn: false,
+    options: {
+      amount: 200,
+      personalization: false,
+    },
   })
-)('GooglePay tests', ({ preferences, title }) => {
+)('GooglePay tests', ({ preferences, title, options }) => {
   test(title, async () => {
-    const options = makeOptions();
     preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
       page,

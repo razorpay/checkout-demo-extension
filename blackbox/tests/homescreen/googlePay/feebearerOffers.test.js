@@ -31,15 +31,12 @@ const { openCheckoutWithNewHomeScreen } = require('../open');
 describe.each(
   getTestData('Perform Offers GooglePay transaction with customer feebearer', {
     loggedIn: false,
-  })
-)('GooglePay tests', ({ preferences, title }) => {
-  test(title, async () => {
-    const options = {
+    options: {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 60000,
       personalization: false,
-    };
-    const preferences = makePreferences({
+    },
+    preferences: {
       fee_bearer: true,
       offers: [
         {
@@ -61,7 +58,10 @@ describe.each(
           display_text: 'Rs. 20 off on PayTM',
         },
       ],
-    });
+    },
+  })
+)('GooglePay tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
       page,

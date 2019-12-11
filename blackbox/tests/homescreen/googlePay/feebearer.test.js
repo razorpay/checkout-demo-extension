@@ -27,16 +27,17 @@ const { openCheckoutWithNewHomeScreen } = require('../open');
 describe.each(
   getTestData('Perform GooglePay transaction with feebearer enabled', {
     loggedIn: false,
-  })
-)('GooglePay tests', ({ preferences, title }) => {
-  test(title, async () => {
-    const options = {
+    options: {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 60000,
       personalization: false,
-    };
-    const preferences = makePreferences({ fee_bearer: true });
-
+    },
+    preferences: {
+      fee_bearer: true,
+    },
+  })
+)('GooglePay tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
       page,

@@ -29,15 +29,18 @@ describe.each(
     'Perform GooglePay transaction with feebearer enabled and optional contact',
     {
       loggedIn: false,
+      options: {
+        amount: 200,
+        personalization: false,
+      },
+      preferences: {
+        fee_bearer: true,
+        optional: ['contact'],
+      },
     }
   )
-)('GooglePay tests', ({ preferences, title }) => {
+)('GooglePay tests', ({ preferences, title, options }) => {
   test(title, async () => {
-    const options = makeOptions();
-    const preferences = makePreferences({
-      fee_bearer: true,
-      optional: ['contact'],
-    });
     preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
       page,
