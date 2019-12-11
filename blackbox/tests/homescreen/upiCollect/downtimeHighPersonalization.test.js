@@ -9,7 +9,7 @@ const {
   assertPaymentMethods,
   assertEditUserDetailsAndBack,
   verifyHighDowntime,
-  verifyPersonalizationVPAText,
+  verifyPersonalizationText,
 } = require('../actions');
 
 describe.each(
@@ -55,7 +55,7 @@ describe.each(
     await assertUserDetails(context);
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
-    await verifyPersonalizationVPAText(context);
+    await verifyPersonalizationText(context, 'upi');
     await verifyHighDowntime(
       context,
       'upi',
