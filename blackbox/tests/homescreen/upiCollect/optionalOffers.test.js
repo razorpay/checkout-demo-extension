@@ -30,6 +30,7 @@ describe.each(
   getTestData(
     'Perform upi collect transaction with offers and optional contact applied',
     {
+      loggedIn: false,
       options: {
         amount: 200000,
         personalization: false,

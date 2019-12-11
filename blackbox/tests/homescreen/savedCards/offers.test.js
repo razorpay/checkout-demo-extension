@@ -28,13 +28,13 @@ const {
 
 describe.each(
   getTestData('Perform saved card transaction with offers applied', {
+    loggedIn: false,
     options: {
       amount: 200,
       personalization: true,
       remember_customer: true,
     },
     preferences: {
-      loggedIn: false,
       offers: [
         {
           original_amount: 200000,

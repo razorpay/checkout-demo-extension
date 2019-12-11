@@ -29,6 +29,7 @@ describe.each(
   getTestData(
     'perform netbaking transaction with offers applied and partial payments enabled',
     {
+      loggedIn: false,
       options: {
         amount: 200000,
         personalization: false,
