@@ -101,8 +101,8 @@ async function assertMissingDetails(context) {
 /**
  * Fill user contact and email
  */
-async function fillUserDetails(context) {
-  let contact = context.prefilledEmail || randomContact();
+async function fillUserDetails(context, number) {
+  let contact = context.prefilledEmail || number || randomContact();
   let email = context.prefilledContact || randomEmail();
 
   if (!context.prefilledContact && !context.isContactOptional) {
@@ -221,8 +221,9 @@ async function assertPaymentMethods(context) {
   const methods = await Promise.all(
     buttons.map(button => getAttribute(context.page, button, 'method'))
   );
-
-  expect(methods).toEqual(['card', 'netbanking', 'wallet']);
+  expect(methods).toEqual(
+    expect.arrayContaining(['card', 'netbanking', 'wallet'])
+  );
 }
 
 /**
