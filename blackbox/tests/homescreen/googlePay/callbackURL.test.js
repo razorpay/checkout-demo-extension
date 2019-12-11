@@ -21,10 +21,10 @@ const {
 const { openCheckoutWithNewHomeScreen } = require('../open');
 
 describe.each(
-  getTestData('Basic GooglePay payment', {
+  getTestData('Perform GooglePay transaction with callback URL', {
     loggedIn: false,
   })
-)('Perform GooglePay transaction', ({ preferences, title }) => {
+)('GooglePay tests', ({ preferences, title }) => {
   test(title, async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -44,8 +44,7 @@ describe.each(
     await proceed(context);
     await assertUserDetails(context);
     await assertEditUserDetailsAndBack(context);
-    const paymentMethods = ['card', 'netbanking', 'wallet', 'upi'];
-    await assertPaymentMethods(context, paymentMethods);
+    await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await selectUPIMethod(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');

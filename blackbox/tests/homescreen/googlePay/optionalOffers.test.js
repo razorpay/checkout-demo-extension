@@ -79,8 +79,7 @@ describe.each(
     await fillUserDetails(context);
     await proceed(context);
     await assertEditUserDetailsAndBack(context);
-    const paymentMethods = ['card', 'netbanking', 'wallet', 'upi'];
-    await assertPaymentMethods(context, paymentMethods);
+    await assertPaymentMethods(context);
     await assertEditUserDetailsAndBack(context);
     await selectPaymentMethod(context, 'upi');
     await selectUPIMethod(context, 'Google Pay');

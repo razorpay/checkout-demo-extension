@@ -45,8 +45,7 @@ describe.each(
     await assertUserDetails(context);
     await assertEditUserDetailsAndBack(context);
     await assertEditUserDetailsAndBack(context);
-    const paymentMethods = ['card', 'netbanking', 'wallet', 'upi'];
-    await assertPaymentMethods(context, paymentMethods);
+    await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await selectUPIMethod(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');

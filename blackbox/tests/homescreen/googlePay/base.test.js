@@ -26,7 +26,7 @@ describe.each(
   getTestData('Basic GooglePay payment', {
     loggedIn: false,
   })
-)('Perform GooglePay transaction', ({ preferences, title }) => {
+)('GooglePay tests', ({ preferences, title }) => {
   test(title, async () => {
     const options = makeOptions();
     preferences.methods.upi = true;
@@ -40,8 +40,8 @@ describe.each(
     await proceed(context);
     await assertUserDetails(context);
     await assertEditUserDetailsAndBack(context);
-    const paymentMethods = ['card', 'netbanking', 'wallet', 'upi'];
-    await assertPaymentMethods(context, paymentMethods);
+    //const paymentMethods = ['card', 'netbanking', 'wallet', 'upi'];
+    await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await selectUPIMethod(context, 'Google Pay');
     await enterUPIAccount(context, 'scbaala');
