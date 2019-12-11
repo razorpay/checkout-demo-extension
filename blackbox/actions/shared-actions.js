@@ -107,6 +107,11 @@ async function expectRedirectWithCallback(context, fields) {
       !context.preferences.offers)
   )
     apiSuffix = 'ajax';
+  else if (
+    context.preferences.methods.cardless_emi != undefined &&
+    context.preferences.customer != undefined
+  )
+    apiSuffix = 'ajax';
   else apiSuffix = 'checkout';
   expect(request.url).toEqual(apiUrl + apiSuffix);
 
