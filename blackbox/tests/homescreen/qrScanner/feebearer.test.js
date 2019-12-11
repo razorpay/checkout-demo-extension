@@ -23,7 +23,7 @@ const {
 const { openCheckoutWithNewHomeScreen } = require('../open');
 
 describe.each(
-  getTestData('Basic QR Code payment', {
+  getTestData('Perform QR Code with feebearer transaction', {
     loggedIn: false,
   })
 )('Perform QR Code transaction', ({ preferences, title }) => {
