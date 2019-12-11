@@ -34,6 +34,7 @@ describe.each(
       remember_customer: true,
     },
     preferences: {
+      loggedIn: false,
       offers: [
         {
           original_amount: 200000,

@@ -31,6 +31,7 @@ describe.each(
   getTestData(
     'Perform saved card transaction with offers applied and customer feebearer enabled',
     {
+      loggedIn: false,
       options: {
         amount: 200,
         personalization: true,
@@ -86,7 +87,7 @@ describe.each(
     await handleCustomerCardStatusRequest(context);
     await typeOTPandSubmit(context);
     await respondSavedCards(context);
-    await viewOffers(context);
+    await await viewOffers(context);
     await selectOffer(context, '1');
     await verifyOfferApplied(context);
     await verifyDiscountPaybleAmount(context, '₹ 1,980');

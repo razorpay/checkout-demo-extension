@@ -30,6 +30,7 @@ describe.each(
   getTestData(
     'Perform saved card transaction with offers and contact optional applied',
     {
+      loggedIn: false,
       options: {
         amount: 200,
         personalization: true,
