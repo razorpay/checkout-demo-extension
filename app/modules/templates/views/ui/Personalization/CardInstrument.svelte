@@ -55,7 +55,7 @@
       // We don't know anytihng about the card. User is logged out.
       if (!savedCard && !instrument.issuer) {
         text = 'Use your saved cards';
-        icon = '&#xe715';
+        icon = '&#xe715;';
         hasCvv = false;
       }
       // We know stuff about the card. User is logged out.

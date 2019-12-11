@@ -43,7 +43,6 @@ describe('Card tests', () => {
 
     await assertUserDetails(context);
     await assertEditUserDetailsAndBack(context);
-
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
 

@@ -33,7 +33,6 @@ describe('Saved Card tests', () => {
     await respondSavedCards(context);
     await selectSavedCardAndTypeCvv(context);
     await submit(context);
-
     await handleCardValidation(context);
     await handleMockSuccessDialog(context);
   });

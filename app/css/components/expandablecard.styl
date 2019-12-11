@@ -14,23 +14,23 @@
     color: #757575;
     font-size: 13px;
     line-height: 16px;
-    border-top: 1px solid transparent;
     max-height: 0px;
     transition: all 0.15s ease-in-out;
     overflow: hidden;
+
+    & [slot=detail]:not(:empty)
+      border-top: 1px solid transparent;
 
     ul
       padding-left: 18px;
       margin: 0;
 
 .expandable-card--expanded
-  .expandable-card-title
-    margin-bottom: 16px;
-
-  .expandable-card-detail
+  .expandable-card-detail [slot=detail]:not(:empty)
     border-top-color: #E6E7E8;
     max-height: 32px;
     padding-top: 16px;
+    margin-top: 16px;
 
 .expandable-card-list
   .expandable-card

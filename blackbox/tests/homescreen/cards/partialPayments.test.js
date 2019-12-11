@@ -1,4 +1,4 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const {
   submit,
   enterCardDetails,
@@ -25,14 +25,14 @@ const {
 // Opener
 const { openCheckoutWithNewHomeScreen } = require('../open');
 
-describe('Card tests', () => {
-  test('perform card transaction with partial payment enabled', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+describe.each(
+  getTestData('perform card transaction with partial payment enabled', {
+    loggedIn: false,
+    options: {
       amount: 20000,
       personalization: false,
-    };
-    const preferences = makePreferences({
+    },
+    preferences: {
       order: {
         amount: 20000,
         amount_due: 20000,
@@ -41,7 +41,10 @@ describe('Card tests', () => {
         first_payment_min_amount: null,
         partial_payment: true,
       },
-    });
+    },
+  })
+)('Card tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,
@@ -58,7 +61,6 @@ describe('Card tests', () => {
     await assertUserDetails(context);
 
     await assertEditUserDetailsAndBack(context);
-
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
 

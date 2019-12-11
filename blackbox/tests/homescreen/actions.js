@@ -1,4 +1,6 @@
 const { randomContact, randomEmail, delay } = require('../../util');
+const personalizationActions = require('./personalization-actions');
+const downtimeTimeoutActions = require('./downtime-actions');
 
 /**
  * Sets the state in context
@@ -101,8 +103,8 @@ async function assertMissingDetails(context) {
 /**
  * Fill user contact and email
  */
-async function fillUserDetails(context) {
-  let contact = context.prefilledEmail || randomContact();
+async function fillUserDetails(context, number) {
+  let contact = context.prefilledEmail || number || randomContact();
   let email = context.prefilledContact || randomEmail();
 
   if (!context.prefilledContact && !context.isContactOptional) {
@@ -221,8 +223,9 @@ async function assertPaymentMethods(context) {
   const methods = await Promise.all(
     buttons.map(button => getAttribute(context.page, button, 'method'))
   );
-
-  expect(methods).toEqual(['card', 'netbanking', 'wallet']);
+  expect(['card', 'netbanking', 'wallet', 'upi', 'emi']).toEqual(
+    expect.arrayContaining(methods)
+  );
 }
 
 /**
@@ -280,4 +283,6 @@ module.exports = {
   handlePartialPayment,
   assertMethodsScreen,
   assertMissingDetails,
+  ...personalizationActions,
+  ...downtimeTimeoutActions,
 };

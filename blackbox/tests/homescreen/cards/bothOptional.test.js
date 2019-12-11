@@ -1,4 +1,4 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const {
   submit,
   enterCardDetails,
@@ -20,14 +20,22 @@ const {
 // Opener
 const { openCheckoutWithNewHomeScreen } = require('../open');
 
-describe('Card tests', () => {
-  test('perform card transaction with contact and email optional', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 200,
-      personalization: false,
-    };
-    const preferences = makePreferences({ optional: ['contact', 'email'] });
+describe.each(
+  getTestData(
+    'perform successful card transaction with contact and email optional',
+    {
+      loggedIn: false,
+      options: {
+        amount: 200,
+        personalization: false,
+      },
+      preferences: {
+        optional: ['contact', 'email'],
+      },
+    }
+  )
+)('Card tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,
@@ -37,7 +45,6 @@ describe('Card tests', () => {
     // Both are optional, we should land on the methods screen
     await assertMethodsScreen(context);
     await assertMissingDetails(context);
-
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
 

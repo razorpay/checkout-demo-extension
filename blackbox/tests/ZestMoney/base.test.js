@@ -1,47 +1,45 @@
 const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
-const { delay } = require('../../util');
 const {
   assertHomePage,
   fillUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
-  selectWallet,
-  assertWalletPage,
-  submit,
+  selectCardlessEMIOption,
+  handleCardlessEMIValidation,
   typeOTPandSubmit,
-  handleOtpVerification,
-  handleValidationRequest,
-  retryWalletTransaction,
+  handleOtpVerificationForCardlessEMI,
+  handleCardlessEMIPaymentCreation,
+  selectZestMoneyEMIPlan,
+  submit,
+  verifyOfferApplied,
 } = require('../../actions/common');
 
-describe.skip('Basic ZestMoney payment', () => {
-  test('Perform ZestMoney transaction', async () => {
+describe('Cardless EMI tests', () => {
+  test('perform Cardless EMI - ZestMoney transaction', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 2000000,
+      amount: 500000,
       personalization: false,
     };
     const preferences = makePreferences();
+    preferences.methods.cardless_emi = {
+      earlysalary: true,
+      zestmoney: true,
+      flexmoney: true,
+    };
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
-    await delay(40000);
-    // await assertPaymentMethods(context);
-    // await selectPaymentMethod(context, 'wallet');
-    // await assertWalletPage(context);
-    // await selectWallet(context, 'freecharge');
-    // await submit(context);
-    // await handleOtpVerification(context);
-    // await typeOTPandSubmit(context);
-
-    // await handleValidationRequest(context, 'fail');
-    // await retryWalletTransaction(context);
-
-    // await submit(context);
-    // await handleOtpVerification(context);
-    // await typeOTPandSubmit(context);
-
-    // await handleValidationRequest(context, 'pass');
+    await assertPaymentMethods(context);
+    await selectPaymentMethod(context, 'cardless_emi');
+    await selectCardlessEMIOption(context, 'ZestMoney');
+    await handleCardlessEMIValidation(context);
+    await typeOTPandSubmit(context);
+    await handleOtpVerificationForCardlessEMI(context);
+    await selectZestMoneyEMIPlan(context, 1);
+    await verifyOfferApplied(context);
+    await submit(context);
+    await handleCardlessEMIPaymentCreation(context);
   });
 });

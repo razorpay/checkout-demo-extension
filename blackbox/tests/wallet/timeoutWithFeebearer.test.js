@@ -41,6 +41,7 @@ describe.skip('Wallet tests', () => {
 
     await handleValidationRequest(context, 'fail');
     await retryWalletTransaction(context);
+    await selectWallet(context, 'freecharge');
 
     await submit(context);
     await handleFeeBearer(context);
