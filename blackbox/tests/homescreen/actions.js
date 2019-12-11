@@ -221,7 +221,6 @@ async function assertPaymentMethods(context) {
   const methods = await Promise.all(
     buttons.map(button => getAttribute(context.page, button, 'method'))
   );
-
   expect(['card', 'netbanking', 'wallet', 'upi', 'emi']).toEqual(
     expect.arrayContaining(methods)
   );
