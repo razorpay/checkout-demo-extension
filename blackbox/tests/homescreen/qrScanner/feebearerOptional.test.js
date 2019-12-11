@@ -27,15 +27,19 @@ describe.each(
     'Perform QR Code with optional contact and feebearer transaction',
     {
       loggedIn: false,
+      options: {
+        key: 'rzp_test_1DP5mmOlF5G5ag',
+        amount: 20000,
+        personalization: false,
+      },
+      preferences: {
+        fee_bearer: true,
+        optional: ['contact'],
+      },
     }
   )
-)('Perform QR Code transaction', ({ preferences, title }) => {
+)('Perform QR Code transaction', ({ preferences, title, options }) => {
   test(title, async () => {
-    const options = makeOptions();
-    const preferences = makePreferences({
-      fee_bearer: true,
-      optional: ['contact'],
-    });
     preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
       page,

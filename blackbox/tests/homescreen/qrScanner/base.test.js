@@ -22,10 +22,14 @@ const {
 describe.each(
   getTestData('Basic QR Code payment', {
     loggedIn: false,
+    options: {
+      key: 'rzp_test_1DP5mmOlF5G5ag',
+      amount: 200000,
+      personalization: false,
+    },
   })
-)('Perform QR Code transaction', ({ preferences, title }) => {
+)('Perform QR Code transaction', ({ preferences, title, options }) => {
   test(title, async () => {
-    const options = makeOptions();
     preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
       page,

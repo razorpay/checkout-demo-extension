@@ -222,18 +222,9 @@ async function assertPaymentMethods(context) {
     buttons.map(button => getAttribute(context.page, button, 'method'))
   );
 
-  if (
-    context.preferences.methods.upi !== undefined &&
-    context.preferences.methods.upi === true
-  ) {
-    expect(methods).toEqual(
-      expect.arrayContaining(['card', 'netbanking', 'wallet', 'upi'])
-    );
-  } else {
-    expect(methods).toEqual(
-      expect.arrayContaining(['card', 'netbanking', 'wallet'])
-    );
-  }
+  expect(['card', 'netbanking', 'wallet', 'upi', 'emi']).toEqual(
+    expect.arrayContaining(methods)
+  );
 }
 
 /**

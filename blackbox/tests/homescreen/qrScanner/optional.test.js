@@ -24,13 +24,17 @@ const { openCheckoutWithNewHomeScreen } = require('../open');
 describe.each(
   getTestData('Perform QR Code with optional contact transaction', {
     loggedIn: false,
-  })
-)('Perform QR Code transaction', ({ preferences, title }) => {
-  test(title, async () => {
-    const options = makeOptions();
-    const preferences = makePreferences({
+    options: {
+      key: 'rzp_test_1DP5mmOlF5G5ag',
+      amount: 20000,
+      personalization: false,
+    },
+    preferences: {
       optional: ['contact'],
-    });
+    },
+  })
+)('Perform QR Code transaction', ({ preferences, title, options }) => {
+  test(title, async () => {
     preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
       page,
