@@ -8,7 +8,7 @@ const {
   verifyTimeout,
 } = require('../../actions/common');
 
-describe('Basic GooglePay payment', () => {
+describe.skip('Basic GooglePay payment', () => {
   test('Verify GooglePay downtime - High with timeout enabled', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',

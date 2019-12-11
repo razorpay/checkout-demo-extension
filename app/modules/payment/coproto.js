@@ -78,6 +78,9 @@ var responseTypes = {
   },
 
   first: function(request, fullResponse) {
+    if (request.method === 'redirect') {
+      request.method = 'post';
+    }
     var direct = request.method === 'direct';
     var content = request.content;
     var popup = this.popup;

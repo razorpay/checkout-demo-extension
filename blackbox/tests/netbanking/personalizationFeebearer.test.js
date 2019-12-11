@@ -1,38 +1,37 @@
-const { openCheckoutForPersonalization } = require('../../actions/checkout');
+const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
-  assertPaymentMethodsNetbanking,
+  verifyPersonalizationText,
   submit,
-  failRequestwithErrorMessage,
-  verifyErrorMessage,
+  passRequestNetbanking,
+  handleMockSuccessDialog,
   handleFeeBearer,
+  selectPersonalizationPaymentMethod,
 } = require('../../actions/common');
 
-describe.skip('Basic Netbanking with Personalization', () => {
-  test('Perform Netbanking with Personalization transaction', async () => {
+describe('Basic Netbanking with Personalization', () => {
+  test('Perform Netbanking with Personalization and customer feebearer transaction', async () => {
     const options = {
       key: 'rzp_test_VwsqHDsQPoVQi6',
       amount: 60000,
+      personalization: true,
     };
     const preferences = makePreferences({ fee_bearer: true });
-    const context = await openCheckoutForPersonalization({
+    const context = await openCheckout({
       page,
       options,
       preferences,
       method: 'Netbanking',
     });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true, '8888888882');
-    await assertPaymentMethodsNetbanking(context);
+    await fillUserDetails(context, '8888888881');
+    await verifyPersonalizationText(context, 'netbanking');
+    await selectPersonalizationPaymentMethod(context, '1');
     await submit(context);
-    await handleFeeBearer(context, page);
-
-    await context.popup();
-
-    const expectedErrorMeassage = 'Payment failed';
-    await failRequestwithErrorMessage(context, expectedErrorMeassage);
-    await verifyErrorMessage(context, expectedErrorMeassage);
+    await handleFeeBearer(context);
+    await passRequestNetbanking(context);
+    await handleMockSuccessDialog(context);
   });
 });

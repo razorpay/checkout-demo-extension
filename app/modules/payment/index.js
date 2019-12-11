@@ -16,11 +16,8 @@ import Iframe from 'payment/iframe';
 import { formatPayment, formatPayload } from 'payment/validator';
 import { formatAmountWithSymbol } from 'common/currency';
 import { FormatDelegator } from 'formatter';
-import Razorpay, {
-  RazorpayConfig,
-  makeAuthUrl,
-  makeUrl,
-} from 'common/Razorpay';
+import Razorpay, { makeAuthUrl, makeUrl } from 'common/Razorpay';
+import RazorpayConfig from 'common/RazorpayConfig';
 import { internetExplorer, ajaxRouteNotSupported } from 'common/useragent';
 import { isPowerWallet } from 'common/wallet';
 import { checkPaymentAdapter } from 'payment/adapters';
@@ -222,7 +219,7 @@ export default function Payment(data, params = {}, r) {
        * Show popup if:
        * - Contact is missing
        */
-      if (data.method === 'paylater' && data.contact) {
+      if (data.provider === 'epaylater' && data.contact) {
         avoidPopup = true;
       }
 
@@ -848,22 +845,6 @@ razorpayProto.topupWallet = function() {
     },
   });
 };
-
-export function createFees(data, razorpayInstance, onSuccess, onError) {
-  data = formatPayload(data, razorpayInstance);
-
-  fetch.post({
-    url: makeUrl('payments/create/fees'),
-    data,
-    callback: function(response) {
-      if (response.error) {
-        return onError(response);
-      } else {
-        return onSuccess(response);
-      }
-    },
-  });
-}
 
 /**
  * Cache store for flows.
