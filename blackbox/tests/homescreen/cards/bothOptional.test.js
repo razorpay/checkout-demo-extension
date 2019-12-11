@@ -37,7 +37,6 @@ describe('Card tests', () => {
     // Both are optional, we should land on the methods screen
     await assertMethodsScreen(context);
     await assertMissingDetails(context);
-
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
 

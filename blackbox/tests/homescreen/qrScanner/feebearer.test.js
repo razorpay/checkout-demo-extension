@@ -1,12 +1,15 @@
+const { makeOptions, getTestData } = require('../../../actions');
 const { makePreferences } = require('../../../actions/preferences');
+
 const {
-  submit,
-  enterCardDetails,
-  expectRedirectWithCallback,
   handleFeeBearer,
+  selectUPIApp,
+  validateQRImage,
+  responseWithQRImage,
+  respondToUPIAjax,
+  respondToUPIPaymentStatus,
 } = require('../../../actions/common');
 
-// New imports
 const {
   assertBasicDetailsScreen,
   fillUserDetails,
@@ -17,41 +20,38 @@ const {
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
-// Opener
 const { openCheckoutWithNewHomeScreen } = require('../open');
 
-describe('Card tests', () => {
-  test('perform successful card transaction with callback URL and FeeBearer enabled', async () => {
-    const options = {
+describe.each(
+  getTestData('Perform QR Code with feebearer transaction', {
+    loggedIn: false,
+    preferences: { fee_bearer: true },
+    options: {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 200,
+      amount: 20000,
       personalization: false,
-      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
-      redirect: true,
-    };
-    const preferences = makePreferences({ fee_bearer: true });
+    },
+  })
+)('Perform QR Code transaction', ({ preferences, title, options }) => {
+  test(title, async () => {
+    preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,
       preferences,
     });
-
-    // Basic options with no prefill, we'll land on the details screen
     await assertBasicDetailsScreen(context);
-
     await fillUserDetails(context);
     await proceed(context);
-
     await assertUserDetails(context);
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'card');
-
-    // -------- OLD FLOW --------
-
-    await enterCardDetails(context);
-    await submit(context);
-    await handleFeeBearer(context, page);
-    await expectRedirectWithCallback(context, { method: 'card' });
+    await selectPaymentMethod(context, 'upi');
+    await selectUPIApp(context, '1');
+    await handleFeeBearer(context);
+    await respondToUPIAjax(context, { method: 'qr' });
+    await responseWithQRImage(context);
+    await validateQRImage(context);
+    await respondToUPIPaymentStatus(context);
   });
 });
