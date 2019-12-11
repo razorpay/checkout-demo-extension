@@ -23,6 +23,9 @@
 
   // Utils imports
   import CheckoutStore from 'checkoutstore';
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
+  import { CONTACT_REGEX, EMAIL_REGEX } from 'common/constants';
 
   const entries = _Obj.entries;
 
@@ -44,6 +47,28 @@
     readonly,
     hidden,
   } = checkoutStore;
+
+  function trackContactFilled() {
+    const valid = CONTACT_REGEX.test($contact);
+    Analytics.track('contact:fill', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        valid,
+        value: $contact,
+      },
+    });
+  }
+
+  function trackEmailFilled() {
+    const valid = EMAIL_REGEX.test($email);
+    Analytics.track('email:fill', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        valid,
+        value: $email,
+      },
+    });
+  }
 
   const isEmailHidden = hidden.email && optional.email;
   const isContactHidden = hidden.contact && optional.contact;
@@ -70,12 +95,12 @@
   <div class="details-block">
     {#if !isContactHidden}
       <div class="contact-field">
-        <ContactField bind:value={$contact} />
+        <ContactField bind:value={$contact} on:blur={trackContactFilled} />
       </div>
     {/if}
     {#if !isEmailHidden}
       <div class="email-field">
-        <EmailField bind:value={$email} />
+        <EmailField bind:value={$email} on:blur={trackEmailFilled} />
       </div>
     {/if}
   </div>
