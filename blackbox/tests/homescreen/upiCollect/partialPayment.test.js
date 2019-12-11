@@ -1,34 +1,36 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 const {
-  selectWallet,
-  assertWalletPage,
   submit,
-  typeOTPandSubmit,
-  handleOtpVerification,
-  handleValidationRequest,
-  retryWalletTransaction,
+  selectUPIMethod,
+  enterUPIAccount,
+  handleUPIAccountValidation,
+  respondToUPIAjax,
+  respondToUPIPaymentStatus,
   verifyPartialAmount,
 } = require('../../../actions/common');
 
 const {
-  handlePartialPayment,
   assertBasicDetailsScreen,
   fillUserDetails,
+  proceed,
   assertUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
   assertEditUserDetailsAndBack,
+  handlePartialPayment,
 } = require('../actions');
 
-describe('Wallet tests', () => {
-  test('Wallet keyless payment with partial payment', async () => {
-    const options = {
-      order_id: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 200000,
+describe.each(
+  getTestData('Perform upi collect transaction with partial payments enabled', {
+    loggedIn: false,
+    options: {
+      amount: 20000,
       personalization: false,
-    };
-    const preferences = makePreferences({
+      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
+      redirect: true,
+    },
+    preferences: {
       order: {
         amount: 20000,
         amount_due: 20000,
@@ -37,7 +39,11 @@ describe('Wallet tests', () => {
         first_payment_min_amount: null,
         partial_payment: true,
       },
-    });
+    },
+  })
+)('UPI tests', ({ preferences, title, options }) => {
+  test(title, async () => {
+    preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,
@@ -49,21 +55,13 @@ describe('Wallet tests', () => {
     await assertUserDetails(context);
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'wallet');
-    await assertWalletPage(context);
-    await selectWallet(context, 'freecharge');
-    await submit(context);
-    await handleOtpVerification(context);
+    await selectPaymentMethod(context, 'upi');
+    await selectUPIMethod(context, 'BHIM');
+    await enterUPIAccount(context, 'BHIM');
     await verifyPartialAmount(context, '₹ 100');
-    await typeOTPandSubmit(context);
-
-    await handleValidationRequest(context, 'fail');
-    await retryWalletTransaction(context);
-
     await submit(context);
-    await handleOtpVerification(context);
-    await typeOTPandSubmit(context);
-
-    await handleValidationRequest(context, 'pass');
+    await handleUPIAccountValidation(context, 'BHIM@upi');
+    await respondToUPIAjax(context);
+    await respondToUPIPaymentStatus(context);
   });
 });

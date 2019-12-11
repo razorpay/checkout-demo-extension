@@ -1,11 +1,12 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 const {
-  selectBank,
-  assertNetbankingPage,
   submit,
-  passRequestNetbanking,
-  handleMockSuccessDialog,
+  selectUPIMethod,
+  enterUPIAccount,
+  handleUPIAccountValidation,
+  respondToUPIAjax,
+  respondToUPIPaymentStatus,
 } = require('../../../actions/common');
 
 const {
@@ -18,14 +19,17 @@ const {
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
-describe('Netbanking tests', () => {
-  test('perform keyless netbaking transaction with contact optional', async () => {
-    const options = {
-      order_id: 'rzp_test_1DP5mmOlF5G5ag',
+describe.each(
+  getTestData('Perform upi collect transaction', {
+    loggedIn: false,
+    options: {
       amount: 200,
       personalization: false,
-    };
-    const preferences = makePreferences({ optional: ['contact'] });
+    },
+  })
+)('UPI tests', ({ preferences, title, options }) => {
+  test(title, async () => {
+    preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,
@@ -37,11 +41,12 @@ describe('Netbanking tests', () => {
     await assertUserDetails(context);
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'netbanking');
-    await assertNetbankingPage(context);
-    await selectBank(context, 'SBIN');
+    await selectPaymentMethod(context, 'upi');
+    await selectUPIMethod(context, 'BHIM');
+    await enterUPIAccount(context, 'BHIM');
     await submit(context);
-    await passRequestNetbanking(context);
-    await handleMockSuccessDialog(context);
+    await handleUPIAccountValidation(context, 'BHIM@upi');
+    await respondToUPIAjax(context);
+    await respondToUPIPaymentStatus(context);
   });
 });

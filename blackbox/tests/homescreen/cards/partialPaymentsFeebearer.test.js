@@ -1,4 +1,4 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const {
   submit,
   enterCardDetails,
@@ -26,24 +26,30 @@ const {
 // Opener
 const { openCheckoutWithNewHomeScreen } = require('../open');
 
-describe('Card tests', () => {
-  test('perform card transaction with partial payments and feebearer enabled', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 20000,
-      personalization: false,
-    };
-    const preferences = makePreferences({
-      fee_bearer: true,
-      order: {
+describe.each(
+  getTestData(
+    'perform card transaction with partial payments and feebearer enabled',
+    {
+      loggedIn: false,
+      options: {
         amount: 20000,
-        amount_due: 20000,
-        amount_paid: 0,
-        currency: 'INR',
-        first_payment_min_amount: null,
-        partial_payment: true,
+        personalization: false,
       },
-    });
+      preferences: {
+        fee_bearer: true,
+        order: {
+          amount: 20000,
+          amount_due: 20000,
+          amount_paid: 0,
+          currency: 'INR',
+          first_payment_min_amount: null,
+          partial_payment: true,
+        },
+      },
+    }
+  )
+)('Card tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,

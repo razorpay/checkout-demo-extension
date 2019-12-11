@@ -1,4 +1,4 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 const {
   selectBank,
@@ -24,14 +24,14 @@ const {
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
-describe('Netbanking tests', () => {
-  test('perform netbaking transaction with offers applied', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+describe.each(
+  getTestData('perform netbaking transaction with offers applied', {
+    loggedIn: false,
+    options: {
       amount: 200000,
       personalization: false,
-    };
-    const preferences = makePreferences({
+    },
+    preferences: {
       offers: [
         {
           original_amount: 200000,
@@ -52,7 +52,10 @@ describe('Netbanking tests', () => {
           display_text: 'Rs. 20 off on HDF Netbanking',
         },
       ],
-    });
+    },
+  })
+)('Netbanking tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,

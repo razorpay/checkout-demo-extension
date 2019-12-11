@@ -1,4 +1,4 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 const {
   selectBank,
@@ -25,43 +25,49 @@ const {
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
-describe('Netbanking tests', () => {
-  test('perform netbaking transaction with offers applied and partial payments enabled', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 200000,
-      personalization: false,
-    };
-    const preferences = makePreferences({
-      order: {
+describe.each(
+  getTestData(
+    'perform netbaking transaction with offers applied and partial payments enabled',
+    {
+      loggedIn: false,
+      options: {
         amount: 200000,
-        amount_due: 200000,
-        amount_paid: 0,
-        currency: 'INR',
-        first_payment_min_amount: null,
-        partial_payment: true,
+        personalization: false,
       },
-      offers: [
-        {
-          original_amount: 200000,
-          amount: 198000,
-          id: 'offer_DeyaOUCgXd49pt',
-          name: 'Netbanking_SBI_1',
-          payment_method: 'netbanking',
-          issuer: 'SBIN',
-          display_text: 'Rs. 20 off on SBI Netbanking',
+      preferences: {
+        order: {
+          amount: 200000,
+          amount_due: 200000,
+          amount_paid: 0,
+          currency: 'INR',
+          first_payment_min_amount: null,
+          partial_payment: true,
         },
-        {
-          original_amount: 200000,
-          amount: 198000,
-          id: 'offer_DeycnL6DJueSQ6',
-          name: 'Netbanking_HDFC_1',
-          payment_method: 'netbanking',
-          issuer: 'HDFC',
-          display_text: 'Rs. 20 off on HDF Netbanking',
-        },
-      ],
-    });
+        offers: [
+          {
+            original_amount: 200000,
+            amount: 198000,
+            id: 'offer_DeyaOUCgXd49pt',
+            name: 'Netbanking_SBI_1',
+            payment_method: 'netbanking',
+            issuer: 'SBIN',
+            display_text: 'Rs. 20 off on SBI Netbanking',
+          },
+          {
+            original_amount: 200000,
+            amount: 198000,
+            id: 'offer_DeycnL6DJueSQ6',
+            name: 'Netbanking_HDFC_1',
+            payment_method: 'netbanking',
+            issuer: 'HDFC',
+            display_text: 'Rs. 20 off on HDF Netbanking',
+          },
+        ],
+      },
+    }
+  )
+)('Netbanking tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,

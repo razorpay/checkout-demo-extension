@@ -1,4 +1,4 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 const {
   selectBank,
@@ -25,36 +25,42 @@ const {
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
-describe('Netbanking tests', () => {
-  test('perform netbaking transaction with offers and customer feebearer applied', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 200000,
-      personalization: false,
-    };
-    const preferences = makePreferences({
-      fee_bearer: true,
-      offers: [
-        {
-          original_amount: 200000,
-          amount: 198000,
-          id: 'offer_DeyaOUCgXd49pt',
-          name: 'Netbanking_SBI_1',
-          payment_method: 'netbanking',
-          issuer: 'SBIN',
-          display_text: 'Rs. 20 off on SBI Netbanking',
-        },
-        {
-          original_amount: 200000,
-          amount: 198000,
-          id: 'offer_DeycnL6DJueSQ6',
-          name: 'Netbanking_HDFC_1',
-          payment_method: 'netbanking',
-          issuer: 'HDFC',
-          display_text: 'Rs. 20 off on HDF Netbanking',
-        },
-      ],
-    });
+describe.each(
+  getTestData(
+    'perform netbaking transaction with offers and customer feebearer applied',
+    {
+      loggedIn: false,
+      options: {
+        amount: 200000,
+        personalization: false,
+      },
+      preferences: {
+        fee_bearer: true,
+        offers: [
+          {
+            original_amount: 200000,
+            amount: 198000,
+            id: 'offer_DeyaOUCgXd49pt',
+            name: 'Netbanking_SBI_1',
+            payment_method: 'netbanking',
+            issuer: 'SBIN',
+            display_text: 'Rs. 20 off on SBI Netbanking',
+          },
+          {
+            original_amount: 200000,
+            amount: 198000,
+            id: 'offer_DeycnL6DJueSQ6',
+            name: 'Netbanking_HDFC_1',
+            payment_method: 'netbanking',
+            issuer: 'HDFC',
+            display_text: 'Rs. 20 off on HDF Netbanking',
+          },
+        ],
+      },
+    }
+  )
+)('Netbanking tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,
