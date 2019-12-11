@@ -227,6 +227,5 @@ module.exports = {
 
     return returnObj;
   },
-
   cdnUrl,
 };
