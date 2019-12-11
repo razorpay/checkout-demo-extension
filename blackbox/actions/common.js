@@ -14,6 +14,7 @@ const walletActions = require('./wallet-actions');
 const sharedActions = require('./shared-actions');
 const qrActions = require('./qr-actions');
 const emandateBanktransferActions = require('./emandate-banktransfer-actions');
+const paylaterActions = require('./paylater-actions');
 const personalizationActions = require('./personalization-actions');
 const payoutActions = require('./payout-actions');
 
@@ -36,6 +37,7 @@ module.exports = {
   ...sharedActions,
   ...qrActions,
   ...emandateBanktransferActions,
+  ...paylaterActions,
   ...personalizationActions,
   ...payoutActions,
   verifyDiscountPaybleAmount,

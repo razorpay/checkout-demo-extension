@@ -5,7 +5,7 @@ const {
   fillUserDetails,
   submit,
   handleUPIAccountValidation,
-  verifyPersonalizationVPAText,
+  verifyPersonalizationText,
   selectPersonalizationPaymentMethod,
   expectRedirectWithCallback,
 } = require('../../actions/common');
@@ -15,9 +15,9 @@ describe('Basic upi payment', () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,
-      personalization: true,
       callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
       redirect: true,
+      personalization: true,
     };
     const preferences = makePreferences();
     preferences.methods.upi = true;
@@ -29,7 +29,7 @@ describe('Basic upi payment', () => {
     });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, '8888888881');
-    await verifyPersonalizationVPAText(context);
+    await verifyPersonalizationText(context, 'upi');
     await selectPersonalizationPaymentMethod(context, 1);
     await submit(context);
     await handleUPIAccountValidation(context, 'dsd@okhdfcbank');
