@@ -1,33 +1,33 @@
 const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 const {
-  submit,
   selectUPIMethod,
-  enterUPIAccount,
-  handleUPIAccountValidation,
-  respondToUPIAjax,
-  respondToUPIPaymentStatus,
+  submit,
+  verifyOmnichannelPhoneNumber,
+  expectRedirectWithCallback,
   verifyLowDowntime,
 } = require('../../../actions/common');
 
 const {
   assertBasicDetailsScreen,
-  selectPaymentMethod,
   fillUserDetails,
   proceed,
   assertUserDetails,
   assertPaymentMethods,
+  selectPaymentMethod,
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
 describe.each(
-  getTestData('Verify UPI downtime - Low', {
-    loggedIn: false,
+  getTestData('Verify Omnichannel downtime - Low with callbackURL enabled', {
     options: {
-      amount: 200,
+      amount: 60000,
       personalization: false,
+      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
+      redirect: true,
     },
     preferences: {
+      features: { google_pay_omnichannel: true },
       payment_downtime: {
         entity: 'collection',
         count: 1,
@@ -48,7 +48,7 @@ describe.each(
       },
     },
   })
-)('UPI tests', ({ preferences, title, options }) => {
+)('Omnichannel tests', ({ preferences, title, options }) => {
   test(title, async () => {
     preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
@@ -64,11 +64,9 @@ describe.each(
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await verifyLowDowntime(context, 'UPI');
-    await selectUPIMethod(context, 'BHIM');
-    await enterUPIAccount(context, 'BHIM');
+    await selectUPIMethod(context, 'Google Pay');
+    await verifyOmnichannelPhoneNumber(context);
     await submit(context);
-    await handleUPIAccountValidation(context, 'BHIM@upi');
-    await respondToUPIAjax(context);
-    await respondToUPIPaymentStatus(context);
+    await expectRedirectWithCallback(context, { method: 'upi' });
   });
 });

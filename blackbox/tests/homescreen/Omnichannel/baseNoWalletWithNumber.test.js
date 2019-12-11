@@ -1,54 +1,42 @@
 const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 const {
-  submit,
   selectUPIMethod,
-  enterUPIAccount,
-  handleUPIAccountValidation,
+  submit,
   respondToUPIAjax,
+  verifyOmnichannelPhoneNumber,
   respondToUPIPaymentStatus,
-  verifyLowDowntime,
+  retryTransaction,
+  respondToUPIAjaxWithFailure,
+  handleUPIAccountValidation,
+  selectBankNameFromGooglePayDropDown,
+  enterUPIAccount,
 } = require('../../../actions/common');
 
 const {
   assertBasicDetailsScreen,
-  selectPaymentMethod,
   fillUserDetails,
   proceed,
   assertUserDetails,
   assertPaymentMethods,
+  selectPaymentMethod,
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
 describe.each(
-  getTestData('Verify UPI downtime - Low', {
-    loggedIn: false,
-    options: {
-      amount: 200,
-      personalization: false,
-    },
-    preferences: {
-      payment_downtime: {
-        entity: 'collection',
-        count: 1,
-        items: [
-          {
-            id: 'down_DEW7D9S10PEsl1',
-            entity: 'payment.downtime',
-            method: 'upi',
-            begin: 1567686386,
-            end: null,
-            status: 'started',
-            scheduled: false,
-            severity: 'low',
-            created_at: 1567686387,
-            updated_at: 1567686387,
-          },
-        ],
+  getTestData(
+    'Perform Omnichannel transaction with no wallet linked to current number',
+    {
+      options: {
+        amount: 60000,
+        personalization: false,
       },
-    },
-  })
-)('UPI tests', ({ preferences, title, options }) => {
+      preferences: {
+        features: { google_pay_omnichannel: true },
+      },
+    }
+  )
+)('Omnichannel tests', ({ preferences, title, options }) => {
   test(title, async () => {
     preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
@@ -63,11 +51,15 @@ describe.each(
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await verifyLowDowntime(context, 'UPI');
-    await selectUPIMethod(context, 'BHIM');
-    await enterUPIAccount(context, 'BHIM');
+    await selectUPIMethod(context, 'Google Pay');
+    await verifyOmnichannelPhoneNumber(context);
     await submit(context);
-    await handleUPIAccountValidation(context, 'BHIM@upi');
+    await respondToUPIAjaxWithFailure(context);
+    await retryTransaction(context);
+    await enterUPIAccount(context, 'sjain');
+    await selectBankNameFromGooglePayDropDown(context, 'okhdfcbank');
+    await submit(context);
+    await handleUPIAccountValidation(context, 'sjain@okhdfcbank', false);
     await respondToUPIAjax(context);
     await respondToUPIPaymentStatus(context);
   });

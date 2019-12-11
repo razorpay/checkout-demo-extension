@@ -20,6 +20,7 @@ const {
 
 describe.each(
   getTestData('Verify UPI downtime - Low with personalization enabled', {
+    loggedIn: false,
     options: {
       amount: 200,
       personalization: true,

@@ -1,33 +1,26 @@
 const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
-const {
-  submit,
-  selectUPIMethod,
-  enterUPIAccount,
-  handleUPIAccountValidation,
-  respondToUPIAjax,
-  respondToUPIPaymentStatus,
-  verifyLowDowntime,
-} = require('../../../actions/common');
 
 const {
   assertBasicDetailsScreen,
-  selectPaymentMethod,
   fillUserDetails,
   proceed,
   assertUserDetails,
   assertPaymentMethods,
+  selectPaymentMethod,
   assertEditUserDetailsAndBack,
+  verifyHighDowntime,
 } = require('../actions');
 
 describe.each(
-  getTestData('Verify UPI downtime - Low', {
-    loggedIn: false,
+  getTestData('Verify Omnichannel downtime - High with contact optional', {
     options: {
-      amount: 200,
+      amount: 60000,
       personalization: false,
     },
     preferences: {
+      features: { google_pay_omnichannel: true },
+      optional: ['contact'],
       payment_downtime: {
         entity: 'collection',
         count: 1,
@@ -40,7 +33,7 @@ describe.each(
             end: null,
             status: 'started',
             scheduled: false,
-            severity: 'low',
+            severity: 'high',
             created_at: 1567686387,
             updated_at: 1567686387,
           },
@@ -48,7 +41,7 @@ describe.each(
       },
     },
   })
-)('UPI tests', ({ preferences, title, options }) => {
+)('Omnichannel tests', ({ preferences, title, options }) => {
   test(title, async () => {
     preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
@@ -62,13 +55,10 @@ describe.each(
     await assertUserDetails(context);
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'upi');
-    await verifyLowDowntime(context, 'UPI');
-    await selectUPIMethod(context, 'BHIM');
-    await enterUPIAccount(context, 'BHIM');
-    await submit(context);
-    await handleUPIAccountValidation(context, 'BHIM@upi');
-    await respondToUPIAjax(context);
-    await respondToUPIPaymentStatus(context);
+    await verifyHighDowntime(
+      context,
+      'upi',
+      'UPI is facing temporary issues right now.'
+    );
   });
 });

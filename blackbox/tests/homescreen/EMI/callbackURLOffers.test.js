@@ -24,6 +24,7 @@ const {
 
 describe.each(
   getTestData('Perform EMI transaction with callbackURL with offers applied', {
+    loggedIn: false,
     options: {
       amount: 500000,
       personalization: false,
