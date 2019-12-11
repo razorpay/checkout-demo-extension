@@ -20,19 +20,19 @@ async function handleOtpVerification(context, walletissuer = 'freecharge') {
   });
 }
 
-async function typeOTPandSubmit(context) {
-  await typeOTP(context);
+async function typeOTPandSubmit(context, otpValue = '5555') {
+  await typeOTP(context, otpValue);
   await delay(500);
   const footer = await context.page.waitForSelector('#footer', {
     visible: true,
   });
   await footer.click();
 }
-async function typeOTP(context) {
+async function typeOTP(context, otpValue) {
   await context.page.waitForSelector('#otp', {
     visible: true,
   });
-  await context.page.type('#otp', '5555');
+  await context.page.type('#otp', otpValue);
 }
 
 async function verifyOTP(context, passOrFail) {
