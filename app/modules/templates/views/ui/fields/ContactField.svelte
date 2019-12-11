@@ -8,6 +8,8 @@
   // UI imports
   import Field from 'templates/views/ui/Field.svelte';
 
+  import { CONTACT_PATTERN } from 'common/constants';
+
   // Props
   export let value;
 
@@ -18,7 +20,7 @@
   const prefilledContact = prefill.contact;
   const isContactReadonly = readonly.contact && prefilledContact;
 
-  const CONTACT_REGEX = optional.contact ? '.*' : '^\\+?[0-9]{8,15}$';
+  const CONTACT_REGEX = optional.contact ? '.*' : CONTACT_PATTERN;
 
   const label = optional.contact ? 'Phone (Optional)' : 'Phone';
 </script>
