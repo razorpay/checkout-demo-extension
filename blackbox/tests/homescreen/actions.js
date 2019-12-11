@@ -215,14 +215,21 @@ async function getMethodButtons(context) {
 /**
  * Verify that methods are being shown
  */
-async function assertPaymentMethods(context, paymentMethods) {
+async function assertPaymentMethods(context) {
   const buttons = await getMethodButtons(context);
 
   const methods = await Promise.all(
     buttons.map(button => getAttribute(context.page, button, 'method'))
   );
 
-  expect(methods).toEqual(paymentMethods);
+  if (
+    context.preferences.methods.upi !== undefined &&
+    context.preferences.methods.upi === true
+  ) {
+    expect(methods).toEqual(['card', 'netbanking', 'wallet', 'upi']);
+  } else {
+    expect(methods).toEqual(['card', 'netbanking', 'wallet']);
+  }
 }
 
 /**

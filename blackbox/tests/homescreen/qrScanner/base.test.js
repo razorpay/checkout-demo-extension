@@ -37,8 +37,7 @@ describe.each(
     await proceed(context);
     await assertUserDetails(context);
     await assertEditUserDetailsAndBack(context);
-    const paymentMethods = ['card', 'netbanking', 'wallet', 'upi'];
-    await assertPaymentMethods(context, paymentMethods);
+    await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await selectUPIApp(context, '1');
     await respondToUPIAjax(context, { method: 'qr' });
