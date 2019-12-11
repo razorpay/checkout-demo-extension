@@ -11,6 +11,7 @@ pipeline:
     secrets: [docker_username, docker_password]
     build_args:
       - GIT_COMMIT_HASH=${DRONE_COMMIT_SHA}
+      - BUILD_NUMBER=${DRONE_BUILD_NUMBER}
     tags: ${DRONE_COMMIT_SHA}
     when:
       status: [success]

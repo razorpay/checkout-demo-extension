@@ -5,7 +5,7 @@ const {
   handleCardValidation,
   handleMockFailureDialog,
   verifyErrorMessage,
-  retryCardTransaction,
+  retryTransaction,
   verifyPartialAmount,
   handleFeeBearer,
   handleMockSuccessDialog,
@@ -60,7 +60,6 @@ describe('Card tests', () => {
     await assertUserDetails(context);
 
     await assertEditUserDetailsAndBack(context);
-
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
 
@@ -73,7 +72,7 @@ describe('Card tests', () => {
     await handleCardValidation(context);
     await handleMockFailureDialog(context);
     await verifyErrorMessage(context, 'The payment has already been processed');
-    await retryCardTransaction(context);
+    await retryTransaction(context);
     await verifyPartialAmount(context, '₹ 100');
     await submit(context);
     await handleFeeBearer(context);

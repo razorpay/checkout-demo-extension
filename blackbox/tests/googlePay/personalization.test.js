@@ -1,0 +1,38 @@
+const { openCheckout } = require('../../actions/checkout');
+const { makePreferences } = require('../../actions/preferences');
+const {
+  assertHomePage,
+  fillUserDetails,
+  verifyPersonalizationText,
+  submit,
+  respondToUPIPaymentStatus,
+  respondToUPIAjax,
+  handleUPIAccountValidation,
+  selectPersonalizationPaymentMethod,
+} = require('../../actions/common');
+
+describe('GooglePay with Personalization  payment', () => {
+  test('Perform GooglePay with Personalization transaction', async () => {
+    const options = {
+      key: 'rzp_test_VwsqHDsQPoVQi6',
+      amount: 60000,
+      personalization: true,
+    };
+    const preferences = makePreferences();
+    preferences.methods.upi = true;
+    const context = await openCheckout({
+      page,
+      options,
+      preferences,
+      method: 'UPI',
+    });
+    await assertHomePage(context, true, true);
+    await fillUserDetails(context, '8888888881');
+    await verifyPersonalizationText(context, 'upi');
+    await selectPersonalizationPaymentMethod(context, '1');
+    await submit(context);
+    await handleUPIAccountValidation(context, 'dsd@okhdfcbank');
+    await respondToUPIAjax(context);
+    await respondToUPIPaymentStatus(context);
+  });
+});

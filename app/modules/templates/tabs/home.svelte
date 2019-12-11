@@ -59,6 +59,13 @@
     session.hasOffers &&
     _Arr.any(session.eligibleOffers, offer => offer.homescreen);
 
+  // Recurring callout
+  const showRecurringCallout =
+    session.recurring &&
+    session.tab !== 'emandate' &&
+    methods.count === 1 &&
+    methods.card;
+
   const {
     isPartialPayment,
     prefill,
@@ -81,6 +88,7 @@
   $: showSecuredByMessage =
     view === 'details' &&
     !hasOffersOnHomescreen &&
+    !showRecurringCallout &&
     !session.multiTpv &&
     !session.tpvBank &&
     !isPartialPayment &&
@@ -327,54 +335,83 @@
     const DETAILS = 'details';
     const METHODS = 'methods';
 
-    // If email and contact are prefilled, validate them
-    if (!contactEmailOptional && !contactEmailHidden) {
+    /**
+     * Mark contact and email as invalid by default
+     */
+    let isContactValid = false;
+    let isEmailValid = false;
+
+    /**
+     * Mark optional fields as valid
+     */
+    if (optional.contact) {
+      isContactValid = true;
+    }
+    if (optional.email) {
+      isEmailValid = true;
+    }
+
+    /**
+     * If contact and email are mandatory, validate
+     */
+    if (!contactEmailOptional) {
       const contactRegex = /^\+?[0-9]{8,15}$/;
       const emailRegex = /^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/;
 
-      /**
-       * For contact and email:
-       * - If optional, allow anything
-       * - If not optional, validate
-       */
-      if (!optional.contact && !contactRegex.test($contact)) {
-        return DETAILS;
-      }
-
-      if (!optional.email && !emailRegex.test($email)) {
-        return DETAILS;
-      }
+      isContactValid = isContactValid || contactRegex.test($contact);
+      isEmailValid = isEmailValid || emailRegex.test($email);
     }
 
-    // TPV bank
-    // TPV UPI
-    // Multi TPV
+    /**
+     * If contact or email are invalid,
+     * we need to get them corrected.
+     */
+    if (!isContactValid || !isEmailValid) {
+      return DETAILS;
+    }
+
+    /**
+     * Need TPV selection from the details screen.
+     */
     if (session.tpvBank || session.upiTpv || session.multiTpv) {
       return DETAILS;
     }
 
+    /**
+     * Need partial payment details from the details screen.
+     */
     if (isPartialPayment) {
       return DETAILS;
     }
 
+    /**
+     * Need address from the details screen.
+     */
     if (address) {
       return DETAILS;
     }
 
-    if (contactEmailOptional || contactEmailHidden || contactEmailReadonly) {
-      return METHODS;
-    }
+    /**
+     * If contact exists, get the instruments
+     * for the user.
+     */
+    const doesContactExist = $contact && $contact.length;
+    const _instruments = doesContactExist ? getInstruments() : [];
 
-    // TODO: What should we do in case of only one of email or contact is optional?
-
-    // Missing contact
-    if (!$contact || !$contact.length) {
-      return DETAILS;
-    }
-
-    // Update instruments
-    const _instruments = getInstruments();
-
+    /**
+     * If there's just one method available,
+     * we want to land on the details screen.
+     *
+     * But, there's an exception:
+     *
+     * There are some instruments for which we want to show
+     * personalized methods.
+     *
+     * If an instrument on any of these methods exists,
+     * we take the user to the methods screen.
+     *
+     * Otherwise, we take the user to the details screen.
+     */
     if (session.oneMethod) {
       if (
         _Arr.contains(['wallet', 'netbanking', 'upi'], session.oneMethod) &&
@@ -386,6 +423,11 @@
       }
     }
 
+    /**
+     * If there are multple methods
+     * and no validations have failed,
+     * we take the user to the methods screen.
+     */
     return METHODS;
   }
 
@@ -477,7 +519,7 @@
       {}
     );
 
-    Analytics.track('p13n:intruments:list', {
+    Analytics.track('p13n:instruments:list', {
       data: {
         length: instruments.length,
         shown: Math.min(_instruments.length, MAX_P13N_INSTRUMENTS),
@@ -720,6 +762,36 @@
     </div>
 
     <div slot="bottom">
+      {#if showRecurringCallout}
+        <Callout>
+          {#if session.get('subscription_id')}
+            {#if methods.debit_card && methods.credit_card}
+              Subscription payments are supported on Visa and Mastercard Credit
+              Cards from all Banks and Debit Cards from ICICI, Kotak, Citibank
+              and Canara Bank.
+            {:else if methods.debit_card}
+              Subscription payments are only supported on Visa and Mastercard
+              Debit Cards from ICICI, Kotak, Citibank and Canara Bank.
+            {:else}
+              Subscription payments are only supported on Mastercard and Visa
+              Credit Cards.
+            {/if}
+          {:else if methods.debit_card && methods.credit_card}
+            Visa and Mastercard Credit Cards from all Banks and Debit Cards from
+            ICICI, Kotak, Citibank and Canara Bank are supported for this
+            payment.
+          {:else if methods.debit_card}
+            Only Visa and Mastercard Debit Cards from ICICI, Kotak, Citibank and
+            Canara Bank are supported for this payment.
+          {:else}
+            Only Visa and Mastercard Credit Cards are supported for this
+            payment.
+          {/if}
+        </Callout>
+      {/if}
+
+      <OffersPortal />
+
       {#if showSecuredByMessage}
         <div class="secured-message" out:slide={{ duration: 100 }}>
           <i>
@@ -748,36 +820,6 @@
           </i>
           This payment is secured by Razorpay.
         </div>
-      {/if}
-
-      <OffersPortal />
-
-      {#if session.recurring && session.tab !== 'emandate' && methods.count === 1 && methods.card}
-        <Callout>
-          {#if session.get('subscription_id')}
-            {#if methods.debit_card && methods.credit_card}
-              Subscription payments are supported on Visa and Mastercard Credit
-              Cards from all Banks and Debit Cards from ICICI, Kotak, Citibank
-              and Canara Bank.
-            {:else if methods.debit_card}
-              Subscription payments are only supported on Visa and Mastercard
-              Debit Cards from ICICI, Kotak, Citibank and Canara Bank.
-            {:else}
-              Subscription payments are only supported on Mastercard and Visa
-              Credit Cards.
-            {/if}
-          {:else if methods.debit_card && methods.credit_card}
-            Visa and Mastercard Credit Cards from all Banks and Debit Cards from
-            ICICI, Kotak, Citibank and Canara Bank are supported for this
-            payment.
-          {:else if methods.debit_card}
-            Only Visa and Mastercard Debit Cards from ICICI, Kotak, Citibank and
-            Canara Bank are supported for this payment.
-          {:else}
-            Only Visa and Mastercard Credit Cards are supported for this
-            payment.
-          {/if}
-        </Callout>
       {/if}
 
     </div>

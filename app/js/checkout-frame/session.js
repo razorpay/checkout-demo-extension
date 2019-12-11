@@ -1190,7 +1190,10 @@ Session.prototype = {
       }
       var div = document.createElement('div');
       var styleEl = this.renderCss();
-      div.innerHTML = templates.modal(this, getStore);
+      div.innerHTML = templates.modal(this, {
+        getStore: getStore,
+        cta: storeGetter(Cta.getStore()),
+      });
       this.el = div.firstChild;
       this.applyFont(this.el.querySelector('#powered-link'));
       document.body.appendChild(this.el);
@@ -1216,6 +1219,7 @@ Session.prototype = {
   },
 
   fillData: function() {
+    var self = this;
     var oldMethod = this.data.method;
     if (oldMethod) {
       this.wants_skip = true;
@@ -1248,7 +1252,7 @@ Session.prototype = {
 
     if (tab && !(this.order && this.order.bank) && this.methods[tab]) {
       this.switchTab(tab);
-    } else if (tab === '') {
+    } else if (tab === '' && this.newHomeScreen) {
       this.switchTab(tab);
     }
 
@@ -1304,6 +1308,7 @@ Session.prototype = {
           var val = data[name];
           if (el && val) {
             el.value = val;
+            self.input(el);
           }
         }
       );
@@ -1484,7 +1489,8 @@ Session.prototype = {
           this.handleOfferSelection.bind(this),
           this.handleOfferRemoval.bind(this),
           this.formatAmountWithCurrency.bind(this),
-          $('#body')[0]
+          $('#body')[0],
+          this
         );
 
         this.renderOffers(this.screen);

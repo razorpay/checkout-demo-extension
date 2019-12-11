@@ -179,9 +179,12 @@ export const getDownBanks = preferences => {
   let downList = [];
 
   if (downtime) {
-    _Arr.loop(_Arr.map(downtime.netbanking || [], o => o.issuer), downBanks => {
-      downList = downList.concat(downBanks);
-    });
+    _Arr.loop(
+      _Arr.map(downtime.netbanking || [], o => o.issuer),
+      downBanks => {
+        downList = downList.concat(downBanks);
+      }
+    );
   }
 
   // TODO: Remove duplicate entries from downList

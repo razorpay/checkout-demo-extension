@@ -5,7 +5,7 @@ const {
   handleCardValidation,
   handleMockFailureDialog,
   verifyErrorMessage,
-  retryCardTransaction,
+  retryTransaction,
   handleMockSuccessDialog,
 } = require('../../../actions/common');
 
@@ -45,7 +45,6 @@ describe('Card tests', () => {
 
     await assertUserDetails(context);
     await assertEditUserDetailsAndBack(context);
-
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'card');
 
@@ -56,7 +55,7 @@ describe('Card tests', () => {
     await handleCardValidation(context);
     await handleMockFailureDialog(context);
     await verifyErrorMessage(context, 'The payment has already been processed');
-    await retryCardTransaction(context);
+    await retryTransaction(context);
     await submit(context);
 
     await handleCardValidation(context);
