@@ -1,36 +1,34 @@
 const { getTestData } = require('../../../actions');
+const { openCheckoutWithNewHomeScreen } = require('../open');
 const {
   submit,
-  enterCardDetails,
-  expectRedirectWithCallback,
+  selectUPIMethod,
+  enterUPIAccount,
+  handleUPIAccountValidation,
+  respondToUPIAjax,
+  respondToUPIPaymentStatus,
   verifyPartialAmount,
+  selectBankNameFromGooglePayDropDown,
 } = require('../../../actions/common');
 
-// New imports
 const {
+  handlePartialPayment,
   assertBasicDetailsScreen,
   fillUserDetails,
-  proceed,
   assertUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
   assertEditUserDetailsAndBack,
-  handlePartialPayment,
 } = require('../actions');
-
-// Opener
-const { openCheckoutWithNewHomeScreen } = require('../open');
 
 describe.each(
   getTestData(
-    'perform successful card transaction with callback URL and Partial Payments enabled',
+    'Perform GooglePay transaction with optional contact and partial payments enabled',
     {
       loggedIn: false,
       options: {
         amount: 20000,
         personalization: false,
-        callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
-        redirect: true,
       },
       preferences: {
         order: {
@@ -41,35 +39,32 @@ describe.each(
           first_payment_min_amount: null,
           partial_payment: true,
         },
+        optional: ['contact'],
       },
     }
   )
-)('Card tests', ({ preferences, title, options }) => {
+)('GooglePay tests', ({ preferences, title, options }) => {
   test(title, async () => {
+    preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,
       preferences,
     });
-
-    // Basic options with no prefill, we'll land on the details screen
     await assertBasicDetailsScreen(context);
-
     await fillUserDetails(context);
-
     await handlePartialPayment(context, '100');
-
     await assertUserDetails(context);
-
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'card');
-
-    // -------- OLD FLOW --------
-
-    await enterCardDetails(context);
+    await selectPaymentMethod(context, 'upi');
+    await selectUPIMethod(context, 'Google Pay');
+    await enterUPIAccount(context, 'scbaala');
+    await selectBankNameFromGooglePayDropDown(context, 'okhdfcbank');
     await verifyPartialAmount(context, '₹ 100');
     await submit(context);
-    await expectRedirectWithCallback(context, { method: 'card' });
+    await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
+    await respondToUPIAjax(context);
+    await respondToUPIPaymentStatus(context);
   });
 });

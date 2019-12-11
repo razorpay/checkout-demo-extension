@@ -1,16 +1,17 @@
-const { getTestData } = require('../../../actions');
+const { makePreferences } = require('../../../actions/preferences');
+const { makeOptions, getTestData } = require('../../../actions');
+
 const {
+  selectBankNameFromGooglePayDropDown,
   submit,
-  enterCardDetails,
-  handleCardValidation,
-  handleMockSuccessDialog,
-  verifyErrorMessage,
-  retryTransaction,
+  respondToUPIAjax,
   handleFeeBearer,
-  handleMockFailureDialog,
+  enterUPIAccount,
+  selectUPIMethod,
+  handleUPIAccountValidation,
+  respondToUPIPaymentStatus,
 } = require('../../../actions/common');
 
-// New imports
 const {
   assertBasicDetailsScreen,
   fillUserDetails,
@@ -21,12 +22,11 @@ const {
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
-// Opener
 const { openCheckoutWithNewHomeScreen } = require('../open');
 
 describe.each(
   getTestData(
-    'perform successful card transaction with Optional Contact and FeeBearer enabled',
+    'Perform GooglePay transaction with feebearer enabled and optional contact',
     {
       loggedIn: false,
       options: {
@@ -39,37 +39,28 @@ describe.each(
       },
     }
   )
-)('Card tests', ({ preferences, title, options }) => {
+)('GooglePay tests', ({ preferences, title, options }) => {
   test(title, async () => {
+    preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,
       preferences,
     });
-
-    // Basic options with no prefill, we'll land on the details screen
     await assertBasicDetailsScreen(context);
-
     await fillUserDetails(context);
     await proceed(context);
-
     await assertUserDetails(context);
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'card');
-
-    // -------- OLD FLOW --------
-
-    await enterCardDetails(context);
+    await selectPaymentMethod(context, 'upi');
+    await selectUPIMethod(context, 'Google Pay');
+    await enterUPIAccount(context, 'scbaala');
+    await selectBankNameFromGooglePayDropDown(context, 'okhdfcbank');
     await submit(context);
-    await handleFeeBearer(context);
-    await handleCardValidation(context);
-    await handleMockFailureDialog(context);
-    // await verifyErrorMessage(context, 'The payment has already been processed');
-    await retryTransaction(context);
-    await submit(context);
-    await handleFeeBearer(context);
-    await handleCardValidation(context);
-    await handleMockSuccessDialog(context);
+    await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
+    await handleFeeBearer(context, page);
+    await respondToUPIAjax(context);
+    await respondToUPIPaymentStatus(context);
   });
 });
