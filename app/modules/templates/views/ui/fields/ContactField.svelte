@@ -36,6 +36,7 @@
     {label}
     icon="&#xe607;"
     on:input={e => ($contact = e.target.value)}
+    on:blur
     bind:value
     helpText="Please enter a valid contact number" />
 </div>

@@ -38,5 +38,6 @@
     {label}
     icon="&#xe603;"
     on:input={e => ($email = e.target.value)}
+    on:blur
     helpText="Please enter a valid email. Example: you@example.com" />
 </div>
