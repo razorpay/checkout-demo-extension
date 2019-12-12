@@ -5519,6 +5519,14 @@ Session.prototype = {
       delete data.auth_type;
     }
 
+    /**
+     * For Paper Nach, we need to send auth_type=physical
+     * for now.
+     */
+    if (data.method === 'nach' && !data.auth_type) {
+      data.auth_type = 'physical';
+    }
+
     if (data.partial_payment) {
       delete data.partial_payment;
     }
