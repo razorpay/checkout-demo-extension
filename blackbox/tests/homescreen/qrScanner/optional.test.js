@@ -1,13 +1,12 @@
-const { getTestData } = require('../../../actions');
-const { openCheckoutWithNewHomeScreen } = require('../open');
+const { makeOptions, getTestData } = require('../../../actions');
+const { makePreferences } = require('../../../actions/preferences');
+
 const {
-  submit,
-  selectUPIMethod,
-  enterUPIAccount,
-  handleUPIAccountValidation,
+  selectUPIApp,
+  validateQRImage,
+  responseWithQRImage,
   respondToUPIAjax,
   respondToUPIPaymentStatus,
-  handleFeeBearer,
 } = require('../../../actions/common');
 
 const {
@@ -20,22 +19,21 @@ const {
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
+const { openCheckoutWithNewHomeScreen } = require('../open');
+
 describe.each(
-  getTestData(
-    'Verify UPI Collect with customer Feebearer and callbackURL enabled',
-    {
-      loggedIn: false,
-      options: {
-        amount: 200,
-        personalization: false,
-      },
-      preferences: {
-        fee_bearer: true,
-        optional: ['contact'],
-      },
-    }
-  )
-)('UPI tests', ({ preferences, title, options }) => {
+  getTestData('Perform QR Code with optional contact transaction', {
+    loggedIn: false,
+    options: {
+      key: 'rzp_test_1DP5mmOlF5G5ag',
+      amount: 20000,
+      personalization: false,
+    },
+    preferences: {
+      optional: ['contact'],
+    },
+  })
+)('Perform QR Code transaction', ({ preferences, title, options }) => {
   test(title, async () => {
     preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
@@ -50,12 +48,10 @@ describe.each(
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIMethod(context, 'BHIM');
-    await enterUPIAccount(context, 'BHIM');
-    await submit(context);
-    await handleUPIAccountValidation(context, 'BHIM@upi');
-    await handleFeeBearer(context);
-    await respondToUPIAjax(context);
+    await selectUPIApp(context, '1');
+    await respondToUPIAjax(context, { method: 'qr' });
+    await responseWithQRImage(context);
+    await validateQRImage(context);
     await respondToUPIPaymentStatus(context);
   });
 });

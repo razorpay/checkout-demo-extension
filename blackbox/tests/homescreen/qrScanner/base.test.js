@@ -1,13 +1,12 @@
-const { getTestData } = require('../../../actions');
+const { makeOptions, getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
+
 const {
-  submit,
-  selectUPIMethod,
-  enterUPIAccount,
-  handleUPIAccountValidation,
+  selectUPIApp,
+  validateQRImage,
   respondToUPIAjax,
   respondToUPIPaymentStatus,
-  handleFeeBearer,
+  responseWithQRImage,
 } = require('../../../actions/common');
 
 const {
@@ -21,21 +20,15 @@ const {
 } = require('../actions');
 
 describe.each(
-  getTestData(
-    'Verify UPI Collect with customer Feebearer and callbackURL enabled',
-    {
-      loggedIn: false,
-      options: {
-        amount: 200,
-        personalization: false,
-      },
-      preferences: {
-        fee_bearer: true,
-        optional: ['contact'],
-      },
-    }
-  )
-)('UPI tests', ({ preferences, title, options }) => {
+  getTestData('Basic QR Code payment', {
+    loggedIn: false,
+    options: {
+      key: 'rzp_test_1DP5mmOlF5G5ag',
+      amount: 200000,
+      personalization: false,
+    },
+  })
+)('Perform QR Code transaction', ({ preferences, title, options }) => {
   test(title, async () => {
     preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
@@ -50,12 +43,10 @@ describe.each(
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIMethod(context, 'BHIM');
-    await enterUPIAccount(context, 'BHIM');
-    await submit(context);
-    await handleUPIAccountValidation(context, 'BHIM@upi');
-    await handleFeeBearer(context);
-    await respondToUPIAjax(context);
+    await selectUPIApp(context, '1');
+    await respondToUPIAjax(context, { method: 'qr' });
+    await responseWithQRImage(context);
+    await validateQRImage(context);
     await respondToUPIPaymentStatus(context);
   });
 });

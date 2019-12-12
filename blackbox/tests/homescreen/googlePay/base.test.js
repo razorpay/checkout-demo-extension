@@ -1,13 +1,13 @@
-const { getTestData } = require('../../../actions');
-const { openCheckoutWithNewHomeScreen } = require('../open');
+const { makeOptions, getTestData } = require('../../../actions');
+
 const {
-  submit,
   selectUPIMethod,
   enterUPIAccount,
-  handleUPIAccountValidation,
+  selectBankNameFromGooglePayDropDown,
+  submit,
   respondToUPIAjax,
+  handleUPIAccountValidation,
   respondToUPIPaymentStatus,
-  handleFeeBearer,
 } = require('../../../actions/common');
 
 const {
@@ -20,22 +20,17 @@ const {
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
+const { openCheckoutWithNewHomeScreen } = require('../open');
+
 describe.each(
-  getTestData(
-    'Verify UPI Collect with customer Feebearer and callbackURL enabled',
-    {
-      loggedIn: false,
-      options: {
-        amount: 200,
-        personalization: false,
-      },
-      preferences: {
-        fee_bearer: true,
-        optional: ['contact'],
-      },
-    }
-  )
-)('UPI tests', ({ preferences, title, options }) => {
+  getTestData('Basic GooglePay payment', {
+    loggedIn: false,
+    options: {
+      amount: 200,
+      personalization: false,
+    },
+  })
+)('GooglePay tests', ({ preferences, title, options }) => {
   test(title, async () => {
     preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
@@ -48,13 +43,14 @@ describe.each(
     await proceed(context);
     await assertUserDetails(context);
     await assertEditUserDetailsAndBack(context);
+    //const paymentMethods = ['card', 'netbanking', 'wallet', 'upi'];
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIMethod(context, 'BHIM');
-    await enterUPIAccount(context, 'BHIM');
+    await selectUPIMethod(context, 'Google Pay');
+    await enterUPIAccount(context, 'scbaala');
+    await selectBankNameFromGooglePayDropDown(context, 'okhdfcbank');
     await submit(context);
-    await handleUPIAccountValidation(context, 'BHIM@upi');
-    await handleFeeBearer(context);
+    await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
     await respondToUPIAjax(context);
     await respondToUPIPaymentStatus(context);
   });

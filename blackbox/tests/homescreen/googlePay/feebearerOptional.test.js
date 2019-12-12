@@ -1,13 +1,15 @@
-const { getTestData } = require('../../../actions');
-const { openCheckoutWithNewHomeScreen } = require('../open');
+const { makePreferences } = require('../../../actions/preferences');
+const { makeOptions, getTestData } = require('../../../actions');
+
 const {
+  selectBankNameFromGooglePayDropDown,
   submit,
-  selectUPIMethod,
-  enterUPIAccount,
-  handleUPIAccountValidation,
   respondToUPIAjax,
-  respondToUPIPaymentStatus,
   handleFeeBearer,
+  enterUPIAccount,
+  selectUPIMethod,
+  handleUPIAccountValidation,
+  respondToUPIPaymentStatus,
 } = require('../../../actions/common');
 
 const {
@@ -20,9 +22,11 @@ const {
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
+const { openCheckoutWithNewHomeScreen } = require('../open');
+
 describe.each(
   getTestData(
-    'Verify UPI Collect with customer Feebearer and callbackURL enabled',
+    'Perform GooglePay transaction with feebearer enabled and optional contact',
     {
       loggedIn: false,
       options: {
@@ -35,7 +39,7 @@ describe.each(
       },
     }
   )
-)('UPI tests', ({ preferences, title, options }) => {
+)('GooglePay tests', ({ preferences, title, options }) => {
   test(title, async () => {
     preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
@@ -50,11 +54,12 @@ describe.each(
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIMethod(context, 'BHIM');
-    await enterUPIAccount(context, 'BHIM');
+    await selectUPIMethod(context, 'Google Pay');
+    await enterUPIAccount(context, 'scbaala');
+    await selectBankNameFromGooglePayDropDown(context, 'okhdfcbank');
     await submit(context);
-    await handleUPIAccountValidation(context, 'BHIM@upi');
-    await handleFeeBearer(context);
+    await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
+    await handleFeeBearer(context, page);
     await respondToUPIAjax(context);
     await respondToUPIPaymentStatus(context);
   });
