@@ -2,6 +2,7 @@ const { randomContact, randomEmail, delay } = require('../../util');
 const personalizationActions = require('./personalization-actions');
 const downtimeTimeoutActions = require('./downtime-actions');
 const emandateActions = require('./emandate-actions.js');
+const paylaterActions = require('./paylater-actions');
 
 /**
  * Sets the state in context
@@ -241,6 +242,7 @@ async function assertPaymentMethods(context) {
     'upi',
     'emi',
     'bank_transfer',
+    'paylater',
   ]).toEqual(expect.arrayContaining(methods));
 }
 
@@ -302,4 +304,5 @@ module.exports = {
   ...personalizationActions,
   ...downtimeTimeoutActions,
   ...emandateActions,
+  ...paylaterActions,
 };
