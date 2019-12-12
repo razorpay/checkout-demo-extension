@@ -20,7 +20,6 @@ async function assertNetbankingPage(context) {
     await context.page.$eval('label[for=bank-radio-YESB]', visible)
   ).toEqual(true);
 }
-
 module.exports = {
   assertNetbankingPage,
 };

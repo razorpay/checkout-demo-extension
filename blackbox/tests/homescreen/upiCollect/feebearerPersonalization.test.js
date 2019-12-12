@@ -15,7 +15,7 @@ const {
   assertUserDetails,
   assertPaymentMethods,
   assertEditUserDetailsAndBack,
-  verifyPersonalizationVPAText,
+  verifyPersonalizationText,
   selectPersonalizationPaymentMethod,
 } = require('../actions');
 
@@ -47,7 +47,7 @@ describe.each(
     await assertUserDetails(context);
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
-    await verifyPersonalizationVPAText(context);
+    await verifyPersonalizationText(context, 'upi');
     await selectPersonalizationPaymentMethod(context, 1);
     await submit(context);
     await handleUPIAccountValidation(context, 'dsd@okhdfcbank');
