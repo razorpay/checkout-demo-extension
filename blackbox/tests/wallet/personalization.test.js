@@ -3,21 +3,22 @@ const { makePreferences } = require('../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
-  assertPaymentMethodsPersonalization,
+  verifyPersonalizationText,
   submit,
   handleOtpVerification,
   typeOTPandSubmit,
   handleValidationRequest,
+  selectPersonalizationPaymentMethod,
 } = require('../../actions/common');
 
-describe.skip('Wallet with Personalization  payment', () => {
+describe('Wallet with Personalization  payment', () => {
   test('Perform Wallet with Personalization transaction', async () => {
     const options = {
       key: 'rzp_test_VwsqHDsQPoVQi6',
       amount: 60000,
+      personalization: true,
     };
     const preferences = makePreferences();
-    preferences.methods.upi = true;
     const context = await openCheckout({
       page,
       options,
@@ -25,9 +26,9 @@ describe.skip('Wallet with Personalization  payment', () => {
       method: 'Wallet',
     });
     await assertHomePage(context, true, true);
-    await fillUserDetails(context, true, '8888888885');
-    await assertPaymentMethodsPersonalization(context);
-    await delay(1000);
+    await fillUserDetails(context, '8888888881');
+    await verifyPersonalizationText(context, 'wallet');
+    await selectPersonalizationPaymentMethod(context, '1');
     await submit(context);
     await handleOtpVerification(context);
     await typeOTPandSubmit(context);

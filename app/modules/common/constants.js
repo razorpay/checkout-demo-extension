@@ -72,8 +72,11 @@ export const TAB_TITLES = {
  */
 export const SHOWN_CLASS = 'drishy';
 
-export const CONTACT_PATTERN = /^\+?[0-9]{8,15}$/;
-export const EMAIL_PATTERN = /^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/;
+export const CONTACT_PATTERN = '^\\+?[0-9]{8,15}$';
+export const CONTACT_REGEX = new RegExp(CONTACT_PATTERN);
+
+export const EMAIL_PATTERN = '^[^@\\s]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)+$';
+export const EMAIL_REGEX = new RegExp(EMAIL_PATTERN);
 
 export const UPI_POLL_URL = 'rzp_upi_payment_poll_url';
 export const PENDING_PAYMENT_TS = 'rzp_upi_pending_payment_timestamp';
