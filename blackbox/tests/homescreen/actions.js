@@ -243,6 +243,7 @@ async function assertPaymentMethods(context) {
     'emi',
     'bank_transfer',
     'paylater',
+    'cardless_emi',
   ]).toEqual(expect.arrayContaining(methods));
 }
 
