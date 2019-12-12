@@ -91,17 +91,12 @@ describe('Basic upi payment', () => {
     await selectOffer(context, '1');
     await verifyOfferApplied(context);
     await verifyDiscountPaybleAmount(context, '₹ 1,990');
-    console.log('1');
     await verifyDiscountAmountInBanner(context, '₹ 1,990');
-    console.log('2');
     await verifyDiscountText(context, 'You save ₹ 10');
-    console.log('3');
-    // await delay(30000);
     await verifyHighDowntime(
       context,
       'upi',
       ' UPI\n          is experiencing low success rates.'
     );
-    console.log('4');
   });
 });

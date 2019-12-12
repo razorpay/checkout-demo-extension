@@ -59,7 +59,6 @@ describe('Basic upi payment', () => {
     await assertUserDetails(context);
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
-    console.log('3');
     await verifyHighDowntime(
       context,
       'upi',
