@@ -9,7 +9,7 @@ const {
   handleMockSuccessDialog,
   handlePartialPayment,
   verifyPartialAmount,
-} = require('../../actions/common');
+} = require('../../../actions/common');
 describe.skip('Third Party Verification test', () => {
   test('Perform Third Party Verification transaction with Partial Payments enabled', async () => {
     const options = {
