@@ -22,8 +22,9 @@ const {
 
 describe.each(
   getTestData(
-    'Verify UPI downtime - Low with callbackURLand customer feebearer enabled',
+    'Verify UPI Collect with customer Feebearer and callbackURL enabled',
     {
+      loggedIn: false,
       options: {
         amount: 200,
         personalization: false,

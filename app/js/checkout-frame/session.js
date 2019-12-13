@@ -11,8 +11,8 @@ var preferences = window.preferences,
   tab_titles = Constants.TAB_TITLES,
   getDownBanks = Bank.getDownBanks,
   freqWallets = Wallet.wallets,
-  contactPattern = Constants.CONTACT_PATTERN,
-  emailPattern = Constants.EMAIL_PATTERN,
+  contactPattern = Constants.CONTACT_REGEX,
+  emailPattern = Constants.EMAIL_REGEX,
   ua_Android = discreet.UserAgent.androidBrowser,
   isMobile = discreet.UserAgent.isMobile,
   cookieDisabled = !navigator.cookieEnabled,
@@ -1219,6 +1219,7 @@ Session.prototype = {
   },
 
   fillData: function() {
+    var self = this;
     var oldMethod = this.data.method;
     if (oldMethod) {
       this.wants_skip = true;
@@ -1251,7 +1252,7 @@ Session.prototype = {
 
     if (tab && !(this.order && this.order.bank) && this.methods[tab]) {
       this.switchTab(tab);
-    } else if (tab === '') {
+    } else if (tab === '' && this.newHomeScreen) {
       this.switchTab(tab);
     }
 
@@ -1307,6 +1308,7 @@ Session.prototype = {
           var val = data[name];
           if (el && val) {
             el.value = val;
+            self.input(el);
           }
         }
       );
@@ -1487,7 +1489,8 @@ Session.prototype = {
           this.handleOfferSelection.bind(this),
           this.handleOfferRemoval.bind(this),
           this.formatAmountWithCurrency.bind(this),
-          $('#body')[0]
+          $('#body')[0],
+          this
         );
 
         this.renderOffers(this.screen);
@@ -5514,6 +5517,14 @@ Session.prototype = {
        * API takes 3DS, which is the default anyway.
        */
       delete data.auth_type;
+    }
+
+    /**
+     * For Paper Nach, we need to send auth_type=physical
+     * for now.
+     */
+    if (data.method === 'nach' && !data.auth_type) {
+      data.auth_type = 'physical';
     }
 
     if (data.partial_payment) {

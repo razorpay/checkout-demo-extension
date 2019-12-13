@@ -5,6 +5,9 @@
   // UI imports
   import Field from 'templates/views/ui/Field.svelte';
 
+  // Utils
+  import { EMAIL_PATTERN } from 'common/constants';
+
   // Props
   export let value;
 
@@ -18,9 +21,7 @@
   const prefilledEmail = prefill.email;
   const isEmailReadonly = readonly.email && prefilledEmail;
 
-  const EMAIL_REGEX = optional.email
-    ? '.*'
-    : '^[^@\\s]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)+$';
+  const EMAIL_REGEX = optional.email ? '.*' : EMAIL_PATTERN;
 
   const label = optional.email ? 'Email (Optional)' : 'Email';
 </script>
@@ -37,5 +38,6 @@
     {label}
     icon="&#xe603;"
     on:input={e => ($email = e.target.value)}
+    on:blur
     helpText="Please enter a valid email. Example: you@example.com" />
 </div>
