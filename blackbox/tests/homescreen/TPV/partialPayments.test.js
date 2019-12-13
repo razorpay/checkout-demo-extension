@@ -1,5 +1,5 @@
-const { openCheckout } = require('../../actions/checkout');
-const { makePreferences } = require('../../actions/preferences');
+const { openCheckout } = require('../../../actions/checkout');
+const { makePreferences } = require('../../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
