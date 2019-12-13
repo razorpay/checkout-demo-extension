@@ -15,12 +15,6 @@ async function handlePartialPayment(context, amount) {
     '#partial-radio'
   );
   await makePartialCheckBox.click();
-  // await delay(800);
-  // await makePartialCheckBox.click();
-  // await makePartialCheckBox.click();
-  // await delay(800);
-  // await makePartialCheckBox.click();
-  // await makePartialCheckBox.click();
   const amountValue = await context.page.waitForSelector('#amount-value');
   await amountValue.type(amount);
   await delay(300);

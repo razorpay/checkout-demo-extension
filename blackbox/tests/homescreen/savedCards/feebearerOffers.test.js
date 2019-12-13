@@ -87,7 +87,7 @@ describe.each(
     await handleCustomerCardStatusRequest(context);
     await typeOTPandSubmit(context);
     await respondSavedCards(context);
-    await await viewOffers(context);
+    await viewOffers(context);
     await selectOffer(context, '1');
     await verifyOfferApplied(context);
     await verifyDiscountPaybleAmount(context, '₹ 1,980');

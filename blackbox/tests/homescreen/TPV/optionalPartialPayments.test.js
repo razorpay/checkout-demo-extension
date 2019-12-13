@@ -1,5 +1,5 @@
-const { openCheckout } = require('../../actions/checkout');
-const { makePreferences } = require('../../actions/preferences');
+const { openCheckout } = require('../../../actions/checkout');
+const { makePreferences } = require('../../../actions/preferences');
 const {
   assertHomePage,
   fillUserDetails,
@@ -9,7 +9,7 @@ const {
   handleMockSuccessDialog,
   handlePartialPayment,
   verifyPartialAmount,
-} = require('../../actions/common');
+} = require('../../../actions/common');
 describe.skip('Third Party Verification test', () => {
   test('Perform Third Party Verification transaction with Partial Payments enabled and contact optional', async () => {
     const options = {

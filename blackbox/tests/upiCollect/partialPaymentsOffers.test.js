@@ -1,6 +1,5 @@
 const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
-const { delay, visible } = require('../../util');
 const {
   assertHomePage,
   fillUserDetails,
@@ -62,9 +61,7 @@ describe.skip('Basic upi payment', () => {
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
-    await delay(20000);
     await handlePartialPayment(context, '100');
-    await delay(10000);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await selectUPIMethod(context, 'BHIM');
