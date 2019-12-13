@@ -43,7 +43,6 @@ describe('Basic upi payment', () => {
     });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, '8888888881');
-    // await delay(30000);
     await verifyPersonalizationText(context, 'upi');
     await verifyHighDowntime(
       context,
