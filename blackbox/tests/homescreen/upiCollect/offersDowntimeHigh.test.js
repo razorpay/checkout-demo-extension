@@ -22,7 +22,6 @@ const {
 
 describe.each(
   getTestData('Verify upi downtime - high with offers applied', {
-    loggedIn: false,
     options: {
       amount: 200,
       personalization: false,

@@ -24,7 +24,6 @@ describe.each(
   getTestData(
     'Perform upi collect transaction with customer feebearer enabled',
     {
-      loggedIn: false,
       options: {
         amount: 200,
         personalization: false,

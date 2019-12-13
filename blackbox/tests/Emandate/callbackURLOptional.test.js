@@ -1,6 +1,5 @@
 const { openCheckout } = require('../../actions/checkout');
 const { makePreferences } = require('../../actions/preferences');
-const { delay } = require('../../util');
 const {
   assertHomePage,
   fillUserDetails,
@@ -37,7 +36,6 @@ describe('Netbanking tests', () => {
     const context = await openCheckout({ page, options, preferences });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
-    await delay(300);
     await submit(context);
     await verifyEmandateBank(context);
     await selectEmandateNetbanking(context);

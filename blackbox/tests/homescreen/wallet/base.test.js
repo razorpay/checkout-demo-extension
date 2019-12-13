@@ -22,7 +22,6 @@ const {
 
 describe.each(
   getTestData('Perform wallet transaction', {
-    loggedIn: false,
     options: {
       amount: 200,
       personalization: false,

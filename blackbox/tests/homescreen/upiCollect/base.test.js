@@ -21,7 +21,6 @@ const {
 
 describe.each(
   getTestData('Perform upi collect transaction', {
-    loggedIn: false,
     options: {
       amount: 200,
       personalization: false,

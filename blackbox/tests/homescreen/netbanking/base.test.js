@@ -20,7 +20,6 @@ const {
 
 describe.each(
   getTestData('perform netbaking transaction', {
-    loggedIn: false,
     options: {
       amount: 200,
       personalization: false,

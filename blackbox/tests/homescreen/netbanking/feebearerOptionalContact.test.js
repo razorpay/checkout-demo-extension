@@ -23,7 +23,6 @@ describe.each(
   getTestData(
     'perform netbanking transaction with fee bearer and contact optional',
     {
-      loggedIn: false,
       options: {
         amount: 600,
         personalization: false,

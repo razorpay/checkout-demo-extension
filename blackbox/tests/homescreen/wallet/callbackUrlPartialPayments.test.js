@@ -22,7 +22,6 @@ describe.each(
   getTestData(
     'Perform wallet transaction with callbackURL and Partial Payments enabled',
     {
-      loggedIn: false,
       options: {
         amount: 20000,
         personalization: false,

@@ -25,7 +25,6 @@ describe.each(
   getTestData(
     'Perform saved card transaction with callback URL and partial payments enabled',
     {
-      loggedIn: false,
       options: {
         amount: 200,
         personalization: true,

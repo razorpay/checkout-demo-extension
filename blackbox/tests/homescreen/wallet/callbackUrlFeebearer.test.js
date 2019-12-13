@@ -22,7 +22,6 @@ describe.each(
   getTestData(
     'Perform wallet transaction with callbackURL and customer feebearer enabled',
     {
-      loggedIn: false,
       options: {
         amount: 200,
         personalization: false,

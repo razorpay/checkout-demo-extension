@@ -23,7 +23,6 @@ describe.each(
   getTestData(
     'Perform saved card transaction with personalization and callbackURL',
     {
-      loggedIn: false,
       options: {
         amount: 200,
         personalization: true,

@@ -19,7 +19,6 @@ const {
 
 describe.each(
   getTestData('perform netbaking transaction with callback url', {
-    loggedIn: false,
     options: {
       amount: 200,
       personalization: false,

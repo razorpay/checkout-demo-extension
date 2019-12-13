@@ -22,7 +22,6 @@ describe.each(
   getTestData(
     'Perform upi collect transaction with callbackURL and contact optional',
     {
-      loggedIn: false,
       options: {
         amount: 200,
         personalization: false,
