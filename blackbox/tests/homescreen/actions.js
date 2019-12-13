@@ -1,6 +1,7 @@
 const { randomContact, randomEmail, delay } = require('../../util');
 const personalizationActions = require('./personalization-actions');
 const downtimeTimeoutActions = require('./downtime-actions');
+const emandateActions = require('./emandate-actions.js');
 
 /**
  * Sets the state in context
@@ -302,4 +303,5 @@ module.exports = {
   assertMissingDetails,
   ...personalizationActions,
   ...downtimeTimeoutActions,
+  ...emandateActions,
 };
