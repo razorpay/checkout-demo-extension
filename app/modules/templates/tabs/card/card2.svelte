@@ -1,4 +1,5 @@
 <script>
+  /* global each */
   import { fly } from 'svelte/transition';
 
   import Tab from 'templates/tabs/Tab.svelte';
@@ -15,203 +16,132 @@
 
   // Utils imports
   import { getSession } from 'sessionmanager';
-
-  export let askOTP = _Func.noop;
+  import { getSavedCards } from 'common/token';
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
 
   let currentView = 'add-card';
   let cardType = null;
+  let savedCards = [];
+
+  let showAddCardCta = false;
+  $: showAddCardCta = savedCards && savedCards.length;
+
+  // Refs
+  let savedCardsView;
 
   const session = getSession();
 
-  const cards = [
-    {
-      id: 'token_DiV5lzvFEwI31Y',
-      entity: 'token',
-      token: 'HwsKpQLNbKBrZ5',
-      bank: null,
-      wallet: null,
-      method: 'card',
-      card: {
-        entity: 'card',
-        name: 'Test Service Center',
-        last4: '1111',
-        network: 'Visa',
-        type: 'debit',
-        issuer: null,
-        international: false,
-        emi: false,
-        expiry_month: 2,
-        expiry_year: 2021,
-        flows: { recurring: false, iframe: true },
-        networkCode: 'visa',
-      },
-      recurring: false,
-      auth_type: null,
-      mrn: null,
-      used_at: 1574232987,
-      created_at: 1574232987,
-      expired_at: 1614536999,
-      plans: null,
-      cvvDigits: 3,
-      debitPin: false,
-    },
-    {
-      id: 'token_Bsz59A6aWr7RsR',
-      entity: 'token',
-      token: 'HSUHVkyFGqBFll',
-      bank: null,
-      wallet: null,
-      method: 'card',
-      card: {
-        entity: 'card',
-        name: 'Chintan',
-        last4: '8293',
-        network: 'Visa',
-        type: 'debit',
-        issuer: 'SBIN',
-        international: false,
-        emi: false,
-        expiry_month: 2,
-        expiry_year: 2021,
-        flows: { recurring: false, iframe: false },
-        networkCode: 'visa',
-      },
-      recurring: false,
-      auth_type: null,
-      mrn: null,
-      used_at: 1556195751,
-      created_at: 1549447828,
-      expired_at: 1614536999,
-      plans: false,
-      cvvDigits: 3,
-      debitPin: false,
-    },
-  ];
+  function setSavedCards() {
+    const { customer } = session;
+    const tokens = customer && customer.tokens && customer.tokens.count;
+    if (tokens) {
+      var tokensList = customer.tokens;
+      // TODO: check what this if condition does
+      if (
+        _Doc.querySelectorAll('.saved-card').length !== tokensList.items.length
+      ) {
+        try {
+          // Keep EMI cards at the end
+          tokensList.items.sort(function(a, b) {
+            if (a.card && b.card) {
+              if (a.card.emi && b.card.emi) {
+                return 0;
+              } else if (a.card.emi) {
+                return 1;
+              } else if (b.card.emi) {
+                return -1;
+              }
+            }
+          });
+        } catch (e) {}
+
+        var savedCardsCount = getSavedCards(tokensList.items).length;
+
+        if (savedCardsCount) {
+          Analytics.setMeta('has.savedCards', true);
+          Analytics.setMeta('count.savedCards', savedCardsCount);
+          Analytics.track('saved_cards', {
+            type: AnalyticsTypes.RENDER,
+            data: {
+              count: savedCardsCount,
+            },
+          });
+        }
+
+        savedCards = session.transformTokens(tokensList.items); // Rajat, looks emi is this needed here?
+        // showSavedCards = true;
+        // TODO: show saved cards
+
+        var totalSavedCards = getSavedCards(savedCards).length;
+      }
+    }
+
+    // TODO: check if this can be removed
+    // var selectableSavedCard = getSelectableSavedCardElement(
+    //   'card', //hardcoding for now
+    //   this.selectedSavedCardToken
+    // );
+    //
+    // if (tokens && selectableSavedCard) {
+    //   session.setSavedCard({ delegateTarget: selectableSavedCard });
+    // }
+
+    session.savedCardScreen = tokens;
+
+    // TODO: implement
+    // toggleSavedCards(!!tokens);
+
+    // TODO: check if this is required
+    _El.toggleClass(_Doc.querySelector('#form-card'), 'has-cards'); //TODO: pure functions
+
+    // TODO: handle this using Field component
+    each(_Doc.querySelectorAll('.saved-cvv'), function(i, input) {
+      // delegator.add('number', input);
+    });
+  }
+
+  export function showSavedCards() {
+    setView('saved-cards');
+  }
 
   function setView(view) {
     currentView = view;
   }
 
-  function showCards() {
-    // TODO: implement
+  function toggleSavedCards(condition) {
+    if (condition) {
+      setView('saved-cards');
+    }
   }
 
   export function getPayload() {
-    return {
-      'card[number]': $cardNumber,
-      'card[expiry]': $cardExpiry,
-      'card[cvv]': $cardCvv,
-      'card[name]': $cardName,
-    };
+    if (currentView === 'add-card') {
+      return {
+        'card[number]': $cardNumber,
+        'card[expiry]': $cardExpiry,
+        'card[cvv]': $cardCvv,
+        'card[name]': $cardName,
+      };
+    } else {
+      return savedCardsView.getSelectedToken();
+    }
   }
 
-  // function onSixDigits(e) {
-  //   const el = _Doc.querySelector('#card_number');
-  //   var emi_options = session.emi_options; // Rajat: remove this later.
-  //   const cardType = _Doc.querySelector('#elem-card .cardtype[cardtype]');
-  //   var nocvvCheck = _Doc.querySelector('nocvv');
-  //   var emiObj;
-  //   var val = el.value;
-  //
-  //   var isMaestro = /^maestro/.test(cardType);
-  //   var sixDigits = val.length > 5;
-  //   var trimmedVal = val.replace(/[ ]/g, '');
-  //
-  //   _El.toggleClass(el.parentNode, 'six');
-  //
-  //   if (sixDigits) {
-  //     if (isMaestro) {
-  //       if (nocvvCheck.disabled) {
-  //         toggleNoCvv(true);
-  //       }
-  //     } else {
-  //       each(emi_options.banks, function(bank, emiObjInner) {
-  //         if (emiObjInner.patt.test(val.replace(/ /g, ''))) {
-  //           emiObj = emiObjInner;
-  //         }
-  //       });
-  //
-  //       toggleNoCvv(false);
-  //     }
-  //   } else {
-  //     toggleNoCvv(false);
-  //   }
-  //
-  //   this.emiPlansForNewCard = emiObj;
-  //
-  //   if (emiObj) {
-  //     _Doc.querySelector('#expiry-cvv').removeClass('hidden'); //Rajat, convention for id of elements
-  //   } else {
-  //     _Doc.querySelector('#emi_duration').value = '';
-  //   }
-  //
-  //   if (trimmedVal.length >= 6) {
-  //     var emiBankChangeEvent;
-  //     if (typeof Event === 'function') {
-  //       emiBankChangeEvent = new Event('change');
-  //     } else {
-  //       emiBankChangeEvent = document.createEvent('Event');
-  //       emiBankChangeEvent.initEvent('change', true, true);
-  //     }
-  //   }
-  //
-  //   noCvvToggle();
-  //
-  //   var elem_emi = _Doc.querySelector('#elem-emi');
-  //   var hiddenClass = 'hidden';
-  //
-  //   if (isMaestro && sixDigits) {
-  //     elem_emi.addClass(hiddenClass);
-  //   } else if (elem_emi.classList.contains(hiddenClass)) {
-  //     invoke('removeClass', elem_emi, hiddenClass, 200);
-  //   }
-  // }
+  function handleViewPlans(event) {
+    debugger;
+    Analytics.track('saved_card:emi:plans:view', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        from: session.tab,
+      },
+    });
+
+    session.showEmiPlans('saved')(event.detail);
+  }
 
   export function onShown() {
-    let { customer } = session;
-    session.otpView.updateScreen({
-      maxlength: 6,
-    });
-    // onSixDigits.call(this);
-    const remember = session.get('remember_customer');
-
-    if (!remember) {
-      // Rajat
-      return session.setScreen('card');
-    }
-
-    session.tab_titles.otp = session.tab_titles.card; //Rajat, how is this working?
-    session.otpView.updateScreen({
-      skipText: 'Skip Saved Cards',
-    });
-    if (!session.customer.logged && !session.wants_skip) {
-      session.commenceOTP('saved cards', true);
-      customer.checkStatus(function() {
-        /**
-         * 1. If this is a recurring payment and customer doesn't have saved cards,
-         *    create and ask for OTP.
-         * 2. If customer has saved cards and is not logged in, ask for OTP.
-         * 3. If customer doesn't have saved cards, show cards screen.
-         */
-        if (session.recurring && !customer.saved && !customer.logged) {
-          customer.createOTP(function() {
-            askOTP(
-              session.otpView,
-              'Enter OTP sent on ' +
-                session.getPhone() +
-                '<br>to save your card for future payments',
-              true
-            );
-          });
-        } else if (customer.saved && !customer.logged) {
-          askOTP(session.otpView, undefined, true);
-        } else {
-          // showCards();
-        }
-      });
-    } else {
-      // showCards();
-    }
+    setSavedCards();
   }
 </script>
 
@@ -228,18 +158,23 @@
 <Tab method="card" pad={false}>
   {#if currentView === 'add-card'}
     <div transition:fly={{ duration: 100, y: 100 }}>
-      <div
-        id="show-saved-cards"
-        on:click={() => setView('saved-cards')}
-        class="text-btn left-card">
-        Use saved cards
-      </div>
+      {#if showAddCardCta}
+        <div
+          id="show-saved-cards"
+          on:click={() => showSavedCards()}
+          class="text-btn left-card">
+          Use saved cards
+        </div>
+      {/if}
       <AddCardView bind:cardType />
     </div>
   {:else}
     <div>
       <div id="saved-cards-container">
-        <SavedCards {cards} />
+        <SavedCards
+          cards={savedCards}
+          bind:this={savedCardsView}
+          on:viewPlans={handleViewPlans} />
       </div>
       <div
         id="show-add-card"

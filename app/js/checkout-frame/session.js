@@ -3769,7 +3769,7 @@ Session.prototype = {
       send_ecod_link.call(this);
     }
 
-    if (tab === 'emi' && this.screen !== 'emi') {
+    if (tab === 'card' || (tab === 'emi' && this.screen !== 'emi')) {
       this.showCardTab(tab);
       setEmiPlansCta(this.screen, tab);
     } else {
@@ -3809,6 +3809,7 @@ Session.prototype = {
       maxlength: 6,
     });
 
+    // TODO: move to onShown/onMount
     onSixDigits.call(this, {
       target: gel('card_number'),
     });
@@ -3816,6 +3817,8 @@ Session.prototype = {
     var self = this;
     var customer = self.customer;
     var remember = self.get('remember_customer');
+
+    // TODO: move to onShown/onMount/computed
     $('#form-card').toggleClass('save-enabled', remember);
 
     if (!remember) {
@@ -3849,11 +3852,11 @@ Session.prototype = {
         } else if (customer.saved && !customer.logged) {
           askOTP(self.otpView, undefined, true);
         } else {
-          self.showCards();
+          self.setScreen('card');
         }
       });
     } else {
-      self.showCards();
+      self.setScreen('card');
     }
   },
 
@@ -4336,22 +4339,6 @@ Session.prototype = {
 
         this.transformedTokens = this.transformTokens(tokensList.items);
 
-        this.savedCardsView.$set({
-          cards: this.transformedTokens,
-          on: {
-            viewPlans: function(event) {
-              Analytics.track('saved_card:emi:plans:view', {
-                type: AnalyticsTypes.BEHAV,
-                data: {
-                  from: self.tab,
-                },
-              });
-
-              self.showEmiPlans('saved')(event.detail);
-            },
-          },
-        });
-
         var totalSavedCards = discreet.Token.getSavedCards(
           this.transformedTokens
         ).length;
@@ -4361,6 +4348,7 @@ Session.prototype = {
             '#form-card .saved-card-pay-without-emi',
             '#add-card-container .emi-pay-without',
           ];
+          // TODO: port to svelte tab
           each(selectorsForSavedCardText, function(index, selector) {
             var stripEl = $(selector);
             if (stripEl[0]) {
@@ -4626,15 +4614,6 @@ Session.prototype = {
             var $emiDuration = $checkedCard.$('.emi_duration');
             var appliedOffer = this.offers && this.offers.offerSelectedByDrawer;
             appliedOffer = appliedOffer || {};
-            data.token = $checkedCard.attr('token');
-            data['card[cvv]'] = $checkedCard.$('.saved-cvv').val();
-
-            // Set auth_type for Debit+PIN for saved cards.
-            var authType = $checkedCard.$('.flow.input-radio input:checked');
-            authType = authType[0] && authType.val();
-            if (authType) {
-              data['auth_type'] = authType;
-            }
 
             if (
               (tab === 'emi' || appliedOffer.payment_method === 'emi') &&

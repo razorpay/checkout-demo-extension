@@ -1,22 +1,45 @@
 <script>
+  // Svelte imports
+  import { createEventDispatcher } from 'svelte';
+
   // UI imports
-  import { afterUpdate } from 'svelte';
   import SavedCard from 'templates/views/savedcard.svelte';
-  import * as Card from 'common/card';
 
   // Props
   export let cards = [];
-  export let on = {};
-  let selected = '';
+  let selected = {};
+
+  // TODO: handle for radio as well
+  let currentCvv = '';
+  let currentAuthType = '';
+
+  const dispatch = createEventDispatcher();
 
   export function onViewPlans(event) {
-    if (on.viewPlans) {
-      on.viewPlans(event);
-    }
+    dispatch('viewPlans', event.detail);
   }
 
-  export function handleClick(id) {
-    selected = id;
+  function handleClick(card, { cvv, authType }) {
+    dispatch('select', { token: card });
+    currentCvv = cvv;
+    currentAuthType = authType;
+    selected = card;
+  }
+
+  function handleCvvChange(event) {
+    currentCvv = event.detail.cvv;
+  }
+
+  function handleAuthTypeChange(event) {
+    currentAuthType = event.detail.authType;
+  }
+
+  export function getSelectedToken() {
+    const payload = { token: selected.token, 'card[cvv]': currentCvv };
+    if (currentAuthType) {
+      payload.auth_type = currentAuthType;
+    }
+    return payload;
   }
 </script>
 
@@ -27,9 +50,11 @@
     token={card.token}
     cvvDigits={card.cvvDigits}
     plans={card.plans}
-    on:click={() => {
-      handleClick(card.id);
+    on:click={event => {
+      handleClick(card, event.detail);
     }}
-    selected={selected === card.id}
+    on:cvvchange={handleCvvChange}
+    on:authtypechange={handleAuthTypeChange}
+    selected={selected.id === card.id}
     on:viewPlans={onViewPlans} />
 {/each}

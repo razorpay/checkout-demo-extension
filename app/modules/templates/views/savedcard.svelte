@@ -22,6 +22,9 @@
   export let attributes;
   export let showOuter;
 
+  let cvvValue = '';
+  let authType = debitPin ? 'c3ds' : '';
+
   const dispatch = createEventDispatcher();
 
   $: {
@@ -49,6 +52,15 @@
 
   $: showOuter = card.networkCode === 'maestro' || debitPin || plans;
 
+  function handleAuthRadioChanged(event) {
+    trackAtmRadio(event);
+    authType = event.target.value;
+    const payload = {
+      authType,
+    };
+    dispatch('authtypechange', payload);
+  }
+
   function trackAtmRadio(event) {
     Analytics.track('atmpin:flows:change', {
       type: AnalyticsTypes.BEHAV,
@@ -58,12 +70,20 @@
       },
     });
   }
+
+  function handleClick() {
+    const payload = { cvv: cvvValue };
+    if (debitPin) {
+      payload.authType = authType;
+    }
+    dispatch('click', payload);
+  }
 </script>
 
 <div
   class="saved-card "
   class:checked={selected}
-  on:click
+  on:click={handleClick}
   tabIndex="0"
   {...attributes}>
   <div class="help up">EMI is not available on this card</div>
@@ -77,6 +97,8 @@
       pattern={`[0-9]{${cvvDigits}}`}
       placeholder="CVV"
       required
+      on:input={_ => dispatch('cvvchange', { cvv: cvvValue })}
+      bind:value={cvvValue}
       type="tel" />
   </div>
   {#if showOuter}
