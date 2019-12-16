@@ -39,6 +39,10 @@
     margin-left: 20px;
     width: 33.33%;
   }
+
+  .save-checkbox {
+    margin-top: 24px;
+  }
 </style>
 
 <div class="pad" id="add-card-container">
@@ -62,5 +66,17 @@
       <!-- TODO: pass type -->
       <CvvField bind:value={$cardCvv} {cardType} />
     </div>
+  </div>
+  <div class="row save-checkbox">
+    <label class="first" id="should-save-card" for="save" tabIndex="0">
+      <input
+        type="checkbox"
+        class="checkbox--square"
+        id="save"
+        name="save"
+        value="1" />
+      <span class="checkbox" />
+      Remember Card
+    </label>
   </div>
 </div>
