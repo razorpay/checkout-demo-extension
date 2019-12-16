@@ -67,7 +67,8 @@
   }
 
   function handleNetwork(data) {
-    dispatch('network', { type });
+    type = data.type;
+    dispatch('network', data);
     // TODO: check what amex, maestro and noamex classes do
     // update cvv element
     // var cvvlen = type !== 'amex' ? 3 : 4;
@@ -202,7 +203,7 @@
   .icon {
     position: absolute;
     right: 4px;
-    top: 32px;
+    top: 24px;
     width: 24px;
   }
 </style>
