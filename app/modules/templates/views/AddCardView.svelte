@@ -33,8 +33,10 @@
     switch (curField) {
       case 'numberField':
         expiryField.ref.focus();
+        break;
       case 'expiryField':
         $cardName ? cvvField.ref.focus() : nameField.ref.focus();
+        break;
       default:
         return;
     }
