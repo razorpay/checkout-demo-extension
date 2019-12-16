@@ -215,6 +215,16 @@
   }
 </script>
 
+<style>
+  #show-saved-cards {
+    cursor: pointer;
+    height: unset;
+    transition: 0.2s;
+    transition-delay: 0.15s;
+    z-index: 1;
+  }
+</style>
+
 <Tab method="card" pad={false}>
   {#if currentView === 'add-card'}
     <div transition:fly={{ duration: 100, y: 100 }}>
