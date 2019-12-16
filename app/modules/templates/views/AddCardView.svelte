@@ -10,6 +10,7 @@
     cardExpiry,
     cardName,
     cardNumber,
+    remember,
   } from 'checkoutstore/screens/card';
 
   // Utils
@@ -56,6 +57,7 @@
 
   .save-checkbox {
     margin-top: 24px;
+    justify-content: space-between;
   }
 </style>
 
@@ -86,15 +88,19 @@
     </div>
   </div>
   <div class="row save-checkbox">
-    <label class="first" id="should-save-card" for="save" tabIndex="0">
-      <input
-        type="checkbox"
-        class="checkbox--square"
-        id="save"
-        name="save"
-        value="1" />
-      <span class="checkbox" />
-      Remember Card
-    </label>
+    <div>
+      <label for="save" tabIndex="0">
+        <input
+          type="checkbox"
+          class="checkbox--square"
+          id="save"
+          name="save"
+          value="1"
+          bind:checked={$remember} />
+        <span class="checkbox" />
+        Remember Card
+      </label>
+    </div>
+    <div id="view-emi-plans" class="link">View all EMI Plans</div>
   </div>
 </div>
