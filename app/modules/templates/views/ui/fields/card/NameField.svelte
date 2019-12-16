@@ -2,6 +2,7 @@
   import Field from 'templates/views/ui/Field.svelte';
 
   export let value = '';
+  export let ref = null;
 
   const NAME_PATTERN = "^[a-zA-Z. 0-9'-]{1,100}$";
 
@@ -20,6 +21,7 @@
   type="text"
   {value}
   on:input={handleInput}
+  bind:this={ref}
   handleBlur
   handleFocus
   handleInput />

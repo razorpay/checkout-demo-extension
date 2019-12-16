@@ -23,6 +23,7 @@
   export let loading = true;
   export let data = null;
   export let error = null;
+  let cardNumber;
   /*
   global each Event invoke
   */

@@ -1,6 +1,8 @@
 <script>
   import Field from 'templates/views/ui/Field.svelte';
 
+  export let ref = null;
+
   function getCvvDigits(type) {
     return type === 'amex' ? 4 : 3;
   }
@@ -35,6 +37,7 @@
   type="tel"
   maxlength={cvvLength}
   {value}
+  bind:this={ref}
   on:input={handleInput}
   handleBlur
   handleFocus

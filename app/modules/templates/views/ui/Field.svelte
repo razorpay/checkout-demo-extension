@@ -41,8 +41,13 @@
   // Refs
   export let wrap = null;
   export let input = null;
+  let formatterObj = null;
 
   const session = getSession();
+
+  export function getCaret() {
+    return formatterObj.caretPosition;
+  }
 
   $: {
     if (maxlength && input) {
@@ -56,7 +61,7 @@
     }
 
     const delegator = session.delegator;
-    const formatterObj = delegator.add(data.type, node);
+    formatterObj = delegator.add(data.type, node);
 
     _Obj.loop(data.on, (callback, event) => {
       formatterObj.on(event, callback);
@@ -98,8 +103,12 @@
     return input.value;
   }
 
-  export function setInvalid() {
-    _El.addClass(wrap, 'invalid');
+  export function getRawValue() {
+    return formatterObj ? formatterObj.value : input.value;
+  }
+
+  export function setValid(isValid) {
+    _El.keepClass(wrap, 'invalid', !isValid);
   }
 </script>
 
