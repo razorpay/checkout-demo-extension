@@ -1,4 +1,5 @@
 <script>
+  /* global showOverlay */
   // UI Imports
   import NumberField from 'templates/views/ui/fields/card/NumberField.svelte';
   import ExpiryField from 'templates/views/ui/fields/card/ExpiryField.svelte';
@@ -16,6 +17,8 @@
   // Utils
   import { getSession } from 'sessionmanager';
   import NameField from './ui/fields/card/NameField.svelte';
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
 
   const session = getSession();
   let expiryField = null;
@@ -40,6 +43,15 @@
       default:
         return;
     }
+  }
+
+  function showEmiPlans() {
+    // TODO: Update showOverlay once session.js is refactored.
+    showOverlay({ 0: _Doc.querySelector('#emi-wrap') });
+
+    Analytics.track('emi:plans:view:all', {
+      type: AnalyticsTypes.BEHAV,
+    });
   }
 </script>
 
@@ -103,6 +115,8 @@
         Remember Card
       </label>
     </div>
-    <div id="view-emi-plans" class="link">View all EMI Plans</div>
+    <div id="view-emi-plans" on:click={showEmiPlans} class="link">
+      View all EMI Plans
+    </div>
   </div>
 </div>

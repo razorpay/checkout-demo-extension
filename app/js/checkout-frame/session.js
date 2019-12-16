@@ -6069,10 +6069,6 @@ Session.prototype = {
 
       this.tab = this.screen = '';
 
-      if (this.emi) {
-        this.emi.unbind();
-      }
-
       this.tab = this.screen = '';
       this.modal = this.emi = this.el = this.card = null;
       this.upiTab = this.otpView = this.netbankingTab = this.svelteCardTab = null;
