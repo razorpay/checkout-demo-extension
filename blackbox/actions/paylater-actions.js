@@ -1,6 +1,6 @@
 async function verifyPayLaterPaymentMode(context) {
-  const messageDiv = await context.page.waitForXPath(
-    '//div[@data-paylater="epaylater"]'
+  const messageDiv = await context.page.waitForSelector(
+    '[data-paylater="epaylater"]'
   );
   let messageText = await context.page.evaluate(
     messageDiv => messageDiv.textContent,
@@ -11,8 +11,8 @@ async function verifyPayLaterPaymentMode(context) {
 }
 
 async function selectPayLaterPaymentMode(context) {
-  const paylater = await context.page.waitForXPath(
-    '//div[@data-paylater="epaylater"]'
+  const paylater = await context.page.waitForSelector(
+    '[data-paylater="epaylater"]'
   );
   await paylater.click();
 }
