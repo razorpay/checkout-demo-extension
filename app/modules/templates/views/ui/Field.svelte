@@ -1,4 +1,7 @@
 <script>
+  // Svelte imports
+  import { createEventDispatcher } from 'svelte';
+
   // Utils imports
   import { getSession } from 'sessionmanager';
   import Track from 'tracker';
@@ -37,6 +40,10 @@
 
   // Computed
   export let identifier;
+  export let inputType;
+
+  let focused = false;
+  let placeholderToShow = placeholder;
 
   // Refs
   export let wrap = null;
@@ -44,6 +51,8 @@
   let formatterObj = null;
 
   const session = getSession();
+
+  const dispatch = createEventDispatcher();
 
   export function getCaret() {
     return formatterObj.caretPosition;
@@ -89,6 +98,24 @@
         input.dispatchEvent(event);
       }
     });
+  }
+
+  $: {
+    if (!focused && label && placeholder) {
+      placeholderToShow = '';
+    } else {
+      placeholderToShow = placeholder;
+    }
+  }
+
+  function handleInputFocus(event) {
+    focused = true;
+    dispatch('focus', event.detail);
+  }
+
+  function handleInputBlur(event) {
+    focused = false;
+    dispatch('blur', event.detail);
   }
 
   export function focus() {
@@ -141,7 +168,7 @@
     {value}
     {required}
     {autocomplete}
-    {placeholder}
+    placeholder={placeholderToShow}
     {pattern}
     {readonly}
     {min}
@@ -151,8 +178,8 @@
     use:focusAction={handleFocus}
     use:blurAction={handleBlur}
     use:inputAction={handleInput}
-    on:focus
-    on:blur
+    on:focus={handleInputFocus}
+    on:blur={handleInputBlur}
     on:input
     class:no-refresh={!refresh}
     class:no-focus={handleFocus}
