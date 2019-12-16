@@ -3,7 +3,7 @@
   import { fly } from 'svelte/transition';
 
   import Tab from 'templates/tabs/Tab.svelte';
-  import AddCardView from '../../views/AddCardView.svelte';
+  import AddCardView from 'templates/views/AddCardView.svelte';
   import SavedCards from 'templates/screens/savedcards.svelte';
 
   // Store
@@ -30,6 +30,7 @@
 
   // Refs
   let savedCardsView;
+  let addCardView;
 
   const session = getSession();
 
@@ -125,16 +126,7 @@
   }
 
   function getAddCardPayload() {
-    const payload = {
-      'card[number]': $cardNumber,
-      'card[expiry]': $cardExpiry,
-      'card[cvv]': $cardCvv,
-      'card[name]': $cardName,
-    };
-    if ($remember) {
-      payload.save = 1;
-    }
-    return payload;
+    return addCardView.getPayload();
   }
 
   function getSavedCardPayload() {
@@ -178,7 +170,7 @@
           Use saved cards
         </div>
       {/if}
-      <AddCardView bind:cardType />
+      <AddCardView bind:cardType bind:this={addCardView} />
     </div>
   {:else}
     <div>

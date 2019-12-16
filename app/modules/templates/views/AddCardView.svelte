@@ -12,6 +12,7 @@
     cardName,
     cardNumber,
     remember,
+    authType,
   } from 'checkoutstore/screens/card';
 
   // Utils
@@ -19,6 +20,7 @@
   import NameField from './ui/fields/card/NameField.svelte';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
+  import CardFlowSelectionRadio from './ui/CardFlowSelectionRadio.svelte';
 
   const session = getSession();
   let expiryField = null;
@@ -27,6 +29,7 @@
 
   export let cardType = null;
   let cvvLength = 3;
+  let showAuthTypeSelectionRadio = true; // TODO: set this for showing/hiding radio
 
   function handleCardNetworkChanged(event) {
     cardType = event.detail.type;
@@ -53,6 +56,22 @@
       type: AnalyticsTypes.BEHAV,
     });
   }
+
+  export function getPayload() {
+    const payload = {
+      'card[number]': $cardNumber,
+      'card[expiry]': $cardExpiry,
+      'card[cvv]': $cardCvv,
+      'card[name]': $cardName,
+    };
+    if ($remember) {
+      payload.save = 1;
+    }
+    if (showAuthTypeSelectionRadio) {
+      payload.auth_type = $authType;
+    }
+    return payload;
+  }
 </script>
 
 <style>
@@ -72,23 +91,6 @@
   .save-checkbox {
     margin-top: 24px;
     justify-content: space-between;
-  }
-
-  .flow-selection-container {
-    margin: 16px 0 8px 0;
-    display: flex;
-  }
-
-  .flow-selection-container > * {
-    flex-grow: 1;
-  }
-
-  .flow-selection-container > label {
-    text-transform: uppercase;
-    color: rgba(0, 0, 0, 0.64);
-    font-size: 12px;
-    letter-spacing: 1px;
-    margin-bottom: 4px;
   }
 </style>
 
@@ -135,27 +137,6 @@
     </div>
   </div>
   <div class="row">
-    <div class="flow-selection-container">
-      <label>Complete Payment Using</label>
-      <div class="flow input-radio">
-        <input
-          type="radio"
-          name="auth_type"
-          id="flow-3ds"
-          value="c3ds"
-          checked />
-        <label for="flow-3ds">
-          <div class="radio-display" />
-          <div class="label-content">OTP / Password</div>
-        </label>
-      </div>
-      <div class="flow input-radio">
-        <input type="radio" name="auth_type" id="flow-pin" value="pin" />
-        <label for="flow-pin">
-          <div class="radio-display" />
-          <div class="label-content">ATM PIN</div>
-        </label>
-      </div>
-    </div>
+    <CardFlowSelectionRadio bind:value={$authType} />
   </div>
 </div>
