@@ -150,32 +150,7 @@ $cardpl = 70px;
     }
   }
 
-  .flow-selection-container {
-    &:not(.drishy) {
-      opacity: 0;
-      position: absolute;
-      z-index: -1;
-      pointer-events: none;
-    }
 
-    transition: all 0.15s ease-in;
-    width: 100%;
-    margin-top: 16px;
-
-    &>label {
-      text-transform: uppercase;
-      color: rgba(0,0,0,0.64);
-      font-size: 12px;
-      letter-spacing: 1px;
-      display: block;
-      margin-bottom: 4px;
-    }
-
-    .flow {
-      display: inline-block;
-      width: 49%;
-    }
-  }
 }
 
 .saved-card {
@@ -199,19 +174,6 @@ $cardpl = 70px;
       margin-bottom: 0;
     }
   }
-
-  .flow-selection-container {
-    display: none;
-    padding-bottom: 8px;
-    .flow {
-      &:not(:last-child) {
-        margin: 4px 0;
-      }
-      &:last-child {
-        margin-top: 4px
-      }
-    }
-  }
 }
 
 .saved-inner {
@@ -228,7 +190,6 @@ $cardpl = 70px;
 }
 
 #saved-cards-container {
-  // display: none;
   position: relative;
   line-height: $cardHeights['default'];
   min-height: $cardHeights['default'];
