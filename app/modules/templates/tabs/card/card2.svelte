@@ -12,6 +12,7 @@
     cardExpiry,
     cardName,
     cardNumber,
+    remember,
   } from 'checkoutstore/screens/card';
 
   // Utils imports
@@ -117,19 +118,30 @@
 
   export function getPayload() {
     if (currentView === 'add-card') {
-      return {
-        'card[number]': $cardNumber,
-        'card[expiry]': $cardExpiry,
-        'card[cvv]': $cardCvv,
-        'card[name]': $cardName,
-      };
+      return getAddCardPayload();
     } else {
-      return savedCardsView.getSelectedToken();
+      return getSavedCardPayload();
     }
   }
 
+  function getAddCardPayload() {
+    const payload = {
+      'card[number]': $cardNumber,
+      'card[expiry]': $cardExpiry,
+      'card[cvv]': $cardCvv,
+      'card[name]': $cardName,
+    };
+    if ($remember) {
+      payload.save = 1;
+    }
+    return payload;
+  }
+
+  function getSavedCardPayload() {
+    return savedCardsView.getSelectedToken();
+  }
+
   function handleViewPlans(event) {
-    debugger;
     Analytics.track('saved_card:emi:plans:view', {
       type: AnalyticsTypes.BEHAV,
       data: {
