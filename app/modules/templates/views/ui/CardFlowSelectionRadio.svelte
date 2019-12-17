@@ -26,7 +26,6 @@
   }
 </style>
 
-{@debug value}
 <div class="flow-selection-container">
   <label>Complete Payment Using</label>
   <div class="flow input-radio">
