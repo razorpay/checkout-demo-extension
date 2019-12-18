@@ -1,8 +1,13 @@
 <script>
   import Field from 'templates/views/ui/Field.svelte';
+  import { getSession } from 'sessionmanager';
 
-  export let value = '';
+  export let value = session.get('prefill.name');
   export let ref = null;
+  const session = getSession();
+
+  let name_readonly =
+    session.get('readonly.name') && session.get('prefill.name');
 
   const NAME_PATTERN = "^[a-zA-Z. 0-9'-]{1,100}$";
 
@@ -24,4 +29,5 @@
   bind:this={ref}
   handleBlur
   handleFocus
-  handleInput />
+  handleInput
+  readonly={name_readonly} />
