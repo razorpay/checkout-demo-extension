@@ -6,9 +6,10 @@
 
   export let maxAmount = null;
   export let minAmount = null;
-  export let minAmountLabel = null;
   export let amountPaid = null;
   export let value;
+  export let minAmountLabel;
+  export let partialDescription;
 
   const session = getSession();
 
@@ -89,8 +90,6 @@
       )}`;
     }
   }
-
-  $: minAmountLabel = minAmountLabel || 'Minimum Amount Due';
 </script>
 
 <style>
@@ -144,7 +143,5 @@
 {/if}
 
 {#if !minAmount || amountPaid !== 0}
-  <div class="subtitle subtitle--help">
-    Pay some amount now and remaining later.
-  </div>
+  <div class="subtitle subtitle--help">{partialDescription}</div>
 {/if}
