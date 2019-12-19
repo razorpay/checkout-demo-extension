@@ -1408,8 +1408,6 @@ Session.prototype = {
   },
 
   setExperiments: function() {
-    this.newHomeScreen =
-      discreet.Experiments.getSegmentOrCreate('home_2019') === 1;
     discreet.Experiments.clearOldExperiments();
   },
 
@@ -1438,6 +1436,7 @@ Session.prototype = {
     }
 
     this.isOpen = true;
+    this.newHomeScreen = true;
 
     this.setExperiments();
     this.setTpvBanks();
