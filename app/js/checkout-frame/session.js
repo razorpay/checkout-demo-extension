@@ -4422,7 +4422,7 @@ Session.prototype = {
   /**
    * Returns a closure to handle showing of EMI plans screen.
    *
-   * @param {String} tyoe
+   * @param {String} type
    *
    * @return {Function}
    */
@@ -4472,6 +4472,7 @@ Session.prototype = {
         self.emiPlansView.setPlans({
           amount: amount,
           plans: emiPlans,
+          bank,
           on: {
             back: bind(function() {
               self.switchTab(prevTab);
@@ -4559,6 +4560,7 @@ Session.prototype = {
         self.emiPlansView.setPlans({
           amount: amount,
           plans: emiPlans,
+          bank,
           on: {
             back: function() {
               self.switchTab(prevTab);
@@ -4650,6 +4652,7 @@ Session.prototype = {
         self.emiPlansView.setPlans({
           amount: amount,
           plans: emiPlans,
+          bank,
           on: {
             back: function() {
               self.switchTab(prevTab);

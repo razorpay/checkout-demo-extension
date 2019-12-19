@@ -2,6 +2,7 @@
   // Util imports
   import Razorpay from 'common/Razorpay';
   import { getSession } from 'sessionmanager';
+  import { roundUpToNearestMajor } from 'common/currency';
 
   // UI imports
   import ExpandableCard from 'templates/views/ui/ExpandableCard.svelte';
@@ -9,6 +10,7 @@
   // Props
   export let amount;
   export let plan;
+  export let bank;
   export let provider;
   export let expanded;
 
@@ -37,6 +39,16 @@
       );
     }
   }
+
+  $: {
+    if (bank === 'BAJAJ' && amountPerMonth) {
+      amountPerMonth = roundUpToNearestMajor(
+        amountPerMonth,
+        session.get('currency')
+      );
+    }
+  }
+
   $: noCostEmi =
     plan.subvention === 'merchant' ||
     (provider === 'zestmoney' && plan.duration === 3);

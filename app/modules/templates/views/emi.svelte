@@ -6,6 +6,7 @@
 
   // Util imports
   import { getSession } from 'sessionmanager';
+  import { roundUpToNearestMajor } from 'common/currency';
 
   // Props
   export let banks;
@@ -32,11 +33,18 @@
   $: {
     let _plans = (banks[selected] || {}).plans || {};
     _plans = _Obj.map(_plans, (plan, duration) => {
-      const installment = Razorpay.emi.calculator(
+      let installment = Razorpay.emi.calculator(
         amount,
         duration,
         plan.interest
       );
+
+      if (selected === 'BAJAJ') {
+        installment = roundUpToNearestMajor(
+          installment,
+          session.get('currency')
+        );
+      }
 
       return {
         duration: duration,
