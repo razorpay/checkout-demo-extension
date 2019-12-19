@@ -1,7 +1,13 @@
 /* global CheckoutBridge */
 
 import Analytics from 'analytics';
+import { VPA_REGEX } from 'common/constants';
+
 export const GOOGLE_PAY_PACKAGE_NAME = 'com.google.android.apps.nbu.paisa.user';
+
+export function isVpaValid(vpa) {
+  return VPA_REGEX.test(vpa);
+}
 
 const UPI_APPS = {
   /**
