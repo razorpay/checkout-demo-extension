@@ -11,8 +11,8 @@ var preferences = window.preferences,
   tab_titles = Constants.TAB_TITLES,
   getDownBanks = Bank.getDownBanks,
   freqWallets = Wallet.wallets,
-  contactPattern = Constants.CONTACT_PATTERN,
-  emailPattern = Constants.EMAIL_PATTERN,
+  contactPattern = Constants.CONTACT_REGEX,
+  emailPattern = Constants.EMAIL_REGEX,
   ua_Android = discreet.UserAgent.androidBrowser,
   isMobile = discreet.UserAgent.isMobile,
   cookieDisabled = !navigator.cookieEnabled,
@@ -1408,8 +1408,6 @@ Session.prototype = {
   },
 
   setExperiments: function() {
-    this.newHomeScreen =
-      discreet.Experiments.getSegmentOrCreate('home_2019') === 1;
     discreet.Experiments.clearOldExperiments();
   },
 
@@ -1438,6 +1436,7 @@ Session.prototype = {
     }
 
     this.isOpen = true;
+    this.newHomeScreen = true;
 
     this.setExperiments();
     this.setTpvBanks();
@@ -5517,6 +5516,14 @@ Session.prototype = {
        * API takes 3DS, which is the default anyway.
        */
       delete data.auth_type;
+    }
+
+    /**
+     * For Paper Nach, we need to send auth_type=physical
+     * for now.
+     */
+    if (data.method === 'nach' && !data.auth_type) {
+      data.auth_type = 'physical';
     }
 
     if (data.partial_payment) {

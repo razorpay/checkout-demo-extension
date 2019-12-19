@@ -1,4 +1,4 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 const {
   selectWallet,
@@ -24,14 +24,14 @@ const {
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
-describe('Basic wallet payment', () => {
-  test('Perform wallet transaction with offers applied', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+describe.each(
+  getTestData('Perform wallet transaction with offers applied', {
+    loggedIn: false,
+    options: {
       amount: 200000,
       personalization: false,
-    };
-    const preferences = makePreferences({
+    },
+    preferences: {
       offers: [
         {
           original_amount: 200000,
@@ -52,7 +52,10 @@ describe('Basic wallet payment', () => {
           display_text: '10% off with Amazon Pay',
         },
       ],
-    });
+    },
+  })
+)('Wallet tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,

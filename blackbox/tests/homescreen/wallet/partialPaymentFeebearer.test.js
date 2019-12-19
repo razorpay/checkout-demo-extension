@@ -1,4 +1,4 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 const {
   selectWallet,
@@ -22,24 +22,29 @@ const {
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
-describe('Wallet tests', () => {
-  test('Wallet payment with partial payment and feebearer enabled', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 60000,
-      personalization: false,
-    };
-    const preferences = makePreferences({
-      fee_bearer: true,
-      order: {
+describe.each(
+  getTestData(
+    'Perform wallet transaction with partial payments and customer feebearer enabled',
+    {
+      options: {
         amount: 60000,
-        amount_due: 60000,
-        amount_paid: 0,
-        currency: 'INR',
-        first_payment_min_amount: null,
-        partial_payment: true,
+        personalization: false,
       },
-    });
+      preferences: {
+        fee_bearer: true,
+        order: {
+          amount: 60000,
+          amount_due: 60000,
+          amount_paid: 0,
+          currency: 'INR',
+          first_payment_min_amount: null,
+          partial_payment: true,
+        },
+      },
+    }
+  )
+)('Wallet tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,

@@ -1,4 +1,4 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 const {
   selectBank,
@@ -19,18 +19,22 @@ const {
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
-describe('Netbanking tests', () => {
-  test('perform netbanking transaction with fee bearer and contact optional', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 600,
-      personalization: false,
-    };
-
-    const preferences = makePreferences({
-      fee_bearer: true,
-      optional: ['contact'],
-    });
+describe.each(
+  getTestData(
+    'perform netbanking transaction with fee bearer and contact optional',
+    {
+      options: {
+        amount: 600,
+        personalization: false,
+      },
+      preferences: {
+        fee_bearer: true,
+        optional: ['contact'],
+      },
+    }
+  )
+)('Netbanking tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,

@@ -440,6 +440,11 @@ Payment.prototype = {
       return;
     }
 
+    // no ajax route for simpl
+    if (data.provider === 'getsimpl') {
+      return;
+    }
+
     /**
      * type: otp is not handled on razorpayjs
      * which is sent for some of the wallets, unidentifiable from

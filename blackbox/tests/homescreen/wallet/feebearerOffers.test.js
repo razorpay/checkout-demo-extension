@@ -1,4 +1,4 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 const {
   selectWallet,
@@ -25,36 +25,42 @@ const {
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
-describe('Basic wallet payment', () => {
-  test('Perform wallet transaction with offers applied and feebearer enabled', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 200000,
-      personalization: false,
-    };
-    const preferences = makePreferences({
-      fee_bearer: true,
-      offers: [
-        {
-          original_amount: 200000,
-          amount: 198000,
-          id: 'offer_DfJLos7WHTOGB5',
-          name: 'Payzapp_Offer_3',
-          payment_method: 'wallet',
-          issuer: 'payzapp',
-          display_text: 'Payzapp - Rs. 10 off',
-        },
-        {
-          original_amount: 200000,
-          amount: 198000,
-          id: 'offer_DfJQsNytt7xVTe',
-          name: 'AmazonPay_Offer_1',
-          payment_method: 'wallet',
-          issuer: 'amazonpay',
-          display_text: '10% off with Amazon Pay',
-        },
-      ],
-    });
+describe.each(
+  getTestData(
+    'Perform wallet transaction with offers applied and feebearer enabled',
+    {
+      loggedIn: false,
+      options: {
+        amount: 200000,
+        personalization: false,
+      },
+      preferences: {
+        fee_bearer: true,
+        offers: [
+          {
+            original_amount: 200000,
+            amount: 198000,
+            id: 'offer_DfJLos7WHTOGB5',
+            name: 'Payzapp_Offer_3',
+            payment_method: 'wallet',
+            issuer: 'payzapp',
+            display_text: 'Payzapp - Rs. 10 off',
+          },
+          {
+            original_amount: 200000,
+            amount: 198000,
+            id: 'offer_DfJQsNytt7xVTe',
+            name: 'AmazonPay_Offer_1',
+            payment_method: 'wallet',
+            issuer: 'amazonpay',
+            display_text: '10% off with Amazon Pay',
+          },
+        ],
+      },
+    }
+  )
+)('Wallet tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,

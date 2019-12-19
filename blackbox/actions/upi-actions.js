@@ -71,7 +71,6 @@ async function handleUPIAccountValidation(context, vpa, accountexists = true) {
     expect(req.url).toContain('create/ajax');
   else expect(req.url).toContain('validate/account');
   await context.respondJSON({ vpa: vpa, success: true, customer_name: null });
-  // await delay(1000);
 }
 
 async function selectUPIMethod(context, UPIMethod) {

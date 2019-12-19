@@ -37,7 +37,6 @@ describe.skip('Partial GooglePay payment', () => {
     });
     await assertHomePage(context, true, true);
     await fillUserDetails(context, true, '8888888881');
-    await delay(1000);
     await assertPaymentMethodsPersonalization(context);
     await handlePartialPayment(context, '1');
     await verifyPartialAmount(context, '₹ 1');

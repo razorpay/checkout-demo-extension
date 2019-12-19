@@ -1,4 +1,4 @@
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 const {
   assertNetbankingPage,
@@ -19,24 +19,29 @@ const {
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
-describe('Netbanking tests', () => {
-  test('perform netbaking transaction with partial payment and contact optional', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 20000,
-      personalization: false,
-    };
-    const preferences = makePreferences({
-      optional: ['contact'],
-      order: {
+describe.each(
+  getTestData(
+    'perform netbaking transaction with partial payment and contact optional',
+    {
+      options: {
         amount: 20000,
-        amount_due: 20000,
-        amount_paid: 0,
-        currency: 'INR',
-        first_payment_min_amount: null,
-        partial_payment: true,
+        personalization: false,
       },
-    });
+      preferences: {
+        optional: ['contact'],
+        order: {
+          amount: 20000,
+          amount_due: 20000,
+          amount_paid: 0,
+          currency: 'INR',
+          first_payment_min_amount: null,
+          partial_payment: true,
+        },
+      },
+    }
+  )
+)('Netbanking tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,

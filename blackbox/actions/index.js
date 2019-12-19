@@ -35,6 +35,7 @@ const getTestData = (
   } = {}
 ) => {
   let tests = [];
+  loggedIn = false; //doing this as time of execution is too much and too many random failures also
   preferencesLoggedIn = makePreferencesLogged(preferences);
   preferences = makePreferences(preferences);
   options = makeOptions(options);

@@ -1,5 +1,5 @@
 const { openCheckoutWithNewHomeScreen } = require('../open');
-const { makePreferences } = require('../../../actions/preferences');
+const { getTestData } = require('../../../actions');
 const {
   selectPersonalizedCard,
   submit,
@@ -16,16 +16,21 @@ const {
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
-describe('Card tests', () => {
-  test('perform card transaction with personalization and callbackURL enabled', async () => {
-    const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 200,
-      personalization: true,
-      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
-      redirect: true,
-    };
-    const preferences = makePreferences();
+describe.each(
+  getTestData(
+    'perform successful card transaction with callback URL and Personalization enabled',
+    {
+      loggedIn: false,
+      options: {
+        amount: 200,
+        personalization: true,
+        callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
+        redirect: true,
+      },
+    }
+  )
+)('Card tests', ({ preferences, title, options }) => {
+  test(title, async () => {
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,

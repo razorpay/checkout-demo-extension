@@ -25,7 +25,6 @@ async function selectWallet(context, walletName) {
 }
 
 async function handleWalletPopUp(context) {
-  //   await delay(200);
   let popup = await context.popup();
   let popupPage = await popup.page;
   const ContactField = await popupPage.waitForSelector('[name = contact]');
@@ -36,7 +35,6 @@ async function handleWalletPopUp(context) {
   const submit = await popupPage.$x('//button[text() = "Submit"]');
   await submit[0].click();
   await popupPage.waitForNavigation({ waitUntil: 'domcontentloaded' });
-  //   await delay(800);
   const passButton = await popupPage.waitForSelector('.success');
   //   const passButton = await popupPage.$('.success');
   await passButton.click();
