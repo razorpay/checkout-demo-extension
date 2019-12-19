@@ -7,7 +7,7 @@ import * as Bridge from 'bridge';
 import * as strings from 'common/strings';
 import * as OtpService from 'common/otpservice';
 
-/* global errorHandler */
+/* global errorHandler, getPhone */
 
 let customers = {};
 let qpmap = _.getQueryParams();
@@ -143,7 +143,8 @@ Customer.prototype = {
   submitOTP: function(data, callback, queryParams) {
     let user = this;
 
-    data.contact = this.contact;
+    // TODO: fix this
+    data.contact = this.contact || getCustomer(getPhone()).contact;
     let url = 'otp/verify';
 
     if (queryParams) {
