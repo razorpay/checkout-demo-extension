@@ -25,7 +25,6 @@ describe.each(
   getTestData(
     'Perform upi collect transaction with contact optional and partial payments enabled',
     {
-      loggedIn: false,
       options: {
         amount: 20000,
         personalization: false,

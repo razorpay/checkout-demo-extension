@@ -20,7 +20,6 @@ describe.each(
   getTestData(
     'perform netbanking transaction with partial payments and downtime',
     {
-      loggedIn: false,
       options: {
         amount: 20000,
         personalization: false,

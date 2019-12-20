@@ -22,9 +22,8 @@ const {
 
 describe.each(
   getTestData(
-    'Verify UPI Collect with customer Feebearer and callbackURL enabled',
+    'Verify UPI Collect with customer Feebearer and contact optional enabled',
     {
-      loggedIn: false,
       options: {
         amount: 200,
         personalization: false,

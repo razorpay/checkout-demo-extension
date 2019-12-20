@@ -23,7 +23,6 @@ const {
 
 describe.each(
   getTestData('Perform wallet transaction with fee bearer', {
-    loggedIn: false,
     options: {
       amount: 60000,
       personalization: false,

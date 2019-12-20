@@ -19,7 +19,6 @@ const {
 
 describe.each(
   getTestData('Perform wallet transaction with callbackURL enabled', {
-    loggedIn: false,
     options: {
       amount: 200,
       personalization: false,

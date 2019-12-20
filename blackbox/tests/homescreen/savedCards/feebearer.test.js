@@ -23,7 +23,6 @@ const {
 
 describe.each(
   getTestData('Perform saved card transaction with feebearer enabled', {
-    loggedIn: false,
     options: {
       amount: 200,
       personalization: true,

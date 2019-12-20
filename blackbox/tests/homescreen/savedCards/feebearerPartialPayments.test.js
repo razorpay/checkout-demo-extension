@@ -27,7 +27,6 @@ describe.each(
   getTestData(
     'Perform saved card transaction with partial payments and customer feebearer enabled',
     {
-      loggedIn: false,
       options: {
         amount: 200,
         personalization: true,

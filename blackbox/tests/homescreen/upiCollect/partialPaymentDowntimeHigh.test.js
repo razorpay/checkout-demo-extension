@@ -14,7 +14,6 @@ const {
 
 describe.each(
   getTestData('Verify UPI downtime - High with partial payments enabled', {
-    loggedIn: false,
     options: {
       amount: 20000,
       personalization: false,

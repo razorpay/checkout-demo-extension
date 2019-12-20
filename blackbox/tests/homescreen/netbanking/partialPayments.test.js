@@ -21,7 +21,6 @@ const {
 
 describe.each(
   getTestData('perform netbanking transaction with partial payments', {
-    loggedIn: false,
     options: {
       amount: 20000,
       personalization: false,

@@ -1,6 +1,8 @@
 const { randomContact, randomEmail, delay } = require('../../util');
 const personalizationActions = require('./personalization-actions');
 const downtimeTimeoutActions = require('./downtime-actions');
+const emandateActions = require('./emandate-actions.js');
+const paylaterActions = require('./paylater-actions');
 
 /**
  * Sets the state in context
@@ -70,16 +72,20 @@ async function assertBasicDetailsScreen(context) {
   const $form = await context.page.waitForSelector('#form-common', {
     visible: true,
   });
+  if (!context.prefilledContact && !context.isContactOptional) {
+    const $contact = await $form.$('#contact');
 
-  const $contact = await $form.$('#contact');
+    expect(await $contact.evaluate(el => el.value)).toEqual(
+      context.prefilledContact
+    );
+  }
+  if (!context.prefilledEmail && !context.isEmailOptional) {
+    const $email = await $form.$('#email');
 
-  expect(await $contact.evaluate(el => el.value)).toEqual(
-    context.prefilledContact
-  );
-
-  const $email = await $form.$('#email');
-
-  expect(await $email.evaluate(el => el.value)).toEqual(context.prefilledEmail);
+    expect(await $email.evaluate(el => el.value)).toEqual(
+      context.prefilledEmail
+    );
+  }
 }
 
 async function assertMethodsScreen(context) {
@@ -96,8 +102,12 @@ async function assertMissingDetails(context) {
     visible: true,
   });
   const strip = await $form.$('#user-details');
-
-  expect(strip).toEqual(null);
+  if (!context.preferences.customer) {
+    expect(strip).toEqual(null);
+  } else {
+    expect(strip).not.toEqual(null);
+    await assertEditUserDetailsAndBack(context);
+  }
 }
 
 /**
@@ -146,33 +156,35 @@ async function proceed(context) {
  * are the same as those entered.
  */
 async function assertUserDetails(context) {
-  const { contact, email } = context.state;
+  if (!context.preferences.customer) {
+    const { contact, email } = context.state;
 
-  const first = contact || email;
-  const last = email;
+    const first = contact || email;
+    const last = email;
 
-  const strip = await context.page.waitForSelector(
-    '#user-details [slot=title]',
-    {
-      visible: true,
+    const strip = await context.page.waitForSelector(
+      '#user-details [slot=title]',
+      {
+        visible: true,
+      }
+    );
+    const firstInPage = await innerText(
+      context.page,
+      await strip.$('span:first-child')
+    );
+    const lastInPage = await innerText(
+      context.page,
+      await strip.$('span:last-child')
+    );
+
+    if (!first && !last) {
+      expect(firstInPage).toEqual(undefined);
+      expect(lastInPage).toEqual(undefined);
+    } else if (first) {
+      expect(firstInPage).toEqual(first);
+    } else if (last) {
+      expect(lastInPage).toEqual(last);
     }
-  );
-  const firstInPage = await innerText(
-    context.page,
-    await strip.$('span:first-child')
-  );
-  const lastInPage = await innerText(
-    context.page,
-    await strip.$('span:last-child')
-  );
-
-  if (!first && !last) {
-    expect(firstInPage).toEqual(undefined);
-    expect(lastInPage).toEqual(undefined);
-  } else if (first) {
-    expect(firstInPage).toEqual(first);
-  } else if (last) {
-    expect(lastInPage).toEqual(last);
   }
 }
 
@@ -223,9 +235,16 @@ async function assertPaymentMethods(context) {
   const methods = await Promise.all(
     buttons.map(button => getAttribute(context.page, button, 'method'))
   );
-  expect(['card', 'netbanking', 'wallet', 'upi', 'emi']).toEqual(
-    expect.arrayContaining(methods)
-  );
+  expect([
+    'card',
+    'netbanking',
+    'wallet',
+    'upi',
+    'emi',
+    'bank_transfer',
+    'paylater',
+    'cardless_emi',
+  ]).toEqual(expect.arrayContaining(methods));
 }
 
 /**
@@ -285,4 +304,6 @@ module.exports = {
   assertMissingDetails,
   ...personalizationActions,
   ...downtimeTimeoutActions,
+  ...emandateActions,
+  ...paylaterActions,
 };
