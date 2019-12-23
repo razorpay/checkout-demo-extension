@@ -1244,3 +1244,42 @@ export function displayAmount(razorpay, payloadAmount, payloadCurrency) {
 
 export const getDecimalAmount = amount =>
   (amount / 100).toFixed(2).replace('.00', '');
+
+/**
+ * Returns the amount in major
+ * @param amount {number} amount in minor
+ * @param currency {string}
+ * @return {number}
+ */
+function getAmountInMajor(amount, currency) {
+  const currencyConfig = getCurrencyConfig(currency);
+  return parseFloat(
+    (parseInt(amount) / Math.pow(10, currencyConfig.decimals)).toFixed(
+      currencyConfig.decimals
+    )
+  );
+}
+
+/**
+ * Returns the amount in minor
+ * @param amount {number} the amount in major
+ * @param currency {string}
+ * @return {number}
+ */
+function getAmountInMinor(amount, currency) {
+  const currencyConfig = getCurrencyConfig(currency);
+  return parseInt((amount * Math.pow(10, currencyConfig.decimals)).toFixed(0));
+}
+
+/**
+ * Rounds up the amount to the nearest major
+ * @param amount {number} amount in minor
+ * @param currency {string}
+ * @return {number} the rounded up amount in minor
+ */
+export function roundUpToNearestMajor(amount, currency) {
+  const originalAmountInMajor = getAmountInMajor(amount, currency);
+  const roundedUpAmountInMajor = Math.ceil(originalAmountInMajor);
+  const roundedUpAmountInMinor = getAmountInMinor(roundedUpAmountInMajor);
+  return roundedUpAmountInMinor;
+}

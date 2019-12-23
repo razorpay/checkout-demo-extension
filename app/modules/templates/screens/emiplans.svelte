@@ -8,6 +8,7 @@
   export let branding = null;
   export let expanded = -1;
   export let plans;
+  export let bank;
   export let amount;
   export let provider = null;
   export let on = {};
@@ -88,6 +89,7 @@
     {#each plans as plan, index}
       <EmiPlanCard
         {plan}
+        {bank}
         expanded={index === expanded}
         {amount}
         {provider}

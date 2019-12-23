@@ -90,6 +90,7 @@ const fetchAgreements = (provider, loanUrl, plans, amount) => {
 emiPlansView.prototype = {
   setPlans: function({
     plans,
+    bank,
     actions = {},
     on = {},
     provider,
@@ -123,6 +124,7 @@ emiPlansView.prototype = {
     const props = {
       on,
       plans,
+      bank,
       actions,
       expanded: -1,
       amount,
