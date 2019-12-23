@@ -4472,7 +4472,7 @@ Session.prototype = {
         self.emiPlansView.setPlans({
           amount: amount,
           plans: emiPlans,
-          bank,
+          bank: bank,
           on: {
             back: bind(function() {
               self.switchTab(prevTab);
@@ -4560,7 +4560,7 @@ Session.prototype = {
         self.emiPlansView.setPlans({
           amount: amount,
           plans: emiPlans,
-          bank,
+          bank: bank,
           on: {
             back: function() {
               self.switchTab(prevTab);
@@ -4652,7 +4652,7 @@ Session.prototype = {
         self.emiPlansView.setPlans({
           amount: amount,
           plans: emiPlans,
-          bank,
+          bank: bank,
           on: {
             back: function() {
               self.switchTab(prevTab);
