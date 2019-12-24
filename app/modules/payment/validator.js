@@ -152,6 +152,9 @@ export const formatPayload = function(payload, razorpayInstance, params = {}) {
       data[`_[shield][${key}]`] = value;
     });
 
+  // eslint-disable-next-line no-undef
+  data['_[build]'] = __BUILD_NUMBER__ || 0;
+
   // flatten notes, card
   // notes.abc -> notes[abc]
   flattenProp(data, 'notes', '[]');
