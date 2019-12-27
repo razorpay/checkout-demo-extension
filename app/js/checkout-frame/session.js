@@ -18,6 +18,8 @@ var preferences = window.preferences,
   cookieDisabled = !navigator.cookieEnabled,
   getCustomer = discreet.getCustomer,
   Customer = discreet.Customer,
+  Constants = discreet.Constants,
+  OfferType = Constants.OfferType,
   sanitizeTokens = discreet.sanitizeTokens,
   getQueryParams = discreet.getQueryParams,
   Store = discreet.Store,
@@ -3677,8 +3679,8 @@ Session.prototype = {
     if (this.preSelectedOffer) {
       this.offers.selectOffer(this.preSelectedOffer);
       // Explicitly call this because we selected the offer explicitly
-      this.handleOfferSelection(this.preSelectedOffer, tab);
       this.offers.applyOffer();
+      this.handleOfferSelection(this.preSelectedOffer, tab);
 
       /* Don't set preSelectedOffer to null if it's on card OTP screen  */
       if (this.screen === 'otp' && tab !== 'card' && tab !== 'emi') {
@@ -3723,8 +3725,11 @@ Session.prototype = {
 
     offer = offer.data;
 
-    // Show discount if needed
-    if (offer.original_amount > offer.amount) {
+    // Show discount if it is not a cashback offer
+    if (
+      offer.type !== OfferType.DEFERRED &&
+      offer.original_amount > offer.amount
+    ) {
       this.showDiscount();
     }
 

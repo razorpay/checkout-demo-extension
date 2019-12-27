@@ -3,6 +3,8 @@ var selectedClass = ' selected',
   discountClass = ' has-discount',
   singleOfferClass = 'single-offer';
 
+var OfferType = discreet.Constants.OfferType;
+
 /**
  * Get an element onto which things can be dumped
  *
@@ -49,6 +51,7 @@ function Offer(data, options) {
         description: data.display_text,
         discount: this.discount > 0 && options.formatAmount(this.discount),
         removable: data.removable,
+        cashback: data.type === OfferType.DEFERRED,
       })
     )),
     $offerTitle = $el.querySelector('.offer-title'),
