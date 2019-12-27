@@ -5969,7 +5969,7 @@ Session.prototype = {
 
     if (appliedOffer) {
       // Set offer ID based on offer type
-      switch (appliedOffer.type) {
+      switch (appliedOffer._type) {
         case 'api':
           data.offer_id = appliedOffer.id;
           break;
