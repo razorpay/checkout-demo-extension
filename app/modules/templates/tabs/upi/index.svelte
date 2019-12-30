@@ -7,7 +7,7 @@
   import * as GPay from 'gpay';
   import * as Bridge from 'bridge';
   import DowntimesStore from 'checkoutstore/downtimes';
-  import { VPA_REGEX } from 'common/constants';
+  import { isVpaValid } from 'common/upi';
   import {
     doesAppExist,
     GOOGLE_PAY_PACKAGE_NAME,
@@ -69,10 +69,6 @@
     isPayout,
     showRecommendedUPIApp,
   } = session;
-
-  function isVpaValid(vpa) {
-    return VPA_REGEX.test(vpa);
-  }
 
   const checkGPay = session => {
     const hasFeature =

@@ -1,7 +1,9 @@
 <script>
   // Utils imports
   import { getSession } from 'sessionmanager';
-  import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi';
+  import { GOOGLE_PAY_PACKAGE_NAME, isVpaValid } from 'common/upi';
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
 
   // UI imports
   import RadioOption from 'templates/views/ui/options/RadioOption.svelte';
@@ -40,6 +42,32 @@
     } else {
       showableApps = _Arr.slice(apps, 0, 4);
     }
+  }
+
+  function getVpa() {
+    if (vpaField) {
+      return vpaField.getValue();
+    }
+    return '';
+  }
+
+  function trackVpaEntry() {
+    const vpa = getVpa();
+
+    if (!vpa) {
+      return;
+    }
+
+    const valid = isVpaValid(vpa);
+
+    Analytics.track('vpa:fill', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        app: selectedApp,
+        value: vpa,
+        valid,
+      },
+    });
   }
 
   export function getPayload() {
@@ -222,6 +250,7 @@
         required={true}
         helpText="Please enter a valid VPA of the form username@bank"
         pattern=".+@.+"
+        on:blur={trackVpaEntry}
         formatter={{ type: 'vpa' }} />
     </RadioOption>
   </div>
