@@ -16,7 +16,7 @@ RazorpayDefaults.partial_payment = {
   full_amount_label: 'Pay in full',
   partial_amount_label: 'Make payment in parts',
   partial_amount_description: 'Pay some now and the remaining later',
-  select_partial: 0,
+  select_partial: false,
 };
 
 RazorpayDefaults.method = {
