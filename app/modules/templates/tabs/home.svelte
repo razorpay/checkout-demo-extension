@@ -66,6 +66,8 @@
     methods.count === 1 &&
     methods.card;
 
+  const cardOffer = session.cardOffer;
+
   const {
     isPartialPayment,
     prefill,
@@ -775,6 +777,15 @@
             {:else}
               Subscription payments are only supported on Mastercard and Visa
               Credit Cards.
+            {/if}
+          {:else if cardOffer}
+            {#if methods.debit_card && methods.credit_card}
+              All {cardOffer.issuer} Cards are supported for this payment
+            {:else if methods.debit_card}
+              All {cardOffer.issuer} Debit Cards are supported for this payment
+            {:else}
+              All {cardOffer.issuer} Credit Cards are supported for this
+              payment.
             {/if}
           {:else if methods.debit_card && methods.credit_card}
             Visa and Mastercard Credit Cards from all Banks and Debit Cards from
