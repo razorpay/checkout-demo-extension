@@ -3993,12 +3993,9 @@ Session.prototype = {
       if (!confirmClose()) {
         return;
       }
-
-      if (cardlessEmiOtpPage) {
-        this.clearRequest({
-          '_[reason]': 'PAYMENT_CANCEL_BEFORE_OTP_VERIFY',
-        });
-      }
+      this.clearRequest({
+        '_[reason]': 'PAYMENT_CANCEL_BEFORE_OTP_VERIFY',
+      });
     }
 
     if (BackStore && BackStore.screen) {
