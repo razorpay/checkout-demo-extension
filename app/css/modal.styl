@@ -822,7 +822,7 @@ i {
   }
 }
 
-#body.sub, #container.one-method #body:not([tab]) {
+#body.sub {
   #footer {
     pointer-events: auto;
     opacity: 1;
@@ -845,12 +845,7 @@ i {
   background: #fff;
 }
 
-#partial-back {
-  padding: 0 24px;
-  z-index: 3;
-}
-
-#topbar, #partial-back {
+#topbar {
   display: none;
   cursor: pointer;
   background: #fff;
@@ -1692,34 +1687,6 @@ $outline = #ddd;
   }
 }
 
-#container.extra {
-  &.show-methods {
-    #partial-back {
-      display: block;
-    }
-
-    #form-common .legend {
-      padding: 48px 0 6px;
-    }
-  }
-
-  #pad-common {
-    & + div {
-      display: none;
-    }
-  }
-}
-
-#container.extra, #container.emandate-extra {
-  #next-button {
-    opacity: 1;
-    margin-bottom: -1px;
-    cursor: pointer;
-    z-index: 1;
-    transform: translateY(0);
-  }
-}
-
 .elem-state {
   padding-top: 0;
 
@@ -1738,12 +1705,12 @@ $outline = #ddd;
   }
 }
 
-#container.no-details:not(.partial), #container.extra.show-methods {
+#container.no-details:not(.partial) {
   #pad-common + div {
     display: block;
   }
 
-  #pad-common, #top-right, #next-button {
+  #pad-common, #top-right {
     display: none;
   }
 
@@ -1778,7 +1745,7 @@ $outline = #ddd;
   font-size: 32px;
 }
 
-#container.emandate, #container.no-details, #container.extra.show-methods {
+#container.emandate, #container.no-details {
   .desc {
     display: block;
     color: #777;
