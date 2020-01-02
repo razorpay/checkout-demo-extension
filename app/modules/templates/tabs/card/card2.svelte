@@ -249,6 +249,8 @@
 
 <style>
   #show-saved-cards {
+    padding-top: 12px;
+    padding-bottom: 12px;
     cursor: pointer;
     height: unset;
     transition: 0.2s;
