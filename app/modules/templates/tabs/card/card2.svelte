@@ -1,5 +1,5 @@
 <script>
-  /* global each */
+  /* global each, gel, Event */
   import { fly } from 'svelte/transition';
 
   import Tab from 'templates/tabs/Tab.svelte';
@@ -20,10 +20,13 @@
   import { getSavedCards } from 'common/token';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
+  import { getCardType } from 'common/card';
 
   let currentView = 'add-card';
   let cardType = null;
   let savedCards = [];
+  let showEmiCta;
+  let emiCtaView;
 
   let showAddCardCta = false;
   $: showAddCardCta = savedCards && savedCards.length;
@@ -91,12 +94,6 @@
 
     session.savedCardScreen = tokens;
 
-    // TODO: implement
-    // toggleSavedCards(!!tokens);
-
-    // TODO: check if this is required
-    _El.toggleClass(_Doc.querySelector('#form-card'), 'has-cards'); //TODO: pure functions
-
     // TODO: handle this using Field component
     each(_Doc.querySelectorAll('.saved-cvv'), function(i, input) {
       // delegator.add('number', input);
@@ -144,8 +141,109 @@
     session.showEmiPlans('saved')(event.detail);
   }
 
+  function onCardInput() {
+    const emi_options = session.emi_options;
+    const cardNumber = $cardNumber;
+    const cardType = getCardType(cardNumber);
+    const isMaestro = /^maestro/.test(cardType);
+    const sixDigits = cardNumber.length > 5;
+    const trimmedVal = cardNumber.replace(/[ ]/g, '');
+
+    var emiObj;
+
+    if (sixDigits && !isMaestro) {
+      emiObj = _Obj
+        .entries(emi_options.banks)
+        .find(([bank, emiObjInner]) =>
+          emiObjInner.patt.test(cardNumber.replace(/ /g, ''))
+        );
+    }
+
+    session.emiPlansForNewCard = emiObj;
+
+    if (!emiObj) {
+      // TODO: move to session.js
+      // $('#emi_duration').val('');
+    }
+
+    showAppropriateEmiDetailsForNewCard(
+      session.tab,
+      emiObj,
+      trimmedVal.length,
+      session.methods
+    );
+
+    if (trimmedVal.length >= 6) {
+      var emiBankChangeEvent;
+      if (typeof Event === 'function') {
+        emiBankChangeEvent = new Event('change');
+      } else {
+        emiBankChangeEvent = document.createEvent('Event');
+        emiBankChangeEvent.initEvent('change', true, true);
+      }
+    }
+
+    // var elem_emi = $('#elem-emi');
+    // var hiddenClass = 'hidden';
+
+    // if (isMaestro && sixDigits) {
+    // elem_emi.addClass(hiddenClass);
+    // } else if (elem_emi.hasClass(hiddenClass)) {
+    //   invoke('removeClass', elem_emi, hiddenClass, 200);
+    // }
+  }
+
+  /**
+   * Show appropriate EMI-details strip on the new card screen.
+   */
+  function showAppropriateEmiDetailsForNewCard(
+    tab,
+    hasPlans,
+    cardLength,
+    methods
+  ) {
+    /**
+     * tab=card
+     * - plan selected: emi available
+     * - does not have plans: nothing
+     * - has plans: emi available
+     * - default: nothing
+     *
+     *
+     * tab=emi
+     * - plan selected: plan details
+     * - does not have plans: emi unavailable (with action)
+     * - does not have emi plans and methods.card=false: emi unavailable (without action)
+     * - has plans: pay without emi
+     * - methods.card=false: nothing
+     * - default: pay without emi
+     */
+    // TODO: read from state once moved
+    const emiDuration = _Doc.querySelector('#emi_duration').value;
+    showEmiCta = true;
+
+    if (tab === 'card') {
+      if (hasPlans) {
+        emiCtaView = 'available';
+      } else {
+        showEmiCta = false;
+      }
+    } else if (tab === 'emi') {
+      if (emiDuration) {
+        emiCtaView = 'plans-available';
+      } else if (cardLength >= 6 && !hasPlans) {
+        emiCtaView = 'plans-unavailable';
+      } else if (methods.card) {
+        emiCtaView = 'pay-without-emi';
+      } else {
+        showEmiCta = false;
+      }
+    }
+  }
+
   export function onShown() {
     setSavedCards();
+    onCardInput();
   }
 </script>
 
@@ -160,6 +258,8 @@
 </style>
 
 <Tab method="card" pad={false}>
+  <!-- TODO: check if this can be moved to store/ state -->
+  <input type="hidden" id="emi_duration" name="emi_duration" />
   {#if currentView === 'add-card'}
     <div transition:fly={{ duration: 100, y: 100 }}>
       {#if showAddCardCta}
@@ -170,7 +270,12 @@
           Use saved cards
         </div>
       {/if}
-      <AddCardView bind:cardType bind:this={addCardView} />
+      <AddCardView
+        {showEmiCta}
+        {emiCtaView}
+        bind:cardType
+        bind:this={addCardView}
+        on:cardinput={onCardInput} />
     </div>
   {:else}
     <div>
