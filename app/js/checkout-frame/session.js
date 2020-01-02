@@ -319,75 +319,6 @@ function toggleEmiPlanDetails(container, planIsSelected) {
   }
 }
 
-/**
- * Show appropriate EMI-details strip on the new card screen.
- */
-function showAppropriateEmiDetailsForNewCard(
-  tab,
-  hasPlans,
-  cardLength,
-  methods
-) {
-  /**
-   * tab=card
-   * - plan selected: emi available
-   * - does not have plans: nothing
-   * - has plans: emi available
-   * - default: nothing
-   *
-   *
-   * tab=emi
-   * - plan selected: plan details
-   * - does not have plans: emi unavailable (with action)
-   * - does not have emi plans and methods.card=false: emi unavailable (without action)
-   * - has plans: pay without emi
-   * - methods.card=false: nothing
-   * - default: pay without emi
-   */
-
-  var emiDuration = $('#emi_duration').val();
-
-  var emiPlanDetailsContainer = $(
-    '#add-card-container .emi-plans-info-container'
-  );
-  var payWithoutEmi = $(
-    '#add-card-container .emi-plans-trigger .emi-pay-without'
-  );
-  var emiPlansAvailable = $(
-    '#add-card-container .emi-plans-trigger .emi-plan-unselected'
-  );
-  var emiPlansUnavailable = $(
-    '#add-card-container .emi-plans-trigger .emi-plan-unavailable'
-  );
-  var emiPlanDetails = $(
-    '#add-card-container .emi-plans-trigger .emi-plan-selected'
-  );
-
-  payWithoutEmi.addClass('hidden');
-  emiPlansAvailable.addClass('hidden');
-  emiPlansUnavailable.addClass('hidden');
-  emiPlanDetails.addClass('hidden');
-  emiPlanDetailsContainer.addClass('details-visible');
-
-  if (tab === 'card') {
-    if (hasPlans) {
-      emiPlansAvailable.removeClass('hidden');
-    } else {
-      emiPlanDetailsContainer.removeClass('details-visible');
-    }
-  } else if (tab === 'emi') {
-    if (emiDuration) {
-      emiPlanDetails.removeClass('hidden');
-    } else if (cardLength >= 6 && !hasPlans) {
-      emiPlansUnavailable.removeClass('hidden');
-    } else if (methods.card) {
-      payWithoutEmi.removeClass('hidden');
-    } else {
-      emiPlanDetailsContainer.removeClass('details-visible');
-    }
-  }
-}
-
 function setEmiBank(data, savedCardScreen) {
   if (savedCardScreen) {
     var savedEmi = $('#saved-cards-container .checked input.emi_duration')[0];
@@ -402,94 +333,6 @@ function setEmiBank(data, savedCardScreen) {
       data.emi_duration = activeEmiPlan;
     }
   }
-}
-
-function onSixDigits(e) {
-  var el = e.target;
-  var emi_options = this.emi_options;
-
-  // Sanity check.
-  if (!el) {
-    return;
-  }
-
-  var val = el.value;
-
-  var cardType = $('#elem-card .cardtype').attr('cardtype');
-  var isMaestro = /^maestro/.test(cardType);
-  var sixDigits = val.length > 5;
-  var trimmedVal = val.replace(/[\ ]/g, '');
-
-  $(el.parentNode).toggleClass('six', sixDigits);
-  var emiObj;
-
-  var nocvvCheck = gel('nocvv');
-
-  if (sixDigits) {
-    if (isMaestro) {
-      if (nocvvCheck.disabled) {
-        toggleNoCvv(true);
-      }
-    } else {
-      each(emi_options.banks, function(bank, emiObjInner) {
-        if (emiObjInner.patt.test(val.replace(/ /g, ''))) {
-          emiObj = emiObjInner;
-        }
-      });
-
-      toggleNoCvv(false);
-    }
-  } else {
-    toggleNoCvv(false);
-  }
-
-  this.emiPlansForNewCard = emiObj;
-
-  if (emiObj) {
-    $('#expiry-cvv').removeClass('hidden');
-  } else {
-    $('#emi_duration').val('');
-  }
-
-  showAppropriateEmiDetailsForNewCard(
-    this.tab,
-    emiObj,
-    trimmedVal.length,
-    this.methods
-  );
-
-  if (trimmedVal.length >= 6) {
-    var emiBankChangeEvent;
-    if (typeof Event === 'function') {
-      emiBankChangeEvent = new Event('change');
-    } else {
-      emiBankChangeEvent = document.createEvent('Event');
-      emiBankChangeEvent.initEvent('change', true, true);
-    }
-  }
-
-  noCvvToggle({ target: nocvvCheck });
-
-  var elem_emi = $('#elem-emi');
-  var hiddenClass = 'hidden';
-
-  if (isMaestro && sixDigits) {
-    elem_emi.addClass(hiddenClass);
-  } else if (elem_emi.hasClass(hiddenClass)) {
-    invoke('removeClass', elem_emi, hiddenClass, 200);
-  }
-}
-
-function noCvvToggle(e) {
-  var nocvvCheck = e.target;
-  var shouldHideExpiryCVV = nocvvCheck.checked && !nocvvCheck.disabled;
-  $('#form-card').toggleClass('nocvv', shouldHideExpiryCVV);
-}
-
-function toggleNoCvv(show) {
-  // Display or hide the nocvv checkbox
-  $('#nocvv-check').toggleClass(shownClass, show);
-  gel('nocvv').disabled = !show;
 }
 
 function makeVisible(subject) {
@@ -2638,12 +2481,6 @@ Session.prototype = {
         this.fixLandscapeBug();
       }
 
-      this.on('keyup', '#card_number', onSixDigits);
-      // Also listen for paste.
-      this.on('blur', '#card_number', onSixDigits);
-
-      this.on('change', '#nocvv', noCvvToggle);
-
       var saveTick = qs('#save');
       if (saveTick) {
         this.on('change', '#save', function(e) {
@@ -2770,46 +2607,6 @@ Session.prototype = {
     }
 
     if (enabledMethods.emi) {
-      this.on('click', '#add-card-container', 'emi-plans-trigger', function(e) {
-        var $target = $(e.delegateTarget);
-        var eventName = 'emi:plans:';
-        var eventData = {
-          from: self.tab,
-        };
-
-        self.removeAndCleanupOffers();
-
-        if ($target.$('.emi-plan-unselected:not(.hidden)')[0]) {
-          self.showEmiPlans('new')(e);
-          eventName += 'view';
-        } else if ($target.$('.emi-plan-selected:not(.hidden)')[0]) {
-          self.showEmiPlans('new')(e);
-          eventName += 'edit';
-        } else if ($target.$('.emi-pay-without:not(.hidden)')[0]) {
-          if (enabledMethods.card) {
-            self.setScreen('card');
-            self.switchTab('card');
-            self.offers && self.renderOffers(this.tab);
-
-            eventName = 'emi:pay_without';
-          }
-        } else if ($target.$('.emi-plan-unavailable:not(.hidden)')[0]) {
-          if (enabledMethods.card) {
-            self.setScreen('card');
-            self.switchTab('card');
-            self.toggleSavedCards(false);
-            self.offers && self.renderOffers(this.tab);
-
-            eventName = 'emi:pay_without';
-          }
-        }
-
-        Analytics.track(eventName, {
-          type: AnalyticsTypes.BEHAV,
-          data: eventData,
-        });
-      });
-
       this.on('click', '#form-card', 'saved-card-pay-without-emi', function(e) {
         self.removeAndCleanupOffers();
 
@@ -3795,10 +3592,6 @@ Session.prototype = {
       this.bankTransferView.onShown();
     }
 
-    if (tab === 'card') {
-      this.svelteCardTab.onShown();
-    }
-
     if (!tab && this.multiTpv) {
       $('#body').addClass('sub');
     }
@@ -3809,10 +3602,7 @@ Session.prototype = {
       maxlength: 6,
     });
 
-    // TODO: move to onShown/onMount
-    onSixDigits.call(this, {
-      target: gel('card_number'),
-    });
+    this.svelteCardTab.onShown();
 
     var self = this;
     var customer = self.customer;
