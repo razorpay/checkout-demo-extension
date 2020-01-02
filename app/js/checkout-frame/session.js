@@ -1443,7 +1443,6 @@ Session.prototype = {
     this.setExperiments();
     this.setTpvBanks();
     this.getEl();
-    this.setMethodsList();
     this.setFormatting();
     this.improvisePaymentOptions();
     this.setSvelteComponents();
@@ -1549,19 +1548,6 @@ Session.prototype = {
       },
     });
     Analytics.setMeta('timeSince.render', discreet.timer());
-  },
-
-  setMethodsList: function() {
-    if (!this.methodsList && !this.newHomeScreen) {
-      this.methodsList = new discreet.MethodsList({
-        target: '#methods-list',
-        props: {
-          animate: false,
-        },
-      });
-
-      Analytics.track('p13n:set');
-    }
   },
 
   setUpiTab: function() {
