@@ -120,6 +120,7 @@
         </div>
       {/if}
 
+      <!-- TODO: handle nocvv for saved cards in getPayload -->
       {#if card.networkCode === 'maestro'}
         <label for={`nocvv-${token}`} class="maestro-cvv">
           <input class="nocvv-checkbox" type="checkbox" id={`nocvv-${token}`} />
@@ -138,7 +139,7 @@
             label="Pay using <strong>OTP / Password </strong>"
             name={`auth_type-${token}`}
             value="c3ds"
-            on:change={trackAtmRadio} />
+            on:change={handleAuthRadioChanged} />
           <Radio
             contaierClass="flow"
             id={`flow-pin-${token}`}
@@ -146,7 +147,7 @@
             label="Pay using <strong>ATM PIN</strong>"
             name={`auth_type-${token}`}
             value="pin"
-            on:change={trackAtmRadio} />
+            on:change={handleAuthRadioChanged} />
         </div>
       {/if}
     </div>
