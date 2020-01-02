@@ -1114,14 +1114,6 @@ Session.prototype = {
       classes.push('partial');
     }
 
-    if (getStore('contactEmailOptional') && !this.newHomeScreen) {
-      if (this.tpvBank) {
-        classes.push('tpv-no-details');
-      } else {
-        classes.push('no-details');
-      }
-    }
-
     if (this.irctc) {
       tab_titles.upi = 'BHIM/UPI';
       tab_titles.card = 'Debit/Credit Card';
@@ -1254,7 +1246,7 @@ Session.prototype = {
 
     if (tab && !(this.order && this.order.bank) && this.methods[tab]) {
       this.switchTab(tab);
-    } else if (tab === '' && this.newHomeScreen) {
+    } else if (tab === '') {
       this.switchTab(tab);
     }
 
@@ -1438,7 +1430,6 @@ Session.prototype = {
     }
 
     this.isOpen = true;
-    this.newHomeScreen = true;
 
     this.setExperiments();
     this.setTpvBanks();
@@ -1456,9 +1447,7 @@ Session.prototype = {
 
     Hacks.initPostRenderHacks();
 
-    if (this.newHomeScreen) {
-      makeContainerLong();
-    }
+    makeContainerLong();
 
     errorHandler.call(this, this.params);
 
@@ -1563,11 +1552,9 @@ Session.prototype = {
   },
 
   setHomeTab: function() {
-    if (this.newHomeScreen) {
-      this.homeTab = new discreet.HomeTab({
-        target: gel('home-screen-wrap'),
-      });
-    }
+    this.homeTab = new discreet.HomeTab({
+      target: gel('home-screen-wrap'),
+    });
   },
 
   setNetbankingTab: function() {
@@ -2582,30 +2569,10 @@ Session.prototype = {
         (amountValue * 100).toFixed(currencyConfig.decimals)
       );
       this.setPaymentMethods(this.preferences);
-
-      if (!this.newHomeScreen) {
-        options['prefill.contact'] = getPhone();
-        options['prefill.email'] = getEmail();
-        this.render({ forceRender: true });
-      } else {
-        this.updateAmountInHeader(amountValue * 100);
-      }
+      this.updateAmountInHeader(amountValue * 100);
     }
-    if (!this.newHomeScreen) {
-      $(this.el).addClass('show-methods');
-    } else {
-      this.homeTab.showMethods();
-    }
+    this.homeTab.showMethods();
     SessionStore.set({ screen: '' });
-
-    if (!this.newHomeScreen) {
-      if (this.methods.count >= 4) {
-        $(this.el).addClass('long');
-      }
-      if (this.methods.count >= 5) {
-        $(this.el).addClass('x-long');
-      }
-    }
   },
 
   setAmount: function(amount) {
@@ -2852,9 +2819,7 @@ Session.prototype = {
             $('#top-right').removeClass('logged');
             customer.logout(e.target.parentNode.firstChild === e.target);
 
-            if (this.newHomeScreen) {
-              this.homeTab.updateCustomer();
-            }
+            this.homeTab.updateCustomer();
           }
           container_listener();
           $('#top-right').removeClass('focus');
@@ -3299,70 +3264,6 @@ Session.prototype = {
         .add('phone', contactEl)
         .on('change', function() {
           self.input(this.el);
-
-          if (!self.newHomeScreen) {
-            var instruments = [];
-
-            var shouldUseP13n = self.p13n;
-
-            if (this.isValid() && shouldUseP13n) {
-              instruments = P13n.getInstrumentsForCustomer(
-                self.getCustomer(this.value),
-                {
-                  methods: self.methods,
-                }
-              );
-
-              if (instruments.length) {
-                Analytics.setMeta('p13n', true);
-
-                // Determine the number of instruments to be shown
-                var listOfInstrumentsToBeShown = isMobile() ? 3 : 2;
-                var _preferredMethods = {};
-
-                /**
-                 * Preprending method name with an underscore
-                 * because Lumberjack will delete a key called `card`.
-                 * It won't delete `_card` though.
-                 */
-                _Arr.loop(
-                  instruments.slice(0, listOfInstrumentsToBeShown),
-                  function(instrument) {
-                    _preferredMethods['_' + instrument.method] = true;
-                  }
-                );
-
-                Analytics.track('p13n:instruments:list', {
-                  data: {
-                    length: instruments.length,
-                    shown: Math.min(
-                      instruments.length,
-                      listOfInstrumentsToBeShown
-                    ),
-                    methods: _preferredMethods,
-                  },
-                });
-
-                /**
-                 * If the number of payment methods available
-                 * are few, the container may not be long
-                 * already.
-                 *
-                 * Make the container long if we are going
-                 * to use p13n.
-                 */
-                makeContainerLong();
-              }
-            }
-
-            self.methodsList &&
-              self.methodsList.set({
-                instruments: instruments,
-                customer: self.getCustomer(this.value),
-                tpvBank: this.tpvBank,
-                animate: true,
-              });
-          }
         });
 
       _El.on('blur', function() {
@@ -3509,11 +3410,7 @@ Session.prototype = {
      * Temp check, will be fixed when old homescreen is removed.
      */
     if (screen === '') {
-      if (this.newHomeScreen) {
-        if (this.homeTab && this.homeTab.onDetailsScreen()) {
-          invoke('focus', qs(screenEl + ' .invalid input'));
-        }
-      } else {
+      if (this.homeTab && this.homeTab.onDetailsScreen()) {
         invoke('focus', qs(screenEl + ' .invalid input'));
       }
     } else if (!(screen === 'upi' && this.upi_intents_data)) {
@@ -3537,7 +3434,7 @@ Session.prototype = {
       showPaybtn = Boolean(selectedInstrument);
     }
 
-    if (screen === '' && this.newHomeScreen && this.homeTab) {
+    if (screen === '' && this.homeTab) {
       this.homeTab.onShown();
     } else {
       this.body.toggleClass('sub', showPaybtn);
@@ -3873,7 +3770,7 @@ Session.prototype = {
     $('#content').removeClass('has-discount');
     //TODO: optimise queries
     $('#amount .discount').html('');
-    if (!(this.tab === '' && this.newHomeScreen)) {
+    if (this.tab !== '') {
       Cta.showAmountInCta();
     }
   },
@@ -4037,7 +3934,7 @@ Session.prototype = {
   checkCommonValid: function() {
     var selector = '#pad-common';
 
-    if (this.newHomeScreen && this.homeTab.onDetailsScreen()) {
+    if (this.homeTab.onDetailsScreen()) {
       selector = '#form-common';
     }
 
@@ -4107,9 +4004,7 @@ Session.prototype = {
     Analytics.setMeta('timeSince.tab', discreet.timer());
 
     if (tab === '') {
-      if (this.newHomeScreen) {
-        this.homeTab.onShown();
-      }
+      this.homeTab.onShown();
     }
 
     if (tab) {
@@ -4960,11 +4855,8 @@ Session.prototype = {
 
     fillData('#pad-common', data);
 
-    if (this.newHomeScreen) {
-      data.contact = getPhone();
-      data.email = getEmail();
-      // TODO: data.address, etc.
-    }
+    data.contact = getPhone();
+    data.email = getEmail();
 
     var prefillEmail = this.get('prefill.email');
     var prefillContact = this.get('prefill.contact');
@@ -5444,40 +5336,15 @@ Session.prototype = {
       return this.extraNext();
     }
 
-    if (this.oneMethod && !this.tab && !this.newHomeScreen) {
-      setTimeout(function() {
-        window.scrollTo(0, 100);
-      });
-
-      /**
-       * PayPal as a one-method submits
-       * directly from the homescreen.
-       * Do not switch the tab for it.
-       */
-      if (this.oneMethod !== 'paypal') {
-        return this.switchTab(this.oneMethod);
-      }
-    }
-
     preventDefault(e);
     var screen = this.screen;
     var tab = this.tab;
-
-    if (
-      !this.tab &&
-      !this.newHomeScreen &&
-      !this.order &&
-      !this.p13n &&
-      !(this.oneMethod && this.oneMethod === 'paypal')
-    ) {
-      return;
-    }
 
     /**
      * The CTA for home screen is visible only on the new design. If it was
      * clicked, switch to the new payment methods screen.
      */
-    if (!screen && this.newHomeScreen) {
+    if (!screen) {
       if (this.checkCommonValid()) {
         // switch to methods tab
         if (this.homeTab.onDetailsScreen()) {
@@ -5710,29 +5577,16 @@ Session.prototype = {
          * Add cvv to data from the currently selected method (p13n)
          * TODO: figure out a better way to do this.
          */
-        if (this.newHomeScreen) {
-          var $cvvEl = _Doc.querySelector(
-            '#instruments-list > .selected input.input'
-          );
+        var $cvvEl = _Doc.querySelector(
+          '#instruments-list > .selected input.input'
+        );
 
-          if ($cvvEl) {
-            if ($cvvEl.value.length === $cvvEl.maxLength) {
-              data['card[cvv]'] = $cvvEl.value;
-            } else {
-              $cvvEl.focus();
-              return this.shake();
-            }
-          }
-        } else {
-          var $cvvEl = $('#methods-list .option.selected .cvv-input');
-
-          if ($cvvEl) {
-            if ($cvvEl.val().length === selectedInstrument.cvvDigits) {
-              data['card[cvv]'] = $cvvEl.val();
-            } else {
-              $cvvEl.focus();
-              return this.shake();
-            }
+        if ($cvvEl) {
+          if ($cvvEl.value.length === $cvvEl.maxLength) {
+            data['card[cvv]'] = $cvvEl.value;
+          } else {
+            $cvvEl.focus();
+            return this.shake();
           }
         }
       }
@@ -5750,11 +5604,7 @@ Session.prototype = {
       return;
     }
 
-    if (this.newHomeScreen) {
-      return this.homeTab.getSelectedInstrument();
-    } else if (this.methodsList) {
-      return this.methodsList.getSelectedInstrument();
-    }
+    return this.homeTab.getSelectedInstrument();
   },
 
   verifyVpaAndContinue: function(data, params) {
@@ -5903,19 +5753,10 @@ Session.prototype = {
     if (this.get('address') && !(this.order && this.order.partial_payment)) {
       var notes = (data.notes = clone(this.get('notes')) || {});
 
-      if (!this.newHomeScreen) {
-        var $address = $('#address');
-
-        if ($address[0]) {
-          notes.address = $address.val();
-          notes.pincode = $('#pincode').val();
-          notes.state = $('#state').val();
-        }
-      } else {
-        notes.address = storeGetter(HomeScreenStore.address);
-        notes.pincode = storeGetter(HomeScreenStore.pincode);
-        notes.state = storeGetter(HomeScreenStore.state);
-      }
+      // Add address
+      notes.address = storeGetter(HomeScreenStore.address);
+      notes.pincode = storeGetter(HomeScreenStore.pincode);
+      notes.state = storeGetter(HomeScreenStore.state);
 
       if (Object.keys(notes).length > 15) {
         delete notes.pincode;
