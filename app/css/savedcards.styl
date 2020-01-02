@@ -12,7 +12,6 @@ $savedcontainerh = 220px;
 $cardpl = 70px;
 
 .left-card {
-  // display: none;
   padding: 0 20px 0 $cardpl;
   height: $cardHeights['default'];
   left: 0;
@@ -27,92 +26,92 @@ $cardpl = 70px;
 }
 
 
-#savedcards-recurring-message{
+#savedcards-recurring-message {
   display: none;
 }
 
 
 #form-card {
   .saved-card {
-      pointer-events: none;
-      height: $cardHeights['emi'];
-      max-height: $cardHeights['default'];
-      overflow: hidden;
-      z-index: 2;
-      pointer-events: all;
+    pointer-events: none;
+    height: $cardHeights['emi'];
+    max-height: $cardHeights['default'];
+    overflow: hidden;
+    z-index: 2;
+    pointer-events: all;
 
-      &[maestro].checked {
+    &[maestro].checked {
 
-        .elem-savedcards-emi {
+      .elem-savedcards-emi {
+        display: block;
+      }
+    }
+
+    &[pin] {
+      &.checked {
+        overflow: hidden;
+
+        .flow-selection-container {
           display: block;
         }
       }
+    }
 
-      &[pin] {
-        &.checked {
-          overflow: hidden;
+    &.checked {
+      background: #eff0f1;
+      border-color: $bc;
 
-          .flow-selection-container {
-            display: block;
-          }
-        }
-      }
-      &.checked {
-        background: #eff0f1;
-        border-color: $bc;
-        .saved-cvv {
-          pointer-events: auto;
-          opacity: 1;
-        }
+      .saved-cvv {
+        pointer-events: auto;
+        opacity: 1;
       }
     }
+  }
+
   .saved-inner,
-    .saved-outer {
-      opacity: 1;
-    }
+  .saved-outer {
+    opacity: 1;
+  }
+
   &:not(.saved-cards) {
     #saved-cards-container {
       margin-bottom: -8px;
     }
   }
-    #elem-emi {
-      display: none;
-    }
-    #show-saved-cards {
-      transition-delay: 0s;
-      // opacity: 0;
-      pointer-events: inherit;
-    }
-    #show-add-card {
-      opacity: 1;
-    }
 
-    .maestro-cvv {
-      display: block;
-      font-size: 13px;
-      line-height: 32px;
-    }
-    .cardtype {
-      transform: none;
-    }
-    #add-card-container {
-      z-index: 0;
-    }
-    #show-add-card + .pad {
-      pointer-events: none;
-    }
-    #savedcards-recurring-message {
-      display: block;
-    }
-    #addcard-recurring-message {
-      display: none;
-    }
+  #elem-emi {
+    display: none;
   }
-  &.has-cards {
-    #saved-cards-container,
-    #show-saved-cards {
-      display: block;
-    }
+
+  #show-add-card {
+    opacity: 1;
+  }
+
+  .maestro-cvv {
+    display: block;
+    font-size: 13px;
+    line-height: 32px;
+  }
+
+  .cardtype {
+    transform: none;
+  }
+
+  #add-card-container {
+    z-index: 0;
+  }
+
+  #show-add-card + .pad {
+    pointer-events: none;
+  }
+
+  #savedcards-recurring-message {
+    display: block;
+  }
+
+  #addcard-recurring-message {
+    display: none;
+  }
 }
 
 .saved-card:last-child:not(:first-child) .cardtype {
@@ -121,36 +120,8 @@ $cardpl = 70px;
 
 #add-card-container {
   transition: 0.2s;
-  height: 166px;
   z-index: 2;
   position: relative;
-
-  .card-fields {
-    .elem-wrap {
-      height: auto;
-      margin-bottom: 8px;
-
-      &:nth-last-child(1),
-      &:nth-last-child(2) {
-        margin-bottom: 16px;
-      }
-    }
-  }
-
-  .elem {
-    label {
-      top: 24px;
-    }
-    .input {
-      padding: 24px 0 4px 0;
-    }
-
-    select.input {
-      padding: 7px 0;
-    }
-  }
-
-
 }
 
 .saved-card {
@@ -228,6 +199,7 @@ $cardpl = 70px;
       border-color: #0189CF;
       background: linear-gradient(to bottom, #53AEF5, #0167A9);
     }
+
     &[cardtype=maestro] {
       background: linear-gradient(to bottom, #FBD51F, #EFA010);
       border-color: #DAB608;
@@ -252,7 +224,6 @@ $cardpl = 70px;
   font-size: 20px;
   color: #777;
   font-weight: bold;
-
 }
 
 #show-add-card {
@@ -262,41 +233,12 @@ $cardpl = 70px;
   position: absolute;
   z-index: 1;
   opacity: 0;
+
   &::before {
     display: inline-block;
     content: '+';
   }
 }
-
-.elem-card {
-  .cardtype {
-    position: absolute;
-    right: 0;
-    bottom: 10px;
-  }
-}
-
-#nocvv-check {
-  margin: 10px 0 0;
-  position: relative;
-  z-index: 10;
-}
-
-
-.left-card,
-  #should-save-card {
-    display: block;
-  }
-// .save-enabled {
-//   .left-card,
-//   #should-save-card {
-//     display: block;
-//   }
-
-//   #add-card-container {
-//     height: 196px;
-//   }
-// }
 
 .cardtype::before, .networkicon {
   content: '';
@@ -373,8 +315,8 @@ $cardpl = 70px;
       display: none;
 
   #form-card
-    &.no-emi-cards
-      #show-saved-cards,
+    &.no-emi-cards // TODO: check what this does
+
       #saved-cards-container
         display: none;
 
@@ -398,9 +340,11 @@ $cardpl = 70px;
         &[emi]
           height: $cardHeights['emi'];
           max-height: $cardHeights['emi'];
+
         &[pin]
           height: $cardHeights['debitPin'];
           max-height: $cardHeights['debitPin'];
+
         &[maestro]
           height: $cardHeights['maestro'];
           max-height: $cardHeights['maestro'];
@@ -409,6 +353,7 @@ $cardpl = 70px;
           &[pin]
             height: $cardHeights['debitPin'] + $emiStripHeight;
             max-height: $cardHeights['debitPin'] + $emiStripHeight;
+
         &[emi]
           &[maestro]
             height: $cardHeights['emi'] + $maestroHeight;
