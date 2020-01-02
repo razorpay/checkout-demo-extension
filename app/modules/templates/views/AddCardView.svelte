@@ -1,9 +1,11 @@
 <script>
-  /* global showOverlay */
-  // UI Imports
+  /* global showOverlay, gel, Event */
   import NumberField from 'templates/views/ui/fields/card/NumberField.svelte';
   import ExpiryField from 'templates/views/ui/fields/card/ExpiryField.svelte';
   import CvvField from 'templates/views/ui/fields/card/CvvField.svelte';
+
+  // Svelte imports
+  import { createEventDispatcher } from 'svelte';
 
   // Store
   import {
@@ -21,15 +23,37 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import CardFlowSelectionRadio from './ui/CardFlowSelectionRadio.svelte';
+  import { getIin, getCardDigits, getCardType } from 'common/card';
+  import { DEFAULT_AUTH_TYPE_RADIO } from 'common/constants';
 
   const session = getSession();
+  const dispatch = createEventDispatcher();
+
+  let numberField = null;
   let expiryField = null;
   let nameField = null;
   let cvvField = null;
 
+  let noCvvChecked = false;
+  let showNoCvvCheckbox = false;
+  let hideExpiryCvvFields = false;
+
+  $: {
+    if (cardType) {
+      showNoCvvCheckbox = cardType === 'maestro' && $cardNumber.length > 5;
+    }
+  }
+
+  $: {
+    hideExpiryCvvFields = showNoCvvCheckbox && noCvvChecked;
+  }
+
   export let cardType = null;
-  let cvvLength = 3;
-  let showAuthTypeSelectionRadio = true; // TODO: set this for showing/hiding radio
+  export let showEmiCta = false;
+  export let emiCtaView = '';
+
+  let showAuthTypeSelectionRadio = false;
+  let showDebitPinRadio = false;
 
   function handleCardNetworkChanged(event) {
     cardType = event.detail.type;
@@ -64,6 +88,11 @@
       'card[cvv]': $cardCvv,
       'card[name]': $cardName,
     };
+    // Fill in dummy values for expiry and CVV if the CVV and expiry fields are hidden
+    if (hideExpiryCvvFields) {
+      payload['card[expiry]'] = '12 / 21';
+      payload['card[cvv]'] = '000';
+    }
     if ($remember) {
       payload.save = 1;
     }
@@ -72,53 +101,180 @@
     }
     return payload;
   }
+
+  function setDebitPinRadiosVisibility(visible) {
+    if (visible) {
+      $authType = DEFAULT_AUTH_TYPE_RADIO;
+    }
+
+    showDebitPinRadio = Boolean(visible);
+  }
+
+  const Flows = {
+    PIN: 'pin',
+    OTP: 'otp',
+    RECURRING: 'recurring',
+  };
+
+  /**
+   * @param {Object} flows
+   * @param {String} flow
+   *
+   * @return {Boolean}
+   */
+  const isFlowApplicable = _.curry2((flows, flow) => Boolean(flows[flow]));
+
+  /**
+   * Checks and performs actions related to card flows
+   * and validate the card input.
+   */
+  function onCardNumberChange() {
+    const value = $cardNumber;
+    const cardNumber = getCardDigits(value);
+    const iin = getIin(cardNumber);
+    const isStrictlyRecurring =
+      session.recurring && session.get('recurring') !== 'preferred';
+
+    const flowChecker = (flows = {}) => {
+      const cardNumber = getCardDigits(value);
+      const isIinSame = getIin(cardNumber) === iin;
+
+      // If the card number was changed before response, do nothing
+      if (!isIinSame) {
+        return;
+      }
+
+      let isValid = numberField.sync();
+
+      if (isStrictlyRecurring) {
+        isValid = isValid && isFlowApplicable(flows, Flows.RECURRING);
+      } else {
+        // Debit-PIN is not supposed to work in case of recurring
+        if (isFlowApplicable(flows, Flows.PIN)) {
+          setDebitPinRadiosVisibility(true);
+        } else {
+          setDebitPinRadiosVisibility(false);
+        }
+      }
+
+      numberField.setCardValidity(isValid);
+    };
+
+    if (iin.length < 6) {
+      setDebitPinRadiosVisibility(false);
+    }
+
+    if (iin.length >= 6) {
+      session.r.getCardFlows(iin, flowChecker);
+    }
+  }
+
+  function handleEmiCtaClick(e) {
+    let eventName = 'emi:plans:';
+    const eventData = {
+      from: session.tab,
+    };
+
+    session.removeAndCleanupOffers();
+
+    if (emiCtaView === 'available') {
+      session.showEmiPlans('new')(e);
+      eventName += 'view';
+    } else if (emiCtaView === 'plans-available') {
+      session.showEmiPlans('new')(e);
+      eventName += 'edit';
+    } else if (emiCtaView === 'pay-without-emi') {
+      if (session.methods.card) {
+        session.setScreen('card');
+        session.switchTab('card');
+        session.offers && session.renderOffers(session.tab);
+
+        eventName = 'emi:pay_without';
+      }
+    } else if (emiCtaView === 'plans-unavailable') {
+      if (session.methods.card) {
+        session.setScreen('card');
+        session.switchTab('card');
+        session.toggleSavedCards(false);
+        session.offers && session.renderOffers(this.tab);
+
+        eventName = 'emi:pay_without';
+      }
+    }
+
+    Analytics.track(eventName, {
+      type: AnalyticsTypes.BEHAV,
+      data: eventData,
+    });
+  }
 </script>
 
 <style>
   .row {
     display: flex;
+    margin-top: 12px;
+    margin-bottom: 12px;
+  }
+
+  .row.card-fields {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .remember-check {
+    justify-content: space-between;
+    margin-top: 20px;
   }
 
   .two-third {
     width: 66.66%;
+    flex-grow: 1;
   }
 
   .third {
-    margin-left: 20px;
+    box-sizing: border-box;
+    padding-left: 20px;
     width: 33.33%;
-  }
-
-  .save-checkbox {
-    margin-top: 24px;
-    justify-content: space-between;
   }
 </style>
 
 <div class="pad" id="add-card-container">
-  <div class="row">
+  <div class="row card-fields">
     <div class="two-third">
       <NumberField
+        id="card_number"
         bind:value={$cardNumber}
+        bind:this={numberField}
         type={cardType}
         on:network={handleCardNetworkChanged}
-        on:filled={_ => handleFilled('numberField')} />
+        on:filled={_ => handleFilled('numberField')}
+        on:input={_ => dispatch('cardinput')} />
     </div>
-    <div class="third">
-      <ExpiryField
-        bind:value={$cardExpiry}
-        bind:this={expiryField}
-        on:filled={_ => handleFilled('expiryField')} />
-    </div>
+    {#if !hideExpiryCvvFields}
+      <div class="third">
+        <ExpiryField
+          id="card_expiry"
+          bind:value={$cardExpiry}
+          bind:this={expiryField}
+          on:filled={_ => handleFilled('expiryField')} />
+      </div>
+    {/if}
   </div>
-  <div class="row">
+  <div class="row card-fields">
     <div class="two-third">
-      <NameField bind:value={$cardName} bind:this={nameField} />
+      <NameField id="card_name" bind:value={$cardName} bind:this={nameField} />
     </div>
-    <div class="third">
-      <CvvField bind:value={$cardCvv} {cardType} bind:this={cvvField} />
-    </div>
+    {#if !hideExpiryCvvFields}
+      <div class="third">
+        <CvvField
+          id="card_cvv"
+          bind:value={$cardCvv}
+          {cardType}
+          bind:this={cvvField} />
+      </div>
+    {/if}
   </div>
-  <div class="row save-checkbox">
+  <div class="row remember-check">
     <div>
       <label for="save" tabIndex="0">
         <input
@@ -136,7 +292,66 @@
       View all EMI Plans
     </div>
   </div>
-  <div class="row">
-    <CardFlowSelectionRadio bind:value={$authType} />
-  </div>
+  {#if showEmiCta}
+    <div id="elem-emi">
+      <div
+        class="strip emi-plans-info-container emi-plans-trigger"
+        on:click={handleEmiCtaClick}>
+        {#if emiCtaView === 'plans-unavailable'}
+          <div class="emi-plan-unavailable emi-icon-multiple-cards">
+            <!-- TODO generate CSV -->
+            <span class="help">
+              EMI is available on `=emi_banks_csv ` cards. Enter your credit
+              card to avail.
+            </span>
+            <div class="emi-plans-text">EMI unavailable</div>
+            {#if session.methods.card}
+              <div class="emi-plans-action theme-highlight">
+                Pay entire amount
+              </div>
+            {/if}
+          </div>
+        {/if}
+        {#if emiCtaView === 'plans-available'}
+          <div class="emi-plan-selected emi-icon-multiple-cards">
+            <div class="emi-plans-text" />
+            <div class="emi-plans-action theme-highlight">Edit</div>
+          </div>
+        {/if}
+        {#if emiCtaView === 'available'}
+          <div class="emi-plan-unselected emi-icon-multiple-cards">
+            <div class="emi-plans-text">EMI Available</div>
+            <div class="emi-plans-action theme-highlight">Pay with EMI</div>
+          </div>
+        {/if}
+        {#if emiCtaView === 'pay-without-emi'}
+          <div class="emi-pay-without emi-icon-single-card">
+            <div class="emi-plans-text no-action">
+              Pay entire amount
+              <span class="count-text" />
+            </div>
+            <div class="emi-plans-action theme-highlight" />
+          </div>
+        {/if}
+      </div>
+    </div>
+  {/if}
+  {#if showNoCvvCheckbox}
+    <div class="row">
+      <label id="nocvv-check" for="nocvv">
+        <input
+          type="checkbox"
+          class="checkbox--square"
+          id="nocvv"
+          bind:checked={noCvvChecked} />
+        <span class="checkbox" />
+        My Maestro Card doesn't have Expiry/CVV
+      </label>
+    </div>
+  {/if}
+  {#if showAuthTypeSelectionRadio}
+    <div class="row">
+      <CardFlowSelectionRadio bind:value={$authType} />
+    </div>
+  {/if}
 </div>
