@@ -1,5 +1,5 @@
 <script>
-  export let value = null;
+  export let value;
 
   function handleRadioChanged(event) {
     value = event.target.value;
@@ -34,7 +34,7 @@
       name="auth_type"
       id="flow-3ds"
       value="c3ds"
-      checked={value === 'c3ds'}
+      bind:group={value}
       on:change={handleRadioChanged} />
     <label for="flow-3ds">
       <div class="radio-display" />
@@ -47,7 +47,7 @@
       name="auth_type"
       id="flow-pin"
       value="pin"
-      checked={value === 'pin'}
+      bind:group={value}
       on:change={handleRadioChanged} />
     <label for="flow-pin">
       <div class="radio-display" />
