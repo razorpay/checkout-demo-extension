@@ -10,6 +10,7 @@
   export let value;
   export let minAmountLabel;
   export let partialDescription;
+  export let showMinAmountCheckbox = false;
 
   const session = getSession();
 
@@ -142,6 +143,6 @@
   </div>
 {/if}
 
-{#if !minAmount || amountPaid !== 0}
+{#if showMinAmountCheckbox}
   <div class="subtitle subtitle--help">{partialDescription}</div>
 {/if}
