@@ -2741,10 +2741,9 @@ Session.prototype = {
 
     var el_amount = gel('amount-value');
     if (self.methods.card || self.methods.emi) {
-      var el_card = gel('card_number');
+      // TODO: move to field onMount
       var el_expiry = gel('card_expiry');
       var el_cvv = gel('card_cvv');
-      var el_name = gel('card_name');
 
       // check if we're in webkit
       // checking el_expiry here in place of el_cvv, as IE also returns browser unsupported attribute rules from getComputedStyle
@@ -2777,56 +2776,6 @@ Session.prototype = {
           }
         }
       } catch (e) {}
-
-      delegator.card = delegator
-        .add('card', el_card)
-        .on('network', function() {
-          var type = this.type;
-          // update cvv element
-          var cvvlen = type !== 'amex' ? 3 : 4;
-          el_cvv.maxLength = cvvlen;
-          el_cvv.pattern = '^[0-9]{' + cvvlen + '}$';
-          $(el_cvv)
-            .toggleClass('amex', type === 'amex')
-            .toggleClass('maestro', type === 'maestro');
-
-          if (!preferences.methods.amex && type === 'amex') {
-            $('#elem-card').addClass('noamex');
-          } else {
-            $('#elem-card').removeClass('noamex');
-          }
-
-          self.input(el_cvv);
-
-          // card icon element
-          this.el.parentNode
-            .querySelector('.cardtype')
-            .setAttribute('cardtype', type);
-        })
-        .on('change', function() {
-          discreet.Flows.performCardFlowActionsAndValidate(
-            gel('elem-card'),
-            this.el,
-            gel('card_expiry')
-          );
-        });
-
-      delegator.expiry = delegator
-        .add('expiry', el_expiry)
-        .on('change', function() {
-          self.input(el_expiry);
-
-          var isValid = this.isValid();
-          toggleInvalid($(this.el.parentNode), isValid);
-
-          if (isValid && this.el.value.length === this.caretPosition) {
-            invoke('focus', el_name.value ? el_cvv : el_name);
-          }
-        });
-
-      delegator.cvv = delegator.add('number', el_cvv).on('change', function() {
-        self.input(this.el);
-      });
     }
 
     delegator.otp = delegator
@@ -4908,42 +4857,26 @@ Session.prototype = {
           return this.showLoadError('AMEX cards are not supported', true);
         }
         var nocvv_el = $('#nocvv-check [type=checkbox]')[0];
-        if (!this.savedCardScreen) {
-          // handling add new card screen
-          // formattingDelegator.card.format();
-          // formattingDelegator.expiry.format();
-          // if maestro card is active
-          // if (nocvv_el.checked && !nocvv_el.disabled) {
-          //   $('.elem-expiry').removeClass('invalid');
-          //   $('.elem-cvv').removeClass('invalid');
-          //   data['card[cvv]'] = '000';
-          // explicitly remove, else it'll override month/year later
-          // delete data['card[expiry]'];
-          // data['card[expiry_month]'] = '12';
-          // data['card[expiry_year]'] = '21';
-          // }
-        } else {
-          if (!data['card[cvv]']) {
-            var checkedCard = $('.saved-card.checked');
+        if (this.savedCardScreen && !data['card[cvv]']) {
+          var checkedCard = $('.saved-card.checked');
 
-            /**
-             * When CVV is missing, allow to go ahead only if:
-             * 1. Card is a not Maestro card
-             * OR
-             * 2. tab=emi and saved card supports emi and emi duration is not selected
-             */
-            if (
-              !(
-                checkedCard.$('.cardtype').attr('cardtype') === 'maestro' ||
-                (checkedCard.attr('emi') &&
-                  this.tab === 'emi' &&
-                  !data.emi_duration)
-              )
-            ) {
-              // no saved card was selected
-              this.shake();
-              return $('.checked .saved-cvv').focus();
-            }
+          /**
+           * When CVV is missing, allow to go ahead only if:
+           * 1. Card is a not Maestro card
+           * OR
+           * 2. tab=emi and saved card supports emi and emi duration is not selected
+           */
+          if (
+            !(
+              checkedCard.$('.cardtype').attr('cardtype') === 'maestro' ||
+              (checkedCard.attr('emi') &&
+                this.tab === 'emi' &&
+                !data.emi_duration)
+            )
+          ) {
+            // no saved card was selected
+            this.shake();
+            return $('.checked .saved-cvv').focus();
           }
         }
 
