@@ -135,7 +135,9 @@
   }
 
   export function setValid(isValid) {
-    _El.keepClass(wrap, 'invalid', !isValid);
+    setTimeout(_ => {
+      _El.keepClass(wrap, 'invalid', !isValid);
+    });
   }
 </script>
 
@@ -144,7 +146,7 @@
    * TODO: standardize / fix padding
    */
   div:not(.help) {
-    padding: 4px 0;
+    /*padding: 4px 0;*/
     input {
       opacity: 1;
       width: 100%;
@@ -184,7 +186,7 @@
     class:no-refresh={!refresh}
     class:no-focus={handleFocus}
     class:no-blur={handleBlur}
-    class:no-input={handleInput}
+    class:no-validate={handleInput}
     class:cvv-input={type === 'cvv'} />
   {#if label}
     <label>{label}</label>
