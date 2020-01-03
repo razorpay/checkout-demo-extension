@@ -35,8 +35,8 @@
   },
   "scripts": {
     "test:unit": "./rollup.test.js | tap-difflet",
-    "jest": "jest blackbox/tests --testTimeout=30000",
-    "test": "npm run test:unit && npm run build && jest blackbox/tests/homescreen blackbox/tests/Payouts --testTimeout=30000",
+    "jest": "jest blackbox/tests --testTimeout=30000 --bail",
+    "test": "npm run test:unit && npm run build && jest blackbox/tests/homescreen blackbox/tests/Payouts --testTimeout=30000 --bail",
     "build": "$ rollup -c --environment prod && $ gulp && $ lintOutput app/js/generated/entry",
     "start": "$ gulp watch",
     "clean": "$ ./scripts/clean.sh"
