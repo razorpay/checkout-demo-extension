@@ -17,7 +17,6 @@
 
   let invalid = false;
   let field = null;
-  let formatterObj = null;
 
   export function getType() {
     return type;
@@ -123,7 +122,6 @@
     required={true}
     {value}
     type="tel"
-    formatterObj
     autocomplete="off"
     label="Card Number"
     handleBlur
