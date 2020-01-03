@@ -28,6 +28,15 @@
     dispatch('input', e.detail);
   }
 
+  function getHelpText(methods, cardType) {
+    if (!methods.amex && type === 'amex') {
+      return 'Amex cards are not supported for this transaction.';
+    }
+    return 'Please enter your card number';
+  }
+
+  $: helpText = getHelpText(session.methods, type);
+
   /**
    * Validate the card number.
    * @return {Boolean}
@@ -60,11 +69,6 @@
     //   .toggleClass('amex', type === 'amex')
     //   .toggleClass('maestro', type === 'maestro');
     //
-    // if (!preferences.methods.amex && type === 'amex') {
-    //   $('#elem-card').addClass('noamex');
-    // } else {
-    //   $('#elem-card').removeClass('noamex');
-    // }
   }
 
   export function setCardValidity(isValid) {
@@ -114,10 +118,11 @@
   <!-- TODO: set maxlength based on type or remove from here if already handled by formatter -->
   <!-- TODO: handle prefill and readonly -->
   <!-- TODO: change help message for AMEX -->
+  <!-- TODO: Fix invalid class not being applied -->
   <Field
     {id}
     formatter={{ type: 'card', on: { network: handleNetwork } }}
-    helpText="Please enter your card number"
+    {helpText}
     name="card[number]"
     required={true}
     {value}
