@@ -145,11 +145,11 @@
         );
     }
 
-    session.emiPlansForNewCard = emiObj;
+    session.emiPlansForNewCard = emiObj && emiObj[1];
 
     if (!emiObj) {
       // TODO: move to session.js
-      // $('#emi_duration').val('');
+      _Doc.querySelector('#emi_duration').value = '';
     }
 
     showAppropriateEmiDetailsForNewCard(
@@ -169,14 +169,9 @@
       }
     }
 
-    // var elem_emi = $('#elem-emi');
-    // var hiddenClass = 'hidden';
-
-    // if (isMaestro && sixDigits) {
-    // elem_emi.addClass(hiddenClass);
-    // } else if (elem_emi.hasClass(hiddenClass)) {
-    //   invoke('removeClass', elem_emi, hiddenClass, 200);
-    // }
+    if (isMaestro && sixDigits) {
+      showEmiCta = false;
+    }
   }
 
   /**

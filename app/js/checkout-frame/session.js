@@ -41,6 +41,7 @@ var preferences = window.preferences,
   OtpService = discreet.OtpService,
   storeGetter = discreet.storeGetter,
   HomeScreenStore = discreet.HomeScreenStore,
+  EmiStore = discreet.EmiStore,
   Cta = discreet.Cta,
   NBHandlers = discreet.NBHandlers;
 
@@ -3833,8 +3834,6 @@ Session.prototype = {
       return function(e) {
         tab_titles.emiplans = tabTitle;
 
-        var trigger = e.delegateTarget;
-        var $trigger = $(trigger);
         var bank = self.emiPlansForNewCard && self.emiPlansForNewCard.code;
         var plans = (emi_options.banks[bank] || {}).plans;
 
@@ -3886,9 +3885,7 @@ Session.prototype = {
               });
 
               $('#emi_duration').val(value);
-              $trigger.$(
-                '.emi-plan-selected .emi-plans-text'
-              )[0].innerHTML = text;
+              EmiStore.selectedPlanText.set(text);
 
               self.switchTab('emi');
               self.toggleSavedCards(false);
@@ -3973,11 +3970,11 @@ Session.prototype = {
                 value: value,
               });
 
-              $trigger.$('.emi_duration').val(value);
-              $trigger.$(
-                '.emi-plan-selected .emi-plans-text'
-              )[0].innerHTML = text;
-              toggleEmiPlanDetails($trigger.parent().parent(), true);
+              // TODO: set in store
+              // $trigger.$('.emi_duration').val(value);
+              EmiStore.selectedPlanText.set(text);
+              // TODO: check what toggle does
+              // toggleEmiPlanDetails($trigger.parent().parent(), true);
 
               self.switchTab('emi');
               self.setScreen('card');
@@ -4174,6 +4171,7 @@ Session.prototype = {
     } else if (this.tab === 'emi') {
       this.toggleSavedCards(emiCards.length > 0);
     }
+    // TODO: remove and implement in cards tab
     $('#form-card').toggleClass('has-cards', tokens);
     $('#form-card').toggleClass('no-emi-cards', !emiCards.length);
 

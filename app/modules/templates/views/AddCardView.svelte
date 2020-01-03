@@ -17,6 +17,8 @@
     authType,
   } from 'checkoutstore/screens/card';
 
+  import { selectedPlanText } from 'checkoutstore/emi';
+
   // Utils
   import { getSession } from 'sessionmanager';
   import NameField from './ui/fields/card/NameField.svelte';
@@ -196,7 +198,7 @@
         session.setScreen('card');
         session.switchTab('card');
         session.toggleSavedCards(false);
-        session.offers && session.renderOffers(this.tab);
+        session.offers && session.renderOffers(session.tab);
 
         eventName = 'emi:pay_without';
       }
@@ -314,7 +316,7 @@
         {/if}
         {#if emiCtaView === 'plans-available'}
           <div class="emi-plan-selected emi-icon-multiple-cards">
-            <div class="emi-plans-text" />
+            <div class="emi-plans-text">{$selectedPlanText}</div>
             <div class="emi-plans-action theme-highlight">Edit</div>
           </div>
         {/if}

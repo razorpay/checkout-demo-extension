@@ -53,6 +53,7 @@ import Store from 'checkoutstore';
 import PreferencesStore from 'checkoutstore/preferences';
 import SessionStore from 'checkoutstore/session';
 import DowntimesStore from 'checkoutstore/downtimes';
+import * as EmiStore from 'checkoutstore/emi';
 import * as OTPScreenStore from 'checkoutstore/screens/otp';
 import * as Cta from 'checkoutstore/cta';
 import * as HomeScreenStore from 'checkoutstore/screens/home';
@@ -133,6 +134,7 @@ export default {
   SessionStore,
   OTPScreenStore,
   HomeScreenStore,
+  EmiStore,
   Cta,
 
   getQueryParams: _.getQueryParams,
