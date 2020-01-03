@@ -28,7 +28,6 @@
   }
 </script>
 
-<!-- TODO: fix label overlapping placeholder  -->
 <Field
   formatter={{ type: 'expiry' }}
   id="card[expiry]"

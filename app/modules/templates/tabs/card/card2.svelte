@@ -74,23 +74,9 @@
           });
         }
 
-        savedCards = session.transformTokens(tokensList.items); // Rajat, looks emi is this needed here?
-        // showSavedCards = true;
-        // TODO: show saved cards
-
-        var totalSavedCards = getSavedCards(savedCards).length;
+        savedCards = session.transformTokens(tokensList.items);
       }
     }
-
-    // TODO: check if this can be removed
-    // var selectableSavedCard = getSelectableSavedCardElement(
-    //   'card', //hardcoding for now
-    //   this.selectedSavedCardToken
-    // );
-    //
-    // if (tokens && selectableSavedCard) {
-    //   session.setSavedCard({ delegateTarget: selectableSavedCard });
-    // }
 
     session.savedCardScreen = tokens;
 

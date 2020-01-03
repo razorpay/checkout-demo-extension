@@ -9,7 +9,6 @@
   export let cards = [];
   let selected = {};
 
-  // TODO: handle for radio as well
   let currentCvv = '';
   let currentAuthType = '';
 
