@@ -1,6 +1,6 @@
 <script>
   import Field from 'templates/views/ui/Field.svelte';
-  import { getSession } from 'sessionmanager';
+
   import { Formatter } from 'formatter';
   import { createEventDispatcher } from 'svelte';
 
@@ -9,8 +9,6 @@
   export let ref = null;
 
   const dispatch = createEventDispatcher();
-  const session = getSession();
-  let formatterObj = null;
 
   function handleInput(event) {
     value = event.target.value;
