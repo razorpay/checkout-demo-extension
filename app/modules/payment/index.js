@@ -442,7 +442,7 @@ Payment.prototype = {
 
     // no ajax route for simpl/icici
     if (data.method === 'paylater') {
-      if (data.provider === 'simpl' || data.provider === 'icici') {
+      if (data.provider === 'getsimpl' || data.provider === 'icici') {
         return;
       }
     }
