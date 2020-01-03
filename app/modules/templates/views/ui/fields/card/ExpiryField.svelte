@@ -19,7 +19,7 @@
 
   function onChange() {
     let isValid = Formatter.rules.expiry.isValid.call({
-      value: ref.getRawValue(),
+      value: ref.getRawValue() || '',
     });
     ref.setValid(isValid);
     if (isValid && value.length === ref.getCaret()) {
