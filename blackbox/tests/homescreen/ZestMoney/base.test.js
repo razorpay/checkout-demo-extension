@@ -8,7 +8,6 @@ const {
   handleCardlessEMIPaymentCreation,
   selectZestMoneyEMIPlan,
   submit,
-  verifyOfferApplied,
 } = require('../../../actions/common');
 
 const {
@@ -53,7 +52,6 @@ describe.each(
     await typeOTPandSubmit(context);
     await handleOtpVerificationForCardlessEMI(context);
     await selectZestMoneyEMIPlan(context, 1);
-    await verifyOfferApplied(context);
     await submit(context);
     await handleCardlessEMIPaymentCreation(context);
   });

@@ -3671,8 +3671,6 @@ Session.prototype = {
       // Don't preselect offer for Cardless EMI homescreen.
       if (tab === 'cardless_emi' && this.screen === 'cardless_emi') {
         this.preSelectedOffer = null;
-      } else {
-        this.preSelectedOffer = defaultOffer;
       }
     }
 
@@ -7060,16 +7058,18 @@ Session.prototype = {
     var order = preferences.order;
 
     // emandate
-    if (order && order.bank_account) {
-      _Arr.loop(['ifsc', 'name', 'account_number'], function(key) {
-        if (order.bank_account[key]) {
-          options['prefill.bank_account[' + key + ']'] =
-            order.bank_account[key];
-        }
-      });
+    if (order) {
+      if (order.bank_account) {
+        _Arr.loop(['ifsc', 'name', 'account_number'], function(key) {
+          if (order.bank_account[key]) {
+            options['prefill.bank_account[' + key + ']'] =
+              order.bank_account[key];
+          }
+        });
 
-      if (order.bank) {
-        options['prefill.bank'] = order.bank;
+        if (order.bank) {
+          options['prefill.bank'] = order.bank;
+        }
       }
 
       if (order.auth_type) {

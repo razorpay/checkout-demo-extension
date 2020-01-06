@@ -8,7 +8,6 @@ const {
   handleCardlessEMIPaymentCreation,
   selectZestMoneyEMIPlan,
   submit,
-  verifyOfferApplied,
   verifyPartialAmount,
 } = require('../../../actions/common');
 
