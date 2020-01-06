@@ -466,17 +466,6 @@ function initOffers(
         return visibleOffers.length;
       },
     },
-
-    /**
-     * If there's only one offer, returns it.
-     *
-     * @returns {Offer|Object}
-     */
-    defaultOffer: {
-      get: function() {
-        return visibleOffers.length === 1 && visibleOffers[0];
-      },
-    },
   });
 
   // TODO: need to change to addEventlistner style
