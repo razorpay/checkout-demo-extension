@@ -9,5 +9,5 @@ export const pincode = writable('');
 export const state = writable('');
 
 export const multiTpvOption = writable('netbanking');
-export const partialPaymentOption = writable('full');
+export const partialPaymentOption = writable();
 export const partialPaymentAmount = writable('');

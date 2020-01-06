@@ -11,6 +11,13 @@ RazorpayDefaults.personalization = false;
 RazorpayDefaults.paused = false;
 
 RazorpayDefaults.min_amount_label = ''; // Added for RBL custom label while Partial Amount
+RazorpayDefaults.partial_payment = {
+  min_amount_label: 'Minimum first amount',
+  full_amount_label: 'Pay in full',
+  partial_amount_label: 'Make payment in parts',
+  partial_amount_description: 'Pay some now and the remaining later',
+  select_partial: false,
+};
 
 RazorpayDefaults.method = {
   netbanking: null,

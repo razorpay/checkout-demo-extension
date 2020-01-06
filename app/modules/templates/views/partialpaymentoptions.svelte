@@ -24,7 +24,20 @@
   const maxAmount = order.amount_due;
   const minAmount = order.first_payment_min_amount;
   const amountPaid = Number(order.amount_paid);
-  const minAmountLabel = session.get('min_amount_label');
+  const showMinAmountCheckbox = !minAmount || amountPaid !== 0;
+  const minAmountLabel =
+    session.get('min_amount_label') ||
+    session.get('partial_payment.min_amount_label');
+  const fullAmountLabel = session.get('partial_payment.full_amount_label');
+  const partialAmountLabel = session.get(
+    'partial_payment.partial_amount_label'
+  );
+  const partialDescription = session.get(
+    'partial_payment.partial_amount_description'
+  );
+  $partialPaymentOption = session.get('partial_payment.select_partial')
+    ? 'partial'
+    : 'full';
 
   // Computed
   let expanded = false;
@@ -88,7 +101,7 @@
     selected={$partialPaymentOption === 'full'}
     reverse
     on:click={_ => handleRadioSelection('full')}>
-    <div slot="title">Pay full amount</div>
+    <div slot="title">{fullAmountLabel}</div>
   </SlottedRadioOption>
   <SlottedRadioOption
     name="payment_type"
@@ -97,14 +110,16 @@
     reverse
     selected={$partialPaymentOption === 'partial'}
     on:click={_ => handleRadioSelection('partial')}>
-    <div slot="title">Make payment in parts</div>
+    <div slot="title">{partialAmountLabel}</div>
     <div slot="subtitle" bind:this={partialPaymentRef}>
       {#if expanded}
         <PartialPaymentAmountField
           {maxAmount}
           {minAmount}
+          {showMinAmountCheckbox}
           {amountPaid}
           {minAmountLabel}
+          {partialDescription}
           bind:value={$partialPaymentAmount}
           bind:this={partialAmountField} />
       {/if}
