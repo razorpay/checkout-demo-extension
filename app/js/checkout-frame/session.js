@@ -785,24 +785,11 @@ function cancelHandler(response) {
 }
 
 function getPhone() {
-  var el = gel('contact');
-
-  // TOREMOVE: Homescreen
-  if (el) {
-    return el.value;
-  } else {
-    return storeGetter(HomeScreenStore.contact);
-  }
+  return storeGetter(HomeScreenStore.contact);
 }
 
 function getEmail() {
-  var el = gel('email');
-
-  if (el) {
-    return el.value;
-  } else {
-    return storeGetter(HomeScreenStore.email);
-  }
+  return storeGetter(HomeScreenStore.email);
 }
 
 function setOtpText(view, text) {
@@ -1088,10 +1075,6 @@ Session.prototype = {
       classes.push('test');
     }
 
-    if (this.forceRender) {
-      classes.push('rerender');
-    }
-
     if (this.fontLoaded) {
       classes.push('font-loaded');
     }
@@ -1112,14 +1095,6 @@ Session.prototype = {
 
     if (getStore('isPartialPayment')) {
       classes.push('partial');
-    }
-
-    if (getStore('contactEmailOptional') && !this.newHomeScreen) {
-      if (this.tpvBank) {
-        classes.push('tpv-no-details');
-      } else {
-        classes.push('no-details');
-      }
     }
 
     if (this.irctc) {
@@ -1254,7 +1229,7 @@ Session.prototype = {
 
     if (tab && !(this.order && this.order.bank) && this.methods[tab]) {
       this.switchTab(tab);
-    } else if (tab === '' && this.newHomeScreen) {
+    } else if (tab === '') {
       this.switchTab(tab);
     }
 
@@ -1418,11 +1393,6 @@ Session.prototype = {
 
     options = options || {};
 
-    if (options.forceRender) {
-      this.forceRender = true;
-      this.close();
-    }
-
     if (this.upi_intents_data) {
       /**
        * We need to show "(Recommended)" string alongside the app name
@@ -1438,12 +1408,10 @@ Session.prototype = {
     }
 
     this.isOpen = true;
-    this.newHomeScreen = true;
 
     this.setExperiments();
     this.setTpvBanks();
     this.getEl();
-    this.setMethodsList();
     this.setFormatting();
     this.improvisePaymentOptions();
     this.setSvelteComponents();
@@ -1457,9 +1425,7 @@ Session.prototype = {
 
     Hacks.initPostRenderHacks();
 
-    if (this.newHomeScreen) {
-      makeContainerLong();
-    }
+    makeContainerLong();
 
     errorHandler.call(this, this.params);
 
@@ -1551,19 +1517,6 @@ Session.prototype = {
     Analytics.setMeta('timeSince.render', discreet.timer());
   },
 
-  setMethodsList: function() {
-    if (!this.methodsList && !this.newHomeScreen) {
-      this.methodsList = new discreet.MethodsList({
-        target: '#methods-list',
-        props: {
-          animate: false,
-        },
-      });
-
-      Analytics.track('p13n:set');
-    }
-  },
-
   setUpiTab: function() {
     /**
      * This is being handled in Tab component as well,
@@ -1577,11 +1530,9 @@ Session.prototype = {
   },
 
   setHomeTab: function() {
-    if (this.newHomeScreen) {
-      this.homeTab = new discreet.HomeTab({
-        target: gel('home-screen-wrap'),
-      });
-    }
+    this.homeTab = new discreet.HomeTab({
+      target: gel('home-screen-wrap'),
+    });
   },
 
   setNetbankingTab: function() {
@@ -2596,30 +2547,10 @@ Session.prototype = {
         (amountValue * 100).toFixed(currencyConfig.decimals)
       );
       this.setPaymentMethods(this.preferences);
-
-      if (!this.newHomeScreen) {
-        options['prefill.contact'] = getPhone();
-        options['prefill.email'] = getEmail();
-        this.render({ forceRender: true });
-      } else {
-        this.updateAmountInHeader(amountValue * 100);
-      }
+      this.updateAmountInHeader(amountValue * 100);
     }
-    if (!this.newHomeScreen) {
-      $(this.el).addClass('show-methods');
-    } else {
-      this.homeTab.showMethods();
-    }
+    this.homeTab.showMethods();
     SessionStore.set({ screen: '' });
-
-    if (!this.newHomeScreen) {
-      if (this.methods.count >= 4) {
-        $(this.el).addClass('long');
-      }
-      if (this.methods.count >= 5) {
-        $(this.el).addClass('x-long');
-      }
-    }
   },
 
   setAmount: function(amount) {
@@ -2667,75 +2598,6 @@ Session.prototype = {
       $(thisEl).removeClass('show-methods');
       gotoAmountScreen();
     });
-
-    // TOREMOVE: Remove once we migrate to the new home screen
-    this.on('change', 'input[name=partial_payment]', function(e) {
-      var parentEle = $('#amount-value').parent();
-      var optionEle = $('.minimum-amount-select');
-      var value = e.target.value;
-
-      if (!e.target.checked || value === 'pay_full') {
-        var amount = this.order.amount_due;
-        $('#amount-value').val(this.getDecimalAmount(amount));
-        toggleInvalid(parentEle, true); // To unset 'invalid' class on 'partial amount input' field's parent
-
-        this.setAmount(amount);
-
-        var minAmountField = gel('minimum-amount-select');
-
-        if (minAmountField) {
-          minAmountField.checked = false;
-        }
-
-        var infoEle = $('.partial-payment-block .subtitle--help');
-        /* Reset text in info element */
-        if (infoEle) {
-          infoEle.html('Pay some amount now and remaining later.');
-        }
-        /* Hide keyboard */
-        if (document.activeElement) {
-          document.activeElement.blur();
-        }
-      } else {
-        $('#amount-value').val(null);
-        $('#amount-value').focus();
-
-        parentEle.addClass('mature'); // mature class helps show tooltip if input is invalid
-      }
-    });
-
-    if (
-      self.order &&
-      self.order.partial_payment &&
-      self.order.first_payment_min_amount &&
-      Number(self.order.amount_paid) === 0
-    ) {
-      this.on('change', '#minimum-amount-select', function(e) {
-        var el_amount = gel('amount-value');
-
-        if (!el_amount) {
-          return;
-        }
-
-        var amount;
-        if (!e.target.checked) {
-          amount = '';
-          el_amount.focus();
-        } else {
-          amount = self.formatAmount(self.order.first_payment_min_amount);
-        }
-
-        el_amount.value = amount;
-
-        if ('createEvent' in document) {
-          var evt = document.createEvent('HTMLEvents');
-          evt.initEvent('change', false, true);
-          el_amount.dispatchEvent(evt);
-        } else {
-          el_amount.fireEvent('onchange');
-        }
-      });
-    }
 
     this.click('#next-button', 'extraNext');
 
@@ -2866,9 +2728,7 @@ Session.prototype = {
             $('#top-right').removeClass('logged');
             customer.logout(e.target.parentNode.firstChild === e.target);
 
-            if (this.newHomeScreen) {
-              this.homeTab.updateCustomer();
-            }
+            this.homeTab.updateCustomer();
           }
           container_listener();
           $('#top-right').removeClass('focus');
@@ -3217,223 +3077,11 @@ Session.prototype = {
       });
     }
 
-    //
-    // TODO: replicate in new home screen
-    if (el_amount) {
-      delegator.amount = delegator
-        .add('amount', el_amount)
-        .on('change', function() {
-          var optionEle = $('#minimum-amount-select')[0];
-
-          var firstPaymentMinAmount;
-          if (
-            self.order &&
-            self.order.partial_payment &&
-            self.order.first_payment_min_amount &&
-            Number(self.order.amount_paid) === 0
-          ) {
-            firstPaymentMinAmount = self.order.first_payment_min_amount;
-          }
-
-          if (
-            optionEle &&
-            firstPaymentMinAmount &&
-            Number(self.formatAmount(firstPaymentMinAmount)) !==
-              Number(this.value)
-          ) {
-            optionEle.checked = false;
-          }
-
-          var currency = self.get('currency');
-          var currencyConfig = discreet.Currency.getCurrencyConfig(currency);
-
-          self.input(el_amount);
-          var multiplier = Math.pow(10, currencyConfig.decimals);
-          var value = parseInt(
-            (this.value * multiplier).toFixed(currencyConfig.decimals)
-          );
-          var maxAmount =
-            self.order && self.order.partial_payment
-              ? self.order.amount_due
-              : self.order.amount;
-
-          var minAmount = firstPaymentMinAmount || currencyConfig.minimum;
-          var isValid = minAmount <= value && value <= maxAmount;
-          toggleInvalid($(this.el.parentNode), isValid);
-
-          var amountDue = self.order.amount_due;
-          var amountDueFormatted = self.formatAmountWithCurrency(amountDue);
-
-          var infoEle = $('.partial-payment-block .subtitle--help');
-
-          if (isValid) {
-            self.updateAmountInHeader(value);
-
-            // Update the remaining amount being changed
-            if (value && gel('partial-select-partial').checked && infoEle) {
-              infoEle.rawHtml(
-                'Pay remaining ' +
-                  self.formatAmountWithCurrency(amountDue - value) +
-                  ' later.'
-              );
-            }
-          } else {
-            var helpEle = $('#amount-value + .help');
-
-            self.updateAmountInHeader(amountDue);
-
-            /* Update tooltip error */
-            if (helpEle) {
-              if (!value) {
-                // Reset error on no value
-                helpEle.rawHtml(
-                  'Please enter a valid amount upto ' + amountDueFormatted
-                );
-              } else if (value > self.order.amount_due) {
-                helpEle.rawHtml('Amount cannot exceed ' + amountDueFormatted);
-              } else if (value < minAmount) {
-                helpEle.rawHtml(
-                  'Minimum payable amount is ' +
-                    self.formatAmountWithCurrency(minAmount)
-                );
-              }
-            }
-
-            /* Reset text in info element */
-            if (infoEle) {
-              infoEle.html('Pay some amount now and remaining later.');
-            }
-          }
-        });
-    }
-
-    var contactEl = gel('contact');
-    if (contactEl) {
-      delegator.contact = delegator
-        .add('phone', contactEl)
-        .on('change', function() {
-          self.input(this.el);
-
-          if (!self.newHomeScreen) {
-            var instruments = [];
-
-            var shouldUseP13n = self.p13n;
-
-            if (this.isValid() && shouldUseP13n) {
-              instruments = P13n.getInstrumentsForCustomer(
-                self.getCustomer(this.value),
-                {
-                  methods: self.methods,
-                }
-              );
-
-              if (instruments.length) {
-                Analytics.setMeta('p13n', true);
-
-                // Determine the number of instruments to be shown
-                var listOfInstrumentsToBeShown = isMobile() ? 3 : 2;
-                var _preferredMethods = {};
-
-                /**
-                 * Preprending method name with an underscore
-                 * because Lumberjack will delete a key called `card`.
-                 * It won't delete `_card` though.
-                 */
-                _Arr.loop(
-                  instruments.slice(0, listOfInstrumentsToBeShown),
-                  function(instrument) {
-                    _preferredMethods['_' + instrument.method] = true;
-                  }
-                );
-
-                Analytics.track('p13n:instruments:list', {
-                  data: {
-                    length: instruments.length,
-                    shown: Math.min(
-                      instruments.length,
-                      listOfInstrumentsToBeShown
-                    ),
-                    methods: _preferredMethods,
-                  },
-                });
-
-                /**
-                 * If the number of payment methods available
-                 * are few, the container may not be long
-                 * already.
-                 *
-                 * Make the container long if we are going
-                 * to use p13n.
-                 */
-                makeContainerLong();
-              }
-            }
-
-            self.methodsList &&
-              self.methodsList.set({
-                instruments: instruments,
-                customer: self.getCustomer(this.value),
-                tpvBank: this.tpvBank,
-                animate: true,
-              });
-          }
-        });
-
-      _El.on('blur', function() {
-        var value = this.value;
-
-        if (!value) {
-          return;
-        }
-
-        var valid = discreet.Formatter.rules.phone.isValid.call(this);
-
-        Analytics.track('contact:fill', {
-          type: AnalyticsTypes.BEHAV,
-          data: {
-            valid: valid,
-            value: value,
-          },
-        });
-      })(contactEl);
-    }
-
-    var emailEl = gel('email');
-    if (emailEl) {
-      _El.on('blur', function() {
-        var value = this.value;
-
-        if (!value) {
-          return;
-        }
-
-        var valid = emailPattern.test(value);
-
-        Analytics.track('email:fill', {
-          type: AnalyticsTypes.BEHAV,
-          data: {
-            valid: valid,
-            value: value,
-          },
-        });
-      })(emailEl);
-    }
-
     delegator.otp = delegator
       .add('number', gel('otp'))
       .on('change', function() {
         self.input(this.el);
       });
-
-    var pinEl = gel('pincode');
-    if (pinEl) {
-      delegator.add('number', pinEl).on('change', function() {
-        self.input(this.el);
-        if (this.value.length === 6) {
-          $('#state').focus();
-        }
-      });
-    }
   },
 
   setScreen: function(screen) {
@@ -3523,11 +3171,7 @@ Session.prototype = {
      * Temp check, will be fixed when old homescreen is removed.
      */
     if (screen === '') {
-      if (this.newHomeScreen) {
-        if (this.homeTab && this.homeTab.onDetailsScreen()) {
-          invoke('focus', qs(screenEl + ' .invalid input'));
-        }
-      } else {
+      if (this.homeTab && this.homeTab.onDetailsScreen()) {
         invoke('focus', qs(screenEl + ' .invalid input'));
       }
     } else if (!(screen === 'upi' && this.upi_intents_data)) {
@@ -3551,7 +3195,7 @@ Session.prototype = {
       showPaybtn = Boolean(selectedInstrument);
     }
 
-    if (screen === '' && this.newHomeScreen && this.homeTab) {
+    if (screen === '' && this.homeTab) {
       this.homeTab.onShown();
     } else {
       this.body.toggleClass('sub', showPaybtn);
@@ -3664,17 +3308,6 @@ Session.prototype = {
     }
 
     this.offers.applyFilter(filters);
-
-    // Pre-select offer if there is only one visible offer
-    var defaultOffer = this.offers.defaultOffer;
-    if (defaultOffer && tab) {
-      // Don't preselect offer for Cardless EMI homescreen.
-      if (tab === 'cardless_emi' && this.screen === 'cardless_emi') {
-        this.preSelectedOffer = null;
-      } else {
-        this.preSelectedOffer = defaultOffer;
-      }
-    }
 
     if (this.preSelectedOffer) {
       this.offers.selectOffer(this.preSelectedOffer);
@@ -3887,7 +3520,7 @@ Session.prototype = {
     $('#content').removeClass('has-discount');
     //TODO: optimise queries
     $('#amount .discount').html('');
-    if (!(this.tab === '' && this.newHomeScreen)) {
+    if (this.tab !== '') {
       Cta.showAmountInCta();
     }
   },
@@ -4051,7 +3684,7 @@ Session.prototype = {
   checkCommonValid: function() {
     var selector = '#pad-common';
 
-    if (this.newHomeScreen && this.homeTab.onDetailsScreen()) {
+    if (this.homeTab.onDetailsScreen()) {
       selector = '#form-common';
     }
 
@@ -4121,9 +3754,7 @@ Session.prototype = {
     Analytics.setMeta('timeSince.tab', discreet.timer());
 
     if (tab === '') {
-      if (this.newHomeScreen) {
-        this.homeTab.onShown();
-      }
+      this.homeTab.onShown();
     }
 
     if (tab) {
@@ -4974,11 +4605,8 @@ Session.prototype = {
 
     fillData('#pad-common', data);
 
-    if (this.newHomeScreen) {
-      data.contact = getPhone();
-      data.email = getEmail();
-      // TODO: data.address, etc.
-    }
+    data.contact = getPhone();
+    data.email = getEmail();
 
     var prefillEmail = this.get('prefill.email');
     var prefillContact = this.get('prefill.contact');
@@ -5458,40 +5086,15 @@ Session.prototype = {
       return this.extraNext();
     }
 
-    if (this.oneMethod && !this.tab && !this.newHomeScreen) {
-      setTimeout(function() {
-        window.scrollTo(0, 100);
-      });
-
-      /**
-       * PayPal as a one-method submits
-       * directly from the homescreen.
-       * Do not switch the tab for it.
-       */
-      if (this.oneMethod !== 'paypal') {
-        return this.switchTab(this.oneMethod);
-      }
-    }
-
     preventDefault(e);
     var screen = this.screen;
     var tab = this.tab;
-
-    if (
-      !this.tab &&
-      !this.newHomeScreen &&
-      !this.order &&
-      !this.p13n &&
-      !(this.oneMethod && this.oneMethod === 'paypal')
-    ) {
-      return;
-    }
 
     /**
      * The CTA for home screen is visible only on the new design. If it was
      * clicked, switch to the new payment methods screen.
      */
-    if (!screen && this.newHomeScreen) {
+    if (!screen) {
       if (this.checkCommonValid()) {
         // switch to methods tab
         if (this.homeTab.onDetailsScreen()) {
@@ -5724,29 +5327,16 @@ Session.prototype = {
          * Add cvv to data from the currently selected method (p13n)
          * TODO: figure out a better way to do this.
          */
-        if (this.newHomeScreen) {
-          var $cvvEl = _Doc.querySelector(
-            '#instruments-list > .selected input.input'
-          );
+        var $cvvEl = _Doc.querySelector(
+          '#instruments-list > .selected input.input'
+        );
 
-          if ($cvvEl) {
-            if ($cvvEl.value.length === $cvvEl.maxLength) {
-              data['card[cvv]'] = $cvvEl.value;
-            } else {
-              $cvvEl.focus();
-              return this.shake();
-            }
-          }
-        } else {
-          var $cvvEl = $('#methods-list .option.selected .cvv-input');
-
-          if ($cvvEl) {
-            if ($cvvEl.val().length === selectedInstrument.cvvDigits) {
-              data['card[cvv]'] = $cvvEl.val();
-            } else {
-              $cvvEl.focus();
-              return this.shake();
-            }
+        if ($cvvEl) {
+          if ($cvvEl.value.length === $cvvEl.maxLength) {
+            data['card[cvv]'] = $cvvEl.value;
+          } else {
+            $cvvEl.focus();
+            return this.shake();
           }
         }
       }
@@ -5764,11 +5354,7 @@ Session.prototype = {
       return;
     }
 
-    if (this.newHomeScreen) {
-      return this.homeTab.getSelectedInstrument();
-    } else if (this.methodsList) {
-      return this.methodsList.getSelectedInstrument();
-    }
+    return this.homeTab.getSelectedInstrument();
   },
 
   verifyVpaAndContinue: function(data, params) {
@@ -5917,19 +5503,10 @@ Session.prototype = {
     if (this.get('address') && !(this.order && this.order.partial_payment)) {
       var notes = (data.notes = clone(this.get('notes')) || {});
 
-      if (!this.newHomeScreen) {
-        var $address = $('#address');
-
-        if ($address[0]) {
-          notes.address = $address.val();
-          notes.pincode = $('#pincode').val();
-          notes.state = $('#state').val();
-        }
-      } else {
-        notes.address = storeGetter(HomeScreenStore.address);
-        notes.pincode = storeGetter(HomeScreenStore.pincode);
-        notes.state = storeGetter(HomeScreenStore.state);
-      }
+      // Add address
+      notes.address = storeGetter(HomeScreenStore.address);
+      notes.pincode = storeGetter(HomeScreenStore.pincode);
+      notes.state = storeGetter(HomeScreenStore.state);
 
       if (Object.keys(notes).length > 15) {
         delete notes.pincode;

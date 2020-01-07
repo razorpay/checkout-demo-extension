@@ -28,8 +28,6 @@ import otpView from 'checkoutframe/otp';
 import * as Curtain from 'components/curtain';
 import { setShieldParams } from 'payment/validator';
 import * as P13n from 'checkoutframe/personalization';
-import MethodsList from 'components/MethodsList';
-import * as WalletUtils from 'common/wallet';
 import { commonBanks, getFullBankLogo } from 'common/bank';
 
 /* Required for merchant.js migration */
@@ -119,7 +117,6 @@ export default {
   Checkout,
   Bridge,
   P13n,
-  MethodsList,
   UserAgent,
   Offers,
   Flows,

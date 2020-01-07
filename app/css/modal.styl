@@ -580,10 +580,6 @@ i {
       transform: none;
       transition: 0.2s, 0.3s cubic-bezier(0.3, 1.5, 0.7, 1) transform;
     }
-
-    &.rerender #modal {
-      transition: none;
-    }
   }
 
   &.notopbar {
@@ -1851,22 +1847,8 @@ $outline = #ddd;
   }
 }
 
-#minimum-amount-select + .checkbox {
-  float: left;
-  top: 1px;
-  margin-right: 8px;
-}
-
 .minimum-amount-select {
   margin: 12px 0 10px 26px;
-  display: none;
-}
-
-#partial-select-partial:checked + label .minimum-amount-select {
-  display: block;
-}
-
-#partial-select-partial:not(:checked) + .checkbox + #elem-wrap-amount {
   display: none;
 }
 
