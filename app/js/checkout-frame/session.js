@@ -3665,10 +3665,6 @@ Session.prototype = {
 
     this.offers.applyFilter(filters);
 
-    if (tab === 'cardless_emi' && this.screen === 'cardless_emi') {
-      this.preSelectedOffer = null;
-    }
-
     if (this.preSelectedOffer) {
       this.offers.selectOffer(this.preSelectedOffer);
       // Explicitly call this because we selected the offer explicitly
