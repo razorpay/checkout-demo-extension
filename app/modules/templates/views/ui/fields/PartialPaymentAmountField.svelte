@@ -1,12 +1,12 @@
 <script>
   import Field from 'templates/views/ui/Field.svelte';
+  import Checkbox from 'templates/views/ui/Checkbox.svelte';
 
   import { getSession } from 'sessionmanager';
   import { getCurrencyConfig } from 'common/currency';
 
   export let maxAmount = null;
   export let minAmount = null;
-  export let amountPaid = null;
   export let value;
   export let minAmountLabel;
   export let partialDescription;
@@ -129,18 +129,12 @@
   on:input={handleInput} />
 
 {#if showPartialAmountLabel}
+  <Checkbox
+    className="minimum-amount-selection"
+    id="min-amount-checkbox"
+    on:change={handleCheckboxChange}
+    checked={valueInMinor === minAmount}>
+    {minAmountLabel} {session.formatAmountWithCurrency(minAmount)}
+  </Checkbox>
   <div class="subtitle subtitle--help">{partialDescription}</div>
-{:else if minAmount && amountPaid === 0}
-  <div class="minimum-amount-selection">
-    <input
-      type="checkbox"
-      class="checkbox--square"
-      id="minimum-amount-checkbox"
-      on:change={handleCheckboxChange}
-      checked={valueInMinor === minAmount} />
-    <div class="checkbox inner-checkbox" for="minimum-amount-checkbox" />
-    <label class="partial-label" for="minimum-amount-checkbox">
-      {minAmountLabel} {session.formatAmountWithCurrency(minAmount)}
-    </label>
-  </div>
 {/if}

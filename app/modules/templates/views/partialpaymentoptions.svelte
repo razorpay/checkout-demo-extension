@@ -24,7 +24,7 @@
   const maxAmount = order.amount_due;
   const minAmount = order.first_payment_min_amount;
   const amountPaid = Number(order.amount_paid);
-  const showPartialAmountLabel = !minAmount || amountPaid !== 0;
+  const showPartialAmountLabel = !minAmount || amountPaid !== 0; // Show label and checkbox if order.first_payment_min_amount is not null and is first payment
   const minAmountLabel =
     session.get('min_amount_label') ||
     session.get('partial_payment.min_amount_label');
@@ -117,7 +117,6 @@
           {maxAmount}
           {minAmount}
           {showPartialAmountLabel}
-          {amountPaid}
           {minAmountLabel}
           {partialDescription}
           bind:value={$partialPaymentAmount}
