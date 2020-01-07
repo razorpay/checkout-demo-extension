@@ -27,6 +27,9 @@
     width: 16px;
     height: 16px;
     flex-shrink: 0;
+    position: relative;
+    margin: 0;
+    margin-right: 6px;
 
     z-index: 0;
   }
@@ -35,14 +38,14 @@
   input::before {
     content: '';
 
-    width: 16px;
-    height: 16px;
     background: #fff;
     transition: 0.2s;
 
     position: absolute;
+    top: 0;
     left: 0;
-    top: 2px;
+    bottom: 0;
+    right: 0;
 
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -66,8 +69,8 @@
     transform: rotate(40deg) translate(5px, -2px);
 
     position: absolute;
-    top: 3px;
-    left: 1px;
+    top: 0;
+    left: 0;
 
     z-index: 1;
   }
