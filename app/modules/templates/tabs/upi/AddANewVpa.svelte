@@ -13,7 +13,6 @@
   import { VPA_REGEX } from 'common/constants';
 
   // Props
-  export let appId;
   export let selected = true;
   export let selectedApp;
   export let vpa;
@@ -23,6 +22,7 @@
 
   // Refs
   export let vpaField = null;
+  let rememberVpaCheckbox = null;
 
   // Computed
   export let pattern;
@@ -50,15 +50,19 @@
     return `${vpa}@${pspHandle}`;
   }
 
+  export function shouldRememberVpa() {
+    return rememberVpaCheckbox.checked ? 1 : 0;
+  }
+
   export function blur() {
-    vpaField.blur();
+    if (vpaField) vpaField.blur();
   }
 
   export function focus() {
     vpaField.focus();
   }
 
-  $: pattern = appId ? PATTERN_WITHOUT_HANDLE : PATTERN_WITH_HANDLE;
+  $: pattern = PATTERN_WITH_HANDLE;
 </script>
 
 <style>
@@ -100,12 +104,16 @@
     {#if selected}
       <div transition:slide={{ duration: 200 }}>
         <Field
+          formatter={{ type: 'vpa' }}
+          {pattern}
+          helpText="Please enter a valid VPA of the form username@bank"
           elemClasses="mature"
           id="amount-value"
           name="amount"
           type="text"
           required
           bind:this={vpaField}
+          on:blur
           placeholder="Enter your UPI ID" />
         <div class="should-save-vpa-container">
           <label id="should-save-vpa" for="save-vpa">
@@ -113,6 +121,7 @@
               type="checkbox"
               class="checkbox--square"
               id="save-vpa"
+              bind:this={rememberVpaCheckbox}
               name="save" />
             <span class="checkbox" />
             Remember VPA

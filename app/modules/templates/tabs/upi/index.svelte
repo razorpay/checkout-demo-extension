@@ -12,7 +12,6 @@
   import {
     doesAppExist,
     GOOGLE_PAY_PACKAGE_NAME,
-    topUpiApps,
     otherAppsIcon,
   } from 'common/upi';
   import Analytics from 'analytics';
@@ -128,7 +127,6 @@
     return hasFeature;
   };
 
-  $: selectedAppData = _Arr.find(topUpiApps, item => item.id === selectedApp);
   $: intent = Boolean(
     !isPayout && preferIntent && intentApps && _.lengthOf(intentApps) > 0
   );
@@ -294,7 +292,12 @@
           }
         }
       } else if (selectedToken) {
-        data = { token: selectedToken.token };
+        if (selectedToken === 'new') {
+          data = {
+            vpa: getFullVpa(),
+            save: vpaField.shouldRememberVpa(),
+          };
+        } else data = { token: selectedToken.token };
       } else {
         data = {
           vpa: getFullVpa(),
@@ -525,7 +528,7 @@
           {showRecommendedUPIApp} />
       {:else if selectedApp === undefined || isGPaySelected}
         <!-- <div class="legend left">Select a UPI app</div>
-        <Grid items={topUpiApps} on:select={onUpiAppSelection} /> -->
+        -->
         <div class="legend left">PAY USING UPI ID</div>
         <div class="border-list">
           {#each tokens as app, i}
@@ -546,11 +549,11 @@
           <AddANewVpa
             onSelection={_ => {
               selectedToken = 'new';
+              showCta();
             }}
             selected={selectedToken === 'new'}
             bind:this={vpaField} />
         </div>
-        <!-- <Grid items={topUpiApps} on:select={onUpiAppSelection} /> -->
       {:else}
         <div class="legend left">Selected UPI app</div>
         <Card>
