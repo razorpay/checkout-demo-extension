@@ -50,14 +50,7 @@
     const array = [];
     const fees = Object.keys(displayFees);
 
-    let fee_label = '';
-
-    // If fee label is provided by merchant, fee_label takes it's value otherwise picks default //
-    if (session.get().rzp_fee_default_label) {
-      fee_label = session.get().rzp_fee_default_label;
-    } else {
-      fee_label = session.get('rzp_fee_default_label');
-    }
+    const fee_label = session.get('fee_label');
 
     for (let i = 0; i < fees.length; i++) {
       const fee = fees[i];
@@ -70,7 +63,7 @@
           title = fee_label;
           break;
         case 'tax':
-          title = 'GST on Gateway Charges';
+          title = `GST on ${fee_label}`;
           break;
       }
       if (title) {

@@ -9,7 +9,7 @@ RazorpayDefaults.nativeotp = true;
 RazorpayDefaults.remember_customer = false;
 RazorpayDefaults.personalization = false;
 RazorpayDefaults.paused = false;
-RazorpayDefaults.rzp_fee_default_label = 'Gateway Charges';
+RazorpayDefaults.fee_label = 'Gateway Charges';
 
 RazorpayDefaults.min_amount_label = ''; // Added for RBL custom label while Partial Amount
 RazorpayDefaults.partial_payment = {
