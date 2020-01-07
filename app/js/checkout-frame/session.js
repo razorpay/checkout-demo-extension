@@ -4168,6 +4168,10 @@ Session.prototype = {
       this.netbankingTab.onShown();
     }
 
+    if (tab === 'upi') {
+      this.upiTab.onShown();
+    }
+
     if (/^emandate/.test(tab)) {
       return this.emandateView.showTab(tab);
     }

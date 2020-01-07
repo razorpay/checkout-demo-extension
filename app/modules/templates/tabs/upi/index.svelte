@@ -1,6 +1,7 @@
 <script>
   // Svelte imports
   import { onMount } from 'svelte';
+  import { slide } from 'svelte/transition';
 
   // Util imports
   import { getSession } from 'sessionmanager';
@@ -17,7 +18,8 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { Formatter } from 'formatter';
-  import { hideCta, showCtaWithDefaultText } from 'checkoutstore/cta';
+  import { hideCta, showCtaWithDefaultText, showCta } from 'checkoutstore/cta';
+  import { getSavedVPA } from 'common/token.js';
 
   // UI imports
   import UpiIntent from './UpiIntent.svelte';
@@ -33,6 +35,8 @@
   import NextOption from 'templates/views/ui/options/NextOption.svelte';
   import Screen from 'templates/layouts/Screen.svelte';
   import OffersPortal from 'templates/views/OffersPortal.svelte';
+  import SlottedRadioOption from 'templates/views/ui/options/Slotted/RadioOption.svelte';
+  import PartialPaymentAmountField from 'templates/views/ui/fields/PartialPaymentAmountField.svelte';
 
   // Props
   export let selectedApp = undefined;
@@ -61,6 +65,10 @@
   export let pspHandle;
   export let shouldShowQr;
   let disabled = false;
+  let tokens = [];
+  let selectedToken = null;
+  let isANewVpa = false;
+  let rememberVpaCheckbox;
 
   const session = getSession();
   const {
@@ -203,6 +211,46 @@
     omnichannelType = type;
   }
 
+  export function onShown() {
+    if (!session.customer.tokens) return;
+    // tokens = getSavedVPA(session.customer.tokens.items);
+    // session.customer.tokens.count = 3;
+    // tokens.push(
+    //   {
+    //     auth_type: null,
+    //     bank: null,
+    //     card: null,
+    //     created_at: 1575890449,
+    //     entity: 'token',
+    //     expired_at: 1701368999,
+    //     id: 'token_Dq5kK5crQ1WLab',
+    //     method: 'upi',
+    //     mrn: null,
+    //     recurring: false,
+    //     token: '6VPEIb26rcmEOv',
+    //     used_at: 1575954761,
+    //     wallet: null,
+    //     vpa: 'saranshgupta1995@okaxis',
+    //   },
+    //   {
+    //     auth_type: null,
+    //     bank: null,
+    //     card: null,
+    //     created_at: 1575890449,
+    //     entity: 'token',
+    //     expired_at: 1701368999,
+    //     id: 'token_Dq5kK5crQ1WLab',
+    //     method: 'upi',
+    //     mrn: null,
+    //     recurring: false,
+    //     token: '6VPEIb26rcmEOv',
+    //     used_at: 1575954761,
+    //     wallet: null,
+    //     vpa: 'saranshgupta1995@okhdfc',
+    //   }
+    // );
+  }
+
   export function getPayload() {
     /**
      * getPayload is called when the users presses Pay.
@@ -244,6 +292,8 @@
             data.upi_provider = 'google_pay';
           }
         }
+      } else if (selectedToken) {
+        data = { token: selectedToken.token };
       } else {
         data = {
           vpa: getFullVpa(),
@@ -260,7 +310,6 @@
     }
 
     data.method = 'upi';
-
     return data;
   }
 
@@ -442,6 +491,14 @@
     }
   }
 
+  .should-save-vpa-container {
+    margin-top: 12px;
+
+    #should-save-vpa span.checkbox {
+      display: inline-block;
+    }
+  }
+
   div :global(.input) {
     padding-top: 6px !important;
   }
@@ -457,6 +514,10 @@
     height: @width;
   }
 
+  [slot='icon'].top {
+    align-self: flex-start;
+  }
+
   span :global(img) {
     height: 20px;
     width: 20px;
@@ -466,6 +527,23 @@
 <Tab method="upi" {down} pad={false}>
   <Screen>
     <div slot="main">
+      <div class="border-list">
+        {#each tokens as app, i}
+          <SlottedRadioOption
+            name="payment_type"
+            value="partial"
+            selected={selectedToken === app}
+            on:click={_ => {
+              selectedToken = app;
+              showCta();
+            }}>
+            <div slot="title">{app.vpa}</div>
+            <i slot="icon">
+              <Icon icon="https://cdn.razorpay.com/bank/SBIN.gif" />
+            </i>
+          </SlottedRadioOption>
+        {/each}
+      </div>
       {#if intent}
         <UpiIntent
           bind:this={intentView}
@@ -473,8 +551,51 @@
           {selectedApp}
           {showRecommendedUPIApp} />
       {:else if selectedApp === undefined || isGPaySelected}
-        <div class="legend left">Select a UPI app</div>
-        <Grid items={topUpiApps} on:select={onUpiAppSelection} />
+        <!-- <div class="legend left">Select a UPI app</div>
+        <Grid items={topUpiApps} on:select={onUpiAppSelection} /> -->
+        <div class="legend left">PAY USING UPI ID</div>
+        <div class="border-list">
+          <SlottedRadioOption
+            name="payment_type"
+            value="full"
+            align="top"
+            on:click={_ => {
+              isANewVpa = true;
+            }}>
+            <div slot="title">UPI ID</div>
+            <div slot="subtitle">Google Pay, BHIM, Phone Pe & more</div>
+            <i slot="icon" class="top">
+              <Icon icon={session.themeMeta.icons.upi} />
+            </i>
+
+            <div transition:slide|local slot="slot-body">
+              {#if isANewVpa}
+                <div transition:slide|local>
+                  <Field
+                    elemClasses="mature"
+                    id="amount-value"
+                    name="amount"
+                    type="text"
+                    required
+                    placeholder="Enter your UPI ID" />
+                  <div class="should-save-vpa-container">
+                    <label id="should-save-vpa" for="save-vpa">
+                      <input
+                        bind:this={rememberVpaCheckbox}
+                        type="checkbox"
+                        class="checkbox--square"
+                        id="save-vpa"
+                        name="save" />
+                      <span class="checkbox" />
+                      Remember VPA
+                    </label>
+                  </div>
+                </div>
+              {/if}
+            </div>
+          </SlottedRadioOption>
+        </div>
+        <!-- <Grid items={topUpiApps} on:select={onUpiAppSelection} /> -->
       {:else}
         <div class="legend left">Selected UPI app</div>
         <Card>
