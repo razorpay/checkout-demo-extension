@@ -3665,17 +3665,6 @@ Session.prototype = {
 
     this.offers.applyFilter(filters);
 
-    // Pre-select offer if there is only one visible offer
-    var defaultOffer = this.offers.defaultOffer;
-    if (defaultOffer && tab) {
-      // Don't preselect offer for Cardless EMI homescreen.
-      if (tab === 'cardless_emi' && this.screen === 'cardless_emi') {
-        this.preSelectedOffer = null;
-      } else {
-        this.preSelectedOffer = defaultOffer;
-      }
-    }
-
     if (this.preSelectedOffer) {
       this.offers.selectOffer(this.preSelectedOffer);
       // Explicitly call this because we selected the offer explicitly
