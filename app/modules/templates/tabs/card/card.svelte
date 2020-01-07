@@ -1,63 +1,48 @@
 <script>
-  //   Utils imports
-  import Razorpay from 'common/Razorpay';
-  import { makeAuthUrl } from 'common/Razorpay';
-  import { timeConverter } from 'common/formatDate';
-  import { copyToClipboard } from 'common/clipboard';
+  /* global each, gel, Event */
+  import { fly } from 'svelte/transition';
+
+  import Tab from 'templates/tabs/Tab.svelte';
+  import AddCardView from 'templates/views/AddCardView.svelte';
+  import SavedCards from 'templates/screens/savedcards.svelte';
+
+  // Store
+  import {
+    cardCvv,
+    cardExpiry,
+    cardName,
+    cardNumber,
+    remember,
+  } from 'checkoutstore/screens/card';
+
+  // Utils imports
   import { getSession } from 'sessionmanager';
+  import { getSavedCards } from 'common/token';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import { getSavedCards } from 'common/token';
-  import Field from 'templates/views/ui/Field.svelte';
-  import * as Card from 'common/card';
+  import { getCardType } from 'common/card';
 
-  // UI imports
-  import AsyncLoading from 'templates/views/ui/AsyncLoading.svelte';
-  import Callout from 'templates/views/ui/Callout.svelte';
-  import Tab from 'templates/tabs/Tab.svelte';
-  import SavedCards from 'templates/screens/savedcards.svelte';
+  let currentView = 'add-card';
+  let cardType = null;
+  let savedCards = [];
+  let showEmiCta;
+  let emiCtaView;
+
+  let showAddCardCta = false;
+  $: showAddCardCta = savedCards && savedCards.length;
+
+  // Refs
+  let savedCardsView;
+  let addCardView;
 
   const session = getSession();
 
-  // Props
-  export let loading = true;
-  export let data = null;
-  export let error = null;
-  let cardNumber;
-  /*
-  global each Event invoke
-  */
-
-  // Refs
-  const cardType = _Doc.querySelector('#elem-card .cardtype[cardtype]');
-  var nocvvCheck = _Doc.querySelector('#nocvv');
-
-  var remember = false;
-
-  $: showSavedCardsScreen = false;
-  $: showSavedCards = false;
-  $: customer = session.customer;
-  var transformedTokens = null;
-
-  function toggleNoCvv(show) {
-    // Display or hide the nocvv checkbox
-    nocvvCheck.disabled = !show;
-  }
-
-  function noCvvToggle() {
-    var shouldHideExpiryCVV = nocvvCheck.checked && !nocvvCheck.disabled;
-  }
-
-  export function showCards() {
-    setSavedCards();
-    session.setScreen('card');
-  }
-
   function setSavedCards() {
-    let { customer } = session;
-    var tokens = customer && customer.tokens && customer.tokens.count;
+    const { customer } = session;
+    const tokens = customer && customer.tokens && customer.tokens.count;
     if (tokens) {
       var tokensList = customer.tokens;
+      // TODO: check what this if condition does
       if (
         _Doc.querySelectorAll('.saved-card').length !== tokensList.items.length
       ) {
@@ -89,313 +74,206 @@
           });
         }
 
-        transformedTokens = session.transformTokens(tokensList.items); // Rajat, looks emi is this needed here?
-        showSavedCards = true;
-
-        var totalSavedCards = getSavedCards(transformedTokens).length;
+        savedCards = session.transformTokens(tokensList.items);
       }
-    }
-
-    var selectableSavedCard = getSelectableSavedCardElement(
-      'card', //hardcoding for now
-      this.selectedSavedCardToken
-    );
-
-    if (tokens && selectableSavedCard) {
-      session.setSavedCard({ delegateTarget: selectableSavedCard });
     }
 
     session.savedCardScreen = tokens;
 
-    toggleSavedCards(!!tokens);
-
-    _El.toggleClass(_Doc.querySelector('#form-card'), 'has-cards'); //TODO: pure functions
-
+    // TODO: handle this using Field component
     each(_Doc.querySelectorAll('.saved-cvv'), function(i, input) {
-      delegator.add('number', input);
+      // delegator.add('number', input);
     });
   }
 
-  function getSelectableSavedCardElement(tab, token) {
-    // TODO: Remove this
-    var selectors = {
-      checked: '.saved-card.checked',
-      saved: '.saved-card',
-      token: '.saved-card',
-    };
-
-    // Add token to selectors
-    if (token) {
-      selectors.token += '[token="' + token + '"]';
-    }
-
-    var emiSelector = tab === 'emi' ? '[emi]' : '';
-
-    // Add EMI selector to selectors
-    selectors = _Obj.map(selectors, function(value) {
-      return value + emiSelector;
-    });
-
-    var validSelector = _Arr.find(
-      [selectors.checked, selectors.token, selectors.saved],
-      function(selector) {
-        return _Doc.querySelector(selector);
-      }
-    );
-
-    var elem = _Doc.querySelector(validSelector);
-
-    return elem;
+  export function showSavedCards() {
+    setView('saved-cards');
   }
 
-  export function shouldSubmit() {}
-
-  export function toggleSavedCards(value) {
-    showSavedCards = value;
+  function setView(view) {
+    currentView = view;
   }
 
-  export function preSubmit() {
-    let formattingDelegator = session.delegator;
-
-    // Do not proceed with amex cards if amex is disabled for merchant
-    // also without this, cardsaving is triggered before API returning unsupported card error
-    if (
-      !session.preferences.methods.amex &&
-      formattingDelegator.card.type === 'amex'
-    ) {
-      return session.showLoadError('AMEX cards are not supported', true);
+  function toggleSavedCards(condition) {
+    if (condition) {
+      setView('saved-cards');
     }
-    var nocvv_el = _Doc.querySelector('#nocvv-check [type=checkbox]');
-    if (!showSavedCards) {
-      // handling add new card screen
-      formattingDelegator.card.format();
-      formattingDelegator.expiry.format();
+  }
 
-      // if maestro card is active
-      if (nocvv_el.checked && !nocvv_el.disabled) {
-        _Doc.querySelector('.elem-expiry').removeClass('invalid');
-        _Doc.querySelector('.elem-cvv').removeClass('invalid');
-        session.data['card[cvv]'] = '000';
-
-        // explicitly remove, else it'll override month/year later
-        delete session.data['card[expiry]'];
-        session.data['card[expiry_month]'] = '12';
-        session.data['card[expiry_year]'] = '21';
-      }
+  export function getPayload() {
+    if (currentView === 'add-card') {
+      return getAddCardPayload();
     } else {
-      if (!session.data['card[cvv]']) {
-        var checkedCard = _Doc.querySelector('.saved-card.checked');
-
-        /**
-         * When CVV is missing, allow to go ahead only if:
-         * 1. Card is a not Maestro card
-         * OR
-         * 2. tab=emi and saved card supports emi and emi duration is not selected
-         */
-        if (
-          !(
-            _Doc.querySelector('.saved-card.checked .cardtype') &&
-            _Doc
-              .querySelector('.saved-card.checked .cardtype')
-              .getAttribute('cardtype') === 'maestro'
-          )
-        ) {
-          // no saved card was selected
-          session.shake();
-          return _Doc.querySelector('.checked .saved-cvv').focus();
-        }
-      }
+      return getSavedCardPayload();
     }
   }
 
-  export function viewPlans(event) {
+  function getAddCardPayload() {
+    return addCardView.getPayload();
+  }
+
+  function getSavedCardPayload() {
+    return savedCardsView.getSelectedToken();
+  }
+
+  function handleViewPlans(event) {
     Analytics.track('saved_card:emi:plans:view', {
       type: AnalyticsTypes.BEHAV,
       data: {
-        from: 'card',
+        from: session.tab,
       },
     });
+
     session.showEmiPlans('saved')(event.detail);
+  }
+
+  function onCardInput() {
+    const emi_options = session.emi_options;
+    const cardNumber = $cardNumber;
+    const cardType = getCardType(cardNumber);
+    const isMaestro = /^maestro/.test(cardType);
+    const sixDigits = cardNumber.length > 5;
+    const trimmedVal = cardNumber.replace(/[ ]/g, '');
+
+    var emiObj;
+
+    if (sixDigits && !isMaestro) {
+      emiObj = _Obj
+        .entries(emi_options.banks)
+        .find(([bank, emiObjInner]) =>
+          emiObjInner.patt.test(cardNumber.replace(/ /g, ''))
+        );
+    }
+
+    session.emiPlansForNewCard = emiObj && emiObj[1];
+
+    if (!emiObj) {
+      // TODO: move to session.js
+      _Doc.querySelector('#emi_duration').value = '';
+    }
+
+    showAppropriateEmiDetailsForNewCard(
+      session.tab,
+      emiObj,
+      trimmedVal.length,
+      session.methods
+    );
+
+    if (trimmedVal.length >= 6) {
+      var emiBankChangeEvent;
+      if (typeof Event === 'function') {
+        emiBankChangeEvent = new Event('change');
+      } else {
+        emiBankChangeEvent = document.createEvent('Event');
+        emiBankChangeEvent.initEvent('change', true, true);
+      }
+    }
+
+    if (isMaestro && sixDigits) {
+      showEmiCta = false;
+    }
+  }
+
+  /**
+   * Show appropriate EMI-details strip on the new card screen.
+   */
+  function showAppropriateEmiDetailsForNewCard(
+    tab,
+    hasPlans,
+    cardLength,
+    methods
+  ) {
+    /**
+     * tab=card
+     * - plan selected: emi available
+     * - does not have plans: nothing
+     * - has plans: emi available
+     * - default: nothing
+     *
+     *
+     * tab=emi
+     * - plan selected: plan details
+     * - does not have plans: emi unavailable (with action)
+     * - does not have emi plans and methods.card=false: emi unavailable (without action)
+     * - has plans: pay without emi
+     * - methods.card=false: nothing
+     * - default: pay without emi
+     */
+    // TODO: read from state once moved
+    const emiDuration = _Doc.querySelector('#emi_duration').value;
+    showEmiCta = true;
+
+    if (tab === 'card') {
+      if (hasPlans) {
+        emiCtaView = 'available';
+      } else {
+        showEmiCta = false;
+      }
+    } else if (tab === 'emi') {
+      if (emiDuration) {
+        emiCtaView = 'plans-available';
+      } else if (cardLength >= 6 && !hasPlans) {
+        emiCtaView = 'plans-unavailable';
+      } else if (methods.card) {
+        emiCtaView = 'pay-without-emi';
+      } else {
+        showEmiCta = false;
+      }
+    }
+  }
+
+  export function onShown() {
+    setSavedCards();
+    onCardInput();
   }
 </script>
 
-<Tab method="card" pad={false}>
+<style>
+  #show-saved-cards {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    cursor: pointer;
+    height: unset;
+    transition: 0.2s;
+    transition-delay: 0.15s;
+    z-index: 1;
+  }
+</style>
 
-  {#if showSavedCards}
-    <div id="saved-cards-container">
-      <SavedCards cards={transformedTokens} on:viewPlans={viewPlans} />
-    </div>
-    <div
-      id="show-add-card"
-      on:click={() => toggleSavedCards(false)}
-      class="text-btn left-card">
-      Add another card
+<Tab method="card" pad={false}>
+  <!-- TODO: check if this can be moved to store/ state -->
+  <input type="hidden" id="emi_duration" name="emi_duration" />
+  {#if currentView === 'add-card'}
+    <div transition:fly={{ duration: 100, y: 100 }}>
+      {#if showAddCardCta}
+        <div
+          id="show-saved-cards"
+          on:click={() => showSavedCards()}
+          class="text-btn left-card">
+          Use saved cards
+        </div>
+      {/if}
+      <AddCardView
+        {showEmiCta}
+        {emiCtaView}
+        bind:cardType
+        bind:this={addCardView}
+        on:cardinput={onCardInput} />
     </div>
   {:else}
-    <div
-      id="show-saved-cards"
-      on:click={() => toggleSavedCards(true)}
-      class="text-btn left-card">
-      Use saved cards
-    </div>
-    <div class="pad">
-      <div id="add-card-container">
-        <div class="card-fields">
-          <div class="elem-wrap two-third">
-            <div
-              class="elem elem-card {session.recurring ? 'recurring' : ''}
-              "
-              id="elem-card">
-              <div class="cardtype" />
-              <label>Card Number</label>
-              <i>&#xe605;</i>
-              <span class="help">Please enter a valid card number</span>
-              <span class="help amex-error">
-                Amex cards are not supported for this transaction
-              </span>
-              <span class="help recurring-card-error">
-                Card does not support automatic recurring payments
-              </span>
-              <Field
-                formatter={{ type: 'card', on: { input: handleCardNumber, change: handleCardNumber } }}
-                helpText="Please enter your card number"
-                id="card_number"
-                name="card[number]"
-                required={true}
-                type="tel"
-                class="input"
-                autocomplete="off"
-                maxlength={19}
-                value={''}
-                bind:this={cardNumber}
-                on:input
-                on:change />
-            </div>
-          </div>
-          <div class="elem-wrap third">
-            <div class="elem elem-expiry">
-              <label>Expiry</label>
-              <i>&#xe606;</i>
-              <Field
-                formatter={{ type: 'expiry' }}
-                helpText="Please enter your expiry"
-                id="card_expiry"
-                name="card[expiry]"
-                placeholder="MM / YY"
-                required={true}
-                type={session.isMobile() ? 'tel' : ''}
-                class="input"
-                maxlength={7}
-                value={session.get('prefill.card[expiry]')}
-                on:blur />
-            </div>
-          </div>
-          <div class="elem-wrap two-third">
-            <div
-              class="elem elem-name {session.get('prefill.name') && session.get('readonly.name') ? 'name_readonly' : ''}">
-              <span class="help">Please enter name on your card</span>
-              <label>Card Holder's Name</label>
-              <i>&#xe602;</i>
-              <Field
-                formatter={{ type: 'card' }}
-                helpText="Please enter name on your card"
-                id="card_name"
-                name="card[name]"
-                pattern="^[a-zA-Z. 0-9'-]{(1, 100)}$"
-                required={true}
-                type="text"
-                class="input"
-                value={session.get('prefill.name')}
-                on:blur />
-            </div>
-          </div>
-          <div class="elem-wrap third">
-            <div class="elem elem-cvv mature">
-              <label>CVV</label>
-              <i>&#xe604;</i>
-              <Field
-                formatter={{ type: 'number' }}
-                helpText="Please enter your cvv"
-                id="card_cvv"
-                name="card[cvv]"
-                pattern="[0-9]{3}"
-                required={true}
-                type="tel"
-                class="input"
-                maxlength={3}
-                value={session.get('prefill.card[cvv]')}
-                on:blur />
-              <div class="help" />
-            </div>
-          </div>
-        </div>
-        <div class="clear" />
-        <div class="double">
-          {#if !session.recurring && session.get('remember_customer')}
-            <label class="first" id="should-save-card" for="save" tabIndex="0">
-              <input
-                type="checkbox"
-                class="checkbox--square"
-                id="save"
-                name="save"
-                value="1"
-                checked />
-              <span class="checkbox" />
-              Remember Card
-            </label>
-          {/if}
-          <div class="second">
-            <span id="view-emi-plans" class="link">
-              <a>View all EMI Plans</a>
-            </span>
-          </div>
-          <div class="clear" />
-        </div>
-        <label id="nocvv-check" for="nocvv">
-          <input type="checkbox" class="checkbox--square" id="nocvv" disabled />
-          <span class="checkbox" />
-          My Maestro Card doesn't have Expiry/CVV
-        </label>
-        <div class="flow-selection-container">
-          <label>Complete Payment Using</label>
-          <div class="flow input-radio">
-            <input
-              type="radio"
-              name="auth_type"
-              id="flow-3ds"
-              value="c3ds"
-              checked />
-            <label for="flow-3ds">
-              <div class="radio-display" />
-              <div class="label-content">OTP / Password</div>
-            </label>
-          </div>
-
-          <div class="flow input-radio">
-            <input type="radio" name="auth_type" id="flow-pin" value="pin" />
-            <label for="flow-pin">
-              <div class="radio-display" />
-              <div class="label-content">ATM PIN</div>
-            </label>
-          </div>
-        </div>
+    <div>
+      <div id="saved-cards-container">
+        <SavedCards
+          cards={savedCards}
+          bind:this={savedCardsView}
+          on:viewPlans={handleViewPlans} />
+      </div>
+      <div
+        id="show-add-card"
+        class="text-btn left-card"
+        on:click={() => setView('add-card')}>
+        Add another card
       </div>
     </div>
   {/if}
-  {#if session.recurring}
-    <div id="recurring-message" class="pad recurring-message">
-      <span>&#x2139;</span>
-      `? !_.subscription`
-      {#if session.subscription}
-        Future payments on this card will be charged automatically.
-        {#if session.subscription && session.subscription.type === 0}
-          The charge is to enable subscription on this card and it will be
-          refunded.
-        {/if}
-        This card will be linked to the subscription and future payments will be
-        charged automatically.
-      {/if}
-    </div>
-  {/if}
-
 </Tab>
