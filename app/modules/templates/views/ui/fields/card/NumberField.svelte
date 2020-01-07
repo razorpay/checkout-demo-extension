@@ -15,7 +15,7 @@
   const dispatch = createEventDispatcher();
   const session = getSession();
 
-  let invalid = false;
+  let valid = true;
   let field = null;
 
   export function getType() {
@@ -24,7 +24,7 @@
 
   function handleInput(e) {
     value = e.target.value;
-    setCardValidity(sync());
+    setCardValidityAndDispatchFilled();
     dispatch('input', e.detail);
   }
 
@@ -43,41 +43,26 @@
    */
   export function sync() {
     const cardNumber = getCardDigits(value);
-    const cardType = getCardType(cardNumber);
 
     let isValid = Formatter.rules.card.isValid.call({
       value: cardNumber,
-      type: cardType,
+      type,
     });
 
-    if (!session.preferences.methods.amex && cardType === 'amex') {
+    if (!session.preferences.methods.amex && type === 'amex') {
       isValid = false;
     }
 
     return isValid;
   }
 
-  function handleNetwork(data) {
-    type = data.type;
-    dispatch('network', data);
-    // TODO: check what amex, maestro and noamex classes do
-    // update cvv element
-    // var cvvlen = type !== 'amex' ? 3 : 4;
-    // el_cvv.maxLength = cvvlen;
-    // el_cvv.pattern = '^[0-9]{' + cvvlen + '}$';
-    // $(el_cvv)
-    //   .toggleClass('amex', type === 'amex')
-    //   .toggleClass('maestro', type === 'maestro');
-    //
-  }
-
-  export function setCardValidity(isValid) {
-    const cardNumber = getCardDigits(value);
-    const cardType = getCardType(cardNumber);
+  export function setCardValidityAndDispatchFilled() {
+    const isValid = sync();
     const caretPosition = field.getCaret();
 
+    valid = isValid;
+
     if (isValid) {
-      invalid = false;
       /**
        * Focus on expiry elem if we have the entire card number
        * and the cursor is at the end of the input field.
@@ -86,12 +71,17 @@
         value.length === caretPosition &&
         document.activeElement === field.input
       ) {
-        if (cardType !== 'maestro') {
+        if (type !== 'maestro') {
           dispatch('filled');
         }
       }
-    } else {
-      invalid = true;
+    }
+  }
+
+  $: {
+    if (field) {
+      // TODO: fix invalid being overridden by onInput
+      field.setValid(valid);
     }
   }
 </script>
@@ -109,7 +99,7 @@
   }
 </style>
 
-<div class="field-container {invalid ? 'name_readonly' : ''}">
+<div class="field-container">
   {#if type}
     <div class="icon">
       <Icon icon={getIcon(type)} />
@@ -121,7 +111,7 @@
   <!-- TODO: Fix invalid class not being applied -->
   <Field
     {id}
-    formatter={{ type: 'card', on: { network: handleNetwork } }}
+    formatter={{ type: 'card' }}
     {helpText}
     name="card[number]"
     required={true}
