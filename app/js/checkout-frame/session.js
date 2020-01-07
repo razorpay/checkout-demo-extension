@@ -1075,10 +1075,6 @@ Session.prototype = {
       classes.push('test');
     }
 
-    if (this.forceRender) {
-      classes.push('rerender');
-    }
-
     if (this.fontLoaded) {
       classes.push('font-loaded');
     }
@@ -1396,11 +1392,6 @@ Session.prototype = {
     var that = this;
 
     options = options || {};
-
-    if (options.forceRender) {
-      this.forceRender = true;
-      this.close();
-    }
 
     if (this.upi_intents_data) {
       /**
