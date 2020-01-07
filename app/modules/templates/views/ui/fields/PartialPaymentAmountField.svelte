@@ -95,13 +95,7 @@
 
 <style>
   .minimum-amount-selection {
-    display: flex;
     margin: 12px 0 0 0;
-    align-items: center;
-
-    .checkbox.inner-checkbox {
-      margin-right: 8px;
-    }
   }
 
   .subtitle.subtitle--help {
@@ -129,12 +123,13 @@
   on:input={handleInput} />
 
 {#if showPartialAmountLabel}
-  <Checkbox
-    className="minimum-amount-selection"
-    id="min-amount-checkbox"
-    on:change={handleCheckboxChange}
-    checked={valueInMinor === minAmount}>
-    {minAmountLabel} {session.formatAmountWithCurrency(minAmount)}
-  </Checkbox>
+  <div class="minimum-amount-selection">
+    <Checkbox
+      id="min-amount-checkbox"
+      on:change={handleCheckboxChange}
+      checked={valueInMinor === minAmount}>
+      {minAmountLabel} {session.formatAmountWithCurrency(minAmount)}
+    </Checkbox>
+  </div>
   <div class="subtitle subtitle--help">{partialDescription}</div>
 {/if}
