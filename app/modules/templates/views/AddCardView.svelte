@@ -15,6 +15,7 @@
     cardNumber,
     remember,
     authType,
+    cardType,
   } from 'checkoutstore/screens/card';
 
   import { selectedPlanText } from 'checkoutstore/emi';
@@ -25,7 +26,7 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import CardFlowSelectionRadio from './ui/CardFlowSelectionRadio.svelte';
-  import { getIin, getCardDigits, getCardType } from 'common/card';
+  import { getIin, getCardDigits } from 'common/card';
   import { DEFAULT_AUTH_TYPE_RADIO } from 'common/constants';
 
   const session = getSession();
@@ -41,8 +42,8 @@
   let hideExpiryCvvFields = false;
 
   $: {
-    if (cardType) {
-      showNoCvvCheckbox = cardType === 'maestro' && $cardNumber.length > 5;
+    if ($cardType) {
+      showNoCvvCheckbox = $cardType === 'maestro' && $cardNumber.length > 5;
     }
   }
 
@@ -50,16 +51,11 @@
     hideExpiryCvvFields = showNoCvvCheckbox && noCvvChecked;
   }
 
-  export let cardType = null;
   export let showEmiCta = false;
   export let emiCtaView = '';
 
   let showAuthTypeSelectionRadio = false;
   let showDebitPinRadio = false;
-
-  function handleCardNetworkChanged(event) {
-    cardType = event.detail.type;
-  }
 
   function handleFilled(curField) {
     switch (curField) {
@@ -248,7 +244,6 @@
         bind:value={$cardNumber}
         bind:this={numberField}
         type={cardType}
-        on:network={handleCardNetworkChanged}
         on:filled={_ => handleFilled('numberField')}
         on:input={_ => dispatch('cardinput')} />
     </div>
@@ -271,7 +266,7 @@
         <CvvField
           id="card_cvv"
           bind:value={$cardCvv}
-          {cardType}
+          cardType={$cardType}
           bind:this={cvvField} />
       </div>
     {/if}
