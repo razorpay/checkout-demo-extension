@@ -37,6 +37,7 @@
   import OffersPortal from 'templates/views/OffersPortal.svelte';
   import SlottedRadioOption from 'templates/views/ui/options/Slotted/RadioOption.svelte';
   import PartialPaymentAmountField from 'templates/views/ui/fields/PartialPaymentAmountField.svelte';
+  import AddANewVpa from './AddANewVpa.svelte';
 
   // Props
   export let selectedApp = undefined;
@@ -213,42 +214,42 @@
 
   export function onShown() {
     if (!session.customer.tokens) return;
-    // tokens = getSavedVPA(session.customer.tokens.items);
-    // session.customer.tokens.count = 3;
-    // tokens.push(
-    //   {
-    //     auth_type: null,
-    //     bank: null,
-    //     card: null,
-    //     created_at: 1575890449,
-    //     entity: 'token',
-    //     expired_at: 1701368999,
-    //     id: 'token_Dq5kK5crQ1WLab',
-    //     method: 'upi',
-    //     mrn: null,
-    //     recurring: false,
-    //     token: '6VPEIb26rcmEOv',
-    //     used_at: 1575954761,
-    //     wallet: null,
-    //     vpa: 'saranshgupta1995@okaxis',
-    //   },
-    //   {
-    //     auth_type: null,
-    //     bank: null,
-    //     card: null,
-    //     created_at: 1575890449,
-    //     entity: 'token',
-    //     expired_at: 1701368999,
-    //     id: 'token_Dq5kK5crQ1WLab',
-    //     method: 'upi',
-    //     mrn: null,
-    //     recurring: false,
-    //     token: '6VPEIb26rcmEOv',
-    //     used_at: 1575954761,
-    //     wallet: null,
-    //     vpa: 'saranshgupta1995@okhdfc',
-    //   }
-    // );
+    tokens = getSavedVPA(session.customer.tokens.items);
+    session.customer.tokens.count = 3;
+    tokens.push(
+      {
+        auth_type: null,
+        bank: null,
+        card: null,
+        created_at: 1575890449,
+        entity: 'token',
+        expired_at: 1701368999,
+        id: 'token_Dq5kK5crQ1WLab',
+        method: 'upi',
+        mrn: null,
+        recurring: false,
+        token: '6VPEIb26rcmEOv',
+        used_at: 1575954761,
+        wallet: null,
+        vpa: 'saranshgupta1995@okaxis',
+      },
+      {
+        auth_type: null,
+        bank: null,
+        card: null,
+        created_at: 1575890449,
+        entity: 'token',
+        expired_at: 1701368999,
+        id: 'token_Dq5kK5crQ1WLabiuy',
+        method: 'upi',
+        mrn: null,
+        recurring: false,
+        token: '6VPEIb26rcmEOv',
+        used_at: 1575954761,
+        wallet: null,
+        vpa: 'saranshgupta1995@okhdfc',
+      }
+    );
   }
 
   export function getPayload() {
@@ -491,14 +492,6 @@
     }
   }
 
-  .should-save-vpa-container {
-    margin-top: 12px;
-
-    #should-save-vpa span.checkbox {
-      display: inline-block;
-    }
-  }
-
   div :global(.input) {
     padding-top: 6px !important;
   }
@@ -514,10 +507,6 @@
     height: @width;
   }
 
-  [slot='icon'].top {
-    align-self: flex-start;
-  }
-
   span :global(img) {
     height: 20px;
     width: 20px;
@@ -527,23 +516,7 @@
 <Tab method="upi" {down} pad={false}>
   <Screen>
     <div slot="main">
-      <div class="border-list">
-        {#each tokens as app, i}
-          <SlottedRadioOption
-            name="payment_type"
-            value="partial"
-            selected={selectedToken === app}
-            on:click={_ => {
-              selectedToken = app;
-              showCta();
-            }}>
-            <div slot="title">{app.vpa}</div>
-            <i slot="icon">
-              <Icon icon="https://cdn.razorpay.com/bank/SBIN.gif" />
-            </i>
-          </SlottedRadioOption>
-        {/each}
-      </div>
+      <div class="border-list" />
       {#if intent}
         <UpiIntent
           bind:this={intentView}
@@ -555,45 +528,27 @@
         <Grid items={topUpiApps} on:select={onUpiAppSelection} /> -->
         <div class="legend left">PAY USING UPI ID</div>
         <div class="border-list">
-          <SlottedRadioOption
-            name="payment_type"
-            value="full"
-            align="top"
-            on:click={_ => {
-              isANewVpa = true;
-            }}>
-            <div slot="title">UPI ID</div>
-            <div slot="subtitle">Google Pay, BHIM, Phone Pe & more</div>
-            <i slot="icon" class="top">
-              <Icon icon={session.themeMeta.icons.upi} />
-            </i>
-
-            <div transition:slide|local slot="slot-body">
-              {#if isANewVpa}
-                <div transition:slide|local>
-                  <Field
-                    elemClasses="mature"
-                    id="amount-value"
-                    name="amount"
-                    type="text"
-                    required
-                    placeholder="Enter your UPI ID" />
-                  <div class="should-save-vpa-container">
-                    <label id="should-save-vpa" for="save-vpa">
-                      <input
-                        bind:this={rememberVpaCheckbox}
-                        type="checkbox"
-                        class="checkbox--square"
-                        id="save-vpa"
-                        name="save" />
-                      <span class="checkbox" />
-                      Remember VPA
-                    </label>
-                  </div>
-                </div>
-              {/if}
-            </div>
-          </SlottedRadioOption>
+          {#each tokens as app, i}
+            <SlottedRadioOption
+              name="payment_type"
+              value="partial"
+              selected={selectedToken === app.id}
+              on:click={_ => {
+                selectedToken = app.id;
+                showCta();
+              }}>
+              <div slot="title">{app.vpa}</div>
+              <i slot="icon">
+                <Icon icon="https://cdn.razorpay.com/bank/SBIN.gif" />
+              </i>
+            </SlottedRadioOption>
+          {/each}
+          <AddANewVpa
+            onSelection={_ => {
+              selectedToken = 'new';
+            }}
+            selected={selectedToken === 'new'}
+            bind:this={vpaField} />
         </div>
         <!-- <Grid items={topUpiApps} on:select={onUpiAppSelection} /> -->
       {:else}
