@@ -94,7 +94,7 @@
     currentView = view;
   }
 
-  function toggleSavedCards(condition) {
+  export function toggleSavedCards(condition) {
     if (condition) {
       setView('saved-cards');
     }
@@ -256,6 +256,7 @@
       <AddCardView
         {showEmiCta}
         {emiCtaView}
+        savedCount={savedCards.length}
         bind:cardType
         bind:this={addCardView}
         on:cardinput={onCardInput} />

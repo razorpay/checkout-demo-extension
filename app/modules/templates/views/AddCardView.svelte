@@ -53,6 +53,7 @@
 
   export let showEmiCta = false;
   export let emiCtaView = '';
+  export let savedCount = 0;
 
   let showAuthTypeSelectionRadio = false;
   let showDebitPinRadio = false;
@@ -185,6 +186,7 @@
       if (session.methods.card) {
         session.setScreen('card');
         session.switchTab('card');
+        session.svelteCardTab.toggleSavedCards(true); // TODO find out a better way
         session.offers && session.renderOffers(session.tab);
 
         eventName = 'emi:pay_without';
@@ -193,7 +195,7 @@
       if (session.methods.card) {
         session.setScreen('card');
         session.switchTab('card');
-        session.toggleSavedCards(false);
+        session.svelteCardTab.toggleSavedCards(false); // TODO find out a better way
         session.offers && session.renderOffers(session.tab);
 
         eventName = 'emi:pay_without';
@@ -325,7 +327,9 @@
           <div class="emi-pay-without emi-icon-single-card">
             <div class="emi-plans-text no-action">
               Pay entire amount
-              <span class="count-text" />
+              {#if savedCount}
+                <span class="count-text">( {savedCount} cards available )</span>
+              {/if}
             </div>
             <div class="emi-plans-action theme-highlight" />
           </div>

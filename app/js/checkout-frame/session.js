@@ -2494,9 +2494,6 @@ Session.prototype = {
         });
       }
 
-      // saved cards events
-      // this.click('#show-add-card', this.toggleSavedCards);
-      // this.click('#show-saved-cards', this.toggleSavedCards);
       this.on(
         'click',
         '#saved-cards-container',
@@ -3805,7 +3802,7 @@ Session.prototype = {
             back: bind(function() {
               self.switchTab(prevTab);
               self.setScreen(prevScreen);
-              self.toggleSavedCards(false);
+              self.svelteCardTab.toggleSavedCards(false);
 
               return true;
             }),
@@ -3819,7 +3816,7 @@ Session.prototype = {
 
               self.switchTab('card');
               self.setScreen('card');
-              self.toggleSavedCards(false);
+              self.svelteCardTab.toggleSavedCards(false);
 
               self.processOffersOnEmiPlanSelection();
             },
@@ -3837,7 +3834,7 @@ Session.prototype = {
               EmiStore.selectedPlanText.set(text);
 
               self.switchTab('emi');
-              self.toggleSavedCards(false);
+              self.svelteCardTab.toggleSavedCards(false);
 
               self.processOffersOnEmiPlanSelection(plan);
 
@@ -3905,7 +3902,7 @@ Session.prototype = {
 
               self.switchTab('card');
               self.setScreen('card');
-              self.toggleSavedCards(true);
+              self.svelteCardTab.toggleSavedCards(true);
 
               self.processOffersOnEmiPlanSelection();
             },
@@ -3927,7 +3924,7 @@ Session.prototype = {
 
               self.switchTab('emi');
               self.setScreen('card');
-              self.toggleSavedCards(true);
+              self.svelteCardTab.toggleSavedCards(true);
 
               self.processOffersOnEmiPlanSelection(plan);
 
@@ -3936,7 +3933,7 @@ Session.prototype = {
               } else {
                 self.switchTab('emi');
                 self.setScreen('card');
-                self.toggleSavedCards(true);
+                self.svelteCardTab.toggleSavedCards(true);
               }
             },
 
@@ -4116,9 +4113,9 @@ Session.prototype = {
     }
 
     if (this.tab === 'card') {
-      this.toggleSavedCards(!!tokens);
+      this.svelteCardTab.toggleSavedCards(!!tokens);
     } else if (this.tab === 'emi') {
-      this.toggleSavedCards(emiCards.length > 0);
+      this.svelteCardTab.toggleSavedCards(emiCards.length > 0);
     }
     // TODO: remove and implement in cards tab
     $('#form-card').toggleClass('has-cards', tokens);
@@ -4129,7 +4126,8 @@ Session.prototype = {
     });
   },
 
-  toggleSavedCards: function(saveScreen) {
+  //TODO remove
+  toggleSavedCards_old: function(saveScreen) {
     var tabCard = $('#form-card');
     var saveClass = 'saved-cards';
 
