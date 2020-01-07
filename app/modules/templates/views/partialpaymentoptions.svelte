@@ -24,7 +24,7 @@
   const maxAmount = order.amount_due;
   const minAmount = order.first_payment_min_amount;
   const amountPaid = Number(order.amount_paid);
-  const showMinAmountCheckbox = !minAmount || amountPaid !== 0;
+  const showPartialAmountLabel = !minAmount || amountPaid !== 0;
   const minAmountLabel =
     session.get('min_amount_label') ||
     session.get('partial_payment.min_amount_label');
@@ -116,7 +116,7 @@
         <PartialPaymentAmountField
           {maxAmount}
           {minAmount}
-          {showMinAmountCheckbox}
+          {showPartialAmountLabel}
           {amountPaid}
           {minAmountLabel}
           {partialDescription}

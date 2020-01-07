@@ -10,7 +10,7 @@
   export let value;
   export let minAmountLabel;
   export let partialDescription;
-  export let showMinAmountCheckbox = false;
+  export let showPartialAmountLabel = false;
 
   const session = getSession();
 
@@ -128,7 +128,9 @@
   handleInput={true}
   on:input={handleInput} />
 
-{#if minAmount && amountPaid === 0}
+{#if showPartialAmountLabel}
+  <div class="subtitle subtitle--help">{partialDescription}</div>
+{:else if minAmount && amountPaid === 0}
   <div class="minimum-amount-selection">
     <input
       type="checkbox"
@@ -141,8 +143,4 @@
       {minAmountLabel} {session.formatAmountWithCurrency(minAmount)}
     </label>
   </div>
-{/if}
-
-{#if showMinAmountCheckbox}
-  <div class="subtitle subtitle--help">{partialDescription}</div>
 {/if}
