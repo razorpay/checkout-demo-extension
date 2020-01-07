@@ -44,24 +44,14 @@ export function showAmountInCta() {
 export function setAppropriateCtaText() {
   const session = getSession();
 
-  if (session.newHomeScreen) {
-    if (session.tab === '') {
-      if (session.homeTab.onDetailsScreen()) {
-        session.homeTab.setDetailsCta();
-      } else {
-        showAmountInCta();
-      }
+  if (session.tab === '') {
+    if (session.homeTab.onDetailsScreen()) {
+      session.homeTab.setDetailsCta();
     } else {
       showAmountInCta();
     }
   } else {
-    if (!session.get('amount')) {
-      updateCta('Authenticate');
-    } else if (session.oneMethod && session.tab === '') {
-      updateCta('Pay by ' + TAB_TITLES[session.oneMethod]);
-    } else {
-      showAmountInCta();
-    }
+    showAmountInCta();
   }
 }
 
