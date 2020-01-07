@@ -5969,7 +5969,7 @@ Session.prototype = {
 
     if (appliedOffer) {
       // Set offer ID based on offer type
-      switch (appliedOffer.type) {
+      switch (appliedOffer._type) {
         case 'api':
           data.offer_id = appliedOffer.id;
           break;
@@ -7060,16 +7060,18 @@ Session.prototype = {
     var order = preferences.order;
 
     // emandate
-    if (order && order.bank_account) {
-      _Arr.loop(['ifsc', 'name', 'account_number'], function(key) {
-        if (order.bank_account[key]) {
-          options['prefill.bank_account[' + key + ']'] =
-            order.bank_account[key];
-        }
-      });
+    if (order) {
+      if (order.bank_account) {
+        _Arr.loop(['ifsc', 'name', 'account_number'], function(key) {
+          if (order.bank_account[key]) {
+            options['prefill.bank_account[' + key + ']'] =
+              order.bank_account[key];
+          }
+        });
 
-      if (order.bank) {
-        options['prefill.bank'] = order.bank;
+        if (order.bank) {
+          options['prefill.bank'] = order.bank;
+        }
       }
 
       if (order.auth_type) {

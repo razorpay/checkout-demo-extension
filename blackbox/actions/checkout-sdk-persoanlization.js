@@ -9,26 +9,29 @@ async function openSdkCheckoutPersonalization({
   let paymentResult = null;
   let resolver = null;
 
-  await page.exposeFunction('__CheckoutBridge_oncomplete', async data => {
-    data = JSON.parse(data);
-    if (data.error) {
-      const newContext = await openCheckout({
-        page,
-        options,
-        preferences,
-        apps,
-        params: {
-          'error.description': data.error.description,
-        },
-      });
-      Object.assign(returnObj, newContext);
-    } else if (data.razorpay_payment_id) {
-      paymentResult = data;
-      resolver && resolver(data);
-    } else {
-      console.error('malformed callback data', data);
-    }
-  });
+  try {
+    await page.exposeFunction('__CheckoutBridge_oncomplete', async data => {
+      data = JSON.parse(data);
+      if (data.error) {
+        const newContext = await openCheckout({
+          page,
+          options,
+          preferences,
+          apps,
+          params: {
+            'error.description': data.error.description,
+          },
+        });
+        Object.assign(returnObj, newContext);
+      } else if (data.razorpay_payment_id) {
+        paymentResult = data;
+        resolver && resolver(data);
+      } else {
+        console.error('malformed callback data', data);
+      }
+    });
+  } catch (err) {}
+
   await page.evaluateOnNewDocument(() => {
     window.CheckoutBridge = {
       oncomplete(data) {
