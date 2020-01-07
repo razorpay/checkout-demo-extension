@@ -3671,6 +3671,8 @@ Session.prototype = {
       // Don't preselect offer for Cardless EMI homescreen.
       if (tab === 'cardless_emi' && this.screen === 'cardless_emi') {
         this.preSelectedOffer = null;
+      } else {
+        this.preSelectedOffer = defaultOffer;
       }
     }
 
@@ -5971,7 +5973,7 @@ Session.prototype = {
 
     if (appliedOffer) {
       // Set offer ID based on offer type
-      switch (appliedOffer.type) {
+      switch (appliedOffer._type) {
         case 'api':
           data.offer_id = appliedOffer.id;
           break;

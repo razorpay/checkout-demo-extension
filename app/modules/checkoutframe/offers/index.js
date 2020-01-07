@@ -39,7 +39,7 @@ const fillMissingDataInOffers = (offers, data) =>
  */
 const getLocalOffers = opts => {
   return fillMissingDataInOffers([], {
-    type: 'local',
+    _type: 'local',
   });
 };
 
@@ -55,7 +55,7 @@ const getGlobalOffers = opts =>
       |> _Arr.filter(globalOffer => globalOffer.isEligible(opts))
       |> _Arr.map(eligibleOffer => eligibleOffer.offer),
     {
-      type: 'global',
+      _type: 'global',
     }
   );
 
@@ -67,7 +67,7 @@ const getGlobalOffers = opts =>
  */
 const getApiOffers = ({ preferences }) =>
   fillMissingDataInOffers(preferences.offers || [], {
-    type: 'api',
+    _type: 'api',
   });
 
 /**
