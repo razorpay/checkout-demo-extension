@@ -785,24 +785,11 @@ function cancelHandler(response) {
 }
 
 function getPhone() {
-  var el = gel('contact');
-
-  // TOREMOVE: Homescreen
-  if (el) {
-    return el.value;
-  } else {
-    return storeGetter(HomeScreenStore.contact);
-  }
+  return storeGetter(HomeScreenStore.contact);
 }
 
 function getEmail() {
-  var el = gel('email');
-
-  if (el) {
-    return el.value;
-  } else {
-    return storeGetter(HomeScreenStore.email);
-  }
+  return storeGetter(HomeScreenStore.email);
 }
 
 function setOtpText(view, text) {
