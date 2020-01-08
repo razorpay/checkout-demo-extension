@@ -184,6 +184,7 @@
 
     qrEnabled = session.methods.qr;
     qrIcon = session.themeMeta.icons.qr;
+    console.error(session);
   });
 
   export function selectQrMethod() {
@@ -293,11 +294,12 @@
         }
       } else if (selectedToken) {
         if (selectedToken === 'new') {
+          // manually typed VPA
           data = {
             vpa: getFullVpa(),
             save: vpaField.shouldRememberVpa(),
           };
-        } else data = { token: selectedToken.token };
+        } else data = { token: selectedToken.token }; // saved vpa token
       } else {
         data = {
           vpa: getFullVpa(),
@@ -530,6 +532,23 @@
         <!-- <div class="legend left">Select a UPI app</div>
         -->
         <div class="legend left">PAY USING UPI ID</div>
+        <div class="border-list">
+          {#if useWebPaymentsApi}
+            <SlottedRadioOption
+              name="google_pay_wpa"
+              value="partial"
+              selected={selectedToken === 'gpay'}
+              on:click={_ => {
+                onUpiAppSelection({ detail: { id: 'gpay' } });
+              }}>
+              <div slot="title">Google Pay</div>
+              <i slot="icon">
+                <Icon icon={session.themeMeta.icons.gpay} />
+              </i>
+            </SlottedRadioOption>
+          {/if}
+        </div>
+        <div class="legend left">PAY USING APPS</div>
         <div class="border-list">
           {#each tokens as app, i}
             <SlottedRadioOption
