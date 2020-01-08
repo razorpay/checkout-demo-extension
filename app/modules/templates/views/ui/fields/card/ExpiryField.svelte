@@ -7,6 +7,7 @@
   export let value;
   export let type = '';
   export let ref = null;
+  export let id;
 
   const dispatch = createEventDispatcher();
 
@@ -27,8 +28,8 @@
 </script>
 
 <Field
+  {id}
   formatter={{ type: 'expiry' }}
-  id="card[expiry]"
   name="card[expiry]"
   placeholder="MM / YY"
   label="Expiry"

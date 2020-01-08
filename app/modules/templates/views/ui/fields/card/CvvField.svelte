@@ -13,6 +13,7 @@
 
   export let cardType = null;
   export let value = '';
+  export let id;
 
   const cvvLength = getCvvDigits(cardType);
   const cvvPattern = `[0-9]{${cvvLength}}`;
@@ -45,7 +46,7 @@
 <Field
   formatter={{ type: 'number' }}
   helpText="It's a {cvvLength} digit code printed on the back of your card."
-  id="card_cvv"
+  {id}
   name="card[cvv]"
   label="CVV"
   pattern={cvvPattern}
