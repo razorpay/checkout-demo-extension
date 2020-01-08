@@ -1,22 +1,19 @@
 <script>
+  // UI imports
   import Track from 'tracker';
   import Stack from 'templates/layouts/Stack.svelte';
 
-  export let className = '';
+  // Props
   export let checked;
-  export let id = `id_${Track.makeUid()}`;
+  export let id = `id_${Track.makeUid()}`; // Generate a random ID if one isn't provided
 
+  // `for` attrib for the label should be same as the ID
   const htmlFor = id;
 </script>
 
 <style>
-  div {
-    position: relative;
-  }
-
   label {
     cursor: pointer;
-    display: block;
     min-height: 24px;
     white-space: normal;
   }
@@ -76,11 +73,9 @@
   }
 </style>
 
-<div class={className}>
-  <label for={htmlFor} class="sv-checkbox" class:checked>
-    <Stack horizontal>
-      <input {id} type="checkbox" on:change bind:checked />
-      <slot />
-    </Stack>
-  </label>
-</div>
+<label for={htmlFor} class="sv-checkbox" class:checked>
+  <Stack horizontal>
+    <input {id} type="checkbox" on:change bind:checked />
+    <slot />
+  </Stack>
+</label>
