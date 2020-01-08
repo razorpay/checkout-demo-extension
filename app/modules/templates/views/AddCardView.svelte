@@ -37,6 +37,8 @@
   let nameField = null;
   let cvvField = null;
 
+  let isCardFieldValid = false;
+
   let noCvvChecked = false;
   let showNoCvvCheckbox = false;
   let hideExpiryCvvFields = false;
@@ -131,6 +133,7 @@
     const value = $cardNumber;
     const cardNumber = getCardDigits(value);
     const iin = getIin(cardNumber);
+
     const isStrictlyRecurring =
       session.recurring && session.get('recurring') !== 'preferred';
 
@@ -143,7 +146,7 @@
         return;
       }
 
-      let isValid = numberField.sync();
+      let isValid = isCardFieldValid;
 
       if (isStrictlyRecurring) {
         isValid = isValid && isFlowApplicable(flows, Flows.RECURRING);
@@ -156,7 +159,7 @@
         }
       }
 
-      numberField.setCardValidity(isValid);
+      isCardFieldValid = isValid;
     };
 
     if (iin.length < 6) {
@@ -207,6 +210,11 @@
       data: eventData,
     });
   }
+
+  function handleCardInput() {
+    onCardNumberChange();
+    dispatch('cardinput');
+  }
 </script>
 
 <style>
@@ -245,9 +253,10 @@
         id="card_number"
         bind:value={$cardNumber}
         bind:this={numberField}
-        type={cardType}
+        bind:valid={isCardFieldValid}
+        type={$cardType}
         on:filled={_ => handleFilled('numberField')}
-        on:input={_ => dispatch('cardinput')} />
+        on:input={handleCardInput} />
     </div>
     {#if !hideExpiryCvvFields}
       <div class="third">
@@ -331,7 +340,6 @@
                 <span class="count-text">( {savedCount} cards available )</span>
               {/if}
             </div>
-            <div class="emi-plans-action theme-highlight" />
           </div>
         {/if}
       </div>

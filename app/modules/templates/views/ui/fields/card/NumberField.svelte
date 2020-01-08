@@ -11,11 +11,11 @@
   export let value = '';
   export let type = null;
   export let id = '';
+  export let valid = false;
 
   const dispatch = createEventDispatcher();
   const session = getSession();
 
-  let valid = true;
   let field = null;
 
   export function getType() {
