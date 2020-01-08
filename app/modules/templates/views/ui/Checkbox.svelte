@@ -69,12 +69,13 @@
     top: 0;
     left: 0;
 
+    cursor: pointer;
     z-index: 1;
   }
 </style>
 
 <label for={htmlFor} class="sv-checkbox" class:checked>
-  <Stack horizontal>
+  <Stack inline horizontal>
     <input {id} type="checkbox" on:change bind:checked />
     <slot />
   </Stack>
