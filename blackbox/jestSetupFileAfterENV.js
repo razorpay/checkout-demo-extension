@@ -1,3 +1,3 @@
 beforeAll(() => {
-  jest.retryTimes(1);
+  jest.retryTimes(3);
 });
