@@ -23,7 +23,6 @@
   import { getCardType } from 'common/card';
 
   let currentView = 'add-card';
-  let cardType = null;
   let savedCards = [];
   let showEmiCta;
   let emiCtaView;
@@ -37,7 +36,7 @@
 
   const session = getSession();
 
-  function setSavedCards() {
+  export function setSavedCards() {
     const { customer } = session;
     const tokens = customer && customer.tokens && customer.tokens.count;
     if (tokens) {
@@ -75,6 +74,8 @@
         }
 
         savedCards = session.transformTokens(tokensList.items);
+        setView('saved-cards');
+        // TODO: set selectable saved card element
       }
     }
 
@@ -257,7 +258,6 @@
         {showEmiCta}
         {emiCtaView}
         savedCount={savedCards.length}
-        bind:cardType
         bind:this={addCardView}
         on:cardinput={onCardInput} />
     </div>
