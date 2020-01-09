@@ -57,6 +57,7 @@ import * as EmiStore from 'checkoutstore/emi';
 import * as OTPScreenStore from 'checkoutstore/screens/otp';
 import * as Cta from 'checkoutstore/cta';
 import * as HomeScreenStore from 'checkoutstore/screens/home';
+import * as CardScreenStore from 'checkoutstore/screens/card';
 
 import QRScreen from 'templates/views/qr.svelte';
 import BankTransferScreen from 'templates/views/bank_transfer.svelte';
@@ -133,6 +134,7 @@ export default {
   SessionStore,
   OTPScreenStore,
   HomeScreenStore,
+  CardScreenStore,
   EmiStore,
   Cta,
 

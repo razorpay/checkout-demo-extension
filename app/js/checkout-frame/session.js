@@ -41,6 +41,7 @@ var preferences = window.preferences,
   OtpService = discreet.OtpService,
   storeGetter = discreet.storeGetter,
   HomeScreenStore = discreet.HomeScreenStore,
+  CardScreenStore = discreet.CardScreenStore,
   EmiStore = discreet.EmiStore,
   Cta = discreet.Cta,
   NBHandlers = discreet.NBHandlers;
@@ -4843,15 +4844,11 @@ Session.prototype = {
       }
     } else if (screen) {
       if (screen === 'card') {
-        // This is kept intact so as to not mess any unknown existing flow
-        var formattingDelegator = this.delegator;
+        var cardType = discreet.storeGetter(CardScreenStore.cardType);
 
         // Do not proceed with amex cards if amex is disabled for merchant
         // also without this, cardsaving is triggered before API returning unsupported card error
-        if (
-          !preferences.methods.amex &&
-          formattingDelegator.card.type === 'amex'
-        ) {
+        if (!preferences.methods.amex && cardType === 'amex') {
           return this.showLoadError('AMEX cards are not supported', true);
         }
         var nocvv_el = $('#nocvv-check [type=checkbox]')[0];
