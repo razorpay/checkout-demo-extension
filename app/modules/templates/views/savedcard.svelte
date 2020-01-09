@@ -25,6 +25,9 @@
   let cvvValue = '';
   let authType = debitPin ? 'c3ds' : '';
 
+  // Refs
+  let cvvInput;
+
   const dispatch = createEventDispatcher();
 
   $: {
@@ -73,6 +76,9 @@
 
   function handleClick() {
     const payload = { cvv: cvvValue };
+    if (cvvInput) {
+      cvvInput.focus();
+    }
     if (debitPin) {
       payload.authType = authType;
     }
@@ -95,6 +101,7 @@
       inputmode="numeric"
       maxlength={cvvDigits}
       pattern={`[0-9]{${cvvDigits}}`}
+      bind:this={cvvInput}
       placeholder="CVV"
       required
       on:input={_ => dispatch('cvvchange', { cvv: cvvValue })}
