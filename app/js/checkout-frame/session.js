@@ -2487,12 +2487,6 @@ Session.prototype = {
         });
       }
 
-      this.on(
-        'click',
-        '#saved-cards-container',
-        'saved-card',
-        this.setSavedCard
-      );
       this.on('click', '#saved-cards-container', 'nocvv-checkbox', function(e) {
         var target = e.delegateTarget;
         var checked = target.checked;
@@ -2515,7 +2509,7 @@ Session.prototype = {
             var customer = self.customer;
             customer.logged = false;
             customer.tokens = null;
-            self.setSavedCards();
+            self.svelteCardTab.setSavedCards();
             $('#top-right').removeClass('logged');
             customer.logout(e.target.parentNode.firstChild === e.target);
 
@@ -3095,7 +3089,7 @@ Session.prototype = {
           filteredTokens.push(token);
         }
       });
-      this.setSavedCards({
+      this.svelteCardTab.setSavedCards({
         entity: 'collection',
         count: filteredTokens.length,
         items: filteredTokens,
@@ -3185,7 +3179,7 @@ Session.prototype = {
     this.hideDiscount();
 
     if (this.customer && this.customer.tokens && this.customer.tokens.count) {
-      this.setSavedCards(this.customer.tokens);
+      this.svelteCardTab.setSavedCards(this.customer.tokens);
     }
   },
 
