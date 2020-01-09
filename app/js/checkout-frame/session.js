@@ -1637,12 +1637,20 @@ Session.prototype = {
 
     var banks = this.methods.netbanking;
 
-    if (bankCode && banks) {
-      this.tpvBank = {
-        name:
+    if (bankCode) {
+      // Use bank code as name if netbanking is disabled
+      var bankName;
+      if (banks) {
+        bankName =
           typeof banks[bankCode] === 'object'
             ? banks[bankCode].name
-            : banks[bankCode],
+            : banks[bankCode];
+      } else {
+        bankName = bankCode + ' Bank';
+      }
+
+      this.tpvBank = {
+        name: bankName,
         code: bankCode,
         account_number: accountNumber,
         image: 'https://cdn.razorpay.com/bank/' + bankCode + '.gif',
