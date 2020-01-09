@@ -64,7 +64,6 @@ import BankTransferScreen from 'templates/views/bank_transfer.svelte';
 import UpiTab from 'templates/tabs/upi/index.svelte';
 import emiOptionsView from 'templates/screens/cardlessemi.svelte';
 import emiScreenView from 'templates/screens/emiscreen.svelte';
-import SavedCardsView from 'templates/screens/savedcards.svelte';
 import PayLaterView from 'templates/screens/paylater.svelte';
 import HomeTab from 'templates/tabs/home.svelte';
 import NetbankingTab from 'templates/tabs/netbanking/index.svelte';
@@ -149,7 +148,6 @@ export default {
   emiOptionsView,
   emiScreenView,
   emiPlansView,
-  SavedCardsView,
 
   FeeBearerView,
   PayoutsInstruments,

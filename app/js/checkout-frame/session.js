@@ -1501,14 +1501,6 @@ Session.prototype = {
     }
   },
 
-  setSavedCardsView: function() {
-    if (this.methods.card || this.methods.emi) {
-      this.savedCardsView = new discreet.SavedCardsView({
-        target: _Doc.querySelector('#saved-cards-container'),
-      });
-    }
-  },
-
   setEmandate: function() {
     if (this.emandate && this.methods.emandate) {
       this.emandateView = new discreet.emandateView();
@@ -3596,11 +3588,6 @@ Session.prototype = {
     } else {
       self.setScreen('card');
     }
-  },
-
-  showCards: function() {
-    this.setSavedCards();
-    this.setScreen('card');
   },
 
   deleteCard: function(e) {
@@ -5759,10 +5746,6 @@ Session.prototype = {
         this.bankTransferView.$destroy();
       }
 
-      if (this.savedCardsView) {
-        this.savedCardsView.$destroy();
-      }
-
       if (this.feeBearerView) {
         this.feeBearerView.$destroy();
       }
@@ -5789,7 +5772,7 @@ Session.prototype = {
       this.modal = this.emi = this.el = this.card = null;
       this.upiTab = this.otpView = this.netbankingTab = this.svelteCardTab = null;
       this.payoutsView = this.payoutsAccountView = null;
-      this.savedCardsView = this.feeBearerView = this.payLaterView = null;
+      this.feeBearerView = this.payLaterView = null;
       this.nachScreen = null;
 
       this.isOpen = false;
