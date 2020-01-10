@@ -75,7 +75,7 @@
         Full amount of {formattedAmount} will be deducted from your account,
         which will be converted into EMI by your bank in 3-4 days.
         {#if bank === HDFC_BANK_CODE}
-          Convenience Fee of Rs 99+GST applicable for EMI transactions on HDFC
+          Convenience Fee of ₹99 + GST applicable for EMI transactions on HDFC
           Bank Cards
         {/if}
       {:else}
