@@ -6203,6 +6203,7 @@ Session.prototype = {
     var bankMethod = 'netbanking';
     var passedWallets = this.get('method.wallet');
     var self = this;
+    var session = this;
     var emi_options = this.emi_options;
     var qrEnabled =
       this.get('method.qr') &&
@@ -6222,21 +6223,52 @@ Session.prototype = {
       if (availMethods.emandate) {
         bankMethod = 'emandate';
         this.emandate = true;
+
+        var emandateBanks = {};
+
+        /**
+         * There may be multiple auth types present for each bank
+         * but right now, we'll only support those that have
+         * netbanking and debitcard as auth types.
+         */
+        var emandateSupportedAuthTypes = ['netbanking', 'debitcard'];
+        var authTypeFromOrder = session.order.auth_type;
+
+        /**
+         * If an auth_type is there in order,
+         * we only show banks with that auth_type
+         */
+        if (authTypeFromOrder) {
+          emandateSupportedAuthTypes = [authTypeFromOrder];
+        }
+
         each(availMethods[bankMethod], function(bankCode, bankObj) {
+          var bankHasSupportedAuthType = false;
+
           /**
-           * There may be multiple auth types present for each bank
-           * but right now, we'll only support those that have
-           * netbanking as an auth type.
+           * Determine if the bank has any of the supported auth types
            */
-          if (
-            bankObj.auth_types &&
-            (_Arr.contains(bankObj.auth_types, 'netbanking') ||
-              _Arr.contains(bankObj.auth_types, 'debitcard'))
-          ) {
-            banks[bankCode] = bankObj.name;
+          if (bankObj.auth_types) {
+            bankHasSupportedAuthType = _Arr.any(bankObj.auth_types, function(
+              authType
+            ) {
+              return _Arr.contains(emandateSupportedAuthTypes, authType);
+            });
+          }
+
+          if (bankHasSupportedAuthType) {
+            emandateBanks[bankCode] = _Obj.clone(bankObj);
+            emandateBanks[bankCode].auth_types = emandateSupportedAuthTypes;
           }
         });
-        this.emandateBanks = availMethods[bankMethod];
+
+        // Set available banks
+        this.emandateBanks = emandateBanks;
+
+        // Update the list of banks to available banks
+        _Obj.loop(emandateBanks, function(bankDetails, bankCode) {
+          banks[bankCode] = bankDetails.name;
+        });
         availMethods[bankMethod] = banks;
       }
 
