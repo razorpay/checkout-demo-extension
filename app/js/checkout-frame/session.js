@@ -163,6 +163,40 @@ function getCardTypeFromPayload(payload, tokens) {
 }
 
 /**
+ * Returns the issuer for EMI from Payload
+ *
+ * @param {Object} payload
+ * @param {Array} tokens
+ *
+ * @return {String} issuer
+ */
+function getIssuerForEmiFromPayload(payload, tokens) {
+  var issuer = '';
+
+  if (payload.token) {
+    if (tokens) {
+      tokens.forEach(function(t) {
+        if (t.token === payload.token) {
+          issuer = t.card.issuer;
+
+          if (issuer === 'HDFC' && t.card.type === 'debit') {
+            issuer = 'HDFC_DC';
+          }
+        }
+      });
+    }
+  } else {
+    issuer = _Obj.getSafely(
+      Bank.getBankFromCard(payload['card[number]']),
+      'code',
+      ''
+    );
+  }
+
+  return issuer;
+}
+
+/**
  * Set the "View EMI Plans" CTA as the Pay Button
  * if all the criteria are met.
  *
@@ -5722,6 +5756,11 @@ Session.prototype = {
             tab: 'emi',
             screen: 'emi',
           };
+        } else if (
+          getIssuerForEmiFromPayload(data, this.transformedTokens) === 'HDFC_DC'
+        ) {
+          // Skip Native OTP for EMI with HDFC Debit Cards
+          shouldUseNativeOTP = false;
         }
       }
 
