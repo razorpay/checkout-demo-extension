@@ -67,7 +67,7 @@ describe.each(
     }
   )
 )('Netbanking tests', ({ preferences, title, options }) => {
-  test(title, async () => {
+  test.skip(title, async () => {
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,
