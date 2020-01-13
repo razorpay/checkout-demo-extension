@@ -24,7 +24,7 @@ const {
 } = require('../actions');
 
 describe('Basic upi payment', () => {
-  test('Perform upi intent transaction with partial payments enabled and offers applied', async () => {
+  test.skip('Perform upi intent transaction with partial payments enabled and offers applied', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
       amount: 200,

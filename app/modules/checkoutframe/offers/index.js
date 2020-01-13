@@ -1,4 +1,5 @@
 import GlobalOffers from './global';
+import CheckoutStore from 'checkoutstore';
 
 /**
  * Default data that should be present in all offers.
@@ -129,10 +130,14 @@ export const createOffers = opts => {
   const globalOffers = getGlobalOffers(opts);
   const localOffers = getLocalOffers(opts);
 
-  // Concat all offers and check for eligibility
-  const allOffers =
-    [].concat(apiOffers, globalOffers, localOffers)
-    |> _Arr.filter(offer => isOfferEligible(offer, opts));
+  let allOffers = [];
+
+  // Concat all offers and check for eligibility, but only if this isn't a partial payment
+  if (!CheckoutStore.get().isPartialPayment) {
+    allOffers =
+      [].concat(apiOffers, globalOffers, localOffers)
+      |> _Arr.filter(offer => isOfferEligible(offer, opts));
+  }
 
   return {
     offers: allOffers,

@@ -18,7 +18,7 @@ async function handlePartialPayment(context, amount) {
   const amountValue = await context.page.waitForSelector('#amount-value');
   await amountValue.type(amount);
   await delay(300);
-  const nextButton = await context.page.waitForSelector('#next-button');
+  const nextButton = await context.page.waitForSelector('#footer');
   await nextButton.click();
   await delay(200);
 }
