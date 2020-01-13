@@ -283,8 +283,8 @@ emandateView.prototype = {
     });
 
     this.history.pop();
+
     if (this.history.length === 0) {
-      _El.removeClass(_Doc.querySelector('#container'), 'emandate-extra');
       return false;
     }
 

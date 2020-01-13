@@ -54,10 +54,6 @@ function getStore(prop) {
   return Store.get()[prop];
 }
 
-function gotoAmountScreen() {
-  SessionStore.set({ screen: 'amount' });
-}
-
 // .shown has display: none from iOS ad-blocker
 // using दृश्य, which will never be seen by tim cook
 var shownClass = 'drishy';
@@ -1084,12 +1080,9 @@ Session.prototype = {
     }
 
     var key = getter('key');
+
     if (key === UDACITY_KEY || key === EMBIBE_KEY) {
-      if (getStore('isPartialPayment')) {
-        classes.push('extra');
-      } else {
-        classes.push('address extra');
-      }
+      classes.push('address');
       setter('address', true);
     }
 
@@ -1133,10 +1126,6 @@ Session.prototype = {
       classes.push('ip');
     }
 
-    if (getStore('isPartialPayment')) {
-      classes.push('extra');
-    }
-
     if (this.emandate) {
       classes.push('emandate');
     }
@@ -1151,10 +1140,6 @@ Session.prototype = {
   getEl: function() {
     var r = this.r;
     if (!this.el) {
-      if (getStore('isPartialPayment')) {
-        gotoAmountScreen();
-      }
-
       var classes = this.getClasses();
       var ecod = r.get('ecod');
       if (ecod) {
@@ -2533,32 +2518,8 @@ Session.prototype = {
     this.r.topupWallet();
   },
 
-  extraNext: function() {
-    if (!this.checkCommonValidAndTrackIfInvalid()) {
-      var commonInvalid = $('#pad-common .invalid');
-
-      return commonInvalid
-        .addClass('mature')
-        .$('.input')
-        .focus();
-    }
-
-    var partialEl = gel('amount-value');
-
-    if (partialEl) {
-      var amountValue = partialEl.value;
-      var options = this.get();
-      var currency = this.get('currency');
-      var currencyConfig = discreet.Currency.getCurrencyConfig(currency);
-
-      options.amount = parseInt(
-        (amountValue * 100).toFixed(currencyConfig.decimals)
-      );
-      this.setPaymentMethods(this.preferences);
-      this.updateAmountInHeader(amountValue * 100);
-    }
-    this.homeTab.showMethods();
-    SessionStore.set({ screen: '' });
+  handlePartialAmount: function() {
+    this.setPaymentMethods(this.preferences);
   },
 
   setAmount: function(amount) {
@@ -2601,13 +2562,6 @@ Session.prototype = {
     this.listeners.push(function() {
       document.removeEventListener('touchstart', noop);
     });
-
-    this.click('#partial-back', function() {
-      $(thisEl).removeClass('show-methods');
-      gotoAmountScreen();
-    });
-
-    this.click('#next-button', 'extraNext');
 
     this.on('focus', '#body', 'input', 'focus', true);
     this.on('blur', '#body', 'input', 'blur', true);
@@ -5087,13 +5041,6 @@ Session.prototype = {
    * @param {Object} payload Overridden payload
    */
   preSubmit: function(e, payload) {
-    var session = this;
-    var storeScreen = SessionStore.get().screen;
-
-    if (storeScreen === 'amount') {
-      return this.extraNext();
-    }
-
     preventDefault(e);
     var screen = this.screen;
     var tab = this.tab;
