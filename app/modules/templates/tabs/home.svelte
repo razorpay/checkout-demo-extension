@@ -153,9 +153,7 @@
 
   export function setDetailsCta() {
     if (isPartialPayment) {
-      // TODO: This hack should be removed and Next button should be removed too
-      _El.addClass(_Doc.querySelector('#container'), 'extra');
-      hideCta();
+      showCtaWithText('Next');
 
       return;
     }
@@ -314,9 +312,6 @@
 
   export function onShown() {
     if (view === 'methods') {
-      // TODO: This hack should be removed and Next button should be removed
-      _El.removeClass(_Doc.querySelector('#container'), 'extra');
-
       if ($selectedInstrumentId) {
         showCtaWithDefaultText();
       } else {
@@ -441,6 +436,12 @@
   });
 
   export function next() {
+    if (isPartialPayment) {
+      if ($partialPaymentOption !== 'full') {
+        session.handlePartialAmount();
+      }
+    }
+
     // Multi TPV
     if (session.multiTpv) {
       if ($multiTpvOption === 'upi') {
