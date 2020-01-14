@@ -51,7 +51,11 @@
   // TPV
   const multiTpv = session.multiTpv;
   const onlyUpiTpv = session.upiTpv;
-  const onlyNetbankingTpv = session.tpvBank && !onlyUpiTpv && !multiTpv;
+  const onlyNetbankingTpv =
+    session.tpvBank &&
+    !onlyUpiTpv &&
+    !multiTpv &&
+    session.oneMethod !== 'emandate';
   const isTpv = multiTpv || onlyUpiTpv || onlyNetbankingTpv;
 
   // Offers
@@ -467,7 +471,7 @@
     }
 
     // TPV bank
-    if (session.tpvBank) {
+    if (session.onlyNetbankingTpv) {
       session.preSubmit();
       return;
     }
