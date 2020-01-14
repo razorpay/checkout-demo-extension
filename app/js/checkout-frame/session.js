@@ -179,6 +179,7 @@ function getIssuerForEmiFromPayload(payload, tokens) {
         if (t.token === payload.token) {
           issuer = t.card.issuer;
 
+          // EMI code for HDFC Debit Cards is HDFC_DC
           if (issuer === 'HDFC' && t.card.type === 'debit') {
             issuer = 'HDFC_DC';
           }
