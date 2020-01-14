@@ -55,7 +55,7 @@
     session.tpvBank &&
     !onlyUpiTpv &&
     !multiTpv &&
-    session.oneMethod === 'netbanking';
+    session.oneMethod !== 'emandate';
   const isTpv = multiTpv || onlyUpiTpv || onlyNetbankingTpv;
 
   // Offers
