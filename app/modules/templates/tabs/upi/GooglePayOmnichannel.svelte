@@ -1,13 +1,16 @@
 <script>
   // Svelte imports
   import { createEventDispatcher, onMount } from 'svelte';
+  import { slide } from 'svelte/transition';
 
   // Util imports
   import { getSession } from 'sessionmanager';
 
   // UI imports
   import Field from 'templates/views/ui/Field.svelte';
+  import Icon from 'templates/views/ui/Icon.svelte';
   import Card from 'templates/views/ui/Card.svelte';
+  import SlottedRadioOption from 'templates/views/ui/options/Slotted/RadioOption.svelte';
 
   // Props
   export let selected = true;
@@ -25,15 +28,16 @@
   // Computed
   const amount = session.formatAmountWithCurrency(session.get('amount'));
 
-  onMount(() => {
-    const customer = session.customer;
+  const onSelection = () => {
+    console.warn(session.customer);
+    const customer = session.customer || {};
 
     contact = customer.contact ? customer.contact.replace('+91', '') : '';
 
     if (focusOnCreate) {
       focus();
     }
-  });
+  };
 
   export function handleCardClick(event) {
     signalSelect();
@@ -52,7 +56,10 @@
 
   export function focus() {
     signalSelect();
-    phoneField.focus();
+    //TODO check if there is a better way
+    setTimeout(() => {
+      phoneField.focus();
+    }, 0);
     dispatch('focus');
   }
 
@@ -69,6 +76,7 @@
 
   .legend {
     margin-top: 18px;
+    padding: 12px 0 8px 12px;
   }
 
   .info {
@@ -81,32 +89,41 @@
     margin-top: 18px;
     color: red;
   }
+  [slot='icon'].top {
+    align-self: flex-start;
+  }
 </style>
 
-<div class="legend left">Enter your Mobile Number</div>
+<div class="legend left">OR, PAY USING PHONE NUMBER</div>
 
-<div id="upi-gpay-phone" class="upi-gpay">
-  <Card
-    {selected}
-    on:click={handleCardClick}
-    error={selected && error && isFirst}>
-    <div class="elem-wrap collect-form">
-      <Field
-        type="text"
-        name="phone"
-        id="phone"
-        bind:this={phoneField}
-        placeholder="Enter Mobile Number"
-        formatter={{ type: 'number' }}
-        required={true}
-        helpText="Please enter a valid contact no."
-        maxlength={10}
-        value={contact}
-        on:blur={blur}
-        on:focus={focus} />
-    </div>
-  </Card>
-</div>
+<SlottedRadioOption
+  name="payment_type"
+  value="full"
+  align="top"
+  on:click={onSelection}
+  {selected}>
+  <div slot="title">UPI ID</div>
+  <i slot="icon" class="top">
+    <img src="https://cdn.razorpay.com/app/googlepay.svg" alt="Google Pay" />
+  </i>
+
+  <div slot="slot-body">
+    {#if selected}
+      <div transition:slide={{ duration: 200 }}>
+        <Field
+          formatter={{ type: 'number' }}
+          elemClasses="mature"
+          id="amount-value"
+          name="amount"
+          type="text"
+          required
+          bind:this={phoneField}
+          on:blur
+          placeholder="Enter your phone number" />
+      </div>
+    {/if}
+  </div>
+</SlottedRadioOption>
 
 {#if selected}
   {#if error}

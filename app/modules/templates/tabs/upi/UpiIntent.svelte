@@ -42,6 +42,7 @@
     } else {
       showableApps = _Arr.slice(apps, 0, 4);
     }
+    console.log(showableApps);
   }
 
   function getVpa() {
@@ -94,7 +95,6 @@
     if (packageName === 'directpay') {
       vpaField.focus();
     }
-
     session.onUpiAppSelect(packageName);
     selected = packageName;
   }
@@ -199,6 +199,7 @@
   }
 </style>
 
+<div class="legend left">PAY USING APPS</div>
 <div id="upi-apps">
   <div id="svelte-upi-apps-list" class="options options-no-margin">
     {#each showableApps as app, i}
@@ -228,7 +229,7 @@
     {/if}
   </div>
 
-  <div
+  <!-- <div
     id="svelte-collect-in-intent"
     class="options options-no-margin ref-collect">
     <RadioOption
@@ -253,5 +254,5 @@
         on:blur={trackVpaEntry}
         formatter={{ type: 'vpa' }} />
     </RadioOption>
-  </div>
+  </div> -->
 </div>

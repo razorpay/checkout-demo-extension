@@ -83,6 +83,10 @@
     }
   }
 
+  .legend {
+    padding: 12px 0 8px 12px;
+  }
+
   [slot='icon'].top {
     align-self: flex-start;
   }
