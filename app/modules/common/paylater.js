@@ -12,7 +12,7 @@ const config = {
   getsimpl: {
     name: 'Simpl',
   },
-  icici: {
+  icic: {
     name: 'ICICI PayLater',
   },
 };
