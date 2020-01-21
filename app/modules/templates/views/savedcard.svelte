@@ -1,11 +1,14 @@
 <script>
   // Svelte imports
-  import { createEventDispatcher, afterUpdate } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
 
   // Utils imports
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { DEFAULT_AUTH_TYPE_RADIO } from 'common/constants';
+
+  // Store
+  import { selectedPlanText } from 'checkoutstore/emi';
 
   // UI imports
   import Radio from 'templates/views/ui/Radio.svelte';
@@ -17,10 +20,11 @@
   export let token;
   export let cvvDigits;
   export let selected;
+  export let tab;
 
   // Computed
-  export let attributes;
-  export let showOuter;
+  let attributes;
+  let showOuter;
 
   let cvvValue = '';
   let authType = debitPin ? 'c3ds' : '';
@@ -108,21 +112,25 @@
       bind:value={cvvValue}
       type="tel" />
   </div>
-  {#if showOuter}
+  {#if showOuter && selected}
     <div class="saved-outer">
       {#if plans}
+        <!-- TODO: refactor into separate component -->
         <div
           class="emi-plans-info-container emi-plans-trigger"
           data-bank={card.issuer}
           on:click={event => dispatch('viewPlans', event)}>
-          <div class="emi-plan-unselected emi-icon-multiple-cards">
-            <div class="emi-plans-text">EMI Available</div>
-            <div class="emi-plans-action theme-highlight">Pay with EMI</div>
-          </div>
-          <div class="emi-plan-selected emi-icon-multiple-cards">
-            <div class="emi-plans-text" />
-            <div class="emi-plans-action theme-highlight">Edit</div>
-          </div>
+          {#if $selectedPlanText}
+            <div class="emi-plan-selected emi-icon-multiple-cards">
+              <div class="emi-plans-text">{$selectedPlanText}</div>
+              <div class="emi-plans-action theme-highlight">Edit</div>
+            </div>
+          {:else}
+            <div class="emi-plan-unselected emi-icon-multiple-cards">
+              <div class="emi-plans-text">EMI Available</div>
+              <div class="emi-plans-action theme-highlight">Pay with EMI</div>
+            </div>
+          {/if}
           <input type="hidden" class="emi_duration" />
         </div>
       {/if}
