@@ -7,6 +7,8 @@
 
   // Props
   export let cards = [];
+  export let tab;
+
   let selected = {};
 
   let currentCvv = '';
@@ -49,6 +51,7 @@
     token={card.token}
     cvvDigits={card.cvvDigits}
     plans={card.plans}
+    {tab}
     on:click={event => {
       handleClick(card, event.detail);
     }}

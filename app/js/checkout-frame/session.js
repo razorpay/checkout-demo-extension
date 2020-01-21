@@ -3470,6 +3470,7 @@ Session.prototype = {
         return;
       }
       this.customer = this.getCustomer(contact);
+      this.svelteCardTab.updateCustomer(this.customer);
       if (this.customer.logged && !this.local) {
         $('#top-right').addClass('logged');
       }
@@ -3541,9 +3542,6 @@ Session.prototype = {
     var self = this;
     var customer = self.customer;
     var remember = self.get('remember_customer');
-
-    // TODO: move to onShown/onMount/computed
-    $('#form-card').toggleClass('save-enabled', remember);
 
     if (!remember) {
       return self.setScreen('card');
@@ -3661,20 +3659,6 @@ Session.prototype = {
   },
 
   /**
-   * @param {Array} tokens
-   *
-   * @return {Array} tokens
-   */
-  transformTokens: function(tokens) {
-    return Token.transform(tokens, {
-      amount: this.get('amount'),
-      emi: this.methods.emi,
-      emiOptions: this.emi_options,
-      recurring: this.recurring,
-    });
-  },
-
-  /**
    * Returns the EMI plans for a given bank.
    * @param {String} bank
    *
@@ -3784,7 +3768,7 @@ Session.prototype = {
             back: bind(function() {
               self.switchTab(prevTab);
               self.setScreen(prevScreen);
-              self.svelteCardTab.toggleSavedCards(false);
+              self.svelteCardTab.showAddCardView();
 
               return true;
             }),
@@ -3798,7 +3782,7 @@ Session.prototype = {
 
               self.switchTab('card');
               self.setScreen('card');
-              self.svelteCardTab.toggleSavedCards(false);
+              self.svelteCardTab.showAddCardView();
 
               self.processOffersOnEmiPlanSelection();
             },
@@ -3816,7 +3800,7 @@ Session.prototype = {
               EmiStore.selectedPlanText.set(text);
 
               self.switchTab('emi');
-              self.svelteCardTab.toggleSavedCards(false);
+              self.svelteCardTab.showAddCardView();
 
               self.processOffersOnEmiPlanSelection(plan);
 
@@ -3884,7 +3868,7 @@ Session.prototype = {
 
               self.switchTab('card');
               self.setScreen('card');
-              self.svelteCardTab.toggleSavedCards(true);
+              self.svelteCardTab.showSavedCards();
 
               self.processOffersOnEmiPlanSelection();
             },
@@ -3906,7 +3890,7 @@ Session.prototype = {
 
               self.switchTab('emi');
               self.setScreen('card');
-              self.svelteCardTab.toggleSavedCards(true);
+              self.svelteCardTab.showSavedCards();
 
               self.processOffersOnEmiPlanSelection(plan);
 
@@ -3915,7 +3899,7 @@ Session.prototype = {
               } else {
                 self.switchTab('emi');
                 self.setScreen('card');
-                self.svelteCardTab.toggleSavedCards(true);
+                self.svelteCardTab.showSavedCards();
               }
             },
 
@@ -4002,178 +3986,6 @@ Session.prototype = {
       this.offers.removeOffer();
       this.hideDiscount();
     }
-  },
-
-  setSavedCards: function(providedTokens) {
-    var customer = this.customer;
-    var tokens =
-      (providedTokens && providedTokens.count) ||
-      (customer && customer.tokens && customer.tokens.count);
-    var cardTab = $('#form-card');
-    var delegator = this.delegator;
-    var self = this;
-
-    if (!delegator) {
-      delegator = this.delegator = Razorpay.setFormatter(this.el);
-    }
-
-    if (tokens) {
-      var tokensList = providedTokens || customer.tokens;
-      if (
-        providedTokens ||
-        $$('.saved-card').length !== tokensList.items.length
-      ) {
-        try {
-          // Keep EMI cards at the end
-          tokensList.items.sort(function(a, b) {
-            if (a.card && b.card) {
-              if (a.card.emi && b.card.emi) {
-                return 0;
-              } else if (a.card.emi) {
-                return 1;
-              } else if (b.card.emi) {
-                return -1;
-              }
-            }
-          });
-        } catch (e) {}
-
-        var savedCardsCount = discreet.Token.getSavedCards(tokensList.items)
-          .length;
-
-        if (savedCardsCount) {
-          Analytics.setMeta('has.savedCards', true);
-          Analytics.setMeta('count.savedCards', savedCardsCount);
-          Analytics.track('saved_cards', {
-            type: AnalyticsTypes.RENDER,
-            data: {
-              count: savedCardsCount,
-            },
-          });
-        }
-
-        this.transformedTokens = this.transformTokens(tokensList.items);
-
-        var totalSavedCards = discreet.Token.getSavedCards(
-          this.transformedTokens
-        ).length;
-
-        if (totalSavedCards) {
-          var selectorsForSavedCardText = [
-            '#form-card .saved-card-pay-without-emi',
-            '#add-card-container .emi-pay-without',
-          ];
-          // TODO: port to svelte tab
-          each(selectorsForSavedCardText, function(index, selector) {
-            var stripEl = $(selector);
-            if (stripEl[0]) {
-              var emiTextEl = stripEl.$('.emi-plans-text .count-text');
-
-              emiTextEl.html(' (' + totalSavedCards + ' cards available)');
-            }
-          });
-        }
-      }
-    }
-
-    var selectableSavedCard = getSelectableSavedCardElement(
-      this.tab,
-      this.selectedSavedCardToken
-    );
-    if (tokens && selectableSavedCard) {
-      this.setSavedCard({ delegateTarget: selectableSavedCard });
-    }
-
-    this.savedCardScreen = tokens;
-
-    var emiCards = [];
-
-    if (this.transformedTokens) {
-      emiCards = this.transformedTokens.filter(function(token) {
-        return token.plans;
-      });
-    }
-
-    if (this.tab === 'card') {
-      this.svelteCardTab.toggleSavedCards(!!tokens);
-    } else if (this.tab === 'emi') {
-      this.svelteCardTab.toggleSavedCards(emiCards.length > 0);
-    }
-    // TODO: remove and implement in cards tab
-    $('#form-card').toggleClass('has-cards', tokens);
-    $('#form-card').toggleClass('no-emi-cards', !emiCards.length);
-
-    each($$('.saved-cvv'), function(i, input) {
-      delegator.add('number', input);
-    });
-  },
-
-  //TODO remove
-  toggleSavedCards_old: function(saveScreen) {
-    var tabCard = $('#form-card');
-    var saveClass = 'saved-cards';
-
-    /**
-     * If offer was auto-applied from the
-     * emi plans screen.
-     * TODO: Validate this.
-     */
-    if (
-      this.offers &&
-      !this.offers.offerSelectedByDrawer &&
-      this.offers.appliedOffer
-    ) {
-      this.offers.removeOffer();
-    }
-
-    if (typeof saveScreen !== 'boolean') {
-      saveScreen = !tabCard.hasClass(saveClass);
-
-      Analytics.track('saved_cards:toggle', {
-        type: AnalyticsTypes.BEHAV,
-        data: {
-          from: tabCard.hasClass(saveClass) ? 'saved' : 'new',
-        },
-      });
-    }
-
-    $('#elem-emi').removeClass('hidden');
-
-    var $savedContainer = $('#saved-cards-container');
-
-    if (saveScreen) {
-      this.setSavedCard({
-        delegateTarget: getSelectableSavedCardElement(
-          this.tab,
-          this.selectedSavedCardToken
-        ),
-      });
-      invoke('addClass', $savedContainer, 'scroll', 300);
-    } else {
-      try {
-        if (document.activeElement) {
-          document.activeElement.blur();
-        }
-      } catch (e) {}
-      $savedContainer.removeClass('scroll');
-    }
-
-    $('#form-card .saved-card-pay-without-emi').toggleClass(
-      'hidden',
-      !saveScreen
-    );
-
-    this.savedCardScreen = saveScreen;
-    tabCard.toggleClass(saveClass, saveScreen);
-
-    setEmiPlansCta(this.screen, this.tab);
-  },
-
-  checkDown: function(val) {
-    $('.down')
-      .toggleClass('vis', indexOf(this.down, val) !== -1)
-      .$('.text')
-      .html((this.methods.netbanking || this.methods.emandate)[val]);
   },
 
   /**

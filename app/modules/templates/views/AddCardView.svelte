@@ -189,7 +189,6 @@
       if (session.methods.card) {
         session.setScreen('card');
         session.switchTab('card');
-        session.svelteCardTab.toggleSavedCards(true); // TODO find out a better way
         session.offers && session.renderOffers(session.tab);
 
         eventName = 'emi:pay_without';
@@ -198,7 +197,6 @@
       if (session.methods.card) {
         session.setScreen('card');
         session.switchTab('card');
-        session.svelteCardTab.toggleSavedCards(false); // TODO find out a better way
         session.offers && session.renderOffers(session.tab);
 
         eventName = 'emi:pay_without';
