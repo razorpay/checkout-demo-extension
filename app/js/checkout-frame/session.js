@@ -159,6 +159,41 @@ function getCardTypeFromPayload(payload, tokens) {
 }
 
 /**
+ * Returns the issuer for EMI from Payload
+ *
+ * @param {Object} payload
+ * @param {Array} tokens
+ *
+ * @return {String} issuer
+ */
+function getIssuerForEmiFromPayload(payload, tokens) {
+  var issuer = '';
+
+  if (payload.token) {
+    if (tokens) {
+      tokens.forEach(function(t) {
+        if (t.token === payload.token) {
+          issuer = t.card.issuer;
+
+          // EMI code for HDFC Debit Cards is HDFC_DC
+          if (issuer === 'HDFC' && t.card.type === 'debit') {
+            issuer = 'HDFC_DC';
+          }
+        }
+      });
+    }
+  } else {
+    issuer = _Obj.getSafely(
+      Bank.getBankFromCard(payload['card[number]']),
+      'code',
+      ''
+    );
+  }
+
+  return issuer;
+}
+
+/**
  * Set the "View EMI Plans" CTA as the Pay Button
  * if all the criteria are met.
  *
@@ -5669,6 +5704,11 @@ Session.prototype = {
             tab: 'emi',
             screen: 'emi',
           };
+        } else if (
+          getIssuerForEmiFromPayload(data, this.transformedTokens) === 'HDFC_DC'
+        ) {
+          // Skip Native OTP for EMI with HDFC Debit Cards
+          shouldUseNativeOTP = false;
         }
       }
 
@@ -6150,11 +6190,9 @@ Session.prototype = {
     var bankMethod = 'netbanking';
     var passedWallets = this.get('method.wallet');
     var self = this;
+    var session = this;
     var emi_options = this.emi_options;
-    var qrEnabled =
-      this.get('method.qr') &&
-      !getStore('isPartialPayment') &&
-      !window.matchMedia(discreet.UserAgent.mobileQuery).matches;
+    var qrEnabled = this.get('method.qr') && !discreet.UserAgent.isMobile();
 
     var methods = (this.methods = {
       count: 0,
@@ -6169,21 +6207,52 @@ Session.prototype = {
       if (availMethods.emandate) {
         bankMethod = 'emandate';
         this.emandate = true;
+
+        var emandateBanks = {};
+
+        /**
+         * There may be multiple auth types present for each bank
+         * but right now, we'll only support those that have
+         * netbanking and debitcard as auth types.
+         */
+        var emandateSupportedAuthTypes = ['netbanking', 'debitcard'];
+        var authTypeFromOrder = session.order.auth_type;
+
+        /**
+         * If an auth_type is there in order,
+         * we only show banks with that auth_type
+         */
+        if (authTypeFromOrder) {
+          emandateSupportedAuthTypes = [authTypeFromOrder];
+        }
+
         each(availMethods[bankMethod], function(bankCode, bankObj) {
+          var bankHasSupportedAuthType = false;
+
           /**
-           * There may be multiple auth types present for each bank
-           * but right now, we'll only support those that have
-           * netbanking as an auth type.
+           * Determine if the bank has any of the supported auth types
            */
-          if (
-            bankObj.auth_types &&
-            (_Arr.contains(bankObj.auth_types, 'netbanking') ||
-              _Arr.contains(bankObj.auth_types, 'debitcard'))
-          ) {
-            banks[bankCode] = bankObj.name;
+          if (bankObj.auth_types) {
+            bankHasSupportedAuthType = _Arr.any(bankObj.auth_types, function(
+              authType
+            ) {
+              return _Arr.contains(emandateSupportedAuthTypes, authType);
+            });
+          }
+
+          if (bankHasSupportedAuthType) {
+            emandateBanks[bankCode] = _Obj.clone(bankObj);
+            emandateBanks[bankCode].auth_types = emandateSupportedAuthTypes;
           }
         });
-        this.emandateBanks = availMethods[bankMethod];
+
+        // Set available banks
+        this.emandateBanks = emandateBanks;
+
+        // Update the list of banks to available banks
+        _Obj.loop(emandateBanks, function(bankDetails, bankCode) {
+          banks[bankCode] = bankDetails.name;
+        });
         availMethods[bankMethod] = banks;
       }
 
