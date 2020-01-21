@@ -54,10 +54,6 @@ function getStore(prop) {
   return Store.get()[prop];
 }
 
-function gotoAmountScreen() {
-  SessionStore.set({ screen: 'amount' });
-}
-
 // .shown has display: none from iOS ad-blocker
 // using दृश्य, which will never be seen by tim cook
 var shownClass = 'drishy';
@@ -1119,12 +1115,9 @@ Session.prototype = {
     }
 
     var key = getter('key');
+
     if (key === UDACITY_KEY || key === EMBIBE_KEY) {
-      if (getStore('isPartialPayment')) {
-        classes.push('extra');
-      } else {
-        classes.push('address extra');
-      }
+      classes.push('address');
       setter('address', true);
     }
 
@@ -1168,10 +1161,6 @@ Session.prototype = {
       classes.push('ip');
     }
 
-    if (getStore('isPartialPayment')) {
-      classes.push('extra');
-    }
-
     if (this.emandate) {
       classes.push('emandate');
     }
@@ -1186,10 +1175,6 @@ Session.prototype = {
   getEl: function() {
     var r = this.r;
     if (!this.el) {
-      if (getStore('isPartialPayment')) {
-        gotoAmountScreen();
-      }
-
       var classes = this.getClasses();
       var ecod = r.get('ecod');
       if (ecod) {
@@ -2568,32 +2553,8 @@ Session.prototype = {
     this.r.topupWallet();
   },
 
-  extraNext: function() {
-    if (!this.checkCommonValidAndTrackIfInvalid()) {
-      var commonInvalid = $('#pad-common .invalid');
-
-      return commonInvalid
-        .addClass('mature')
-        .$('.input')
-        .focus();
-    }
-
-    var partialEl = gel('amount-value');
-
-    if (partialEl) {
-      var amountValue = partialEl.value;
-      var options = this.get();
-      var currency = this.get('currency');
-      var currencyConfig = discreet.Currency.getCurrencyConfig(currency);
-
-      options.amount = parseInt(
-        (amountValue * 100).toFixed(currencyConfig.decimals)
-      );
-      this.setPaymentMethods(this.preferences);
-      this.updateAmountInHeader(amountValue * 100);
-    }
-    this.homeTab.showMethods();
-    SessionStore.set({ screen: '' });
+  handlePartialAmount: function() {
+    this.setPaymentMethods(this.preferences);
   },
 
   setAmount: function(amount) {
@@ -2636,13 +2597,6 @@ Session.prototype = {
     this.listeners.push(function() {
       document.removeEventListener('touchstart', noop);
     });
-
-    this.click('#partial-back', function() {
-      $(thisEl).removeClass('show-methods');
-      gotoAmountScreen();
-    });
-
-    this.click('#next-button', 'extraNext');
 
     this.on('focus', '#body', 'input', 'focus', true);
     this.on('blur', '#body', 'input', 'blur', true);
@@ -5122,13 +5076,6 @@ Session.prototype = {
    * @param {Object} payload Overridden payload
    */
   preSubmit: function(e, payload) {
-    var session = this;
-    var storeScreen = SessionStore.get().screen;
-
-    if (storeScreen === 'amount') {
-      return this.extraNext();
-    }
-
     preventDefault(e);
     var screen = this.screen;
     var tab = this.tab;
@@ -6243,6 +6190,7 @@ Session.prototype = {
     var bankMethod = 'netbanking';
     var passedWallets = this.get('method.wallet');
     var self = this;
+    var session = this;
     var emi_options = this.emi_options;
     var qrEnabled =
       this.get('method.qr') &&
@@ -6262,21 +6210,52 @@ Session.prototype = {
       if (availMethods.emandate) {
         bankMethod = 'emandate';
         this.emandate = true;
+
+        var emandateBanks = {};
+
+        /**
+         * There may be multiple auth types present for each bank
+         * but right now, we'll only support those that have
+         * netbanking and debitcard as auth types.
+         */
+        var emandateSupportedAuthTypes = ['netbanking', 'debitcard'];
+        var authTypeFromOrder = session.order.auth_type;
+
+        /**
+         * If an auth_type is there in order,
+         * we only show banks with that auth_type
+         */
+        if (authTypeFromOrder) {
+          emandateSupportedAuthTypes = [authTypeFromOrder];
+        }
+
         each(availMethods[bankMethod], function(bankCode, bankObj) {
+          var bankHasSupportedAuthType = false;
+
           /**
-           * There may be multiple auth types present for each bank
-           * but right now, we'll only support those that have
-           * netbanking as an auth type.
+           * Determine if the bank has any of the supported auth types
            */
-          if (
-            bankObj.auth_types &&
-            (_Arr.contains(bankObj.auth_types, 'netbanking') ||
-              _Arr.contains(bankObj.auth_types, 'debitcard'))
-          ) {
-            banks[bankCode] = bankObj.name;
+          if (bankObj.auth_types) {
+            bankHasSupportedAuthType = _Arr.any(bankObj.auth_types, function(
+              authType
+            ) {
+              return _Arr.contains(emandateSupportedAuthTypes, authType);
+            });
+          }
+
+          if (bankHasSupportedAuthType) {
+            emandateBanks[bankCode] = _Obj.clone(bankObj);
+            emandateBanks[bankCode].auth_types = emandateSupportedAuthTypes;
           }
         });
-        this.emandateBanks = availMethods[bankMethod];
+
+        // Set available banks
+        this.emandateBanks = emandateBanks;
+
+        // Update the list of banks to available banks
+        _Obj.loop(emandateBanks, function(bankDetails, bankCode) {
+          banks[bankCode] = bankDetails.name;
+        });
         availMethods[bankMethod] = banks;
       }
 
