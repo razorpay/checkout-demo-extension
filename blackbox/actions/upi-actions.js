@@ -74,11 +74,21 @@ async function handleUPIAccountValidation(context, vpa, accountexists = true) {
 }
 
 async function selectUPIMethod(context, UPIMethod) {
-  await delay(500);
-  const upibutton = await context.page.$x(
-    '//div[contains(@class,"ref-text") and text() = "' + UPIMethod + '"]'
-  );
-  await upibutton[0].click();
+  let tokenSelector = null;
+
+  switch (UPIMethod) {
+    case 'omnichannel':
+      tokenSelector = 'gpay-omnichannel';
+      break;
+
+    default:
+      break;
+  }
+  let selectedUPI = await context.page.waitForSelector('#' + tokenSelector);
+  await selectedUPI.click();
+  return await context.page.waitForSelector('#gpay-phone', {
+    visible: true,
+  });
 }
 
 async function enterUPIAccount(context, UPIAccountId) {
@@ -91,11 +101,11 @@ async function selectBankNameFromGooglePayDropDown(context, valuetoBeSelected) {
 }
 
 async function verifyOmnichannelPhoneNumber(context) {
-  expect(await context.page.$('#phone')).not.toEqual(null);
+  expect(await context.page.$('#gpay-phone')).not.toEqual(null);
 }
 
 async function enterOmnichannelPhoneNumber(context) {
-  const phoneField = await context.page.waitForSelector('#phone');
+  const phoneField = await context.page.waitForSelector('#gpay-phone');
   await phoneField.type(randomContact());
 }
 
