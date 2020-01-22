@@ -187,6 +187,7 @@ export default function Track(r, event, data, immediately) {
     var trackingOptions = [
       'amount',
       'contact_id',
+      'currency',
       'description',
       'display_amount',
       'display_currency',
@@ -196,6 +197,7 @@ export default function Track(r, event, data, immediately) {
       'name',
       'prefill',
       'readonly',
+      'recurring',
       'redirect',
       'theme',
     ];
