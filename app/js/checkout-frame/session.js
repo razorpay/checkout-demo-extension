@@ -6218,7 +6218,7 @@ Session.prototype = {
          * netbanking and debitcard as auth types.
          */
         var emandateSupportedAuthTypes = ['netbanking', 'debitcard'];
-        var authTypeFromOrder = session.order.auth_type;
+        var authTypeFromOrder = session.order && session.order.auth_type;
 
         /**
          * If an auth_type is there in order,
