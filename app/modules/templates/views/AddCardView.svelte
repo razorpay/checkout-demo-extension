@@ -213,6 +213,12 @@
     onCardNumberChange();
     dispatch('cardinput');
   }
+
+  function getEmiBanksList() {
+    const { banks = {} } = session.emi_options || {};
+    const bankList = _Obj.entries(banks).map(([_, bank]) => bank.name);
+    return bankList.join(', ');
+  }
 </script>
 
 <style>
@@ -307,7 +313,7 @@
           <div class="emi-plan-unavailable emi-icon-multiple-cards">
             <!-- TODO generate CSV -->
             <span class="help">
-              EMI is available on `=emi_banks_csv ` cards. Enter your credit
+              EMI is available on {getEmiBanksList()} cards. Enter your credit
               card to avail.
             </span>
             <div class="emi-plans-text">EMI unavailable</div>
