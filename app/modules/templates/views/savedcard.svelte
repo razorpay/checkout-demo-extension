@@ -1,11 +1,12 @@
 <script>
   // Svelte imports
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount, onDestroy } from 'svelte';
 
   // Utils imports
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { DEFAULT_AUTH_TYPE_RADIO } from 'common/constants';
+  import { getSession } from 'sessionmanager';
 
   // Store
   import { selectedPlanTextForSavedCard } from 'checkoutstore/emi';
@@ -29,8 +30,23 @@
   let cvvValue = '';
   let authType = debitPin ? 'c3ds' : '';
 
+  const session = getSession();
+
   // Refs
   let cvvInput;
+  let cvvInputFormatter;
+
+  onMount(() => {
+    if (cvvInput) {
+      cvvInputFormatter = session.delegator.add('number', cvvInput);
+    }
+  });
+
+  onDestroy(() => {
+    if (cvvInputFormatter) {
+      cvvInputFormatter.unbind();
+    }
+  });
 
   const dispatch = createEventDispatcher();
 
