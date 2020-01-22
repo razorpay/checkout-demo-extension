@@ -102,7 +102,6 @@
   }
 
   export function showLandingView() {
-    console.log('showing landing view');
     let viewToSet = 'saved-card';
 
     // TODO compare based on tab as well
