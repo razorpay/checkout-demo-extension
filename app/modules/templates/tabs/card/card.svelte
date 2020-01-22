@@ -1,6 +1,6 @@
 <script>
   /* global each, gel, Event */
-  import { fly } from 'svelte/transition';
+  import { fade } from 'svelte/transition';
 
   import Tab from 'templates/tabs/Tab.svelte';
   import AddCardView from 'templates/views/AddCardView.svelte';
@@ -302,7 +302,7 @@
   <!-- TODO: check if this can be moved to store/ state -->
   <input type="hidden" id="emi_duration" name="emi_duration" />
   {#if currentView === 'add-card'}
-    <div transition:fly={{ duration: 100, y: 100 }}>
+    <div in:fade={{ duration: 100, y: 100 }}>
       {#if showAddCardCta}
         <div
           id="show-saved-cards"
@@ -319,7 +319,7 @@
         on:cardinput={onCardInput} />
     </div>
   {:else}
-    <div>
+    <div in:fade={{ duration: 100 }}>
       <div id="saved-cards-container">
         <SavedCards
           {tab}
