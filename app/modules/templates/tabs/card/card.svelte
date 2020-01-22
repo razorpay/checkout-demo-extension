@@ -32,6 +32,7 @@
   let emiCards = [];
   let savedCards = [];
   let lastSavedCard = null;
+  let selectedOffer = {};
 
   let showEmiCta;
   let emiCtaView;
@@ -62,6 +63,10 @@
         },
       });
     }
+  }
+
+  $: {
+    allSavedCards = filterSavedCardsForOffer(allSavedCards, selectedOffer);
   }
 
   $: {
@@ -105,6 +110,29 @@
       emi: session.methods.emi,
       emiOptions: session.emi_options,
       recurring: session.recurring,
+    });
+  }
+
+  function filterSavedCardsForOffer(savedCards, offer) {
+    const emiBanks = session.emi_options.banks;
+    return _Arr.filter(savedCards, function(index, token) {
+      var card = token.card;
+      if (card && offer.payment_method === 'emi' && offer.emi_subvention) {
+        /* Merchant subvention EMI */
+        const bank = card.issuer;
+        const emiBank = emiBanks[bank];
+
+        if (bank && emiBank) {
+          const plans = emiBank.plans;
+          if (typeof plans !== 'object') {
+            return false;
+          }
+
+          return _Arr.any(plans, plan => plan.offer_id === offer.id);
+        }
+      } else {
+        return true;
+      }
     });
   }
 
@@ -281,9 +309,14 @@
     }
   }
 
-  export function updateCustomer(newCustomer) {
+  export function updateCustomer(newCustomer = {}) {
     customer = newCustomer;
     allSavedCards = getSavedCardsFromCustomer(customer);
+    showLandingView();
+  }
+
+  export function setSelectedOffer(newOffer) {
+    selectedOffer = newOffer;
   }
 
   export function onShown() {

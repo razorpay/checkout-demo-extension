@@ -3059,6 +3059,8 @@ Session.prototype = {
       this.showDiscount();
     }
 
+    this.svelteCardTab.setSelectedOffer(offer);
+
     var savedCards =
       this.customer && this.customer.tokens && this.customer.tokens.items;
 
@@ -3189,10 +3191,8 @@ Session.prototype = {
    */
   handleOfferRemoval: function() {
     this.hideDiscount();
-
-    if (this.customer && this.customer.tokens && this.customer.tokens.count) {
-      this.svelteCardTab.setSavedCards(this.customer.tokens);
-    }
+    // Reset selected offer in cards tab to show all saved cards
+    this.svelteCardTab.setSelectedOffer();
   },
 
   /**
