@@ -334,7 +334,7 @@
           <AddCardView
             {showEmiCta}
             {emiCtaView}
-            savedCount={savedCards.length}
+            savedCount={allSavedCards.length}
             bind:this={addCardView}
             on:cardinput={onCardInput} />
         </div>
