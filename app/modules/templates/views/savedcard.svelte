@@ -8,7 +8,7 @@
   import { DEFAULT_AUTH_TYPE_RADIO } from 'common/constants';
 
   // Store
-  import { selectedPlanText } from 'checkoutstore/emi';
+  import { selectedPlanTextForSavedCard } from 'checkoutstore/emi';
 
   // UI imports
   import Radio from 'templates/views/ui/Radio.svelte';
@@ -120,9 +120,9 @@
           class="emi-plans-info-container emi-plans-trigger"
           data-bank={card.issuer}
           on:click={event => dispatch('viewPlans', event)}>
-          {#if $selectedPlanText}
+          {#if $selectedPlanTextForSavedCard && tab === 'emi'}
             <div class="emi-plan-selected emi-icon-multiple-cards">
-              <div class="emi-plans-text">{$selectedPlanText}</div>
+              <div class="emi-plans-text">{$selectedPlanTextForSavedCard}</div>
               <div class="emi-plans-action theme-highlight">Edit</div>
             </div>
           {:else}
@@ -131,7 +131,6 @@
               <div class="emi-plans-action theme-highlight">Pay with EMI</div>
             </div>
           {/if}
-          <input type="hidden" class="emi_duration" />
         </div>
       {/if}
 

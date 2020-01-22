@@ -218,7 +218,7 @@ function setEmiPlansCta(screen, tab) {
   if (screen === 'card' && tab === 'emi') {
     if (isSavedScreen) {
       if (savedCard[0]) {
-        var emiDurationField = savedCard.$('.emi_duration');
+        var emiDurationField = getEmiDurationForSavedCard();
 
         if (emiDurationField[0]) {
           if (!emiDurationField.val()) {
@@ -321,19 +321,11 @@ function toggleEmiPlanDetails(container, planIsSelected) {
   }
 }
 
-function setEmiBank(data, savedCardScreen) {
-  if (savedCardScreen) {
-    var savedEmi = $('#saved-cards-container .checked input.emi_duration')[0];
-    if (savedEmi && savedEmi.value) {
-      data.method = 'emi';
-      data.emi_duration = savedEmi.value;
-    }
-  } else {
-    var activeEmiPlan = getEmiDurationForNewCard();
-    if (activeEmiPlan) {
-      data.method = 'emi';
-      data.emi_duration = activeEmiPlan;
-    }
+function setEmiBank(data) {
+  var activeEmiPlan = getEmiDurationForNewCard();
+  if (activeEmiPlan) {
+    data.method = 'emi';
+    data.emi_duration = activeEmiPlan;
   }
 }
 
@@ -626,7 +618,19 @@ function getEmail() {
 }
 
 function getEmiDurationForNewCard() {
-  return storeGetter(EmiStore.emiDuration);
+  return storeGetter(EmiStore.newCardEmiDuration);
+}
+
+function setEmiDurationForNewCard(duration) {
+  EmiStore.newCardEmiDuration.set(duration);
+}
+
+function getEmiDurationForSavedCard() {
+  return storeGetter(EmiStore.savedCardEmiDuration);
+}
+
+function setEmiDurationForSavedCard(duration) {
+  EmiStore.setEmiDurationForSavedCard(duration);
 }
 
 function setOtpText(view, text) {
@@ -3131,14 +3135,18 @@ Session.prototype = {
           plan.offer_id !== offer.id
         ) {
           // Clear duration
-          EmiStore.emiDuration.set('');
+          setEmiDurationForNewCard('');
         }
       }
 
       //TODO: WIP try to see if the card exists in the saved cards and focus
       var savedCards = this.customer.tokens && this.customer.tokens.items;
 
-      if (this.savedCardScreen && savedCards && savedCards.length > 0) {
+      if (
+        this.svelteCardTab.isOnSavedCardsScreen() &&
+        savedCards &&
+        savedCards.length > 0
+      ) {
         var matchingCardIndex;
 
         savedCards.every(function(item, index) {
@@ -3627,7 +3635,7 @@ Session.prototype = {
     if (this.tab === 'emi' && $savedCard.$('.emi-plans-trigger')[0]) {
       var $trigger = $savedCard.$('.emi-plans-trigger');
       var issuer = $trigger.attr('data-bank');
-      var duration = $savedCard.$('.emi_duration').val();
+      var duration = getEmiDurationForSavedCard();
 
       // Set offer in case it is applicable.
       if (issuer && duration) {
@@ -3782,7 +3790,7 @@ Session.prototype = {
                 from: prevTab,
               });
 
-              EmiStore.emiDuration.set('');
+              setEmiDurationForNewCard('');
 
               self.switchTab('card');
               self.setScreen('card');
@@ -3800,8 +3808,8 @@ Session.prototype = {
                 value: value,
               });
 
-              EmiStore.emiDuration.set(value);
-              EmiStore.selectedPlanText.set(text);
+              setEmiDurationForNewCard(value);
+              EmiStore.selectedPlanTextForNewCard.set(text);
 
               self.switchTab('emi');
               self.svelteCardTab.showAddCardView();
@@ -3867,7 +3875,8 @@ Session.prototype = {
                 from: prevTab,
               });
 
-              $trigger.$('.emi_duration').val('');
+              setEmiDurationForSavedCard('');
+              EmiStore.selectedPlanTextForSavedCard.set('');
               toggleEmiPlanDetails($trigger.parent().parent(), false);
 
               self.switchTab('card');
@@ -3886,11 +3895,9 @@ Session.prototype = {
                 value: value,
               });
 
-              // TODO: set in store
-              // $trigger.$('.emi_duration').val(value);
-              EmiStore.selectedPlanText.set(text);
-              // TODO: check what toggle does
-              // toggleEmiPlanDetails($trigger.parent().parent(), true);
+              setEmiDurationForSavedCard(value);
+              // TODO use separate text?
+              EmiStore.selectedPlanTextForSavedCard.set(text);
 
               self.switchTab('emi');
               self.setScreen('card');
@@ -4072,7 +4079,7 @@ Session.prototype = {
     // TODO: move this logic to cards Svelte component
     if (form === 'emi') {
       var whichCardTab = 'add-card';
-      if (this.savedCardScreen) {
+      if (this.svelteCardTab.isOnSavedCardsScreen()) {
         whichCardTab = 'saved-cards';
       }
 
@@ -4140,35 +4147,11 @@ Session.prototype = {
 
       if (this.screen === 'card') {
         _Obj.extend(data, this.svelteCardTab.getPayload());
-        if (this.savedCardScreen) {
-          var $checkedCard = $('.saved-card.checked');
-          if ($checkedCard[0]) {
-            var $emiPlans = $checkedCard.$('.elem-savedcards-emi');
-            var $emiDuration = $checkedCard.$('.emi_duration');
-            var appliedOffer = this.offers && this.offers.offerSelectedByDrawer;
-            appliedOffer = appliedOffer || {};
-
-            if (
-              (tab === 'emi' || appliedOffer.payment_method === 'emi') &&
-              !$emiDuration.val()
-            ) {
-              $emiPlans
-                .addClass('mature')
-                .addClass('invalid')
-                .focus();
-            } else {
-              $emiPlans.removeClass('mature').removeClass('invalid');
-            }
+        if (tab === 'emi') {
+          var emiDuration = getEmiDurationForNewCard();
+          if (emiDuration) {
+            data.emi_duration = emiDuration;
           }
-        } else {
-          if (tab === 'emi') {
-            var emiDuration = getEmiDurationForNewCard();
-            if (emiDuration) {
-              data.emi_duration = emiDuration;
-            }
-          }
-          var cardNumberKey = 'card[number]';
-          data[cardNumberKey] = data[cardNumberKey].replace(/\ /g, '');
         }
         if (!data.emi_duration) {
           data.method = 'card';
@@ -4211,7 +4194,6 @@ Session.prototype = {
       $('#modal-inner').removeClass('shake');
       hideOverlayMessage();
       this.modal.hide();
-      this.savedCardScreen = undefined;
       discreet.Bridge.stopListeningForBackPresses();
     }
   },
@@ -4648,8 +4630,7 @@ Session.prototype = {
         if (!preferences.methods.amex && cardType === 'amex') {
           return this.showLoadError('AMEX cards are not supported', true);
         }
-        var nocvv_el = $('#nocvv-check [type=checkbox]')[0];
-        if (this.savedCardScreen && !data['card[cvv]']) {
+        if (this.svelteCardTab.isOnSavedCardsScreen() && !data['card[cvv]']) {
           var checkedCard = $('.saved-card.checked');
 
           /**
@@ -5463,7 +5444,9 @@ Session.prototype = {
     }
 
     if (this.screen === 'card' && this.tab === 'emi') {
-      setEmiBank(data, this.savedCardScreen);
+      if (!this.svelteCardTab.isOnSavedCardsScreen()) {
+        setEmiBank(data);
+      }
       if (this.recurring) {
         var recurringValue = this.get('recurring');
         data.recurring = isString(recurringValue) ? recurringValue : 1;
@@ -6160,6 +6143,7 @@ Session.prototype = {
   },
 
   setPreferences: function(prefs) {
+    prefs.methods.amex = true;
     PreferencesStore.set(prefs);
     DowntimesStore.set(discreet.Downtimes.getDowntimes(prefs));
     this.r.preferences = prefs;

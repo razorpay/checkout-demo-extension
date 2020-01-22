@@ -60,7 +60,6 @@
 
 <div class="pad">
   <div id="add-emi-container">
-    <input type="hidden" name="emi_duration" bind:value={emiDuration} />
     <div class="clear" />
     <div
       class="strip emi-plans-info-container emi-plans-trigger details-visible"

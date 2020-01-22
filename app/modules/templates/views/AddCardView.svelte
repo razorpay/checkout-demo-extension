@@ -18,7 +18,7 @@
     cardType,
   } from 'checkoutstore/screens/card';
 
-  import { selectedPlanText } from 'checkoutstore/emi';
+  import { selectedPlanTextForNewCard } from 'checkoutstore/emi';
 
   // Utils
   import { getSession } from 'sessionmanager';
@@ -84,7 +84,7 @@
 
   export function getPayload() {
     const payload = {
-      'card[number]': $cardNumber,
+      'card[number]': $cardNumber.replace(/ /g, ''),
       'card[expiry]': $cardExpiry,
       'card[cvv]': $cardCvv,
       'card[name]': $cardName,
@@ -320,7 +320,7 @@
         {/if}
         {#if emiCtaView === 'plans-available'}
           <div class="emi-plan-selected emi-icon-multiple-cards">
-            <div class="emi-plans-text">{$selectedPlanText}</div>
+            <div class="emi-plans-text">{$selectedPlanTextForNewCard}</div>
             <div class="emi-plans-action theme-highlight">Edit</div>
           </div>
         {/if}

@@ -16,7 +16,7 @@
     remember,
   } from 'checkoutstore/screens/card';
 
-  import { emiDuration } from 'checkoutstore/emi';
+  import { newCardEmiDuration } from 'checkoutstore/emi';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -125,18 +125,17 @@
 
   export function showAddCardView() {
     setView('add-card');
-    session.savedCardScreen = false;
   }
 
   export function showSavedCards() {
     setView('saved-cards');
-    session.savedCardScreen = true;
   }
 
   function setView(view) {
     currentView = view;
   }
 
+  // TODO: remove and track when view changes
   export function toggleSavedCards() {
     /**
      * If offer was auto-applied from the
@@ -165,6 +164,10 @@
     } else {
       return getSavedCardPayload();
     }
+  }
+
+  export function isOnSavedCardsScreen() {
+    return currentView === 'saved-card';
   }
 
   function getAddCardPayload() {
@@ -207,7 +210,7 @@
     session.emiPlansForNewCard = emiObj && emiObj[1];
 
     if (!emiObj) {
-      $emiDuration = '';
+      $newCardEmiDuration = '';
     }
 
     showAppropriateEmiDetailsForNewCard(
@@ -266,7 +269,7 @@
         showEmiCta = false;
       }
     } else if (tab === 'emi') {
-      if ($emiDuration) {
+      if ($newCardEmiDuration) {
         emiCtaView = 'plans-available';
       } else if (cardLength >= 6 && !hasPlans) {
         emiCtaView = 'plans-unavailable';
@@ -314,8 +317,6 @@
 <Tab method="card" pad={false}>
   <Screen pad={false}>
     <div slot="main">
-      <!-- TODO: check if this can be moved to store/ state -->
-      <input type="hidden" id="emi_duration" name="emi_duration" />
       {#if currentView === 'add-card'}
         <div in:fade={{ duration: 100, y: 100 }}>
           {#if showAddCardCta}

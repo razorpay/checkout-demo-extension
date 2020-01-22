@@ -5,16 +5,25 @@
   // UI imports
   import SavedCard from 'templates/views/savedcard.svelte';
 
+  // Store
+  import { selectedTokenId, savedCardEmiDuration } from 'checkoutstore/emi';
+
   // Props
   export let cards = [];
   export let tab;
 
-  let selected = {};
+  let selected = null;
 
   let currentCvv = '';
   let currentAuthType = '';
 
   const dispatch = createEventDispatcher();
+
+  $: {
+    if (selected) {
+      $selectedTokenId = selected.token;
+    }
+  }
 
   export function onViewPlans(event) {
     dispatch('viewPlans', event.detail);
@@ -36,9 +45,13 @@
   }
 
   export function getSelectedToken() {
-    const payload = { token: selected.token, 'card[cvv]': currentCvv };
+    const selectedToken = selected || {};
+    const payload = { token: selectedToken.token, 'card[cvv]': currentCvv };
     if (currentAuthType) {
       payload.auth_type = currentAuthType;
+    }
+    if ($savedCardEmiDuration) {
+      payload.emi_duration = $savedCardEmiDuration;
     }
     return payload;
   }
@@ -57,6 +70,6 @@
     }}
     on:cvvchange={handleCvvChange}
     on:authtypechange={handleAuthTypeChange}
-    selected={selected.id === card.id}
+    selected={selected && selected.id === card.id}
     on:viewPlans={onViewPlans} />
 {/each}
