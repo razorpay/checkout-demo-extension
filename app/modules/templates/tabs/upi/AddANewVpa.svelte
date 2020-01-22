@@ -55,7 +55,7 @@
   }
 
   export function blur() {
-    if (vpaField) vpaField.blur();
+    if (selected) vpaField.blur();
   }
 
   export function focus() {
@@ -98,7 +98,7 @@
   align="top"
   on:click={onSelection}
   {selected}>
-  <div slot="title">UPI ID</div>
+  <div id="new-vpa-field" slot="title">UPI ID</div>
   <div slot="subtitle">Google Pay, BHIM, Phone Pe & more</div>
   <i slot="icon" class="top">
     <Icon icon={session.themeMeta.icons.upi} />

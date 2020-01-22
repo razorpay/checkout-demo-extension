@@ -69,6 +69,7 @@
   let selectedToken = null;
   let isANewVpa = false;
   let rememberVpaCheckbox;
+  let intentAppSelected = null;
 
   const session = getSession();
   const {
@@ -135,32 +136,32 @@
   $: shouldShowQr =
     qrEnabled && !selectedApp && selectedApp !== null && !isPayout;
 
-  $: {
-    if (tab) {
-      /**
-       * For separate Gpay tab, if it is intent app and app does not exist,
-       * fallback to older GPay UI
-       **/
-      if (selectedApp === 'gpay') {
-        if (tab === 'gpay') {
-          preferIntent = doesAppExist(GOOGLE_PAY_PACKAGE_NAME, intentApps);
-        } else if (tab === 'upi') {
-          preferIntent = true;
-        }
-      }
-    }
-  }
+  // $: {
+  //   if (tab) {
+  //     /**
+  //      * For separate Gpay tab, if it is intent app and app does not exist,
+  //      * fallback to older GPay UI
+  //      **/
+  //     if (selectedApp === 'gpay') {
+  //       if (tab === 'gpay') {
+  //         preferIntent = doesAppExist(GOOGLE_PAY_PACKAGE_NAME, intentApps);
+  //       } else if (tab === 'upi') {
+  //         preferIntent = true;
+  //       }
+  //     }
+  //   }
+  // }
 
-  $: {
-    if (session.tab === 'upi' || session.tab === 'gpay') {
-      /* TODO: bad practice, remove asap */
-      if (selectedApp === undefined || isGPaySelected) {
-        hideCta();
-      } else {
-        showCtaWithDefaultText();
-      }
-    }
-  }
+  // $: {
+  //   if (session.tab === 'upi' || session.tab === 'gpay') {
+  //     /* TODO: bad practice, remove asap */
+  //     if (selectedApp === undefined || isGPaySelected) {
+  //       hideCta();
+  //     } else {
+  //       showCtaWithDefaultText();
+  //     }
+  //   }
+  // }
 
   onMount(() => {
     checkGPay(session)
@@ -184,7 +185,6 @@
 
     qrEnabled = session.methods.qr;
     qrIcon = session.themeMeta.icons.qr;
-    console.error(session);
   });
 
   export function selectQrMethod() {
@@ -198,58 +198,45 @@
     session.switchTab('qr');
   }
 
-  // export function setOmnichannelType(event) {
-  //   const { type } = event.detail;
-
-  //   Analytics.track('omnichannel:type:select', {
-  //     type: AnalyticsTypes.BEHAV,
-  //     data: {
-  //       type,
-  //     },
-  //   });
-
-  //   omnichannelType = type;
-  // }
-
   // TODO check why saved this is not called in intent flow. --log in first
   export function onShown() {
     if (!session.customer.tokens) return;
     tokens = getSavedVPA(session.customer.tokens.items);
-    session.customer.tokens.count = 3;
-    tokens.push(
-      {
-        auth_type: null,
-        bank: null,
-        card: null,
-        created_at: 1575890449,
-        entity: 'token',
-        expired_at: 1701368999,
-        id: 'token_Dq5kK5crQ1WLab',
-        method: 'upi',
-        mrn: null,
-        recurring: false,
-        token: '6VPEIb26rcmEOv',
-        used_at: 1575954761,
-        wallet: null,
-        vpa: 'saranshgupta1995@okaxis',
-      },
-      {
-        auth_type: null,
-        bank: null,
-        card: null,
-        created_at: 1575890449,
-        entity: 'token',
-        expired_at: 1701368999,
-        id: 'token_Dq5kK5crQ1WLabiuy',
-        method: 'upi',
-        mrn: null,
-        recurring: false,
-        token: '6VPEIb26rcmEOv',
-        used_at: 1575954761,
-        wallet: null,
-        vpa: 'saranshgupta1995@okhdfc',
-      }
-    );
+    // session.customer.tokens.count = 3;
+    // tokens.push(
+    //   {
+    //     auth_type: null,
+    //     bank: null,
+    //     card: null,
+    //     created_at: 1575890449,
+    //     entity: 'token',
+    //     expired_at: 1701368999,
+    //     id: 'token_Dq5kK5crQ1WLab',
+    //     method: 'upi',
+    //     mrn: null,
+    //     recurring: false,
+    //     token: '6VPEIb26rcmEOv',
+    //     used_at: 1575954761,
+    //     wallet: null,
+    //     vpa: 'saranshgupta1995@okaxis',
+    //   },
+    //   {
+    //     auth_type: null,
+    //     bank: null,
+    //     card: null,
+    //     created_at: 1575890449,
+    //     entity: 'token',
+    //     expired_at: 1701368999,
+    //     id: 'token_Dq5kK5crQ1WLabiuy',
+    //     method: 'upi',
+    //     mrn: null,
+    //     recurring: false,
+    //     token: '6VPEIb26rcmEOv',
+    //     used_at: 1575954761,
+    //     wallet: null,
+    //     vpa: 'saranshgupta1995@okhdfc',
+    //   }
+    // );
   }
 
   export function getPayload() {
@@ -269,55 +256,36 @@
     if (vpaField) {
       vpaField.blur();
     }
-    debugger;
     let data = {};
-    if (intent) {
-      data = intentView.getPayload();
-    } else {
-      // if (selectedApp && isGPaySelected) {
-      //   data = {
-      //     '_[flow]': 'gpay',
-      //   };
-      // }
-      //  else
-      if (selectedToken) {
-        switch (selectedToken) {
-          case 'new':
-            data = {
-              vpa: getFullVpa(),
-              save: vpaField.shouldRememberVpa(),
-            };
-            break;
-          case 'gpay-omni':
-            data = {
-              '_[flow]': 'intent',
-              contact: omnichannelField.getPhone(),
-              upi_provider: 'google_pay',
-            };
-            break;
+    switch (selectedToken) {
+      case 'new':
+        data = {
+          vpa: getFullVpa(),
+          save: vpaField.shouldRememberVpa(),
+        };
+        break;
+      case 'intent':
+        data = intentView.getPayload();
+        break;
+      case 'gpay-omni':
+        data = {
+          '_[flow]': 'intent',
+          contact: omnichannelField.getPhone(),
+          upi_provider: 'google_pay',
+        };
+        break;
 
-          default:
-            data = { token: selectedToken };
-            break;
-        }
-        // if (selectedToken === 'new') {
-        //   // manually typed VPA
-        // }
-        // else data = { token: selectedToken }; // saved vpa token
-      }
-      // else {
-      //   data = {
-      //     vpa: getFullVpa(),
-      //   };
-      // }
+      default:
+        data = { token: selectedToken };
+        break;
+    }
 
-      /**
-       * TODO: discuss with vivek whether to continue sending
-       * directpay for collect requests
-       */
-      if (!data['_[flow]']) {
-        data['_[flow]'] = 'directpay';
-      }
+    /**
+     * TODO: discuss with vivek whether to continue sending
+     * directpay for collect requests
+     */
+    if (!data['_[flow]']) {
+      data['_[flow]'] = 'directpay';
     }
 
     data.method = 'upi';
@@ -353,47 +321,34 @@
     return false;
   }
 
+  //TODO check web payments api
   export function onUpiAppSelection(event) {
     const id = event.detail.id;
-
-    // if (typeof id !== 'undefined') {
-    //   /**
-    //    * `id` is undefined when the user wants to switch app
-    //    * and it is null when the user select "other apps"
-    //    */
-    //   Analytics.track('upi:app:select', {
-    //     type: AnalyticsTypes.BEHAV,
-    //     data: {
-    //       flow: 'collect',
-    //       app: id,
-    //     },
-    //   });
-    // }
-
-    selectedApp = id;
+    selectedToken = id;
+    intentAppSelected = event.detail.app || null;
 
     /**
      * Wait for `isGpaySelected` to be updated. It does not update synchronously when selectedApp is reassigned, hence
      * the setTimeout.
      */
-    setTimeout(function() {
-      if (isGPaySelected) {
-        return session.preSubmit();
-      }
+    // setTimeout(function() {
+    //   if (isGPaySelected) {
+    //     return session.preSubmit();
+    //   }
 
-      focusVpa();
-    });
+    //   // focusVpa();
+    // });
   }
 
-  export function focusVpa() {
-    if (!focused && vpaField) {
-      if (useOmnichannel && selectedApp === 'gpay') {
-        omnichannelField.focus();
-      } else {
-        vpaField.focus();
-      }
-    }
-  }
+  // export function focusVpa() {
+  //   if (!focused && vpaField) {
+  //     if (useOmnichannel && selectedApp === 'gpay') {
+  //       omnichannelField.focus();
+  //     } else {
+  //       vpaField.focus();
+  //     }
+  //   }
+  // }
 
   export function getFullVpa() {
     if (vpaField) {
@@ -402,24 +357,24 @@
     return '';
   }
 
-  export function trackVpaEntry() {
-    const vpa = getFullVpa();
+  // export function trackVpaEntry() {
+  //   const vpa = getFullVpa();
 
-    if (!vpa) {
-      return;
-    }
+  //   if (!vpa) {
+  //     return;
+  //   }
 
-    const valid = isVpaValid(vpa);
+  //   const valid = isVpaValid(vpa);
 
-    Analytics.track('vpa:fill', {
-      type: AnalyticsTypes.BEHAV,
-      data: {
-        app: selectedApp,
-        value: vpa,
-        valid,
-      },
-    });
-  }
+  //   Analytics.track('vpa:fill', {
+  //     type: AnalyticsTypes.BEHAV,
+  //     data: {
+  //       app: selectedApp,
+  //       value: vpa,
+  //       valid,
+  //     },
+  //   });
+  // }
 
   export function trackHandleSelection(event) {
     const handle = event.detail;
@@ -529,12 +484,15 @@
       <div class="border-list" />
       {#if false}
 
-      {:else if selectedApp === undefined || isGPaySelected}
+      {:else if true}
         {#if intent}
           <UpiIntent
             bind:this={intentView}
             apps={intentApps || []}
-            {selectedApp}
+            selected={intentAppSelected}
+            intentSelection={app => {
+              onUpiAppSelection({ detail: { id: 'intent', app } });
+            }}
             {showRecommendedUPIApp} />
         {/if}
         {#if useWebPaymentsApi}
@@ -565,15 +523,16 @@
                 selectedToken = app.id;
                 showCta();
               }}>
-              <div slot="title">{app.vpa}</div>
+              <div slot="title">{app.vpa.username + '@' + app.vpa.handle}</div>
               <i slot="icon">
+                <!-- Check if we can reversemap from handle to handle image -->
                 <Icon icon="https://cdn.razorpay.com/bank/SBIN.gif" />
               </i>
             </SlottedRadioOption>
           {/each}
           <AddANewVpa
             onSelection={_ => {
-              selectedToken = 'new';
+              onUpiAppSelection({ detail: { id: 'new' } });
               showCta();
             }}
             selected={selectedToken === 'new'}
@@ -588,52 +547,10 @@
             selected={selectedToken === 'gpay-omni'}
             on:blur={trackOmnichannelEntry}
             on:select={_ => {
-              selectedToken = 'gpay-omni';
+              onUpiAppSelection({ detail: { id: 'gpay-omni' } });
               showCta();
             }}
             bind:this={omnichannelField} />
-        {/if}
-      {:else}
-        <div class="legend left">Selected UPI app</div>
-        <Card>
-          <span class="ref-iconwrap">
-            <Icon icon={selectedAppData.icon} alt={selectedAppData.text} />
-          </span>
-          <span>{selectedAppData.text}</span>
-          <div class="ref-changebtn" on:click={onUpiAppSelection}>change</div>
-        </Card>
-        {#if selectedApp === 'gpay'}
-          <!-- {#if useOmnichannel}
-            <GooglePayOmnichannel
-              error={retryOmnichannel}
-              focusOnCreate={true}
-              {isFirst}
-              retry={retryOmnichannel}
-              selected={omnichannelType === 'phone'}
-              on:blur={trackOmnichannelEntry}
-              on:select={setOmnichannelType}
-              bind:this={omnichannelField} />
-          {/if} -->
-          <!-- {#if retryOmnichannel || !useOmnichannel}
-            <GooglePayCollect
-              focusOnCreate={!retryOmnichannel}
-              {pspHandle}
-              retry={retryOmnichannel}
-              selected={omnichannelType === 'vpa'}
-              on:blur={trackVpaEntry}
-              on:handleChange={trackHandleSelection}
-              on:select={setOmnichannelType}
-              bind:this={vpaField} />
-          {/if} -->
-        {:else}
-          <Collect
-            appId={selectedAppData.id}
-            focusOnCreate={true}
-            {pspHandle}
-            {selectedApp}
-            {vpa}
-            on:blur={trackVpaEntry}
-            bind:this={vpaField} />
         {/if}
       {/if}
 

@@ -17,6 +17,7 @@
   export let selected = null;
   export let showRecommendedUPIApp;
   export let selectedApp;
+  export let intentSelection;
 
   // Computed
   export let showableApps;
@@ -92,11 +93,8 @@
   export function onAppSelect({ detail }) {
     const packageName = detail.package_name;
 
-    if (packageName === 'directpay') {
-      vpaField.focus();
-    }
     session.onUpiAppSelect(packageName);
-    selected = packageName;
+    intentSelection(packageName);
   }
 </script>
 
@@ -159,6 +157,10 @@
     }
   }
 
+  #upi-apps {
+    padding-top: unset;
+  }
+
   #upi-apps .ref-collect {
     :global(.option-icon) {
       left: 20px;
@@ -197,6 +199,10 @@
     line-height: 15px;
     margin-top: 4px;
   }
+
+  .legend {
+    padding: 12px 0 8px 12px;
+  }
 </style>
 
 <div class="legend left">PAY USING APPS</div>
@@ -229,30 +235,4 @@
     {/if}
   </div>
 
-  <!-- <div
-    id="svelte-collect-in-intent"
-    class="options options-no-margin ref-collect">
-    <RadioOption
-      data={{ package_name: 'directpay' }}
-      icon={'&#xe70e;'}
-      name="upi_app"
-      value="directpay"
-      selected={selected === 'directpay'}
-      on:select={onAppSelect}>
-      <div class="ref-title">UPI Address</div>
-      <div class="ref-submessage">
-        You will receive a payment request in your UPI app
-      </div>
-      <Field
-        type="text"
-        name="vpa"
-        bind:this={vpaField}
-        placeholder="Enter your UPI Address"
-        required={true}
-        helpText="Please enter a valid VPA of the form username@bank"
-        pattern=".+@.+"
-        on:blur={trackVpaEntry}
-        formatter={{ type: 'vpa' }} />
-    </RadioOption>
-  </div> -->
 </div>

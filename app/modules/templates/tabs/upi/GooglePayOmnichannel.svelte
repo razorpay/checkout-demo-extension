@@ -67,6 +67,9 @@
     phoneField.blur();
     dispatch('blur', event.detail);
   }
+
+  // TODO trigger shake on invalid phone number
+  $: pattern = '[0-9]{10}';
 </script>
 
 <style>
@@ -102,7 +105,7 @@
   align="top"
   on:click={onSelection}
   {selected}>
-  <div slot="title">UPI ID</div>
+  <div id="gpay-omnichannel" slot="title">UPI ID</div>
   <i slot="icon" class="top">
     <img src="https://cdn.razorpay.com/app/googlepay.svg" alt="Google Pay" />
   </i>
@@ -113,12 +116,14 @@
         <Field
           formatter={{ type: 'number' }}
           elemClasses="mature"
-          id="amount-value"
+          id="gpay-phone"
+          {pattern}
           name="amount"
           type="text"
           required
           bind:this={phoneField}
           on:blur
+          value={contact}
           placeholder="Enter your phone number" />
       </div>
     {/if}
