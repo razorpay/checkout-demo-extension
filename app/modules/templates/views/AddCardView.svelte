@@ -311,7 +311,6 @@
         on:click={handleEmiCtaClick}>
         {#if emiCtaView === 'plans-unavailable'}
           <div class="emi-plan-unavailable emi-icon-multiple-cards">
-            <!-- TODO generate CSV -->
             <span class="help">
               EMI is available on {getEmiBanksList()} cards. Enter your credit
               card to avail.

@@ -3885,7 +3885,6 @@ Session.prototype = {
               });
 
               setEmiDurationForSavedCard(value);
-              // TODO use separate text?
               EmiStore.selectedPlanTextForSavedCard.set(text);
 
               self.switchTab('emi');
@@ -4065,7 +4064,7 @@ Session.prototype = {
 
   getActiveForm: function() {
     var form = this.tab || 'common';
-    // TODO: move this logic to cards Svelte component
+    // TODO: get rid of this
     if (form === 'emi') {
       var whichCardTab = 'add-card';
       if (this.svelteCardTab.isOnSavedCardsScreen()) {

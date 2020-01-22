@@ -105,9 +105,7 @@
       <Icon icon={getIcon(type)} />
     </div>
   {/if}
-  <!-- TODO: set maxlength based on type or remove from here if already handled by formatter -->
   <!-- TODO: handle prefill and readonly -->
-  <!-- TODO: change help message for AMEX -->
   <!-- TODO: Fix invalid class not being applied -->
   <Field
     {id}
@@ -123,7 +121,6 @@
     handleFocus
     handleInput
     on:blur
-    maxlength={19}
     bind:this={field}
     on:input={handleInput} />
 </div>

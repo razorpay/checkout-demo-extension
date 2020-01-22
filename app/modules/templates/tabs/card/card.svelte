@@ -139,7 +139,6 @@
   export function showLandingView() {
     let viewToSet = 'saved-card';
 
-    // TODO compare based on tab as well
     if (allSavedCards.length === 0) {
       viewToSet = 'add-card';
     }
