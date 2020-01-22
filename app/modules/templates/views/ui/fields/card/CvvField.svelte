@@ -15,8 +15,13 @@
   export let value = '';
   export let id;
 
-  const cvvLength = getCvvDigits(cardType);
-  const cvvPattern = `[0-9]{${cvvLength}}`;
+  let cvvLength = 3;
+  let cvvPattern = '[0-9]{3}}';
+
+  $: {
+    cvvLength = getCvvDigits(cardType);
+    cvvPattern = `[0-9]{${cvvLength}}`;
+  }
 </script>
 
 <style>
