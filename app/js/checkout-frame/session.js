@@ -6192,7 +6192,9 @@ Session.prototype = {
     var self = this;
     var session = this;
     var emi_options = this.emi_options;
-    var qrEnabled = this.get('method.qr') && !discreet.UserAgent.isMobile();
+    var qrEnabled =
+      this.get('method.qr') &&
+      !window.matchMedia(discreet.UserAgent.mobileQuery).matches;
 
     var methods = (this.methods = {
       count: 0,
@@ -6216,7 +6218,7 @@ Session.prototype = {
          * netbanking and debitcard as auth types.
          */
         var emandateSupportedAuthTypes = ['netbanking', 'debitcard'];
-        var authTypeFromOrder = session.order.auth_type;
+        var authTypeFromOrder = session.order && session.order.auth_type;
 
         /**
          * If an auth_type is there in order,
