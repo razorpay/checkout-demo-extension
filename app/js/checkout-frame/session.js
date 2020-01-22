@@ -2483,6 +2483,7 @@ Session.prototype = {
         this.fixLandscapeBug();
       }
 
+      // TODO: move tracking to add card view
       var saveTick = qs('#save');
       if (saveTick) {
         this.on('change', '#save', function(e) {
@@ -2494,18 +2495,6 @@ Session.prototype = {
           });
         });
       }
-
-      this.on('click', '#saved-cards-container', 'nocvv-checkbox', function(e) {
-        var target = e.delegateTarget;
-        var checked = target.checked;
-        var cvvField = $(target.parentNode.parentNode).qs('input.saved-cvv');
-
-        if (checked) {
-          $(cvvField).css('display', 'none');
-        } else {
-          $(cvvField).css('display', 'block');
-        }
-      });
     } //TODO: visit this again
     this.on('click', '#top-right', function() {
       $('#top-right').addClass('focus');

@@ -27,6 +27,7 @@
   let attributes;
   let showOuter;
 
+  let noCvvChecked = false;
   let cvvValue = '';
   let authType = debitPin ? 'c3ds' : '';
 
@@ -118,6 +119,7 @@
     <span class="saved-number">{card.last4}</span>
     <input
       class="saved-cvv cvv-input"
+      class:hidden={noCvvChecked}
       inputmode="numeric"
       maxlength={cvvDigits}
       pattern={`[0-9]{${cvvDigits}}`}
@@ -153,7 +155,11 @@
       <!-- TODO: handle nocvv for saved cards in getPayload -->
       {#if card.networkCode === 'maestro'}
         <label for={`nocvv-${token}`} class="maestro-cvv">
-          <input class="nocvv-checkbox" type="checkbox" id={`nocvv-${token}`} />
+          <input
+            class="nocvv-checkbox"
+            type="checkbox"
+            id={`nocvv-${token}`}
+            bind:checked={noCvvChecked} />
           <span class="checkbox" />
           My Maestro Card doesn't have Expiry/CVV
         </label>
