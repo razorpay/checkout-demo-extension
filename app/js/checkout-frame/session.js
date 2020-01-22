@@ -6859,6 +6859,16 @@ Session.prototype = {
     // Set Offers
     this.setOffers(preferences);
 
+    // Set optional fields in meta
+    Analytics.setMeta(
+      'optional.contact',
+      _Arr.contains(preferences.optional || [], 'contact')
+    );
+    Analytics.setMeta(
+      'optional.email',
+      _Arr.contains(preferences.optional || [], 'email')
+    );
+
     return {};
   },
 
