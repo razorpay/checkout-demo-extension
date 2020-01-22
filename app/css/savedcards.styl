@@ -74,10 +74,6 @@ $cardpl = 70px;
     display: none;
   }
 
-  #show-add-card {
-    opacity: 1;
-  }
-
   .maestro-cvv {
     display: block;
     font-size: 13px;
@@ -153,7 +149,6 @@ $cardpl = 70px;
 #saved-cards-container {
   position: relative;
   line-height: $cardHeights['default'];
-  padding-bottom: 1px;
 
   &.scroll {
     overflow-y: auto;
@@ -217,10 +212,9 @@ $cardpl = 70px;
 #show-add-card {
   transition: 0.2s;
   cursor: pointer;
+  position: relative;
   line-height: $cardHeights['default'];
-  position: absolute;
   z-index: 1;
-  opacity: 0;
 
   &::before {
     display: inline-block;

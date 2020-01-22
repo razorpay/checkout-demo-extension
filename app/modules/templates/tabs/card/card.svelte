@@ -3,6 +3,7 @@
   import { fade } from 'svelte/transition';
 
   import Tab from 'templates/tabs/Tab.svelte';
+  import Screen from 'templates/layouts/Screen.svelte';
   import AddCardView from 'templates/views/AddCardView.svelte';
   import SavedCards from 'templates/screens/savedcards.svelte';
 
@@ -296,43 +297,51 @@
     transition-delay: 0.15s;
     z-index: 1;
   }
+
+  .saved-cards-icon {
+    position: absolute;
+  }
 </style>
 
 <Tab method="card" pad={false}>
-  <!-- TODO: check if this can be moved to store/ state -->
-  <input type="hidden" id="emi_duration" name="emi_duration" />
-  {#if currentView === 'add-card'}
-    <div in:fade={{ duration: 100, y: 100 }}>
-      {#if showAddCardCta}
-        <div
-          id="show-saved-cards"
-          on:click={showSavedCards}
-          class="text-btn left-card">
-          Use saved cards
+  <Screen pad={false}>
+    <div slot="main">
+      <!-- TODO: check if this can be moved to store/ state -->
+      <input type="hidden" id="emi_duration" name="emi_duration" />
+      {#if currentView === 'add-card'}
+        <div in:fade={{ duration: 100, y: 100 }}>
+          {#if showAddCardCta}
+            <div
+              id="show-saved-cards"
+              on:click={showSavedCards}
+              class="text-btn left-card">
+              Use saved cards
+            </div>
+          {/if}
+          <AddCardView
+            {showEmiCta}
+            {emiCtaView}
+            savedCount={savedCards.length}
+            bind:this={addCardView}
+            on:cardinput={onCardInput} />
+        </div>
+      {:else}
+        <div in:fade={{ duration: 100 }}>
+          <div id="saved-cards-container">
+            <SavedCards
+              {tab}
+              cards={savedCards}
+              bind:this={savedCardsView}
+              on:viewPlans={handleViewPlans} />
+          </div>
+          <div
+            id="show-add-card"
+            class="text-btn left-card"
+            on:click={() => setView('add-card')}>
+            Add another card
+          </div>
         </div>
       {/if}
-      <AddCardView
-        {showEmiCta}
-        {emiCtaView}
-        savedCount={savedCards.length}
-        bind:this={addCardView}
-        on:cardinput={onCardInput} />
     </div>
-  {:else}
-    <div in:fade={{ duration: 100 }}>
-      <div id="saved-cards-container">
-        <SavedCards
-          {tab}
-          cards={savedCards}
-          bind:this={savedCardsView}
-          on:viewPlans={handleViewPlans} />
-      </div>
-      <div
-        id="show-add-card"
-        class="text-btn left-card"
-        on:click={() => setView('add-card')}>
-        Add another card
-      </div>
-    </div>
-  {/if}
+  </Screen>
 </Tab>
