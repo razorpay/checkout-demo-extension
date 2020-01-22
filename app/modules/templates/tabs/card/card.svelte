@@ -29,6 +29,7 @@
   let allSavedCards = [];
   let emiCards = [];
   let savedCards = [];
+  let lastSavedCard = null;
 
   let showEmiCta;
   let emiCtaView;
@@ -67,6 +68,10 @@
 
   $: {
     savedCards = tab === 'emi' ? emiCards : allSavedCards;
+  }
+
+  $: {
+    lastSavedCard = savedCards && savedCards[savedCards.length - 1];
   }
 
   function getSavedCardsFromCustomer(customer = {}) {
@@ -295,10 +300,15 @@
     transition: 0.2s;
     transition-delay: 0.15s;
     z-index: 1;
+    line-height: 24px;
+    margin-bottom: -12px;
   }
 
   .saved-cards-icon {
     position: absolute;
+    left: 24px;
+    top: 10px;
+    border: 1px solid red;
   }
 </style>
 
@@ -314,6 +324,10 @@
               id="show-saved-cards"
               on:click={showSavedCards}
               class="text-btn left-card">
+              <div
+                class="cardtype"
+                class:multiple={savedCards && savedCards.length > 1}
+                cardtype={lastSavedCard && lastSavedCard.card.networkCode} />
               Use saved cards
             </div>
           {/if}
