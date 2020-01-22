@@ -6192,7 +6192,9 @@ Session.prototype = {
     var self = this;
     var session = this;
     var emi_options = this.emi_options;
-    var qrEnabled = this.get('method.qr') && !discreet.UserAgent.isMobile();
+    var qrEnabled =
+      this.get('method.qr') &&
+      !window.matchMedia(discreet.UserAgent.mobileQuery).matches;
 
     var methods = (this.methods = {
       count: 0,
