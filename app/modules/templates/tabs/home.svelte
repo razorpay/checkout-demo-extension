@@ -436,6 +436,7 @@
   Analytics.track('home:landing', {
     data: {
       view,
+      oneMethod: session.oneMethod,
     },
   });
 
