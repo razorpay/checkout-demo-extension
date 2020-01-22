@@ -211,8 +211,8 @@ function setEmiPlansCta(screen, tab) {
   var type = 'pay';
 
   var isSavedScreen =
-    $('#form-card')[0] && $('#form-card').hasClass('saved-cards');
-  var emiDuration = $('#emi_duration')[0] && $('#emi_duration').val();
+    $('#form-card')[0] && $('#form-card').hasClass('saved-cards'); // TODO: fix me
+  var emiDuration = getEmiDurationForNewCard();
   var savedCard = $('.saved-card.checked');
 
   if (screen === 'card' && tab === 'emi') {
@@ -329,7 +329,7 @@ function setEmiBank(data, savedCardScreen) {
       data.emi_duration = savedEmi.value;
     }
   } else {
-    var activeEmiPlan = $('#emi_duration').val();
+    var activeEmiPlan = getEmiDurationForNewCard();
     if (activeEmiPlan) {
       data.method = 'emi';
       data.emi_duration = activeEmiPlan;
@@ -623,6 +623,10 @@ function getPhone() {
 
 function getEmail() {
   return storeGetter(HomeScreenStore.email);
+}
+
+function getEmiDurationForNewCard() {
+  return storeGetter(EmiStore.emiDuration);
 }
 
 function setOtpText(view, text) {
@@ -3114,7 +3118,7 @@ Session.prototype = {
         this.netbankingTab.setSelectedBank(issuer);
       }
     } else if (screen === 'emi') {
-      var emiDuration = $('#emi_duration').val();
+      var emiDuration = getEmiDurationForNewCard();
       var bank = this.emiPlansForNewCard && this.emiPlansForNewCard.code;
       var emiBank = emiBanks[bank];
 
@@ -3127,7 +3131,7 @@ Session.prototype = {
           plan.offer_id !== offer.id
         ) {
           // Clear duration
-          $('#emi_duration').val('');
+          EmiStore.emiDuration.set('');
         }
       }
 
@@ -3778,7 +3782,7 @@ Session.prototype = {
                 from: prevTab,
               });
 
-              $('#emi_duration').val('');
+              EmiStore.emiDuration.set('');
 
               self.switchTab('card');
               self.setScreen('card');
@@ -3796,7 +3800,7 @@ Session.prototype = {
                 value: value,
               });
 
-              $('#emi_duration').val(value);
+              EmiStore.emiDuration.set(value);
               EmiStore.selectedPlanText.set(text);
 
               self.switchTab('emi');
@@ -4158,7 +4162,7 @@ Session.prototype = {
           }
         } else {
           if (tab === 'emi') {
-            var emiDuration = $('#emi_duration').val();
+            var emiDuration = getEmiDurationForNewCard();
             if (emiDuration) {
               data.emi_duration = emiDuration;
             }

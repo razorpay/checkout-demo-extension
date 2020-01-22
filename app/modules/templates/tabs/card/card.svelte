@@ -16,6 +16,8 @@
     remember,
   } from 'checkoutstore/screens/card';
 
+  import { emiDuration } from 'checkoutstore/emi';
+
   // Utils imports
   import { getSession } from 'sessionmanager';
   import { getSavedCards, transform } from 'common/token';
@@ -205,8 +207,7 @@
     session.emiPlansForNewCard = emiObj && emiObj[1];
 
     if (!emiObj) {
-      // TODO: move to session.js
-      _Doc.querySelector('#emi_duration').value = '';
+      $emiDuration = '';
     }
 
     showAppropriateEmiDetailsForNewCard(
@@ -256,8 +257,6 @@
      * - methods.card=false: nothing
      * - default: pay without emi
      */
-    // TODO: read from state once moved
-    const emiDuration = _Doc.querySelector('#emi_duration').value;
     showEmiCta = true;
 
     if (tab === 'card') {
@@ -267,7 +266,7 @@
         showEmiCta = false;
       }
     } else if (tab === 'emi') {
-      if (emiDuration) {
+      if ($emiDuration) {
         emiCtaView = 'plans-available';
       } else if (cardLength >= 6 && !hasPlans) {
         emiCtaView = 'plans-unavailable';
