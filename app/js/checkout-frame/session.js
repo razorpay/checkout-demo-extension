@@ -2517,11 +2517,11 @@ Session.prototype = {
             var customer = self.customer;
             customer.logged = false;
             customer.tokens = null;
-            self.svelteCardTab.setSavedCards();
             $('#top-right').removeClass('logged');
             customer.logout(e.target.parentNode.firstChild === e.target);
 
-            this.homeTab.updateCustomer();
+            self.svelteCardTab.updateCustomer();
+            self.homeTab.updateCustomer();
           }
           container_listener();
           $('#top-right').removeClass('focus');
