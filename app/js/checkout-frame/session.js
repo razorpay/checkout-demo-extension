@@ -3734,7 +3734,9 @@ Session.prototype = {
     }
 
     var savedCards =
-      this.customer && this.customer.tokens && this.customer.tokens.items;
+      this.customer &&
+      this.customer.tokens &&
+      Token.getSavedCards(this.customer.tokens.items);
 
     screen = screen || this.screen;
 
@@ -3814,7 +3816,8 @@ Session.prototype = {
       }
 
       //TODO: WIP try to see if the card exists in the saved cards and focus
-      var savedCards = this.customer.tokens && this.customer.tokens.items;
+      var savedCards =
+        this.customer.tokens && Token.getSavedCards(this.customer.tokens.items);
 
       if (this.savedCardScreen && savedCards && savedCards.length > 0) {
         var matchingCardIndex;
@@ -3860,7 +3863,11 @@ Session.prototype = {
   handleOfferRemoval: function() {
     this.hideDiscount();
 
-    if (this.customer && this.customer.tokens && this.customer.tokens.count) {
+    if (
+      this.customer &&
+      this.customer.tokens &&
+      Token.getSavedCards(this.customer.tokens.items).length
+    ) {
       this.setSavedCards(this.customer.tokens);
     }
   },
@@ -4358,12 +4365,14 @@ Session.prototype = {
   },
 
   /**
+   * @description Method used to transform card tokens into their EMI equivalents
+   *
    * @param {Array} tokens
    *
    * @return {Array} tokens
    */
   transformTokens: function(tokens) {
-    return Token.transform(tokens, {
+    return Token.transform(Token.getSavedCards(tokens), {
       amount: this.get('amount'),
       emi: this.methods.emi,
       emiOptions: this.emi_options,
@@ -4709,7 +4718,9 @@ Session.prototype = {
     var customer = this.customer;
     var tokens =
       (providedTokens && providedTokens.count) ||
-      (customer && customer.tokens && customer.tokens.count);
+      (customer &&
+        customer.tokens &&
+        Token.getSavedCards(customer.tokens.items).length);
     var cardTab = $('#form-card');
     var delegator = this.delegator;
     var self = this;
@@ -4722,11 +4733,12 @@ Session.prototype = {
       var tokensList = providedTokens || customer.tokens;
       if (
         providedTokens ||
-        $$('.saved-card').length !== tokensList.items.length
+        $$('.saved-card').length !==
+          Token.getSavedCards(tokensList.items).length
       ) {
         try {
           // Keep EMI cards at the end
-          tokensList.items.sort(function(a, b) {
+          Token.getSavedCards(tokensList.items).sort(function(a, b) {
             if (a.card && b.card) {
               if (a.card.emi && b.card.emi) {
                 return 0;
@@ -4739,8 +4751,7 @@ Session.prototype = {
           });
         } catch (e) {}
 
-        var savedCardsCount = discreet.Token.getSavedCards(tokensList.items)
-          .length;
+        var savedCardsCount = Token.getSavedCards(tokensList.items).length;
 
         if (savedCardsCount) {
           Analytics.setMeta('has.savedCards', true);
@@ -4771,9 +4782,8 @@ Session.prototype = {
           },
         });
 
-        var totalSavedCards = discreet.Token.getSavedCards(
-          this.transformedTokens
-        ).length;
+        var totalSavedCards = Token.getSavedCards(this.transformedTokens)
+          .length;
 
         if (totalSavedCards) {
           var selectorsForSavedCardText = [
@@ -7085,6 +7095,7 @@ Session.prototype = {
   },
 
   setPreferences: function(prefs) {
+    console.warn(JSON.parse(JSON.stringify(prefs)));
     PreferencesStore.set(prefs);
     DowntimesStore.set(discreet.Downtimes.getDowntimes(prefs));
     this.r.preferences = prefs;
