@@ -2,7 +2,7 @@
   /* global each, Event */
 
   // Svelte imports
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
 
   // UI Imports
   import Tab from 'templates/tabs/Tab.svelte';
@@ -38,7 +38,6 @@
 
   let tab = '';
   let allSavedCards = [];
-  let emiCards = [];
   let savedCards = [];
   let lastSavedCard = null;
   let selectedOffer = {};
@@ -46,9 +45,8 @@
   let showEmiCta;
   let emiCtaView;
 
-  let showAddCardCta = false;
-  $: showAddCardCta =
-    allSavedCards && allSavedCards.length && !session.recurring;
+  let showSavedCardsCta = false;
+  $: showSavedCardsCta = savedCards && savedCards.length;
 
   // State
   let customer = {};
@@ -81,16 +79,24 @@
     }
   }
 
-  $: {
-    allSavedCards = filterSavedCardsForOffer(allSavedCards, selectedOffer);
+  function getSavedCardsForDisplay(allSavedCards, tab) {
+    if (session.recurring) {
+      return filterSavedCardsForRecurring(allSavedCards);
+    }
+
+    if (tab === 'emi') {
+      return filterSavedCardsForEmi(allSavedCards);
+    }
+
+    return allSavedCards;
   }
 
   $: {
-    emiCards = allSavedCards.filter(card => card.plans);
+    allSavedCards = getSavedCardsFromCustomer(customer);
   }
 
   $: {
-    savedCards = tab === 'emi' ? emiCards : allSavedCards;
+    savedCards = getSavedCardsForDisplay(allSavedCards, tab);
   }
 
   $: {
@@ -152,19 +158,18 @@
     });
   }
 
+  function filterSavedCardsForRecurring(tokens) {
+    return _Arr.filter(tokens, token => token.recurring);
+  }
+
+  function filterSavedCardsForEmi(tokens) {
+    return _Arr.filter(tokens, token => token.plans);
+  }
+
   export function showLandingView() {
     let viewToSet = 'saved-card';
 
-    if (allSavedCards.length === 0) {
-      viewToSet = 'add-card';
-    }
-
-    if (tab === 'emi' && emiCards.length === 0) {
-      viewToSet = 'add-card';
-    }
-
-    // Always land onto new card view for recurring payments
-    if (session.recurring) {
+    if (savedCards.length === 0) {
       viewToSet = 'add-card';
     }
 
@@ -321,8 +326,8 @@
 
   export function updateCustomer(newCustomer = {}) {
     customer = newCustomer;
-    allSavedCards = getSavedCardsFromCustomer(customer);
-    showLandingView();
+    // Wait for pending state updates from reactive statements
+    tick().then(showLandingView);
   }
 
   export function setSelectedOffer(newOffer) {
@@ -362,7 +367,7 @@
     <div slot="main">
       {#if currentView === 'add-card'}
         <div in:fade={{ duration: 100, y: 100 }}>
-          {#if showAddCardCta}
+          {#if showSavedCardsCta}
             <div
               id="show-saved-cards"
               on:click={showSavedCards}
