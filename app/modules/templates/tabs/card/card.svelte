@@ -6,6 +6,7 @@
 
   // UI Imports
   import Tab from 'templates/tabs/Tab.svelte';
+  import Callout from 'templates/views/ui/Callout.svelte';
   import Screen from 'templates/layouts/Screen.svelte';
   import AddCardView from 'templates/views/AddCardView.svelte';
   import SavedCards from 'templates/screens/savedcards.svelte';
@@ -31,6 +32,8 @@
   // Transitions
   import { fade } from 'svelte/transition';
 
+  const session = getSession();
+
   let currentView = 'add-card';
 
   let tab = '';
@@ -44,7 +47,8 @@
   let emiCtaView;
 
   let showAddCardCta = false;
-  $: showAddCardCta = allSavedCards && allSavedCards.length;
+  $: showAddCardCta =
+    allSavedCards && allSavedCards.length && !session.recurring;
 
   // State
   let customer = {};
@@ -52,8 +56,6 @@
   // Refs
   let savedCardsView;
   let addCardView;
-
-  const session = getSession();
 
   onMount(() => {
     // Prefill
@@ -158,6 +160,11 @@
     }
 
     if (tab === 'emi' && emiCards.length === 0) {
+      viewToSet = 'add-card';
+    }
+
+    // Always land onto new card view for recurring payments
+    if (session.recurring) {
       viewToSet = 'add-card';
     }
 
@@ -390,6 +397,13 @@
             Add another card
           </div>
         </div>
+      {/if}
+    </div>
+    <div slot="bottom">
+      {#if session.recurring}
+        <Callout>
+          Future payments on this card will be charged automatically.
+        </Callout>
       {/if}
     </div>
   </Screen>
