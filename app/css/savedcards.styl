@@ -221,9 +221,14 @@ $cardpl = 70px;
   bottom: -1px;
   left: -1px;
   right: -1px;
+  z-index: -1;
   border: 1px solid #ccc;
   border-radius: 2px;
   background: linear-gradient(to bottom, white, #eee);
+  transform: translateX(-3px) translateY(-1px) rotateZ(-10deg);
+}
+
+#show-saved-cards .cardtype.multiple::before {
   transform: translateX(-3px) translateY(-1px) rotateZ(-10deg);
 }
 
