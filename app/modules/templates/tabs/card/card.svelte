@@ -59,7 +59,7 @@
     // Prefill
     $cardNumber = session.get('prefill.card[number]') || '';
     $cardExpiry = session.get('prefill.card[expiry]') || '';
-    $cardName = session.get('prefill.card[name]') || '';
+    $cardName = session.get('prefill.name') || '';
     $cardCvv = session.get('prefill.card[cvv]') || '';
   });
 
