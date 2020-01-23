@@ -1085,10 +1085,6 @@ Session.prototype = {
           contact: 'contact',
           email: 'email',
           bank: 'bank-select',
-          'card[name]': 'card_name',
-          'card[number]': 'card_number',
-          'card[expiry]': 'card_expiry',
-          'card[cvv]': 'card_cvv',
         },
         function(name, id) {
           var el = gel(id);

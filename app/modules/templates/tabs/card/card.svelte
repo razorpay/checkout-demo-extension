@@ -1,7 +1,10 @@
 <script>
-  /* global each, gel, Event */
-  import { fade } from 'svelte/transition';
+  /* global each, Event */
 
+  // Svelte imports
+  import { onMount } from 'svelte';
+
+  // UI Imports
   import Tab from 'templates/tabs/Tab.svelte';
   import Screen from 'templates/layouts/Screen.svelte';
   import AddCardView from 'templates/views/AddCardView.svelte';
@@ -24,6 +27,9 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getCardType } from 'common/card';
+
+  // Transitions
+  import { fade } from 'svelte/transition';
 
   let currentView = 'add-card';
 
@@ -48,6 +54,14 @@
   let addCardView;
 
   const session = getSession();
+
+  onMount(() => {
+    // Prefill
+    $cardNumber = session.get('prefill.card[number]') || '';
+    $cardExpiry = session.get('prefill.card[expiry]') || '';
+    $cardName = session.get('prefill.card[name]') || '';
+    $cardCvv = session.get('prefill.card[cvv]') || '';
+  });
 
   $: {
     // Track saved cards

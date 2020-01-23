@@ -105,7 +105,7 @@
       <Icon icon={getIcon(type)} />
     </div>
   {/if}
-  <!-- TODO: handle prefill and readonly -->
+  <!-- TODO: handle readonly -->
   <!-- TODO: Fix invalid class not being applied -->
   <Field
     {id}
