@@ -37,6 +37,9 @@
   let nameField = null;
   let cvvField = null;
 
+  const nameReadonly =
+    session.get('readonly.name') && session.get('prefill.name');
+
   let isCardFieldValid = false;
 
   let noCvvChecked = false;
@@ -274,7 +277,12 @@
   </div>
   <div class="row card-fields">
     <div class="two-third">
-      <NameField id="card_name" bind:value={$cardName} bind:this={nameField} />
+      <NameField
+        id="card_name"
+        name="card[name]"
+        bind:value={$cardName}
+        bind:this={nameField}
+        readonly={nameReadonly} />
     </div>
     {#if !hideExpiryCvvFields}
       <div class="third">

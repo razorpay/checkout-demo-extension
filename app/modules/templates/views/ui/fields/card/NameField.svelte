@@ -4,10 +4,9 @@
 
   export let value = session.get('prefill.name');
   export let ref = null;
-  const session = getSession();
-
-  let name_readonly =
-    session.get('readonly.name') && session.get('prefill.name');
+  export let id;
+  export let name;
+  export let readonly = false;
 
   const NAME_PATTERN = "^[a-zA-Z. 0-9'-]{1,100}$";
 
@@ -18,8 +17,8 @@
 
 <Field
   helpText="Please enter name on your card"
-  id="card_name"
-  name="card[name]"
+  {id}
+  {name}
   label="Card Holder's name"
   pattern={NAME_PATTERN}
   required
@@ -30,4 +29,4 @@
   handleBlur
   handleFocus
   handleInput
-  readonly={name_readonly} />
+  {readonly} />
