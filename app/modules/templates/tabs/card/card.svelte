@@ -261,16 +261,6 @@
       session.methods
     );
 
-    if (trimmedVal.length >= 6) {
-      var emiBankChangeEvent;
-      if (typeof Event === 'function') {
-        emiBankChangeEvent = new Event('change');
-      } else {
-        emiBankChangeEvent = document.createEvent('Event');
-        emiBankChangeEvent.initEvent('change', true, true);
-      }
-    }
-
     if (isMaestro && sixDigits) {
       showEmiCta = false;
     }
