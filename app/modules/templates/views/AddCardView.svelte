@@ -61,6 +61,7 @@
   export let showEmiCta = false;
   export let emiCtaView = '';
   export let savedCount = 0;
+  export let tab;
 
   let showAuthTypeSelectionRadio = false;
   let showDebitPinRadio = false;
@@ -313,9 +314,11 @@
         </label>
       {/if}
     </div>
-    <div id="view-emi-plans" on:click={showEmiPlans} class="link">
-      View all EMI Plans
-    </div>
+    {#if tab === 'emi'}
+      <div id="view-emi-plans" on:click={showEmiPlans} class="link">
+        View all EMI Plans
+      </div>
+    {/if}
   </div>
   {#if showEmiCta}
     <div id="elem-emi">

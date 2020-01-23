@@ -380,6 +380,7 @@
             </div>
           {/if}
           <AddCardView
+            {tab}
             {showEmiCta}
             {emiCtaView}
             savedCount={allSavedCards.length}
