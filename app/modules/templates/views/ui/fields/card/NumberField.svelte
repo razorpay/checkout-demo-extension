@@ -28,14 +28,19 @@
     dispatch('input', e.detail);
   }
 
-  function getHelpText(methods, cardType) {
+  function getHelpText(methods, cardType, isRecurring) {
+    if (isRecurring) {
+      return 'Card does not support recurring payments.';
+    }
+
     if (!methods.amex && type === 'amex') {
       return 'Amex cards are not supported for this transaction.';
     }
-    return 'Please enter your card number';
+
+    return 'Please enter your card number.';
   }
 
-  $: helpText = getHelpText(session.methods, type);
+  $: helpText = getHelpText(session.methods, type, session.recurring);
 
   /**
    * Validate the card number.
