@@ -40,6 +40,8 @@
   const nameReadonly =
     session.get('readonly.name') && session.get('prefill.name');
 
+  const showRememberCardCheck = !session.recurring;
+
   let isCardFieldValid = false;
 
   let noCvvChecked = false;
@@ -295,18 +297,21 @@
     {/if}
   </div>
   <div class="row remember-check">
+
     <div>
-      <label for="save" tabIndex="0">
-        <input
-          type="checkbox"
-          class="checkbox--square"
-          id="save"
-          name="save"
-          value="1"
-          bind:checked={$remember} />
-        <span class="checkbox" />
-        Remember Card
-      </label>
+      {#if showRememberCardCheck}
+        <label for="save" tabIndex="0">
+          <input
+            type="checkbox"
+            class="checkbox--square"
+            id="save"
+            name="save"
+            value="1"
+            bind:checked={$remember} />
+          <span class="checkbox" />
+          Remember Card
+        </label>
+      {/if}
     </div>
     <div id="view-emi-plans" on:click={showEmiPlans} class="link">
       View all EMI Plans
