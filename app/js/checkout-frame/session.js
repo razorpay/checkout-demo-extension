@@ -1117,7 +1117,6 @@ Session.prototype = {
     var key = getter('key');
 
     if (key === UDACITY_KEY || key === EMBIBE_KEY) {
-      classes.push('address');
       setter('address', true);
     }
 
