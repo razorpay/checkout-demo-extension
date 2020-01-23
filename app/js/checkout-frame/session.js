@@ -6229,22 +6229,22 @@ Session.prototype = {
         }
 
         each(availMethods[bankMethod], function(bankCode, bankObj) {
-          var bankHasSupportedAuthType = false;
+          var eligibleAuthTypesOfBank = [];
 
           /**
            * Determine if the bank has any of the supported auth types
            */
           if (bankObj.auth_types) {
-            bankHasSupportedAuthType = _Arr.any(bankObj.auth_types, function(
+            eligibleAuthTypesOfBank = _Arr.filter(bankObj.auth_types, function(
               authType
             ) {
               return _Arr.contains(emandateSupportedAuthTypes, authType);
             });
           }
 
-          if (bankHasSupportedAuthType) {
+          if (eligibleAuthTypesOfBank.length) {
             emandateBanks[bankCode] = _Obj.clone(bankObj);
-            emandateBanks[bankCode].auth_types = emandateSupportedAuthTypes;
+            emandateBanks[bankCode].auth_types = eligibleAuthTypesOfBank;
           }
         });
 
