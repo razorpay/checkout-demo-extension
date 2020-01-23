@@ -2,7 +2,7 @@
   import Field from 'templates/views/ui/Field.svelte';
   import { getSession } from 'sessionmanager';
 
-  export let value = session.get('prefill.name');
+  export let value = '';
   export let ref = null;
   export let id;
   export let name;
