@@ -15,9 +15,11 @@
 <style>
   div.wrap {
     padding: 0 24px;
-  }
-  #elem-wrap-address {
     margin-top: 24px;
+  }
+
+  #elem-wrap-address {
+    height: 52px;
   }
 </style>
 
