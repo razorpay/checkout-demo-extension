@@ -2235,7 +2235,6 @@ Session.prototype = {
     this.oneMethod = methodName;
 
     $(this.el).addClass('one-method');
-    $('.payment-option').addClass('submit-button button');
   },
 
   improvisePaymentOptions: function() {
@@ -2885,15 +2884,6 @@ Session.prototype = {
       $('#form-upi.collapsible .item.expanded').removeClass('expanded');
       $(e.currentTarget).addClass('expanded');
     });
-
-    if (gel('methods-list')) {
-      this.on('click', '#methods-list', 'option', function(e) {
-        var $cvvEl = $(e.delegateTarget).$('.cvv-input');
-        if ($cvvEl) {
-          $cvvEl.focus();
-        }
-      });
-    }
   },
 
   onUpiAppSelect: function(packageName) {

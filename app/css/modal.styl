@@ -1578,49 +1578,6 @@ $outline = #ddd;
   }
 }
 
-#payment-options {
-  border-radius: 0 0 $br $br;
-  border-top: 1px solid $bc;
-  background: #fff;
-  z-index: 1;
-  position: relative;
-
-  &.count-5, &.count-6 {
-    border-bottom: none;
-
-    .item {
-      width: 33.33%;
-      border-bottom: 1px solid $bc !important;
-    }
-  }
-
-  .desc {
-    display: none;
-  }
-
-  label {
-    padding-top: 20px;
-    height: 97px;
-  }
-
-  i {
-    display: block;
-    font-size: 40px;
-    color: $pri;
-    margin: 0 0 -4px;
-    transition: 0.3s;
-    height: 1.2em;
-  }
-
-  .item {
-    border-bottom: none !important;
-  }
-
-  &.count-4 .item {
-    width: 25%;
-  }
-}
-
 .stackable {
   position: absolute;
   top: 0;
@@ -1677,7 +1634,7 @@ $outline = #ddd;
 
 #container.one-method {
   #form-common {
-    #form-fields .legend, #payment-options, #methods-list {
+    #form-fields .legend {
       display: none;
     }
   }
@@ -1699,53 +1656,7 @@ $outline = #ddd;
   margin-bottom: 21px;
 }
 
-#container.tpv-no-details {
-  #elem-wrap-contact, #elem-wrap-email {
-    display: none;
-  }
-}
-
-#container.no-details:not(.partial) {
-  #pad-common + div {
-    display: block;
-  }
-
-  #pad-common, #top-right {
-    display: none;
-  }
-
-  #form-common {
-    padding-top: 0;
-    left: 20px;
-    right: 20px;
-    width: auto;
-  }
-
-  .legend {
-    text-align: left;
-  }
-}
-
-#container.no-details.partial {
-  #pad-common > .elem-wrap {
-    display: none;
-  }
-
-  #form-common {
-    padding-top: 4px;
-
-    .legend {
-      margin: 5px 0 0;
-    }
-  }
-}
-
-#container #payment-options .payment-option.item .gpay-icon {
-  margin: -9px auto 0 auto;
-  font-size: 32px;
-}
-
-#container.emandate, #container.no-details {
+#container.emandate {
   .desc {
     display: block;
     color: #777;
@@ -1754,7 +1665,7 @@ $outline = #ddd;
     overflow: hidden;
   }
 
-  #payment-options, #emandate-options {
+  #emandate-options {
     border: 1px solid #eee;
     border-radius: 2px;
     background: #f9fafb;
@@ -1765,7 +1676,7 @@ $outline = #ddd;
       line-height: 16px;
     }
 
-    .payment-option.item, .auth-option.item {
+    .auth-option.item {
       width: auto;
       float: none;
       border: 0;
@@ -1800,7 +1711,7 @@ $outline = #ddd;
 }
 
 #container.emandate {
-  #payment-options, #emandate-options {
+  #emandate-options {
     label {
       &:after {
         content: '\e604';
