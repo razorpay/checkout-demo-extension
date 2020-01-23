@@ -3725,9 +3725,6 @@ Session.prototype = {
      */
     if (!this.tab && !this.isPayout) {
       if (!this.checkCommonValidAndTrackIfInvalid()) {
-        if (this.methodsList && this.p13n) {
-          this.methodsList.otherMethodsView.hideMethods();
-        }
         return;
       }
     }
@@ -6036,10 +6033,6 @@ Session.prototype = {
       clearTimeout(fontTimeout);
 
       // TODO: refactor this into cleanupSvelteComponents.
-      if (this.methodsList) {
-        this.methodsList.$destroy();
-      }
-
       if (this.otpView) {
         this.otpView.$destroy();
       }
@@ -6103,7 +6096,7 @@ Session.prototype = {
       }
 
       this.tab = this.screen = '';
-      this.methodsList = this.modal = this.emi = this.el = this.card = null;
+      this.modal = this.emi = this.el = this.card = null;
       this.upiTab = this.otpView = this.netbankingTab = null;
       this.payoutsView = this.payoutsAccountView = null;
       this.savedCardsView = this.feeBearerView = this.payLaterView = null;
