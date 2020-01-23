@@ -218,12 +218,9 @@ function setEmiPlansCta(screen, tab) {
   if (screen === 'card' && tab === 'emi') {
     if (isSavedScreen) {
       if (savedCard[0]) {
-        var emiDurationField = getEmiDurationForSavedCard();
-
-        if (emiDurationField[0]) {
-          if (!emiDurationField.val()) {
-            type = 'show';
-          }
+        var emiDurationForSavedCard = getEmiDurationForSavedCard();
+        if (!emiDurationForSavedCard) {
+          type = 'show';
         }
       }
     } else if (!emiDuration) {
@@ -2395,8 +2392,6 @@ Session.prototype = {
   },
   bindEvents: function() {
     var self = this;
-    var emi_options = this.emi_options;
-    var thisEl = this.el;
 
     // cultgear.com bug: no events register unless
     // https://stackoverflow.com/questions/41869122/touch-events-within-iframe-are-not-working-on-ios
@@ -2491,7 +2486,7 @@ Session.prototype = {
           });
         });
       }
-    } //TODO: visit this again
+    }
     this.on('click', '#top-right', function() {
       $('#top-right').addClass('focus');
       var self = this;
