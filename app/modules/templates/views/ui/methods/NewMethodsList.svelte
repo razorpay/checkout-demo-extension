@@ -67,6 +67,19 @@
     }
 
     visibleMethods = available;
+
+    const _methods = {};
+
+    _Arr.loop(visibleMethods, method => {
+      _methods[method] = true;
+    });
+
+    Analytics.track('methods:list', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        methods: _methods,
+      },
+    });
   }
 
   $: {
