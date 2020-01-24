@@ -246,6 +246,15 @@
     const bankList = _Obj.entries(banks).map(([_, bank]) => bank.name);
     return bankList.join(', ');
   }
+
+  function trackRememberChecked(event) {
+    Analytics.track('card:save:change', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        active: event.target.checked,
+      },
+    });
+  }
 </script>
 
 <style>
@@ -328,6 +337,7 @@
             id="save"
             name="save"
             value="1"
+            on:change={trackRememberChecked}
             bind:checked={$remember} />
           <span class="checkbox" />
           Remember Card

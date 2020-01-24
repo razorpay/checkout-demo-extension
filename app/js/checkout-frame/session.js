@@ -2473,19 +2473,6 @@ Session.prototype = {
       if (Hacks.isDeviceLandscape() && isMobile()) {
         this.fixLandscapeBug();
       }
-
-      // TODO: move tracking to add card view
-      var saveTick = qs('#save');
-      if (saveTick) {
-        this.on('change', '#save', function(e) {
-          Analytics.track('card:save:change', {
-            type: AnalyticsTypes.BEHAV,
-            data: {
-              active: e.target.checked,
-            },
-          });
-        });
-      }
     }
     this.on('click', '#top-right', function() {
       $('#top-right').addClass('focus');
