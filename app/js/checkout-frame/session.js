@@ -41,7 +41,8 @@ var preferences = window.preferences,
   OtpService = discreet.OtpService,
   storeGetter = discreet.storeGetter,
   HomeScreenStore = discreet.HomeScreenStore,
-  Cta = discreet.Cta;
+  Cta = discreet.Cta,
+  NBHandlers = discreet.NBHandlers;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -737,29 +738,7 @@ function errorHandler(response) {
     }
   }
 
-  checkIfCorpNetbanking(this, message);
-}
-
-function checkIfCorpNetbanking(session, message) {
-  // If error code exists and matches the string, removed the retry button
-  // and replaces it with ok button, which closes checkout.
-  if (
-    message ===
-    'Payment is pending authorization. Request for authorization from approver.'
-  ) {
-    session.isCorporateBanking = true;
-    $('#fd-hide').remove();
-    var okButton = document.createElement('button');
-    okButton.id = 'fd-ok';
-    okButton.className = 'btn';
-    okButton.innerText = 'OK';
-    $('#error-message').append(okButton);
-    $('#fd-ok').on('click', function() {
-      session.hide();
-    });
-  } else {
-    $('#fd-hide').focus();
-  }
+  NBHandlers.replaceRetryIfCorporateNetbanking(this, message);
 }
 
 /* bound with session */
