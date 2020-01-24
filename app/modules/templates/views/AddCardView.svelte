@@ -1,8 +1,12 @@
 <script>
   /* global showOverlay, gel, Event */
+
+  // UI Imports
   import NumberField from 'templates/views/ui/fields/card/NumberField.svelte';
   import ExpiryField from 'templates/views/ui/fields/card/ExpiryField.svelte';
   import CvvField from 'templates/views/ui/fields/card/CvvField.svelte';
+  import CardFlowSelectionRadio from 'templates/views/ui/CardFlowSelectionRadio.svelte';
+  import NameField from 'templates/views/ui/fields/card/NameField.svelte';
 
   // Svelte imports
   import { createEventDispatcher } from 'svelte';
@@ -22,12 +26,11 @@
 
   // Utils
   import { getSession } from 'sessionmanager';
-  import NameField from './ui/fields/card/NameField.svelte';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import CardFlowSelectionRadio from './ui/CardFlowSelectionRadio.svelte';
   import { getIin, getCardDigits } from 'common/card';
   import { DEFAULT_AUTH_TYPE_RADIO } from 'common/constants';
+  import { Formatter } from 'formatter';
 
   const session = getSession();
   const dispatch = createEventDispatcher();
@@ -41,8 +44,6 @@
     session.get('readonly.name') && session.get('prefill.name');
 
   const showRememberCardCheck = !session.recurring;
-
-  let isCardFieldValid = false;
 
   let noCvvChecked = false;
   let showNoCvvCheckbox = false;
@@ -132,6 +133,25 @@
   const isFlowApplicable = _.curry2((flows, flow) => Boolean(flows[flow]));
 
   /**
+   * Validate the card number.
+   * @return {Boolean}
+   */
+  export function validateCardNumber() {
+    const cardNumberWithoutSpaces = getCardDigits($cardNumber);
+
+    let isValid = Formatter.rules.card.isValid.call({
+      value: cardNumberWithoutSpaces,
+      $cardType,
+    });
+
+    if (!session.preferences.methods.amex && $cardType === 'amex') {
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
+  /**
    * Checks and performs actions related to card flows
    * and validate the card input.
    */
@@ -143,6 +163,9 @@
     const isStrictlyRecurring =
       session.recurring && session.get('recurring') !== 'preferred';
 
+    let isValid = validateCardNumber();
+    numberField.setValid(isValid);
+
     const flowChecker = (flows = {}) => {
       const cardNumber = getCardDigits(value);
       const isIinSame = getIin(cardNumber) === iin;
@@ -151,8 +174,6 @@
       if (!isIinSame) {
         return;
       }
-
-      let isValid = isCardFieldValid;
 
       if (isStrictlyRecurring) {
         isValid = isValid && isFlowApplicable(flows, Flows.RECURRING);
@@ -165,7 +186,7 @@
         }
       }
 
-      isCardFieldValid = isValid;
+      numberField.setValid(isValid);
     };
 
     if (iin.length < 6) {
@@ -263,7 +284,6 @@
         id="card_number"
         bind:value={$cardNumber}
         bind:this={numberField}
-        bind:valid={isCardFieldValid}
         type={$cardType}
         on:filled={_ => handleFilled('numberField')}
         on:input={handleCardInput} />

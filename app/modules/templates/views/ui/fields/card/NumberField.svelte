@@ -3,29 +3,28 @@
 
   import Field from 'templates/views/ui/Field.svelte';
   import Icon from 'templates/views/ui/Icon.svelte';
+
+  // Utils
   import { getSession } from 'sessionmanager';
-  import { Formatter } from 'formatter';
-  import { getCardType, getIin, getCardDigits } from 'common/card';
   import { getIcon } from 'icons/network';
 
   export let value = '';
   export let type = null;
   export let id = '';
-  export let valid = false;
+
+  // State
+  let valid = false;
 
   const dispatch = createEventDispatcher();
   const session = getSession();
 
+  // Refs
   let field = null;
-
-  export function getType() {
-    return type;
-  }
 
   function handleInput(e) {
     value = e.target.value;
-    setCardValidityAndDispatchFilled();
     dispatch('input', e.detail);
+    dispatchFilledIfValid();
   }
 
   function getHelpText(methods, cardType, isRecurring) {
@@ -42,32 +41,10 @@
 
   $: helpText = getHelpText(session.methods, type, session.recurring);
 
-  /**
-   * Validate the card number.
-   * @return {Boolean}
-   */
-  export function sync() {
-    const cardNumber = getCardDigits(value);
-
-    let isValid = Formatter.rules.card.isValid.call({
-      value: cardNumber,
-      type,
-    });
-
-    if (!session.preferences.methods.amex && type === 'amex') {
-      isValid = false;
-    }
-
-    return isValid;
-  }
-
-  export function setCardValidityAndDispatchFilled() {
-    const isValid = sync();
+  export function dispatchFilledIfValid() {
     const caretPosition = field.getCaret();
 
-    valid = isValid;
-
-    if (isValid) {
+    if (valid) {
       /**
        * Focus on expiry elem if we have the entire card number
        * and the cursor is at the end of the input field.
@@ -83,10 +60,10 @@
     }
   }
 
-  $: {
+  export function setValid(isValid) {
+    valid = isValid;
     if (field) {
-      // TODO: fix invalid being overridden by onInput
-      field.setValid(valid);
+      field.setValid(isValid);
     }
   }
 </script>
