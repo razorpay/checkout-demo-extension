@@ -10,6 +10,7 @@
   import Screen from 'templates/layouts/Screen.svelte';
   import AddCardView from 'templates/views/AddCardView.svelte';
   import SavedCards from 'templates/screens/savedcards.svelte';
+  import OffersPortal from 'templates/views/OffersPortal.svelte';
 
   // Store
   import {
@@ -406,6 +407,7 @@
       {/if}
     </div>
     <div slot="bottom">
+      <OffersPortal />
       {#if session.recurring}
         <Callout>
           Future payments on this card will be charged automatically.
