@@ -615,28 +615,6 @@ function getEmiText(session, amount, plan) {
   );
 }
 
-/**
- * Makes the container long if not already long.
- *
- * @return {Boolean} madeLong?
- */
-function makeContainerLong() {
-  var LONG_CLASSES = ['long', 'x-long'];
-  var container = $('#container');
-
-  var isAlreadyLong = _Arr.any(LONG_CLASSES, function(className) {
-    return container.hasClass(className);
-  });
-
-  if (isAlreadyLong) {
-    return false;
-  }
-
-  container.addClass(LONG_CLASSES[0]);
-
-  return true;
-}
-
 function overlayVisible() {
   return $('#overlay').hasClass(shownClass);
 }
@@ -1128,7 +1106,6 @@ Session.prototype = {
     if (this.irctc) {
       tab_titles.upi = 'BHIM/UPI';
       tab_titles.card = 'Debit/Credit Card';
-      classes.push('long');
       this.r.set('theme.image_frame', false);
     }
 
@@ -1143,10 +1120,6 @@ Session.prototype = {
     if (this.methods.emi) {
       tab_titles.card = 'Card';
       classes.push('emi-method');
-    }
-
-    if (this.methods.count >= 5) {
-      classes.push('long');
     }
 
     if (getter('ecod')) {
@@ -1444,8 +1417,6 @@ Session.prototype = {
     this.setEmiScreen();
 
     Hacks.initPostRenderHacks();
-
-    makeContainerLong();
 
     errorHandler.call(this, this.params);
 
