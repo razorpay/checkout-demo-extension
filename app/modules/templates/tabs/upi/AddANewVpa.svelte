@@ -62,6 +62,8 @@
     vpaField.focus();
   }
 
+  const getSafely = _Obj.getSafely;
+
   $: pattern = PATTERN_WITH_HANDLE;
 </script>
 
@@ -112,25 +114,27 @@
           {pattern}
           helpText="Please enter a valid VPA of the form username@bank"
           elemClasses="mature"
-          id="amount-value"
+          id="new-vpa-input"
           name="amount"
           type="text"
           required
           bind:this={vpaField}
           on:blur
           placeholder="Enter your UPI ID" />
-        <div class="should-save-vpa-container">
-          <label id="should-save-vpa" for="save-vpa">
-            <input
-              type="checkbox"
-              class="checkbox--square"
-              id="save-vpa"
-              bind:this={rememberVpaCheckbox}
-              name="save" />
-            <span class="checkbox" />
-            Remember VPA
-          </label>
-        </div>
+        {#if getSafely(session, 'customer.logged')}
+          <div class="should-save-vpa-container">
+            <label id="should-save-vpa" for="save-vpa">
+              <input
+                type="checkbox"
+                class="checkbox--square"
+                id="save-vpa"
+                bind:this={rememberVpaCheckbox}
+                name="save" />
+              <span class="checkbox" />
+              Remember VPA
+            </label>
+          </div>
+        {/if}
       </div>
     {/if}
   </div>
