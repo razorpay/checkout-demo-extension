@@ -4387,6 +4387,7 @@ Session.prototype = {
             // OTP verification successful
             OtpService.resetCount('razorpay');
 
+            self.svelteCardTab.updateCustomer(self.customer);
             self.showCardTab();
           } else {
             Analytics.track('behav:otp:incorrect', {
