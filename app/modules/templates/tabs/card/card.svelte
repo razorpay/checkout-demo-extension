@@ -174,13 +174,14 @@
   }
 
   export function showLandingView() {
-    let viewToSet = 'saved-card';
+    tick().then(_ => {
+      let viewToSet = 'saved-card';
 
-    if (savedCards.length === 0) {
-      viewToSet = 'add-card';
-    }
-
-    setView(viewToSet);
+      if (savedCards.length === 0) {
+        viewToSet = 'add-card';
+      }
+      setView(viewToSet);
+    });
   }
 
   export function showAddCardView() {
@@ -192,30 +193,8 @@
   }
 
   function setView(view) {
+    debugger;
     currentView = view;
-  }
-
-  // TODO: remove and track when view changes
-  export function toggleSavedCards() {
-    /**
-     * If offer was auto-applied from the
-     * emi plans screen.
-     * TODO: Validate this.
-     */
-    if (
-      session.offers &&
-      !session.offers.offerSelectedByDrawer &&
-      session.offers.appliedOffer
-    ) {
-      session.offers.removeOffer();
-    }
-
-    Analytics.track('saved_cards:toggle', {
-      type: AnalyticsTypes.BEHAV,
-      data: {
-        from: currentView === 'saved-cards' ? 'saved' : 'new',
-      },
-    });
   }
 
   export function getPayload() {
