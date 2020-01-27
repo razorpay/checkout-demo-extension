@@ -325,7 +325,7 @@
     }
   }
 
-  export function updateCustomer(newCustomer = {}) {
+  export function updateCustomerAndShowLandingView(newCustomer = {}) {
     customer = newCustomer;
     // Wait for pending state updates from reactive statements
     tick().then(showLandingView);

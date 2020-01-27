@@ -2487,7 +2487,7 @@ Session.prototype = {
             $('#top-right').removeClass('logged');
             customer.logout(e.target.parentNode.firstChild === e.target);
 
-            self.svelteCardTab.updateCustomer();
+            self.svelteCardTab.updateCustomerAndShowLandingView();
             self.homeTab.updateCustomer();
           }
           container_listener();
@@ -4387,7 +4387,7 @@ Session.prototype = {
             // OTP verification successful
             OtpService.resetCount('razorpay');
 
-            self.svelteCardTab.updateCustomer(self.customer);
+            self.svelteCardTab.updateCustomerAndShowLandingView(self.customer);
             self.showCardTab();
           } else {
             Analytics.track('behav:otp:incorrect', {
