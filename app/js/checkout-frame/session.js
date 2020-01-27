@@ -41,7 +41,8 @@ var preferences = window.preferences,
   OtpService = discreet.OtpService,
   storeGetter = discreet.storeGetter,
   HomeScreenStore = discreet.HomeScreenStore,
-  Cta = discreet.Cta;
+  Cta = discreet.Cta,
+  NBHandlers = discreet.NBHandlers;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -615,28 +616,6 @@ function getEmiText(session, amount, plan) {
   );
 }
 
-/**
- * Makes the container long if not already long.
- *
- * @return {Boolean} madeLong?
- */
-function makeContainerLong() {
-  var LONG_CLASSES = ['long', 'x-long'];
-  var container = $('#container');
-
-  var isAlreadyLong = _Arr.any(LONG_CLASSES, function(className) {
-    return container.hasClass(className);
-  });
-
-  if (isAlreadyLong) {
-    return false;
-  }
-
-  container.addClass(LONG_CLASSES[0]);
-
-  return true;
-}
-
 function overlayVisible() {
   return $('#overlay').hasClass(shownClass);
 }
@@ -759,29 +738,7 @@ function errorHandler(response) {
     }
   }
 
-  checkIfCorpNetbanking(this, message);
-}
-
-function checkIfCorpNetbanking(session, message) {
-  // If error code exists and matches the string, removed the retry button
-  // and replaces it with ok button, which closes checkout.
-  if (
-    message ===
-    'Payment is pending authorization. Request for authorization from approver.'
-  ) {
-    session.isCorporateBanking = true;
-    $('#fd-hide').remove();
-    var okButton = document.createElement('button');
-    okButton.id = 'fd-ok';
-    okButton.className = 'btn';
-    okButton.innerText = 'OK';
-    $('#error-message').append(okButton);
-    $('#fd-ok').on('click', function() {
-      session.hide();
-    });
-  } else {
-    $('#fd-hide').focus();
-  }
+  NBHandlers.replaceRetryIfCorporateNetbanking(this, message);
 }
 
 /* bound with session */
@@ -1127,7 +1084,6 @@ Session.prototype = {
     if (this.irctc) {
       tab_titles.upi = 'BHIM/UPI';
       tab_titles.card = 'Debit/Credit Card';
-      classes.push('long');
       this.r.set('theme.image_frame', false);
     }
 
@@ -1142,10 +1098,6 @@ Session.prototype = {
     if (this.methods.emi) {
       tab_titles.card = 'Card';
       classes.push('emi-method');
-    }
-
-    if (this.methods.count >= 5) {
-      classes.push('long');
     }
 
     if (getter('ecod')) {
@@ -1443,8 +1395,6 @@ Session.prototype = {
     this.setEmiScreen();
 
     Hacks.initPostRenderHacks();
-
-    makeContainerLong();
 
     errorHandler.call(this, this.params);
 
@@ -6211,22 +6161,22 @@ Session.prototype = {
         }
 
         each(availMethods[bankMethod], function(bankCode, bankObj) {
-          var bankHasSupportedAuthType = false;
+          var eligibleAuthTypesOfBank = [];
 
           /**
            * Determine if the bank has any of the supported auth types
            */
           if (bankObj.auth_types) {
-            bankHasSupportedAuthType = _Arr.any(bankObj.auth_types, function(
+            eligibleAuthTypesOfBank = _Arr.filter(bankObj.auth_types, function(
               authType
             ) {
               return _Arr.contains(emandateSupportedAuthTypes, authType);
             });
           }
 
-          if (bankHasSupportedAuthType) {
+          if (eligibleAuthTypesOfBank.length) {
             emandateBanks[bankCode] = _Obj.clone(bankObj);
-            emandateBanks[bankCode].auth_types = emandateSupportedAuthTypes;
+            emandateBanks[bankCode].auth_types = eligibleAuthTypesOfBank;
           }
         });
 
