@@ -322,6 +322,7 @@
 
   export function onShown() {
     tab = session.tab;
+    onCardInput();
   }
 </script>
 

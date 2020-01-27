@@ -3016,9 +3016,6 @@ Session.prototype = {
 
     this.svelteCardTab.setSelectedOffer(offer);
 
-    var savedCards =
-      this.customer && this.customer.tokens && this.customer.tokens.items;
-
     screen = screen || this.screen;
 
     // Go to the offer's method if we're on homescreen
@@ -3055,43 +3052,6 @@ Session.prototype = {
           setEmiDurationForNewCard('');
         }
       }
-
-      //TODO: WIP try to see if the card exists in the saved cards and focus
-      var savedCards = this.customer.tokens && this.customer.tokens.items;
-
-      if (
-        this.svelteCardTab.isOnSavedCardsScreen() &&
-        savedCards &&
-        savedCards.length > 0
-      ) {
-        var matchingCardIndex;
-
-        savedCards.every(function(item, index) {
-          var card = item.card;
-
-          if (!card) {
-            return true;
-          }
-
-          if (
-            offer.issuer === card.issuer &&
-            (!offer.payment_network || offer.payment_network === card.network)
-          ) {
-            matchingCardIndex = index;
-            return false;
-          }
-
-          return true;
-        });
-
-        if (typeof matchingCardIndex === void 0) {
-          var cvv = qs('#saved-cards-container .saved-cvv')[matchingCardIndex];
-
-          if (cvv) {
-            cvv.focus();
-          }
-        }
-      }
     } else if (screen === 'cardless_emi' && this.screen !== 'otp') {
       var provider = offer.provider;
 
@@ -3108,6 +3068,20 @@ Session.prototype = {
     this.hideDiscount();
     // Reset selected offer in cards tab to show all saved cards
     this.svelteCardTab.setSelectedOffer();
+  },
+
+  /**
+   * Removes currently selected offer if it was selected from the list by the
+   * user (and not autoamatically applied).
+   */
+  removeOfferSelectedFromDrawer: function() {
+    if (
+      this.offers &&
+      !this.offers.offerSelectedByDrawer &&
+      this.offers.appliedOffer
+    ) {
+      this.offers.removeOffer();
+    }
   },
 
   /**
@@ -3429,6 +3403,9 @@ Session.prototype = {
     }
 
     if (tab === 'card' || (tab === 'emi' && this.screen !== 'emi')) {
+      if (this.screen === '') {
+        this.svelteCardTab.showLandingView();
+      }
       this.showCardTab(tab);
       setEmiPlansCta(this.screen, tab);
     } else {
