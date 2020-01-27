@@ -1074,7 +1074,6 @@ Session.prototype = {
     var key = getter('key');
 
     if (key === UDACITY_KEY || key === EMBIBE_KEY) {
-      classes.push('address');
       setter('address', true);
     }
 
@@ -2185,7 +2184,6 @@ Session.prototype = {
     this.oneMethod = methodName;
 
     $(this.el).addClass('one-method');
-    $('.payment-option').addClass('submit-button button');
   },
 
   improvisePaymentOptions: function() {
@@ -2835,15 +2833,6 @@ Session.prototype = {
       $('#form-upi.collapsible .item.expanded').removeClass('expanded');
       $(e.currentTarget).addClass('expanded');
     });
-
-    if (gel('methods-list')) {
-      this.on('click', '#methods-list', 'option', function(e) {
-        var $cvvEl = $(e.delegateTarget).$('.cvv-input');
-        if ($cvvEl) {
-          $cvvEl.focus();
-        }
-      });
-    }
   },
 
   onUpiAppSelect: function(packageName) {
@@ -3675,9 +3664,6 @@ Session.prototype = {
      */
     if (!this.tab && !this.isPayout) {
       if (!this.checkCommonValidAndTrackIfInvalid()) {
-        if (this.methodsList && this.p13n) {
-          this.methodsList.otherMethodsView.hideMethods();
-        }
         return;
       }
     }
@@ -5986,10 +5972,6 @@ Session.prototype = {
       clearTimeout(fontTimeout);
 
       // TODO: refactor this into cleanupSvelteComponents.
-      if (this.methodsList) {
-        this.methodsList.$destroy();
-      }
-
       if (this.otpView) {
         this.otpView.$destroy();
       }
@@ -6053,7 +6035,7 @@ Session.prototype = {
       }
 
       this.tab = this.screen = '';
-      this.methodsList = this.modal = this.emi = this.el = this.card = null;
+      this.modal = this.emi = this.el = this.card = null;
       this.upiTab = this.otpView = this.netbankingTab = null;
       this.payoutsView = this.payoutsAccountView = null;
       this.savedCardsView = this.feeBearerView = this.payLaterView = null;

@@ -18,14 +18,6 @@ var activeStateColor = themeMeta.activeStateColor;
   cursor: pointer;
 }
 
-`?_('theme.upi_only')`
-#payment-options div:nth-child(-n+3){
-  pointer-events: none;
-  -webkit-filter: grayscale(100%);
-  filter: grayscale(100%);
-}
-`?`
-
 .button, .btn, .submit-button, .loader::after
 {
   background: `=c`;
@@ -45,7 +37,6 @@ var activeStateColor = themeMeta.activeStateColor;
   border-color: `=highlightColor` !important;
 }
 
-#payment-options i,
 .text-btn,
 #cancel_upi .back-btn,
 .offer-info li:first-child,
@@ -67,14 +58,6 @@ var activeStateColor = themeMeta.activeStateColor;
 
 .options .next-option.secondary-color:after {
   color: `=backgroundColor`;
-}
-
-#payment-options i svg {
-  display: inline-block;
-  height: 0.75em;
-  vertical-align: top;
-  /* take care with max-width in IE11 */
-  max-width: 38px;
 }
 
 #header{
