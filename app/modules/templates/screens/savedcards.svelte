@@ -8,9 +8,14 @@
   // Store
   import { selectedTokenId, savedCardEmiDuration } from 'checkoutstore/emi';
 
+  // Utils
+  import { getSession } from 'sessionmanager';
+
   // Props
   export let cards = [];
   export let tab;
+
+  const session = getSession();
 
   let selected = null;
 
@@ -29,11 +34,44 @@
     dispatch('viewPlans', event.detail);
   }
 
+  /**
+   * TODO: comment
+   * @param card
+   */
+  function handleOffersForSavedCard(card) {
+    if (session.offers && !this.offers.offerSelectedByDrawer) {
+      session.offers.removeOffer();
+    }
+
+    // If EMI is supported on saved card
+    if (session.tab === 'emi' && card.plans) {
+      var issuer = card.card.issuer;
+      var duration = savedCardEmiDuration;
+
+      // Set offer in case it is applicable.
+      if (issuer && duration) {
+        var emi_options = this.emi_options;
+        var plans = (emi_options.banks[issuer] || {}).plans;
+
+        if (
+          plans &&
+          plans[duration] &&
+          plans[duration].offer_id &&
+          session.offers
+        ) {
+          session.offers.selectOfferById(plans[duration].offer_id);
+        }
+      }
+    }
+  }
+
   function handleClick(card, { cvv, authType }) {
     dispatch('select', { token: card });
     currentCvv = cvv;
     currentAuthType = authType;
     selected = card;
+
+    handleOffersForSavedCard(card);
   }
 
   function handleCvvChange(event) {

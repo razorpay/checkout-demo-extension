@@ -3021,46 +3021,6 @@ Session.prototype = {
 
     screen = screen || this.screen;
 
-    // Show only those cards on which the offer is eligible
-    if (savedCards && savedCards.length > 0) {
-      var filteredTokens = [];
-      each(savedCards, function(index, token) {
-        var card = token.card;
-        if (card && offer.payment_method === 'emi' && offer.emi_subvention) {
-          /* Merchant subvention EMI */
-          var bank = card.issuer;
-          var emiBank = emiBanks[bank];
-
-          if (bank && emiBank) {
-            var plans = emiBank.plans;
-            if (typeof plans !== 'object') {
-              return;
-            }
-
-            var hasOffer = false;
-
-            each(plans, function(duration, plan) {
-              if (plan.offer_id === offer.id) {
-                hasOffer = true;
-                return;
-              }
-            });
-
-            if (hasOffer) {
-              filteredTokens.push(token);
-            }
-          }
-        } else {
-          filteredTokens.push(token);
-        }
-      });
-      this.svelteCardTab.setSavedCards({
-        entity: 'collection',
-        count: filteredTokens.length,
-        items: filteredTokens,
-      });
-    }
-
     // Go to the offer's method if we're on homescreen
     if (!screen) {
       this.preSelectedOffer = offerInstance;
@@ -3562,66 +3522,6 @@ Session.prototype = {
           parent.remove();
         }
       );
-    }
-  },
-
-  setSavedCard: function(e) {
-    // TODO: Return from here if we are selecting the same selected card
-
-    var $savedCard = $(e.delegateTarget);
-    if (this.tab === 'emi' && !isString($savedCard.attr('emi'))) {
-      return;
-    }
-
-    if (!e.target || e.target !== $savedCard.find('.elem-savedcards-emi')[0]) {
-      $savedCard.$('.saved-cvv').focus();
-    }
-
-    $('#saved-cards-container .checked').removeClass('checked');
-    $savedCard.addClass('checked');
-
-    this.selectedSavedCardToken = $savedCard.attr('token');
-
-    if (this.offers && !this.offers.offerSelectedByDrawer) {
-      this.offers.removeOffer();
-    }
-
-    // If EMI is supported on saved card
-    if (this.tab === 'emi' && $savedCard.$('.emi-plans-trigger')[0]) {
-      var $trigger = $savedCard.$('.emi-plans-trigger');
-      var issuer = $trigger.attr('data-bank');
-      var duration = getEmiDurationForSavedCard();
-
-      // Set offer in case it is applicable.
-      if (issuer && duration) {
-        var emi_options = this.emi_options;
-        var plans = (emi_options.banks[issuer] || {}).plans;
-
-        if (
-          plans &&
-          plans[duration] &&
-          plans[duration].offer_id &&
-          this.offers
-        ) {
-          this.offers.selectOfferById(plans[duration].offer_id);
-        }
-      }
-
-      // Add class manually in case svelte rerendered.
-      if (duration) {
-        $savedCard.addClass('emi-selected');
-      }
-    }
-
-    setEmiPlansCta(this.screen, this.tab);
-
-    if ($savedCard.$('.flow-selection-container')[0]) {
-      Analytics.track('atmpin:saved_card:select', {
-        type: AnalyticsTypes.BEHAV,
-        data: {
-          default_auth_type: Constants.DEFAULT_AUTH_TYPE_RADIO,
-        },
-      });
     }
   },
 
