@@ -443,7 +443,15 @@
       <OffersPortal />
       {#if session.recurring}
         <Callout>
-          Future payments on this card will be charged automatically.
+          {#if !session.subscription}
+            Future payments on this card will be charged automatically.
+          {:else if session.subscription && session.subscription.type === 0}
+            The charge is to enable subscription on this card and it will be
+            refunded.
+          {:else}
+            This card will be linked to the subscription and future payments
+            will be charged automatically.
+          {/if}
         </Callout>
       {/if}
     </div>
