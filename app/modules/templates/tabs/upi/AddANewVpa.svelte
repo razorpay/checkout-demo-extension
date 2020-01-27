@@ -51,7 +51,7 @@
   }
 
   export function shouldRememberVpa() {
-    return rememberVpaCheckbox.checked ? 1 : 0;
+    return rememberVpaCheckbox && rememberVpaCheckbox.checked ? 1 : 0;
   }
 
   export function blur() {
