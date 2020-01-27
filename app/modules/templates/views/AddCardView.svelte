@@ -141,7 +141,7 @@
 
     let isValid = Formatter.rules.card.isValid.call({
       value: cardNumberWithoutSpaces,
-      $cardType,
+      type: $cardType,
     });
 
     if (!session.preferences.methods.amex && $cardType === 'amex') {
