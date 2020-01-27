@@ -22,6 +22,7 @@ describe.each(
   getTestData(
     'Perform upi collect transaction with callbackURL and contact optional',
     {
+      loggedIn: true,
       options: {
         amount: 200,
         personalization: false,
@@ -48,8 +49,8 @@ describe.each(
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIMethod(context, 'BHIM');
-    await enterUPIAccount(context, 'BHIM');
+    await selectUPIMethod(context, 'new');
+    await enterUPIAccount(context, 'saranshgupta1995@okaxis');
     await submit(context);
     await handleUPIAccountValidation(context, 'BHIM@upi');
     await expectRedirectWithCallback(context, { method: 'upi' });

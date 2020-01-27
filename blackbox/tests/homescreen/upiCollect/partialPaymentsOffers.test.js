@@ -5,7 +5,7 @@ const {
   selectUPIMethod,
   enterUPIAccount,
   handleUPIAccountValidation,
-  respondToUPIAjax,
+  handleSaveVpaRequest,
   respondToUPIPaymentStatus,
   setPreferenceForOffer,
   viewOffers,
@@ -31,7 +31,8 @@ describe.each(
   getTestData(
     'Perform upi collect transaction with offers and partial payments applied',
     {
-      loggedIn: false,
+      loggedIn: true,
+      anon: false,
       options: {
         amount: 200000,
         personalization: false,
@@ -90,8 +91,8 @@ describe.each(
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIMethod(context, 'BHIM');
-    await enterUPIAccount(context, 'BHIM');
+    await selectUPIMethod(context, 'new');
+    await enterUPIAccount(context, 'saranshgupta1995@okaxis');
     await verifyPartialAmount(context, '₹ 100');
     await viewOffers(context);
     await selectOffer(context, '1');
@@ -101,7 +102,7 @@ describe.each(
     await verifyDiscountText(context, 'You save ₹ 10');
     await submit(context);
     await handleUPIAccountValidation(context, 'BHIM@upi');
-    await respondToUPIAjax(context, 'offer_id=' + preferences.offers[0].id);
+    await handleSaveVpaRequest(context, 'offer_id=' + preferences.offers[0].id);
     await respondToUPIPaymentStatus(context);
   });
 });
