@@ -306,18 +306,6 @@ function getSelectableSavedCardElement(tab, token) {
   return elem;
 }
 
-/**
- * Add/remove a class to the saved card container
- * when EMI plan is selected.
- */
-function toggleEmiPlanDetails(container, planIsSelected) {
-  if (planIsSelected) {
-    container.addClass('emi-selected');
-  } else {
-    container.removeClass('emi-selected');
-  }
-}
-
 function setEmiBank(data) {
   var activeEmiPlan = getEmiDurationForNewCard();
   if (activeEmiPlan) {
@@ -3844,7 +3832,6 @@ Session.prototype = {
 
               setEmiDurationForSavedCard('');
               EmiStore.selectedPlanTextForSavedCard.set('');
-              toggleEmiPlanDetails($trigger.parent().parent(), false);
 
               self.switchTab('card');
               self.setScreen('card');
