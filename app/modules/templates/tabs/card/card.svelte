@@ -115,10 +115,10 @@
       return [];
     }
 
-    const tokenList = getSavedCards(customer.tokens.items);
+    let tokenList = getSavedCards(customer.tokens.items);
 
     // TODO: move to separate function
-    tokenList.sort((a, b) => {
+    tokenList = tokenList.slice().sort((a, b) => {
       if (a.card && b.card) {
         if (a.card.emi && b.card.emi) {
           return 0;
