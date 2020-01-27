@@ -336,8 +336,6 @@
   }
 
   export function onShown() {
-    showLandingView();
-    onCardInput();
     tab = session.tab;
   }
 </script>
