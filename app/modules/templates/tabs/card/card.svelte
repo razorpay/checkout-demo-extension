@@ -104,7 +104,10 @@
   }
 
   $: {
-    savedCards = getSavedCardsForDisplay(allSavedCards, tab);
+    savedCards = filterSavedCardsForOffer(
+      getSavedCardsForDisplay(allSavedCards, tab),
+      selectedOffer
+    );
   }
 
   $: {
@@ -144,6 +147,11 @@
   }
 
   function filterSavedCardsForOffer(savedCards, offer) {
+    // If offer no offer is selected, do not try to filter cards.
+    if (!offer) {
+      return savedCards;
+    }
+
     const emiBanks = session.emi_options.banks;
     return _Arr.filter(savedCards, function(index, token) {
       var card = token.card;
