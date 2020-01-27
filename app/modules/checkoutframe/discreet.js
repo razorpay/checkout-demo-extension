@@ -76,6 +76,8 @@ import * as Hacks from 'checkoutframe/hacks';
 import { get as storeGetter } from 'svelte/store';
 import * as Experiments from 'experiments';
 
+import * as NBHandlers from 'handlers/netbanking';
+
 export default {
   RazorpayConfig,
   makeAuthUrl,
@@ -172,4 +174,6 @@ export default {
   _Func,
   _Obj,
   _,
+
+  NBHandlers,
 };
