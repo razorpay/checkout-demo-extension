@@ -21,6 +21,8 @@
     remember,
   } from 'checkoutstore/screens/card';
 
+  import { contact } from 'checkoutstore/screens/home';
+
   import { newCardEmiDuration } from 'checkoutstore/emi';
 
   // Utils imports
@@ -62,6 +64,10 @@
     $cardExpiry = session.get('prefill.card[expiry]') || '';
     $cardName = session.get('prefill.name') || '';
     $cardCvv = session.get('prefill.card[cvv]') || '';
+
+    // Set customer and show landing screen
+    const customer = session.getCustomer($contact);
+    updateCustomerAndShowLandingView(customer);
   });
 
   $: {

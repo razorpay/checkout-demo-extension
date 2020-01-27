@@ -3449,7 +3449,7 @@ Session.prototype = {
         return;
       }
       this.customer = this.getCustomer(contact);
-      this.svelteCardTab.updateCustomer(this.customer);
+
       if (this.customer.logged && !this.local) {
         $('#top-right').addClass('logged');
       }
