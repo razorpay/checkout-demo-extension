@@ -9,6 +9,7 @@
   import Callout from 'templates/views/ui/Callout.svelte';
   import Screen from 'templates/layouts/Screen.svelte';
   import AddCardView from 'templates/views/AddCardView.svelte';
+  import EmiActions from 'templates/views/EmiActions.svelte';
   import SavedCards from 'templates/screens/savedcards.svelte';
   import OffersPortal from 'templates/views/OffersPortal.svelte';
 
@@ -43,7 +44,7 @@
   let allSavedCards = [];
   let savedCards = [];
   let lastSavedCard = null;
-  let selectedOffer = {};
+  let selectedOffer = null;
 
   let showEmiCta;
   let emiCtaView;
@@ -193,7 +194,6 @@
   }
 
   function setView(view) {
-    debugger;
     currentView = view;
   }
 
@@ -310,6 +310,45 @@
     }
   }
 
+  function handleEmiCtaClick(e) {
+    let eventName = 'emi:plans:';
+    const eventData = {
+      from: session.tab,
+    };
+
+    session.removeAndCleanupOffers();
+
+    if (emiCtaView === 'available') {
+      session.showEmiPlans('new')(e);
+      eventName += 'view';
+    } else if (emiCtaView === 'plans-available') {
+      session.showEmiPlans('new')(e);
+      eventName += 'edit';
+    } else if (emiCtaView === 'pay-without-emi') {
+      if (session.methods.card) {
+        session.setScreen('card');
+        session.switchTab('card');
+        session.offers && session.renderOffers(session.tab);
+        showLandingView();
+
+        eventName = 'emi:pay_without';
+      }
+    } else if (emiCtaView === 'plans-unavailable') {
+      if (session.methods.card) {
+        session.setScreen('card');
+        session.switchTab('card');
+        session.offers && session.renderOffers(session.tab);
+
+        eventName = 'emi:pay_without';
+      }
+    }
+
+    Analytics.track(eventName, {
+      type: AnalyticsTypes.BEHAV,
+      data: eventData,
+    });
+  }
+
   export function updateCustomerAndShowLandingView(newCustomer = {}) {
     customer = newCustomer;
     // Wait for pending state updates from reactive statements
@@ -366,11 +405,13 @@
           {/if}
           <AddCardView
             {tab}
+            bind:this={addCardView}
+            on:cardinput={onCardInput} />
+          <EmiActions
             {showEmiCta}
             {emiCtaView}
             savedCount={allSavedCards.length}
-            bind:this={addCardView}
-            on:cardinput={onCardInput} />
+            on:click={handleEmiCtaClick} />
         </div>
       {:else}
         <div in:fade={{ duration: 100 }}>

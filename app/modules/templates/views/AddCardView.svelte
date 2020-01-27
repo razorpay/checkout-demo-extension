@@ -22,8 +22,6 @@
     cardType,
   } from 'checkoutstore/screens/card';
 
-  import { selectedPlanTextForNewCard } from 'checkoutstore/emi';
-
   // Utils
   import { getSession } from 'sessionmanager';
   import Analytics from 'analytics';
@@ -59,9 +57,6 @@
     hideExpiryCvvFields = showNoCvvCheckbox && noCvvChecked;
   }
 
-  export let showEmiCta = false;
-  export let emiCtaView = '';
-  export let savedCount = 0;
   export let tab;
 
   let showAuthTypeSelectionRadio = false;
@@ -198,53 +193,9 @@
     }
   }
 
-  function handleEmiCtaClick(e) {
-    let eventName = 'emi:plans:';
-    const eventData = {
-      from: session.tab,
-    };
-
-    session.removeAndCleanupOffers();
-
-    if (emiCtaView === 'available') {
-      session.showEmiPlans('new')(e);
-      eventName += 'view';
-    } else if (emiCtaView === 'plans-available') {
-      session.showEmiPlans('new')(e);
-      eventName += 'edit';
-    } else if (emiCtaView === 'pay-without-emi') {
-      if (session.methods.card) {
-        session.setScreen('card');
-        session.switchTab('card');
-        session.offers && session.renderOffers(session.tab);
-
-        eventName = 'emi:pay_without';
-      }
-    } else if (emiCtaView === 'plans-unavailable') {
-      if (session.methods.card) {
-        session.setScreen('card');
-        session.switchTab('card');
-        session.offers && session.renderOffers(session.tab);
-
-        eventName = 'emi:pay_without';
-      }
-    }
-
-    Analytics.track(eventName, {
-      type: AnalyticsTypes.BEHAV,
-      data: eventData,
-    });
-  }
-
   function handleCardInput() {
     onCardNumberChange();
     dispatch('cardinput');
-  }
-
-  function getEmiBanksList() {
-    const { banks = {} } = session.emi_options || {};
-    const bankList = _Obj.entries(banks).map(([_, bank]) => bank.name);
-    return bankList.join(', ');
   }
 
   function trackRememberChecked(event) {
@@ -350,50 +301,6 @@
       </div>
     {/if}
   </div>
-  {#if showEmiCta}
-    <div id="elem-emi">
-      <div
-        class="strip emi-plans-info-container emi-plans-trigger"
-        on:click={handleEmiCtaClick}>
-        {#if emiCtaView === 'plans-unavailable'}
-          <div class="emi-plan-unavailable emi-icon-multiple-cards">
-            <span class="help">
-              EMI is available on {getEmiBanksList()} cards. Enter your credit
-              card to avail.
-            </span>
-            <div class="emi-plans-text">EMI unavailable</div>
-            {#if session.methods.card}
-              <div class="emi-plans-action theme-highlight">
-                Pay entire amount
-              </div>
-            {/if}
-          </div>
-        {/if}
-        {#if emiCtaView === 'plans-available'}
-          <div class="emi-plan-selected emi-icon-multiple-cards">
-            <div class="emi-plans-text">{$selectedPlanTextForNewCard}</div>
-            <div class="emi-plans-action theme-highlight">Edit</div>
-          </div>
-        {/if}
-        {#if emiCtaView === 'available'}
-          <div class="emi-plan-unselected emi-icon-multiple-cards">
-            <div class="emi-plans-text">EMI Available</div>
-            <div class="emi-plans-action theme-highlight">Pay with EMI</div>
-          </div>
-        {/if}
-        {#if emiCtaView === 'pay-without-emi'}
-          <div class="emi-pay-without emi-icon-single-card">
-            <div class="emi-plans-text no-action">
-              Pay entire amount
-              {#if savedCount}
-                <span class="count-text">( {savedCount} cards available )</span>
-              {/if}
-            </div>
-          </div>
-        {/if}
-      </div>
-    </div>
-  {/if}
   {#if showNoCvvCheckbox}
     <div class="row">
       <label id="nocvv-check" for="nocvv">
