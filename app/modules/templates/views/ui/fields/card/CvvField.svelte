@@ -83,6 +83,7 @@
   {value}
   bind:this={ref}
   on:input={handleInput}
+  on:input
   handleBlur
   handleFocus
   handleInput />
