@@ -4456,11 +4456,17 @@ Session.prototype = {
       if (screen === 'card') {
         var cardType = discreet.storeGetter(CardScreenStore.cardType);
 
+        // TODO: simplify conditions
         // Do not proceed with amex cards if amex is disabled for merchant
         // also without this, cardsaving is triggered before API returning unsupported card error
-        if (!preferences.methods.amex && cardType === 'amex') {
+        if (
+          !this.svelteCardTab.isOnSavedCardsScreen() &&
+          !preferences.methods.amex &&
+          cardType === 'amex'
+        ) {
           return this.showLoadError('AMEX cards are not supported', true);
         }
+
         if (this.svelteCardTab.isOnSavedCardsScreen() && !data['card[cvv]']) {
           var checkedCard = $('.saved-card.checked');
 
