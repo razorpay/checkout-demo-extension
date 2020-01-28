@@ -5974,7 +5974,6 @@ Session.prototype = {
   },
 
   setPreferences: function(prefs) {
-    prefs.methods.amex = true;
     PreferencesStore.set(prefs);
     DowntimesStore.set(discreet.Downtimes.getDowntimes(prefs));
     this.r.preferences = prefs;
