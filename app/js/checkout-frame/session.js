@@ -1068,10 +1068,6 @@ Session.prototype = {
       classes.push('notopbar');
     }
 
-    if (getStore('isPartialPayment')) {
-      classes.push('partial');
-    }
-
     if (this.irctc) {
       tab_titles.upi = 'BHIM/UPI';
       tab_titles.card = 'Debit/Credit Card';
@@ -1088,7 +1084,6 @@ Session.prototype = {
 
     if (this.methods.emi) {
       tab_titles.card = 'Card';
-      classes.push('emi-method');
     }
 
     if (getter('ecod')) {
