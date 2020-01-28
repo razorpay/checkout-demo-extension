@@ -65,7 +65,6 @@
   export let tab;
 
   let showAuthTypeSelectionRadio = false;
-  let showDebitPinRadio = false;
 
   function handleFilled(curField) {
     switch (curField) {
@@ -115,7 +114,7 @@
       $authType = DEFAULT_AUTH_TYPE_RADIO;
     }
 
-    showDebitPinRadio = Boolean(visible);
+    showAuthTypeSelectionRadio = Boolean(visible);
   }
 
   const Flows = {

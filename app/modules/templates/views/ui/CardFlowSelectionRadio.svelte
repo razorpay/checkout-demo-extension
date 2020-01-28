@@ -1,9 +1,5 @@
 <script>
   export let value;
-
-  function handleRadioChanged(event) {
-    value = event.target.value;
-  }
 </script>
 
 <style>
@@ -34,8 +30,7 @@
       name="auth_type"
       id="flow-3ds"
       value="c3ds"
-      bind:group={value}
-      on:change={handleRadioChanged} />
+      bind:group={value} />
     <label for="flow-3ds">
       <div class="radio-display" />
       <div class="label-content">OTP / Password</div>
@@ -47,8 +42,7 @@
       name="auth_type"
       id="flow-pin"
       value="pin"
-      bind:group={value}
-      on:change={handleRadioChanged} />
+      bind:group={value} />
     <label for="flow-pin">
       <div class="radio-display" />
       <div class="label-content">ATM PIN</div>
