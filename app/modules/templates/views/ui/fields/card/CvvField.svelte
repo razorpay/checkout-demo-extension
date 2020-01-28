@@ -37,8 +37,11 @@
   }
 
   $: {
-    cvvLength = getCvvDigits(cardType);
-    cvvPattern = `[0-9]{${cvvLength}}`;
+    cvvPattern = `[0-9]{${length}}`;
+  }
+
+  export function focus() {
+    ref.focus();
   }
 </script>
 

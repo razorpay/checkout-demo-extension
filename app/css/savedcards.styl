@@ -133,11 +133,13 @@ $cardpl = 70px;
 }
 
 .saved-inner {
+  display: flex;
   opacity: 0;
   transition: 0.2s;
 }
 
 .saved-number {
+  flex-grow: 1;
   &::before {
     content: 'Card ending with';
     color: #777;
@@ -162,15 +164,16 @@ $cardpl = 70px;
   }
 
   .saved-cvv {
-    opacity: 0;
-    position: absolute;
-    right: 24px;
-    top: 8px;
-    pointer-events: none;
-    transition: 0.3s;
+    font-size: 12px;
     padding: 5px;
-    width: 36px;
-    border-bottom: 1px solid #ccc;
+    width: 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .saved-cvv .elem .input {
+    padding: 0 0 4px 0;
   }
 
   .cardtype {

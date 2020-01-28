@@ -1,6 +1,6 @@
 <script>
   // Svelte imports
-  import { createEventDispatcher, onMount, onDestroy } from 'svelte';
+  import { createEventDispatcher, tick } from 'svelte';
 
   // Utils imports
   import Analytics from 'analytics';
@@ -13,6 +13,7 @@
 
   // UI imports
   import Radio from 'templates/views/ui/Radio.svelte';
+  import CvvField from 'templates/views/ui/fields/card/CvvField.svelte';
 
   // Props
   export let card;
@@ -26,6 +27,7 @@
   // Computed
   let attributes;
   let showOuter;
+  let showCvv;
 
   let noCvvChecked = false;
   let cvvValue = '';
@@ -36,18 +38,6 @@
   // Refs
   let cvvInput;
   let cvvInputFormatter;
-
-  onMount(() => {
-    if (cvvInput) {
-      cvvInputFormatter = session.delegator.add('number', cvvInput);
-    }
-  });
-
-  onDestroy(() => {
-    if (cvvInputFormatter) {
-      cvvInputFormatter.unbind();
-    }
-  });
 
   const dispatch = createEventDispatcher();
 
@@ -76,6 +66,8 @@
 
   $: showOuter = card.networkCode === 'maestro' || debitPin || plans;
 
+  $: showCvv = !noCvvChecked && selected;
+
   function handleAuthRadioChanged(event) {
     trackAtmRadio(event);
     authType = event.target.value;
@@ -97,12 +89,18 @@
 
   function handleClick() {
     const payload = { cvv: cvvValue };
-    if (cvvInput) {
-      cvvInput.focus();
-    }
+
+    // Focus on next tick because the CVV field might not have rendered right now.
+    tick().then(_ => {
+      if (cvvInput) {
+        cvvInput.focus();
+      }
+    });
+
     if (debitPin) {
       payload.authType = authType;
     }
+
     dispatch('click', payload);
   }
 </script>
@@ -116,19 +114,18 @@
   <div class="help up">EMI is not available on this card</div>
   <div class="cardtype" cardtype={card.networkCode} />
   <div class="saved-inner">
-    <span class="saved-number">{card.last4}</span>
-    <input
-      class="saved-cvv cvv-input"
-      class:hidden={noCvvChecked}
-      inputmode="numeric"
-      maxlength={cvvDigits}
-      pattern={`[0-9]{${cvvDigits}}`}
-      bind:this={cvvInput}
-      placeholder="CVV"
-      required
-      on:input={_ => dispatch('cvvchange', { cvv: cvvValue })}
-      bind:value={cvvValue}
-      type="tel" />
+    <div class="saved-number">{card.last4}</div>
+    <div class="saved-cvv">
+      {#if showCvv}
+        <CvvField
+          bind:value={cvvValue}
+          on:input={_ => dispatch('cvvchange', { cvv: cvvValue })}
+          bind:this={cvvInput}
+          length={cvvDigits}
+          showHelp={false}
+          showPlaceholder />
+      {/if}
+    </div>
   </div>
   {#if showOuter && selected}
     <div class="saved-outer">
