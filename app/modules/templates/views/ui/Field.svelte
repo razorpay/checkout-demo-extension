@@ -39,8 +39,8 @@
   export let tabindex = 0;
 
   // Computed
-  export let identifier;
-  export let inputType;
+  let identifier;
+  let inputType;
 
   let focused = false;
   let placeholderToShow = placeholder;
