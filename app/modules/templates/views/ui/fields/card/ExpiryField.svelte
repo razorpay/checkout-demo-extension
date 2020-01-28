@@ -5,7 +5,6 @@
   import { createEventDispatcher } from 'svelte';
 
   export let value;
-  export let type = '';
   export let ref = null;
   export let id;
 
@@ -35,7 +34,7 @@
   label="Expiry"
   required
   {value}
-  {type}
+  type="tel"
   maxlength={7}
   bind:this={ref}
   on:input={handleInput}
