@@ -1386,12 +1386,14 @@ Session.prototype = {
   },
 
   setSvelteCardTab: function() {
-    this.svelteCardTab = new discreet.CardTab({
-      target: gel('card-svelte-wrap'),
-      props: {
-        askOTP: askOTP,
-      },
-    });
+    if (this.methods.card || this.methods.emi) {
+      this.svelteCardTab = new discreet.CardTab({
+        target: gel('card-svelte-wrap'),
+        props: {
+          askOTP: askOTP,
+        },
+      });
+    }
   },
 
   setSvelteComponents: function() {
