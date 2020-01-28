@@ -54,7 +54,7 @@
 
   const dispatch = createEventDispatcher();
 
-  export function getCaret() {
+  export function getCaretPosition() {
     return formatterObj.caretPosition;
   }
 

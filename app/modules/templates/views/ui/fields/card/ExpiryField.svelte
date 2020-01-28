@@ -20,7 +20,7 @@
       value: ref.getRawValue() || '',
     });
     ref.setValid(isValid);
-    if (isValid && value.length === ref.getCaret()) {
+    if (isValid && value.length === ref.getCaretPosition()) {
       dispatch('filled');
     }
   }

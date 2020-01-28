@@ -42,7 +42,7 @@
   $: helpText = getHelpText(session.methods, type, session.recurring);
 
   export function dispatchFilledIfValid() {
-    const caretPosition = field.getCaret();
+    const caretPosition = field.getCaretPosition();
 
     if (valid) {
       /**
