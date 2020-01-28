@@ -165,7 +165,7 @@
       {#if debitPin}
         <div class="elem-wrap flow-selection-container">
           <Radio
-            checked={true}
+            checked={authType === 'c3ds'}
             containerClass="flow"
             id={`flow-3ds-${token}`}
             inputClass="auth_type_radio"
@@ -175,6 +175,7 @@
             on:change={handleAuthRadioChanged} />
           <Radio
             contaierClass="flow"
+            checked={authType === 'pin'}
             id={`flow-pin-${token}`}
             inputClass="auth_type_radio"
             label="Pay using <strong>ATM PIN</strong>"

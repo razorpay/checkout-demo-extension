@@ -66,6 +66,11 @@
   }
 
   function handleClick(card, { cvv, authType }) {
+    // The same card was clicked again, do nothing.
+    if (selected && selected.id === card.id) {
+      return;
+    }
+
     dispatch('select', { token: card });
     currentCvv = cvv;
     currentAuthType = authType;
