@@ -936,9 +936,6 @@ function cancel_upi(session) {
   });
 }
 
-var UDACITY_KEY = 'rzp_live_z1RZhOg4kKaEZn';
-var EMBIBE_KEY = 'rzp_live_qqfsRaeiWx5JmS';
-
 var IRCTC_KEYS = [
   'rzp_test_mZcDnA8WJMFQQD',
   'rzp_live_ENneAQv5t7kTEQ',
@@ -1069,12 +1066,6 @@ Session.prototype = {
 
     if (getter('theme.hide_topbar')) {
       classes.push('notopbar');
-    }
-
-    var key = getter('key');
-
-    if (key === UDACITY_KEY || key === EMBIBE_KEY) {
-      setter('address', true);
     }
 
     if (getStore('isPartialPayment')) {
