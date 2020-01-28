@@ -3911,16 +3911,11 @@ Session.prototype = {
     var form = this.tab || 'common';
     // TODO: get rid of this
     if (form === 'emi') {
-      var whichCardTab = 'add-card';
-      if (this.svelteCardTab.isOnSavedCardsScreen()) {
-        whichCardTab = 'saved-cards';
-      }
-
       if (form === 'emi' && this.screen === 'emi') {
-        whichCardTab = 'add-emi';
+        return '#add-emi-container';
+      } else {
+        form = 'card';
       }
-
-      return '#' + whichCardTab + '-container';
     }
     if (form === 'emandate') {
       form = 'netbanking';
