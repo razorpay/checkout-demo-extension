@@ -110,12 +110,10 @@
 
   function handleInputFocus(event) {
     focused = true;
-    dispatch('focus', event.detail);
   }
 
   function handleInputBlur(event) {
     focused = false;
-    dispatch('blur', event.detail);
   }
 
   export function focus() {
@@ -182,6 +180,8 @@
     use:inputAction={handleInput}
     on:focus={handleInputFocus}
     on:blur={handleInputBlur}
+    on:focus
+    on:blur
     on:input
     class:no-refresh={!refresh}
     class:no-focus={handleFocus}
