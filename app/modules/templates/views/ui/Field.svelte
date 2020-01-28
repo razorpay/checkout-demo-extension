@@ -1,7 +1,4 @@
 <script>
-  // Svelte imports
-  import { createEventDispatcher } from 'svelte';
-
   // Utils imports
   import { getSession } from 'sessionmanager';
   import Track from 'tracker';
@@ -51,8 +48,6 @@
   let formatterObj = null;
 
   const session = getSession();
-
-  const dispatch = createEventDispatcher();
 
   export function getCaretPosition() {
     return formatterObj.caretPosition;
