@@ -5692,6 +5692,11 @@ Session.prototype = {
       this.otpView.updateScreen({
         maxlength: 4,
       });
+    } else if (this.headless) {
+      // OTP of length 8 is only required for Headless OTP.
+      this.otpView.updateScreen({
+        maxlength: 8,
+      });
     } else {
       this.otpView.updateScreen({
         maxlength: 6,
