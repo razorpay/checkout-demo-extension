@@ -231,7 +231,7 @@ function setEmiPlansCta(screen, tab) {
       var savedCard = $('.saved-card.checked');
 
       if (savedCard[0]) {
-        if (!savedCard.$('.saved-cvv').val()) {
+        if (!savedCard.$('.saved-cvv input').val()) {
           type = 'select';
         }
       }
@@ -3682,7 +3682,7 @@ Session.prototype = {
         var plans = (emi_options.banks[bank] || {}).plans;
         var emiPlans = self.getEmiPlans(bank);
         var $savedCard = $('.saved-card.checked');
-        var savedCvv = $savedCard.$('.saved-cvv').val();
+        var savedCvv = $savedCard.$('.saved-cvv input').val();
 
         if (self.isOfferApplicableOnIssuer(bank)) {
           amount = self.getDiscountedAmount();
@@ -4489,7 +4489,7 @@ Session.prototype = {
           ) {
             // no saved card was selected
             this.shake();
-            return $('.checked .saved-cvv').focus();
+            return $('.checked .saved-cvv input').focus();
           }
         }
 
