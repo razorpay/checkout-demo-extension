@@ -77,6 +77,7 @@
     position: absolute;
     right: 4px;
     top: 30px;
+    bottom: 0;
     width: 24px;
   }
 </style>
@@ -88,7 +89,6 @@
     </div>
   {/if}
   <!-- TODO: handle readonly -->
-  <!-- TODO: Fix invalid class not being applied -->
   <Field
     {id}
     formatter={{ type: 'card' }}
