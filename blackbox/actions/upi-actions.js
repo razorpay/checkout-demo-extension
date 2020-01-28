@@ -35,6 +35,29 @@ async function respondToUPIAjax(context, { method } = {}, offerId = '') {
     },
   });
 }
+async function handleSaveVpaRequest(context, { method } = {}, offerId = '') {
+  let typeValue = 'async';
+  let dataValue = null;
+
+  const req = await context.expectRequest();
+  if (offerId != '') expect(req.body).toContain(offerId);
+  if (context.preferences.customer) expect(req.body).toContain('save=1');
+  expect(req.url).toContain('create/ajax');
+
+  await context.respondJSON({
+    type: typeValue,
+    version: 1,
+    payment_id: 'pay_DaaBCIH1rZXZg5',
+    gateway:
+      'eyJpdiI6IlFOYUo1WEY1WWJmY1FHWURKdmpLeUE9PSIsInZhbHVlIjoiQlhXRTFNcXZKblhxSzJRYTBWK1pMc2VLM0owWUpLRk9JWTZXT04rZlJYRT0iLCJtYWMiOiIxZjk5Yjc5ZmRlZDFlNThmNWQ5ZTc3ZDdiMTMzYzU0ZmRiOTIxY2NlM2IxYjZlNjk5NDEzMGUzMzEzOTA1ZGEwIn0',
+    data: dataValue,
+    request: {
+      url:
+        'https://api.razorpay.com/v1/payments/pay_DaaBCIH1rZXZg5/status?key_id=rzp_test_1DP5mmOlF5G5ag',
+      method: 'GET',
+    },
+  });
+}
 
 async function respondToUPIAjaxWithFailure(context) {
   const req = await context.expectRequest();
@@ -73,27 +96,47 @@ async function handleUPIAccountValidation(context, vpa, accountexists = true) {
   await context.respondJSON({ vpa: vpa, success: true, customer_name: null });
 }
 
+async function handleSavedTokenValidation(context, vpa, accountexists = true) {
+  const req = await context.expectRequest();
+  expect(req.url).toContain('create/ajax');
+  await context.respondJSON({ vpa: vpa, success: true, customer_name: null });
+}
+
 async function selectUPIMethod(context, UPIMethod) {
   let tokenSelector = null;
+  let elementToBeVisible = null;
 
   switch (UPIMethod) {
     case 'omnichannel':
       tokenSelector = 'gpay-omnichannel';
+      elementToBeVisible = 'gpay-phone';
       break;
-
+    case 'new':
+      tokenSelector = 'new-vpa-field';
+      elementToBeVisible = 'new-vpa-input';
+      break;
+    case 'token':
+      tokenSelector = 'upi-svelte-wrap .slotted-radio';
+      elementToBeVisible = 'footer';
+      break;
     default:
       break;
   }
   let selectedUPI = await context.page.waitForSelector('#' + tokenSelector);
   await selectedUPI.click();
-  return await context.page.waitForSelector('#gpay-phone', {
+  return await context.page.waitForSelector('#' + elementToBeVisible, {
     visible: true,
   });
 }
 
 async function enterUPIAccount(context, UPIAccountId) {
-  const vpaField = await context.page.waitForSelector('#vpa');
+  const vpaField = await context.page.waitForSelector('#new-vpa-input');
   await vpaField.type(UPIAccountId);
+  if (!context.preferences.customer) return;
+  const rememberMeCheckbox = await context.page.waitForSelector(
+    '#should-save-vpa'
+  );
+  await rememberMeCheckbox.click();
 }
 
 async function selectBankNameFromGooglePayDropDown(context, valuetoBeSelected) {
@@ -120,4 +163,6 @@ module.exports = {
   verifyOmnichannelPhoneNumber,
   enterOmnichannelPhoneNumber,
   respondToUPIAjaxWithFailure,
+  handleSaveVpaRequest,
+  handleSavedTokenValidation,
 };

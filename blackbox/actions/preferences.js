@@ -86,6 +86,8 @@ module.exports = {
         email: randomEmail(),
         contact: randomContact(),
         tokens: {
+          count: 2,
+          entity: 'collection',
           items: [
             {
               token: 'token_' + randomId(),
@@ -97,6 +99,29 @@ module.exports = {
                 issuer: randomItem(Object.keys(netbanking)),
                 international: randomBool(),
               },
+            },
+            {
+              auth_type: null,
+              bank: null,
+              created_at: 1579513972,
+              entity: 'token',
+              id: 'token_E6ggSqoaxSnzQc',
+              method: 'upi',
+              mrn: null,
+              recurring: false,
+              recurring_details: {
+                status: 'not_applicable',
+                failure_reason: null,
+              },
+              start_time: null,
+              token: 'BrLOcWE6Mu9kLB',
+              used_at: 1579513972,
+              vpa: {
+                username: 'saranshgupta1995',
+                handle: 'okhdfcbank',
+                name: null,
+              },
+              wallet: null,
             },
           ],
         },
