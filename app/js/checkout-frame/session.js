@@ -3403,8 +3403,9 @@ Session.prototype = {
     }
 
     if (tab === 'card' || (tab === 'emi' && this.screen !== 'emi')) {
+      // If we are switching from home tab, the customer might have changed.
       if (this.screen === '') {
-        this.svelteCardTab.showLandingView();
+        this.svelteCardTab.updateCustomerAndShowLandingView(this.customer);
       }
       this.showCardTab(tab);
       setEmiPlansCta(this.screen, tab);

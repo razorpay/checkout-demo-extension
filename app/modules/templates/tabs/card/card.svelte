@@ -65,10 +65,6 @@
     $cardExpiry = session.get('prefill.card[expiry]') || '';
     $cardName = session.get('prefill.name') || '';
     $cardCvv = session.get('prefill.card[cvv]') || '';
-
-    // Set customer and show landing screen
-    const customer = session.getCustomer($contact);
-    updateCustomerAndShowLandingView(customer);
   });
 
   $: {
@@ -112,6 +108,14 @@
 
   $: {
     lastSavedCard = savedCards && savedCards[savedCards.length - 1];
+  }
+
+  $: {
+    // TODO: find a better way
+    // Remove selected offer every time the view changes.
+    if (currentView) {
+      session.removeOfferSelectedFromDrawer();
+    }
   }
 
   function getSavedCardsFromCustomer(customer = {}) {
