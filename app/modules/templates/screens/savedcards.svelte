@@ -39,7 +39,7 @@
    * @param card
    */
   function handleOffersForSavedCard(card) {
-    if (session.offers && !this.offers.offerSelectedByDrawer) {
+    if (session.offers && !session.offers.offerSelectedByDrawer) {
       session.offers.removeOffer();
     }
 
