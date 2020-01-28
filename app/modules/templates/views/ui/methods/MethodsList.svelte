@@ -21,6 +21,7 @@
   import CheckoutStore from 'checkoutstore';
   import PreferencesStore from 'checkoutstore/preferences';
   import { hasAnyInstrumentsOnDevice } from 'checkoutframe/personalization';
+  import { getSavedCards } from 'common/token.js';
 
   // Props
   export let instruments = [];
@@ -203,7 +204,7 @@
             break;
           case 'card':
             if (customer) {
-              var cards = (customer.tokens || {}).items || [];
+              var cards = getSavedCards(customer.tokens || {}).items || [];
               var tokenObj = _Arr.find(
                 cards,
                 x => x.id === instrument.token_id

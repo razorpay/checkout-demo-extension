@@ -276,7 +276,11 @@
         break;
 
       default:
-        data = { token: selectedToken };
+        const _token = _Arr.find(
+          session.customer.tokens.items,
+          token => token.id === selectedToken
+        );
+        data = { token: _token.token };
         break;
     }
 
@@ -500,7 +504,6 @@
           <div class="border-list">
             <SlottedRadioOption
               name="google_pay_wpa"
-              value="partial"
               selected={selectedToken === 'gpay'}
               on:click={_ => {
                 onUpiAppSelection({ detail: { id: 'gpay' } });
@@ -517,7 +520,6 @@
           {#each tokens as app, i}
             <SlottedRadioOption
               name="payment_type"
-              value="partial"
               selected={selectedToken === app.id}
               on:click={_ => {
                 selectedToken = app.id;

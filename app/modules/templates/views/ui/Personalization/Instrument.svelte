@@ -70,7 +70,14 @@
             alt = 'UPI App';
           }
         } else {
-          vpaSplit = instrument.vpa.split('@');
+          vpaSplit = instrument.vpa
+            ? instrument.vpa.split('@')
+            : (() => {
+                let vpaDetails = session.preferences.customer.tokens.items.find(
+                  item => item.id === instrument.token
+                ).vpa;
+                return [vpaDetails.username, vpaDetails.handle];
+              })();
           text = `UPI - ${vpaSplit[0]}@${vpaSplit[1]}`;
           icon = '&#xe70e;';
           alt = 'UPI';

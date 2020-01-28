@@ -16,7 +16,7 @@ const INSTRUMENT_PROPS = {
   card: 'token',
   wallet: 'wallet',
   netbanking: 'bank',
-  upi: ['_[flow]', 'vpa', 'upi_app', '_[upiqr]'],
+  upi: ['_[flow]', 'vpa', 'upi_app', '_[upiqr]', 'token'],
   paypal: [],
 };
 
@@ -85,6 +85,32 @@ function getExtractedDetails(payment, customer, extra = {}) {
     }
   }
 
+  /**
+   * If we are using a VPA token,
+   * we want to generate the VPA from the token details
+   * and store it in the instrument so that we can show the VPA in UI
+   */
+  if (payment.method === 'upi') {
+    if (payment.token && customer) {
+      let tokens = (customer.tokens || {}).items || [];
+      let token = _Arr.find(tokens, token => token.token === details.token);
+
+      if (!token) {
+        return;
+      }
+
+      details.token_id = token.id;
+      delete details.token;
+
+      let vpaDetails = token.vpa;
+
+      // Create a VPA from the token, if the VPA does not exist
+      if (!details.vpa) {
+        details.vpa = `${vpaDetails.username}@${vpaDetails.handle}`;
+      }
+    }
+  }
+
   if (payment.upi_app) {
     let app = _Arr.find(
       upi_intents_data,
@@ -134,6 +160,47 @@ export function createInstrumentFromPayment(payment, customer, extra) {
   return createInstrumentFromExtracted(extracted);
 }
 
+const MAPPERS = {
+  upi: (extracted, instruments) => {
+    const vpa = extracted.vpa;
+
+    if (!vpa) {
+      return MAPPERS.default(extracted, instruments);
+    }
+
+    // Find an instrument with the same VPA
+    const existingInstrumentWithVpa = _Arr.find(
+      instruments,
+      instrument => instrument.vpa === vpa
+    );
+
+    // Add token to the existing instrument if it doesn't have a token already
+    if (
+      existingInstrumentWithVpa &&
+      extracted.token_id &&
+      !existingInstrumentWithVpa.token_id
+    ) {
+      existingInstrumentWithVpa.token_id = extracted.token_id;
+    }
+
+    return existingInstrumentWithVpa;
+  },
+
+  default: (extracted, instruments) => {
+    return _Arr.find(instruments, instrument => {
+      let same = true;
+
+      _Obj.loop(extracted, (val, key) => {
+        if (instrument[key] !== val) {
+          same = false;
+        }
+      });
+
+      return same;
+    });
+  },
+};
+
 /**
  * Returns an instrument matching the payload.
  * If one doesn't exist, creates a new instrument.
@@ -151,17 +218,11 @@ function getOrCreateInstrument(instruments, payment, customer, extra) {
     return;
   }
 
-  const existing = _Arr.find(instruments, item => {
-    let same = true;
+  const method = payment.method;
 
-    _Obj.loop(extracted, (val, key) => {
-      if (item[key] !== val) {
-        same = false;
-      }
-    });
+  const mapper = MAPPERS[method] || MAPPERS.default;
 
-    return same;
-  });
+  const existing = mapper(extracted, instruments);
 
   if (existing) {
     return existing;
@@ -352,19 +413,20 @@ export function addInstrumentToPaymentData(payment, instrument, customer) {
     }
   });
 
-  // Add token to saved card instrument
-  if (payment.method === 'card') {
-    if (customer && customer.tokens && customer.tokens.items) {
-      const token = _Arr.find(
-        customer.tokens.items,
-        token => token.id === instrument.token_id
-      );
+  // Add token to saved card and saved vpa instrument
+  if (_Arr.contains(['card', 'upi'], payment.method)) {
+    const tokens = customer && _Obj.getSafely(customer, 'tokens.items', []);
 
-      if (token) {
-        payment.token = token.token;
-        added = true;
-      }
+    const token = _Arr.find(tokens, token => token.id === instrument.token_id);
+
+    if (token) {
+      payment.token = token.token;
+      added = true;
     }
+  }
+
+  if (payment.method === 'upi' && payment.token) {
+    delete payment.vpa;
   }
 
   return added;
