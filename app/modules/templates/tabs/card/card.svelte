@@ -251,11 +251,10 @@
     var emiObj;
 
     if (sixDigits && !isMaestro) {
-      emiObj = _Obj
-        .entries(emi_options.banks)
-        .find(([bank, emiObjInner]) =>
-          emiObjInner.patt.test(cardNumber.replace(/ /g, ''))
-        );
+      const emiBanks = _Obj.entries(emi_options.banks);
+      emiObj = _Arr.find(emiBanks, ([bank, emiObjInner]) =>
+        emiObjInner.patt.test(cardNumber.replace(/ /g, ''))
+      );
     }
 
     session.emiPlansForNewCard = emiObj && emiObj[1];
