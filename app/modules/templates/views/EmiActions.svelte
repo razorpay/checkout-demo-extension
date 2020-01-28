@@ -64,7 +64,7 @@
           <div class="emi-plans-text no-action">
             Pay entire amount
             {#if savedCount}
-              <span class="count-text">( {savedCount} cards available )</span>
+              <span class="count-text">({savedCount} cards available)</span>
             {/if}
           </div>
           <div class="emi-plans-action theme-highlight" />
