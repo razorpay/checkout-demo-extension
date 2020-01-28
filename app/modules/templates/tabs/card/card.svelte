@@ -419,11 +419,13 @@
             {tab}
             bind:this={addCardView}
             on:cardinput={onCardInput} />
-          <EmiActions
-            {showEmiCta}
-            {emiCtaView}
-            savedCount={allSavedCards.length}
-            on:click={handleEmiCtaClick} />
+          {#if showEmiCta}
+            <EmiActions
+              {showEmiCta}
+              {emiCtaView}
+              savedCount={allSavedCards.length}
+              on:click={handleEmiCtaClick} />
+          {/if}
         </div>
       {:else}
         <div in:fade={{ duration: 100 }}>
