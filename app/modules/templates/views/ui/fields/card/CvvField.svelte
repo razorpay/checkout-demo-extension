@@ -3,20 +3,38 @@
 
   export let ref = null;
 
-  function getCvvDigits(type) {
-    return type === 'amex' ? 4 : 3;
-  }
-
   function handleInput(event) {
     value = event.target.value;
   }
 
-  export let cardType = null;
   export let value = '';
   export let id;
+  export let length = 3;
+  export let showPlaceholder = false; // Turns label into placeholder
+  export let showHelp = true;
 
-  let cvvLength = 3;
   let cvvPattern = '[0-9]{3}';
+  let helpText = `It's a ${length} digit code printed on the back of your card.`;
+  let placeholder;
+  let label;
+
+  $: {
+    if (showHelp) {
+      helpText = `It's a ${length} digit code printed on the back of your card.`;
+    } else {
+      helpText = null;
+    }
+  }
+
+  $: {
+    if (showPlaceholder) {
+      label = null;
+      placeholder = 'CVV';
+    } else {
+      label = 'CVV';
+      placeholder = null;
+    }
+  }
 
   $: {
     cvvLength = getCvvDigits(cardType);
@@ -50,14 +68,15 @@
 <!-- TODO: make helpText support an image as well -->
 <Field
   formatter={{ type: 'number' }}
-  helpText="It's a {cvvLength} digit code printed on the back of your card."
+  {helpText}
   {id}
+  {label}
+  {placeholder}
   name="card[cvv]"
-  label="CVV"
   pattern={cvvPattern}
   required
-  type="tel"
-  maxlength={cvvLength}
+  type="cvv"
+  maxlength={length}
   {value}
   bind:this={ref}
   on:input={handleInput}

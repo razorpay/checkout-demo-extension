@@ -46,6 +46,7 @@
   let noCvvChecked = false;
   let showNoCvvCheckbox = false;
   let hideExpiryCvvFields = false;
+  let cvvLength = 3;
 
   $: {
     if ($cardType) {
@@ -55,6 +56,10 @@
 
   $: {
     hideExpiryCvvFields = showNoCvvCheckbox && noCvvChecked;
+  }
+
+  $: {
+    cvvLength = getCvvDigits($cardType);
   }
 
   export let tab;
@@ -198,6 +203,10 @@
     dispatch('cardinput');
   }
 
+  function getCvvDigits(type) {
+    return type === 'amex' ? 4 : 3;
+  }
+
   function trackRememberChecked(event) {
     Analytics.track('card:save:change', {
       type: AnalyticsTypes.BEHAV,
@@ -272,7 +281,7 @@
         <CvvField
           id="card_cvv"
           bind:value={$cardCvv}
-          cardType={$cardType}
+          length={cvvLength}
           bind:this={cvvField} />
       </div>
     {/if}
