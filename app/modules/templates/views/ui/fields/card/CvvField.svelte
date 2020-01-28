@@ -16,7 +16,7 @@
   export let id;
 
   let cvvLength = 3;
-  let cvvPattern = '[0-9]{3}}';
+  let cvvPattern = '[0-9]{3}';
 
   $: {
     cvvLength = getCvvDigits(cardType);
