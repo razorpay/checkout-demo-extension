@@ -22,6 +22,8 @@
     cardType,
   } from 'checkoutstore/screens/card';
 
+  import CheckoutStore from 'checkoutstore';
+
   // Utils
   import { getSession } from 'sessionmanager';
   import Analytics from 'analytics';
@@ -38,8 +40,7 @@
   let nameField = null;
   let cvvField = null;
 
-  const nameReadonly =
-    session.get('readonly.name') && session.get('prefill.name');
+  const nameReadonly = CheckoutStore.get().readonly.name;
 
   const showRememberCardCheck = !session.recurring;
 
