@@ -140,7 +140,7 @@
               <div class="emi-plans-text">{$selectedPlanTextForSavedCard}</div>
               <div class="emi-plans-action theme-highlight">Edit</div>
             </div>
-          {:else}
+          {:else if tab !== 'emi'}
             <div class="emi-plan-unselected emi-icon-multiple-cards">
               <div class="emi-plans-text">EMI Available</div>
               <div class="emi-plans-action theme-highlight">Pay with EMI</div>
