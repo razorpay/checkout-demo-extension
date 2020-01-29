@@ -135,11 +135,7 @@
 </script>
 
 <style>
-  /*
-   * TODO: standardize / fix padding
-   */
   div:not(.help) {
-    /*padding: 4px 0;*/
     input {
       opacity: 1;
       width: 100%;
