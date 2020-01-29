@@ -261,6 +261,7 @@
       <div class="third">
         <ExpiryField
           id="card_expiry"
+          name="card[expiry]"
           bind:value={$cardExpiry}
           bind:this={expiryField}
           on:filled={_ => handleFilled('expiryField')} />
