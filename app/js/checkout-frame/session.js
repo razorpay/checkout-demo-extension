@@ -3405,8 +3405,9 @@ Session.prototype = {
     }
 
     if (tab === 'card' || (tab === 'emi' && this.screen !== 'emi')) {
-      // If we are switching from home tab, the customer might have changed.
-      if (this.screen === '') {
+      // If we are switching from home tab or cardless emi tab (after choosing
+      // "EMI on Cards"), the customer might have changed.
+      if (this.screen === '' || this.screen === 'cardless_emi') {
         this.svelteCardTab.updateCustomerAndShowLandingView(this.customer);
       }
       this.showCardTab(tab);
