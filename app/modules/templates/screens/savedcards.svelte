@@ -45,13 +45,13 @@
 
     // If EMI is supported on saved card
     if (session.tab === 'emi' && card.plans) {
-      var issuer = card.card.issuer;
-      var duration = savedCardEmiDuration;
+      const issuer = card.card.issuer;
+      const duration = savedCardEmiDuration;
 
       // Set offer in case it is applicable.
       if (issuer && duration) {
-        var emi_options = this.emi_options;
-        var plans = (emi_options.banks[issuer] || {}).plans;
+        const emi_options = session.emi_options;
+        const plans = (emi_options.banks[issuer] || {}).plans;
 
         if (
           plans &&
