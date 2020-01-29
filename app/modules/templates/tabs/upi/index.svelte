@@ -306,8 +306,19 @@
     return false;
   }
 
-  //TODO check web payments api
   export function onUpiAppSelection(event) {
+    Analytics.track('vpa:option:click', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        app: event.detail.app,
+        value:
+          {
+            gpay: 'gpay web payments',
+            'gpay-omni': 'gpay omnichannel',
+            new: 'add new',
+          }[event.detail.id] || 'saved vpa',
+      },
+    });
     const id = event.detail.id;
     selectedToken = id;
     intentAppSelected = event.detail.app || null;
