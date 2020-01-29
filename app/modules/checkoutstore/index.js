@@ -48,7 +48,11 @@ function CheckoutStore(base) {
     storeState.isPartialPayment =
       preferences.order && preferences.order.partial_payment;
 
-    storeState.address = session.get('address');
+    storeState.address = _Obj.getSafely(
+      preferences,
+      'features.customer_address',
+      false
+    );
 
     storeState.contactEmailOptional =
       storeState.optional.contact && storeState.optional.email;

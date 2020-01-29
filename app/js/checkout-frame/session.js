@@ -936,9 +936,6 @@ function cancel_upi(session) {
   });
 }
 
-var UDACITY_KEY = 'rzp_live_z1RZhOg4kKaEZn';
-var EMBIBE_KEY = 'rzp_live_qqfsRaeiWx5JmS';
-
 var IRCTC_KEYS = [
   'rzp_test_mZcDnA8WJMFQQD',
   'rzp_live_ENneAQv5t7kTEQ',
@@ -1071,16 +1068,6 @@ Session.prototype = {
       classes.push('notopbar');
     }
 
-    var key = getter('key');
-
-    if (key === UDACITY_KEY || key === EMBIBE_KEY) {
-      setter('address', true);
-    }
-
-    if (getStore('isPartialPayment')) {
-      classes.push('partial');
-    }
-
     if (this.irctc) {
       tab_titles.upi = 'BHIM/UPI';
       tab_titles.card = 'Debit/Credit Card';
@@ -1097,7 +1084,6 @@ Session.prototype = {
 
     if (this.methods.emi) {
       tab_titles.card = 'Card';
-      classes.push('emi-method');
     }
 
     if (getter('ecod')) {
