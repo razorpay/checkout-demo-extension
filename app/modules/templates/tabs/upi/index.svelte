@@ -80,11 +80,6 @@
   } = session;
 
   const checkGPay = session => {
-    const hasFeature =
-      session.preferences &&
-      session.preferences.features &&
-      session.preferences.features.google_pay;
-
     /* disable Web payments API for fee_bearer for now */
     if (session.preferences.fee_bearer) {
       return Promise.reject();
@@ -97,11 +92,6 @@
 
     /* disable Web payments API for Android SDK as we have intent there */
     if (Bridge.checkout.exists()) {
-      return Promise.reject();
-    }
-
-    /* disable it if it's not enabled for a specific merchant */
-    if (!hasFeature) {
       return Promise.reject();
     }
 
@@ -166,9 +156,13 @@
   onMount(() => {
     checkGPay(session)
       /* Use Google Pay */
-      .then(() => (useWebPaymentsApi = true))
+      .then(() => {
+        useWebPaymentsApi = true;
+      })
       /* Don't use Google Pay */
-      .catch(() => (useWebPaymentsApi = false));
+      .catch(e => {
+        useWebPaymentsApi = false;
+      });
 
     useOmnichannel = checkOmnichannel(session);
 
@@ -272,6 +266,11 @@
           '_[flow]': 'intent',
           contact: omnichannelField.getPhone(),
           upi_provider: 'google_pay',
+        };
+        break;
+      case 'gpay':
+        data = {
+          '_[flow]': 'gpay',
         };
         break;
 
@@ -500,13 +499,14 @@
             {showRecommendedUPIApp} />
         {/if}
         {#if useWebPaymentsApi}
-          <div class="legend left">PAY USING UPI ID</div>
+          <div class="legend left">PAY USING THE GPAY APP</div>
           <div class="border-list">
             <SlottedRadioOption
               name="google_pay_wpa"
               selected={selectedToken === 'gpay'}
               on:click={_ => {
-                onUpiAppSelection({ detail: { id: 'gpay' } });
+                selectedToken = 'gpay';
+                session.preSubmit();
               }}>
               <div slot="title">Google Pay</div>
               <i slot="icon">
