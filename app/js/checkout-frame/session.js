@@ -4992,7 +4992,7 @@ Session.prototype = {
           shouldUseNativeOTP = true;
         }
       } else if (data.method === 'emi') {
-        if (cardType === 'bajaj') {
+        if (cardType === 'bajaj' && this.r.isLiveMode()) {
           shouldUseNativeOTP = true;
 
           BackStore = {
