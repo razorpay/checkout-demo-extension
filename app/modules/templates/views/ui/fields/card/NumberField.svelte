@@ -23,7 +23,6 @@
 
   function handleInput(e) {
     value = e.target.value;
-    dispatch('input', e.detail);
     dispatchFilledIfValid();
   }
 
@@ -102,7 +101,8 @@
     handleBlur
     handleFocus
     handleInput
-    on:blur
     bind:this={field}
-    on:input={handleInput} />
+    on:blur
+    on:input={handleInput}
+    on:input />
 </div>
