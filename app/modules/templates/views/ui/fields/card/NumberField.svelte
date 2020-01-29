@@ -1,6 +1,8 @@
 <script>
+  // Svelte imports
   import { createEventDispatcher } from 'svelte';
 
+  // UI Imports
   import Field from 'templates/views/ui/Field.svelte';
   import Icon from 'templates/views/ui/Icon.svelte';
 
@@ -87,7 +89,6 @@
       <Icon icon={getIcon(type)} />
     </div>
   {/if}
-  <!-- TODO: handle readonly -->
   <Field
     {id}
     formatter={{ type: 'card' }}
