@@ -71,6 +71,23 @@
   let rememberVpaCheckbox;
   let intentAppSelected = null;
 
+  const handleMap = {
+    UTIB_C: ['@pingpay', '@axisbank', '@apl', '@axisb', '@abfspay', '@okaxis'],
+    'Federal Bank': ['@fbl'],
+    'HDFC Bank': ['@hdfcbankjd', '@ikwik'],
+    'IDFC Bank': ['@idfcbank'],
+    'IndusInd Bank': ['@indus'],
+    'Yes Bank': ['@ybl', '@yesbank'],
+    ICIC_C: ['@icicibank', '@myicici', '@icici'],
+    KKBK: ['@kmbl'],
+  };
+
+  const getBankLogoFromHandle = handle => {
+    for (let bank in handleMap) {
+      if (handleMap[bank].includes(handle)) return bank;
+    }
+  };
+
   const session = getSession();
   const {
     all_upi_intents_data: allIntentApps,
@@ -196,41 +213,6 @@
   export function onShown() {
     if (!session.customer.tokens) return;
     tokens = getSavedVPA(session.customer.tokens.items);
-    // session.customer.tokens.count = 3;
-    // tokens.push(
-    //   {
-    //     auth_type: null,
-    //     bank: null,
-    //     card: null,
-    //     created_at: 1575890449,
-    //     entity: 'token',
-    //     expired_at: 1701368999,
-    //     id: 'token_Dq5kK5crQ1WLab',
-    //     method: 'upi',
-    //     mrn: null,
-    //     recurring: false,
-    //     token: '6VPEIb26rcmEOv',
-    //     used_at: 1575954761,
-    //     wallet: null,
-    //     vpa: 'saranshgupta1995@okaxis',
-    //   },
-    //   {
-    //     auth_type: null,
-    //     bank: null,
-    //     card: null,
-    //     created_at: 1575890449,
-    //     entity: 'token',
-    //     expired_at: 1701368999,
-    //     id: 'token_Dq5kK5crQ1WLabiuy',
-    //     method: 'upi',
-    //     mrn: null,
-    //     recurring: false,
-    //     token: '6VPEIb26rcmEOv',
-    //     used_at: 1575954761,
-    //     wallet: null,
-    //     vpa: 'saranshgupta1995@okhdfc',
-    //   }
-    // );
   }
 
   export function getPayload() {
@@ -343,41 +325,12 @@
     // });
   }
 
-  // export function focusVpa() {
-  //   if (!focused && vpaField) {
-  //     if (useOmnichannel && selectedApp === 'gpay') {
-  //       omnichannelField.focus();
-  //     } else {
-  //       vpaField.focus();
-  //     }
-  //   }
-  // }
-
   export function getFullVpa() {
     if (vpaField) {
       return vpaField.getVpa();
     }
     return '';
   }
-
-  // export function trackVpaEntry() {
-  //   const vpa = getFullVpa();
-
-  //   if (!vpa) {
-  //     return;
-  //   }
-
-  //   const valid = isVpaValid(vpa);
-
-  //   Analytics.track('vpa:fill', {
-  //     type: AnalyticsTypes.BEHAV,
-  //     data: {
-  //       app: selectedApp,
-  //       value: vpa,
-  //       valid,
-  //     },
-  //   });
-  // }
 
   export function trackHandleSelection(event) {
     const handle = event.detail;
@@ -528,7 +481,8 @@
               <div slot="title">{app.vpa.username + '@' + app.vpa.handle}</div>
               <i slot="icon">
                 <!-- Check if we can reversemap from handle to handle image -->
-                <Icon icon="https://cdn.razorpay.com/bank/SBIN.gif" />
+                <Icon
+                  icon={`https://cdn.razorpay.com/bank/${getBankLogoFromHandle('@' + app.vpa.handle)}.gif`} />
               </i>
             </SlottedRadioOption>
           {/each}
