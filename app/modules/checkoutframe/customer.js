@@ -76,12 +76,6 @@ Customer.prototype = {
       _Doc.querySelector('#top-right') |> _El.addClass('logged');
     }
 
-    if (session.methodsList) {
-      session.methodsList.set({
-        customer: this,
-      });
-    }
-
     Analytics.setMeta('loggedIn', true);
   },
 
@@ -222,12 +216,6 @@ Customer.prototype = {
     ajaxOpts.url += '&logout=' + (this_device ? 'app' : 'all');
 
     fetch.setSessionId(null);
-
-    if (session.methodsList) {
-      session.methodsList.set({
-        customer: this,
-      });
-    }
 
     Analytics.removeMeta('loggedIn');
     fetch(ajaxOpts);

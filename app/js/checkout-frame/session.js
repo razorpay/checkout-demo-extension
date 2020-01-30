@@ -41,7 +41,8 @@ var preferences = window.preferences,
   OtpService = discreet.OtpService,
   storeGetter = discreet.storeGetter,
   HomeScreenStore = discreet.HomeScreenStore,
-  Cta = discreet.Cta;
+  Cta = discreet.Cta,
+  NBHandlers = discreet.NBHandlers;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -615,28 +616,6 @@ function getEmiText(session, amount, plan) {
   );
 }
 
-/**
- * Makes the container long if not already long.
- *
- * @return {Boolean} madeLong?
- */
-function makeContainerLong() {
-  var LONG_CLASSES = ['long', 'x-long'];
-  var container = $('#container');
-
-  var isAlreadyLong = _Arr.any(LONG_CLASSES, function(className) {
-    return container.hasClass(className);
-  });
-
-  if (isAlreadyLong) {
-    return false;
-  }
-
-  container.addClass(LONG_CLASSES[0]);
-
-  return true;
-}
-
 function overlayVisible() {
   return $('#overlay').hasClass(shownClass);
 }
@@ -759,29 +738,7 @@ function errorHandler(response) {
     }
   }
 
-  checkIfCorpNetbanking(this, message);
-}
-
-function checkIfCorpNetbanking(session, message) {
-  // If error code exists and matches the string, removed the retry button
-  // and replaces it with ok button, which closes checkout.
-  if (
-    message ===
-    'Payment is pending authorization. Request for authorization from approver.'
-  ) {
-    session.isCorporateBanking = true;
-    $('#fd-hide').remove();
-    var okButton = document.createElement('button');
-    okButton.id = 'fd-ok';
-    okButton.className = 'btn';
-    okButton.innerText = 'OK';
-    $('#error-message').append(okButton);
-    $('#fd-ok').on('click', function() {
-      session.hide();
-    });
-  } else {
-    $('#fd-hide').focus();
-  }
+  NBHandlers.replaceRetryIfCorporateNetbanking(this, message);
 }
 
 /* bound with session */
@@ -979,9 +936,6 @@ function cancel_upi(session) {
   });
 }
 
-var UDACITY_KEY = 'rzp_live_z1RZhOg4kKaEZn';
-var EMBIBE_KEY = 'rzp_live_qqfsRaeiWx5JmS';
-
 var IRCTC_KEYS = [
   'rzp_test_mZcDnA8WJMFQQD',
   'rzp_live_ENneAQv5t7kTEQ',
@@ -1114,21 +1068,9 @@ Session.prototype = {
       classes.push('notopbar');
     }
 
-    var key = getter('key');
-
-    if (key === UDACITY_KEY || key === EMBIBE_KEY) {
-      classes.push('address');
-      setter('address', true);
-    }
-
-    if (getStore('isPartialPayment')) {
-      classes.push('partial');
-    }
-
     if (this.irctc) {
       tab_titles.upi = 'BHIM/UPI';
       tab_titles.card = 'Debit/Credit Card';
-      classes.push('long');
       this.r.set('theme.image_frame', false);
     }
 
@@ -1142,11 +1084,6 @@ Session.prototype = {
 
     if (this.methods.emi) {
       tab_titles.card = 'Card';
-      classes.push('emi-method');
-    }
-
-    if (this.methods.count >= 5) {
-      classes.push('long');
     }
 
     if (getter('ecod')) {
@@ -1442,10 +1379,8 @@ Session.prototype = {
     this.completePendingPayment();
     this.bindEvents();
     this.setEmiScreen();
-
+    this.runMaxmindScript();
     Hacks.initPostRenderHacks();
-
-    makeContainerLong();
 
     errorHandler.call(this, this.params);
 
@@ -1535,6 +1470,13 @@ Session.prototype = {
       },
     });
     Analytics.setMeta('timeSince.render', discreet.timer());
+  },
+  runMaxmindScript: function() {
+    var script = _El.create('script');
+    window.maxmind_user_id = '115820';
+    script.async = true;
+    script.src = 'https://device.maxmind.com/js/device.js';
+    document.body.appendChild(script);
   },
 
   setUpiTab: function() {
@@ -2235,7 +2177,6 @@ Session.prototype = {
     this.oneMethod = methodName;
 
     $(this.el).addClass('one-method');
-    $('.payment-option').addClass('submit-button button');
   },
 
   improvisePaymentOptions: function() {
@@ -2885,15 +2826,6 @@ Session.prototype = {
       $('#form-upi.collapsible .item.expanded').removeClass('expanded');
       $(e.currentTarget).addClass('expanded');
     });
-
-    if (gel('methods-list')) {
-      this.on('click', '#methods-list', 'option', function(e) {
-        var $cvvEl = $(e.delegateTarget).$('.cvv-input');
-        if ($cvvEl) {
-          $cvvEl.focus();
-        }
-      });
-    }
   },
 
   onUpiAppSelect: function(packageName) {
@@ -3725,9 +3657,6 @@ Session.prototype = {
      */
     if (!this.tab && !this.isPayout) {
       if (!this.checkCommonValidAndTrackIfInvalid()) {
-        if (this.methodsList && this.p13n) {
-          this.methodsList.otherMethodsView.hideMethods();
-        }
         return;
       }
     }
@@ -5756,6 +5685,11 @@ Session.prototype = {
       this.otpView.updateScreen({
         maxlength: 4,
       });
+    } else if (this.headless) {
+      // OTP of length 8 is only required for Headless OTP.
+      this.otpView.updateScreen({
+        maxlength: 8,
+      });
     } else {
       this.otpView.updateScreen({
         maxlength: 6,
@@ -6036,10 +5970,6 @@ Session.prototype = {
       clearTimeout(fontTimeout);
 
       // TODO: refactor this into cleanupSvelteComponents.
-      if (this.methodsList) {
-        this.methodsList.$destroy();
-      }
-
       if (this.otpView) {
         this.otpView.$destroy();
       }
@@ -6103,7 +6033,7 @@ Session.prototype = {
       }
 
       this.tab = this.screen = '';
-      this.methodsList = this.modal = this.emi = this.el = this.card = null;
+      this.modal = this.emi = this.el = this.card = null;
       this.upiTab = this.otpView = this.netbankingTab = null;
       this.payoutsView = this.payoutsAccountView = null;
       this.savedCardsView = this.feeBearerView = this.payLaterView = null;
