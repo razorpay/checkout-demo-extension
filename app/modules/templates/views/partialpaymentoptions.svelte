@@ -36,9 +36,13 @@
   const partialDescription = session.get(
     'partial_payment.partial_amount_description'
   );
-  $partialPaymentOption = session.get('partial_payment.select_partial')
-    ? 'partial'
-    : 'full';
+
+  // Only set the value in store if nothing has already been set
+  if (!$partialPaymentOption) {
+    $partialPaymentOption = session.get('partial_payment.select_partial')
+      ? 'partial'
+      : 'full';
+  }
 
   // Computed
   let expanded = false;
