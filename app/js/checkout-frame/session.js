@@ -4485,13 +4485,8 @@ Session.prototype = {
   },
 
   removeNetbankingOfferIfNotApplicable: function(event) {
-    // If no offer was applied, return
-    if (!this.offers.appliedOffer) {
-      return;
-    }
-
     var code = event.detail.bank.code;
-    var offerIssuer = this.offers.appliedOffer.issuer;
+    var offerIssuer = _Obj.getSafely(this, 'offers.appliedOffer.issuer');
     var self = this;
 
     // If the issuer is missing, the offer should be applied regardless of the
@@ -4500,10 +4495,10 @@ Session.prototype = {
       return;
     }
 
-    if (this.offers.appliedOffer && offerIssuer !== code) {
+    if (offerIssuer !== code) {
       this.showOffersError(function(offerRemoved) {
         if (!offerRemoved) {
-          // If the offer was removed, revert to the bank in offer issuer
+          // If the offer was not removed, revert to the bank in offer issuer
           self.netbankingTab.setSelectedBank(offerIssuer);
         }
       });
