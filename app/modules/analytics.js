@@ -21,6 +21,18 @@ const calculateMeta = _m => {
   return meta;
 };
 
+const sanitizeEventData = data => {
+  const dataToMask = ['token'];
+
+  _data = _Obj.clone(data);
+
+  dataToMask.forEach(key => {
+    _data[key] = '__REDACTED__';
+  });
+
+  return _data;
+};
+
 const Analytics = () => ({
   /**
    * @param {Razorpay} r
@@ -43,7 +55,7 @@ const Analytics = () => ({
     { type, data = {}, r = rInstance, immediately = false } = {}
   ) {
     let calculatedMeta = calculateMeta(META);
-
+    data = sanitizeEventData(data);
     if (_.isNonNullObject(data)) {
       data = _Obj.clone(data);
     } else {
