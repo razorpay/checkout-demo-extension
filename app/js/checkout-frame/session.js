@@ -1539,6 +1539,11 @@ Session.prototype = {
           this.proceedAutomaticallyAfterSelectingBank.bind(this)
         );
       }
+
+      this.netbankingTab.$on(
+        'bankSelected',
+        this.removeNetbankingOfferIfNotApplicable.bind(this)
+      );
     }
   },
 
@@ -4477,6 +4482,32 @@ Session.prototype = {
     }
 
     return this.emandateView.showBankDetailsForm(bank.code);
+  },
+
+  removeNetbankingOfferIfNotApplicable: function(event) {
+    // If no offer was applied, return
+    if (!this.offers.appliedOffer) {
+      return;
+    }
+
+    var code = event.detail.bank.code;
+    var offerIssuer = this.offers.appliedOffer.issuer;
+    var self = this;
+
+    // If the issuer is missing, the offer should be applied regardless of the
+    // bank selected. Do not validate in that case.
+    if (!offerIssuer) {
+      return;
+    }
+
+    if (this.offers.appliedOffer && offerIssuer !== code) {
+      this.showOffersError(function(offerRemoved) {
+        if (!offerRemoved) {
+          // If the offer was removed, revert to the bank in offer issuer
+          self.netbankingTab.setSelectedBank(offerIssuer);
+        }
+      });
+    }
   },
 
   checkInvalid: function(parent) {
