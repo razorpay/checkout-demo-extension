@@ -1379,7 +1379,7 @@ Session.prototype = {
     this.completePendingPayment();
     this.bindEvents();
     this.setEmiScreen();
-
+    this.runMaxmindScript();
     Hacks.initPostRenderHacks();
 
     errorHandler.call(this, this.params);
@@ -1470,6 +1470,13 @@ Session.prototype = {
       },
     });
     Analytics.setMeta('timeSince.render', discreet.timer());
+  },
+  runMaxmindScript: function() {
+    var script = _El.create('script');
+    window.maxmind_user_id = '115820';
+    script.async = true;
+    script.src = 'https://device.maxmind.com/js/device.js';
+    document.body.appendChild(script);
   },
 
   setUpiTab: function() {
