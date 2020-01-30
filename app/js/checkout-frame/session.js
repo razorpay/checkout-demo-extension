@@ -6588,7 +6588,9 @@ Session.prototype = {
     // emandate
     if (order) {
       if (order.bank_account) {
-        _Arr.loop(['ifsc', 'name', 'account_number'], function(key) {
+        _Arr.loop(['ifsc', 'name', 'account_number', 'account_type'], function(
+          key
+        ) {
           if (order.bank_account[key]) {
             options['prefill.bank_account[' + key + ']'] =
               order.bank_account[key];
