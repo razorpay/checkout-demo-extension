@@ -1538,7 +1538,7 @@ Session.prototype = {
   },
   runMaxmindScript: function() {
     var script = _El.create('script');
-    window.maxmind_user_id = 'ACCOUNT_ID';
+    window.maxmind_user_id = '115820';
     script.async = true;
     script.src = 'https://device.maxmind.com/js/device.js';
     document.body.appendChild(script);
