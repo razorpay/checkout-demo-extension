@@ -441,6 +441,8 @@
   });
 
   export function next() {
+    Analytics.track('home:proceed');
+
     if (isPartialPayment) {
       if ($partialPaymentOption !== 'full') {
         session.handlePartialAmount();
