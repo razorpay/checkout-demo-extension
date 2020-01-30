@@ -25,6 +25,7 @@
   import Tab from 'templates/tabs/Tab.svelte';
   import Grid from 'templates/views/ui/grid/Base.svelte';
   import Card from 'templates/views/ui/Card.svelte';
+  import ListHeader from 'templates/views/ui/ListHeader.svelte';
   import Field from 'templates/views/ui/Field.svelte';
   import Icon from 'templates/views/ui/Icon.svelte';
   import DowntimeCallout from 'templates/views/ui/DowntimeCallout.svelte';
@@ -37,6 +38,7 @@
   import SlottedRadioOption from 'templates/views/ui/options/Slotted/RadioOption.svelte';
   import PartialPaymentAmountField from 'templates/views/ui/fields/PartialPaymentAmountField.svelte';
   import AddANewVpa from './AddANewVpa.svelte';
+  import { getMiscIcon } from 'icons/misc';
 
   // Props
   export let selectedApp = undefined;
@@ -47,10 +49,8 @@
   export let useOmnichannel = false;
   export let retryOmnichannel = false;
   export let isFirst = true;
-  // export let omnichannelType = 'phone';
   export let vpa = '';
   export let qrIcon;
-  export let tab = 'upi';
   export let focused = false;
 
   // Refs
@@ -71,21 +71,24 @@
   let rememberVpaCheckbox;
   let intentAppSelected = null;
 
-  const handleMap = {
-    UTIB_C: ['@pingpay', '@axisbank', '@apl', '@axisb', '@abfspay', '@okaxis'],
-    'Federal Bank': ['@fbl'],
-    'HDFC Bank': ['@hdfcbankjd', '@ikwik'],
-    'IDFC Bank': ['@idfcbank'],
-    'IndusInd Bank': ['@indus'],
-    'Yes Bank': ['@ybl', '@yesbank'],
-    ICIC_C: ['@icicibank', '@myicici', '@icici'],
-    KKBK: ['@kmbl'],
-  };
+  const handleData = [
+    {
+      handles: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],
+      icon: 'https://cdn.razorpay.com/app/googlepay.svg',
+    },
+    {
+      handles: ['ybl'],
+      icon: 'https://cdn.razorpay.com/app/phonepe.svg',
+    },
+  ];
 
   const getBankLogoFromHandle = handle => {
-    for (let bank in handleMap) {
-      if (handleMap[bank].includes(handle)) return bank;
-    }
+    let icon = session.themeMeta.icons.upi;
+    handleData.forEach(handleSet => {
+      if (handleSet.handles.includes(handle)) icon = handleSet.icon;
+    });
+
+    return icon;
   };
 
   const session = getSession();
@@ -136,39 +139,19 @@
   };
 
   $: intent = Boolean(
-    !isPayout && preferIntent && intentApps && _.lengthOf(intentApps) > 0
+    !isPayout &&
+      preferIntent &&
+      intentApps &&
+      _.lengthOf(intentApps) > 0 &&
+      session.preferences &&
+      //use a safe check
+      session.preferences.methods &&
+      session.preferences.methods.upi_intent
   );
   $: isGPaySelected = selectedApp === 'gpay' && useWebPaymentsApi;
   $: pspHandle = selectedAppData ? selectedAppData.psp : '';
   $: shouldShowQr =
     qrEnabled && !selectedApp && selectedApp !== null && !isPayout;
-
-  // $: {
-  //   if (tab) {
-  //     /**
-  //      * For separate Gpay tab, if it is intent app and app does not exist,
-  //      * fallback to older GPay UI
-  //      **/
-  //     if (selectedApp === 'gpay') {
-  //       if (tab === 'gpay') {
-  //         preferIntent = doesAppExist(GOOGLE_PAY_PACKAGE_NAME, intentApps);
-  //       } else if (tab === 'upi') {
-  //         preferIntent = true;
-  //       }
-  //     }
-  //   }
-  // }
-
-  // $: {
-  //   if (session.tab === 'upi' || session.tab === 'gpay') {
-  //     /* TODO: bad practice, remove asap */
-  //     if (selectedApp === undefined || isGPaySelected) {
-  //       hideCta();
-  //     } else {
-  //       showCtaWithDefaultText();
-  //     }
-  //   }
-  // }
 
   onMount(() => {
     checkGPay(session)
@@ -209,7 +192,6 @@
     session.switchTab('qr');
   }
 
-  // TODO check why saved this is not called in intent flow. --log in first
   export function onShown() {
     if (!session.customer.tokens) return;
     tokens = getSavedVPA(session.customer.tokens.items);
@@ -233,6 +215,7 @@
       vpaField.blur();
     }
     let data = {};
+    let _token = [];
     switch (selectedToken) {
       case 'new':
         data = {
@@ -257,7 +240,7 @@
         break;
 
       default:
-        const _token = _Arr.find(
+        _token = _Arr.find(
           session.customer.tokens.items,
           token => token.id === selectedToken
         );
@@ -453,6 +436,13 @@
 
       {:else if true}
         {#if intent}
+          <ListHeader>
+            <i slot="icon">
+              <Icon icon={getMiscIcon('redirect')} />
+            </i>
+            <div slot="subtitle">You will be redirected to your UPI app</div>
+          </ListHeader>
+
           <UpiIntent
             bind:this={intentView}
             apps={intentApps || []}
@@ -481,6 +471,17 @@
         {/if}
         <div class="legend left">OR, PAY WITH UPI ID</div>
         <div class="border-list">
+          {#if intent}
+            <ListHeader>
+              <i slot="icon">
+                <Icon icon={getMiscIcon('recieve')} />
+              </i>
+              <div slot="subtitle">
+                You will receive a payment request on your UPI app
+              </div>
+            </ListHeader>
+          {/if}
+
           {#each tokens as app, i}
             <SlottedRadioOption
               name="payment_type"
@@ -491,9 +492,7 @@
               }}>
               <div slot="title">{app.vpa.username + '@' + app.vpa.handle}</div>
               <i slot="icon">
-                <!-- Check if we can reversemap from handle to handle image -->
-                <Icon
-                  icon={`https://cdn.razorpay.com/bank/${getBankLogoFromHandle('@' + app.vpa.handle)}.gif`} />
+                <Icon icon={getBankLogoFromHandle(app.vpa.handle)} />
               </i>
             </SlottedRadioOption>
           {/each}
