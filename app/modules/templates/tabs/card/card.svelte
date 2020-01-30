@@ -397,7 +397,7 @@
   }
 </style>
 
-<Tab method="card" pad={false}>
+<Tab method="card" pad={false} overrideMethodCheck>
   <Screen pad={false}>
     <div slot="main">
       {#if currentView === 'add-card'}
