@@ -51,7 +51,6 @@
   export let isFirst = true;
   export let vpa = '';
   export let qrIcon;
-  export let focused = false;
 
   // Refs
   export let intentView = null;
@@ -432,92 +431,89 @@
   <Screen>
     <div slot="main">
       <div class="border-list" />
-      {#if false}
 
-      {:else if true}
+      {#if intent}
+        <ListHeader>
+          <i slot="icon">
+            <Icon icon={getMiscIcon('redirect')} />
+          </i>
+          <div slot="subtitle">You will be redirected to your UPI app</div>
+        </ListHeader>
+
+        <UpiIntent
+          bind:this={intentView}
+          apps={intentApps || []}
+          selected={intentAppSelected}
+          intentSelection={app => {
+            onUpiAppSelection({ detail: { id: 'intent', app } });
+          }}
+          {showRecommendedUPIApp} />
+      {/if}
+      {#if useWebPaymentsApi}
+        <div class="legend left">PAY USING THE GPAY APP</div>
+        <div class="border-list">
+          <SlottedRadioOption
+            name="google_pay_wpa"
+            selected={selectedToken === 'gpay'}
+            on:click={_ => {
+              selectedToken = 'gpay';
+              session.preSubmit();
+            }}>
+            <div slot="title">Google Pay</div>
+            <i slot="icon">
+              <Icon icon={session.themeMeta.icons.gpay} />
+            </i>
+          </SlottedRadioOption>
+        </div>
+      {/if}
+      <div class="legend left">OR, PAY WITH UPI ID</div>
+      <div class="border-list">
         {#if intent}
           <ListHeader>
             <i slot="icon">
-              <Icon icon={getMiscIcon('redirect')} />
+              <Icon icon={getMiscIcon('recieve')} />
             </i>
-            <div slot="subtitle">You will be redirected to your UPI app</div>
+            <div slot="subtitle">
+              You will receive a payment request on your UPI app
+            </div>
           </ListHeader>
+        {/if}
 
-          <UpiIntent
-            bind:this={intentView}
-            apps={intentApps || []}
-            selected={intentAppSelected}
-            intentSelection={app => {
-              onUpiAppSelection({ detail: { id: 'intent', app } });
-            }}
-            {showRecommendedUPIApp} />
-        {/if}
-        {#if useWebPaymentsApi}
-          <div class="legend left">PAY USING THE GPAY APP</div>
-          <div class="border-list">
-            <SlottedRadioOption
-              name="google_pay_wpa"
-              selected={selectedToken === 'gpay'}
-              on:click={_ => {
-                selectedToken = 'gpay';
-                session.preSubmit();
-              }}>
-              <div slot="title">Google Pay</div>
-              <i slot="icon">
-                <Icon icon={session.themeMeta.icons.gpay} />
-              </i>
-            </SlottedRadioOption>
-          </div>
-        {/if}
-        <div class="legend left">OR, PAY WITH UPI ID</div>
-        <div class="border-list">
-          {#if intent}
-            <ListHeader>
-              <i slot="icon">
-                <Icon icon={getMiscIcon('recieve')} />
-              </i>
-              <div slot="subtitle">
-                You will receive a payment request on your UPI app
-              </div>
-            </ListHeader>
-          {/if}
-
-          {#each tokens as app, i}
-            <SlottedRadioOption
-              name="payment_type"
-              selected={selectedToken === app.id}
-              on:click={_ => {
-                selectedToken = app.id;
-                showCta();
-              }}>
-              <div slot="title">{app.vpa.username + '@' + app.vpa.handle}</div>
-              <i slot="icon">
-                <Icon icon={getBankLogoFromHandle(app.vpa.handle)} />
-              </i>
-            </SlottedRadioOption>
-          {/each}
-          <AddANewVpa
-            onSelection={_ => {
-              onUpiAppSelection({ detail: { id: 'new' } });
+        {#each tokens as app, i}
+          <SlottedRadioOption
+            name="payment_type"
+            selected={selectedToken === app.id}
+            on:click={_ => {
+              selectedToken = app.id;
               showCta();
-            }}
-            selected={selectedToken === 'new'}
-            bind:this={vpaField} />
-        </div>
-        {#if useOmnichannel}
-          <GooglePayOmnichannel
-            error={retryOmnichannel}
-            focusOnCreate={true}
-            {isFirst}
-            retry={retryOmnichannel}
-            selected={selectedToken === 'gpay-omni'}
-            on:blur={trackOmnichannelEntry}
-            on:select={_ => {
-              onUpiAppSelection({ detail: { id: 'gpay-omni' } });
-              showCta();
-            }}
-            bind:this={omnichannelField} />
-        {/if}
+            }}>
+            <div slot="title">{app.vpa.username + '@' + app.vpa.handle}</div>
+            <i slot="icon">
+              <Icon icon={getBankLogoFromHandle(app.vpa.handle)} />
+            </i>
+          </SlottedRadioOption>
+        {/each}
+        <AddANewVpa
+          onSelection={_ => {
+            onUpiAppSelection({ detail: { id: 'new' } });
+            showCta();
+          }}
+          selected={selectedToken === 'new'}
+          bind:this={vpaField} />
+      </div>
+      {#if useOmnichannel}
+        <GooglePayOmnichannel
+          error={retryOmnichannel}
+          focusOnCreate={true}
+          {isFirst}
+          retry={retryOmnichannel}
+          selected={selectedToken === 'gpay-omni'}
+          on:blur={trackOmnichannelEntry}
+          on:select={_ => {
+            onUpiAppSelection({ detail: { id: 'gpay-omni' } });
+            showCta();
+          }}
+          bind:this={omnichannelField} />
       {/if}
 
       {#if shouldShowQr}
