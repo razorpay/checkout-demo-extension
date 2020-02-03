@@ -1479,7 +1479,6 @@ Session.prototype = {
       this.runMaxmindScript();
 
       Analytics.setMeta('maxmind', true);
-      this.maxmind = true;
     }
   },
 
@@ -4661,7 +4660,7 @@ Session.prototype = {
       }
     }
 
-    if (this.maxmind) {
+    if (Analytics.getMeta('maxmind')) {
       data['_[maxmind]'] = 1;
     }
 
