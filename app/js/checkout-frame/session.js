@@ -1479,6 +1479,7 @@ Session.prototype = {
       this.runMaxmindScript();
 
       Analytics.setMeta('maxmind', true);
+      this.maxmind = true;
     }
   },
 
@@ -4659,6 +4660,11 @@ Session.prototype = {
         });
       }
     }
+
+    if (this.maxmind) {
+      data['_[maxmind]'] = 1;
+    }
+
     return data;
   },
 
