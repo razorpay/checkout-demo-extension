@@ -32,6 +32,7 @@
     id="contact"
     name="contact"
     type="tel"
+    autocomplete="tel"
     required={!optional.contact}
     pattern={CONTACT_REGEX}
     readonly={isContactReadonly}
