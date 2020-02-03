@@ -1474,8 +1474,11 @@ Session.prototype = {
 
   runMaxmindScriptIfApplicable: function() {
     var MAXMIND_PCT = 0.25;
+
     if (_.random() < MAXMIND_PCT) {
       this.runMaxmindScript();
+
+      Analytics.setMeta('maxmind', true);
     }
   },
 
