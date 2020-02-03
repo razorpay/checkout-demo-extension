@@ -1379,7 +1379,7 @@ Session.prototype = {
     this.completePendingPayment();
     this.bindEvents();
     this.setEmiScreen();
-    this.runMaxmindScript();
+    this.runMaxmindScriptIfApplicable();
     Hacks.initPostRenderHacks();
 
     errorHandler.call(this, this.params);
@@ -1471,6 +1471,14 @@ Session.prototype = {
     });
     Analytics.setMeta('timeSince.render', discreet.timer());
   },
+
+  runMaxmindScriptIfApplicable: function() {
+    var MAXMIND_PCT = 0.25;
+    if (_.random() < MAXMIND_PCT) {
+      this.runMaxmindScript();
+    }
+  },
+
   runMaxmindScript: function() {
     var script = _El.create('script');
     window.maxmind_user_id = '115820';
