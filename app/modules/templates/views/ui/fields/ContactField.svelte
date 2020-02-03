@@ -22,7 +22,9 @@
 
   const CONTACT_REGEX = optional.contact ? '.*' : CONTACT_PATTERN;
 
-  const label = optional.contact ? 'Phone (Optional)' : 'Phone';
+  const label = optional.contact
+    ? 'Phone with Country Code (Optional)'
+    : 'Phone with Country Code';
 </script>
 
 <div>
