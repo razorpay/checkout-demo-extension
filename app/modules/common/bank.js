@@ -8,31 +8,40 @@ const fullPrefix = cdnUrl + 'bank-lg/';
 export const getBankLogo = code => `${prefix}${code.slice(0, 4)}.gif`;
 export const getFullBankLogo = code => `${fullPrefix}${code.slice(0, 4)}.svg`;
 
-const _commonBanks = [
-  ['ICIC_C', 'ICICI Corporate'],
-  ['UTIB_C', 'Axis Corporate'],
-  ['SBIN', 'SBI'],
-  ['HDFC', 'HDFC'],
-  ['ICIC', 'ICICI'],
-  ['UTIB', 'Axis'],
-  ['KKBK', 'Kotak'],
-  ['YESB', 'Yes'],
-  ['IBKL', 'IDBI'],
-  ['BARB_R', 'BOB'],
-  ['PUNB_R', 'PNB'],
-  ['IOBA', 'IOB'],
-  ['FDRL', 'Federal'],
-  ['CORP', 'Corporate'],
-  ['IDFB', 'IDFC'],
-  ['INDB', 'IndusInd'],
-  ['VIJB', 'Vijaya Bank'],
-];
+const _commonBanks = {
+  ICIC_C: 'ICICI Corporate',
+  UTIB_C: 'Axis Corporate',
+  SBIN: 'SBI',
+  HDFC: 'HDFC',
+  ICIC: 'ICICI',
+  UTIB: 'Axis',
+  KKBK: 'Kotak',
+  YESB: 'Yes',
+  IBKL: 'IDBI',
+  BARB_R: 'BOB',
+  PUNB_R: 'PNB',
+  IOBA: 'IOB',
+  FDRL: 'Federal',
+  CORP: 'Corporate',
+  IDFB: 'IDFC',
+  INDB: 'IndusInd',
+  VIJB: 'Vijaya Bank',
+};
 
-export const commonBanks = _Arr.map(_commonBanks, banks => ({
-  name: banks[1],
-  code: banks[0],
-  logo: getBankLogo(banks[0]),
-}));
+/**
+ * Transforms a banks object to a list with name, code and logo
+ * @param {Object} bankObj
+ * @return {Array<{name: string, code: string, logo: string}>}
+ */
+const transformBanks = bankObj =>
+  _Obj.entries(bankObj)
+  |> _Arr.map(entry => ({
+    name: entry[1],
+    code: entry[0],
+    logo: getBankLogo(entry[0]),
+  }));
+
+export const commonBanks = transformBanks(_commonBanks);
 
 export const emiBanks = [
   {
@@ -130,8 +139,10 @@ export const getPreferredBanks = (availBanks, bankOptions) => {
     });
 
   if (_.isArray(order)) {
+    const availBanksList = transformBanks(availBanks);
+
     /* Indexing to avoid search */
-    var bankIndexMap = bankList.reduce(function(map, bank, index) {
+    var bankIndexMap = availBanksList.reduce(function(map, bank, index) {
       map[bank.code] = bank;
       return map;
     }, {});
