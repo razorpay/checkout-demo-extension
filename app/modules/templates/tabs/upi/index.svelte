@@ -71,11 +71,6 @@
   } = session;
 
   const checkGPay = session => {
-    const hasFeature =
-      session.preferences &&
-      session.preferences.features &&
-      session.preferences.features.google_pay;
-
     /* disable Web payments API for fee_bearer for now */
     if (session.preferences.fee_bearer) {
       return Promise.reject();
@@ -88,11 +83,6 @@
 
     /* disable Web payments API for Android SDK as we have intent there */
     if (Bridge.checkout.exists()) {
-      return Promise.reject();
-    }
-
-    /* disable it if it's not enabled for a specific merchant */
-    if (!hasFeature) {
       return Promise.reject();
     }
 

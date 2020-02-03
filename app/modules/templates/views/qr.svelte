@@ -38,6 +38,11 @@
       '_[upiqr]': '1',
     });
 
+    // Add bank in payload for TPV orders
+    if (session.order && session.order.bank) {
+      paymentData.bank = session.order.bank;
+    }
+
     if (session.preferences.fee_bearer) {
       view = 'fee';
     } else {

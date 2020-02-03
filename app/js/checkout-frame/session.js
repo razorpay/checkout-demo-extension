@@ -1379,7 +1379,7 @@ Session.prototype = {
     this.completePendingPayment();
     this.bindEvents();
     this.setEmiScreen();
-    this.runMaxmindScript();
+    this.runMaxmindScriptIfApplicable();
     Hacks.initPostRenderHacks();
 
     errorHandler.call(this, this.params);
@@ -1471,6 +1471,14 @@ Session.prototype = {
     });
     Analytics.setMeta('timeSince.render', discreet.timer());
   },
+
+  runMaxmindScriptIfApplicable: function() {
+    var MAXMIND_PCT = 0.25;
+    if (_.random() < MAXMIND_PCT) {
+      this.runMaxmindScript();
+    }
+  },
+
   runMaxmindScript: function() {
     var script = _El.create('script');
     window.maxmind_user_id = '115820';
@@ -1532,6 +1540,11 @@ Session.prototype = {
           this.proceedAutomaticallyAfterSelectingBank.bind(this)
         );
       }
+
+      this.netbankingTab.$on(
+        'bankSelected',
+        this.removeNetbankingOfferIfNotApplicable.bind(this)
+      );
     }
   },
 
@@ -4470,6 +4483,27 @@ Session.prototype = {
     }
 
     return this.emandateView.showBankDetailsForm(bank.code);
+  },
+
+  removeNetbankingOfferIfNotApplicable: function(event) {
+    var code = event.detail.bank.code;
+    var offerIssuer = _Obj.getSafely(this, 'offers.appliedOffer.issuer');
+    var self = this;
+
+    // If the issuer is missing, the offer should be applied regardless of the
+    // bank selected. Do not validate in that case.
+    if (!offerIssuer) {
+      return;
+    }
+
+    if (offerIssuer !== code) {
+      this.showOffersError(function(offerRemoved) {
+        if (!offerRemoved) {
+          // If the offer was not removed, revert to the bank in offer issuer
+          self.netbankingTab.setSelectedBank(offerIssuer);
+        }
+      });
+    }
   },
 
   checkInvalid: function(parent) {
