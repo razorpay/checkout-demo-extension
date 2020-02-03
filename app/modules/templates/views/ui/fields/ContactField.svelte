@@ -22,7 +22,9 @@
 
   const CONTACT_REGEX = optional.contact ? '.*' : CONTACT_PATTERN;
 
-  const label = optional.contact ? 'Phone (Optional)' : 'Phone';
+  const label = optional.contact
+    ? 'Phone with Country Code (Optional)'
+    : 'Phone with Country Code';
 </script>
 
 <div>
@@ -30,6 +32,7 @@
     id="contact"
     name="contact"
     type="tel"
+    autocomplete="tel"
     required={!optional.contact}
     pattern={CONTACT_REGEX}
     readonly={isContactReadonly}
