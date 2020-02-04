@@ -470,7 +470,7 @@
         <div class="legend left">Pay using Gpay App</div>
         <div class="border-list">
           <SlottedRadioOption
-            name="google_pay_wpa"
+            name="google_pay_web"
             selected={selectedToken === 'gpay'}
             on:click={_ => {
               selectedToken = 'gpay';
