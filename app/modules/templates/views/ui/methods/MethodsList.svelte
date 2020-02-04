@@ -21,7 +21,7 @@
   import CheckoutStore from 'checkoutstore';
   import PreferencesStore from 'checkoutstore/preferences';
   import { hasAnyInstrumentsOnDevice } from 'checkoutframe/personalization';
-  import { getSavedCards } from 'common/token.js';
+  import { getSavedCards } from 'common/token';
 
   // Props
   export let instruments = [];

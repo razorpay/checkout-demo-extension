@@ -18,7 +18,7 @@
   import * as AnalyticsTypes from 'analytics-types';
   import { Formatter } from 'formatter';
   import { hideCta, showCtaWithDefaultText, showCta } from 'checkoutstore/cta';
-  import { filterUPITokens } from 'common/token.js';
+  import { filterUPITokens } from 'common/token';
 
   // UI imports
   import UpiIntent from './UpiIntent.svelte';
