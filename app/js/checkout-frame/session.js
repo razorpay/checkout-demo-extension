@@ -2543,6 +2543,42 @@ Session.prototype = {
       this.on('blur', '#card_cvv', shiftDown);
     }
   },
+
+  /**
+   * Logs the user out
+   * @param {boolean} outOfAllDevices
+   */
+  _logUserOut: function(customer, outOfAllDevices) {
+    if (customer) {
+      customer.logged = false;
+      customer.tokens = null;
+
+      customer.logout(outOfAllDevices);
+    }
+
+    this.setSavedCards();
+
+    _El.removeClass(_Doc.querySelector('#top-right'), 'logged');
+
+    this.homeTab.updateCustomer();
+  },
+
+  /**
+   * Logs user out of this device.
+   * @param {Customer} customer
+   */
+  logUserOut: function(customer) {
+    this._logUserOut(customer);
+  },
+
+  /**
+   * Logs user out of all devices.
+   * @param {Customer} customer
+   */
+  logUserOutOfAllDevices: function(customer) {
+    this._logUserOut(customer, true);
+  },
+
   bindEvents: function() {
     var self = this;
     var emi_options = this.emi_options;
@@ -2675,14 +2711,11 @@ Session.prototype = {
         'click',
         function(e) {
           if (e.target.tagName === 'LI') {
-            var customer = self.customer;
-            customer.logged = false;
-            customer.tokens = null;
-            self.setSavedCards();
-            $('#top-right').removeClass('logged');
-            customer.logout(e.target.parentNode.firstChild === e.target);
-
-            this.homeTab.updateCustomer();
+            if (e.target.parentNode.firstChild === e.target) {
+              self.logUserOutOfAllDevices(self.customer);
+            } else {
+              self.logUserOut(self.customer);
+            }
           }
           container_listener();
           $('#top-right').removeClass('focus');

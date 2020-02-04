@@ -19,5 +19,7 @@ export const partialPaymentAmount = writable('');
 contact.subscribe(value => {
   const topbar = _Doc.querySelector('#topbar #top-right');
 
-  _El.keepClass(topbar, 'hidden', !value);
+  if (topbar) {
+    _El.keepClass(topbar, 'hidden', !value);
+  }
 });
