@@ -536,7 +536,7 @@
       {/if}
 
       {#if shouldShowQr}
-        <div class="legend left">Or, Pay using QR CODE</div>
+        <div class="legend left">Or, Pay using QR Code</div>
         <div class="options" id="showQr">
           <NextOption
             icon={qrIcon}
