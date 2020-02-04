@@ -7095,7 +7095,6 @@ Session.prototype = {
   },
 
   setPreferences: function(prefs) {
-    console.warn(JSON.parse(JSON.stringify(prefs)));
     PreferencesStore.set(prefs);
     DowntimesStore.set(discreet.Downtimes.getDowntimes(prefs));
     this.r.preferences = prefs;

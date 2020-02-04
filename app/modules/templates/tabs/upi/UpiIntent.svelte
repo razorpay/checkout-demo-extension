@@ -43,7 +43,6 @@
     } else {
       showableApps = _Arr.slice(apps, 0, 4);
     }
-    console.log(showableApps);
   }
 
   function getVpa() {
