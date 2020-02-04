@@ -2,30 +2,6 @@
   // Svelte imports
 
   import SlottedOption from 'templates/views/ui/options/Slotted/Option.svelte';
-
-  // Props
-  export let type;
-  export let classes = [];
-  export let reverse = false;
-
-  // Computed
-  export let optionClasses;
-
-  // Refs
-
-  $: {
-    const defaultClasses = ['option'];
-
-    if (type) {
-      defaultClasses.push(type);
-    }
-
-    if (reverse) {
-      defaultClasses.push('reverse');
-    }
-
-    optionClasses = defaultClasses.concat(classes).join(' ');
-  }
 </script>
 
 <style>
