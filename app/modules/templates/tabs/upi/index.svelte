@@ -251,8 +251,7 @@
     }
 
     /**
-     * TODO: discuss with vivek whether to continue sending
-     * directpay for collect requests
+     * default to directpay for collect requests
      */
     if (!data['_[flow]']) {
       data['_[flow]'] = 'directpay';
