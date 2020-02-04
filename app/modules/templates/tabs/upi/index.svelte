@@ -448,7 +448,6 @@
 <Tab method="upi" {down} pad={false}>
   <Screen>
     <div slot="main">
-      <div class="border-list" />
 
       {#if intent}
         <ListHeader>
