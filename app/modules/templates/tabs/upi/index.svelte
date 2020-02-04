@@ -85,7 +85,9 @@
   const getBankLogoFromHandle = handle => {
     let icon = session.themeMeta.icons.upi;
     handleData.forEach(handleSet => {
-      if (handleSet.handles.includes(handle)) icon = handleSet.icon;
+      if (handleSet.handles.includes(handle)) {
+        icon = handleSet.icon;
+      }
     });
 
     return icon;

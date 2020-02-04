@@ -55,7 +55,9 @@
   }
 
   export function blur() {
-    if (selected) vpaField.blur();
+    if (selected) {
+      vpaField.blur();
+    }
   }
 
   export function focus() {
