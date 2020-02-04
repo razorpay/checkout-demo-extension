@@ -443,6 +443,14 @@
   export function next() {
     Analytics.track('home:proceed');
 
+    const loggedIn = _Obj.getSafely(customer, 'logged', false);
+
+    if (loggedIn) {
+      if ($contact !== customer.contact) {
+        session.logUserOut(customer);
+      }
+    }
+
     if (isPartialPayment) {
       if ($partialPaymentOption !== 'full') {
         session.handlePartialAmount();
