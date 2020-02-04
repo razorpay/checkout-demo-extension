@@ -109,7 +109,7 @@
     <img src="https://cdn.razorpay.com/app/googlepay.svg" alt="Google Pay" />
   </i>
 
-  <div slot="slot-body">
+  <div slot="body">
     {#if selected}
       <div transition:slide={{ duration: 200 }}>
         <Field

@@ -106,7 +106,7 @@
     <Icon icon={session.themeMeta.icons.upi} />
   </i>
 
-  <div slot="slot-body">
+  <div slot="body">
     {#if selected}
       <div transition:slide={{ duration: 200 }}>
         <Field

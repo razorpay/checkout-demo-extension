@@ -74,7 +74,7 @@
     <div>
       <slot name="title" />
       <slot name="subtitle" />
-      <slot name="slot-body" />
+      <slot name="body" />
     </div>
     <div class="radio" class:reverse class:top={align === 'top'}>
       <Radio
