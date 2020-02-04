@@ -1145,7 +1145,6 @@ Session.prototype = {
       if (ecod) {
         r.set('prefill.method', 'wallet');
         r.set('theme.hide_topbar', true);
-        gel('form-wallet').insertBefore(gel('pad-common'), gel('ecod-label'));
       }
       $(this.el).addClass(classes);
     }
