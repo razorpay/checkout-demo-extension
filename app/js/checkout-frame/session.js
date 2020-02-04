@@ -3627,11 +3627,12 @@ Session.prototype = {
    * @returns {boolean} valid
    */
   checkCommonValid: function() {
-    var selector = '#pad-common';
-
-    if (this.homeTab.onDetailsScreen()) {
-      selector = '#form-common';
+    // Only check if we're on the homescreen
+    if (!this.homeTab.onDetailsScreen()) {
+      return true;
     }
+
+    var selector = '#form-common';
 
     var valid = !this.checkInvalid(selector);
 
@@ -3648,7 +3649,7 @@ Session.prototype = {
     var valid = this.checkCommonValid();
 
     if (!valid) {
-      var fields = _Doc.querySelectorAll('#pad-common .invalid [name]');
+      var fields = _Doc.querySelectorAll('#form-common .invalid [name]');
 
       var invalidFields = {};
 
@@ -4565,8 +4566,6 @@ Session.prototype = {
   getFormData: function() {
     var tab = this.tab;
     var data = {};
-
-    fillData('#pad-common', data);
 
     data.contact = getPhone();
     data.email = getEmail();
