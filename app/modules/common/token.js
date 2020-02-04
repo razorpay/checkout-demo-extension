@@ -80,4 +80,4 @@ export const getSavedCards = tokens =>
  *
  * @return {Array}
  */
-export const getSavedVPA = filterTokensByMethod('upi');
+export const filterUPITokens = filterTokensByMethod('upi');

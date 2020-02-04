@@ -22,11 +22,11 @@ const calculateMeta = _m => {
 };
 
 const sanitizeEventData = data => {
-  const dataToMask = ['token'];
+  const keysToMask = ['token'];
 
   const _data = _Obj.clone(data);
 
-  dataToMask.forEach(key => {
+  keysToMask.forEach(key => {
     _data[key] = '__REDACTED__';
   });
 

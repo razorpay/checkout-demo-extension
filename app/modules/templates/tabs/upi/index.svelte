@@ -18,7 +18,7 @@
   import * as AnalyticsTypes from 'analytics-types';
   import { Formatter } from 'formatter';
   import { hideCta, showCtaWithDefaultText, showCta } from 'checkoutstore/cta';
-  import { getSavedVPA } from 'common/token.js';
+  import { filterUPITokens } from 'common/token.js';
 
   // UI imports
   import UpiIntent from './UpiIntent.svelte';
@@ -51,6 +51,7 @@
   export let isFirst = true;
   export let vpa = '';
   export let qrIcon;
+  export let tab = 'upi';
 
   // Refs
   export let intentView = null;
@@ -193,7 +194,7 @@
 
   export function onShown() {
     if (!session.customer.tokens) return;
-    tokens = getSavedVPA(session.customer.tokens.items);
+    tokens = filterUPITokens(session.customer.tokens.items);
   }
 
   export function getPayload() {
@@ -466,7 +467,7 @@
           </SlottedRadioOption>
         </div>
       {/if}
-      <div class="legend left">OR, PAY WITH UPI ID</div>
+      <div class="legend left">PAY WITH UPI ID</div>
       <div class="border-list">
         {#if intent}
           <ListHeader>
