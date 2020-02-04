@@ -327,6 +327,22 @@
     return '';
   }
 
+  export function trackVpaEntry() {
+    const vpa = getFullVpa();
+    if (!vpa) {
+      return;
+    }
+    const valid = isVpaValid(vpa);
+    Analytics.track('vpa:fill', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        app: selectedApp,
+        value: vpa,
+        valid,
+      },
+    });
+  }
+
   export function trackHandleSelection(event) {
     const handle = event.detail;
 
@@ -500,6 +516,7 @@
             onUpiAppSelection({ detail: { id: 'new' } });
             showCta();
           }}
+          on:blur={trackVpaEntry}
           selected={selectedToken === 'new'}
           bind:this={vpaField} />
       </div>

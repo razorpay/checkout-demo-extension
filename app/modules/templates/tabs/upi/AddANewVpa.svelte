@@ -1,6 +1,6 @@
 <script>
   // Svelte imports
-  import { onMount } from 'svelte';
+  import { onMount, createEventDispatcher } from 'svelte';
   import { slide } from 'svelte/transition';
 
   // UI Imports
@@ -55,6 +55,8 @@
   }
 
   export function blur() {
+    const dispatch = createEventDispatcher();
+    dispatch('blur');
     if (selected) {
       vpaField.blur();
     }
