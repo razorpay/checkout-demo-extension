@@ -68,7 +68,7 @@
   }
 
   // TODO trigger shake on invalid phone number
-  $: pattern = '[0-9]{10}';
+  const pattern = '[0-9]{10}';
 </script>
 
 <style>
