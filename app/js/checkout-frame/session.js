@@ -1462,6 +1462,14 @@ Session.prototype = {
       Analytics.setMeta('orientation', Hacks.getDeviceOrientation());
     });
 
+    if (this.get('ecod')) {
+      Analytics.setMeta('ecod', true);
+
+      if (this.invoice) {
+        Analytics.setMeta('invoice', true);
+      }
+    }
+
     Analytics.track('complete', {
       type: AnalyticsTypes.RENDER,
       data: {
