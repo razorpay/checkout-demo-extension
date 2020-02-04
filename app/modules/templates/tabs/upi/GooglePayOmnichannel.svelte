@@ -96,7 +96,7 @@
   }
 </style>
 
-<div class="legend left">OR, PAY USING PHONE NUMBER</div>
+<div class="legend left">Or, pay using phone number</div>
 
 <SlottedRadioOption
   name="payment_type"
