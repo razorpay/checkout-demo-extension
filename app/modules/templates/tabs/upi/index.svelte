@@ -467,7 +467,7 @@
           {showRecommendedUPIApp} />
       {/if}
       {#if useWebPaymentsApi}
-        <div class="legend left">PAY USING THE GPAY APP</div>
+        <div class="legend left">Pay using Gpay App</div>
         <div class="border-list">
           <SlottedRadioOption
             name="google_pay_wpa"
@@ -483,7 +483,7 @@
           </SlottedRadioOption>
         </div>
       {/if}
-      <div class="legend left">PAY WITH UPI ID</div>
+      <div class="legend left">Pay using UPI ID</div>
       <div class="border-list">
         {#if intent}
           <ListHeader>
