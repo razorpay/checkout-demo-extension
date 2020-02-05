@@ -100,6 +100,7 @@
 <SlottedRadioOption
   {name}
   {selected}
+  ellipsis
   value={instrument.id}
   radio={false}
   className="p13n-instrument"
