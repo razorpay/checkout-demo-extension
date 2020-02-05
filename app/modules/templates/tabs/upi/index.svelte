@@ -13,6 +13,7 @@
     doesAppExist,
     GOOGLE_PAY_PACKAGE_NAME,
     otherAppsIcon,
+    getUPIAppLogoFromHandle,
   } from 'common/upi';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
@@ -70,28 +71,6 @@
   let isANewVpa = false;
   let rememberVpaCheckbox;
   let intentAppSelected = null;
-
-  const handleData = [
-    {
-      handles: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],
-      icon: 'https://cdn.razorpay.com/app/googlepay.svg',
-    },
-    {
-      handles: ['ybl'],
-      icon: 'https://cdn.razorpay.com/app/phonepe.svg',
-    },
-  ];
-
-  const getBankLogoFromHandle = handle => {
-    let icon = session.themeMeta.icons.upi;
-    handleData.forEach(handleSet => {
-      if (handleSet.handles.includes(handle)) {
-        icon = handleSet.icon;
-      }
-    });
-
-    return icon;
-  };
 
   const session = getSession();
   const {
@@ -466,7 +445,8 @@
             }}>
             <div slot="title">{app.vpa.username + '@' + app.vpa.handle}</div>
             <i slot="icon">
-              <Icon icon={getBankLogoFromHandle(app.vpa.handle)} />
+              <Icon
+                icon={getUPIAppLogoFromHandle(app.vpa.handle) || session.themeMeta.icons.upi} />
             </i>
           </SlottedRadioOption>
         {/each}
