@@ -254,4 +254,4 @@ const countryCodeToRegionCodeMap = {
   threes,
 };
 
-module.exports = countryCodeToRegionCodeMap;
+export default countryCodeToRegionCodeMap;

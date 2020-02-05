@@ -1,32 +1,55 @@
-var countrycodes = require('./countrycodes');
+import countrycodes from 'modules/countrycodes';
 
 const MAX_LENGTH_COUNTRY_CODE = 3;
 
-function findCountryCode(number) {
+export default function findCountryCode(phno) {
+  let number = phno;
   number = number.replace(/^0{2}/, '+');
 
   if (number[0] === '+') {
     number = number.split('+')[1];
     let num = checkForInternational(number);
     if (num) {
-      return num;
+      return {
+        countrycode: num,
+        phnumber: number.replace(num, ''),
+      };
     } else {
-      return '91';
+      return {
+        code: undefined,
+        phnumber: phno,
+      };
     }
   } else {
     if (number.length === 10) {
       let regex = /^[6-9]/;
       if (number.match(regex)) {
-        return '91';
-      }
-    }
-
-    if (number.length === 12) {
+        return {
+          code: 91,
+          phnumber: number,
+        };
+      } else
+        return {
+          code: undefined,
+          phnumber: phno,
+        };
+    } else if (number.length === 12) {
       let regex = /^91[6-9]/;
       if (number.match(regex)) {
-        return '91';
-      }
-    }
+        return {
+          code: 91,
+          phnumber: number.substring(2),
+        };
+      } else
+        return {
+          code: undefined,
+          phnumber: phno,
+        };
+    } else
+      return {
+        code: undefined,
+        phnumber: phno,
+      };
   }
 }
 
@@ -60,5 +83,3 @@ function checkForInternational(number) {
 
   return countryCode;
 }
-
-console.log(findCountryCode('+6620765451'));
