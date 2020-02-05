@@ -3146,20 +3146,6 @@ Session.prototype = {
       this.body.toggleClass('sub', showPaybtn);
     }
 
-    if (screen === 'upi') {
-      var isIntentFlow = this.upiTab.intent;
-
-      if (isIntentFlow) {
-        var data = this.upiTab.getPayload();
-
-        if (data['_[flow]'] === 'intent' && !data.upi_app) {
-          $('#body').removeClass('sub');
-        }
-      } else if (typeof this.upiTab.selectedApp === 'undefined') {
-        $('#body').removeClass('sub');
-      }
-    }
-
     if (this.upiTab) {
       if (isGPayScreen) {
         this.upiTab.$set({ selectedApp: 'gpay' });
