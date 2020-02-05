@@ -629,32 +629,40 @@ function attachLogoutListeners(session) {
   var profile = _Doc.querySelector('#profile');
   var topRight = _Doc.querySelector('#top-right');
 
-  /**
-   * Attach listener on body to collapse the dropdown
-   * when the dropdown is open and the user clicks
-   * somewhere outside the dropdown
-   */
-  document.body.addEventListener(
-    'click',
-    function(event) {
-      var focused = _El.hasClass(topRight, 'focus');
+  function outsideDropdownListener(event) {
+    var open = _El.hasClass(topRight, 'focus');
 
-      if (focused) {
-        var isTargetTopRight =
-          _El.closest(event.target, '#top-right') === topRight;
+    if (open) {
+      var isTargetTopRight =
+        _El.closest(event.target, '#top-right') === topRight;
 
-        /**
-         * If the user has clicked outside of the dropdown, collapse
-         * and don't let the click propagate
-         */
-        if (!isTargetTopRight) {
-          event.stopPropagation();
-          _El.removeClass(topRight, 'focus');
-        }
+      /**
+       * If the user has clicked outside of the dropdown, collapse
+       * and don't let the click propagate
+       */
+      if (!isTargetTopRight) {
+        event.stopPropagation();
+        hideDropdown();
       }
-    },
-    true
-  );
+    }
+  }
+
+  function showDropdown() {
+    _El.addClass(topRight, 'focus');
+
+    /**
+     * Attach listener on body to collapse the dropdown
+     * when the dropdown is open and the user clicks
+     * somewhere outside the dropdown
+     */
+    document.body.addEventListener('click', outsideDropdownListener, true);
+  }
+
+  function hideDropdown() {
+    _El.removeClass(topRight, 'focus');
+
+    document.body.removeEventListener('click', outsideDropdownListener);
+  }
 
   /**
    * Toggle the dropdown every time it's clicked on
@@ -662,7 +670,13 @@ function attachLogoutListeners(session) {
   topRight.addEventListener('click', function(event) {
     event.preventDefault();
 
-    _El.toggleClass(topRight, 'focus');
+    var open = _El.hasClass(topRight, 'focus');
+
+    if (open) {
+      hideDropdown();
+    } else {
+      showDropdown();
+    }
   });
 
   /**
@@ -679,7 +693,7 @@ function attachLogoutListeners(session) {
       return;
     }
 
-    if (_El.getAttribute(target, 'data-all')) {
+    if (_Obj.getSafely(target.dataset, 'all')) {
       session.logUserOutOfAllDevices(session.customer);
     } else {
       session.logUserOut(session.customer);
