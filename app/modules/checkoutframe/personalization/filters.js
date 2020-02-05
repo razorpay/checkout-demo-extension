@@ -11,6 +11,20 @@ import DowntimesStore from 'checkoutstore/downtimes';
  * function (instrument: Object, meta: Object): boolean
  */
 const METHOD_FILTERS = {
+  card: (instrument, { customer }) => {
+    const logged = _Obj.getSafely(customer, 'logged');
+
+    // For logged out users, show all possible card instruments
+    if (!logged) {
+      return true;
+    }
+
+    const tokens = _Obj.getSafely(customer, 'tokens.items', []);
+
+    // Allow this instrument only if a token for this exists on the customer
+    return _Arr.any(tokens, token => instrument.token_id === token.id);
+  },
+
   wallet: (instrument, { methods }) => {
     const { wallet: wallets } = methods;
 
