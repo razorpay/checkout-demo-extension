@@ -8,37 +8,51 @@ const fullPrefix = cdnUrl + 'bank-lg/';
 export const getBankLogo = code => `${prefix}${code.slice(0, 4)}.gif`;
 export const getFullBankLogo = code => `${fullPrefix}${code.slice(0, 4)}.svg`;
 
-const _commonBanks = [
-  ['ICIC_C', 'ICICI Corporate'],
-  ['UTIB_C', 'Axis Corporate'],
-  ['SBIN', 'SBI'],
-  ['HDFC', 'HDFC'],
-  ['ICIC', 'ICICI'],
-  ['UTIB', 'Axis'],
-  ['KKBK', 'Kotak'],
-  ['YESB', 'Yes'],
-  ['IBKL', 'IDBI'],
-  ['BARB_R', 'BOB'],
-  ['PUNB_R', 'PNB'],
-  ['IOBA', 'IOB'],
-  ['FDRL', 'Federal'],
-  ['CORP', 'Corporate'],
-  ['IDFB', 'IDFC'],
-  ['INDB', 'IndusInd'],
-  ['VIJB', 'Vijaya Bank'],
-];
+const _commonBanks = {
+  ICIC_C: 'ICICI Corporate',
+  UTIB_C: 'Axis Corporate',
+  SBIN: 'SBI',
+  HDFC: 'HDFC',
+  ICIC: 'ICICI',
+  UTIB: 'Axis',
+  KKBK: 'Kotak',
+  YESB: 'Yes',
+  IBKL: 'IDBI',
+  BARB_R: 'BOB',
+  PUNB_R: 'PNB',
+  IOBA: 'IOB',
+  FDRL: 'Federal',
+  CORP: 'Corporate',
+  IDFB: 'IDFC',
+  INDB: 'IndusInd',
+  VIJB: 'Vijaya Bank',
+};
 
-export const commonBanks = _Arr.map(_commonBanks, banks => ({
-  name: banks[1],
-  code: banks[0],
-  logo: getBankLogo(banks[0]),
-}));
+/**
+ * Transforms a banks object to a list with name, code and logo
+ * @param {Object} bankObj
+ * @return {Array<{name: string, code: string, logo: string}>}
+ */
+const transformBanks = bankObj =>
+  _Obj.entries(bankObj)
+  |> _Arr.map(entry => ({
+    name: entry[1],
+    code: entry[0],
+    logo: getBankLogo(entry[0]),
+  }));
+
+export const commonBanks = transformBanks(_commonBanks);
 
 export const emiBanks = [
   {
     code: 'KKBK',
     name: 'Kotak Mahindra Bank',
     patt: /^((4(3(63(8[89]|90)|466[89])|1(664[3456]|4767)|04861|62409|78006)|5(4(3705|7981)|24253)))/,
+  },
+  {
+    code: 'HDFC_DC',
+    name: 'HDFC Bank Debit Cards',
+    patt: /^(4(05988|1(6021|82(19|41|61))|2(0090|1(3(08|1(4|8)|92)|424|578))|3(5502|6303|8624)|40384|64115|76646|85446|9(0246|8792))|5(1(296(7|8)|4834|7(725|848))|2(4254|6(099|419))|3(183(1|6)|2676|3136)|41919|5(0372|3115)))/,
   },
   {
     code: 'HDFC',
@@ -125,8 +139,10 @@ export const getPreferredBanks = (availBanks, bankOptions) => {
     });
 
   if (_.isArray(order)) {
+    const availBanksList = transformBanks(availBanks);
+
     /* Indexing to avoid search */
-    var bankIndexMap = bankList.reduce(function(map, bank, index) {
+    var bankIndexMap = availBanksList.reduce(function(map, bank, index) {
       map[bank.code] = bank;
       return map;
     }, {});

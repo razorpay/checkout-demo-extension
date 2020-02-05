@@ -185,19 +185,21 @@ export default function Track(r, event, data, immediately) {
     }
 
     var trackingOptions = [
-      'key',
       'amount',
-      'prefill',
-      'theme',
-      'image',
-      'description',
-      'name',
-      'method',
-      'display_currency',
-      'display_amount',
-      'redirect',
-      'readonly',
       'contact_id',
+      'currency',
+      'description',
+      'display_amount',
+      'display_currency',
+      'image',
+      'key',
+      'method',
+      'name',
+      'prefill',
+      'readonly',
+      'recurring',
+      'redirect',
+      'theme',
     ];
 
     _Obj.loop(r.get(), function(value, key) {

@@ -6,6 +6,19 @@
   const ADDRESS_PATTERN = '[\\s\\S]{10}';
 </script>
 
+<style>
+  textarea {
+    width: 100%;
+    resize: none;
+    max-height: 45px;
+    padding-top: 0;
+  }
+
+  label {
+    top: 0;
+  }
+</style>
+
 <div class="elem elem-address">
   <div class="help">Address should be at least 10 characters long</div>
   <label>Address</label>

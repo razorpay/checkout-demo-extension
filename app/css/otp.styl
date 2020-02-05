@@ -42,6 +42,15 @@
     width: 14px;
     content: '';
   }
+  &.wide {
+    background-size: 1px 100%;
+    &::after {
+      content: none;
+    }
+    input#otp {
+      text-align: center;
+    }
+  }
 }
 
 #otp {

@@ -51,7 +51,11 @@
   // TPV
   const multiTpv = session.multiTpv;
   const onlyUpiTpv = session.upiTpv;
-  const onlyNetbankingTpv = session.tpvBank && !onlyUpiTpv && !multiTpv;
+  const onlyNetbankingTpv =
+    session.tpvBank &&
+    !onlyUpiTpv &&
+    !multiTpv &&
+    session.oneMethod !== 'emandate';
   const isTpv = multiTpv || onlyUpiTpv || onlyNetbankingTpv;
 
   // Offers
@@ -65,6 +69,8 @@
     session.tab !== 'emandate' &&
     methods.count === 1 &&
     methods.card;
+
+  const cardOffer = session.cardOffer;
 
   const {
     isPartialPayment,
@@ -151,9 +157,7 @@
 
   export function setDetailsCta() {
     if (isPartialPayment) {
-      // TODO: This hack should be removed and Next button should be removed too
-      _El.addClass(_Doc.querySelector('#container'), 'extra');
-      hideCta();
+      showCtaWithText('Next');
 
       return;
     }
@@ -312,9 +316,6 @@
 
   export function onShown() {
     if (view === 'methods') {
-      // TODO: This hack should be removed and Next button should be removed
-      _El.removeClass(_Doc.querySelector('#container'), 'extra');
-
       if ($selectedInstrumentId) {
         showCtaWithDefaultText();
       } else {
@@ -435,10 +436,19 @@
   Analytics.track('home:landing', {
     data: {
       view,
+      oneMethod: session.oneMethod,
     },
   });
 
   export function next() {
+    Analytics.track('home:proceed');
+
+    if (isPartialPayment) {
+      if ($partialPaymentOption !== 'full') {
+        session.handlePartialAmount();
+      }
+    }
+
     // Multi TPV
     if (session.multiTpv) {
       if ($multiTpvOption === 'upi') {
@@ -464,7 +474,7 @@
     }
 
     // TPV bank
-    if (session.tpvBank) {
+    if (session.onlyNetbankingTpv) {
       session.preSubmit();
       return;
     }
@@ -775,6 +785,15 @@
             {:else}
               Subscription payments are only supported on Mastercard and Visa
               Credit Cards.
+            {/if}
+          {:else if cardOffer}
+            {#if methods.debit_card && methods.credit_card}
+              All {cardOffer.issuer} Cards are supported for this payment
+            {:else if methods.debit_card}
+              All {cardOffer.issuer} Debit Cards are supported for this payment
+            {:else}
+              All {cardOffer.issuer} Credit Cards are supported for this
+              payment.
             {/if}
           {:else if methods.debit_card && methods.credit_card}
             Visa and Mastercard Credit Cards from all Banks and Debit Cards from

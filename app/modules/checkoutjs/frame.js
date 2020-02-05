@@ -94,8 +94,10 @@ function sanitizeImage(options) {
 }
 
 function makeCheckoutUrl(rzp) {
-  const CANARY_PERCENTAGE = 0.05;
+  const CANARY_PERCENTAGE = 0.1;
   var url = RazorpayConfig.frame;
+
+  const useCanary = _.random() < CANARY_PERCENTAGE;
 
   if (!url) {
     url = makeUrl('checkout');
@@ -103,12 +105,16 @@ function makeCheckoutUrl(rzp) {
     var urlParams = makePrefParams(rzp);
     if (!urlParams) {
       url += '/public';
+
+      if (useCanary) {
+        url += '/canary';
+      }
     } else {
       url = _.appendParamsToUrl(url, urlParams);
     }
   }
 
-  if (_.random() < CANARY_PERCENTAGE) {
+  if (useCanary) {
     url = _.appendParamsToUrl(url, { canary: 1 });
   }
 

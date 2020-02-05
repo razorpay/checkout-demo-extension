@@ -24,7 +24,8 @@
   const maxAmount = order.amount_due;
   const minAmount = order.first_payment_min_amount;
   const amountPaid = Number(order.amount_paid);
-  const showMinAmountCheckbox = !minAmount || amountPaid !== 0;
+  const isFirstPayment = amountPaid === 0;
+  const showPartialAmountLabel = minAmount && isFirstPayment; // Show label and checkbox if order.first_payment_min_amount is set and is first payment
   const minAmountLabel =
     session.get('min_amount_label') ||
     session.get('partial_payment.min_amount_label');
@@ -35,9 +36,13 @@
   const partialDescription = session.get(
     'partial_payment.partial_amount_description'
   );
-  $partialPaymentOption = session.get('partial_payment.select_partial')
-    ? 'partial'
-    : 'full';
+
+  // Only set the value in store if nothing has already been set
+  if (!$partialPaymentOption) {
+    $partialPaymentOption = session.get('partial_payment.select_partial')
+      ? 'partial'
+      : 'full';
+  }
 
   // Computed
   let expanded = false;
@@ -116,8 +121,7 @@
         <PartialPaymentAmountField
           {maxAmount}
           {minAmount}
-          {showMinAmountCheckbox}
-          {amountPaid}
+          {showPartialAmountLabel}
           {minAmountLabel}
           {partialDescription}
           bind:value={$partialPaymentAmount}

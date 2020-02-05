@@ -28,8 +28,6 @@ import otpView from 'checkoutframe/otp';
 import * as Curtain from 'components/curtain';
 import { setShieldParams } from 'payment/validator';
 import * as P13n from 'checkoutframe/personalization';
-import MethodsList from 'components/MethodsList';
-import * as WalletUtils from 'common/wallet';
 import { commonBanks, getFullBankLogo } from 'common/bank';
 
 /* Required for merchant.js migration */
@@ -78,6 +76,8 @@ import * as Hacks from 'checkoutframe/hacks';
 import { get as storeGetter } from 'svelte/store';
 import * as Experiments from 'experiments';
 
+import * as NBHandlers from 'handlers/netbanking';
+
 export default {
   RazorpayConfig,
   makeAuthUrl,
@@ -119,7 +119,6 @@ export default {
   Checkout,
   Bridge,
   P13n,
-  MethodsList,
   UserAgent,
   Offers,
   Flows,
@@ -175,4 +174,6 @@ export default {
   _Func,
   _Obj,
   _,
+
+  NBHandlers,
 };

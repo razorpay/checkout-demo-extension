@@ -50,6 +50,8 @@
     const array = [];
     const fees = Object.keys(displayFees);
 
+    const fee_label = session.get('fee_label');
+
     for (let i = 0; i < fees.length; i++) {
       const fee = fees[i];
       let title = '';
@@ -58,10 +60,10 @@
           title = 'Amount';
           break;
         case 'razorpay_fee':
-          title = 'Gateway Charges';
+          title = fee_label;
           break;
         case 'tax':
-          title = 'GST on Gateway Charges';
+          title = `GST on ${fee_label}`;
           break;
       }
       if (title) {

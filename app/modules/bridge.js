@@ -344,37 +344,6 @@ function closeModal() {
 }
 
 /**
- * Checks if the Other Methods list
- * of p13n is open.
- * @param {Session} session
- *
- * @return {Boolean}
- */
-function isP13nListOpen(session) {
-  try {
-    const { instrumentsData } = session.methodsList.view;
-    const {
-      visible: otherMethodsVisible,
-    } = session.methodsList.otherMethodsView;
-
-    return otherMethodsVisible && instrumentsData.length;
-  } catch (e) {}
-
-  return false;
-}
-
-/**
- * Hides the Other Methods list
- * of p13n.
- * @param {Session} session
- */
-function hideP13nList(session) {
-  try {
-    session.methodsList.otherMethodsView.hideMethods();
-  } catch (e) {}
-}
-
-/**
  * window.backPressed is called by Android SDK everytime android backbutton is
  * pressed by user. Checkout will handle the back button action if the user is
  * on a sub screen. Checkout will give a callback to android in case that there
@@ -425,25 +394,13 @@ function backPressed(callback) {
       session.back();
     }
   } else {
-    if (session.newHomeScreen && session.homeTab) {
-      if (session.homeTab.canGoBack()) {
-        session.homeTab.hideMethods();
-      } else if (CheckoutBridge && _.isFunction(CheckoutBridge[callback])) {
-        CheckoutBridge[callback]();
-      } else {
-        if (session.get('theme.close_button')) {
-          closeModal();
-        }
-      }
+    if (session.homeTab && session.homeTab.canGoBack()) {
+      session.homeTab.hideMethods();
+    } else if (CheckoutBridge && _.isFunction(CheckoutBridge[callback])) {
+      CheckoutBridge[callback]();
     } else {
-      if (isP13nListOpen(session)) {
-        hideP13nList(session);
-      } else if (CheckoutBridge && _.isFunction(CheckoutBridge[callback])) {
-        CheckoutBridge[callback]();
-      } else {
-        if (session.get('theme.close_button')) {
-          closeModal();
-        }
+      if (session.get('theme.close_button')) {
+        closeModal();
       }
     }
   }

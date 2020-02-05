@@ -3,11 +3,16 @@
   export let horizontal = false;
   export let vertical = false;
   export let reverse = false;
+  export let inline = false;
 </script>
 
 <style>
   .stack {
     display: flex;
+  }
+
+  .stack.inline {
+    display: inline-flex;
   }
 
   .stack.horizontal {
@@ -27,6 +32,6 @@
   }
 </style>
 
-<div class="stack" class:horizontal class:vertical class:reverse>
+<div class="stack" class:horizontal class:vertical class:reverse class:inline>
   <slot />
 </div>

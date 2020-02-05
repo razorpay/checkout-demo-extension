@@ -466,17 +466,6 @@ function initOffers(
         return visibleOffers.length;
       },
     },
-
-    /**
-     * If there's only one offer, returns it.
-     *
-     * @returns {Offer|Object}
-     */
-    defaultOffer: {
-      get: function() {
-        return visibleOffers.length === 1 && visibleOffers[0];
-      },
-    },
   });
 
   // TODO: need to change to addEventlistner style
@@ -505,11 +494,14 @@ function initOffers(
     var $target = e.target,
       isOfferRemoved = false;
 
+    var clickedOnContinue = $offersErrorPay.contains($target);
+    var clickedOnBack = $offersErrorCancel.contains($target);
+
     /**
      * Logic around user wanting to remove the offer
      * or retry in case there's an error.
      */
-    if ($offersErrorPay.contains($target)) {
+    if (clickedOnContinue) {
       isOfferRemoved = true;
       Analytics.track('offers:retry_screen:remove', {
         type: AnalyticsTypes.BEHAV,
@@ -520,7 +512,7 @@ function initOffers(
       if (onRemoveOffer) {
         onRemoveOffer();
       }
-    } else if ($offersErrorCancel.contains($target)) {
+    } else if (clickedOnBack) {
       Analytics.track('offers:retry', {
         type: Analytics.BEHAV,
         data: appliedOffer && appliedOffer.data,
@@ -528,9 +520,16 @@ function initOffers(
       hideOfferError();
     }
 
-    if (offersErrorResolutionCb) {
-      offersErrorResolutionCb(isOfferRemoved);
-      offersErrorResolutionCb = null;
+    /**
+     * Call offers resolution callback only if one of the buttons was clicked.
+     * This check is required because the event listener is on the offers root,
+     * and not on the buttons.
+     */
+    if (clickedOnContinue || clickedOnBack) {
+      if (offersErrorResolutionCb) {
+        offersErrorResolutionCb(isOfferRemoved);
+        offersErrorResolutionCb = null;
+      }
     }
   });
 

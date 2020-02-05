@@ -127,13 +127,12 @@ if(emi_options && emi_options.banks){
             </div>
           `?`
         </div>
-        <div id="body"`?_.tpvBank || _.newHomeScreen` class="sub"`?`>
+        <div id="body" class="sub">
           <div id="curtain">
             <div id="curtain-container-parent"></div>
             <div id="curtain-overlay"></div>
           </div>
           <div id="messages"></div>
-          <div id="partial-back" class="theme-secondary-highlight"><i class="back">&#xe604;</i>Back to `?order.partial_payment`amount`??`contact details`?`</div>
           <div id="topbar" class="theme-secondary-highlight">
             <div id="top-right" class="`?optional.contact`hidden`?`">
               <div id="user"></div>
@@ -146,180 +145,7 @@ if(emi_options && emi_options.banks){
           </div>
           <form id="form" method="POST" novalidate autocomplete="off" onsubmit="return false">
             <div id="form-fields">
-              `?!_.newHomeScreen`
-              <div id="form-common" class="showable drishy screen">
-                <div class="pad partial-payment-block" id="pad-common">
-                  <div class="elem-wrap`?contact_hidden` invisible`?`" id="elem-wrap-contact"><div class="elem elem-contact`?contact_readonly` readonly`?`">
-                    <i>&#xe607;</i>
-                    <div class="help">Please enter a valid contact number</div>
-                    <label>Phone</label>
-                    <input class="input" id="contact" name="contact" type="tel" value="`=prefill_contact`"`?!optional.contact` required pattern="^\+?[0-9]{8,15}$"`??` pattern=".*"`?``?contact_readonly` readonly`?`>
-                  </div></div>
-                  <div class="elem-wrap`?email_hidden` invisible`?`" id="elem-wrap-email"><div class="elem elem-email`?email_readonly` readonly`?`">
-                    <i>&#xe603;</i>
-                    <div class="help">Please enter a valid email. Example:<br> you@example.com</div>
-                    <label>Email`?optional.email` (Optional)`?`</label>
-                    <input class="input" name="email" type="email" id="email" value="`=prefill_email`"`?!optional.email` required pattern="^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$"`??` pattern=".*"`?``?email_readonly` readonly`?`>
-                  </div></div>
-                  `?order.partial_payment`
-                  `?contactEmailOptional`
-                  <div class="legend">Select a payment type</div>
-                  `?`
-                  <div id='partial-list' class="list collapsable">
-                    `?contactEmailOptional`
-                    <div class="item">
-                      <input type="radio" name="partial_payment" value="pay_full" id="partial-full">
-                      <label for="partial-full">
-                        <span class="checkbox"></span>
-                        Pay in full
-                      </label>
-                    </div>
-                    `?`
-                    <div id="partial-radio" class="item">
-                      <input type="`?contactEmailOptional`radio`??`checkbox`?`" name="partial_payment" value="pay_parts" id="partial-select-partial"`?order.amount_due!==o('amount')` checked`?`>
-                      <label for="partial-select-partial">
-                        <span class="checkbox"></span>
-                        Make payment in parts
-                        <div class="elem-wrap collapsable-content" id="elem-wrap-amount" style="height: 38px">
-                          <div class="elem elem-amount">
-                            <input class="input" name="amount" type="tel" id="amount-value" placeholder="Enter amount" value="`=_.getDecimalAmount(o('amount'))`">
-                            <div class="help">Please enter a valid amount (upto `=_.getDecimalAmount(order.amount_due)`)</div>
-                          </div>
-                        </div>
-
-                        `?(order.partial_payment && !!order.first_payment_min_amount && Number(order.amount_paid) === 0)`
-                          <div class="minimum-amount-select">
-                            <input type="checkbox" class="checkbox--square" id="minimum-amount-select" `?order.first_payment_min_amount===o('amount')` checked`?`>
-                            <div class="checkbox inner-checkbox" for="minimum-amount-select"></div>
-                            <label class="partial-label" for="minimum-amount-select">
-                              `=html(o('min_amount_label') || 'Minimum Amount Due')` (`=html(firstPaymentMinAmount)`)
-                            </label>
-                          </div>
-                        `?`
-
-                        `?(order.partial_payment && (!order.first_payment_min_amount || Number(order.amount_paid) !== 0))`
-                          <div class="subtitle subtitle--help">Pay some amount now and remaining later.</div>
-                        `?`
-                      </label>
-                    </div>
-                  </div>
-
-                  `?`
-                  `?address&&!order.partial_payment`
-                  <div class="elem-wrap" id="elem-wrap-address"><div class="elem elem-address">
-                    <div class="help">Address should be atleast 10 characters long</div>
-                    <label>Address</label>
-                    <textarea class="input" name="address" type="text" id="address" required pattern="[\s\S]{10}" maxlength="200" rows='2'></textarea>
-                  </div></div>
-                  <div class="elem-wrap"><div class="elem">
-                    <div class="help">Enter 6 digit pincode</div>
-                    <label>PIN Code</label>
-                    <input class="input" required pattern="^\d{6}$" maxlength="6" id="pincode">
-                  </div></div>
-                  <div class="elem-wrap"><div class="elem select elem-state">
-                    <div class="help">Select a value from list of states</div>
-                    <i class="select-arrow">&#xe601;</i>
-                    <select class="input" required id="state">
-                      <option value="">Select State</option>
-                      `~_.states:code:text`
-                        <option value="`=code`">`=text`</option>
-                      `~`
-                    </select>
-                  </div></div>
-                  `?`
-                  `?_.multiTpv`
-                    <div class="multi-tpv input-radio centered">
-                      <div class="multi-tpv-header">Pay Using</div>
-                      <input checked type="radio" name="method" id="multitpv-netb" value="netbanking">
-                      <label for="multitpv-netb">
-                        <i><img src="https://cdn.razorpay.com/bank/`=bank.code`.gif"></i>
-                        <div class="radio-display"></div>
-                        <div class="label-content">A/C: `=bank.account_number`</div>
-                        <span>`=bank.name`</span>
-                      </label>
-                      <input type="radio" name="method" id="multitpv-upi" value="upi">
-                      <label for="multitpv-upi">
-                        <i>`=icons.upi`</i>
-                        <div class="radio-display"></div>
-                        <div class="label-content">UPI Payment</div>
-                        <span>`=bank.name` Account `=bank.account_number`</span>
-                      </label>
-                    </div>
-                  `??_.tpvBank`
-                    <div class="customer-bank-details">
-                      <div class="bank-name">
-                        `?bank.logo`
-                          <img src="`=bank.logo`">
-                        `?`
-                        `?bank.name`
-                          `=bank.name`
-                        `??`
-                          Bank Details
-                        `?`
-                      </div>
-                      `?bank.account_number`
-                        <div class="account-details clearfix">
-                          <div>Account Number</div>
-                          <div>`=bank.account_number`</div>
-                        </div>
-                      `?`
-                      `?accountName`
-                        <div class="account-details clearfix">
-                          <div>Customer Name</div>
-                          <div>`=accountName`</div>
-                        </div>
-                      `?`
-                      `?contactEmailOptional && bank.ifsc`
-                        <div class="account-details clearfix">
-                          <div>IFSC code</div>
-                          <div class="text-uppercase">`=bank.ifsc`</div>
-                        </div>
-                      `?`
-                    </div>
-                  `?`
-                </div>
-                `?_.recurring && _.tab !== 'emandate' && _.methods.count === 1 && method.card`
-                  <div class="pad recurring-message">
-                    <span>&#x2139;</span>
-                    `?o('subscription_id')`
-                      `?method.debit_card && method.credit_card`
-                        Subscription payments are supported on Visa and Mastercard Credit Cards from all Banks and Debit Cards from ICICI, Kotak, Citibank and Canara Bank.
-                      `??method.debit_card`
-                        Subscription payments are only supported on Visa and Mastercard Debit Cards from ICICI, Kotak, Citibank and Canara Bank.
-                      `??`
-                        Subscription payments are only supported on Mastercard and Visa Credit Cards.
-                      `?`
-                    `??`
-                      `?method.debit_card && method.credit_card`
-                        Visa and Mastercard Credit Cards from all Banks and Debit Cards from ICICI, Kotak, Citibank and Canara Bank are supported for this payment.
-                      `??method.debit_card`
-                        Only Visa and Mastercard Debit Cards from ICICI, Kotak, Citibank and Canara Bank are supported for this payment.
-                      `??`
-                        Only Visa and Mastercard Credit Cards are supported for this payment.
-                      `?`
-                    `?`
-                  </div>
-                `?`
-                `?cardOffer`
-                  <div class="pad" id="card-offer">
-                    `?cardOffer.name`
-                      <div class="text-btn"><strong>`=cardOffer.name`</strong></div>
-                    `?`
-                    `?cardOffer.display_text`
-                      `=cardOffer.display_text`
-                    `?`
-                  </div>
-                `?`
-                <div`?_.tpvBank` class="showable"`?`>
-                  <div id="methods-list"></div>
-                  <div id="other-methods"></div>
-                  <div class="clear"></div>
-                </div>
-              </div>
-              `??`
-                <div id="home-screen-wrap"></div>
-                <div id="methods-screen-wrap"></div>
-              `?`
+              <div id="home-screen-wrap"></div>
               `?_.irctc`
                 <div class='recurring-message' style='right: 0;left: 0;border-radius:0 0 3px 3px'>
                       <span>&#x2139;</span>
@@ -560,7 +386,6 @@ if(emi_options && emi_options.banks){
                 </div>
               `?`
             </div>
-            <div id='next-button' class="submit-button">Next</div>
             <div class="offers-container" id="offers-container"></div>
             <button id="footer" type="submit" class="button">
               <span>`=cta`</span>
