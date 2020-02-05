@@ -417,13 +417,6 @@
     <div slot="main">
 
       {#if intent}
-        <ListHeader>
-          <i slot="icon">
-            <Icon icon={getMiscIcon('redirect')} />
-          </i>
-          <div slot="subtitle">You will be redirected to your UPI app</div>
-        </ListHeader>
-
         <UpiIntent
           bind:this={intentView}
           apps={intentApps || []}

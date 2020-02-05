@@ -10,6 +10,10 @@
   import NextOption from 'templates/views/ui/options/NextOption.svelte';
   import OptionIcon from 'templates/views/ui/options/OptionIcon.svelte';
   import Field from 'templates/views/ui/Field.svelte';
+  import ListHeader from 'templates/views/ui/ListHeader.svelte';
+  import Icon from 'templates/views/ui/Icon.svelte';
+
+  import { getMiscIcon } from 'icons/misc';
 
   // Props
   export let apps;
@@ -207,6 +211,13 @@
 <div class="legend left">PAY USING APPS</div>
 <div id="upi-apps">
   <div id="svelte-upi-apps-list" class="options options-no-margin">
+    <ListHeader>
+      <i slot="icon">
+        <Icon icon={getMiscIcon('redirect')} />
+      </i>
+      <div slot="subtitle">You will be redirected to your UPI app</div>
+    </ListHeader>
+
     {#each showableApps as app, i}
       <RadioOption
         data={app}
