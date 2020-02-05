@@ -5,7 +5,7 @@
 </script>
 
 <style>
-  div[slot='icon'].full-opacity.higher-spec {
+  div[slot='icon'][higher-css-specificity].full-opacity.higher-spec {
     opacity: 1;
     margin-right: 0px;
   }
@@ -18,7 +18,7 @@
   <div slot="subtitle">
     <slot name="subtitle" />
   </div>
-  <div slot="icon" class="full-opacity higher-spec">
+  <div slot="icon" higher-css-specificity class="full-opacity higher-spec">
     <slot name="icon" />
   </div>
 </SlottedOption>
