@@ -7,6 +7,7 @@
   import { getSession } from 'sessionmanager';
   import * as GPay from 'gpay';
   import * as Bridge from 'bridge';
+  import Preferences from 'checkoutstore/preferences';
   import DowntimesStore from 'checkoutstore/downtimes';
   import { isVpaValid } from 'common/upi';
   import {
@@ -73,6 +74,8 @@
   let intentAppSelected = null;
 
   const session = getSession();
+  const preferences = Preferences.get();
+
   const {
     all_upi_intents_data: allIntentApps,
     upi_intents_data: intentApps,
@@ -101,8 +104,8 @@
 
   const checkOmnichannel = session => {
     const hasFeature = _Obj.getSafely(
-      session,
-      'preferences.features.google_pay_omnichannel'
+      preferences,
+      'features.google_pay_omnichannel'
     );
 
     // Do not use omnichannel for Payouts
@@ -124,7 +127,7 @@
       preferIntent &&
       intentApps &&
       _.lengthOf(intentApps) > 0 &&
-      _Obj.getSafely(session, 'preferences.methods.upi_intent')
+      _Obj.getSafely(preferences, 'methods.upi_intent')
   );
   $: isGPaySelected = selectedApp === 'gpay' && useWebPaymentsApi;
   $: pspHandle = selectedAppData ? selectedAppData.psp : '';
