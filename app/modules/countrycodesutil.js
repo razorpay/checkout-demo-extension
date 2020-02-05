@@ -33,13 +33,28 @@ function findCountryCode(number) {
 function checkForInternational(number) {
   let countryCode = '';
 
+  const singleDigitCodes = Object.keys(countrycodes.ones);
+  const doubleDigitCodes = Object.keys(countrycodes.twos);
+  const tripleDigitCodes = Object.keys(countrycodes.threes);
+
   for (let i = MAX_LENGTH_COUNTRY_CODE; i >= 1; i--) {
     let code = number.substring(0, i);
 
-    const allCodes = Object.keys(countrycodes);
-    if (allCodes.indexOf(code) >= 0) {
-      countryCode = code;
-      break;
+    if (code.length === 3) {
+      if (tripleDigitCodes.indexOf(code) >= 0) {
+        countryCode = code;
+        break;
+      }
+    } else if (code.length === 2) {
+      if (doubleDigitCodes.indexOf(code) >= 0) {
+        countryCode = code;
+        break;
+      }
+    } else if (code.length === 1) {
+      if (singleDigitCodes.indexOf(code) >= 0) {
+        countryCode = code;
+        break;
+      }
     }
   }
 

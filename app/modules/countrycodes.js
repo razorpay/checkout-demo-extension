@@ -1,4 +1,4 @@
-const countryCodeToRegionCodeMap = {
+const ones = {
   1: [
     'US',
     'AG',
@@ -27,6 +27,9 @@ const countryCodeToRegionCodeMap = {
     'VI',
   ],
   7: ['RU', 'KZ'],
+};
+
+const twos = {
   20: ['EG'],
   27: ['ZA'],
   30: ['GR'],
@@ -71,6 +74,9 @@ const countryCodeToRegionCodeMap = {
   94: ['LK'],
   95: ['MM'],
   98: ['IR'],
+};
+
+const threes = {
   211: ['SS'],
   212: ['MA', 'EH'],
   213: ['DZ'],
@@ -240,6 +246,12 @@ const countryCodeToRegionCodeMap = {
   995: ['GE'],
   996: ['KG'],
   998: ['UZ'],
+};
+
+const countryCodeToRegionCodeMap = {
+  ones,
+  twos,
+  threes,
 };
 
 module.exports = countryCodeToRegionCodeMap;
