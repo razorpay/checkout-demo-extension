@@ -3311,10 +3311,9 @@ Session.prototype = {
       this.showDiscount();
     }
 
-    var savedCards =
-      this.customer &&
-      this.customer.tokens &&
-      Token.getSavedCards(this.customer.tokens.items);
+    var savedCards = Token.getSavedCards(
+      _Obj.getSafely(this, 'customer.tokens.items')
+    );
 
     screen = screen || this.screen;
 
@@ -3442,9 +3441,7 @@ Session.prototype = {
     this.hideDiscount();
 
     if (
-      this.customer &&
-      this.customer.tokens &&
-      Token.getSavedCards(this.customer.tokens.items).length
+      Token.getSavedCards(_Obj.getSafely(this, 'customer.tokens.items')).length
     ) {
       this.setSavedCards(this.customer.tokens);
     }
@@ -4291,10 +4288,7 @@ Session.prototype = {
     var customer = this.customer;
     var tokens =
       (providedTokens && providedTokens.count) ||
-      (customer &&
-        customer.tokens &&
-        Token.getSavedCards(customer.tokens.items).length);
-    var cardTab = $('#form-card');
+      Token.getSavedCards(_Obj.getSafely(this, 'customer.tokens.items')).length;
     var delegator = this.delegator;
     var self = this;
 

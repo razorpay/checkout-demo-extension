@@ -70,8 +70,12 @@ const filterTokensByMethod = method => {
  *
  * @return {Array}
  */
-export const getSavedCards = tokens =>
-  _Arr.filter(tokens, token => token.method === 'card');
+export const getSavedCards = tokens => {
+  if (!tokens) {
+    return [];
+  }
+  return _Arr.filter(tokens, token => token.method === 'card');
+};
 
 /**
  * Filter out all the saved cards from tokens.
