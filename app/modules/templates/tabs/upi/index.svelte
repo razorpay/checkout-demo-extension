@@ -100,10 +100,10 @@
   };
 
   const checkOmnichannel = session => {
-    const hasFeature =
-      session.preferences &&
-      session.preferences.features &&
-      session.preferences.features.google_pay_omnichannel;
+    const hasFeature = _Obj.getSafely(
+      session,
+      'preferences.features.google_pay_omnichannel'
+    );
 
     // Do not use omnichannel for Payouts
     if (session.isPayout) {
@@ -124,10 +124,7 @@
       preferIntent &&
       intentApps &&
       _.lengthOf(intentApps) > 0 &&
-      session.preferences &&
-      //use a safe check
-      session.preferences.methods &&
-      session.preferences.methods.upi_intent
+      _Obj.getSafely(session, 'preferences.methods.upi_intent')
   );
   $: isGPaySelected = selectedApp === 'gpay' && useWebPaymentsApi;
   $: pspHandle = selectedAppData ? selectedAppData.psp : '';
