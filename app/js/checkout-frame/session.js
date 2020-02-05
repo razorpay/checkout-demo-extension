@@ -620,6 +620,73 @@ function overlayVisible() {
   return $('#overlay').hasClass(shownClass);
 }
 
+/**
+ * Attaches listeners that add functionality
+ * to the Log Out dropdown
+ * @param {Session} session
+ */
+function attachLogoutListeners(session) {
+  var profile = _Doc.querySelector('#profile');
+  var topRight = _Doc.querySelector('#top-right');
+
+  /**
+   * Attach listener on body to collapse the dropdown
+   * when the dropdown is open and the user clicks
+   * somewhere outside the dropdown
+   */
+  document.body.addEventListener(
+    'click',
+    function(event) {
+      var focused = _El.hasClass(topRight, 'focus');
+
+      if (focused) {
+        var isTargetTopRight =
+          _El.closest(event.target, '#top-right') === topRight;
+
+        /**
+         * If the user has clicked outside of the dropdown, collapse
+         * and don't let the click propagate
+         */
+        if (!isTargetTopRight) {
+          event.stopPropagation();
+          _El.removeClass(topRight, 'focus');
+        }
+      }
+    },
+    true
+  );
+
+  /**
+   * Toggle the dropdown every time it's clicked on
+   */
+  topRight.addEventListener('click', function(event) {
+    event.preventDefault();
+
+    _El.toggleClass(topRight, 'focus');
+  });
+
+  /**
+   * When the user clicks on one of the buttons, do something.
+   *
+   * This should probably have individual click listeners, once we move this to Svelte.
+   */
+  profile.addEventListener('click', function(event) {
+    event.preventDefault();
+
+    var target = event.target;
+
+    if (target.tagName !== 'LI') {
+      return;
+    }
+
+    if (_El.getAttribute(target, 'data-all')) {
+      session.logUserOutOfAllDevices(session.customer);
+    } else {
+      session.logUserOut(session.customer);
+    }
+  });
+}
+
 // this === Session
 function errorHandler(response) {
   if (isString(response)) {
@@ -2704,26 +2771,9 @@ Session.prototype = {
         }
       });
     }
-    this.on('click', '#top-right', function() {
-      $('#top-right').addClass('focus');
-      var self = this;
-      var container_listener = $('#container').on(
-        'click',
-        function(e) {
-          if (e.target.tagName === 'LI') {
-            if (e.target.parentNode.firstChild === e.target) {
-              self.logUserOutOfAllDevices(self.customer);
-            } else {
-              self.logUserOut(self.customer);
-            }
-          }
-          container_listener();
-          $('#top-right').removeClass('focus');
-          return preventDefault(e);
-        },
-        true
-      );
-    });
+
+    attachLogoutListeners(this);
+
     if (enabledMethods.wallet) {
       try {
         this.on(
