@@ -33,6 +33,13 @@
     let flow;
     let vpaSplit;
 
+    let getInstrumentName = () => {
+      let vpaDetails = session.preferences.customer.tokens.items.find(
+        item => item.id === instrument.token
+      ).vpa;
+      return [vpaDetails.username, vpaDetails.handle];
+    };
+
     switch (instrument.method) {
       case 'paypal':
         text = 'PayPal';
@@ -72,12 +79,7 @@
         } else {
           vpaSplit = instrument.vpa
             ? instrument.vpa.split('@')
-            : (() => {
-                let vpaDetails = session.preferences.customer.tokens.items.find(
-                  item => item.id === instrument.token
-                ).vpa;
-                return [vpaDetails.username, vpaDetails.handle];
-              })();
+            : getInstrumentName();
           text = `UPI - ${vpaSplit[0]}@${vpaSplit[1]}`;
           icon = '&#xe70e;';
           alt = 'UPI';
