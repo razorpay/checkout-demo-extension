@@ -77,7 +77,7 @@
   }
 
   .legend {
-    margin-top: 18px;
+    margin-top: 10px;
     padding: 12px 0 8px 12px;
   }
 
@@ -104,7 +104,7 @@
   align="top"
   on:click={onSelection}
   {selected}>
-  <div id="gpay-omnichannel" slot="title">UPI ID</div>
+  <div id="gpay-omnichannel" slot="title">Google Pay phone number</div>
   <i slot="icon" class="top">
     <img src="https://cdn.razorpay.com/app/googlepay.svg" alt="Google Pay" />
   </i>
@@ -133,11 +133,6 @@
   {#if error}
     <p class:regular={!isFirst} class:error={isFirst}>
       Please ensure the same number is linked to the Google Pay account.
-    </p>
-  {:else}
-    <p class="info">
-      You will get a request of {amount} in your Google Pay app linked with this
-      mobile number.
     </p>
   {/if}
 {/if}

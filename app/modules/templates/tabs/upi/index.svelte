@@ -306,18 +306,6 @@
     const id = event.detail.id;
     selectedToken = id;
     intentAppSelected = event.detail.app || null;
-
-    /**
-     * Wait for `isGpaySelected` to be updated. It does not update synchronously when selectedApp is reassigned, hence
-     * the setTimeout.
-     */
-    // setTimeout(function() {
-    //   if (isGPaySelected) {
-    //     return session.preSubmit();
-    //   }
-
-    //   // focusVpa();
-    // });
   }
 
   export function getFullVpa() {
@@ -381,6 +369,7 @@
 
 <style>
   .legend {
+    margin-top: 10px;
     padding: 12px 0 8px 12px;
   }
 
@@ -399,28 +388,6 @@
 
     &.paytm :global(.elem) {
       padding-right: 64px;
-    }
-  }
-
-  .ref-changebtn {
-    position: absolute;
-    top: 0;
-    right: 4px;
-    bottom: 0;
-    font-size: 12px;
-    line-height: 47px;
-    padding: 0 20px 0 30px;
-    color: #7b7f95;
-    overflow: hidden;
-    cursor: pointer;
-
-    &:after {
-      content: '\e604';
-      transform: rotate(270deg);
-      font-size: 8px;
-      position: absolute;
-      right: 8px;
-      top: 0;
     }
   }
 

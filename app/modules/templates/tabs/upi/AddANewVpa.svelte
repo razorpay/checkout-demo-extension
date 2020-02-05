@@ -104,7 +104,7 @@
   align="top"
   on:click={onSelection}
   {selected}>
-  <div id="new-vpa-field" slot="title">UPI ID</div>
+  <div id="new-vpa-field" slot="title">Add UPI ID</div>
   <div slot="subtitle">Google Pay, BHIM, Phone Pe & more</div>
   <i slot="icon" class="top">
     <Icon icon={session.themeMeta.icons.upi} />
@@ -125,7 +125,7 @@
           bind:this={vpaField}
           on:blur
           placeholder="Enter your UPI ID" />
-        {#if getSafely(session, 'customer.logged')}
+        {#if getSafely(session, 'customer.logged') && getSafely(session, 'preferences.features.save_vpa')}
           <div class="should-save-vpa-container">
             <label id="should-save-vpa" for="save-vpa">
               <input
@@ -135,7 +135,7 @@
                 bind:this={rememberVpaCheckbox}
                 name="save" />
               <span class="checkbox" />
-              Remember VPA
+              Securely save your UPI ID
             </label>
           </div>
         {/if}
