@@ -46,7 +46,7 @@
   },
   "dependencies": {
     "chalk": "^2.4.1",
-    "fe": "git+https://github.com/razorpay/common-frontend-utils.git#03125d5",
+    "fe": "git+https://github.com/razorpay/common-frontend-utils.git#0c797af",
     "gulp": "^4.0.0",
     "gulp-stylus": "^2.7.0",
     "gulp-usemin": "^0.3.29",
