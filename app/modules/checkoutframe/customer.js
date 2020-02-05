@@ -37,7 +37,6 @@ export function Customer(contact) {
 
 export const sanitizeTokens = (tokens, filters) => {
   let _filters = filters || {};
-  // figure out for both cards and upi
   let methods = _filters.methods || ['upi', 'card'],
     recurring = _filters.recurring || false;
 
@@ -46,10 +45,9 @@ export const sanitizeTokens = (tokens, filters) => {
 
     tokens.items
       |> _Obj.loop(item => {
-        if (
-          methods.includes(item.method) &&
-          (recurring ? item.recurring : true)
-        ) {
+        const isAValidToken =
+          methods.includes(item.method) && (recurring ? item.recurring : true);
+        if (isAValidToken) {
           items.push(item);
         }
       });
