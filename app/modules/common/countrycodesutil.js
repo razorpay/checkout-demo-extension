@@ -16,7 +16,7 @@ export default function findCountryCode(phno) {
       };
     } else {
       return {
-        code: undefined,
+        countrycode: undefined,
         phnumber: phno,
       };
     }
@@ -25,29 +25,29 @@ export default function findCountryCode(phno) {
       let regex = /^[6-9]/;
       if (number.match(regex)) {
         return {
-          code: 91,
+          countrycode: '91',
           phnumber: number,
         };
       } else
         return {
-          code: undefined,
+          countrycode: undefined,
           phnumber: phno,
         };
     } else if (number.length === 12) {
       let regex = /^91[6-9]/;
       if (number.match(regex)) {
         return {
-          code: 91,
+          countrycode: '91',
           phnumber: number.substring(2),
         };
       } else
         return {
-          code: undefined,
+          countrycode: undefined,
           phnumber: phno,
         };
     } else
       return {
-        code: undefined,
+        countrycode: undefined,
         phnumber: phno,
       };
   }
