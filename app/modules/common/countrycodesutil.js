@@ -1,4 +1,4 @@
-import countrycodes from 'modules/countrycodes';
+import countrycodes from 'countrycodes';
 
 const MAX_LENGTH_COUNTRY_CODE = 3;
 
