@@ -1,4 +1,7 @@
 <script>
+  // Svelte imports
+  import { createEventDispatcher } from 'svelte';
+
   // Utils imports
   import { getSession } from 'sessionmanager';
   import { GOOGLE_PAY_PACKAGE_NAME, isVpaValid } from 'common/upi';
@@ -21,7 +24,6 @@
   export let selected = null;
   export let showRecommendedUPIApp;
   export let selectedApp;
-  export let intentSelection;
 
   // Computed
   export let showableApps;
@@ -93,11 +95,13 @@
     return data;
   }
 
+  const dispatch = createEventDispatcher();
+
   export function onAppSelect({ detail }) {
     const packageName = detail.package_name;
 
     session.onUpiAppSelect(packageName);
-    intentSelection(packageName);
+    dispatch('select', { packageName });
   }
 </script>
 

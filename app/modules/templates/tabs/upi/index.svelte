@@ -398,8 +398,10 @@
           bind:this={intentView}
           apps={intentApps || []}
           selected={intentAppSelected}
-          intentSelection={app => {
-            onUpiAppSelection({ detail: { id: 'intent', app } });
+          on:select={e => {
+            onUpiAppSelection({
+              detail: { id: 'intent', app: e.detail.packageName },
+            });
           }}
           {showRecommendedUPIApp} />
       {/if}
@@ -449,7 +451,7 @@
           </SlottedRadioOption>
         {/each}
         <AddANewVpa
-          onSelection={_ => {
+          on:click={_ => {
             onUpiAppSelection({ detail: { id: 'new' } });
             showCta();
           }}

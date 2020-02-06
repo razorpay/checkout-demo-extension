@@ -102,7 +102,7 @@
   name="payment_type"
   value="full"
   align="top"
-  on:click={onSelection}
+  on:click
   {selected}>
   <div id="new-vpa-field" slot="title">Add UPI ID</div>
   <div slot="subtitle">Google Pay, BHIM, Phone Pe & more</div>
