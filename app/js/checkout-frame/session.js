@@ -1136,16 +1136,12 @@ Session.prototype = {
 
       this.body = $('#body');
 
-      if (this.invoice) {
-        r.set('order_id', this.invoice.order_id);
-        if (ecod) {
-          commenceECOD(this);
-        }
+      if (this.invoice && ecod) {
+        commenceECOD(this);
       }
       if (ecod) {
         r.set('prefill.method', 'wallet');
         r.set('theme.hide_topbar', true);
-        gel('form-wallet').insertBefore(gel('pad-common'), gel('ecod-label'));
       }
       $(this.el).addClass(classes);
     }
@@ -1462,6 +1458,14 @@ Session.prototype = {
     window.addEventListener('orientationchange', function() {
       Analytics.setMeta('orientation', Hacks.getDeviceOrientation());
     });
+
+    if (this.get('ecod')) {
+      Analytics.setMeta('ecod', true);
+
+      if (this.invoice) {
+        Analytics.setMeta('invoice', true);
+      }
+    }
 
     Analytics.track('complete', {
       type: AnalyticsTypes.RENDER,
@@ -3627,11 +3631,12 @@ Session.prototype = {
    * @returns {boolean} valid
    */
   checkCommonValid: function() {
-    var selector = '#pad-common';
-
-    if (this.homeTab.onDetailsScreen()) {
-      selector = '#form-common';
+    // Only check if we're on the homescreen
+    if (!this.homeTab.onDetailsScreen()) {
+      return true;
     }
+
+    var selector = '#form-common';
 
     var valid = !this.checkInvalid(selector);
 
@@ -3648,7 +3653,7 @@ Session.prototype = {
     var valid = this.checkCommonValid();
 
     if (!valid) {
-      var fields = _Doc.querySelectorAll('#pad-common .invalid [name]');
+      var fields = _Doc.querySelectorAll('#form-common .invalid [name]');
 
       var invalidFields = {};
 
@@ -4565,8 +4570,6 @@ Session.prototype = {
   getFormData: function() {
     var tab = this.tab;
     var data = {};
-
-    fillData('#pad-common', data);
 
     data.contact = getPhone();
     data.email = getEmail();
@@ -6783,6 +6786,10 @@ Session.prototype = {
 
     // Amount and currency have been updated, set EMI options
     this.setEmiOptions();
+    // set orderid as it is required while creating payments
+    if (prefs.invoice) {
+      this.r.set('order_id', prefs.invoice.order_id);
+    }
 
     /*
      * Set redirect mode if TPV and callback_url exists
