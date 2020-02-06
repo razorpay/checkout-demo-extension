@@ -108,6 +108,7 @@
 <SlottedRadioOption
   {name}
   {selected}
+  ellipsis
   value={instrument.id}
   className="p13n-instrument"
   on:click
