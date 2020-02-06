@@ -2342,7 +2342,6 @@ Session.prototype = {
 
     $('#overlay-close').hide();
     hideOverlayMessage();
-    $('.omnichannel').hide(); // Hide the Google Pay logo
   },
 
   shake: function() {
@@ -4552,10 +4551,6 @@ Session.prototype = {
     return '#form-' + form;
   },
 
-  retryWithOmnichannel: function() {
-    this.upiTab.setOmnichannelAsRetried();
-  },
-
   getFormData: function() {
     var tab = this.tab;
     var data = {};
@@ -4684,30 +4679,6 @@ Session.prototype = {
     }
   },
 
-  showOmnichannelLoader: function(text) {
-    setTimeout(function() {
-      $('#error-message .link').html('');
-    }, 100);
-
-    $('.omnichannel').show();
-    $('#overlay-close').show();
-
-    this.showLoadError(text, false);
-  },
-
-  /**
-   * Get the message to be shown in the omnichannel loader.
-   * @return {string}
-   */
-  getOmnichannelMessage: function() {
-    return (
-      'Please accept the request of ' +
-      this.formatAmountWithCurrency(this.get('amount')) +
-      ' in your Google Pay app linked with +91' +
-      this.payload.contact
-    );
-  },
-
   showLoadError: function(text, error) {
     if (this.headless && this.screen === 'card') {
       return;
@@ -4728,11 +4699,6 @@ Session.prototype = {
       loadingState = false;
     } else {
       actionState = false;
-    }
-
-    var isOmnichannel = this.isOmnichannel();
-    if (isOmnichannel && error) {
-      this.retryWithOmnichannel();
     }
 
     if (!text) {
@@ -5226,44 +5192,16 @@ Session.prototype = {
 
       // perform the actual validation
       if (screen === 'upi') {
-        var formSelector = '#form-upi';
-        var omnichannelType = this.upiTab.omnichannelType;
+        var formSelector = '#new-vpa-input';
 
-        if (data['_[flow]'] === 'intent') {
-          if (!omnichannelType) {
-            formSelector = '#svelte-collect-in-intent';
-          } else {
-            if (omnichannelType === 'vpa') {
-              formSelector = '#upi-gpay-vpa';
-            }
-
-            if (omnichannelType === 'phone') {
-              formSelector = '#upi-gpay-phone';
-            }
-          }
-        }
-
-        if (
-          data['_[flow]'] === 'directpay' &&
-          this.upiTab.selectedApp === 'gpay'
-        ) {
-          if (omnichannelType === 'vpa') {
-            formSelector = '#upi-gpay-vpa';
-          }
-
-          if (omnichannelType === 'phone') {
-            formSelector = '#upi-gpay-phone';
+        if (data['_[flow]'] === 'directpay') {
+          if (data.upi_provider === 'google_pay') {
+            formSelector = '#gpay-phone';
           }
         }
 
         if (this.checkInvalid(formSelector)) {
           return;
-        }
-
-        if (this.isOmnichannel()) {
-          $('.omnichannel').show();
-        } else {
-          $('.omnichannel').hide();
         }
       } else if (this.checkInvalid()) {
         return;
@@ -5709,8 +5647,6 @@ Session.prototype = {
       tab_titles.otp =
         '<img src="' + walletObj.logo + '" height="' + walletObj.h + '">';
       this.commenceOTP(wallet + ' account', true);
-    } else if (this.isOmnichannel()) {
-      this.showOmnichannelLoader(strings.gpay_omnichannel);
     } else if (!this.isPayout) {
       this.showLoadError();
     } else {
@@ -5904,13 +5840,9 @@ Session.prototype = {
           return that.showLoadError('Waiting for payment confirmation.');
         }
 
-        if (that.isOmnichannel()) {
-          that.showOmnichannelLoader(that.getOmnichannelMessage());
-        } else {
-          that.showLoadError(
-            "Please accept the request from Razorpay's VPA on your UPI app"
-          );
-        }
+        that.showLoadError(
+          "Please accept the request from Razorpay's VPA on your UPI app"
+        );
       });
     } else {
       if (!this.headless) {
@@ -6593,15 +6525,6 @@ Session.prototype = {
 
   getCustomer: function() {
     return getCustomer.apply(null, arguments);
-  },
-  isOmnichannel: function() {
-    return (
-      this.preferences.features &&
-      this.preferences.features.google_pay_omnichannel &&
-      this.upiTab &&
-      this.upiTab.selectedApp === 'gpay' &&
-      this.upiTab.omnichannelType === 'phone'
-    );
   },
 
   /**

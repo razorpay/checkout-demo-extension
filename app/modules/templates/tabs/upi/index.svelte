@@ -240,14 +240,6 @@
     return data;
   }
 
-  export function setOmnichannelAsRetried() {
-    Analytics.track('omnichannel:retry:click', {
-      type: AnalyticsTypes.BEHAV,
-    });
-
-    retryOmnichannel = true;
-  }
-
   export function onBack() {
     // User has gone back, set isFirst as false
     isFirst = false;
