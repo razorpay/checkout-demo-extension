@@ -5301,8 +5301,8 @@ Session.prototype = {
           }
         }
       }
-    } else if (data.method === 'paypal' && this.oneMethod === 'paypal') {
-      // Do not return
+    } else if (data.method === 'paypal') {
+      // Let method=paypal payments go through directly
     } else {
       return;
     }
