@@ -1136,11 +1136,8 @@ Session.prototype = {
 
       this.body = $('#body');
 
-      if (this.invoice) {
-        r.set('order_id', this.invoice.order_id);
-        if (ecod) {
-          commenceECOD(this);
-        }
+      if (this.invoice && ecod) {
+        commenceECOD(this);
       }
       if (ecod) {
         r.set('prefill.method', 'wallet');
@@ -6789,6 +6786,10 @@ Session.prototype = {
 
     // Amount and currency have been updated, set EMI options
     this.setEmiOptions();
+    // set orderid as it is required while creating payments
+    if (prefs.invoice) {
+      this.r.set('order_id', prefs.invoice.order_id);
+    }
 
     /*
      * Set redirect mode if TPV and callback_url exists
