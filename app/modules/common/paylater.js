@@ -13,7 +13,7 @@ const config = {
     name: 'Simpl',
   },
   icic: {
-    name: 'ICICI PayLater',
+    name: 'ICICI Bank PayLater',
   },
 };
 
