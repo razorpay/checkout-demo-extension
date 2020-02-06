@@ -1,7 +1,7 @@
 import findCountryCode from 'common/countrycodesutil';
 
 test('Module: countrycodeutil', t => {
-  test('Valid indian phone number starting with +91', t => {
+  test('Phone number starting with +91', t => {
     const formatedNumber = findCountryCode('+918600720041');
     const expectedFormat = {
       countrycode: '91',
@@ -11,7 +11,7 @@ test('Module: countrycodeutil', t => {
     t.end();
   });
 
-  test('Valid indian phone number starting with 91', t => {
+  test('Phone number starting with 91', t => {
     const formatedNumber = findCountryCode('918600720041');
     const expectedFormat = {
       countrycode: '91',
@@ -31,7 +31,7 @@ test('Module: countrycodeutil', t => {
     t.end();
   });
 
-  test('Valid international phone number starting with 00', t => {
+  test('Phone number starting with 00', t => {
     const formatedNumber = findCountryCode('006585341767');
     const expectedFormat = {
       countrycode: '65',
