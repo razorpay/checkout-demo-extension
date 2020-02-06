@@ -7,6 +7,7 @@
   import Field from 'templates/views/ui/Field.svelte';
   import Icon from 'templates/views/ui/Icon.svelte';
   import SlottedRadioOption from 'templates/views/ui/options/Slotted/RadioOption.svelte';
+  import Checkbox from 'templates/views/ui/Checkbox.svelte';
   import { getSession } from 'sessionmanager';
 
   // Util imports
@@ -14,15 +15,14 @@
 
   // Props
   export let selected = true;
-  export let selectedApp;
-  export let vpa;
-  export let pspHandle;
+  let vpa;
+  let pspHandle;
   export let focusOnCreate = false;
-  export let onSelection = false;
 
   // Refs
   export let vpaField = null;
   let rememberVpaCheckbox = null;
+  let rememberVpa = true;
 
   // Computed
   export let pattern;
@@ -51,7 +51,7 @@
   }
 
   export function shouldRememberVpa() {
-    return rememberVpaCheckbox && rememberVpaCheckbox.checked ? 1 : 0;
+    return rememberVpa ? 1 : 0;
   }
 
   export function blur() {
@@ -128,14 +128,9 @@
         {#if getSafely(session, 'customer.logged') && getSafely(session, 'preferences.features.save_vpa')}
           <div class="should-save-vpa-container">
             <label id="should-save-vpa" for="save-vpa">
-              <input
-                type="checkbox"
-                class="checkbox--square"
-                id="save-vpa"
-                bind:this={rememberVpaCheckbox}
-                name="save" />
-              <span class="checkbox" />
-              Securely save your UPI ID
+              <Checkbox bind:checked={rememberVpa} id="save-vpa">
+                Securely save your UPI ID
+              </Checkbox>
             </label>
           </div>
         {/if}
