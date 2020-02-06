@@ -58,10 +58,8 @@ describe.each(
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await selectUPIMethod(context, 'token');
-    // await enterUPIAccount(context, 'BHIM');
     await verifyPartialAmount(context, '₹ 100');
     await submit(context);
-    // await handleUPIAccountValidation(context, 'BHIM@upi');
     await respondToUPIAjax(context);
     await respondToUPIPaymentStatus(context);
   });

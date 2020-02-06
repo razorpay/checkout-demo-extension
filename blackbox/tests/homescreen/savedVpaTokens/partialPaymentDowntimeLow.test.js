@@ -75,10 +75,8 @@ describe.each(
     await selectPaymentMethod(context, 'upi');
     await verifyLowDowntime(context, 'UPI');
     await selectUPIMethod(context, 'token');
-    // await enterUPIAccount(context, 'BHIM');
     await verifyPartialAmount(context, '₹ 100');
     await submit(context);
-    // await handleUPIAccountValidation(context, 'BHIM@upi');
     await respondToUPIAjax(context);
     await respondToUPIPaymentStatus(context);
   });

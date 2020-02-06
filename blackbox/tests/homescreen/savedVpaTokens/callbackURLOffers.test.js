@@ -84,7 +84,6 @@ describe.each(
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await selectUPIMethod(context, 'token');
-    // await enterUPIAccount(context, 'BHIM');
     await viewOffers(context);
     await selectOffer(context, '1');
     await verifyOfferApplied(context);
@@ -92,7 +91,6 @@ describe.each(
     await verifyDiscountAmountInBanner(context, '₹ 1,990');
     await verifyDiscountText(context, 'You save ₹ 10');
     await submit(context);
-    // await handleUPIAccountValidation(context, 'BHIM@upi');
     await expectRedirectWithCallback(context, { method: 'upi' });
   });
 });

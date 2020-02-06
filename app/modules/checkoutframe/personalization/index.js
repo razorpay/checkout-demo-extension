@@ -160,10 +160,14 @@ export function createInstrumentFromPayment(payment, customer, extra) {
   return createInstrumentFromExtracted(extracted);
 }
 
+/**
+ * A map of functions that help get existing tokens for extracted information
+ */
 const MAPPERS = {
   upi: (extracted, instruments) => {
     const vpa = extracted.vpa;
 
+    // if not by vpa, find a match by key
     if (!vpa) {
       return MAPPERS.default(extracted, instruments);
     }
@@ -186,6 +190,7 @@ const MAPPERS = {
     return existingInstrumentWithVpa;
   },
 
+  // Works to extract instruments based on a unique key
   default: (extracted, instruments) => {
     return _Arr.find(instruments, instrument => {
       let same = true;
@@ -218,9 +223,7 @@ function getOrCreateInstrument(instruments, payment, customer, extra) {
     return;
   }
 
-  const method = payment.method;
-
-  const mapper = MAPPERS[method] || MAPPERS.default;
+  const mapper = MAPPERS[payment.method] || MAPPERS.default;
 
   const existing = mapper(extracted, instruments);
 

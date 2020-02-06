@@ -51,9 +51,7 @@ describe.each(
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await selectUPIMethod(context, 'token');
-    // await enterUPIAccount(context, 'BHIM');
     await submit(context);
-    // await handleUPIAccountValidation(context, 'BHIM@upi');
     await handleFeeBearer(context);
     await respondToUPIAjax(context);
     await respondToUPIPaymentStatus(context);

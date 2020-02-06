@@ -262,19 +262,25 @@
   }
 
   export function onUpiAppSelection(event) {
+    const getEventValueForFeature = feature => {
+      return (
+        {
+          gpay: 'gpay web payments',
+          'gpay-omni': 'gpay omnichannel',
+          new: 'add new',
+        }[feature] || 'saved vpa'
+      );
+    };
+
+    const id = event.detail.id;
+
     Analytics.track('vpa:option:click', {
       type: AnalyticsTypes.BEHAV,
       data: {
         app: event.detail.app,
-        value:
-          {
-            gpay: 'gpay web payments',
-            'gpay-omni': 'gpay omnichannel',
-            new: 'add new',
-          }[event.detail.id] || 'saved vpa',
+        value: getEventValueForFeature(id),
       },
     });
-    const id = event.detail.id;
     selectedToken = id;
     intentAppSelected = event.detail.app || null;
   }
