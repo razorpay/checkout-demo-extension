@@ -12,6 +12,7 @@
   export let radio = true;
   export let align = 'center';
   export let defaultStyles = true;
+  export let ellipsis = false; // Should we truncate the text?
 
   let radioClasses;
   $: {
@@ -63,6 +64,7 @@
 
 <button
   class={className}
+  class:ellipsis
   class:slotted-radio={defaultStyles}
   class:selected
   on:click

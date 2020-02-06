@@ -10,12 +10,19 @@
 
     > div:first-of-type {
       margin-right: 8px;
-      overflow: hidden;
+    }
+  }
 
-      > * {
+  &.ellipsis {
+    .stack {
+      > div:first-of-type {
         overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
+
+        > * {
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
       }
     }
   }
