@@ -1367,6 +1367,7 @@ Session.prototype = {
     this.getEl();
     this.setFormatting();
     this.improvisePaymentOptions();
+    this.improvisePrefill();
     this.setSvelteComponents();
     this.fillData();
     this.setEMI();
@@ -1376,6 +1377,7 @@ Session.prototype = {
     this.bindEvents();
     this.setEmiScreen();
     this.runMaxmindScriptIfApplicable();
+    this.prefillPostRender();
     Hacks.initPostRenderHacks();
 
     errorHandler.call(this, this.params);
@@ -2222,6 +2224,37 @@ Session.prototype = {
 
     if (this.upiTpv) {
       this.setOneMethod('upi');
+    }
+  },
+
+  /**
+   * Improvise the prefill options.
+   */
+  improvisePrefill: function() {
+    var prefilledMethod = this.get('prefill.method');
+    var prefilledProvider = this.get('prefill.provider');
+
+    /**
+     * Bajaj Finserv is _technically_ EMI,
+     * but we're grouping it under Cardless EMI screen
+     * on Checkout.
+     */
+    if (prefilledMethod === 'emi' && prefilledProvider === 'bajaj') {
+      this.set('prefill.method', 'cardless_emi');
+    }
+  },
+
+  /**
+   * Anything related to prefilled that needs to be done
+   * once everything has rendered,
+   * goes into this function.
+   */
+  prefillPostRender: function() {
+    var prefilledMethod = this.get('prefill.method');
+    var prefilledProvider = this.get('prefill.provider');
+
+    if (prefilledMethod === 'cardless_emi') {
+      this.selectCardlessEmiProvider(prefilledProvider);
     }
   },
 
