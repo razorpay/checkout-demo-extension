@@ -210,7 +210,8 @@ function setEmiPlansCta(screen, tab) {
   var session = SessionManager.getSession();
   var type = 'pay';
 
-  var isSavedScreen = session.svelteCardTab.isOnSavedCardsScreen();
+  var isSavedScreen =
+    session.svelteCardTab && session.svelteCardTab.isOnSavedCardsScreen();
 
   var emiDuration = getEmiDurationForNewCard();
   var savedCard = $('.saved-card.checked');
