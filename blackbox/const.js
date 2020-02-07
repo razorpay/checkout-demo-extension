@@ -5,4 +5,5 @@ module.exports = {
   lumberjackUrl: 'https://lumberjack.razorpay.com',
   zestMoneyLoanAgreementUrl:
     'https://app.zestmoney.in/PaymentGateway//RazorPay/document/loanAgreement',
+  maxmindScriptUrl: 'https://device.maxmind.com/js/device.js',
 };
