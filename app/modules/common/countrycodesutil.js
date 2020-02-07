@@ -19,60 +19,84 @@ import countrycodes from 'countrycodes';
 
 const MAX_LENGTH_COUNTRY_CODE = 3;
 
+const removePlus = number => number.replace(/^\+/, '');
+
+/**
+ * Sanitizes a phone number
+ * @param {string} number Phone number
+ *
+ * @returns {string}
+ */
+function sanitizeNumber(number) {
+  number = number.replace(/^00/, '+');
+
+  const startsWithPlus = _Str.startsWith(number, '+');
+
+  let sanitized = number.replace(/\D/g, '');
+
+  if (startsWithPlus) {
+    sanitized = '+' + sanitized;
+  }
+
+  return sanitized;
+}
+
+/**
+ * Returns the object if the number is Indian
+ * @param {string} number
+ *
+ * @returns {Object|undefined}
+ */
+function getIndianNumber(number) {
+  let phone = removePlus(number);
+
+  if (phone.length === 12 && _Str.startsWith(number, '91')) {
+    phone = phone.slice(2);
+  }
+
+  if (phone.length === 10 && /^[6-9]/.test(phone)) {
+    return {
+      phone,
+      code: '91',
+    };
+  }
+}
+
 /**
  * Finds country code for a given phonenumber
  * @param {string} phonenumber
  * @returns {Object} With country code and phonenumber
  */
 export default function findCountryCode(phno) {
-  let number = phno;
-  number = number.replace(/^0{2}/, '+');
+  let number = sanitizeNumber(phno);
 
-  if (number[0] === '+') {
-    number = number.split('+')[1];
-    let num = checkForInternational(number);
-    if (num) {
-      return {
-        countrycode: num,
-        phnumber: number.replace(num, ''),
-      };
-    } else {
-      return {
-        countrycode: undefined,
-        phnumber: phno,
-      };
+  const beginsWithPlus = _Str.startsWith(number, '+');
+  const lengthWithPlus = number.length;
+  const lengthWithoutPlus = removePlus(number).length;
+
+  const couldBeInternationalIndian = beginsWithPlus && lengthWithoutPlus === 12;
+  const couldBeRegularIndian = !beginsWithPlus && lengthWithoutPlus === 10;
+
+  if (couldBeInternationalIndian || couldBeRegularIndian) {
+    const indian = getIndianNumber(number);
+
+    if (indian) {
+      return indian;
     }
-  } else {
-    if (number.length === 10) {
-      let regex = /^[6-9]/;
-      if (number.match(regex)) {
-        return {
-          countrycode: '91',
-          phnumber: number,
-        };
-      } else
-        return {
-          countrycode: undefined,
-          phnumber: phno,
-        };
-    } else if (number.length === 12) {
-      let regex = /^91[6-9]/;
-      if (number.match(regex)) {
-        return {
-          countrycode: '91',
-          phnumber: number.substring(2),
-        };
-      } else
-        return {
-          countrycode: undefined,
-          phnumber: phno,
-        };
-    } else
-      return {
-        countrycode: undefined,
-        phnumber: phno,
-      };
   }
+
+  const intlCode = checkForInternational(number);
+
+  let phone = removePlus(number);
+
+  if (intlCode) {
+    phone = phone.slice(intlCode.length);
+  }
+
+  return {
+    phone,
+    code: intlCode,
+  };
 }
 
 /**
@@ -81,6 +105,8 @@ export default function findCountryCode(phno) {
  * @returns {string} country code
  */
 function checkForInternational(number) {
+  number = removePlus(number);
+
   let countryCode = '';
 
   const singleDigitCodes = Object.keys(countrycodes.ones);
