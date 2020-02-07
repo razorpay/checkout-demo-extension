@@ -8,25 +8,27 @@
   import Icon from 'templates/views/ui/Icon.svelte';
   import SlottedRadioOption from 'templates/views/ui/options/Slotted/RadioOption.svelte';
   import Checkbox from 'templates/views/ui/Checkbox.svelte';
-  import { getSession } from 'sessionmanager';
 
   // Util imports
+  import { getSession } from 'sessionmanager';
+  import Preferences from 'checkoutstore/preferences';
   import { VPA_REGEX } from 'common/constants';
 
   // Props
   export let selected = true;
-  let vpa;
-  let pspHandle;
   export let focusOnCreate = false;
+  export let customer;
 
   // Refs
   export let vpaField = null;
-  let newVpa = '';
   let rememberVpaCheckbox = null;
-  let rememberVpa = true;
 
   // Computed
   export let pattern;
+  let rememberVpa = true;
+  let newVpa = '';
+  let vpa;
+  let pspHandle;
 
   function isVpaValid(vpa) {
     return VPA_REGEX.test(vpa);
@@ -36,6 +38,8 @@
   const PATTERN_WITHOUT_HANDLE = '.+';
 
   const session = getSession();
+  const preferences = Preferences.get();
+  const getSafely = _Obj.getSafely;
 
   onMount(() => {
     if (focusOnCreate) {
@@ -55,8 +59,8 @@
   }
 
   export function shouldRememberVpa() {
-    return getSafely(session, 'customer.logged') &&
-      getSafely(session, 'preferences.features.save_vpa') &&
+    return getSafely(customer, 'logged') &&
+      getSafely(preferences, 'features.save_vpa') &&
       rememberVpa
       ? 1
       : 0;
@@ -74,7 +78,11 @@
     vpaField.focus();
   }
 
-  const getSafely = _Obj.getSafely;
+  const canSaveVpa = _Obj.getSafely(preferences, 'features.save_vpa');
+
+  let logged;
+
+  $: logged = _Obj.getSafely(customer, 'logged');
 
   $: pattern = PATTERN_WITH_HANDLE;
 </script>
@@ -138,7 +146,7 @@
           bind:this={vpaField}
           on:blur
           placeholder="Enter your UPI ID" />
-        {#if getSafely(session, 'customer.logged') && getSafely(session, 'preferences.features.save_vpa')}
+        {#if logged && canSaveVpa}
           <div class="should-save-vpa-container">
             <label id="should-save-vpa" for="save-vpa">
               <Checkbox bind:checked={rememberVpa} id="save-vpa">

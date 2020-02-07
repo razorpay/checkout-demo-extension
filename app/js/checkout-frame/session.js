@@ -2681,7 +2681,11 @@ Session.prototype = {
             $('#top-right').removeClass('logged');
             customer.logout(e.target.parentNode.firstChild === e.target);
 
-            this.homeTab.updateCustomer();
+            self.homeTab.updateCustomer();
+
+            if (self.upiTab) {
+              self.upiTab.updateCustomer();
+            }
           }
           container_listener();
           $('#top-right').removeClass('focus');

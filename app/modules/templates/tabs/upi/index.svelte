@@ -42,6 +42,9 @@
   import AddANewVpa from './AddANewVpa.svelte';
   import { getMiscIcon } from 'icons/misc';
 
+  // Store
+  import { contact } from 'checkoutstore/screens/home';
+
   // Props
   export let selectedApp = undefined;
   export let preferIntent = true;
@@ -72,6 +75,7 @@
   let isANewVpa = false;
   let rememberVpaCheckbox;
   let intentAppSelected = null;
+  let customer;
 
   const session = getSession();
   const preferences = Preferences.get();
@@ -173,16 +177,18 @@
     session.switchTab('qr');
   }
 
-  export function onShown() {
-    if (!session.customer.tokens) {
-      tokens = [];
-      return;
-    }
-    tokens = filterUPITokens(session.customer.tokens.items);
+  export function updateCustomer() {
+    customer = session.getCustomer($contact);
+
+    tokens = filterUPITokens(_Obj.getSafely(customer, 'tokens.items', []));
 
     if (!tokens.length) {
       selectedToken = 'new';
     }
+  }
+
+  export function onShown() {
+    updateCustomer();
   }
 
   export function getPayload() {
@@ -349,6 +355,8 @@
       },
     });
   }
+
+  updateCustomer();
 </script>
 
 <style>
@@ -462,6 +470,7 @@
             onUpiAppSelection({ detail: { id: 'new' } });
             showCta();
           }}
+          {customer}
           on:blur={trackVpaEntry}
           selected={selectedToken === 'new'}
           bind:this={vpaField} />
