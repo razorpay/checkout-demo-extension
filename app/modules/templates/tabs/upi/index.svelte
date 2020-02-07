@@ -174,7 +174,10 @@
   }
 
   export function onShown() {
-    if (!session.customer.tokens) return;
+    if (!session.customer.tokens) {
+      tokens = [];
+      return;
+    }
     tokens = filterUPITokens(session.customer.tokens.items);
 
     if (!tokens.length) {
