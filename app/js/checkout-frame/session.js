@@ -3029,8 +3029,6 @@ Session.prototype = {
   },
 
   setScreen: function(screen) {
-    var isGPayScreen = false;
-
     if (screen) {
       var screenTitle =
         this.tab === 'emi'
@@ -3048,11 +3046,6 @@ Session.prototype = {
 
     if (screen !== 'otp') {
       this.headless = false;
-    }
-
-    if (screen === 'gpay' && this.separateGPay) {
-      screen = 'upi';
-      isGPayScreen = true;
     }
 
     setEmiPlansCta(screen, this.tab);
@@ -3143,23 +3136,6 @@ Session.prototype = {
       this.homeTab.onShown();
     } else {
       this.body.toggleClass('sub', showPaybtn);
-    }
-
-    if (this.upiTab) {
-      if (isGPayScreen) {
-        this.upiTab.$set({ selectedApp: 'gpay' });
-        this.upiTab.onUpiAppSelection({
-          detail: {
-            id: 'gpay',
-          },
-        });
-      }
-
-      /**
-       * TODO: when more tabs are ported to Svelte, move current `tab` state to
-       *       Store
-       */
-      this.upiTab.$set({ tab: this.tab });
     }
 
     return this.offers && this.renderOffers(this.tab);

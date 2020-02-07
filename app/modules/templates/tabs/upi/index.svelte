@@ -176,6 +176,10 @@
   export function onShown() {
     if (!session.customer.tokens) return;
     tokens = filterUPITokens(session.customer.tokens.items);
+
+    if (!tokens.length) {
+      selectedToken = 'new';
+    }
   }
 
   export function getPayload() {

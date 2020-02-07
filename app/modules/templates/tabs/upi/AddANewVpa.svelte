@@ -21,6 +21,7 @@
 
   // Refs
   export let vpaField = null;
+  let newVpa = '';
   let rememberVpaCheckbox = null;
   let rememberVpa = true;
 
@@ -40,6 +41,9 @@
     if (focusOnCreate) {
       focus();
     }
+    if (session.get('prefill.vpa')) {
+      newVpa = session.get('prefill.vpa');
+    }
   });
 
   export function getVpa() {
@@ -51,7 +55,11 @@
   }
 
   export function shouldRememberVpa() {
-    return rememberVpa ? 1 : 0;
+    return getSafely(session, 'customer.logged') &&
+      getSafely(session, 'preferences.features.save_vpa') &&
+      rememberVpa
+      ? 1
+      : 0;
   }
 
   export function blur() {
@@ -96,6 +104,10 @@
   [slot='icon'].top {
     align-self: flex-start;
   }
+
+  div[slot='body'] {
+    margin-top: 5px;
+  }
 </style>
 
 <SlottedRadioOption
@@ -122,6 +134,7 @@
           name="amount"
           type="text"
           required
+          bind:value={newVpa}
           bind:this={vpaField}
           on:blur
           placeholder="Enter your UPI ID" />
