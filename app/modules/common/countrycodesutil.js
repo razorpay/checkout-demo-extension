@@ -2,6 +2,11 @@ import countrycodes from 'countrycodes';
 
 const MAX_LENGTH_COUNTRY_CODE = 3;
 
+/**
+ * Finds country code for a given phonenumber
+ * @param {string} phonenumber
+ * @returns {Object} With country code and phonenumber
+ */
 export default function findCountryCode(phno) {
   let number = phno;
   number = number.replace(/^0{2}/, '+');
@@ -53,6 +58,11 @@ export default function findCountryCode(phno) {
   }
 }
 
+/**
+ * Returns country code for a given international phonenumber
+ * @param {string} phonenumber
+ * @returns {string} country code
+ */
 function checkForInternational(number) {
   let countryCode = '';
 
