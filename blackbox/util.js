@@ -7,6 +7,7 @@ const {
   cdnUrl,
   lumberjackUrl,
   zestMoneyLoanAgreementUrl,
+  maxmindScriptUrl,
 } = require('./const');
 
 const chrup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -86,7 +87,8 @@ const util = (module.exports = {
         url.startsWith('data') ||
         url.startsWith(cdnUrl) ||
         url.startsWith(lumberjackUrl) ||
-        url.includes(zestMoneyLoanAgreementUrl);
+        url.includes(zestMoneyLoanAgreementUrl) ||
+        url.includes(maxmindScriptUrl);
       if (ignoredUrl || (pattern && !pattern.test(url))) return true;
     }
 
