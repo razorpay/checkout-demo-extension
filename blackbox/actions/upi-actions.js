@@ -96,7 +96,7 @@ async function handleUPIAccountValidation(context, vpa, accountexists = true) {
   await context.respondJSON({ vpa: vpa, success: true, customer_name: null });
 }
 
-async function handleSavedTokenValidation(context, vpa, accountexists = true) {
+async function handleSavedTokenValidation(context, vpa) {
   const req = await context.expectRequest();
   expect(req.url).toContain('create/ajax');
   await context.respondJSON({ vpa: vpa, success: true, customer_name: null });
@@ -133,10 +133,7 @@ async function enterUPIAccount(context, UPIAccountId) {
   const vpaField = await context.page.waitForSelector('#new-vpa-input');
   await vpaField.type(UPIAccountId);
   if (!context.preferences.customer) return;
-  const rememberMeCheckbox = await context.page.waitForSelector(
-    '#should-save-vpa'
-  );
-  await rememberMeCheckbox.click();
+  return await context.page.waitForSelector('#should-save-vpa');
 }
 
 async function selectBankNameFromGooglePayDropDown(context, valuetoBeSelected) {

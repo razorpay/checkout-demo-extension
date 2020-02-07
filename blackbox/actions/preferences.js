@@ -62,6 +62,9 @@ async function sendPreferences({
 function makePreferences(overrides) {
   return {
     options: {},
+    features: {
+      save_vpa: true,
+    },
     methods: {
       emi: true,
       emi_subvention: 'customer',
