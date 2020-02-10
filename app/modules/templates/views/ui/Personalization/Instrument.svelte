@@ -15,6 +15,9 @@
   import { getBankLogo } from 'common/bank';
   import { getWallet } from 'common/wallet';
 
+  // Store
+  import { contact } from 'checkoutstore/screens/home';
+
   // Props
   export let instrument = {}; // P13n instrument
   export let name; // Name of the input
@@ -34,9 +37,9 @@
     let vpaSplit;
 
     let getInstrumentName = () => {
-      let vpaDetails = session.preferences.customer.tokens.items.find(
-        item => item.id === instrument.token
-      ).vpa;
+      let vpaDetails = session
+        .getCustomer($contact)
+        .tokens.items.find(item => item.id === instrument.token).vpa;
       return [vpaDetails.username, vpaDetails.handle];
     };
 
