@@ -453,6 +453,7 @@
         {#each tokens as app, i}
           <SlottedRadioOption
             name="payment_type"
+            ellipsis
             selected={selectedToken === app.id}
             on:click={_ => {
               selectedToken = app.id;

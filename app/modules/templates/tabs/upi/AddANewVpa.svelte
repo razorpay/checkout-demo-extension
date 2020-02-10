@@ -123,6 +123,9 @@
   value="full"
   align="top"
   on:click
+  on:click={_ => {
+    vpaField.focus();
+  }}
   {selected}>
   <div id="new-vpa-field" slot="title">Add UPI ID</div>
   <div slot="subtitle">Google Pay, BHIM, Phone Pe & more</div>
