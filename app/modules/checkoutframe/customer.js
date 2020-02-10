@@ -46,7 +46,8 @@ export const sanitizeTokens = (tokens, filters) => {
     tokens.items
       |> _Obj.loop(item => {
         const isAValidToken =
-          methods.includes(item.method) && (recurring ? item.recurring : true);
+          _Arr.contains(methods, item.method) &&
+          (recurring ? item.recurring : true);
         if (isAValidToken) {
           items.push(item);
         }

@@ -509,7 +509,7 @@ const handleData = [
 export const getUPIAppLogoFromHandle = handle => {
   let icon = null;
   handleData.forEach(handleSet => {
-    if (handleSet.handles.includes(handle)) {
+    if (_Arr.contains(handleSet.handles, handle)) {
       icon = handleSet.icon;
     }
   });
