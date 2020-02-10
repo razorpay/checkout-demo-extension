@@ -23,17 +23,6 @@
   export let vpaField = null;
   let rememberVpaCheckbox = null;
 
-  // Computed
-  export let pattern;
-  let rememberVpa = true;
-  let newVpa = '';
-  let vpa;
-  let pspHandle;
-
-  function isVpaValid(vpa) {
-    return VPA_REGEX.test(vpa);
-  }
-
   const PATTERN_WITH_HANDLE = '.+@.+';
   const PATTERN_WITHOUT_HANDLE = '.+';
 
@@ -41,12 +30,20 @@
   const preferences = Preferences.get();
   const getSafely = _Obj.getSafely;
 
+  // Computed
+  export let pattern;
+  let rememberVpa = true;
+  let newVpa = session.get('prefill.vpa') || '';
+  let vpa;
+  let pspHandle;
+
+  function isVpaValid(vpa) {
+    return VPA_REGEX.test(vpa);
+  }
+
   onMount(() => {
     if (focusOnCreate) {
       focus();
-    }
-    if (session.get('prefill.vpa')) {
-      newVpa = session.get('prefill.vpa');
     }
   });
 
