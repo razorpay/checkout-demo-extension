@@ -1,0 +1,27 @@
+FROM debian:sid-slim
+
+RUN echo $'APT::Install-Suggests "0";\nAPT::Install-Recommends "0";\nAPT::Get::Assume-Yes "1";' > /etc/apt/apt.conf \
+  && apt-get update && apt-get install \
+    git \
+    openssh-client \
+    curl \
+    gnupg2 \
+    ca-certificates \
+    python \
+    make \
+    g++ \
+    zopfli \
+    brotli \
+  && curl -sL https://deb.nodesource.com/setup_13.x | bash - \
+  && apt-get install nodejs \
+  && apt-get purge gnupg2 \
+  && apt autoremove \
+  && rm -rf /etc/apt/sources.list.d \
+  && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/*
+
+RUN mkdir /scripts && echo -e '#!/bin/bash\ncd $DIST_DIR;\nfor COMPRESS in zopfli brotli;\ndo for i in `find . -type f -regex ".+\.\(js\|css\|svg\|html\)"`;\ndo $COMPRESS "$i";\ndone;\ndone;' > /scripts/compress && chmod +x /scripts/compress
+
+RUN apt-get update && apt-get install
+    chromium
+  && rm -rf /etc/apt/sources.list.d
+  && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/*
