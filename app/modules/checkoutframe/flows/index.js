@@ -2,7 +2,7 @@ import { getSession } from 'sessionmanager';
 import { DEFAULT_AUTH_TYPE_RADIO, SHOWN_CLASS } from 'common/constants';
 import { Formatter } from 'formatter';
 import { getCardType, getIin, getCardDigits } from 'common/card';
-import { getCardFlowsFromCache } from 'payment';
+import { getCardFeaturesFromCache } from 'payment';
 import {
   isCardNetworkInPaymentOneOf,
   networks as CardNetworks,
@@ -43,7 +43,7 @@ function getFlowsForPayment(paymentData, tokens = []) {
       return cardToken.card.flows;
     }
   } else if (cardNumber) {
-    const flows = getCardFlowsFromCache(cardNumber);
+    const { flows } = getCardFeaturesFromCache(cardNumber) || {};
 
     if (flows) {
       return flows;
@@ -229,6 +229,9 @@ export function performCardFlowActionsAndValidate(
   }
 
   if (iin.length >= 6) {
-    session.r.getCardFlows(iin, flowChecker);
+    session.r
+      .getCardFeatures(iin)
+      .then(flowChecker)
+      .catch(flowChecker);
   }
 }

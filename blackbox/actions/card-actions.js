@@ -79,7 +79,7 @@ async function enterCardDetails(context, { cardType, nativeOtp = false } = {}) {
   if (nativeOtp) {
     flows.otp = true;
   }
-  await context.respondJSONP(flows);
+  await context.respondJSONP({ flows });
   await context.page.type('#card_expiry', '12/55');
   await context.page.type('#card_name', 'SakshiJain');
   await context.page.type('#card_cvv', '112');
