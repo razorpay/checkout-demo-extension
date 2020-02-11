@@ -121,10 +121,14 @@
   align="top"
   on:click
   on:click={_ => {
-    vpaField.focus();
+    setTimeout(() => {
+      vpaField.focus();
+    }, 200);
   }}
   {selected}>
-  <div id="new-vpa-field" slot="title">Add UPI ID</div>
+  <div id="new-vpa-field" slot="title">
+    {logged && canSaveVpa ? 'Add UPI ID' : 'UPI ID'}
+  </div>
   <div slot="subtitle">Google Pay, BHIM, Phone Pe & more</div>
   <i slot="icon" class="top">
     <Icon icon={session.themeMeta.icons.upi} />
