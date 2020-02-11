@@ -1367,6 +1367,7 @@ Session.prototype = {
     this.getEl();
     this.setFormatting();
     this.improvisePaymentOptions();
+    this.improvisePrefill();
     this.setSvelteComponents();
     this.fillData();
     this.setEMI();
@@ -1376,6 +1377,7 @@ Session.prototype = {
     this.bindEvents();
     this.setEmiScreen();
     this.runMaxmindScriptIfApplicable();
+    this.prefillPostRender();
     Hacks.initPostRenderHacks();
 
     errorHandler.call(this, this.params);
@@ -2221,6 +2223,37 @@ Session.prototype = {
     }
   },
 
+  /**
+   * Improvise the prefill options.
+   */
+  improvisePrefill: function() {
+    var prefilledMethod = this.get('prefill.method');
+    var prefilledProvider = this.get('prefill.provider');
+
+    /**
+     * Bajaj Finserv is _technically_ EMI,
+     * but we're grouping it under Cardless EMI screen
+     * on Checkout.
+     */
+    if (prefilledMethod === 'emi' && prefilledProvider === 'bajaj') {
+      this.set('prefill.method', 'cardless_emi');
+    }
+  },
+
+  /**
+   * Anything related to prefilled that needs to be done
+   * once everything has rendered,
+   * goes into this function.
+   */
+  prefillPostRender: function() {
+    var prefilledMethod = this.get('prefill.method');
+    var prefilledProvider = this.get('prefill.provider');
+
+    if (prefilledMethod === 'cardless_emi') {
+      this.selectCardlessEmiProvider(prefilledProvider);
+    }
+  },
+
   renderCss: function() {
     var div = document.createElement('div');
     var style = document.createElement('style');
@@ -2542,6 +2575,42 @@ Session.prototype = {
       this.on('blur', '#card_cvv', shiftDown);
     }
   },
+
+  /**
+   * Logs the user out
+   * @param {boolean} outOfAllDevices
+   */
+  _logUserOut: function(customer, outOfAllDevices) {
+    if (customer) {
+      customer.logged = false;
+      customer.tokens = null;
+
+      customer.logout(outOfAllDevices);
+    }
+
+    this.setSavedCards();
+
+    _El.removeClass(_Doc.querySelector('#top-right'), 'logged');
+
+    this.homeTab.updateCustomer();
+  },
+
+  /**
+   * Logs user out of this device.
+   * @param {Customer} customer
+   */
+  logUserOut: function(customer) {
+    this._logUserOut(customer);
+  },
+
+  /**
+   * Logs user out of all devices.
+   * @param {Customer} customer
+   */
+  logUserOutOfAllDevices: function(customer) {
+    this._logUserOut(customer, true);
+  },
+
   bindEvents: function() {
     var self = this;
     var emi_options = this.emi_options;
@@ -2667,33 +2736,9 @@ Session.prototype = {
         }
       });
     }
-    this.on('click', '#top-right', function() {
-      $('#top-right').addClass('focus');
-      var self = this;
-      var container_listener = $('#container').on(
-        'click',
-        function(e) {
-          if (e.target.tagName === 'LI') {
-            var customer = self.customer;
-            customer.logged = false;
-            customer.tokens = null;
-            self.setSavedCards();
-            $('#top-right').removeClass('logged');
-            customer.logout(e.target.parentNode.firstChild === e.target);
 
-            self.homeTab.updateCustomer();
+    discreet.UserHandlers.attachLogoutListeners(this);
 
-            if (self.upiTab) {
-              self.upiTab.updateCustomer();
-            }
-          }
-          container_listener();
-          $('#top-right').removeClass('focus');
-          return preventDefault(e);
-        },
-        true
-      );
-    });
     if (enabledMethods.wallet) {
       try {
         this.on(

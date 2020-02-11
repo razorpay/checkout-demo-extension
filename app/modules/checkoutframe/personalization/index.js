@@ -354,6 +354,7 @@ export const getInstrumentsForCustomer = (customer, extra = {}) => {
     instruments,
     methods,
     upiApps,
+    customer,
   });
 
   // Add score for each instrument
