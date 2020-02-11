@@ -5216,7 +5216,7 @@ Session.prototype = {
 
       // perform the actual validation
       if (screen === 'upi') {
-        var formSelector = '#new-vpa-input';
+        var formSelector = '#vpa';
 
         if (data['_[flow]'] === 'directpay') {
           if (data.upi_provider === 'google_pay') {

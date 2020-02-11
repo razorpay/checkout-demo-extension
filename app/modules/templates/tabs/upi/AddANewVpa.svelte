@@ -142,7 +142,7 @@
           {pattern}
           helpText="Please enter a valid VPA of the form username@bank"
           elemClasses="mature"
-          id="new-vpa-input"
+          id="vpa"
           name="amount"
           type="text"
           required

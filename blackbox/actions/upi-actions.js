@@ -113,7 +113,7 @@ async function selectUPIMethod(context, UPIMethod) {
       break;
     case 'new':
       tokenSelector = 'new-vpa-field';
-      elementToBeVisible = 'new-vpa-input';
+      elementToBeVisible = 'vpa';
       break;
     case 'token':
       tokenSelector = 'upi-svelte-wrap .slotted-radio';
@@ -130,7 +130,7 @@ async function selectUPIMethod(context, UPIMethod) {
 }
 
 async function enterUPIAccount(context, UPIAccountId) {
-  const vpaField = await context.page.waitForSelector('#new-vpa-input');
+  const vpaField = await context.page.waitForSelector('#vpa');
   await vpaField.type(UPIAccountId);
   if (!context.preferences.customer) return;
   return await context.page.waitForSelector('#should-save-vpa');
