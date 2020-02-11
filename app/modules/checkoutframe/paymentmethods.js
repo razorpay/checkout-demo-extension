@@ -21,7 +21,7 @@ function oxfordComma(list) {
     return list.join(' and ');
   }
 
-  return `${list.slice(0, length - 1)}, and ${list[length - 1]}`;
+  return `${list.slice(0, length - 1).join(', ')}, and ${list[length - 1]}`;
 }
 
 /**
