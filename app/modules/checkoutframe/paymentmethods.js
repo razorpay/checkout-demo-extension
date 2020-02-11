@@ -47,18 +47,40 @@ const CARD_DESCRIPTION = ({ session }) => {
     return session.recurring_card_text;
   }
 
-  const networks = ['MasterCard', 'Visa'];
+  const preferences = PreferencesStore.get();
 
-  if (!session.irctc) {
-    networks.push('RuPay');
-    networks.push('Maestro');
-  }
+  // Keep in order that we want to display
+  const NW_MAP = {
+    VISA: 'Visa',
+    MC: 'MasterCard',
+    RUPAY: 'RuPay',
+    AMEX: 'Amex',
+    DICL: 'Diners Club',
+    MAES: 'Maestro',
+    JCB: 'JCB',
+  };
 
-  if (session.preferences.methods.amex) {
-    networks.push('Amex');
-  }
+  // Get all networks from preferences.
+  const networksFromPrefs = _Obj.getSafely(
+    preferences,
+    'methods.card_networks',
+    {}
+  );
 
-  return networks.join(', ');
+  // Get the enabled networks for the merchant.
+  const enabledNetworks =
+    networksFromPrefs
+    |> _Obj.keys
+    |> _Arr.filter(network => Boolean(networksFromPrefs[network]));
+
+  // Get the network names to show
+  const networks =
+    NW_MAP
+    |> _Obj.keys
+    |> _Arr.filter(network => _Arr.contains(enabledNetworks, network))
+    |> _Arr.map(network => NW_MAP[network]);
+
+  return generateTextFromList(networks, 4);
 };
 
 /**
