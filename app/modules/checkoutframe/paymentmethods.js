@@ -67,17 +67,11 @@ const CARD_DESCRIPTION = ({ session }) => {
     {}
   );
 
-  // Get the enabled networks for the merchant.
-  const enabledNetworks =
-    networksFromPrefs
-    |> _Obj.keys
-    |> _Arr.filter(network => Boolean(networksFromPrefs[network]));
-
   // Get the network names to show
   const networks =
     NW_MAP
     |> _Obj.keys
-    |> _Arr.filter(network => _Arr.contains(enabledNetworks, network))
+    |> _Arr.filter(network => Boolean(networksFromPrefs[network]))
     |> _Arr.map(network => NW_MAP[network]);
 
   return generateTextFromList(networks, 4);
