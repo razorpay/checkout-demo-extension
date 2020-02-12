@@ -1,21 +1,44 @@
 import { getProvider as getCardlessEmiProvider } from 'common/cardlessemi';
 import { getProvider as getPayLaterProvider } from 'common/paylater';
 import { AVAILABLE_METHODS } from 'common/constants';
+import PreferencesStore from 'checkoutstore/preferences';
+
+/**
+ * Returns a stringified version of the list with oxford commas
+ * @param {Array<string>} list
+ *
+ * @returns {string}
+ */
+function oxfordComma(list) {
+  const length = list.length;
+
+  if (list.length === 1) {
+    return list[0];
+  }
+
+  // We do not use an oxford comma for two items
+  if (list.length === 2) {
+    return list.join(' and ');
+  }
+
+  return `${list.slice(0, length - 1).join(', ')}, and ${list[length - 1]}`;
+}
 
 /**
  * Returns the text with commas or "and" as the separator.
  * Example: list: ['a', 'b', 'c', 'd'], max: 2 - returns "a, b & More"
  * Example: list: ['a', 'b'], max: 2 - returns "a and b"
+ * Example: list: ['a', 'b', 'c'], max: 3 - returns "a, b, and c"
  * @param {Array} list
  * @param {Number} max
  *
  * @return {String}
  */
 function generateTextFromList(list, max) {
-  if (list.length <= max) {
-    return list.slice(0, max).join(' and ');
+  if (list.length > max) {
+    return `${list.slice(0, max - 1).join(', ')} & More`;
   } else {
-    return `${list.slice(0, max).join(', ')} & More`;
+    return oxfordComma(list);
   }
 }
 
@@ -24,18 +47,34 @@ const CARD_DESCRIPTION = ({ session }) => {
     return session.recurring_card_text;
   }
 
-  const networks = ['MasterCard', 'Visa'];
+  const preferences = PreferencesStore.get();
 
-  if (!session.irctc) {
-    networks.push('RuPay');
-    networks.push('Maestro');
-  }
+  // Keep in order that we want to display
+  const NW_MAP = {
+    VISA: 'Visa',
+    MC: 'MasterCard',
+    RUPAY: 'RuPay',
+    AMEX: 'Amex',
+    DICL: 'Diners Club',
+    MAES: 'Maestro',
+    JCB: 'JCB',
+  };
 
-  if (session.preferences.methods.amex) {
-    networks.push('Amex');
-  }
+  // Get all networks from preferences.
+  const networksFromPrefs = _Obj.getSafely(
+    preferences,
+    'methods.card_networks',
+    {}
+  );
 
-  return networks.join(', ');
+  // Get the network names to show
+  const networks =
+    NW_MAP
+    |> _Obj.keys
+    |> _Arr.filter(network => Boolean(networksFromPrefs[network]))
+    |> _Arr.map(network => NW_MAP[network]);
+
+  return generateTextFromList(networks, 4);
 };
 
 /**
@@ -67,7 +106,7 @@ const DESCRIPTIONS = {
       });
     }
 
-    const text = generateTextFromList(providers, 2);
+    const text = generateTextFromList(providers, 3);
 
     if (cardEmi) {
       return text;
