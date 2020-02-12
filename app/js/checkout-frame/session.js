@@ -1223,11 +1223,14 @@ Session.prototype = {
         data['card[expiry]'] = exp_m + ' / ' + exp_y;
       }
 
+      if (data['bank']) {
+        this.netbankingTab.setSelectedBank(data['bank']);
+      }
+
       each(
         {
           contact: 'contact',
           email: 'email',
-          bank: 'bank-select',
           'card[name]': 'card_name',
           'card[number]': 'card_number',
           'card[expiry]': 'card_expiry',
