@@ -1,6 +1,7 @@
 import { VPA_REGEX } from 'common/constants';
 import { doesAppExist } from 'common/upi';
 import DowntimesStore from 'checkoutstore/downtimes';
+import PreferencesStore from 'checkoutstore/preferences';
 
 /**
  * Map of filter fn for each method
@@ -13,6 +14,19 @@ import DowntimesStore from 'checkoutstore/downtimes';
 const METHOD_FILTERS = {
   card: (instrument, { customer }) => {
     const logged = _Obj.getSafely(customer, 'logged');
+    const preferences = PreferencesStore.get();
+
+    const allowedTypes = {
+      credit: _Obj.getSafely(preferences, 'methods.credit_card') |> Boolean,
+      debit: _Obj.getSafely(preferences, 'methods.debit_card') |> Boolean,
+    };
+
+    const isCardTypeAllowed = allowedTypes[instrument.type];
+
+    // If the card type is not allowed, filter this out
+    if (!isCardTypeAllowed) {
+      return false;
+    }
 
     // For logged out users, show all possible card instruments
     if (!logged) {
