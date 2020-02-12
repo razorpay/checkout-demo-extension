@@ -445,7 +445,11 @@
 
     if (isPartialPayment) {
       if ($partialPaymentOption !== 'full') {
+        Analytics.track('partial_payment:pay_in_parts');
+
         session.handlePartialAmount();
+      } else {
+        Analytics.track('partial_payment:pay_in_full');
       }
     }
 

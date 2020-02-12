@@ -65,6 +65,12 @@
     }
   }
 
+  function handleCheckboxChecked() {
+    Analytics.track('partial_payment:min_amount_due_selected', {
+      type: AnalyticsTypes.BEHAV,
+    });
+  }
+
   function handleRadioSelection(type) {
     if ($partialPaymentOption !== type) {
       if (type === 'partial') {
@@ -124,6 +130,7 @@
           {showPartialAmountLabel}
           {minAmountLabel}
           {partialDescription}
+          on:checkboxChecked={handleCheckboxChecked}
           bind:value={$partialPaymentAmount}
           bind:this={partialAmountField} />
       {/if}
