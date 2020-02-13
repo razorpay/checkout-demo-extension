@@ -215,6 +215,42 @@
       },
     });
   }
+
+  function trackCardNumberFilled() {
+    Analytics.track('card_number:filled', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        valid: numberField.isValid(),
+      },
+    });
+  }
+
+  function trackCvvFilled() {
+    Analytics.track('card_cvv:filled', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        valid: cvvField.isValid(),
+      },
+    });
+  }
+
+  function trackExpiryFilled() {
+    Analytics.track('card_expiry:filled', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        valid: expiryField.isValid(),
+      },
+    });
+  }
+
+  function trackNameFilled() {
+    Analytics.track('card_name:filled', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        valid: nameField.isValid(),
+      },
+    });
+  }
 </script>
 
 <style>
@@ -255,7 +291,8 @@
         bind:this={numberField}
         type={$cardType}
         on:filled={_ => handleFilled('numberField')}
-        on:input={handleCardInput} />
+        on:input={handleCardInput}
+        on:blur={trackCardNumberFilled} />
     </div>
     {#if !hideExpiryCvvFields}
       <div class="third">
@@ -264,6 +301,7 @@
           name="card[expiry]"
           bind:value={$cardExpiry}
           bind:this={expiryField}
+          on:blur={trackExpiryFilled}
           on:filled={_ => handleFilled('expiryField')} />
       </div>
     {/if}
@@ -273,17 +311,19 @@
       <NameField
         id="card_name"
         name="card[name]"
+        readonly={nameReadonly}
         bind:value={$cardName}
         bind:this={nameField}
-        readonly={nameReadonly} />
+        on:blur={trackNameFilled} />
     </div>
     {#if !hideExpiryCvvFields}
       <div class="third">
         <CvvField
           id="card_cvv"
-          bind:value={$cardCvv}
           length={cvvLength}
-          bind:this={cvvField} />
+          bind:value={$cardCvv}
+          bind:this={cvvField}
+          on:blur={trackCvvFilled} />
       </div>
     {/if}
   </div>

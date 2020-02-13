@@ -67,6 +67,10 @@
       field.setValid(isValid);
     }
   }
+
+  export function isValid() {
+    return valid;
+  }
 </script>
 
 <style>

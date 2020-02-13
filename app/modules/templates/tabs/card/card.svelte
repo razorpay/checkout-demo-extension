@@ -38,7 +38,7 @@
 
   const session = getSession();
 
-  let currentView = 'add-card';
+  let currentView = 'saved-cards';
 
   let tab = '';
   let allSavedCards = [];
@@ -360,10 +360,17 @@
     });
   }
 
+  /**
+   * Updates the customer, shows the landing view and returns a promise that resolves when the landing view is visible
+   * @param newCustomer
+   * @return {Promise<void>}
+   */
   export function updateCustomerAndShowLandingView(newCustomer = {}) {
     customer = newCustomer;
     // Wait for pending state updates from reactive statements
-    tick().then(showLandingView);
+    return tick()
+      .then(showLandingView)
+      .then(tick);
   }
 
   export function setSelectedOffer(newOffer) {

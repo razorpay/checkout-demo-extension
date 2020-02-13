@@ -4251,8 +4251,11 @@ Session.prototype = {
             // OTP verification successful
             OtpService.resetCount('razorpay');
 
-            self.svelteCardTab.updateCustomerAndShowLandingView(self.customer);
-            self.showCardTab();
+            self.svelteCardTab
+              .updateCustomerAndShowLandingView(self.customer)
+              .then(function() {
+                self.showCardTab();
+              });
           } else {
             Analytics.track('behav:otp:incorrect', {
               wallet: self.tab === 'wallet',

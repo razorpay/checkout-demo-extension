@@ -9,6 +9,14 @@
   export let id;
   export let name;
 
+  let valid = false;
+
+  $: {
+    if (ref) {
+      ref.setValid(valid);
+    }
+  }
+
   const dispatch = createEventDispatcher();
 
   function handleInput(event) {
@@ -20,10 +28,16 @@
     let isValid = Formatter.rules.expiry.isValid.call({
       value: ref.getRawValue() || '',
     });
-    ref.setValid(isValid);
+
+    valid = isValid;
+
     if (isValid && value.length === ref.getCaretPosition()) {
       dispatch('filled');
     }
+  }
+
+  export function isValid() {
+    return valid;
   }
 </script>
 
@@ -39,6 +53,7 @@
   maxlength={7}
   bind:this={ref}
   on:input={handleInput}
+  on:blur
   handleBlur
   handleFocus
   handleInput />

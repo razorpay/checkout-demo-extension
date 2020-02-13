@@ -43,6 +43,10 @@
   export function focus() {
     ref.focus();
   }
+
+  export function isValid() {
+    return new RegExp(cvvPattern).test(value);
+  }
 </script>
 
 <style>
@@ -84,6 +88,7 @@
   bind:this={ref}
   on:input={handleInput}
   on:input
+  on:blur
   handleBlur
   handleFocus
   handleInput />

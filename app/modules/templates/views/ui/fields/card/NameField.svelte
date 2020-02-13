@@ -13,6 +13,10 @@
   function handleInput(event) {
     value = event.target.value;
   }
+
+  export function isValid() {
+    return value !== '';
+  }
 </script>
 
 <Field
@@ -25,6 +29,7 @@
   type="text"
   {value}
   on:input={handleInput}
+  on:blur
   bind:this={ref}
   handleBlur
   handleFocus
