@@ -30,18 +30,25 @@
   let icon;
   let alt;
 
+  function getVpaFromInstrument(instrument) {
+    const { vpa, token } = instrument;
+
+    if (vpa) {
+      return vpa;
+    }
+
+    const customer = session.getCustomer($contact);
+    const tokens = _Obj.getSafely(customer, 'tokens.items', []);
+    const vpaToken = _Arr.find(tokens, item => item.id === token);
+
+    return `${vpaToken.vpa.username}@${vpaToken.vpa.handle}`;
+  }
+
   $: {
     const banks = PreferencesStore.get().methods.netbanking;
     let wallet;
     let flow;
     let vpaSplit;
-
-    let getInstrumentName = () => {
-      let vpaDetails = session
-        .getCustomer($contact)
-        .tokens.items.find(item => item.id === instrument.token).vpa;
-      return [vpaDetails.username, vpaDetails.handle];
-    };
 
     switch (instrument.method) {
       case 'paypal':
@@ -70,6 +77,7 @@
         }
 
         flow = instrument['_[flow]'];
+
         if (flow === 'intent') {
           text = `UPI - ${instrument.app_name.replace(/ UPI$/, '')}`;
           if (instrument.app_icon) {
@@ -80,10 +88,7 @@
             alt = 'UPI App';
           }
         } else {
-          vpaSplit = instrument.vpa
-            ? instrument.vpa.split('@')
-            : getInstrumentName();
-          text = `UPI - ${vpaSplit[0]}@${vpaSplit[1]}`;
+          text = `UPI - ${getVpaFromInstrument(instrument)}`;
           icon = '&#xe70e;';
           alt = 'UPI';
         }

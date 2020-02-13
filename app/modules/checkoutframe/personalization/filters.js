@@ -65,6 +65,13 @@ const METHOD_FILTERS = {
 
     return Boolean(netbanking[bank]);
   },
+
+  upi: instrument => {
+    // Only allow UPI collect instruments that have a VPA
+    if (instrument['_[flow]'] === 'directpay') {
+      return Boolean(instrument.vpa);
+    }
+  },
 };
 
 /**
