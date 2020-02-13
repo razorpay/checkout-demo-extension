@@ -56,7 +56,6 @@
   export let isFirst = true;
   export let vpa = '';
   export let qrIcon;
-  export let tab = 'upi';
 
   // Refs
   export let intentView = null;
