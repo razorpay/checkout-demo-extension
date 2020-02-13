@@ -92,7 +92,7 @@ function getExtractedDetails(payment, customer, extra = {}) {
    */
   if (payment.method === 'upi') {
     if (payment.token && customer) {
-      let tokens = (customer.tokens || {}).items || [];
+      let tokens = _Obj.getSafely(customer, 'tokens.items', []);
       let token = _Arr.find(tokens, token => token.token === details.token);
 
       if (!token) {
