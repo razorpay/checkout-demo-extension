@@ -66,9 +66,12 @@
   export function blur() {
     const dispatch = createEventDispatcher();
     dispatch('blur');
-    if (selected) {
-      vpaField.blur();
-    }
+
+    try {
+      if (vpaField && selected) {
+        vpaField.blur();
+      }
+    } catch (err) {}
   }
 
   export function focus() {
@@ -141,9 +144,8 @@
           formatter={{ type: 'vpa' }}
           {pattern}
           helpText="Please enter a valid VPA of the form username@bank"
-          elemClasses="mature"
           id="vpa"
-          name="amount"
+          name="vpa"
           type="text"
           required
           bind:value={newVpa}

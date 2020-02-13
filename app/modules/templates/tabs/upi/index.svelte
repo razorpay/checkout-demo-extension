@@ -205,9 +205,12 @@
      * already focused on, so this would be fine if the
      * user decides to manually press the pay button.
      */
-    if (vpaField) {
-      vpaField.blur();
-    }
+    try {
+      if (vpaField) {
+        vpaField.blur();
+      }
+    } catch (err) {}
+
     let data = {};
     let _token = [];
     switch (selectedToken) {
