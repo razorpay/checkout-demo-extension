@@ -66,7 +66,7 @@
   }
 
   function handleCheckboxChecked() {
-    Analytics.track('partial_payment:min_amount_due_selected', {
+    Analytics.track('partial_payment:min_amount_due:select', {
       type: AnalyticsTypes.BEHAV,
     });
   }
