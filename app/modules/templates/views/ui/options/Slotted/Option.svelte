@@ -7,6 +7,7 @@
   export let disabled = false;
   export let id;
   export let attributes = {}; // Extra attributes for the HTML element
+  export let defaultStyles = false;
 
   $: {
     disabled = disabled ? true : undefined;
@@ -43,6 +44,7 @@
 <button
   type="button"
   class={className}
+  class:slotted-option={defaultStyles}
   role="listitem"
   {disabled}
   {id}

@@ -549,7 +549,7 @@
       data: event.detail,
     });
 
-    const { down, method } = event.detail;
+    let { down, method } = event.detail;
 
     if (down) {
       return;
@@ -559,9 +559,15 @@
 
     if (method === 'paypal') {
       createPaypalPayment();
-    } else {
-      session.switchTab(method);
+      return;
     }
+
+    if (method === 'gpay') {
+      // GPay is UPI underneath
+      method = 'upi';
+    }
+
+    session.switchTab(method);
   }
 
   export function shouldGoNext() {

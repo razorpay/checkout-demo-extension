@@ -5,7 +5,7 @@ const {
   selectUPIMethod,
   enterUPIAccount,
   handleUPIAccountValidation,
-  respondToUPIAjax,
+  handleSaveVpaRequest,
   respondToUPIPaymentStatus,
   handleFeeBearer,
 } = require('../../../actions/common');
@@ -49,12 +49,12 @@ describe.each(
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIMethod(context, 'BHIM');
-    await enterUPIAccount(context, 'BHIM');
+    await selectUPIMethod(context, 'new');
+    await enterUPIAccount(context, 'saranshgupta1995@okaxis');
     await submit(context);
     await handleUPIAccountValidation(context, 'BHIM@upi');
     await handleFeeBearer(context);
-    await respondToUPIAjax(context);
+    await handleSaveVpaRequest(context);
     await respondToUPIPaymentStatus(context);
   });
 });

@@ -2375,7 +2375,6 @@ Session.prototype = {
 
     $('#overlay-close').hide();
     hideOverlayMessage();
-    $('.omnichannel').hide(); // Hide the Google Pay logo
   },
 
   shake: function() {
@@ -3079,8 +3078,6 @@ Session.prototype = {
   },
 
   setScreen: function(screen) {
-    var isGPayScreen = false;
-
     if (screen) {
       var screenTitle =
         this.tab === 'emi'
@@ -3098,11 +3095,6 @@ Session.prototype = {
 
     if (screen !== 'otp') {
       this.headless = false;
-    }
-
-    if (screen === 'gpay' && this.separateGPay) {
-      screen = 'upi';
-      isGPayScreen = true;
     }
 
     setEmiPlansCta(screen, this.tab);
@@ -3193,37 +3185,6 @@ Session.prototype = {
       this.homeTab.onShown();
     } else {
       this.body.toggleClass('sub', showPaybtn);
-    }
-
-    if (screen === 'upi') {
-      var isIntentFlow = this.upiTab.intent;
-
-      if (isIntentFlow) {
-        var data = this.upiTab.getPayload();
-
-        if (data['_[flow]'] === 'intent' && !data.upi_app) {
-          $('#body').removeClass('sub');
-        }
-      } else if (typeof this.upiTab.selectedApp === 'undefined') {
-        $('#body').removeClass('sub');
-      }
-    }
-
-    if (this.upiTab) {
-      if (isGPayScreen) {
-        this.upiTab.$set({ selectedApp: 'gpay' });
-        this.upiTab.onUpiAppSelection({
-          detail: {
-            id: 'gpay',
-          },
-        });
-      }
-
-      /**
-       * TODO: when more tabs are ported to Svelte, move current `tab` state to
-       *       Store
-       */
-      this.upiTab.$set({ tab: this.tab });
     }
 
     return this.offers && this.renderOffers(this.tab);
@@ -3360,8 +3321,9 @@ Session.prototype = {
       this.showDiscount();
     }
 
-    var savedCards =
-      this.customer && this.customer.tokens && this.customer.tokens.items;
+    var savedCards = Token.getSavedCards(
+      _Obj.getSafely(this, 'customer.tokens.items')
+    );
 
     screen = screen || this.screen;
 
@@ -3441,7 +3403,8 @@ Session.prototype = {
       }
 
       //TODO: WIP try to see if the card exists in the saved cards and focus
-      var savedCards = this.customer.tokens && this.customer.tokens.items;
+      var savedCards =
+        this.customer.tokens && Token.getSavedCards(this.customer.tokens.items);
 
       if (this.savedCardScreen && savedCards && savedCards.length > 0) {
         var matchingCardIndex;
@@ -3487,7 +3450,9 @@ Session.prototype = {
   handleOfferRemoval: function() {
     this.hideDiscount();
 
-    if (this.customer && this.customer.tokens && this.customer.tokens.count) {
+    if (
+      Token.getSavedCards(_Obj.getSafely(this, 'customer.tokens.items')).length
+    ) {
       this.setSavedCards(this.customer.tokens);
     }
   },
@@ -3793,6 +3758,10 @@ Session.prototype = {
       this.netbankingTab.onShown();
     }
 
+    if (tab === 'upi') {
+      this.upiTab.onShown();
+    }
+
     if (/^emandate/.test(tab)) {
       return this.emandateView.showTab(tab);
     }
@@ -3977,12 +3946,14 @@ Session.prototype = {
   },
 
   /**
+   * @description Method used to transform card tokens into their EMI equivalents
+   *
    * @param {Array} tokens
    *
    * @return {Array} tokens
    */
   transformTokens: function(tokens) {
-    return Token.transform(tokens, {
+    return Token.transform(Token.getSavedCards(tokens), {
       amount: this.get('amount'),
       emi: this.methods.emi,
       emiOptions: this.emi_options,
@@ -4328,8 +4299,7 @@ Session.prototype = {
     var customer = this.customer;
     var tokens =
       (providedTokens && providedTokens.count) ||
-      (customer && customer.tokens && customer.tokens.count);
-    var cardTab = $('#form-card');
+      Token.getSavedCards(_Obj.getSafely(this, 'customer.tokens.items')).length;
     var delegator = this.delegator;
     var self = this;
 
@@ -4341,11 +4311,12 @@ Session.prototype = {
       var tokensList = providedTokens || customer.tokens;
       if (
         providedTokens ||
-        $$('.saved-card').length !== tokensList.items.length
+        $$('.saved-card').length !==
+          Token.getSavedCards(tokensList.items).length
       ) {
         try {
           // Keep EMI cards at the end
-          tokensList.items.sort(function(a, b) {
+          Token.getSavedCards(tokensList.items).sort(function(a, b) {
             if (a.card && b.card) {
               if (a.card.emi && b.card.emi) {
                 return 0;
@@ -4358,8 +4329,7 @@ Session.prototype = {
           });
         } catch (e) {}
 
-        var savedCardsCount = discreet.Token.getSavedCards(tokensList.items)
-          .length;
+        var savedCardsCount = Token.getSavedCards(tokensList.items).length;
 
         if (savedCardsCount) {
           Analytics.setMeta('has.savedCards', true);
@@ -4390,9 +4360,8 @@ Session.prototype = {
           },
         });
 
-        var totalSavedCards = discreet.Token.getSavedCards(
-          this.transformedTokens
-        ).length;
+        var totalSavedCards = Token.getSavedCards(this.transformedTokens)
+          .length;
 
         if (totalSavedCards) {
           var selectorsForSavedCardText = [
@@ -4616,10 +4585,6 @@ Session.prototype = {
     return '#form-' + form;
   },
 
-  retryWithOmnichannel: function() {
-    this.upiTab.setOmnichannelAsRetried();
-  },
-
   getFormData: function() {
     var tab = this.tab;
     var data = {};
@@ -4746,30 +4711,6 @@ Session.prototype = {
     }
   },
 
-  showOmnichannelLoader: function(text) {
-    setTimeout(function() {
-      $('#error-message .link').html('');
-    }, 100);
-
-    $('.omnichannel').show();
-    $('#overlay-close').show();
-
-    this.showLoadError(text, false);
-  },
-
-  /**
-   * Get the message to be shown in the omnichannel loader.
-   * @return {string}
-   */
-  getOmnichannelMessage: function() {
-    return (
-      'Please accept the request of ' +
-      this.formatAmountWithCurrency(this.get('amount')) +
-      ' in your Google Pay app linked with +91' +
-      this.payload.contact
-    );
-  },
-
   showLoadError: function(text, error) {
     if (this.headless && this.screen === 'card') {
       return;
@@ -4790,11 +4731,6 @@ Session.prototype = {
       loadingState = false;
     } else {
       actionState = false;
-    }
-
-    var isOmnichannel = this.isOmnichannel();
-    if (isOmnichannel && error) {
-      this.retryWithOmnichannel();
     }
 
     if (!text) {
@@ -5288,44 +5224,16 @@ Session.prototype = {
 
       // perform the actual validation
       if (screen === 'upi') {
-        var formSelector = '#form-upi';
-        var omnichannelType = this.upiTab.omnichannelType;
+        var formSelector = '#vpa';
 
-        if (data['_[flow]'] === 'intent') {
-          if (!omnichannelType) {
-            formSelector = '#svelte-collect-in-intent';
-          } else {
-            if (omnichannelType === 'vpa') {
-              formSelector = '#upi-gpay-vpa';
-            }
-
-            if (omnichannelType === 'phone') {
-              formSelector = '#upi-gpay-phone';
-            }
-          }
-        }
-
-        if (
-          data['_[flow]'] === 'directpay' &&
-          this.upiTab.selectedApp === 'gpay'
-        ) {
-          if (omnichannelType === 'vpa') {
-            formSelector = '#upi-gpay-vpa';
-          }
-
-          if (omnichannelType === 'phone') {
-            formSelector = '#upi-gpay-phone';
+        if (data['_[flow]'] === 'directpay') {
+          if (data.upi_provider === 'google_pay') {
+            formSelector = '#gpay-phone';
           }
         }
 
         if (this.checkInvalid(formSelector)) {
           return;
-        }
-
-        if (this.isOmnichannel()) {
-          $('.omnichannel').show();
-        } else {
-          $('.omnichannel').hide();
         }
       } else if (this.checkInvalid()) {
         return;
@@ -5771,8 +5679,6 @@ Session.prototype = {
       tab_titles.otp =
         '<img src="' + walletObj.logo + '" height="' + walletObj.h + '">';
       this.commenceOTP(wallet + ' account', true);
-    } else if (this.isOmnichannel()) {
-      this.showOmnichannelLoader(strings.gpay_omnichannel);
     } else if (!this.isPayout) {
       this.showLoadError();
     } else {
@@ -5966,13 +5872,9 @@ Session.prototype = {
           return that.showLoadError('Waiting for payment confirmation.');
         }
 
-        if (that.isOmnichannel()) {
-          that.showOmnichannelLoader(that.getOmnichannelMessage());
-        } else {
-          that.showLoadError(
-            "Please accept the request from Razorpay's VPA on your UPI app"
-          );
-        }
+        that.showLoadError(
+          "Please accept the request from Razorpay's VPA on your UPI app"
+        );
       });
     } else {
       if (!this.headless) {
@@ -6655,15 +6557,6 @@ Session.prototype = {
 
   getCustomer: function() {
     return getCustomer.apply(null, arguments);
-  },
-  isOmnichannel: function() {
-    return (
-      this.preferences.features &&
-      this.preferences.features.google_pay_omnichannel &&
-      this.upiTab &&
-      this.upiTab.selectedApp === 'gpay' &&
-      this.upiTab.omnichannelType === 'phone'
-    );
   },
 
   /**

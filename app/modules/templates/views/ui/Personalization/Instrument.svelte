@@ -15,6 +15,9 @@
   import { getBankLogo } from 'common/bank';
   import { getWallet } from 'common/wallet';
 
+  // Store
+  import { contact } from 'checkoutstore/screens/home';
+
   // Props
   export let instrument = {}; // P13n instrument
   export let name; // Name of the input
@@ -32,6 +35,13 @@
     let wallet;
     let flow;
     let vpaSplit;
+
+    let getInstrumentName = () => {
+      let vpaDetails = session
+        .getCustomer($contact)
+        .tokens.items.find(item => item.id === instrument.token).vpa;
+      return [vpaDetails.username, vpaDetails.handle];
+    };
 
     switch (instrument.method) {
       case 'paypal':
@@ -70,7 +80,9 @@
             alt = 'UPI App';
           }
         } else {
-          vpaSplit = instrument.vpa.split('@');
+          vpaSplit = instrument.vpa
+            ? instrument.vpa.split('@')
+            : getInstrumentName();
           text = `UPI - ${vpaSplit[0]}@${vpaSplit[1]}`;
           icon = '&#xe70e;';
           alt = 'UPI';
@@ -99,6 +111,7 @@
 <SlottedRadioOption
   {name}
   {selected}
+  ellipsis
   value={instrument.id}
   className="p13n-instrument"
   on:click
