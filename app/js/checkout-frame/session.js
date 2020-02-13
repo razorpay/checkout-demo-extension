@@ -4521,7 +4521,15 @@ Session.prototype = {
       return true;
     }
 
-    return this.offers.appliedOffer.issuer === selectedVal;
+    // Get the issuer for the offer
+    var appliedOfferIssuer = this.offers.appliedOffer.issuer;
+
+    // Validate only if an issuer is provided
+    if (appliedOfferIssuer) {
+      return this.offers.appliedOffer.issuer === selectedVal;
+    }
+
+    return true;
   },
 
   /**
