@@ -78,6 +78,14 @@
     vpaField.focus();
   }
 
+  function focusAfterTimeout() {
+    setTimeout(() => {
+      if (vpaField) {
+        vpaField.focus();
+      }
+    }, 200);
+  }
+
   const canSaveVpa = _Obj.getSafely(preferences, 'features.save_vpa');
 
   let logged;
@@ -123,11 +131,7 @@
   value="full"
   align="top"
   on:click
-  on:click={_ => {
-    setTimeout(() => {
-      vpaField.focus();
-    }, 200);
-  }}
+  on:click={focusAfterTimeout}
   {selected}>
   <div id="new-vpa-field" slot="title">
     {logged && canSaveVpa ? 'Add UPI ID' : 'UPI ID'}
