@@ -4526,7 +4526,7 @@ Session.prototype = {
 
     // Validate only if an issuer is provided
     if (appliedOfferIssuer) {
-      return this.offers.appliedOffer.issuer === selectedVal;
+      return appliedOfferIssuer === selectedVal;
     }
 
     return true;
