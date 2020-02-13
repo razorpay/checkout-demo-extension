@@ -38,7 +38,7 @@
   function handleCheckboxChange(event) {
     if (event.target.checked) {
       value = minAmount / 100;
-      dispatch('checkboxChecked');
+      dispatch('check');
     } else {
       value = '';
     }
