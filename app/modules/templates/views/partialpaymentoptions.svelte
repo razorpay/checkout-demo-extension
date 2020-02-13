@@ -130,7 +130,7 @@
           {showPartialAmountLabel}
           {minAmountLabel}
           {partialDescription}
-          on:checkboxChecked={handleCheckboxChecked}
+          on:check={handleCheckboxChecked}
           bind:value={$partialPaymentAmount}
           bind:this={partialAmountField} />
       {/if}
