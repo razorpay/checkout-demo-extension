@@ -1,29 +1,33 @@
 <script>
   // Svelte imports
   import { onMount } from 'svelte';
+  import { slide } from 'svelte/transition';
 
   // Util imports
   import { getSession } from 'sessionmanager';
   import * as GPay from 'gpay';
   import * as Bridge from 'bridge';
+  import Preferences from 'checkoutstore/preferences';
   import DowntimesStore from 'checkoutstore/downtimes';
   import { isVpaValid } from 'common/upi';
   import {
     doesAppExist,
     GOOGLE_PAY_PACKAGE_NAME,
-    topUpiApps,
     otherAppsIcon,
+    getUPIAppLogoFromHandle,
   } from 'common/upi';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { Formatter } from 'formatter';
-  import { hideCta, showCtaWithDefaultText } from 'checkoutstore/cta';
+  import { hideCta, showCtaWithDefaultText, showCta } from 'checkoutstore/cta';
+  import { filterUPITokens } from 'common/token';
 
   // UI imports
   import UpiIntent from './UpiIntent.svelte';
   import Tab from 'templates/tabs/Tab.svelte';
   import Grid from 'templates/views/ui/grid/Base.svelte';
   import Card from 'templates/views/ui/Card.svelte';
+  import ListHeader from 'templates/views/ui/ListHeader.svelte';
   import Field from 'templates/views/ui/Field.svelte';
   import Icon from 'templates/views/ui/Icon.svelte';
   import DowntimeCallout from 'templates/views/ui/DowntimeCallout.svelte';
@@ -33,6 +37,13 @@
   import NextOption from 'templates/views/ui/options/NextOption.svelte';
   import Screen from 'templates/layouts/Screen.svelte';
   import OffersPortal from 'templates/views/OffersPortal.svelte';
+  import SlottedRadioOption from 'templates/views/ui/options/Slotted/RadioOption.svelte';
+  import PartialPaymentAmountField from 'templates/views/ui/fields/PartialPaymentAmountField.svelte';
+  import AddANewVpa from './AddANewVpa.svelte';
+  import { getMiscIcon } from 'icons/misc';
+
+  // Store
+  import { contact } from 'checkoutstore/screens/home';
 
   // Props
   export let selectedApp = undefined;
@@ -43,11 +54,9 @@
   export let useOmnichannel = false;
   export let retryOmnichannel = false;
   export let isFirst = true;
-  export let omnichannelType = 'phone';
   export let vpa = '';
   export let qrIcon;
   export let tab = 'upi';
-  export let focused = false;
 
   // Refs
   export let intentView = null;
@@ -61,8 +70,16 @@
   export let pspHandle;
   export let shouldShowQr;
   let disabled = false;
+  let tokens = [];
+  let selectedToken = null;
+  let isANewVpa = false;
+  let rememberVpaCheckbox;
+  let intentAppSelected = null;
+  let customer;
 
   const session = getSession();
+  const preferences = Preferences.get();
+
   const {
     all_upi_intents_data: allIntentApps,
     upi_intents_data: intentApps,
@@ -90,10 +107,10 @@
   };
 
   const checkOmnichannel = session => {
-    const hasFeature =
-      session.preferences &&
-      session.preferences.features &&
-      session.preferences.features.google_pay_omnichannel;
+    const hasFeature = _Obj.getSafely(
+      preferences,
+      'features.google_pay_omnichannel'
+    );
 
     // Do not use omnichannel for Payouts
     if (session.isPayout) {
@@ -109,48 +126,28 @@
     return hasFeature;
   };
 
-  $: selectedAppData = _Arr.find(topUpiApps, item => item.id === selectedApp);
   $: intent = Boolean(
-    !isPayout && preferIntent && intentApps && _.lengthOf(intentApps) > 0
+    !isPayout &&
+      preferIntent &&
+      intentApps &&
+      _.lengthOf(intentApps) > 0 &&
+      _Obj.getSafely(preferences, 'methods.upi_intent')
   );
   $: isGPaySelected = selectedApp === 'gpay' && useWebPaymentsApi;
   $: pspHandle = selectedAppData ? selectedAppData.psp : '';
   $: shouldShowQr =
     qrEnabled && !selectedApp && selectedApp !== null && !isPayout;
 
-  $: {
-    if (tab) {
-      /**
-       * For separate Gpay tab, if it is intent app and app does not exist,
-       * fallback to older GPay UI
-       **/
-      if (selectedApp === 'gpay') {
-        if (tab === 'gpay') {
-          preferIntent = doesAppExist(GOOGLE_PAY_PACKAGE_NAME, intentApps);
-        } else if (tab === 'upi') {
-          preferIntent = true;
-        }
-      }
-    }
-  }
-
-  $: {
-    if (session.tab === 'upi' || session.tab === 'gpay') {
-      /* TODO: bad practice, remove asap */
-      if (selectedApp === undefined || isGPaySelected) {
-        hideCta();
-      } else {
-        showCtaWithDefaultText();
-      }
-    }
-  }
-
   onMount(() => {
     checkGPay(session)
       /* Use Google Pay */
-      .then(() => (useWebPaymentsApi = true))
+      .then(() => {
+        useWebPaymentsApi = true;
+      })
       /* Don't use Google Pay */
-      .catch(() => (useWebPaymentsApi = false));
+      .catch(e => {
+        useWebPaymentsApi = false;
+      });
 
     useOmnichannel = checkOmnichannel(session);
 
@@ -180,17 +177,18 @@
     session.switchTab('qr');
   }
 
-  export function setOmnichannelType(event) {
-    const { type } = event.detail;
+  export function updateCustomer() {
+    customer = session.getCustomer($contact);
 
-    Analytics.track('omnichannel:type:select', {
-      type: AnalyticsTypes.BEHAV,
-      data: {
-        type,
-      },
-    });
+    tokens = filterUPITokens(_Obj.getSafely(customer, 'tokens.items', []));
 
-    omnichannelType = type;
+    if (!tokens.length) {
+      selectedToken = 'new';
+    }
+  }
+
+  export function onShown() {
+    updateCustomer();
   }
 
   export function getPayload() {
@@ -210,56 +208,49 @@
     if (vpaField) {
       vpaField.blur();
     }
-
     let data = {};
-    if (intent) {
-      data = intentView.getPayload();
-    } else {
-      if (selectedApp && isGPaySelected) {
+    let _token = [];
+    switch (selectedToken) {
+      case 'new':
+        data = {
+          vpa: getFullVpa(),
+          save: vpaField.shouldRememberVpa(),
+        };
+        break;
+      case 'intent':
+        data = intentView.getPayload();
+        break;
+      case 'gpay-omni':
+        data = {
+          '_[flow]': 'intent',
+          contact: omnichannelField.getPhone(),
+          upi_provider: 'google_pay',
+        };
+        break;
+      case 'gpay':
         data = {
           '_[flow]': 'gpay',
         };
-      } else if (useOmnichannel && selectedApp === 'gpay') {
-        if (!retryOmnichannel) {
-          data['_[flow]'] = 'intent';
-          data.contact = omnichannelField.getPhone();
-          data.upi_provider = 'google_pay';
-        } else {
-          if (omnichannelType === 'vpa') {
-            data['_[flow]'] = 'directpay';
-            data.vpa = getFullVpa();
-          } else if (omnichannelType === 'phone') {
-            data['_[flow]'] = 'intent';
-            data.contact = omnichannelField.getPhone();
-            data.upi_provider = 'google_pay';
-          }
-        }
-      } else {
-        data = {
-          vpa: getFullVpa(),
-        };
-      }
+        break;
 
-      /**
-       * TODO: discuss with vivek whether to continue sending
-       * directpay for collect requests
-       */
-      if (!data['_[flow]']) {
-        data['_[flow]'] = 'directpay';
-      }
+      default:
+        _token = _Arr.find(
+          session.customer.tokens.items,
+          token => token.id === selectedToken
+        );
+        data = { token: _token.token };
+        break;
+    }
+
+    /**
+     * default to directpay for collect requests
+     */
+    if (!data['_[flow]']) {
+      data['_[flow]'] = 'directpay';
     }
 
     data.method = 'upi';
-
     return data;
-  }
-
-  export function setOmnichannelAsRetried() {
-    Analytics.track('omnichannel:retry:click', {
-      type: AnalyticsTypes.BEHAV,
-    });
-
-    retryOmnichannel = true;
   }
 
   export function onBack() {
@@ -284,45 +275,27 @@
   }
 
   export function onUpiAppSelection(event) {
+    const getEventValueForFeature = feature => {
+      return (
+        {
+          gpay: 'gpay web payments',
+          'gpay-omni': 'gpay omnichannel',
+          new: 'add new',
+        }[feature] || 'saved vpa'
+      );
+    };
+
     const id = event.detail.id;
 
-    if (typeof id !== 'undefined') {
-      /**
-       * `id` is undefined when the user wants to switch app
-       * and it is null when the user select "other apps"
-       */
-      Analytics.track('upi:app:select', {
-        type: AnalyticsTypes.BEHAV,
-        data: {
-          flow: 'collect',
-          app: id,
-        },
-      });
-    }
-
-    selectedApp = id;
-
-    /**
-     * Wait for `isGpaySelected` to be updated. It does not update synchronously when selectedApp is reassigned, hence
-     * the setTimeout.
-     */
-    setTimeout(function() {
-      if (isGPaySelected) {
-        return session.preSubmit();
-      }
-
-      focusVpa();
+    Analytics.track('vpa:option:click', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        app: event.detail.app,
+        value: getEventValueForFeature(id),
+      },
     });
-  }
-
-  export function focusVpa() {
-    if (!focused && vpaField) {
-      if (useOmnichannel && selectedApp === 'gpay') {
-        omnichannelField.focus();
-      } else {
-        vpaField.focus();
-      }
-    }
+    selectedToken = id;
+    intentAppSelected = event.detail.app || null;
   }
 
   export function getFullVpa() {
@@ -334,13 +307,10 @@
 
   export function trackVpaEntry() {
     const vpa = getFullVpa();
-
     if (!vpa) {
       return;
     }
-
     const valid = isVpaValid(vpa);
-
     Analytics.track('vpa:fill', {
       type: AnalyticsTypes.BEHAV,
       data: {
@@ -385,10 +355,13 @@
       },
     });
   }
+
+  updateCustomer();
 </script>
 
 <style>
   .legend {
+    margin-top: 10px;
     padding: 12px 0 8px 12px;
   }
 
@@ -407,28 +380,6 @@
 
     &.paytm :global(.elem) {
       padding-right: 64px;
-    }
-  }
-
-  .ref-changebtn {
-    position: absolute;
-    top: 0;
-    right: 4px;
-    bottom: 0;
-    font-size: 12px;
-    line-height: 47px;
-    padding: 0 20px 0 30px;
-    color: #7b7f95;
-    overflow: hidden;
-    cursor: pointer;
-
-    &:after {
-      content: '\e604';
-      transform: rotate(270deg);
-      font-size: 8px;
-      position: absolute;
-      right: 8px;
-      top: 0;
     }
   }
 
@@ -456,61 +407,92 @@
 <Tab method="upi" {down} pad={false}>
   <Screen>
     <div slot="main">
+
       {#if intent}
         <UpiIntent
           bind:this={intentView}
-          apps={intentApps}
-          {selectedApp}
+          apps={intentApps || []}
+          selected={intentAppSelected}
+          on:select={e => {
+            onUpiAppSelection({
+              detail: { id: 'intent', app: e.detail.packageName },
+            });
+          }}
           {showRecommendedUPIApp} />
-      {:else if selectedApp === undefined || isGPaySelected}
-        <div class="legend left">Select a UPI app</div>
-        <Grid items={topUpiApps} on:select={onUpiAppSelection} />
-      {:else}
-        <div class="legend left">Selected UPI app</div>
-        <Card>
-          <span class="ref-iconwrap">
-            <Icon icon={selectedAppData.icon} alt={selectedAppData.text} />
-          </span>
-          <span>{selectedAppData.text}</span>
-          <div class="ref-changebtn" on:click={onUpiAppSelection}>change</div>
-        </Card>
-        {#if selectedApp === 'gpay'}
-          {#if useOmnichannel}
-            <GooglePayOmnichannel
-              error={retryOmnichannel}
-              focusOnCreate={true}
-              {isFirst}
-              retry={retryOmnichannel}
-              selected={omnichannelType === 'phone'}
-              on:blur={trackOmnichannelEntry}
-              on:select={setOmnichannelType}
-              bind:this={omnichannelField} />
-          {/if}
-          {#if retryOmnichannel || !useOmnichannel}
-            <GooglePayCollect
-              focusOnCreate={!retryOmnichannel}
-              {pspHandle}
-              retry={retryOmnichannel}
-              selected={omnichannelType === 'vpa'}
-              on:blur={trackVpaEntry}
-              on:handleChange={trackHandleSelection}
-              on:select={setOmnichannelType}
-              bind:this={vpaField} />
-          {/if}
-        {:else}
-          <Collect
-            appId={selectedAppData.id}
-            focusOnCreate={true}
-            {pspHandle}
-            {selectedApp}
-            {vpa}
-            on:blur={trackVpaEntry}
-            bind:this={vpaField} />
+      {/if}
+      {#if useWebPaymentsApi}
+        <div class="legend left">Pay using Gpay App</div>
+        <div class="border-list">
+          <SlottedRadioOption
+            name="google_pay_web"
+            selected={selectedToken === 'gpay'}
+            on:click={_ => {
+              selectedToken = 'gpay';
+              session.preSubmit();
+            }}>
+            <div slot="title">Google Pay</div>
+            <i slot="icon">
+              <Icon icon={session.themeMeta.icons.gpay} />
+            </i>
+          </SlottedRadioOption>
+        </div>
+      {/if}
+      <div class="legend left">Pay using UPI ID</div>
+      <div class="border-list">
+        {#if intent}
+          <ListHeader>
+            <i slot="icon">
+              <Icon icon={getMiscIcon('recieve')} />
+            </i>
+            <div slot="subtitle">
+              You will receive a payment request on your UPI app
+            </div>
+          </ListHeader>
         {/if}
+
+        {#each tokens as app, i}
+          <SlottedRadioOption
+            name="payment_type"
+            ellipsis
+            selected={selectedToken === app.id}
+            on:click={_ => {
+              selectedToken = app.id;
+              showCta();
+            }}>
+            <div slot="title">{app.vpa.username + '@' + app.vpa.handle}</div>
+            <i slot="icon">
+              <Icon
+                icon={getUPIAppLogoFromHandle(app.vpa.handle) || session.themeMeta.icons.upi} />
+            </i>
+          </SlottedRadioOption>
+        {/each}
+        <AddANewVpa
+          on:click={_ => {
+            onUpiAppSelection({ detail: { id: 'new' } });
+            showCta();
+          }}
+          {customer}
+          on:blur={trackVpaEntry}
+          selected={selectedToken === 'new'}
+          bind:this={vpaField} />
+      </div>
+      {#if useOmnichannel}
+        <GooglePayOmnichannel
+          error={retryOmnichannel}
+          focusOnCreate={true}
+          {isFirst}
+          retry={retryOmnichannel}
+          selected={selectedToken === 'gpay-omni'}
+          on:blur={trackOmnichannelEntry}
+          on:select={_ => {
+            onUpiAppSelection({ detail: { id: 'gpay-omni' } });
+            showCta();
+          }}
+          bind:this={omnichannelField} />
       {/if}
 
       {#if shouldShowQr}
-        <div class="legend left">Or, Pay using QR</div>
+        <div class="legend left">Or, Pay using QR Code</div>
         <div class="options" id="showQr">
           <NextOption
             icon={qrIcon}

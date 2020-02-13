@@ -8,29 +8,31 @@ const {
   respondToUPIAjax,
   respondToUPIPaymentStatus,
   verifyPartialAmount,
-  selectBankNameFromGooglePayDropDown,
 } = require('../../../actions/common');
 
 const {
-  handlePartialPayment,
   assertBasicDetailsScreen,
   fillUserDetails,
+  proceed,
   assertUserDetails,
   assertPaymentMethods,
   selectPaymentMethod,
   assertEditUserDetailsAndBack,
+  handlePartialPayment,
 } = require('../actions');
 
 describe.each(
   getTestData(
-    'Perform GooglePay transaction with optional contact and partial payments enabled',
+    'Perform upi collect transaction with contact optional and partial payments enabled',
     {
-      loggedIn: false,
+      loggedIn: true,
+      anon: false,
       options: {
         amount: 20000,
         personalization: false,
       },
       preferences: {
+        optional: ['contact'],
         order: {
           amount: 20000,
           amount_due: 20000,
@@ -39,11 +41,10 @@ describe.each(
           first_payment_min_amount: null,
           partial_payment: true,
         },
-        optional: ['contact'],
       },
     }
   )
-)('GooglePay tests', ({ preferences, title, options }) => {
+)('UPI tests', ({ preferences, title, options }) => {
   test(title, async () => {
     preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
@@ -51,19 +52,16 @@ describe.each(
       options,
       preferences,
     });
-    await assertBasicDetailsScreen(context);
-    await fillUserDetails(context);
-    await handlePartialPayment(context, '100');
-    await assertUserDetails(context);
-    await assertEditUserDetailsAndBack(context);
+    // await assertBasicDetailsScreen(context);
+    // await fillUserDetails(context);
+    // await handlePartialPayment(context, '100');
+    // await assertUserDetails(context);
+    // await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIMethod(context, 'Google Pay');
-    await enterUPIAccount(context, 'scbaala');
-    await selectBankNameFromGooglePayDropDown(context, 'okhdfcbank');
+    await selectUPIMethod(context, 'token');
     await verifyPartialAmount(context, '₹ 100');
     await submit(context);
-    await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
     await respondToUPIAjax(context);
     await respondToUPIPaymentStatus(context);
   });

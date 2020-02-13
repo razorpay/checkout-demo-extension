@@ -29,7 +29,8 @@ describe.each(
   getTestData(
     'Perform upi collect transaction with callbackURL and offers applied',
     {
-      loggedIn: false,
+      loggedIn: true,
+      anon: false,
       options: {
         amount: 200000,
         personalization: false,
@@ -82,8 +83,8 @@ describe.each(
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIMethod(context, 'BHIM');
-    await enterUPIAccount(context, 'BHIM');
+    await selectUPIMethod(context, 'new');
+    await enterUPIAccount(context, 'saranshgupta1995@okaxis');
     await viewOffers(context);
     await selectOffer(context, '1');
     await verifyOfferApplied(context);
