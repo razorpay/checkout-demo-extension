@@ -73,6 +73,7 @@ function makePreferences(overrides) {
       netbanking,
       emi_options,
       recurring,
+      upi_intent: true,
     },
     ...overrides,
   };
