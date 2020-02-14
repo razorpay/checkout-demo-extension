@@ -2252,7 +2252,7 @@ Session.prototype = {
     var prefilledMethod = this.get('prefill.method');
     var prefilledProvider = this.get('prefill.provider');
 
-    if (prefilledMethod === 'cardless_emi') {
+    if (prefilledMethod === 'cardless_emi' && prefilledProvider) {
       this.selectCardlessEmiProvider(prefilledProvider);
     }
   },
