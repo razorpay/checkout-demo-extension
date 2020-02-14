@@ -1223,11 +1223,14 @@ Session.prototype = {
         data['card[expiry]'] = exp_m + ' / ' + exp_y;
       }
 
+      if (data['bank']) {
+        this.netbankingTab.setSelectedBank(data['bank']);
+      }
+
       each(
         {
           contact: 'contact',
           email: 'email',
-          bank: 'bank-select',
           'card[name]': 'card_name',
           'card[number]': 'card_number',
           'card[expiry]': 'card_expiry',
@@ -1499,7 +1502,7 @@ Session.prototype = {
      */
     if (this.methods.upi) {
       this.upiTab = new discreet.UpiTab({
-        target: gel('upi-svelte-wrap'),
+        target: _Doc.querySelector('#upi-svelte-wrap'),
       });
     }
   },
@@ -2249,7 +2252,7 @@ Session.prototype = {
     var prefilledMethod = this.get('prefill.method');
     var prefilledProvider = this.get('prefill.provider');
 
-    if (prefilledMethod === 'cardless_emi') {
+    if (prefilledMethod === 'cardless_emi' && prefilledProvider) {
       this.selectCardlessEmiProvider(prefilledProvider);
     }
   },

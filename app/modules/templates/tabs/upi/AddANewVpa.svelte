@@ -66,13 +66,24 @@
   export function blur() {
     const dispatch = createEventDispatcher();
     dispatch('blur');
-    if (selected) {
-      vpaField.blur();
-    }
+
+    try {
+      if (selected) {
+        vpaField.blur();
+      }
+    } catch (err) {}
   }
 
   export function focus() {
     vpaField.focus();
+  }
+
+  function focusAfterTimeout() {
+    setTimeout(() => {
+      if (vpaField) {
+        vpaField.focus();
+      }
+    }, 200);
   }
 
   const canSaveVpa = _Obj.getSafely(preferences, 'features.save_vpa');
@@ -120,11 +131,7 @@
   value="full"
   align="top"
   on:click
-  on:click={_ => {
-    setTimeout(() => {
-      vpaField.focus();
-    }, 200);
-  }}
+  on:click={focusAfterTimeout}
   {selected}>
   <div id="new-vpa-field" slot="title">
     {logged && canSaveVpa ? 'Add UPI ID' : 'UPI ID'}
@@ -141,9 +148,8 @@
           formatter={{ type: 'vpa' }}
           {pattern}
           helpText="Please enter a valid VPA of the form username@bank"
-          elemClasses="mature"
           id="vpa"
-          name="amount"
+          name="vpa"
           type="text"
           required
           bind:value={newVpa}

@@ -166,6 +166,7 @@
 
   #upi-apps {
     padding-top: unset;
+    padding-bottom: unset;
   }
 
   #upi-apps .ref-collect {
