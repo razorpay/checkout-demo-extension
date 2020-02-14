@@ -56,7 +56,6 @@
   export let isFirst = true;
   export let vpa = '';
   export let qrIcon;
-  export let tab = 'upi';
 
   // Refs
   export let intentView = null;
@@ -205,9 +204,10 @@
      * already focused on, so this would be fine if the
      * user decides to manually press the pay button.
      */
-    if (vpaField) {
+    try {
       vpaField.blur();
-    }
+    } catch (err) {}
+
     let data = {};
     let _token = [];
     switch (selectedToken) {

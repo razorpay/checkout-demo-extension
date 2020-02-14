@@ -1502,7 +1502,7 @@ Session.prototype = {
      */
     if (this.methods.upi) {
       this.upiTab = new discreet.UpiTab({
-        target: gel('upi-svelte-wrap'),
+        target: _Doc.querySelector('#upi-svelte-wrap'),
       });
     }
   },
