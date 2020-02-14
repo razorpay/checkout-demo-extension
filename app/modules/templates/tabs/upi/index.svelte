@@ -281,6 +281,7 @@
           gpay: 'gpay web payments',
           'gpay-omni': 'gpay omnichannel',
           new: 'add new',
+          intent: 'intent',
         }[feature] || 'saved vpa'
       );
     };
