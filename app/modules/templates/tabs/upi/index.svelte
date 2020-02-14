@@ -64,10 +64,11 @@
 
   // Computed
   export let selectedAppData = null;
-  export let intent;
+  export let intent = false;
   export let isGPaySelected;
   export let pspHandle;
   export let shouldShowQr;
+
   let disabled = false;
   let tokens = [];
   let selectedToken = null;
@@ -138,6 +139,8 @@
     qrEnabled && !selectedApp && selectedApp !== null && !isPayout;
 
   onMount(() => {
+    updateCustomer();
+
     checkGPay(session)
       /* Use Google Pay */
       .then(() => {
@@ -181,7 +184,11 @@
 
     tokens = filterUPITokens(_Obj.getSafely(customer, 'tokens.items', []));
 
-    if (!tokens.length) {
+    /**
+     * If there are no tokens, select "new" as the default option.
+     * But only do that if intent flow is not available.
+     */
+    if (!tokens.length && !intent) {
       selectedToken = 'new';
     }
   }
@@ -355,8 +362,6 @@
       },
     });
   }
-
-  updateCustomer();
 </script>
 
 <style>
