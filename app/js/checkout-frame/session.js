@@ -2658,20 +2658,6 @@ Session.prototype = {
       true
     );
 
-    /**
-     * Listener used for UPI Intent flow.
-     * 1. Scrolls the App List to the bottom (to make the error tooltip visible)
-     * 2. Selects the VPA radio button
-     */
-    this.on('focus', '#vpa', function() {
-      $('#form-upi').scrollTo(window.innerHeight);
-      var directpayRadio = gel('upi_app-directpay');
-      if (directpayRadio) {
-        directpayRadio.checked = true;
-        $('#body').addClass('sub');
-      }
-    });
-
     if (this.get('theme.close_button')) {
       this.click('#modal-close', function() {
         if (this.get('modal.confirm_close') && !confirmClose()) {
@@ -2896,8 +2882,6 @@ Session.prototype = {
   },
 
   onUpiAppSelect: function(packageName) {
-    $('#body').toggleClass('sub', packageName);
-
     Analytics.track('upi:app:select', {
       type: AnalyticsTypes.BEHAV,
       data: {
@@ -3186,7 +3170,7 @@ Session.prototype = {
 
     if (screen === '' && this.homeTab) {
       this.homeTab.onShown();
-    } else {
+    } else if (screen !== 'upi') {
       this.body.toggleClass('sub', showPaybtn);
     }
 
