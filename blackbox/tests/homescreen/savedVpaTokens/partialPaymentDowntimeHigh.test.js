@@ -57,12 +57,12 @@ describe.each(
       options,
       preferences,
     });
-    // await assertBasicDetailsScreen(context);
-    // await fillUserDetails(context);
-    // await handlePartialPayment(context, '100');
-    // await proceed(context);
-    // await assertUserDetails(context);
-    // await assertEditUserDetailsAndBack(context);
+    await assertBasicDetailsScreen(context);
+    await fillUserDetails(context);
+    await handlePartialPayment(context, '100');
+    await proceed(context);
+    await assertUserDetails(context);
+    await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await verifyHighDowntime(
       context,

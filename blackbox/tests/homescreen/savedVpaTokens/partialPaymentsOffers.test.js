@@ -76,7 +76,7 @@ describe.each(
     }
   )
 )('UPI tests', ({ preferences, title, options }) => {
-  test(title, async () => {
+  test.skip(title, async () => {
     preferences.methods.upi = true;
     await setPreferenceForOffer(preferences);
     const context = await openCheckoutWithNewHomeScreen({
