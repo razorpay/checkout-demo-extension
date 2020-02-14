@@ -52,11 +52,11 @@ describe.each(
       options,
       preferences,
     });
-    // await assertBasicDetailsScreen(context);
-    // await fillUserDetails(context);
-    // await handlePartialPayment(context, '100');
-    // await assertUserDetails(context);
-    // await assertEditUserDetailsAndBack(context);
+    await assertBasicDetailsScreen(context);
+    await fillUserDetails(context);
+    await handlePartialPayment(context, '100');
+    await assertUserDetails(context);
+    await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await selectUPIMethod(context, 'token');
