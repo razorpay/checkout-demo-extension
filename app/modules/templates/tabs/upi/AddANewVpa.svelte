@@ -68,7 +68,7 @@
     dispatch('blur');
 
     try {
-      if (vpaField && selected) {
+      if (selected) {
         vpaField.blur();
       }
     } catch (err) {}

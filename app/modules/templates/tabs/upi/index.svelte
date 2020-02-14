@@ -205,9 +205,7 @@
      * user decides to manually press the pay button.
      */
     try {
-      if (vpaField) {
-        vpaField.blur();
-      }
+      vpaField.blur();
     } catch (err) {}
 
     let data = {};
