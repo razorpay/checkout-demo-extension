@@ -2103,6 +2103,7 @@ Session.prototype = {
       this.commenceOTP('Resending OTP...');
     } else if (action === 'verify') {
       this.commenceOTP('Verifying OTP...');
+      return;
     } else {
       this.commenceOTP(payLaterProviderObj.name + ' account', true);
     }
