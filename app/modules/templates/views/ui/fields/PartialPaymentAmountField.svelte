@@ -1,4 +1,6 @@
 <script>
+  import { createEventDispatcher } from 'svelte';
+
   import Field from 'templates/views/ui/Field.svelte';
   import Checkbox from 'templates/views/ui/Checkbox.svelte';
 
@@ -13,6 +15,7 @@
   export let showPartialAmountLabel = false;
 
   const session = getSession();
+  const dispatch = createEventDispatcher();
 
   // Refs
   let field;
@@ -35,6 +38,7 @@
   function handleCheckboxChange(event) {
     if (event.target.checked) {
       value = minAmount / 100;
+      dispatch('check');
     } else {
       value = '';
     }

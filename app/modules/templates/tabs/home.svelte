@@ -239,9 +239,8 @@
   export function updateCustomer() {
     customer = session.getCustomer($contact);
 
-    const availableInstruments = getAllAvailableP13nInstruments();
-    instruments = availableInstruments.slice(0, MAX_P13N_INSTRUMENTS);
-    trackP13nInstruments(availableInstruments);
+    const loggedIn = _Obj.getSafely(customer, 'logged');
+    _El.keepClass(_Doc.querySelector('#topbar #top-right'), 'logged', loggedIn);
   }
 
   function shouldUseP13n() {
@@ -298,6 +297,10 @@
 
       if (personalization) {
         updateCustomer();
+
+        const availableInstruments = getAllAvailableP13nInstruments();
+        instruments = availableInstruments.slice(0, MAX_P13N_INSTRUMENTS);
+        trackP13nInstruments(availableInstruments);
       } else {
         instruments = [];
       }
@@ -443,6 +446,8 @@
   export function next() {
     Analytics.track('home:proceed');
 
+    updateCustomer();
+
     if (isPartialPayment) {
       if ($partialPaymentOption !== 'full') {
         session.handlePartialAmount();
@@ -544,7 +549,7 @@
       data: event.detail,
     });
 
-    const { down, method } = event.detail;
+    let { down, method } = event.detail;
 
     if (down) {
       return;
@@ -554,9 +559,15 @@
 
     if (method === 'paypal') {
       createPaypalPayment();
-    } else {
-      session.switchTab(method);
+      return;
     }
+
+    if (method === 'gpay') {
+      // GPay is UPI underneath
+      method = 'upi';
+    }
+
+    session.switchTab(method);
   }
 
   export function shouldGoNext() {

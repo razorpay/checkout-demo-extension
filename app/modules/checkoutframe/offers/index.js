@@ -87,14 +87,20 @@ const isOfferEligible = (offer, opts) => {
 
   if (method === 'wallet') {
     if (_.isArray(enabledMethods.wallet)) {
-      if (
-        _Arr.filter(
+      const offerWallet = offer.issuer;
+
+      if (offerWallet) {
+        // If a wallet is specified for the offer, check if it is enabled
+        const isAnyWalletEligible = _Arr.any(
           enabledMethods.wallet,
-          wallet => wallet.code === offer.issuer
-        ).length
-      ) {
-        return true;
+          wallet => wallet.code === offerWallet
+        );
+
+        return isAnyWalletEligible;
       }
+
+      // If no wallet is specified, this offer can be applied to all wallets
+      return true;
     }
   } else if (method === 'cardless_emi' && offer.provider) {
     return (

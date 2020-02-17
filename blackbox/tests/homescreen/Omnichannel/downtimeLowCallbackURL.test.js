@@ -64,7 +64,7 @@ describe.each(
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await verifyLowDowntime(context, 'UPI');
-    await selectUPIMethod(context, 'Google Pay');
+    await selectUPIMethod(context, 'omnichannel');
     await verifyOmnichannelPhoneNumber(context);
     await submit(context);
     await expectRedirectWithCallback(context, { method: 'upi' });

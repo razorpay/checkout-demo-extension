@@ -1,4 +1,7 @@
 <script>
+  // Svelte imports
+  import { createEventDispatcher } from 'svelte';
+
   // Utils imports
   import { getSession } from 'sessionmanager';
   import { GOOGLE_PAY_PACKAGE_NAME, isVpaValid } from 'common/upi';
@@ -10,6 +13,10 @@
   import NextOption from 'templates/views/ui/options/NextOption.svelte';
   import OptionIcon from 'templates/views/ui/options/OptionIcon.svelte';
   import Field from 'templates/views/ui/Field.svelte';
+  import ListHeader from 'templates/views/ui/ListHeader.svelte';
+  import Icon from 'templates/views/ui/Icon.svelte';
+
+  import { getMiscIcon } from 'icons/misc';
 
   // Props
   export let apps;
@@ -88,15 +95,13 @@
     return data;
   }
 
+  const dispatch = createEventDispatcher();
+
   export function onAppSelect({ detail }) {
     const packageName = detail.package_name;
 
-    if (packageName === 'directpay') {
-      vpaField.focus();
-    }
-
     session.onUpiAppSelect(packageName);
-    selected = packageName;
+    dispatch('select', { packageName });
   }
 </script>
 
@@ -159,6 +164,11 @@
     }
   }
 
+  #upi-apps {
+    padding-top: unset;
+    padding-bottom: unset;
+  }
+
   #upi-apps .ref-collect {
     :global(.option-icon) {
       left: 20px;
@@ -197,10 +207,22 @@
     line-height: 15px;
     margin-top: 4px;
   }
+
+  .legend {
+    padding: 12px 0 8px 12px;
+  }
 </style>
 
+<div class="legend left">PAY USING APPS</div>
 <div id="upi-apps">
   <div id="svelte-upi-apps-list" class="options options-no-margin">
+    <ListHeader>
+      <i slot="icon">
+        <Icon icon={getMiscIcon('redirect')} />
+      </i>
+      <div slot="subtitle">You will be redirected to your UPI app</div>
+    </ListHeader>
+
     {#each showableApps as app, i}
       <RadioOption
         data={app}
@@ -228,30 +250,4 @@
     {/if}
   </div>
 
-  <div
-    id="svelte-collect-in-intent"
-    class="options options-no-margin ref-collect">
-    <RadioOption
-      data={{ package_name: 'directpay' }}
-      icon={'&#xe70e;'}
-      name="upi_app"
-      value="directpay"
-      selected={selected === 'directpay'}
-      on:select={onAppSelect}>
-      <div class="ref-title">UPI Address</div>
-      <div class="ref-submessage">
-        You will receive a payment request in your UPI app
-      </div>
-      <Field
-        type="text"
-        name="vpa"
-        bind:this={vpaField}
-        placeholder="Enter your UPI Address"
-        required={true}
-        helpText="Please enter a valid VPA of the form username@bank"
-        pattern=".+@.+"
-        on:blur={trackVpaEntry}
-        formatter={{ type: 'vpa' }} />
-    </RadioOption>
-  </div>
 </div>

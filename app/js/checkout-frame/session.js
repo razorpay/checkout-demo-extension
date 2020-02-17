@@ -975,16 +975,12 @@ Session.prototype = {
 
       this.body = $('#body');
 
-      if (this.invoice) {
-        r.set('order_id', this.invoice.order_id);
-        if (ecod) {
-          commenceECOD(this);
-        }
+      if (this.invoice && ecod) {
+        commenceECOD(this);
       }
       if (ecod) {
         r.set('prefill.method', 'wallet');
         r.set('theme.hide_topbar', true);
-        gel('form-wallet').insertBefore(gel('pad-common'), gel('ecod-label'));
       }
       $(this.el).addClass(classes);
     }
@@ -1066,11 +1062,14 @@ Session.prototype = {
         data['card[expiry]'] = exp_m + ' / ' + exp_y;
       }
 
+      if (data['bank']) {
+        this.netbankingTab.setSelectedBank(data['bank']);
+      }
+
       each(
         {
           contact: 'contact',
           email: 'email',
-          bank: 'bank-select',
         },
         function(name, id) {
           var el = gel(id);
@@ -1206,6 +1205,7 @@ Session.prototype = {
     this.getEl();
     this.setFormatting();
     this.improvisePaymentOptions();
+    this.improvisePrefill();
     this.setSvelteComponents();
     this.fillData();
     this.setEMI();
@@ -1215,6 +1215,7 @@ Session.prototype = {
     this.bindEvents();
     this.setEmiScreen();
     this.runMaxmindScriptIfApplicable();
+    this.prefillPostRender();
     Hacks.initPostRenderHacks();
 
     errorHandler.call(this, this.params);
@@ -1298,6 +1299,14 @@ Session.prototype = {
       Analytics.setMeta('orientation', Hacks.getDeviceOrientation());
     });
 
+    if (this.get('ecod')) {
+      Analytics.setMeta('ecod', true);
+
+      if (this.invoice) {
+        Analytics.setMeta('invoice', true);
+      }
+    }
+
     Analytics.track('complete', {
       type: AnalyticsTypes.RENDER,
       data: {
@@ -1308,13 +1317,9 @@ Session.prototype = {
   },
 
   runMaxmindScriptIfApplicable: function() {
-    var MAXMIND_PCT = 0.25;
+    this.runMaxmindScript();
 
-    if (_.random() < MAXMIND_PCT) {
-      this.runMaxmindScript();
-
-      Analytics.setMeta('maxmind', true);
-    }
+    Analytics.setMeta('maxmind', true);
   },
 
   runMaxmindScript: function() {
@@ -1332,7 +1337,7 @@ Session.prototype = {
      */
     if (this.methods.upi) {
       this.upiTab = new discreet.UpiTab({
-        target: gel('upi-svelte-wrap'),
+        target: _Doc.querySelector('#upi-svelte-wrap'),
       });
     }
   },
@@ -2059,6 +2064,37 @@ Session.prototype = {
     }
   },
 
+  /**
+   * Improvise the prefill options.
+   */
+  improvisePrefill: function() {
+    var prefilledMethod = this.get('prefill.method');
+    var prefilledProvider = this.get('prefill.provider');
+
+    /**
+     * Bajaj Finserv is _technically_ EMI,
+     * but we're grouping it under Cardless EMI screen
+     * on Checkout.
+     */
+    if (prefilledMethod === 'emi' && prefilledProvider === 'bajaj') {
+      this.set('prefill.method', 'cardless_emi');
+    }
+  },
+
+  /**
+   * Anything related to prefilled that needs to be done
+   * once everything has rendered,
+   * goes into this function.
+   */
+  prefillPostRender: function() {
+    var prefilledMethod = this.get('prefill.method');
+    var prefilledProvider = this.get('prefill.provider');
+
+    if (prefilledMethod === 'cardless_emi' && prefilledProvider) {
+      this.selectCardlessEmiProvider(prefilledProvider);
+    }
+  },
+
   renderCss: function() {
     var div = document.createElement('div');
     var style = document.createElement('style');
@@ -2180,7 +2216,6 @@ Session.prototype = {
 
     $('#overlay-close').hide();
     hideOverlayMessage();
-    $('.omnichannel').hide(); // Hide the Google Pay logo
   },
 
   shake: function() {
@@ -2381,6 +2416,42 @@ Session.prototype = {
       this.on('blur', '#card_cvv', shiftDown);
     }
   },
+
+  /**
+   * Logs the user out
+   * @param {boolean} outOfAllDevices
+   */
+  _logUserOut: function(customer, outOfAllDevices) {
+    if (customer) {
+      customer.logged = false;
+      customer.tokens = null;
+
+      customer.logout(outOfAllDevices);
+    }
+
+    this.setSavedCards();
+
+    _El.removeClass(_Doc.querySelector('#top-right'), 'logged');
+
+    this.homeTab.updateCustomer();
+  },
+
+  /**
+   * Logs user out of this device.
+   * @param {Customer} customer
+   */
+  logUserOut: function(customer) {
+    this._logUserOut(customer);
+  },
+
+  /**
+   * Logs user out of all devices.
+   * @param {Customer} customer
+   */
+  logUserOutOfAllDevices: function(customer) {
+    this._logUserOut(customer, true);
+  },
+
   bindEvents: function() {
     var self = this;
 
@@ -2465,29 +2536,9 @@ Session.prototype = {
         this.fixLandscapeBug();
       }
     }
-    this.on('click', '#top-right', function() {
-      $('#top-right').addClass('focus');
-      var self = this;
-      var container_listener = $('#container').on(
-        'click',
-        function(e) {
-          if (e.target.tagName === 'LI') {
-            var customer = self.customer;
-            customer.logged = false;
-            customer.tokens = null;
-            $('#top-right').removeClass('logged');
-            customer.logout(e.target.parentNode.firstChild === e.target);
 
-            self.svelteCardTab.updateCustomerAndShowLandingView();
-            self.homeTab.updateCustomer();
-          }
-          container_listener();
-          $('#top-right').removeClass('focus');
-          return preventDefault(e);
-        },
-        true
-      );
-    });
+    discreet.UserHandlers.attachLogoutListeners(this);
+
     if (enabledMethods.wallet) {
       try {
         this.on(
@@ -2736,8 +2787,6 @@ Session.prototype = {
   },
 
   setScreen: function(screen) {
-    var isGPayScreen = false;
-
     if (screen) {
       var screenTitle =
         this.tab === 'emi'
@@ -2755,11 +2804,6 @@ Session.prototype = {
 
     if (screen !== 'otp') {
       this.headless = false;
-    }
-
-    if (screen === 'gpay' && this.separateGPay) {
-      screen = 'upi';
-      isGPayScreen = true;
     }
 
     setEmiPlansCta(screen, this.tab);
@@ -2850,37 +2894,6 @@ Session.prototype = {
       this.homeTab.onShown();
     } else {
       this.body.toggleClass('sub', showPaybtn);
-    }
-
-    if (screen === 'upi') {
-      var isIntentFlow = this.upiTab.intent;
-
-      if (isIntentFlow) {
-        var data = this.upiTab.getPayload();
-
-        if (data['_[flow]'] === 'intent' && !data.upi_app) {
-          $('#body').removeClass('sub');
-        }
-      } else if (typeof this.upiTab.selectedApp === 'undefined') {
-        $('#body').removeClass('sub');
-      }
-    }
-
-    if (this.upiTab) {
-      if (isGPayScreen) {
-        this.upiTab.$set({ selectedApp: 'gpay' });
-        this.upiTab.onUpiAppSelection({
-          detail: {
-            id: 'gpay',
-          },
-        });
-      }
-
-      /**
-       * TODO: when more tabs are ported to Svelte, move current `tab` state to
-       *       Store
-       */
-      this.upiTab.$set({ tab: this.tab });
     }
 
     return this.offers && this.renderOffers(this.tab);
@@ -3271,11 +3284,12 @@ Session.prototype = {
    * @returns {boolean} valid
    */
   checkCommonValid: function() {
-    var selector = '#pad-common';
-
-    if (this.homeTab.onDetailsScreen()) {
-      selector = '#form-common';
+    // Only check if we're on the homescreen
+    if (!this.homeTab.onDetailsScreen()) {
+      return true;
     }
+
+    var selector = '#form-common';
 
     var valid = !this.checkInvalid(selector);
 
@@ -3292,7 +3306,7 @@ Session.prototype = {
     var valid = this.checkCommonValid();
 
     if (!valid) {
-      var fields = _Doc.querySelectorAll('#pad-common .invalid [name]');
+      var fields = _Doc.querySelectorAll('#form-common .invalid [name]');
 
       var invalidFields = {};
 
@@ -3386,6 +3400,10 @@ Session.prototype = {
 
     if (tab === 'netbanking') {
       this.netbankingTab.onShown();
+    }
+
+    if (tab === 'upi') {
+      this.upiTab.onShown();
     }
 
     if (/^emandate/.test(tab)) {
@@ -3847,7 +3865,15 @@ Session.prototype = {
       return true;
     }
 
-    return this.offers.appliedOffer.issuer === selectedVal;
+    // Get the issuer for the offer
+    var appliedOfferIssuer = this.offers.appliedOffer.issuer;
+
+    // Validate only if an issuer is provided
+    if (appliedOfferIssuer) {
+      return appliedOfferIssuer === selectedVal;
+    }
+
+    return true;
   },
 
   /**
@@ -3936,15 +3962,9 @@ Session.prototype = {
     return '#form-' + form;
   },
 
-  retryWithOmnichannel: function() {
-    this.upiTab.setOmnichannelAsRetried();
-  },
-
   getFormData: function() {
     var tab = this.tab;
     var data = {};
-
-    fillData('#pad-common', data);
 
     data.contact = getPhone();
     data.email = getEmail();
@@ -4035,30 +4055,6 @@ Session.prototype = {
     }
   },
 
-  showOmnichannelLoader: function(text) {
-    setTimeout(function() {
-      $('#error-message .link').html('');
-    }, 100);
-
-    $('.omnichannel').show();
-    $('#overlay-close').show();
-
-    this.showLoadError(text, false);
-  },
-
-  /**
-   * Get the message to be shown in the omnichannel loader.
-   * @return {string}
-   */
-  getOmnichannelMessage: function() {
-    return (
-      'Please accept the request of ' +
-      this.formatAmountWithCurrency(this.get('amount')) +
-      ' in your Google Pay app linked with +91' +
-      this.payload.contact
-    );
-  },
-
   showLoadError: function(text, error) {
     if (this.headless && this.screen === 'card') {
       return;
@@ -4079,11 +4075,6 @@ Session.prototype = {
       loadingState = false;
     } else {
       actionState = false;
-    }
-
-    var isOmnichannel = this.isOmnichannel();
-    if (isOmnichannel && error) {
-      this.retryWithOmnichannel();
     }
 
     if (!text) {
@@ -4575,44 +4566,16 @@ Session.prototype = {
 
       // perform the actual validation
       if (screen === 'upi') {
-        var formSelector = '#form-upi';
-        var omnichannelType = this.upiTab.omnichannelType;
+        var formSelector = '#vpa';
 
-        if (data['_[flow]'] === 'intent') {
-          if (!omnichannelType) {
-            formSelector = '#svelte-collect-in-intent';
-          } else {
-            if (omnichannelType === 'vpa') {
-              formSelector = '#upi-gpay-vpa';
-            }
-
-            if (omnichannelType === 'phone') {
-              formSelector = '#upi-gpay-phone';
-            }
-          }
-        }
-
-        if (
-          data['_[flow]'] === 'directpay' &&
-          this.upiTab.selectedApp === 'gpay'
-        ) {
-          if (omnichannelType === 'vpa') {
-            formSelector = '#upi-gpay-vpa';
-          }
-
-          if (omnichannelType === 'phone') {
-            formSelector = '#upi-gpay-phone';
+        if (data['_[flow]'] === 'directpay') {
+          if (data.upi_provider === 'google_pay') {
+            formSelector = '#gpay-phone';
           }
         }
 
         if (this.checkInvalid(formSelector)) {
           return;
-        }
-
-        if (this.isOmnichannel()) {
-          $('.omnichannel').show();
-        } else {
-          $('.omnichannel').hide();
         }
       } else if (this.checkInvalid()) {
         return;
@@ -4644,8 +4607,8 @@ Session.prototype = {
           }
         }
       }
-    } else if (data.method === 'paypal' && this.oneMethod === 'paypal') {
-      // Do not return
+    } else if (data.method === 'paypal') {
+      // Let method=paypal payments go through directly
     } else {
       return;
     }
@@ -5063,8 +5026,6 @@ Session.prototype = {
       tab_titles.otp =
         '<img src="' + walletObj.logo + '" height="' + walletObj.h + '">';
       this.commenceOTP(wallet + ' account', true);
-    } else if (this.isOmnichannel()) {
-      this.showOmnichannelLoader(strings.gpay_omnichannel);
     } else if (!this.isPayout) {
       this.showLoadError();
     } else {
@@ -5258,13 +5219,9 @@ Session.prototype = {
           return that.showLoadError('Waiting for payment confirmation.');
         }
 
-        if (that.isOmnichannel()) {
-          that.showOmnichannelLoader(that.getOmnichannelMessage());
-        } else {
-          that.showLoadError(
-            "Please accept the request from Razorpay's VPA on your UPI app"
-          );
-        }
+        that.showLoadError(
+          "Please accept the request from Razorpay's VPA on your UPI app"
+        );
       });
     } else {
       if (!this.headless) {
@@ -5946,15 +5903,6 @@ Session.prototype = {
   getCustomer: function() {
     return getCustomer.apply(null, arguments);
   },
-  isOmnichannel: function() {
-    return (
-      this.preferences.features &&
-      this.preferences.features.google_pay_omnichannel &&
-      this.upiTab &&
-      this.upiTab.selectedApp === 'gpay' &&
-      this.upiTab.omnichannelType === 'phone'
-    );
-  },
 
   /**
    * Mark headless as failed and perform cleanup
@@ -6129,6 +6077,10 @@ Session.prototype = {
 
     // Amount and currency have been updated, set EMI options
     this.setEmiOptions();
+    // set orderid as it is required while creating payments
+    if (prefs.invoice) {
+      this.r.set('order_id', prefs.invoice.order_id);
+    }
 
     /*
      * Set redirect mode if TPV and callback_url exists

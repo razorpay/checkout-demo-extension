@@ -7,31 +7,35 @@ const {
   handleUPIAccountValidation,
   respondToUPIAjax,
   respondToUPIPaymentStatus,
-  selectBankNameFromGooglePayDropDown,
+  handleFeeBearer,
 } = require('../../../actions/common');
 
 const {
   assertBasicDetailsScreen,
-  assertPaymentMethods,
   fillUserDetails,
   proceed,
   assertUserDetails,
+  assertPaymentMethods,
   selectPaymentMethod,
   assertEditUserDetailsAndBack,
 } = require('../actions');
 
 describe.each(
-  getTestData('Perform GooglePay transaction with contact optional', {
-    loggedIn: false,
-    options: {
-      amount: 200,
-      personalization: false,
-    },
-    preferences: {
-      optional: ['contact'],
-    },
-  })
-)('GooglePay tests', ({ preferences, title, options }) => {
+  getTestData(
+    'Perform upi collect transaction with customer feebearer enabled',
+    {
+      anon: false,
+      loggedIn: true,
+      options: {
+        amount: 200,
+        personalization: false,
+      },
+      preferences: {
+        fee_bearer: true,
+      },
+    }
+  )
+)('UPI tests', ({ preferences, title, options }) => {
   test(title, async () => {
     preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
@@ -39,19 +43,16 @@ describe.each(
       options,
       preferences,
     });
-    await assertBasicDetailsScreen(context);
-    await fillUserDetails(context);
-    await proceed(context);
-    await assertUserDetails(context);
-    await assertEditUserDetailsAndBack(context);
-    await assertEditUserDetailsAndBack(context);
+    // await assertBasicDetailsScreen(context);
+    // await fillUserDetails(context);
+    // await proceed(context);
+    // await assertUserDetails(context);
+    // await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIMethod(context, 'Google Pay');
-    await enterUPIAccount(context, 'scbaala');
-    await selectBankNameFromGooglePayDropDown(context, 'okhdfcbank');
+    await selectUPIMethod(context, 'token');
     await submit(context);
-    await handleUPIAccountValidation(context, 'scbaala@okhdfcbank');
+    await handleFeeBearer(context);
     await respondToUPIAjax(context);
     await respondToUPIPaymentStatus(context);
   });

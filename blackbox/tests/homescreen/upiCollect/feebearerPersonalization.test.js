@@ -3,7 +3,7 @@ const { openCheckoutWithNewHomeScreen } = require('../open');
 const {
   submit,
   handleUPIAccountValidation,
-  respondToUPIAjax,
+  handleSaveVpaRequest,
   respondToUPIPaymentStatus,
   handleFeeBearer,
 } = require('../../../actions/common');
@@ -52,7 +52,7 @@ describe.each(
     await submit(context);
     await handleUPIAccountValidation(context, 'dsd@okhdfcbank');
     await handleFeeBearer(context);
-    await respondToUPIAjax(context);
+    await handleSaveVpaRequest(context);
     await respondToUPIPaymentStatus(context);
   });
 });

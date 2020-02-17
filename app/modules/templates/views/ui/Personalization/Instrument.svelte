@@ -15,6 +15,9 @@
   import { getBankLogo } from 'common/bank';
   import { getWallet } from 'common/wallet';
 
+  // Store
+  import { contact } from 'checkoutstore/screens/home';
+
   // Props
   export let instrument = {}; // P13n instrument
   export let name; // Name of the input
@@ -26,6 +29,20 @@
   let text;
   let icon;
   let alt;
+
+  function getVpaFromInstrument(instrument) {
+    const { vpa, token } = instrument;
+
+    if (vpa) {
+      return vpa;
+    }
+
+    const customer = session.getCustomer($contact);
+    const tokens = _Obj.getSafely(customer, 'tokens.items', []);
+    const vpaToken = _Arr.find(tokens, item => item.id === token);
+
+    return `${vpaToken.vpa.username}@${vpaToken.vpa.handle}`;
+  }
 
   $: {
     const banks = PreferencesStore.get().methods.netbanking;
@@ -60,6 +77,7 @@
         }
 
         flow = instrument['_[flow]'];
+
         if (flow === 'intent') {
           text = `UPI - ${instrument.app_name.replace(/ UPI$/, '')}`;
           if (instrument.app_icon) {
@@ -70,8 +88,7 @@
             alt = 'UPI App';
           }
         } else {
-          vpaSplit = instrument.vpa.split('@');
-          text = `UPI - ${vpaSplit[0]}@${vpaSplit[1]}`;
+          text = `UPI - ${getVpaFromInstrument(instrument)}`;
           icon = '&#xe70e;';
           alt = 'UPI';
         }
@@ -99,6 +116,7 @@
 <SlottedRadioOption
   {name}
   {selected}
+  ellipsis
   value={instrument.id}
   className="p13n-instrument"
   on:click

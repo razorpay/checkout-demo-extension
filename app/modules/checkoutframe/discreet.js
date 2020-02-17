@@ -79,6 +79,7 @@ import { get as storeGetter } from 'svelte/store';
 import * as Experiments from 'experiments';
 
 import * as NBHandlers from 'handlers/netbanking';
+import * as UserHandlers from 'handlers/user';
 
 export default {
   RazorpayConfig,
@@ -181,4 +182,5 @@ export default {
   _,
 
   NBHandlers,
+  UserHandlers,
 };
