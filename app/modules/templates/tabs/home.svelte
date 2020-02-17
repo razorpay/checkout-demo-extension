@@ -86,8 +86,9 @@
 
   const formattedPhoneNumber = findCountryCode(prefill.contact);
 
-  $contact =
-    `${formattedPhoneNumber.code}${formattedPhoneNumber.phone}` || '+91';
+  $contact = prefill.contact
+    ? `+${formattedPhoneNumber.code}${formattedPhoneNumber.phone}`
+    : '+91';
   $email = prefill.email || '';
 
   // Prop that decides which view to show.
