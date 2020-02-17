@@ -131,7 +131,7 @@
       preferIntent &&
       intentApps &&
       _.lengthOf(intentApps) > 0 &&
-      _Obj.getSafely(preferences, 'methods.upi_intent')
+      _Obj.getSafely(session, 'methods.upi_intent')
   );
   $: isGPaySelected = selectedApp === 'gpay' && useWebPaymentsApi;
   $: pspHandle = selectedAppData ? selectedAppData.psp : '';
