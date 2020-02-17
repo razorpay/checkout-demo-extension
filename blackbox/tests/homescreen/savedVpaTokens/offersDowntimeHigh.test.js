@@ -84,11 +84,11 @@ describe.each(
       options,
       preferences,
     });
-    // await assertBasicDetailsScreen(context);
-    // await fillUserDetails(context);
-    // await proceed(context);
-    // await assertUserDetails(context);
-    // await assertEditUserDetailsAndBack(context);
+    await assertBasicDetailsScreen(context);
+    await fillUserDetails(context);
+    await proceed(context);
+    await assertUserDetails(context);
+    await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await viewOffers(context);
     await selectOffer(context, '1');

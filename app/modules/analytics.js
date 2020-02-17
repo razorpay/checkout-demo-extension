@@ -27,7 +27,9 @@ const sanitizeEventData = data => {
   const _data = _Obj.clone(data);
 
   keysToMask.forEach(key => {
-    _data[key] = '__REDACTED__';
+    if (_data[key]) {
+      _data[key] = '__REDACTED__';
+    }
   });
 
   return _data;

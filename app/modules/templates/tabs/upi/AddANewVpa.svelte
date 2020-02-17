@@ -15,7 +15,7 @@
   import { VPA_REGEX } from 'common/constants';
 
   // Props
-  export let selected = true;
+  export let selected = false;
   export let focusOnCreate = false;
   export let customer;
 
