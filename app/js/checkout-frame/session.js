@@ -3472,6 +3472,7 @@ Session.prototype = {
          */
         if (self.recurring && !customer.saved && !customer.logged) {
           self.customer.createOTP(function() {
+            Analytics.track('saved_cards:access:otp:ask');
             askOTP(
               self.otpView,
               'Enter OTP sent on ' +
@@ -3894,6 +3895,12 @@ Session.prototype = {
     }
     var invalids = $(parent).find('.invalid');
     if (invalids && invalids[0]) {
+      Analytics.track('shake:invalid', {
+        data: {
+          class: $(invalids[0]).prop('class'),
+          id: $(invalids[0]).prop('id'),
+        },
+      });
       this.shake();
       var invalidInput = $(invalids[0]).find('.input')[0];
       if (invalidInput) {
@@ -4246,6 +4253,15 @@ Session.prototype = {
         };
       } else {
         var self = this;
+
+        if (this.payload) {
+          // OTP verification for saving card
+          Analytics.track('saved_cards:save:otp:submit');
+        } else {
+          // OTP verification for accessing saved cards
+          Analytics.track('saved_cards:access:otp:submit');
+        }
+
         callback = function(msg) {
           if (self.customer.logged) {
             // OTP verification successful
@@ -4488,6 +4504,7 @@ Session.prototype = {
             )
           ) {
             // no saved card was selected
+            Analytics.track('shake:saved-cvv');
             this.shake();
             return $('.checked .saved-cvv input').focus();
           }
@@ -4504,6 +4521,7 @@ Session.prototype = {
              * this is a validation error.
              */
             if (!data.token && !this.emiPlansForNewCard) {
+              Analytics.track('shake:no-emi-plans');
               this.shake();
               return $('#card_number').focus();
             }
@@ -4780,6 +4798,7 @@ Session.prototype = {
         this.otpView.updateScreen({
           skipText: 'Skip saving card',
         });
+        Analytics.track('saved_cards:save:otp:ask');
         this.commenceOTP(strings.otpsend);
         debounceAskOTP(this.otpView, undefined, true);
         return this.customer.createOTP();

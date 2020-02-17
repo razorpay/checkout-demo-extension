@@ -10,6 +10,8 @@
 
   // Utils
   import { getSession } from 'sessionmanager';
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
 
   // Props
   export let cards = [];
@@ -70,6 +72,10 @@
     if (selected && selected.id === card.id) {
       return;
     }
+
+    Analytics.track('saved_card:select', {
+      type: AnalyticsTypes.BEHAV,
+    });
 
     dispatch('select', { token: card });
     currentCvv = cvv;

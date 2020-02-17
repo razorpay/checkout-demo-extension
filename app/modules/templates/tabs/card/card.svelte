@@ -198,10 +198,12 @@
   }
 
   export function showAddCardView() {
+    Analytics.track('saved_cards:hide');
     setView('add-card');
   }
 
   export function showSavedCards() {
+    Analytics.track('saved_cards:show');
     setView('saved-cards');
   }
 
