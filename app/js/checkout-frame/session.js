@@ -4463,20 +4463,15 @@ Session.prototype = {
       }
     } else if (screen) {
       if (screen === 'card') {
-        var cardType = discreet.storeGetter(CardScreenStore.cardType);
-
         // TODO: simplify conditions
         // Do not proceed with amex cards if amex is disabled for merchant
         // also without this, cardsaving is triggered before API returning unsupported card error
-        if (
-          !this.svelteCardTab.isOnSavedCardsScreen() &&
-          !preferences.methods.amex &&
-          cardType === 'amex'
-        ) {
-          return this.showLoadError('AMEX cards are not supported', true);
-        }
-
-        if (this.svelteCardTab.isOnSavedCardsScreen() && !data['card[cvv]']) {
+        if (!this.svelteCardTab.isOnSavedCardsScreen()) {
+          var cardType = discreet.storeGetter(CardScreenStore.cardType);
+          if (!preferences.methods.amex && cardType === 'amex') {
+            return this.showLoadError('AMEX cards are not supported', true);
+          }
+        } else if (!data['card[cvv]']) {
           var checkedCard = $('.saved-card.checked');
 
           /**
