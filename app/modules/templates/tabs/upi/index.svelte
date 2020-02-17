@@ -64,10 +64,11 @@
 
   // Computed
   export let selectedAppData = null;
-  export let intent;
+  export let intent = false;
   export let isGPaySelected;
   export let pspHandle;
   export let shouldShowQr;
+
   let disabled = false;
   let tokens = [];
   let selectedToken = null;
@@ -137,15 +138,53 @@
   $: shouldShowQr =
     qrEnabled && !selectedApp && selectedApp !== null && !isPayout;
 
+  $: {
+    /**
+     * If there are no tokens, select "new" as the default option.
+     * But only do that if intent flow is not available.
+     */
+    if (!tokens.length && !intent) {
+      selectedToken = 'new';
+    }
+  }
+
+  $: {
+    if (selectedToken && session.tab === 'upi') {
+      determineCtaVisibility();
+    }
+  }
+
+  function setWebPaymentsApiUsage(to) {
+    useWebPaymentsApi = to;
+
+    /**
+     * If web payments API is available,
+     * do not select Add New VPA by default
+     */
+    if (to) {
+      selectedToken = null;
+    }
+  }
+
+  function determineCtaVisibility() {
+    if (selectedToken) {
+      showCta();
+    } else {
+      hideCta();
+    }
+  }
+
   onMount(() => {
+    updateCustomer();
+
     checkGPay(session)
       /* Use Google Pay */
       .then(() => {
-        useWebPaymentsApi = true;
+        setWebPaymentsApiUsage(true);
       })
       /* Don't use Google Pay */
       .catch(e => {
-        useWebPaymentsApi = false;
+        setWebPaymentsApiUsage(false);
       });
 
     useOmnichannel = checkOmnichannel(session);
@@ -180,14 +219,11 @@
     customer = session.getCustomer($contact);
 
     tokens = filterUPITokens(_Obj.getSafely(customer, 'tokens.items', []));
-
-    if (!tokens.length) {
-      selectedToken = 'new';
-    }
   }
 
   export function onShown() {
     updateCustomer();
+    determineCtaVisibility();
   }
 
   export function getPayload() {
@@ -295,6 +331,7 @@
         value: getEventValueForFeature(id),
       },
     });
+
     selectedToken = id;
     intentAppSelected = event.detail.app || null;
   }
@@ -356,8 +393,6 @@
       },
     });
   }
-
-  updateCustomer();
 </script>
 
 <style>
@@ -427,7 +462,7 @@
           <SlottedRadioOption
             name="google_pay_web"
             selected={selectedToken === 'gpay'}
-            on:click={_ => {
+            on:click={() => {
               selectedToken = 'gpay';
               session.preSubmit();
             }}>
@@ -456,9 +491,8 @@
             name="payment_type"
             ellipsis
             selected={selectedToken === app.id}
-            on:click={_ => {
+            on:click={() => {
               selectedToken = app.id;
-              showCta();
             }}>
             <div slot="title">{app.vpa.username + '@' + app.vpa.handle}</div>
             <i slot="icon">
@@ -468,9 +502,8 @@
           </SlottedRadioOption>
         {/each}
         <AddANewVpa
-          on:click={_ => {
+          on:click={() => {
             onUpiAppSelection({ detail: { id: 'new' } });
-            showCta();
           }}
           {customer}
           on:blur={trackVpaEntry}
@@ -485,9 +518,8 @@
           retry={retryOmnichannel}
           selected={selectedToken === 'gpay-omni'}
           on:blur={trackOmnichannelEntry}
-          on:select={_ => {
+          on:select={() => {
             onUpiAppSelection({ detail: { id: 'gpay-omni' } });
-            showCta();
           }}
           bind:this={omnichannelField} />
       {/if}
