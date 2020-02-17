@@ -2429,10 +2429,9 @@ Session.prototype = {
       customer.logout(outOfAllDevices);
     }
 
-    this.setSavedCards();
-
     _El.removeClass(_Doc.querySelector('#top-right'), 'logged');
 
+    this.svelteCardTab.updateCustomerAndShowLandingView();
     this.homeTab.updateCustomer();
   },
 
