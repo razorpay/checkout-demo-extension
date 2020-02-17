@@ -3922,8 +3922,8 @@ Session.prototype = {
     if (invalids && invalids[0]) {
       Analytics.track('shake:invalid', {
         data: {
-          class: $(invalids[0]).prop('class'),
-          id: $(invalids[0]).prop('id'),
+          class: $(invalids[0]).attr('class'),
+          id: $(invalids[0]).attr('id'),
         },
       });
       this.shake();
