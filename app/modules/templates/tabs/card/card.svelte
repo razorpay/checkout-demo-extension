@@ -36,9 +36,15 @@
   // Transitions
   import { fade } from 'svelte/transition';
 
+  // Constants
+  const Views = {
+    SAVED_CARDS: 'saved-cards',
+    ADD_CARD: 'add-card',
+  };
+
   const session = getSession();
 
-  let currentView = 'saved-cards';
+  let currentView = Views.SAVED_CARDS;
 
   let tab = '';
   let allSavedCards = [];
@@ -188,10 +194,10 @@
 
   export function showLandingView() {
     tick().then(_ => {
-      let viewToSet = 'saved-card';
+      let viewToSet = Views.SAVED_CARDS;
 
       if (savedCards.length === 0) {
-        viewToSet = 'add-card';
+        viewToSet = Views.ADD_CARD;
       }
       setView(viewToSet);
     });
@@ -199,12 +205,12 @@
 
   export function showAddCardView() {
     Analytics.track('saved_cards:hide');
-    setView('add-card');
+    setView(Views.ADD_CARD);
   }
 
   export function showSavedCards() {
     Analytics.track('saved_cards:show');
-    setView('saved-cards');
+    setView(Views.SAVED_CARDS);
   }
 
   function setView(view) {
@@ -212,7 +218,7 @@
   }
 
   export function getPayload() {
-    if (currentView === 'add-card') {
+    if (currentView === Views.ADD_CARD) {
       return getAddCardPayload();
     } else {
       return getSavedCardPayload();
@@ -220,7 +226,7 @@
   }
 
   export function isOnSavedCardsScreen() {
-    return currentView === 'saved-card';
+    return currentView === Views.SAVED_CARDS;
   }
 
   function getAddCardPayload() {
@@ -409,7 +415,7 @@
 <Tab method="card" pad={false} overrideMethodCheck>
   <Screen pad={false}>
     <div slot="main">
-      {#if currentView === 'add-card'}
+      {#if currentView === Views.ADD_CARD}
         <div in:fade={{ duration: 100, y: 100 }}>
           {#if showSavedCardsCta}
             <div
@@ -447,7 +453,7 @@
           <div
             id="show-add-card"
             class="text-btn left-card"
-            on:click={() => setView('add-card')}>
+            on:click={() => setView(Views.ADD_CARD)}>
             Add another card
           </div>
         </div>
