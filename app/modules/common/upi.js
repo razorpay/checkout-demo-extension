@@ -497,6 +497,10 @@ const handleData = [
     handles: ['ybl'],
     icon: 'https://cdn.razorpay.com/app/phonepe.svg',
   },
+  {
+    handles: ['icicibank'],
+    icon: 'https://cdn.razorpay.com/app/whatsapp.svg',
+  },
 ];
 
 /**
