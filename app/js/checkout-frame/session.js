@@ -1165,6 +1165,7 @@ Session.prototype = {
 
       var valid = true;
       var fields = ['contact', 'email'];
+
       each(fields, function(optionKey, option) {
         if (valid && !prefill[option] && !optional[option]) {
           valid = false;
@@ -1175,6 +1176,7 @@ Session.prototype = {
           });
         }
       });
+
       if (!valid) {
         tab = '';
       }
@@ -2238,7 +2240,11 @@ Session.prototype = {
      * but we're grouping it under Cardless EMI screen
      * on Checkout.
      */
-    if (prefilledMethod === 'emi' && prefilledProvider === 'bajaj') {
+    if (
+      prefilledMethod === 'emi' &&
+      prefilledProvider === 'bajaj' &&
+      this.methods.cardless_emi // Is the method enabled?
+    ) {
       this.set('prefill.method', 'cardless_emi');
     }
   },
