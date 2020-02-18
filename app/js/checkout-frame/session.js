@@ -5947,27 +5947,30 @@ Session.prototype = {
     return reason;
   },
 
+  /**
+   * Cleans up all the Svelte components that were added.
+   */
   cleanUpSvelteComponents: function() {
     var views = [
-      'upiTab',
-      'otpView',
-      'netbankingTab',
-      'savedCardsView',
-      'feeBearerView',
-      'payLaterView',
-      'nachScreen',
-      'homeTab',
-      'emi',
-      'emiPlansView',
-      'emandateView',
-      'emiOptionsView',
       'bankTransferView',
-      'emiScreenView',
-      'payoutsView',
-      'payoutsAccountView',
-      'otpView',
       'currentScreen',
+      'emandateView',
+      'emi',
+      'emiOptionsView',
+      'emiPlansView',
+      'emiScreenView',
       'feeBearerView',
+      'feeBearerView',
+      'homeTab',
+      'nachScreen',
+      'netbankingTab',
+      'otpView',
+      'otpView',
+      'payLaterView',
+      'payoutsAccountView',
+      'payoutsView',
+      'savedCardsView',
+      'upiTab',
     ];
 
     var session = this;
