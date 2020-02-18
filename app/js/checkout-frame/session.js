@@ -2431,7 +2431,10 @@ Session.prototype = {
 
     _El.removeClass(_Doc.querySelector('#top-right'), 'logged');
 
-    this.svelteCardTab.updateCustomerAndShowLandingView();
+    if (this.svelteCardTab) {
+      this.svelteCardTab.updateCustomerAndShowLandingView();
+    }
+
     this.homeTab.updateCustomer();
   },
 
