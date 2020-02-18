@@ -492,7 +492,7 @@
             ellipsis
             selected={selectedToken === app.id}
             on:click={() => {
-              selectedToken = app.id;
+              onUpiAppSelection({ detail: { id: app.id } });
             }}>
             <div slot="title">{app.vpa.username + '@' + app.vpa.handle}</div>
             <i slot="icon">
