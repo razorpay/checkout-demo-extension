@@ -3396,8 +3396,7 @@ Session.prototype = {
       }
 
       //TODO: WIP try to see if the card exists in the saved cards and focus
-      var savedCards =
-        this.customer.tokens && Token.getSavedCards(this.customer.tokens.items);
+      var savedCards = _Obj.getSafely(this, 'customer.tokens.items');
 
       if (this.savedCardScreen && savedCards && savedCards.length > 0) {
         var matchingCardIndex;
@@ -3597,7 +3596,7 @@ Session.prototype = {
     if (tab === 'upi') {
       var upiData = this.upiTab;
 
-      if (upiData.intent) {
+      if (upiData && upiData.intent) {
         /**
          * If intent, track UPI apps installed and eligible
          */
