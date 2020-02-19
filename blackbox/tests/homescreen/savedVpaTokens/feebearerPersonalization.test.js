@@ -43,11 +43,11 @@ describe.each(
       preferences,
       method: 'UPI',
     });
-    // await assertBasicDetailsScreen(context);
-    // await fillUserDetails(context, '8888888881');
-    // await proceed(context);
-    // await assertUserDetails(context);
-    // await assertEditUserDetailsAndBack(context);
+    await assertBasicDetailsScreen(context);
+    await fillUserDetails(context, '8888888881');
+    await proceed(context);
+    await assertUserDetails(context);
+    await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await verifyPersonalizationText(context, 'upi');
     await selectPersonalizationPaymentMethod(context, 1);
