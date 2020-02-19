@@ -1165,6 +1165,7 @@ Session.prototype = {
 
       var valid = true;
       var fields = ['contact', 'email'];
+
       each(fields, function(optionKey, option) {
         if (valid && !prefill[option] && !optional[option]) {
           valid = false;
@@ -1175,6 +1176,7 @@ Session.prototype = {
           });
         }
       });
+
       if (!valid) {
         tab = '';
       }
@@ -2238,7 +2240,11 @@ Session.prototype = {
      * but we're grouping it under Cardless EMI screen
      * on Checkout.
      */
-    if (prefilledMethod === 'emi' && prefilledProvider === 'bajaj') {
+    if (
+      prefilledMethod === 'emi' &&
+      prefilledProvider === 'bajaj' &&
+      this.methods.cardless_emi // Is the method enabled?
+    ) {
       this.set('prefill.method', 'cardless_emi');
     }
   },
@@ -5941,6 +5947,53 @@ Session.prototype = {
     return reason;
   },
 
+  /**
+   * Cleans up all the Svelte components that were added.
+   */
+  cleanUpSvelteComponents: function() {
+    var views = [
+      'bankTransferView',
+      'currentScreen',
+      'emandateView',
+      'emi',
+      'emiOptionsView',
+      'emiPlansView',
+      'emiScreenView',
+      'feeBearerView',
+      'feeBearerView',
+      'homeTab',
+      'nachScreen',
+      'netbankingTab',
+      'otpView',
+      'otpView',
+      'payLaterView',
+      'payoutsAccountView',
+      'payoutsView',
+      'savedCardsView',
+      'upiTab',
+    ];
+
+    var session = this;
+
+    _Arr.loop(views, function(_view) {
+      var view = session[_view];
+
+      if (view) {
+        try {
+          if (_.isFunction(view.$destroy)) {
+            view.$destroy();
+          }
+
+          if (_.isFunction(view.destroy)) {
+            view.destroy();
+          }
+        } catch (err) {}
+
+        session[_view] = null;
+      }
+    });
+  },
+
   close: function() {
     if (this.prefCall) {
       this.prefCall.abort();
@@ -5956,50 +6009,7 @@ Session.prototype = {
       this.isOpen = false;
       clearTimeout(fontTimeout);
 
-      // TODO: refactor this into cleanupSvelteComponents.
-      if (this.otpView) {
-        this.otpView.$destroy();
-      }
-
-      if (this.payoutsView) {
-        this.payoutsView.$destroy();
-      }
-
-      if (this.payoutsAccountView) {
-        this.payoutsAccountView.$destroy();
-      }
-
-      if (this.netbankingTab) {
-        this.netbankingTab.$destroy();
-      }
-
-      if (this.upiTab) {
-        this.upiTab.$destroy();
-      }
-
-      if (this.emiScreenView) {
-        this.emiScreenView.$destroy();
-      }
-
-      if (this.nachScreen) {
-        this.nachScreen.$destroy();
-      }
-
-      if (this.bankTransferView) {
-        this.bankTransferView.$destroy();
-      }
-
-      if (this.savedCardsView) {
-        this.savedCardsView.$destroy();
-      }
-
-      if (this.feeBearerView) {
-        this.feeBearerView.$destroy();
-      }
-
-      if (this.payLaterView) {
-        this.payLaterView.$destroy();
-      }
+      this.cleanUpSvelteComponents();
 
       try {
         this.delegator.destroy();
@@ -6021,10 +6031,6 @@ Session.prototype = {
 
       this.tab = this.screen = '';
       this.modal = this.emi = this.el = this.card = null;
-      this.upiTab = this.otpView = this.netbankingTab = null;
-      this.payoutsView = this.payoutsAccountView = null;
-      this.savedCardsView = this.feeBearerView = this.payLaterView = null;
-      this.nachScreen = null;
 
       this.isOpen = false;
       window.setPaymentID = window.onComplete = null;
