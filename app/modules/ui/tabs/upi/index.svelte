@@ -109,35 +109,38 @@
     isMethodEnabled('qr') && !selectedApp && selectedApp !== null;
 
   $: {
-    /**
-     * If there are no tokens, select "new" as the default option.
-     * But only do that if intent flow is not available.
-     */
-    if (!tokens.length && !intent) {
-      selectedToken = 'new';
-    }
-  }
-
-  $: {
     if (selectedToken && session.tab === 'upi') {
       determineCtaVisibility();
     }
   }
 
+  function setDefaultTokenValue() {
+    const hasIntentFlow = intent || useWebPaymentsApi;
+    const hasTokens = tokens && tokens.length;
+
+    /**
+     * If there are no tokens, select "new" as the default option.
+     * But only do that if intent flow is not available.
+     */
+
+    if (hasIntentFlow || hasTokens) {
+      selectedToken = null;
+
+      return;
+    }
+
+    selectedToken = 'new';
+  }
+
   $: {
     tokens = filterUPITokens(_Obj.getSafely($customer, 'tokens.items', []));
+    setDefaultTokenValue();
   }
 
   function setWebPaymentsApiUsage(to) {
     useWebPaymentsApi = to;
 
-    /**
-     * If web payments API is available,
-     * do not select Add New VPA by default
-     */
-    if (to) {
-      selectedToken = null;
-    }
+    setDefaultTokenValue();
   }
 
   function determineCtaVisibility() {
