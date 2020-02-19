@@ -5,6 +5,7 @@ import Track from 'tracker';
 import Analytics from 'analytics';
 import { filterInstruments } from './filters';
 import { hashFnv32a, set, getAllInstruments } from './utils';
+import { extendInstruments } from './extend';
 
 /* halflife for timestamp, 5 days in ms */
 const TS_HALFLIFE = Math.log(2) / (5 * 86400000);
@@ -354,6 +355,11 @@ export const getInstrumentsForCustomer = (customer, extra = {}) => {
     instruments,
     methods,
     upiApps,
+    customer,
+  });
+
+  instruments = extendInstruments({
+    instruments,
     customer,
   });
 
