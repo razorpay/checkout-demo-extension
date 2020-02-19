@@ -3239,7 +3239,7 @@ Session.prototype = {
     if (tab === 'upi') {
       var upiData = this.upiTab;
 
-      if (upiData.intent) {
+      if (upiData && upiData.intent) {
         /**
          * If intent, track UPI apps installed and eligible
          */
