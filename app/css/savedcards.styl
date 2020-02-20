@@ -8,11 +8,9 @@ $cardHeights = {
 };
 $emiStripHeight = 26px;
 $maestroHeight = 32px;
-$savedcontainerh = 220px;
 $cardpl = 70px;
 
 .left-card {
-  display: none;
   padding: 0 20px 0 $cardpl;
   height: $cardHeights['default'];
   left: 0;
@@ -26,111 +24,80 @@ $cardpl = 70px;
   display: none;
 }
 
-#show-saved-cards {
-  line-height: $cardHeights['default'];
-  display: none;
-  cursor: pointer;
-  position: absolute;
-  transition: 0.2s;
-  transition-delay: 0.15s;
-  z-index: 1;
-}
 
-#should-save-card {
+#savedcards-recurring-message {
   display: none;
 }
 
-#savedcards-recurring-message{
-  display: none;
-}
+
 #form-card {
   .saved-card {
     pointer-events: none;
-  }
-  &:not(.saved-cards) {
-    #saved-cards-container {
-      margin-bottom: -8px;
-    }
-  }
-  &.saved-cards {
-    #elem-emi {
-      display: none;
-    }
-    #show-saved-cards {
-      transition-delay: 0s;
-      opacity: 0;
-      pointer-events: none;
-    }
-    #show-add-card {
-      opacity: 1;
+    overflow: hidden;
+    z-index: 2;
+    pointer-events: all;
+
+    &[maestro].checked {
+
+      .elem-savedcards-emi {
+        display: block;
+      }
     }
 
-    .maestro-cvv {
-      display: block;
-      font-size: 13px;
-      line-height: 32px;
-    }
+    &[pin] {
+      &.checked {
+        overflow: hidden;
 
-    .saved-card {
-      height: $cardHeights['emi'];
-      max-height: $cardHeights['default'];
-      overflow: hidden;
-      z-index: 2;
-      pointer-events: all;
-
-      &[maestro].checked {
-
-        .elem-savedcards-emi {
+        .flow-selection-container {
           display: block;
         }
       }
+    }
 
-      &[pin] {
-        &.checked {
-          overflow: hidden;
+    &.checked {
+      background: #eff0f1;
+      border-color: $bc;
 
-          .flow-selection-container {
-            display: block;
-          }
-        }
+      .saved-cvv {
+        pointer-events: auto;
+        opacity: 1;
       }
-      &.checked {
-        background: #eff0f1;
-        border-color: $bc;
-        .saved-cvv {
-          pointer-events: auto;
-          opacity: 1;
-        }
-      }
-    }
-    .saved-inner,
-    .saved-outer {
-      opacity: 1;
-    }
-    .cardtype {
-      transform: none;
-    }
-    #add-card-container {
-      height: 55px;
-      opacity: 0;
-      transform: translateY(-10px);
-      z-index: 0;
-    }
-    #show-add-card + .pad {
-      pointer-events: none;
-    }
-    #savedcards-recurring-message {
-      display: block;
-    }
-    #addcard-recurring-message {
-      display: none;
     }
   }
-  &.has-cards {
-    #saved-cards-container,
-    #show-saved-cards {
-      display: block;
-    }
+
+  .saved-inner,
+  .saved-outer {
+    opacity: 1;
+  }
+
+  #elem-emi {
+    display: none;
+  }
+
+  .maestro-cvv {
+    display: block;
+    font-size: 13px;
+    line-height: 32px;
+  }
+
+  .cardtype {
+    transform: none;
+  }
+
+  #add-card-container {
+    z-index: 0;
+  }
+
+  #show-add-card + .pad {
+    pointer-events: none;
+  }
+
+  #savedcards-recurring-message {
+    display: block;
+  }
+
+  #addcard-recurring-message {
+    display: none;
   }
 }
 
@@ -140,69 +107,14 @@ $cardpl = 70px;
 
 #add-card-container {
   transition: 0.2s;
-  height: 166px;
   z-index: 2;
   position: relative;
-
-  .card-fields {
-    .elem-wrap {
-      height: auto;
-      margin-bottom: 8px;
-
-      &:nth-last-child(1),
-      &:nth-last-child(2) {
-        margin-bottom: 16px;
-      }
-    }
-  }
-
-  .elem {
-    label {
-      top: 24px;
-    }
-    .input {
-      padding: 24px 0 4px 0;
-    }
-
-    select.input {
-      padding: 7px 0;
-    }
-  }
-
-  .flow-selection-container {
-    &:not(.drishy) {
-      opacity: 0;
-      position: absolute;
-      z-index: -1;
-      pointer-events: none;
-    }
-
-    transition: all 0.15s ease-in;
-    width: 100%;
-    margin-top: 16px;
-
-    &>label {
-      text-transform: uppercase;
-      color: rgba(0,0,0,0.64);
-      font-size: 12px;
-      letter-spacing: 1px;
-      display: block;
-      margin-bottom: 4px;
-    }
-
-    .flow {
-      display: inline-block;
-      width: 49%;
-    }
-  }
 }
 
 .saved-card {
   cursor: pointer;
-  height: 0;
   transition: 0.2s;
   position: relative;
-  background: #fff;
 
   .elem-wrap {
     height: auto;
@@ -218,27 +130,16 @@ $cardpl = 70px;
       margin-bottom: 0;
     }
   }
-
-  .flow-selection-container {
-    display: none;
-    padding-bottom: 8px;
-    .flow {
-      &:not(:last-child) {
-        margin: 4px 0;
-      }
-      &:last-child {
-        margin-top: 4px
-      }
-    }
-  }
 }
 
 .saved-inner {
+  display: flex;
   opacity: 0;
   transition: 0.2s;
 }
 
 .saved-number {
+  flex-grow: 1;
   &::before {
     content: 'Card ending with';
     color: #777;
@@ -247,12 +148,8 @@ $cardpl = 70px;
 }
 
 #saved-cards-container {
-  display: none;
   position: relative;
   line-height: $cardHeights['default'];
-  min-height: $cardHeights['default'];
-  padding-bottom: 1px;
-  max-height: $savedcontainerh;
 
   &.scroll {
     overflow-y: auto;
@@ -267,15 +164,16 @@ $cardpl = 70px;
   }
 
   .saved-cvv {
-    opacity: 0;
-    position: absolute;
-    right: 24px;
-    top: 8px;
-    pointer-events: none;
-    transition: 0.3s;
+    font-size: 12px;
     padding: 5px;
-    width: 36px;
-    border-bottom: 1px solid #ccc;
+    width: 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .saved-cvv .elem .input {
+    padding: 0 0 4px 0;
   }
 
   .cardtype {
@@ -286,6 +184,7 @@ $cardpl = 70px;
       border-color: #0189CF;
       background: linear-gradient(to bottom, #53AEF5, #0167A9);
     }
+
     &[cardtype=maestro] {
       background: linear-gradient(to bottom, #FBD51F, #EFA010);
       border-color: #DAB608;
@@ -294,6 +193,7 @@ $cardpl = 70px;
 }
 
 #saved-cards-container .cardtype,
+#show-saved-cards .cardtype,
 #show-add-card::before {
   position: absolute;
   z-index: 1;
@@ -310,44 +210,40 @@ $cardpl = 70px;
   font-size: 20px;
   color: #777;
   font-weight: bold;
+}
 
+#show-saved-cards .cardtype {
+  margin-top: 0;
+}
+
+#show-saved-cards .cardtype.multiple::after {
+  content: '';
+  position: absolute;
+  top: -1px;
+  bottom: -1px;
+  left: -1px;
+  right: -1px;
+  z-index: -1;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  background: linear-gradient(to bottom, white, #eee);
+  transform: translateX(-3px) translateY(-1px) rotateZ(-10deg);
+}
+
+#show-saved-cards .cardtype.multiple::before {
+  transform: translateX(-3px) translateY(-1px) rotateZ(-10deg);
 }
 
 #show-add-card {
   transition: 0.2s;
   cursor: pointer;
+  position: relative;
   line-height: $cardHeights['default'];
-  position: absolute;
   z-index: 1;
-  opacity: 0;
+
   &::before {
     display: inline-block;
     content: '+';
-  }
-}
-
-.elem-card {
-  .cardtype {
-    position: absolute;
-    right: 0;
-    bottom: 10px;
-  }
-}
-
-#nocvv-check {
-  margin: 10px 0 0;
-  position: relative;
-  z-index: 10;
-}
-
-.save-enabled {
-  .left-card,
-  #should-save-card {
-    display: block;
-  }
-
-  #add-card-container {
-    height: 196px;
   }
 }
 
@@ -364,7 +260,7 @@ $cardpl = 70px;
 
 [cardtype=bajaj]::before, .networkicon.bajaj {
   background: no-repeat url('https://cdn.razorpay.com/cardless_emi-sq/bajaj.svg');
-  background-position: 100%;
+  background-position: 50%;
   background-size: contain;
 }
 
@@ -393,12 +289,7 @@ $cardpl = 70px;
 }
 
 // New styles for Svelte component begin here
-
 .saved-cards
-  #add-card-container
-    input
-      display: none !important
-
 .saved-card
   padding: 0 24px;
 
@@ -406,130 +297,31 @@ $cardpl = 70px;
     padding-left: 48px;
 
   .saved-outer
-    padding: 12px 0;
     opacity: 0;
     border-top 1px solid #E6E7E8;
 
-.saved-card
-  &[emi]
-    &.checked
-      &:not(.emi-selected)
-        .emi-plan-selected
-          display: none;
+    .emi-plans-info-container
+      padding: 0;
+      margin-top: 0;
 
-#body[tab=emi]
-  .saved-card
-    &:not([emi])
-      display: none;
+      .emi-plans-action
+        top: 0;
+        right: 0;
 
-    .emi-plan-unselected
-      display: none;
-
-  #form-card
-    &.no-emi-cards
-      #show-saved-cards,
-      #saved-cards-container
-        display: none;
-
-#body[tab=card]
-  .saved-card
-    .emi-plan-selected
-      display: none;
-
-#body[tab=card]
-  .saved-card
-    &.checkeed
-      &[pin],
-      &[maestro]
-        .emi-plans-info-container
-          margin-bottom: 12px;
-
-#body[tab=card]
-  #form-card
-    .saved-card
-      &.checked
-        &[emi]
-          height: $cardHeights['emi'];
-          max-height: $cardHeights['emi'];
-        &[pin]
-          height: $cardHeights['debitPin'];
-          max-height: $cardHeights['debitPin'];
-        &[maestro]
-          height: $cardHeights['maestro'];
-          max-height: $cardHeights['maestro'];
-
-        &[emi]
-          &[pin]
-            height: $cardHeights['debitPin'] + $emiStripHeight;
-            max-height: $cardHeights['debitPin'] + $emiStripHeight;
-        &[emi]
-          &[maestro]
-            height: $cardHeights['emi'] + $maestroHeight;
-            max-height: $cardHeights['emi'] + $maestroHeight;
+    .emi-plan-unselected, .emi-plan-selected
+      margin: 12px 0;
 
 
-        &[pin]
-          &[maestro]
-            height: $cardHeights['debitPin'] + $maestroHeight;
-            max-height: $cardHeights['debitPin'] + $maestroHeight;
+// Bajaj Finserv EMI
+#add-emi-container
+  .elem-card
+    .cardtype
+      position: absolute;
+      right: 0;
+      top: 26px;
 
-        &[emi]
-          &[pin]
-            &[maestro]
-              height: $cardHeights['debitPin'] + $maestroHeight + $emiStripHeight;
-              max-height: $cardHeights['debitPin'] + $maestroHeight + $emiStripHeight;
+  .emi-plans-info-container
+    padding: 12px 0;
 
-        &[emi]
-          &[pin],
-          &[maestro]
-            .emi-plans-info-container
-              margin-bottom: 12px;
-
-#body[tab=emi]
-  #form-card
-    .saved-card
-      &.checked
-        &[emi]
-          height: $cardHeights['default'];
-          max-height: $cardHeights['default'];
-
-          &.emi-selected
-            height: $cardHeights['emi'];
-            max-height: $cardHeights['emi'];
-
-        &[emi]
-          &[pin]
-            height: $cardHeights['debitPin'];
-            max-height: $cardHeights['debitPin'];
-
-            &.emi-selected
-              height: $cardHeights['debitPin'] + $emiStripHeight;
-              max-height: $cardHeights['debitPin'] + $emiStripHeight;
-
-        &[emi]
-          &[maestro]
-            height: $cardHeights['maestro'];
-            max-height: $cardHeights['maestro'];
-
-            &.emi-selected
-              height: $cardHeights['emi'] + $maestroHeight;
-              max-height: $cardHeights['emi'] + $maestroHeight;
-
-        &[emi]
-          &[pin]
-            &[maestro]
-              height: $cardHeights['debitPin'] + $maestroHeight;
-              max-height: $cardHeights['debitPin'] + $maestroHeight;
-
-              &.emi-selected
-                height: $cardHeights['debitPin'] + $maestroHeight + $emiStripHeight;
-                max-height: $cardHeights['debitPin'] + $maestroHeight + $emiStripHeight;
-
-        &.emi-selected
-          .emi-plans-info-container
-            margin-bottom: 12px;
-
-.tab-content
-  &:not(.saved-cards)
-    .saved-card
-      height: 0px !important;
+    .emi-plans-action
+      right: 0;

@@ -92,7 +92,7 @@ export const EMI_HELP_TEXT =
   'to avail.';
 
 // Change this when running experiment 2 for Debit + Pin: Select ATM PIN by default.
-export const DEFAULT_AUTH_TYPE_RADIO = '3ds';
+export const DEFAULT_AUTH_TYPE_RADIO = 'c3ds';
 
 export const STRINGS = {
   process: 'Your payment is being processed',

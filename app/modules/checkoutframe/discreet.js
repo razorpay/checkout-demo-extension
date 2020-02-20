@@ -53,20 +53,22 @@ import Store from 'checkoutstore';
 import PreferencesStore from 'checkoutstore/preferences';
 import SessionStore from 'checkoutstore/session';
 import DowntimesStore from 'checkoutstore/downtimes';
+import * as EmiStore from 'checkoutstore/emi';
 import * as OTPScreenStore from 'checkoutstore/screens/otp';
 import * as Cta from 'checkoutstore/cta';
 import * as HomeScreenStore from 'checkoutstore/screens/home';
+import * as CardScreenStore from 'checkoutstore/screens/card';
 
 import QRScreen from 'templates/views/qr.svelte';
 import BankTransferScreen from 'templates/views/bank_transfer.svelte';
 import UpiTab from 'templates/tabs/upi/index.svelte';
 import emiOptionsView from 'templates/screens/cardlessemi.svelte';
 import emiScreenView from 'templates/screens/emiscreen.svelte';
-import SavedCardsView from 'templates/screens/savedcards.svelte';
 import PayLaterView from 'templates/screens/paylater.svelte';
 import HomeTab from 'templates/tabs/home.svelte';
 import NetbankingTab from 'templates/tabs/netbanking/index.svelte';
 import NachScreen from 'templates/views/nach.svelte';
+import CardTab from 'templates/tabs/card/card.svelte';
 
 import PayoutsInstruments from 'templates/screens/payout-instruments.svelte';
 import PayoutAccount from 'templates/screens/payout-account.svelte';
@@ -132,6 +134,8 @@ export default {
   SessionStore,
   OTPScreenStore,
   HomeScreenStore,
+  CardScreenStore,
+  EmiStore,
   Cta,
 
   getQueryParams: _.getQueryParams,
@@ -145,7 +149,6 @@ export default {
   emiOptionsView,
   emiScreenView,
   emiPlansView,
-  SavedCardsView,
 
   FeeBearerView,
   PayoutsInstruments,
@@ -164,6 +167,7 @@ export default {
   UpiTab,
   NetbankingTab,
   NachScreen,
+  CardTab,
 
   Hacks,
   storeGetter,

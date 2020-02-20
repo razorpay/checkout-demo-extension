@@ -11,7 +11,7 @@
     const value = accountNumberField.getValue();
     const confirmValue = confirmAccountNumberField.getValue();
     if (value !== confirmValue) {
-      confirmAccountNumberField.setInvalid();
+      confirmAccountNumberField.setValid(false);
     }
   }
 </script>
