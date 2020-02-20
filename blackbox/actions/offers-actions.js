@@ -1,6 +1,7 @@
 const { delay, visible } = require('../util');
 
 async function viewOffers(context) {
+  await delay(200);
   await context.page.click('.offers-title');
 }
 
