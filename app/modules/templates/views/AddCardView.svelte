@@ -332,7 +332,7 @@
 
     <div>
       {#if showRememberCardCheck}
-        <label for="save" id="should-save-card" tabIndex="0">
+        <label class="first" for="save" id="should-save-card" tabIndex="0">
           <input
             type="checkbox"
             class="checkbox--square"
