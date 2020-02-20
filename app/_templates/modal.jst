@@ -154,127 +154,6 @@ if(emi_options && emi_options.banks){
                       <span>&#x2139;</span>
                 *Payment charges and taxes as applicable.</div>
               `?`
-              `?method.card || method.emi`
-                <div class="tab-content showable screen" id="form-card">
-                  <input type="hidden" id='emi_duration' name="emi_duration">
-                  <div id="show-saved-cards" class='text-btn left-card'>Use saved cards</div>
-                  <div id="saved-cards-container"></div>
-                  <div id="show-add-card" class="text-btn left-card">Add another card</div>
-                  `?method.card`
-                    <div class="strip emi-plans-info-container emi-plans-trigger saved-card-pay-without-emi hidden emi-icon-single-card">
-                      <div class="emi-plans-text no-action">Pay entire amount<span class="count-text"></span></div>
-                      <div class="emi-plans-action theme-highlight"></div>
-                    </div>
-                  `?`
-                  <div class="pad">
-                  <div id="add-card-container">
-                  <div class="card-fields">
-                      <div class="elem-wrap two-third"><div class="elem elem-card `?_.recurring`recurring`?`" id="elem-card">
-                        <div class="cardtype"></div>
-                        <label>Card Number</label>
-                        <i>&#xe605;</i>
-                        <span class="help">Please enter a valid card number</span>
-                        <span class="help amex-error">Amex cards are not supported for this transaction</span>
-                        <span class="help recurring-card-error">Card does not support automatic recurring payments</span>
-                        <input class="input" type="tel" id="card_number" name="card[number]" autocomplete="off" maxlength="19" value="`=attr(o('prefill.card[number]'))`">
-                      </div></div>
-                      <div class="elem-wrap third"><div class="elem elem-expiry">
-                        <label>Expiry</label>
-                        <i>&#xe606;</i>
-                        <input class="input"`?_.isMobile()` type="tel"`?` id="card_expiry" name="card[expiry]" placeholder="MM / YY" maxlength="7" value="`=attr(o('prefill.card[expiry]'))`">
-                      </div></div>
-                      <div class="elem-wrap two-third"><div class="elem elem-name `?name_readonly`readonly`?`">
-                        <span class="help">Please enter name on your card</span>
-                        <label>Card Holder's Name</label>
-                        <i>&#xe602;</i>
-                        <input class="input" type="text" id="card_name" name="card[name]" required value="`=attr(o('prefill.name'))`" pattern="^[a-zA-Z. 0-9'-]{1,100}$" `?name_readonly`readonly`?`>
-                      </div></div>
-                      <div class="elem-wrap third"><div class="elem elem-cvv mature">
-                        <label>CVV</label>
-                        <i>&#xe604;</i>
-                        <input class="input cvv-input" type="tel" id="card_cvv" inputmode="numeric" name="card[cvv]" maxlength="3" required pattern="[0-9]{3}" value="`=attr(o('prefill.card[cvv]'))`">
-                        <div class="help"></div>
-                      </div></div>
-                    </div>
-                    <div class="clear"></div>
-                    <div class="double">
-                      `?!_.recurring && o('remember_customer')`
-                        <label class="first" id="should-save-card" for="save" tabIndex="0">
-                          <input type="checkbox" class="checkbox--square" id="save" name="save" value="1" checked>
-                          <span class="checkbox"></span>
-                          Remember Card
-                        </label>
-                      `?`
-                      <div class="second">
-                        <span id="view-emi-plans" class="link">
-                          <a>View all EMI Plans</a>
-                        </span>
-                      </div>
-                      <div class="clear"></div>
-                    </div>
-                    <div id="elem-emi">
-                      <div class="strip emi-plans-info-container emi-plans-trigger">
-                        <div class="emi-plan-unavailable hidden emi-icon-multiple-cards">
-                          <span class="help">EMI is available on `=emi_banks_csv ` cards. Enter your credit card to avail.</span>
-                          <div class="emi-plans-text">EMI unavailable</div>
-                          `?method.card`
-                          <div class="emi-plans-action theme-highlight">Pay entire amount</div>
-                          `?`
-                        </div>
-                        <div class="emi-plan-selected hidden emi-icon-multiple-cards">
-                          <div class="emi-plans-text"></div>
-                          <div class="emi-plans-action theme-highlight">Edit</div>
-                        </div>
-                        `?method.emi`
-                          <div class="emi-plan-unselected hidden emi-icon-multiple-cards">
-                            <div class="emi-plans-text">EMI Available</div>
-                            <div class="emi-plans-action theme-highlight">Pay with EMI</div>
-                          </div>
-                        `?`
-                        `?method.card`
-                          <div class="emi-pay-without hidden emi-icon-single-card">
-                            <div class="emi-plans-text no-action">Pay entire amount<span class="count-text"></span></div>
-                            <div class="emi-plans-action theme-highlight"></div>
-                          </div>
-                        `?`
-                      </div>
-                    </div>
-                    <label id="nocvv-check" for="nocvv">
-                      <input type="checkbox" class='checkbox--square' id="nocvv" disabled>
-                      <span class="checkbox"></span>
-                      My Maestro Card doesn't have Expiry/CVV
-                    </label>
-                    <div class="flow-selection-container">
-                      <label>Complete Payment Using</label>
-                      <div class="flow input-radio">
-                        <input type="radio" name="auth_type" id="flow-3ds" value="c3ds" checked>
-                        <label for="flow-3ds">
-                          <div class="radio-display"></div>
-                          <div class="label-content">OTP / Password</div>
-                        </label>
-                      </div>
-
-                      <div class="flow input-radio">
-                        <input type="radio" name="auth_type" id="flow-pin" value="pin">
-                        <label for="flow-pin">
-                          <div class="radio-display"></div>
-                          <div class="label-content">ATM PIN</div>
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                  </div>
-                  `?_.recurring`
-                    <div id='recurring-message' class="pad recurring-message">
-                      <span>&#x2139;</span>
-                      `? !_.subscription` Future payments on this card will be charged automatically.
-                      `?? subscription_will_refund` The charge is to enable subscription on this card and it will be refunded.
-                      `??` This card will be linked to the subscription and future payments will be charged automatically.
-                      `?`
-                    </div>
-                  `?`
-                </div>
-              `?`
               `?method.emi && _.emi_options.banks['BAJAJ']`
                 <div class="tab-content showable screen" id="form-emi"></div>
               `?`
@@ -343,6 +222,8 @@ if(emi_options && emi_options.banks){
                 </div>
               `?`
               <div id="netbanking-svelte-wrap">
+              </div>
+              <div id="card-svelte-wrap">
               </div>
               <!-- UPI method -->
               <div id='upi-svelte-wrap'>
