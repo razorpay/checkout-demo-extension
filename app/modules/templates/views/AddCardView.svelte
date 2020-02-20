@@ -42,7 +42,8 @@
 
   const nameReadonly = CheckoutStore.get().readonly.name;
 
-  const showRememberCardCheck = !session.recurring;
+  const showRememberCardCheck =
+    !session.recurring && session.get('remember_customer');
 
   let noCvvChecked = false;
   let showNoCvvCheckbox = false;
