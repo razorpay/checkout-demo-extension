@@ -42,8 +42,9 @@
 
   const nameReadonly = CheckoutStore.get().readonly.name;
 
-  const showRememberCardCheck =
-    !session.recurring && session.get('remember_customer');
+  const isSavedCardsEnabled = session.get('remember_customer');
+
+  const showRememberCardCheck = !session.recurring && isSavedCardsEnabled;
 
   let noCvvChecked = false;
   let showNoCvvCheckbox = false;
@@ -102,7 +103,7 @@
       payload['card[expiry]'] = '12 / 21';
       payload['card[cvv]'] = '000';
     }
-    if ($remember) {
+    if ($remember && isSavedCardsEnabled) {
       payload.save = 1;
     }
     if (showAuthTypeSelectionRadio) {

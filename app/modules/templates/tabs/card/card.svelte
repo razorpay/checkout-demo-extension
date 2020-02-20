@@ -43,6 +43,7 @@
   };
 
   const session = getSession();
+  const isSavedCardsEnabled = session.get('remember_customer');
 
   let currentView = Views.SAVED_CARDS;
 
@@ -56,7 +57,7 @@
   let emiCtaView;
 
   let showSavedCardsCta = false;
-  $: showSavedCardsCta = savedCards && savedCards.length;
+  $: showSavedCardsCta = savedCards && savedCards.length && isSavedCardsEnabled;
 
   // State
   let customer = {};
@@ -194,10 +195,10 @@
 
   export function showLandingView() {
     tick().then(_ => {
-      let viewToSet = Views.SAVED_CARDS;
+      let viewToSet = Views.ADD_CARD;
 
-      if (savedCards.length === 0) {
-        viewToSet = Views.ADD_CARD;
+      if (savedCards && savedCards.length > 0 && isSavedCardsEnabled) {
+        viewToSet = Views.SAVED_CARDS;
       }
       setView(viewToSet);
     });
