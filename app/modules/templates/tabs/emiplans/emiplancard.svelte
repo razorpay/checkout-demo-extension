@@ -64,7 +64,7 @@
   );
 </script>
 
-<ExpandableCard {badge} {expanded} on:click>
+<ExpandableCard showRadio="true" {badge} {expanded} on:click>
   <div slot="title">
     {plan.duration} Months ({formattedAmountPerMonth}/mo)
     {#if showInterest}&nbsp;@ {plan.interest}%{/if}
