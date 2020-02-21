@@ -5,7 +5,7 @@
   // Props
   export let expanded;
   export let badge;
-  export let showRadio;
+  export let showRadio = false;
 
   // Computed
   export let elementClass;
