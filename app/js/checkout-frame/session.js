@@ -121,7 +121,7 @@ function createPayLaterTopbarImages(providerCode) {
 var BackStore = null;
 
 function confirmClose() {
-  return confirm('Ongoing payment. Press OK to abort payment.');
+  return confirm(discreet.confirmCancelMsg);
 }
 
 function fillData(container, returnObj) {
@@ -665,7 +665,7 @@ function askOTP(view, text, shouldLimitResend, screenProps) {
         loading: false,
         action: false,
         otp: '',
-        allowSkip: !Boolean(thisSession.recurring),
+        allowSkip: !thisSession.recurring,
         allowResend: shouldLimitResend
           ? OtpService.canSendOtp('razorpay')
           : true,
@@ -4030,7 +4030,7 @@ Session.prototype = {
     if (this.isOpen) {
       if (confirmedCancel !== true && this.r._payment) {
         return Confirm.show({
-          message: 'Your payment is ongoing. Press OK to cancel the payment.',
+          message: discreet.confirmCancelMsg,
           heading: 'Cancel Payment?',
           positiveBtnTxt: 'Yes, cancel',
           negativeBtnTxt: 'No',
