@@ -84,11 +84,14 @@
     hidden,
   } = CheckoutStore.get();
 
-  const formattedPhoneNumber = findCountryCode(prefill.contact);
+  if (prefill.contact) {
+    const formattedPhoneNumber = findCountryCode(prefill.contact);
 
-  $contact = prefill.contact
-    ? `+${formattedPhoneNumber.code}${formattedPhoneNumber.phone}`
-    : '+91';
+    $contact = `+${formattedPhoneNumber.code}${formattedPhoneNumber.phone}`;
+  } else {
+    $contact = '+91';
+  }
+
   $email = prefill.email || '';
 
   // Prop that decides which view to show.
@@ -704,6 +707,7 @@
   }
 </style>
 
+f
 <Tab method="common" overrideMethodCheck={true} shown={true} pad={false}>
   <Screen pad={false}>
     <div slot="main" class="screen-main">
