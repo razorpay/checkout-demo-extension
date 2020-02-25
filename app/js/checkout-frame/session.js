@@ -4610,6 +4610,11 @@ Session.prototype = {
     data.contact = getPhone();
     data.email = getEmail();
 
+    // If it's te default contact details, do not send them
+    if (data.contact === '+91' || data.contact === '+') {
+      delete data.contact;
+    }
+
     var prefillEmail = this.get('prefill.email');
     var prefillContact = this.get('prefill.contact');
 

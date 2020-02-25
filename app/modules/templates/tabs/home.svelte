@@ -249,7 +249,7 @@
     }
 
     // Missing contact
-    if (!$contact || !$contact.length) {
+    if (!($contact && $contact.length > 3)) {
       return false;
     }
 
@@ -398,7 +398,7 @@
      * If contact exists, get the instruments
      * for the user.
      */
-    const doesContactExist = $contact && $contact.length;
+    const doesContactExist = $contact && $contact.length > 3;
     const _instruments = doesContactExist ? getInstruments() : [];
 
     /**
@@ -699,7 +699,6 @@
   }
 </style>
 
-f
 <Tab method="common" overrideMethodCheck={true} shown={true} pad={false}>
   <Screen pad={false}>
     <div slot="main" class="screen-main">
@@ -722,7 +721,7 @@ f
                     <Icon icon={icons.contact} />
                   </i>
                   <div slot="title">
-                    {#if $contact && !hidden.contact}
+                    {#if $contact && $contact.length > 3 && !hidden.contact}
                       <span>{$contact}</span>
                     {/if}
                     {#if $email && !hidden.email}
