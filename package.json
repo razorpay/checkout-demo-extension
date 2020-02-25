@@ -37,6 +37,7 @@
     "test:unit": "./rollup.test.js | tap-difflet",
     "jest": "jest blackbox/tests/homescreen/**/base.test.js --testTimeout=30000",
     "test": "npm run test:unit && npm run build && npm run jest",
+    "lint-fix": "$ lintFix app/modules",
     "build": "$ rollup -c --environment prod && $ gulp && $ lintOutput app/js/generated/entry",
     "start": "$ gulp watch",
     "clean": "$ ./scripts/clean.sh"
@@ -46,7 +47,7 @@
   },
   "dependencies": {
     "chalk": "^2.4.1",
-    "fe": "git+https://github.com/razorpay/common-frontend-utils.git#0c797af",
+    "fe": "git+https://github.com/razorpay/common-frontend-utils.git#d9496d8",
     "gulp": "^4.0.0",
     "gulp-stylus": "^2.7.0",
     "gulp-usemin": "^0.3.29",
@@ -68,13 +69,19 @@
   "devDependencies": {
     "husky": "^1.0.0-rc.14",
     "jest-circus": "^24.9.0",
+    "lint-staged": "^10.0.7",
     "prettier": "^1.18.2",
     "prettier-plugin-svelte": "^0.7.0",
     "pretty-quick": "^2.0.0"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "pretty-quick --plugin-search-dir=. --staged"
+      "pre-commit": "lint-staged && pretty-quick --plugin-search-dir=. --staged"
     }
+  },
+  "lint-staged": {
+    "*.{js,svelte}": [
+      "$ lintFix"
+    ]
   }
 }
