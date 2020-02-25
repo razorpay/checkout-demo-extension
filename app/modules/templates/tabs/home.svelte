@@ -40,7 +40,6 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
-  import findCountryCode from 'common/countrycodesutil';
 
   const MAX_P13N_INSTRUMENTS = 3;
 
@@ -84,14 +83,7 @@
     hidden,
   } = CheckoutStore.get();
 
-  if (prefill.contact) {
-    const formattedPhoneNumber = findCountryCode(prefill.contact);
-
-    $contact = `+${formattedPhoneNumber.code}${formattedPhoneNumber.phone}`;
-  } else {
-    $contact = '+91';
-  }
-
+  $contact = prefill.contact || '+91';
   $email = prefill.email || '';
 
   // Prop that decides which view to show.

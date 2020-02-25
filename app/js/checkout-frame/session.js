@@ -134,6 +134,35 @@ function fillData(container, returnObj) {
 }
 
 /**
+ * Improvise the contact from prefill
+ * @param {Session} session
+ */
+function improvisePrefilledContact(session) {
+  var prefilledContact = session.get('prefill.contact');
+
+  if (!prefilledContact) {
+    return;
+  }
+
+  var formattedContact = discreet.CountryCodesUtil.findCountryCode(
+    prefilledContact
+  );
+  var newContact = '+' + formattedContact.code + formattedContact.phone;
+
+  if (prefilledContact !== newContact) {
+    session.set('prefill.contact', newContact);
+
+    Analytics.track('prefill:improvise', {
+      data: {
+        type: 'contact',
+        from: prefilledContact,
+        to: newContact,
+      },
+    });
+  }
+}
+
+/**
  * Returns the cardType from payload
  *
  * @param {Object} payload
@@ -2241,6 +2270,8 @@ Session.prototype = {
     if (prefilledMethod === 'emi' && prefilledProvider === 'bajaj') {
       this.set('prefill.method', 'cardless_emi');
     }
+
+    improvisePrefilledContact(this);
   },
 
   /**
