@@ -1,4 +1,4 @@
-const puppeteer = require('puppeteer-core');
+const puppeteer = require('puppeteer');
 const { execSync } = require('child_process');
 const DIR = require('./tmpdir');
 const fs = require('fs');
