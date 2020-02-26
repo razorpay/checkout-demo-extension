@@ -116,7 +116,7 @@ function setUpiMethod(session, methods) {
     !window.matchMedia(discreet.UserAgent.mobileQuery).matches;
 
   // If disabled by the merchant
-  if (upiFromMerchant === false || upiFromMerchant === null) {
+  if (upiFromMerchant === false) {
     methods.upi = false;
   }
 
