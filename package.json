@@ -37,7 +37,7 @@
     "test:unit": "./rollup.test.js | tap-difflet",
     "jest:base": "jest blackbox/tests/homescreen/**/base.test.js --testTimeout=30000",
     "jest": "jest blackbox/tests/homescreen/ --testTimeout=30000",
-    "test": "npm run test:unit && npm run build && npm run jest:base",
+    "test": "npm run test:unit && npm run build && npm run jest",
     "lint-fix": "$ lintFix app/modules",
     "build": "$ rollup -c --environment prod && $ gulp && $ lintOutput app/js/generated/entry",
     "start": "$ gulp watch",
