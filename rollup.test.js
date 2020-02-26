@@ -69,7 +69,7 @@ Promise.all(
             writeFileSync(prePath + '.html', template(bundleName));
 
             const browser = await puppeteer.launch({
-              executablePath: env.CHROME_BIN || '/usr/bin/chromium',
+              // executablePath: env.CHROME_BIN || '/usr/bin/chromium',
               args: ['--no-sandbox'],
               // headless: false,
               // devtools: true,
