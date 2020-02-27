@@ -21,7 +21,7 @@ const {
 describe('Wallet tests', () => {
   test('Wallet keyless payment with partial payment and contact optional', async () => {
     const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+      key: 'rzp_test_o39NWyo4QjBTFF',
       amount: 200000,
       personalization: false,
     };
