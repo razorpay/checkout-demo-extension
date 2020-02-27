@@ -1,6 +1,6 @@
-const createTest = require('./create');
+const createNetbankingTest = require('../../../create/netbanking');
 
-createTest({
+createNetbankingTest({
   keyless: true,
   partialPayment: true,
 });

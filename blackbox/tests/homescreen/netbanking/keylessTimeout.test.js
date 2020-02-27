@@ -1,6 +1,6 @@
-const createTest = require('./create.js');
+const createNetbankingTest = require('../../../create/netbanking');
 
-createTest({
+createNetbankingTest({
   keyless: true,
   timeout: true,
 });
