@@ -205,10 +205,7 @@ async function assertEditUserDetailsAndBack(context) {
   // TODO: Update details
 
   if (context.state && context.state.partial) {
-    const nextButton = await context.page.waitForSelector('#footer', {
-      visible: true,
-    });
-    await nextButton.click();
+    await proceed(context);
   } else {
     await delay(500);
     await proceed(context);
@@ -285,10 +282,7 @@ async function handlePartialPayment(context, amount) {
   });
   await amountValue.type(amount);
 
-  const nextButton = await context.page.waitForSelector('#footer', {
-    visible: true,
-  });
-  await nextButton.click();
+  await proceed(context);
 }
 
 module.exports = {
