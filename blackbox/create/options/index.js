@@ -8,6 +8,7 @@ const defaultFeatures = {
   downtime: false,
   offers: false,
   partialPayment: false,
+  personalization: false,
 };
 
 /**
@@ -16,12 +17,22 @@ const defaultFeatures = {
  *
  * @returns {Object}
  */
-function makeTestOptions({ partialPayment, keyless, timeout, callbackUrl }) {
+function makeTestOptions({
+  partialPayment,
+  keyless,
+  timeout,
+  callbackUrl,
+  personalization,
+}) {
   const options = {
     key: 'rzp_test_1DP5mmOlF5G5ag',
     amount: 200,
     personalization: false,
   };
+
+  if (personalization) {
+    options.personalization = true;
+  }
 
   if (keyless || partialPayment) {
     delete options.key;
@@ -29,7 +40,7 @@ function makeTestOptions({ partialPayment, keyless, timeout, callbackUrl }) {
   }
 
   if (timeout) {
-    options.timeout = 3;
+    options.timeout = 2;
   }
 
   if (callbackUrl) {
@@ -104,7 +115,7 @@ function getFeaturesString(features) {
  *
  * @returns {Object}
  */
-function makeOptionsAndPreferences(method, features) {
+function makeOptionsAndPreferences(method, features = {}) {
   features = {
     ...defaultFeatures,
     ...features,

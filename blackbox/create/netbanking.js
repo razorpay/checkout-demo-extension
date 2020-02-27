@@ -1,5 +1,4 @@
 const makeOptionsAndPreferences = require('./options/index.js');
-
 const { getTestData } = require('../actions');
 const { openCheckoutWithNewHomeScreen } = require('../tests/homescreen/open');
 const {
@@ -43,6 +42,10 @@ const {
 
   // Partial Payments
   handlePartialPayment,
+
+  // Personalization
+  selectPersonalizationPaymentMethod,
+  verifyPersonalizationText,
 } = require('../tests/homescreen/actions');
 
 module.exports = function(testFeatures) {
@@ -58,6 +61,9 @@ module.exports = function(testFeatures) {
     callbackUrl,
     downtime,
     offers,
+    personalization,
+    optionalContact,
+    optionalEmail,
   } = features;
 
   describe.each(
@@ -67,33 +73,65 @@ module.exports = function(testFeatures) {
     })
   )('Netbanking tests', ({ preferences, title, options }) => {
     test(title, async () => {
+      if (personalization) {
+        if (preferences.customer) {
+          preferences.customer.contact = '+918888888881';
+        }
+      }
+
+      let bank = 'SBIN';
+
       const context = await openCheckoutWithNewHomeScreen({
         page,
         options,
         preferences,
+        method: 'Netbanking',
       });
-      await assertBasicDetailsScreen(context);
-      await fillUserDetails(context);
+
+      const missingUserDetails = optionalContact && optionalEmail;
+
+      const isHomeScreenSkipped = missingUserDetails && !partialPayment; // and not TPV
+
+      if (!isHomeScreenSkipped) {
+        await assertBasicDetailsScreen(context);
+      }
+
+      if (!missingUserDetails) {
+        await fillUserDetails(context, '8888888881');
+      }
 
       if (partialPayment) {
         await handlePartialPayment(context, '100');
-      } else {
+      } else if (!isHomeScreenSkipped) {
         await proceed(context);
       }
 
-      await assertUserDetails(context);
-      await assertEditUserDetailsAndBack(context);
-      await assertPaymentMethods(context);
-      await selectPaymentMethod(context, 'netbanking');
-      await assertNetbankingPage(context);
+      if (!missingUserDetails) {
+        await assertUserDetails(context);
+        await assertEditUserDetailsAndBack(context);
+      }
 
-      if (downtime) {
-        await selectBank(context, 'ICIC');
-        await verifyLowDowntime(context, 'ICICI Bank');
-        await selectBank(context, 'HDFC');
-        await verifyLowDowntime(context, 'HDFC Bank');
+      await assertPaymentMethods(context);
+
+      if (personalization) {
+        await verifyPersonalizationText(context, 'netbanking');
+        await selectPersonalizationPaymentMethod(context, '1');
+
+        bank = 'HDFC';
       } else {
-        await selectBank(context, 'SBIN');
+        await selectPaymentMethod(context, 'netbanking');
+        await assertNetbankingPage(context);
+
+        if (downtime) {
+          await selectBank(context, 'ICIC');
+          await verifyLowDowntime(context, 'ICICI Bank');
+          await selectBank(context, 'HDFC');
+          await verifyLowDowntime(context, 'HDFC Bank');
+
+          bank = 'HDFC';
+        } else {
+          await selectBank(context, 'SBIN');
+        }
       }
 
       if (offers) {
@@ -131,7 +169,7 @@ module.exports = function(testFeatures) {
       if (callbackUrl) {
         await expectRedirectWithCallback(context, {
           method: 'netbanking',
-          bank: 'SBIN',
+          bank,
         });
       } else {
         await passRequestNetbanking(context);
