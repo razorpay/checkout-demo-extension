@@ -1,26 +1,29 @@
-const { openCheckout } = require('../../actions/checkout');
-const { makePreferences } = require('../../actions/preferences');
+const { getTestData } = require('../../../actions');
+const { openCheckoutWithNewHomeScreen } = require('../open');
 const {
-  assertHomePage,
-  fillUserDetails,
-  assertPaymentMethods,
-  selectPaymentMethod,
   selectBank,
   assertNetbankingPage,
-  verifyHighDowntime,
   verifyLowDowntime,
-} = require('../../actions/common');
+} = require('../../../actions/common');
 
-describe('Netbanking tests', () => {
-  test('perform netbaking transaction with callback url', async () => {
-    const options = {
+const {
+  assertBasicDetailsScreen,
+  fillUserDetails,
+  proceed,
+  assertUserDetails,
+  assertPaymentMethods,
+  selectPaymentMethod,
+  assertEditUserDetailsAndBack,
+} = require('../actions');
+
+describe.each(
+  getTestData('perform netbanking transaction with fee bearer', {
+    options: {
       key: 'rzp_test_1DP5mmOlF5G5ag',
-      amount: 200,
+      amount: 600,
       personalization: false,
-      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
-      redirect: true,
-    };
-    const preferences = makePreferences({
+    },
+    preferences: {
       payment_downtime: {
         entity: 'collection',
         count: 2,
@@ -57,10 +60,20 @@ describe('Netbanking tests', () => {
           },
         ],
       },
+    },
+  })
+)('Netbanking tests', ({ preferences, title, options }) => {
+  test(title, async () => {
+    const context = await openCheckoutWithNewHomeScreen({
+      page,
+      options,
+      preferences,
     });
-    const context = await openCheckout({ page, options, preferences });
-    await assertHomePage(context, true, true);
+    await assertBasicDetailsScreen(context);
     await fillUserDetails(context);
+    await proceed(context);
+    await assertUserDetails(context);
+    await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'netbanking');
     await assertNetbankingPage(context);
