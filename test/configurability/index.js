@@ -1,0 +1,187 @@
+import * as Configurability from 'configurability';
+
+test('Module: configurability', t => {
+  test('Configurability.getBlockConfig', t => {
+    let options;
+    let expected;
+    let found;
+
+    options = {
+      blocks: {
+        gpay: {
+          name: 'Pay via Google Pay',
+          description: 'Make a payment using your Google Pay app',
+          instruments: [
+            {
+              method: 'upi',
+              apps: ['gpay'],
+            },
+          ],
+        },
+        hdfc: {
+          name: 'Pay via HDFC Bank',
+          description: 'Make the paymnet using your HDFC account',
+          instruments: [
+            {
+              method: 'card',
+              issuers: ['HDFC'],
+            },
+            {
+              method: 'netbanking',
+              banks: ['HDFC'],
+            },
+            {
+              method: 'wallet',
+              wallets: ['payzapp'],
+            },
+          ],
+        },
+      },
+      exclude: [
+        {
+          method: 'wallet',
+          wallets: ['olamoney'],
+        },
+        {
+          method: 'card',
+          issuers: ['SBIN'],
+          networks: ['mastercard'],
+        },
+        {
+          method: 'card',
+          card_types: ['credit'],
+        },
+        {
+          method: 'card',
+          issuers: ['ICIC'],
+          card_types: ['debit'],
+        },
+      ],
+      settings: {
+        methods: {
+          upi: false,
+        },
+      },
+      sequence: ['block.gpay', 'netbanking', 'block.hdfc'],
+    };
+
+    expected = [
+      {
+        code: 'block.gpay',
+        type: 'block',
+        instruments: [
+          {
+            method: 'upi',
+            apps: ['gpay'],
+            type: 'instrument',
+          },
+        ],
+        title: 'Pay via Google Pay',
+      },
+      {
+        code: 'rzp.cluster',
+        type: 'block',
+        instruments: [
+          {
+            code: 'netbanking',
+            type: 'method',
+            method: 'netbanking',
+          },
+        ],
+        title: 'Pay via Netbanking',
+      },
+      {
+        code: 'block.hdfc',
+        type: 'block',
+        instruments: [
+          {
+            method: 'card',
+            issuers: ['HDFC'],
+            type: 'instrument',
+          },
+          {
+            method: 'netbanking',
+            banks: ['HDFC'],
+            type: 'instrument',
+          },
+          {
+            method: 'wallet',
+            wallets: ['payzapp'],
+            type: 'instrument',
+          },
+        ],
+        title: 'Pay via HDFC Bank',
+      },
+      {
+        code: 'rzp.cluster',
+        type: 'block',
+        instruments: [
+          {
+            code: 'card',
+            type: 'method',
+            method: 'card',
+          },
+          {
+            code: 'wallet',
+            type: 'method',
+            method: 'wallet',
+          },
+          {
+            code: 'upi',
+            type: 'instrument',
+            method: 'upi',
+          },
+          {
+            code: 'gpay',
+            type: 'instrument',
+            method: 'gpay',
+          },
+          {
+            code: 'emi',
+            type: 'instrument',
+            method: 'emi',
+          },
+          {
+            code: 'cardless_emi',
+            type: 'instrument',
+            method: 'cardless_emi',
+          },
+          {
+            code: 'qr',
+            type: 'instrument',
+            method: 'qr',
+          },
+          {
+            code: 'paylater',
+            type: 'instrument',
+            method: 'paylater',
+          },
+          {
+            code: 'paypal',
+            type: 'instrument',
+            method: 'paypal',
+          },
+          {
+            code: 'bank_transfer',
+            type: 'instrument',
+            method: 'bank_transfer',
+          },
+          {
+            code: 'nach',
+            type: 'instrument',
+            method: 'nach',
+          },
+        ],
+        title: 'Cards, Wallets & More',
+      },
+    ];
+
+    found = Configurability.getBlockConfig(options);
+
+    t.deepEqual(found, expected, 'Retrieves the expected block config');
+
+    t.end();
+  });
+
+  t.end();
+});
