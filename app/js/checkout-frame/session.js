@@ -781,7 +781,9 @@ function askOTP(view, text, shouldLimitResend, screenProps) {
 
             if (bankLogo) {
               qs('#tab-title').innerHTML =
-                '<img class="headless-bank" src="' + bankLogo + '">';
+                '<img class="native-otp-bank" src="' +
+                bankLogo +
+                '" onerror="this.style.opacity = 0;">';
             }
           }
           if (!origText.next || origText.next.indexOf('otp_resend') === -1) {
@@ -2027,6 +2029,7 @@ Session.prototype = {
       this.commenceOTP('Resending OTP...');
     } else if (action === 'verify') {
       this.commenceOTP('Verifying OTP...');
+      return;
     } else {
       this.commenceOTP(payLaterProviderObj.name + ' account', true);
     }

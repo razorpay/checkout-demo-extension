@@ -29,6 +29,10 @@ describe.each(
 )('UPI tests', ({ preferences, title, options }) => {
   test(title, async () => {
     preferences.methods.upi = true;
+    if (preferences.customer) {
+      preferences.customer.contact = '+918888888881';
+    }
+
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,
