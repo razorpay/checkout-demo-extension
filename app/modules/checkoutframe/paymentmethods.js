@@ -235,7 +235,7 @@ export function getMethodPrefix(method) {
 export function getMethodNameForPaymentOption(method, { session }) {
   switch (method) {
     case 'upi':
-      if (session.methods.qr) {
+      if (session.methods.upi.qr) {
         return 'UPI / QR';
       }
 

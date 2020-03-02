@@ -233,7 +233,7 @@ if(emi_options && emi_options.banks){
               </div>
               <div id='payout-account-svelte-wrap'>
               </div>
-              `?method.qr`
+              `?method.upi && method.upi.qr`
                 <div class="tab-content showable screen pad" id="form-qr"></div>
               `?`
               `?method.bank_transfer`

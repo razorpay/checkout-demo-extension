@@ -93,6 +93,90 @@ var PayLaterStore = {
   lenderBranding: {},
 };
 
+/**
+ * Sets the UPI method based on its config.
+ *
+ * This doesn't accommodate for Web Payments API yet
+ * since determining the availability of that API in the browser
+ * is async.
+ *
+ * @param {Session} session
+ * @param {Object} methods preferences.methods
+ */
+function setUpiMethod(session, methods) {
+  var upiFromMerchant = session.get('method.upi');
+  var intentApps = session.upi_intents_data;
+  var isPayout = session.isPayout;
+  var hasOmnichannelFeature = _Obj.getSafely(
+    session.preferences,
+    'features.google_pay_omnichannel'
+  );
+  var qrEnabled =
+    session.get('method.qr') &&
+    !window.matchMedia(discreet.UserAgent.mobileQuery).matches;
+
+  // If disabled by the merchant
+  if (upiFromMerchant === false) {
+    methods.upi = false;
+  }
+
+  // If disabled altogether
+  if (!methods.upi) {
+    return;
+  }
+
+  // Get the object passed by merchant
+  var merchantObj = _.isNonNullObject(upiFromMerchant) ? upiFromMerchant : {};
+
+  // Extend merchant's config with defaults
+  var upi = _Obj.extend(
+    {
+      collect: true,
+      intent: true,
+      omnichannel: true,
+      qr: true,
+    },
+    merchantObj
+  );
+
+  // QR
+  upi.qr = upi.qr && qrEnabled && !isPayout;
+
+  // Intent
+  upi.intent =
+    upi.intent &&
+    session.methods.upi_intent &&
+    !isPayout &&
+    intentApps &&
+    intentApps.length > 0;
+
+  // Omnichannel
+  upi.omnichannel = upi.omnichannel && !isPayout && hasOmnichannelFeature;
+
+  var isUpiAMethod = false;
+
+  // Check if any flow is enabled
+  _Obj.loop(upi, function(enabled, flow) {
+    if (enabled) {
+      isUpiAMethod = true;
+    }
+  });
+
+  // None of the flows are available
+  if (!isUpiAMethod) {
+    methods.upi = false;
+    return;
+  }
+
+  methods.upi = upi;
+  methods.count++;
+
+  if (session.separateGPay) {
+    methods.count++;
+    methods.gpay = true;
+  }
+}
+
 function createCardlessEmiImage(src) {
   return '<img src="' + src + '" class="cardless_emi-topbar-image">';
 }
@@ -697,7 +781,9 @@ function askOTP(view, text, shouldLimitResend, screenProps) {
 
             if (bankLogo) {
               qs('#tab-title').innerHTML =
-                '<img class="headless-bank" src="' + bankLogo + '">';
+                '<img class="native-otp-bank" src="' +
+                bankLogo +
+                '" onerror="this.style.opacity = 0;">';
             }
           }
           if (!origText.next || origText.next.indexOf('otp_resend') === -1) {
@@ -1943,6 +2029,7 @@ Session.prototype = {
       this.commenceOTP('Resending OTP...');
     } else if (action === 'verify') {
       this.commenceOTP('Verifying OTP...');
+      return;
     } else {
       this.commenceOTP(payLaterProviderObj.name + ' account', true);
     }
@@ -5731,22 +5818,7 @@ Session.prototype = {
     }
 
     if (methods.upi) {
-      methods.count++;
-      if (qrEnabled) {
-        methods.qr = true;
-
-        /**
-         * Do not increase the count since we don't
-         * want to show QR in intial list of
-         * payment options anymore.
-         */
-        // methods.count++;
-      }
-
-      if (this.separateGPay) {
-        methods.count++;
-        methods.gpay = true;
-      }
+      setUpiMethod(this, methods);
     }
 
     /* set external wallets */
