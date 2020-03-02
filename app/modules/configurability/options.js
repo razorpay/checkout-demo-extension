@@ -77,6 +77,6 @@ export function translateExternal(options) {
  *
  * @returns {Object}
  */
-export function translateInternal(options) {
+function translateInternal(options) {
   return _translate(options, false);
 }
