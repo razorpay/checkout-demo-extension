@@ -1,8 +1,6 @@
 import { createBlock } from './blocks';
-import {
-  generateTextFromList,
-  getMethodPrefix,
-} from 'checkoutframe/paymentmethods';
+import { getMethodPrefix } from 'checkoutframe/paymentmethods';
+import { generateTextFromList } from 'lib/utils';
 
 /**
  * Adds a name to the clusters in the list of blocks
