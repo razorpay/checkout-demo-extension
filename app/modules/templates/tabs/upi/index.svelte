@@ -76,6 +76,7 @@
   let rememberVpaCheckbox;
   let intentAppSelected = null;
   let customer;
+  let collectEnabled = false;
 
   const session = getSession();
   const preferences = Preferences.get();
@@ -106,37 +107,13 @@
     return session.r.checkPaymentAdapter('gpay');
   };
 
-  const checkOmnichannel = session => {
-    const hasFeature = _Obj.getSafely(
-      preferences,
-      'features.google_pay_omnichannel'
-    );
+  const checkOmnichannel = session =>
+    _Obj.getSafely(session, 'methods.upi.omnichannel');
 
-    // Do not use omnichannel for Payouts
-    if (session.isPayout) {
-      return false;
-    }
-
-    if (hasFeature) {
-      Analytics.track('omnichannel', {
-        type: AnalyticsTypes.RENDER,
-      });
-    }
-
-    return hasFeature;
-  };
-
-  $: intent = Boolean(
-    !isPayout &&
-      preferIntent &&
-      intentApps &&
-      _.lengthOf(intentApps) > 0 &&
-      _Obj.getSafely(session, 'methods.upi_intent')
-  );
+  $: intent = preferIntent && _Obj.getSafely(session, 'methods.upi.intent');
   $: isGPaySelected = selectedApp === 'gpay' && useWebPaymentsApi;
   $: pspHandle = selectedAppData ? selectedAppData.psp : '';
-  $: shouldShowQr =
-    qrEnabled && !selectedApp && selectedApp !== null && !isPayout;
+  $: shouldShowQr = qrEnabled && !selectedApp && selectedApp !== null;
 
   $: {
     /**
@@ -200,8 +177,10 @@
     down = _Arr.contains(downtimes.low.methods, 'upi');
     disabled = _Arr.contains(downtimes.high.methods, 'upi');
 
-    qrEnabled = session.methods.qr;
+    qrEnabled = _Obj.getSafely(session, 'methods.upi.qr');
     qrIcon = session.themeMeta.icons.qr;
+
+    collectEnabled = _Obj.getSafely(session, 'methods.upi.collect');
   });
 
   export function selectQrMethod() {
@@ -456,6 +435,7 @@
           }}
           {showRecommendedUPIApp} />
       {/if}
+
       {#if useWebPaymentsApi}
         <div class="legend left">Pay using Gpay App</div>
         <div class="border-list">
@@ -473,43 +453,47 @@
           </SlottedRadioOption>
         </div>
       {/if}
-      <div class="legend left">Pay using UPI ID</div>
-      <div class="border-list">
-        {#if intent}
-          <ListHeader>
-            <i slot="icon">
-              <Icon icon={getMiscIcon('recieve')} />
-            </i>
-            <div slot="subtitle">
-              You will receive a payment request on your UPI app
-            </div>
-          </ListHeader>
-        {/if}
 
-        {#each tokens as app, i}
-          <SlottedRadioOption
-            name="payment_type"
-            ellipsis
-            selected={selectedToken === app.id}
+      {#if collectEnabled}
+        <div class="legend left">Pay using UPI ID</div>
+        <div class="border-list">
+          {#if intent}
+            <ListHeader>
+              <i slot="icon">
+                <Icon icon={getMiscIcon('recieve')} />
+              </i>
+              <div slot="subtitle">
+                You will receive a payment request on your UPI app
+              </div>
+            </ListHeader>
+          {/if}
+
+          {#each tokens as app, i}
+            <SlottedRadioOption
+              name="payment_type"
+              ellipsis
+              selected={selectedToken === app.id}
+              on:click={() => {
+                onUpiAppSelection({ detail: { id: app.id } });
+              }}>
+              <div slot="title">{app.vpa.username + '@' + app.vpa.handle}</div>
+              <i slot="icon">
+                <Icon
+                  icon={getUPIAppLogoFromHandle(app.vpa.handle) || session.themeMeta.icons.upi} />
+              </i>
+            </SlottedRadioOption>
+          {/each}
+          <AddANewVpa
             on:click={() => {
-              onUpiAppSelection({ detail: { id: app.id } });
-            }}>
-            <div slot="title">{app.vpa.username + '@' + app.vpa.handle}</div>
-            <i slot="icon">
-              <Icon
-                icon={getUPIAppLogoFromHandle(app.vpa.handle) || session.themeMeta.icons.upi} />
-            </i>
-          </SlottedRadioOption>
-        {/each}
-        <AddANewVpa
-          on:click={() => {
-            onUpiAppSelection({ detail: { id: 'new' } });
-          }}
-          {customer}
-          on:blur={trackVpaEntry}
-          selected={selectedToken === 'new'}
-          bind:this={vpaField} />
-      </div>
+              onUpiAppSelection({ detail: { id: 'new' } });
+            }}
+            {customer}
+            on:blur={trackVpaEntry}
+            selected={selectedToken === 'new'}
+            bind:this={vpaField} />
+        </div>
+      {/if}
+
       {#if useOmnichannel}
         <GooglePayOmnichannel
           error={retryOmnichannel}
@@ -525,7 +509,7 @@
       {/if}
 
       {#if shouldShowQr}
-        <div class="legend left">Or, Pay using QR Code</div>
+        <div class="legend left">Pay using QR Code</div>
         <div class="options" id="showQr">
           <NextOption
             icon={qrIcon}
