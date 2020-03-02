@@ -301,6 +301,8 @@ module.exports = {
   assertEditUserDetailsAndBack,
   handlePartialPayment,
   assertMethodsScreen,
+  getMethodButtons,
+  getAttribute,
   assertMissingDetails,
   ...personalizationActions,
   ...downtimeTimeoutActions,
