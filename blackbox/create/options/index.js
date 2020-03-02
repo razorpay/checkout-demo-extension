@@ -124,7 +124,7 @@ function makeOptionsAndPreferences(method, features = {}) {
   let options = makeTestOptions(features);
   let preferences = makeTestPreferences(features);
 
-  const maker = require(`./${method}`);
+  const maker = require(`./makers/${method}`);
 
   options = maker.makeOptions(features, options);
   preferences = maker.makePreferences(features, preferences);
