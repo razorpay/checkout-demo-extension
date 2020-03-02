@@ -145,7 +145,7 @@ function setUpiMethod(session, methods) {
   // Intent
   upi.intent =
     upi.intent &&
-    session.get('method.upi_intent') &&
+    session.methods.upi_intent &&
     !isPayout &&
     intentApps &&
     intentApps.length > 0;
