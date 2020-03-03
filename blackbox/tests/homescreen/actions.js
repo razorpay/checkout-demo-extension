@@ -114,8 +114,8 @@ async function assertMissingDetails(context) {
  * Fill user contact and email
  */
 async function fillUserDetails(context, number) {
-  let contact = context.prefilledEmail || number || randomContact();
-  let email = context.prefilledContact || randomEmail();
+  let contact = context.prefilledContact || number || randomContact();
+  let email = context.prefilledEmail || randomEmail();
 
   if (!context.prefilledContact && !context.isContactOptional) {
     await context.page.type('#contact', contact);
