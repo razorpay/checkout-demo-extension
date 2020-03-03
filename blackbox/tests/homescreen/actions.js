@@ -227,6 +227,19 @@ async function getMethodButtons(context) {
 }
 
 /**
+ * Returns all available method buttons
+ */
+async function getEmiButtons(context) {
+  const list = await context.page.waitForSelector(
+    '#form-cardless_emi .options',
+    {
+      visible: true,
+    }
+  );
+  return Array.from(await list.$$('#form-cardless_emi .option-title'));
+}
+
+/**
  * Verify that methods are being shown
  */
 async function assertPaymentMethods(context) {
@@ -302,6 +315,7 @@ module.exports = {
   handlePartialPayment,
   assertMethodsScreen,
   getMethodButtons,
+  getEmiButtons,
   getAttribute,
   assertMissingDetails,
   ...personalizationActions,
