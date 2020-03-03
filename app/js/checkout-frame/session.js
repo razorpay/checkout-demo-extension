@@ -4079,7 +4079,7 @@ Session.prototype = {
     data.contact = getPhone();
     data.email = getEmail();
 
-    // If it's te default contact details, do not send them
+    // If it's the default contact details, do not send them
     if (data.contact === '+91' || data.contact === '+') {
       delete data.contact;
     }
