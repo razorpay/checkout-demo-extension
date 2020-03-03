@@ -32,15 +32,7 @@ export function getSequencedBlocks(params) {
   sequence = _Arr.mergeWith(sequence, methodsToList);
 
   // Filter the sequence for duplicates
-  let filtered = [];
-
-  _Arr.loop(sequence, code => {
-    if (!_Arr.contains(filtered, code)) {
-      filtered.push(code);
-    }
-  });
-
-  sequence = filtered;
+  sequence = _Arr.removeDuplicates(sequence);
 
   // Get all blocks
   const allBlocks = _Arr.merge(methodBlocks, blocks);
