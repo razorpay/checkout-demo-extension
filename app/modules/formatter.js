@@ -171,6 +171,7 @@ Formatter.rules = {
         }
         return yearValue > currentYear;
       }
+      return false;
     },
   },
 

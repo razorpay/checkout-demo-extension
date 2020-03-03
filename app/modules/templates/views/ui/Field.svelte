@@ -36,13 +36,22 @@
   export let tabindex = 0;
 
   // Computed
-  export let identifier;
+  let identifier;
+  let inputType;
+
+  let focused = false;
+  let placeholderToShow = placeholder;
 
   // Refs
   export let wrap = null;
   export let input = null;
+  let formatterObj = null;
 
   const session = getSession();
+
+  export function getCaretPosition() {
+    return formatterObj.caretPosition;
+  }
 
   $: {
     if (maxlength && input) {
@@ -56,7 +65,7 @@
     }
 
     const delegator = session.delegator;
-    const formatterObj = delegator.add(data.type, node);
+    formatterObj = delegator.add(data.type, node);
 
     _Obj.loop(data.on, (callback, event) => {
       formatterObj.on(event, callback);
@@ -86,6 +95,22 @@
     });
   }
 
+  $: {
+    if (!focused && label && placeholder) {
+      placeholderToShow = '';
+    } else {
+      placeholderToShow = placeholder;
+    }
+  }
+
+  function handleInputFocus(event) {
+    focused = true;
+  }
+
+  function handleInputBlur(event) {
+    focused = false;
+  }
+
   export function focus() {
     input.focus();
   }
@@ -98,17 +123,19 @@
     return input.value;
   }
 
-  export function setInvalid() {
-    _El.addClass(wrap, 'invalid');
+  export function getRawValue() {
+    return formatterObj ? formatterObj.value : input.value;
+  }
+
+  export function setValid(isValid) {
+    setTimeout(_ => {
+      _El.keepClass(wrap, 'invalid', !isValid);
+    });
   }
 </script>
 
 <style>
-  /*
-   * TODO: standardize / fix padding
-   */
   div:not(.help) {
-    padding: 4px 0;
     input {
       opacity: 1;
       width: 100%;
@@ -132,7 +159,7 @@
     {value}
     {required}
     {autocomplete}
-    {placeholder}
+    placeholder={placeholderToShow}
     {pattern}
     {readonly}
     {min}
@@ -142,13 +169,15 @@
     use:focusAction={handleFocus}
     use:blurAction={handleBlur}
     use:inputAction={handleInput}
+    on:focus={handleInputFocus}
+    on:blur={handleInputBlur}
     on:focus
     on:blur
     on:input
     class:no-refresh={!refresh}
     class:no-focus={handleFocus}
     class:no-blur={handleBlur}
-    class:no-input={handleInput}
+    class:no-validate={handleInput}
     class:cvv-input={type === 'cvv'} />
   {#if label}
     <label>{label}</label>

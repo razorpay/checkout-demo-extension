@@ -1,7 +1,4 @@
 <script>
-  // Store
-  import { email } from 'checkoutstore/screens/home';
-
   // UI imports
   import Field from 'templates/views/ui/Field.svelte';
 
@@ -31,13 +28,13 @@
     id="email"
     name="email"
     type="email"
-    bind:value
+    {value}
     required={!optional.email}
     pattern={EMAIL_REGEX}
     readonly={isEmailReadonly}
     {label}
     icon="&#xe603;"
-    on:input={e => ($email = e.target.value)}
+    on:input={e => (value = e.target.value)}
     on:blur
     helpText="Please enter a valid email. Example: you@example.com" />
 </div>

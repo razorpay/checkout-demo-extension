@@ -26,7 +26,7 @@ const {
 describe('Basic wallet payment', () => {
   test('Perform wallet transaction with offers and optional contact applied', async () => {
     const options = {
-      key: 'rzp_test_1DP5mmOlF5G5ag',
+      key: 'rzp_test_o39NWyo4QjBTFF',
       amount: 200000,
       personalization: false,
     };

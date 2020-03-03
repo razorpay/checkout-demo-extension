@@ -35,10 +35,13 @@ function CheckoutStore(base) {
       session.get('readonly.contact') && session.get('prefill.contact');
     readonlyFields.email =
       session.get('readonly.email') && session.get('prefill.email');
+    readonlyFields.name =
+      session.get('readonly.name') && session.get('prefill.name');
 
     const prefill = {
       contact: session.get('prefill.contact'),
       email: session.get('prefill.email'),
+      name: session.get('prefill.name'),
     };
 
     storeState.prefill = prefill;

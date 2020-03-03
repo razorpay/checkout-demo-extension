@@ -50,7 +50,6 @@ describe.each(
     await handlePayLaterOTPOrCustomerCardStatusRequest(context);
     await typeOTPandSubmit(context, '333333');
     await handlePayLaterOTPOrCustomerCardStatusRequest(context);
-    await handlePayLaterOTPOrCustomerCardStatusRequest(context);
     await handleFeeBearer(context);
     await handleValidationRequest(context, 'pass');
   });

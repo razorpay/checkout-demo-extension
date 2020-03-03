@@ -2,9 +2,6 @@
   // Utils
   import CheckoutStore from 'checkoutstore';
 
-  // Store
-  import { contact } from 'checkoutstore/screens/home';
-
   // UI imports
   import Field from 'templates/views/ui/Field.svelte';
 
@@ -39,8 +36,8 @@
     formatter={{ type: 'phone' }}
     {label}
     icon="&#xe607;"
-    on:input={e => ($contact = e.target.value)}
+    on:input={e => (value = e.target.value)}
     on:blur
-    bind:value
+    {value}
     helpText="Please enter a valid contact number" />
 </div>
