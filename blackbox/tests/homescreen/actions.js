@@ -78,7 +78,7 @@ async function assertBasicDetailsScreen(context) {
     let contact = context.prefilledContact;
 
     // Add the country code if missing
-    if (contact.indexOf('+91') !== 0) {
+    if (contect && contact.indexOf('+91') !== 0) {
       contact = '+91' + contact;
     }
 
@@ -123,7 +123,7 @@ async function fillUserDetails(context, number) {
   let email = context.prefilledContact || randomEmail();
 
   // "+91" is already typed, remove the country code
-  if (contact.indexOf('+91') === 0) {
+  if (contect && contact.indexOf('+91') === 0) {
     contact = contact.replace('+91', '');
   }
 
@@ -170,7 +170,7 @@ async function assertUserDetails(context) {
     let { contact, email } = context.state;
 
     // Add the country code if missing
-    if (contact.indexOf('+91') !== 0) {
+    if (contect && contact.indexOf('+91') !== 0) {
       contact = '+91' + contact;
     }
 

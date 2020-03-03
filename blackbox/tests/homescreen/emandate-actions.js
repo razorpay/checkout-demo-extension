@@ -22,7 +22,7 @@ async function assertEmandateUserDetails(context) {
     let { contact } = context.state;
 
     // Add the country code if missing
-    if (contact.indexOf('+91') !== 0) {
+    if (contect && contact.indexOf('+91') !== 0) {
       contact = '+91' + contact;
     }
 
