@@ -99,6 +99,13 @@
     !isPartialPayment &&
     !session.get('address');
 
+  /**
+   * A contact is said to be present if it has more than three characters,
+   * the three characters usually being "+91".
+   */
+  let isContactPresent;
+  $: isContactPresent = $contact && $contact.length > 3;
+
   export function showMethods() {
     view = 'methods';
 
@@ -249,7 +256,7 @@
     }
 
     // Missing contact
-    if (!($contact && $contact.length > 3)) {
+    if (!isContactPresent) {
       return false;
     }
 
@@ -395,11 +402,10 @@
     }
 
     /**
-     * If contact exists, get the instruments
+     * If contact is present, get the instruments
      * for the user.
      */
-    const doesContactExist = $contact && $contact.length > 3;
-    const _instruments = doesContactExist ? getInstruments() : [];
+    const _instruments = isContactPresent ? getInstruments() : [];
 
     /**
      * If there's just one method available,
@@ -721,7 +727,7 @@
                     <Icon icon={icons.contact} />
                   </i>
                   <div slot="title">
-                    {#if $contact && $contact.length > 3 && !hidden.contact}
+                    {#if isContactPresent && !hidden.contact}
                       <span>{$contact}</span>
                     {/if}
                     {#if $email && !hidden.email}
