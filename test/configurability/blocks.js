@@ -2,118 +2,135 @@ import * as Blocks from 'configurability/blocks';
 
 test('Module: configurability/blocks', t => {
   test('Blocks.createBlock', t => {
-    let code;
-    let config;
-    let expected;
-    let found;
+    test('Instrument and name', t => {
+      let code, config, expected, found;
 
-    code = 'block.hdfc';
-    config = {
-      name: 'Pay via HDFC Bank',
-      description: 'Make the paymnet using your HDFC account',
-      instruments: [
-        {
-          method: 'card',
-          issuers: ['HDFC'],
-        },
-        {
-          method: 'netbanking',
-          banks: ['HDFC'],
-        },
-        {
-          method: 'wallet',
-          wallets: ['payzapp'],
-        },
-      ],
-    };
+      code = 'block.hdfc';
+      config = {
+        name: 'Pay via HDFC Bank',
+        description: 'Make the paymnet using your HDFC account',
+        instruments: [
+          {
+            method: 'card',
+            issuers: ['HDFC'],
+          },
+          {
+            method: 'netbanking',
+            banks: ['HDFC'],
+          },
+          {
+            method: 'wallet',
+            wallets: ['payzapp'],
+          },
+        ],
+      };
 
-    expected = {
-      code: 'block.hdfc',
-      type: 'block',
-      instruments: [
-        {
-          method: 'card',
-          issuers: ['HDFC'],
-          type: 'instrument',
-        },
-        {
-          method: 'netbanking',
-          banks: ['HDFC'],
-          type: 'instrument',
-        },
-        {
-          method: 'wallet',
-          wallets: ['payzapp'],
-          type: 'instrument',
-        },
-      ],
-      title: 'Pay via HDFC Bank',
-    };
+      expected = {
+        code: 'block.hdfc',
+        type: 'block',
+        instruments: [
+          {
+            method: 'card',
+            issuers: ['HDFC'],
+            type: 'instrument',
+          },
+          {
+            method: 'netbanking',
+            banks: ['HDFC'],
+            type: 'instrument',
+          },
+          {
+            method: 'wallet',
+            wallets: ['payzapp'],
+            type: 'instrument',
+          },
+        ],
+        title: 'Pay via HDFC Bank',
+      };
 
-    found = Blocks.createBlock(code, config);
+      found = Blocks.createBlock(code, config);
 
-    t.deepEqual(found, expected, 'Creates a block with instruments and a name');
+      t.deepEqual(
+        found,
+        expected,
+        'Creates a block with instruments and a name'
+      );
 
-    code = 'block.netbanking';
-    config = {
-      name: 'Pay via Netbanking',
-      description: 'Make the paymnet using your HDFC account',
-    };
+      t.end();
+    });
 
-    expected = {
-      code: 'block.netbanking',
-      type: 'block',
-      title: 'Pay via Netbanking',
-    };
+    test('Without instruments', t => {
+      let code, config, expected, found;
 
-    found = Blocks.createBlock(code, config);
+      code = 'block.netbanking';
+      config = {
+        name: 'Pay via Netbanking',
+        description: 'Make the paymnet using your HDFC account',
+      };
 
-    t.deepEqual(found, expected, 'Creates a block without instruments');
+      expected = {
+        code: 'block.netbanking',
+        type: 'block',
+        title: 'Pay via Netbanking',
+      };
 
-    code = 'block.hdfc';
-    config = {
-      description: 'Make the paymnet using your HDFC account',
-      instruments: [
-        {
-          method: 'card',
-          issuers: ['HDFC'],
-        },
-        {
-          method: 'netbanking',
-          banks: ['HDFC'],
-        },
-        {
-          method: 'wallet',
-          wallets: ['payzapp'],
-        },
-      ],
-    };
+      found = Blocks.createBlock(code, config);
 
-    expected = {
-      code: 'block.hdfc',
-      type: 'block',
-      instruments: [
-        {
-          method: 'card',
-          issuers: ['HDFC'],
-          type: 'instrument',
-        },
-        {
-          method: 'netbanking',
-          banks: ['HDFC'],
-          type: 'instrument',
-        },
-        {
-          method: 'wallet',
-          wallets: ['payzapp'],
-          type: 'instrument',
-        },
-      ],
-    };
+      t.deepEqual(found, expected, 'Creates a block without instruments');
 
-    found = Blocks.createBlock(code, config);
+      t.end();
+    });
 
-    t.deepEqual(found, expected, 'Creates a block without a name');
+    test('Without name', t => {
+      let code, config, expected, found;
+
+      code = 'block.hdfc';
+      config = {
+        description: 'Make the paymnet using your HDFC account',
+        instruments: [
+          {
+            method: 'card',
+            issuers: ['HDFC'],
+          },
+          {
+            method: 'netbanking',
+            banks: ['HDFC'],
+          },
+          {
+            method: 'wallet',
+            wallets: ['payzapp'],
+          },
+        ],
+      };
+
+      expected = {
+        code: 'block.hdfc',
+        type: 'block',
+        instruments: [
+          {
+            method: 'card',
+            issuers: ['HDFC'],
+            type: 'instrument',
+          },
+          {
+            method: 'netbanking',
+            banks: ['HDFC'],
+            type: 'instrument',
+          },
+          {
+            method: 'wallet',
+            wallets: ['payzapp'],
+            type: 'instrument',
+          },
+        ],
+      };
+
+      found = Blocks.createBlock(code, config);
+
+      t.deepEqual(found, expected, 'Creates a block without a name');
+
+      t.end();
+    });
 
     t.end();
   });

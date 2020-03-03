@@ -2,80 +2,110 @@ import * as Instruments from 'configurability/instruments';
 
 test('Module: configurability/instruments', t => {
   test('Instruments.createInstrument', t => {
-    let config;
-    let expected;
-    let found;
+    test('Fails to create an instrument without a method', t => {
+      let config, expected, found;
 
-    config = {
-      card_types: ['credit'],
-    };
+      config = {
+        card_types: ['credit'],
+      };
 
-    found = Instruments.createInstrument(config);
+      found = Instruments.createInstrument(config);
 
-    t.notOk(found, expected, 'Fails to create an instrument without a method');
+      t.notOk(
+        found,
+        expected,
+        'Fails to create an instrument without a method'
+      );
 
-    config = {
-      card_types: ['credit'],
-      method: 'card',
-    };
+      t.end();
+    });
 
-    expected = {
-      card_types: ['credit'],
-      method: 'card',
-      type: 'instrument',
-    };
+    test('Creates instrument of type=instrument with instrument keys', t => {
+      let config, expected, found;
 
-    found = Instruments.createInstrument(config);
+      config = {
+        card_types: ['credit'],
+        method: 'card',
+      };
 
-    t.deepEqual(
-      found,
-      expected,
-      'Creates instrument of type=instrument with instrument keys'
-    );
+      expected = {
+        card_types: ['credit'],
+        method: 'card',
+        type: 'instrument',
+      };
 
-    config = {
-      method: 'netbanking',
-    };
+      found = Instruments.createInstrument(config);
 
-    expected = {
-      method: 'netbanking',
-      type: 'method',
-    };
+      t.deepEqual(
+        found,
+        expected,
+        'Creates instrument of type=instrument with instrument keys'
+      );
 
-    found = Instruments.createInstrument(config);
+      t.end();
+    });
 
-    t.deepEqual(
-      found,
-      expected,
-      'Creates instrument of type=method without instrument keys'
-    );
+    test('Creates instrument of type=method without instrument keys', t => {
+      let config, expected, found;
+
+      config = {
+        method: 'netbanking',
+      };
+
+      expected = {
+        method: 'netbanking',
+        type: 'method',
+      };
+
+      found = Instruments.createInstrument(config);
+
+      t.deepEqual(
+        found,
+        expected,
+        'Creates instrument of type=method without instrument keys'
+      );
+
+      t.end();
+    });
 
     t.end();
   });
 
   test('Instruments.isInstrumentForEntireMethod', t => {
-    let instrument;
-    let found;
+    test('Identifies instrument with keys as not a method instrument', t => {
+      let instrument, found;
 
-    instrument = {
-      card_types: ['credit'],
-      method: 'card',
-    };
+      instrument = {
+        card_types: ['credit'],
+        method: 'card',
+      };
 
-    found = Instruments.isInstrumentForEntireMethod(instrument);
+      found = Instruments.isInstrumentForEntireMethod(instrument);
 
-    t.false(
-      found,
-      'Identifies instrument with keys as not a method instrument'
-    );
+      t.false(
+        found,
+        'Identifies instrument with keys as not a method instrument'
+      );
 
-    instrument = {
-      method: 'netbanking',
-    };
+      t.end();
+    });
 
-    found = Instruments.isInstrumentForEntireMethod(instrument);
+    test('Identifies instrument without keys as a method instrument', t => {
+      let instrument, found;
 
-    t.true(found, 'Identifies instrument without keys as a method instrument');
+      instrument = {
+        method: 'netbanking',
+      };
+
+      found = Instruments.isInstrumentForEntireMethod(instrument);
+
+      t.true(
+        found,
+        'Identifies instrument without keys as a method instrument'
+      );
+
+      t.end();
+    });
 
     t.end();
   });
