@@ -38,11 +38,12 @@ function _translate(options, external) {
    * Create excluded instruments
    */
   const allExcludedInstruments =
-    _Arr.map(exclude, createInstrument) |> _Arr.filter(Boolean);
+    exclude |> _Arr.map(createInstrument) |> _Arr.filter(Boolean);
 
-  const excludedInstruments =
-    allExcludedInstruments
-    |> _Arr.filter(instrument => !isInstrumentForEntireMethod(instrument));
+  const excludedInstruments = _Arr.filter(
+    allExcludedInstruments,
+    instrument => !isInstrumentForEntireMethod(instrument)
+  );
 
   /**
    * Create disabled methods

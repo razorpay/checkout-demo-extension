@@ -25,9 +25,11 @@ function getBlocksWithNamedClusters(blocks) {
       return block;
     }
 
-    const methods =
-      block.instruments |> _Arr.map(instrument => instrument.method);
-    const names = methods |> _Arr.map(getMethodPrefix);
+    const methods = _Arr.map(
+      block.instruments,
+      instrument => instrument.method
+    );
+    const names = _Arr.map(methods, getMethodPrefix);
 
     let name;
 
@@ -111,5 +113,5 @@ export function clusterRazorpayBlocks(blocks) {
   // Push any pending clusters
   checkAndPushCluster();
 
-  return clustered |> getBlocksWithNamedClusters;
+  return getBlocksWithNamedClusters(clustered);
 }

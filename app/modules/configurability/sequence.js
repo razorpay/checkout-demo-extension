@@ -47,9 +47,9 @@ export function getSequencedBlocks(params) {
 
   // Get blocks mentioned in the sequence
   const sequencedBlocks =
-    _Arr.map(sequence, code =>
-      _Arr.find(allBlocks, block => block.code === code)
-    ) |> _Arr.filter(Boolean);
+    sequence
+    |> _Arr.map(code => _Arr.find(allBlocks, block => block.code === code))
+    |> _Arr.filter(Boolean);
 
   return sequencedBlocks;
 }
