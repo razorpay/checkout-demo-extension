@@ -1,5 +1,6 @@
 const createNetbankingTest = require('../../../create/netbanking');
 
 createNetbankingTest({
-  offers: true,
+  callbackUrl: true,
+  timeout: true,
 });
