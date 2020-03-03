@@ -12,6 +12,7 @@
   import Address from 'templates/views/address.svelte';
   import PaymentDetails from 'templates/views/PaymentDetails.svelte';
   import Callout from 'templates/views/ui/Callout.svelte';
+  import {INDIA_COUNTRY_CODE} from 'common/constants';
 
   // Svelte imports
   import { onMount } from 'svelte';
@@ -83,7 +84,7 @@
     hidden,
   } = CheckoutStore.get();
 
-  $contact = prefill.contact || '+91';
+  $contact = prefill.contact || INDIA_COUNTRY_CODE;
   $email = prefill.email || '';
 
   // Prop that decides which view to show.

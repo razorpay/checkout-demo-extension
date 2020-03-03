@@ -4080,7 +4080,7 @@ Session.prototype = {
     data.email = getEmail();
 
     // If it's the default contact details, do not send them
-    if (data.contact === '+91' || data.contact === '+') {
+    if (data.contact === Constants.INDIA_COUNTRY_CODE || data.contact === '+') {
       delete data.contact;
     }
 
