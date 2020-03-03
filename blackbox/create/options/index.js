@@ -1,3 +1,5 @@
+const Makers = require('./makers');
+
 const defaultFeatures = {
   timeout: false,
   keyless: false,
@@ -124,7 +126,7 @@ function makeOptionsAndPreferences(method, features = {}) {
   let options = makeTestOptions(features);
   let preferences = makeTestPreferences(features);
 
-  const maker = require(`./makers/${method}`);
+  const maker = Makers[method];
 
   options = maker.makeOptions(features, options);
   preferences = maker.makePreferences(features, preferences);
