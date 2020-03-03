@@ -75,9 +75,14 @@ async function assertBasicDetailsScreen(context) {
   if (!context.prefilledContact && !context.isContactOptional) {
     const $contact = await $form.$('#contact');
 
-    expect(await $contact.evaluate(el => el.value)).toEqual(
-      context.prefilledContact
-    );
+    let contact = context.prefilledContact;
+
+    // Add the country code if missing
+    if (contact.indexOf('+91') !== 0) {
+      contact = '+91' + contact;
+    }
+
+    expect(await $contact.evaluate(el => el.value)).toEqual(contact);
   }
   if (!context.prefilledEmail && !context.isEmailOptional) {
     const $email = await $form.$('#email');
@@ -116,6 +121,11 @@ async function assertMissingDetails(context) {
 async function fillUserDetails(context, number) {
   let contact = context.prefilledEmail || number || randomContact();
   let email = context.prefilledContact || randomEmail();
+
+  // "+91" is already typed, remove the country code
+  if (contact.indexOf('+91') === 0) {
+    contact = contact.replace('+91', '');
+  }
 
   if (!context.prefilledContact && !context.isContactOptional) {
     await context.page.type('#contact', contact);
@@ -157,7 +167,12 @@ async function proceed(context) {
  */
 async function assertUserDetails(context) {
   if (!context.preferences.customer) {
-    const { contact, email } = context.state;
+    let { contact, email } = context.state;
+
+    // Add the country code if missing
+    if (contact.indexOf('+91') !== 0) {
+      contact = '+91' + contact;
+    }
 
     const first = contact || email;
     const last = email;
