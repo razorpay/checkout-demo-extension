@@ -1,12 +1,13 @@
 import { createMethodBlock } from './methods';
 
 /**
- *
+ * Transforms the list of blocks into the order defined in the
+ * sequence option provided by the merchant
  * @param {Object} params
  *  @prop {Object} translated Translated config
  *    @prop {Array<Block>} blocks
  *    @prop {Object} exclude
- *      @prop {Array<Instruments>} instruments Excluded insturments
+ *      @prop {Array<Instrument>} instruments Excluded insturments
  *      @prop {Array<string>} methods Excluded methods
  *  @prop {Object} original Original Merchant config
  *  @prop {Array<string>} methods Available methods for the merchant
