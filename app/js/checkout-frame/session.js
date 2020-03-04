@@ -1949,7 +1949,11 @@ Session.prototype = {
     var topbarImages = createCardlessEmiTopbarImages(providerCode);
     tab_titles.otp = topbarImages;
 
-    this.commenceOTP(cardlessEmiProviderObj.name + ' account', true);
+    this.commenceOTP(
+      cardlessEmiProviderObj.name + ' account',
+      true,
+      'cardless_emi_enter'
+    );
 
     if (this.screen !== 'otp' && this.tab !== 'cardless_emi') {
       return;
@@ -2057,12 +2061,16 @@ Session.prototype = {
       self.otpView.setText(discreet.wrongOtpMsg);
       return;
     } else if (action === 'resend') {
-      this.commenceOTP('Resending OTP...');
+      this.commenceOTP('Resending OTP...', false, 'paylater_resend');
     } else if (action === 'verify') {
       this.commenceOTP('Verifying OTP...');
       return;
     } else {
-      this.commenceOTP(payLaterProviderObj.name + ' account', true);
+      this.commenceOTP(
+        payLaterProviderObj.name + ' account',
+        true,
+        'paylater_enter'
+      );
     }
 
     this.checkCustomerStatus(params, function(error) {
@@ -2898,7 +2906,8 @@ Session.prototype = {
       });
   },
 
-  setScreen: function(screen) {
+  setScreen: function(screen, params) {
+    var extraProps = params && params.extraProps;
     if (screen) {
       var screenTitle =
         this.tab === 'emi'
@@ -2937,11 +2946,17 @@ Session.prototype = {
       this.currentScreen = null;
     }
 
+    var trackingData = {
+      from: this.screen,
+      to: screen,
+    };
+
+    if (extraProps) {
+      trackingData = _Obj.extend(trackingData, extraProps);
+    }
+
     Analytics.track('screen:switch', {
-      data: {
-        from: this.screen,
-        to: screen,
-      },
+      data: trackingData,
     });
     Analytics.setMeta('screen', screen);
     Analytics.setMeta('timeSince.screen', discreet.timer());
@@ -3592,7 +3607,7 @@ Session.prototype = {
     });
 
     if (!customer.logged && !this.wants_skip) {
-      self.commenceOTP('saved cards', true);
+      self.commenceOTP('saved cards', true, 'saved_cards_access');
       customer.checkStatus(function() {
         /**
          * 1. If this is a recurring payment and customer doesn't have saved cards,
@@ -4216,8 +4231,16 @@ Session.prototype = {
     }
   },
 
-  commenceOTP: function(text, partial) {
-    this.setScreen('otp');
+  commenceOTP: function(text, partial, reason) {
+    var params = {
+      extraProps: {},
+    };
+
+    if (reason) {
+      params.extraProps.reason = reason;
+    }
+
+    this.setScreen('otp', params);
 
     this.otpView.updateScreen({
       addFunds: false,
@@ -4874,7 +4897,7 @@ Session.prototype = {
           skipText: 'Skip saving card',
         });
         Analytics.track('saved_cards:save:otp:ask');
-        this.commenceOTP(strings.otpsend);
+        this.commenceOTP(strings.otpsend, false, 'saved_cards_save');
         debounceAskOTP(this.otpView, undefined, true);
         return this.customer.createOTP();
       } else if (!this.headless) {
@@ -5107,9 +5130,15 @@ Session.prototype = {
       }
 
       if (shouldUseNativeOTP) {
+        var params = {
+          extraProps: {
+            reason: 'native_otp_enter',
+          },
+        };
+
         this.headless = true;
         Analytics.track('native_otp:attempt');
-        this.setScreen('otp');
+        this.setScreen('otp', params);
         this.r.on('payment.otp.required', function(data) {
           askOTP(that.otpView, data);
         });
@@ -5137,7 +5166,7 @@ Session.prototype = {
       });
       tab_titles.otp =
         '<img src="' + walletObj.logo + '" height="' + walletObj.h + '">';
-      this.commenceOTP(wallet + ' account', true);
+      this.commenceOTP(wallet + ' account', true, 'wallet_enter');
     } else if (!this.isPayout) {
       this.showLoadError();
     } else {
