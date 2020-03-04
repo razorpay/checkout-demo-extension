@@ -238,6 +238,8 @@ function improvisePrefilledContact(session) {
   if (prefilledContact !== newContact) {
     session.set('prefill.contact', newContact);
 
+    Analytics.setMeta('improvised.prefilledContact', true);
+
     Analytics.track('prefill:improvise', {
       data: {
         type: 'contact',
