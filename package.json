@@ -34,17 +34,17 @@
     "url": "git@github.com:razorpay/checkout.git"
   },
   "scripts": {
-    "test:unit": "./rollup.test.js | tap-difflet",
+    "start": "$ gulp watch",
+    "build": "$ rollup -c --environment prod && $ gulp && $ lintOutput app/js/generated/entry",
+    "lint-fix": "$ lintFix app/modules",
+    "clean": "$ ./scripts/clean.sh",
     "jest:base": "jest blackbox/tests/homescreen/**/base.test.js --testTimeout=40000",
     "jest:netbanking": "jest blackbox/tests/homescreen/netbanking --testTimeout=40000",
     "jest": "jest blackbox/tests/homescreen/ --testTimeout=40000",
-    "test:base": "npm run test:unit && npm run build && npm run jest:base && npm run jest:netbanking",
-    "test": "npm run test:unit && npm run build && npm run jest",
-    "test:build": "if test \"$BRANCH\" = \"dev\" ; then npm run test ; else npm run test:base ; fi",
-    "lint-fix": "$ lintFix app/modules",
-    "build": "$ rollup -c --environment prod && $ gulp && $ lintOutput app/js/generated/entry",
-    "start": "$ gulp watch",
-    "clean": "$ ./scripts/clean.sh"
+    "test:all": "npm run test:unit && npm run build && npm run jest",
+    "test:base": "npm run test:unit && npm run build && npm run jest:base",
+    "test:unit": "./rollup.test.js | tap-difflet",
+    "test": "if test \"$BRANCH\" = \"dev-tests-all\" ; then npm run test:all ; else npm run test:base ; fi"
   },
   "bugs": {
     "url": "https://github.com/razorpay/checkout/issues"
