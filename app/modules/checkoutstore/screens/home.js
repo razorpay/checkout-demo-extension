@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { readable, writable } from 'svelte/store';
 
 export const contact = writable('+');
 export const email = writable('');
@@ -13,10 +13,22 @@ export const partialPaymentOption = writable();
 export const partialPaymentAmount = writable('');
 
 /**
+ * A contact is said to be present if it has more than three characters,
+ * the three characters usually being "+91".
+ */
+export const isContactPresent = readable(false, set => {
+  contact.subscribe(value => {
+    const isPresent = value && value !== '+91' && value !== '+';
+
+    set(isPresent);
+  });
+});
+
+/**
  * Toggle visibility of contact details in the topbar
  * depending on the presence of contact number.
  */
-contact.subscribe(value => {
+isContactPresent.subscribe(value => {
   const topbar = _Doc.querySelector('#topbar #top-right');
 
   if (topbar) {
