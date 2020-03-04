@@ -15,7 +15,7 @@
 
   // UI imports
   import Attachment from 'ui/elements/Attachment.svelte';
-  import DocumentIllustration from 'ui/illustrations/nach/Document.svelte/';
+  import DocumentIllustration from 'ui/tabs/nach/document-illustration.svelte';
   import Note from 'ui/elements/Note.svelte';
   import Tab from 'ui/tabs/Tab.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
