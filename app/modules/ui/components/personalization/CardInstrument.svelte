@@ -1,6 +1,6 @@
 <script>
   // UI imports
-  import Field from 'ui/elements/Field.svelte';
+  import Field from 'ui/components/Field.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import Icon from 'ui/elements/Icon.svelte';
 

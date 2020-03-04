@@ -1,7 +1,7 @@
 <script>
   // UI Imports
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
-  import PartialPaymentAmountField from 'ui/elements/fields/PartialPaymentAmountField.svelte';
+  import PartialPaymentAmountField from 'ui/components/PartialPaymentAmountField.svelte';
 
   // Store
   import {

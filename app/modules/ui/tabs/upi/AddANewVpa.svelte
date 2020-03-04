@@ -4,7 +4,7 @@
   import { slide } from 'svelte/transition';
 
   // UI Imports
-  import Field from 'ui/elements/Field.svelte';
+  import Field from 'ui/components/Field.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import Checkbox from 'ui/elements/Checkbox.svelte';

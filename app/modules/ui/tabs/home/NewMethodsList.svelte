@@ -8,9 +8,9 @@
   export let customer = {};
 
   // UI imports
-  import Method from 'ui/elements/methods/Method.svelte';
-  import CardInstrument from 'ui/elements/Personalization/CardInstrument.svelte';
-  import Instrument from 'ui/elements/Personalization/Instrument.svelte';
+  import Method from 'ui/tabs/home/Method.svelte';
+  import CardInstrument from 'ui/components/personalization/CardInstrument.svelte';
+  import Instrument from 'ui/components/personalization/Instrument.svelte';
 
   // Utils imports
   import { AVAILABLE_METHODS } from 'common/constants';

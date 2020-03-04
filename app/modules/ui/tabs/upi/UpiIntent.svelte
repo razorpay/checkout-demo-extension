@@ -12,7 +12,7 @@
   import RadioOption from 'ui/elements/options/RadioOption.svelte';
   import NextOption from 'ui/elements/options/NextOption.svelte';
   import OptionIcon from 'ui/elements/options/OptionIcon.svelte';
-  import Field from 'ui/elements/Field.svelte';
+  import Field from 'ui/components/Field.svelte';
   import ListHeader from 'ui/elements/ListHeader.svelte';
   import Icon from 'ui/elements/Icon.svelte';
 

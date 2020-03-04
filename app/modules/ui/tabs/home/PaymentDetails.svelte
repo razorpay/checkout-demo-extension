@@ -5,8 +5,8 @@
   import MultiTpvOptions from 'ui/elements/MultiTpvOptions.svelte';
   import TpvBank from 'ui/elements/TpvBank.svelte';
   import CardOffer from 'ui/elements/CardOffer.svelte';
-  import ContactField from 'ui/elements/fields/ContactField.svelte';
-  import EmailField from 'ui/elements/fields/EmailField.svelte';
+  import ContactField from 'ui/components/ContactField.svelte';
+  import EmailField from 'ui/components/EmailField.svelte';
 
   // Store
   import {

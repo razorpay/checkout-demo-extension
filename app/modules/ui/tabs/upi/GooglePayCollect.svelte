@@ -3,7 +3,7 @@
   import { createEventDispatcher, onMount } from 'svelte';
 
   // UI imports
-  import Field from 'ui/elements/Field.svelte';
+  import Field from 'ui/components/Field.svelte';
   import Card from 'ui/elements/Card.svelte';
 
   // Props

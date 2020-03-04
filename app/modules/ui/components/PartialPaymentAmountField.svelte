@@ -1,7 +1,7 @@
 <script>
   import { createEventDispatcher } from 'svelte';
 
-  import Field from 'ui/elements/Field.svelte';
+  import Field from 'ui/components/Field.svelte';
   import Checkbox from 'ui/elements/Checkbox.svelte';
 
   import { getSession } from 'sessionmanager';

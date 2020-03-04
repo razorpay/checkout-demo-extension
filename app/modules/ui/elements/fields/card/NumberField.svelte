@@ -3,7 +3,7 @@
   import { createEventDispatcher } from 'svelte';
 
   // UI Imports
-  import Field from 'ui/elements/Field.svelte';
+  import Field from 'ui/components/Field.svelte';
   import Icon from 'ui/elements/Icon.svelte';
 
   // Utils

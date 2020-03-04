@@ -1,6 +1,5 @@
 <script>
-  import Field from 'ui/elements/Field.svelte';
-  import { getSession } from 'sessionmanager';
+  import Field from 'ui/components/Field.svelte';
 
   export let value = '';
   export let ref = null;

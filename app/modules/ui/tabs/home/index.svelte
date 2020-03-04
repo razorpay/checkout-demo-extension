@@ -2,11 +2,11 @@
   // UI imports
   import Tab from 'ui/tabs/Tab.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
-  import Field from 'ui/elements/Field.svelte';
+  import Field from 'ui/components/Field.svelte';
   import PartialPaymentOptions from 'ui/tabs/home/partialpaymentoptions.svelte';
   import RadioOption from 'ui/elements/options/RadioOption.svelte';
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
-  import NewMethodsList from 'ui/elements/methods/NewMethodsList.svelte';
+  import NewMethodsList from 'ui/tabs/home/NewMethodsList.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import OffersPortal from 'ui/views/OffersPortal.svelte';
   import Address from 'ui/views/address.svelte';

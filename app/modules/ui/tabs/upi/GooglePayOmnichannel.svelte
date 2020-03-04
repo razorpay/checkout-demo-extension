@@ -7,7 +7,7 @@
   import { getSession } from 'sessionmanager';
 
   // UI imports
-  import Field from 'ui/elements/Field.svelte';
+  import Field from 'ui/components/Field.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import Card from 'ui/elements/Card.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';

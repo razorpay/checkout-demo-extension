@@ -28,7 +28,7 @@
   import Grid from 'ui/elements/grid/Base.svelte';
   import Card from 'ui/elements/Card.svelte';
   import ListHeader from 'ui/elements/ListHeader.svelte';
-  import Field from 'ui/elements/Field.svelte';
+  import Field from 'ui/components/Field.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
   import Collect from './Collect.svelte';
@@ -38,7 +38,6 @@
   import Screen from 'ui/layouts/Screen.svelte';
   import OffersPortal from 'ui/views/OffersPortal.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
-  import PartialPaymentAmountField from 'ui/elements/fields/PartialPaymentAmountField.svelte';
   import AddANewVpa from './AddANewVpa.svelte';
   import { getMiscIcon } from 'icons/misc';
 

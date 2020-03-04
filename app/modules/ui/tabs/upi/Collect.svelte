@@ -3,7 +3,7 @@
   import { onMount } from 'svelte';
 
   // UI Imports
-  import Field from 'ui/elements/Field.svelte';
+  import Field from 'ui/components/Field.svelte';
   import Card from 'ui/elements/Card.svelte';
 
   // Util imports
