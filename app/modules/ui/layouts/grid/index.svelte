@@ -3,7 +3,7 @@
   import { createEventDispatcher } from 'svelte';
 
   // UI imports
-  import Item from './Item.svelte';
+  import Item from './item.svelte';
 
   // Props
   export let items = [];

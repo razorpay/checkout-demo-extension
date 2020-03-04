@@ -25,7 +25,7 @@
   // UI imports
   import UpiIntent from './UpiIntent.svelte';
   import Tab from 'ui/tabs/Tab.svelte';
-  import Grid from 'ui/elements/grid/Base.svelte';
+  import Grid from 'ui/layouts/grid/index.svelte';
   import Card from 'ui/elements/Card.svelte';
   import ListHeader from 'ui/elements/ListHeader.svelte';
   import Field from 'ui/components/Field.svelte';
