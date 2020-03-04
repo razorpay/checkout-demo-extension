@@ -123,8 +123,8 @@ async function assertMissingDetails(context) {
  * Fill user contact and email
  */
 async function fillUserDetails(context, number) {
-  let contact = context.prefilledEmail || number || randomContact();
-  let email = context.prefilledContact || randomEmail();
+  let contact = context.prefilledContact || number || randomContact();
+  let email = context.prefilledEmail || randomEmail();
 
   // "+91" is already typed, remove the country code
   if (contact && contact.indexOf('+91') === 0) {
