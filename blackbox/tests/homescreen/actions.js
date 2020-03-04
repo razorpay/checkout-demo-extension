@@ -82,6 +82,10 @@ async function assertBasicDetailsScreen(context) {
       contact = '+91' + contact;
     }
 
+    if (!contact) {
+      contact = '+91';
+    }
+
     expect(await $contact.evaluate(el => el.value)).toEqual(contact);
   }
   if (!context.prefilledEmail && !context.isEmailOptional) {
