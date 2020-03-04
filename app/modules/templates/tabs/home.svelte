@@ -12,6 +12,7 @@
   import Address from 'templates/views/address.svelte';
   import PaymentDetails from 'templates/views/PaymentDetails.svelte';
   import Callout from 'templates/views/ui/Callout.svelte';
+  import { INDIA_COUNTRY_CODE } from 'common/constants';
 
   // Svelte imports
   import { onMount } from 'svelte';
@@ -83,13 +84,12 @@
     hidden,
   } = CheckoutStore.get();
 
-  $contact = prefill.contact || '';
+  $contact = prefill.contact || INDIA_COUNTRY_CODE;
   $email = prefill.email || '';
 
   // Prop that decides which view to show.
   // Values: 'details', 'methods'
   let view = 'details';
-
   let showSecuredByMessage;
   $: showSecuredByMessage =
     view === 'details' &&
@@ -99,6 +99,13 @@
     !session.tpvBank &&
     !isPartialPayment &&
     !session.get('address');
+
+  /**
+   * A contact is said to be present if it has more than three characters,
+   * the three characters usually being "+91".
+   */
+  let isContactPresent;
+  $: isContactPresent = $contact && $contact.length > 3;
 
   export function showMethods() {
     view = 'methods';
@@ -250,7 +257,7 @@
     }
 
     // Missing contact
-    if (!$contact || !$contact.length) {
+    if (!isContactPresent) {
       return false;
     }
 
@@ -396,11 +403,10 @@
     }
 
     /**
-     * If contact exists, get the instruments
+     * If contact is present, get the instruments
      * for the user.
      */
-    const doesContactExist = $contact && $contact.length;
-    const _instruments = doesContactExist ? getInstruments() : [];
+    const _instruments = isContactPresent ? getInstruments() : [];
 
     /**
      * If there's just one method available,
@@ -619,7 +625,7 @@
 
   let showUserDetailsStrip;
   $: {
-    showUserDetailsStrip = ($contact || $email) && !contactEmailHidden;
+    showUserDetailsStrip = (isContactPresent || $email) && !contactEmailHidden;
   }
 </script>
 
@@ -722,7 +728,7 @@
                     <Icon icon={icons.contact} />
                   </i>
                   <div slot="title">
-                    {#if $contact && !hidden.contact}
+                    {#if isContactPresent && !hidden.contact}
                       <span>{$contact}</span>
                     {/if}
                     {#if $email && !hidden.email}

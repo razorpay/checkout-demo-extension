@@ -220,6 +220,37 @@ function fillData(container, returnObj) {
 }
 
 /**
+ * Improvise the contact from prefill
+ * @param {Session} session
+ */
+function improvisePrefilledContact(session) {
+  var prefilledContact = session.get('prefill.contact');
+
+  if (!prefilledContact) {
+    return;
+  }
+
+  var formattedContact = discreet.CountryCodesUtil.findCountryCode(
+    prefilledContact
+  );
+  var newContact = '+' + formattedContact.code + formattedContact.phone;
+
+  if (prefilledContact !== newContact) {
+    session.set('prefill.contact', newContact);
+
+    Analytics.setMeta('improvised.prefilledContact', true);
+
+    Analytics.track('prefill:improvise', {
+      data: {
+        type: 'contact',
+        from: prefilledContact,
+        to: newContact,
+      },
+    });
+  }
+}
+
+/**
  * Returns the cardType from payload
  *
  * @param {Object} payload
@@ -2172,6 +2203,8 @@ Session.prototype = {
     ) {
       this.set('prefill.method', 'cardless_emi');
     }
+
+    improvisePrefilledContact(this);
   },
 
   /**
@@ -4047,6 +4080,11 @@ Session.prototype = {
 
     data.contact = getPhone();
     data.email = getEmail();
+
+    // If it's the default contact details, do not send them
+    if (data.contact === Constants.INDIA_COUNTRY_CODE || data.contact === '+') {
+      delete data.contact;
+    }
 
     var prefillEmail = this.get('prefill.email');
     var prefillContact = this.get('prefill.contact');

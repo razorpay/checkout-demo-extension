@@ -206,10 +206,7 @@ Formatter.rules = {
   phone: {
     raw: function(value) {
       let returnVal = value.slice(0, 15).replace(/\D/g, '');
-      if (value[0] === '+') {
-        returnVal = '+' + returnVal;
-      }
-      return returnVal;
+      return `+${returnVal}`;
     },
 
     isValid: function(value) {

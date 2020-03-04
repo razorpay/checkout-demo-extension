@@ -33,6 +33,7 @@
     required={!optional.contact}
     pattern={CONTACT_REGEX}
     readonly={isContactReadonly}
+    formatter={{ type: 'phone' }}
     {label}
     icon="&#xe607;"
     on:input={e => (value = e.target.value)}

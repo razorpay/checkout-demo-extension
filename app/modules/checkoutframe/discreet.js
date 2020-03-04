@@ -29,6 +29,7 @@ import * as Curtain from 'components/curtain';
 import { setShieldParams } from 'payment/validator';
 import * as P13n from 'checkoutframe/personalization';
 import { commonBanks, getFullBankLogo } from 'common/bank';
+import * as CountryCodesUtil from 'common/countrycodesutil';
 
 /* Required for merchant.js migration */
 import * as Constants from 'common/constants';
@@ -127,6 +128,7 @@ export default {
   Flows,
   Downtimes,
   Payouts,
+  CountryCodesUtil,
 
   Store,
   PreferencesStore,
