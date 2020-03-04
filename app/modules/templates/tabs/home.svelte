@@ -12,7 +12,7 @@
   import Address from 'templates/views/address.svelte';
   import PaymentDetails from 'templates/views/PaymentDetails.svelte';
   import Callout from 'templates/views/ui/Callout.svelte';
-  import {INDIA_COUNTRY_CODE} from 'common/constants';
+  import { INDIA_COUNTRY_CODE } from 'common/constants';
 
   // Svelte imports
   import { onMount } from 'svelte';
@@ -625,7 +625,7 @@
 
   let showUserDetailsStrip;
   $: {
-    showUserDetailsStrip = ($contact || $email) && !contactEmailHidden;
+    showUserDetailsStrip = (isContactPresent || $email) && !contactEmailHidden;
   }
 </script>
 
