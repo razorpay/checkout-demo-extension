@@ -10,7 +10,7 @@
   import Screen from 'ui/layouts/Screen.svelte';
   import AddCardView from 'ui/views/AddCardView.svelte';
   import EmiActions from 'ui/views/EmiActions.svelte';
-  import SavedCards from 'ui/screens/savedcards.svelte';
+  import SavedCards from 'ui/tabs/card/savedcards.svelte';
   import OffersPortal from 'ui/views/OffersPortal.svelte';
 
   // Store

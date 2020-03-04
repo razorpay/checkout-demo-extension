@@ -1,7 +1,7 @@
 <script>
   // UI imports
   import Callout from 'ui/views/ui/Callout.svelte';
-  import EmiPlanCard from 'ui/tabs/emiplans/emiplancard.svelte';
+  import EmiPlanCard from 'ui/tabs/emi/emiplancard.svelte';
 
   // Props
   export let actions;

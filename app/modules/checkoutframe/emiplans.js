@@ -1,4 +1,4 @@
-import EMIPlansView from 'ui/screens/emiplans.svelte';
+import EMIPlansView from 'ui/tabs/emi/emiplans.svelte';
 import * as TermsCurtain from 'checkoutframe/termscurtain';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';

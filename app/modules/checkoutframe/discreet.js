@@ -63,16 +63,16 @@ import * as CardScreenStore from 'checkoutstore/screens/card';
 import QRScreen from 'ui/views/qr.svelte';
 import BankTransferScreen from 'ui/views/bank_transfer.svelte';
 import UpiTab from 'ui/tabs/upi/index.svelte';
-import emiOptionsView from 'ui/screens/cardlessemi.svelte';
-import emiScreenView from 'ui/screens/emiscreen.svelte';
-import PayLaterView from 'ui/screens/paylater.svelte';
-import HomeTab from 'ui/tabs/home.svelte';
+import emiOptionsView from 'ui/tabs/cardless-emi/index.svelte';
+import emiScreenView from 'ui/tabs/emi/emiscreen.svelte';
+import PayLaterView from 'ui/tabs/paylater/index.svelte';
+import HomeTab from 'ui/tabs/home/index.svelte';
 import NetbankingTab from 'ui/tabs/netbanking/index.svelte';
 import NachScreen from 'ui/views/nach.svelte';
-import CardTab from 'ui/tabs/card/card.svelte';
+import CardTab from 'ui/tabs/card/index.svelte';
 
-import PayoutsInstruments from 'ui/screens/payout-instruments.svelte';
-import PayoutAccount from 'ui/screens/payout-account.svelte';
+import PayoutsInstruments from 'ui/tabs/payout/payout-instruments.svelte';
+import PayoutAccount from 'ui/tabs/payout/payout-account.svelte';
 
 import * as Hacks from 'checkoutframe/hacks';
 
