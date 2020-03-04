@@ -8,8 +8,8 @@
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import NewMethodsList from 'ui/tabs/home/NewMethodsList.svelte';
   import Icon from 'ui/elements/Icon.svelte';
-  import OffersPortal from 'ui/views/OffersPortal.svelte';
-  import Address from 'ui/views/address.svelte';
+  import OffersPortal from 'ui/components/OffersPortal.svelte';
+  import Address from 'ui/elements/address.svelte';
   import PaymentDetails from 'ui/tabs/home/PaymentDetails.svelte';
   import Callout from 'ui/elements/Callout.svelte';
   import { INDIA_COUNTRY_CODE } from 'common/constants';

@@ -9,9 +9,9 @@
   import Callout from 'ui/elements/Callout.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
   import AddCardView from 'ui/tabs/card/AddCardView.svelte';
-  import EmiActions from 'ui/views/EmiActions.svelte';
+  import EmiActions from 'ui/components/EmiActions.svelte';
   import SavedCards from 'ui/tabs/card/savedcards.svelte';
-  import OffersPortal from 'ui/views/OffersPortal.svelte';
+  import OffersPortal from 'ui/components/OffersPortal.svelte';
 
   // Store
   import {

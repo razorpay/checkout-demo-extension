@@ -5,7 +5,7 @@
   // UI imports
   import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
-  import FeeBearer from 'ui/views/feebearer.svelte';
+  import FeeBearer from 'ui/components/feebearer.svelte';
 
   // Utils imports
   import RazorpayConfig from 'common/RazorpayConfig';

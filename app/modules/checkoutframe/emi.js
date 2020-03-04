@@ -1,5 +1,5 @@
 /* global templates, showOverlay, hideEmi, Event */
-import EmiView from 'ui/views/emi.svelte';
+import EmiView from 'ui/components/emi.svelte';
 import { getSession } from 'sessionmanager';
 
 const bankOverrides = {

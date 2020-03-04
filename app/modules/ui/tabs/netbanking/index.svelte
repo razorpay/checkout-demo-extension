@@ -9,7 +9,7 @@
   import Callout from 'ui/elements/Callout.svelte';
   import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
-  import OffersPortal from 'ui/views/OffersPortal.svelte';
+  import OffersPortal from 'ui/components/OffersPortal.svelte';
 
   // Utils imports
   import Razorpay from 'common/Razorpay';

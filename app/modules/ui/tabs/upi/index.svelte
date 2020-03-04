@@ -36,7 +36,7 @@
   import GooglePayOmnichannel from './GooglePayOmnichannel.svelte';
   import NextOption from 'ui/elements/options/NextOption.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
-  import OffersPortal from 'ui/views/OffersPortal.svelte';
+  import OffersPortal from 'ui/components/OffersPortal.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import AddANewVpa from './AddANewVpa.svelte';
   import { getMiscIcon } from 'icons/misc';
