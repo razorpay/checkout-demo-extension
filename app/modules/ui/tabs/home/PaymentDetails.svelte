@@ -1,6 +1,6 @@
 <script>
   // UI imports
-  import PartialPaymentOptions from 'ui/views/partialpaymentoptions.svelte';
+  import PartialPaymentOptions from 'ui/tabs/home/partialpaymentoptions.svelte';
   import Address from 'ui/views/address.svelte';
   import MultiTpvOptions from 'ui/views/ui/MultiTpvOptions.svelte';
   import TpvBank from 'ui/views/ui/TpvBank.svelte';

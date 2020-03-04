@@ -3,14 +3,14 @@
   import Tab from 'ui/tabs/Tab.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
   import Field from 'ui/views/ui/Field.svelte';
-  import PartialPaymentOptions from 'ui/views/partialpaymentoptions.svelte';
+  import PartialPaymentOptions from 'ui/tabs/home/partialpaymentoptions.svelte';
   import RadioOption from 'ui/views/ui/options/RadioOption.svelte';
   import SlottedOption from 'ui/views/ui/options/Slotted/Option.svelte';
   import NewMethodsList from 'ui/views/ui/methods/NewMethodsList.svelte';
   import Icon from 'ui/views/ui/Icon.svelte';
   import OffersPortal from 'ui/views/OffersPortal.svelte';
   import Address from 'ui/views/address.svelte';
-  import PaymentDetails from 'ui/views/PaymentDetails.svelte';
+  import PaymentDetails from 'ui/tabs/home/PaymentDetails.svelte';
   import Callout from 'ui/views/ui/Callout.svelte';
   import { INDIA_COUNTRY_CODE } from 'common/constants';
 
