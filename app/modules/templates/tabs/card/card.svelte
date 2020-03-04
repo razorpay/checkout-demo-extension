@@ -226,6 +226,10 @@
     }
   }
 
+  export function getTransformedTokens() {
+    return allSavedCards;
+  }
+
   export function isOnSavedCardsScreen() {
     return currentView === Views.SAVED_CARDS;
   }
