@@ -13,7 +13,7 @@ import * as UPIUtils from 'common/upi';
 import * as EmiUtils from 'common/emi';
 import * as GPay from 'gpay';
 import * as Color from 'lib/color';
-import * as _PaymentMethodIcons from 'ui/paymentMethodIcons';
+import * as _PaymentMethodIcons from 'ui/icons/payment-methods';
 import * as Confirm from 'confirm';
 import Callout from 'callout';
 import * as Currency from 'common/currency';
