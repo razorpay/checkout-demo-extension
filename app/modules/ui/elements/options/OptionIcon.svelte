@@ -1,6 +1,6 @@
 <script>
   // UI imports
-  import Icon from 'ui/views/ui/Icon.svelte';
+  import Icon from 'ui/elements/Icon.svelte';
 
   // Props
   export let icon;

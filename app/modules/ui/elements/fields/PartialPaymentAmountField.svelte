@@ -1,8 +1,8 @@
 <script>
   import { createEventDispatcher } from 'svelte';
 
-  import Field from 'ui/views/ui/Field.svelte';
-  import Checkbox from 'ui/views/ui/Checkbox.svelte';
+  import Field from 'ui/elements/Field.svelte';
+  import Checkbox from 'ui/elements/Checkbox.svelte';
 
   import { getSession } from 'sessionmanager';
   import { getCurrencyConfig } from 'common/currency';

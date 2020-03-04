@@ -6,7 +6,7 @@
 
   // UI Imports
   import Tab from 'ui/tabs/Tab.svelte';
-  import Callout from 'ui/views/ui/Callout.svelte';
+  import Callout from 'ui/elements/Callout.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
   import AddCardView from 'ui/tabs/card/AddCardView.svelte';
   import EmiActions from 'ui/views/EmiActions.svelte';

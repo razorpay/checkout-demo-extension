@@ -1,8 +1,8 @@
 <script>
   // UI Imports
-  import AddressField from 'ui/views/ui/fields/AddressField.svelte';
-  import PinCodeField from 'ui/views/ui/fields/PinCodeField.svelte';
-  import StateField from 'ui/views/ui/fields/StateField.svelte';
+  import AddressField from 'ui/elements/fields/AddressField.svelte';
+  import PinCodeField from 'ui/elements/fields/PinCodeField.svelte';
+  import StateField from 'ui/elements/fields/StateField.svelte';
 
   // Props
   export let states;

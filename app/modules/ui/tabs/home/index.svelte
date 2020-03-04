@@ -2,16 +2,16 @@
   // UI imports
   import Tab from 'ui/tabs/Tab.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
-  import Field from 'ui/views/ui/Field.svelte';
+  import Field from 'ui/elements/Field.svelte';
   import PartialPaymentOptions from 'ui/tabs/home/partialpaymentoptions.svelte';
-  import RadioOption from 'ui/views/ui/options/RadioOption.svelte';
-  import SlottedOption from 'ui/views/ui/options/Slotted/Option.svelte';
-  import NewMethodsList from 'ui/views/ui/methods/NewMethodsList.svelte';
-  import Icon from 'ui/views/ui/Icon.svelte';
+  import RadioOption from 'ui/elements/options/RadioOption.svelte';
+  import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
+  import NewMethodsList from 'ui/elements/methods/NewMethodsList.svelte';
+  import Icon from 'ui/elements/Icon.svelte';
   import OffersPortal from 'ui/views/OffersPortal.svelte';
   import Address from 'ui/views/address.svelte';
   import PaymentDetails from 'ui/tabs/home/PaymentDetails.svelte';
-  import Callout from 'ui/views/ui/Callout.svelte';
+  import Callout from 'ui/elements/Callout.svelte';
   import { INDIA_COUNTRY_CODE } from 'common/constants';
 
   // Svelte imports

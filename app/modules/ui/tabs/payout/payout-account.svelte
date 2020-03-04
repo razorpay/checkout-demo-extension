@@ -1,6 +1,6 @@
 <script>
   // UI imports
-  import Field from 'ui/views/ui/Field.svelte';
+  import Field from 'ui/elements/Field.svelte';
   import Tab from 'ui/tabs/Tab.svelte';
 
   // Refs

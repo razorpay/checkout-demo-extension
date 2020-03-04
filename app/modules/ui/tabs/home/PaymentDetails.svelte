@@ -2,11 +2,11 @@
   // UI imports
   import PartialPaymentOptions from 'ui/tabs/home/partialpaymentoptions.svelte';
   import Address from 'ui/views/address.svelte';
-  import MultiTpvOptions from 'ui/views/ui/MultiTpvOptions.svelte';
-  import TpvBank from 'ui/views/ui/TpvBank.svelte';
-  import CardOffer from 'ui/views/ui/CardOffer.svelte';
-  import ContactField from 'ui/views/ui/fields/ContactField.svelte';
-  import EmailField from 'ui/views/ui/fields/EmailField.svelte';
+  import MultiTpvOptions from 'ui/elements/MultiTpvOptions.svelte';
+  import TpvBank from 'ui/elements/TpvBank.svelte';
+  import CardOffer from 'ui/elements/CardOffer.svelte';
+  import ContactField from 'ui/elements/fields/ContactField.svelte';
+  import EmailField from 'ui/elements/fields/EmailField.svelte';
 
   // Store
   import {

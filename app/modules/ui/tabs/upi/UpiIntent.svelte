@@ -9,12 +9,12 @@
   import * as AnalyticsTypes from 'analytics-types';
 
   // UI imports
-  import RadioOption from 'ui/views/ui/options/RadioOption.svelte';
-  import NextOption from 'ui/views/ui/options/NextOption.svelte';
-  import OptionIcon from 'ui/views/ui/options/OptionIcon.svelte';
-  import Field from 'ui/views/ui/Field.svelte';
-  import ListHeader from 'ui/views/ui/ListHeader.svelte';
-  import Icon from 'ui/views/ui/Icon.svelte';
+  import RadioOption from 'ui/elements/options/RadioOption.svelte';
+  import NextOption from 'ui/elements/options/NextOption.svelte';
+  import OptionIcon from 'ui/elements/options/OptionIcon.svelte';
+  import Field from 'ui/elements/Field.svelte';
+  import ListHeader from 'ui/elements/ListHeader.svelte';
+  import Icon from 'ui/elements/Icon.svelte';
 
   import { getMiscIcon } from 'icons/misc';
 

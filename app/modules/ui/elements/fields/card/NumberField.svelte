@@ -3,8 +3,8 @@
   import { createEventDispatcher } from 'svelte';
 
   // UI Imports
-  import Field from 'ui/views/ui/Field.svelte';
-  import Icon from 'ui/views/ui/Icon.svelte';
+  import Field from 'ui/elements/Field.svelte';
+  import Icon from 'ui/elements/Icon.svelte';
 
   // Utils
   import { getSession } from 'sessionmanager';

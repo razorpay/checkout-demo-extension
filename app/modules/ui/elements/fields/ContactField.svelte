@@ -3,7 +3,7 @@
   import CheckoutStore from 'checkoutstore';
 
   // UI imports
-  import Field from 'ui/views/ui/Field.svelte';
+  import Field from 'ui/elements/Field.svelte';
 
   import { CONTACT_PATTERN } from 'common/constants';
 

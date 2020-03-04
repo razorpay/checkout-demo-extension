@@ -10,8 +10,8 @@
   import { showCtaWithText, showCtaWithDefaultText } from 'checkoutstore/cta';
 
   // UI imports
-  import AsyncLoading from 'ui/views/ui/AsyncLoading.svelte';
-  import Callout from 'ui/views/ui/Callout.svelte';
+  import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
+  import Callout from 'ui/elements/Callout.svelte';
   import Tab from 'ui/tabs/Tab.svelte';
 
   // Props

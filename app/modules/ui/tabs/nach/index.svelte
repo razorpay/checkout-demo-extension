@@ -14,9 +14,9 @@
   import { updateCta, showAmountInCta } from 'checkoutstore/cta';
 
   // UI imports
-  import Attachment from 'ui/views/ui/Attachment.svelte';
+  import Attachment from 'ui/elements/Attachment.svelte';
   import DocumentIllustration from 'ui/illustrations/nach/Document.svelte/';
-  import Note from 'ui/views/ui/Note.svelte';
+  import Note from 'ui/elements/Note.svelte';
   import Tab from 'ui/tabs/Tab.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
 

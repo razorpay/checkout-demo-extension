@@ -2,11 +2,11 @@
   /* global showOverlay, gel, Event */
 
   // UI Imports
-  import NumberField from 'ui/views/ui/fields/card/NumberField.svelte';
-  import ExpiryField from 'ui/views/ui/fields/card/ExpiryField.svelte';
-  import CvvField from 'ui/views/ui/fields/card/CvvField.svelte';
-  import CardFlowSelectionRadio from 'ui/views/ui/CardFlowSelectionRadio.svelte';
-  import NameField from 'ui/views/ui/fields/card/NameField.svelte';
+  import NumberField from 'ui/elements/fields/card/NumberField.svelte';
+  import ExpiryField from 'ui/elements/fields/card/ExpiryField.svelte';
+  import CvvField from 'ui/elements/fields/card/CvvField.svelte';
+  import CardFlowSelectionRadio from 'ui/elements/CardFlowSelectionRadio.svelte';
+  import NameField from 'ui/elements/fields/card/NameField.svelte';
 
   // Svelte imports
   import { createEventDispatcher } from 'svelte';

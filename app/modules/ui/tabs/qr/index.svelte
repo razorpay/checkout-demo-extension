@@ -3,8 +3,8 @@
   import { onMount } from 'svelte';
 
   // UI imports
-  import DowntimeCallout from 'ui/views/ui/DowntimeCallout.svelte';
-  import AsyncLoading from 'ui/views/ui/AsyncLoading.svelte';
+  import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
+  import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
   import FeeBearer from 'ui/views/feebearer.svelte';
 
   // Utils imports

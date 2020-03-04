@@ -1,5 +1,5 @@
 <script>
-  import Field from 'ui/views/ui/Field.svelte';
+  import Field from 'ui/elements/Field.svelte';
 
   import { Formatter } from 'formatter';
   import { createEventDispatcher } from 'svelte';

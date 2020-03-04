@@ -1,7 +1,7 @@
 <script>
   // UI Imports
-  import SlottedRadioOption from 'ui/views/ui/options/Slotted/RadioOption.svelte';
-  import Icon from 'ui/views/ui/Icon.svelte';
+  import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
+  import Icon from 'ui/elements/Icon.svelte';
 
   // Utils
   import Analytics from 'analytics';

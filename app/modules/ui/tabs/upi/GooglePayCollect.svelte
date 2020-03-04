@@ -3,8 +3,8 @@
   import { createEventDispatcher, onMount } from 'svelte';
 
   // UI imports
-  import Field from 'ui/views/ui/Field.svelte';
-  import Card from 'ui/views/ui/Card.svelte';
+  import Field from 'ui/elements/Field.svelte';
+  import Card from 'ui/elements/Card.svelte';
 
   // Props
   export let retry = false;

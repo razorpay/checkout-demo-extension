@@ -5,7 +5,7 @@
   import { roundUpToNearestMajor } from 'common/currency';
 
   // UI imports
-  import ExpandableCard from 'ui/views/ui/ExpandableCard.svelte';
+  import ExpandableCard from 'ui/elements/ExpandableCard.svelte';
 
   // Props
   export let amount;

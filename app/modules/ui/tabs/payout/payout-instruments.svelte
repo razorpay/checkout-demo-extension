@@ -6,9 +6,9 @@
   import { getSession } from 'sessionmanager';
 
   // UI imports
-  import Icon from 'ui/views/ui/Icon.svelte';
-  import NextOption from 'ui/views/ui/options/NextOption.svelte';
-  import PayoutInstrument from 'ui/views/ui/PayoutInstrument.svelte';
+  import Icon from 'ui/elements/Icon.svelte';
+  import NextOption from 'ui/elements/options/NextOption.svelte';
+  import PayoutInstrument from 'ui/elements/PayoutInstrument.svelte';
   import Tab from 'ui/tabs/Tab.svelte';
 
   // Props

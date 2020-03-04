@@ -6,8 +6,8 @@
   // UI imports
   import Tab from 'ui/tabs/Tab.svelte';
   import GridItem from 'ui/tabs/netbanking/GridItem.svelte';
-  import Callout from 'ui/views/ui/Callout.svelte';
-  import DowntimeCallout from 'ui/views/ui/DowntimeCallout.svelte';
+  import Callout from 'ui/elements/Callout.svelte';
+  import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
   import OffersPortal from 'ui/views/OffersPortal.svelte';
 

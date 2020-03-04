@@ -1,7 +1,7 @@
 <script>
   // UI imports
   import Tab from 'ui/tabs/Tab.svelte';
-  import NextOption from 'ui/views/ui/options/NextOption.svelte';
+  import NextOption from 'ui/elements/options/NextOption.svelte';
 
   // Props
   export let providers = [];

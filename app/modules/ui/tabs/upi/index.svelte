@@ -25,20 +25,20 @@
   // UI imports
   import UpiIntent from './UpiIntent.svelte';
   import Tab from 'ui/tabs/Tab.svelte';
-  import Grid from 'ui/views/ui/grid/Base.svelte';
-  import Card from 'ui/views/ui/Card.svelte';
-  import ListHeader from 'ui/views/ui/ListHeader.svelte';
-  import Field from 'ui/views/ui/Field.svelte';
-  import Icon from 'ui/views/ui/Icon.svelte';
-  import DowntimeCallout from 'ui/views/ui/DowntimeCallout.svelte';
+  import Grid from 'ui/elements/grid/Base.svelte';
+  import Card from 'ui/elements/Card.svelte';
+  import ListHeader from 'ui/elements/ListHeader.svelte';
+  import Field from 'ui/elements/Field.svelte';
+  import Icon from 'ui/elements/Icon.svelte';
+  import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
   import Collect from './Collect.svelte';
   import GooglePayCollect from './GooglePayCollect.svelte';
   import GooglePayOmnichannel from './GooglePayOmnichannel.svelte';
-  import NextOption from 'ui/views/ui/options/NextOption.svelte';
+  import NextOption from 'ui/elements/options/NextOption.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
   import OffersPortal from 'ui/views/OffersPortal.svelte';
-  import SlottedRadioOption from 'ui/views/ui/options/Slotted/RadioOption.svelte';
-  import PartialPaymentAmountField from 'ui/views/ui/fields/PartialPaymentAmountField.svelte';
+  import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
+  import PartialPaymentAmountField from 'ui/elements/fields/PartialPaymentAmountField.svelte';
   import AddANewVpa from './AddANewVpa.svelte';
   import { getMiscIcon } from 'icons/misc';
 

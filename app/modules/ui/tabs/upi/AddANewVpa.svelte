@@ -4,10 +4,10 @@
   import { slide } from 'svelte/transition';
 
   // UI Imports
-  import Field from 'ui/views/ui/Field.svelte';
-  import Icon from 'ui/views/ui/Icon.svelte';
-  import SlottedRadioOption from 'ui/views/ui/options/Slotted/RadioOption.svelte';
-  import Checkbox from 'ui/views/ui/Checkbox.svelte';
+  import Field from 'ui/elements/Field.svelte';
+  import Icon from 'ui/elements/Icon.svelte';
+  import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
+  import Checkbox from 'ui/elements/Checkbox.svelte';
 
   // Util imports
   import { getSession } from 'sessionmanager';
