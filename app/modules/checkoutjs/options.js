@@ -102,3 +102,7 @@ RazorpayDefaults._ = {
   integration_version: null, // Used for passing the integration version. eg.: 1.0.2
   integration_parent_version: null, // Used for passing the version of the platform eg.: Magento version for Magento integration
 };
+
+RazorpayDefaults.config = {
+  display: null, // Display config for Payment Method Configurability
+};
