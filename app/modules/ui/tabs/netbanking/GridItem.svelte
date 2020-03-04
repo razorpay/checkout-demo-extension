@@ -7,7 +7,7 @@
   export let fullName = '';
 
   // UI imports
-  import Tooltip from 'templates/views/ui/Tooltip.svelte';
+  import Tooltip from 'ui/views/ui/Tooltip.svelte';
 </script>
 
 <style>

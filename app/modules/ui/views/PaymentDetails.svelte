@@ -1,12 +1,12 @@
 <script>
   // UI imports
-  import PartialPaymentOptions from 'templates/views/partialpaymentoptions.svelte';
-  import Address from 'templates/views/address.svelte';
-  import MultiTpvOptions from 'templates/views/ui/MultiTpvOptions.svelte';
-  import TpvBank from 'templates/views/ui/TpvBank.svelte';
-  import CardOffer from 'templates/views/ui/CardOffer.svelte';
-  import ContactField from 'templates/views/ui/fields/ContactField.svelte';
-  import EmailField from 'templates/views/ui/fields/EmailField.svelte';
+  import PartialPaymentOptions from 'ui/views/partialpaymentoptions.svelte';
+  import Address from 'ui/views/address.svelte';
+  import MultiTpvOptions from 'ui/views/ui/MultiTpvOptions.svelte';
+  import TpvBank from 'ui/views/ui/TpvBank.svelte';
+  import CardOffer from 'ui/views/ui/CardOffer.svelte';
+  import ContactField from 'ui/views/ui/fields/ContactField.svelte';
+  import EmailField from 'ui/views/ui/fields/EmailField.svelte';
 
   // Store
   import {

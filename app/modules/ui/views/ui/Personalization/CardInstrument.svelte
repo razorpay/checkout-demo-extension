@@ -1,8 +1,8 @@
 <script>
   // UI imports
-  import Field from 'templates/views/ui/Field.svelte';
-  import SlottedRadioOption from 'templates/views/ui/options/Slotted/RadioOption.svelte';
-  import Icon from 'templates/views/ui/Icon.svelte';
+  import Field from 'ui/views/ui/Field.svelte';
+  import SlottedRadioOption from 'ui/views/ui/options/Slotted/RadioOption.svelte';
+  import Icon from 'ui/views/ui/Icon.svelte';
 
   // Utils imports
   import { findCodeByNetworkName } from 'common/card';

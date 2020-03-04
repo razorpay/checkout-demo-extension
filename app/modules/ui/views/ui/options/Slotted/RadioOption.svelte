@@ -1,7 +1,7 @@
 <script>
   // UI imports
-  import Stack from 'templates/layouts/Stack.svelte';
-  import Radio from 'templates/views/ui/Radio.svelte';
+  import Stack from 'ui/layouts/Stack.svelte';
+  import Radio from 'ui/views/ui/Radio.svelte';
 
   // Props
   export let className = '';

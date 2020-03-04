@@ -3,7 +3,7 @@
   import { createEventDispatcher } from 'svelte';
 
   // UI imports
-  import RadioOption from 'templates/views/ui/options/RadioOption.svelte';
+  import RadioOption from 'ui/views/ui/options/RadioOption.svelte';
 
   // Props
   export let account;

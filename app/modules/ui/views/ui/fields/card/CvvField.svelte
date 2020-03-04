@@ -1,5 +1,5 @@
 <script>
-  import Field from 'templates/views/ui/Field.svelte';
+  import Field from 'ui/views/ui/Field.svelte';
 
   export let ref = null;
 

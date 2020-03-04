@@ -3,7 +3,7 @@
   import { createEventDispatcher } from 'svelte';
 
   // UI imports
-  import Icon from 'templates/views/ui/Icon.svelte';
+  import Icon from 'ui/views/ui/Icon.svelte';
 
   // Props
   export let icon;

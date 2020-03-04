@@ -1,6 +1,6 @@
 <script>
   // UI imports
-  import NextOption from 'templates/views/ui/options/NextOption.svelte';
+  import NextOption from 'ui/views/ui/options/NextOption.svelte';
 
   // Props
   export let providers = [];

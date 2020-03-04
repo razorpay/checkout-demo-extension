@@ -5,13 +5,13 @@
   import { onMount, tick } from 'svelte';
 
   // UI Imports
-  import Tab from 'templates/tabs/Tab.svelte';
-  import Callout from 'templates/views/ui/Callout.svelte';
-  import Screen from 'templates/layouts/Screen.svelte';
-  import AddCardView from 'templates/views/AddCardView.svelte';
-  import EmiActions from 'templates/views/EmiActions.svelte';
-  import SavedCards from 'templates/screens/savedcards.svelte';
-  import OffersPortal from 'templates/views/OffersPortal.svelte';
+  import Tab from 'ui/tabs/Tab.svelte';
+  import Callout from 'ui/views/ui/Callout.svelte';
+  import Screen from 'ui/layouts/Screen.svelte';
+  import AddCardView from 'ui/views/AddCardView.svelte';
+  import EmiActions from 'ui/views/EmiActions.svelte';
+  import SavedCards from 'ui/screens/savedcards.svelte';
+  import OffersPortal from 'ui/views/OffersPortal.svelte';
 
   // Store
   import {

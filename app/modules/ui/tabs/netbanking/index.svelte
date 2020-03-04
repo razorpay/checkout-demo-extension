@@ -4,12 +4,12 @@
   import { fade } from 'svelte/transition';
 
   // UI imports
-  import Tab from 'templates/tabs/Tab.svelte';
-  import GridItem from 'templates/tabs/netbanking/GridItem.svelte';
-  import Callout from 'templates/views/ui/Callout.svelte';
-  import DowntimeCallout from 'templates/views/ui/DowntimeCallout.svelte';
-  import Screen from 'templates/layouts/Screen.svelte';
-  import OffersPortal from 'templates/views/OffersPortal.svelte';
+  import Tab from 'ui/tabs/Tab.svelte';
+  import GridItem from 'ui/tabs/netbanking/GridItem.svelte';
+  import Callout from 'ui/views/ui/Callout.svelte';
+  import DowntimeCallout from 'ui/views/ui/DowntimeCallout.svelte';
+  import Screen from 'ui/layouts/Screen.svelte';
+  import OffersPortal from 'ui/views/OffersPortal.svelte';
 
   // Utils imports
   import Razorpay from 'common/Razorpay';

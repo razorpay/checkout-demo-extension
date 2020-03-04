@@ -12,8 +12,8 @@
   import { selectedPlanTextForSavedCard } from 'checkoutstore/emi';
 
   // UI imports
-  import Radio from 'templates/views/ui/Radio.svelte';
-  import CvvField from 'templates/views/ui/fields/card/CvvField.svelte';
+  import Radio from 'ui/views/ui/Radio.svelte';
+  import CvvField from 'ui/views/ui/fields/card/CvvField.svelte';
 
   // Props
   export let card;

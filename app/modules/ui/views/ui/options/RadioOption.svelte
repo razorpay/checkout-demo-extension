@@ -1,8 +1,8 @@
 <script>
   // UI imports
-  import Option from 'templates/views/ui/options/Option.svelte';
-  import OptionIcon from 'templates/views/ui/options/OptionIcon.svelte';
-  import Radio from 'templates/views/ui/Radio.svelte';
+  import Option from 'ui/views/ui/options/Option.svelte';
+  import OptionIcon from 'ui/views/ui/options/OptionIcon.svelte';
+  import Radio from 'ui/views/ui/Radio.svelte';
 
   // Props
   export let selected = false;

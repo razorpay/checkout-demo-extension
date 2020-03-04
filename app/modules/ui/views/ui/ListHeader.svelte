@@ -1,7 +1,7 @@
 <script>
   // Svelte imports
 
-  import SlottedOption from 'templates/views/ui/options/Slotted/Option.svelte';
+  import SlottedOption from 'ui/views/ui/options/Slotted/Option.svelte';
 </script>
 
 <style>

@@ -3,7 +3,7 @@
   import { createEventDispatcher } from 'svelte';
 
   // UI imports
-  import Stack from 'templates/layouts/Stack.svelte';
+  import Stack from 'ui/layouts/Stack.svelte';
 
   const dispatch = createEventDispatcher();
 </script>

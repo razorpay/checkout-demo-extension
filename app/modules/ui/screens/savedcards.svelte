@@ -3,7 +3,7 @@
   import { createEventDispatcher } from 'svelte';
 
   // UI imports
-  import SavedCard from 'templates/views/savedcard.svelte';
+  import SavedCard from 'ui/views/savedcard.svelte';
 
   // Store
   import { selectedTokenId, savedCardEmiDuration } from 'checkoutstore/emi';

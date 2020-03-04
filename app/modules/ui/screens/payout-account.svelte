@@ -1,7 +1,7 @@
 <script>
   // UI imports
-  import Field from 'templates/views/ui/Field.svelte';
-  import Tab from 'templates/tabs/Tab.svelte';
+  import Field from 'ui/views/ui/Field.svelte';
+  import Tab from 'ui/tabs/Tab.svelte';
 
   // Refs
   export let accountNumberField = null;

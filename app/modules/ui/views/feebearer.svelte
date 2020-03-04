@@ -3,7 +3,7 @@
   import { createEventDispatcher, onMount } from 'svelte';
 
   // UI imports
-  import AsyncLoading from 'templates/views/ui/AsyncLoading.svelte';
+  import AsyncLoading from 'ui/views/ui/AsyncLoading.svelte';
 
   // Utils imports
   import { formatAmountWithSymbol } from 'common/currency';

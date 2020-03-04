@@ -1,4 +1,4 @@
-import OTPScreen from 'templates/screens/otp.svelte';
+import OTPScreen from 'ui/screens/otp.svelte';
 import * as OtpScreenStore from 'checkoutstore/screens/otp';
 
 export default function otpView({ target, props }) {

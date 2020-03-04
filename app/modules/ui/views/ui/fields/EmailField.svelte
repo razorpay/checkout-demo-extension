@@ -1,6 +1,6 @@
 <script>
   // UI imports
-  import Field from 'templates/views/ui/Field.svelte';
+  import Field from 'ui/views/ui/Field.svelte';
 
   // Utils
   import { EMAIL_PATTERN } from 'common/constants';

@@ -10,8 +10,8 @@
   export let downtime = true; // Should we consider downtime?
 
   // UI imports
-  import SlottedOption from 'templates/views/ui/options/Slotted/Option.svelte';
-  import Icon from 'templates/views/ui/Icon.svelte';
+  import SlottedOption from 'ui/views/ui/options/Slotted/Option.svelte';
+  import Icon from 'ui/views/ui/Icon.svelte';
 
   // Utils imports
   import { getSession } from 'sessionmanager';

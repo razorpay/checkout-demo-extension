@@ -1,17 +1,17 @@
 <script>
   // UI imports
-  import Tab from 'templates/tabs/Tab.svelte';
-  import Screen from 'templates/layouts/Screen.svelte';
-  import Field from 'templates/views/ui/Field.svelte';
-  import PartialPaymentOptions from 'templates/views/partialpaymentoptions.svelte';
-  import RadioOption from 'templates/views/ui/options/RadioOption.svelte';
-  import SlottedOption from 'templates/views/ui/options/Slotted/Option.svelte';
-  import NewMethodsList from 'templates/views/ui/methods/NewMethodsList.svelte';
-  import Icon from 'templates/views/ui/Icon.svelte';
-  import OffersPortal from 'templates/views/OffersPortal.svelte';
-  import Address from 'templates/views/address.svelte';
-  import PaymentDetails from 'templates/views/PaymentDetails.svelte';
-  import Callout from 'templates/views/ui/Callout.svelte';
+  import Tab from 'ui/tabs/Tab.svelte';
+  import Screen from 'ui/layouts/Screen.svelte';
+  import Field from 'ui/views/ui/Field.svelte';
+  import PartialPaymentOptions from 'ui/views/partialpaymentoptions.svelte';
+  import RadioOption from 'ui/views/ui/options/RadioOption.svelte';
+  import SlottedOption from 'ui/views/ui/options/Slotted/Option.svelte';
+  import NewMethodsList from 'ui/views/ui/methods/NewMethodsList.svelte';
+  import Icon from 'ui/views/ui/Icon.svelte';
+  import OffersPortal from 'ui/views/OffersPortal.svelte';
+  import Address from 'ui/views/address.svelte';
+  import PaymentDetails from 'ui/views/PaymentDetails.svelte';
+  import Callout from 'ui/views/ui/Callout.svelte';
   import { INDIA_COUNTRY_CODE } from 'common/constants';
 
   // Svelte imports

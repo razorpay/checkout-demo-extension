@@ -7,10 +7,10 @@
   import { getSession } from 'sessionmanager';
 
   // UI imports
-  import Field from 'templates/views/ui/Field.svelte';
-  import Icon from 'templates/views/ui/Icon.svelte';
-  import Card from 'templates/views/ui/Card.svelte';
-  import SlottedRadioOption from 'templates/views/ui/options/Slotted/RadioOption.svelte';
+  import Field from 'ui/views/ui/Field.svelte';
+  import Icon from 'ui/views/ui/Icon.svelte';
+  import Card from 'ui/views/ui/Card.svelte';
+  import SlottedRadioOption from 'ui/views/ui/options/Slotted/RadioOption.svelte';
 
   // Props
   export let selected = true;

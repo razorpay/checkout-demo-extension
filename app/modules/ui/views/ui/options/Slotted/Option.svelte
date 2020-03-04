@@ -1,6 +1,6 @@
 <script>
   // UI imports
-  import Stack from 'templates/layouts/Stack.svelte';
+  import Stack from 'ui/layouts/Stack.svelte';
 
   // Props
   export let className = '';

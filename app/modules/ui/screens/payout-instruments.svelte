@@ -6,10 +6,10 @@
   import { getSession } from 'sessionmanager';
 
   // UI imports
-  import Icon from 'templates/views/ui/Icon.svelte';
-  import NextOption from 'templates/views/ui/options/NextOption.svelte';
-  import PayoutInstrument from 'templates/views/ui/PayoutInstrument.svelte';
-  import Tab from 'templates/tabs/Tab.svelte';
+  import Icon from 'ui/views/ui/Icon.svelte';
+  import NextOption from 'ui/views/ui/options/NextOption.svelte';
+  import PayoutInstrument from 'ui/views/ui/PayoutInstrument.svelte';
+  import Tab from 'ui/tabs/Tab.svelte';
 
   // Props
   export let upiAccounts;

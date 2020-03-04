@@ -1,4 +1,4 @@
-import TermsCurtain from 'templates/views/ui/TermsCurtain.svelte';
+import TermsCurtain from 'ui/views/ui/TermsCurtain.svelte';
 const TARGET_QS = '#tnc-wrap';
 let view;
 

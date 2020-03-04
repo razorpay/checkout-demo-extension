@@ -14,11 +14,11 @@
   import { updateCta, showAmountInCta } from 'checkoutstore/cta';
 
   // UI imports
-  import Attachment from 'templates/views/ui/Attachment.svelte';
-  import DocumentIllustration from 'templates/illustrations/nach/Document.svelte/';
-  import Note from 'templates/views/ui/Note.svelte';
-  import Tab from 'templates/tabs/Tab.svelte';
-  import Screen from 'templates/layouts/Screen.svelte';
+  import Attachment from 'ui/views/ui/Attachment.svelte';
+  import DocumentIllustration from 'ui/illustrations/nach/Document.svelte/';
+  import Note from 'ui/views/ui/Note.svelte';
+  import Tab from 'ui/tabs/Tab.svelte';
+  import Screen from 'ui/layouts/Screen.svelte';
 
   let abortUploadRequest = () => {};
   let uploaded = false;

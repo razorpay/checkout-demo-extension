@@ -3,8 +3,8 @@
   import { onMount } from 'svelte';
 
   // UI Imports
-  import Field from 'templates/views/ui/Field.svelte';
-  import Card from 'templates/views/ui/Card.svelte';
+  import Field from 'ui/views/ui/Field.svelte';
+  import Card from 'ui/views/ui/Card.svelte';
 
   // Util imports
   import { VPA_REGEX } from 'common/constants';

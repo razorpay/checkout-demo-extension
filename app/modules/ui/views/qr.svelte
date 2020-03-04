@@ -3,9 +3,9 @@
   import { onMount } from 'svelte';
 
   // UI imports
-  import DowntimeCallout from 'templates/views/ui/DowntimeCallout.svelte';
-  import AsyncLoading from 'templates/views/ui/AsyncLoading.svelte';
-  import FeeBearer from 'templates/views/feebearer.svelte';
+  import DowntimeCallout from 'ui/views/ui/DowntimeCallout.svelte';
+  import AsyncLoading from 'ui/views/ui/AsyncLoading.svelte';
+  import FeeBearer from 'ui/views/feebearer.svelte';
 
   // Utils imports
   import RazorpayConfig from 'common/RazorpayConfig';

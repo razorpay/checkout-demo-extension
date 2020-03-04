@@ -1,6 +1,6 @@
 <script>
   // UI imports
-  import Callout from 'templates/views/ui/Callout.svelte';
+  import Callout from 'ui/views/ui/Callout.svelte';
 
   // Props
   export let severe = false;

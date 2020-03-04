@@ -3,8 +3,8 @@
   import { createEventDispatcher } from 'svelte';
 
   // UI imports
-  import Option from 'templates/views/ui/options/Option.svelte';
-  import OptionIcon from 'templates/views/ui/options/OptionIcon.svelte';
+  import Option from 'ui/views/ui/options/Option.svelte';
+  import OptionIcon from 'ui/views/ui/options/OptionIcon.svelte';
 
   // Props
   export let data = {};
