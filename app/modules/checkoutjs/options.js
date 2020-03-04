@@ -27,7 +27,7 @@ RazorpayDefaults.method = {
   wallet: null,
   emi: true,
   upi: null,
-  upi_intent: null,
+  upi_intent: true,
   qr: true,
   bank_transfer: true,
 };
