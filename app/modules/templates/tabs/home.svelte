@@ -21,6 +21,7 @@
   // Store
   import {
     contact,
+    isContactPresent,
     email,
     selectedInstrumentId,
     multiTpvOption,
@@ -99,13 +100,6 @@
     !session.tpvBank &&
     !isPartialPayment &&
     !session.get('address');
-
-  /**
-   * A contact is said to be present if it has more than three characters,
-   * the three characters usually being "+91".
-   */
-  let isContactPresent;
-  $: isContactPresent = $contact && $contact.length > 3;
 
   export function showMethods() {
     view = 'methods';
@@ -257,7 +251,7 @@
     }
 
     // Missing contact
-    if (!isContactPresent) {
+    if (!$isContactPresent) {
       return false;
     }
 
@@ -406,7 +400,7 @@
      * If contact is present, get the instruments
      * for the user.
      */
-    const _instruments = isContactPresent ? getInstruments() : [];
+    const _instruments = $isContactPresent ? getInstruments() : [];
 
     /**
      * If there's just one method available,
@@ -625,7 +619,7 @@
 
   let showUserDetailsStrip;
   $: {
-    showUserDetailsStrip = (isContactPresent || $email) && !contactEmailHidden;
+    showUserDetailsStrip = ($isContactPresent || $email) && !contactEmailHidden;
   }
 </script>
 
@@ -728,7 +722,7 @@
                     <Icon icon={icons.contact} />
                   </i>
                   <div slot="title">
-                    {#if isContactPresent && !hidden.contact}
+                    {#if $isContactPresent && !hidden.contact}
                       <span>{$contact}</span>
                     {/if}
                     {#if $email && !hidden.email}

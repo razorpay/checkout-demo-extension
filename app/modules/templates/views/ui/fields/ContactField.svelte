@@ -30,6 +30,7 @@
     name="contact"
     type="tel"
     autocomplete="tel"
+    x-autocompletetype="phone-full"
     required={!optional.contact}
     pattern={CONTACT_REGEX}
     readonly={isContactReadonly}
