@@ -4,11 +4,11 @@ const config = {
   },
 
   netbanking: {
-    keys: ['banks'],
+    keys: ['bank', 'banks'],
   },
 
   wallet: {
-    keys: ['wallets'],
+    keys: ['wallet', 'wallets'],
   },
 
   // TODO: Add more methods
