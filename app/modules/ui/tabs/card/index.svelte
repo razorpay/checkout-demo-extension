@@ -466,7 +466,6 @@
       {/if}
     </div>
     <div slot="bottom">
-      <OffersPortal />
       {#if session.recurring}
         <Callout>
           {#if !session.subscription}
@@ -484,6 +483,8 @@
       <DowntimeCallout>
         Yes Bank Cards are temporarily disabled. Please pay via another method.
       </DowntimeCallout>
+
+      <OffersPortal />
     </div>
   </Screen>
 </Tab>
