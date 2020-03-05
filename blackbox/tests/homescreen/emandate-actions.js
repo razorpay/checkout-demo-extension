@@ -19,7 +19,12 @@ async function innerText(page, element) {
  */
 async function assertEmandateUserDetails(context) {
   if (!context.preferences.customer) {
-    const { contact } = context.state;
+    let { contact } = context.state;
+
+    // Add the country code if missing
+    if (contact && contact.indexOf('+91') !== 0) {
+      contact = '+91' + contact;
+    }
 
     const strip = await context.page.waitForSelector('#top-right', {
       visible: true,

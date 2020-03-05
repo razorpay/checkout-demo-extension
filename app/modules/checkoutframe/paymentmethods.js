@@ -2,45 +2,7 @@ import { getProvider as getCardlessEmiProvider } from 'common/cardlessemi';
 import { getProvider as getPayLaterProvider } from 'common/paylater';
 import { AVAILABLE_METHODS } from 'common/constants';
 import PreferencesStore from 'checkoutstore/preferences';
-
-/**
- * Returns a stringified version of the list with oxford commas
- * @param {Array<string>} list
- *
- * @returns {string}
- */
-function oxfordComma(list) {
-  const length = list.length;
-
-  if (list.length === 1) {
-    return list[0];
-  }
-
-  // We do not use an oxford comma for two items
-  if (list.length === 2) {
-    return list.join(' and ');
-  }
-
-  return `${list.slice(0, length - 1).join(', ')}, and ${list[length - 1]}`;
-}
-
-/**
- * Returns the text with commas or "and" as the separator.
- * Example: list: ['a', 'b', 'c', 'd'], max: 2 - returns "a, b & More"
- * Example: list: ['a', 'b'], max: 2 - returns "a and b"
- * Example: list: ['a', 'b', 'c'], max: 3 - returns "a, b, and c"
- * @param {Array} list
- * @param {Number} max
- *
- * @return {String}
- */
-function generateTextFromList(list, max) {
-  if (list.length > max) {
-    return `${list.slice(0, max - 1).join(', ')} & More`;
-  } else {
-    return oxfordComma(list);
-  }
-}
+import { generateTextFromList } from 'lib/utils';
 
 const CARD_DESCRIPTION = ({ session }) => {
   if (session.recurring_card_text) {
@@ -235,7 +197,7 @@ export function getMethodPrefix(method) {
 export function getMethodNameForPaymentOption(method, { session }) {
   switch (method) {
     case 'upi':
-      if (session.methods.qr) {
+      if (session.methods.upi.qr) {
         return 'UPI / QR';
       }
 

@@ -1,4 +1,4 @@
-const puppeteer = require('puppeteer-core');
+const puppeteer = require('puppeteer');
 const { execSync } = require('child_process');
 const DIR = require('./tmpdir');
 const fs = require('fs');
@@ -6,7 +6,7 @@ const isProd = process.env.NODE_ENV === 'production';
 
 module.exports = async function() {
   const browser = await puppeteer.launch({
-    executablePath: process.env.CHROME_BIN || '/usr/bin/chromium',
+    // executablePath: process.env.CHROME_BIN || '/usr/bin/chromium',
     args: ['--no-sandbox', '--single-process'],
     headless: isProd,
     // devtools: true,

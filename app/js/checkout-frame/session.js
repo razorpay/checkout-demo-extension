@@ -93,6 +93,90 @@ var PayLaterStore = {
   lenderBranding: {},
 };
 
+/**
+ * Sets the UPI method based on its config.
+ *
+ * This doesn't accommodate for Web Payments API yet
+ * since determining the availability of that API in the browser
+ * is async.
+ *
+ * @param {Session} session
+ * @param {Object} methods preferences.methods
+ */
+function setUpiMethod(session, methods) {
+  var upiFromMerchant = session.get('method.upi');
+  var intentApps = session.upi_intents_data;
+  var isPayout = session.isPayout;
+  var hasOmnichannelFeature = _Obj.getSafely(
+    session.preferences,
+    'features.google_pay_omnichannel'
+  );
+  var qrEnabled =
+    session.get('method.qr') &&
+    !window.matchMedia(discreet.UserAgent.mobileQuery).matches;
+
+  // If disabled by the merchant
+  if (upiFromMerchant === false) {
+    methods.upi = false;
+  }
+
+  // If disabled altogether
+  if (!methods.upi) {
+    return;
+  }
+
+  // Get the object passed by merchant
+  var merchantObj = _.isNonNullObject(upiFromMerchant) ? upiFromMerchant : {};
+
+  // Extend merchant's config with defaults
+  var upi = _Obj.extend(
+    {
+      collect: true,
+      intent: true,
+      omnichannel: true,
+      qr: true,
+    },
+    merchantObj
+  );
+
+  // QR
+  upi.qr = upi.qr && qrEnabled && !isPayout;
+
+  // Intent
+  upi.intent =
+    upi.intent &&
+    session.methods.upi_intent &&
+    !isPayout &&
+    intentApps &&
+    intentApps.length > 0;
+
+  // Omnichannel
+  upi.omnichannel = upi.omnichannel && !isPayout && hasOmnichannelFeature;
+
+  var isUpiAMethod = false;
+
+  // Check if any flow is enabled
+  _Obj.loop(upi, function(enabled, flow) {
+    if (enabled) {
+      isUpiAMethod = true;
+    }
+  });
+
+  // None of the flows are available
+  if (!isUpiAMethod) {
+    methods.upi = false;
+    return;
+  }
+
+  methods.upi = upi;
+  methods.count++;
+
+  if (session.separateGPay) {
+    methods.count++;
+    methods.gpay = true;
+  }
+}
+
 function createCardlessEmiImage(src) {
   return '<img src="' + src + '" class="cardless_emi-topbar-image">';
 }
@@ -121,7 +205,7 @@ function createPayLaterTopbarImages(providerCode) {
 var BackStore = null;
 
 function confirmClose() {
-  return confirm('Ongoing payment. Press OK to abort payment.');
+  return confirm(discreet.confirmCancelMsg);
 }
 
 function fillData(container, returnObj) {
@@ -133,6 +217,37 @@ function fillData(container, returnObj) {
       returnObj[el.name] = el.value;
     }
   });
+}
+
+/**
+ * Improvise the contact from prefill
+ * @param {Session} session
+ */
+function improvisePrefilledContact(session) {
+  var prefilledContact = session.get('prefill.contact');
+
+  if (!prefilledContact) {
+    return;
+  }
+
+  var formattedContact = discreet.CountryCodesUtil.findCountryCode(
+    prefilledContact
+  );
+  var newContact = '+' + formattedContact.code + formattedContact.phone;
+
+  if (prefilledContact !== newContact) {
+    session.set('prefill.contact', newContact);
+
+    Analytics.setMeta('improvised.prefilledContact', true);
+
+    Analytics.track('prefill:improvise', {
+      data: {
+        type: 'contact',
+        from: prefilledContact,
+        to: newContact,
+      },
+    });
+  }
 }
 
 /**
@@ -585,7 +700,10 @@ function cancelHandler(response) {
     this.screen !== 'card'
   ) {
     if (
-      getCardTypeFromPayload(this.payload, this.transformedTokens) === 'bajaj'
+      getCardTypeFromPayload(
+        this.payload,
+        this.svelteCardTab.getSavedCards()
+      ) === 'bajaj'
     ) {
       this.setScreen('emi');
       this.switchTab('emi');
@@ -665,7 +783,7 @@ function askOTP(view, text, shouldLimitResend, screenProps) {
         loading: false,
         action: false,
         otp: '',
-        allowSkip: !Boolean(thisSession.recurring),
+        allowSkip: !thisSession.recurring,
         allowResend: shouldLimitResend
           ? OtpService.canSendOtp('razorpay')
           : true,
@@ -697,7 +815,9 @@ function askOTP(view, text, shouldLimitResend, screenProps) {
 
             if (bankLogo) {
               qs('#tab-title').innerHTML =
-                '<img class="headless-bank" src="' + bankLogo + '">';
+                '<img class="native-otp-bank" src="' +
+                bankLogo +
+                '" onerror="this.style.opacity = 0;">';
             }
           }
           if (!origText.next || origText.next.indexOf('otp_resend') === -1) {
@@ -1832,7 +1952,11 @@ Session.prototype = {
     var topbarImages = createCardlessEmiTopbarImages(providerCode);
     tab_titles.otp = topbarImages;
 
-    this.commenceOTP(cardlessEmiProviderObj.name + ' account', true);
+    this.commenceOTP(
+      cardlessEmiProviderObj.name + ' account',
+      true,
+      'cardless_emi_enter'
+    );
 
     if (this.screen !== 'otp' && this.tab !== 'cardless_emi') {
       return;
@@ -1940,11 +2064,16 @@ Session.prototype = {
       self.otpView.setText(discreet.wrongOtpMsg);
       return;
     } else if (action === 'resend') {
-      this.commenceOTP('Resending OTP...');
+      this.commenceOTP('Resending OTP...', false, 'paylater_resend');
     } else if (action === 'verify') {
       this.commenceOTP('Verifying OTP...');
+      return;
     } else {
-      this.commenceOTP(payLaterProviderObj.name + ' account', true);
+      this.commenceOTP(
+        payLaterProviderObj.name + ' account',
+        true,
+        'paylater_enter'
+      );
     }
 
     this.checkCustomerStatus(params, function(error) {
@@ -2085,6 +2214,8 @@ Session.prototype = {
     ) {
       this.set('prefill.method', 'cardless_emi');
     }
+
+    improvisePrefilledContact(this);
   },
 
   /**
@@ -2365,7 +2496,6 @@ Session.prototype = {
       delete payload.app_token;
       this.submit();
       this.setScreen('card');
-      this.showLoadError();
     } else {
       this.showCardTab();
     }
@@ -2778,7 +2908,8 @@ Session.prototype = {
       });
   },
 
-  setScreen: function(screen) {
+  setScreen: function(screen, params) {
+    var extraProps = params && params.extraProps;
     if (screen) {
       var screenTitle =
         this.tab === 'emi'
@@ -2817,11 +2948,17 @@ Session.prototype = {
       this.currentScreen = null;
     }
 
+    var trackingData = {
+      from: this.screen,
+      to: screen,
+    };
+
+    if (extraProps) {
+      trackingData = _Obj.extend(trackingData, extraProps);
+    }
+
     Analytics.track('screen:switch', {
-      data: {
-        from: this.screen,
-        to: screen,
-      },
+      data: trackingData,
     });
     Analytics.setMeta('screen', screen);
     Analytics.setMeta('timeSince.screen', discreet.timer());
@@ -3472,7 +3609,7 @@ Session.prototype = {
     });
 
     if (!customer.logged && !this.wants_skip) {
-      self.commenceOTP('saved cards', true);
+      self.commenceOTP('saved cards', true, 'saved_cards_access');
       customer.checkStatus(function() {
         /**
          * 1. If this is a recurring payment and customer doesn't have saved cards,
@@ -3961,6 +4098,11 @@ Session.prototype = {
     data.contact = getPhone();
     data.email = getEmail();
 
+    // If it's the default contact details, do not send them
+    if (data.contact === Constants.INDIA_COUNTRY_CODE || data.contact === '+') {
+      delete data.contact;
+    }
+
     var prefillEmail = this.get('prefill.email');
     var prefillContact = this.get('prefill.contact');
 
@@ -4030,7 +4172,7 @@ Session.prototype = {
     if (this.isOpen) {
       if (confirmedCancel !== true && this.r._payment) {
         return Confirm.show({
-          message: 'Your payment is ongoing. Press OK to cancel the payment.',
+          message: discreet.confirmCancelMsg,
           heading: 'Cancel Payment?',
           positiveBtnTxt: 'Yes, cancel',
           negativeBtnTxt: 'No',
@@ -4091,8 +4233,16 @@ Session.prototype = {
     }
   },
 
-  commenceOTP: function(text, partial) {
-    this.setScreen('otp');
+  commenceOTP: function(text, partial, reason) {
+    var params = {
+      extraProps: {},
+    };
+
+    if (reason) {
+      params.extraProps.reason = reason;
+    }
+
+    this.setScreen('otp', params);
 
     this.otpView.updateScreen({
       addFunds: false,
@@ -4749,7 +4899,7 @@ Session.prototype = {
           skipText: 'Skip saving card',
         });
         Analytics.track('saved_cards:save:otp:ask');
-        this.commenceOTP(strings.otpsend);
+        this.commenceOTP(strings.otpsend, false, 'saved_cards_save');
         debounceAskOTP(this.otpView, undefined, true);
         return this.customer.createOTP();
       } else if (!this.headless) {
@@ -4953,14 +5103,17 @@ Session.prototype = {
     if (data.method === 'card' || data.method === 'emi') {
       this.nativeotp = !!this.shouldUseNativeOTP();
 
-      var cardType = getCardTypeFromPayload(data, this.transformedTokens);
+      var cardType = getCardTypeFromPayload(
+        data,
+        this.svelteCardTab.getTransformedTokens()
+      );
       var shouldUseNativeOTP = false;
       if (data.method === 'card') {
         if (
           this.nativeotp &&
           discreet.Flows.shouldUseNativeOtpForCardPayment(
             data,
-            this.transformedTokens
+            this.svelteCardTab.getTransformedTokens()
           )
         ) {
           shouldUseNativeOTP = true;
@@ -4974,7 +5127,10 @@ Session.prototype = {
             screen: 'emi',
           };
         } else if (
-          getIssuerForEmiFromPayload(data, this.transformedTokens) === 'HDFC_DC'
+          getIssuerForEmiFromPayload(
+            data,
+            this.svelteCardTab.getTransformedTokens()
+          ) === 'HDFC_DC'
         ) {
           // Skip Native OTP for EMI with HDFC Debit Cards
           shouldUseNativeOTP = false;
@@ -4982,9 +5138,15 @@ Session.prototype = {
       }
 
       if (shouldUseNativeOTP) {
+        var params = {
+          extraProps: {
+            reason: 'native_otp_enter',
+          },
+        };
+
         this.headless = true;
         Analytics.track('native_otp:attempt');
-        this.setScreen('otp');
+        this.setScreen('otp', params);
         this.r.on('payment.otp.required', function(data) {
           askOTP(that.otpView, data);
         });
@@ -5012,7 +5174,7 @@ Session.prototype = {
       });
       tab_titles.otp =
         '<img src="' + walletObj.logo + '" height="' + walletObj.h + '">';
-      this.commenceOTP(wallet + ' account', true);
+      this.commenceOTP(wallet + ' account', true, 'wallet_enter');
     } else if (!this.isPayout) {
       this.showLoadError();
     } else {
@@ -5731,22 +5893,7 @@ Session.prototype = {
     }
 
     if (methods.upi) {
-      methods.count++;
-      if (qrEnabled) {
-        methods.qr = true;
-
-        /**
-         * Do not increase the count since we don't
-         * want to show QR in intial list of
-         * payment options anymore.
-         */
-        // methods.count++;
-      }
-
-      if (this.separateGPay) {
-        methods.count++;
-        methods.gpay = true;
-      }
+      setUpiMethod(this, methods);
     }
 
     /* set external wallets */

@@ -6,10 +6,7 @@
     "Reflect": true,
     "Map": true,
     "Set": true,
-    "div_nodes": true,
-    "div0_nodes": true,
-    "div1_nodes": true,
-    "button_nodes": true
+    "Symbol": true
   },
   "proto": true,
   "-W001": true,
