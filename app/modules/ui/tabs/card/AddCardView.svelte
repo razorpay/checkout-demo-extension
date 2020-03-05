@@ -291,6 +291,8 @@
         id="card_number"
         bind:value={$cardNumber}
         bind:this={numberField}
+        methods={session.methods}
+        recurring={session.recurring}
         type={$cardType}
         on:filled={_ => handleFilled('numberField')}
         on:input={handleCardInput}

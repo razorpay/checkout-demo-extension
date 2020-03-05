@@ -7,18 +7,18 @@
   import Icon from 'ui/elements/Icon.svelte';
 
   // Utils
-  import { getSession } from 'sessionmanager';
   import { getIcon } from 'icons/network';
 
   export let value = '';
   export let type = null;
   export let id = '';
+  export let methods = {};
+  export let recurring = false;
 
   // State
   let valid = false;
 
   const dispatch = createEventDispatcher();
-  const session = getSession();
 
   // Refs
   let field = null;
@@ -28,19 +28,19 @@
     dispatchFilledIfValid();
   }
 
-  function getHelpText(methods, cardType, isRecurring) {
-    if (isRecurring) {
+  function getHelpText() {
+    if (recurring) {
       return 'Card does not support recurring payments.';
     }
 
-    if (!methods.amex && type === 'amex') {
+    if (methods && !methods.amex && type === 'amex') {
       return 'Amex cards are not supported for this transaction.';
     }
 
     return 'Please enter your card number.';
   }
 
-  $: helpText = getHelpText(session.methods, type, session.recurring);
+  $: helpText = getHelpText();
 
   export function dispatchFilledIfValid() {
     const caretPosition = field.getCaretPosition();
