@@ -2496,7 +2496,6 @@ Session.prototype = {
       delete payload.app_token;
       this.submit();
       this.setScreen('card');
-      this.showLoadError();
     } else {
       this.showCardTab();
     }
