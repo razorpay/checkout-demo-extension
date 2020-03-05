@@ -33,7 +33,9 @@ const METHOD_FILTERS = {
       return true;
     }
 
-    const tokens = _Obj.getSafely(customer, 'tokens.items', []);
+    const tokens =
+      _Obj.getSafely(customer, 'tokens.items', [])
+      |> _Arr.filter(token => _Obj.getSafely(token, 'card.issuer') !== 'YESB');
 
     // Allow this instrument only if a token for this exists on the customer
     return _Arr.any(tokens, token => instrument.token_id === token.id);
