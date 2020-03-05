@@ -24,7 +24,7 @@ const calculateMeta = _m => {
 const sanitizeEventData = data => {
   const keysToMask = ['token'];
 
-  const _data = _Obj.clone(data);
+  const _data = _Obj.clone(data || {});
 
   keysToMask.forEach(key => {
     if (_data[key]) {
