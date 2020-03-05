@@ -73,7 +73,7 @@ const METHOD_FILTERS = {
     if (instrument['_[flow]'] === 'directpay') {
       if (instrument.vpa) {
         // We filter out @ybl VPAs
-        const isYblVpa = _Str.endsWith('@ybl');
+        const isYblVpa = _Str.endsWith(instrument.vpa, '@ybl');
 
         if (isYblVpa) {
           return false;
