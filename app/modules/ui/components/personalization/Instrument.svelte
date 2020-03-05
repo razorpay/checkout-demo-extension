@@ -80,13 +80,8 @@
 
         if (flow === 'intent') {
           text = `UPI - ${instrument.app_name.replace(/ UPI$/, '')}`;
-          if (instrument.app_icon) {
-            icon = instrument.app_icon;
-            alt = instrument.app_name;
-          } else {
-            icon = '&#xe70e';
-            alt = 'UPI App';
-          }
+          icon = instrument.app_icon || '&#xe70e';
+          alt = instrument.app_name || 'UPI App';
         } else {
           text = `UPI - ${getVpaFromInstrument(instrument)}`;
           icon = '&#xe70e;';
