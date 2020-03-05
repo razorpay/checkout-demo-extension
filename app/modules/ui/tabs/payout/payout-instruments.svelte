@@ -232,7 +232,7 @@
         classes={['secondary-color']}
         on:select={() => dispatch('add', { method: 'upi' })}>
         <div>UPI</div>
-        <div class="desc">Add a UPI ID (BHIM, PhonePe and more)</div>
+        <div class="desc">Add a UPI ID (BHIM, Google Pay and more)</div>
       </NextOption>
 
     </div>

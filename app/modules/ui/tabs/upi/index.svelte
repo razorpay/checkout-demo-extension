@@ -380,10 +380,6 @@
   }
 
   #vpa-wrap {
-    &.phonepe :global(.elem) {
-      padding-right: 44px;
-    }
-
     &.bhim :global(.elem) {
       padding-right: 45px;
     }
