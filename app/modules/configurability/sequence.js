@@ -17,6 +17,10 @@ import { createMethodBlock } from './methods';
 export function getSequencedBlocks(params) {
   const { translated, original, methods } = params;
   const { blocks, exclude } = translated;
+  const settings = _Obj.getSafely(original, 'settings', {});
+  const {
+    show_default_blocks = true, // Show default blocks by default
+  } = settings;
 
   let { sequence = [] } = original;
 
@@ -29,8 +33,10 @@ export function getSequencedBlocks(params) {
   // Create a method block for all listed methods
   const methodBlocks = _Arr.map(methodsToList, createMethodBlock);
 
-  // Extend the given sequence with our default sequence
-  sequence = _Arr.mergeWith(sequence, methodsToList);
+  if (show_default_blocks) {
+    // Extend the given sequence with our default sequence
+    sequence = _Arr.mergeWith(sequence, methodsToList);
+  }
 
   // Filter the sequence for duplicates
   sequence = _Arr.removeDuplicates(sequence);
