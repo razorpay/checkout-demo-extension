@@ -12,6 +12,7 @@
   import EmiActions from 'ui/components/EmiActions.svelte';
   import SavedCards from 'ui/tabs/card/savedcards.svelte';
   import OffersPortal from 'ui/components/OffersPortal.svelte';
+  import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
 
   // Store
   import {
@@ -479,6 +480,10 @@
           {/if}
         </Callout>
       {/if}
+
+      <DowntimeCallout>
+        Yes Bank Cards are temporarily disabled. Please pay via another method.
+      </DowntimeCallout>
     </div>
   </Screen>
 </Tab>
