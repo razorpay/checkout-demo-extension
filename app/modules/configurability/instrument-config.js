@@ -1,6 +1,17 @@
 const config = {
   card: {
-    keys: ['card_types', 'iins', 'issuers', 'networks'],
+    keys: [
+      'card_type',
+      'card_types',
+      'iin',
+      'iins',
+      'issuer',
+      'issuers',
+      'network',
+      'networks',
+      'token_id',
+      'token_ids',
+    ],
   },
 
   netbanking: {
