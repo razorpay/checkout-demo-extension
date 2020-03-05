@@ -118,7 +118,7 @@
   {selected}
   ellipsis
   value={instrument.id}
-  className="p13n-instrument"
+  className="instrument"
   on:click
   on:keydown={attemptSubmit}>
   <i slot="icon">

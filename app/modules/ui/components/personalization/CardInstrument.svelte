@@ -103,7 +103,7 @@
   ellipsis
   value={instrument.id}
   radio={false}
-  className="p13n-instrument"
+  className="instrument"
   on:click>
   <i slot="icon">
     <Icon {icon} alt="Card" />
