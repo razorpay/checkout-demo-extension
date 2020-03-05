@@ -45,6 +45,66 @@ const randomName = () => {
 };
 
 const util = (module.exports = {
+  /**
+   * Sets the state in context
+   */
+  setState: function(context, what = {}) {
+    if (!context.state) {
+      context.state = {};
+    }
+
+    let state = {
+      ...context.state,
+      ...what,
+    };
+
+    context.state = state;
+  },
+
+  /**
+   * Get the textContent of an element
+   */
+  innerText: async function(page, element) {
+    try {
+      return await page.evaluate(element => element.textContent, element);
+    } catch (err) {
+      return undefined;
+    }
+  },
+
+  /**
+   * Get the value of an attribute on an element
+   * @param {Page} page
+   * @param {Element} element
+   * @param {String} attribute
+   */
+  getAttribute: async function(page, element, attribute) {
+    try {
+      return await page.evaluate(
+        (element, attribute) => element.getAttribute(attribute),
+        element,
+        attribute
+      );
+    } catch (err) {
+      return undefined;
+    }
+  },
+
+  /**
+   * Array.find, but with async support
+   * @param {Array} array
+   * @param {Function} evaluator
+   */
+  find: async function(array, evaluator) {
+    const promises = array.map(evaluator);
+
+    const results = await Promise.all(promises);
+
+    const index = results.findIndex(Boolean);
+
+    return array[index];
+  },
+
   delay: ms => new Promise(resolve => setTimeout(resolve, ms)),
 
   visible: el => !!el.getBoundingClientRect().width,
@@ -89,11 +149,15 @@ const util = (module.exports = {
         url.startsWith(lumberjackUrl) ||
         url.includes(zestMoneyLoanAgreementUrl) ||
         url.includes(maxmindScriptUrl);
-      if (ignoredUrl || (pattern && !pattern.test(url))) return true;
+      if (ignoredUrl || (pattern && !pattern.test(url))) {
+        return true;
+      }
     }
 
     page.on('request', interceptedRequest => {
-      if (shouldIgnore(interceptedRequest)) return;
+      if (shouldIgnore(interceptedRequest)) {
+        return;
+      }
       expect(currentRequest).toBeNull();
       currentRequest = interceptedRequest;
       resolver && resolver(currentRequest);

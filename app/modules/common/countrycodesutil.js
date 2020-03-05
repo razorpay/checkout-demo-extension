@@ -67,7 +67,7 @@ function getIndianNumber(number) {
  * @param {string} phonenumber
  * @returns {Object} With country code and phonenumber
  */
-export default function findCountryCode(phno) {
+export function findCountryCode(phno) {
   let number = sanitizeNumber(phno);
 
   const beginsWithPlus = _Str.startsWith(number, '+');

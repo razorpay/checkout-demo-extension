@@ -1,7 +1,5 @@
 /* global templates, showOverlay, hideEmi, Event */
-import EmiView from 'templates/views/emi.svelte';
-import Analytics from 'analytics';
-import * as AnalyticsTypes from 'analytics-types';
+import EmiView from 'ui/components/emi.svelte';
 import { getSession } from 'sessionmanager';
 
 const bankOverrides = {
@@ -58,8 +56,6 @@ emiView.prototype = {
     const wrap = _Doc.querySelector('#emi-wrap');
     const banks = useBankOverrides(this.opts.banks);
 
-    this.unbind();
-
     let defaultBank = _Obj.keys(banks)[0];
 
     this.view = new EmiView({
@@ -69,31 +65,11 @@ emiView.prototype = {
         selected: defaultBank,
       },
     });
-
-    this.bind();
   },
 
   on: function(event, sel, listener) {
     const el = _Doc.querySelector(sel);
 
     this.listeners.push(el |> _El.on(event, listener));
-  },
-
-  bind() {
-    this.on('click', '#view-emi-plans', function() {
-      // TODO: Update showOverlay once session.js is refactored.
-      showOverlay({ 0: _Doc.querySelector('#emi-wrap') });
-
-      Analytics.track('emi:plans:view:all', {
-        type: AnalyticsTypes.BEHAV,
-      });
-    });
-  },
-
-  unbind: function() {
-    _Arr.loop(this.listeners, function(delistener) {
-      delistener();
-    });
-    this.listeners = [];
   },
 };
