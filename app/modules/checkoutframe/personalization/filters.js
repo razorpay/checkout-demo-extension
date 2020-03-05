@@ -67,10 +67,22 @@ const METHOD_FILTERS = {
   },
 
   upi: instrument => {
-    // Only allow UPI collect instruments that have a VPA
+    // Only allow directpay instruments that have a VPA
     if (instrument['_[flow]'] === 'directpay') {
       return Boolean(instrument.vpa);
     }
+
+    // Allow QR instruments
+    if (instrument['_[upiqr]']) {
+      return true;
+    }
+
+    // Allow intent instruments with an app name
+    if (instrument['_[flow]'] === 'intent') {
+      return Boolean(instrument.upi_app);
+    }
+
+    return false;
   },
 };
 
