@@ -43,7 +43,7 @@ describe.each(
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIMethod(context, 'Google Pay');
+    await selectUPIMethod(context, 'omnichannel');
     await verifyOmnichannelPhoneNumber(context);
     await submit(context);
     await respondToUPIAjax(context);

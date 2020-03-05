@@ -21,7 +21,8 @@ const {
 
 describe.each(
   getTestData('Verify UPI downtime - Low with callbackURL enabled', {
-    loggedIn: false,
+    loggedIn: true,
+    anon: false,
     options: {
       amount: 200,
       personalization: false,
@@ -65,8 +66,8 @@ describe.each(
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await verifyLowDowntime(context, 'UPI');
-    await selectUPIMethod(context, 'BHIM');
-    await enterUPIAccount(context, 'BHIM');
+    await selectUPIMethod(context, 'new');
+    await enterUPIAccount(context, 'saranshgupta1995@okaxis');
     await submit(context);
     await handleUPIAccountValidation(context, 'BHIM@upi');
     await expectRedirectWithCallback(context, { method: 'upi' });

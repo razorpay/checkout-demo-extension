@@ -170,6 +170,14 @@ emandateView.prototype = {
       }
       return true;
     }
+
+    // If the selected bank has just one auth type we directly switch to the bank details form
+    const authType = this.getAvailableAuthTypes(this.bank);
+    if (tab === 'emandate-auth-selection' && authType.length === 1) {
+      this.setAuthType(authType[0]);
+      this.showTab('emandate-details');
+      return true;
+    }
     return false;
   },
 

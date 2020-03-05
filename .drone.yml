@@ -12,6 +12,7 @@ pipeline:
     build_args:
       - GIT_COMMIT_HASH=${DRONE_COMMIT_SHA}
       - BUILD_NUMBER=${DRONE_BUILD_NUMBER}
+      - BRANCH=${DRONE_BRANCH}
     tags: ${DRONE_COMMIT_SHA}
     when:
       status: [success]

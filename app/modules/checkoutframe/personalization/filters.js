@@ -1,6 +1,7 @@
 import { VPA_REGEX } from 'common/constants';
 import { doesAppExist } from 'common/upi';
 import DowntimesStore from 'checkoutstore/downtimes';
+import PreferencesStore from 'checkoutstore/preferences';
 
 /**
  * Map of filter fn for each method
@@ -8,11 +9,38 @@ import DowntimesStore from 'checkoutstore/downtimes';
  * should be allowed.
  *
  * Format:
- * function (instrument: Object, availableMethods: Object): boolean
+ * function (instrument: Object, meta: Object): boolean
  */
 const METHOD_FILTERS = {
-  wallet: (instrument, availableMethods) => {
-    const { wallet: wallets } = availableMethods;
+  card: (instrument, { customer }) => {
+    const logged = _Obj.getSafely(customer, 'logged');
+    const preferences = PreferencesStore.get();
+
+    const allowedTypes = {
+      credit: _Obj.getSafely(preferences, 'methods.credit_card') |> Boolean,
+      debit: _Obj.getSafely(preferences, 'methods.debit_card') |> Boolean,
+    };
+
+    const isCardTypeAllowed = allowedTypes[instrument.type];
+
+    // If the card type is not allowed, filter this out
+    if (!isCardTypeAllowed) {
+      return false;
+    }
+
+    // For logged out users, show all possible card instruments
+    if (!logged) {
+      return true;
+    }
+
+    const tokens = _Obj.getSafely(customer, 'tokens.items', []);
+
+    // Allow this instrument only if a token for this exists on the customer
+    return _Arr.any(tokens, token => instrument.token_id === token.id);
+  },
+
+  wallet: (instrument, { methods }) => {
+    const { wallet: wallets } = methods;
 
     if (!wallets) {
       return false;
@@ -26,10 +54,10 @@ const METHOD_FILTERS = {
     return enabledWallet;
   },
 
-  netbanking: (instrument, availableMethods) => {
+  netbanking: (instrument, { methods }) => {
     const { bank } = instrument;
 
-    const { netbanking } = availableMethods;
+    const { netbanking } = methods;
 
     if (!netbanking) {
       return;
@@ -37,18 +65,27 @@ const METHOD_FILTERS = {
 
     return Boolean(netbanking[bank]);
   },
+
+  upi: instrument => {
+    // Only allow UPI collect instruments that have a VPA
+    if (instrument['_[flow]'] === 'directpay') {
+      return Boolean(instrument.vpa);
+    }
+  },
 };
 
 /**
  * Filters out instruments and returns only those
  * that can be used for this payment.
  * @param {Array} instruments List of instruments
- * @param {Object} availableMethods Available methods
+ * @param {Object} meta Meta info
+ *  @prop {Object} methods Available methods
+ *  @prop {Customer} customer
  *
  * @returns {Array}
  */
 export const filterInstrumentsForAvailableMethods = _.curry2(
-  (instruments, availableMethods) => {
+  (instruments, { methods, customer }) => {
     // TODO: Move Downtime logic to this function
 
     const allowed = _Arr.filter(instruments, instrument => {
@@ -58,9 +95,9 @@ export const filterInstrumentsForAvailableMethods = _.curry2(
         method = 'qr';
       }
 
-      if (availableMethods[method]) {
+      if (methods[method]) {
         if (METHOD_FILTERS[method]) {
-          return METHOD_FILTERS[method](instrument, availableMethods);
+          return METHOD_FILTERS[method](instrument, { methods, customer });
         }
 
         return true;
@@ -166,13 +203,19 @@ const filterInstrumentsByAvailableUpiApps = _.curry2((instruments, apps) => {
  *  @prop {Array} instruments
  *  @prop {Object} methods
  *  @prop {Array} upiApps List of UPI apps on the device
+ *  @prop {Customer} customer
  *
  * @returns {Array} filtered instruments
  */
-export function filterInstruments({ instruments, methods, upiApps = [] }) {
+export function filterInstruments({
+  instruments,
+  methods,
+  upiApps = [],
+  customer,
+}) {
   return (
     instruments
-    |> filterInstrumentsForAvailableMethods(methods)
+    |> filterInstrumentsForAvailableMethods({ methods, customer })
     |> filterInstrumentsByAvailableUpiApps(upiApps)
     |> filterInstrumentsForSanity
     |> filterInstrumentsForDowntime

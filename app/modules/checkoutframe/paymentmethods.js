@@ -1,41 +1,42 @@
 import { getProvider as getCardlessEmiProvider } from 'common/cardlessemi';
 import { getProvider as getPayLaterProvider } from 'common/paylater';
 import { AVAILABLE_METHODS } from 'common/constants';
-
-/**
- * Returns the text with commas or "and" as the separator.
- * Example: list: ['a', 'b', 'c', 'd'], max: 2 - returns "a, b & More"
- * Example: list: ['a', 'b'], max: 2 - returns "a and b"
- * @param {Array} list
- * @param {Number} max
- *
- * @return {String}
- */
-function generateTextFromList(list, max) {
-  if (list.length <= max) {
-    return list.slice(0, max).join(' and ');
-  } else {
-    return `${list.slice(0, max).join(', ')} & More`;
-  }
-}
+import PreferencesStore from 'checkoutstore/preferences';
+import { generateTextFromList } from 'lib/utils';
 
 const CARD_DESCRIPTION = ({ session }) => {
   if (session.recurring_card_text) {
     return session.recurring_card_text;
   }
 
-  const networks = ['MasterCard', 'Visa'];
+  const preferences = PreferencesStore.get();
 
-  if (!session.irctc) {
-    networks.push('RuPay');
-    networks.push('Maestro');
-  }
+  // Keep in order that we want to display
+  const NW_MAP = {
+    VISA: 'Visa',
+    MC: 'MasterCard',
+    RUPAY: 'RuPay',
+    AMEX: 'Amex',
+    DICL: 'Diners Club',
+    MAES: 'Maestro',
+    JCB: 'JCB',
+  };
 
-  if (session.preferences.methods.amex) {
-    networks.push('Amex');
-  }
+  // Get all networks from preferences.
+  const networksFromPrefs = _Obj.getSafely(
+    preferences,
+    'methods.card_networks',
+    {}
+  );
 
-  return networks.join(', ');
+  // Get the network names to show
+  const networks =
+    NW_MAP
+    |> _Obj.keys
+    |> _Arr.filter(network => Boolean(networksFromPrefs[network]))
+    |> _Arr.map(network => NW_MAP[network]);
+
+  return generateTextFromList(networks, 4);
 };
 
 /**
@@ -67,7 +68,7 @@ const DESCRIPTIONS = {
       });
     }
 
-    const text = generateTextFromList(providers, 2);
+    const text = generateTextFromList(providers, 3);
 
     if (cardEmi) {
       return text;
@@ -196,7 +197,7 @@ export function getMethodPrefix(method) {
 export function getMethodNameForPaymentOption(method, { session }) {
   switch (method) {
     case 'upi':
-      if (session.methods.qr) {
+      if (session.methods.upi.qr) {
         return 'UPI / QR';
       }
 

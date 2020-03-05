@@ -22,6 +22,7 @@ describe.each(
     'Perform wallet transaction with callbackURL with contact optional enabled',
     {
       options: {
+        key: 'rzp_test_o39NWyo4QjBTFF',
         amount: 200,
         personalization: false,
         callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',

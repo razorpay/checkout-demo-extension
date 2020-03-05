@@ -8,31 +8,40 @@ const fullPrefix = cdnUrl + 'bank-lg/';
 export const getBankLogo = code => `${prefix}${code.slice(0, 4)}.gif`;
 export const getFullBankLogo = code => `${fullPrefix}${code.slice(0, 4)}.svg`;
 
-const _commonBanks = [
-  ['ICIC_C', 'ICICI Corporate'],
-  ['UTIB_C', 'Axis Corporate'],
-  ['SBIN', 'SBI'],
-  ['HDFC', 'HDFC'],
-  ['ICIC', 'ICICI'],
-  ['UTIB', 'Axis'],
-  ['KKBK', 'Kotak'],
-  ['YESB', 'Yes'],
-  ['IBKL', 'IDBI'],
-  ['BARB_R', 'BOB'],
-  ['PUNB_R', 'PNB'],
-  ['IOBA', 'IOB'],
-  ['FDRL', 'Federal'],
-  ['CORP', 'Corporate'],
-  ['IDFB', 'IDFC'],
-  ['INDB', 'IndusInd'],
-  ['VIJB', 'Vijaya Bank'],
-];
+const _commonBanks = {
+  ICIC_C: 'ICICI Corporate',
+  UTIB_C: 'Axis Corporate',
+  SBIN: 'SBI',
+  HDFC: 'HDFC',
+  ICIC: 'ICICI',
+  UTIB: 'Axis',
+  KKBK: 'Kotak',
+  YESB: 'Yes',
+  IBKL: 'IDBI',
+  BARB_R: 'BOB',
+  PUNB_R: 'PNB',
+  IOBA: 'IOB',
+  FDRL: 'Federal',
+  CORP: 'Corporate',
+  IDFB: 'IDFC',
+  INDB: 'IndusInd',
+  VIJB: 'Vijaya Bank',
+};
 
-export const commonBanks = _Arr.map(_commonBanks, banks => ({
-  name: banks[1],
-  code: banks[0],
-  logo: getBankLogo(banks[0]),
-}));
+/**
+ * Transforms a banks object to a list with name, code and logo
+ * @param {Object} bankObj
+ * @return {Array<{name: string, code: string, logo: string}>}
+ */
+const transformBanks = bankObj =>
+  _Obj.entries(bankObj)
+  |> _Arr.map(entry => ({
+    name: entry[1],
+    code: entry[0],
+    logo: getBankLogo(entry[0]),
+  }));
+
+export const commonBanks = transformBanks(_commonBanks);
 
 export const emiBanks = [
   {
@@ -88,7 +97,7 @@ export const emiBanks = [
   {
     code: 'SBIN',
     name: 'State Bank of India',
-    patt: /^((4(0((474|969)5|3(009|250)|066[67])|3(1(75[47]|459)|358[78]|7748|8105)|5(257[24]|9247)|6(874[23]|1119)|20739|72642)|5(1(0(1(28|35)|223)|(262|725)2)|2(4((24|31)7|182)|6468|8734)|36298|47359)))/,
+    patt: /^(4(0(066(6|7)|3(009|250)|4745|96(38|95))|20739|3(1(459|75(4|7))|358(7|8)|7748|8105)|5(257(2|4)|9247)|6(1119|874(2|3))|72642)|5(1(0(1(28|35)|223)|2622|7252)|2(4(182|247|317)|6468|8734)|36298|47359))/,
   },
   {
     code: 'BARB',
@@ -130,8 +139,10 @@ export const getPreferredBanks = (availBanks, bankOptions) => {
     });
 
   if (_.isArray(order)) {
+    const availBanksList = transformBanks(availBanks);
+
     /* Indexing to avoid search */
-    var bankIndexMap = bankList.reduce(function(map, bank, index) {
+    var bankIndexMap = availBanksList.reduce(function(map, bank, index) {
       map[bank.code] = bank;
       return map;
     }, {});
