@@ -136,7 +136,7 @@
   <div id="new-vpa-field" slot="title">
     {logged && canSaveVpa ? 'Add UPI ID' : 'UPI ID'}
   </div>
-  <div slot="subtitle">Google Pay, BHIM, Phone Pe & more</div>
+  <div slot="subtitle">Google Pay, BHIM & more</div>
   <i slot="icon" class="top">
     <Icon icon={session.themeMeta.icons.upi} />
   </i>

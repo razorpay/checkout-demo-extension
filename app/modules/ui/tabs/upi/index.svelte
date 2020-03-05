@@ -380,10 +380,6 @@
   }
 
   #vpa-wrap {
-    &.phonepe :global(.elem) {
-      padding-right: 44px;
-    }
-
     &.bhim :global(.elem) {
       padding-right: 45px;
     }
@@ -529,6 +525,11 @@
           is experiencing low success rates.
         </DowntimeCallout>
       {/if}
+
+      <DowntimeCallout>
+        PhonePe and Yesbank UPI payments are temporarily disabled. Please pay
+        via another method.
+      </DowntimeCallout>
 
       <OffersPortal />
     </div>

@@ -56,7 +56,12 @@ export const transform = (tokens, { amount, emi, emiOptions, recurring }) => {
     }
   });
 
-  return tokens;
+  return _Arr.filter(tokens, token => {
+    const issuer = _Obj.getSafely(token, 'card.issuer');
+
+    // Filter out YESB cards
+    return issuer !== 'YESB';
+  });
 };
 
 const filterTokensByMethod = method => {
