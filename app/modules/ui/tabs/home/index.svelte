@@ -714,10 +714,7 @@
               class="details-container border-list"
               transition:slide={{ duration: 400 }}>
               {#if showUserDetailsStrip}
-                <SlottedOption
-                  on:click={hideMethods}
-                  className="instrument-strip"
-                  id="user-details">
+                <SlottedOption on:click={hideMethods} id="user-details">
                   <i slot="icon">
                     <Icon icon={icons.contact} />
                   </i>
@@ -743,7 +740,6 @@
               {#if isPartialPayment}
                 <SlottedOption
                   on:click={hideMethods}
-                  className="instrument-strip"
                   id="partial-payment-details">
                   <div slot="title">
                     <span>{formattedPartialAmount}</span>
