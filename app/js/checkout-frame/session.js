@@ -702,7 +702,7 @@ function cancelHandler(response) {
     if (
       getCardTypeFromPayload(
         this.payload,
-        this.svelteCardTab.getSavedCards()
+        this.svelteCardTab.getTransformedTokens()
       ) === 'bajaj'
     ) {
       this.setScreen('emi');
