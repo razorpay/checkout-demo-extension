@@ -13,7 +13,7 @@ const {
 const nameToBePrefilled = 'Saransh';
 
 describe.each(
-  getTestData('Check contact and card prefills', {
+  getTestData('Check readonly options', {
     options: {
       prefill: {
         contact: '+91222222222',
