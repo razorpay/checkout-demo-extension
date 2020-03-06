@@ -196,14 +196,7 @@
   export function updateCustomer() {
     customer = session.getCustomer($contact);
 
-    const _tokens = filterUPITokens(
-      _Obj.getSafely(customer, 'tokens.items', [])
-    );
-
-    tokens = _Arr.filter(
-      _tokens,
-      token => _Obj.getSafely(token, 'vpa.handle') !== 'ybl'
-    ); // Filter out PhonePe VPAs
+    tokens = filterUPITokens(_Obj.getSafely(customer, 'tokens.items', []));
   }
 
   export function onShown() {
@@ -387,6 +380,10 @@
   }
 
   #vpa-wrap {
+    &.phonepe :global(.elem) {
+      padding-right: 44px;
+    }
+
     &.bhim :global(.elem) {
       padding-right: 45px;
     }
@@ -532,11 +529,6 @@
           is experiencing low success rates.
         </DowntimeCallout>
       {/if}
-
-      <DowntimeCallout>
-        PhonePe and Yes Bank UPI payments are temporarily disabled. Please pay
-        via another method.
-      </DowntimeCallout>
 
       <OffersPortal />
     </div>

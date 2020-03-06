@@ -201,7 +201,8 @@
       <div
         class="message"
         style="background-image: url('{RazorpayConfig.cdn}checkout/upi-apps.png')">
-        Scan the QR using any UPI app on your phone like BHIM, Google Pay etc.
+        Scan the QR using any UPI app on your phone like BHIM, PhonePe, Google
+        Pay etc.
       </div>
       {#if qrImage}
         <div class="qr-image">
