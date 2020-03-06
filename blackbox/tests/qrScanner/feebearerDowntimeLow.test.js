@@ -48,7 +48,7 @@ describe('QR Code Downtime payment', () => {
     await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await verifyLowDowntime(context, 'UPI');
+    await verifyLowDowntime(context, 'UPI', 'upi');
     await selectUPIApp(context, '1');
     await handleFeeBearer(context);
     await respondToUPIAjax(context, { method: 'qr' });

@@ -196,7 +196,14 @@
   export function updateCustomer() {
     customer = session.getCustomer($contact);
 
-    tokens = filterUPITokens(_Obj.getSafely(customer, 'tokens.items', []));
+    const _tokens = filterUPITokens(
+      _Obj.getSafely(customer, 'tokens.items', [])
+    );
+
+    tokens = _Arr.filter(
+      _tokens,
+      token => _Obj.getSafely(token, 'vpa.handle') !== 'ybl'
+    ); // Filter out PhonePe VPAs
   }
 
   export function onShown() {
@@ -527,7 +534,7 @@
       {/if}
 
       <DowntimeCallout>
-        PhonePe and Yesbank UPI payments are temporarily disabled. Please pay
+        PhonePe and Yes Bank UPI payments are temporarily disabled. Please pay
         via another method.
       </DowntimeCallout>
 
