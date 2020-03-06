@@ -59,11 +59,37 @@ async function assertInputValue(context, selector, value) {
   expect(selectorInputValue).toBe(value);
 }
 
+async function getTextContent(page, element) {
+  try {
+    return await page.evaluate(element => element.textContent, element);
+  } catch (err) {
+    return undefined;
+  }
+}
+
+/**
+ *
+ * @param {Context} context The test context
+ * @param {String} selector selector to match the targeted element
+ * @param {String} value Value that is to be asserted
+ */
+async function assertTextContent(context, selector, value, contains = false) {
+  const selectorInput = await context.page.waitForSelector(selector);
+  const textContent = await getTextContent(context.page, selectorInput);
+  if (!contains) {
+    expect(textContent).toBe(value);
+  } else {
+    expect(textContent).toContain(value);
+  }
+}
+
 module.exports = {
   proceed,
   handlePartialPayment,
   assertInputValue,
   getAttribute,
+  getTextContent,
+  assertTextContent,
   ...homeScreenActions,
   ...personalizationActions,
   ...downtimeTimeoutActions,
