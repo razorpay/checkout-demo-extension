@@ -59,11 +59,22 @@ async function assertInputValue(context, selector, value) {
   expect(selectorInputValue).toBe(value);
 }
 
+/**
+ *
+ * @param {Context} context The test context
+ * @param {String} selector selector to match the targeted element
+ */
+async function assertSelectorAbsence(context, selector) {
+  const el = await context.page.$(selector);
+  expect(el).toBe(null);
+}
+
 module.exports = {
   proceed,
   handlePartialPayment,
   assertInputValue,
   getAttribute,
+  assertSelectorAbsence,
   ...homeScreenActions,
   ...personalizationActions,
   ...downtimeTimeoutActions,
