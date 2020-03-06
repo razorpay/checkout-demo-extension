@@ -534,7 +534,7 @@
       {/if}
 
       <DowntimeCallout>
-        PhonePe and Yesbank UPI payments are temporarily disabled. Please pay
+        PhonePe and Yes Bank UPI payments are temporarily disabled. Please pay
         via another method.
       </DowntimeCallout>
 
