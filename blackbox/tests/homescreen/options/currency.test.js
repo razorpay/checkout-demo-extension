@@ -2,7 +2,7 @@ const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 
 describe.each(
-  getTestData('Perform saved card transaction', {
+  getTestData('Check for currency in options', {
     options: {
       amount: 305,
       currency: 'RUB',
@@ -12,7 +12,7 @@ describe.each(
     keyless: false,
     preferences: {},
   })
-)('Saved Card tests', ({ preferences, title, options }) => {
+)('Options tests', ({ preferences, title, options }) => {
   test(title, async () => {
     const context = await openCheckoutWithNewHomeScreen({
       page,
@@ -31,7 +31,7 @@ describe.each(
 });
 
 describe.each(
-  getTestData('Perform saved card transaction', {
+  getTestData('Check default currency in options', {
     options: {
       amount: 305,
       personalization: true,
@@ -40,7 +40,7 @@ describe.each(
     preferences: {},
     keyless: false,
   })
-)('Saved Card tests', ({ preferences, title, options }) => {
+)('Options tests', ({ preferences, title, options }) => {
   test(title, async () => {
     const context = await openCheckoutWithNewHomeScreen({
       page,
