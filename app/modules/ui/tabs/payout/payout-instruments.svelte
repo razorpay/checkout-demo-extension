@@ -259,8 +259,8 @@
     </div>
     <div slot="bottom">
       <DowntimeCallout>
-        Payouts to Yes Bank and PhonePe accounts are temporarily disabled.
-        Please try another bank.
+        Payouts to Yes Bank accounts are temporarily disabled. Please try
+        another bank.
       </DowntimeCallout>
     </div>
   </Screen>

@@ -530,11 +530,6 @@
         </DowntimeCallout>
       {/if}
 
-      <DowntimeCallout>
-        PhonePe and Yes Bank UPI payments are temporarily disabled. Please pay
-        via another method.
-      </DowntimeCallout>
-
       <OffersPortal />
     </div>
   </Screen>
