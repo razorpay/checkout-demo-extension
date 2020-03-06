@@ -11,7 +11,7 @@ if (!filename) {
   process.exit(1);
 }
 
-// filename = 'app/modules/templates/views/emi.svelte';
+// filename = 'app/modules/ui/components/emi.svelte';
 //const files = glob(filename || 'app/modules/**/*.svelte');
 const files = glob(filename);
 

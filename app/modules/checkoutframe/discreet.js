@@ -13,7 +13,7 @@ import * as UPIUtils from 'common/upi';
 import * as EmiUtils from 'common/emi';
 import * as GPay from 'gpay';
 import * as Color from 'lib/color';
-import * as _PaymentMethodIcons from 'templates/paymentMethodIcons';
+import * as _PaymentMethodIcons from 'ui/icons/payment-methods';
 import * as Confirm from 'confirm';
 import Callout from 'callout';
 import * as Currency from 'common/currency';
@@ -21,7 +21,7 @@ import * as OtpService from 'common/otpservice';
 import * as strings from 'common/strings';
 import * as UserAgent from 'common/useragent';
 import emiView from 'checkoutframe/emi';
-import FeeBearerView from 'templates/views/feebearer.svelte';
+import FeeBearerView from 'ui/components/feebearer.svelte';
 import emandateView from 'checkoutframe/emandate';
 import emiPlansView from 'checkoutframe/emiplans';
 import otpView from 'checkoutframe/otp';
@@ -29,6 +29,7 @@ import * as Curtain from 'components/curtain';
 import { setShieldParams } from 'payment/validator';
 import * as P13n from 'checkoutframe/personalization';
 import { commonBanks, getFullBankLogo } from 'common/bank';
+import * as CountryCodesUtil from 'common/countrycodesutil';
 
 /* Required for merchant.js migration */
 import * as Constants from 'common/constants';
@@ -59,19 +60,19 @@ import * as Cta from 'checkoutstore/cta';
 import * as HomeScreenStore from 'checkoutstore/screens/home';
 import * as CardScreenStore from 'checkoutstore/screens/card';
 
-import QRScreen from 'templates/views/qr.svelte';
-import BankTransferScreen from 'templates/views/bank_transfer.svelte';
-import UpiTab from 'templates/tabs/upi/index.svelte';
-import emiOptionsView from 'templates/screens/cardlessemi.svelte';
-import emiScreenView from 'templates/screens/emiscreen.svelte';
-import PayLaterView from 'templates/screens/paylater.svelte';
-import HomeTab from 'templates/tabs/home.svelte';
-import NetbankingTab from 'templates/tabs/netbanking/index.svelte';
-import NachScreen from 'templates/views/nach.svelte';
-import CardTab from 'templates/tabs/card/card.svelte';
+import QRScreen from 'ui/tabs/qr/index.svelte';
+import BankTransferScreen from 'ui/tabs/bank-transfer/index.svelte';
+import UpiTab from 'ui/tabs/upi/index.svelte';
+import emiOptionsView from 'ui/tabs/cardless-emi/index.svelte';
+import emiScreenView from 'ui/tabs/emi/emiscreen.svelte';
+import PayLaterView from 'ui/tabs/paylater/index.svelte';
+import HomeTab from 'ui/tabs/home/index.svelte';
+import NetbankingTab from 'ui/tabs/netbanking/index.svelte';
+import NachScreen from 'ui/tabs/nach/index.svelte';
+import CardTab from 'ui/tabs/card/index.svelte';
 
-import PayoutsInstruments from 'templates/screens/payout-instruments.svelte';
-import PayoutAccount from 'templates/screens/payout-account.svelte';
+import PayoutsInstruments from 'ui/tabs/payout/payout-instruments.svelte';
+import PayoutAccount from 'ui/tabs/payout/payout-account.svelte';
 
 import * as Hacks from 'checkoutframe/hacks';
 
@@ -127,6 +128,7 @@ export default {
   Flows,
   Downtimes,
   Payouts,
+  CountryCodesUtil,
 
   Store,
   PreferencesStore,

@@ -1,6 +1,10 @@
 FROM pronav/chrome:checkout as builder
+
 ARG BUILD_NUMBER
 ENV BUILD_NUMBER=${BUILD_NUMBER}
+
+ARG BRANCH
+ENV BRANCH=${BRANCH}
 
 COPY . /checkout_build
 
