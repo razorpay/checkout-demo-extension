@@ -18,11 +18,12 @@ test('Module: personalization', t => {
 
       t.ok(actual, 'Returns a truthy value');
       t.equals(typeof actual, 'object', 'Returns an object');
+      t.equals(actual.id, 'EOZESgq122HsIH', 'Returns correct id');
       t.equals(actual.method, 'upi', 'Returns correct method');
       t.equals(actual.flow, 'collect', 'Returns correct flow');
       t.equals(actual.vpa, 'success@razorpay', 'Returns correct VPA');
       t.ok(actual.meta, 'Meta is present');
-      t.ok(actual.meta.preferred);
+      t.ok(actual.meta.preferred, 'meta.preferred is truthy');
       t.end();
     });
 
@@ -42,6 +43,7 @@ test('Module: personalization', t => {
 
       t.ok(actual, 'Returns a truthy value');
       t.equals(typeof actual, 'object', 'Returns an object');
+      t.equals(actual.id, 'EOZESgq122HsIH', 'Returns correct id');
       t.equals(actual.method, 'upi', 'Returns correct method');
       t.equals(actual.app, 'in.org.npci.upiapp', 'Returns correct app');
       t.equals(actual.flow, 'intent', 'Returns correct flow');
@@ -66,6 +68,7 @@ test('Module: personalization', t => {
 
       t.ok(actual, 'Returns a truthy value');
       t.equals(typeof actual, 'object', 'Returns an object');
+      t.equals(actual.id, 'EOZESgq122HsIH', 'Returns correct id');
       t.equals(actual.method, 'upi', 'Returns correct method');
       t.equals(actual.flow, 'qr', 'Returns correct flow');
       t.ok(actual.meta, 'Meta is present');
@@ -90,6 +93,7 @@ test('Module: personalization', t => {
 
       t.ok(actual, 'Returns a truthy value');
       t.equals(typeof actual, 'object', 'Returns an object');
+      t.equals(actual.id, 'Dhh671dR688OWQ', 'Returns correct id');
       t.equals(actual.method, 'card', 'Returns correct method');
       t.equals(actual.issuer, 'ICIC', 'Returns correct issuer');
       t.equals(actual.network, 'visa', 'Returns correct network');
@@ -117,6 +121,7 @@ test('Module: personalization', t => {
 
       t.ok(actual, 'Returns a truthy value');
       t.equals(typeof actual, 'object', 'Returns an object');
+      t.equals(actual.id, 'DhoBzK59KicZni', 'Returns correct id');
       t.equals(actual.method, 'wallet', 'Returns correct method');
       t.equals(actual.wallet, 'freecharge', 'Returns correct wallet');
       t.ok(actual.meta, 'Meta is present');
@@ -138,10 +143,29 @@ test('Module: personalization', t => {
 
       t.ok(actual, 'Returns a truthy value');
       t.equals(typeof actual, 'object', 'Returns an object');
+      t.equals(actual.id, 'Dhh86QTueOpyWX', 'Returns correct id');
       t.equals(actual.method, 'netbanking', 'Returns correct method');
       t.equals(actual.issuer, 'HDFC', 'Returns correct bank');
       t.ok(actual.meta, 'Meta is present');
       t.ok(actual.meta.preferred, 'meta.preferred is truthy');
+      t.end();
+    });
+
+    test('returns undefined for empty instrument', t => {
+      const instrument = {};
+
+      const actual = translateInstrumentToConfig(instrument);
+
+      t.equals(typeof actual, 'undefined', 'Returns undefined');
+      t.end();
+    });
+
+    test('returns undefined for undefined instrument', t => {
+      const instrument = undefined;
+
+      const actual = translateInstrumentToConfig(instrument);
+
+      t.equals(typeof actual, 'undefined', 'Returns undefined');
       t.end();
     });
 

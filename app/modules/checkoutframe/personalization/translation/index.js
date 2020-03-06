@@ -6,9 +6,13 @@ import ConfigExtractors from './extractors';
  * @return {Object}
  */
 function extractConfigData(instrument) {
+  if (!instrument) {
+    return;
+  }
+
   let extractor = ConfigExtractors[instrument.method];
   if (!extractor) {
-    extractor = v => v; // TODO: how do we handle unknown method?
+    return;
   }
   return extractor(instrument);
 }
@@ -34,9 +38,13 @@ function addMetaProperties(config) {
  * @return {Object}
  */
 export function translateInstrumentToConfig(instrument) {
-  return addMetaProperties(
-    addTokenData(extractConfigData(instrument), instrument)
-  );
+  const config = extractConfigData(instrument);
+
+  if (!config) {
+    return;
+  }
+
+  return addMetaProperties(addTokenData(config, instrument));
 }
 
 /**
@@ -47,6 +55,7 @@ export function translateInstrumentToConfig(instrument) {
  */
 function addTokenData(config, instrument) {
   config = _Obj.clone(config);
+  config.id = instrument.id;
   if (instrument.token_id) {
     config.token_id = instrument.token_id;
   }
