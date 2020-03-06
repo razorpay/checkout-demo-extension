@@ -11,7 +11,8 @@
   export let instrument;
 
   const isMethodInstrument = isInstrumentForEntireMethod(instrument);
-  const isSavedCardInstrument = instrument.method && instrument.token_id;
+  const isSavedCardInstrument =
+    _Arr.contains(['card', 'emi'], instrument.method) && instrument.token_id;
 </script>
 
 {#if isMethodInstrument}
