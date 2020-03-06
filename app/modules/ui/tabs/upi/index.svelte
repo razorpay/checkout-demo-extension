@@ -196,14 +196,7 @@
   export function updateCustomer() {
     customer = session.getCustomer($contact);
 
-    const _tokens = filterUPITokens(
-      _Obj.getSafely(customer, 'tokens.items', [])
-    );
-
-    tokens = _Arr.filter(
-      _tokens,
-      token => _Obj.getSafely(token, 'vpa.handle') !== 'ybl'
-    ); // Filter out PhonePe VPAs
+    tokens = filterUPITokens(_Obj.getSafely(customer, 'tokens.items', []));
   }
 
   export function onShown() {
