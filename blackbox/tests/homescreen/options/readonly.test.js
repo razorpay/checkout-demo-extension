@@ -29,7 +29,7 @@ describe.each(
     keyless: false,
     preferences: {},
   })
-)('Prefill tests', ({ preferences, title, options }) => {
+)('Checkout Options tests', ({ preferences, title, options }) => {
   test(title, async () => {
     const context = await openCheckoutWithNewHomeScreen({
       page,
