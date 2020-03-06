@@ -5,7 +5,7 @@ const { assertBasicDetailsScreen, assertTextContent } = require('../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 
 describe.each(
-  getTestData('perform card transaction with partial payment enabled', {
+  getTestData('check partial payments object in options', {
     loggedIn: false,
     preferences: {
       order: {
@@ -28,7 +28,7 @@ describe.each(
     },
     keyless: false,
   })
-)('Card tests', ({ preferences, title, options }) => {
+)('Options tests', ({ preferences, title, options }) => {
   test(title, async () => {
     const context = await openCheckoutWithNewHomeScreen({
       page,
