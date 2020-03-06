@@ -73,7 +73,7 @@ describe.each(
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await verifyLowDowntime(context, 'UPI');
+    await verifyLowDowntime(context, 'UPI', 'upi');
     await selectUPIMethod(context, 'token');
     await verifyPartialAmount(context, '₹ 100');
     await submit(context);

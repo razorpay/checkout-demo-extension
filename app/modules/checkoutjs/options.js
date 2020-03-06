@@ -27,7 +27,7 @@ RazorpayDefaults.method = {
   wallet: null,
   emi: true,
   upi: null,
-  upi_intent: null,
+  upi_intent: true,
   qr: true,
   bank_transfer: true,
 };
@@ -101,4 +101,8 @@ RazorpayDefaults._ = {
   integration: null, // Used for passing the integration mode. eg.: flutter, woocommerce
   integration_version: null, // Used for passing the integration version. eg.: 1.0.2
   integration_parent_version: null, // Used for passing the version of the platform eg.: Magento version for Magento integration
+};
+
+RazorpayDefaults.config = {
+  display: null, // Display config for Payment Method Configurability
 };

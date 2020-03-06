@@ -73,7 +73,7 @@ describe.each(
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await verifyLowDowntime(context, 'UPI');
+    await verifyLowDowntime(context, 'UPI', 'upi');
     await selectUPIMethod(context, 'new');
     await enterUPIAccount(context, 'saranshgupta1995@okaxis');
     await verifyPartialAmount(context, '₹ 100');

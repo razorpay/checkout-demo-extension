@@ -700,7 +700,10 @@ function cancelHandler(response) {
     this.screen !== 'card'
   ) {
     if (
-      getCardTypeFromPayload(this.payload, this.transformedTokens) === 'bajaj'
+      getCardTypeFromPayload(
+        this.payload,
+        this.svelteCardTab.getTransformedTokens()
+      ) === 'bajaj'
     ) {
       this.setScreen('emi');
       this.switchTab('emi');
@@ -2493,7 +2496,6 @@ Session.prototype = {
       delete payload.app_token;
       this.submit();
       this.setScreen('card');
-      this.showLoadError();
     } else {
       this.showCardTab();
     }
@@ -5101,14 +5103,17 @@ Session.prototype = {
     if (data.method === 'card' || data.method === 'emi') {
       this.nativeotp = !!this.shouldUseNativeOTP();
 
-      var cardType = getCardTypeFromPayload(data, this.transformedTokens);
+      var cardType = getCardTypeFromPayload(
+        data,
+        this.svelteCardTab.getTransformedTokens()
+      );
       var shouldUseNativeOTP = false;
       if (data.method === 'card') {
         if (
           this.nativeotp &&
           discreet.Flows.shouldUseNativeOtpForCardPayment(
             data,
-            this.transformedTokens
+            this.svelteCardTab.getTransformedTokens()
           )
         ) {
           shouldUseNativeOTP = true;
@@ -5122,7 +5127,10 @@ Session.prototype = {
             screen: 'emi',
           };
         } else if (
-          getIssuerForEmiFromPayload(data, this.transformedTokens) === 'HDFC_DC'
+          getIssuerForEmiFromPayload(
+            data,
+            this.svelteCardTab.getTransformedTokens()
+          ) === 'HDFC_DC'
         ) {
           // Skip Native OTP for EMI with HDFC Debit Cards
           shouldUseNativeOTP = false;
