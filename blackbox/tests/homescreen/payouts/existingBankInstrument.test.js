@@ -1,17 +1,13 @@
-const { openCheckout } = require('../../actions/checkout');
-const { makePreferences } = require('../../actions/preferences');
+const { openCheckout } = require('../../../actions/checkout');
+const { makePreferences } = require('../../../actions/preferences');
 const {
   verifyPayoutInstruments,
-  addInstrument,
-  selectUPIMethod,
+  selectInstrument,
   submit,
-  enterUPIAccount,
-  respondToFundAccountsRequest,
-  handleUPIAccountValidation,
-} = require('../../actions/common');
+} = require('../../../actions/common');
 
 describe('Payout tests', () => {
-  test('Verify payouts by adding new VPA Instrument while other Instruments exist', async () => {
+  test('verify payouts using existing Bank instrument', async () => {
     const options = {
       contact_id: 'cont_BXV5GAmaJEcGr1',
       payout: true,
@@ -43,13 +39,9 @@ describe('Payout tests', () => {
         ],
       },
     });
-    preferences.methods.upi = true;
     const context = await openCheckout({ page, options, preferences });
     await verifyPayoutInstruments(context);
-    await addInstrument(context, 'VPA');
-    await enterUPIAccount(context, 'BHIM');
+    await selectInstrument(context, 2);
     await submit(context);
-    await handleUPIAccountValidation(context, 'BHIM@upi');
-    await respondToFundAccountsRequest(context, 'BHIM');
   });
 });
