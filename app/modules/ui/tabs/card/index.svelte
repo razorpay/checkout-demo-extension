@@ -228,7 +228,11 @@
   }
 
   export function getTransformedTokens() {
-    return allSavedCards;
+    if (allSavedCards && allSavedCards.length) {
+      return allSavedCards;
+    }
+    // TODO: Fix session.customer usage when customer is moved to store.
+    return getSavedCardsFromCustomer(session.customer);
   }
 
   export function isOnSavedCardsScreen() {
