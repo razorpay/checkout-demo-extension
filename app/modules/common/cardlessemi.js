@@ -90,7 +90,11 @@ export function getEligibleProvidersBasedOnMinAmount(amount, enabledProviders) {
   }
 
   _Obj.loop(enabledProviders, (enabled, provider) => {
-    if (providers[provider] && providers[provider].min_amount <= amount) {
+    if (
+      enabledProviders[provider] &&
+      providers[provider] &&
+      providers[provider].min_amount <= amount
+    ) {
       eligible[provider] = true;
     }
   });

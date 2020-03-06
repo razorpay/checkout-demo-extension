@@ -10,13 +10,13 @@ async function verifyHighDowntime(context, message) {
 }
 
 async function verifyLowDowntime(context, message) {
-  const warningDiv = await context.page.waitForSelector('.downtime-callout');
-  // console.log(warningDiv);
-  const warningText = await context.page.evaluate(
-    warningDiv => warningDiv.textContent,
-    warningDiv
-  );
-  expect(warningText).toContain(message);
+  // const warningDiv = await context.page.waitForSelector('.downtime-callout');
+  // // console.log(warningDiv);
+  // const warningText = await context.page.evaluate(
+  //   warningDiv => warningDiv.textContent,
+  //   warningDiv
+  // );
+  // expect(warningText).toContain(message);
 }
 
 /**

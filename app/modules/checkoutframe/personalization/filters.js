@@ -33,7 +33,9 @@ const METHOD_FILTERS = {
       return true;
     }
 
-    const tokens = _Obj.getSafely(customer, 'tokens.items', []);
+    const tokens =
+      _Obj.getSafely(customer, 'tokens.items', [])
+      |> _Arr.filter(token => _Obj.getSafely(token, 'card.issuer') !== 'YESB');
 
     // Allow this instrument only if a token for this exists on the customer
     return _Arr.any(tokens, token => instrument.token_id === token.id);
@@ -67,10 +69,33 @@ const METHOD_FILTERS = {
   },
 
   upi: instrument => {
-    // Only allow UPI collect instruments that have a VPA
+    // Only allow directpay instruments that have a VPA
     if (instrument['_[flow]'] === 'directpay') {
-      return Boolean(instrument.vpa);
+      if (instrument.vpa) {
+        // We filter out @ybl VPAs
+        const isYblVpa = _Str.endsWith(instrument.vpa, '@ybl');
+
+        if (isYblVpa) {
+          return false;
+        } else {
+          return true;
+        }
+      } else {
+        return false;
+      }
     }
+
+    // Allow QR instruments
+    if (instrument['_[upiqr]']) {
+      return true;
+    }
+
+    // Allow intent instruments with an app name
+    if (instrument['_[flow]'] === 'intent') {
+      return Boolean(instrument.upi_app);
+    }
+
+    return false;
   },
 };
 
