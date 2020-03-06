@@ -63,7 +63,7 @@ describe.each(
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await verifyLowDowntime(context, 'UPI');
+    await verifyLowDowntime(context, 'UPI', 'upi');
     await selectUPIMethod(context, 'omnichannel');
     await verifyOmnichannelPhoneNumber(context);
     await submit(context);

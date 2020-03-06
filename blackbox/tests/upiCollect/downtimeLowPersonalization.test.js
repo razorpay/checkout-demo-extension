@@ -52,7 +52,7 @@ describe('Basic upi payment', () => {
       method: 'UPI',
     });
     await assertHomePage(context, true, true);
-    // await verifyLowDowntime(context, 'UPI');
+    await verifyLowDowntime(context, 'UPI', 'upi');
     await fillUserDetails(context, '8888888881');
     await verifyPersonalizationText(context, 'upi');
     await selectPersonalizationPaymentMethod(context, 1);

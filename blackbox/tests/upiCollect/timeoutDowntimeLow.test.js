@@ -45,7 +45,7 @@ describe.skip('Basic upi payment', () => {
     await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await verifyLowDowntime(context, 'UPI');
+    await verifyLowDowntime(context, 'UPI', 'upi');
     await selectUPIMethod(context, 'BHIM');
     await enterUPIAccount(context, 'BHIM');
     await verifyTimeout(context, 'upi');
