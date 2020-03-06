@@ -26,7 +26,6 @@ describe('Payout tests', () => {
     preferences.methods.upi = true;
     const context = await openCheckout({ page, options, preferences });
     await addInstrument(context, 'VPA');
-    await selectUPIMethod(context, 'BHIM');
     await enterUPIAccount(context, 'BHIM');
     await submit(context);
     await handleUPIAccountValidation(context, 'BHIM@upi');
