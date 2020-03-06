@@ -4791,11 +4791,14 @@ Session.prototype = {
           });
         }, 200);
       })
-      .catch(function() {
-        self.showLoadError(
-          'Invalid VPA, please try again with correct VPA',
-          true
+      .catch(function(vpaValidationError) {
+        var vpaValidationDescription = _Obj.getSafely(
+          vpaValidationError,
+          'error.description',
+          'Invalid VPA, please try again with correct VPA'
         );
+
+        self.showLoadError(vpaValidationDescription, true);
       });
   },
 
