@@ -1,11 +1,11 @@
-const { openCheckout } = require('../../actions/checkout');
-const { makePreferences } = require('../../actions/preferences');
+const { openCheckout } = require('../../../actions/checkout');
+const { makePreferences } = require('../../../actions/preferences');
 const {
   enterBankAccountDetails,
   addInstrument,
   submit,
   respondToFundAccountsRequest,
-} = require('../../actions/common');
+} = require('../../../actions/common');
 
 describe('Payout tests', () => {
   test('Verify payouts by adding new Bank Instrument while other Instruments do not exist', async () => {

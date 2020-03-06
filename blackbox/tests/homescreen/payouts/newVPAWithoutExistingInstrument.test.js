@@ -1,5 +1,5 @@
-const { openCheckout } = require('../../actions/checkout');
-const { makePreferences } = require('../../actions/preferences');
+const { openCheckout } = require('../../../actions/checkout');
+const { makePreferences } = require('../../../actions/preferences');
 const {
   addInstrument,
   selectUPIMethod,
@@ -7,7 +7,7 @@ const {
   enterUPIAccount,
   respondToFundAccountsRequest,
   handleUPIAccountValidation,
-} = require('../../actions/common');
+} = require('../../../actions/common');
 
 describe('Payout tests', () => {
   test('Verify payouts by adding new VPA Instrument while other Instruments do not exist', async () => {
@@ -26,7 +26,6 @@ describe('Payout tests', () => {
     preferences.methods.upi = true;
     const context = await openCheckout({ page, options, preferences });
     await addInstrument(context, 'VPA');
-    await selectUPIMethod(context, 'BHIM');
     await enterUPIAccount(context, 'BHIM');
     await submit(context);
     await handleUPIAccountValidation(context, 'BHIM@upi');

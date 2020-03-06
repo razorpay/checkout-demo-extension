@@ -91,7 +91,7 @@ describe('Basic upi payment', () => {
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await verifyLowDowntime(context, 'UPI');
+    await verifyLowDowntime(context, 'UPI', 'upi');
     await selectUPIApp(context, '1');
     await viewOffers(context);
     await selectOffer(context, '1');

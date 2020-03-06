@@ -1,13 +1,13 @@
-const { openCheckout } = require('../../actions/checkout');
-const { makePreferences } = require('../../actions/preferences');
+const { openCheckout } = require('../../../actions/checkout');
+const { makePreferences } = require('../../../actions/preferences');
 const {
   verifyPayoutInstruments,
   selectInstrument,
   submit,
-} = require('../../actions/common');
+} = require('../../../actions/common');
 
 describe('Payout tests', () => {
-  test('verify payouts using existing Bank instrument', async () => {
+  test('verify payouts using existing VPA instrument', async () => {
     const options = {
       contact_id: 'cont_BXV5GAmaJEcGr1',
       payout: true,
@@ -41,7 +41,7 @@ describe('Payout tests', () => {
     });
     const context = await openCheckout({ page, options, preferences });
     await verifyPayoutInstruments(context);
-    await selectInstrument(context, 2);
+    await selectInstrument(context, 1);
     await submit(context);
   });
 });

@@ -61,7 +61,7 @@ describe('Basic Omnichannel payment', () => {
     await handlePartialPayment(context, '1');
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await verifyLowDowntime(context, 'UPI');
+    await verifyLowDowntime(context, 'UPI', 'upi');
     await selectUPIMethod(context, 'Google Pay');
     await verifyOmnichannelPhoneNumber(context);
     await verifyPartialAmount(context, '₹ 1');
