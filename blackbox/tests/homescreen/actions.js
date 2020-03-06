@@ -44,9 +44,25 @@ async function handlePartialPayment(context, amount) {
   await proceed(context);
 }
 
+/**
+ *
+ * @param {Context} context The test context
+ * @param {String} selector selector to match the targeted element
+ * @param {String} value Value that is to be asserted
+ */
+async function assertInputValue(context, selector, value) {
+  const selectorInput = await context.page.waitForSelector(selector);
+  const selectorInputValue = await context.page.evaluate(
+    selectorInput => selectorInput.value,
+    selectorInput
+  );
+  expect(selectorInputValue).toBe(value);
+}
+
 module.exports = {
   proceed,
   handlePartialPayment,
+  assertInputValue,
   getAttribute,
   ...homeScreenActions,
   ...personalizationActions,
