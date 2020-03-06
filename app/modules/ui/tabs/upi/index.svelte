@@ -531,7 +531,7 @@
       {/if}
 
       <DowntimeCallout>
-        UPI payments via Yesbank accounts are temporarily disabled. Please pay
+        UPI payments via Yes Bank accounts are temporarily disabled. Please pay
         via another method.
       </DowntimeCallout>
 
