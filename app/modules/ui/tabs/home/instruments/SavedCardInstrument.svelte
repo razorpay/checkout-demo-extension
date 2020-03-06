@@ -1,6 +1,7 @@
 <script>
   // UI imports
   import Field from 'ui/components/Field.svelte';
+  import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import Icon from 'ui/elements/Icon.svelte';
 
@@ -9,14 +10,20 @@
   import { getSession } from 'sessionmanager';
   import PreferencesStore from 'checkoutstore/preferences';
   import { getIcon as getNetworkIcon } from 'icons/network';
+  import Track from 'tracker';
+
+  // Store
+  import { contact } from 'checkoutstore/screens/home';
 
   // Props
   export let instrument = {}; // P13n instrument
-  export let name; // Name of the input
-  export let customer = {}; // Current customer
   export let selected = false; // Whether or not this instrument is selected
 
   const session = getSession();
+  const customer = session.getCustomer($contact);
+
+  const name = Track.makeUid();
+  const id = Track.makeUid();
 
   function getBankText(card, loggedIn) {
     const banks = PreferencesStore.get().methods.netbanking;
@@ -42,45 +49,47 @@
     }
   }
 
-  let text;
+  let title;
   let icon;
   let hasCvv = false;
   let cvvLength = 3;
-  let savedCards;
+  let cardKnown = false;
 
-  $: savedCards = _Obj.getSafely(customer, 'tokens.items', []);
-  $: savedCard = _Arr.find(savedCards, card => card.id === instrument.token_id);
-  $: {
-    if (customer) {
-      // We don't know anytihng about the card. User is logged out.
-      if (!savedCard && !instrument.issuer) {
-        text = 'Use your saved cards';
-        icon = '&#xe715;';
-        hasCvv = false;
-      }
-      // We know stuff about the card. User is logged out.
-      else if (!savedCard && instrument.issuer) {
-        text = getBankText(instrument, false);
-        icon = getIcon(instrument);
-        hasCvv = false;
-      }
-      // User is logged in
-      else {
-        const card = savedCard.card || {};
-        const networkCode = findCodeByNetworkName(card.network);
+  const savedCards = _Obj.getSafely(customer, 'tokens.items', []);
+  const savedCard = _Arr.find(
+    savedCards,
+    card => card.id === instrument.token_id
+  );
 
-        text = getBankText(card, true);
-        icon = getIcon(card);
+  if (savedCard) {
+    // User is logged in
+    const card = savedCard.card || {};
+    const networkCode = findCodeByNetworkName(card.network);
 
-        cvvLength = networkCode === 'amex' ? 4 : 3;
-        hasCvv = true;
-      }
+    title = getBankText(card, true);
+    icon = getIcon(card);
+
+    cvvLength = networkCode === 'amex' ? 4 : 3;
+    hasCvv = true;
+
+    cardKnown = true;
+  } else {
+    // User is logged out.
+
+    if (instrument.issuer) {
+      // We know stuff about the card.
+      title = getBankText(instrument, false);
+      icon = getIcon(instrument);
+      hasCvv = false;
     } else {
-      text = `Use your saved cards`;
+      // We don't know anything about the card.
+      title = 'Use your saved cards';
       icon = getIcon();
       hasCvv = false;
     }
   }
+
+  const component = cardKnown ? SlottedRadioOption : SlottedOption;
 </script>
 
 <style>
@@ -89,26 +98,25 @@
     transform: rotate(180deg);
   }
 
-  div[slot='extra'] {
-    :global(.elem .input) {
-      padding: 0;
-      width: 2rem;
-    }
+  div[slot='extra'] :global(.elem .input) {
+    padding: 0;
+    width: 2rem;
   }
 </style>
 
-<SlottedRadioOption
+<svelte:component
+  this={component}
   {name}
   {selected}
   ellipsis
-  value={instrument.id}
+  value={id}
   radio={false}
   className="instrument"
   on:click>
   <i slot="icon">
     <Icon {icon} alt="Card" />
   </i>
-  <div slot="title">{text}</div>
+  <div slot="title">{title}</div>
 
   <div slot="extra">
     {#if hasCvv}
@@ -124,4 +132,4 @@
       <span class="theme-highlight-color">&#xe604;</span>
     {/if}
   </div>
-</SlottedRadioOption>
+</svelte:component>

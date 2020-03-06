@@ -28,7 +28,7 @@ async function verifyPersonalizationText(context, paymentMode) {
     }
   }
   var paymentMethod = await context.page.$x(
-    '//button[contains(@class,"p13n-instrument")]'
+    '//button[contains(@class,"instrument")]'
   );
   for (let i = 0; i < paymentMethod.length; i++) {
     const currentPaymentMethod = paymentMethod[i];
@@ -41,7 +41,7 @@ async function verifyPersonalizationText(context, paymentMode) {
     if (
       context.preferences.payment_downtime &&
       context.preferences.payment_downtime.items[0].severity == 'high'
-    )
+    ) {
       expect(paymentMethodArray).not.toEqual(
         expect.arrayContaining([
           paymentMethodText
@@ -49,7 +49,7 @@ async function verifyPersonalizationText(context, paymentMode) {
             .trim(),
         ])
       );
-    else
+    } else {
       expect(paymentMethodArray).toEqual(
         expect.arrayContaining([
           paymentMethodText
@@ -57,12 +57,13 @@ async function verifyPersonalizationText(context, paymentMode) {
             .trim(),
         ])
       );
+    }
   }
 }
 
 async function selectPersonalizationPaymentMethod(context, optionNumber) {
   var apiOption = await context.page.$x(
-    '//button[contains(@class,"p13n-instrument")]'
+    '//button[contains(@class,"instrument")]'
   );
   await apiOption[optionNumber - 1].click();
 }

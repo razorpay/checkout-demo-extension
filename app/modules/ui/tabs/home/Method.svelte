@@ -115,6 +115,7 @@
 
 <SlottedOption
   className="new-method"
+  defaultStyles={false}
   on:click={select}
   disabled={down}
   attributes={{ method }}>

@@ -7,7 +7,7 @@
   export let disabled = false;
   export let id;
   export let attributes = {}; // Extra attributes for the HTML element
-  export let defaultStyles = false;
+  export let defaultStyles = true;
 
   $: {
     disabled = disabled ? true : undefined;
