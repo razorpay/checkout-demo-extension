@@ -20,14 +20,19 @@ async function verifyHighDowntime(context, method, message) {
   }
 }
 
-async function verifyLowDowntime(context, message) {
-  // const warningDiv = await context.page.waitForSelector('.downtime-callout');
-  // // console.log(warningDiv);
-  // const warningText = await context.page.evaluate(
-  //   warningDiv => warningDiv.textContent,
-  //   warningDiv
-  // );
-  // expect(warningText).toContain(message);
+async function verifyLowDowntime(context, message, method) {
+  let selector = '.downtime-callout';
+
+  if (method) {
+    selector = `#form-${method} ${selector}`;
+  }
+
+  const warningDiv = await context.page.waitForSelector(selector);
+  const warningText = await context.page.evaluate(
+    warningDiv => warningDiv.textContent,
+    warningDiv
+  );
+  expect(warningText).toContain(message);
 }
 
 module.exports = {

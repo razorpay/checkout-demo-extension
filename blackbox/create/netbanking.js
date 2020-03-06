@@ -124,9 +124,9 @@ module.exports = function(testFeatures) {
 
         if (downtime) {
           await selectBank(context, 'ICIC');
-          await verifyLowDowntime(context, 'ICICI Bank');
+          await verifyLowDowntime(context, 'ICICI Bank', 'netbanking');
           await selectBank(context, 'HDFC');
-          await verifyLowDowntime(context, 'HDFC Bank');
+          await verifyLowDowntime(context, 'HDFC Bank', 'netbanking');
 
           bank = 'HDFC';
         } else {
