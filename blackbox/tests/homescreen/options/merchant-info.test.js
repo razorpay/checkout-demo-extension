@@ -9,7 +9,7 @@ const merchantDesc = 'Lost of stuff that is almost free';
 const merchantImage = 'http://i.imgur.com/n5tjHFD.png';
 
 describe.each(
-  getTestData('check partial payments object in options', {
+  getTestData('check merchant name, desc and image in options', {
     loggedIn: false,
     preferences: {},
     options: {
