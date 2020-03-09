@@ -19,6 +19,19 @@ async function getMethodButtons(context) {
 }
 
 /**
+ * Returns all available EMI buttons
+ */
+async function getEmiButtons(context) {
+  const list = await context.page.waitForSelector(
+    '#emi-options-wrapper .options',
+    {
+      visible: true,
+    }
+  );
+  return Array.from(await list.$$('#emi-options-wrapper .options .option'));
+}
+
+/**
  * Verify that methods are being shown
  */
 async function assertPaymentMethods(context) {
@@ -76,4 +89,5 @@ module.exports = {
   selectPaymentMethod,
   assertMethodsScreen,
   selectQRScanner,
+  getEmiButtons,
 };
