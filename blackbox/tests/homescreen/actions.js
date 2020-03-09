@@ -63,6 +63,16 @@ async function assertInputValue(context, selector, value) {
  *
  * @param {Context} context The test context
  * @param {String} selector selector to match the targeted element
+ */
+async function assertSelectorAbsence(context, selector) {
+  const el = await context.page.$(selector);
+  expect(el).toBe(null);
+}
+
+/**
+ *
+ * @param {Context} context The test context
+ * @param {String} selector selector to match the targeted element
  * @param {String} attr Attribute that is to be asserted
  * @param {String} value Value that the attribute is supposed to have
  */
@@ -86,6 +96,7 @@ module.exports = {
   handlePartialPayment,
   assertInputValue,
   getAttribute,
+  assertSelectorAbsence,
   assertElementHasAttribute,
   ...homeScreenActions,
   ...personalizationActions,
