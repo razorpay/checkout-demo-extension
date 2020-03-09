@@ -2496,6 +2496,9 @@ Session.prototype = {
       delete payload.app_token;
       this.submit();
       this.setScreen('card');
+      if (!this.preferences.fee_bearer) {
+        this.showLoadError();
+      }
     } else {
       this.showCardTab();
     }
