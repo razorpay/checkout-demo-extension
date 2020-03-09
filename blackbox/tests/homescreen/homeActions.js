@@ -63,9 +63,17 @@ async function assertMethodsScreen(context) {
   expect(methods).not.toEqual(null);
 }
 
+async function selectQRScanner(context) {
+  const selectQR = await context.page.waitForSelector('#showQr', {
+    visible: true,
+  });
+  await selectQR.click();
+}
+
 module.exports = {
   getMethodButtons,
   assertPaymentMethods,
   selectPaymentMethod,
   assertMethodsScreen,
+  selectQRScanner,
 };
