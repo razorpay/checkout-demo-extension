@@ -184,23 +184,6 @@ Customer.prototype = {
     });
   },
 
-  deleteCard: function(token, callback) {
-    let user = this;
-
-    if (!this.id) {
-      return;
-    }
-
-    fetch({
-      url: makeAuthUrl(this.r, 'apps/' + this.id + '/tokens/' + token),
-      method: 'delete',
-      callback: function() {
-        callback();
-        deleteToken(user, token);
-      },
-    });
-  },
-
   logout: function(this_device, callback) {
     let session = getSession();
     Analytics.track('logout', {
@@ -223,15 +206,4 @@ Customer.prototype = {
     Analytics.removeMeta('loggedIn');
     fetch(ajaxOpts);
   },
-};
-
-export const deleteToken = (user, token) => {
-  let tokens = user.tokens;
-  for (var i = 0; i < tokens.count; i++) {
-    if (tokens.items[i].token === token) {
-      tokens.items.splice(i, 1);
-      tokens.count--;
-      return;
-    }
-  }
 };
