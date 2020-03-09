@@ -9,11 +9,9 @@ var preferences = window.preferences,
   ownerWindow = isIframe ? parent : opener,
   _uid = Track.id,
   tab_titles = Constants.TAB_TITLES,
-  getDownBanks = Bank.getDownBanks,
   freqWallets = Wallet.wallets,
   contactPattern = Constants.CONTACT_REGEX,
   emailPattern = Constants.EMAIL_REGEX,
-  ua_Android = discreet.UserAgent.androidBrowser,
   isMobile = discreet.UserAgent.isMobile,
   cookieDisabled = !navigator.cookieEnabled,
   getCustomer = discreet.getCustomer,
@@ -917,9 +915,6 @@ function Session(message) {
       self[key] = val;
     }
   });
-
-  this.ua_Android = ua_Android;
-  this.isMobile = isMobile;
 
   if (this.embedded) {
     $(doc).addClass('embedded');
@@ -3639,22 +3634,6 @@ Session.prototype = {
     }
   },
 
-  deleteCard: function(e) {
-    var target = $(e.target);
-    if (!target.hasClass('delete')) {
-      return;
-    }
-    var parent = target.parent().parent();
-    if (confirm('Press OK to delete card.')) {
-      this.customer.deleteCard(
-        parent.find('[type=radio]')[0].value,
-        function() {
-          parent.remove();
-        }
-      );
-    }
-  },
-
   /**
    * Returns the EMI plans for a given bank.
    * @param {String} bank
@@ -5466,11 +5445,9 @@ Session.prototype = {
       'emiPlansView',
       'emiScreenView',
       'feeBearerView',
-      'feeBearerView',
       'homeTab',
       'nachScreen',
       'netbankingTab',
-      'otpView',
       'otpView',
       'payLaterView',
       'payoutsAccountView',
@@ -5530,11 +5507,7 @@ Session.prototype = {
       $(this.el).remove();
 
       this.tab = this.screen = '';
-
-      this.tab = this.screen = '';
       this.modal = this.emi = this.el = this.card = null;
-
-      this.isOpen = false;
       window.setPaymentID = window.onComplete = null;
       this.isCorporateBanking = null;
     }

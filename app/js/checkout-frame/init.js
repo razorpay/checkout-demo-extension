@@ -15,7 +15,6 @@ var Confirm = discreet.Confirm;
 var Callout = discreet.Callout;
 var getDecimalAmount = discreet.getDecimalAmount;
 var _PaymentMethodIcons = discreet._PaymentMethodIcons;
-var ua_android_browser = discreet.UserAgent.androidBrowser;
 var Constants = discreet.Constants;
 var Bank = discreet.Bank;
 var Wallet = discreet.Wallet;

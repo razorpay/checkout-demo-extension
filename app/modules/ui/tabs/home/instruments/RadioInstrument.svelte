@@ -3,32 +3,33 @@
   import { createEventDispatcher } from 'svelte';
 
   // UI imports
-  import Field from 'ui/components/Field.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import Icon from 'ui/elements/Icon.svelte';
 
   // Utils imports
-  import { findCodeByNetworkName } from 'common/card';
   import { getSession } from 'sessionmanager';
-  import PreferencesStore from 'checkoutstore/preferences';
-  import { getIcon as getNetworkIcon } from 'icons/network';
   import { getBankLogo } from 'common/bank';
+  import PreferencesStore from 'checkoutstore/preferences';
   import { getWallet } from 'common/wallet';
+  import Track from 'tracker';
 
   // Store
   import { contact } from 'checkoutstore/screens/home';
 
   // Props
   export let instrument = {}; // P13n instrument
-  export let name; // Name of the input
-  export let selected = false; // Whether or not this instrument is selected
 
   const session = getSession();
   const dispatch = createEventDispatcher();
 
-  let text;
+  const name = Track.makeUid();
+  const id = Track.makeUid();
+
+  let title;
   let icon;
   let alt;
+
+  let selected = false;
 
   function getVpaFromInstrument(instrument) {
     const { vpa, token } = instrument;
@@ -52,41 +53,48 @@
 
     switch (instrument.method) {
       case 'paypal':
-        text = 'PayPal';
+        title = 'PayPal';
         icon = session.themeMeta.icons.paypal;
         alt = 'PayPal';
+
         break;
 
       case 'netbanking':
-        text = `Netbanking - ${banks[instrument.bank]} `;
+        title = `Netbanking - ${banks[instrument.bank]} `;
         icon = getBankLogo(instrument.bank);
         alt = banks[instrument.bank];
+
         break;
       case 'wallet':
         wallet = getWallet(instrument.wallet);
-        text = `Wallet - ${wallet.name}`;
+        title = `Wallet - ${wallet.name}`;
         icon = wallet.sqLogo;
         alt = wallet;
+
         break;
       case 'upi':
         if (instrument['_[upiqr]'] === '1') {
-          text = `UPI QR`;
+          title = `UPI QR`;
           icon = session.themeMeta.icons['qr'];
-          alt = text;
+          alt = title;
+
           break;
-        }
+        } else if (instrument['_[flow]'] === 'intent') {
+          title = `UPI - ${instrument.app_name.replace(/ UPI$/, '')}`;
 
-        flow = instrument['_[flow]'];
-
-        if (flow === 'intent') {
-          text = `UPI - ${instrument.app_name.replace(/ UPI$/, '')}`;
-          icon = instrument.app_icon || '&#xe70e';
-          alt = instrument.app_name || 'UPI App';
+          if (instrument.app_icon) {
+            icon = instrument.app_icon;
+            alt = instrument.app_name;
+          } else {
+            icon = '&#xe70e';
+            alt = 'UPI App';
+          }
         } else {
-          text = `UPI - ${getVpaFromInstrument(instrument)}`;
+          title = `UPI - ${getVpaFromInstrument(instrument)}`;
           icon = '&#xe70e;';
           alt = 'UPI';
         }
+
         break;
     }
   }
@@ -110,14 +118,13 @@
 
 <SlottedRadioOption
   {name}
-  {selected}
   ellipsis
-  value={instrument.id}
+  value={id}
   className="instrument"
   on:click
   on:keydown={attemptSubmit}>
   <i slot="icon">
     <Icon {icon} {alt} />
   </i>
-  <div slot="title">{text}</div>
+  <div slot="title">{title}</div>
 </SlottedRadioOption>
