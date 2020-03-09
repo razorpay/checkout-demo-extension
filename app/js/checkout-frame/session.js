@@ -3865,7 +3865,7 @@ Session.prototype = {
 
               self.switchTab('card');
               self.setScreen('card');
-              self.svelteCardTab.showSavedCards();
+              self.svelteCardTab.showSavedCardsView();
 
               self.processOffersOnEmiPlanSelection();
             },
@@ -3884,7 +3884,7 @@ Session.prototype = {
 
               self.switchTab('emi');
               self.setScreen('card');
-              self.svelteCardTab.showSavedCards();
+              self.svelteCardTab.showSavedCardsView();
 
               self.processOffersOnEmiPlanSelection(plan);
 
@@ -3893,7 +3893,7 @@ Session.prototype = {
               } else {
                 self.switchTab('emi');
                 self.setScreen('card');
-                self.svelteCardTab.showSavedCards();
+                self.svelteCardTab.showSavedCardsView();
               }
             },
 

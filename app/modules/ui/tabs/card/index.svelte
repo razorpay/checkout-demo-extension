@@ -210,7 +210,7 @@
     setView(Views.ADD_CARD);
   }
 
-  export function showSavedCards() {
+  export function showSavedCardsView() {
     Analytics.track('saved_cards:show');
     setView(Views.SAVED_CARDS);
   }
@@ -426,7 +426,7 @@
           {#if showSavedCardsCta}
             <div
               id="show-saved-cards"
-              on:click={showSavedCards}
+              on:click={showSavedCardsView}
               class="text-btn left-card">
               <div
                 class="cardtype"
