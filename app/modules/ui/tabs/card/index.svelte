@@ -459,7 +459,7 @@
           <div
             id="show-add-card"
             class="text-btn left-card"
-            on:click={() => setView(Views.ADD_CARD)}>
+            on:click={showAddCardView}>
             Add another card
           </div>
         </div>
