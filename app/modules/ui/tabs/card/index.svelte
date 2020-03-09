@@ -118,14 +118,6 @@
     lastSavedCard = savedCards && savedCards[savedCards.length - 1];
   }
 
-  $: {
-    // TODO: find a better way
-    // Remove selected offer every time the view changes.
-    if (currentView) {
-      session.removeOfferSelectedFromDrawer();
-    }
-  }
-
   function getSavedCardsFromCustomer(customer = {}) {
     if (!customer.tokens) {
       return [];
@@ -207,11 +199,13 @@
 
   export function showAddCardView() {
     Analytics.track('saved_cards:hide');
+    session.removeAutomaticallyAppliedOffer();
     setView(Views.ADD_CARD);
   }
 
-  export function showSavedCards() {
+  export function showSavedCardsView() {
     Analytics.track('saved_cards:show');
+    session.removeAutomaticallyAppliedOffer();
     setView(Views.SAVED_CARDS);
   }
 
@@ -426,7 +420,7 @@
           {#if showSavedCardsCta}
             <div
               id="show-saved-cards"
-              on:click={showSavedCards}
+              on:click={showSavedCardsView}
               class="text-btn left-card">
               <div
                 class="cardtype"
@@ -459,7 +453,7 @@
           <div
             id="show-add-card"
             class="text-btn left-card"
-            on:click={() => setView(Views.ADD_CARD)}>
+            on:click={showAddCardView}>
             Add another card
           </div>
         </div>

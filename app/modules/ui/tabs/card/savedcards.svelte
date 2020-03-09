@@ -41,14 +41,12 @@
    * @param card
    */
   function handleOffersForSavedCard(card) {
-    if (session.offers && !session.offers.offerSelectedByDrawer) {
-      session.offers.removeOffer();
-    }
+    session.removeAutomaticallyAppliedOffer();
 
     // If EMI is supported on saved card
     if (session.tab === 'emi' && card.plans) {
       const issuer = card.card.issuer;
-      const duration = savedCardEmiDuration;
+      const duration = $savedCardEmiDuration;
 
       // Set offer in case it is applicable.
       if (issuer && duration) {

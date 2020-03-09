@@ -2496,6 +2496,9 @@ Session.prototype = {
       delete payload.app_token;
       this.submit();
       this.setScreen('card');
+      if (!this.preferences.fee_bearer) {
+        this.showLoadError();
+      }
     } else {
       this.showCardTab();
     }
@@ -3216,10 +3219,10 @@ Session.prototype = {
   },
 
   /**
-   * Removes currently selected offer if it was selected from the list by the
-   * user (and not autoamatically applied).
+   * Removes currently selected offer if it was automatically applied (and not
+   * selected by the user)
    */
-  removeOfferSelectedFromDrawer: function() {
+  removeAutomaticallyAppliedOffer: function() {
     if (
       this.offers &&
       !this.offers.offerSelectedByDrawer &&
@@ -3865,7 +3868,7 @@ Session.prototype = {
 
               self.switchTab('card');
               self.setScreen('card');
-              self.svelteCardTab.showSavedCards();
+              self.svelteCardTab.showSavedCardsView();
 
               self.processOffersOnEmiPlanSelection();
             },
@@ -3884,7 +3887,7 @@ Session.prototype = {
 
               self.switchTab('emi');
               self.setScreen('card');
-              self.svelteCardTab.showSavedCards();
+              self.svelteCardTab.showSavedCardsView();
 
               self.processOffersOnEmiPlanSelection(plan);
 
@@ -3893,7 +3896,7 @@ Session.prototype = {
               } else {
                 self.switchTab('emi');
                 self.setScreen('card');
-                self.svelteCardTab.showSavedCards();
+                self.svelteCardTab.showSavedCardsView();
               }
             },
 
