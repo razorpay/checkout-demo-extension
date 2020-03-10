@@ -59,7 +59,7 @@ export function isInstrumentForEntireMethod(instrument) {
 
   // None of the keys in the config should be present in the instrument
   return _Arr.every(
-    config.keys,
+    config.properties,
     key => !_Arr.contains(currentInsturmentKeys, key)
   );
 }
