@@ -18,11 +18,11 @@
   // Props
   export let instrument = {}; // P13n instrument
   export let selected = false; // Whether or not this instrument is selected
+  export let name = 'instrument';
 
   const session = getSession();
   const customer = session.getCustomer($contact);
 
-  const name = Track.makeUid();
   const id = Track.makeUid();
 
   function getBankText(card, loggedIn) {

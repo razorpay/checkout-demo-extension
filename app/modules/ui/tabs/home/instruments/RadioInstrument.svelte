@@ -18,11 +18,11 @@
 
   // Props
   export let instrument = {}; // P13n instrument
+  export let name = 'instrument';
 
   const session = getSession();
   const dispatch = createEventDispatcher();
 
-  const name = Track.makeUid();
   const id = Track.makeUid();
 
   let title;
