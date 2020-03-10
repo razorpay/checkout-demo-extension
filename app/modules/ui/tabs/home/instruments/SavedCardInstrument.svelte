@@ -32,11 +32,11 @@
 
     if (loggedIn) {
       return `${bank ? `${bankText} ` : ''}${_Str.toTitleCase(
-        card.type || ''
+        card.card_type || ''
       )} card - ${card.last4}`;
     } else {
       return `Use your${bank ? ` ${bankText}` : ''} ${_Str.toTitleCase(
-        card.type || ''
+        card.card_type || ''
       )} card`;
     }
   }
