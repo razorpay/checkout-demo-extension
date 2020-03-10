@@ -52,10 +52,6 @@ const config = {
     ],
     payment: ['token'],
     groupedToIndividual: (grouped, { tokens = [] } = {}) => {
-      if (!grouped.token_ids) {
-        return [grouped];
-      }
-
       const base = _Obj.clone(grouped);
       delete base.token_ids;
 
