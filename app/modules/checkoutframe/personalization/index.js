@@ -5,6 +5,7 @@ import Track from 'tracker';
 import Analytics from 'analytics';
 import { filterInstruments } from './filters';
 import { hashFnv32a, set, getAllInstruments } from './utils';
+import { translateInstrumentToConfig } from './translation';
 
 /* halflife for timestamp, 5 days in ms */
 const TS_HALFLIFE = Math.log(2) / (5 * 86400000);
@@ -381,6 +382,24 @@ export const getInstrumentsForCustomer = (customer, extra = {}) => {
 
   return instruments;
 };
+
+/**
+ * Returns the list of preferred payment modes for the user in a sorted order,
+ * but translated to the Payment Method Configurability spec.
+ * @param {Object} customer
+ * @param {Object} extra
+ *  @prop {Object} methods
+ *  @prop {Array} upiApps List of UPI apps on the device
+ *
+ * @returns {Array<Instrument>}
+ */
+export function getTranslatedInstrumentsForCustomer(customer, extra) {
+  const instruments = getInstrumentsForCustomer(customer, extra);
+
+  return (
+    _Arr.map(instruments, translateInstrumentToConfig) |> _Arr.filter(Boolean)
+  );
+}
 
 /**
  * Appends the data from the selected instrument
