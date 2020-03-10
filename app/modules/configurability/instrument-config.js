@@ -1,3 +1,5 @@
+import { toLowerCaseSafe } from 'lib/utils';
+
 /**
  * Get the updated payment payload augmented with the given instrument
  * @param {Instrument} instrument
@@ -49,16 +51,64 @@ const config = {
       'token_ids',
     ],
     payment: ['token'],
+    groupedToIndividual: (grouped, { tokens = [] } = {}) => {
+      if (!grouped.token_ids) {
+        return [grouped];
+      }
+
+      const base = _Obj.clone(grouped);
+      delete base.token_ids;
+
+      return _Arr.map(grouped.token_ids, token_id => {
+        const token = _Arr.find(tokens, token => token.id === token_id);
+
+        return _Obj.extend(
+          {
+            token_id,
+            card_type: token.type,
+            issuer: token.issuer,
+            network: toLowerCaseSafe(token.network),
+          },
+          base
+        );
+      });
+    },
   },
 
   netbanking: {
     properties: ['bank', 'banks'],
     payment: ['bank'],
+    groupedToIndividual: grouped => {
+      const base = _Obj.clone(grouped);
+      delete base.banks;
+
+      return _Arr.map(grouped.banks || [], bank => {
+        return _Obj.extend(
+          {
+            bank,
+          },
+          base
+        );
+      });
+    },
   },
 
   wallet: {
     properties: ['wallet', 'wallets'],
     payment: ['wallet'],
+    groupedToIndividual: grouped => {
+      const base = _Obj.clone(grouped);
+      delete base.wallets;
+
+      return _Arr.map(grouped.wallets || [], wallet => {
+        return _Obj.extend(
+          {
+            wallet,
+          },
+          base
+        );
+      });
+    },
   },
 
   // TODO: Add more methods
