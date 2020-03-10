@@ -21,7 +21,7 @@ export function getBlockConfig(options) {
   });
 
   // Group blocks of Razorpay
-  const grouped = clusterRazorpayBlocks(sequentialied);
+  const clustered = clusterRazorpayBlocks(sequentialied);
 
-  return grouped;
+  return clustered;
 }
