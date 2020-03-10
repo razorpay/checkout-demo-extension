@@ -12,6 +12,17 @@ export const multiTpvOption = writable('netbanking');
 export const partialPaymentOption = writable();
 export const partialPaymentAmount = writable('');
 
+export const blocks = writable([]);
+export const instruments = derived(blocks, allBlocks => {
+  let allInstruments = [];
+
+  _Arr.loop(allBlocks, block =>
+    _Arr.mergeWith(allInstruments, block.instruments)
+  );
+
+  return allInstruments;
+});
+
 /**
  * A contact is said to be present if it has more than three characters,
  * the three characters usually being "+91".
