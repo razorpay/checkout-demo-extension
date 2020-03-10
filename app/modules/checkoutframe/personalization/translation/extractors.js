@@ -1,3 +1,5 @@
+import { toLowerCaseSafe } from 'lib/utils';
+
 /**
  * Extracts config data related to UPI from the p13n instrument.
  *
@@ -55,14 +57,6 @@ function card(instrument) {
     issuer: instrument.issuer,
     network: toLowerCaseSafe(instrument.network),
   };
-}
-
-function toLowerCaseSafe(str) {
-  if (!str) {
-    return;
-  }
-
-  return str.toLowerCase();
 }
 
 /**
