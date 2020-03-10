@@ -3,14 +3,11 @@
   import { createEventDispatcher } from 'svelte';
 
   // Props
-  export let personalization = false;
-  export let instruments = [];
   export let customer = {};
 
   // UI imports
   import Method from 'ui/tabs/home/Method.svelte';
-  import CardInstrument from 'ui/components/personalization/CardInstrument.svelte';
-  import Instrument from 'ui/components/personalization/Instrument.svelte';
+  import Instrument from 'ui/tabs/home/instruments/Instrument.svelte';
 
   // Utils imports
   import { AVAILABLE_METHODS } from 'common/constants';
@@ -23,7 +20,12 @@
   import * as AnalyticsTypes from 'analytics-types';
 
   // Store
-  import { contact, selectedInstrumentId } from 'checkoutstore/screens/home';
+  import {
+    contact,
+    selectedInstrumentId,
+    blocks,
+    instruments,
+  } from 'checkoutstore/screens/home';
 
   const dispatch = createEventDispatcher();
   let visibleMethods = [];
@@ -76,7 +78,7 @@
   $: {
     if ($selectedInstrumentId) {
       const selected = _Arr.find(
-        instruments || [],
+        $instruments,
         instrument => instrument.id === $selectedInstrumentId
       );
 
@@ -151,28 +153,18 @@
   }
 </style>
 
-{#if personalization && instruments && instruments.length}
-  <h3 class="title">Preferred Payment Methods</h3>
-  <div role="list" class="border-list" id="instruments-list">
-    {#each instruments as instrument, index (instrument.id)}
-      {#if instrument.method === 'card'}
-        <CardInstrument
-          name="p13n"
-          {instrument}
-          {customer}
-          selected={instrument.id === $selectedInstrumentId}
-          on:click={() => selectP13nInstrument(instrument, index)} />
-      {:else}
-        <Instrument
-          name="p13n"
-          {instrument}
-          selected={instrument.id === $selectedInstrumentId}
-          on:click={() => selectP13nInstrument(instrument, index)}
-          on:submit />
-      {/if}
+{#each $blocks as block}
+  <h3 class="title">{block.title}</h3>
+  <div role="list" class="border-list">
+    {#each block.instruments as instrument, index (instrument.id)}
+      <Instrument
+        {instrument}
+        selected={instrument.id === $selectedInstrumentId}
+        on:click={() => selectP13nInstrument(instrument, index)}
+        on:submit />
     {/each}
   </div>
-{/if}
+{/each}
 
 <h3 class="title">All Payment Methods</h3>
 <div role="list" class="methods-container border-list">
