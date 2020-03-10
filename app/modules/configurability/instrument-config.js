@@ -91,6 +91,8 @@ const config = {
         );
       });
     },
+    isIndividual: instrument =>
+      instrument.bank || _Obj.getSafely(instrument, 'banks', []).length === 1,
   },
 
   wallet: {
@@ -109,6 +111,9 @@ const config = {
         );
       });
     },
+    isIndividual: instrument =>
+      instrument.wallet ||
+      _Obj.getSafely(instrument, 'wallets', []).length === 1,
   },
 
   // TODO: Add more methods
