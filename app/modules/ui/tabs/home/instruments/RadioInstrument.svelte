@@ -19,17 +19,14 @@
   // Props
   export let instrument = {}; // P13n instrument
   export let name = 'instrument';
+  export let selected = false;
 
   const session = getSession();
   const dispatch = createEventDispatcher();
 
-  const id = Track.makeUid();
-
   let title;
   let icon;
   let alt;
-
-  let selected = false;
 
   function getVpaFromInstrument(instrument) {
     const { vpa, token } = instrument;
@@ -117,10 +114,11 @@
 </script>
 
 <SlottedRadioOption
-  {name}
   ellipsis
-  value={id}
+  {name}
+  {selected}
   className="instrument"
+  value={instrument.id}
   on:click
   on:keydown={attemptSubmit}>
   <i slot="icon">
