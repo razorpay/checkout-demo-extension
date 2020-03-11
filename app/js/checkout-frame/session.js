@@ -782,7 +782,7 @@ function debounceAskOTP(view, msg, shouldLimitResend, screenProps) {
 
 // this === Session
 function successHandler(response) {
-  if (this.p13n && this.paymentInstrument) {
+  if (this.paymentInstrument) {
     P13n.recordSuccess(
       this.paymentInstrument,
       this.customer || this.getCustomer(this.payload.contact)
@@ -4465,6 +4465,8 @@ Session.prototype = {
         }
       }
     } else if (screen) {
+      var selectedInstrument = this.getSelectedPaymentInstrument();
+
       if (screen === 'card') {
         // TODO: simplify conditions
         // Do not proceed with amex cards if amex is disabled for merchant
@@ -4579,27 +4581,32 @@ Session.prototype = {
       }
     } else if (this.oneMethod === 'netbanking') {
       data.bank = this.get('prefill.bank');
-    } else if (this.p13n) {
+    } else if (selectedInstrument) {
       if (!this.checkCommonValid()) {
         return;
       }
 
-      var selectedInstrument = this.getSelectedPaymentInstrument();
-
-      if (selectedInstrument && selectedInstrument.method === 'card') {
+      if (selectedInstrument.method === 'card') {
         /*
-         * Add cvv to data from the currently selected method (p13n)
-         * TODO: figure out a better way to do this.
+         * Add cvv to data from the currently selected instrument
          */
-        var $cvvEl = _Doc.querySelector(
+        var instrumentInDom = _El.closest(
+          _Doc.querySelector(
+            '.home-methods input[value="' + instrument.id + '"]'
+          ),
+          '.instrument'
+        );
+        var cvvInput = instrumentInDom.querySelector('.cvv-input');
+
+        var cvvInput = _Doc.querySelector(
           '#instruments-list > .selected input.input'
         );
 
-        if ($cvvEl) {
-          if ($cvvEl.value.length === $cvvEl.maxLength) {
-            data['card[cvv]'] = $cvvEl.value;
+        if (cvvInput) {
+          if (cvvInput.value.length === cvvInput.maxLength) {
+            data['card[cvv]'] = cvvInput.value;
           } else {
-            $cvvEl.focus();
+            cvvInput.focus();
             return this.shake();
           }
         }
@@ -4614,11 +4621,7 @@ Session.prototype = {
   },
 
   getSelectedPaymentInstrument: function() {
-    if (!this.p13n) {
-      return;
-    }
-
-    return this.homeTab.getSelectedInstrument();
+    return storeGetter(HomeScreenStore.selectedInstrument);
   },
 
   verifyVpaAndContinue: function(data, params) {
@@ -5061,9 +5064,7 @@ Session.prototype = {
       });
     }
 
-    if (this.p13n) {
-      this.paymentInstrument = P13n.processInstrument(data, this);
-    }
+    this.paymentInstrument = P13n.processInstrument(data, this);
 
     if (this.isPayout) {
       Analytics.track('payout:create:start');

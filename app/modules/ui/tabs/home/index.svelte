@@ -288,10 +288,8 @@
   $: {
     if (personalization) {
       Analytics.setMeta('p13n', true);
-      session.p13n = true;
     } else {
       Analytics.removeMeta('p13n');
-      session.p13n = false;
     }
   }
 
