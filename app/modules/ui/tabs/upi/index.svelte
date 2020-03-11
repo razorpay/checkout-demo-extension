@@ -43,6 +43,7 @@
 
   // Store
   import { contact } from 'checkoutstore/screens/home';
+  import { customer } from 'checkoutstore/customer';
 
   // Props
   export let selectedApp = undefined;
@@ -72,7 +73,7 @@
   let isANewVpa = false;
   let rememberVpaCheckbox;
   let intentAppSelected = null;
-  let customer;
+  let collectEnabled = false;
 
   const session = getSession();
 
@@ -124,6 +125,10 @@
     }
   }
 
+  $: {
+    tokens = filterUPITokens(_Obj.getSafely($customer, 'tokens.items', []));
+  }
+
   function setWebPaymentsApiUsage(to) {
     useWebPaymentsApi = to;
 
@@ -145,8 +150,6 @@
   }
 
   onMount(() => {
-    updateCustomer();
-
     checkGPay(session)
       /* Use Google Pay */
       .then(() => {
@@ -181,14 +184,7 @@
     session.switchTab('qr');
   }
 
-  export function updateCustomer() {
-    customer = session.getCustomer($contact);
-
-    tokens = filterUPITokens(_Obj.getSafely(customer, 'tokens.items', []));
-  }
-
   export function onShown() {
-    updateCustomer();
     determineCtaVisibility();
   }
 
@@ -474,7 +470,7 @@
             on:click={() => {
               onUpiAppSelection({ detail: { id: 'new' } });
             }}
-            {customer}
+            customer={$customer}
             on:blur={trackVpaEntry}
             selected={selectedToken === 'new'}
             bind:this={vpaField} />
