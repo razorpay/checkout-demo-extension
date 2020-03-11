@@ -71,18 +71,7 @@ const METHOD_FILTERS = {
   upi: instrument => {
     // Only allow directpay instruments that have a VPA
     if (instrument['_[flow]'] === 'directpay') {
-      if (instrument.vpa) {
-        // We filter out @ybl VPAs
-        const isYblVpa = _Str.endsWith(instrument.vpa, '@ybl');
-
-        if (isYblVpa) {
-          return false;
-        } else {
-          return true;
-        }
-      } else {
-        return false;
-      }
+      return Boolean(instrument.vpa);
     }
 
     // Allow QR instruments
