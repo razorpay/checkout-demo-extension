@@ -549,16 +549,6 @@
     return true;
   }
 
-  export function getSelectedInstrument() {
-    return (
-      instruments &&
-      _Arr.find(
-        instruments,
-        instrument => instrument.id === $selectedInstrumentId
-      )
-    );
-  }
-
   function attemptPayment() {
     session.preSubmit();
   }
