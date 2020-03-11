@@ -1896,7 +1896,7 @@ Session.prototype = {
 
     this.customer.checkStatus(
       function(response) {
-        self.updateCustomerInStore(self.customer);
+        self.updateCustomerInStore();
         if (_Obj.hasOwnProp(response, 'saved')) {
           if (response.saved) {
             callback();
@@ -2336,7 +2336,7 @@ Session.prototype = {
       var self = this;
       this.customer.createOTP(function(message) {
         debounceAskOTP(self.otpView, message, true);
-        self.updateCustomerInStore(self.customer);
+        self.updateCustomerInStore();
       });
     }
   },
@@ -3383,7 +3383,7 @@ Session.prototype = {
       }
       var customer = this.getCustomer(contact);
       this.customer = customer;
-      this.updateCustomerInStore(customer);
+      this.updateCustomerInStore();
 
       if (this.customer.logged && !this.local) {
         $('#top-right').addClass('logged');
@@ -3399,6 +3399,7 @@ Session.prototype = {
     }
 
     if (tab === 'upi') {
+      this.updateCustomerInStore();
       this.upiTab.onShown();
     }
 
@@ -3423,7 +3424,7 @@ Session.prototype = {
       // If we are switching from home tab or cardless emi tab (after choosing
       // "EMI on Cards"), the customer might have changed.
       if (this.screen === '' || this.screen === 'cardless_emi') {
-        this.updateCustomerInStore(this.customer);
+        this.updateCustomerInStore();
         this.svelteCardTab.showLandingView();
       }
       this.showCardTab(tab);
@@ -3495,7 +3496,7 @@ Session.prototype = {
                 '<br>to save your card for future payments',
               true
             );
-            self.updateCustomerInStore(self.customer);
+            self.updateCustomerInStore();
           });
         } else if (customer.saved && !customer.logged) {
           askOTP(self.otpView, undefined, true);
@@ -4239,7 +4240,7 @@ Session.prototype = {
               wallet: this.tab === 'wallet',
             });
             askOTP(this.otpView, msg, true);
-            this.updateCustomerInStore(this.customer);
+            this.updateCustomerInStore();
           }
         };
       } else {
@@ -4258,7 +4259,7 @@ Session.prototype = {
             // OTP verification successful
             OtpService.resetCount('razorpay');
 
-            self.updateCustomerInStore(self.customer);
+            self.updateCustomerInStore();
             self.svelteCardTab.showLandingView().then(function() {
               self.showCardTab();
             });
@@ -4267,7 +4268,7 @@ Session.prototype = {
               wallet: self.tab === 'wallet',
             });
             askOTP(this.otpView, msg, true);
-            self.updateCustomerInStore(self.customer);
+            self.updateCustomerInStore();
           }
         };
       }
@@ -4764,7 +4765,7 @@ Session.prototype = {
         this.commenceOTP(strings.otpsend, false, 'saved_cards_save');
         debounceAskOTP(this.otpView, undefined, true);
         this.customer.createOTP(function() {
-          session.updateCustomerInStore(session.customer);
+          session.updateCustomerInStore();
         });
       } else if (!this.headless) {
         request.message = 'Verifying OTP...';
@@ -5524,7 +5525,8 @@ Session.prototype = {
     return getCustomer.apply(null, arguments);
   },
 
-  updateCustomerInStore: function(customer) {
+  updateCustomerInStore: function() {
+    var customer = this.getCustomer(getPhone());
     CustomerStore.customer.set(customer);
   },
 
