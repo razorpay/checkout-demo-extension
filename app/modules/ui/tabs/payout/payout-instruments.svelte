@@ -235,7 +235,7 @@
             classes={['secondary-color']}
             on:select={() => dispatch('add', { method: 'upi' })}>
             <div>UPI</div>
-            <div class="desc">Add a UPI ID (BHIM, Google Pay and more)</div>
+            <div class="desc">Add a UPI ID (BHIM, PhonePe and more)</div>
           </NextOption>
 
         </div>
@@ -259,8 +259,8 @@
     </div>
     <div slot="bottom">
       <DowntimeCallout>
-        Payouts to Yes Bank and PhonePe accounts are temporarily disabled.
-        Please try another bank.
+        Payouts to Yes Bank accounts are temporarily disabled. Please try
+        another bank.
       </DowntimeCallout>
     </div>
   </Screen>
