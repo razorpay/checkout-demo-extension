@@ -1,7 +1,7 @@
 import { toLowerCaseSafe } from 'lib/utils';
 
 /**
- * Extracts config data related to UPI from the p13n instrument.
+ * Extracts config data related to UPI from the preferred instrument.
  *
  * @param {Object} instrument
  * @return {Object}
@@ -32,7 +32,7 @@ function upi(instrument) {
 }
 
 /**
- * Extracts config data related to netbanking from the p13n instrument.
+ * Extracts config data related to netbanking from the preferred instrument.
  *
  * @param {Object} instrument
  * @return {Object}
@@ -45,7 +45,7 @@ function netbanking(instrument) {
 }
 
 /**
- * Extracts config data related to saved card from the p13n instrument.
+ * Extracts config data related to saved card from the preferred instrument.
  *
  * @param {Object} instrument
  * @return {Object}
@@ -60,7 +60,7 @@ function card(instrument) {
 }
 
 /**
- * Extracts config data related to wallet from the p13n instrument.
+ * Extracts config data related to wallet from the preferred instrument.
  *
  * @param {Object} instrument
  * @return {Object}

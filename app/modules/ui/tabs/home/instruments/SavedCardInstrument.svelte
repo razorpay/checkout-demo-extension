@@ -16,7 +16,7 @@
   import { contact, selectedInstrumentId } from 'checkoutstore/screens/home';
 
   // Props
-  export let instrument = {}; // P13n instrument
+  export let instrument = {};
   export let name = 'instrument';
 
   const session = getSession();

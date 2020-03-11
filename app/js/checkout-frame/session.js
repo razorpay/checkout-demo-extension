@@ -4359,10 +4359,10 @@ Session.prototype = {
     }
 
     this.isResumedPayment = false;
-    this.doneByP13n = false;
+    this.doneByInstrument = false;
     this.payload = null;
 
-    Analytics.removeMeta('doneByP13n');
+    Analytics.removeMeta('doneByInstrument');
 
     var params = {};
     params[Constants.UPI_POLL_URL] = '';
@@ -4727,15 +4727,15 @@ Session.prototype = {
       var selectedInstrument = this.getSelectedPaymentInstrument();
 
       if (selectedInstrument) {
-        this.doneByP13n = P13n.addInstrumentToPaymentData(
+        this.doneByInstrument = P13n.addInstrumentToPaymentData(
           data,
           selectedInstrument,
           this.getCustomer(getPhone())
         );
 
         /* TODO: the following code is the hack for ftx (2018), fix it properly */
-        if (this.doneByP13n) {
-          Analytics.setMeta('doneByP13n', true);
+        if (this.doneByInstrument) {
+          Analytics.setMeta('doneByInstrument', true);
           if (
             ['card', 'emi', 'wallet'].indexOf(selectedInstrument.method) > -1
           ) {
