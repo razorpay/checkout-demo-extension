@@ -2,7 +2,6 @@ const { getTestData } = require('../../../actions');
 
 const {
   assertBasicDetailsScreen,
-  assertSelectorAbsence,
   fillUserDetails,
   proceed,
 } = require('../actions');
@@ -27,10 +26,9 @@ describe.each(
       preferences,
       method: 'Card',
     });
-
     await assertBasicDetailsScreen(context);
     await fillUserDetails(context, '8888888881');
     await proceed(context);
-    await assertSelectorAbsence(context, '#instruments-list');
+    await expect('#instruments-list').selectorToBeAbsent(context);
   });
 });
