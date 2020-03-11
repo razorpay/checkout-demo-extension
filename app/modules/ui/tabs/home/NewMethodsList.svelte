@@ -82,51 +82,14 @@
     }
   }
 
-  function trackP13nInstrumentSelected(instrument, index) {
-    Analytics.track('p13:method:select', {
+  function trackInstrumentSelection(instrument, index) {
+    Analytics.track('instrument:select', {
       type: AnalyticsTypes.BEHAV,
       data: {
         data: instrument,
         index,
       },
     });
-  }
-
-  function selectP13nInstrument(instrument, index) {
-    trackP13nInstrumentSelected(instrument, index);
-
-    if (instrument.method === 'card') {
-      const tokens = _Obj.getSafely(customer, 'tokens.items', []);
-      const existing = _Arr.find(
-        tokens,
-        token => token.id === instrument.token_id
-      );
-
-      if (existing) {
-        setTimeout(() => {
-          // Focus on the input field
-          // TODO: Figure out a better way to do this
-          const extraInput = _Doc.querySelector(
-            '#instruments-list > .selected input.input'
-          );
-
-          if (extraInput) {
-            extraInput.focus();
-          }
-        });
-      } else {
-        selectMethod({
-          detail: {
-            method: 'card',
-          },
-        });
-
-        return;
-      }
-    }
-
-    $selectedInstrumentId = instrument.id;
-    showCtaWithDefaultText();
   }
 
   function deselectInstrument() {
@@ -153,8 +116,7 @@
     {#each block.instruments as instrument, index (instrument.id)}
       <Instrument
         {instrument}
-        selected={instrument.id === $selectedInstrumentId}
-        on:click={() => selectP13nInstrument(instrument, index)}
+        on:click={() => trackInstrumentSelection(instrument, index)}
         on:submit />
     {/each}
   </div>

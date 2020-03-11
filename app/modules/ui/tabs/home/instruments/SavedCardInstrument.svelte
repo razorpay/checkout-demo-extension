@@ -93,10 +93,25 @@
   function selectionHandler() {
     if (cardKnown) {
       $selectedInstrumentId = instrument.id;
+
+      setTimeout(() => {
+        // Focus on the input field
+        const instrumentInDom = _El.closest(
+          _Doc.querySelector(`.home-methods input[value="${instrument.id}"]`),
+          '.instrument'
+        );
+        const cvvInput = instrumentInDom.querySelector('.cvv-input');
+
+        if (cvvInput) {
+          cvvInput.focus();
+        }
+      });
     } else {
       $selectedInstrumentId = null;
 
-      // TODO: Switch to cards screen
+      // TODO: Someday, preselect the saved card in the saved cards list.
+
+      session.switchTab('card');
     }
   }
 </script>
