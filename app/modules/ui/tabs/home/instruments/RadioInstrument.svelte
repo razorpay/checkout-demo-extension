@@ -14,12 +14,14 @@
   import Track from 'tracker';
 
   // Store
-  import { contact } from 'checkoutstore/screens/home';
+  import { contact, selectedInstrumentId } from 'checkoutstore/screens/home';
 
   // Props
   export let instrument = {}; // P13n instrument
   export let name = 'instrument';
-  export let selected = false;
+
+  let selected = false;
+  $: selected = $selectedInstrumentId === instrument.id;
 
   const session = getSession();
   const dispatch = createEventDispatcher();
@@ -111,6 +113,10 @@
       dispatch('submit');
     }
   }
+
+  function selectInstrument() {
+    $selectedInstrumentId = instrument.id;
+  }
 </script>
 
 <SlottedRadioOption
@@ -120,6 +126,7 @@
   className="instrument"
   value={instrument.id}
   on:click
+  on:click={selectInstrument}
   on:keydown={attemptSubmit}>
   <i slot="icon">
     <Icon {icon} {alt} />
