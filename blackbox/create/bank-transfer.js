@@ -49,7 +49,7 @@ module.exports = function(testFeatures) {
       });
 
       const missingUserDetails = optionalContact && optionalEmail;
-      const isHomeScreenSkipped = missingUserDetails && !partialPayment; // and not TPV
+      const isHomeScreenSkipped = missingUserDetails && !partialPayments; // and not TPV
 
       if (!isHomeScreenSkipped) {
         await assertBasicDetailsScreen(context);
