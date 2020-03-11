@@ -1,6 +1,4 @@
 <script>
-  /* global each, Event */
-
   // Svelte imports
   import { onMount, tick } from 'svelte';
 
