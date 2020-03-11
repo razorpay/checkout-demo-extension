@@ -39,6 +39,7 @@ var preferences = window.preferences,
   storeGetter = discreet.storeGetter,
   HomeScreenStore = discreet.HomeScreenStore,
   CardScreenStore = discreet.CardScreenStore,
+  CustomerStore = discreet.CustomerStore,
   EmiStore = discreet.EmiStore,
   Cta = discreet.Cta,
   NBHandlers = discreet.NBHandlers;
@@ -1888,12 +1889,14 @@ Session.prototype = {
   },
 
   checkCustomerStatus: function(params, callback) {
+    var self = this;
     var provider = params.provider;
     var data = params.data;
     var phone = params.contact;
 
     this.customer.checkStatus(
       function(response) {
+        self.updateCustomerInStore(self.customer);
         if (_Obj.hasOwnProp(response, 'saved')) {
           if (response.saved) {
             callback();
@@ -2333,6 +2336,7 @@ Session.prototype = {
       var self = this;
       this.customer.createOTP(function(message) {
         debounceAskOTP(self.otpView, message, true);
+        self.updateCustomerInStore(self.customer);
       });
     }
   },
@@ -3378,7 +3382,9 @@ Session.prototype = {
       ) {
         return;
       }
-      this.customer = this.getCustomer(contact);
+      var customer = this.getCustomer(contact);
+      this.customer = customer;
+      this.updateCustomerInStore(customer);
 
       if (this.customer.logged && !this.local) {
         $('#top-right').addClass('logged');
@@ -3489,6 +3495,7 @@ Session.prototype = {
                 '<br>to save your card for future payments',
               true
             );
+            self.updateCustomerInStore(self.customer);
           });
         } else if (customer.saved && !customer.logged) {
           askOTP(self.otpView, undefined, true);
@@ -4232,6 +4239,7 @@ Session.prototype = {
               wallet: this.tab === 'wallet',
             });
             askOTP(this.otpView, msg, true);
+            this.updateCustomerInStore(this.customer);
           }
         };
       } else {
@@ -4260,6 +4268,7 @@ Session.prototype = {
               wallet: self.tab === 'wallet',
             });
             askOTP(this.otpView, msg, true);
+            this.updateCustomerInStore(this.customer);
           }
         };
       }
@@ -4755,7 +4764,9 @@ Session.prototype = {
         Analytics.track('saved_cards:save:otp:ask');
         this.commenceOTP(strings.otpsend, false, 'saved_cards_save');
         debounceAskOTP(this.otpView, undefined, true);
-        return this.customer.createOTP();
+        this.customer.createOTP(function() {
+          session.updateCustomerInStore(session.customer);
+        });
       } else if (!this.headless) {
         request.message = 'Verifying OTP...';
         request.paused = true;
@@ -5512,6 +5523,10 @@ Session.prototype = {
 
   getCustomer: function() {
     return getCustomer.apply(null, arguments);
+  },
+
+  updateCustomerInStore: function(customer) {
+    CustomerStore.customer.set(customer);
   },
 
   /**

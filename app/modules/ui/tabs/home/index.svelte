@@ -27,6 +27,8 @@
     partialPaymentOption,
   } from 'checkoutstore/screens/home';
 
+  import { customer } from 'checkoutstore/customer';
+
   // Utils imports
   import { getSession } from 'sessionmanager';
   import {
@@ -230,9 +232,9 @@
   }
 
   export function updateCustomer() {
-    customer = session.getCustomer($contact);
+    $customer = session.getCustomer($contact);
 
-    const loggedIn = _Obj.getSafely(customer, 'logged');
+    const loggedIn = _Obj.getSafely($customer, 'logged');
     _El.keepClass(_Doc.querySelector('#topbar #top-right'), 'logged', loggedIn);
   }
 
@@ -282,7 +284,6 @@
 
   let personalization;
   let instruments;
-  let customer;
 
   $: {
     if (view === 'methods') {
@@ -757,7 +758,7 @@
             <NewMethodsList
               {personalization}
               {instruments}
-              {customer}
+              customer={$customer}
               on:selectMethod={selectMethod}
               on:submit={attemptPayment} />
           </div>
