@@ -782,9 +782,9 @@ function debounceAskOTP(view, msg, shouldLimitResend, screenProps) {
 
 // this === Session
 function successHandler(response) {
-  if (this.p13n && this.p13nInstrument) {
+  if (this.p13n && this.paymentInstrument) {
     P13n.recordSuccess(
-      this.p13nInstrument,
+      this.paymentInstrument,
       this.customer || this.getCustomer(this.payload.contact)
     );
   }
@@ -3437,7 +3437,7 @@ Session.prototype = {
     }
 
     if (!tab) {
-      var selectedInstrument = this.getSelectedP13nInstrument();
+      var selectedInstrument = this.getSelectedPaymentInstrument();
 
       if (selectedInstrument) {
         $('#body').addClass('sub');
@@ -4584,7 +4584,7 @@ Session.prototype = {
         return;
       }
 
-      var selectedInstrument = this.getSelectedP13nInstrument();
+      var selectedInstrument = this.getSelectedPaymentInstrument();
 
       if (selectedInstrument && selectedInstrument.method === 'card') {
         /*
@@ -4613,7 +4613,7 @@ Session.prototype = {
     this.submit();
   },
 
-  getSelectedP13nInstrument: function() {
+  getSelectedPaymentInstrument: function() {
     if (!this.p13n) {
       return;
     }
@@ -4724,7 +4724,7 @@ Session.prototype = {
     };
 
     if (!this.screen) {
-      var selectedInstrument = this.getSelectedP13nInstrument();
+      var selectedInstrument = this.getSelectedPaymentInstrument();
 
       if (selectedInstrument) {
         this.doneByP13n = P13n.addInstrumentToPaymentData(
@@ -5062,7 +5062,7 @@ Session.prototype = {
     }
 
     if (this.p13n) {
-      this.p13nInstrument = P13n.processInstrument(data, this);
+      this.paymentInstrument = P13n.processInstrument(data, this);
     }
 
     if (this.isPayout) {
