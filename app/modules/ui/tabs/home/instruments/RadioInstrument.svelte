@@ -9,7 +9,7 @@
   // Utils imports
   import { getSession } from 'sessionmanager';
   import { getBankLogo } from 'common/bank';
-  import PreferencesStore from 'checkoutstore/preferences';
+  import { getBanks } from 'checkoutstore';
   import { getWallet } from 'common/wallet';
   import Track from 'tracker';
 
@@ -45,7 +45,7 @@
   }
 
   $: {
-    const banks = PreferencesStore.get().methods.netbanking;
+    const banks = getBanks();
     let wallet;
     let flow;
     let vpaSplit;

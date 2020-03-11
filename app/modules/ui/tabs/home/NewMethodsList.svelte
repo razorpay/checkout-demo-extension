@@ -2,9 +2,6 @@
   // Svelte imports
   import { createEventDispatcher } from 'svelte';
 
-  // Props
-  export let customer = {};
-
   // UI imports
   import Method from 'ui/tabs/home/Method.svelte';
   import Instrument from 'ui/tabs/home/instruments/Instrument.svelte';

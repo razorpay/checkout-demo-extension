@@ -8,7 +8,7 @@
   // Utils imports
   import { findCodeByNetworkName } from 'common/card';
   import { getSession } from 'sessionmanager';
-  import PreferencesStore from 'checkoutstore/preferences';
+  import { getBanks } from 'checkoutstore';
   import { getIcon as getNetworkIcon } from 'icons/network';
   import Track from 'tracker';
 
@@ -23,7 +23,7 @@
   const customer = session.getCustomer($contact);
 
   function getBankText(card, loggedIn) {
-    const banks = PreferencesStore.get().methods.netbanking;
+    const banks = getBanks();
     const bank = banks[card.issuer] || '';
     const bankText = bank.replace(/ Bank$/, '');
 

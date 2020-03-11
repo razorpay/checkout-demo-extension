@@ -718,7 +718,6 @@
             in:fly={{ delay: 100, duration: 400, y: 100 }}
             out:fly={{ duration: 400, y: 100 }}>
             <NewMethodsList
-              customer={$customer}
               on:selectMethod={selectMethod}
               on:submit={attemptPayment} />
           </div>

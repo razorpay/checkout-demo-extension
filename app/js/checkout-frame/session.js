@@ -4449,6 +4449,8 @@ Session.prototype = {
     }
 
     var merchantOrder = Store.getMerchantOrder();
+    var selectedInstrument = this.getSelectedPaymentInstrument();
+
     if (merchantOrder && merchantOrder.bank && !Store.isRecurring()) {
       if (!this.checkCommonValid()) {
         return;
@@ -4465,8 +4467,6 @@ Session.prototype = {
         }
       }
     } else if (screen) {
-      var selectedInstrument = this.getSelectedPaymentInstrument();
-
       if (screen === 'card') {
         // TODO: simplify conditions
         // Do not proceed with amex cards if amex is disabled for merchant
@@ -4592,7 +4592,7 @@ Session.prototype = {
          */
         var instrumentInDom = _El.closest(
           _Doc.querySelector(
-            '.home-methods input[value="' + instrument.id + '"]'
+            '.home-methods input[value="' + selectedInstrument.id + '"]'
           ),
           '.instrument'
         );

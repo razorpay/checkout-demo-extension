@@ -35,7 +35,7 @@
   }
 
   function switchToMethod() {
-    const method = instrument.method;
+    let method = instrument.method;
 
     if (method === 'paypal') {
       createPaypalPayment();
