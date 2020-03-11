@@ -23,6 +23,8 @@
     remember,
   } from 'checkoutstore/screens/card';
 
+  import { customer } from 'checkoutstore/customer';
+
   import { contact } from 'checkoutstore/screens/home';
   import { isRecurring, shouldRememberCustomer } from 'checkoutstore';
   import {
@@ -65,9 +67,6 @@
   let showSavedCardsCta = false;
   $: showSavedCardsCta = savedCards && savedCards.length && isSavedCardsEnabled;
 
-  // State
-  let customer = {};
-
   // Refs
   let savedCardsView;
   let addCardView;
@@ -109,7 +108,7 @@
   }
 
   $: {
-    allSavedCards = getSavedCardsFromCustomer(customer);
+    allSavedCards = getSavedCardsFromCustomer($customer);
   }
 
   $: {
@@ -188,14 +187,16 @@
   }
 
   export function showLandingView() {
-    tick().then(_ => {
-      let viewToSet = Views.ADD_CARD;
+    return tick()
+      .then(_ => {
+        let viewToSet = Views.ADD_CARD;
 
-      if (savedCards && savedCards.length > 0 && isSavedCardsEnabled) {
-        viewToSet = Views.SAVED_CARDS;
-      }
-      setView(viewToSet);
-    });
+        if (savedCards && savedCards.length > 0 && isSavedCardsEnabled) {
+          viewToSet = Views.SAVED_CARDS;
+        }
+        setView(viewToSet);
+      })
+      .then(tick);
   }
 
   export function showAddCardView() {
@@ -360,19 +361,6 @@
       type: AnalyticsTypes.BEHAV,
       data: eventData,
     });
-  }
-
-  /**
-   * Updates the customer, shows the landing view and returns a promise that resolves when the landing view is visible
-   * @param newCustomer
-   * @return {Promise<void>}
-   */
-  export function updateCustomerAndShowLandingView(newCustomer = {}) {
-    customer = newCustomer;
-    // Wait for pending state updates from reactive statements
-    return tick()
-      .then(showLandingView)
-      .then(tick);
   }
 
   export function setSelectedOffer(newOffer) {

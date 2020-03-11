@@ -2438,7 +2438,8 @@ Session.prototype = {
     _El.removeClass(_Doc.querySelector('#top-right'), 'logged');
 
     if (this.svelteCardTab) {
-      this.svelteCardTab.updateCustomerAndShowLandingView();
+      CustomerStore.customer.set({});
+      this.svelteCardTab.showLandingView();
     }
 
     this.homeTab.updateCustomer();
@@ -3424,7 +3425,8 @@ Session.prototype = {
       // If we are switching from home tab or cardless emi tab (after choosing
       // "EMI on Cards"), the customer might have changed.
       if (this.screen === '' || this.screen === 'cardless_emi') {
-        this.svelteCardTab.updateCustomerAndShowLandingView(this.customer);
+        this.updateCustomerInStore(this.customer);
+        this.svelteCardTab.showLandingView();
       }
       this.showCardTab(tab);
       setEmiPlansCta(this.screen, tab);
@@ -4258,17 +4260,16 @@ Session.prototype = {
             // OTP verification successful
             OtpService.resetCount('razorpay');
 
-            self.svelteCardTab
-              .updateCustomerAndShowLandingView(self.customer)
-              .then(function() {
-                self.showCardTab();
-              });
+            self.updateCustomerInStore(self.customer);
+            self.svelteCardTab.showLandingView().then(function() {
+              self.showCardTab();
+            });
           } else {
             Analytics.track('behav:otp:incorrect', {
               wallet: self.tab === 'wallet',
             });
             askOTP(this.otpView, msg, true);
-            this.updateCustomerInStore(this.customer);
+            self.updateCustomerInStore(self.customer);
           }
         };
       }
