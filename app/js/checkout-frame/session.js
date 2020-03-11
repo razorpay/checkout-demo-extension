@@ -2437,12 +2437,10 @@ Session.prototype = {
 
     _El.removeClass(_Doc.querySelector('#top-right'), 'logged');
 
+    CustomerStore.customer.set({});
     if (this.svelteCardTab) {
-      CustomerStore.customer.set({});
       this.svelteCardTab.showLandingView();
     }
-
-    this.homeTab.updateCustomer();
   },
 
   /**
