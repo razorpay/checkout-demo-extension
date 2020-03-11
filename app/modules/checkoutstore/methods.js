@@ -9,6 +9,7 @@ import {
   isIRCTC,
   hasFeature,
   isPayout,
+  isOfferForced,
 } from 'checkoutstore';
 
 import {
@@ -116,6 +117,7 @@ const ALL_METHODS = {
   bank_transfer() {
     return (
       getAmount() &&
+      !isOfferForced() &&
       !isInternational() &&
       getOption('method.bank_transfer') &&
       getOption('order_id')

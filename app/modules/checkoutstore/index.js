@@ -25,6 +25,8 @@ export const isIRCTC = () => IRCTC_KEYS |> _Arr.contains(getOption('key'));
 export const getMerchantMethods = () => preferences.methods;
 export const getRecurringMethods = () => preferences.methods.recurring;
 export const getMerchantOrder = () => preferences.order;
+export const getMerchantOffers = () => preferences.offers;
+export const isOfferForced = () => preferences.force_offer;
 export const getDowntimes = () => _getDowntimes(preferences);
 export const isCustomerFeeBearer = () => preferences.fee_bearer;
 
