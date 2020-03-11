@@ -73,7 +73,6 @@
   let isANewVpa = false;
   let rememberVpaCheckbox;
   let intentAppSelected = null;
-  let collectEnabled = false;
 
   const session = getSession();
 
