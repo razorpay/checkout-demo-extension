@@ -4,23 +4,14 @@
 
   // Store
   import { selectedPlanTextForNewCard } from 'checkoutstore/emi';
-
-  // Utils
-  import { getSession } from 'sessionmanager';
+  import { isMethodEnabled } from 'checkoutstore/methods';
+  import { getEMIBanksText } from 'checkoutframe/paymentmethods';
 
   // Props
   export let emiCtaView;
   export let savedCount = 0;
 
-  const session = getSession();
-
   const dispatch = createEventDispatcher();
-
-  function getEmiBanksList() {
-    const { banks = {} } = session.emi_options || {};
-    const bankList = _Obj.entries(banks).map(([_, bank]) => bank.name);
-    return bankList.join(', ');
-  }
 
   function handleEmiCtaClick(event) {
     dispatch('click', event.detail);
@@ -34,11 +25,11 @@
     {#if emiCtaView === 'plans-unavailable'}
       <div class="emi-plan-unavailable emi-icon-multiple-cards">
         <span class="help">
-          EMI is available on {getEmiBanksList()} cards. Enter your credit card
+          EMI is available on {getEMIBanksText()} cards. Enter your credit card
           to avail.
         </span>
         <div class="emi-plans-text">EMI unavailable</div>
-        {#if session.methods.card}
+        {#if isMethodEnabled('card')}
           <div class="emi-plans-action theme-highlight">Pay entire amount</div>
         {/if}
       </div>

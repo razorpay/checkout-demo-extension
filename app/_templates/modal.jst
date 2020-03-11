@@ -1,21 +1,21 @@
 `
 var params = arguments[1];
-var getStore = params.getStore;
+
+var Store = params.Store;
+var MethodStore = params.MethodStore;
+var isMethodEnabled = MethodStore.isMethodEnabled;
+var emiBanks = MethodStore.getEMIBanks();
+var emiCsv = Object.keys(emiBanks).join(', ');
+
 var cta = params.cta;
 
-var optional = getStore('optional');
-var contactEmailOptional = getStore('contactEmailOptional');
 var o = _.get;
 var ecod = o('ecod');
 var address = o('address');
 var method = _.methods;
 var cardOffer = _.cardOffer;
-var wallet = method.wallet;
+var wallet = MethodStore.getWallets();
 var icons = _.themeMeta.icons;
-var freechargeWallet = findBy(wallet, 'name', 'freecharge') || {};
-var airtelmoneyWallet = findBy(wallet, 'name', 'airtelmoney') || {};
-var mobikwikWallet = findBy(wallet, 'name', 'mobikwik') || {};
-var olamoneyWallet = freqWallets.olamoney || {};
 var html = function(html){return html.replace(/<[^>]*>?/g, "")};
 var attr = function(attr){return attr.replace(/"/g,'')};
 var order = _.order || {};
@@ -24,7 +24,6 @@ var gpay_omnichannel = preferences.features && preferences.features.google_pay_o
 var invoice = _.invoice;
 
 var bank = _.tpvBank || {};
-var emi_options = _.emi_options;
 var accountName = o('prefill.bank_account[name]');
 
 var amount;
@@ -39,24 +38,11 @@ var prefill_email = attr(o('prefill.email'));
 var prefill_contact = attr(o('prefill.contact'));
 var prefill_name = attr(o('prefill.name'));
 
-var contact_hidden = o('hidden.contact') && optional.contact;
-var email_hidden = o('hidden.email') && optional.email;
-
 var contact_readonly = o('readonly.contact') && prefill_contact;
 var email_readonly = o('readonly.email') && prefill_email;
 var name_readonly = o('readonly.name') && prefill_name;
 
 var subscription_will_refund = _.subscription && (_.subscription.type === 0);
-
-var emi_banks_csv = '';
-if(emi_options && emi_options.banks){
-   var emi_bank_names = [];
-   for(var bank_code in emi_options.banks){
-      emi_bank_names.push(emi_options.banks[bank_code].name);
-   }
-   emi_banks_csv = emi_bank_names.join(', ');
-}
-
 `
 <div id="container" class="mfix animations" tabIndex="0">
   <div id="backdrop"></div>
@@ -149,12 +135,12 @@ if(emi_options && emi_options.banks){
           <form id="form" method="POST" novalidate autocomplete="off" onsubmit="return false">
             <div id="form-fields">
               <div id="home-screen-wrap"></div>
-              `?_.irctc`
+              `?Store.isIRCTC()`
                 <div class='recurring-message' style='right: 0;left: 0;border-radius:0 0 3px 3px'>
                       <span>&#x2139;</span>
                 *Payment charges and taxes as applicable.</div>
               `?`
-              `?method.emi && _.emi_options.banks['BAJAJ']`
+              `?isMethodEnabled('emi') && emiBanks.BAJAJ`
                 <div class="tab-content showable screen" id="form-emi"></div>
               `?`
               `?(wallet && wallet.length) || ecod`
@@ -165,7 +151,7 @@ if(emi_options && emi_options.banks){
                   <div id="wallets">
                     `?ecod`
                       <div class="list">
-                        `?method.upi`
+                        `?isMethodEnabled('upi')`
                           <div class="item radio-item wallet" tab="upi">
                             <input type="radio" name="wallet" id="ecod-radio-upi" tab="upi">
                             <label for="ecod-radio-upi" class="radio-label mfix">
@@ -233,10 +219,10 @@ if(emi_options && emi_options.banks){
               </div>
               <div id='payout-account-svelte-wrap'>
               </div>
-              `?method.upi && method.upi.qr`
+              `?isMethodEnabled('qr')`
                 <div class="tab-content showable screen pad" id="form-qr"></div>
               `?`
-              `?method.bank_transfer`
+              `?isMethodEnabled('bank_transfer')`
                 <div id='bank-transfer-svelte-wrap'></div>
               `?`
               `?ecod && invoice`
@@ -257,15 +243,15 @@ if(emi_options && emi_options.banks){
               `?`
               <div id="otp-screen-wrapper"></div>
               <div id="emi-plan-screen-wrapper"></div>
-              `?method.emandate`
+              `?isMethodEnabled('emandate')`
                 <div id="emandate-wrapper">
                 </div>
               `?`
-              `?method.cardless_emi`
+              `?isMethodEnabled('cardless_emi')`
                 <div id="emi-options-wrapper">
                 </div>
               `?`
-              `?method.paylater`
+              `?isMethodEnabled('paylater')`
                 <div id="paylater-wrapper">
                 </div>
               `?`

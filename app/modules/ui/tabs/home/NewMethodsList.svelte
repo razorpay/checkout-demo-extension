@@ -14,10 +14,10 @@
 
   // Utils imports
   import { AVAILABLE_METHODS } from 'common/constants';
-  import { getSession } from 'sessionmanager';
+  import { shouldSeparateDebitCard } from 'checkoutstore';
+  import { isMethodEnabled } from 'checkoutstore/methods';
   import { isMobile } from 'common/useragent';
   import { doesAppExist } from 'common/upi';
-  import { getInstrumentsForCustomer } from 'checkoutframe/personalization';
   import { showCtaWithDefaultText, hideCta } from 'checkoutstore/cta';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
@@ -26,19 +26,10 @@
   import { contact, selectedInstrumentId } from 'checkoutstore/screens/home';
 
   const dispatch = createEventDispatcher();
-  const session = getSession();
   let visibleMethods = [];
 
-  function filterMethods(methods) {
-    return _Arr.filter(AVAILABLE_METHODS, method => {
-      return _.isArray(methods[method])
-        ? Boolean(methods[method].length)
-        : methods[method];
-    });
-  }
-
   function setMethods(methods) {
-    let available = filterMethods(methods);
+    let available = _Arr.filter(AVAILABLE_METHODS, isMethodEnabled);
 
     /**
      * Cardless EMI and EMI are the same payment option.
@@ -61,7 +52,7 @@
     // TODO: Filter based on amount
 
     // Separate out debit and credit cards
-    if (session.get('theme.debit_card')) {
+    if (shouldSeparateDebitCard()) {
       available = _Arr.remove(available, 'card');
       available = ['credit_card', 'debit_card'].concat(available);
     }
@@ -147,7 +138,7 @@
     hideCta();
   }
 
-  setMethods(session.methods);
+  setMethods();
 
   function selectMethod(event) {
     dispatch('selectMethod', event.detail);

@@ -12,7 +12,7 @@
   export let value = '';
   export let type = null;
   export let id = '';
-  export let methods = {};
+  export let amexEnabled = false;
   export let recurring = false;
 
   // State
@@ -33,7 +33,7 @@
       return 'Card does not support recurring payments.';
     }
 
-    if (methods && !methods.amex && type === 'amex') {
+    if (amexEnabled && type === 'amex') {
       return 'Amex cards are not supported for this transaction.';
     }
 
