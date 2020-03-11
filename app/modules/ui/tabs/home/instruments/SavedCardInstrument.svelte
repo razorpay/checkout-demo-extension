@@ -13,17 +13,14 @@
   import Track from 'tracker';
 
   // Store
-  import { contact } from 'checkoutstore/screens/home';
+  import { contact, selectedInstrumentId } from 'checkoutstore/screens/home';
 
   // Props
   export let instrument = {}; // P13n instrument
-  export let selected = false; // Whether or not this instrument is selected
   export let name = 'instrument';
 
   const session = getSession();
   const customer = session.getCustomer($contact);
-
-  const id = Track.makeUid();
 
   function getBankText(card, loggedIn) {
     const banks = PreferencesStore.get().methods.netbanking;
@@ -90,6 +87,18 @@
   }
 
   const component = cardKnown ? SlottedRadioOption : SlottedOption;
+
+  let selected = cardKnown && $selectedInstrumentId === instrument.id;
+
+  function selectionHandler() {
+    if (cardKnown) {
+      $selectedInstrumentId = instrument.id;
+    } else {
+      $selectedInstrumentId = null;
+
+      // TODO: Switch to cards screen
+    }
+  }
 </script>
 
 <style>
@@ -106,12 +115,13 @@
 
 <svelte:component
   this={component}
+  ellipsis
   {name}
   {selected}
-  ellipsis
-  value={id}
-  radio={false}
   className="instrument"
+  radio={false}
+  value={instrument.id}
+  on:click={selectionHandler}
   on:click>
   <i slot="icon">
     <Icon {icon} alt="Card" />
