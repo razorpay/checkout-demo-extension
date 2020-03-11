@@ -29,16 +29,13 @@ function makeOptions(features, options) {
 }
 
 function makePreferences(features, preferences) {
-  preferences.order = [
-    {
-      amount: 0,
-      currency: 'INR',
-      payment_capture: true,
-    },
-  ];
-  preferences.order.bank = 'HDFC';
-  preferences.order.method = 'emandate';
-
+  preferences.order = {
+    amount: 0,
+    currency: 'INR',
+    payment_capture: true,
+    bank: 'HDFC',
+    method: 'emandate',
+  };
   return preferences;
 }
 
