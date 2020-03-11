@@ -22,6 +22,7 @@
   // Store
   import {
     contact,
+    selectedInstrument,
     selectedInstrumentId,
     blocks,
     instruments,
@@ -76,15 +77,8 @@
   }
 
   $: {
-    if ($selectedInstrumentId) {
-      const selected = _Arr.find(
-        $instruments,
-        instrument => instrument.id === $selectedInstrumentId
-      );
-
-      if (!selected) {
-        deselectInstrument();
-      }
+    if (!$selectedInstrument) {
+      deselectInstrument();
     }
   }
 
