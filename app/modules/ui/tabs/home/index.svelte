@@ -224,9 +224,7 @@
   }
 
   function getAllAvailableP13nInstruments() {
-    const _customer = session.getCustomer($contact);
-
-    return getTranslatedInstrumentsForCustomer(_customer, {
+    return getTranslatedInstrumentsForCustomer($customer, {
       upiApps: session.upi_intents_data,
     });
   }

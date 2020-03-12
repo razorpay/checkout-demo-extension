@@ -14,7 +14,8 @@
   import Track from 'tracker';
 
   // Store
-  import { contact, selectedInstrumentId } from 'checkoutstore/screens/home';
+  import { selectedInstrumentId } from 'checkoutstore/screens/home';
+  import { customer } from 'checkoutstore/customer';
 
   // Props
   export let instrument = {};
@@ -37,8 +38,7 @@
       return vpa;
     }
 
-    const customer = session.getCustomer($contact);
-    const tokens = _Obj.getSafely(customer, 'tokens.items', []);
+    const tokens = _Obj.getSafely($customer, 'tokens.items', []);
     const vpaToken = _Arr.find(tokens, item => item.id === token);
 
     return `${vpaToken.vpa.username}@${vpaToken.vpa.handle}`;

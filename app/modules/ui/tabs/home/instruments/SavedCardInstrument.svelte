@@ -13,14 +13,14 @@
   import Track from 'tracker';
 
   // Store
-  import { contact, selectedInstrumentId } from 'checkoutstore/screens/home';
+  import { selectedInstrumentId } from 'checkoutstore/screens/home';
+  import { customer } from 'checkoutstore/customer';
 
   // Props
   export let instrument = {};
   export let name = 'instrument';
 
   const session = getSession();
-  const customer = session.getCustomer($contact);
 
   function getBankText(card, loggedIn) {
     const banks = getBanks();
@@ -52,7 +52,7 @@
   let cvvLength = 3;
   let cardKnown = false;
 
-  const savedCards = _Obj.getSafely(customer, 'tokens.items', []);
+  const savedCards = _Obj.getSafely($customer, 'tokens.items', []);
   const savedCard = _Arr.find(
     savedCards,
     card => card.id === instrument.token_id
