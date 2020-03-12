@@ -3,11 +3,12 @@ const { execSync } = require('child_process');
 const DIR = require('./tmpdir');
 const fs = require('fs');
 const isProd = process.env.NODE_ENV === 'production';
+const flags = require('./chrome-flags');
 
 module.exports = async function() {
   const browser = await puppeteer.launch({
     // executablePath: process.env.CHROME_BIN || '/usr/bin/chromium',
-    args: ['--no-sandbox', '--single-process'],
+    args: flags,
     headless: isProd,
     // devtools: true,
   });

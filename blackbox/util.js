@@ -64,12 +64,8 @@ const util = (module.exports = {
   /**
    * Get the textContent of an element
    */
-  innerText: async function(page, element) {
-    try {
-      return await page.evaluate(element => element.textContent, element);
-    } catch (err) {
-      return undefined;
-    }
+  innerText: async function(selector) {
+    return await page.$eval(selector, el => el.textContent);
   },
 
   /**
@@ -107,7 +103,18 @@ const util = (module.exports = {
 
   delay: ms => new Promise(resolve => setTimeout(resolve, ms)),
 
-  visible: el => !!el.getBoundingClientRect().width,
+  visible: el => Boolean(el.offsetWidth),
+  assertVisible: async sel => {
+    expect(
+      await page.evaluate(sel => {
+        const el = document.querySelector(sel);
+        if (!el) {
+          throw `Element ${sel} is not present`;
+        }
+        return Boolean(el.offsetWidth);
+      }, sel)
+    ).toEqual(true);
+  },
 
   chrlow,
   chrup,

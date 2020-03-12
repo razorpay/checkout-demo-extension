@@ -124,11 +124,12 @@ module.exports = function(testFeatures) {
         await verifyDiscountAmountInBanner(context, '₹ 1,980');
         await verifyDiscountText(context, 'You save ₹ 20');
       }
-      await submit(context);
 
       if (partialPayment) {
         await verifyPartialAmount(context, '₹ 100');
       }
+
+      await submit(context);
 
       if (callbackUrl && timeout) {
         await verifyTimeout(context, 'card');

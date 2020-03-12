@@ -1,21 +1,17 @@
 const { delay } = require('../util');
 
 async function verifyPartialAmount(context, amount) {
-  const orignalAmount = await context.page.$('.original-amount');
-  const otpAmount = await context.page.evaluate(
-    orignalAmount => orignalAmount.textContent,
-    orignalAmount
+  const otpAmount = await context.page.$eval(
+    '.original-amount',
+    el => el.textContent
   );
   expect(otpAmount).toEqual(amount);
 }
 
 async function handlePartialPayment(context, amount) {
-  const makePartialCheckBox = await context.page.$('#partial-radio');
-  await makePartialCheckBox.click();
-  const amountValue = await context.page.$('#amount-value');
-  await amountValue.type(amount);
-  const nextButton = await context.page.$('#footer');
-  await nextButton.click();
+  await context.page.click('#partial-radio');
+  await context.page.type('#amount-value', amount);
+  await context.page.click('#footer');
 }
 
 module.exports = {
