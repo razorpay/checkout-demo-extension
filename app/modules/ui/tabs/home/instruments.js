@@ -1,6 +1,7 @@
 import { createBlock } from 'configurability/blocks';
 import { blocks } from 'checkoutstore/screens/home';
 import Track from 'tracker';
+import { MAX_PREFERRED_INSTRUMENTS } from 'common/constants';
 
 export function setBlocks({ preferred = [], merchant = [] }) {
   const preferredBlock = createBlock('rzp.preferred', {
@@ -12,7 +13,10 @@ export function setBlocks({ preferred = [], merchant = [] }) {
   // TODO: Filter out instruments from preferredBlock.instruments
 
   // Take top 3 preferred
-  preferredBlock.instruments = preferredBlock.instruments.slice(0, 3);
+  preferredBlock.instruments = preferredBlock.instruments.slice(
+    0,
+    MAX_PREFERRED_INSTRUMENTS
+  );
 
   let allBlocks = [preferredBlock];
 
