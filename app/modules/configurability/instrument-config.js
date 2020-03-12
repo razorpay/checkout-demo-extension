@@ -178,7 +178,7 @@ const config = {
 
       // App is known by a different name
       if (payment.app) {
-        payment.upi_app = app;
+        payment.upi_app = payment.app;
 
         delete payment.app;
       }
