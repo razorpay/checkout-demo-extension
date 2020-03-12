@@ -50,7 +50,9 @@ async function assertUserDetails(context) {
  */
 async function assertEditUserDetailsAndBack(context) {
   await context.page.click('#user-details [slot=title]');
+  await delay(200);
   await context.page.click('#footer');
+  await delay(200);
   await assertUserDetails(context);
 }
 
