@@ -34,4 +34,10 @@ export function setBlocks({ preferred = [], merchant = [] }) {
   });
 
   blocks.set(allBlocks);
+
+  return {
+    merchant,
+    preferred: preferredBlock,
+    all: allBlocks,
+  };
 }

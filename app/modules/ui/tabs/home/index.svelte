@@ -234,9 +234,15 @@
     const loggedIn = _Obj.getSafely($customer, 'logged');
     _El.keepClass(_Doc.querySelector('#topbar #top-right'), 'logged', loggedIn);
 
-    setBlocks({
+    const blocksThatWereSet = setBlocks({
       preferred: getAllAvailableP13nInstruments(),
     });
+
+    if (blocksThatWereSet.preferred.instruments.length) {
+      Analytics.setMeta('p13n', true);
+    } else {
+      Analytics.removeMeta('p13n');
+    }
   }
 
   function shouldUseP13n() {
@@ -284,14 +290,6 @@
   }
 
   let personalization;
-
-  $: {
-    if (personalization) {
-      Analytics.setMeta('p13n', true);
-    } else {
-      Analytics.removeMeta('p13n');
-    }
-  }
 
   export function onShown() {
     if (view === 'methods') {
