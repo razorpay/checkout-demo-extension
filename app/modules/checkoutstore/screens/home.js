@@ -15,9 +15,9 @@ export const blocks = writable([]);
 export const instruments = derived(blocks, allBlocks => {
   let allInstruments = [];
 
-  _Arr.loop(allBlocks, block =>
-    _Arr.mergeWith(allInstruments, block.instruments)
-  );
+  _Arr.loop(allBlocks, block => {
+    allInstruments = _Arr.mergeWith(allInstruments, block.instruments);
+  });
 
   return allInstruments;
 });

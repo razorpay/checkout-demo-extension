@@ -27,12 +27,12 @@ function getIndividualInstruments(instrument) {
  */
 export function ungroupInstruments(block) {
   const instruments = block.instruments;
-  const ungrouped = [];
+  let ungrouped = [];
 
   _Arr.loop(instruments, instrument => {
     const individuals = getIndividualInstruments(instrument);
 
-    _Arr.mergeWith(ungrouped, individuals);
+    ungrouped = _Arr.mergeWith(ungrouped, individuals);
   });
 
   return _Obj.extend(_Obj.clone(block), {

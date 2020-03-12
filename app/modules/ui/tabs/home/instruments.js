@@ -20,7 +20,7 @@ export function setBlocks({ preferred = [], merchant = [] }) {
 
   let allBlocks = [preferredBlock];
 
-  _Arr.mergeWith(allBlocks, merchant);
+  allBlocks = _Arr.mergeWith(allBlocks, merchant);
 
   // Filter out blocks with no instruments
   allBlocks = _Arr.filter(
