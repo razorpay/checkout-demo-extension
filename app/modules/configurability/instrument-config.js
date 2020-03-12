@@ -130,14 +130,15 @@ const config = {
 
   upi: {
     properties: ['flow', 'flows', 'app', 'apps', 'token_id', 'token_ids'],
-    payment: ['flow', 'app', 'token'],
+    payment: ['flow', 'app', 'token', 'vpa'],
     groupedToIndividual: grouped => {
       // TODO
 
       return [grouped];
     },
     isIndividual: instrument => {
-      const singleFlow = instrument.flow || _Obj.getSafely(instrument, 'flows', []).length === 1;
+      const singleFlow =
+        instrument.flow || _Obj.getSafely(instrument, 'flows', []).length === 1;
 
       const missingApp = !instrument.app && !instrument.apps;
       const singleApp =
@@ -146,7 +147,8 @@ const config = {
 
       const missingToken = !instrument.token_id && !instrument.token_ids;
       const singleToken =
-        instrument.token_id || _Obj.getSafely(instrument, 'token_ids', []).length === 1;
+        instrument.token_id ||
+        _Obj.getSafely(instrument, 'token_ids', []).length === 1;
       const singleorMissingTokens = singleToken || missingToken;
 
       return singleFlow && singleorMissingApps && singleorMissingTokens;
@@ -170,7 +172,7 @@ const config = {
       // Set flow to a different property
       if (payment.flow) {
         payment['_[flow]'] = payment.flow;
-        
+
         delete payment.flow;
       }
 
