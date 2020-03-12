@@ -40,7 +40,7 @@ function upi(instrument) {
 function netbanking(instrument) {
   return {
     method: 'netbanking',
-    issuer: instrument.bank,
+    bank: instrument.bank,
   };
 }
 

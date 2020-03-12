@@ -145,7 +145,7 @@ test('Module: personalization', t => {
       t.equals(typeof actual, 'object', 'Returns an object');
       t.equals(actual.id, 'Dhh86QTueOpyWX', 'Returns correct id');
       t.equals(actual.method, 'netbanking', 'Returns correct method');
-      t.equals(actual.issuer, 'HDFC', 'Returns correct bank');
+      t.equals(actual.bank, 'HDFC', 'Returns correct bank');
       t.ok(actual.meta, 'Meta is present');
       t.ok(actual.meta.preferred, 'meta.preferred is truthy');
       t.end();
