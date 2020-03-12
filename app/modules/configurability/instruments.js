@@ -59,7 +59,26 @@ export function isInstrumentForEntireMethod(instrument) {
 
   // None of the keys in the config should be present in the instrument
   return _Arr.every(
-    config.keys,
+    config.properties,
     key => !_Arr.contains(currentInsturmentKeys, key)
   );
+}
+
+/**
+ * Adds instrument data to payment payload
+ * @param {Instrument} instrument
+ * @param {Object} payment Payment payload
+ * @param {Customer} customer
+ *
+ * @returns {Object}
+ */
+export function addInstrumentToPaymentData(instrument, payment, customer) {
+  const method = instrument.method;
+  const config = InstrumentConfig[method];
+
+  if (!config) {
+    return payment;
+  }
+
+  return config.getPaymentPayload(instrument, payment, customer);
 }

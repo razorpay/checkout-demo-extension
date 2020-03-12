@@ -1,16 +1,10 @@
 <script>
   // Svelte imports
-  import { createEventDispatcher } from 'svelte';
-
-  // Props
-  export let personalization = false;
-  export let instruments = [];
-  export let customer = {};
+  import { createEventDispatcher, onDestroy } from 'svelte';
 
   // UI imports
   import Method from 'ui/tabs/home/Method.svelte';
-  import CardInstrument from 'ui/components/personalization/CardInstrument.svelte';
-  import Instrument from 'ui/components/personalization/Instrument.svelte';
+  import Instrument from 'ui/tabs/home/instruments/Instrument.svelte';
 
   // Utils imports
   import { AVAILABLE_METHODS } from 'common/constants';
@@ -21,11 +15,24 @@
   import { showCtaWithDefaultText, hideCta } from 'checkoutstore/cta';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
+  import { getSession } from 'sessionmanager';
 
   // Store
-  import { contact, selectedInstrumentId } from 'checkoutstore/screens/home';
+  import {
+    contact,
+    selectedInstrument,
+    selectedInstrumentId,
+    blocks,
+    instruments,
+  } from 'checkoutstore/screens/home';
+
+  onDestroy(() => {
+    deselectInstrument();
+  });
 
   const dispatch = createEventDispatcher();
+  const session = getSession();
+
   let visibleMethods = [];
 
   function setMethods(methods) {
@@ -74,20 +81,17 @@
   }
 
   $: {
-    if ($selectedInstrumentId) {
-      const selected = _Arr.find(
-        instruments || [],
-        instrument => instrument.id === $selectedInstrumentId
-      );
-
-      if (!selected) {
-        deselectInstrument();
+    if (session.screen === '') {
+      if ($selectedInstrument) {
+        showCtaWithDefaultText();
+      } else {
+        hideCta();
       }
     }
   }
 
-  function trackP13nInstrumentSelected(instrument, index) {
-    Analytics.track('p13:method:select', {
+  function trackInstrumentSelection(instrument, index) {
+    Analytics.track('instrument:select', {
       type: AnalyticsTypes.BEHAV,
       data: {
         data: instrument,
@@ -96,46 +100,8 @@
     });
   }
 
-  function selectP13nInstrument(instrument, index) {
-    trackP13nInstrumentSelected(instrument, index);
-
-    if (instrument.method === 'card') {
-      const tokens = _Obj.getSafely(customer, 'tokens.items', []);
-      const existing = _Arr.find(
-        tokens,
-        token => token.id === instrument.token_id
-      );
-
-      if (existing) {
-        setTimeout(() => {
-          // Focus on the input field
-          // TODO: Figure out a better way to do this
-          const extraInput = _Doc.querySelector(
-            '#instruments-list > .selected input.input'
-          );
-
-          if (extraInput) {
-            extraInput.focus();
-          }
-        });
-      } else {
-        selectMethod({
-          detail: {
-            method: 'card',
-          },
-        });
-
-        return;
-      }
-    }
-
-    $selectedInstrumentId = instrument.id;
-    showCtaWithDefaultText();
-  }
-
   function deselectInstrument() {
     $selectedInstrumentId = null;
-    hideCta();
   }
 
   setMethods();
@@ -151,28 +117,19 @@
   }
 </style>
 
-{#if personalization && instruments && instruments.length}
-  <h3 class="title">Preferred Payment Methods</h3>
-  <div role="list" class="border-list" id="instruments-list">
-    {#each instruments as instrument, index (instrument.id)}
-      {#if instrument.method === 'card'}
-        <CardInstrument
-          name="p13n"
-          {instrument}
-          {customer}
-          selected={instrument.id === $selectedInstrumentId}
-          on:click={() => selectP13nInstrument(instrument, index)} />
-      {:else}
+{#each $blocks as block}
+  <div class="methods-block" data-block={block.code}>
+    <h3 class="title">{block.title}</h3>
+    <div role="list" class="border-list">
+      {#each block.instruments as instrument, index (instrument.id)}
         <Instrument
-          name="p13n"
           {instrument}
-          selected={instrument.id === $selectedInstrumentId}
-          on:click={() => selectP13nInstrument(instrument, index)}
+          on:click={() => trackInstrumentSelection(instrument, index)}
           on:submit />
-      {/if}
-    {/each}
+      {/each}
+    </div>
   </div>
-{/if}
+{/each}
 
 <h3 class="title">All Payment Methods</h3>
 <div role="list" class="methods-container border-list">

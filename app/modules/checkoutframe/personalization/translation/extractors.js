@@ -1,5 +1,7 @@
+import { toLowerCaseSafe } from 'lib/utils';
+
 /**
- * Extracts config data related to UPI from the p13n instrument.
+ * Extracts config data related to UPI from the preferred instrument.
  *
  * @param {Object} instrument
  * @return {Object}
@@ -30,7 +32,7 @@ function upi(instrument) {
 }
 
 /**
- * Extracts config data related to netbanking from the p13n instrument.
+ * Extracts config data related to netbanking from the preferred instrument.
  *
  * @param {Object} instrument
  * @return {Object}
@@ -38,12 +40,12 @@ function upi(instrument) {
 function netbanking(instrument) {
   return {
     method: 'netbanking',
-    issuer: instrument.bank,
+    bank: instrument.bank,
   };
 }
 
 /**
- * Extracts config data related to saved card from the p13n instrument.
+ * Extracts config data related to saved card from the preferred instrument.
  *
  * @param {Object} instrument
  * @return {Object}
@@ -57,16 +59,8 @@ function card(instrument) {
   };
 }
 
-function toLowerCaseSafe(str) {
-  if (!str) {
-    return;
-  }
-
-  return str.toLowerCase();
-}
-
 /**
- * Extracts config data related to wallet from the p13n instrument.
+ * Extracts config data related to wallet from the preferred instrument.
  *
  * @param {Object} instrument
  * @return {Object}

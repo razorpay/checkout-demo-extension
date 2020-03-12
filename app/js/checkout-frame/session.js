@@ -42,7 +42,8 @@ var preferences = window.preferences,
   CustomerStore = discreet.CustomerStore,
   EmiStore = discreet.EmiStore,
   Cta = discreet.Cta,
-  NBHandlers = discreet.NBHandlers;
+  NBHandlers = discreet.NBHandlers,
+  Instruments = discreet.Instruments;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -782,9 +783,9 @@ function debounceAskOTP(view, msg, shouldLimitResend, screenProps) {
 
 // this === Session
 function successHandler(response) {
-  if (this.p13n && this.p13nInstrument) {
+  if (this.preferredInstrument) {
     P13n.recordSuccess(
-      this.p13nInstrument,
+      this.preferredInstrument,
       this.customer || this.getCustomer(this.payload.contact)
     );
   }
@@ -3437,7 +3438,7 @@ Session.prototype = {
     }
 
     if (!tab) {
-      var selectedInstrument = this.getSelectedP13nInstrument();
+      var selectedInstrument = this.getSelectedPaymentInstrument();
 
       if (selectedInstrument) {
         $('#body').addClass('sub');
@@ -4359,10 +4360,9 @@ Session.prototype = {
     }
 
     this.isResumedPayment = false;
-    this.doneByP13n = false;
     this.payload = null;
 
-    Analytics.removeMeta('doneByP13n');
+    Analytics.removeMeta('doneByInstrument');
 
     var params = {};
     params[Constants.UPI_POLL_URL] = '';
@@ -4449,6 +4449,8 @@ Session.prototype = {
     }
 
     var merchantOrder = Store.getMerchantOrder();
+    var selectedInstrument = this.getSelectedPaymentInstrument();
+
     if (merchantOrder && merchantOrder.bank && !Store.isRecurring()) {
       if (!this.checkCommonValid()) {
         return;
@@ -4579,27 +4581,28 @@ Session.prototype = {
       }
     } else if (this.oneMethod === 'netbanking') {
       data.bank = this.get('prefill.bank');
-    } else if (this.p13n) {
+    } else if (selectedInstrument) {
       if (!this.checkCommonValid()) {
         return;
       }
 
-      var selectedInstrument = this.getSelectedP13nInstrument();
-
-      if (selectedInstrument && selectedInstrument.method === 'card') {
+      if (selectedInstrument.method === 'card') {
         /*
-         * Add cvv to data from the currently selected method (p13n)
-         * TODO: figure out a better way to do this.
+         * Add cvv to data from the currently selected instrument
          */
-        var $cvvEl = _Doc.querySelector(
-          '#instruments-list > .selected input.input'
+        var instrumentInDom = _El.closest(
+          _Doc.querySelector(
+            '.home-methods input[value="' + selectedInstrument.id + '"]'
+          ),
+          '.instrument'
         );
+        var cvvInput = instrumentInDom.querySelector('.cvv-input');
 
-        if ($cvvEl) {
-          if ($cvvEl.value.length === $cvvEl.maxLength) {
-            data['card[cvv]'] = $cvvEl.value;
+        if (cvvInput) {
+          if (cvvInput.value.length === cvvInput.maxLength) {
+            data['card[cvv]'] = cvvInput.value;
           } else {
-            $cvvEl.focus();
+            cvvInput.focus();
             return this.shake();
           }
         }
@@ -4613,12 +4616,8 @@ Session.prototype = {
     this.submit();
   },
 
-  getSelectedP13nInstrument: function() {
-    if (!this.p13n) {
-      return;
-    }
-
-    return this.homeTab.getSelectedInstrument();
+  getSelectedPaymentInstrument: function() {
+    return storeGetter(HomeScreenStore.selectedInstrument);
   },
 
   verifyVpaAndContinue: function(data, params) {
@@ -4724,28 +4723,24 @@ Session.prototype = {
     };
 
     if (!this.screen) {
-      var selectedInstrument = this.getSelectedP13nInstrument();
+      var selectedInstrument = this.getSelectedPaymentInstrument();
 
       if (selectedInstrument) {
-        this.doneByP13n = P13n.addInstrumentToPaymentData(
-          data,
+        data = Instruments.addInstrumentToPaymentData(
           selectedInstrument,
+          data,
           this.getCustomer(getPhone())
         );
 
         /* TODO: the following code is the hack for ftx (2018), fix it properly */
-        if (this.doneByP13n) {
-          Analytics.setMeta('doneByP13n', true);
-          if (
-            ['card', 'emi', 'wallet'].indexOf(selectedInstrument.method) > -1
-          ) {
-            this.switchTab(selectedInstrument.method);
-          } else if (
-            selectedInstrument.method === 'upi' &&
-            selectedInstrument['_[upiqr]'] === '1'
-          ) {
-            return this.switchTab('qr');
-          }
+        Analytics.setMeta('doneByInstrument', true);
+        if (['card', 'emi', 'wallet'].indexOf(selectedInstrument.method) > -1) {
+          this.switchTab(selectedInstrument.method);
+        } else if (
+          selectedInstrument.method === 'upi' &&
+          selectedInstrument['_[upiqr]'] === '1'
+        ) {
+          return this.switchTab('qr');
         }
       }
     }
@@ -5061,9 +5056,7 @@ Session.prototype = {
       });
     }
 
-    if (this.p13n) {
-      this.p13nInstrument = P13n.processInstrument(data, this);
-    }
+    this.preferredInstrument = P13n.processInstrument(data, this);
 
     if (this.isPayout) {
       Analytics.track('payout:create:start');

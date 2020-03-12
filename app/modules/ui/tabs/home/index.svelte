@@ -25,6 +25,8 @@
     multiTpvOption,
     partialPaymentAmount,
     partialPaymentOption,
+    instruments,
+    blocks,
   } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
@@ -51,7 +53,7 @@
     isDebitCardEnabled,
     getSingleMethod,
   } from 'checkoutstore/methods';
-  import { getInstrumentsForCustomer } from 'checkoutframe/personalization';
+  import { getTranslatedInstrumentsForCustomer } from 'checkoutframe/personalization';
   import {
     hideCta,
     showCta,
@@ -61,9 +63,11 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
-  import { INDIA_COUNTRY_CODE } from 'common/constants';
-
-  const MAX_P13N_INSTRUMENTS = 3;
+  import {
+    INDIA_COUNTRY_CODE,
+    MAX_PREFERRED_INSTRUMENTS,
+  } from 'common/constants';
+  import { setBlocks } from 'ui/tabs/home/instruments';
 
   const session = getSession();
   const icons = session.themeMeta.icons;
@@ -219,14 +223,8 @@
     return view === 'details';
   }
 
-  function getInstruments() {
-    return getAllAvailableP13nInstruments().slice(0, MAX_P13N_INSTRUMENTS);
-  }
-
   function getAllAvailableP13nInstruments() {
-    const _customer = session.getCustomer($contact);
-
-    return getInstrumentsForCustomer(_customer, {
+    return getTranslatedInstrumentsForCustomer($customer, {
       upiApps: session.upi_intents_data,
     });
   }
@@ -234,6 +232,16 @@
   $: {
     const loggedIn = _Obj.getSafely($customer, 'logged');
     _El.keepClass(_Doc.querySelector('#topbar #top-right'), 'logged', loggedIn);
+
+    const blocksThatWereSet = setBlocks({
+      preferred: getAllAvailableP13nInstruments(),
+    });
+
+    if (blocksThatWereSet.preferred.instruments.length) {
+      Analytics.setMeta('p13n', true);
+    } else {
+      Analytics.removeMeta('p13n');
+    }
   }
 
   function shouldUseP13n() {
@@ -281,31 +289,6 @@
   }
 
   let personalization;
-  let instruments;
-
-  $: {
-    if (view === 'methods') {
-      personalization = shouldUseP13n();
-
-      if (personalization) {
-        const availableInstruments = getAllAvailableP13nInstruments();
-        instruments = availableInstruments.slice(0, MAX_P13N_INSTRUMENTS);
-        trackP13nInstruments(availableInstruments);
-      } else {
-        instruments = [];
-      }
-    }
-  }
-
-  $: {
-    if (personalization) {
-      Analytics.setMeta('p13n', true);
-      session.p13n = true;
-    } else {
-      Analytics.removeMeta('p13n');
-      session.p13n = false;
-    }
-  }
 
   export function onShown() {
     if (view === 'methods') {
@@ -386,12 +369,6 @@
     }
 
     /**
-     * If contact is present, get the instruments
-     * for the user.
-     */
-    const _instruments = $isContactPresent ? getInstruments() : [];
-
-    /**
      * If there's just one method available,
      * we want to land on the details screen.
      *
@@ -408,7 +385,7 @@
     if (singleMethod) {
       if (
         _Arr.contains(['wallet', 'netbanking', 'upi'], singleMethod) &&
-        _instruments.length > 0
+        $instruments.length > 0
       ) {
         return METHODS;
       } else {
@@ -465,8 +442,6 @@
       return;
     }
 
-    const _instruments = getInstruments();
-
     if (singleMethod) {
       if (singleMethod === 'paypal') {
         createPaypalPayment();
@@ -475,7 +450,7 @@
 
       if (
         _Arr.contains(['wallet', 'netbanking', 'upi'], singleMethod) &&
-        _instruments.length > 0
+        $instruments.length > 0
       ) {
         showMethods();
         return;
@@ -505,7 +480,7 @@
       return;
     }
 
-    const _instruments = instruments.slice(0, MAX_P13N_INSTRUMENTS);
+    const _instruments = instruments.slice(0, MAX_PREFERRED_INSTRUMENTS);
     const _preferredMethods = _Arr.reduce(
       _instruments,
       (acc, instrument) => {
@@ -518,7 +493,7 @@
     Analytics.track('p13n:instruments:list', {
       data: {
         length: instruments.length,
-        shown: Math.min(_instruments.length, MAX_P13N_INSTRUMENTS),
+        shown: Math.min(_instruments.length, MAX_PREFERRED_INSTRUMENTS),
         methods: _preferredMethods,
       },
     });
@@ -569,16 +544,6 @@
     }
 
     return true;
-  }
-
-  export function getSelectedInstrument() {
-    return (
-      instruments &&
-      _Arr.find(
-        instruments,
-        instrument => instrument.id === $selectedInstrumentId
-      )
-    );
   }
 
   function attemptPayment() {
@@ -750,9 +715,6 @@
             in:fly={{ delay: 100, duration: 400, y: 100 }}
             out:fly={{ duration: 400, y: 100 }}>
             <NewMethodsList
-              {personalization}
-              {instruments}
-              customer={$customer}
               on:selectMethod={selectMethod}
               on:submit={attemptPayment} />
           </div>

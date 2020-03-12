@@ -80,6 +80,8 @@ import * as Experiments from 'experiments';
 import * as NBHandlers from 'handlers/netbanking';
 import * as UserHandlers from 'handlers/user';
 
+import * as Instruments from 'configurability/instruments';
+
 export default {
   RazorpayConfig,
   makeAuthUrl,
@@ -120,6 +122,7 @@ export default {
   Checkout,
   Bridge,
   P13n,
+  Instruments,
   UserAgent,
   Offers,
   Flows,
