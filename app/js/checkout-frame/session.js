@@ -42,7 +42,8 @@ var preferences = window.preferences,
   CustomerStore = discreet.CustomerStore,
   EmiStore = discreet.EmiStore,
   Cta = discreet.Cta,
-  NBHandlers = discreet.NBHandlers;
+  NBHandlers = discreet.NBHandlers,
+  Instruments = discreet.Instruments;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -4359,7 +4360,6 @@ Session.prototype = {
     }
 
     this.isResumedPayment = false;
-    this.doneByInstrument = false;
     this.payload = null;
 
     Analytics.removeMeta('doneByInstrument');
@@ -4730,25 +4730,17 @@ Session.prototype = {
       var selectedInstrument = this.getSelectedPaymentInstrument();
 
       if (selectedInstrument) {
-        this.doneByInstrument = P13n.addInstrumentToPaymentData(
-          data,
-          selectedInstrument,
-          this.getCustomer(getPhone())
-        );
+        data = Instruments.addInstrumentToPaymentData(selectedInstrument, data);
 
         /* TODO: the following code is the hack for ftx (2018), fix it properly */
-        if (this.doneByInstrument) {
-          Analytics.setMeta('doneByInstrument', true);
-          if (
-            ['card', 'emi', 'wallet'].indexOf(selectedInstrument.method) > -1
-          ) {
-            this.switchTab(selectedInstrument.method);
-          } else if (
-            selectedInstrument.method === 'upi' &&
-            selectedInstrument['_[upiqr]'] === '1'
-          ) {
-            return this.switchTab('qr');
-          }
+        Analytics.setMeta('doneByInstrument', true);
+        if (['card', 'emi', 'wallet'].indexOf(selectedInstrument.method) > -1) {
+          this.switchTab(selectedInstrument.method);
+        } else if (
+          selectedInstrument.method === 'upi' &&
+          selectedInstrument['_[upiqr]'] === '1'
+        ) {
+          return this.switchTab('qr');
         }
       }
     }

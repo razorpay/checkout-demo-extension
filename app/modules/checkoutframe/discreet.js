@@ -80,6 +80,8 @@ import * as Experiments from 'experiments';
 import * as NBHandlers from 'handlers/netbanking';
 import * as UserHandlers from 'handlers/user';
 
+import { addInstrumentToPaymentData } from 'configurability/instruments';
+
 export default {
   RazorpayConfig,
   makeAuthUrl,
@@ -181,4 +183,8 @@ export default {
 
   NBHandlers,
   UserHandlers,
+
+  Instruments: {
+    addInstrumentToPaymentData,
+  },
 };

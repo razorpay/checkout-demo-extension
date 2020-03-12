@@ -63,3 +63,21 @@ export function isInstrumentForEntireMethod(instrument) {
     key => !_Arr.contains(currentInsturmentKeys, key)
   );
 }
+
+/**
+ * Adds instrument data to payment payload
+ * @param {Instrument} instrument
+ * @param {Object} payment Payment payload
+ *
+ * @returns {Object}
+ */
+export function addInstrumentToPaymentData(instrument, payment) {
+  const method = instrument.method;
+  const config = InstrumentConfig[method];
+
+  if (!config) {
+    return payment;
+  }
+
+  return config.getPaymentPayload(instrument, payment);
+}
