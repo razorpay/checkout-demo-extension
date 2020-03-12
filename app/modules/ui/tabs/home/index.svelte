@@ -3,7 +3,6 @@
   import Tab from 'ui/tabs/Tab.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
   import Field from 'ui/components/Field.svelte';
-  import PartialPaymentOptions from 'ui/tabs/home/partialpaymentoptions.svelte';
   import RadioOption from 'ui/elements/options/RadioOption.svelte';
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import NewMethodsList from 'ui/tabs/home/NewMethodsList.svelte';
@@ -12,7 +11,6 @@
   import Address from 'ui/elements/address.svelte';
   import PaymentDetails from 'ui/tabs/home/PaymentDetails.svelte';
   import Callout from 'ui/elements/Callout.svelte';
-  import { INDIA_COUNTRY_CODE } from 'common/constants';
 
   // Svelte imports
   import { onMount } from 'svelte';
@@ -31,7 +29,26 @@
 
   // Utils imports
   import { getSession } from 'sessionmanager';
-  import CheckoutStore from 'checkoutstore';
+  import {
+    isPartialPayment as getIsPartialPayment,
+    isContactOptional,
+    isEmailOptional,
+    isContactHidden,
+    isEmailHidden,
+    isContactEmailOptional,
+    isContactEmailHidden,
+    isContactEmailReadOnly,
+    getPrefilledContact,
+    getPrefilledEmail,
+    isAddressEnabled,
+    isRecurring,
+    getMerchantOrder,
+  } from 'checkoutstore';
+  import {
+    isCreditCardEnabled,
+    isDebitCardEnabled,
+    getSingleMethod,
+  } from 'checkoutstore/methods';
   import { getInstrumentsForCustomer } from 'checkoutframe/personalization';
   import {
     hideCta,
@@ -42,22 +59,20 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
+  import { INDIA_COUNTRY_CODE } from 'common/constants';
 
   const MAX_P13N_INSTRUMENTS = 3;
 
   const session = getSession();
-  const methods = session.methods;
   const icons = session.themeMeta.icons;
-  const order = session.order || {};
+  const order = getMerchantOrder();
+  const singleMethod = getSingleMethod();
 
   // TPV
   const multiTpv = session.multiTpv;
   const onlyUpiTpv = session.upiTpv;
   const onlyNetbankingTpv =
-    session.tpvBank &&
-    !onlyUpiTpv &&
-    !multiTpv &&
-    session.oneMethod !== 'emandate';
+    session.tpvBank && !onlyUpiTpv && !multiTpv && singleMethod !== 'emandate';
   const isTpv = multiTpv || onlyUpiTpv || onlyNetbankingTpv;
 
   // Offers
@@ -67,26 +82,14 @@
 
   // Recurring callout
   const showRecurringCallout =
-    session.recurring &&
-    session.tab !== 'emandate' &&
-    methods.count === 1 &&
-    methods.card;
+    isRecurring() && session.tab !== 'emandate' && singleMethod === 'card';
 
   const cardOffer = session.cardOffer;
+  const isPartialPayment = getIsPartialPayment();
+  const contactEmailReadonly = isContactEmailReadOnly();
 
-  const {
-    isPartialPayment,
-    prefill,
-    contactEmailOptional,
-    contactEmailHidden,
-    contactEmailReadonly,
-    address,
-    optional,
-    hidden,
-  } = CheckoutStore.get();
-
-  $contact = prefill.contact || INDIA_COUNTRY_CODE;
-  $email = prefill.email || '';
+  $contact = getPrefilledContact() || INDIA_COUNTRY_CODE;
+  $email = getPrefilledEmail();
 
   // Prop that decides which view to show.
   // Values: 'details', 'methods'
@@ -120,7 +123,7 @@
       return true;
     }
 
-    if (address) {
+    if (isAddressEnabled()) {
       return true;
     }
 
@@ -133,7 +136,7 @@
      * there's nothing left on the details
      * screen anymore.
      */
-    if (contactEmailHidden) {
+    if (isContactEmailHidden()) {
       return false;
     }
 
@@ -165,13 +168,8 @@
 
     if (!session.get('amount')) {
       showCtaWithText('Authenticate');
-    } else if (session.oneMethod) {
-      showCtaWithText(
-        'Pay by ' +
-          getMethodNameForPaymentOption(session.oneMethod, {
-            session,
-          })
-      );
+    } else if (singleMethod) {
+      showCtaWithText('Pay by ' + getMethodNameForPaymentOption(singleMethod));
     } else if (isTpv) {
       let _method;
       if (onlyNetbankingTpv) {
@@ -182,12 +180,7 @@
         _method = $multiTpvOption;
       }
 
-      showCtaWithText(
-        'Pay by ' +
-          getMethodNameForPaymentOption(_method, {
-            session,
-          })
-      );
+      showCtaWithText('Pay by ' + getMethodNameForPaymentOption(_method));
     } else {
       showCtaWithText('Proceed');
     }
@@ -232,7 +225,6 @@
     const _customer = session.getCustomer($contact);
 
     return getInstrumentsForCustomer(_customer, {
-      methods: session.methods,
       upiApps: session.upi_intents_data,
     });
   }
@@ -257,8 +249,8 @@
 
     // Single method
     if (
-      session.oneMethod &&
-      !_Arr.contains(['wallet', 'netbanking', 'upi'], session.oneMethod)
+      singleMethod &&
+      !_Arr.contains(['wallet', 'netbanking', 'upi'], singleMethod)
     ) {
       return false;
     }
@@ -349,17 +341,17 @@
     /**
      * Mark optional fields as valid
      */
-    if (optional.contact) {
+    if (isContactOptional()) {
       isContactValid = true;
     }
-    if (optional.email) {
+    if (isEmailOptional()) {
       isEmailValid = true;
     }
 
     /**
      * If contact and email are mandatory, validate
      */
-    if (!contactEmailOptional) {
+    if (!isContactEmailOptional()) {
       const contactRegex = /^\+?[0-9]{8,15}$/;
       const emailRegex = /^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/;
 
@@ -392,7 +384,7 @@
     /**
      * Need address from the details screen.
      */
-    if (address) {
+    if (isAddressEnabled()) {
       return DETAILS;
     }
 
@@ -416,9 +408,9 @@
      *
      * Otherwise, we take the user to the details screen.
      */
-    if (session.oneMethod) {
+    if (singleMethod) {
       if (
-        _Arr.contains(['wallet', 'netbanking', 'upi'], session.oneMethod) &&
+        _Arr.contains(['wallet', 'netbanking', 'upi'], singleMethod) &&
         _instruments.length > 0
       ) {
         return METHODS;
@@ -439,7 +431,7 @@
   Analytics.track('home:landing', {
     data: {
       view,
-      oneMethod: session.oneMethod,
+      oneMethod: singleMethod,
     },
   });
 
@@ -447,12 +439,6 @@
     Analytics.track('home:proceed');
 
     updateCustomer();
-
-    if (isPartialPayment) {
-      if ($partialPaymentOption !== 'full') {
-        session.handlePartialAmount();
-      }
-    }
 
     // Multi TPV
     if (session.multiTpv) {
@@ -486,14 +472,14 @@
 
     const _instruments = getInstruments();
 
-    if (session.oneMethod) {
-      if (session.oneMethod === 'paypal') {
+    if (singleMethod) {
+      if (singleMethod === 'paypal') {
         createPaypalPayment();
         return;
       }
 
       if (
-        _Arr.contains(['wallet', 'netbanking', 'upi'], session.oneMethod) &&
+        _Arr.contains(['wallet', 'netbanking', 'upi'], singleMethod) &&
         _instruments.length > 0
       ) {
         showMethods();
@@ -501,7 +487,7 @@
       } else {
         selectMethod({
           detail: {
-            method: session.oneMethod,
+            method: singleMethod,
           },
         });
         return;
@@ -571,7 +557,7 @@
   }
 
   export function shouldGoNext() {
-    if (session.oneMethod === 'paypal') {
+    if (singleMethod === 'paypal') {
       return false;
     }
 
@@ -619,7 +605,8 @@
 
   let showUserDetailsStrip;
   $: {
-    showUserDetailsStrip = ($isContactPresent || $email) && !contactEmailHidden;
+    showUserDetailsStrip =
+      ($isContactPresent || $email) && !isContactEmailHidden();
   }
 </script>
 
@@ -714,18 +701,15 @@
               class="details-container border-list"
               transition:slide={{ duration: 400 }}>
               {#if showUserDetailsStrip}
-                <SlottedOption
-                  on:click={hideMethods}
-                  className="instrument-strip"
-                  id="user-details">
+                <SlottedOption on:click={hideMethods} id="user-details">
                   <i slot="icon">
                     <Icon icon={icons.contact} />
                   </i>
                   <div slot="title">
-                    {#if $isContactPresent && !hidden.contact}
+                    {#if $isContactPresent && !isContactHidden()}
                       <span>{$contact}</span>
                     {/if}
-                    {#if $email && !hidden.email}
+                    {#if $email && !isEmailHidden()}
                       <span>{$email}</span>
                     {/if}
                   </div>
@@ -743,7 +727,6 @@
               {#if isPartialPayment}
                 <SlottedOption
                   on:click={hideMethods}
-                  className="instrument-strip"
                   id="partial-payment-details">
                   <div slot="title">
                     <span>{formattedPartialAmount}</span>
@@ -786,11 +769,11 @@
       {#if showRecurringCallout}
         <Callout>
           {#if session.get('subscription_id')}
-            {#if methods.debit_card && methods.credit_card}
+            {#if isDebitCardEnabled() && isCreditCardEnabled()}
               Subscription payments are supported on Visa and Mastercard Credit
               Cards from all Banks and Debit Cards from ICICI, Kotak, Citibank
               and Canara Bank.
-            {:else if methods.debit_card}
+            {:else if isDebitCardEnabled()}
               Subscription payments are only supported on Visa and Mastercard
               Debit Cards from ICICI, Kotak, Citibank and Canara Bank.
             {:else}
@@ -798,19 +781,19 @@
               Credit Cards.
             {/if}
           {:else if cardOffer}
-            {#if methods.debit_card && methods.credit_card}
+            {#if isDebitCardEnabled() && isCreditCardEnabled()}
               All {cardOffer.issuer} Cards are supported for this payment
-            {:else if methods.debit_card}
+            {:else if isDebitCardEnabled()}
               All {cardOffer.issuer} Debit Cards are supported for this payment
             {:else}
               All {cardOffer.issuer} Credit Cards are supported for this
               payment.
             {/if}
-          {:else if methods.debit_card && methods.credit_card}
+          {:else if isDebitCardEnabled() && isCreditCardEnabled()}
             Visa and Mastercard Credit Cards from all Banks and Debit Cards from
             ICICI, Kotak, Citibank and Canara Bank are supported for this
             payment.
-          {:else if methods.debit_card}
+          {:else if isDebitCardEnabled()}
             Only Visa and Mastercard Debit Cards from ICICI, Kotak, Citibank and
             Canara Bank are supported for this payment.
           {:else}

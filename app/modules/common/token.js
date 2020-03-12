@@ -1,4 +1,5 @@
 import * as Card from 'common/card';
+import { getEMIBankPlans } from 'checkoutstore/methods';
 
 const transformerByMethod = {
   /**
@@ -6,14 +7,12 @@ const transformerByMethod = {
    * @param {Object} data
    *  @prop {Number} amount
    *  @prop {Boolean} emi
-   *  @prop {Object} emiOptions
    *  @prop {Boolean} recurring
    *
    * @return {Object}
    */
-  card: (token, { amount, emi, emiOptions, recurring }) => {
+  card: (token, { amount, emi, recurring }) => {
     const { card } = token;
-    let { banks: allBanks } = emiOptions;
     let { flows = [], issuer: bank, network } = card;
     let networkCode = Card.findCodeByNetworkName(network);
 
@@ -23,8 +22,7 @@ const transformerByMethod = {
     }
     card.networkCode = networkCode;
 
-    token.plans =
-      bank && emi && card.emi && allBanks[bank] && allBanks[bank].plans;
+    token.plans = bank && emi && card.emi && getEMIBankPlans(bank);
 
     token.cvvDigits = networkCode === 'amex' ? 4 : 3;
 
@@ -39,18 +37,16 @@ const transformerByMethod = {
  * @param {Object} data
  *  @prop {Number} amount
  *  @prop {Boolean} emi
- *  @prop {Object} emiOptions
  *  @prop {Boolean} recurring
  *
  * @return {Array}
  */
-export const transform = (tokens, { amount, emi, emiOptions, recurring }) => {
+export const transform = (tokens, { amount, emi, recurring }) => {
   _Arr.loop(tokens, token => {
     if (token.method && transformerByMethod[token.method]) {
       token = transformerByMethod[token.method](token, {
         amount,
         emi,
-        emiOptions,
         recurring,
       });
     }

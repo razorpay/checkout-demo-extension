@@ -1,14 +1,25 @@
 const config = {
   card: {
-    keys: ['card_types', 'iins', 'issuers', 'networks'],
+    keys: [
+      'card_type',
+      'card_types',
+      'iin',
+      'iins',
+      'issuer',
+      'issuers',
+      'network',
+      'networks',
+      'token_id',
+      'token_ids',
+    ],
   },
 
   netbanking: {
-    keys: ['banks'],
+    keys: ['bank', 'banks'],
   },
 
   wallet: {
-    keys: ['wallets'],
+    keys: ['wallet', 'wallets'],
   },
 
   // TODO: Add more methods

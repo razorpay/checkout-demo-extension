@@ -1,3 +1,17 @@
+import { emiBanks } from 'common/bank';
+
+// convert emiBanks array to map keyed by bank-code
+const bankMap =
+  emiBanks
+  |> _Arr.reduce((banks, bankObj) => {
+    banks[bankObj.code] = bankObj;
+    return banks;
+  }, {});
+
+export function getEMIBank(code) {
+  return bankMap[code];
+}
+
 /**
  * Returns the list of eligible banks for the transaction
  * @param {number} amount Amount of the transaction
@@ -9,10 +23,20 @@ export function getEligibleBanksBasedOnMinAmount(amount, banks) {
   const eligible = {};
 
   _Obj.loop(banks, (plans, bank) => {
-    const eligiblePlans = _Arr.filter(plans, plan => plan.min_amount <= amount);
+    if (getEMIBank(bank)) {
+      const eligiblePlans = _Arr.filter(
+        plans,
+        plan => plan.min_amount <= amount
+      );
 
-    if (eligiblePlans.length) {
-      eligible[bank] = eligiblePlans;
+      if (eligiblePlans.length) {
+        eligible[bank] =
+          eligiblePlans
+          |> _Arr.reduce((o, plan) => {
+            o[plan.duration] = plan;
+            return o;
+          }, {});
+      }
     }
   });
 

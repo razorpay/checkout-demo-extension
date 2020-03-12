@@ -7,8 +7,8 @@
   import { getSession } from 'sessionmanager';
   import * as GPay from 'gpay';
   import * as Bridge from 'bridge';
-  import Preferences from 'checkoutstore/preferences';
-  import DowntimesStore from 'checkoutstore/downtimes';
+  import { getDowntimes, hasFeature, isCustomerFeeBearer } from 'checkoutstore';
+  import { isMethodEnabled, isUPIFlowEnabled } from 'checkoutstore/methods';
   import { isVpaValid } from 'common/upi';
   import {
     doesAppExist,
@@ -48,9 +48,7 @@
   export let selectedApp = undefined;
   export let preferIntent = true;
   export let useWebPaymentsApi = false;
-  export let qrEnabled = false;
   export let down = false;
-  export let useOmnichannel = false;
   export let retryOmnichannel = false;
   export let isFirst = true;
   export let vpa = '';
@@ -75,10 +73,8 @@
   let rememberVpaCheckbox;
   let intentAppSelected = null;
   let customer;
-  let collectEnabled = false;
 
   const session = getSession();
-  const preferences = Preferences.get();
 
   const {
     all_upi_intents_data: allIntentApps,
@@ -89,7 +85,7 @@
 
   const checkGPay = session => {
     /* disable Web payments API for fee_bearer for now */
-    if (session.preferences.fee_bearer) {
+    if (isCustomerFeeBearer()) {
       return Promise.reject();
     }
 
@@ -106,13 +102,11 @@
     return session.r.checkPaymentAdapter('gpay');
   };
 
-  const checkOmnichannel = session =>
-    _Obj.getSafely(session, 'methods.upi.omnichannel');
-
-  $: intent = preferIntent && _Obj.getSafely(session, 'methods.upi.intent');
+  $: intent = preferIntent && isUPIFlowEnabled('intent');
   $: isGPaySelected = selectedApp === 'gpay' && useWebPaymentsApi;
   $: pspHandle = selectedAppData ? selectedAppData.psp : '';
-  $: shouldShowQr = qrEnabled && !selectedApp && selectedApp !== null;
+  $: shouldShowQr =
+    isMethodEnabled('qr') && !selectedApp && selectedApp !== null;
 
   $: {
     /**
@@ -163,23 +157,17 @@
         setWebPaymentsApiUsage(false);
       });
 
-    useOmnichannel = checkOmnichannel(session);
-
     /* TODO: improve handling of `prefill.vpa` */
     if (session.get('prefill.vpa')) {
       selectedApp = null;
       vpa = session.get('prefill.vpa');
     }
 
-    const downtimes = DowntimesStore.get();
+    const downtimes = getDowntimes();
 
     down = _Arr.contains(downtimes.low.methods, 'upi');
     disabled = _Arr.contains(downtimes.high.methods, 'upi');
-
-    qrEnabled = _Obj.getSafely(session, 'methods.upi.qr');
     qrIcon = session.themeMeta.icons.qr;
-
-    collectEnabled = _Obj.getSafely(session, 'methods.upi.collect');
   });
 
   export function selectQrMethod() {
@@ -453,7 +441,7 @@
         </div>
       {/if}
 
-      {#if collectEnabled}
+      {#if isUPIFlowEnabled('collect')}
         <div class="legend left">Pay using UPI ID</div>
         <div class="border-list">
           {#if intent}
@@ -493,7 +481,7 @@
         </div>
       {/if}
 
-      {#if useOmnichannel}
+      {#if isUPIFlowEnabled('omnichannel')}
         <GooglePayOmnichannel
           error={retryOmnichannel}
           focusOnCreate={true}
