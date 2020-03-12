@@ -1,18 +1,5 @@
 function makeOptions(features, options) {
-  const { callbackUrl } = features;
-
-  if (callbackUrl) {
-    options = {
-      amount: 500000,
-      personalization: false,
-      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
-      redirect: true,
-    };
-  } else {
-    options = {
-      amount: 500000,
-    };
-  }
+  options.amount = 500000;
   return options;
 }
 

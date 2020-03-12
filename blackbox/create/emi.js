@@ -66,8 +66,9 @@ module.exports = function(testFeatures) {
     })
   )('EMI tests', ({ preferences, title, options }) => {
     test(title, async () => {
-      await setPreferenceForOffer(preferences);
-
+      if (offers) {
+        await setPreferenceForOffer(preferences);
+      }
       const context = await openCheckoutWithNewHomeScreen({
         page,
         options,
@@ -111,7 +112,7 @@ module.exports = function(testFeatures) {
       }
 
       if (callbackUrl && timeout) {
-        await verifyTimeout(context, 'netbanking');
+        await verifyTimeout(context, 'emi');
 
         return;
       }
