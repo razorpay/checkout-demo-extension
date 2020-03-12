@@ -1,6 +1,6 @@
 <script>
   // Svelte imports
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onDestroy } from 'svelte';
 
   // UI imports
   import Method from 'ui/tabs/home/Method.svelte';
@@ -15,6 +15,7 @@
   import { showCtaWithDefaultText, hideCta } from 'checkoutstore/cta';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
+  import { getSession } from 'sessionmanager';
 
   // Store
   import {
@@ -25,7 +26,13 @@
     instruments,
   } from 'checkoutstore/screens/home';
 
+  onDestroy(() => {
+    deselectInstrument();
+  });
+
   const dispatch = createEventDispatcher();
+  const session = getSession();
+
   let visibleMethods = [];
 
   function setMethods(methods) {
@@ -75,7 +82,17 @@
 
   $: {
     if (!$selectedInstrument) {
-      deselectInstrument();
+      hideCta();
+    }
+  }
+
+  $: {
+    if (session.screen === '') {
+      if ($selectedInstrument) {
+        showCtaWithDefaultText();
+      } else {
+        hideCta();
+      }
     }
   }
 
@@ -91,7 +108,6 @@
 
   function deselectInstrument() {
     $selectedInstrumentId = null;
-    hideCta();
   }
 
   setMethods();
