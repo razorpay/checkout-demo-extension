@@ -292,45 +292,6 @@ function setEmiPlansCta(screen, tab) {
   }
 }
 
-/**
- * Get the saved card elemnnt that should be selected
- * when the saved cards screen is shown.
- * @param {string} tab
- * @param {string} token
- *
- * @returns {Element}
- */
-function getSelectableSavedCardElement(tab, token) {
-  var selectors = {
-    checked: '.saved-card.checked',
-    saved: '.saved-card',
-    token: '.saved-card',
-  };
-
-  // Add token to selectors
-  if (token) {
-    selectors.token += '[token="' + token + '"]';
-  }
-
-  var emiSelector = tab === 'emi' ? '[emi]' : '';
-
-  // Add EMI selector to selectors
-  selectors = _Obj.map(selectors, function(value) {
-    return value + emiSelector;
-  });
-
-  var validSelector = _Arr.find(
-    [selectors.checked, selectors.token, selectors.saved],
-    function(selector) {
-      return qs(selector);
-    }
-  );
-
-  var elem = qs(validSelector);
-
-  return elem;
-}
-
 function setEmiBank(data) {
   var activeEmiPlan = getEmiDurationForNewCard();
   if (activeEmiPlan) {
