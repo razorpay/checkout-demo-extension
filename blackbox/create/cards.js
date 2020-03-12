@@ -131,7 +131,7 @@ module.exports = function(testFeatures) {
       }
 
       if (callbackUrl && timeout) {
-        await verifyTimeout(context, 'netbanking');
+        await verifyTimeout(context, 'card');
 
         return;
       }
