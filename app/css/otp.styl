@@ -30,27 +30,10 @@
 #otp-elem {
   margin: 0 auto;
   width: 151px;
-  position: relative;
-  background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAuCAMAAAAFiil6AAAABlBMVEUAAADg4ODy8Xj7AAAAAXRSTlMAQObYZgAAABZJREFUeAFjoBoYBaNgFIwCRhSAXwIABzoAHRAAbMUAAAAASUVORK5CYII=');
-  background-size: contain;
-  &::after {
-    position: absolute;
-    top: 0;
-    right: 0;
-    height: 100%;
-    background: #fff;
-    width: 14px;
-    content: '';
-  }
-  &.wide {
-    background: none;
-    border-bottom: 1px solid #ccc;
-    &::after {
-      content: none;
-    }
-    input#otp {
-      text-align: center;
-    }
+  border-bottom: 1px solid #ccc;
+  
+  input#otp {
+    text-align: center;
   }
 }
 

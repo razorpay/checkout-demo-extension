@@ -110,11 +110,7 @@
       </div>
     {/if}
 
-    <div
-      id="otp-elem"
-      style="width: {inputWidth};"
-      class:hidden={!showInput}
-      class:wide={$maxlength > 6}>
+    <div id="otp-elem" style="width: {inputWidth};" class:hidden={!showInput}>
       <div class="help">Please enter the OTP</div>
       <input
         bind:this={input}
