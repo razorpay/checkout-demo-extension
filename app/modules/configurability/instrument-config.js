@@ -114,6 +114,70 @@ const config = {
       _Obj.getSafely(instrument, 'wallets', []).length === 1,
   },
 
+  upi: {
+    properties: ['flow', 'flows', 'app', 'apps', 'token_id', 'token_ids'],
+    payment: ['flow', 'app', 'token'],
+    groupedToIndividual: grouped => {
+      // TODO
+
+      return [grouped];
+    },
+    isIndividual: instrument => {
+      const singleFlow = instrument.flow || _Obj.getSafely(instrument, 'flows', []).length === 1;
+
+      const missingApp = !instrument.app && !instrument.apps;
+      const singleApp =
+        instrument.app || _Obj.getSafely(instrument, 'apps', []).length === 1;
+      const singleorMissingApps = singleApp || missingApp;
+
+      const missingToken = !instrument.token_id && !instrument.token_ids;
+      const singleToken =
+        instrument.token_id || _Obj.getSafely(instrument, 'token_ids', []).length === 1;
+      const singleorMissingTokens = singleToken || missingToken;
+
+      return singleFlow && singleorMissingApps && singleorMissingTokens;
+    },
+
+    getPaymentPayload: (instrument, payment) => {
+      payment = genericPaymentPayloadGetter(instrument, payment);
+
+      // Collect is known as directpay
+      if (payment.flow === 'collect') {
+        payment.flow = 'directpay';
+      }
+
+      // QR is intent underneath
+      if (payment.flow === 'qr') {
+        payment['_[upiqr]'] = 1;
+
+        payment.flow = 'intent';
+      }
+
+      // Set flow to a different property
+      if (payment.flow) {
+        payment['_[flow]'] = payment.flow;
+        
+        delete payment.flow;
+      }
+
+      // App is known by a different name
+      if (payment.app) {
+        payment.upi_app = app;
+
+        delete payment.app;
+      }
+
+      return payment;
+    },
+  },
+
+  paypal: {
+    properties: [],
+    payment: [],
+    groupedToIndividual: grouped => [grouped],
+    isIndividual: () => true,
+  },
+
   // TODO: Add more methods
 };
 
