@@ -81,12 +81,6 @@
   }
 
   $: {
-    if (!$selectedInstrument) {
-      hideCta();
-    }
-  }
-
-  $: {
     if (session.screen === '') {
       if ($selectedInstrument) {
         showCtaWithDefaultText();
