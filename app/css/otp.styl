@@ -30,10 +30,22 @@
 #otp-elem {
   margin: 0 auto;
   width: 151px;
+  position: relative;
   border-bottom: 1px solid #ccc;
   
   input#otp {
     text-align: center;
+    box-sizing: border-box;
+  }
+
+  .help {
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+
+    &::after {
+      left: calc(50% + 8px);
+    }
   }
 }
 
