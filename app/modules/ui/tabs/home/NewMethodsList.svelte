@@ -124,14 +124,16 @@
 </style>
 
 {#each $blocks as block}
-  <h3 class="title">{block.title}</h3>
-  <div role="list" class="border-list">
-    {#each block.instruments as instrument, index (instrument.id)}
-      <Instrument
-        {instrument}
-        on:click={() => trackInstrumentSelection(instrument, index)}
-        on:submit />
-    {/each}
+  <div class="methods-block" data-block={block.code}>
+    <h3 class="title">{block.title}</h3>
+    <div role="list" class="border-list">
+      {#each block.instruments as instrument, index (instrument.id)}
+        <Instrument
+          {instrument}
+          on:click={() => trackInstrumentSelection(instrument, index)}
+          on:submit />
+      {/each}
+    </div>
   </div>
 {/each}
 
