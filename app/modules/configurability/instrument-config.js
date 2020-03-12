@@ -13,6 +13,8 @@ function genericPaymentPayloadGetter(instrument, payment) {
   const method = instrument.method;
   const paymentKeys = config[method].payment;
 
+  payment.method = method;
+
   _Obj.loop(paymentKeys, (val, key) => {
     if (!_.isUndefined(val)) {
       payment[key] = val;
