@@ -10,7 +10,6 @@ import Track from 'tracker';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import * as UPIUtils from 'common/upi';
-import * as EmiUtils from 'common/emi';
 import * as GPay from 'gpay';
 import * as Color from 'lib/color';
 import * as _PaymentMethodIcons from 'ui/icons/payment-methods';
@@ -43,17 +42,15 @@ import * as SessionManager from 'sessionmanager';
 import * as Checkout from 'checkoutframe/index';
 import * as Offers from 'checkoutframe/offers';
 import * as Flows from 'checkoutframe/flows';
-import * as Downtimes from 'checkoutframe/downtimes';
 import * as Payouts from 'checkoutframe/payouts';
 import { initIframe } from 'checkoutframe/iframe';
 import * as Bridge from 'bridge';
 import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
 import { Formatter } from 'formatter';
 
-import Store from 'checkoutstore';
-import PreferencesStore from 'checkoutstore/preferences';
+import * as Store from 'checkoutstore';
+import * as MethodStore from 'checkoutstore/methods';
 import SessionStore from 'checkoutstore/session';
-import DowntimesStore from 'checkoutstore/downtimes';
 import * as EmiStore from 'checkoutstore/emi';
 import * as OTPScreenStore from 'checkoutstore/screens/otp';
 import * as Cta from 'checkoutstore/cta';
@@ -92,7 +89,6 @@ export default {
   Analytics,
   AnalyticsTypes,
   UPIUtils,
-  EmiUtils,
   setShieldParams,
   GPay,
   Color,
@@ -126,13 +122,11 @@ export default {
   UserAgent,
   Offers,
   Flows,
-  Downtimes,
   Payouts,
   CountryCodesUtil,
 
   Store,
-  PreferencesStore,
-  DowntimesStore,
+  MethodStore,
   SessionStore,
   OTPScreenStore,
   HomeScreenStore,

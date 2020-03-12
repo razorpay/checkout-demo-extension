@@ -1,6 +1,6 @@
 <script>
   // Utils
-  import CheckoutStore from 'checkoutstore';
+  import { isContactReadOnly, isContactOptional } from 'checkoutstore';
 
   // UI imports
   import Field from 'ui/components/Field.svelte';
@@ -10,16 +10,10 @@
   // Props
   export let value;
 
-  const checkoutStore = CheckoutStore.get();
+  const isOptional = isContactOptional();
+  const CONTACT_REGEX = isOptional ? '.*' : CONTACT_PATTERN;
 
-  const { optional, readonly, hidden, prefill } = checkoutStore;
-
-  const prefilledContact = prefill.contact;
-  const isContactReadonly = readonly.contact && prefilledContact;
-
-  const CONTACT_REGEX = optional.contact ? '.*' : CONTACT_PATTERN;
-
-  const label = optional.contact
+  const label = isOptional
     ? 'Phone with Country Code (Optional)'
     : 'Phone with Country Code';
 </script>
@@ -30,10 +24,10 @@
     name="contact"
     type="tel"
     autocomplete="tel"
+    required={!isOptional}
     x-autocompletetype="phone-full"
-    required={!optional.contact}
     pattern={CONTACT_REGEX}
-    readonly={isContactReadonly}
+    readonly={isContactReadOnly()}
     formatter={{ type: 'phone' }}
     {label}
     icon="&#xe607;"

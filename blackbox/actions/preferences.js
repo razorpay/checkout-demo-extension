@@ -103,6 +103,7 @@ module.exports = {
                 issuer: randomItem(Object.keys(netbanking)),
                 international: randomBool(),
               },
+              method: 'card',
             },
             {
               auth_type: null,

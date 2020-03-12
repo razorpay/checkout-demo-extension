@@ -1,4 +1,5 @@
 const { getTestData } = require('../../../actions');
+const { visible } = require('../../../util');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 const {
   submit,
@@ -39,7 +40,12 @@ describe.each(
     });
     await assertBasicDetailsScreen(context);
     await fillUserDetails(context);
-    await proceed(context);
+
+    // only proceed if on contact/email screen
+    // but not on method selection screen
+    if (!(await context.page.$('#user-details'))) {
+      await proceed(context);
+    }
     await assertUserDetails(context);
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);

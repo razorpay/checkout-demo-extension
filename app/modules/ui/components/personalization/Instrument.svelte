@@ -10,7 +10,7 @@
   // Utils imports
   import { findCodeByNetworkName } from 'common/card';
   import { getSession } from 'sessionmanager';
-  import PreferencesStore from 'checkoutstore/preferences';
+  import { getBanks } from 'checkoutstore';
   import { getIcon as getNetworkIcon } from 'icons/network';
   import { getBankLogo } from 'common/bank';
   import { getWallet } from 'common/wallet';
@@ -45,7 +45,7 @@
   }
 
   $: {
-    const banks = PreferencesStore.get().methods.netbanking;
+    const banks = getBanks();
     let wallet;
     let flow;
     let vpaSplit;

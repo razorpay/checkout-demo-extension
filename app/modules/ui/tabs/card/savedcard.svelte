@@ -6,7 +6,6 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { DEFAULT_AUTH_TYPE_RADIO } from 'common/constants';
-  import { getSession } from 'sessionmanager';
 
   // Store
   import { selectedPlanTextForSavedCard } from 'checkoutstore/emi';
@@ -32,8 +31,6 @@
   let noCvvChecked = false;
   let cvvValue = '';
   let authType = debitPin ? 'c3ds' : '';
-
-  const session = getSession();
 
   // Refs
   let cvvInput;

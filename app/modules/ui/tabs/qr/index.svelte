@@ -10,7 +10,12 @@
   // Utils imports
   import RazorpayConfig from 'common/RazorpayConfig';
   import { processInstrument } from 'checkoutframe/personalization';
-  import DowntimesStore from 'checkoutstore/downtimes';
+  import {
+    getDowntimes,
+    getMerchantOrder,
+    isCustomerFeeBearer,
+    getOptionalObject,
+  } from 'checkoutstore';
   import { getSession } from 'sessionmanager';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
@@ -39,17 +44,18 @@
     });
 
     // Add bank in payload for TPV orders
-    if (session.order && session.order.bank) {
-      paymentData.bank = session.order.bank;
+    const order = getMerchantOrder();
+    if (order && order.bank) {
+      paymentData.bank = order.bank;
     }
 
-    if (session.preferences.fee_bearer) {
+    if (isCustomerFeeBearer()) {
       view = 'fee';
     } else {
       createPayment();
     }
 
-    const downtimes = DowntimesStore.get();
+    const downtimes = getDowntimes();
 
     down = _Arr.contains(downtimes.low.methods, 'qr');
     disabled = _Arr.contains(downtimes.high.methods, 'qr');
@@ -107,11 +113,10 @@
       event: 'submit',
       data: paymentData,
     });
-
     session.r
       .createPayment(paymentData, {
         upiqr: true,
-        optional: session.optional,
+        optional: getOptionalObject(),
         paused: session.get().paused,
       })
       .on('payment.upi.coproto_response', _Func.bind(handleResponse, this))

@@ -7,6 +7,7 @@
 
   // Store
   import { selectedTokenId, savedCardEmiDuration } from 'checkoutstore/emi';
+  import { getEMIBankPlans } from 'checkoutstore/methods';
 
   // Utils
   import { getSession } from 'sessionmanager';
@@ -50,8 +51,7 @@
 
       // Set offer in case it is applicable.
       if (issuer && duration) {
-        const emi_options = session.emi_options;
-        const plans = (emi_options.banks[issuer] || {}).plans;
+        const plans = getEMIBankPlans(issuer);
 
         if (
           plans &&
