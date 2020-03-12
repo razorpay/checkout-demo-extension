@@ -88,7 +88,8 @@
 
   const component = cardKnown ? SlottedRadioOption : SlottedOption;
 
-  let selected = cardKnown && $selectedInstrumentId === instrument.id;
+  let selected = false;
+  $: selected = cardKnown && $selectedInstrumentId === instrument.id;
 
   function selectionHandler() {
     if (cardKnown) {
