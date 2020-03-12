@@ -4,10 +4,11 @@ import { toLowerCaseSafe } from 'lib/utils';
  * Get the updated payment payload augmented with the given instrument
  * @param {Instrument} instrument
  * @param {Object} payment Payment payload
+ * @param {Customer} customer
  *
  * @returns {Object} Payment payload
  */
-function genericPaymentPayloadGetter(instrument, payment) {
+function genericPaymentPayloadGetter(instrument, payment, customer) {
   payment = _Obj.clone(payment);
 
   const method = instrument.method;
@@ -15,11 +16,24 @@ function genericPaymentPayloadGetter(instrument, payment) {
 
   payment.method = method;
 
-  _Obj.loop(paymentKeys, (val, key) => {
-    if (!_.isUndefined(val)) {
-      payment[key] = val;
+  _Arr.loop(paymentKeys, key => {
+    const value = instrument[key];
+
+    if (!_.isUndefined(value)) {
+      payment[key] = value;
     }
   });
+
+  // Add a token
+  if (instrument.token_id && customer) {
+    const token =
+      _Obj.getSafely(customer, 'tokens.items', [])
+      |> _Arr.find(token => token.id === instrument.token_id);
+
+    if (token) {
+      payment.token = token.token;
+    }
+  }
 
   return payment;
 }

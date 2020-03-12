@@ -4598,10 +4598,6 @@ Session.prototype = {
         );
         var cvvInput = instrumentInDom.querySelector('.cvv-input');
 
-        var cvvInput = _Doc.querySelector(
-          '#instruments-list > .selected input.input'
-        );
-
         if (cvvInput) {
           if (cvvInput.value.length === cvvInput.maxLength) {
             data['card[cvv]'] = cvvInput.value;
@@ -4730,7 +4726,11 @@ Session.prototype = {
       var selectedInstrument = this.getSelectedPaymentInstrument();
 
       if (selectedInstrument) {
-        data = Instruments.addInstrumentToPaymentData(selectedInstrument, data);
+        data = Instruments.addInstrumentToPaymentData(
+          selectedInstrument,
+          data,
+          this.getCustomer(getPhone())
+        );
 
         /* TODO: the following code is the hack for ftx (2018), fix it properly */
         Analytics.setMeta('doneByInstrument', true);

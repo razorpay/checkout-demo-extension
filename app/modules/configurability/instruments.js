@@ -68,10 +68,11 @@ export function isInstrumentForEntireMethod(instrument) {
  * Adds instrument data to payment payload
  * @param {Instrument} instrument
  * @param {Object} payment Payment payload
+ * @param {Customer} customer
  *
  * @returns {Object}
  */
-export function addInstrumentToPaymentData(instrument, payment) {
+export function addInstrumentToPaymentData(instrument, payment, customer) {
   const method = instrument.method;
   const config = InstrumentConfig[method];
 
@@ -79,5 +80,5 @@ export function addInstrumentToPaymentData(instrument, payment) {
     return payment;
   }
 
-  return config.getPaymentPayload(instrument, payment);
+  return config.getPaymentPayload(instrument, payment, customer);
 }
