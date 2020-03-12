@@ -1393,7 +1393,7 @@ Session.prototype = {
           bankOptions: this.get('method.netbanking'),
           banks: banks,
           method: method,
-          selectedBankCode: banks[prefilledbank] || '',
+          selectedBankCode: prefilledbank,
         },
       });
 
