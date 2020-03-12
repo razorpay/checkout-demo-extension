@@ -100,7 +100,7 @@
     view = 'qr';
     loading = true;
 
-    session.paymentInstrument = processInstrument(paymentData);
+    session.preferredInstrument = processInstrument(paymentData);
 
     /**
      * TODO:

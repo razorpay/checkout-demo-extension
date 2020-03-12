@@ -783,9 +783,9 @@ function debounceAskOTP(view, msg, shouldLimitResend, screenProps) {
 
 // this === Session
 function successHandler(response) {
-  if (this.paymentInstrument) {
+  if (this.preferredInstrument) {
     P13n.recordSuccess(
-      this.paymentInstrument,
+      this.preferredInstrument,
       this.customer || this.getCustomer(this.payload.contact)
     );
   }
@@ -5056,7 +5056,7 @@ Session.prototype = {
       });
     }
 
-    this.paymentInstrument = P13n.processInstrument(data, this);
+    this.preferredInstrument = P13n.processInstrument(data, this);
 
     if (this.isPayout) {
       Analytics.track('payout:create:start');
