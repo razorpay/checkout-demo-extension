@@ -233,6 +233,12 @@
   }
 
   $: {
+    if (view === 'methods') {
+      $customer = session.getCustomer($contact);
+    }
+  }
+
+  $: {
     const loggedIn = _Obj.getSafely($customer, 'logged');
     _El.keepClass(_Doc.querySelector('#topbar #top-right'), 'logged', loggedIn);
 
