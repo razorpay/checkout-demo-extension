@@ -140,6 +140,24 @@ export function isMethodEnabled(method) {
   }
 }
 
+export const getPrefilledMethod = () => {
+  const ecod = getOption('ecod');
+  if (ecod) {
+    return 'wallet';
+  }
+
+  const prefilledMethod = getOption('prefill.method');
+  const prefilledProvider = getOption('prefill.provider');
+  if (
+    prefilledMethod === 'emi' &&
+    prefilledProvider === 'bajaj' &&
+    isMethodEnabled('cardless_emi') // Is the method enabled?
+  ) {
+    return 'cardless_emi';
+  }
+  return prefilledMethod;
+};
+
 export function isCardOrEMIEnabled() {
   return isMethodEnabled('card') || isMethodEnabled('emi');
 }
