@@ -5,6 +5,7 @@ const bankTransfer = require('./bank-transfer');
 const savedCards = require('./saved-cards');
 const cards = require('./cards');
 const emi = require('./emi');
+const wallet = require('./wallet');
 
 module.exports = {
   netbanking: netbanking,
@@ -14,4 +15,5 @@ module.exports = {
   'saved-cards': savedCards,
   cards: cards,
   emi: emi,
+  wallet: wallet,
 };
