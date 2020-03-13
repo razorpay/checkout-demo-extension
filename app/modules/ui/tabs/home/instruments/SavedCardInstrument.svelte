@@ -26,14 +26,15 @@
     const banks = getBanks();
     const bank = banks[card.issuer] || '';
     const bankText = bank.replace(/ Bank$/, '');
+    const cardType = card.type || card.card_type || '';
 
     if (loggedIn) {
       return `${bank ? `${bankText} ` : ''}${_Str.toTitleCase(
-        card.card_type || ''
+        cardType
       )} card - ${card.last4}`;
     } else {
       return `Use your${bank ? ` ${bankText}` : ''} ${_Str.toTitleCase(
-        card.card_type || ''
+        cardType
       )} card`;
     }
   }
