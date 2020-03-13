@@ -952,7 +952,6 @@ Session.prototype = {
         commenceECOD(this);
       }
       if (ecod) {
-        r.set('prefill.method', 'wallet');
         r.set('theme.hide_topbar', true);
       }
       $(this.el).addClass(classes);
@@ -966,7 +965,7 @@ Session.prototype = {
     if (oldMethod) {
       this.wants_skip = true;
     }
-    var tab = oldMethod || this.get('prefill.method');
+    var tab = oldMethod || MethodStore.getPrefilledMethod();
 
     if (tab) {
       var optional = {
@@ -2027,22 +2026,6 @@ Session.prototype = {
    * Improvise the prefill options.
    */
   improvisePrefill: function() {
-    var prefilledMethod = this.get('prefill.method');
-    var prefilledProvider = this.get('prefill.provider');
-
-    /**
-     * Bajaj Finserv is _technically_ EMI,
-     * but we're grouping it under Cardless EMI screen
-     * on Checkout.
-     */
-    if (
-      prefilledMethod === 'emi' &&
-      prefilledProvider === 'bajaj' &&
-      MethodStore.isMethodEnabled('cardless_emi') // Is the method enabled?
-    ) {
-      this.set('prefill.method', 'cardless_emi');
-    }
-
     improvisePrefilledContact(this);
   },
 
@@ -2052,7 +2035,7 @@ Session.prototype = {
    * goes into this function.
    */
   prefillPostRender: function() {
-    var prefilledMethod = this.get('prefill.method');
+    var prefilledMethod = MethodStore.getPrefilledMethod();
     var prefilledProvider = this.get('prefill.provider');
 
     if (prefilledMethod === 'cardless_emi' && prefilledProvider) {
