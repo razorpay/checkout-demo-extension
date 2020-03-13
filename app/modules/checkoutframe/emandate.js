@@ -4,6 +4,7 @@ import { getCheckoutBridge } from 'bridge';
 import * as Curtain from 'components/curtain';
 import { getSession } from 'sessionmanager';
 import { hideCta, showCtaWithDefaultText } from 'checkoutstore/cta';
+import { getEMandateBanks, getEMandateAuthTypes } from 'checkoutstore/methods';
 
 /* global templates, fillData */
 
@@ -39,8 +40,7 @@ export default function emandateView() {
     prefill: this.prefill,
   };
 
-  this.banks = this.session.methods.emandate;
-  this.emandateBanks = this.session.emandateBanks;
+  this.banks = getEMandateBanks();
 
   this.setTabTitles();
   this.render();
@@ -147,7 +147,7 @@ emandateView.prototype = {
      * switched to is emandate i.e. the landing screen and bank is prefilled,
      * we set the bank snd skip the bank selection screen.
      */
-    if (tab === 'emandate' && this.prefill.bank && this.banks[prefilledBank]) {
+    if (tab === 'emandate' && prefilledBank && this.banks[prefilledBank]) {
       this.session.netbankingTab.setSelectedBank(prefilledBank);
       this.setBank(prefilledBank);
 
@@ -170,27 +170,19 @@ emandateView.prototype = {
       }
       return true;
     }
+
+    // If the selected bank has just one auth type we directly switch to the bank details form
+    const authType = this.getAvailableAuthTypes(this.bank);
+    if (tab === 'emandate-auth-selection' && authType.length === 1) {
+      this.setAuthType(authType[0]);
+      this.showTab('emandate-details');
+      return true;
+    }
     return false;
   },
 
   getAvailableAuthTypes: function(bankCode) {
-    let authTypes = [];
-    bankCode = bankCode || this.bank;
-
-    if (this.session.emandateBanks && this.session.emandateBanks[bankCode]) {
-      authTypes = this.session.emandateBanks[bankCode].auth_types;
-    }
-
-    /**
-     * Netbanking is allowed only if
-     * 1. netbanking is an auth type, AND
-     * 2. account_type is NOT set in prefill
-     */
-    if (authTypes.indexOf('netbanking') > -1 && this.prefill.account_type) {
-      authTypes.splice(authTypes.indexOf('netbanking'), 1);
-    }
-
-    return authTypes;
+    return getEMandateAuthTypes(bankCode || this.bank);
   },
 
   setBank: function(bankCode) {
@@ -207,7 +199,7 @@ emandateView.prototype = {
 
     _El.setContents(
       _Doc.querySelector('#emandate-inner .bank-name'),
-      this.banks[bankCode]
+      this.banks[bankCode].name
     );
   },
 

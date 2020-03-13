@@ -1,10 +1,12 @@
 const { getTestData } = require('../../../actions');
+const { visible } = require('../../../util');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 const {
   submit,
   selectUPIMethod,
   enterUPIAccount,
   handleUPIAccountValidation,
+  handleSaveVpaRequest,
   respondToUPIAjax,
   respondToUPIPaymentStatus,
 } = require('../../../actions/common');
@@ -25,6 +27,8 @@ describe.each(
       amount: 200,
       personalization: false,
     },
+    loggedIn: true,
+    keyless: true,
   })
 )('UPI tests', ({ preferences, title, options }) => {
   test(title, async () => {
@@ -36,16 +40,21 @@ describe.each(
     });
     await assertBasicDetailsScreen(context);
     await fillUserDetails(context);
-    await proceed(context);
+
+    // only proceed if on contact/email screen
+    // but not on method selection screen
+    if (!(await context.page.$('#user-details'))) {
+      await proceed(context);
+    }
     await assertUserDetails(context);
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIMethod(context, 'BHIM');
-    await enterUPIAccount(context, 'BHIM');
+    await selectUPIMethod(context, 'new');
+    await enterUPIAccount(context, 'saranshgupta1995@okaxis');
     await submit(context);
     await handleUPIAccountValidation(context, 'BHIM@upi');
-    await respondToUPIAjax(context);
+    await handleSaveVpaRequest(context);
     await respondToUPIPaymentStatus(context);
   });
 });

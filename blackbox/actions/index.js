@@ -29,13 +29,14 @@ const getTestData = (
   {
     preferences = {},
     options = {},
-    loggedIn = true,
+    //do not run logged in tests by default
+    loggedIn = false,
     anon = true,
     keyless = true,
   } = {}
 ) => {
+  keyless = false;
   let tests = [];
-  loggedIn = false; //doing this as time of execution is too much and too many random failures also
   preferencesLoggedIn = makePreferencesLogged(preferences);
   preferences = makePreferences(preferences);
   options = makeOptions(options);
@@ -46,7 +47,9 @@ const getTestData = (
       options,
     };
     tests.push(loggedInData);
-    if (keyless) tests.push(getDataUpdatedForKeyless(loggedInData));
+    if (keyless) {
+      tests.push(getDataUpdatedForKeyless(loggedInData));
+    }
   }
   if (anon) {
     let anonymousUserData = {
@@ -55,7 +58,9 @@ const getTestData = (
       options,
     };
     tests.push(anonymousUserData);
-    if (keyless) tests.push(getDataUpdatedForKeyless(anonymousUserData));
+    if (keyless) {
+      tests.push(getDataUpdatedForKeyless(anonymousUserData));
+    }
   }
   return tests;
 };

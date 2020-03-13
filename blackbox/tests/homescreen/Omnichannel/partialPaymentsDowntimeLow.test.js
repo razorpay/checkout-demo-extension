@@ -74,8 +74,8 @@ describe.each(
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await verifyLowDowntime(context, 'UPI');
-    await selectUPIMethod(context, 'Google Pay');
+    await verifyLowDowntime(context, 'UPI', 'upi');
+    await selectUPIMethod(context, 'omnichannel');
     await verifyOmnichannelPhoneNumber(context);
     await verifyPartialAmount(context, '₹ 1');
     await submit(context);

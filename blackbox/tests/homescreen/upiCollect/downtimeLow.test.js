@@ -5,7 +5,7 @@ const {
   selectUPIMethod,
   enterUPIAccount,
   handleUPIAccountValidation,
-  respondToUPIAjax,
+  handleSaveVpaRequest,
   respondToUPIPaymentStatus,
   verifyLowDowntime,
 } = require('../../../actions/common');
@@ -22,7 +22,8 @@ const {
 
 describe.each(
   getTestData('Verify UPI downtime - Low', {
-    loggedIn: false,
+    loggedIn: true,
+    anon: false,
     options: {
       amount: 200,
       personalization: false,
@@ -63,12 +64,12 @@ describe.each(
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await verifyLowDowntime(context, 'UPI');
-    await selectUPIMethod(context, 'BHIM');
-    await enterUPIAccount(context, 'BHIM');
+    await verifyLowDowntime(context, 'UPI', 'upi');
+    await selectUPIMethod(context, 'new');
+    await enterUPIAccount(context, 'saranshgupta1995@okaxis');
     await submit(context);
     await handleUPIAccountValidation(context, 'BHIM@upi');
-    await respondToUPIAjax(context);
+    await handleSaveVpaRequest(context);
     await respondToUPIPaymentStatus(context);
   });
 });

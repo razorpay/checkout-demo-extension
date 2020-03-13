@@ -9,9 +9,14 @@ async function verifyHighDowntime(context, message) {
   expect(toolTipText).toContain(message);
 }
 
-async function verifyLowDowntime(context, message) {
-  const warningDiv = await context.page.waitForSelector('.downtime-callout');
-  // console.log(warningDiv);
+async function verifyLowDowntime(context, message, method) {
+  let selector = '.downtime-callout';
+
+  if (method) {
+    selector = `#form-${method} ${selector}`;
+  }
+
+  const warningDiv = await context.page.waitForSelector(selector);
   const warningText = await context.page.evaluate(
     warningDiv => warningDiv.textContent,
     warningDiv
@@ -19,7 +24,38 @@ async function verifyLowDowntime(context, message) {
   expect(warningText).toContain(message);
 }
 
+/**
+ * Waits for a given selector to be null
+ * @param {Page} page
+ * @param {string} selector
+ * @param {number} timeout
+ */
+function waitForRemoval(page, selector, timeout = 8000) {
+  return new Promise(async (resolve, reject) => {
+    let time = 0;
+
+    const interval = setInterval(async () => {
+      time += 300;
+
+      if (time >= timeout) {
+        clearInterval(interval);
+        return reject();
+      }
+
+      const el = await page.$(selector);
+
+      if (!el) {
+        clearInterval(interval);
+        return resolve();
+      }
+    }, 300);
+    await page.waitForSelector(selector);
+  });
+}
+
 async function verifyTimeout(context, paymentMode) {
+  let selector;
+
   if (
     paymentMode == 'netbanking' ||
     paymentMode == 'card' ||
@@ -28,15 +64,14 @@ async function verifyTimeout(context, paymentMode) {
     paymentMode == 'tpv' ||
     paymentMode == 'paylater'
   ) {
-    await delay(1000);
-    expect(await context.page.$('#fd-hide')).not.toEqual(null);
-    await delay(10000);
-    expect(await context.page.$('#fd-hide')).toEqual(null);
+    selector = '#fd-hide';
   } else if (paymentMode == 'wallet') {
-    await delay(5000);
-    expect(await context.page.$('#footer')).not.toEqual(null);
-    await delay(7000);
-    expect(await context.page.$('#footer')).toEqual(null);
+    selector = '#footer;';
+  }
+
+  if (selector) {
+    await waitForRemoval(context.page, selector, 10000);
+    expect(await context.page.$(selector)).toEqual(null);
   }
 }
 

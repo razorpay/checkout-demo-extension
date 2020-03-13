@@ -36,7 +36,7 @@
       "name": "Federal Bank"
     },
     "HDFC": {
-      "auth_types": ["netbanking"],
+      "auth_types": ["debitcard", "netbanking"],
       "name": "HDFC Bank"
     },
     "ICIC": {

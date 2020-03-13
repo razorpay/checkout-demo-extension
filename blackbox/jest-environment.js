@@ -1,5 +1,5 @@
 const NodeEnvironment = require('jest-environment-node');
-const puppeteer = require('puppeteer-core');
+const puppeteer = require('puppeteer');
 const DIR = require('./tmpdir');
 const { readFileSync } = require('fs');
 const { delay } = require('./util');

@@ -1,41 +1,49 @@
-import { getProvider as getCardlessEmiProvider } from 'common/cardlessemi';
-import { getProvider as getPayLaterProvider } from 'common/paylater';
-import { AVAILABLE_METHODS } from 'common/constants';
+import { TAB_TITLES, AVAILABLE_METHODS } from 'common/constants';
+import {
+  isMethodEnabled,
+  getPayLaterProviders,
+  getCardlessEMIProviders,
+  getWallets,
+  getCardNetworks,
+  getEMIBanks,
+} from 'checkoutstore/methods';
+import { getRecurringMethods, isRecurring } from 'checkoutstore';
+import { generateTextFromList } from 'lib/utils';
 
-/**
- * Returns the text with commas or "and" as the separator.
- * Example: list: ['a', 'b', 'c', 'd'], max: 2 - returns "a, b & More"
- * Example: list: ['a', 'b'], max: 2 - returns "a and b"
- * @param {Array} list
- * @param {Number} max
- *
- * @return {String}
- */
-function generateTextFromList(list, max) {
-  if (list.length <= max) {
-    return list.slice(0, max).join(' and ');
-  } else {
-    return `${list.slice(0, max).join(', ')} & More`;
+function getRecurringCardDescription() {
+  if (isRecurring()) {
+    return getRecurringMethods().card?.credit?.join(' and ') + ' credit cards';
   }
 }
 
 const CARD_DESCRIPTION = ({ session }) => {
-  if (session.recurring_card_text) {
-    return session.recurring_card_text;
+  const recurring_text = getRecurringCardDescription();
+  if (recurring_text) {
+    return recurring_text;
   }
 
-  const networks = ['MasterCard', 'Visa'];
+  // Keep in order that we want to display
+  const NW_MAP = {
+    VISA: 'Visa',
+    MC: 'MasterCard',
+    RUPAY: 'RuPay',
+    AMEX: 'Amex',
+    DICL: 'Diners Club',
+    MAES: 'Maestro',
+    JCB: 'JCB',
+  };
 
-  if (!session.irctc) {
-    networks.push('RuPay');
-    networks.push('Maestro');
-  }
+  // Get all networks from preferences.
+  const networksFromPrefs = getCardNetworks();
 
-  if (session.preferences.methods.amex) {
-    networks.push('Amex');
-  }
+  // Get the network names to show
+  const networks =
+    NW_MAP
+    |> _Obj.keys
+    |> _Arr.filter(network => Boolean(networksFromPrefs[network]))
+    |> _Arr.map(network => NW_MAP[network]);
 
-  return networks.join(', ');
+  return generateTextFromList(networks, 4);
 };
 
 /**
@@ -49,25 +57,14 @@ const DESCRIPTIONS = {
      * Cardless EMI: EMI via ZestMoney & More
      */
 
-    const providers = [];
-    const cardEmi = session.methods.emi;
-    const cardlessEmiProviders = session.methods.cardless_emi;
+    const cardEmi = isMethodEnabled('emi');
+    const providers = getCardlessEMIProviders() |> _Obj.keys;
 
     if (cardEmi) {
-      providers.push('Cards');
+      providers.unshift('Cards');
     }
 
-    if (cardlessEmiProviders && _.isNonNullObject(cardlessEmiProviders)) {
-      _Obj.loop(cardlessEmiProviders, (_, code) => {
-        const cardlessEmiProviderObj = getCardlessEmiProvider(code);
-
-        if (cardlessEmiProviderObj) {
-          providers.push(cardlessEmiProviderObj.name);
-        }
-      });
-    }
-
-    const text = generateTextFromList(providers, 2);
+    const text = generateTextFromList(providers, 3);
 
     if (cardEmi) {
       return text;
@@ -80,20 +77,8 @@ const DESCRIPTIONS = {
   emandate: () => 'Pay with Netbanking',
   emi: () => 'EMI via Credit & Debit Cards',
   netbanking: () => 'All Indian banks',
-  paylater: ({ session }) => {
-    const providers = [];
-    const paylaterProviders = session.methods.paylater;
-
-    if (paylaterProviders && _.isNonNullObject(paylaterProviders)) {
-      _Obj.loop(paylaterProviders, (_, code) => {
-        const paylaterProviderObj = getPayLaterProvider(code);
-
-        if (paylaterProviderObj) {
-          providers.push(paylaterProviderObj.name);
-        }
-      });
-    }
-
+  paylater: () => {
+    const providers = getPayLaterProviders().map(p => p.name);
     const text = generateTextFromList(providers, 2);
 
     return `Pay later using ${text}`;
@@ -102,18 +87,11 @@ const DESCRIPTIONS = {
   qr: () => 'Pay by scanning QR Code',
   gpay: () => 'Instant payment using Google Pay App',
   upi: () => 'Instant payment using UPI App',
-  wallet: ({ session }) => {
-    const walletNames = _Arr.map(
-      session.methods.wallet.slice(0, 2),
-      item => item.name
-    );
-
-    if (session.methods.wallet.length <= 2) {
-      return walletNames.join(' and ');
-    } else {
-      return walletNames.join(', ') + ' & More';
-    }
-  },
+  wallet: () =>
+    generateTextFromList(
+      getWallets().map(w => w.name),
+      2
+    ),
 };
 
 /**
@@ -139,6 +117,13 @@ export function getMethodDescription(method, props) {
   }
 
   return fn(props);
+}
+
+export function getEMIBanksText() {
+  const emiBanks = getEMIBanks();
+  const bankNames =
+    emiBanks |> _Obj.keys |> _Arr.map(bank => emiBanks[bank].name);
+  return generateTextFromList(bankNames, 12);
 }
 
 /**
@@ -193,17 +178,17 @@ export function getMethodPrefix(method) {
  *
  * @returns {string}
  */
-export function getMethodNameForPaymentOption(method, { session }) {
+export function getMethodNameForPaymentOption(method) {
   switch (method) {
     case 'upi':
-      if (session.methods.qr) {
+      if (isMethodEnabled('qr')) {
         return 'UPI / QR';
       }
 
-      return session.tab_titles.upi;
+      return TAB_TITLES.upi;
 
     default:
-      return session.tab_titles[method];
+      return TAB_TITLES[method];
   }
 }
 

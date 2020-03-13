@@ -50,8 +50,8 @@ describe('Basic Omnichannel payment', () => {
     await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await verifyLowDowntime(context, 'UPI');
-    await selectUPIMethod(context, 'Google Pay');
+    await verifyLowDowntime(context, 'UPI', 'upi');
+    await selectUPIMethod(context, 'omnichannel');
     await verifyOmnichannelPhoneNumber(context);
     await submit(context);
     await respondToUPIAjax(context);

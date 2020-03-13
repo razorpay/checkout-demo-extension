@@ -58,7 +58,7 @@ describe('Basic upi payment', () => {
     await handlePartialPayment(context, '100');
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await verifyLowDowntime(context, 'UPI');
+    await verifyLowDowntime(context, 'UPI', 'upi');
     await selectUPIMethod(context, 'BHIM');
     await enterUPIAccount(context, 'BHIM');
     await verifyPartialAmount(context, '₹ 100');

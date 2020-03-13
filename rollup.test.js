@@ -8,7 +8,7 @@ const { execSync } = require('child_process');
 
 const { Collector, Reporter } = require('istanbul');
 const coverage = require('rollup-plugin-coverage');
-const puppeteer = require('puppeteer-core');
+const puppeteer = require('puppeteer');
 const { stylus, rollupCommon, getPlugins } = require('fe/rollup-plugins');
 const rollupPlugins = getPlugins({
   src: 'app/modules',
@@ -69,7 +69,7 @@ Promise.all(
             writeFileSync(prePath + '.html', template(bundleName));
 
             const browser = await puppeteer.launch({
-              executablePath: env.CHROME_BIN || '/usr/bin/chromium',
+              // executablePath: env.CHROME_BIN || '/usr/bin/chromium',
               args: ['--no-sandbox'],
               // headless: false,
               // devtools: true,

@@ -92,7 +92,7 @@ export const EMI_HELP_TEXT =
   'to avail.';
 
 // Change this when running experiment 2 for Debit + Pin: Select ATM PIN by default.
-export const DEFAULT_AUTH_TYPE_RADIO = '3ds';
+export const DEFAULT_AUTH_TYPE_RADIO = 'c3ds';
 
 export const STRINGS = {
   process: 'Your payment is being processed',
@@ -124,3 +124,5 @@ export const AVAILABLE_METHODS = [
 export const VPA_REGEX = /^[a-z0-9][a-z0-9.-]{2,}@[a-z]+$/i;
 
 export const NO_PAYMENT_ADAPTER_ERROR = 'Payment Adapter does not exist.';
+
+export const INDIA_COUNTRY_CODE = '+91';

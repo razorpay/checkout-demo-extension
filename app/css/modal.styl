@@ -1,6 +1,6 @@
 @require 'common';
 
-.headless-bank {
+.native-otp-bank {
   height: 20px;
   padding-top: 13px !important;
 }
@@ -1337,19 +1337,9 @@ $outline = #ddd;
     }
   }
 
-  &[tab=emi] {
-    #form-card.saved-cards #saved-cards-container {
-      max-height: 238px;
-    }
-  }
-
   .tab-content {
-    &#form-wallet, &#form-card {
+    &#form-wallet {
       bottom: $topbarh;
-    }
-
-    &.saved-cards #saved-cards-container {
-      max-height: 188px;
     }
   }
 }
@@ -1534,10 +1524,6 @@ $outline = #ddd;
     display: block;
   }
 
-  .save-enabled #add-card-container {
-    height: 248px;
-  }
-
   .saved-cards #saved-cards-container {
     max-height: 277px;
   }
@@ -1631,10 +1617,6 @@ $outline = #ddd;
     #form-fields .legend {
       display: none;
     }
-  }
-
-  #saved-cards-container {
-    max-height: 156px;
   }
 }
 

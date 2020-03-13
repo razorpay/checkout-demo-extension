@@ -6,6 +6,7 @@ import * as AnalyticsTypes from 'analytics-types';
 import * as Bridge from 'bridge';
 import * as strings from 'common/strings';
 import * as OtpService from 'common/otpservice';
+import { isRecurring } from 'checkoutstore';
 
 /* global errorHandler, getPhone */
 
@@ -35,24 +36,20 @@ export function Customer(contact) {
   }
 }
 
-export const sanitizeTokens = (tokens, filters) => {
-  let _filters = filters || {};
-  let method = _filters.method || 'card',
-    recurring = _filters.recurring || false;
+export const sanitizeTokens = tokens => {
+  const recurring = isRecurring();
 
   if (tokens) {
-    let items = [];
-
-    tokens.items
-      |> _Obj.loop(item => {
-        if (item.method === method && (recurring ? item.recurring : true)) {
-          items.push(item);
-        }
-      });
-
-    tokens
-      |> _Obj.setProp('items', items)
-      |> _Obj.setProp('count', items.length);
+    tokens.items = tokens.items.filter(item => {
+      if (recurring && !item.recurring) {
+        return false;
+      }
+      // only allow card and upi tokens
+      if (item.method === 'card' || item.method === 'upi') {
+        return true;
+      }
+    });
+    tokens.count = tokens.items.length;
   }
 };
 
@@ -63,12 +60,9 @@ Customer.prototype = {
 
   mark_logged: function(data) {
     var session = getSession();
-    let recurring = session.recurring || false;
     this.logged = true;
 
-    sanitizeTokens(data.tokens, {
-      recurring: recurring,
-    });
+    sanitizeTokens(data.tokens);
 
     this.tokens = data.tokens;
 
@@ -181,25 +175,7 @@ Customer.prototype = {
     });
   },
 
-  deleteCard: function(token, callback) {
-    let user = this;
-
-    if (!this.id) {
-      return;
-    }
-
-    fetch({
-      url: makeAuthUrl(this.r, 'apps/' + this.id + '/tokens/' + token),
-      method: 'delete',
-      callback: function() {
-        callback();
-        deleteToken(user, token);
-      },
-    });
-  },
-
   logout: function(this_device, callback) {
-    let session = getSession();
     Analytics.track('logout', {
       type: AnalyticsTypes.BEHAV,
       data: {
@@ -220,15 +196,4 @@ Customer.prototype = {
     Analytics.removeMeta('loggedIn');
     fetch(ajaxOpts);
   },
-};
-
-export const deleteToken = (user, token) => {
-  let tokens = user.tokens;
-  for (var i = 0; i < tokens.count; i++) {
-    if (tokens.items[i].token === token) {
-      tokens.items.splice(i, 1);
-      tokens.count--;
-      return;
-    }
-  }
 };

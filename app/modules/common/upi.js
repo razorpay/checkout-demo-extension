@@ -110,9 +110,6 @@ const UPI_APPS = {
       package_name: 'com.fss.idfcpsp',
     },
     {
-      package_name: 'com.YesBank',
-    },
-    {
       package_name: 'com.abipbl.upi',
     },
     {
@@ -486,6 +483,39 @@ export const getNumberOfAppsByCategory = allApps => {
   });
 
   return count;
+};
+
+const handleData = [
+  {
+    handles: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],
+    icon: 'https://cdn.razorpay.com/app/googlepay.svg',
+  },
+  {
+    handles: ['ybl'],
+    icon: 'https://cdn.razorpay.com/app/phonepe.svg',
+  },
+  {
+    handles: ['icicibank'],
+    icon: 'https://cdn.razorpay.com/app/whatsapp.svg',
+  },
+];
+
+/**
+ * get icon url from handle
+ *
+ * @param {String} handle eg. okaxis, ybl
+ *
+ * @returns string url to the app icon
+ */
+export const getUPIAppLogoFromHandle = handle => {
+  let icon = null;
+  handleData.forEach(handleSet => {
+    if (_Arr.contains(handleSet.handles, handle)) {
+      icon = handleSet.icon;
+    }
+  });
+
+  return icon;
 };
 
 /**

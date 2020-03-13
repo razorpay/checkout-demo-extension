@@ -67,9 +67,11 @@ async function handleBankRequest(context) {
 }
 
 async function enterCardDetails(context, { cardType, nativeOtp = false } = {}) {
-  const cardNum = await context.page.waitForSelector('#card_number');
-  if (cardType == undefined) await cardNum.type('5241 9333 8074 0001');
-  else if (cardType == 'VISA') await cardNum.type('4111 1111 1111 1111');
+  const visa = cardType === 'VISA';
+  await context.page.type(
+    '#card_number',
+    visa ? '4111111111111111' : '376939393939397'
+  );
   await context.expectRequest(req => {});
   const flows = {
     recurring: false,
@@ -82,7 +84,7 @@ async function enterCardDetails(context, { cardType, nativeOtp = false } = {}) {
   await context.respondJSONP({ flows });
   await context.page.type('#card_expiry', '12/55');
   await context.page.type('#card_name', 'SakshiJain');
-  await context.page.type('#card_cvv', '112');
+  await context.page.type('#card_cvv', visa ? '111' : '1111');
 }
 
 async function handleCustomerCardStatusRequest(context, cardType) {
@@ -91,7 +93,7 @@ async function handleCustomerCardStatusRequest(context, cardType) {
   await context.respondJSON({ saved: true });
 }
 
-async function respondSavedCards(context) {
+async function respondSavedCards(context, { nativeOtp = false } = {}) {
   const req = await context.expectRequest();
   expect(req.url).toContain('otp/verify');
   await context.respondJSON({
@@ -121,6 +123,7 @@ async function respondSavedCards(context) {
             flows: {
               recurring: false,
               iframe: true,
+              otp: nativeOtp,
             },
           },
           recurring: false,
@@ -133,11 +136,13 @@ async function respondSavedCards(context) {
       ],
     },
   });
+
+  // let UI be rendered
+  await delay(600);
 }
 
 async function selectSavedCardAndTypeCvv(context) {
-  await delay(500);
-  const SavedCard = await context.page.waitForSelector('.saved-inner');
+  const SavedCard = await context.page.$('.saved-inner');
   await SavedCard.click();
   await SavedCard.type('222');
 }

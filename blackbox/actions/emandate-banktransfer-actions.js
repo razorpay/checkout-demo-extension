@@ -14,7 +14,7 @@ async function verifyEmandateBank(context) {
 }
 
 async function selectEmandateNetbanking(context) {
-  await context.page.waitFor('#emandate-options > .auth-option', {
+  await context.page.waitFor('#emandate-options > .auth-option.netbanking', {
     timeout: 2000,
     visible: true,
   });
@@ -77,7 +77,9 @@ async function verifyNeftDetails(context) {
 }
 
 async function verifyRoundOffAlertMessage(context) {
-  const messageDiv = await context.page.waitForSelector('.callout.warning');
+  const messageDiv = await context.page.waitForSelector(
+    '#form-bank_transfer .callout.warning'
+  );
   let messageText = await context.page.evaluate(
     messageDiv => messageDiv.textContent,
     messageDiv

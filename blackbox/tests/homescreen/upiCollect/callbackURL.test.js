@@ -26,6 +26,8 @@ describe.each(
       callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
       redirect: true,
     },
+    loggedIn: true,
+    anon: false,
   })
 )('UPI tests', ({ preferences, title, options }) => {
   test(title, async () => {
@@ -42,8 +44,8 @@ describe.each(
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await selectUPIMethod(context, 'BHIM');
-    await enterUPIAccount(context, 'BHIM');
+    await selectUPIMethod(context, 'new');
+    await enterUPIAccount(context, 'saranshgupta1995@okaxis');
     await submit(context);
     await handleUPIAccountValidation(context, 'BHIM@upi');
     await expectRedirectWithCallback(context, { method: 'upi' });

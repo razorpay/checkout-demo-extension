@@ -1,5 +1,10 @@
 import GlobalOffers from './global';
-import CheckoutStore from 'checkoutstore';
+import { isPartialPayment } from 'checkoutstore';
+import {
+  isMethodEnabled,
+  getWallets,
+  getCardlessEMIProviders,
+} from 'checkoutstore/methods';
 
 /**
  * Default data that should be present in all offers.
@@ -79,32 +84,26 @@ const getApiOffers = ({ preferences }) =>
  *
  * @return {Boolean}
  */
-const isOfferEligible = (offer, opts) => {
-  const { session } = opts;
-
+const isOfferEligible = offer => {
   const method = offer.payment_method;
-  const enabledMethods = session.methods;
+  let isEnabled;
 
   if (method === 'wallet') {
-    if (_.isArray(enabledMethods.wallet)) {
-      if (
-        _Arr.filter(
-          enabledMethods.wallet,
-          wallet => wallet.code === offer.issuer
-        ).length
-      ) {
-        return true;
-      }
-    }
-  } else if (method === 'cardless_emi' && offer.provider) {
     return (
-      enabledMethods.cardless_emi && enabledMethods.cardless_emi[offer.provider]
+      getWallets() |> _Arr.filter(w => w.code === offer.issuer) |> _.lengthOf
     );
-  } else {
-    return enabledMethods[method];
   }
 
-  return false;
+  if (method === 'cardless_emi') {
+    if (offer.provider) {
+      return (
+        isMethodEnabled('cardless_emi') &&
+        getCardlessEMIProviders()[offer.provider]
+      );
+    }
+  }
+
+  return isMethodEnabled(offer.payment_method);
 };
 
 /**
@@ -133,10 +132,10 @@ export const createOffers = opts => {
   let allOffers = [];
 
   // Concat all offers and check for eligibility, but only if this isn't a partial payment
-  if (!CheckoutStore.get().isPartialPayment) {
+  if (!isPartialPayment()) {
     allOffers =
       [].concat(apiOffers, globalOffers, localOffers)
-      |> _Arr.filter(offer => isOfferEligible(offer, opts));
+      |> _Arr.filter(offer => isOfferEligible(offer));
   }
 
   return {

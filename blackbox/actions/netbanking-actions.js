@@ -1,6 +1,8 @@
-const { visible } = require('../util');
+const { visible, delay } = require('../util');
 
 async function assertNetbankingPage(context) {
+  await delay(300);
+
   expect(
     await context.page.$eval('label[for=bank-radio-SBIN]', visible)
   ).toEqual(true);
@@ -15,9 +17,6 @@ async function assertNetbankingPage(context) {
   ).toEqual(true);
   expect(
     await context.page.$eval('label[for=bank-radio-KKBK]', visible)
-  ).toEqual(true);
-  expect(
-    await context.page.$eval('label[for=bank-radio-YESB]', visible)
   ).toEqual(true);
 }
 module.exports = {

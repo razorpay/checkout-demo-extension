@@ -1,29 +1,91 @@
-const { randomContact, randomEmail, delay } = require('../../util');
+const {
+  randomContact,
+  randomEmail,
+  delay,
+  setState,
+  find,
+  getAttribute,
+  innerText,
+} = require('../../util');
+
 const personalizationActions = require('./personalization-actions');
 const downtimeTimeoutActions = require('./downtime-actions');
-const emandateActions = require('./emandate-actions.js');
+const emandateActions = require('./emandate-actions');
 const paylaterActions = require('./paylater-actions');
+const homeScreenActions = require('./homeActions');
+const userDetailsActions = require('./userDetailsActions');
+const sharedActions = require('./sharedActions');
+
+const { proceed } = sharedActions;
 
 /**
- * Sets the state in context
+ * Selects the option to pay partially
+ * and enters an amount
  */
-function setState(context, what = {}) {
-  if (!context.state) {
-    context.state = {};
-  }
+async function handlePartialPayment(context, amount) {
+  await context.page.click('.partial-payment-block button:nth-of-type(2)');
 
-  let state = {
-    ...context.state,
-    ...what,
-  };
+  setState(context, {
+    partial: true,
+  });
 
-  context.state = state;
+  await context.page.type('#amount-value', amount);
+  await delay(100);
+  await context.page.evaluate(() =>
+    document.querySelector('#amount-value').blur()
+  );
+  await delay(100);
+  await context.page.click('#footer');
 }
 
 /**
- * Get the textContent of an element
+ *
+ * @param {Context} context The test context
+ * @param {String} selector selector to match the targeted element
+ * @param {String} value Value that is to be asserted
  */
-async function innerText(page, element) {
+async function assertInputValue(context, selector, value) {
+  const selectorInput = await context.page.waitForSelector(selector);
+  const selectorInputValue = await context.page.evaluate(
+    selectorInput => selectorInput.value,
+    selectorInput
+  );
+  expect(selectorInputValue).toBe(value);
+}
+
+/**
+ *
+ * @param {Context} context The test context
+ * @param {String} selector selector to match the targeted element
+ */
+async function assertSelectorAbsence(context, selector) {
+  const el = await context.page.$(selector);
+  expect(el).toBe(null);
+}
+
+/**
+ *
+ * @param {Context} context The test context
+ * @param {String} selector selector to match the targeted element
+ * @param {String} attr Attribute that is to be asserted
+ * @param {String} value Value that the attribute is supposed to have
+ */
+async function assertElementHasAttribute(
+  context,
+  selector,
+  attr,
+  value = true
+) {
+  const selectorElement = await context.page.waitForSelector(selector);
+  const hasAttribute = await context.page.evaluate(
+    (selectorElement, attr) => selectorElement.hasAttribute(attr),
+    selectorElement,
+    attr
+  );
+  expect(hasAttribute).toBe(value);
+}
+
+async function getTextContent(page, element) {
   try {
     return await page.evaluate(element => element.textContent, element);
   } catch (err) {
@@ -32,278 +94,35 @@ async function innerText(page, element) {
 }
 
 /**
- * Get the value of an attribute on an element
- * @param {Page} page
- * @param {Element} element
- * @param {String} attribute
+ *
+ * @param {Context} context The test context
+ * @param {String} selector selector to match the targeted element
+ * @param {String} value Value that is to be asserted
  */
-async function getAttribute(page, element, attribute) {
-  try {
-    return await page.evaluate(
-      (element, attribute) => element.getAttribute(attribute),
-      element,
-      attribute
-    );
-  } catch (err) {
-    return undefined;
-  }
-}
-
-/**
- * Array.find, but with async support
- * @param {Array} array
- * @param {Function} evaluator
- */
-async function find(array, evaluator) {
-  const promises = array.map(evaluator);
-
-  const results = await Promise.all(promises);
-
-  const index = results.findIndex(Boolean);
-
-  return array[index];
-}
-
-/**
- * Makes sure that the details screen is visible
- * with contact and email fields
- */
-async function assertBasicDetailsScreen(context) {
-  const $form = await context.page.waitForSelector('#form-common', {
-    visible: true,
-  });
-  if (!context.prefilledContact && !context.isContactOptional) {
-    const $contact = await $form.$('#contact');
-
-    expect(await $contact.evaluate(el => el.value)).toEqual(
-      context.prefilledContact
-    );
-  }
-  if (!context.prefilledEmail && !context.isEmailOptional) {
-    const $email = await $form.$('#email');
-
-    expect(await $email.evaluate(el => el.value)).toEqual(
-      context.prefilledEmail
-    );
-  }
-}
-
-async function assertMethodsScreen(context) {
-  const $form = await context.page.waitForSelector('#form-common', {
-    visible: true,
-  });
-  const methods = await $form.$('.methods-container');
-
-  expect(methods).not.toEqual(null);
-}
-
-async function assertMissingDetails(context) {
-  const $form = await context.page.waitForSelector('#form-common', {
-    visible: true,
-  });
-  const strip = await $form.$('#user-details');
-  if (!context.preferences.customer) {
-    expect(strip).toEqual(null);
+async function assertTextContent(context, selector, value, contains = false) {
+  const selectorInput = await context.page.waitForSelector(selector);
+  const textContent = await getTextContent(context.page, selectorInput);
+  if (!contains) {
+    expect(textContent).toBe(value);
   } else {
-    expect(strip).not.toEqual(null);
-    await assertEditUserDetailsAndBack(context);
+    expect(textContent).toContain(value);
   }
-}
-
-/**
- * Fill user contact and email
- */
-async function fillUserDetails(context, number) {
-  let contact = context.prefilledEmail || number || randomContact();
-  let email = context.prefilledContact || randomEmail();
-
-  if (!context.prefilledContact && !context.isContactOptional) {
-    await context.page.type('#contact', contact);
-  }
-
-  if (!context.prefilledEmail && !context.isEmailOptional) {
-    await context.page.type('#email', email);
-  }
-
-  const state = {
-    contact,
-    email,
-  };
-
-  if (context.isContactOptional) {
-    delete state.contact;
-  }
-
-  if (context.isEmailOptional) {
-    delete state.email;
-  }
-
-  setState(context, state);
-}
-
-/**
- * Click on the CTA
- */
-async function proceed(context) {
-  const proceed = await context.page.waitForSelector('#footer', {
-    visible: true,
-  });
-  await proceed.click();
-}
-
-/**
- * Asserts that the user details in the strip
- * are the same as those entered.
- */
-async function assertUserDetails(context) {
-  if (!context.preferences.customer) {
-    const { contact, email } = context.state;
-
-    const first = contact || email;
-    const last = email;
-
-    const strip = await context.page.waitForSelector(
-      '#user-details [slot=title]',
-      {
-        visible: true,
-      }
-    );
-    const firstInPage = await innerText(
-      context.page,
-      await strip.$('span:first-child')
-    );
-    const lastInPage = await innerText(
-      context.page,
-      await strip.$('span:last-child')
-    );
-
-    if (!first && !last) {
-      expect(firstInPage).toEqual(undefined);
-      expect(lastInPage).toEqual(undefined);
-    } else if (first) {
-      expect(firstInPage).toEqual(first);
-    } else if (last) {
-      expect(lastInPage).toEqual(last);
-    }
-  }
-}
-
-/**
- * Asserts that going back to edit
- * and returning keeps the behaviour intact
- */
-async function assertEditUserDetailsAndBack(context) {
-  const strip = await context.page.waitForSelector(
-    '#user-details [slot=title]',
-    {
-      visible: true,
-    }
-  );
-
-  await strip.click();
-
-  // TODO: Update details
-
-  if (context.state && context.state.partial) {
-    const nextButton = await context.page.waitForSelector('#footer', {
-      visible: true,
-    });
-    await nextButton.click();
-  } else {
-    await delay(500);
-    await proceed(context);
-  }
-  await assertUserDetails(context);
-}
-
-/**
- * Returns all available method buttons
- */
-async function getMethodButtons(context) {
-  const list = await context.page.waitForSelector('.methods-container', {
-    visible: true,
-  });
-  return Array.from(await list.$$('button.new-method'));
-}
-
-/**
- * Verify that methods are being shown
- */
-async function assertPaymentMethods(context) {
-  const buttons = await getMethodButtons(context);
-
-  const methods = await Promise.all(
-    buttons.map(button => getAttribute(context.page, button, 'method'))
-  );
-  expect([
-    'card',
-    'netbanking',
-    'wallet',
-    'upi',
-    'emi',
-    'bank_transfer',
-    'paylater',
-    'cardless_emi',
-  ]).toEqual(expect.arrayContaining(methods));
-}
-
-/**
- * Select a payment method
- */
-async function selectPaymentMethod(context, method) {
-  const buttons = await getMethodButtons(context);
-
-  const methodButton = await find(buttons, async button => {
-    const buttonMethod = await getAttribute(context.page, button, 'method');
-
-    return method === buttonMethod;
-  });
-
-  await methodButton.click();
-}
-
-/**
- * Selects the option to pay partially
- * and enters an amount
- */
-async function handlePartialPayment(context, amount) {
-  const payPartially = await context.page.waitForSelector(
-    '.partial-payment-block button:nth-of-type(2)',
-    {
-      visible: true,
-    }
-  );
-
-  await payPartially.click();
-
-  setState(context, {
-    partial: true,
-  });
-
-  const amountValue = await context.page.waitForSelector('#amount-value', {
-    visible: true,
-  });
-  await amountValue.type(amount);
-
-  const nextButton = await context.page.waitForSelector('#footer', {
-    visible: true,
-  });
-  await nextButton.click();
 }
 
 module.exports = {
-  assertBasicDetailsScreen,
-  fillUserDetails,
   proceed,
-  assertUserDetails,
-  assertPaymentMethods,
-  selectPaymentMethod,
-  assertEditUserDetailsAndBack,
   handlePartialPayment,
-  assertMethodsScreen,
-  assertMissingDetails,
+  assertInputValue,
+  getAttribute,
+  getTextContent,
+  assertTextContent,
+  assertSelectorAbsence,
+  assertElementHasAttribute,
+  ...homeScreenActions,
   ...personalizationActions,
   ...downtimeTimeoutActions,
   ...emandateActions,
   ...paylaterActions,
+  ...userDetailsActions,
+  ...sharedActions,
 };

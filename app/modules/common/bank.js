@@ -16,7 +16,6 @@ const _commonBanks = {
   ICIC: 'ICICI',
   UTIB: 'Axis',
   KKBK: 'Kotak',
-  YESB: 'Yes',
   IBKL: 'IDBI',
   BARB_R: 'BOB',
   PUNB_R: 'PNB',
@@ -85,11 +84,6 @@ export const emiBanks = [
     patt: /^((5(4(0(46[01]|711)|91(24|32)|3186|4438)|5(4(37[458]|623)|3160|8959)|2(3990|9388))|4(5((41|63)98|7036)|1(290[345]|9607)|622(7[0123]|69)|(0287|2934)4|9407[67])))/,
   },
   {
-    code: 'YESB',
-    name: 'Yes Bank',
-    patt: /^(5(3(1849|6303)|24167|49921|58918))/,
-  },
-  {
     code: 'AMEX',
     name: 'American Express',
     patt: /^(37(9(8(6[123789]|7[012678])|397)|693))/,
@@ -97,7 +91,7 @@ export const emiBanks = [
   {
     code: 'SBIN',
     name: 'State Bank of India',
-    patt: /^((4(0((474|969)5|3(009|250)|066[67])|3(1(75[47]|459)|358[78]|7748|8105)|5(257[24]|9247)|6(874[23]|1119)|20739|72642)|5(1(0(1(28|35)|223)|(262|725)2)|2(4((24|31)7|182)|6468|8734)|36298|47359)))/,
+    patt: /^(4(0(066(6|7)|3(009|250)|4745|96(38|95))|20739|3(1(459|75(4|7))|358(7|8)|7748|8105)|5(257(2|4)|9247)|6(1119|874(2|3))|72642)|5(1(0(1(28|35)|223)|2622|7252)|2(4(182|247|317)|6468|8734)|36298|47359))/,
   },
   {
     code: 'BARB',
@@ -168,44 +162,6 @@ export const getPreferredBanks = (availBanks, bankOptions) => {
   }
 
   return bankList;
-};
-
-/**
- * Returns the list of banks that have a downtime.
- * @param {Object} preferences
- *
- * @return {Array}
- */
-export const getDownBanks = preferences => {
-  /*
-    "downtime": {
-      "netbanking": [
-        {
-          "issuer": [
-            "CIUB"
-          ],
-          "severity": "high",
-          "begin": 1554061550
-        }
-      ]
-    }
-  */
-
-  const downtime = preferences.downtime;
-  let downList = [];
-
-  if (downtime) {
-    _Arr.loop(
-      _Arr.map(downtime.netbanking || [], o => o.issuer),
-      downBanks => {
-        downList = downList.concat(downBanks);
-      }
-    );
-  }
-
-  // TODO: Remove duplicate entries from downList
-
-  return downList;
 };
 
 /**

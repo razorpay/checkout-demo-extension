@@ -62,6 +62,9 @@ async function sendPreferences({
 function makePreferences(overrides) {
   return {
     options: {},
+    features: {
+      save_vpa: true,
+    },
     methods: {
       emi: true,
       emi_subvention: 'customer',
@@ -70,6 +73,7 @@ function makePreferences(overrides) {
       netbanking,
       emi_options,
       recurring,
+      upi_intent: true,
     },
     ...overrides,
   };
@@ -80,15 +84,19 @@ module.exports = {
   makePreferences,
 
   makePreferencesLogged(overrides) {
+    const token = randomId();
     return {
       ...makePreferences(overrides),
       customer: {
         email: randomEmail(),
         contact: randomContact(),
         tokens: {
+          count: 2,
+          entity: 'collection',
           items: [
             {
-              token: 'token_' + randomId(),
+              id: 'token_' + token,
+              token,
               card: {
                 name: randomName(),
                 last4: randomString(chrnum)(4),
@@ -97,6 +105,30 @@ module.exports = {
                 issuer: randomItem(Object.keys(netbanking)),
                 international: randomBool(),
               },
+              method: 'card',
+            },
+            {
+              auth_type: null,
+              bank: null,
+              created_at: 1579513972,
+              entity: 'token',
+              id: 'token_E6ggSqoaxSnzQc',
+              method: 'upi',
+              mrn: null,
+              recurring: false,
+              recurring_details: {
+                status: 'not_applicable',
+                failure_reason: null,
+              },
+              start_time: null,
+              token: 'BrLOcWE6Mu9kLB',
+              used_at: 1579513972,
+              vpa: {
+                username: 'saranshgupta1995',
+                handle: 'okhdfcbank',
+                name: null,
+              },
+              wallet: null,
             },
           ],
         },

@@ -58,7 +58,7 @@ $mobile-view() {
     height: $bodyhmobile;
     height: calc(100% - 129px);
     height: calc(100vh - 129px);
-    min-height: $bodyhmobile;
+    min-height: $bodyhmobile - $footerh;
 
     // Reduce height by 24px if timeout banner is shown
     &.has-timeout {
@@ -172,7 +172,7 @@ $mobile-view() {
     }
   }
 
-  #wallets, #upi-apps {
+  #wallets {
     padding-bottom: $footerh + 12px;
   }
 

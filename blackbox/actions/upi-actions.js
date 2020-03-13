@@ -8,7 +8,9 @@ async function respondToUPIAjax(context, { method } = {}, offerId = '') {
   var dataValue,
     typeValue = {};
   const req = await context.expectRequest();
-  if (offerId != '') expect(req.body).toContain(offerId);
+  if (offerId != '') {
+    expect(req.body).toContain(offerId);
+  }
   expect(req.url).toContain('create/ajax');
   if (method === 'qr') {
     typeValue = 'intent';
@@ -20,6 +22,33 @@ async function respondToUPIAjax(context, { method } = {}, offerId = '') {
     typeValue = 'async';
     dataValue = null;
   }
+
+  await context.respondJSON({
+    type: typeValue,
+    version: 1,
+    payment_id: 'pay_DaaBCIH1rZXZg5',
+    gateway:
+      'eyJpdiI6IlFOYUo1WEY1WWJmY1FHWURKdmpLeUE9PSIsInZhbHVlIjoiQlhXRTFNcXZKblhxSzJRYTBWK1pMc2VLM0owWUpLRk9JWTZXT04rZlJYRT0iLCJtYWMiOiIxZjk5Yjc5ZmRlZDFlNThmNWQ5ZTc3ZDdiMTMzYzU0ZmRiOTIxY2NlM2IxYjZlNjk5NDEzMGUzMzEzOTA1ZGEwIn0',
+    data: dataValue,
+    request: {
+      url:
+        'https://api.razorpay.com/v1/payments/pay_DaaBCIH1rZXZg5/status?key_id=rzp_test_1DP5mmOlF5G5ag',
+      method: 'GET',
+    },
+  });
+}
+async function handleSaveVpaRequest(context, { method } = {}, offerId = '') {
+  let typeValue = 'async';
+  let dataValue = null;
+
+  const req = await context.expectRequest();
+  if (offerId != '') {
+    expect(req.body).toContain(offerId);
+  }
+  if (context.preferences.customer) {
+    expect(req.body).toContain('save=1');
+  }
+  expect(req.url).toContain('create/ajax');
 
   await context.respondJSON({
     type: typeValue,
@@ -67,23 +96,54 @@ async function handleUPIAccountValidation(context, vpa, accountexists = true) {
     accountexists &&
     context.preferences.features != null &&
     context.preferences.features.google_pay_omnichannel == true
-  )
+  ) {
     expect(req.url).toContain('create/ajax');
-  else expect(req.url).toContain('validate/account');
+  } else {
+    expect(req.url).toContain('validate/account');
+  }
+  await context.respondJSON({ vpa: vpa, success: true, customer_name: null });
+}
+
+async function handleSavedTokenValidation(context, vpa) {
+  const req = await context.expectRequest();
+  expect(req.url).toContain('create/ajax');
   await context.respondJSON({ vpa: vpa, success: true, customer_name: null });
 }
 
 async function selectUPIMethod(context, UPIMethod) {
-  await delay(500);
-  const upibutton = await context.page.$x(
-    '//div[contains(@class,"ref-text") and text() = "' + UPIMethod + '"]'
-  );
-  await upibutton[0].click();
+  let tokenSelector = null;
+  let elementToBeVisible = null;
+
+  switch (UPIMethod) {
+    case 'omnichannel':
+      tokenSelector = '#gpay-omnichannel';
+      elementToBeVisible = '#gpay-phone';
+      break;
+    case 'new':
+      tokenSelector = '#new-vpa-field';
+      elementToBeVisible = '#vpa';
+      break;
+    case 'token':
+      tokenSelector = '#form-upi .slotted-radio';
+      elementToBeVisible = '#footer';
+      break;
+    default:
+      break;
+  }
+
+  await context.page.click(tokenSelector);
+  return await context.page.waitForSelector(elementToBeVisible, {
+    visible: true,
+  });
 }
 
 async function enterUPIAccount(context, UPIAccountId) {
   const vpaField = await context.page.waitForSelector('#vpa');
   await vpaField.type(UPIAccountId);
+  if (!context.preferences.customer) {
+    return;
+  }
+  return await context.page.waitForSelector('#should-save-vpa');
 }
 
 async function selectBankNameFromGooglePayDropDown(context, valuetoBeSelected) {
@@ -91,11 +151,11 @@ async function selectBankNameFromGooglePayDropDown(context, valuetoBeSelected) {
 }
 
 async function verifyOmnichannelPhoneNumber(context) {
-  expect(await context.page.$('#phone')).not.toEqual(null);
+  expect(await context.page.$('#gpay-phone')).not.toEqual(null);
 }
 
 async function enterOmnichannelPhoneNumber(context) {
-  const phoneField = await context.page.waitForSelector('#phone');
+  const phoneField = await context.page.waitForSelector('#gpay-phone');
   await phoneField.type(randomContact());
 }
 
@@ -110,4 +170,6 @@ module.exports = {
   verifyOmnichannelPhoneNumber,
   enterOmnichannelPhoneNumber,
   respondToUPIAjaxWithFailure,
+  handleSaveVpaRequest,
+  handleSavedTokenValidation,
 };

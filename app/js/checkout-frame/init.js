@@ -15,7 +15,6 @@ var Confirm = discreet.Confirm;
 var Callout = discreet.Callout;
 var getDecimalAmount = discreet.getDecimalAmount;
 var _PaymentMethodIcons = discreet._PaymentMethodIcons;
-var ua_android_browser = discreet.UserAgent.androidBrowser;
 var Constants = discreet.Constants;
 var Bank = discreet.Bank;
 var Wallet = discreet.Wallet;
@@ -27,9 +26,22 @@ var Bridge = discreet.Bridge;
 var Curtain = discreet.Curtain;
 var P13n = discreet.P13n;
 var Store = discreet.Store;
+var _Str = discreet._Str;
+var _Arr = discreet._Arr;
+
+var ERROR_TRACKING_URLS = [
+  'https://checkout.razorpay.com',
+  'https://prod-checkout-canary.razorpay.com',
+];
+
+function isUrlApplicableForErrorTracking(url) {
+  return _Arr.any(ERROR_TRACKING_URLS, function(availableUrl) {
+    return _Str.startsWith(url, availableUrl);
+  });
+}
 
 window.onerror = function(errorMsg, url, lineNumber, column, errorObj) {
-  if (isString(url) && url.indexOf('https://checkout.razorpay.com')) {
+  if (isString(url) && !isUrlApplicableForErrorTracking(url)) {
     return;
   }
 
