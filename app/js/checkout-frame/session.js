@@ -1236,6 +1236,7 @@ Session.prototype = {
     this.setEmiScreen();
     this.runMaxmindScriptIfApplicable();
     this.prefillPostRender();
+    this.updateCustomerInStore();
     Hacks.initPostRenderHacks();
 
     errorHandler.call(this, this.params);
