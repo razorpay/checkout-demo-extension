@@ -117,7 +117,7 @@ const ALL_METHODS = {
   bank_transfer() {
     return (
       getAmount() &&
-      !isOfferForced() &&
+      getMerchantMethods().bank_transfer &&
       !isInternational() &&
       getOption('method.bank_transfer') &&
       getOption('order_id')
@@ -207,7 +207,10 @@ function isUPIBaseEnabled() {
   return (
     getOption('method.upi') !== false &&
     getMerchantMethods().upi &&
-    getAmount() < 1e7 &&
+    // if amount less than 1L, or order has method=upi
+    // order.method = upi with amount > 1L is passed
+    // by mutual fund who can accept more than the standard limit
+    (getAmount() < 1e7 || getMerchantOrder()?.method === 'upi') &&
     !isInternational() &&
     !isRecurring() &&
     getAmount()
