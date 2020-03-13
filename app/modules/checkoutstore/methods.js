@@ -334,7 +334,7 @@ export function getCardlessEMIProviders() {
     emiMethod = {};
   }
 
-  if (getEMIBanks().bajaj) {
+  if (getEMIBanks().BAJAJ) {
     emiMethod.bajaj = true;
   }
 
