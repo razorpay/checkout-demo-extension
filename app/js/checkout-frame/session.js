@@ -4364,6 +4364,7 @@ Session.prototype = {
     this.payload = null;
 
     Analytics.removeMeta('doneByInstrument');
+    Analytics.removeMeta('doneByP13n');
 
     var params = {};
     params[Constants.UPI_POLL_URL] = '';
@@ -4733,8 +4734,12 @@ Session.prototype = {
           this.getCustomer(getPhone())
         );
 
-        /* TODO: the following code is the hack for ftx (2018), fix it properly */
         Analytics.setMeta('doneByInstrument', true);
+
+        if (_Obj.getSafely(selectedInstrument, 'meta.preferred')) {
+          Analytics.setMeta('doneByP13n');
+        }
+
         if (['card', 'emi', 'wallet'].indexOf(selectedInstrument.method) > -1) {
           this.switchTab(selectedInstrument.method);
         } else if (
