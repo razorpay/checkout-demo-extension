@@ -233,11 +233,34 @@
     const loggedIn = _Obj.getSafely($customer, 'logged');
     _El.keepClass(_Doc.querySelector('#topbar #top-right'), 'logged', loggedIn);
 
+    const allPreferredInstruments = getAllAvailableP13nInstruments();
+
     const blocksThatWereSet = setBlocks({
-      preferred: getAllAvailableP13nInstruments(),
+      preferred: allPreferredInstruments,
     });
 
-    if (blocksThatWereSet.preferred.instruments.length) {
+    const setPreferredInstruments = blocksThatWereSet.preferred.instruments;
+
+    // Get the methods for which a preferred instrument was shown
+    const preferredMethods = _Arr.reduce(
+      setPreferredInstruments,
+      (acc, instrument) => {
+        acc[`_${instrument.method}`] = true;
+        return acc;
+      },
+      {}
+    );
+
+    // Track preferred-methods related things
+    Analytics.track('p13n:instruments:list', {
+      data: {
+        length: allPreferredInstruments.length,
+        shown: setPreferredInstruments.length,
+        methods: preferredMethods,
+      },
+    });
+
+    if (setPreferredInstruments.length) {
       Analytics.setMeta('p13n', true);
     } else {
       Analytics.removeMeta('p13n');
@@ -473,30 +496,6 @@
     payload.method = 'paypal';
 
     session.preSubmit(null, payload);
-  }
-
-  function trackP13nInstruments(instruments) {
-    if (instruments.length === 0) {
-      return;
-    }
-
-    const _instruments = instruments.slice(0, MAX_PREFERRED_INSTRUMENTS);
-    const _preferredMethods = _Arr.reduce(
-      _instruments,
-      (acc, instrument) => {
-        acc[`_${instrument.method}`] = true;
-        return acc;
-      },
-      {}
-    );
-
-    Analytics.track('p13n:instruments:list', {
-      data: {
-        length: instruments.length,
-        shown: Math.min(_instruments.length, MAX_PREFERRED_INSTRUMENTS),
-        methods: _preferredMethods,
-      },
-    });
   }
 
   function selectMethod(event) {
