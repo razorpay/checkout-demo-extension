@@ -15,7 +15,7 @@ export function getBlockConfig(options) {
 
   // Reorder blocks
   const sequentialied = getSequencedBlocks({
-    translated: translated,
+    translated,
     original: options,
     methods: AVAILABLE_METHODS, // TODO: Should be the actual eligible methods
   });
@@ -23,5 +23,8 @@ export function getBlockConfig(options) {
   // Group blocks of Razorpay
   const clustered = clusterRazorpayBlocks(sequentialied);
 
-  return clustered;
+  return {
+    blocks: clustered,
+    excluded: translated.exclude.instruments,
+  };
 }
