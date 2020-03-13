@@ -53,7 +53,10 @@
     isDebitCardEnabled,
     getSingleMethod,
   } from 'checkoutstore/methods';
-  import { getTranslatedInstrumentsForCustomer } from 'checkoutframe/personalization';
+  import {
+    getTranslatedInstrumentsForCustomer,
+    getAllInstrumentsForCustomer,
+  } from 'checkoutframe/personalization';
   import {
     hideCta,
     showCta,
@@ -233,10 +236,13 @@
     const loggedIn = _Obj.getSafely($customer, 'logged');
     _El.keepClass(_Doc.querySelector('#topbar #top-right'), 'logged', loggedIn);
 
-    const allPreferredInstruments = getAllAvailableP13nInstruments();
+    const isPersonalizationEnabled = shouldUsePersonalization();
+    const eligiblePreferredInstruments = isPersonalizationEnabled
+      ? getAllAvailableP13nInstruments()
+      : [];
 
     const blocksThatWereSet = setBlocks({
-      preferred: allPreferredInstruments,
+      preferred: eligiblePreferredInstruments,
     });
 
     const setPreferredInstruments = blocksThatWereSet.preferred.instruments;
@@ -251,23 +257,37 @@
       {}
     );
 
-    // Track preferred-methods related things
-    Analytics.track('p13n:instruments:list', {
-      data: {
-        length: allPreferredInstruments.length,
-        shown: setPreferredInstruments.length,
-        methods: preferredMethods,
-      },
-    });
+    /**
+     * - `meta.p13n` will only be set when preferred methods are shown in the UI.
+     * - `p13n:instruments:list` will be fired when we attempt to show the list.
+     * - `p13n:instruments:list` with `meta.p13n` set as true will tell you whether or not preferred methods were shown.
+     */
 
+    // meta.p13n should always be set before `p13n:instruments:list`
     if (setPreferredInstruments.length) {
       Analytics.setMeta('p13n', true);
     } else {
       Analytics.removeMeta('p13n');
     }
+
+    const allPreferredInstrumentsForCustomer = getAllInstrumentsForCustomer(
+      $customer
+    );
+
+    if (isPersonalizationEnabled && allPreferredInstrumentsForCustomer.length) {
+      // Track preferred-methods related things
+      Analytics.track('p13n:instruments:list', {
+        data: {
+          all: allPreferredInstrumentsForCustomer.length,
+          eligible: eligiblePreferredInstruments.length,
+          shown: setPreferredInstruments.length,
+          methods: preferredMethods,
+        },
+      });
+    }
   }
 
-  function shouldUseP13n() {
+  function shouldUsePersonalization() {
     // Merchant has asked to disable
     if (session.get().personalization === false) {
       return false;
@@ -310,8 +330,6 @@
 
     return true;
   }
-
-  let personalization;
 
   export function onShown() {
     if (view === 'methods') {
