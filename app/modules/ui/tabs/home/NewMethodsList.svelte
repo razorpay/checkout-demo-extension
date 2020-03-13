@@ -94,7 +94,7 @@
     Analytics.track('instrument:select', {
       type: AnalyticsTypes.BEHAV,
       data: {
-        data: instrument,
+        instrument,
         index,
       },
     });
