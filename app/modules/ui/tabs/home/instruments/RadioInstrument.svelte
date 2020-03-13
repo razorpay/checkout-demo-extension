@@ -68,7 +68,7 @@
         wallet = getWallet(instrument.wallet);
         title = `Wallet - ${wallet.name}`;
         icon = wallet.sqLogo;
-        alt = wallet;
+        alt = wallet.name;
 
         break;
       case 'upi':
