@@ -9,7 +9,6 @@ const tpv = require('./tpv');
 const wallet = require('./wallet');
 const upiIntent = require('./upi-intent');
 
-
 module.exports = {
   netbanking: netbanking,
   'upi-qr': upiQr,
