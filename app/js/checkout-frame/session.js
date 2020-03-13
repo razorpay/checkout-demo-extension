@@ -4683,7 +4683,7 @@ Session.prototype = {
           this.switchTab(selectedInstrument.method);
         } else if (
           selectedInstrument.method === 'upi' &&
-          selectedInstrument['_[upiqr]'] === '1'
+          selectedInstrument.flow === 'qr'
         ) {
           return this.switchTab('qr');
         }

@@ -17,8 +17,8 @@ function upi(instrument) {
     // Intent
     base.flow = 'intent';
 
-    if (instrument.app_name) {
-      base.app = instrument.app_name;
+    if (instrument.upi_app) {
+      base.app = instrument.upi_app;
     }
   } else if (instrument['_[flow]'] === 'directpay') {
     base.flow = 'collect';

@@ -34,7 +34,7 @@ test('Module: personalization', t => {
         success: false,
         timestamp: 1583417852181,
         '_[flow]': 'intent',
-        app_name: 'in.org.npci.upiapp',
+        upi_app: 'in.org.npci.upiapp',
         method: 'upi',
         score: 0.3449507176395772,
       };

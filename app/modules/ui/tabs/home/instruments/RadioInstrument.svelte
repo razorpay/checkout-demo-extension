@@ -72,18 +72,23 @@
 
         break;
       case 'upi':
-        if (instrument['_[upiqr]'] === '1') {
+        if (instrument.flow === 'qr') {
           title = `UPI QR`;
           icon = session.themeMeta.icons['qr'];
           alt = title;
 
           break;
-        } else if (instrument['_[flow]'] === 'intent') {
-          title = `UPI - ${instrument.app_name.replace(/ UPI$/, '')}`;
+        } else if (instrument.flow === 'intent') {
+          const app = _Arr.find(
+            session.upi_intents_data,
+            app => app.package_name === instrument.app
+          );
 
-          if (instrument.app_icon) {
-            icon = instrument.app_icon;
-            alt = instrument.app_name;
+          title = `UPI - ${app.app_name.replace(/ UPI$/, '')}`;
+
+          if (app.app_icon) {
+            icon = app.app_icon;
+            alt = app.app_name;
           } else {
             icon = '&#xe70e';
             alt = 'UPI App';
