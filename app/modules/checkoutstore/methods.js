@@ -147,6 +147,7 @@ export const getPrefilledMethod = () => {
   }
 
   const prefilledMethod = getOption('prefill.method');
+  const prefilledProvider = getOption('prefill.provider');
   if (
     prefilledMethod === 'emi' &&
     prefilledProvider === 'bajaj' &&
