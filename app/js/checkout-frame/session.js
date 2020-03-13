@@ -1299,8 +1299,6 @@ Session.prototype = {
 
   runMaxmindScriptIfApplicable: function() {
     this.runMaxmindScript();
-
-    Analytics.setMeta('maxmind', true);
   },
 
   runMaxmindScript: function() {
@@ -3962,10 +3960,6 @@ Session.prototype = {
           data[key] = value;
         });
       }
-    }
-
-    if (Analytics.getMeta('maxmind')) {
-      data['_[maxmind]'] = 1;
     }
 
     return data;
