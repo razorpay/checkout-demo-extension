@@ -4677,6 +4677,7 @@ Session.prototype = {
           data,
           this.getCustomer(getPhone())
         );
+        this.payload = data;
 
         Analytics.setMeta('doneByInstrument', true);
 
