@@ -3,20 +3,14 @@ const { getTestData } = require('../actions');
 const { openCheckoutWithNewHomeScreen } = require('../tests/homescreen/open');
 const {
   // Generic
-  verifyTimeout,
   handleFeeBearer,
   submit,
-  handleValidationRequest,
+  passRequestNetbanking,
   handleMockSuccessDialog,
   expectRedirectWithCallback,
 
-  // Card Payment
-  enterCardDetails,
-  handleCardValidation,
-  handleMockFailureDialog,
-  verifyErrorMessage,
-  retryTransaction,
-  selectPersonalizedCard,
+  //TPV
+  verifyAutoSelectBankTPV,
 
   // Offers
   verifyOfferApplied,
@@ -31,16 +25,9 @@ const {
 } = require('../actions/common');
 
 const {
-  // Generic
-  proceed,
-
   // Homescreen
   assertBasicDetailsScreen,
   fillUserDetails,
-  assertUserDetails,
-  assertPaymentMethods,
-  selectPaymentMethod,
-  assertEditUserDetailsAndBack,
 
   // Partial Payments
   handlePartialPayment,
@@ -48,14 +35,13 @@ const {
 
 module.exports = function(testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
-    'cards',
+    'tpv',
     testFeatures
   );
 
   const {
     partialPayment,
     feeBearer,
-    timeout,
     callbackUrl,
     offers,
     personalization,
@@ -68,7 +54,7 @@ module.exports = function(testFeatures) {
       options,
       preferences,
     })
-  )('Cards tests', ({ preferences, title, options }) => {
+  )('TPV tests', ({ preferences, title, options }) => {
     test(title, async () => {
       if (personalization) {
         if (preferences.customer) {
@@ -80,12 +66,19 @@ module.exports = function(testFeatures) {
         page,
         options,
         preferences,
-        method: 'Card',
       });
 
       const missingUserDetails = optionalContact && optionalEmail;
 
-      const isHomeScreenSkipped = missingUserDetails && !partialPayment; // and not TPV
+      const isHomeScreenSkipped = missingUserDetails && !partialPayment;
+
+      if (callbackUrl) {
+        await expectRedirectWithCallback(context, {
+          method: 'netbanking',
+          bank: 'SBIN',
+        });
+        return;
+      }
 
       if (!isHomeScreenSkipped) {
         await assertBasicDetailsScreen(context);
@@ -97,23 +90,10 @@ module.exports = function(testFeatures) {
 
       if (partialPayment) {
         await handlePartialPayment(context, '100');
-      } else if (!isHomeScreenSkipped) {
-        await proceed(context);
       }
 
       if (!missingUserDetails) {
-        await assertUserDetails(context);
-        await assertEditUserDetailsAndBack(context);
-      }
-
-      await assertPaymentMethods(context);
-
-      if (personalization) {
-        await selectPersonalizedCard(context);
-        await enterCardDetails(context);
-      } else {
-        await selectPaymentMethod(context, 'card');
-        await enterCardDetails(context);
+        await verifyAutoSelectBankTPV(context, 'State Bank of India');
       }
 
       if (offers) {
@@ -131,33 +111,12 @@ module.exports = function(testFeatures) {
 
       await submit(context);
 
-      if (callbackUrl && timeout) {
-        await verifyTimeout(context, 'card');
-
-        return;
-      }
-
       if (feeBearer) {
-        await handleFeeBearer(context, page);
+        await handleFeeBearer(context);
       }
 
-      if (callbackUrl) {
-        await expectRedirectWithCallback(context, { method: 'card' });
-      } else {
-        await handleCardValidation(context);
-        await handleMockFailureDialog(context);
-        await verifyErrorMessage(
-          context,
-          'The payment has already been processed'
-        );
-        await retryTransaction(context);
-        await submit(context);
-        if (feeBearer) {
-          await handleFeeBearer(context);
-        }
-        await handleCardValidation(context);
-        await handleMockSuccessDialog(context);
-      }
+      await passRequestNetbanking(context);
+      await handleMockSuccessDialog(context);
     });
   });
 };

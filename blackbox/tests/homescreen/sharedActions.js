@@ -2,10 +2,9 @@
  * Click on the CTA
  */
 async function proceed(context) {
-  const proceed = await context.page.waitForSelector('#footer', {
-    visible: true,
-  });
-  await proceed.click();
+  if (!(await context.page.$('#user-details'))) {
+    await context.page.click('#footer');
+  }
 }
 
 module.exports = {

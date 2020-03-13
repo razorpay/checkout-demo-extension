@@ -613,6 +613,8 @@
 <style>
   .screen-main {
     padding-top: 12px;
+    display: flex;
+    flex-direction: column;
   }
 
   .secured-message {
@@ -684,6 +686,7 @@
 
   .solidbg {
     background: white;
+    order: -1;
   }
 </style>
 
@@ -694,12 +697,15 @@
         <PaymentDetails {session} />
       {/if}
       {#if view === 'methods'}
-        <div class="solidbg" transition:slide={{ duration: 400 }}>
+        <div
+          class="solidbg"
+          in:slide={{ duration: 400 }}
+          out:fly={{ duration: 200, y: 80 }}>
           {#if showUserDetailsStrip || isPartialPayment}
             <div
               use:touchfix
               class="details-container border-list"
-              transition:slide={{ duration: 400 }}>
+              in:fly={{ duration: 400, y: 80 }}>
               {#if showUserDetailsStrip}
                 <SlottedOption on:click={hideMethods} id="user-details">
                   <i slot="icon">
@@ -752,8 +758,7 @@
 
           <div
             class="home-methods"
-            in:fly={{ delay: 100, duration: 400, y: 100 }}
-            out:fly={{ duration: 400, y: 100 }}>
+            in:fly={{ delay: 100, duration: 400, y: 80 }}>
             <NewMethodsList
               {personalization}
               {instruments}
