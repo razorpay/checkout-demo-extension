@@ -27,7 +27,7 @@ async function verifyPersonalizationText(context, paymentMode) {
       paymentMethodArray.push('upi qr');
     }
   }
-  var paymentMethod = await context.page.$(
+  var paymentMethod = await context.page.$$(
     '.home-methods .methods-block[data-block="rzp.preferred"] .instrument'
   );
   for (let i = 0; i < paymentMethod.length; i++) {
@@ -62,9 +62,10 @@ async function verifyPersonalizationText(context, paymentMode) {
 }
 
 async function selectPersonalizationPaymentMethod(context, optionNumber) {
-  var apiOption = await context.page.$x(
+  var apiOption = await context.page.$$(
     '.home-methods .methods-block[data-block="rzp.preferred"] .instrument'
   );
+
   await apiOption[optionNumber - 1].click();
 }
 
