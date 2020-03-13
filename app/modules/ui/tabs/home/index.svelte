@@ -238,7 +238,7 @@
 
     const isPersonalizationEnabled = shouldUsePersonalization();
     const eligiblePreferredInstruments = isPersonalizationEnabled
-      ? getAllAvailableP13nInstruments()
+      ? getAllAvailableP13nInstruments($customer)
       : [];
 
     const blocksThatWereSet = setBlocks({
