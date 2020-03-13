@@ -38,13 +38,13 @@
     "build": "$ rollup -c --environment prod && $ gulp && $ lintOutput app/js/generated/entry",
     "lint-fix": "$ lintFix app/modules",
     "clean": "$ ./scripts/clean.sh",
-    "jest:base": "jest blackbox/tests/homescreen/**/base.test.js --testTimeout=40000",
-    "jest:netbanking": "jest blackbox/tests/homescreen/netbanking --testTimeout=40000",
-    "jest": "jest blackbox/tests/homescreen/ --testTimeout=40000",
-    "test:all": "npm run test:unit && npm run build && npm run jest",
+    "jest:base": "jest blackbox/tests/homescreen/**/base.test.js",
+    "jest": "jest blackbox/tests/homescreen --testPathIgnorePatterns ersonalization",
+    "jest:p13n": "jest blackbox/tests/homescreen/**/*ersonalization*.test.js --runInBand",
+    "test:all": "npm run test:unit && npm run build && npm run jest && npm run jest:p13n",
     "test:base": "npm run test:unit && npm run build && npm run jest:base",
     "test:unit": "./rollup.test.js | tap-difflet",
-    "test": "if test \"$BRANCH\" = \"dev\" ; then npm run test:all ; else npm run test:base ; fi"
+    "test": "npm run test:all"
   },
   "bugs": {
     "url": "https://github.com/razorpay/checkout/issues"

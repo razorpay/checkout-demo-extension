@@ -117,7 +117,7 @@ const ALL_METHODS = {
   bank_transfer() {
     return (
       getAmount() &&
-      !isOfferForced() &&
+      getMerchantMethods().bank_transfer &&
       !isInternational() &&
       getOption('method.bank_transfer') &&
       getOption('order_id')
@@ -139,6 +139,24 @@ export function isMethodEnabled(method) {
     return checker();
   }
 }
+
+export const getPrefilledMethod = () => {
+  const ecod = getOption('ecod');
+  if (ecod) {
+    return 'wallet';
+  }
+
+  const prefilledMethod = getOption('prefill.method');
+  const prefilledProvider = getOption('prefill.provider');
+  if (
+    prefilledMethod === 'emi' &&
+    prefilledProvider === 'bajaj' &&
+    isMethodEnabled('cardless_emi') // Is the method enabled?
+  ) {
+    return 'cardless_emi';
+  }
+  return prefilledMethod;
+};
 
 export function isCardOrEMIEnabled() {
   return isMethodEnabled('card') || isMethodEnabled('emi');
@@ -207,7 +225,10 @@ function isUPIBaseEnabled() {
   return (
     getOption('method.upi') !== false &&
     getMerchantMethods().upi &&
-    getAmount() < 1e7 &&
+    // if amount less than 1L, or order has method=upi
+    // order.method = upi with amount > 1L is passed
+    // by mutual fund who can accept more than the standard limit
+    (getAmount() < 1e7 || getMerchantOrder()?.method === 'upi') &&
     !isInternational() &&
     !isRecurring() &&
     getAmount()
@@ -334,7 +355,7 @@ export function getCardlessEMIProviders() {
     emiMethod = {};
   }
 
-  if (getEMIBanks().bajaj) {
+  if (getEMIBanks().BAJAJ) {
     emiMethod.bajaj = true;
   }
 

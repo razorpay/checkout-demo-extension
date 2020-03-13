@@ -88,7 +88,7 @@ module.exports = function(testFeatures) {
       }
 
       if (partialPayment) {
-        await handlePartialPayment(context, '3000');
+        await handlePartialPayment(context, '5120');
       } else if (!isHomeScreenSkipped) {
         await proceed(context);
       }
@@ -103,12 +103,12 @@ module.exports = function(testFeatures) {
       await enterCardDetails(context);
       if (offers) {
         await viewOffers(context);
-        await selectOffer(context, '6');
+        await selectOffer(context, '9');
         await verifyOfferApplied(context);
       }
 
       if (partialPayment) {
-        await verifyPartialAmount(context, '₹ 3,000');
+        await verifyPartialAmount(context, '₹ 5,120');
       }
 
       if (callbackUrl && timeout) {
