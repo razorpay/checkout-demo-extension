@@ -7,9 +7,9 @@ const {
   fillUserDetails,
   proceed,
   assertUserDetails,
-  getMethodButtons,
+  getHomescreenMethods,
   getAttribute,
-  getEmiButtons,
+  getEmiButtonTexts,
   selectPaymentMethod,
 } = require('../actions');
 
@@ -25,10 +25,7 @@ async function getTextContent(page, element) {
  * Verify that methods are being shown
  */
 async function checkPaymentMethods(context, expected) {
-  const buttons = await getMethodButtons(context);
-  const methods = await Promise.all(
-    buttons.map(button => getAttribute(context.page, button, 'method'))
-  );
+  const methods = await getHomescreenMethods(context);
   expect(expected).toEqual(methods);
 }
 
@@ -36,11 +33,8 @@ async function checkPaymentMethods(context, expected) {
  * Verify that methods are being shown
  */
 async function checkEmiMethods(context, expected) {
-  const buttons = await getEmiButtons(context);
-  const methods = await Promise.all(
-    buttons.map(button => getTextContent(context.page, button, 'textContent'))
-  );
-  expect(expected).toEqual(methods);
+  const buttons = await getEmiButtonTexts(context);
+  expect(expected).toEqual(buttons);
 }
 
 describe.each(
@@ -182,9 +176,9 @@ describe.each(
       await proceed(context);
       await selectPaymentMethod(context, 'cardless_emi');
       await checkEmiMethods(context, [
-        '  EMI on Cards ',
-        '  ZestMoney ',
-        '  InstaCred Cardless EMI ',
+        'EMI on Cards',
+        'ZestMoney',
+        'InstaCred Cardless EMI',
       ]);
     });
   }

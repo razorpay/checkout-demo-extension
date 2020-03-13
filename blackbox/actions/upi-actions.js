@@ -8,7 +8,9 @@ async function respondToUPIAjax(context, { method } = {}, offerId = '') {
   var dataValue,
     typeValue = {};
   const req = await context.expectRequest();
-  if (offerId != '') expect(req.body).toContain(offerId);
+  if (offerId != '') {
+    expect(req.body).toContain(offerId);
+  }
   expect(req.url).toContain('create/ajax');
   if (method === 'qr') {
     typeValue = 'intent';
@@ -40,8 +42,12 @@ async function handleSaveVpaRequest(context, { method } = {}, offerId = '') {
   let dataValue = null;
 
   const req = await context.expectRequest();
-  if (offerId != '') expect(req.body).toContain(offerId);
-  if (context.preferences.customer) expect(req.body).toContain('save=1');
+  if (offerId != '') {
+    expect(req.body).toContain(offerId);
+  }
+  if (context.preferences.customer) {
+    expect(req.body).toContain('save=1');
+  }
   expect(req.url).toContain('create/ajax');
 
   await context.respondJSON({
@@ -90,9 +96,11 @@ async function handleUPIAccountValidation(context, vpa, accountexists = true) {
     accountexists &&
     context.preferences.features != null &&
     context.preferences.features.google_pay_omnichannel == true
-  )
+  ) {
     expect(req.url).toContain('create/ajax');
-  else expect(req.url).toContain('validate/account');
+  } else {
+    expect(req.url).toContain('validate/account');
+  }
   await context.respondJSON({ vpa: vpa, success: true, customer_name: null });
 }
 
@@ -108,23 +116,23 @@ async function selectUPIMethod(context, UPIMethod) {
 
   switch (UPIMethod) {
     case 'omnichannel':
-      tokenSelector = 'gpay-omnichannel';
-      elementToBeVisible = 'gpay-phone';
+      tokenSelector = '#gpay-omnichannel';
+      elementToBeVisible = '#gpay-phone';
       break;
     case 'new':
-      tokenSelector = 'new-vpa-field';
-      elementToBeVisible = 'vpa';
+      tokenSelector = '#new-vpa-field';
+      elementToBeVisible = '#vpa';
       break;
     case 'token':
-      tokenSelector = 'upi-svelte-wrap .slotted-radio';
-      elementToBeVisible = 'footer';
+      tokenSelector = '#form-upi .slotted-radio';
+      elementToBeVisible = '#footer';
       break;
     default:
       break;
   }
-  let selectedUPI = await context.page.waitForSelector('#' + tokenSelector);
-  await selectedUPI.click();
-  return await context.page.waitForSelector('#' + elementToBeVisible, {
+
+  await context.page.click(tokenSelector);
+  return await context.page.waitForSelector(elementToBeVisible, {
     visible: true,
   });
 }
@@ -132,7 +140,9 @@ async function selectUPIMethod(context, UPIMethod) {
 async function enterUPIAccount(context, UPIAccountId) {
   const vpaField = await context.page.waitForSelector('#vpa');
   await vpaField.type(UPIAccountId);
-  if (!context.preferences.customer) return;
+  if (!context.preferences.customer) {
+    return;
+  }
   return await context.page.waitForSelector('#should-save-vpa');
 }
 

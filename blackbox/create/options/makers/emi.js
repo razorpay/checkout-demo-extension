@@ -8,9 +8,9 @@ function makePreferences(features, preferences) {
 
   if (partialPayment) {
     preferences.order = {
-      amount: 500000,
-      amount_due: 500000,
-      amount_paid: 0,
+      amount: 600000,
+      amount_due: 570099,
+      amount_paid: 29901,
       currency: 'INR',
       first_payment_min_amount: null,
       partial_payment: true,
