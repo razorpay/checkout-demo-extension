@@ -1,7 +1,6 @@
 const { delay, visible } = require('../util');
 
 async function viewOffers(context) {
-  await delay(200);
   await context.page.click('.offers-title');
 }
 
@@ -11,10 +10,10 @@ async function selectOffer(context, offernumber) {
 }
 
 async function setPreferenceForOffer(preferences) {
-  preferences.methods.emi_options.ICIC[0].subvention = 'merchant';
-  preferences.methods.emi_options.ICIC[1].subvention = 'merchant';
-  preferences.methods.emi_options.ICIC[0].offer_id = 'offer_DWcdgbZjWPlmou';
-  preferences.methods.emi_options.ICIC[1].offer_id = 'offer_DWcdgbZjWPlmou';
+  preferences.methods.emi_options.AMEX[0].subvention = 'merchant';
+  preferences.methods.emi_options.AMEX[1].subvention = 'merchant';
+  preferences.methods.emi_options.AMEX[0].offer_id = 'offer_DWchUIIT6QYX76';
+  preferences.methods.emi_options.AMEX[1].offer_id = 'offer_DWchUIIT6QYX76';
   return preferences;
 }
 

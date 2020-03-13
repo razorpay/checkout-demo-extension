@@ -64,7 +64,7 @@ describe.each(
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'cardless_emi');
     await verifyPartialAmount(context, '₹ 3,000');
-    await selectCardlessEMIOption(context, 'ZestMoney');
+    await selectCardlessEMIOption(context, 'zestmoney');
     await handleCardlessEMIValidation(context);
     await typeOTPandSubmit(context);
     await handleOtpVerificationForCardlessEMI(context);

@@ -35,6 +35,7 @@ const getTestData = (
     keyless = true,
   } = {}
 ) => {
+  keyless = false;
   let tests = [];
   preferencesLoggedIn = makePreferencesLogged(preferences);
   preferences = makePreferences(preferences);
@@ -46,7 +47,9 @@ const getTestData = (
       options,
     };
     tests.push(loggedInData);
-    if (keyless) tests.push(getDataUpdatedForKeyless(loggedInData));
+    if (keyless) {
+      tests.push(getDataUpdatedForKeyless(loggedInData));
+    }
   }
   if (anon) {
     let anonymousUserData = {
@@ -55,7 +58,9 @@ const getTestData = (
       options,
     };
     tests.push(anonymousUserData);
-    if (keyless) tests.push(getDataUpdatedForKeyless(anonymousUserData));
+    if (keyless) {
+      tests.push(getDataUpdatedForKeyless(anonymousUserData));
+    }
   }
   return tests;
 };

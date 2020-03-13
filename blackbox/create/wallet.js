@@ -7,22 +7,22 @@ const {
   handleFeeBearer,
   submit,
   handleValidationRequest,
-  handleMockSuccessDialog,
   expectRedirectWithCallback,
 
-  // Card Payment
-  enterCardDetails,
-  handleCardValidation,
-  handleMockFailureDialog,
-  verifyErrorMessage,
-  retryTransaction,
-  selectPersonalizedCard,
+  // Wallet
+  assertWalletPage,
+  handleOtpVerification,
+  typeOTPandSubmit,
+  retryWalletTransaction,
+  selectWallet,
+  handleWalletPopUp,
 
   // Offers
   verifyOfferApplied,
   verifyDiscountPaybleAmount,
   verifyDiscountAmountInBanner,
   verifyDiscountText,
+  retryPayzappWalletTransaction,
   viewOffers,
   selectOffer,
 
@@ -44,11 +44,15 @@ const {
 
   // Partial Payments
   handlePartialPayment,
+
+  // Personalization
+  selectPersonalizationPaymentMethod,
+  verifyPersonalizationText,
 } = require('../tests/homescreen/actions');
 
 module.exports = function(testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
-    'cards',
+    'wallet',
     testFeatures
   );
 
@@ -68,7 +72,7 @@ module.exports = function(testFeatures) {
       options,
       preferences,
     })
-  )('Cards tests', ({ preferences, title, options }) => {
+  )('Wallet tests', ({ preferences, title, options }) => {
     test(title, async () => {
       if (personalization) {
         if (preferences.customer) {
@@ -80,9 +84,8 @@ module.exports = function(testFeatures) {
         page,
         options,
         preferences,
-        method: 'Card',
+        method: 'Wallet',
       });
-
       const missingUserDetails = optionalContact && optionalEmail;
 
       const isHomeScreenSkipped = missingUserDetails && !partialPayment; // and not TPV
@@ -109,11 +112,17 @@ module.exports = function(testFeatures) {
       await assertPaymentMethods(context);
 
       if (personalization) {
-        await selectPersonalizedCard(context);
-        await enterCardDetails(context);
+        await verifyPersonalizationText(context, 'wallet');
+        await selectPersonalizationPaymentMethod(context, '1');
       } else {
-        await selectPaymentMethod(context, 'card');
-        await enterCardDetails(context);
+        await selectPaymentMethod(context, 'wallet');
+        await assertWalletPage(context);
+
+        if (offers || (optionalContact && !callbackUrl)) {
+          await selectWallet(context, 'payzapp');
+        } else {
+          await selectWallet(context, 'freecharge');
+        }
       }
 
       if (offers) {
@@ -129,34 +138,70 @@ module.exports = function(testFeatures) {
         await verifyPartialAmount(context, '₹ 100');
       }
 
-      await submit(context);
-
       if (callbackUrl && timeout) {
-        await verifyTimeout(context, 'card');
+        await verifyTimeout(context, 'wallet');
 
         return;
       }
 
-      if (feeBearer) {
-        await handleFeeBearer(context, page);
+      await submit(context);
+      if (optionalContact && !callbackUrl) {
+        await handleWalletPopUp(context);
+        return;
+      }
+
+      if (feeBearer && !personalization) {
+        await handleFeeBearer(context);
+      }
+
+      if (timeout) {
+        await handleValidationRequest(context, 'fail');
+        await verifyTimeout(context, 'wallet');
+
+        return;
       }
 
       if (callbackUrl) {
-        await expectRedirectWithCallback(context, { method: 'card' });
+        if (offers) {
+          await expectRedirectWithCallback(context, {
+            method: 'wallet',
+            wallet: 'payzapp',
+          });
+        } else {
+          await expectRedirectWithCallback(context, {
+            method: 'wallet',
+            wallet: 'freecharge',
+          });
+        }
       } else {
-        await handleCardValidation(context);
-        await handleMockFailureDialog(context);
-        await verifyErrorMessage(
-          context,
-          'The payment has already been processed'
-        );
-        await retryTransaction(context);
-        await submit(context);
+        if (offers) {
+          await handleValidationRequest(context, 'fail');
+          await retryPayzappWalletTransaction(context);
+          await verifyOfferApplied(context);
+          await verifyDiscountPaybleAmount(context, '₹ 1,980');
+          await verifyDiscountAmountInBanner(context, '₹ 1,980');
+          await verifyDiscountText(context, 'You save ₹ 20');
+          await submit(context);
+          if (partialPayment) {
+            await verifyPartialAmount(context, '₹ 100');
+          }
+          await handleValidationRequest(context, 'pass');
+          return;
+        }
+
+        if (!personalization) {
+          await handleOtpVerification(context);
+          await typeOTPandSubmit(context);
+          await handleValidationRequest(context, 'fail');
+          await retryWalletTransaction(context);
+          await submit(context);
+        }
         if (feeBearer) {
           await handleFeeBearer(context);
         }
-        await handleCardValidation(context);
-        await handleMockSuccessDialog(context);
+        await handleOtpVerification(context);
+        await typeOTPandSubmit(context);
+        await handleValidationRequest(context, 'pass');
       }
     });
   });
