@@ -7,6 +7,8 @@ const cards = require('./cards');
 const emi = require('./emi');
 const tpv = require('./tpv');
 const wallet = require('./wallet');
+const upiIntent = require('./upi-intent');
+
 
 module.exports = {
   netbanking: netbanking,
@@ -18,4 +20,5 @@ module.exports = {
   emi: emi,
   tpv: tpv,
   wallet: wallet,
+  'upi-intent': upiIntent,
 };
