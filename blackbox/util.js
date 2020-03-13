@@ -111,9 +111,9 @@ const util = (module.exports = {
         if (!el) {
           throw `Element ${sel} is not present`;
         }
-        return Boolean(el.offsetWidth);
+        return el.offsetWidth;
       }, sel)
-    ).toEqual(true);
+    ).toBeGreaterThan(0);
   },
 
   chrlow,

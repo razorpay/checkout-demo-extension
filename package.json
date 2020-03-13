@@ -44,7 +44,7 @@
     "test:all": "npm run test:unit && npm run build && npm run jest && npm run jest:p13n",
     "test:base": "npm run test:unit && npm run build && npm run jest:base",
     "test:unit": "./rollup.test.js | tap-difflet",
-    "test": "if test \"$BRANCH\" = \"dev\" ; then npm run test:all ; else npm run test:base ; fi"
+    "test": "npm run test:all"
   },
   "bugs": {
     "url": "https://github.com/razorpay/checkout/issues"
