@@ -19,7 +19,7 @@
   } from 'checkoutstore/screens/home';
 
   // Transitions
-  import { slide } from 'svelte/transition';
+  import { fly } from 'svelte/transition';
 
   // Utils imports
   import {
@@ -85,7 +85,7 @@
   }
 </style>
 
-<div transition:slide={{ duration: 400 }}>
+<div in:fly={{ delay: 100, duration: 200, y: 40 }}>
   <div class="details-block">
     {#if !isContactHidden()}
       <div class="contact-field">

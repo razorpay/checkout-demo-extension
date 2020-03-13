@@ -292,45 +292,6 @@ function setEmiPlansCta(screen, tab) {
   }
 }
 
-/**
- * Get the saved card elemnnt that should be selected
- * when the saved cards screen is shown.
- * @param {string} tab
- * @param {string} token
- *
- * @returns {Element}
- */
-function getSelectableSavedCardElement(tab, token) {
-  var selectors = {
-    checked: '.saved-card.checked',
-    saved: '.saved-card',
-    token: '.saved-card',
-  };
-
-  // Add token to selectors
-  if (token) {
-    selectors.token += '[token="' + token + '"]';
-  }
-
-  var emiSelector = tab === 'emi' ? '[emi]' : '';
-
-  // Add EMI selector to selectors
-  selectors = _Obj.map(selectors, function(value) {
-    return value + emiSelector;
-  });
-
-  var validSelector = _Arr.find(
-    [selectors.checked, selectors.token, selectors.saved],
-    function(selector) {
-      return qs(selector);
-    }
-  );
-
-  var elem = qs(validSelector);
-
-  return elem;
-}
-
 function setEmiBank(data) {
   var activeEmiPlan = getEmiDurationForNewCard();
   if (activeEmiPlan) {
@@ -991,7 +952,6 @@ Session.prototype = {
         commenceECOD(this);
       }
       if (ecod) {
-        r.set('prefill.method', 'wallet');
         r.set('theme.hide_topbar', true);
       }
       $(this.el).addClass(classes);
@@ -1005,7 +965,7 @@ Session.prototype = {
     if (oldMethod) {
       this.wants_skip = true;
     }
-    var tab = oldMethod || this.get('prefill.method');
+    var tab = oldMethod || MethodStore.getPrefilledMethod();
 
     if (tab) {
       var optional = {
@@ -1336,8 +1296,6 @@ Session.prototype = {
 
   runMaxmindScriptIfApplicable: function() {
     this.runMaxmindScript();
-
-    Analytics.setMeta('maxmind', true);
   },
 
   runMaxmindScript: function() {
@@ -2066,22 +2024,6 @@ Session.prototype = {
    * Improvise the prefill options.
    */
   improvisePrefill: function() {
-    var prefilledMethod = this.get('prefill.method');
-    var prefilledProvider = this.get('prefill.provider');
-
-    /**
-     * Bajaj Finserv is _technically_ EMI,
-     * but we're grouping it under Cardless EMI screen
-     * on Checkout.
-     */
-    if (
-      prefilledMethod === 'emi' &&
-      prefilledProvider === 'bajaj' &&
-      MethodStore.isMethodEnabled('cardless_emi') // Is the method enabled?
-    ) {
-      this.set('prefill.method', 'cardless_emi');
-    }
-
     improvisePrefilledContact(this);
   },
 
@@ -2091,7 +2033,7 @@ Session.prototype = {
    * goes into this function.
    */
   prefillPostRender: function() {
-    var prefilledMethod = this.get('prefill.method');
+    var prefilledMethod = MethodStore.getPrefilledMethod();
     var prefilledProvider = this.get('prefill.provider');
 
     if (prefilledMethod === 'cardless_emi' && prefilledProvider) {
@@ -4008,10 +3950,6 @@ Session.prototype = {
           data[key] = value;
         });
       }
-    }
-
-    if (Analytics.getMeta('maxmind')) {
-      data['_[maxmind]'] = 1;
     }
 
     return data;
