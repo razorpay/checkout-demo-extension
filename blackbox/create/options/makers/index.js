@@ -8,6 +8,8 @@ const emi = require('./emi');
 const tpv = require('./tpv');
 const wallet = require('./wallet');
 const zestMoney = require('./zest-money');
+const omniChannel = require('./omni-channel');
+const payLater = require('./pay-later');
 
 module.exports = {
   netbanking: netbanking,
@@ -20,4 +22,6 @@ module.exports = {
   tpv: tpv,
   wallet: wallet,
   'zest-money': zestMoney,
+  'omni-channel': omniChannel,
+  'pay-later': payLater,
 };
