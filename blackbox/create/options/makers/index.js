@@ -11,6 +11,7 @@ const zestMoney = require('./zest-money');
 const upiIntent = require('./upi-intent');
 const omniChannel = require('./omni-channel');
 const payLater = require('./pay-later');
+const savedVPA = require('./saved-vpa');
 
 module.exports = {
   netbanking: netbanking,
@@ -26,4 +27,5 @@ module.exports = {
   'upi-intent': upiIntent,
   'omni-channel': omniChannel,
   'pay-later': payLater,
+  'saved-vpa': savedVPA,
 };
