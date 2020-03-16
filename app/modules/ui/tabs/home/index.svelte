@@ -254,7 +254,7 @@
     const blocksThatWereSet = setBlocks(
       {
         preferred: eligiblePreferredInstruments,
-        // merchantConfig: getRawMerchantConfig(), // TODO: implement this function
+        merchantConfig: getRawMerchantConfig(),
       },
       $customer
     );
