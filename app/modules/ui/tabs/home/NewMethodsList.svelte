@@ -5,6 +5,7 @@
   // UI imports
   import Method from 'ui/tabs/home/Method.svelte';
   import Instrument from 'ui/tabs/home/instruments/Instrument.svelte';
+  import RazorpayCluster from 'ui/tabs/home/RazorpayCluster.svelte';
 
   // Utils imports
   import { AVAILABLE_METHODS } from 'common/constants';
@@ -118,22 +119,19 @@
 </style>
 
 {#each $blocks as block}
-  <div class="methods-block" data-block={block.code}>
-    <h3 class="title">{block.title}</h3>
-    <div role="list" class="border-list">
-      {#each block.instruments as instrument, index (instrument.id)}
-        <Instrument
-          {instrument}
-          on:click={() => trackInstrumentSelection(instrument, index)}
-          on:submit />
-      {/each}
+  {#if block.code === 'rzp.cluster'}
+    <RazorpayCluster {block} on:selectMethod />
+  {:else}
+    <div class="methods-block" data-block={block.code}>
+      <h3 class="title">{block.title}</h3>
+      <div role="list" class="border-list">
+        {#each block.instruments as instrument, index (instrument.id)}
+          <Instrument
+            {instrument}
+            on:click={() => trackInstrumentSelection(instrument, index)}
+            on:submit />
+        {/each}
+      </div>
     </div>
-  </div>
+  {/if}
 {/each}
-
-<h3 class="title">All Payment Methods</h3>
-<div role="list" class="methods-container border-list">
-  {#each visibleMethods as method}
-    <Method {method} on:select={selectMethod} />
-  {/each}
-</div>
