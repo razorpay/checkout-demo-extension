@@ -13,8 +13,6 @@ import { confirmCancelMsg } from 'common/strings';
 import * as AnalyticsTypes from 'analytics-types';
 import { processPaymentCreate } from 'payment/coproto';
 
-import { getPrefilledMethod } from 'checkoutstore/methods';
-
 /* Our primary bridge is CheckoutBridge */
 export const defineIosBridge = () => {
   let CB = {
@@ -374,7 +372,7 @@ function backPressed(callback) {
     TermsCurtain.hide();
   } else if (
     session.tab &&
-    !(getPrefilledMethod() && session.get('theme.hide_topbar'))
+    !(session.get('prefill.method') && session.get('theme.hide_topbar'))
   ) {
     /**
      * When an overlay is visible, there's some message
