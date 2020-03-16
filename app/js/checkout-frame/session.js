@@ -3005,7 +3005,7 @@ Session.prototype = {
       var bank = this.emiPlansForNewCard && this.emiPlansForNewCard.code;
 
       if (emiDuration) {
-        var plan = MethodStore.getEMIBankPlans(bank).find(function(p) {
+        var plan = _Arr.find(MethodStore.getEMIBankPlans(bank), function(p) {
           return p.duration === emiDuration;
         });
         if (
@@ -3588,7 +3588,7 @@ Session.prototype = {
             },
 
             select: function(value) {
-              var plan = plans.find(function(p) {
+              var plan = _Arr.find(plans, function(p) {
                 return p.duration === value;
               });
               var text = getEmiText(self, amount, plan) || '';
@@ -3676,7 +3676,9 @@ Session.prototype = {
             },
 
             select: function(value) {
-              var plan = plans[value];
+              var plan = _Arr.find(plans, function(p) {
+                return p.duration === value;
+              });
               var text = getEmiText(self, amount, plan) || '';
 
               trackEmi('emi:plan:select', {
