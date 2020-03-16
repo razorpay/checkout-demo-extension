@@ -56,6 +56,7 @@ import * as OTPScreenStore from 'checkoutstore/screens/otp';
 import * as Cta from 'checkoutstore/cta';
 import * as HomeScreenStore from 'checkoutstore/screens/home';
 import * as CardScreenStore from 'checkoutstore/screens/card';
+import * as CustomerStore from 'checkoutstore/customer';
 
 import QRScreen from 'ui/tabs/qr/index.svelte';
 import BankTransferScreen from 'ui/tabs/bank-transfer/index.svelte';
@@ -78,6 +79,8 @@ import * as Experiments from 'experiments';
 
 import * as NBHandlers from 'handlers/netbanking';
 import * as UserHandlers from 'handlers/user';
+
+import * as Instruments from 'configurability/instruments';
 
 export default {
   RazorpayConfig,
@@ -119,6 +122,7 @@ export default {
   Checkout,
   Bridge,
   P13n,
+  Instruments,
   UserAgent,
   Offers,
   Flows,
@@ -128,6 +132,7 @@ export default {
   Store,
   MethodStore,
   SessionStore,
+  CustomerStore,
   OTPScreenStore,
   HomeScreenStore,
   CardScreenStore,

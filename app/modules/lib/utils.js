@@ -106,3 +106,11 @@ export function generateTextFromList(list, max) {
     return oxfordComma(list);
   }
 }
+
+export function toLowerCaseSafe(str) {
+  if (!str) {
+    return;
+  }
+
+  return str.toLowerCase();
+}

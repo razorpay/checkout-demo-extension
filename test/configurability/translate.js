@@ -1,7 +1,7 @@
-import * as Options from 'configurability/options';
+import * as Translate from 'configurability/translate';
 
-test('Module: configurability/options', t => {
-  test('Options.translateExternal', t => {
+test('Module: configurability/translate', t => {
+  test('Translate.translateExternal', t => {
     test('Translates external options properly', t => {
       let options, expected, found;
 
@@ -130,7 +130,7 @@ test('Module: configurability/options', t => {
         },
       };
 
-      found = Options.translateExternal(options);
+      found = Translate.translateExternal(options);
 
       t.deepEqual(found, expected, 'Translates external options properly');
 

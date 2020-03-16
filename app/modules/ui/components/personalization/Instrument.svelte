@@ -66,7 +66,7 @@
         wallet = getWallet(instrument.wallet);
         text = `Wallet - ${wallet.name}`;
         icon = wallet.sqLogo;
-        alt = wallet;
+        alt = wallet.name;
         break;
       case 'upi':
         if (instrument['_[upiqr]'] === '1') {
