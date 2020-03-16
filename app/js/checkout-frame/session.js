@@ -2058,7 +2058,11 @@ Session.prototype = {
     var prefilledMethod = this.get('prefill.method');
     var prefilledProvider = this.get('prefill.provider');
 
-    if (prefilledMethod === 'cardless_emi' && prefilledProvider) {
+    if (
+      prefilledMethod === 'cardless_emi' &&
+      prefilledProvider &&
+      this.checkCommonValidAndTrackIfInvalid()
+    ) {
       this.selectCardlessEmiProvider(prefilledProvider);
     }
   },
@@ -3762,7 +3766,10 @@ Session.prototype = {
             },
 
             select: function(value) {
-              var plan = plans[value];
+              var plan = _Arr.find(plans, function(plan) {
+                return plan.duration === value;
+              });
+
               var text = getEmiText(self, amount, plan) || '';
 
               self.emiScreenView.setPlan({
