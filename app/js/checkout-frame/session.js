@@ -952,6 +952,7 @@ Session.prototype = {
         commenceECOD(this);
       }
       if (ecod) {
+        r.set('prefill.method', 'wallet');
         r.set('theme.hide_topbar', true);
       }
       $(this.el).addClass(classes);
@@ -965,7 +966,7 @@ Session.prototype = {
     if (oldMethod) {
       this.wants_skip = true;
     }
-    var tab = oldMethod || MethodStore.getPrefilledMethod();
+    var tab = oldMethod || this.get('prefill.method');
 
     if (tab) {
       var optional = {
@@ -2024,6 +2025,22 @@ Session.prototype = {
    * Improvise the prefill options.
    */
   improvisePrefill: function() {
+    var prefilledMethod = this.get('prefill.method');
+    var prefilledProvider = this.get('prefill.provider');
+
+    /**
+     * Bajaj Finserv is _technically_ EMI,
+     * but we're grouping it under Cardless EMI screen
+     * on Checkout.
+     */
+    if (
+      prefilledMethod === 'emi' &&
+      prefilledProvider === 'bajaj' &&
+      MethodStore.isMethodEnabled('cardless_emi') // Is the method enabled?
+    ) {
+      this.set('prefill.method', 'cardless_emi');
+    }
+
     improvisePrefilledContact(this);
   },
 
@@ -2033,7 +2050,7 @@ Session.prototype = {
    * goes into this function.
    */
   prefillPostRender: function() {
-    var prefilledMethod = MethodStore.getPrefilledMethod();
+    var prefilledMethod = this.get('prefill.method');
     var prefilledProvider = this.get('prefill.provider');
 
     if (prefilledMethod === 'cardless_emi' && prefilledProvider) {
@@ -2988,7 +3005,7 @@ Session.prototype = {
       var bank = this.emiPlansForNewCard && this.emiPlansForNewCard.code;
 
       if (emiDuration) {
-        var plan = MethodStore.getEMIBankPlans(bank).find(function(p) {
+        var plan = _Arr.find(MethodStore.getEMIBankPlans(bank), function(p) {
           return p.duration === emiDuration;
         });
         if (
@@ -3571,7 +3588,7 @@ Session.prototype = {
             },
 
             select: function(value) {
-              var plan = plans.find(function(p) {
+              var plan = _Arr.find(plans, function(p) {
                 return p.duration === value;
               });
               var text = getEmiText(self, amount, plan) || '';
@@ -3659,7 +3676,9 @@ Session.prototype = {
             },
 
             select: function(value) {
-              var plan = plans[value];
+              var plan = _Arr.find(plans, function(p) {
+                return p.duration === value;
+              });
               var text = getEmiText(self, amount, plan) || '';
 
               trackEmi('emi:plan:select', {
