@@ -25,6 +25,13 @@ function instrumentPresentInGroup(instrument, group) {
 
     case 'wallet':
       return _Arr.contains(group.wallets, instrument.wallet);
+
+    case 'card':
+      return (
+        _Arr.contains(group.issuers, instrument.issuer) ||
+        _Arr.contains(group.networks, instrument.network) ||
+        _Arr.contains(group.card_types, instrument.card_type)
+      );
   }
 
   return true;
@@ -40,9 +47,10 @@ export function setBlocks({ preferred = [], merchantConfig = {} }, customer) {
   const filteredPreferredInstruments = _Arr.filter(
     preferredInstruments,
     instrument =>
-      _Arr.every(excluded, excludedGroup => {
-        return !instrumentPresentInGroup(instrument, excludedGroup);
-      })
+      _Arr.every(
+        excluded,
+        excludedGroup => !instrumentPresentInGroup(instrument, excludedGroup)
+      )
   );
 
   // Take top 3 preferred
