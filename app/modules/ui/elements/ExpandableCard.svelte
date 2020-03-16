@@ -1,6 +1,6 @@
 <script>
-  import Stack from 'templates/layouts/Stack.svelte';
-  import Radio from 'templates/views/ui/Radio.svelte';
+  import Stack from 'ui/layouts/Stack.svelte';
+  import Radio from 'ui/elements/Radio.svelte';
 
   // Props
   export let expanded;
