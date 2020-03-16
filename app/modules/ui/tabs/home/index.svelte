@@ -113,6 +113,10 @@
     !isPartialPayment &&
     !session.get('address');
 
+  function getRawMerchantConfig() {
+    return session.get('config.display');
+  }
+
   export function showMethods() {
     view = 'methods';
 
