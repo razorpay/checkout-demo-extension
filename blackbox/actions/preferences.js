@@ -84,6 +84,7 @@ module.exports = {
   makePreferences,
 
   makePreferencesLogged(overrides) {
+    const token = randomId();
     return {
       ...makePreferences(overrides),
       customer: {
@@ -94,7 +95,8 @@ module.exports = {
           entity: 'collection',
           items: [
             {
-              token: 'token_' + randomId(),
+              id: 'token_' + token,
+              token,
               card: {
                 name: randomName(),
                 last4: randomString(chrnum)(4),
@@ -103,6 +105,7 @@ module.exports = {
                 issuer: randomItem(Object.keys(netbanking)),
                 international: randomBool(),
               },
+              method: 'card',
             },
             {
               auth_type: null,

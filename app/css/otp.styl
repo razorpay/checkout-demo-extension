@@ -31,25 +31,20 @@
   margin: 0 auto;
   width: 151px;
   position: relative;
-  background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAuCAMAAAAFiil6AAAABlBMVEUAAADg4ODy8Xj7AAAAAXRSTlMAQObYZgAAABZJREFUeAFjoBoYBaNgFIwCRhSAXwIABzoAHRAAbMUAAAAASUVORK5CYII=');
-  background-size: contain;
-  &::after {
-    position: absolute;
-    top: 0;
-    right: 0;
-    height: 100%;
-    background: #fff;
-    width: 14px;
-    content: '';
+  border-bottom: 1px solid #ccc;
+  
+  input#otp {
+    text-align: center;
+    box-sizing: border-box;
   }
-  &.wide {
-    background: none;
-    border-bottom: 1px solid #ccc;
+
+  .help {
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+
     &::after {
-      content: none;
-    }
-    input#otp {
-      text-align: center;
+      left: calc(50% + 8px);
     }
   }
 }

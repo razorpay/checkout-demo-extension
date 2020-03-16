@@ -86,7 +86,9 @@ module.exports = {
     method,
   }) {
     let checkoutUrl = checkoutPublic;
-    if (params) checkoutUrl += '?' + querystring.stringify(params);
+    if (params) {
+      checkoutUrl += '?' + querystring.stringify(params);
+    }
     if (interceptorOptions) {
       interceptorOptions.disableInterceptor();
       page.removeListener('request', cdnRequestHandler);
@@ -222,11 +224,16 @@ module.exports = {
 
     if (options) {
       const message = { options };
-      if (apps) message.upi_intents_data = apps;
+      if (apps) {
+        message.upi_intents_data = apps;
+      }
       await passMessage(page, message);
     }
-    if (preferences) await sendPreferences(returnObj);
-
+    if (preferences) {
+      await sendPreferences(returnObj);
+    }
+    // page takes some time to render
+    await delay(200);
     return returnObj;
   },
   cdnUrl,

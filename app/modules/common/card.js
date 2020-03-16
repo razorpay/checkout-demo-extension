@@ -41,7 +41,7 @@ export const findCodeByNetworkName = name => {
   let code;
 
   _Obj.loop(networks, (val, key) => {
-    if (name === val) {
+    if (name === val || name === key) {
       code = key;
     }
   });

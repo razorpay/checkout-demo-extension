@@ -7,7 +7,7 @@
   // Utils imports
   import { findCodeByNetworkName } from 'common/card';
   import { getSession } from 'sessionmanager';
-  import PreferencesStore from 'checkoutstore/preferences';
+  import { getBanks } from 'checkoutstore';
   import { getIcon as getNetworkIcon } from 'icons/network';
 
   // Props
@@ -19,7 +19,7 @@
   const session = getSession();
 
   function getBankText(card, loggedIn) {
-    const banks = PreferencesStore.get().methods.netbanking;
+    const banks = getBanks();
     const bank = banks[card.issuer] || '';
     const bankText = bank.replace(/ Bank$/, '');
 
@@ -103,7 +103,7 @@
   ellipsis
   value={instrument.id}
   radio={false}
-  className="p13n-instrument"
+  className="instrument"
   on:click>
   <i slot="icon">
     <Icon {icon} alt="Card" />

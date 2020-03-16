@@ -1,6 +1,4 @@
 <script>
-  /* global each, Event */
-
   // Svelte imports
   import { onMount, tick } from 'svelte';
 
@@ -12,6 +10,7 @@
   import EmiActions from 'ui/components/EmiActions.svelte';
   import SavedCards from 'ui/tabs/card/savedcards.svelte';
   import OffersPortal from 'ui/components/OffersPortal.svelte';
+  import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
 
   // Store
   import {
@@ -22,8 +21,15 @@
     remember,
   } from 'checkoutstore/screens/card';
 
-  import { contact } from 'checkoutstore/screens/home';
+  import { customer } from 'checkoutstore/customer';
 
+  import { contact } from 'checkoutstore/screens/home';
+  import { isRecurring, shouldRememberCustomer } from 'checkoutstore';
+  import {
+    isMethodEnabled,
+    getEMIBanks,
+    getEMIBankPlans,
+  } from 'checkoutstore/methods';
   import { newCardEmiDuration } from 'checkoutstore/emi';
 
   // Utils imports
@@ -43,7 +49,7 @@
   };
 
   const session = getSession();
-  const isSavedCardsEnabled = session.get('remember_customer');
+  const isSavedCardsEnabled = shouldRememberCustomer();
 
   let currentView = Views.SAVED_CARDS;
 
@@ -58,9 +64,6 @@
 
   let showSavedCardsCta = false;
   $: showSavedCardsCta = savedCards && savedCards.length && isSavedCardsEnabled;
-
-  // State
-  let customer = {};
 
   // Refs
   let savedCardsView;
@@ -91,7 +94,7 @@
   }
 
   function getSavedCardsForDisplay(allSavedCards, tab) {
-    if (session.recurring) {
+    if (isRecurring()) {
       return filterSavedCardsForRecurring(allSavedCards);
     }
 
@@ -103,7 +106,7 @@
   }
 
   $: {
-    allSavedCards = getSavedCardsFromCustomer(customer);
+    allSavedCards = getSavedCardsFromCustomer($customer);
   }
 
   $: {
@@ -115,14 +118,6 @@
 
   $: {
     lastSavedCard = savedCards && savedCards[savedCards.length - 1];
-  }
-
-  $: {
-    // TODO: find a better way
-    // Remove selected offer every time the view changes.
-    if (currentView) {
-      session.removeOfferSelectedFromDrawer();
-    }
   }
 
   function getSavedCardsFromCustomer(customer = {}) {
@@ -151,9 +146,8 @@
   function transformTokens(tokens) {
     return transform(tokens, {
       amount: session.get('amount'),
-      emi: session.methods.emi,
-      emiOptions: session.emi_options,
-      recurring: session.recurring,
+      emi: isMethodEnabled('emi'),
+      recurring: isRecurring(),
     });
   }
 
@@ -163,17 +157,14 @@
       return savedCards;
     }
 
-    const emiBanks = session.emi_options.banks;
     return _Arr.filter(savedCards, function(index, token) {
       var card = token.card;
       if (card && offer.payment_method === 'emi' && offer.emi_subvention) {
         /* Merchant subvention EMI */
         const bank = card.issuer;
-        const emiBank = emiBanks[bank];
-
-        if (bank && emiBank) {
-          const plans = emiBank.plans;
-          if (typeof plans !== 'object') {
+        if (bank) {
+          const plans = getEMIBankPlans(bank);
+          if (!plans) {
             return false;
           }
 
@@ -194,23 +185,27 @@
   }
 
   export function showLandingView() {
-    tick().then(_ => {
-      let viewToSet = Views.ADD_CARD;
+    return tick()
+      .then(_ => {
+        let viewToSet = Views.ADD_CARD;
 
-      if (savedCards && savedCards.length > 0 && isSavedCardsEnabled) {
-        viewToSet = Views.SAVED_CARDS;
-      }
-      setView(viewToSet);
-    });
+        if (savedCards && savedCards.length > 0 && isSavedCardsEnabled) {
+          viewToSet = Views.SAVED_CARDS;
+        }
+        setView(viewToSet);
+      })
+      .then(tick);
   }
 
   export function showAddCardView() {
     Analytics.track('saved_cards:hide');
+    session.removeAutomaticallyAppliedOffer();
     setView(Views.ADD_CARD);
   }
 
-  export function showSavedCards() {
+  export function showSavedCardsView() {
     Analytics.track('saved_cards:show');
+    session.removeAutomaticallyAppliedOffer();
     setView(Views.SAVED_CARDS);
   }
 
@@ -227,7 +222,11 @@
   }
 
   export function getTransformedTokens() {
-    return allSavedCards;
+    if (allSavedCards && allSavedCards.length) {
+      return allSavedCards;
+    }
+    // TODO: Fix session.customer usage when customer is moved to store.
+    return getSavedCardsFromCustomer(session.customer);
   }
 
   export function isOnSavedCardsScreen() {
@@ -254,7 +253,6 @@
   }
 
   function onCardInput() {
-    const emi_options = session.emi_options;
     const cardNumber = $cardNumber;
     const cardType = getCardType(cardNumber);
     const isMaestro = /^maestro/.test(cardType);
@@ -264,7 +262,7 @@
     var emiObj;
 
     if (sixDigits && !isMaestro) {
-      const emiBanks = _Obj.entries(emi_options.banks);
+      const emiBanks = _Obj.entries(getEMIBanks());
       emiObj = _Arr.find(emiBanks, ([bank, emiObjInner]) =>
         emiObjInner.patt.test(cardNumber.replace(/ /g, ''))
       );
@@ -276,12 +274,7 @@
       $newCardEmiDuration = '';
     }
 
-    showAppropriateEmiDetailsForNewCard(
-      session.tab,
-      emiObj,
-      trimmedVal.length,
-      session.methods
-    );
+    showAppropriateEmiDetailsForNewCard(session.tab, emiObj, trimmedVal.length);
 
     if (isMaestro && sixDigits) {
       showEmiCta = false;
@@ -291,12 +284,7 @@
   /**
    * Show appropriate EMI-details strip on the new card screen.
    */
-  function showAppropriateEmiDetailsForNewCard(
-    tab,
-    hasPlans,
-    cardLength,
-    methods
-  ) {
+  function showAppropriateEmiDetailsForNewCard(tab, hasPlans, cardLength) {
     /**
      * tab=card
      * - plan selected: emi available
@@ -326,7 +314,7 @@
         emiCtaView = 'plans-available';
       } else if (cardLength >= 6 && !hasPlans) {
         emiCtaView = 'plans-unavailable';
-      } else if (methods.card) {
+      } else if (isMethodEnabled('card')) {
         emiCtaView = 'pay-without-emi';
       } else {
         showEmiCta = false;
@@ -349,7 +337,7 @@
       session.showEmiPlans('new')(e);
       eventName += 'edit';
     } else if (emiCtaView === 'pay-without-emi') {
-      if (session.methods.card) {
+      if (isMethodEnabled('card')) {
         session.setScreen('card');
         session.switchTab('card');
         session.offers && session.renderOffers(session.tab);
@@ -358,7 +346,7 @@
         eventName = 'emi:pay_without';
       }
     } else if (emiCtaView === 'plans-unavailable') {
-      if (session.methods.card) {
+      if (isMethodEnabled('card')) {
         session.setScreen('card');
         session.switchTab('card');
         session.offers && session.renderOffers(session.tab);
@@ -371,19 +359,6 @@
       type: AnalyticsTypes.BEHAV,
       data: eventData,
     });
-  }
-
-  /**
-   * Updates the customer, shows the landing view and returns a promise that resolves when the landing view is visible
-   * @param newCustomer
-   * @return {Promise<void>}
-   */
-  export function updateCustomerAndShowLandingView(newCustomer = {}) {
-    customer = newCustomer;
-    // Wait for pending state updates from reactive statements
-    return tick()
-      .then(showLandingView)
-      .then(tick);
   }
 
   export function setSelectedOffer(newOffer) {
@@ -425,7 +400,7 @@
           {#if showSavedCardsCta}
             <div
               id="show-saved-cards"
-              on:click={showSavedCards}
+              on:click={showSavedCardsView}
               class="text-btn left-card">
               <div
                 class="cardtype"
@@ -458,15 +433,14 @@
           <div
             id="show-add-card"
             class="text-btn left-card"
-            on:click={() => setView(Views.ADD_CARD)}>
+            on:click={showAddCardView}>
             Add another card
           </div>
         </div>
       {/if}
     </div>
     <div slot="bottom">
-      <OffersPortal />
-      {#if session.recurring}
+      {#if isRecurring()}
         <Callout>
           {#if !session.subscription}
             Future payments on this card will be charged automatically.
@@ -479,6 +453,12 @@
           {/if}
         </Callout>
       {/if}
+
+      <DowntimeCallout>
+        Yes Bank Cards are temporarily disabled. Please pay via another method.
+      </DowntimeCallout>
+
+      <OffersPortal />
     </div>
   </Screen>
 </Tab>

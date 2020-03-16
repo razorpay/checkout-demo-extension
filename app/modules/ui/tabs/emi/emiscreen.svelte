@@ -4,6 +4,11 @@
 
   // Utils imports
   import { getSession } from 'sessionmanager';
+  import {
+    isNameReadOnly,
+    getPrefilledName,
+    getPrefilledCardNumber,
+  } from 'checkoutstore';
 
   // Props
   export let emiDuration = '';
@@ -12,11 +17,11 @@
   const session = getSession();
   const dispatch = createEventDispatcher();
   const prefill = {
-    'card[number]': session.get('prefill.card[number]'),
-    name: session.get('prefill.name'),
+    'card[number]': getPrefilledCardNumber(),
+    name: getPrefilledName(),
   };
   const readonly = {
-    name: session.get('readonly.name') && session.get('prefill.name'),
+    name: isNameReadOnly(),
   };
 
   onMount(() => {

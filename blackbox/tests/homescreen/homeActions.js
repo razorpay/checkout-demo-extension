@@ -6,27 +6,33 @@ const {
   find,
   getAttribute,
   innerText,
+  assertVisible,
 } = require('../../util');
 
 /**
  * Returns all available method buttons
  */
-async function getMethodButtons(context) {
-  const list = await context.page.waitForSelector('.methods-container', {
-    visible: true,
+async function getHomescreenMethods(context) {
+  await assertVisible('.methods-container');
+  return context.page.$$eval('button.new-method', buttons => {
+    return buttons.map(b => b.getAttribute('method'));
   });
-  return Array.from(await list.$$('button.new-method'));
+}
+
+/**
+ * Returns all available EMI buttons
+ */
+function getEmiButtonTexts(context) {
+  return context.page.$$eval('#form-cardless_emi .options .option', els => {
+    return els.map(el => el.textContent.trim());
+  });
 }
 
 /**
  * Verify that methods are being shown
  */
 async function assertPaymentMethods(context) {
-  const buttons = await getMethodButtons(context);
-
-  const methods = await Promise.all(
-    buttons.map(button => getAttribute(context.page, button, 'method'))
-  );
+  const methods = await getHomescreenMethods(context);
   expect([
     'card',
     'netbanking',
@@ -43,29 +49,32 @@ async function assertPaymentMethods(context) {
  * Select a payment method
  */
 async function selectPaymentMethod(context, method) {
-  const buttons = await getMethodButtons(context);
-
-  const methodButton = await find(buttons, async button => {
-    const buttonMethod = await getAttribute(context.page, button, 'method');
-
-    return method === buttonMethod;
-  });
-
-  await methodButton.click();
+  // click through puppeteer may fail if element not in view due to scroll offset
+  await context.page.evaluate(method => {
+    const el = document.querySelector(`button.new-method[method=${method}]`);
+    if (!el || !el.offsetWidth) {
+      throw `${method} button is not visible`;
+    }
+    el.click();
+  }, method);
 }
 
 async function assertMethodsScreen(context) {
-  const $form = await context.page.waitForSelector('#form-common', {
+  await assertVisible('.methods-container');
+}
+
+async function selectQRScanner(context) {
+  const selectQR = await context.page.waitForSelector('#showQr', {
     visible: true,
   });
-  const methods = await $form.$('.methods-container');
-
-  expect(methods).not.toEqual(null);
+  await selectQR.click();
 }
 
 module.exports = {
-  getMethodButtons,
+  getHomescreenMethods,
   assertPaymentMethods,
   selectPaymentMethod,
   assertMethodsScreen,
+  selectQRScanner,
+  getEmiButtonTexts,
 };

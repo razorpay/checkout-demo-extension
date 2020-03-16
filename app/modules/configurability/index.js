@@ -1,4 +1,4 @@
-import { translateExternal } from './options';
+import { translateExternal } from './translate';
 import { getSequencedBlocks } from './sequence';
 import { AVAILABLE_METHODS } from 'common/constants';
 import { clusterRazorpayBlocks } from './methods';
@@ -21,7 +21,7 @@ export function getBlockConfig(options) {
   });
 
   // Group blocks of Razorpay
-  const grouped = clusterRazorpayBlocks(sequentialied);
+  const clustered = clusterRazorpayBlocks(sequentialied);
 
-  return grouped;
+  return clustered;
 }

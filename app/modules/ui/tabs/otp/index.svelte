@@ -36,10 +36,10 @@
   $: {
     /**
      * Base width (Mandatory): 19px
-     * Each dash: 14px
-     * Each space between two dashes: 10px
+     * Each digit: 14px
+     * Each space between two digits: 10px
      *
-     * There are maxlength-1 spaces and maxlength dashes.
+     * There are maxlength-1 spaces and maxlength digits.
      */
 
     inputWidth = `${19 + ($maxlength - 1) * 10 + $maxlength * 14}px`;
@@ -110,11 +110,7 @@
       </div>
     {/if}
 
-    <div
-      id="otp-elem"
-      style="width: {inputWidth};"
-      class:hidden={!showInput}
-      class:wide={$maxlength > 6}>
+    <div id="otp-elem" style="width: {inputWidth};" class:hidden={!showInput}>
       <div class="help">Please enter the OTP</div>
       <input
         bind:this={input}
