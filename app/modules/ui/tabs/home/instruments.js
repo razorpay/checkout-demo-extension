@@ -14,22 +14,44 @@ function generateBasePreferredBlock(preferred) {
   return preferredBlock;
 }
 
+function instrumentPresentInGroup(instrument, group) {
+  if (instrument.method !== group.method) {
+    return false;
+  }
+
+  switch (instrument.method) {
+    case 'netbanking':
+      return _Arr.contains(group.banks, instrument.bank);
+  }
+
+  return true;
+}
+
 export function setBlocks({ preferred = [], merchantConfig = {} }, customer) {
   const preferredBlock = generateBasePreferredBlock(preferred);
   const parsedConfig = getBlockConfig(merchantConfig, customer);
 
-  // TODO: Filter out instruments from preferredBlock.instruments using `excluded`
   const excluded = parsedConfig.excluded;
 
+  const preferredInstruments = preferredBlock.instruments;
+  const filteredPreferredInstruments = _Arr.filter(
+    preferredInstruments,
+    instrument =>
+      _Arr.every(excluded, excludedGroup => {
+        return !instrumentPresentInGroup(instrument, excludedGroup);
+      })
+  );
+
   // Take top 3 preferred
-  preferredBlock.instruments = preferredBlock.instruments.slice(
+  preferredBlock.instruments = filteredPreferredInstruments.slice(
     0,
     MAX_PREFERRED_INSTRUMENTS
   );
 
   let allBlocks = [preferredBlock];
+  const merchantBlocks = parsedConfig.blocks;
 
-  allBlocks = _Arr.mergeWith(allBlocks, parsedConfig.blocks);
+  allBlocks = _Arr.mergeWith(allBlocks, merchantBlocks);
 
   // Filter out blocks with no instruments
   allBlocks = _Arr.filter(
