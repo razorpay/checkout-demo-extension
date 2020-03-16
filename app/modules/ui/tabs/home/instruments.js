@@ -27,11 +27,17 @@ function instrumentPresentInGroup(instrument, group) {
       return _Arr.contains(group.wallets, instrument.wallet);
 
     case 'card':
+    case 'emi':
       return (
         _Arr.contains(group.issuers, instrument.issuer) ||
         _Arr.contains(group.networks, instrument.network) ||
         _Arr.contains(group.card_types, instrument.card_type)
       );
+    // TODO: filter out based on iins as well
+    // TODO: filter out / remove plans excluding the durations for emi
+
+    case 'upi':
+      return _Arr.contains(group.flows, instrument.flow);
   }
 
   return true;
