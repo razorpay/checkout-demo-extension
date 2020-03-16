@@ -7,6 +7,7 @@ const cards = require('./cards');
 const emi = require('./emi');
 const tpv = require('./tpv');
 const wallet = require('./wallet');
+const zestMoney = require('./zest-money');
 
 module.exports = {
   netbanking: netbanking,
@@ -18,4 +19,5 @@ module.exports = {
   emi: emi,
   tpv: tpv,
   wallet: wallet,
+  'zest-money': zestMoney,
 };
