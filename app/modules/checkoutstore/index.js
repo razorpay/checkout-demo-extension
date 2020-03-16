@@ -1,6 +1,5 @@
 import { getDowntimes as _getDowntimes } from 'checkoutframe/downtimes';
 import { TAB_TITLES } from 'common/constants';
-import { getPrefilledMethod } from './methods';
 
 let razorpayInstance, preferences;
 
@@ -122,7 +121,7 @@ export function isPartialPayment() {
 
 export function isRecurring() {
   if (
-    getPrefilledMethod() === 'emandate' &&
+    getOption('prefill.method') === 'emandate' &&
     (preferences.methods || {}).recurring
   ) {
     return true;
