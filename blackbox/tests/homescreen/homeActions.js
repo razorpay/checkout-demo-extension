@@ -13,7 +13,7 @@ const {
  * Returns all available method buttons
  */
 async function getHomescreenMethods(context) {
-  await assertVisible('.methods-container');
+  await assertVisible('.methods-block[data-block="rzp.cluster"]');
   return context.page.$$eval('button.new-method', buttons => {
     return buttons.map(b => b.getAttribute('method'));
   });
@@ -60,7 +60,7 @@ async function selectPaymentMethod(context, method) {
 }
 
 async function assertMethodsScreen(context) {
-  await assertVisible('.methods-container');
+  await assertVisible('.methods-block[data-block="rzp.cluster"]');
 }
 
 async function selectQRScanner(context) {
