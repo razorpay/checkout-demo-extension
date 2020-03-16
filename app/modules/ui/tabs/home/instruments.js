@@ -22,6 +22,9 @@ function instrumentPresentInGroup(instrument, group) {
   switch (instrument.method) {
     case 'netbanking':
       return _Arr.contains(group.banks, instrument.bank);
+
+    case 'wallet':
+      return _Arr.contains(group.wallets, instrument.wallet);
   }
 
   return true;
