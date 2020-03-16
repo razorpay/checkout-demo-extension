@@ -3766,7 +3766,10 @@ Session.prototype = {
             },
 
             select: function(value) {
-              var plan = plans[value];
+              var plan = _Arr.find(plans, function(plan) {
+                return plan.duration === value;
+              });
+
               var text = getEmiText(self, amount, plan) || '';
 
               self.emiScreenView.setPlan({
