@@ -14,28 +14,10 @@
   import OffersPortal from 'ui/components/OffersPortal.svelte';
   import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
 
-  // Store
-  import {
-    cardCvv,
-    cardExpiry,
-    cardName,
-    cardNumber,
-    remember,
-  } from 'checkoutstore/screens/card';
-
-  import { contact } from 'checkoutstore/screens/home';
-  import { isRecurring, shouldRememberCustomer } from 'checkoutstore';
-  import {
-    isMethodEnabled,
-    getEMIBanks,
-    getEMIBankPlans,
-    getWallets,
-  } from 'checkoutstore/methods';
-  import { newCardEmiDuration } from 'checkoutstore/emi';
+  import { getWallets } from 'checkoutstore/methods';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
-  import { getSavedCards, transform } from 'common/token';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getCardType } from 'common/card';
@@ -43,11 +25,27 @@
   // Transitions
   import { fade } from 'svelte/transition';
 
-  const _ = getSession();
+  const session = getSession();
   const wallet = getWallets();
 
-  const applicableOffer =
-    _.walletOffer && _.walletOffer.issuer === w.code && _.walletOffer;
+  let selectedWallet = null;
+
+  const imageReferences = {};
+
+  // Called when the user presses the pay button
+  export function getPayload() {}
+
+  /**
+   * @description get an applicable offer (if any)
+   * @param {String} code Wallet code for the offer is needed
+   */
+  function getApplicableOffer(code) {
+    return (
+      session.walletOffer &&
+      session.walletOffer.issuer === code &&
+      session.walletOffer
+    );
+  }
 </script>
 
 <style>
@@ -57,11 +55,6 @@
 <div class="list collapsable">
   {#each wallet as w, i}
     <div class="wallet item radio-item">
-      <!-- @Todo Move this to images work -->
-      <!-- on:load={function() {
-            console.log(this)
-            this.nextElementSibling.style.backgroundImage = 'url(' + this.src + ')';
-          }} -->
       <input
         type="radio"
         name="wallet"
@@ -69,12 +62,21 @@
         id={`wallet-radio-${w.code}`} />
       <label for={`wallet-radio-${w.code}`} class="radio-label">
         <span class="checkbox" />
-        <img alt={w.code} style="display:none" src={`${w.sqLogo}`} />
-        <div class="placeholder" />
+        <img
+          alt={w.name}
+          style="display:none"
+          on:load={() => {
+            imageReferences[w.code].style.backgroundImage = 'url(' + w.sqLogo + ')';
+          }}
+          src={w.sqLogo} />
+
+        <div class="placeholder" bind:this={imageReferences[w.code]} />
         <span class="title">{w.name}</span>
-        {#if applicableOffer}
-          <span class="offer">{applicableOffer.name}</span>
-          <div class="offer-info">{applicableOffer.display_text}</div>
+        {#if getApplicableOffer(w.code)}
+          <span class="offer">{getApplicableOffer(w.code).name}</span>
+          <div class="offer-info">
+            {getApplicableOffer(w.code).display_text}
+          </div>
         {/if}
       </label>
     </div>
