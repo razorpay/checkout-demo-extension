@@ -1,6 +1,7 @@
 import { translateExternal } from './translate';
 import { getSequencedBlocks } from './sequence';
 import { clusterRazorpayBlocks } from './methods';
+import { ungroupInstruments } from './ungroup';
 
 import { AVAILABLE_METHODS } from 'common/constants';
 import { isMethodEnabled } from 'checkoutstore/methods';
@@ -52,6 +53,9 @@ function getAvailableDefaultMethods() {
 export function getBlockConfig(options) {
   // Translate external representation to internal representation
   const translated = translateExternal(options);
+
+  // Ungroup instruments for now
+  translated.blocks = _Arr.map(translated.blocks, ungroupInstruments);
 
   // Reorder blocks
   const sequentialied = getSequencedBlocks({
