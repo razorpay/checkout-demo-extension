@@ -4720,6 +4720,40 @@ Session.prototype = {
             }
             break;
           }
+
+          case 'cardless_emi': {
+            this.switchTab('cardless_emi');
+
+            /**
+             * Setting a timeout because the instrument needs to be
+             * deselected before attempting a payment.
+             *
+             * This can be removed Cardless EMI payment creation flow is moved
+             * out of session.js. Once that is done, instrument-based payments for
+             * Cardless EMI can be done from the homescreen too, without switching tab.
+             */
+            setTimeout(function() {
+              session.selectCardlessEmiProvider(selectedInstrument.provider);
+            }, 200);
+            return;
+          }
+
+          case 'paylater': {
+            this.switchTab('paylater');
+
+            /**
+             * Setting a timeout because the instrument needs to be
+             * deselected before attempting a payment.
+             *
+             * This can be removed Paylater payment creation flow is moved
+             * out of session.js. Once that is done, instrument-based payments for
+             * Paylater can be done from the homescreen too, without switching tab.
+             */
+            setTimeout(function() {
+              session.selectPayLaterProvider(selectedInstrument.provider);
+            }, 200);
+            return;
+          }
         }
       }
     }
