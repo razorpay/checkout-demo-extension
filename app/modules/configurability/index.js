@@ -60,6 +60,12 @@ export function getBlockConfig(options, customer) {
     ungroupInstruments(block, customer)
   );
 
+  // Remove empty blocks
+  translated.blocks = _Arr.filter(
+    translated.block,
+    block => block.instruments.length > 0
+  );
+
   // Reorder blocks
   const sequentialied = getSequencedBlocks({
     translated,
