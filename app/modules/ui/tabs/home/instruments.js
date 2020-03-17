@@ -2,6 +2,7 @@ import { createBlock } from 'configurability/blocks';
 import { blocks } from 'checkoutstore/screens/home';
 import Track from 'tracker';
 import { MAX_PREFERRED_INSTRUMENTS } from 'common/constants';
+import { getBlockConfig } from 'configurability';
 
 function generateBasePreferredBlock(preferred) {
   const preferredBlock = createBlock('rzp.preferred', {
@@ -28,7 +29,7 @@ export function setBlocks({ preferred = [], merchantConfig = {} }) {
 
   let allBlocks = [preferredBlock];
 
-  allBlocks = _Arr.mergeWith(allBlocks, merchant);
+  allBlocks = _Arr.mergeWith(allBlocks, parsedConfig.blocks);
 
   // Filter out blocks with no instruments
   allBlocks = _Arr.filter(
@@ -48,7 +49,7 @@ export function setBlocks({ preferred = [], merchantConfig = {} }) {
   blocks.set(allBlocks);
 
   return {
-    merchant,
+    merchant: parsedConfig,
     preferred: preferredBlock,
     all: allBlocks,
   };
