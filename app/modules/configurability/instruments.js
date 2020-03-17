@@ -1,4 +1,4 @@
-import InstrumentConfig from './instrument-config';
+import InstrumentsConfig from './instruments-config';
 
 /**
  * Adds a type and category to an instrument
@@ -49,7 +49,7 @@ export function createInstrument(config) {
  */
 export function isInstrumentForEntireMethod(instrument) {
   const method = instrument.method;
-  const config = InstrumentConfig[method];
+  const config = InstrumentsConfig[method];
 
   if (!config) {
     return false;
@@ -74,7 +74,7 @@ export function isInstrumentForEntireMethod(instrument) {
  */
 export function addInstrumentToPaymentData(instrument, payment, customer) {
   const method = instrument.method;
-  const config = InstrumentConfig[method];
+  const config = InstrumentsConfig[method];
 
   if (!config) {
     return payment;

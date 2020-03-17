@@ -1,4 +1,4 @@
-import Config from './instrument-config';
+import InstrumentsConfig from './instruments-config';
 
 /**
  * Returns individual instruments from an instrument that might contain a group.
@@ -8,7 +8,7 @@ import Config from './instrument-config';
  */
 function getIndividualInstruments(instrument) {
   const method = instrument.method;
-  const config = Config[method];
+  const config = InstrumentsConfig[method];
 
   if (config.isIndividual(instrument)) {
     return [instrument];
