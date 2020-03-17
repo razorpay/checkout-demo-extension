@@ -4705,13 +4705,21 @@ Session.prototype = {
           Analytics.setMeta('doneByP13n');
         }
 
-        if (['card', 'emi', 'wallet'].indexOf(selectedInstrument.method) > -1) {
-          this.switchTab(selectedInstrument.method);
-        } else if (
-          selectedInstrument.method === 'upi' &&
-          selectedInstrument.flow === 'qr'
-        ) {
-          return this.switchTab('qr');
+        switch (selectedInstrument.method) {
+          case 'card':
+          case 'emi':
+          case 'wallet': {
+            this.switchTab(selectedInstrument.method);
+            break;
+          }
+
+          case 'upi': {
+            if (selectedInstrument.flow === 'qr') {
+              this.switchTab('qr');
+              return;
+            }
+            break;
+          }
         }
       }
     }
