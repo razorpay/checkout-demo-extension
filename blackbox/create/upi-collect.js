@@ -152,8 +152,6 @@ module.exports = function(testFeatures) {
         await verifyDiscountText(context, 'You save ₹ 10');
       }
       if (downtimeHigh && offers) {
-        console.log('inside downtimeHigh && offers');
-
         await verifyHighDowntime(
           context,
           'upi',
