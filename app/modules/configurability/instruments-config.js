@@ -52,6 +52,10 @@ function genericIsIndividual(instrument) {
   return _Arr.any(paymentKeys, key => instrument[key]);
 }
 
+function genericGroupedToIndividual(grouped, customer) {
+  return [grouped];
+}
+
 const config = {
   card: {
     properties: [
@@ -200,10 +204,16 @@ const config = {
 };
 
 _Obj.loop(config, (val, method) => {
-  config[method].getPaymentPayload =
-    config[method].getPaymentPayload || genericPaymentPayloadGetter;
-  config[method].isIndividual =
-    config[method].isIndividual || genericIsIndividual;
+  config[method] = _Obj.extend(
+    {
+      getPaymentPayload: genericPaymentPayloadGetter,
+      isIndividual: genericIsIndividual,
+      groupedToIndividual: genericGroupedToIndividual,
+      properties: [],
+      payment: [],
+    },
+    config[method]
+  );
 });
 
 export default config;
