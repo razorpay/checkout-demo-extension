@@ -1382,6 +1382,13 @@ Session.prototype = {
     }
   },
 
+  setWalletsTab: function() {
+    this.svelteWalletsTab = new discreet.WalletTab({
+      target: gel('wallet-svelte-wrap'),
+      props: {},
+    });
+  },
+
   setSvelteComponents: function() {
     this.setHomeTab();
     this.setSvelteCardTab();
@@ -1394,6 +1401,7 @@ Session.prototype = {
     this.setPayoutsScreen();
     this.setNach();
     this.setBankTransfer();
+    this.setWalletsTab();
   },
 
   showTimer: function(cb) {
@@ -3347,7 +3355,6 @@ Session.prototype = {
       this.payload = null;
       this.clearRequest();
     }
-
     if (tab === 'netbanking') {
       this.netbankingTab.onShown();
     }
@@ -3371,6 +3378,10 @@ Session.prototype = {
 
     if (tab === 'ecod') {
       send_ecod_link.call(this);
+    }
+
+    if (tab === 'wallet') {
+      this.setScreen('wallet');
     }
 
     if (tab === 'card' || (tab === 'emi' && this.screen !== 'emi')) {

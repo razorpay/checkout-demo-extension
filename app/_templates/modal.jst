@@ -181,28 +181,7 @@ var subscription_will_refund = _.subscription && (_.subscription.type === 0);
                         `?`
                       </div>
                     `?`
-                    <div class="list collapsable">
-                      `~wallet:i:w`
-                      `
-                        var hasOffer = _.walletOffer && _.walletOffer.issuer === w.code && _.walletOffer;
-                      `
-                        <div class="wallet item radio-item">
-
-                          <input type="radio" name="wallet" value="`=w.code`" id="wallet-radio-`=w.code`">
-                          <label for="wallet-radio-`=w.code`" class="radio-label">
-                            <span class="checkbox"></span>
-                            <img style="display:none" src="`=w.sqLogo`" onload="this.nextElementSibling.style.backgroundImage = 'url('+this.src+')'">
-                            <div class="placeholder"></div>
-                            <span class="title">`=w.name`</span>
-                            `?hasOffer`
-                              <span class="offer">`=hasOffer.name`</span>
-                              <div class="offer-info">
-                                `=hasOffer.display_text`
-                              </div>
-                            `?`
-                          </label>
-                        </div>
-                      `~`
+                      <div id="wallet-svelte-wrap">
                     </div>
                   </div>
                 </div>
