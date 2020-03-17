@@ -11,6 +11,8 @@
   import { getBankLogo } from 'common/bank';
   import { getBanks } from 'checkoutstore';
   import { getWallet } from 'common/wallet';
+  import { getProvider as getCardlessEmiProvider } from 'common/cardlessemi';
+  import { getProvider as getPaylaterProvider } from 'common/paylater';
   import Track from 'tracker';
 
   // Store
@@ -49,6 +51,7 @@
     let wallet;
     let flow;
     let vpaSplit;
+    let provider;
 
     switch (instrument.method) {
       case 'paypal':
@@ -98,6 +101,22 @@
           icon = '&#xe70e;';
           alt = 'UPI';
         }
+
+        break;
+
+      case 'cardless_emi':
+        provider = getCardlessEmiProvider(instrument.provider);
+        title = `EMI - ${provider.name}`;
+        icon = provider.sqLogo;
+        alt = provider.name;
+
+        break;
+
+      case 'paylater':
+        provider = getPaylaterProvider(instrument.provider);
+        title = `Pay Later - ${provider.name}`;
+        icon = provider.sqLogo;
+        alt = provider.name;
 
         break;
     }
