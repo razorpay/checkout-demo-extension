@@ -194,13 +194,50 @@ const config = {
   },
 
   paypal: {
-    properties: [],
-    payment: [],
-    groupedToIndividual: grouped => [grouped],
     isIndividual: () => true,
   },
 
-  // TODO: Add more methods
+  cardless_emi: {
+    properties: ['provider', 'providers'],
+    isIndividual: instrument => instrument && instrument.provider,
+    groupedToIndividual: grouped => {
+      const base = _Obj.clone(grouped);
+      delete base.providers;
+
+      return _Arr.map(grouped.providers || [], provider => {
+        return _Obj.extend(
+          {
+            provider,
+          },
+          base
+        );
+      });
+    },
+  },
+
+  paylater: {
+    properties: ['provider', 'providers'],
+    isIndividual: instrument => instrument && instrument.provider,
+    groupedToIndividual: grouped => {
+      const base = _Obj.clone(grouped);
+      delete base.providers;
+
+      return _Arr.map(grouped.providers || [], provider => {
+        return _Obj.extend(
+          {
+            provider,
+          },
+          base
+        );
+      });
+    },
+  },
+
+  bank_transfer: {
+    isIndividual: () => false,
+  },
+
+  // TODO: Pending methods: emi, gpay
 };
 
 _Obj.loop(config, (val, method) => {
