@@ -62,7 +62,7 @@ export function getBlockConfig(options, customer) {
 
   // Remove empty blocks
   translated.blocks = _Arr.filter(
-    translated.block,
+    translated.blocks,
     block => block.instruments.length > 0
   );
 
