@@ -84,7 +84,12 @@ export function setBlocks({ preferred = [], merchantConfig = {} }, customer) {
   const preferredBlock = generateBasePreferredBlock(preferred);
   const parsedConfig = getBlockConfig(merchantConfig, customer);
 
-  const excluded = parsedConfig.excluded;
+  const shownInstruments =
+    parsedConfig.blocks
+    |> _Arr.map(block => block.instruments)
+    |> _Arr.reduce(_Arr.mergeWith, []);
+
+  const excluded = _Arr.mergeWith(parsedConfig.excluded, shownInstruments);
 
   const preferredInstruments = preferredBlock.instruments;
   const filteredPreferredInstruments = _Arr.filter(
