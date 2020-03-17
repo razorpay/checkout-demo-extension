@@ -29,6 +29,7 @@
     isMethodEnabled,
     getEMIBanks,
     getEMIBankPlans,
+    getWallets,
   } from 'checkoutstore/methods';
   import { newCardEmiDuration } from 'checkoutstore/emi';
 
@@ -42,11 +43,41 @@
   // Transitions
   import { fade } from 'svelte/transition';
 
-  const session = getSession();
+  const _ = getSession();
+  const wallet = getWallets();
+
+  const applicableOffer =
+    _.walletOffer && _.walletOffer.issuer === w.code && _.walletOffer;
 </script>
 
 <style>
 
 </style>
 
-<div>Test</div>
+<div class="list collapsable">
+  {#each wallet as w, i}
+    <div class="wallet item radio-item">
+      <!-- @Todo Move this to images work -->
+      <!-- on:load={function() {
+            console.log(this)
+            this.nextElementSibling.style.backgroundImage = 'url(' + this.src + ')';
+          }} -->
+      <input
+        type="radio"
+        name="wallet"
+        value={w.code}
+        id={`wallet-radio-${w.code}`} />
+      <label for={`wallet-radio-${w.code}`} class="radio-label">
+        <span class="checkbox" />
+        <img alt={w.code} style="display:none" src={`${w.sqLogo}`} />
+        <div class="placeholder" />
+        <span class="title">{w.name}</span>
+        {#if applicableOffer}
+          <span class="offer">{applicableOffer.name}</span>
+          <div class="offer-info">{applicableOffer.display_text}</div>
+        {/if}
+      </label>
+    </div>
+  {/each}
+
+</div>
