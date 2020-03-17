@@ -84,6 +84,7 @@ export function setBlocks({ preferred = [], merchantConfig = {} }, customer) {
   const preferredBlock = generateBasePreferredBlock(preferred);
   const parsedConfig = getBlockConfig(merchantConfig, customer);
 
+  // TODO: use _Arr.flatMap
   const shownInstruments =
     parsedConfig.blocks
     |> _Arr.map(block => block.instruments)
