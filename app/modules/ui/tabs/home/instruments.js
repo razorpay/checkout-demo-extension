@@ -21,36 +21,59 @@ function instrumentPresentInGroup(instrument, group) {
 
   switch (instrument.method) {
     case 'netbanking': {
-      const banks = group.banks || [];
-      return _Arr.contains(banks, instrument.bank);
+      const hasBank = Boolean(group.bank);
+
+      const bankMatches = hasBank ? group.bank === instrument.bank : true;
+
+      return bankMatches;
     }
 
     case 'wallet': {
-      const wallets = group.wallets || [];
-      return _Arr.contains(wallets, instrument.wallet);
+      const hasWallet = Boolean(group.wallet);
+
+      const walletMatches = hasWallet
+        ? group.wallet === instrument.wallet
+        : true;
+
+      return walletMatches;
     }
 
     case 'card':
     case 'emi': {
+      const hasIssuers = Boolean(group.issuers);
+      const hasNetworks = Boolean(group.networks);
+      const hasCardTypes = Boolean(group.card_types);
+
       const issuers = group.issuers || [];
       const networks = group.networks || [];
       const card_types = group.card_types || [];
-      return (
-        _Arr.contains(issuers, instrument.issuer) ||
-        _Arr.contains(networks, instrument.network) ||
-        _Arr.contains(card_types, instrument.card_type)
-      );
+
+      // If there is no issuer present, it means match all issuers.
+      const issuerMatches = hasIssuers
+        ? _Arr.contains(issuers, instrument.issuer)
+        : true;
+
+      const networkMatches = hasNetworks
+        ? _Arr.contains(networks, instrument.network)
+        : true;
+
+      const cardTypeMatches = hasCardTypes
+        ? _Arr.contains(card_types, instrument.card_type)
+        : true;
+
+      return issuerMatches && networkMatches && cardTypeMatches;
     }
     // TODO: filter out based on iins as well
     // TODO: filter out / remove plans excluding the durations for emi
 
     case 'upi': {
-      const flows = group.flows || [];
-      const apps = group.apps || [];
-      return (
-        _Arr.contains(flows, instrument.flow) ||
-        _Arr.contains(apps, instrument.app)
-      );
+      const hasFlow = Boolean(group.flows);
+      const hasApp = Boolean(group.apps);
+
+      const flowMatches = hasFlow ? group.flow === instrument.flow : true;
+      const appMatches = hasApp ? group.app === instrument.app : true;
+
+      return flowMatches && appMatches;
     }
   }
 
