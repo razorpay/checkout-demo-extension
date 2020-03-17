@@ -46,7 +46,7 @@ function instrumentPresentInGroup(instrument, group) {
 
     case 'upi': {
       const flows = group.flows || [];
-      const apps = group.apps;
+      const apps = group.apps || [];
       return (
         _Arr.contains(flows, instrument.flow) ||
         _Arr.contains(apps, instrument.app)
