@@ -56,7 +56,7 @@ const providers = _Obj.map(config, (details, code) => {
   );
 });
 
-export const getProvider = code => providers[code];
+export const getProvider = code => providers[code] || {};
 
 /**
  * Extends the config of the given with the updated config
@@ -95,7 +95,7 @@ export function getEligibleProvidersBasedOnMinAmount(amount, enabledProviders) {
       providers[provider] &&
       providers[provider].min_amount <= amount
     ) {
-      eligible[provider] = true;
+      eligible[provider] = getProvider(provider);
     }
   });
 
@@ -109,7 +109,7 @@ export function getEligibleProvidersBasedOnMinAmount(amount, enabledProviders) {
  * @returns {boolean}
  */
 export const isProviderHeadless = provider => {
-  const { headless } = getProvider(provider) || {};
+  const { headless } = getProvider(provider);
 
   return Boolean(headless);
 };

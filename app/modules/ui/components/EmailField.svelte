@@ -9,18 +9,11 @@
   export let value;
 
   // Utils
-  import CheckoutStore from 'checkoutstore';
+  import { isEmailReadOnly, isEmailOptional } from 'checkoutstore';
 
-  const checkoutStore = CheckoutStore.get();
-
-  const { optional, prefill, readonly, hidden } = checkoutStore;
-
-  const prefilledEmail = prefill.email;
-  const isEmailReadonly = readonly.email && prefilledEmail;
-
-  const EMAIL_REGEX = optional.email ? '.*' : EMAIL_PATTERN;
-
-  const label = optional.email ? 'Email (Optional)' : 'Email';
+  const isOptional = isEmailOptional();
+  const EMAIL_REGEX = isOptional ? '.*' : EMAIL_PATTERN;
+  const label = isOptional ? 'Email (Optional)' : 'Email';
 </script>
 
 <div>
@@ -29,9 +22,9 @@
     name="email"
     type="email"
     {value}
-    required={!optional.email}
+    required={!isOptional}
     pattern={EMAIL_REGEX}
-    readonly={isEmailReadonly}
+    readonly={isEmailReadOnly()}
     {label}
     icon="&#xe603;"
     on:input={e => (value = e.target.value)}

@@ -110,9 +110,6 @@ const UPI_APPS = {
       package_name: 'com.fss.idfcpsp',
     },
     {
-      package_name: 'com.YesBank',
-    },
-    {
       package_name: 'com.abipbl.upi',
     },
     {

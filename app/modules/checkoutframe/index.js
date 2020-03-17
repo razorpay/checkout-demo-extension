@@ -15,7 +15,11 @@ import {
   ownerWindow,
 } from 'common/constants';
 
-var CheckoutBridge = window.CheckoutBridge;
+let CheckoutBridge = window.CheckoutBridge;
+let upi_intents_data;
+export function getUPIIntentApps() {
+  return upi_intents_data;
+}
 
 const validUID = id => {
   /* check only for iFrame because we trust our SDKs */
@@ -71,10 +75,14 @@ const optionsTransformer = {
   },
 
   addUpiIntentsData: (o, message) => {
-    /* TODO: update better names for these variables */
+    // @TODO: update better names for these variables
     if (message.upi_intents_data && message.upi_intents_data.length) {
+      // @TODO: used to just send an event. send from here itself
       o.all_upi_intents_data = message.upi_intents_data;
-      o.upi_intents_data = getSortedApps(message.upi_intents_data);
+      const filteredApps = getSortedApps(message.upi_intents_data);
+      if (filteredApps.length) {
+        upi_intents_data = o.upi_intents_data = filteredApps;
+      }
     }
   },
 

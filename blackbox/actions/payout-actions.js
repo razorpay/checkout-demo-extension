@@ -35,9 +35,7 @@ async function selectInstrument(context, instrumentNumber) {
 }
 
 async function addInstrument(context, instrumentType) {
-  const instrument = await context.page.$x(
-    '//div[contains(@class, "option next-option")]'
-  );
+  const instrument = await context.page.$$('#form-payouts .next-option');
   switch (instrumentType) {
     case 'VPA':
       await instrument[0].click();
@@ -61,7 +59,7 @@ async function respondToFundAccountsRequest(context, instrumentType) {
       account_type: 'vpa',
       vpa: { address: UPI },
     });
-  } else if (instrumentType == 'Bank')
+  } else if (instrumentType == 'Bank') {
     await context.respondJSON({
       id: 'fa_DkSvNzU47AqV5h',
       account_type: 'bank_account',
@@ -73,6 +71,7 @@ async function respondToFundAccountsRequest(context, instrumentType) {
         account_number: accountNum,
       },
     });
+  }
 }
 
 async function enterBankAccountDetails(context) {

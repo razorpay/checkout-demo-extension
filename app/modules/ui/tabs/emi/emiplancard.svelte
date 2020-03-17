@@ -26,6 +26,7 @@
 
   const session = getSession();
   const HDFC_BANK_CODE = 'HDFC';
+  const HDFC_BANK_DEBIT_CODE = 'HDFC_DC';
 
   // amountPerMonth
   $: {
@@ -64,7 +65,13 @@
   );
 </script>
 
-<ExpandableCard {badge} {expanded} on:click>
+<style>
+  span.inline-block {
+    display: inline-block;
+  }
+</style>
+
+<ExpandableCard showRadio {badge} {expanded} on:click>
   <div slot="title">
     {plan.duration} Months ({formattedAmountPerMonth}/mo)
     {#if showInterest}&nbsp;@ {plan.interest}%{/if}
@@ -72,9 +79,16 @@
   <div slot="detail">
     {#if plan.subvention !== 'merchant'}
       {#if isCardEmi}
-        Full amount of {formattedAmount} will be deducted from your account,
-        which will be converted into EMI by your bank in 3-4 days.
-        {#if bank === HDFC_BANK_CODE}
+        {#if bank === HDFC_BANK_DEBIT_CODE}
+          No minimum balance is required. There will be no amount blocked on
+          your card. You will pay
+          <span class="inline-block">{formattedAmountPerMonth}/mo</span>
+          (includes interest).
+        {:else}
+          Full amount of {formattedAmount} will be deducted from your account,
+          which will be converted into EMI by your bank in 3-4 days.
+        {/if}
+        {#if bank === HDFC_BANK_CODE || bank === HDFC_BANK_DEBIT_CODE}
           Convenience Fee of ₹99 + GST applicable for EMI transactions on HDFC
           Bank Cards.
         {/if}

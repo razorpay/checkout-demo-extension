@@ -195,6 +195,8 @@ gulp.task('watch', cb => {
             event.duration +
             'ms'
         );
+      case 'ERROR':
+        return console.error(event);
     }
   });
 });

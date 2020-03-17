@@ -11,7 +11,7 @@
 
   // Util imports
   import { getSession } from 'sessionmanager';
-  import Preferences from 'checkoutstore/preferences';
+  import { hasFeature, getPrefilledVPA } from 'checkoutstore';
   import { VPA_REGEX } from 'common/constants';
 
   // Props
@@ -27,13 +27,11 @@
   const PATTERN_WITHOUT_HANDLE = '.+';
 
   const session = getSession();
-  const preferences = Preferences.get();
-  const getSafely = _Obj.getSafely;
 
   // Computed
   export let pattern;
   let rememberVpa = true;
-  let newVpa = session.get('prefill.vpa') || '';
+  let newVpa = getPrefilledVPA();
   let vpa;
   let pspHandle;
 
@@ -56,8 +54,8 @@
   }
 
   export function shouldRememberVpa() {
-    return getSafely(customer, 'logged') &&
-      getSafely(preferences, 'features.save_vpa') &&
+    return _Obj.getSafely(customer, 'logged') &&
+      hasFeature('save_vpa') &&
       rememberVpa
       ? 1
       : 0;
@@ -86,7 +84,7 @@
     }, 200);
   }
 
-  const canSaveVpa = _Obj.getSafely(preferences, 'features.save_vpa');
+  const canSaveVpa = hasFeature('save_vpa');
 
   let logged;
 
@@ -136,7 +134,7 @@
   <div id="new-vpa-field" slot="title">
     {logged && canSaveVpa ? 'Add UPI ID' : 'UPI ID'}
   </div>
-  <div slot="subtitle">Google Pay, BHIM, Phone Pe & more</div>
+  <div slot="subtitle">Google Pay, BHIM, PhonePe & more</div>
   <i slot="icon" class="top">
     <Icon icon={session.themeMeta.icons.upi} />
   </i>

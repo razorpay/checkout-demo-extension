@@ -27,8 +27,8 @@ async function verifyPersonalizationText(context, paymentMode) {
       paymentMethodArray.push('upi qr');
     }
   }
-  var paymentMethod = await context.page.$x(
-    '//button[contains(@class,"p13n-instrument")]'
+  var paymentMethod = await context.page.$$(
+    '.home-methods .methods-block[data-block="rzp.preferred"] .instrument'
   );
   for (let i = 0; i < paymentMethod.length; i++) {
     const currentPaymentMethod = paymentMethod[i];
@@ -41,7 +41,7 @@ async function verifyPersonalizationText(context, paymentMode) {
     if (
       context.preferences.payment_downtime &&
       context.preferences.payment_downtime.items[0].severity == 'high'
-    )
+    ) {
       expect(paymentMethodArray).not.toEqual(
         expect.arrayContaining([
           paymentMethodText
@@ -49,7 +49,7 @@ async function verifyPersonalizationText(context, paymentMode) {
             .trim(),
         ])
       );
-    else
+    } else {
       expect(paymentMethodArray).toEqual(
         expect.arrayContaining([
           paymentMethodText
@@ -57,13 +57,15 @@ async function verifyPersonalizationText(context, paymentMode) {
             .trim(),
         ])
       );
+    }
   }
 }
 
 async function selectPersonalizationPaymentMethod(context, optionNumber) {
-  var apiOption = await context.page.$x(
-    '//button[contains(@class,"p13n-instrument")]'
+  var apiOption = await context.page.$$(
+    '.home-methods .methods-block[data-block="rzp.preferred"] .instrument'
   );
+
   await apiOption[optionNumber - 1].click();
 }
 
