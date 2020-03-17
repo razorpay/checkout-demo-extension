@@ -66,16 +66,11 @@ export function getBlockConfig(options, customer) {
     block => block.instruments.length > 0
   );
 
-  let excludedInstruments = [];
-
-  _Arr.loop(translated.exclude.instruments, group => {
-    excludedInstruments = _Arr.mergeWith(
-      excludedInstruments,
-      getIndividualInstruments(group, customer)
-    );
-  });
-
-  translated.exclude.instruments = excludedInstruments;
+  // Ungroup excluded instrument as well
+  translated.exclude.instruments =
+    translated.exclude.instruments
+    |> _Arr.map(group => getIndividualInstruments(group, customer))
+    |> _Arr.reduce(_Arr.mergeWith, []);
 
   // Reorder blocks
   const sequentialied = getSequencedBlocks({
