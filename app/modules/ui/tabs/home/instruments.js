@@ -14,9 +14,9 @@ function generateBasePreferredBlock(preferred) {
   return preferredBlock;
 }
 
-export function setBlocks({ preferred = [], merchantConfig = {} }) {
+export function setBlocks({ preferred = [], merchantConfig = {} }, customer) {
   const preferredBlock = generateBasePreferredBlock(preferred);
-  const parsedConfig = getBlockConfig(merchantConfig);
+  const parsedConfig = getBlockConfig(merchantConfig, customer);
 
   // TODO: Filter out instruments from preferredBlock.instruments using `excluded`
   const excluded = parsedConfig.excluded;

@@ -47,15 +47,18 @@ function getAvailableDefaultMethods() {
 /**
  * Creates a block config for rendering
  * @param {Object} options Options passed by the merchant
+ * @param {Object} customer
  *
  * @returns {Object}
  */
-export function getBlockConfig(options) {
+export function getBlockConfig(options, customer) {
   // Translate external representation to internal representation
   const translated = translateExternal(options);
 
   // Ungroup instruments for now
-  translated.blocks = _Arr.map(translated.blocks, ungroupInstruments);
+  translated.blocks = _Arr.map(translated.blocks, block =>
+    ungroupInstruments(block, customer)
+  );
 
   // Reorder blocks
   const sequentialied = getSequencedBlocks({
