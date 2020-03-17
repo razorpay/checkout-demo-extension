@@ -52,6 +52,10 @@ function genericIsIndividual(instrument) {
   return _Arr.any(paymentKeys, key => instrument[key]);
 }
 
+function genericGroupedToIndividual(grouped, customer) {
+  return [grouped];
+}
+
 const config = {
   card: {
     properties: [
@@ -67,24 +71,47 @@ const config = {
       'token_ids',
     ],
     payment: ['token'],
-    groupedToIndividual: (grouped, { tokens = [] } = {}) => {
+    groupedToIndividual: (grouped, customer) => {
+      const tokens = _Obj.getSafely(customer, 'tokens.items', []);
       const base = _Obj.clone(grouped);
+
+      // Convert single token_id into token_ids
+      if (base.token_id && !base.token_ids) {
+        base.token_ids = [base.token_id];
+        delete base.token_id;
+      }
+
+      const token_ids = base.token_ids;
+
+      // Cards is ungrouped based on token_ids. If there are no tokens, don't ungroup.
+      if (!token_ids) {
+        return [grouped];
+      }
+
       delete base.token_ids;
 
-      return _Arr.map(grouped.token_ids, token_id => {
-        const token = _Arr.find(tokens, token => token.id === token_id);
+      return (
+        _Arr.map(token_ids, token_id => {
+          const token = _Arr.find(tokens, token => token.id === token_id);
 
-        return _Obj.extend(
-          {
-            token_id,
-            card_type: token.type,
-            issuer: token.issuer,
-            network: toLowerCaseSafe(token.network),
-          },
-          base
-        );
-      });
+          if (!token) {
+            return;
+          }
+
+          return _Obj.extend(
+            {
+              token_id,
+              card_type: token.card.type,
+              issuer: token.card.issuer,
+              network: toLowerCaseSafe(token.card.network),
+            },
+            base
+          );
+        }) |> _Arr.filter(Boolean)
+      );
     },
+    isIndividual: instrument =>
+      instrument.token_id && (instrument.network || instrument.issuer),
   },
 
   netbanking: {
@@ -190,20 +217,65 @@ const config = {
   },
 
   paypal: {
-    properties: [],
-    payment: [],
-    groupedToIndividual: grouped => [grouped],
     isIndividual: () => true,
   },
 
-  // TODO: Add more methods
+  cardless_emi: {
+    properties: ['provider', 'providers'],
+    payment: ['provider'],
+    isIndividual: instrument => instrument && instrument.provider,
+    groupedToIndividual: grouped => {
+      const base = _Obj.clone(grouped);
+      delete base.providers;
+
+      return _Arr.map(grouped.providers || [], provider => {
+        return _Obj.extend(
+          {
+            provider,
+          },
+          base
+        );
+      });
+    },
+  },
+
+  paylater: {
+    properties: ['provider', 'providers'],
+    payment: ['provider'],
+    isIndividual: instrument => instrument && instrument.provider,
+    groupedToIndividual: grouped => {
+      const base = _Obj.clone(grouped);
+      delete base.providers;
+
+      return _Arr.map(grouped.providers || [], provider => {
+        return _Obj.extend(
+          {
+            provider,
+          },
+          base
+        );
+      });
+    },
+  },
+
+  bank_transfer: {
+    isIndividual: () => false,
+  },
+
+  // TODO: Pending methods: emi, gpay
 };
 
 _Obj.loop(config, (val, method) => {
-  config[method].getPaymentPayload =
-    config[method].getPaymentPayload || genericPaymentPayloadGetter;
-  config[method].isIndividual =
-    config[method].isIndividual || genericIsIndividual;
+  config[method] = _Obj.extend(
+    {
+      getPaymentPayload: genericPaymentPayloadGetter,
+      isIndividual: genericIsIndividual,
+      groupedToIndividual: genericGroupedToIndividual,
+      properties: [],
+      payment: [],
+    },
+    config[method]
+  );
 });
 
 export default config;

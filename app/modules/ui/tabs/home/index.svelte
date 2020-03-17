@@ -247,10 +247,13 @@
       ? getAllAvailableP13nInstruments($customer)
       : [];
 
-    const blocksThatWereSet = setBlocks({
-      preferred: eligiblePreferredInstruments,
-      // merchantConfig: getRawMerchantConfig(), // TODO: implement this function
-    });
+    const blocksThatWereSet = setBlocks(
+      {
+        preferred: eligiblePreferredInstruments,
+        // merchantConfig: getRawMerchantConfig(), // TODO: implement this function
+      },
+      $customer
+    );
 
     const setPreferredInstruments = blocksThatWereSet.preferred.instruments;
 
