@@ -154,12 +154,17 @@ const config = {
       return singleFlow && singleorMissingApps && singleorMissingTokens;
     },
 
-    getPaymentPayload: (instrument, payment) => {
-      payment = genericPaymentPayloadGetter(instrument, payment);
+    getPaymentPayload: (instrument, payment, customer) => {
+      payment = genericPaymentPayloadGetter(instrument, payment, customer);
 
       // Collect is known as directpay
       if (payment.flow === 'collect') {
         payment.flow = 'directpay';
+
+        // If `token` and `vpa` both exist, keep only `token`
+        if (payment.token && payment.vpa) {
+          delete payment.vpa;
+        }
       }
 
       // QR is intent underneath
