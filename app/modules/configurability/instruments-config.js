@@ -199,6 +199,7 @@ const config = {
 
   cardless_emi: {
     properties: ['provider', 'providers'],
+    payment: ['provider'],
     isIndividual: instrument => instrument && instrument.provider,
     groupedToIndividual: grouped => {
       const base = _Obj.clone(grouped);
@@ -217,6 +218,7 @@ const config = {
 
   paylater: {
     properties: ['provider', 'providers'],
+    payment: ['provider'],
     isIndividual: instrument => instrument && instrument.provider,
     groupedToIndividual: grouped => {
       const base = _Obj.clone(grouped);
