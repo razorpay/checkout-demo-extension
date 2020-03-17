@@ -12,7 +12,7 @@ test('Module: configurability/ungroup', t => {
 
       individualInstrument = {
         method: 'netbanking',
-        banks: ['HDFC'],
+        bank: 'HDFC',
       };
 
       block = {
@@ -66,7 +66,7 @@ test('Module: configurability/ungroup', t => {
 
       individualInstrument = {
         method: 'wallet',
-        wallets: ['freecharge'],
+        wallet: 'freecharge',
       };
 
       block = {

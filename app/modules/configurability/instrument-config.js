@@ -103,8 +103,7 @@ const config = {
         );
       });
     },
-    isIndividual: instrument =>
-      instrument.bank || _Obj.getSafely(instrument, 'banks', []).length === 1,
+    isIndividual: instrument => instrument.bank,
   },
 
   wallet: {
@@ -123,9 +122,7 @@ const config = {
         );
       });
     },
-    isIndividual: instrument =>
-      instrument.wallet ||
-      _Obj.getSafely(instrument, 'wallets', []).length === 1,
+    isIndividual: instrument => instrument.wallet,
   },
 
   upi: {

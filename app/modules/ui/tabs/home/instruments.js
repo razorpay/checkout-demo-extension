@@ -2,15 +2,24 @@ import { createBlock } from 'configurability/blocks';
 import { blocks } from 'checkoutstore/screens/home';
 import Track from 'tracker';
 import { MAX_PREFERRED_INSTRUMENTS } from 'common/constants';
+import { getBlockConfig } from 'configurability';
 
-export function setBlocks({ preferred = [], merchant = [] }) {
+function generateBasePreferredBlock(preferred) {
   const preferredBlock = createBlock('rzp.preferred', {
     name: 'Preferred Payment Methods',
   });
 
   preferredBlock.instruments = preferred;
 
-  // TODO: Filter out instruments from preferredBlock.instruments
+  return preferredBlock;
+}
+
+export function setBlocks({ preferred = [], merchantConfig = {} }) {
+  const preferredBlock = generateBasePreferredBlock(preferred);
+  const parsedConfig = getBlockConfig(merchantConfig);
+
+  // TODO: Filter out instruments from preferredBlock.instruments using `excluded`
+  const excluded = parsedConfig.excluded;
 
   // Take top 3 preferred
   preferredBlock.instruments = preferredBlock.instruments.slice(
@@ -20,7 +29,7 @@ export function setBlocks({ preferred = [], merchant = [] }) {
 
   let allBlocks = [preferredBlock];
 
-  allBlocks = _Arr.mergeWith(allBlocks, merchant);
+  allBlocks = _Arr.mergeWith(allBlocks, parsedConfig.blocks);
 
   // Filter out blocks with no instruments
   allBlocks = _Arr.filter(
@@ -40,7 +49,7 @@ export function setBlocks({ preferred = [], merchant = [] }) {
   blocks.set(allBlocks);
 
   return {
-    merchant,
+    merchant: parsedConfig,
     preferred: preferredBlock,
     all: allBlocks,
   };
