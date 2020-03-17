@@ -379,6 +379,60 @@ test('Module: configurability/ungroup', t => {
       t.end();
     });
 
+    test('method=paylater', t => {
+      let block, expected, found;
+      let individualInstrument, groupedInstrument;
+
+      individualInstrument = {
+        method: 'paylater',
+        provider: 'epaylater',
+      };
+
+      block = {
+        code: 'block.test',
+        instruments: [individualInstrument],
+      };
+
+      expected = {
+        code: 'block.test',
+        instruments: [individualInstrument],
+      };
+
+      found = Ungroup.ungroupInstruments(block);
+
+      t.deepEqual(found, expected, 'Leaves individual instruments untouched');
+
+      groupedInstrument = {
+        method: 'paylater',
+        providers: ['epaylater', 'getsimpl'],
+      };
+
+      block = {
+        code: 'block.test',
+        instruments: [groupedInstrument],
+      };
+
+      expected = {
+        code: 'block.test',
+        instruments: [
+          {
+            method: 'paylater',
+            provider: 'epaylater',
+          },
+          {
+            method: 'paylater',
+            provider: 'getsimpl',
+          },
+        ],
+      };
+
+      found = Ungroup.ungroupInstruments(block);
+
+      t.deepEqual(found, expected, 'Ungroupes a grouped instrument');
+
+      t.end();
+    });
+
     test('method=paypal', t => {
       let block, expected, found;
       let instrument;
