@@ -156,6 +156,13 @@ const config = {
     properties: ['flow', 'flows', 'app', 'apps', 'token_id', 'token_ids'],
     payment: ['flow', 'app', 'token', 'vpa'],
     groupedToIndividual: (grouped, customer) => {
+      /**
+       * For UPI apps, ungrouping works in the following way:
+       * - If token_id or token_ids are present, use tokens and force flow=collect
+       * - If app or apps are present, use apps and force flow=intent
+       * - Ungroup flows and discard apps
+       */
+
       let flows = [];
       let apps = [];
       let token_ids = [];
