@@ -28,12 +28,18 @@ import { getUPIIntentApps } from 'checkoutframe';
 
 const ALL_METHODS = {
   card() {
-    return getAmount() && getOption('method.card') && getMerchantMethods().card;
+    if (getAmount() && getOption('method.card')) {
+      if (isRecurring()) {
+        return getRecurringMethods()?.card;
+      }
+      return getMerchantMethods().card;
+    }
   },
 
   netbanking() {
     return (
       getAmount() &&
+        !isRecurring() &&
         !isInternational() &&
         getOption('method.netbanking') !== false &&
         getNetbankingBanks()
@@ -91,7 +97,7 @@ const ALL_METHODS = {
   },
 
   cardless_emi() {
-    if (!getAmount() || isInternational()) {
+    if (!getAmount() || isInternational() || isRecurring()) {
       return false;
     }
     const providers = getCardlessEMIProviders();
@@ -109,6 +115,7 @@ const ALL_METHODS = {
      */
     return (
       getAmount() &&
+      !isRecurring() &&
       !isInternational() &&
       !_Obj.isEmpty(getMerchantMethods().paylater)
     );
@@ -116,6 +123,7 @@ const ALL_METHODS = {
 
   bank_transfer() {
     return (
+      !isRecurring() &&
       getAmount() &&
       getMerchantMethods().bank_transfer &&
       !isInternational() &&
@@ -125,7 +133,9 @@ const ALL_METHODS = {
   },
 
   paypal() {
-    return isInternational() && getMerchantMethods().wallet?.paypal;
+    return (
+      !isRecurring() && isInternational() && getMerchantMethods().wallet?.paypal
+    );
   },
 
   gpay() {
