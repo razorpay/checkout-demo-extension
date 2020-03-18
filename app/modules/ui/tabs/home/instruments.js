@@ -76,6 +76,15 @@ function instrumentPresentInGroup(instrument, group) {
 
       return flowMatches && appMatches;
     }
+
+    case 'cardless_emi':
+    case 'paylater': {
+      const hasProvider = Boolean(group.provider);
+      const providerMatches = hasProvider
+        ? group.provider === instrument.provider
+        : true;
+      return providerMatches;
+    }
   }
 
   return true;
