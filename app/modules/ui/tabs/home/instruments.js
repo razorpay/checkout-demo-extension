@@ -15,6 +15,12 @@ function generateBasePreferredBlock(preferred) {
   return preferredBlock;
 }
 
+/**
+ * Tells whether a given instrument is a part of an instrument group.
+ * @param {Object} instrument
+ * @param {Object} group
+ * @returns {boolean}
+ */
 function instrumentPresentInGroup(instrument, group) {
   if (instrument.method !== group.method) {
     return false;
@@ -39,6 +45,11 @@ function instrumentPresentInGroup(instrument, group) {
       return walletMatches;
     }
 
+    /**
+     * Card and EMI instruments will not be ungrouped by getBlockConfig as a
+     * special case (to avoid large no. of permutations when iins are used).
+     * Hence we are checking for presence in arrays.
+     */
     case 'card':
     case 'emi': {
       const hasIssuers = Boolean(group.issuers);
@@ -94,13 +105,21 @@ export function setBlocks({ preferred = [], merchantConfig = {} }, customer) {
   const preferredBlock = generateBasePreferredBlock(preferred);
   const parsedConfig = getBlockConfig(merchantConfig, customer);
 
-  const shownInstruments =
+  // Remove rzp block instruments and method instruments
+  const shownIndividualInstruments =
     parsedConfig.blocks
     |> _Arr.filter(block => block.name !== 'rzp.cluster')
     |> _Arr.flatMap(block => block.instruments)
     |> _Arr.filter(instrument => !isInstrumentForEntireMethod(instrument));
 
-  const excluded = _Arr.mergeWith(parsedConfig.excluded, shownInstruments);
+  /**
+   * All individual instruments that are already being shown by the merchant
+   * need to be removed from preferred instruments.
+   */
+  const excluded = _Arr.mergeWith(
+    parsedConfig.excluded,
+    shownIndividualInstruments
+  );
 
   const preferredInstruments = preferredBlock.instruments;
   const filteredPreferredInstruments = _Arr.filter(
