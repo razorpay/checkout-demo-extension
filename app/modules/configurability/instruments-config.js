@@ -155,8 +155,89 @@ const config = {
   upi: {
     properties: ['flow', 'flows', 'app', 'apps', 'token_id', 'token_ids'],
     payment: ['flow', 'app', 'token', 'vpa'],
-    groupedToIndividual: grouped => {
-      // TODO
+    groupedToIndividual: (grouped, customer) => {
+      /**
+       * For UPI apps, ungrouping works in the following way:
+       * - If token_id or token_ids are present, use tokens and force flow=collect
+       * - If app or apps are present, use apps and force flow=intent
+       * - Ungroup flows and discard apps
+       */
+
+      let flows = [];
+      let apps = [];
+      let token_ids = [];
+
+      const tokens = _Obj.getSafely(customer, 'tokens.items', []);
+      const base = _Obj.clone(grouped);
+
+      // Remove all extra properties
+      _Arr.loop(
+        ['flow', 'flows', 'app', 'apps', 'token_id', 'token_ids'],
+        key => {
+          delete base[key];
+        }
+      );
+
+      if (grouped.token_ids) {
+        token_ids = grouped.token_ids;
+      } else if (grouped.token_id) {
+        token_ids = [grouped.token_id];
+      }
+
+      if (token_ids.length > 0) {
+        return (
+          _Arr.map(token_ids, token_id => {
+            const token = _Arr.find(tokens, token => token.id === token_id);
+
+            if (!token) {
+              return;
+            }
+
+            return _Obj.extend(
+              {
+                token_id,
+                flow: 'collect',
+              },
+              base
+            );
+          }) |> _Arr.filter(Boolean)
+        );
+      }
+
+      if (grouped.apps) {
+        apps = grouped.apps;
+      } else if (grouped.app) {
+        apps = [grouped.app];
+      }
+
+      if (apps.length > 0) {
+        return _Arr.map(apps, app =>
+          _Obj.extend(
+            {
+              app,
+              flow: 'intent',
+            },
+            base
+          )
+        );
+      }
+
+      if (grouped.flows) {
+        flows = grouped.flows;
+      } else if (grouped.flow) {
+        flows = [grouped.flow];
+      }
+
+      if (flows.length > 0) {
+        return _Arr.map(flows, flow =>
+          _Obj.extend(
+            {
+              flow,
+            },
+            base
+          )
+        );
+      }
 
       return [grouped];
     },
