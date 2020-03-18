@@ -7,10 +7,10 @@ import InstrumentsConfig from './instruments-config';
  * @returns {Instrument}
  */
 function addTypeAndCategory(instrument) {
-  instrument.type = 'instrument';
+  instrument._type = 'instrument';
 
   if (isInstrumentForEntireMethod(instrument)) {
-    instrument.type = 'method';
+    instrument._type = 'method';
   }
 
   return instrument;

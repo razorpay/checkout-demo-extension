@@ -31,7 +31,7 @@ test('Module: configurability/instruments', t => {
       expected = {
         types: ['credit'],
         method: 'card',
-        type: 'instrument',
+        _type: 'instrument',
       };
 
       found = Instruments.createInstrument(config);
@@ -54,7 +54,7 @@ test('Module: configurability/instruments', t => {
 
       expected = {
         method: 'netbanking',
-        type: 'method',
+        _type: 'method',
       };
 
       found = Instruments.createInstrument(config);
