@@ -67,11 +67,9 @@ export function getBlockConfig(options, customer) {
   );
 
   // Ungroup excluded instrument as well
-  // TODO: use _Arr.flatMap
   translated.exclude.instruments =
     translated.exclude.instruments
-    |> _Arr.map(group => getIndividualInstruments(group, customer))
-    |> _Arr.reduce(_Arr.mergeWith, []);
+    |> _Arr.flatMap(group => getIndividualInstruments(group, customer));
 
   // Reorder blocks
   const sequentialied = getSequencedBlocks({

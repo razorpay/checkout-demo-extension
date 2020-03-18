@@ -85,12 +85,10 @@ export function setBlocks({ preferred = [], merchantConfig = {} }, customer) {
   const preferredBlock = generateBasePreferredBlock(preferred);
   const parsedConfig = getBlockConfig(merchantConfig, customer);
 
-  // TODO: use _Arr.flatMap
   const shownInstruments =
     parsedConfig.blocks
     |> _Arr.filter(block => block.name !== 'rzp.cluster')
-    |> _Arr.map(block => block.instruments)
-    |> _Arr.reduce(_Arr.mergeWith, [])
+    |> _Arr.flatMap(block => block.instruments)
     |> _Arr.filter(instrument => !isInstrumentForEntireMethod(instrument));
 
   const excluded = _Arr.mergeWith(parsedConfig.excluded, shownInstruments);
