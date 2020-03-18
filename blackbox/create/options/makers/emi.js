@@ -69,6 +69,13 @@ function makePreferences(features, preferences) {
         emi_subvention: true,
       },
       {
+        id: 'offer_DWceNzkjugg37y',
+        name: 'No Cost EMI - Yes Bank',
+        payment_method: 'emi',
+        issuer: 'YESB',
+        emi_subvention: true,
+      },
+      {
         id: 'offer_DWcgB9L2MBVGwZ',
         name: 'No Cost EMI - SBI Bank',
         payment_method: 'emi',
