@@ -8,14 +8,14 @@ import { createBlock } from './blocks';
  *
  * @returns {Object} translated
  *  @prop {Array<Block>} blocks
- *  @prop {Object} exclude
- *    @prop {Array<Instruments>} instruments Excluded insturments
- *    @prop {Array<string>} methods Excluded methods
+ *  @prop {Object} hide
+ *    @prop {Array<Instruments>} instruments Hidden insturments
+ *    @prop {Array<string>} methods Hidden methods
  */
 function _translate(options, external) {
   options = _Obj.clone(options);
 
-  const { blocks = {}, exclude = [] } = options;
+  const { blocks = {}, hide = [] } = options;
 
   /**
    * Create blocks
@@ -35,29 +35,29 @@ function _translate(options, external) {
   });
 
   /**
-   * Create excluded instruments
+   * Create hidden instruments
    */
-  const allExcludedInstruments =
-    exclude |> _Arr.map(createInstrument) |> _Arr.filter(Boolean);
+  const allHiddenInstruments =
+    hide |> _Arr.map(createInstrument) |> _Arr.filter(Boolean);
 
-  const excludedInstruments = _Arr.filter(
-    allExcludedInstruments,
+  const hiddenInstruments = _Arr.filter(
+    allHiddenInstruments,
     instrument => !isInstrumentForEntireMethod(instrument)
   );
 
   /**
    * Create disabled methods
    */
-  const excludedMethods =
-    allExcludedInstruments
+  const hiddenMethods =
+    allHiddenInstruments
     |> _Arr.filter(isInstrumentForEntireMethod)
     |> _Arr.map(instrument => instrument.method);
 
   return {
     blocks: includedBlocks,
-    exclude: {
-      instruments: excludedInstruments,
-      methods: excludedMethods,
+    hide: {
+      instruments: hiddenInstruments,
+      methods: hiddenMethods,
     },
   };
 }

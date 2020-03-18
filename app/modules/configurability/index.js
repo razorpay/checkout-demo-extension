@@ -78,6 +78,6 @@ export function getBlockConfig(options, customer) {
 
   return {
     blocks: clustered,
-    excluded: translated.exclude.instruments,
+    hidden: translated.hide.instruments,
   };
 }

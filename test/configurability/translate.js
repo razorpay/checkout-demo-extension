@@ -36,7 +36,7 @@ test('Module: configurability/translate', t => {
             ],
           },
         },
-        exclude: [
+        hide: [
           {
             method: 'wallet',
             wallets: ['olamoney'],
@@ -101,7 +101,7 @@ test('Module: configurability/translate', t => {
             title: 'Pay via HDFC Bank',
           },
         ],
-        exclude: {
+        hide: {
           instruments: [
             {
               method: 'wallet',

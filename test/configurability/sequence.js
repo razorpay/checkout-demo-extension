@@ -43,7 +43,7 @@ test('Module: configurability/sequence', t => {
               title: 'Pay via HDFC Bank',
             },
           ],
-          exclude: {
+          hide: {
             instruments: [
               {
                 method: 'wallet',
@@ -102,7 +102,7 @@ test('Module: configurability/sequence', t => {
               ],
             },
           },
-          exclude: [
+          hide: [
             {
               method: 'wallet',
               wallets: ['olamoney'],
@@ -294,7 +294,7 @@ test('Module: configurability/sequence', t => {
               title: 'Pay via HDFC Bank',
             },
           ],
-          exclude: {
+          hide: {
             instruments: [
               {
                 method: 'wallet',
@@ -353,7 +353,7 @@ test('Module: configurability/sequence', t => {
               ],
             },
           },
-          exclude: [
+          hide: [
             {
               method: 'wallet',
               wallets: ['olamoney'],

@@ -36,7 +36,7 @@ test('Module: configurability', t => {
             ],
           },
         },
-        exclude: [
+        hide: [
           {
             method: 'wallet',
             wallets: ['olamoney'],
