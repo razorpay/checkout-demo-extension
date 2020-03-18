@@ -62,13 +62,6 @@ function makePreferences(features, preferences) {
         emi_subvention: true,
       },
       {
-        id: 'offer_DWceNzkjugg37y',
-        name: 'No Cost EMI - Yes Bank',
-        payment_method: 'emi',
-        issuer: 'YESB',
-        emi_subvention: true,
-      },
-      {
         id: 'offer_DWcfDUXq0X08U6',
         name: 'No Cost EMI - Kotak ',
         payment_method: 'emi',
@@ -87,6 +80,13 @@ function makePreferences(features, preferences) {
         name: 'No Cost EMI - AMEX',
         payment_method: 'emi',
         payment_network: 'AMEX',
+        emi_subvention: true,
+      },
+      {
+        id: 'offer_DWceNzkjugg37y',
+        name: 'No Cost EMI - Yes Bank',
+        payment_method: 'emi',
+        issuer: 'YESB',
         emi_subvention: true,
       },
     ];
