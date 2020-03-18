@@ -26,7 +26,7 @@
     const banks = getBanks();
     const bank = banks[card.issuer] || '';
     const bankText = bank.replace(/ Bank$/, '');
-    const cardType = card.type || card.card_type || '';
+    const cardType = card.type || '';
 
     if (loggedIn) {
       return `${bank ? `${bankText} ` : ''}${_Str.toTitleCase(

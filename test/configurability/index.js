@@ -48,12 +48,12 @@ test('Module: configurability', t => {
           },
           {
             method: 'card',
-            card_types: ['credit'],
+            types: ['credit'],
           },
           {
             method: 'card',
             issuers: ['ICIC'],
-            card_types: ['debit'],
+            types: ['debit'],
           },
         ],
         settings: {

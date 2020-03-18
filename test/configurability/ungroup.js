@@ -93,7 +93,7 @@ test('Module: configurability/ungroup', t => {
           {
             method: 'card',
             token_id: 'token_12345',
-            card_type: 'credit',
+            type: 'credit',
             issuer: 'HDFC',
             network: 'visa',
           },
@@ -120,14 +120,14 @@ test('Module: configurability/ungroup', t => {
           {
             method: 'card',
             token_id: 'token_12345',
-            card_type: 'credit',
+            type: 'credit',
             issuer: 'HDFC',
             network: 'visa',
           },
           {
             method: 'card',
             token_id: 'token_54321',
-            card_type: 'debit',
+            type: 'debit',
             issuer: 'ICIC',
             network: 'mastercard',
           },
@@ -183,14 +183,14 @@ test('Module: configurability/ungroup', t => {
           {
             method: 'card',
             token_id: 'token_12345',
-            card_type: 'credit',
+            type: 'credit',
             issuer: 'HDFC',
             network: 'visa',
           },
           {
             method: 'card',
             token_id: 'token_54321',
-            card_type: 'debit',
+            type: 'debit',
             issuer: 'ICIC',
             network: 'mastercard',
           },

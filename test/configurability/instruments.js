@@ -6,7 +6,7 @@ test('Module: configurability/instruments', t => {
       let config, expected, found;
 
       config = {
-        card_types: ['credit'],
+        types: ['credit'],
       };
 
       found = Instruments.createInstrument(config);
@@ -24,12 +24,12 @@ test('Module: configurability/instruments', t => {
       let config, expected, found;
 
       config = {
-        card_types: ['credit'],
+        types: ['credit'],
         method: 'card',
       };
 
       expected = {
-        card_types: ['credit'],
+        types: ['credit'],
         method: 'card',
         type: 'instrument',
       };
@@ -76,7 +76,7 @@ test('Module: configurability/instruments', t => {
       let instrument, found;
 
       instrument = {
-        card_types: ['credit'],
+        types: ['credit'],
         method: 'card',
       };
 

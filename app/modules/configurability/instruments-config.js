@@ -59,8 +59,8 @@ function genericGroupedToIndividual(grouped, customer) {
 const config = {
   card: {
     properties: [
-      'card_type',
-      'card_types',
+      'type',
+      'types',
       'iin',
       'iins',
       'issuer',
@@ -101,7 +101,7 @@ const config = {
           return _Obj.extend(
             {
               token_id,
-              card_type: token.card.type,
+              type: token.card.type,
               issuer: token.card.issuer,
               network: toLowerCaseSafe(token.card.network),
             },

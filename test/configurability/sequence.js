@@ -58,13 +58,13 @@ test('Module: configurability/sequence', t => {
               },
               {
                 method: 'card',
-                card_types: ['credit'],
+                types: ['credit'],
                 type: 'instrument',
               },
               {
                 method: 'card',
                 issuers: ['ICIC'],
-                card_types: ['debit'],
+                types: ['debit'],
                 type: 'instrument',
               },
             ],
@@ -114,12 +114,12 @@ test('Module: configurability/sequence', t => {
             },
             {
               method: 'card',
-              card_types: ['credit'],
+              types: ['credit'],
             },
             {
               method: 'card',
               issuers: ['ICIC'],
-              card_types: ['debit'],
+              types: ['debit'],
             },
           ],
           settings: {
@@ -309,13 +309,13 @@ test('Module: configurability/sequence', t => {
               },
               {
                 method: 'card',
-                card_types: ['credit'],
+                types: ['credit'],
                 type: 'instrument',
               },
               {
                 method: 'card',
                 issuers: ['ICIC'],
-                card_types: ['debit'],
+                types: ['debit'],
                 type: 'instrument',
               },
             ],
@@ -365,12 +365,12 @@ test('Module: configurability/sequence', t => {
             },
             {
               method: 'card',
-              card_types: ['credit'],
+              types: ['credit'],
             },
             {
               method: 'card',
               issuers: ['ICIC'],
-              card_types: ['debit'],
+              types: ['debit'],
             },
           ],
           settings: {
