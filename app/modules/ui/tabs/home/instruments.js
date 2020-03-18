@@ -3,6 +3,7 @@ import { blocks } from 'checkoutstore/screens/home';
 import Track from 'tracker';
 import { MAX_PREFERRED_INSTRUMENTS } from 'common/constants';
 import { getBlockConfig } from 'configurability';
+import { isInstrumentForEntireMethod } from 'configurability/instruments';
 
 function generateBasePreferredBlock(preferred) {
   const preferredBlock = createBlock('rzp.preferred', {
@@ -87,8 +88,10 @@ export function setBlocks({ preferred = [], merchantConfig = {} }, customer) {
   // TODO: use _Arr.flatMap
   const shownInstruments =
     parsedConfig.blocks
+    |> _Arr.filter(block => block.name !== 'rzp.cluster')
     |> _Arr.map(block => block.instruments)
-    |> _Arr.reduce(_Arr.mergeWith, []);
+    |> _Arr.reduce(_Arr.mergeWith, [])
+    |> _Arr.filter(instrument => !isInstrumentForEntireMethod(instrument));
 
   const excluded = _Arr.mergeWith(parsedConfig.excluded, shownInstruments);
 
