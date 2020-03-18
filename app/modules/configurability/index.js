@@ -67,8 +67,8 @@ export function getBlockConfig(options, customer) {
   );
 
   // Ungroup excluded instrument as well
-  translated.exclude.instruments =
-    translated.exclude.instruments
+  translated.hide.instruments =
+    translated.hide.instruments
     |> _Arr.flatMap(group => getIndividualInstruments(group, customer));
 
   // Reorder blocks

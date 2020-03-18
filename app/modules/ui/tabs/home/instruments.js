@@ -116,8 +116,8 @@ export function setBlocks({ preferred = [], merchantConfig = {} }, customer) {
    * All individual instruments that are already being shown by the merchant
    * need to be removed from preferred instruments.
    */
-  const excluded = _Arr.mergeWith(
-    parsedConfig.excluded,
+  const hidden = _Arr.mergeWith(
+    parsedConfig.hidden,
     shownIndividualInstruments
   );
 
@@ -126,8 +126,8 @@ export function setBlocks({ preferred = [], merchantConfig = {} }, customer) {
     preferredInstruments,
     instrument =>
       _Arr.every(
-        excluded,
-        excludedGroup => !instrumentPresentInGroup(instrument, excludedGroup)
+        hidden,
+        hiddenGroup => !instrumentPresentInGroup(instrument, hiddenGroup)
       )
   );
 
