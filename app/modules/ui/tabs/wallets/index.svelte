@@ -28,12 +28,16 @@
   const session = getSession();
   const wallet = getWallets();
 
-  let selectedWallet = null;
+  export let selectedWallet = null;
 
   const imageReferences = {};
 
   // Called when the user presses the pay button
-  export function getPayload() {}
+  export function getPayload() {
+    return {
+      wallet: selectedWallet,
+    };
+  }
 
   /**
    * @description get an applicable offer (if any)
@@ -54,7 +58,11 @@
 
 <div class="list collapsable">
   {#each wallet as w, i}
-    <div class="wallet item radio-item">
+    <div
+      class="wallet item radio-item"
+      on:click={() => {
+        selectedWallet = w.code;
+      }}>
       <input
         type="radio"
         name="wallet"

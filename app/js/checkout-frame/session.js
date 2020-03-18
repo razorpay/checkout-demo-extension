@@ -3945,7 +3945,9 @@ Session.prototype = {
       data.method = tab;
       var activeForm = this.getActiveForm();
 
-      if (activeForm !== '#form-upi' && activeForm !== '#form-card') {
+      if (
+        !_Arr.contains(['#form-upi', '#form-card', '#form-wallet'], activeForm)
+      ) {
         fillData(activeForm, data);
       }
 
@@ -3977,6 +3979,17 @@ Session.prototype = {
         each(upiData, function(key, value) {
           data[key] = value;
         });
+      }
+
+      if (this.screen === 'wallet') {
+        /* Wallet tab being responsible for its subdata */
+        if (this.svelteWalletsTab.selectedWallet) {
+          var walletData = this.svelteWalletsTab.getPayload();
+
+          each(walletData, function(key, value) {
+            data[key] = value;
+          });
+        }
       }
     }
 
