@@ -36,7 +36,7 @@ test('Module: configurability/translate', t => {
             ],
           },
         },
-        exclude: [
+        hide: [
           {
             method: 'wallet',
             wallets: ['olamoney'],
@@ -48,12 +48,12 @@ test('Module: configurability/translate', t => {
           },
           {
             method: 'card',
-            card_types: ['credit'],
+            types: ['credit'],
           },
           {
             method: 'card',
             issuers: ['ICIC'],
-            card_types: ['debit'],
+            types: ['debit'],
           },
         ],
         settings: {
@@ -68,62 +68,62 @@ test('Module: configurability/translate', t => {
         blocks: [
           {
             code: 'block.gpay',
-            type: 'block',
+            _type: 'block',
             instruments: [
               {
                 method: 'upi',
                 apps: ['gpay'],
-                type: 'instrument',
+                _type: 'instrument',
               },
             ],
             title: 'Pay via Google Pay',
           },
           {
             code: 'block.hdfc',
-            type: 'block',
+            _type: 'block',
             instruments: [
               {
                 method: 'card',
                 issuers: ['HDFC'],
-                type: 'instrument',
+                _type: 'instrument',
               },
               {
                 method: 'netbanking',
                 banks: ['HDFC'],
-                type: 'instrument',
+                _type: 'instrument',
               },
               {
                 method: 'wallet',
                 wallets: ['payzapp'],
-                type: 'instrument',
+                _type: 'instrument',
               },
             ],
             title: 'Pay via HDFC Bank',
           },
         ],
-        exclude: {
+        hide: {
           instruments: [
             {
               method: 'wallet',
               wallets: ['olamoney'],
-              type: 'instrument',
+              _type: 'instrument',
             },
             {
               method: 'card',
               issuers: ['SBIN'],
               networks: ['mastercard'],
-              type: 'instrument',
+              _type: 'instrument',
             },
             {
               method: 'card',
-              card_types: ['credit'],
-              type: 'instrument',
+              types: ['credit'],
+              _type: 'instrument',
             },
             {
               method: 'card',
               issuers: ['ICIC'],
-              card_types: ['debit'],
-              type: 'instrument',
+              types: ['debit'],
+              _type: 'instrument',
             },
           ],
           methods: [],

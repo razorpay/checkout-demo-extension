@@ -6,7 +6,7 @@ test('Module: configurability/instruments', t => {
       let config, expected, found;
 
       config = {
-        card_types: ['credit'],
+        types: ['credit'],
       };
 
       found = Instruments.createInstrument(config);
@@ -24,14 +24,14 @@ test('Module: configurability/instruments', t => {
       let config, expected, found;
 
       config = {
-        card_types: ['credit'],
+        types: ['credit'],
         method: 'card',
       };
 
       expected = {
-        card_types: ['credit'],
+        types: ['credit'],
         method: 'card',
-        type: 'instrument',
+        _type: 'instrument',
       };
 
       found = Instruments.createInstrument(config);
@@ -54,7 +54,7 @@ test('Module: configurability/instruments', t => {
 
       expected = {
         method: 'netbanking',
-        type: 'method',
+        _type: 'method',
       };
 
       found = Instruments.createInstrument(config);
@@ -76,7 +76,7 @@ test('Module: configurability/instruments', t => {
       let instrument, found;
 
       instrument = {
-        card_types: ['credit'],
+        types: ['credit'],
         method: 'card',
       };
 
