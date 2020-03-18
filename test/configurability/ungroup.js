@@ -1,9 +1,5 @@
 import * as Ungroup from 'configurability/ungroup';
 
-/**
- * TODO: Tests for card, upi.
- */
-
 test('Module: configurability/ungroup', t => {
   test('Ungroup.ungroupInstruments', t => {
     test('method=card', t => {
@@ -267,6 +263,259 @@ test('Module: configurability/ungroup', t => {
       found = Ungroup.ungroupInstruments(block);
 
       t.deepEqual(found, expected, 'Ungroupes a grouped instrument');
+
+      t.end();
+    });
+
+    test('method=upi', t => {
+      let block, expected, found;
+      let individualInstrument, groupedInstrument;
+
+      const customer = {
+        tokens: {
+          items: [
+            {
+              id: 'token_12345',
+              entity: 'token',
+              token: 'abcde',
+              bank: null,
+              wallet: null,
+              method: 'upi',
+              vpa: {
+                username: 'test',
+                handle: 'unit',
+                name: null,
+              },
+              recurring: false,
+              recurring_details: {
+                status: 'not_applicable',
+                failure_reason: null,
+              },
+              auth_type: null,
+              mrn: null,
+              used_at: 1582093612,
+              created_at: 1580912391,
+              start_time: null,
+            },
+            {
+              id: 'token_54321',
+              entity: 'token',
+              token: 'pqrst',
+              bank: null,
+              wallet: null,
+              method: 'upi',
+              vpa: {
+                username: 'anothertest',
+                handle: 'unit',
+                name: null,
+              },
+              recurring: false,
+              recurring_details: {
+                status: 'not_applicable',
+                failure_reason: null,
+              },
+              auth_type: null,
+              mrn: null,
+              used_at: 1582093612,
+              created_at: 1580912391,
+              start_time: null,
+            },
+          ],
+        },
+      };
+
+      individualInstrument = {
+        method: 'upi',
+        flow: 'qr',
+      };
+
+      block = {
+        code: 'block.test',
+        instruments: [individualInstrument],
+      };
+
+      expected = {
+        code: 'block.test',
+        instruments: [individualInstrument],
+      };
+
+      found = Ungroup.ungroupInstruments(block);
+
+      t.deepEqual(found, expected, 'Works for individual instrument: flow');
+
+      individualInstrument = {
+        method: 'upi',
+        app: 'com.google.android.apps.nbu.paisa.user',
+      };
+
+      block = {
+        code: 'block.test',
+        instruments: [individualInstrument],
+      };
+
+      expected = {
+        code: 'block.test',
+        instruments: [
+          {
+            method: 'upi',
+            app: 'com.google.android.apps.nbu.paisa.user',
+            flow: 'intent',
+          },
+        ],
+      };
+
+      found = Ungroup.ungroupInstruments(block);
+
+      t.deepEqual(found, expected, 'Works for individual instrument: app');
+
+      individualInstrument = {
+        method: 'upi',
+        token_id: 'token_12345',
+      };
+
+      block = {
+        code: 'block.test',
+        instruments: [individualInstrument],
+      };
+
+      expected = {
+        code: 'block.test',
+        instruments: [
+          {
+            method: 'upi',
+            token_id: 'token_12345',
+            flow: 'collect',
+          },
+        ],
+      };
+
+      found = Ungroup.ungroupInstruments(block, customer);
+
+      t.deepEqual(found, expected, 'Works for individual instrument: token_id');
+
+      groupedInstrument = {
+        method: 'upi',
+        flows: ['qr', 'collect'],
+      };
+
+      block = {
+        code: 'block.test',
+        instruments: [groupedInstrument],
+      };
+
+      expected = {
+        code: 'block.test',
+        instruments: [
+          {
+            method: 'upi',
+            flow: 'qr',
+          },
+          {
+            method: 'upi',
+            flow: 'collect',
+          },
+        ],
+      };
+
+      found = Ungroup.ungroupInstruments(block);
+
+      t.deepEqual(found, expected, 'Works for groupe instrument: flows');
+
+      groupedInstrument = {
+        method: 'upi',
+        apps: ['com.google.android.apps.nbu.paisa.user', 'com.phonepe.app'],
+      };
+
+      block = {
+        code: 'block.test',
+        instruments: [groupedInstrument],
+      };
+
+      expected = {
+        code: 'block.test',
+        instruments: [
+          {
+            method: 'upi',
+            app: 'com.google.android.apps.nbu.paisa.user',
+            flow: 'intent',
+          },
+          {
+            method: 'upi',
+            app: 'com.phonepe.app',
+            flow: 'intent',
+          },
+        ],
+      };
+
+      found = Ungroup.ungroupInstruments(block);
+
+      t.deepEqual(found, expected, 'Works for grouped instrument: apps');
+
+      groupedInstrument = {
+        method: 'upi',
+        token_ids: ['token_12345', 'token_54321'],
+      };
+
+      block = {
+        code: 'block.test',
+        instruments: [groupedInstrument],
+      };
+
+      expected = {
+        code: 'block.test',
+        instruments: [
+          {
+            method: 'upi',
+            token_id: 'token_12345',
+            flow: 'collect',
+          },
+
+          {
+            method: 'upi',
+            token_id: 'token_54321',
+            flow: 'collect',
+          },
+        ],
+      };
+
+      found = Ungroup.ungroupInstruments(block, customer);
+
+      t.deepEqual(found, expected, 'Works for grouped instrument: token_ids');
+
+      groupedInstrument = {
+        method: 'upi',
+        apps: ['com.google.android.apps.nbu.paisa.user', 'com.phonepe.app'],
+        flows: ['qr', 'collect'],
+      };
+
+      block = {
+        code: 'block.test',
+        instruments: [groupedInstrument],
+      };
+
+      expected = {
+        code: 'block.test',
+        instruments: [
+          {
+            method: 'upi',
+            app: 'com.google.android.apps.nbu.paisa.user',
+            flow: 'intent',
+          },
+          {
+            method: 'upi',
+            app: 'com.phonepe.app',
+            flow: 'intent',
+          },
+        ],
+      };
+
+      found = Ungroup.ungroupInstruments(block);
+
+      t.deepEqual(
+        found,
+        expected,
+        'Works for grouped instrument with multiple keys: apps, flows'
+      );
 
       t.end();
     });
