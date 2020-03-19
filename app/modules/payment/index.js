@@ -70,7 +70,7 @@ function onPaymentCancel(metaParam) {
               data: response,
               r: razorpay,
             });
-          } else {
+          } else if (!response.error) {
             response = cancelError;
           }
           this.complete(response);
