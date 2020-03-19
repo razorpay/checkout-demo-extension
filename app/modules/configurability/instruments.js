@@ -82,3 +82,18 @@ export function addInstrumentToPaymentData(instrument, payment, customer) {
 
   return config.getPaymentPayload(instrument, payment, customer);
 }
+
+/**
+ * Tells whether or not the instrument is a card instrument
+ * to be used from inside the card tab
+ * @param {Instrument} instrument
+ *
+ * @returns {boolean}
+ */
+export function isDetailedCardInstrument(instrument) {
+  const isMethodInstrument = isInstrumentForEntireMethod(instrument);
+  const isMethodCardOrEmi = _Arr.contains(['card', 'emi'], instrument.method);
+  const isSavedCardInstrument = instrument.token_id;
+
+  return isMethodCardOrEmi && !isMethodInstrument && !isSavedCardInstrument;
+}
