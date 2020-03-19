@@ -7,7 +7,7 @@ import InstrumentsConfig from './instruments-config';
  *
  * @returns {Array<Instrument>}
  */
-function getIndividualInstruments(instrument, customer) {
+export function getIndividualInstruments(instrument, customer) {
   const method = instrument.method;
   const config = InstrumentsConfig[method];
 

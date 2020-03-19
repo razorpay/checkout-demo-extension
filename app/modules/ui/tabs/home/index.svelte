@@ -113,6 +113,10 @@
     !isPartialPayment &&
     !session.get('address');
 
+  function getRawMerchantConfig() {
+    return session.get('config.display');
+  }
+
   export function showMethods() {
     view = 'methods';
 
@@ -250,7 +254,7 @@
     const blocksThatWereSet = setBlocks(
       {
         preferred: eligiblePreferredInstruments,
-        // merchantConfig: getRawMerchantConfig(), // TODO: implement this function
+        merchantConfig: getRawMerchantConfig(),
       },
       $customer
     );

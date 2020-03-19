@@ -346,6 +346,9 @@ const config = {
   // TODO: Pending methods: emi, gpay
 };
 
+// EMI and Cards are the same for now.
+config.emi = config.card;
+
 _Obj.loop(config, (val, method) => {
   config[method] = _Obj.extend(
     {
