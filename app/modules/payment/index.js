@@ -51,7 +51,12 @@ function clearPollingInterval(force) {
 
 function onPaymentCancel(metaParam) {
   if (!this.done) {
-    var cancelError = _.rzpError(strings.cancelMsg);
+    var cancelError = {
+      error: {
+        code: 'BAD_REQUEST_ERROR',
+        description: 'Payment processing cancelled by user',
+      },
+    };
     var payment_id = this.payment_id;
     var razorpay = this.r;
     var eventData = {};
@@ -70,7 +75,7 @@ function onPaymentCancel(metaParam) {
               data: response,
               r: razorpay,
             });
-          } else {
+          } else if (!response.error) {
             response = cancelError;
           }
           this.complete(response);
