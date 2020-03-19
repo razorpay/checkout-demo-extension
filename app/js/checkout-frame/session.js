@@ -4702,7 +4702,7 @@ Session.prototype = {
         Analytics.setMeta('doneByInstrument', true);
 
         if (_Obj.getSafely(selectedInstrument, 'meta.preferred')) {
-          Analytics.setMeta('doneByP13n');
+          Analytics.setMeta('doneByP13n', true);
         }
 
         switch (selectedInstrument.method) {
