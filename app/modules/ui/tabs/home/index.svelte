@@ -113,6 +113,10 @@
     !isPartialPayment &&
     !session.get('address');
 
+  function getRawMerchantConfig() {
+    return session.get('config.display');
+  }
+
   export function showMethods() {
     view = 'methods';
 
@@ -247,10 +251,13 @@
       ? getAllAvailableP13nInstruments($customer)
       : [];
 
-    const blocksThatWereSet = setBlocks({
-      preferred: eligiblePreferredInstruments,
-      // merchantConfig: getRawMerchantConfig(), // TODO: implement this function
-    });
+    const blocksThatWereSet = setBlocks(
+      {
+        preferred: eligiblePreferredInstruments,
+        merchantConfig: getRawMerchantConfig(),
+      },
+      $customer
+    );
 
     const setPreferredInstruments = blocksThatWereSet.preferred.instruments;
 

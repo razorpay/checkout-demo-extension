@@ -1,6 +1,7 @@
 import { translateExternal } from './translate';
 import { getSequencedBlocks } from './sequence';
 import { clusterRazorpayBlocks } from './methods';
+import { ungroupInstruments, getIndividualInstruments } from './ungroup';
 
 import { AVAILABLE_METHODS } from 'common/constants';
 import { isMethodEnabled } from 'checkoutstore/methods';
@@ -46,12 +47,29 @@ function getAvailableDefaultMethods() {
 /**
  * Creates a block config for rendering
  * @param {Object} options Options passed by the merchant
+ * @param {Customer} customer
  *
  * @returns {Object}
  */
-export function getBlockConfig(options) {
+export function getBlockConfig(options, customer) {
   // Translate external representation to internal representation
   const translated = translateExternal(options);
+
+  // Ungroup instruments for now
+  translated.blocks = _Arr.map(translated.blocks, block =>
+    ungroupInstruments(block, customer)
+  );
+
+  // Remove empty blocks
+  translated.blocks = _Arr.filter(
+    translated.blocks,
+    block => block.instruments.length > 0
+  );
+
+  // Ungroup excluded instrument as well
+  translated.hide.instruments =
+    translated.hide.instruments
+    |> _Arr.flatMap(group => getIndividualInstruments(group, customer));
 
   // Reorder blocks
   const sequentialied = getSequencedBlocks({
@@ -65,6 +83,6 @@ export function getBlockConfig(options) {
 
   return {
     blocks: clustered,
-    excluded: translated.exclude.instruments,
+    hidden: translated.hide.instruments,
   };
 }
