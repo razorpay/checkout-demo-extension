@@ -15,28 +15,92 @@
   import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
 
   import { getWallets } from 'checkoutstore/methods';
+  import { showCta } from 'checkoutstore/cta';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getCardType } from 'common/card';
+  import * as WalletsData from 'common/wallet';
+
+  import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
+  import Icon from 'ui/elements/Icon.svelte';
+  import { scrollIntoView } from 'lib/utils';
 
   // Transitions
-  import { fade } from 'svelte/transition';
+  import { slide } from 'svelte/transition';
 
   const session = getSession();
   const wallet = getWallets();
 
-  export let selectedWallet = null;
+  const ua = navigator.userAgent;
+  const ua_iPhone = /iPhone/.test(ua);
 
-  const imageReferences = {};
+  export let selectedWallet = session.get('prefill.wallet') || null;
+
+  const walletReferences = {};
+
+  export function onWalletSelection(e, code) {
+    const isEcod = session.get('ecod');
+    selectedWallet = code;
+
+    if (!session.validateOffers(selectedWallet)) {
+      session.showOffersError(function(removeOffer) {
+        if (removeOffer) {
+          selectedWallet = code;
+        } else {
+          selectedWallet = null;
+        }
+      });
+
+      return;
+    }
+
+    if (ua_iPhone) {
+      window.Razorpay.sendMessage({ event: 'blur' });
+    }
+
+    Analytics.track('wallet:select', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        wallet: selectedWallet,
+        power: WalletsData.isPowerWallet(selectedWallet),
+      },
+    });
+
+    showCta();
+  }
+
+  export function onShown() {
+    if (selectedWallet) {
+      showCta();
+      setTimeout(() => {
+        scrollIntoView(walletReferences[selectedWallet]);
+      }, 200);
+    }
+  }
 
   // Called when the user presses the pay button
   export function getPayload() {
-    return {
+    const payload = {
       wallet: selectedWallet,
     };
+
+    /**
+     * Wallets might need to go through intent flow too
+     * TODO: Add a feature check here
+     */
+    const shouldTurnWalletToIntent = WalletsData.shouldTurnWalletToIntent(
+      selectedWallet,
+      session.upi_intents_data
+    );
+
+    if (shouldTurnWalletToIntent) {
+      payload.upi_app = WalletsData.getPackageNameForWallet(selectedWallet);
+    }
+
+    return payload;
   }
 
   /**
@@ -53,41 +117,44 @@
 </script>
 
 <style>
+  .border-list {
+    margin: 0 -12px;
+  }
 
+  [slot='icon'].top {
+    align-self: flex-start;
+  }
 </style>
 
-<div class="list collapsable">
+<div class="border-list collapsable">
   {#each wallet as w, i}
-    <div
-      class="wallet item radio-item"
-      on:click={() => {
-        selectedWallet = w.code;
-      }}>
-      <input
-        type="radio"
-        name="wallet"
-        value={w.code}
-        id={`wallet-radio-${w.code}`} />
-      <label for={`wallet-radio-${w.code}`} class="radio-label">
-        <span class="checkbox" />
-        <img
-          alt={w.name}
-          style="display:none"
-          on:load={() => {
-            imageReferences[w.code].style.backgroundImage = 'url(' + w.sqLogo + ')';
-          }}
-          src={w.sqLogo} />
-
-        <div class="placeholder" bind:this={imageReferences[w.code]} />
+    <SlottedRadioOption
+      name={w.code}
+      selected={selectedWallet === w.code}
+      align="top"
+      on:click={e => onWalletSelection(e, w.code)}>
+      <div
+        slot="title"
+        bind:this={walletReferences[w.code]}
+        id={`wallet-radio-${w.code}`}>
         <span class="title">{w.name}</span>
-        {#if getApplicableOffer(w.code)}
-          <span class="offer">{getApplicableOffer(w.code).name}</span>
-          <div class="offer-info">
-            {getApplicableOffer(w.code).display_text}
+      </div>
+      <div slot="body">
+        {#if selectedWallet === w.code}
+          <div transition:slide={{ duration: 200 }}>
+            {#if getApplicableOffer(w.code)}
+              <span class="offer">{getApplicableOffer(w.code).name}</span>
+              <div class="offer-info">
+                {getApplicableOffer(w.code).display_text}
+              </div>
+            {/if}
           </div>
         {/if}
-      </label>
-    </div>
+      </div>
+      <i slot="icon" class="top">
+        <Icon icon={w.sqLogo} />
+      </i>
+    </SlottedRadioOption>
   {/each}
 
 </div>

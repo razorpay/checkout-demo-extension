@@ -2514,36 +2514,10 @@ Session.prototype = {
               } else {
                 this.preSubmit();
               }
-            } else {
-              var value = e.target.value;
-
-              Analytics.track('wallet:select', {
-                type: AnalyticsTypes.BEHAV,
-                data: {
-                  wallet: value,
-                  power: discreet.Wallet.isPowerWallet(value),
-                },
-              });
-
-              $('#body').toggleClass('sub', value);
-              $('#wallets').removeClass('invalid');
             }
           },
           true
         );
-
-        this.on('click', '#wallets [name="wallet"]', function(e) {
-          if (!this.validateOffers(e.target.value)) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            this.showOffersError(function(removeOffer) {
-              return removeOffer && e.target.click();
-            });
-
-            return;
-          }
-        });
       } catch (e) {}
     }
 
@@ -3382,6 +3356,7 @@ Session.prototype = {
 
     if (tab === 'wallet') {
       this.setScreen('wallet');
+      this.svelteWalletsTab.onShown();
     }
 
     if (tab === 'card' || (tab === 'emi' && this.screen !== 'emi')) {
@@ -4755,21 +4730,6 @@ Session.prototype = {
         delete notes.state;
         notes.address +=
           ', ' + Constants.STATES[notes.state] + ' - ' + notes.pincode;
-      }
-    }
-
-    /**
-     * Wallets might need to go through intent flow too
-     * TODO: Add a feature check here
-     */
-    if (data.method === 'wallet') {
-      var shouldTurnWalletToIntent = discreet.Wallet.shouldTurnWalletToIntent(
-        data.wallet,
-        this.upi_intents_data
-      );
-
-      if (shouldTurnWalletToIntent) {
-        data.upi_app = discreet.Wallet.getPackageNameForWallet(data.wallet);
       }
     }
 
