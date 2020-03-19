@@ -74,41 +74,40 @@ const config = {
     groupedToIndividual: (grouped, customer) => {
       const tokens = _Obj.getSafely(customer, 'tokens.items', []);
       const base = _Obj.clone(grouped);
+      let token_ids = [];
 
       // Convert single token_id into token_ids
-      if (base.token_id && !base.token_ids) {
-        base.token_ids = [base.token_id];
-        delete base.token_id;
-      }
-
-      const token_ids = base.token_ids;
-
-      // Cards is ungrouped based on token_ids. If there are no tokens, don't ungroup.
-      if (!token_ids) {
-        return [grouped];
+      if (grouped.token_ids) {
+        token_ids = grouped.token_ids;
+      } else if (grouped.token_id) {
+        token_ids = [grouped.token_id];
       }
 
       delete base.token_ids;
 
-      return (
-        _Arr.map(token_ids, token_id => {
-          const token = _Arr.find(tokens, token => token.id === token_id);
+      if (token_ids.length > 0) {
+        return (
+          _Arr.map(token_ids, token_id => {
+            const token = _Arr.find(tokens, token => token.id === token_id);
 
-          if (!token) {
-            return;
-          }
+            if (!token) {
+              return;
+            }
 
-          return _Obj.extend(
-            {
-              token_id,
-              type: token.card.type,
-              issuer: token.card.issuer,
-              network: toLowerCaseSafe(token.card.network),
-            },
-            base
-          );
-        }) |> _Arr.filter(Boolean)
-      );
+            return _Obj.extend(
+              {
+                token_id,
+                type: token.card.type,
+                issuer: token.card.issuer,
+                network: toLowerCaseSafe(token.card.network),
+              },
+              base
+            );
+          }) |> _Arr.filter(Boolean)
+        );
+      }
+
+      return [grouped];
     },
     isIndividual: instrument =>
       instrument.token_id && (instrument.network || instrument.issuer),

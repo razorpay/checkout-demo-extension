@@ -54,11 +54,11 @@ function instrumentPresentInGroup(instrument, group) {
     case 'emi': {
       const hasIssuers = Boolean(group.issuers);
       const hasNetworks = Boolean(group.networks);
-      const hasCardTypes = Boolean(group.card_types);
+      const hasTypes = Boolean(group.types);
 
       const issuers = group.issuers || [];
       const networks = group.networks || [];
-      const card_types = group.card_types || [];
+      const types = group.types || [];
 
       // If there is no issuer present, it means match all issuers.
       const issuerMatches = hasIssuers
@@ -69,11 +69,11 @@ function instrumentPresentInGroup(instrument, group) {
         ? _Arr.contains(networks, instrument.network)
         : true;
 
-      const cardTypeMatches = hasCardTypes
-        ? _Arr.contains(card_types, instrument.card_type)
+      const typeMatches = hasTypes
+        ? _Arr.contains(types, instrument.types)
         : true;
 
-      return issuerMatches && networkMatches && cardTypeMatches;
+      return issuerMatches && networkMatches && typeMatches;
     }
     // TODO: filter out based on iins as well
     // TODO: filter out / remove plans excluding the durations for emi

@@ -19,6 +19,7 @@
     cardNumber,
     remember,
   } from 'checkoutstore/screens/card';
+  import { methodTabInstruments } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
 
@@ -104,15 +105,75 @@
     return allSavedCards;
   }
 
+  /**
+   * Filters saved card tokens against the given instruments.
+   * Only allows those cards that match any of the given instruments.
+   *
+   * @param {Array<Token>} tokens
+   * @param {Array<Instrument>} instruments
+   *
+   * @returns {Array<Token}
+   */
+  function filterSavedCardsAgainstInstruments(tokens, instruments) {
+    const eligibleInstruments = _Arr.filter(
+      instruments,
+      instrument => instrument.method === tab
+    );
+
+    // There are no instruments to filter against
+    if (!eligibleInstruments.length) {
+      return tokens;
+    }
+
+    const eligibleTokens = _Arr.filter(tokens, token => {
+      return _Arr.any(eligibleInstruments, instrument => {
+        const hasIssuers = Boolean(instrument.issuers);
+        const hasNetworks = Boolean(instrument.networks);
+        const hasTypes = Boolean(instrument.types);
+
+        const issuers = instrument.issuers || [];
+        const networks = instrument.networks || [];
+        const types = instrument.types || [];
+
+        // If there is no issuer present, it means match all issuers.
+        const issuerMatches = hasIssuers
+          ? _Arr.contains(issuers, token.card.issuer)
+          : true;
+
+        const networkMatches = hasNetworks
+          ? _Arr.contains(
+              networks,
+              token.card.network && token.card.network.toLowerCase()
+            )
+          : true;
+
+        const typeMatches = hasTypes
+          ? _Arr.contains(types, token.card.type)
+          : true;
+
+        return issuerMatches && networkMatches && typeMatches;
+      });
+    });
+
+    return eligibleTokens;
+  }
+
   $: {
     allSavedCards = getSavedCardsFromCustomer($customer);
   }
 
   $: {
-    savedCards = filterSavedCardsForOffer(
+    let _savedCards = filterSavedCardsForOffer(
       getSavedCardsForDisplay(allSavedCards, tab),
       selectedOffer
     );
+
+    _savedCards = filterSavedCardsAgainstInstruments(
+      _savedCards,
+      $methodTabInstruments
+    );
+
+    savedCards = _savedCards;
   }
 
   $: {

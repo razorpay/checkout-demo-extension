@@ -22,6 +22,7 @@
     isContactPresent,
     email,
     selectedInstrumentId,
+    methodTabInstruments,
     multiTpvOption,
     partialPaymentAmount,
     partialPaymentOption,
@@ -346,6 +347,8 @@
   }
 
   export function onShown() {
+    $methodTabInstruments = [];
+
     if (view === 'methods') {
       if ($selectedInstrumentId) {
         showCtaWithDefaultText();
