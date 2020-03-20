@@ -10,7 +10,10 @@
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
 
   // Store imports
-  import { selectedInstrumentId } from 'checkoutstore/screens/home';
+  import {
+    selectedInstrumentId,
+    methodTabInstruments,
+  } from 'checkoutstore/screens/home';
 
   // Props
   export let instrument = {};
@@ -54,6 +57,10 @@
 
     session.preSubmit(null, payload);
   }
+
+  function setMethodInstruments() {
+    $methodTabInstruments = [instrument];
+  }
 </script>
 
 <style>
@@ -71,6 +78,7 @@
   className="instrument"
   on:click
   on:click={deselectInstrument}
+  on:click={setMethodInstruments}
   on:click={switchToMethod}>
   <i slot="icon">
     <Icon {icon} alt={methodName} />
