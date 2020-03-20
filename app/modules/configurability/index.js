@@ -2,6 +2,7 @@ import { translateExternal } from './translate';
 import { getSequencedBlocks } from './sequence';
 import { clusterRazorpayBlocks } from './methods';
 import { ungroupInstruments, getIndividualInstruments } from './ungroup';
+import InstrumentConfig from './instruments-config';
 
 import { AVAILABLE_METHODS } from 'common/constants';
 import {
@@ -53,11 +54,17 @@ function getAvailableDefaultMethods() {
   return available;
 }
 
+/**
+ * Removes all flows/issuers/providers that are not available for
+ * an instrument
+ * @param {Instrument} instrument
+ * @returns {Object|null}
+ */
 function removeNonApplicableInstrumentFlows(instrument) {
   instrument = _Obj.clone(instrument);
 
   if (!isMethodEnabled(instrument.method)) {
-    return false;
+    return null;
   }
 
   switch (instrument.method) {
@@ -145,13 +152,34 @@ function removeNonApplicableInstrumentFlows(instrument) {
   return instrument;
 }
 
+/**
+ * Removes all disabled instruments from the block.
+ * @param block
+ * @returns {*}
+ */
 function removeDisabledInstrumentsFromBlock(block) {
   block = _Obj.clone(block);
-  block.instruments = _Arr.map(
-    block.instruments,
-    removeNonApplicableInstrumentFlows
-  );
+  block.instruments =
+    block.instruments
+    |> _Arr.map(removeNonApplicableInstrumentFlows)
+    |> _Arr.filter(Boolean)
+    |> _Arr.filter(isInstrumentValid);
+
   return block;
+}
+
+/**
+ * Checks if a given instrument is valid.
+ * @param {Instrument} instrument
+ * @returns {boolean}
+ */
+function isInstrumentValid(instrument) {
+  const { method } = instrument;
+  const config = InstrumentConfig[method];
+  if (!method || !config) {
+    return false;
+  }
+  return config.isValid(instrument);
 }
 
 /**
