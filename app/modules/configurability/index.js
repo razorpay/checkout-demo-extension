@@ -114,7 +114,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
       const hasProviders = Boolean(instrument.providers);
 
       if (hasProviders) {
-        const enabledProviders = getCardlessEMIProviders();
+        const enabledProviders = getPayLaterProviders();
         const shownProviders = _Arr.filter(instrument.providers, provider =>
           _Arr.any(
             enabledProviders,
