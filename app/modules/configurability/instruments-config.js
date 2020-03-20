@@ -241,18 +241,14 @@ const config = {
       return [grouped];
     },
     isIndividual: instrument => {
-      const singleFlow =
-        instrument.flow || _Obj.getSafely(instrument, 'flows', []).length === 1;
+      const singleFlow = instrument.flow;
 
       const missingApp = !instrument.app && !instrument.apps;
-      const singleApp =
-        instrument.app || _Obj.getSafely(instrument, 'apps', []).length === 1;
+      const singleApp = instrument.app;
       const singleorMissingApps = singleApp || missingApp;
 
       const missingToken = !instrument.token_id && !instrument.token_ids;
-      const singleToken =
-        instrument.token_id ||
-        _Obj.getSafely(instrument, 'token_ids', []).length === 1;
+      const singleToken = instrument.token_id;
       const singleorMissingTokens = singleToken || missingToken;
 
       return singleFlow && singleorMissingApps && singleorMissingTokens;
