@@ -3959,11 +3959,7 @@ Session.prototype = {
       if (this.screen === 'wallet') {
         /* Wallet tab being responsible for its subdata */
         if (this.svelteWalletsTab.selectedWallet) {
-          var walletData = this.svelteWalletsTab.getPayload();
-
-          each(walletData, function(key, value) {
-            data[key] = value;
-          });
+          _Obj.extend(data, this.svelteWalletsTab.getPayload());
         }
       }
     }
