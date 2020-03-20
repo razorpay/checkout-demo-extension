@@ -4,8 +4,17 @@ import { clusterRazorpayBlocks } from './methods';
 import { ungroupInstruments, getIndividualInstruments } from './ungroup';
 
 import { AVAILABLE_METHODS } from 'common/constants';
-import { isMethodEnabled } from 'checkoutstore/methods';
+import {
+  isMethodEnabled,
+  getNetbankingBanks,
+  getWallets,
+  isUPIFlowEnabled,
+  getPayLaterProviders,
+  getCardlessEMIProviders,
+} from 'checkoutstore/methods';
+
 import { shouldSeparateDebitCard } from 'checkoutstore';
+import wallet from 'ui/icons/payment-methods/wallet';
 
 /**
  * Returns the available methods
@@ -44,6 +53,66 @@ function getAvailableDefaultMethods() {
   return available;
 }
 
+function isInstrumentEnabled(instrument) {
+  if (!isMethodEnabled(instrument.method)) {
+    return false;
+  }
+
+  switch (instrument.method) {
+    case 'netbanking': {
+      const hasBank = Boolean(instrument.bank);
+      const banks = getNetbankingBanks();
+
+      return hasBank ? Boolean(banks[instrument.bank]) : true;
+    }
+
+    case 'wallet': {
+      const hasWallet = Boolean(instrument.wallet);
+      const wallets = getWallets();
+      const walletEnabled = _Arr.any(
+        wallets,
+        wallet => wallet.code === instrument.wallet
+      );
+
+      return hasWallet ? walletEnabled : true;
+    }
+
+    case 'cardless_emi': {
+      const hasProvider = Boolean(instrument.provider);
+      const providers = getCardlessEMIProviders();
+
+      return hasProvider ? Boolean(providers[instrument.provider]) : true;
+    }
+
+    case 'paylater': {
+      const hasProvider = Boolean(instrument.provider);
+      const providers = getCardlessEMIProviders();
+      const providerEnabled = _Arr.any(
+        providers,
+        provider => provider.code === instrument.provider
+      );
+
+      return hasProvider ? providerEnabled : true;
+    }
+
+    case 'upi': {
+      const hasFlow = Boolean(instrument.flow);
+      const flowEnabled = hasFlow ? isUPIFlowEnabled(instrument.flow) : true;
+
+      // TODO: check for app
+      return flowEnabled;
+    }
+
+    // TODO: card and EMI
+  }
+}
+
+function removeDisabledInstrumentsFromBlock(block) {
+  block = _Obj.clone(block);
+  block.instruments = _Arr.filter(block.instruments, isInstrumentEnabled);
+  return block;
+}
+
 /**
  * Creates a block config for rendering
  * @param {Object} options Options passed by the merchant
@@ -55,10 +124,11 @@ export function getBlockConfig(options, customer) {
   // Translate external representation to internal representation
   const translated = translateExternal(options);
 
-  // Ungroup instruments for now
-  translated.blocks = _Arr.map(translated.blocks, block =>
-    ungroupInstruments(block, customer)
-  );
+  // Ungroup instruments and remove disabed instruments for each block
+  translated.blocks =
+    translated.blocks
+    |> _Arr.map(block => ungroupInstruments(block, customer))
+    |> _Arr.map(removeDisabledInstrumentsFromBlock);
 
   // Remove empty blocks
   translated.blocks = _Arr.filter(
