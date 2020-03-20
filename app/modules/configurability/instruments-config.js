@@ -52,6 +52,10 @@ function genericIsIndividual(instrument) {
   return _Arr.any(paymentKeys, key => instrument[key]);
 }
 
+function genericIsValid(instrument) {
+  return true;
+}
+
 function genericGroupedToIndividual(grouped, customer) {
   return [grouped];
 }
@@ -130,6 +134,9 @@ const config = {
       });
     },
     isIndividual: instrument => instrument.bank,
+    isValid: instrument =>
+      Boolean(instrument.bank) ||
+      (Boolean(instrument.banks) && instrument.banks.length > 0),
   },
 
   wallet: {
@@ -149,6 +156,9 @@ const config = {
       });
     },
     isIndividual: instrument => instrument.wallet,
+    isValid: instrument =>
+      Boolean(instrument.wallet) ||
+      (Boolean(instrument.wallets) && instrument.wallets.length > 0),
   },
 
   upi: {
@@ -290,6 +300,10 @@ const config = {
 
       return payment;
     },
+    isValid: instrument => {
+      // TODO
+      return true;
+    },
   },
 
   paypal: {
@@ -313,6 +327,9 @@ const config = {
         );
       });
     },
+    isValid: instrument =>
+      Boolean(instrument.provider) ||
+      (Boolean(instrument.providers) && instrument.providers.length > 0),
   },
 
   paylater: {
@@ -332,6 +349,9 @@ const config = {
         );
       });
     },
+    isValid: instrument =>
+      Boolean(instrument.provider) ||
+      (Boolean(instrument.providers) && instrument.providers.length > 0),
   },
 
   bank_transfer: {
@@ -350,6 +370,7 @@ _Obj.loop(config, (val, method) => {
       getPaymentPayload: genericPaymentPayloadGetter,
       isIndividual: genericIsIndividual,
       groupedToIndividual: genericGroupedToIndividual,
+      isValid: genericIsValid,
       properties: [],
       payment: [],
     },
