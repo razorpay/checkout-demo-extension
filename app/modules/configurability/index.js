@@ -53,63 +53,104 @@ function getAvailableDefaultMethods() {
   return available;
 }
 
-function isInstrumentEnabled(instrument) {
+function removeNonApplicableInstrumentFlows(instrument) {
+  instrument = _Obj.clone(instrument);
+
   if (!isMethodEnabled(instrument.method)) {
     return false;
   }
 
   switch (instrument.method) {
     case 'netbanking': {
-      const hasBank = Boolean(instrument.bank);
-      const banks = getNetbankingBanks();
+      const hasBanks = Boolean(instrument.banks);
 
-      return hasBank ? Boolean(banks[instrument.bank]) : true;
+      if (!hasBanks) {
+        const enabledBanks = getNetbankingBanks();
+        const shownBanks = _Arr.filter(
+          instrument.banks,
+          bank => enabledBanks[bank]
+        );
+
+        instrument.banks = shownBanks;
+      }
+
+      return instrument;
     }
 
     case 'wallet': {
-      const hasWallet = Boolean(instrument.wallet);
-      const wallets = getWallets();
-      const walletEnabled = _Arr.any(
-        wallets,
-        wallet => wallet.code === instrument.wallet
-      );
+      const hasWallets = Boolean(instrument.wallets);
 
-      return hasWallet ? walletEnabled : true;
+      if (hasWallets) {
+        const enabledWallets = getWallets();
+        const shownWallets = _Arr.filter(instrument.wallets, wallet =>
+          _Arr.any(
+            enabledWallets,
+            enabledWallet => enabledWallet.code === wallet
+          )
+        );
+
+        instrument.wallet = shownWallets;
+      }
+
+      return instrument;
     }
 
     case 'cardless_emi': {
-      const hasProvider = Boolean(instrument.provider);
-      const providers = getCardlessEMIProviders();
+      const hasProviders = Boolean(instrument.providers);
 
-      return hasProvider ? Boolean(providers[instrument.provider]) : true;
+      if (hasProviders) {
+        const enabledProviders = getCardlessEMIProviders();
+        const shownProviders = _Arr.filter(
+          instrument.providers,
+          provider => enabledProviders[provider]
+        );
+        instrument.providers = shownProviders;
+      }
+
+      return instrument;
     }
 
     case 'paylater': {
-      const hasProvider = Boolean(instrument.provider);
-      const providers = getCardlessEMIProviders();
-      const providerEnabled = _Arr.any(
-        providers,
-        provider => provider.code === instrument.provider
-      );
+      const hasProviders = Boolean(instrument.providers);
 
-      return hasProvider ? providerEnabled : true;
+      if (hasProviders) {
+        const enabledProviders = getCardlessEMIProviders();
+        const shownProviders = _Arr.filter(instrument.providers, provider =>
+          _Arr.any(
+            enabledProviders,
+            enabledProvider => enabledProvider.code === provider
+          )
+        );
+        instrument.providers = shownProviders;
+      }
+
+      return instrument;
     }
 
     case 'upi': {
-      const hasFlow = Boolean(instrument.flow);
-      const flowEnabled = hasFlow ? isUPIFlowEnabled(instrument.flow) : true;
+      const hasFlows = Boolean(instrument.flows);
+
+      if (hasFlows) {
+        const shownFlows = _Arr.filter(instrument.flows, isUPIFlowEnabled);
+        instrument.flows = shownFlows;
+      }
 
       // TODO: check for app
-      return flowEnabled;
+      return instrument;
     }
 
     // TODO: card and EMI
   }
+
+  return instrument;
 }
 
 function removeDisabledInstrumentsFromBlock(block) {
   block = _Obj.clone(block);
-  block.instruments = _Arr.filter(block.instruments, isInstrumentEnabled);
+  block.instruments = _Arr.map(
+    block.instruments,
+    removeNonApplicableInstrumentFlows
+  );
   return block;
 }
 
@@ -127,8 +168,8 @@ export function getBlockConfig(options, customer) {
   // Ungroup instruments and remove disabed instruments for each block
   translated.blocks =
     translated.blocks
-    |> _Arr.map(block => ungroupInstruments(block, customer))
-    |> _Arr.map(removeDisabledInstrumentsFromBlock);
+    |> _Arr.map(removeDisabledInstrumentsFromBlock)
+    |> _Arr.map(block => ungroupInstruments(block, customer));
 
   // Remove empty blocks
   translated.blocks = _Arr.filter(
