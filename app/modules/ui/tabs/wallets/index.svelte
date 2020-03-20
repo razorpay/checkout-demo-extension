@@ -1,19 +1,8 @@
 <script>
-  /* global each, Event */
-
   // Svelte imports
-  import { onMount, tick } from 'svelte';
+  import { onMount } from 'svelte';
 
-  // UI Imports
-  import Tab from 'ui/tabs/Tab.svelte';
-  import Callout from 'ui/elements/Callout.svelte';
-  import Screen from 'ui/layouts/Screen.svelte';
-  import AddCardView from 'ui/tabs/card/AddCardView.svelte';
-  import EmiActions from 'ui/components/EmiActions.svelte';
-  import SavedCards from 'ui/tabs/card/savedcards.svelte';
-  import OffersPortal from 'ui/components/OffersPortal.svelte';
-  import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
-
+  // Store Imports
   import { getWallets } from 'checkoutstore/methods';
   import { showCta } from 'checkoutstore/cta';
 
@@ -21,7 +10,6 @@
   import { getSession } from 'sessionmanager';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import { getCardType } from 'common/card';
   import * as WalletsData from 'common/wallet';
 
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
