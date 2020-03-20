@@ -4714,7 +4714,7 @@ Session.prototype = {
           }
 
           case 'upi': {
-            if (selectedInstrument.flow === 'qr') {
+            if (selectedInstrument._ungrouped[0].flow === 'qr') {
               this.switchTab('qr');
               return;
             }
@@ -4733,7 +4733,9 @@ Session.prototype = {
              * Cardless EMI can be done from the homescreen too, without switching tab.
              */
             setTimeout(function() {
-              session.selectCardlessEmiProvider(selectedInstrument.provider);
+              session.selectCardlessEmiProvider(
+                selectedInstrument._ungrouped[0].provider
+              );
             }, 200);
             return;
           }
@@ -4750,7 +4752,9 @@ Session.prototype = {
              * Paylater can be done from the homescreen too, without switching tab.
              */
             setTimeout(function() {
-              session.selectPayLaterProvider(selectedInstrument.provider);
+              session.selectPayLaterProvider(
+                selectedInstrument._ungrouped[0].provider
+              );
             }, 200);
             return;
           }
