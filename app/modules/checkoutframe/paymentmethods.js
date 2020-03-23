@@ -51,20 +51,23 @@ const CARD_DESCRIPTION = ({ session }) => {
  */
 const DESCRIPTIONS = {
   card: CARD_DESCRIPTION,
-  cardless_emi: ({ session }) => {
+  cardless_emi: () => {
     /**
      * EMI + Cardless EMI: Cards, ZestMoney, & More
      * Cardless EMI: EMI via ZestMoney & More
      */
 
     const cardEmi = isMethodEnabled('emi');
-    const providers = getCardlessEMIProviders() |> _Obj.keys;
+    let providerNames = [];
+    _Obj.loop(getCardlessEMIProviders(), providerObj => {
+      providerNames.push(providerObj.name);
+    });
 
     if (cardEmi) {
-      providers.unshift('Cards');
+      providerNames.unshift('Cards');
     }
 
-    const text = generateTextFromList(providers, 3);
+    const text = generateTextFromList(providerNames, 3);
 
     if (cardEmi) {
       return text;
