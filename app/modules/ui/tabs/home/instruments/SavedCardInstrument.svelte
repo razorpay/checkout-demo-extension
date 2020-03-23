@@ -11,6 +11,7 @@
   import { getBanks } from 'checkoutstore';
   import { getIcon as getNetworkIcon } from 'icons/network';
   import Track from 'tracker';
+  import { getExtendedSingleInstrument } from 'configurability/instruments';
 
   // Store
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
@@ -19,6 +20,9 @@
   // Props
   export let instrument = {};
   export let name = 'instrument';
+
+  let individualInstrument = getExtendedSingleInstrument(instrument);
+  $: individualInstrument = getExtendedSingleInstrument(instrument);
 
   const session = getSession();
 
@@ -56,7 +60,7 @@
   const savedCards = _Obj.getSafely($customer, 'tokens.items', []);
   const savedCard = _Arr.find(
     savedCards,
-    card => card.id === instrument.token_id
+    card => card.id === individualInstrument.token_id
   );
 
   if (savedCard) {
@@ -74,7 +78,7 @@
   } else {
     // User is logged out.
 
-    if (instrument.issuer) {
+    if (individualInstrument.issuer) {
       // We know stuff about the card.
       title = getBankText(instrument, false);
       icon = getIcon(instrument);

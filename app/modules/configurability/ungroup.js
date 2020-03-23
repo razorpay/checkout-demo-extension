@@ -12,12 +12,22 @@ export function getIndividualInstruments(instrument, customer) {
   const config = InstrumentsConfig[method];
 
   if (config.isIndividual(instrument)) {
-    return [instrument];
+    return _Obj.extend(
+      {
+        _ungrouped: [instrument],
+      },
+      instrument
+    );
   }
 
   const individuals = config.groupedToIndividual(instrument, customer);
 
-  return individuals;
+  return _Obj.extend(
+    {
+      _ungrouped: individuals,
+    },
+    instrument
+  );
 }
 
 /**
@@ -34,7 +44,7 @@ export function ungroupInstruments(block, customer) {
   _Arr.loop(instruments, instrument => {
     const individuals = getIndividualInstruments(instrument, customer);
 
-    ungrouped = _Arr.mergeWith(ungrouped, individuals);
+    ungrouped.push(individuals);
   });
 
   return _Obj.extend(_Obj.clone(block), {

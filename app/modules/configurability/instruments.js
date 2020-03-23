@@ -80,20 +80,19 @@ export function addInstrumentToPaymentData(instrument, payment, customer) {
     return payment;
   }
 
-  return config.getPaymentPayload(instrument, payment, customer);
+  return config.getPaymentPayload(
+    getExtendedSingleInstrument(instrument),
+    payment,
+    customer
+  );
 }
 
 /**
- * Tells whether or not the instrument is a card instrument
- * to be used from inside the card tab
+ * Extends the instrument using the first ungrouped instrument
  * @param {Instrument} instrument
  *
- * @returns {boolean}
+ * @returns {Instrument}
  */
-export function isDetailedCardInstrument(instrument) {
-  const isMethodInstrument = isInstrumentForEntireMethod(instrument);
-  const isMethodCardOrEmi = _Arr.contains(['card', 'emi'], instrument.method);
-  const isSavedCardInstrument = instrument.token_id;
-
-  return isMethodCardOrEmi && !isMethodInstrument && !isSavedCardInstrument;
+export function getExtendedSingleInstrument(instrument) {
+  return _Obj.extend(_Obj.extend({}, instrument), instrument._ungrouped[0]);
 }

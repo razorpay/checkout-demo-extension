@@ -4,6 +4,7 @@ import Track from 'tracker';
 import { MAX_PREFERRED_INSTRUMENTS } from 'common/constants';
 import { getBlockConfig } from 'configurability';
 import { isInstrumentForEntireMethod } from 'configurability/instruments';
+import { getIndividualInstruments } from 'configurability/ungroup';
 
 function generateBasePreferredBlock(preferred) {
   const preferredBlock = createBlock('rzp.preferred', {
@@ -108,8 +109,13 @@ export function setBlocks({ preferred = [], merchantConfig = {} }, customer) {
   // Remove rzp block instruments and method instruments
   const shownIndividualInstruments =
     parsedConfig.blocks
-    |> _Arr.filter(block => block.name !== 'rzp.cluster')
-    |> _Arr.flatMap(block => block.instruments)
+    |> _Arr.filter(block => block.code !== 'rzp.cluster')
+    |> _Arr.flatMap(block => {
+      return _Arr.filter(
+        block.instruments,
+        instrument => instrument._ungrouped.length === 1
+      );
+    })
     |> _Arr.filter(instrument => !isInstrumentForEntireMethod(instrument));
 
   /**
@@ -135,6 +141,12 @@ export function setBlocks({ preferred = [], merchantConfig = {} }, customer) {
   preferredBlock.instruments = filteredPreferredInstruments.slice(
     0,
     MAX_PREFERRED_INSTRUMENTS
+  );
+
+  // Convert preferred instruments to ungrouped format
+  preferredBlock.instruments = _Arr.map(
+    preferredBlock.instruments,
+    instrument => getIndividualInstruments(instrument, customer)
   );
 
   let allBlocks = [preferredBlock];

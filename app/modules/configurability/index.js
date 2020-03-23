@@ -66,10 +66,12 @@ export function getBlockConfig(options, customer) {
     block => block.instruments.length > 0
   );
 
-  // Ungroup excluded instrument as well
+  // Ungroup hidden instrument as well
   translated.hide.instruments =
     translated.hide.instruments
-    |> _Arr.flatMap(group => getIndividualInstruments(group, customer));
+    |> _Arr.flatMap(
+      group => getIndividualInstruments(group, customer)._ungrouped
+    );
 
   // Reorder blocks
   const sequentialied = getSequencedBlocks({

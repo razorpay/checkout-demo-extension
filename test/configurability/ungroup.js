@@ -93,9 +93,15 @@ test('Module: configurability/ungroup', t => {
           {
             method: 'card',
             token_id: 'token_12345',
-            type: 'credit',
-            issuer: 'HDFC',
-            network: 'visa',
+            _ungrouped: [
+              {
+                method: 'card',
+                token_id: 'token_12345',
+                type: 'credit',
+                issuer: 'HDFC',
+                network: 'visa',
+              },
+            ],
           },
         ],
       };
@@ -119,17 +125,23 @@ test('Module: configurability/ungroup', t => {
         instruments: [
           {
             method: 'card',
-            token_id: 'token_12345',
-            type: 'credit',
-            issuer: 'HDFC',
-            network: 'visa',
-          },
-          {
-            method: 'card',
-            token_id: 'token_54321',
-            type: 'debit',
-            issuer: 'ICIC',
-            network: 'mastercard',
+            token_ids: ['token_12345', 'token_54321'],
+            _ungrouped: [
+              {
+                method: 'card',
+                token_id: 'token_12345',
+                type: 'credit',
+                issuer: 'HDFC',
+                network: 'visa',
+              },
+              {
+                method: 'card',
+                token_id: 'token_54321',
+                type: 'debit',
+                issuer: 'ICIC',
+                network: 'mastercard',
+              },
+            ],
           },
         ],
       };
@@ -151,7 +163,20 @@ test('Module: configurability/ungroup', t => {
 
       expected = {
         code: 'block.test',
-        instruments: [groupedInstrument],
+        instruments: [
+          {
+            method: 'card',
+            card_networks: ['visa'],
+            issuers: ['HDFC', 'ICIC'],
+            _ungrouped: [
+              {
+                method: 'card',
+                card_networks: ['visa'],
+                issuers: ['HDFC', 'ICIC'],
+              },
+            ],
+          },
+        ],
       };
 
       found = Ungroup.ungroupInstruments(block, customer);
@@ -182,22 +207,35 @@ test('Module: configurability/ungroup', t => {
         instruments: [
           {
             method: 'card',
-            token_id: 'token_12345',
-            type: 'credit',
-            issuer: 'HDFC',
-            network: 'visa',
-          },
-          {
-            method: 'card',
-            token_id: 'token_54321',
-            type: 'debit',
-            issuer: 'ICIC',
-            network: 'mastercard',
+            token_ids: ['token_12345', 'token_54321'],
+            _ungrouped: [
+              {
+                method: 'card',
+                token_id: 'token_12345',
+                type: 'credit',
+                issuer: 'HDFC',
+                network: 'visa',
+              },
+              {
+                method: 'card',
+                token_id: 'token_54321',
+                type: 'debit',
+                issuer: 'ICIC',
+                network: 'mastercard',
+              },
+            ],
           },
           {
             method: 'card',
             card_networks: ['visa'],
             issuers: ['HDFC', 'ICIC'],
+            _ungrouped: [
+              {
+                method: 'card',
+                card_networks: ['visa'],
+                issuers: ['HDFC', 'ICIC'],
+              },
+            ],
           },
         ],
       };
@@ -229,7 +267,19 @@ test('Module: configurability/ungroup', t => {
 
       expected = {
         code: 'block.test',
-        instruments: [individualInstrument],
+        instruments: [
+          {
+            method: 'netbanking',
+            bank: 'HDFC',
+
+            _ungrouped: [
+              {
+                method: 'netbanking',
+                bank: 'HDFC',
+              },
+            ],
+          },
+        ],
       };
 
       found = Ungroup.ungroupInstruments(block);
@@ -251,11 +301,17 @@ test('Module: configurability/ungroup', t => {
         instruments: [
           {
             method: 'netbanking',
-            bank: 'HDFC',
-          },
-          {
-            method: 'netbanking',
-            bank: 'ICIC',
+            banks: ['HDFC', 'ICIC'],
+            _ungrouped: [
+              {
+                method: 'netbanking',
+                bank: 'HDFC',
+              },
+              {
+                method: 'netbanking',
+                bank: 'ICIC',
+              },
+            ],
           },
         ],
       };
@@ -336,7 +392,18 @@ test('Module: configurability/ungroup', t => {
 
       expected = {
         code: 'block.test',
-        instruments: [individualInstrument],
+        instruments: [
+          {
+            method: 'upi',
+            flow: 'qr',
+            _ungrouped: [
+              {
+                method: 'upi',
+                flow: 'qr',
+              },
+            ],
+          },
+        ],
       };
 
       found = Ungroup.ungroupInstruments(block);
@@ -359,7 +426,14 @@ test('Module: configurability/ungroup', t => {
           {
             method: 'upi',
             app: 'com.google.android.apps.nbu.paisa.user',
-            flow: 'intent',
+
+            _ungrouped: [
+              {
+                method: 'upi',
+                app: 'com.google.android.apps.nbu.paisa.user',
+                flow: 'intent',
+              },
+            ],
           },
         ],
       };
@@ -384,7 +458,13 @@ test('Module: configurability/ungroup', t => {
           {
             method: 'upi',
             token_id: 'token_12345',
-            flow: 'collect',
+            _ungrouped: [
+              {
+                method: 'upi',
+                token_id: 'token_12345',
+                flow: 'collect',
+              },
+            ],
           },
         ],
       };
@@ -408,11 +488,17 @@ test('Module: configurability/ungroup', t => {
         instruments: [
           {
             method: 'upi',
-            flow: 'qr',
-          },
-          {
-            method: 'upi',
-            flow: 'collect',
+            flows: ['qr', 'collect'],
+            _ungrouped: [
+              {
+                method: 'upi',
+                flow: 'qr',
+              },
+              {
+                method: 'upi',
+                flow: 'collect',
+              },
+            ],
           },
         ],
       };
@@ -436,13 +522,19 @@ test('Module: configurability/ungroup', t => {
         instruments: [
           {
             method: 'upi',
-            app: 'com.google.android.apps.nbu.paisa.user',
-            flow: 'intent',
-          },
-          {
-            method: 'upi',
-            app: 'com.phonepe.app',
-            flow: 'intent',
+            apps: ['com.google.android.apps.nbu.paisa.user', 'com.phonepe.app'],
+            _ungrouped: [
+              {
+                method: 'upi',
+                app: 'com.google.android.apps.nbu.paisa.user',
+                flow: 'intent',
+              },
+              {
+                method: 'upi',
+                app: 'com.phonepe.app',
+                flow: 'intent',
+              },
+            ],
           },
         ],
       };
@@ -466,14 +558,20 @@ test('Module: configurability/ungroup', t => {
         instruments: [
           {
             method: 'upi',
-            token_id: 'token_12345',
-            flow: 'collect',
-          },
+            token_ids: ['token_12345', 'token_54321'],
+            _ungrouped: [
+              {
+                method: 'upi',
+                token_id: 'token_12345',
+                flow: 'collect',
+              },
 
-          {
-            method: 'upi',
-            token_id: 'token_54321',
-            flow: 'collect',
+              {
+                method: 'upi',
+                token_id: 'token_54321',
+                flow: 'collect',
+              },
+            ],
           },
         ],
       };
@@ -498,13 +596,20 @@ test('Module: configurability/ungroup', t => {
         instruments: [
           {
             method: 'upi',
-            app: 'com.google.android.apps.nbu.paisa.user',
-            flow: 'intent',
-          },
-          {
-            method: 'upi',
-            app: 'com.phonepe.app',
-            flow: 'intent',
+            apps: ['com.google.android.apps.nbu.paisa.user', 'com.phonepe.app'],
+            flows: ['qr', 'collect'],
+            _ungrouped: [
+              {
+                method: 'upi',
+                app: 'com.google.android.apps.nbu.paisa.user',
+                flow: 'intent',
+              },
+              {
+                method: 'upi',
+                app: 'com.phonepe.app',
+                flow: 'intent',
+              },
+            ],
           },
         ],
       };
@@ -536,7 +641,18 @@ test('Module: configurability/ungroup', t => {
 
       expected = {
         code: 'block.test',
-        instruments: [individualInstrument],
+        instruments: [
+          {
+            method: 'wallet',
+            wallet: 'freecharge',
+            _ungrouped: [
+              {
+                method: 'wallet',
+                wallet: 'freecharge',
+              },
+            ],
+          },
+        ],
       };
 
       found = Ungroup.ungroupInstruments(block);
@@ -558,11 +674,17 @@ test('Module: configurability/ungroup', t => {
         instruments: [
           {
             method: 'wallet',
-            wallet: 'freecharge',
-          },
-          {
-            method: 'wallet',
-            wallet: 'olamoney',
+            wallets: ['freecharge', 'olamoney'],
+            _ungrouped: [
+              {
+                method: 'wallet',
+                wallet: 'freecharge',
+              },
+              {
+                method: 'wallet',
+                wallet: 'olamoney',
+              },
+            ],
           },
         ],
       };
@@ -590,7 +712,18 @@ test('Module: configurability/ungroup', t => {
 
       expected = {
         code: 'block.test',
-        instruments: [individualInstrument],
+        instruments: [
+          {
+            method: 'cardless_emi',
+            provider: 'zestmoney',
+            _ungrouped: [
+              {
+                method: 'cardless_emi',
+                provider: 'zestmoney',
+              },
+            ],
+          },
+        ],
       };
 
       found = Ungroup.ungroupInstruments(block);
@@ -612,11 +745,17 @@ test('Module: configurability/ungroup', t => {
         instruments: [
           {
             method: 'cardless_emi',
-            provider: 'zestmoney',
-          },
-          {
-            method: 'cardless_emi',
-            provider: 'earlysalary',
+            providers: ['zestmoney', 'earlysalary'],
+            _ungrouped: [
+              {
+                method: 'cardless_emi',
+                provider: 'zestmoney',
+              },
+              {
+                method: 'cardless_emi',
+                provider: 'earlysalary',
+              },
+            ],
           },
         ],
       };
@@ -644,7 +783,18 @@ test('Module: configurability/ungroup', t => {
 
       expected = {
         code: 'block.test',
-        instruments: [individualInstrument],
+        instruments: [
+          {
+            method: 'paylater',
+            provider: 'epaylater',
+            _ungrouped: [
+              {
+                method: 'paylater',
+                provider: 'epaylater',
+              },
+            ],
+          },
+        ],
       };
 
       found = Ungroup.ungroupInstruments(block);
@@ -666,11 +816,17 @@ test('Module: configurability/ungroup', t => {
         instruments: [
           {
             method: 'paylater',
-            provider: 'epaylater',
-          },
-          {
-            method: 'paylater',
-            provider: 'getsimpl',
+            providers: ['epaylater', 'getsimpl'],
+            _ungrouped: [
+              {
+                method: 'paylater',
+                provider: 'epaylater',
+              },
+              {
+                method: 'paylater',
+                provider: 'getsimpl',
+              },
+            ],
           },
         ],
       };
@@ -697,7 +853,16 @@ test('Module: configurability/ungroup', t => {
 
       expected = {
         code: 'block.test',
-        instruments: [instrument],
+        instruments: [
+          {
+            method: 'paypal',
+            _ungrouped: [
+              {
+                method: 'paypal',
+              },
+            ],
+          },
+        ],
       };
 
       found = Ungroup.ungroupInstruments(block);
@@ -722,7 +887,16 @@ test('Module: configurability/ungroup', t => {
 
       expected = {
         code: 'block.test',
-        instruments: [instrument],
+        instruments: [
+          {
+            method: 'bank_transfer',
+            _ungrouped: [
+              {
+                method: 'bank_transfer',
+              },
+            ],
+          },
+        ],
       };
 
       found = Ungroup.ungroupInstruments(block);

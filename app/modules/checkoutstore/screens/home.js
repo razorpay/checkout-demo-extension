@@ -13,11 +13,7 @@ export const partialPaymentAmount = writable('');
 
 export const blocks = writable([]);
 export const instruments = derived(blocks, allBlocks => {
-  let allInstruments = [];
-
-  _Arr.loop(allBlocks, block => {
-    allInstruments = _Arr.mergeWith(allInstruments, block.instruments);
-  });
+  const allInstruments = _Arr.flatMap(allBlocks, block => block.instruments);
 
   return allInstruments;
 });
