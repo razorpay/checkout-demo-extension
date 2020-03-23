@@ -41,9 +41,9 @@
 </script>
 
 {#if isGroupedInstrument}
-  <MethodInstrument {instrument} />
+  <MethodInstrument {instrument} on:click />
 {:else if isSavedCardInstrument}
-  <SavedCardInstrument {instrument} />
+  <SavedCardInstrument {instrument} on:click />
 {:else}
-  <RadioInstrument {instrument} />
+  <RadioInstrument {instrument} on:click />
 {/if}
