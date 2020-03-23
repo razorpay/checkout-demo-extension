@@ -29,6 +29,20 @@ const _commonBanks = {
 };
 
 /**
+ * Returns the name of the common bank
+ * @param {string} code
+ *
+ * @returns {string}
+ */
+export function getCommonBankName(code) {
+  if (_commonBanks[code]) {
+    return _commonBanks[code];
+  }
+
+  return code;
+}
+
+/**
  * Transforms a banks object to a list with name, code and logo
  * @param {Object} bankObj
  * @return {Array<{name: string, code: string, logo: string}>}
