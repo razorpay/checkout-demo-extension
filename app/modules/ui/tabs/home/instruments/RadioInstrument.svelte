@@ -24,10 +24,8 @@
   export let instrument = {};
   export let name = 'instrument';
 
-  let individualInstrument;
-  $: {
-    individualInstrument = getExtendedSingleInstrument(instrument);
-  }
+  let individualInstrument = getExtendedSingleInstrument(instrument);
+  $: individualInstrument = getExtendedSingleInstrument(instrument);
 
   let selected = false;
   $: selected = $selectedInstrumentId === instrument.id;

@@ -21,10 +21,8 @@
   export let instrument = {};
   export let name = 'instrument';
 
-  let individualInstrument;
-  $: {
-    individualInstrument = getExtendedSingleInstrument(instrument);
-  }
+  let individualInstrument = getExtendedSingleInstrument(instrument);
+  $: individualInstrument = getExtendedSingleInstrument(instrument);
 
   const session = getSession();
 
