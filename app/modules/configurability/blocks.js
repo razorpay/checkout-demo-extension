@@ -11,7 +11,7 @@ import { createInstrument } from './instruments';
 export function createBlock(code, config = {}) {
   const block = {
     code,
-    type: 'block',
+    _type: 'block',
   };
 
   const { instruments, name } = config;

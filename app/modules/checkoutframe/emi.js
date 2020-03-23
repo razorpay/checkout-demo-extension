@@ -1,6 +1,7 @@
 /* global templates, showOverlay, hideEmi, Event */
 import EmiView from 'ui/components/emi.svelte';
 import { getSession } from 'sessionmanager';
+import { getEMIBanks } from 'checkoutstore/methods';
 
 const bankOverrides = {
   SBIN: {
@@ -28,7 +29,9 @@ function useBankOverrides(allBanks) {
 
 export default function emiView() {
   const session = getSession();
-  const opts = session.emi_options;
+  const opts = {
+    banks: getEMIBanks(),
+  };
 
   const amount = (opts.amount = session.get('amount')),
     offer = session.getAppliedOffer(),

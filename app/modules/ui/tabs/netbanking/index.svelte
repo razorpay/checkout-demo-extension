@@ -17,7 +17,7 @@
   import * as AnalyticsTypes from 'analytics-types';
   import { iPhone } from 'common/useragent';
   import { getPreferredBanks } from 'common/bank';
-  import { getSession } from 'sessionmanager';
+  import { getDowntimes, isRecurring } from 'checkoutstore';
   import * as InputActions from 'actions/input';
   import {
     hasMultipleOptions,
@@ -30,8 +30,7 @@
   // Props
   export let selectedBankCode = '';
   export let banks;
-  export let recurring;
-  export let downtimes = {};
+  export let downtimes = getDowntimes();
   export let method;
   export let bankOptions;
   export let active = false;
@@ -55,7 +54,7 @@
   const blur = InputActions.blur;
   const input = InputActions.input;
 
-  const session = getSession();
+  const recurring = isRecurring();
   const dispatch = createEventDispatcher();
 
   export function setCorporateOption() {

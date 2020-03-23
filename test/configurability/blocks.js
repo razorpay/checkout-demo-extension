@@ -27,22 +27,22 @@ test('Module: configurability/blocks', t => {
 
       expected = {
         code: 'block.hdfc',
-        type: 'block',
+        _type: 'block',
         instruments: [
           {
             method: 'card',
             issuers: ['HDFC'],
-            type: 'instrument',
+            _type: 'instrument',
           },
           {
             method: 'netbanking',
             banks: ['HDFC'],
-            type: 'instrument',
+            _type: 'instrument',
           },
           {
             method: 'wallet',
             wallets: ['payzapp'],
-            type: 'instrument',
+            _type: 'instrument',
           },
         ],
         title: 'Pay via HDFC Bank',
@@ -70,7 +70,7 @@ test('Module: configurability/blocks', t => {
 
       expected = {
         code: 'block.netbanking',
-        type: 'block',
+        _type: 'block',
         title: 'Pay via Netbanking',
       };
 
@@ -105,22 +105,22 @@ test('Module: configurability/blocks', t => {
 
       expected = {
         code: 'block.hdfc',
-        type: 'block',
+        _type: 'block',
         instruments: [
           {
             method: 'card',
             issuers: ['HDFC'],
-            type: 'instrument',
+            _type: 'instrument',
           },
           {
             method: 'netbanking',
             banks: ['HDFC'],
-            type: 'instrument',
+            _type: 'instrument',
           },
           {
             method: 'wallet',
             wallets: ['payzapp'],
-            type: 'instrument',
+            _type: 'instrument',
           },
         ],
       };

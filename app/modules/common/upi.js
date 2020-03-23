@@ -26,6 +26,10 @@ const UPI_APPS = {
       verify_registration: true,
     },
     {
+      package_name: 'com.phonepe.app',
+      app_icon: 'https://cdn.razorpay.com/checkout/phonepe.png',
+    },
+    {
       name: 'PayTM',
       app_name: 'PayTM UPI',
       package_name: 'net.one97.paytm',
@@ -104,6 +108,9 @@ const UPI_APPS = {
     },
     {
       package_name: 'com.fss.idfcpsp',
+    },
+    {
+      package_name: 'com.YesBank',
     },
     {
       package_name: 'com.abipbl.upi',
@@ -219,6 +226,13 @@ export const topUpiApps = [
     icon: 'https://cdn.razorpay.com/app/googlepay.svg',
     id: 'gpay',
     psp: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],
+  },
+
+  {
+    text: 'PhonePe',
+    icon: 'https://cdn.razorpay.com/app/phonepe.svg',
+    id: 'phonepe',
+    psp: 'ybl',
   },
   {
     text: 'BHIM',
@@ -479,6 +493,10 @@ const handleData = [
   {
     handles: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],
     icon: 'https://cdn.razorpay.com/app/googlepay.svg',
+  },
+  {
+    handles: ['ybl'],
+    icon: 'https://cdn.razorpay.com/app/phonepe.svg',
   },
   {
     handles: ['icicibank'],

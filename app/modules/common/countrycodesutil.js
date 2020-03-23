@@ -54,6 +54,10 @@ function getIndianNumber(number) {
     phone = phone.slice(2);
   }
 
+  if (phone.length === 11 && _Str.startsWith(phone, '0')) {
+    phone = phone.slice(1);
+  }
+
   if (phone.length === 10 && /^[6-9]/.test(phone)) {
     return {
       phone,
@@ -71,11 +75,14 @@ export function findCountryCode(phno) {
   let number = sanitizeNumber(phno);
 
   const beginsWithPlus = _Str.startsWith(number, '+');
+  const beginsWithZero = _Str.startsWith(number, '0');
   const lengthWithPlus = number.length;
   const lengthWithoutPlus = removePlus(number).length;
 
   const couldBeInternationalIndian = beginsWithPlus && lengthWithoutPlus === 12;
-  const couldBeRegularIndian = !beginsWithPlus && lengthWithoutPlus === 10;
+  const couldBeRegularIndian =
+    (!beginsWithPlus && lengthWithoutPlus === 10) ||
+    (beginsWithZero && lengthWithoutPlus === 11);
 
   if (couldBeInternationalIndian || couldBeRegularIndian) {
     const indian = getIndianNumber(number);

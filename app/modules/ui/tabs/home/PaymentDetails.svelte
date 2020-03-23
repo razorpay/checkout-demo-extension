@@ -19,10 +19,17 @@
   } from 'checkoutstore/screens/home';
 
   // Transitions
-  import { slide } from 'svelte/transition';
+  import { fly } from 'svelte/transition';
 
   // Utils imports
-  import CheckoutStore from 'checkoutstore';
+  import {
+    isContactEmailOptional,
+    isPartialPayment,
+    isEmailHidden,
+    isContactHidden,
+    isAddressEnabled,
+    getMerchantOrder,
+  } from 'checkoutstore';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { CONTACT_REGEX, EMAIL_REGEX } from 'common/constants';
@@ -33,20 +40,10 @@
   export let session;
 
   const cardOffer = session.cardOffer;
-  const order = session.order || {};
+  const order = getMerchantOrder();
   const bank = session.tpvBank || {};
   const accountName = session.get('prefill.bank_account[name]');
   const icons = session.themeMeta.icons;
-
-  const checkoutStore = CheckoutStore.get();
-  const {
-    contactEmailOptional,
-    isPartialPayment,
-    optional,
-    prefill,
-    readonly,
-    hidden,
-  } = checkoutStore;
 
   function trackContactFilled() {
     const valid = CONTACT_REGEX.test($contact);
@@ -70,10 +67,7 @@
     });
   }
 
-  const isEmailHidden = hidden.email && optional.email;
-  const isContactHidden = hidden.contact && optional.contact;
-
-  const showAddress = checkoutStore.address && !isPartialPayment;
+  const showAddress = isAddressEnabled() && !isPartialPayment();
 </script>
 
 <style>
@@ -91,21 +85,21 @@
   }
 </style>
 
-<div transition:slide={{ duration: 400 }}>
+<div in:fly={{ delay: 100, duration: 200, y: 40 }}>
   <div class="details-block">
-    {#if !isContactHidden}
+    {#if !isContactHidden()}
       <div class="contact-field">
         <ContactField bind:value={$contact} on:blur={trackContactFilled} />
       </div>
     {/if}
-    {#if !isEmailHidden}
+    {#if !isEmailHidden()}
       <div class="email-field">
         <EmailField bind:value={$email} on:blur={trackEmailFilled} />
       </div>
     {/if}
   </div>
 
-  {#if isPartialPayment}
+  {#if isPartialPayment()}
     <div class="partial-payment-block">
       <PartialPaymentOptions {order} />
     </div>
@@ -127,7 +121,7 @@
     </div>
   {:else if session.tpvBank}
     <div class="tpv-bank-block">
-      <TpvBank {bank} {accountName} showIfsc={contactEmailOptional} />
+      <TpvBank {bank} {accountName} showIfsc={isContactEmailOptional()} />
     </div>
   {/if}
 

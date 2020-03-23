@@ -11,7 +11,6 @@
   import PayoutInstrument from 'ui/elements/PayoutInstrument.svelte';
   import Tab from 'ui/tabs/Tab.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
-  import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
 
   // Props
   export let upiAccounts;
@@ -235,7 +234,7 @@
             classes={['secondary-color']}
             on:select={() => dispatch('add', { method: 'upi' })}>
             <div>UPI</div>
-            <div class="desc">Add a UPI ID (BHIM, Google Pay and more)</div>
+            <div class="desc">Add a UPI ID (BHIM, PhonePe and more)</div>
           </NextOption>
 
         </div>
@@ -256,12 +255,6 @@
 
         </div>
       {/if}
-    </div>
-    <div slot="bottom">
-      <DowntimeCallout>
-        Payouts to Yes Bank and PhonePe accounts are temporarily disabled.
-        Please try another bank.
-      </DowntimeCallout>
     </div>
   </Screen>
 </Tab>

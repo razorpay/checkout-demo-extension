@@ -9,27 +9,33 @@
   // Utils imports
   import { getSession } from 'sessionmanager';
   import { getBankLogo } from 'common/bank';
-  import PreferencesStore from 'checkoutstore/preferences';
+  import { getBanks } from 'checkoutstore';
   import { getWallet } from 'common/wallet';
+  import { getProvider as getCardlessEmiProvider } from 'common/cardlessemi';
+  import { getProvider as getPaylaterProvider } from 'common/paylater';
   import Track from 'tracker';
+  import { getExtendedSingleInstrument } from 'configurability/instruments';
 
   // Store
-  import { contact } from 'checkoutstore/screens/home';
+  import { selectedInstrumentId } from 'checkoutstore/screens/home';
+  import { customer } from 'checkoutstore/customer';
 
   // Props
-  export let instrument = {}; // P13n instrument
+  export let instrument = {};
+  export let name = 'instrument';
+
+  let individualInstrument = getExtendedSingleInstrument(instrument);
+  $: individualInstrument = getExtendedSingleInstrument(instrument);
+
+  let selected = false;
+  $: selected = $selectedInstrumentId === instrument.id;
 
   const session = getSession();
   const dispatch = createEventDispatcher();
 
-  const name = Track.makeUid();
-  const id = Track.makeUid();
-
   let title;
   let icon;
   let alt;
-
-  let selected = false;
 
   function getVpaFromInstrument(instrument) {
     const { vpa, token } = instrument;
@@ -38,20 +44,20 @@
       return vpa;
     }
 
-    const customer = session.getCustomer($contact);
-    const tokens = _Obj.getSafely(customer, 'tokens.items', []);
+    const tokens = _Obj.getSafely($customer, 'tokens.items', []);
     const vpaToken = _Arr.find(tokens, item => item.id === token);
 
     return `${vpaToken.vpa.username}@${vpaToken.vpa.handle}`;
   }
 
   $: {
-    const banks = PreferencesStore.get().methods.netbanking;
+    const banks = getBanks();
     let wallet;
     let flow;
     let vpaSplit;
+    let provider;
 
-    switch (instrument.method) {
+    switch (individualInstrument.method) {
       case 'paypal':
         title = 'PayPal';
         icon = session.themeMeta.icons.paypal;
@@ -60,31 +66,36 @@
         break;
 
       case 'netbanking':
-        title = `Netbanking - ${banks[instrument.bank]} `;
-        icon = getBankLogo(instrument.bank);
-        alt = banks[instrument.bank];
+        title = `Netbanking - ${banks[individualInstrument.bank]} `;
+        icon = getBankLogo(individualInstrument.bank);
+        alt = banks[individualInstrument.bank];
 
         break;
       case 'wallet':
-        wallet = getWallet(instrument.wallet);
+        wallet = getWallet(individualInstrument.wallet);
         title = `Wallet - ${wallet.name}`;
         icon = wallet.sqLogo;
-        alt = wallet;
+        alt = wallet.name;
 
         break;
       case 'upi':
-        if (instrument['_[upiqr]'] === '1') {
+        if (individualInstrument.flow === 'qr') {
           title = `UPI QR`;
           icon = session.themeMeta.icons['qr'];
           alt = title;
 
           break;
-        } else if (instrument['_[flow]'] === 'intent') {
-          title = `UPI - ${instrument.app_name.replace(/ UPI$/, '')}`;
+        } else if (individualInstrument.flow === 'intent') {
+          const app = _Arr.find(
+            session.upi_intents_data,
+            app => app.package_name === individualInstrument.app
+          );
 
-          if (instrument.app_icon) {
-            icon = instrument.app_icon;
-            alt = instrument.app_name;
+          title = `UPI - ${app.app_name.replace(/ UPI$/, '')}`;
+
+          if (app.app_icon) {
+            icon = app.app_icon;
+            alt = app.app_name;
           } else {
             icon = '&#xe70e';
             alt = 'UPI App';
@@ -94,6 +105,22 @@
           icon = '&#xe70e;';
           alt = 'UPI';
         }
+
+        break;
+
+      case 'cardless_emi':
+        provider = getCardlessEmiProvider(individualInstrument.provider);
+        title = `EMI - ${provider.name}`;
+        icon = provider.sqLogo;
+        alt = provider.name;
+
+        break;
+
+      case 'paylater':
+        provider = getPaylaterProvider(individualInstrument.provider);
+        title = `Pay Later - ${provider.name}`;
+        icon = provider.sqLogo;
+        alt = provider.name;
 
         break;
     }
@@ -114,14 +141,20 @@
       dispatch('submit');
     }
   }
+
+  function selectInstrument() {
+    $selectedInstrumentId = instrument.id;
+  }
 </script>
 
 <SlottedRadioOption
-  {name}
   ellipsis
-  value={id}
+  {name}
+  {selected}
   className="instrument"
+  value={instrument.id}
   on:click
+  on:click={selectInstrument}
   on:keydown={attemptSubmit}>
   <i slot="icon">
     <Icon {icon} {alt} />

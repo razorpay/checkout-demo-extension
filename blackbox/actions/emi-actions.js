@@ -7,46 +7,39 @@ contents = String(
 );
 
 async function verifyEMIPlansWithOffers(context, offerNumber) {
-  await context.page.waitForSelector(
-    '.emi-plans-list .expandable-card.expandable-card--has-badge:nth-of-type(' +
-      1 +
-      ')'
+  await context.page.$$eval(
+    '.emi-plans-list .expandable-card.expandable-card--has-badge',
+    (elems, offerNumber) => {
+      if (elems.length != offerNumber) {
+        throw `EMI Plan elements with offer (${elems.length}) not equal to expected number (${offerNumber})`;
+      }
+      if (offerNumber && !elems[0].offsetWidth) {
+        throw 'EMI Plan element with offer not visible';
+      }
+    },
+    [offerNumber]
   );
-  for (var i = 1; i <= offerNumber; i++) {
-    const currentElement = await context.page.$eval(
-      '.emi-plans-list .expandable-card.expandable-card--has-badge:nth-of-type(' +
-        i +
-        ')',
-      visible
-    );
-    expect(currentElement).toEqual(true);
-  }
 }
 
 async function selectEMIPlanWithOffer(context, offerNumber) {
-  await context.page.waitForSelector(
-    '.emi-plans-list .expandable-card.expandable-card--has-badge:nth-of-type(' +
-      1 +
-      ')'
-  );
   await context.page.click(
-    '.emi-plans-list .expandable-card.expandable-card--has-badge:nth-of-type(' +
-      offerNumber +
-      ')'
+    `.emi-plans-list .expandable-card.expandable-card--has-badge:nth-of-type(${offerNumber})`
   );
 }
 
 async function verifyEMIPlansWithoutOffers(context, offerNumber) {
-  await context.page.waitForSelector(
-    '.emi-plans-list .expandable-card:nth-of-type(' + 1 + ')'
+  await context.page.$$eval(
+    '.emi-plans-list .expandable-card:not(.expandable-card--has-badge)',
+    (elems, offerNumber) => {
+      if (elems.length != offerNumber) {
+        throw `EMI Plan elements without offer (${elems.length}) not equal to expected number (${offerNumber})`;
+      }
+      if (offerNumber && !elems[0].offsetWidth) {
+        throw 'EMI Plan element without offer not visible';
+      }
+    },
+    [offerNumber]
   );
-  for (var i = 1; i <= offerNumber; i++) {
-    const currentElement = await context.page.$eval(
-      '.emi-plans-list .expandable-card:nth-of-type(' + i + ')',
-      visible
-    );
-    expect(currentElement).toEqual(true);
-  }
 }
 
 async function selectEMIPlanWithoutOffer(context, offerNumber) {
@@ -56,10 +49,7 @@ async function selectEMIPlanWithoutOffer(context, offerNumber) {
 }
 
 async function selectCardlessEMIOption(context, optionName) {
-  const cardlessEmiOption = await context.page.waitForXPath(
-    '//div[text() = "' + optionName + '"]'
-  );
-  await cardlessEmiOption.click();
+  await page.$eval(`img[src$="${optionName}.svg"]`, el => el.click());
 }
 
 async function handleCardlessEMIValidation(context) {

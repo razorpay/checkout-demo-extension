@@ -20,12 +20,12 @@
     getMethodNameForPaymentOption,
     getMethodDescription,
   } from 'checkoutframe/paymentmethods';
-  import DowntimesStore from 'checkoutstore/downtimes';
+  import { getDowntimes } from 'checkoutstore';
 
   const session = getSession();
   const dispatch = createEventDispatcher();
 
-  const downtimes = DowntimesStore.get().high.methods;
+  const downtimes = getDowntimes().high.methods;
   let down = false;
   if (downtime) {
     if (/card$/.test(method)) {
