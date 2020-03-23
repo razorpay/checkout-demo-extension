@@ -114,9 +114,18 @@ const config = {
       return [grouped];
     },
     isValid: instrument => {
+      if (instrument.token_id) {
+        return true;
+      }
+
+      const hasTokens = Boolean(instrument.token_ids);
       const hasIssuers = Boolean(instrument.issuers);
       const hasNetworks = Boolean(instrument.networks);
       const hasTypes = Boolean(instrument.types);
+
+      if (hasTokens && !instrument.token_ids.length) {
+        return false;
+      }
 
       if (hasIssuers && !instrument.issuers.length) {
         return false;
