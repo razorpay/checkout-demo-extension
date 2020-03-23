@@ -1,4 +1,6 @@
 import RazorpayConfig from 'common/RazorpayConfig';
+import { generateTextFromList } from 'lib/utils';
+import { getCommonBankName } from 'common/bank';
 
 export const networks = {
   amex: 'American Express',
@@ -191,4 +193,164 @@ export function isCardNetworkInPaymentOneOf(
       listNetwork => listNetwork.toLowerCase() === network
     )
   );
+}
+
+/**
+ * Generates a string from the list after filtering for truthy values
+ * @param {Array<string>} list
+ *
+ * @returns {string}
+ */
+function concatTruthyString(list) {
+  return list |> _Arr.filter(Boolean) |> _Arr.join(' ');
+}
+
+/**
+ * Creates subtext to be used for a Card Instrument
+ *
+ * Document: https://docs.google.com/spreadsheets/d/1Yqz_4GBT0aSxvYu1xjflQLy2I-PnLq5GZsFY8Pi-3OY/edit?usp=sharing
+ * @param {Instrument} instrument
+ *
+ * @returns {string}
+ */
+export function getSubtextFromCardInstrument(instrument) {
+  const instrumentIssuers =
+    instrument.issuers || []
+    |> _Arr.map(bank => {
+      return getCommonBankName(bank).replace(/ Bank$/, '');
+    });
+  const instrumentNetworks =
+    instrument.networks || [] |> _Arr.map(network => networks[network]);
+  const instrumentTypes = instrument.types || [];
+
+  const issuersLength = instrumentIssuers.length;
+  const networksLength = instrumentNetworks.length;
+  const typesLength = instrumentTypes.length;
+
+  const allIssusers = issuersLength === 0;
+  const allNetworks = networksLength === 0;
+  const allTypes = typesLength === 0;
+
+  if (allIssusers) {
+    let stringList = ['Only'];
+
+    let typesString;
+    let cardsString = 'cards';
+    let networksString;
+
+    if (!allTypes) {
+      typesString = generateTextFromList(instrumentTypes);
+    }
+
+    if (allNetworks) {
+      if (allTypes) {
+        return 'All cards supported';
+      }
+    } else if (networksLength <= 2) {
+      networksString = generateTextFromList(instrumentNetworks, 2);
+    } else {
+      if (allTypes) {
+        networksString = 'select networks';
+        cardsString = null;
+      } else {
+        networksString = 'select network';
+      }
+    }
+
+    stringList.push(networksString);
+    stringList.push(typesString);
+    stringList.push(cardsString);
+
+    stringList.push('supported');
+
+    return concatTruthyString(stringList);
+  } else if (issuersLength === 1) {
+    let stringList = ['Only'];
+
+    let issuersString = instrumentIssuers[0];
+    let typesString;
+    let cardsString = 'cards';
+    let networksString;
+
+    if (!allTypes) {
+      typesString = generateTextFromList(instrumentTypes);
+    }
+
+    if (allNetworks) {
+      // Do nothing
+    } else if (networksLength === 1) {
+      networksString = instrumentNetworks[0];
+    } else {
+      issuersString = `select ${issuersString}`;
+    }
+
+    stringList.push(issuersString);
+    stringList.push(networksString);
+    stringList.push(typesString);
+    stringList.push(cardsString);
+
+    stringList.push('supported');
+
+    return concatTruthyString(stringList);
+  } else if (issuersLength === 2) {
+    let stringList = ['Only'];
+
+    let issuersString = generateTextFromList(instrumentIssuers, 2);
+    let typesString;
+    let cardsString = 'cards';
+    let networksString;
+
+    if (!allTypes) {
+      typesString = generateTextFromList(instrumentTypes);
+    }
+
+    if (allNetworks) {
+      // Do nothing
+    } else if (networksLength === 1) {
+      if (allTypes) {
+        networksString = instrumentNetworks[0];
+      } else {
+        issuersString = `select ${issuersString}`;
+      }
+    } else {
+      issuersString = `select`;
+    }
+
+    stringList.push(issuersString);
+    stringList.push(networksString);
+    stringList.push(typesString);
+    stringList.push(cardsString);
+
+    stringList.push('supported');
+
+    return concatTruthyString(stringList);
+  } else {
+    let stringList = ['Only'];
+
+    let issuersString = 'select';
+    let typesString;
+    let cardsString = 'cards';
+    let networksString;
+
+    if (!allTypes) {
+      typesString = generateTextFromList(instrumentTypes);
+    }
+
+    if (allNetworks) {
+      // Do nothing
+    } else if (networksLength === 1) {
+      networksString = instrumentNetworks[0];
+    } else {
+      issuersString = `select`;
+    }
+
+    stringList.push(issuersString);
+    stringList.push(networksString);
+    stringList.push(typesString);
+    stringList.push(cardsString);
+
+    stringList.push('supported');
+
+    return concatTruthyString(stringList);
+  }
 }
