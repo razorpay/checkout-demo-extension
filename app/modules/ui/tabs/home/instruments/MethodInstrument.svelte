@@ -9,15 +9,18 @@
   import Track from 'tracker';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
 
+  // Store imports
+  import { selectedInstrumentId } from 'checkoutstore/screens/home';
+
   // Props
   export let instrument = {};
+  export let name = 'instrument';
 
   const session = getSession();
 
   const method = instrument.method;
   const methodName = getMethodNameForPaymentOption(method, { session });
   const title = `Pay using ${methodName}`;
-  const name = Track.makeUid();
   const id = Track.makeUid();
 
   let icon;
@@ -25,6 +28,31 @@
     icon = session.themeMeta.icons['card'];
   } else {
     icon = session.themeMeta.icons[method];
+  }
+
+  function deselectInstrument() {
+    $selectedInstrumentId = null;
+  }
+
+  function switchToMethod() {
+    let method = instrument.method;
+
+    if (method === 'paypal') {
+      createPaypalPayment();
+      return;
+    } else if (method === 'gpay') {
+      method = 'upi';
+    }
+
+    session.switchTab(method);
+  }
+
+  function createPaypalPayment() {
+    const payload = session.getPayload();
+
+    payload.method = 'paypal';
+
+    session.preSubmit(null, payload);
   }
 </script>
 
@@ -36,12 +64,14 @@
 </style>
 
 <SlottedOption
-  {name}
   ellipsis
-  value={id}
+  {name}
+  value={instrument.id}
   radio={false}
   className="instrument"
-  on:click>
+  on:click
+  on:click={deselectInstrument}
+  on:click={switchToMethod}>
   <i slot="icon">
     <Icon {icon} alt={methodName} />
   </i>

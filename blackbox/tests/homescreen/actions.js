@@ -23,25 +23,19 @@ const { proceed } = sharedActions;
  * and enters an amount
  */
 async function handlePartialPayment(context, amount) {
-  const payPartially = await context.page.waitForSelector(
-    '.partial-payment-block button:nth-of-type(2)',
-    {
-      visible: true,
-    }
-  );
-
-  await payPartially.click();
+  await context.page.click('.partial-payment-block button:nth-of-type(2)');
 
   setState(context, {
     partial: true,
   });
 
-  const amountValue = await context.page.waitForSelector('#amount-value', {
-    visible: true,
-  });
-  await amountValue.type(amount);
-
-  await proceed(context);
+  await context.page.type('#amount-value', amount);
+  await delay(100);
+  await context.page.evaluate(() =>
+    document.querySelector('#amount-value').blur()
+  );
+  await delay(100);
+  await context.page.click('#footer');
 }
 
 /**

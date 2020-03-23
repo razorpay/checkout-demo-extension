@@ -1,4 +1,4 @@
-import InstrumentConfig from './instrument-config';
+import InstrumentsConfig from './instruments-config';
 
 /**
  * Adds a type and category to an instrument
@@ -7,10 +7,10 @@ import InstrumentConfig from './instrument-config';
  * @returns {Instrument}
  */
 function addTypeAndCategory(instrument) {
-  instrument.type = 'instrument';
+  instrument._type = 'instrument';
 
   if (isInstrumentForEntireMethod(instrument)) {
-    instrument.type = 'method';
+    instrument._type = 'method';
   }
 
   return instrument;
@@ -49,7 +49,7 @@ export function createInstrument(config) {
  */
 export function isInstrumentForEntireMethod(instrument) {
   const method = instrument.method;
-  const config = InstrumentConfig[method];
+  const config = InstrumentsConfig[method];
 
   if (!config) {
     return false;
@@ -59,7 +59,41 @@ export function isInstrumentForEntireMethod(instrument) {
 
   // None of the keys in the config should be present in the instrument
   return _Arr.every(
-    config.keys,
+    config.properties,
     key => !_Arr.contains(currentInsturmentKeys, key)
   );
+}
+
+/**
+ * Adds instrument data to payment payload
+ * @param {Instrument} instrument
+ * @param {Object} payment Payment payload
+ * @param {Customer} customer
+ *
+ * @returns {Object}
+ */
+export function addInstrumentToPaymentData(instrument, payment, customer) {
+  const method = instrument.method;
+  const config = InstrumentsConfig[method];
+
+  if (!config) {
+    return payment;
+  }
+
+  return config.getPaymentPayload(instrument, payment, customer);
+}
+
+/**
+ * Tells whether or not the instrument is a card instrument
+ * to be used from inside the card tab
+ * @param {Instrument} instrument
+ *
+ * @returns {boolean}
+ */
+export function isDetailedCardInstrument(instrument) {
+  const isMethodInstrument = isInstrumentForEntireMethod(instrument);
+  const isMethodCardOrEmi = _Arr.contains(['card', 'emi'], instrument.method);
+  const isSavedCardInstrument = instrument.token_id;
+
+  return isMethodCardOrEmi && !isMethodInstrument && !isSavedCardInstrument;
 }

@@ -6,9 +6,8 @@ const {
   find,
   getAttribute,
   innerText,
+  assertVisible,
 } = require('../../util');
-
-const { proceed } = require('./sharedActions');
 
 /**
  * Asserts that the user details in the strip
@@ -26,19 +25,12 @@ async function assertUserDetails(context) {
     const first = contact || email;
     const last = email;
 
-    const strip = await context.page.waitForSelector(
-      '#user-details [slot=title]',
-      {
-        visible: true,
-      }
-    );
+    await assertVisible('#user-details [slot=title]');
     const firstInPage = await innerText(
-      context.page,
-      await strip.$('span:first-child')
+      '#user-details [slot=title] span:first-child'
     );
     const lastInPage = await innerText(
-      context.page,
-      await strip.$('span:last-child')
+      '#user-details [slot=title] span:last-child'
     );
 
     if (!first && !last) {
@@ -57,23 +49,8 @@ async function assertUserDetails(context) {
  * and returning keeps the behaviour intact
  */
 async function assertEditUserDetailsAndBack(context) {
-  const strip = await context.page.waitForSelector(
-    '#user-details [slot=title]',
-    {
-      visible: true,
-    }
-  );
-
-  await strip.click();
-
-  // TODO: Update details
-
-  if (context.state && context.state.partial) {
-    await proceed(context);
-  } else {
-    await delay(500);
-    await proceed(context);
-  }
+  await context.page.click('#user-details [slot=title]');
+  await context.page.click('#footer');
   await assertUserDetails(context);
 }
 
@@ -118,11 +95,8 @@ async function fillUserDetails(context, number) {
  * with contact and email fields
  */
 async function assertBasicDetailsScreen(context) {
-  const $form = await context.page.waitForSelector('#form-common', {
-    visible: true,
-  });
   if (!context.prefilledContact && !context.isContactOptional) {
-    const $contact = await $form.$('#contact');
+    const $contact = await context.page.$('#contact');
 
     let contact = context.prefilledContact;
 
@@ -138,7 +112,7 @@ async function assertBasicDetailsScreen(context) {
     expect(await $contact.evaluate(el => el.value)).toEqual(contact);
   }
   if (!context.prefilledEmail && !context.isEmailOptional) {
-    const $email = await $form.$('#email');
+    const $email = await context.page.$('#email');
 
     expect(await $email.evaluate(el => el.value)).toEqual(
       context.prefilledEmail
@@ -147,10 +121,7 @@ async function assertBasicDetailsScreen(context) {
 }
 
 async function assertMissingDetails(context) {
-  const $form = await context.page.waitForSelector('#form-common', {
-    visible: true,
-  });
-  const strip = await $form.$('#user-details');
+  const strip = await context.page.$('#user-details');
   if (!context.preferences.customer) {
     expect(strip).toEqual(null);
   } else {

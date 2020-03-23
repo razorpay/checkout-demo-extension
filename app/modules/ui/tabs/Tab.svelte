@@ -1,6 +1,6 @@
 <script>
   // Utils imports
-  import { getSession } from 'sessionmanager';
+  import { isMethodEnabled } from 'checkoutstore/methods';
 
   // Props
   export let method;
@@ -13,9 +13,7 @@
   // Computed
   export let methodSupported;
 
-  const session = getSession();
-
-  $: methodSupported = overrideMethodCheck || session.methods[method];
+  $: methodSupported = overrideMethodCheck || isMethodEnabled(method);
 </script>
 
 {#if methodSupported}

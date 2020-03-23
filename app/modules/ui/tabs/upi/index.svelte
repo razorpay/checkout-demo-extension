@@ -7,8 +7,8 @@
   import { getSession } from 'sessionmanager';
   import * as GPay from 'gpay';
   import * as Bridge from 'bridge';
-  import Preferences from 'checkoutstore/preferences';
-  import DowntimesStore from 'checkoutstore/downtimes';
+  import { getDowntimes, hasFeature, isCustomerFeeBearer } from 'checkoutstore';
+  import { isMethodEnabled, isUPIFlowEnabled } from 'checkoutstore/methods';
   import { isVpaValid } from 'common/upi';
   import {
     doesAppExist,
@@ -43,14 +43,13 @@
 
   // Store
   import { contact } from 'checkoutstore/screens/home';
+  import { customer } from 'checkoutstore/customer';
 
   // Props
   export let selectedApp = undefined;
   export let preferIntent = true;
   export let useWebPaymentsApi = false;
-  export let qrEnabled = false;
   export let down = false;
-  export let useOmnichannel = false;
   export let retryOmnichannel = false;
   export let isFirst = true;
   export let vpa = '';
@@ -74,11 +73,8 @@
   let isANewVpa = false;
   let rememberVpaCheckbox;
   let intentAppSelected = null;
-  let customer;
-  let collectEnabled = false;
 
   const session = getSession();
-  const preferences = Preferences.get();
 
   const {
     all_upi_intents_data: allIntentApps,
@@ -89,7 +85,7 @@
 
   const checkGPay = session => {
     /* disable Web payments API for fee_bearer for now */
-    if (session.preferences.fee_bearer) {
+    if (isCustomerFeeBearer()) {
       return Promise.reject();
     }
 
@@ -106,13 +102,11 @@
     return session.r.checkPaymentAdapter('gpay');
   };
 
-  const checkOmnichannel = session =>
-    _Obj.getSafely(session, 'methods.upi.omnichannel');
-
-  $: intent = preferIntent && _Obj.getSafely(session, 'methods.upi.intent');
+  $: intent = preferIntent && isUPIFlowEnabled('intent');
   $: isGPaySelected = selectedApp === 'gpay' && useWebPaymentsApi;
   $: pspHandle = selectedAppData ? selectedAppData.psp : '';
-  $: shouldShowQr = qrEnabled && !selectedApp && selectedApp !== null;
+  $: shouldShowQr =
+    isMethodEnabled('qr') && !selectedApp && selectedApp !== null;
 
   $: {
     /**
@@ -128,6 +122,10 @@
     if (selectedToken && session.tab === 'upi') {
       determineCtaVisibility();
     }
+  }
+
+  $: {
+    tokens = filterUPITokens(_Obj.getSafely($customer, 'tokens.items', []));
   }
 
   function setWebPaymentsApiUsage(to) {
@@ -151,8 +149,6 @@
   }
 
   onMount(() => {
-    updateCustomer();
-
     checkGPay(session)
       /* Use Google Pay */
       .then(() => {
@@ -163,23 +159,17 @@
         setWebPaymentsApiUsage(false);
       });
 
-    useOmnichannel = checkOmnichannel(session);
-
     /* TODO: improve handling of `prefill.vpa` */
     if (session.get('prefill.vpa')) {
       selectedApp = null;
       vpa = session.get('prefill.vpa');
     }
 
-    const downtimes = DowntimesStore.get();
+    const downtimes = getDowntimes();
 
     down = _Arr.contains(downtimes.low.methods, 'upi');
     disabled = _Arr.contains(downtimes.high.methods, 'upi');
-
-    qrEnabled = _Obj.getSafely(session, 'methods.upi.qr');
     qrIcon = session.themeMeta.icons.qr;
-
-    collectEnabled = _Obj.getSafely(session, 'methods.upi.collect');
   });
 
   export function selectQrMethod() {
@@ -193,21 +183,7 @@
     session.switchTab('qr');
   }
 
-  export function updateCustomer() {
-    customer = session.getCustomer($contact);
-
-    const _tokens = filterUPITokens(
-      _Obj.getSafely(customer, 'tokens.items', [])
-    );
-
-    tokens = _Arr.filter(
-      _tokens,
-      token => _Obj.getSafely(token, 'vpa.handle') !== 'ybl'
-    ); // Filter out PhonePe VPAs
-  }
-
   export function onShown() {
-    updateCustomer();
     determineCtaVisibility();
   }
 
@@ -387,6 +363,10 @@
   }
 
   #vpa-wrap {
+    &.phonepe :global(.elem) {
+      padding-right: 44px;
+    }
+
     &.bhim :global(.elem) {
       padding-right: 45px;
     }
@@ -456,7 +436,7 @@
         </div>
       {/if}
 
-      {#if collectEnabled}
+      {#if isUPIFlowEnabled('collect')}
         <div class="legend left">Pay using UPI ID</div>
         <div class="border-list">
           {#if intent}
@@ -489,14 +469,14 @@
             on:click={() => {
               onUpiAppSelection({ detail: { id: 'new' } });
             }}
-            {customer}
+            customer={$customer}
             on:blur={trackVpaEntry}
             selected={selectedToken === 'new'}
             bind:this={vpaField} />
         </div>
       {/if}
 
-      {#if useOmnichannel}
+      {#if isUPIFlowEnabled('omnichannel')}
         <GooglePayOmnichannel
           error={retryOmnichannel}
           focusOnCreate={true}
@@ -532,11 +512,6 @@
           is experiencing low success rates.
         </DowntimeCallout>
       {/if}
-
-      <DowntimeCallout>
-        PhonePe and Yes Bank UPI payments are temporarily disabled. Please pay
-        via another method.
-      </DowntimeCallout>
 
       <OffersPortal />
     </div>

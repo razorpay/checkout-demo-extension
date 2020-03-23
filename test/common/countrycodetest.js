@@ -71,5 +71,15 @@ test('Module: countrycodeutil', t => {
     t.end();
   });
 
+  test('Indian phone nubmer starting with 0', t => {
+    const formatedNumber = findCountryCode('09988776655');
+    const expectedFormat = {
+      phone: '9988776655',
+      code: '91',
+    };
+    t.same(formatedNumber, expectedFormat);
+    t.end();
+  });
+
   t.end();
 });

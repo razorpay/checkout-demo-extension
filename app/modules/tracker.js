@@ -200,6 +200,8 @@ export default function Track(r, event, data, immediately) {
       'recurring',
       'redirect',
       'theme',
+      'hidden',
+      'ecod',
     ];
 
     _Obj.loop(r.get(), function(value, key) {
