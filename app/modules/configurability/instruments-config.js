@@ -113,6 +113,25 @@ const config = {
 
       return [grouped];
     },
+    isValid: instrument => {
+      const hasIssuers = Boolean(instrument.issuers);
+      const hasNetworks = Boolean(instrument.networks);
+      const hasTypes = Boolean(instrument.types);
+
+      if (hasIssuers && !instrument.issuers.length) {
+        return false;
+      }
+
+      if (hasNetworks && !instrument.networks.length) {
+        return false;
+      }
+
+      if (hasTypes && !instrument.types.length) {
+        return false;
+      }
+
+      return true;
+    },
     isIndividual: instrument =>
       instrument.token_id && (instrument.network || instrument.issuer),
   },

@@ -12,10 +12,12 @@ import {
   isUPIFlowEnabled,
   getPayLaterProviders,
   getCardlessEMIProviders,
+  getCardNetworks,
 } from 'checkoutstore/methods';
 
-import { shouldSeparateDebitCard } from 'checkoutstore';
+import { shouldSeparateDebitCard, getMerchantMethods } from 'checkoutstore';
 import wallet from 'ui/icons/payment-methods/wallet';
+import { API_NETWORK_CODES_MAP } from 'common/card';
 
 /**
  * Returns the available methods
@@ -68,6 +70,49 @@ function removeNonApplicableInstrumentFlows(instrument) {
   }
 
   switch (instrument.method) {
+    case 'emi':
+    case 'card': {
+      // We don't have eligible issuers, so we'll only filter on types and networks.
+      const hasNetworks = Boolean(instrument.networks);
+      const hasTypes = Boolean(instrument.types);
+
+      // Filter based on networks
+      if (hasNetworks) {
+        let availableNetworks = [];
+
+        _Obj.loop(getCardNetworks(), (val, key) => {
+          if (val) {
+            availableNetworks.push(API_NETWORK_CODES_MAP[key]);
+          }
+        });
+
+        instrument.networks = _Arr.filter(instrument.networks, network =>
+          _Arr.contains(availableNetworks, network)
+        );
+      }
+
+      // Filter based on types
+      if (hasTypes) {
+        // Check for credit cards
+        if (
+          _Arr.contains(instrument.types, 'credit') &&
+          !getMerchantMethods().credit_card
+        ) {
+          instrument.types = _Arr.remove(instrument.types, 'credit');
+        }
+
+        // Check for debit cards
+        if (
+          _Arr.contains(instrument.types, 'debit') &&
+          !getMerchantMethods().debit_card
+        ) {
+          instrument.types = _Arr.remove(instrument.types, 'debit');
+        }
+      }
+
+      return instrument;
+    }
+
     case 'netbanking': {
       const hasBanks = Boolean(instrument.banks);
 
@@ -145,8 +190,6 @@ function removeNonApplicableInstrumentFlows(instrument) {
       // TODO: check for app
       return instrument;
     }
-
-    // TODO: card and EMI
   }
 
   return instrument;
