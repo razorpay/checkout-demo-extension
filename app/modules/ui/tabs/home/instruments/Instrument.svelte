@@ -1,9 +1,6 @@
 <script>
   // Utils imports
-  import {
-    isInstrumentForEntireMethod,
-    isDetailedCardInstrument,
-  } from 'configurability/instruments';
+  import { isInstrumentForEntireMethod } from 'configurability/instruments';
 
   // UI imports
   import MethodInstrument from './MethodInstrument.svelte';
