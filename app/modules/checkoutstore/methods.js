@@ -364,7 +364,7 @@ export function getWallets() {
    * Also, enable/disable wallets on the basis of merchant options
    */
   const passedWallets = getOption('method.wallet');
-  const enabledWallets = getMerchantMethods().wallet |> _Obj.keys;
+  let enabledWallets = getMerchantMethods().wallet |> _Obj.keys;
 
   addExternalWallets(enabledWallets);
 
@@ -379,9 +379,8 @@ export function getWallets() {
   }
 
   if (_.isNonNullObject(passedWallets)) {
-    return (
-      enabledWallets |> _Arr.filter(wallet => passedWallets[wallet] !== false)
-    );
+    enabledWallets =
+      enabledWallets |> _Arr.filter(wallet => passedWallets[wallet] !== false);
   }
   return (
     enabledWallets |> _Arr.map(wallet => wallets[wallet]) |> _Arr.filter(_ => _)
