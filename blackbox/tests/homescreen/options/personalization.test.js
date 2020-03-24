@@ -29,6 +29,6 @@ describe.each(
     await assertBasicDetailsScreen(context);
     await fillUserDetails(context, '8888888881');
     await proceed(context);
-    await expect('#instruments-list').selectorToBeAbsent(context);
+    await expect('div[data-block="rzp.preferred"]').selectorToBeAbsent(context);
   });
 });
