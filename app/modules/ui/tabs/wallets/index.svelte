@@ -30,7 +30,6 @@
   const walletReferences = {};
 
   export function onWalletSelection(e, code) {
-    const isEcod = session.get('ecod');
     selectedWallet = code;
 
     if (!session.validateOffers(selectedWallet)) {
