@@ -1,27 +1,90 @@
-import { translateExternal } from './options';
+import { translateExternal } from './translate';
 import { getSequencedBlocks } from './sequence';
-import { AVAILABLE_METHODS } from 'common/constants';
 import { clusterRazorpayBlocks } from './methods';
+import { ungroupInstruments, getIndividualInstruments } from './ungroup';
+
+import { AVAILABLE_METHODS } from 'common/constants';
+import { isMethodEnabled } from 'checkoutstore/methods';
+import { shouldSeparateDebitCard } from 'checkoutstore';
+
+/**
+ * Returns the available methods
+ *
+ * @returns {Array<string>}
+ */
+function getAvailableDefaultMethods() {
+  let available = _Arr.filter(AVAILABLE_METHODS, isMethodEnabled);
+
+  /**
+   * Cardless EMI and EMI are the same payment option.
+   * When we click EMI, it should take to Cardless EMI if
+   * cardless_emi is an available method.
+   */
+  if (
+    _Arr.contains(available, 'cardless_emi') &&
+    _Arr.contains(available, 'emi')
+  ) {
+    available = _Arr.remove(available, 'emi');
+  }
+
+  /**
+   * We do not want to show QR in the primary list
+   * of payment options anymore
+   */
+  available = _Arr.remove(available, 'qr');
+
+  // TODO: Filter based on amount
+
+  // Separate out debit and credit cards
+  if (shouldSeparateDebitCard()) {
+    available = _Arr.remove(available, 'card');
+    available = ['credit_card', 'debit_card'].concat(available);
+  }
+
+  return available;
+}
 
 /**
  * Creates a block config for rendering
  * @param {Object} options Options passed by the merchant
+ * @param {Customer} customer
  *
  * @returns {Object}
  */
-export function getBlockConfig(options) {
+export function getBlockConfig(options, customer) {
   // Translate external representation to internal representation
   const translated = translateExternal(options);
 
+  // Ungroup instruments for now
+  translated.blocks = _Arr.map(translated.blocks, block =>
+    ungroupInstruments(block, customer)
+  );
+
+  // Remove empty blocks
+  translated.blocks = _Arr.filter(
+    translated.blocks,
+    block => block.instruments.length > 0
+  );
+
+  // Ungroup hidden instrument as well
+  translated.hide.instruments =
+    translated.hide.instruments
+    |> _Arr.flatMap(
+      group => getIndividualInstruments(group, customer)._ungrouped
+    );
+
   // Reorder blocks
   const sequentialied = getSequencedBlocks({
-    translated: translated,
+    translated,
     original: options,
-    methods: AVAILABLE_METHODS, // TODO: Should be the actual eligible methods
+    methods: getAvailableDefaultMethods(),
   });
 
   // Group blocks of Razorpay
-  const grouped = clusterRazorpayBlocks(sequentialied);
+  const clustered = clusterRazorpayBlocks(sequentialied);
 
-  return grouped;
+  return {
+    blocks: clustered,
+    hidden: translated.hide.instruments,
+  };
 }

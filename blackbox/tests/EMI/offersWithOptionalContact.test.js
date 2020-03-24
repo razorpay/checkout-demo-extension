@@ -71,6 +71,13 @@ describe.each(
           emi_subvention: true,
         },
         {
+          id: 'offer_DWceNzkjugg37y',
+          name: 'No Cost EMI - Yes Bank',
+          payment_method: 'emi',
+          issuer: 'YESB',
+          emi_subvention: true,
+        },
+        {
           id: 'offer_DWcfDUXq0X08U6',
           name: 'No Cost EMI - Kotak ',
           payment_method: 'emi',

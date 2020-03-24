@@ -103,5 +103,5 @@ RazorpayDefaults._ = {
 };
 
 RazorpayDefaults.config = {
-  display: null, // Display config for Payment Method Configurability
+  display: {}, // Display config for Payment Method Configurability
 };

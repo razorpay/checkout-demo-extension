@@ -70,10 +70,13 @@ async function validateHelpMessage(context, message) {
 async function submit(context) {
   // needed for wallet screen animation
   await delay(300);
+  const clickPromise = context.page.click('#footer');
 
-  // can not await this due to redirection
-  context.page.click('#footer');
-  await delay(300);
+  if (context.options.redirect) {
+    await delay(600);
+  } else {
+    await clickPromise;
+  }
 }
 
 async function handleMockFailureDialog(context) {

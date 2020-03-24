@@ -100,9 +100,7 @@
     view = 'qr';
     loading = true;
 
-    if (session.p13n) {
-      session.p13nInstrument = processInstrument(paymentData);
-    }
+    session.preferredInstrument = processInstrument(paymentData);
 
     /**
      * TODO:

@@ -8,5 +8,5 @@ module.exports = {
   maxWorkers: 6,
   // testRunner: 'jest-circus/runner',
   // verbose: true,
-  // setupFilesAfterEnv: ['./blackbox/jestSetupFileAfterENV'],
+  setupFilesAfterEnv: ['./blackbox/jestSetupFileAfterENV'],
 };

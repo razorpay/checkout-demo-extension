@@ -1,6 +1,4 @@
 <script>
-  /* global each, Event */
-
   // Svelte imports
   import { onMount, tick } from 'svelte';
 
@@ -12,7 +10,6 @@
   import EmiActions from 'ui/components/EmiActions.svelte';
   import SavedCards from 'ui/tabs/card/savedcards.svelte';
   import OffersPortal from 'ui/components/OffersPortal.svelte';
-  import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
 
   // Store
   import {
@@ -22,6 +19,9 @@
     cardNumber,
     remember,
   } from 'checkoutstore/screens/card';
+  import { methodTabInstruments } from 'checkoutstore/screens/home';
+
+  import { customer } from 'checkoutstore/customer';
 
   import { contact } from 'checkoutstore/screens/home';
   import { isRecurring, shouldRememberCustomer } from 'checkoutstore';
@@ -65,9 +65,6 @@
   let showSavedCardsCta = false;
   $: showSavedCardsCta = savedCards && savedCards.length && isSavedCardsEnabled;
 
-  // State
-  let customer = {};
-
   // Refs
   let savedCardsView;
   let addCardView;
@@ -108,15 +105,75 @@
     return allSavedCards;
   }
 
-  $: {
-    allSavedCards = getSavedCardsFromCustomer(customer);
+  /**
+   * Filters saved card tokens against the given instruments.
+   * Only allows those cards that match any of the given instruments.
+   *
+   * @param {Array<Token>} tokens
+   * @param {Array<Instrument>} instruments
+   *
+   * @returns {Array<Token}
+   */
+  function filterSavedCardsAgainstInstruments(tokens, instruments) {
+    const eligibleInstruments = _Arr.filter(
+      instruments,
+      instrument => instrument.method === tab
+    );
+
+    // There are no instruments to filter against
+    if (!eligibleInstruments.length) {
+      return tokens;
+    }
+
+    const eligibleTokens = _Arr.filter(tokens, token => {
+      return _Arr.any(eligibleInstruments, instrument => {
+        const hasIssuers = Boolean(instrument.issuers);
+        const hasNetworks = Boolean(instrument.networks);
+        const hasTypes = Boolean(instrument.types);
+
+        const issuers = instrument.issuers || [];
+        const networks = instrument.networks || [];
+        const types = instrument.types || [];
+
+        // If there is no issuer present, it means match all issuers.
+        const issuerMatches = hasIssuers
+          ? _Arr.contains(issuers, token.card.issuer)
+          : true;
+
+        const networkMatches = hasNetworks
+          ? _Arr.contains(
+              networks,
+              token.card.network && token.card.network.toLowerCase()
+            )
+          : true;
+
+        const typeMatches = hasTypes
+          ? _Arr.contains(types, token.card.type)
+          : true;
+
+        return issuerMatches && networkMatches && typeMatches;
+      });
+    });
+
+    return eligibleTokens;
   }
 
   $: {
-    savedCards = filterSavedCardsForOffer(
+    allSavedCards = getSavedCardsFromCustomer($customer);
+  }
+
+  $: {
+    let _savedCards = filterSavedCardsForOffer(
       getSavedCardsForDisplay(allSavedCards, tab),
       selectedOffer
     );
+
+    _savedCards = filterSavedCardsAgainstInstruments(
+      _savedCards,
+      $methodTabInstruments
+    );
+
+    savedCards = _savedCards;
   }
 
   $: {
@@ -188,14 +245,16 @@
   }
 
   export function showLandingView() {
-    tick().then(_ => {
-      let viewToSet = Views.ADD_CARD;
+    return tick()
+      .then(_ => {
+        let viewToSet = Views.ADD_CARD;
 
-      if (savedCards && savedCards.length > 0 && isSavedCardsEnabled) {
-        viewToSet = Views.SAVED_CARDS;
-      }
-      setView(viewToSet);
-    });
+        if (savedCards && savedCards.length > 0 && isSavedCardsEnabled) {
+          viewToSet = Views.SAVED_CARDS;
+        }
+        setView(viewToSet);
+      })
+      .then(tick);
   }
 
   export function showAddCardView() {
@@ -362,19 +421,6 @@
     });
   }
 
-  /**
-   * Updates the customer, shows the landing view and returns a promise that resolves when the landing view is visible
-   * @param newCustomer
-   * @return {Promise<void>}
-   */
-  export function updateCustomerAndShowLandingView(newCustomer = {}) {
-    customer = newCustomer;
-    // Wait for pending state updates from reactive statements
-    return tick()
-      .then(showLandingView)
-      .then(tick);
-  }
-
   export function setSelectedOffer(newOffer) {
     selectedOffer = newOffer;
   }
@@ -467,10 +513,6 @@
           {/if}
         </Callout>
       {/if}
-
-      <DowntimeCallout>
-        Yes Bank Cards are temporarily disabled. Please pay via another method.
-      </DowntimeCallout>
 
       <OffersPortal />
     </div>

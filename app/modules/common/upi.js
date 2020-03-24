@@ -110,6 +110,9 @@ const UPI_APPS = {
       package_name: 'com.fss.idfcpsp',
     },
     {
+      package_name: 'com.YesBank',
+    },
+    {
       package_name: 'com.abipbl.upi',
     },
     {
@@ -224,6 +227,7 @@ export const topUpiApps = [
     id: 'gpay',
     psp: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],
   },
+
   {
     text: 'PhonePe',
     icon: 'https://cdn.razorpay.com/app/phonepe.svg',

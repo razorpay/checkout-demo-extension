@@ -66,7 +66,7 @@ export function createMethodBlock(method) {
 
   block = _Obj.extend(block, {
     method,
-    type: 'rzp_method',
+    _type: 'rzp_method',
   });
 
   return block;
@@ -96,7 +96,7 @@ export function clusterRazorpayBlocks(blocks) {
   }
 
   _Arr.loop(blocks, block => {
-    const isRazorpayMethodBlock = block.type === 'rzp_method';
+    const isRazorpayMethodBlock = block._type === 'rzp_method';
 
     if (isRazorpayMethodBlock) {
       // Add to cluster
