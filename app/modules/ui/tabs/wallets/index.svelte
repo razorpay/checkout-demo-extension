@@ -27,6 +27,10 @@
 
   export let selectedWallet = session.get('prefill.wallet') || null;
 
+  export function isAnyWalletSelected() {
+    return !!selectedWallet;
+  }
+
   const walletReferences = {};
 
   export function onWalletSelection(e, code) {

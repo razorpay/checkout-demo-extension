@@ -3901,7 +3901,7 @@ Session.prototype = {
 
       if (this.screen === 'wallet') {
         /* Wallet tab being responsible for its subdata */
-        if (this.svelteWalletsTab.selectedWallet) {
+        if (this.svelteWalletsTab.isAnyWalletSelected()) {
           _Obj.extend(data, this.svelteWalletsTab.getPayload());
         }
       }
