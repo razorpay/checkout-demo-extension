@@ -19,7 +19,7 @@
     cardNumber,
     remember,
   } from 'checkoutstore/screens/card';
-  import { methodTabInstruments } from 'checkoutstore/screens/home';
+  import { methodTabInstrument } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
 
@@ -106,53 +106,50 @@
   }
 
   /**
-   * Filters saved card tokens against the given instruments.
-   * Only allows those cards that match any of the given instruments.
+   * Filters saved card tokens against the given instrument.
+   * Only allows those cards that match the given instruments.
    *
    * @param {Array<Token>} tokens
-   * @param {Array<Instrument>} instruments
+   * @param {Instrument} instrument
    *
    * @returns {Array<Token}
    */
-  function filterSavedCardsAgainstInstruments(tokens, instruments) {
-    const eligibleInstruments = _Arr.filter(
-      instruments,
-      instrument => instrument.method === tab
-    );
+  function filterSavedCardsAgainstInstrument(tokens, instrument) {
+    // Sanity check
+    if (!instrument) {
+      return tokens;
+    }
 
-    // There are no instruments to filter against
-    if (!eligibleInstruments.length) {
+    if (instrument.method !== tab) {
       return tokens;
     }
 
     const eligibleTokens = _Arr.filter(tokens, token => {
-      return _Arr.any(eligibleInstruments, instrument => {
-        const hasIssuers = Boolean(instrument.issuers);
-        const hasNetworks = Boolean(instrument.networks);
-        const hasTypes = Boolean(instrument.types);
+      const hasIssuers = Boolean(instrument.issuers);
+      const hasNetworks = Boolean(instrument.networks);
+      const hasTypes = Boolean(instrument.types);
 
-        const issuers = instrument.issuers || [];
-        const networks = instrument.networks || [];
-        const types = instrument.types || [];
+      const issuers = instrument.issuers || [];
+      const networks = instrument.networks || [];
+      const types = instrument.types || [];
 
-        // If there is no issuer present, it means match all issuers.
-        const issuerMatches = hasIssuers
-          ? _Arr.contains(issuers, token.card.issuer)
-          : true;
+      // If there is no issuer present, it means match all issuers.
+      const issuerMatches = hasIssuers
+        ? _Arr.contains(issuers, token.card.issuer)
+        : true;
 
-        const networkMatches = hasNetworks
-          ? _Arr.contains(
-              networks,
-              token.card.network && token.card.network.toLowerCase()
-            )
-          : true;
+      const networkMatches = hasNetworks
+        ? _Arr.contains(
+            networks,
+            token.card.network && token.card.network.toLowerCase()
+          )
+        : true;
 
-        const typeMatches = hasTypes
-          ? _Arr.contains(types, token.card.type)
-          : true;
+      const typeMatches = hasTypes
+        ? _Arr.contains(types, token.card.type)
+        : true;
 
-        return issuerMatches && networkMatches && typeMatches;
-      });
+      return issuerMatches && networkMatches && typeMatches;
     });
 
     return eligibleTokens;
@@ -168,9 +165,9 @@
       selectedOffer
     );
 
-    _savedCards = filterSavedCardsAgainstInstruments(
+    _savedCards = filterSavedCardsAgainstInstrument(
       _savedCards,
-      $methodTabInstruments
+      $methodTabInstrument
     );
 
     savedCards = _savedCards;

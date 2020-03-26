@@ -22,7 +22,7 @@
     isContactPresent,
     email,
     selectedInstrumentId,
-    methodTabInstruments,
+    methodTabInstrument,
     multiTpvOption,
     partialPaymentAmount,
     partialPaymentOption,
@@ -363,7 +363,7 @@
   }
 
   export function onShown() {
-    $methodTabInstruments = [];
+    $methodTabInstrument = undefined;
 
     if (view === 'methods') {
       if ($selectedInstrumentId) {
