@@ -255,11 +255,12 @@ export function getSubtextFromCardInstrument(instrument) {
       }
     }
 
-    stringList.push(networksString);
-    stringList.push(typesString);
-    stringList.push(cardsString);
-
-    stringList.push('supported');
+    stringList = _Arr.mergeWith(stringList, [
+      networksString,
+      typesString,
+      cardsString,
+      'supported',
+    ]);
 
     return concatTruthyString(stringList);
   } else if (issuersLength === 1) {
@@ -282,12 +283,13 @@ export function getSubtextFromCardInstrument(instrument) {
       issuersString = `select ${issuersString}`;
     }
 
-    stringList.push(issuersString);
-    stringList.push(networksString);
-    stringList.push(typesString);
-    stringList.push(cardsString);
-
-    stringList.push('supported');
+    stringList = _Arr.mergeWith(stringList, [
+      issuersString,
+      networksString,
+      typesString,
+      cardsString,
+      'supported',
+    ]);
 
     return concatTruthyString(stringList);
   } else if (issuersLength === 2) {
@@ -314,12 +316,13 @@ export function getSubtextFromCardInstrument(instrument) {
       issuersString = `select`;
     }
 
-    stringList.push(issuersString);
-    stringList.push(networksString);
-    stringList.push(typesString);
-    stringList.push(cardsString);
-
-    stringList.push('supported');
+    stringList = _Arr.mergeWith(stringList, [
+      issuersString,
+      networksString,
+      typesString,
+      cardsString,
+      'supported',
+    ]);
 
     return concatTruthyString(stringList);
   } else {
@@ -342,12 +345,13 @@ export function getSubtextFromCardInstrument(instrument) {
       issuersString = `select`;
     }
 
-    stringList.push(issuersString);
-    stringList.push(networksString);
-    stringList.push(typesString);
-    stringList.push(cardsString);
-
-    stringList.push('supported');
+    stringList = _Arr.mergeWith(stringList, [
+      issuersString,
+      networksString,
+      typesString,
+      cardsString,
+      'supported',
+    ]);
 
     return concatTruthyString(stringList);
   }
