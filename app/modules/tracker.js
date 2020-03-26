@@ -186,11 +186,14 @@ export default function Track(r, event, data, immediately) {
 
     var trackingOptions = [
       'amount',
+      'checkout_config_id',
       'contact_id',
       'currency',
       'description',
       'display_amount',
       'display_currency',
+      'ecod',
+      'hidden',
       'image',
       'key',
       'method',
@@ -200,8 +203,6 @@ export default function Track(r, event, data, immediately) {
       'recurring',
       'redirect',
       'theme',
-      'hidden',
-      'ecod',
     ];
 
     _Obj.loop(r.get(), function(value, key) {

@@ -99,7 +99,7 @@ function oxfordComma(list) {
  *
  * @return {String}
  */
-export function generateTextFromList(list, max) {
+export function generateTextFromList(list, max = Infinity) {
   if (list.length > max) {
     return `${list.slice(0, max - 1).join(', ')} & More`;
   } else {

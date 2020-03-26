@@ -48,6 +48,7 @@
     isAddressEnabled,
     isRecurring,
     getMerchantOrder,
+    getCheckoutConfig,
   } from 'checkoutstore';
   import {
     isCreditCardEnabled,
@@ -115,7 +116,22 @@
     !session.get('address');
 
   function getRawMerchantConfig() {
-    return session.get('config.display');
+    const displayFromOptions = session.get('config.display');
+    const displayFromPreferences = _Obj.getSafely(
+      getCheckoutConfig(),
+      'display',
+      {}
+    );
+
+    if (_.isNull(displayFromOptions)) {
+      // Setting config.display as null allows you to disable the configuration
+      return {};
+    } else if (!_.isEmptyObject(displayFromOptions)) {
+      // displayFromOptions will be an empty object by default
+      return displayFromOptions;
+    }
+
+    return displayFromPreferences;
   }
 
   export function showMethods() {
