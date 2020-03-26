@@ -274,7 +274,6 @@ export function getEMandateBanks() {
 
 export function getEMandateAuthTypes(bankCode) {
   const authTypeFromOrder = getMerchantOrder()?.auth_type;
-  const accountType = getOption('prefill.bank_account[account_type]');
 
   /**
    * There may be multiple auth types present for each bank
@@ -290,7 +289,8 @@ export function getEMandateAuthTypes(bankCode) {
       if (authTypeFromOrder) {
         return type === authTypeFromOrder;
       }
-      return (!accountType && type === 'netbanking') || type === 'debitcard';
+
+      return type === 'netbanking' || type === 'debitcard';
     }) || []
   );
 }
