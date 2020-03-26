@@ -29,6 +29,7 @@ export const getMerchantOffers = () => preferences.offers;
 export const isOfferForced = () => preferences.force_offer;
 export const getDowntimes = () => _getDowntimes(preferences);
 export const isCustomerFeeBearer = () => preferences.fee_bearer;
+export const getCheckoutConfig = () => preferences.checkout_config;
 
 const optionGetter = option => () => getOption(option);
 export const getOption = option => razorpayInstance.get(option);
