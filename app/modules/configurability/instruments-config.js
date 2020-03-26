@@ -52,6 +52,10 @@ function genericIsIndividual(instrument) {
   return _Arr.any(paymentKeys, key => instrument[key]);
 }
 
+function genericIsValid(instrument) {
+  return true;
+}
+
 function genericGroupedToIndividual(grouped, customer) {
   return [grouped];
 }
@@ -109,6 +113,34 @@ const config = {
 
       return [grouped];
     },
+    isValid: instrument => {
+      if (instrument.token_id) {
+        return true;
+      }
+
+      const hasTokens = Boolean(instrument.token_ids);
+      const hasIssuers = Boolean(instrument.issuers);
+      const hasNetworks = Boolean(instrument.networks);
+      const hasTypes = Boolean(instrument.types);
+
+      if (hasTokens && !instrument.token_ids.length) {
+        return false;
+      }
+
+      if (hasIssuers && !instrument.issuers.length) {
+        return false;
+      }
+
+      if (hasNetworks && !instrument.networks.length) {
+        return false;
+      }
+
+      if (hasTypes && !instrument.types.length) {
+        return false;
+      }
+
+      return true;
+    },
     isIndividual: instrument =>
       instrument.token_id && (instrument.network || instrument.issuer),
   },
@@ -130,6 +162,9 @@ const config = {
       });
     },
     isIndividual: instrument => instrument.bank,
+    isValid: instrument =>
+      Boolean(instrument.bank) ||
+      (Boolean(instrument.banks) && instrument.banks.length > 0),
   },
 
   wallet: {
@@ -149,6 +184,9 @@ const config = {
       });
     },
     isIndividual: instrument => instrument.wallet,
+    isValid: instrument =>
+      Boolean(instrument.wallet) ||
+      (Boolean(instrument.wallets) && instrument.wallets.length > 0),
   },
 
   upi: {
@@ -241,18 +279,14 @@ const config = {
       return [grouped];
     },
     isIndividual: instrument => {
-      const singleFlow =
-        instrument.flow || _Obj.getSafely(instrument, 'flows', []).length === 1;
+      const singleFlow = instrument.flow;
 
       const missingApp = !instrument.app && !instrument.apps;
-      const singleApp =
-        instrument.app || _Obj.getSafely(instrument, 'apps', []).length === 1;
+      const singleApp = instrument.app;
       const singleorMissingApps = singleApp || missingApp;
 
       const missingToken = !instrument.token_id && !instrument.token_ids;
-      const singleToken =
-        instrument.token_id ||
-        _Obj.getSafely(instrument, 'token_ids', []).length === 1;
+      const singleToken = instrument.token_id;
       const singleorMissingTokens = singleToken || missingToken;
 
       return singleFlow && singleorMissingApps && singleorMissingTokens;
@@ -294,6 +328,21 @@ const config = {
 
       return payment;
     },
+    isValid: instrument => {
+      const hasFlows = Boolean(instrument.flows);
+      const hasApps = Boolean(instrument.apps);
+
+      if (hasFlows && !instrument.flows.length) {
+        return false;
+      }
+
+      if (hasApps && !instrument.apps.length) {
+        return false;
+      }
+
+      // Individual instrument should either have flow or app
+      return Boolean(instrument.flow) || Boolean(instrument.app);
+    },
   },
 
   paypal: {
@@ -317,6 +366,9 @@ const config = {
         );
       });
     },
+    isValid: instrument =>
+      Boolean(instrument.provider) ||
+      (Boolean(instrument.providers) && instrument.providers.length > 0),
   },
 
   paylater: {
@@ -336,6 +388,9 @@ const config = {
         );
       });
     },
+    isValid: instrument =>
+      Boolean(instrument.provider) ||
+      (Boolean(instrument.providers) && instrument.providers.length > 0),
   },
 
   bank_transfer: {
@@ -354,6 +409,7 @@ _Obj.loop(config, (val, method) => {
       getPaymentPayload: genericPaymentPayloadGetter,
       isIndividual: genericIsIndividual,
       groupedToIndividual: genericGroupedToIndividual,
+      isValid: genericIsValid,
       properties: [],
       payment: [],
     },

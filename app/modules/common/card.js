@@ -1,5 +1,15 @@
 import RazorpayConfig from 'common/RazorpayConfig';
 
+export const API_NETWORK_CODES_MAP = {
+  AMEX: 'amex',
+  DICL: 'diners',
+  JCB: 'jcb',
+  MAES: 'maestro',
+  MC: 'mastercard',
+  RUPAY: 'rupay',
+  VISA: 'visa',
+};
+
 export const networks = {
   amex: 'American Express',
   diners: 'Diners Club',
