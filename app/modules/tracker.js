@@ -202,6 +202,7 @@ export default function Track(r, event, data, immediately) {
       'theme',
       'hidden',
       'ecod',
+      'checkout_config_id',
     ];
 
     _Obj.loop(r.get(), function(value, key) {
