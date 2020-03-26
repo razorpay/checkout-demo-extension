@@ -329,8 +329,19 @@ const config = {
       return payment;
     },
     isValid: instrument => {
-      // TODO
-      return true;
+      const hasFlows = Boolean(instrument.flows);
+      const hasApps = Boolean(instrument.apps);
+
+      if (hasFlows && !instrument.flows.length) {
+        return false;
+      }
+
+      if (hasApps && !instrument.apps.length) {
+        return false;
+      }
+
+      // Individual instrument should either have flow or app
+      return Boolean(instrument.flow) || Boolean(instrument.app);
     },
   },
 
