@@ -37,7 +37,7 @@
   import { getSavedCards, transform } from 'common/token';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import { getCardType } from 'common/card';
+  import { getCardType, getSubtextFromCardInstrument } from 'common/card';
 
   // Transitions
   import { fade } from 'svelte/transition';
@@ -175,6 +175,17 @@
 
   $: {
     lastSavedCard = savedCards && savedCards[savedCards.length - 1];
+  }
+
+  let instrumentSubtext;
+  $: {
+    if (!$methodTabInstrument) {
+      instrumentSubtext = undefined;
+    } else if ($methodTabInstrument.method !== tab) {
+      instrumentSubtext = undefined;
+    } else {
+      instrumentSubtext = getSubtextFromCardInstrument($methodTabInstrument);
+    }
   }
 
   function getSavedCardsFromCustomer(customer = {}) {
@@ -447,11 +458,20 @@
     top: 10px;
     border: 1px solid red;
   }
+
+  .instrument-subtext-description {
+    margin: 12px 0;
+  }
 </style>
 
 <Tab method="card" pad={false} overrideMethodCheck>
   <Screen pad={false}>
     <div slot="main">
+      {#if instrumentSubtext}
+        <div class="pad instrument-subtext-description">
+          {instrumentSubtext}
+        </div>
+      {/if}
       {#if currentView === Views.ADD_CARD}
         <div in:fade={{ duration: 100, y: 100 }}>
           {#if showSavedCardsCta}
