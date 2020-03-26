@@ -207,8 +207,9 @@ function concatTruthyString(list) {
 
 /**
  * Creates subtext to be used for a Card Instrument
- *
- * Document: https://docs.google.com/spreadsheets/d/1Yqz_4GBT0aSxvYu1xjflQLy2I-PnLq5GZsFY8Pi-3OY/edit?usp=sharing
+ * To understand how the strings are supposed to be generated,
+ * take a look at the tests, or the document here:
+ * https://docs.google.com/spreadsheets/d/1Yqz_4GBT0aSxvYu1xjflQLy2I-PnLq5GZsFY8Pi-3OY/edit?usp=sharing
  * @param {Instrument} instrument
  *
  * @returns {string}
