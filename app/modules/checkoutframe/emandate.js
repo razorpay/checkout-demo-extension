@@ -1,12 +1,11 @@
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
-import { getCheckoutBridge } from 'bridge';
-import * as Curtain from 'components/curtain';
 import { getSession } from 'sessionmanager';
 import { hideCta, showCtaWithDefaultText } from 'checkoutstore/cta';
 import { getEMandateBanks, getEMandateAuthTypes } from 'checkoutstore/methods';
+import EmandateView from 'ui/tabs/emandate/index.svelte';
 
-/* global templates, fillData */
+/* global fillData */
 
 const emandateTabTitles = {
   'emandate-details': 'Account Details',
@@ -50,14 +49,13 @@ emandateView.prototype = {
   render: function() {
     this.unbind();
 
-    _El.setContents(
-      _Doc.querySelector('#emandate-wrapper'),
-      templates.emandate(this.opts)
-    );
+    const target = _Doc.querySelector('#emandate-wrapper');
+    new EmandateView({
+      target,
+    });
 
     this.el = _Doc.querySelector('#emandate-wrapper').firstChild;
 
-    this.input();
     this.bind();
   },
 
@@ -130,12 +128,6 @@ emandateView.prototype = {
       delistener();
     });
     this.listeners = [];
-  },
-
-  input: function() {
-    _Arr.loop(this.el.querySelectorAll('input[name]'), el => {
-      this.session.input(el);
-    });
   },
 
   showLandingScreenIfApplicable: function(tab) {
