@@ -4779,6 +4779,7 @@ Session.prototype = {
         this.customer.createOTP(function() {
           session.updateCustomerInStore();
         });
+        return;
       } else if (!this.headless) {
         request.message = 'Verifying OTP...';
         request.paused = true;
