@@ -9,6 +9,17 @@
   const bank_name = session.get('prefill.bank_account[name]');
   const bank_ifsc = session.get('prefill.bank_account[ifsc]');
 
+  var account_type = session.get('prefill.bank_account[account_type]');
+  var accountTexts = {
+    savings: 'Savings Account',
+    current: 'Current Account',
+  };
+  var accountTypes = _Obj.keys(accountTexts);
+
+  if (!_Arr.contains(accountTypes, account_type)) {
+    account_type = false;
+  }
+
   const ifsc_pattern = '^[a-zA-Z]{4}[a-zA-Z0-9]{7}$';
   const name_pattern = "^[a-zA-Z. 0-9\\']{(1, 100)}$";
 
@@ -107,6 +118,22 @@
           spellcheck="false"
           autocorrect="off"
           autocapitalize="off" />
+      </div>
+    </div>
+    <div class="elem-wrap">
+      <div class="elem select `?account_type`readonly`?`">
+        <i class="select-arrow"></i>
+        <div class="help">Please select a bank account type</div>
+        <select name="bank_account[account_type]" required class="input">
+          {#if account_type}
+            <option value={account_type}>{accountTexts[account_type]}</option>
+          {:else}
+            <option value="">Type of Bank Account</option>
+            {#each accountTypes as type}
+              <option value={type}>{accountTexts[type]}</option>
+            {/each}
+          {/if}
+        </select>
       </div>
     </div>
   </div>
