@@ -15,8 +15,8 @@ export function isVpaValid(vpa) {
  *
  * @returns {string | undefined}
  */
-function getPackageNameFromShortcode(shortcode) {
-  const app = getAllApps() |> _Arr.filter(app => app.shortcode === shortcode);
+export function getPackageNameFromShortcode(shortcode) {
+  const app = getAllApps() |> _Arr.find(app => app.shortcode === shortcode);
 
   if (app) {
     return app.package_name;
