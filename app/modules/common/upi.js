@@ -309,7 +309,7 @@ export const didUPIIntentSucceed = parsedResponse =>
  *
  * @return {String}
  */
-export const getPackageNames = list => {
+const getPackageNames = list => {
   const arr = [];
   _Arr.loop(list, app => arr.push(app.package_name));
   return arr;
@@ -330,14 +330,10 @@ export const doesAppExist = (packageName, list) =>
  *
  * @return {Array}
  */
-export const getUsableApps = () => {
+const getUsableApps = () => {
   let apps = [];
 
   _Arr.loop(UPI_APPS_ORDER, group => {
-    if (group === 'blacklist') {
-      return;
-    }
-
     apps = _Arr.merge(UPI_APPS[group], apps);
   });
 
@@ -361,33 +357,6 @@ export const getAllApps = () => {
 
 export const isPreferredApp = packageName =>
   doesAppExist(packageName, UPI_APPS.preferred);
-export const isWhitelistedApp = packageName =>
-  doesAppExist(packageName, UPI_APPS.whitelist);
-
-export const isBlacklistedApp = packageName =>
-  doesAppExist(packageName, UPI_APPS.blacklist);
-
-export const isUsableApp = packageName =>
-  doesAppExist(packageName, getUsableApps());
-
-/**
- * Finds app form package name.
- * @param {String} packageName
- *
- * @return {Object}
- */
-export const getAppByPackageName = packageName => {
-  const app = _Arr.filter(
-    getAllApps(),
-    app => app.package_name === packageName
-  );
-
-  if (app.length) {
-    return app[0];
-  }
-
-  return null;
-};
 
 /**
  * Returns a list of sorted apps to use.
