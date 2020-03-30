@@ -363,7 +363,7 @@
   }
 
   export function onShown() {
-    $methodTabInstrument = undefined;
+    $methodTabInstrument = null;
 
     if (view === 'methods') {
       if ($selectedInstrumentId) {
