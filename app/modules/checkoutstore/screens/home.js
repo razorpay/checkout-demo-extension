@@ -29,9 +29,9 @@ export const selectedInstrument = derived(
 );
 
 /**
- * Stores an array of instruments to be used from inside the method tab
+ * Stores the instrument for which method is opened
  */
-export const methodTabInstruments = writable([]);
+export const methodTabInstrument = writable(null);
 
 /**
  * A contact is said to be present if it has more than three characters,

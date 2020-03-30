@@ -12,7 +12,7 @@
   // Store imports
   import {
     selectedInstrumentId,
-    methodTabInstruments,
+    methodTabInstrument,
   } from 'checkoutstore/screens/home';
 
   // Props
@@ -58,8 +58,8 @@
     session.preSubmit(null, payload);
   }
 
-  function setMethodInstruments() {
-    $methodTabInstruments = [instrument];
+  function setMethodInstrument() {
+    $methodTabInstrument = instrument;
   }
 </script>
 
@@ -78,7 +78,7 @@
   className="instrument"
   on:click
   on:click={deselectInstrument}
-  on:click={setMethodInstruments}
+  on:click={setMethodInstrument}
   on:click={switchToMethod}>
   <i slot="icon">
     <Icon {icon} alt={methodName} />
