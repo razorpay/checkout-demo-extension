@@ -4767,25 +4767,6 @@ Session.prototype = {
       data.wallet = 'paypal';
     }
 
-    // ask user to verify phone number if not logged in and wants to save card
-    if (data.save && !this.customer.logged) {
-      if (this.screen === 'card') {
-        this.otpView.updateScreen({
-          skipText: 'Skip saving card',
-        });
-        Analytics.track('saved_cards:save:otp:ask');
-        this.commenceOTP(strings.otpsend, false, 'saved_cards_save');
-        debounceAskOTP(this.otpView, undefined, true);
-        this.customer.createOTP(function() {
-          session.updateCustomerInStore();
-        });
-      } else if (!this.headless) {
-        request.message = 'Verifying OTP...';
-        request.paused = true;
-      }
-    }
-    delete data.app_token;
-
     if (this.get('address') && !Store.isPartialPayment()) {
       var notes = (data.notes = clone(this.get('notes')) || {});
 
@@ -4943,6 +4924,29 @@ Session.prototype = {
     if (preferences.fee_bearer && this.showFeesUi()) {
       return;
     }
+
+    /**
+     * - Ask user to verify phone number if not logged in and wants to save card
+     * - Show OTP screen after user agrees to fees
+     */
+    if (data.save && !this.customer.logged) {
+      if (this.screen === 'card') {
+        this.otpView.updateScreen({
+          skipText: 'Skip saving card',
+        });
+        Analytics.track('saved_cards:save:otp:ask');
+        this.commenceOTP(strings.otpsend, false, 'saved_cards_save');
+        debounceAskOTP(this.otpView, undefined, true);
+        this.customer.createOTP(function() {
+          session.updateCustomerInStore();
+        });
+        return;
+      } else if (!this.headless) {
+        request.message = 'Verifying OTP...';
+        request.paused = true;
+      }
+    }
+    delete data.app_token;
 
     Razorpay.sendMessage({
       event: 'submit',
