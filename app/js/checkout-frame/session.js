@@ -4371,7 +4371,7 @@ Session.prototype = {
      * clicked, switch to the new payment methods screen.
      */
     if (!screen) {
-      if (this.checkCommonValid()) {
+      if (this.checkCommonValidAndTrackIfInvalid()) {
         // switch to methods tab
         if (this.homeTab.onDetailsScreen()) {
           if (this.homeTab.shouldGoNext()) {
@@ -4418,7 +4418,7 @@ Session.prototype = {
     var selectedInstrument = this.getSelectedPaymentInstrument();
 
     if (merchantOrder && merchantOrder.bank && !Store.isRecurring()) {
-      if (!this.checkCommonValid()) {
+      if (!this.checkCommonValidAndTrackIfInvalid()) {
         return;
       }
       data.method = merchantOrder.method || data.method || 'netbanking';
@@ -4548,7 +4548,7 @@ Session.prototype = {
     } else if (this.oneMethod === 'netbanking') {
       data.bank = this.get('prefill.bank');
     } else if (selectedInstrument) {
-      if (!this.checkCommonValid()) {
+      if (!this.checkCommonValidAndTrackIfInvalid()) {
         return;
       }
 
