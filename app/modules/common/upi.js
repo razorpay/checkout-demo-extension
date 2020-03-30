@@ -9,6 +9,20 @@ export function isVpaValid(vpa) {
   return VPA_REGEX.test(vpa);
 }
 
+/**
+ * Returns the package name corresponding to the app shortcode.
+ * @param {string} shortcode
+ *
+ * @returns {string | undefined}
+ */
+function getPackageNameFromShortcode(shortcode) {
+  const app = getAllApps() |> _Arr.filter(app => app.shortcode === shortcode);
+
+  if (app) {
+    return app.package_name;
+  }
+}
+
 const UPI_APPS = {
   /**
    * Preferred apps.
@@ -24,6 +38,7 @@ const UPI_APPS = {
        * and only display if they are.
        */
       verify_registration: true,
+      shortcode: 'googlepay',
     },
     {
       package_name: 'com.phonepe.app',
@@ -33,9 +48,11 @@ const UPI_APPS = {
       name: 'PayTM',
       app_name: 'PayTM UPI',
       package_name: 'net.one97.paytm',
+      shortcode: 'paytm',
     },
     {
       package_name: 'in.org.npci.upiapp',
+      shortcode: 'bhim',
     },
   ],
 
@@ -48,12 +65,15 @@ const UPI_APPS = {
       name: 'WhatsApp Business',
       app_name: 'WhatsApp Business UPI',
       package_name: 'com.whatsapp.w4b',
+      shortcode: 'whatsapp-biz',
     },
     {
       package_name: 'com.csam.icici.bank.imobile',
+      shortcode: 'imobile',
     },
     {
       package_name: 'com.sbi.upi',
+      shortcode: 'sbi',
     },
     {
       package_name: 'com.upi.axispay',
@@ -156,6 +176,7 @@ const UPI_APPS = {
     },
     {
       package_name: 'in.amazon.mShop.android.shopping',
+      shortcode: 'amazon',
     },
     {
       package_name: 'com.mipay.in.wallet',
@@ -181,15 +202,18 @@ const UPI_APPS = {
   blacklist: [
     {
       package_name: 'com.whatsapp',
+      shortcode: 'whatsapp',
     },
     {
       package_name: 'com.truecaller',
+      shortcode: 'truecaller',
     },
     {
       package_name: 'com.olacabs.customer',
     },
     {
       package_name: 'com.myairtelapp',
+      shortcode: 'airtel',
     },
     {
       package_name: 'com.paytmmall',
