@@ -14,7 +14,7 @@ test('Module: configurability/sequence', t => {
               instruments: [
                 {
                   method: 'upi',
-                  apps: ['gpay'],
+                  apps: ['googlepay'],
                   _type: 'instrument',
                 },
               ],
@@ -79,7 +79,7 @@ test('Module: configurability/sequence', t => {
               instruments: [
                 {
                   method: 'upi',
-                  apps: ['gpay'],
+                  apps: ['googlepay'],
                 },
               ],
             },
@@ -152,7 +152,7 @@ test('Module: configurability/sequence', t => {
           instruments: [
             {
               method: 'upi',
-              apps: ['gpay'],
+              apps: ['googlepay'],
               _type: 'instrument',
             },
           ],
@@ -265,7 +265,7 @@ test('Module: configurability/sequence', t => {
               instruments: [
                 {
                   method: 'upi',
-                  apps: ['gpay'],
+                  apps: ['googlepay'],
                   _type: 'instrument',
                 },
               ],
@@ -330,7 +330,7 @@ test('Module: configurability/sequence', t => {
               instruments: [
                 {
                   method: 'upi',
-                  apps: ['gpay'],
+                  apps: ['googlepay'],
                 },
               ],
             },
@@ -401,7 +401,7 @@ test('Module: configurability/sequence', t => {
           instruments: [
             {
               method: 'upi',
-              apps: ['gpay'],
+              apps: ['googlepay'],
               _type: 'instrument',
             },
           ],

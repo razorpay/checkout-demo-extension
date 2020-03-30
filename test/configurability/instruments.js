@@ -68,6 +68,28 @@ test('Module: configurability/instruments', t => {
       t.end();
     });
 
+    test('Transforms UPI app name', t => {
+      let config, expected, found;
+
+      config = {
+        method: 'upi',
+        flows: ['intent'],
+        apps: ['googlepay', 'com.somerandom.app'],
+      };
+
+      expected = {
+        method: 'upi',
+        flows: ['intent'],
+        _type: 'instrument',
+      };
+
+      found = Instruments.createInstrument(config);
+
+      t.deepEqual(found, expected, 'Transforms UPI app name');
+
+      t.end();
+    });
+
     t.end();
   });
 
