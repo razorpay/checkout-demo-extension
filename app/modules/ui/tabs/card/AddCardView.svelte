@@ -22,17 +22,22 @@
     cardType,
   } from 'checkoutstore/screens/card';
 
-  import CheckoutStore from 'checkoutstore';
+  import {
+    isNameReadOnly,
+    shouldRememberCustomer,
+    isRecurring,
+    isStrictlyRecurring,
+    getCardFlows,
+  } from 'checkoutstore';
+  import { isAMEXEnabled } from 'checkoutstore/methods';
 
   // Utils
-  import { getSession } from 'sessionmanager';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getIin, getCardDigits } from 'common/card';
   import { DEFAULT_AUTH_TYPE_RADIO } from 'common/constants';
   import { Formatter } from 'formatter';
 
-  const session = getSession();
   const dispatch = createEventDispatcher();
 
   let numberField = null;
@@ -40,11 +45,11 @@
   let nameField = null;
   let cvvField = null;
 
-  const nameReadonly = CheckoutStore.get().readonly.name;
+  const nameReadonly = isNameReadOnly();
 
-  const isSavedCardsEnabled = session.get('remember_customer');
+  const isSavedCardsEnabled = shouldRememberCustomer();
 
-  const showRememberCardCheck = !session.recurring && isSavedCardsEnabled;
+  const showRememberCardCheck = !isRecurring() && isSavedCardsEnabled;
 
   let noCvvChecked = false;
   let showNoCvvCheckbox = false;
@@ -146,7 +151,7 @@
       type: $cardType,
     });
 
-    if (!session.preferences.methods.amex && $cardType === 'amex') {
+    if (!isAMEXEnabled() && $cardType === 'amex') {
       isValid = false;
     }
 
@@ -162,9 +167,6 @@
     const cardNumber = getCardDigits(value);
     const iin = getIin(cardNumber);
 
-    const isStrictlyRecurring =
-      session.recurring && session.get('recurring') !== 'preferred';
-
     let isValid = validateCardNumber();
     numberField.setValid(isValid);
 
@@ -177,7 +179,7 @@
         return;
       }
 
-      if (isStrictlyRecurring) {
+      if (isStrictlyRecurring()) {
         isValid = isValid && isFlowApplicable(flows, Flows.RECURRING);
       } else {
         // Debit-PIN is not supposed to work in case of recurring
@@ -196,7 +198,7 @@
     }
 
     if (iin.length >= 6) {
-      session.r.getCardFlows(iin, flowChecker);
+      getCardFlows(iin, flowChecker);
     }
   }
 
@@ -291,8 +293,8 @@
         id="card_number"
         bind:value={$cardNumber}
         bind:this={numberField}
-        methods={session.methods}
-        recurring={session.recurring}
+        amexEnabled={isAMEXEnabled()}
+        recurring={isRecurring()}
         type={$cardType}
         on:filled={_ => handleFilled('numberField')}
         on:input={handleCardInput}

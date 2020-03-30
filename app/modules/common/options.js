@@ -29,6 +29,7 @@ export const RazorpayDefaults = {
     max_amount: 0,
     expire_by: 0,
   },
+  checkout_config_id: '',
 };
 
 function base_set(flatObj, defObj, objKey, objVal) {

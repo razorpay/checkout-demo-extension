@@ -99,10 +99,26 @@ function oxfordComma(list) {
  *
  * @return {String}
  */
-export function generateTextFromList(list, max) {
+export function generateTextFromList(list, max = Infinity) {
   if (list.length > max) {
     return `${list.slice(0, max - 1).join(', ')} & More`;
   } else {
     return oxfordComma(list);
   }
+}
+
+export function toLowerCaseSafe(str) {
+  if (!str) {
+    return;
+  }
+
+  return str.toLowerCase();
+}
+
+export function toTitleCase(str) {
+  if (!str) {
+    return str;
+  }
+
+  return str[0].toUpperCase() + str.slice(1);
 }

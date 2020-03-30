@@ -21,10 +21,10 @@
 
   const session = getSession();
 
-  const maxAmount = order.amount_due;
-  const minAmount = order.first_payment_min_amount;
   const amountPaid = Number(order.amount_paid);
   const isFirstPayment = amountPaid === 0;
+  const maxAmount = order.amount_due;
+  const minAmount = isFirstPayment && order.first_payment_min_amount;
   const showPartialAmountLabel = minAmount && isFirstPayment; // Show label and checkbox if order.first_payment_min_amount is set and is first payment
   const minAmountLabel =
     session.get('min_amount_label') ||

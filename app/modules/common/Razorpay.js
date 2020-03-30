@@ -25,6 +25,7 @@ const backendEntityIds = [
   'auth_link_id',
   'payment_link_id',
   'contact_id',
+  'checkout_config_id',
 ];
 
 export function makeAuthUrl(r, url) {
@@ -277,6 +278,7 @@ export function makePrefParams(rzp) {
         'subscription_card_change',
         'account_id',
         'contact_id',
+        'checkout_config_id',
       ],
       function(key) {
         var value = getter(key);

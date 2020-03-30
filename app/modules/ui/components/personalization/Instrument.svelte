@@ -10,7 +10,7 @@
   // Utils imports
   import { findCodeByNetworkName } from 'common/card';
   import { getSession } from 'sessionmanager';
-  import PreferencesStore from 'checkoutstore/preferences';
+  import { getBanks } from 'checkoutstore';
   import { getIcon as getNetworkIcon } from 'icons/network';
   import { getBankLogo } from 'common/bank';
   import { getWallet } from 'common/wallet';
@@ -45,7 +45,7 @@
   }
 
   $: {
-    const banks = PreferencesStore.get().methods.netbanking;
+    const banks = getBanks();
     let wallet;
     let flow;
     let vpaSplit;
@@ -66,7 +66,7 @@
         wallet = getWallet(instrument.wallet);
         text = `Wallet - ${wallet.name}`;
         icon = wallet.sqLogo;
-        alt = wallet;
+        alt = wallet.name;
         break;
       case 'upi':
         if (instrument['_[upiqr]'] === '1') {
@@ -80,13 +80,8 @@
 
         if (flow === 'intent') {
           text = `UPI - ${instrument.app_name.replace(/ UPI$/, '')}`;
-          if (instrument.app_icon) {
-            icon = instrument.app_icon;
-            alt = instrument.app_name;
-          } else {
-            icon = '&#xe70e';
-            alt = 'UPI App';
-          }
+          icon = instrument.app_icon || '&#xe70e';
+          alt = instrument.app_name || 'UPI App';
         } else {
           text = `UPI - ${getVpaFromInstrument(instrument)}`;
           icon = '&#xe70e;';
@@ -118,7 +113,7 @@
   {selected}
   ellipsis
   value={instrument.id}
-  className="p13n-instrument"
+  className="instrument"
   on:click
   on:keydown={attemptSubmit}>
   <i slot="icon">

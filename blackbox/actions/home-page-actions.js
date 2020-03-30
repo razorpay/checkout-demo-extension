@@ -44,6 +44,8 @@ async function assertPaymentMethods(context) {
 
 async function selectPaymentMethod(context, method) {
   await context.page.click('[tab=' + method + ']');
+  // animation
+  await delay(400);
 }
 
 module.exports = {

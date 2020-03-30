@@ -78,7 +78,9 @@ async function verifyNeftDetails(context) {
 }
 
 async function verifyRoundOffAlertMessage(context) {
-  const messageDiv = await context.page.waitForSelector('.callout.warning');
+  const messageDiv = await context.page.waitForSelector(
+    '#form-bank_transfer .callout.warning'
+  );
   let messageText = await context.page.evaluate(
     messageDiv => messageDiv.textContent,
     messageDiv

@@ -227,6 +227,7 @@ export const topUpiApps = [
     id: 'gpay',
     psp: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],
   },
+
   {
     text: 'PhonePe',
     icon: 'https://cdn.razorpay.com/app/phonepe.svg',

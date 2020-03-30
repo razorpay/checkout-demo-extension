@@ -51,7 +51,9 @@ async function verifyErrorMessage(context, expectedErrorMeassage) {
         messageDiv => messageDiv.textContent,
         messageDiv
       );
-    } else if (messageText == expectedErrorMeassage) break;
+    } else if (messageText == expectedErrorMeassage) {
+      break;
+    }
   }
   expect(messageText).toEqual(expectedErrorMeassage);
 }
@@ -66,12 +68,15 @@ async function validateHelpMessage(context, message) {
 }
 
 async function submit(context) {
-  await context.page.waitFor('#footer', {
-    timeout: 2000,
-    visible: true,
-  });
+  // needed for wallet screen animation
   await delay(300);
-  context.page.click('#footer');
+  const clickPromise = context.page.click('#footer');
+
+  if (context.options.redirect) {
+    await delay(600);
+  } else {
+    await clickPromise;
+  }
 }
 
 async function handleMockFailureDialog(context) {
@@ -93,10 +98,13 @@ async function expectRedirectWithCallback(context, fields) {
   const body = querystring.parse(request.body);
   const apiUrl = 'https://api.razorpay.com/v1/payments/create/';
   expect(request.method).toEqual('POST');
-  if (fields) expect(body).toMatchObject(fields);
+  if (fields) {
+    expect(body).toMatchObject(fields);
+  }
   let apiSuffix = '';
-  if (context.preferences.fees) apiSuffix = 'fees';
-  else if (
+  if (context.preferences.fees) {
+    apiSuffix = 'fees';
+  } else if (
     context.preferences.methods.upi ||
     fields.method == 'paylater' ||
     (context.preferences.methods.cardless_emi != undefined &&
@@ -106,14 +114,16 @@ async function expectRedirectWithCallback(context, fields) {
       !context.prefilledContact &&
       !context.isContactOptional &&
       !context.preferences.offers)
-  )
+  ) {
     apiSuffix = 'ajax';
-  else if (
+  } else if (
     context.preferences.methods.cardless_emi != undefined &&
     context.preferences.customer != undefined
-  )
+  ) {
     apiSuffix = 'ajax';
-  else apiSuffix = 'checkout';
+  } else {
+    apiSuffix = 'checkout';
+  }
   expect(request.url).toEqual(apiUrl + apiSuffix);
 
   expect(body.callback_url).toEqual(context.options.callback_url);

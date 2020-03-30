@@ -61,10 +61,10 @@ async function handleFeeBearer(context, pressContinue) {
     feeAmount
   );
   expect(feeAmount4).toEqual(expectedfeeAmount1);
-  const continueButton = await context.page.$x(
-    '//*[@class="btn" and text() = "Continue"]'
-  );
-  if (pressContinue != false) await continueButton[0].click();
+  if (pressContinue != false) {
+    context.page.click('.fee-bearer .btn');
+    await delay(400);
+  }
 }
 
 module.exports = {

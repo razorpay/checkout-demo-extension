@@ -1,6 +1,5 @@
 <script>
-  // Svelte imports
-
+  // UI imports
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
 </script>
 
@@ -14,7 +13,7 @@
   }
 </style>
 
-<SlottedOption defaultStyles disabled>
+<SlottedOption disabled>
   <div slot="subtitle">
     <slot name="subtitle" />
   </div>

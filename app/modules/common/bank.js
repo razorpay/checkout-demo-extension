@@ -29,6 +29,20 @@ const _commonBanks = {
 };
 
 /**
+ * Returns the name of the common bank
+ * @param {string} code
+ *
+ * @returns {string}
+ */
+export function getCommonBankName(code) {
+  if (_commonBanks[code]) {
+    return _commonBanks[code];
+  }
+
+  return code;
+}
+
+/**
  * Transforms a banks object to a list with name, code and logo
  * @param {Object} bankObj
  * @return {Array<{name: string, code: string, logo: string}>}
@@ -109,6 +123,11 @@ export const emiBanks = [
     name: 'Bajaj Finserv',
     patt: /^203040/,
   },
+  {
+    code: 'CITI',
+    name: 'CITI Bank',
+    patt: /^(4(0545(0|1)|3(0463|8(106|5(28|87)|628))|5(5(03(3|8)|8(22|38))|6(407|822)|8448)|6179(5|6|7)|93714)|5(1(7700|8(371|936))|2(0386|4133|6421|9(117|495))|31662|4(01(65|75)|1497|2556|4170|9852)|5(2(093|137)|46(19|37))))/,
+  },
 ];
 
 export const getBankFromCard = cardNum => {
@@ -168,44 +187,6 @@ export const getPreferredBanks = (availBanks, bankOptions) => {
   }
 
   return bankList;
-};
-
-/**
- * Returns the list of banks that have a downtime.
- * @param {Object} preferences
- *
- * @return {Array}
- */
-export const getDownBanks = preferences => {
-  /*
-    "downtime": {
-      "netbanking": [
-        {
-          "issuer": [
-            "CIUB"
-          ],
-          "severity": "high",
-          "begin": 1554061550
-        }
-      ]
-    }
-  */
-
-  const downtime = preferences.downtime;
-  let downList = [];
-
-  if (downtime) {
-    _Arr.loop(
-      _Arr.map(downtime.netbanking || [], o => o.issuer),
-      downBanks => {
-        downList = downList.concat(downBanks);
-      }
-    );
-  }
-
-  // TODO: Remove duplicate entries from downList
-
-  return downList;
 };
 
 /**

@@ -3,7 +3,6 @@
   import Tab from 'ui/tabs/Tab.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
   import Field from 'ui/components/Field.svelte';
-  import PartialPaymentOptions from 'ui/tabs/home/partialpaymentoptions.svelte';
   import RadioOption from 'ui/elements/options/RadioOption.svelte';
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import NewMethodsList from 'ui/tabs/home/NewMethodsList.svelte';
@@ -12,7 +11,6 @@
   import Address from 'ui/elements/address.svelte';
   import PaymentDetails from 'ui/tabs/home/PaymentDetails.svelte';
   import Callout from 'ui/elements/Callout.svelte';
-  import { INDIA_COUNTRY_CODE } from 'common/constants';
 
   // Svelte imports
   import { onMount } from 'svelte';
@@ -24,15 +22,43 @@
     isContactPresent,
     email,
     selectedInstrumentId,
+    methodTabInstruments,
     multiTpvOption,
     partialPaymentAmount,
     partialPaymentOption,
+    instruments,
+    blocks,
   } from 'checkoutstore/screens/home';
+
+  import { customer } from 'checkoutstore/customer';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
-  import CheckoutStore from 'checkoutstore';
-  import { getInstrumentsForCustomer } from 'checkoutframe/personalization';
+  import {
+    isPartialPayment as getIsPartialPayment,
+    isContactOptional,
+    isEmailOptional,
+    isContactHidden,
+    isEmailHidden,
+    isContactEmailOptional,
+    isContactEmailHidden,
+    isContactEmailReadOnly,
+    getPrefilledContact,
+    getPrefilledEmail,
+    isAddressEnabled,
+    isRecurring,
+    getMerchantOrder,
+    getCheckoutConfig,
+  } from 'checkoutstore';
+  import {
+    isCreditCardEnabled,
+    isDebitCardEnabled,
+    getSingleMethod,
+  } from 'checkoutstore/methods';
+  import {
+    getTranslatedInstrumentsForCustomer,
+    getAllInstrumentsForCustomer,
+  } from 'checkoutframe/personalization';
   import {
     hideCta,
     showCta,
@@ -42,22 +68,22 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
-
-  const MAX_P13N_INSTRUMENTS = 3;
+  import {
+    INDIA_COUNTRY_CODE,
+    MAX_PREFERRED_INSTRUMENTS,
+  } from 'common/constants';
+  import { setBlocks } from 'ui/tabs/home/instruments';
 
   const session = getSession();
-  const methods = session.methods;
   const icons = session.themeMeta.icons;
-  const order = session.order || {};
+  const order = getMerchantOrder();
+  const singleMethod = getSingleMethod();
 
   // TPV
   const multiTpv = session.multiTpv;
   const onlyUpiTpv = session.upiTpv;
   const onlyNetbankingTpv =
-    session.tpvBank &&
-    !onlyUpiTpv &&
-    !multiTpv &&
-    session.oneMethod !== 'emandate';
+    session.tpvBank && !onlyUpiTpv && !multiTpv && singleMethod !== 'emandate';
   const isTpv = multiTpv || onlyUpiTpv || onlyNetbankingTpv;
 
   // Offers
@@ -67,26 +93,14 @@
 
   // Recurring callout
   const showRecurringCallout =
-    session.recurring &&
-    session.tab !== 'emandate' &&
-    methods.count === 1 &&
-    methods.card;
+    isRecurring() && session.tab !== 'emandate' && singleMethod === 'card';
 
   const cardOffer = session.cardOffer;
+  const isPartialPayment = getIsPartialPayment();
+  const contactEmailReadonly = isContactEmailReadOnly();
 
-  const {
-    isPartialPayment,
-    prefill,
-    contactEmailOptional,
-    contactEmailHidden,
-    contactEmailReadonly,
-    address,
-    optional,
-    hidden,
-  } = CheckoutStore.get();
-
-  $contact = prefill.contact || INDIA_COUNTRY_CODE;
-  $email = prefill.email || '';
+  $contact = getPrefilledContact() || INDIA_COUNTRY_CODE;
+  $email = getPrefilledEmail();
 
   // Prop that decides which view to show.
   // Values: 'details', 'methods'
@@ -100,6 +114,25 @@
     !session.tpvBank &&
     !isPartialPayment &&
     !session.get('address');
+
+  function getRawMerchantConfig() {
+    const displayFromOptions = session.get('config.display');
+    const displayFromPreferences = _Obj.getSafely(
+      getCheckoutConfig(),
+      'display',
+      {}
+    );
+
+    if (_.isNull(displayFromOptions)) {
+      // Setting config.display as null allows you to disable the configuration
+      return {};
+    } else if (!_.isEmptyObject(displayFromOptions)) {
+      // displayFromOptions will be an empty object by default
+      return displayFromOptions;
+    }
+
+    return displayFromPreferences;
+  }
 
   export function showMethods() {
     view = 'methods';
@@ -120,7 +153,7 @@
       return true;
     }
 
-    if (address) {
+    if (isAddressEnabled()) {
       return true;
     }
 
@@ -133,7 +166,7 @@
      * there's nothing left on the details
      * screen anymore.
      */
-    if (contactEmailHidden) {
+    if (isContactEmailHidden()) {
       return false;
     }
 
@@ -165,13 +198,8 @@
 
     if (!session.get('amount')) {
       showCtaWithText('Authenticate');
-    } else if (session.oneMethod) {
-      showCtaWithText(
-        'Pay by ' +
-          getMethodNameForPaymentOption(session.oneMethod, {
-            session,
-          })
-      );
+    } else if (singleMethod) {
+      showCtaWithText('Pay by ' + getMethodNameForPaymentOption(singleMethod));
     } else if (isTpv) {
       let _method;
       if (onlyNetbankingTpv) {
@@ -182,12 +210,7 @@
         _method = $multiTpvOption;
       }
 
-      showCtaWithText(
-        'Pay by ' +
-          getMethodNameForPaymentOption(_method, {
-            session,
-          })
-      );
+      showCtaWithText('Pay by ' + getMethodNameForPaymentOption(_method));
     } else {
       showCtaWithText('Proceed');
     }
@@ -224,27 +247,78 @@
     return view === 'details';
   }
 
-  function getInstruments() {
-    return getAllAvailableP13nInstruments().slice(0, MAX_P13N_INSTRUMENTS);
-  }
-
   function getAllAvailableP13nInstruments() {
-    const _customer = session.getCustomer($contact);
-
-    return getInstrumentsForCustomer(_customer, {
-      methods: session.methods,
+    return getTranslatedInstrumentsForCustomer($customer, {
       upiApps: session.upi_intents_data,
     });
   }
 
-  export function updateCustomer() {
-    customer = session.getCustomer($contact);
-
-    const loggedIn = _Obj.getSafely(customer, 'logged');
-    _El.keepClass(_Doc.querySelector('#topbar #top-right'), 'logged', loggedIn);
+  $: {
+    if (view === 'methods') {
+      $customer = session.getCustomer($contact);
+    }
   }
 
-  function shouldUseP13n() {
+  $: {
+    const loggedIn = _Obj.getSafely($customer, 'logged');
+    _El.keepClass(_Doc.querySelector('#topbar #top-right'), 'logged', loggedIn);
+
+    const isPersonalizationEnabled = shouldUsePersonalization();
+    const eligiblePreferredInstruments = isPersonalizationEnabled
+      ? getAllAvailableP13nInstruments($customer)
+      : [];
+
+    const blocksThatWereSet = setBlocks(
+      {
+        preferred: eligiblePreferredInstruments,
+        merchantConfig: getRawMerchantConfig(),
+      },
+      $customer
+    );
+
+    const setPreferredInstruments = blocksThatWereSet.preferred.instruments;
+
+    // Get the methods for which a preferred instrument was shown
+    const preferredMethods = _Arr.reduce(
+      setPreferredInstruments,
+      (acc, instrument) => {
+        acc[`_${instrument.method}`] = true;
+        return acc;
+      },
+      {}
+    );
+
+    /**
+     * - `meta.p13n` will only be set when preferred methods are shown in the UI.
+     * - `p13n:instruments:list` will be fired when we attempt to show the list.
+     * - `p13n:instruments:list` with `meta.p13n` set as true will tell you whether or not preferred methods were shown.
+     */
+
+    // meta.p13n should always be set before `p13n:instruments:list`
+    if (setPreferredInstruments.length) {
+      Analytics.setMeta('p13n', true);
+    } else {
+      Analytics.removeMeta('p13n');
+    }
+
+    const allPreferredInstrumentsForCustomer = getAllInstrumentsForCustomer(
+      $customer
+    );
+
+    if (isPersonalizationEnabled && allPreferredInstrumentsForCustomer.length) {
+      // Track preferred-methods related things
+      Analytics.track('p13n:instruments:list', {
+        data: {
+          all: allPreferredInstrumentsForCustomer.length,
+          eligible: eligiblePreferredInstruments.length,
+          shown: setPreferredInstruments.length,
+          methods: preferredMethods,
+        },
+      });
+    }
+  }
+
+  function shouldUsePersonalization() {
     // Merchant has asked to disable
     if (session.get().personalization === false) {
       return false;
@@ -257,8 +331,8 @@
 
     // Single method
     if (
-      session.oneMethod &&
-      !_Arr.contains(['wallet', 'netbanking', 'upi'], session.oneMethod)
+      singleMethod &&
+      !_Arr.contains(['wallet', 'netbanking', 'upi'], singleMethod)
     ) {
       return false;
     }
@@ -288,37 +362,9 @@
     return true;
   }
 
-  let personalization;
-  let instruments;
-  let customer;
-
-  $: {
-    if (view === 'methods') {
-      personalization = shouldUseP13n();
-
-      if (personalization) {
-        updateCustomer();
-
-        const availableInstruments = getAllAvailableP13nInstruments();
-        instruments = availableInstruments.slice(0, MAX_P13N_INSTRUMENTS);
-        trackP13nInstruments(availableInstruments);
-      } else {
-        instruments = [];
-      }
-    }
-  }
-
-  $: {
-    if (personalization) {
-      Analytics.setMeta('p13n', true);
-      session.p13n = true;
-    } else {
-      Analytics.removeMeta('p13n');
-      session.p13n = false;
-    }
-  }
-
   export function onShown() {
+    $methodTabInstruments = [];
+
     if (view === 'methods') {
       if ($selectedInstrumentId) {
         showCtaWithDefaultText();
@@ -349,17 +395,17 @@
     /**
      * Mark optional fields as valid
      */
-    if (optional.contact) {
+    if (isContactOptional()) {
       isContactValid = true;
     }
-    if (optional.email) {
+    if (isEmailOptional()) {
       isEmailValid = true;
     }
 
     /**
      * If contact and email are mandatory, validate
      */
-    if (!contactEmailOptional) {
+    if (!isContactEmailOptional()) {
       const contactRegex = /^\+?[0-9]{8,15}$/;
       const emailRegex = /^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/;
 
@@ -392,15 +438,9 @@
     /**
      * Need address from the details screen.
      */
-    if (address) {
+    if (isAddressEnabled()) {
       return DETAILS;
     }
-
-    /**
-     * If contact is present, get the instruments
-     * for the user.
-     */
-    const _instruments = $isContactPresent ? getInstruments() : [];
 
     /**
      * If there's just one method available,
@@ -416,10 +456,10 @@
      *
      * Otherwise, we take the user to the details screen.
      */
-    if (session.oneMethod) {
+    if (singleMethod) {
       if (
-        _Arr.contains(['wallet', 'netbanking', 'upi'], session.oneMethod) &&
-        _instruments.length > 0
+        _Arr.contains(['wallet', 'netbanking', 'upi'], singleMethod) &&
+        $instruments.length > 0
       ) {
         return METHODS;
       } else {
@@ -439,20 +479,12 @@
   Analytics.track('home:landing', {
     data: {
       view,
-      oneMethod: session.oneMethod,
+      oneMethod: singleMethod,
     },
   });
 
   export function next() {
     Analytics.track('home:proceed');
-
-    updateCustomer();
-
-    if (isPartialPayment) {
-      if ($partialPaymentOption !== 'full') {
-        session.handlePartialAmount();
-      }
-    }
 
     // Multi TPV
     if (session.multiTpv) {
@@ -484,24 +516,22 @@
       return;
     }
 
-    const _instruments = getInstruments();
-
-    if (session.oneMethod) {
-      if (session.oneMethod === 'paypal') {
+    if (singleMethod) {
+      if (singleMethod === 'paypal') {
         createPaypalPayment();
         return;
       }
 
       if (
-        _Arr.contains(['wallet', 'netbanking', 'upi'], session.oneMethod) &&
-        _instruments.length > 0
+        _Arr.contains(['wallet', 'netbanking', 'upi'], singleMethod) &&
+        $instruments.length > 0
       ) {
         showMethods();
         return;
       } else {
         selectMethod({
           detail: {
-            method: session.oneMethod,
+            method: singleMethod,
           },
         });
         return;
@@ -517,30 +547,6 @@
     payload.method = 'paypal';
 
     session.preSubmit(null, payload);
-  }
-
-  function trackP13nInstruments(instruments) {
-    if (instruments.length === 0) {
-      return;
-    }
-
-    const _instruments = instruments.slice(0, MAX_P13N_INSTRUMENTS);
-    const _preferredMethods = _Arr.reduce(
-      _instruments,
-      (acc, instrument) => {
-        acc[`_${instrument.method}`] = true;
-        return acc;
-      },
-      {}
-    );
-
-    Analytics.track('p13n:instruments:list', {
-      data: {
-        length: instruments.length,
-        shown: Math.min(_instruments.length, MAX_P13N_INSTRUMENTS),
-        methods: _preferredMethods,
-      },
-    });
   }
 
   function selectMethod(event) {
@@ -571,7 +577,7 @@
   }
 
   export function shouldGoNext() {
-    if (session.oneMethod === 'paypal') {
+    if (singleMethod === 'paypal') {
       return false;
     }
 
@@ -588,16 +594,6 @@
     }
 
     return true;
-  }
-
-  export function getSelectedInstrument() {
-    return (
-      instruments &&
-      _Arr.find(
-        instruments,
-        instrument => instrument.id === $selectedInstrumentId
-      )
-    );
   }
 
   function attemptPayment() {
@@ -619,13 +615,16 @@
 
   let showUserDetailsStrip;
   $: {
-    showUserDetailsStrip = ($isContactPresent || $email) && !contactEmailHidden;
+    showUserDetailsStrip =
+      ($isContactPresent || $email) && !isContactEmailHidden();
   }
 </script>
 
 <style>
   .screen-main {
     padding-top: 12px;
+    display: flex;
+    flex-direction: column;
   }
 
   .secured-message {
@@ -697,6 +696,7 @@
 
   .solidbg {
     background: white;
+    order: -1;
   }
 </style>
 
@@ -707,25 +707,25 @@
         <PaymentDetails {session} />
       {/if}
       {#if view === 'methods'}
-        <div class="solidbg" transition:slide={{ duration: 400 }}>
+        <div
+          class="solidbg"
+          in:slide={{ duration: 400 }}
+          out:fly={{ duration: 200, y: 80 }}>
           {#if showUserDetailsStrip || isPartialPayment}
             <div
               use:touchfix
               class="details-container border-list"
-              transition:slide={{ duration: 400 }}>
+              in:fly={{ duration: 400, y: 80 }}>
               {#if showUserDetailsStrip}
-                <SlottedOption
-                  on:click={hideMethods}
-                  className="instrument-strip"
-                  id="user-details">
+                <SlottedOption on:click={hideMethods} id="user-details">
                   <i slot="icon">
                     <Icon icon={icons.contact} />
                   </i>
                   <div slot="title">
-                    {#if $isContactPresent && !hidden.contact}
+                    {#if $isContactPresent && !isContactHidden()}
                       <span>{$contact}</span>
                     {/if}
-                    {#if $email && !hidden.email}
+                    {#if $email && !isEmailHidden()}
                       <span>{$email}</span>
                     {/if}
                   </div>
@@ -743,7 +743,6 @@
               {#if isPartialPayment}
                 <SlottedOption
                   on:click={hideMethods}
-                  className="instrument-strip"
                   id="partial-payment-details">
                   <div slot="title">
                     <span>{formattedPartialAmount}</span>
@@ -769,12 +768,8 @@
 
           <div
             class="home-methods"
-            in:fly={{ delay: 100, duration: 400, y: 100 }}
-            out:fly={{ duration: 400, y: 100 }}>
+            in:fly={{ delay: 100, duration: 400, y: 80 }}>
             <NewMethodsList
-              {personalization}
-              {instruments}
-              {customer}
               on:selectMethod={selectMethod}
               on:submit={attemptPayment} />
           </div>
@@ -786,11 +781,11 @@
       {#if showRecurringCallout}
         <Callout>
           {#if session.get('subscription_id')}
-            {#if methods.debit_card && methods.credit_card}
+            {#if isDebitCardEnabled() && isCreditCardEnabled()}
               Subscription payments are supported on Visa and Mastercard Credit
               Cards from all Banks and Debit Cards from ICICI, Kotak, Citibank
               and Canara Bank.
-            {:else if methods.debit_card}
+            {:else if isDebitCardEnabled()}
               Subscription payments are only supported on Visa and Mastercard
               Debit Cards from ICICI, Kotak, Citibank and Canara Bank.
             {:else}
@@ -798,19 +793,19 @@
               Credit Cards.
             {/if}
           {:else if cardOffer}
-            {#if methods.debit_card && methods.credit_card}
+            {#if isDebitCardEnabled() && isCreditCardEnabled()}
               All {cardOffer.issuer} Cards are supported for this payment
-            {:else if methods.debit_card}
+            {:else if isDebitCardEnabled()}
               All {cardOffer.issuer} Debit Cards are supported for this payment
             {:else}
               All {cardOffer.issuer} Credit Cards are supported for this
               payment.
             {/if}
-          {:else if methods.debit_card && methods.credit_card}
+          {:else if isDebitCardEnabled() && isCreditCardEnabled()}
             Visa and Mastercard Credit Cards from all Banks and Debit Cards from
             ICICI, Kotak, Citibank and Canara Bank are supported for this
             payment.
-          {:else if methods.debit_card}
+          {:else if isDebitCardEnabled()}
             Only Visa and Mastercard Debit Cards from ICICI, Kotak, Citibank and
             Canara Bank are supported for this payment.
           {:else}
