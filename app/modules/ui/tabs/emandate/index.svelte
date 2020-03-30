@@ -1,5 +1,6 @@
 <script>
   import { getSession } from 'sessionmanager';
+  import AccountNumberField from '../../components/AccountNumberField.svelte';
 
   const session = getSession();
 
@@ -62,26 +63,7 @@
   </div>
 
   <div id="form-emandate-details" class="tab-content showable screen pad">
-    <div class="elem-wrap" id="elem-wrap-nb-acc-no">
-      <div class="elem elem-nb-acc-no" class:readonly={bank_account}>
-        <div class="bank-icon" />
-        <div class="help">Please enter a valid Account Number</div>
-        <label>Bank account Number</label>
-        <input
-          class="input"
-          name="bank_account[account_number]"
-          type="text"
-          id="nb-acc-no"
-          value={bank_account}
-          readonly={Boolean(bank_account)}
-          required
-          pattern="^[a-zA-Z0-9]{(4, 20)}$"
-          maxlength="20"
-          spellcheck="false"
-          autocorrect="off"
-          autocapitalize="off" />
-      </div>
-    </div>
+    <AccountNumberField name="bank_account[account_number]" id="nb-acc-no" />
     <div class="elem-wrap" id="elem-wrap-nb-acc-ifsc">
       <div class="elem elem-nb-acc-ifsc" class:readonly={bank_ifsc}>
         <div class="help">Please enter a valid IFSC</div>
