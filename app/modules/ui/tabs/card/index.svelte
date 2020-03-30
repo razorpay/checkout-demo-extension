@@ -112,7 +112,7 @@
    * @param {Array<Token>} tokens
    * @param {Instrument} instrument
    *
-   * @returns {Array<Token}
+   * @returns {Array<Token>}
    */
   function filterSavedCardsAgainstInstrument(tokens, instrument) {
     // Sanity check
