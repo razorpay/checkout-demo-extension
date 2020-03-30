@@ -14,7 +14,6 @@ import * as GPay from 'gpay';
 import * as Color from 'lib/color';
 import * as _PaymentMethodIcons from 'ui/icons/payment-methods';
 import * as Confirm from 'confirm';
-import Callout from 'callout';
 import * as Currency from 'common/currency';
 import * as OtpService from 'common/otpservice';
 import * as strings from 'common/strings';
@@ -97,7 +96,6 @@ export default {
   Color,
   _PaymentMethodIcons,
   Confirm,
-  Callout,
   Currency,
   OtpService,
   getDecimalAmount: Currency.getDecimalAmount,
