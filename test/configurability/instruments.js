@@ -80,6 +80,7 @@ test('Module: configurability/instruments', t => {
       expected = {
         method: 'upi',
         flows: ['intent'],
+        apps: ['com.google.android.apps.nbu.paisa.user', 'com.somerandom.app'],
         _type: 'instrument',
       };
 

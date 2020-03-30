@@ -14,7 +14,7 @@ test('Module: configurability/sequence', t => {
               instruments: [
                 {
                   method: 'upi',
-                  apps: ['googlepay'],
+                  apps: ['com.google.android.apps.nbu.paisa.user'],
                   _type: 'instrument',
                 },
               ],
@@ -152,7 +152,7 @@ test('Module: configurability/sequence', t => {
           instruments: [
             {
               method: 'upi',
-              apps: ['googlepay'],
+              apps: ['com.google.android.apps.nbu.paisa.user'],
               _type: 'instrument',
             },
           ],
@@ -265,7 +265,7 @@ test('Module: configurability/sequence', t => {
               instruments: [
                 {
                   method: 'upi',
-                  apps: ['googlepay'],
+                  apps: ['com.google.android.apps.nbu.paisa.user'],
                   _type: 'instrument',
                 },
               ],
@@ -401,7 +401,7 @@ test('Module: configurability/sequence', t => {
           instruments: [
             {
               method: 'upi',
-              apps: ['googlepay'],
+              apps: ['com.google.android.apps.nbu.paisa.user'],
               _type: 'instrument',
             },
           ],

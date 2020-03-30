@@ -71,7 +71,7 @@ test('Module: configurability', t => {
           instruments: [
             {
               method: 'upi',
-              apps: ['googlepay'],
+              apps: ['com.google.android.apps.nbu.paisa.user'],
               _type: 'instrument',
             },
           ],
