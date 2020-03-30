@@ -345,10 +345,10 @@ const getUsableApps = () => {
  *
  * @return {Array}
  */
-export const getAllApps = () => {
+const getAllApps = () => {
   let apps = [];
 
-  _Arr.loop(UPI_APPS_ORDER, group => {
+  _Arr.loop(_Obj.keys(UPI_APPS), group => {
     apps = _Arr.merge(UPI_APPS[group], apps);
   });
 
