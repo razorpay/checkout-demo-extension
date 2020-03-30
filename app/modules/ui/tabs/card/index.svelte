@@ -467,11 +467,6 @@
 <Tab method="card" pad={false} overrideMethodCheck>
   <Screen pad={false}>
     <div slot="main">
-      {#if instrumentSubtext}
-        <div class="pad instrument-subtext-description">
-          {instrumentSubtext}
-        </div>
-      {/if}
       {#if currentView === Views.ADD_CARD}
         <div in:fade={{ duration: 100, y: 100 }}>
           {#if showSavedCardsCta}
@@ -486,6 +481,13 @@
               Use saved cards
             </div>
           {/if}
+
+          {#if instrumentSubtext}
+            <div class="pad instrument-subtext-description">
+              {instrumentSubtext}
+            </div>
+          {/if}
+
           <AddCardView
             {tab}
             bind:this={addCardView}
@@ -500,6 +502,12 @@
         </div>
       {:else}
         <div in:fade={{ duration: 100 }}>
+          {#if instrumentSubtext}
+            <div class="pad instrument-subtext-description">
+              {instrumentSubtext}
+            </div>
+          {/if}
+
           <div id="saved-cards-container">
             <SavedCards
               {tab}
