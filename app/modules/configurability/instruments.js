@@ -1,4 +1,5 @@
 import InstrumentsConfig from './instruments-config';
+import { getPackageNameFromShortcode } from 'common/upi';
 
 /**
  * Adds a type and category to an instrument
@@ -18,6 +19,20 @@ function addTypeAndCategory(instrument) {
 
 const INSTRUMENT_CREATORS = {
   default: instrument => instrument,
+  upi: instrument => {
+    if (instrument.app) {
+      instrument.app =
+        getPackageNameFromShortcode(instrument.app) || instrument.app;
+    }
+
+    if (instrument.apps) {
+      instrument.apps = _Arr.map(instrument.apps, app => {
+        return getPackageNameFromShortcode(app) || app;
+      });
+    }
+
+    return instrument;
+  },
 };
 
 /**
