@@ -40,6 +40,7 @@
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import AddANewVpa from './AddANewVpa.svelte';
   import { getMiscIcon } from 'icons/misc';
+  import Callout from 'ui/elements/Callout.svelte';
 
   // Store
   import { contact } from 'checkoutstore/screens/home';
@@ -86,8 +87,8 @@
   } = session;
 
   const checkGPay = session => {
-    /* disable Web payments API for fee_bearer for now */
-    if (isCustomerFeeBearer()) {
+    /* disable Web payments API for fee_bearer and OTM for now */
+    if (isCustomerFeeBearer() || isOtm) {
       return Promise.reject();
     }
 
@@ -104,11 +105,12 @@
     return session.r.checkPaymentAdapter('gpay');
   };
 
-  $: intent = preferIntent && isUPIFlowEnabled('intent');
+  //Otm does not support intent or QR
+  $: intent = !isOtm && preferIntent && isUPIFlowEnabled('intent');
   $: isGPaySelected = selectedApp === 'gpay' && useWebPaymentsApi;
   $: pspHandle = selectedAppData ? selectedAppData.psp : '';
   $: shouldShowQr =
-    isMethodEnabled('qr') && !selectedApp && selectedApp !== null;
+    isMethodEnabled('qr') && !selectedApp && selectedApp !== null && !isOtm;
 
   $: {
     /**
@@ -129,6 +131,8 @@
   $: {
     tokens = filterUPITokens(_Obj.getSafely($customer, 'tokens.items', []));
   }
+
+  $: isOtm = method === 'upi_otm';
 
   function setWebPaymentsApiUsage(to) {
     useWebPaymentsApi = to;
@@ -438,7 +442,7 @@
         </div>
       {/if}
 
-      {#if isUPIFlowEnabled('collect')}
+      {#if isOtm || isUPIFlowEnabled('collect')}
         <div class="legend left">Pay using UPI ID</div>
         <div class="border-list">
           {#if intent}
@@ -468,6 +472,7 @@
             </SlottedRadioOption>
           {/each}
           <AddANewVpa
+            subtitleText={isOtm ? 'Use you BHIM account' : 'Google Pay, BHIM, PhonePe & more'}
             on:click={() => {
               onUpiAppSelection({ detail: { id: 'new' } });
             }}
@@ -513,6 +518,16 @@
           <strong>UPI</strong>
           is experiencing low success rates.
         </DowntimeCallout>
+      {/if}
+      {#if isOtm}
+        <Callout
+          type={'warning'}
+          classes={['downtime-callout']}
+          showIcon={false}>
+          <!-- @TODO-OTM update with real data -->
+          ₹7990 will be blocked on your acount by clicking pay. Your account
+          will be charged by Acme Corp between 20 Dec 2019 to 25 Dec 2019
+        </Callout>
       {/if}
 
       <OffersPortal />

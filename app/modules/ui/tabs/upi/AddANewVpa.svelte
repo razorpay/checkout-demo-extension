@@ -30,6 +30,7 @@
 
   // Computed
   export let pattern;
+  export let subtitleText = '';
   let rememberVpa = true;
   let newVpa = getPrefilledVPA();
   let vpa;
@@ -134,7 +135,7 @@
   <div id="new-vpa-field" slot="title">
     {logged && canSaveVpa ? 'Add UPI ID' : 'UPI ID'}
   </div>
-  <div slot="subtitle">Google Pay, BHIM, PhonePe & more</div>
+  <div slot="subtitle">{subtitleText}</div>
   <i slot="icon" class="top">
     <Icon icon={session.themeMeta.icons.upi} />
   </i>

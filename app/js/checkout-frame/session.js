@@ -2865,7 +2865,7 @@ Session.prototype = {
         'emi',
         'netbanking',
         'wallet',
-        'upi', // TODO: Support offers on UPI OTM?
+        'upi',
         'cardless_emi',
       ].indexOf(tab) < 0
     ) {

@@ -141,6 +141,10 @@ const ALL_METHODS = {
   gpay() {
     return isUPIBaseEnabled() && isIRCTC();
   },
+
+  upi_otm() {
+    return isUPIOTMBaseEnabled();
+  },
 };
 
 export function isMethodEnabled(method) {
@@ -222,6 +226,20 @@ function isUPIBaseEnabled() {
     // order.method = upi with amount > 1L is passed
     // by mutual fund who can accept more than the standard limit
     (getAmount() < 1e7 || getMerchantOrder()?.method === 'upi') &&
+    !isInternational() &&
+    !isRecurring() &&
+    getAmount()
+  );
+}
+
+function isUPIOTMBaseEnabled() {
+  return (
+    getOption('method.upi_otm') !== false &&
+    getMerchantMethods().upi_otm &&
+    // if amount less than 1L, or order has method=upi
+    // order.method = upi with amount > 1L is passed
+    // by mutual fund who can accept more than the standard limit
+    (getAmount() < 1e7 || getMerchantOrder()?.method === 'upi_otm') &&
     !isInternational() &&
     !isRecurring() &&
     getAmount()

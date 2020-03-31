@@ -95,6 +95,7 @@ const DESCRIPTIONS = {
       getWallets().map(w => w.name),
       2
     ),
+  upi_otm: () => 'Paylater using BHIM',
 };
 
 /**
