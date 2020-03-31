@@ -2693,44 +2693,6 @@ Session.prototype = {
     self.refresh();
     var bits = self.bits;
     var delegator = (self.delegator = Razorpay.setFormatter(self.el));
-
-    var el_amount = gel('amount-value');
-
-    // TODO: move to field onMount
-    var el_expiry = gel('card_expiry');
-    var el_cvv = gel('card_cvv');
-    if (el_expiry && el_cvv) {
-      // check if we're in webkit
-      // checking el_expiry here in place of el_cvv, as IE also returns browser unsupported attribute rules from getComputedStyle
-      try {
-        // https://bugzilla.mozilla.org/show_bug.cgi?id=548397
-        /**
-         * -webkit-text-security is supported from IE9.
-         * input[type=tel] is supported from IE10.
-         *
-         * If <IE9, use type=password
-         * If <IE10, use type=number (-webkit-text-security will still be applied)
-         */
-
-        /**
-         * Check for <IE10. input[type=tel] will be converted to input[type=text] automatically on <IE10.
-         */
-        if (el_cvv.type === 'text') {
-          el_cvv.type = 'number';
-        }
-
-        /**
-         * Check for <IE9. Masking-input-using-CSS isn't available so we change the type to password.
-         */
-        if (
-          typeof getComputedStyle(el_expiry)['-webkit-text-security'] ===
-          'undefined'
-        ) {
-          el_cvv.type = 'password';
-        }
-      } catch (e) {}
-    }
-
     delegator.otp = delegator
       .add('number', gel('otp'))
       .on('change', function() {

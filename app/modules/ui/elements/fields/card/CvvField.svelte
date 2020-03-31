@@ -52,7 +52,7 @@
 <style>
   /* TODO: find a better way */
   :global(#card_cvv) {
-    -webkit-text-security: disc;
+    font-family: rzpcvv;
   }
 
   :global(#card_cvv) ~ .help {
