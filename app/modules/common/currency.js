@@ -1131,26 +1131,6 @@ export const displayCurrencies = {
 };
 
 /**
- * REMOVE THIS AFTER INTEGRATING API
- * Adding min_value from hard-coded list of currencies
- */
-_Obj.loop(currenciesList, (val, key) => {
-  if (currenciesConfig[key]) {
-    currenciesConfig[key].minimum = currenciesList[key].min_value;
-  }
-});
-
-/**
- * REMOVE THIS AFTER INTEGRATING API
- * Adding symbol from hard-coded list of currencies
- */
-_Obj.loop(currenciesList, (val, key) => {
-  if (displayCurrencies[key]) {
-    displayCurrencies[key] = currenciesList[key].symbol;
-  }
-});
-
-/**
  * 1. Add default currency's attribs
  *    to rest of the currencies
  *    as default attribs.
@@ -1159,19 +1139,65 @@ _Obj.loop(currenciesList, (val, key) => {
  *
  * This will also add the default config for all the currencies in displayCurrencies
  * whose configs are missing from currenciesConfig.
+ * @param displayCurrencies
  */
-_Obj.loop(displayCurrencies, (symbol, currency) => {
-  currenciesConfig[currency] =
-    {}
-    |> _Obj.extend(currenciesConfig.default)
-    |> _Obj.extend(currenciesConfig[currency] || {});
+const updateCurrencyConfig = displayCurrencies => {
+  _Obj.loop(displayCurrencies, (symbol, currency) => {
+    currenciesConfig[currency] =
+      {}
+      |> _Obj.extend(currenciesConfig.default)
+      |> _Obj.extend(currenciesConfig[currency] || {});
 
-  currenciesConfig[currency].code = currency;
+    currenciesConfig[currency].code = currency;
 
-  if (displayCurrencies[currency]) {
-    currenciesConfig[currency].symbol = displayCurrencies[currency];
-  }
-});
+    if (displayCurrencies[currency]) {
+      currenciesConfig[currency].symbol = displayCurrencies[currency];
+    }
+  });
+};
+
+/**
+ * Updates the hardcoded list of currencies.
+ *
+ * @param list
+ */
+export const updateCurrencies = list => {
+  const displayCurrenciesToAdd = {};
+  /**
+   * REMOVE THIS AFTER INTEGRATING API
+   * Adding min_value, symbol from hard-coded list of currencies
+   */
+  _Obj.loop(list, (val, currency) => {
+    currenciesList[currency] = val;
+
+    // If there's an existing hardcoded config, then use that,
+    // else, create an empty config.
+    currenciesConfig[currency] = currenciesConfig[currency] || {};
+
+    if (list[currency].min_value) {
+      currenciesConfig[currency].minimum = list[currency].min_value;
+    }
+
+    // Backend will send denomination in 10's multiple.
+    // Example: For INR, the precision is 2 so denomination will be 100.
+    if (list[currency].denomination) {
+      currenciesConfig[currency].decimals = Math.log10(
+        list[currency].denomination
+      );
+    }
+
+    displayCurrenciesToAdd[currency] = list[currency].symbol;
+  });
+
+  // Add the newer currency symbols to display currencies
+  _Obj.extend(displayCurrencies, displayCurrenciesToAdd);
+
+  // Finally, extend the default config for the newer currencies
+  updateCurrencyConfig(displayCurrenciesToAdd);
+};
+
+updateCurrencies(currenciesList); // Default hardcoded list
+updateCurrencyConfig(displayCurrencies);
 
 /**
  * TODO
