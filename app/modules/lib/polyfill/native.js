@@ -181,4 +181,16 @@
     });
   }
 })();
+
+/**
+ * Polyfill for Math.log10
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/log10
+ */
+(function() {
+  if (!Math.log10) {
+    Math.log10 = function(x) {
+      return Math.log(x) * Math.LOG10E;
+    };
+  }
+})();
 /* eslint-enable no-extend-native */
