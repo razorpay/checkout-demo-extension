@@ -173,6 +173,7 @@ export function getSingleMethod() {
       'netbanking',
       'emandate',
       'nach',
+      'upi_otm',
       'upi',
       'wallet',
       'paypal',

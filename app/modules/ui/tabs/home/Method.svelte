@@ -30,7 +30,7 @@
   if (downtime) {
     if (/card$/.test(method)) {
       down = _Arr.contains(downtimes, 'card');
-    } else if (method === 'gpay') {
+    } else if (method === 'gpay' || method === 'upi_otm') {
       down = _Arr.contains(downtimes, 'upi');
     } else {
       down = _Arr.contains(downtimes, method);

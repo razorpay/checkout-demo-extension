@@ -158,6 +158,9 @@ export function getMethodPrefix(method) {
     case 'qr':
       return 'UPI QR';
 
+    case 'upi_otm':
+      return 'UPI OTM';
+
     case 'upi':
       return 'UPI';
 

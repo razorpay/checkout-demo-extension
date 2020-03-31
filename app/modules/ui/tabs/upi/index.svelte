@@ -54,6 +54,7 @@
   export let isFirst = true;
   export let vpa = '';
   export let qrIcon;
+  export let method = 'upi';
 
   // Refs
   export let intentView = null;
@@ -73,6 +74,7 @@
   let isANewVpa = false;
   let rememberVpaCheckbox;
   let intentAppSelected = null;
+  let isOtm = method === 'upi_otm';
 
   const session = getSession();
 
@@ -119,7 +121,7 @@
   }
 
   $: {
-    if (selectedToken && session.tab === 'upi') {
+    if (selectedToken && _Arr.contains(['upi', 'upi_otm'], session.tab)) {
       determineCtaVisibility();
     }
   }
@@ -401,7 +403,7 @@
   }
 </style>
 
-<Tab method="upi" {down} pad={false}>
+<Tab {method} {down} pad={false}>
   <Screen>
     <div slot="main">
 
