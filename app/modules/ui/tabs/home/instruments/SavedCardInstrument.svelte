@@ -130,7 +130,9 @@
 
   div[slot='extra'] :global(.elem .input) {
     padding: 0;
-    width: 2rem;
+    width: 40px;
+    letter-spacing: -3px;
+    font-family: rzpcvv;
   }
 </style>
 
