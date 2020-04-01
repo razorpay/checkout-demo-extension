@@ -171,6 +171,7 @@
     {autocapitalize}
     {autocomplete}
     {autocorrect}
+    {spellcheck}
     use:formatterAction={formatter}
     use:focusAction={handleFocus}
     use:blurAction={handleBlur}
