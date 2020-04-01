@@ -4703,22 +4703,11 @@ Session.prototype = {
           }
 
           case 'paylater': {
-            this.switchTab('paylater');
+            session.selectPayLaterProvider(
+              selectedInstrument._ungrouped[0].provider
+            );
 
-            /**
-             * Setting a timeout because the instrument needs to be
-             * deselected before attempting a payment.
-             *
-             * This can be removed Paylater payment creation flow is moved
-             * out of session.js. Once that is done, instrument-based payments for
-             * Paylater can be done from the homescreen too, without switching tab.
-             */
-            setTimeout(function() {
-              session.selectPayLaterProvider(
-                selectedInstrument._ungrouped[0].provider
-              );
-            }, 200);
-            return;
+            break;
           }
         }
       }
