@@ -60,7 +60,7 @@ export const TAB_TITLES = {
   paypal: 'PayPal',
   qr: 'UPI QR',
   upi: 'UPI',
-  upi_otm: 'UPI OTM',
+  upi_otm: 'UPI Mandate',
   gpay: 'Google Pay',
   wallet: 'Wallet',
   payout_account: 'Add Bank Account',

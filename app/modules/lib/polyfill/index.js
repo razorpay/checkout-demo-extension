@@ -136,6 +136,33 @@ if (!_.isFunction(Object.getOwnPropertyDescriptors)) {
   Object.getOwnPropertyDescriptors = getOwnPropertyDescriptor;
 }
 
+Date.prototype.toShortFormat = function(delimter = ' ') {
+  var month_names = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+
+  var day = this.getDate();
+  var month_index = this.getMonth();
+  var year = this.getFullYear();
+
+  return '' + day + delimter + month_names[month_index] + delimter + year;
+};
+
+Date.prototype.addDays = function(days) {
+  return new Date(this.getTime() + days * 1000 * 24 * 3600);
+};
+
 import './native';
 import './customelements';
 // import './getownpropertydescriptors';

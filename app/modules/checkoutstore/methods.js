@@ -143,7 +143,7 @@ const ALL_METHODS = {
   },
 
   upi_otm() {
-    return isUPIOTMBaseEnabled();
+    return isUPIOTMBaseEnabled() || true;
   },
 };
 

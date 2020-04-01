@@ -22,6 +22,8 @@
   import { hideCta, showCtaWithDefaultText, showCta } from 'checkoutstore/cta';
   import { filterUPITokens } from 'common/token';
 
+  import { getAmount, getName } from 'checkoutstore';
+
   // UI imports
   import UpiIntent from './UpiIntent.svelte';
   import Tab from 'ui/tabs/Tab.svelte';
@@ -76,6 +78,8 @@
   let rememberVpaCheckbox;
   let intentAppSelected = null;
   let isOtm = method === 'upi_otm';
+  let otmStartDate = new Date();
+  let otmEndDate = otmStartDate.addDays(90);
 
   const session = getSession();
 
@@ -525,8 +529,9 @@
           classes={['downtime-callout']}
           showIcon={false}>
           <!-- @TODO-OTM update with real data -->
-          ₹7990 will be blocked on your acount by clicking pay. Your account
-          will be charged by Acme Corp between 20 Dec 2019 to 25 Dec 2019
+          {session.formatAmountWithCurrency(getAmount())} will be blocked on
+          your acount by clicking pay. Your account will be charged by {getName()}
+          between {otmStartDate.toShortFormat()} to {otmEndDate.toShortFormat()}.
         </Callout>
       {/if}
 
