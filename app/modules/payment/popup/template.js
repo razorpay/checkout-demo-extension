@@ -1,9 +1,13 @@
 import { displayAmount } from 'common/currency';
 import css from './popup.styl';
-import { cancelMsg } from 'common/strings';
 import { sanitizeHtmlEntities } from 'lib/utils';
 
-const cancelError = _Obj.stringify(_.rzpError(cancelMsg));
+const cancelError = _Obj.stringify({
+  error: {
+    code: 'BAD_REQUEST_ERROR',
+    description: 'Payment processing cancelled by user',
+  },
+});
 
 export default function popupTemplate(_) {
   var get = _.r.get;
