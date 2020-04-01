@@ -67,24 +67,6 @@ emandateView.prototype = {
   },
 
   bind: function() {
-    const delegator = this.session.delegator;
-
-    delegator.nb_acc_no = delegator.add(
-      'alphanumeric',
-      _Doc.querySelector('#nb-acc-no')
-    );
-
-    delegator.nb_ifsc = delegator
-      .add('ifsc', _Doc.querySelector('#nb-acc-ifsc'))
-      .on('change', function() {
-        if (this.isValid() && this.el.value.length === this.caretPosition) {
-          let field = _Doc.querySelector('#nb-acc-name');
-          if (field && _.isFunction(field.focus)) {
-            field.focus();
-          }
-        }
-      });
-
     if (!this.session.get('prefill.bank')) {
       this.on('click', '#emandate-bank .btn-change-bank', () => {
         selectedBank.set('');
