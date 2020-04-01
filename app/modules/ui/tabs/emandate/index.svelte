@@ -121,7 +121,7 @@
       </div>
     </div>
     <div class="elem-wrap">
-      <div class="elem select `?account_type`readonly`?`">
+      <div class="elem select" class:readonly={account_type}>
         <i class="select-arrow"></i>
         <div class="help">Please select a bank account type</div>
         <select name="bank_account[account_type]" required class="input">
