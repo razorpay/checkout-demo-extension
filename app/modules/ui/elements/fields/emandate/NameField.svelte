@@ -20,7 +20,7 @@
   {id}
   {readonly}
   {value}
-  label="IFSC"
+  label="Account Holder Name"
   helpText="Please enter a valid Name as per your account"
   maxlength="100"
   required={true}
