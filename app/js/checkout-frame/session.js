@@ -747,7 +747,7 @@ function successHandler(response) {
   if (this.preferredInstrument) {
     P13n.recordSuccess(
       this.preferredInstrument,
-      this.getCurrentCustomer(this.payload.contact)
+      this.getCurrentCustomer(this.payload && this.payload.contact)
     );
   }
 
