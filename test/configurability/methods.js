@@ -35,7 +35,7 @@ test('Module: configurability/methods', t => {
           instruments: [
             {
               method: 'upi',
-              apps: ['gpay'],
+              apps: ['googlepay'],
               _type: 'instrument',
             },
           ],
@@ -149,7 +149,7 @@ test('Module: configurability/methods', t => {
           instruments: [
             {
               method: 'upi',
-              apps: ['gpay'],
+              apps: ['com.google.android.apps.nbu.paisa.user'],
               _type: 'instrument',
             },
           ],
