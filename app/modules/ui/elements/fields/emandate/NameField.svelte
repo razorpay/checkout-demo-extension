@@ -5,7 +5,13 @@
   export let name;
   export let readonly;
 
+  export let value;
+
   const PATTERN = "^[a-zA-Z. 0-9\\']{1,100}$";
+
+  function handleInput(event) {
+    value = event.target.value;
+  }
 </script>
 
 <Field
@@ -13,6 +19,7 @@
   {name}
   {id}
   {readonly}
+  {value}
   label="IFSC"
   helpText="Please enter a valid Name as per your account"
   maxlength="100"
@@ -23,4 +30,5 @@
   autocapitalize="off"
   handleBlur
   handleFocus
-  handleInput />
+  handleInput
+  on:input={handleInput} />

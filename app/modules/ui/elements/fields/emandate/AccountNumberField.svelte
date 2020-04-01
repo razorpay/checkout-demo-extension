@@ -7,7 +7,13 @@
 
   export let bankCode;
 
+  export let value;
+
   const PATTERN = '^[a-zA-Z0-9]{4,20}$';
+
+  function handleInput(event) {
+    value = event.target.value;
+  }
 </script>
 
 <Field
@@ -26,4 +32,5 @@
   autocapitalize="off"
   handleBlur
   handleFocus
-  handleInput />
+  handleInput
+  on:input={handleInput} />

@@ -5,7 +5,13 @@
   export let name;
   export let readonly;
 
+  export let value;
+
   const PATTERN = '^[a-zA-Z]{4}[a-zA-Z0-9]{7}$';
+
+  function handleInput(event) {
+    value = event.target.value;
+  }
 </script>
 
 <Field
@@ -24,4 +30,5 @@
   autocapitalize="off"
   handleBlur
   handleFocus
-  handleInput />
+  handleInput
+  on:input={handleInput} />
