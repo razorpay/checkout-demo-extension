@@ -9,10 +9,12 @@
   const session = getSession();
 
   // Prefill
-  const bank = session.get('prefill.bank');
-  const bank_account = session.get('prefill.bank_account[account_number]');
-  const bank_name = session.get('prefill.bank_account[name]');
-  const bank_ifsc = session.get('prefill.bank_account[ifsc]');
+  const prefilledBank = session.get('prefill.bank');
+  const prefillledBankAccount = session.get(
+    'prefill.bank_account[account_number]'
+  );
+  const prefilledName = session.get('prefill.bank_account[name]');
+  const prefilledIfsc = session.get('prefill.bank_account[ifsc]');
 
   var account_type = session.get('prefill.bank_account[account_type]');
   var accountTexts = {
@@ -25,8 +27,10 @@
     account_type = false;
   }
 
-  const ifsc_pattern = '^[a-zA-Z]{4}[a-zA-Z0-9]{7}$';
-  const name_pattern = "^[a-zA-Z. 0-9\\']{(1, 100)}$";
+  // State
+  let accountNumber = prefillledBankAccount;
+  let bankName = prefilledName;
+  let ifsc = prefilledIfsc;
 
   const icons = session.themeMeta.icons;
 </script>
@@ -37,7 +41,7 @@
     <div id="emandate-bank">
       <div class="bank-icon" />
       <div class="bank-name">HDFC Bank</div>
-      {#if !bank}
+      {#if !prefilledBank}
         <div class="btn-change-bank">Change Bank</div>
       {/if}
     </div>
@@ -67,9 +71,25 @@
   </div>
 
   <div id="form-emandate-details" class="tab-content showable screen pad">
-    <AccountNumberField name="bank_account[account_number]" id="nb-acc-no" />
-    <IfscField id="nb-acc-ifsc" name="bank_account[ifsc]" />
-    <NameField id="nb-acc-name" name="bank_account[name]" />
+
+    <AccountNumberField
+      name="bank_account[account_number]"
+      id="nb-acc-no"
+      readonly={Boolean(prefillledBankAccount)}
+      bind:value={accountNumber} />
+
+    <IfscField
+      id="nb-acc-ifsc"
+      name="bank_account[ifsc]"
+      readonly={Boolean(prefilledIfsc)}
+      bind:value={ifsc} />
+
+    <NameField
+      id="nb-acc-name"
+      name="bank_account[name]"
+      readonly={Boolean(prefilledName)}
+      bind:value={bankName} />
+
     <div class="elem-wrap">
       <div class="elem select" class:readonly={account_type}>
         <i class="select-arrow"></i>
