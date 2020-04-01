@@ -1492,11 +1492,6 @@ Session.prototype = {
     }
   },
 
-  /**
-   * Equivalent of clicking a provider option from the
-   * Cardless EMI homescreen.
-   * @param {String} providerCode Code for the provider
-   */
   selectCardlessEmiProvider: function(providerCode) {
     Analytics.track('cardless_emi:provider:select', {
       type: AnalyticsTypes.BEHAV,
@@ -1523,7 +1518,15 @@ Session.prototype = {
     CardlessEmiStore.providerCode = providerCode;
 
     $('#form-cardless_emi input[name=provider]').val(providerCode);
+  },
 
+  /**
+   * Equivalent of clicking a provider option from the
+   * Cardless EMI homescreen.
+   * @param {String} providerCode Code for the provider
+   */
+  selectCardlessEmiProviderAndAttemptPayment: function(provider) {
+    this.selectCardlessEmiProvider(provider);
     this.preSubmit();
   },
 
@@ -1552,7 +1555,7 @@ Session.prototype = {
           select: function(event) {
             var providerCode = event.detail.code;
 
-            self.selectCardlessEmiProvider(providerCode);
+            self.selectCardlessEmiProviderAndAttemptPayment(providerCode);
           },
         },
       });
@@ -2063,7 +2066,7 @@ Session.prototype = {
       prefilledProvider &&
       this.checkCommonValidAndTrackIfInvalid()
     ) {
-      this.selectCardlessEmiProvider(prefilledProvider);
+      this.selectCardlessEmiProviderAndAttemptPayment(prefilledProvider);
     }
   },
 
@@ -2993,7 +2996,7 @@ Session.prototype = {
       var provider = offer.provider;
 
       if (provider) {
-        this.selectCardlessEmiProvider(provider);
+        this.selectCardlessEmiProviderAndAttemptPayment(provider);
       }
     }
   },
