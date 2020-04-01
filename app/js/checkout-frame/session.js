@@ -38,6 +38,7 @@ var preferences = window.preferences,
   storeGetter = discreet.storeGetter,
   HomeScreenStore = discreet.HomeScreenStore,
   CardScreenStore = discreet.CardScreenStore,
+  NetbankingScreenStore = discreet.NetbankingScreenStore,
   CustomerStore = discreet.CustomerStore,
   EmiStore = discreet.EmiStore,
   Cta = discreet.Cta,
@@ -1044,7 +1045,7 @@ Session.prototype = {
       }
 
       if (data['bank']) {
-        this.netbankingTab.setSelectedBank(data['bank']);
+        NetbankingScreenStore.selectedBank.set(data['bank']);
       }
 
       each(
@@ -1275,7 +1276,7 @@ Session.prototype = {
 
   setNetbankingTab: function() {
     var method, banks;
-    var prefilledbank = this.get('prefill.bank');
+    var prefilledBank = this.get('prefill.bank');
 
     if (MethodStore.isEMandateEnabled()) {
       method = 'emandate';
@@ -1293,6 +1294,11 @@ Session.prototype = {
       banks = Store.getMerchantMethods().netbanking;
     }
 
+    // Set prefilled bank in store
+    if (prefilledBank) {
+      NetbankingScreenStore.selectedBank.set(prefilledBank);
+    }
+
     if (method) {
       this.netbankingTab = new discreet.NetbankingTab({
         target: gel('form-fields'),
@@ -1300,7 +1306,6 @@ Session.prototype = {
           bankOptions: this.get('method.netbanking'),
           banks: banks,
           method: method,
-          selectedBankCode: prefilledbank,
         },
       });
 
@@ -2737,7 +2742,7 @@ Session.prototype = {
     } else if (screen === 'netbanking') {
       // Select bank
       if (issuer) {
-        this.netbankingTab.setSelectedBank(issuer);
+        NetbankingScreenStore.selectedBank.set(issuer);
       }
     } else if (screen === 'emi') {
       var emiDuration = getEmiDurationForNewCard();
@@ -4168,7 +4173,7 @@ Session.prototype = {
         if (this.screen === 'emandate') {
           // TODO: looks like dead code, see if this can be removed
           screen = 'netbanking';
-          data.bank = this.netbankingTab.getSelectedBank();
+          data.bank = storeGetter(NetbankingScreenStore.selectedBank);
           data.method = 'emandate';
         }
         return this.emandateView.submit(data);

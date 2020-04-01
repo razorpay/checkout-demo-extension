@@ -3,6 +3,8 @@ import * as AnalyticsTypes from 'analytics-types';
 import { getSession } from 'sessionmanager';
 import { hideCta, showCtaWithDefaultText } from 'checkoutstore/cta';
 import { getEMandateBanks, getEMandateAuthTypes } from 'checkoutstore/methods';
+import { selectedBank } from 'checkoutstore/screens/netbanking';
+
 import EmandateView from 'ui/tabs/emandate/index.svelte';
 
 /* global fillData */
@@ -85,7 +87,7 @@ emandateView.prototype = {
 
     if (!this.session.get('prefill.bank')) {
       this.on('click', '#emandate-bank .btn-change-bank', () => {
-        this.session.netbankingTab.deselectBank();
+        selectedBank.set('');
         this.setScreen('emandate');
         this.history = ['emandate'];
       });
@@ -140,7 +142,7 @@ emandateView.prototype = {
      * we set the bank snd skip the bank selection screen.
      */
     if (tab === 'emandate' && prefilledBank && this.banks[prefilledBank]) {
-      this.session.netbankingTab.setSelectedBank(prefilledBank);
+      selectedBank.set(prefilledBank);
       this.setBank(prefilledBank);
 
       /**
@@ -276,7 +278,7 @@ emandateView.prototype = {
     this.setScreen(newScreen);
 
     if (newScreen === 'emandate') {
-      this.session.netbankingTab.deselectBank();
+      selectedBank.set('');
     }
 
     return true;

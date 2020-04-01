@@ -57,6 +57,7 @@ import * as OTPScreenStore from 'checkoutstore/screens/otp';
 import * as Cta from 'checkoutstore/cta';
 import * as HomeScreenStore from 'checkoutstore/screens/home';
 import * as CardScreenStore from 'checkoutstore/screens/card';
+import * as NetbankingScreenStore from 'checkoutstore/screens/netbanking';
 import * as CustomerStore from 'checkoutstore/customer';
 
 import QRScreen from 'ui/tabs/qr/index.svelte';
@@ -137,6 +138,7 @@ export default {
   OTPScreenStore,
   HomeScreenStore,
   CardScreenStore,
+  NetbankingScreenStore,
   EmiStore,
   Cta,
 
