@@ -899,10 +899,6 @@ Session.prototype = {
       tab_titles.card = 'Card';
     }
 
-    if (getter('ecod')) {
-      classes.push('ecod');
-    }
-
     if (!getter('image')) {
       classes.push('noimage');
     }
@@ -926,15 +922,6 @@ Session.prototype = {
     var r = this.r;
     if (!this.el) {
       var classes = this.getClasses();
-      var ecod = r.get('ecod');
-      if (ecod) {
-        if (!r.get('prefill.email')) {
-          r.set('prefill.email', 'void@razorpay.com');
-        }
-        if (!r.get('prefill.contact')) {
-          r.set('prefill.contact', '' + preferences.customer.contact);
-        }
-      }
       var div = document.createElement('div');
       var styleEl = this.renderCss();
       div.innerHTML = templates.modal(this, {
@@ -950,13 +937,6 @@ Session.prototype = {
 
       this.body = $('#body');
 
-      if (this.invoice && ecod) {
-        commenceECOD(this);
-      }
-      if (ecod) {
-        r.set('prefill.method', 'wallet');
-        r.set('theme.hide_topbar', true);
-      }
       $(this.el).addClass(classes);
     }
     return this.el;
@@ -1281,14 +1261,6 @@ Session.prototype = {
       Analytics.setMeta('orientation', Hacks.getDeviceOrientation());
     });
 
-    if (this.get('ecod')) {
-      Analytics.setMeta('ecod', true);
-
-      if (this.invoice) {
-        Analytics.setMeta('invoice', true);
-      }
-    }
-
     Analytics.track('complete', {
       type: AnalyticsTypes.RENDER,
       data: {
@@ -1385,6 +1357,13 @@ Session.prototype = {
     }
   },
 
+  setWalletsTab: function() {
+    this.svelteWalletsTab = new discreet.WalletTab({
+      target: gel('wallet-svelte-wrap'),
+      props: {},
+    });
+  },
+
   setSvelteComponents: function() {
     this.setHomeTab();
     this.setSvelteCardTab();
@@ -1397,6 +1376,7 @@ Session.prototype = {
     this.setPayoutsScreen();
     this.setNach();
     this.setBankTransfer();
+    this.setWalletsTab();
   },
 
   showTimer: function(cb) {
@@ -2504,47 +2484,9 @@ Session.prototype = {
             if (ua_iPhone) {
               Razorpay.sendMessage({ event: 'blur' });
             }
-            if (this.get('ecod')) {
-              $(this.el).removeClass('notopbar');
-              var tab = $(e.target).attr('tab');
-              if (tab !== 'ecod') {
-                $('#footer').css('display', 'block');
-              }
-              if (tab) {
-                this.switchTab(tab);
-              } else {
-                this.preSubmit();
-              }
-            } else {
-              var value = e.target.value;
-
-              Analytics.track('wallet:select', {
-                type: AnalyticsTypes.BEHAV,
-                data: {
-                  wallet: value,
-                  power: discreet.Wallet.isPowerWallet(value),
-                },
-              });
-
-              $('#body').toggleClass('sub', value);
-              $('#wallets').removeClass('invalid');
-            }
           },
           true
         );
-
-        this.on('click', '#wallets [name="wallet"]', function(e) {
-          if (!this.validateOffers(e.target.value)) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            this.showOffersError(function(removeOffer) {
-              return removeOffer && e.target.click();
-            });
-
-            return;
-          }
-        });
       } catch (e) {}
     }
 
@@ -2570,10 +2512,6 @@ Session.prototype = {
 
         self.switchTab('card');
       });
-    }
-
-    if (this.get('ecod')) {
-      this.click('#ecod-resend', send_ecod_link);
     }
 
     var goto_payment = '#error-message .link';
@@ -3069,16 +3007,7 @@ Session.prototype = {
       });
     };
 
-    if (this.get('ecod')) {
-      $('#footer').hide();
-      $('#wallets input:checked').prop('checked', false);
-      $(this.el).addClass('notopbar');
-      tab = 'wallet';
-    } else if (
-      this.screen === 'otp' &&
-      thisTab !== 'card' &&
-      thisTab !== 'emi'
-    ) {
+    if (this.screen === 'otp' && thisTab !== 'card' && thisTab !== 'emi') {
       tab = thisTab;
     } else if (
       (thisTab === 'qr' && this.r._payment) ||
@@ -3320,7 +3249,6 @@ Session.prototype = {
       this.payload = null;
       this.clearRequest();
     }
-
     if (tab === 'netbanking') {
       this.netbankingTab.onShown();
     }
@@ -3343,8 +3271,9 @@ Session.prototype = {
     this.body.attr('tab', tab);
     this.tab = tab;
 
-    if (tab === 'ecod') {
-      send_ecod_link.call(this);
+    if (tab === 'wallet') {
+      this.setScreen('wallet');
+      this.svelteWalletsTab.onShown();
     }
 
     if (tab === 'card' || (tab === 'emi' && this.screen !== 'emi')) {
@@ -3915,7 +3844,9 @@ Session.prototype = {
       data.method = tab;
       var activeForm = this.getActiveForm();
 
-      if (activeForm !== '#form-upi' && activeForm !== '#form-card') {
+      if (
+        !_Arr.contains(['#form-upi', '#form-card', '#form-wallet'], activeForm)
+      ) {
         fillData(activeForm, data);
       }
 
@@ -3947,6 +3878,13 @@ Session.prototype = {
         each(upiData, function(key, value) {
           data[key] = value;
         });
+      }
+
+      if (this.screen === 'wallet') {
+        /* Wallet tab being responsible for its subdata */
+        if (this.svelteWalletsTab.isAnyWalletSelected()) {
+          _Obj.extend(data, this.svelteWalletsTab.getPayload());
+        }
       }
     }
 
@@ -3982,10 +3920,7 @@ Session.prototype = {
     var actionState;
     var loadingState = true;
     if (error) {
-      if (
-        (this.screen === 'upi' || this.get('ecod')) &&
-        text === discreet.cancelMsg
-      ) {
+      if (this.screen === 'upi' && text === discreet.cancelMsg) {
         if (this.payload && this.payload['_[flow]'] === 'intent') {
           return;
         }
@@ -4745,21 +4680,6 @@ Session.prototype = {
       }
     }
 
-    /**
-     * Wallets might need to go through intent flow too
-     * TODO: Add a feature check here
-     */
-    if (data.method === 'wallet') {
-      var shouldTurnWalletToIntent = discreet.Wallet.shouldTurnWalletToIntent(
-        data.wallet,
-        this.upi_intents_data
-      );
-
-      if (shouldTurnWalletToIntent) {
-        data.upi_app = discreet.Wallet.getPackageNameForWallet(data.wallet);
-      }
-    }
-
     // If there's a package name, the flow is intent.
     if (data.upi_app) {
       data['_[flow]'] = 'intent';
@@ -5152,16 +5072,6 @@ Session.prototype = {
           });
 
           var insufficient_text = 'Insufficient balance in your wallet';
-          if (this.get('ecod')) {
-            this.back();
-            this.clearRequest();
-            defer(
-              bind(function() {
-                this.showLoadError(insufficient_text, true);
-              }, this),
-              400
-            );
-          }
           if (
             this.payload &&
             this.payload.wallet === 'payumoney' &&
@@ -5806,37 +5716,6 @@ Session.prototype = {
 
   hideOverlayMessage: hideOverlayMessage,
 };
-
-function commenceECOD(session) {
-  var url = makeAuthUrl(
-    session.r,
-    'invoices/' + session.get('invoice_id') + '/status'
-  );
-  setTimeout(function() {
-    session.ajax = fetch({
-      url: url,
-      callback: function(response) {
-        if (response.error) {
-          errorHandler.call(session, response);
-        } else if (response.razorpay_payment_id) {
-          successHandler.call(session, response);
-        }
-      },
-    }).till(function(response) {
-      return response && response.status;
-    });
-  }, 6000);
-}
-
-function send_ecod_link() {
-  // this == session
-  this.showLoadError('Sending link to ' + getPhone());
-  var r = this.r;
-  fetch.post({
-    url: makeAuthUrl(r, 'invoices/' + r.get('invoice_id') + '/notify/sms'),
-    callback: debounce(hideOverlayMessage, 4000),
-  });
-}
 
 function updateTimer(timeoutEl, closeAt) {
   return function() {

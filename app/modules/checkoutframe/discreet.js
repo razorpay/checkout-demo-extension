@@ -67,6 +67,7 @@ import HomeTab from 'ui/tabs/home/index.svelte';
 import NetbankingTab from 'ui/tabs/netbanking/index.svelte';
 import NachScreen from 'ui/tabs/nach/index.svelte';
 import CardTab from 'ui/tabs/card/index.svelte';
+import WalletTab from 'ui/tabs/wallets/index.svelte';
 
 import PayoutsInstruments from 'ui/tabs/payout/payout-instruments.svelte';
 import PayoutAccount from 'ui/tabs/payout/payout-account.svelte';
@@ -164,6 +165,7 @@ export default {
 
   HomeTab,
   UpiTab,
+  WalletTab,
   NetbankingTab,
   NachScreen,
   CardTab,

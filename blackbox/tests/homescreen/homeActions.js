@@ -29,6 +29,15 @@ function getEmiButtonTexts(context) {
 }
 
 /**
+ * Returns all available EMI buttons
+ */
+function getWalletButtonTexts(context) {
+  return context.page.$$eval('#form-wallet button .title', els => {
+    return els.map(el => el.textContent.trim().toLowerCase());
+  });
+}
+
+/**
  * Verify that methods are being shown
  */
 async function assertPaymentMethods(context) {
@@ -77,4 +86,5 @@ module.exports = {
   assertMethodsScreen,
   selectQRScanner,
   getEmiButtonTexts,
+  getWalletButtonTexts,
 };
