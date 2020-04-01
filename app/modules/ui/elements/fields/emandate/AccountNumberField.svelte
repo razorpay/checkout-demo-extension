@@ -21,6 +21,7 @@
   {name}
   {id}
   {readonly}
+  {value}
   label="Bank Account Number"
   helpText="Please enter a valid account number"
   maxlength="20"

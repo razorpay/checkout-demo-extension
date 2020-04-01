@@ -19,6 +19,7 @@
   {name}
   {id}
   {readonly}
+  {value}
   label="IFSC"
   helpText="Please enter a valid IFSC"
   maxlength="11"
