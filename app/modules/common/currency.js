@@ -1181,9 +1181,9 @@ export const updateCurrencies = list => {
     // Backend will send denomination in 10's multiple.
     // Example: For INR, the precision is 2 so denomination will be 100.
     if (list[currency].denomination) {
-      currenciesConfig[currency].decimals = Math.log10(
-        list[currency].denomination
-      );
+      // not using Math.log10 to support IE11
+      currenciesConfig[currency].decimals =
+        Math.LOG10E * Math.log(list[currency].denomination);
     }
 
     displayCurrenciesToAdd[currency] = list[currency].symbol;
