@@ -1,6 +1,10 @@
 <script>
   import { getSession } from 'sessionmanager';
-  import AccountNumberField from '../../components/AccountNumberField.svelte';
+
+  // UI Imports
+  import AccountNumberField from 'ui/elements/fields/emandate/AccountNumberField.svelte';
+  import IfscField from 'ui/elements/fields/emandate/IfscField.svelte';
+  import NameField from 'ui/elements/fields/emandate/NameField.svelte';
 
   const session = getSession();
 
@@ -64,44 +68,8 @@
 
   <div id="form-emandate-details" class="tab-content showable screen pad">
     <AccountNumberField name="bank_account[account_number]" id="nb-acc-no" />
-    <div class="elem-wrap" id="elem-wrap-nb-acc-ifsc">
-      <div class="elem elem-nb-acc-ifsc" class:readonly={bank_ifsc}>
-        <div class="help">Please enter a valid IFSC</div>
-        <label>IFSC</label>
-        <input
-          class="input"
-          name="bank_account[ifsc]"
-          type="text"
-          id="nb-acc-ifsc"
-          value={bank_ifsc}
-          readonly={bank_ifsc}
-          required
-          pattern={ifsc_pattern}
-          maxlength="11"
-          spellcheck="false"
-          autocorrect="off"
-          autocapitalize="off" />
-      </div>
-    </div>
-    <div class="elem-wrap" id="elem-wrap-nb-acc-name">
-      <div class="elem elem-nb-acc-name" class:readonly={bank_name}>
-        <div class="help">Please enter a valid Name as per your account</div>
-        <label>Account Holder Name</label>
-        <input
-          class="input"
-          name="bank_account[name]"
-          type="text"
-          id="nb-acc-name"
-          value={bank_name}
-          readonly={Boolean(bank_name)}
-          required
-          pattern={name_pattern}
-          maxlength="100"
-          spellcheck="false"
-          autocorrect="off"
-          autocapitalize="off" />
-      </div>
-    </div>
+    <IfscField id="nb-acc-ifsc" name="bank_account[ifsc]" />
+    <NameField id="nb-acc-name" name="bank_account[name]" />
     <div class="elem-wrap">
       <div class="elem select" class:readonly={account_type}>
         <i class="select-arrow"></i>
