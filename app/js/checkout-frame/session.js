@@ -747,7 +747,7 @@ function successHandler(response) {
   if (this.preferredInstrument) {
     P13n.recordSuccess(
       this.preferredInstrument,
-      this.customer || this.getCustomer(this.payload.contact)
+      this.getCurrentCustomer(this.payload.contact)
     );
   }
 
@@ -1861,7 +1861,7 @@ Session.prototype = {
     var data = params.data;
     var phone = params.contact;
 
-    this.customer.checkStatus(
+    this.getCurrentCustomer(phone).checkStatus(
       function(response) {
         self.updateCustomerInStore();
         if (_Obj.hasOwnProp(response, 'saved')) {
@@ -2305,7 +2305,7 @@ Session.prototype = {
       this.r.resendOTP(this.r.emitter('payment.otp.required'));
     } else {
       var self = this;
-      this.customer.createOTP(function(message) {
+      this.getCurrentCustomer().createOTP(function(message) {
         debounceAskOTP(self.otpView, message, true);
         self.updateCustomerInStore();
       });
@@ -3315,10 +3315,9 @@ Session.prototype = {
         return;
       }
       var customer = this.getCustomer(contact);
-      this.customer = customer;
       this.updateCustomerInStore();
 
-      if (this.customer.logged && !this.local) {
+      if (this.getCurrentCustomer().logged && !this.local) {
         $('#top-right').addClass('logged');
       }
       $('#user').html(contact);
@@ -3398,7 +3397,7 @@ Session.prototype = {
     this.svelteCardTab.onShown();
 
     var self = this;
-    var customer = self.customer;
+    var customer = self.getCurrentCustomer();
     var remember = Store.shouldRememberCustomer();
 
     if (!remember) {
@@ -3420,7 +3419,7 @@ Session.prototype = {
          * 3. If customer doesn't have saved cards, show cards screen.
          */
         if (Store.isRecurring() && !customer.saved && !customer.logged) {
-          self.customer.createOTP(function() {
+          self.getCurrentCustomer().createOTP(function() {
             Analytics.track('saved_cards:access:otp:ask');
             askOTP(
               self.otpView,
@@ -4158,7 +4157,7 @@ Session.prototype = {
           this.submit();
         }
         callback = function(msg) {
-          if (this.customer.logged) {
+          if (this.getCurrentCustomer().logged) {
             // OTP verification successful
             OtpService.resetCount('razorpay');
 
@@ -4189,7 +4188,7 @@ Session.prototype = {
         }
 
         callback = function(msg) {
-          if (self.customer.logged) {
+          if (self.getCurrentCustomer().logged) {
             // OTP verification successful
             OtpService.resetCount('razorpay');
 
@@ -4270,7 +4269,15 @@ Session.prototype = {
       };
       this.commenceOTP('Verifying OTP...');
     }
-    this.customer.submitOTP(submitPayload, bind(callback, this), queryParams);
+    this.getCurrentCustomer().submitOTP(
+      submitPayload,
+      bind(callback, this),
+      queryParams
+    );
+  },
+
+  getCurrentCustomer: function(phone) {
+    return this.getCustomer(phone || getPhone());
   },
 
   clearRequest: function(extra) {
@@ -4880,7 +4887,7 @@ Session.prototype = {
      * - Ask user to verify phone number if not logged in and wants to save card
      * - Show OTP screen after user agrees to fees
      */
-    if (data.save && !this.customer.logged) {
+    if (data.save && !this.getCurrentCustomer().logged) {
       if (this.screen === 'card') {
         this.otpView.updateScreen({
           skipText: 'Skip saving card',
@@ -4888,7 +4895,7 @@ Session.prototype = {
         Analytics.track('saved_cards:save:otp:ask');
         this.commenceOTP(strings.otpsend, false, 'saved_cards_save');
         debounceAskOTP(this.otpView, undefined, true);
-        this.customer.createOTP(function() {
+        this.getCurrentCustomer().createOTP(function() {
           session.updateCustomerInStore();
         });
         return;

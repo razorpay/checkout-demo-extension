@@ -232,7 +232,7 @@
 
       default:
         _token = _Arr.find(
-          _Obj.getSafely(session.customer, 'tokens.items', []),
+          _Obj.getSafely(session.getCurrentCustomer(), 'tokens.items', []),
           token => token.id === selectedToken
         );
         data = { token: _token.token };
