@@ -1562,11 +1562,6 @@ Session.prototype = {
     }
   },
 
-  /**
-   * Equivalent of clicking a provider option from the
-   * PayLater homescreen.
-   * @param {String} providerCode Code for the provider
-   */
   selectPayLaterProvider: function(providerCode) {
     Analytics.track('paylater:provider:select', {
       type: AnalyticsTypes.BEHAV,
@@ -1581,7 +1576,15 @@ Session.prototype = {
     PayLaterStore.providerCode = providerCode;
     PayLaterStore.userRegistered = false;
     PayLaterStore.otpVerified = false;
+  },
 
+  /**
+   * Equivalent of clicking a provider option from the
+   * PayLater homescreen.
+   * @param {String} providerCode Code for the provider
+   */
+  selectPayLaterProviderAndAttemptPayment: function(providerCode) {
+    this.selectPayLaterProvider(providerCode);
     this.preSubmit();
   },
 
@@ -1628,7 +1631,7 @@ Session.prototype = {
       on: {
         select: function(event) {
           var providerCode = event.detail.code;
-          self.selectPayLaterProvider(providerCode);
+          self.selectPayLaterProviderAndAttemptPayment(providerCode);
         },
       },
     });
