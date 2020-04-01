@@ -4676,6 +4676,11 @@ Session.prototype = {
           }
 
           case 'upi': {
+            /**
+             * UPI QR is a built on Checkout like a method in itself with method=upi and flow=qr.
+             * And the payment happens from within the tab.
+             * So, let's switch to it instead of continuing from here.
+             */
             if (selectedInstrument._ungrouped[0].flow === 'qr') {
               this.switchTab('qr');
               return;
