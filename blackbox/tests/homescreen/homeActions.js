@@ -42,6 +42,7 @@ async function assertPaymentMethods(context) {
     'bank_transfer',
     'paylater',
     'cardless_emi',
+    'upi_otm',
   ]).toEqual(expect.arrayContaining(methods));
 }
 

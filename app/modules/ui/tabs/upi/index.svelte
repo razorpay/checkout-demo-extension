@@ -79,9 +79,35 @@
   let intentAppSelected = null;
   let isOtm = method === 'upi_otm';
   let otmStartDate = new Date();
-  let otmEndDate = otmStartDate.addDays(90);
 
   const session = getSession();
+
+  let toShortFormat = function(date, delimter = ' ') {
+    let month_names = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+
+    let day = date.getDate();
+    let month_index = date.getMonth();
+    let year = date.getFullYear();
+
+    return '' + day + delimter + month_names[month_index] + delimter + year;
+  };
+
+  const addDaysToDate = function(date, days) {
+    return new Date(date.getTime() + days * 1000 * 24 * 3600);
+  };
 
   const {
     all_upi_intents_data: allIntentApps,
@@ -89,6 +115,8 @@
     isPayout,
     showRecommendedUPIApp,
   } = session;
+
+  let otmEndDate = addDaysToDate(otmStartDate, 90);
 
   const checkGPay = session => {
     /* disable Web payments API for fee_bearer and OTM for now */
@@ -177,8 +205,8 @@
 
     const downtimes = getDowntimes();
 
-    down = _Arr.contains(downtimes.low.methods, 'upi');
-    disabled = _Arr.contains(downtimes.high.methods, 'upi');
+    down = _Arr.contains(downtimes.low.methods, method);
+    disabled = _Arr.contains(downtimes.high.methods, method);
     qrIcon = session.themeMeta.icons.qr;
   });
 
@@ -531,7 +559,7 @@
           <!-- @TODO-OTM update with real data -->
           {session.formatAmountWithCurrency(getAmount())} will be blocked on
           your acount by clicking pay. Your account will be charged by {getName()}
-          between {otmStartDate.toShortFormat()} to {otmEndDate.toShortFormat()}.
+          between {toShortFormat(otmStartDate)} to {toShortFormat(otmEndDate)}.
         </Callout>
       {/if}
 
