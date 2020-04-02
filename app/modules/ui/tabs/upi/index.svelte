@@ -21,6 +21,7 @@
   import { Formatter } from 'formatter';
   import { hideCta, showCtaWithDefaultText, showCta } from 'checkoutstore/cta';
   import { filterUPITokens } from 'common/token';
+  import { getUPIIntentApps } from 'checkoutframe';
 
   // UI imports
   import UpiIntent from './UpiIntent.svelte';
@@ -79,12 +80,7 @@
 
   const session = getSession();
 
-  const {
-    all_upi_intents_data: allIntentApps,
-    upi_intents_data: intentApps,
-    isPayout,
-    showRecommendedUPIApp,
-  } = session;
+  const { isPayout, showRecommendedUPIApp } = session;
 
   function getAvailableFlowsFromInstrument(instrument) {
     let availableFlows = {
@@ -107,10 +103,6 @@
         availableFlows[flow] = true;
       });
     }
-
-    console.log({
-      availableFlows,
-    });
 
     return availableFlows;
   }
