@@ -5225,6 +5225,7 @@ Session.prototype = {
       'payoutsAccountView',
       'payoutsView',
       'savedCardsView',
+      'svelteWalletsTab',
       'upiTab',
     ];
 
