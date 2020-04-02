@@ -4682,8 +4682,7 @@ Session.prototype = {
 
         switch (selectedInstrument.method) {
           case 'card':
-          case 'emi':
-          case 'wallet': {
+          case 'emi': {
             this.switchTab(selectedInstrument.method);
             break;
           }
