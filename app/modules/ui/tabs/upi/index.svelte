@@ -82,12 +82,18 @@
 
   const { isPayout, showRecommendedUPIApp } = session;
 
+  /**
+   * An instrument might has for some flows to be available
+   * @param {Instrument | undefined} instrument
+   *
+   * @returns {Object}
+   */
   function getAvailableFlowsFromInstrument(instrument) {
     let availableFlows = {
-      omnichannel: true,
-      collect: true,
-      intent: true,
-      qr: true,
+      omnichannel: isUPIFlowEnabled('omnichannel'),
+      collect: isUPIFlowEnabled('collect'),
+      intent: isUPIFlowEnabled('intent'),
+      qr: isUPIFlowEnabled('qr'),
     };
 
     if (!instrument || instrument.method !== 'upi') {
@@ -95,10 +101,12 @@
     }
 
     if (instrument.flows) {
+      // Disable all flows
       _Obj.loop(availableFlows, (val, key) => {
         availableFlows[key] = false;
       });
 
+      // Enable ones that are asked for
       _Arr.loop(instrument.flows, flow => {
         availableFlows[flow] = true;
       });
@@ -112,6 +120,12 @@
     availableFlows = getAvailableFlowsFromInstrument($methodTabInstrument);
   }
 
+  /**
+   * An instrument might has only for some apps to be shown
+   * @param {Instrument | undefined} instrument
+   *
+   * @returns {Array<Object>}
+   */
   function getUPIIntentAppsFromInstrument(instrument) {
     if (!instrument || instrument.method !== 'upi') {
       return getUPIIntentApps().filtered;
@@ -157,8 +171,7 @@
     return session.r.checkPaymentAdapter('gpay');
   };
 
-  $: intent =
-    availableFlows.intent && preferIntent && isUPIFlowEnabled('intent');
+  $: intent = availableFlows.intent && preferIntent;
   $: isGPaySelected = selectedApp === 'gpay' && useWebPaymentsApi;
   $: pspHandle = selectedAppData ? selectedAppData.psp : '';
   $: shouldShowQr =
@@ -166,9 +179,8 @@
     isMethodEnabled('qr') &&
     !selectedApp &&
     selectedApp !== null;
-  $: shouldShowCollect = availableFlows.collect && isUPIFlowEnabled('collect');
-  $: shouldShowOmnichannel =
-    availableFlows.omnichannel && isUPIFlowEnabled('omnichannel');
+  $: shouldShowCollect = availableFlows.collect;
+  $: shouldShowOmnichannel = availableFlows.omnichannel;
 
   $: {
     /**
