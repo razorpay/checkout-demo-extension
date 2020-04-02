@@ -141,7 +141,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
           )
         );
 
-        instrument.wallet = shownWallets;
+        instrument.wallets = shownWallets;
       }
 
       return instrument;
