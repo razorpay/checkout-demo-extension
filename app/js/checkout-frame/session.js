@@ -5136,7 +5136,9 @@ Session.prototype = {
     if (this.powerwallet) {
       this.showLoadError(strings.otpsend + getPhone());
       this.r.on('payment.otp.required', function(message) {
-        debounceAskOTP(that.otpView, message);
+        debounceAskOTP(that.otpView, message, false, {
+          allowSkip: false,
+        });
       });
       this.r.on(
         'payment.wallet.topup',
