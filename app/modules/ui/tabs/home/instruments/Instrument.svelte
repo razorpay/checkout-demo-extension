@@ -34,6 +34,16 @@
       return !doesTokenExist;
     }
 
+    // UPI collect and omnichannel need to go deeper
+    if (instrument.method === 'upi' && instrument.flows) {
+      if (
+        _Arr.contains(instrument.flows, 'collect') ||
+        _Arr.contains(instrument.flows, 'omnichannel')
+      ) {
+        return true;
+      }
+    }
+
     return instrument._ungrouped.length > 1;
   }
 

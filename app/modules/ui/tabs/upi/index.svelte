@@ -44,6 +44,7 @@
   // Store
   import { contact } from 'checkoutstore/screens/home';
   import { customer } from 'checkoutstore/customer';
+  import { methodTabInstrument } from 'checkoutstore/screens/home';
 
   // Props
   export let selectedApp = undefined;
@@ -66,6 +67,8 @@
   export let isGPaySelected;
   export let pspHandle;
   export let shouldShowQr;
+  let shouldShowCollect;
+  let shouldShowOmnichannel;
 
   let disabled = false;
   let tokens = [];
@@ -82,6 +85,40 @@
     isPayout,
     showRecommendedUPIApp,
   } = session;
+
+  function getAvailableFlowsFromInstrument(instrument) {
+    let availableFlows = {
+      omnichannel: true,
+      collect: true,
+      intent: true,
+      qr: true,
+    };
+
+    if (!instrument || instrument.method !== 'upi') {
+      return availableFlows;
+    }
+
+    if (instrument.flows) {
+      _Obj.loop(availableFlows, (val, key) => {
+        availableFlows[key] = false;
+      });
+
+      _Arr.loop(instrument.flows, flow => {
+        availableFlows[flow] = true;
+      });
+    }
+
+    console.log({
+      availableFlows,
+    });
+
+    return availableFlows;
+  }
+
+  let availableFlows = getAvailableFlowsFromInstrument();
+  $: {
+    availableFlows = getAvailableFlowsFromInstrument($methodTabInstrument);
+  }
 
   const checkGPay = session => {
     /* disable Web payments API for fee_bearer for now */
@@ -102,11 +139,18 @@
     return session.r.checkPaymentAdapter('gpay');
   };
 
-  $: intent = preferIntent && isUPIFlowEnabled('intent');
+  $: intent =
+    availableFlows.intent && preferIntent && isUPIFlowEnabled('intent');
   $: isGPaySelected = selectedApp === 'gpay' && useWebPaymentsApi;
   $: pspHandle = selectedAppData ? selectedAppData.psp : '';
   $: shouldShowQr =
-    isMethodEnabled('qr') && !selectedApp && selectedApp !== null;
+    availableFlows.qr &&
+    isMethodEnabled('qr') &&
+    !selectedApp &&
+    selectedApp !== null;
+  $: shouldShowCollect = availableFlows.collect && isUPIFlowEnabled('collect');
+  $: shouldShowOmnichannel =
+    availableFlows.omnichannel && isUPIFlowEnabled('omnichannel');
 
   $: {
     /**
@@ -129,7 +173,7 @@
   }
 
   function setWebPaymentsApiUsage(to) {
-    useWebPaymentsApi = to;
+    useWebPaymentsApi = availableFlows.intent && to;
 
     /**
      * If web payments API is available,
@@ -436,7 +480,7 @@
         </div>
       {/if}
 
-      {#if isUPIFlowEnabled('collect')}
+      {#if shouldShowCollect}
         <div class="legend left">Pay using UPI ID</div>
         <div class="border-list">
           {#if intent}
@@ -476,7 +520,7 @@
         </div>
       {/if}
 
-      {#if isUPIFlowEnabled('omnichannel')}
+      {#if shouldShowOmnichannel}
         <GooglePayOmnichannel
           error={retryOmnichannel}
           focusOnCreate={true}
