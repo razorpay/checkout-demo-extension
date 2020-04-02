@@ -112,6 +112,32 @@
     availableFlows = getAvailableFlowsFromInstrument($methodTabInstrument);
   }
 
+  function getUPIIntentAppsFromInstrument(instrument) {
+    if (!instrument || instrument.method !== 'upi') {
+      return getUPIIntentApps().filtered;
+    }
+
+    if (
+      !instrument.flows ||
+      !instrument.apps ||
+      !_Arr.contains(instrument.flows, 'intent')
+    ) {
+      return getUPIIntentApps().filtered;
+    }
+
+    const allApps = getUPIIntentApps().all;
+
+    return _Arr.filter(
+      _Arr.map(instrument.apps, app =>
+        _Arr.find(allApps, deviceApp => deviceApp.package_name === app)
+      ),
+      Boolean
+    );
+  }
+
+  let intentApps = getUPIIntentApps().filtered;
+  $: intentApps = getUPIIntentAppsFromInstrument($methodTabInstrument);
+
   const checkGPay = session => {
     /* disable Web payments API for fee_bearer for now */
     if (isCustomerFeeBearer()) {
