@@ -63,9 +63,23 @@ const util = (module.exports = {
 
   /**
    * Get the textContent of an element
+   * @param {string | ElementHandle} selectorOrElem
+   *
+   * @returns {string | undefined}
    */
-  innerText: async function(selector) {
-    return await page.$eval(selector, el => el.textContent);
+  innerText: async function(selectorOrElem) {
+    if (typeof selectorOrElem === 'string') {
+      return await page.$eval(selectorOrElem, el => el.textContent);
+    }
+
+    try {
+      return await page.evaluate(
+        element => element.textContent,
+        selectorOrElem
+      );
+    } catch (err) {
+      return undefined;
+    }
   },
 
   /**
