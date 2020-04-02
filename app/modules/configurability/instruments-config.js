@@ -332,12 +332,12 @@ const config = {
       const hasFlows = Boolean(instrument.flows);
       const hasApps = Boolean(instrument.apps);
 
-      if (hasFlows && !instrument.flows.length) {
-        return false;
+      if (hasFlows) {
+        return Boolean(instrument.flows.length);
       }
 
-      if (hasApps && !instrument.apps.length) {
-        return false;
+      if (hasApps) {
+        return Boolean(instrument.apps.length);
       }
 
       // Individual instrument should either have flow or app
