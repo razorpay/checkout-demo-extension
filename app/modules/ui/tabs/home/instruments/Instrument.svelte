@@ -19,10 +19,7 @@
    */
   function isInstrumentGrouped(instrument) {
     const isMethodInstrument = isInstrumentForEntireMethod(instrument);
-    const isMethodWithToken = _Arr.contains(
-      ['card', 'emi', 'upi'],
-      instrument.method
-    );
+    const isMethodWithToken = _Arr.contains(['card', 'emi'], instrument.method);
 
     if (isMethodInstrument) {
       return true;
