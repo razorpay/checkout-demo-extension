@@ -1079,7 +1079,7 @@ Session.prototype = {
       }
 
       if (pollUrl) {
-        this.switchTab('upi'); // TODO: Store method and switch to OTM
+        this.switchTab(self.tab);
         this.showLoadError();
         this.isResumedPayment = true;
 
