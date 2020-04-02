@@ -182,11 +182,14 @@ export function getMethodPrefix(method) {
  * @returns {string}
  */
 export function getMethodNameForPaymentOption(method, extra = {}) {
+  let hasInstrument = extra.instrument;
+  let qrEnabled;
+  let hasQr;
+
   switch (method) {
     case 'upi':
-      const hasInstrument = extra.instrument;
-      const qrEnabled = isMethodEnabled('qr');
-      let hasQr = qrEnabled;
+      qrEnabled = isMethodEnabled('qr');
+      hasQr = qrEnabled;
 
       if (qrEnabled && hasInstrument) {
         hasQr = _Arr.contains(extra.instrument.flows || [], 'qr');
@@ -194,9 +197,9 @@ export function getMethodNameForPaymentOption(method, extra = {}) {
 
       if (hasQr) {
         return 'UPI / QR';
-      } else {
-        return TAB_TITLES.upi;
       }
+
+      return TAB_TITLES.upi;
 
     default:
       return TAB_TITLES[method];
