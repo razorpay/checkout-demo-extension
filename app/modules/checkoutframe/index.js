@@ -76,11 +76,6 @@ const optionsTransformer = {
 
   addUpiIntentsData: (o, message) => {
     // @TODO: update better names for these variables
-    message.upi_intents_data = [
-      { package_name: 'in.org.npci.upiapp', app_name: 'BHIM' },
-      { package_name: 'umang.app', app_name: "Umang's App" },
-    ];
-
     if (message.upi_intents_data && message.upi_intents_data.length) {
       // @TODO: used to just send an event. send from here itself
       o.all_upi_intents_data = message.upi_intents_data;
