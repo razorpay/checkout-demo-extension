@@ -19,16 +19,19 @@
    */
   function isInstrumentGrouped(instrument) {
     const isMethodInstrument = isInstrumentForEntireMethod(instrument);
-    const isMethodCardOrEmi = _Arr.contains(['card', 'emi'], instrument.method);
+    const isMethodWithToken = _Arr.contains(
+      ['card', 'emi', 'upi'],
+      instrument.method
+    );
 
     if (isMethodInstrument) {
       return true;
     }
 
-    if (isMethodCardOrEmi) {
-      const isSavedCardInstrument = instrument.token_id;
+    if (isMethodWithToken) {
+      const doesTokenExist = instrument.token_id;
 
-      return !isSavedCardInstrument;
+      return !doesTokenExist;
     }
 
     return instrument._ungrouped.length > 1;
