@@ -284,6 +284,18 @@
       data['_[flow]'] = 'directpay';
     }
 
+    if (isOtm) {
+      data.upi = {
+        flow: 'collect',
+        type: 'otm',
+      };
+      if (data.vpa) {
+        data.upi.vpa = data.vpa;
+        delete data.vpa;
+      }
+      delete data['_[flow]'];
+    }
+
     data.method = 'upi';
     return data;
   }
