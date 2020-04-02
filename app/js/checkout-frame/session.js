@@ -5256,6 +5256,7 @@ Session.prototype = {
    */
   cleanUpSvelteComponents: function() {
     var views = [
+      'upiOtmTab',
       'bankTransferView',
       'svelteCardTab',
       'currentScreen',
