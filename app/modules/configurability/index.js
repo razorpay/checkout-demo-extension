@@ -117,7 +117,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
     case 'netbanking': {
       const hasBanks = Boolean(instrument.banks);
 
-      if (!hasBanks) {
+      if (hasBanks) {
         const enabledBanks = getNetbankingBanks();
         const shownBanks = _Arr.filter(
           instrument.banks,
