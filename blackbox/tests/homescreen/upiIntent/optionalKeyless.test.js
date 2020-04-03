@@ -32,7 +32,7 @@ describe('UPI Intent tests', () => {
       page,
       options,
       preferences,
-      apps: [{ package_name: 'in.org.npci.upiapp', app_name: 'BHIM' }],
+      apps: true,
     });
     await assertBasicDetailsScreen(context);
     await fillUserDetails(context);
