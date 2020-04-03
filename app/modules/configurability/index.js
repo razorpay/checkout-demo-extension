@@ -3,6 +3,7 @@ import { getSequencedBlocks } from './sequence';
 import { clusterRazorpayBlocks } from './methods';
 import { ungroupInstruments, getIndividualInstruments } from './ungroup';
 import InstrumentConfig from './instruments-config';
+import { isInstrumentForEntireMethod } from './instruments';
 
 import { AVAILABLE_METHODS } from 'common/constants';
 import {
@@ -219,9 +220,15 @@ function removeDisabledInstrumentsFromBlock(block) {
 function isInstrumentValid(instrument) {
   const { method } = instrument;
   const config = InstrumentConfig[method];
+
   if (!method || !config) {
     return false;
   }
+
+  if (isInstrumentForEntireMethod(instrument)) {
+    return true;
+  }
+
   return config.isValid(instrument);
 }
 
