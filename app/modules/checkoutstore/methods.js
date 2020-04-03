@@ -154,6 +154,12 @@ export function isCardOrEMIEnabled() {
   return isMethodEnabled('card') || isMethodEnabled('emi');
 }
 
+export function isDebitEMIEnabled() {
+  const DEBIT_EMI_BANKS = ['HDFC_DC'];
+  const emiBanks = getEMIBanks();
+  return DEBIT_EMI_BANKS |> _Arr.any(bank => emiBanks[bank]);
+}
+
 /*
  * @returns {Array} of enabled methods
  */

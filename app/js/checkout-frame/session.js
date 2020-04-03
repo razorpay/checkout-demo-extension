@@ -1522,7 +1522,10 @@ Session.prototype = {
       });
 
       if (MethodStore.isMethodEnabled('emi')) {
-        providers.unshift(CardlessEmi.createProvider('cards', 'EMI on Cards'));
+        var providerTitle = MethodStore.isDebitEMIEnabled()
+          ? 'EMI on Debit/Credit Cards'
+          : 'EMI on Cards';
+        providers.unshift(CardlessEmi.createProvider('cards', providerTitle));
       }
 
       this.emiOptionsView.$set({
