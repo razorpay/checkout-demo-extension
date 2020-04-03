@@ -1,6 +1,6 @@
 <script>
   // UI imports
-  import Option from 'ui/elements/options/Option.svelte';
+  import DeprecatedOption from 'ui/elements/options/DeprecatedOption.svelte';
   import OptionIcon from 'ui/elements/options/OptionIcon.svelte';
   import Radio from 'ui/elements/Radio.svelte';
 
@@ -32,7 +32,7 @@
   }
 </script>
 
-<Option {data} {classes} {reverse} type="radio-option" on:select>
+<DeprecatedOption {data} {classes} {reverse} type="radio-option" on:select>
   {#if icon || iconPlaceholder}
     <OptionIcon {icon} placeholder={iconPlaceholder} />
   {/if}
@@ -42,4 +42,4 @@
   {#if showRadio}
     <Radio checked={selected} {name} {value} />
   {/if}
-</Option>
+</DeprecatedOption>
