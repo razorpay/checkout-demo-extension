@@ -1,3 +1,3 @@
-const createUPICollectTest = require('../../../create/upi-otm');
+const createUPIOtmCollectTest = require('../../../create/upi-otm');
 
-createUPICollectTest();
+createUPIOtmCollectTest();

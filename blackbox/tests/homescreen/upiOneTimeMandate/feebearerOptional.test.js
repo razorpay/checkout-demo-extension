@@ -1,5 +1,5 @@
-const createUPICollectTest = require('../../../create/upi-otm');
-createUPICollectTest({
+const createUPIOtmCollectTest = require('../../../create/upi-otm');
+createUPIOtmCollectTest({
   optionalContact: true,
   feeBearer: true,
 });
