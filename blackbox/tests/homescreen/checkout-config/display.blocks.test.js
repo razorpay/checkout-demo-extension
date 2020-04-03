@@ -48,11 +48,11 @@ const CONFIG = {
             method: 'wallet',
             wallets: ['freecharge'],
           },
-          // {
-          //   method: 'upi',
-          //   flows: ['intent'],
-          //   apps: ['bhim'],
-          // },
+          {
+            method: 'upi',
+            flows: ['intent'],
+            apps: ['bhim'],
+          },
         ],
       },
     },
