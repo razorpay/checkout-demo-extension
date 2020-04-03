@@ -291,9 +291,7 @@
       };
       if (data.vpa) {
         data.upi.vpa = data.vpa;
-        delete data.vpa;
       }
-      delete data['_[flow]'];
     }
 
     data.method = 'upi';
