@@ -186,6 +186,10 @@ function removeNonApplicableInstrumentFlows(instrument) {
       if (hasFlows) {
         const shownFlows = _Arr.filter(instrument.flows, isUPIFlowEnabled);
         instrument.flows = shownFlows;
+
+        if (instrument.apps && !_Arr.contains(instrument.flows, 'intent')) {
+          delete instrument.apps;
+        }
       }
 
       // TODO: check for app
