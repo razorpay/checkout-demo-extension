@@ -1,5 +1,19 @@
 const { innerText, visible, getAttribute } = require('../../../util');
 
+function matchAllStringsInList(a, b) {
+  if (a.length !== b.length) {
+    return false;
+  }
+
+  for (let i = 0; i < a.length; i++) {
+    if (!b.includes(a[i])) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 /**
  * Parses blocks and returns their text
  * @param {Context} context
@@ -91,19 +105,8 @@ async function assertShownBanks(context, banks) {
     options.map(option => getAttribute(context.page, option, 'value'))
   );
 
-  // Length of shown v/s expected should match
-  expect(values.length).toBe(banks.length);
-
   // Verify that all expected banks are present
-  let hasAll = true;
-  for (let i = 0; i < banks; i++) {
-    if (!values.includes(banks[i])) {
-      hasAll = false;
-      break;
-    }
-  }
-
-  expect(hasAll).toBe(true);
+  expect(matchAllStringsInList(banks, values)).toBe(true);
 }
 
 module.exports = {
