@@ -92,6 +92,11 @@ describe('display.blocks', () => {
       `.methods-block[data-block='block.individual'] [role=list] > *`
     );
 
+    // Check the number of instruments rendered
+    expect(individualInstruments.length).toBe(
+      CONFIG.display.blocks.individual.instruments.length
+    );
+
     // Assert that they are all individual
     await Promise.all(
       Array.from(individualInstruments).map(isIndividualInstrument)
@@ -130,6 +135,11 @@ describe('display.blocks', () => {
     // Get all instruments from block.grouped
     const groupedInstruments = await context.page.$$(
       `.methods-block[data-block='block.grouped'] [role=list] > *`
+    );
+
+    // Check the number of instruments rendered
+    expect(groupedInstruments.length).toBe(
+      CONFIG.display.blocks.grouped.instruments.length
     );
 
     // Assert that they are all grouped
