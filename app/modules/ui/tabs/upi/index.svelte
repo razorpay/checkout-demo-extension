@@ -512,7 +512,7 @@
 
       {#if shouldShowCollect}
         <div class="legend left">Pay using UPI ID</div>
-        <div class="border-list">
+        <div class="border-list" id="upi-collect-list">
           {#if intent}
             <ListHeader>
               <i slot="icon">

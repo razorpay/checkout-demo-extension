@@ -84,7 +84,7 @@ async function isGroupedInstrument(element) {
 }
 
 /**
- * Assert that the epxected banks are shown
+ * Assert that the expected banks are shown
  * @param {Context} context
  * @param {Array<string>} banks List of banks that should have been shown
  */
@@ -109,9 +109,50 @@ async function assertShownBanks(context, banks) {
   expect(matchAllStringsInList(banks, values)).toBe(true);
 }
 
+/**
+ * Assert that the expected UPI intent apps are shown
+ * @param {Context} context
+ * @param {Array<string>} apps List of app names that should have been shown
+ */
+async function assertUpiIntent(context, apps) {
+  // UPI screen is visible
+  expect(await context.page.$eval('#form-upi', visible)).toEqual(true);
+
+  // Apps are visible
+  expect(await context.page.$eval('#svelte-upi-apps-list', visible)).toEqual(
+    true
+  );
+
+  // Get all apps except for the first one, since the first one acts as a label
+  const appsElements = await context.page.$$(
+    '#svelte-upi-apps-list > *:not(:first-child)'
+  );
+
+  // Get the names of all apps
+  let appNames = await Promise.all(appsElements.map(innerText));
+  appNames = appNames.map(name => name.trim());
+
+  // Verify that all expected apps are present
+  expect(matchAllStringsInList(apps, appNames)).toBe(true);
+}
+
+/**
+ * Assert that the UPI Collect UI is visible
+ * @param {Context} context
+ */
+async function assertUpiCollect(context) {
+  // UPI screen is visible
+  expect(await context.page.$eval('#form-upi', visible)).toEqual(true);
+
+  // UPI Collect options are visible
+  expect(await context.page.$eval('#upi-collect-list', visible)).toEqual(true);
+}
+
 module.exports = {
   parseBlocksFromHomescreen,
   isIndividualInstrument,
   isGroupedInstrument,
   assertShownBanks,
+  assertUpiIntent,
+  assertUpiCollect,
 };

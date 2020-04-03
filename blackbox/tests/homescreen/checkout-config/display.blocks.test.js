@@ -11,6 +11,8 @@ const {
   isIndividualInstrument,
   isGroupedInstrument,
   assertShownBanks,
+  assertUpiIntent,
+  assertUpiCollect,
 } = require('./config-utils');
 
 const CONFIG = {
@@ -23,14 +25,14 @@ const CONFIG = {
             method: 'netbanking',
             banks: ['ICIC', 'HDFC'],
           },
+          {
+            method: 'upi',
+            flows: ['collect', 'intent'],
+            apps: ['bhim', 'some.random.app'],
+          },
           // {
           //   method: 'wallet',
           //   wallets: ['freecharge', 'olamoney'],
-          // },
-          // {
-          //   method: 'upi',
-          //   flows: ['collect', 'intent'],
-          //   apps: ['bhim', 'some.random.app'],
           // },
         ],
       },
@@ -48,7 +50,7 @@ const CONFIG = {
           },
           // {
           //   method: 'upi',
-          //   flows: ['collect', 'intent'],
+          //   flows: ['intent'],
           //   apps: ['bhim'],
           // },
         ],
@@ -188,5 +190,49 @@ describe('display.blocks', () => {
       context,
       CONFIG.display.blocks.grouped.instruments[0].banks
     );
+  });
+});
+
+describe('display.blocks', () => {
+  test('Grouped instrument: UPI', async () => {
+    const preferences = makePreferences();
+
+    preferences.methods.upi = true;
+
+    const options = {
+      key: 'rzp_test_1DP5mmOlF5G5ag',
+      amount: 600000,
+      prefill: {
+        contact: '+919988776655',
+        email: 'void@razorpay.com',
+      },
+
+      config: CONFIG,
+    };
+
+    const context = await openCheckoutWithNewHomeScreen({
+      page,
+      options,
+      preferences,
+      apps: true,
+    });
+
+    // User details
+    await fillUserDetails(context, '9988776655');
+    await assertUserDetails(context);
+
+    // Get the UPI grouped instrument
+    const upiInstrument = await context.page.$(
+      `.methods-block[data-block='block.grouped'] [role=list] > *:nth-child(2)`
+    );
+
+    // Select it
+    await upiInstrument.click();
+
+    // Assert that all apps are shown
+    await assertUpiIntent(context, ['BHIM', 'Some Random App']);
+
+    // Assert that UPI collect is shown
+    await assertUpiCollect(context);
   });
 });
