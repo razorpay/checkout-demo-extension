@@ -5448,7 +5448,6 @@ Session.prototype = {
     if (screen === 'netbanking') {
       methodDescription = 'Bank';
     } else if (screen === 'upi') {
-      // TODO: Are we supporting offers on OTM?
       methodDescription = 'VPA';
     } else {
       methodDescription = titleCase(this.screen);
