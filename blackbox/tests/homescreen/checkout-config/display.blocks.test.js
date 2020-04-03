@@ -42,10 +42,10 @@ const CONFIG = {
             method: 'netbanking',
             banks: ['ICIC'],
           },
-          // {
-          //   method: 'wallet',
-          //   wallets: ['freecharge'],
-          // },
+          {
+            method: 'wallet',
+            wallets: ['freecharge'],
+          },
           // {
           //   method: 'upi',
           //   flows: ['collect', 'intent'],
