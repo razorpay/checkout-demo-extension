@@ -332,16 +332,20 @@ const config = {
       const hasFlows = Boolean(instrument.flows);
       const hasApps = Boolean(instrument.apps);
 
-      if (hasApps) {
-        return (
-          Boolean(instrument.apps.length) &&
-          hasFlows &&
-          _Arr.contains(instrument.flows, 'intent')
-        );
+      if (hasFlows && !instrument.flows.length) {
+        return false;
       }
 
-      if (hasFlows) {
-        return Boolean(instrument.flows.length);
+      if (hasApps) {
+        if (!instrument.apps.length) {
+          return false;
+        }
+
+        if (!hasFlows || !_Arr.contains(instrument.flows, 'intent')) {
+          return false;
+        }
+
+        return true;
       }
 
       // Individual instrument should either have flow or app
