@@ -115,7 +115,15 @@
     return filteredBanks;
   }
 
-  $: filteredBanks = filterBanksAgainstInstrument(banks, $methodTabInstrument);
+  $: {
+    filteredBanks = filterBanksAgainstInstrument(banks, $methodTabInstrument);
+
+    // If the currently selected bank is not present in filtered banks, we need to unset it.
+    if (!filteredBanks[$selectedBank]) {
+      $selectedBank = '';
+    }
+  }
+
   $: showCorporateRadio =
     !recurring && hasMultipleOptions($selectedBank, filteredBanks);
   $: corporateSelected = isCorporateCode($selectedBank);
