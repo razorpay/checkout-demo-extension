@@ -19,6 +19,14 @@
    */
   function isInstrumentGrouped(instrument) {
     const isMethodInstrument = isInstrumentForEntireMethod(instrument);
+
+    /**
+     * All the methods that have a token.
+     * UPI has tokens, but it needs some more checks on
+     * the flows as well. It's not needed now, but we will eventually need to add it.
+     *
+     * TODO: Check for UPI in isMethodWithToken
+     */
     const isMethodWithToken = _Arr.contains(['card', 'emi'], instrument.method);
 
     if (isMethodInstrument) {
