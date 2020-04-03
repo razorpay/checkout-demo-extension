@@ -97,7 +97,7 @@
             icon = app.app_icon;
             alt = app.app_name;
           } else {
-            icon = '&#xe70e';
+            icon = '&#xe70e;';
             alt = 'UPI App';
           }
         } else {
