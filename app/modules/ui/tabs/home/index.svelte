@@ -362,15 +362,16 @@
     return true;
   }
 
-  export function onShown() {
+  function deselectAllInstruments() {
     $methodTabInstrument = null;
+    $selectedInstrumentId = null;
+  }
+
+  export function onShown() {
+    deselectAllInstruments();
 
     if (view === 'methods') {
-      if ($selectedInstrumentId) {
-        showCtaWithDefaultText();
-      } else {
-        hideCta();
-      }
+      hideCta();
     } else {
       setDetailsCta();
     }

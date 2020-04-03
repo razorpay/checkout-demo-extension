@@ -29,7 +29,7 @@
   const amount = session.formatAmountWithCurrency(session.get('amount'));
 
   const onSelection = () => {
-    const customer = session.customer || {};
+    const customer = session.getCurrentCustomer() || {};
 
     contact = customer.contact ? customer.contact.replace('+91', '') : '';
 
