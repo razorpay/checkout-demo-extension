@@ -203,7 +203,7 @@
   }
 
   function setWebPaymentsApiUsage(to) {
-    useWebPaymentsApi = availableFlows.intent && to;
+    useWebPaymentsApi = to;
 
     /**
      * If web payments API is available,
