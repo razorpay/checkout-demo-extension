@@ -8,6 +8,7 @@ const {
 } = require('../actions');
 
 const {
+  parseBlocksFromHomescreen,
   isIndividualInstrument,
   isGroupedInstrument,
   assertShownBanks,
@@ -55,9 +56,23 @@ const CONFIG = {
           },
         ],
       },
+
+      method: {
+        name: 'Method Instruments',
+        instruments: [
+          { method: 'card' },
+          { method: 'netbanking' },
+          { method: 'wallet' },
+          { method: 'upi' },
+          { method: 'emi' },
+          { method: 'cardless_emi' },
+          { method: 'paylater' },
+          { method: 'bank_transfer' },
+        ],
+      },
     },
 
-    sequence: ['block.individual', 'block.grouped'],
+    sequence: ['block.individual', 'block.grouped', 'block.method'],
   },
 };
 
@@ -146,6 +161,67 @@ describe('display.blocks', () => {
 
     // Assert that they are all grouped
     await Promise.all(Array.from(groupedInstruments).map(isGroupedInstrument));
+  });
+});
+
+describe('display.blocks', () => {
+  test('Method instruments', async () => {
+    const preferences = makePreferences();
+
+    preferences.methods = {
+      ...preferences.methods,
+      upi: true,
+      cardless_emi: {
+        zestmoney: true,
+        earlysalary: true,
+      },
+      paylater: {
+        epaylater: true,
+        icic: true,
+      },
+      bank_transfer: true,
+    };
+
+    const options = {
+      key: 'rzp_test_1DP5mmOlF5G5ag',
+      amount: 600000,
+      prefill: {
+        contact: '+919988776655',
+        email: 'void@razorpay.com',
+      },
+      order_id: 'order_test1234',
+
+      config: CONFIG,
+    };
+
+    const context = await openCheckoutWithNewHomeScreen({
+      page,
+      options,
+      preferences,
+      apps: true,
+    });
+
+    // User details
+    await fillUserDetails(context, '9988776655');
+    await assertUserDetails(context);
+
+    // Get block.method
+    const parsedBlocks = await parseBlocksFromHomescreen(context);
+    const methodBlock = parsedBlocks.find(
+      block => block.title === CONFIG.display.blocks.method.name
+    );
+
+    // Check the number of instruments rendered
+    expect(methodBlock.items.length).toBe(
+      CONFIG.display.blocks.method.instruments.length
+    );
+
+    // Assert that they all start with "Pay using" and don't have a description
+    const allAreMethodInstruments = methodBlock.items.every(
+      item => item.title.startsWith('Pay using') && !item.description
+    );
+
+    expect(allAreMethodInstruments).toBe(true);
   });
 });
 
