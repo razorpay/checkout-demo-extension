@@ -3168,14 +3168,17 @@ Session.prototype = {
       var fields = _Doc.querySelectorAll('#form-common .invalid [name]');
 
       var invalidFields = {};
+      var invalidValues = {};
 
       _Arr.loop(fields, function(field) {
         invalidFields[field.name] = true;
+        invalidValues[field.name] = field.value;
       });
 
       Analytics.track('homescreen:fields:invalid', {
         data: {
           fields: invalidFields,
+          values: invalidValues,
         },
       });
     }
