@@ -122,11 +122,6 @@ test('Module: configurability/sequence', t => {
               types: ['debit'],
             },
           ],
-          settings: {
-            methods: {
-              upi: false,
-            },
-          },
           sequence: ['block.gpay', 'netbanking', 'block.hdfc'],
         },
         methods: [
@@ -373,7 +368,7 @@ test('Module: configurability/sequence', t => {
               types: ['debit'],
             },
           ],
-          settings: {
+          preferences: {
             show_default_blocks: false,
           },
           sequence: ['block.gpay', 'netbanking', 'block.hdfc'],
