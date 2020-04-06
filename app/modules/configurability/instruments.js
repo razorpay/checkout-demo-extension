@@ -1,5 +1,6 @@
 import InstrumentsConfig from './instruments-config';
 import { getPackageNameFromShortcode } from 'common/upi';
+import { getUPIIntentApps } from 'checkoutframe';
 
 /**
  * Adds a type and category to an instrument
@@ -26,9 +27,15 @@ const INSTRUMENT_CREATORS = {
     }
 
     if (instrument.apps) {
-      instrument.apps = _Arr.map(instrument.apps, app => {
-        return getPackageNameFromShortcode(app) || app;
-      });
+      const allApps = getUPIIntentApps().all;
+      instrument.apps =
+        instrument.apps
+        |> _Arr.map(app => {
+          return getPackageNameFromShortcode(app) || app;
+        })
+        |> _Arr.filter(app =>
+          _Arr.find(allApps, deviceApp => deviceApp.package_name === app)
+        );
     }
 
     return instrument;

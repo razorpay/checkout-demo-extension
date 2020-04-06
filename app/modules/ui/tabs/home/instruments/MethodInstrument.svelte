@@ -22,7 +22,7 @@
   const session = getSession();
 
   const method = instrument.method;
-  const methodName = getMethodNameForPaymentOption(method, { session });
+  const methodName = getMethodNameForPaymentOption(method, { instrument });
   const title = `Pay using ${methodName}`;
   const id = Track.makeUid();
 

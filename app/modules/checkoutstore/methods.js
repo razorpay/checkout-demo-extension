@@ -215,7 +215,8 @@ const UPI_METHODS = {
   collect: () => true,
   omnichannel: () => !isPayout() && hasFeature('google_pay_omnichannel'),
   qr: () => getOption('method.qr') && !global.matchMedia(mobileQuery).matches,
-  intent: () => getMerchantMethods().upi_intent && getUPIIntentApps(),
+  intent: () =>
+    getMerchantMethods().upi_intent && getUPIIntentApps().all.length,
 };
 
 // check if upi itself is enabled, before checking any

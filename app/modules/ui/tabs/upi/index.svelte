@@ -21,6 +21,7 @@
   import { Formatter } from 'formatter';
   import { hideCta, showCtaWithDefaultText, showCta } from 'checkoutstore/cta';
   import { filterUPITokens } from 'common/token';
+  import { getUPIIntentApps } from 'checkoutframe';
 
   // UI imports
   import UpiIntent from './UpiIntent.svelte';
@@ -44,6 +45,7 @@
   // Store
   import { contact } from 'checkoutstore/screens/home';
   import { customer } from 'checkoutstore/customer';
+  import { methodTabInstrument } from 'checkoutstore/screens/home';
 
   // Props
   export let selectedApp = undefined;
@@ -66,6 +68,8 @@
   export let isGPaySelected;
   export let pspHandle;
   export let shouldShowQr;
+  let shouldShowCollect;
+  let shouldShowOmnichannel;
 
   let disabled = false;
   let tokens = [];
@@ -76,12 +80,77 @@
 
   const session = getSession();
 
-  const {
-    all_upi_intents_data: allIntentApps,
-    upi_intents_data: intentApps,
-    isPayout,
-    showRecommendedUPIApp,
-  } = session;
+  const { isPayout, showRecommendedUPIApp } = session;
+
+  /**
+   * An instrument might has for some flows to be available
+   * @param {Instrument | undefined} instrument
+   *
+   * @returns {Object}
+   */
+  function getAvailableFlowsFromInstrument(instrument) {
+    let availableFlows = {
+      omnichannel: isUPIFlowEnabled('omnichannel'),
+      collect: isUPIFlowEnabled('collect'),
+      intent: isUPIFlowEnabled('intent'),
+      qr: isUPIFlowEnabled('qr'),
+    };
+
+    if (!instrument || instrument.method !== 'upi') {
+      return availableFlows;
+    }
+
+    if (instrument.flows) {
+      // Disable all flows
+      _Obj.loop(availableFlows, (val, key) => {
+        availableFlows[key] = false;
+      });
+
+      // Enable ones that are asked for
+      _Arr.loop(instrument.flows, flow => {
+        availableFlows[flow] = true;
+      });
+    }
+
+    return availableFlows;
+  }
+
+  let availableFlows = getAvailableFlowsFromInstrument();
+  $: {
+    availableFlows = getAvailableFlowsFromInstrument($methodTabInstrument);
+  }
+
+  /**
+   * An instrument might has only for some apps to be shown
+   * @param {Instrument | undefined} instrument
+   *
+   * @returns {Array<Object>}
+   */
+  function getUPIIntentAppsFromInstrument(instrument) {
+    if (!instrument || instrument.method !== 'upi') {
+      return getUPIIntentApps().filtered;
+    }
+
+    if (
+      !instrument.flows ||
+      !instrument.apps ||
+      !_Arr.contains(instrument.flows, 'intent')
+    ) {
+      return getUPIIntentApps().filtered;
+    }
+
+    const allApps = getUPIIntentApps().all;
+
+    return _Arr.filter(
+      _Arr.map(instrument.apps, app =>
+        _Arr.find(allApps, deviceApp => deviceApp.package_name === app)
+      ),
+      Boolean
+    );
+  }
+
+  let intentApps = getUPIIntentApps().filtered;
+  $: intentApps = getUPIIntentAppsFromInstrument($methodTabInstrument);
 
   const checkGPay = session => {
     /* disable Web payments API for fee_bearer for now */
@@ -102,11 +171,16 @@
     return session.r.checkPaymentAdapter('gpay');
   };
 
-  $: intent = preferIntent && isUPIFlowEnabled('intent');
+  $: intent = availableFlows.intent && preferIntent;
   $: isGPaySelected = selectedApp === 'gpay' && useWebPaymentsApi;
   $: pspHandle = selectedAppData ? selectedAppData.psp : '';
   $: shouldShowQr =
-    isMethodEnabled('qr') && !selectedApp && selectedApp !== null;
+    availableFlows.qr &&
+    isMethodEnabled('qr') &&
+    !selectedApp &&
+    selectedApp !== null;
+  $: shouldShowCollect = availableFlows.collect;
+  $: shouldShowOmnichannel = availableFlows.omnichannel;
 
   $: {
     /**
@@ -436,9 +510,9 @@
         </div>
       {/if}
 
-      {#if isUPIFlowEnabled('collect')}
+      {#if shouldShowCollect}
         <div class="legend left">Pay using UPI ID</div>
-        <div class="border-list">
+        <div class="border-list" id="upi-collect-list">
           {#if intent}
             <ListHeader>
               <i slot="icon">
@@ -476,7 +550,7 @@
         </div>
       {/if}
 
-      {#if isUPIFlowEnabled('omnichannel')}
+      {#if shouldShowOmnichannel}
         <GooglePayOmnichannel
           error={retryOmnichannel}
           focusOnCreate={true}
