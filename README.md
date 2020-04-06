@@ -38,41 +38,7 @@ Format: `key`, `merchant_id`
 
 # Adding/removing new BINs for EMI Banks
 
-### Semi-automated
-
 1. Add/remove BIN to/from [`scripts/emi/bins.js`](scripts/emi/bins.js), ensure that it is in a numerically sorted order.
 2. `cd scripts/emi`
 3. `node local.js <bank_code>`
 4. Copy the regex and paste it in [`app/modules/common/bank.js`](app/modules/common/bank.js)
-
-### Manual
-
-1. Generate a list of existing BINs using existing regex in [bank.js](https://github.com/razorpay/checkout/blob/master/app/modules/common/bank.js#L37) (See step 10 for list generation)
-2. Append new BINs in that.
-3. Make a simple Regex using:
-
-   `simpleRegex = '(' + out.join('|') + ')'`
-
-4. Go to [https://myregextester.com](https://myregextester.com)
-5. Paste `simpleRegex` in match pattern & list of BINs in the "Source Text" field.
-6. Check these:
-
-   ![image](https://user-images.githubusercontent.com/11299391/57135808-56e13f80-6dc8-11e9-87eb-b6778da27c02.png)
-
-7. Click Submit.
-8. You'll see optimized Regex in `Optimized Match Pattern:`
-
-   ![image](https://user-images.githubusercontent.com/11299391/57135853-75dfd180-6dc8-11e9-86a9-b54bd8ca8b1b.png)
-
-9. Remove all `:?` (non-capturing symbols) from the regex.
-10. Generating/Verifying all BINs against a RegExp:
-
-    1. Open console, set your new regex:
-
-       `r = /^(37(9(8(6[123789]|7[012678])|397)|693))/`
-
-    2. Set out:
-
-       `out = Array(1000000).fill(null).map((_, i) => String(i).padStart(6, '0')).filter(i => r.test(i));`
-
-    You'll get an array of all BINs that match your new regex.
