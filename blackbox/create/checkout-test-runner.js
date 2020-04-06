@@ -92,6 +92,15 @@ class CheckoutTestRunner {
     });
     return this;
   }
+
+  /**
+   * @param {Number} depth The max number of features included in a test
+   * @example setMaxCombinationDepth(3)
+   */
+  setMaxCombinationDepth(depth) {
+    this.maxCombinationDepth = depth;
+    return this._createTestCombs();
+  }
 }
 
 module.exports = new CheckoutTestRunner();
