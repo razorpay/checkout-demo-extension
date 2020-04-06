@@ -26,6 +26,8 @@ import { extendConfig } from 'common/cardlessemi';
 import { mobileQuery } from 'common/useragent';
 import { getUPIIntentApps } from 'checkoutframe';
 
+const DEBIT_EMI_BANKS = ['HDFC_DC'];
+
 const ALL_METHODS = {
   card() {
     if (getAmount() && getOption('method.card')) {
@@ -155,7 +157,6 @@ export function isCardOrEMIEnabled() {
 }
 
 export function isDebitEMIEnabled() {
-  const DEBIT_EMI_BANKS = ['HDFC_DC'];
   const emiBanks = getEMIBanks();
   return DEBIT_EMI_BANKS |> _Arr.any(bank => emiBanks[bank]);
 }
@@ -301,9 +302,19 @@ export function getEMandateAuthTypes(bankCode) {
   );
 }
 
-export function getEMIBankPlans(code) {
+export function getEMIBankPlans(code, cardType = 'credit') {
   const options = code && getMerchantMethods().emi_options;
   if (options) {
+    if (cardType === 'debit') {
+      // For Banks with EMI on Debit Cards,
+      // code will end with "_DC".
+      // Example: If the issuer is HDFC and card type is debit
+      // Then use "HDFC_DC" plans and not "HDFC" plans.
+      const debitCode = code + '_DC';
+      if (DEBIT_EMI_BANKS |> _Arr.contains(debitCode)) {
+        return options[debitCode];
+      }
+    }
     return options[code];
   }
 }

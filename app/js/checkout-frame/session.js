@@ -3379,8 +3379,8 @@ Session.prototype = {
    *
    * @returns {Array}
    */
-  getEmiPlans: function(bank) {
-    var plans = MethodStore.getEMIBankPlans(bank);
+  getEmiPlans: function(bank, cardType) {
+    var plans = MethodStore.getEMIBankPlans(bank, cardType);
     var appliedOffer = this.offers && this.offers.offerSelectedByDrawer;
 
     var emiPlans = [];
@@ -3547,8 +3547,9 @@ Session.prototype = {
         var trigger = e.currentTarget;
         var $trigger = $(trigger);
         var bank = $trigger.attr('data-bank');
-        var plans = MethodStore.getEMIBankPlans(bank);
-        var emiPlans = self.getEmiPlans(bank);
+        var cardType = $trigger.attr('data-card-type');
+        var plans = MethodStore.getEMIBankPlans(bank, cardType);
+        var emiPlans = self.getEmiPlans(bank, cardType);
         var $savedCard = $('.saved-card.checked');
         var savedCvv = $savedCard.$('.saved-cvv input').val();
 

@@ -131,6 +131,7 @@
         <div
           class="emi-plans-info-container emi-plans-trigger"
           data-bank={card.issuer}
+          data-card-type={card.type}
           on:click={event => dispatch('viewPlans', event)}>
           {#if $selectedPlanTextForSavedCard && tab === 'emi'}
             <div class="emi-plan-selected emi-icon-multiple-cards">
