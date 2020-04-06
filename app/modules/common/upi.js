@@ -43,6 +43,7 @@ const UPI_APPS = {
     {
       package_name: 'com.phonepe.app',
       app_icon: 'https://cdn.razorpay.com/checkout/phonepe.png',
+      shortcode: 'phonepe',
     },
     {
       name: 'PayTM',
