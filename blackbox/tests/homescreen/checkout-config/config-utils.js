@@ -1,5 +1,13 @@
 const { innerText, visible, getAttribute } = require('../../../util');
 
+/**
+ * Matches that all strings in a are also in b.
+ * Does not account for duplicates.
+ * @param {Array<string>} a
+ * @param {Array<string>} b
+ *
+ * @returns {boolean}
+ */
 function matchAllStringsInList(a, b) {
   if (a.length !== b.length) {
     return false;
