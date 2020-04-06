@@ -17,10 +17,10 @@ import { createMethodBlock } from './methods';
 export function getSequencedBlocks(params) {
   const { translated, original, methods } = params;
   const { blocks, hide } = translated;
-  const settings = _Obj.getSafely(original, 'settings', {});
+  const preferences = _Obj.getSafely(original, 'preferences', {});
   const {
     show_default_blocks = true, // Show default blocks by default
-  } = settings;
+  } = preferences;
 
   let { sequence = [] } = original;
 
