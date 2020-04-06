@@ -56,11 +56,6 @@ test('Module: configurability/translate', t => {
             types: ['debit'],
           },
         ],
-        settings: {
-          methods: {
-            upi: false,
-          },
-        },
         sequence: ['block.gpay', 'netbanking', 'block.hdfc'],
       };
 

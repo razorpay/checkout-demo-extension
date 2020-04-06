@@ -56,11 +56,6 @@ test('Module: configurability', t => {
             types: ['debit'],
           },
         ],
-        settings: {
-          methods: {
-            upi: false,
-          },
-        },
         sequence: ['block.gpay', 'netbanking', 'block.hdfc'],
       };
 
