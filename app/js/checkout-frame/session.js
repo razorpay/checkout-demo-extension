@@ -5505,6 +5505,8 @@ Session.prototype = {
       this.set('retry', false);
     }
 
+    Analytics.setMeta('features', preferences.features);
+
     /* Used previously logged in customer details and saved card tokens */
     if (saved_customer) {
       /* saved card details take priority over prefill */
