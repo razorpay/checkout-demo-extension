@@ -5,6 +5,7 @@
 
   // Store
   import { selectedBank } from 'checkoutstore/screens/netbanking';
+  import { methodTabInstrument } from 'checkoutstore/screens/home';
 
   // UI imports
   import Tab from 'ui/tabs/Tab.svelte';
@@ -13,9 +14,6 @@
   import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
-
-  // Store imports
-  import { methodTabInstrument } from 'checkoutstore/screens/home';
 
   // Utils imports
   import Razorpay from 'common/Razorpay';
