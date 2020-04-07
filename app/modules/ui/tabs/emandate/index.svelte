@@ -2,6 +2,9 @@
   import { getSession } from 'sessionmanager';
 
   // UI Imports
+  import Screen from 'ui/layouts/Screen.svelte';
+  import Tab from 'ui/tabs/Tab.svelte';
+
   import AccountNumberField from 'ui/elements/fields/emandate/AccountNumberField.svelte';
   import IfscField from 'ui/elements/fields/emandate/IfscField.svelte';
   import NameField from 'ui/elements/fields/emandate/NameField.svelte';
@@ -9,10 +12,18 @@
   // Store imports
   import {
     accountNumber,
-    bankName,
+    name,
     ifsc,
     accountType,
+    authType,
   } from 'checkoutstore/screens/emandate';
+
+  import { selectedBank } from 'checkoutstore/screens/netbanking';
+
+  import { getEMandateBanks } from 'checkoutstore/methods';
+
+  // Utils
+  import { getBankLogo } from 'common/bank';
 
   const session = getSession();
 
@@ -23,13 +34,15 @@
   );
   const prefilledName = session.get('prefill.bank_account[name]');
   const prefilledIfsc = session.get('prefill.bank_account[ifsc]');
+  const prefilledAuthType = session.get('prefill.auth_type');
 
-  var prefilledAccountType = session.get('prefill.bank_account[account_type]');
-  var accountTexts = {
+  let prefilledAccountType = session.get('prefill.bank_account[account_type]');
+
+  const accountTexts = {
     savings: 'Savings Account',
     current: 'Current Account',
   };
-  var accountTypes = _Obj.keys(accountTexts);
+  const accountTypes = _Obj.keys(accountTexts);
 
   if (!_Arr.contains(accountTypes, prefilledAccountType)) {
     prefilledAccountType = false;
@@ -37,89 +50,221 @@
 
   // Set prefill
   $accountNumber = prefillledBankAccount;
-  $bankName = prefilledName;
+  $name = prefilledName;
   $ifsc = prefilledIfsc;
   $accountType = prefilledAccountType;
+  $authType = prefilledAuthType;
+
+  function getBankName(bankCode) {
+    return (banks[bankCode] || {}).name || '';
+  }
+
+  function getAuthTypes(bankCode) {
+    return (banks[bankCode] || {}).auth_types || [];
+  }
+
+  const Views = {
+    AUTH_SELECTION: 'auth_selection',
+    BANK_DETAILS: 'bank_details',
+  };
+
+  let currentView = Views.AUTH_SELECTION;
+
+  let bankName;
+  $: {
+    bankName = getBankName($selectedBank);
+  }
+
+  let availableAuthTypes;
+  $: {
+    availableAuthTypes = getAuthTypes($selectedBank);
+  }
+
+  const banks = getEMandateBanks();
+
+  function resetBankIfNotPrefilled() {
+    if (!prefilledBank) {
+      session.switchTab('netbanking');
+      // TODO: is there a better way?
+      // Wait for transition to complete before resetting bank
+      setTimeout(() => {
+        $selectedBank = '';
+      }, 200);
+    }
+  }
+
+  function setAuthType(newAuthType) {
+    $authType = newAuthType;
+  }
 
   const icons = session.themeMeta.icons;
 </script>
 
-<div id="emandate-inner">
+<style>
+  .legend {
+    text-align: left;
+    padding-left: 12px;
+    margin-top: 10px;
+  }
 
-  <div id="form-emandate-auth-selection" class="tab-content showable screen">
-    <div id="emandate-bank">
-      <div class="bank-icon" />
-      <div class="bank-name">HDFC Bank</div>
-      {#if !prefilledBank}
-        <div class="btn-change-bank">Change Bank</div>
-      {/if}
-    </div>
+  #emandate-bank {
+    border: 1px solid #e6e7e8;
+    padding: 14px;
+    position: relative;
+    display: flex;
+  }
 
-    <div class="legend">Authenticate using</div>
-    <div id="emandate-options" class="grid clear count-2">
-      <div class="auth-option item debitcard">
-        <label>
-          <i class="theme">
-            {@html icons.card}
-          </i>
-          Debit Card
-          <span class="desc">via Bank Account and Debit Card details</span>
-        </label>
-      </div>
-      <div class="auth-option item netbanking">
-        <label>
-          <i class="theme">
-            {@html icons.netbanking}
-          </i>
-          Netbanking
-          <span class="desc">via Bank Account and Netbanking details</span>
-        </label>
-      </div>
+  #emandate-bank .bank-icon {
+    top: 23px;
+    left: 14px;
+    margin: 0;
+  }
 
-    </div>
-  </div>
+  #emandate-bank .bank-name {
+    font-size: 14px;
+  }
 
-  <div id="form-emandate-details" class="tab-content showable screen pad">
+  #emandate-bank .btn-change-bank {
+    font-size: 12px;
+    cursor: pointer;
+    margin-top: -14px;
+    margin-bottom: -14px;
+    line-height: 40px;
+    margin-left: auto;
+  }
 
-    <AccountNumberField
-      name="bank_account[account_number]"
-      id="nb-acc-no"
-      readonly={Boolean(prefillledBankAccount)}
-      bind:value={$accountNumber} />
+  #emandate-bank .btn-change-bank:after {
+    content: '\e601';
+    font-size: 22px;
+    position: relative;
+    left: 4px;
+    top: 1px;
+  }
 
-    <IfscField
-      id="nb-acc-ifsc"
-      name="bank_account[ifsc]"
-      readonly={Boolean(prefilledIfsc)}
-      bind:value={$ifsc} />
+  #emandate-options .auth-option.disabled {
+    color: #80859b;
+    background: #efefef;
+    cursor: not-allowed;
+  }
 
-    <NameField
-      id="nb-acc-name"
-      name="bank_account[name]"
-      readonly={Boolean(prefilledName)}
-      bind:value={$bankName} />
+  #emandate-options .auth-option.disabled .desc {
+    display: none;
+  }
 
-    <div class="elem-wrap">
-      <div class="elem select" class:readonly={prefilledAccountType}>
-        <i class="select-arrow"></i>
-        <div class="help">Please select a bank account type</div>
-        <select
-          name="bank_account[account_type]"
-          required
-          class="input"
-          bind:value={$accountType}>
-          {#if prefilledAccountType}
-            <option value={prefilledAccountType}>
-              {accountTexts[prefilledAccountType]}
-            </option>
-          {:else}
-            <option value="">Type of Bank Account</option>
-            {#each accountTypes as type}
-              <option value={type}>{accountTexts[type]}</option>
-            {/each}
+  #emandate-options .auth-option.disabled:hover label {
+    background: #efefef;
+  }
+
+  #emandate-options .auth-option.disabled .theme {
+    color: #80859b;
+  }
+
+  #emandate-inner {
+    padding-top: 12px;
+  }
+
+  #emandate-inner .bank-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+  }
+
+  .bank-icon img {
+    max-width: 100%;
+    max-height: 100%;
+  }
+</style>
+
+<Tab method="emandate" overrideMethodCheck pad={false}>
+  <Screen>
+    <div slot="main" id="emandate-inner">
+
+      {#if currentView === Views.AUTH_SELECTION}
+        <div id="emandate-bank">
+          <div class="bank-icon">
+            <img src={getBankLogo($selectedBank)} alt={bankName} />
+          </div>
+          <div class="bank-name">{bankName}</div>
+          {#if !prefilledBank}
+            <div class="btn-change-bank" on:click={resetBankIfNotPrefilled}>
+              Change Bank
+            </div>
           {/if}
-        </select>
-      </div>
+        </div>
+
+        <div class="legend">Authenticate using</div>
+        <div id="emandate-options" class="grid clear count-2">
+          {#if _Arr.contains(availableAuthTypes, 'debitcard')}
+            <div class="auth-option item debitcard">
+              <label>
+                <i class="theme">
+                  {@html icons.card}
+                </i>
+                Debit Card
+                <span class="desc">
+                  via Bank Account and Debit Card details
+                </span>
+              </label>
+            </div>
+          {/if}
+          {#if _Arr.contains(availableAuthTypes, 'netbanking')}
+            <div class="auth-option item netbanking">
+              <label>
+                <i class="theme">
+                  {@html icons.netbanking}
+                </i>
+                Netbanking
+                <span class="desc">
+                  via Bank Account and Netbanking details
+                </span>
+              </label>
+            </div>
+          {/if}
+        </div>
+      {:else if currentView === Views.BANK_DETAILS}
+        <AccountNumberField
+          name="bank_account[account_number]"
+          id="nb-acc-no"
+          bankCode={$selectedBank}
+          readonly={Boolean(prefillledBankAccount)}
+          bind:value={$accountNumber} />
+
+        <IfscField
+          id="nb-acc-ifsc"
+          name="bank_account[ifsc]"
+          readonly={Boolean(prefilledIfsc)}
+          bind:value={$ifsc} />
+
+        <NameField
+          id="nb-acc-name"
+          name="bank_account[name]"
+          readonly={Boolean(prefilledName)}
+          bind:value={$name} />
+
+        <div class="elem-wrap">
+          <div class="elem select" class:readonly={prefilledAccountType}>
+            <i class="select-arrow"></i>
+            <div class="help">Please select a bank account type</div>
+            <select
+              name="bank_account[account_type]"
+              required
+              class="input"
+              bind:value={$accountType}>
+              {#if prefilledAccountType}
+                <option value={prefilledAccountType}>
+                  {accountTexts[prefilledAccountType]}
+                </option>
+              {:else}
+                <option value="">Type of Bank Account</option>
+                {#each accountTypes as type}
+                  <option value={type}>{accountTexts[type]}</option>
+                {/each}
+              {/if}
+            </select>
+          </div>
+        </div>
+      {/if}
+
     </div>
-  </div>
-</div>
+  </Screen>
+</Tab>

@@ -2672,10 +2672,6 @@ Session.prototype = {
       makeHidden('#topbar');
     }
 
-    if (screen === 'emandate') {
-      screen = 'netbanking';
-    }
-
     var screenEl = '#form-' + (screen || 'common');
     makeVisible(screenEl);
 
@@ -3071,9 +3067,10 @@ Session.prototype = {
       this.upiTab.onShown();
     }
 
-    if (/^emandate/.test(tab)) {
-      return this.emandateView.showTab(tab);
-    }
+    // TODO: implement onShown
+    // if (/^emandate/.test(tab)) {
+    // return this.emandateView.showTab(tab);
+    // }
 
     if (tab === '' && this.tab === 'upi') {
       if (this.upiTab.onBack()) {
@@ -3481,13 +3478,11 @@ Session.prototype = {
    * proceed automatically if some conditions are met.
    */
   proceedAutomaticallyAfterSelectingBank: function(event) {
-    var bank = event.detail.bank;
-
     if (this.checkInvalid()) {
       return;
     }
 
-    return this.emandateView.showBankDetailsForm(bank.code);
+    this.switchTab('emandate');
   },
 
   checkInvalid: function(parent) {

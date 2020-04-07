@@ -606,6 +606,10 @@
       method = 'upi';
     }
 
+    if (method === 'emandate') {
+      method = 'netbanking';
+    }
+
     session.switchTab(method);
   }
 

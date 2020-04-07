@@ -24,21 +24,8 @@ export default function emandateView() {
   this.prefill = {
     /* bank is the bank code for a particular bank */
     bank: session.get('prefill.bank'),
-    /* bank_account is the account number of user */
-    bank_account: session.get('prefill.bank_account[account_number]'),
-    /* bank_name is the name of the account holder */
-    bank_name: session.get('prefill.bank_account[name]'),
-    /* account type can be savings/current */
-    account_type: session.get('prefill.bank_account[account_type]'),
-    /* bank_ifsc is the ifsc code for user's bank account */
-    bank_ifsc: session.get('prefill.bank_account[ifsc]'),
     /* auth_type that the merchant wants to enforce */
     auth_type: session.get('prefill.auth_type'),
-  };
-
-  this.opts = {
-    session: session,
-    prefill: this.prefill,
   };
 
   this.banks = getEMandateBanks();
@@ -49,21 +36,17 @@ export default function emandateView() {
 
 emandateView.prototype = {
   render: function() {
-    this.unbind();
-
     const target = _Doc.querySelector('#emandate-wrapper');
     new EmandateView({
       target,
     });
 
-    this.el = _Doc.querySelector('#emandate-wrapper').firstChild;
-
-    this.bind();
+    // this.bind();
   },
 
   on: function(event, selector, listener, capture) {
     const el = _Doc.querySelector(selector);
-    this.listeners.push(el |> _El.on(event, listener, capture));
+    el |> _El.on(event, listener, capture);
   },
 
   bind: function() {
@@ -162,21 +145,9 @@ emandateView.prototype = {
   },
 
   setBank: function(bankCode) {
-    const backgroundImage = `background-image: url(https://cdn.razorpay.com/bank/${bankCode}.gif)`;
-
     this.bank = bankCode;
-
     const authTypes = this.getAvailableAuthTypes(bankCode);
     this.setAvailableAuthTypesInView(authTypes);
-
-    _Arr.loop(_Doc.querySelectorAll('#emandate-inner .bank-icon'), elem => {
-      _El.setAttribute(elem, 'style', backgroundImage);
-    });
-
-    _El.setContents(
-      _Doc.querySelector('#emandate-inner .bank-name'),
-      this.banks[bankCode].name
-    );
   },
 
   setAuthType: function(authType) {
