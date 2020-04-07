@@ -20,7 +20,7 @@
   import { slide } from 'svelte/transition';
 
   const session = getSession();
-  const wallet = getWallets();
+  const wallets = getWallets();
 
   const ua = navigator.userAgent;
   const ua_iPhone = /iPhone/.test(ua);
@@ -118,32 +118,32 @@
 </style>
 
 <div class="border-list collapsable">
-  {#each wallet as w, i}
+  {#each wallets as wallet, i}
     <SlottedRadioOption
-      name={w.code}
-      selected={selectedWallet === w.code}
+      name={wallet.code}
+      selected={selectedWallet === wallet.code}
       align="top"
-      on:click={e => onWalletSelection(e, w.code)}>
+      on:click={e => onWalletSelection(e, wallet.code)}>
       <div
         slot="title"
-        bind:this={walletReferences[w.code]}
-        id={`wallet-radio-${w.code}`}>
-        <span class="title">{w.name}</span>
+        bind:this={walletReferences[wallet.code]}
+        id={`wallet-radio-${wallet.code}`}>
+        <span class="title">{wallet.name}</span>
       </div>
       <div slot="body">
-        {#if selectedWallet === w.code}
+        {#if selectedWallet === wallet.code}
           <div transition:slide={{ duration: 200 }}>
-            {#if getApplicableOffer(w.code)}
-              <span class="offer">{getApplicableOffer(w.code).name}</span>
+            {#if getApplicableOffer(wallet.code)}
+              <span class="offer">{getApplicableOffer(wallet.code).name}</span>
               <div class="offer-info">
-                {getApplicableOffer(w.code).display_text}
+                {getApplicableOffer(wallet.code).display_text}
               </div>
             {/if}
           </div>
         {/if}
       </div>
       <i slot="icon" class="top">
-        <Icon icon={w.sqLogo} />
+        <Icon icon={wallet.sqLogo} />
       </i>
     </SlottedRadioOption>
   {/each}
