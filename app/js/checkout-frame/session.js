@@ -1358,10 +1358,12 @@ Session.prototype = {
   },
 
   setWalletsTab: function() {
-    this.svelteWalletsTab = new discreet.WalletTab({
-      target: gel('wallet-svelte-wrap'),
-      props: {},
-    });
+    if (MethodStore.isMethodEnabled('wallet')) {
+      this.svelteWalletsTab = new discreet.WalletTab({
+        target: gel('wallet-svelte-wrap'),
+        props: {},
+      });
+    }
   },
 
   setSvelteComponents: function() {

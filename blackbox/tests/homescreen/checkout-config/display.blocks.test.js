@@ -33,6 +33,19 @@ const CONFIG = {
             apps: ['bhim', 'some.random.app'],
           },
           {
+            method: 'upi',
+            flows: ['collect'],
+          },
+          {
+            method: 'upi',
+            flows: ['intent'],
+          },
+          {
+            method: 'upi',
+            flows: ['qr', 'intent'],
+            apps: ['bhim', 'some.random.app'],
+          },
+          {
             method: 'wallet',
             wallets: ['freecharge', 'mobikwik', 'payzapp'],
           },
@@ -50,6 +63,10 @@ const CONFIG = {
             method: 'upi',
             flows: ['intent'],
             apps: ['bhim'],
+          },
+          {
+            method: 'upi',
+            flows: ['qr'],
           },
           {
             method: 'wallet',
