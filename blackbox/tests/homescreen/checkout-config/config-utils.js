@@ -124,7 +124,10 @@ async function assertShownBanks(context, banks) {
  */
 async function assertShownWallets(context, wallets) {
   // Wallet screen is visible
-  expect(await context.page.$eval('#form-wallet', visible)).toEqual(true);
+  await context.page.waitForSelector('#form-wallet', {
+    visible: true,
+    timeout: 500,
+  });
 
   // Get all Wallet elements
   const elements = await context.page.$$(
