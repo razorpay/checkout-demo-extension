@@ -16,9 +16,6 @@ async function verifyHighDowntime(context, method, message) {
       toolTip => toolTip.textContent,
       toolTip
     );
-    if (method === 'upi') {
-      expect(2).toContain(-2);
-    }
     expect(toolTipText).toContain(message);
   }
 }
