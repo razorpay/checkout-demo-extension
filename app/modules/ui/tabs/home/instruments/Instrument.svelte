@@ -39,12 +39,22 @@
       return !doesTokenExist;
     }
 
-    // UPI collect and omnichannel need to go deeper
     if (instrument.method === 'upi' && instrument.flows) {
+      // More than one flow always needs to go deeper
+      if (instrument.flows.length > 1) {
+        return true;
+      }
+
+      // UPI collect, omnichannel always need to go deeper
       if (
         _Arr.contains(instrument.flows, 'collect') ||
         _Arr.contains(instrument.flows, 'omnichannel')
       ) {
+        return true;
+      }
+
+      // If flow is intent and no apps are specified, go deeper
+      if (_Arr.contains(instrument.flows, 'intent') && !instrument.apps) {
         return true;
       }
     }
