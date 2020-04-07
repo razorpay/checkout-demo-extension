@@ -118,6 +118,28 @@ async function assertShownBanks(context, banks) {
 }
 
 /**
+ * Assert that the expected wallets are shown
+ * @param {Context} context
+ * @param {Array<string>} wallets List of wallets that should have been shown
+ */
+async function assertShownWallets(context, wallets) {
+  // Wallet screen is visible
+  expect(await context.page.$eval('#form-wallet', visible)).toEqual(true);
+
+  // Get all Wallet elements
+  const elements = await context.page.$$(
+    '#form-wallet .border-list [role=listitem]'
+  );
+
+  // Get the names from all elements
+  let values = await Promise.all(elements.map(innerText));
+  values = values.map(value => value.trim());
+
+  // Verify that all expected banks are present
+  expect(matchAllStringsInList(wallets, values)).toBe(true);
+}
+
+/**
  * Assert that the expected UPI intent apps are shown
  * @param {Context} context
  * @param {Array<string>} apps List of app names that should have been shown
@@ -163,4 +185,5 @@ module.exports = {
   assertShownBanks,
   assertUpiIntent,
   assertUpiCollect,
+  assertShownWallets,
 };

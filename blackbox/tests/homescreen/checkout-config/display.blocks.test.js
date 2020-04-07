@@ -14,6 +14,7 @@ const {
   assertShownBanks,
   assertUpiIntent,
   assertUpiCollect,
+  assertShownWallets,
 } = require('./config-utils');
 
 const CONFIG = {
@@ -31,10 +32,10 @@ const CONFIG = {
             flows: ['collect', 'intent'],
             apps: ['bhim', 'some.random.app'],
           },
-          // {
-          //   method: 'wallet',
-          //   wallets: ['freecharge', 'olamoney'],
-          // },
+          {
+            method: 'wallet',
+            wallets: ['freecharge', 'mobikwik', 'payzapp'],
+          },
         ],
       },
 
@@ -46,13 +47,13 @@ const CONFIG = {
             banks: ['ICIC'],
           },
           {
-            method: 'wallet',
-            wallets: ['freecharge'],
-          },
-          {
             method: 'upi',
             flows: ['intent'],
             apps: ['bhim'],
+          },
+          {
+            method: 'wallet',
+            wallets: ['freecharge'],
           },
         ],
       },
@@ -310,5 +311,46 @@ describe('display.blocks', () => {
 
     // Assert that UPI collect is shown
     await assertUpiCollect(context);
+  });
+});
+
+describe('display.blocks', () => {
+  test('Grouped instrument: Wallets', async () => {
+    const preferences = makePreferences();
+
+    preferences.methods.upi = true;
+
+    const options = {
+      key: 'rzp_test_1DP5mmOlF5G5ag',
+      amount: 600000,
+      prefill: {
+        contact: '+919988776655',
+        email: 'void@razorpay.com',
+      },
+
+      config: CONFIG,
+    };
+
+    const context = await openCheckoutWithNewHomeScreen({
+      page,
+      options,
+      preferences,
+      apps: true,
+    });
+
+    // User details
+    await fillUserDetails(context, '9988776655');
+    await assertUserDetails(context);
+
+    // Get the grouped Wallet instrument
+    const walletInstrument = await context.page.$(
+      `.methods-block[data-block='block.grouped'] [role=list] > *:nth-child(3)`
+    );
+
+    // Click on the instrument UI element
+    await walletInstrument.click();
+
+    // Assert that expected wallets are shown
+    await assertShownWallets(context, ['Freecharge', 'Mobikwik', 'PayZapp']);
   });
 });
