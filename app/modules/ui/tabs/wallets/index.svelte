@@ -5,6 +5,7 @@
   // Store Imports
   import { getWallets } from 'checkoutstore/methods';
   import { showCta } from 'checkoutstore/cta';
+  import { methodTabInstrument } from 'checkoutstore/screens/home';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -26,6 +27,47 @@
   const ua_iPhone = /iPhone/.test(ua);
 
   export let selectedWallet = session.get('prefill.wallet') || null;
+
+  let filteredWallets = wallets;
+  $: {
+    filteredWallets = filterWalletsAgainstInstrument(
+      wallets,
+      $methodTabInstrument
+    );
+
+    // If a wallet was selected and has been filtered out, deselect it
+    if (
+      selectedWallet &&
+      !_Arr.any(filteredWallets, wallet => wallet.code === selectedWallet)
+    ) {
+      selectedWallet = null;
+    }
+  }
+
+  /**
+   * Filters wallets against the given instrument.
+   * Only allows those wallets that match the given instruments.
+   *
+   * @param {Array<Wallet>} wallets
+   * @param {Instrument} instrument
+   *
+   * @returns {Array<Wallet>}
+   */
+  function filterWalletsAgainstInstrument(wallets, instrument) {
+    if (!instrument || instrument.method !== 'wallet') {
+      return wallets;
+    }
+
+    if (!instrument.wallets) {
+      return wallets;
+    }
+
+    let filtered = _Arr.filter(wallets, wallet =>
+      _Arr.contains(instrument.wallets, wallet.code)
+    );
+
+    return filtered;
+  }
 
   export function isAnyWalletSelected() {
     return !!selectedWallet;
@@ -118,7 +160,7 @@
 </style>
 
 <div class="border-list collapsable">
-  {#each wallets as wallet, i}
+  {#each filteredWallets as wallet, i}
     <SlottedRadioOption
       name={wallet.code}
       selected={selectedWallet === wallet.code}
