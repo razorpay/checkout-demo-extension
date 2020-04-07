@@ -30,7 +30,7 @@
 
   // Computed
   export let pattern;
-  export let subtitleText = '';
+  export let subtitleText = 'Google Pay, BHIM, PhonePe & more';
   let rememberVpa = true;
   let newVpa = getPrefilledVPA();
   let vpa;
