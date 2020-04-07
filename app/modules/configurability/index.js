@@ -3,6 +3,7 @@ import { getSequencedBlocks } from './sequence';
 import { clusterRazorpayBlocks } from './methods';
 import { ungroupInstruments, getIndividualInstruments } from './ungroup';
 import InstrumentConfig from './instruments-config';
+import { isInstrumentForEntireMethod } from './instruments';
 
 import { AVAILABLE_METHODS } from 'common/constants';
 import {
@@ -116,7 +117,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
     case 'netbanking': {
       const hasBanks = Boolean(instrument.banks);
 
-      if (!hasBanks) {
+      if (hasBanks) {
         const enabledBanks = getNetbankingBanks();
         const shownBanks = _Arr.filter(
           instrument.banks,
@@ -141,7 +142,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
           )
         );
 
-        instrument.wallet = shownWallets;
+        instrument.wallets = shownWallets;
       }
 
       return instrument;
@@ -185,6 +186,10 @@ function removeNonApplicableInstrumentFlows(instrument) {
       if (hasFlows) {
         const shownFlows = _Arr.filter(instrument.flows, isUPIFlowEnabled);
         instrument.flows = shownFlows;
+
+        if (instrument.apps && !_Arr.contains(instrument.flows, 'intent')) {
+          delete instrument.apps;
+        }
       }
 
       // TODO: check for app
@@ -219,9 +224,15 @@ function removeDisabledInstrumentsFromBlock(block) {
 function isInstrumentValid(instrument) {
   const { method } = instrument;
   const config = InstrumentConfig[method];
+
   if (!method || !config) {
     return false;
   }
+
+  if (isInstrumentForEntireMethod(instrument)) {
+    return true;
+  }
+
   return config.isValid(instrument);
 }
 

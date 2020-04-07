@@ -3,7 +3,7 @@
   import { createEventDispatcher } from 'svelte';
 
   // UI imports
-  import Option from 'ui/elements/options/Option.svelte';
+  import DeprecatedOption from 'ui/elements/options/DeprecatedOption.svelte';
   import OptionIcon from 'ui/elements/options/OptionIcon.svelte';
 
   // Props
@@ -22,7 +22,7 @@
   }
 </script>
 
-<Option
+<DeprecatedOption
   {data}
   {attributes}
   {classes}
@@ -38,4 +38,4 @@
   {#if arrowText}
     <div class="option-arrow-text theme-highlight">{arrowText}</div>
   {/if}
-</Option>
+</DeprecatedOption>

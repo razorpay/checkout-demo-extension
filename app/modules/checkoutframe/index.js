@@ -16,9 +16,9 @@ import {
 } from 'common/constants';
 
 let CheckoutBridge = window.CheckoutBridge;
-let upi_intents_data;
+let upiApps = { all: [], filtered: [] };
 export function getUPIIntentApps() {
-  return upi_intents_data;
+  return upiApps;
 }
 
 const validUID = id => {
@@ -80,8 +80,22 @@ const optionsTransformer = {
       // @TODO: used to just send an event. send from here itself
       o.all_upi_intents_data = message.upi_intents_data;
       const filteredApps = getSortedApps(message.upi_intents_data);
+      const unusedApps = _Arr.filter(
+        message.upi_intents_data,
+        app =>
+          !_Arr.find(
+            filteredApps,
+            filteredApp => filteredApp.package_name === app.package_name
+          )
+      );
+
+      upiApps = {
+        all: _Arr.mergeWith(filteredApps, unusedApps),
+        filtered: filteredApps,
+      };
+
       if (filteredApps.length) {
-        upi_intents_data = o.upi_intents_data = filteredApps;
+        o.upi_intents_data = filteredApps;
       }
     }
   },

@@ -747,7 +747,7 @@ function successHandler(response) {
   if (this.preferredInstrument) {
     P13n.recordSuccess(
       this.preferredInstrument,
-      this.customer || this.getCustomer(this.payload.contact)
+      this.getCurrentCustomer(this.payload && this.payload.contact)
     );
   }
 
@@ -1484,11 +1484,6 @@ Session.prototype = {
     }
   },
 
-  /**
-   * Equivalent of clicking a provider option from the
-   * Cardless EMI homescreen.
-   * @param {String} providerCode Code for the provider
-   */
   selectCardlessEmiProvider: function(providerCode) {
     Analytics.track('cardless_emi:provider:select', {
       type: AnalyticsTypes.BEHAV,
@@ -1515,7 +1510,15 @@ Session.prototype = {
     CardlessEmiStore.providerCode = providerCode;
 
     $('#form-cardless_emi input[name=provider]').val(providerCode);
+  },
 
+  /**
+   * Equivalent of clicking a provider option from the
+   * Cardless EMI homescreen.
+   * @param {String} providerCode Code for the provider
+   */
+  selectCardlessEmiProviderAndAttemptPayment: function(provider) {
+    this.selectCardlessEmiProvider(provider);
     this.preSubmit();
   },
 
@@ -1534,7 +1537,10 @@ Session.prototype = {
       });
 
       if (MethodStore.isMethodEnabled('emi')) {
-        providers.unshift(CardlessEmi.createProvider('cards', 'EMI on Cards'));
+        var providerTitle = MethodStore.isDebitEMIEnabled()
+          ? 'EMI on Debit/Credit Cards'
+          : 'EMI on Cards';
+        providers.unshift(CardlessEmi.createProvider('cards', providerTitle));
       }
 
       this.emiOptionsView.$set({
@@ -1544,18 +1550,13 @@ Session.prototype = {
           select: function(event) {
             var providerCode = event.detail.code;
 
-            self.selectCardlessEmiProvider(providerCode);
+            self.selectCardlessEmiProviderAndAttemptPayment(providerCode);
           },
         },
       });
     }
   },
 
-  /**
-   * Equivalent of clicking a provider option from the
-   * PayLater homescreen.
-   * @param {String} providerCode Code for the provider
-   */
   selectPayLaterProvider: function(providerCode) {
     Analytics.track('paylater:provider:select', {
       type: AnalyticsTypes.BEHAV,
@@ -1570,7 +1571,15 @@ Session.prototype = {
     PayLaterStore.providerCode = providerCode;
     PayLaterStore.userRegistered = false;
     PayLaterStore.otpVerified = false;
+  },
 
+  /**
+   * Equivalent of clicking a provider option from the
+   * PayLater homescreen.
+   * @param {String} providerCode Code for the provider
+   */
+  selectPayLaterProviderAndAttemptPayment: function(providerCode) {
+    this.selectPayLaterProvider(providerCode);
     this.preSubmit();
   },
 
@@ -1617,7 +1626,7 @@ Session.prototype = {
       on: {
         select: function(event) {
           var providerCode = event.detail.code;
-          self.selectPayLaterProvider(providerCode);
+          self.selectPayLaterProviderAndAttemptPayment(providerCode);
         },
       },
     });
@@ -1847,7 +1856,7 @@ Session.prototype = {
     var data = params.data;
     var phone = params.contact;
 
-    this.customer.checkStatus(
+    this.getCurrentCustomer(phone).checkStatus(
       function(response) {
         self.updateCustomerInStore();
         if (_Obj.hasOwnProp(response, 'saved')) {
@@ -2055,7 +2064,7 @@ Session.prototype = {
       prefilledProvider &&
       this.checkCommonValidAndTrackIfInvalid()
     ) {
-      this.selectCardlessEmiProvider(prefilledProvider);
+      this.selectCardlessEmiProviderAndAttemptPayment(prefilledProvider);
     }
   },
 
@@ -2291,7 +2300,7 @@ Session.prototype = {
       this.r.resendOTP(this.r.emitter('payment.otp.required'));
     } else {
       var self = this;
-      this.customer.createOTP(function(message) {
+      this.getCurrentCustomer().createOTP(function(message) {
         debounceAskOTP(self.otpView, message, true);
         self.updateCustomerInStore();
       });
@@ -2948,7 +2957,7 @@ Session.prototype = {
       var provider = offer.provider;
 
       if (provider) {
-        this.selectCardlessEmiProvider(provider);
+        this.selectCardlessEmiProviderAndAttemptPayment(provider);
       }
     }
   },
@@ -3127,18 +3136,18 @@ Session.prototype = {
           type: AnalyticsTypes.RENDER,
           data: {
             count: {
-              eligible: _.lengthOf(this.upi_intents_data),
-              all: _.lengthOf(this.all_upi_intents_data),
+              eligible: _.lengthOf(this.upi_intents_data || []),
+              all: _.lengthOf(this.all_upi_intents_data || []),
             },
             list: {
               eligible: _Arr.join(
-                _Arr.map(this.upi_intents_data, function(app) {
+                _Arr.map(this.upi_intents_data || [], function(app) {
                   return app.package_name;
                 }),
                 ','
               ),
               all: _Arr.join(
-                _Arr.map(this.all_upi_intents_data, function(app) {
+                _Arr.map(this.all_upi_intents_data || [], function(app) {
                   return app.package_name;
                 }),
                 ','
@@ -3181,14 +3190,17 @@ Session.prototype = {
       var fields = _Doc.querySelectorAll('#form-common .invalid [name]');
 
       var invalidFields = {};
+      var invalidValues = {};
 
       _Arr.loop(fields, function(field) {
         invalidFields[field.name] = true;
+        invalidValues[field.name] = field.value;
       });
 
       Analytics.track('homescreen:fields:invalid', {
         data: {
           fields: invalidFields,
+          values: invalidValues,
         },
       });
     }
@@ -3260,10 +3272,9 @@ Session.prototype = {
         return;
       }
       var customer = this.getCustomer(contact);
-      this.customer = customer;
       this.updateCustomerInStore();
 
-      if (this.customer.logged && !this.local) {
+      if (this.getCurrentCustomer().logged && !this.local) {
         $('#top-right').addClass('logged');
       }
       $('#user').html(contact);
@@ -3354,7 +3365,7 @@ Session.prototype = {
     this.svelteCardTab.onShown();
 
     var self = this;
-    var customer = self.customer;
+    var customer = self.getCurrentCustomer();
     var remember = Store.shouldRememberCustomer();
 
     if (!remember) {
@@ -3376,7 +3387,7 @@ Session.prototype = {
          * 3. If customer doesn't have saved cards, show cards screen.
          */
         if (Store.isRecurring() && !customer.saved && !customer.logged) {
-          self.customer.createOTP(function() {
+          self.getCurrentCustomer().createOTP(function() {
             Analytics.track('saved_cards:access:otp:ask');
             askOTP(
               self.otpView,
@@ -3404,8 +3415,8 @@ Session.prototype = {
    *
    * @returns {Array}
    */
-  getEmiPlans: function(bank) {
-    var plans = MethodStore.getEMIBankPlans(bank);
+  getEmiPlans: function(bank, cardType) {
+    var plans = MethodStore.getEMIBankPlans(bank, cardType);
     var appliedOffer = this.offers && this.offers.offerSelectedByDrawer;
 
     var emiPlans = [];
@@ -3572,8 +3583,9 @@ Session.prototype = {
         var trigger = e.currentTarget;
         var $trigger = $(trigger);
         var bank = $trigger.attr('data-bank');
-        var plans = MethodStore.getEMIBankPlans(bank);
-        var emiPlans = self.getEmiPlans(bank);
+        var cardType = $trigger.attr('data-card-type');
+        var plans = MethodStore.getEMIBankPlans(bank, cardType);
+        var emiPlans = self.getEmiPlans(bank, cardType);
         var $savedCard = $('.saved-card.checked');
         var savedCvv = $savedCard.$('.saved-cvv input').val();
 
@@ -4135,7 +4147,7 @@ Session.prototype = {
           this.submit();
         }
         callback = function(msg) {
-          if (this.customer.logged) {
+          if (this.getCurrentCustomer().logged) {
             // OTP verification successful
             OtpService.resetCount('razorpay');
 
@@ -4166,7 +4178,7 @@ Session.prototype = {
         }
 
         callback = function(msg) {
-          if (self.customer.logged) {
+          if (self.getCurrentCustomer().logged) {
             // OTP verification successful
             OtpService.resetCount('razorpay');
 
@@ -4247,7 +4259,15 @@ Session.prototype = {
       };
       this.commenceOTP('Verifying OTP...');
     }
-    this.customer.submitOTP(submitPayload, bind(callback, this), queryParams);
+    this.getCurrentCustomer().submitOTP(
+      submitPayload,
+      bind(callback, this),
+      queryParams
+    );
+  },
+
+  getCurrentCustomer: function(phone) {
+    return this.getCustomer(phone || getPhone());
   },
 
   clearRequest: function(extra) {
@@ -4652,13 +4672,17 @@ Session.prototype = {
 
         switch (selectedInstrument.method) {
           case 'card':
-          case 'emi':
-          case 'wallet': {
+          case 'emi': {
             this.switchTab(selectedInstrument.method);
             break;
           }
 
           case 'upi': {
+            /**
+             * UPI QR is a built on Checkout like a method in itself with method=upi and flow=qr.
+             * And the payment happens from within the tab.
+             * So, let's switch to it instead of continuing from here.
+             */
             if (selectedInstrument._ungrouped[0].flow === 'qr') {
               this.switchTab('qr');
               return;
@@ -4667,41 +4691,19 @@ Session.prototype = {
           }
 
           case 'cardless_emi': {
-            this.switchTab('cardless_emi');
+            session.selectCardlessEmiProvider(
+              selectedInstrument._ungrouped[0].provider
+            );
 
-            /**
-             * Setting a timeout because the instrument needs to be
-             * deselected before attempting a payment.
-             *
-             * This can be removed Cardless EMI payment creation flow is moved
-             * out of session.js. Once that is done, instrument-based payments for
-             * Cardless EMI can be done from the homescreen too, without switching tab.
-             */
-            setTimeout(function() {
-              session.selectCardlessEmiProvider(
-                selectedInstrument._ungrouped[0].provider
-              );
-            }, 200);
-            return;
+            break;
           }
 
           case 'paylater': {
-            this.switchTab('paylater');
+            session.selectPayLaterProvider(
+              selectedInstrument._ungrouped[0].provider
+            );
 
-            /**
-             * Setting a timeout because the instrument needs to be
-             * deselected before attempting a payment.
-             *
-             * This can be removed Paylater payment creation flow is moved
-             * out of session.js. Once that is done, instrument-based payments for
-             * Paylater can be done from the homescreen too, without switching tab.
-             */
-            setTimeout(function() {
-              session.selectPayLaterProvider(
-                selectedInstrument._ungrouped[0].provider
-              );
-            }, 200);
-            return;
+            break;
           }
         }
       }
@@ -4859,7 +4861,7 @@ Session.prototype = {
      * - Ask user to verify phone number if not logged in and wants to save card
      * - Show OTP screen after user agrees to fees
      */
-    if (data.save && !this.customer.logged) {
+    if (data.save && !this.getCurrentCustomer().logged) {
       if (this.screen === 'card') {
         this.otpView.updateScreen({
           skipText: 'Skip saving card',
@@ -4867,7 +4869,7 @@ Session.prototype = {
         Analytics.track('saved_cards:save:otp:ask');
         this.commenceOTP(strings.otpsend, false, 'saved_cards_save');
         debounceAskOTP(this.otpView, undefined, true);
-        this.customer.createOTP(function() {
+        this.getCurrentCustomer().createOTP(function() {
           session.updateCustomerInStore();
         });
         return;
@@ -5108,7 +5110,9 @@ Session.prototype = {
     if (this.powerwallet) {
       this.showLoadError(strings.otpsend + getPhone());
       this.r.on('payment.otp.required', function(message) {
-        debounceAskOTP(that.otpView, message);
+        debounceAskOTP(that.otpView, message, false, {
+          allowSkip: false,
+        });
       });
       this.r.on(
         'payment.wallet.topup',
@@ -5274,6 +5278,7 @@ Session.prototype = {
       'payoutsAccountView',
       'payoutsView',
       'savedCardsView',
+      'svelteWalletsTab',
       'upiTab',
     ];
 

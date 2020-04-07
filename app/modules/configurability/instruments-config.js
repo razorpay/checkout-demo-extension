@@ -336,8 +336,16 @@ const config = {
         return false;
       }
 
-      if (hasApps && !instrument.apps.length) {
-        return false;
+      if (hasApps) {
+        if (!instrument.apps.length) {
+          return false;
+        }
+
+        if (!hasFlows || !_Arr.contains(instrument.flows, 'intent')) {
+          return false;
+        }
+
+        return true;
       }
 
       // Individual instrument should either have flow or app

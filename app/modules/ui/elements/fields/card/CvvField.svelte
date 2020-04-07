@@ -83,6 +83,7 @@
   pattern={cvvPattern}
   required
   type="cvv"
+  autocomplete="cc-csc"
   maxlength={length}
   {value}
   bind:this={ref}

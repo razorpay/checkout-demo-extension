@@ -26,6 +26,7 @@
   pattern={NAME_PATTERN}
   required
   type="text"
+  autocomplete="cc-name"
   {value}
   on:input={handleInput}
   on:blur

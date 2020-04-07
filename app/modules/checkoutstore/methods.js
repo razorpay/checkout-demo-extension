@@ -26,6 +26,8 @@ import { extendConfig } from 'common/cardlessemi';
 import { mobileQuery } from 'common/useragent';
 import { getUPIIntentApps } from 'checkoutframe';
 
+const DEBIT_EMI_BANKS = ['HDFC_DC'];
+
 const ALL_METHODS = {
   card() {
     if (getAmount() && getOption('method.card')) {
@@ -158,6 +160,11 @@ export function isCardOrEMIEnabled() {
   return isMethodEnabled('card') || isMethodEnabled('emi');
 }
 
+export function isDebitEMIEnabled() {
+  const emiBanks = getEMIBanks();
+  return DEBIT_EMI_BANKS |> _Arr.any(bank => emiBanks[bank]);
+}
+
 /*
  * @returns {Array} of enabled methods
  */
@@ -213,7 +220,8 @@ const UPI_METHODS = {
   collect: () => true,
   omnichannel: () => !isPayout() && hasFeature('google_pay_omnichannel'),
   qr: () => getOption('method.qr') && !global.matchMedia(mobileQuery).matches,
-  intent: () => getMerchantMethods().upi_intent && getUPIIntentApps(),
+  intent: () =>
+    getMerchantMethods().upi_intent && getUPIIntentApps().all.length,
 };
 
 // check if upi itself is enabled, before checking any
@@ -314,9 +322,19 @@ export function getEMandateAuthTypes(bankCode) {
   );
 }
 
-export function getEMIBankPlans(code) {
+export function getEMIBankPlans(code, cardType = 'credit') {
   const options = code && getMerchantMethods().emi_options;
   if (options) {
+    if (cardType === 'debit') {
+      // For Banks with EMI on Debit Cards,
+      // code will end with "_DC".
+      // Example: If the issuer is HDFC and card type is debit
+      // Then use "HDFC_DC" plans and not "HDFC" plans.
+      const debitCode = code + '_DC';
+      if (DEBIT_EMI_BANKS |> _Arr.contains(debitCode)) {
+        return options[debitCode];
+      }
+    }
     return options[code];
   }
 }

@@ -21,6 +21,7 @@
   import { Formatter } from 'formatter';
   import { hideCta, showCtaWithDefaultText, showCta } from 'checkoutstore/cta';
   import { filterUPITokens } from 'common/token';
+  import { getUPIIntentApps } from 'checkoutframe';
 
   import { getAmount, getName } from 'checkoutstore';
 
@@ -47,6 +48,7 @@
   // Store
   import { contact } from 'checkoutstore/screens/home';
   import { customer } from 'checkoutstore/customer';
+  import { methodTabInstrument } from 'checkoutstore/screens/home';
 
   // Props
   export let selectedApp = undefined;
@@ -70,6 +72,8 @@
   export let isGPaySelected;
   export let pspHandle;
   export let shouldShowQr;
+  let shouldShowCollect;
+  let shouldShowOmnichannel;
 
   let disabled = false;
   let tokens = [];
@@ -109,12 +113,77 @@
     return new Date(date.getTime() + days * 1000 * 24 * 3600);
   };
 
-  const {
-    all_upi_intents_data: allIntentApps,
-    upi_intents_data: intentApps,
-    isPayout,
-    showRecommendedUPIApp,
-  } = session;
+  const { isPayout, showRecommendedUPIApp } = session;
+
+  /**
+   * An instrument might has for some flows to be available
+   * @param {Instrument | undefined} instrument
+   *
+   * @returns {Object}
+   */
+  function getAvailableFlowsFromInstrument(instrument) {
+    let availableFlows = {
+      omnichannel: isUPIFlowEnabled('omnichannel'),
+      collect: isUPIFlowEnabled('collect'),
+      intent: isUPIFlowEnabled('intent'),
+      qr: isUPIFlowEnabled('qr'),
+    };
+
+    if (!instrument || instrument.method !== 'upi') {
+      return availableFlows;
+    }
+
+    if (instrument.flows) {
+      // Disable all flows
+      _Obj.loop(availableFlows, (val, key) => {
+        availableFlows[key] = false;
+      });
+
+      // Enable ones that are asked for
+      _Arr.loop(instrument.flows, flow => {
+        availableFlows[flow] = true;
+      });
+    }
+
+    return availableFlows;
+  }
+
+  let availableFlows = getAvailableFlowsFromInstrument();
+  $: {
+    availableFlows = getAvailableFlowsFromInstrument($methodTabInstrument);
+  }
+
+  /**
+   * An instrument might has only for some apps to be shown
+   * @param {Instrument | undefined} instrument
+   *
+   * @returns {Array<Object>}
+   */
+  function getUPIIntentAppsFromInstrument(instrument) {
+    if (!instrument || instrument.method !== 'upi') {
+      return getUPIIntentApps().filtered;
+    }
+
+    if (
+      !instrument.flows ||
+      !instrument.apps ||
+      !_Arr.contains(instrument.flows, 'intent')
+    ) {
+      return getUPIIntentApps().filtered;
+    }
+
+    const allApps = getUPIIntentApps().all;
+
+    return _Arr.filter(
+      _Arr.map(instrument.apps, app =>
+        _Arr.find(allApps, deviceApp => deviceApp.package_name === app)
+      ),
+      Boolean
+    );
+  }
+
+  let intentApps = getUPIIntentApps().filtered;
+  $: intentApps = getUPIIntentAppsFromInstrument($methodTabInstrument);
 
   let otmEndDate = addDaysToDate(otmStartDate, 90);
 
@@ -137,12 +206,17 @@
     return session.r.checkPaymentAdapter('gpay');
   };
 
-  //Otm does not support intent or QR
-  $: intent = !isOtm && preferIntent && isUPIFlowEnabled('intent');
+  $: intent = !isOtm && availableFlows.intent && preferIntent;
   $: isGPaySelected = selectedApp === 'gpay' && useWebPaymentsApi;
   $: pspHandle = selectedAppData ? selectedAppData.psp : '';
   $: shouldShowQr =
-    isMethodEnabled('qr') && !selectedApp && selectedApp !== null && !isOtm;
+    availableFlows.qr &&
+    isMethodEnabled('qr') &&
+    !selectedApp &&
+    selectedApp !== null &&
+    !isOtm;
+  $: shouldShowCollect = availableFlows.collect || isOtm;
+  $: shouldShowOmnichannel = availableFlows.omnichannel && !isOtm;
 
   $: {
     /**
@@ -270,7 +344,7 @@
 
       default:
         _token = _Arr.find(
-          _Obj.getSafely(session.customer, 'tokens.items', []),
+          _Obj.getSafely(session.getCurrentCustomer(), 'tokens.items', []),
           token => token.id === selectedToken
         );
         data = { token: _token.token };
@@ -484,9 +558,9 @@
         </div>
       {/if}
 
-      {#if isOtm || isUPIFlowEnabled('collect')}
+      {#if shouldShowCollect}
         <div class="legend left">Pay using UPI ID</div>
-        <div class="border-list">
+        <div class="border-list" id="upi-collect-list">
           {#if intent}
             <ListHeader>
               <i slot="icon">
@@ -525,7 +599,7 @@
         </div>
       {/if}
 
-      {#if isUPIFlowEnabled('omnichannel')}
+      {#if shouldShowOmnichannel}
         <GooglePayOmnichannel
           error={retryOmnichannel}
           focusOnCreate={true}

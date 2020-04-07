@@ -87,7 +87,7 @@ module.exports = function(testFeatures) {
         page,
         options,
         preferences,
-        apps: [{ package_name: 'in.org.npci.upiapp', app_name: 'BHIM' }],
+        apps: true,
       });
 
       const missingUserDetails = optionalContact && optionalEmail;

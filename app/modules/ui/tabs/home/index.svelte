@@ -3,7 +3,7 @@
   import Tab from 'ui/tabs/Tab.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
   import Field from 'ui/components/Field.svelte';
-  import RadioOption from 'ui/elements/options/RadioOption.svelte';
+
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import NewMethodsList from 'ui/tabs/home/NewMethodsList.svelte';
   import Icon from 'ui/elements/Icon.svelte';
@@ -362,15 +362,16 @@
     return true;
   }
 
-  export function onShown() {
+  function deselectAllInstruments() {
     $methodTabInstrument = null;
+    $selectedInstrumentId = null;
+  }
+
+  export function onShown() {
+    deselectAllInstruments();
 
     if (view === 'methods') {
-      if ($selectedInstrumentId) {
-        showCtaWithDefaultText();
-      } else {
-        hideCta();
-      }
+      hideCta();
     } else {
       setDetailsCta();
     }

@@ -294,7 +294,7 @@
       return allSavedCards;
     }
     // TODO: Fix session.customer usage when customer is moved to store.
-    return getSavedCardsFromCustomer(session.customer);
+    return getSavedCardsFromCustomer(session.getCurrentCustomer());
   }
 
   export function isOnSavedCardsScreen() {

@@ -101,13 +101,14 @@
     required={true}
     {value}
     type="tel"
-    autocomplete="off"
+    autocomplete="cc-number"
     label="Card Number"
     handleBlur
     handleFocus
     handleInput
     bind:this={field}
     on:blur
+    on:autocomplete
     on:input={handleInput}
     on:input />
 </div>
