@@ -566,9 +566,8 @@
           type={'warning'}
           classes={['downtime-callout']}
           showIcon={false}>
-          <!-- @TODO-OTM update with real data -->
           {session.formatAmountWithCurrency(getAmount())} will be blocked on
-          your acount by clicking pay. Your account will be charged by {getName()}
+          your acount by clicking pay. Your account will be charged by {getName() || 'merchant'}
           between {toShortFormat(otmStartDate)} to {toShortFormat(otmEndDate)}.
         </Callout>
       {/if}
