@@ -2,7 +2,7 @@ const createUPICollectTest = require('../../../create/upi-collect');
 const testRunner = require('../../../create/checkout-test-runner');
 
 testRunner
-  .setTestFeatures(testRunner.globalFeatureList)
+  .setTestFeatures(['downtimeHigh'])
   .setExemptedTestCombinations([
     ['offers', 'partialPayment'],
     ['offers', 'downtimeHigh'],
