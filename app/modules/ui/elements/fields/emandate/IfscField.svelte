@@ -24,7 +24,7 @@
   helpText="Please enter a valid IFSC"
   maxlength="11"
   required={true}
-  formatter={{ type: 'alphanumeric' }}
+  formatter={{ type: 'ifsc' }}
   pattern={PATTERN}
   spellcheck="false"
   autocorrect="off"
