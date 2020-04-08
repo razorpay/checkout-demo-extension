@@ -3,9 +3,16 @@
   import Tab from 'ui/tabs/Tab.svelte';
   import NextOption from 'ui/elements/options/NextOption.svelte';
 
+  // Utils imports
+  import { getPayLaterProviders } from 'checkoutstore/methods';
+  import { createProvider } from 'common/paylater';
+
   // Props
-  export let providers = [];
   export let on = {};
+
+  const providers = _Arr.map(getPayLaterProviders(), providerObj =>
+    createProvider(providerObj.code, providerObj.name)
+  );
 
   export function select(event) {
     const { select = _Func.noop } = on;

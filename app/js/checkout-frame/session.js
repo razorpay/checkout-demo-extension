@@ -1604,15 +1604,7 @@ Session.prototype = {
       target: _Doc.querySelector('#paylater-wrapper'),
     });
 
-    var providers = MethodStore.getPayLaterProviders().map(function(
-      providerObj
-    ) {
-      return PayLater.createProvider(providerObj.code, providerObj.name);
-    });
-
     this.payLaterView.$set({
-      providers: providers,
-
       on: {
         select: function(event) {
           var providerCode = event.detail.code;
