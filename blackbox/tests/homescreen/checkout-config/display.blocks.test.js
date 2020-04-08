@@ -15,6 +15,7 @@ const {
   assertUpiIntent,
   assertUpiCollect,
   assertShownWallets,
+  assertShownPaylaterProviders,
 } = require('./config-utils');
 
 function augmentPreferences(preferences) {
@@ -70,6 +71,10 @@ const CONFIG = {
             method: 'wallet',
             wallets: ['freecharge', 'mobikwik', 'payzapp'],
           },
+          {
+            method: 'paylater',
+            providers: ['epaylater', 'icic'],
+          },
         ],
       },
 
@@ -88,6 +93,10 @@ const CONFIG = {
           {
             method: 'wallet',
             wallets: ['freecharge'],
+          },
+          {
+            method: 'paylater',
+            providers: ['epaylater'],
           },
         ],
       },
@@ -362,5 +371,47 @@ describe('display.blocks', () => {
 
     // Assert that expected wallets are shown
     await assertShownWallets(context, ['Freecharge', 'Mobikwik', 'PayZapp']);
+  });
+});
+
+describe('display.blocks', () => {
+  test('Grouped instrument: Paylater', async () => {
+    const preferences = augmentPreferences(makePreferences());
+
+    const options = {
+      key: 'rzp_test_1DP5mmOlF5G5ag',
+      amount: 600000,
+      prefill: {
+        contact: '+919988776655',
+        email: 'void@razorpay.com',
+      },
+
+      config: CONFIG,
+    };
+
+    const context = await openCheckoutWithNewHomeScreen({
+      page,
+      options,
+      preferences,
+      apps: true,
+    });
+
+    // User details
+    await fillUserDetails(context, '9988776655');
+    await assertUserDetails(context);
+
+    // Get the grouped Paylater instrument
+    const paylaterInstrument = await context.page.$(
+      `.methods-block[data-block='block.grouped'] [role=list] > *:nth-child(7)`
+    );
+
+    // Select it
+    await paylaterInstrument.click();
+
+    // Assert that all apps are shown
+    await assertShownPaylaterProviders(context, [
+      'ePayLater',
+      'ICICI Bank PayLater',
+    ]);
   });
 });
