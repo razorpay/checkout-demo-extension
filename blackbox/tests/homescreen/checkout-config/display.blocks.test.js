@@ -15,7 +15,29 @@ const {
   assertUpiIntent,
   assertUpiCollect,
   assertShownWallets,
+  assertShownPaylaterProviders,
 } = require('./config-utils');
+
+function augmentPreferences(preferences) {
+  return {
+    ...preferences,
+    methods: {
+      ...preferences.methods,
+      upi: true,
+      upi_intent: true,
+      paylater: {
+        epaylater: true,
+        getsimpl: true,
+        icic: true,
+      },
+      cardless_emi: {
+        zestmoney: true,
+        earlysalary: true,
+      },
+      bank_transfer: true,
+    },
+  };
+}
 
 const CONFIG = {
   display: {
@@ -33,8 +55,25 @@ const CONFIG = {
             apps: ['bhim', 'some.random.app'],
           },
           {
+            method: 'upi',
+            flows: ['collect'],
+          },
+          {
+            method: 'upi',
+            flows: ['intent'],
+          },
+          {
+            method: 'upi',
+            flows: ['qr', 'intent'],
+            apps: ['bhim', 'some.random.app'],
+          },
+          {
             method: 'wallet',
             wallets: ['freecharge', 'mobikwik', 'payzapp'],
+          },
+          {
+            method: 'paylater',
+            providers: ['epaylater', 'icic'],
           },
         ],
       },
@@ -54,6 +93,10 @@ const CONFIG = {
           {
             method: 'wallet',
             wallets: ['freecharge'],
+          },
+          {
+            method: 'paylater',
+            providers: ['epaylater'],
           },
         ],
       },
@@ -79,9 +122,7 @@ const CONFIG = {
 
 describe('display.blocks', () => {
   test('Individual instruments', async () => {
-    const preferences = makePreferences();
-
-    preferences.methods.upi = true;
+    const preferences = augmentPreferences(makePreferences());
 
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -124,9 +165,7 @@ describe('display.blocks', () => {
 
 describe('display.blocks', () => {
   test('Grouped instruments', async () => {
-    const preferences = makePreferences();
-
-    preferences.methods.upi = true;
+    const preferences = augmentPreferences(makePreferences());
 
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -167,21 +206,7 @@ describe('display.blocks', () => {
 
 describe('display.blocks', () => {
   test('Method instruments', async () => {
-    const preferences = makePreferences();
-
-    preferences.methods = {
-      ...preferences.methods,
-      upi: true,
-      cardless_emi: {
-        zestmoney: true,
-        earlysalary: true,
-      },
-      paylater: {
-        epaylater: true,
-        icic: true,
-      },
-      bank_transfer: true,
-    };
+    const preferences = augmentPreferences(makePreferences());
 
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -228,9 +253,7 @@ describe('display.blocks', () => {
 
 describe('display.blocks', () => {
   test('Grouped instrument: Netbanking', async () => {
-    const preferences = makePreferences();
-
-    preferences.methods.upi = true;
+    const preferences = augmentPreferences(makePreferences());
 
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -272,9 +295,7 @@ describe('display.blocks', () => {
 
 describe('display.blocks', () => {
   test('Grouped instrument: UPI', async () => {
-    const preferences = makePreferences();
-
-    preferences.methods.upi = true;
+    const preferences = augmentPreferences(makePreferences());
 
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -316,9 +337,7 @@ describe('display.blocks', () => {
 
 describe('display.blocks', () => {
   test('Grouped instrument: Wallets', async () => {
-    const preferences = makePreferences();
-
-    preferences.methods.upi = true;
+    const preferences = augmentPreferences(makePreferences());
 
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -344,7 +363,7 @@ describe('display.blocks', () => {
 
     // Get the grouped Wallet instrument
     const walletInstrument = await context.page.$(
-      `.methods-block[data-block='block.grouped'] [role=list] > *:nth-child(3)`
+      `.methods-block[data-block='block.grouped'] [role=list] > *:nth-child(6)`
     );
 
     // Click on the instrument UI element
@@ -352,5 +371,47 @@ describe('display.blocks', () => {
 
     // Assert that expected wallets are shown
     await assertShownWallets(context, ['Freecharge', 'Mobikwik', 'PayZapp']);
+  });
+});
+
+describe('display.blocks', () => {
+  test('Grouped instrument: Paylater', async () => {
+    const preferences = augmentPreferences(makePreferences());
+
+    const options = {
+      key: 'rzp_test_1DP5mmOlF5G5ag',
+      amount: 600000,
+      prefill: {
+        contact: '+919988776655',
+        email: 'void@razorpay.com',
+      },
+
+      config: CONFIG,
+    };
+
+    const context = await openCheckoutWithNewHomeScreen({
+      page,
+      options,
+      preferences,
+      apps: true,
+    });
+
+    // User details
+    await fillUserDetails(context, '9988776655');
+    await assertUserDetails(context);
+
+    // Get the grouped Paylater instrument
+    const paylaterInstrument = await context.page.$(
+      `.methods-block[data-block='block.grouped'] [role=list] > *:nth-child(7)`
+    );
+
+    // Select it
+    await paylaterInstrument.click();
+
+    // Assert that all apps are shown
+    await assertShownPaylaterProviders(context, [
+      'ePayLater',
+      'ICICI Bank PayLater',
+    ]);
   });
 });

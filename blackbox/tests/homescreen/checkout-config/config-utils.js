@@ -181,6 +181,29 @@ async function assertUpiCollect(context) {
   expect(await context.page.$eval('#upi-collect-list', visible)).toEqual(true);
 }
 
+/**
+ * Asserts that all expected paylater providers are shown
+ * @param {Context} context
+ * @param {Array<string>} providers
+ */
+async function assertShownPaylaterProviders(context, providers) {
+  // Paylater screen is visible
+  await context.page.waitForSelector('#form-paylater', {
+    visible: true,
+    timeout: 500,
+  });
+
+  // Get all Paylater elements
+  const elements = await context.page.$$('#form-paylater .options > *');
+
+  // Get the names from all elements
+  let values = await Promise.all(elements.map(innerText));
+  values = values.map(value => value.trim());
+
+  // Verify that all expected banks are present
+  expect(matchAllStringsInList(providers, values)).toBe(true);
+}
+
 module.exports = {
   parseBlocksFromHomescreen,
   isIndividualInstrument,
@@ -189,4 +212,5 @@ module.exports = {
   assertUpiIntent,
   assertUpiCollect,
   assertShownWallets,
+  assertShownPaylaterProviders,
 };
