@@ -993,7 +993,7 @@ Session.prototype = {
       if (selectedWalletEl && selectedWalletEl[0]) {
         selectedWalletEl.prop('checked', true);
         if (tab === 'wallet') {
-          $('#body').addClass('sub');
+          Cta.showCta();
         }
 
         var walletsEle = $('#wallets')[0].parentElement;
