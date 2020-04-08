@@ -54,6 +54,19 @@ const CONFIG = {
             apps: ['bhim', 'some.random.app'],
           },
           {
+            method: 'upi',
+            flows: ['collect'],
+          },
+          {
+            method: 'upi',
+            flows: ['intent'],
+          },
+          {
+            method: 'upi',
+            flows: ['qr', 'intent'],
+            apps: ['bhim', 'some.random.app'],
+          },
+          {
             method: 'wallet',
             wallets: ['freecharge', 'mobikwik', 'payzapp'],
           },
@@ -341,7 +354,7 @@ describe('display.blocks', () => {
 
     // Get the grouped Wallet instrument
     const walletInstrument = await context.page.$(
-      `.methods-block[data-block='block.grouped'] [role=list] > *:nth-child(3)`
+      `.methods-block[data-block='block.grouped'] [role=list] > *:nth-child(6)`
     );
 
     // Click on the instrument UI element
