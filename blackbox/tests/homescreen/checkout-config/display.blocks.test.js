@@ -17,6 +17,27 @@ const {
   assertShownWallets,
 } = require('./config-utils');
 
+function augmentPreferences(preferences) {
+  return {
+    ...preferences,
+    methods: {
+      ...preferences.methods,
+      upi: true,
+      upi_intent: true,
+      paylater: {
+        epaylater: true,
+        getsimpl: true,
+        icic: true,
+      },
+      cardless_emi: {
+        zestmoney: true,
+        earlysalary: true,
+      },
+      bank_transfer: true,
+    },
+  };
+}
+
 const CONFIG = {
   display: {
     blocks: {
@@ -79,9 +100,7 @@ const CONFIG = {
 
 describe('display.blocks', () => {
   test('Individual instruments', async () => {
-    const preferences = makePreferences();
-
-    preferences.methods.upi = true;
+    const preferences = augmentPreferences(makePreferences());
 
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -124,9 +143,7 @@ describe('display.blocks', () => {
 
 describe('display.blocks', () => {
   test('Grouped instruments', async () => {
-    const preferences = makePreferences();
-
-    preferences.methods.upi = true;
+    const preferences = augmentPreferences(makePreferences());
 
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -167,21 +184,7 @@ describe('display.blocks', () => {
 
 describe('display.blocks', () => {
   test('Method instruments', async () => {
-    const preferences = makePreferences();
-
-    preferences.methods = {
-      ...preferences.methods,
-      upi: true,
-      cardless_emi: {
-        zestmoney: true,
-        earlysalary: true,
-      },
-      paylater: {
-        epaylater: true,
-        icic: true,
-      },
-      bank_transfer: true,
-    };
+    const preferences = augmentPreferences(makePreferences());
 
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -228,9 +231,7 @@ describe('display.blocks', () => {
 
 describe('display.blocks', () => {
   test('Grouped instrument: Netbanking', async () => {
-    const preferences = makePreferences();
-
-    preferences.methods.upi = true;
+    const preferences = augmentPreferences(makePreferences());
 
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -272,9 +273,7 @@ describe('display.blocks', () => {
 
 describe('display.blocks', () => {
   test('Grouped instrument: UPI', async () => {
-    const preferences = makePreferences();
-
-    preferences.methods.upi = true;
+    const preferences = augmentPreferences(makePreferences());
 
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -316,9 +315,7 @@ describe('display.blocks', () => {
 
 describe('display.blocks', () => {
   test('Grouped instrument: Wallets', async () => {
-    const preferences = makePreferences();
-
-    preferences.methods.upi = true;
+    const preferences = augmentPreferences(makePreferences());
 
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
