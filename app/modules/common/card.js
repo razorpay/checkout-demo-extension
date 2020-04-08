@@ -45,6 +45,27 @@ export const getCardDigits = cardNumber => cardNumber.replace(/\D/g, '');
 export const getIin = cardNumber => getCardDigits(cardNumber).slice(0, 6);
 
 /**
+ * Returns either IIN or Token from a payload.
+ *
+ * @param payload
+ * @returns {string|*}
+ */
+export const getCardEntityFromPayload = payload => {
+  if (payload.tokenId) {
+    return payload.tokenId;
+  }
+  if (payload.cardNumber) {
+    return String(payload.cardNumber).slice(0, 6);
+  }
+  if (payload['card[number]']) {
+    return String(payload['card[number]']).slice(0, 6);
+  }
+  if (payload.iin) {
+    return String(payload.iin).slice(0, 6);
+  }
+};
+
+/**
  * @param {String} name {eg: MasterCard}
  *
  * @return {String} {eg: mastercard}

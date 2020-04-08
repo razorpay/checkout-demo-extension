@@ -8,6 +8,7 @@
   // Store
   import { selectedTokenId, savedCardEmiDuration } from 'checkoutstore/emi';
   import { getEMIBankPlans } from 'checkoutstore/methods';
+  import { selectedCard } from 'checkoutstore/screens/card';
 
   // Utils
   import { getSession } from 'sessionmanager';
@@ -20,7 +21,7 @@
 
   const session = getSession();
 
-  let selected = null;
+  $selectedCard = null; // Refresh selection when landing again
 
   let currentCvv = '';
   let currentAuthType = '';
@@ -28,8 +29,8 @@
   const dispatch = createEventDispatcher();
 
   $: {
-    if (selected) {
-      $selectedTokenId = selected.token;
+    if ($selectedCard) {
+      $selectedTokenId = $selectedCard.token;
     }
   }
 
@@ -67,7 +68,7 @@
 
   function handleClick(card, { cvv, authType }) {
     // The same card was clicked again, do nothing.
-    if (selected && selected.id === card.id) {
+    if ($selectedCard && $selectedCard.id === card.id) {
       return;
     }
 
@@ -78,7 +79,7 @@
     dispatch('select', { token: card });
     currentCvv = cvv;
     currentAuthType = authType;
-    selected = card;
+    $selectedCard = card;
 
     handleOffersForSavedCard(card);
   }
@@ -92,7 +93,7 @@
   }
 
   export function getSelectedToken() {
-    const selectedToken = selected || {};
+    const selectedToken = $selectedCard || {};
     const payload = { token: selectedToken.token, 'card[cvv]': currentCvv };
     if (currentAuthType) {
       payload.auth_type = currentAuthType;
@@ -117,6 +118,6 @@
     }}
     on:cvvchange={handleCvvChange}
     on:authtypechange={handleAuthTypeChange}
-    selected={selected && selected.id === card.id}
+    selected={$selectedCard && $selectedCard.id === card.id}
     on:viewPlans={onViewPlans} />
 {/each}

@@ -1,4 +1,5 @@
-const { delay } = require('../util');
+const { delay, innerText } = require('../util');
+const querystring = require('querystring');
 
 async function handleCardValidation(context, { urlShouldContain } = {}) {
   const req = await context.expectRequest();
@@ -93,7 +94,10 @@ async function handleCustomerCardStatusRequest(context, cardType) {
   await context.respondJSON({ saved: true });
 }
 
-async function respondSavedCards(context, { nativeOtp = false } = {}) {
+async function respondSavedCards(
+  context,
+  { nativeOtp = false, dcc = false } = {}
+) {
   const req = await context.expectRequest();
   expect(req.url).toContain('otp/verify');
   await context.respondJSON({
@@ -109,6 +113,7 @@ async function respondSavedCards(context, { nativeOtp = false } = {}) {
           bank: null,
           wallet: null,
           method: 'card',
+          dcc_enabled: dcc,
           card: {
             entity: 'card',
             name: 'Sakshi Jain',
@@ -141,18 +146,129 @@ async function respondSavedCards(context, { nativeOtp = false } = {}) {
   await delay(600);
 }
 
+const getCardCurrencies = amount => {
+  const normalizer = amount / 50000;
+  return {
+    recurring: false,
+    all_currencies: {
+      AED: {
+        code: '784',
+        denomination: 100,
+        min_value: 10,
+        min_auth_value: 10,
+        symbol: 'د.إ',
+        name: 'Emirati Dirham',
+        amount: normalizer * 2625,
+      },
+      EUR: {
+        code: '978',
+        denomination: 100,
+        min_value: 50,
+        min_auth_value: 50,
+        symbol: '€',
+        name: 'Euro',
+        amount: normalizer * 525,
+      },
+      GBP: {
+        code: '826',
+        denomination: 100,
+        min_value: 30,
+        min_auth_value: 30,
+        symbol: '£',
+        name: 'British Pound',
+        amount: normalizer * 525,
+      },
+      INR: {
+        code: '356',
+        denomination: 100,
+        min_value: 100,
+        min_auth_value: 100,
+        symbol: '₹',
+        name: 'Indian Rupee',
+        amount: normalizer * 50000,
+      },
+      USD: {
+        code: '840',
+        denomination: 100,
+        min_value: 50,
+        min_auth_value: 50,
+        symbol: '$',
+        name: 'US Dollar',
+        amount: normalizer * 525,
+      },
+    },
+    currency_request_id: 'EW1CiHoC8eARvW',
+    card_currency: 'USD',
+  };
+};
+
+const getDisplayAmount = currencyConfig => {
+  const { symbol, denomination, amount } = currencyConfig;
+  const precision = Math.log10(denomination);
+  return symbol + ' ' + (amount / denomination).toFixed(precision);
+};
+
+async function respondCurrencies(context) {
+  const req = await context.expectRequest();
+  expect(req.url).toContain('/flows');
+  expect(req.params).toHaveProperty('amount');
+  expect(req.params).toHaveProperty('currency');
+  const { amount } = req.params;
+  const body = getCardCurrencies(amount);
+  await context.respondJSONP(body);
+}
+
+async function selectCurrency(context, code) {
+  await context.page.waitForSelector('.more-btn');
+  await context.page.click('.more-btn');
+  await context.page.type('.search-curtain input', code);
+  await context.page.click('.search-curtain .list-item');
+}
+
+async function expectDCCParametersInRequest(context, currency = 'USD') {
+  const request = await context.expectRequest();
+  const body = querystring.parse(request.body);
+  expect(body).toMatchObject({
+    currency_request_id: 'EW1CiHoC8eARvW',
+    dcc_currency: currency,
+  });
+}
+
 async function selectSavedCardAndTypeCvv(context) {
   const SavedCard = await context.page.$('.saved-inner');
   await SavedCard.click();
   await SavedCard.type('222');
 }
 
+async function verifyAmount(context, currency) {
+  const originalAmount = context.options.amount;
+  const currencyConfig = getCardCurrencies(originalAmount).all_currencies[
+    currency
+  ];
+  const displayAmount = getDisplayAmount(currencyConfig);
+  const amountInHeader = (await innerText('#amount')).trim();
+  expect(amountInHeader).toEqual(displayAmount);
+  const amountInFooter = (await innerText('#footer')).trim();
+  expect(amountInFooter).toEqual('PAY ' + displayAmount);
+}
+
+async function selectCurrencyAndVerifyAmount(context, currency = 'USD') {
+  await respondCurrencies(context);
+  await selectCurrency(context, currency);
+  await verifyAmount(context, currency);
+}
+
 module.exports = {
   enterCardDetails,
+  expectDCCParametersInRequest,
   handleCardValidation,
   handleCardValidationForNativeOTP,
   handleBankRequest,
   handleCustomerCardStatusRequest,
   respondSavedCards,
+  respondCurrencies,
+  selectCurrency,
+  selectCurrencyAndVerifyAmount,
   selectSavedCardAndTypeCvv,
+  verifyAmount,
 };

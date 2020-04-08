@@ -34,6 +34,14 @@ export const getCheckoutConfig = () => preferences.checkout_config;
 const optionGetter = option => () => getOption(option);
 export const getOption = option => razorpayInstance.get(option);
 export const getCardFlows = (iin, cb) => razorpayInstance.getCardFlows(iin, cb);
+export const getCardCurrencies = ({ iin, tokenId, cardNumber }) =>
+  razorpayInstance.getCardCurrencies({
+    iin,
+    tokenId,
+    cardNumber,
+    amount: getAmount(),
+    currency: getCurrency(), // Entity currency
+  });
 
 const entityWithAmount = ['order', 'invoice', 'subscription'];
 const getEntityWithAmount = () =>
@@ -47,7 +55,7 @@ export const getAmount = () => {
 };
 
 // @TODO export and use everywhere
-const getCurrency = () => {
+export const getCurrency = () => {
   return getEntityWithAmount()?.currency || getOption('currency');
 };
 
@@ -67,6 +75,10 @@ export function isPayout() {
 
 export function isAddressEnabled() {
   return hasFeature('customer_address', false);
+}
+
+export function isDCCEnabled() {
+  return hasFeature('dcc', false);
 }
 
 export function isContactOptional() {

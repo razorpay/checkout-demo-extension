@@ -11,6 +11,7 @@
   import Address from 'ui/elements/address.svelte';
   import PaymentDetails from 'ui/tabs/home/PaymentDetails.svelte';
   import Callout from 'ui/elements/Callout.svelte';
+  import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
 
   // Svelte imports
   import { onMount } from 'svelte';
@@ -31,6 +32,7 @@
   } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
+  import { isDCCEnabled } from 'checkoutstore';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -779,6 +781,9 @@
     </div>
 
     <div slot="bottom">
+      {#if isDCCEnabled()}
+        <DynamicCurrencyView view="home-screen" />
+      {/if}
       {#if showRecurringCallout}
         <Callout>
           {#if session.get('subscription_id')}

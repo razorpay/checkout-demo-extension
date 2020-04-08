@@ -10,6 +10,7 @@
   import EmiActions from 'ui/components/EmiActions.svelte';
   import SavedCards from 'ui/tabs/card/savedcards.svelte';
   import OffersPortal from 'ui/components/OffersPortal.svelte';
+  import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
 
   // Store
   import {
@@ -18,13 +19,18 @@
     cardName,
     cardNumber,
     remember,
+    selectedCard,
   } from 'checkoutstore/screens/card';
   import { methodTabInstrument } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
 
   import { contact } from 'checkoutstore/screens/home';
-  import { isRecurring, shouldRememberCustomer } from 'checkoutstore';
+  import {
+    isRecurring,
+    shouldRememberCustomer,
+    isDCCEnabled,
+  } from 'checkoutstore';
   import {
     isMethodEnabled,
     getEMIBanks,
@@ -91,6 +97,17 @@
         },
       });
     }
+  }
+
+  /**
+   * Session calls this to ask if tab will handle back
+   *
+   * @returns {boolean} will tab handle back
+   */
+  export function onBack() {
+    $selectedCard = null; // De-select saved card
+
+    return false;
   }
 
   function getSavedCardsForDisplay(allSavedCards, tab) {
@@ -525,6 +542,10 @@
       {/if}
     </div>
     <div slot="bottom">
+      {#if isDCCEnabled()}
+        <DynamicCurrencyView view={currentView} />
+      {/if}
+
       {#if isRecurring()}
         <Callout>
           {#if !session.subscription}

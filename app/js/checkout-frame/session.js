@@ -854,6 +854,14 @@ Session.prototype = {
       this.formatAmountWithCurrency(amount)
     );
   },
+  /**
+   * Set the amount in header.
+   *
+   * @param {String} html
+   */
+  setRawAmountInHeader: function(html) {
+    $('#amount .original-amount').html(html);
+  },
 
   track: function(event, extra) {
     Track(this.r, event, extra);
@@ -3056,6 +3064,10 @@ Session.prototype = {
       MethodStore.isMethodEnabled('cardless_emi')
     ) {
       tab = 'cardless_emi';
+    } else if (this.tab === 'card') {
+      if (this.svelteCardTab.onBack()) {
+        return;
+      }
     } else if (this.tab === 'netbanking') {
       if (this.netbankingTab.onBack()) {
         return;
@@ -4859,6 +4871,13 @@ Session.prototype = {
 
     if (this.modal) {
       this.modal.options.backdropclose = false;
+    }
+
+    if (data.method === 'card' && Store.isDCCEnabled()) {
+      data.currency_request_id = discreet.storeGetter(
+        CardScreenStore.currencyRequestId
+      );
+      data.dcc_currency = discreet.storeGetter(CardScreenStore.dccCurrency);
     }
 
     if (data.method === 'card' || data.method === 'emi') {
