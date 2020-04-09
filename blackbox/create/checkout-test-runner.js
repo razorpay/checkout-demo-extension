@@ -25,15 +25,15 @@ class CheckoutTestRunner {
     let tests = this.featuresToBeTested;
     let combs = [[]];
     tests.forEach(test => {
-      const old_combs = [...combs];
+      const oldCombs = [...combs];
 
-      old_combs.forEach(comb => {
+      oldCombs.forEach(comb => {
         if (comb.length < this.maxCombinationDepth) {
           let newComb = [...comb, test].sort(this._sortingFunction);
           if (
-            exempted.find(
+            !exempted.some(
               combToBeBarred => combToBeBarred + '' === newComb + ''
-            ) == undefined
+            )
           ) {
             combs.push(newComb);
           }
