@@ -92,7 +92,6 @@ async function isGroupedInstrument(element) {
     .replace(/\n/g, '') // Remove all line breaks
     .trim();
 
-  console.log(instrumentText);
   expect(instrumentText.startsWith('Pay using')).toBe(true);
 }
 
