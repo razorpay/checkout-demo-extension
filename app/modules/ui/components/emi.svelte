@@ -28,7 +28,10 @@
     }
   }
 
-  $: banksList = _Obj.entries(banks || {});
+  // Sort the list by bank names
+  $: banksList = _Arr.sort(_Obj.values(banks || {}), (a, b) =>
+    a.name.localeCompare(b.name)
+  );
 
   $: {
     let _plans = (banks[selected] || {}).plans || {};
@@ -68,8 +71,8 @@
     <div class="col">Select Bank:</div>
     <i class="i select-arrow">&#xe601;</i>
     <select id="emi-bank-select" bind:value={selected}>
-      {#each banksList as [i, bank]}
-        <option value={i}>{bank.name}</option>
+      {#each banksList as bank}
+        <option value={bank.code}>{bank.name}</option>
       {/each}
     </select>
   </div>

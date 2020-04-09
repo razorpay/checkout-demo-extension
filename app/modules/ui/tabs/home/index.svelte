@@ -3,7 +3,7 @@
   import Tab from 'ui/tabs/Tab.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
   import Field from 'ui/components/Field.svelte';
-  import RadioOption from 'ui/elements/options/RadioOption.svelte';
+
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import NewMethodsList from 'ui/tabs/home/NewMethodsList.svelte';
   import Icon from 'ui/elements/Icon.svelte';
@@ -11,6 +11,7 @@
   import Address from 'ui/elements/address.svelte';
   import PaymentDetails from 'ui/tabs/home/PaymentDetails.svelte';
   import Callout from 'ui/elements/Callout.svelte';
+  import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
 
   // Svelte imports
   import { onMount } from 'svelte';
@@ -22,10 +23,16 @@
     isContactPresent,
     email,
     selectedInstrumentId,
+    methodTabInstrument,
     multiTpvOption,
     partialPaymentAmount,
     partialPaymentOption,
+    instruments,
+    blocks,
   } from 'checkoutstore/screens/home';
+
+  import { customer } from 'checkoutstore/customer';
+  import { isDCCEnabled } from 'checkoutstore';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -43,13 +50,17 @@
     isAddressEnabled,
     isRecurring,
     getMerchantOrder,
+    getCheckoutConfig,
   } from 'checkoutstore';
   import {
     isCreditCardEnabled,
     isDebitCardEnabled,
     getSingleMethod,
   } from 'checkoutstore/methods';
-  import { getInstrumentsForCustomer } from 'checkoutframe/personalization';
+  import {
+    getTranslatedInstrumentsForCustomer,
+    getAllInstrumentsForCustomer,
+  } from 'checkoutframe/personalization';
   import {
     hideCta,
     showCta,
@@ -59,9 +70,11 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
-  import { INDIA_COUNTRY_CODE } from 'common/constants';
-
-  const MAX_P13N_INSTRUMENTS = 3;
+  import {
+    INDIA_COUNTRY_CODE,
+    MAX_PREFERRED_INSTRUMENTS,
+  } from 'common/constants';
+  import { setBlocks } from 'ui/tabs/home/instruments';
 
   const session = getSession();
   const icons = session.themeMeta.icons;
@@ -103,6 +116,25 @@
     !session.tpvBank &&
     !isPartialPayment &&
     !session.get('address');
+
+  function getRawMerchantConfig() {
+    const displayFromOptions = session.get('config.display');
+    const displayFromPreferences = _Obj.getSafely(
+      getCheckoutConfig(),
+      'display',
+      {}
+    );
+
+    if (_.isNull(displayFromOptions)) {
+      // Setting config.display as null allows you to disable the configuration
+      return {};
+    } else if (!_.isEmptyObject(displayFromOptions)) {
+      // displayFromOptions will be an empty object by default
+      return displayFromOptions;
+    }
+
+    return displayFromPreferences;
+  }
 
   export function showMethods() {
     view = 'methods';
@@ -217,26 +249,78 @@
     return view === 'details';
   }
 
-  function getInstruments() {
-    return getAllAvailableP13nInstruments().slice(0, MAX_P13N_INSTRUMENTS);
-  }
-
   function getAllAvailableP13nInstruments() {
-    const _customer = session.getCustomer($contact);
-
-    return getInstrumentsForCustomer(_customer, {
+    return getTranslatedInstrumentsForCustomer($customer, {
       upiApps: session.upi_intents_data,
     });
   }
 
-  export function updateCustomer() {
-    customer = session.getCustomer($contact);
-
-    const loggedIn = _Obj.getSafely(customer, 'logged');
-    _El.keepClass(_Doc.querySelector('#topbar #top-right'), 'logged', loggedIn);
+  $: {
+    if (view === 'methods') {
+      $customer = session.getCustomer($contact);
+    }
   }
 
-  function shouldUseP13n() {
+  $: {
+    const loggedIn = _Obj.getSafely($customer, 'logged');
+    _El.keepClass(_Doc.querySelector('#topbar #top-right'), 'logged', loggedIn);
+
+    const isPersonalizationEnabled = shouldUsePersonalization();
+    const eligiblePreferredInstruments = isPersonalizationEnabled
+      ? getAllAvailableP13nInstruments($customer)
+      : [];
+
+    const blocksThatWereSet = setBlocks(
+      {
+        preferred: eligiblePreferredInstruments,
+        merchantConfig: getRawMerchantConfig(),
+      },
+      $customer
+    );
+
+    const setPreferredInstruments = blocksThatWereSet.preferred.instruments;
+
+    // Get the methods for which a preferred instrument was shown
+    const preferredMethods = _Arr.reduce(
+      setPreferredInstruments,
+      (acc, instrument) => {
+        acc[`_${instrument.method}`] = true;
+        return acc;
+      },
+      {}
+    );
+
+    /**
+     * - `meta.p13n` will only be set when preferred methods are shown in the UI.
+     * - `p13n:instruments:list` will be fired when we attempt to show the list.
+     * - `p13n:instruments:list` with `meta.p13n` set as true will tell you whether or not preferred methods were shown.
+     */
+
+    // meta.p13n should always be set before `p13n:instruments:list`
+    if (setPreferredInstruments.length) {
+      Analytics.setMeta('p13n', true);
+    } else {
+      Analytics.removeMeta('p13n');
+    }
+
+    const allPreferredInstrumentsForCustomer = getAllInstrumentsForCustomer(
+      $customer
+    );
+
+    if (isPersonalizationEnabled && allPreferredInstrumentsForCustomer.length) {
+      // Track preferred-methods related things
+      Analytics.track('p13n:instruments:list', {
+        data: {
+          all: allPreferredInstrumentsForCustomer.length,
+          eligible: eligiblePreferredInstruments.length,
+          shown: setPreferredInstruments.length,
+          methods: preferredMethods,
+        },
+      });
+    }
+  }
+
+  function shouldUsePersonalization() {
     // Merchant has asked to disable
     if (session.get().personalization === false) {
       return false;
@@ -280,43 +364,16 @@
     return true;
   }
 
-  let personalization;
-  let instruments;
-  let customer;
-
-  $: {
-    if (view === 'methods') {
-      personalization = shouldUseP13n();
-
-      if (personalization) {
-        updateCustomer();
-
-        const availableInstruments = getAllAvailableP13nInstruments();
-        instruments = availableInstruments.slice(0, MAX_P13N_INSTRUMENTS);
-        trackP13nInstruments(availableInstruments);
-      } else {
-        instruments = [];
-      }
-    }
-  }
-
-  $: {
-    if (personalization) {
-      Analytics.setMeta('p13n', true);
-      session.p13n = true;
-    } else {
-      Analytics.removeMeta('p13n');
-      session.p13n = false;
-    }
+  function deselectAllInstruments() {
+    $methodTabInstrument = null;
+    $selectedInstrumentId = null;
   }
 
   export function onShown() {
+    deselectAllInstruments();
+
     if (view === 'methods') {
-      if ($selectedInstrumentId) {
-        showCtaWithDefaultText();
-      } else {
-        hideCta();
-      }
+      hideCta();
     } else {
       setDetailsCta();
     }
@@ -389,12 +446,6 @@
     }
 
     /**
-     * If contact is present, get the instruments
-     * for the user.
-     */
-    const _instruments = $isContactPresent ? getInstruments() : [];
-
-    /**
      * If there's just one method available,
      * we want to land on the details screen.
      *
@@ -411,7 +462,7 @@
     if (singleMethod) {
       if (
         _Arr.contains(['wallet', 'netbanking', 'upi'], singleMethod) &&
-        _instruments.length > 0
+        $instruments.length > 0
       ) {
         return METHODS;
       } else {
@@ -437,8 +488,6 @@
 
   export function next() {
     Analytics.track('home:proceed');
-
-    updateCustomer();
 
     // Multi TPV
     if (session.multiTpv) {
@@ -470,8 +519,6 @@
       return;
     }
 
-    const _instruments = getInstruments();
-
     if (singleMethod) {
       if (singleMethod === 'paypal') {
         createPaypalPayment();
@@ -480,7 +527,7 @@
 
       if (
         _Arr.contains(['wallet', 'netbanking', 'upi'], singleMethod) &&
-        _instruments.length > 0
+        $instruments.length > 0
       ) {
         showMethods();
         return;
@@ -503,30 +550,6 @@
     payload.method = 'paypal';
 
     session.preSubmit(null, payload);
-  }
-
-  function trackP13nInstruments(instruments) {
-    if (instruments.length === 0) {
-      return;
-    }
-
-    const _instruments = instruments.slice(0, MAX_P13N_INSTRUMENTS);
-    const _preferredMethods = _Arr.reduce(
-      _instruments,
-      (acc, instrument) => {
-        acc[`_${instrument.method}`] = true;
-        return acc;
-      },
-      {}
-    );
-
-    Analytics.track('p13n:instruments:list', {
-      data: {
-        length: instruments.length,
-        shown: Math.min(_instruments.length, MAX_P13N_INSTRUMENTS),
-        methods: _preferredMethods,
-      },
-    });
   }
 
   function selectMethod(event) {
@@ -574,16 +597,6 @@
     }
 
     return true;
-  }
-
-  export function getSelectedInstrument() {
-    return (
-      instruments &&
-      _Arr.find(
-        instruments,
-        instrument => instrument.id === $selectedInstrumentId
-      )
-    );
   }
 
   function attemptPayment() {
@@ -760,9 +773,6 @@
             class="home-methods"
             in:fly={{ delay: 100, duration: 400, y: 80 }}>
             <NewMethodsList
-              {personalization}
-              {instruments}
-              {customer}
               on:selectMethod={selectMethod}
               on:submit={attemptPayment} />
           </div>
@@ -771,6 +781,9 @@
     </div>
 
     <div slot="bottom">
+      {#if isDCCEnabled()}
+        <DynamicCurrencyView view="home-screen" />
+      {/if}
       {#if showRecurringCallout}
         <Callout>
           {#if session.get('subscription_id')}

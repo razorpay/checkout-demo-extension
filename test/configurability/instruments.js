@@ -6,7 +6,7 @@ test('Module: configurability/instruments', t => {
       let config, expected, found;
 
       config = {
-        card_types: ['credit'],
+        types: ['credit'],
       };
 
       found = Instruments.createInstrument(config);
@@ -24,14 +24,14 @@ test('Module: configurability/instruments', t => {
       let config, expected, found;
 
       config = {
-        card_types: ['credit'],
+        types: ['credit'],
         method: 'card',
       };
 
       expected = {
-        card_types: ['credit'],
+        types: ['credit'],
         method: 'card',
-        type: 'instrument',
+        _type: 'instrument',
       };
 
       found = Instruments.createInstrument(config);
@@ -54,7 +54,7 @@ test('Module: configurability/instruments', t => {
 
       expected = {
         method: 'netbanking',
-        type: 'method',
+        _type: 'method',
       };
 
       found = Instruments.createInstrument(config);
@@ -68,6 +68,29 @@ test('Module: configurability/instruments', t => {
       t.end();
     });
 
+    test('Transforms UPI app name', t => {
+      let config, expected, found;
+
+      config = {
+        method: 'upi',
+        flows: ['intent'],
+        apps: ['googlepay', 'com.somerandom.app'],
+      };
+
+      expected = {
+        method: 'upi',
+        flows: ['intent'],
+        apps: ['com.google.android.apps.nbu.paisa.user', 'com.somerandom.app'],
+        _type: 'instrument',
+      };
+
+      found = Instruments.createInstrument(config);
+
+      t.deepEqual(found, expected, 'Transforms UPI app name');
+
+      t.end();
+    });
+
     t.end();
   });
 
@@ -76,7 +99,7 @@ test('Module: configurability/instruments', t => {
       let instrument, found;
 
       instrument = {
-        card_types: ['credit'],
+        types: ['credit'],
         method: 'card',
       };
 

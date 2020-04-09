@@ -231,6 +231,15 @@
     });
   }
 
+  function trackCardNumberAutoFilled() {
+    Analytics.track('card_number:autofilled', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        valid: numberField.isValid(),
+      },
+    });
+  }
+
   function trackCvvFilled() {
     Analytics.track('card_cvv:filled', {
       type: AnalyticsTypes.BEHAV,
@@ -299,6 +308,7 @@
         recurring={isRecurring()}
         type={$cardType}
         on:filled={_ => handleFilled('numberField')}
+        on:autocomplete={trackCardNumberAutoFilled}
         on:input={handleCardInput}
         on:blur={trackCardNumberFilled} />
     </div>

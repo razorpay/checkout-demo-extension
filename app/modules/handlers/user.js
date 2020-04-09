@@ -72,9 +72,9 @@ export function attachLogoutListeners(session) {
     }
 
     if (_Obj.getSafely(target.dataset, 'all')) {
-      session.logUserOutOfAllDevices(session.customer);
+      session.logUserOutOfAllDevices(session.getCurrentCustomer());
     } else {
-      session.logUserOut(session.customer);
+      session.logUserOut(session.getCurrentCustomer());
     }
   });
 }

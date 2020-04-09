@@ -181,4 +181,3 @@
     });
   }
 })();
-/* eslint-enable no-extend-native */

@@ -6,9 +6,9 @@ import { createMethodBlock } from './methods';
  * @param {Object} params
  *  @prop {Object} translated Translated config
  *    @prop {Array<Block>} blocks
- *    @prop {Object} exclude
- *      @prop {Array<Instrument>} instruments Excluded insturments
- *      @prop {Array<string>} methods Excluded methods
+ *    @prop {Object} hide
+ *      @prop {Array<Instrument>} instruments Hidden insturments
+ *      @prop {Array<string>} methods Hidden methods
  *  @prop {Object} original Original Merchant config
  *  @prop {Array<string>} methods Available methods for the merchant
  *
@@ -16,18 +16,18 @@ import { createMethodBlock } from './methods';
  */
 export function getSequencedBlocks(params) {
   const { translated, original, methods } = params;
-  const { blocks, exclude } = translated;
-  const settings = _Obj.getSafely(original, 'settings', {});
+  const { blocks, hide } = translated;
+  const preferences = _Obj.getSafely(original, 'preferences', {});
   const {
     show_default_blocks = true, // Show default blocks by default
-  } = settings;
+  } = preferences;
 
   let { sequence = [] } = original;
 
   // Get the methods to list
   const methodsToList = _Arr.filter(
     methods,
-    method => !_Arr.contains(exclude.methods, method)
+    method => !_Arr.contains(hide.methods, method)
   );
 
   // Create a method block for all listed methods

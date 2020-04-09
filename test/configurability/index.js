@@ -13,7 +13,7 @@ test('Module: configurability', t => {
             instruments: [
               {
                 method: 'upi',
-                apps: ['gpay'],
+                apps: ['googlepay'],
               },
             ],
           },
@@ -36,7 +36,7 @@ test('Module: configurability', t => {
             ],
           },
         },
-        exclude: [
+        hide: [
           {
             method: 'wallet',
             wallets: ['olamoney'],
@@ -48,42 +48,37 @@ test('Module: configurability', t => {
           },
           {
             method: 'card',
-            card_types: ['credit'],
+            types: ['credit'],
           },
           {
             method: 'card',
             issuers: ['ICIC'],
-            card_types: ['debit'],
+            types: ['debit'],
           },
         ],
-        settings: {
-          methods: {
-            upi: false,
-          },
-        },
         sequence: ['block.gpay', 'netbanking', 'block.hdfc'],
       };
 
       expected = [
         {
           code: 'block.gpay',
-          type: 'block',
+          _type: 'block',
           instruments: [
             {
               method: 'upi',
-              apps: ['gpay'],
-              type: 'instrument',
+              apps: ['com.google.android.apps.nbu.paisa.user'],
+              _type: 'instrument',
             },
           ],
           title: 'Pay via Google Pay',
         },
         {
           code: 'rzp.cluster',
-          type: 'block',
+          _type: 'block',
           instruments: [
             {
               code: 'netbanking',
-              type: 'method',
+              _type: 'method',
               method: 'netbanking',
             },
           ],
@@ -91,83 +86,83 @@ test('Module: configurability', t => {
         },
         {
           code: 'block.hdfc',
-          type: 'block',
+          _type: 'block',
           instruments: [
             {
               method: 'card',
               issuers: ['HDFC'],
-              type: 'instrument',
+              _type: 'instrument',
             },
             {
               method: 'netbanking',
               banks: ['HDFC'],
-              type: 'instrument',
+              _type: 'instrument',
             },
             {
               method: 'wallet',
               wallets: ['payzapp'],
-              type: 'instrument',
+              _type: 'instrument',
             },
           ],
           title: 'Pay via HDFC Bank',
         },
         {
           code: 'rzp.cluster',
-          type: 'block',
+          _type: 'block',
           instruments: [
             {
               code: 'card',
-              type: 'method',
+              _type: 'method',
               method: 'card',
             },
             {
               code: 'wallet',
-              type: 'method',
+              _type: 'method',
               method: 'wallet',
             },
             {
               code: 'upi',
-              type: 'instrument',
+              _type: 'instrument',
               method: 'upi',
             },
             {
               code: 'gpay',
-              type: 'instrument',
+              _type: 'instrument',
               method: 'gpay',
             },
             {
               code: 'emi',
-              type: 'instrument',
+              _type: 'instrument',
               method: 'emi',
             },
             {
               code: 'cardless_emi',
-              type: 'instrument',
+              _type: 'instrument',
               method: 'cardless_emi',
             },
             {
               code: 'qr',
-              type: 'instrument',
+              _type: 'instrument',
               method: 'qr',
             },
             {
               code: 'paylater',
-              type: 'instrument',
+              _type: 'instrument',
               method: 'paylater',
             },
             {
               code: 'paypal',
-              type: 'instrument',
+              _type: 'instrument',
               method: 'paypal',
             },
             {
               code: 'bank_transfer',
-              type: 'instrument',
+              _type: 'instrument',
               method: 'bank_transfer',
             },
             {
               code: 'nach',
-              type: 'instrument',
+              _type: 'instrument',
               method: 'nach',
             },
           ],

@@ -47,6 +47,7 @@ describe.each(
     await assertElementHasAttribute(context, '#email', 'readonly');
     await assertElementHasAttribute(context, '#contact', 'readonly');
     await fillUserDetails(context);
+    await delay(500);
     await proceed(context);
     await assertUserDetails(context);
     await selectPaymentMethod(context, 'card');

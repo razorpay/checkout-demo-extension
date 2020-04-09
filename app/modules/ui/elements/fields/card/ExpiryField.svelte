@@ -50,6 +50,7 @@
   required
   {value}
   type="tel"
+  autocomplete="cc-exp"
   maxlength={7}
   bind:this={ref}
   on:input={handleInput}

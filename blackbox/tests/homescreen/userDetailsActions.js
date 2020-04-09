@@ -66,11 +66,20 @@ async function fillUserDetails(context, number) {
     contact = contact.replace('+91', '');
   }
 
-  if (!context.prefilledContact && !context.isContactOptional) {
+  const readonlyContact =
+    context.options.readonly && context.options.readonly.contact;
+  const readonlyEmail =
+    context.options.readonly && context.options.readonly.email;
+
+  if (
+    !context.prefilledContact &&
+    !context.isContactOptional &&
+    !readonlyContact
+  ) {
     await context.page.type('#contact', contact);
   }
 
-  if (!context.prefilledEmail && !context.isEmailOptional) {
+  if (!context.prefilledEmail && !context.isEmailOptional && !readonlyEmail) {
     await context.page.type('#email', email);
   }
 

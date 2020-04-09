@@ -28,6 +28,7 @@ async function fillEmandateBankDetails(context) {
   await context.page.type('[name="bank_account[account_number]"]', accountNum);
   await context.page.type('[name="bank_account[ifsc]"]', ifscCode);
   await context.page.type('[name="bank_account[name]"]', 'Sakshi Jain');
+  await context.page.select('[name="bank_account[account_type]"]', 'savings');
 }
 
 async function returnVirtualAccounts(context) {

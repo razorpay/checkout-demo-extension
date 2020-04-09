@@ -11,7 +11,6 @@
   import PayoutInstrument from 'ui/elements/PayoutInstrument.svelte';
   import Tab from 'ui/tabs/Tab.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
-  import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
 
   // Props
   export let upiAccounts;
@@ -256,12 +255,6 @@
 
         </div>
       {/if}
-    </div>
-    <div slot="bottom">
-      <DowntimeCallout>
-        Payouts to Yes Bank accounts are temporarily disabled. Please try
-        another bank.
-      </DowntimeCallout>
     </div>
   </Screen>
 </Tab>

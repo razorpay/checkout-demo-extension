@@ -8,35 +8,37 @@
   // Utils imports
   import { findCodeByNetworkName } from 'common/card';
   import { getSession } from 'sessionmanager';
-  import PreferencesStore from 'checkoutstore/preferences';
+  import { getBanks } from 'checkoutstore';
   import { getIcon as getNetworkIcon } from 'icons/network';
   import Track from 'tracker';
+  import { getExtendedSingleInstrument } from 'configurability/instruments';
 
   // Store
-  import { contact } from 'checkoutstore/screens/home';
+  import { selectedInstrumentId } from 'checkoutstore/screens/home';
+  import { customer } from 'checkoutstore/customer';
 
   // Props
-  export let instrument = {}; // P13n instrument
-  export let selected = false; // Whether or not this instrument is selected
+  export let instrument = {};
+  export let name = 'instrument';
+
+  let individualInstrument = getExtendedSingleInstrument(instrument);
+  $: individualInstrument = getExtendedSingleInstrument(instrument);
 
   const session = getSession();
-  const customer = session.getCustomer($contact);
-
-  const name = Track.makeUid();
-  const id = Track.makeUid();
 
   function getBankText(card, loggedIn) {
-    const banks = PreferencesStore.get().methods.netbanking;
+    const banks = getBanks();
     const bank = banks[card.issuer] || '';
     const bankText = bank.replace(/ Bank$/, '');
+    const cardType = card.type || '';
 
     if (loggedIn) {
       return `${bank ? `${bankText} ` : ''}${_Str.toTitleCase(
-        card.type || ''
+        cardType
       )} card - ${card.last4}`;
     } else {
       return `Use your${bank ? ` ${bankText}` : ''} ${_Str.toTitleCase(
-        card.type || ''
+        cardType
       )} card`;
     }
   }
@@ -55,10 +57,10 @@
   let cvvLength = 3;
   let cardKnown = false;
 
-  const savedCards = _Obj.getSafely(customer, 'tokens.items', []);
+  const savedCards = _Obj.getSafely($customer, 'tokens.items', []);
   const savedCard = _Arr.find(
     savedCards,
-    card => card.id === instrument.token_id
+    card => card.id === individualInstrument.token_id
   );
 
   if (savedCard) {
@@ -76,7 +78,7 @@
   } else {
     // User is logged out.
 
-    if (instrument.issuer) {
+    if (individualInstrument.issuer) {
       // We know stuff about the card.
       title = getBankText(instrument, false);
       icon = getIcon(instrument);
@@ -90,6 +92,34 @@
   }
 
   const component = cardKnown ? SlottedRadioOption : SlottedOption;
+
+  let selected = false;
+  $: selected = cardKnown && $selectedInstrumentId === instrument.id;
+
+  function selectionHandler() {
+    if (cardKnown) {
+      $selectedInstrumentId = instrument.id;
+
+      setTimeout(() => {
+        // Focus on the input field
+        const instrumentInDom = _El.closest(
+          _Doc.querySelector(`.home-methods input[value="${instrument.id}"]`),
+          '.instrument'
+        );
+        const cvvInput = instrumentInDom.querySelector('.cvv-input');
+
+        if (cvvInput) {
+          cvvInput.focus();
+        }
+      });
+    } else {
+      $selectedInstrumentId = null;
+
+      // TODO: Someday, preselect the saved card in the saved cards list.
+
+      session.switchTab('card');
+    }
+  }
 </script>
 
 <style>
@@ -100,18 +130,21 @@
 
   div[slot='extra'] :global(.elem .input) {
     padding: 0;
-    width: 2rem;
+    width: 40px;
+    letter-spacing: -3px;
+    font-family: rzpcvv;
   }
 </style>
 
 <svelte:component
   this={component}
+  ellipsis
   {name}
   {selected}
-  ellipsis
-  value={id}
-  radio={false}
   className="instrument"
+  radio={false}
+  value={instrument.id}
+  on:click={selectionHandler}
   on:click>
   <i slot="icon">
     <Icon {icon} alt="Card" />

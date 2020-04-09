@@ -40,7 +40,7 @@ describe('Basic upi payment', () => {
       page,
       options,
       preferences,
-      apps: [{ package_name: 'in.org.npci.upiapp', app_name: 'BHIM' }],
+      apps: true,
     });
     await assertHomePage(context, true, true);
     await fillUserDetails(context);

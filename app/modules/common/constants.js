@@ -50,7 +50,6 @@ export const TAB_TITLES = {
   cardless_emi: 'EMI',
   credit_card: 'Credit Card',
   debit_card: 'Debit Card',
-  ecod: 'Pay by Link',
   emandate: 'Bank Account',
   emi: 'EMI',
   emiplans: 'EMI Plans',
@@ -126,3 +125,5 @@ export const VPA_REGEX = /^[a-z0-9][a-z0-9.-]{2,}@[a-z]+$/i;
 export const NO_PAYMENT_ADAPTER_ERROR = 'Payment Adapter does not exist.';
 
 export const INDIA_COUNTRY_CODE = '+91';
+
+export const MAX_PREFERRED_INSTRUMENTS = 3;

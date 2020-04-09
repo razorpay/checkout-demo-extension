@@ -1,4 +1,6 @@
-import InstrumentConfig from './instrument-config';
+import InstrumentsConfig from './instruments-config';
+import { getPackageNameFromShortcode } from 'common/upi';
+import { getUPIIntentApps } from 'checkoutframe';
 
 /**
  * Adds a type and category to an instrument
@@ -7,10 +9,10 @@ import InstrumentConfig from './instrument-config';
  * @returns {Instrument}
  */
 function addTypeAndCategory(instrument) {
-  instrument.type = 'instrument';
+  instrument._type = 'instrument';
 
   if (isInstrumentForEntireMethod(instrument)) {
-    instrument.type = 'method';
+    instrument._type = 'method';
   }
 
   return instrument;
@@ -18,6 +20,26 @@ function addTypeAndCategory(instrument) {
 
 const INSTRUMENT_CREATORS = {
   default: instrument => instrument,
+  upi: instrument => {
+    if (instrument.app) {
+      instrument.app =
+        getPackageNameFromShortcode(instrument.app) || instrument.app;
+    }
+
+    if (instrument.apps) {
+      const allApps = getUPIIntentApps().all;
+      instrument.apps =
+        instrument.apps
+        |> _Arr.map(app => {
+          return getPackageNameFromShortcode(app) || app;
+        })
+        |> _Arr.filter(app =>
+          _Arr.find(allApps, deviceApp => deviceApp.package_name === app)
+        );
+    }
+
+    return instrument;
+  },
 };
 
 /**
@@ -49,7 +71,7 @@ export function createInstrument(config) {
  */
 export function isInstrumentForEntireMethod(instrument) {
   const method = instrument.method;
-  const config = InstrumentConfig[method];
+  const config = InstrumentsConfig[method];
 
   if (!config) {
     return false;
@@ -59,7 +81,40 @@ export function isInstrumentForEntireMethod(instrument) {
 
   // None of the keys in the config should be present in the instrument
   return _Arr.every(
-    config.keys,
+    config.properties,
     key => !_Arr.contains(currentInsturmentKeys, key)
   );
+}
+
+/**
+ * Adds instrument data to payment payload
+ * @param {Instrument} instrument
+ * @param {Object} payment Payment payload
+ * @param {Customer} customer
+ *
+ * @returns {Object}
+ */
+export function addInstrumentToPaymentData(instrument, payment, customer) {
+  const method = instrument.method;
+  const config = InstrumentsConfig[method];
+
+  if (!config) {
+    return payment;
+  }
+
+  return config.getPaymentPayload(
+    getExtendedSingleInstrument(instrument),
+    payment,
+    customer
+  );
+}
+
+/**
+ * Extends the instrument using the first ungrouped instrument
+ * @param {Instrument} instrument
+ *
+ * @returns {Instrument}
+ */
+export function getExtendedSingleInstrument(instrument) {
+  return _Obj.extend(_Obj.extend({}, instrument), instrument._ungrouped[0]);
 }

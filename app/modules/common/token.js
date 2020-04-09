@@ -13,7 +13,7 @@ const transformerByMethod = {
    */
   card: (token, { amount, emi, recurring }) => {
     const { card } = token;
-    let { flows = [], issuer: bank, network } = card;
+    let { flows = [], issuer: bank, network, type } = card;
     let networkCode = Card.findCodeByNetworkName(network);
 
     if (networkCode === 'amex') {
@@ -22,7 +22,7 @@ const transformerByMethod = {
     }
     card.networkCode = networkCode;
 
-    token.plans = bank && emi && card.emi && getEMIBankPlans(bank);
+    token.plans = bank && emi && card.emi && getEMIBankPlans(bank, type);
 
     token.cvvDigits = networkCode === 'amex' ? 4 : 3;
 
@@ -52,12 +52,7 @@ export const transform = (tokens, { amount, emi, recurring }) => {
     }
   });
 
-  return _Arr.filter(tokens, token => {
-    const issuer = _Obj.getSafely(token, 'card.issuer');
-
-    // Filter out YESB cards
-    return issuer !== 'YESB';
-  });
+  return tokens;
 };
 
 const filterTokensByMethod = method => {

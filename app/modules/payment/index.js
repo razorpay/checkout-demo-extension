@@ -24,6 +24,8 @@ import { checkPaymentAdapter } from 'payment/adapters';
 import * as GPay from 'gpay';
 import Analytics from 'analytics';
 import { isProviderHeadless } from 'common/cardlessemi';
+import { updateCurrencies, setCurrenciesRate } from 'common/currency';
+import { getCardEntityFromPayload } from 'common/card';
 
 /**
  * Tells if we're being executed from
@@ -51,7 +53,12 @@ function clearPollingInterval(force) {
 
 function onPaymentCancel(metaParam) {
   if (!this.done) {
-    var cancelError = _.rzpError(strings.cancelMsg);
+    var cancelError = {
+      error: {
+        code: 'BAD_REQUEST_ERROR',
+        description: 'Payment processing cancelled by user',
+      },
+    };
     var payment_id = this.payment_id;
     var razorpay = this.r;
     var eventData = {};
@@ -70,7 +77,7 @@ function onPaymentCancel(metaParam) {
               data: response,
               r: razorpay,
             });
-          } else {
+          } else if (!response.error) {
             response = cancelError;
           }
           this.complete(response);
@@ -898,6 +905,32 @@ export function getCardFeaturesFromCache(cardNumber) {
 }
 
 /**
+ * Returns card currencies from cache
+ *
+ * @param payload Payload which contains either Card Number, IIN or Token.
+ */
+export function getCardCurrenciesFromCache(payload) {
+  const entity = getCardEntityFromPayload(payload);
+  return CardCurrencyCache[entity] || {};
+}
+/**
+ * Store ongoing flow request*
+ */
+var ongoingFlowRequest = {
+  iin: {},
+};
+
+/**
+ * Store ongoing currency request
+ */
+var CardCurrencyRequests = {};
+
+/**
+ * Currency cache for synchronous retrieval
+ */
+var CardCurrencyCache = {};
+
+/**
  * Gets the features associated with a card.
  * @param {string} cardNumber
  *
@@ -979,3 +1012,79 @@ razorpayProto.getCardFlows = function(cardNumber = '', callback = _Func.noop) {
 };
 
 razorpayProto.getCardFeatures = getCardFeatures;
+
+/**
+ * Gets the currencies associated with a card.
+ * @param payload Payload which contains amount, currency and either Card Number, IIN or Token
+ * @returns {*}
+ */
+razorpayProto.getCardCurrencies = function(payload) {
+  const requestPayload = {
+    '_[source]': Track.props.library,
+  };
+
+  const entity = getCardEntityFromPayload(payload);
+  if (entity.length === 6) {
+    requestPayload.iin = entity;
+  } else {
+    requestPayload.token = entity;
+  }
+
+  const { amount, currency } = payload;
+  if (amount && currency) {
+    requestPayload.amount = amount;
+    requestPayload.currency = currency;
+  }
+
+  const existingRequest = CardCurrencyRequests[entity];
+  if (existingRequest) {
+    return existingRequest;
+  }
+
+  CardCurrencyRequests[entity] = new Promise((resolve, reject) => {
+    let url = makeAuthUrl(this, 'payment/flows');
+
+    // append requestPayload
+    url = _.appendParamsToUrl(url, requestPayload);
+
+    fetch.jsonp({
+      url,
+      callback: response => {
+        if (response.error) {
+          Analytics.track('currencies:card:fetch:failure', {
+            data: {
+              entity,
+              error: response.error,
+            },
+          });
+          return reject(response.error);
+        }
+
+        if (response.all_currencies) {
+          updateCurrencies(response.all_currencies);
+          setCurrenciesRate(response.all_currencies, amount);
+        }
+
+        // Store in cache
+        CardCurrencyCache[entity] = response;
+
+        // Resolve
+        resolve(response);
+
+        Analytics.track('currencies:card:fetch:success', {
+          data: {
+            entity,
+          },
+        });
+      },
+    });
+
+    Analytics.track('currencies:card:fetch:start', {
+      data: {
+        entity,
+      },
+    });
+  });
+
+  return CardCurrencyRequests[entity];
+};

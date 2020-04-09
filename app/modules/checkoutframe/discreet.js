@@ -14,7 +14,6 @@ import * as GPay from 'gpay';
 import * as Color from 'lib/color';
 import * as _PaymentMethodIcons from 'ui/icons/payment-methods';
 import * as Confirm from 'confirm';
-import Callout from 'callout';
 import * as Currency from 'common/currency';
 import * as OtpService from 'common/otpservice';
 import * as strings from 'common/strings';
@@ -56,6 +55,7 @@ import * as OTPScreenStore from 'checkoutstore/screens/otp';
 import * as Cta from 'checkoutstore/cta';
 import * as HomeScreenStore from 'checkoutstore/screens/home';
 import * as CardScreenStore from 'checkoutstore/screens/card';
+import * as CustomerStore from 'checkoutstore/customer';
 
 import QRScreen from 'ui/tabs/qr/index.svelte';
 import BankTransferScreen from 'ui/tabs/bank-transfer/index.svelte';
@@ -67,6 +67,7 @@ import HomeTab from 'ui/tabs/home/index.svelte';
 import NetbankingTab from 'ui/tabs/netbanking/index.svelte';
 import NachScreen from 'ui/tabs/nach/index.svelte';
 import CardTab from 'ui/tabs/card/index.svelte';
+import WalletTab from 'ui/tabs/wallets/index.svelte';
 
 import PayoutsInstruments from 'ui/tabs/payout/payout-instruments.svelte';
 import PayoutAccount from 'ui/tabs/payout/payout-account.svelte';
@@ -78,6 +79,8 @@ import * as Experiments from 'experiments';
 
 import * as NBHandlers from 'handlers/netbanking';
 import * as UserHandlers from 'handlers/user';
+
+import * as Instruments from 'configurability/instruments';
 
 export default {
   RazorpayConfig,
@@ -94,7 +97,6 @@ export default {
   Color,
   _PaymentMethodIcons,
   Confirm,
-  Callout,
   Currency,
   OtpService,
   getDecimalAmount: Currency.getDecimalAmount,
@@ -119,6 +121,7 @@ export default {
   Checkout,
   Bridge,
   P13n,
+  Instruments,
   UserAgent,
   Offers,
   Flows,
@@ -128,6 +131,7 @@ export default {
   Store,
   MethodStore,
   SessionStore,
+  CustomerStore,
   OTPScreenStore,
   HomeScreenStore,
   CardScreenStore,
@@ -161,6 +165,7 @@ export default {
 
   HomeTab,
   UpiTab,
+  WalletTab,
   NetbankingTab,
   NachScreen,
   CardTab,
