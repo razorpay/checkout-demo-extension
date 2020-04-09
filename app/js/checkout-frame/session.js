@@ -1545,14 +1545,11 @@ Session.prototype = {
 
       this.cardlessEmiView.$set({
         providers: providers,
+      });
 
-        on: {
-          select: function(event) {
-            var providerCode = event.detail.code;
-
-            self.selectCardlessEmiProviderAndAttemptPayment(providerCode);
-          },
-        },
+      this.cardlessEmiView.$on('select', function(event) {
+        var providerCode = event.detail.code;
+        self.selectCardlessEmiProviderAndAttemptPayment(providerCode);
       });
     }
   },

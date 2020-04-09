@@ -4,13 +4,6 @@
 
   // Props
   export let providers = [];
-  export let on = {};
-
-  export function select(event) {
-    const { select = _Func.noop } = on;
-
-    select(event);
-  }
 </script>
 
 <div class="tab-content showable screen pad collapsible" id="form-cardless_emi">
@@ -20,7 +13,7 @@
   <h3>Select an Option</h3>
   <div class="options">
     {#each providers as provider}
-      <NextOption {...provider} on:select={select}>{provider.title}</NextOption>
+      <NextOption {...provider} on:select>{provider.title}</NextOption>
     {/each}
   </div>
 </div>
