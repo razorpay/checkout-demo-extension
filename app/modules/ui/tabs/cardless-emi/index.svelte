@@ -10,6 +10,9 @@
     isDebitEMIEnabled,
   } from 'checkoutstore/methods';
 
+  // Store imports
+  import { methodTabInstrument } from 'checkoutstore/screens/home';
+
   const providers = getAllProviders();
 
   /**
@@ -35,6 +38,37 @@
 
     return providers;
   }
+
+  /**
+   * Filters providers against the given instrument.
+   * Only allows those providers that match the given instruments.
+   *
+   * @param {Array<string>} providers
+   * @param {Instrument} instrument
+   *
+   * @returns {Object}
+   */
+  function filterProvidersAgainstInstrument(providers, instrument) {
+    if (!instrument || instrument.method !== 'cardless_emi') {
+      return providers;
+    }
+
+    if (!instrument.providers) {
+      return providers;
+    }
+
+    const filteredProviders = _Arr.filter(providers, provider =>
+      _Arr.contains(instrument.providers, provider.data.code)
+    );
+
+    return filteredProviders;
+  }
+
+  let filteredProviders = providers;
+  $: filteredProviders = filterProvidersAgainstInstrument(
+    providers,
+    $methodTabInstrument
+  );
 </script>
 
 <div class="tab-content showable screen pad collapsible" id="form-cardless_emi">
@@ -43,7 +77,7 @@
   <input type="hidden" name="ott" />
   <h3>Select an Option</h3>
   <div class="options">
-    {#each providers as provider}
+    {#each filteredProviders as provider}
       <NextOption {...provider} on:select>{provider.title}</NextOption>
     {/each}
   </div>
