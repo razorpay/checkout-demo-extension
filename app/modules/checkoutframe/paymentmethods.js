@@ -206,6 +206,8 @@ export function getMethodNameForPaymentOption(method, extra = {}) {
       if (hasInstrument) {
         return 'Cardless EMI';
       }
+
+      return TAB_TITLES[method];
     }
 
     default:
