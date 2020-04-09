@@ -78,7 +78,7 @@ export function isAddressEnabled() {
 }
 
 export function isDCCEnabled() {
-  return hasFeature('dcc', false);
+  return hasFeature('dcc', false) && getCurrency() === 'INR';
 }
 
 export function isContactOptional() {
