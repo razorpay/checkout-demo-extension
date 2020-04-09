@@ -264,6 +264,7 @@
   .more-btn {
     text-transform: none;
     letter-spacing: normal;
+    cursor: pointer;
   }
 
   .default-currencies {
