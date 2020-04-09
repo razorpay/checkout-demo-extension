@@ -1526,7 +1526,7 @@ Session.prototype = {
     var self = this;
 
     if (MethodStore.isMethodEnabled('cardless_emi')) {
-      this.emiOptionsView = new discreet.emiOptionsView({
+      this.cardlessEmiView = new discreet.CardlessEmiView({
         target: _Doc.querySelector('#emi-options-wrapper'),
       });
 
@@ -1543,7 +1543,7 @@ Session.prototype = {
         providers.unshift(CardlessEmi.createProvider('cards', providerTitle));
       }
 
-      this.emiOptionsView.$set({
+      this.cardlessEmiView.$set({
         providers: providers,
 
         on: {
@@ -5224,11 +5224,10 @@ Session.prototype = {
   cleanUpSvelteComponents: function() {
     var views = [
       'bankTransferView',
-      'svelteCardTab',
+      'cardlessEmiView',
       'currentScreen',
       'emandateView',
       'emi',
-      'emiOptionsView',
       'emiPlansView',
       'emiScreenView',
       'feeBearerView',
@@ -5240,6 +5239,7 @@ Session.prototype = {
       'payoutsAccountView',
       'payoutsView',
       'savedCardsView',
+      'svelteCardTab',
       'svelteWalletsTab',
       'upiTab',
     ];
