@@ -16,6 +16,7 @@ const {
   assertUpiCollect,
   assertShownWallets,
   assertShownPaylaterProviders,
+  assertShownCardlessEmiProviders,
 } = require('./config-utils');
 
 function augmentPreferences(preferences) {
@@ -33,6 +34,7 @@ function augmentPreferences(preferences) {
       cardless_emi: {
         zestmoney: true,
         earlysalary: true,
+        flexmoney: true,
       },
       bank_transfer: true,
     },
@@ -75,6 +77,10 @@ const CONFIG = {
             method: 'paylater',
             providers: ['epaylater', 'icic'],
           },
+          {
+            method: 'cardless_emi',
+            providers: ['zestmoney', 'earlysalary'],
+          },
         ],
       },
 
@@ -97,6 +103,10 @@ const CONFIG = {
           {
             method: 'paylater',
             providers: ['epaylater'],
+          },
+          {
+            method: 'cardless_emi',
+            providers: ['zestmoney'],
           },
         ],
       },
@@ -408,10 +418,52 @@ describe('display.blocks', () => {
     // Select it
     await paylaterInstrument.click();
 
-    // Assert that all apps are shown
+    // Assert that all providers are shown
     await assertShownPaylaterProviders(context, [
       'ePayLater',
       'ICICI Bank PayLater',
+    ]);
+  });
+});
+
+describe('display.blocks', () => {
+  test('Grouped instrument: Cardless EMI', async () => {
+    const preferences = augmentPreferences(makePreferences());
+
+    const options = {
+      key: 'rzp_test_1DP5mmOlF5G5ag',
+      amount: 600000,
+      prefill: {
+        contact: '+919988776655',
+        email: 'void@razorpay.com',
+      },
+
+      config: CONFIG,
+    };
+
+    const context = await openCheckoutWithNewHomeScreen({
+      page,
+      options,
+      preferences,
+      apps: true,
+    });
+
+    // User details
+    await fillUserDetails(context, '9988776655');
+    await assertUserDetails(context);
+
+    // Get the grouped Cardless EMI instrument
+    const cardlessEmiInstrument = await context.page.$(
+      `.methods-block[data-block='block.grouped'] [role=list] > *:nth-child(8)`
+    );
+
+    // Select it
+    await cardlessEmiInstrument.click();
+
+    // Assert that all providers are shown
+    await assertShownCardlessEmiProviders(context, [
+      'ZestMoney',
+      'EarlySalary',
     ]);
   });
 });
