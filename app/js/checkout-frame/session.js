@@ -1614,13 +1614,9 @@ Session.prototype = {
       target: _Doc.querySelector('#paylater-wrapper'),
     });
 
-    this.payLaterView.$set({
-      on: {
-        select: function(event) {
-          var providerCode = event.detail.code;
-          self.selectPayLaterProviderAndAttemptPayment(providerCode);
-        },
-      },
+    this.payLaterView.$on('select', function(event) {
+      var providerCode = event.detail.code;
+      self.selectPayLaterProviderAndAttemptPayment(providerCode);
     });
   },
 

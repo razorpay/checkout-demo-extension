@@ -10,9 +10,6 @@
   // Store imports
   import { methodTabInstrument } from 'checkoutstore/screens/home';
 
-  // Props
-  export let on = {};
-
   const providers = _Arr.map(getPayLaterProviders(), providerObj =>
     createProvider(providerObj.code, providerObj.name)
   );
@@ -47,12 +44,6 @@
     providers,
     $methodTabInstrument
   );
-
-  export function select(event) {
-    const { select = _Func.noop } = on;
-
-    select(event);
-  }
 </script>
 
 <Tab method="paylater">
@@ -65,7 +56,7 @@
         attributes={{ 'data-paylater': provider.data.code }}
         tabindex={0}
         {...provider}
-        on:select={select}>
+        on:select>
         {provider.title}
       </NextOption>
     {/each}
