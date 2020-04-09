@@ -87,7 +87,12 @@ async function isGroupedInstrument(element) {
   expect(element).not.toBe(null);
   expect(await element.$('input[type=radio], input[type=tel]')).toBe(null);
 
-  const instrumentText = (await innerText(element)).trim();
+  const instrumentText = (await innerText(element))
+    .replace(/[^\w\s]/g, '') // Some options have SVG icons which might come under innerText
+    .replace(/\n/g, '') // Remove all line breaks
+    .trim();
+
+  console.log(instrumentText);
   expect(instrumentText.startsWith('Pay using')).toBe(true);
 }
 
