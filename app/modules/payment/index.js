@@ -972,7 +972,7 @@ function getCardFeatures(cardNumber) {
         }
 
         // Store in cache
-        CardFeatureCache[iin] = features;
+        CardFeatureCache.iin[iin] = features;
 
         // Resolve
         resolve(features);
