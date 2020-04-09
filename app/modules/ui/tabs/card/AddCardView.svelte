@@ -170,7 +170,7 @@
     let isValid = validateCardNumber();
     numberField.setValid(isValid);
 
-    const flowChecker = ({ flows } = {}) => {
+    const flowChecker = ({ flows = {} } = {}) => {
       const cardNumber = getCardDigits(value);
       const isIinSame = getIin(cardNumber) === iin;
 
