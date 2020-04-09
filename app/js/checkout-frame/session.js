@@ -1530,23 +1530,6 @@ Session.prototype = {
         target: _Doc.querySelector('#emi-options-wrapper'),
       });
 
-      var providers = MethodStore.getCardlessEMIProviders();
-      providers = _Obj.keys(providers).map(function(provider) {
-        var providerObj = providers[provider];
-        return CardlessEmi.createProvider(providerObj.code, providerObj.name);
-      });
-
-      if (MethodStore.isMethodEnabled('emi')) {
-        var providerTitle = MethodStore.isDebitEMIEnabled()
-          ? 'EMI on Debit/Credit Cards'
-          : 'EMI on Cards';
-        providers.unshift(CardlessEmi.createProvider('cards', providerTitle));
-      }
-
-      this.cardlessEmiView.$set({
-        providers: providers,
-      });
-
       this.cardlessEmiView.$on('select', function(event) {
         var providerCode = event.detail.code;
         self.selectCardlessEmiProviderAndAttemptPayment(providerCode);

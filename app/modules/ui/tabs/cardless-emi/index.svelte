@@ -2,8 +2,39 @@
   // UI imports
   import NextOption from 'ui/elements/options/NextOption.svelte';
 
-  // Props
-  export let providers = [];
+  // Utils imports
+  import { createProvider } from 'common/cardlessemi';
+  import {
+    getCardlessEMIProviders,
+    isMethodEnabled,
+    isDebitEMIEnabled,
+  } from 'checkoutstore/methods';
+
+  const providers = getAllProviders();
+
+  /**
+   * Returns _all_ Cardless EMI providers
+   *
+   * @returns {Array<Provider>}
+   */
+  function getAllProviders() {
+    let providers = [];
+
+    _Obj.loop(getCardlessEMIProviders(), providerObj => {
+      providers.push(createProvider(providerObj.code, providerObj.name));
+    });
+
+    if (isMethodEnabled('emi')) {
+      providers.unshift(
+        createProvider(
+          'cards',
+          isDebitEMIEnabled() ? 'EMI on Debit/Credit Cards' : 'EMI on Cards'
+        )
+      );
+    }
+
+    return providers;
+  }
 </script>
 
 <div class="tab-content showable screen pad collapsible" id="form-cardless_emi">
