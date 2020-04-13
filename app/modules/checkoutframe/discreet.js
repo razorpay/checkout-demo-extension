@@ -147,7 +147,6 @@ export default {
   sanitizeTokens,
 
   emiView,
-  emiOptionsView,
   CardlessEmiView,
   emiScreenView,
   emiPlansView,
