@@ -11,6 +11,9 @@
   import IfscField from 'ui/elements/fields/emandate/IfscField.svelte';
   import NameField from 'ui/elements/fields/emandate/NameField.svelte';
 
+  // Svelte imports
+  import { fade } from 'svelte/transition';
+
   // Store imports
   import {
     accountNumber,
@@ -315,53 +318,59 @@
     <div slot="main" id="emandate-inner">
 
       {#if currentView === Views.AUTH_SELECTION}
-        <div id="emandate-bank">
-          <div class="bank-icon">
-            {#if $selectedBank}
-              <img src={getBankLogo($selectedBank)} alt={bankName} />
+        <div
+          class="emandate-auth-selection"
+          in:fade={{ duration: 200, delay: 200 }}>
+          <div id="emandate-bank">
+            <div class="bank-icon">
+              {#if $selectedBank}
+                <img src={getBankLogo($selectedBank)} alt={bankName} />
+              {/if}
+            </div>
+            <div class="bank-name">{bankName}</div>
+            {#if !prefilledBank}
+              <div class="btn-change-bank" on:click={resetBank}>
+                Change Bank
+              </div>
             {/if}
           </div>
-          <div class="bank-name">{bankName}</div>
-          {#if !prefilledBank}
-            <div class="btn-change-bank" on:click={resetBank}>Change Bank</div>
-          {/if}
-        </div>
 
-        <div class="legend">Authenticate using</div>
-        <div id="emandate-options">
-          {#if _Arr.contains(availableAuthTypes, AuthTypes.DEBIT_CARD)}
-            <div
-              class="auth-option item debitcard"
-              on:click={() => handleAuthTypeClicked(AuthTypes.DEBIT_CARD)}>
-              <label>
-                <i class="theme">
-                  {@html icons.card}
-                </i>
-                Debit Card
-                <span class="desc">
-                  via Bank Account and Debit Card details
-                </span>
-              </label>
-            </div>
-          {/if}
-          {#if _Arr.contains(availableAuthTypes, AuthTypes.NETBANKING)}
-            <div
-              class="auth-option item netbanking"
-              on:click={() => handleAuthTypeClicked(AuthTypes.NETBANKING)}>
-              <label>
-                <i class="theme">
-                  {@html icons.netbanking}
-                </i>
-                Netbanking
-                <span class="desc">
-                  via Bank Account and Netbanking details
-                </span>
-              </label>
-            </div>
-          {/if}
+          <div class="legend">Authenticate using</div>
+          <div id="emandate-options">
+            {#if _Arr.contains(availableAuthTypes, AuthTypes.DEBIT_CARD)}
+              <div
+                class="auth-option item debitcard"
+                on:click={() => handleAuthTypeClicked(AuthTypes.DEBIT_CARD)}>
+                <label>
+                  <i class="theme">
+                    {@html icons.card}
+                  </i>
+                  Debit Card
+                  <span class="desc">
+                    via Bank Account and Debit Card details
+                  </span>
+                </label>
+              </div>
+            {/if}
+            {#if _Arr.contains(availableAuthTypes, AuthTypes.NETBANKING)}
+              <div
+                class="auth-option item netbanking"
+                on:click={() => handleAuthTypeClicked(AuthTypes.NETBANKING)}>
+                <label>
+                  <i class="theme">
+                    {@html icons.netbanking}
+                  </i>
+                  Netbanking
+                  <span class="desc">
+                    via Bank Account and Netbanking details
+                  </span>
+                </label>
+              </div>
+            {/if}
+          </div>
         </div>
       {:else if currentView === Views.BANK_DETAILS}
-        <div class="emandate-fields">
+        <div class="emandate-fields" in:fade={{ duration: 200, delay: 200 }}>
           <AccountNumberField
             name="bank_account[account_number]"
             id="nb-acc-no"
