@@ -1,4 +1,6 @@
 <script>
+  /* global _Arr */
+
   import { getSession } from 'sessionmanager';
 
   // UI Imports
