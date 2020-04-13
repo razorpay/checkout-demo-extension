@@ -97,7 +97,9 @@
   }
 
   export function onBack() {
-    $selectedBank = '';
+    if (currentView === Views.AUTH_SELECTION || shouldSkipAuthSelection()) {
+      $selectedBank = '';
+    }
 
     if (!prefilledBank && currentView === Views.AUTH_SELECTION) {
       session.switchTab('netbanking');
