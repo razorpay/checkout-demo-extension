@@ -1451,7 +1451,10 @@ Session.prototype = {
 
   setEmandate: function() {
     if (MethodStore.isEMandateEnabled()) {
-      this.emandateView = new discreet.emandateView();
+      this.emandateView = new discreet.EmandateTab({
+        target: _Doc.querySelector('#emandate-wrapper'),
+        props: {},
+      });
     }
   },
 

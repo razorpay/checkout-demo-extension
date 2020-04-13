@@ -22,7 +22,6 @@ import emiView from 'checkoutframe/emi';
 import FeeBearerView from 'ui/components/feebearer.svelte';
 import OffersView from 'ui/components/offers/index.svelte';
 import NoCostExplainer from 'ui/components/offers/NoCostExplainer.svelte';
-import emandateView from 'checkoutframe/emandate';
 import emiPlansView from 'checkoutframe/emiplans';
 import otpView from 'checkoutframe/otp';
 import * as Curtain from 'components/curtain';
@@ -68,6 +67,7 @@ import emiScreenView from 'ui/tabs/emi/emiscreen.svelte';
 import PayLaterView from 'ui/tabs/paylater/index.svelte';
 import HomeTab from 'ui/tabs/home/index.svelte';
 import NetbankingTab from 'ui/tabs/netbanking/index.svelte';
+import EmandateTab from 'ui/tabs/emandate/index.svelte';
 import NachScreen from 'ui/tabs/nach/index.svelte';
 import CardTab from 'ui/tabs/card/index.svelte';
 import WalletTab from 'ui/tabs/wallets/index.svelte';
@@ -147,7 +147,7 @@ export default {
   sanitizeTokens,
 
   emiView,
-  emandateView,
+  emiOptionsView,
   CardlessEmiView,
   emiScreenView,
   emiPlansView,
@@ -171,6 +171,7 @@ export default {
   UpiTab,
   WalletTab,
   NetbankingTab,
+  EmandateTab,
   NachScreen,
   CardTab,
 
