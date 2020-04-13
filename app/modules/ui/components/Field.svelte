@@ -169,7 +169,6 @@
     {max}
     {tabindex}
     {autocapitalize}
-    {autocomplete}
     {autocorrect}
     {spellcheck}
     use:formatterAction={formatter}
