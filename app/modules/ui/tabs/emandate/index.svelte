@@ -163,7 +163,10 @@
 
   function setView(view) {
     currentView = view;
-    if (view !== Views.BANK_DETAILS) {
+  }
+
+  $: {
+    if (currentView !== Views.BANK_DETAILS) {
       hideCta();
     } else {
       showCtaWithDefaultText();
