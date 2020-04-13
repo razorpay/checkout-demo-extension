@@ -887,7 +887,7 @@ export function getCardFeaturesFromCache(cardNumber) {
   const iin = getIin(cardNumber);
 
   if (!iin || iin.length < 6) {
-    return;
+    return {};
   }
 
   const features = CardFeatureCache.iin[iin];
@@ -940,7 +940,7 @@ function getCardFeatures(cardNumber) {
   const iin = getIin(cardNumber);
 
   if (!iin || iin.length < 6) {
-    return Promise.reject();
+    return Promise.resolve({});
   }
 
   const existingRequest = CardFeatureRequests.iin[iin];
