@@ -107,6 +107,14 @@
     margin-top: 10px;
   }
 
+  .desc {
+    display: block;
+    color: #777;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
   #emandate-bank {
     border: 1px solid #e6e7e8;
     padding: 14px;
@@ -139,6 +147,29 @@
     position: relative;
     left: 4px;
     top: 1px;
+  }
+
+  #emandate-options {
+    border: 1px solid #eee;
+    border-radius: 2px;
+    background: #f9fafb;
+  }
+
+  .auth-option.item {
+    width: auto;
+    float: none;
+    border: 0;
+    text-align: left;
+  }
+
+  .auth-option.item i {
+    float: left;
+    font-size: 32px;
+    margin: 2px 16px;
+    line-height: 30px;
+    min-width: 27px;
+    width: 27px;
+    height: 27px;
   }
 
   #emandate-options .auth-option.disabled {
