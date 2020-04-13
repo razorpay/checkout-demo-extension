@@ -1526,33 +1526,13 @@ Session.prototype = {
     var self = this;
 
     if (MethodStore.isMethodEnabled('cardless_emi')) {
-      this.emiOptionsView = new discreet.emiOptionsView({
+      this.cardlessEmiView = new discreet.CardlessEmiView({
         target: _Doc.querySelector('#emi-options-wrapper'),
       });
 
-      var providers = MethodStore.getCardlessEMIProviders();
-      providers = _Obj.keys(providers).map(function(provider) {
-        var providerObj = providers[provider];
-        return CardlessEmi.createProvider(providerObj.code, providerObj.name);
-      });
-
-      if (MethodStore.isMethodEnabled('emi')) {
-        var providerTitle = MethodStore.isDebitEMIEnabled()
-          ? 'EMI on Debit/Credit Cards'
-          : 'EMI on Cards';
-        providers.unshift(CardlessEmi.createProvider('cards', providerTitle));
-      }
-
-      this.emiOptionsView.$set({
-        providers: providers,
-
-        on: {
-          select: function(event) {
-            var providerCode = event.detail.code;
-
-            self.selectCardlessEmiProviderAndAttemptPayment(providerCode);
-          },
-        },
+      this.cardlessEmiView.$on('select', function(event) {
+        var providerCode = event.detail.code;
+        self.selectCardlessEmiProviderAndAttemptPayment(providerCode);
       });
     }
   },
@@ -5224,11 +5204,10 @@ Session.prototype = {
   cleanUpSvelteComponents: function() {
     var views = [
       'bankTransferView',
-      'svelteCardTab',
+      'cardlessEmiView',
       'currentScreen',
       'emandateView',
       'emi',
-      'emiOptionsView',
       'emiPlansView',
       'emiScreenView',
       'feeBearerView',
@@ -5240,6 +5219,7 @@ Session.prototype = {
       'payoutsAccountView',
       'payoutsView',
       'savedCardsView',
+      'svelteCardTab',
       'svelteWalletsTab',
       'upiTab',
     ];

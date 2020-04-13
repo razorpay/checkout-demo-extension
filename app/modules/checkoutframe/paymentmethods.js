@@ -187,7 +187,7 @@ export function getMethodNameForPaymentOption(method, extra = {}) {
   let hasQr;
 
   switch (method) {
-    case 'upi':
+    case 'upi': {
       qrEnabled = isMethodEnabled('qr');
       hasQr = qrEnabled;
 
@@ -200,6 +200,15 @@ export function getMethodNameForPaymentOption(method, extra = {}) {
       }
 
       return TAB_TITLES.upi;
+    }
+
+    case 'cardless_emi': {
+      if (hasInstrument) {
+        return 'Cardless EMI';
+      }
+
+      return TAB_TITLES[method];
+    }
 
     default:
       return TAB_TITLES[method];
