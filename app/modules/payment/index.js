@@ -868,6 +868,18 @@ razorpayProto.topupWallet = function() {
  */
 const getIin = cardNumber => cardNumber.replace(/\D/g, '').slice(0, 6);
 
+/**
+ * Tells whether or not the IIN is valid
+ * @param {string} cardNumber
+ *
+ * @returns {boolean}
+ */
+const isIinValid = cardNumber => {
+  const iin = getIin(cardNumber);
+
+  return iin && iin.length >= 6;
+};
+
 const CardFeatureCache = {
   iin: {},
 };
@@ -884,11 +896,11 @@ const CardFeatureRequests = {
  * @return {Object/undefined}
  */
 export function getCardFeaturesFromCache(cardNumber) {
-  const iin = getIin(cardNumber);
-
-  if (!iin || iin.length < 6) {
+  if (!isIinValid(cardNumber)) {
     return {};
   }
+
+  const iin = getIin(cardNumber);
 
   const features = CardFeatureCache.iin[iin];
 
@@ -937,11 +949,11 @@ var CardCurrencyCache = {};
  * @returns {Promise}
  */
 function getCardFeatures(cardNumber) {
-  const iin = getIin(cardNumber);
-
-  if (!iin || iin.length < 6) {
+  if (!isIinValid(cardNumber)) {
     return Promise.resolve({});
   }
+
+  const iin = getIin(cardNumber);
 
   const existingRequest = CardFeatureRequests.iin[iin];
 
