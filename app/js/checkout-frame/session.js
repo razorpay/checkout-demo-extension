@@ -2824,10 +2824,6 @@ Session.prototype = {
       } else {
         tab = 'card';
       }
-    } else if (/^emandate/.test(this.screen)) {
-      if (this.emandateView.back()) {
-        return;
-      }
     } else if (/^emiplans/.test(this.screen)) {
       if (this.emiPlansView.back()) {
         return;
@@ -2860,6 +2856,10 @@ Session.prototype = {
       }
     } else if (this.tab === 'bank_transfer') {
       if (this.bankTransferView.onBack()) {
+        return;
+      }
+    } else if (this.tab === 'emandate') {
+      if (this.emandateView.onBack()) {
         return;
       }
     } else {
@@ -3067,10 +3067,9 @@ Session.prototype = {
       this.upiTab.onShown();
     }
 
-    // TODO: implement onShown
-    // if (/^emandate/.test(tab)) {
-    // return this.emandateView.showTab(tab);
-    // }
+    if (tab === 'emandate') {
+      this.emandateView.onShown();
+    }
 
     if (tab === '' && this.tab === 'upi') {
       if (this.upiTab.onBack()) {
@@ -3526,10 +3525,6 @@ Session.prototype = {
         form = 'card';
       }
     }
-    if (form === 'emandate') {
-      form = 'netbanking';
-    }
-
     if (form === 'gpay') {
       form = 'upi';
     }
@@ -3575,7 +3570,7 @@ Session.prototype = {
       var activeForm = this.getActiveForm();
 
       if (
-        !_Arr.contains(['#form-upi', '#form-card', '#form-wallet'], activeForm)
+        !_Arr.contains(['#form-upi', '#form-card', '#form-wallet', '#form-emandate'], activeForm)
       ) {
         fillData(activeForm, data);
       }
@@ -3615,6 +3610,10 @@ Session.prototype = {
         if (this.svelteWalletsTab.isAnyWalletSelected()) {
           _Obj.extend(data, this.svelteWalletsTab.getPayload());
         }
+      }
+
+      if (this.tab === 'emandate') {
+        _Obj.extend(data, this.emandateView.getPayload());
       }
     }
 
@@ -4164,14 +4163,6 @@ Session.prototype = {
             delete data.emi_duration;
           }
         }
-      } else if (/^emandate/.test(screen)) {
-        if (this.screen === 'emandate') {
-          // TODO: looks like dead code, see if this can be removed
-          screen = 'netbanking';
-          data.bank = storeGetter(NetbankingScreenStore.selectedBank);
-          data.method = 'emandate';
-        }
-        return this.emandateView.submit(data);
       } else if (/^emiplans/.test(screen)) {
         if (!(data.method === 'cardless_emi' && data.emi_duration)) {
           return this.emiPlansView.submit();

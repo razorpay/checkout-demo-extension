@@ -20,10 +20,16 @@
 
   import { selectedBank } from 'checkoutstore/screens/netbanking';
 
-  import { getEMandateBanks } from 'checkoutstore/methods';
+  import {
+    getEMandateAuthTypes,
+    getEMandateBanks,
+  } from 'checkoutstore/methods';
 
   // Utils
   import { getBankLogo } from 'common/bank';
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
+  import { hideCta, showCtaWithDefaultText } from 'checkoutstore/cta';
 
   const session = getSession();
 
@@ -37,6 +43,11 @@
   const prefilledAuthType = session.get('prefill.auth_type');
 
   let prefilledAccountType = session.get('prefill.bank_account[account_type]');
+
+  const AuthTypes = {
+    NETBANKING: 'netbanking',
+    DEBIT_CARD: 'debitcard',
+  };
 
   const accountTexts = {
     savings: 'Savings Account',
@@ -59,8 +70,62 @@
     return (banks[bankCode] || {}).name || '';
   }
 
-  function getAuthTypes(bankCode) {
-    return (banks[bankCode] || {}).auth_types || [];
+  function showLandingView() {
+    let view = Views.AUTH_SELECTION;
+
+    if (prefilledBank) {
+      $selectedBank = prefilledBank;
+    }
+
+    if (prefilledAuthType) {
+      $authType = prefilledAuthType;
+    }
+
+    if (shouldSkipAuthSelection()) {
+      view = Views.BANK_DETAILS;
+    }
+
+    setView(view);
+  }
+
+  function shouldSkipAuthSelection() {
+    return prefilledBank && prefilledAuthType;
+  }
+
+  export function onShown() {
+    showLandingView();
+  }
+
+  export function onBack() {
+    $selectedBank = '';
+
+    if (!prefilledBank && currentView === Views.AUTH_SELECTION) {
+      session.switchTab('netbanking');
+      return true;
+    }
+
+    if (currentView === Views.BANK_DETAILS) {
+      // TODO: skip if both auth type and bank were prefilled.
+      if (shouldSkipAuthSelection()) {
+        return false;
+      }
+
+      setView(Views.AUTH_SELECTION);
+      return true;
+    }
+
+    return false;
+  }
+
+  export function getPayload() {
+    return {
+      'bank_account[account_number]': $accountNumber,
+      'bank_account[ifsc]': $ifsc,
+      'bank_account[name]': $name,
+      'bank_account[account_type]': $accountType,
+      auth_type: $authType,
+      bank: $selectedBank,
+    };
   }
 
   const Views = {
@@ -77,24 +142,45 @@
 
   let availableAuthTypes;
   $: {
-    availableAuthTypes = getAuthTypes($selectedBank);
+    availableAuthTypes = getEMandateAuthTypes($selectedBank);
   }
 
   const banks = getEMandateBanks();
 
-  function resetBankIfNotPrefilled() {
-    if (!prefilledBank) {
-      session.switchTab('netbanking');
-      // TODO: is there a better way?
-      // Wait for transition to complete before resetting bank
-      setTimeout(() => {
-        $selectedBank = '';
-      }, 200);
-    }
+  function resetBank() {
+    session.switchTab('netbanking');
+    // Wait for transition to complete before resetting bank
+    setTimeout(() => {
+      $selectedBank = '';
+    }, 200);
   }
 
   function setAuthType(newAuthType) {
     $authType = newAuthType;
+  }
+
+  function setView(view) {
+    currentView = view;
+    if (view !== Views.BANK_DETAILS) {
+      hideCta();
+    } else {
+      showCtaWithDefaultText();
+    }
+  }
+
+  function handleAuthTypeClicked(newAuthType) {
+    setAuthType(newAuthType);
+    trackAuthTypeSelected(newAuthType);
+    setView(Views.BANK_DETAILS);
+  }
+
+  function trackAuthTypeSelected(authType) {
+    Analytics.track('emandate:auth_type:select', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        auth_type: authType,
+      },
+    });
   }
 
   const icons = session.themeMeta.icons;
@@ -217,16 +303,16 @@
           </div>
           <div class="bank-name">{bankName}</div>
           {#if !prefilledBank}
-            <div class="btn-change-bank" on:click={resetBankIfNotPrefilled}>
-              Change Bank
-            </div>
+            <div class="btn-change-bank" on:click={resetBank}>Change Bank</div>
           {/if}
         </div>
 
         <div class="legend">Authenticate using</div>
         <div id="emandate-options" class="grid clear count-2">
-          {#if _Arr.contains(availableAuthTypes, 'debitcard')}
-            <div class="auth-option item debitcard">
+          {#if _Arr.contains(availableAuthTypes, AuthTypes.DEBIT_CARD)}
+            <div
+              class="auth-option item debitcard"
+              on:click={() => handleAuthTypeClicked(AuthTypes.DEBIT_CARD)}>
               <label>
                 <i class="theme">
                   {@html icons.card}
@@ -238,8 +324,10 @@
               </label>
             </div>
           {/if}
-          {#if _Arr.contains(availableAuthTypes, 'netbanking')}
-            <div class="auth-option item netbanking">
+          {#if _Arr.contains(availableAuthTypes, AuthTypes.NETBANKING)}
+            <div
+              class="auth-option item netbanking"
+              on:click={() => handleAuthTypeClicked(AuthTypes.NETBANKING)}>
               <label>
                 <i class="theme">
                   {@html icons.netbanking}
