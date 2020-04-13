@@ -44,7 +44,7 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getCardType } from 'common/card';
-  import { getSubtextForInstrument } from 'configurability/subtext';
+  import { getSubtextForInstrument } from 'common/subtext';
 
   // Transitions
   import { fade } from 'svelte/transition';

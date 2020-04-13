@@ -1,6 +1,6 @@
-import * as Subtext from 'configurability/subtext';
+import * as Subtext from 'common/subtext';
 
-test('Module: configurability/subtext', t => {
+test('Module: common/subtext', t => {
   test('Subtext.getSubtextForInstrument', t => {
     test('method: card', t => {
       let instrument;
