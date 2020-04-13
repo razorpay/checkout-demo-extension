@@ -246,14 +246,21 @@
     background: #f9fafb;
   }
 
-  .auth-option.item {
+  .auth-option {
     width: auto;
     float: none;
+    position: relative;
     border: 0;
+    padding: 14px 0;
     text-align: left;
+    cursor: pointer;
   }
 
-  .auth-option.item i {
+  .auth-option:not(:first-child) {
+    border-top: 1px solid #eee;
+  }
+
+  .auth-option i {
     float: left;
     font-size: 32px;
     margin: 2px 16px;
@@ -291,6 +298,10 @@
     margin-right: 10px;
   }
 
+  .emandate-fields {
+    padding: 0 12px;
+  }
+
   .bank-icon img {
     max-width: 100%;
     max-height: 100%;
@@ -313,7 +324,7 @@
         </div>
 
         <div class="legend">Authenticate using</div>
-        <div id="emandate-options" class="grid clear count-2">
+        <div id="emandate-options">
           {#if _Arr.contains(availableAuthTypes, AuthTypes.DEBIT_CARD)}
             <div
               class="auth-option item debitcard"
@@ -346,49 +357,50 @@
           {/if}
         </div>
       {:else if currentView === Views.BANK_DETAILS}
-        <AccountNumberField
-          name="bank_account[account_number]"
-          id="nb-acc-no"
-          bankCode={$selectedBank}
-          readonly={Boolean(prefillledBankAccount)}
-          bind:value={$accountNumber} />
+        <div class="emandate-fields">
+          <AccountNumberField
+            name="bank_account[account_number]"
+            id="nb-acc-no"
+            bankCode={$selectedBank}
+            readonly={Boolean(prefillledBankAccount)}
+            bind:value={$accountNumber} />
 
-        <IfscField
-          id="nb-acc-ifsc"
-          name="bank_account[ifsc]"
-          readonly={Boolean(prefilledIfsc)}
-          bind:value={$ifsc} />
+          <IfscField
+            id="nb-acc-ifsc"
+            name="bank_account[ifsc]"
+            readonly={Boolean(prefilledIfsc)}
+            bind:value={$ifsc} />
 
-        <NameField
-          id="nb-acc-name"
-          name="bank_account[name]"
-          readonly={Boolean(prefilledName)}
-          bind:value={$name} />
+          <NameField
+            id="nb-acc-name"
+            name="bank_account[name]"
+            readonly={Boolean(prefilledName)}
+            bind:value={$name} />
 
-        <div class="elem-wrap">
-          <div class="elem select" class:readonly={prefilledAccountType}>
-            <i class="select-arrow"></i>
-            <div class="help">Please select a bank account type</div>
-            <select
-              name="bank_account[account_type]"
-              required
-              class="input"
-              bind:value={$accountType}>
-              {#if prefilledAccountType}
-                <option value={prefilledAccountType}>
-                  {accountTexts[prefilledAccountType]}
-                </option>
-              {:else}
-                <option value="">Type of Bank Account</option>
-                {#each accountTypes as type}
-                  <option value={type}>{accountTexts[type]}</option>
-                {/each}
-              {/if}
-            </select>
+          <div class="elem-wrap">
+            <div class="elem select" class:readonly={prefilledAccountType}>
+              <i class="select-arrow"></i>
+              <div class="help">Please select a bank account type</div>
+              <select
+                name="bank_account[account_type]"
+                required
+                class="input"
+                bind:value={$accountType}>
+                {#if prefilledAccountType}
+                  <option value={prefilledAccountType}>
+                    {accountTexts[prefilledAccountType]}
+                  </option>
+                {:else}
+                  <option value="">Type of Bank Account</option>
+                  {#each accountTypes as type}
+                    <option value={type}>{accountTexts[type]}</option>
+                  {/each}
+                {/if}
+              </select>
+            </div>
           </div>
         </div>
       {/if}
-
     </div>
   </Screen>
 </Tab>
