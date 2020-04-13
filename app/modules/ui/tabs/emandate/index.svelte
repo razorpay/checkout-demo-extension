@@ -317,7 +317,9 @@
       {#if currentView === Views.AUTH_SELECTION}
         <div id="emandate-bank">
           <div class="bank-icon">
-            <img src={getBankLogo($selectedBank)} alt={bankName} />
+            {#if $selectedBank}
+              <img src={getBankLogo($selectedBank)} alt={bankName} />
+            {/if}
           </div>
           <div class="bank-name">{bankName}</div>
           {#if !prefilledBank}
