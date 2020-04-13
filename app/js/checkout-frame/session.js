@@ -2697,7 +2697,9 @@ Session.prototype = {
       screen === 'paylater' ||
       screen === 'qr' ||
       (screen === 'wallet' && !$('.wallet :checked')[0]) ||
-      screen === 'bank_transfer'
+      screen === 'bank_transfer' ||
+      screen === 'netbanking' ||
+      screen === 'emandate'
     ) {
       showPaybtn = false;
     }

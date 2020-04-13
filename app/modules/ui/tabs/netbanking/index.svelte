@@ -30,6 +30,7 @@
     isCorporateCode,
   } from 'common/bank';
   import { scrollIntoView } from 'lib/utils';
+  import { hideCta, showCtaWithDefaultText } from 'checkoutstore/cta';
 
   // Props
   export let banks;
@@ -71,6 +72,13 @@
 
   export function onShown() {
     active = true;
+    // For emandate, the screen switches as soon as user selects a bank. We do not need to show the CTA
+    // in that case.
+    if (recurring) {
+      hideCta();
+    } else {
+      showCtaWithDefaultText();
+    }
   }
 
   export function onBack() {
