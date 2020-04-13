@@ -5,6 +5,8 @@ import { MAX_PREFERRED_INSTRUMENTS } from 'common/constants';
 import { getBlockConfig } from 'configurability';
 import { isInstrumentForEntireMethod } from 'configurability/instruments';
 import { getIndividualInstruments } from 'configurability/ungroup';
+import Analytics from 'analytics';
+import * as AnalyticsTypes from 'analytics-types';
 
 function generateBasePreferredBlock(preferred) {
   const preferredBlock = createBlock('rzp.preferred', {
@@ -167,6 +169,11 @@ export function setBlocks({ preferred = [], merchantConfig = {} }, customer) {
         instrument.id = Track.makeUid();
       }
     });
+  });
+
+  Analytics.track('config:blocks', {
+    type: AnalyticsTypes.RENDER,
+    data: allBlocks,
   });
 
   blocks.set(allBlocks);
