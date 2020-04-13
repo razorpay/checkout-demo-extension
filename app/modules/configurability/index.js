@@ -4,6 +4,7 @@ import { clusterRazorpayBlocks } from './methods';
 import { ungroupInstruments, getIndividualInstruments } from './ungroup';
 import InstrumentConfig from './instruments-config';
 import { isInstrumentForEntireMethod } from './instruments';
+import { getUPIIntentApps } from 'checkoutframe';
 
 import { AVAILABLE_METHODS } from 'common/constants';
 import {
@@ -189,6 +190,18 @@ function removeNonApplicableInstrumentFlows(instrument) {
 
         if (instrument.apps && !_Arr.contains(instrument.flows, 'intent')) {
           delete instrument.apps;
+        }
+
+        if (instrument.apps) {
+          const allUpiAppsOnDevice = getUPIIntentApps().all;
+
+          // Keep only those apps which are present on the device
+          instrument.apps = _Arr.filter(instrument.apps, app =>
+            _Arr.find(
+              allUpiAppsOnDevice,
+              deviceApp => deviceApp.package_name === app
+            )
+          );
         }
       }
 
