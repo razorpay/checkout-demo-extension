@@ -2701,7 +2701,7 @@ Session.prototype = {
       screen === 'qr' ||
       (screen === 'wallet' && !$('.wallet :checked')[0]) ||
       screen === 'bank_transfer' ||
-      screen === 'netbanking' ||
+      (screen === 'netbanking' && Store.isRecurring()) ||
       screen === 'emandate'
     ) {
       showPaybtn = false;
