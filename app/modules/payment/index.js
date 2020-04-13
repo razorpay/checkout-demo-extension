@@ -25,7 +25,7 @@ import * as GPay from 'gpay';
 import Analytics from 'analytics';
 import { isProviderHeadless } from 'common/cardlessemi';
 import { updateCurrencies, setCurrenciesRate } from 'common/currency';
-import { getCardEntityFromPayload } from 'common/card';
+import { getCardEntityFromPayload, getIin, isIinValid } from 'common/card';
 
 /**
  * Tells if we're being executed from
@@ -858,26 +858,6 @@ razorpayProto.topupWallet = function() {
       }
     },
   });
-};
-
-/**
- * Gets the IIN from a card number
- * @param {string} cardNumber
- *
- * @returns {string} iin
- */
-const getIin = cardNumber => cardNumber.replace(/\D/g, '').slice(0, 6);
-
-/**
- * Tells whether or not the IIN is valid
- * @param {string} cardNumber
- *
- * @returns {boolean}
- */
-const isIinValid = cardNumber => {
-  const iin = getIin(cardNumber);
-
-  return iin && iin.length >= 6;
 };
 
 const CardFeatureCache = {
