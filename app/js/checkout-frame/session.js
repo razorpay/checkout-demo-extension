@@ -1271,6 +1271,10 @@ Session.prototype = {
       Analytics.setMeta('orientation', Hacks.getDeviceOrientation());
     });
 
+    if (discreet.UserAgent.Safari) {
+      Analytics.setMeta('safari', true);
+    }
+
     Analytics.track('complete', {
       type: AnalyticsTypes.RENDER,
       data: {
