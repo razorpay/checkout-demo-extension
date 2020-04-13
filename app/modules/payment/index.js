@@ -997,6 +997,10 @@ function getCardFeatures(cardNumber) {
 }
 
 /**
+ * [DEPRECATED]
+ * This method exists on the prototype only because
+ * it had been exposed to merchants previously.
+ *
  * Gets the flows associated with a card.
  * @param {string} cardNumber
  * @param {Function} callback
