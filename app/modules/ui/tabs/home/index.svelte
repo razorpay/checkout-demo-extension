@@ -98,6 +98,7 @@
   const showRecurringCallout =
     isRecurring() && session.tab !== 'emandate' && singleMethod === 'card';
 
+  const prefilledBank = session.get('prefill.bank');
   const isPartialPayment = getIsPartialPayment();
   const contactEmailReadonly = isContactEmailReadOnly();
 
@@ -607,7 +608,10 @@
     }
 
     if (method === 'emandate') {
-      method = 'netbanking';
+      // If bank is not prefilled, go to netbanking tab. Otherwise, go to the emandate tab directly.
+      if (!prefilledBank) {
+        method = 'netbanking';
+      }
     }
 
     session.switchTab(method);
