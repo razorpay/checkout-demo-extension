@@ -104,7 +104,10 @@ function instrumentPresentInGroup(instrument, group) {
   return true;
 }
 
-export function setBlocks({ preferred = [], merchantConfig = {} }, customer) {
+export function setBlocks(
+  { preferred = [], merchantConfig = {}, configSource },
+  customer
+) {
   const preferredBlock = generateBasePreferredBlock(preferred);
   const parsedConfig = getBlockConfig(merchantConfig, customer);
 

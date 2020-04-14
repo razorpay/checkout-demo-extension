@@ -125,15 +125,29 @@
       {}
     );
 
+    let config = null;
+    let source;
+
     if (_.isNull(displayFromOptions)) {
       // Setting config.display as null allows you to disable the configuration
-      return {};
+      source = 'options';
+      config = null;
+    } else if (_.isNull(displayFromPreferences)) {
+      source = 'preferences';
+      config = null;
     } else if (!_.isEmptyObject(displayFromOptions)) {
       // displayFromOptions will be an empty object by default
-      return displayFromOptions;
+      source = 'options';
+      config = displayFromOptions;
+    } else if (!_.isEmptyObject(displayFromPreferences)) {
+      source = 'preferences';
+      config = displayFromPreferences;
     }
 
-    return displayFromPreferences;
+    return {
+      config,
+      source,
+    };
   }
 
   export function showMethods() {
@@ -270,10 +284,13 @@
       ? getAllAvailableP13nInstruments($customer)
       : [];
 
+    const merchantConfig = getRawMerchantConfig();
+
     const blocksThatWereSet = setBlocks(
       {
         preferred: eligiblePreferredInstruments,
-        merchantConfig: getRawMerchantConfig(),
+        merchantConfig: merchantConfig.config,
+        configSource: merchantConfig.source,
       },
       $customer
     );
