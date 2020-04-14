@@ -25,7 +25,7 @@ import * as GPay from 'gpay';
 import Analytics from 'analytics';
 import { isProviderHeadless } from 'common/cardlessemi';
 import { updateCurrencies, setCurrenciesRate } from 'common/currency';
-import { getCardEntityFromPayload } from 'common/card';
+import { getCardEntityFromPayload, getIin, isIinValid } from 'common/card';
 
 /**
  * Tells if we're being executed from
@@ -860,32 +860,32 @@ razorpayProto.topupWallet = function() {
   });
 };
 
-/**
- * Cache store for flows.
- */
-var flowCache = {
-  card: {},
+const CardFeatureCache = {
+  iin: {},
+};
+const CardFeatureRequests = {
+  iin: {},
 };
 
 /**
- * Fetches card flows from cache.
+ * Fetches card features from cache.
+ * TODO: Remove cache for this when logic to determine Native OTP
+ *       flow can be supported using a Promise
  * @param {String} cardNumber
  *
  * @return {Object/undefined}
  */
-export function getCardFlowsFromCache(cardNumber = '') {
-  cardNumber = cardNumber.replace(/\D/g, '');
-
-  if (cardNumber.length < 6) {
-    return;
+export function getCardFeaturesFromCache(cardNumber) {
+  if (!isIinValid(cardNumber)) {
+    return {};
   }
 
-  const iin = cardNumber.slice(0, 6);
+  const iin = getIin(cardNumber);
 
-  const flows = flowCache.card[iin];
+  const features = CardFeatureCache.iin[iin];
 
-  if (flows) {
-    Analytics.track('flows:card:fetch:success', {
+  if (features) {
+    Analytics.track('features:card:fetch:success', {
       data: {
         iin,
         cache: true,
@@ -893,7 +893,7 @@ export function getCardFlowsFromCache(cardNumber = '') {
     });
   }
 
-  return flows;
+  return features;
 }
 
 /**
@@ -923,73 +923,91 @@ var CardCurrencyRequests = {};
 var CardCurrencyCache = {};
 
 /**
- * Gets the flows associated with a card.
+ * Gets the features associated with a card.
  * @param {string} cardNumber
- * @param {Function} callback
+ *
+ * @returns {Promise}
  */
-razorpayProto.getCardFlows = function(cardNumber = '', callback = _Func.noop) {
-  // Sanitize
-  cardNumber = cardNumber.replace(/\D/g, '');
-
-  if (cardNumber.length < 6) {
-    callback({});
-    return;
+function getCardFeatures(cardNumber) {
+  if (!isIinValid(cardNumber)) {
+    return Promise.resolve({});
   }
 
-  const iin = cardNumber.slice(0, 6);
+  const iin = getIin(cardNumber);
 
-  let exitClosure = function() {
-    let promise = ongoingFlowRequest.iin[iin];
-    if (callback) {
-      promise.then(callback);
-      promise.catch(callback);
-    }
-    return promise;
-  };
+  const existingRequest = CardFeatureRequests.iin[iin];
 
-  if (ongoingFlowRequest.iin[iin]) {
-    return exitClosure();
+  if (existingRequest) {
+    return existingRequest;
   }
 
-  ongoingFlowRequest.iin[iin] = new Promise((resolve, reject) => {
-    let url = makeAuthUrl(this, 'payment/flows');
-    // append IIN and source as query to flows route
+  CardFeatureRequests.iin[iin] = new Promise((resolve, reject) => {
+    let url = makeAuthUrl(this, 'payment/iin');
+
+    // append IIN and source as query
     url = _.appendParamsToUrl(url, {
       iin,
       '_[source]': Track.props.library,
     });
+
     fetch.jsonp({
       url,
-      callback: flows => {
-        if (flows.error) {
-          Analytics.track('flows:card:fetch:failure', {
+      callback: features => {
+        if (features.error) {
+          Analytics.track('features:card:fetch:failure', {
             data: {
               iin,
-              error: flows.error,
+              error: features.error,
             },
           });
-          return reject(flows.error);
+          return reject(features.error);
         }
-        // Add to cache.
-        flowCache.card[iin] = flows;
-        resolve(flows);
-        Analytics.track('flows:card:fetch:success', {
+
+        // Store in cache
+        CardFeatureCache.iin[iin] = features;
+
+        // Resolve
+        resolve(features);
+
+        Analytics.track('features:card:fetch:success', {
           data: {
             iin,
-            flows,
+            features,
           },
         });
       },
     });
-    Analytics.track('flows:card:fetch:start', {
+
+    Analytics.track('features:card:fetch:start', {
       data: {
         iin,
       },
     });
   });
 
-  return exitClosure();
+  return CardFeatureRequests.iin[iin];
+}
+
+/**
+ * [DEPRECATED]
+ * This method exists on the prototype only because
+ * it had been exposed to merchants previously.
+ *
+ * Gets the flows associated with a card.
+ * @param {string} cardNumber
+ * @param {Function} callback
+ */
+razorpayProto.getCardFlows = function(cardNumber = '', callback = _Func.noop) {
+  getCardFeatures(cardNumber)
+    .then(({ flows = {} }) => {
+      callback(flows);
+    })
+    .catch(() => {
+      callback({});
+    });
 };
+
+razorpayProto.getCardFeatures = getCardFeatures;
 
 /**
  * Gets the currencies associated with a card.

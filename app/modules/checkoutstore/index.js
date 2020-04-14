@@ -35,7 +35,7 @@ export const getCheckoutConfig = () => preferences.checkout_config;
 
 const optionGetter = option => () => getOption(option);
 export const getOption = option => razorpayInstance.get(option);
-export const getCardFlows = (iin, cb) => razorpayInstance.getCardFlows(iin, cb);
+export const getCardFeatures = iin => razorpayInstance.getCardFeatures(iin);
 export const getCardCurrencies = ({ iin, tokenId, cardNumber }) =>
   razorpayInstance.getCardCurrencies({
     iin,
