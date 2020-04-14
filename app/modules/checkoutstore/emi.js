@@ -5,6 +5,7 @@ export const selectedPlanTextForSavedCard = writable('');
 export const newCardEmiDuration = writable('');
 
 export const selectedTokenId = writable(null);
+export const selectedPlan = writable();
 export const emiDurations = writable({});
 
 export const savedCardEmiDuration = derived(

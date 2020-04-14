@@ -58,38 +58,16 @@
 
 <style>
   .screen {
-    height: 100%;
-    overflow: auto;
+    flex: 1;
     box-sizing: border-box;
-
     padding: 0;
-
     display: flex;
     flex-direction: column;
-  }
-
-  .grow {
-    flex-grow: 1;
-    height: 100%;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .screen-main {
     height: 100%;
     overflow: auto;
-    position: static; /* Needed for the overflow shadows */
   }
 
-  .screen-main.pad {
-    padding: 0 12px 12px;
-  }
-
-  .screen-bottom {
-    z-index: 1000;
-    flex-shrink: 0;
-  }
-
+  // @TODO
   .screen-bottom:not(.noShadow) > :global([slot='bottom']:not(:empty)) {
     box-shadow: 0px -6px 26px -17px rgba(0, 0, 0, 0.75);
   }
@@ -131,29 +109,22 @@
     /* background: linear-gradient(0deg, rgba(255,255,255,0.8477766106442577) 0%, rgba(255,255,255,0.8309698879551821) 51%, rgba(255,255,255,0.43881302521008403) 82%, rgba(255,255,255,0) 100%); */
   }
 
-  .grow.topShadow > .shadow-top {
+  .topShadow ~ .shadow-top {
     max-height: 24px;
   }
 
-  .grow.bottomShadow > .shadow-bottom {
+  .bottomShadow ~ .shadow-bottom {
     max-height: 24px;
   }
 </style>
 
-<div class="screen screen-comp">
-  <div class="grow" class:bottomShadow>
-    <div class="shadow shadow-top" />
-    <div class="shadow shadow-bottom" />
-    <div
-      class="screen-main"
-      class:pad
-      bind:this={contentRef}
-      on:scroll={onScroll}>
-      <slot name="main" />
-    </div>
-  </div>
-
-  <div class="screen-bottom" class:noShadow={bottomShadow}>
-    <slot name="bottom" />
-  </div>
+<div
+  class="screen screen-comp"
+  class:bottomShadow
+  class:pad
+  bind:this={contentRef}
+  on:scroll={onScroll}>
+  <slot />
 </div>
+<div class="shadow shadow-top" />
+<div class="shadow shadow-bottom" />

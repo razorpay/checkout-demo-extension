@@ -87,7 +87,7 @@ describe('Basic upi payment', () => {
     await verifyOfferApplied(context);
     await verifyDiscountPaybleAmount(context, '₹ 1,990');
     await verifyDiscountAmountInBanner(context, '₹ 1,990');
-    await verifyDiscountText(context, 'You save ₹ 10');
+    await verifyDiscountText(context, 'You save ₹10');
     await submit(context);
     await respondAndVerifyIntentRequest(context);
   });

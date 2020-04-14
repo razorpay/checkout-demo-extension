@@ -13,7 +13,7 @@ async function verifyLowDowntime(context, message, method) {
   let selector = '.downtime-callout';
 
   if (method) {
-    selector = `#form-${method} ${selector}`;
+    selector = `#form-${method}.drishy ~ #bottom .bottom[tab="${method}"] ${selector}`;
   }
 
   const warningDiv = await context.page.waitForSelector(selector);

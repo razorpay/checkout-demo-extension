@@ -1,7 +1,7 @@
 async function verifyHighDowntime(context, method, message) {
   if (context.preferences.offers) {
-    const toolTip = await context.page.waitForXPath(
-      '//div[contains(@class,"callout error downtime-callout")]'
+    const toolTip = await context.page.waitForSelector(
+      '.callout.error.downtime-callout'
     );
     const toolTipText = await context.page.evaluate(
       toolTip => toolTip.textContent,
@@ -9,8 +9,8 @@ async function verifyHighDowntime(context, method, message) {
     );
     expect(toolTipText).toContain(message); //class="callout error downtime-callout drishy"
   } else {
-    const toolTip = await context.page.waitForXPath(
-      '//button[@method = "' + method + '"]//*[@slot = "subtitle"]'
+    const toolTip = await context.page.waitForSelector(
+      'button[method="' + method + '"] [slot=subtitle]'
     );
     const toolTipText = await context.page.evaluate(
       toolTip => toolTip.textContent,
@@ -24,7 +24,7 @@ async function verifyLowDowntime(context, message, method) {
   let selector = '.downtime-callout';
 
   if (method) {
-    selector = `#form-${method} ${selector}`;
+    selector = `#form-${method}.drishy ~ #bottom .bottom[tab="${method}"] ${selector}`;
   }
 
   const warningDiv = await context.page.waitForSelector(selector);

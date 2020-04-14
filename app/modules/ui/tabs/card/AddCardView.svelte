@@ -27,7 +27,7 @@
     shouldRememberCustomer,
     isRecurring,
     isStrictlyRecurring,
-    getCardFlows,
+    getCardFeatures,
   } from 'checkoutstore';
   import { isAMEXEnabled } from 'checkoutstore/methods';
 
@@ -170,7 +170,7 @@
     let isValid = validateCardNumber();
     numberField.setValid(isValid);
 
-    const flowChecker = (flows = {}) => {
+    const flowChecker = ({ flows = {} } = {}) => {
       const cardNumber = getCardDigits(value);
       const isIinSame = getIin(cardNumber) === iin;
 
@@ -198,7 +198,9 @@
     }
 
     if (iin.length >= 6) {
-      getCardFlows(iin, flowChecker);
+      getCardFeatures(iin)
+        .then(flowChecker)
+        .catch(flowChecker);
     }
   }
 

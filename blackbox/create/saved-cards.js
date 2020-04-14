@@ -128,7 +128,8 @@ module.exports = function(testFeatures) {
         await verifyOfferApplied(context);
         await verifyDiscountPaybleAmount(context, '₹ 1,980');
         await verifyDiscountAmountInBanner(context, '₹ 1,980');
-        await verifyDiscountText(context, 'You save ₹ 20');
+        await verifyDiscountText(context, 'You save ₹20');
+        await delay(400);
       }
 
       if (partialPayment) {

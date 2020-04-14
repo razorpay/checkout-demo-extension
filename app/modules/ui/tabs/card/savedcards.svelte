@@ -38,34 +38,6 @@
     dispatch('viewPlans', event.detail);
   }
 
-  /**
-   * TODO: comment
-   * @param card
-   */
-  function handleOffersForSavedCard(card) {
-    session.removeAutomaticallyAppliedOffer();
-
-    // If EMI is supported on saved card
-    if (session.tab === 'emi' && card.plans) {
-      const issuer = card.card.issuer;
-      const duration = $savedCardEmiDuration;
-
-      // Set offer in case it is applicable.
-      if (issuer && duration) {
-        const plans = getEMIBankPlans(issuer);
-
-        if (
-          plans &&
-          plans[duration] &&
-          plans[duration].offer_id &&
-          session.offers
-        ) {
-          session.offers.selectOfferById(plans[duration].offer_id);
-        }
-      }
-    }
-  }
-
   function handleClick(card, { cvv, authType }) {
     // The same card was clicked again, do nothing.
     if ($selectedCard && $selectedCard.id === card.id) {
@@ -80,8 +52,6 @@
     currentCvv = cvv;
     currentAuthType = authType;
     $selectedCard = card;
-
-    handleOffersForSavedCard(card);
   }
 
   function handleCvvChange(event) {

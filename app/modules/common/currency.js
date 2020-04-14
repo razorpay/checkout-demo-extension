@@ -1260,11 +1260,14 @@ export function formatAmount(amount, currency) {
  * and the symbol on the left.
  * @param {Number} amount Amount in the lowest denomination
  * @param {String} currency
+ * @param {Boolean} space whether to have space between currency and amount
  *
  * @return {String}
  */
-export function formatAmountWithSymbol(amount, currency) {
-  return `${displayCurrencies[currency]} ${formatAmount(amount, currency)}`;
+export function formatAmountWithSymbol(amount, currency, space = true) {
+  return [displayCurrencies[currency], formatAmount(amount, currency)].join(
+    space ? ' ' : ''
+  );
 }
 
 export function displayAmount(razorpay, payloadAmount, payloadCurrency) {

@@ -2,6 +2,7 @@ import { writable } from 'svelte/store';
 import { getSession } from 'sessionmanager';
 import { displayAmount } from 'common/currency';
 import { TAB_TITLES } from 'common/constants';
+import { isCardValidForOffer } from 'checkoutstore/offers';
 
 export const cta = writable('');
 
@@ -11,6 +12,12 @@ cta.subscribe(text => {
   if (span) {
     _El.setContents(span, text);
   }
+});
+
+let withoutOffer = false;
+isCardValidForOffer.subscribe(value => {
+  withoutOffer = !value;
+  setAppropriateCtaText();
 });
 
 export function getStore() {
@@ -33,7 +40,6 @@ export function showAmountInCta() {
   } else {
     const offer = session.getAppliedOffer();
     const amount = (offer && offer.amount) || session.get('amount');
-
     updateCta('PAY ' + displayAmount(session.r, amount));
   }
 }
@@ -43,15 +49,23 @@ export function showAmountInCta() {
  */
 export function setAppropriateCtaText() {
   const session = getSession();
+  if (!session) {
+    return;
+  }
+  const tab = session.tab;
 
-  if (session.tab === '') {
-    if (session.homeTab && session.homeTab.onDetailsScreen()) {
+  if (tab === '') {
+    if (session.homeTab?.onDetailsScreen()) {
       session.homeTab.setDetailsCta();
     } else {
       showAmountInCta();
     }
   } else {
-    showAmountInCta();
+    if (withoutOffer && (tab === 'card' || tab === 'emi')) {
+      updateCta('Pay Without Offer');
+    } else {
+      showAmountInCta();
+    }
   }
 }
 

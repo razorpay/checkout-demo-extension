@@ -77,16 +77,20 @@ export function sanitizeHtmlEntities(string) {
 function oxfordComma(list) {
   const length = list.length;
 
-  if (list.length === 1) {
-    return list[0];
-  }
+  switch (length) {
+    case 0:
+      return '';
 
-  // We do not use an oxford comma for two items
-  if (list.length === 2) {
-    return list.join(' and ');
-  }
+    case 1:
+      return list[0];
 
-  return `${list.slice(0, length - 1).join(', ')}, and ${list[length - 1]}`;
+    // We do not use an oxford comma for two items
+    case 2:
+      return list.join(' and ');
+
+    default:
+      return `${list.slice(0, length - 1).join(', ')}, and ${list[length - 1]}`;
+  }
 }
 
 /**

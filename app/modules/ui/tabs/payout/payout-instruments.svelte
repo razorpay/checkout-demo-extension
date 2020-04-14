@@ -39,11 +39,6 @@
 </script>
 
 <style>
-  :global(#form-payouts) {
-    overflow: auto;
-    top: 0;
-  }
-
   .instrument-group {
     font-size: 13px;
   }
@@ -158,103 +153,99 @@
 
 <Tab method="payouts" overrideMethodCheck={true} pad={false}>
   <Screen>
-    <div slot="main">
-      <div class="title">
-        <h3>Select an account</h3>
-        <p>{amount} will be credited to your specified account.</p>
-      </div>
-
-      {#if upiAccountsAvailable}
-        <div class="instrument-group">
-          <div class="instrument-header">
-            <div class="icon-left">
-              <Icon icon={themeMeta.icons['upi']} alt="UPI" />
-            </div>
-            <span class="header-text">Select a UPI ID</span>
-          </div>
-          <div class="options">
-            {#each upiAccounts as account (account.id)}
-              <PayoutInstrument
-                {account}
-                selected={selectedInstrument && selectedInstrument.id === account.id}
-                on:select={() => select(account)}>
-                <div class="instrument-name">{account.vpa.address}</div>
-              </PayoutInstrument>
-            {/each}
-            <div
-              class="instrument-add option next-option secondary-color"
-              on:click={() => dispatch('add', { method: 'upi' })}>
-              <div class="icon icon-left icon-add">+</div>
-              Add UPI ID
-            </div>
-          </div>
-        </div>
-      {/if}
-
-      {#if bankAccountsAvailable}
-        <div class="instrument-group">
-          <div class="instrument-header">
-            <div class="icon-left ref-nbicon">
-              <Icon icon={themeMeta.icons['netbanking']} alt="Netbanking" />
-            </div>
-            <span class="header-text">Select a Bank Account</span>
-          </div>
-          <div class="options">
-            {#each bankAccounts as account (account.id)}
-              <PayoutInstrument
-                {account}
-                selected={selectedInstrument && selectedInstrument.id === account.id}
-                on:select={() => select(account)}>
-                <div class="instrument-name">
-                  A/c No. {account.bank_account.account_number}
-                </div>
-                <div class="instrument-info">
-                  IFSC: {account.bank_account.ifsc}, {account.bank_account.name}
-                </div>
-              </PayoutInstrument>
-            {/each}
-            <div
-              class="instrument-add option next-option secondary-color"
-              on:click={() => dispatch('add', { method: 'bank' })}>
-              <div class="icon icon-left icon-add">+</div>
-              Add Bank Account
-            </div>
-          </div>
-
-        </div>
-      {/if}
-
-      {#if !upiAccountsAvailable}
-        <div class="options add-option">
-
-          <NextOption
-            icon={themeMeta.icons.upi}
-            tabindex="0"
-            attributes={{ role: 'button', 'aria-label': 'Add a UPI ID' }}
-            classes={['secondary-color']}
-            on:select={() => dispatch('add', { method: 'upi' })}>
-            <div>UPI</div>
-            <div class="desc">Add a UPI ID (BHIM, PhonePe and more)</div>
-          </NextOption>
-
-        </div>
-      {/if}
-
-      {#if !bankAccountsAvailable}
-        <div class="options add-option">
-
-          <NextOption
-            icon={themeMeta.icons.netbanking}
-            tabindex="0"
-            attributes={{ role: 'button', 'aria-label': 'Add a UPI ID' }}
-            classes={['secondary-color']}
-            on:select={() => dispatch('add', { method: 'bank' })}>
-            <div>BANK</div>
-            <div class="desc">Add a Bank Account</div>
-          </NextOption>
-
-        </div>
-      {/if}
+    <div class="title">
+      <h3>Select an account</h3>
+      <p>{amount} will be credited to your specified account.</p>
     </div>
+
+    {#if upiAccountsAvailable}
+      <div class="instrument-group">
+        <div class="instrument-header">
+          <div class="icon-left">
+            <Icon icon={themeMeta.icons['upi']} alt="UPI" />
+          </div>
+          <span class="header-text">Select a UPI ID</span>
+        </div>
+        <div class="options">
+          {#each upiAccounts as account (account.id)}
+            <PayoutInstrument
+              {account}
+              selected={selectedInstrument && selectedInstrument.id === account.id}
+              on:select={() => select(account)}>
+              <div class="instrument-name">{account.vpa.address}</div>
+            </PayoutInstrument>
+          {/each}
+          <div
+            class="instrument-add option next-option secondary-color"
+            on:click={() => dispatch('add', { method: 'upi' })}>
+            <div class="icon icon-left icon-add">+</div>
+            Add UPI ID
+          </div>
+        </div>
+      </div>
+    {/if}
+
+    {#if bankAccountsAvailable}
+      <div class="instrument-group">
+        <div class="instrument-header">
+          <div class="icon-left ref-nbicon">
+            <Icon icon={themeMeta.icons['netbanking']} alt="Netbanking" />
+          </div>
+          <span class="header-text">Select a Bank Account</span>
+        </div>
+        <div class="options">
+          {#each bankAccounts as account (account.id)}
+            <PayoutInstrument
+              {account}
+              selected={selectedInstrument && selectedInstrument.id === account.id}
+              on:select={() => select(account)}>
+              <div class="instrument-name">
+                A/c No. {account.bank_account.account_number}
+              </div>
+              <div class="instrument-info">
+                IFSC: {account.bank_account.ifsc}, {account.bank_account.name}
+              </div>
+            </PayoutInstrument>
+          {/each}
+          <div
+            class="instrument-add option next-option secondary-color"
+            on:click={() => dispatch('add', { method: 'bank' })}>
+            <div class="icon icon-left icon-add">+</div>
+            Add Bank Account
+          </div>
+        </div>
+
+      </div>
+    {/if}
+
+    {#if !upiAccountsAvailable}
+      <div class="options add-option">
+
+        <NextOption
+          icon={themeMeta.icons.upi}
+          tabindex="0"
+          attributes={{ role: 'button', 'aria-label': 'Add a UPI ID' }}
+          classes={['secondary-color']}
+          on:select={() => dispatch('add', { method: 'upi' })}>
+          <div>UPI</div>
+          <div class="desc">Add a UPI ID (BHIM, PhonePe and more)</div>
+        </NextOption>
+
+      </div>
+    {/if}
+
+    {#if !bankAccountsAvailable}
+      <div class="options add-option">
+        <NextOption
+          icon={themeMeta.icons.netbanking}
+          tabindex="0"
+          attributes={{ role: 'button', 'aria-label': 'Add a UPI ID' }}
+          classes={['secondary-color']}
+          on:select={() => dispatch('add', { method: 'bank' })}>
+          <div>BANK</div>
+          <div class="desc">Add a Bank Account</div>
+        </NextOption>
+      </div>
+    {/if}
   </Screen>
 </Tab>

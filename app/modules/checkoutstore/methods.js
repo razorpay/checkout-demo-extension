@@ -145,6 +145,10 @@ const ALL_METHODS = {
   },
 };
 
+export function isZestMoneyEnabled() {
+  return isMethodEnabled('cardless_emi') && getCardlessEMIProviders().zestmoney;
+}
+
 export function isMethodEnabled(method) {
   const checker = ALL_METHODS[method];
   if (checker) {
@@ -375,7 +379,7 @@ export function getCardlessEMIProviders() {
 export function getWallets() {
   /**
    * disable wallets if:
-   * - amount > 20k
+   * - amount > 1L
    * - Wallets not enabled by backend
    * - Recurring payment
    * - International
@@ -389,7 +393,7 @@ export function getWallets() {
   if (
     !getAmount() ||
     passedWallets === false ||
-    getAmount() >= 20000 * 100 ||
+    getAmount() >= 1e5 * 100 ||
     isRecurring() ||
     isInternational()
   ) {

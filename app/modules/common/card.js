@@ -223,3 +223,15 @@ export function isCardNetworkInPaymentOneOf(
     )
   );
 }
+
+/**
+ * Tells whether or not the IIN is valid
+ * @param {string} cardNumber
+ *
+ * @returns {boolean}
+ */
+export const isIinValid = cardNumber => {
+  const iin = getIin(cardNumber);
+
+  return iin && iin.length >= 6;
+};

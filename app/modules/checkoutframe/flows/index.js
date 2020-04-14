@@ -1,4 +1,4 @@
-import { getCardFlowsFromCache } from 'payment';
+import { getCardFeaturesFromCache } from 'payment';
 
 const Flows = {
   PIN: 'pin',
@@ -33,7 +33,7 @@ function getFlowsForPayment(paymentData, tokens = []) {
       return cardToken.card.flows;
     }
   } else if (cardNumber) {
-    const flows = getCardFlowsFromCache(cardNumber);
+    const { flows } = getCardFeaturesFromCache(cardNumber) || {};
 
     if (flows) {
       return flows;

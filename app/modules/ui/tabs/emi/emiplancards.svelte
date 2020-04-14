@@ -1,0 +1,23 @@
+<script>
+  import EmiPlanCard from 'ui/tabs/emi/emiplancard.svelte';
+  export let plans;
+  export let bank;
+  export let expanded;
+  export let amount;
+  export let provider;
+  export let expand;
+  export let title = 'Select an EMI Plan';
+</script>
+
+<h3>{title}</h3>
+<div class="emi-plans-list expandable-card-list">
+  {#each plans as plan, index}
+    <EmiPlanCard
+      {plan}
+      {bank}
+      expanded={plan.duration === expanded}
+      {amount}
+      {provider}
+      on:click={() => expand(plan)} />
+  {/each}
+</div>
