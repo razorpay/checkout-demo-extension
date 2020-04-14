@@ -20,6 +20,8 @@ import * as strings from 'common/strings';
 import * as UserAgent from 'common/useragent';
 import emiView from 'checkoutframe/emi';
 import FeeBearerView from 'ui/components/feebearer.svelte';
+import OffersView from 'ui/components/offers/index.svelte';
+import NoCostExplainer from 'ui/components/offers/NoCostExplainer.svelte';
 import emandateView from 'checkoutframe/emandate';
 import emiPlansView from 'checkoutframe/emiplans';
 import otpView from 'checkoutframe/otp';
@@ -151,6 +153,8 @@ export default {
   emiPlansView,
 
   FeeBearerView,
+  OffersView,
+  NoCostExplainer,
   PayoutsInstruments,
   PayoutAccount,
 

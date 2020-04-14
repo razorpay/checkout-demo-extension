@@ -1,5 +1,6 @@
 import { getDowntimes as _getDowntimes } from 'checkoutframe/downtimes';
 import { TAB_TITLES } from 'common/constants';
+import { makeAuthUrl as _makeAuthUrl } from 'common/Razorpay';
 
 let razorpayInstance, preferences;
 
@@ -12,6 +13,7 @@ export function setRazorpayInstance(_razorpayInstance) {
     razorpayInstance.set('theme.image_frame', false);
   }
 }
+export const makeAuthUrl = url => _makeAuthUrl(razorpayInstance, url);
 
 const IRCTC_KEYS = [
   'rzp_test_mZcDnA8WJMFQQD',
@@ -45,7 +47,7 @@ export const getCardCurrencies = ({ iin, tokenId, cardNumber }) =>
 
 const entityWithAmount = ['order', 'invoice', 'subscription'];
 const getEntityWithAmount = () =>
-  entityWithAmount.find(entity => preferences |> _Obj.hasProp(entity));
+  entityWithAmount |> _Arr.find(entity => preferences |> _Obj.hasProp(entity));
 
 // @TODO return amount based on partial payment
 // @TODO use everywhere instead of session.get('amount')
@@ -54,11 +56,12 @@ export const getAmount = () => {
   return getOption('amount');
 };
 
-// @TODO export and use everywhere
+// @TODO use everywhere
 export const getCurrency = () => {
   return getEntityWithAmount()?.currency || getOption('currency');
 };
 
+export const getOrderId = optionGetter('order_id');
 export const getPrefilledContact = optionGetter('prefill.contact');
 export const getPrefilledEmail = optionGetter('prefill.email');
 export const getPrefilledName = optionGetter('prefill.name');

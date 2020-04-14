@@ -27,7 +27,7 @@
   const session = getSession();
 
   function getBankText(card, loggedIn) {
-    const banks = getBanks();
+    const banks = getBanks() || {};
     const bank = banks[card.issuer] || '';
     const bankText = bank.replace(/ Bank$/, '');
     const cardType = card.type || '';

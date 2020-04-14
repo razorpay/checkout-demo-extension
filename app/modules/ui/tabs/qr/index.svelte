@@ -6,6 +6,8 @@
   import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
   import FeeBearer from 'ui/components/feebearer.svelte';
+  import Bottom from 'ui/layouts/Bottom.svelte';
+  import Tab from 'ui/tabs/Tab.svelte';
 
   // Utils imports
   import RazorpayConfig from 'common/RazorpayConfig';
@@ -124,15 +126,9 @@
 </script>
 
 <style>
-  :global(#body[tab='qr']) {
-    height: 374px;
-  }
-  .loading {
-    margin-top: 20px;
-  }
-  .container {
+  :global(#form-qr) {
     text-align: center;
-    padding: 15px 0;
+    padding-top: 12px;
   }
   .message {
     background: no-repeat center bottom;
@@ -194,7 +190,7 @@
   }
 </style>
 
-<div class="container">
+<Tab method="qr">
   {#if view === 'fee'}
     <FeeBearer {paymentData} on:continue={createPaymentWithFees} />
   {:else if view === 'qr'}
@@ -222,9 +218,11 @@
   {/if}
 
   {#if down || disabled}
-    <DowntimeCallout severe={disabled}>
-      <strong>UPI QR</strong>
-      is experiencing low success rates.
-    </DowntimeCallout>
+    <Bottom tab="qr">
+      <DowntimeCallout severe={disabled}>
+        <strong>UPI QR</strong>
+        is experiencing low success rates.
+      </DowntimeCallout>
+    </Bottom>
   {/if}
-</div>
+</Tab>

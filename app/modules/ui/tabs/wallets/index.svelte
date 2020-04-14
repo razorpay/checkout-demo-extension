@@ -76,18 +76,15 @@
   const walletReferences = {};
 
   export function onWalletSelection(e, code) {
-    selectedWallet = code;
+    const offerError = !session.validateOffers(code, function(removeOffer) {
+      if (removeOffer) {
+        selectedWallet = code;
+      }
+    });
 
-    if (!session.validateOffers(selectedWallet)) {
-      session.showOffersError(function(removeOffer) {
-        if (removeOffer) {
-          selectedWallet = code;
-        } else {
-          selectedWallet = null;
-        }
-      });
-
-      return;
+    if (!offerError) {
+      selectedWallet = code;
+      showCta();
     }
 
     if (ua_iPhone) {
@@ -101,8 +98,6 @@
         power: WalletsData.isPowerWallet(selectedWallet),
       },
     });
-
-    showCta();
   }
 
   export function onShown() {

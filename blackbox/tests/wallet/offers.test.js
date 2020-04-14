@@ -59,7 +59,7 @@ describe('Basic wallet payment', () => {
     await verifyOfferApplied(context);
     await verifyDiscountPaybleAmount(context, '₹ 1,980');
     await verifyDiscountAmountInBanner(context, '₹ 1,980');
-    await verifyDiscountText(context, 'You save ₹ 20');
+    await verifyDiscountText(context, 'You save ₹20');
     await submit(context);
 
     await handleValidationRequest(context, 'fail');
@@ -67,7 +67,7 @@ describe('Basic wallet payment', () => {
     await verifyOfferApplied(context);
     await verifyDiscountPaybleAmount(context, '₹ 1,980');
     await verifyDiscountAmountInBanner(context, '₹ 1,980');
-    await verifyDiscountText(context, 'You save ₹ 20');
+    await verifyDiscountText(context, 'You save ₹20');
     await submit(context);
 
     await handleValidationRequest(context, 'pass');

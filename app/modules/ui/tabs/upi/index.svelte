@@ -37,7 +37,7 @@
   import GooglePayOmnichannel from './GooglePayOmnichannel.svelte';
   import NextOption from 'ui/elements/options/NextOption.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
-  import OffersPortal from 'ui/components/OffersPortal.svelte';
+  import Bottom from 'ui/layouts/Bottom.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import AddANewVpa from './AddANewVpa.svelte';
   import { getMiscIcon } from 'icons/misc';
@@ -475,9 +475,9 @@
   }
 </style>
 
-<Tab method="upi" {down} pad={false}>
+<Tab method="upi" pad={false}>
   <Screen>
-    <div slot="main">
+    <div>
 
       {#if intent}
         <UpiIntent
@@ -579,15 +579,13 @@
       {/if}
     </div>
 
-    <div slot="bottom">
+    <Bottom tab="upi">
       {#if down || disabled}
         <DowntimeCallout severe={disabled}>
           <strong>UPI</strong>
           is experiencing low success rates.
         </DowntimeCallout>
       {/if}
-
-      <OffersPortal />
-    </div>
+    </Bottom>
   </Screen>
 </Tab>

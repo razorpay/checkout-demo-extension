@@ -93,7 +93,7 @@ describe.each(
     await verifyOfferApplied(context);
     await verifyDiscountPaybleAmount(context, '₹ 1,990');
     await verifyDiscountAmountInBanner(context, '₹ 1,990');
-    await verifyDiscountText(context, 'You save ₹ 10');
+    await verifyDiscountText(context, 'You save ₹10');
     await verifyHighDowntime(
       context,
       'upi',

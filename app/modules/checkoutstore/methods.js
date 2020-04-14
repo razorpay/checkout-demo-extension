@@ -145,6 +145,10 @@ const ALL_METHODS = {
   },
 };
 
+export function isZestMoneyEnabled() {
+  return isMethodEnabled('cardless_emi') && getCardlessEMIProviders().zestmoney;
+}
+
 export function isMethodEnabled(method) {
   const checker = ALL_METHODS[method];
   if (checker) {
