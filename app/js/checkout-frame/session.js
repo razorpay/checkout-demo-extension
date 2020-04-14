@@ -119,6 +119,22 @@ function confirmClose() {
   return confirm(discreet.confirmCancelMsg);
 }
 
+/**
+ * A valid contact can only contain
+ * - number
+ * - spaces
+ * - hyphens
+ * - parenthesis
+ * - plus
+ *
+ * @param {string} contact
+ *
+ * @returns {boolean}
+ */
+function doesContactHaveValidCharacters(contact) {
+  return !/[^\d\+\s\-\(\)]+/.test(contact);
+}
+
 function fillData(container, returnObj) {
   each($(container).find('input[name],select[name]'), function(i, el) {
     if (/radio|checkbox/.test(el.getAttribute('type')) && !el.checked) {
@@ -138,6 +154,18 @@ function improvisePrefilledContact(session) {
   var prefilledContact = session.get('prefill.contact');
 
   if (!prefilledContact) {
+    return;
+  }
+
+  // We have some invalid charactes
+  if (!doesContactHaveValidCharacters(prefilledContact)) {
+    Analytics.track('prefill:invalid:chars', {
+      data: {
+        type: 'contact',
+        value: prefilledContact,
+      },
+    });
+
     return;
   }
 
