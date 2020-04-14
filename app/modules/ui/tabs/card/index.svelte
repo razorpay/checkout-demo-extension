@@ -43,7 +43,8 @@
   import { getSavedCards, transform } from 'common/token';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import { getCardType, getSubtextFromCardInstrument } from 'common/card';
+  import { getCardType } from 'common/card';
+  import { getSubtextForInstrument } from 'common/subtext';
 
   // Transitions
   import { fade } from 'svelte/transition';
@@ -197,7 +198,7 @@
     } else if ($methodTabInstrument.method !== tab) {
       instrumentSubtext = undefined;
     } else {
-      instrumentSubtext = getSubtextFromCardInstrument($methodTabInstrument);
+      instrumentSubtext = getSubtextForInstrument($methodTabInstrument);
     }
   }
 
