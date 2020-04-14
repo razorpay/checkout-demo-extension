@@ -18,6 +18,7 @@ import countrycodes from 'countrycodes';
  */
 
 const MAX_LENGTH_COUNTRY_CODE = 3;
+const AMERICAN_REGEX = /^\(\d{3}\)[\s\-]?\d{3}\-?\d{4}$/;
 
 const hasPlus = number => _Str.startsWith(number, '+');
 const removePlus = number => number.replace(/^\+/, '');
@@ -90,6 +91,28 @@ function getIndianNumber(number) {
 }
 
 /**
+ * Returns the object if the number is American
+ * @param {string} number
+ *
+ * @returns {Object}
+ */
+function getAmericanFormattedNumber(number) {
+  number = number.trim();
+
+  if (AMERICAN_REGEX.test(number)) {
+    return {
+      success: true,
+      code: '1',
+      phone: sanitizeNumber(number),
+    };
+  }
+
+  return {
+    success: false,
+  };
+}
+
+/**
  * Finds country code for a given phonenumber
  * @param {string} phonenumber
  * @returns {Object} With country code and phonenumber
@@ -101,6 +124,15 @@ export function findCountryCode(phno) {
     return {
       phone: indian.phone,
       code: indian.code,
+    };
+  }
+
+  let american = getAmericanFormattedNumber(phno);
+
+  if (american.success) {
+    return {
+      phone: american.phone,
+      code: american.code,
     };
   }
 
