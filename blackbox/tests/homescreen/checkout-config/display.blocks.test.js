@@ -17,6 +17,7 @@ const {
   assertShownWallets,
   assertShownPaylaterProviders,
   assertShownCardlessEmiProviders,
+  assertCardScreenAndText,
 } = require('./config-utils');
 
 function augmentPreferences(preferences) {
@@ -80,6 +81,10 @@ const CONFIG = {
           {
             method: 'cardless_emi',
             providers: ['zestmoney', 'earlysalary'],
+          },
+          {
+            method: 'card',
+            issuers: ['HDFC', 'ICIC'],
           },
         ],
       },
@@ -465,5 +470,47 @@ describe('display.blocks', () => {
       'ZestMoney',
       'EarlySalary',
     ]);
+  });
+});
+
+describe('display.blocks', () => {
+  test('Grouped instrument: Cards', async () => {
+    const preferences = augmentPreferences(makePreferences());
+
+    const options = {
+      key: 'rzp_test_1DP5mmOlF5G5ag',
+      amount: 600000,
+      prefill: {
+        contact: '+919988776655',
+        email: 'void@razorpay.com',
+      },
+
+      config: CONFIG,
+    };
+
+    const context = await openCheckoutWithNewHomeScreen({
+      page,
+      options,
+      preferences,
+      apps: true,
+    });
+
+    // User details
+    await fillUserDetails(context, '9988776655');
+    await assertUserDetails(context);
+
+    // Get the grouped Card instrument
+    const cardInstrument = await context.page.$(
+      `.methods-block[data-block='block.grouped'] [role=list] > *:nth-child(9)`
+    );
+
+    // Select it
+    await cardInstrument.click();
+
+    // Assert that expected info is shown
+    await assertCardScreenAndText(
+      context,
+      'Only HDFC and ICICI cards supported'
+    );
   });
 });

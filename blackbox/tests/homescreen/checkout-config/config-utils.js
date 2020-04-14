@@ -231,6 +231,27 @@ async function assertShownCardlessEmiProviders(context, providers) {
   expect(matchAllStringsInList(providers, values)).toBe(true);
 }
 
+/**
+ * Asserts that all expected cardless EMI providers are shown
+ * @param {Context} context
+ * @param {string} text Description
+ */
+async function assertCardScreenAndText(context, text) {
+  // Card screen is visible
+  await context.page.waitForSelector('#form-card', {
+    visible: true,
+    timeout: 500,
+  });
+
+  let description = await innerText(
+    '#form-card .instrument-subtext-description'
+  );
+  description = description.trim();
+
+  // Description is what is expected
+  expect(description).toBe(text);
+}
+
 module.exports = {
   parseBlocksFromHomescreen,
   isIndividualInstrument,
@@ -241,4 +262,5 @@ module.exports = {
   assertShownWallets,
   assertShownPaylaterProviders,
   assertShownCardlessEmiProviders,
+  assertCardScreenAndText,
 };
