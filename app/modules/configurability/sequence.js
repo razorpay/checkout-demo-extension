@@ -22,7 +22,7 @@ export function getSequencedBlocks(params) {
     show_default_blocks = true, // Show default blocks by default
   } = preferences;
 
-  let { sequence = [] } = original;
+  let { sequence = [] } = original || {};
 
   // Get the methods to list
   const methodsToList = _Arr.filter(

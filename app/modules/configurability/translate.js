@@ -15,7 +15,7 @@ import { createBlock } from './blocks';
 function _translate(options, external) {
   options = _Obj.clone(options);
 
-  const { blocks = {}, hide = [] } = options;
+  const { blocks = {}, hide = [] } = options || {};
 
   /**
    * Create blocks
