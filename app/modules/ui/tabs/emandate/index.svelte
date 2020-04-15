@@ -99,6 +99,7 @@
 
   export function onShown() {
     showLandingView();
+    setCtaVisibility(currentView);
   }
 
   export function onBack() {
@@ -171,7 +172,11 @@
   }
 
   $: {
-    if (currentView !== Views.BANK_DETAILS) {
+    setCtaVisibility(currentView);
+  }
+
+  function setCtaVisibility(view) {
+    if (view !== Views.BANK_DETAILS) {
       hideCta();
     } else {
       showCtaWithDefaultText();
