@@ -1,6 +1,4 @@
 <script>
-  /* global _Arr */
-
   import { getSession } from 'sessionmanager';
 
   // UI Imports
@@ -28,6 +26,8 @@
   import {
     getEMandateAuthTypes,
     getEMandateBanks,
+    isEMandateAuthTypeEnabled,
+    isEMandateBankEnabled,
   } from 'checkoutstore/methods';
 
   // Utils
@@ -46,6 +46,12 @@
   const prefilledName = session.get('prefill.bank_account[name]');
   const prefilledIfsc = session.get('prefill.bank_account[ifsc]');
   const prefilledAuthType = session.get('prefill.auth_type');
+
+  const isPrefilledBankAvailable =
+    prefilledBank && isEMandateBankEnabled(prefilledBank);
+  const isPrefilledAuthTypeAvailable =
+    prefilledAuthType &&
+    isEMandateAuthTypeEnabled(prefilledBank, prefilledAuthType);
 
   let prefilledAccountType = session.get('prefill.bank_account[account_type]');
 
@@ -75,53 +81,80 @@
     return (banks[bankCode] || {}).name || '';
   }
 
-  function showLandingView() {
-    let view = Views.AUTH_SELECTION;
-
-    if (prefilledBank) {
+  function setInitialState() {
+    if (isPrefilledBankAvailable) {
       $selectedBank = prefilledBank;
     }
 
-    if (prefilledAuthType) {
+    if (isPrefilledAuthTypeAvailable) {
       $authType = prefilledAuthType;
     }
+
+    const availableAuthTypes = getEMandateAuthTypes($selectedBank);
+    if (availableAuthTypes.length === 1) {
+      $authType = availableAuthTypes[0];
+    }
+  }
+
+  function determineLandingView() {
+    let view = Views.AUTH_SELECTION;
 
     if (shouldSkipAuthSelection()) {
       view = Views.BANK_DETAILS;
     }
 
-    setView(view);
+    return view;
+  }
+
+  function showLandingView() {
+    setView(determineLandingView());
   }
 
   function shouldSkipAuthSelection() {
-    return prefilledBank && prefilledAuthType;
+    return (
+      (isPrefilledBankAvailable && isPrefilledAuthTypeAvailable) ||
+      getEMandateAuthTypes($selectedBank).length === 1
+    );
   }
 
   export function onShown() {
+    active = true;
+    setInitialState();
     showLandingView();
     setCtaVisibility(currentView);
   }
 
   export function onBack() {
-    if (currentView === Views.AUTH_SELECTION || shouldSkipAuthSelection()) {
-      $selectedBank = '';
-    }
+    Analytics.track('emandate:back', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        auth_type: $authType,
+      },
+    });
 
-    if (!prefilledBank && currentView === Views.AUTH_SELECTION) {
+    const shouldGoToNBScreen =
+      !prefilledBank &&
+      (currentView === Views.AUTH_SELECTION || shouldSkipAuthSelection());
+
+    if (shouldGoToNBScreen) {
+      $selectedBank = '';
+      active = false;
       session.switchTab('netbanking');
       return true;
     }
 
     if (currentView === Views.BANK_DETAILS) {
-      // TODO: skip if both auth type and bank were prefilled.
       if (shouldSkipAuthSelection()) {
+        active = false;
         return false;
       }
 
       setView(Views.AUTH_SELECTION);
+      active = true;
       return true;
     }
 
+    active = false;
     return false;
   }
 
@@ -148,10 +181,7 @@
     bankName = getBankName($selectedBank);
   }
 
-  let availableAuthTypes;
-  $: {
-    availableAuthTypes = getEMandateAuthTypes($selectedBank);
-  }
+  let active = false;
 
   const banks = getEMandateBanks();
 
@@ -172,15 +202,19 @@
   }
 
   $: {
-    setCtaVisibility(currentView);
+    if (active) {
+      setCtaVisibility(currentView);
+    }
   }
 
   function setCtaVisibility(view) {
-    if (view !== Views.BANK_DETAILS) {
-      hideCta();
-    } else {
-      showCtaWithDefaultText();
-    }
+    setTimeout(() => {
+      if (view !== Views.BANK_DETAILS) {
+        hideCta();
+      } else {
+        showCtaWithDefaultText();
+      }
+    });
   }
 
   function handleAuthTypeClicked(newAuthType) {
@@ -298,7 +332,7 @@
     color: #80859b;
   }
 
-  #emandate-inner {
+  .emandate-auth-selection {
     padding-top: 12px;
   }
 
@@ -342,7 +376,7 @@
 
           <div class="legend">Authenticate using</div>
           <div id="emandate-options">
-            {#if _Arr.contains(availableAuthTypes, AuthTypes.DEBIT_CARD)}
+            {#if isEMandateAuthTypeEnabled($selectedBank, AuthTypes.DEBIT_CARD)}
               <div
                 class="auth-option item debitcard"
                 on:click={() => handleAuthTypeClicked(AuthTypes.DEBIT_CARD)}>
@@ -357,7 +391,7 @@
                 </label>
               </div>
             {/if}
-            {#if _Arr.contains(availableAuthTypes, AuthTypes.NETBANKING)}
+            {#if isEMandateAuthTypeEnabled($selectedBank, AuthTypes.NETBANKING)}
               <div
                 class="auth-option item netbanking"
                 on:click={() => handleAuthTypeClicked(AuthTypes.NETBANKING)}>
