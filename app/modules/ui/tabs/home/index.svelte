@@ -117,31 +117,44 @@
     !isPartialPayment &&
     !session.get('address');
 
+  function getConfigFromOptions() {
+    if (_.isNull(session.get('config'))) {
+      return null;
+    }
+
+    let config = {};
+    const display = session.get('config.display');
+
+    if (display) {
+      config.display = display;
+    }
+
+    return config;
+  }
+
   function getRawMerchantConfig() {
-    const displayFromOptions = session.get('config.display');
-    const displayFromPreferences = _Obj.getSafely(
-      getCheckoutConfig(),
-      'display',
-      {}
-    );
+    const configFromOptions = getConfigFromOptions();
+    const configFromPreferences = getCheckoutConfig();
 
     let config = null;
     let source;
 
-    if (_.isNull(displayFromOptions)) {
-      // Setting config.display as null allows you to disable the configuration
+    if (_.isNull(configFromOptions)) {
+      // Setting config as null allows you to disable the configuration
       source = 'options';
       config = null;
-    } else if (_.isNull(displayFromPreferences)) {
+    } else if (_.isNull(configFromPreferences)) {
       source = 'preferences';
       config = null;
-    } else if (!_.isEmptyObject(displayFromOptions)) {
-      // displayFromOptions will be an empty object by default
-      source = 'options';
-      config = displayFromOptions;
-    } else if (!_.isEmptyObject(displayFromPreferences)) {
+    } else if (
+      _.isNonNullObject(configFromPreferences) &&
+      !_.isEmptyObject(configFromPreferences)
+    ) {
       source = 'preferences';
-      config = displayFromPreferences;
+      config = configFromPreferences;
+    } else {
+      source = 'options';
+      config = configFromOptions;
     }
 
     return {
