@@ -10,22 +10,20 @@ import { createMethodBlock } from './methods';
  *      @prop {Object} hide
  *        @prop {Array<Instrument>} instruments Hidden insturments
  *        @prop {Array<string>} methods Hidden methods
- *  @prop {Object} original Original Merchant config
  *  @prop {Array<string>} methods Available methods for the merchant
  *
  * @returns {Array<Block>}
  */
 export function getSequencedBlocks(params) {
-  const { translated, original, methods } = params;
+  const { translated, methods } = params;
   const { display } = translated;
-  const { blocks, hide } = display;
+  const { blocks, hide, preferences } = display;
 
-  const preferences = _Obj.getSafely(original, 'display.preferences', {});
+  let { sequence } = display;
+
   const {
     show_default_blocks = true, // Show default blocks by default
   } = preferences;
-
-  let sequence = _Obj.getSafely(original, 'display.sequence', []);
 
   // Get the methods to list
   const methodsToList = _Arr.filter(

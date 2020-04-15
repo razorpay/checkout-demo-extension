@@ -71,60 +71,7 @@ test('Module: configurability/sequence', t => {
               ],
               methods: [],
             },
-          },
-        },
-        original: {
-          display: {
-            blocks: {
-              gpay: {
-                name: 'Pay via Google Pay',
-                description: 'Make a payment using your Google Pay app',
-                instruments: [
-                  {
-                    method: 'upi',
-                    apps: ['googlepay'],
-                  },
-                ],
-              },
-              hdfc: {
-                name: 'Pay via HDFC Bank',
-                description: 'Make the paymnet using your HDFC account',
-                instruments: [
-                  {
-                    method: 'card',
-                    issuers: ['HDFC'],
-                  },
-                  {
-                    method: 'netbanking',
-                    banks: ['HDFC'],
-                  },
-                  {
-                    method: 'wallet',
-                    wallets: ['payzapp'],
-                  },
-                ],
-              },
-            },
-            hide: [
-              {
-                method: 'wallet',
-                wallets: ['olamoney'],
-              },
-              {
-                method: 'card',
-                issuers: ['SBIN'],
-                networks: ['mastercard'],
-              },
-              {
-                method: 'card',
-                types: ['credit'],
-              },
-              {
-                method: 'card',
-                issuers: ['ICIC'],
-                types: ['debit'],
-              },
-            ],
+            preferences: {},
             sequence: ['block.gpay', 'netbanking', 'block.hdfc'],
           },
         },
@@ -321,60 +268,6 @@ test('Module: configurability/sequence', t => {
               ],
               methods: [],
             },
-          },
-        },
-        original: {
-          display: {
-            blocks: {
-              gpay: {
-                name: 'Pay via Google Pay',
-                description: 'Make a payment using your Google Pay app',
-                instruments: [
-                  {
-                    method: 'upi',
-                    apps: ['googlepay'],
-                  },
-                ],
-              },
-              hdfc: {
-                name: 'Pay via HDFC Bank',
-                description: 'Make the paymnet using your HDFC account',
-                instruments: [
-                  {
-                    method: 'card',
-                    issuers: ['HDFC'],
-                  },
-                  {
-                    method: 'netbanking',
-                    banks: ['HDFC'],
-                  },
-                  {
-                    method: 'wallet',
-                    wallets: ['payzapp'],
-                  },
-                ],
-              },
-            },
-            hide: [
-              {
-                method: 'wallet',
-                wallets: ['olamoney'],
-              },
-              {
-                method: 'card',
-                issuers: ['SBIN'],
-                networks: ['mastercard'],
-              },
-              {
-                method: 'card',
-                types: ['credit'],
-              },
-              {
-                method: 'card',
-                issuers: ['ICIC'],
-                types: ['debit'],
-              },
-            ],
             preferences: {
               show_default_blocks: false,
             },

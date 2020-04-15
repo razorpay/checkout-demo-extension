@@ -282,7 +282,6 @@ export function getBlockConfig(options, customer) {
   // Reorder blocks
   const sequentialied = getSequencedBlocks({
     translated,
-    original: options,
     methods: getAvailableDefaultMethods(),
   });
 
