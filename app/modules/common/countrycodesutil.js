@@ -18,8 +18,18 @@ import countrycodes from 'countrycodes';
  */
 
 const MAX_LENGTH_COUNTRY_CODE = 3;
+const AMERICAN_REGEX = /^\(\d{3}\)[\s\-]?\d{3}\-?\d{4}$/;
 
+const hasPlus = number => _Str.startsWith(number, '+');
 const removePlus = number => number.replace(/^\+/, '');
+
+function hasAtLeastTwoLeadingZeroes(number) {
+  return /^0{2}/.test(number);
+}
+
+function removeLeadingZeroes(number) {
+  return number.replace(/^0*/, '');
+}
 
 /**
  * Sanitizes a phone number
@@ -28,7 +38,12 @@ const removePlus = number => number.replace(/^\+/, '');
  * @returns {string}
  */
 function sanitizeNumber(number) {
-  number = number.replace(/^00/, '+');
+  // Decide whether or not to add plus
+  if (hasAtLeastTwoLeadingZeroes(number)) {
+    number = `+${removeLeadingZeroes(number)}`;
+  } else {
+    number = removeLeadingZeroes(number);
+  }
 
   const startsWithPlus = _Str.startsWith(number, '+');
 
@@ -45,25 +60,56 @@ function sanitizeNumber(number) {
  * Returns the object if the number is Indian
  * @param {string} number
  *
- * @returns {Object|undefined}
+ * @returns {Object}
  */
 function getIndianNumber(number) {
+  number = sanitizeNumber(number);
+
+  // If it starts with + and is not followed by 91, it's not Indian
+  if (hasPlus(number) && !_Str.startsWith(number, '+91')) {
+    return {
+      success: false,
+    };
+  }
+
   let phone = removePlus(number);
+  let success = false;
 
   if (phone.length === 12 && _Str.startsWith(number, '91')) {
     phone = phone.slice(2);
   }
 
-  if (phone.length === 11 && _Str.startsWith(phone, '0')) {
-    phone = phone.slice(1);
+  if (phone.length === 10 && /^[6-9]/.test(phone)) {
+    success = true;
   }
 
-  if (phone.length === 10 && /^[6-9]/.test(phone)) {
+  return {
+    success,
+    phone,
+    code: '91',
+  };
+}
+
+/**
+ * Returns the object if the number is American
+ * @param {string} number
+ *
+ * @returns {Object}
+ */
+function getAmericanFormattedNumber(number) {
+  number = number.trim();
+
+  if (AMERICAN_REGEX.test(number)) {
     return {
-      phone,
-      code: '91',
+      success: true,
+      code: '1',
+      phone: sanitizeNumber(number),
     };
   }
+
+  return {
+    success: false,
+  };
 }
 
 /**
@@ -72,25 +118,25 @@ function getIndianNumber(number) {
  * @returns {Object} With country code and phonenumber
  */
 export function findCountryCode(phno) {
-  let number = sanitizeNumber(phno);
+  let indian = getIndianNumber(phno);
 
-  const beginsWithPlus = _Str.startsWith(number, '+');
-  const beginsWithZero = _Str.startsWith(number, '0');
-  const lengthWithPlus = number.length;
-  const lengthWithoutPlus = removePlus(number).length;
-
-  const couldBeInternationalIndian = beginsWithPlus && lengthWithoutPlus === 12;
-  const couldBeRegularIndian =
-    (!beginsWithPlus && lengthWithoutPlus === 10) ||
-    (beginsWithZero && lengthWithoutPlus === 11);
-
-  if (couldBeInternationalIndian || couldBeRegularIndian) {
-    const indian = getIndianNumber(number);
-
-    if (indian) {
-      return indian;
-    }
+  if (indian.success) {
+    return {
+      phone: indian.phone,
+      code: indian.code,
+    };
   }
+
+  let american = getAmericanFormattedNumber(phno);
+
+  if (american.success) {
+    return {
+      phone: american.phone,
+      code: american.code,
+    };
+  }
+
+  let number = sanitizeNumber(phno);
 
   const intlCode = checkForInternational(number);
 
