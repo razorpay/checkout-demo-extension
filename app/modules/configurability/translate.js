@@ -62,7 +62,7 @@ function _translate(options = {}, external) {
   const allowedInstruments =
     allow |> _Arr.map(createInstrument) |> _Arr.filter(Boolean);
   const allowedBlock = createBlock('rzp.restrict_allow', {
-    name: 'Some payment methods', // TODO
+    name: 'Available Payment Methods', // TODO
     instruments: allowedInstruments,
   });
 
