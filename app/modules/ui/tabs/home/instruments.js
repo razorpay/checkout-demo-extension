@@ -113,7 +113,7 @@ export function setBlocks(
 
   // Remove rzp block instruments and method instruments
   const shownIndividualInstruments =
-    parsedConfig.blocks
+    parsedConfig.display.blocks
     |> _Arr.filter(block => block.code !== 'rzp.cluster')
     |> _Arr.flatMap(block => {
       return _Arr.filter(
@@ -128,7 +128,7 @@ export function setBlocks(
    * need to be removed from preferred instruments.
    */
   const hidden = _Arr.mergeWith(
-    parsedConfig.hidden,
+    parsedConfig.display.hidden,
     shownIndividualInstruments
   );
 
@@ -155,7 +155,7 @@ export function setBlocks(
   );
 
   let allBlocks = [preferredBlock];
-  const merchantBlocks = parsedConfig.blocks;
+  const merchantBlocks = parsedConfig.display.blocks;
 
   allBlocks = _Arr.mergeWith(allBlocks, merchantBlocks);
 

@@ -7,15 +7,17 @@ import { createBlock } from './blocks';
  * @param {boolean} external Is this an external representation?
  *
  * @returns {Object} translated
- *  @prop {Array<Block>} blocks
- *  @prop {Object} hide
- *    @prop {Array<Instruments>} instruments Hidden insturments
- *    @prop {Array<string>} methods Hidden methods
+ *  @prop {Object} display
+ *    @prop {Array<Block>} blocks
+ *    @prop {Object} hide
+ *      @prop {Array<Instruments>} instruments Hidden insturments
+ *      @prop {Array<string>} methods Hidden methods
  */
 function _translate(options, external) {
   options = _Obj.clone(options);
 
-  const { blocks = {}, hide = [] } = options || {};
+  const { display } = options || {};
+  const { blocks = {}, hide = [] } = display || {};
 
   /**
    * Create blocks
@@ -54,10 +56,12 @@ function _translate(options, external) {
     |> _Arr.map(instrument => instrument.method);
 
   return {
-    blocks: includedBlocks,
-    hide: {
-      instruments: hiddenInstruments,
-      methods: hiddenMethods,
+    display: {
+      blocks: includedBlocks,
+      hide: {
+        instruments: hiddenInstruments,
+        methods: hiddenMethods,
+      },
     },
   };
 }
