@@ -1452,7 +1452,7 @@ Session.prototype = {
   setEmandate: function() {
     if (MethodStore.isEMandateEnabled()) {
       this.emandateView = new discreet.EmandateTab({
-        target: _Doc.querySelector('#emandate-wrapper'),
+        target: _Doc.querySelector('#form-fields'),
         props: {},
       });
     }
@@ -3575,7 +3575,10 @@ Session.prototype = {
       var activeForm = this.getActiveForm();
 
       if (
-        !_Arr.contains(['#form-upi', '#form-card', '#form-wallet', '#form-emandate'], activeForm)
+        !_Arr.contains(
+          ['#form-upi', '#form-card', '#form-wallet', '#form-emandate'],
+          activeForm
+        )
       ) {
         fillData(activeForm, data);
       }
