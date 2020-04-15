@@ -336,6 +336,10 @@
     padding-top: 12px;
   }
 
+  #emandate-inner {
+    padding: 0 12px;
+  }
+
   #emandate-inner .bank-icon {
     width: 18px;
     height: 18px;
@@ -354,7 +358,7 @@
 
 <Tab method="emandate" overrideMethodCheck pad={false}>
   <Screen>
-    <div slot="main" id="emandate-inner">
+    <div id="emandate-inner">
 
       {#if currentView === Views.AUTH_SELECTION}
         <div
