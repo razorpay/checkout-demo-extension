@@ -260,6 +260,26 @@ export function getBlockConfig(options, customer) {
   // Translate external representation to internal representation
   const translated = translateExternal(options);
 
+  const hasAllowedRestrictions =
+    translated.restrictions.allow.instruments.length > 0;
+  const hasTranslatedBlocks = translated.display.blocks.length > 0;
+  const hasConfiguredBlocks =
+    hasTranslatedBlocks &&
+    _Arr.any(translated.display.blocks.length, block =>
+      _Arr.contains(translated.display.sequence, block.code)
+    );
+
+  /**
+   * If the merchant wants to use restrictions,
+   * but has not provided any blocks,
+   * we use the restricted instruments as a block.
+   */
+  if (hasAllowedRestrictions && !hasConfiguredBlocks) {
+    translated.display.sequence = [translated.restrictions.allow.code];
+    translated.display.blocks = [translated.restrictions.allow];
+    translated.display.preferences.show_default_blocks = false;
+  }
+
   // Ungroup instruments and remove disabed instruments for each block
   translated.display.blocks =
     translated.display.blocks
@@ -292,6 +312,13 @@ export function getBlockConfig(options, customer) {
     display: {
       blocks: clustered,
       hidden: translated.display.hide.instruments,
+    },
+
+    restrictions: translated.restrictions,
+
+    _meta: {
+      hasCustomizations: translated.display.sequence.length > 0,
+      hasRestrictedInstruments: hasAllowedRestrictions,
     },
   };
 }

@@ -174,9 +174,7 @@ export function setBlocks(
     });
   });
 
-  // Sequence is necessary in a config to "customize" Checkout
-  const hasCustomConfig = _Obj.getSafely(merchantConfig, 'sequence') |> Boolean;
-
+  const hasCustomConfig = parsedConfig._meta.hasCustomizations;
   Analytics.setMeta('config.custom', hasCustomConfig);
 
   Analytics.track('config:blocks', {
