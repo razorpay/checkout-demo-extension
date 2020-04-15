@@ -123,6 +123,12 @@
     }
 
     let config = {};
+
+    /**
+     * Only certain keys are allowed to be passed from options
+     * For example, restrictions aren't allowed
+     */
+
     const display = session.get('config.display');
 
     if (display) {
