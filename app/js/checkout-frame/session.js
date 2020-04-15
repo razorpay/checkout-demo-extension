@@ -19,7 +19,6 @@ var preferences = window.preferences,
   Constants = discreet.Constants,
   OfferType = Constants.OfferType,
   sanitizeTokens = discreet.sanitizeTokens,
-  getQueryParams = discreet.getQueryParams,
   Store = discreet.Store,
   MethodStore = discreet.MethodStore,
   SessionStore = discreet.SessionStore,
@@ -606,7 +605,7 @@ function askOTP(view, text, shouldLimitResend, screenProps) {
   }
 
   var origText = text; // ಠ_ಠ
-  var qpmap = getQueryParams();
+  var qpmap = _.getQueryParams();
   var thisSession = SessionManager.getSession();
 
   // Track if OTP was invalid
@@ -5350,19 +5349,6 @@ Session.prototype = {
   },
 
   showModal: function(preferences) {
-    var qpmap = _Obj.unflatten(getQueryParams());
-
-    var methods = MethodStore.getEnabledMethods();
-    if (!methods.length) {
-      var message = 'No appropriate payment method found.';
-      if (MethodStore.isEMandateEnabled() && !this.get('customer_id')) {
-        message += '\nMake sure to pass customer_id for e-mandate payments';
-      }
-      return Razorpay.sendMessage({ event: 'fault', data: message });
-    }
-
-    this.render();
-
     Razorpay.sendMessage({ event: 'render' });
 
     if (CheckoutBridge) {
@@ -5379,6 +5365,7 @@ Session.prototype = {
       $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
     }
 
+    var qpmap = _Obj.unflatten(_.getQueryParams());
     if (qpmap.error) {
       errorHandler.call(this, qpmap);
     }

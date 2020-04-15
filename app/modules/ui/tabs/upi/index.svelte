@@ -21,7 +21,7 @@
   import { Formatter } from 'formatter';
   import { hideCta, showCtaWithDefaultText, showCta } from 'checkoutstore/cta';
   import { filterUPITokens } from 'common/token';
-  import { getUPIIntentApps } from 'checkoutframe';
+  import { getUPIIntentApps } from 'checkoutstore/native';
 
   // UI imports
   import UpiIntent from './UpiIntent.svelte';

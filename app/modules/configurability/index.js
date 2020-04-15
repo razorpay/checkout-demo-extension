@@ -4,7 +4,7 @@ import { clusterRazorpayBlocks } from './methods';
 import { ungroupInstruments, getIndividualInstruments } from './ungroup';
 import InstrumentConfig from './instruments-config';
 import { isInstrumentForEntireMethod } from './instruments';
-import { getUPIIntentApps } from 'checkoutframe';
+import { getUPIIntentApps } from 'checkoutstore/native';
 
 import { AVAILABLE_METHODS } from 'common/constants';
 import {

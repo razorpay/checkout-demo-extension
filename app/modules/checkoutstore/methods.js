@@ -24,7 +24,7 @@ import { getProvider } from 'common/paylater';
 import { wallets } from 'common/wallet';
 import { extendConfig } from 'common/cardlessemi';
 import { mobileQuery } from 'common/useragent';
-import { getUPIIntentApps } from 'checkoutframe';
+import { getUPIIntentApps } from 'checkoutstore/native';
 
 const DEBIT_EMI_BANKS = ['HDFC_DC'];
 

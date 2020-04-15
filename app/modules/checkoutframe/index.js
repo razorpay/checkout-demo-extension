@@ -3,8 +3,9 @@ import Razorpay from 'common/Razorpay';
 import Analytics from 'analytics';
 import * as SessionManager from 'sessionmanager';
 import { makePrefParams } from 'common/Razorpay';
-import { getSortedApps } from 'common/upi';
 import Track from 'tracker';
+import { processNativeMessage } from 'checkoutstore/native';
+import { isEMandateEnabled, getEnabledMethods } from 'checkoutstore/methods';
 
 import {
   UPI_POLL_URL,
@@ -16,10 +17,6 @@ import {
 } from 'common/constants';
 
 let CheckoutBridge = window.CheckoutBridge;
-let upiApps = { all: [], filtered: [] };
-export function getUPIIntentApps() {
-  return upiApps;
-}
 
 const validUID = id => {
   /* check only for iFrame because we trust our SDKs */
@@ -45,94 +42,6 @@ Razorpay.sendMessage = function(message) {
     ownerWindow.postMessage(message, '*');
   }
 };
-
-const optionsTransformer = {
-  addOptions: (o, message) => {
-    o.options = _Obj.clone(message.options);
-  },
-
-  addFeatures: (o, message) => {
-    const features = ['activity_recreated', 'embedded', 'params'];
-    const options = message.options;
-
-    _Obj.loop(features, feature => {
-      if (typeof message[feature] !== 'undefined') {
-        o[feature] = message[feature];
-      }
-    });
-
-    /* Share link option on ePOS App */
-    if (options && options.epos_build_code >= 3) {
-      o.epos_share_link = true;
-    }
-  },
-
-  addExternalSdks: (o, message) => {
-    if (_.isNonNullObject(message.external_sdks)) {
-      o.hasAmazonpaySdk = message.external_sdks.amazonpay;
-      o.hasGooglePaySdk = message.external_sdks.googlepay;
-    }
-  },
-
-  addUpiIntentsData: (o, message) => {
-    // @TODO: update better names for these variables
-    if (message.upi_intents_data && message.upi_intents_data.length) {
-      // @TODO: used to just send an event. send from here itself
-      o.all_upi_intents_data = message.upi_intents_data;
-      const filteredApps = getSortedApps(message.upi_intents_data);
-      const unusedApps = _Arr.filter(
-        message.upi_intents_data,
-        app =>
-          !_Arr.find(
-            filteredApps,
-            filteredApp => filteredApp.package_name === app.package_name
-          )
-      );
-
-      upiApps = {
-        all: _Arr.mergeWith(filteredApps, unusedApps),
-        filtered: filteredApps,
-      };
-
-      if (filteredApps.length) {
-        o.upi_intents_data = filteredApps;
-      }
-    }
-  },
-
-  addPreviousData: (o, message) => {
-    var data = message.data;
-    if (data) {
-      if (_.isString(data)) {
-        try {
-          data = JSON.parse(data);
-        } catch (e) {}
-      }
-      if (_.isNonNullObject(data)) {
-        o.data = data;
-      }
-    }
-  },
-
-  useTrackingProps: (o, message) => {
-    var props = ['referer', 'integration'];
-
-    _Obj.loop(props, prop => {
-      if (typeof message[prop] !== 'undefined') {
-        Track.props[prop] = message[prop];
-      }
-    });
-  },
-};
-
-function transformOptions(message) {
-  var response = {};
-  _Obj.loop(optionsTransformer, (transformer, key) => {
-    transformer.call(null, response, message);
-  });
-
-  return response;
-}
 
 /**
  * Set meta for Analytics.
@@ -212,7 +121,7 @@ export const handleMessage = function(message) {
     return;
   }
 
-  let transformedOptions = transformOptions(message);
+  let transformedOptions = processNativeMessage(message);
   var options = message.options;
 
   setAnalyticsMeta(message);
@@ -250,6 +159,16 @@ export const handleMessage = function(message) {
           data: error,
         });
       } else {
+        var qpmap = _.getQueryParams() |> _Obj.unflatten;
+        var methods = getEnabledMethods();
+        if (!methods.length) {
+          var message = 'No appropriate payment method found.';
+          if (isEMandateEnabled() && !options.customer_id) {
+            message += '\nMake sure to pass customer_id for e-mandate payments';
+          }
+          return Razorpay.sendMessage({ event: 'fault', data: message });
+        }
+        session.render();
         session.showModal(preferences);
       }
     });

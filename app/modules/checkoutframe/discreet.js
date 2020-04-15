@@ -140,8 +140,6 @@ export default {
   EmiStore,
   Cta,
 
-  getQueryParams: _.getQueryParams,
-
   Customer,
   getCustomer,
   sanitizeTokens,
