@@ -1270,7 +1270,7 @@ Session.prototype = {
   setUpiOtmTab: function() {
     if (MethodStore.isMethodEnabled('upi_otm')) {
       this.upiOtmTab = new discreet.UpiTab({
-        target: _Doc.querySelector('#upi_otm-svelte-wrap'),
+        target: _Doc.querySelector('#form-fields'),
         props: {
           method: 'upi_otm',
         },
