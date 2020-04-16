@@ -1,6 +1,7 @@
 <script>
   // Utils
   import { isContactReadOnly, isContactOptional } from 'checkoutstore';
+  import { findCountryCode } from 'common/countrycodesutil';
 
   // UI imports
   import Field from 'ui/components/Field.svelte';
@@ -13,6 +14,16 @@
   const isOptional = isContactOptional();
   const CONTACT_REGEX = isOptional ? '.*' : CONTACT_PATTERN;
 
+  function appendCountryCodeAsynchronously() {
+    setTimeout(() => {
+      const internationalFormat = findCountryCode(value);
+
+      if (internationalFormat.code) {
+        value = `+${internationalFormat.code}${internationalFormat.phone}`;
+      }
+    });
+  }
+
   const label = isOptional
     ? 'Phone with Country Code (Optional)'
     : 'Phone with Country Code';
@@ -24,6 +35,8 @@
     name="contact"
     type="tel"
     autocomplete="tel"
+    on:autocomplete={appendCountryCodeAsynchronously}
+    on:paste={appendCountryCodeAsynchronously}
     required={!isOptional}
     x-autocompletetype="phone-full"
     pattern={CONTACT_REGEX}
