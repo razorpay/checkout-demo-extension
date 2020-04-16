@@ -1,7 +1,7 @@
-import * as Subtext from 'common/subtext';
+import * as CardSubtext from 'subtext/card';
 
-test('Module: common/subtext', t => {
-  test('Subtext.getSubtextForInstrument', t => {
+test('Module: subtext/card', t => {
+  test('CardSubtext.generateCardSubtext', t => {
     test('method: card', t => {
       let instrument;
 
@@ -13,7 +13,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'All cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: all, Networks: all, Types: all'
       );
 
@@ -24,7 +24,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: all, Networks: all, Types: 1'
       );
 
@@ -35,7 +35,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only MasterCard cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: all, Networks: 1, Types: all'
       );
 
@@ -47,7 +47,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only MasterCard credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: all, Networks: 1, Types: 1'
       );
 
@@ -58,7 +58,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only MasterCard and Visa cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: all, Networks: 2, Types: all'
       );
 
@@ -70,7 +70,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only MasterCard and Visa credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: all, Networks: 2, Types: 1'
       );
 
@@ -81,7 +81,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only select networks supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: all, Networks: 2+, Types: all'
       );
 
@@ -93,7 +93,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only select network credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: all, Networks: 2+, Types: 1'
       );
 
@@ -106,7 +106,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only HDFC cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: 1, Networks: all, Types: all'
       );
 
@@ -118,7 +118,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only HDFC credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: 1, Networks: all, Types: 1'
       );
 
@@ -130,7 +130,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only HDFC MasterCard cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: 1, Networks: 1, Types: all'
       );
 
@@ -143,7 +143,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only HDFC MasterCard credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: 1, Networks: 1, Types: 1'
       );
 
@@ -155,7 +155,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only select HDFC cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: 1, Networks: 2, Types: all'
       );
 
@@ -168,7 +168,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only select HDFC credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: 1, Networks: 2, Types: 1'
       );
 
@@ -180,7 +180,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only select HDFC cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: 1, Networks: 2+, Types: all'
       );
 
@@ -193,7 +193,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only select HDFC credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: 1, Networks: 2+, Types: 1'
       );
 
@@ -206,7 +206,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only HDFC and Axis cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: 2, Networks: all, Types: all'
       );
 
@@ -218,7 +218,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only HDFC and Axis credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: 2, Networks: all, Types: 1'
       );
 
@@ -230,7 +230,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only HDFC and Axis MasterCard cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: 2, Networks: 1, Types: all'
       );
 
@@ -243,7 +243,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only select HDFC and Axis credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: 2, Networks: 1, Types: 1'
       );
 
@@ -255,7 +255,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only select cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: 2, Networks: 2, Types: all'
       );
 
@@ -268,7 +268,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only select credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: 2, Networks: 2, Types: 1'
       );
 
@@ -280,7 +280,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only select cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: 2, Networks: 2+, Types: all'
       );
 
@@ -293,7 +293,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only select credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: 2, Networks: 2+, Types: 1'
       );
 
@@ -306,7 +306,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only select cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: 2+, Networks: all, Types: all'
       );
 
@@ -318,7 +318,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only select credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: 2+, Networks: all, Types: 1'
       );
 
@@ -330,7 +330,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only select MasterCard cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: 2+, Networks: 1, Types: all'
       );
 
@@ -343,7 +343,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only select MasterCard credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: 2+, Networks: 1, Types: 1'
       );
 
@@ -355,7 +355,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only select cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: 2+, Networks: 2, Types: all'
       );
 
@@ -368,7 +368,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only select credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: 2+, Networks: 2, Types: 1'
       );
 
@@ -380,7 +380,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only select cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: 2+, Networks: 2+, Types: all'
       );
 
@@ -393,7 +393,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only select credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateCardSubtext(instrument),
         'Issuers: 2+, Networks: 2+, Types: 1'
       );
 

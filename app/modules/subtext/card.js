@@ -21,7 +21,7 @@ function concatTruthyString(list) {
  *
  * @returns {string}
  */
-function generateCardSubtext(instrument) {
+export function generateCardSubtext(instrument) {
   const instrumentIssuers =
     instrument.issuers || []
     |> _Arr.map(bank => getCommonBankName(bank).replace(/ Bank$/, ''));
@@ -162,21 +162,5 @@ function generateCardSubtext(instrument) {
     ]);
 
     return concatTruthyString(stringList);
-  }
-}
-
-const INSTRuMENT_SUBTEXT = {
-  card: generateCardSubtext,
-};
-
-/**
- * Generates subtext for an instrument
- * @param {Instrument} instrument
- *
- * @returns {string}
- */
-export function getSubtextForInstrument(instrument) {
-  if (INSTRuMENT_SUBTEXT[instrument.method]) {
-    return INSTRuMENT_SUBTEXT[instrument.method](instrument);
   }
 }
