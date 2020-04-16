@@ -37,6 +37,7 @@
     autocomplete="tel"
     on:autocomplete={appendCountryCodeAsynchronously}
     on:paste={appendCountryCodeAsynchronously}
+    on:blur={appendCountryCodeAsynchronously}
     required={!isOptional}
     x-autocompletetype="phone-full"
     pattern={CONTACT_REGEX}
