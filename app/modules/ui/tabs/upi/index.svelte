@@ -479,6 +479,10 @@
 </script>
 
 <style>
+  strong {
+    font-weight: bolder;
+  }
+
   .legend {
     margin-top: 10px;
     padding: 12px 0 8px 12px;
@@ -588,7 +592,7 @@
             </SlottedRadioOption>
           {/each}
           <AddANewVpa
-            subtitleText={isOtm ? 'Use you BHIM account' : 'Google Pay, BHIM, PhonePe & more'}
+            subtitleText={isOtm ? 'Supported only for BHIM app' : 'Google Pay, BHIM, PhonePe & more'}
             on:click={() => {
               onUpiAppSelection({ detail: { id: 'new' } });
             }}
@@ -640,9 +644,13 @@
           type={'warning'}
           classes={['downtime-callout']}
           showIcon={false}>
-          {session.formatAmountWithCurrency(getAmount())} will be blocked on
-          your acount by clicking pay. Your account will be charged by {getName() || 'merchant'}
-          between {toShortFormat(otmStartDate)} to {toShortFormat(otmEndDate)}.
+          <strong>{session.formatAmountWithCurrency(getAmount())}</strong>
+          will be blocked on your account by clicking pay. Your account will be
+          charged {getName() ? 'by ' + getName() : 'merchant'} between
+          <strong>{toShortFormat(otmStartDate)}</strong>
+          to
+          <strong>{toShortFormat(otmEndDate)}</strong>
+          .
         </Callout>
       {/if}
 
