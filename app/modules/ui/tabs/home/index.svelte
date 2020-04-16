@@ -53,29 +53,36 @@
     getMerchantOrder,
     getCheckoutConfig,
   } from 'checkoutstore';
+
   import {
     isCreditCardEnabled,
     isDebitCardEnabled,
     getSingleMethod,
+    isEMandateBankEnabled,
   } from 'checkoutstore/methods';
+
   import {
     getTranslatedInstrumentsForCustomer,
     getAllInstrumentsForCustomer,
   } from 'checkoutframe/personalization';
+
   import {
     hideCta,
     showCta,
     showCtaWithText,
     showCtaWithDefaultText,
   } from 'checkoutstore/cta';
+
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getCardOffer, hasOffersOnHomescreen } from 'checkoutframe/offers';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
+
   import {
     INDIA_COUNTRY_CODE,
     MAX_PREFERRED_INSTRUMENTS,
   } from 'common/constants';
+
   import { setBlocks } from 'ui/tabs/home/instruments';
 
   const cardOffer = getCardOffer();
@@ -609,7 +616,7 @@
 
     if (method === 'emandate') {
       // If bank is not prefilled, go to netbanking tab. Otherwise, go to the emandate tab directly.
-      if (!prefilledBank) {
+      if (!prefilledBank || !isEMandateBankEnabled(prefilledBank)) {
         method = 'netbanking';
       }
     }
