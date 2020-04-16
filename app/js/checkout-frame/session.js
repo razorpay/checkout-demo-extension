@@ -1323,7 +1323,7 @@ Session.prototype = {
         session.validateOffers(e.detail.bank.code, function(offerRemoved) {
           if (!offerRemoved) {
             // If the offer was not removed, revert to the bank in offer issuer
-            session.netbankingTab.setSelectedBank(
+            NetbankingScreenStore.selectedBank.set(
               session.getAppliedOffer().issuer
             );
           }
