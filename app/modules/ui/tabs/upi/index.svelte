@@ -628,7 +628,7 @@
       {/if}
     </div>
 
-    <Bottom tab={'upi_otm'}>
+    <Bottom tab={method}>
       {#if down || disabled}
         <DowntimeCallout severe={disabled}>
           <strong>UPI</strong>
