@@ -21,7 +21,7 @@
   import { Formatter } from 'formatter';
   import { hideCta, showCtaWithDefaultText, showCta } from 'checkoutstore/cta';
   import { filterUPITokens } from 'common/token';
-  import { getUPIIntentApps } from 'checkoutframe';
+  import { getUPIIntentApps } from 'checkoutstore/native';
 
   import { getAmount, getName } from 'checkoutstore';
 
@@ -39,7 +39,7 @@
   import GooglePayOmnichannel from './GooglePayOmnichannel.svelte';
   import NextOption from 'ui/elements/options/NextOption.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
-  import OffersPortal from 'ui/components/OffersPortal.svelte';
+  import Bottom from 'ui/layouts/Bottom.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import AddANewVpa from './AddANewVpa.svelte';
   import { getMiscIcon } from 'icons/misc';
@@ -525,7 +525,7 @@
 
 <Tab {method} {down} pad={false}>
   <Screen>
-    <div slot="main">
+    <div>
 
       {#if intent}
         <UpiIntent
@@ -628,7 +628,7 @@
       {/if}
     </div>
 
-    <div slot="bottom">
+    <Bottom tab={'upi_otm'}>
       {#if down || disabled}
         <DowntimeCallout severe={disabled}>
           <strong>UPI</strong>
@@ -646,7 +646,6 @@
         </Callout>
       {/if}
 
-      <OffersPortal />
-    </div>
+    </Bottom>
   </Screen>
 </Tab>

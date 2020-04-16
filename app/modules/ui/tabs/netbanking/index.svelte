@@ -9,7 +9,7 @@
   import Callout from 'ui/elements/Callout.svelte';
   import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
-  import OffersPortal from 'ui/components/OffersPortal.svelte';
+  import Bottom from 'ui/layouts/Bottom.svelte';
 
   // Store imports
   import { methodTabInstrument } from 'checkoutstore/screens/home';
@@ -203,7 +203,7 @@
   overrideMethodCheck
   hasMessage={selectedBankHasDowntime}>
   <Screen pad={false}>
-    <div slot="main">
+    <div>
       <div id="netb-banks" class="clear grid count-3">
         {#each netbanks as { name, code }}
           <GridItem
@@ -270,7 +270,7 @@
       {/if}
     </div>
 
-    <div slot="bottom">
+    <Bottom tab="netbanking">
       <!-- Show recurring message for recurring payments -->
       {#if recurring}
         <Callout>
@@ -291,9 +291,7 @@
           {/if}
         </DowntimeCallout>
       {/if}
-
-      <OffersPortal />
-    </div>
+    </Bottom>
 
   </Screen>
 </Tab>

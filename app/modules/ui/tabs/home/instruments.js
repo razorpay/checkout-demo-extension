@@ -5,6 +5,8 @@ import { MAX_PREFERRED_INSTRUMENTS } from 'common/constants';
 import { getBlockConfig } from 'configurability';
 import { isInstrumentForEntireMethod } from 'configurability/instruments';
 import { getIndividualInstruments } from 'configurability/ungroup';
+import Analytics from 'analytics';
+import * as AnalyticsTypes from 'analytics-types';
 
 function generateBasePreferredBlock(preferred) {
   const preferredBlock = createBlock('rzp.preferred', {
@@ -102,13 +104,16 @@ function instrumentPresentInGroup(instrument, group) {
   return true;
 }
 
-export function setBlocks({ preferred = [], merchantConfig = {} }, customer) {
+export function setBlocks(
+  { preferred = [], merchantConfig = {}, configSource },
+  customer
+) {
   const preferredBlock = generateBasePreferredBlock(preferred);
   const parsedConfig = getBlockConfig(merchantConfig, customer);
 
   // Remove rzp block instruments and method instruments
   const shownIndividualInstruments =
-    parsedConfig.blocks
+    parsedConfig.display.blocks
     |> _Arr.filter(block => block.code !== 'rzp.cluster')
     |> _Arr.flatMap(block => {
       return _Arr.filter(
@@ -123,7 +128,7 @@ export function setBlocks({ preferred = [], merchantConfig = {} }, customer) {
    * need to be removed from preferred instruments.
    */
   const hidden = _Arr.mergeWith(
-    parsedConfig.hidden,
+    parsedConfig.display.hidden,
     shownIndividualInstruments
   );
 
@@ -150,7 +155,7 @@ export function setBlocks({ preferred = [], merchantConfig = {} }, customer) {
   );
 
   let allBlocks = [preferredBlock];
-  const merchantBlocks = parsedConfig.blocks;
+  const merchantBlocks = parsedConfig.display.blocks;
 
   allBlocks = _Arr.mergeWith(allBlocks, merchantBlocks);
 
@@ -167,6 +172,21 @@ export function setBlocks({ preferred = [], merchantConfig = {} }, customer) {
         instrument.id = Track.makeUid();
       }
     });
+  });
+
+  // Sequence is necessary in a config to "customize" Checkout
+  const hasCustomConfig = _Obj.getSafely(merchantConfig, 'sequence') |> Boolean;
+
+  Analytics.setMeta('config.custom', hasCustomConfig);
+
+  Analytics.track('config:blocks', {
+    type: AnalyticsTypes.RENDER,
+    data: {
+      final: allBlocks,
+      merchant: merchantConfig,
+      source: configSource,
+      custom: hasCustomConfig,
+    },
   });
 
   blocks.set(allBlocks);

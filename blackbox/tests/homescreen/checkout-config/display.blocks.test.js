@@ -14,7 +14,33 @@ const {
   assertShownBanks,
   assertUpiIntent,
   assertUpiCollect,
+  assertShownWallets,
+  assertShownPaylaterProviders,
+  assertShownCardlessEmiProviders,
+  assertCardScreenAndText,
 } = require('./config-utils');
+
+function augmentPreferences(preferences) {
+  return {
+    ...preferences,
+    methods: {
+      ...preferences.methods,
+      upi: true,
+      upi_intent: true,
+      paylater: {
+        epaylater: true,
+        getsimpl: true,
+        icic: true,
+      },
+      cardless_emi: {
+        zestmoney: true,
+        earlysalary: true,
+        flexmoney: true,
+      },
+      bank_transfer: true,
+    },
+  };
+}
 
 const CONFIG = {
   display: {
@@ -31,10 +57,35 @@ const CONFIG = {
             flows: ['collect', 'intent'],
             apps: ['bhim', 'some.random.app'],
           },
-          // {
-          //   method: 'wallet',
-          //   wallets: ['freecharge', 'olamoney'],
-          // },
+          {
+            method: 'upi',
+            flows: ['collect'],
+          },
+          {
+            method: 'upi',
+            flows: ['intent'],
+          },
+          {
+            method: 'upi',
+            flows: ['qr', 'intent'],
+            apps: ['bhim', 'some.random.app'],
+          },
+          {
+            method: 'wallet',
+            wallets: ['freecharge', 'mobikwik', 'payzapp'],
+          },
+          {
+            method: 'paylater',
+            providers: ['epaylater', 'icic'],
+          },
+          {
+            method: 'cardless_emi',
+            providers: ['zestmoney', 'earlysalary'],
+          },
+          {
+            method: 'card',
+            issuers: ['HDFC', 'ICIC'],
+          },
         ],
       },
 
@@ -46,13 +97,21 @@ const CONFIG = {
             banks: ['ICIC'],
           },
           {
+            method: 'upi',
+            flows: ['intent'],
+            apps: ['bhim'],
+          },
+          {
             method: 'wallet',
             wallets: ['freecharge'],
           },
           {
-            method: 'upi',
-            flows: ['intent'],
-            apps: ['bhim'],
+            method: 'paylater',
+            providers: ['epaylater'],
+          },
+          {
+            method: 'cardless_emi',
+            providers: ['zestmoney'],
           },
         ],
       },
@@ -78,9 +137,7 @@ const CONFIG = {
 
 describe('display.blocks', () => {
   test('Individual instruments', async () => {
-    const preferences = makePreferences();
-
-    preferences.methods.upi = true;
+    const preferences = augmentPreferences(makePreferences());
 
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -123,9 +180,7 @@ describe('display.blocks', () => {
 
 describe('display.blocks', () => {
   test('Grouped instruments', async () => {
-    const preferences = makePreferences();
-
-    preferences.methods.upi = true;
+    const preferences = augmentPreferences(makePreferences());
 
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -166,21 +221,7 @@ describe('display.blocks', () => {
 
 describe('display.blocks', () => {
   test('Method instruments', async () => {
-    const preferences = makePreferences();
-
-    preferences.methods = {
-      ...preferences.methods,
-      upi: true,
-      cardless_emi: {
-        zestmoney: true,
-        earlysalary: true,
-      },
-      paylater: {
-        epaylater: true,
-        icic: true,
-      },
-      bank_transfer: true,
-    };
+    const preferences = augmentPreferences(makePreferences());
 
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -227,9 +268,7 @@ describe('display.blocks', () => {
 
 describe('display.blocks', () => {
   test('Grouped instrument: Netbanking', async () => {
-    const preferences = makePreferences();
-
-    preferences.methods.upi = true;
+    const preferences = augmentPreferences(makePreferences());
 
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -271,9 +310,7 @@ describe('display.blocks', () => {
 
 describe('display.blocks', () => {
   test('Grouped instrument: UPI', async () => {
-    const preferences = makePreferences();
-
-    preferences.methods.upi = true;
+    const preferences = augmentPreferences(makePreferences());
 
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -310,5 +347,170 @@ describe('display.blocks', () => {
 
     // Assert that UPI collect is shown
     await assertUpiCollect(context);
+  });
+});
+
+describe('display.blocks', () => {
+  test('Grouped instrument: Wallets', async () => {
+    const preferences = augmentPreferences(makePreferences());
+
+    const options = {
+      key: 'rzp_test_1DP5mmOlF5G5ag',
+      amount: 600000,
+      prefill: {
+        contact: '+919988776655',
+        email: 'void@razorpay.com',
+      },
+
+      config: CONFIG,
+    };
+
+    const context = await openCheckoutWithNewHomeScreen({
+      page,
+      options,
+      preferences,
+      apps: true,
+    });
+
+    // User details
+    await fillUserDetails(context, '9988776655');
+    await assertUserDetails(context);
+
+    // Get the grouped Wallet instrument
+    const walletInstrument = await context.page.$(
+      `.methods-block[data-block='block.grouped'] [role=list] > *:nth-child(6)`
+    );
+
+    // Click on the instrument UI element
+    await walletInstrument.click();
+
+    // Assert that expected wallets are shown
+    await assertShownWallets(context, ['Freecharge', 'Mobikwik', 'PayZapp']);
+  });
+});
+
+describe('display.blocks', () => {
+  test('Grouped instrument: Paylater', async () => {
+    const preferences = augmentPreferences(makePreferences());
+
+    const options = {
+      key: 'rzp_test_1DP5mmOlF5G5ag',
+      amount: 600000,
+      prefill: {
+        contact: '+919988776655',
+        email: 'void@razorpay.com',
+      },
+
+      config: CONFIG,
+    };
+
+    const context = await openCheckoutWithNewHomeScreen({
+      page,
+      options,
+      preferences,
+      apps: true,
+    });
+
+    // User details
+    await fillUserDetails(context, '9988776655');
+    await assertUserDetails(context);
+
+    // Get the grouped Paylater instrument
+    const paylaterInstrument = await context.page.$(
+      `.methods-block[data-block='block.grouped'] [role=list] > *:nth-child(7)`
+    );
+
+    // Select it
+    await paylaterInstrument.click();
+
+    // Assert that all providers are shown
+    await assertShownPaylaterProviders(context, [
+      'ePayLater',
+      'ICICI Bank PayLater',
+    ]);
+  });
+});
+
+describe('display.blocks', () => {
+  test('Grouped instrument: Cardless EMI', async () => {
+    const preferences = augmentPreferences(makePreferences());
+
+    const options = {
+      key: 'rzp_test_1DP5mmOlF5G5ag',
+      amount: 600000,
+      prefill: {
+        contact: '+919988776655',
+        email: 'void@razorpay.com',
+      },
+
+      config: CONFIG,
+    };
+
+    const context = await openCheckoutWithNewHomeScreen({
+      page,
+      options,
+      preferences,
+      apps: true,
+    });
+
+    // User details
+    await fillUserDetails(context, '9988776655');
+    await assertUserDetails(context);
+
+    // Get the grouped Cardless EMI instrument
+    const cardlessEmiInstrument = await context.page.$(
+      `.methods-block[data-block='block.grouped'] [role=list] > *:nth-child(8)`
+    );
+
+    // Select it
+    await cardlessEmiInstrument.click();
+
+    // Assert that all providers are shown
+    await assertShownCardlessEmiProviders(context, [
+      'ZestMoney',
+      'EarlySalary',
+    ]);
+  });
+});
+
+describe('display.blocks', () => {
+  test('Grouped instrument: Cards', async () => {
+    const preferences = augmentPreferences(makePreferences());
+
+    const options = {
+      key: 'rzp_test_1DP5mmOlF5G5ag',
+      amount: 600000,
+      prefill: {
+        contact: '+919988776655',
+        email: 'void@razorpay.com',
+      },
+
+      config: CONFIG,
+    };
+
+    const context = await openCheckoutWithNewHomeScreen({
+      page,
+      options,
+      preferences,
+      apps: true,
+    });
+
+    // User details
+    await fillUserDetails(context, '9988776655');
+    await assertUserDetails(context);
+
+    // Get the grouped Card instrument
+    const cardInstrument = await context.page.$(
+      `.methods-block[data-block='block.grouped'] [role=list] > *:nth-child(9)`
+    );
+
+    // Select it
+    await cardInstrument.click();
+
+    // Assert that expected info is shown
+    await assertCardScreenAndText(
+      context,
+      'Only HDFC and ICICI cards supported'
+    );
   });
 });

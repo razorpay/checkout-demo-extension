@@ -4,7 +4,6 @@
   import Address from 'ui/elements/address.svelte';
   import MultiTpvOptions from 'ui/elements/MultiTpvOptions.svelte';
   import TpvBank from 'ui/elements/TpvBank.svelte';
-  import CardOffer from 'ui/elements/CardOffer.svelte';
   import ContactField from 'ui/components/ContactField.svelte';
   import EmailField from 'ui/components/EmailField.svelte';
 
@@ -39,7 +38,6 @@
   // Props
   export let session;
 
-  const cardOffer = session.cardOffer;
   const order = getMerchantOrder();
   const bank = session.tpvBank || {};
   const accountName = session.get('prefill.bank_account[name]');
@@ -123,9 +121,5 @@
     <div class="tpv-bank-block">
       <TpvBank {bank} {accountName} showIfsc={isContactEmailOptional()} />
     </div>
-  {/if}
-
-  {#if cardOffer}
-    <CardOffer offer={cardOffer} />
   {/if}
 </div>

@@ -19,6 +19,7 @@
   import Note from 'ui/elements/Note.svelte';
   import Tab from 'ui/tabs/Tab.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
+  import Bottom from 'ui/layouts/Bottom.svelte';
 
   let abortUploadRequest = () => {};
   let uploaded = false;
@@ -247,7 +248,7 @@
 
 <Tab method="nach" overrideMethodCheck="true" pad={false}>
   <Screen>
-    <div slot="main">
+    <div>
       <input
         type="file"
         bind:this={fileInput}

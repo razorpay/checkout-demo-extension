@@ -12,7 +12,6 @@ var cta = params.cta;
 var o = _.get;
 var address = o('address');
 var method = _.methods;
-var cardOffer = _.cardOffer;
 var wallet = MethodStore.getWallets();
 var icons = _.themeMeta.icons;
 var html = function(html){return html.replace(/<[^>]*>?/g, "")};
@@ -45,12 +44,12 @@ var subscription_will_refund = _.subscription && (_.subscription.type === 0);
 `
 <div id="container" class="mfix animations" tabIndex="0">
   <div id="backdrop"></div>
-  <div id="timeout"></div>
   <i id="powered-by"><a id="powered-link" href="https://razorpay.com?ref=org-in-chk" target="_blank" tabindex="-1">&#xe608;</a></i>
   <div id="tnc-wrap"></div>
   <div id="modal" class="mchild">
     <div id="modal-inner">
       <div id="overlay" class="showable"></div>
+      <div id="nocost-overlay" class="showable"></div>
       <div id="confirmation-dialog" class="showable"></div>
       <div id="emi-wrap" class="overlay showable mfix"></div>
       <div id="fee-wrap" class="overlay showable mfix"></div>
@@ -133,7 +132,6 @@ var subscription_will_refund = _.subscription && (_.subscription.type === 0);
           </div>
           <form id="form" method="POST" novalidate autocomplete="off" onsubmit="return false">
             <div id="form-fields">
-              <div id="home-screen-wrap"></div>
               `?Store.isIRCTC()`
                 <div class='recurring-message' style='right: 0;left: 0;border-radius:0 0 3px 3px'>
                       <span>&#x2139;</span>
@@ -150,43 +148,14 @@ var subscription_will_refund = _.subscription && (_.subscription.type === 0);
                   </div>
                 </div>
               `?`
-              <div id="netbanking-svelte-wrap">
-              </div>
-              <div id="card-svelte-wrap">
-              </div>
-              <!-- UPI method -->
-              <div id='upi-svelte-wrap'>
-              </div>
-              <div id='upi_otm-svelte-wrap'>
-              </div>
-              <div id="nach-wrap"></div>
-              <div id='payouts-svelte-wrap'>
-              </div>
-              <div id='payout-account-svelte-wrap'>
-              </div>
-              `?isMethodEnabled('qr')`
-                <div class="tab-content showable screen pad" id="form-qr"></div>
-              `?`
-              `?isMethodEnabled('bank_transfer')`
-                <div id='bank-transfer-svelte-wrap'></div>
-              `?`
-              `
-              <div id="otp-screen-wrapper"></div>
-              <div id="emi-plan-screen-wrapper"></div>
               `?isMethodEnabled('emandate')`
                 <div id="emandate-wrapper">
                 </div>
               `?`
-              `?isMethodEnabled('cardless_emi')`
-                <div id="emi-options-wrapper">
-                </div>
-              `?`
-              `?isMethodEnabled('paylater')`
-                <div id="paylater-wrapper">
-                </div>
-              `?`
             </div>
-            <div class="offers-container" id="offers-container"></div>
+            <div id="bottom">
+              <div id="timeout"></div>
+            </div>
             <button id="footer" type="submit" class="button">
               <span>`=cta`</span>
             </button>

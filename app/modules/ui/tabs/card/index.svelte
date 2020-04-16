@@ -6,10 +6,11 @@
   import Tab from 'ui/tabs/Tab.svelte';
   import Callout from 'ui/elements/Callout.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
+  import Bottom from 'ui/layouts/Bottom.svelte';
   import AddCardView from 'ui/tabs/card/AddCardView.svelte';
   import EmiActions from 'ui/components/EmiActions.svelte';
   import SavedCards from 'ui/tabs/card/savedcards.svelte';
-  import OffersPortal from 'ui/components/OffersPortal.svelte';
+  import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
 
   // Store
   import {
@@ -18,13 +19,18 @@
     cardName,
     cardNumber,
     remember,
+    selectedCard,
   } from 'checkoutstore/screens/card';
   import { methodTabInstrument } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
 
   import { contact } from 'checkoutstore/screens/home';
-  import { isRecurring, shouldRememberCustomer } from 'checkoutstore';
+  import {
+    isRecurring,
+    shouldRememberCustomer,
+    isDCCEnabled,
+  } from 'checkoutstore';
   import {
     isMethodEnabled,
     getEMIBanks,
@@ -37,7 +43,8 @@
   import { getSavedCards, transform } from 'common/token';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import { getCardType, getSubtextFromCardInstrument } from 'common/card';
+  import { getCardType } from 'common/card';
+  import { getSubtextForInstrument } from 'common/subtext';
 
   // Transitions
   import { fade } from 'svelte/transition';
@@ -57,7 +64,6 @@
   let allSavedCards = [];
   let savedCards = [];
   let lastSavedCard = null;
-  let selectedOffer = null;
 
   let showEmiCta;
   let emiCtaView;
@@ -91,6 +97,17 @@
         },
       });
     }
+  }
+
+  /**
+   * Session calls this to ask if tab will handle back
+   *
+   * @returns {boolean} will tab handle back
+   */
+  export function onBack() {
+    $selectedCard = null; // De-select saved card
+
+    return false;
   }
 
   function getSavedCardsForDisplay(allSavedCards, tab) {
@@ -160,10 +177,7 @@
   }
 
   $: {
-    let _savedCards = filterSavedCardsForOffer(
-      getSavedCardsForDisplay(allSavedCards, tab),
-      selectedOffer
-    );
+    let _savedCards = getSavedCardsForDisplay(allSavedCards, tab);
 
     _savedCards = filterSavedCardsAgainstInstrument(
       _savedCards,
@@ -184,7 +198,7 @@
     } else if ($methodTabInstrument.method !== tab) {
       instrumentSubtext = undefined;
     } else {
-      instrumentSubtext = getSubtextFromCardInstrument($methodTabInstrument);
+      instrumentSubtext = getSubtextForInstrument($methodTabInstrument);
     }
   }
 
@@ -219,31 +233,6 @@
     });
   }
 
-  function filterSavedCardsForOffer(savedCards, offer) {
-    // If offer no offer is selected, do not try to filter cards.
-    if (!offer) {
-      return savedCards;
-    }
-
-    return _Arr.filter(savedCards, function(index, token) {
-      var card = token.card;
-      if (card && offer.payment_method === 'emi' && offer.emi_subvention) {
-        /* Merchant subvention EMI */
-        const bank = card.issuer;
-        if (bank) {
-          const plans = getEMIBankPlans(bank);
-          if (!plans) {
-            return false;
-          }
-
-          return _Arr.any(plans, plan => plan.offer_id === offer.id);
-        }
-      } else {
-        return true;
-      }
-    });
-  }
-
   function filterSavedCardsForRecurring(tokens) {
     return _Arr.filter(tokens, token => token.recurring);
   }
@@ -267,13 +256,11 @@
 
   export function showAddCardView() {
     Analytics.track('saved_cards:hide');
-    session.removeAutomaticallyAppliedOffer();
     setView(Views.ADD_CARD);
   }
 
   export function showSavedCardsView() {
     Analytics.track('saved_cards:show');
-    session.removeAutomaticallyAppliedOffer();
     setView(Views.SAVED_CARDS);
   }
 
@@ -396,8 +383,6 @@
       from: session.tab,
     };
 
-    session.removeAndCleanupOffers();
-
     if (emiCtaView === 'available') {
       session.showEmiPlans('new')(e);
       eventName += 'view';
@@ -408,17 +393,13 @@
       if (isMethodEnabled('card')) {
         session.setScreen('card');
         session.switchTab('card');
-        session.offers && session.renderOffers(session.tab);
         showLandingView();
-
         eventName = 'emi:pay_without';
       }
     } else if (emiCtaView === 'plans-unavailable') {
       if (isMethodEnabled('card')) {
         session.setScreen('card');
         session.switchTab('card');
-        session.offers && session.renderOffers(session.tab);
-
         eventName = 'emi:pay_without';
       }
     }
@@ -427,10 +408,6 @@
       type: AnalyticsTypes.BEHAV,
       data: eventData,
     });
-  }
-
-  export function setSelectedOffer(newOffer) {
-    selectedOffer = newOffer;
   }
 
   export function onShown() {
@@ -466,7 +443,7 @@
 
 <Tab method="card" pad={false} overrideMethodCheck>
   <Screen pad={false}>
-    <div slot="main">
+    <div>
       {#if currentView === Views.ADD_CARD}
         <div in:fade={{ duration: 100, y: 100 }}>
           {#if showSavedCardsCta}
@@ -524,7 +501,10 @@
         </div>
       {/if}
     </div>
-    <div slot="bottom">
+    <Bottom tab="card">
+      {#if isDCCEnabled()}
+        <DynamicCurrencyView view={currentView} />
+      {/if}
       {#if isRecurring()}
         <Callout>
           {#if !session.subscription}
@@ -538,8 +518,6 @@
           {/if}
         </Callout>
       {/if}
-
-      <OffersPortal />
-    </div>
+    </Bottom>
   </Screen>
 </Tab>

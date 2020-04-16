@@ -332,7 +332,8 @@ const config = {
       const hasFlows = Boolean(instrument.flows);
       const hasApps = Boolean(instrument.apps);
 
-      if (hasFlows && !instrument.flows.length) {
+      // Flows is mandatory
+      if (!hasFlows || !instrument.flows.length) {
         return false;
       }
 
@@ -348,8 +349,8 @@ const config = {
         return true;
       }
 
-      // Individual instrument should either have flow or app
-      return Boolean(instrument.flow) || Boolean(instrument.app);
+      // Individual instrument should have a flow
+      return Boolean(instrument.flow) || Boolean(instrument.flows);
     },
   },
 

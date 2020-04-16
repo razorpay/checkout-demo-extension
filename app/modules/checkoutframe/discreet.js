@@ -20,6 +20,8 @@ import * as strings from 'common/strings';
 import * as UserAgent from 'common/useragent';
 import emiView from 'checkoutframe/emi';
 import FeeBearerView from 'ui/components/feebearer.svelte';
+import OffersView from 'ui/components/offers/index.svelte';
+import NoCostExplainer from 'ui/components/offers/NoCostExplainer.svelte';
 import emandateView from 'checkoutframe/emandate';
 import emiPlansView from 'checkoutframe/emiplans';
 import otpView from 'checkoutframe/otp';
@@ -60,7 +62,7 @@ import * as CustomerStore from 'checkoutstore/customer';
 import QRScreen from 'ui/tabs/qr/index.svelte';
 import BankTransferScreen from 'ui/tabs/bank-transfer/index.svelte';
 import UpiTab from 'ui/tabs/upi/index.svelte';
-import emiOptionsView from 'ui/tabs/cardless-emi/index.svelte';
+import CardlessEmiView from 'ui/tabs/cardless-emi/index.svelte';
 import emiScreenView from 'ui/tabs/emi/emiscreen.svelte';
 import PayLaterView from 'ui/tabs/paylater/index.svelte';
 import HomeTab from 'ui/tabs/home/index.svelte';
@@ -138,19 +140,19 @@ export default {
   EmiStore,
   Cta,
 
-  getQueryParams: _.getQueryParams,
-
   Customer,
   getCustomer,
   sanitizeTokens,
 
   emiView,
   emandateView,
-  emiOptionsView,
+  CardlessEmiView,
   emiScreenView,
   emiPlansView,
 
   FeeBearerView,
+  OffersView,
+  NoCostExplainer,
   PayoutsInstruments,
   PayoutAccount,
 

@@ -19,7 +19,6 @@ var preferences = window.preferences,
   Constants = discreet.Constants,
   OfferType = Constants.OfferType,
   sanitizeTokens = discreet.sanitizeTokens,
-  getQueryParams = discreet.getQueryParams,
   Store = discreet.Store,
   MethodStore = discreet.MethodStore,
   SessionStore = discreet.SessionStore,
@@ -119,6 +118,22 @@ function confirmClose() {
   return confirm(discreet.confirmCancelMsg);
 }
 
+/**
+ * A valid contact can only contain
+ * - number
+ * - spaces
+ * - hyphens
+ * - parenthesis
+ * - plus
+ *
+ * @param {string} contact
+ *
+ * @returns {boolean}
+ */
+function doesContactHaveValidCharacters(contact) {
+  return !/[^\d\+\s\-\(\)]+/.test(contact);
+}
+
 function fillData(container, returnObj) {
   each($(container).find('input[name],select[name]'), function(i, el) {
     if (/radio|checkbox/.test(el.getAttribute('type')) && !el.checked) {
@@ -138,6 +153,18 @@ function improvisePrefilledContact(session) {
   var prefilledContact = session.get('prefill.contact');
 
   if (!prefilledContact) {
+    return;
+  }
+
+  // We have some invalid charactes
+  if (!doesContactHaveValidCharacters(prefilledContact)) {
+    Analytics.track('prefill:invalid:chars', {
+      data: {
+        type: 'contact',
+        value: prefilledContact,
+      },
+    });
+
     return;
   }
 
@@ -525,27 +552,10 @@ function errorHandler(response) {
   }
 
   if (this.tab || message !== discreet.cancelMsg) {
-    if (message && message.indexOf('OFFER_MISMATCH') === 0) {
-      // show offers UI error only when offers ui is initialized
-      if (this.offers) {
-        hideOverlayMessage();
-        this.showOffersError();
-      } else {
-        this.showLoadError(
-          'The Offer you selected is not applicable on this Payment Method',
-          true
-        );
-      }
-
-      Analytics.track('offers:mismatch', {
-        data: this.getAppliedOffer(),
-      });
-    } else {
-      this.showLoadError(
-        message || 'There was an error in handling your request',
-        true
-      );
-    }
+    this.showLoadError(
+      message || 'There was an error in handling your request',
+      true
+    );
   }
 
   NBHandlers.replaceRetryIfCorporateNetbanking(this, message);
@@ -623,7 +633,7 @@ function askOTP(view, text, shouldLimitResend, screenProps) {
   }
 
   var origText = text; // ಠ_ಠ
-  var qpmap = getQueryParams();
+  var qpmap = _.getQueryParams();
   var thisSession = SessionManager.getSession();
 
   // Track if OTP was invalid
@@ -854,6 +864,14 @@ Session.prototype = {
       this.formatAmountWithCurrency(amount)
     );
   },
+  /**
+   * Set the amount in header.
+   *
+   * @param {String} html
+   */
+  setRawAmountInHeader: function(html) {
+    $('#amount .original-amount').html(html);
+  },
 
   track: function(event, extra) {
     Track(this.r, event, extra);
@@ -992,7 +1010,9 @@ Session.prototype = {
 
       if (selectedWalletEl && selectedWalletEl[0]) {
         selectedWalletEl.prop('checked', true);
-        $('#body').addClass('sub');
+        if (tab === 'wallet') {
+          Cta.showCta();
+        }
 
         var walletsEle = $('#wallets')[0].parentElement;
 
@@ -1182,57 +1202,6 @@ Session.prototype = {
 
     errorHandler.call(this, this.params);
 
-    var hasOffers = this.hasOffers,
-      forcedOffer = this.forcedOffer;
-
-    if (forcedOffer) {
-      if (
-        'original_amount' in forcedOffer &&
-        'amount' in forcedOffer &&
-        forcedOffer.amount !== forcedOffer.original_amount
-      ) {
-        this.showDiscount();
-        Analytics.track('offers:forced_with_discount', {
-          data: forcedOffer,
-        });
-      }
-    } else if (hasOffers) {
-      var $offersContainer = $('#body #offers-container'),
-        $offersTitle;
-
-      if (this.eligibleOffers.length > 0) {
-        // TODO: convert args to kwargs
-        this.offers = initOffers(
-          $offersContainer[0],
-          this.eligibleOffers,
-          {},
-          this.handleOfferSelection.bind(this),
-          this.handleOfferRemoval.bind(this),
-          this.formatAmountWithCurrency.bind(this),
-          $('#body')[0],
-          this
-        );
-
-        this.renderOffers(this.screen);
-
-        // For portals, this tracking snippet is present in the Svelte component of Offer Portal.
-        $offersContainer.on('click', function(e) {
-          $offersTitle = $offersTitle || this.querySelector('.offers-title');
-
-          if (!$offersTitle || !$offersTitle.contains(e.target)) {
-            return;
-          }
-
-          Analytics.track(
-            'offers:list_view:screen:' + (that.screen || 'home'),
-            {
-              data: that.offers.appliedOffer,
-            }
-          );
-        });
-      }
-    }
-
     if (!this.tab && !this.get('prefill.contact')) {
       $('#contact').focus();
     }
@@ -1260,6 +1229,10 @@ Session.prototype = {
     window.addEventListener('orientationchange', function() {
       Analytics.setMeta('orientation', Hacks.getDeviceOrientation());
     });
+
+    if (discreet.UserAgent.Safari) {
+      Analytics.setMeta('safari', true);
+    }
 
     Analytics.track('complete', {
       type: AnalyticsTypes.RENDER,
@@ -1289,7 +1262,7 @@ Session.prototype = {
      */
     if (MethodStore.isMethodEnabled('upi')) {
       this.upiTab = new discreet.UpiTab({
-        target: _Doc.querySelector('#upi-svelte-wrap'),
+        target: _Doc.querySelector('#form-fields'),
       });
     }
   },
@@ -1307,7 +1280,7 @@ Session.prototype = {
 
   setHomeTab: function() {
     this.homeTab = new discreet.HomeTab({
-      target: gel('home-screen-wrap'),
+      target: gel('form-fields'),
     });
   },
 
@@ -1333,7 +1306,7 @@ Session.prototype = {
 
     if (method) {
       this.netbankingTab = new discreet.NetbankingTab({
-        target: gel('netbanking-svelte-wrap'),
+        target: gel('form-fields'),
         props: {
           bankOptions: this.get('method.netbanking'),
           banks: banks,
@@ -1350,17 +1323,25 @@ Session.prototype = {
         );
       }
 
-      this.netbankingTab.$on(
-        'bankSelected',
-        this.removeNetbankingOfferIfNotApplicable.bind(this)
-      );
+      var session = this;
+
+      this.netbankingTab.$on('bankSelected', function(e) {
+        session.validateOffers(e.detail.bank.code, function(offerRemoved) {
+          if (!offerRemoved) {
+            // If the offer was not removed, revert to the bank in offer issuer
+            session.netbankingTab.setSelectedBank(
+              session.getAppliedOffer().issuer
+            );
+          }
+        });
+      });
     }
   },
 
   setSvelteCardTab: function() {
     if (MethodStore.isCardOrEMIEnabled()) {
       this.svelteCardTab = new discreet.CardTab({
-        target: gel('card-svelte-wrap'),
+        target: gel('form-fields'),
         props: {
           askOTP: askOTP,
         },
@@ -1369,10 +1350,12 @@ Session.prototype = {
   },
 
   setWalletsTab: function() {
-    this.svelteWalletsTab = new discreet.WalletTab({
-      target: gel('wallet-svelte-wrap'),
-      props: {},
-    });
+    if (MethodStore.isMethodEnabled('wallet')) {
+      this.svelteWalletsTab = new discreet.WalletTab({
+        target: gel('wallet-svelte-wrap'),
+        props: {},
+      });
+    }
   },
 
   setSvelteComponents: function() {
@@ -1389,21 +1372,17 @@ Session.prototype = {
     this.setNach();
     this.setBankTransfer();
     this.setWalletsTab();
+    this.setOffers();
+    // make bottom the last element
+    gel('form-fields').appendChild(gel('bottom'));
   },
 
   showTimer: function(cb) {
     this.hideTimer();
     var timeLeft = this.closeAt - now();
     var timeoutEl = $('#timeout').show()[0];
-    $('#body').addClass('has-timeout');
     var timerFn = updateTimer(timeoutEl, this.closeAt);
     timerFn();
-    if (this.headless && !this.get('timeout')) {
-      qs('#form-otp').insertBefore(timeoutEl, qs('#otp-sec-outer'));
-    } else if (isMobile()) {
-      var modalEl = gel('modal');
-      modalEl.insertBefore(timeoutEl, modalEl.firstChild);
-    }
     var self = this;
     this.closeTimer = setInterval(timerFn, 1000);
     this.closeTimeout = setTimeout(function() {
@@ -1414,7 +1393,6 @@ Session.prototype = {
 
   hideTimer: function() {
     $('#timeout').hide();
-    $('#body').removeClass('has-timeout');
     clearInterval(this.closeTimer);
     clearTimeout(this.closeTimeout);
   },
@@ -1526,33 +1504,13 @@ Session.prototype = {
     var self = this;
 
     if (MethodStore.isMethodEnabled('cardless_emi')) {
-      this.emiOptionsView = new discreet.emiOptionsView({
-        target: _Doc.querySelector('#emi-options-wrapper'),
+      this.cardlessEmiView = new discreet.CardlessEmiView({
+        target: _Doc.querySelector('#form-fields'),
       });
 
-      var providers = MethodStore.getCardlessEMIProviders();
-      providers = _Obj.keys(providers).map(function(provider) {
-        var providerObj = providers[provider];
-        return CardlessEmi.createProvider(providerObj.code, providerObj.name);
-      });
-
-      if (MethodStore.isMethodEnabled('emi')) {
-        var providerTitle = MethodStore.isDebitEMIEnabled()
-          ? 'EMI on Debit/Credit Cards'
-          : 'EMI on Cards';
-        providers.unshift(CardlessEmi.createProvider('cards', providerTitle));
-      }
-
-      this.emiOptionsView.$set({
-        providers: providers,
-
-        on: {
-          select: function(event) {
-            var providerCode = event.detail.code;
-
-            self.selectCardlessEmiProviderAndAttemptPayment(providerCode);
-          },
-        },
+      this.cardlessEmiView.$on('select', function(event) {
+        var providerCode = event.detail.code;
+        self.selectCardlessEmiProviderAndAttemptPayment(providerCode);
       });
     }
   },
@@ -1589,7 +1547,7 @@ Session.prototype = {
   setNach: function() {
     if (MethodStore.isMethodEnabled('nach')) {
       this.nachScreen = new discreet.NachScreen({
-        target: _Doc.querySelector('#nach-wrap'),
+        target: _Doc.querySelector('#form-fields'),
       });
     }
   },
@@ -1597,7 +1555,7 @@ Session.prototype = {
   setBankTransfer: function() {
     if (MethodStore.isMethodEnabled('bank_transfer')) {
       this.bankTransferView = new discreet.BankTransferScreen({
-        target: _Doc.querySelector('#bank-transfer-svelte-wrap'),
+        target: _Doc.querySelector('#form-fields'),
       });
     }
   },
@@ -1611,24 +1569,12 @@ Session.prototype = {
     }
 
     this.payLaterView = new PayLaterView({
-      target: _Doc.querySelector('#paylater-wrapper'),
+      target: _Doc.querySelector('#form-fields'),
     });
 
-    var providers = MethodStore.getPayLaterProviders().map(function(
-      providerObj
-    ) {
-      return PayLater.createProvider(providerObj.code, providerObj.name);
-    });
-
-    this.payLaterView.$set({
-      providers: providers,
-
-      on: {
-        select: function(event) {
-          var providerCode = event.detail.code;
-          self.selectPayLaterProviderAndAttemptPayment(providerCode);
-        },
-      },
+    this.payLaterView.$on('select', function(event) {
+      var providerCode = event.detail.code;
+      self.selectPayLaterProviderAndAttemptPayment(providerCode);
     });
   },
 
@@ -1667,7 +1613,7 @@ Session.prototype = {
     Analytics.setMeta('count.accounts.bank', bankAccounts.length);
 
     this.payoutsView = new discreet.PayoutsInstruments({
-      target: gel('payouts-svelte-wrap'),
+      target: gel('form-fields'),
       props: {
         amount: this.formatAmountWithCurrency(this.get('amount')),
         upiAccounts: upiAccounts,
@@ -1676,7 +1622,7 @@ Session.prototype = {
     });
 
     this.payoutsAccountView = new discreet.PayoutAccount({
-      target: gel('payout-account-svelte-wrap'),
+      target: gel('form-fields'),
     });
 
     $('#top-right').addClass('hidden');
@@ -1975,7 +1921,7 @@ Session.prototype = {
   setOtpScreen: function() {
     if (!this.otpView) {
       this.otpView = new discreet.otpView({
-        target: gel('otp-screen-wrapper'),
+        target: gel('form-fields'),
 
         props: {
           on: {
@@ -2158,6 +2104,15 @@ Session.prototype = {
   },
 
   hideErrorMessage: function(confirmedCancel) {
+    if (this.nocostModal) {
+      var modal = this.nocostModal;
+      hideOverlay($('#nocost-overlay'));
+      setTimeout(function() {
+        modal.$destroy();
+        modal = null;
+      }, 200);
+      return;
+    }
     var self = this;
     if (this.r._payment) {
       if (
@@ -2532,8 +2487,6 @@ Session.prototype = {
 
     if (MethodStore.isMethodEnabled('emi')) {
       this.on('click', '#form-card', 'saved-card-pay-without-emi', function(e) {
-        self.removeAndCleanupOffers();
-
         self.switchTab('card');
       });
     }
@@ -2691,7 +2644,7 @@ Session.prototype = {
 
     if (screen === 'qr') {
       this.currentScreen = new discreet.QRScreen({
-        target: qs('#form-qr'),
+        target: qs('#form-fields'),
         props: {
           paymentData: this.getFormData(),
           onSuccess: bind(successHandler, this),
@@ -2716,11 +2669,6 @@ Session.prototype = {
     });
     Analytics.setMeta('screen', screen);
     Analytics.setMeta('timeSince.screen', discreet.timer());
-
-    // Back button is pressed before going to card page page
-    if (this.screen === 'otp' && screen !== 'card' && screen !== 'emi') {
-      this.preSelectedOffer = null;
-    }
 
     this.screen = screen;
     $('#body').attr('screen', screen);
@@ -2781,119 +2729,7 @@ Session.prototype = {
       this.body.toggleClass('sub', showPaybtn);
     }
 
-    return this.offers && this.renderOffers(this.tab);
-  },
-
-  /**
-   * Renders offers
-   * @param {string} tab
-   */
-  renderOffers: function(tab) {
-    /**
-     * Going to the OTP screen resets the offers
-     * Prevent that by not rendering offers there
-     * and aborting early.
-     */
-    if (this.screen === 'otp' || tab === 'otp') {
-      return this.offers.display(false);
-    }
-
-    // EMI plans should have the same offers as EMI
-    // TODO: Fix for Cardless EMI
-    if (tab === 'emiplans') {
-      tab = 'emi';
-    }
-
-    // Allow offers only on certain tabs
-    if (
-      [
-        '',
-        'card',
-        'emi',
-        'netbanking',
-        'wallet',
-        'upi',
-        'cardless_emi',
-      ].indexOf(tab) < 0
-    ) {
-      $('#body').removeClass('has-offers');
-      return this.offers.display(false);
-    }
-
-    // reset offers UI
-    if (this.offers.appliedOffer || this.offers.selectedOffer) {
-      this.offers.removeOffer();
-      // Explicitly call this because we removed the offer explicitly
-      this.handleOfferRemoval();
-    }
-
-    var paymentMethod = tab;
-
-    var filters = (tab && { payment_method: paymentMethod }) || {};
-
-    /**
-     * For every Cardless EMI screen other than
-     * the Cardless EMI homescreen,
-     * set the provider in the filters.
-     *
-     * Side-effect: We won't be able to show
-     * provider-less offers for Cardless EMI
-     * until Offers code is refactored.
-     */
-    if (tab === 'cardless_emi') {
-      if (this.screen !== 'cardless_emi') {
-        filters.provider = CardlessEmiStore.providerCode;
-      }
-    }
-
-    /**
-     * Offers have a 'homescreen' attribute that tells
-     * whether or not we want to show that offer on the homescreen.
-     *
-     * `tab` being '' means we are on the homescreen.
-     */
-    if (tab === '') {
-      filters.homescreen = tab === '';
-    }
-
-    this.offers.applyFilter(filters);
-
-    if (this.preSelectedOffer) {
-      this.offers.selectOffer(this.preSelectedOffer);
-      // Explicitly call this because we selected the offer explicitly
-      this.offers.applyOffer();
-      this.handleOfferSelection(this.preSelectedOffer, tab);
-
-      /* Don't set preSelectedOffer to null if it's on card OTP screen  */
-      if (this.screen === 'otp' && tab !== 'card' && tab !== 'emi') {
-        this.preSelectedOffer = null;
-      }
-    }
-
-    /**
-     * On some screens, there might be an offers portal available.
-     * We render the Offers strip inside that portal.
-     *
-     * If a portal is available, use that portal.
-     * Otherwise, fall back to the default container.
-     */
-    var usingPortal = false;
-    var offersPortal = _Doc.querySelector(
-      this.getActiveForm() + ' .offers-portal'
-    );
-    var offersContainer = _Doc.querySelector('#offers-container');
-    var hasOffers = this.offers.numVisibleOffers > 0;
-
-    usingPortal = Boolean(offersPortal);
-
-    if (usingPortal) {
-      offersContainer = offersPortal;
-    }
-
-    this.offers.updateContainerRef(offersContainer);
-
-    $('#body').toggleClass('has-offers', hasOffers);
-    $('#body').toggleClass('using-offers-portal', usingPortal);
+    return this.offers && this.offers.renderTab(this.tab);
   },
 
   /**
@@ -2902,27 +2738,12 @@ Session.prototype = {
    * @param {string} screen
    */
   handleOfferSelection: function(offer, screen) {
-    var offerInstance = offer;
-
-    offer = offer.data;
-
-    // Show discount if it is not a cashback offer
-    if (
-      offer.type !== OfferType.DEFERRED &&
-      offer.original_amount > offer.amount
-    ) {
-      this.showDiscount();
-    }
-
-    this.svelteCardTab.setSelectedOffer(offer);
-
     screen = screen || this.screen;
 
     // Go to the offer's method if we're on homescreen
-    if (!screen) {
-      this.preSelectedOffer = offerInstance;
+    if (screen !== offer.payment_method) {
       this.switchTab(offer.payment_method);
-      return this.handleOfferSelection(offerInstance, offer.payment_method);
+      return this.handleOfferSelection(offer, offer.payment_method);
     }
 
     var issuer = offer.issuer;
@@ -2963,54 +2784,18 @@ Session.prototype = {
   },
 
   /**
-   * Removes offer
-   */
-  handleOfferRemoval: function() {
-    this.hideDiscount();
-    // Reset selected offer in cards tab to show all saved cards
-    this.svelteCardTab.setSelectedOffer();
-  },
-
-  /**
-   * Removes currently selected offer if it was automatically applied (and not
-   * selected by the user)
-   */
-  removeAutomaticallyAppliedOffer: function() {
-    if (
-      this.offers &&
-      !this.offers.offerSelectedByDrawer &&
-      this.offers.appliedOffer
-    ) {
-      this.offers.removeOffer();
-    }
-  },
-
-  /**
    * Show the discount amount.
    */
-  showDiscount: function() {
+  handleDiscount: function() {
     var offer = this.getAppliedOffer();
-
-    if (!offer) {
-      return;
-    }
-
-    $('#content').addClass('has-discount');
-
-    var discountAmount = this.formatAmountWithCurrency(offer.amount);
-
-    //TODO: optimise queries
-    $('#amount .discount')[0].innerHTML = discountAmount;
+    var hasDiscount = offer && offer.amount !== offer.original_amount;
+    $('#content').toggleClass('has-discount', hasDiscount);
+    $('#amount .discount').html(
+      hasDiscount ? this.formatAmountWithCurrency(offer.amount) : ''
+    );
     Cta.showAmountInCta();
   },
-  hideDiscount: function() {
-    $('#content').removeClass('has-discount');
-    //TODO: optimise queries
-    $('#amount .discount').html('');
-    if (this.tab !== '') {
-      Cta.showAmountInCta();
-    }
-  },
+
   back: function(confirmedCancel) {
     var tab = '';
     var payment = this.r._payment;
@@ -3077,6 +2862,10 @@ Session.prototype = {
       MethodStore.isMethodEnabled('cardless_emi')
     ) {
       tab = 'cardless_emi';
+    } else if (this.tab === 'card') {
+      if (this.svelteCardTab.onBack()) {
+        return;
+      }
     } else if (this.tab === 'netbanking') {
       if (this.netbankingTab.onBack()) {
         return;
@@ -3113,7 +2902,6 @@ Session.prototype = {
       this.setScreen(BackStore.screen);
     }
 
-    this.preSelectedOffer = null;
     this.switchTab(tab);
 
     BackStore = null;
@@ -3278,6 +3066,15 @@ Session.prototype = {
         $('#top-right').addClass('logged');
       }
       $('#user').html(contact);
+
+      var offer = this.getAppliedOffer();
+      if (
+        this.offers &&
+        offer &&
+        discreet.Offers.getOfferMethodForTab(tab) !== offer.payment_method
+      ) {
+        this.offers.clearOffer();
+      }
     } else {
       this.payload = null;
       this.clearRequest();
@@ -3447,17 +3244,13 @@ Session.prototype = {
    * @param {Object} plan
    */
   processOffersOnEmiPlanSelection: function(plan) {
-    if (plan && plan.offer_id) {
-      if (this.offers) {
-        this.preSelectedOffer = this.offers.selectOfferById(plan.offer_id);
-      }
-    } else {
+    if (!plan || !plan.offer_id) {
       if (
         this.offers &&
         this.offers.appliedOffer &&
         this.offers.appliedOffer.emi_subvention
       ) {
-        this.offers.removeOffer();
+        this.offers.clearOffer();
       }
     }
   },
@@ -3497,15 +3290,7 @@ Session.prototype = {
 
         var bank = self.emiPlansForNewCard && self.emiPlansForNewCard.code;
         var plans = MethodStore.getEMIBankPlans(bank);
-
-        if (self.isOfferApplicableOnIssuer(bank)) {
-          amount = self.getDiscountedAmount();
-        } else {
-          self.removeAndCleanupOffers();
-        }
-
         var emiPlans = self.getEmiPlans(bank);
-
         var prevTab = self.tab;
         var prevScreen = self.screen;
 
@@ -3540,6 +3325,7 @@ Session.prototype = {
               var plan = _Arr.find(plans, function(p) {
                 return p.duration === value;
               });
+
               var text = getEmiText(self, amount, plan) || '';
 
               trackEmi('emi:plan:select', {
@@ -3567,12 +3353,6 @@ Session.prototype = {
           },
         });
 
-        if (self.offers) {
-          if (!self.offers.selectedOffer && !self.offers.appliedOffer) {
-            self.preSelectedOffer = null;
-          }
-        }
-
         self.switchTab('emiplans');
         $('#body').removeClass('sub');
       };
@@ -3588,13 +3368,6 @@ Session.prototype = {
         var emiPlans = self.getEmiPlans(bank, cardType);
         var $savedCard = $('.saved-card.checked');
         var savedCvv = $savedCard.$('.saved-cvv input').val();
-
-        if (self.isOfferApplicableOnIssuer(bank)) {
-          amount = self.getDiscountedAmount();
-        } else {
-          self.removeAndCleanupOffers();
-        }
-
         var prevTab = self.tab;
         var prevScreen = self.screen;
 
@@ -3663,12 +3436,6 @@ Session.prototype = {
           },
         });
 
-        if (self.offers) {
-          if (!self.offers.selectedOffer && !self.offers.appliedOffer) {
-            self.preSelectedOffer = null;
-          }
-        }
-
         self.switchTab('emiplans');
         $('#body').removeClass('sub');
       };
@@ -3679,13 +3446,6 @@ Session.prototype = {
         var bank = 'BAJAJ';
         var plans = MethodStore.getEMIBankPlans(bank);
         var emiPlans = self.getEmiPlans(bank);
-
-        if (self.isOfferApplicableOnIssuer(bank)) {
-          amount = self.getDiscountedAmount();
-        } else {
-          self.removeAndCleanupOffers();
-        }
-
         var prevTab = self.tab;
         var prevScreen = self.screen;
 
@@ -3697,7 +3457,6 @@ Session.prototype = {
             back: function() {
               self.switchTab(prevTab);
               self.setScreen(prevScreen);
-
               return true;
             },
 
@@ -3732,36 +3491,16 @@ Session.prototype = {
   },
 
   /**
-   * Removes offers and cleans up all the corresponding variables
-   */
-  removeAndCleanupOffers: function() {
-    if (this.offers) {
-      this.preSelectedOffer = null;
-      this.offers.removeOffer();
-      this.hideDiscount();
-    }
-  },
-
-  /**
    * Validates that the issuer of the offer is same as the selected value
    * @param {string} selectedVal
-   * @param {Element} selectedEl
    *
    * @returns {boolean}
    */
-  validateOffers: function(selectedVal, selectedEl) {
-    if (!this.offers || !this.offers.appliedOffer) {
-      return true;
+  validateOffers: function(selectedIssuer, callback) {
+    var offer = this.getAppliedOffer();
+    if (offer && offer.issuer && selectedIssuer !== offer.issuer) {
+      return this.showOffersError(callback);
     }
-
-    // Get the issuer for the offer
-    var appliedOfferIssuer = this.offers.appliedOffer.issuer;
-
-    // Validate only if an issuer is provided
-    if (appliedOfferIssuer) {
-      return appliedOfferIssuer === selectedVal;
-    }
-
     return true;
   },
 
@@ -3777,27 +3516,6 @@ Session.prototype = {
     }
 
     return this.emandateView.showBankDetailsForm(bank.code);
-  },
-
-  removeNetbankingOfferIfNotApplicable: function(event) {
-    var code = event.detail.bank.code;
-    var offerIssuer = _Obj.getSafely(this, 'offers.appliedOffer.issuer');
-    var self = this;
-
-    // If the issuer is missing, the offer should be applied regardless of the
-    // bank selected. Do not validate in that case.
-    if (!offerIssuer) {
-      return;
-    }
-
-    if (offerIssuer !== code) {
-      this.showOffersError(function(offerRemoved) {
-        if (!offerRemoved) {
-          // If the offer was not removed, revert to the bank in offer issuer
-          self.netbankingTab.setSelectedBank(offerIssuer);
-        }
-      });
-    }
   },
 
   checkInvalid: function(parent) {
@@ -4331,6 +4049,14 @@ Session.prototype = {
     var screen = this.screen;
     var tab = this.tab;
 
+    var isOffersVisible = this.offers && this.offers.isListShown();
+    if (isOffersVisible) {
+      this.offers.onSubmit();
+      if (screen) {
+        return;
+      }
+    }
+
     /**
      * The CTA for home screen is visible only on the new design. If it was
      * clicked, switch to the new payment methods screen.
@@ -4343,6 +4069,12 @@ Session.prototype = {
             return this.homeTab.next();
           }
         }
+      } else {
+        this.offers && this.offers.clearOffer();
+        return;
+      }
+      if (isOffersVisible) {
+        return;
       }
     }
 
@@ -4743,23 +4475,18 @@ Session.prototype = {
 
     var appliedOffer = this.getAppliedOffer();
 
-    if (appliedOffer) {
-      // Set offer ID based on offer type
-      switch (appliedOffer._type) {
-        case 'api':
-          data.offer_id = appliedOffer.id;
-          break;
-
-        case 'local':
-          data['notes[offer_id]'] = appliedOffer.id;
-          break;
-      }
+    if (appliedOffer && (!this.offers || this.offers.shouldSendOfferToApi())) {
+      data.offer_id = appliedOffer.id;
       this.r.display_amount = appliedOffer.amount;
       Analytics.track('offers:applied_with_payment', {
         data: appliedOffer,
       });
     } else {
       delete this.r.display_amount;
+      var selectedPlan = this.emiPlansView.selectedPlan;
+      if (data.emi_duration && selectedPlan && selectedPlan.offer_id) {
+        data.offer_id = selectedPlan.offer_id;
+      }
     }
 
     if (data.method === 'cardless_emi') {
@@ -4911,6 +4638,13 @@ Session.prototype = {
 
     if (this.modal) {
       this.modal.options.backdropclose = false;
+    }
+
+    if (data.method === 'card' && Store.isDCCEnabled()) {
+      data.currency_request_id = discreet.storeGetter(
+        CardScreenStore.currencyRequestId
+      );
+      data.dcc_currency = discreet.storeGetter(CardScreenStore.dccCurrency);
     }
 
     if (data.method === 'card' || data.method === 'emi') {
@@ -5262,11 +4996,10 @@ Session.prototype = {
     var views = [
       'upiOtmTab',
       'bankTransferView',
-      'svelteCardTab',
+      'cardlessEmiView',
       'currentScreen',
       'emandateView',
       'emi',
-      'emiOptionsView',
       'emiPlansView',
       'emiScreenView',
       'feeBearerView',
@@ -5278,6 +5011,7 @@ Session.prototype = {
       'payoutsAccountView',
       'payoutsView',
       'savedCardsView',
+      'svelteCardTab',
       'svelteWalletsTab',
       'upiTab',
     ];
@@ -5358,39 +5092,64 @@ Session.prototype = {
     }
   },
 
-  /**
-   * Sets offers for this session
-   * @param {Object} preferences
-   */
-  setOffers: function(preferences) {
-    var allOffers = discreet.Offers.createOffers({
-      preferences: preferences,
-      session: this,
+  showNoCostExplainer: function(plan) {
+    this.nocostModal = new discreet.NoCostExplainer({
+      target: gel('nocost-overlay'),
+      props: {
+        plan: plan,
+        formatter: this.formatAmountWithCurrency.bind(this),
+      },
     });
+    showOverlay($('#nocost-overlay'));
+  },
 
-    this.eligibleOffers = allOffers.offers;
+  setOffers: function() {
+    var forcedOffer = discreet.Offers.getForcedOffer();
+    var allOffers = discreet.Offers.getOffersForTab();
 
-    this.hasOffers = allOffers.offers.length > 0;
-    this.forcedOffer = allOffers.forcedOffer;
-
-    if (this.hasOffers) {
+    // we show offers from backend + zestmoney offer which is
+    // universally enabled
+    if (forcedOffer || allOffers.length > 0) {
       Analytics.setMeta('hasOffers', true);
+    } else if (!MethodStore.isZestMoneyEnabled()) {
+      // if zestmoney isn't enabled, and backend also hasn't sent
+      // any offers, don't proceed to initialize offers.
+      return;
     }
 
-    if (this.forcedOffer) {
-      Analytics.setMeta('forcedOffer', true);
-    }
-
-    if (this.forcedOffer) {
-      var paymentMethod = this.forcedOffer.payment_method;
-
-      if (['emi', 'card', 'wallet'].indexOf(paymentMethod) >= 0) {
-        // need this while preparing the template
-        this[paymentMethod + 'Offer'] = preferences.offers[0];
+    if (forcedOffer) {
+      if (forcedOffer.payment_method === 'wallet') {
+        this.walletOffer = forcedOffer;
       }
-
-      Analytics.track('offers:forced', {
-        data: this.forcedOffer,
+      Analytics.setMeta('forcedOffer', true);
+    } else {
+      var appliedOffer;
+      this.getAppliedOffer = function() {
+        return appliedOffer;
+      };
+      var session = this;
+      this.offers = new discreet.OffersView({
+        target: gel('bottom'),
+        props: {
+          applicableOffers: allOffers,
+          setAppliedOffer: function(offer, shouldNavigate) {
+            if (appliedOffer !== offer) {
+              appliedOffer = offer;
+              if (offer && shouldNavigate) {
+                session.handleOfferSelection(offer);
+              }
+              session.handleDiscount();
+            }
+          },
+          onShown: function() {
+            Analytics.track(
+              'offers:list_view:screen:' + (session.screen || 'home'),
+              {
+                data: session.getAppliedOffer(),
+              }
+            );
+          },
+        },
       });
     }
   },
@@ -5401,7 +5160,7 @@ Session.prototype = {
    * @returns {Offer}
    */
   getAppliedOffer: function() {
-    return this.forcedOffer || (this.offers && this.offers.appliedOffer);
+    return discreet.Offers.getForcedOffer();
   },
 
   /**
@@ -5451,11 +5210,13 @@ Session.prototype = {
       screen = this.screen;
 
     if (screen === 'netbanking') {
-      methodDescription = 'Bank';
+      methodDescription = 'selected bank';
     } else if (screen === 'upi') {
-      methodDescription = 'VPA';
+      methodDescription = 'entered VPA';
+    } else if (screen === 'emi' || screen === 'emiplans') {
+      methodDescription = 'selected plan';
     } else {
-      methodDescription = titleCase(this.screen);
+      methodDescription = 'selected ' + this.screen;
     }
 
     this.offers.showError(methodDescription, cb);
@@ -5554,6 +5315,8 @@ Session.prototype = {
       this.set('retry', false);
     }
 
+    Analytics.setMeta('features', preferences.features);
+
     /* Used previously logged in customer details and saved card tokens */
     if (saved_customer) {
       /* saved card details take priority over prefill */
@@ -5649,9 +5412,6 @@ Session.prototype = {
       };
     }
 
-    // Set Offers
-    this.setOffers(preferences);
-
     // Set optional fields in meta
     Analytics.setMeta(
       'optional.contact',
@@ -5666,19 +5426,6 @@ Session.prototype = {
   },
 
   showModal: function(preferences) {
-    var qpmap = _Obj.unflatten(getQueryParams());
-
-    var methods = MethodStore.getEnabledMethods();
-    if (!methods.length) {
-      var message = 'No appropriate payment method found.';
-      if (MethodStore.isEMandateEnabled() && !this.get('customer_id')) {
-        message += '\nMake sure to pass customer_id for e-mandate payments';
-      }
-      return Razorpay.sendMessage({ event: 'fault', data: message });
-    }
-
-    this.render();
-
     Razorpay.sendMessage({ event: 'render' });
 
     if (CheckoutBridge) {
@@ -5695,6 +5442,7 @@ Session.prototype = {
       $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
     }
 
+    var qpmap = _Obj.unflatten(_.getQueryParams());
     if (qpmap.error) {
       errorHandler.call(this, qpmap);
     }

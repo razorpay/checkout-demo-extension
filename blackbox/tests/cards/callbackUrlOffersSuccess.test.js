@@ -66,7 +66,7 @@ describe('Card tests', () => {
     await verifyOfferApplied(context);
     await verifyDiscountPaybleAmount(context, '₹ 1,980');
     await verifyDiscountAmountInBanner(context, '₹ 1,980');
-    await verifyDiscountText(context, 'You save ₹ 20');
+    await verifyDiscountText(context, 'You save ₹20');
     await submit(context);
     await expectRedirectWithCallback(context, { method: 'card' });
   });

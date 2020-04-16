@@ -126,10 +126,9 @@ async function verifyDiscountPaybleAmount(context, expectedDiscountAmount) {
 }
 
 async function verifyDiscountText(context, expectedDiscountAmount) {
-  const discount = await context.page.waitForSelector('.discount-text');
-  let discountAmount = await context.page.evaluate(
-    discount => discount.textContent,
-    discount
+  const discount = await context.page.$eval(
+    '.offers-container small',
+    el => el.innerText
   );
-  expect(discountAmount).toEqual(expectedDiscountAmount);
+  expect(discount).toEqual(expectedDiscountAmount);
 }

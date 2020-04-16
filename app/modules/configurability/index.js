@@ -4,6 +4,7 @@ import { clusterRazorpayBlocks } from './methods';
 import { ungroupInstruments, getIndividualInstruments } from './ungroup';
 import InstrumentConfig from './instruments-config';
 import { isInstrumentForEntireMethod } from './instruments';
+import { getUPIIntentApps } from 'checkoutstore/native';
 
 import { AVAILABLE_METHODS } from 'common/constants';
 import {
@@ -190,6 +191,18 @@ function removeNonApplicableInstrumentFlows(instrument) {
         if (instrument.apps && !_Arr.contains(instrument.flows, 'intent')) {
           delete instrument.apps;
         }
+
+        if (instrument.apps) {
+          const allUpiAppsOnDevice = getUPIIntentApps().all;
+
+          // Keep only those apps which are present on the device
+          instrument.apps = _Arr.filter(instrument.apps, app =>
+            _Arr.find(
+              allUpiAppsOnDevice,
+              deviceApp => deviceApp.package_name === app
+            )
+          );
+        }
       }
 
       // TODO: check for app
@@ -248,20 +261,20 @@ export function getBlockConfig(options, customer) {
   const translated = translateExternal(options);
 
   // Ungroup instruments and remove disabed instruments for each block
-  translated.blocks =
-    translated.blocks
+  translated.display.blocks =
+    translated.display.blocks
     |> _Arr.map(removeDisabledInstrumentsFromBlock)
     |> _Arr.map(block => ungroupInstruments(block, customer));
 
   // Remove empty blocks
-  translated.blocks = _Arr.filter(
-    translated.blocks,
+  translated.display.blocks = _Arr.filter(
+    translated.display.blocks,
     block => block.instruments.length > 0
   );
 
   // Ungroup hidden instrument as well
-  translated.hide.instruments =
-    translated.hide.instruments
+  translated.display.hide.instruments =
+    translated.display.hide.instruments
     |> _Arr.flatMap(
       group => getIndividualInstruments(group, customer)._ungrouped
     );
@@ -277,7 +290,9 @@ export function getBlockConfig(options, customer) {
   const clustered = clusterRazorpayBlocks(sequentialied);
 
   return {
-    blocks: clustered,
-    hidden: translated.hide.instruments,
+    display: {
+      blocks: clustered,
+      hidden: translated.display.hide.instruments,
+    },
   };
 }

@@ -7,6 +7,6 @@ module.exports = {
   testTimeout: 40 * 1000,
   maxWorkers: 6,
   // testRunner: 'jest-circus/runner',
-  // verbose: true,
+  verbose: true,
   setupFilesAfterEnv: ['./blackbox/jestSetupFileAfterENV'],
 };

@@ -5,6 +5,7 @@
   // Store Imports
   import { getWallets } from 'checkoutstore/methods';
   import { showCta } from 'checkoutstore/cta';
+  import { methodTabInstrument } from 'checkoutstore/screens/home';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -20,12 +21,53 @@
   import { slide } from 'svelte/transition';
 
   const session = getSession();
-  const wallet = getWallets();
+  const wallets = getWallets();
 
   const ua = navigator.userAgent;
   const ua_iPhone = /iPhone/.test(ua);
 
   export let selectedWallet = session.get('prefill.wallet') || null;
+
+  let filteredWallets = wallets;
+  $: {
+    filteredWallets = filterWalletsAgainstInstrument(
+      wallets,
+      $methodTabInstrument
+    );
+
+    // If a wallet was selected and has been filtered out, deselect it
+    if (
+      selectedWallet &&
+      !_Arr.any(filteredWallets, wallet => wallet.code === selectedWallet)
+    ) {
+      selectedWallet = null;
+    }
+  }
+
+  /**
+   * Filters wallets against the given instrument.
+   * Only allows those wallets that match the given instruments.
+   *
+   * @param {Array<Wallet>} wallets
+   * @param {Instrument} instrument
+   *
+   * @returns {Array<Wallet>}
+   */
+  function filterWalletsAgainstInstrument(wallets, instrument) {
+    if (!instrument || instrument.method !== 'wallet') {
+      return wallets;
+    }
+
+    if (!instrument.wallets) {
+      return wallets;
+    }
+
+    let filtered = _Arr.filter(wallets, wallet =>
+      _Arr.contains(instrument.wallets, wallet.code)
+    );
+
+    return filtered;
+  }
 
   export function isAnyWalletSelected() {
     return !!selectedWallet;
@@ -34,18 +76,15 @@
   const walletReferences = {};
 
   export function onWalletSelection(e, code) {
-    selectedWallet = code;
+    const offerError = !session.validateOffers(code, function(removeOffer) {
+      if (removeOffer) {
+        selectedWallet = code;
+      }
+    });
 
-    if (!session.validateOffers(selectedWallet)) {
-      session.showOffersError(function(removeOffer) {
-        if (removeOffer) {
-          selectedWallet = code;
-        } else {
-          selectedWallet = null;
-        }
-      });
-
-      return;
+    if (!offerError) {
+      selectedWallet = code;
+      showCta();
     }
 
     if (ua_iPhone) {
@@ -59,8 +98,6 @@
         power: WalletsData.isPowerWallet(selectedWallet),
       },
     });
-
-    showCta();
   }
 
   export function onShown() {
@@ -118,32 +155,32 @@
 </style>
 
 <div class="border-list collapsable">
-  {#each wallet as w, i}
+  {#each filteredWallets as wallet, i}
     <SlottedRadioOption
-      name={w.code}
-      selected={selectedWallet === w.code}
+      name={wallet.code}
+      selected={selectedWallet === wallet.code}
       align="top"
-      on:click={e => onWalletSelection(e, w.code)}>
+      on:click={e => onWalletSelection(e, wallet.code)}>
       <div
         slot="title"
-        bind:this={walletReferences[w.code]}
-        id={`wallet-radio-${w.code}`}>
-        <span class="title">{w.name}</span>
+        bind:this={walletReferences[wallet.code]}
+        id={`wallet-radio-${wallet.code}`}>
+        <span class="title">{wallet.name}</span>
       </div>
       <div slot="body">
-        {#if selectedWallet === w.code}
+        {#if selectedWallet === wallet.code}
           <div transition:slide={{ duration: 200 }}>
-            {#if getApplicableOffer(w.code)}
-              <span class="offer">{getApplicableOffer(w.code).name}</span>
+            {#if getApplicableOffer(wallet.code)}
+              <span class="offer">{getApplicableOffer(wallet.code).name}</span>
               <div class="offer-info">
-                {getApplicableOffer(w.code).display_text}
+                {getApplicableOffer(wallet.code).display_text}
               </div>
             {/if}
           </div>
         {/if}
       </div>
       <i slot="icon" class="top">
-        <Icon icon={w.sqLogo} />
+        <Icon icon={wallet.sqLogo} />
       </i>
     </SlottedRadioOption>
   {/each}

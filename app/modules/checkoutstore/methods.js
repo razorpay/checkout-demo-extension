@@ -24,7 +24,7 @@ import { getProvider } from 'common/paylater';
 import { wallets } from 'common/wallet';
 import { extendConfig } from 'common/cardlessemi';
 import { mobileQuery } from 'common/useragent';
-import { getUPIIntentApps } from 'checkoutframe';
+import { getUPIIntentApps } from 'checkoutstore/native';
 
 const DEBIT_EMI_BANKS = ['HDFC_DC'];
 
@@ -148,6 +148,10 @@ const ALL_METHODS = {
     return isUPIOTMBaseEnabled();
   },
 };
+
+export function isZestMoneyEnabled() {
+  return isMethodEnabled('cardless_emi') && getCardlessEMIProviders().zestmoney;
+}
 
 export function isMethodEnabled(method) {
   const checker = ALL_METHODS[method];
@@ -394,7 +398,7 @@ export function getCardlessEMIProviders() {
 export function getWallets() {
   /**
    * disable wallets if:
-   * - amount > 20k
+   * - amount > 1L
    * - Wallets not enabled by backend
    * - Recurring payment
    * - International
@@ -408,7 +412,7 @@ export function getWallets() {
   if (
     !getAmount() ||
     passedWallets === false ||
-    getAmount() >= 20000 * 100 ||
+    getAmount() >= 1e5 * 100 ||
     isRecurring() ||
     isInternational()
   ) {

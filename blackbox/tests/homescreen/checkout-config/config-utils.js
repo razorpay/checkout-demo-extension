@@ -87,7 +87,11 @@ async function isGroupedInstrument(element) {
   expect(element).not.toBe(null);
   expect(await element.$('input[type=radio], input[type=tel]')).toBe(null);
 
-  const instrumentText = (await innerText(element)).trim();
+  const instrumentText = (await innerText(element))
+    .replace(/[^\w\s]/g, '') // Some options have SVG icons which might come under innerText
+    .replace(/\n/g, '') // Remove all line breaks
+    .trim();
+
   expect(instrumentText.startsWith('Pay using')).toBe(true);
 }
 
@@ -115,6 +119,31 @@ async function assertShownBanks(context, banks) {
 
   // Verify that all expected banks are present
   expect(matchAllStringsInList(banks, values)).toBe(true);
+}
+
+/**
+ * Assert that the expected wallets are shown
+ * @param {Context} context
+ * @param {Array<string>} wallets List of wallets that should have been shown
+ */
+async function assertShownWallets(context, wallets) {
+  // Wallet screen is visible
+  await context.page.waitForSelector('#form-wallet', {
+    visible: true,
+    timeout: 500,
+  });
+
+  // Get all Wallet elements
+  const elements = await context.page.$$(
+    '#form-wallet .border-list [role=listitem]'
+  );
+
+  // Get the names from all elements
+  let values = await Promise.all(elements.map(innerText));
+  values = values.map(value => value.trim());
+
+  // Verify that all expected banks are present
+  expect(matchAllStringsInList(wallets, values)).toBe(true);
 }
 
 /**
@@ -156,6 +185,73 @@ async function assertUpiCollect(context) {
   expect(await context.page.$eval('#upi-collect-list', visible)).toEqual(true);
 }
 
+/**
+ * Asserts that all expected paylater providers are shown
+ * @param {Context} context
+ * @param {Array<string>} providers
+ */
+async function assertShownPaylaterProviders(context, providers) {
+  // Paylater screen is visible
+  await context.page.waitForSelector('#form-paylater', {
+    visible: true,
+    timeout: 500,
+  });
+
+  // Get all Paylater elements
+  const elements = await context.page.$$('#form-paylater .options > *');
+
+  // Get the names from all elements
+  let values = await Promise.all(elements.map(innerText));
+  values = values.map(value => value.trim());
+
+  // Verify that all expected providers are present
+  expect(matchAllStringsInList(providers, values)).toBe(true);
+}
+
+/**
+ * Asserts that all expected cardless EMI providers are shown
+ * @param {Context} context
+ * @param {Array<string>} providers
+ */
+async function assertShownCardlessEmiProviders(context, providers) {
+  // Paylater screen is visible
+  await context.page.waitForSelector('#form-cardless_emi', {
+    visible: true,
+    timeout: 500,
+  });
+
+  // Get all Paylater elements
+  const elements = await context.page.$$('#form-cardless_emi .options > *');
+
+  // Get the names from all elements
+  let values = await Promise.all(elements.map(innerText));
+  values = values.map(value => value.trim());
+
+  // Verify that all expected providers are present
+  expect(matchAllStringsInList(providers, values)).toBe(true);
+}
+
+/**
+ * Asserts that all expected cardless EMI providers are shown
+ * @param {Context} context
+ * @param {string} text Description
+ */
+async function assertCardScreenAndText(context, text) {
+  // Card screen is visible
+  await context.page.waitForSelector('#form-card', {
+    visible: true,
+    timeout: 500,
+  });
+
+  let description = await innerText(
+    '#form-card .instrument-subtext-description'
+  );
+  description = description.trim();
+
+  // Description is what is expected
+  expect(description).toBe(text);
+}
+
 module.exports = {
   parseBlocksFromHomescreen,
   isIndividualInstrument,
@@ -163,4 +259,8 @@ module.exports = {
   assertShownBanks,
   assertUpiIntent,
   assertUpiCollect,
+  assertShownWallets,
+  assertShownPaylaterProviders,
+  assertShownCardlessEmiProviders,
+  assertCardScreenAndText,
 };

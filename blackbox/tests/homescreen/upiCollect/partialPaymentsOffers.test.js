@@ -99,7 +99,7 @@ describe.each(
     await verifyOfferApplied(context);
     await verifyDiscountPaybleAmount(context, '₹ 1,990');
     await verifyDiscountAmountInBanner(context, '₹ 1,990');
-    await verifyDiscountText(context, 'You save ₹ 10');
+    await verifyDiscountText(context, 'You save ₹10');
     await submit(context);
     await handleUPIAccountValidation(context, 'BHIM@upi');
     await handleSaveVpaRequest(context, 'offer_id=' + preferences.offers[0].id);

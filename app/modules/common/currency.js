@@ -862,6 +862,15 @@ const currenciesConfig = {
     minor: 'ngwee',
   },
 };
+
+/**
+ * Stores the converted amounts for a given amount.
+ *
+ * When we retrieve card currencies for DCC,
+ * we get the amounts for each currency.
+ */
+const currenciesRate = {};
+
 /**
  * @param {String} currency
  * @return {Object} config
@@ -1196,6 +1205,19 @@ export const updateCurrencies = list => {
   updateCurrencyConfig(displayCurrenciesToAdd);
 };
 
+/**
+ * Sets the converted amounts for a given amount.
+ * @param list
+ * @param amount
+ */
+export const setCurrenciesRate = (list, amount) => {
+  const rates = {};
+  _Obj.loop(list, (val, currency) => {
+    rates[currency] = val.amount;
+  });
+  currenciesRate[amount] = rates;
+};
+
 updateCurrencies(currenciesList); // Default hardcoded list
 updateCurrencyConfig(displayCurrencies);
 
@@ -1238,11 +1260,14 @@ export function formatAmount(amount, currency) {
  * and the symbol on the left.
  * @param {Number} amount Amount in the lowest denomination
  * @param {String} currency
+ * @param {Boolean} space whether to have space between currency and amount
  *
  * @return {String}
  */
-export function formatAmountWithSymbol(amount, currency) {
-  return `${displayCurrencies[currency]} ${formatAmount(amount, currency)}`;
+export function formatAmountWithSymbol(amount, currency, space = true) {
+  return [displayCurrencies[currency], formatAmount(amount, currency)].join(
+    space ? ' ' : ''
+  );
 }
 
 export function displayAmount(razorpay, payloadAmount, payloadCurrency) {
@@ -1270,6 +1295,19 @@ export function displayAmount(razorpay, payloadAmount, payloadCurrency) {
 
 export const getDecimalAmount = amount =>
   (amount / 100).toFixed(2).replace('.00', '');
+
+/**
+ * Returns the converted amount for the asked currency
+ * @param amount
+ * @param currency
+ * @returns {*}
+ */
+export const getConvertedAmount = (amount, currency) => {
+  if (currenciesRate[amount]) {
+    return currenciesRate[amount][currency];
+  }
+  return '';
+};
 
 /**
  * Returns the amount in major

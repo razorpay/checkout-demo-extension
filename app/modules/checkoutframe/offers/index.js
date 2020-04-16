@@ -1,5 +1,9 @@
 import GlobalOffers from './global';
-import { isPartialPayment } from 'checkoutstore';
+import {
+  isPartialPayment,
+  getMerchantOffers,
+  isOfferForced,
+} from 'checkoutstore';
 import {
   isMethodEnabled,
   getWallets,
@@ -7,80 +11,9 @@ import {
 } from 'checkoutstore/methods';
 
 /**
- * Default data that should be present in all offers.
- */
-const defaultDataForOffer = {
-  homescreen: true,
-  removable: true,
-};
-
-/**
- * Fill data in an offer.
- * @param {Object} offer Offer
- * @param {Object} data Extra data to be filled, apart from the default data
- *
- * @return {Object}
- */
-const fillMissingDataInOffer = (offer, data = {}) =>
-  ({}
-  |> _Obj.extend(defaultDataForOffer)
-  |> _Obj.extend(data)
-  |> _Obj.extend(offer));
-
-/**
- * Fill data in all offers in a list.
- * @param {Array} offers List of offers
- * @param {Object} data Extra data to be filled, apart from the default data
- *
- * @return {Array}
- */
-const fillMissingDataInOffers = (offers, data) =>
-  offers.map(offer => fillMissingDataInOffer(offer, data));
-
-/**
- * Get local offers.
- * @param {Object} opts Options
- *
- * @return {Array} offers Local offers
- */
-const getLocalOffers = opts => {
-  return fillMissingDataInOffers([], {
-    _type: 'local',
-  });
-};
-
-/**
- * Get the eligible global offers.
- * @param {Object} opts Options
- *
- * @return {Array} offers Eligible global offers
- */
-const getGlobalOffers = opts =>
-  fillMissingDataInOffers(
-    GlobalOffers
-      |> _Arr.filter(globalOffer => globalOffer.isEligible(opts))
-      |> _Arr.map(eligibleOffer => eligibleOffer.offer),
-    {
-      _type: 'global',
-    }
-  );
-
-/**
- * Get offers from API.
- * @param {Object} opts Options
- *
- * @return {Array} offers Offers from API
- */
-const getApiOffers = ({ preferences }) =>
-  fillMissingDataInOffers(preferences.offers || [], {
-    _type: 'api',
-  });
-
-/**
  * Checks if offer is eligible.
  *
  * @param {Object} offer
- * @param {opts} opts
  *
  * @return {Boolean}
  */
@@ -108,38 +41,114 @@ const isOfferEligible = offer => {
 
 /**
  * Get the forced offer.
- * @param {Object} opts Options
  *
  * @return {Object} offer Forced offer
  */
-export const getForcedOffer = opts => {
-  const { preferences } = opts;
+export const getForcedOffer = () => {
+  return isOfferForced() && getMerchantOffers()[0];
+};
 
-  return preferences.force_offer && getApiOffers(opts)[0];
+export const getCardOffer = () => {
+  const offer = getForcedOffer();
+  if (offer?.payment_method === 'card') {
+    return offer;
+  }
+  return null;
+};
+
+export const hasOffersOnHomescreen = () => {
+  return Boolean(getCardOffer() || getOffersForTab().length);
+};
+
+export function getOfferMethodForTab(tab) {
+  if (tab === 'emiplans') {
+    tab = 'emi';
+  }
+  return tab;
+}
+
+/**
+ * Returns a list of offers to be used on a given tab
+ * @param {String} tab Current Tab
+ *
+ * @return {Array} offers List of offers
+ */
+export function getOffersForTab(method) {
+  const allOffers = getAllOffers();
+
+  if (method) {
+    // EMI plans should have the same offers as EMI
+    // TODO: Fix for Cardless EMI
+    method = getOfferMethodForTab(method);
+    if (method === 'cardless_emi') {
+      allOffers.push(zestMoneyOffer);
+    }
+    return allOffers.filter(function(o) {
+      return o.payment_method === method;
+    });
+  }
+  return allOffers;
+}
+
+const instrumentKey = {
+  cardless_emi: 'provider',
+  wallet: 'wallet',
+  card: 'issuer',
+  netbanking: 'bank',
 };
 
 /**
- * Creates a list of offers to be used.
- * @param {Object} opts Options
+ * Returns a list of offers to be used on a given instrument
+ * @param {Object} instrument Selected instrument
+ *
+ * @return {Array} offers List of offers
+ */
+export function getOffersForInstrument(instrument) {
+  const offers = getOffersForTab(instrument.method);
+  const key = instrumentKey[instrument.method];
+  if (key) {
+    return offers.filter(o => !o.issuer || o.issuer === instrument[key]);
+  }
+  return offers;
+}
+
+/**
+ * Returns a list of offers not applicable on selected method or instrument
+ * @param  {Array} filteredOffers list of all offers available for
+ *                                current checkout session
+ * @return {Array} List of offers
+ */
+export function getOtherOffers(filteredOffers) {
+  const allOffers = getAllOffers();
+  const otherOffers = [];
+  let filteredIndex = 0;
+  for (let i = 0; i < allOffers.length; i++) {
+    if (filteredOffers[filteredIndex] === allOffers[i]) {
+      filteredIndex++;
+    } else {
+      otherOffers.push(allOffers[i]);
+    }
+  }
+  return otherOffers;
+}
+
+/**
+ * Creates a list of all offers.
  *
  * @return {Object} offers List of offers
  */
-export const createOffers = opts => {
-  const apiOffers = getApiOffers(opts);
-  const globalOffers = getGlobalOffers(opts);
-  const localOffers = getLocalOffers(opts);
-
-  let allOffers = [];
-
-  // Concat all offers and check for eligibility, but only if this isn't a partial payment
-  if (!isPartialPayment()) {
-    allOffers =
-      [].concat(apiOffers, globalOffers, localOffers)
-      |> _Arr.filter(offer => isOfferEligible(offer));
+export const getAllOffers = () => {
+  if (isPartialPayment()) {
+    return [];
+  } else {
+    return getMerchantOffers() || [] |> _Arr.filter(isOfferEligible);
   }
+};
 
-  return {
-    offers: allOffers,
-    forcedOffer: getForcedOffer(opts),
-  };
+const zestMoneyOffer = {
+  name: 'ZestMoney: 0% Interest available',
+  payment_method: 'cardless_emi',
+  provider: 'zestmoney',
+  display_text:
+    'Applicable only on EMI tenure of 3 months.\nInterest will be returned as cashback on repayment of each EMI.',
 };

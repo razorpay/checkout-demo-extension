@@ -1,0 +1,216 @@
+<script>
+  // Svelte imports
+  import { createEventDispatcher, onMount } from 'svelte';
+
+  // UI imports
+  import Stack from 'ui/layouts/Stack.svelte';
+  import Icon from 'ui/elements/Icon.svelte';
+  import { getMiscIcon } from 'icons/misc';
+
+  // Props
+  export let visible = false;
+  export let inputPlaceholderText = 'Type to search';
+  export let currencies = [];
+
+  onMount(() => {
+    document.querySelector('#container').appendChild(ref);
+  });
+
+  // Variables
+  const dispatch = createEventDispatcher();
+  let ref;
+  let query = '';
+  let filteredList = currencies;
+
+  $: {
+    filteredList = _Obj.entries(currencies).filter(([code, currency]) => {
+      const queryText = query.toLowerCase().trim();
+      const matchesCode = code.toLowerCase().includes(queryText);
+      const matchesName = currency.name.toLowerCase().includes(queryText);
+      const matchesSymbol = currency.symbol.toLowerCase().includes(queryText);
+      return matchesCode || matchesName || matchesSymbol;
+    });
+  }
+
+  function onSelect(item) {
+    dispatch('select', item);
+  }
+
+  export function open() {
+    visible = true;
+  }
+
+  export function close() {
+    visible = false;
+  }
+</script>
+
+<style>
+  .search-curtain {
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    text-align: left;
+    font-family: 'lato', ubuntu, helvetica, sans-serif;
+  }
+
+  .search-curtain-bg {
+    background-color: rgba(0, 0, 0, 0.5);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .search-curtain:not(.shown) {
+    display: none;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .search-curtain.shown {
+    display: flex;
+    z-index: 3;
+  }
+
+  .search-box {
+    position: relative;
+    background-color: white;
+    width: 100%;
+    height: 100%;
+    margin-top: 24px;
+    max-width: 344px * 0.9;
+    max-height: 500px * 0.95;
+  }
+
+  :global(.mobile) .search-box {
+    margin-top: 0;
+    max-width: 92%;
+    max-height: 85%;
+  }
+
+  .search-box {
+    box-sizing: border-box;
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .search-field {
+    display: flex;
+    align-items: center;
+    box-shadow: 0px 6px 4px rgba(196, 196, 196, 0.2);
+  }
+
+  .search-field > * {
+    height: 48px;
+  }
+
+  .search-field .icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 0;
+    height: 48px;
+    width: 48px + 8px;
+  }
+
+  .search-field .icon :global(svg) {
+    width: 20px;
+    height: 20px;
+  }
+
+  .search-field input {
+    color: #888;
+    width: 100%;
+    font-size: 13px;
+  }
+
+  .search-field input::placeholder {
+    color: #888;
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+    overflow-y: auto;
+    margin: 0;
+  }
+
+  .list-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 14px;
+    border-bottom: 1px solid #ddd;
+    color: #888;
+    cursor: pointer;
+  }
+
+  .list-item:hover {
+    background-color: #eff0f1;
+  }
+
+  .list-item .middle {
+    flex-grow: 1;
+    padding-left: 12px;
+  }
+
+  .list-item .left,
+  .list-item .right {
+    min-width: 36px;
+  }
+
+  .list-item .left {
+    border-right: 1px solid #888;
+  }
+
+  .list-item .right {
+    text-align: right;
+    border-left: 1px solid #888;
+  }
+
+  .no-results {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    color: #888;
+  }
+</style>
+
+<div class="search-curtain" class:shown={visible} bind:this={ref}>
+  <div class="search-curtain-bg" on:click={close} />
+  <div class="search-box">
+    <div class="search-field">
+      <div class="icon">
+        <Icon icon={getMiscIcon('search')} />
+      </div>
+      <input
+        type="text"
+        autocomplete="transaction-currency"
+        placeholder={inputPlaceholderText}
+        bind:value={query} />
+    </div>
+    <div class="list">
+      {#if filteredList.length}
+        {#each filteredList as [code, config]}
+          <div class="list-item" on:click={() => onSelect(code)}>
+            <div class="left">{code}</div>
+            <div class="middle">{config.name}</div>
+            <div class="right">{config.symbol}</div>
+          </div>
+        {/each}
+      {:else}
+        <div class="no-results">No results for "{query}"</div>
+      {/if}
+    </div>
+  </div>
+</div>

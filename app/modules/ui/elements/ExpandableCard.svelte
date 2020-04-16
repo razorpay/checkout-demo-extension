@@ -4,7 +4,6 @@
 
   // Props
   export let expanded;
-  export let badge;
   export let showRadio = false;
 
   // Computed
@@ -15,10 +14,6 @@
 
     if (expanded) {
       list.push('expandable-card--expanded');
-    }
-
-    if (badge) {
-      list.push('expandable-card--has-badge');
     }
 
     elementClass = list.join(' ');
@@ -34,28 +29,12 @@
   .expandable-card-title > :global(.stack) > :global([slot='title']) {
     line-height: 24px;
   }
-
-  .badge {
-    flex-shrink: 0;
-    margin: 2px 8px 0;
-    border: 1px solid #70be53;
-    border-radius: 2px;
-    background-color: #f7fbf5;
-    color: #70be53;
-    font-size: 10px;
-    padding: 0 3px;
-    text-transform: uppercase;
-    pointer-events: none;
-  }
 </style>
 
 <div class={elementClass} on:click>
   <div class="expandable-card-title">
     <Stack horizontal>
       <slot name="title" />
-      {#if badge}
-        <div class="badge">{badge}</div>
-      {/if}
       {#if showRadio}
         <Radio checked={expanded} />
       {/if}

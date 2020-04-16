@@ -2,8 +2,9 @@ import EMIPlansView from 'ui/tabs/emi/emiplans.svelte';
 import * as TermsCurtain from 'checkoutframe/termscurtain';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
+import { getSession } from 'sessionmanager';
 
-const TARGET_QS = '#emi-plan-screen-wrapper';
+const TARGET_QS = '#form-fields';
 const AGREEMENT_STORE = {};
 
 const AGREEMENT_HELPER = {
@@ -107,6 +108,19 @@ emiPlansView.prototype = {
 
     on.select = event => {
       const plan = event.detail;
+      const session = getSession();
+
+      var offer = session.getAppliedOffer();
+      if (offer && offer.id !== plan.offer_id) {
+        return session.showOffersError(offerRemoved => {
+          if (offerRemoved) {
+            on.select(event);
+          } else {
+            this.view.deselectAll();
+          }
+        });
+      }
+
       Analytics.track('emi:plan:choose', {
         type: AnalyticsTypes.BEHAV,
         data: {

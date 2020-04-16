@@ -52,6 +52,10 @@ var activeStateColor = themeMeta.activeStateColor;
   color: `=highlightColor`;
 }
 
+.dcc-view {
+  background-color: `=secondaryHighlightColor`;
+}
+
 .options .next-option.secondary-color:after {
   color: `=backgroundColor`;
 }
@@ -120,13 +124,22 @@ color: `=c`;
   border-color: `=c`;
 }
 
-.theme-highlight {
+.theme-highlight,
+.offers-container header:before,
+.close-offerlist:before,
+.close-offerlist span,
+.remove-offer
+{
   color: `=highlightColor`;
 }
 
 .iframe-title,
-#topbar:before, .offers-container .offers-content {
+#topbar:before {
   background-color: `=secondaryHighlightColor` !important;
+}
+
+.offers-container header {
+  background-color: `=secondaryHighlightColor`;
 }
 
 .iframe-title,
@@ -172,24 +185,12 @@ color: `=c`;
   border-color: `=c`;
 }
 
-.offers-list-title:after, .offers-title .toggle:after {
-
-  color: `=highlightColor`;
-}
-
-ul.offers-list > li.offer.selected, ul.offers-list > li.offer.selected .checkbox {
-
+.offer-item.selected, .offer-item .checkbox {
   border-color: `=highlightColor` !important;
 }
 
-ul.offers-list > li.offer.selected .checkbox {
-
+.offer-item .checkbox {
   background-color: `=highlightColor`;
-}
-
-svg.offer-icon path {
-
-  fill: `=highlightColor`;
 }
 
 .expandable-card--expanded {
