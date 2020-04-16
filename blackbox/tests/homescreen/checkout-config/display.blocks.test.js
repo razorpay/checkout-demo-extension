@@ -258,8 +258,8 @@ describe('display.blocks', () => {
     );
 
     // Assert that they all start with "Pay using" and don't have a description
-    const allAreMethodInstruments = methodBlock.items.every(
-      item => item.title.startsWith('Pay using') && !item.description
+    const allAreMethodInstruments = methodBlock.items.every(item =>
+      item.title.startsWith('Pay using')
     );
 
     expect(allAreMethodInstruments).toBe(true);
