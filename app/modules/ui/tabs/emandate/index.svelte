@@ -314,6 +314,15 @@
     height: 27px;
   }
 
+  .auth-option label:after {
+    content: '\e604';
+    position: absolute;
+    right: 16px;
+    top: 20px;
+    transform: scaleX(-1);
+    color: #777;
+  }
+
   #emandate-options .auth-option.disabled {
     color: #80859b;
     background: #efefef;

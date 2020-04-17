@@ -926,10 +926,6 @@ Session.prototype = {
       classes.push('ip');
     }
 
-    if (MethodStore.isEMandateEnabled()) {
-      classes.push('emandate');
-    }
-
     if (isIE) {
       classes.push('noanim');
     }
