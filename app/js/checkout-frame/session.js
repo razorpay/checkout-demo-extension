@@ -5005,6 +5005,10 @@ Session.prototype = {
     }
 
     if (this.isOpen) {
+      Analytics.track('modal:close', {
+        immediately: true,
+      });
+
       var cancelReason = this.getCancelReason();
 
       this.hideTimer();
