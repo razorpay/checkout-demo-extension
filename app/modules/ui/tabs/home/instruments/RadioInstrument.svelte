@@ -152,6 +152,7 @@
   {name}
   {selected}
   className="instrument"
+  data-type="individual"
   value={instrument.id}
   on:click
   on:click={selectInstrument}

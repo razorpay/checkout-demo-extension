@@ -6,8 +6,8 @@
 
   // Utils imports
   import { getSession } from 'sessionmanager';
-  import Track from 'tracker';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
+  import { getSubtextForInstrument } from 'common/subtext';
 
   // Store imports
   import {
@@ -24,7 +24,8 @@
   const method = instrument.method;
   const methodName = getMethodNameForPaymentOption(method, { instrument });
   const title = `Pay using ${methodName}`;
-  const id = Track.makeUid();
+  const id = instrument.id;
+  const subtext = getSubtextForInstrument(instrument);
 
   let icon;
   if (/card$/.test(method)) {
@@ -76,6 +77,7 @@
   value={instrument.id}
   radio={false}
   className="instrument"
+  data-type="method"
   on:click
   on:click={deselectInstrument}
   on:click={setMethodInstrument}
@@ -84,7 +86,9 @@
     <Icon {icon} alt={methodName} />
   </i>
   <div slot="title">{title}</div>
-
+  <div slot="subtitle">
+    {#if subtext}{subtext}{/if}
+  </div>
   <div slot="extra">
     <span class="theme-highlight-color">&#xe604;</span>
   </div>
