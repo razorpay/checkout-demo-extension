@@ -133,7 +133,7 @@
     });
 
     const shouldGoToNBScreen =
-      !prefilledBank &&
+      !isPrefilledBankAvailable &&
       (currentView === Views.AUTH_SELECTION || shouldSkipAuthSelection());
 
     if (shouldGoToNBScreen) {
