@@ -42,6 +42,12 @@ const messageTransformers = {
     }
   },
 
+  addSmsHash: (o, message) => {
+    if (message.sms_hash) {
+      o.sms_hash = message.sms_hash;
+    }
+  },
+
   addUpiIntentsData: (transfomed, message) => {
     // @TODO: update better names for these variables
     if (message.upi_intents_data && message.upi_intents_data.length) {

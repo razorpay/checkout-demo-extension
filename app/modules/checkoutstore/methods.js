@@ -285,22 +285,46 @@ export function isEMandateEnabled() {
 }
 
 export function getEMandateBanks() {
-  const banks = getRecurringMethods().emandate;
+  let banks = getRecurringMethods().emandate;
+
   if (banks) {
     const authTypeFromOrder = getMerchantOrder()?.auth_type;
     if (authTypeFromOrder) {
-      return (
+      banks =
         banks
         |> _Obj.reduce((filteredBanks, bank, bankCode) => {
           if (bank.auth_types |> _Arr.contains(authTypeFromOrder)) {
             filteredBanks[bankCode] = bank;
           }
           return filteredBanks;
-        }, {})
-      );
+        }, {});
     }
   }
-  return banks;
+
+  return filterBanksOnAllowedAuthTypes(banks);
+}
+
+/**
+ * Removes banks that do not have any supported auth types
+ * @param {Object} banks
+ * @returns {Object}
+ */
+function filterBanksOnAllowedAuthTypes(banks) {
+  const allowedAuthTypes = ['netbanking', 'debitcard'];
+
+  return (
+    banks
+    |> _Obj.reduce((filteredBanks, bank, bankCode) => {
+      if (
+        _Arr.any(bank.auth_types, authType =>
+          _Arr.contains(allowedAuthTypes, authType)
+        )
+      ) {
+        filteredBanks[bankCode] = bank;
+      }
+      return filteredBanks;
+    }, {})
+  );
 }
 
 export function getEMandateAuthTypes(bankCode) {

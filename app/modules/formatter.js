@@ -216,8 +216,8 @@ Formatter.rules = {
       let returnVal = value
         .replace('+0', '+91')
         .slice(0, 15)
-        .replace(/\D/g, '');
-      return `+${returnVal}`;
+        .replace(/[^+\d]/g, '');
+      return `${returnVal}`;
     },
 
     isValid: function(value) {

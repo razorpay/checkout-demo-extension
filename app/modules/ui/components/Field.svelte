@@ -175,6 +175,7 @@
     on:blur
     on:input
     on:autocomplete
+    on:paste
     class:no-refresh={!refresh}
     class:no-focus={handleFocus}
     class:no-blur={handleBlur}
