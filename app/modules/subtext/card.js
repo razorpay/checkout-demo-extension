@@ -21,7 +21,7 @@ function concatTruthyString(list) {
  *
  * @returns {string}
  */
-export function generateCardSubtext(instrument) {
+export function generateSubtextForCardInstrument(instrument) {
   const instrumentIssuers =
     instrument.issuers || []
     |> _Arr.map(bank => getCommonBankName(bank).replace(/ Bank$/, ''));
