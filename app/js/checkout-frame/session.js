@@ -873,10 +873,6 @@ Session.prototype = {
     $('#amount .original-amount').html(html);
   },
 
-  track: function(event, extra) {
-    Track(this.r, event, extra);
-  },
-
   /**
    * Returns the Payment instance for the current payment.
    *
