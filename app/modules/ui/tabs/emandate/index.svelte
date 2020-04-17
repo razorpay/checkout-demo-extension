@@ -30,6 +30,8 @@
     isEMandateBankEnabled,
   } from 'checkoutstore/methods';
 
+  import { getOption } from 'checkoutstore';
+
   // Utils
   import { getBankLogo } from 'common/bank';
   import Analytics from 'analytics';
@@ -39,13 +41,13 @@
   const session = getSession();
 
   // Prefill
-  const prefilledBank = session.get('prefill.bank');
-  const prefillledBankAccount = session.get(
+  const prefilledBank = getOption('prefill.bank');
+  const prefillledBankAccount = getOption(
     'prefill.bank_account[account_number]'
   );
-  const prefilledName = session.get('prefill.bank_account[name]');
-  const prefilledIfsc = session.get('prefill.bank_account[ifsc]');
-  const prefilledAuthType = session.get('prefill.auth_type');
+  const prefilledName = getOption('prefill.bank_account[name]');
+  const prefilledIfsc = getOption('prefill.bank_account[ifsc]');
+  const prefilledAuthType = getOption('prefill.auth_type');
 
   const isPrefilledBankAvailable =
     prefilledBank && isEMandateBankEnabled(prefilledBank);
@@ -53,7 +55,7 @@
     prefilledAuthType &&
     isEMandateAuthTypeEnabled(prefilledBank, prefilledAuthType);
 
-  let prefilledAccountType = session.get('prefill.bank_account[account_type]');
+  let prefilledAccountType = getOption('prefill.bank_account[account_type]');
 
   const AuthTypes = {
     NETBANKING: 'netbanking',
