@@ -363,8 +363,11 @@ function backPressed(callback) {
     session.hideErrorMessage();
   }
 
-  Analytics.track('navigate:back', {
+  Analytics.track('back', {
     type: AnalyticsTypes.BEHAV,
+    data: {
+      source: 'device',
+    },
   });
 
   if (Confirm.isConfirmShown) {
