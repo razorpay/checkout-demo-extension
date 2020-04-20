@@ -7,7 +7,7 @@
   // Utils imports
   import { getSession } from 'sessionmanager';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
-  import { getSubtextForInstrument } from 'common/subtext';
+  import { getSubtextForInstrument } from 'subtext';
 
   // Store imports
   import {
