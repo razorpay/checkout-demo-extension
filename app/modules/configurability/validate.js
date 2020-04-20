@@ -6,7 +6,37 @@ const PAYMENT_VALIDATORS = {
 
     return _Arr.contains(instrument.banks, payment.bank);
   },
+
+  wallet: (payment, instrument) => {
+    if (!instrument.wallets) {
+      return true;
+    }
+
+    return _Arr.contains(instrument.wallets, payment.wallet);
+  },
+
+  // Also used for paylater
+  cardless_emi: (payment, instrument) => {
+    if (!instrument.providers) {
+      return true;
+    }
+
+    return _Arr.contains(instrument.providers, payment.provider);
+  },
+
+  // TODO
+  upi: () => true,
+
+  // TODO
+  // Also used for emi
+  card: () => true,
+
+  bank_transfer: () => true,
+  paypal: () => true,
 };
+
+PAYMENT_VALIDATORS.paylater = PAYMENT_VALIDATORS.cardless_emi;
+PAYMENT_VALIDATORS.emi = PAYMENT_VALIDATORS.card;
 
 /**
  * Checks if the instrument is valid for the payment payload
