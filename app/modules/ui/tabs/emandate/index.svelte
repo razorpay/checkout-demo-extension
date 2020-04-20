@@ -79,6 +79,10 @@
   $accountType = prefilledAccountType;
   $authType = prefilledAuthType;
 
+  // Set tab titles
+  // TODO: move current tab title to store and fix this.
+  session.tab_titles['netbanking'] = 'Bank Account';
+
   function getBankName(bankCode) {
     return (banks[bankCode] || {}).name || '';
   }

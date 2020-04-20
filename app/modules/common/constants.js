@@ -50,7 +50,7 @@ export const TAB_TITLES = {
   cardless_emi: 'EMI',
   credit_card: 'Credit Card',
   debit_card: 'Debit Card',
-  emandate: 'Bank Account',
+  emandate: 'Account Details',
   emi: 'EMI',
   emiplans: 'EMI Plans',
   nach: 'NACH',
