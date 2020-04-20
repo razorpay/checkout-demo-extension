@@ -159,7 +159,7 @@ test('Module: configurability/sequence', t => {
         },
         {
           code: 'netbanking',
-          type: 'rzp_method',
+          _type: 'rzp_method',
           method: 'netbanking',
         },
         {
@@ -186,57 +186,57 @@ test('Module: configurability/sequence', t => {
         },
         {
           code: 'card',
-          type: 'rzp_method',
+          _type: 'rzp_method',
           method: 'card',
         },
         {
           code: 'wallet',
-          type: 'rzp_method',
+          _type: 'rzp_method',
           method: 'wallet',
         },
         {
           code: 'upi',
-          type: 'rzp_method',
+          _type: 'rzp_method',
           method: 'upi',
         },
         {
           code: 'gpay',
-          type: 'rzp_method',
+          _type: 'rzp_method',
           method: 'gpay',
         },
         {
           code: 'emi',
-          type: 'rzp_method',
+          _type: 'rzp_method',
           method: 'emi',
         },
         {
           code: 'cardless_emi',
-          type: 'rzp_method',
+          _type: 'rzp_method',
           method: 'cardless_emi',
         },
         {
           code: 'qr',
-          type: 'rzp_method',
+          _type: 'rzp_method',
           method: 'qr',
         },
         {
           code: 'paylater',
-          type: 'rzp_method',
+          _type: 'rzp_method',
           method: 'paylater',
         },
         {
           code: 'paypal',
-          type: 'rzp_method',
+          _type: 'rzp_method',
           method: 'paypal',
         },
         {
           code: 'bank_transfer',
-          type: 'rzp_method',
+          _type: 'rzp_method',
           method: 'bank_transfer',
         },
         {
           code: 'nach',
-          type: 'rzp_method',
+          _type: 'rzp_method',
           method: 'nach',
         },
       ];
@@ -412,7 +412,7 @@ test('Module: configurability/sequence', t => {
         },
         {
           code: 'netbanking',
-          type: 'rzp_method',
+          _type: 'rzp_method',
           method: 'netbanking',
         },
         {
