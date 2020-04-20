@@ -24,8 +24,35 @@ const PAYMENT_VALIDATORS = {
     return _Arr.contains(instrument.providers, payment.provider);
   },
 
-  // TODO
-  upi: () => true,
+  upi: (payment, instrument) => {
+    const { flows, apps } = instrument;
+
+    if (!flows) {
+      return true;
+    }
+
+    const isVpaPayment = payment.vpa || payment.token;
+    const isQrPayment = payment['_[upiqr]'];
+    const isIntentPayment = !isQrPayment && payment['_[flow]'] === 'intent';
+
+    if (isVpaPayment) {
+      return _Arr.contains(flows, 'collect');
+    }
+
+    if (isQrPayment) {
+      return _Arr.contains(flows, 'qr');
+    }
+
+    if (isIntentPayment && _Arr.contains(flows, 'intent')) {
+      if (!apps) {
+        return true;
+      }
+
+      return _Arr.contains(apps, payment['_[app]']);
+    }
+
+    return false;
+  },
 
   // TODO
   // Also used for emi

@@ -128,6 +128,151 @@ test('Module: configurability/validate', t => {
       Promise.all(tests).finally(() => t.end());
     });
 
+    test('method=upi', t => {
+      const vpaPayment = {
+        method: 'upi',
+        vpa: 'test@rzp',
+      };
+
+      const tokenPayment = {
+        method: 'upi',
+        token: 'tkntest',
+      };
+
+      const qrPayment = {
+        method: 'upi',
+        '_[flow]': 'intent',
+        '_[upiqr]': '1',
+      };
+
+      const intentPayment = {
+        method: 'upi',
+        '_[flow]': 'intent',
+        '_[app]': 'some.random.app',
+      };
+
+      let tests = [
+        Validate.isInstrumentValidForPayment(
+          { method: 'upi' },
+          vpaPayment
+        ).then(valid => t.ok(valid, 'VPA Payment: Method instrument is valid')),
+
+        Validate.isInstrumentValidForPayment(
+          { method: 'upi' },
+          tokenPayment
+        ).then(valid =>
+          t.ok(valid, 'Token Payment: Method instrument is valid')
+        ),
+
+        Validate.isInstrumentValidForPayment(
+          { method: 'upi' },
+          qrPayment
+        ).then(valid => t.ok(valid, 'QR Payment: Method instrument is valid')),
+
+        Validate.isInstrumentValidForPayment(
+          { method: 'upi' },
+          intentPayment
+        ).then(valid =>
+          t.ok(valid, 'Intent Payment: Method instrument is valid')
+        ),
+
+        Validate.isInstrumentValidForPayment(
+          { method: 'upi', flows: ['qr', 'collect'] },
+          vpaPayment
+        ).then(valid =>
+          t.ok(valid, 'VPA Payment: Instrument with expected flow is valid')
+        ),
+
+        Validate.isInstrumentValidForPayment(
+          { method: 'upi', flows: ['qr', 'intent'] },
+          vpaPayment
+        ).then(valid =>
+          t.notOk(
+            valid,
+            'VPA Payment: Instrument without expected flow is invalid'
+          )
+        ),
+
+        Validate.isInstrumentValidForPayment(
+          { method: 'upi', flows: ['qr', 'collect'] },
+          tokenPayment
+        ).then(valid =>
+          t.ok(valid, 'Token Payment: Instrument with expected flow is valid')
+        ),
+
+        Validate.isInstrumentValidForPayment(
+          { method: 'upi', flows: ['qr', 'intent'] },
+          tokenPayment
+        ).then(valid =>
+          t.notOk(
+            valid,
+            'Token Payment: Instrument without expected flow is invalid'
+          )
+        ),
+
+        Validate.isInstrumentValidForPayment(
+          { method: 'upi', flows: ['qr', 'collect'] },
+          qrPayment
+        ).then(valid =>
+          t.ok(valid, 'QR Payment: Instrument with expected flow is valid')
+        ),
+
+        Validate.isInstrumentValidForPayment(
+          { method: 'upi', flows: ['intent', 'collect'] },
+          qrPayment
+        ).then(valid =>
+          t.notOk(
+            valid,
+            'QR Payment: Instrument without expected flow is invalid'
+          )
+        ),
+
+        Validate.isInstrumentValidForPayment(
+          { method: 'upi', flows: ['intent', 'collect'] },
+          intentPayment
+        ).then(valid =>
+          t.ok(valid, 'Intent Payment: Instrument with expected flow is valid')
+        ),
+
+        Validate.isInstrumentValidForPayment(
+          { method: 'upi', flows: ['qr', 'collect'] },
+          intentPayment
+        ).then(valid =>
+          t.notOk(
+            valid,
+            'Intent Payment: Instrument without expected flow is invalid'
+          )
+        ),
+
+        Validate.isInstrumentValidForPayment(
+          {
+            method: 'upi',
+            flows: ['intent', 'collect'],
+            apps: ['some.random.app', 'another.random.app'],
+          },
+          intentPayment
+        ).then(valid =>
+          t.ok(valid, 'Intent Payment: Instrument with expected app is valid')
+        ),
+
+        Validate.isInstrumentValidForPayment(
+          {
+            method: 'upi',
+            flows: ['intent', 'collect'],
+            apps: ['first.random.app', 'another.random.app'],
+          },
+          intentPayment
+        ).then(valid =>
+          t.notOk(
+            valid,
+            'Intent Payment: Instrument without expected app is invalid'
+          )
+        ),
+      ];
+
+      Promise.all(tests).finally(() => t.end());
+    });
+
     t.end();
   });
 
