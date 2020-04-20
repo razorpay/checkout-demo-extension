@@ -273,6 +273,169 @@ test('Module: configurability/validate', t => {
       Promise.all(tests).finally(() => t.end());
     });
 
+    test('method=card', t => {
+      const tokens = [
+        {
+          id: 'token_1',
+          entity: 'token',
+          token: 'tkn_one',
+          bank: null,
+          wallet: null,
+          method: 'card',
+          card: {
+            entity: 'card',
+            name: 'John Doe',
+            last4: '0353',
+            network: 'Visa',
+            type: 'debit',
+            issuer: 'ICIC',
+            international: false,
+            emi: false,
+            expiry_month: 3,
+            expiry_year: 2021,
+            flows: {
+              otp: true,
+              recurring: true,
+              iframe: false,
+            },
+            networkCode: 'visa',
+          },
+          vpa: null,
+          recurring: false,
+          auth_type: null,
+          mrn: null,
+          used_at: 1539620122,
+          created_at: 1529910871,
+          expired_at: 1617215399,
+          dcc_enabled: false,
+          plans: false,
+          cvvDigits: 3,
+          debitPin: false,
+        },
+        {
+          id: 'token_2',
+          entity: 'token',
+          token: 'tkn_two',
+          bank: null,
+          wallet: null,
+          method: 'card',
+          card: {
+            entity: 'card',
+            name: 'Jane Doe',
+            last4: '4321',
+            network: 'MasterCard',
+            type: 'credit',
+            issuer: 'HDFC',
+            international: false,
+            emi: true,
+            expiry_month: 11,
+            expiry_year: 2022,
+            flows: {
+              otp: true,
+              recurring: true,
+              iframe: false,
+            },
+            networkCode: 'visa',
+          },
+          vpa: null,
+          recurring: true,
+          auth_type: null,
+          mrn: null,
+          used_at: 1587119071,
+          created_at: 1574414210,
+          expired_at: 1669832999,
+          dcc_enabled: false,
+          plans: false,
+          cvvDigits: 3,
+          debitPin: false,
+        },
+      ];
+
+      let payment;
+
+      payment = {
+        method: 'card',
+        token: 'tkn_two',
+      };
+
+      let tests = [
+        Validate.isInstrumentValidForPayment({ method: 'card' }, payment, {
+          tokens,
+        }).then(valid => t.ok(valid, 'Method instrument is valid')),
+
+        Validate.isInstrumentValidForPayment(
+          { method: 'card', issuers: ['HDFC', 'UTIB'] },
+          payment,
+          {
+            tokens,
+          }
+        ).then(valid =>
+          t.ok(valid, 'Saved Card: Instrument with expected issuers is valid')
+        ),
+
+        Validate.isInstrumentValidForPayment(
+          { method: 'card', issuers: ['ICIC', 'UTIB'] },
+          payment,
+          {
+            tokens,
+          }
+        ).then(valid =>
+          t.notOk(
+            valid,
+            'Saved Card: Instrument without expected issuers is invalid'
+          )
+        ),
+
+        Validate.isInstrumentValidForPayment(
+          { method: 'card', networks: ['mastercard', 'visa'] },
+          payment,
+          {
+            tokens,
+          }
+        ).then(valid =>
+          t.ok(valid, 'Saved Card: Instrument with expected networks is valid')
+        ),
+
+        Validate.isInstrumentValidForPayment(
+          { method: 'card', networks: ['amex', 'visa'] },
+          payment,
+          {
+            tokens,
+          }
+        ).then(valid =>
+          t.notOk(
+            valid,
+            'Saved Card: Instrument without expected networks is invalid'
+          )
+        ),
+
+        Validate.isInstrumentValidForPayment(
+          { method: 'card', types: ['credit', 'debit'] },
+          payment,
+          {
+            tokens,
+          }
+        ).then(valid =>
+          t.ok(valid, 'Saved Card: Instrument with expected types is valid')
+        ),
+
+        Validate.isInstrumentValidForPayment(
+          { method: 'card', types: ['debit'] },
+          payment,
+          {
+            tokens,
+          }
+        ).then(valid =>
+          t.notOk(
+            valid,
+            'Saved Card: Instrument without expected types is invalid'
+          )
+        ),
+      ];
+
+      Promise.all(tests).finally(() => t.end());
+    });
+
     t.end();
   });
 

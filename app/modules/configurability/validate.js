@@ -1,3 +1,9 @@
+import {
+  getIin,
+  findCodeByNetworkName,
+  getNetworkFromCardNumber,
+} from 'common/card';
+
 const PAYMENT_VALIDATORS = {
   netbanking: (payment, instrument) => {
     if (!instrument.banks) {
@@ -54,9 +60,68 @@ const PAYMENT_VALIDATORS = {
     return false;
   },
 
-  // TODO
   // Also used for emi
-  card: () => true,
+  card: (payment, instrument, { tokens = [] } = {}) => {
+    tokens = _Arr.filter(tokens, token => token.method === 'card');
+
+    let featuresPromise = Promise.resolve({});
+
+    if (payment.token) {
+      let token = _Arr.find(tokens, token => token.token === payment.token);
+
+      if (token) {
+        featuresPromise = Promise.resolve(token.card);
+      }
+    }
+
+    return featuresPromise.then(features => {
+      const cardNumberFromPayment = payment['card[number]'];
+
+      // Set things from features
+      const type = features.type;
+      const issuer = features.issuer;
+
+      let network;
+      let iin;
+
+      // Network is sometimes fucked up
+      if (features.network) {
+        network = findCodeByNetworkName(features.network);
+      } else if (cardNumberFromPayment) {
+        network = getNetworkFromCardNumber(cardNumberFromPayment);
+      }
+
+      // IIN doesn't exist on saved cards
+      if (cardNumberFromPayment) {
+        iin = getIin(cardNumberFromPayment);
+      }
+
+      const { types, iins, issuers, networks } = instrument;
+
+      let isTypeValid = true;
+      let isNetworkValid = true;
+      let isIssuerValid = true;
+      let isIinValid = true;
+
+      if (iin && iins) {
+        isIinValid = _Arr.contains(iins, iin);
+      }
+
+      if (type && types) {
+        isTypeValid = _Arr.contains(types, type);
+      }
+
+      if (issuer && issuers) {
+        isIssuerValid = _Arr.contains(issuers, issuer);
+      }
+
+      if (network && networks) {
+        isNetworkValid = _Arr.contains(networks, network);
+      }
+
+      return isTypeValid && isNetworkValid && isIssuerValid && isIinValid;
+    });
+  },
 
   bank_transfer: () => true,
   paypal: () => true,
@@ -69,17 +134,18 @@ PAYMENT_VALIDATORS.emi = PAYMENT_VALIDATORS.card;
  * Checks if the instrument is valid for the payment payload
  * @param {Instrument} instrument
  * @param {Object} payment Payment payload
+ * @param {Object} extra extra
  *
  * @returns {Promise<boolean>}
  */
-export function isInstrumentValidForPayment(instrument, payment) {
+export function isInstrumentValidForPayment(instrument, payment, extra) {
   const validator = PAYMENT_VALIDATORS[instrument.method];
 
   if (!validator) {
     return Promise.resolve(false); // Should reject but we'd need to polyfill Promise.allSettled for getValidPaymentInstruments
   }
 
-  const validated = validator(payment, instrument);
+  const validated = validator(payment, instrument, extra);
 
   return Promise.resolve(validated);
 }
@@ -88,17 +154,18 @@ export function isInstrumentValidForPayment(instrument, payment) {
  * Returns the valid payment instruments
  * @param {Object} payment Payment payload
  * @param {Array<Instrument>} instruments
+ * @param {Object} extra
  *
  * @returns {Promise<Array<Instrument>>}
  */
-export function getValidPaymentInstruments(payment, instruments) {
+export function getValidPaymentInstruments(payment, instruments, extra) {
   const methodInstruments = _Arr.filter(
     instruments,
     instrument => instrument.method === payment.method
   );
 
   const promises = _Arr.map(methodInstruments, instrument =>
-    isInstrumentValidForPayment(instrument, payment)
+    isInstrumentValidForPayment(instrument, payment, extra)
   );
 
   return Promise.all(promises).then(instrumentValidities => {
