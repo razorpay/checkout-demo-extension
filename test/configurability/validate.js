@@ -436,6 +436,40 @@ test('Module: configurability/validate', t => {
       Promise.all(tests).finally(() => t.end());
     });
 
+    test('method=bank_transfer', t => {
+      let payment;
+
+      payment = {
+        method: 'bank_transfer',
+      };
+
+      let tests = [
+        Validate.isInstrumentValidForPayment(
+          { method: 'bank_transfer' },
+          payment
+        ).then(valid => t.ok(valid, 'Method instrument is valid')),
+      ];
+
+      Promise.all(tests).finally(() => t.end());
+    });
+
+    test('method=paypal', t => {
+      let payment;
+
+      payment = {
+        method: 'paypal',
+      };
+
+      let tests = [
+        Validate.isInstrumentValidForPayment(
+          { method: 'paypal' },
+          payment
+        ).then(valid => t.ok(valid, 'Method instrument is valid')),
+      ];
+
+      Promise.all(tests).finally(() => t.end());
+    });
+
     t.end();
   });
 
