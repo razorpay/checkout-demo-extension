@@ -33,7 +33,7 @@
   } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
-  import { isDCCEnabled } from 'checkoutstore';
+  import { getOption, isDCCEnabled } from 'checkoutstore';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -105,7 +105,7 @@
   const showRecurringCallout =
     isRecurring() && session.tab !== 'emandate' && singleMethod === 'card';
 
-  const prefilledBank = session.get('prefill.bank');
+  const prefilledBank = getOption('prefill.bank');
   const isPartialPayment = getIsPartialPayment();
   const contactEmailReadonly = isContactEmailReadOnly();
 
