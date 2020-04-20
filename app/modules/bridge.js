@@ -10,6 +10,7 @@ import { otp as $otp } from 'checkoutstore/screens/otp';
 import Track from 'tracker';
 import { confirmCancelMsg } from 'common/strings';
 
+import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { processPaymentCreate } from 'payment/coproto';
 
@@ -362,8 +363,11 @@ function backPressed(callback) {
     session.hideErrorMessage();
   }
 
-  session.track('navigate:back', {
+  Analytics.track('back', {
     type: AnalyticsTypes.BEHAV,
+    data: {
+      source: 'device',
+    },
   });
 
   if (Confirm.isConfirmShown) {

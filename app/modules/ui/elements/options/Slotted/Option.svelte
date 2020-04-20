@@ -6,7 +6,6 @@
   export let className = '';
   export let disabled = false;
   export let id;
-  export let attributes = {}; // Extra attributes for the HTML element
   export let defaultStyles = true;
 
   $: {
@@ -49,7 +48,7 @@
   {disabled}
   {id}
   on:click
-  {...attributes}>
+  {...$$restProps}>
   <Stack horizontal>
     <slot name="icon" />
     <div>

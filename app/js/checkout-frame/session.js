@@ -873,10 +873,6 @@ Session.prototype = {
     $('#amount .original-amount').html(html);
   },
 
-  track: function(event, extra) {
-    Track(this.r, event, extra);
-  },
-
   /**
    * Returns the Payment instance for the current payment.
    *
@@ -1839,6 +1835,11 @@ Session.prototype = {
       },
       contact: getPhone(),
     };
+
+    var smsHash = this.sms_hash;
+    if (this.get('send_sms_hash') && smsHash) {
+      params.data.sms_hash = smsHash;
+    }
 
     if (action === 'incorrect') {
       self.otpView.setText(discreet.wrongOtpMsg);
@@ -3143,6 +3144,11 @@ Session.prototype = {
 
     if (!customer.logged && !this.wants_skip) {
       self.commenceOTP('saved cards', true, 'saved_cards_access');
+      var smsHash = this.get('send_sms_hash') && this.sms_hash;
+      var params = {};
+      if (smsHash) {
+        params.sms_hash = smsHash;
+      }
       customer.checkStatus(function() {
         /**
          * 1. If this is a recurring payment and customer doesn't have saved cards,
@@ -3167,7 +3173,7 @@ Session.prototype = {
         } else {
           self.setScreen('card');
         }
-      });
+      }, params);
     } else {
       self.setScreen('card');
     }
@@ -4995,6 +5001,10 @@ Session.prototype = {
     }
 
     if (this.isOpen) {
+      Analytics.track('modal:close', {
+        immediately: true,
+      });
+
       var cancelReason = this.getCancelReason();
 
       this.hideTimer();
