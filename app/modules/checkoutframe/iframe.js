@@ -4,6 +4,7 @@ import Razorpay from 'common/Razorpay';
 import { ownerWindow } from 'common/constants';
 import Track from 'tracker';
 import { getSession } from 'sessionmanager';
+import Analytics from 'analytics';
 
 /**
  * This handles methods of the new iOS SDK Bridge.
