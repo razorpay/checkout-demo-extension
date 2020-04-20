@@ -153,6 +153,22 @@ export const getCardType = cardNumber => {
   return cardType;
 };
 
+/**
+ * Tries to figure out the network from the card number
+ * @param {string} cardNumber
+ *
+ * @returns {string}
+ */
+export const getNetworkFromCardNumber = cardNumber => {
+  let network = getCardType(cardNumber);
+
+  if (network === 'maestro16') {
+    network = 'maestro';
+  }
+
+  return network;
+};
+
 export const getCardMaxLen = cardType => cardLengths[cardType] || 16;
 
 export const getCardSpacing = maxLen => {
