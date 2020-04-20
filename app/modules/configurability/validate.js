@@ -1,5 +1,12 @@
 const PAYMENT_VALIDATORS = {
-}
+  netbanking: (payment, instrument) => {
+    if (!instrument.banks) {
+      return true;
+    }
+
+    return _Arr.contains(instrument.banks, payment.bank);
+  },
+};
 
 /**
  * Checks if the instrument is valid for the payment payload
