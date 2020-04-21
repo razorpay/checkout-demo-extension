@@ -3,6 +3,7 @@ import {
   findCodeByNetworkName,
   getNetworkFromCardNumber,
 } from 'common/card';
+import { getCardFeatures } from 'checkoutstore';
 
 export function validateCardInstrument(
   payment,
@@ -11,6 +12,7 @@ export function validateCardInstrument(
 ) {
   tokens = _Arr.filter(tokens, token => token.method === 'card');
 
+  const cardNumberFromPayment = payment['card[number]'];
   let featuresPromise = Promise.resolve({});
 
   if (payment.token) {
@@ -19,11 +21,11 @@ export function validateCardInstrument(
     if (token) {
       featuresPromise = Promise.resolve(token.card);
     }
+  } else if (cardNumberFromPayment) {
+    featuresPromise = getCardFeatures(cardNumberFromPayment);
   }
 
   return featuresPromise.then(features => {
-    const cardNumberFromPayment = payment['card[number]'];
-
     // Set things from features
     const type = features.type;
     const issuer = features.issuer;
