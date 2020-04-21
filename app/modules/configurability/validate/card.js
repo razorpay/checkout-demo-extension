@@ -13,19 +13,19 @@ export function validateCardInstrument(
   tokens = _Arr.filter(tokens, token => token.method === 'card');
 
   const cardNumberFromPayment = payment['card[number]'];
-  let featuresPromise = Promise.resolve({});
+  let features = {};
 
   if (payment.token) {
     let token = _Arr.find(tokens, token => token.token === payment.token);
 
     if (token) {
-      featuresPromise = Promise.resolve(token.card);
+      features = token.card;
     }
   } else if (cardNumberFromPayment) {
-    featuresPromise = getCardFeatures(cardNumberFromPayment);
+    features = getCardFeatures(cardNumberFromPayment);
   }
 
-  return featuresPromise.then(features => {
+  return Promise.resolve(features).then(features => {
     // Set things from features
     const type = features.type;
     const issuer = features.issuer;
