@@ -85,34 +85,3 @@ export function isInstrumentValidForPayment(instrument, payment, extra) {
 
   return Promise.resolve(validated);
 }
-
-/**
- * Returns the valid payment instruments
- * @param {Object} payment Payment payload
- * @param {Array<Instrument>} instruments
- * @param {Object} extra
- *
- * @returns {Promise<Array<Instrument>>}
- */
-export function getValidPaymentInstruments(payment, instruments, extra) {
-  const methodInstruments = _Arr.filter(
-    instruments,
-    instrument => instrument.method === payment.method
-  );
-
-  const promises = _Arr.map(methodInstruments, instrument =>
-    isInstrumentValidForPayment(instrument, payment, extra)
-  );
-
-  return Promise.all(promises).then(instrumentValidities => {
-    let validInstruments = [];
-
-    _Arr.loop(instrumentValidities, (valid, index) => {
-      if (valid) {
-        validInstruments.push(methodInstruments[index]);
-      }
-
-      return validInstruments;
-    });
-  });
-}
