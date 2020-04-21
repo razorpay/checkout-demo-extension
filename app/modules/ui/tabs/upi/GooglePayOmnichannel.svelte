@@ -117,7 +117,7 @@
           elemClasses="mature"
           id="gpay-phone"
           {pattern}
-          name="amount"
+          name="phone"
           type="text"
           required
           bind:this={phoneField}
