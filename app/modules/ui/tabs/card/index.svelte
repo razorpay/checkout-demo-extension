@@ -6,11 +6,11 @@
   import Tab from 'ui/tabs/Tab.svelte';
   import Callout from 'ui/elements/Callout.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
+  import Bottom from 'ui/layouts/Bottom.svelte';
   import AddCardView from 'ui/tabs/card/AddCardView.svelte';
   import EmiActions from 'ui/components/EmiActions.svelte';
   import SavedCards from 'ui/tabs/card/savedcards.svelte';
-  import OffersPortal from 'ui/components/OffersPortal.svelte';
-  import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
+  import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
 
   // Store
   import {
@@ -19,12 +19,18 @@
     cardName,
     cardNumber,
     remember,
+    selectedCard,
   } from 'checkoutstore/screens/card';
+  import { methodTabInstrument } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
 
   import { contact } from 'checkoutstore/screens/home';
-  import { isRecurring, shouldRememberCustomer } from 'checkoutstore';
+  import {
+    isRecurring,
+    shouldRememberCustomer,
+    isDCCEnabled,
+  } from 'checkoutstore';
   import {
     isMethodEnabled,
     getEMIBanks,
@@ -38,6 +44,7 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getCardType } from 'common/card';
+  import { getSubtextForInstrument } from 'subtext';
 
   // Transitions
   import { fade } from 'svelte/transition';
@@ -57,7 +64,6 @@
   let allSavedCards = [];
   let savedCards = [];
   let lastSavedCard = null;
-  let selectedOffer = null;
 
   let showEmiCta;
   let emiCtaView;
@@ -93,6 +99,17 @@
     }
   }
 
+  /**
+   * Session calls this to ask if tab will handle back
+   *
+   * @returns {boolean} will tab handle back
+   */
+  export function onBack() {
+    $selectedCard = null; // De-select saved card
+
+    return false;
+  }
+
   function getSavedCardsForDisplay(allSavedCards, tab) {
     if (isRecurring()) {
       return filterSavedCardsForRecurring(allSavedCards);
@@ -105,19 +122,84 @@
     return allSavedCards;
   }
 
+  /**
+   * Filters saved card tokens against the given instrument.
+   * Only allows those cards that match the given instruments.
+   *
+   * @param {Array<Token>} tokens
+   * @param {Instrument} instrument
+   *
+   * @returns {Array<Token>}
+   */
+  function filterSavedCardsAgainstInstrument(tokens, instrument) {
+    // Sanity check
+    if (!instrument) {
+      return tokens;
+    }
+
+    if (instrument.method !== tab) {
+      return tokens;
+    }
+
+    const eligibleTokens = _Arr.filter(tokens, token => {
+      const hasIssuers = Boolean(instrument.issuers);
+      const hasNetworks = Boolean(instrument.networks);
+      const hasTypes = Boolean(instrument.types);
+
+      const issuers = instrument.issuers || [];
+      const networks = instrument.networks || [];
+      const types = instrument.types || [];
+
+      // If there is no issuer present, it means match all issuers.
+      const issuerMatches = hasIssuers
+        ? _Arr.contains(issuers, token.card.issuer)
+        : true;
+
+      const networkMatches = hasNetworks
+        ? _Arr.contains(
+            networks,
+            token.card.network && token.card.network.toLowerCase()
+          )
+        : true;
+
+      const typeMatches = hasTypes
+        ? _Arr.contains(types, token.card.type)
+        : true;
+
+      return issuerMatches && networkMatches && typeMatches;
+    });
+
+    return eligibleTokens;
+  }
+
   $: {
     allSavedCards = getSavedCardsFromCustomer($customer);
   }
 
   $: {
-    savedCards = filterSavedCardsForOffer(
-      getSavedCardsForDisplay(allSavedCards, tab),
-      selectedOffer
+    let _savedCards = getSavedCardsForDisplay(allSavedCards, tab);
+
+    _savedCards = filterSavedCardsAgainstInstrument(
+      _savedCards,
+      $methodTabInstrument
     );
+
+    savedCards = _savedCards;
   }
 
   $: {
     lastSavedCard = savedCards && savedCards[savedCards.length - 1];
+  }
+
+  let instrumentSubtext;
+  $: {
+    if (!$methodTabInstrument) {
+      instrumentSubtext = undefined;
+    } else if ($methodTabInstrument.method !== tab) {
+      instrumentSubtext = undefined;
+    } else {
+      instrumentSubtext = getSubtextForInstrument($methodTabInstrument);
+    }
   }
 
   function getSavedCardsFromCustomer(customer = {}) {
@@ -151,31 +233,6 @@
     });
   }
 
-  function filterSavedCardsForOffer(savedCards, offer) {
-    // If offer no offer is selected, do not try to filter cards.
-    if (!offer) {
-      return savedCards;
-    }
-
-    return _Arr.filter(savedCards, function(index, token) {
-      var card = token.card;
-      if (card && offer.payment_method === 'emi' && offer.emi_subvention) {
-        /* Merchant subvention EMI */
-        const bank = card.issuer;
-        if (bank) {
-          const plans = getEMIBankPlans(bank);
-          if (!plans) {
-            return false;
-          }
-
-          return _Arr.any(plans, plan => plan.offer_id === offer.id);
-        }
-      } else {
-        return true;
-      }
-    });
-  }
-
   function filterSavedCardsForRecurring(tokens) {
     return _Arr.filter(tokens, token => token.recurring);
   }
@@ -199,13 +256,11 @@
 
   export function showAddCardView() {
     Analytics.track('saved_cards:hide');
-    session.removeAutomaticallyAppliedOffer();
     setView(Views.ADD_CARD);
   }
 
   export function showSavedCardsView() {
     Analytics.track('saved_cards:show');
-    session.removeAutomaticallyAppliedOffer();
     setView(Views.SAVED_CARDS);
   }
 
@@ -226,7 +281,7 @@
       return allSavedCards;
     }
     // TODO: Fix session.customer usage when customer is moved to store.
-    return getSavedCardsFromCustomer(session.customer);
+    return getSavedCardsFromCustomer(session.getCurrentCustomer());
   }
 
   export function isOnSavedCardsScreen() {
@@ -328,8 +383,6 @@
       from: session.tab,
     };
 
-    session.removeAndCleanupOffers();
-
     if (emiCtaView === 'available') {
       session.showEmiPlans('new')(e);
       eventName += 'view';
@@ -340,17 +393,13 @@
       if (isMethodEnabled('card')) {
         session.setScreen('card');
         session.switchTab('card');
-        session.offers && session.renderOffers(session.tab);
         showLandingView();
-
         eventName = 'emi:pay_without';
       }
     } else if (emiCtaView === 'plans-unavailable') {
       if (isMethodEnabled('card')) {
         session.setScreen('card');
         session.switchTab('card');
-        session.offers && session.renderOffers(session.tab);
-
         eventName = 'emi:pay_without';
       }
     }
@@ -359,10 +408,6 @@
       type: AnalyticsTypes.BEHAV,
       data: eventData,
     });
-  }
-
-  export function setSelectedOffer(newOffer) {
-    selectedOffer = newOffer;
   }
 
   export function onShown() {
@@ -390,11 +435,15 @@
     top: 10px;
     border: 1px solid red;
   }
+
+  .instrument-subtext-description {
+    margin: 12px 0;
+  }
 </style>
 
 <Tab method="card" pad={false} overrideMethodCheck>
   <Screen pad={false}>
-    <div slot="main">
+    <div>
       {#if currentView === Views.ADD_CARD}
         <div in:fade={{ duration: 100, y: 100 }}>
           {#if showSavedCardsCta}
@@ -409,6 +458,13 @@
               Use saved cards
             </div>
           {/if}
+
+          {#if instrumentSubtext}
+            <div class="pad instrument-subtext-description">
+              {instrumentSubtext}
+            </div>
+          {/if}
+
           <AddCardView
             {tab}
             bind:this={addCardView}
@@ -423,6 +479,12 @@
         </div>
       {:else}
         <div in:fade={{ duration: 100 }}>
+          {#if instrumentSubtext}
+            <div class="pad instrument-subtext-description">
+              {instrumentSubtext}
+            </div>
+          {/if}
+
           <div id="saved-cards-container">
             <SavedCards
               {tab}
@@ -439,7 +501,10 @@
         </div>
       {/if}
     </div>
-    <div slot="bottom">
+    <Bottom tab="card">
+      {#if isDCCEnabled()}
+        <DynamicCurrencyView view={currentView} />
+      {/if}
       {#if isRecurring()}
         <Callout>
           {#if !session.subscription}
@@ -453,12 +518,6 @@
           {/if}
         </Callout>
       {/if}
-
-      <DowntimeCallout>
-        Yes Bank Cards are temporarily disabled. Please pay via another method.
-      </DowntimeCallout>
-
-      <OffersPortal />
-    </div>
+    </Bottom>
   </Screen>
 </Tab>

@@ -11,7 +11,10 @@
   import { getBankLogo } from 'common/bank';
   import { getBanks } from 'checkoutstore';
   import { getWallet } from 'common/wallet';
+  import { getProvider as getCardlessEmiProvider } from 'common/cardlessemi';
+  import { getProvider as getPaylaterProvider } from 'common/paylater';
   import Track from 'tracker';
+  import { getExtendedSingleInstrument } from 'configurability/instruments';
 
   // Store
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
@@ -20,6 +23,9 @@
   // Props
   export let instrument = {};
   export let name = 'instrument';
+
+  let individualInstrument = getExtendedSingleInstrument(instrument);
+  $: individualInstrument = getExtendedSingleInstrument(instrument);
 
   let selected = false;
   $: selected = $selectedInstrumentId === instrument.id;
@@ -49,8 +55,9 @@
     let wallet;
     let flow;
     let vpaSplit;
+    let provider;
 
-    switch (instrument.method) {
+    switch (individualInstrument.method) {
       case 'paypal':
         title = 'PayPal';
         icon = session.themeMeta.icons.paypal;
@@ -59,29 +66,29 @@
         break;
 
       case 'netbanking':
-        title = `Netbanking - ${banks[instrument.bank]} `;
-        icon = getBankLogo(instrument.bank);
-        alt = banks[instrument.bank];
+        title = `Netbanking - ${banks[individualInstrument.bank]} `;
+        icon = getBankLogo(individualInstrument.bank);
+        alt = banks[individualInstrument.bank];
 
         break;
       case 'wallet':
-        wallet = getWallet(instrument.wallet);
+        wallet = getWallet(individualInstrument.wallet);
         title = `Wallet - ${wallet.name}`;
         icon = wallet.sqLogo;
         alt = wallet.name;
 
         break;
       case 'upi':
-        if (instrument.flow === 'qr') {
+        if (individualInstrument.flow === 'qr') {
           title = `UPI QR`;
           icon = session.themeMeta.icons['qr'];
           alt = title;
 
           break;
-        } else if (instrument.flow === 'intent') {
+        } else if (individualInstrument.flow === 'intent') {
           const app = _Arr.find(
             session.upi_intents_data,
-            app => app.package_name === instrument.app
+            app => app.package_name === individualInstrument.app
           );
 
           title = `UPI - ${app.app_name.replace(/ UPI$/, '')}`;
@@ -90,7 +97,7 @@
             icon = app.app_icon;
             alt = app.app_name;
           } else {
-            icon = '&#xe70e';
+            icon = '&#xe70e;';
             alt = 'UPI App';
           }
         } else {
@@ -98,6 +105,22 @@
           icon = '&#xe70e;';
           alt = 'UPI';
         }
+
+        break;
+
+      case 'cardless_emi':
+        provider = getCardlessEmiProvider(individualInstrument.provider);
+        title = `EMI - ${provider.name}`;
+        icon = provider.sqLogo;
+        alt = provider.name;
+
+        break;
+
+      case 'paylater':
+        provider = getPaylaterProvider(individualInstrument.provider);
+        title = `Pay Later - ${provider.name}`;
+        icon = provider.sqLogo;
+        alt = provider.name;
 
         break;
     }
@@ -129,6 +152,7 @@
   {name}
   {selected}
   className="instrument"
+  data-type="individual"
   value={instrument.id}
   on:click
   on:click={selectInstrument}

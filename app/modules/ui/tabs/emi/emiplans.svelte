@@ -1,7 +1,9 @@
 <script>
   // UI imports
   import Callout from 'ui/elements/Callout.svelte';
-  import EmiPlanCard from 'ui/tabs/emi/emiplancard.svelte';
+  import Bottom from 'ui/layouts/Bottom.svelte';
+  import EmiPlanCards from 'ui/tabs/emi/emiplancards.svelte';
+  import { appliedOffer } from 'checkoutstore/offers';
 
   // Props
   export let actions;
@@ -15,23 +17,42 @@
 
   // Computed
   export let showActions;
-  export let hasCallout;
+
+  // plans without offer
+  let otherPlans = [];
+  let offerPlans = [];
 
   $: showActions = actions && _Obj.keys(actions).length;
-
   $: {
-    const hasBranding = Boolean(branding);
-    const hasAgreement = actions.showAgreement && expanded >= 0;
-
-    hasCallout = hasBranding || hasAgreement;
+    const _otherPlans = [];
+    const _offerPlans = [];
+    if ($appliedOffer) {
+      plans.forEach(plan => {
+        if (plan.offer_id !== $appliedOffer.id) {
+          _otherPlans.push(plan);
+        } else {
+          _offerPlans.push(plan);
+        }
+      });
+    }
+    if (_otherPlans.length && _offerPlans.length) {
+      otherPlans = _otherPlans;
+      offerPlans = _offerPlans;
+    } else {
+      otherPlans = offerPlans = [];
+    }
   }
 
-  export function expand(index) {
-    expanded = index;
+  export function expand(plan) {
+    expanded = plan.duration;
 
     invoke('select', {
-      detail: plans[index],
+      detail: plan,
     });
+  }
+
+  export function deselectAll() {
+    expanded = -1;
   }
 
   export function invoke(type, event) {
@@ -54,48 +75,26 @@
       max-height: 24px;
     }
   }
-
-  .has-callout {
-    padding-bottom: 64px;
-  }
-
-  :global(.mobile) {
-    .has-callout {
-      padding-bottom: 120px;
-    }
-  }
-  .sanitized h3 {
-    text-transform: none;
-    color: black;
-  }
 </style>
 
-<div
-  id="form-emiplans"
-  class="tab-content showable screen pad vertical-pad"
-  class:has-callout={hasCallout}>
-  {#if plans.length}
-    <h3>Select an EMI Plan</h3>
-  {:else}
-    <div class="sanitized">
-      <h3>
-        There is a mismatch between the selected offer and entered card details.
-      </h3>
-      <h3>Please go back and select a different offer or card.</h3>
-    </div>
+<div id="form-emiplans" class="tab-content showable screen pad vertical-pad">
+  <EmiPlanCards
+    plans={otherPlans.length ? offerPlans : plans}
+    {bank}
+    {amount}
+    {expand}
+    {expanded}
+    {provider} />
+  {#if otherPlans.length}
+    <EmiPlanCards
+      title="Plans without offer"
+      plans={otherPlans}
+      {bank}
+      {amount}
+      {expand}
+      {expanded}
+      {provider} />
   {/if}
-
-  <div class="emi-plans-list expandable-card-list">
-    {#each plans as plan, index}
-      <EmiPlanCard
-        {plan}
-        {bank}
-        expanded={index === expanded}
-        {amount}
-        {provider}
-        on:click={() => expand(index)} />
-    {/each}
-  </div>
 
   <div
     class="emi-plans-actions actionlink-container"
@@ -115,19 +114,22 @@
       </div>
     {/if}
   </div>
-  {#if actions.showAgreement && expanded >= 0}
-    <div
-      class="callout drishy"
-      on:click={event => invoke('viewAgreement', event)}>
-      <span>&#x2139;</span>
-      By clicking on Pay, you agree to the terms of our&nbsp;
-      <span class="theme-highlight">Loan Agreement</span>
-    </div>
-  {/if}
 
-  {#if branding}
-    <Callout classes={['emi-branding-callout']} showIcon={false}>
-      <img src={branding} alt={provider} />
-    </Callout>
-  {/if}
+  <Bottom tab="emiplans">
+    {#if actions.showAgreement && expanded >= 0}
+      <div
+        class="callout drishy"
+        on:click={event => invoke('viewAgreement', event)}>
+        <span>&#x2139;</span>
+        By clicking on Pay, you agree to the terms of our&nbsp;
+        <span class="theme-highlight">Loan Agreement</span>
+      </div>
+    {/if}
+
+    {#if branding}
+      <Callout classes={['emi-branding-callout']} showIcon={false}>
+        <img src={branding} alt={provider} />
+      </Callout>
+    {/if}
+  </Bottom>
 </div>

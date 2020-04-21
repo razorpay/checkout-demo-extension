@@ -71,7 +71,7 @@ describe('Basic upi payment', () => {
       page,
       options,
       preferences,
-      apps: [{ package_name: 'in.org.npci.upiapp', app_name: 'BHIM' }],
+      apps: true,
     });
     await assertBasicDetailsScreen(context);
     await fillUserDetails(context);
@@ -87,7 +87,7 @@ describe('Basic upi payment', () => {
     await verifyOfferApplied(context);
     await verifyDiscountPaybleAmount(context, '₹ 1,990');
     await verifyDiscountAmountInBanner(context, '₹ 1,990');
-    await verifyDiscountText(context, 'You save ₹ 10');
+    await verifyDiscountText(context, 'You save ₹10');
     await submit(context);
     await respondAndVerifyIntentRequest(context);
   });

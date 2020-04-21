@@ -4,7 +4,7 @@ function makeOptions(features, options) {
 }
 
 function makePreferences(features, preferences) {
-  const { downtime, offers } = features;
+  const { downtime, offers, dcc } = features;
 
   if (offers) {
     preferences.offers = [
@@ -35,6 +35,10 @@ function makePreferences(features, preferences) {
         display_text: 'Master Card Offer - 20% off',
       },
     ];
+  }
+
+  if (dcc) {
+    preferences.features = { dcc: true };
   }
 
   return preferences;

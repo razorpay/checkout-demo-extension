@@ -87,7 +87,7 @@ module.exports = function(testFeatures) {
         page,
         options,
         preferences,
-        apps: [{ package_name: 'in.org.npci.upiapp', app_name: 'BHIM' }],
+        apps: true,
       });
 
       const missingUserDetails = optionalContact && optionalEmail;
@@ -121,7 +121,7 @@ module.exports = function(testFeatures) {
         await verifyOfferApplied(context);
         await verifyDiscountPaybleAmount(context, '₹ 1,990');
         await verifyDiscountAmountInBanner(context, '₹ 1,990');
-        await verifyDiscountText(context, 'You save ₹ 10');
+        await verifyDiscountText(context, 'You save ₹10');
       } else {
         await selectPaymentMethod(context, 'upi');
 
@@ -148,7 +148,7 @@ module.exports = function(testFeatures) {
         await verifyOfferApplied(context);
         await verifyDiscountPaybleAmount(context, '₹ 1,990');
         await verifyDiscountAmountInBanner(context, '₹ 1,990');
-        await verifyDiscountText(context, 'You save ₹ 10');
+        await verifyDiscountText(context, 'You save ₹10');
       }
 
       if (downtimeHigh && offers) {

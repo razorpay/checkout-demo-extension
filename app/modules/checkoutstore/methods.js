@@ -24,16 +24,24 @@ import { getProvider } from 'common/paylater';
 import { wallets } from 'common/wallet';
 import { extendConfig } from 'common/cardlessemi';
 import { mobileQuery } from 'common/useragent';
-import { getUPIIntentApps } from 'checkoutframe';
+import { getUPIIntentApps } from 'checkoutstore/native';
+
+const DEBIT_EMI_BANKS = ['HDFC_DC'];
 
 const ALL_METHODS = {
   card() {
-    return getAmount() && getOption('method.card') && getMerchantMethods().card;
+    if (getAmount() && getOption('method.card')) {
+      if (isRecurring()) {
+        return getRecurringMethods()?.card;
+      }
+      return getMerchantMethods().card;
+    }
   },
 
   netbanking() {
     return (
       getAmount() &&
+        !isRecurring() &&
         !isInternational() &&
         getOption('method.netbanking') !== false &&
         getNetbankingBanks()
@@ -91,7 +99,7 @@ const ALL_METHODS = {
   },
 
   cardless_emi() {
-    if (!getAmount() || isInternational()) {
+    if (!getAmount() || isInternational() || isRecurring()) {
       return false;
     }
     const providers = getCardlessEMIProviders();
@@ -109,6 +117,7 @@ const ALL_METHODS = {
      */
     return (
       getAmount() &&
+      !isRecurring() &&
       !isInternational() &&
       !_Obj.isEmpty(getMerchantMethods().paylater)
     );
@@ -116,6 +125,7 @@ const ALL_METHODS = {
 
   bank_transfer() {
     return (
+      !isRecurring() &&
       getAmount() &&
       getMerchantMethods().bank_transfer &&
       !isInternational() &&
@@ -125,13 +135,19 @@ const ALL_METHODS = {
   },
 
   paypal() {
-    return isInternational() && getMerchantMethods().wallet?.paypal;
+    return (
+      !isRecurring() && isInternational() && getMerchantMethods().wallet?.paypal
+    );
   },
 
   gpay() {
     return isUPIBaseEnabled() && isIRCTC();
   },
 };
+
+export function isZestMoneyEnabled() {
+  return isMethodEnabled('cardless_emi') && getCardlessEMIProviders().zestmoney;
+}
 
 export function isMethodEnabled(method) {
   const checker = ALL_METHODS[method];
@@ -142,6 +158,11 @@ export function isMethodEnabled(method) {
 
 export function isCardOrEMIEnabled() {
   return isMethodEnabled('card') || isMethodEnabled('emi');
+}
+
+export function isDebitEMIEnabled() {
+  const emiBanks = getEMIBanks();
+  return DEBIT_EMI_BANKS |> _Arr.any(bank => emiBanks[bank]);
 }
 
 /*
@@ -198,7 +219,8 @@ const UPI_METHODS = {
   collect: () => true,
   omnichannel: () => !isPayout() && hasFeature('google_pay_omnichannel'),
   qr: () => getOption('method.qr') && !global.matchMedia(mobileQuery).matches,
-  intent: () => getMerchantMethods().upi_intent && getUPIIntentApps(),
+  intent: () =>
+    getMerchantMethods().upi_intent && getUPIIntentApps().all.length,
 };
 
 // check if upi itself is enabled, before checking any
@@ -244,27 +266,50 @@ export function isEMandateEnabled() {
 }
 
 export function getEMandateBanks() {
-  const banks = getRecurringMethods().emandate;
+  let banks = getRecurringMethods().emandate;
+
   if (banks) {
     const authTypeFromOrder = getMerchantOrder()?.auth_type;
     if (authTypeFromOrder) {
-      return (
+      banks =
         banks
         |> _Obj.reduce((filteredBanks, bank, bankCode) => {
           if (bank.auth_types |> _Arr.contains(authTypeFromOrder)) {
             filteredBanks[bankCode] = bank;
           }
           return filteredBanks;
-        }, {})
-      );
+        }, {});
     }
   }
-  return banks;
+
+  return filterBanksOnAllowedAuthTypes(banks);
+}
+
+/**
+ * Removes banks that do not have any supported auth types
+ * @param {Object} banks
+ * @returns {Object}
+ */
+function filterBanksOnAllowedAuthTypes(banks) {
+  const allowedAuthTypes = ['netbanking', 'debitcard'];
+
+  return (
+    banks
+    |> _Obj.reduce((filteredBanks, bank, bankCode) => {
+      if (
+        _Arr.any(bank.auth_types, authType =>
+          _Arr.contains(allowedAuthTypes, authType)
+        )
+      ) {
+        filteredBanks[bankCode] = bank;
+      }
+      return filteredBanks;
+    }, {})
+  );
 }
 
 export function getEMandateAuthTypes(bankCode) {
   const authTypeFromOrder = getMerchantOrder()?.auth_type;
-  const accountType = getOption('prefill.bank_account[account_type]');
 
   /**
    * There may be multiple auth types present for each bank
@@ -280,14 +325,25 @@ export function getEMandateAuthTypes(bankCode) {
       if (authTypeFromOrder) {
         return type === authTypeFromOrder;
       }
-      return (!accountType && type === 'netbanking') || type === 'debitcard';
+
+      return type === 'netbanking' || type === 'debitcard';
     }) || []
   );
 }
 
-export function getEMIBankPlans(code) {
+export function getEMIBankPlans(code, cardType = 'credit') {
   const options = code && getMerchantMethods().emi_options;
   if (options) {
+    if (cardType === 'debit') {
+      // For Banks with EMI on Debit Cards,
+      // code will end with "_DC".
+      // Example: If the issuer is HDFC and card type is debit
+      // Then use "HDFC_DC" plans and not "HDFC" plans.
+      const debitCode = code + '_DC';
+      if (DEBIT_EMI_BANKS |> _Arr.contains(debitCode)) {
+        return options[debitCode];
+      }
+    }
     return options[code];
   }
 }
@@ -347,21 +403,21 @@ export function getCardlessEMIProviders() {
 export function getWallets() {
   /**
    * disable wallets if:
-   * - amount > 20k
+   * - amount > 1L
    * - Wallets not enabled by backend
    * - Recurring payment
    * - International
    * Also, enable/disable wallets on the basis of merchant options
    */
   const passedWallets = getOption('method.wallet');
-  const enabledWallets = getMerchantMethods().wallet |> _Obj.keys;
+  let enabledWallets = getMerchantMethods().wallet |> _Obj.keys;
 
   addExternalWallets(enabledWallets);
 
   if (
     !getAmount() ||
     passedWallets === false ||
-    getAmount() >= 20000 * 100 ||
+    getAmount() >= 1e5 * 100 ||
     isRecurring() ||
     isInternational()
   ) {
@@ -369,9 +425,8 @@ export function getWallets() {
   }
 
   if (_.isNonNullObject(passedWallets)) {
-    return (
-      enabledWallets |> _Arr.filter(wallet => passedWallets[wallet] !== false)
-    );
+    enabledWallets =
+      enabledWallets |> _Arr.filter(wallet => passedWallets[wallet] !== false);
   }
   return (
     enabledWallets |> _Arr.map(wallet => wallets[wallet]) |> _Arr.filter(_ => _)

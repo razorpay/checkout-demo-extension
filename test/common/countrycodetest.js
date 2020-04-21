@@ -71,5 +71,48 @@ test('Module: countrycodeutil', t => {
     t.end();
   });
 
+  test('Indian phone nubmer starting with 0', t => {
+    const formatedNumber = findCountryCode('09988776655');
+    const expectedFormat = {
+      phone: '9988776655',
+      code: '91',
+    };
+    t.same(formatedNumber, expectedFormat);
+    t.end();
+  });
+
+  test('American: (541) 754-3010', t => {
+    const formatted = findCountryCode('(541) 754-3010');
+    const expected = {
+      phone: '5417543010',
+      code: '1',
+    };
+
+    t.same(formatted, expected);
+    t.end();
+  });
+
+  test('American: 1-541-754-3010', t => {
+    const formatted = findCountryCode('1-541-754-3010');
+    const expected = {
+      phone: '5417543010',
+      code: '1',
+    };
+
+    t.same(formatted, expected);
+    t.end();
+  });
+
+  test('American: +1-541-754-3010', t => {
+    const formatted = findCountryCode('+1-541-754-3010');
+    const expected = {
+      phone: '5417543010',
+      code: '1',
+    };
+
+    t.same(formatted, expected);
+    t.end();
+  });
+
   t.end();
 });

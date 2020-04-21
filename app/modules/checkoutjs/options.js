@@ -3,7 +3,6 @@ import { RazorpayDefaults } from 'common/options';
 RazorpayDefaults.timeout = 0;
 RazorpayDefaults.name = '';
 RazorpayDefaults.partnership_logo = '';
-RazorpayDefaults.ecod = false;
 
 RazorpayDefaults.nativeotp = true;
 RazorpayDefaults.remember_customer = false;
@@ -104,5 +103,5 @@ RazorpayDefaults._ = {
 };
 
 RazorpayDefaults.config = {
-  display: null, // Display config for Payment Method Configurability
+  display: {}, // Display config for Payment Method Configurability
 };

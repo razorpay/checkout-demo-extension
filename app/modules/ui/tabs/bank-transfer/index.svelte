@@ -13,6 +13,7 @@
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
   import Callout from 'ui/elements/Callout.svelte';
   import Tab from 'ui/tabs/Tab.svelte';
+  import Bottom from 'ui/layouts/Bottom.svelte';
 
   // Props
   export let loading = true;
@@ -190,10 +191,12 @@
         {/if}
       </div>
 
-      <Callout>
-        Do not round-off the amount. Transfer the exact amount for the payment
-        to be successful.
-      </Callout>
+      <Bottom tab="bank_transfer">
+        <Callout>
+          Do not round-off the amount. Transfer the exact amount for the payment
+          to be successful.
+        </Callout>
+      </Bottom>
     {:else}
       <div class="error">
         <div class="error-text">{error || 'Error'}</div>

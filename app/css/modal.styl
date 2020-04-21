@@ -1,5 +1,17 @@
 @require 'common';
 
+#bottom {
+  order: 1;
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+@font-face {
+  font-family: 'rzpcvv';
+  src: url("data:application/x-font-woff;base64,d09GRgABAAAAAAWEAA0AAAAACbwAAQBoAAAAAAAAAAAAAAAAAAAAAAAAAABGRlRNAAAFaAAAABwAAAAcfyJSH09TLzIAAAGoAAAAWwAAAGDZurM6Y21hcAAAAhwAAABlAAABWh0IGSNjdnQgAAAChAAAAAQAAAAEAEIE82dhc3AAAAVgAAAACAAAAAj//wADZ2x5ZgAAAqgAAAERAAADgCcE3W1oZWFkAAABMAAAADYAAAA2CduKGWhoZWEAAAFoAAAAHQAAACQNMAYraG10eAAAAgQAAAAWAAAAJhtgDBJsb2NhAAACiAAAACAAAAAgBOwFvG1heHAAAAGIAAAAHQAAACAAUgAxbmFtZQAAA7wAAAFnAAACcEWNnwdwb3N0AAAFJAAAADkAAABIH9yg2AABAAAAARqfH/ls5l8PPPUACwfQAAAAAMqTXnAAAAAA2qjGpAAI//AFeAWpAAAACAACAAAAAAAAeJxjYGRgYN/2LwxIXmAAAtYKBkYGVMACAF0aA2wAAAB4nGNgZGBg4GfQYwDRDAxMQMwIZjuA+QwACGMAhAAAAHicY2Bmv8A4gYGVgYG1glWEgYFRAkIz72KoYPzCwczEz8rExMTCzMS8gIFhfQBDgjcDFJRUBvgAKV6GMDavf1WME9i3Ma5SYGCYDJJj/so6E0gpMDACALP0D3QAeJxjv8AAB+wXmCIwIUMUAwcAZqgFlQAAeJxjYGBgZoBgGQZGBhAIAfIYwXwWBgsgzcXAwcAEhLwMlgzODGH//wPFeBkMIOz/X/9f/n/q/w6oXihgZGOACzAyAQkmBlTAyIABmFlY2dg5OLm4eeBCvJiq+DCFBikAAOVgDlYAAAAAQgTzAAAAAAAAAAAAIgBEAGYAiACqAMwA7gEQATIBVAGaAcB4nGNgZIpguMRawfyJQZiBgcHEjtlIjlmEj1lJj4kpQsMruaqpKtlLA8ZgUkThghhATQyjZoyaQXMzGKL+f2DlZF3JoAvkGckz8jEqK+kxMgkImakYG4mJs4P4+ox6zMpKfEyiInJMxkZ2TOYsExR4fSJ+b5z9Z1NS5j5GzgXznkbaswsJ8vIpi5h5JTkU7+/y9W3dlumQFu6txqjBG5xWlH0QaLQLI9+h7KSQSC5eTgk+BRlh/0mXmtouTfThVzBUArmFg4GB1Z11JoMQA4MwyHZGOUZxO0ZzRjtGa0ZGZY7ZUgocjFP5xLk5RfkYJ7MrSc75u2M960wpkT+8SgHa2gFKzJ8FZX+lAz0CADc409oAAAB4nHWPy07CQBiFT6HgJQS3xI11pZFwKWFVtoSFIYEYI+uGTsqEplNnpgtIfB5d+RC+gK/kKZmgMdrJdL75zz9nzgBo4x0eqs+Dj3PHNZzgynEdd3hx7KOFD8cN3HrXjptoeYnjNi69V57y/DNWTg8OFdeoXDiu4xE3jn108Oa4gSU+HTfR8e4dtzH2njFHDAsFzGPL/wMEUpTIWNbcirTMYoLFjjbqUM+R8FiJLdlgjymn5LnksK4RITjaBr8cK22EIUIO2N1SZXGezMttbPbTvRTJXq6joIoSuKujYDQM2fufIX42A08UNVNJtuZsDtHnHGKMCXcrqoY2VU+OrnuRZG1DVaGgknOnaK/5EkFDoY1UeRD2w+F4EqyEsULnXQaXZhOoQuRGlXotvhP2/krYOybcsMnypggDDsNbNBMUrBlmrZJnXBWrKfUFZjTGxtoiGgzMWsvCmr6RWV/pdLCYzfEFXUVwKwB4nGNgYgCD5z0MFQzYAD8QMzIyMQgziDCIMogxiDNIMEgySDFIM8gwqDFYspfmZRoYGLgAAJ2iBXIAAAAAAAAB//8AAgAAAAEAAAAA2eYtCgAAAADKk15wAAAAANqoxqQ=");
+}
+
 .native-otp-bank {
   height: 20px;
   padding-top: 13px !important;
@@ -103,12 +115,6 @@ body, html {
 
 .vertical-pad {
   padding-bottom: 12px;
-}
-
-.has-offers {
-  .vertical-pad {
-    padding-bottom: 44px;
-  }
 }
 
 #wallets, #upi-apps {
@@ -588,7 +594,7 @@ i {
     }
 
     .tab-content {
-      top: 0;
+      margin-top: 0;
     }
 
     #form-card {
@@ -658,6 +664,8 @@ i {
 #content {
   text-align: left;
   white-space: normal;
+  display: flex;
+  flex-direction: column;
 
   &.has-discount {
     #header {
@@ -682,8 +690,9 @@ i {
   max-height: $headerh;
   position: relative;
   z-index: 3;
+  flex-shrink: 0;
 
-  &::before {
+  &::before, &::after {
     content: '';
     left: 0;
     right: 0;
@@ -695,6 +704,34 @@ i {
 
   .discount {
     display: none;
+  }
+
+  &::after {
+    transition: 0.2s;
+    background: none;
+  }
+
+  &.offer-fade {
+    &::after {
+      background: rgba(0,0,0,0.4);
+    }
+    & + #body #topbar {
+      display: none !important;
+    }
+  }
+  &.offer-error {
+    &::after {
+      background: rgba(0,0,0,0.4);
+    }
+    & + #body #topbar:after {
+      content: '';
+      left: 0;
+      right: 0;
+      bottom: -1px;
+      top: 0;
+      position: absolute;
+      background: rgba(0,0,0,0.4);
+    }
   }
 }
 
@@ -805,8 +842,10 @@ i {
 }
 
 #body {
+  flex: 1;
   border-radius: 0 0 $br $br;
   height: $bodyh;
+  flex-basis: $bodyh;
   background: #fff;
   backface-visibility: none;
 
@@ -843,6 +882,9 @@ i {
   z-index: 1;
   border-radius: 0 0 $br $br;
   background: #fff;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 #topbar {
@@ -989,117 +1031,21 @@ $outline = #ddd;
 }
 
 .tab-content {
-  top: $topbarh + 1px;
+  margin-top: $topbarh + 1px;
+  flex: 1;
+  overflow: auto;
+  box-sizing: border-box;
+  // still need to keep below properties to support
+  // position: absolute during animations
+  top: 0;
   left: 0;
   width: 100%;
   bottom: 0;
-  background: #fff;
-  z-index: 4;
-  border-radius: 3px;
 }
 
 .offers-container {
-  display: none;
-  width: 100%;
-  position: absolute;
-  left: 0;
-  height: $topbarh;
-  line-height: $topbarh;
-  z-index: -1;
-  box-sizing: border-box;
-  transform: none;
-  transition: 0.3s transform ease-in 0s, 0.3s opacity ease-in 0s, 0.1s color;
+  order: 1;
   border-top: 1px solid #ebedf0;
-
-  .offers-content {
-    position: relative;
-    height: 100%;
-
-    .single-offer-text {
-      display: none;
-      max-width: 250px;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-
-    &.single-offer {
-      .multi-offer-el {
-        display: none;
-      }
-
-      .single-offer-text {
-        display: inline-block;
-      }
-    }
-
-    .offers-title {
-      height: 100%;
-      cursor: pointer;
-      position: relative;
-
-      > span.offer-icon {
-        position: absolute;
-        font-size: 20px;
-        transform: translate(-4px, 21px);
-        line-height: 0;
-      }
-
-      .select-offer, .selected-offer {
-        height: 100%;
-        overflow: hidden;
-        padding-left: 1.57em;
-
-        > span {
-          line-height: 1;
-          display: inline-block;
-          padding-top: 15px;
-
-          &.toggle {
-            display: block;
-            height: $topbarh - 1px;
-            position: relative;
-            padding-right: 15px;
-            box-sizing: border-box;
-
-            &:after {
-              content: '\e601';
-              display: block;
-              font-size: 20px;
-              line-height: 1em;
-              position: absolute;
-              top: 50%;
-              right: 0;
-              transform: translate(0, -50%) rotate(180deg);
-              margin-top: 5px;
-            }
-          }
-        }
-      }
-
-      .selected-offer {
-        display: none;
-
-        .discount-text {
-          color: #70be53;
-        }
-      }
-
-      &.applied {
-        .selected-offer {
-          display: block;
-        }
-
-        .select-offer {
-          display: none;
-        }
-      }
-    }
-
-    .offers-title {
-      padding: 0 $p;
-    }
-  }
 }
 
 .offers-list-container, .offers-error {
@@ -1108,21 +1054,16 @@ $outline = #ddd;
 
 .offers-list-container {
   background-color: #F7F7F7;
-  height: $bodyh + $footerh;
-  transform: translate(0, -100%);
-  position: relative;
-  top: $footerh + 1px;
+  top: 128px;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  position: absolute;
   transition: 0.3s transform ease-in 0s, 0.3s opacity ease-in 0s, 0.1s color;
-  padding-top: $topbarh;
   padding-bottom: 8px;
-  box-sizing: border-box;
   border-radius: 0 0 3px 3px;
   line-height: $topbarh;
   box-shadow: 0px -6px 26px -17px rgba(0, 0, 0, 0.75);
-
-  &.selected {
-    padding-bottom: $footerh;
-  }
 
   .offers-list-title {
     position: absolute;
@@ -1142,206 +1083,6 @@ $outline = #ddd;
       font-size: 20px;
     }
   }
-
-  button.apply-offer {
-    display: none;
-  }
-
-  &.selected button.apply-offer {
-    display: block;
-  }
-
-  ul.offers-list {
-    margin: 0;
-    padding: 0 8px;
-    list-style-type: none;
-    height: 100%;
-    overflow-y: auto;
-
-    > li.offer {
-      display: block;
-      border: 1px solid #E6E7E8;
-      border-radius: 1px;
-      padding: 0 16px;
-      background-color: #fff;
-      margin: 0;
-      cursor: pointer;
-      border-top-width: 0;
-      position: relative;
-
-      &:first-child, &.selected {
-        border-top-width: 1px;
-      }
-
-      .offer-title {
-        overflow: hidden;
-
-        .checkbox {
-          vertical-align: middle;
-        }
-      }
-
-      .offer-details {
-        line-height: 1.5rem;
-        font-size: 13px;
-        color: #666666;
-
-        &.no-desc .remove-offer {
-          margin-top: 0;
-        }
-      }
-
-      .cashback-message {
-        border-top: 1px solid #E6E7E8;
-        margin-top: 8px;
-        padding-top: 8px;
-      }
-
-      .offer-details, &.selected .offer-details.no-desc, .remove-offer {
-        display: none;
-      }
-
-      .remove-offer {
-        margin-top: 16px;
-      }
-
-      &.selected .offer-details, &.selected.applied .offer-details.no-desc, &.applied .remove-offer {
-        display: block;
-      }
-
-      .discount-details {
-        color: rgb(112, 190, 83);
-        margin-bottom: 2px;
-      }
-
-      &.selected {
-        top: -1px;
-
-        &:first-child {
-          top: 0;
-        }
-
-        .offer-details {
-          border-top: 1px solid #E6E7E8;
-          padding-top: 8px;
-          margin-bottom: 16px;
-        }
-
-        .offer-title .checkbox:after {
-          border-color: #fff;
-        }
-      }
-    }
-  }
-
-  button.apply-offer {
-    position: absolute;
-    width: 100%;
-    bottom: 0;
-    left: 0;
-    border-radius: 0 0 3px 3px;
-    font-weight: normal;
-  }
-}
-
-.offers-error {
-  bottom: 0;
-  height: $bodyh + $footerh + $topbarh;
-  overflow: hidden;
-  background-color: rgba(0, 0, 0, 0.3);
-  position: relative;
-  transform: translate(0, -100%);
-  border-radius: 0 0 3px 3px;
-  color: #717171;
-  line-height: $topbarh;
-
-  .offers-error-content {
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    padding: 0 $p;
-    position: absolute;
-    background-color: #fff;
-    box-sizing: border-box;
-
-    .error-desc {
-      margin: 16px 0;
-    }
-
-    .error-title, .error-actionables {
-      font-size: 14px;
-    }
-
-    .error-title {
-      font-size: 14px;
-      border-bottom: 1px solid #F3F3F3;
-    }
-
-    .error-actionables, .error-desc {
-      line-height: 1.5rem;
-    }
-
-    .error-actionables {
-      margin-bottom: 16px;
-
-      .pay {
-        margin-left: $p;
-      }
-    }
-  }
-}
-
-.sub {
-  .offers-error {
-    bottom: - $footerh;
-  }
-}
-
-#body.has-offers {
-  .left-align {
-    float: left;
-  }
-
-  .right-align {
-    float: right;
-  }
-
-  &.using-offers-portal {
-    #offers-container {
-      display: none;
-    }
-  }
-
-  .offers-container {
-    /* need 99 z-index due to pay button in card screen */
-    z-index: 99;
-  }
-
-  .offers-container {
-    bottom: -($topbarh) + 2px;
-    display: block;
-    background-color: #fff;
-    border-radius: 0 0 3px 3px;
-
-    &.count-5 {
-      bottom: -($topbarh) - 98px + 2px;
-    }
-  }
-
-  &[screen] {
-    .offers-container {
-      transform: translate(0, -100%);
-      margin-top: 0;
-      border-radius: 0;
-      bottom: -44px;
-    }
-  }
-
-  .tab-content {
-    &#form-wallet {
-      bottom: $topbarh;
-    }
-  }
 }
 
 #form-common.ios-paybtn-landscape-fix {
@@ -1350,8 +1091,7 @@ $outline = #ddd;
 
 #form-common {
   padding: 20px 0 0;
-  top: 0;
-  bottom: 0;
+  margin-top: 0;
 
   .legend {
     margin: 9px 24px;
@@ -1366,24 +1106,12 @@ $outline = #ddd;
   }
 }
 
-#form-wallet, #form-emiplans {
-  overflow: auto;
-}
-
-#card-offer {
-  position: absolute;
-  bottom: 20px;
-  pointer-events: none;
-  font-size: 12px;
-}
-
 #wallets {
   input[type=radio]:checked + label .offer-info {
     opacity: 1;
   }
 
   .offer {
-    position: absolute;
     top: 16px;
     right: 12px;
     line-height: 20px;
@@ -1400,7 +1128,6 @@ $outline = #ddd;
     font-size: 13px;
     transition: 0.3s opacity;
     line-height: 19px;
-    opacity: 0;
 
     &.active {
       display: block;
@@ -1502,10 +1229,6 @@ $outline = #ddd;
 }
 
 #container {
-  #body[tab=netbanking] {
-    height: 374px;
-  }
-
   #body[tab=emandate] {
     .nb-selection-container {
       display: none;
@@ -1513,21 +1236,10 @@ $outline = #ddd;
   }
 }
 
-#body[screen=card] #footer {
-  z-index: 98;
-}
-
 #body[tab=emi] {
-  height: 374px;
-
   #elem-emi {
     display: block;
   }
-
-  .saved-cards #saved-cards-container {
-    max-height: 277px;
-  }
-
   .saved-card:focus:not([emi]) .help {
     opacity: 1;
   }
@@ -1569,16 +1281,14 @@ $outline = #ddd;
 }
 
 .recurring-message, .callout {
-  position: absolute;
-  bottom: 0;
-  padding-top: 12px;
-  padding-bottom: 12px;
+  padding: 12px;
+  padding-left: 24px + 20px;
   background: #fff7e0;
   font-size: 13px;
   line-height: 20px;
   border-top: 1px solid #f3ebd3;
-  padding-left: 24px + 20px;
   color: #666;
+  pointer-events: none;
 
   span {
     position: absolute;
@@ -1589,27 +1299,6 @@ $outline = #ddd;
     background-color: rgb(243, 219, 213);
     border-color: rgb(243, 182, 160);
   }
-}
-
-.callout {
-  z-index: 9;
-  padding-right: 12px;
-  left: 0;
-  right: 0;
-  box-sizing: border-box;
-  opacity: 0;
-  transition: 0.2s opacity, 0.2s transform;
-  pointer-events: none;
-  transform: translateY(24px);
-
-  &.drishy {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-#body[tab] #form-card.drishy .recurring-message {
-  animation: none;
 }
 
 #container.one-method {
@@ -1760,8 +1449,4 @@ $outline = #ddd;
   text-transform: uppercase;
   letter-spacing: 0.25px;
   margin-bottom: 5px;
-}
-
-#payouts-svelte-wrap {
-  overflow: visible;
 }

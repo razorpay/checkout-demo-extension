@@ -186,11 +186,14 @@ export default function Track(r, event, data, immediately) {
 
     var trackingOptions = [
       'amount',
+      'checkout_config_id',
       'contact_id',
       'currency',
       'description',
       'display_amount',
       'display_currency',
+      'ecod',
+      'hidden',
       'image',
       'key',
       'method',

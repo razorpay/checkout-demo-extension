@@ -1,5 +1,15 @@
 import RazorpayConfig from 'common/RazorpayConfig';
 
+export const API_NETWORK_CODES_MAP = {
+  AMEX: 'amex',
+  DICL: 'diners',
+  JCB: 'jcb',
+  MAES: 'maestro',
+  MC: 'mastercard',
+  RUPAY: 'rupay',
+  VISA: 'visa',
+};
+
 export const networks = {
   amex: 'American Express',
   diners: 'Diners Club',
@@ -31,6 +41,27 @@ export const getCardDigits = cardNumber => cardNumber.replace(/\D/g, '');
  * @return {String}
  */
 export const getIin = cardNumber => getCardDigits(cardNumber).slice(0, 6);
+
+/**
+ * Returns either IIN or Token from a payload.
+ *
+ * @param payload
+ * @returns {string|*}
+ */
+export const getCardEntityFromPayload = payload => {
+  if (payload.tokenId) {
+    return payload.tokenId;
+  }
+  if (payload.cardNumber) {
+    return String(payload.cardNumber).slice(0, 6);
+  }
+  if (payload['card[number]']) {
+    return String(payload['card[number]']).slice(0, 6);
+  }
+  if (payload.iin) {
+    return String(payload.iin).slice(0, 6);
+  }
+};
 
 /**
  * @param {String} name {eg: MasterCard}
@@ -192,3 +223,15 @@ export function isCardNetworkInPaymentOneOf(
     )
   );
 }
+
+/**
+ * Tells whether or not the IIN is valid
+ * @param {string} cardNumber
+ *
+ * @returns {boolean}
+ */
+export const isIinValid = cardNumber => {
+  const iin = getIin(cardNumber);
+
+  return iin && iin.length >= 6;
+};

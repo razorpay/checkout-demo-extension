@@ -13,7 +13,7 @@ const {
  * Returns all available method buttons
  */
 async function getHomescreenMethods(context) {
-  await assertVisible('.methods-container');
+  await assertVisible('.methods-block[data-block="rzp.cluster"]');
   return context.page.$$eval('button.new-method', buttons => {
     return buttons.map(b => b.getAttribute('method'));
   });
@@ -25,6 +25,15 @@ async function getHomescreenMethods(context) {
 function getEmiButtonTexts(context) {
   return context.page.$$eval('#form-cardless_emi .options .option', els => {
     return els.map(el => el.textContent.trim());
+  });
+}
+
+/**
+ * Returns all available EMI buttons
+ */
+function getWalletButtonTexts(context) {
+  return context.page.$$eval('#form-wallet button .title', els => {
+    return els.map(el => el.textContent.trim().toLowerCase());
   });
 }
 
@@ -60,7 +69,7 @@ async function selectPaymentMethod(context, method) {
 }
 
 async function assertMethodsScreen(context) {
-  await assertVisible('.methods-container');
+  await assertVisible('.methods-block[data-block="rzp.cluster"]');
 }
 
 async function selectQRScanner(context) {
@@ -77,4 +86,5 @@ module.exports = {
   assertMethodsScreen,
   selectQRScanner,
   getEmiButtonTexts,
+  getWalletButtonTexts,
 };

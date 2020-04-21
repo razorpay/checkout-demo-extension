@@ -9,7 +9,10 @@
   import Callout from 'ui/elements/Callout.svelte';
   import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
-  import OffersPortal from 'ui/components/OffersPortal.svelte';
+  import Bottom from 'ui/layouts/Bottom.svelte';
+
+  // Store imports
+  import { methodTabInstrument } from 'checkoutstore/screens/home';
 
   // Utils imports
   import Razorpay from 'common/Razorpay';
@@ -36,6 +39,7 @@
   export let active = false;
 
   // Computed
+  let filteredBanks = banks; // Always use this to get the banks
   let showCorporateRadio;
   let maxGridCount;
   let corporateSelected;
@@ -58,7 +62,7 @@
   const dispatch = createEventDispatcher();
 
   export function setCorporateOption() {
-    const corporateOption = getCorporateOption(selectedBankCode, banks);
+    const corporateOption = getCorporateOption(selectedBankCode, filteredBanks);
 
     if (corporateOption) {
       selectedBankCode = corporateOption;
@@ -74,7 +78,7 @@
   }
 
   export function setRetailOption() {
-    const retailOption = getRetailOption(selectedBankCode, banks);
+    const retailOption = getRetailOption(selectedBankCode, filteredBanks);
     if (retailOption) {
       selectedBankCode = retailOption;
     }
@@ -92,17 +96,50 @@
     selectedBankCode = '';
   }
 
+  /**
+   * Filters banks against the given instrument.
+   * Only allows those banks that match the given instruments.
+   *
+   * @param {Object} banks
+   * @param {Instrument} instrument
+   *
+   * @returns {Object}
+   */
+  function filterBanksAgainstInstrument(banks, instrument) {
+    if (!instrument || instrument.method !== method) {
+      return banks;
+    }
+
+    if (!instrument.banks) {
+      return banks;
+    }
+
+    let filteredBanks = {};
+
+    _Arr.loop(instrument.banks, code => {
+      if (banks[code]) {
+        filteredBanks[code] = banks[code];
+      }
+    });
+
+    return filteredBanks;
+  }
+
+  $: filteredBanks = filterBanksAgainstInstrument(banks, $methodTabInstrument);
   $: showCorporateRadio =
-    !recurring && hasMultipleOptions(selectedBankCode, banks);
+    !recurring && hasMultipleOptions(selectedBankCode, filteredBanks);
   $: corporateSelected = isCorporateCode(selectedBankCode);
   $: maxGridCount = recurring ? 3 : 6;
-  $: banksArr = _Arr.map(_Obj.entries(banks), entry => ({
+  $: banksArr = _Arr.map(_Obj.entries(filteredBanks), entry => ({
     code: entry[0],
     name: entry[1],
     downtime: downtimes[entry[0]],
   }));
   $: invalid = method !== 'emandate' && !selectedBankCode;
-  $: netbanks = getPreferredBanks(banks, bankOptions).slice(0, maxGridCount);
+  $: netbanks = getPreferredBanks(filteredBanks, bankOptions).slice(
+    0,
+    maxGridCount
+  );
   $: selectedBankHasSevereDowntime =
     method === 'netbanking' &&
     _Arr.contains(downtimes.high.banks, selectedBankCode);
@@ -166,13 +203,13 @@
   overrideMethodCheck
   hasMessage={selectedBankHasDowntime}>
   <Screen pad={false}>
-    <div slot="main">
+    <div>
       <div id="netb-banks" class="clear grid count-3">
         {#each netbanks as { name, code }}
           <GridItem
             {name}
             {code}
-            fullName={banks[code]}
+            fullName={filteredBanks[code]}
             bind:group={selectedBankCode} />
         {/each}
       </div>
@@ -233,7 +270,7 @@
       {/if}
     </div>
 
-    <div slot="bottom">
+    <Bottom tab="netbanking">
       <!-- Show recurring message for recurring payments -->
       {#if recurring}
         <Callout>
@@ -245,18 +282,16 @@
       {#if selectedBankHasDowntime}
         <DowntimeCallout severe={selectedBankHasSevereDowntime}>
           {#if selectedBankHasSevereDowntime}
-            <strong>{banks[selectedBankCode]}</strong>
+            <strong>{filteredBanks[selectedBankCode]}</strong>
             accounts are temporarily unavailable right now. Please select
             another bank.
           {:else}
-            <strong>{banks[selectedBankCode]}</strong>
+            <strong>{filteredBanks[selectedBankCode]}</strong>
             accounts are experiencing low success rates.
           {/if}
         </DowntimeCallout>
       {/if}
-
-      <OffersPortal />
-    </div>
+    </Bottom>
 
   </Screen>
 </Tab>

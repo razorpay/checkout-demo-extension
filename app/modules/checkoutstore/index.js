@@ -1,5 +1,6 @@
 import { getDowntimes as _getDowntimes } from 'checkoutframe/downtimes';
 import { TAB_TITLES } from 'common/constants';
+import { makeAuthUrl as _makeAuthUrl } from 'common/Razorpay';
 
 let razorpayInstance, preferences;
 
@@ -12,6 +13,7 @@ export function setRazorpayInstance(_razorpayInstance) {
     razorpayInstance.set('theme.image_frame', false);
   }
 }
+export const makeAuthUrl = url => _makeAuthUrl(razorpayInstance, url);
 
 const IRCTC_KEYS = [
   'rzp_test_mZcDnA8WJMFQQD',
@@ -29,14 +31,23 @@ export const getMerchantOffers = () => preferences.offers;
 export const isOfferForced = () => preferences.force_offer;
 export const getDowntimes = () => _getDowntimes(preferences);
 export const isCustomerFeeBearer = () => preferences.fee_bearer;
+export const getCheckoutConfig = () => preferences.checkout_config;
 
 const optionGetter = option => () => getOption(option);
 export const getOption = option => razorpayInstance.get(option);
-export const getCardFlows = (iin, cb) => razorpayInstance.getCardFlows(iin, cb);
+export const getCardFeatures = iin => razorpayInstance.getCardFeatures(iin);
+export const getCardCurrencies = ({ iin, tokenId, cardNumber }) =>
+  razorpayInstance.getCardCurrencies({
+    iin,
+    tokenId,
+    cardNumber,
+    amount: getAmount(),
+    currency: getCurrency(), // Entity currency
+  });
 
 const entityWithAmount = ['order', 'invoice', 'subscription'];
 const getEntityWithAmount = () =>
-  entityWithAmount.find(entity => preferences |> _Obj.hasProp(entity));
+  entityWithAmount |> _Arr.find(entity => preferences |> _Obj.hasProp(entity));
 
 // @TODO return amount based on partial payment
 // @TODO use everywhere instead of session.get('amount')
@@ -45,11 +56,12 @@ export const getAmount = () => {
   return getOption('amount');
 };
 
-// @TODO export and use everywhere
-const getCurrency = () => {
+// @TODO use everywhere
+export const getCurrency = () => {
   return getEntityWithAmount()?.currency || getOption('currency');
 };
 
+export const getOrderId = optionGetter('order_id');
 export const getPrefilledContact = optionGetter('prefill.contact');
 export const getPrefilledEmail = optionGetter('prefill.email');
 export const getPrefilledName = optionGetter('prefill.name');
@@ -66,6 +78,10 @@ export function isPayout() {
 
 export function isAddressEnabled() {
   return hasFeature('customer_address', false);
+}
+
+export function isDCCEnabled() {
+  return hasFeature('dcc', false) && getCurrency() === 'INR';
 }
 
 export function isContactOptional() {

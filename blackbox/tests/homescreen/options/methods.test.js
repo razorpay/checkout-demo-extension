@@ -1,6 +1,5 @@
 const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
-const { makePreferences } = require('../../../actions/preferences');
 
 const {
   assertBasicDetailsScreen,
@@ -10,6 +9,7 @@ const {
   getHomescreenMethods,
   getAttribute,
   getEmiButtonTexts,
+  getWalletButtonTexts,
   selectPaymentMethod,
 } = require('../actions');
 
@@ -34,6 +34,14 @@ async function checkPaymentMethods(context, expected) {
  */
 async function checkEmiMethods(context, expected) {
   const buttons = await getEmiButtonTexts(context);
+  expect(expected).toEqual(buttons);
+}
+
+/**
+ * Verify that methods are being shown
+ */
+async function checkWalletMethods(context, expected) {
+  const buttons = await getWalletButtonTexts(context);
   expect(expected).toEqual(buttons);
 }
 
@@ -183,3 +191,39 @@ describe.each(
     });
   }
 );
+
+describe.each(
+  getTestData('Test Wallet methods', {
+    keyless: false,
+    options: {
+      amount: 1000000,
+      method: {
+        wallet: {
+          payzapp: false,
+          olamoney: false,
+        },
+      },
+    },
+    preferences: {},
+  })
+)('Check if disabling wallets works', ({ preferences, title, options }) => {
+  test(title, async () => {
+    preferences.methods.upi = true;
+    preferences.methods.wallet = {
+      payzapp: true,
+      olamoney: true,
+      phonepe: true,
+    };
+    const context = await openCheckoutWithNewHomeScreen({
+      page,
+      options,
+      preferences,
+    });
+
+    await assertBasicDetailsScreen(context);
+    await fillUserDetails(context);
+    await proceed(context);
+    await selectPaymentMethod(context, 'wallet');
+    await checkWalletMethods(context, ['phonepe']);
+  });
+});

@@ -13,11 +13,7 @@ export const partialPaymentAmount = writable('');
 
 export const blocks = writable([]);
 export const instruments = derived(blocks, allBlocks => {
-  let allInstruments = [];
-
-  _Arr.loop(allBlocks, block => {
-    allInstruments = _Arr.mergeWith(allInstruments, block.instruments);
-  });
+  const allInstruments = _Arr.flatMap(allBlocks, block => block.instruments);
 
   return allInstruments;
 });
@@ -31,6 +27,11 @@ export const selectedInstrument = derived(
       instrument => instrument.id === $selectedInstrumentId
     )
 );
+
+/**
+ * Stores the instrument for which method is opened
+ */
+export const methodTabInstrument = writable(null);
 
 /**
  * A contact is said to be present if it has more than three characters,

@@ -225,6 +225,13 @@ module.exports = {
     if (options) {
       const message = { options };
       if (apps) {
+        if (typeof apps === 'boolean') {
+          apps = [
+            { package_name: 'in.org.npci.upiapp', app_name: 'BHIM' },
+            { package_name: 'some.random.app', app_name: 'Some Random App' },
+          ];
+        }
+
         message.upi_intents_data = apps;
       }
       await passMessage(page, message);

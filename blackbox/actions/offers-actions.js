@@ -1,12 +1,12 @@
 const { delay, visible } = require('../util');
 
 async function viewOffers(context) {
-  await context.page.click('.offers-title');
+  await context.page.click('.offer-action');
 }
 
 async function selectOffer(context, offernumber) {
-  await context.page.click('.offer.item:nth-of-type(' + offernumber + ')');
-  await context.page.click('button[class = "button apply-offer"]');
+  await context.page.click('.offer-item:nth-of-type(' + offernumber + ')');
+  await context.page.click('#footer');
 }
 
 async function setPreferenceForOffer(preferences) {
@@ -18,7 +18,16 @@ async function setPreferenceForOffer(preferences) {
 }
 
 async function verifyOfferApplied(context) {
-  expect(await context.page.$eval('.selected-offer', visible)).toEqual(true);
+  expect(await context.page.$eval('.offer-action', el => el.innerText)).toEqual(
+    'Change'
+  );
+}
+
+async function validateCardForOffer(context) {
+  const req = await context.expectRequest();
+  expect(req.method).toBe('POST');
+  expect(req.url).toContain('validate/checkout/offers');
+  await context.respondJSON([1]);
 }
 
 module.exports = {
@@ -26,4 +35,5 @@ module.exports = {
   selectOffer,
   verifyOfferApplied,
   setPreferenceForOffer,
+  validateCardForOffer,
 };

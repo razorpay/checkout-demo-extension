@@ -7,8 +7,10 @@ contents = String(
 );
 
 async function verifyEMIPlansWithOffers(context, offerNumber) {
+  const lists = await context.page.$$('.emi-plans-list');
+  expect(lists.length).toBe(2);
   await context.page.$$eval(
-    '.emi-plans-list .expandable-card.expandable-card--has-badge',
+    '.emi-plans-list:nth-child(2) .expandable-card',
     (elems, offerNumber) => {
       if (elems.length != offerNumber) {
         throw `EMI Plan elements with offer (${elems.length}) not equal to expected number (${offerNumber})`;
@@ -23,13 +25,13 @@ async function verifyEMIPlansWithOffers(context, offerNumber) {
 
 async function selectEMIPlanWithOffer(context, offerNumber) {
   await context.page.click(
-    `.emi-plans-list .expandable-card.expandable-card--has-badge:nth-of-type(${offerNumber})`
+    `.emi-plans-list:nth-child(2) .expandable-card:nth-child(${offerNumber})`
   );
 }
 
 async function verifyEMIPlansWithoutOffers(context, offerNumber) {
   await context.page.$$eval(
-    '.emi-plans-list .expandable-card:not(.expandable-card--has-badge)',
+    '.emi-plans-list .expandable-card',
     (elems, offerNumber) => {
       if (elems.length != offerNumber) {
         throw `EMI Plan elements without offer (${elems.length}) not equal to expected number (${offerNumber})`;
@@ -44,7 +46,7 @@ async function verifyEMIPlansWithoutOffers(context, offerNumber) {
 
 async function selectEMIPlanWithoutOffer(context, offerNumber) {
   await context.page.click(
-    '.emi-plans-list .expandable-card:nth-of-type(' + offerNumber + ')'
+    '.emi-plans-list .expandable-card:nth-child(' + offerNumber + ')'
   );
 }
 

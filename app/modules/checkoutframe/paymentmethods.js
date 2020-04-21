@@ -51,20 +51,23 @@ const CARD_DESCRIPTION = ({ session }) => {
  */
 const DESCRIPTIONS = {
   card: CARD_DESCRIPTION,
-  cardless_emi: ({ session }) => {
+  cardless_emi: () => {
     /**
      * EMI + Cardless EMI: Cards, ZestMoney, & More
      * Cardless EMI: EMI via ZestMoney & More
      */
 
     const cardEmi = isMethodEnabled('emi');
-    const providers = getCardlessEMIProviders() |> _Obj.keys;
+    let providerNames = [];
+    _Obj.loop(getCardlessEMIProviders(), providerObj => {
+      providerNames.push(providerObj.name);
+    });
 
     if (cardEmi) {
-      providers.unshift('Cards');
+      providerNames.unshift('Cards');
     }
 
-    const text = generateTextFromList(providers, 3);
+    const text = generateTextFromList(providerNames, 3);
 
     if (cardEmi) {
       return text;
@@ -178,14 +181,34 @@ export function getMethodPrefix(method) {
  *
  * @returns {string}
  */
-export function getMethodNameForPaymentOption(method) {
+export function getMethodNameForPaymentOption(method, extra = {}) {
+  let hasInstrument = extra.instrument;
+  let qrEnabled;
+  let hasQr;
+
   switch (method) {
-    case 'upi':
-      if (isMethodEnabled('qr')) {
+    case 'upi': {
+      qrEnabled = isMethodEnabled('qr');
+      hasQr = qrEnabled;
+
+      if (qrEnabled && hasInstrument) {
+        hasQr = _Arr.contains(extra.instrument.flows || [], 'qr');
+      }
+
+      if (hasQr) {
         return 'UPI / QR';
       }
 
       return TAB_TITLES.upi;
+    }
+
+    case 'cardless_emi': {
+      if (hasInstrument) {
+        return 'Cardless EMI';
+      }
+
+      return TAB_TITLES[method];
+    }
 
     default:
       return TAB_TITLES[method];

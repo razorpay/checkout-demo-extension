@@ -19,7 +19,6 @@ var preferences = window.preferences,
   Constants = discreet.Constants,
   OfferType = Constants.OfferType,
   sanitizeTokens = discreet.sanitizeTokens,
-  getQueryParams = discreet.getQueryParams,
   Store = discreet.Store,
   MethodStore = discreet.MethodStore,
   SessionStore = discreet.SessionStore,
@@ -119,6 +118,22 @@ function confirmClose() {
   return confirm(discreet.confirmCancelMsg);
 }
 
+/**
+ * A valid contact can only contain
+ * - number
+ * - spaces
+ * - hyphens
+ * - parenthesis
+ * - plus
+ *
+ * @param {string} contact
+ *
+ * @returns {boolean}
+ */
+function doesContactHaveValidCharacters(contact) {
+  return !/[^\d\+\s\-\(\)]+/.test(contact);
+}
+
 function fillData(container, returnObj) {
   each($(container).find('input[name],select[name]'), function(i, el) {
     if (/radio|checkbox/.test(el.getAttribute('type')) && !el.checked) {
@@ -138,6 +153,18 @@ function improvisePrefilledContact(session) {
   var prefilledContact = session.get('prefill.contact');
 
   if (!prefilledContact) {
+    return;
+  }
+
+  // We have some invalid charactes
+  if (!doesContactHaveValidCharacters(prefilledContact)) {
+    Analytics.track('prefill:invalid:chars', {
+      data: {
+        type: 'contact',
+        value: prefilledContact,
+      },
+    });
+
     return;
   }
 
@@ -525,27 +552,10 @@ function errorHandler(response) {
   }
 
   if (this.tab || message !== discreet.cancelMsg) {
-    if (message && message.indexOf('OFFER_MISMATCH') === 0) {
-      // show offers UI error only when offers ui is initialized
-      if (this.offers) {
-        hideOverlayMessage();
-        this.showOffersError();
-      } else {
-        this.showLoadError(
-          'The Offer you selected is not applicable on this Payment Method',
-          true
-        );
-      }
-
-      Analytics.track('offers:mismatch', {
-        data: this.getAppliedOffer(),
-      });
-    } else {
-      this.showLoadError(
-        message || 'There was an error in handling your request',
-        true
-      );
-    }
+    this.showLoadError(
+      message || 'There was an error in handling your request',
+      true
+    );
   }
 
   NBHandlers.replaceRetryIfCorporateNetbanking(this, message);
@@ -623,7 +633,7 @@ function askOTP(view, text, shouldLimitResend, screenProps) {
   }
 
   var origText = text; // ಠ_ಠ
-  var qpmap = getQueryParams();
+  var qpmap = _.getQueryParams();
   var thisSession = SessionManager.getSession();
 
   // Track if OTP was invalid
@@ -747,7 +757,7 @@ function successHandler(response) {
   if (this.preferredInstrument) {
     P13n.recordSuccess(
       this.preferredInstrument,
-      this.customer || this.getCustomer(this.payload.contact)
+      this.getCurrentCustomer(this.payload && this.payload.contact)
     );
   }
 
@@ -854,9 +864,13 @@ Session.prototype = {
       this.formatAmountWithCurrency(amount)
     );
   },
-
-  track: function(event, extra) {
-    Track(this.r, event, extra);
+  /**
+   * Set the amount in header.
+   *
+   * @param {String} html
+   */
+  setRawAmountInHeader: function(html) {
+    $('#amount .original-amount').html(html);
   },
 
   /**
@@ -899,10 +913,6 @@ Session.prototype = {
       tab_titles.card = 'Card';
     }
 
-    if (getter('ecod')) {
-      classes.push('ecod');
-    }
-
     if (!getter('image')) {
       classes.push('noimage');
     }
@@ -926,15 +936,6 @@ Session.prototype = {
     var r = this.r;
     if (!this.el) {
       var classes = this.getClasses();
-      var ecod = r.get('ecod');
-      if (ecod) {
-        if (!r.get('prefill.email')) {
-          r.set('prefill.email', 'void@razorpay.com');
-        }
-        if (!r.get('prefill.contact')) {
-          r.set('prefill.contact', '' + preferences.customer.contact);
-        }
-      }
       var div = document.createElement('div');
       var styleEl = this.renderCss();
       div.innerHTML = templates.modal(this, {
@@ -950,13 +951,6 @@ Session.prototype = {
 
       this.body = $('#body');
 
-      if (this.invoice && ecod) {
-        commenceECOD(this);
-      }
-      if (ecod) {
-        r.set('prefill.method', 'wallet');
-        r.set('theme.hide_topbar', true);
-      }
       $(this.el).addClass(classes);
     }
     return this.el;
@@ -1012,7 +1006,9 @@ Session.prototype = {
 
       if (selectedWalletEl && selectedWalletEl[0]) {
         selectedWalletEl.prop('checked', true);
-        $('#body').addClass('sub');
+        if (tab === 'wallet') {
+          Cta.showCta();
+        }
 
         var walletsEle = $('#wallets')[0].parentElement;
 
@@ -1202,57 +1198,6 @@ Session.prototype = {
 
     errorHandler.call(this, this.params);
 
-    var hasOffers = this.hasOffers,
-      forcedOffer = this.forcedOffer;
-
-    if (forcedOffer) {
-      if (
-        'original_amount' in forcedOffer &&
-        'amount' in forcedOffer &&
-        forcedOffer.amount !== forcedOffer.original_amount
-      ) {
-        this.showDiscount();
-        Analytics.track('offers:forced_with_discount', {
-          data: forcedOffer,
-        });
-      }
-    } else if (hasOffers) {
-      var $offersContainer = $('#body #offers-container'),
-        $offersTitle;
-
-      if (this.eligibleOffers.length > 0) {
-        // TODO: convert args to kwargs
-        this.offers = initOffers(
-          $offersContainer[0],
-          this.eligibleOffers,
-          {},
-          this.handleOfferSelection.bind(this),
-          this.handleOfferRemoval.bind(this),
-          this.formatAmountWithCurrency.bind(this),
-          $('#body')[0],
-          this
-        );
-
-        this.renderOffers(this.screen);
-
-        // For portals, this tracking snippet is present in the Svelte component of Offer Portal.
-        $offersContainer.on('click', function(e) {
-          $offersTitle = $offersTitle || this.querySelector('.offers-title');
-
-          if (!$offersTitle || !$offersTitle.contains(e.target)) {
-            return;
-          }
-
-          Analytics.track(
-            'offers:list_view:screen:' + (that.screen || 'home'),
-            {
-              data: that.offers.appliedOffer,
-            }
-          );
-        });
-      }
-    }
-
     if (!this.tab && !this.get('prefill.contact')) {
       $('#contact').focus();
     }
@@ -1281,12 +1226,8 @@ Session.prototype = {
       Analytics.setMeta('orientation', Hacks.getDeviceOrientation());
     });
 
-    if (this.get('ecod')) {
-      Analytics.setMeta('ecod', true);
-
-      if (this.invoice) {
-        Analytics.setMeta('invoice', true);
-      }
+    if (discreet.UserAgent.Safari) {
+      Analytics.setMeta('safari', true);
     }
 
     Analytics.track('complete', {
@@ -1317,14 +1258,14 @@ Session.prototype = {
      */
     if (MethodStore.isMethodEnabled('upi')) {
       this.upiTab = new discreet.UpiTab({
-        target: _Doc.querySelector('#upi-svelte-wrap'),
+        target: _Doc.querySelector('#form-fields'),
       });
     }
   },
 
   setHomeTab: function() {
     this.homeTab = new discreet.HomeTab({
-      target: gel('home-screen-wrap'),
+      target: gel('form-fields'),
     });
   },
 
@@ -1350,7 +1291,7 @@ Session.prototype = {
 
     if (method) {
       this.netbankingTab = new discreet.NetbankingTab({
-        target: gel('netbanking-svelte-wrap'),
+        target: gel('form-fields'),
         props: {
           bankOptions: this.get('method.netbanking'),
           banks: banks,
@@ -1367,20 +1308,37 @@ Session.prototype = {
         );
       }
 
-      this.netbankingTab.$on(
-        'bankSelected',
-        this.removeNetbankingOfferIfNotApplicable.bind(this)
-      );
+      var session = this;
+
+      this.netbankingTab.$on('bankSelected', function(e) {
+        session.validateOffers(e.detail.bank.code, function(offerRemoved) {
+          if (!offerRemoved) {
+            // If the offer was not removed, revert to the bank in offer issuer
+            session.netbankingTab.setSelectedBank(
+              session.getAppliedOffer().issuer
+            );
+          }
+        });
+      });
     }
   },
 
   setSvelteCardTab: function() {
     if (MethodStore.isCardOrEMIEnabled()) {
       this.svelteCardTab = new discreet.CardTab({
-        target: gel('card-svelte-wrap'),
+        target: gel('form-fields'),
         props: {
           askOTP: askOTP,
         },
+      });
+    }
+  },
+
+  setWalletsTab: function() {
+    if (MethodStore.isMethodEnabled('wallet')) {
+      this.svelteWalletsTab = new discreet.WalletTab({
+        target: gel('wallet-svelte-wrap'),
+        props: {},
       });
     }
   },
@@ -1397,21 +1355,18 @@ Session.prototype = {
     this.setPayoutsScreen();
     this.setNach();
     this.setBankTransfer();
+    this.setWalletsTab();
+    this.setOffers();
+    // make bottom the last element
+    gel('form-fields').appendChild(gel('bottom'));
   },
 
   showTimer: function(cb) {
     this.hideTimer();
     var timeLeft = this.closeAt - now();
     var timeoutEl = $('#timeout').show()[0];
-    $('#body').addClass('has-timeout');
     var timerFn = updateTimer(timeoutEl, this.closeAt);
     timerFn();
-    if (this.headless && !this.get('timeout')) {
-      qs('#form-otp').insertBefore(timeoutEl, qs('#otp-sec-outer'));
-    } else if (isMobile()) {
-      var modalEl = gel('modal');
-      modalEl.insertBefore(timeoutEl, modalEl.firstChild);
-    }
     var self = this;
     this.closeTimer = setInterval(timerFn, 1000);
     this.closeTimeout = setTimeout(function() {
@@ -1422,7 +1377,6 @@ Session.prototype = {
 
   hideTimer: function() {
     $('#timeout').hide();
-    $('#body').removeClass('has-timeout');
     clearInterval(this.closeTimer);
     clearTimeout(this.closeTimeout);
   },
@@ -1492,11 +1446,6 @@ Session.prototype = {
     }
   },
 
-  /**
-   * Equivalent of clicking a provider option from the
-   * Cardless EMI homescreen.
-   * @param {String} providerCode Code for the provider
-   */
   selectCardlessEmiProvider: function(providerCode) {
     Analytics.track('cardless_emi:provider:select', {
       type: AnalyticsTypes.BEHAV,
@@ -1523,7 +1472,15 @@ Session.prototype = {
     CardlessEmiStore.providerCode = providerCode;
 
     $('#form-cardless_emi input[name=provider]').val(providerCode);
+  },
 
+  /**
+   * Equivalent of clicking a provider option from the
+   * Cardless EMI homescreen.
+   * @param {String} providerCode Code for the provider
+   */
+  selectCardlessEmiProviderAndAttemptPayment: function(provider) {
+    this.selectCardlessEmiProvider(provider);
     this.preSubmit();
   },
 
@@ -1531,39 +1488,17 @@ Session.prototype = {
     var self = this;
 
     if (MethodStore.isMethodEnabled('cardless_emi')) {
-      this.emiOptionsView = new discreet.emiOptionsView({
-        target: _Doc.querySelector('#emi-options-wrapper'),
+      this.cardlessEmiView = new discreet.CardlessEmiView({
+        target: _Doc.querySelector('#form-fields'),
       });
 
-      var providers = MethodStore.getCardlessEMIProviders();
-      providers = _Obj.keys(providers).map(function(provider) {
-        var providerObj = providers[provider];
-        return CardlessEmi.createProvider(providerObj.code, providerObj.name);
-      });
-
-      if (MethodStore.isMethodEnabled('emi')) {
-        providers.unshift(CardlessEmi.createProvider('cards', 'EMI on Cards'));
-      }
-
-      this.emiOptionsView.$set({
-        providers: providers,
-
-        on: {
-          select: function(event) {
-            var providerCode = event.detail.code;
-
-            self.selectCardlessEmiProvider(providerCode);
-          },
-        },
+      this.cardlessEmiView.$on('select', function(event) {
+        var providerCode = event.detail.code;
+        self.selectCardlessEmiProviderAndAttemptPayment(providerCode);
       });
     }
   },
 
-  /**
-   * Equivalent of clicking a provider option from the
-   * PayLater homescreen.
-   * @param {String} providerCode Code for the provider
-   */
   selectPayLaterProvider: function(providerCode) {
     Analytics.track('paylater:provider:select', {
       type: AnalyticsTypes.BEHAV,
@@ -1578,7 +1513,15 @@ Session.prototype = {
     PayLaterStore.providerCode = providerCode;
     PayLaterStore.userRegistered = false;
     PayLaterStore.otpVerified = false;
+  },
 
+  /**
+   * Equivalent of clicking a provider option from the
+   * PayLater homescreen.
+   * @param {String} providerCode Code for the provider
+   */
+  selectPayLaterProviderAndAttemptPayment: function(providerCode) {
+    this.selectPayLaterProvider(providerCode);
     this.preSubmit();
   },
 
@@ -1588,7 +1531,7 @@ Session.prototype = {
   setNach: function() {
     if (MethodStore.isMethodEnabled('nach')) {
       this.nachScreen = new discreet.NachScreen({
-        target: _Doc.querySelector('#nach-wrap'),
+        target: _Doc.querySelector('#form-fields'),
       });
     }
   },
@@ -1596,7 +1539,7 @@ Session.prototype = {
   setBankTransfer: function() {
     if (MethodStore.isMethodEnabled('bank_transfer')) {
       this.bankTransferView = new discreet.BankTransferScreen({
-        target: _Doc.querySelector('#bank-transfer-svelte-wrap'),
+        target: _Doc.querySelector('#form-fields'),
       });
     }
   },
@@ -1610,24 +1553,12 @@ Session.prototype = {
     }
 
     this.payLaterView = new PayLaterView({
-      target: _Doc.querySelector('#paylater-wrapper'),
+      target: _Doc.querySelector('#form-fields'),
     });
 
-    var providers = MethodStore.getPayLaterProviders().map(function(
-      providerObj
-    ) {
-      return PayLater.createProvider(providerObj.code, providerObj.name);
-    });
-
-    this.payLaterView.$set({
-      providers: providers,
-
-      on: {
-        select: function(event) {
-          var providerCode = event.detail.code;
-          self.selectPayLaterProvider(providerCode);
-        },
-      },
+    this.payLaterView.$on('select', function(event) {
+      var providerCode = event.detail.code;
+      self.selectPayLaterProviderAndAttemptPayment(providerCode);
     });
   },
 
@@ -1666,7 +1597,7 @@ Session.prototype = {
     Analytics.setMeta('count.accounts.bank', bankAccounts.length);
 
     this.payoutsView = new discreet.PayoutsInstruments({
-      target: gel('payouts-svelte-wrap'),
+      target: gel('form-fields'),
       props: {
         amount: this.formatAmountWithCurrency(this.get('amount')),
         upiAccounts: upiAccounts,
@@ -1675,7 +1606,7 @@ Session.prototype = {
     });
 
     this.payoutsAccountView = new discreet.PayoutAccount({
-      target: gel('payout-account-svelte-wrap'),
+      target: gel('form-fields'),
     });
 
     $('#top-right').addClass('hidden');
@@ -1855,7 +1786,7 @@ Session.prototype = {
     var data = params.data;
     var phone = params.contact;
 
-    this.customer.checkStatus(
+    this.getCurrentCustomer(phone).checkStatus(
       function(response) {
         self.updateCustomerInStore();
         if (_Obj.hasOwnProp(response, 'saved')) {
@@ -1904,6 +1835,11 @@ Session.prototype = {
       },
       contact: getPhone(),
     };
+
+    var smsHash = this.sms_hash;
+    if (this.get('send_sms_hash') && smsHash) {
+      params.data.sms_hash = smsHash;
+    }
 
     if (action === 'incorrect') {
       self.otpView.setText(discreet.wrongOtpMsg);
@@ -1974,7 +1910,7 @@ Session.prototype = {
   setOtpScreen: function() {
     if (!this.otpView) {
       this.otpView = new discreet.otpView({
-        target: gel('otp-screen-wrapper'),
+        target: gel('form-fields'),
 
         props: {
           on: {
@@ -2063,7 +1999,7 @@ Session.prototype = {
       prefilledProvider &&
       this.checkCommonValidAndTrackIfInvalid()
     ) {
-      this.selectCardlessEmiProvider(prefilledProvider);
+      this.selectCardlessEmiProviderAndAttemptPayment(prefilledProvider);
     }
   },
 
@@ -2157,6 +2093,15 @@ Session.prototype = {
   },
 
   hideErrorMessage: function(confirmedCancel) {
+    if (this.nocostModal) {
+      var modal = this.nocostModal;
+      hideOverlay($('#nocost-overlay'));
+      setTimeout(function() {
+        modal.$destroy();
+        modal = null;
+      }, 200);
+      return;
+    }
     var self = this;
     if (this.r._payment) {
       if (
@@ -2299,7 +2244,7 @@ Session.prototype = {
       this.r.resendOTP(this.r.emitter('payment.otp.required'));
     } else {
       var self = this;
-      this.customer.createOTP(function(message) {
+      this.getCurrentCustomer().createOTP(function(message) {
         debounceAskOTP(self.otpView, message, true);
         self.updateCustomerInStore();
       });
@@ -2504,47 +2449,9 @@ Session.prototype = {
             if (ua_iPhone) {
               Razorpay.sendMessage({ event: 'blur' });
             }
-            if (this.get('ecod')) {
-              $(this.el).removeClass('notopbar');
-              var tab = $(e.target).attr('tab');
-              if (tab !== 'ecod') {
-                $('#footer').css('display', 'block');
-              }
-              if (tab) {
-                this.switchTab(tab);
-              } else {
-                this.preSubmit();
-              }
-            } else {
-              var value = e.target.value;
-
-              Analytics.track('wallet:select', {
-                type: AnalyticsTypes.BEHAV,
-                data: {
-                  wallet: value,
-                  power: discreet.Wallet.isPowerWallet(value),
-                },
-              });
-
-              $('#body').toggleClass('sub', value);
-              $('#wallets').removeClass('invalid');
-            }
           },
           true
         );
-
-        this.on('click', '#wallets [name="wallet"]', function(e) {
-          if (!this.validateOffers(e.target.value)) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            this.showOffersError(function(removeOffer) {
-              return removeOffer && e.target.click();
-            });
-
-            return;
-          }
-        });
       } catch (e) {}
     }
 
@@ -2566,14 +2473,8 @@ Session.prototype = {
 
     if (MethodStore.isMethodEnabled('emi')) {
       this.on('click', '#form-card', 'saved-card-pay-without-emi', function(e) {
-        self.removeAndCleanupOffers();
-
         self.switchTab('card');
       });
-    }
-
-    if (this.get('ecod')) {
-      this.click('#ecod-resend', send_ecod_link);
     }
 
     var goto_payment = '#error-message .link';
@@ -2693,44 +2594,6 @@ Session.prototype = {
     self.refresh();
     var bits = self.bits;
     var delegator = (self.delegator = Razorpay.setFormatter(self.el));
-
-    var el_amount = gel('amount-value');
-
-    // TODO: move to field onMount
-    var el_expiry = gel('card_expiry');
-    var el_cvv = gel('card_cvv');
-    if (el_expiry && el_cvv) {
-      // check if we're in webkit
-      // checking el_expiry here in place of el_cvv, as IE also returns browser unsupported attribute rules from getComputedStyle
-      try {
-        // https://bugzilla.mozilla.org/show_bug.cgi?id=548397
-        /**
-         * -webkit-text-security is supported from IE9.
-         * input[type=tel] is supported from IE10.
-         *
-         * If <IE9, use type=password
-         * If <IE10, use type=number (-webkit-text-security will still be applied)
-         */
-
-        /**
-         * Check for <IE10. input[type=tel] will be converted to input[type=text] automatically on <IE10.
-         */
-        if (el_cvv.type === 'text') {
-          el_cvv.type = 'number';
-        }
-
-        /**
-         * Check for <IE9. Masking-input-using-CSS isn't available so we change the type to password.
-         */
-        if (
-          typeof getComputedStyle(el_expiry)['-webkit-text-security'] ===
-          'undefined'
-        ) {
-          el_cvv.type = 'password';
-        }
-      } catch (e) {}
-    }
-
     delegator.otp = delegator
       .add('number', gel('otp'))
       .on('change', function() {
@@ -2767,7 +2630,7 @@ Session.prototype = {
 
     if (screen === 'qr') {
       this.currentScreen = new discreet.QRScreen({
-        target: qs('#form-qr'),
+        target: qs('#form-fields'),
         props: {
           paymentData: this.getFormData(),
           onSuccess: bind(successHandler, this),
@@ -2792,11 +2655,6 @@ Session.prototype = {
     });
     Analytics.setMeta('screen', screen);
     Analytics.setMeta('timeSince.screen', discreet.timer());
-
-    // Back button is pressed before going to card page page
-    if (this.screen === 'otp' && screen !== 'card' && screen !== 'emi') {
-      this.preSelectedOffer = null;
-    }
 
     this.screen = screen;
     $('#body').attr('screen', screen);
@@ -2855,119 +2713,7 @@ Session.prototype = {
       this.body.toggleClass('sub', showPaybtn);
     }
 
-    return this.offers && this.renderOffers(this.tab);
-  },
-
-  /**
-   * Renders offers
-   * @param {string} tab
-   */
-  renderOffers: function(tab) {
-    /**
-     * Going to the OTP screen resets the offers
-     * Prevent that by not rendering offers there
-     * and aborting early.
-     */
-    if (this.screen === 'otp' || tab === 'otp') {
-      return this.offers.display(false);
-    }
-
-    // EMI plans should have the same offers as EMI
-    // TODO: Fix for Cardless EMI
-    if (tab === 'emiplans') {
-      tab = 'emi';
-    }
-
-    // Allow offers only on certain tabs
-    if (
-      [
-        '',
-        'card',
-        'emi',
-        'netbanking',
-        'wallet',
-        'upi',
-        'cardless_emi',
-      ].indexOf(tab) < 0
-    ) {
-      $('#body').removeClass('has-offers');
-      return this.offers.display(false);
-    }
-
-    // reset offers UI
-    if (this.offers.appliedOffer || this.offers.selectedOffer) {
-      this.offers.removeOffer();
-      // Explicitly call this because we removed the offer explicitly
-      this.handleOfferRemoval();
-    }
-
-    var paymentMethod = tab;
-
-    var filters = (tab && { payment_method: paymentMethod }) || {};
-
-    /**
-     * For every Cardless EMI screen other than
-     * the Cardless EMI homescreen,
-     * set the provider in the filters.
-     *
-     * Side-effect: We won't be able to show
-     * provider-less offers for Cardless EMI
-     * until Offers code is refactored.
-     */
-    if (tab === 'cardless_emi') {
-      if (this.screen !== 'cardless_emi') {
-        filters.provider = CardlessEmiStore.providerCode;
-      }
-    }
-
-    /**
-     * Offers have a 'homescreen' attribute that tells
-     * whether or not we want to show that offer on the homescreen.
-     *
-     * `tab` being '' means we are on the homescreen.
-     */
-    if (tab === '') {
-      filters.homescreen = tab === '';
-    }
-
-    this.offers.applyFilter(filters);
-
-    if (this.preSelectedOffer) {
-      this.offers.selectOffer(this.preSelectedOffer);
-      // Explicitly call this because we selected the offer explicitly
-      this.offers.applyOffer();
-      this.handleOfferSelection(this.preSelectedOffer, tab);
-
-      /* Don't set preSelectedOffer to null if it's on card OTP screen  */
-      if (this.screen === 'otp' && tab !== 'card' && tab !== 'emi') {
-        this.preSelectedOffer = null;
-      }
-    }
-
-    /**
-     * On some screens, there might be an offers portal available.
-     * We render the Offers strip inside that portal.
-     *
-     * If a portal is available, use that portal.
-     * Otherwise, fall back to the default container.
-     */
-    var usingPortal = false;
-    var offersPortal = _Doc.querySelector(
-      this.getActiveForm() + ' .offers-portal'
-    );
-    var offersContainer = _Doc.querySelector('#offers-container');
-    var hasOffers = this.offers.numVisibleOffers > 0;
-
-    usingPortal = Boolean(offersPortal);
-
-    if (usingPortal) {
-      offersContainer = offersPortal;
-    }
-
-    this.offers.updateContainerRef(offersContainer);
-
-    $('#body').toggleClass('has-offers', hasOffers);
-    $('#body').toggleClass('using-offers-portal', usingPortal);
+    return this.offers && this.offers.renderTab(this.tab);
   },
 
   /**
@@ -2976,27 +2722,12 @@ Session.prototype = {
    * @param {string} screen
    */
   handleOfferSelection: function(offer, screen) {
-    var offerInstance = offer;
-
-    offer = offer.data;
-
-    // Show discount if it is not a cashback offer
-    if (
-      offer.type !== OfferType.DEFERRED &&
-      offer.original_amount > offer.amount
-    ) {
-      this.showDiscount();
-    }
-
-    this.svelteCardTab.setSelectedOffer(offer);
-
     screen = screen || this.screen;
 
     // Go to the offer's method if we're on homescreen
-    if (!screen) {
-      this.preSelectedOffer = offerInstance;
+    if (screen !== offer.payment_method) {
       this.switchTab(offer.payment_method);
-      return this.handleOfferSelection(offerInstance, offer.payment_method);
+      return this.handleOfferSelection(offer, offer.payment_method);
     }
 
     var issuer = offer.issuer;
@@ -3031,60 +2762,24 @@ Session.prototype = {
       var provider = offer.provider;
 
       if (provider) {
-        this.selectCardlessEmiProvider(provider);
+        this.selectCardlessEmiProviderAndAttemptPayment(provider);
       }
-    }
-  },
-
-  /**
-   * Removes offer
-   */
-  handleOfferRemoval: function() {
-    this.hideDiscount();
-    // Reset selected offer in cards tab to show all saved cards
-    this.svelteCardTab.setSelectedOffer();
-  },
-
-  /**
-   * Removes currently selected offer if it was automatically applied (and not
-   * selected by the user)
-   */
-  removeAutomaticallyAppliedOffer: function() {
-    if (
-      this.offers &&
-      !this.offers.offerSelectedByDrawer &&
-      this.offers.appliedOffer
-    ) {
-      this.offers.removeOffer();
     }
   },
 
   /**
    * Show the discount amount.
    */
-  showDiscount: function() {
+  handleDiscount: function() {
     var offer = this.getAppliedOffer();
-
-    if (!offer) {
-      return;
-    }
-
-    $('#content').addClass('has-discount');
-
-    var discountAmount = this.formatAmountWithCurrency(offer.amount);
-
-    //TODO: optimise queries
-    $('#amount .discount')[0].innerHTML = discountAmount;
+    var hasDiscount = offer && offer.amount !== offer.original_amount;
+    $('#content').toggleClass('has-discount', hasDiscount);
+    $('#amount .discount').html(
+      hasDiscount ? this.formatAmountWithCurrency(offer.amount) : ''
+    );
     Cta.showAmountInCta();
   },
-  hideDiscount: function() {
-    $('#content').removeClass('has-discount');
-    //TODO: optimise queries
-    $('#amount .discount').html('');
-    if (this.tab !== '') {
-      Cta.showAmountInCta();
-    }
-  },
+
   back: function(confirmedCancel) {
     var tab = '';
     var payment = this.r._payment;
@@ -3107,16 +2802,7 @@ Session.prototype = {
       });
     };
 
-    if (this.get('ecod')) {
-      $('#footer').hide();
-      $('#wallets input:checked').prop('checked', false);
-      $(this.el).addClass('notopbar');
-      tab = 'wallet';
-    } else if (
-      this.screen === 'otp' &&
-      thisTab !== 'card' &&
-      thisTab !== 'emi'
-    ) {
+    if (this.screen === 'otp' && thisTab !== 'card' && thisTab !== 'emi') {
       tab = thisTab;
     } else if (
       (thisTab === 'qr' && this.r._payment) ||
@@ -3160,6 +2846,10 @@ Session.prototype = {
       MethodStore.isMethodEnabled('cardless_emi')
     ) {
       tab = 'cardless_emi';
+    } else if (this.tab === 'card') {
+      if (this.svelteCardTab.onBack()) {
+        return;
+      }
     } else if (this.tab === 'netbanking') {
       if (this.netbankingTab.onBack()) {
         return;
@@ -3196,7 +2886,6 @@ Session.prototype = {
       this.setScreen(BackStore.screen);
     }
 
-    this.preSelectedOffer = null;
     this.switchTab(tab);
 
     BackStore = null;
@@ -3214,18 +2903,18 @@ Session.prototype = {
           type: AnalyticsTypes.RENDER,
           data: {
             count: {
-              eligible: _.lengthOf(this.upi_intents_data),
-              all: _.lengthOf(this.all_upi_intents_data),
+              eligible: _.lengthOf(this.upi_intents_data || []),
+              all: _.lengthOf(this.all_upi_intents_data || []),
             },
             list: {
               eligible: _Arr.join(
-                _Arr.map(this.upi_intents_data, function(app) {
+                _Arr.map(this.upi_intents_data || [], function(app) {
                   return app.package_name;
                 }),
                 ','
               ),
               all: _Arr.join(
-                _Arr.map(this.all_upi_intents_data, function(app) {
+                _Arr.map(this.all_upi_intents_data || [], function(app) {
                   return app.package_name;
                 }),
                 ','
@@ -3268,14 +2957,17 @@ Session.prototype = {
       var fields = _Doc.querySelectorAll('#form-common .invalid [name]');
 
       var invalidFields = {};
+      var invalidValues = {};
 
       _Arr.loop(fields, function(field) {
         invalidFields[field.name] = true;
+        invalidValues[field.name] = field.value;
       });
 
       Analytics.track('homescreen:fields:invalid', {
         data: {
           fields: invalidFields,
+          values: invalidValues,
         },
       });
     }
@@ -3347,18 +3039,25 @@ Session.prototype = {
         return;
       }
       var customer = this.getCustomer(contact);
-      this.customer = customer;
       this.updateCustomerInStore();
 
-      if (this.customer.logged && !this.local) {
+      if (this.getCurrentCustomer().logged && !this.local) {
         $('#top-right').addClass('logged');
       }
       $('#user').html(contact);
+
+      var offer = this.getAppliedOffer();
+      if (
+        this.offers &&
+        offer &&
+        discreet.Offers.getOfferMethodForTab(tab) !== offer.payment_method
+      ) {
+        this.offers.clearOffer();
+      }
     } else {
       this.payload = null;
       this.clearRequest();
     }
-
     if (tab === 'netbanking') {
       this.netbankingTab.onShown();
     }
@@ -3381,8 +3080,9 @@ Session.prototype = {
     this.body.attr('tab', tab);
     this.tab = tab;
 
-    if (tab === 'ecod') {
-      send_ecod_link.call(this);
+    if (tab === 'wallet') {
+      this.setScreen('wallet');
+      this.svelteWalletsTab.onShown();
     }
 
     if (tab === 'card' || (tab === 'emi' && this.screen !== 'emi')) {
@@ -3430,7 +3130,7 @@ Session.prototype = {
     this.svelteCardTab.onShown();
 
     var self = this;
-    var customer = self.customer;
+    var customer = self.getCurrentCustomer();
     var remember = Store.shouldRememberCustomer();
 
     if (!remember) {
@@ -3444,6 +3144,11 @@ Session.prototype = {
 
     if (!customer.logged && !this.wants_skip) {
       self.commenceOTP('saved cards', true, 'saved_cards_access');
+      var smsHash = this.get('send_sms_hash') && this.sms_hash;
+      var params = {};
+      if (smsHash) {
+        params.sms_hash = smsHash;
+      }
       customer.checkStatus(function() {
         /**
          * 1. If this is a recurring payment and customer doesn't have saved cards,
@@ -3452,7 +3157,7 @@ Session.prototype = {
          * 3. If customer doesn't have saved cards, show cards screen.
          */
         if (Store.isRecurring() && !customer.saved && !customer.logged) {
-          self.customer.createOTP(function() {
+          self.getCurrentCustomer().createOTP(function() {
             Analytics.track('saved_cards:access:otp:ask');
             askOTP(
               self.otpView,
@@ -3468,7 +3173,7 @@ Session.prototype = {
         } else {
           self.setScreen('card');
         }
-      });
+      }, params);
     } else {
       self.setScreen('card');
     }
@@ -3480,8 +3185,8 @@ Session.prototype = {
    *
    * @returns {Array}
    */
-  getEmiPlans: function(bank) {
-    var plans = MethodStore.getEMIBankPlans(bank);
+  getEmiPlans: function(bank, cardType) {
+    var plans = MethodStore.getEMIBankPlans(bank, cardType);
     var appliedOffer = this.offers && this.offers.offerSelectedByDrawer;
 
     var emiPlans = [];
@@ -3512,17 +3217,13 @@ Session.prototype = {
    * @param {Object} plan
    */
   processOffersOnEmiPlanSelection: function(plan) {
-    if (plan && plan.offer_id) {
-      if (this.offers) {
-        this.preSelectedOffer = this.offers.selectOfferById(plan.offer_id);
-      }
-    } else {
+    if (!plan || !plan.offer_id) {
       if (
         this.offers &&
         this.offers.appliedOffer &&
         this.offers.appliedOffer.emi_subvention
       ) {
-        this.offers.removeOffer();
+        this.offers.clearOffer();
       }
     }
   },
@@ -3562,15 +3263,7 @@ Session.prototype = {
 
         var bank = self.emiPlansForNewCard && self.emiPlansForNewCard.code;
         var plans = MethodStore.getEMIBankPlans(bank);
-
-        if (self.isOfferApplicableOnIssuer(bank)) {
-          amount = self.getDiscountedAmount();
-        } else {
-          self.removeAndCleanupOffers();
-        }
-
         var emiPlans = self.getEmiPlans(bank);
-
         var prevTab = self.tab;
         var prevScreen = self.screen;
 
@@ -3605,6 +3298,7 @@ Session.prototype = {
               var plan = _Arr.find(plans, function(p) {
                 return p.duration === value;
               });
+
               var text = getEmiText(self, amount, plan) || '';
 
               trackEmi('emi:plan:select', {
@@ -3632,12 +3326,6 @@ Session.prototype = {
           },
         });
 
-        if (self.offers) {
-          if (!self.offers.selectedOffer && !self.offers.appliedOffer) {
-            self.preSelectedOffer = null;
-          }
-        }
-
         self.switchTab('emiplans');
         $('#body').removeClass('sub');
       };
@@ -3648,17 +3336,11 @@ Session.prototype = {
         var trigger = e.currentTarget;
         var $trigger = $(trigger);
         var bank = $trigger.attr('data-bank');
-        var plans = MethodStore.getEMIBankPlans(bank);
-        var emiPlans = self.getEmiPlans(bank);
+        var cardType = $trigger.attr('data-card-type');
+        var plans = MethodStore.getEMIBankPlans(bank, cardType);
+        var emiPlans = self.getEmiPlans(bank, cardType);
         var $savedCard = $('.saved-card.checked');
         var savedCvv = $savedCard.$('.saved-cvv input').val();
-
-        if (self.isOfferApplicableOnIssuer(bank)) {
-          amount = self.getDiscountedAmount();
-        } else {
-          self.removeAndCleanupOffers();
-        }
-
         var prevTab = self.tab;
         var prevScreen = self.screen;
 
@@ -3727,12 +3409,6 @@ Session.prototype = {
           },
         });
 
-        if (self.offers) {
-          if (!self.offers.selectedOffer && !self.offers.appliedOffer) {
-            self.preSelectedOffer = null;
-          }
-        }
-
         self.switchTab('emiplans');
         $('#body').removeClass('sub');
       };
@@ -3743,13 +3419,6 @@ Session.prototype = {
         var bank = 'BAJAJ';
         var plans = MethodStore.getEMIBankPlans(bank);
         var emiPlans = self.getEmiPlans(bank);
-
-        if (self.isOfferApplicableOnIssuer(bank)) {
-          amount = self.getDiscountedAmount();
-        } else {
-          self.removeAndCleanupOffers();
-        }
-
         var prevTab = self.tab;
         var prevScreen = self.screen;
 
@@ -3761,7 +3430,6 @@ Session.prototype = {
             back: function() {
               self.switchTab(prevTab);
               self.setScreen(prevScreen);
-
               return true;
             },
 
@@ -3796,36 +3464,16 @@ Session.prototype = {
   },
 
   /**
-   * Removes offers and cleans up all the corresponding variables
-   */
-  removeAndCleanupOffers: function() {
-    if (this.offers) {
-      this.preSelectedOffer = null;
-      this.offers.removeOffer();
-      this.hideDiscount();
-    }
-  },
-
-  /**
    * Validates that the issuer of the offer is same as the selected value
    * @param {string} selectedVal
-   * @param {Element} selectedEl
    *
    * @returns {boolean}
    */
-  validateOffers: function(selectedVal, selectedEl) {
-    if (!this.offers || !this.offers.appliedOffer) {
-      return true;
+  validateOffers: function(selectedIssuer, callback) {
+    var offer = this.getAppliedOffer();
+    if (offer && offer.issuer && selectedIssuer !== offer.issuer) {
+      return this.showOffersError(callback);
     }
-
-    // Get the issuer for the offer
-    var appliedOfferIssuer = this.offers.appliedOffer.issuer;
-
-    // Validate only if an issuer is provided
-    if (appliedOfferIssuer) {
-      return appliedOfferIssuer === selectedVal;
-    }
-
     return true;
   },
 
@@ -3841,27 +3489,6 @@ Session.prototype = {
     }
 
     return this.emandateView.showBankDetailsForm(bank.code);
-  },
-
-  removeNetbankingOfferIfNotApplicable: function(event) {
-    var code = event.detail.bank.code;
-    var offerIssuer = _Obj.getSafely(this, 'offers.appliedOffer.issuer');
-    var self = this;
-
-    // If the issuer is missing, the offer should be applied regardless of the
-    // bank selected. Do not validate in that case.
-    if (!offerIssuer) {
-      return;
-    }
-
-    if (offerIssuer !== code) {
-      this.showOffersError(function(offerRemoved) {
-        if (!offerRemoved) {
-          // If the offer was not removed, revert to the bank in offer issuer
-          self.netbankingTab.setSelectedBank(offerIssuer);
-        }
-      });
-    }
   },
 
   checkInvalid: function(parent) {
@@ -3953,7 +3580,9 @@ Session.prototype = {
       data.method = tab;
       var activeForm = this.getActiveForm();
 
-      if (activeForm !== '#form-upi' && activeForm !== '#form-card') {
+      if (
+        !_Arr.contains(['#form-upi', '#form-card', '#form-wallet'], activeForm)
+      ) {
         fillData(activeForm, data);
       }
 
@@ -3985,6 +3614,13 @@ Session.prototype = {
         each(upiData, function(key, value) {
           data[key] = value;
         });
+      }
+
+      if (this.screen === 'wallet') {
+        /* Wallet tab being responsible for its subdata */
+        if (this.svelteWalletsTab.isAnyWalletSelected()) {
+          _Obj.extend(data, this.svelteWalletsTab.getPayload());
+        }
       }
     }
 
@@ -4020,10 +3656,7 @@ Session.prototype = {
     var actionState;
     var loadingState = true;
     if (error) {
-      if (
-        (this.screen === 'upi' || this.get('ecod')) &&
-        text === discreet.cancelMsg
-      ) {
+      if (this.screen === 'upi' && text === discreet.cancelMsg) {
         if (this.payload && this.payload['_[flow]'] === 'intent') {
           return;
         }
@@ -4190,7 +3823,7 @@ Session.prototype = {
           this.submit();
         }
         callback = function(msg) {
-          if (this.customer.logged) {
+          if (this.getCurrentCustomer().logged) {
             // OTP verification successful
             OtpService.resetCount('razorpay');
 
@@ -4221,7 +3854,7 @@ Session.prototype = {
         }
 
         callback = function(msg) {
-          if (self.customer.logged) {
+          if (self.getCurrentCustomer().logged) {
             // OTP verification successful
             OtpService.resetCount('razorpay');
 
@@ -4302,7 +3935,15 @@ Session.prototype = {
       };
       this.commenceOTP('Verifying OTP...');
     }
-    this.customer.submitOTP(submitPayload, bind(callback, this), queryParams);
+    this.getCurrentCustomer().submitOTP(
+      submitPayload,
+      bind(callback, this),
+      queryParams
+    );
+  },
+
+  getCurrentCustomer: function(phone) {
+    return this.getCustomer(phone || getPhone());
   },
 
   clearRequest: function(extra) {
@@ -4366,18 +4007,32 @@ Session.prototype = {
     var screen = this.screen;
     var tab = this.tab;
 
+    var isOffersVisible = this.offers && this.offers.isListShown();
+    if (isOffersVisible) {
+      this.offers.onSubmit();
+      if (screen) {
+        return;
+      }
+    }
+
     /**
      * The CTA for home screen is visible only on the new design. If it was
      * clicked, switch to the new payment methods screen.
      */
     if (!screen) {
-      if (this.checkCommonValid()) {
+      if (this.checkCommonValidAndTrackIfInvalid()) {
         // switch to methods tab
         if (this.homeTab.onDetailsScreen()) {
           if (this.homeTab.shouldGoNext()) {
             return this.homeTab.next();
           }
         }
+      } else {
+        this.offers && this.offers.clearOffer();
+        return;
+      }
+      if (isOffersVisible) {
+        return;
       }
     }
 
@@ -4418,7 +4073,7 @@ Session.prototype = {
     var selectedInstrument = this.getSelectedPaymentInstrument();
 
     if (merchantOrder && merchantOrder.bank && !Store.isRecurring()) {
-      if (!this.checkCommonValid()) {
+      if (!this.checkCommonValidAndTrackIfInvalid()) {
         return;
       }
       data.method = merchantOrder.method || data.method || 'netbanking';
@@ -4548,7 +4203,7 @@ Session.prototype = {
     } else if (this.oneMethod === 'netbanking') {
       data.bank = this.get('prefill.bank');
     } else if (selectedInstrument) {
-      if (!this.checkCommonValid()) {
+      if (!this.checkCommonValidAndTrackIfInvalid()) {
         return;
       }
 
@@ -4702,16 +4357,44 @@ Session.prototype = {
         Analytics.setMeta('doneByInstrument', true);
 
         if (_Obj.getSafely(selectedInstrument, 'meta.preferred')) {
-          Analytics.setMeta('doneByP13n');
+          Analytics.setMeta('doneByP13n', true);
         }
 
-        if (['card', 'emi', 'wallet'].indexOf(selectedInstrument.method) > -1) {
-          this.switchTab(selectedInstrument.method);
-        } else if (
-          selectedInstrument.method === 'upi' &&
-          selectedInstrument.flow === 'qr'
-        ) {
-          return this.switchTab('qr');
+        switch (selectedInstrument.method) {
+          case 'card':
+          case 'emi': {
+            this.switchTab(selectedInstrument.method);
+            break;
+          }
+
+          case 'upi': {
+            /**
+             * UPI QR is a built on Checkout like a method in itself with method=upi and flow=qr.
+             * And the payment happens from within the tab.
+             * So, let's switch to it instead of continuing from here.
+             */
+            if (selectedInstrument._ungrouped[0].flow === 'qr') {
+              this.switchTab('qr');
+              return;
+            }
+            break;
+          }
+
+          case 'cardless_emi': {
+            session.selectCardlessEmiProvider(
+              selectedInstrument._ungrouped[0].provider
+            );
+
+            break;
+          }
+
+          case 'paylater': {
+            session.selectPayLaterProvider(
+              selectedInstrument._ungrouped[0].provider
+            );
+
+            break;
+          }
         }
       }
     }
@@ -4720,25 +4403,6 @@ Session.prototype = {
       data.method = 'wallet';
       data.wallet = 'paypal';
     }
-
-    // ask user to verify phone number if not logged in and wants to save card
-    if (data.save && !this.customer.logged) {
-      if (this.screen === 'card') {
-        this.otpView.updateScreen({
-          skipText: 'Skip saving card',
-        });
-        Analytics.track('saved_cards:save:otp:ask');
-        this.commenceOTP(strings.otpsend, false, 'saved_cards_save');
-        debounceAskOTP(this.otpView, undefined, true);
-        this.customer.createOTP(function() {
-          session.updateCustomerInStore();
-        });
-      } else if (!this.headless) {
-        request.message = 'Verifying OTP...';
-        request.paused = true;
-      }
-    }
-    delete data.app_token;
 
     if (this.get('address') && !Store.isPartialPayment()) {
       var notes = (data.notes = clone(this.get('notes')) || {});
@@ -4756,21 +4420,6 @@ Session.prototype = {
       }
     }
 
-    /**
-     * Wallets might need to go through intent flow too
-     * TODO: Add a feature check here
-     */
-    if (data.method === 'wallet') {
-      var shouldTurnWalletToIntent = discreet.Wallet.shouldTurnWalletToIntent(
-        data.wallet,
-        this.upi_intents_data
-      );
-
-      if (shouldTurnWalletToIntent) {
-        data.upi_app = discreet.Wallet.getPackageNameForWallet(data.wallet);
-      }
-    }
-
     // If there's a package name, the flow is intent.
     if (data.upi_app) {
       data['_[flow]'] = 'intent';
@@ -4784,23 +4433,18 @@ Session.prototype = {
 
     var appliedOffer = this.getAppliedOffer();
 
-    if (appliedOffer) {
-      // Set offer ID based on offer type
-      switch (appliedOffer._type) {
-        case 'api':
-          data.offer_id = appliedOffer.id;
-          break;
-
-        case 'local':
-          data['notes[offer_id]'] = appliedOffer.id;
-          break;
-      }
+    if (appliedOffer && (!this.offers || this.offers.shouldSendOfferToApi())) {
+      data.offer_id = appliedOffer.id;
       this.r.display_amount = appliedOffer.amount;
       Analytics.track('offers:applied_with_payment', {
         data: appliedOffer,
       });
     } else {
       delete this.r.display_amount;
+      var selectedPlan = this.emiPlansView.selectedPlan;
+      if (data.emi_duration && selectedPlan && selectedPlan.offer_id) {
+        data.offer_id = selectedPlan.offer_id;
+      }
     }
 
     if (data.method === 'cardless_emi') {
@@ -4898,6 +4542,29 @@ Session.prototype = {
       return;
     }
 
+    /**
+     * - Ask user to verify phone number if not logged in and wants to save card
+     * - Show OTP screen after user agrees to fees
+     */
+    if (data.save && !this.getCurrentCustomer().logged) {
+      if (this.screen === 'card') {
+        this.otpView.updateScreen({
+          skipText: 'Skip saving card',
+        });
+        Analytics.track('saved_cards:save:otp:ask');
+        this.commenceOTP(strings.otpsend, false, 'saved_cards_save');
+        debounceAskOTP(this.otpView, undefined, true);
+        this.getCurrentCustomer().createOTP(function() {
+          session.updateCustomerInStore();
+        });
+        return;
+      } else if (!this.headless) {
+        request.message = 'Verifying OTP...';
+        request.paused = true;
+      }
+    }
+    delete data.app_token;
+
     Razorpay.sendMessage({
       event: 'submit',
       data: data,
@@ -4929,6 +4596,13 @@ Session.prototype = {
 
     if (this.modal) {
       this.modal.options.backdropclose = false;
+    }
+
+    if (data.method === 'card' && Store.isDCCEnabled()) {
+      data.currency_request_id = discreet.storeGetter(
+        CardScreenStore.currencyRequestId
+      );
+      data.dcc_currency = discreet.storeGetter(CardScreenStore.dccCurrency);
     }
 
     if (data.method === 'card' || data.method === 'emi') {
@@ -5128,7 +4802,9 @@ Session.prototype = {
     if (this.powerwallet) {
       this.showLoadError(strings.otpsend + getPhone());
       this.r.on('payment.otp.required', function(message) {
-        debounceAskOTP(that.otpView, message);
+        debounceAskOTP(that.otpView, message, false, {
+          allowSkip: false,
+        });
       });
       this.r.on(
         'payment.wallet.topup',
@@ -5140,16 +4816,6 @@ Session.prototype = {
           });
 
           var insufficient_text = 'Insufficient balance in your wallet';
-          if (this.get('ecod')) {
-            this.back();
-            this.clearRequest();
-            defer(
-              bind(function() {
-                this.showLoadError(insufficient_text, true);
-              }, this),
-              400
-            );
-          }
           if (
             this.payload &&
             this.payload.wallet === 'payumoney' &&
@@ -5287,11 +4953,10 @@ Session.prototype = {
   cleanUpSvelteComponents: function() {
     var views = [
       'bankTransferView',
-      'svelteCardTab',
+      'cardlessEmiView',
       'currentScreen',
       'emandateView',
       'emi',
-      'emiOptionsView',
       'emiPlansView',
       'emiScreenView',
       'feeBearerView',
@@ -5303,6 +4968,8 @@ Session.prototype = {
       'payoutsAccountView',
       'payoutsView',
       'savedCardsView',
+      'svelteCardTab',
+      'svelteWalletsTab',
       'upiTab',
     ];
 
@@ -5334,6 +5001,10 @@ Session.prototype = {
     }
 
     if (this.isOpen) {
+      Analytics.track('modal:close', {
+        immediately: true,
+      });
+
       var cancelReason = this.getCancelReason();
 
       this.hideTimer();
@@ -5382,39 +5053,64 @@ Session.prototype = {
     }
   },
 
-  /**
-   * Sets offers for this session
-   * @param {Object} preferences
-   */
-  setOffers: function(preferences) {
-    var allOffers = discreet.Offers.createOffers({
-      preferences: preferences,
-      session: this,
+  showNoCostExplainer: function(plan) {
+    this.nocostModal = new discreet.NoCostExplainer({
+      target: gel('nocost-overlay'),
+      props: {
+        plan: plan,
+        formatter: this.formatAmountWithCurrency.bind(this),
+      },
     });
+    showOverlay($('#nocost-overlay'));
+  },
 
-    this.eligibleOffers = allOffers.offers;
+  setOffers: function() {
+    var forcedOffer = discreet.Offers.getForcedOffer();
+    var allOffers = discreet.Offers.getOffersForTab();
 
-    this.hasOffers = allOffers.offers.length > 0;
-    this.forcedOffer = allOffers.forcedOffer;
-
-    if (this.hasOffers) {
+    // we show offers from backend + zestmoney offer which is
+    // universally enabled
+    if (forcedOffer || allOffers.length > 0) {
       Analytics.setMeta('hasOffers', true);
+    } else if (!MethodStore.isZestMoneyEnabled()) {
+      // if zestmoney isn't enabled, and backend also hasn't sent
+      // any offers, don't proceed to initialize offers.
+      return;
     }
 
-    if (this.forcedOffer) {
-      Analytics.setMeta('forcedOffer', true);
-    }
-
-    if (this.forcedOffer) {
-      var paymentMethod = this.forcedOffer.payment_method;
-
-      if (['emi', 'card', 'wallet'].indexOf(paymentMethod) >= 0) {
-        // need this while preparing the template
-        this[paymentMethod + 'Offer'] = preferences.offers[0];
+    if (forcedOffer) {
+      if (forcedOffer.payment_method === 'wallet') {
+        this.walletOffer = forcedOffer;
       }
-
-      Analytics.track('offers:forced', {
-        data: this.forcedOffer,
+      Analytics.setMeta('forcedOffer', true);
+    } else {
+      var appliedOffer;
+      this.getAppliedOffer = function() {
+        return appliedOffer;
+      };
+      var session = this;
+      this.offers = new discreet.OffersView({
+        target: gel('bottom'),
+        props: {
+          applicableOffers: allOffers,
+          setAppliedOffer: function(offer, shouldNavigate) {
+            if (appliedOffer !== offer) {
+              appliedOffer = offer;
+              if (offer && shouldNavigate) {
+                session.handleOfferSelection(offer);
+              }
+              session.handleDiscount();
+            }
+          },
+          onShown: function() {
+            Analytics.track(
+              'offers:list_view:screen:' + (session.screen || 'home'),
+              {
+                data: session.getAppliedOffer(),
+              }
+            );
+          },
+        },
       });
     }
   },
@@ -5425,7 +5121,7 @@ Session.prototype = {
    * @returns {Offer}
    */
   getAppliedOffer: function() {
-    return this.forcedOffer || (this.offers && this.offers.appliedOffer);
+    return discreet.Offers.getForcedOffer();
   },
 
   /**
@@ -5475,11 +5171,13 @@ Session.prototype = {
       screen = this.screen;
 
     if (screen === 'netbanking') {
-      methodDescription = 'Bank';
+      methodDescription = 'selected bank';
     } else if (screen === 'upi') {
-      methodDescription = 'VPA';
+      methodDescription = 'entered VPA';
+    } else if (screen === 'emi' || screen === 'emiplans') {
+      methodDescription = 'selected plan';
     } else {
-      methodDescription = titleCase(this.screen);
+      methodDescription = 'selected ' + this.screen;
     }
 
     this.offers.showError(methodDescription, cb);
@@ -5521,7 +5219,9 @@ Session.prototype = {
     // emandate
     if (order) {
       if (order.bank_account) {
-        _Arr.loop(['ifsc', 'name', 'account_number'], function(key) {
+        _Arr.loop(['ifsc', 'name', 'account_number', 'account_type'], function(
+          key
+        ) {
           if (order.bank_account[key]) {
             options['prefill.bank_account[' + key + ']'] =
               order.bank_account[key];
@@ -5575,6 +5275,8 @@ Session.prototype = {
       // We are disabling retries for payouts for now.
       this.set('retry', false);
     }
+
+    Analytics.setMeta('features', preferences.features);
 
     /* Used previously logged in customer details and saved card tokens */
     if (saved_customer) {
@@ -5671,9 +5373,6 @@ Session.prototype = {
       };
     }
 
-    // Set Offers
-    this.setOffers(preferences);
-
     // Set optional fields in meta
     Analytics.setMeta(
       'optional.contact',
@@ -5688,19 +5387,6 @@ Session.prototype = {
   },
 
   showModal: function(preferences) {
-    var qpmap = _Obj.unflatten(getQueryParams());
-
-    var methods = MethodStore.getEnabledMethods();
-    if (!methods.length) {
-      var message = 'No appropriate payment method found.';
-      if (MethodStore.isEMandateEnabled() && !this.get('customer_id')) {
-        message += '\nMake sure to pass customer_id for e-mandate payments';
-      }
-      return Razorpay.sendMessage({ event: 'fault', data: message });
-    }
-
-    this.render();
-
     Razorpay.sendMessage({ event: 'render' });
 
     if (CheckoutBridge) {
@@ -5717,6 +5403,7 @@ Session.prototype = {
       $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
     }
 
+    var qpmap = _Obj.unflatten(_.getQueryParams());
     if (qpmap.error) {
       errorHandler.call(this, qpmap);
     }
@@ -5792,37 +5479,6 @@ Session.prototype = {
 
   hideOverlayMessage: hideOverlayMessage,
 };
-
-function commenceECOD(session) {
-  var url = makeAuthUrl(
-    session.r,
-    'invoices/' + session.get('invoice_id') + '/status'
-  );
-  setTimeout(function() {
-    session.ajax = fetch({
-      url: url,
-      callback: function(response) {
-        if (response.error) {
-          errorHandler.call(session, response);
-        } else if (response.razorpay_payment_id) {
-          successHandler.call(session, response);
-        }
-      },
-    }).till(function(response) {
-      return response && response.status;
-    });
-  }, 6000);
-}
-
-function send_ecod_link() {
-  // this == session
-  this.showLoadError('Sending link to ' + getPhone());
-  var r = this.r;
-  fetch.post({
-    url: makeAuthUrl(r, 'invoices/' + r.get('invoice_id') + '/notify/sms'),
-    callback: debounce(hideOverlayMessage, 4000),
-  });
-}
 
 function updateTimer(timeoutEl, closeAt) {
   return function() {

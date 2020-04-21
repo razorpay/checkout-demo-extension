@@ -196,7 +196,7 @@ gulp.task('watch', cb => {
             'ms'
         );
       case 'ERROR':
-        return console.error(event);
+        return console.log(event);
     }
   });
 });

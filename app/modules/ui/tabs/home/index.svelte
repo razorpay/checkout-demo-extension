@@ -2,15 +2,17 @@
   // UI imports
   import Tab from 'ui/tabs/Tab.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
+  import Bottom from 'ui/layouts/Bottom.svelte';
   import Field from 'ui/components/Field.svelte';
-  import RadioOption from 'ui/elements/options/RadioOption.svelte';
+
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import NewMethodsList from 'ui/tabs/home/NewMethodsList.svelte';
   import Icon from 'ui/elements/Icon.svelte';
-  import OffersPortal from 'ui/components/OffersPortal.svelte';
   import Address from 'ui/elements/address.svelte';
   import PaymentDetails from 'ui/tabs/home/PaymentDetails.svelte';
   import Callout from 'ui/elements/Callout.svelte';
+  import CardOffer from 'ui/elements/CardOffer.svelte';
+  import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
 
   // Svelte imports
   import { onMount } from 'svelte';
@@ -22,6 +24,7 @@
     isContactPresent,
     email,
     selectedInstrumentId,
+    methodTabInstrument,
     multiTpvOption,
     partialPaymentAmount,
     partialPaymentOption,
@@ -30,6 +33,7 @@
   } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
+  import { isDCCEnabled } from 'checkoutstore';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -47,6 +51,7 @@
     isAddressEnabled,
     isRecurring,
     getMerchantOrder,
+    getCheckoutConfig,
   } from 'checkoutstore';
   import {
     isCreditCardEnabled,
@@ -65,6 +70,7 @@
   } from 'checkoutstore/cta';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
+  import { getCardOffer, hasOffersOnHomescreen } from 'checkoutframe/offers';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
   import {
     INDIA_COUNTRY_CODE,
@@ -72,6 +78,7 @@
   } from 'common/constants';
   import { setBlocks } from 'ui/tabs/home/instruments';
 
+  const cardOffer = getCardOffer();
   const session = getSession();
   const icons = session.themeMeta.icons;
   const order = getMerchantOrder();
@@ -85,15 +92,12 @@
   const isTpv = multiTpv || onlyUpiTpv || onlyNetbankingTpv;
 
   // Offers
-  const hasOffersOnHomescreen =
-    session.hasOffers &&
-    _Arr.any(session.eligibleOffers, offer => offer.homescreen);
+  const showOffers = hasOffersOnHomescreen();
 
   // Recurring callout
   const showRecurringCallout =
     isRecurring() && session.tab !== 'emandate' && singleMethod === 'card';
 
-  const cardOffer = session.cardOffer;
   const isPartialPayment = getIsPartialPayment();
   const contactEmailReadonly = isContactEmailReadOnly();
 
@@ -106,12 +110,58 @@
   let showSecuredByMessage;
   $: showSecuredByMessage =
     view === 'details' &&
-    !hasOffersOnHomescreen &&
+    !showOffers &&
     !showRecurringCallout &&
     !session.multiTpv &&
     !session.tpvBank &&
     !isPartialPayment &&
     !session.get('address');
+
+  function getConfigFromOptions() {
+    if (_.isNull(session.get('config'))) {
+      return null;
+    }
+
+    let config = {};
+    const display = session.get('config.display');
+
+    if (display) {
+      config.display = display;
+    }
+
+    return config;
+  }
+
+  function getRawMerchantConfig() {
+    const configFromOptions = getConfigFromOptions();
+    const configFromPreferences = getCheckoutConfig();
+
+    let config = null;
+    let source;
+
+    if (_.isNull(configFromOptions)) {
+      // Setting config as null allows you to disable the configuration
+      source = 'options';
+      config = null;
+    } else if (_.isNull(configFromPreferences)) {
+      source = 'preferences';
+      config = null;
+    } else if (
+      _.isNonNullObject(configFromPreferences) &&
+      !_.isEmptyObject(configFromPreferences)
+    ) {
+      source = 'preferences';
+      config = configFromPreferences;
+    } else {
+      source = 'options';
+      config = configFromOptions;
+    }
+
+    return {
+      config,
+      source,
+    };
+  }
 
   export function showMethods() {
     view = 'methods';
@@ -247,9 +297,16 @@
       ? getAllAvailableP13nInstruments($customer)
       : [];
 
-    const blocksThatWereSet = setBlocks({
-      preferred: eligiblePreferredInstruments,
-    });
+    const merchantConfig = getRawMerchantConfig();
+
+    const blocksThatWereSet = setBlocks(
+      {
+        preferred: eligiblePreferredInstruments,
+        merchantConfig: merchantConfig.config,
+        configSource: merchantConfig.source,
+      },
+      $customer
+    );
 
     const setPreferredInstruments = blocksThatWereSet.preferred.instruments;
 
@@ -337,13 +394,16 @@
     return true;
   }
 
+  function deselectAllInstruments() {
+    $methodTabInstrument = null;
+    $selectedInstrumentId = null;
+  }
+
   export function onShown() {
+    deselectAllInstruments();
+
     if (view === 'methods') {
-      if ($selectedInstrumentId) {
-        showCtaWithDefaultText();
-      } else {
-        hideCta();
-      }
+      hideCta();
     } else {
       setDetailsCta();
     }
@@ -675,7 +735,7 @@
 
 <Tab method="common" overrideMethodCheck={true} shown={true} pad={false}>
   <Screen pad={false}>
-    <div slot="main" class="screen-main">
+    <div class="screen-main">
       {#if view === 'details'}
         <PaymentDetails {session} />
       {/if}
@@ -750,7 +810,13 @@
       {/if}
     </div>
 
-    <div slot="bottom">
+    <Bottom tab="common">
+      {#if cardOffer}
+        <CardOffer offer={cardOffer} />
+      {/if}
+      {#if isDCCEnabled()}
+        <DynamicCurrencyView view="home-screen" />
+      {/if}
       {#if showRecurringCallout}
         <Callout>
           {#if session.get('subscription_id')}
@@ -788,8 +854,6 @@
         </Callout>
       {/if}
 
-      <OffersPortal />
-
       {#if showSecuredByMessage}
         <div class="secured-message" out:slide={{ duration: 100 }}>
           <i>
@@ -819,7 +883,6 @@
           This payment is secured by Razorpay.
         </div>
       {/if}
-
-    </div>
+    </Bottom>
   </Screen>
 </Tab>

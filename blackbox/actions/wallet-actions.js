@@ -7,21 +7,21 @@ async function retryWalletTransaction(context) {
 
 async function assertWalletPage(context) {
   expect(
-    await context.page.$eval('label[for=wallet-radio-freecharge]', visible)
+    await context.page.$eval('div#wallet-radio-freecharge', visible)
   ).toEqual(true);
   expect(
-    await context.page.$eval('label[for=wallet-radio-olamoney]', visible)
+    await context.page.$eval('div#wallet-radio-olamoney', visible)
   ).toEqual(true);
+  expect(await context.page.$eval('div#wallet-radio-payzapp', visible)).toEqual(
+    true
+  );
   expect(
-    await context.page.$eval('label[for=wallet-radio-payzapp]', visible)
-  ).toEqual(true);
-  expect(
-    await context.page.$eval('label[for=wallet-radio-mobikwik]', visible)
+    await context.page.$eval('div#wallet-radio-mobikwik', visible)
   ).toEqual(true);
 }
 
 async function selectWallet(context, walletName) {
-  await context.page.click('label[for=wallet-radio-' + walletName + ']');
+  await context.page.click('div#wallet-radio-' + walletName);
 }
 
 async function handleWalletPopUp(context) {
