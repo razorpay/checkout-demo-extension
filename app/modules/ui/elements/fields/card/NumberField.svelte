@@ -14,6 +14,7 @@
   export let id = '';
   export let amexEnabled = false;
   export let recurring = false;
+  export let helpText;
 
   // State
   let valid = false;
@@ -28,6 +29,8 @@
     dispatchFilledIfValid();
   }
 
+  $: helpText = helpText || getHelpText();
+
   function getHelpText() {
     if (recurring) {
       return 'Card does not support recurring payments.';
@@ -39,8 +42,6 @@
 
     return 'Please enter your card number.';
   }
-
-  $: helpText = getHelpText();
 
   export function dispatchFilledIfValid() {
     const caretPosition = field.getCaretPosition();
