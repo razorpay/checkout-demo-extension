@@ -189,21 +189,22 @@
   }
 
   function setDefaultTokenValue() {
-    const hasIntentFlow = intent || useWebPaymentsApi;
+    const hasIntentFlow = availableFlows.intent || useWebPaymentsApi;
     const hasTokens = tokens && tokens.length;
 
     /**
      * If there are no tokens, select "new" as the default option.
      * But only do that if intent flow is not available.
      */
-
-    if (hasIntentFlow || hasTokens) {
+    if (hasIntentFlow) {
       selectedToken = null;
-
-      return;
+    } else if (availableFlows.collect) {
+      if (hasTokens) {
+        selectedToken = null;
+      } else {
+        selectedToken = 'new';
+      }
     }
-
-    selectedToken = 'new';
   }
 
   $: {
