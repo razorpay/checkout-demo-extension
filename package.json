@@ -51,7 +51,7 @@
   },
   "dependencies": {
     "chalk": "^2.4.1",
-    "fe": "git+https://github.com/razorpay/common-frontend-utils.git#e7ef0df",
+    "fe": "git+https://github.com/razorpay/common-frontend-utils.git#4391354",
     "gulp": "^4.0.0",
     "gulp-stylus": "^2.7.0",
     "gulp-usemin": "^0.3.29",
@@ -63,7 +63,6 @@
     "rollup-plugin-coverage": "^0.1.4",
     "rollup-plugin-svelte": "^5.1.0",
     "run-sequence": "^2.2.1",
-    "svelte": "^3.12.1",
     "tap-difflet": "^0.7.1",
     "testdouble": "^3.12.5",
     "through": "^2.3.8",
