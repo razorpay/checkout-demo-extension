@@ -83,5 +83,5 @@ export function isInstrumentValidForPayment(instrument, payment, extra) {
 
   const validated = validator(payment, instrument, extra);
 
-  return Promise.resolve(validated);
+  return Promise.resolve(validated).catch(() => false);
 }
