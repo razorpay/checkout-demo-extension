@@ -63,6 +63,7 @@
     "rollup-plugin-coverage": "^0.1.4",
     "rollup-plugin-svelte": "^5.1.0",
     "run-sequence": "^2.2.1",
+    "svelte-i18n": "^3.0.3",
     "tap-difflet": "^0.7.1",
     "testdouble": "^3.12.5",
     "through": "^2.3.8",
