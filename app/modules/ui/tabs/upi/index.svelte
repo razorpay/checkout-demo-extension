@@ -120,6 +120,9 @@
     availableFlows = getAvailableFlowsFromInstrument($methodTabInstrument);
   }
 
+  // Set default token value when the available flows change
+  $: availableFlows, setDefaultTokenValue();
+
   /**
    * An instrument might has only for some apps to be shown
    * @param {Instrument | undefined} instrument
@@ -183,7 +186,7 @@
   $: shouldShowOmnichannel = availableFlows.omnichannel;
 
   // Determine CTA visilibty when selectedToken changes, but only if session.tab is 'upi'
-  $: selectedToken, session.tab === 'upi' && determineCtaVisbility();
+  $: selectedToken, session.tab === 'upi' && determineCtaVisibility();
 
   function setDefaultTokenValue() {
     const hasIntentFlow = availableFlows.intent || useWebPaymentsApi;
@@ -211,7 +214,6 @@
 
   function setWebPaymentsApiUsage(to) {
     useWebPaymentsApi = to;
-
     setDefaultTokenValue();
   }
 
@@ -241,6 +243,8 @@
     }
 
     const downtimes = getDowntimes();
+
+    setDefaultTokenValue();
 
     down = _Arr.contains(downtimes.low.methods, 'upi');
     disabled = _Arr.contains(downtimes.high.methods, 'upi');
