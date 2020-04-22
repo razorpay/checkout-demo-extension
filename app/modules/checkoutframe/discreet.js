@@ -30,6 +30,7 @@ import { setShieldParams } from 'payment/validator';
 import * as P13n from 'checkoutframe/personalization';
 import { commonBanks, getFullBankLogo } from 'common/bank';
 import * as CountryCodesUtil from 'common/countrycodesutil';
+import { init as initI18n } from 'i18n';
 
 /* Required for merchant.js migration */
 import * as Constants from 'common/constants';
@@ -186,4 +187,6 @@ export default {
 
   NBHandlers,
   UserHandlers,
+
+  initI18n,
 };
