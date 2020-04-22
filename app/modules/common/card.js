@@ -251,3 +251,80 @@ export const isIinValid = cardNumber => {
 
   return iin && iin.length >= 6;
 };
+
+// Store card metadata (issuer, network, type, last4)
+const CardMetadata = {
+  iin: {},
+  token: {},
+};
+
+/**
+ * Cache IIN metadata
+ * For network, checkout network code is saved.
+ * @param iin
+ * @param data
+ */
+export function updateCardIINMetadata(iin, data = {}) {
+  iin = getIin(iin);
+  if (!CardMetadata.iin[iin]) {
+    CardMetadata.iin[iin] = {};
+  }
+  const cache = CardMetadata.iin[iin];
+  if (data.issuer) {
+    cache.issuer = data.issuer;
+  }
+  if (data.network) {
+    // Not "MasterCard", not "MC", just "mastercard".
+    cache.network = findCodeByNetworkName(data.network);
+  } else {
+    cache.network = getCardType(iin);
+  }
+  if (data.type) {
+    cache.type = data.type;
+  }
+}
+
+/**
+ * Cache token metadata
+ * @param token
+ * @param data
+ */
+export function updateCardTokenMetadata(token, data = {}) {
+  if (!CardMetadata.token[token]) {
+    CardMetadata.token[token] = {};
+  }
+  const cache = CardMetadata.token[token];
+  if (data.issuer) {
+    cache.issuer = data.issuer;
+  }
+  if (data.network) {
+    cache.network = findCodeByNetworkName(data.network);
+  }
+  if (data.type) {
+    cache.type = data.type;
+  }
+  if (data.last4) {
+    cache.last4 = data.last4;
+  }
+}
+
+/**
+ * Returns card metadata if it was cached earlier
+ * @param entity IIN/Token/Card Number
+ * @returns {{}}
+ */
+export function getCardMetadata(entity) {
+  const isToken = /[a-zA-Z]/.test(entity);
+  if (isToken) {
+    return _Obj.clone(CardMetadata.token[entity] || {});
+  }
+  const isIIN = /^\d{6}$/.test(entity);
+  if (isIIN) {
+    return _Obj.clone(CardMetadata.iin[entity] || {});
+  }
+  const iin = getIin(entity);
+  // If entity is a card number then we can send last 4 digits in metadata.
+  const data = { last4: getCardDigits(entity).slice(-4) };
+  // Merge { last4 } with other cached details and return.
+  return _Obj.extend(data, CardMetadata.iin[iin] || {});
+}
