@@ -9,7 +9,7 @@
   import NameField from 'ui/elements/fields/card/NameField.svelte';
 
   // Svelte imports
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, tick } from 'svelte';
 
   // Store
   import {
@@ -21,6 +21,7 @@
     authType,
     cardType,
   } from 'checkoutstore/screens/card';
+  import { methodTabInstrument } from 'checkoutstore/screens/home';
 
   import {
     isNameReadOnly,
@@ -37,6 +38,7 @@
   import { getIin, getCardDigits } from 'common/card';
   import { DEFAULT_AUTH_TYPE_RADIO } from 'common/constants';
   import { Formatter } from 'formatter';
+  import { isInstrumentValidForPayment } from 'configurability/validate';
 
   const dispatch = createEventDispatcher();
 
@@ -55,6 +57,8 @@
   let showNoCvvCheckbox = false;
   let hideExpiryCvvFields = false;
   let cvvLength = 3;
+  let cardNumberHelpText;
+  let isCardNumberValid = true;
 
   $: {
     if ($cardType) {
@@ -68,6 +72,12 @@
 
   $: {
     cvvLength = getCvvDigits($cardType);
+  }
+
+  $: {
+    if (numberField) {
+      numberField.setValid(isCardNumberValid);
+    }
   }
 
   export let tab;
@@ -167,8 +177,20 @@
     const cardNumber = getCardDigits(value);
     const iin = getIin(cardNumber);
 
-    let isValid = validateCardNumber();
-    numberField.setValid(isValid);
+    // This is just for the scope of the function, since there are promise callbacks that need this
+    let _validCardNumber = true;
+
+    if (iin.length < 6) {
+      setDebitPinRadiosVisibility(false);
+    }
+
+    // Check if the card number itself is valid
+    if (!validateCardNumber()) {
+      isCardNumberValid = false;
+      _validCardNumber = false;
+
+      return;
+    }
 
     const flowChecker = ({ flows = {} } = {}) => {
       const cardNumber = getCardDigits(value);
@@ -176,11 +198,12 @@
 
       // If the card number was changed before response, do nothing
       if (!isIinSame) {
-        return;
+        return Promise.reject();
       }
 
       if (isStrictlyRecurring()) {
-        isValid = isValid && isFlowApplicable(flows, Flows.RECURRING);
+        _validCardNumber =
+          _validCardNumber && isFlowApplicable(flows, Flows.RECURRING);
       } else {
         // Debit-PIN is not supposed to work in case of recurring
         if (isFlowApplicable(flows, Flows.PIN)) {
@@ -190,17 +213,60 @@
         }
       }
 
-      numberField.setValid(isValid);
+      return Promise.resolve(_validCardNumber);
     };
 
-    if (iin.length < 6) {
-      setDebitPinRadiosVisibility(false);
-    }
+    getCardFeatures(iin)
+      .then(features => {
+        let validationPromises = [flowChecker(features)];
 
-    if (iin.length >= 6) {
-      getCardFeatures(iin)
-        .then(flowChecker)
-        .catch(flowChecker);
+        /**
+         * If there's a card instrument, we check for its validity.
+         * Otherwise we'll just assume that this is successful validation.
+         */
+        if ($methodTabInstrument && $methodTabInstrument.method === 'card') {
+          validationPromises.push(
+            isInstrumentValidForPayment($methodTabInstrument, {
+              method: 'card',
+              'card[number]': $cardNumber,
+            })
+          );
+        } else {
+          validationPromises.push(Promise.resolve(true));
+        }
+
+        return Promise.all(validationPromises);
+      })
+      .then(([isFlowValid, isInstrumentValid]) => {
+        if (!isInstrumentValid) {
+          cardNumberHelpText = 'This card is not supported for the payment';
+        } else {
+          // Let the default help text kick in
+          cardNumberHelpText = undefined;
+        }
+
+        isCardNumberValid =
+          _validCardNumber && isFlowValid && isInstrumentValid;
+      })
+      .catch(_Func.noop); // IIN changed, do nothing
+  }
+
+  function performValidationsForInstrument() {}
+
+  $: {
+    /**
+     * When $methodTabInstrument changes and is a card instrument,
+     * we'll need to perform all vaildations again
+     */
+
+    const hasCardMethodTabInstrument =
+      $methodTabInstrument && $methodTabInstrument.method === 'card';
+    if ($methodTabInstrument) {
+      if ($methodTabInstrument.method === 'card') {
+        onCardNumberChange();
+      }
+    } else {
+      onCardNumberChange();
     }
   }
 
@@ -305,6 +371,7 @@
         bind:value={$cardNumber}
         bind:this={numberField}
         amexEnabled={isAMEXEnabled()}
+        helpText={cardNumberHelpText}
         recurring={isRecurring()}
         type={$cardType}
         on:filled={_ => handleFilled('numberField')}
