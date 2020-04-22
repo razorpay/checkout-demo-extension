@@ -104,5 +104,4 @@ RazorpayDefaults._ = {
 
 RazorpayDefaults.config = {
   display: {}, // Display config for Payment Method Configurability
-  restrictions: {}, // Restricted payment instruments
 };
