@@ -123,6 +123,10 @@ export function setBlocks(
     })
     |> _Arr.filter(instrument => !isInstrumentForEntireMethod(instrument));
 
+  // Add preferred methods block only if restrictions are not used
+  const addPreferredInstrumentsBlock = !parsedConfig._meta
+    .hasRestrictedInstruments;
+
   /**
    * All individual instruments that are already being shown by the merchant
    * need to be removed from preferred instruments.
@@ -132,32 +136,33 @@ export function setBlocks(
     shownIndividualInstruments
   );
 
-  const preferredInstruments = preferredBlock.instruments;
-  const filteredPreferredInstruments = _Arr.filter(
-    preferredInstruments,
-    instrument =>
-      _Arr.every(
-        hidden,
-        hiddenGroup => !instrumentPresentInGroup(instrument, hiddenGroup)
-      )
-  );
+  let allBlocks = parsedConfig.display.blocks;
 
-  // Take top 3 preferred
-  preferredBlock.instruments = filteredPreferredInstruments.slice(
-    0,
-    MAX_PREFERRED_INSTRUMENTS
-  );
+  if (addPreferredInstrumentsBlock) {
+    const preferredInstruments = preferredBlock.instruments;
+    const filteredPreferredInstruments = _Arr.filter(
+      preferredInstruments,
+      instrument =>
+        _Arr.every(
+          hidden,
+          hiddenGroup => !instrumentPresentInGroup(instrument, hiddenGroup)
+        )
+    );
 
-  // Convert preferred instruments to ungrouped format
-  preferredBlock.instruments = _Arr.map(
-    preferredBlock.instruments,
-    instrument => getIndividualInstruments(instrument, customer)
-  );
+    // Take top 3 preferred
+    preferredBlock.instruments = filteredPreferredInstruments.slice(
+      0,
+      MAX_PREFERRED_INSTRUMENTS
+    );
 
-  let allBlocks = [preferredBlock];
-  const merchantBlocks = parsedConfig.display.blocks;
+    // Convert preferred instruments to ungrouped format
+    preferredBlock.instruments = _Arr.map(
+      preferredBlock.instruments,
+      instrument => getIndividualInstruments(instrument, customer)
+    );
 
-  allBlocks = _Arr.mergeWith(allBlocks, merchantBlocks);
+    allBlocks = _Arr.merge([preferredBlock], allBlocks);
+  }
 
   // Filter out blocks with no instruments
   allBlocks = _Arr.filter(
@@ -174,9 +179,7 @@ export function setBlocks(
     });
   });
 
-  // Sequence is necessary in a config to "customize" Checkout
-  const hasCustomConfig = _Obj.getSafely(merchantConfig, 'sequence') |> Boolean;
-
+  const hasCustomConfig = parsedConfig._meta.hasCustomizations;
   Analytics.setMeta('config.custom', hasCustomConfig);
 
   Analytics.track('config:blocks', {

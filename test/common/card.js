@@ -48,6 +48,51 @@ test('common/card', t => {
     t.end();
   });
 
+  test('getNetworkFromCardNumber', function(t) {
+    t.equal(
+      Card.getNetworkFromCardNumber(testCards.bajaj),
+      'bajaj',
+      'Detected Bajaj Card'
+    );
+    t.equal(
+      Card.getNetworkFromCardNumber(testCards.visa),
+      'visa',
+      'Detected Visa Card'
+    );
+    t.equal(
+      Card.getNetworkFromCardNumber(testCards.mastercard),
+      'mastercard',
+      'Detected MasterCard Card'
+    );
+    t.equal(
+      Card.getNetworkFromCardNumber(testCards.amex),
+      'amex',
+      'Detected Amex Card'
+    );
+    t.equal(
+      Card.getNetworkFromCardNumber(testCards.maestro),
+      'maestro',
+      'Detected Maestro Card'
+    );
+    t.equal(
+      Card.getNetworkFromCardNumber(testCards.diners),
+      'diners',
+      'Detected Diners Card'
+    );
+    t.equal(
+      Card.getNetworkFromCardNumber(testCards.discover),
+      'discover',
+      'Detected Discover Card'
+    );
+    t.equal(
+      Card.getNetworkFromCardNumber(testCards.jcb),
+      'jcb',
+      'Detected JCB Card'
+    );
+
+    t.end();
+  });
+
   test('getCardMaxLen', function(t) {
     t.equal(
       Card.getCardMaxLen(Card.getCardType(testCards.bajaj)),

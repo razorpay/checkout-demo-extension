@@ -184,3 +184,55 @@ export function isInternational() {
 export function getBanks() {
   return preferences.methods.netbanking;
 }
+
+function getConfigFromOptions() {
+  if (_.isNull(getOption('config'))) {
+    return null;
+  }
+
+  let config = {};
+
+  /**
+   * Only certain keys are allowed to be passed from options
+   * For example, restrictions aren't allowed
+   */
+
+  const display = getOption('config.display');
+
+  if (display) {
+    config.display = display;
+  }
+
+  return config;
+}
+
+export function getMerchantConfig() {
+  const configFromOptions = getConfigFromOptions();
+  const configFromPreferences = getCheckoutConfig();
+
+  let config = null;
+  let source;
+
+  if (_.isNull(configFromOptions)) {
+    // Setting config as null allows you to disable the configuration
+    source = 'options';
+    config = null;
+  } else if (_.isNull(configFromPreferences)) {
+    source = 'preferences';
+    config = null;
+  } else if (
+    _.isNonNullObject(configFromPreferences) &&
+    !_.isEmptyObject(configFromPreferences)
+  ) {
+    source = 'preferences';
+    config = configFromPreferences;
+  } else {
+    source = 'options';
+    config = configFromOptions;
+  }
+
+  return {
+    config,
+    source,
+  };
+}

@@ -126,6 +126,17 @@ test('Module: configurability/translate', t => {
             ],
             methods: [],
           },
+          sequence: ['block.gpay', 'netbanking', 'block.hdfc'],
+          preferences: {},
+        },
+
+        restrictions: {
+          allow: {
+            code: 'rzp.restrict_allow',
+            _type: 'block',
+            instruments: [],
+            title: 'Available Payment Methods',
+          },
         },
       };
 
