@@ -182,11 +182,8 @@
   $: shouldShowCollect = availableFlows.collect;
   $: shouldShowOmnichannel = availableFlows.omnichannel;
 
-  $: {
-    if (selectedToken && session.tab === 'upi') {
-      determineCtaVisibility();
-    }
-  }
+  // Determine CTA visilibty when selectedToken changes, but only if session.tab is 'upi'
+  $: selectedToken, session.tab === 'upi' && determineCtaVisbility();
 
   function setDefaultTokenValue() {
     const hasIntentFlow = availableFlows.intent || useWebPaymentsApi;
