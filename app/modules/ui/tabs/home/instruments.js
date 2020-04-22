@@ -123,7 +123,7 @@ export function setBlocks(
     })
     |> _Arr.filter(instrument => !isInstrumentForEntireMethod(instrument));
 
-  // Add preferred methods block only if restrictions are used
+  // Add preferred methods block only if restrictions are not used
   const addPreferredInstrumentsBlock = !parsedConfig._meta
     .hasRestrictedInstruments;
 
