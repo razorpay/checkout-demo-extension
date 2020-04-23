@@ -161,7 +161,7 @@ export function setBlocks(
       instrument => getIndividualInstruments(instrument, customer)
     );
 
-    allBlocks = _Arr.merge([preferredBlock], allBlocks);
+    allBlocks = _Arr.mergeWith([preferredBlock], allBlocks);
   }
 
   // Filter out blocks with no instruments
