@@ -31,20 +31,12 @@ function isPreferredInstrumentPartOfInstrument(preferred, instrument) {
     return false;
   }
 
-  /**
-   * If instrument is for the entire method,
-   * the preferred instrument is a part of it
-   */
-  if (isInstrumentForEntireMethod(instrument)) {
-    return true;
-  }
-
   switch (preferred.method) {
     case 'netbanking': {
-      const hasBank = Boolean(instrument.banks);
+      const hasBanks = Boolean(instrument.banks);
 
       // Does the instrument ask for specific wallets to be shown?
-      if (hasBank) {
+      if (hasBanks) {
         return _Arr.any(
           instrument._ungrouped,
           ungrouped => ungrouped.bank === preferred.bank
@@ -55,10 +47,10 @@ function isPreferredInstrumentPartOfInstrument(preferred, instrument) {
     }
 
     case 'wallet': {
-      const hasWallet = Boolean(instrument.wallets);
+      const hasWallets = Boolean(instrument.wallets);
 
       // Does the instrument ask for specific wallets to be shown?
-      if (hasWallet) {
+      if (hasWallets) {
         return _Arr.any(
           instrument._ungrouped,
           ungrouped => ungrouped.wallet === preferred.wallet
@@ -102,22 +94,45 @@ function isPreferredInstrumentPartOfInstrument(preferred, instrument) {
     // TODO: filter out / remove plans excluding the durations for emi
 
     case 'upi': {
-      const hasFlow = Boolean(instrument.flows);
-      const hasApp = Boolean(instrument.apps);
+      const hasFlows = Boolean(instrument.flows);
+      const hasApps = Boolean(instrument.apps);
 
-      const flowMatches = hasFlow ? instrument.flow === preferred.flow : true;
-      const appMatches = hasApp ? instrument.app === preferred.app : true;
+      // If there are any apps, check if the app matches
+      if (hasApps) {
+        return _Arr.any(
+          instrument._ungrouped,
+          ungrouped => ungrouped.app === preferred.app
+        );
+      }
 
-      return flowMatches && appMatches;
+      // If there are any flows, check if the flows match and is invidiual flow
+      if (hasFlows) {
+        const individualFlows = ['qr', 'intent'];
+
+        return _Arr.any(
+          instrument._ungrouped,
+          ungrouped =>
+            _Arr.contains(individualFlows, ungrouped.flow) &&
+            ungrouped.flow === preferred.flow
+        );
+      }
+
+      return false;
     }
 
     case 'cardless_emi':
     case 'paylater': {
-      const hasProvider = Boolean(instrument.provider);
-      const providerMatches = hasProvider
-        ? instrument.provider === preferred.provider
-        : true;
-      return providerMatches;
+      const hasProviders = Boolean(instrument.providers);
+
+      // Does the instrument ask for specific providers to be shown?
+      if (hasProviders) {
+        return _Arr.any(
+          instrument._ungrouped,
+          ungrouped => ungrouped.provider === preferred.provider
+        );
+      }
+
+      return false;
     }
   }
 
