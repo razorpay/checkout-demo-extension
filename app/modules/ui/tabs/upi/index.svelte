@@ -244,8 +244,6 @@
 
     const downtimes = getDowntimes();
 
-    setDefaultTokenValue();
-
     down = _Arr.contains(downtimes.low.methods, 'upi');
     disabled = _Arr.contains(downtimes.high.methods, 'upi');
     qrIcon = session.themeMeta.icons.qr;
@@ -263,6 +261,7 @@
   }
 
   export function onShown() {
+    setDefaultTokenValue();
     determineCtaVisibility();
   }
 
