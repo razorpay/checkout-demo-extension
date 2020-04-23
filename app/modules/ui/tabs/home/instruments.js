@@ -31,6 +31,14 @@ function isPreferredInstrumentPartOfInstrument(preferred, instrument) {
     return false;
   }
 
+  /**
+   * If instrument is for the entire method,
+   * the preferred instrument is a part of it
+   */
+  if (isInstrumentForEntireMethod(instrument)) {
+    return true;
+  }
+
   switch (preferred.method) {
     case 'netbanking': {
       const hasBank = Boolean(instrument.banks);
@@ -135,30 +143,38 @@ export function setBlocks(
     })
     |> _Arr.filter(instrument => !isInstrumentForEntireMethod(instrument));
 
-  // Add preferred methods block only if restrictions are not used
-  const addPreferredInstrumentsBlock = !parsedConfig._meta
-    .hasRestrictedInstruments;
+  // Add preferred methods block only if restrictions are not used and default blocks should be shown
+  const addPreferredInstrumentsBlock =
+    !parsedConfig._meta.hasRestrictedInstruments &&
+    parsedConfig.display.preferences.show_default_blocks;
 
-  /**
-   * All individual instruments that are already being shown by the merchant
-   * need to be removed from preferred instruments.
-   */
-  const hiddenFromPreferredMethods = _Arr.mergeWith(
-    parsedConfig.display.hidden,
-    shownIndividualInstruments
-  );
+  // Get all hidden method-instruments
+  const hiddenMethods = parsedConfig.display.hide.methods;
 
   let allBlocks = parsedConfig.display.blocks;
 
   if (addPreferredInstrumentsBlock) {
     const preferredInstruments = preferredBlock.instruments;
-    const filteredPreferredInstruments = _Arr.filter(
+
+    // Filter out all preferred methods whose methods are asked to be hidden
+    let filteredPreferredInstruments = _Arr.filter(
       preferredInstruments,
+      preferredInstrument => {
+        return !_Arr.contains(hiddenMethods, preferredInstrument.method);
+      }
+    );
+
+    // Filter out all preferred methods that are already being shown by the merchant
+    filteredPreferredInstruments = _Arr.filter(
+      filteredPreferredInstruments,
       instrument =>
         _Arr.every(
-          hiddenFromPreferredMethods,
-          hiddenGroup =>
-            !isPreferredInstrumentPartOfInstrument(instrument, hiddenGroup)
+          shownIndividualInstruments,
+          individualInstrument =>
+            !isPreferredInstrumentPartOfInstrument(
+              instrument,
+              individualInstrument
+            )
         )
     );
 
