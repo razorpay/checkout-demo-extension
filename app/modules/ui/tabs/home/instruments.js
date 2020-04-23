@@ -20,32 +20,44 @@ function generateBasePreferredBlock(preferred) {
 
 /**
  * Tells whether a given instrument is a part of an instrument group.
- * @param {Object} instrument
- * @param {Object} group
+ * Used to filter out preferred methods instruments.
+ * @param {Instrument} preferred
+ * @param {Instrument} instrument
+ *
  * @returns {boolean}
  */
-function instrumentPresentInGroup(instrument, group) {
-  if (instrument.method !== group.method) {
+function isPreferredInstrumentPartOfInstrument(preferred, instrument) {
+  if (preferred.method !== instrument.method) {
     return false;
   }
 
-  switch (instrument.method) {
+  switch (preferred.method) {
     case 'netbanking': {
-      const hasBank = Boolean(group.bank);
+      const hasBank = Boolean(instrument.banks);
 
-      const bankMatches = hasBank ? group.bank === instrument.bank : true;
+      // Does the instrument ask for specific wallets to be shown?
+      if (hasBank) {
+        return _Arr.any(
+          instrument._ungrouped,
+          ungrouped => ungrouped.bank === preferred.bank
+        );
+      }
 
-      return bankMatches;
+      return false;
     }
 
     case 'wallet': {
-      const hasWallet = Boolean(group.wallet);
+      const hasWallet = Boolean(instrument.wallets);
 
-      const walletMatches = hasWallet
-        ? group.wallet === instrument.wallet
-        : true;
+      // Does the instrument ask for specific wallets to be shown?
+      if (hasWallet) {
+        return _Arr.any(
+          instrument._ungrouped,
+          ungrouped => ungrouped.wallet === preferred.wallet
+        );
+      }
 
-      return walletMatches;
+      return false;
     }
 
     /**
@@ -55,25 +67,25 @@ function instrumentPresentInGroup(instrument, group) {
      */
     case 'card':
     case 'emi': {
-      const hasIssuers = Boolean(group.issuers);
-      const hasNetworks = Boolean(group.networks);
-      const hasTypes = Boolean(group.types);
+      const hasIssuers = Boolean(instrument.issuers);
+      const hasNetworks = Boolean(instrument.networks);
+      const hasTypes = Boolean(instrument.types);
 
-      const issuers = group.issuers || [];
-      const networks = group.networks || [];
-      const types = group.types || [];
+      const issuers = instrument.issuers || [];
+      const networks = instrument.networks || [];
+      const types = instrument.types || [];
 
       // If there is no issuer present, it means match all issuers.
       const issuerMatches = hasIssuers
-        ? _Arr.contains(issuers, instrument.issuer)
+        ? _Arr.contains(issuers, preferred.issuer)
         : true;
 
       const networkMatches = hasNetworks
-        ? _Arr.contains(networks, instrument.network)
+        ? _Arr.contains(networks, preferred.network)
         : true;
 
       const typeMatches = hasTypes
-        ? _Arr.contains(types, instrument.types)
+        ? _Arr.contains(types, preferred.types)
         : true;
 
       return issuerMatches && networkMatches && typeMatches;
@@ -82,20 +94,20 @@ function instrumentPresentInGroup(instrument, group) {
     // TODO: filter out / remove plans excluding the durations for emi
 
     case 'upi': {
-      const hasFlow = Boolean(group.flows);
-      const hasApp = Boolean(group.apps);
+      const hasFlow = Boolean(instrument.flows);
+      const hasApp = Boolean(instrument.apps);
 
-      const flowMatches = hasFlow ? group.flow === instrument.flow : true;
-      const appMatches = hasApp ? group.app === instrument.app : true;
+      const flowMatches = hasFlow ? instrument.flow === preferred.flow : true;
+      const appMatches = hasApp ? instrument.app === preferred.app : true;
 
       return flowMatches && appMatches;
     }
 
     case 'cardless_emi':
     case 'paylater': {
-      const hasProvider = Boolean(group.provider);
+      const hasProvider = Boolean(instrument.provider);
       const providerMatches = hasProvider
-        ? group.provider === instrument.provider
+        ? instrument.provider === preferred.provider
         : true;
       return providerMatches;
     }
@@ -131,7 +143,7 @@ export function setBlocks(
    * All individual instruments that are already being shown by the merchant
    * need to be removed from preferred instruments.
    */
-  const hidden = _Arr.mergeWith(
+  const hiddenFromPreferredMethods = _Arr.mergeWith(
     parsedConfig.display.hidden,
     shownIndividualInstruments
   );
@@ -144,8 +156,9 @@ export function setBlocks(
       preferredInstruments,
       instrument =>
         _Arr.every(
-          hidden,
-          hiddenGroup => !instrumentPresentInGroup(instrument, hiddenGroup)
+          hiddenFromPreferredMethods,
+          hiddenGroup =>
+            !isPreferredInstrumentPartOfInstrument(instrument, hiddenGroup)
         )
     );
 
