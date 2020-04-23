@@ -314,6 +314,15 @@
           _Obj.getSafely(session.getCurrentCustomer(), 'tokens.items', []),
           token => token.id === selectedToken
         );
+
+        Analytics.track('upi:token:switch:default', {
+          data: {
+            selectedToken,
+            _token,
+          },
+          immediately: true,
+        });
+
         data = { token: _token.token };
         break;
     }
