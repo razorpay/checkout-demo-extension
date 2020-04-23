@@ -19,124 +19,111 @@ function generateBasePreferredBlock(preferred) {
 }
 
 /**
- * Tells whether a given instrument is a part of an instrument group.
+ * Tells whether a given preferred instrument is allowed
  * Used to filter out preferred methods instruments.
  * @param {Instrument} preferred
- * @param {Instrument} instrument
+ * @param {Array<Instrument>} instruments
  *
  * @returns {boolean}
  */
-function isPreferredInstrumentPartOfInstrument(preferred, instrument) {
-  if (preferred.method !== instrument.method) {
-    return false;
-  }
-
-  switch (preferred.method) {
-    case 'netbanking': {
-      const hasBanks = Boolean(instrument.banks);
-
-      // Does the instrument ask for specific wallets to be shown?
-      if (hasBanks) {
-        return _Arr.any(
-          instrument._ungrouped,
-          ungrouped => ungrouped.bank === preferred.bank
-        );
-      }
-
-      return false;
+function shouldAllowPreferredInstrument(preferred, instruments) {
+  return _Arr.every(instruments, instrument => {
+    if (preferred.method !== instrument.method) {
+      return true;
     }
 
-    case 'wallet': {
-      const hasWallets = Boolean(instrument.wallets);
-
-      // Does the instrument ask for specific wallets to be shown?
-      if (hasWallets) {
-        return _Arr.any(
-          instrument._ungrouped,
-          ungrouped => ungrouped.wallet === preferred.wallet
-        );
-      }
-
-      return false;
+    // If entire method is asked to be shown, we can show the preferred instrument too
+    if (isInstrumentForEntireMethod(instrument)) {
+      return true;
     }
 
-    /**
-     * Card and EMI instruments will not be ungrouped by getBlockConfig as a
-     * special case (to avoid large no. of permutations when iins are used).
-     * Hence we are checking for presence in arrays.
-     */
-    case 'card':
-    case 'emi': {
-      const hasIssuers = Boolean(instrument.issuers);
-      const hasNetworks = Boolean(instrument.networks);
-      const hasTypes = Boolean(instrument.types);
+    switch (preferred.method) {
+      case 'netbanking': {
+        const hasBanks = Boolean(instrument.banks);
 
-      const issuers = instrument.issuers || [];
-      const networks = instrument.networks || [];
-      const types = instrument.types || [];
+        // Does the instrument ask for specific banks to be shown?
+        if (hasBanks) {
+          return !_Arr.any(
+            instrument._ungrouped,
+            ungrouped => ungrouped.bank === preferred.bank
+          );
+        }
 
-      // If there is no issuer present, it means match all issuers.
-      const issuerMatches = hasIssuers
-        ? _Arr.contains(issuers, preferred.issuer)
-        : true;
-
-      const networkMatches = hasNetworks
-        ? _Arr.contains(networks, preferred.network)
-        : true;
-
-      const typeMatches = hasTypes
-        ? _Arr.contains(types, preferred.types)
-        : true;
-
-      return issuerMatches && networkMatches && typeMatches;
-    }
-    // TODO: filter out based on iins as well
-    // TODO: filter out / remove plans excluding the durations for emi
-
-    case 'upi': {
-      const hasFlows = Boolean(instrument.flows);
-      const hasApps = Boolean(instrument.apps);
-
-      // If there are any apps, check if the app matches
-      if (hasApps) {
-        return _Arr.any(
-          instrument._ungrouped,
-          ungrouped => ungrouped.app === preferred.app
-        );
+        return true;
       }
 
-      // If there are any flows, check if the flows match and is invidiual flow
-      if (hasFlows) {
-        const individualFlows = ['qr', 'intent'];
+      case 'wallet': {
+        const hasWallets = Boolean(instrument.wallets);
 
-        return _Arr.any(
-          instrument._ungrouped,
-          ungrouped =>
-            _Arr.contains(individualFlows, ungrouped.flow) &&
-            ungrouped.flow === preferred.flow
-        );
+        // Does the instrument ask for specific wallets to be shown?
+        if (hasWallets) {
+          return !_Arr.any(
+            instrument._ungrouped,
+            ungrouped => ungrouped.wallet === preferred.wallet
+          );
+        }
+
+        return true;
       }
 
-      return false;
-    }
+      /**
+       * Card and EMI instruments will not be ungrouped by getBlockConfig as a
+       * special case (to avoid large no. of permutations when iins are used).
+       * Hence we are checking for presence in arrays.
+       */
+      case 'card':
+      case 'emi': {
+        // Always show card and emi instruments
+        return true;
+      }
+      // TODO: filter out based on iins as well
+      // TODO: filter out / remove plans excluding the durations for emi
 
-    case 'cardless_emi':
-    case 'paylater': {
-      const hasProviders = Boolean(instrument.providers);
+      case 'upi': {
+        const hasFlows = Boolean(instrument.flows);
+        const hasApps = Boolean(instrument.apps);
 
-      // Does the instrument ask for specific providers to be shown?
-      if (hasProviders) {
-        return _Arr.any(
-          instrument._ungrouped,
-          ungrouped => ungrouped.provider === preferred.provider
-        );
+        // If there are any apps, check if the app matches
+        if (hasApps) {
+          return !_Arr.any(
+            instrument._ungrouped,
+            ungrouped => ungrouped.app === preferred.app
+          );
+        }
+
+        // If there are any flows, check if the flows match and is invidiual flow
+        if (hasFlows) {
+          const individualFlows = ['qr', 'intent'];
+
+          return !_Arr.any(
+            instrument._ungrouped,
+            ungrouped =>
+              _Arr.contains(individualFlows, ungrouped.flow) &&
+              ungrouped.flow === preferred.flow
+          );
+        }
+
+        return true;
       }
 
-      return false;
-    }
-  }
+      case 'cardless_emi':
+      case 'paylater': {
+        const hasProviders = Boolean(instrument.providers);
 
-  return true;
+        // Does the instrument ask for specific providers to be shown?
+        if (hasProviders) {
+          return !_Arr.any(
+            instrument._ungrouped,
+            ungrouped => ungrouped.provider === preferred.provider
+          );
+        }
+
+        return true;
+      }
+    }
+
+    return true;
+  });
 }
 
 export function setBlocks(
@@ -183,14 +170,7 @@ export function setBlocks(
     filteredPreferredInstruments = _Arr.filter(
       filteredPreferredInstruments,
       instrument =>
-        _Arr.every(
-          shownIndividualInstruments,
-          individualInstrument =>
-            !isPreferredInstrumentPartOfInstrument(
-              instrument,
-              individualInstrument
-            )
-        )
+        shouldAllowPreferredInstrument(instrument, shownIndividualInstruments)
     );
 
     // Take top 3 preferred
