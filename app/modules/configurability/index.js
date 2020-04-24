@@ -30,18 +30,6 @@ function getAvailableDefaultMethods() {
   let available = _Arr.filter(AVAILABLE_METHODS, isMethodEnabled);
 
   /**
-   * Cardless EMI and EMI are the same payment option.
-   * When we click EMI, it should take to Cardless EMI if
-   * cardless_emi is an available method.
-   */
-  if (
-    _Arr.contains(available, 'cardless_emi') &&
-    _Arr.contains(available, 'emi')
-  ) {
-    available = _Arr.remove(available, 'emi');
-  }
-
-  /**
    * We do not want to show QR in the primary list
    * of payment options anymore
    */
