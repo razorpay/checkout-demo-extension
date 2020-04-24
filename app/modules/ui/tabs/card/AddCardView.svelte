@@ -58,7 +58,12 @@
   let hideExpiryCvvFields = false;
   let cvvLength = 3;
   let cardNumberHelpText;
-  let isCardNumberValid = true;
+
+  function setCardNumberValidity(valid) {
+    if (numberField) {
+      numberField.setValid(valid);
+    }
+  }
 
   $: {
     if ($cardType) {
@@ -72,12 +77,6 @@
 
   $: {
     cvvLength = getCvvDigits($cardType);
-  }
-
-  $: {
-    if (numberField) {
-      numberField.setValid(isCardNumberValid);
-    }
   }
 
   export let tab;
@@ -153,7 +152,7 @@
    * Validate the card number.
    * @return {Boolean}
    */
-  export function validateCardNumber() {
+  function validateCardNumber() {
     const cardNumberWithoutSpaces = getCardDigits($cardNumber);
 
     let isValid = Formatter.rules.card.isValid.call({
@@ -165,7 +164,7 @@
       isValid = false;
     }
 
-    return isValid;
+    return Promise.resolve(isValid);
   }
 
   /**
@@ -177,24 +176,15 @@
     const cardNumber = getCardDigits(value);
     const iin = getIin(cardNumber);
 
-    // This is just for the scope of the function, since there are promise callbacks that need this
-    let _validCardNumber = true;
-
     if (iin.length < 6) {
       setDebitPinRadiosVisibility(false);
-    }
-
-    // Check if the card number itself is valid
-    if (!validateCardNumber()) {
-      isCardNumberValid = false;
-      _validCardNumber = false;
-
       return;
     }
 
     const flowChecker = ({ flows = {} } = {}) => {
       const cardNumber = getCardDigits(value);
       const isIinSame = getIin(cardNumber) === iin;
+      let _validCardNumber = true;
 
       // If the card number was changed before response, do nothing
       if (!isIinSame) {
@@ -218,7 +208,7 @@
 
     getCardFeatures(iin)
       .then(features => {
-        let validationPromises = [flowChecker(features)];
+        let validationPromises = [flowChecker(features), validateCardNumber()];
 
         /**
          * If there's a card instrument, we check for its validity.
@@ -237,7 +227,7 @@
 
         return Promise.all(validationPromises);
       })
-      .then(([isFlowValid, isInstrumentValid]) => {
+      .then(([isFlowValid, isCardNumberValid, isInstrumentValid]) => {
         if (!isInstrumentValid) {
           cardNumberHelpText = 'This card is not supported for the payment';
         } else {
@@ -245,13 +235,12 @@
           cardNumberHelpText = undefined;
         }
 
-        isCardNumberValid =
-          _validCardNumber && isFlowValid && isInstrumentValid;
+        setCardNumberValidity(
+          isCardNumberValid && isFlowValid && isInstrumentValid
+        );
       })
       .catch(_Func.noop); // IIN changed, do nothing
   }
-
-  function performValidationsForInstrument() {}
 
   $: {
     /**
