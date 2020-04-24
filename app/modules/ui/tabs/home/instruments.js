@@ -43,7 +43,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
 
         // Does the instrument ask for specific banks to be shown?
         if (hasBanks) {
-          return !_Arr.any(
+          return _Arr.none(
             instrument._ungrouped,
             ungrouped => ungrouped.bank === preferred.bank
           );
@@ -57,7 +57,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
 
         // Does the instrument ask for specific wallets to be shown?
         if (hasWallets) {
-          return !_Arr.any(
+          return _Arr.none(
             instrument._ungrouped,
             ungrouped => ungrouped.wallet === preferred.wallet
           );
@@ -85,7 +85,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
 
         // If there are any apps, check if the app matches
         if (hasApps) {
-          return !_Arr.any(
+          return _Arr.none(
             instrument._ungrouped,
             ungrouped => ungrouped.app === preferred.app
           );
@@ -95,7 +95,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
         if (hasFlows) {
           const individualFlows = ['qr', 'intent'];
 
-          return !_Arr.any(
+          return _Arr.none(
             instrument._ungrouped,
             ungrouped =>
               _Arr.contains(individualFlows, ungrouped.flow) &&
@@ -112,7 +112,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
 
         // Does the instrument ask for specific providers to be shown?
         if (hasProviders) {
-          return !_Arr.any(
+          return _Arr.none(
             instrument._ungrouped,
             ungrouped => ungrouped.provider === preferred.provider
           );
