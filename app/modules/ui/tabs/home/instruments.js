@@ -145,10 +145,16 @@ export function setBlocks(
     })
     |> _Arr.filter(instrument => !isInstrumentForEntireMethod(instrument));
 
+  // show_default_blocks defaults to true
+  const show_default_blocks = _Obj.getSafely(
+    parsedConfig,
+    'display.preferences.show_default_blocks',
+    true
+  );
+
   // Add preferred methods block only if restrictions are not used and default blocks should be shown
   const addPreferredInstrumentsBlock =
-    !parsedConfig._meta.hasRestrictedInstruments &&
-    parsedConfig.display.preferences.show_default_blocks;
+    !parsedConfig._meta.hasRestrictedInstruments && show_default_blocks;
 
   // Get all hidden method-instruments
   const hiddenMethods = parsedConfig.display.hide.methods;
