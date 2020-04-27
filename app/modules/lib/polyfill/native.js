@@ -60,9 +60,34 @@
         var len = toInteger(value);
         return Math.min(Math.max(len, 0), maxSafeInteger);
       };
+      var setToArray = function(set) {
+        let values = [];
+
+        set.forEach(value => values.push(value));
+
+        return values;
+      };
 
       // The length property of the from method is 1.
       return function from(arrayLike /*, mapFn, thisArg */) {
+        /**
+         * 🚨🚨🚨🚨
+         * IMPORTANT
+         * 🚨🚨🚨🚨
+         * Use custom handler for Set.
+         *
+         * DO NOT REMOVE THE FOLLOW if-BLOCK
+         * OTHERWISE CHECKOUT WILL BREAK ON IE 11
+         *
+         * We are doing this because Symbol is not present on IE 11
+         * and adding a Symbol polyfill does nothing because
+         * we would also need to polyfill Set.prototype[Symbol.iterator]
+         * and that somehow did not work after 3 hours of debugging.
+         */
+        if (arrayLike instanceof Set) {
+          return setToArray(arrayLike);
+        }
+
         // 1. Let C be the this value.
         var C = this;
 
