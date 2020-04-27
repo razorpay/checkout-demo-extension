@@ -22,6 +22,14 @@ function getOptions(module) {
       name: modules[module],
     },
     plugins,
+    onwarn: function(warning) {
+      // Suppress "this is undefined" warning due to an issue in the
+      // intl-messageformat module.
+      if (warning.code === 'THIS_IS_UNDEFINED') {
+        return;
+      }
+      console.error(warning.message);
+    },
   };
 }
 
