@@ -98,11 +98,6 @@ export const STRINGS = {
   redirect: 'Redirecting to Bank page',
 };
 
-export const OfferType = {
-  INSTANT: 'instant',
-  DEFERRED: 'deferred',
-};
-
 /* Being used for filtering actual methods from methods object */
 export const AVAILABLE_METHODS = [
   'card',

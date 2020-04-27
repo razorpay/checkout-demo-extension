@@ -1,9 +1,4 @@
 import 'entry/checkout-frame';
-import {
-  makeAuthUrl,
-  makePrefParams,
-  validateOverrides,
-} from 'common/Razorpay';
 import RazorpayConfig from 'common/RazorpayConfig';
 
 import Track from 'tracker';
@@ -86,9 +81,6 @@ import * as Instruments from 'configurability/instruments';
 
 export default {
   RazorpayConfig,
-  makeAuthUrl,
-  validateOverrides,
-  makePrefParams,
   fetch,
   Track,
   Analytics,
