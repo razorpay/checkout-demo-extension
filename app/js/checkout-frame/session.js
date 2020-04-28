@@ -715,18 +715,20 @@ function askOTP(view, text, shouldLimitResend, screenProps) {
           }
 
           if (!thisSession.get('timeout')) {
-            thisSession.closeAt = now() + 3 * 60 * 1000;
-            thisSession.showTimer(function() {
-              thisSession.hideTimer();
-              thisSession.back(true);
-              setTimeout(function() {
-                Analytics.track('native_otp:timeout');
-                thisSession.showLoadError(
-                  'Payment was not completed on time',
-                  1
-                );
-              }, 300);
-            });
+            thisSession.timer = discreet.showTimer(
+              now() + 3 * 60 * 1000,
+              function() {
+                thisSession.hideTimer();
+                thisSession.back(true);
+                setTimeout(function() {
+                  Analytics.track('native_otp:timeout');
+                  thisSession.showLoadError(
+                    'Payment was not completed on time',
+                    1
+                  );
+                }, 300);
+              }
+            );
           }
         }
       } else {
@@ -1196,13 +1198,6 @@ Session.prototype = {
       $('#contact').focus();
     }
 
-    if (this.closeAt) {
-      this.showTimer(function() {
-        that.dismissReason = 'timeout';
-        that.modal.hide();
-      });
-    }
-
     // Look for new UPI apps.
     if (this.all_upi_intents_data) {
       discreet.UPIUtils.findAndReportNewApps(this.all_upi_intents_data);
@@ -1355,24 +1350,14 @@ Session.prototype = {
     gel('form-fields').appendChild(gel('bottom'));
   },
 
-  showTimer: function(cb) {
-    this.hideTimer();
-    var timeLeft = this.closeAt - now();
-    var timeoutEl = $('#timeout').show()[0];
-    var timerFn = updateTimer(timeoutEl, this.closeAt);
-    timerFn();
-    var self = this;
-    this.closeTimer = setInterval(timerFn, 1000);
-    this.closeTimeout = setTimeout(function() {
-      clearInterval(self.closeTimer);
-      cb();
-    }, timeLeft);
-  },
-
+  // this does not apply if options.timeout was passed
+  // because in that case timer needn't be hidden while checkout is open
+  // applied only for localized timers e.g headless OTP timer
   hideTimer: function() {
-    $('#timeout').hide();
-    clearInterval(this.closeTimer);
-    clearTimeout(this.closeTimeout);
+    if (!this.get('timeout') && this.timer) {
+      this.timer.$destroy();
+      this.timer = null;
+    }
   },
 
   setTpvBanks: function() {
@@ -2214,9 +2199,7 @@ Session.prototype = {
 
     if (this.headless) {
       this.showLoadError('Resending OTP');
-      if (!this.get('timeout')) {
-        this.hideTimer();
-      }
+      this.hideTimer();
 
       if (this.headlessMetadata) {
         var metadata = this.headlessMetadata;
@@ -2247,13 +2230,11 @@ Session.prototype = {
 
   secAction: function() {
     if (this.headless && this.r._payment) {
-      if (!this.get('timeout')) {
-        Analytics.track('native_otp:gotobank', {
-          type: AnalyticsTypes.BEHAV,
-          immediately: true,
-        });
-        this.hideTimer();
-      }
+      Analytics.track('native_otp:gotobank', {
+        type: AnalyticsTypes.BEHAV,
+        immediately: true,
+      });
+      this.hideTimer();
       this.showLoadError('Waiting for payment to complete on bank page');
       return this.r._payment.gotoBank();
     }
@@ -3920,10 +3901,7 @@ Session.prototype = {
   },
 
   clearRequest: function(extra) {
-    if (!this.get('timeout') && this.closeAt) {
-      this.hideTimer();
-      this.closeAt = null;
-    }
+    this.hideTimer();
     var powerotp = gel('powerotp');
     if (powerotp) {
       powerotp.value = '';
@@ -4944,6 +4922,7 @@ Session.prototype = {
       'svelteCardTab',
       'svelteWalletsTab',
       'upiTab',
+      'timer',
     ];
 
     var session = this;
@@ -4980,7 +4959,6 @@ Session.prototype = {
 
       var cancelReason = this.getCancelReason();
 
-      this.hideTimer();
       abortAjax(this.ajax);
       this.clearRequest(cancelReason);
       this.isOpen = false;
@@ -5354,18 +5332,6 @@ Session.prototype = {
 
   hideOverlayMessage: hideOverlayMessage,
 };
-
-function updateTimer(timeoutEl, closeAt) {
-  return function() {
-    var timeLeft = Math.floor((closeAt - now()) / 1000);
-    timeoutEl.innerHTML =
-      '<i>&#x2139;</i>This page will timeout in ' +
-      Math.floor(timeLeft / 60) +
-      ':' +
-      ('0' + (timeLeft % 60)).slice(-2) +
-      ' minutes';
-  };
-}
 
 /*
  * Call initIframe() after the session class is defined.

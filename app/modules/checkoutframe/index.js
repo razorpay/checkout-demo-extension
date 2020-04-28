@@ -5,6 +5,7 @@ import * as SessionManager from 'sessionmanager';
 import Track from 'tracker';
 import { processNativeMessage } from 'checkoutstore/native';
 import { isEMandateEnabled, getEnabledMethods } from 'checkoutstore/methods';
+import showTimer from 'checkoutframe/timer';
 
 import {
   UPI_POLL_URL,
@@ -168,9 +169,10 @@ function fetchPrefs(session) {
   /* Start listening for back presses */
   Bridge.setHistoryAndListenForBackPresses();
 
-  var timeout = session.r.get('timeout');
+  let closeAt;
+  const timeout = session.r.get('timeout');
   if (timeout) {
-    session.closeAt = _.now() + timeout * 1000;
+    closeAt = _.now() + timeout * 1000;
   }
 
   session.prefCall = Razorpay.payment.getPrefs(
@@ -184,6 +186,12 @@ function fetchPrefs(session) {
         });
       } else {
         setSessionPreferences(session, preferences);
+        if (closeAt) {
+          session.timer = showTimer(closeAt, () => {
+            session.dismissReason = 'timeout';
+            session.modal.hide();
+          });
+        }
       }
     }
   );
