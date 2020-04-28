@@ -1339,6 +1339,7 @@ Session.prototype = {
     this.setBankTransfer();
     this.setWalletsTab();
     this.setOffers();
+    this.setLanguageDropdown();
     this.setSvelteOverlay();
     // make bottom the last element
     gel('form-fields').appendChild(gel('bottom'));
@@ -5095,6 +5096,15 @@ Session.prototype = {
             );
           },
         },
+      });
+    }
+  },
+
+  setLanguageDropdown: function() {
+    if (this.preferences.features.vernacular || true) {
+      var target = _Doc.querySelector('#language-dropdown');
+      this.languageSelectionView = new discreet.languageSelectionView({
+        target: target,
       });
     }
   },

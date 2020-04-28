@@ -1,0 +1,22 @@
+<script>
+  import { locale, locales, isLoading } from 'svelte-i18n';
+</script>
+
+<style>
+  .elem,
+  .select-arrow {
+    color: #fff;
+  }
+</style>
+
+<div class="elem select">
+  {#if $isLoading}
+    <p>Loading...</p>
+  {/if}
+  <i class="select-arrow"></i>
+  <select bind:value={$locale} class="input">
+    {#each $locales as locale}
+      <option value={locale}>{locale}</option>
+    {/each}
+  </select>
+</div>

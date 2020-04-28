@@ -22,6 +22,7 @@ import NoCostExplainer from 'ui/components/offers/NoCostExplainer.svelte';
 import emandateView from 'checkoutframe/emandate';
 import emiPlansView from 'checkoutframe/emiplans';
 import otpView from 'checkoutframe/otp';
+import languageSelectionView from 'ui/elements/LanguageSelection.svelte';
 import * as Curtain from 'components/curtain';
 import { setShieldParams } from 'payment/validator';
 import * as P13n from 'checkoutframe/personalization';
@@ -162,6 +163,7 @@ export default {
   PayoutAccount,
 
   otpView,
+  languageSelectionView,
   PayLaterView,
   Curtain,
   commonBanks,
