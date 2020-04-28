@@ -1,11 +1,11 @@
 import * as Bridge from 'bridge';
-import Razorpay from 'common/Razorpay';
+import Razorpay, { makePrefParams, validateOverrides } from 'common/Razorpay';
 import Analytics from 'analytics';
 import * as SessionManager from 'sessionmanager';
-import { makePrefParams } from 'common/Razorpay';
 import Track from 'tracker';
 import { processNativeMessage } from 'checkoutstore/native';
 import { isEMandateEnabled, getEnabledMethods } from 'checkoutstore/methods';
+import showTimer from 'checkoutframe/timer';
 
 import {
   UPI_POLL_URL,
@@ -56,7 +56,7 @@ const setAnalyticsMeta = message => {
   if (message.metadata && message.metadata.openedAt) {
     Analytics.setMeta(
       'timeSince.open',
-      () => Date.now() - message.metadata.openedAt
+      () => _.now() - message.metadata.openedAt
     );
   }
 
@@ -149,29 +149,7 @@ export const handleMessage = function(message) {
   }
 
   if (message.event === 'open' || options) {
-    /* always fetch preferences, disregard backend printed one. */
-    session.fetchPrefs(({ preferences, validation }) => {
-      const { error } = validation;
-
-      if (error) {
-        return Razorpay.sendMessage({
-          event: 'fault',
-          data: error,
-        });
-      } else {
-        var qpmap = _.getQueryParams() |> _Obj.unflatten;
-        var methods = getEnabledMethods();
-        if (!methods.length) {
-          var message = 'No appropriate payment method found.';
-          if (isEMandateEnabled() && !options.customer_id) {
-            message += '\nMake sure to pass customer_id for e-mandate payments';
-          }
-          return Razorpay.sendMessage({ event: 'fault', data: message });
-        }
-        session.render();
-        session.showModal(preferences);
-      }
-    });
+    fetchPrefs(session);
   }
 
   try {
@@ -181,6 +159,118 @@ export const handleMessage = function(message) {
     }
   } catch (e) {}
 };
+
+function fetchPrefs(session) {
+  if (session.isOpen) {
+    return;
+  }
+  session.isOpen = true;
+
+  /* Start listening for back presses */
+  Bridge.setHistoryAndListenForBackPresses();
+
+  let closeAt;
+  const timeout = session.r.get('timeout');
+  if (timeout) {
+    closeAt = _.now() + timeout * 1000;
+  }
+
+  session.prefCall = Razorpay.payment.getPrefs(
+    getPreferenecsParams(session.r),
+    preferences => {
+      session.prefCall = null;
+      if (preferences.error) {
+        Razorpay.sendMessage({
+          event: 'fault',
+          data: preferences.error,
+        });
+      } else {
+        setSessionPreferences(session, preferences);
+        if (closeAt) {
+          session.timer = showTimer(closeAt, () => {
+            session.dismissReason = 'timeout';
+            session.modal.hide();
+          });
+        }
+      }
+    }
+  );
+}
+
+function setSessionPreferences(session, preferences) {
+  const razorpayInstance = session.r;
+  const order = preferences.order;
+
+  if (
+    order &&
+    order.bank &&
+    order.method === 'netbanking' &&
+    razorpayInstance.get('callback_url')
+  ) {
+    redirectForTPV(razorpayInstance, preferences);
+  } else {
+    session.setPreferences(preferences);
+
+    // session.setPreferences updates razorpay options.
+    // validate options now
+    try {
+      validateOverrides(razorpayInstance);
+    } catch (e) {
+      return Razorpay.sendMessage({
+        event: 'fault',
+        data: e.message,
+      });
+    }
+
+    /* pass preferences options to SDK */
+    Bridge.checkout.callAndroid(
+      'setMerchantOptions',
+      JSON.stringify(preferences.options)
+    );
+
+    const qpmap = _.getQueryParams() |> _Obj.unflatten;
+    const methods = getEnabledMethods();
+    if (!methods.length) {
+      var message = 'No appropriate payment method found.';
+      if (isEMandateEnabled() && !razorpayInstance.get('customer_id')) {
+        message += '\nMake sure to pass customer_id for e-mandate payments';
+      }
+      return Razorpay.sendMessage({ event: 'fault', data: message });
+    }
+    session.render();
+    session.showModal(preferences);
+  }
+}
+
+function redirectForTPV(razorpayInstance, preferences) {
+  razorpayInstance.set('redirect', true);
+
+  var paymentPayload = {
+    amount: razorpayInstance.get('amount'),
+    bank: preferences.order.bank,
+    contact: razorpayInstance.get('prefill.contact') || '9999999999',
+    email: razorpayInstance.get('prefill.email') || 'void@razorpay.com',
+    method: 'netbanking',
+  };
+
+  razorpayInstance.createPayment(paymentPayload, {
+    fee: preferences.fee_bearer,
+  });
+}
+
+function getPreferenecsParams(razorpayInstance) {
+  const prefData = makePrefParams(razorpayInstance);
+  if (cookieDisabled) {
+    prefData.checkcookie = 0;
+  } else {
+    /* set test cookie
+     * if it is not reflected at backend while fetching prefs, disable
+     * cardsaving */
+    prefData.checkcookie = 1;
+    document.cookie = 'checkcookie=1;path=/';
+  }
+  return prefData;
+}
 
 /* expose handleMessage to window for our Mobile SDKs */
 window.handleMessage = handleMessage;

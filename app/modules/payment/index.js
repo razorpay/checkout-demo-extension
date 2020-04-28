@@ -25,7 +25,12 @@ import * as GPay from 'gpay';
 import Analytics from 'analytics';
 import { isProviderHeadless } from 'common/cardlessemi';
 import { updateCurrencies, setCurrenciesRate } from 'common/currency';
-import { getCardEntityFromPayload, getIin, isIinValid } from 'common/card';
+import {
+  getCardEntityFromPayload,
+  getIin,
+  isIinValid,
+  updateCardIINMetadata,
+} from 'common/card';
 
 /**
  * Tells if we're being executed from
@@ -965,6 +970,9 @@ function getCardFeatures(cardNumber) {
 
         // Store in cache
         CardFeatureCache.iin[iin] = features;
+
+        // Update card metadata
+        updateCardIINMetadata(iin, features);
 
         // Resolve
         resolve(features);

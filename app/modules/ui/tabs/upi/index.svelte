@@ -120,6 +120,9 @@
     availableFlows = getAvailableFlowsFromInstrument($methodTabInstrument);
   }
 
+  // Set default token value when the available flows change
+  $: availableFlows, setDefaultTokenValue();
+
   /**
    * An instrument might has only for some apps to be shown
    * @param {Instrument | undefined} instrument
@@ -182,36 +185,36 @@
   $: shouldShowCollect = availableFlows.collect;
   $: shouldShowOmnichannel = availableFlows.omnichannel;
 
-  $: {
+  // Determine CTA visilibty when selectedToken changes, but only if session.tab is 'upi'
+  $: selectedToken, session.tab === 'upi' && determineCtaVisibility();
+
+  function setDefaultTokenValue() {
+    const hasIntentFlow = availableFlows.intent || useWebPaymentsApi;
+    const hasTokens = tokens && tokens.length;
+
     /**
      * If there are no tokens, select "new" as the default option.
      * But only do that if intent flow is not available.
      */
-    if (!tokens.length && !intent) {
-      selectedToken = 'new';
-    }
-  }
-
-  $: {
-    if (selectedToken && session.tab === 'upi') {
-      determineCtaVisibility();
+    if (hasIntentFlow) {
+      selectedToken = null;
+    } else if (availableFlows.collect) {
+      if (hasTokens) {
+        selectedToken = null;
+      } else {
+        selectedToken = 'new';
+      }
     }
   }
 
   $: {
     tokens = filterUPITokens(_Obj.getSafely($customer, 'tokens.items', []));
+    setDefaultTokenValue();
   }
 
   function setWebPaymentsApiUsage(to) {
     useWebPaymentsApi = to;
-
-    /**
-     * If web payments API is available,
-     * do not select Add New VPA by default
-     */
-    if (to) {
-      selectedToken = null;
-    }
+    setDefaultTokenValue();
   }
 
   function determineCtaVisibility() {
@@ -258,6 +261,7 @@
   }
 
   export function onShown() {
+    setDefaultTokenValue();
     determineCtaVisibility();
   }
 
@@ -309,6 +313,15 @@
           _Obj.getSafely(session.getCurrentCustomer(), 'tokens.items', []),
           token => token.id === selectedToken
         );
+
+        Analytics.track('upi:token:switch:default', {
+          data: {
+            selectedToken,
+            _token,
+          },
+          immediately: true,
+        });
+
         data = { token: _token.token };
         break;
     }

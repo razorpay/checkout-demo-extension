@@ -1,9 +1,4 @@
 import 'entry/checkout-frame';
-import {
-  makeAuthUrl,
-  makePrefParams,
-  validateOverrides,
-} from 'common/Razorpay';
 import RazorpayConfig from 'common/RazorpayConfig';
 
 import Track from 'tracker';
@@ -30,6 +25,7 @@ import { setShieldParams } from 'payment/validator';
 import * as P13n from 'checkoutframe/personalization';
 import { commonBanks, getFullBankLogo } from 'common/bank';
 import * as CountryCodesUtil from 'common/countrycodesutil';
+import { init as initI18n } from 'i18n';
 
 /* Required for merchant.js migration */
 import * as Constants from 'common/constants';
@@ -74,6 +70,8 @@ import WalletTab from 'ui/tabs/wallets/index.svelte';
 import PayoutsInstruments from 'ui/tabs/payout/payout-instruments.svelte';
 import PayoutAccount from 'ui/tabs/payout/payout-account.svelte';
 
+import showTimer from 'checkoutframe/timer';
+
 import * as Hacks from 'checkoutframe/hacks';
 
 import { get as storeGetter } from 'svelte/store';
@@ -86,9 +84,6 @@ import * as Instruments from 'configurability/instruments';
 
 export default {
   RazorpayConfig,
-  makeAuthUrl,
-  validateOverrides,
-  makePrefParams,
   fetch,
   Track,
   Analytics,
@@ -111,6 +106,8 @@ export default {
   wrongOtpMsg: strings.wrongOtp,
 
   initIframe,
+
+  showTimer,
 
   Constants,
   Bank,
@@ -186,4 +183,6 @@ export default {
 
   NBHandlers,
   UserHandlers,
+
+  initI18n,
 };

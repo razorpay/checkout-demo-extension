@@ -7,6 +7,7 @@
   export let disabled = false;
   export let id;
   export let defaultStyles = true;
+  export let attributes = {};
 
   $: {
     disabled = disabled ? true : undefined;
@@ -47,8 +48,8 @@
   role="listitem"
   {disabled}
   {id}
-  on:click
-  {...$$restProps}>
+  {...attributes}
+  on:click>
   <Stack horizontal>
     <slot name="icon" />
     <div>

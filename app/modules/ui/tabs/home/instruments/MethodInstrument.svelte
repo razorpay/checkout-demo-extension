@@ -77,7 +77,7 @@
   value={instrument.id}
   radio={false}
   className="instrument"
-  data-type="method"
+  attributes={{ 'data-type': 'method' }}
   on:click
   on:click={deselectInstrument}
   on:click={setMethodInstrument}

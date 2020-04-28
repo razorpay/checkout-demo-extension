@@ -118,7 +118,7 @@
   defaultStyles={false}
   on:click={select}
   disabled={down}
-  {method}>
+  attributes={{ method }}>
   <i slot="icon">
     <Icon icon={_icon} />
   </i>

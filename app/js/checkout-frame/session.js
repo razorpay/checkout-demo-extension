@@ -2,7 +2,7 @@ var RAZORPAY_HOVER_COLOR = '#626A74';
 
 var ua = navigator.userAgent;
 
-var preferences = window.preferences,
+var preferences,
   CheckoutBridge = window.CheckoutBridge,
   StorageBridge = window.StorageBridge,
   isIframe = window !== parent,
@@ -13,11 +13,9 @@ var preferences = window.preferences,
   contactPattern = Constants.CONTACT_REGEX,
   emailPattern = Constants.EMAIL_REGEX,
   isMobile = discreet.UserAgent.isMobile,
-  cookieDisabled = !navigator.cookieEnabled,
   getCustomer = discreet.getCustomer,
   Customer = discreet.Customer,
   Constants = discreet.Constants,
-  OfferType = Constants.OfferType,
   sanitizeTokens = discreet.sanitizeTokens,
   Store = discreet.Store,
   MethodStore = discreet.MethodStore,
@@ -46,8 +44,7 @@ var preferences = window.preferences,
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
-var shouldFixFixed = /iPhone/.test(ua);
-var ua_iPhone = shouldFixFixed;
+var ua_iPhone = /iPhone/.test(ua);
 var isIE = /MSIE |Trident\//.test(ua);
 var DEMO_MERCHANT_KEY = 'rzp_live_ILgsfZCZoFIKMb';
 
@@ -718,18 +715,20 @@ function askOTP(view, text, shouldLimitResend, screenProps) {
           }
 
           if (!thisSession.get('timeout')) {
-            thisSession.closeAt = now() + 3 * 60 * 1000;
-            thisSession.showTimer(function() {
-              thisSession.hideTimer();
-              thisSession.back(true);
-              setTimeout(function() {
-                Analytics.track('native_otp:timeout');
-                thisSession.showLoadError(
-                  'Payment was not completed on time',
-                  1
-                );
-              }, 300);
-            });
+            thisSession.timer = discreet.showTimer(
+              now() + 3 * 60 * 1000,
+              function() {
+                thisSession.hideTimer();
+                thisSession.back(true);
+                setTimeout(function() {
+                  Analytics.track('native_otp:timeout');
+                  thisSession.showLoadError(
+                    'Payment was not completed on time',
+                    1
+                  );
+                }, 300);
+              }
+            );
           }
         }
       } else {
@@ -915,10 +914,6 @@ Session.prototype = {
 
     if (!getter('image')) {
       classes.push('noimage');
-    }
-
-    if (shouldFixFixed) {
-      classes.push('ip');
     }
 
     if (MethodStore.isEMandateEnabled()) {
@@ -1177,6 +1172,7 @@ Session.prototype = {
 
     this.isOpen = true;
 
+    discreet.initI18n();
     this.setExperiments();
     this.setTpvBanks();
     this.getEl();
@@ -1200,13 +1196,6 @@ Session.prototype = {
 
     if (!this.tab && !this.get('prefill.contact')) {
       $('#contact').focus();
-    }
-
-    if (this.closeAt) {
-      this.showTimer(function() {
-        that.dismissReason = 'timeout';
-        that.modal.hide();
-      });
     }
 
     // Look for new UPI apps.
@@ -1361,24 +1350,14 @@ Session.prototype = {
     gel('form-fields').appendChild(gel('bottom'));
   },
 
-  showTimer: function(cb) {
-    this.hideTimer();
-    var timeLeft = this.closeAt - now();
-    var timeoutEl = $('#timeout').show()[0];
-    var timerFn = updateTimer(timeoutEl, this.closeAt);
-    timerFn();
-    var self = this;
-    this.closeTimer = setInterval(timerFn, 1000);
-    this.closeTimeout = setTimeout(function() {
-      clearInterval(self.closeTimer);
-      cb();
-    }, timeLeft);
-  },
-
+  // this does not apply if options.timeout was passed
+  // because in that case timer needn't be hidden while checkout is open
+  // applied only for localized timers e.g headless OTP timer
   hideTimer: function() {
-    $('#timeout').hide();
-    clearInterval(this.closeTimer);
-    clearTimeout(this.closeTimeout);
+    if (!this.get('timeout') && this.timer) {
+      this.timer.$destroy();
+      this.timer = null;
+    }
   },
 
   setTpvBanks: function() {
@@ -2220,9 +2199,7 @@ Session.prototype = {
 
     if (this.headless) {
       this.showLoadError('Resending OTP');
-      if (!this.get('timeout')) {
-        this.hideTimer();
-      }
+      this.hideTimer();
 
       if (this.headlessMetadata) {
         var metadata = this.headlessMetadata;
@@ -2253,13 +2230,11 @@ Session.prototype = {
 
   secAction: function() {
     if (this.headless && this.r._payment) {
-      if (!this.get('timeout')) {
-        Analytics.track('native_otp:gotobank', {
-          type: AnalyticsTypes.BEHAV,
-          immediately: true,
-        });
-        this.hideTimer();
-      }
+      Analytics.track('native_otp:gotobank', {
+        type: AnalyticsTypes.BEHAV,
+        immediately: true,
+      });
+      this.hideTimer();
       this.showLoadError('Waiting for payment to complete on bank page');
       return this.r._payment.gotoBank();
     }
@@ -3212,23 +3187,6 @@ Session.prototype = {
   },
 
   /**
-   * Do things to offers when an EMI plan is selected.
-   *
-   * @param {Object} plan
-   */
-  processOffersOnEmiPlanSelection: function(plan) {
-    if (!plan || !plan.offer_id) {
-      if (
-        this.offers &&
-        this.offers.appliedOffer &&
-        this.offers.appliedOffer.emi_subvention
-      ) {
-        this.offers.clearOffer();
-      }
-    }
-  },
-
-  /**
    * Returns a closure to handle showing of EMI plans screen.
    *
    * @param {String} type
@@ -3290,8 +3248,6 @@ Session.prototype = {
               self.switchTab('card');
               self.setScreen('card');
               self.svelteCardTab.showAddCardView();
-
-              self.processOffersOnEmiPlanSelection();
             },
 
             select: function(value) {
@@ -3311,8 +3267,6 @@ Session.prototype = {
 
               self.switchTab('emi');
               self.svelteCardTab.showAddCardView();
-
-              self.processOffersOnEmiPlanSelection(plan);
 
               self.preSubmit();
             },
@@ -3947,10 +3901,7 @@ Session.prototype = {
   },
 
   clearRequest: function(extra) {
-    if (!this.get('timeout') && this.closeAt) {
-      this.hideTimer();
-      this.closeAt = null;
-    }
+    this.hideTimer();
     var powerotp = gel('powerotp');
     if (powerotp) {
       powerotp.value = '';
@@ -4971,6 +4922,7 @@ Session.prototype = {
       'svelteCardTab',
       'svelteWalletsTab',
       'upiTab',
+      'timer',
     ];
 
     var session = this;
@@ -5007,7 +4959,6 @@ Session.prototype = {
 
       var cancelReason = this.getCancelReason();
 
-      this.hideTimer();
       abortAjax(this.ajax);
       this.clearRequest(cancelReason);
       this.isOpen = false;
@@ -5337,42 +5288,6 @@ Session.prototype = {
       this.r.set('order_id', prefs.invoice.order_id);
     }
 
-    /*
-     * Set redirect mode if TPV and callback_url exists
-     *
-     * TODO: move this to payment
-     */
-    if (
-      order &&
-      order.bank &&
-      this.get('callback_url') &&
-      order.method !== 'upi' &&
-      order.method !== 'emandate' // Should these just be a check for order.method=netbanking?
-    ) {
-      session_options.redirect = true;
-      this.tpvRedirect = true;
-
-      var paymentPayload = {
-        amount: session_options.amount,
-        bank: order.bank,
-        contact: this.get('prefill.contact') || '9999999999',
-        email: this.get('prefill.email') || 'void@razorpay.com',
-        method: 'netbanking',
-      };
-
-      return this.r.createPayment(paymentPayload, {
-        fee: preferences.fee_bearer,
-      });
-    }
-
-    try {
-      discreet.validateOverrides(this);
-    } catch (e) {
-      return {
-        error: e.message,
-      };
-    }
-
     // Set optional fields in meta
     Analytics.setMeta(
       'optional.contact',
@@ -5382,8 +5297,6 @@ Session.prototype = {
       'optional.email',
       _Arr.contains(preferences.optional || [], 'email')
     );
-
-    return {};
   },
 
   showModal: function(preferences) {
@@ -5413,84 +5326,12 @@ Session.prototype = {
     }
   },
 
-  fetchPrefs: function(callback) {
-    var prefData = makePrefParams(this);
-    var self = this;
-
-    if (cookieDisabled) {
-      prefData.checkcookie = 0;
-    } else {
-      /* set test cookie
-       * if it is not reflected at backend while fetching prefs, disable
-       * cardsaving */
-      prefData.checkcookie = 1;
-      document.cookie = 'checkcookie=1;path=/';
-    }
-
-    if (this.isOpen) {
-      return;
-    }
-
-    this.isOpen = true;
-
-    var timeout = this.get('timeout');
-    if (timeout) {
-      this.closeAt = now() + timeout * 1000;
-    }
-
-    this.prefCall = Razorpay.payment.getPrefs(prefData, function(response) {
-      self.prefCall = null;
-      if (response.error) {
-        return Razorpay.sendMessage({
-          event: 'fault',
-          data: response.error,
-        });
-      }
-
-      var preferences = response;
-
-      var validation = self.setPreferences(preferences);
-
-      /* pass preferences options to SDK */
-      Bridge.checkout.callAndroid(
-        'setMerchantOptions',
-        JSON.stringify(preferences.options)
-      );
-
-      if (self.tpvRedirect) {
-        return;
-      }
-
-      callback({
-        preferences: preferences,
-        validation: validation,
-      });
-    });
-
-    /* Start listening for back presses */
-    discreet.Bridge.setHistoryAndListenForBackPresses();
-
-    return this.prefCall;
-  },
-
   fetchFundAccounts: function() {
     return Payouts.fetchFundAccounts(this.get('contact_id'));
   },
 
   hideOverlayMessage: hideOverlayMessage,
 };
-
-function updateTimer(timeoutEl, closeAt) {
-  return function() {
-    var timeLeft = Math.floor((closeAt - now()) / 1000);
-    timeoutEl.innerHTML =
-      '<i>&#x2139;</i>This page will timeout in ' +
-      Math.floor(timeLeft / 60) +
-      ':' +
-      ('0' + (timeLeft % 60)).slice(-2) +
-      ' minutes';
-  };
-}
 
 /*
  * Call initIframe() after the session class is defined.

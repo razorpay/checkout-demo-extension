@@ -13,6 +13,10 @@
 
   // Store imports
   import { methodTabInstrument } from 'checkoutstore/screens/home';
+  import { _ } from 'svelte-i18n';
+
+  // i18n labels
+  import { NETBANKING_SELECT_LABEL, NETBANKING_SELECT_HELP } from 'ui/labels';
 
   // Utils imports
   import Razorpay from 'common/Razorpay';
@@ -217,18 +221,17 @@
       <div class="elem-wrap pad">
         <div id="nb-elem" class="elem select" class:invalid>
           <i class="select-arrow"></i>
-          <div class="help">Please select a bank</div>
+          <div class="help">{$_(NETBANKING_SELECT_HELP)}</div>
           <select
             id="bank-select"
             name="bank"
             required
             class="input no-refresh no-validate no-focus no-blur"
-            pattern="[\w]+"
             bind:value={selectedBankCode}
             use:focus
             use:blur
             use:input>
-            <option value="">Select a different Bank</option>
+            <option value="">{$_(NETBANKING_SELECT_LABEL)}</option>
             {#each banksArr as bank}
               <option value={bank.code}>{bank.name}</option>
             {/each}
