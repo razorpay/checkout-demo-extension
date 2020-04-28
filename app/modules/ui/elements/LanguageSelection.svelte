@@ -10,9 +10,6 @@
 </style>
 
 <div class="elem select">
-  {#if $isLoading}
-    <p>Loading...</p>
-  {/if}
   <i class="select-arrow"></i>
   <select bind:value={$locale} class="input">
     {#each $locales as locale}
