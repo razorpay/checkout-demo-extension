@@ -10,7 +10,7 @@
     "globalThis": true
   },
   "proto": true,
-  
+
   "-W001": true,
   "-W007": true,
   "-W014": true,
