@@ -1,4 +1,5 @@
 /* eslint-disable no-extend-native */
+/* global Set */
 
 /**
  * Polyfill for String.prototype.includes
