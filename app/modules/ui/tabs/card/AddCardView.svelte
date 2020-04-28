@@ -9,7 +9,7 @@
   import NameField from 'ui/elements/fields/card/NameField.svelte';
 
   // Svelte imports
-  import { createEventDispatcher, tick } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
 
   // Store
   import {
@@ -150,7 +150,7 @@
 
   /**
    * Validate the card number.
-   * @return {Boolean}
+   * @return {Promise<boolean>}
    */
   function validateCardNumber() {
     const cardNumberWithoutSpaces = getCardDigits($cardNumber);
