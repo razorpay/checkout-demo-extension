@@ -190,18 +190,13 @@ function getConfigFromOptions() {
     return null;
   }
 
-  let config = {};
-
   /**
    * Only certain keys are allowed to be passed from options
    * For example, restrictions aren't allowed
    */
-
-  const display = getOption('config.display');
-
-  if (display) {
-    config.display = display;
-  }
+  const config = {
+    display: getOption('config.display'),
+  };
 
   return config;
 }
@@ -210,29 +205,57 @@ export function getMerchantConfig() {
   const configFromOptions = getConfigFromOptions();
   const configFromPreferences = getCheckoutConfig();
 
-  let config = null;
-  let source;
+  const displayFromOptions = _Obj.getSafely(configFromOptions, 'display');
+  const displayFromPreferences = _Obj.getSafely(
+    configFromPreferences,
+    'display'
+  );
 
-  if (_.isNull(configFromOptions)) {
-    // Setting config as null allows you to disable the configuration
-    source = 'options';
-    config = null;
-  } else if (_.isNull(configFromPreferences)) {
-    source = 'preferences';
-    config = null;
-  } else if (
-    _.isNonNullObject(configFromPreferences) &&
-    !_.isEmptyObject(configFromPreferences)
-  ) {
-    source = 'preferences';
-    config = configFromPreferences;
+  const restrictions = {
+    config: _Obj.getSafely(configFromPreferences, 'restrictions'),
+    source: 'preferences',
+  };
+
+  let display = {};
+
+  if (_.isNull(displayFromOptions)) {
+    // Setting config.display as null allows you to disable the display configuration
+    display = {
+      config: null,
+      source: 'options',
+    };
   } else {
-    source = 'options';
-    config = configFromOptions;
+    if (
+      !_.isUndefined(displayFromOptions) &&
+      _.isNonNullObject(displayFromOptions) &&
+      !_.isEmptyObject(displayFromOptions)
+    ) {
+      display = {
+        config: displayFromOptions,
+        source: 'options',
+      };
+    } else if (!_.isUndefined(displayFromPreferences)) {
+      display = {
+        config: displayFromPreferences,
+        source: 'preferences',
+      };
+    }
   }
 
   return {
-    config,
-    source,
+    config: {
+      display: display.config,
+      restrictions: restrictions.config,
+    },
+
+    sources: {
+      display: display.source,
+      restrictions: restrictions.source,
+    },
+
+    _raw: {
+      options: configFromOptions,
+      preferences: configFromPreferences,
+    },
   };
 }
