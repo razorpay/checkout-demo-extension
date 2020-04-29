@@ -6,21 +6,21 @@ const prefix = cdnUrl + 'wallet/';
 const sqPrefix = cdnUrl + 'wallet-sq/';
 
 const list = {
-  amazonpay: ['Amazon Pay', 28],
-  paytm: ['Paytm', 18],
-  zeta: ['Zeta', 25],
-  freecharge: ['Freecharge', 18],
+  // mpesa: ['Vodafone mPesa', 50],
   airtelmoney: ['Airtel Money', 32],
+  amazonpay: ['Amazon Pay', 28],
+  citrus: ['Citrus Wallet', 32],
+  freecharge: ['Freecharge', 18],
   jiomoney: ['JioMoney', 68],
-  olamoney: ['Ola Money (Postpaid + Wallet)', 22],
   mobikwik: ['Mobikwik', 20],
+  olamoney: ['Ola Money (Postpaid + Wallet)', 22],
+  paypal: ['PayPal', 20],
+  paytm: ['Paytm', 18],
   payumoney: ['PayUMoney', 18],
   payzapp: ['PayZapp', 24],
-  citrus: ['Citrus Wallet', 32],
-  // mpesa: ['Vodafone mPesa', 50],
-  sbibuddy: ['SBI Buddy', 22],
   phonepe: ['PhonePe', 20],
-  paypal: ['PayPal', 20],
+  sbibuddy: ['SBI Buddy', 22],
+  zeta: ['Zeta', 25],
 };
 
 const otpLengths = {
