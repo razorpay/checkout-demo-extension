@@ -103,7 +103,7 @@ const config = {
                 token_id,
                 type: token.card.type,
                 issuer: token.card.issuer,
-                network: toLowerCaseSafe(token.card.network),
+                network: token.card.network,
               },
               base
             );

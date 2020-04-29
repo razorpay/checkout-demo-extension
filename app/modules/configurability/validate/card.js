@@ -1,6 +1,6 @@
 import {
   getIin,
-  findCodeByNetworkName,
+  networks as CardNetworks,
   getNetworkFromCardNumber,
 } from 'common/card';
 import { getCardFeatures } from 'checkoutstore';
@@ -35,9 +35,14 @@ export function validateCardInstrument(
 
     // Network is sometimes fucked up
     if (features.network) {
-      network = findCodeByNetworkName(features.network);
+      network = features.network;
     } else if (cardNumberFromPayment) {
       network = getNetworkFromCardNumber(cardNumberFromPayment);
+
+      if (network) {
+        // Translate mastercard to MasterCard
+        network = CardNetworks[network];
+      }
     }
 
     // IIN doesn't exist on saved cards

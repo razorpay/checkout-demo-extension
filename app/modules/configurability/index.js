@@ -19,7 +19,7 @@ import {
 
 import { shouldSeparateDebitCard, getMerchantMethods } from 'checkoutstore';
 import wallet from 'ui/icons/payment-methods/wallet';
-import { API_NETWORK_CODES_MAP } from 'common/card';
+import { API_NETWORK_CODES_MAP, networks as CardNetworks } from 'common/card';
 
 /**
  * Returns the available methods
@@ -72,7 +72,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
 
         _Obj.loop(getCardNetworks(), (val, key) => {
           if (val) {
-            availableNetworks.push(API_NETWORK_CODES_MAP[key]);
+            availableNetworks.push(CardNetworks[API_NETWORK_CODES_MAP[key]]);
           }
         });
 
