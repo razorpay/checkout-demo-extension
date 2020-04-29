@@ -2747,7 +2747,11 @@ Session.prototype = {
    */
   handleDiscount: function() {
     var offer = this.getAppliedOffer();
-    var hasDiscount = offer && offer.amount !== offer.original_amount;
+    var hasDiscount =
+      offer &&
+      offer.amount !== offer.original_amount &&
+      this.offers &&
+      this.offers.isCardApplicable();
     $('#content').toggleClass('has-discount', hasDiscount);
     $('#amount .discount').html(
       hasDiscount ? this.formatAmountWithCurrency(offer.amount) : ''
@@ -5050,8 +5054,8 @@ Session.prototype = {
               if (offer && shouldNavigate) {
                 session.handleOfferSelection(offer);
               }
-              session.handleDiscount();
             }
+            session.handleDiscount();
           },
           onShown: function() {
             Analytics.track(
