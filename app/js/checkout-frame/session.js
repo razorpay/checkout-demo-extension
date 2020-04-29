@@ -3325,8 +3325,6 @@ Session.prototype = {
               self.switchTab('card');
               self.setScreen('card');
               self.svelteCardTab.showSavedCardsView();
-
-              self.processOffersOnEmiPlanSelection();
             },
 
             select: function(value) {
@@ -3346,8 +3344,6 @@ Session.prototype = {
               self.switchTab('emi');
               self.setScreen('card');
               self.svelteCardTab.showSavedCardsView();
-
-              self.processOffersOnEmiPlanSelection(plan);
 
               if (savedCvv) {
                 self.preSubmit();
