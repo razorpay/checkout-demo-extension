@@ -23,6 +23,47 @@ const list = {
   zeta: ['Zeta', 25],
 };
 
+/**
+ * Order to sort the wallets in
+ */
+const WALLET_SORT_ORDER = [
+  'phonepe',
+  'amazonpay',
+  'mobikwik',
+  'freecharge',
+  'airtelmoney',
+  'olamoney',
+  'jiomoney',
+  'paytm',
+  'paypal',
+];
+
+/**
+ * Returns a sorted list of wallets
+ * @param {Array<Wallet>} wallet
+ *
+ * @returns {Array<Wallet>}
+ */
+export function getSortedWallets(wallets) {
+  return _Arr.sort(wallets, (a, b) => {
+    const containsA = _Arr.contains(WALLET_SORT_ORDER, a.code);
+    const containsB = _Arr.contains(WALLET_SORT_ORDER, b.code);
+
+    const indexA = _Arr.indexOf(WALLET_SORT_ORDER, a.code);
+    const indexB = _Arr.indexOf(WALLET_SORT_ORDER, b.code);
+
+    if (containsA && containsB) {
+      return indexA - indexB;
+    } else if (containsA) {
+      return -1;
+    } else if (containsB) {
+      return 1;
+    } else {
+      return 0;
+    }
+  });
+}
+
 const otpLengths = {
   freecharge: 4,
 };
