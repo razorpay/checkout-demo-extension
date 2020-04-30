@@ -240,6 +240,17 @@
         setCardNumberValidity(
           isCardNumberValid && isFlowValid && isInstrumentValid
         );
+
+        // Track validity if instrument was used
+        if ($methodTabInstrument) {
+          Analytics.track('instrument:input:validate', {
+            data: {
+              method: $methodTabInstrument.method,
+              instrument: $methodTabInstrument,
+              valid: isInstrumentValid,
+            },
+          });
+        }
       })
       .catch(_Func.noop); // IIN changed, do nothing
   }
