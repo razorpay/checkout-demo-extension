@@ -234,6 +234,10 @@ RazorProto.postInit = function() {
   this.modal = { options: {} };
 
   if (this.get('parent')) {
+    if (!preloadedFrame) {
+      preloadedFrame = getPreloadedFrame(this);
+    }
+
     this.open();
   }
 };
@@ -308,7 +312,7 @@ var initRazorpayCheckout = needBody(function() {
    * More details:
    * https://docs.google.com/document/d/1DSqQ2w70pepJFsf2roQmvRrWaYFaWOLinwcIonfoWQI/edit?usp=sharing
    */
-  if (!Safari) {
+  if (!Safari && !preloadedFrame) {
     preloadedFrame = getPreloadedFrame();
   }
 
