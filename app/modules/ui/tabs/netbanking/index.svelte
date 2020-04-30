@@ -221,6 +221,7 @@
       <div class="elem-wrap pad">
         <div id="nb-elem" class="elem select" class:invalid>
           <i class="select-arrow"></i>
+          <!-- LABEL: Please select a bank -->
           <div class="help">{$_(NETBANKING_SELECT_HELP)}</div>
           <select
             id="bank-select"
@@ -231,6 +232,7 @@
             use:focus
             use:blur
             use:input>
+            <!-- LABEL: Select a different bank -->
             <option value="">{$_(NETBANKING_SELECT_LABEL)}</option>
             {#each banksArr as bank}
               <option value={bank.code}>{bank.name}</option>
