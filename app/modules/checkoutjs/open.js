@@ -308,9 +308,9 @@ var initRazorpayCheckout = needBody(function() {
    * More details:
    * https://docs.google.com/document/d/1DSqQ2w70pepJFsf2roQmvRrWaYFaWOLinwcIonfoWQI/edit?usp=sharing
    */
-  if (!Safari) {
-    preloadedFrame = getPreloadedFrame();
-  }
+  // if (!Safari) {
+  preloadedFrame = getPreloadedFrame();
+  // }
 
   // Get the ball rolling in case we are in manual mode
   try {
