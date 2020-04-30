@@ -211,6 +211,7 @@ export function getMerchantConfig() {
     'display'
   );
 
+  // Restrictions can only come from preferences
   const restrictions = {
     config: _Obj.getSafely(configFromPreferences, 'restrictions'),
     source: 'preferences',
