@@ -1172,7 +1172,6 @@ Session.prototype = {
 
     this.isOpen = true;
 
-    discreet.initI18n();
     this.setExperiments();
     this.setTpvBanks();
     this.getEl();
@@ -2747,7 +2746,11 @@ Session.prototype = {
    */
   handleDiscount: function() {
     var offer = this.getAppliedOffer();
-    var hasDiscount = offer && offer.amount !== offer.original_amount;
+    var hasDiscount =
+      offer &&
+      offer.amount !== offer.original_amount &&
+      this.offers &&
+      this.offers.isCardApplicable();
     $('#content').toggleClass('has-discount', hasDiscount);
     $('#amount .discount').html(
       hasDiscount ? this.formatAmountWithCurrency(offer.amount) : ''
@@ -3321,8 +3324,6 @@ Session.prototype = {
               self.switchTab('card');
               self.setScreen('card');
               self.svelteCardTab.showSavedCardsView();
-
-              self.processOffersOnEmiPlanSelection();
             },
 
             select: function(value) {
@@ -3342,8 +3343,6 @@ Session.prototype = {
               self.switchTab('emi');
               self.setScreen('card');
               self.svelteCardTab.showSavedCardsView();
-
-              self.processOffersOnEmiPlanSelection(plan);
 
               if (savedCvv) {
                 self.preSubmit();
@@ -5050,8 +5049,8 @@ Session.prototype = {
               if (offer && shouldNavigate) {
                 session.handleOfferSelection(offer);
               }
-              session.handleDiscount();
             }
+            session.handleDiscount();
           },
           onShown: function() {
             Analytics.track(
