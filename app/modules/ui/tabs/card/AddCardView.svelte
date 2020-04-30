@@ -150,7 +150,7 @@
 
   /**
    * Validate the card number.
-   * @return {Promise<boolean>}
+   * @return {boolean}
    */
   function validateCardNumber() {
     const cardNumberWithoutSpaces = getCardDigits($cardNumber);
@@ -164,7 +164,7 @@
       isValid = false;
     }
 
-    return Promise.resolve(isValid);
+    return isValid;
   }
 
   /**
@@ -178,6 +178,8 @@
 
     if (iin.length < 6) {
       setDebitPinRadiosVisibility(false);
+      setCardNumberValidity(validateCardNumber());
+
       return;
     }
 
