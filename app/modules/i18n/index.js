@@ -6,7 +6,6 @@ import {
 } from 'svelte-i18n';
 
 import en from './bundles/en';
-import en2 from './bundles/en2';
 
 import { getSession } from 'sessionmanager';
 
