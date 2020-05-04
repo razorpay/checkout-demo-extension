@@ -16,7 +16,7 @@ import { getSession } from 'sessionmanager';
  */
 function makeBundleUrl(locale) {
   // TODO: change URL once finalized
-  return `https://cdn2.razorpay.com/bundles/${locale}.json`;
+  return `https://cdn.razorpay.com/bundles/${locale}.json`;
 }
 
 /**
