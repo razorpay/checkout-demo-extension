@@ -1,8 +1,15 @@
 const bundles = require('../fixtures/bundles');
+const { flatten } = require('../util');
 const { assertTextContent } = require('../tests/homescreen/actions');
 
+function getFlattenedBundle(locale) {
+  const bundle = bundles[locale];
+  return flatten(bundle || {});
+}
+
 async function verifyLabel(context, selector, locale, label) {
-  const expectedText = bundles[locale][label];
+  const bundle = getFlattenedBundle(locale);
+  const expectedText = bundle[label];
   await assertTextContent(context, selector, expectedText);
 }
 
