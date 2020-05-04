@@ -7,6 +7,10 @@
   .select-arrow {
     color: #fff;
   }
+
+  option {
+    color: #363636;
+  }
 </style>
 
 <div class="elem select">
