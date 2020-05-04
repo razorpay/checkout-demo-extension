@@ -6,22 +6,63 @@ const prefix = cdnUrl + 'wallet/';
 const sqPrefix = cdnUrl + 'wallet-sq/';
 
 const list = {
-  amazonpay: ['Amazon Pay', 28],
-  paytm: ['Paytm', 18],
-  zeta: ['Zeta', 25],
-  freecharge: ['Freecharge', 18],
+  // mpesa: ['Vodafone mPesa', 50],
   airtelmoney: ['Airtel Money', 32],
+  amazonpay: ['Amazon Pay', 28],
+  citrus: ['Citrus Wallet', 32],
+  freecharge: ['Freecharge', 18],
   jiomoney: ['JioMoney', 68],
-  olamoney: ['Ola Money (Postpaid + Wallet)', 22],
   mobikwik: ['Mobikwik', 20],
+  olamoney: ['Ola Money (Postpaid + Wallet)', 22],
+  paypal: ['PayPal', 20],
+  paytm: ['Paytm', 18],
   payumoney: ['PayUMoney', 18],
   payzapp: ['PayZapp', 24],
-  citrus: ['Citrus Wallet', 32],
-  // mpesa: ['Vodafone mPesa', 50],
-  sbibuddy: ['SBI Buddy', 22],
   phonepe: ['PhonePe', 20],
-  paypal: ['PayPal', 20],
+  sbibuddy: ['SBI Buddy', 22],
+  zeta: ['Zeta', 25],
 };
+
+/**
+ * Order to sort the wallets in
+ */
+const WALLET_SORT_ORDER = [
+  'phonepe',
+  'amazonpay',
+  'mobikwik',
+  'freecharge',
+  'airtelmoney',
+  'olamoney',
+  'jiomoney',
+  'paytm',
+  'paypal',
+];
+
+/**
+ * Returns a sorted list of wallets
+ * @param {Array<Wallet>} wallet
+ *
+ * @returns {Array<Wallet>}
+ */
+export function getSortedWallets(wallets) {
+  return _Arr.sort(wallets, (a, b) => {
+    const containsA = _Arr.contains(WALLET_SORT_ORDER, a.code);
+    const containsB = _Arr.contains(WALLET_SORT_ORDER, b.code);
+
+    const indexA = _Arr.indexOf(WALLET_SORT_ORDER, a.code);
+    const indexB = _Arr.indexOf(WALLET_SORT_ORDER, b.code);
+
+    if (containsA && containsB) {
+      return indexA - indexB;
+    } else if (containsA) {
+      return -1;
+    } else if (containsB) {
+      return 1;
+    } else {
+      return 0;
+    }
+  });
+}
 
 const otpLengths = {
   freecharge: 4,
