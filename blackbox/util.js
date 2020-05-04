@@ -5,6 +5,7 @@ const querystring = require('querystring');
 const {
   testDir,
   cdnUrl,
+  bundleUrl,
   lumberjackUrl,
   zestMoneyLoanAgreementUrl,
   maxmindScriptUrl,
@@ -186,7 +187,7 @@ const util = (module.exports = {
         !interceptorEnabled ||
         url.endsWith('favicon.ico') ||
         url.startsWith('data') ||
-        url.startsWith(cdnUrl) ||
+        (url.startsWith(cdnUrl) && !url.startsWith(bundleUrl)) || // Bundles are present on CDN, but need to be intercepted.
         url.startsWith(lumberjackUrl) ||
         url.includes(zestMoneyLoanAgreementUrl) ||
         url.includes(maxmindScriptUrl);
