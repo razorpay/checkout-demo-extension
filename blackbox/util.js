@@ -137,7 +137,6 @@ const util = (module.exports = {
   randomRange,
   randomName,
   randomEmail,
-  randomName,
   randomContact: () => '+91' + String(randomRange(8000000000, 9999999999)),
   randomString,
   randomLengthString,
