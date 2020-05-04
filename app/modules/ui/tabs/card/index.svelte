@@ -156,10 +156,7 @@
         : true;
 
       const networkMatches = hasNetworks
-        ? _Arr.contains(
-            networks,
-            token.card.network && token.card.network.toLowerCase()
-          )
+        ? _Arr.contains(networks, token.card.network)
         : true;
 
       const typeMatches = hasTypes

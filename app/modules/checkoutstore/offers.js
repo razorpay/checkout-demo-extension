@@ -2,6 +2,8 @@ import { getBankFromCard } from 'common/bank';
 import { getOrderId, getAmount, makeAuthUrl } from 'checkoutstore';
 import { writable, derived } from 'svelte/store';
 import { cardIin } from 'checkoutstore/screens/card';
+import Analytics from 'analytics';
+import { BEHAV } from 'analytics-types';
 
 export const appliedOffer = writable();
 
@@ -47,6 +49,13 @@ export const isCardValidForOffer = derived(
         currentRequest = null;
         if (data.error || (_.isArray(data) && !data.length)) {
           // set card invalid for offer
+          Analytics.track('offers:card_invalid', {
+            type: BEHAV,
+            data: {
+              offer_id: $appliedOffer.id,
+              iin: $cardIin,
+            },
+          });
           set(false);
         }
       },

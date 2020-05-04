@@ -19,7 +19,7 @@ import {
 
 import { shouldSeparateDebitCard, getMerchantMethods } from 'checkoutstore';
 import wallet from 'ui/icons/payment-methods/wallet';
-import { API_NETWORK_CODES_MAP } from 'common/card';
+import { API_NETWORK_CODES_MAP, networks as CardNetworks } from 'common/card';
 
 /**
  * Returns the available methods
@@ -28,18 +28,6 @@ import { API_NETWORK_CODES_MAP } from 'common/card';
  */
 function getAvailableDefaultMethods() {
   let available = _Arr.filter(AVAILABLE_METHODS, isMethodEnabled);
-
-  /**
-   * Cardless EMI and EMI are the same payment option.
-   * When we click EMI, it should take to Cardless EMI if
-   * cardless_emi is an available method.
-   */
-  if (
-    _Arr.contains(available, 'cardless_emi') &&
-    _Arr.contains(available, 'emi')
-  ) {
-    available = _Arr.remove(available, 'emi');
-  }
 
   /**
    * We do not want to show QR in the primary list
@@ -84,7 +72,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
 
         _Obj.loop(getCardNetworks(), (val, key) => {
           if (val) {
-            availableNetworks.push(API_NETWORK_CODES_MAP[key]);
+            availableNetworks.push(CardNetworks[API_NETWORK_CODES_MAP[key]]);
           }
         });
 

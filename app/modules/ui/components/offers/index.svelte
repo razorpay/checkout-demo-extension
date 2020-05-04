@@ -58,6 +58,8 @@
   $: discount =
     $appliedOffer && $appliedOffer.original_amount - $appliedOffer.amount;
 
+  $: $isCardValidForOffer, setAppliedOffer($appliedOffer);
+
   function switchInstrument() {
     if (!currentTab) {
       renderTab();
@@ -93,6 +95,10 @@
 
   export function getAppliedOffer() {
     return $appliedOffer;
+  }
+
+  export function isCardApplicable() {
+    return $isCardValidForOffer;
   }
 
   export function shouldSendOfferToApi() {

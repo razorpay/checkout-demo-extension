@@ -42,6 +42,41 @@ export function getSequencedBlocks(params) {
   // Filter the sequence for duplicates
   sequence = _Arr.removeDuplicates(sequence);
 
+  /**
+   * Cardless EMI and EMI are the same payment option in the UI.
+   *
+   * If only Cardless EMI is available, it becomes method=cardless_emi
+   * If only EMI is available, it becomes method=emi
+   * If both EMI and Cardless EMI are available, it becomes method=cardless_emi
+   *
+   * When both of them are present, things get complicated.
+   * Let's handle that.
+   * Whichever of "emi" or "cardless_emi" is present first in the sequence,
+   * lets put "cardless_emi" at that place. And remove "emi" altogether.
+   */
+  if (
+    _Arr.contains(sequence, 'cardless_emi') &&
+    _Arr.contains(sequence, 'emi')
+  ) {
+    let indexOfEmi = _Arr.indexOf(sequence, 'emi');
+    let indexOfCardlessEmi = _Arr.indexOf(sequence, 'cardless_emi');
+
+    if (indexOfEmi < indexOfCardlessEmi) {
+      /**
+       * If emi is present before cardless_emi
+       * Remove old cardless_emi and put it in the place of emi
+       */
+      sequence = _Arr.remove(sequence, 'cardless_emi');
+      sequence[indexOfEmi] = 'cardless_emi';
+    } else {
+      /**
+       * cardless_emi is already before emi
+       * Remove emi
+       */
+      sequence = _Arr.remove(sequence, 'emi');
+    }
+  }
+
   // Get all blocks
   const allBlocks = _Arr.merge(methodBlocks, blocks);
 

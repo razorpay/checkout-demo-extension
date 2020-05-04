@@ -30,7 +30,7 @@ test('Module: subtext/card', t => {
 
       instrument = {
         method: 'card',
-        networks: ['mastercard'],
+        networks: ['MasterCard'],
       };
 
       t.equal(
@@ -41,7 +41,7 @@ test('Module: subtext/card', t => {
 
       instrument = {
         method: 'card',
-        networks: ['mastercard'],
+        networks: ['MasterCard'],
         types: ['credit'],
       };
 
@@ -53,7 +53,7 @@ test('Module: subtext/card', t => {
 
       instrument = {
         method: 'card',
-        networks: ['mastercard', 'visa'],
+        networks: ['MasterCard', 'Visa'],
       };
 
       t.equal(
@@ -64,7 +64,7 @@ test('Module: subtext/card', t => {
 
       instrument = {
         method: 'card',
-        networks: ['mastercard', 'visa'],
+        networks: ['MasterCard', 'Visa'],
         types: ['credit'],
       };
 
@@ -76,7 +76,7 @@ test('Module: subtext/card', t => {
 
       instrument = {
         method: 'card',
-        networks: ['mastercard', 'visa', 'rupay'],
+        networks: ['MasterCard', 'Visa', 'RuPay'],
       };
 
       t.equal(
@@ -87,7 +87,7 @@ test('Module: subtext/card', t => {
 
       instrument = {
         method: 'card',
-        networks: ['mastercard', 'visa', 'rupay'],
+        networks: ['MasterCard', 'Visa', 'RuPay'],
         types: ['credit'],
       };
 
@@ -125,7 +125,7 @@ test('Module: subtext/card', t => {
       instrument = {
         method: 'card',
         issuers: ['HDFC'],
-        networks: ['mastercard'],
+        networks: ['MasterCard'],
       };
 
       t.equal(
@@ -137,7 +137,7 @@ test('Module: subtext/card', t => {
       instrument = {
         method: 'card',
         issuers: ['HDFC'],
-        networks: ['mastercard'],
+        networks: ['MasterCard'],
         types: ['credit'],
       };
 
@@ -150,7 +150,7 @@ test('Module: subtext/card', t => {
       instrument = {
         method: 'card',
         issuers: ['HDFC'],
-        networks: ['mastercard', 'visa'],
+        networks: ['MasterCard', 'Visa'],
       };
 
       t.equal(
@@ -162,7 +162,7 @@ test('Module: subtext/card', t => {
       instrument = {
         method: 'card',
         issuers: ['HDFC'],
-        networks: ['mastercard', 'visa'],
+        networks: ['MasterCard', 'Visa'],
         types: ['credit'],
       };
 
@@ -175,7 +175,7 @@ test('Module: subtext/card', t => {
       instrument = {
         method: 'card',
         issuers: ['HDFC'],
-        networks: ['mastercard', 'visa', 'rupay'],
+        networks: ['MasterCard', 'Visa', 'RuPay'],
       };
 
       t.equal(
@@ -187,7 +187,7 @@ test('Module: subtext/card', t => {
       instrument = {
         method: 'card',
         issuers: ['HDFC'],
-        networks: ['mastercard', 'visa', 'rupay'],
+        networks: ['MasterCard', 'Visa', 'RuPay'],
         types: ['credit'],
       };
 
@@ -225,7 +225,7 @@ test('Module: subtext/card', t => {
       instrument = {
         method: 'card',
         issuers: ['HDFC', 'UTIB'],
-        networks: ['mastercard'],
+        networks: ['MasterCard'],
       };
 
       t.equal(
@@ -237,7 +237,7 @@ test('Module: subtext/card', t => {
       instrument = {
         method: 'card',
         issuers: ['HDFC', 'UTIB'],
-        networks: ['mastercard'],
+        networks: ['MasterCard'],
         types: ['credit'],
       };
 
@@ -250,7 +250,7 @@ test('Module: subtext/card', t => {
       instrument = {
         method: 'card',
         issuers: ['HDFC', 'UTIB'],
-        networks: ['mastercard', 'visa'],
+        networks: ['MasterCard', 'Visa'],
       };
 
       t.equal(
@@ -262,7 +262,7 @@ test('Module: subtext/card', t => {
       instrument = {
         method: 'card',
         issuers: ['HDFC', 'UTIB'],
-        networks: ['mastercard', 'visa'],
+        networks: ['MasterCard', 'Visa'],
         types: ['credit'],
       };
 
@@ -275,7 +275,7 @@ test('Module: subtext/card', t => {
       instrument = {
         method: 'card',
         issuers: ['HDFC', 'UTIB'],
-        networks: ['mastercard', 'visa', 'rupay'],
+        networks: ['MasterCard', 'Visa', 'RuPay'],
       };
 
       t.equal(
@@ -287,7 +287,7 @@ test('Module: subtext/card', t => {
       instrument = {
         method: 'card',
         issuers: ['HDFC', 'UTIB'],
-        networks: ['mastercard', 'visa', 'rupay'],
+        networks: ['MasterCard', 'Visa', 'RuPay'],
         types: ['credit'],
       };
 
@@ -325,7 +325,7 @@ test('Module: subtext/card', t => {
       instrument = {
         method: 'card',
         issuers: ['HDFC', 'UTIB', 'ICIC'],
-        networks: ['mastercard'],
+        networks: ['MasterCard'],
       };
 
       t.equal(
@@ -337,7 +337,7 @@ test('Module: subtext/card', t => {
       instrument = {
         method: 'card',
         issuers: ['HDFC', 'UTIB', 'ICIC'],
-        networks: ['mastercard'],
+        networks: ['MasterCard'],
         types: ['credit'],
       };
 
@@ -350,7 +350,7 @@ test('Module: subtext/card', t => {
       instrument = {
         method: 'card',
         issuers: ['HDFC', 'UTIB', 'ICIC'],
-        networks: ['mastercard', 'visa'],
+        networks: ['MasterCard', 'Visa'],
       };
 
       t.equal(
@@ -362,7 +362,7 @@ test('Module: subtext/card', t => {
       instrument = {
         method: 'card',
         issuers: ['HDFC', 'UTIB', 'ICIC'],
-        networks: ['mastercard', 'visa'],
+        networks: ['MasterCard', 'Visa'],
         types: ['credit'],
       };
 
@@ -375,7 +375,7 @@ test('Module: subtext/card', t => {
       instrument = {
         method: 'card',
         issuers: ['HDFC', 'UTIB', 'ICIC'],
-        networks: ['mastercard', 'visa', 'rupay'],
+        networks: ['MasterCard', 'Visa', 'RuPay'],
       };
 
       t.equal(
@@ -387,7 +387,7 @@ test('Module: subtext/card', t => {
       instrument = {
         method: 'card',
         issuers: ['HDFC', 'UTIB', 'ICIC'],
-        networks: ['mastercard', 'visa', 'rupay'],
+        networks: ['MasterCard', 'Visa', 'RuPay'],
         types: ['credit'],
       };
 

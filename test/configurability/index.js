@@ -45,7 +45,7 @@ test('Module: configurability', t => {
             {
               method: 'card',
               issuers: ['SBIN'],
-              networks: ['mastercard'],
+              networks: ['MasterCard'],
             },
             {
               method: 'card',
