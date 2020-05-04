@@ -20,6 +20,8 @@
     </style>
     <link href="dist/v1/css/checkout.css" type="text/css" rel="stylesheet" />
   </head>
+
+  <!-- This script introduces api params for development and is not present in the final bundle -->
   <script src="config.js"></script>
   <body>
     <script>
@@ -126,10 +128,15 @@
       window.preferences = null;
     </script>
   </body>
+  <!-- Everything till endbuild is bundled into a single js file -->
   <!-- build:js checkout-frame.js -->
   <!-- This is equivalent to razorpay.js -->
+
+  <!-- //1 Introduce globals to be used. Ideally should not be present.  -->
   <script src="js/lib/util.js"></script>
   <script src="js/lib/$.js"></script>
+
+  <!-- The generated es6 code -->
   <script src="js/generated/checkoutframe/discreet.js"></script>
   <script src="js/checkout-frame/init.js"></script>
 
@@ -140,11 +147,14 @@
   <script src="templates/emandate.js"></script>
   <script src="templates/confirm.js"></script>
   <script src="templates/curtain.js"></script>
+
+  <!-- Modal related util. should not be present ideally. check if can be removed later -->
   <script src="/js/lib/modal.js"></script>
 
   <script src="/js/checkout-frame/session.js"></script>
   <!-- endbuild -->
 </html>
+<!-- not present in the prod bundle. options are received through handleMessage -->
 <script>
   var options = {
     // 'key': 'rzp_live_ILgsfZCZoFIKMb',
