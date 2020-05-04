@@ -10,16 +10,40 @@ import en2 from './bundles/en2';
 
 import { getSession } from 'sessionmanager';
 
+/**
+ * Returns the URL for the locale bundle on CDN
+ * @param locale {string}
+ * @returns {string}
+ */
+function makeBundleUrl(locale) {
+  // TODO: change URL once finalized
+  return `https://cdn2.razorpay.com/bundles/${locale}.json`;
+}
+
+/**
+ * Fetches the bundle for a given locale.
+ * @param locale {string}
+ * @returns {Promise<Object>}
+ */
 function fetchBundle(locale) {
-  return new Promise(resolve => {
-    setTimeout(() => resolve(en2), 3000);
+  return new Promise((resolve, reject) => {
+    fetch({
+      url: makeBundleUrl(locale),
+      callback: response => {
+        if (response.error) {
+          reject(response.error);
+        } else {
+          resolve(response);
+        }
+      },
+    });
   });
 }
 
 export function init() {
   // Add bundled messages
   addMessages('en', en);
-  register('en2', () => fetchBundle('en2'));
+  register('hi', () => fetchBundle('hi'));
 
   const session = getSession();
 
