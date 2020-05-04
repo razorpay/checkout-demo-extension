@@ -3,6 +3,11 @@ import Razorpay, { makePrefParams, validateOverrides } from 'common/Razorpay';
 import Analytics from 'analytics';
 import * as SessionManager from 'sessionmanager';
 import Track from 'tracker';
+import {
+  setRazorpayInstance,
+  getMerchantOrder,
+  setOption,
+} from 'checkoutstore';
 import { processNativeMessage } from 'checkoutstore/native';
 import { isEMandateEnabled, getEnabledMethods } from 'checkoutstore/methods';
 import showTimer from 'checkoutframe/timer';
@@ -199,8 +204,17 @@ function fetchPrefs(session) {
 
 function setSessionPreferences(session, preferences) {
   const razorpayInstance = session.r;
-  const order = preferences.order;
+  razorpayInstance.preferences = preferences;
+  setRazorpayInstance(razorpayInstance);
 
+  updateOptions(preferences);
+  updateEmandatePrefill();
+  updateAnalytics(preferences);
+
+  Razorpay.configure(preferences.options);
+  session.setPreferences(preferences);
+
+  const order = preferences.order;
   if (
     order &&
     order.bank &&
@@ -209,8 +223,6 @@ function setSessionPreferences(session, preferences) {
   ) {
     redirectForTPV(razorpayInstance, preferences);
   } else {
-    session.setPreferences(preferences);
-
     // session.setPreferences updates razorpay options.
     // validate options now
     try {
@@ -270,6 +282,72 @@ function getPreferenecsParams(razorpayInstance) {
     document.cookie = 'checkcookie=1;path=/';
   }
   return prefData;
+}
+
+function updateOptions(preferences) {
+  // Get amount
+  const orderKey =
+    ['order', 'invoice', 'subscription']
+    |> _Arr.find(
+      key => preferences[key] && _.isNumber(preferences[key].amount)
+    );
+
+  if (orderKey) {
+    const order = preferences[orderKey];
+    setOption(
+      'amount',
+      order.partial_payment ? order.amount_due : order.amount
+    );
+    if (order.currency) {
+      setOption('currency', order.currency);
+    }
+  }
+
+  // set orderid as it is required while creating payments
+  if (preferences.invoice) {
+    setOption('order_id', preferences.invoice.order_id);
+  }
+}
+
+function updateEmandatePrefill() {
+  const order = getMerchantOrder();
+  if (!order) {
+    return;
+  }
+
+  if (order.auth_type) {
+    setOption('prefill.auth_type', order.auth_type);
+  }
+
+  const bank_account = order.bank_account;
+  if (bank_account) {
+    ['ifsc', 'name', 'account_number', 'account_type']
+      |> _Arr.loop(key => {
+        if (bank_account[key]) {
+          setOption(`prefill.bank_account[${key}]`, bank_account[key]);
+        }
+      });
+
+    if (order.bank) {
+      setOption('prefill.bank', order.bank);
+    }
+  }
+}
+
+function updateAnalytics(preferences) {
+  Analytics.setMeta('features', preferences.features);
+  // Set optional fields in meta
+  const optionalFields = preferences.optional;
+  if (optionalFields |> _.isArray) {
+    Analytics.setMeta(
+      'optional.contact',
+      optionalFields |> _Arr.contains('contact')
+    );
+    Analytics.setMeta(
+      'optional.email',
+      optionalFields |> _Arr.contains('email')
+    );
+  }
 }
 
 /* expose handleMessage to window for our Mobile SDKs */

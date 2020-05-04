@@ -5157,54 +5157,18 @@ Session.prototype = {
     }
   },
 
-  /**
-   * Sets some prefill values from preferences.
-   * Modifies `options` in place, not a pure func.
-   * @param {Object} preferences
-   * @param {Object} options
-   */
-  setPrefillFromPreferences: function(preferences, options) {
-    var order = preferences.order;
-
-    // emandate
-    if (order) {
-      if (order.bank_account) {
-        _Arr.loop(['ifsc', 'name', 'account_number', 'account_type'], function(
-          key
-        ) {
-          if (order.bank_account[key]) {
-            options['prefill.bank_account[' + key + ']'] =
-              order.bank_account[key];
-          }
-        });
-
-        if (order.bank) {
-          options['prefill.bank'] = order.bank;
-        }
-      }
-
-      if (order.auth_type) {
-        options['prefill.auth_type'] = order.auth_type;
-      }
-    }
-  },
-
   setPreferences: function(prefs) {
-    this.r.preferences = prefs;
-    Store.setRazorpayInstance(this.r);
     this.preferences = prefs;
     preferences = prefs;
-
     this.tab_titles = tab_titles;
 
-    var self = this,
-      customer,
-      saved_customer = preferences.customer,
-      session_options = this.get(),
-      order = preferences.order,
-      invoice = (this.invoice = preferences.invoice),
-      subscription = (this.subscription = preferences.subscription),
-      options = preferences.options;
+    var self = this;
+    var customer;
+    var saved_customer = preferences.customer;
+    var session_options = this.get();
+
+    this.invoice = preferences.invoice;
+    this.subscription = preferences.subscription;
 
     /* set empty customer in case of local card saving */
     if (preferences.global === false) {
@@ -5215,8 +5179,6 @@ Session.prototype = {
       };
     }
 
-    this.setPrefillFromPreferences(preferences, session_options);
-
     this.isPayout = Store.isPayout();
 
     if (this.isPayout) {
@@ -5225,8 +5187,6 @@ Session.prototype = {
       // We are disabling retries for payouts for now.
       this.set('retry', false);
     }
-
-    Analytics.setMeta('features', preferences.features);
 
     /* Used previously logged in customer details and saved card tokens */
     if (saved_customer) {
@@ -5253,49 +5213,6 @@ Session.prototype = {
 
     /* set Razorpay instance for customer */
     Customer.prototype.r = this.r;
-
-    /* Apply options overrides from preferences */
-    Razorpay.configure(options);
-
-    // Get amount
-    var entityWithAmount = _Arr.filter([order, invoice, subscription], function(
-      entity
-    ) {
-      return entity && _Obj.hasProp(entity, 'amount');
-    })[0];
-
-    if (entityWithAmount) {
-      session_options.amount = entityWithAmount.partial_payment
-        ? entityWithAmount.amount_due
-        : entityWithAmount.amount;
-    }
-
-    // Get currency
-    var entityWithCurrency = _Arr.filter(
-      [order, invoice, subscription],
-      function(entity) {
-        return entity && _Obj.hasProp(entity, 'currency');
-      }
-    )[0];
-
-    if (entityWithCurrency) {
-      session_options.currency = entityWithCurrency.currency;
-    }
-
-    // set orderid as it is required while creating payments
-    if (prefs.invoice) {
-      this.r.set('order_id', prefs.invoice.order_id);
-    }
-
-    // Set optional fields in meta
-    Analytics.setMeta(
-      'optional.contact',
-      _Arr.contains(preferences.optional || [], 'contact')
-    );
-    Analytics.setMeta(
-      'optional.email',
-      _Arr.contains(preferences.optional || [], 'email')
-    );
   },
 
   showModal: function(preferences) {
