@@ -45,7 +45,7 @@ test('Module: configurability/translate', t => {
             {
               method: 'card',
               issuers: ['SBIN'],
-              networks: ['mastercard'],
+              networks: ['MasterCard'],
             },
             {
               method: 'card',
@@ -109,7 +109,7 @@ test('Module: configurability/translate', t => {
               {
                 method: 'card',
                 issuers: ['SBIN'],
-                networks: ['mastercard'],
+                networks: ['MasterCard'],
                 _type: 'instrument',
               },
               {

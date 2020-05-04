@@ -1,6 +1,5 @@
 import { generateTextFromList } from 'lib/utils';
 import { getCommonBankName } from 'common/bank';
-import { networks as CardNetworks } from 'common/card';
 
 /**
  * Generates a string from the list after filtering for truthy values
@@ -25,8 +24,7 @@ export function generateSubtextForCardInstrument(instrument) {
   const instrumentIssuers =
     instrument.issuers || []
     |> _Arr.map(bank => getCommonBankName(bank).replace(/ Bank$/, ''));
-  const instrumentNetworks =
-    instrument.networks || [] |> _Arr.map(network => CardNetworks[network]);
+  const instrumentNetworks = instrument.networks || [];
   const instrumentTypes = instrument.types || [];
 
   const issuersLength = instrumentIssuers.length;

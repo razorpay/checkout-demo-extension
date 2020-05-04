@@ -54,7 +54,7 @@ test('Module: configurability/sequence', t => {
                 {
                   method: 'card',
                   issuers: ['SBIN'],
-                  networks: ['mastercard'],
+                  networks: ['MasterCard'],
                   _type: 'instrument',
                 },
                 {
@@ -251,7 +251,7 @@ test('Module: configurability/sequence', t => {
                 {
                   method: 'card',
                   issuers: ['SBIN'],
-                  networks: ['mastercard'],
+                  networks: ['MasterCard'],
                   _type: 'instrument',
                 },
                 {

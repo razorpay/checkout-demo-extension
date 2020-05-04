@@ -335,7 +335,7 @@ test('Module: configurability/validate', t => {
               recurring: true,
               iframe: false,
             },
-            networkCode: 'visa',
+            networkCode: 'mastercard',
           },
           vpa: null,
           recurring: true,
@@ -387,7 +387,7 @@ test('Module: configurability/validate', t => {
         ),
 
         Validate.isInstrumentValidForPayment(
-          { method: 'card', networks: ['mastercard', 'visa'] },
+          { method: 'card', networks: ['MasterCard', 'Visa'] },
           payment,
           {
             tokens,
@@ -397,7 +397,7 @@ test('Module: configurability/validate', t => {
         ),
 
         Validate.isInstrumentValidForPayment(
-          { method: 'card', networks: ['amex', 'visa'] },
+          { method: 'card', networks: ['American Express', 'Visa'] },
           payment,
           {
             tokens,
