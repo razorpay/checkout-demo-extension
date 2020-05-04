@@ -15,6 +15,26 @@ const chrlow = 'abcdefghijklmnopqrstuvwxyz';
 const chrnum = '0123456789';
 const chrsp = '!@#$%^&*()';
 
+/**
+ * Flattens the object by turning nested object into object with delimiters in the keys
+ * @param {Object} o
+ * @param {string} prefix [prefix='']
+ *
+ * @returns {Object}
+ */
+const flatten = (o, prefix = '') => {
+  const result = {};
+  Object.entries(o).forEach(([key, val]) => {
+    const flattenedKey = prefix ? `${prefix}.${key}` : key;
+    if (val && typeof val === 'object') {
+      Object.assign(result, flatten(val, flattenedKey));
+    } else {
+      result[flattenedKey] = val;
+    }
+  });
+  return result;
+};
+
 const randomRange = (min, max) =>
   min + Math.floor((1 + max - min) * Math.random());
 const randomString = set => (length = 14) =>
@@ -134,6 +154,7 @@ const util = (module.exports = {
   chrup,
   chrnum,
   chrsp,
+  flatten,
   randomRange,
   randomName,
   randomEmail,
