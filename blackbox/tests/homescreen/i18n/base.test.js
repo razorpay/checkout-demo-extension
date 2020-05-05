@@ -1,6 +1,4 @@
 const { openCheckoutWithNewHomeScreen } = require('../open');
-const { delay } = require('../../../util');
-const { makePreferences } = require('../../../actions/preferences');
 
 const { proceed, fillUserDetails, selectPaymentMethod } = require('../actions');
 
@@ -30,13 +28,13 @@ describe('I18n tests', () => {
     await fillUserDetails(context);
     await proceed(context);
     await selectPaymentMethod(context, 'netbanking');
-    await selectLocale(context, 'hi');
     await verifyLabel(
       context,
       '#nb-elem select option[value=""]',
       'en',
       'netbanking.select_label'
     );
+    await selectLocale(context, 'hi');
     await respondToBundleRequest(context, 'hi');
     await verifyLabel(
       context,
