@@ -2755,7 +2755,7 @@ Session.prototype = {
     $('#amount .discount').html(
       hasDiscount ? this.formatAmountWithCurrency(offer.amount) : ''
     );
-    Cta.showAmountInCta();
+    Cta.setAppropriateCtaText();
   },
 
   back: function(confirmedCancel) {

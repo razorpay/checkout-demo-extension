@@ -40,6 +40,15 @@ $mobile-view() {
     }
   }
 
+  #form, #body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #form, #form-fields {
+    flex: 1;
+  }
+
   // #container and &#container is needed because
   // this function applies to a media query (root)
   // as well as .mobile (ampersand)
