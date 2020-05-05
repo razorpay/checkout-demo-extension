@@ -299,7 +299,8 @@ export function getBlockConfig(options, customer) {
   return {
     display: {
       blocks: clustered,
-      hidden: translated.display.hide.instruments,
+      hide: translated.display.hide,
+      preferences: translated.display.preferences,
     },
 
     restrictions: translated.restrictions,

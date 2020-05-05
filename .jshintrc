@@ -6,7 +6,8 @@
     "Reflect": true,
     "Map": true,
     "Set": true,
-    "Symbol": true
+    "Symbol": true,
+    "globalThis": true
   },
   "proto": true,
   
