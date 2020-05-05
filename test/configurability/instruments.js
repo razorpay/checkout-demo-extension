@@ -74,7 +74,7 @@ test('Module: configurability/instruments', t => {
       config = {
         method: 'upi',
         flows: ['intent'],
-        apps: ['googlepay', 'com.somerandom.app'],
+        apps: ['google_pay', 'com.somerandom.app'],
       };
 
       expected = {
