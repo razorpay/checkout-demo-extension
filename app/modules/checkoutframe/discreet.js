@@ -53,6 +53,7 @@ import * as Cta from 'checkoutstore/cta';
 import * as HomeScreenStore from 'checkoutstore/screens/home';
 import * as CardScreenStore from 'checkoutstore/screens/card';
 import * as CustomerStore from 'checkoutstore/customer';
+import * as Theme from 'checkoutstore/theme';
 
 import QRScreen from 'ui/tabs/qr/index.svelte';
 import BankTransferScreen from 'ui/tabs/bank-transfer/index.svelte';
@@ -125,6 +126,7 @@ export default {
   Flows,
   Payouts,
   CountryCodesUtil,
+  Theme,
 
   Store,
   MethodStore,

@@ -2012,29 +2012,11 @@ Session.prototype = {
     // update r.themeMeta based on prefs color
     this.r.postInit();
 
-    var themeMeta = this.r.themeMeta;
+    // ThemeMeta in razorpay.js contains only
+    // color, textColor, highlightColor
+    discreet.Theme.setThemeColor(this.r.themeMeta.color);
 
-    var themeColor = themeMeta.color,
-      colorVariations = Color.getColorVariations(themeColor),
-      hoverStateColor = Color.getHoverStateColor(
-        themeColor,
-        colorVariations.backgroundColor,
-        RAZORPAY_HOVER_COLOR
-      ),
-      activeStateColor = Color.getActiveStateColor(
-        themeColor,
-        colorVariations.backgroundColor,
-        RAZORPAY_HOVER_COLOR
-      ),
-      secondaryHighlightColor = hoverStateColor;
-
-    themeMeta = this.themeMeta = Object.create(this.r.themeMeta);
-
-    themeMeta.secondaryHighlightColor = secondaryHighlightColor;
-    themeMeta.hoverStateColor = hoverStateColor;
-    themeMeta.activeStateColor = activeStateColor;
-    themeMeta.backgroundColor = colorVariations.backgroundColor;
-    themeMeta.icons = _PaymentMethodIcons.getIcons(colorVariations);
+    this.themeMeta = discreet.Theme.getThemeMeta();
   },
 
   applyFont: function(anchor, retryCount) {
