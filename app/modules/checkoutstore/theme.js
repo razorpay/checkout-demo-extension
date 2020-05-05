@@ -21,10 +21,11 @@ export function getThemeColor() {
 
 export function setThemeColor(color) {
   const colorVariations = Color.getColorVariations(color);
+  const { backgroundColor, foregroundColor } = Color.getColorVariations(color);
 
   theme.color = color;
-  theme.backgroundColor = colorVariations.backgroundColor;
-  theme.foregroundColor = colorVariations.foregroundColor;
+  theme.backgroundColor = backgroundColor;
+  theme.foregroundColor = foregroundColor;
   theme.textColor = Color.isDark(color) ? TEXT_COLOR_WHITE : TEXT_COLOR_BLACK;
   theme.hoverStateColor = Color.getHoverStateColor(
     color,
