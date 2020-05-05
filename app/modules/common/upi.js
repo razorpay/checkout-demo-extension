@@ -38,7 +38,7 @@ const UPI_APPS = {
        * and only display if they are.
        */
       verify_registration: true,
-      shortcode: 'googlepay',
+      shortcode: 'google_pay',
     },
     {
       package_name: 'com.phonepe.app',

@@ -6,12 +6,19 @@
     "Reflect": true,
     "Map": true,
     "Set": true,
-    "Symbol": true
+    "Symbol": true,
+    "globalThis": true
   },
   "proto": true,
+  
   "-W001": true,
+  "-W007": true,
+  "-W014": true,
   "-W021": true,
+  "-W080": true,
+  "-W083": true,
   "-W120": true,
+
   "expr": true,
   "scripturl": true,
   "laxbreak": true,
@@ -30,5 +37,6 @@
   "eqnull": true,
   "browser": true,
   "strict": true,
-  "validthis": true
+  "validthis": true,
+  "laxcomma": true
 }
