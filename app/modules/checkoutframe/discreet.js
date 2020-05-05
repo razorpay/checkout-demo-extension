@@ -80,6 +80,7 @@ import * as NBHandlers from 'handlers/netbanking';
 import * as UserHandlers from 'handlers/user';
 
 import * as Instruments from 'configurability/instruments';
+import { getInstrumentMeta } from 'ui/tabs/home/instruments';
 
 export default {
   RazorpayConfig,
@@ -120,6 +121,7 @@ export default {
   Bridge,
   P13n,
   Instruments,
+  getInstrumentMeta,
   UserAgent,
   Offers,
   Flows,

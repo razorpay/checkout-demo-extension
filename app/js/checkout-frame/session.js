@@ -186,47 +186,6 @@ function improvisePrefilledContact(session) {
 }
 
 /**
- * Returns the block that contains the instrument
- * @param {Instrument} instrument
- *
- * @returns {Block}
- */
-function getInstrumentBlock(instrument) {
-  var blocks = storeGetter(HomeScreenStore.blocks);
-
-  return _Arr.find(blocks, function(block) {
-    return _Arr.any(block.instruments, function(blockInstrument) {
-      return blockInstrument.id === instrument.id;
-    });
-  });
-}
-
-/**
- * Returns meta information about the instrument
- * @param {Instrument} instrumnt
- *
- * @returns {Object} meta
- */
-function getInstrumentMeta(instrument) {
-  var block = getInstrumentBlock(instrument);
-
-  var meta = {};
-
-  if (block) {
-    meta.index = _Arr.findIndex(block.instruments, function(blockInstrument) {
-      return blockInstrument.id === instrument.id;
-    });
-
-    meta.block = {
-      title: block.title,
-      code: block.code,
-    };
-  }
-
-  return meta;
-}
-
-/**
  * Returns the cardType from payload
  *
  * @param {Object} payload
@@ -4349,7 +4308,7 @@ Session.prototype = {
         Analytics.setMeta('doneByInstrument', true);
         Analytics.setMeta(
           'instrumentMeta',
-          getInstrumentMeta(selectedInstrument)
+          discreet.getInstrumentMeta(selectedInstrument)
         );
 
         if (_Obj.getSafely(selectedInstrument, 'meta.preferred')) {
