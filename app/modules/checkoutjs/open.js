@@ -234,6 +234,17 @@ RazorProto.postInit = function() {
   this.modal = { options: {} };
 
   if (this.get('parent')) {
+    /**
+     * On some browsers (eg. Safari), we do not preload the frame
+     * But in embedded mode (i.e. when `parent` Checkout option is provided)
+     * we open Checkout directly.
+     *
+     * Make sure that the frame is preloaded before opening it.
+     */
+    if (!preloadedFrame) {
+      preloadedFrame = getPreloadedFrame(this);
+    }
+
     this.open();
   }
 };
@@ -308,9 +319,15 @@ var initRazorpayCheckout = needBody(function() {
    * More details:
    * https://docs.google.com/document/d/1DSqQ2w70pepJFsf2roQmvRrWaYFaWOLinwcIonfoWQI/edit?usp=sharing
    */
-  // if (!Safari) {
-  preloadedFrame = getPreloadedFrame();
-  // }
+  if (!Safari) {
+    /**
+     * Frame might have already been preloaded if this is used in embedded mode
+     * (i.e. by providing `parent` Checkout option)
+     */
+    if (!preloadedFrame) {
+      preloadedFrame = getPreloadedFrame();
+    }
+  }
 
   // Get the ball rolling in case we are in manual mode
   try {
