@@ -1455,11 +1455,13 @@ Session.prototype = {
   /**
    * Equivalent of clicking a provider option from the
    * Cardless EMI homescreen.
-   * @param {String} providerCode Code for the provider
+   * @param {String} provider Code for the provider
    */
   selectCardlessEmiProviderAndAttemptPayment: function(provider) {
     this.selectCardlessEmiProvider(provider);
-    this.preSubmit();
+    if (provider !== 'cards') {
+      this.preSubmit();
+    }
   },
 
   setCardlessEmi: function() {
