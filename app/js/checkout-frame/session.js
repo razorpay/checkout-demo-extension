@@ -1455,11 +1455,18 @@ Session.prototype = {
   /**
    * Equivalent of clicking a provider option from the
    * Cardless EMI homescreen.
-   * @param {String} providerCode Code for the provider
+   * @param {String} provider Code for the provider
    */
   selectCardlessEmiProviderAndAttemptPayment: function(provider) {
     this.selectCardlessEmiProvider(provider);
-    this.preSubmit();
+    /**
+     * When a cardless EMI provider except "EMI on Cards" is chosen, the payment
+     * should be created immediately. Selecting "EMI on cards" should take us
+     * to the EMI screen, hence preSubmit should not be called.
+     */
+    if (provider !== 'cards') {
+      this.preSubmit();
+    }
   },
 
   setCardlessEmi: function() {
@@ -2012,29 +2019,11 @@ Session.prototype = {
     // update r.themeMeta based on prefs color
     this.r.postInit();
 
-    var themeMeta = this.r.themeMeta;
+    // ThemeMeta in razorpay.js contains only
+    // color, textColor, highlightColor
+    discreet.Theme.setThemeColor(this.r.themeMeta.color);
 
-    var themeColor = themeMeta.color,
-      colorVariations = Color.getColorVariations(themeColor),
-      hoverStateColor = Color.getHoverStateColor(
-        themeColor,
-        colorVariations.backgroundColor,
-        RAZORPAY_HOVER_COLOR
-      ),
-      activeStateColor = Color.getActiveStateColor(
-        themeColor,
-        colorVariations.backgroundColor,
-        RAZORPAY_HOVER_COLOR
-      ),
-      secondaryHighlightColor = hoverStateColor;
-
-    themeMeta = this.themeMeta = Object.create(this.r.themeMeta);
-
-    themeMeta.secondaryHighlightColor = secondaryHighlightColor;
-    themeMeta.hoverStateColor = hoverStateColor;
-    themeMeta.activeStateColor = activeStateColor;
-    themeMeta.backgroundColor = colorVariations.backgroundColor;
-    themeMeta.icons = _PaymentMethodIcons.getIcons(colorVariations);
+    this.themeMeta = discreet.Theme.getThemeMeta();
   },
 
   applyFont: function(anchor, retryCount) {
@@ -2755,7 +2744,7 @@ Session.prototype = {
     $('#amount .discount').html(
       hasDiscount ? this.formatAmountWithCurrency(offer.amount) : ''
     );
-    Cta.showAmountInCta();
+    Cta.setAppropriateCtaText();
   },
 
   back: function(confirmedCancel) {
@@ -3120,7 +3109,11 @@ Session.prototype = {
       skipText: 'Skip Saved Cards',
     });
 
-    if (!customer.logged && !this.wants_skip) {
+    /**
+     * When the user comes back to the card tab after selecting EMI plan,
+     * do not commence OTP again.
+     */
+    if (!customer.logged && !this.wants_skip && this.screen !== 'emiplans') {
       self.commenceOTP('saved cards', true, 'saved_cards_access');
       var smsHash = this.get('send_sms_hash') && this.sms_hash;
       var params = {};

@@ -35,7 +35,7 @@ test('Module: configurability/methods', t => {
           instruments: [
             {
               method: 'upi',
-              apps: ['googlepay'],
+              apps: ['google_pay'],
               _type: 'instrument',
             },
           ],
