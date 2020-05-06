@@ -66,7 +66,6 @@ function _translate(options = {}, external) {
 
   // These are coming from the merchant so we need to validate the keys of the instruments
   const allowedBlock = validateAndCreateBlock('rzp.restrict_allow', {
-    name: 'Available Payment Methods', // TODO
     instruments: allowedInstruments,
   });
 

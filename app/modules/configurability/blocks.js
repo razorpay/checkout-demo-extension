@@ -29,7 +29,9 @@ function _createBlock(code, config = {}, validate = false) {
       |> _Arr.filter(Boolean);
   }
 
-  block.title = name || 'Available Payment Methods';
+  if (name) {
+    block.title = name;
+  }
 
   return block;
 }
