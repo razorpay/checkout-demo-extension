@@ -19,9 +19,9 @@ function addTypeAndCategory(instrument) {
 
 /**
  * Keys that are allowed in the instruments
- * passed created by the merchant
+ * passed created by the merchant a.k.a public API
  */
-const ALLOWED_INSTRUMENT_KEYS = {
+const PUBLIC_API_INSTRUMENT_KEYS = {
   card: ['issuers', 'networks', 'types', 'iin'],
   emi: ['issuers', 'networks', 'types', 'iin', 'durations'],
   netbanking: ['banks'],
@@ -64,7 +64,7 @@ function hasOnlyAllowedKeys(instrument) {
     return false;
   }
 
-  const allowedKeys = ALLOWED_INSTRUMENT_KEYS[method];
+  const allowedKeys = PUBLIC_API_INSTRUMENT_KEYS[method];
 
   // If we don't have any specific whitelisted keys, allow this
   if (!allowedKeys) {
