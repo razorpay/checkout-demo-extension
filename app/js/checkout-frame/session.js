@@ -1459,6 +1459,11 @@ Session.prototype = {
    */
   selectCardlessEmiProviderAndAttemptPayment: function(provider) {
     this.selectCardlessEmiProvider(provider);
+    /**
+     * When a cardless EMI provider except "EMI on Cards" is chosen, the payment
+     * should be created immediately. Selecting "EMI on cards" should take us
+     * to the EMI screen, hence preSubmit should not be called.
+     */
     if (provider !== 'cards') {
       this.preSubmit();
     }
