@@ -3109,7 +3109,11 @@ Session.prototype = {
       skipText: 'Skip Saved Cards',
     });
 
-    if (!customer.logged && !this.wants_skip) {
+    /**
+     * When the user comes back to the card tab after selecting EMI plan,
+     * do not commence OTP again.
+     */
+    if (!customer.logged && !this.wants_skip && this.screen !== 'emiplans') {
       self.commenceOTP('saved cards', true, 'saved_cards_access');
       var smsHash = this.get('send_sms_hash') && this.sms_hash;
       var params = {};
