@@ -40,7 +40,7 @@
   import Bottom from 'ui/layouts/Bottom.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import AddANewVpa from './AddANewVpa.svelte';
-  import { getMiscIcon } from 'icons/misc';
+  import { getMiscIcon } from 'checkoutframe/icons';
 
   // Store
   import { contact } from 'checkoutstore/screens/home';
@@ -529,7 +529,7 @@
           {#if intent}
             <ListHeader>
               <i slot="icon">
-                <Icon icon={getMiscIcon('recieve')} />
+                <Icon icon={getMiscIcon('receive')} />
               </i>
               <div slot="subtitle">
                 You will receive a payment request on your UPI app
