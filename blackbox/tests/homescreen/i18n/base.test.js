@@ -8,7 +8,10 @@ const {
   respondToBundleRequest,
 } = require('../../../actions/i18n');
 
-describe('I18n tests', () => {
+const { makePreferences } = require('../../../actions');
+
+// TODO: Fix broken request interception in headless mode (fixed in puppeteer v3)
+describe.skip('I18n tests', () => {
   test('Verify labels for netbanking', async () => {
     const options = {
       key: 'rzp_test_1DP5mmOlF5G5ag',
