@@ -18,7 +18,7 @@ import countrycodes from 'countrycodes';
  */
 
 const MAX_LENGTH_COUNTRY_CODE = 3;
-const AMERICAN_REGEX = /^\(\d{3}\)[\s\-]?\d{3}\-?\d{4}$/;
+const AMERICAN_REGEX = /^\(\d{3}\)[\s-]?\d{3}-?\d{4}$/;
 
 const hasPlus = number => _Str.startsWith(number, '+');
 const removePlus = number => number.replace(/^\+/, '');

@@ -44,7 +44,7 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getCardType } from 'common/card';
-  import { getSubtextForInstrument } from 'common/subtext';
+  import { getSubtextForInstrument } from 'subtext';
 
   // Transitions
   import { fade } from 'svelte/transition';
@@ -156,10 +156,7 @@
         : true;
 
       const networkMatches = hasNetworks
-        ? _Arr.contains(
-            networks,
-            token.card.network && token.card.network.toLowerCase()
-          )
+        ? _Arr.contains(networks, token.card.network)
         : true;
 
       const typeMatches = hasTypes

@@ -96,7 +96,7 @@ test('Module: personalization', t => {
       t.equals(actual.id, 'Dhh671dR688OWQ', 'Returns correct id');
       t.equals(actual.method, 'card', 'Returns correct method');
       t.equals(actual.issuer, 'ICIC', 'Returns correct issuer');
-      t.equals(actual.network, 'visa', 'Returns correct network');
+      t.equals(actual.network, 'Visa', 'Returns correct network');
       t.equals(
         actual.token_id,
         'token_9AT28Pxxe0Npi9',

@@ -13,11 +13,12 @@ import { createBlock } from './blocks';
  *      @prop {Array<Instruments>} instruments Hidden insturments
  *      @prop {Array<string>} methods Hidden methods
  */
-function _translate(options, external) {
+function _translate(options = {}, external) {
   options = _Obj.clone(options);
 
-  const { display } = options || {};
-  const { blocks = {}, hide = [] } = display || {};
+  const { display = {}, restrictions = [] } = options;
+  const { blocks = {}, hide = [], preferences = {}, sequence = [] } = display;
+  const { allow = [] } = restrictions;
 
   /**
    * Create blocks
@@ -55,13 +56,30 @@ function _translate(options, external) {
     |> _Arr.filter(isInstrumentForEntireMethod)
     |> _Arr.map(instrument => instrument.method);
 
+  /**
+   * RESTRICTIONS
+   */
+  const allowedInstruments =
+    allow |> _Arr.map(createInstrument) |> _Arr.filter(Boolean);
+  const allowedBlock = createBlock('rzp.restrict_allow', {
+    name: 'Available Payment Methods', // TODO
+    instruments: allowedInstruments,
+  });
+
   return {
     display: {
+      preferences,
+      sequence,
+
       blocks: includedBlocks,
       hide: {
         instruments: hiddenInstruments,
         methods: hiddenMethods,
       },
+    },
+
+    restrictions: {
+      allow: allowedBlock,
     },
   };
 }

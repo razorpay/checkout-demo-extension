@@ -62,6 +62,10 @@ module.exports = function(testFeatures) {
         }
       }
 
+      if (callbackUrl) {
+        preferences.order.method = 'netbanking';
+      }
+
       const context = await openCheckoutWithNewHomeScreen({
         page,
         options,

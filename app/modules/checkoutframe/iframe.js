@@ -3,6 +3,8 @@ import * as Bridge from 'bridge';
 import Razorpay from 'common/Razorpay';
 import { ownerWindow } from 'common/constants';
 import Track from 'tracker';
+import { getSession } from 'sessionmanager';
+import Analytics from 'analytics';
 
 /**
  * This handles methods of the new iOS SDK Bridge.
@@ -102,8 +104,26 @@ export function initIframe() {
   };
 
   window |> _El.on('message', parseMessage);
-  window |> _El.on('beforeunload', flush);
   window |> _El.on('blur', flush);
+  window
+    |> _El.on('beforeunload', () => {
+      const session = getSession();
+
+      /**
+       * If the user navigates away from the current website
+       * while Checkout is still open, track it
+       */
+      if (session && session.isOpen) {
+        Analytics.track('modal:close', {
+          data: {
+            navigation: true,
+          },
+          immediately: true,
+        });
+      }
+
+      flush();
+    });
 
   const qpmap = _.getQueryParams();
   const platform = qpmap.platform;

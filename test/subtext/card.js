@@ -1,7 +1,7 @@
-import * as Subtext from 'common/subtext';
+import * as CardSubtext from 'subtext/card';
 
-test('Module: common/subtext', t => {
-  test('Subtext.getSubtextForInstrument', t => {
+test('Module: subtext/card', t => {
+  test('CardSubtext.generateSubtextForCardInstrument', t => {
     test('method: card', t => {
       let instrument;
 
@@ -13,7 +13,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'All cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: all, Networks: all, Types: all'
       );
 
@@ -24,76 +24,76 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: all, Networks: all, Types: 1'
       );
 
       instrument = {
         method: 'card',
-        networks: ['mastercard'],
+        networks: ['MasterCard'],
       };
 
       t.equal(
         'Only MasterCard cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: all, Networks: 1, Types: all'
       );
 
       instrument = {
         method: 'card',
-        networks: ['mastercard'],
+        networks: ['MasterCard'],
         types: ['credit'],
       };
 
       t.equal(
         'Only MasterCard credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: all, Networks: 1, Types: 1'
       );
 
       instrument = {
         method: 'card',
-        networks: ['mastercard', 'visa'],
+        networks: ['MasterCard', 'Visa'],
       };
 
       t.equal(
         'Only MasterCard and Visa cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: all, Networks: 2, Types: all'
       );
 
       instrument = {
         method: 'card',
-        networks: ['mastercard', 'visa'],
+        networks: ['MasterCard', 'Visa'],
         types: ['credit'],
       };
 
       t.equal(
         'Only MasterCard and Visa credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: all, Networks: 2, Types: 1'
       );
 
       instrument = {
         method: 'card',
-        networks: ['mastercard', 'visa', 'rupay'],
+        networks: ['MasterCard', 'Visa', 'RuPay'],
       };
 
       t.equal(
         'Only select networks supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: all, Networks: 2+, Types: all'
       );
 
       instrument = {
         method: 'card',
-        networks: ['mastercard', 'visa', 'rupay'],
+        networks: ['MasterCard', 'Visa', 'RuPay'],
         types: ['credit'],
       };
 
       t.equal(
         'Only select network credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: all, Networks: 2+, Types: 1'
       );
 
@@ -106,7 +106,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only HDFC cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: 1, Networks: all, Types: all'
       );
 
@@ -118,82 +118,82 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only HDFC credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: 1, Networks: all, Types: 1'
       );
 
       instrument = {
         method: 'card',
         issuers: ['HDFC'],
-        networks: ['mastercard'],
+        networks: ['MasterCard'],
       };
 
       t.equal(
         'Only HDFC MasterCard cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: 1, Networks: 1, Types: all'
       );
 
       instrument = {
         method: 'card',
         issuers: ['HDFC'],
-        networks: ['mastercard'],
+        networks: ['MasterCard'],
         types: ['credit'],
       };
 
       t.equal(
         'Only HDFC MasterCard credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: 1, Networks: 1, Types: 1'
       );
 
       instrument = {
         method: 'card',
         issuers: ['HDFC'],
-        networks: ['mastercard', 'visa'],
+        networks: ['MasterCard', 'Visa'],
       };
 
       t.equal(
         'Only select HDFC cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: 1, Networks: 2, Types: all'
       );
 
       instrument = {
         method: 'card',
         issuers: ['HDFC'],
-        networks: ['mastercard', 'visa'],
+        networks: ['MasterCard', 'Visa'],
         types: ['credit'],
       };
 
       t.equal(
         'Only select HDFC credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: 1, Networks: 2, Types: 1'
       );
 
       instrument = {
         method: 'card',
         issuers: ['HDFC'],
-        networks: ['mastercard', 'visa', 'rupay'],
+        networks: ['MasterCard', 'Visa', 'RuPay'],
       };
 
       t.equal(
         'Only select HDFC cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: 1, Networks: 2+, Types: all'
       );
 
       instrument = {
         method: 'card',
         issuers: ['HDFC'],
-        networks: ['mastercard', 'visa', 'rupay'],
+        networks: ['MasterCard', 'Visa', 'RuPay'],
         types: ['credit'],
       };
 
       t.equal(
         'Only select HDFC credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: 1, Networks: 2+, Types: 1'
       );
 
@@ -206,7 +206,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only HDFC and Axis cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: 2, Networks: all, Types: all'
       );
 
@@ -218,82 +218,82 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only HDFC and Axis credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: 2, Networks: all, Types: 1'
       );
 
       instrument = {
         method: 'card',
         issuers: ['HDFC', 'UTIB'],
-        networks: ['mastercard'],
+        networks: ['MasterCard'],
       };
 
       t.equal(
         'Only HDFC and Axis MasterCard cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: 2, Networks: 1, Types: all'
       );
 
       instrument = {
         method: 'card',
         issuers: ['HDFC', 'UTIB'],
-        networks: ['mastercard'],
+        networks: ['MasterCard'],
         types: ['credit'],
       };
 
       t.equal(
         'Only select HDFC and Axis credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: 2, Networks: 1, Types: 1'
       );
 
       instrument = {
         method: 'card',
         issuers: ['HDFC', 'UTIB'],
-        networks: ['mastercard', 'visa'],
+        networks: ['MasterCard', 'Visa'],
       };
 
       t.equal(
         'Only select cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: 2, Networks: 2, Types: all'
       );
 
       instrument = {
         method: 'card',
         issuers: ['HDFC', 'UTIB'],
-        networks: ['mastercard', 'visa'],
+        networks: ['MasterCard', 'Visa'],
         types: ['credit'],
       };
 
       t.equal(
         'Only select credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: 2, Networks: 2, Types: 1'
       );
 
       instrument = {
         method: 'card',
         issuers: ['HDFC', 'UTIB'],
-        networks: ['mastercard', 'visa', 'rupay'],
+        networks: ['MasterCard', 'Visa', 'RuPay'],
       };
 
       t.equal(
         'Only select cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: 2, Networks: 2+, Types: all'
       );
 
       instrument = {
         method: 'card',
         issuers: ['HDFC', 'UTIB'],
-        networks: ['mastercard', 'visa', 'rupay'],
+        networks: ['MasterCard', 'Visa', 'RuPay'],
         types: ['credit'],
       };
 
       t.equal(
         'Only select credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: 2, Networks: 2+, Types: 1'
       );
 
@@ -306,7 +306,7 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only select cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: 2+, Networks: all, Types: all'
       );
 
@@ -318,82 +318,82 @@ test('Module: common/subtext', t => {
 
       t.equal(
         'Only select credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: 2+, Networks: all, Types: 1'
       );
 
       instrument = {
         method: 'card',
         issuers: ['HDFC', 'UTIB', 'ICIC'],
-        networks: ['mastercard'],
+        networks: ['MasterCard'],
       };
 
       t.equal(
         'Only select MasterCard cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: 2+, Networks: 1, Types: all'
       );
 
       instrument = {
         method: 'card',
         issuers: ['HDFC', 'UTIB', 'ICIC'],
-        networks: ['mastercard'],
+        networks: ['MasterCard'],
         types: ['credit'],
       };
 
       t.equal(
         'Only select MasterCard credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: 2+, Networks: 1, Types: 1'
       );
 
       instrument = {
         method: 'card',
         issuers: ['HDFC', 'UTIB', 'ICIC'],
-        networks: ['mastercard', 'visa'],
+        networks: ['MasterCard', 'Visa'],
       };
 
       t.equal(
         'Only select cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: 2+, Networks: 2, Types: all'
       );
 
       instrument = {
         method: 'card',
         issuers: ['HDFC', 'UTIB', 'ICIC'],
-        networks: ['mastercard', 'visa'],
+        networks: ['MasterCard', 'Visa'],
         types: ['credit'],
       };
 
       t.equal(
         'Only select credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: 2+, Networks: 2, Types: 1'
       );
 
       instrument = {
         method: 'card',
         issuers: ['HDFC', 'UTIB', 'ICIC'],
-        networks: ['mastercard', 'visa', 'rupay'],
+        networks: ['MasterCard', 'Visa', 'RuPay'],
       };
 
       t.equal(
         'Only select cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: 2+, Networks: 2+, Types: all'
       );
 
       instrument = {
         method: 'card',
         issuers: ['HDFC', 'UTIB', 'ICIC'],
-        networks: ['mastercard', 'visa', 'rupay'],
+        networks: ['MasterCard', 'Visa', 'RuPay'],
         types: ['credit'],
       };
 
       t.equal(
         'Only select credit cards supported',
-        Subtext.getSubtextForInstrument(instrument),
+        CardSubtext.generateSubtextForCardInstrument(instrument),
         'Issuers: 2+, Networks: 2+, Types: 1'
       );
 

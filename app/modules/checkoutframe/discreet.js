@@ -1,9 +1,4 @@
 import 'entry/checkout-frame';
-import {
-  makeAuthUrl,
-  makePrefParams,
-  validateOverrides,
-} from 'common/Razorpay';
 import RazorpayConfig from 'common/RazorpayConfig';
 
 import Track from 'tracker';
@@ -58,6 +53,7 @@ import * as HomeScreenStore from 'checkoutstore/screens/home';
 import * as CardScreenStore from 'checkoutstore/screens/card';
 import * as NetbankingScreenStore from 'checkoutstore/screens/netbanking';
 import * as CustomerStore from 'checkoutstore/customer';
+import * as Theme from 'checkoutstore/theme';
 
 import QRScreen from 'ui/tabs/qr/index.svelte';
 import BankTransferScreen from 'ui/tabs/bank-transfer/index.svelte';
@@ -75,6 +71,8 @@ import WalletTab from 'ui/tabs/wallets/index.svelte';
 import PayoutsInstruments from 'ui/tabs/payout/payout-instruments.svelte';
 import PayoutAccount from 'ui/tabs/payout/payout-account.svelte';
 
+import showTimer from 'checkoutframe/timer';
+
 import * as Hacks from 'checkoutframe/hacks';
 
 import { get as storeGetter } from 'svelte/store';
@@ -87,9 +85,6 @@ import * as Instruments from 'configurability/instruments';
 
 export default {
   RazorpayConfig,
-  makeAuthUrl,
-  validateOverrides,
-  makePrefParams,
   fetch,
   Track,
   Analytics,
@@ -113,6 +108,8 @@ export default {
 
   initIframe,
 
+  showTimer,
+
   Constants,
   Bank,
   Card,
@@ -130,6 +127,7 @@ export default {
   Flows,
   Payouts,
   CountryCodesUtil,
+  Theme,
 
   Store,
   MethodStore,

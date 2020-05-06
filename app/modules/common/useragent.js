@@ -56,6 +56,11 @@ export const isMobile = () => {
   );
 };
 
+// Some stock android browsers that pause the checkout tab
+// when we open popup for redirection
+export const browsersThatPauseTab = check(/(Vivo|HeyTap|Realme|Oppo)Browser/);
+
 export const stockAndroidBrowser = android && !chrome && !firefox;
 
-export const ajaxRouteNotSupported = iOS || stockAndroidBrowser;
+export const ajaxRouteNotSupported =
+  browsersThatPauseTab || iOS || stockAndroidBrowser;

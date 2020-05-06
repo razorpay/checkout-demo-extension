@@ -14,7 +14,7 @@ test('Module: configurability/translate', t => {
               instruments: [
                 {
                   method: 'upi',
-                  apps: ['googlepay'],
+                  apps: ['google_pay'],
                 },
               ],
             },
@@ -45,7 +45,7 @@ test('Module: configurability/translate', t => {
             {
               method: 'card',
               issuers: ['SBIN'],
-              networks: ['mastercard'],
+              networks: ['MasterCard'],
             },
             {
               method: 'card',
@@ -109,7 +109,7 @@ test('Module: configurability/translate', t => {
               {
                 method: 'card',
                 issuers: ['SBIN'],
-                networks: ['mastercard'],
+                networks: ['MasterCard'],
                 _type: 'instrument',
               },
               {
@@ -125,6 +125,17 @@ test('Module: configurability/translate', t => {
               },
             ],
             methods: [],
+          },
+          sequence: ['block.gpay', 'netbanking', 'block.hdfc'],
+          preferences: {},
+        },
+
+        restrictions: {
+          allow: {
+            code: 'rzp.restrict_allow',
+            _type: 'block',
+            instruments: [],
+            title: 'Available Payment Methods',
           },
         },
       };

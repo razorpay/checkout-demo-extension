@@ -10,22 +10,20 @@ import { createMethodBlock } from './methods';
  *      @prop {Object} hide
  *        @prop {Array<Instrument>} instruments Hidden insturments
  *        @prop {Array<string>} methods Hidden methods
- *  @prop {Object} original Original Merchant config
  *  @prop {Array<string>} methods Available methods for the merchant
  *
  * @returns {Array<Block>}
  */
 export function getSequencedBlocks(params) {
-  const { translated, original, methods } = params;
+  const { translated, methods } = params;
   const { display } = translated;
-  const { blocks, hide } = display;
+  const { blocks, hide, preferences } = display;
 
-  const preferences = _Obj.getSafely(original, 'display.preferences', {});
+  let { sequence } = display;
+
   const {
     show_default_blocks = true, // Show default blocks by default
   } = preferences;
-
-  let sequence = _Obj.getSafely(original, 'display.sequence', []);
 
   // Get the methods to list
   const methodsToList = _Arr.filter(
@@ -43,6 +41,41 @@ export function getSequencedBlocks(params) {
 
   // Filter the sequence for duplicates
   sequence = _Arr.removeDuplicates(sequence);
+
+  /**
+   * Cardless EMI and EMI are the same payment option in the UI.
+   *
+   * If only Cardless EMI is available, it becomes method=cardless_emi
+   * If only EMI is available, it becomes method=emi
+   * If both EMI and Cardless EMI are available, it becomes method=cardless_emi
+   *
+   * When both of them are present, things get complicated.
+   * Let's handle that.
+   * Whichever of "emi" or "cardless_emi" is present first in the sequence,
+   * lets put "cardless_emi" at that place. And remove "emi" altogether.
+   */
+  if (
+    _Arr.contains(sequence, 'cardless_emi') &&
+    _Arr.contains(sequence, 'emi')
+  ) {
+    let indexOfEmi = _Arr.indexOf(sequence, 'emi');
+    let indexOfCardlessEmi = _Arr.indexOf(sequence, 'cardless_emi');
+
+    if (indexOfEmi < indexOfCardlessEmi) {
+      /**
+       * If emi is present before cardless_emi
+       * Remove old cardless_emi and put it in the place of emi
+       */
+      sequence = _Arr.remove(sequence, 'cardless_emi');
+      sequence[indexOfEmi] = 'cardless_emi';
+    } else {
+      /**
+       * cardless_emi is already before emi
+       * Remove emi
+       */
+      sequence = _Arr.remove(sequence, 'emi');
+    }
+  }
 
   // Get all blocks
   const allBlocks = _Arr.merge(methodBlocks, blocks);
