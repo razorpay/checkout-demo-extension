@@ -237,7 +237,7 @@ export function setBlocks(
  * @param {Instrument} instrument
  * @param {Array<Blocks>} blocks
  *
- * @returns {Block}
+ * @returns {Block|undefined}
  */
 function getInstrumentBlock(instrument, blocks) {
   return _Arr.find(blocks, block => {
