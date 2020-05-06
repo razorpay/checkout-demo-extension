@@ -17,8 +17,9 @@ function _translate(options = {}, external) {
   options = _Obj.clone(options);
 
   const { display = {}, restrictions = [] } = options;
-  const { blocks = {}, hide = [], preferences = {}, sequence = [] } = display;
-  const { allow = [] } = restrictions;
+  const { blocks = {}, hide = [], preferences = {}, sequence = [] } =
+    display || {};
+  const { allow = [] } = restrictions || {};
 
   /**
    * Create blocks
