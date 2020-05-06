@@ -3912,6 +3912,7 @@ Session.prototype = {
     this.payload = null;
 
     Analytics.removeMeta('doneByInstrument');
+    Analytics.removeMeta('instrumentMeta');
     Analytics.removeMeta('doneByP13n');
 
     var params = {};
@@ -4298,6 +4299,10 @@ Session.prototype = {
         this.payload = data;
 
         Analytics.setMeta('doneByInstrument', true);
+        Analytics.setMeta(
+          'instrumentMeta',
+          discreet.getInstrumentMeta(selectedInstrument)
+        );
 
         if (_Obj.getSafely(selectedInstrument, 'meta.preferred')) {
           Analytics.setMeta('doneByP13n', true);

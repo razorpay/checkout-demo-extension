@@ -1,5 +1,6 @@
 import { createBlock } from 'configurability/blocks';
-import { blocks } from 'checkoutstore/screens/home';
+import { blocks, instruments } from 'checkoutstore/screens/home';
+import { get as storeGetter } from 'svelte/store';
 import Track from 'tracker';
 import { MAX_PREFERRED_INSTRUMENTS } from 'common/constants';
 import { getBlockConfig } from 'configurability';
@@ -229,4 +230,58 @@ export function setBlocks(
     preferred: preferredBlock,
     all: allBlocks,
   };
+}
+
+/**
+ * Returns the block that contains the instrument
+ * @param {Instrument} instrument
+ * @param {Array<Blocks>} blocks
+ *
+ * @returns {Block|undefined}
+ */
+function getInstrumentBlock(instrument, blocks) {
+  return _Arr.find(blocks, block => {
+    return _Arr.any(
+      block.instruments,
+      blockInstrument => blockInstrument.id === instrument.id
+    );
+  });
+}
+
+/**
+ * Returns meta information about the instrument
+ * @param {Instrument} instrumnt
+ *
+ * @returns {Object} meta
+ */
+export function getInstrumentMeta(instrument) {
+  const allBlocks = storeGetter(blocks);
+  const block = getInstrumentBlock(instrument, allBlocks);
+
+  let meta = {};
+
+  if (block) {
+    // All indices should be one-indexed
+
+    meta.indexOfBlock = _Arr.indexOf(allBlocks, block) + 1;
+
+    meta.indexInBlock =
+      _Arr.findIndex(
+        block.instruments,
+        blockInstrument => blockInstrument.id === instrument.id
+      ) + 1;
+
+    meta.indexInInstruments =
+      _Arr.findIndex(
+        storeGetter(instruments),
+        storeInstrument => storeInstrument.id === instrument.id
+      ) + 1;
+
+    meta.block = {
+      title: block.title,
+      code: block.code,
+    };
+  }
+
+  return meta;
 }

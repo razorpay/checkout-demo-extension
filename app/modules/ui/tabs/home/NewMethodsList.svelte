@@ -11,6 +11,7 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getSession } from 'sessionmanager';
+  import { getInstrumentMeta } from 'ui/tabs/home/instruments';
 
   // Store
   import {
@@ -41,6 +42,7 @@
       data: {
         instrument,
         index,
+        instrumentMeta: getInstrumentMeta(instrument),
       },
     });
   }
