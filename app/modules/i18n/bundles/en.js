@@ -265,6 +265,6 @@ export default {
     scan_on_phone:
       'Scan the QR using any UPI app on your phone like BHIM, PhonePe, Google Pay etc.',
     retry: 'Retry',
-    downtime_text: '**UPI QR** is experiencing __low__ **success rates**.',
+    downtime_text: '**UPI QR** is experiencing low success rates.',
   },
 };
