@@ -17,6 +17,7 @@ export const instruments = derived(blocks, allBlocks => {
 
   return allInstruments;
 });
+export const sequence = writable([]);
 
 export const selectedInstrumentId = writable(null);
 export const selectedInstrument = derived(

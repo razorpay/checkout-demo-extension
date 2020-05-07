@@ -1,5 +1,5 @@
 import { createBlock } from 'configurability/blocks';
-import { blocks, instruments } from 'checkoutstore/screens/home';
+import { blocks, instruments, sequence } from 'checkoutstore/screens/home';
 import { get as storeGetter } from 'svelte/store';
 import Track from 'tracker';
 import { MAX_PREFERRED_INSTRUMENTS } from 'common/constants';
@@ -224,6 +224,7 @@ export function setBlocks(
   });
 
   blocks.set(allBlocks);
+  sequence.set(parsedConfig.display.sequence);
 
   return {
     merchant: parsedConfig,
