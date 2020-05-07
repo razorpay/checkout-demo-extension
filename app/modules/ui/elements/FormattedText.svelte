@@ -3,11 +3,11 @@
   const formatters = [
     {
       flag: '**',
-      tag: 'bold',
+      type: 'bold',
     },
     {
       flag: '__',
-      tag: 'italic',
+      type: 'italic',
     },
   ];
 
@@ -20,7 +20,7 @@
 
   const tokenizeTextForFormatter = (tokenText, formatter) => {
     return tokenText.split(formatter.flag).map((text, i) => {
-      return { text: text, type: i % 2 ? formatter.tag : 'plain' };
+      return { text: text, type: i % 2 ? formatter.type : 'plain' };
     });
   };
 
