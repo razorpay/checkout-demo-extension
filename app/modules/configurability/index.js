@@ -298,6 +298,8 @@ export function getBlockConfig(options, customer) {
 
   return {
     display: {
+      sequence,
+
       blocks: clustered,
       hide: translated.display.hide,
       preferences: translated.display.preferences,
