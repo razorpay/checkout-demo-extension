@@ -288,13 +288,13 @@ export function getBlockConfig(options, customer) {
     );
 
   // Reorder blocks
-  const sequentialied = getSequencedBlocks({
+  const { blocks: sequentialized, sequence } = getSequencedBlocks({
     translated,
     methods: getAvailableDefaultMethods(),
   });
 
   // Group blocks of Razorpay
-  const clustered = clusterRazorpayBlocks(sequentialied);
+  const clustered = clusterRazorpayBlocks(sequentialized);
 
   return {
     display: {
