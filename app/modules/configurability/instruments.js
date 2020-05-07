@@ -82,9 +82,14 @@ function hasOnlyAllowedKeys(instrument) {
 
   if (anyAbsent) {
     return false;
-  } else {
-    return true;
   }
+
+  // All keys must be arrays
+  const allArrays = _Arr.every(instrumentKeys, key =>
+    _.isArray(instrument[key])
+  );
+
+  return allArrays;
 }
 
 /**

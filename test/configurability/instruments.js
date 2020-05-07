@@ -202,6 +202,24 @@ test('Module: configurability/instruments', t => {
       t.end();
     });
 
+    test('Fails to create instrument for expected keys as non-array', t => {
+      let config, expected, found;
+
+      config = {
+        method: 'upi',
+        flows: 'intent',
+        apps: ['google_pay', 'com.somerandom.app'],
+      };
+
+      expected = undefined;
+
+      found = Instruments.validateKeysAndCreateInstrument(config);
+
+      t.deepEqual(found, expected, 'Does not create instrument');
+
+      t.end();
+    });
+
     t.end();
   });
 
