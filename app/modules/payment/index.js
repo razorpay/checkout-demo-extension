@@ -540,64 +540,24 @@ Payment.prototype = {
   },
 
   gotoBank: function() {
-    if (this.gotoBankRequest) {
-      this.gotoBankUsingRequest();
-    } else if (this.gotoBankHtml) {
-      this.gotoBankUsingHtml();
-    } else if (this.gotoBankUrl) {
-      this.gotoBankUsingUrl();
-    }
-  },
-
-  gotoBankUsingUrl: function() {
-    // We can open the bank URL in either open popup or iframe.
+    // For redirect mode where we do not have a popup, redirect using POST
     if (!this.popup) {
       if (this.iframe) {
-        // Make popup will actually open an iframe if this.iframe is true.
-        // Ignore the function name.
         this.makePopup();
+      } else {
+        this.redirect({ url: this.gotoBankUrl, method: 'post' });
+        return;
       }
     }
+
     const isIframe = this.popup instanceof Iframe;
     if (isIframe) {
       this.popup.write(popupTemplate(this));
-    } else {
-      // For redirect mode where we do not have a popup, redirect using POST
-      this.redirect({ url: this.gotoBankUrl, method: 'post' });
-      return;
     }
     _Doc.submitForm(this.gotoBankUrl, null, 'post', this.popup.name);
-    // Iframe is not visible by default.
-    // Popup shows up automatically when created.
     if (isIframe) {
       this.popup.show();
     }
-  },
-
-  gotoBankUsingHtml: function() {
-    // Create popup if it doesn't exist.
-    if (!this.popup) {
-      this.makePopup();
-    }
-    // In type: first JSON response, we get HTML page which redirects to bank.
-    // Write HTML into popup.
-    this.popup.write(this.gotoBankHtml);
-  },
-
-  gotoBankUsingRequest: function() {
-    // Create popup if it doesn't exist.
-    if (!this.popup) {
-      this.makePopup();
-    }
-    // In type: first JSON response, we got request data.
-    // Append form into popup and submit.
-    const request = this.gotoBankRequest;
-    _Doc.submitForm(
-      request.url,
-      request.content,
-      request.method,
-      this.popup.name
-    );
   },
 
   makePopup: function() {
