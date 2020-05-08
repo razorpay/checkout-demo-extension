@@ -6,7 +6,7 @@
   // UI imports
   import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
-  import FormattedText from 'ui/elements/FormattedText.svelte';
+  import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import FeeBearer from 'ui/components/feebearer.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
   import Tab from 'ui/tabs/Tab.svelte';
