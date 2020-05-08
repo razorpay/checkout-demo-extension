@@ -15,6 +15,14 @@ export const tokenizeTextForFormatter = (tokenText, formatter) => {
   });
 };
 
+/**
+ * @description converts marked strings to recognizable tokens
+ *
+ * @param {String} text text to be converted into tokens
+ *
+ * @variation FeatureRequest would need changes to support nesting of tags **This will __not__ work **
+ * @example tokenizeTextForFormatters(textToBeFormatted) -> [{"text":"This ","type":"plain"},{"text":"might","type":"italic"},{"text":" work","type":"plain"}]
+ */
 export const tokenizeTextForFormatters = token => {
   let _tokenized = token;
   formatters.forEach(formatter => {
