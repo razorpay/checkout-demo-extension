@@ -42,7 +42,7 @@
   import Bottom from 'ui/layouts/Bottom.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import AddANewVpa from './AddANewVpa.svelte';
-  import { getMiscIcon } from 'icons/misc';
+  import { getMiscIcon } from 'checkoutframe/icons';
   import Callout from 'ui/elements/Callout.svelte';
 
   // Store
