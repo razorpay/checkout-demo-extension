@@ -50,8 +50,14 @@ async function parseBlocksFromHomescreen(context) {
                   const itemDescription = await innerText(
                     await subItemElement.$('[slot=subtitle]')
                   );
+                  const type = await getAttribute(
+                    context.page,
+                    subItemElement,
+                    'data-type'
+                  );
 
                   resolve({
+                    type,
                     title: itemTitle,
                     description: itemDescription,
                   });

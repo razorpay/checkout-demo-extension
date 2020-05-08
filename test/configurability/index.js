@@ -14,7 +14,7 @@ test('Module: configurability', t => {
               instruments: [
                 {
                   method: 'upi',
-                  apps: ['googlepay'],
+                  apps: ['google_pay'],
                 },
               ],
             },
@@ -45,7 +45,7 @@ test('Module: configurability', t => {
             {
               method: 'card',
               issuers: ['SBIN'],
-              networks: ['mastercard'],
+              networks: ['MasterCard'],
             },
             {
               method: 'card',

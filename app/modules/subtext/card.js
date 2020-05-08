@@ -1,6 +1,5 @@
 import { generateTextFromList } from 'lib/utils';
 import { getCommonBankName } from 'common/bank';
-import { networks as CardNetworks } from 'common/card';
 
 /**
  * Generates a string from the list after filtering for truthy values
@@ -21,12 +20,11 @@ function concatTruthyString(list) {
  *
  * @returns {string}
  */
-function generateCardSubtext(instrument) {
+export function generateSubtextForCardInstrument(instrument) {
   const instrumentIssuers =
     instrument.issuers || []
     |> _Arr.map(bank => getCommonBankName(bank).replace(/ Bank$/, ''));
-  const instrumentNetworks =
-    instrument.networks || [] |> _Arr.map(network => CardNetworks[network]);
+  const instrumentNetworks = instrument.networks || [];
   const instrumentTypes = instrument.types || [];
 
   const issuersLength = instrumentIssuers.length;
@@ -162,21 +160,5 @@ function generateCardSubtext(instrument) {
     ]);
 
     return concatTruthyString(stringList);
-  }
-}
-
-const INSTRuMENT_SUBTEXT = {
-  card: generateCardSubtext,
-};
-
-/**
- * Generates subtext for an instrument
- * @param {Instrument} instrument
- *
- * @returns {string}
- */
-export function getSubtextForInstrument(instrument) {
-  if (INSTRuMENT_SUBTEXT[instrument.method]) {
-    return INSTRuMENT_SUBTEXT[instrument.method](instrument);
   }
 }

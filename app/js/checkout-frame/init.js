@@ -2,8 +2,6 @@ var Razorpay = window.Razorpay;
 var templates = {};
 
 var RazorpayConfig = discreet.RazorpayConfig;
-var makeAuthUrl = discreet.makeAuthUrl;
-var makePrefParams = discreet.makePrefParams;
 var fetch = discreet.fetch;
 var Track = discreet.Track;
 var Analytics = discreet.Analytics;

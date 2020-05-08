@@ -1,5 +1,3 @@
-import { toLowerCaseSafe } from 'lib/utils';
-
 /**
  * Extracts config data related to UPI from the preferred instrument.
  *
@@ -55,7 +53,7 @@ function card(instrument) {
     method: 'card',
     type: instrument.type,
     issuer: instrument.issuer,
-    network: toLowerCaseSafe(instrument.network),
+    network: instrument.network,
   };
 }
 

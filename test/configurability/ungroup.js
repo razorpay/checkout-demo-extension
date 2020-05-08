@@ -99,7 +99,7 @@ test('Module: configurability/ungroup', t => {
                 token_id: 'token_12345',
                 type: 'credit',
                 issuer: 'HDFC',
-                network: 'visa',
+                network: 'Visa',
               },
             ],
           },
@@ -132,14 +132,14 @@ test('Module: configurability/ungroup', t => {
                 token_id: 'token_12345',
                 type: 'credit',
                 issuer: 'HDFC',
-                network: 'visa',
+                network: 'Visa',
               },
               {
                 method: 'card',
                 token_id: 'token_54321',
                 type: 'debit',
                 issuer: 'ICIC',
-                network: 'mastercard',
+                network: 'MasterCard',
               },
             ],
           },
@@ -152,7 +152,7 @@ test('Module: configurability/ungroup', t => {
 
       groupedInstrument = {
         method: 'card',
-        card_networks: ['visa'],
+        networks: ['Visa'],
         issuers: ['HDFC', 'ICIC'],
       };
 
@@ -166,12 +166,12 @@ test('Module: configurability/ungroup', t => {
         instruments: [
           {
             method: 'card',
-            card_networks: ['visa'],
+            networks: ['Visa'],
             issuers: ['HDFC', 'ICIC'],
             _ungrouped: [
               {
                 method: 'card',
-                card_networks: ['visa'],
+                networks: ['Visa'],
                 issuers: ['HDFC', 'ICIC'],
               },
             ],
@@ -196,7 +196,7 @@ test('Module: configurability/ungroup', t => {
           },
           {
             method: 'card',
-            card_networks: ['visa'],
+            networks: ['Visa'],
             issuers: ['HDFC', 'ICIC'],
           },
         ],
@@ -214,25 +214,25 @@ test('Module: configurability/ungroup', t => {
                 token_id: 'token_12345',
                 type: 'credit',
                 issuer: 'HDFC',
-                network: 'visa',
+                network: 'Visa',
               },
               {
                 method: 'card',
                 token_id: 'token_54321',
                 type: 'debit',
                 issuer: 'ICIC',
-                network: 'mastercard',
+                network: 'MasterCard',
               },
             ],
           },
           {
             method: 'card',
-            card_networks: ['visa'],
+            networks: ['Visa'],
             issuers: ['HDFC', 'ICIC'],
             _ungrouped: [
               {
                 method: 'card',
-                card_networks: ['visa'],
+                networks: ['Visa'],
                 issuers: ['HDFC', 'ICIC'],
               },
             ],

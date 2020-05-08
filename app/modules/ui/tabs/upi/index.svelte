@@ -153,6 +153,9 @@
     availableFlows = getAvailableFlowsFromInstrument($methodTabInstrument);
   }
 
+  // Set default token value when the available flows change
+  $: availableFlows, setDefaultTokenValue();
+
   /**
    * An instrument might has only for some apps to be shown
    * @param {Instrument | undefined} instrument
@@ -218,38 +221,38 @@
   $: shouldShowCollect = availableFlows.collect || isOtm;
   $: shouldShowOmnichannel = availableFlows.omnichannel && !isOtm;
 
-  $: {
+  // Determine CTA visilibty when selectedToken changes, but only if session.tab is 'upi'
+  $: selectedToken, session.tab === 'upi' && determineCtaVisibility();
+
+  function setDefaultTokenValue() {
+    const hasIntentFlow = availableFlows.intent || useWebPaymentsApi;
+    const hasTokens = tokens && tokens.length;
+
     /**
      * If there are no tokens, select "new" as the default option.
      * But only do that if intent flow is not available.
      */
-    if (!tokens.length && !intent) {
-      selectedToken = 'new';
-    }
-  }
-
-  $: {
-    if (selectedToken && _Arr.contains(['upi', 'upi_otm'], session.tab)) {
-      determineCtaVisibility();
+    if (hasIntentFlow) {
+      selectedToken = null;
+    } else if (availableFlows.collect) {
+      if (hasTokens) {
+        selectedToken = null;
+      } else {
+        selectedToken = 'new';
+      }
     }
   }
 
   $: {
     tokens = filterUPITokens(_Obj.getSafely($customer, 'tokens.items', []));
+    setDefaultTokenValue();
   }
 
   $: isOtm = method === 'upi_otm';
 
   function setWebPaymentsApiUsage(to) {
     useWebPaymentsApi = to;
-
-    /**
-     * If web payments API is available,
-     * do not select Add New VPA by default
-     */
-    if (to) {
-      selectedToken = null;
-    }
+    setDefaultTokenValue();
   }
 
   function determineCtaVisibility() {
@@ -296,6 +299,7 @@
   }
 
   export function onShown() {
+    setDefaultTokenValue();
     determineCtaVisibility();
   }
 
@@ -343,11 +347,24 @@
         break;
 
       default:
-        _token = _Arr.find(
-          _Obj.getSafely(session.getCurrentCustomer(), 'tokens.items', []),
-          token => token.id === selectedToken
-        );
-        data = { token: _token.token };
+        // `selectedToken` can be null if nothing is to be selected by default
+        if (selectedToken) {
+          _token = _Arr.find(
+            _Obj.getSafely(session.getCurrentCustomer(), 'tokens.items', []),
+            token => token.id === selectedToken
+          );
+
+          Analytics.track('upi:token:switch:default', {
+            data: {
+              selectedToken,
+              _token,
+            },
+            immediately: true,
+          });
+
+          data = { token: _token.token };
+        }
+
         break;
     }
 
@@ -568,7 +585,7 @@
           {#if intent}
             <ListHeader>
               <i slot="icon">
-                <Icon icon={getMiscIcon('recieve')} />
+                <Icon icon={getMiscIcon('receive')} />
               </i>
               <div slot="subtitle">
                 You will receive a payment request on your UPI app

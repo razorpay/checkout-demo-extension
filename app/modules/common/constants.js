@@ -99,11 +99,6 @@ export const STRINGS = {
   redirect: 'Redirecting to Bank page',
 };
 
-export const OfferType = {
-  INSTANT: 'instant',
-  DEFERRED: 'deferred',
-};
-
 /* Being used for filtering actual methods from methods object */
 export const AVAILABLE_METHODS = [
   'card',
@@ -129,3 +124,10 @@ export const NO_PAYMENT_ADAPTER_ERROR = 'Payment Adapter does not exist.';
 export const INDIA_COUNTRY_CODE = '+91';
 
 export const MAX_PREFERRED_INSTRUMENTS = 3;
+
+export const COLORS = {
+  RAZORPAY_COLOR: '#528FF0',
+  RAZORPAY_HOVER_COLOR: '#626A74',
+  TEXT_COLOR_BLACK: 'rgba(0, 0, 0, 0.85)',
+  TEXT_COLOR_WHITE: '#FFFFFF',
+};

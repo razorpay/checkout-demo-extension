@@ -21,7 +21,7 @@ import {
 import { getEligibleProvidersBasedOnMinAmount } from 'common/cardlessemi';
 import { getProvider } from 'common/paylater';
 
-import { wallets } from 'common/wallet';
+import { wallets, getSortedWallets } from 'common/wallet';
 import { extendConfig } from 'common/cardlessemi';
 import { mobileQuery } from 'common/useragent';
 import { getUPIIntentApps } from 'checkoutstore/native';
@@ -448,7 +448,10 @@ export function getWallets() {
       enabledWallets |> _Arr.filter(wallet => passedWallets[wallet] !== false);
   }
   return (
-    enabledWallets |> _Arr.map(wallet => wallets[wallet]) |> _Arr.filter(_ => _)
+    enabledWallets
+    |> _Arr.map(wallet => wallets[wallet])
+    |> _Arr.filter(Boolean)
+    |> getSortedWallets
   );
 }
 

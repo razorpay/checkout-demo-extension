@@ -35,6 +35,7 @@ export const getCheckoutConfig = () => preferences.checkout_config;
 
 const optionGetter = option => () => getOption(option);
 export const getOption = option => razorpayInstance.get(option);
+export const setOption = (option, value) => razorpayInstance.set(option, value);
 export const getCardFeatures = iin => razorpayInstance.getCardFeatures(iin);
 export const getCardCurrencies = ({ iin, tokenId, cardNumber }) =>
   razorpayInstance.getCardCurrencies({
@@ -186,4 +187,80 @@ export function isInternational() {
 
 export function getBanks() {
   return preferences.methods.netbanking;
+}
+
+function getConfigFromOptions() {
+  if (_.isNull(getOption('config'))) {
+    return null;
+  }
+
+  /**
+   * Only certain keys are allowed to be passed from options
+   * For example, restrictions aren't allowed
+   */
+  const config = {
+    display: getOption('config.display'),
+  };
+
+  return config;
+}
+
+export function getMerchantConfig() {
+  const configFromOptions = getConfigFromOptions();
+  const configFromPreferences = getCheckoutConfig();
+
+  const displayFromOptions = _Obj.getSafely(configFromOptions, 'display');
+  const displayFromPreferences = _Obj.getSafely(
+    configFromPreferences,
+    'display'
+  );
+
+  // Restrictions can only come from preferences
+  const restrictions = {
+    config: _Obj.getSafely(configFromPreferences, 'restrictions'),
+    source: 'preferences',
+  };
+
+  let display = {};
+
+  if (_.isNull(displayFromOptions)) {
+    // Setting config.display as null allows you to disable the display configuration
+    display = {
+      config: null,
+      source: 'options',
+    };
+  } else {
+    if (
+      !_.isUndefined(displayFromOptions) &&
+      _.isNonNullObject(displayFromOptions) &&
+      !_.isEmptyObject(displayFromOptions)
+    ) {
+      display = {
+        config: displayFromOptions,
+        source: 'options',
+      };
+    } else if (!_.isUndefined(displayFromPreferences)) {
+      display = {
+        config: displayFromPreferences,
+        source: 'preferences',
+      };
+    }
+  }
+
+  return {
+    config: {
+      display: display.config,
+      restrictions: restrictions.config,
+    },
+
+    sources: {
+      display: display.source,
+      restrictions: restrictions.source,
+    },
+
+    _raw: {
+      options: configFromOptions,
+      preferences: configFromPreferences,
+    },
+  };
 }

@@ -70,7 +70,8 @@
   on:click
   on:keydown
   type="button"
-  role="listitem">
+  role="listitem"
+  {...$$restProps}>
   <Stack horizontal {reverse}>
     <slot name="icon" />
     <div>

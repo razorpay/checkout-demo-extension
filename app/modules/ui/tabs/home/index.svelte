@@ -51,7 +51,7 @@
     isAddressEnabled,
     isRecurring,
     getMerchantOrder,
-    getCheckoutConfig,
+    getMerchantConfig,
   } from 'checkoutstore';
   import {
     isCreditCardEnabled,
@@ -116,52 +116,6 @@
     !session.tpvBank &&
     !isPartialPayment &&
     !session.get('address');
-
-  function getConfigFromOptions() {
-    if (_.isNull(session.get('config'))) {
-      return null;
-    }
-
-    let config = {};
-    const display = session.get('config.display');
-
-    if (display) {
-      config.display = display;
-    }
-
-    return config;
-  }
-
-  function getRawMerchantConfig() {
-    const configFromOptions = getConfigFromOptions();
-    const configFromPreferences = getCheckoutConfig();
-
-    let config = null;
-    let source;
-
-    if (_.isNull(configFromOptions)) {
-      // Setting config as null allows you to disable the configuration
-      source = 'options';
-      config = null;
-    } else if (_.isNull(configFromPreferences)) {
-      source = 'preferences';
-      config = null;
-    } else if (
-      _.isNonNullObject(configFromPreferences) &&
-      !_.isEmptyObject(configFromPreferences)
-    ) {
-      source = 'preferences';
-      config = configFromPreferences;
-    } else {
-      source = 'options';
-      config = configFromOptions;
-    }
-
-    return {
-      config,
-      source,
-    };
-  }
 
   export function showMethods() {
     view = 'methods';
@@ -297,13 +251,13 @@
       ? getAllAvailableP13nInstruments($customer)
       : [];
 
-    const merchantConfig = getRawMerchantConfig();
+    const merchantConfig = getMerchantConfig();
 
     const blocksThatWereSet = setBlocks(
       {
         preferred: eligiblePreferredInstruments,
         merchantConfig: merchantConfig.config,
-        configSource: merchantConfig.source,
+        configSource: merchantConfig.sources,
       },
       $customer
     );

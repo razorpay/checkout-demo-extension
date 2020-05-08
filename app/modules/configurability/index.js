@@ -19,7 +19,7 @@ import {
 
 import { shouldSeparateDebitCard, getMerchantMethods } from 'checkoutstore';
 import wallet from 'ui/icons/payment-methods/wallet';
-import { API_NETWORK_CODES_MAP } from 'common/card';
+import { API_NETWORK_CODES_MAP, networks as CardNetworks } from 'common/card';
 
 /**
  * Returns the available methods
@@ -28,18 +28,6 @@ import { API_NETWORK_CODES_MAP } from 'common/card';
  */
 function getAvailableDefaultMethods() {
   let available = _Arr.filter(AVAILABLE_METHODS, isMethodEnabled);
-
-  /**
-   * Cardless EMI and EMI are the same payment option.
-   * When we click EMI, it should take to Cardless EMI if
-   * cardless_emi is an available method.
-   */
-  if (
-    _Arr.contains(available, 'cardless_emi') &&
-    _Arr.contains(available, 'emi')
-  ) {
-    available = _Arr.remove(available, 'emi');
-  }
 
   /**
    * We do not want to show QR in the primary list
@@ -84,7 +72,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
 
         _Obj.loop(getCardNetworks(), (val, key) => {
           if (val) {
-            availableNetworks.push(API_NETWORK_CODES_MAP[key]);
+            availableNetworks.push(CardNetworks[API_NETWORK_CODES_MAP[key]]);
           }
         });
 
@@ -260,6 +248,26 @@ export function getBlockConfig(options, customer) {
   // Translate external representation to internal representation
   const translated = translateExternal(options);
 
+  const hasAllowedRestrictions =
+    translated.restrictions.allow.instruments.length > 0;
+  const hasTranslatedBlocks = translated.display.blocks.length > 0;
+  const hasConfiguredBlocks =
+    hasTranslatedBlocks &&
+    _Arr.any(translated.display.blocks.length, block =>
+      _Arr.contains(translated.display.sequence, block.code)
+    );
+
+  /**
+   * If the merchant wants to use restrictions,
+   * but has not provided any blocks,
+   * we use the restricted instruments as a block.
+   */
+  if (hasAllowedRestrictions && !hasConfiguredBlocks) {
+    translated.display.sequence = [translated.restrictions.allow.code];
+    translated.display.blocks = [translated.restrictions.allow];
+    translated.display.preferences.show_default_blocks = false;
+  }
+
   // Ungroup instruments and remove disabed instruments for each block
   translated.display.blocks =
     translated.display.blocks
@@ -282,7 +290,6 @@ export function getBlockConfig(options, customer) {
   // Reorder blocks
   const sequentialied = getSequencedBlocks({
     translated,
-    original: options,
     methods: getAvailableDefaultMethods(),
   });
 
@@ -292,7 +299,15 @@ export function getBlockConfig(options, customer) {
   return {
     display: {
       blocks: clustered,
-      hidden: translated.display.hide.instruments,
+      hide: translated.display.hide,
+      preferences: translated.display.preferences,
+    },
+
+    restrictions: translated.restrictions,
+
+    _meta: {
+      hasCustomizations: translated.display.sequence.length > 0,
+      hasRestrictedInstruments: hasAllowedRestrictions,
     },
   };
 }
