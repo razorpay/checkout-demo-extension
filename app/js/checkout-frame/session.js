@@ -698,19 +698,36 @@ function askOTP(view, text, shouldLimitResend, screenProps) {
                 '" onerror="this.style.opacity = 0;">';
             }
           }
-          if (!origText.next || origText.next.indexOf('otp_resend') === -1) {
-            view.updateScreen({
-              allowResend: false,
-            });
-          }
 
-          view.updateScreen({
-            skipText: "Complete on bank's page",
-          });
-          if (thisSession.headless && !origText.redirect) {
+          if (origText.mode === 'hdfc_debit_emi') {
+            var next = _Obj.getSafely(origText, 'request.content.next');
+            // HDFC Debit EMI next array is same as wallet.
+            // It's "resend_otp" not "otp_resend".
+            if (!next || next.indexOf('resend_otp') === -1) {
+              view.updateScreen({
+                allowResend: false,
+              });
+            }
+            // Don't show secondary action like go to bank in HDFC Debit EMI
             view.updateScreen({
               allowSkip: false,
             });
+          } else {
+            if (!origText.next || origText.next.indexOf('otp_resend') === -1) {
+              view.updateScreen({
+                allowResend: false,
+              });
+            }
+
+            view.updateScreen({
+              skipText: "Complete on bank's page",
+            });
+
+            if (!origText.redirect) {
+              view.updateScreen({
+                allowSkip: false,
+              });
+            }
           }
 
           if (!thisSession.get('timeout')) {
@@ -2776,6 +2793,7 @@ Session.prototype = {
           tab = thisTab;
         }
         this.clearRequest();
+        this.otpView.onBack();
       } else {
         return confirm();
       }
@@ -3173,7 +3191,11 @@ Session.prototype = {
       }
     });
 
-    return emiPlans;
+    var emiPlansSorted = _Arr.sort(emiPlans, function(a, b) {
+      return a.duration - b.duration;
+    });
+
+    return emiPlansSorted;
   },
 
   /**
@@ -3210,15 +3232,27 @@ Session.prototype = {
         tab_titles.emiplans = tabTitle;
 
         var bank = self.emiPlansForNewCard && self.emiPlansForNewCard.code;
+        var cardIssuer = bank.split('_')[0];
+        var cardType = _Str.endsWith(bank, '_DC') ? 'debit' : 'credit';
+        var contactRequiredForEMI = MethodStore.isContactRequiredForEMI(
+          bank,
+          cardType
+        );
         var plans = MethodStore.getEMIBankPlans(bank);
         var emiPlans = self.getEmiPlans(bank);
         var prevTab = self.tab;
         var prevScreen = self.screen;
 
         self.emiPlansView.setPlans({
+          type: type,
           amount: amount,
           plans: emiPlans,
           bank: bank,
+          card: {
+            issuer: cardIssuer,
+            type: cardType,
+          },
+          contactRequiredForEMI: contactRequiredForEMI,
           on: {
             back: bind(function() {
               self.switchTab(prevTab);
@@ -3240,10 +3274,11 @@ Session.prototype = {
               self.svelteCardTab.showAddCardView();
             },
 
-            select: function(value) {
+            select: function(value, contact) {
               var plan = _Arr.find(plans, function(p) {
                 return p.duration === value;
               });
+              EmiStore.selectedPlan.set(plan);
 
               var text = getEmiText(self, amount, plan) || '';
 
@@ -3257,6 +3292,10 @@ Session.prototype = {
 
               self.switchTab('emi');
               self.svelteCardTab.showAddCardView();
+
+              if (contactRequiredForEMI) {
+                HomeScreenStore.emiContact.set(contact);
+              }
 
               self.preSubmit();
             },
@@ -3280,7 +3319,12 @@ Session.prototype = {
         var trigger = e.currentTarget;
         var $trigger = $(trigger);
         var bank = $trigger.attr('data-bank');
+        var cardIssuer = bank;
         var cardType = $trigger.attr('data-card-type');
+        var contactRequiredForEMI = MethodStore.isContactRequiredForEMI(
+          bank,
+          cardType
+        );
         var plans = MethodStore.getEMIBankPlans(bank, cardType);
         var emiPlans = self.getEmiPlans(bank, cardType);
         var $savedCard = $('.saved-card.checked');
@@ -3289,9 +3333,15 @@ Session.prototype = {
         var prevScreen = self.screen;
 
         self.emiPlansView.setPlans({
+          type: type,
           amount: amount,
           plans: emiPlans,
+          card: {
+            issuer: cardIssuer,
+            type: cardType,
+          },
           bank: bank,
+          contactRequiredForEMI: contactRequiredForEMI,
           on: {
             back: function() {
               self.switchTab(prevTab);
@@ -3313,10 +3363,12 @@ Session.prototype = {
               self.svelteCardTab.showSavedCardsView();
             },
 
-            select: function(value) {
+            select: function(value, contact) {
               var plan = _Arr.find(plans, function(p) {
                 return p.duration === value;
               });
+              EmiStore.selectedPlan.set(plan);
+
               var text = getEmiText(self, amount, plan) || '';
 
               trackEmi('emi:plan:select', {
@@ -3330,6 +3382,10 @@ Session.prototype = {
               self.switchTab('emi');
               self.setScreen('card');
               self.svelteCardTab.showSavedCardsView();
+
+              if (contactRequiredForEMI) {
+                HomeScreenStore.emiContact.set(contact);
+              }
 
               if (savedCvv) {
                 self.preSubmit();
@@ -3363,6 +3419,7 @@ Session.prototype = {
         var prevScreen = self.screen;
 
         self.emiPlansView.setPlans({
+          type: type,
           amount: amount,
           plans: emiPlans,
           bank: bank,
@@ -3448,7 +3505,9 @@ Session.prototype = {
         },
       });
       this.shake();
-      var invalidInput = $(invalids[0]).find('.input')[0];
+      var invalidInput =
+        $(invalids[0]).find('.input')[0] ||
+        $(invalids[0]).find('input[type=checkbox]')[0];
       if (invalidInput) {
         invalidInput.focus();
       } else if ($(invalids[0]).hasClass('selector')) {
@@ -4568,6 +4627,19 @@ Session.prototype = {
       data.dcc_currency = discreet.storeGetter(CardScreenStore.dccCurrency);
     }
 
+    var emiCode, emiContact, isHDFCDebitEMI;
+    if (data.method === 'emi') {
+      emiCode = getIssuerForEmiFromPayload(
+        data,
+        this.svelteCardTab.getTransformedTokens()
+      );
+      isHDFCDebitEMI = emiCode === 'HDFC_DC';
+      emiContact = discreet.storeGetter(HomeScreenStore.emiContact);
+      if (isHDFCDebitEMI && emiContact) {
+        data.contact = emiContact;
+      }
+    }
+
     if (data.method === 'card' || data.method === 'emi') {
       this.nativeotp = !!this.shouldUseNativeOTP();
 
@@ -4594,14 +4666,9 @@ Session.prototype = {
             tab: 'emi',
             screen: 'emi',
           };
-        } else if (
-          getIssuerForEmiFromPayload(
-            data,
-            this.svelteCardTab.getTransformedTokens()
-          ) === 'HDFC_DC'
-        ) {
+        } else if (isHDFCDebitEMI) {
           // Skip Native OTP for EMI with HDFC Debit Cards
-          shouldUseNativeOTP = false;
+          shouldUseNativeOTP = true;
         }
       }
 
@@ -4671,6 +4738,11 @@ Session.prototype = {
     if (wallet === 'freecharge') {
       this.otpView.updateScreen({
         maxlength: 4,
+      });
+    } else if (isHDFCDebitEMI) {
+      this.otpView.updateScreen({
+        maxlength: 6,
+        mode: emiCode,
       });
     } else if (this.headless) {
       // OTP of length 8 is only required for Headless OTP.

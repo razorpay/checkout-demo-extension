@@ -74,6 +74,10 @@ export const SHOWN_CLASS = 'drishy';
 export const CONTACT_PATTERN = '^\\+?[0-9]{8,15}$';
 export const CONTACT_REGEX = new RegExp(CONTACT_PATTERN);
 
+// Number may or may not contain +91 and should start with any of 6/7/8/9
+export const INDIAN_CONTACT_PATTERN = '^(\\+91)?[6-9]\\d{9}$';
+export const INDIAN_CONTACT_REGEX = new RegExp(INDIAN_CONTACT_PATTERN);
+
 export const EMAIL_PATTERN = '^[^@\\s]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)+$';
 export const EMAIL_REGEX = new RegExp(EMAIL_PATTERN);
 

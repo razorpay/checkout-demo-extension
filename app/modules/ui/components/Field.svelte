@@ -18,6 +18,7 @@
   export let readonly = false;
   export let required = false;
   export let autocomplete = 'off';
+  export let xautocompletetype;
   export let icon = null;
   export let label = '';
   export let placeholder = '';
@@ -159,6 +160,7 @@
     {value}
     {required}
     {autocomplete}
+    x-autocompletetype={xautocompletetype}
     placeholder={placeholderToShow}
     {pattern}
     {readonly}
