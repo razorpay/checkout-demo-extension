@@ -16,7 +16,7 @@
   import ListHeader from 'ui/elements/ListHeader.svelte';
   import Icon from 'ui/elements/Icon.svelte';
 
-  import { getMiscIcon } from 'icons/misc';
+  import { getMiscIcon } from 'checkoutframe/icons';
 
   // Props
   export let apps;

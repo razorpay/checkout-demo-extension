@@ -265,7 +265,7 @@
       {
         preferred: eligiblePreferredInstruments,
         merchantConfig: merchantConfig.config,
-        configSource: merchantConfig.source,
+        configSource: merchantConfig.sources,
       },
       $customer
     );

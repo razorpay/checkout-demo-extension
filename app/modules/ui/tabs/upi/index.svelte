@@ -40,7 +40,7 @@
   import Bottom from 'ui/layouts/Bottom.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import AddANewVpa from './AddANewVpa.svelte';
-  import { getMiscIcon } from 'icons/misc';
+  import { getMiscIcon } from 'checkoutframe/icons';
 
   // Store
   import { contact } from 'checkoutstore/screens/home';
@@ -309,20 +309,24 @@
         break;
 
       default:
-        _token = _Arr.find(
-          _Obj.getSafely(session.getCurrentCustomer(), 'tokens.items', []),
-          token => token.id === selectedToken
-        );
+        // `selectedToken` can be null if nothing is to be selected by default
+        if (selectedToken) {
+          _token = _Arr.find(
+            _Obj.getSafely(session.getCurrentCustomer(), 'tokens.items', []),
+            token => token.id === selectedToken
+          );
 
-        Analytics.track('upi:token:switch:default', {
-          data: {
-            selectedToken,
-            _token,
-          },
-          immediately: true,
-        });
+          Analytics.track('upi:token:switch:default', {
+            data: {
+              selectedToken,
+              _token,
+            },
+            immediately: true,
+          });
 
-        data = { token: _token.token };
+          data = { token: _token.token };
+        }
+
         break;
     }
 
@@ -529,7 +533,7 @@
           {#if intent}
             <ListHeader>
               <i slot="icon">
-                <Icon icon={getMiscIcon('recieve')} />
+                <Icon icon={getMiscIcon('receive')} />
               </i>
               <div slot="subtitle">
                 You will receive a payment request on your UPI app

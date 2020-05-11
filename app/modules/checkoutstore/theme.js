@@ -19,6 +19,13 @@ export function getThemeColor() {
   return theme.color;
 }
 
+export function getColorVariations() {
+  return {
+    backgroundColor: theme.backgroundColor,
+    foregroundColor: theme.foregroundColor,
+  };
+}
+
 export function setThemeColor(color) {
   const colorVariations = Color.getColorVariations(color);
   const { backgroundColor, foregroundColor } = Color.getColorVariations(color);
