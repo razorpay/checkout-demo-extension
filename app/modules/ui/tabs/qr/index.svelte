@@ -204,11 +204,13 @@
     <FeeBearer {paymentData} on:continue={createPaymentWithFees} />
   {:else if view === 'qr'}
     {#if loading}
+      <!-- LABEL: Generating QR Code... -->
       <AsyncLoading>{$_(QR_GENERATING_LABEL)}</AsyncLoading>
     {:else}
       <div
         class="message"
         style="background-image: url('{RazorpayConfig.cdn}checkout/upi-apps.png')">
+        <!-- LABEL: Scan the QR using any UPI app on your phone like BHIM, PhonePe, Google Pay etc. -->
         {$_(QR_SCAN_ON_PHONE)}
       </div>
       {#if qrImage}
@@ -221,6 +223,7 @@
     <div class="error mchild">
       <div class="error-text">{error}</div>
       <br />
+      <!-- LABEL: Retry -->
       <div class="btn" on:click={init}>{$_(QR_RETRY)}</div>
     </div>
   {/if}
@@ -228,6 +231,7 @@
   {#if down || disabled}
     <Bottom tab="qr">
       <DowntimeCallout severe={disabled}>
+        <!-- LABEL: UPI QR is experiencing low success rates. -->
         <FormattedText text={$_(QR_DOWNTIME_TEXT)} />
 
       </DowntimeCallout>
