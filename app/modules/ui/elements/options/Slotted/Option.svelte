@@ -6,8 +6,8 @@
   export let className = '';
   export let disabled = false;
   export let id;
-  export let attributes = {}; // Extra attributes for the HTML element
   export let defaultStyles = true;
+  export let attributes = {};
 
   $: {
     disabled = disabled ? true : undefined;
@@ -48,8 +48,8 @@
   role="listitem"
   {disabled}
   {id}
-  on:click
-  {...attributes}>
+  {...attributes}
+  on:click>
   <Stack horizontal>
     <slot name="icon" />
     <div>

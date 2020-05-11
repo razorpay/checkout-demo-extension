@@ -62,6 +62,10 @@ module.exports = function(testFeatures) {
         }
       }
 
+      if (callbackUrl) {
+        preferences.order.method = 'netbanking';
+      }
+
       const context = await openCheckoutWithNewHomeScreen({
         page,
         options,
@@ -102,7 +106,7 @@ module.exports = function(testFeatures) {
         await verifyOfferApplied(context);
         await verifyDiscountPaybleAmount(context, '₹ 1,980');
         await verifyDiscountAmountInBanner(context, '₹ 1,980');
-        await verifyDiscountText(context, 'You save ₹ 20');
+        await verifyDiscountText(context, 'You save ₹20');
       }
 
       if (partialPayment) {

@@ -11,6 +11,7 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getSession } from 'sessionmanager';
+  import { getInstrumentMeta } from 'ui/tabs/home/instruments';
 
   // Store
   import {
@@ -41,6 +42,7 @@
       data: {
         instrument,
         index,
+        instrumentMeta: getInstrumentMeta(instrument),
       },
     });
   }
@@ -61,7 +63,7 @@
     <RazorpayCluster {block} on:selectMethod />
   {:else}
     <div class="methods-block" data-block={block.code}>
-      <h3 class="title">{block.title}</h3>
+      <h3 class="title">{block.title || 'Available Payment Methods'}</h3>
       <div role="list" class="border-list">
         {#each block.instruments as instrument, index (instrument.id)}
           <Instrument

@@ -21,13 +21,14 @@
     authType,
     cardType,
   } from 'checkoutstore/screens/card';
+  import { methodTabInstrument } from 'checkoutstore/screens/home';
 
   import {
     isNameReadOnly,
     shouldRememberCustomer,
     isRecurring,
     isStrictlyRecurring,
-    getCardFlows,
+    getCardFeatures,
   } from 'checkoutstore';
   import { isAMEXEnabled } from 'checkoutstore/methods';
 
@@ -37,6 +38,7 @@
   import { getIin, getCardDigits } from 'common/card';
   import { DEFAULT_AUTH_TYPE_RADIO } from 'common/constants';
   import { Formatter } from 'formatter';
+  import { isInstrumentValidForPayment } from 'configurability/validate';
 
   const dispatch = createEventDispatcher();
 
@@ -55,6 +57,13 @@
   let showNoCvvCheckbox = false;
   let hideExpiryCvvFields = false;
   let cvvLength = 3;
+  let cardNumberHelpText;
+
+  function setCardNumberValidity(valid) {
+    if (numberField) {
+      numberField.setValid(valid);
+    }
+  }
 
   $: {
     if ($cardType) {
@@ -141,9 +150,9 @@
 
   /**
    * Validate the card number.
-   * @return {Boolean}
+   * @return {boolean}
    */
-  export function validateCardNumber() {
+  function validateCardNumber() {
     const cardNumberWithoutSpaces = getCardDigits($cardNumber);
 
     let isValid = Formatter.rules.card.isValid.call({
@@ -167,20 +176,26 @@
     const cardNumber = getCardDigits(value);
     const iin = getIin(cardNumber);
 
-    let isValid = validateCardNumber();
-    numberField.setValid(isValid);
+    if (iin.length < 6) {
+      setDebitPinRadiosVisibility(false);
+      setCardNumberValidity(validateCardNumber());
 
-    const flowChecker = (flows = {}) => {
+      return;
+    }
+
+    const flowChecker = ({ flows = {} } = {}) => {
       const cardNumber = getCardDigits(value);
       const isIinSame = getIin(cardNumber) === iin;
+      let _validCardNumber = true;
 
       // If the card number was changed before response, do nothing
       if (!isIinSame) {
-        return;
+        return Promise.reject();
       }
 
       if (isStrictlyRecurring()) {
-        isValid = isValid && isFlowApplicable(flows, Flows.RECURRING);
+        _validCardNumber =
+          _validCardNumber && isFlowApplicable(flows, Flows.RECURRING);
       } else {
         // Debit-PIN is not supposed to work in case of recurring
         if (isFlowApplicable(flows, Flows.PIN)) {
@@ -190,15 +205,70 @@
         }
       }
 
-      numberField.setValid(isValid);
+      return Promise.resolve(_validCardNumber);
     };
 
-    if (iin.length < 6) {
-      setDebitPinRadiosVisibility(false);
-    }
+    getCardFeatures(iin)
+      .then(features => {
+        let validationPromises = [flowChecker(features), validateCardNumber()];
 
-    if (iin.length >= 6) {
-      getCardFlows(iin, flowChecker);
+        /**
+         * If there's a card instrument, we check for its validity.
+         * Otherwise we'll just assume that this is successful validation.
+         */
+        if ($methodTabInstrument && $methodTabInstrument.method === 'card') {
+          validationPromises.push(
+            isInstrumentValidForPayment($methodTabInstrument, {
+              method: 'card',
+              'card[number]': $cardNumber,
+            })
+          );
+        } else {
+          validationPromises.push(Promise.resolve(true));
+        }
+
+        return Promise.all(validationPromises);
+      })
+      .then(([isFlowValid, isCardNumberValid, isInstrumentValid]) => {
+        if (!isInstrumentValid) {
+          cardNumberHelpText = 'This card is not supported for the payment';
+        } else {
+          // Let the default help text kick in
+          cardNumberHelpText = undefined;
+        }
+
+        setCardNumberValidity(
+          isCardNumberValid && isFlowValid && isInstrumentValid
+        );
+
+        // Track validity if instrument was used
+        if ($methodTabInstrument) {
+          Analytics.track('instrument:input:validate', {
+            data: {
+              method: $methodTabInstrument.method,
+              instrument: $methodTabInstrument,
+              valid: isInstrumentValid,
+            },
+          });
+        }
+      })
+      .catch(_Func.noop); // IIN changed, do nothing
+  }
+
+  $: {
+    /**
+     * When $methodTabInstrument changes and is a card instrument,
+     * we'll need to perform all vaildations again
+     */
+
+    const hasCardMethodTabInstrument =
+      $methodTabInstrument && $methodTabInstrument.method === 'card';
+    if ($methodTabInstrument) {
+      if ($methodTabInstrument.method === 'card') {
+        onCardNumberChange();
+      }
+    } else {
+      onCardNumberChange();
     }
   }
 
@@ -222,6 +292,15 @@
 
   function trackCardNumberFilled() {
     Analytics.track('card_number:filled', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        valid: numberField.isValid(),
+      },
+    });
+  }
+
+  function trackCardNumberAutoFilled() {
+    Analytics.track('card_number:autofilled', {
       type: AnalyticsTypes.BEHAV,
       data: {
         valid: numberField.isValid(),
@@ -294,9 +373,11 @@
         bind:value={$cardNumber}
         bind:this={numberField}
         amexEnabled={isAMEXEnabled()}
+        helpText={cardNumberHelpText}
         recurring={isRecurring()}
         type={$cardType}
         on:filled={_ => handleFilled('numberField')}
+        on:autocomplete={trackCardNumberAutoFilled}
         on:input={handleCardInput}
         on:blur={trackCardNumberFilled} />
     </div>

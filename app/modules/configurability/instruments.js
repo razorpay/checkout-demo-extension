@@ -1,4 +1,5 @@
-import InstrumentConfig from './instrument-config';
+import InstrumentsConfig from './instruments-config';
+import { getPackageNameFromShortcode } from 'common/upi';
 
 /**
  * Adds a type and category to an instrument
@@ -7,18 +8,91 @@ import InstrumentConfig from './instrument-config';
  * @returns {Instrument}
  */
 function addTypeAndCategory(instrument) {
-  instrument.type = 'instrument';
+  instrument._type = 'instrument';
 
   if (isInstrumentForEntireMethod(instrument)) {
-    instrument.type = 'method';
+    instrument._type = 'method';
   }
 
   return instrument;
 }
 
+/**
+ * Keys that are allowed in the instruments
+ * passed created by the merchant a.k.a public API
+ */
+const PUBLIC_API_INSTRUMENT_KEYS = {
+  card: ['issuers', 'networks', 'types', 'iin'],
+  emi: ['issuers', 'networks', 'types', 'iin', 'durations'],
+  netbanking: ['banks'],
+  wallet: ['wallets'],
+  upi: ['flows', 'apps'],
+  cardless_emi: ['providers'],
+  paylater: ['providers'],
+  bank_transfer: [],
+  paypal: [],
+};
+
 const INSTRUMENT_CREATORS = {
   default: instrument => instrument,
+  upi: instrument => {
+    if (instrument.app) {
+      instrument.app =
+        getPackageNameFromShortcode(instrument.app) || instrument.app;
+    }
+
+    if (instrument.apps) {
+      instrument.apps =
+        instrument.apps
+        |> _Arr.map(app => {
+          return getPackageNameFromShortcode(app) || app;
+        });
+    }
+
+    return instrument;
+  },
 };
+
+/**
+ * Checks if the instrument has only the allowed keys
+ * @param {Instrument} instrument
+ *
+ * @returns {boolean}
+ */
+function hasOnlyAllowedKeys(instrument) {
+  const { method } = instrument;
+
+  if (!method) {
+    return false;
+  }
+
+  const allowedKeys = PUBLIC_API_INSTRUMENT_KEYS[method];
+
+  // If we don't have any specific whitelisted keys, reject this
+  if (!allowedKeys) {
+    return false;
+  }
+
+  // Removing 'method' because it is a common key
+  const instrumentKeys = instrument |> _Obj.keys |> _Arr.remove('method');
+
+  // None of the instrumentKeys should be absent from allowedKeys
+  const anyAbsent = _Arr.any(
+    instrumentKeys,
+    key => !_Arr.contains(allowedKeys, key)
+  );
+
+  if (anyAbsent) {
+    return false;
+  }
+
+  // All keys must be arrays
+  const allArrays = _Arr.every(instrumentKeys, key =>
+    _.isArray(instrument[key])
+  );
+
+  return allArrays;
+}
 
 /**
  * Creates an instrument from the instrument config
@@ -41,6 +115,21 @@ export function createInstrument(config) {
 }
 
 /**
+ * Validates the keys of the instrument before
+ * creating the instrument
+ * @param {Object} config Instrument config
+ *
+ * @return {Instrument|undefined}
+ */
+export function validateKeysAndCreateInstrument(config) {
+  if (!hasOnlyAllowedKeys(config)) {
+    return;
+  }
+
+  return createInstrument(config);
+}
+
+/**
  * Tells whether or not the instrument denotes an entire method.
  * Checks if none of the keys for the instrument's method are present
  * @param {Instrument} instrument
@@ -49,7 +138,7 @@ export function createInstrument(config) {
  */
 export function isInstrumentForEntireMethod(instrument) {
   const method = instrument.method;
-  const config = InstrumentConfig[method];
+  const config = InstrumentsConfig[method];
 
   if (!config) {
     return false;
@@ -74,11 +163,25 @@ export function isInstrumentForEntireMethod(instrument) {
  */
 export function addInstrumentToPaymentData(instrument, payment, customer) {
   const method = instrument.method;
-  const config = InstrumentConfig[method];
+  const config = InstrumentsConfig[method];
 
   if (!config) {
     return payment;
   }
 
-  return config.getPaymentPayload(instrument, payment, customer);
+  return config.getPaymentPayload(
+    getExtendedSingleInstrument(instrument),
+    payment,
+    customer
+  );
+}
+
+/**
+ * Extends the instrument using the first ungrouped instrument
+ * @param {Instrument} instrument
+ *
+ * @returns {Instrument}
+ */
+export function getExtendedSingleInstrument(instrument) {
+  return _Obj.extend(_Obj.extend({}, instrument), instrument._ungrouped[0]);
 }

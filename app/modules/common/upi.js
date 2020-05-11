@@ -9,6 +9,20 @@ export function isVpaValid(vpa) {
   return VPA_REGEX.test(vpa);
 }
 
+/**
+ * Returns the package name corresponding to the app shortcode.
+ * @param {string} shortcode
+ *
+ * @returns {string | undefined}
+ */
+export function getPackageNameFromShortcode(shortcode) {
+  const app = getAllApps() |> _Arr.find(app => app.shortcode === shortcode);
+
+  if (app) {
+    return app.package_name;
+  }
+}
+
 const UPI_APPS = {
   /**
    * Preferred apps.
@@ -24,18 +38,22 @@ const UPI_APPS = {
        * and only display if they are.
        */
       verify_registration: true,
+      shortcode: 'google_pay',
     },
     {
       package_name: 'com.phonepe.app',
       app_icon: 'https://cdn.razorpay.com/checkout/phonepe.png',
+      shortcode: 'phonepe',
     },
     {
       name: 'PayTM',
       app_name: 'PayTM UPI',
       package_name: 'net.one97.paytm',
+      shortcode: 'paytm',
     },
     {
       package_name: 'in.org.npci.upiapp',
+      shortcode: 'bhim',
     },
   ],
 
@@ -48,12 +66,15 @@ const UPI_APPS = {
       name: 'WhatsApp Business',
       app_name: 'WhatsApp Business UPI',
       package_name: 'com.whatsapp.w4b',
+      shortcode: 'whatsapp-biz',
     },
     {
       package_name: 'com.csam.icici.bank.imobile',
+      shortcode: 'imobile',
     },
     {
       package_name: 'com.sbi.upi',
+      shortcode: 'sbi',
     },
     {
       package_name: 'com.upi.axispay',
@@ -110,6 +131,9 @@ const UPI_APPS = {
       package_name: 'com.fss.idfcpsp',
     },
     {
+      package_name: 'com.YesBank',
+    },
+    {
       package_name: 'com.abipbl.upi',
     },
     {
@@ -153,6 +177,7 @@ const UPI_APPS = {
     },
     {
       package_name: 'in.amazon.mShop.android.shopping',
+      shortcode: 'amazon',
     },
     {
       package_name: 'com.mipay.in.wallet',
@@ -178,15 +203,18 @@ const UPI_APPS = {
   blacklist: [
     {
       package_name: 'com.whatsapp',
+      shortcode: 'whatsapp',
     },
     {
       package_name: 'com.truecaller',
+      shortcode: 'truecaller',
     },
     {
       package_name: 'com.olacabs.customer',
     },
     {
       package_name: 'com.myairtelapp',
+      shortcode: 'airtel',
     },
     {
       package_name: 'com.paytmmall',
@@ -224,6 +252,7 @@ export const topUpiApps = [
     id: 'gpay',
     psp: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],
   },
+
   {
     text: 'PhonePe',
     icon: 'https://cdn.razorpay.com/app/phonepe.svg',
@@ -305,7 +334,7 @@ export const didUPIIntentSucceed = parsedResponse =>
  *
  * @return {String}
  */
-export const getPackageNames = list => {
+const getPackageNames = list => {
   const arr = [];
   _Arr.loop(list, app => arr.push(app.package_name));
   return arr;
@@ -326,14 +355,10 @@ export const doesAppExist = (packageName, list) =>
  *
  * @return {Array}
  */
-export const getUsableApps = () => {
+const getUsableApps = () => {
   let apps = [];
 
   _Arr.loop(UPI_APPS_ORDER, group => {
-    if (group === 'blacklist') {
-      return;
-    }
-
     apps = _Arr.merge(UPI_APPS[group], apps);
   });
 
@@ -345,10 +370,10 @@ export const getUsableApps = () => {
  *
  * @return {Array}
  */
-export const getAllApps = () => {
+const getAllApps = () => {
   let apps = [];
 
-  _Arr.loop(UPI_APPS_ORDER, group => {
+  _Arr.loop(_Obj.keys(UPI_APPS), group => {
     apps = _Arr.merge(UPI_APPS[group], apps);
   });
 
@@ -357,33 +382,6 @@ export const getAllApps = () => {
 
 export const isPreferredApp = packageName =>
   doesAppExist(packageName, UPI_APPS.preferred);
-export const isWhitelistedApp = packageName =>
-  doesAppExist(packageName, UPI_APPS.whitelist);
-
-export const isBlacklistedApp = packageName =>
-  doesAppExist(packageName, UPI_APPS.blacklist);
-
-export const isUsableApp = packageName =>
-  doesAppExist(packageName, getUsableApps());
-
-/**
- * Finds app form package name.
- * @param {String} packageName
- *
- * @return {Object}
- */
-export const getAppByPackageName = packageName => {
-  const app = _Arr.filter(
-    getAllApps(),
-    app => app.package_name === packageName
-  );
-
-  if (app.length) {
-    return app[0];
-  }
-
-  return null;
-};
 
 /**
  * Returns a list of sorted apps to use.

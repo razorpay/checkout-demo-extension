@@ -21,6 +21,7 @@
   import { Formatter } from 'formatter';
   import { hideCta, showCtaWithDefaultText, showCta } from 'checkoutstore/cta';
   import { filterUPITokens } from 'common/token';
+  import { getUPIIntentApps } from 'checkoutstore/native';
 
   // UI imports
   import UpiIntent from './UpiIntent.svelte';
@@ -36,14 +37,15 @@
   import GooglePayOmnichannel from './GooglePayOmnichannel.svelte';
   import NextOption from 'ui/elements/options/NextOption.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
-  import OffersPortal from 'ui/components/OffersPortal.svelte';
+  import Bottom from 'ui/layouts/Bottom.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import AddANewVpa from './AddANewVpa.svelte';
-  import { getMiscIcon } from 'icons/misc';
+  import { getMiscIcon } from 'checkoutframe/icons';
 
   // Store
   import { contact } from 'checkoutstore/screens/home';
   import { customer } from 'checkoutstore/customer';
+  import { methodTabInstrument } from 'checkoutstore/screens/home';
 
   // Props
   export let selectedApp = undefined;
@@ -66,6 +68,8 @@
   export let isGPaySelected;
   export let pspHandle;
   export let shouldShowQr;
+  let shouldShowCollect;
+  let shouldShowOmnichannel;
 
   let disabled = false;
   let tokens = [];
@@ -76,12 +80,80 @@
 
   const session = getSession();
 
-  const {
-    all_upi_intents_data: allIntentApps,
-    upi_intents_data: intentApps,
-    isPayout,
-    showRecommendedUPIApp,
-  } = session;
+  const { isPayout, showRecommendedUPIApp } = session;
+
+  /**
+   * An instrument might has for some flows to be available
+   * @param {Instrument | undefined} instrument
+   *
+   * @returns {Object}
+   */
+  function getAvailableFlowsFromInstrument(instrument) {
+    let availableFlows = {
+      omnichannel: isUPIFlowEnabled('omnichannel'),
+      collect: isUPIFlowEnabled('collect'),
+      intent: isUPIFlowEnabled('intent'),
+      qr: isUPIFlowEnabled('qr'),
+    };
+
+    if (!instrument || instrument.method !== 'upi') {
+      return availableFlows;
+    }
+
+    if (instrument.flows) {
+      // Disable all flows
+      _Obj.loop(availableFlows, (val, key) => {
+        availableFlows[key] = false;
+      });
+
+      // Enable ones that are asked for
+      _Arr.loop(instrument.flows, flow => {
+        availableFlows[flow] = true;
+      });
+    }
+
+    return availableFlows;
+  }
+
+  let availableFlows = getAvailableFlowsFromInstrument();
+  $: {
+    availableFlows = getAvailableFlowsFromInstrument($methodTabInstrument);
+  }
+
+  // Set default token value when the available flows change
+  $: availableFlows, setDefaultTokenValue();
+
+  /**
+   * An instrument might has only for some apps to be shown
+   * @param {Instrument | undefined} instrument
+   *
+   * @returns {Array<Object>}
+   */
+  function getUPIIntentAppsFromInstrument(instrument) {
+    if (!instrument || instrument.method !== 'upi') {
+      return getUPIIntentApps().filtered;
+    }
+
+    if (
+      !instrument.flows ||
+      !instrument.apps ||
+      !_Arr.contains(instrument.flows, 'intent')
+    ) {
+      return getUPIIntentApps().filtered;
+    }
+
+    const allApps = getUPIIntentApps().all;
+
+    return _Arr.filter(
+      _Arr.map(instrument.apps, app =>
+        _Arr.find(allApps, deviceApp => deviceApp.package_name === app)
+      ),
+      Boolean
+    );
+  }
+
+  let intentApps = getUPIIntentApps().filtered;
+  $: intentApps = getUPIIntentAppsFromInstrument($methodTabInstrument);
 
   const checkGPay = session => {
     /* disable Web payments API for fee_bearer for now */
@@ -102,42 +174,47 @@
     return session.r.checkPaymentAdapter('gpay');
   };
 
-  $: intent = preferIntent && isUPIFlowEnabled('intent');
+  $: intent = availableFlows.intent && preferIntent;
   $: isGPaySelected = selectedApp === 'gpay' && useWebPaymentsApi;
   $: pspHandle = selectedAppData ? selectedAppData.psp : '';
   $: shouldShowQr =
-    isMethodEnabled('qr') && !selectedApp && selectedApp !== null;
+    availableFlows.qr &&
+    isMethodEnabled('qr') &&
+    !selectedApp &&
+    selectedApp !== null;
+  $: shouldShowCollect = availableFlows.collect;
+  $: shouldShowOmnichannel = availableFlows.omnichannel;
 
-  $: {
+  // Determine CTA visilibty when selectedToken changes, but only if session.tab is 'upi'
+  $: selectedToken, session.tab === 'upi' && determineCtaVisibility();
+
+  function setDefaultTokenValue() {
+    const hasIntentFlow = availableFlows.intent || useWebPaymentsApi;
+    const hasTokens = tokens && tokens.length;
+
     /**
      * If there are no tokens, select "new" as the default option.
      * But only do that if intent flow is not available.
      */
-    if (!tokens.length && !intent) {
-      selectedToken = 'new';
-    }
-  }
-
-  $: {
-    if (selectedToken && session.tab === 'upi') {
-      determineCtaVisibility();
+    if (hasIntentFlow) {
+      selectedToken = null;
+    } else if (availableFlows.collect) {
+      if (hasTokens) {
+        selectedToken = null;
+      } else {
+        selectedToken = 'new';
+      }
     }
   }
 
   $: {
     tokens = filterUPITokens(_Obj.getSafely($customer, 'tokens.items', []));
+    setDefaultTokenValue();
   }
 
   function setWebPaymentsApiUsage(to) {
     useWebPaymentsApi = to;
-
-    /**
-     * If web payments API is available,
-     * do not select Add New VPA by default
-     */
-    if (to) {
-      selectedToken = null;
-    }
+    setDefaultTokenValue();
   }
 
   function determineCtaVisibility() {
@@ -184,6 +261,7 @@
   }
 
   export function onShown() {
+    setDefaultTokenValue();
     determineCtaVisibility();
   }
 
@@ -231,11 +309,24 @@
         break;
 
       default:
-        _token = _Arr.find(
-          session.customer.tokens.items,
-          token => token.id === selectedToken
-        );
-        data = { token: _token.token };
+        // `selectedToken` can be null if nothing is to be selected by default
+        if (selectedToken) {
+          _token = _Arr.find(
+            _Obj.getSafely(session.getCurrentCustomer(), 'tokens.items', []),
+            token => token.id === selectedToken
+          );
+
+          Analytics.track('upi:token:switch:default', {
+            data: {
+              selectedToken,
+              _token,
+            },
+            immediately: true,
+          });
+
+          data = { token: _token.token };
+        }
+
         break;
     }
 
@@ -401,9 +492,9 @@
   }
 </style>
 
-<Tab method="upi" {down} pad={false}>
+<Tab method="upi" pad={false}>
   <Screen>
-    <div slot="main">
+    <div>
 
       {#if intent}
         <UpiIntent
@@ -436,13 +527,13 @@
         </div>
       {/if}
 
-      {#if isUPIFlowEnabled('collect')}
+      {#if shouldShowCollect}
         <div class="legend left">Pay using UPI ID</div>
-        <div class="border-list">
+        <div class="border-list" id="upi-collect-list">
           {#if intent}
             <ListHeader>
               <i slot="icon">
-                <Icon icon={getMiscIcon('recieve')} />
+                <Icon icon={getMiscIcon('receive')} />
               </i>
               <div slot="subtitle">
                 You will receive a payment request on your UPI app
@@ -476,7 +567,7 @@
         </div>
       {/if}
 
-      {#if isUPIFlowEnabled('omnichannel')}
+      {#if shouldShowOmnichannel}
         <GooglePayOmnichannel
           error={retryOmnichannel}
           focusOnCreate={true}
@@ -505,20 +596,13 @@
       {/if}
     </div>
 
-    <div slot="bottom">
+    <Bottom tab="upi">
       {#if down || disabled}
         <DowntimeCallout severe={disabled}>
           <strong>UPI</strong>
           is experiencing low success rates.
         </DowntimeCallout>
       {/if}
-
-      <DowntimeCallout>
-        UPI payments via Yes Bank accounts are temporarily disabled. Please pay
-        via another method.
-      </DowntimeCallout>
-
-      <OffersPortal />
-    </div>
+    </Bottom>
   </Screen>
 </Tab>

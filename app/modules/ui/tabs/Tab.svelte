@@ -5,7 +5,6 @@
   // Props
   export let method;
   export let overrideMethodCheck = false;
-  export let down = false;
   export let pad = true;
   export let shown = false;
   export let hasMessage = false;
@@ -18,7 +17,6 @@
 
 {#if methodSupported}
   <div
-    {down}
     id="form-{method}"
     class="tab-content showable screen"
     class:drishy={shown}

@@ -77,16 +77,20 @@ export function sanitizeHtmlEntities(string) {
 function oxfordComma(list) {
   const length = list.length;
 
-  if (list.length === 1) {
-    return list[0];
-  }
+  switch (length) {
+    case 0:
+      return '';
 
-  // We do not use an oxford comma for two items
-  if (list.length === 2) {
-    return list.join(' and ');
-  }
+    case 1:
+      return list[0];
 
-  return `${list.slice(0, length - 1).join(', ')}, and ${list[length - 1]}`;
+    // We do not use an oxford comma for two items
+    case 2:
+      return list.join(' and ');
+
+    default:
+      return `${list.slice(0, length - 1).join(', ')}, and ${list[length - 1]}`;
+  }
 }
 
 /**
@@ -99,7 +103,7 @@ function oxfordComma(list) {
  *
  * @return {String}
  */
-export function generateTextFromList(list, max) {
+export function generateTextFromList(list, max = Infinity) {
   if (list.length > max) {
     return `${list.slice(0, max - 1).join(', ')} & More`;
   } else {
@@ -113,4 +117,12 @@ export function toLowerCaseSafe(str) {
   }
 
   return str.toLowerCase();
+}
+
+export function toTitleCase(str) {
+  if (!str) {
+    return str;
+  }
+
+  return str[0].toUpperCase() + str.slice(1);
 }

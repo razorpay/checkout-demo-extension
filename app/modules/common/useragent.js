@@ -13,7 +13,8 @@ export const internetExplorer = check(/MSIE |Trident\//);
 export const iPhone = check(/iPhone/);
 export const iOS = iPhone || check(/iPad/);
 export const android = check(/Android/);
-export const Safari = check(/Safari/);
+export const Safari =
+  check(/^((?!chrome|android).)*safari/i) || checkVendor(/Apple/);
 export const firefox = check(/firefox/);
 export const chrome = check(/Chrome/) && checkVendor(/Google Inc/);
 
@@ -55,6 +56,11 @@ export const isMobile = () => {
   );
 };
 
+// Some stock android browsers that pause the checkout tab
+// when we open popup for redirection
+export const browsersThatPauseTab = check(/(Vivo|HeyTap|Realme|Oppo)Browser/);
+
 export const stockAndroidBrowser = android && !chrome && !firefox;
 
-export const ajaxRouteNotSupported = iOS || stockAndroidBrowser;
+export const ajaxRouteNotSupported =
+  browsersThatPauseTab || iOS || stockAndroidBrowser;

@@ -52,7 +52,7 @@
 <style>
   /* TODO: find a better way */
   :global(#card_cvv) {
-    -webkit-text-security: disc;
+    font-family: rzpcvv;
   }
 
   :global(#card_cvv) ~ .help {
@@ -83,6 +83,7 @@
   pattern={cvvPattern}
   required
   type="cvv"
+  autocomplete="cc-csc"
   maxlength={length}
   {value}
   bind:this={ref}

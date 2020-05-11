@@ -14,6 +14,7 @@
   export let id = '';
   export let amexEnabled = false;
   export let recurring = false;
+  export let helpText;
 
   // State
   let valid = false;
@@ -28,6 +29,8 @@
     dispatchFilledIfValid();
   }
 
+  $: helpText = helpText || getHelpText();
+
   function getHelpText() {
     if (recurring) {
       return 'Card does not support recurring payments.';
@@ -39,8 +42,6 @@
 
     return 'Please enter your card number.';
   }
-
-  $: helpText = getHelpText();
 
   export function dispatchFilledIfValid() {
     const caretPosition = field.getCaretPosition();
@@ -101,13 +102,14 @@
     required={true}
     {value}
     type="tel"
-    autocomplete="off"
+    autocomplete="cc-number"
     label="Card Number"
     handleBlur
     handleFocus
     handleInput
     bind:this={field}
     on:blur
+    on:autocomplete
     on:input={handleInput}
     on:input />
 </div>

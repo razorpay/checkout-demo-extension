@@ -3,134 +3,143 @@ import * as Translate from 'configurability/translate';
 test('Module: configurability/translate', t => {
   test('Translate.translateExternal', t => {
     test('Translates external options properly', t => {
-      let options, expected, found;
+      let config, expected, found;
 
-      options = {
-        blocks: {
-          gpay: {
-            name: 'Pay via Google Pay',
-            description: 'Make a payment using your Google Pay app',
-            instruments: [
-              {
-                method: 'upi',
-                apps: ['gpay'],
-              },
-            ],
+      config = {
+        display: {
+          blocks: {
+            gpay: {
+              name: 'Pay via Google Pay',
+              description: 'Make a payment using your Google Pay app',
+              instruments: [
+                {
+                  method: 'upi',
+                  apps: ['google_pay'],
+                },
+              ],
+            },
+            hdfc: {
+              name: 'Pay via HDFC Bank',
+              description: 'Make the paymnet using your HDFC account',
+              instruments: [
+                {
+                  method: 'card',
+                  issuers: ['HDFC'],
+                },
+                {
+                  method: 'netbanking',
+                  banks: ['HDFC'],
+                },
+                {
+                  method: 'wallet',
+                  wallets: ['payzapp'],
+                },
+              ],
+            },
           },
-          hdfc: {
-            name: 'Pay via HDFC Bank',
-            description: 'Make the paymnet using your HDFC account',
-            instruments: [
-              {
-                method: 'card',
-                issuers: ['HDFC'],
-              },
-              {
-                method: 'netbanking',
-                banks: ['HDFC'],
-              },
-              {
-                method: 'wallet',
-                wallets: ['payzapp'],
-              },
-            ],
-          },
-        },
-        exclude: [
-          {
-            method: 'wallet',
-            wallets: ['olamoney'],
-          },
-          {
-            method: 'card',
-            issuers: ['SBIN'],
-            networks: ['mastercard'],
-          },
-          {
-            method: 'card',
-            card_types: ['credit'],
-          },
-          {
-            method: 'card',
-            issuers: ['ICIC'],
-            card_types: ['debit'],
-          },
-        ],
-        settings: {
-          methods: {
-            upi: false,
-          },
-        },
-        sequence: ['block.gpay', 'netbanking', 'block.hdfc'],
-      };
-
-      expected = {
-        blocks: [
-          {
-            code: 'block.gpay',
-            type: 'block',
-            instruments: [
-              {
-                method: 'upi',
-                apps: ['gpay'],
-                type: 'instrument',
-              },
-            ],
-            title: 'Pay via Google Pay',
-          },
-          {
-            code: 'block.hdfc',
-            type: 'block',
-            instruments: [
-              {
-                method: 'card',
-                issuers: ['HDFC'],
-                type: 'instrument',
-              },
-              {
-                method: 'netbanking',
-                banks: ['HDFC'],
-                type: 'instrument',
-              },
-              {
-                method: 'wallet',
-                wallets: ['payzapp'],
-                type: 'instrument',
-              },
-            ],
-            title: 'Pay via HDFC Bank',
-          },
-        ],
-        exclude: {
-          instruments: [
+          hide: [
             {
               method: 'wallet',
               wallets: ['olamoney'],
-              type: 'instrument',
             },
             {
               method: 'card',
               issuers: ['SBIN'],
-              networks: ['mastercard'],
-              type: 'instrument',
+              networks: ['MasterCard'],
             },
             {
               method: 'card',
-              card_types: ['credit'],
-              type: 'instrument',
+              types: ['credit'],
             },
             {
               method: 'card',
               issuers: ['ICIC'],
-              card_types: ['debit'],
-              type: 'instrument',
+              types: ['debit'],
             },
           ],
-          methods: [],
+          sequence: ['block.gpay', 'netbanking', 'block.hdfc'],
         },
       };
 
-      found = Translate.translateExternal(options);
+      expected = {
+        display: {
+          blocks: [
+            {
+              code: 'block.gpay',
+              _type: 'block',
+              instruments: [
+                {
+                  method: 'upi',
+                  apps: ['com.google.android.apps.nbu.paisa.user'],
+                  _type: 'instrument',
+                },
+              ],
+              title: 'Pay via Google Pay',
+            },
+            {
+              code: 'block.hdfc',
+              _type: 'block',
+              instruments: [
+                {
+                  method: 'card',
+                  issuers: ['HDFC'],
+                  _type: 'instrument',
+                },
+                {
+                  method: 'netbanking',
+                  banks: ['HDFC'],
+                  _type: 'instrument',
+                },
+                {
+                  method: 'wallet',
+                  wallets: ['payzapp'],
+                  _type: 'instrument',
+                },
+              ],
+              title: 'Pay via HDFC Bank',
+            },
+          ],
+          hide: {
+            instruments: [
+              {
+                method: 'wallet',
+                wallets: ['olamoney'],
+                _type: 'instrument',
+              },
+              {
+                method: 'card',
+                issuers: ['SBIN'],
+                networks: ['MasterCard'],
+                _type: 'instrument',
+              },
+              {
+                method: 'card',
+                types: ['credit'],
+                _type: 'instrument',
+              },
+              {
+                method: 'card',
+                issuers: ['ICIC'],
+                types: ['debit'],
+                _type: 'instrument',
+              },
+            ],
+            methods: [],
+          },
+          sequence: ['block.gpay', 'netbanking', 'block.hdfc'],
+          preferences: {},
+        },
+
+        restrictions: {
+          allow: {
+            code: 'rzp.restrict_allow',
+            _type: 'block',
+            instruments: [],
+          },
+        },
+      };
+
+      found = Translate.translateExternal(config);
 
       t.deepEqual(found, expected, 'Translates external options properly');
 

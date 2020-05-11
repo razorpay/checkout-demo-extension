@@ -28,6 +28,7 @@ async function fillEmandateBankDetails(context) {
   await context.page.type('[name="bank_account[account_number]"]', accountNum);
   await context.page.type('[name="bank_account[ifsc]"]', ifscCode);
   await context.page.type('[name="bank_account[name]"]', 'Sakshi Jain');
+  await context.page.select('[name="bank_account[account_type]"]', 'savings');
 }
 
 async function returnVirtualAccounts(context) {
@@ -78,7 +79,7 @@ async function verifyNeftDetails(context) {
 
 async function verifyRoundOffAlertMessage(context) {
   const messageDiv = await context.page.waitForSelector(
-    '#form-bank_transfer .callout.warning'
+    `#form-bank_transfer.drishy ~ #bottom .bottom[tab="bank_transfer"]`
   );
   let messageText = await context.page.evaluate(
     messageDiv => messageDiv.textContent,

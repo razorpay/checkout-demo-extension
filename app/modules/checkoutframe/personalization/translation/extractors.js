@@ -1,5 +1,3 @@
-import { toLowerCaseSafe } from 'lib/utils';
-
 /**
  * Extracts config data related to UPI from the preferred instrument.
  *
@@ -53,9 +51,9 @@ function netbanking(instrument) {
 function card(instrument) {
   return {
     method: 'card',
-    card_type: instrument.type,
+    type: instrument.type,
     issuer: instrument.issuer,
-    network: toLowerCaseSafe(instrument.network),
+    network: instrument.network,
   };
 }
 

@@ -27,22 +27,22 @@ test('Module: configurability/blocks', t => {
 
       expected = {
         code: 'block.hdfc',
-        type: 'block',
+        _type: 'block',
         instruments: [
           {
             method: 'card',
             issuers: ['HDFC'],
-            type: 'instrument',
+            _type: 'instrument',
           },
           {
             method: 'netbanking',
             banks: ['HDFC'],
-            type: 'instrument',
+            _type: 'instrument',
           },
           {
             method: 'wallet',
             wallets: ['payzapp'],
-            type: 'instrument',
+            _type: 'instrument',
           },
         ],
         title: 'Pay via HDFC Bank',
@@ -70,7 +70,7 @@ test('Module: configurability/blocks', t => {
 
       expected = {
         code: 'block.netbanking',
-        type: 'block',
+        _type: 'block',
         title: 'Pay via Netbanking',
       };
 
@@ -105,22 +105,22 @@ test('Module: configurability/blocks', t => {
 
       expected = {
         code: 'block.hdfc',
-        type: 'block',
+        _type: 'block',
         instruments: [
           {
             method: 'card',
             issuers: ['HDFC'],
-            type: 'instrument',
+            _type: 'instrument',
           },
           {
             method: 'netbanking',
             banks: ['HDFC'],
-            type: 'instrument',
+            _type: 'instrument',
           },
           {
             method: 'wallet',
             wallets: ['payzapp'],
-            type: 'instrument',
+            _type: 'instrument',
           },
         ],
       };
@@ -128,6 +128,119 @@ test('Module: configurability/blocks', t => {
       found = Blocks.createBlock(code, config);
 
       t.deepEqual(found, expected, 'Creates a block without a name');
+
+      t.end();
+    });
+
+    test('Keeps invalid instruments', t => {
+      let code, config, expected, found;
+
+      code = 'block.hdfc';
+      config = {
+        name: 'Pay via HDFC Bank',
+        description: 'Make the paymnet using your HDFC account',
+        instruments: [
+          {
+            method: 'card',
+            issuer: ['HDFC'],
+          },
+          {
+            method: 'netbanking',
+            banks: ['HDFC'],
+          },
+          {
+            method: 'wallet',
+            wallets: ['payzapp'],
+          },
+        ],
+      };
+
+      expected = {
+        code: 'block.hdfc',
+        _type: 'block',
+        instruments: [
+          {
+            method: 'card',
+            issuer: ['HDFC'],
+            _type: 'instrument',
+          },
+          {
+            method: 'netbanking',
+            banks: ['HDFC'],
+            _type: 'instrument',
+          },
+          {
+            method: 'wallet',
+            wallets: ['payzapp'],
+            _type: 'instrument',
+          },
+        ],
+        title: 'Pay via HDFC Bank',
+      };
+
+      found = Blocks.createBlock(code, config);
+
+      t.deepEqual(
+        found,
+        expected,
+        'Creates a block with invalid instruments intact'
+      );
+
+      t.end();
+    });
+
+    t.end();
+  });
+
+  test('Blocks.validateAndCreateBlock', t => {
+    test('Keeps only valid instruments', t => {
+      let code, config, expected, found;
+
+      code = 'block.hdfc';
+      config = {
+        name: 'Pay via HDFC Bank',
+        description: 'Make the paymnet using your HDFC account',
+        instruments: [
+          {
+            method: 'card',
+            issuer: ['HDFC'],
+          },
+          {
+            method: 'netbanking',
+            banks: ['HDFC'],
+          },
+          {
+            method: 'wallet',
+            wallets: ['payzapp'],
+          },
+        ],
+      };
+
+      expected = {
+        code: 'block.hdfc',
+        _type: 'block',
+        instruments: [
+          {
+            method: 'netbanking',
+            banks: ['HDFC'],
+            _type: 'instrument',
+          },
+          {
+            method: 'wallet',
+            wallets: ['payzapp'],
+            _type: 'instrument',
+          },
+        ],
+        title: 'Pay via HDFC Bank',
+      };
+
+      found = Blocks.validateAndCreateBlock(code, config);
+
+      t.deepEqual(
+        found,
+        expected,
+        'Creates a block with only valid instruments'
+      );
 
       t.end();
     });

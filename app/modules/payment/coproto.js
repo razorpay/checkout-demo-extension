@@ -91,8 +91,8 @@ var responseTypes = {
 
     if (this.nativeotp) {
       Analytics.track('native_otp:error', {
-        error: {
-          message: 'TYPE_FIRST',
+        data: {
+          error: 'TYPE_FIRST',
         },
       });
       // We were expecting `type: 'otp'` response from API (to ask OTP on checkout),
@@ -106,10 +106,18 @@ var responseTypes = {
       } else {
         // ಠ_ಠ - Should not reach here.
         Analytics.track('native_otp:error', {
-          error: {
-            message: 'REDIRECT_PARAMS_MISSING',
+          data: {
+            error: 'REDIRECT_PARAMS_MISSING',
           },
         });
+        // If request.method = 'direct', then we've got HTML in content key.
+        // Else we got request (method = get/post) with content.
+        if (direct) {
+          this.gotoBankHtml = content;
+        } else {
+          this.gotoBankRequest = request;
+        }
+        return this.emit('3ds.required');
       }
     } else if (popup) {
       if (this.iframe) {

@@ -5,11 +5,13 @@ const {
   // Generic
   verifyTimeout,
   handleFeeBearer,
+  selectCurrencyAndVerifyAmount,
   submit,
   handleValidationRequest,
   handleCardValidation,
   handleMockSuccessDialog,
   expectRedirectWithCallback,
+  expectDCCParametersInRequest,
 
   //Saved Cards
   handleCustomerCardStatusRequest,
@@ -63,6 +65,7 @@ module.exports = function(testFeatures) {
     personalization,
     optionalContact,
     optionalEmail,
+    dcc,
   } = features;
 
   describe.each(
@@ -117,7 +120,7 @@ module.exports = function(testFeatures) {
 
       await handleCustomerCardStatusRequest(context);
       await typeOTPandSubmit(context);
-      await respondSavedCards(context);
+      await respondSavedCards(context, { dcc });
 
       if (offers) {
         await viewOffers(context);
@@ -125,7 +128,8 @@ module.exports = function(testFeatures) {
         await verifyOfferApplied(context);
         await verifyDiscountPaybleAmount(context, '₹ 1,980');
         await verifyDiscountAmountInBanner(context, '₹ 1,980');
-        await verifyDiscountText(context, 'You save ₹ 20');
+        await verifyDiscountText(context, 'You save ₹20');
+        await delay(400);
       }
 
       if (partialPayment) {
@@ -139,6 +143,15 @@ module.exports = function(testFeatures) {
       }
 
       await selectSavedCardAndTypeCvv(context);
+
+      if (dcc) {
+        await selectCurrencyAndVerifyAmount(context);
+        await submit(context);
+        await expectDCCParametersInRequest(context);
+
+        return;
+      }
+
       await submit(context);
 
       if (feeBearer) {

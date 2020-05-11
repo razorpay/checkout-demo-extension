@@ -9,14 +9,14 @@
   import * as AnalyticsTypes from 'analytics-types';
 
   // UI imports
-  import RadioOption from 'ui/elements/options/RadioOption.svelte';
+  import DeprecatedRadioOption from 'ui/elements/options/DeprecatedRadioOption.svelte';
   import NextOption from 'ui/elements/options/NextOption.svelte';
   import OptionIcon from 'ui/elements/options/OptionIcon.svelte';
   import Field from 'ui/components/Field.svelte';
   import ListHeader from 'ui/elements/ListHeader.svelte';
   import Icon from 'ui/elements/Icon.svelte';
 
-  import { getMiscIcon } from 'icons/misc';
+  import { getMiscIcon } from 'checkoutframe/icons';
 
   // Props
   export let apps;
@@ -219,7 +219,7 @@
     </ListHeader>
 
     {#each showableApps as app, i}
-      <RadioOption
+      <DeprecatedRadioOption
         data={app}
         icon={app.app_icon}
         iconPlaceholder=".placeholder"
@@ -235,7 +235,7 @@
             </span>
           {/if}
         </div>
-      </RadioOption>
+      </DeprecatedRadioOption>
     {/each}
 
     {#if apps.length > 5 && !showAll}

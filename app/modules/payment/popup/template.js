@@ -1,9 +1,13 @@
-import { displayAmount } from 'common/currency';
+import { displayAmount, getConvertedAmount } from 'common/currency';
 import css from './popup.styl';
-import { cancelMsg } from 'common/strings';
 import { sanitizeHtmlEntities } from 'lib/utils';
 
-const cancelError = _Obj.stringify(_.rzpError(cancelMsg));
+const cancelError = _Obj.stringify({
+  error: {
+    code: 'BAD_REQUEST_ERROR',
+    description: 'Payment processing cancelled by user',
+  },
+});
 
 export default function popupTemplate(_) {
   var get = _.r.get;
@@ -18,6 +22,13 @@ export default function popupTemplate(_) {
     _.data && _.data.amount,
     _.data && _.data.currency
   );
+
+  var dccCurrency = _.data && _.data.dcc_currency;
+  if (dccCurrency) {
+    var dccAmount = getConvertedAmount(_.data.amount, dccCurrency);
+    amount = displayAmount(_.r, dccAmount, dccCurrency);
+  }
+
   var hideAmount =
     _.data && _.data.method === 'emandate' ? 'display: none;' : '';
 
@@ -43,7 +54,7 @@ export default function popupTemplate(_) {
   <div id='name'>${title}</div>
   <div id="amt" style="${hideAmount}">
     <div style="font-size:12px;color:#757575;line-height:15px;margin-bottom:5px;text-align:right">PAYING</div>
-    <div style="font-size:20px;line-height:24px;">${amount}</div>
+    <div dir="ltr" style="font-size:20px;line-height:24px;">${amount}</div>
   </div>
 </div>
 <div id="ldr"></div>

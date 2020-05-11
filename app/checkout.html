@@ -1,141 +1,110 @@
 <!DOCTYPE html>
 <html dir="ltr">
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>Razorpay Checkout</title>
-    <meta http-equiv="pragma" content="no-cache">
-    <meta http-equiv="cache-control" content="no-cache">
-    <meta name="viewport" content="user-scalable=no,width=device-width,initial-scale=1,maximum-scale=1">
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta
+      name="viewport"
+      content="user-scalable=no,width=device-width,initial-scale=1,maximum-scale=1"
+    />
     <style>
       @font-face {
-        font-family:'lato';
+        font-family: 'lato';
         src: url('fonts/lato.eot?#iefix') format('embedded-opentype'),
           url('fonts/lato.woff') format('woff');
-        font-weight:normal;
-        font-style:normal
+        font-weight: normal;
+        font-style: normal;
       }
     </style>
-    <link href="dist/v1/css/checkout.css" type="text/css" rel="stylesheet">
- </head>
+    <link href="dist/v1/css/checkout.css" type="text/css" rel="stylesheet" />
+  </head>
+
+  <!-- This script introduces api params for development and is not present in the final bundle -->
   <script src="config.js"></script>
-  <body>
-    <script>
-    window.preferences = {
-      methods: {
-        "entity":"methods",
-        "card":true,
-        "netbanking":{"ALLA":"Allahabad Bank","ANDB":"Andhra Bank","UTIB":"Axis Bank","BBKM":"Bank of Bahrain & Kuwait","BARB_C":"Bank of Baroda - Corporate Banking","BARB_R":"Bank of Baroda - Retail Banking","BKID":"Bank of India","MAHB":"Bank of Maharashtra","CNRB":"Canara Bank","CSBK":"Catholic Syrian Bank","CBIN":"Central Bank of India","CIUB":"City Union Bank","COSB":"Cosmos Co-Operative Bank","BKDN":"Dena Bank","DEUT":"Deutsche Bank","DCBL":"Development Credit Bank","DLXB":"Dhanalakshmi Bank","FDRL":"Federal Bank","HDFC":"HDFC Bank","ICIC":"ICICI Bank","IBKL":"IDBI Bank","VYSA":"ING Vysya Bank","IDIB":"Indian Bank","IOBA":"Indian Overseas Bank","INDB":"IndusInd Bank","JAKA":"Jammu & Kashmir Bank","JSBP":"Janata Sahakari Bank Ltd","KARB":"Karnataka Bank","KVBL":"Karur Vysya Bank","LAVB_C":"Lakshmi Vilas Bank - Corporate Banking","LAVB_R":"Lakshmi Vilas Bank - Retail Banking","NKGS":"North Kanara GSB Co-op. Bank","ORBC":"Oriental Bank of Commerce","PMCB":"Punjab & Maharashtra Co-operative Bank","PSIB":"Punjab & Sind Bank","PUNB_C":"Punjab National Bank - Corporate Banking","PUNB_R":"Punjab National Bank - Retail Banking","RATN":"Ratnakar Bank","ABNA":"Royal Bank of Scotland","SRCB":"Saraswat Co-Operative Bank","SVCB":"Shamrao Vithal Co-operative Bank","SIBL":"South Indian Bank","SBBJ":"State Bank of Bikaner & Jaipur","SBHY":"State Bank of Hyderabad","SBIN":"State Bank of India","SBMY":"State Bank of Mysore","STBP":"State Bank of Patiala","SBTR":"State Bank of Travancore","SYNB":"Syndicate Bank","TNSC":"Tamil Nadu State Apex Co-Operative Bank","TMBL":"Tamilnad Mercantile Bank","UCBA":"UCO Bank","UBIN":"Union Bank of India","UTBI":"United Bank of India","VIJB":"Vijaya Bank","YESB":"Yes Bank"},
-        "wallet":{
-          "paytm":true,
-          "mobikwik":true,
-          "payzapp":true,
-          freecharge: true,
-        },
-        emi: true,
-        //emi_subvention: "merchant",
-      },
-      // optional: ['email', 'contact'],
-      options: {
-        theme: {
-          color: 'red'
-        }
-      },
-      // "order": {
-      //   "partial_payment": true,
-      //   "amount": 4000000,
-      //   "amount_paid": 0,
-      //   "amount_due": 3900000
-      // },
-      offers: [{
-        payment_method: 'wallet',
-        issuer: 'freecharge',
-        name: "10% cashback",
-        display_text: "<ul><li>Offer title</l1> <li>Point1</li><li>Point2</li></ul>"
-      },{
-        payment_method: 'wallet',
-        issuer: 'mobikwik',
-        name: "12% cashback",
-        display_text: "<ul><li>Offer title</l1> <li>Point1</li><li>Point2</li></ul>"
-      }]
-    }
-    window.preferences = null;
-    </script>
-  </body>
+  <body></body>
+  <!-- Everything till endbuild is bundled into a single js file -->
   <!-- build:js checkout-frame.js -->
   <!-- This is equivalent to razorpay.js -->
+
+  <!-- //1 Introduce globals to be used. Ideally should not be present.  -->
   <script src="js/lib/util.js"></script>
   <script src="js/lib/$.js"></script>
+
+  <!-- The generated es6 code -->
   <script src="js/generated/checkoutframe/discreet.js"></script>
   <script src="js/checkout-frame/init.js"></script>
 
   <!-- This is the iframe specific part -->
   <script src="templates/theme.js"></script>
-  <script src="templates/offers.js"></script>
-  <script src="templates/offerslist.js"></script>
-  <script src="templates/offererror.js"></script>
-  <script src="templates/offer.js"></script>
   <script src="templates/modal.js"></script>
   <script src="templates/emi.js"></script>
   <script src="templates/emandate.js"></script>
   <script src="templates/confirm.js"></script>
   <script src="templates/curtain.js"></script>
-  <script src="templates/callout.js"></script>
+
+  <!-- Modal related util. should not be present ideally. check if can be removed later -->
   <script src="/js/lib/modal.js"></script>
 
-  <script src="/js/checkout-frame/offers.js"></script>
   <script src="/js/checkout-frame/session.js"></script>
   <!-- endbuild -->
 </html>
+<!-- not present in the prod bundle. options are received through handleMessage -->
 <script>
-var options = {
-  // 'key': 'rzp_live_ILgsfZCZoFIKMb',
-  'key': 'rzp_test_1DP5mmOlF5G5ag',
-  // key: 'rzp_live_gC8obGlwaRlyui',
-  'amount': 749090,
-  'name': 'Innerchef',
-  'description': 'JEE Main & Advanced',
-  'image': 'http://i.imgur.com/n5tjHFD.png',
-  'handler': function (transaction){
-    alert("You have successfully purchased " + options.description);
-  },
-  'method': {
-    netbanking: true,
-    wallet: true,
-    card: true
-  },
-  // ecod: true,
-  'remember_customer': false,
-  // parent: '#x',
-  external: {
-    // wallets: ['payumoney'],
-    handler: function(data){
-      console.log(this, data);
-    }
-  },
-  // callback_url: 'http://google.com',
-  // redirect: true,
-  // display_amount: '12.23',
-  // display_currency: 'SGD',
-  'prefill': {
-    'method': 'card',
-    'card[number]': '405028',
-    'name': 'Harshil \"Mathur',
-    'email': 'harshil@razorpay.com',
-    'contact': '8879524924'
-  },
-  // customer_id: 'cust_5rZjWeKfUdrIfG',
-  notes: {
-    'address': 'Hello World'
-  },
-  // order_id: 'order_7I0DqYTedcFfns',
-  theme: {
-    // customer_details: false,
-    color: '#1abc9c'
-  },
-  modal: {
-    ondismiss: function(){console.log(1)},
-    onhidden: function(){console.log(2)}
-  }
-}
-// handleMessage({options: options , upi_intents_data: ['sda'], sdk_popup: true, magic: true});
+  var options = {
+    // 'key': 'rzp_live_ILgsfZCZoFIKMb',
+    key: 'rzp_test_1DP5mmOlF5G5ag',
+    // key: 'rzp_live_gC8obGlwaRlyui',
+    amount: 749090,
+    name: 'Innerchef',
+    description: 'JEE Main & Advanced',
+    image: 'http://i.imgur.com/n5tjHFD.png',
+    handler: function(transaction) {
+      alert('You have successfully purchased ' + options.description);
+    },
+    method: {
+      netbanking: true,
+      wallet: true,
+      card: true,
+    },
+    // ecod: true,
+    remember_customer: false,
+    // parent: '#x',
+    external: {
+      // wallets: ['payumoney'],
+      handler: function(data) {
+        console.log(this, data);
+      },
+    },
+    // callback_url: 'http://google.com',
+    // redirect: true,
+    // display_amount: '12.23',
+    // display_currency: 'SGD',
+    prefill: {
+      method: 'card',
+      'card[number]': '405028',
+      name: 'Harshil "Mathur',
+      email: 'harshil@razorpay.com',
+      contact: '8879524924',
+    },
+    // customer_id: 'cust_5rZjWeKfUdrIfG',
+    notes: {
+      address: 'Hello World',
+    },
+    // order_id: 'order_7I0DqYTedcFfns',
+    theme: {
+      // customer_details: false,
+      color: '#1abc9c',
+    },
+    modal: {
+      ondismiss: function() {
+        console.log(1);
+      },
+      onhidden: function() {
+        console.log(2);
+      },
+    },
+  };
+  // handleMessage({options: options , upi_intents_data: ['sda'], sdk_popup: true, magic: true});
 </script>

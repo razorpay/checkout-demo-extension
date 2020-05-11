@@ -44,6 +44,7 @@ function getBlocksWithNamedClusters(blocks) {
     }
 
     // Recreate the block with the name
+    // Using createBlock instead of validateAndCreateBlock because validations would already be done by this point
     return createBlock(
       block.code,
       _Obj.extend(block, {
@@ -66,7 +67,7 @@ export function createMethodBlock(method) {
 
   block = _Obj.extend(block, {
     method,
-    type: 'rzp_method',
+    _type: 'rzp_method',
   });
 
   return block;
@@ -96,7 +97,7 @@ export function clusterRazorpayBlocks(blocks) {
   }
 
   _Arr.loop(blocks, block => {
-    const isRazorpayMethodBlock = block.type === 'rzp_method';
+    const isRazorpayMethodBlock = block._type === 'rzp_method';
 
     if (isRazorpayMethodBlock) {
       // Add to cluster

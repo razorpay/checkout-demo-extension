@@ -29,7 +29,7 @@
   const amount = session.formatAmountWithCurrency(session.get('amount'));
 
   const onSelection = () => {
-    const customer = session.customer || {};
+    const customer = session.getCurrentCustomer() || {};
 
     contact = customer.contact ? customer.contact.replace('+91', '') : '';
 
@@ -117,7 +117,7 @@
           elemClasses="mature"
           id="gpay-phone"
           {pattern}
-          name="amount"
+          name="phone"
           type="text"
           required
           bind:this={phoneField}

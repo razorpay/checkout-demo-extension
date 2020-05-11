@@ -2,8 +2,6 @@ var Razorpay = window.Razorpay;
 var templates = {};
 
 var RazorpayConfig = discreet.RazorpayConfig;
-var makeAuthUrl = discreet.makeAuthUrl;
-var makePrefParams = discreet.makePrefParams;
 var fetch = discreet.fetch;
 var Track = discreet.Track;
 var Analytics = discreet.Analytics;
@@ -12,7 +10,6 @@ var UPIUtils = discreet.UPIUtils;
 var GPay = discreet.GPay;
 var Color = discreet.Color;
 var Confirm = discreet.Confirm;
-var Callout = discreet.Callout;
 var getDecimalAmount = discreet.getDecimalAmount;
 var _PaymentMethodIcons = discreet._PaymentMethodIcons;
 var Constants = discreet.Constants;
