@@ -44,6 +44,7 @@ function getBlocksWithNamedClusters(blocks) {
     }
 
     // Recreate the block with the name
+    // Using createBlock instead of validateAndCreateBlock because validations would already be done by this point
     return createBlock(
       block.code,
       _Obj.extend(block, {
