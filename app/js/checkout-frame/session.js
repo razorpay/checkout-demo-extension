@@ -408,9 +408,8 @@ function hideFeeWrap() {
 }
 
 function hideOverlayMessage() {
-  if (!hideEmi() && !hideFeeWrap()) {
-    var session = SessionManager.getSession();
-
+  var session = SessionManager.getSession();
+  if (!hideEmi() && !hideFeeWrap() && !session.hideSvelteOverlay()) {
     if (session.tab === 'nach') {
       if (!session.nachScreen.shouldHideOverlay()) {
         return;
@@ -806,13 +805,7 @@ function Session(message) {
 
 Session.prototype = {
   shouldUseNativeOTP: function() {
-    // For demo merchant, if the flow is present, we want to use Native OTP without checking for network.
-    var isDemoMerchant = this.get('key') === DEMO_MERCHANT_KEY;
-
-    var redirectModeWithNativeOtp =
-      this.get('nativeotp') && this.get('redirect') && this.r.isLiveMode();
-
-    return isDemoMerchant || redirectModeWithNativeOtp;
+    return this.get('nativeotp') && this.r.isLiveMode();
   },
 
   getDecimalAmount: getDecimalAmount,
@@ -1345,6 +1338,7 @@ Session.prototype = {
     this.setBankTransfer();
     this.setWalletsTab();
     this.setOffers();
+    this.setSvelteOverlay();
     // make bottom the last element
     gel('form-fields').appendChild(gel('bottom'));
   },
@@ -3670,6 +3664,27 @@ Session.prototype = {
     }
   },
 
+  setSvelteOverlay: function() {
+    this.svelteOverlay = new discreet.Overlay({
+      target: _Doc.querySelector('#modal-inner'),
+      props: {},
+    });
+  },
+
+  showSvelteOverlay: function() {
+    if (!this.svelteOverlay) {
+      this.setSvelteOverlay();
+    }
+    showOverlay();
+    this.svelteOverlay.show();
+  },
+
+  hideSvelteOverlay: function() {
+    if (this.svelteOverlay) {
+      this.svelteOverlay.hide();
+    }
+  },
+
   /**
    * Show fees UI if `fee` is missing in payload and return whether the UI was
    * shown or not.
@@ -4603,14 +4618,33 @@ Session.prototype = {
         this.r.on('payment.otp.required', function(data) {
           askOTP(that.otpView, data);
         });
+        this.r.on('payment.3ds.required', function() {
+          that.svelteOverlay.$set({
+            component: discreet.AuthOverlay,
+          });
+
+          that.showSvelteOverlay();
+          Analytics.track('native_otp:3ds_required:prompt');
+
+          var clearActionListener = that.svelteOverlay.$on('action', function(
+            event
+          ) {
+            var action = event.detail.action;
+            if (action === 'continue') {
+              Analytics.track('native_otp:3ds_required:click', {
+                type: AnalyticsTypes.BEHAV,
+              });
+              that.r._payment.gotoBank();
+              that.hideSvelteOverlay();
+            }
+          });
+          var clearHideListener = that.svelteOverlay.$on('hidden', function() {
+            clearActionListener();
+            clearHideListener();
+          });
+        });
 
         request.nativeotp = true;
-
-        // Only demo merchant supports iframe for now.
-        if (this.get('key') === DEMO_MERCHANT_KEY) {
-          request.iframe = true;
-          Analytics.track('iframe:attempt');
-        }
       }
     }
 
@@ -4918,6 +4952,7 @@ Session.prototype = {
       'savedCardsView',
       'svelteCardTab',
       'svelteWalletsTab',
+      'svelteOverlay',
       'upiTab',
       'timer',
     ];

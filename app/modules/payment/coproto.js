@@ -110,6 +110,14 @@ var responseTypes = {
             error: 'REDIRECT_PARAMS_MISSING',
           },
         });
+        // If request.method = 'direct', then we've got HTML in content key.
+        // Else we got request (method = get/post) with content.
+        if (direct) {
+          this.gotoBankHtml = content;
+        } else {
+          this.gotoBankRequest = request;
+        }
+        return this.emit('3ds.required');
       }
     } else if (popup) {
       if (this.iframe) {
