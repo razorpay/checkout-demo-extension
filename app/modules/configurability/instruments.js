@@ -29,6 +29,8 @@ const PUBLIC_API_INSTRUMENT_KEYS = {
   upi: ['flows', 'apps'],
   cardless_emi: ['providers'],
   paylater: ['providers'],
+  bank_transfer: [],
+  paypal: [],
 };
 
 const INSTRUMENT_CREATORS = {
@@ -66,9 +68,9 @@ function hasOnlyAllowedKeys(instrument) {
 
   const allowedKeys = PUBLIC_API_INSTRUMENT_KEYS[method];
 
-  // If we don't have any specific whitelisted keys, allow this
+  // If we don't have any specific whitelisted keys, reject this
   if (!allowedKeys) {
-    return true;
+    return false;
   }
 
   // Removing 'method' because it is a common key
