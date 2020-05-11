@@ -1,11 +1,19 @@
 export const formatters = [
   {
-    flag: '**',
-    type: 'bold',
+    flag: '<strong>',
+    type: 'strong',
   },
   {
-    flag: '__',
+    flag: '<i>',
     type: 'italic',
+  },
+  {
+    flag: '<em>',
+    type: 'emphasis',
+  },
+  {
+    flag: '<b>',
+    type: 'bold',
   },
 ];
 
