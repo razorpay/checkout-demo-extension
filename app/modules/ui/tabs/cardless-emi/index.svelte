@@ -6,7 +6,7 @@
   import { createProvider } from 'common/cardlessemi';
   import {
     getCardlessEMIProviders,
-    isMethodEnabled,
+    isMethodUsable,
     isDebitEMIEnabled,
   } from 'checkoutstore/methods';
 
@@ -27,7 +27,7 @@
       providers.push(createProvider(providerObj.code, providerObj.name));
     });
 
-    if (isMethodEnabled('emi')) {
+    if (isMethodUsable('emi')) {
       providers.unshift(
         createProvider(
           'cards',
