@@ -1,7 +1,7 @@
 <script>
   // Svelte imports
   import { onMount } from 'svelte';
-  import { _ } from 'svelte-i18n';
+  import { t } from 'svelte-i18n';
 
   // UI imports
   import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
@@ -205,13 +205,13 @@
   {:else if view === 'qr'}
     {#if loading}
       <!-- LABEL: Generating QR Code... -->
-      <AsyncLoading>{$_(QR_GENERATING_LABEL)}</AsyncLoading>
+      <AsyncLoading>{$t(QR_GENERATING_LABEL)}</AsyncLoading>
     {:else}
       <div
         class="message"
         style="background-image: url('{RazorpayConfig.cdn}checkout/upi-apps.png')">
         <!-- LABEL: Scan the QR using any UPI app on your phone like BHIM, PhonePe, Google Pay etc. -->
-        {$_(QR_SCAN_ON_PHONE)}
+        {$t(QR_SCAN_ON_PHONE)}
       </div>
       {#if qrImage}
         <div class="qr-image">
@@ -224,7 +224,7 @@
       <div class="error-text">{error}</div>
       <br />
       <!-- LABEL: Retry -->
-      <div class="btn" on:click={init}>{$_(QR_RETRY)}</div>
+      <div class="btn" on:click={init}>{$t(QR_RETRY)}</div>
     </div>
   {/if}
 
@@ -232,7 +232,7 @@
     <Bottom tab="qr">
       <DowntimeCallout severe={disabled}>
         <!-- LABEL: UPI QR is experiencing low success rates. -->
-        <FormattedText text={$_(QR_DOWNTIME_TEXT)} />
+        <FormattedText text={$t(QR_DOWNTIME_TEXT)} />
 
       </DowntimeCallout>
     </Bottom>
