@@ -917,10 +917,6 @@ Session.prototype = {
       classes.push('noimage');
     }
 
-    if (MethodStore.isEMandateEnabled()) {
-      classes.push('emandate');
-    }
-
     if (isIE) {
       classes.push('noanim');
     }
