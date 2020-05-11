@@ -14,6 +14,7 @@
   import { getSession } from 'sessionmanager';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
+  import { getCardMetadata } from 'common/card';
 
   // Props
   export let cards = [];
@@ -46,6 +47,9 @@
 
     Analytics.track('saved_card:select', {
       type: AnalyticsTypes.BEHAV,
+      data: {
+        card: getCardMetadata(card.token),
+      },
     });
 
     dispatch('select', { token: card });

@@ -23,6 +23,10 @@ otpView.prototype = {
     this.view.$destroy();
   },
 
+  onBack() {
+    this.view.onBack();
+  },
+
   updateScreen(props) {
     _Obj.loop(props, (val, prop) => {
       if (OtpScreenStore[prop]) {
