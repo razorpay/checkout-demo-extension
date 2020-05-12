@@ -141,7 +141,7 @@ export function getEMIBanksText() {
 export function getMethodPrefix(method, locale = 'en') {
   const bundles = get(dictionary);
   const currentBundle = bundles[locale];
-  const methodKey = getMethodForPrefix(`methods.${method}`);
+  const methodKey = getMethodForPrefix(`methods.prefixes.${method}`);
   // TODO: remove capitalized fallback
   return currentBundle[methodKey] || method[0].toUpperCase() + method.slice(1);
 }
