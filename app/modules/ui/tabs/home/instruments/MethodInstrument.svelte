@@ -26,15 +26,12 @@
   const method = instrument.method;
 
   let methodName;
-  $: {
-    methodName = getMethodNameForPaymentOption(method, { instrument }, $locale);
-  }
+  $: $locale,
+    (methodName = getMethodNameForPaymentOption(method, { instrument }));
 
   let title;
-  $: {
-    // TODO: use templates when implemented
-    title = `Pay using ${methodName}`;
-  }
+  // TODO: use templates when implemented
+  $: title = `Pay using ${methodName}`;
 
   const id = instrument.id;
   const subtext = getSubtextForInstrument(instrument);

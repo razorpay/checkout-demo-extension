@@ -137,9 +137,9 @@ export function getEMIBanksText() {
  * @param {string} locale
  * @return {String}
  */
-export function getTranslatedMethodPrefix(method, locale = 'en') {
+export function getTranslatedMethodPrefix(method) {
   const methodKey = getMethodForPrefix(method);
-  return getMethodPrefix(methodKey, locale);
+  return getMethodPrefix(methodKey);
 }
 
 /**
@@ -177,11 +177,7 @@ function getMethodForPrefix(method) {
  *
  * @returns {string}
  */
-export function getMethodNameForPaymentOption(
-  method,
-  extra = {},
-  locale = 'en'
-) {
+export function getMethodNameForPaymentOption(method, extra = {}) {
   let hasInstrument = extra.instrument;
   let qrEnabled;
   let hasQr;
@@ -196,22 +192,22 @@ export function getMethodNameForPaymentOption(
       }
 
       if (hasQr) {
-        return getMethodTitle('upiqr', locale);
+        return getMethodTitle('upiqr');
       }
 
-      return getMethodTitle('upi', locale);
+      return getMethodTitle('upi');
     }
 
     case 'cardless_emi': {
       if (hasInstrument) {
-        return getMethodTitle('cardless_emi', locale);
+        return getMethodTitle('cardless_emi');
       }
 
-      return getMethodTitle('emi', locale);
+      return getMethodTitle('emi');
     }
 
     default:
-      return getMethodTitle(method, locale);
+      return getMethodTitle(method);
   }
 }
 

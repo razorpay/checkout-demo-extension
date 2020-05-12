@@ -120,7 +120,7 @@ export function getBundle(locale) {
  * @param {string} locale
  * @returns {string}
  */
-export function getMethodPrefix(method, locale) {
+export function getMethodPrefix(method) {
   return get(t)(`methods.prefixes.${method}`);
 }
 
@@ -130,6 +130,6 @@ export function getMethodPrefix(method, locale) {
  * @param {string} locale
  * @returns {string}
  */
-export function getMethodTitle(method, locale) {
+export function getMethodTitle(method) {
   return get(t)(`methods.titles.${method}`);
 }

@@ -17,12 +17,13 @@
 
   const dispatch = createEventDispatcher();
 
-  function getTitleFromInstruments(instruments, locale) {
+  let title;
+  $: $locale, (title = getTitleFromInstruments(block.instruments));
+
+  function getTitleFromInstruments(instruments) {
     const methods = _Arr.map(instruments, (instrument) => instrument.method);
 
-    const names = _Arr.map(methods, (method) =>
-      getTranslatedMethodPrefix(method, locale)
-    );
+    const names = _Arr.map(methods, getTranslatedMethodPrefix);
 
     let name;
 
@@ -36,7 +37,7 @@
       name = generateTextFromList(names, 3);
     }
 
-    return name + '- ' + locale;
+    return name;
   }
 
   function selectMethod(event) {
@@ -51,7 +52,7 @@
 </style>
 
 <div class="methods-block" data-block={block.code}>
-  <h3 class="title">{getTitleFromInstruments(block.instruments, $locale)}</h3>
+  <h3 class="title">{title}</h3>
   <div role="list" class="border-list">
     {#each block.instruments as instrument, index (instrument.id)}
       <Method method={instrument.method} on:select={selectMethod} />
