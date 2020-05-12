@@ -13,7 +13,7 @@
 
   // Store imports
   import { methodTabInstrument } from 'checkoutstore/screens/home';
-  import { _ } from 'svelte-i18n';
+  import { t } from 'svelte-i18n';
 
   // i18n labels
   import { NETBANKING_SELECT_LABEL, NETBANKING_SELECT_HELP } from 'ui/labels';
@@ -120,7 +120,7 @@
 
     let filteredBanks = {};
 
-    _Arr.loop(instrument.banks, code => {
+    _Arr.loop(instrument.banks, (code) => {
       if (banks[code]) {
         filteredBanks[code] = banks[code];
       }
@@ -134,7 +134,7 @@
     !recurring && hasMultipleOptions(selectedBankCode, filteredBanks);
   $: corporateSelected = isCorporateCode(selectedBankCode);
   $: maxGridCount = recurring ? 3 : 6;
-  $: banksArr = _Arr.map(_Obj.entries(filteredBanks), entry => ({
+  $: banksArr = _Arr.map(_Obj.entries(filteredBanks), (entry) => ({
     code: entry[0],
     name: entry[1],
     downtime: downtimes[entry[0]],
@@ -222,7 +222,7 @@
         <div id="nb-elem" class="elem select" class:invalid>
           <i class="select-arrow"></i>
           <!-- LABEL: Please select a bank -->
-          <div class="help">{$_(NETBANKING_SELECT_HELP)}</div>
+          <div class="help">{$t(NETBANKING_SELECT_HELP)}</div>
           <select
             id="bank-select"
             name="bank"
@@ -233,7 +233,7 @@
             use:blur
             use:input>
             <!-- LABEL: Select a different bank -->
-            <option value="">{$_(NETBANKING_SELECT_LABEL)}</option>
+            <option value="">{$t(NETBANKING_SELECT_LABEL)}</option>
             {#each banksArr as bank}
               <option value={bank.code}>{bank.name}</option>
             {/each}
