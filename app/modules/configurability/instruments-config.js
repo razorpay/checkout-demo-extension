@@ -36,20 +36,6 @@ function genericPaymentPayloadGetter(instrument, payment, customer) {
   return payment;
 }
 
-/**
- * Tells whether or the instrument is on a granular level.
- * These type of instruments can be directly used to make payments.
- * @param {Instrument} instrument
- *
- * @returns {boolean}
- */
-function genericIsIndividual(instrument) {
-  const method = instrument.method;
-  const paymentKeys = config[method].payment;
-
-  return _Arr.any(paymentKeys, key => instrument[key]);
-}
-
 function genericIsValid(instrument) {
   return true;
 }
@@ -139,12 +125,10 @@ const config = {
 
       return true;
     },
-    isIndividual: instrument =>
-      instrument.token_id && (instrument.network || instrument.issuer),
   },
 
   netbanking: {
-    properties: ['bank', 'banks'],
+    properties: ['banks'],
     payment: ['bank'],
     groupedToIndividual: grouped => {
       const base = _Obj.clone(grouped);
@@ -159,14 +143,12 @@ const config = {
         );
       });
     },
-    isIndividual: instrument => instrument.bank,
     isValid: instrument =>
-      Boolean(instrument.bank) ||
-      (Boolean(instrument.banks) && instrument.banks.length > 0),
+      Boolean(instrument.banks) && instrument.banks.length > 0,
   },
 
   wallet: {
-    properties: ['wallet', 'wallets'],
+    properties: ['wallets'],
     payment: ['wallet'],
     groupedToIndividual: grouped => {
       const base = _Obj.clone(grouped);
@@ -181,10 +163,8 @@ const config = {
         );
       });
     },
-    isIndividual: instrument => instrument.wallet,
     isValid: instrument =>
-      Boolean(instrument.wallet) ||
-      (Boolean(instrument.wallets) && instrument.wallets.length > 0),
+      Boolean(instrument.wallets) && instrument.wallets.length > 0,
   },
 
   upi: {
@@ -296,20 +276,6 @@ const config = {
 
       return ungrouped;
     },
-    isIndividual: instrument => {
-      const singleFlow = instrument.flow;
-
-      const missingApp = !instrument.app && !instrument.apps;
-      const singleApp = instrument.app;
-      const singleorMissingApps = singleApp || missingApp;
-
-      const missingToken = !instrument.token_id && !instrument.token_ids;
-      const singleToken = instrument.token_id;
-      const singleorMissingTokens = singleToken || missingToken;
-
-      return singleFlow && singleorMissingApps && singleorMissingTokens;
-    },
-
     getPaymentPayload: (instrument, payment, customer) => {
       payment = genericPaymentPayloadGetter(instrument, payment, customer);
 
@@ -363,23 +329,17 @@ const config = {
         if (!hasFlows || !_Arr.contains(instrument.flows, 'intent')) {
           return false;
         }
-
-        return true;
       }
 
-      // Individual instrument should have a flow
-      return Boolean(instrument.flow) || Boolean(instrument.flows);
+      return true;
     },
   },
 
-  paypal: {
-    isIndividual: () => true,
-  },
+  paypal: {},
 
   cardless_emi: {
-    properties: ['provider', 'providers'],
+    properties: ['providers'],
     payment: ['provider'],
-    isIndividual: instrument => instrument && instrument.provider,
     groupedToIndividual: grouped => {
       const base = _Obj.clone(grouped);
       delete base.providers;
@@ -394,14 +354,12 @@ const config = {
       });
     },
     isValid: instrument =>
-      Boolean(instrument.provider) ||
-      (Boolean(instrument.providers) && instrument.providers.length > 0),
+      Boolean(instrument.providers) && instrument.providers.length > 0,
   },
 
   paylater: {
-    properties: ['provider', 'providers'],
+    properties: ['providers'],
     payment: ['provider'],
-    isIndividual: instrument => instrument && instrument.provider,
     groupedToIndividual: grouped => {
       const base = _Obj.clone(grouped);
       delete base.providers;
@@ -416,13 +374,10 @@ const config = {
       });
     },
     isValid: instrument =>
-      Boolean(instrument.provider) ||
-      (Boolean(instrument.providers) && instrument.providers.length > 0),
+      Boolean(instrument.providers) && instrument.providers.length > 0,
   },
 
-  bank_transfer: {
-    isIndividual: () => false,
-  },
+  bank_transfer: {},
 
   // TODO: Pending methods: emi, gpay
 };
@@ -434,7 +389,6 @@ _Obj.loop(config, (val, method) => {
   config[method] = _Obj.extend(
     {
       getPaymentPayload: genericPaymentPayloadGetter,
-      isIndividual: genericIsIndividual,
       groupedToIndividual: genericGroupedToIndividual,
       isValid: genericIsValid,
       properties: [],
