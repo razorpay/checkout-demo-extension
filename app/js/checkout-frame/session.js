@@ -132,7 +132,7 @@ function doesContactHaveValidCharacters(contact) {
 }
 
 function fillData(container, returnObj) {
-  each($(container).find('input[name],select[name]'), function(i, el) {
+  each($(container).find('input[name],select[name]'), function (i, el) {
     if (/radio|checkbox/.test(el.getAttribute('type')) && !el.checked) {
       return;
     }
@@ -198,7 +198,7 @@ function getCardTypeFromPayload(payload, tokens) {
 
   if (payload.token) {
     if (tokens) {
-      tokens.forEach(function(t) {
+      tokens.forEach(function (t) {
         if (t.token === payload.token) {
           cardType = t.card.networkCode;
         }
@@ -224,7 +224,7 @@ function getIssuerForEmiFromPayload(payload, tokens) {
 
   if (payload.token) {
     if (tokens) {
-      tokens.forEach(function(t) {
+      tokens.forEach(function (t) {
         if (t.token === payload.token) {
           issuer = t.card.issuer;
 
@@ -327,10 +327,7 @@ function setEmiBank(data) {
 }
 
 function makeVisible(subject) {
-  $(subject)
-    .css('display', 'block')
-    .reflow()
-    .addClass(shownClass);
+  $(subject).css('display', 'block').reflow().addClass(shownClass);
 }
 
 function makeHidden(subject) {
@@ -369,7 +366,7 @@ function hideOverlaySafely($with) {
   if (overlay[0]) {
     // Remove shown class to start transition.
     overlay.removeClass(shownClass);
-    setTimeout(function() {
+    setTimeout(function () {
       if (overlayInUse()) {
         // Don't hide overlay
         // Undo adding shown class
@@ -523,7 +520,7 @@ function errorHandler(response) {
       }
       error_el = $(error_el);
 
-      setTimeout(function() {
+      setTimeout(function () {
         error_el.focus();
       }, 100);
 
@@ -716,10 +713,10 @@ function askOTP(view, text, shouldLimitResend, screenProps) {
           if (!thisSession.get('timeout')) {
             thisSession.timer = discreet.showTimer(
               now() + 3 * 60 * 1000,
-              function() {
+              function () {
                 thisSession.hideTimer();
                 thisSession.back(true);
-                setTimeout(function() {
+                setTimeout(function () {
                   Analytics.track('native_otp:timeout');
                   thisSession.showLoadError(
                     'Payment was not completed on time',
@@ -770,7 +767,7 @@ function successHandler(response) {
 
 function cancel_upi(session) {
   $('#error-message').addClass('cancel_upi');
-  session.r.on('payment.error', function() {
+  session.r.on('payment.error', function () {
     $('#error-message').removeClass('cancel_upi');
   });
 }
@@ -785,7 +782,7 @@ function Session(message) {
   this.tab = this.screen = '';
   this.tab_titles = tab_titles;
 
-  each(message, function(key, val) {
+  each(message, function (key, val) {
     if (key !== 'options') {
       self[key] = val;
     }
@@ -804,20 +801,20 @@ function Session(message) {
 }
 
 Session.prototype = {
-  shouldUseNativeOTP: function() {
+  shouldUseNativeOTP: function () {
     return this.get('nativeotp') && this.r.isLiveMode();
   },
 
   getDecimalAmount: getDecimalAmount,
 
-  formatAmount: function(amount) {
+  formatAmount: function (amount) {
     var displayCurrency = this.r.get('display_currency');
     var currency = this.r.get('currency');
 
     return discreet.Currency.formatAmount(amount, displayCurrency || currency);
   },
 
-  formatAmountWithCurrencyInMinor: function(amount) {
+  formatAmountWithCurrencyInMinor: function (amount) {
     var currency = this.get('currency');
     var config = discreet.Currency.getCurrencyConfig(currency);
     var multiplier = Math.pow(10, config.decimals);
@@ -827,7 +824,7 @@ Session.prototype = {
     return this.formatAmountWithCurrency(value);
   },
 
-  formatAmountWithCurrency: function(amount) {
+  formatAmountWithCurrency: function (amount) {
     var amountFigure = this.formatAmount(amount);
     var displayCurrency = this.r.get('display_currency');
     var currency = this.r.get('currency');
@@ -851,7 +848,7 @@ Session.prototype = {
    *
    * @param {Number} amount
    */
-  updateAmountInHeader: function(amount) {
+  updateAmountInHeader: function (amount) {
     $('#amount .original-amount').rawHtml(
       this.formatAmountWithCurrency(amount)
     );
@@ -861,7 +858,7 @@ Session.prototype = {
    *
    * @param {String} html
    */
-  setRawAmountInHeader: function(html) {
+  setRawAmountInHeader: function (html) {
     $('#amount .original-amount').html(html);
   },
 
@@ -870,11 +867,11 @@ Session.prototype = {
    *
    * @return {Payment}
    */
-  getPayment: function() {
+  getPayment: function () {
     return this.r._payment;
   },
 
-  getClasses: function() {
+  getClasses: function () {
     var classes = [];
     if (isMobile()) {
       classes.push('mobile');
@@ -920,7 +917,7 @@ Session.prototype = {
     return classes.join(' ');
   },
 
-  getEl: function() {
+  getEl: function () {
     var r = this.r;
     if (!this.el) {
       var classes = this.getClasses();
@@ -944,7 +941,7 @@ Session.prototype = {
     return this.el;
   },
 
-  fillData: function() {
+  fillData: function () {
     var self = this;
     var oldMethod = this.data.method;
     if (oldMethod) {
@@ -965,7 +962,7 @@ Session.prototype = {
       var valid = true;
       var fields = ['contact', 'email'];
 
-      each(fields, function(optionKey, option) {
+      each(fields, function (optionKey, option) {
         if (valid && !prefill[option] && !optional[option]) {
           valid = false;
           errorHandler.call(SessionManager.getSession(), {
@@ -1004,7 +1001,7 @@ Session.prototype = {
 
         // TODO: hacky stuff , need to refactor
         // setTimeout with 200ms - waiting for checkout animation to complete
-        window.setTimeout(function() {
+        window.setTimeout(function () {
           // scrolling to the selected wallet when checkout is opened
           var walletsEleBottom =
               walletsEle.getBoundingClientRect().top + walletsEle.clientHeight,
@@ -1036,7 +1033,7 @@ Session.prototype = {
           contact: 'contact',
           email: 'email',
         },
-        function(name, id) {
+        function (name, id) {
           var el = gel(id);
           var val = data[name];
           if (el && val) {
@@ -1048,7 +1045,7 @@ Session.prototype = {
     }
   },
 
-  completePendingPayment: function() {
+  completePendingPayment: function () {
     var self = this;
     try {
       var pollUrl, pendingPaymentTimestamp;
@@ -1093,7 +1090,7 @@ Session.prototype = {
          */
         this.ajax = fetch({
           url: pollUrl,
-          callback: function(response) {
+          callback: function (response) {
             if (response.razorpay_payment_id) {
               invoke(successHandler, self, response);
             } else {
@@ -1105,11 +1102,11 @@ Session.prototype = {
               invoke(errorHandler, self, response);
             }
           },
-        }).till(function(response) {
+        }).till(function (response) {
           return response && response.status;
         });
 
-        var abortPaymentOnUPIIntentFailure = function() {
+        var abortPaymentOnUPIIntentFailure = function () {
           self.ajax.abort();
 
           if (self.r._payment && self.r._payment.upi_app) {
@@ -1124,7 +1121,7 @@ Session.prototype = {
         if (this.recievedUPIIntentRespOnBackBtn) {
           abortPaymentOnUPIIntentFailure();
         } else {
-          this.r.once('activity_recreated_upi_intent_back_btn', function() {
+          this.r.once('activity_recreated_upi_intent_back_btn', function () {
             abortPaymentOnUPIIntentFailure();
           });
         }
@@ -1132,19 +1129,19 @@ Session.prototype = {
     } catch (e) {}
   },
 
-  setParamsInStorage: function(params) {
-    each(params, function(key, val) {
+  setParamsInStorage: function (params) {
+    each(params, function (key, val) {
       try {
         StorageBridge.setString(key, val);
       } catch (e) {}
     });
   },
 
-  setExperiments: function() {
+  setExperiments: function () {
     discreet.Experiments.clearOldExperiments();
   },
 
-  render: function(options) {
+  render: function (options) {
     var that = this;
 
     options = options || {};
@@ -1204,7 +1201,7 @@ Session.prototype = {
 
     // Analytics related to orientation
     Analytics.setMeta('orientation', Hacks.getDeviceOrientation());
-    window.addEventListener('orientationchange', function() {
+    window.addEventListener('orientationchange', function () {
       Analytics.setMeta('orientation', Hacks.getDeviceOrientation());
     });
 
@@ -1221,11 +1218,11 @@ Session.prototype = {
     Analytics.setMeta('timeSince.render', discreet.timer());
   },
 
-  runMaxmindScriptIfApplicable: function() {
+  runMaxmindScriptIfApplicable: function () {
     this.runMaxmindScript();
   },
 
-  runMaxmindScript: function() {
+  runMaxmindScript: function () {
     var script = _El.create('script');
     window.maxmind_user_id = '115820';
     script.async = true;
@@ -1233,7 +1230,7 @@ Session.prototype = {
     document.body.appendChild(script);
   },
 
-  setUpiTab: function() {
+  setUpiTab: function () {
     /**
      * This is being handled in Tab component as well,
      * condition won't be needed here once all ported to svelte
@@ -1245,13 +1242,13 @@ Session.prototype = {
     }
   },
 
-  setHomeTab: function() {
+  setHomeTab: function () {
     this.homeTab = new discreet.HomeTab({
       target: gel('form-fields'),
     });
   },
 
-  setNetbankingTab: function() {
+  setNetbankingTab: function () {
     var method, banks;
     var prefilledbank = this.get('prefill.bank');
 
@@ -1260,7 +1257,7 @@ Session.prototype = {
       var embanks = MethodStore.getEMandateBanks();
       banks = _Obj.reduce(
         embanks,
-        function(banks, bank, code) {
+        function (banks, bank, code) {
           banks[code] = bank.name;
           return banks;
         },
@@ -1292,8 +1289,8 @@ Session.prototype = {
 
       var session = this;
 
-      this.netbankingTab.$on('bankSelected', function(e) {
-        session.validateOffers(e.detail.bank.code, function(offerRemoved) {
+      this.netbankingTab.$on('bankSelected', function (e) {
+        session.validateOffers(e.detail.bank.code, function (offerRemoved) {
           if (!offerRemoved) {
             // If the offer was not removed, revert to the bank in offer issuer
             session.netbankingTab.setSelectedBank(
@@ -1305,7 +1302,7 @@ Session.prototype = {
     }
   },
 
-  setSvelteCardTab: function() {
+  setSvelteCardTab: function () {
     if (MethodStore.isCardOrEMIEnabled()) {
       this.svelteCardTab = new discreet.CardTab({
         target: gel('form-fields'),
@@ -1316,7 +1313,7 @@ Session.prototype = {
     }
   },
 
-  setWalletsTab: function() {
+  setWalletsTab: function () {
     if (MethodStore.isMethodEnabled('wallet')) {
       this.svelteWalletsTab = new discreet.WalletTab({
         target: gel('wallet-svelte-wrap'),
@@ -1325,7 +1322,7 @@ Session.prototype = {
     }
   },
 
-  setSvelteComponents: function() {
+  setSvelteComponents: function () {
     this.setHomeTab();
     this.setSvelteCardTab();
     this.setNetbankingTab();
@@ -1348,14 +1345,14 @@ Session.prototype = {
   // this does not apply if options.timeout was passed
   // because in that case timer needn't be hidden while checkout is open
   // applied only for localized timers e.g headless OTP timer
-  hideTimer: function() {
+  hideTimer: function () {
     if (!this.get('timeout') && this.timer) {
       this.timer.$destroy();
       this.timer = null;
     }
   },
 
-  setTpvBanks: function() {
+  setTpvBanks: function () {
     var options = this.get();
     var bankCode, accountNumber;
     var order = Store.getMerchantOrder();
@@ -1403,7 +1400,7 @@ Session.prototype = {
     }
   },
 
-  setEMI: function() {
+  setEMI: function () {
     if (!this.emi && MethodStore.isMethodEnabled('emi')) {
       $(this.el).addClass('emi');
       this.emi = new discreet.emiView();
@@ -1414,13 +1411,13 @@ Session.prototype = {
     }
   },
 
-  setEmandate: function() {
+  setEmandate: function () {
     if (MethodStore.isEMandateEnabled()) {
       this.emandateView = new discreet.emandateView();
     }
   },
 
-  selectCardlessEmiProvider: function(providerCode) {
+  selectCardlessEmiProvider: function (providerCode) {
     Analytics.track('cardless_emi:provider:select', {
       type: AnalyticsTypes.BEHAV,
       data: {
@@ -1453,7 +1450,7 @@ Session.prototype = {
    * Cardless EMI homescreen.
    * @param {String} provider Code for the provider
    */
-  selectCardlessEmiProviderAndAttemptPayment: function(provider) {
+  selectCardlessEmiProviderAndAttemptPayment: function (provider) {
     this.selectCardlessEmiProvider(provider);
     /**
      * When a cardless EMI provider except "EMI on Cards" is chosen, the payment
@@ -1465,7 +1462,7 @@ Session.prototype = {
     }
   },
 
-  setCardlessEmi: function() {
+  setCardlessEmi: function () {
     var self = this;
 
     if (MethodStore.isMethodEnabled('cardless_emi')) {
@@ -1473,14 +1470,14 @@ Session.prototype = {
         target: _Doc.querySelector('#form-fields'),
       });
 
-      this.cardlessEmiView.$on('select', function(event) {
+      this.cardlessEmiView.$on('select', function (event) {
         var providerCode = event.detail.code;
         self.selectCardlessEmiProviderAndAttemptPayment(providerCode);
       });
     }
   },
 
-  selectPayLaterProvider: function(providerCode) {
+  selectPayLaterProvider: function (providerCode) {
     Analytics.track('paylater:provider:select', {
       type: AnalyticsTypes.BEHAV,
       data: {
@@ -1501,7 +1498,7 @@ Session.prototype = {
    * PayLater homescreen.
    * @param {String} providerCode Code for the provider
    */
-  selectPayLaterProviderAndAttemptPayment: function(providerCode) {
+  selectPayLaterProviderAndAttemptPayment: function (providerCode) {
     this.selectPayLaterProvider(providerCode);
     this.preSubmit();
   },
@@ -1509,7 +1506,7 @@ Session.prototype = {
   /**
    * Adds the Nach screen to DOM
    */
-  setNach: function() {
+  setNach: function () {
     if (MethodStore.isMethodEnabled('nach')) {
       this.nachScreen = new discreet.NachScreen({
         target: _Doc.querySelector('#form-fields'),
@@ -1517,7 +1514,7 @@ Session.prototype = {
     }
   },
 
-  setBankTransfer: function() {
+  setBankTransfer: function () {
     if (MethodStore.isMethodEnabled('bank_transfer')) {
       this.bankTransferView = new discreet.BankTransferScreen({
         target: _Doc.querySelector('#form-fields'),
@@ -1525,7 +1522,7 @@ Session.prototype = {
     }
   },
 
-  setPayLater: function() {
+  setPayLater: function () {
     var self = this;
     var isPayLaterEnabled = MethodStore.isMethodEnabled('paylater');
 
@@ -1537,13 +1534,13 @@ Session.prototype = {
       target: _Doc.querySelector('#form-fields'),
     });
 
-    this.payLaterView.$on('select', function(event) {
+    this.payLaterView.$on('select', function (event) {
       var providerCode = event.detail.code;
       self.selectPayLaterProviderAndAttemptPayment(providerCode);
     });
   },
 
-  setEmiScreen: function() {
+  setEmiScreen: function () {
     var session = this;
     if (!MethodStore.getEMIBanks().BAJAJ) {
       return;
@@ -1556,7 +1553,7 @@ Session.prototype = {
     this.emiScreenView.$on('editplan', this.showEmiPlans('bajaj'));
   },
 
-  setPayoutsScreen: function() {
+  setPayoutsScreen: function () {
     var session = this;
     if (!this.isPayout) {
       return;
@@ -1566,11 +1563,11 @@ Session.prototype = {
       (this.preferences.contact && this.preferences.contact.fund_accounts) ||
       [];
 
-    var upiAccounts = _Arr.filter(accounts, function(account) {
+    var upiAccounts = _Arr.filter(accounts, function (account) {
       return account.account_type === 'vpa';
     });
 
-    var bankAccounts = _Arr.filter(accounts, function(account) {
+    var bankAccounts = _Arr.filter(accounts, function (account) {
       return account.account_type === 'bank_account';
     });
 
@@ -1592,12 +1589,12 @@ Session.prototype = {
 
     $('#top-right').addClass('hidden');
 
-    this.payoutsView.$on('selectaccount', function(event) {
+    this.payoutsView.$on('selectaccount', function (event) {
       $('#body').addClass('sub');
       Analytics.track('payout:account:select', event.detail);
     });
 
-    this.payoutsView.$on('add', function(event) {
+    this.payoutsView.$on('add', function (event) {
       var method = event.detail.method;
 
       if (method === 'upi') {
@@ -1610,14 +1607,14 @@ Session.prototype = {
     this.switchTab('payouts');
   },
 
-  getCardlessEmiPlans: function() {
+  getCardlessEmiPlans: function () {
     var providerCode = CardlessEmiStore.providerCode;
     var plans = CardlessEmiStore.plans[providerCode];
 
     return plans;
   },
 
-  showCardlessEmiPlans: function() {
+  showCardlessEmiPlans: function () {
     var self = this;
     var providerCode = CardlessEmiStore.providerCode;
     var plans = CardlessEmiStore.plans[providerCode];
@@ -1654,7 +1651,7 @@ Session.prototype = {
       branding: CardlessEmiStore.lenderBranding[providerCode],
 
       on: {
-        back: bind(function() {
+        back: bind(function () {
           var payment = this.r._payment;
 
           if (payment && confirmClose()) {
@@ -1668,7 +1665,7 @@ Session.prototype = {
           return true;
         }, this),
 
-        select: function(value) {
+        select: function (value) {
           $('#form-cardless_emi input[name=emi_duration]').val(value);
           $('#form-cardless_emi input[name=provider]').val(
             CardlessEmiStore.providerCode
@@ -1693,7 +1690,7 @@ Session.prototype = {
     this.setScreen('emiplans');
   },
 
-  fetchCardlessEmiPlans: function(params) {
+  fetchCardlessEmiPlans: function (params) {
     if (!params) {
       params = {};
     }
@@ -1717,7 +1714,7 @@ Session.prototype = {
       return;
     }
 
-    var callback = function() {
+    var callback = function () {
       var otpMessage =
         'Enter the OTP sent on ' +
         getPhone() +
@@ -1761,14 +1758,14 @@ Session.prototype = {
     }
   },
 
-  checkCustomerStatus: function(params, callback) {
+  checkCustomerStatus: function (params, callback) {
     var self = this;
     var provider = params.provider;
     var data = params.data;
     var phone = params.contact;
 
     this.getCurrentCustomer(phone).checkStatus(
-      function(response) {
+      function (response) {
         self.updateCustomerInStore();
         if (_Obj.hasOwnProp(response, 'saved')) {
           if (response.saved) {
@@ -1797,7 +1794,7 @@ Session.prototype = {
     );
   },
 
-  askPayLaterOtp: function(action) {
+  askPayLaterOtp: function (action) {
     var providerCode = PayLaterStore.providerCode;
     var payLaterProviderObj = PayLater.getProvider(providerCode);
     var self = this;
@@ -1838,7 +1835,7 @@ Session.prototype = {
       );
     }
 
-    this.checkCustomerStatus(params, function(error) {
+    this.checkCustomerStatus(params, function (error) {
       if (error) {
         PayLaterStore.userRegistered = false;
         self.showLoadError(error, true);
@@ -1865,7 +1862,7 @@ Session.prototype = {
     });
   },
 
-  submitPayLater: function() {
+  submitPayLater: function () {
     // Step 1: Check if user is registered on the given provider.
     if (!PayLaterStore.userRegistered) {
       this.askPayLaterOtp();
@@ -1888,14 +1885,14 @@ Session.prototype = {
     this.preSubmit();
   },
 
-  setOtpScreen: function() {
+  setOtpScreen: function () {
     if (!this.otpView) {
       this.otpView = new discreet.otpView({
         target: gel('form-fields'),
 
         props: {
           on: {
-            chooseMethod: bind(function() {
+            chooseMethod: bind(function () {
               this.switchTab();
             }, this),
             addFunds: bind(this.addFunds, this),
@@ -1908,16 +1905,16 @@ Session.prototype = {
     }
   },
 
-  setModal: function() {
+  setModal: function () {
     if (!this.modal) {
       var self = this;
       this.modal = new window.Modal(this.el, {
         escape: this.get('modal.escape') && !this.embedded,
         backdropclose: this.get('modal.backdropclose'),
-        onhide: function() {
+        onhide: function () {
           Razorpay.sendMessage({ event: 'dismiss', data: self.dismissReason });
         },
-        onhidden: bind(function() {
+        onhidden: bind(function () {
           this.saveAndClose();
           Razorpay.sendMessage({ event: 'hidden' });
         }, this),
@@ -1925,13 +1922,13 @@ Session.prototype = {
     }
   },
 
-  setOneMethod: function(methodName) {
+  setOneMethod: function (methodName) {
     this.oneMethod = methodName;
 
     $(this.el).addClass('one-method');
   },
 
-  improvisePaymentOptions: function() {
+  improvisePaymentOptions: function () {
     var oneMethod = MethodStore.getSingleMethod();
     if (oneMethod) {
       this.setOneMethod(oneMethod);
@@ -1946,7 +1943,7 @@ Session.prototype = {
   /**
    * Improvise the prefill options.
    */
-  improvisePrefill: function() {
+  improvisePrefill: function () {
     var prefilledMethod = this.get('prefill.method');
     var prefilledProvider = this.get('prefill.provider');
 
@@ -1971,7 +1968,7 @@ Session.prototype = {
    * once everything has rendered,
    * goes into this function.
    */
-  prefillPostRender: function() {
+  prefillPostRender: function () {
     var prefilledMethod = this.get('prefill.method');
     var prefilledProvider = this.get('prefill.provider');
 
@@ -1984,7 +1981,7 @@ Session.prototype = {
     }
   },
 
-  renderCss: function() {
+  renderCss: function () {
     var div = document.createElement('div');
     var style = document.createElement('style');
     style.type = 'text/css';
@@ -2011,7 +2008,7 @@ Session.prototype = {
     return style;
   },
 
-  setTheme: function() {
+  setTheme: function () {
     // update r.themeMeta based on prefs color
     this.r.postInit();
 
@@ -2022,7 +2019,7 @@ Session.prototype = {
     this.themeMeta = discreet.Theme.getThemeMeta();
   },
 
-  applyFont: function(anchor, retryCount) {
+  applyFont: function (anchor, retryCount) {
     if (!retryCount) {
       retryCount = 0;
     }
@@ -2032,7 +2029,7 @@ Session.prototype = {
       this.applyPartnershipBranding();
     } else if (retryCount < 25) {
       var self = this;
-      fontTimeout = setTimeout(function() {
+      fontTimeout = setTimeout(function () {
         self.applyFont(anchor, ++retryCount);
       }, 120 + retryCount * 50);
     }
@@ -2041,7 +2038,7 @@ Session.prototype = {
   /**
    * Applies the In Partnership With branding
    */
-  applyPartnershipBranding: function() {
+  applyPartnershipBranding: function () {
     var brand_logo = this.get('partnership_logo');
 
     if (brand_logo) {
@@ -2055,11 +2052,11 @@ Session.prototype = {
     }
   },
 
-  hideErrorMessage: function(confirmedCancel) {
+  hideErrorMessage: function (confirmedCancel) {
     if (this.nocostModal) {
       var modal = this.nocostModal;
       hideOverlay($('#nocost-overlay'));
-      setTimeout(function() {
+      setTimeout(function () {
         modal.$destroy();
         modal = null;
       }, 200);
@@ -2098,7 +2095,7 @@ Session.prototype = {
     hideOverlayMessage();
   },
 
-  shake: function() {
+  shake: function () {
     if (this.el) {
       $(this.el.querySelector('#modal-inner'))
         .removeClass('shake')
@@ -2107,16 +2104,16 @@ Session.prototype = {
     }
   },
 
-  click: function(selector, delegateClass, listener, useCapture) {
+  click: function (selector, delegateClass, listener, useCapture) {
     this.on('click', selector, delegateClass, listener, useCapture);
   },
 
-  on: function(event, selector, delegateClass, listener, useCapture) {
+  on: function (event, selector, delegateClass, listener, useCapture) {
     var listeners = this.listeners;
     if (!listener || listener === true) {
       each(
         $$(selector),
-        function(i, element) {
+        function (i, element) {
           listeners.push($(element).on(event, delegateClass, listener, this));
         },
         this
@@ -2127,7 +2124,7 @@ Session.prototype = {
       return listeners.push(
         $parent.on(
           event,
-          function(e) {
+          function (e) {
             var target = e.target;
             while (target !== $parent[0]) {
               if (!$(target)[0]) {
@@ -2148,7 +2145,7 @@ Session.prototype = {
     }
   },
 
-  resendOTP: function() {
+  resendOTP: function () {
     var otpProvider;
     var paymentExists = Boolean(this.r._payment);
     var isCardlessEmiPayment =
@@ -2205,14 +2202,14 @@ Session.prototype = {
       this.r.resendOTP(this.r.emitter('payment.otp.required'));
     } else {
       var self = this;
-      this.getCurrentCustomer().createOTP(function(message) {
+      this.getCurrentCustomer().createOTP(function (message) {
         debounceAskOTP(self.otpView, message, true);
         self.updateCustomerInStore();
       });
     }
   },
 
-  secAction: function() {
+  secAction: function () {
     if (this.headless && this.r._payment) {
       Analytics.track('native_otp:gotobank', {
         type: AnalyticsTypes.BEHAV,
@@ -2244,7 +2241,7 @@ Session.prototype = {
     }
   },
 
-  addFunds: function(event) {
+  addFunds: function (event) {
     Analytics.track('wallet:balance:add', {
       type: AnalyticsTypes.BEHAV,
       data: {
@@ -2262,12 +2259,12 @@ Session.prototype = {
     this.r.topupWallet();
   },
 
-  setAmount: function(amount) {
+  setAmount: function (amount) {
     this.get().amount = amount;
     this.updateAmountInHeader(amount);
   },
 
-  fixLandscapeBug: function() {
+  fixLandscapeBug: function () {
     function shiftUp() {
       $(this.el.querySelector('#footer'))
         .removeClass('shift-footer-down')
@@ -2296,7 +2293,7 @@ Session.prototype = {
    * Logs the user out
    * @param {boolean} outOfAllDevices
    */
-  _logUserOut: function(customer, outOfAllDevices) {
+  _logUserOut: function (customer, outOfAllDevices) {
     if (customer) {
       customer.logged = false;
       customer.tokens = null;
@@ -2316,7 +2313,7 @@ Session.prototype = {
    * Logs user out of this device.
    * @param {Customer} customer
    */
-  logUserOut: function(customer) {
+  logUserOut: function (customer) {
     this._logUserOut(customer);
   },
 
@@ -2324,17 +2321,17 @@ Session.prototype = {
    * Logs user out of all devices.
    * @param {Customer} customer
    */
-  logUserOutOfAllDevices: function(customer) {
+  logUserOutOfAllDevices: function (customer) {
     this._logUserOut(customer, true);
   },
 
-  bindEvents: function() {
+  bindEvents: function () {
     var self = this;
 
     // cultgear.com bug: no events register unless
     // https://stackoverflow.com/questions/41869122/touch-events-within-iframe-are-not-working-on-ios
     document.addEventListener('touchstart', noop);
-    this.listeners.push(function() {
+    this.listeners.push(function () {
       document.removeEventListener('touchstart', noop);
     });
 
@@ -2344,7 +2341,7 @@ Session.prototype = {
       'input',
       '#body',
       'input',
-      function(e) {
+      function (e) {
         this.input(e.target);
       },
       true
@@ -2354,7 +2351,7 @@ Session.prototype = {
       'focus',
       '#body',
       'selector',
-      function(e) {
+      function (e) {
         $(e.target).addClass('focused');
       },
       true
@@ -2364,14 +2361,14 @@ Session.prototype = {
       'blur',
       '#body',
       'selector',
-      function(e) {
+      function (e) {
         $(e.target).removeClass('focused');
       },
       true
     );
 
     if (this.get('theme.close_button')) {
-      this.click('#modal-close', function() {
+      this.click('#modal-close', function () {
         if (this.get('modal.confirm_close') && !confirmClose()) {
           return;
         }
@@ -2404,7 +2401,7 @@ Session.prototype = {
         this.on(
           'change',
           '#wallets',
-          function(e) {
+          function (e) {
             if (ua_iPhone) {
               Razorpay.sendMessage({ event: 'blur' });
             }
@@ -2415,7 +2412,7 @@ Session.prototype = {
     }
 
     if (MethodStore.isMethodEnabled('upi')) {
-      this.click('#cancel_upi .btn', function() {
+      this.click('#cancel_upi .btn', function () {
         var upi_radio = $('#cancel_upi input:checked');
         if (!upi_radio[0]) {
           return;
@@ -2425,13 +2422,15 @@ Session.prototype = {
         this.clearRequest(metaParam);
         $('#error-message').removeClass('cancel_upi');
       });
-      this.click('#cancel_upi .back-btn', function() {
+      this.click('#cancel_upi .back-btn', function () {
         $('#error-message').removeClass('cancel_upi');
       });
     }
 
     if (MethodStore.isMethodEnabled('emi')) {
-      this.on('click', '#form-card', 'saved-card-pay-without-emi', function(e) {
+      this.on('click', '#form-card', 'saved-card-pay-without-emi', function (
+        e
+      ) {
         self.switchTab('card');
       });
     }
@@ -2440,7 +2439,7 @@ Session.prototype = {
     if (this.get('redirect')) {
       $(goto_payment).hide();
     } else {
-      this.click(goto_payment, function() {
+      this.click(goto_payment, function () {
         if (this.payload && this.payload.method === 'upi') {
           if (this.payload['_[flow]'] === 'directpay') {
             return cancel_upi(this);
@@ -2452,7 +2451,7 @@ Session.prototype = {
       });
     }
     this.click('#backdrop', this.hideErrorMessage);
-    this.click('#overlay', function(e) {
+    this.click('#overlay', function (e) {
       if ($('#confirmation-dialog').hasClass('animate')) {
         return;
       }
@@ -2462,13 +2461,13 @@ Session.prototype = {
     this.click('#fd-hide', this.hideErrorMessage);
     this.click('#overlay-close', this.hideErrorMessage);
 
-    this.on('click', '#form-upi.collapsible .item', function(e) {
+    this.on('click', '#form-upi.collapsible .item', function (e) {
       $('#form-upi.collapsible .item.expanded').removeClass('expanded');
       $(e.currentTarget).addClass('expanded');
     });
   },
 
-  onUpiAppSelect: function(packageName) {
+  onUpiAppSelect: function (packageName) {
     Analytics.track('upi:app:select', {
       type: AnalyticsTypes.BEHAV,
       data: {
@@ -2483,13 +2482,13 @@ Session.prototype = {
     });
   },
 
-  focus: function(e) {
+  focus: function (e) {
     if (_El.hasClass(e.target, 'no-focus')) {
       return;
     }
 
     $(e.target.parentNode).addClass('focused');
-    setTimeout(function() {
+    setTimeout(function () {
       $(e.target).scrollIntoView();
     }, 1000);
     if (ua_iPhone) {
@@ -2497,21 +2496,19 @@ Session.prototype = {
     }
   },
 
-  blur: function(e) {
+  blur: function (e) {
     if (_El.hasClass(e.target, 'no-blur')) {
       return;
     }
 
-    $(e.target.parentNode)
-      .removeClass('focused')
-      .addClass('mature');
+    $(e.target.parentNode).removeClass('focused').addClass('mature');
     this.input(e.target);
     if (ua_iPhone) {
       Razorpay.sendMessage({ event: 'blur' });
     }
   },
 
-  input: function(el) {
+  input: function (el) {
     if (_El.hasClass(el, 'no-validate')) {
       return;
     }
@@ -2541,26 +2538,26 @@ Session.prototype = {
     toggleInvalid($parent, valid);
   },
 
-  refresh: function() {
+  refresh: function () {
     var self = this;
-    each($$('.input:not(.no-refresh)'), function(i, el) {
+    each($$('.input:not(.no-refresh)'), function (i, el) {
       self.input(el);
     });
   },
 
-  setFormatting: function() {
+  setFormatting: function () {
     var self = this;
     self.refresh();
     var bits = self.bits;
     var delegator = (self.delegator = Razorpay.setFormatter(self.el));
     delegator.otp = delegator
       .add('number', gel('otp'))
-      .on('change', function() {
+      .on('change', function () {
         self.input(this.el);
       });
   },
 
-  setScreen: function(screen, params) {
+  setScreen: function (screen, params) {
     var extraProps = params && params.extraProps;
     if (screen) {
       var screenTitle =
@@ -2680,7 +2677,7 @@ Session.prototype = {
    * @param {Offer} offer
    * @param {string} screen
    */
-  handleOfferSelection: function(offer, screen) {
+  handleOfferSelection: function (offer, screen) {
     screen = screen || this.screen;
 
     // Go to the offer's method if we're on homescreen
@@ -2704,7 +2701,7 @@ Session.prototype = {
       var bank = this.emiPlansForNewCard && this.emiPlansForNewCard.code;
 
       if (emiDuration) {
-        var plan = _Arr.find(MethodStore.getEMIBankPlans(bank), function(p) {
+        var plan = _Arr.find(MethodStore.getEMIBankPlans(bank), function (p) {
           return p.duration === emiDuration;
         });
         if (
@@ -2729,7 +2726,7 @@ Session.prototype = {
   /**
    * Show the discount amount.
    */
-  handleDiscount: function() {
+  handleDiscount: function () {
     var offer = this.getAppliedOffer();
     var hasDiscount =
       offer &&
@@ -2743,7 +2740,7 @@ Session.prototype = {
     Cta.setAppropriateCtaText();
   },
 
-  back: function(confirmedCancel) {
+  back: function (confirmedCancel) {
     var tab = '';
     var payment = this.r._payment;
     var thisTab = this.tab;
@@ -2753,13 +2750,13 @@ Session.prototype = {
       type: AnalyticsTypes.BEHAV,
     });
 
-    var confirm = function() {
+    var confirm = function () {
       Confirm.show({
         message: discreet.confirmCancelMsg,
         heading: 'Cancel Payment?',
         positiveBtnTxt: 'Yes, cancel',
         negativeBtnTxt: 'No',
-        onPositiveClick: function() {
+        onPositiveClick: function () {
           self.back(true);
         },
       });
@@ -2854,7 +2851,7 @@ Session.prototype = {
     BackStore = null;
   },
 
-  switchTabAnalytics: function(tab) {
+  switchTabAnalytics: function (tab) {
     if (tab === 'upi') {
       var upiData = this.upiTab;
 
@@ -2871,13 +2868,13 @@ Session.prototype = {
             },
             list: {
               eligible: _Arr.join(
-                _Arr.map(this.upi_intents_data || [], function(app) {
+                _Arr.map(this.upi_intents_data || [], function (app) {
                   return app.package_name;
                 }),
                 ','
               ),
               all: _Arr.join(
-                _Arr.map(this.all_upi_intents_data || [], function(app) {
+                _Arr.map(this.all_upi_intents_data || [], function (app) {
                   return app.package_name;
                 }),
                 ','
@@ -2894,7 +2891,7 @@ Session.prototype = {
    *
    * @returns {boolean} valid
    */
-  checkCommonValid: function() {
+  checkCommonValid: function () {
     // Only check if we're on the homescreen
     if (!this.homeTab.onDetailsScreen()) {
       return true;
@@ -2913,7 +2910,7 @@ Session.prototype = {
    *
    * @returns {boolean} valid
    */
-  checkCommonValidAndTrackIfInvalid: function() {
+  checkCommonValidAndTrackIfInvalid: function () {
     var valid = this.checkCommonValid();
 
     if (!valid) {
@@ -2922,7 +2919,7 @@ Session.prototype = {
       var invalidFields = {};
       var invalidValues = {};
 
-      _Arr.loop(fields, function(field) {
+      _Arr.loop(fields, function (field) {
         invalidFields[field.name] = true;
         invalidValues[field.name] = field.value;
       });
@@ -2938,7 +2935,7 @@ Session.prototype = {
     return valid;
   },
 
-  switchTab: function(tab) {
+  switchTab: function (tab) {
     /**
      * Validate fields on common screen. Do not do this for payouts as payouts
      * tab itself is the initial screen, and we want to switch to it unconditionally.
@@ -3085,7 +3082,7 @@ Session.prototype = {
     }
   },
 
-  showCardTab: function(tab) {
+  showCardTab: function (tab) {
     this.otpView.updateScreen({
       maxlength: 6,
     });
@@ -3116,7 +3113,7 @@ Session.prototype = {
       if (smsHash) {
         params.sms_hash = smsHash;
       }
-      customer.checkStatus(function() {
+      customer.checkStatus(function () {
         /**
          * 1. If this is a recurring payment and customer doesn't have saved cards,
          *    create and ask for OTP.
@@ -3124,7 +3121,7 @@ Session.prototype = {
          * 3. If customer doesn't have saved cards, show cards screen.
          */
         if (Store.isRecurring() && !customer.saved && !customer.logged) {
-          self.getCurrentCustomer().createOTP(function() {
+          self.getCurrentCustomer().createOTP(function () {
             Analytics.track('saved_cards:access:otp:ask');
             askOTP(
               self.otpView,
@@ -3152,12 +3149,12 @@ Session.prototype = {
    *
    * @returns {Array}
    */
-  getEmiPlans: function(bank, cardType) {
+  getEmiPlans: function (bank, cardType) {
     var plans = MethodStore.getEMIBankPlans(bank, cardType);
     var appliedOffer = this.offers && this.offers.offerSelectedByDrawer;
 
     var emiPlans = [];
-    _Obj.loop(plans, function(plan, duration) {
+    _Obj.loop(plans, function (plan, duration) {
       if (
         !appliedOffer ||
         (appliedOffer && !appliedOffer.emi_subvention) ||
@@ -3185,20 +3182,20 @@ Session.prototype = {
    *
    * @return {Function}
    */
-  showEmiPlans: function(type) {
+  showEmiPlans: function (type) {
     var self = this;
     var amount = this.get('amount');
     var tabTitle = 'EMI Plans';
 
-    var trackEmi = function(name, data) {
+    var trackEmi = function (name, data) {
       Analytics.track(name, {
         type: AnalyticsTypes.BEHAV,
         data: data,
       });
     };
 
-    var viewAllPlans = function(tab) {
-      return function() {
+    var viewAllPlans = function (tab) {
+      return function () {
         trackEmi('emi:plans:view:all', {
           from: tab,
         });
@@ -3208,7 +3205,7 @@ Session.prototype = {
     };
 
     if (type === 'new') {
-      return function(e) {
+      return function (e) {
         tab_titles.emiplans = tabTitle;
 
         var bank = self.emiPlansForNewCard && self.emiPlansForNewCard.code;
@@ -3222,7 +3219,7 @@ Session.prototype = {
           plans: emiPlans,
           bank: bank,
           on: {
-            back: bind(function() {
+            back: bind(function () {
               self.switchTab(prevTab);
               self.setScreen(prevScreen);
               self.svelteCardTab.showAddCardView();
@@ -3230,7 +3227,7 @@ Session.prototype = {
               return true;
             }),
 
-            payWithoutEmi: function() {
+            payWithoutEmi: function () {
               trackEmi('emi:pay_without', {
                 from: prevTab,
               });
@@ -3242,8 +3239,8 @@ Session.prototype = {
               self.svelteCardTab.showAddCardView();
             },
 
-            select: function(value) {
-              var plan = _Arr.find(plans, function(p) {
+            select: function (value) {
+              var plan = _Arr.find(plans, function (p) {
                 return p.duration === value;
               });
 
@@ -3276,7 +3273,7 @@ Session.prototype = {
         $('#body').removeClass('sub');
       };
     } else if (type === 'saved') {
-      return function(e) {
+      return function (e) {
         tab_titles.emiplans = tabTitle;
 
         var trigger = e.currentTarget;
@@ -3295,14 +3292,14 @@ Session.prototype = {
           plans: emiPlans,
           bank: bank,
           on: {
-            back: function() {
+            back: function () {
               self.switchTab(prevTab);
               self.setScreen(prevScreen);
 
               return true;
             },
 
-            payWithoutEmi: function() {
+            payWithoutEmi: function () {
               trackEmi('emi:pay_without', {
                 from: prevTab,
               });
@@ -3315,8 +3312,8 @@ Session.prototype = {
               self.svelteCardTab.showSavedCardsView();
             },
 
-            select: function(value) {
-              var plan = _Arr.find(plans, function(p) {
+            select: function (value) {
+              var plan = _Arr.find(plans, function (p) {
                 return p.duration === value;
               });
               var text = getEmiText(self, amount, plan) || '';
@@ -3355,7 +3352,7 @@ Session.prototype = {
         $('#body').removeClass('sub');
       };
     } else if (type === 'bajaj') {
-      return function() {
+      return function () {
         tab_titles.emiplans = tabTitle;
 
         var bank = 'BAJAJ';
@@ -3369,14 +3366,14 @@ Session.prototype = {
           plans: emiPlans,
           bank: bank,
           on: {
-            back: function() {
+            back: function () {
               self.switchTab(prevTab);
               self.setScreen(prevScreen);
               return true;
             },
 
-            select: function(value) {
-              var plan = _Arr.find(plans, function(plan) {
+            select: function (value) {
+              var plan = _Arr.find(plans, function (plan) {
                 return plan.duration === value;
               });
 
@@ -3411,7 +3408,7 @@ Session.prototype = {
    *
    * @returns {boolean}
    */
-  validateOffers: function(selectedIssuer, callback) {
+  validateOffers: function (selectedIssuer, callback) {
     var offer = this.getAppliedOffer();
     if (offer && offer.issuer && selectedIssuer !== offer.issuer) {
       return this.showOffersError(callback);
@@ -3423,7 +3420,7 @@ Session.prototype = {
    * Once the bank is selected in the banks list,
    * proceed automatically if some conditions are met.
    */
-  proceedAutomaticallyAfterSelectingBank: function(event) {
+  proceedAutomaticallyAfterSelectingBank: function (event) {
     var bank = event.detail.bank;
 
     if (this.checkInvalid()) {
@@ -3433,7 +3430,7 @@ Session.prototype = {
     return this.emandateView.showBankDetailsForm(bank.code);
   },
 
-  checkInvalid: function(parent) {
+  checkInvalid: function (parent) {
     if (!parent) {
       parent = this.getActiveForm();
       var payload = this.payload;
@@ -3457,14 +3454,14 @@ Session.prototype = {
         $(invalids[0]).focus();
       }
 
-      each(invalids, function(i, field) {
+      each(invalids, function (i, field) {
         $(field).addClass('mature');
       });
       return true;
     }
   },
 
-  getActiveForm: function() {
+  getActiveForm: function () {
     var form = this.tab || 'common';
     // TODO: get rid of this
     if (form === 'emi') {
@@ -3484,7 +3481,7 @@ Session.prototype = {
     return '#form-' + form;
   },
 
-  getFormData: function() {
+  getFormData: function () {
     var tab = this.tab;
     var data = {};
     if (!preferences) {
@@ -3529,7 +3526,7 @@ Session.prototype = {
       }
 
       // Delete all the auth_type-* keys
-      each(data, function(key, val) {
+      each(data, function (key, val) {
         if (key.indexOf('auth_type-') === 0) {
           delete data[key];
         }
@@ -3553,7 +3550,7 @@ Session.prototype = {
         /* All tabs should be responsible for their subdata */
         var upiData = this.upiTab.getPayload();
 
-        each(upiData, function(key, value) {
+        each(upiData, function (key, value) {
           data[key] = value;
         });
       }
@@ -3569,7 +3566,7 @@ Session.prototype = {
     return data;
   },
 
-  hide: function(confirmedCancel) {
+  hide: function (confirmedCancel) {
     var self = this;
     if (this.isOpen) {
       if (confirmedCancel !== true && this.r._payment) {
@@ -3578,7 +3575,7 @@ Session.prototype = {
           heading: 'Cancel Payment?',
           positiveBtnTxt: 'Yes, cancel',
           negativeBtnTxt: 'No',
-          onPositiveClick: function() {
+          onPositiveClick: function () {
             self.hide(true);
           },
         });
@@ -3591,7 +3588,7 @@ Session.prototype = {
     }
   },
 
-  showLoadError: function(text, error) {
+  showLoadError: function (text, error) {
     if (this.headless && this.screen === 'card') {
       return;
     }
@@ -3632,7 +3629,7 @@ Session.prototype = {
     }
   },
 
-  commenceOTP: function(text, partial, reason) {
+  commenceOTP: function (text, partial, reason) {
     var params = {
       extraProps: {},
     };
@@ -3648,7 +3645,7 @@ Session.prototype = {
     });
 
     invoke(
-      function() {
+      function () {
         if (this.screen === 'otp' && (this.tab !== 'card' || !this.payload)) {
           Cta.updateCta('Verify');
         }
@@ -3666,14 +3663,14 @@ Session.prototype = {
     }
   },
 
-  setSvelteOverlay: function() {
+  setSvelteOverlay: function () {
     this.svelteOverlay = new discreet.Overlay({
       target: _Doc.querySelector('#modal-inner'),
       props: {},
     });
   },
 
-  showSvelteOverlay: function() {
+  showSvelteOverlay: function () {
     if (!this.svelteOverlay) {
       this.setSvelteOverlay();
     }
@@ -3681,7 +3678,7 @@ Session.prototype = {
     this.svelteOverlay.show();
   },
 
-  hideSvelteOverlay: function() {
+  hideSvelteOverlay: function () {
     if (this.svelteOverlay) {
       this.svelteOverlay.hide();
     }
@@ -3696,7 +3693,7 @@ Session.prototype = {
    *
    * @return {Boolean} Whether or not the UI was shown
    */
-  showFeesUi: function() {
+  showFeesUi: function () {
     var session = this;
     var data = session.payload;
     var isFeeMissing = !('fee' in data);
@@ -3725,7 +3722,7 @@ Session.prototype = {
         });
 
         // When user clicks "Continue" in Fee Breakup View
-        this.feeBearerView.$on('continue', function(event) {
+        this.feeBearerView.$on('continue', function (event) {
           var bearer = event.detail;
 
           hideOverlaySafely($('#fee-wrap'));
@@ -3740,7 +3737,7 @@ Session.prototype = {
           session.submit();
         });
 
-        this.feeBearerView.$on('error', function() {
+        this.feeBearerView.$on('error', function () {
           makeHidden('#fee-wrap');
         });
       }
@@ -3753,7 +3750,7 @@ Session.prototype = {
     return false;
   },
 
-  onOtpSubmit: function() {
+  onOtpSubmit: function () {
     if (this.checkInvalid('#form-otp')) {
       return;
     }
@@ -3785,7 +3782,7 @@ Session.prototype = {
         if (!isRedirect) {
           this.submit();
         }
-        callback = function(msg) {
+        callback = function (msg) {
           if (this.getCurrentCustomer().logged) {
             // OTP verification successful
             OtpService.resetCount('razorpay');
@@ -3816,13 +3813,13 @@ Session.prototype = {
           Analytics.track('saved_cards:access:otp:submit');
         }
 
-        callback = function(msg) {
+        callback = function (msg) {
           if (self.getCurrentCustomer().logged) {
             // OTP verification successful
             OtpService.resetCount('razorpay');
 
             self.updateCustomerInStore();
-            self.svelteCardTab.showLandingView().then(function() {
+            self.svelteCardTab.showLandingView().then(function () {
               self.showCardTab();
             });
           } else {
@@ -3850,7 +3847,7 @@ Session.prototype = {
         payment_id: this.r._payment.payment_id,
       });
 
-      callback = function(msg, data) {
+      callback = function (msg, data) {
         if (msg) {
           this.fetchCardlessEmiPlans({
             incorrect: true,
@@ -3878,7 +3875,7 @@ Session.prototype = {
         method: 'paylater',
       };
 
-      callback = function(msg, data) {
+      callback = function (msg, data) {
         this.otpView.updateScreen({ loading: false });
         $('#body').addClass('sub');
         if (msg) {
@@ -3905,11 +3902,11 @@ Session.prototype = {
     );
   },
 
-  getCurrentCustomer: function(phone) {
+  getCurrentCustomer: function (phone) {
     return this.getCustomer(phone || getPhone());
   },
 
-  clearRequest: function(extra) {
+  clearRequest: function (extra) {
     this.hideTimer();
     var powerotp = gel('powerotp');
     if (powerotp) {
@@ -3948,12 +3945,12 @@ Session.prototype = {
    * corresponding to the given provider.
    * @param {string} provider
    */
-  resetCardlessEmiStoreForProvider: function(provider) {
+  resetCardlessEmiStoreForProvider: function (provider) {
     if (!provider) {
       return;
     }
 
-    _Obj.loop(CardlessEmiStore, function(value, key) {
+    _Obj.loop(CardlessEmiStore, function (value, key) {
       delete value[provider];
     });
   },
@@ -3963,7 +3960,7 @@ Session.prototype = {
    * @param {Event} e
    * @param {Object} payload Overridden payload
    */
-  preSubmit: function(e, payload) {
+  preSubmit: function (e, payload) {
     preventDefault(e);
     var screen = this.screen;
     var tab = this.tab;
@@ -4198,11 +4195,11 @@ Session.prototype = {
     this.submit();
   },
 
-  getSelectedPaymentInstrument: function() {
+  getSelectedPaymentInstrument: function () {
     return storeGetter(HomeScreenStore.selectedInstrument);
   },
 
-  verifyVpaAndContinue: function(data, params) {
+  verifyVpaAndContinue: function (data, params) {
     var self = this;
     self.showLoadError('Verifying your VPA');
     $('#overlay-close').hide();
@@ -4223,16 +4220,16 @@ Session.prototype = {
        * attempt payment regardless of verification
        */
       .verifyVpa(vpa, 10000)
-      .then(function() {
+      .then(function () {
         $('#overlay-close').show();
         hideOverlaySafely($('#error-message'));
-        setTimeout(function() {
+        setTimeout(function () {
           self.submit({
             vpaVerified: true,
           });
         }, 200);
       })
-      .catch(function(vpaValidationError) {
+      .catch(function (vpaValidationError) {
         var vpaValidationDescription = _Obj.getSafely(
           vpaValidationError,
           'error.description',
@@ -4243,7 +4240,7 @@ Session.prototype = {
       });
   },
 
-  submit: function(props) {
+  submit: function (props) {
     if (!props) {
       props = {};
     }
@@ -4435,7 +4432,7 @@ Session.prototype = {
         delete data.emi_duration;
       }
 
-      this.r.on('payment.process', function(paymentData) {
+      this.r.on('payment.process', function (paymentData) {
         var request = paymentData.request;
         var response = paymentData.response;
 
@@ -4519,7 +4516,7 @@ Session.prototype = {
         Analytics.track('saved_cards:save:otp:ask');
         this.commenceOTP(strings.otpsend, false, 'saved_cards_save');
         debounceAskOTP(this.otpView, undefined, true);
-        this.getCurrentCustomer().createOTP(function() {
+        this.getCurrentCustomer().createOTP(function () {
           session.updateCustomerInStore();
         });
         return;
@@ -4617,10 +4614,10 @@ Session.prototype = {
         this.headless = true;
         Analytics.track('native_otp:attempt');
         this.setScreen('otp', params);
-        this.r.on('payment.otp.required', function(data) {
+        this.r.on('payment.otp.required', function (data) {
           askOTP(that.otpView, data);
         });
-        this.r.on('payment.3ds.required', function() {
+        this.r.on('payment.3ds.required', function () {
           that.svelteOverlay.$set({
             component: discreet.AuthOverlay,
           });
@@ -4628,7 +4625,7 @@ Session.prototype = {
           that.showSvelteOverlay();
           Analytics.track('native_otp:3ds_required:prompt');
 
-          var clearActionListener = that.svelteOverlay.$on('action', function(
+          var clearActionListener = that.svelteOverlay.$on('action', function (
             event
           ) {
             var action = event.detail.action;
@@ -4640,7 +4637,7 @@ Session.prototype = {
               that.hideSvelteOverlay();
             }
           });
-          var clearHideListener = that.svelteOverlay.$on('hidden', function() {
+          var clearHideListener = that.svelteOverlay.$on('hidden', function () {
             clearActionListener();
             clearHideListener();
           });
@@ -4728,7 +4725,7 @@ Session.prototype = {
         });
 
         Payouts.createFundAccount(data)
-          .then(function(account) {
+          .then(function (account) {
             Analytics.track('payout:create:success', {
               data: {
                 account: Payouts.makeTrackingDataFromAccount(account),
@@ -4759,7 +4756,7 @@ Session.prototype = {
     var iosCheckoutBridgeNew = Bridge.getNewIosBridge();
 
     if (request.external.amazonpay || request.external.gpay) {
-      payment.on('payment.externalsdk.process', function(data) {
+      payment.on('payment.externalsdk.process', function (data) {
         /* invoke external sdk via our SDK */
         if (CheckoutBridge && CheckoutBridge.processPayment) {
           that.showLoadError();
@@ -4785,14 +4782,14 @@ Session.prototype = {
 
     if (this.powerwallet) {
       this.showLoadError(strings.otpsend + getPhone());
-      this.r.on('payment.otp.required', function(message) {
+      this.r.on('payment.otp.required', function (message) {
         debounceAskOTP(that.otpView, message, false, {
           allowSkip: false,
         });
       });
       this.r.on(
         'payment.wallet.topup',
-        bind(function() {
+        bind(function () {
           Analytics.track('wallet:balance:insufficient', {
             data: {
               wallet: this.payload && this.payload.wallet,
@@ -4822,7 +4819,7 @@ Session.prototype = {
     } else if (data.method === 'upi' && !this.multiTpv) {
       sub_link.html('Cancel Payment');
 
-      this.r.on('payment.upi.noapp', function(data) {
+      this.r.on('payment.upi.noapp', function (data) {
         that.showLoadError(
           'No UPI App on this device. Select other UPI option to proceed.',
           true
@@ -4831,18 +4828,18 @@ Session.prototype = {
         that.body.addClass('upi-noapp');
       });
 
-      this.r.on('payment.upi.selectapp', function(data) {
+      this.r.on('payment.upi.selectapp', function (data) {
         that.showLoadError('Select UPI App in your device', false);
       });
 
-      this.r.on('payment.upi.coproto_response', function(response) {
+      this.r.on('payment.upi.coproto_response', function (response) {
         var params = {};
         params[Constants.UPI_POLL_URL] = response.request.url;
         params[Constants.PENDING_PAYMENT_TS] = now() + '';
         that.setParamsInStorage(params);
       });
 
-      this.r.on('payment.upi.pending', function(data) {
+      this.r.on('payment.upi.pending', function (data) {
         if (data && data.flow === 'upi-intent') {
           return that.showLoadError('Waiting for payment confirmation.');
         }
@@ -4862,7 +4859,7 @@ Session.prototype = {
     }
   },
 
-  getPayload: function() {
+  getPayload: function () {
     var data = this.getFormData();
 
     if (this.isPayout && this.screen === 'upi') {
@@ -4913,7 +4910,7 @@ Session.prototype = {
    *
    * @returns {Object}
    */
-  getCancelReason: function() {
+  getCancelReason: function () {
     var reason;
 
     if (this.payload && this.payload.method === 'cardless_emi') {
@@ -4934,7 +4931,7 @@ Session.prototype = {
   /**
    * Cleans up all the Svelte components that were added.
    */
-  cleanUpSvelteComponents: function() {
+  cleanUpSvelteComponents: function () {
     var views = [
       'bankTransferView',
       'cardlessEmiView',
@@ -4954,6 +4951,7 @@ Session.prototype = {
       'savedCardsView',
       'svelteCardTab',
       'svelteWalletsTab',
+      'languageSelectionView',
       'svelteOverlay',
       'upiTab',
       'timer',
@@ -4961,7 +4959,7 @@ Session.prototype = {
 
     var session = this;
 
-    _Arr.loop(views, function(_view) {
+    _Arr.loop(views, function (_view) {
       var view = session[_view];
 
       if (view) {
@@ -4980,7 +4978,7 @@ Session.prototype = {
     });
   },
 
-  close: function() {
+  close: function () {
     if (this.prefCall) {
       this.prefCall.abort();
       this.prefCall = null;
@@ -5019,14 +5017,14 @@ Session.prototype = {
     }
   },
 
-  saveAndClose: function() {
+  saveAndClose: function () {
     if (this.isOpen) {
       this.data = this.getFormData();
       this.close();
     }
   },
 
-  closeAndDismiss: function() {
+  closeAndDismiss: function () {
     var wasShown = this.modal && this.modal.isShown;
     this.saveAndClose();
 
@@ -5038,7 +5036,7 @@ Session.prototype = {
     }
   },
 
-  showNoCostExplainer: function(plan) {
+  showNoCostExplainer: function (plan) {
     this.nocostModal = new discreet.NoCostExplainer({
       target: gel('nocost-overlay'),
       props: {
@@ -5049,7 +5047,7 @@ Session.prototype = {
     showOverlay($('#nocost-overlay'));
   },
 
-  setOffers: function() {
+  setOffers: function () {
     var forcedOffer = discreet.Offers.getForcedOffer();
     var allOffers = discreet.Offers.getOffersForTab();
 
@@ -5070,7 +5068,7 @@ Session.prototype = {
       Analytics.setMeta('forcedOffer', true);
     } else {
       var appliedOffer;
-      this.getAppliedOffer = function() {
+      this.getAppliedOffer = function () {
         return appliedOffer;
       };
       var session = this;
@@ -5078,7 +5076,7 @@ Session.prototype = {
         target: gel('bottom'),
         props: {
           applicableOffers: allOffers,
-          setAppliedOffer: function(offer, shouldNavigate) {
+          setAppliedOffer: function (offer, shouldNavigate) {
             if (appliedOffer !== offer) {
               appliedOffer = offer;
               if (offer && shouldNavigate) {
@@ -5087,7 +5085,7 @@ Session.prototype = {
             }
             session.handleDiscount();
           },
-          onShown: function() {
+          onShown: function () {
             Analytics.track(
               'offers:list_view:screen:' + (session.screen || 'home'),
               {
@@ -5100,7 +5098,7 @@ Session.prototype = {
     }
   },
 
-  setLanguageDropdown: function() {
+  setLanguageDropdown: function () {
     var features = this.preferences.features || {};
     if (features.vernacular) {
       var target = _Doc.querySelector('#language-dropdown');
@@ -5115,7 +5113,7 @@ Session.prototype = {
    *
    * @returns {Offer}
    */
-  getAppliedOffer: function() {
+  getAppliedOffer: function () {
     return discreet.Offers.getForcedOffer();
   },
 
@@ -5127,7 +5125,7 @@ Session.prototype = {
    *
    * @return {boolean}
    */
-  isOfferApplicableOnIssuer: function(issuer, offer) {
+  isOfferApplicableOnIssuer: function (issuer, offer) {
     issuer = issuer.toLowerCase();
     offer = offer || this.getAppliedOffer();
 
@@ -5151,7 +5149,7 @@ Session.prototype = {
    *
    * @returns {Number}
    */
-  getDiscountedAmount: function() {
+  getDiscountedAmount: function () {
     var appliedOffer = this.getAppliedOffer();
 
     return (appliedOffer && appliedOffer.amount) || this.get('amount');
@@ -5161,7 +5159,7 @@ Session.prototype = {
    * Show an error with the offer.
    * @param {Function} cb callback
    */
-  showOffersError: function(cb) {
+  showOffersError: function (cb) {
     var methodDescription = '',
       screen = this.screen;
 
@@ -5178,11 +5176,11 @@ Session.prototype = {
     this.offers.showError(methodDescription, cb);
   },
 
-  getCustomer: function() {
+  getCustomer: function () {
     return getCustomer.apply(null, arguments);
   },
 
-  updateCustomerInStore: function() {
+  updateCustomerInStore: function () {
     var customer = this.getCustomer(getPhone());
     CustomerStore.customer.set(customer);
   },
@@ -5190,7 +5188,7 @@ Session.prototype = {
   /**
    * Mark headless as failed and perform cleanup
    */
-  markHeadlessFailed: function() {
+  markHeadlessFailed: function () {
     Analytics.removeMeta('headless');
     this.headless = false;
 
@@ -5202,7 +5200,7 @@ Session.prototype = {
     }
   },
 
-  setPreferences: function(prefs) {
+  setPreferences: function (prefs) {
     this.preferences = prefs;
     preferences = prefs;
     this.tab_titles = tab_titles;
@@ -5219,7 +5217,7 @@ Session.prototype = {
     if (preferences.global === false) {
       this.local = true;
       customer = new Customer('');
-      this.getCustomer = function() {
+      this.getCustomer = function () {
         return customer;
       };
     }
@@ -5260,7 +5258,7 @@ Session.prototype = {
     Customer.prototype.r = this.r;
   },
 
-  showModal: function(preferences) {
+  showModal: function (preferences) {
     Razorpay.sendMessage({ event: 'render' });
 
     if (CheckoutBridge) {
@@ -5287,7 +5285,7 @@ Session.prototype = {
     }
   },
 
-  fetchFundAccounts: function() {
+  fetchFundAccounts: function () {
     return Payouts.fetchFundAccounts(this.get('contact_id'));
   },
 
