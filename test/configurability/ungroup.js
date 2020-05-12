@@ -253,38 +253,7 @@ test('Module: configurability/ungroup', t => {
 
     test('method=netbanking', t => {
       let block, expected, found;
-      let individualInstrument, groupedInstrument;
-
-      individualInstrument = {
-        method: 'netbanking',
-        bank: 'HDFC',
-      };
-
-      block = {
-        code: 'block.test',
-        instruments: [individualInstrument],
-      };
-
-      expected = {
-        code: 'block.test',
-        instruments: [
-          {
-            method: 'netbanking',
-            bank: 'HDFC',
-
-            _ungrouped: [
-              {
-                method: 'netbanking',
-                bank: 'HDFC',
-              },
-            ],
-          },
-        ],
-      };
-
-      found = Ungroup.ungroupInstruments(block);
-
-      t.deepEqual(found, expected, 'Leaves individual instruments untouched');
+      let groupedInstrument;
 
       groupedInstrument = {
         method: 'netbanking',
@@ -325,7 +294,7 @@ test('Module: configurability/ungroup', t => {
 
     test('method=upi', t => {
       let block, expected, found;
-      let individualInstrument, groupedInstrument;
+      let groupedInstrument;
 
       const customer = {
         tokens: {
@@ -379,99 +348,6 @@ test('Module: configurability/ungroup', t => {
           ],
         },
       };
-
-      individualInstrument = {
-        method: 'upi',
-        flow: 'qr',
-      };
-
-      block = {
-        code: 'block.test',
-        instruments: [individualInstrument],
-      };
-
-      expected = {
-        code: 'block.test',
-        instruments: [
-          {
-            method: 'upi',
-            flow: 'qr',
-            _ungrouped: [
-              {
-                method: 'upi',
-                flow: 'qr',
-              },
-            ],
-          },
-        ],
-      };
-
-      found = Ungroup.ungroupInstruments(block);
-
-      t.deepEqual(found, expected, 'Works for individual instrument: flow');
-
-      individualInstrument = {
-        method: 'upi',
-        app: 'com.google.android.apps.nbu.paisa.user',
-      };
-
-      block = {
-        code: 'block.test',
-        instruments: [individualInstrument],
-      };
-
-      expected = {
-        code: 'block.test',
-        instruments: [
-          {
-            method: 'upi',
-            app: 'com.google.android.apps.nbu.paisa.user',
-
-            _ungrouped: [
-              {
-                method: 'upi',
-                app: 'com.google.android.apps.nbu.paisa.user',
-                flow: 'intent',
-              },
-            ],
-          },
-        ],
-      };
-
-      found = Ungroup.ungroupInstruments(block);
-
-      t.deepEqual(found, expected, 'Works for individual instrument: app');
-
-      individualInstrument = {
-        method: 'upi',
-        token_id: 'token_12345',
-      };
-
-      block = {
-        code: 'block.test',
-        instruments: [individualInstrument],
-      };
-
-      expected = {
-        code: 'block.test',
-        instruments: [
-          {
-            method: 'upi',
-            token_id: 'token_12345',
-            _ungrouped: [
-              {
-                method: 'upi',
-                token_id: 'token_12345',
-                flow: 'collect',
-              },
-            ],
-          },
-        ],
-      };
-
-      found = Ungroup.ungroupInstruments(block, customer);
-
-      t.deepEqual(found, expected, 'Works for individual instrument: token_id');
 
       groupedInstrument = {
         method: 'upi',
@@ -627,37 +503,7 @@ test('Module: configurability/ungroup', t => {
 
     test('method=wallet', t => {
       let block, expected, found;
-      let individualInstrument, groupedInstrument;
-
-      individualInstrument = {
-        method: 'wallet',
-        wallet: 'freecharge',
-      };
-
-      block = {
-        code: 'block.test',
-        instruments: [individualInstrument],
-      };
-
-      expected = {
-        code: 'block.test',
-        instruments: [
-          {
-            method: 'wallet',
-            wallet: 'freecharge',
-            _ungrouped: [
-              {
-                method: 'wallet',
-                wallet: 'freecharge',
-              },
-            ],
-          },
-        ],
-      };
-
-      found = Ungroup.ungroupInstruments(block);
-
-      t.deepEqual(found, expected, 'Leaves individual instruments untouched');
+      let groupedInstrument;
 
       groupedInstrument = {
         method: 'wallet',
@@ -698,37 +544,7 @@ test('Module: configurability/ungroup', t => {
 
     test('method=cardless_emi', t => {
       let block, expected, found;
-      let individualInstrument, groupedInstrument;
-
-      individualInstrument = {
-        method: 'cardless_emi',
-        provider: 'zestmoney',
-      };
-
-      block = {
-        code: 'block.test',
-        instruments: [individualInstrument],
-      };
-
-      expected = {
-        code: 'block.test',
-        instruments: [
-          {
-            method: 'cardless_emi',
-            provider: 'zestmoney',
-            _ungrouped: [
-              {
-                method: 'cardless_emi',
-                provider: 'zestmoney',
-              },
-            ],
-          },
-        ],
-      };
-
-      found = Ungroup.ungroupInstruments(block);
-
-      t.deepEqual(found, expected, 'Leaves individual instruments untouched');
+      let groupedInstrument;
 
       groupedInstrument = {
         method: 'cardless_emi',
@@ -769,37 +585,7 @@ test('Module: configurability/ungroup', t => {
 
     test('method=paylater', t => {
       let block, expected, found;
-      let individualInstrument, groupedInstrument;
-
-      individualInstrument = {
-        method: 'paylater',
-        provider: 'epaylater',
-      };
-
-      block = {
-        code: 'block.test',
-        instruments: [individualInstrument],
-      };
-
-      expected = {
-        code: 'block.test',
-        instruments: [
-          {
-            method: 'paylater',
-            provider: 'epaylater',
-            _ungrouped: [
-              {
-                method: 'paylater',
-                provider: 'epaylater',
-              },
-            ],
-          },
-        ],
-      };
-
-      found = Ungroup.ungroupInstruments(block);
-
-      t.deepEqual(found, expected, 'Leaves individual instruments untouched');
+      let groupedInstrument;
 
       groupedInstrument = {
         method: 'paylater',
