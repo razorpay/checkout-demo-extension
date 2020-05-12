@@ -131,3 +131,12 @@ export function getMethodPrefix(method) {
 export function getMethodTitle(method) {
   return get(t)(`methods.titles.${method}`);
 }
+
+/**
+ * Returns the network name for the current locale
+ * @param {string} network
+ * @returns {string}
+ */
+export function getNetworkName(network) {
+  return get(t)(`networks.${network.toUpperCase()}`);
+}

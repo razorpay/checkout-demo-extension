@@ -33,4 +33,13 @@ export default {
       bank_transfer: 'Bank Transfer',
     },
   },
+  networks: {
+    VISA: 'Visa',
+    MC: 'MasterCard',
+    RUPAY: 'RuPay',
+    AMEX: 'Amex',
+    DICL: 'Diners Club',
+    MAES: 'Maestro',
+    JCB: 'JCB',
+  },
 };
