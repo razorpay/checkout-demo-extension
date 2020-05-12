@@ -44,45 +44,77 @@ function genericGroupedToIndividual(grouped, customer) {
   return [grouped];
 }
 
+/**
+ * Creates a combinations of keys with array-like values
+ * @param {Instrument} instrument
+ * @param {Array<string>} sequence List of keys to make the combinations of
+ *
+ * @returns {Array<Object>}
+ */
+function createCombinations(instrument, sequence) {
+  let soFar = [];
+
+  _Arr.loop(sequence, key => {
+    const values = instrument[key];
+
+    if (!values || !values.length) {
+      return;
+    }
+
+    // "networks" -> "network"
+    const singularKey = key.slice(0, -1);
+
+    // If nothing has been pushed so far, this is the first key to be pushed
+    if (soFar.length === 0) {
+      soFar = _Arr.map(values, value => ({
+        [singularKey]: value,
+      }));
+    } else {
+      // Things have already been pushed so far, extend existing objects
+      let _soFar = [];
+
+      _Arr.loop(values, value => {
+        _soFar = _Arr.mergeWith(
+          _soFar,
+          _Arr.map(soFar, s =>
+            _Obj.extend(
+              {
+                [singularKey]: value,
+              },
+              s
+            )
+          )
+        );
+      });
+
+      soFar = _soFar;
+    }
+  });
+
+  return soFar;
+}
+
 const config = {
   card: {
-    properties: [
-      'type',
-      'types',
-      'iin',
-      'iins',
-      'issuer',
-      'issuers',
-      'network',
-      'networks',
-      'token_id',
-      'token_ids',
-    ],
+    properties: ['types', 'iins', 'issuers', 'networks', 'token_id'],
     payment: ['token'],
     groupedToIndividual: (grouped, customer) => {
       const tokens = _Obj.getSafely(customer, 'tokens.items', []);
       const base = _Obj.clone(grouped);
-      let token_ids = [];
 
-      // Convert single token_id into token_ids
-      if (grouped.token_ids) {
-        token_ids = grouped.token_ids;
-      } else if (grouped.token_id) {
-        token_ids = [grouped.token_id];
-      }
+      // Remove all extra properties
+      _Arr.loop(['types', 'iins', 'issuers', 'networks', 'token_id'], key => {
+        delete base[key];
+      });
 
-      delete base.token_ids;
+      if (grouped.token_id) {
+        const token_id = grouped.token_id;
+        const token = _Arr.find(tokens, token => token.id === token_id);
+        let instrumentFromToken;
 
-      if (token_ids.length > 0) {
-        return (
-          _Arr.map(token_ids, token_id => {
-            const token = _Arr.find(tokens, token => token.id === token_id);
-
-            if (!token) {
-              return;
-            }
-
-            return _Obj.extend(
+        if (token) {
+          instrumentFromToken = [
+            _Obj.extend(
               {
                 token_id,
                 type: token.card.type,
@@ -90,26 +122,33 @@ const config = {
                 network: token.card.network,
               },
               base
-            );
-          }) |> _Arr.filter(Boolean)
-        );
+            ),
+          ];
+        }
+
+        if (instrumentFromToken) {
+          return instrumentFromToken;
+        }
       }
 
-      return [grouped];
+      const combinations = createCombinations(grouped, [
+        'issuers',
+        'networks',
+        'types',
+      ]);
+
+      return _Arr.map(combinations, combination =>
+        _Obj.extend(combination, base)
+      );
     },
     isValid: instrument => {
       if (instrument.token_id) {
         return true;
       }
 
-      const hasTokens = Boolean(instrument.token_ids);
       const hasIssuers = Boolean(instrument.issuers);
       const hasNetworks = Boolean(instrument.networks);
       const hasTypes = Boolean(instrument.types);
-
-      if (hasTokens && !instrument.token_ids.length) {
-        return false;
-      }
 
       if (hasIssuers && !instrument.issuers.length) {
         return false;
