@@ -115,9 +115,8 @@ export function getBundle(locale) {
 }
 
 /**
- * Returns the method prefix for a given locale
+ * Returns the method prefix for the current locale
  * @param {string} method
- * @param {string} locale
  * @returns {string}
  */
 export function getMethodPrefix(method) {
@@ -125,9 +124,8 @@ export function getMethodPrefix(method) {
 }
 
 /**
- * Returns the method title for a given locale
+ * Returns the method title for the current locale
  * @param {string} method
- * @param {string} locale
  * @returns {string}
  */
 export function getMethodTitle(method) {
