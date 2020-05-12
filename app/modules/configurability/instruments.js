@@ -17,6 +17,22 @@ function addTypeAndCategory(instrument) {
   return instrument;
 }
 
+/**
+ * Keys that are allowed in the instruments
+ * passed created by the merchant a.k.a public API
+ */
+const PUBLIC_API_INSTRUMENT_KEYS = {
+  card: ['issuers', 'networks', 'types', 'iin'],
+  emi: ['issuers', 'networks', 'types', 'iin', 'durations'],
+  netbanking: ['banks'],
+  wallet: ['wallets'],
+  upi: ['flows', 'apps'],
+  cardless_emi: ['providers'],
+  paylater: ['providers'],
+  bank_transfer: [],
+  paypal: [],
+};
+
 const INSTRUMENT_CREATORS = {
   default: instrument => instrument,
   upi: instrument => {
@@ -38,6 +54,47 @@ const INSTRUMENT_CREATORS = {
 };
 
 /**
+ * Checks if the instrument has only the allowed keys
+ * @param {Instrument} instrument
+ *
+ * @returns {boolean}
+ */
+function hasOnlyAllowedKeys(instrument) {
+  const { method } = instrument;
+
+  if (!method) {
+    return false;
+  }
+
+  const allowedKeys = PUBLIC_API_INSTRUMENT_KEYS[method];
+
+  // If we don't have any specific whitelisted keys, reject this
+  if (!allowedKeys) {
+    return false;
+  }
+
+  // Removing 'method' because it is a common key
+  const instrumentKeys = instrument |> _Obj.keys |> _Arr.remove('method');
+
+  // None of the instrumentKeys should be absent from allowedKeys
+  const anyAbsent = _Arr.any(
+    instrumentKeys,
+    key => !_Arr.contains(allowedKeys, key)
+  );
+
+  if (anyAbsent) {
+    return false;
+  }
+
+  // All keys must be arrays
+  const allArrays = _Arr.every(instrumentKeys, key =>
+    _.isArray(instrument[key])
+  );
+
+  return allArrays;
+}
+
+/**
  * Creates an instrument from the instrument config
  * @param {Object} config
  *
@@ -55,6 +112,21 @@ export function createInstrument(config) {
   const instrument = creator(config) |> addTypeAndCategory;
 
   return instrument;
+}
+
+/**
+ * Validates the keys of the instrument before
+ * creating the instrument
+ * @param {Object} config Instrument config
+ *
+ * @return {Instrument|undefined}
+ */
+export function validateKeysAndCreateInstrument(config) {
+  if (!hasOnlyAllowedKeys(config)) {
+    return;
+  }
+
+  return createInstrument(config);
 }
 
 /**

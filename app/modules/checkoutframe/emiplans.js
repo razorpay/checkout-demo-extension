@@ -3,6 +3,7 @@ import * as TermsCurtain from 'checkoutframe/termscurtain';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { getSession } from 'sessionmanager';
+import { INDIAN_CONTACT_REGEX } from 'common/constants';
 
 const TARGET_QS = '#form-fields';
 const AGREEMENT_STORE = {};
@@ -92,12 +93,15 @@ emiPlansView.prototype = {
   setPlans: function({
     plans,
     bank,
+    card,
+    contactRequiredForEMI,
     actions = {},
     on = {},
     provider,
     amount,
     loanUrl,
     branding,
+    type,
   }) {
     if (loanUrl) {
       fetchAgreements(provider, loanUrl, plans, amount);
@@ -105,6 +109,7 @@ emiPlansView.prototype = {
 
     this.onSelect = on.select || _Func.noop;
     this.back = on.back || _Func.noop;
+    this.contactRequiredForEMI = contactRequiredForEMI;
 
     on.select = event => {
       const plan = event.detail;
@@ -124,12 +129,20 @@ emiPlansView.prototype = {
       Analytics.track('emi:plan:choose', {
         type: AnalyticsTypes.BEHAV,
         data: {
+          bank,
+          card,
+          provider,
+          type,
           value: plan.duration,
         },
       });
 
       this.selectedPlan = plan;
       _Doc.querySelector('#body') |> _El.addClass('sub');
+    };
+
+    on.setContact = contact => {
+      this.contact = contact;
     };
 
     on.viewAgreement = () =>
@@ -139,6 +152,7 @@ emiPlansView.prototype = {
       on,
       plans,
       bank,
+      type,
       actions,
       expanded: -1,
       amount,
@@ -155,13 +169,24 @@ emiPlansView.prototype = {
     } else {
       this.view.$set(props);
     }
+
+    this.view.onShown();
   },
 
   submit: function() {
     if (!this.selectedPlan) {
+      this.view.showPlansView();
       return;
     }
 
-    this.onSelect(this.selectedPlan.duration);
+    if (
+      this.contactRequiredForEMI &&
+      !INDIAN_CONTACT_REGEX.test(this.contact)
+    ) {
+      this.view.showContactView();
+      return;
+    }
+
+    this.onSelect(this.selectedPlan.duration, this.contact);
   },
 };

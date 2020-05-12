@@ -18,6 +18,7 @@
   export let readonly = false;
   export let required = false;
   export let autocomplete = 'off';
+  export let xautocompletetype;
   export let icon = null;
   export let label = '';
   export let placeholder = '';
@@ -34,6 +35,9 @@
   export let max = null;
   export let elemClasses = '';
   export let tabindex = 0;
+  export let spellcheck = 'false';
+  export let autocorrect = 'off';
+  export let autocapitalize = 'off';
 
   // Computed
   let identifier;
@@ -159,12 +163,16 @@
     {value}
     {required}
     {autocomplete}
+    x-autocompletetype={xautocompletetype}
     placeholder={placeholderToShow}
     {pattern}
     {readonly}
     {min}
     {max}
     {tabindex}
+    {autocapitalize}
+    {autocorrect}
+    {spellcheck}
     use:formatterAction={formatter}
     use:focusAction={handleFocus}
     use:blurAction={handleBlur}

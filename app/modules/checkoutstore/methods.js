@@ -165,6 +165,15 @@ export function isDebitEMIEnabled() {
   return DEBIT_EMI_BANKS |> _Arr.any(bank => emiBanks[bank]);
 }
 
+export function isContactRequiredForEMI(bank, cardType) {
+  if (bank === 'HDFC_DC') {
+    return true;
+  }
+  if (bank === 'HDFC' && cardType === 'debit') {
+    return true;
+  }
+}
+
 /*
  * @returns {Array} of enabled methods
  */
@@ -331,14 +340,35 @@ export function getEMandateAuthTypes(bankCode) {
   );
 }
 
+/**
+ * Tells whether a given bank is enabled for emandate
+ * @param bank
+ * @returns {boolean}
+ */
+export function isEMandateBankEnabled(bank) {
+  return Boolean(getEMandateBanks()[bank]);
+}
+
+/**
+ * Tells whether a given auth type is enabled for a given emandate bank
+ * @param bank
+ * @param authType
+ *
+ * @returns {boolean}
+ */
+export function isEMandateAuthTypeEnabled(bank, authType) {
+  return getEMandateAuthTypes(bank) |> _Arr.contains(authType);
+}
+
 export function getEMIBankPlans(code, cardType = 'credit') {
   const options = code && getMerchantMethods().emi_options;
   if (options) {
-    if (cardType === 'debit') {
+    if (cardType === 'debit' && !_Str.endsWith(code, '_DC')) {
       // For Banks with EMI on Debit Cards,
       // code will end with "_DC".
       // Example: If the issuer is HDFC and card type is debit
       // Then use "HDFC_DC" plans and not "HDFC" plans.
+      // If code is "HDFC_DC" then don't append "_DC" at the end.
       const debitCode = code + '_DC';
       if (DEBIT_EMI_BANKS |> _Arr.contains(debitCode)) {
         return options[debitCode];

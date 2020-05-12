@@ -35,7 +35,7 @@
   // Utils
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import { getIin, getCardDigits } from 'common/card';
+  import { getIin, getCardDigits, getCardMetadata } from 'common/card';
   import { DEFAULT_AUTH_TYPE_RADIO } from 'common/constants';
   import { Formatter } from 'formatter';
   import { isInstrumentValidForPayment } from 'configurability/validate';
@@ -294,6 +294,7 @@
     Analytics.track('card_number:filled', {
       type: AnalyticsTypes.BEHAV,
       data: {
+        card: getCardMetadata($cardNumber),
         valid: numberField.isValid(),
       },
     });
