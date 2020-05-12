@@ -15,6 +15,8 @@
     methodTabInstrument,
   } from 'checkoutstore/screens/home';
 
+  import { locale } from 'svelte-i18n';
+
   // Props
   export let instrument = {};
   export let name = 'instrument';
@@ -22,8 +24,18 @@
   const session = getSession();
 
   const method = instrument.method;
-  const methodName = getMethodNameForPaymentOption(method, { instrument });
-  const title = `Pay using ${methodName}`;
+
+  let methodName;
+  $: {
+    methodName = getMethodNameForPaymentOption(method, { instrument }, $locale);
+  }
+
+  let title;
+  $: {
+    // TODO: use templates when implemented
+    title = `Pay using ${methodName}`;
+  }
+
   const id = instrument.id;
   const subtext = getSubtextForInstrument(instrument);
 

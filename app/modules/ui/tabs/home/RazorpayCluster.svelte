@@ -9,7 +9,7 @@
   import Method from 'ui/tabs/home/Method.svelte';
 
   // Util imports
-  import { getMethodPrefix } from 'checkoutframe/paymentmethods';
+  import { getTranslatedMethodPrefix } from 'checkoutframe/paymentmethods';
   import { generateTextFromList } from 'lib/utils';
 
   // Props
@@ -21,7 +21,7 @@
     const methods = _Arr.map(instruments, (instrument) => instrument.method);
 
     const names = _Arr.map(methods, (method) =>
-      getMethodPrefix(method, locale)
+      getTranslatedMethodPrefix(method, locale)
     );
 
     let name;

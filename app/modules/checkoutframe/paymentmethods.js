@@ -10,7 +10,7 @@ import {
 import { getRecurringMethods, isRecurring } from 'checkoutstore';
 import { generateTextFromList } from 'lib/utils';
 
-import { getBundle } from 'i18n';
+import { getMethodPrefix, getMethodTitle } from 'i18n';
 
 function getRecurringCardDescription() {
   if (isRecurring()) {
@@ -137,11 +137,9 @@ export function getEMIBanksText() {
  * @param {string} locale
  * @return {String}
  */
-export function getMethodPrefix(method, locale = 'en') {
-  const bundle = getBundle(locale);
-  const methodKey = getMethodForPrefix(`methods.prefixes.${method}`);
-  // TODO: remove capitalized fallback
-  return bundle[methodKey] || method[0].toUpperCase() + method.slice(1);
+export function getTranslatedMethodPrefix(method, locale = 'en') {
+  const methodKey = getMethodForPrefix(method);
+  return getMethodPrefix(methodKey, locale);
 }
 
 /**
@@ -179,7 +177,11 @@ function getMethodForPrefix(method) {
  *
  * @returns {string}
  */
-export function getMethodNameForPaymentOption(method, extra = {}, locale) {
+export function getMethodNameForPaymentOption(
+  method,
+  extra = {},
+  locale = 'en'
+) {
   let hasInstrument = extra.instrument;
   let qrEnabled;
   let hasQr;
@@ -194,36 +196,38 @@ export function getMethodNameForPaymentOption(method, extra = {}, locale) {
       }
 
       if (hasQr) {
-        return 'UPI / QR';
+        return getMethodTitle('upiqr', locale);
       }
 
-      return TAB_TITLES.upi;
+      return getMethodTitle('upi', locale);
     }
 
     case 'cardless_emi': {
       if (hasInstrument) {
-        return 'Cardless EMI';
+        return getMethodTitle('cardless_emi', locale);
       }
 
-      return TAB_TITLES[method];
+      return getMethodTitle('emi', locale);
     }
 
     default:
-      return TAB_TITLES[method];
+      return getMethodTitle(method, locale);
   }
 }
 
 /**
  * Returns the downtime description for the given method.
- * @param {String} method
+ * @param {string} method
+ * @param {string} locale
  * @param {Object} param1
  *  @prop {Array} availableMethods
  */
 export function getMethodDowntimeDescription(
   method,
-  { availableMethods = [], downMethods = [] } = {}
+  { availableMethods = [], downMethods = [] } = {},
+  locale = 'en'
 ) {
-  const prefix = getMethodPrefix(method);
+  const prefix = getTranslatedMethodPrefix(method, locale);
   const pluralPrefix = /s$/i.test(prefix);
   const isOrAre = pluralPrefix ? 'are' : 'is';
 

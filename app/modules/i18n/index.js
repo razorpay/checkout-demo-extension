@@ -4,6 +4,7 @@ import {
   register,
   isLoading,
   dictionary,
+  t,
 } from 'svelte-i18n';
 
 import { get } from 'svelte/store';
@@ -28,18 +29,54 @@ function makeBundleUrl(locale) {
  * @returns {Promise<Object>}
  */
 function fetchBundle(locale) {
-  return new Promise((resolve, reject) => {
-    fetch({
-      url: makeBundleUrl(locale),
-      callback: (response) => {
-        if (response.error) {
-          reject(response.error);
-        } else {
-          resolve(response);
-        }
+  return Promise.resolve({
+    netbanking: {
+      select_label: 'Select a different bank2',
+      select_help: 'Please select a bank2',
+    },
+    methods: {
+      prefixes: {
+        card: 'Cards2',
+        netbanking: 'Netbanking2',
+        emi: 'EMI2',
+        paylater: 'PayLater2',
+        paypal: 'PayPal2',
+        qr: 'UPI QR2',
+        upi: 'UPI2',
+        wallet: 'Wallets2',
+        gpay: 'Google Pay2',
       },
-    });
+      titles: {
+        card: 'Card2',
+        cardless_emi: 'EMI2',
+        credit_card: 'Credit Card2',
+        debit_card: 'Debit Card2',
+        emi: 'EMI2',
+        nach: 'NACH2',
+        netbanking: 'Netbanking2',
+        paylater: 'Pay Later2',
+        paypal: 'PayPal2',
+        qr: 'UPI QR2',
+        upiqr: 'UPI / QR2',
+        upi: 'UPI2',
+        gpay: 'Google Pay2',
+        wallet: 'Wallet2',
+        bank_transfer: 'Bank Transfer2',
+      },
+    },
   });
+  // return new Promise((resolve, reject) => {
+  //   fetch({
+  //     url: makeBundleUrl(locale),
+  //     callback: (response) => {
+  //       if (response.error) {
+  //         reject(response.error);
+  //       } else {
+  //         resolve(response);
+  //       }
+  //     },
+  //   });
+  // });
 }
 
 export function init() {
@@ -69,10 +106,30 @@ export function init() {
 
 /**
  * Returns the bundle stored for a given locale
- * @param locale
+ * @param {string} locale
  * @returns {Object}
  */
 export function getBundle(locale) {
   const bundles = get(dictionary);
   return bundles[locale];
+}
+
+/**
+ * Returns the method prefix for a given locale
+ * @param {string} method
+ * @param {string} locale
+ * @returns {string}
+ */
+export function getMethodPrefix(method, locale) {
+  return get(t)(`methods.prefixes.${method}`);
+}
+
+/**
+ * Returns the method title for a given locale
+ * @param {string} method
+ * @param {string} locale
+ * @returns {string}
+ */
+export function getMethodTitle(method, locale) {
+  return get(t)(`methods.titles.${method}`);
 }

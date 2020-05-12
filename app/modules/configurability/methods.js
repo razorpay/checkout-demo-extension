@@ -1,6 +1,4 @@
 import { createBlock } from './blocks';
-import { getMethodPrefix } from 'checkoutframe/paymentmethods';
-import { generateTextFromList } from 'lib/utils';
 
 /**
  * Creates a method block
