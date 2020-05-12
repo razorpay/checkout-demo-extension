@@ -112,130 +112,182 @@ test('Module: configurability/ungroup', t => {
 
       groupedInstrument = {
         method: 'card',
-        token_ids: ['token_12345', 'token_54321'],
-      };
-
-      block = {
-        code: 'block.test',
-        instruments: [groupedInstrument],
-      };
-
-      expected = {
-        code: 'block.test',
-        instruments: [
-          {
-            method: 'card',
-            token_ids: ['token_12345', 'token_54321'],
-            _ungrouped: [
-              {
-                method: 'card',
-                token_id: 'token_12345',
-                type: 'credit',
-                issuer: 'HDFC',
-                network: 'Visa',
-              },
-              {
-                method: 'card',
-                token_id: 'token_54321',
-                type: 'debit',
-                issuer: 'ICIC',
-                network: 'MasterCard',
-              },
-            ],
-          },
-        ],
-      };
-
-      found = Ungroup.ungroupInstruments(block, customer);
-
-      t.deepEqual(found, expected, 'Works for token_ids');
-
-      groupedInstrument = {
-        method: 'card',
         networks: ['Visa'],
         issuers: ['HDFC', 'ICIC'],
       };
 
       block = {
         code: 'block.test',
-        instruments: [groupedInstrument],
+        instruments: [
+          {
+            method: 'card',
+            types: ['credit'],
+          },
+          {
+            method: 'card',
+            networks: ['Visa', 'RuPay'],
+          },
+          {
+            method: 'card',
+            issuers: ['HDFC', 'ICIC'],
+          },
+          {
+            method: 'card',
+            types: ['credit'],
+            networks: ['Visa', 'RuPay'],
+          },
+          {
+            method: 'card',
+            types: ['credit'],
+            issuers: ['HDFC', 'ICIC'],
+          },
+          {
+            method: 'card',
+            networks: ['Visa', 'RuPay'],
+            issuers: ['HDFC', 'ICIC'],
+          },
+          {
+            method: 'card',
+            types: ['credit'],
+            networks: ['Visa', 'RuPay'],
+            issuers: ['HDFC', 'ICIC'],
+          },
+        ],
       };
 
       expected = {
         code: 'block.test',
         instruments: [
           {
-            method: 'card',
-            networks: ['Visa'],
-            issuers: ['HDFC', 'ICIC'],
             _ungrouped: [
               {
+                type: 'credit',
                 method: 'card',
-                networks: ['Visa'],
-                issuers: ['HDFC', 'ICIC'],
               },
             ],
-          },
-        ],
-      };
-
-      found = Ungroup.ungroupInstruments(block, customer);
-
-      t.deepEqual(
-        found,
-        expected,
-        'Leaves instruments without token_id or token_ids untouched'
-      );
-
-      block = {
-        code: 'block.test',
-        instruments: [
-          {
             method: 'card',
-            token_ids: ['token_12345', 'token_54321'],
+            types: ['credit'],
           },
           {
-            method: 'card',
-            networks: ['Visa'],
-            issuers: ['HDFC', 'ICIC'],
-          },
-        ],
-      };
-
-      expected = {
-        code: 'block.test',
-        instruments: [
-          {
-            method: 'card',
-            token_ids: ['token_12345', 'token_54321'],
             _ungrouped: [
               {
+                network: 'Visa',
                 method: 'card',
-                token_id: 'token_12345',
+              },
+              {
+                network: 'RuPay',
+                method: 'card',
+              },
+            ],
+            method: 'card',
+            networks: ['Visa', 'RuPay'],
+          },
+          {
+            _ungrouped: [
+              {
+                issuer: 'HDFC',
+                method: 'card',
+              },
+              {
+                issuer: 'ICIC',
+                method: 'card',
+              },
+            ],
+            method: 'card',
+            issuers: ['HDFC', 'ICIC'],
+          },
+          {
+            _ungrouped: [
+              {
+                type: 'credit',
+                network: 'Visa',
+                method: 'card',
+              },
+              {
+                type: 'credit',
+                network: 'RuPay',
+                method: 'card',
+              },
+            ],
+            method: 'card',
+            types: ['credit'],
+            networks: ['Visa', 'RuPay'],
+          },
+          {
+            _ungrouped: [
+              {
                 type: 'credit',
                 issuer: 'HDFC',
-                network: 'Visa',
+                method: 'card',
               },
               {
-                method: 'card',
-                token_id: 'token_54321',
-                type: 'debit',
+                type: 'credit',
                 issuer: 'ICIC',
-                network: 'MasterCard',
+                method: 'card',
               },
             ],
+            method: 'card',
+            types: ['credit'],
+            issuers: ['HDFC', 'ICIC'],
           },
           {
-            method: 'card',
-            networks: ['Visa'],
-            issuers: ['HDFC', 'ICIC'],
             _ungrouped: [
               {
+                network: 'Visa',
+                issuer: 'HDFC',
                 method: 'card',
-                networks: ['Visa'],
-                issuers: ['HDFC', 'ICIC'],
+              },
+              {
+                network: 'Visa',
+                issuer: 'ICIC',
+                method: 'card',
+              },
+              {
+                network: 'RuPay',
+                issuer: 'HDFC',
+                method: 'card',
+              },
+              {
+                network: 'RuPay',
+                issuer: 'ICIC',
+                method: 'card',
               },
             ],
+            method: 'card',
+            networks: ['Visa', 'RuPay'],
+            issuers: ['HDFC', 'ICIC'],
+          },
+          {
+            _ungrouped: [
+              {
+                type: 'credit',
+                network: 'Visa',
+                issuer: 'HDFC',
+                method: 'card',
+              },
+              {
+                type: 'credit',
+                network: 'Visa',
+                issuer: 'ICIC',
+                method: 'card',
+              },
+              {
+                type: 'credit',
+                network: 'RuPay',
+                issuer: 'HDFC',
+                method: 'card',
+              },
+              {
+                type: 'credit',
+                network: 'RuPay',
+                issuer: 'ICIC',
+                method: 'card',
+              },
+            ],
+            method: 'card',
+            types: ['credit'],
+            networks: ['Visa', 'RuPay'],
+            issuers: ['HDFC', 'ICIC'],
           },
         ],
       };
@@ -245,7 +297,7 @@ test('Module: configurability/ungroup', t => {
       t.deepEqual(
         found,
         expected,
-        'Works on a mix of instruments with and without token_id(s)'
+        'Works on instruments with issuers, networks and types'
       );
 
       t.end();
