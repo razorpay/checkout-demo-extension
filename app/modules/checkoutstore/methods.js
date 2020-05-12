@@ -340,6 +340,26 @@ export function getEMandateAuthTypes(bankCode) {
   );
 }
 
+/**
+ * Tells whether a given bank is enabled for emandate
+ * @param bank
+ * @returns {boolean}
+ */
+export function isEMandateBankEnabled(bank) {
+  return Boolean(getEMandateBanks()[bank]);
+}
+
+/**
+ * Tells whether a given auth type is enabled for a given emandate bank
+ * @param bank
+ * @param authType
+ *
+ * @returns {boolean}
+ */
+export function isEMandateAuthTypeEnabled(bank, authType) {
+  return getEMandateAuthTypes(bank) |> _Arr.contains(authType);
+}
+
 export function getEMIBankPlans(code, cardType = 'credit') {
   const options = code && getMerchantMethods().emi_options;
   if (options) {

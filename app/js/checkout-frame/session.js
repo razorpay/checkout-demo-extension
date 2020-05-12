@@ -36,6 +36,7 @@ var preferences,
   storeGetter = discreet.storeGetter,
   HomeScreenStore = discreet.HomeScreenStore,
   CardScreenStore = discreet.CardScreenStore,
+  NetbankingScreenStore = discreet.NetbankingScreenStore,
   CustomerStore = discreet.CustomerStore,
   EmiStore = discreet.EmiStore,
   Cta = discreet.Cta,
@@ -926,10 +927,6 @@ Session.prototype = {
       classes.push('noimage');
     }
 
-    if (MethodStore.isEMandateEnabled()) {
-      classes.push('emandate');
-    }
-
     if (isIE) {
       classes.push('noanim');
     }
@@ -1045,7 +1042,7 @@ Session.prototype = {
       }
 
       if (data['bank']) {
-        this.netbankingTab.setSelectedBank(data['bank']);
+        NetbankingScreenStore.selectedBank.set(data['bank']);
       }
 
       each(
@@ -1269,7 +1266,7 @@ Session.prototype = {
 
   setNetbankingTab: function() {
     var method, banks;
-    var prefilledbank = this.get('prefill.bank');
+    var prefilledBank = this.get('prefill.bank');
 
     if (MethodStore.isEMandateEnabled()) {
       method = 'emandate';
@@ -1287,6 +1284,11 @@ Session.prototype = {
       banks = Store.getMerchantMethods().netbanking;
     }
 
+    // Set prefilled bank in store
+    if (prefilledBank) {
+      NetbankingScreenStore.selectedBank.set(prefilledBank);
+    }
+
     if (method) {
       this.netbankingTab = new discreet.NetbankingTab({
         target: gel('form-fields'),
@@ -1294,7 +1296,6 @@ Session.prototype = {
           bankOptions: this.get('method.netbanking'),
           banks: banks,
           method: method,
-          selectedBankCode: prefilledbank,
         },
       });
 
@@ -1312,7 +1313,7 @@ Session.prototype = {
         session.validateOffers(e.detail.bank.code, function(offerRemoved) {
           if (!offerRemoved) {
             // If the offer was not removed, revert to the bank in offer issuer
-            session.netbankingTab.setSelectedBank(
+            NetbankingScreenStore.selectedBank.set(
               session.getAppliedOffer().issuer
             );
           }
@@ -1431,7 +1432,10 @@ Session.prototype = {
 
   setEmandate: function() {
     if (MethodStore.isEMandateEnabled()) {
-      this.emandateView = new discreet.emandateView();
+      this.emandateView = new discreet.EmandateTab({
+        target: _Doc.querySelector('#form-fields'),
+        props: {},
+      });
     }
   },
 
@@ -2642,10 +2646,6 @@ Session.prototype = {
       makeHidden('#topbar');
     }
 
-    if (screen === 'emandate') {
-      screen = 'netbanking';
-    }
-
     var screenEl = '#form-' + (screen || 'common');
     makeVisible(screenEl);
 
@@ -2671,7 +2671,9 @@ Session.prototype = {
       screen === 'paylater' ||
       screen === 'qr' ||
       (screen === 'wallet' && !$('.wallet :checked')[0]) ||
-      screen === 'bank_transfer'
+      screen === 'bank_transfer' ||
+      (screen === 'netbanking' && Store.isRecurring()) ||
+      screen === 'emandate'
     ) {
       showPaybtn = false;
     }
@@ -2712,7 +2714,7 @@ Session.prototype = {
     } else if (screen === 'netbanking') {
       // Select bank
       if (issuer) {
-        this.netbankingTab.setSelectedBank(issuer);
+        NetbankingScreenStore.selectedBank.set(issuer);
       }
     } else if (screen === 'emi') {
       var emiDuration = getEmiDurationForNewCard();
@@ -2803,10 +2805,6 @@ Session.prototype = {
       } else {
         tab = 'card';
       }
-    } else if (/^emandate/.test(this.screen)) {
-      if (this.emandateView.back()) {
-        return;
-      }
     } else if (/^emiplans/.test(this.screen)) {
       if (this.emiPlansView.back()) {
         return;
@@ -2839,6 +2837,10 @@ Session.prototype = {
       }
     } else if (this.tab === 'bank_transfer') {
       if (this.bankTransferView.onBack()) {
+        return;
+      }
+    } else if (this.tab === 'emandate') {
+      if (this.emandateView.onBack()) {
         return;
       }
     } else {
@@ -3046,8 +3048,8 @@ Session.prototype = {
       this.upiTab.onShown();
     }
 
-    if (/^emandate/.test(tab)) {
-      return this.emandateView.showTab(tab);
+    if (tab === 'emandate') {
+      this.emandateView.onShown();
     }
 
     if (tab === '' && this.tab === 'upi') {
@@ -3479,13 +3481,11 @@ Session.prototype = {
    * proceed automatically if some conditions are met.
    */
   proceedAutomaticallyAfterSelectingBank: function(event) {
-    var bank = event.detail.bank;
-
     if (this.checkInvalid()) {
       return;
     }
 
-    return this.emandateView.showBankDetailsForm(bank.code);
+    this.switchTab('emandate');
   },
 
   checkInvalid: function(parent) {
@@ -3531,10 +3531,6 @@ Session.prototype = {
         form = 'card';
       }
     }
-    if (form === 'emandate') {
-      form = 'netbanking';
-    }
-
     if (form === 'gpay') {
       form = 'upi';
     }
@@ -3580,7 +3576,10 @@ Session.prototype = {
       var activeForm = this.getActiveForm();
 
       if (
-        !_Arr.contains(['#form-upi', '#form-card', '#form-wallet'], activeForm)
+        !_Arr.contains(
+          ['#form-upi', '#form-card', '#form-wallet', '#form-emandate'],
+          activeForm
+        )
       ) {
         fillData(activeForm, data);
       }
@@ -3620,6 +3619,10 @@ Session.prototype = {
         if (this.svelteWalletsTab.isAnyWalletSelected()) {
           _Obj.extend(data, this.svelteWalletsTab.getPayload());
         }
+      }
+
+      if (this.tab === 'emandate') {
+        _Obj.extend(data, this.emandateView.getPayload());
       }
     }
 
@@ -4188,14 +4191,6 @@ Session.prototype = {
             delete data.emi_duration;
           }
         }
-      } else if (/^emandate/.test(screen)) {
-        if (this.screen === 'emandate') {
-          // TODO: looks like dead code, see if this can be removed
-          screen = 'netbanking';
-          data.bank = this.netbankingTab.getSelectedBank();
-          data.method = 'emandate';
-        }
-        return this.emandateView.submit(data);
       } else if (/^emiplans/.test(screen)) {
         if (!(data.method === 'cardless_emi' && data.emi_duration)) {
           return this.emiPlansView.submit();

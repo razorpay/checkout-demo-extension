@@ -3,6 +3,10 @@
   import { createEventDispatcher } from 'svelte';
   import { fade } from 'svelte/transition';
 
+  // Store
+  import { selectedBank } from 'checkoutstore/screens/netbanking';
+  import { methodTabInstrument } from 'checkoutstore/screens/home';
+
   // UI imports
   import Tab from 'ui/tabs/Tab.svelte';
   import GridItem from 'ui/tabs/netbanking/GridItem.svelte';
@@ -10,9 +14,6 @@
   import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
-
-  // Store imports
-  import { methodTabInstrument } from 'checkoutstore/screens/home';
 
   // Utils imports
   import Razorpay from 'common/Razorpay';
@@ -29,9 +30,9 @@
     isCorporateCode,
   } from 'common/bank';
   import { scrollIntoView } from 'lib/utils';
+  import { hideCta, showCtaWithDefaultText } from 'checkoutstore/cta';
 
   // Props
-  export let selectedBankCode = '';
   export let banks;
   export let downtimes = getDowntimes();
   export let method;
@@ -61,39 +62,34 @@
   const recurring = isRecurring();
   const dispatch = createEventDispatcher();
 
-  export function setCorporateOption() {
-    const corporateOption = getCorporateOption(selectedBankCode, filteredBanks);
+  function setCorporateOption() {
+    const corporateOption = getCorporateOption($selectedBank, filteredBanks);
 
     if (corporateOption) {
-      selectedBankCode = corporateOption;
+      $selectedBank = corporateOption;
     }
   }
 
   export function onShown() {
     active = true;
+    // For emandate, the screen switches as soon as user selects a bank. We do not need to show the CTA
+    // in that case.
+    if (recurring) {
+      hideCta();
+    } else {
+      showCtaWithDefaultText();
+    }
   }
 
   export function onBack() {
     active = false;
   }
 
-  export function setRetailOption() {
-    const retailOption = getRetailOption(selectedBankCode, filteredBanks);
+  function setRetailOption() {
+    const retailOption = getRetailOption($selectedBank, filteredBanks);
     if (retailOption) {
-      selectedBankCode = retailOption;
+      $selectedBank = retailOption;
     }
-  }
-
-  export function getSelectedBank() {
-    return selectedBankCode;
-  }
-
-  export function setSelectedBank(bankCode) {
-    selectedBankCode = bankCode;
-  }
-
-  export function deselectBank() {
-    selectedBankCode = '';
   }
 
   /**
@@ -125,27 +121,35 @@
     return filteredBanks;
   }
 
-  $: filteredBanks = filterBanksAgainstInstrument(banks, $methodTabInstrument);
+  $: {
+    filteredBanks = filterBanksAgainstInstrument(banks, $methodTabInstrument);
+
+    // If the currently selected bank is not present in filtered banks, we need to unset it.
+    if (!filteredBanks[$selectedBank]) {
+      $selectedBank = '';
+    }
+  }
+
   $: showCorporateRadio =
-    !recurring && hasMultipleOptions(selectedBankCode, filteredBanks);
-  $: corporateSelected = isCorporateCode(selectedBankCode);
+    !recurring && hasMultipleOptions($selectedBank, filteredBanks);
+  $: corporateSelected = isCorporateCode($selectedBank);
   $: maxGridCount = recurring ? 3 : 6;
   $: banksArr = _Arr.map(_Obj.entries(filteredBanks), entry => ({
     code: entry[0],
     name: entry[1],
     downtime: downtimes[entry[0]],
   }));
-  $: invalid = method !== 'emandate' && !selectedBankCode;
+  $: invalid = method !== 'emandate' && !$selectedBank;
   $: netbanks = getPreferredBanks(filteredBanks, bankOptions).slice(
     0,
     maxGridCount
   );
   $: selectedBankHasSevereDowntime =
     method === 'netbanking' &&
-    _Arr.contains(downtimes.high.banks, selectedBankCode);
+    _Arr.contains(downtimes.high.banks, $selectedBank);
   $: selectedBankHasLowDowntime =
     method === 'netbanking' &&
-    _Arr.contains(downtimes.low.banks, selectedBankCode);
+    _Arr.contains(downtimes.low.banks, $selectedBank);
   $: selectedBankHasDowntime =
     selectedBankHasSevereDowntime || selectedBankHasLowDowntime;
 
@@ -158,7 +162,7 @@
   }
 
   $: {
-    const bankCode = selectedBankCode;
+    const bankCode = $selectedBank;
 
     if (iPhone) {
       Razorpay.sendMessage({ event: 'blur' });
@@ -210,7 +214,7 @@
             {name}
             {code}
             fullName={filteredBanks[code]}
-            bind:group={selectedBankCode} />
+            bind:group={$selectedBank} />
         {/each}
       </div>
 
@@ -224,7 +228,7 @@
             required
             class="input no-refresh no-validate no-focus no-blur"
             pattern="[\w]+"
-            bind:value={selectedBankCode}
+            bind:value={$selectedBank}
             use:focus
             use:blur
             use:input>
@@ -282,11 +286,11 @@
       {#if selectedBankHasDowntime}
         <DowntimeCallout severe={selectedBankHasSevereDowntime}>
           {#if selectedBankHasSevereDowntime}
-            <strong>{filteredBanks[selectedBankCode]}</strong>
+            <strong>{filteredBanks[$selectedBank]}</strong>
             accounts are temporarily unavailable right now. Please select
             another bank.
           {:else}
-            <strong>{filteredBanks[selectedBankCode]}</strong>
+            <strong>{filteredBanks[$selectedBank]}</strong>
             accounts are experiencing low success rates.
           {/if}
         </DowntimeCallout>
