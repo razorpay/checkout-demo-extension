@@ -7,7 +7,7 @@ test('Module: FormattedText', t => {
 
       // -----------------
 
-      textToBeFormatted = 'This __might__ work';
+      textToBeFormatted = 'This <i>might<i> work';
 
       t.deepEqual(
         tokenizeTextForFormatters(textToBeFormatted),
@@ -19,7 +19,7 @@ test('Module: FormattedText', t => {
         'works for just italic in string'
       );
 
-      textToBeFormatted = 'This **might** work';
+      textToBeFormatted = 'This <b>might<b> work';
 
       t.deepEqual(
         tokenizeTextForFormatters(textToBeFormatted),
@@ -31,7 +31,7 @@ test('Module: FormattedText', t => {
         'works for just bold in string'
       );
 
-      textToBeFormatted = 'This **might** __work__';
+      textToBeFormatted = 'This <b>might<b> <i>work<i>';
 
       t.deepEqual(
         tokenizeTextForFormatters(textToBeFormatted),
