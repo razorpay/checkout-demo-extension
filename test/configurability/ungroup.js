@@ -381,11 +381,12 @@ test('Module: configurability/ungroup', t => {
 
       found = Ungroup.ungroupInstruments(block);
 
-      t.deepEqual(found, expected, 'Works for groupe instrument: flows');
+      t.deepEqual(found, expected, 'Works for grouped instrument: flows');
 
       groupedInstrument = {
         method: 'upi',
         apps: ['com.google.android.apps.nbu.paisa.user', 'com.phonepe.app'],
+        flows: ['intent'],
       };
 
       block = {
@@ -399,6 +400,7 @@ test('Module: configurability/ungroup', t => {
           {
             method: 'upi',
             apps: ['com.google.android.apps.nbu.paisa.user', 'com.phonepe.app'],
+            flows: ['intent'],
             _ungrouped: [
               {
                 method: 'upi',
@@ -421,45 +423,8 @@ test('Module: configurability/ungroup', t => {
 
       groupedInstrument = {
         method: 'upi',
-        token_ids: ['token_12345', 'token_54321'],
-      };
-
-      block = {
-        code: 'block.test',
-        instruments: [groupedInstrument],
-      };
-
-      expected = {
-        code: 'block.test',
-        instruments: [
-          {
-            method: 'upi',
-            token_ids: ['token_12345', 'token_54321'],
-            _ungrouped: [
-              {
-                method: 'upi',
-                token_id: 'token_12345',
-                flow: 'collect',
-              },
-
-              {
-                method: 'upi',
-                token_id: 'token_54321',
-                flow: 'collect',
-              },
-            ],
-          },
-        ],
-      };
-
-      found = Ungroup.ungroupInstruments(block, customer);
-
-      t.deepEqual(found, expected, 'Works for grouped instrument: token_ids');
-
-      groupedInstrument = {
-        method: 'upi',
         apps: ['com.google.android.apps.nbu.paisa.user', 'com.phonepe.app'],
-        flows: ['qr', 'collect'],
+        flows: ['qr', 'collect', 'intent'],
       };
 
       block = {
@@ -473,7 +438,7 @@ test('Module: configurability/ungroup', t => {
           {
             method: 'upi',
             apps: ['com.google.android.apps.nbu.paisa.user', 'com.phonepe.app'],
-            flows: ['qr', 'collect'],
+            flows: ['qr', 'collect', 'intent'],
             _ungrouped: [
               {
                 method: 'upi',
@@ -484,6 +449,14 @@ test('Module: configurability/ungroup', t => {
                 method: 'upi',
                 app: 'com.phonepe.app',
                 flow: 'intent',
+              },
+              {
+                method: 'upi',
+                flow: 'qr',
+              },
+              {
+                method: 'upi',
+                flow: 'collect',
               },
             ],
           },
