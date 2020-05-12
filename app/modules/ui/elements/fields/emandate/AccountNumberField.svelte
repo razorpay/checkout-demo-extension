@@ -42,7 +42,7 @@
 <div class="account-number-field">
   {#if bankCode}
     <div class="bank-icon">
-      <img src={getBankLogo(bankCode)} />
+      <img src={getBankLogo(bankCode)} alt="" />
     </div>
   {/if}
 
