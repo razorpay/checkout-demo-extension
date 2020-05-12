@@ -188,7 +188,7 @@ const config = {
   },
 
   upi: {
-    properties: ['flow', 'flows', 'app', 'apps', 'token_id', 'token_ids'],
+    properties: ['flows', 'apps', 'token_id', 'vpas'],
     payment: ['flow', 'app', 'token', 'vpa'],
     groupedToIndividual: (grouped, customer) => {
       /**
@@ -200,81 +200,101 @@ const config = {
 
       let flows = [];
       let apps = [];
-      let token_ids = [];
+      let vpas = [];
+
+      let ungrouped = [];
 
       const tokens = _Obj.getSafely(customer, 'tokens.items', []);
       const base = _Obj.clone(grouped);
 
       // Remove all extra properties
-      _Arr.loop(
-        ['flow', 'flows', 'app', 'apps', 'token_id', 'token_ids'],
-        key => {
-          delete base[key];
-        }
-      );
+      _Arr.loop(['flows', 'apps', 'token_id', 'vpas'], key => {
+        delete base[key];
+      });
 
-      if (grouped.token_ids) {
-        token_ids = grouped.token_ids;
-      } else if (grouped.token_id) {
-        token_ids = [grouped.token_id];
+      if (grouped.flows) {
+        flows = grouped.flows;
       }
 
-      if (token_ids.length > 0) {
-        return (
-          _Arr.map(token_ids, token_id => {
-            const token = _Arr.find(tokens, token => token.id === token_id);
-
-            if (!token) {
-              return;
-            }
-
-            return _Obj.extend(
-              {
-                token_id,
-                flow: 'collect',
-              },
-              base
-            );
-          }) |> _Arr.filter(Boolean)
-        );
+      if (grouped.vpas) {
+        vpas = grouped.vpas;
       }
 
       if (grouped.apps) {
         apps = grouped.apps;
-      } else if (grouped.app) {
-        apps = [grouped.app];
       }
 
-      if (apps.length > 0) {
-        return _Arr.map(apps, app =>
-          _Obj.extend(
-            {
-              app,
-              flow: 'intent',
-            },
-            base
-          )
-        );
+      if (_Arr.contains(flows, 'collect')) {
+        if (vpas.length) {
+          let individualInstruments = _Arr.map(vpas, vpa => {
+            let individual = _Obj.extend(
+              {
+                vpa,
+                flow: 'collect',
+              },
+              base
+            );
+
+            if (grouped.token_id) {
+              const token_id = grouped.token_id;
+
+              const token = _Arr.find(tokens, token => token.id === token_id);
+
+              if (token) {
+                individual.token_id = token_id;
+              }
+            }
+
+            return individual;
+          });
+
+          ungrouped = _Arr.mergeWith(ungrouped, individualInstruments);
+        }
       }
 
-      if (grouped.flows) {
-        flows = grouped.flows;
-      } else if (grouped.flow) {
-        flows = [grouped.flow];
+      if (_Arr.contains(flows, 'intent')) {
+        if (apps.length) {
+          let individualInstruments = _Arr.map(apps, app =>
+            _Obj.extend(
+              {
+                app,
+                flow: 'intent',
+              },
+              base
+            )
+          );
+
+          ungrouped = _Arr.mergeWith(ungrouped, individualInstruments);
+        }
       }
 
       if (flows.length > 0) {
-        return _Arr.map(flows, flow =>
-          _Obj.extend(
-            {
-              flow,
-            },
-            base
-          )
-        );
+        let individualInstruments =
+          _Arr.map(flows, flow => {
+            let individual = _Obj.extend(
+              {
+                flow,
+              },
+              base
+            );
+
+            // Allow intent only if no apps are present
+            if (flow === 'intent' && apps.length) {
+              return;
+            }
+
+            // Allow collect only if no VPAs are present
+            if (flow === 'collect' && vpas.length) {
+              return;
+            }
+
+            return individual;
+          }) |> _Arr.filter(Boolean);
+
+        ungrouped = _Arr.mergeWith(ungrouped, individualInstruments);
       }
 
-      return [grouped];
+      return ungrouped;
     },
     isIndividual: instrument => {
       const singleFlow = instrument.flow;
