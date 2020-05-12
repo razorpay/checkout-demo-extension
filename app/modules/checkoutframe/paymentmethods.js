@@ -10,8 +10,7 @@ import {
 import { getRecurringMethods, isRecurring } from 'checkoutstore';
 import { generateTextFromList } from 'lib/utils';
 
-import { get } from 'svelte/store';
-import { dictionary } from 'svelte-i18n';
+import { getBundle } from 'i18n';
 
 function getRecurringCardDescription() {
   if (isRecurring()) {
@@ -139,11 +138,10 @@ export function getEMIBanksText() {
  * @return {String}
  */
 export function getMethodPrefix(method, locale = 'en') {
-  const bundles = get(dictionary);
-  const currentBundle = bundles[locale];
+  const bundle = getBundle(locale);
   const methodKey = getMethodForPrefix(`methods.prefixes.${method}`);
   // TODO: remove capitalized fallback
-  return currentBundle[methodKey] || method[0].toUpperCase() + method.slice(1);
+  return bundle[methodKey] || method[0].toUpperCase() + method.slice(1);
 }
 
 /**
@@ -177,10 +175,11 @@ function getMethodForPrefix(method) {
  * @param {string} method
  * @param {Object} extra
  *  @prop {Session} session
+ * @param {string} locale
  *
  * @returns {string}
  */
-export function getMethodNameForPaymentOption(method, extra = {}) {
+export function getMethodNameForPaymentOption(method, extra = {}, locale) {
   let hasInstrument = extra.instrument;
   let qrEnabled;
   let hasQr;

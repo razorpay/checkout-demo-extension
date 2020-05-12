@@ -3,7 +3,10 @@ import {
   init as initSvelteI18n,
   register,
   isLoading,
+  dictionary,
 } from 'svelte-i18n';
+
+import { get } from 'svelte/store';
 
 import en from './bundles/en';
 
@@ -28,7 +31,7 @@ function fetchBundle(locale) {
   return new Promise((resolve, reject) => {
     fetch({
       url: makeBundleUrl(locale),
-      callback: response => {
+      callback: (response) => {
         if (response.error) {
           reject(response.error);
         } else {
@@ -46,7 +49,7 @@ export function init() {
 
   const session = getSession();
 
-  isLoading.subscribe(value => {
+  isLoading.subscribe((value) => {
     if (value) {
       // TODO: lock overlay and prevent dismissal
       session.showLoadError('Loading');
@@ -62,4 +65,14 @@ export function init() {
     fallbackLocale: 'en',
     initialLocale: 'en', // TODO: select from navigator
   });
+}
+
+/**
+ * Returns the bundle stored for a given locale
+ * @param locale
+ * @returns {Object}
+ */
+export function getBundle(locale) {
+  const bundles = get(dictionary);
+  return bundles[locale];
 }
