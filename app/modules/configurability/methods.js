@@ -3,60 +3,6 @@ import { getMethodPrefix } from 'checkoutframe/paymentmethods';
 import { generateTextFromList } from 'lib/utils';
 
 /**
- * Adds a name to the clusters in the list of blocks
- * @param {Array<Block>} blocks
- *
- * @returns {Array<Blocks>}
- */
-function getBlocksWithNamedClusters(blocks) {
-  const rzpBlocks = _Arr.filter(blocks, block => block.code === 'rzp.cluster');
-  const totalRzpBlocks = rzpBlocks.length;
-
-  // If there are no razorpay blocks, don't process
-  if (totalRzpBlocks === 0) {
-    return blocks;
-  }
-
-  blocks = _Arr.map(blocks, block => {
-    const isRzpBlock = block.code === 'rzp.cluster';
-
-    // Not a razorpay block. Do nothing.
-    if (!isRzpBlock) {
-      return block;
-    }
-
-    const methods = _Arr.map(
-      block.instruments,
-      instrument => instrument.method
-    );
-    const names = _Arr.map(methods, getMethodPrefix);
-
-    let name;
-
-    /**
-     * For just one method, use "Pay via {method}"
-     * For more, use generateTextFromList
-     */
-    if (names.length === 1) {
-      name = `Pay via ${names[0]}`;
-    } else {
-      name = generateTextFromList(names, 3);
-    }
-
-    // Recreate the block with the name
-    // Using createBlock instead of validateAndCreateBlock because validations would already be done by this point
-    return createBlock(
-      block.code,
-      _Obj.extend(block, {
-        name,
-      })
-    );
-  });
-
-  return blocks;
-}
-
-/**
  * Creates a method block
  * @param {string} method
  *
@@ -96,7 +42,7 @@ export function clusterRazorpayBlocks(blocks) {
     }
   }
 
-  _Arr.loop(blocks, block => {
+  _Arr.loop(blocks, (block) => {
     const isRazorpayMethodBlock = block._type === 'rzp_method';
 
     if (isRazorpayMethodBlock) {
@@ -114,5 +60,5 @@ export function clusterRazorpayBlocks(blocks) {
   // Push any pending clusters
   checkAndPushCluster();
 
-  return getBlocksWithNamedClusters(clustered);
+  return clustered;
 }

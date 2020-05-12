@@ -10,6 +10,9 @@ import {
 import { getRecurringMethods, isRecurring } from 'checkoutstore';
 import { generateTextFromList } from 'lib/utils';
 
+import { get } from 'svelte/store';
+import { dictionary } from 'svelte-i18n';
+
 function getRecurringCardDescription() {
   if (isRecurring()) {
     return getRecurringMethods().card?.credit?.join(' and ') + ' credit cards';
@@ -40,8 +43,8 @@ const CARD_DESCRIPTION = ({ session }) => {
   const networks =
     NW_MAP
     |> _Obj.keys
-    |> _Arr.filter(network => Boolean(networksFromPrefs[network]))
-    |> _Arr.map(network => NW_MAP[network]);
+    |> _Arr.filter((network) => Boolean(networksFromPrefs[network]))
+    |> _Arr.map((network) => NW_MAP[network]);
 
   return generateTextFromList(networks, 4);
 };
@@ -59,7 +62,7 @@ const DESCRIPTIONS = {
 
     const cardEmi = isMethodEnabled('emi');
     let providerNames = [];
-    _Obj.loop(getCardlessEMIProviders(), providerObj => {
+    _Obj.loop(getCardlessEMIProviders(), (providerObj) => {
       providerNames.push(providerObj.name);
     });
 
@@ -81,7 +84,7 @@ const DESCRIPTIONS = {
   emi: () => 'EMI via Credit & Debit Cards',
   netbanking: () => 'All Indian banks',
   paylater: () => {
-    const providers = getPayLaterProviders().map(p => p.name);
+    const providers = getPayLaterProviders().map((p) => p.name);
     const text = generateTextFromList(providers, 2);
 
     return `Pay later using ${text}`;
@@ -92,7 +95,7 @@ const DESCRIPTIONS = {
   upi: () => 'Instant payment using UPI App',
   wallet: () =>
     generateTextFromList(
-      getWallets().map(w => w.name),
+      getWallets().map((w) => w.name),
       2
     ),
 };
@@ -125,50 +128,46 @@ export function getMethodDescription(method, props) {
 export function getEMIBanksText() {
   const emiBanks = getEMIBanks();
   const bankNames =
-    emiBanks |> _Obj.keys |> _Arr.map(bank => emiBanks[bank].name);
+    emiBanks |> _Obj.keys |> _Arr.map((bank) => emiBanks[bank].name);
   return generateTextFromList(bankNames, 12);
 }
 
 /**
  * Returns the prefix for the given method.
  * @param {String} method
+ * @param {string} locale
  * @return {String}
  */
-export function getMethodPrefix(method) {
+export function getMethodPrefix(method, locale = 'en') {
+  const bundles = get(dictionary);
+  const currentBundle = bundles[locale];
+  const methodKey = getMethodForPrefix(`methods.${method}`);
+  // TODO: remove capitalized fallback
+  return currentBundle[methodKey] || method[0].toUpperCase() + method.slice(1);
+}
+
+/**
+ * Returns the method that should be displayed in the prefix for a given method.
+ * Some methods, such as cardless EMI, are displayed as emi on the prefix. This
+ * function handles the translation for cardless_emi -> emi.
+ *
+ * @param {string} method
+ * @returns {string}
+ */
+function getMethodForPrefix(method) {
   switch (method) {
-    case 'card':
     case 'credit_card':
     case 'debit_card':
-      return 'Cards';
+      return 'card';
 
-    case 'netbanking':
     case 'emandate':
-      return 'Netbanking';
+      return 'netbanking';
 
-    case 'emi':
     case 'cardless_emi':
-      return 'EMI';
-
-    case 'paylater':
-      return 'PayLater';
-
-    case 'paypal':
-      return 'PayPal';
-
-    case 'qr':
-      return 'UPI QR';
-
-    case 'upi':
-      return 'UPI';
-
-    case 'wallet':
-      return 'Wallets';
-
-    case 'gpay':
-      return 'Google Pay';
+      return 'emi';
 
     default:
-      return method[0].toUpperCase() + method.slice(1);
+      return method;
   }
 }
 
@@ -234,7 +233,7 @@ export function getMethodDowntimeDescription(
   // Check if there's another method available that is not down.
   const isAnotherMethodAvailable = _Arr.any(
     availableMethods,
-    enabledMethod => !_Arr.contains(downMethods, enabledMethod)
+    (enabledMethod) => !_Arr.contains(downMethods, enabledMethod)
   );
 
   // If there's another method available, ask user to select it.
