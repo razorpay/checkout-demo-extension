@@ -7,6 +7,8 @@
   import { selectedBank } from 'checkoutstore/screens/netbanking';
   import { methodTabInstrument } from 'checkoutstore/screens/home';
 
+  import { t } from 'svelte-i18n';
+
   // UI imports
   import Tab from 'ui/tabs/Tab.svelte';
   import GridItem from 'ui/tabs/netbanking/GridItem.svelte';
@@ -14,6 +16,9 @@
   import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
+
+  // i18n labels
+  import { NETBANKING_SELECT_LABEL, NETBANKING_SELECT_HELP } from 'ui/labels';
 
   // Utils imports
   import Razorpay from 'common/Razorpay';
@@ -221,18 +226,19 @@
       <div class="elem-wrap pad">
         <div id="nb-elem" class="elem select" class:invalid>
           <i class="select-arrow"></i>
-          <div class="help">Please select a bank</div>
+          <!-- LABEL: Please select a bank -->
+          <div class="help">{$t(NETBANKING_SELECT_HELP)}</div>
           <select
             id="bank-select"
             name="bank"
             required
             class="input no-refresh no-validate no-focus no-blur"
-            pattern="[\w]+"
             bind:value={$selectedBank}
             use:focus
             use:blur
             use:input>
-            <option value="">Select a different Bank</option>
+            <!-- LABEL: Select a different bank -->
+            <option value="">{$t(NETBANKING_SELECT_LABEL)}</option>
             {#each banksArr as bank}
               <option value={bank.code}>{bank.name}</option>
             {/each}

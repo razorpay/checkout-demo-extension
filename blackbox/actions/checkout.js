@@ -1,6 +1,6 @@
 const querystring = require('querystring');
 const { readFileSync } = require('fs');
-const { cdnUrl, lumberjackUrl } = require('../const');
+const { cdnUrl, lumberjackUrl, bundleUrl } = require('../const');
 const { interceptor } = require('../util');
 const { computed } = require('./options');
 const { callbackHtml } = require('./callback');
@@ -54,7 +54,7 @@ function cdnRequestHandler(request) {
     request.respond({ body: url });
   } else if (url.startsWith(lumberjackUrl)) {
     request.respond({ status: 204 });
-  } else if (url.startsWith(cdnUrl)) {
+  } else if (url.startsWith(cdnUrl) && !url.startsWith(bundleUrl)) {
     const localPath = 'app/images/' + url.slice(cdnUrl.length);
     try {
       request.respond({ body: readFileSync(localPath) });

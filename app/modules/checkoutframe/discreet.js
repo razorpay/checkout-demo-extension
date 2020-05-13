@@ -21,11 +21,13 @@ import OffersView from 'ui/components/offers/index.svelte';
 import NoCostExplainer from 'ui/components/offers/NoCostExplainer.svelte';
 import emiPlansView from 'checkoutframe/emiplans';
 import otpView from 'checkoutframe/otp';
+import languageSelectionView from 'ui/elements/LanguageSelection.svelte';
 import * as Curtain from 'components/curtain';
 import { setShieldParams } from 'payment/validator';
 import * as P13n from 'checkoutframe/personalization';
 import { commonBanks, getFullBankLogo } from 'common/bank';
 import * as CountryCodesUtil from 'common/countrycodesutil';
+import { init as initI18n } from 'i18n';
 
 /* Required for merchant.js migration */
 import * as Constants from 'common/constants';
@@ -162,6 +164,7 @@ export default {
   PayoutAccount,
 
   otpView,
+  languageSelectionView,
   PayLaterView,
   Curtain,
   commonBanks,
@@ -192,4 +195,6 @@ export default {
 
   NBHandlers,
   UserHandlers,
+
+  initI18n,
 };

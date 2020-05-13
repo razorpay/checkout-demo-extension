@@ -1179,6 +1179,7 @@ Session.prototype = {
 
     this.isOpen = true;
 
+    discreet.initI18n();
     this.setExperiments();
     this.setTpvBanks();
     this.getEl();
@@ -1356,6 +1357,7 @@ Session.prototype = {
     this.setBankTransfer();
     this.setWalletsTab();
     this.setOffers();
+    this.setLanguageDropdown();
     this.setSvelteOverlay();
     // make bottom the last element
     gel('form-fields').appendChild(gel('bottom'));
@@ -5019,6 +5021,7 @@ Session.prototype = {
       'savedCardsView',
       'svelteCardTab',
       'svelteWalletsTab',
+      'languageSelectionView',
       'svelteOverlay',
       'upiTab',
       'timer',
@@ -5161,6 +5164,16 @@ Session.prototype = {
             );
           },
         },
+      });
+    }
+  },
+
+  setLanguageDropdown: function() {
+    var features = this.preferences.features || {};
+    if (features.vernacular) {
+      var target = _Doc.querySelector('#language-dropdown');
+      this.languageSelectionView = new discreet.languageSelectionView({
+        target: target,
       });
     }
   },
