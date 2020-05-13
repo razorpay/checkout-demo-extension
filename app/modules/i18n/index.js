@@ -140,3 +140,48 @@ export function getMethodTitle(method) {
 export function getNetworkName(network) {
   return get(t)(`networks.${network.toUpperCase()}`);
 }
+
+/**
+ * Returns the method description for the current locale
+ * @param {string} method
+ * @returns {string}
+ */
+export function getRawMethodDescription(method) {
+  return get(t)(`methods.descriptions.${method}`);
+}
+
+/**
+ * Returns the pay later provider name for the current locale
+ * @param {string} providerCode
+ * @returns {string}
+ */
+export function getPaylaterProviderName(providerCode) {
+  return get(t)(`paylater.providers.${providerCode}`);
+}
+
+/**
+ * Returns the cardless emi provider name for the current locale
+ * @param {string} providerCode
+ * @returns {string}
+ */
+export function getCardlessEmiProviderName(providerCode) {
+  return get(t)(`cardless_emi.providers.${providerCode}`);
+}
+
+/**
+ * Returns the wallet name for the current locale
+ * @param {string} walletCode
+ * @returns {string}
+ */
+export function getWalletName(walletCode) {
+  return get(t)(`wallets.${walletCode}`);
+}
+
+/**
+ * Returns the bank name for the current locale
+ * @param bankCode
+ * @returns {*}
+ */
+export function getBankName(bankCode) {
+  return get(t)(`banks.${bankCode.toUpperCase()}`);
+}
