@@ -10,6 +10,7 @@
   // Props
   export let visible = false;
   export let placeholder = 'Type to search';
+  export let autocomplete;
   export let items = [];
   export let component;
   export let keys;
@@ -179,11 +180,7 @@
       <div class="icon">
         <Icon icon={getMiscIcon('search')} />
       </div>
-      <input
-        type="text"
-        autocomplete="transaction-currency"
-        {placeholder}
-        bind:value={query} />
+      <input type="text" {autocomplete} {placeholder} bind:value={query} />
     </div>
     <div class="list">
       {#if matchingItems.length}

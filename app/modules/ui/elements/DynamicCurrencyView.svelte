@@ -320,6 +320,7 @@
       <SearchModal
         title="Select Currency to Pay"
         placeholder="Search for currency or code"
+        autocomplete="transaction-currency"
         items={sortedCurrencies}
         keys={['currency', 'name', 'symbol']}
         component={CurrencySearchItem}
