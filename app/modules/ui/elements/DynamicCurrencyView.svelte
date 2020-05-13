@@ -32,6 +32,7 @@
   import Radio from 'ui/elements/Radio.svelte';
   import SearchModal from 'ui/elements/SearchModal.svelte';
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
+  import CurrencySearchItem from 'ui/elements/search-item/Currency.svelte';
 
   const TOP_CURRENCIES = ['USD', 'GBP', 'EUR'];
   // Constants
@@ -152,10 +153,9 @@
     ([code]) => code === selectedCurrency
   );
 
-  function onSelect(code) {
-    if (selectedCurrency !== code) {
-      selectedCurrency = code;
-    }
+  function onSelect({ currency }) {
+    selectedCurrency = currency;
+
     searchModal.close();
   }
 
@@ -190,24 +190,24 @@
     );
 
     const sorted = _Obj.entries(currencies).sort((_a, _b) => {
-        const a = _a[CODE];
-        const b = _b[CODE];
-        if (a === cardCurrency) {
+      const a = _a[CODE];
+      const b = _b[CODE];
+      if (a === cardCurrency) {
+        return -1;
+      }
+      if (b === cardCurrency) {
+        return 1;
+      }
+      if (_Arr.contains(topCurrencies, a)) {
+        if (_Arr.contains(topCurrencies, b)) {
+          const indexOfA = topCurrencies.indexOf(a);
+          const indexOfB = topCurrencies.indexOf(b);
+          return indexOfA > indexOfB ? 1 : -1;
+        } else {
           return -1;
         }
-        if (b === cardCurrency) {
-          return 1;
-        }
-        if (_Arr.contains(topCurrencies, a)) {
-          if (_Arr.contains(topCurrencies, b)) {
-            const indexOfA = topCurrencies.indexOf(a);
-            const indexOfB = topCurrencies.indexOf(b);
-            return indexOfA > indexOfB ? 1 : -1;
-          } else {
-            return -1;
-          }
-        }
-        return 0;
+      }
+      return 0;
     });
 
     return _Arr.map(sorted, _currency => {
@@ -216,7 +216,7 @@
 
       return _Obj.extend(
         {
-        currency,
+          currency,
         },
         rest
       );
@@ -319,8 +319,10 @@
       </div>
       <SearchModal
         title="Select Currency to Pay"
-        inputPlaceholderText="Search for currency or code"
-        currencies={sortedCurrencies}
+        placeholder="Search for currency or code"
+        items={sortedCurrencies}
+        keys={['currency', 'name', 'symbol']}
+        component={CurrencySearchItem}
         visible={false}
         bind:this={searchModal}
         on:select={({ detail }) => onSelect(detail)} />
