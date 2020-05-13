@@ -176,20 +176,20 @@
    * 3.) Entity Currency
    * 4.) Rest
    * @param {Object} currencies
-   * @returns {Object} sortedCurrencies
+   * @returns {Array<Object>} sortedCurrencies
    */
   function sortCurrencies(currencies) {
     const CODE = 0;
     const CONFIG = 1;
+
     // Insert entity currency on 3rd position.
     const topCurrencies = _Arr.insertAt(
       TOP_CURRENCIES.slice(),
       getCurrency(),
       2
     );
-    return _Obj
-      .entries(currencies)
-      .sort((_a, _b) => {
+
+    const sorted = _Obj.entries(currencies).sort((_a, _b) => {
         const a = _a[CODE];
         const b = _b[CODE];
         if (a === cardCurrency) {
@@ -208,11 +208,19 @@
           }
         }
         return 0;
-      })
-      .reduce((acc, r) => {
-        acc[r[CODE]] = r[CONFIG];
-        return acc;
-      }, {});
+    });
+
+    return _Arr.map(sorted, _currency => {
+      const currency = _currency[0];
+      const rest = _currency[1];
+
+      return _Obj.extend(
+        {
+        currency,
+        },
+        rest
+      );
+    });
   }
 
   function showCurrenciesModal() {
