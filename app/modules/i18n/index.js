@@ -29,54 +29,18 @@ function makeBundleUrl(locale) {
  * @returns {Promise<Object>}
  */
 function fetchBundle(locale) {
-  return Promise.resolve({
-    netbanking: {
-      select_label: 'Select a different bank2',
-      select_help: 'Please select a bank2',
-    },
-    methods: {
-      prefixes: {
-        card: 'Cards2',
-        netbanking: 'Netbanking2',
-        emi: 'EMI2',
-        paylater: 'PayLater2',
-        paypal: 'PayPal2',
-        qr: 'UPI QR2',
-        upi: 'UPI2',
-        wallet: 'Wallets2',
-        gpay: 'Google Pay2',
+  return new Promise((resolve, reject) => {
+    fetch({
+      url: makeBundleUrl(locale),
+      callback: (response) => {
+        if (response.error) {
+          reject(response.error);
+        } else {
+          resolve(response);
+        }
       },
-      titles: {
-        card: 'Card2',
-        cardless_emi: 'EMI2',
-        credit_card: 'Credit Card2',
-        debit_card: 'Debit Card2',
-        emi: 'EMI2',
-        nach: 'NACH2',
-        netbanking: 'Netbanking2',
-        paylater: 'Pay Later2',
-        paypal: 'PayPal2',
-        qr: 'UPI QR2',
-        upiqr: 'UPI / QR2',
-        upi: 'UPI2',
-        gpay: 'Google Pay2',
-        wallet: 'Wallet2',
-        bank_transfer: 'Bank Transfer2',
-      },
-    },
+    });
   });
-  // return new Promise((resolve, reject) => {
-  //   fetch({
-  //     url: makeBundleUrl(locale),
-  //     callback: (response) => {
-  //       if (response.error) {
-  //         reject(response.error);
-  //       } else {
-  //         resolve(response);
-  //       }
-  //     },
-  //   });
-  // });
 }
 
 export function init() {
