@@ -9,6 +9,9 @@
   export let subtitle = null; // Override: subtitle. Picked from method if not overridden.
   export let downtime = true; // Should we consider downtime?
 
+  // Store
+  import { locale } from 'svelte-i18n';
+
   // UI imports
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import Icon from 'ui/elements/Icon.svelte';
@@ -37,28 +40,39 @@
     }
   }
 
-  // Items to display
-  const _title = title || getMethodNameForPaymentOption(method, { session });
-
   const icons = session.themeMeta.icons;
-  let _icon;
-  if (icon) {
-    _icon = icon;
-  } else {
-    if (/card$/.test(method)) {
-      _icon = icons['card'];
+  const _icon = getIconForDisplay();
+
+  let _subtitle;
+  $: $locale, (_subtitle = getSubtitleForDisplay());
+
+  let _title;
+  $: $locale, (_title = getTitleForDisplay());
+
+  function getSubtitleForDisplay() {
+    if (subtitle) {
+      return subtitle;
+    } else if (down) {
+      return getMethodDowntimeDescription(method);
     } else {
-      _icon = icons[method];
+      return getMethodDescription(method, { session });
     }
   }
 
-  let _subtitle;
-  if (subtitle) {
-    _subtitle = subtitle;
-  } else if (down) {
-    _subtitle = getMethodDowntimeDescription(method);
-  } else {
-    _subtitle = getMethodDescription(method, { session });
+  function getTitleForDisplay() {
+    return title || getMethodNameForPaymentOption(method, { session });
+  }
+
+  function getIconForDisplay() {
+    if (icon) {
+      return icon;
+    } else {
+      if (/card$/.test(method)) {
+        return icons['card'];
+      } else {
+        return icons[method];
+      }
+    }
   }
 
   function select(event) {

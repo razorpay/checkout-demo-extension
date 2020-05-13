@@ -10,10 +10,20 @@ import {
 import { getRecurringMethods, isRecurring } from 'checkoutstore';
 import { generateTextFromList } from 'lib/utils';
 
-import { getMethodPrefix, getMethodTitle } from 'i18n';
+import {
+  getMethodPrefix,
+  getMethodTitle,
+  getNetworkName,
+  getPaylaterProviderName,
+  getCardlessEmiProviderName,
+  getRawMethodDescription,
+  getWalletName,
+} from 'i18n';
 
 function getRecurringCardDescription() {
   if (isRecurring()) {
+    // TODO: fix this to return network codes instead of names
+    // TODO: use template when implemented
     return getRecurringMethods().card?.credit?.join(' and ') + ' credit cards';
   }
 }
@@ -25,25 +35,16 @@ const CARD_DESCRIPTION = ({ session }) => {
   }
 
   // Keep in order that we want to display
-  const NW_MAP = {
-    VISA: 'Visa',
-    MC: 'MasterCard',
-    RUPAY: 'RuPay',
-    AMEX: 'Amex',
-    DICL: 'Diners Club',
-    MAES: 'Maestro',
-    JCB: 'JCB',
-  };
+  const NW_ORDER = ['VISA', 'MC', 'RUPAY', 'AMEX', 'DICL', 'MAES', 'JCB'];
 
   // Get all networks from preferences.
   const networksFromPrefs = getCardNetworks();
 
   // Get the network names to show
   const networks =
-    NW_MAP
-    |> _Obj.keys
+    NW_ORDER
     |> _Arr.filter((network) => Boolean(networksFromPrefs[network]))
-    |> _Arr.map((network) => NW_MAP[network]);
+    |> _Arr.map(getNetworkName);
 
   return generateTextFromList(networks, 4);
 };
@@ -62,11 +63,11 @@ const DESCRIPTIONS = {
     const cardEmi = isMethodEnabled('emi');
     let providerNames = [];
     _Obj.loop(getCardlessEMIProviders(), (providerObj) => {
-      providerNames.push(providerObj.name);
+      providerNames.push(getCardlessEmiProviderName(providerObj.code));
     });
 
     if (cardEmi) {
-      providerNames.unshift('Cards');
+      providerNames.unshift(getMethodPrefix('card'));
     }
 
     const text = generateTextFromList(providerNames, 3);
@@ -74,27 +75,31 @@ const DESCRIPTIONS = {
     if (cardEmi) {
       return text;
     } else {
+      // TODO: use templates
       return `EMI via ${text}`;
     }
   },
   credit_card: CARD_DESCRIPTION,
   debit_card: CARD_DESCRIPTION,
-  emandate: () => 'Pay with Netbanking',
-  emi: () => 'EMI via Credit & Debit Cards',
-  netbanking: () => 'All Indian banks',
+  emandate: () => getRawMethodDescription('emandate'),
+  emi: () => getRawMethodDescription('emi'),
+  netbanking: () => getRawMethodDescription('netbanking'),
   paylater: () => {
-    const providers = getPayLaterProviders().map((p) => p.name);
+    const providers = getPayLaterProviders().map((p) =>
+      getPaylaterProviderName(p.code)
+    );
     const text = generateTextFromList(providers, 2);
 
+    // TODO: use templates
     return `Pay later using ${text}`;
   },
-  paypal: () => 'Pay using PayPal wallet',
-  qr: () => 'Pay by scanning QR Code',
-  gpay: () => 'Instant payment using Google Pay App',
-  upi: () => 'Instant payment using UPI App',
+  paypal: () => getRawMethodDescription('paypal'),
+  qr: () => getRawMethodDescription('qr'),
+  gpay: () => getRawMethodDescription('gpay'),
+  upi: () => getRawMethodDescription('upi'),
   wallet: () =>
     generateTextFromList(
-      getWallets().map((w) => w.name),
+      getWallets().map((w) => getWalletName(w.code)),
       2
     ),
 };
@@ -134,7 +139,6 @@ export function getEMIBanksText() {
 /**
  * Returns the prefix for the given method.
  * @param {String} method
- * @param {string} locale
  * @return {String}
  */
 export function getTranslatedMethodPrefix(method) {
@@ -173,7 +177,6 @@ function getMethodForPrefix(method) {
  * @param {string} method
  * @param {Object} extra
  *  @prop {Session} session
- * @param {string} locale
  *
  * @returns {string}
  */
@@ -214,17 +217,17 @@ export function getMethodNameForPaymentOption(method, extra = {}) {
 /**
  * Returns the downtime description for the given method.
  * @param {string} method
- * @param {string} locale
  * @param {Object} param1
  *  @prop {Array} availableMethods
  */
 export function getMethodDowntimeDescription(
   method,
-  { availableMethods = [], downMethods = [] } = {},
-  locale = 'en'
+  { availableMethods = [], downMethods = [] } = {}
 ) {
-  const prefix = getTranslatedMethodPrefix(method, locale);
+  const prefix = getTranslatedMethodPrefix(method);
   const pluralPrefix = /s$/i.test(prefix);
+
+  // TODO: use templates
   const isOrAre = pluralPrefix ? 'are' : 'is';
 
   const sentences = [`${prefix} ${isOrAre} facing temporary issues right now.`];
