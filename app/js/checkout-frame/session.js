@@ -3500,12 +3500,6 @@ Session.prototype = {
     }
     var invalids = $(parent).find('.invalid');
     if (invalids && invalids[0]) {
-      Analytics.track('shake:invalid', {
-        data: {
-          class: $(invalids[0]).attr('class'),
-          id: $(invalids[0]).attr('id'),
-        },
-      });
       this.shake();
       var invalidInput =
         $(invalids[0]).find('.input')[0] ||
@@ -3515,6 +3509,14 @@ Session.prototype = {
       } else if ($(invalids[0]).hasClass('selector')) {
         $(invalids[0]).focus();
       }
+
+      var culprit = invalidInput || invalids[0];
+      Analytics.track('shake:invalid', {
+        data: {
+          class: $(culprit).attr('class'),
+          id: $(culprit).attr('id'),
+        },
+      });
 
       each(invalids, function(i, field) {
         $(field).addClass('mature');
