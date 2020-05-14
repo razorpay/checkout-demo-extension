@@ -135,12 +135,11 @@
     text-align: left;
   }
   .neft-details {
-    margin: 15px 0 0 -15px;
+    margin: 16px -12px 0 -12px;
     padding: 10px 5px;
     border: 1px solid rgba(0, 0, 0, 0.08);
     box-sizing: border-box;
     box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.01);
-    width: 110%;
   }
   .ct-tr {
     padding: 5px 10px;
