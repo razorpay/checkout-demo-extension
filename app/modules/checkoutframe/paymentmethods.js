@@ -18,6 +18,7 @@ import {
   getCardlessEmiProviderName,
   getRawMethodDescription,
   getWalletName,
+  formatTemplateWithLocale,
 } from 'i18n';
 
 function getRecurringCardDescription() {
@@ -75,8 +76,11 @@ const DESCRIPTIONS = {
     if (cardEmi) {
       return text;
     } else {
-      // TODO: use templates
-      return `EMI via ${text}`;
+      return formatTemplateWithLocale(
+        'methods.descriptions.cardless_emi',
+        { text },
+        locale
+      );
     }
   },
   credit_card: CARD_DESCRIPTION,

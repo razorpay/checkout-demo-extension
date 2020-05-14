@@ -40,6 +40,7 @@ export default {
       qr: 'Pay by scanning QR Code',
       gpay: 'Instant payment using Google Pay App',
       upi: 'Instant payment using UPI App',
+      cardless_emi: 'EMI via {text}',
     },
   },
   networks: {
