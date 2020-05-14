@@ -16,6 +16,8 @@
   import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
+  import SearchModal from 'ui/elements/SearchModal.svelte';
+  import BankSearchItem from 'ui/elements/search-item/Bank.svelte';
 
   // i18n labels
   import { NETBANKING_SELECT_LABEL, NETBANKING_SELECT_HELP } from 'ui/labels';
@@ -55,9 +57,22 @@
   let selectedBankHasSevereDowntime;
   let selectedBankHasLowDowntime;
   let selectedBankHasDowntime;
+  let selectedBankName;
+
+  $: {
+    if ($selectedBank) {
+      selectedBankName = _Arr.find(
+        banksArr,
+        bank => bank.code === $selectedBank
+      ).name;
+    } else {
+      selectedBankName = null;
+    }
+  }
 
   // Refs
   let radioContainer;
+  let searchModal;
 
   // Actions
   const focus = InputActions.focus;
@@ -203,6 +218,11 @@
   .input-radio:first-of-type {
     margin-top: 4px;
   }
+
+  .dropdown-like {
+    width: 100%;
+    text-align: start;
+  }
 </style>
 
 <!-- TODO: remove override after fixing method check -->
@@ -223,26 +243,20 @@
         {/each}
       </div>
 
-      <div class="elem-wrap pad">
+      <div class="elem-wrap pad" style="margin-bottom: 24px;">
         <div id="nb-elem" class="elem select" class:invalid>
           <i class="select-arrow"></i>
           <!-- LABEL: Please select a bank -->
           <div class="help">{$t(NETBANKING_SELECT_HELP)}</div>
-          <select
+          <button
+            class="input dropdown-like"
+            type="button"
             id="bank-select"
-            name="bank"
-            required
-            class="input no-refresh no-validate no-focus no-blur"
-            bind:value={$selectedBank}
-            use:focus
-            use:blur
-            use:input>
-            <!-- LABEL: Select a different bank -->
-            <option value="">{$t(NETBANKING_SELECT_LABEL)}</option>
-            {#each banksArr as bank}
-              <option value={bank.code}>{bank.name}</option>
-            {/each}
-          </select>
+            on:click={() => searchModal.open()}>
+            {#if $selectedBank}
+              {selectedBankName}
+            {:else}{$t(NETBANKING_SELECT_LABEL)}{/if}
+          </button>
         </div>
       </div>
 
@@ -279,6 +293,18 @@
         </div>
       {/if}
     </div>
+
+    <SearchModal
+      title="Select Bank to Pay"
+      placeholder="Search for bank"
+      items={banksArr}
+      keys={['code', 'name']}
+      component={BankSearchItem}
+      bind:this={searchModal}
+      on:select={({ detail }) => {
+        $selectedBank = detail.code;
+        searchModal.close();
+      }} />
 
     <Bottom tab="netbanking">
       <!-- Show recurring message for recurring payments -->
