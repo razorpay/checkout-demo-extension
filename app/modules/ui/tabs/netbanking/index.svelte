@@ -272,7 +272,7 @@
 
   #bank-select {
     padding-top: 0;
-    margin-top: 24px;
+    margin-top: 12px;
   }
 </style>
 
