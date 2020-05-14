@@ -1,11 +1,14 @@
 <script>
   // Svelte imports
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { createEventDispatcher, onMount, tick } from 'svelte';
 
   // UI imports
   import Stack from 'ui/layouts/Stack.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import { getMiscIcon } from 'checkoutframe/icons';
+
+  // Utils imports
+  import { isMobile } from 'common/useragent';
 
   // Props
   export let visible = false;
@@ -26,6 +29,9 @@
   let query = '';
   let matchingItems = items;
 
+  // Refs
+  let inputField;
+
   function updateMatches() {
     matchingItems = _Arr.filter(items, item => {
       const queryText = query.toLowerCase().trim();
@@ -42,8 +48,31 @@
     dispatch('select', item);
   }
 
+  function focus() {
+    if (!inputField) {
+      return;
+    }
+
+    /**
+     * Focus on input field on Desktop.
+     * Handle focus on the parent on mobile.
+     */
+    if (isMobile()) {
+      const parent = _El.parent(inputField);
+
+      if (parent) {
+        parent.focus();
+      }
+    } else {
+      inputField.focus();
+    }
+  }
+
   export function open() {
     visible = true;
+
+    // Wait for UI updates before focusing
+    tick().then(focus);
   }
 
   export function close() {
@@ -180,7 +209,12 @@
       <div class="icon">
         <Icon icon={getMiscIcon('search')} />
       </div>
-      <input type="text" {autocomplete} {placeholder} bind:value={query} />
+      <input
+        type="text"
+        {autocomplete}
+        {placeholder}
+        bind:value={query}
+        bind:this={inputField} />
     </div>
     <div class="list">
       {#if matchingItems.length}
