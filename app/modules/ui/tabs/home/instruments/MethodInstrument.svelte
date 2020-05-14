@@ -35,7 +35,7 @@
 
   let title;
   $: title = formatTemplateWithLocale(
-    TITLE_GENERIC,
+    TITLE_GENERIC, // LABEL: Pay using {name}
     { name: methodName },
     $locale
   );

@@ -39,7 +39,7 @@
      */
     if (names.length === 1) {
       name = formatTemplateWithLocale(
-        SINGLE_BLOCK_TITLE,
+        SINGLE_BLOCK_TITLE, // LABEL: Pay via {method}
         { method: names[0] },
         $locale
       );

@@ -69,6 +69,7 @@
     <div class="methods-block" data-block={block.code}>
       <h3 class="title">
         {#if block.code === 'rzp.preferred'}
+          <!-- LABEL: Preferred Payment Methods -->
           {$t(PREFERRED_BLOCK_TITLE)}
         {:else}{block.title || 'Available Payment Methods'}{/if}
       </h3>

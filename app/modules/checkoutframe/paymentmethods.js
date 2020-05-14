@@ -32,7 +32,7 @@ function getRecurringCardDescription(locale) {
   const recurringNetworks = getRecurringMethods().card?.credit || [];
   const networks = generateTextFromList(recurringNetworks);
   return formatTemplateWithLocale(
-    DESCRIPTION_RECURRING_CARDS,
+    DESCRIPTION_RECURRING_CARDS, // LABEL: {networks} credit cards
     { networks },
     locale
   );
@@ -85,7 +85,7 @@ const DESCRIPTIONS = {
       return text;
     } else {
       return formatTemplateWithLocale(
-        DESCRIPTION_CARDLESS_EMI,
+        DESCRIPTION_CARDLESS_EMI, // LABEL: EMI via {text}
         { text },
         locale
       );
