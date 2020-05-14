@@ -9,6 +9,9 @@ export default {
   home: {
     preferred_block_title: 'Preferred Payment Methods',
     single_block_title: 'Pay via ${method}',
+    contact_label_required: 'Phone with Country Code',
+    contact_label_optional: 'Phone with Country Code (Optional)',
+    contact_help_text: 'Please enter a valid contact number',
   },
   bank_transfer: {
     loading_message: 'Getting bank details...',
