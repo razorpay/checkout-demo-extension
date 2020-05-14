@@ -71,18 +71,13 @@ function createCombinations(instrument, sequence) {
       }));
     } else {
       // Things have already been pushed so far, extend existing objects
-      let _soFar = [];
-
-      _Arr.loop(values, value => {
-        _soFar = _Arr.mergeWith(
-          _soFar,
-          _Arr.map(soFar, s =>
-            _Obj.extend(
-              {
-                [singularKey]: value,
-              },
-              s
-            )
+      const _soFar = _Arr.flatMap(values, value => {
+        return _Arr.map(soFar, s =>
+          _Obj.extend(
+            {
+              [singularKey]: value,
+            },
+            s
           )
         );
       });
