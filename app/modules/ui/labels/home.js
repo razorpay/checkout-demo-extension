@@ -15,3 +15,10 @@ export const PARTIAL_AMOUNT_PLACEHOLDER = 'home.partial_amount_placeholder';
 export const PARTIAL_AMOUNT_HELP_INVALID = 'home.partial_amount_help_invalid';
 export const PARTIAL_AMOUNT_HELP_LOWER = 'home.partial_amount_help_lower';
 export const PARTIAL_AMOUNT_HELP_HIGHER = 'home.partial_amount_help_higher';
+
+export const ADDRESS_LABEL = 'home.address_label';
+export const ADDRESS_HELP = 'home.address_help';
+export const PINCODE_LABEL = 'home.pincode_label';
+export const PINCODE_HELP = 'home.pincode_help';
+export const STATE_LABEL = 'home.state_label';
+export const STATE_HELP = 'home.state_help';

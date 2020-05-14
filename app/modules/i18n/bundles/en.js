@@ -24,6 +24,12 @@ export default {
     partial_amount_help_invalid: 'Please enter a valid amount upto {amount}',
     partial_amount_help_lower: 'Minimum payable amount is {amount}',
     partial_amount_help_higher: 'Amount cannot exceed {amount}',
+    address_label: 'Address',
+    address_help: 'Address should be at least 10 characters long',
+    pincode_label: 'PIN Code',
+    pincode_help: 'Enter 6 digit pincode',
+    state_label: 'Select State',
+    state_help: 'Select a value from list of states',
   },
   bank_transfer: {
     loading_message: 'Getting bank details...',
