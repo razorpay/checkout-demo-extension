@@ -20,7 +20,12 @@
   import BankSearchItem from 'ui/elements/search-item/Bank.svelte';
 
   // i18n labels
-  import { NETBANKING_SELECT_LABEL, NETBANKING_SELECT_HELP } from 'ui/labels';
+  import {
+    NETBANKING_SELECT_LABEL,
+    NETBANKING_SELECT_HELP,
+    NETBANKING_SEARCH_TITLE,
+    NETBANKING_SEARCH_PLACEHOLDER,
+  } from 'ui/labels';
 
   // Utils imports
   import Razorpay from 'common/Razorpay';
@@ -351,9 +356,11 @@
       {/if}
     </div>
 
+    <!-- LABEL: Select bank to pay -->
+    <!-- LABEL: Search for bank -->
     <SearchModal
-      title="Select Bank to Pay"
-      placeholder="Search for bank"
+      title={$t(NETBANKING_SEARCH_TITLE)}
+      placeholder={$t(NETBANKING_SEARCH_PLACEHOLDER)}
       items={banksArr}
       keys={['code', 'name']}
       component={BankSearchItem}
