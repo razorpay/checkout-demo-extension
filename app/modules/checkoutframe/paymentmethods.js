@@ -1,4 +1,4 @@
-import { TAB_TITLES, AVAILABLE_METHODS } from 'common/constants';
+import { AVAILABLE_METHODS } from 'common/constants';
 import {
   isMethodEnabled,
   getPayLaterProviders,
@@ -7,6 +7,7 @@ import {
   getCardNetworks,
   getEMIBanks,
 } from 'checkoutstore/methods';
+
 import { getRecurringMethods, isRecurring } from 'checkoutstore';
 import { generateTextFromList } from 'lib/utils';
 
