@@ -22,18 +22,20 @@ import {
   formatTemplateWithLocale,
 } from 'i18n';
 
-function getRecurringCardDescription() {
-  if (isRecurring()) {
-    // TODO: fix this to return network codes instead of names
-    // TODO: use template when implemented
-    return getRecurringMethods().card?.credit?.join(' and ') + ' credit cards';
-  }
+function getRecurringCardDescription(locale) {
+  // TODO: fix this to return network codes instead of names
+  const recurringNetworks = getRecurringMethods().card?.credit || [];
+  const networks = generateTextFromList(recurringNetworks);
+  return formatTemplateWithLocale(
+    'methods.descriptions.recurring_cards',
+    { networks },
+    locale
+  );
 }
 
 const CARD_DESCRIPTION = locale => {
-  const recurring_text = getRecurringCardDescription();
-  if (recurring_text) {
-    return recurring_text;
+  if (isRecurring()) {
+    return getRecurringCardDescription(locale);
   }
 
   // Keep in order that we want to display
