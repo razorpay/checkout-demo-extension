@@ -20,11 +20,6 @@ const {
   assertCardScreenAndText,
 } = require('./config-utils');
 
-const BANKS_MAP = {
-  ICIC: 'ICICI Bank',
-  HDFC: 'HDFC Bank',
-};
-
 function augmentPreferences(preferences) {
   return {
     ...preferences,
@@ -309,7 +304,7 @@ describe('display.blocks', () => {
     await assertShownBanks(
       context,
       CONFIG.display.blocks.grouped.instruments[0].banks.map(
-        code => BANKS_MAP[code]
+        code => preferences.methods.netbanking[code]
       )
     );
   });
