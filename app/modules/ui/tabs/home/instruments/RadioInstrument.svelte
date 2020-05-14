@@ -174,9 +174,11 @@
 
   $: {
     const details = getDetailsForInstrument(individualInstrument, $locale);
-    title = details.title;
-    icon = details.icon;
-    alt = details.alt;
+    if (details) {
+      title = details.title;
+      icon = details.icon;
+      alt = details.alt;
+    }
   }
 
   /**
