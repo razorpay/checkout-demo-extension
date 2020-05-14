@@ -38,6 +38,7 @@
   } from 'common/bank';
   import { scrollIntoView } from 'lib/utils';
   import { hideCta, showCtaWithDefaultText } from 'checkoutstore/cta';
+  import { getSession } from 'sessionmanager';
 
   // Props
   export let banks;
@@ -75,6 +76,7 @@
   // Refs
   let radioContainer;
   let searchModal;
+  let bankSelect;
 
   // Actions
   const focus = InputActions.focus;
@@ -118,6 +120,11 @@
     searchModal.close();
     determineCtaVisibility();
     isSearchOpened = false;
+
+    // Restore focus
+    if (bankSelect) {
+      bankSelect.focus();
+    }
   }
 
   export function onBack() {
@@ -129,6 +136,19 @@
     }
 
     active = false;
+  }
+
+  /**
+   * Handle when the user presses Enter while focused
+   * on button#bank-select
+   */
+  function handleEnterOnButton(event) {
+    // 13 = Enter
+    if (_.getKeyFromEvent(event) === 13) {
+      event.preventDefault();
+
+      getSession().preSubmit();
+    }
   }
 
   function setRetailOption() {
@@ -249,6 +269,11 @@
     width: 100%;
     text-align: start;
   }
+
+  #bank-select {
+    padding-top: 0;
+    margin-top: 24px;
+  }
 </style>
 
 <!-- TODO: remove override after fixing method check -->
@@ -275,13 +300,19 @@
           <!-- LABEL: Please select a bank -->
           <div class="help">{$t(NETBANKING_SELECT_HELP)}</div>
           <button
+            aria-label={`${$selectedBank ? `${selectedBankName} - ${$t(NETBANKING_SELECT_LABEL)}` : $t(NETBANKING_SELECT_LABEL)}`}
             class="input dropdown-like"
             type="button"
             id="bank-select"
-            on:click={showSearch}>
+            bind:this={bankSelect}
+            on:click={showSearch}
+            on:keypress={handleEnterOnButton}>
             {#if $selectedBank}
               {selectedBankName}
-            {:else}{$t(NETBANKING_SELECT_LABEL)}{/if}
+            {:else}
+              <!-- LABEL: Select a different bank -->
+              {$t(NETBANKING_SELECT_LABEL)}
+            {/if}
           </button>
         </div>
       </div>
