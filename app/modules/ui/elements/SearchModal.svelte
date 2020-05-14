@@ -9,28 +9,34 @@
 
   // Props
   export let visible = false;
-  export let inputPlaceholderText = 'Type to search';
-  export let currencies = [];
+  export let placeholder = 'Type to search';
+  export let autocomplete;
+  export let items = [];
+  export let component;
+  export let keys;
 
   onMount(() => {
     document.querySelector('#container').appendChild(ref);
   });
 
-  // Variables
   const dispatch = createEventDispatcher();
+
+  // Variables
   let ref;
   let query = '';
-  let filteredList = currencies;
+  let matchingItems = items;
 
-  $: {
-    filteredList = _Obj.entries(currencies).filter(([code, currency]) => {
+  function updateMatches() {
+    matchingItems = _Arr.filter(items, item => {
       const queryText = query.toLowerCase().trim();
-      const matchesCode = code.toLowerCase().includes(queryText);
-      const matchesName = currency.name.toLowerCase().includes(queryText);
-      const matchesSymbol = currency.symbol.toLowerCase().includes(queryText);
-      return matchesCode || matchesName || matchesSymbol;
+
+      return _Arr.any(keys, key => {
+        return item[key].toLowerCase().includes(queryText);
+      });
     });
   }
+
+  $: query, updateMatches();
 
   function onSelect(item) {
     dispatch('select', item);
@@ -158,25 +164,6 @@
     background-color: #eff0f1;
   }
 
-  .list-item .middle {
-    flex-grow: 1;
-    padding-left: 12px;
-  }
-
-  .list-item .left,
-  .list-item .right {
-    min-width: 36px;
-  }
-
-  .list-item .left {
-    border-right: 1px solid #888;
-  }
-
-  .list-item .right {
-    text-align: right;
-    border-left: 1px solid #888;
-  }
-
   .no-results {
     display: flex;
     justify-content: center;
@@ -193,19 +180,13 @@
       <div class="icon">
         <Icon icon={getMiscIcon('search')} />
       </div>
-      <input
-        type="text"
-        autocomplete="transaction-currency"
-        placeholder={inputPlaceholderText}
-        bind:value={query} />
+      <input type="text" {autocomplete} {placeholder} bind:value={query} />
     </div>
     <div class="list">
-      {#if filteredList.length}
-        {#each filteredList as [code, config]}
-          <div class="list-item" on:click={() => onSelect(code)}>
-            <div class="left">{code}</div>
-            <div class="middle">{config.name}</div>
-            <div class="right">{config.symbol}</div>
+      {#if matchingItems.length}
+        {#each matchingItems as item}
+          <div class="list-item" on:click={() => onSelect(item)}>
+            <svelte:component this={component} {item} />
           </div>
         {/each}
       {:else}
