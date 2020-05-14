@@ -70,6 +70,8 @@
   }
 
   export function open() {
+    query = '';
+
     visible = true;
 
     // Wait for UI updates before focusing
