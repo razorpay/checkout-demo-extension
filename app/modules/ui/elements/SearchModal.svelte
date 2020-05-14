@@ -19,7 +19,7 @@
   export let keys;
 
   onMount(() => {
-    document.querySelector('#container').appendChild(ref);
+    document.querySelector('#modal-inner').appendChild(ref);
   });
 
   const dispatch = createEventDispatcher();
@@ -118,15 +118,8 @@
     background-color: white;
     width: 100%;
     height: 100%;
-    margin-top: 24px;
-    max-width: 344px * 0.9;
-    max-height: 500px * 0.95;
-  }
-
-  :global(.mobile) .search-box {
-    margin-top: 0;
-    max-width: 92%;
-    max-height: 85%;
+    width: 90%;
+    height: 90%;
   }
 
   .search-box {
