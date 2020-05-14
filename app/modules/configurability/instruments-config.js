@@ -110,10 +110,9 @@ const config = {
       if (grouped.token_id) {
         const token_id = grouped.token_id;
         const token = _Arr.find(tokens, token => token.id === token_id);
-        let instrumentFromToken;
 
         if (token) {
-          instrumentFromToken = [
+          let instrumentFromToken = [
             _Obj.extend(
               {
                 token_id,
@@ -124,9 +123,7 @@ const config = {
               base
             ),
           ];
-        }
 
-        if (instrumentFromToken) {
           return instrumentFromToken;
         }
       }
