@@ -2,6 +2,9 @@ export default {
   netbanking: {
     select_label: 'Select a different bank',
     select_help: 'Please select a bank',
+    selection_radio_text: 'Complete Payment Using',
+    corporate_label: 'Corporate',
+    retail_label: 'Retail',
   },
   home: {
     preferred_block_title: 'Preferred Payment Methods',

@@ -19,6 +19,9 @@
   import {
     NETBANKING_SELECT_LABEL,
     NETBANKING_SELECT_HELP,
+    CORPORATE_RADIO_LABEL,
+    RETAIL_RADIO_LABEL,
+    SELECTION_RADIO_TEXT,
   } from 'ui/labels/netbanking';
 
   import { t, locale } from 'svelte-i18n';
@@ -257,7 +260,8 @@
           class="pad ref-radiocontainer"
           bind:this={radioContainer}
           transition:fade={{ duration: 100 }}>
-          <label>Complete Payment Using</label>
+          <!-- LABEL: Complete Payment Using -->
+          <label>{$t(SELECTION_RADIO_TEXT)}</label>
           <div class="input-radio">
             <input
               type="radio"
@@ -267,7 +271,8 @@
               on:click={setRetailOption} />
             <label for="nb_type_retail">
               <div class="radio-display" />
-              <div class="label-content">Retail</div>
+              <!-- LABEL: Retail -->
+              <div class="label-content">{$t(RETAIL_RADIO_LABEL)}</div>
             </label>
           </div>
           <div class="input-radio">
@@ -279,7 +284,8 @@
               on:click={setCorporateOption} />
             <label for="nb_type_corporate">
               <div class="radio-display" />
-              <div class="label-content">Corporate</div>
+              <!-- LABEL: Corporate -->
+              <div class="label-content">{$t(CORPORATE_RADIO_LABEL)}</div>
             </label>
           </div>
         </div>
