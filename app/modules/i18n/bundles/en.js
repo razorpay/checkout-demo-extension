@@ -42,6 +42,7 @@ export default {
       upi: 'Instant payment using UPI App',
       cardless_emi: 'EMI via {text}',
       recurring_cards: '{networks} credit cards',
+      paylater: 'Pay later using {providers}',
     },
   },
   networks: {

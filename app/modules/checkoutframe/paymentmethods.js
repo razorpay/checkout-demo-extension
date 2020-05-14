@@ -96,9 +96,11 @@ const DESCRIPTIONS = {
       getPaylaterProviderName(p.code, locale)
     );
     const text = generateTextFromList(providers, 2);
-
-    // TODO: use templates
-    return `Pay later using ${text}`;
+    return formatTemplateWithLocale(
+      'methods.descriptions.paylater',
+      { providers: text },
+      locale
+    );
   },
   paypal: locale => getRawMethodDescription('paypal', locale),
   qr: locale => getRawMethodDescription('qr', locale),
