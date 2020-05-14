@@ -1,6 +1,7 @@
 <script>
   // Svelte imports
   import { createEventDispatcher, onMount, tick } from 'svelte';
+  import { fade, slide, fly } from 'svelte/transition';
 
   // UI imports
   import Stack from 'ui/layouts/Stack.svelte';
@@ -192,31 +193,35 @@
 <div bind:this={ref}>
   {#if visible}
     <div class="search-curtain">
-  <div class="search-curtain-bg" on:click={close} />
-  <div class="search-box">
-    <div class="search-field">
-      <div class="icon">
-        <Icon icon={getMiscIcon('search')} />
-      </div>
-      <input
-        type="text"
-        {autocomplete}
-        {placeholder}
-        bind:value={query}
-        bind:this={inputField} />
-    </div>
-    <div class="list">
-      {#if matchingItems.length}
-        {#each matchingItems as item}
-          <div class="list-item" on:click={() => onSelect(item)}>
-            <svelte:component this={component} {item} />
+      <div
+        class="search-curtain-bg"
+        on:click={close}
+        in:fade
+        out:fade={{ duration: 200 }} />
+      <div class="search-box" in:slide out:fade={{ duration: 200 }}>
+        <div class="search-field">
+          <div class="icon">
+            <Icon icon={getMiscIcon('search')} />
           </div>
-        {/each}
-      {:else}
-        <div class="no-results">No results for "{query}"</div>
-      {/if}
+          <input
+            type="text"
+            {autocomplete}
+            {placeholder}
+            bind:value={query}
+            bind:this={inputField} />
+        </div>
+        <div class="list">
+          {#if matchingItems.length}
+            {#each matchingItems as item}
+              <div class="list-item" on:click={() => onSelect(item)}>
+                <svelte:component this={component} {item} />
+              </div>
+            {/each}
+          {:else}
+            <div class="no-results">No results for "{query}"</div>
+          {/if}
+        </div>
+      </div>
     </div>
-  </div>
-</div>
   {/if}
 </div>
