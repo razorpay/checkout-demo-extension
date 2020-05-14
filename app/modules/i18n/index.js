@@ -86,7 +86,7 @@ export function getBundle(locale) {
  * @returns {string}
  */
 export function formatTemplateWithLocale(label, data, locale) {
-  return get(t)({ id: label, locale, data });
+  return get(t)({ id: label, locale, values: data });
 }
 
 /**
