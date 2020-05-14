@@ -28,7 +28,7 @@ function getRecurringCardDescription() {
   }
 }
 
-const CARD_DESCRIPTION = ({ session }) => {
+const CARD_DESCRIPTION = locale => {
   const recurring_text = getRecurringCardDescription();
   if (recurring_text) {
     return recurring_text;
@@ -43,8 +43,8 @@ const CARD_DESCRIPTION = ({ session }) => {
   // Get the network names to show
   const networks =
     NW_ORDER
-    |> _Arr.filter((network) => Boolean(networksFromPrefs[network]))
-    |> _Arr.map(getNetworkName);
+    |> _Arr.filter(network => Boolean(networksFromPrefs[network]))
+    |> _Arr.map(network => getNetworkName(network, locale));
 
   return generateTextFromList(networks, 4);
 };
@@ -54,7 +54,7 @@ const CARD_DESCRIPTION = ({ session }) => {
  */
 const DESCRIPTIONS = {
   card: CARD_DESCRIPTION,
-  cardless_emi: () => {
+  cardless_emi: locale => {
     /**
      * EMI + Cardless EMI: Cards, ZestMoney, & More
      * Cardless EMI: EMI via ZestMoney & More
@@ -62,12 +62,12 @@ const DESCRIPTIONS = {
 
     const cardEmi = isMethodEnabled('emi');
     let providerNames = [];
-    _Obj.loop(getCardlessEMIProviders(), (providerObj) => {
-      providerNames.push(getCardlessEmiProviderName(providerObj.code));
+    _Obj.loop(getCardlessEMIProviders(), providerObj => {
+      providerNames.push(getCardlessEmiProviderName(providerObj.code, locale));
     });
 
     if (cardEmi) {
-      providerNames.unshift(getMethodPrefix('card'));
+      providerNames.unshift(getMethodPrefix('card', locale));
     }
 
     const text = generateTextFromList(providerNames, 3);
@@ -81,25 +81,25 @@ const DESCRIPTIONS = {
   },
   credit_card: CARD_DESCRIPTION,
   debit_card: CARD_DESCRIPTION,
-  emandate: () => getRawMethodDescription('emandate'),
-  emi: () => getRawMethodDescription('emi'),
-  netbanking: () => getRawMethodDescription('netbanking'),
-  paylater: () => {
-    const providers = getPayLaterProviders().map((p) =>
-      getPaylaterProviderName(p.code)
+  emandate: locale => getRawMethodDescription('emandate', locale),
+  emi: locale => getRawMethodDescription('emi', locale),
+  netbanking: locale => getRawMethodDescription('netbanking', locale),
+  paylater: locale => {
+    const providers = getPayLaterProviders().map(p =>
+      getPaylaterProviderName(p.code, locale)
     );
     const text = generateTextFromList(providers, 2);
 
     // TODO: use templates
     return `Pay later using ${text}`;
   },
-  paypal: () => getRawMethodDescription('paypal'),
-  qr: () => getRawMethodDescription('qr'),
-  gpay: () => getRawMethodDescription('gpay'),
-  upi: () => getRawMethodDescription('upi'),
-  wallet: () =>
+  paypal: locale => getRawMethodDescription('paypal', locale),
+  qr: locale => getRawMethodDescription('qr', locale),
+  gpay: locale => getRawMethodDescription('gpay', locale),
+  upi: locale => getRawMethodDescription('upi', locale),
+  wallet: locale =>
     generateTextFromList(
-      getWallets().map((w) => getWalletName(w.code)),
+      getWallets().map(w => getWalletName(w.code, locale)),
       2
     ),
 };
@@ -113,37 +113,37 @@ export const getAllMethods = () => AVAILABLE_METHODS;
 
 /**
  * Returns the method description.
- * @param {String} method
- * @param {Object} props
- *  @prop {Object} session
+ * @param {string} method
+ * @param {string} locale
  *
- * @return {String}
+ * @return {string}
  */
-export function getMethodDescription(method, props) {
+export function getMethodDescription(method, locale) {
   const fn = DESCRIPTIONS[method];
 
   if (!fn) {
     return '';
   }
 
-  return fn(props);
+  return fn(locale);
 }
 
 export function getEMIBanksText() {
   const emiBanks = getEMIBanks();
   const bankNames =
-    emiBanks |> _Obj.keys |> _Arr.map((bank) => emiBanks[bank].name);
+    emiBanks |> _Obj.keys |> _Arr.map(bank => emiBanks[bank].name);
   return generateTextFromList(bankNames, 12);
 }
 
 /**
  * Returns the prefix for the given method.
  * @param {String} method
+ * @param {string} locale
  * @return {String}
  */
-export function getTranslatedMethodPrefix(method) {
+export function getTranslatedMethodPrefix(method, locale) {
   const methodKey = getMethodForPrefix(method);
-  return getMethodPrefix(methodKey);
+  return getMethodPrefix(methodKey, locale);
 }
 
 /**
@@ -175,12 +175,13 @@ function getMethodForPrefix(method) {
  * Returns the name for the payment method.
  * Used for showing the name with payment icon
  * @param {string} method
+ * @param {string} locale
  * @param {Object} extra
  *  @prop {Session} session
  *
  * @returns {string}
  */
-export function getMethodNameForPaymentOption(method, extra = {}) {
+export function getMethodNameForPaymentOption(method, locale, extra = {}) {
   let hasInstrument = extra.instrument;
   let qrEnabled;
   let hasQr;
@@ -195,22 +196,22 @@ export function getMethodNameForPaymentOption(method, extra = {}) {
       }
 
       if (hasQr) {
-        return getMethodTitle('upiqr');
+        return getMethodTitle('upiqr', locale);
       }
 
-      return getMethodTitle('upi');
+      return getMethodTitle('upi', locale);
     }
 
     case 'cardless_emi': {
       if (hasInstrument) {
-        return getMethodTitle('cardless_emi');
+        return getMethodTitle('cardless_emi', locale);
       }
 
-      return getMethodTitle('emi');
+      return getMethodTitle('emi', locale);
     }
 
     default:
-      return getMethodTitle(method);
+      return getMethodTitle(method, locale);
   }
 }
 
@@ -235,7 +236,7 @@ export function getMethodDowntimeDescription(
   // Check if there's another method available that is not down.
   const isAnotherMethodAvailable = _Arr.any(
     availableMethods,
-    (enabledMethod) => !_Arr.contains(downMethods, enabledMethod)
+    enabledMethod => !_Arr.contains(downMethods, enabledMethod)
   );
 
   // If there's another method available, ask user to select it.

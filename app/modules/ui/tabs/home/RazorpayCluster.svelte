@@ -18,12 +18,14 @@
   const dispatch = createEventDispatcher();
 
   let title;
-  $: $locale, (title = getTitleFromInstruments(block.instruments));
+  $: title = getTitleFromInstruments(block.instruments, $locale);
 
-  function getTitleFromInstruments(instruments) {
-    const methods = _Arr.map(instruments, (instrument) => instrument.method);
+  function getTitleFromInstruments(instruments, locale) {
+    const methods = _Arr.map(instruments, instrument => instrument.method);
 
-    const names = _Arr.map(methods, getTranslatedMethodPrefix);
+    const names = _Arr.map(methods, method =>
+      getTranslatedMethodPrefix(method, locale)
+    );
 
     let name;
 

@@ -26,8 +26,9 @@
   const method = instrument.method;
 
   let methodName;
-  $: $locale,
-    (methodName = getMethodNameForPaymentOption(method, { instrument }));
+  $: methodName = getMethodNameForPaymentOption(method, $locale, {
+    instrument,
+  });
 
   let title;
   // TODO: use templates when implemented

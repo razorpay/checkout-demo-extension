@@ -44,23 +44,23 @@
   const _icon = getIconForDisplay();
 
   let _subtitle;
-  $: $locale, (_subtitle = getSubtitleForDisplay());
+  $: _subtitle = getSubtitleForDisplay($locale);
 
   let _title;
-  $: $locale, (_title = getTitleForDisplay());
+  $: _title = getTitleForDisplay($locale);
 
-  function getSubtitleForDisplay() {
+  function getSubtitleForDisplay(locale) {
     if (subtitle) {
       return subtitle;
     } else if (down) {
-      return getMethodDowntimeDescription(method);
+      return getMethodDowntimeDescription(method, locale);
     } else {
-      return getMethodDescription(method, { session });
+      return getMethodDescription(method, locale);
     }
   }
 
-  function getTitleForDisplay() {
-    return title || getMethodNameForPaymentOption(method, { session });
+  function getTitleForDisplay(locale) {
+    return title || getMethodNameForPaymentOption(method, locale);
   }
 
   function getIconForDisplay() {

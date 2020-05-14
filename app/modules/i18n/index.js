@@ -15,7 +15,7 @@ import { getSession } from 'sessionmanager';
 
 /**
  * Returns the URL for the locale bundle on CDN
- * @param locale {string}
+ * @param {string} locale
  * @returns {string}
  */
 function makeBundleUrl(locale) {
@@ -25,14 +25,14 @@ function makeBundleUrl(locale) {
 
 /**
  * Fetches the bundle for a given locale.
- * @param locale {string}
+ * @param {string} locale
  * @returns {Promise<Object>}
  */
 function fetchBundle(locale) {
   return new Promise((resolve, reject) => {
     fetch({
       url: makeBundleUrl(locale),
-      callback: (response) => {
+      callback: response => {
         if (response.error) {
           reject(response.error);
         } else {
@@ -50,7 +50,7 @@ export function init() {
 
   const session = getSession();
 
-  isLoading.subscribe((value) => {
+  isLoading.subscribe(value => {
     if (value) {
       // TODO: lock overlay and prevent dismissal
       session.showLoadError('Loading');
@@ -79,73 +79,94 @@ export function getBundle(locale) {
 }
 
 /**
- * Returns the method prefix for the current locale
- * @param {string} method
+ * Formats the message with the given locale
+ * @param {string} label
+ * @param {string} locale
  * @returns {string}
  */
-export function getMethodPrefix(method) {
-  return get(t)(`methods.prefixes.${method}`);
+function formatMessageWithLocale(label, locale) {
+  return get(t)({ id: label, locale });
 }
 
 /**
- * Returns the method title for the current locale
+ * Returns the method prefix for the given locale
  * @param {string} method
+ * @param {string} locale
  * @returns {string}
  */
-export function getMethodTitle(method) {
-  return get(t)(`methods.titles.${method}`);
+export function getMethodPrefix(method, locale) {
+  return formatMessageWithLocale(`methods.prefixes.${method}`, locale);
 }
 
 /**
- * Returns the network name for the current locale
+ * Returns the method title for the given locale
+ * @param {string} method
+ * @param {string} locale
+ * @returns {string}
+ */
+export function getMethodTitle(method, locale) {
+  return formatMessageWithLocale(`methods.titles.${method}`, locale);
+}
+
+/**
+ * Returns the network name for the given locale
  * @param {string} network
+ * @param {string} locale
  * @returns {string}
  */
-export function getNetworkName(network) {
-  return get(t)(`networks.${network.toUpperCase()}`);
+export function getNetworkName(network, locale) {
+  return formatMessageWithLocale(`networks.${network.toUpperCase()}`, locale);
 }
 
 /**
- * Returns the method description for the current locale
+ * Returns the method description for the given locale
  * @param {string} method
+ * @param {string} locale
  * @returns {string}
  */
-export function getRawMethodDescription(method) {
-  return get(t)(`methods.descriptions.${method}`);
+export function getRawMethodDescription(method, locale) {
+  return formatMessageWithLocale(`methods.descriptions.${method}`, locale);
 }
 
 /**
- * Returns the pay later provider name for the current locale
+ * Returns the pay later provider name for the given locale
  * @param {string} providerCode
+ * @param {string} locale
  * @returns {string}
  */
-export function getPaylaterProviderName(providerCode) {
-  return get(t)(`paylater.providers.${providerCode}`);
+export function getPaylaterProviderName(providerCode, locale) {
+  return formatMessageWithLocale(`paylater.providers.${providerCode}`, locale);
 }
 
 /**
- * Returns the cardless emi provider name for the current locale
+ * Returns the cardless emi provider name for the given locale
  * @param {string} providerCode
+ * @param {string} locale
  * @returns {string}
  */
-export function getCardlessEmiProviderName(providerCode) {
-  return get(t)(`cardless_emi.providers.${providerCode}`);
+export function getCardlessEmiProviderName(providerCode, locale) {
+  return formatMessageWithLocale(
+    `cardless_emi.providers.${providerCode}`,
+    locale
+  );
 }
 
 /**
- * Returns the wallet name for the current locale
+ * Returns the wallet name for the given locale
  * @param {string} walletCode
+ * @param {string} locale
  * @returns {string}
  */
-export function getWalletName(walletCode) {
-  return get(t)(`wallets.${walletCode}`);
+export function getWalletName(walletCode, locale) {
+  return formatMessageWithLocale(`wallets.${walletCode}`, locale);
 }
 
 /**
- * Returns the bank name for the current locale
+ * Returns the bank name for the given locale
  * @param bankCode
- * @returns {*}
+ * @param {string} locale
+ * @returns {string}
  */
-export function getBankName(bankCode) {
-  return get(t)(`banks.${bankCode.toUpperCase()}`);
+export function getBankName(bankCode, locale) {
+  return formatMessageWithLocale(`banks.${bankCode.toUpperCase()}`, locale);
 }
