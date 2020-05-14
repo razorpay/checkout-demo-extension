@@ -165,7 +165,6 @@ test('Module: configurability/methods', t => {
               method: 'netbanking',
             },
           ],
-          title: 'Pay via Netbanking',
         },
         {
           code: 'block.hdfc',
@@ -204,7 +203,6 @@ test('Module: configurability/methods', t => {
               method: 'wallet',
             },
           ],
-          title: 'Cards and Wallets',
         },
         {
           code: 'block.icici',
@@ -273,7 +271,6 @@ test('Module: configurability/methods', t => {
               method: 'nach',
             },
           ],
-          title: 'UPI, Google Pay & More',
         },
       ];
 

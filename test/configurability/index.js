@@ -86,7 +86,6 @@ test('Module: configurability', t => {
                   method: 'netbanking',
                 },
               ],
-              title: 'Pay via Netbanking',
             },
             {
               code: 'block.hdfc',
@@ -170,7 +169,6 @@ test('Module: configurability', t => {
                   method: 'nach',
                 },
               ],
-              title: 'Cards, Wallets & More',
             },
           ],
         },
