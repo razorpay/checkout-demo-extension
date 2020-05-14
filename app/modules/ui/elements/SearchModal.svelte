@@ -102,13 +102,7 @@
     height: 100%;
   }
 
-  .search-curtain:not(.shown) {
-    display: none;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .search-curtain.shown {
+  .search-curtain {
     display: flex;
     z-index: 3;
   }
@@ -195,7 +189,9 @@
   }
 </style>
 
-<div class="search-curtain" class:shown={visible} bind:this={ref}>
+<div bind:this={ref}>
+  {#if visible}
+    <div class="search-curtain">
   <div class="search-curtain-bg" on:click={close} />
   <div class="search-box">
     <div class="search-field">
@@ -221,4 +217,6 @@
       {/if}
     </div>
   </div>
+</div>
+  {/if}
 </div>
