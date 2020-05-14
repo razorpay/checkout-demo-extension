@@ -3,3 +3,4 @@ export const DESCRIPTION_RECURRING_CARDS =
 export const TITLE_GENERIC = 'methods.titles.generic';
 export const DESCRIPTION_CARDLESS_EMI = 'methods.descriptions.cardless_emi';
 export const PREFERRED_BLOCK_TITLE = 'home.preferred_block_title';
+export const SINGLE_BLOCK_TITLE = 'home.single_block_title';

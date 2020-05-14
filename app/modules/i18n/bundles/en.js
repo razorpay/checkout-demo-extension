@@ -5,6 +5,7 @@ export default {
   },
   home: {
     preferred_block_title: 'Preferred Payment Methods',
+    single_block_title: 'Pay via ${method}',
   },
   instruments: {
     titles: {

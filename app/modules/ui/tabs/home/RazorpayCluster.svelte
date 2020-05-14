@@ -12,6 +12,10 @@
   import { getTranslatedMethodPrefix } from 'checkoutframe/paymentmethods';
   import { generateTextFromList } from 'lib/utils';
 
+  // i18n
+  import { formatTemplateWithLocale } from 'i18n';
+  import { SINGLE_BLOCK_TITLE } from 'ui/labels/methods';
+
   // Props
   export let block;
 
@@ -30,11 +34,15 @@
     let name;
 
     /**
-     * For just one method, use "Pay via {method}"
+     * For just one method, use SINGLE_BLOCK_TITLE
      * For more, use generateTextFromList
      */
     if (names.length === 1) {
-      name = `Pay via ${names[0]}`;
+      name = formatTemplateWithLocale(
+        SINGLE_BLOCK_TITLE,
+        { method: names[0] },
+        $locale
+      );
     } else {
       name = generateTextFromList(names, 3);
     }
