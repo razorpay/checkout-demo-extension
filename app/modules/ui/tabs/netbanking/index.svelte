@@ -70,6 +70,8 @@
     }
   }
 
+  let isSearchOpened = false; // Is SearchModal opened?
+
   // Refs
   let radioContainer;
   let searchModal;
@@ -90,8 +92,7 @@
     }
   }
 
-  export function onShown() {
-    active = true;
+  function determineCtaVisibility() {
     // For emandate, the screen switches as soon as user selects a bank. We do not need to show the CTA
     // in that case.
     if (recurring) {
@@ -101,7 +102,32 @@
     }
   }
 
+  export function onShown() {
+    active = true;
+
+    determineCtaVisibility();
+  }
+
+  function showSearch() {
+    hideCta();
+    searchModal.open();
+    isSearchOpened = true;
+  }
+
+  function hideSearch() {
+    searchModal.close();
+    determineCtaVisibility();
+    isSearchOpened = false;
+  }
+
   export function onBack() {
+    // Hide SearchModal if it is opened
+    if (isSearchOpened) {
+      hideSearch();
+
+      return true;
+    }
+
     active = false;
   }
 
@@ -252,7 +278,7 @@
             class="input dropdown-like"
             type="button"
             id="bank-select"
-            on:click={() => searchModal.open()}>
+            on:click={showSearch}>
             {#if $selectedBank}
               {selectedBankName}
             {:else}{$t(NETBANKING_SELECT_LABEL)}{/if}
@@ -303,7 +329,7 @@
       bind:this={searchModal}
       on:select={({ detail }) => {
         $selectedBank = detail.code;
-        searchModal.close();
+        hideSearch();
       }} />
 
     <Bottom tab="netbanking">
