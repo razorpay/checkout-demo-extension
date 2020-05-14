@@ -22,12 +22,17 @@ import {
   formatTemplateWithLocale,
 } from 'i18n';
 
+import {
+  DESCRIPTION_RECURRING_CARDS,
+  DESCRIPTION_CARDLESS_EMI,
+} from 'ui/labels/methods';
+
 function getRecurringCardDescription(locale) {
   // TODO: fix this to return network codes instead of names
   const recurringNetworks = getRecurringMethods().card?.credit || [];
   const networks = generateTextFromList(recurringNetworks);
   return formatTemplateWithLocale(
-    'methods.descriptions.recurring_cards',
+    DESCRIPTION_RECURRING_CARDS,
     { networks },
     locale
   );
@@ -80,7 +85,7 @@ const DESCRIPTIONS = {
       return text;
     } else {
       return formatTemplateWithLocale(
-        'methods.descriptions.cardless_emi',
+        DESCRIPTION_CARDLESS_EMI,
         { text },
         locale
       );

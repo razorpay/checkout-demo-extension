@@ -18,7 +18,10 @@
   import Bottom from 'ui/layouts/Bottom.svelte';
 
   // i18n labels
-  import { NETBANKING_SELECT_LABEL, NETBANKING_SELECT_HELP } from 'ui/labels';
+  import {
+    NETBANKING_SELECT_LABEL,
+    NETBANKING_SELECT_HELP,
+  } from 'ui/labels/netbanking';
 
   // Utils imports
   import Razorpay from 'common/Razorpay';

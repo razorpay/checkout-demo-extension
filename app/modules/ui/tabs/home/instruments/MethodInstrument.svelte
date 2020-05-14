@@ -16,7 +16,9 @@
     methodTabInstrument,
   } from 'checkoutstore/screens/home';
 
+  // i18n
   import { locale } from 'svelte-i18n';
+  import { TITLE_GENERIC } from 'ui/labels/methods';
 
   // Props
   export let instrument = {};
@@ -33,7 +35,7 @@
 
   let title;
   $: title = formatTemplateWithLocale(
-    'methods.titles.generic',
+    TITLE_GENERIC,
     { name: methodName },
     $locale
   );
