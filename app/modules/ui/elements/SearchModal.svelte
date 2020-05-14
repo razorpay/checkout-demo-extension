@@ -43,7 +43,7 @@
     });
   }
 
-  $: query, updateMatches();
+  $: items, query, keys, updateMatches();
 
   function onSelect(item) {
     dispatch('select', item);
