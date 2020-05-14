@@ -86,7 +86,7 @@ export function getBundle(locale) {
  * @returns {string}
  */
 export function formatTemplateWithLocale(label, data, locale) {
-  return get(t)({ id: label, locale, values: data });
+  return get(t)(label, { locale, values: data });
 }
 
 /**
@@ -96,7 +96,7 @@ export function formatTemplateWithLocale(label, data, locale) {
  * @returns {string}
  */
 function formatMessageWithLocale(label, locale) {
-  return get(t)({ id: label, locale });
+  return get(t)(label, { locale });
 }
 
 /**
@@ -188,11 +188,27 @@ export function getWalletName(walletCode, locale) {
 }
 
 /**
- * Returns the bank name for the given locale
- * @param bankCode
+ * Returns the long bank name for the given locale
+ * @param {string} bankCode
  * @param {string} locale
  * @returns {string}
  */
-export function getBankName(bankCode, locale) {
-  return formatMessageWithLocale(`banks.${bankCode.toUpperCase()}`, locale);
+export function getLongBankName(bankCode, locale) {
+  return formatMessageWithLocale(
+    `banks.long.${bankCode.toUpperCase()}`,
+    locale
+  );
+}
+
+/**
+ * Returns the short bank name for the given locale
+ * @param {string} bankCode
+ * @param {string} locale
+ * @returns {string}
+ */
+export function getShortBankName(bankCode, locale) {
+  return get(t)(`banks.short.${bankCode.toUpperCase()}`, {
+    locale,
+    default: getLongBankName(bankCode, locale),
+  });
 }

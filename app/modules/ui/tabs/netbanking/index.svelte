@@ -7,8 +7,6 @@
   import { selectedBank } from 'checkoutstore/screens/netbanking';
   import { methodTabInstrument } from 'checkoutstore/screens/home';
 
-  import { t } from 'svelte-i18n';
-
   // UI imports
   import Tab from 'ui/tabs/Tab.svelte';
   import GridItem from 'ui/tabs/netbanking/GridItem.svelte';
@@ -17,11 +15,14 @@
   import Screen from 'ui/layouts/Screen.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
 
-  // i18n labels
+  // i18n
   import {
     NETBANKING_SELECT_LABEL,
     NETBANKING_SELECT_HELP,
   } from 'ui/labels/netbanking';
+
+  import { t, locale } from 'svelte-i18n';
+  import { getShortBankName, getLongBankName } from 'i18n';
 
   // Utils imports
   import Razorpay from 'common/Razorpay';
@@ -219,7 +220,7 @@
       <div id="netb-banks" class="clear grid count-3">
         {#each netbanks as { name, code }}
           <GridItem
-            {name}
+            name={getShortBankName(code, $locale)}
             {code}
             fullName={filteredBanks[code]}
             bind:group={$selectedBank} />
@@ -243,7 +244,9 @@
             <!-- LABEL: Select a different bank -->
             <option value="">{$t(NETBANKING_SELECT_LABEL)}</option>
             {#each banksArr as bank}
-              <option value={bank.code}>{bank.name}</option>
+              <option value={bank.code}>
+                {getLongBankName(bank.code, $locale)}
+              </option>
             {/each}
           </select>
         </div>

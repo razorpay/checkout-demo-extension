@@ -24,7 +24,7 @@
   import { locale } from 'svelte-i18n';
   import {
     getInstrumentTitle,
-    getBankName,
+    getLongBankName,
     getWalletName,
     getCardlessEmiProviderName,
     getPaylaterProviderName,
@@ -69,7 +69,7 @@
   }
 
   function getDetailsForNetbankingInstrument(instrument, locale) {
-    const bankName = getBankName(individualInstrument.bank, locale);
+    const bankName = getLongBankName(individualInstrument.bank, locale);
     return {
       title: getInstrumentTitle('netbanking', bankName, locale),
       icon: getBankLogo(individualInstrument.bank),
