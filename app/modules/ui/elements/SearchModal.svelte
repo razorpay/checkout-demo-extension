@@ -79,6 +79,16 @@
   export function close() {
     visible = false;
   }
+
+  function handleEscape(event) {
+    if (_.getKeyFromEvent(event) === 27) {
+      // Don't close Checkout!
+      event.stopPropagation();
+      event.preventDefault();
+
+      dispatch('close');
+    }
+  }
 </script>
 
 <style>
@@ -204,9 +214,11 @@
             <Icon icon={getMiscIcon('search')} />
           </div>
           <input
+            class="no-escape"
             type="text"
             {autocomplete}
             {placeholder}
+            on:keyup={handleEscape}
             bind:value={query}
             bind:this={inputField} />
         </div>
