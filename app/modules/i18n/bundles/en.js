@@ -31,6 +31,7 @@ export default {
       gpay: 'Google Pay',
       wallet: 'Wallet',
       bank_transfer: 'Bank Transfer',
+      generic: 'Pay using {name}',
     },
     descriptions: {
       emandate: 'Pay with Netbanking',

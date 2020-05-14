@@ -8,6 +8,7 @@
   import { getSession } from 'sessionmanager';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
   import { getSubtextForInstrument } from 'subtext';
+  import { formatTemplateWithLocale } from 'i18n';
 
   // Store imports
   import {
@@ -31,8 +32,11 @@
   });
 
   let title;
-  // TODO: use templates when implemented
-  $: title = `Pay using ${methodName}`;
+  $: title = formatTemplateWithLocale(
+    'methods.titles.generic',
+    { name: methodName },
+    $locale
+  );
 
   const id = instrument.id;
   const subtext = getSubtextForInstrument(instrument);
