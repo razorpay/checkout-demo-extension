@@ -325,6 +325,7 @@
         keys={['currency', 'name', 'symbol']}
         component={CurrencySearchItem}
         bind:this={searchModal}
+        on:close={() => searchModal.close()}
         on:select={({ detail }) => onSelect(detail)} />
     </Stack>
   {/if}

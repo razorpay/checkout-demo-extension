@@ -327,6 +327,7 @@
       keys={['code', 'name']}
       component={BankSearchItem}
       bind:this={searchModal}
+      on:close={hideSearch}
       on:select={({ detail }) => {
         $selectedBank = detail.code;
         hideSearch();

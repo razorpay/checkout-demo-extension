@@ -195,7 +195,7 @@
     <div class="search-curtain">
       <div
         class="search-curtain-bg"
-        on:click={close}
+        on:click={() => dispatch('close')}
         in:fade
         out:fade={{ duration: 200 }} />
       <div class="search-box" in:slide out:fade={{ duration: 200 }}>
