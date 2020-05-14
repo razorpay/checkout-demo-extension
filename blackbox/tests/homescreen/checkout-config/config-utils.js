@@ -113,15 +113,15 @@ async function assertShownBanks(context, banks) {
   // Dropdown is visible
   expect(await context.page.$eval('#bank-select', visible)).toEqual(true);
 
-  // Get all <option>s except for the first one, since the first one acts as a label
-  const options = await context.page.$$(
-    '#bank-select option:not(:first-child)'
-  );
+  // Get all banks
+  await context.page.click('#bank-select');
+
+  const options = await context.page.$$('.search-box .list .list-item');
 
   // Get the values of all options
-  const values = await Promise.all(
-    options.map(option => getAttribute(context.page, option, 'value'))
-  );
+  let values = await Promise.all(options.map(innerText));
+
+  values = values.map(value => value.trim());
 
   // Verify that all expected banks are present
   expect(matchAllStringsInList(banks, values)).toBe(true);
