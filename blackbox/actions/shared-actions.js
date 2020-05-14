@@ -154,6 +154,14 @@ async function selectBank(context, bank) {
   // Type bank code
   await context.page.type('.search-field input', bank);
 
+  // Wait for top result
+  await context.page.waitForSelector(
+    '.search-box .list .list-item:first-child',
+    {
+      timeout: 300,
+    }
+  );
+
   // Select top result
   await context.page.click('.search-box .list .list-item:first-child');
 
