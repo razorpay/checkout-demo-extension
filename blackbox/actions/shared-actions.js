@@ -145,7 +145,14 @@ async function failRequestwithErrorMessage(context, errorMessage) {
 }
 
 async function selectBank(context, bank) {
-  await context.page.select('#bank-select', bank);
+  // Open search modal
+  await context.page.click('#bank-select');
+
+  // Type bank code
+  await context.page.type('.search-field input', bank);
+
+  // Select top result
+  await context.page.click('.search-box .list .list-item:first-child');
 }
 
 async function retryTransaction(context) {
