@@ -60,90 +60,123 @@
     return `${vpaToken.vpa.username}@${vpaToken.vpa.handle}`;
   }
 
-  $: {
-    // TODO: break switch case into separate functions
-    switch (individualInstrument.method) {
-      case 'paypal': {
-        title = getInstrumentTitle('paypal', null, $locale);
-        icon = session.themeMeta.icons.paypal;
-        alt = 'PayPal';
-        break;
+  function getDetailsForPaypalInstrument(instrument, locale) {
+    return {
+      title: getInstrumentTitle('paypal', null, locale),
+      icon: session.themeMeta.icons.paypal,
+      alt: 'PayPal',
+    };
+  }
+
+  function getDetailsForNetbankingInstrument(instrument, locale) {
+    const bankName = getBankName(individualInstrument.bank, locale);
+    return {
+      title: getInstrumentTitle('netbanking', bankName, locale),
+      icon: getBankLogo(individualInstrument.bank),
+      alt: bankName,
+    };
+  }
+
+  function getDetailsForWalletInstrument(instrument, locale) {
+    const wallet = getWallet(individualInstrument.wallet);
+    const walletName = getWalletName(wallet.code, locale);
+    return {
+      title: getInstrumentTitle('wallet', walletName, locale),
+      icon: wallet.sqLogo,
+      alt: wallet.name,
+    };
+  }
+
+  function getDetailsForUpiInstrument(instrument, locale) {
+    // TODO: simplify
+    let title, icon, alt;
+    if (individualInstrument.flow === 'qr') {
+      title = getInstrumentTitle('upiqr', null, locale);
+      icon = session.themeMeta.icons['qr'];
+      alt = title;
+    } else if (individualInstrument.flow === 'intent') {
+      const app = _Arr.find(
+        session.upi_intents_data,
+        app => app.package_name === individualInstrument.app
+      );
+
+      title = getInstrumentTitle(
+        'upi',
+        app.app_name.replace(/ UPI$/, ''),
+        locale
+      );
+
+      if (app.app_icon) {
+        icon = app.app_icon;
+        alt = app.app_name;
+      } else {
+        icon = '&#xe70e;';
+        alt = 'UPI App';
       }
-
-      case 'netbanking': {
-        const bankName = getBankName(individualInstrument.bank, $locale);
-        title = getInstrumentTitle('netbanking', bankName, $locale);
-        icon = getBankLogo(individualInstrument.bank);
-        alt = bankName;
-        break;
-      }
-
-      case 'wallet': {
-        const wallet = getWallet(individualInstrument.wallet);
-        const walletName = getWalletName(wallet.code, $locale);
-        title = getInstrumentTitle('wallet', walletName, $locale);
-        icon = wallet.sqLogo;
-        alt = wallet.name;
-        break;
-      }
-
-      case 'upi': {
-        if (individualInstrument.flow === 'qr') {
-          title = getInstrumentTitle('upiqr', null, $locale);
-          icon = session.themeMeta.icons['qr'];
-          alt = title;
-
-          break;
-        } else if (individualInstrument.flow === 'intent') {
-          const app = _Arr.find(
-            session.upi_intents_data,
-            app => app.package_name === individualInstrument.app
-          );
-
-          title = getInstrumentTitle(
-            'upi',
-            app.app_name.replace(/ UPI$/, ''),
-            $locale
-          );
-
-          if (app.app_icon) {
-            icon = app.app_icon;
-            alt = app.app_name;
-          } else {
-            icon = '&#xe70e;';
-            alt = 'UPI App';
-          }
-        } else {
-          title = getInstrumentTitle(
-            'upi',
-            getVpaFromInstrument(instrument),
-            $locale
-          );
-          icon = '&#xe70e;';
-          alt = 'UPI';
-        }
-
-        break;
-      }
-
-      case 'cardless_emi': {
-        const provider = getCardlessEmiProvider(individualInstrument.provider);
-        const providerName = getCardlessEmiProviderName(provider.code, $locale);
-        title = getInstrumentTitle('emi', providerName, $locale);
-        icon = provider.sqLogo;
-        alt = provider.name;
-        break;
-      }
-
-      case 'paylater': {
-        const provider = getPaylaterProvider(individualInstrument.provider);
-        const providerName = getPaylaterProviderName(provider.code, $locale);
-        title = getInstrumentTitle('paylater', providerName, $locale);
-        icon = provider.sqLogo;
-        alt = provider.name;
-        break;
-      }
+    } else {
+      title = getInstrumentTitle(
+        'upi',
+        getVpaFromInstrument(instrument),
+        locale
+      );
+      icon = '&#xe70e;';
+      alt = 'UPI';
     }
+
+    return {
+      title,
+      icon,
+      alt,
+    };
+  }
+
+  function getDetailsForCardlessEmiInstrument(instrument, locale) {
+    const provider = getCardlessEmiProvider(individualInstrument.provider);
+    const providerName = getCardlessEmiProviderName(provider.code, $locale);
+    return {
+      title: getInstrumentTitle('emi', providerName, locale),
+      icon: provider.sqLogo,
+      alt: provider.name,
+    };
+  }
+
+  function getDetailsForPayLaterInstrument(instrument, locale) {
+    const provider = getPaylaterProvider(individualInstrument.provider);
+    const providerName = getPaylaterProviderName(provider.code, locale);
+    return {
+      title: getInstrumentTitle('paylater', providerName, locale),
+      icon: provider.sqLogo,
+      alt: provider.name,
+    };
+  }
+
+  function getDetailsForInstrument(instrument, locale) {
+    switch (individualInstrument.method) {
+      case 'paypal':
+        return getDetailsForPaypalInstrument(instrument, locale);
+
+      case 'netbanking':
+        return getDetailsForNetbankingInstrument(instrument, locale);
+
+      case 'wallet':
+        return getDetailsForWalletInstrument(instrument, locale);
+
+      case 'upi':
+        return getDetailsForUpiInstrument(instrument, locale);
+
+      case 'cardless_emi':
+        return getDetailsForCardlessEmiInstrument(instrument, locale);
+
+      case 'paylater':
+        return getDetailsForPayLaterInstrument(instrument, locale);
+    }
+  }
+
+  $: {
+    const details = getDetailsForInstrument(individualInstrument, $locale);
+    title = details.title;
+    icon = details.icon;
+    alt = details.alt;
   }
 
   /**
