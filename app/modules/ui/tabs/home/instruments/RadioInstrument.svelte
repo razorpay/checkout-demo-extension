@@ -61,12 +61,7 @@
   }
 
   $: {
-    const banks = getBanks();
-    let wallet;
-    let flow;
-    let vpaSplit;
-    let provider;
-
+    // TODO: break switch case into separate functions
     switch (individualInstrument.method) {
       case 'paypal': {
         title = getInstrumentTitle('paypal', null, $locale);
@@ -79,12 +74,12 @@
         const bankName = getBankName(individualInstrument.bank, $locale);
         title = getInstrumentTitle('netbanking', bankName, $locale);
         icon = getBankLogo(individualInstrument.bank);
-        alt = banks[individualInstrument.bank];
+        alt = bankName;
         break;
       }
 
       case 'wallet': {
-        wallet = getWallet(individualInstrument.wallet);
+        const wallet = getWallet(individualInstrument.wallet);
         const walletName = getWalletName(wallet.code, $locale);
         title = getInstrumentTitle('wallet', walletName, $locale);
         icon = wallet.sqLogo;
@@ -132,7 +127,7 @@
       }
 
       case 'cardless_emi': {
-        provider = getCardlessEmiProvider(individualInstrument.provider);
+        const provider = getCardlessEmiProvider(individualInstrument.provider);
         const providerName = getCardlessEmiProviderName(provider.code, $locale);
         title = getInstrumentTitle('emi', providerName, $locale);
         icon = provider.sqLogo;
@@ -141,7 +136,7 @@
       }
 
       case 'paylater': {
-        provider = getPaylaterProvider(individualInstrument.provider);
+        const provider = getPaylaterProvider(individualInstrument.provider);
         const providerName = getPaylaterProviderName(provider.code, $locale);
         title = getInstrumentTitle('paylater', providerName, $locale);
         icon = provider.sqLogo;
