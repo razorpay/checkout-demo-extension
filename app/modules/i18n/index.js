@@ -79,6 +79,17 @@ export function getBundle(locale) {
 }
 
 /**
+ * Returns template formatted using values from `data`.
+ * @param {string} label
+ * @param {Object} data
+ * @param {string} locale
+ * @returns {string}
+ */
+export function formatTemplateWithLocale(label, data, locale) {
+  return get(t)({ id: label, locale, data });
+}
+
+/**
  * Formats the message with the given locale
  * @param {string} label
  * @param {string} locale
