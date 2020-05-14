@@ -12,6 +12,9 @@ export default {
     contact_label_required: 'Phone with Country Code',
     contact_label_optional: 'Phone with Country Code (Optional)',
     contact_help_text: 'Please enter a valid contact number',
+    email_label_required: 'Email',
+    email_label_optional: 'Email (Optional)',
+    email_help_text: 'Please enter a valid email. Example: you@example.com',
   },
   bank_transfer: {
     loading_message: 'Getting bank details...',
