@@ -15,6 +15,23 @@
   import Tab from 'ui/tabs/Tab.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
 
+  // i18n
+  import {
+    ACCOUNT_LABEL,
+    AMOUNT_LABEL,
+    BENEFICIARY_LABEL,
+    DUE_DATE_NOTE,
+    HEADER,
+    IFSC_LABEL,
+    LOADING_MESSAGE,
+    RETRY_BUTTON_LABEL,
+    ROUND_OFF_CALLOUT,
+  } from 'ui/labels/bank-transfer';
+
+  import { t, locale } from 'svelte-i18n';
+
+  import { formatTemplateWithLocale } from 'i18n';
+
   // Props
   export let loading = true;
   export let data = null;
@@ -158,50 +175,53 @@
 <Tab method="bank_transfer">
   <div class="bank_transfer-container">
     {#if loading}
-      <AsyncLoading>Getting bank details...</AsyncLoading>
+      <!-- LABEL: Getting bank details... -->
+      <AsyncLoading>{$t(LOADING_MESSAGE)}</AsyncLoading>
     {:else if data}
-      <div class="bank_transfer-message">
-        To complete the transaction, make NEFT / RTGS / IMPS transfer to
-      </div>
-
+      <!-- LABEL: To complete the transaction, make NEFT / RTGS / IMPS transfer to -->
+      <div class="bank_transfer-message">{$t(HEADER)}</div>
       <div class="neft-details">
         <div bind:this={neftDetails}>
           <div class="ct-tr">
-            <span class="ct-th">Account:</span>
+            <!-- LABEL: Account -->
+            <span class="ct-th">{$t(ACCOUNT_LABEL)}:</span>
             <span class="ct-td">{data.receiver.account_number}</span>
           </div>
           <div class="ct-tr">
-            <span class="ct-th">IFSC:</span>
+            <!-- LABEL: IFSC -->
+            <span class="ct-th">{$t(IFSC_LABEL)}:</span>
             <span class="ct-td">{data.receiver.ifsc}</span>
           </div>
           <div class="ct-tr">
-            <span class="ct-th">Beneficiary Name:</span>
+            <!-- LABEL: Beneficiary Name -->
+            <span class="ct-th">{$t(BENEFICIARY_LABEL)}:</span>
             <span class="ct-td">{data.receiver.name}</span>
           </div>
           <div class="ct-tr">
-            <span class="ct-th">Amount Expected:</span>
+            <!-- LABEL: Amount Expected -->
+            <span class="ct-th">{$t(AMOUNT_LABEL)}:</span>
             <span class="ct-td">{data.amount}</span>
           </div>
         </div>
 
         {#if data.close_by}
+          <!-- LABEL: Note: Please complete the transaction before {date} -->
           <div class="ct-tr ct-note">
-            Note: Please complete the transaction before {data.close_by}.
+            {formatTemplateWithLocale(DUE_DATE_NOTE, { date: data.close_by }, $locale)}
           </div>
         {/if}
       </div>
 
       <Bottom tab="bank_transfer">
-        <Callout>
-          Do not round-off the amount. Transfer the exact amount for the payment
-          to be successful.
-        </Callout>
+        <!-- LABEL: Do not round-off the amount. Transfer the exact amount for the payment to be successful. -->
+        <Callout>{$t(ROUND_OFF_CALLOUT)}</Callout>
       </Bottom>
     {:else}
       <div class="error">
         <div class="error-text">{error || 'Error'}</div>
         <br />
-        <div class="btn" on:click={init}>Retry</div>
+        <!-- LABEL: Retry -->
+        <div class="btn" on:click={init}>{$t(RETRY_BUTTON_LABEL)}</div>
       </div>
     {/if}
   </div>

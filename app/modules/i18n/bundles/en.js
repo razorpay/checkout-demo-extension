@@ -10,6 +10,18 @@ export default {
     preferred_block_title: 'Preferred Payment Methods',
     single_block_title: 'Pay via ${method}',
   },
+  bank_transfer: {
+    loading_message: 'Getting bank details...',
+    header: 'To complete the transaction, make NEFT / RTGS / IMPS transfer to',
+    account_label: 'Account',
+    ifsc_label: 'IFSC',
+    beneficiary_label: 'Beneficiary Name',
+    amount_label: 'Amount Expected',
+    due_date_note: 'Note: Please complete the transaction before {date}',
+    round_off_callout:
+      'Do not round-off the amount. Transfer the exact amount for the payment to be successful.',
+    retry_button_label: 'Retry',
+  },
   instruments: {
     titles: {
       netbanking: 'Netbanking - {name}',
