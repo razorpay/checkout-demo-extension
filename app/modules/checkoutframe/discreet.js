@@ -19,14 +19,15 @@ import Overlay from 'ui/components/Overlay.svelte';
 import AuthOverlay from 'ui/components/AuthOverlay.svelte';
 import OffersView from 'ui/components/offers/index.svelte';
 import NoCostExplainer from 'ui/components/offers/NoCostExplainer.svelte';
-import emandateView from 'checkoutframe/emandate';
 import emiPlansView from 'checkoutframe/emiplans';
 import otpView from 'checkoutframe/otp';
+import languageSelectionView from 'ui/elements/LanguageSelection.svelte';
 import * as Curtain from 'components/curtain';
 import { setShieldParams } from 'payment/validator';
 import * as P13n from 'checkoutframe/personalization';
 import { commonBanks, getFullBankLogo } from 'common/bank';
 import * as CountryCodesUtil from 'common/countrycodesutil';
+import { init as initI18n } from 'i18n';
 
 /* Required for merchant.js migration */
 import * as Constants from 'common/constants';
@@ -54,6 +55,7 @@ import * as OTPScreenStore from 'checkoutstore/screens/otp';
 import * as Cta from 'checkoutstore/cta';
 import * as HomeScreenStore from 'checkoutstore/screens/home';
 import * as CardScreenStore from 'checkoutstore/screens/card';
+import * as NetbankingScreenStore from 'checkoutstore/screens/netbanking';
 import * as CustomerStore from 'checkoutstore/customer';
 import * as Theme from 'checkoutstore/theme';
 
@@ -65,6 +67,7 @@ import emiScreenView from 'ui/tabs/emi/emiscreen.svelte';
 import PayLaterView from 'ui/tabs/paylater/index.svelte';
 import HomeTab from 'ui/tabs/home/index.svelte';
 import NetbankingTab from 'ui/tabs/netbanking/index.svelte';
+import EmandateTab from 'ui/tabs/emandate/index.svelte';
 import NachScreen from 'ui/tabs/nach/index.svelte';
 import CardTab from 'ui/tabs/card/index.svelte';
 import WalletTab from 'ui/tabs/wallets/index.svelte';
@@ -139,6 +142,7 @@ export default {
   OTPScreenStore,
   HomeScreenStore,
   CardScreenStore,
+  NetbankingScreenStore,
   EmiStore,
   Cta,
 
@@ -147,7 +151,6 @@ export default {
   sanitizeTokens,
 
   emiView,
-  emandateView,
   CardlessEmiView,
   emiScreenView,
   emiPlansView,
@@ -161,6 +164,7 @@ export default {
   PayoutAccount,
 
   otpView,
+  languageSelectionView,
   PayLaterView,
   Curtain,
   commonBanks,
@@ -173,6 +177,7 @@ export default {
   UpiTab,
   WalletTab,
   NetbankingTab,
+  EmandateTab,
   NachScreen,
   CardTab,
 
@@ -190,4 +195,6 @@ export default {
 
   NBHandlers,
   UserHandlers,
+
+  initI18n,
 };

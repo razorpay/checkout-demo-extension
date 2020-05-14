@@ -10,6 +10,7 @@ import Track from 'tracker';
 import Razorpay from 'common/Razorpay';
 import Analytics from 'analytics';
 import { getSession } from 'sessionmanager';
+import { getBankFromCard } from 'common/bank';
 
 export const processOtpResponse = function(response) {
   var error = response.error;
@@ -286,9 +287,17 @@ var responseTypes = {
     if (!this.nativeotp && !this.iframe && request.method === 'direct') {
       return responseTypes.first.call(this, request, responseTypes);
     }
+    // TODO: Remove this usage when API starts sending "mode: hdfc_debit_emi"
+    const iin = fullResponse.metadata && fullResponse.metadata.iin;
+    const bank = getBankFromCard(iin);
     if (this.data.method === 'wallet') {
       this.otpurl = request.url;
       this.emit('otp.required');
+    } else if (this.data.method === 'emi' && bank.code === 'HDFC_DC') {
+      this.otpurl = fullResponse.submit_url;
+      // TODO: Remove this explicit assignment when backend starts sending it.
+      fullResponse.mode = 'hdfc_debit_emi';
+      this.emit('otp.required', fullResponse);
     } else {
       Analytics.setMeta('headless', true);
       this.otpurl = fullResponse.submit_url;
