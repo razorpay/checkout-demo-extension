@@ -997,6 +997,11 @@ Session.prototype = {
 
     var order = Store.getMerchantOrder();
     if (tab && !(order && order.bank) && MethodStore.isMethodEnabled(tab)) {
+      // For method=emandate, we switch to the netbanking tab first if bank
+      // is not prefilled.
+      if (tab === 'emandate' && !this.get('prefill.bank')) {
+        tab = 'netbanking';
+      }
       this.switchTab(tab);
     } else if (tab === '') {
       this.switchTab(tab);
