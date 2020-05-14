@@ -50,6 +50,7 @@ export default {
       upi: 'UPI',
       wallet: 'Wallets',
       gpay: 'Google Pay',
+      bank_transfer: 'Bank Transfer',
     },
     titles: {
       card: 'Card',
