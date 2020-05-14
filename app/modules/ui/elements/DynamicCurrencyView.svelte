@@ -324,7 +324,6 @@
         items={sortedCurrencies}
         keys={['currency', 'name', 'symbol']}
         component={CurrencySearchItem}
-        visible={false}
         bind:this={searchModal}
         on:select={({ detail }) => onSelect(detail)} />
     </Stack>

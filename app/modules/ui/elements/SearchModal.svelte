@@ -11,7 +11,6 @@
   import { isMobile } from 'common/useragent';
 
   // Props
-  export let visible = false;
   export let placeholder = 'Type to search';
   export let autocomplete;
   export let items = [];
@@ -25,6 +24,7 @@
   const dispatch = createEventDispatcher();
 
   // Variables
+  let visible = false;
   let ref;
   let query = '';
   let matchingItems = items;
