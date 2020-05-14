@@ -20,6 +20,10 @@
     blocks,
   } from 'checkoutstore/screens/home';
 
+  // i18n
+  import { t } from 'svelte-i18n';
+  import { PREFERRED_BLOCK_TITLE } from 'ui/labels/methods';
+
   onDestroy(() => {
     deselectInstrument();
   });
@@ -63,7 +67,11 @@
     <RazorpayCluster {block} on:selectMethod />
   {:else}
     <div class="methods-block" data-block={block.code}>
-      <h3 class="title">{block.title || 'Available Payment Methods'}</h3>
+      <h3 class="title">
+        {#if block.code === 'rzp.preferred'}
+          {$t(PREFERRED_BLOCK_TITLE)}
+        {:else}{block.title || 'Available Payment Methods'}{/if}
+      </h3>
       <div role="list" class="border-list">
         {#each block.instruments as instrument, index (instrument.id)}
           <Instrument

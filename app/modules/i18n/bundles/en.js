@@ -3,6 +3,9 @@ export default {
     select_label: 'Select a different bank',
     select_help: 'Please select a bank',
   },
+  home: {
+    preferred_block_title: 'Preferred Payment Methods',
+  },
   methods: {
     prefixes: {
       card: 'Cards',
