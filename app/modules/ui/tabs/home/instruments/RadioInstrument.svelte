@@ -20,6 +20,16 @@
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
   import { customer } from 'checkoutstore/customer';
 
+  // i18n
+  import { locale } from 'svelte-i18n';
+  import {
+    getInstrumentTitle,
+    getBankName,
+    getWalletName,
+    getCardlessEmiProviderName,
+    getPaylaterProviderName,
+  } from 'i18n';
+
   // Props
   export let instrument = {};
   export let name = 'instrument';
@@ -58,29 +68,33 @@
     let provider;
 
     switch (individualInstrument.method) {
-      case 'paypal':
-        title = 'PayPal';
+      case 'paypal': {
+        title = getInstrumentTitle('paypal', null, $locale);
         icon = session.themeMeta.icons.paypal;
         alt = 'PayPal';
-
         break;
+      }
 
-      case 'netbanking':
-        title = `Netbanking - ${banks[individualInstrument.bank]} `;
+      case 'netbanking': {
+        const bankName = getBankName(individualInstrument.bank, $locale);
+        title = getInstrumentTitle('netbanking', bankName, $locale);
         icon = getBankLogo(individualInstrument.bank);
         alt = banks[individualInstrument.bank];
-
         break;
-      case 'wallet':
+      }
+
+      case 'wallet': {
         wallet = getWallet(individualInstrument.wallet);
-        title = `Wallet - ${wallet.name}`;
+        const walletName = getWalletName(wallet.code, $locale);
+        title = getInstrumentTitle('wallet', walletName, $locale);
         icon = wallet.sqLogo;
         alt = wallet.name;
-
         break;
-      case 'upi':
+      }
+
+      case 'upi': {
         if (individualInstrument.flow === 'qr') {
-          title = `UPI QR`;
+          title = getInstrumentTitle('upiqr', null, $locale);
           icon = session.themeMeta.icons['qr'];
           alt = title;
 
@@ -91,7 +105,11 @@
             app => app.package_name === individualInstrument.app
           );
 
-          title = `UPI - ${app.app_name.replace(/ UPI$/, '')}`;
+          title = getInstrumentTitle(
+            'upi',
+            app.app_name.replace(/ UPI$/, ''),
+            $locale
+          );
 
           if (app.app_icon) {
             icon = app.app_icon;
@@ -101,28 +119,35 @@
             alt = 'UPI App';
           }
         } else {
-          title = `UPI - ${getVpaFromInstrument(instrument)}`;
+          title = getInstrumentTitle(
+            'upi',
+            getVpaFromInstrument(instrument),
+            $locale
+          );
           icon = '&#xe70e;';
           alt = 'UPI';
         }
 
         break;
+      }
 
-      case 'cardless_emi':
+      case 'cardless_emi': {
         provider = getCardlessEmiProvider(individualInstrument.provider);
-        title = `EMI - ${provider.name}`;
+        const providerName = getCardlessEmiProviderName(provider.code, $locale);
+        title = getInstrumentTitle('emi', providerName, $locale);
         icon = provider.sqLogo;
         alt = provider.name;
-
         break;
+      }
 
-      case 'paylater':
+      case 'paylater': {
         provider = getPaylaterProvider(individualInstrument.provider);
-        title = `Pay Later - ${provider.name}`;
+        const providerName = getPaylaterProviderName(provider.code, $locale);
+        title = getInstrumentTitle('paylater', providerName, $locale);
         icon = provider.sqLogo;
         alt = provider.name;
-
         break;
+      }
     }
   }
 

@@ -120,6 +120,21 @@ export function getMethodTitle(method, locale) {
 }
 
 /**
+ * Returns the method title for the given locale
+ * @param {string} method
+ * @param {string} name
+ * @param {string} locale
+ * @returns {string}
+ */
+export function getInstrumentTitle(method, name, locale) {
+  return formatTemplateWithLocale(
+    `instruments.titles.${method}`,
+    { name },
+    locale
+  );
+}
+
+/**
  * Returns the network name for the given locale
  * @param {string} network
  * @param {string} locale

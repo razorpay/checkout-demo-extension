@@ -6,6 +6,17 @@ export default {
   home: {
     preferred_block_title: 'Preferred Payment Methods',
   },
+  instruments: {
+    titles: {
+      netbanking: 'Netbanking - {name}',
+      wallet: 'Wallet - {name}',
+      paypal: 'PayPal',
+      upiqr: 'UPI QR',
+      upi: 'UPI - {name}',
+      cardless_emi: 'EMI - {name}',
+      paylater: 'Pay Later - {name}',
+    },
+  },
   methods: {
     prefixes: {
       card: 'Cards',
