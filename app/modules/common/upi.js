@@ -78,102 +78,135 @@ const UPI_APPS = {
     },
     {
       package_name: 'com.upi.axispay',
+      shortcode: 'axispay',
     },
     {
       package_name: 'com.samsung.android.spaymini',
+      shortcode: 'samsung-mini',
     },
     {
       package_name: 'com.samsung.android.spay',
+      shortcode: 'samsung',
     },
     {
       package_name: 'com.snapwork.hdfc',
+      shortcode: 'hdfc-bank',
     },
     {
       package_name: 'com.fss.pnbpsp',
+      shortcode: 'pnb-bank',
     },
     {
       package_name: 'com.icicibank.pockets',
+      shortcode: 'icici-pocket',
     },
     {
       package_name: 'com.bankofbaroda.upi',
+      shortcode: 'bank-of-baroda',
     },
     {
       package_name: 'com.freecharge.android',
+      shortcode: 'freecharge',
     },
     {
       package_name: 'com.fss.unbipsp',
+      shortcode: 'united-upi',
     },
     {
       package_name: 'com.axis.mobile',
+      shortcode: 'axis',
     },
     {
       package_name: 'com.mycompany.kvb',
+      shortcode: 'kvb',
     },
     {
       package_name: 'com.fss.vijayapsp',
+      shortcode: 'vijaya',
     },
     {
       package_name: 'com.dena.upi.gui',
+      shortcode: 'dena',
     },
     {
       package_name: 'com.fss.jnkpsp',
+      shortcode: 'jk-upi',
     },
     {
       package_name: 'com.olive.kotak.upi',
+      shortcode: 'kotak',
     },
     {
       package_name: 'com.enstage.wibmo.hdfc',
+      shortcode: 'payzapp',
     },
     {
       package_name: 'com.bsb.hike',
+      shortcode: 'hike',
     },
     {
       package_name: 'com.fss.idfcpsp',
+      shortcode: 'idfc',
     },
     {
       package_name: 'com.YesBank',
+      shortcode: 'yes-bank',
     },
     {
       package_name: 'com.abipbl.upi',
+      shortcode: 'app missing in playstore',
     },
     {
       package_name: 'com.microsoft.mobile.polymer',
+      shortcode: 'microsoft-kaizala',
     },
     {
       package_name: 'com.finopaytech.bpayfino',
+      shortcode: 'fino',
     },
     {
       package_name: 'com.mgs.obcbank',
+      shortcode: 'oriental',
     },
     {
       package_name: 'com.upi.federalbank.org.lotza',
+      shortcode: 'lotza',
     },
     {
       package_name: 'com.mgs.induspsp',
+      shortcode: 'induspay',
     },
     {
       package_name: 'ai.wizely.android',
+      shortcode: 'wizely',
     },
     {
       package_name: 'com.olive.dcb.upi',
+      shortcode: 'dcb-bank',
     },
     {
       package_name: 'com.mgs.yesmerchantnative.prod',
+      shortcode: 'app missing on google play',
     },
     {
       package_name: 'com.dbs.in.digitalbank',
+      shortcode: 'digibank',
     },
     {
       package_name: 'com.rblbank.mobank',
+      shortcode: 'rbl-mobank',
     },
     {
       package_name: 'in.chillr',
+      shortcode: 'app missing on google play',
     },
     {
       package_name: 'com.citrus.citruspay',
+      shortcode: 'lazypay',
     },
     {
       package_name: 'com.SIBMobile',
+      shortcode: 'sibmirror',
     },
     {
       package_name: 'in.amazon.mShop.android.shopping',
@@ -181,18 +214,23 @@ const UPI_APPS = {
     },
     {
       package_name: 'com.mipay.in.wallet',
+      shortcode: 'mipay',
     },
     {
       package_name: 'com.mipay.wallet.in',
+      shortcode: 'app missing on google play',
     },
     {
       package_name: 'com.dreamplug.androidapp',
+      shortcode: 'cred',
     },
     {
       package_name: 'in.bajajfinservmarkets.app',
+      shortcode: 'finserv',
     },
     {
       package_name: 'in.bajajfinservmarkets.app.uat',
+      shortcode: 'app missing on playstore',
     },
   ],
 
