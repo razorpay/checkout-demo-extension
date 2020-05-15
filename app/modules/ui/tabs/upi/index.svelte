@@ -2,7 +2,7 @@
   // Svelte imports
   import { onMount } from 'svelte';
   import { slide } from 'svelte/transition';
-  import { _ } from 'svelte-i18n';
+  import { _ as t } from 'svelte-i18n';
 
   // Util imports
   import { getSession } from 'sessionmanager';
@@ -526,7 +526,7 @@
       {/if}
 
       <!-- {#if useWebPaymentsApi} -->
-      <div class="legend left">{$_(UPI_GPAY_BLOCK_HEADING)}</div>
+      <div class="legend left">{$t(UPI_GPAY_BLOCK_HEADING)}</div>
       <div class="border-list">
         <SlottedRadioOption
           name="google_pay_web"
@@ -535,7 +535,7 @@
             selectedToken = 'gpay';
             session.preSubmit();
           }}>
-          <div slot="title">{$_(GPAY_WEB_API_TITLE)}</div>
+          <div slot="title">{$t(GPAY_WEB_API_TITLE)}</div>
           <i slot="icon">
             <Icon icon={session.themeMeta.icons.gpay} />
           </i>
@@ -544,14 +544,14 @@
       <!-- {/if} -->
 
       {#if shouldShowCollect}
-        <div class="legend left">{$_(UPI_COLLECT_BLOCK_HEADING)}</div>
+        <div class="legend left">{$t(UPI_COLLECT_BLOCK_HEADING)}</div>
         <div class="border-list" id="upi-collect-list">
           {#if intent}
             <ListHeader>
               <i slot="icon">
                 <Icon icon={getMiscIcon('receive')} />
               </i>
-              <div slot="subtitle">{$_(UPI_COLLECT_BLOCK_SUBHEADING)}</div>
+              <div slot="subtitle">{$t(UPI_COLLECT_BLOCK_SUBHEADING)}</div>
             </ListHeader>
           {/if}
 
@@ -596,15 +596,15 @@
       {/if}
 
       {#if shouldShowQr}
-        <div class="legend left">{$_(QR_BLOCK_HEADING)}</div>
+        <div class="legend left">{$t(QR_BLOCK_HEADING)}</div>
         <div class="options" id="showQr">
           <NextOption
             icon={qrIcon}
             tabindex="0"
             attributes={{ role: 'button', 'aria-label': 'Show QR Code - Scan the QR code using your UPI app' }}
             on:select={selectQrMethod}>
-            <div>{$_(SHOW_QR_CODE)}</div>
-            <div class="desc">{$_(SCAN_QR_CODE)}</div>
+            <div>{$t(SHOW_QR_CODE)}</div>
+            <div class="desc">{$t(SCAN_QR_CODE)}</div>
           </NextOption>
         </div>
       {/if}
@@ -613,7 +613,7 @@
     <Bottom tab="upi">
       {#if down || disabled}
         <DowntimeCallout severe={disabled}>
-          <FormattedText text={$_(UPI_DOWNTIME_TEXT)} />
+          <FormattedText text={$t(UPI_DOWNTIME_TEXT)} />
         </DowntimeCallout>
       {/if}
     </Bottom>

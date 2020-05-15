@@ -2,7 +2,7 @@
   // Svelte imports
   import { onMount, createEventDispatcher } from 'svelte';
   import { slide } from 'svelte/transition';
-  import { _ } from 'svelte-i18n';
+  import { _ as t } from 'svelte-i18n';
 
   // UI Imports
   import Field from 'ui/components/Field.svelte';
@@ -142,9 +142,9 @@
   on:click={focusAfterTimeout}
   {selected}>
   <div id="new-vpa-field" slot="title">
-    {logged && canSaveVpa ? $_(NEW_VPA_TITLE_LOGGED_IN) : $_(NEW_VPA_TITLE_LOGGED_OUT)}
+    {logged && canSaveVpa ? $t(NEW_VPA_TITLE_LOGGED_IN) : $t(NEW_VPA_TITLE_LOGGED_OUT)}
   </div>
-  <div slot="subtitle">{$_(NEW_VPA_SUBTITLE)}</div>
+  <div slot="subtitle">{$t(NEW_VPA_SUBTITLE)}</div>
   <i slot="icon" class="top">
     <Icon icon={session.themeMeta.icons.upi} />
   </i>
@@ -155,7 +155,7 @@
         <Field
           formatter={{ type: 'vpa' }}
           {pattern}
-          helpText={$_(UPI_COLLECT_NEW_VPA_HELP)}
+          helpText={$t(UPI_COLLECT_NEW_VPA_HELP)}
           id="vpa"
           name="vpa"
           type="text"
@@ -163,12 +163,12 @@
           bind:value={newVpa}
           bind:this={vpaField}
           on:blur
-          placeholder={$_(UPI_COLLECT_ENTER_ID)} />
+          placeholder={$t(UPI_COLLECT_ENTER_ID)} />
         {#if logged && canSaveVpa}
           <div class="should-save-vpa-container">
             <label id="should-save-vpa" for="save-vpa">
               <Checkbox bind:checked={rememberVpa} id="save-vpa">
-                {$_(UPI_COLLECT_SAVE)}
+                {$t(UPI_COLLECT_SAVE)}
               </Checkbox>
             </label>
           </div>

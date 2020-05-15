@@ -3,7 +3,7 @@
   import { createEventDispatcher, onMount } from 'svelte';
   import { slide } from 'svelte/transition';
 
-  import { _ } from 'svelte-i18n';
+  import { _ as t } from 'svelte-i18n';
 
   // Util imports
   import { getSession } from 'sessionmanager';
@@ -105,7 +105,7 @@
   }
 </style>
 
-<div class="legend left">{$_(OMNI_BLOCK_HEADING)}</div>
+<div class="legend left">{$t(OMNI_BLOCK_HEADING)}</div>
 
 <SlottedRadioOption
   name="payment_type"
@@ -113,7 +113,7 @@
   align="top"
   on:click={onSelection}
   {selected}>
-  <div id="gpay-omnichannel" slot="title">{$_(OMNI_GPAY_NUMBER)}</div>
+  <div id="gpay-omnichannel" slot="title">{$t(OMNI_GPAY_NUMBER)}</div>
   <i slot="icon" class="top">
     <img src="https://cdn.razorpay.com/app/googlepay.svg" alt="Google Pay" />
   </i>
@@ -132,7 +132,7 @@
           bind:this={phoneField}
           on:blur
           value={contact}
-          placeholder={$_(OMNI_ENTER_NUMBER)} />
+          placeholder={$t(OMNI_ENTER_NUMBER)} />
       </div>
     {/if}
   </div>
@@ -140,6 +140,6 @@
 
 {#if selected}
   {#if error}
-    <p class:regular={!isFirst} class:error={isFirst}>{$_(OMNI_ERROR)}</p>
+    <p class:regular={!isFirst} class:error={isFirst}>{$t(OMNI_ERROR)}</p>
   {/if}
 {/if}

@@ -1,7 +1,7 @@
 <script>
   // Svelte imports
   import { createEventDispatcher } from 'svelte';
-  import { _, locale } from 'svelte-i18n';
+  import { _ as t, locale } from 'svelte-i18n';
 
   import { getUpiIntentAppName } from 'i18n';
 
@@ -218,14 +218,14 @@
   }
 </style>
 
-<div class="legend left">{$_(UPI_INTENT_BLOCK_HEADING)}</div>
+<div class="legend left">{$t(UPI_INTENT_BLOCK_HEADING)}</div>
 <div id="upi-apps">
   <div id="svelte-upi-apps-list" class="options options-no-margin">
     <ListHeader>
       <i slot="icon">
         <Icon icon={getMiscIcon('redirect')} />
       </i>
-      <div slot="subtitle">{$_(UPI_REDIRECT_TO_APP)}</div>
+      <div slot="subtitle">{$t(UPI_REDIRECT_TO_APP)}</div>
     </ListHeader>
 
     {#each showableApps as app, i}
@@ -241,7 +241,7 @@
           {getUpiIntentAppName(app.shortcode)}
           {#if i === 0 && showRecommendedUPIApp}
             <span>
-              <em>({$_(UPI_RECOMMENDED)})</em>
+              <em>({$t(UPI_RECOMMENDED)})</em>
             </span>
           {/if}
         </div>
@@ -250,7 +250,7 @@
 
     {#if apps.length > 5 && !showAll}
       <NextOption on:select={() => (showAll = true)} icon={otherAppsIcon}>
-        {$_(UPI_SHOW_OTHER_APPS)}
+        {$t(UPI_SHOW_OTHER_APPS)}
       </NextOption>
     {/if}
   </div>
