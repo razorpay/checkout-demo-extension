@@ -1,10 +1,10 @@
 export const CONTACT_LABEL_REQUIRED = 'home.contact_label_required';
 export const CONTACT_LABEL_OPTIONAL = 'home.contact_label_optional';
 export const CONTACT_HELP_TEXT = 'home.contact_help_text';
-
 export const EMAIL_LABEL_REQUIRED = 'home.email_label_required';
 export const EMAIL_LABEL_OPTIONAL = 'home.email_label_optional';
 export const EMAIL_HELP_TEXT = 'home.email_help_text';
+export const EDIT_BUTTON_LABEL = 'home.edit_button_label';
 
 export const PARTIAL_PAYMENT_TITLE = 'home.partial_payment_title';
 export const MIN_AMOUNT_LABEL = 'home.min_amount_label';
@@ -15,6 +15,10 @@ export const PARTIAL_AMOUNT_PLACEHOLDER = 'home.partial_amount_placeholder';
 export const PARTIAL_AMOUNT_HELP_INVALID = 'home.partial_amount_help_invalid';
 export const PARTIAL_AMOUNT_HELP_LOWER = 'home.partial_amount_help_lower';
 export const PARTIAL_AMOUNT_HELP_HIGHER = 'home.partial_amount_help_higher';
+export const PARTIAL_AMOUNT_EDIT_LABEL = 'home.partial_amount_edit_label';
+export const PARTIAL_AMOUNT_STATUS_FULL = 'home.partial_amount_status_full';
+export const PARTIAL_AMOUNT_STATUS_PARTIAL =
+  'home.partial_amount_status_partial';
 
 export const ADDRESS_LABEL = 'home.address_label';
 export const ADDRESS_HELP = 'home.address_help';
@@ -26,3 +30,5 @@ export const STATE_HELP = 'home.state_help';
 export const MULTI_TPV_TITLE = 'home.multi_tpv_title';
 export const MULTI_TPV_UPI_TITLE = 'home.multi_tpv_upi_title';
 export const MULTI_TPV_UPI_SUBTITLE = 'home.multi_tpv_upi_subtitle';
+
+export const SECURED_BY_MESSAGE = 'home.secured_by_message';

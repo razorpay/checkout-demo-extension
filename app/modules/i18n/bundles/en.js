@@ -16,6 +16,7 @@ export default {
     email_label_required: 'Email',
     email_label_optional: 'Email (Optional)',
     email_help_text: 'Please enter a valid email. Example: you@example.com',
+    edit_button_label: 'Edit',
 
     partial_payment_title: 'Select a payment type',
     min_amount_label: 'Minimum first amount',
@@ -26,6 +27,9 @@ export default {
     partial_amount_help_invalid: 'Please enter a valid amount upto {amount}',
     partial_amount_help_lower: 'Minimum payable amount is {amount}',
     partial_amount_help_higher: 'Amount cannot exceed {amount}',
+    partial_amount_edit_label: 'Change Amount',
+    partial_amount_status_full: 'Paying full amount',
+    partial_amount_status_partial: 'Paying in parts',
 
     address_label: 'Address',
     address_help: 'Address should be at least 10 characters long',
@@ -37,6 +41,8 @@ export default {
     multi_tpv_title: 'Pay Using',
     multi_tpv_upi_title: 'UPI',
     multi_tpv_upi_subtitle: '{bankName} Account {accountNumber}',
+
+    secured_by_message: 'This payment is secured by Razorpay.',
   },
   bank_transfer: {
     loading_message: 'Getting bank details...',

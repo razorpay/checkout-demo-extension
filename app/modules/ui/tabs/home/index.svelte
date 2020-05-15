@@ -35,6 +35,17 @@
   import { customer } from 'checkoutstore/customer';
   import { getOption, isDCCEnabled } from 'checkoutstore';
 
+  // i18n
+  import {
+    EDIT_BUTTON_LABEL,
+    PARTIAL_AMOUNT_EDIT_LABEL,
+    PARTIAL_AMOUNT_STATUS_FULL,
+    PARTIAL_AMOUNT_STATUS_PARTIAL,
+    SECURED_BY_MESSAGE,
+  } from 'ui/labels/home';
+
+  import { t } from 'svelte-i18n';
+
   // Utils imports
   import { getSession } from 'sessionmanager';
   import {
@@ -736,7 +747,8 @@
                     class="theme-highlight-color"
                     aria-label={contactEmailReadonly ? '' : 'Edit'}>
                     {#if !contactEmailReadonly}
-                      <span>Edit</span>
+                      <!-- LABEL: Edit -->
+                      <span>{$t(EDIT_BUTTON_LABEL)}</span>
                       <span>&#xe604;</span>
                     {/if}
                   </div>
@@ -750,8 +762,12 @@
                     <span>{formattedPartialAmount}</span>
                     <span>
                       {#if $partialPaymentOption === 'full'}
-                        Paying full amount
-                      {:else}Paying in parts{/if}
+                        <!-- LABEL: Paying full amount -->
+                        {$t(PARTIAL_AMOUNT_STATUS_FULL)}
+                      {:else}
+                        <!-- LABEL: Paying in parts -->
+                        {$t(PARTIAL_AMOUNT_STATUS_PARTIAL)}
+                      {/if}
                     </span>
                   </div>
                   <div
@@ -759,7 +775,8 @@
                     class="theme-highlight-color"
                     aria-label={contactEmailReadonly ? '' : 'Edit'}>
                     {#if !contactEmailReadonly}
-                      <span>Change amount</span>
+                      <!-- LABEL: Change amount -->
+                      <span>{$t(PARTIAL_AMOUNT_EDIT_LABEL)}</span>
                       <span>&#xe604;</span>
                     {/if}
                   </div>
@@ -849,7 +866,8 @@
                 fill="#A7A7A7" />
             </svg>
           </i>
-          This payment is secured by Razorpay.
+          <!-- LABEL: This payment is secured by Razorpay. -->
+          {$t(SECURED_BY_MESSAGE)}
         </div>
       {/if}
     </Bottom>
