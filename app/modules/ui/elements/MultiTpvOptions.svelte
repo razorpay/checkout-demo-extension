@@ -3,6 +3,17 @@
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import Icon from 'ui/elements/Icon.svelte';
 
+  // i18n
+  import {
+    MULTI_TPV_TITLE,
+    MULTI_TPV_UPI_SUBTITLE,
+    MULTI_TPV_UPI_TITLE,
+  } from 'ui/labels/home';
+
+  import { getShortBankName, formatTemplateWithLocale } from 'i18n';
+
+  import { t, locale } from 'svelte-i18n';
+
   // Utils
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
@@ -11,6 +22,13 @@
   export let bank;
   export let icons;
   export let selectedOption = '';
+
+  let bankName;
+  $: {
+    if (bank) {
+      bankName = getShortBankName(bank.code, $locale);
+    }
+  }
 
   function trackTpvOptionSelected(data) {
     Analytics.track('multi_tpv:select', {
@@ -30,7 +48,8 @@
   }
 </script>
 
-<h3 class="title">Pay Using</h3>
+<!-- LABEL: Pay Using -->
+<h3 class="title">{$t(MULTI_TPV_TITLE)}</h3>
 <div class="border-list">
   <SlottedRadioOption
     name="method"
@@ -41,7 +60,7 @@
       <Icon icon="https://cdn.razorpay.com/bank/{bank.code}.gif" />
     </i>
     <div slot="title">A/C: {bank.account_number}</div>
-    <div slot="subtitle">{bank.name}</div>
+    <div slot="subtitle">{bankName}</div>
   </SlottedRadioOption>
   <SlottedRadioOption
     name="method"
@@ -51,7 +70,11 @@
     <i slot="icon">
       <Icon icon={icons.upi} />
     </i>
-    <div slot="title">UPI</div>
-    <div slot="subtitle">{bank.name} Account {bank.account_number}</div>
+    <!-- LABEL: UPI -->
+    <div slot="title">{$t(MULTI_TPV_UPI_TITLE)}</div>
+    <!-- LABEL: {bankName} Account {accountNumber} -->
+    <div slot="subtitle">
+      {formatTemplateWithLocale(MULTI_TPV_UPI_SUBTITLE, { bankName, accountNumber: bank.account_number }, $locale)}
+    </div>
   </SlottedRadioOption>
 </div>

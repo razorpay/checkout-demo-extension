@@ -22,3 +22,7 @@ export const PINCODE_LABEL = 'home.pincode_label';
 export const PINCODE_HELP = 'home.pincode_help';
 export const STATE_LABEL = 'home.state_label';
 export const STATE_HELP = 'home.state_help';
+
+export const MULTI_TPV_TITLE = 'home.multi_tpv_title';
+export const MULTI_TPV_UPI_TITLE = 'home.multi_tpv_upi_title';
+export const MULTI_TPV_UPI_SUBTITLE = 'home.multi_tpv_upi_subtitle';

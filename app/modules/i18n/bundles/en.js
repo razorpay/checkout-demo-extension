@@ -9,12 +9,14 @@ export default {
   home: {
     preferred_block_title: 'Preferred Payment Methods',
     single_block_title: 'Pay via ${method}',
+
     contact_label_required: 'Phone with Country Code',
     contact_label_optional: 'Phone with Country Code (Optional)',
     contact_help_text: 'Please enter a valid contact number',
     email_label_required: 'Email',
     email_label_optional: 'Email (Optional)',
     email_help_text: 'Please enter a valid email. Example: you@example.com',
+
     partial_payment_title: 'Select a payment type',
     min_amount_label: 'Minimum first amount',
     full_amount_label: 'Pay in full',
@@ -24,12 +26,17 @@ export default {
     partial_amount_help_invalid: 'Please enter a valid amount upto {amount}',
     partial_amount_help_lower: 'Minimum payable amount is {amount}',
     partial_amount_help_higher: 'Amount cannot exceed {amount}',
+
     address_label: 'Address',
     address_help: 'Address should be at least 10 characters long',
     pincode_label: 'PIN Code',
     pincode_help: 'Enter 6 digit pincode',
     state_label: 'Select State',
     state_help: 'Select a value from list of states',
+
+    multi_tpv_title: 'Pay Using',
+    multi_tpv_upi_title: 'UPI',
+    multi_tpv_upi_subtitle: '{bankName} Account {accountNumber}',
   },
   bank_transfer: {
     loading_message: 'Getting bank details...',
