@@ -5,6 +5,7 @@ const querystring = require('querystring');
 const {
   testDir,
   cdnUrl,
+  bundleUrl,
   lumberjackUrl,
   zestMoneyLoanAgreementUrl,
   maxmindScriptUrl,
@@ -14,6 +15,26 @@ const chrup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const chrlow = 'abcdefghijklmnopqrstuvwxyz';
 const chrnum = '0123456789';
 const chrsp = '!@#$%^&*()';
+
+/**
+ * Flattens the object by turning nested object into object with delimiters in the keys
+ * @param {Object} o
+ * @param {string} prefix [prefix='']
+ *
+ * @returns {Object}
+ */
+const flatten = (o, prefix = '') => {
+  const result = {};
+  Object.entries(o).forEach(([key, val]) => {
+    const flattenedKey = prefix ? `${prefix}.${key}` : key;
+    if (val && typeof val === 'object') {
+      Object.assign(result, flatten(val, flattenedKey));
+    } else {
+      result[flattenedKey] = val;
+    }
+  });
+  return result;
+};
 
 const randomRange = (min, max) =>
   min + Math.floor((1 + max - min) * Math.random());
@@ -134,10 +155,10 @@ const util = (module.exports = {
   chrup,
   chrnum,
   chrsp,
+  flatten,
   randomRange,
   randomName,
   randomEmail,
-  randomName,
   randomContact: () => '+91' + String(randomRange(8000000000, 9999999999)),
   randomString,
   randomLengthString,
@@ -166,7 +187,7 @@ const util = (module.exports = {
         !interceptorEnabled ||
         url.endsWith('favicon.ico') ||
         url.startsWith('data') ||
-        url.startsWith(cdnUrl) ||
+        (url.startsWith(cdnUrl) && !url.startsWith(bundleUrl)) || // Bundles are present on CDN, but need to be intercepted.
         url.startsWith(lumberjackUrl) ||
         url.includes(zestMoneyLoanAgreementUrl) ||
         url.includes(maxmindScriptUrl);

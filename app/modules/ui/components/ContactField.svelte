@@ -39,7 +39,7 @@
     on:paste={appendCountryCodeAsynchronously}
     on:blur={appendCountryCodeAsynchronously}
     required={!isOptional}
-    x-autocompletetype="phone-full"
+    xautocompletetype="phone-full"
     pattern={CONTACT_REGEX}
     readonly={isContactReadOnly()}
     formatter={{ type: 'phone' }}

@@ -10,3 +10,4 @@ export const maxlength = writable(6);
 export const otp = writable('');
 export const skipText = writable('Skip Saved Cards');
 export const text = writable('');
+export const mode = writable('');

@@ -135,7 +135,6 @@ test('Module: configurability/translate', t => {
             code: 'rzp.restrict_allow',
             _type: 'block',
             instruments: [],
-            title: 'Available Payment Methods',
           },
         },
       };

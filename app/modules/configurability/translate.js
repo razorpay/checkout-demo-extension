@@ -1,5 +1,5 @@
 import { createInstrument, isInstrumentForEntireMethod } from './instruments';
-import { createBlock } from './blocks';
+import { validateAndCreateBlock } from './blocks';
 
 /**
  * Translates the options
@@ -31,7 +31,8 @@ function _translate(options = {}, external) {
       code = `block.${code}`;
     }
 
-    const block = createBlock(code, value);
+    // These are coming from the merchant so we need to validate the keys of the instruments
+    const block = validateAndCreateBlock(code, value);
 
     if (block) {
       includedBlocks.push(block);
@@ -62,8 +63,9 @@ function _translate(options = {}, external) {
    */
   const allowedInstruments =
     allow |> _Arr.map(createInstrument) |> _Arr.filter(Boolean);
-  const allowedBlock = createBlock('rzp.restrict_allow', {
-    name: 'Available Payment Methods', // TODO
+
+  // These are coming from the merchant so we need to validate the keys of the instruments
+  const allowedBlock = validateAndCreateBlock('rzp.restrict_allow', {
     instruments: allowedInstruments,
   });
 

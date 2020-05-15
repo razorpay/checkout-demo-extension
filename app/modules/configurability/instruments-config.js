@@ -1,5 +1,3 @@
-import { toLowerCaseSafe } from 'lib/utils';
-
 /**
  * Get the updated payment payload augmented with the given instrument
  * @param {Instrument} instrument

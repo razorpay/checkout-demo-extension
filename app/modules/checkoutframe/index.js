@@ -214,60 +214,34 @@ function setSessionPreferences(session, preferences) {
   Razorpay.configure(preferences.options);
   session.setPreferences(preferences);
 
-  const order = preferences.order;
-  if (
-    order &&
-    order.bank &&
-    order.method === 'netbanking' &&
-    razorpayInstance.get('callback_url')
-  ) {
-    redirectForTPV(razorpayInstance, preferences);
-  } else {
-    // session.setPreferences updates razorpay options.
-    // validate options now
-    try {
-      validateOverrides(razorpayInstance);
-    } catch (e) {
-      return Razorpay.sendMessage({
-        event: 'fault',
-        data: e.message,
-      });
-    }
-
-    /* pass preferences options to SDK */
-    Bridge.checkout.callAndroid(
-      'setMerchantOptions',
-      JSON.stringify(preferences.options)
-    );
-
-    const qpmap = _.getQueryParams() |> _Obj.unflatten;
-    const methods = getEnabledMethods();
-    if (!methods.length) {
-      var message = 'No appropriate payment method found.';
-      if (isEMandateEnabled() && !razorpayInstance.get('customer_id')) {
-        message += '\nMake sure to pass customer_id for e-mandate payments';
-      }
-      return Razorpay.sendMessage({ event: 'fault', data: message });
-    }
-    session.render();
-    session.showModal(preferences);
+  // session.setPreferences updates razorpay options.
+  // validate options now
+  try {
+    validateOverrides(razorpayInstance);
+  } catch (e) {
+    return Razorpay.sendMessage({
+      event: 'fault',
+      data: e.message,
+    });
   }
-}
 
-function redirectForTPV(razorpayInstance, preferences) {
-  razorpayInstance.set('redirect', true);
+  /* pass preferences options to SDK */
+  Bridge.checkout.callAndroid(
+    'setMerchantOptions',
+    JSON.stringify(preferences.options)
+  );
 
-  var paymentPayload = {
-    amount: razorpayInstance.get('amount'),
-    bank: preferences.order.bank,
-    contact: razorpayInstance.get('prefill.contact') || '9999999999',
-    email: razorpayInstance.get('prefill.email') || 'void@razorpay.com',
-    method: 'netbanking',
-  };
-
-  razorpayInstance.createPayment(paymentPayload, {
-    fee: preferences.fee_bearer,
-  });
+  const qpmap = _.getQueryParams() |> _Obj.unflatten;
+  const methods = getEnabledMethods();
+  if (!methods.length) {
+    var message = 'No appropriate payment method found.';
+    if (isEMandateEnabled() && !razorpayInstance.get('customer_id')) {
+      message += '\nMake sure to pass customer_id for e-mandate payments';
+    }
+    return Razorpay.sendMessage({ event: 'fault', data: message });
+  }
+  session.render();
+  session.showModal(preferences);
 }
 
 function getPreferenecsParams(razorpayInstance) {

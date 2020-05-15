@@ -6,9 +6,21 @@
   // Props
   export let checked;
   export let id = `id_${Track.makeUid()}`; // Generate a random ID if one isn't provided
+  export let required = false;
+  export let helpText = '';
 
   // `for` attrib for the label should be same as the ID
   const htmlFor = id;
+
+  function handleInputFocus(event) {
+    focused = true;
+  }
+
+  function handleInputBlur(event) {
+    focused = false;
+  }
+
+  let focused = false;
 </script>
 
 <style>
@@ -74,9 +86,24 @@
   }
 </style>
 
-<label for={htmlFor} class="sv-checkbox" class:checked>
+<label
+  for={htmlFor}
+  class="sv-checkbox"
+  class:checked
+  class:focused
+  class:invalid={required && !checked}>
   <Stack inline horizontal>
-    <input {id} type="checkbox" on:change bind:checked />
+    <input
+      {id}
+      type="checkbox"
+      on:change
+      bind:checked
+      {required}
+      on:focus={handleInputFocus}
+      on:blur={handleInputBlur} />
     <slot />
   </Stack>
+  {#if helpText}
+    <div class="help">{helpText}</div>
+  {/if}
 </label>

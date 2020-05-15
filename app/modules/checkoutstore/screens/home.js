@@ -2,6 +2,7 @@ import { derived, writable } from 'svelte/store';
 
 export const contact = writable('+');
 export const email = writable('');
+export const emiContact = writable('');
 
 export const address = writable('');
 export const pincode = writable('');

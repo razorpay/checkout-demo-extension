@@ -33,7 +33,7 @@
   } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
-  import { isDCCEnabled } from 'checkoutstore';
+  import { getOption, isDCCEnabled } from 'checkoutstore';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -53,29 +53,36 @@
     getMerchantOrder,
     getMerchantConfig,
   } from 'checkoutstore';
+
   import {
     isCreditCardEnabled,
     isDebitCardEnabled,
     getSingleMethod,
+    isEMandateBankEnabled,
   } from 'checkoutstore/methods';
+
   import {
     getTranslatedInstrumentsForCustomer,
     getAllInstrumentsForCustomer,
   } from 'checkoutframe/personalization';
+
   import {
     hideCta,
     showCta,
     showCtaWithText,
     showCtaWithDefaultText,
   } from 'checkoutstore/cta';
+
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getCardOffer, hasOffersOnHomescreen } from 'checkoutframe/offers';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
+
   import {
     INDIA_COUNTRY_CODE,
     MAX_PREFERRED_INSTRUMENTS,
   } from 'common/constants';
+
   import { setBlocks } from 'ui/tabs/home/instruments';
 
   const cardOffer = getCardOffer();
@@ -98,6 +105,7 @@
   const showRecurringCallout =
     isRecurring() && session.tab !== 'emandate' && singleMethod === 'card';
 
+  const prefilledBank = getOption('prefill.bank');
   const isPartialPayment = getIsPartialPayment();
   const contactEmailReadonly = isContactEmailReadOnly();
 
@@ -558,6 +566,13 @@
     if (method === 'gpay') {
       // GPay is UPI underneath
       method = 'upi';
+    }
+
+    if (method === 'emandate') {
+      // If bank is not prefilled, go to netbanking tab. Otherwise, go to the emandate tab directly.
+      if (!prefilledBank || !isEMandateBankEnabled(prefilledBank)) {
+        method = 'netbanking';
+      }
     }
 
     session.switchTab(method);
