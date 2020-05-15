@@ -91,102 +91,116 @@ test('Module: configurability/sequence', t => {
         ],
       };
 
-      expected = [
-        {
-          code: 'block.gpay',
-          _type: 'block',
-          instruments: [
-            {
-              method: 'upi',
-              apps: ['com.google.android.apps.nbu.paisa.user'],
-              _type: 'instrument',
-            },
-          ],
-          title: 'Pay via Google Pay',
-        },
-        {
-          code: 'netbanking',
-          _type: 'rzp_method',
-          method: 'netbanking',
-        },
-        {
-          code: 'block.hdfc',
-          _type: 'block',
-          instruments: [
-            {
-              method: 'card',
-              issuers: ['HDFC'],
-              _type: 'instrument',
-            },
-            {
-              method: 'netbanking',
-              banks: ['HDFC'],
-              _type: 'instrument',
-            },
-            {
-              method: 'wallet',
-              wallets: ['payzapp'],
-              _type: 'instrument',
-            },
-          ],
-          title: 'Pay via HDFC Bank',
-        },
-        {
-          code: 'card',
-          _type: 'rzp_method',
-          method: 'card',
-        },
-        {
-          code: 'wallet',
-          _type: 'rzp_method',
-          method: 'wallet',
-        },
-        {
-          code: 'upi',
-          _type: 'rzp_method',
-          method: 'upi',
-        },
-        {
-          code: 'gpay',
-          _type: 'rzp_method',
-          method: 'gpay',
-        },
-        {
-          code: 'emi',
-          _type: 'rzp_method',
-          method: 'emi',
-        },
-        {
-          code: 'cardless_emi',
-          _type: 'rzp_method',
-          method: 'cardless_emi',
-        },
-        {
-          code: 'qr',
-          _type: 'rzp_method',
-          method: 'qr',
-        },
-        {
-          code: 'paylater',
-          _type: 'rzp_method',
-          method: 'paylater',
-        },
-        {
-          code: 'paypal',
-          _type: 'rzp_method',
-          method: 'paypal',
-        },
-        {
-          code: 'bank_transfer',
-          _type: 'rzp_method',
-          method: 'bank_transfer',
-        },
-        {
-          code: 'nach',
-          _type: 'rzp_method',
-          method: 'nach',
-        },
-      ];
+      expected = {
+        blocks: [
+          {
+            code: 'block.gpay',
+            _type: 'block',
+            instruments: [
+              {
+                method: 'upi',
+                apps: ['com.google.android.apps.nbu.paisa.user'],
+                _type: 'instrument',
+              },
+            ],
+            title: 'Pay via Google Pay',
+          },
+          {
+            code: 'netbanking',
+            _type: 'rzp_method',
+            method: 'netbanking',
+          },
+          {
+            code: 'block.hdfc',
+            _type: 'block',
+            instruments: [
+              {
+                method: 'card',
+                issuers: ['HDFC'],
+                _type: 'instrument',
+              },
+              {
+                method: 'netbanking',
+                banks: ['HDFC'],
+                _type: 'instrument',
+              },
+              {
+                method: 'wallet',
+                wallets: ['payzapp'],
+                _type: 'instrument',
+              },
+            ],
+            title: 'Pay via HDFC Bank',
+          },
+          {
+            code: 'card',
+            _type: 'rzp_method',
+            method: 'card',
+          },
+          {
+            code: 'wallet',
+            _type: 'rzp_method',
+            method: 'wallet',
+          },
+          {
+            code: 'upi',
+            _type: 'rzp_method',
+            method: 'upi',
+          },
+          {
+            code: 'gpay',
+            _type: 'rzp_method',
+            method: 'gpay',
+          },
+          {
+            code: 'cardless_emi',
+            _type: 'rzp_method',
+            method: 'cardless_emi',
+          },
+          {
+            code: 'qr',
+            _type: 'rzp_method',
+            method: 'qr',
+          },
+          {
+            code: 'paylater',
+            _type: 'rzp_method',
+            method: 'paylater',
+          },
+          {
+            code: 'paypal',
+            _type: 'rzp_method',
+            method: 'paypal',
+          },
+          {
+            code: 'bank_transfer',
+            _type: 'rzp_method',
+            method: 'bank_transfer',
+          },
+          {
+            code: 'nach',
+            _type: 'rzp_method',
+            method: 'nach',
+          },
+        ],
+
+        sequence: [
+          'block.gpay',
+          'netbanking',
+          'block.hdfc',
+          'card',
+          'wallet',
+          'upi',
+          'gpay',
+          'emi',
+          'cardless_emi',
+          'qr',
+          'paylater',
+          'paypal',
+          'bank_transfer',
+          'nach',
+        ],
+      };
 
       found = Sequence.getSequencedBlocks(params);
 
@@ -290,47 +304,51 @@ test('Module: configurability/sequence', t => {
         ],
       };
 
-      expected = [
-        {
-          code: 'block.gpay',
-          _type: 'block',
-          instruments: [
-            {
-              method: 'upi',
-              apps: ['com.google.android.apps.nbu.paisa.user'],
-              _type: 'instrument',
-            },
-          ],
-          title: 'Pay via Google Pay',
-        },
-        {
-          code: 'netbanking',
-          _type: 'rzp_method',
-          method: 'netbanking',
-        },
-        {
-          code: 'block.hdfc',
-          _type: 'block',
-          instruments: [
-            {
-              method: 'card',
-              issuers: ['HDFC'],
-              _type: 'instrument',
-            },
-            {
-              method: 'netbanking',
-              banks: ['HDFC'],
-              _type: 'instrument',
-            },
-            {
-              method: 'wallet',
-              wallets: ['payzapp'],
-              _type: 'instrument',
-            },
-          ],
-          title: 'Pay via HDFC Bank',
-        },
-      ];
+      expected = {
+        blocks: [
+          {
+            code: 'block.gpay',
+            _type: 'block',
+            instruments: [
+              {
+                method: 'upi',
+                apps: ['com.google.android.apps.nbu.paisa.user'],
+                _type: 'instrument',
+              },
+            ],
+            title: 'Pay via Google Pay',
+          },
+          {
+            code: 'netbanking',
+            _type: 'rzp_method',
+            method: 'netbanking',
+          },
+          {
+            code: 'block.hdfc',
+            _type: 'block',
+            instruments: [
+              {
+                method: 'card',
+                issuers: ['HDFC'],
+                _type: 'instrument',
+              },
+              {
+                method: 'netbanking',
+                banks: ['HDFC'],
+                _type: 'instrument',
+              },
+              {
+                method: 'wallet',
+                wallets: ['payzapp'],
+                _type: 'instrument',
+              },
+            ],
+            title: 'Pay via HDFC Bank',
+          },
+        ],
+
+        sequence: ['block.gpay', 'netbanking', 'block.hdfc'],
+      };
 
       found = Sequence.getSequencedBlocks(params);
 
