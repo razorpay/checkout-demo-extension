@@ -525,23 +525,23 @@
           {showRecommendedUPIApp} />
       {/if}
 
-      <!-- {#if useWebPaymentsApi} -->
-      <div class="legend left">{$t(UPI_GPAY_BLOCK_HEADING)}</div>
-      <div class="border-list">
-        <SlottedRadioOption
-          name="google_pay_web"
-          selected={selectedToken === 'gpay'}
-          on:click={() => {
-            selectedToken = 'gpay';
-            session.preSubmit();
-          }}>
-          <div slot="title">{$t(GPAY_WEB_API_TITLE)}</div>
-          <i slot="icon">
-            <Icon icon={session.themeMeta.icons.gpay} />
-          </i>
-        </SlottedRadioOption>
-      </div>
-      <!-- {/if} -->
+      {#if useWebPaymentsApi}
+        <div class="legend left">{$t(UPI_GPAY_BLOCK_HEADING)}</div>
+        <div class="border-list">
+          <SlottedRadioOption
+            name="google_pay_web"
+            selected={selectedToken === 'gpay'}
+            on:click={() => {
+              selectedToken = 'gpay';
+              session.preSubmit();
+            }}>
+            <div slot="title">{$t(GPAY_WEB_API_TITLE)}</div>
+            <i slot="icon">
+              <Icon icon={session.themeMeta.icons.gpay} />
+            </i>
+          </SlottedRadioOption>
+        </div>
+      {/if}
 
       {#if shouldShowCollect}
         <div class="legend left">{$t(UPI_COLLECT_BLOCK_HEADING)}</div>
@@ -581,19 +581,19 @@
         </div>
       {/if}
 
-      <!-- {#if shouldShowOmnichannel} -->
-      <GooglePayOmnichannel
-        error={retryOmnichannel}
-        focusOnCreate={true}
-        {isFirst}
-        retry={retryOmnichannel}
-        selected={selectedToken === 'gpay-omni'}
-        on:blur={trackOmnichannelEntry}
-        on:select={() => {
-          onUpiAppSelection({ detail: { id: 'gpay-omni' } });
-        }}
-        bind:this={omnichannelField} />
-      <!-- {/if} -->
+      {#if shouldShowOmnichannel}
+        <GooglePayOmnichannel
+          error={retryOmnichannel}
+          focusOnCreate={true}
+          {isFirst}
+          retry={retryOmnichannel}
+          selected={selectedToken === 'gpay-omni'}
+          on:blur={trackOmnichannelEntry}
+          on:select={() => {
+            onUpiAppSelection({ detail: { id: 'gpay-omni' } });
+          }}
+          bind:this={omnichannelField} />
+      {/if}
 
       {#if shouldShowQr}
         <div class="legend left">{$t(QR_BLOCK_HEADING)}</div>
