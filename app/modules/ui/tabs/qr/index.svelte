@@ -28,7 +28,7 @@
     QR_GENERTATING_LABEL,
     QR_RETRY,
     QR_SCAN_ON_PHONE,
-    QR_DOWNTME_TEXT,
+    QR_DOWNTIME_TEXT,
   } from 'ui/labels';
 
   // Props
@@ -232,7 +232,7 @@
     <Bottom tab="qr">
       <DowntimeCallout severe={disabled}>
         <!-- LABEL: UPI QR is experiencing low success rates. -->
-        <FormattedText text={$t(QR_DOWNTME_TEXT)} />
+        <FormattedText text={$t(QR_DOWNTIME_TEXT)} />
 
       </DowntimeCallout>
     </Bottom>

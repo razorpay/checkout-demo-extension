@@ -32,6 +32,7 @@
   import ListHeader from 'ui/elements/ListHeader.svelte';
   import Field from 'ui/components/Field.svelte';
   import Icon from 'ui/elements/Icon.svelte';
+  import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
   import Collect from './Collect.svelte';
   import GooglePayCollect from './GooglePayCollect.svelte';
@@ -55,6 +56,11 @@
     UPI_COLLECT_NEW_VPA_HELP,
     UPI_COLLECT_ENTER_ID,
     UPI_COLLECT_SAVE,
+    GPAY_WEB_API_TITLE,
+    QR_BLOCK_HEADING,
+    SHOW_QR_CODE,
+    SCAN_QR_CODE,
+    UPI_DOWNTIME_TEXT,
   } from 'ui/labels';
 
   // Props
@@ -529,7 +535,7 @@
             selectedToken = 'gpay';
             session.preSubmit();
           }}>
-          <div slot="title">Google Pay</div>
+          <div slot="title">{$_(GPAY_WEB_API_TITLE)}</div>
           <i slot="icon">
             <Icon icon={session.themeMeta.icons.gpay} />
           </i>
@@ -590,15 +596,15 @@
       {/if}
 
       {#if shouldShowQr}
-        <div class="legend left">Pay using QR Code</div>
+        <div class="legend left">{$_(QR_BLOCK_HEADING)}</div>
         <div class="options" id="showQr">
           <NextOption
             icon={qrIcon}
             tabindex="0"
             attributes={{ role: 'button', 'aria-label': 'Show QR Code - Scan the QR code using your UPI app' }}
             on:select={selectQrMethod}>
-            <div>Show QR Code</div>
-            <div class="desc">Scan the QR code using your UPI app</div>
+            <div>{$_(SHOW_QR_CODE)}</div>
+            <div class="desc">{$_(SCAN_QR_CODE)}</div>
           </NextOption>
         </div>
       {/if}
@@ -607,8 +613,7 @@
     <Bottom tab="upi">
       {#if down || disabled}
         <DowntimeCallout severe={disabled}>
-          <strong>UPI</strong>
-          is experiencing low success rates.
+          <FormattedText text={$_(UPI_DOWNTIME_TEXT)} />
         </DowntimeCallout>
       {/if}
     </Bottom>

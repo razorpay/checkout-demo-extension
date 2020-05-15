@@ -250,6 +250,17 @@ export default {
     collect_securely_save: 'Securely save your UPI ID',
     new_vpa_title_logged_out: 'UPI ID',
     new_vpa_title_logged_in: 'Add UPI ID',
+    new_vpa_subtitle: 'Google Pay, BHIM, PhonePe & more',
+    gpay_web_api_title: 'Google Pay',
+    qr_block_heading: 'Pay using QR Code',
+    show_qr_code: 'Show QR Code',
+    scan_qr_code: 'Scan the QR code using your UPI app',
+    downtime_text: '<strong>UPI<strong> is experiencing low success rates.',
+    omni_block_heading: 'Or, pay using phone number',
+    omni_gpay_number: 'Google Pay phone number',
+    omni_enter_number: 'Enter your phone number',
+    omni_error:
+      'Please ensure the same number is linked to the Google Pay account.',
   },
   upi_intent_apps: {
     google_pay: 'Google Pay (Tez)',

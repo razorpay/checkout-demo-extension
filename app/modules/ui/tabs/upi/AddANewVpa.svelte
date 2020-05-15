@@ -19,8 +19,9 @@
     UPI_COLLECT_NEW_VPA_HELP,
     UPI_COLLECT_ENTER_ID,
     UPI_COLLECT_SAVE,
-    NEw_VPA_TITLE_LOGGED_OUT,
-    NEw_VPA_TITLE_LOGGED_IN,
+    NEW_VPA_TITLE_LOGGED_OUT,
+    NEW_VPA_TITLE_LOGGED_IN,
+    NEW_VPA_SUBTITLE,
   } from 'ui/labels';
 
   // Props
@@ -141,9 +142,9 @@
   on:click={focusAfterTimeout}
   {selected}>
   <div id="new-vpa-field" slot="title">
-    {logged && canSaveVpa ? $_(NEw_VPA_TITLE_LOGGED_IN) : $_(NEw_VPA_TITLE_LOGGED_OUT)}
+    {logged && canSaveVpa ? $_(NEW_VPA_TITLE_LOGGED_IN) : $_(NEW_VPA_TITLE_LOGGED_OUT)}
   </div>
-  <div slot="subtitle">Google Pay, BHIM, PhonePe & more</div>
+  <div slot="subtitle">{$_(NEW_VPA_SUBTITLE)}</div>
   <i slot="icon" class="top">
     <Icon icon={session.themeMeta.icons.upi} />
   </i>
