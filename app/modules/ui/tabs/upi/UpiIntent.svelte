@@ -26,7 +26,7 @@
     UPI_REDIRECT_TO_APP,
     UPI_RECOMMENDED,
     UPI_SHOW_OTHER_APPS,
-  } from 'ui/labels';
+  } from 'ui/labels/upi';
 
   // Props
   export let apps;

@@ -29,7 +29,7 @@
     QR_RETRY,
     QR_SCAN_ON_PHONE,
     QR_DOWNTIME_TEXT,
-  } from 'ui/labels';
+  } from 'ui/labels/qr';
 
   // Props
   export let view = 'qr';

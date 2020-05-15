@@ -61,7 +61,7 @@
     SHOW_QR_CODE,
     SCAN_QR_CODE,
     UPI_DOWNTIME_TEXT,
-  } from 'ui/labels';
+  } from 'ui/labels/upi';
 
   // Props
   export let selectedApp = undefined;
@@ -581,19 +581,19 @@
         </div>
       {/if}
 
-      {#if shouldShowOmnichannel}
-        <GooglePayOmnichannel
-          error={retryOmnichannel}
-          focusOnCreate={true}
-          {isFirst}
-          retry={retryOmnichannel}
-          selected={selectedToken === 'gpay-omni'}
-          on:blur={trackOmnichannelEntry}
-          on:select={() => {
-            onUpiAppSelection({ detail: { id: 'gpay-omni' } });
-          }}
-          bind:this={omnichannelField} />
-      {/if}
+      <!-- {#if shouldShowOmnichannel} -->
+      <GooglePayOmnichannel
+        error={retryOmnichannel}
+        focusOnCreate={true}
+        {isFirst}
+        retry={retryOmnichannel}
+        selected={selectedToken === 'gpay-omni'}
+        on:blur={trackOmnichannelEntry}
+        on:select={() => {
+          onUpiAppSelection({ detail: { id: 'gpay-omni' } });
+        }}
+        bind:this={omnichannelField} />
+      <!-- {/if} -->
 
       {#if shouldShowQr}
         <div class="legend left">{$t(QR_BLOCK_HEADING)}</div>

@@ -19,7 +19,7 @@
     OMNI_GPAY_NUMBER,
     OMNI_ENTER_NUMBER,
     OMNI_ERROR,
-  } from 'ui/labels';
+  } from 'ui/labels/upi';
 
   // Props
   export let selected = true;

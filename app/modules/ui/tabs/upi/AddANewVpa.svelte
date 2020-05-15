@@ -22,7 +22,7 @@
     NEW_VPA_TITLE_LOGGED_OUT,
     NEW_VPA_TITLE_LOGGED_IN,
     NEW_VPA_SUBTITLE,
-  } from 'ui/labels';
+  } from 'ui/labels/upi';
 
   // Props
   export let selected = false;
