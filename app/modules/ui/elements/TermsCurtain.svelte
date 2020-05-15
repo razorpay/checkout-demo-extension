@@ -1,7 +1,11 @@
 <script>
+  // UI imports
+  import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
+
   // Props
   export let terms;
   export let visible = false;
+  export let loading = false;
   export let heading = 'Terms and Conditions';
   export let image;
   export let imageAlt;
@@ -22,21 +26,28 @@
   }
 </script>
 
-<div class={'tnc-curtain ' + (visible ? 'shown' : '')}>
+<div class="tnc-curtain" class:shown={visible}>
   <div class="tnc-container-bg" on:click={close} />
   <div class="tnc-container">
-    <div class="tnc-header">
-      <span>
-        {@html heading}
-      </span>
-      {#if image}
-        <span class="tnc-provider-image">
-          <img src={image} alt={imageAlt} />
+    {#if loading}
+      <AsyncLoading>Loading terms...</AsyncLoading>
+    {:else}
+      <div class="tnc-header">
+        <span>
+          {@html heading}
         </span>
-      {/if}
-      <span class="tnc-close" on:click={close}>&times;</span>
-    </div>
-    <div class="separator" />
-    <div class="tnc-contents">{termsText}</div>
+        {#if image}
+          <span class="tnc-provider-image">
+            <img src={image} alt={imageAlt} />
+          </span>
+        {/if}
+        <span class="tnc-close" on:click={close}>&times;</span>
+      </div>
+      <div class="separator" />
+      <div class="tnc-contents">
+        <div>{termsText}</div>
+      </div>
+    {/if}
+
   </div>
 </div>

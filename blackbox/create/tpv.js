@@ -76,14 +76,6 @@ module.exports = function(testFeatures) {
 
       const isHomeScreenSkipped = missingUserDetails && !partialPayment;
 
-      if (callbackUrl) {
-        await expectRedirectWithCallback(context, {
-          method: 'netbanking',
-          bank: 'SBIN',
-        });
-        return;
-      }
-
       if (!isHomeScreenSkipped) {
         await assertBasicDetailsScreen(context);
       }
@@ -119,8 +111,15 @@ module.exports = function(testFeatures) {
         await handleFeeBearer(context);
       }
 
-      await passRequestNetbanking(context);
-      await handleMockSuccessDialog(context);
+      if (callbackUrl) {
+        await expectRedirectWithCallback(context, {
+          method: 'netbanking',
+          bank: 'SBIN',
+        });
+      } else {
+        await passRequestNetbanking(context);
+        await handleMockSuccessDialog(context);
+      }
     });
   });
 };

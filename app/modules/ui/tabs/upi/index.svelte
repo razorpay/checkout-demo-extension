@@ -309,20 +309,24 @@
         break;
 
       default:
-        _token = _Arr.find(
-          _Obj.getSafely(session.getCurrentCustomer(), 'tokens.items', []),
-          token => token.id === selectedToken
-        );
+        // `selectedToken` can be null if nothing is to be selected by default
+        if (selectedToken) {
+          _token = _Arr.find(
+            _Obj.getSafely(session.getCurrentCustomer(), 'tokens.items', []),
+            token => token.id === selectedToken
+          );
 
-        Analytics.track('upi:token:switch:default', {
-          data: {
-            selectedToken,
-            _token,
-          },
-          immediately: true,
-        });
+          Analytics.track('upi:token:switch:default', {
+            data: {
+              selectedToken,
+              _token,
+            },
+            immediately: true,
+          });
 
-        data = { token: _token.token };
+          data = { token: _token.token };
+        }
+
         break;
     }
 

@@ -11,6 +11,7 @@
     otp,
     skipText,
     text,
+    mode,
   } from 'checkoutstore/screens/otp';
 
   // Utils imports
@@ -21,6 +22,8 @@
   // UI imports
   import LinkButton from 'components/LinkButton.svelte';
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
+  import EmiDetails from 'ui/components/EmiDetails.svelte';
+  import TermsAndConditions from 'ui/components/TermsAndConditions.svelte';
 
   // Props
   export let on = {};
@@ -32,7 +35,13 @@
   export let inputWidth;
   export let showInput;
 
+  let otpPromptVisible;
+
   const session = getSession();
+
+  // This flag indicates whether or not the OTP input field will be visible.
+  // We don't want to show EMI details on loading state or error state.
+  $: otpPromptVisible = !$action && !$loading;
 
   $: {
     /**
@@ -75,9 +84,17 @@
       });
     }
   }
+
+  export function onBack() {
+    $mode = '';
+  }
 </script>
 
 <style>
+  h3 {
+    margin: 10px 0;
+  }
+
   .otp-screen-contents {
     display: flex;
     flex-direction: column;
@@ -96,6 +113,9 @@
   <!-- The only reason "div.otp-screen-contents" exists is because we want to use "display: flex;" -->
   <!-- But since we have legacy code using "makeVisible()", it does "display: block;" -->
   <div class="otp-screen-contents">
+    {#if otpPromptVisible && $mode}
+      <EmiDetails />
+    {/if}
     <div class="otp-controls">
       <div id="otp-prompt">
         {#if $loading}
@@ -154,7 +174,7 @@
         </div>
       </div>
 
-      <div id="otp-sec-outer">
+      <div id="otp-sec-outer" class:compact={$mode === 'HDFC_DC'}>
         {#if showInput}
           {#if $allowResend}
             <LinkButton
@@ -179,5 +199,8 @@
         {/if}
       </div>
     </div>
+    {#if otpPromptVisible && $mode}
+      <TermsAndConditions mode={$mode} />
+    {/if}
   </div>
 </div>

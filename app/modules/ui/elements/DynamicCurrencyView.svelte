@@ -32,6 +32,7 @@
   import Radio from 'ui/elements/Radio.svelte';
   import SearchModal from 'ui/elements/SearchModal.svelte';
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
+  import CurrencySearchItem from 'ui/elements/search-item/Currency.svelte';
 
   const TOP_CURRENCIES = ['USD', 'GBP', 'EUR'];
   // Constants
@@ -152,10 +153,9 @@
     ([code]) => code === selectedCurrency
   );
 
-  function onSelect(code) {
-    if (selectedCurrency !== code) {
-      selectedCurrency = code;
-    }
+  function onSelect({ currency }) {
+    selectedCurrency = currency;
+
     searchModal.close();
   }
 
@@ -176,43 +176,51 @@
    * 3.) Entity Currency
    * 4.) Rest
    * @param {Object} currencies
-   * @returns {Object} sortedCurrencies
+   * @returns {Array<Object>} sortedCurrencies
    */
   function sortCurrencies(currencies) {
     const CODE = 0;
     const CONFIG = 1;
+
     // Insert entity currency on 3rd position.
     const topCurrencies = _Arr.insertAt(
       TOP_CURRENCIES.slice(),
       getCurrency(),
       2
     );
-    return _Obj
-      .entries(currencies)
-      .sort((_a, _b) => {
-        const a = _a[CODE];
-        const b = _b[CODE];
-        if (a === cardCurrency) {
+
+    const sorted = _Obj.entries(currencies).sort((_a, _b) => {
+      const a = _a[CODE];
+      const b = _b[CODE];
+      if (a === cardCurrency) {
+        return -1;
+      }
+      if (b === cardCurrency) {
+        return 1;
+      }
+      if (_Arr.contains(topCurrencies, a)) {
+        if (_Arr.contains(topCurrencies, b)) {
+          const indexOfA = topCurrencies.indexOf(a);
+          const indexOfB = topCurrencies.indexOf(b);
+          return indexOfA > indexOfB ? 1 : -1;
+        } else {
           return -1;
         }
-        if (b === cardCurrency) {
-          return 1;
-        }
-        if (_Arr.contains(topCurrencies, a)) {
-          if (_Arr.contains(topCurrencies, b)) {
-            const indexOfA = topCurrencies.indexOf(a);
-            const indexOfB = topCurrencies.indexOf(b);
-            return indexOfA > indexOfB ? 1 : -1;
-          } else {
-            return -1;
-          }
-        }
-        return 0;
-      })
-      .reduce((acc, r) => {
-        acc[r[CODE]] = r[CONFIG];
-        return acc;
-      }, {});
+      }
+      return 0;
+    });
+
+    return _Arr.map(sorted, _currency => {
+      const currency = _currency[0];
+      const rest = _currency[1];
+
+      return _Obj.extend(
+        {
+          currency,
+        },
+        rest
+      );
+    });
   }
 
   function showCurrenciesModal() {
@@ -311,8 +319,11 @@
       </div>
       <SearchModal
         title="Select Currency to Pay"
-        inputPlaceholderText="Search for currency or code"
-        currencies={sortedCurrencies}
+        placeholder="Search for currency or code"
+        autocomplete="transaction-currency"
+        items={sortedCurrencies}
+        keys={['currency', 'name', 'symbol']}
+        component={CurrencySearchItem}
         visible={false}
         bind:this={searchModal}
         on:select={({ detail }) => onSelect(detail)} />

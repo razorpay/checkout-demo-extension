@@ -51,7 +51,7 @@
   },
   "dependencies": {
     "chalk": "^2.4.1",
-    "fe": "git+https://github.com/razorpay/common-frontend-utils.git#5939631",
+    "fe": "git+https://github.com/razorpay/common-frontend-utils.git#90f5b4a",
     "gulp": "^4.0.0",
     "gulp-stylus": "^2.7.0",
     "gulp-usemin": "^0.3.29",
@@ -74,8 +74,8 @@
     "husky": "^1.0.0-rc.14",
     "jest-circus": "^24.9.0",
     "lint-staged": "^10.2.2",
-    "prettier": "^1.18.2",
-    "prettier-plugin-svelte": "^1.0.0",
+    "prettier": "^1.19.1",
+    "prettier-plugin-svelte": "^1.1.0",
     "pretty-quick": "^2.0.0"
   },
   "husky": {

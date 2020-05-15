@@ -104,6 +104,7 @@ var subscription_will_refund = _.subscription && (_.subscription.type === 0);
               </div>
             `?`
           </div>
+          <div id="language-dropdown"></div>
           `? o('theme.branding') === 'payzapp'`
             <div id="cob-image" style="background-image: url('https://cdn.razorpay.com/brand/`=o('theme.branding')`.png')"></div>
           `?? o('theme.branding')`
@@ -146,10 +147,6 @@ var subscription_will_refund = _.subscription && (_.subscription.type === 0);
                       <div id="wallet-svelte-wrap">
                     </div>
                   </div>
-                </div>
-              `?`
-              `?isMethodEnabled('emandate')`
-                <div id="emandate-wrapper">
                 </div>
               `?`
             </div>

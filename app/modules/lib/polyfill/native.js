@@ -1,11 +1,12 @@
 /* eslint-disable no-extend-native */
+/* global Set */
 
 /**
  * Polyfill for String.prototype.includes
  */
-(function() {
+(function () {
   if (!String.prototype.includes) {
-    String.prototype.includes = function() {
+    String.prototype.includes = function () {
       return String.prototype.indexOf.apply(this, arguments) !== -1;
     };
   }
@@ -14,9 +15,9 @@
 /**
  * Polyfill for Array.prototype.includes
  */
-(function() {
+(function () {
   if (!Array.prototype.includes) {
-    Array.prototype.includes = function() {
+    Array.prototype.includes = function () {
       return Array.prototype.indexOf.apply(this, arguments) !== -1;
     };
   }
@@ -25,9 +26,9 @@
 /**
  * Polyfill for String.prototype.startsWith
  */
-(function() {
+(function () {
   if (!String.prototype.startsWith) {
-    String.prototype.startsWith = function() {
+    String.prototype.startsWith = function () {
       return String.prototype.indexOf.apply(this, arguments) === 0;
     };
   }
@@ -36,16 +37,16 @@
 /*
  * Polyfill for Array.from
  */
-(function() {
+(function () {
   if (!Array.from) {
-    Array.from = (function() {
+    Array.from = (function () {
       var toStr = Object.prototype.toString;
-      var isCallable = function(fn) {
+      var isCallable = function (fn) {
         return (
           typeof fn === 'function' || toStr.call(fn) === '[object Function]'
         );
       };
-      var toInteger = function(value) {
+      var toInteger = function (value) {
         var number = Number(value);
         if (isNaN(number)) {
           return 0;
@@ -56,13 +57,38 @@
         return (number > 0 ? 1 : -1) * Math.floor(Math.abs(number));
       };
       var maxSafeInteger = Math.pow(2, 53) - 1;
-      var toLength = function(value) {
+      var toLength = function (value) {
         var len = toInteger(value);
         return Math.min(Math.max(len, 0), maxSafeInteger);
+      };
+      var setToArray = function (set) {
+        var values = [];
+
+        set.forEach((value) => values.push(value));
+
+        return values;
       };
 
       // The length property of the from method is 1.
       return function from(arrayLike /*, mapFn, thisArg */) {
+        /**
+         * 🚨🚨🚨🚨
+         * IMPORTANT
+         * 🚨🚨🚨🚨
+         * Use custom handler for Set.
+         *
+         * DO NOT REMOVE THE FOLLOW if-BLOCK
+         * OTHERWISE CHECKOUT WILL BREAK ON IE 11
+         *
+         * We are doing this because Symbol is not present on IE 11
+         * and adding a Symbol polyfill does nothing because
+         * we would also need to polyfill Set.prototype[Symbol.iterator]
+         * and that somehow did not work after 3 hours of debugging.
+         */
+        if (arrayLike instanceof Set) {
+          return setToArray(arrayLike);
+        }
+
         // 1. Let C be the this value.
         var C = this;
 
@@ -134,10 +160,10 @@
  * Polyfill for Array.prototype.fill
  * Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/fill#Polyfill
  */
-(function() {
+(function () {
   if (!Array.prototype.fill) {
     Object.defineProperty(Array.prototype, 'fill', {
-      value: function(value) {
+      value: function (value) {
         // Steps 1-2.
         // eslint-disable-next-line eqeqeq
         if (this == null) {
@@ -186,7 +212,7 @@
  * Polyfill for Object.assign
  * Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign#Polyfill
  */
-(function() {
+(function () {
   if (typeof Object.assign !== 'function') {
     // Must be writable: true, enumerable: false, configurable: true
     Object.defineProperty(Object, 'assign', {
@@ -218,3 +244,20 @@
     });
   }
 })();
+
+// Fix Function#name on browsers that do not support it (IE):
+if (!function f() {}.name) {
+  Object.defineProperty(Function.prototype, 'name', {
+    get: function () {
+      var name = (this.toString()
+        .replace(/\n/g, '')
+        .match(/^function\s*([^\s(]+)/) || [])[1];
+      // For better performance only parse once, and then cache the
+      // result through a new accessor for repeated access.
+      Object.defineProperty(this, 'name', { value: name });
+      return name;
+    },
+
+    configurable: true,
+  });
+}
