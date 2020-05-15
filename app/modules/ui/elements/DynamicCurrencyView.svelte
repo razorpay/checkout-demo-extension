@@ -9,6 +9,8 @@
     dccCurrency,
   } from 'checkoutstore/screens/card';
 
+  import { t } from 'svelte-i18n';
+
   import {
     selectedInstrument,
     selectedInstrumentId,
@@ -33,6 +35,13 @@
   import SearchModal from 'ui/elements/SearchModal.svelte';
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
   import CurrencySearchItem from 'ui/elements/search-item/Currency.svelte';
+
+  // i18n labels
+  import {
+    DCC_SEARCH_TITLE,
+    DCC_SEARCH_PLACEHOLDER,
+    DCC_SEARCH_ALL,
+  } from 'ui/labels/dcc';
 
   const TOP_CURRENCIES = ['USD', 'GBP', 'EUR'];
   // Constants
@@ -317,9 +326,14 @@
         {#if selectedCurrencyInDisplay}More{:else}Change{/if}
         <span class="arrow">&#xe604;</span>
       </div>
+
+      <!-- LABEL: Select currency to pay -->
+      <!-- LABEL: Search for currency -->
+      <!-- LABEL: All currencies -->
       <SearchModal
-        title="Select Currency to Pay"
-        placeholder="Search for currency or code"
+        title={$t(DCC_SEARCH_TITLE)}
+        placeholder={$t(DCC_SEARCH_PLACEHOLDER)}
+        all={$t(DCC_SEARCH_ALL)}
         autocomplete="transaction-currency"
         items={sortedCurrencies}
         keys={['currency', 'name', 'symbol']}

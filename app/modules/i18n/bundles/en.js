@@ -6,4 +6,10 @@ export default {
     search_placeholder: 'Search for bank',
     search_all: 'All banks',
   },
+
+  dcc: {
+    search_all: 'All currencies',
+    search_title: 'Select currency to pay',
+    search_placeholder: 'Search for currency',
+  },
 };
