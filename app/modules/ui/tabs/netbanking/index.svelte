@@ -25,6 +25,7 @@
     NETBANKING_SELECT_HELP,
     NETBANKING_SEARCH_TITLE,
     NETBANKING_SEARCH_PLACEHOLDER,
+    NETBANKING_SEARCH_ALL,
   } from 'ui/labels';
 
   // Utils imports
@@ -358,9 +359,11 @@
 
     <!-- LABEL: Select bank to pay -->
     <!-- LABEL: Search for bank -->
+    <!-- LABEL: All banks -->
     <SearchModal
       title={$t(NETBANKING_SEARCH_TITLE)}
       placeholder={$t(NETBANKING_SEARCH_PLACEHOLDER)}
+      all={$t(NETBANKING_SEARCH_ALL)}
       items={banksArr}
       keys={['code', 'name']}
       component={BankSearchItem}

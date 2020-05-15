@@ -17,6 +17,7 @@
   export let items = [];
   export let component;
   export let keys;
+  export let all;
 
   onMount(() => {
     document.querySelector('#modal-inner').appendChild(ref);
@@ -130,11 +131,45 @@
   }
 
   .search-box {
-    box-sizing: border-box;
     font-size: 12px;
+  }
+
+  .search-box > :global(.stack) {
+    height: 100%;
+  }
+
+  .search-results {
+    flex-grow: 1;
+    overflow: auto;
+  }
+
+  .list-header {
     display: flex;
-    flex-direction: column;
-    overflow: hidden;
+    align-items: center;
+    font-size: 11px;
+    line-height: 13px;
+    margin-top: 16px;
+    margin-bottom: 4px;
+
+    color: rgba(117, 117, 117, 0.58);
+  }
+
+  .has-query .list-header {
+    margin-top: 4px;
+  }
+
+  .list-header .text {
+    margin-left: 14px;
+    margin-right: 8px;
+  }
+
+  .list-header .divider {
+    background-color: #eeeeee;
+    height: 1px;
+    border-top-left-radius: 1px;
+    border-bottom-left-radius: 1px;
+    flex-grow: 1;
+    margin-top: 2px;
   }
 
   .search-field {
@@ -184,9 +219,13 @@
     display: flex;
     justify-content: space-between;
     padding: 14px;
-    border-bottom: 1px solid #ddd;
-    color: #888;
+    border-bottom: 1px solid #eeeeee;
+    color: #424242;
     cursor: pointer;
+  }
+
+  .has-query .list.results .list-item:last-child {
+    border-bottom: none;
   }
 
   .list-item:hover {
@@ -211,30 +250,49 @@
         in:fade
         out:fade={{ duration: 200 }} />
       <div class="search-box" in:slide out:fade={{ duration: 200 }}>
-        <div class="search-field">
-          <div class="icon">
-            <Icon icon={getMiscIcon('search')} />
+        <Stack vertical>
+          <div class="search-field">
+            <div class="icon">
+              <Icon icon={getMiscIcon('search')} />
+            </div>
+            <input
+              class="no-escape"
+              type="text"
+              {autocomplete}
+              {placeholder}
+              on:keyup={handleEscape}
+              bind:value={query}
+              bind:this={inputField} />
           </div>
-          <input
-            class="no-escape"
-            type="text"
-            {autocomplete}
-            {placeholder}
-            on:keyup={handleEscape}
-            bind:value={query}
-            bind:this={inputField} />
-        </div>
-        <div class="list">
-          {#if matchingItems.length}
-            {#each matchingItems as item}
-              <div class="list-item" on:click={() => onSelect(item)}>
-                <svelte:component this={component} {item} />
+          <div class="search-results" class:has-query={query}>
+            {#if query}
+              <div class="list results">
+                {#if matchingItems.length}
+                  {#each matchingItems as item}
+                    <div class="list-item" on:click={() => onSelect(item)}>
+                      <svelte:component this={component} {item} />
+                    </div>
+                  {/each}
+                {:else}
+                  <div class="no-results">No results for "{query}"</div>
+                {/if}
               </div>
-            {/each}
-          {:else}
-            <div class="no-results">No results for "{query}"</div>
-          {/if}
-        </div>
+            {/if}
+            {#if all}
+              <div class="list-header">
+                <div class="text">{all}</div>
+                <div class="divider" />
+              </div>
+              <div class="list">
+                {#each items as item}
+                  <div class="list-item" on:click={() => onSelect(item)}>
+                    <svelte:component this={component} {item} />
+                  </div>
+                {/each}
+              </div>
+            {/if}
+          </div>
+        </Stack>
       </div>
     </div>
   {/if}
