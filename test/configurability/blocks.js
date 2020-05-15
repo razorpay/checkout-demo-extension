@@ -162,7 +162,7 @@ test('Module: configurability/blocks', t => {
           {
             method: 'card',
             issuer: ['HDFC'],
-            _type: 'instrument',
+            _type: 'method',
           },
           {
             method: 'netbanking',
@@ -180,11 +180,7 @@ test('Module: configurability/blocks', t => {
 
       found = Blocks.createBlock(code, config);
 
-      t.deepEqual(
-        found,
-        expected,
-        'Creates a block with invalid instruments intact'
-      );
+      t.deepEqual(found, expected, 'Creates a block with invalid instruments');
 
       t.end();
     });

@@ -45,11 +45,27 @@
         return true;
       }
 
-      // UPI collect, omnichannel always need to go deeper
-      if (
-        _Arr.contains(instrument.flows, 'collect') ||
-        _Arr.contains(instrument.flows, 'omnichannel')
-      ) {
+      // UPI omnichannel always needs to go deeper
+      if (_Arr.contains(instrument.flows, 'omnichannel')) {
+        return true;
+      }
+
+      /**
+       * Collect needs to go deeper if this is not an individual
+       * instrument with a VPA
+       */
+      if (_Arr.contains(instrument.flows, 'collect')) {
+        let ungrouped = instrument._ungrouped;
+
+        // If individual, check for VPA
+        if (ungrouped.length === 1) {
+          const { flow, vpa } = ungrouped[0];
+
+          if (flow === 'collect' && vpa) {
+            return false;
+          }
+        }
+
         return true;
       }
 

@@ -101,7 +101,7 @@
             alt = 'UPI App';
           }
         } else {
-          title = `UPI - ${getVpaFromInstrument(instrument)}`;
+          title = `UPI - ${getVpaFromInstrument(individualInstrument)}`;
           icon = '&#xe70e;';
           alt = 'UPI';
         }
