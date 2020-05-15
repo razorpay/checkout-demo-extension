@@ -229,4 +229,26 @@ export default {
       VIJB: 'Vijaya Bank',
     },
   },
+  qr: {
+    generating_label: 'Generating QR Code...',
+    scan_on_phone:
+      'Scan the QR using any UPI app on your phone like BHIM, PhonePe, Google Pay etc.',
+    retry: 'Retry',
+    downtime_text: '<strong>UPI QR<strong> is experiencing low success rates.',
+  },
+  upi: {
+    intent_block_heading: 'PAY USING APPS',
+    redirect_to_app: 'You will be redirected to your UPI app',
+    recommended: 'Recommended',
+    show_other_apps: 'Show other UPI apps',
+    gpay_block_heading: 'Pay using Gpay App',
+    collect_block_heading: 'Pay using UPI ID',
+    collect_block_subheading:
+      'You will receive a payment request on your UPI app',
+    collect_new_vpa_help: 'Please enter a valid VPA of the form username@bank',
+    collect_enter_upi_id: 'Enter your UPI ID',
+    collect_securely_save: 'Securely save your UPI ID',
+    new_vpa_title_logged_out: 'UPI ID',
+    new_vpa_title_logged_in: 'Add UPI ID',
+  },
 };

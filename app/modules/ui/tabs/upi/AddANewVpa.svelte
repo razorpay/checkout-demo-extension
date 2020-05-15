@@ -2,6 +2,7 @@
   // Svelte imports
   import { onMount, createEventDispatcher } from 'svelte';
   import { slide } from 'svelte/transition';
+  import { _ } from 'svelte-i18n';
 
   // UI Imports
   import Field from 'ui/components/Field.svelte';
@@ -13,6 +14,14 @@
   import { getSession } from 'sessionmanager';
   import { hasFeature, getPrefilledVPA } from 'checkoutstore';
   import { VPA_REGEX } from 'common/constants';
+
+  import {
+    UPI_COLLECT_NEW_VPA_HELP,
+    UPI_COLLECT_ENTER_ID,
+    UPI_COLLECT_SAVE,
+    NEw_VPA_TITLE_LOGGED_OUT,
+    NEw_VPA_TITLE_LOGGED_IN,
+  } from 'ui/labels';
 
   // Props
   export let selected = false;
@@ -132,7 +141,7 @@
   on:click={focusAfterTimeout}
   {selected}>
   <div id="new-vpa-field" slot="title">
-    {logged && canSaveVpa ? 'Add UPI ID' : 'UPI ID'}
+    {logged && canSaveVpa ? $_(NEw_VPA_TITLE_LOGGED_IN) : $_(NEw_VPA_TITLE_LOGGED_OUT)}
   </div>
   <div slot="subtitle">Google Pay, BHIM, PhonePe & more</div>
   <i slot="icon" class="top">
@@ -145,7 +154,7 @@
         <Field
           formatter={{ type: 'vpa' }}
           {pattern}
-          helpText="Please enter a valid VPA of the form username@bank"
+          helpText={$_(UPI_COLLECT_NEW_VPA_HELP)}
           id="vpa"
           name="vpa"
           type="text"
@@ -153,12 +162,12 @@
           bind:value={newVpa}
           bind:this={vpaField}
           on:blur
-          placeholder="Enter your UPI ID" />
+          placeholder={$_(UPI_COLLECT_ENTER_ID)} />
         {#if logged && canSaveVpa}
           <div class="should-save-vpa-container">
             <label id="should-save-vpa" for="save-vpa">
               <Checkbox bind:checked={rememberVpa} id="save-vpa">
-                Securely save your UPI ID
+                {$_(UPI_COLLECT_SAVE)}
               </Checkbox>
             </label>
           </div>

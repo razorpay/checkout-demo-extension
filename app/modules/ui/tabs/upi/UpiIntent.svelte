@@ -1,6 +1,7 @@
 <script>
   // Svelte imports
   import { createEventDispatcher } from 'svelte';
+  import { _ } from 'svelte-i18n';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -17,6 +18,13 @@
   import Icon from 'ui/elements/Icon.svelte';
 
   import { getMiscIcon } from 'checkoutframe/icons';
+
+  import {
+    UPI_INTENT_BLOCK_HEADING,
+    UPI_REDIRECT_TO_APP,
+    UPI_RECOMMENDED,
+    UPI_SHOW_OTHER_APPS,
+  } from 'ui/labels';
 
   // Props
   export let apps;
@@ -208,14 +216,14 @@
   }
 </style>
 
-<div class="legend left">PAY USING APPS</div>
+<div class="legend left">{$_(UPI_INTENT_BLOCK_HEADING)}</div>
 <div id="upi-apps">
   <div id="svelte-upi-apps-list" class="options options-no-margin">
     <ListHeader>
       <i slot="icon">
         <Icon icon={getMiscIcon('redirect')} />
       </i>
-      <div slot="subtitle">You will be redirected to your UPI app</div>
+      <div slot="subtitle">{$_(UPI_REDIRECT_TO_APP)}</div>
     </ListHeader>
 
     {#each showableApps as app, i}
@@ -231,7 +239,7 @@
           {app.app_name}
           {#if i === 0 && showRecommendedUPIApp}
             <span>
-              <em>(Recommended)</em>
+              <em>({$_(UPI_RECOMMENDED)})</em>
             </span>
           {/if}
         </div>
@@ -240,7 +248,7 @@
 
     {#if apps.length > 5 && !showAll}
       <NextOption on:select={() => (showAll = true)} icon={otherAppsIcon}>
-        Show other UPI apps
+        {$_(UPI_SHOW_OTHER_APPS)}
       </NextOption>
     {/if}
   </div>

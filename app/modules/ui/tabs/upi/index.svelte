@@ -2,6 +2,7 @@
   // Svelte imports
   import { onMount } from 'svelte';
   import { slide } from 'svelte/transition';
+  import { _ } from 'svelte-i18n';
 
   // Util imports
   import { getSession } from 'sessionmanager';
@@ -46,6 +47,15 @@
   import { contact } from 'checkoutstore/screens/home';
   import { customer } from 'checkoutstore/customer';
   import { methodTabInstrument } from 'checkoutstore/screens/home';
+
+  import {
+    UPI_GPAY_BLOCK_HEADING,
+    UPI_COLLECT_BLOCK_HEADING,
+    UPI_COLLECT_BLOCK_SUBHEADING,
+    UPI_COLLECT_NEW_VPA_HELP,
+    UPI_COLLECT_ENTER_ID,
+    UPI_COLLECT_SAVE,
+  } from 'ui/labels';
 
   // Props
   export let selectedApp = undefined;
@@ -509,35 +519,33 @@
           {showRecommendedUPIApp} />
       {/if}
 
-      {#if useWebPaymentsApi}
-        <div class="legend left">Pay using Gpay App</div>
-        <div class="border-list">
-          <SlottedRadioOption
-            name="google_pay_web"
-            selected={selectedToken === 'gpay'}
-            on:click={() => {
-              selectedToken = 'gpay';
-              session.preSubmit();
-            }}>
-            <div slot="title">Google Pay</div>
-            <i slot="icon">
-              <Icon icon={session.themeMeta.icons.gpay} />
-            </i>
-          </SlottedRadioOption>
-        </div>
-      {/if}
+      <!-- {#if useWebPaymentsApi} -->
+      <div class="legend left">{$_(UPI_GPAY_BLOCK_HEADING)}</div>
+      <div class="border-list">
+        <SlottedRadioOption
+          name="google_pay_web"
+          selected={selectedToken === 'gpay'}
+          on:click={() => {
+            selectedToken = 'gpay';
+            session.preSubmit();
+          }}>
+          <div slot="title">Google Pay</div>
+          <i slot="icon">
+            <Icon icon={session.themeMeta.icons.gpay} />
+          </i>
+        </SlottedRadioOption>
+      </div>
+      <!-- {/if} -->
 
       {#if shouldShowCollect}
-        <div class="legend left">Pay using UPI ID</div>
+        <div class="legend left">{$_(UPI_COLLECT_BLOCK_HEADING)}</div>
         <div class="border-list" id="upi-collect-list">
           {#if intent}
             <ListHeader>
               <i slot="icon">
                 <Icon icon={getMiscIcon('receive')} />
               </i>
-              <div slot="subtitle">
-                You will receive a payment request on your UPI app
-              </div>
+              <div slot="subtitle">{$_(UPI_COLLECT_BLOCK_SUBHEADING)}</div>
             </ListHeader>
           {/if}
 
