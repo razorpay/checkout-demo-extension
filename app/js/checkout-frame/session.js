@@ -2131,6 +2131,10 @@ Session.prototype = {
         .reflow()
         .addClass('shake');
     }
+
+    try {
+      window.navigator.vibrate(200);
+    } catch (err) {}
   },
 
   click: function(selector, delegateClass, listener, useCapture) {
