@@ -248,7 +248,7 @@ async function verifyAmount(context, currency) {
   const amountInHeader = (await innerText('#amount')).trim();
   expect(amountInHeader).toEqual(displayAmount);
   const amountInFooter = (await innerText('#footer')).trim();
-  expect(amountInFooter).toEqual('PAY ' + displayAmount);
+  expect(amountInFooter).toEqual('Pay ' + displayAmount);
 }
 
 async function selectCurrencyAndVerifyAmount(context, currency = 'USD') {
