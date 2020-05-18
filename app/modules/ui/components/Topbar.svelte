@@ -4,6 +4,8 @@
 
   // Store
   import { isContactPresent } from 'checkoutstore/screens/home';
+  import { locale } from 'svelte-i18n';
+  import { getTabTitle } from 'i18n';
 
   // Utils
   import { getSession } from 'sessionmanager';
@@ -17,7 +19,39 @@
   let logoutDropdownShown = false;
   let contact = '';
 
-  let title = '';
+  // TODO: refactor this into a separate tab title store.
+  const titleOverrides = {};
+
+  let tab = '';
+
+  export function setTab(newTab) {
+    tab = newTab;
+  }
+
+  export function setTitleOverride(screen, type, data) {
+    titleOverrides[screen] = {
+      type,
+      data,
+    };
+  }
+
+  export function resetTitleOverride(screen) {
+    delete titleOverrides[screen];
+  }
+
+  function generateOverriddenTitle(tab, locale) {
+    const override = titleOverrides[tab];
+
+    if (!override) {
+      return getTabTitle(tab, locale);
+    }
+
+    if (override.type === 'image') {
+      return `<img src=${override.data} alt="">`;
+    } else {
+      return getTabTitle(override.data, locale);
+    }
+  }
 
   export function show() {
     shown = true;
@@ -37,10 +71,6 @@
 
   export function setLogged(isLogged) {
     logged = isLogged;
-  }
-
-  export function setTitle(newTitle) {
-    title = newTitle;
   }
 
   export function setContact(newContact) {
@@ -100,7 +130,9 @@
     {/if}
     <div id="top-left" on:click={handleBackClick}>
       <i class="back">&#xe604;</i>
-      <div id="tab-title">{title}</div>
+      <div id="tab-title">
+        {@html generateOverriddenTitle(tab, $locale)}
+      </div>
     </div>
   </div>
 {/if}

@@ -85,27 +85,6 @@ var PayLaterStore = {
   lenderBranding: {},
 };
 
-function createCardlessEmiImage(src) {
-  return '<img src="' + src + '" class="cardless_emi-topbar-image">';
-}
-
-function createCardlessEmiTopbarImages(providerCode) {
-  var provider = CardlessEmi.getProvider(providerCode);
-
-  return createCardlessEmiImage(provider.logo);
-}
-
-// TODO: Refactor and merge with Cardless EMI method
-function createPayLaterImage(src) {
-  return '<img src="' + src + '" class="paylater-topbar-image">';
-}
-
-function createPayLaterTopbarImages(providerCode) {
-  var provider = PayLater.getProvider(providerCode);
-
-  return createPayLaterImage(provider.logo);
-}
-
 /**
  * Store for what tab and screen
  * should be shown when back is pressed.
@@ -913,16 +892,6 @@ Session.prototype = {
       classes.push('notopbar');
     }
 
-    if (this.irctc) {
-      tab_titles.upi = 'BHIM/UPI';
-      tab_titles.card = 'Debit/Credit Card';
-      this.r.set('theme.image_frame', false);
-    }
-
-    if (MethodStore.isMethodEnabled('emi')) {
-      tab_titles.card = 'Card';
-    }
-
     if (!getter('image')) {
       classes.push('noimage');
     }
@@ -1649,7 +1618,11 @@ Session.prototype = {
     var providerCode = CardlessEmiStore.providerCode;
     var plans = CardlessEmiStore.plans[providerCode];
 
-    tab_titles.emiplans = createCardlessEmiTopbarImages(providerCode);
+    this.topBar.setTitleOverride(
+      'emiplans',
+      'image',
+      CardlessEmi.getImageUrl(providerCode)
+    );
 
     if (!plans) {
       this.fetchCardlessEmiPlans();
@@ -1731,8 +1704,8 @@ Session.prototype = {
 
     var incorrectOtp = params.incorrect;
 
-    var topbarImages = createCardlessEmiTopbarImages(providerCode);
-    tab_titles.otp = topbarImages;
+    var topbarImages = CardlessEmi.getImageUrl(providerCode);
+    this.topBar.setTitleOverride('otp', 'image', topbarImages);
 
     this.commenceOTP(
       cardlessEmiProviderObj.name + ' account',
@@ -1829,10 +1802,8 @@ Session.prototype = {
     var payLaterProviderObj = PayLater.getProvider(providerCode);
     var self = this;
 
-    var topbarImages = createPayLaterTopbarImages(providerCode);
-    if (tab_titles.otp !== topbarImages) {
-      tab_titles.otp = topbarImages;
-    }
+    var topbarImages = PayLater.getImageUrl(providerCode);
+    this.topBar.setTitleOverride('otp', 'image', topbarImages);
 
     var params = {
       provider: payLaterProviderObj.name,
@@ -2590,17 +2561,14 @@ Session.prototype = {
   setScreen: function(screen, params) {
     var extraProps = params && params.extraProps;
     if (screen) {
-      var screenTitle =
-        this.tab === 'emi'
-          ? tab_titles[this.tab]
-          : tab_titles[this.cardTab || screen];
+      var tabForTitle = this.tab === 'emi' ? this.tab : this.cardTab || screen;
 
       if (screen === 'upi' && this.isPayout) {
-        screenTitle = tab_titles.payout_upi;
+        tabForTitle = 'payout_upi';
       }
 
-      if (screenTitle) {
-        this.topBar.setTitle(screenTitle);
+      if (tabForTitle) {
+        this.topBar.setTab(tabForTitle);
       }
     }
 
@@ -3127,7 +3095,8 @@ Session.prototype = {
       return self.setScreen('card');
     }
 
-    tab_titles.otp = tab_titles.card;
+    this.topBar.setTitleOverride('otp', 'text', 'card');
+
     this.otpView.updateScreen({
       skipText: 'Skip Saved Cards',
     });
@@ -3240,7 +3209,7 @@ Session.prototype = {
 
     if (type === 'new') {
       return function(e) {
-        tab_titles.emiplans = tabTitle;
+        self.topBar.resetTitleOverride('emiplans');
 
         var bank = self.emiPlansForNewCard && self.emiPlansForNewCard.code;
         var cardIssuer = bank.split('_')[0];
@@ -3325,7 +3294,7 @@ Session.prototype = {
       };
     } else if (type === 'saved') {
       return function(e) {
-        tab_titles.emiplans = tabTitle;
+        self.topBar.resetTitleOverride('emiplans');
 
         var trigger = e.currentTarget;
         var $trigger = $(trigger);
@@ -3421,7 +3390,7 @@ Session.prototype = {
       };
     } else if (type === 'bajaj') {
       return function() {
-        tab_titles.emiplans = tabTitle;
+        self.topBar.resetTitleOverride('emiplans');
 
         var bank = 'BAJAJ';
         var plans = MethodStore.getEMIBankPlans(bank);
@@ -4740,8 +4709,7 @@ Session.prototype = {
         skipText: 'Resend OTP', // TODO
         allowSkip: false,
       });
-      tab_titles.otp =
-        '<img src="' + walletObj.logo + '" height="' + walletObj.h + '">';
+      this.topBar.setTitleOverride('otp', 'image', walletObj.logo);
       this.commenceOTP(wallet + ' account', true, 'wallet_enter');
     } else if (!this.isPayout) {
       this.showLoadError();

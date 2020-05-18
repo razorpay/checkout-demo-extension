@@ -79,9 +79,8 @@
   $accountType = prefilledAccountType;
   $authType = prefilledAuthType;
 
-  // Set tab titles
-  // TODO: move current tab title to store and fix this.
-  session.tab_titles['netbanking'] = 'Bank Account';
+  // Set tab title overrides
+  session.topBar.setTitleOverride('netbanking', 'text', 'emandate_account');
 
   function getBankName(bankCode) {
     return (banks[bankCode] || {}).name || '';

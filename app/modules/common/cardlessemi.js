@@ -113,3 +113,13 @@ export const isProviderHeadless = provider => {
 
   return Boolean(headless);
 };
+
+/**
+ * Returns the image url fot the given cardless EMI provider
+ * @param {string} provider
+ * @returns {string}
+ */
+export const getImageUrl = provider => {
+  const { logo } = getProvider(provider);
+  return logo;
+};
