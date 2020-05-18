@@ -1,7 +1,6 @@
 import { writable } from 'svelte/store';
 import { getSession } from 'sessionmanager';
 import { displayAmount } from 'common/currency';
-import { TAB_TITLES } from 'common/constants';
 import { isCardValidForOffer } from 'checkoutstore/offers';
 
 export const cta = writable('');
