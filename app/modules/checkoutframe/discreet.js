@@ -87,6 +87,7 @@ import * as UserHandlers from 'handlers/user';
 
 import * as Instruments from 'configurability/instruments';
 import { getInstrumentMeta } from 'ui/tabs/home/instruments';
+import * as ContactStorage from 'checkoutframe/contact-storage';
 
 export default {
   RazorpayConfig,
@@ -197,4 +198,5 @@ export default {
   UserHandlers,
 
   initI18n,
+  ContactStorage,
 };
