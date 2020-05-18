@@ -218,6 +218,7 @@
   }
 </style>
 
+<!-- LABEL: PAY USING APPS -->
 <div class="legend left">{$t(UPI_INTENT_BLOCK_HEADING)}</div>
 <div id="upi-apps">
   <div id="svelte-upi-apps-list" class="options options-no-margin">
@@ -225,6 +226,7 @@
       <i slot="icon">
         <Icon icon={getMiscIcon('redirect')} />
       </i>
+      <!-- LABEL: You will be redirected to your UPI app -->
       <div slot="subtitle">{$t(UPI_REDIRECT_TO_APP)}</div>
     </ListHeader>
 
@@ -241,6 +243,7 @@
           {getUpiIntentAppName(app.shortcode)}
           {#if i === 0 && showRecommendedUPIApp}
             <span>
+              <!-- LABEL: Recommended -->
               <em>({$t(UPI_RECOMMENDED)})</em>
             </span>
           {/if}
@@ -250,6 +253,7 @@
 
     {#if apps.length > 5 && !showAll}
       <NextOption on:select={() => (showAll = true)} icon={otherAppsIcon}>
+        <!-- LABEL: Show other UPI apps -->
         {$t(UPI_SHOW_OTHER_APPS)}
       </NextOption>
     {/if}

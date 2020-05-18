@@ -105,6 +105,7 @@
   }
 </style>
 
+<!-- LABEL: Or, pay using phone number -->
 <div class="legend left">{$t(OMNI_BLOCK_HEADING)}</div>
 
 <SlottedRadioOption
@@ -113,6 +114,7 @@
   align="top"
   on:click={onSelection}
   {selected}>
+  <!-- LABEL: Google Pay phone number -->
   <div id="gpay-omnichannel" slot="title">{$t(OMNI_GPAY_NUMBER)}</div>
   <i slot="icon" class="top">
     <img src="https://cdn.razorpay.com/app/googlepay.svg" alt="Google Pay" />
@@ -121,6 +123,7 @@
   <div slot="body">
     {#if selected}
       <div transition:slide={{ duration: 200 }}>
+        <!-- LABEL: Enter your phone numbe -->
         <Field
           formatter={{ type: 'number' }}
           elemClasses="mature"
@@ -140,6 +143,7 @@
 
 {#if selected}
   {#if error}
+    <!-- LABEL: Please ensure the same number is linked to the Google Pay account. -->
     <p class:regular={!isFirst} class:error={isFirst}>{$t(OMNI_ERROR)}</p>
   {/if}
 {/if}

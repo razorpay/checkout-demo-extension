@@ -526,6 +526,7 @@
       {/if}
 
       {#if useWebPaymentsApi}
+        <!-- LABEL: Pay using Gpay App -->
         <div class="legend left">{$t(UPI_GPAY_BLOCK_HEADING)}</div>
         <div class="border-list">
           <SlottedRadioOption
@@ -535,6 +536,7 @@
               selectedToken = 'gpay';
               session.preSubmit();
             }}>
+            <!-- LABEL: Google Pay -->
             <div slot="title">{$t(GPAY_WEB_API_TITLE)}</div>
             <i slot="icon">
               <Icon icon={session.themeMeta.icons.gpay} />
@@ -544,6 +546,7 @@
       {/if}
 
       {#if shouldShowCollect}
+        <!-- LABEL: Pay using UPI ID -->
         <div class="legend left">{$t(UPI_COLLECT_BLOCK_HEADING)}</div>
         <div class="border-list" id="upi-collect-list">
           {#if intent}
@@ -551,6 +554,7 @@
               <i slot="icon">
                 <Icon icon={getMiscIcon('receive')} />
               </i>
+              <!-- LABEL: You will receive a payment request on your UPI app -->
               <div slot="subtitle">{$t(UPI_COLLECT_BLOCK_SUBHEADING)}</div>
             </ListHeader>
           {/if}
@@ -596,6 +600,7 @@
       {/if}
 
       {#if shouldShowQr}
+        <!-- LABEL: Pay using QR Code -->
         <div class="legend left">{$t(QR_BLOCK_HEADING)}</div>
         <div class="options" id="showQr">
           <NextOption
@@ -603,7 +608,9 @@
             tabindex="0"
             attributes={{ role: 'button', 'aria-label': 'Show QR Code - Scan the QR code using your UPI app' }}
             on:select={selectQrMethod}>
+            <!-- LABEL: Show QR Code -->
             <div>{$t(SHOW_QR_CODE)}</div>
+            <!-- LABEL: Scan the QR code using your UPI app -->
             <div class="desc">{$t(SCAN_QR_CODE)}</div>
           </NextOption>
         </div>
@@ -613,6 +620,7 @@
     <Bottom tab="upi">
       {#if down || disabled}
         <DowntimeCallout severe={disabled}>
+          <!-- LABEL: UPI is experiencing low success rates. -->
           <FormattedText text={$t(UPI_DOWNTIME_TEXT)} />
         </DowntimeCallout>
       {/if}
