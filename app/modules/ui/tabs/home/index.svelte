@@ -274,7 +274,7 @@
 
   $: {
     const loggedIn = _Obj.getSafely($customer, 'logged');
-    _El.keepClass(_Doc.querySelector('#topbar #top-right'), 'logged', loggedIn);
+    session.topBar.setLogged(loggedIn);
 
     const isPersonalizationEnabled = shouldUsePersonalization();
     const eligiblePreferredInstruments = isPersonalizationEnabled

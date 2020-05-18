@@ -71,6 +71,7 @@ import EmandateTab from 'ui/tabs/emandate/index.svelte';
 import NachScreen from 'ui/tabs/nach/index.svelte';
 import CardTab from 'ui/tabs/card/index.svelte';
 import WalletTab from 'ui/tabs/wallets/index.svelte';
+import TopBar from 'ui/components/Topbar.svelte';
 
 import PayoutsInstruments from 'ui/tabs/payout/payout-instruments.svelte';
 import PayoutAccount from 'ui/tabs/payout/payout-account.svelte';
@@ -83,7 +84,6 @@ import { get as storeGetter } from 'svelte/store';
 import * as Experiments from 'experiments';
 
 import * as NBHandlers from 'handlers/netbanking';
-import * as UserHandlers from 'handlers/user';
 
 import * as Instruments from 'configurability/instruments';
 import { getInstrumentMeta } from 'ui/tabs/home/instruments';
@@ -167,6 +167,7 @@ export default {
   languageSelectionView,
   PayLaterView,
   Curtain,
+  TopBar,
   commonBanks,
   timer: _.timer,
   QRScreen,
@@ -194,7 +195,6 @@ export default {
   _,
 
   NBHandlers,
-  UserHandlers,
 
   initI18n,
 };

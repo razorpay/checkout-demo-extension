@@ -1349,6 +1349,7 @@ Session.prototype = {
   },
 
   setSvelteComponents: function() {
+    this.setTopBar();
     this.setHomeTab();
     this.setSvelteCardTab();
     this.setNetbankingTab();
@@ -1616,7 +1617,7 @@ Session.prototype = {
       target: gel('form-fields'),
     });
 
-    $('#top-right').addClass('hidden');
+    this.topBar.hideUserDetails();
 
     this.payoutsView.$on('selectaccount', function(event) {
       $('#body').addClass('sub');
@@ -2333,7 +2334,7 @@ Session.prototype = {
       customer.logout(outOfAllDevices);
     }
 
-    _El.removeClass(_Doc.querySelector('#top-right'), 'logged');
+    this.topBar.setLogged(false);
 
     CustomerStore.customer.set({});
     if (this.svelteCardTab) {
@@ -2407,7 +2408,6 @@ Session.prototype = {
         this.hide();
       });
     }
-    this.click('#top-left', this.back);
     this.on('submit', '#form', this.preSubmit);
 
     if (MethodStore.isCardOrEMIEnabled()) {
@@ -2425,8 +2425,6 @@ Session.prototype = {
         this.fixLandscapeBug();
       }
     }
-
-    discreet.UserHandlers.attachLogoutListeners(this);
 
     if (MethodStore.isMethodEnabled('wallet')) {
       try {
@@ -2602,7 +2600,7 @@ Session.prototype = {
       }
 
       if (screenTitle) {
-        gel('tab-title').innerHTML = screenTitle;
+        this.topBar.setTitle(screenTitle);
       }
     }
 
@@ -2649,11 +2647,11 @@ Session.prototype = {
     makeHidden('.screen.' + shownClass);
 
     if (screen && !(this.isPayout && screen === 'payouts')) {
-      makeVisible('#topbar');
+      this.topBar.show();
       $('.elem-email').addClass('mature');
       $('.elem-contact').addClass('mature');
     } else {
-      makeHidden('#topbar');
+      this.topBar.hide();
     }
 
     var screenEl = '#form-' + (screen || 'common');
@@ -3033,9 +3031,10 @@ Session.prototype = {
       this.updateCustomerInStore();
 
       if (this.getCurrentCustomer().logged && !this.local) {
-        $('#top-right').addClass('logged');
+        this.topBar.setLogged(true);
       }
-      $('#user').html(contact);
+
+      this.topBar.setContact(contact);
 
       var offer = this.getAppliedOffer();
       if (
@@ -3736,6 +3735,14 @@ Session.prototype = {
       }
       this.showLoadError(text);
     }
+  },
+
+  setTopBar: function() {
+    this.topBar = new discreet.TopBar({
+      target: _Doc.querySelector('#body'),
+      props: {},
+    });
+    this.topBar.$on('back', this.back.bind(this));
   },
 
   setSvelteOverlay: function() {
