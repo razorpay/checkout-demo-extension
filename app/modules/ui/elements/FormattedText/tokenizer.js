@@ -31,8 +31,8 @@ export const tokenizeTextForFormatter = (tokenText, formatter) => {
  * @variation FeatureRequest would need changes to support nesting of tags **This will __not__ work **
  * @example tokenizeTextForFormatters(textToBeFormatted) -> [{"text":"This ","type":"plain"},{"text":"might","type":"italic"},{"text":" work","type":"plain"}]
  */
-export const tokenizeTextForFormatters = token => {
-  let _tokenized = token;
+export const tokenizeTextForFormatters = text => {
+  let _tokenized = text;
   formatters.forEach(formatter => {
     _tokenized = _tokenized.reduce((pV, cV) => {
       if (cV.type === 'plain') {
