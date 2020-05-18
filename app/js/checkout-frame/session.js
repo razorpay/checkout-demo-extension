@@ -996,7 +996,28 @@ Session.prototype = {
     }
 
     var order = Store.getMerchantOrder();
-    if (tab && !(order && order.bank) && MethodStore.isMethodEnabled(tab)) {
+
+    /**
+     * A method needs to be usable in order to prefill to that method
+     */
+    if (tab) {
+      var usableMethod = tab;
+
+      // We're currently bypassing prefill check for emandate and nach.
+      // TODO: We'll need to fix this
+      var methodsToBypassCheckFor = ['emandate', 'nach'];
+      var bypassMethodCheck = _Arr.contains(
+        methodsToBypassCheckFor,
+        usableMethod
+      );
+
+      // Go to homescreen if prefilled method is unusable
+      if (!bypassMethodCheck && !MethodStore.isMethodUsable(usableMethod)) {
+        tab = '';
+      }
+    }
+
+    if (tab && !(order && order.bank)) {
       // For method=emandate, we switch to the netbanking tab first if bank
       // is not prefilled.
       if (tab === 'emandate' && !this.get('prefill.bank')) {
