@@ -42,9 +42,20 @@
     PARTIAL_AMOUNT_STATUS_FULL,
     PARTIAL_AMOUNT_STATUS_PARTIAL,
     SECURED_BY_MESSAGE,
+    SUBSCRIPTIONS_CREDIT_DEBIT_CALLOUT,
+    SUBSCRIPTIONS_DEBIT_ONLY_CALLOUT,
+    SUBSCRIPTIONS_CREDIT_ONLY_CALLOUT,
+    CARD_OFFER_CREDIT_DEBIT_CALLOUT,
+    CARD_OFFER_CREDIT_ONLY_CALLOUT,
+    CARD_OFFER_DEBIT_ONLY_CALLOUT,
+    RECURRING_CREDIT_DEBIT_CALLOUT,
+    RECURRING_CREDIT_ONLY_CALLOUT,
+    RECURRING_DEBIT_ONLY_CALLOUT,
   } from 'ui/labels/home';
 
-  import { t } from 'svelte-i18n';
+  import { t, locale } from 'svelte-i18n';
+
+  import { formatTemplateWithLocale } from 'i18n';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -807,36 +818,23 @@
         <Callout>
           {#if session.get('subscription_id')}
             {#if isDebitCardEnabled() && isCreditCardEnabled()}
-              Subscription payments are supported on Visa and Mastercard Credit
-              Cards from all Banks and Debit Cards from ICICI, Kotak, Citibank
-              and Canara Bank.
+              $t(SUBSCRIPTIONS_CREDIT_DEBIT_CALLOUT)
             {:else if isDebitCardEnabled()}
-              Subscription payments are only supported on Visa and Mastercard
-              Debit Cards from ICICI, Kotak, Citibank and Canara Bank.
-            {:else}
-              Subscription payments are only supported on Mastercard and Visa
-              Credit Cards.
-            {/if}
+              $t(SUBSCRIPTIONS_DEBIT_ONLY_CALLOUT)
+            {:else}$t(SUBSCRIPTIONS_CREDIT_ONLY_CALLOUT){/if}
           {:else if cardOffer}
             {#if isDebitCardEnabled() && isCreditCardEnabled()}
-              All {cardOffer.issuer} Cards are supported for this payment
+              {formatTemplateWithLocale(CARD_OFFER_CREDIT_DEBIT_CALLOUT, { issuer: cardOffer.issuer }, $locale)}
             {:else if isDebitCardEnabled()}
-              All {cardOffer.issuer} Debit Cards are supported for this payment
+              {formatTemplateWithLocale(CARD_OFFER_DEBIT_ONLY_CALLOUT, { issuer: cardOffer.issuer }, $locale)}
             {:else}
-              All {cardOffer.issuer} Credit Cards are supported for this
-              payment.
+              {formatTemplateWithLocale(CARD_OFFER_CREDIT_ONLY_CALLOUT, { issuer: cardOffer.issuer }, $locale)}
             {/if}
           {:else if isDebitCardEnabled() && isCreditCardEnabled()}
-            Visa and Mastercard Credit Cards from all Banks and Debit Cards from
-            ICICI, Kotak, Citibank and Canara Bank are supported for this
-            payment.
+            $t(RECURRING_CREDIT_DEBIT_CALLOUT)
           {:else if isDebitCardEnabled()}
-            Only Visa and Mastercard Debit Cards from ICICI, Kotak, Citibank and
-            Canara Bank are supported for this payment.
-          {:else}
-            Only Visa and Mastercard Credit Cards are supported for this
-            payment.
-          {/if}
+            $t(RECURRING_DEBIT_ONLY_CALLOUT)
+          {:else}$t(RECURRING_CREDIT_ONLY_CALLOUT){/if}
         </Callout>
       {/if}
 

@@ -44,6 +44,31 @@ export default {
 
     secured_by_message: 'This payment is secured by Razorpay.',
   },
+  callouts: {
+    subscriptions: {
+      credit_only_callout:
+        'Subscription payments are only supported on Mastercard and Visa Credit Cards.',
+      debit_only_callout:
+        'Subscription payments are only supported on Visa and Mastercard Debit Cards from ICICI, Kotak, Citibank and Canara Bank.',
+      credit_debit_callout:
+        'Subscription payments are supported on Visa and Mastercard Credit Cards from all Banks and Debit Cards from ICICI, Kotak, Citibank and Canara Bank.',
+    },
+    card_offer: {
+      credit_only_callout:
+        'All {issuer} Credit Cards are supported for this payment',
+      debit_only_callout:
+        'All {issuer} Debit Cards are supported for this payment',
+      credit_debit_callout: 'All {issuer} Cards are supported for this payment',
+    },
+    recurring: {
+      credit_only_callout:
+        'Only Visa and Mastercard Credit Cards are supported for this payment.',
+      debit_only_callout:
+        'Only Visa and Mastercard Debit Cards from ICICI, Kotak, Citibank and Canara Bank are supported for this payment.',
+      credit_debit_callout:
+        'Visa and Mastercard Credit Cards from all Banks and Debit Cards from ICICI, Kotak, Citibank and Canara Bank are supported for this payment.',
+    },
+  },
   bank_transfer: {
     loading_message: 'Getting bank details...',
     header: 'To complete the transaction, make NEFT / RTGS / IMPS transfer to',
