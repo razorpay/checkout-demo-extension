@@ -212,3 +212,13 @@ export function getShortBankName(bankCode, locale) {
     default: getLongBankName(bankCode, locale),
   });
 }
+
+/**
+ * Returns the tab title for the given locale
+ * @param {string} tab
+ * @param {string} locale
+ * @returns {string}
+ */
+export function getTabTitle(tab, locale) {
+  return formatMessageWithLocale(`tab_titles.${tab}`, locale);
+}

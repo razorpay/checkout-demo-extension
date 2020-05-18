@@ -8,7 +8,6 @@ var preferences,
   isIframe = window !== parent,
   ownerWindow = isIframe ? parent : opener,
   _uid = Track.id,
-  tab_titles = Constants.TAB_TITLES,
   freqWallets = Wallet.wallets,
   contactPattern = Constants.CONTACT_REGEX,
   emailPattern = Constants.EMAIL_REGEX,
@@ -780,7 +779,6 @@ function Session(message) {
   this.get = this.r.get;
   this.set = this.r.set;
   this.tab = this.screen = '';
-  this.tab_titles = tab_titles;
 
   each(message, function(key, val) {
     if (key !== 'options') {
@@ -5258,7 +5256,6 @@ Session.prototype = {
   setPreferences: function(prefs) {
     this.preferences = prefs;
     preferences = prefs;
-    this.tab_titles = tab_titles;
 
     var self = this;
     var customer;

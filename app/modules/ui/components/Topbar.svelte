@@ -3,6 +3,7 @@
   import { createEventDispatcher, onMount, onDestroy } from 'svelte';
 
   // Store
+  import { isIRCTC } from 'checkoutstore';
   import { isContactPresent } from 'checkoutstore/screens/home';
   import { locale } from 'svelte-i18n';
   import { getTabTitle } from 'i18n';
@@ -20,6 +21,14 @@
   let contact = '';
 
   // TODO: refactor this into a separate tab title store.
+  /**
+   * Overrides for the tab title. The key is the tab name, value is an object
+   * with `type` and `data`.
+   *
+   * type=image means that an image is to be shown, which has the url `data`.
+   * type=text means that the title of an alternate tab is to be shown, the name
+   * of which is denoted by `data`.
+   */
   const titleOverrides = {};
 
   let tab = '';
@@ -37,6 +46,11 @@
 
   export function resetTitleOverride(screen) {
     delete titleOverrides[screen];
+  }
+
+  function setOverridesForIrctc() {
+    setTitleOverride('upi', 'text', 'irctc_upi');
+    setTitleOverride('card', 'text', 'irctc_card');
   }
 
   function generateOverriddenTitle(tab, locale) {
@@ -102,6 +116,9 @@
   }
 
   onMount(() => {
+    if (isIRCTC()) {
+      setOverridesForIrctc();
+    }
     document.body.addEventListener('click', handleOutsideClick);
   });
 

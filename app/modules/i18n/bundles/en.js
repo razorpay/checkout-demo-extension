@@ -138,6 +138,7 @@ export default {
   },
   tab_titles: {
     card: 'Card',
+    irctc_card: 'Debit/Credit Card',
     cardless_emi: 'EMI',
     credit_card: 'Credit Card',
     debit_card: 'Debit Card',
@@ -152,6 +153,7 @@ export default {
     paypal: 'PayPal',
     qr: 'UPI QR',
     upi: 'UPI',
+    irctc_upi: 'BHIM/UPI',
     gpay: 'Google Pay',
     wallet: 'Wallet',
     payout_account: 'Add Bank Account',
