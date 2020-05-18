@@ -7,7 +7,11 @@
   import { getSession } from 'sessionmanager';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import { showCtaWithText, showCtaWithDefaultText } from 'checkoutstore/cta';
+  import {
+    showCopied,
+    showCopyDetails,
+    showCtaWithDefaultText,
+  } from 'checkoutstore/cta';
 
   // UI imports
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
@@ -44,7 +48,7 @@
 
   function init() {
     if (data !== null) {
-      showCopyButton(true, 'COPY DETAILS');
+      showCopyDetails();
       return;
     }
 
@@ -90,7 +94,7 @@
       };
 
       loading = false;
-      showCopyButton(true, 'COPY DETAILS');
+      showCopyDetails();
     }
   }
 
@@ -99,7 +103,7 @@
   }
 
   export function onBack() {
-    showCopyButton(false, '');
+    showCtaWithDefaultText();
     return false;
   }
 
@@ -108,16 +112,8 @@
     Analytics.track('bank_transfer:copy:click', {
       type: AnalyticsTypes.BEHAV,
     });
-    showCopyButton(true, 'COPIED');
+    showCopied();
     return false;
-  }
-
-  function showCopyButton(show, text) {
-    if (show) {
-      showCtaWithText(text);
-    } else {
-      showCtaWithDefaultText();
-    }
   }
 </script>
 

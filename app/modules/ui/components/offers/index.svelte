@@ -3,7 +3,7 @@
   import { formatAmountWithSymbol } from 'common/currency';
   import { getCurrency } from 'checkoutstore';
   import {
-    showCtaWithText,
+    showApplyOffer,
     setAppropriateCtaText,
     isCtaShown,
     showCta,
@@ -47,7 +47,7 @@
   $: {
     if (listActive) {
       if (selected) {
-        showCtaWithText('Apply Offer');
+        showApplyOffer();
       } else {
         hideCta();
       }

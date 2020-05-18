@@ -90,9 +90,10 @@
 
   import {
     hideCta,
-    showCta,
-    showCtaWithText,
-    showCtaWithDefaultText,
+    showAuthenticate,
+    showPayViaSingleMethod,
+    showProceed,
+    showNext,
   } from 'checkoutstore/cta';
 
   import Analytics from 'analytics';
@@ -100,10 +101,7 @@
   import { getCardOffer, hasOffersOnHomescreen } from 'checkoutframe/offers';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
 
-  import {
-    INDIA_COUNTRY_CODE,
-    MAX_PREFERRED_INSTRUMENTS,
-  } from 'common/constants';
+  import { INDIA_COUNTRY_CODE } from 'common/constants';
 
   import { setBlocks } from 'ui/tabs/home/instruments';
 
@@ -204,15 +202,17 @@
 
   export function setDetailsCta() {
     if (isPartialPayment) {
-      showCtaWithText('Next');
+      showNext('Next');
 
       return;
     }
 
     if (!session.get('amount')) {
-      showCtaWithText('Authenticate');
+      showAuthenticate();
     } else if (singleMethod) {
-      showCtaWithText('Pay by ' + getMethodNameForPaymentOption(singleMethod));
+      showPayViaSingleMethod(
+        getMethodNameForPaymentOption(singleMethod, $locale)
+      );
     } else if (isTpv) {
       let _method;
       if (onlyNetbankingTpv) {
@@ -223,9 +223,9 @@
         _method = $multiTpvOption;
       }
 
-      showCtaWithText('Pay by ' + getMethodNameForPaymentOption(_method));
+      showPayViaSingleMethod(getMethodNameForPaymentOption(_method, $locale));
     } else {
-      showCtaWithText('Proceed');
+      showProceed('Proceed');
     }
   }
 

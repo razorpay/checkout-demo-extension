@@ -16,7 +16,7 @@
 
   import { customer } from 'checkoutstore/customer';
 
-  import { showCtaWithText, showCtaWithDefaultText } from 'checkoutstore/cta';
+  import { showAmount, showCtaWithDefaultText } from 'checkoutstore/cta';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -161,7 +161,7 @@
 
   function updateAmountInHeaderAndCTA(displayAmount) {
     if (displayAmount) {
-      showCtaWithText('PAY ' + displayAmount);
+      showAmount(displayAmount);
       getSession().setRawAmountInHeader(displayAmount);
     } else {
       showCtaWithDefaultText();

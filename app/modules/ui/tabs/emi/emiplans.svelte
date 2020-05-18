@@ -10,7 +10,8 @@
   import {
     showCta,
     hideCta,
-    updateCta,
+    showContinue,
+    showSelectEmiPlan,
     showCtaWithDefaultText,
   } from 'checkoutstore/cta';
 
@@ -69,12 +70,12 @@
 
   $: {
     if (currentView === Views.PLANS) {
-      updateCta('select emi plan');
+      showSelectEmiPlan();
       Analytics.track('emi:plans', {
         type: AnalyticsTypes.RENDER,
       });
     } else if (currentView === Views.CONTACT) {
-      updateCta('continue');
+      showContinue();
       Analytics.track('emi:contact', {
         type: AnalyticsTypes.RENDER,
       });

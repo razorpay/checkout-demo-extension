@@ -95,7 +95,7 @@ export function formatTemplateWithLocale(label, data, locale) {
  * @param {string} locale
  * @returns {string}
  */
-function formatMessageWithLocale(label, locale) {
+export function formatMessageWithLocale(label, locale) {
   return get(t)(label, { locale });
 }
 

@@ -302,19 +302,19 @@ function setEmiPlansCta(screen, tab) {
       break;
 
     case 'show':
-      Cta.updateCta('View EMI Plans');
+      Cta.showViewEmiPlans();
       break;
 
     case 'select':
-      Cta.updateCta('Select EMI Plan');
+      Cta.showSelectEmiPlan();
       break;
 
     case 'emi':
-      Cta.updateCta('Enter Card Details');
+      Cta.showEnterCardDetails();
       break;
 
     case 'confirm-account':
-      Cta.updateCta('Confirm Account');
+      Cta.showConfirmAccount();
       break;
   }
 }
@@ -1194,7 +1194,7 @@ Session.prototype = {
     this.setSvelteComponents();
     this.fillData();
     this.setEMI();
-    Cta.setAppropriateCtaText();
+    Cta.init();
     this.setModal();
     this.completePendingPayment();
     this.bindEvents();
@@ -3722,7 +3722,7 @@ Session.prototype = {
     invoke(
       function() {
         if (this.screen === 'otp' && (this.tab !== 'card' || !this.payload)) {
-          Cta.updateCta('Verify');
+          Cta.showVerify();
         }
       },
       this,

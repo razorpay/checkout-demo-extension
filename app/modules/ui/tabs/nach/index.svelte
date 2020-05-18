@@ -4,6 +4,7 @@
 
   // Utils imports
   import { getSession } from 'sessionmanager';
+
   import {
     ALLOWED_EXTS,
     ALLOWED_MAX_SIZE_IN_MB,
@@ -11,7 +12,12 @@
     getValidityError,
     uploadDocument,
   } from 'checkoutframe/nach';
-  import { updateCta, showAmountInCta } from 'checkoutstore/cta';
+
+  import {
+    showUploadNachForm,
+    showAmountInCta,
+    showSubmit,
+  } from 'checkoutstore/cta';
 
   // UI imports
   import Attachment from 'ui/elements/Attachment.svelte';
@@ -36,9 +42,7 @@
   $: view = file ? 'confirm' : 'upload';
   $: {
     if (file) {
-      const text = file ? 'Submit' : 'Upload NACH form';
-
-      updateCta(text);
+      showSubmit();
     }
   }
 
@@ -61,7 +65,7 @@
    * Session calls this method when it switches to "nach" tab
    */
   export function onShown() {
-    updateCta('Upload NACH Form');
+    showUploadNachForm();
   }
 
   /**
