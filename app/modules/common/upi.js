@@ -154,7 +154,7 @@ const UPI_APPS = {
     },
     {
       package_name: 'com.abipbl.upi',
-      shortcode: 'app missing in playstore',
+      shortcode: 'abpb',
     },
     {
       package_name: 'com.microsoft.mobile.polymer',
@@ -186,7 +186,7 @@ const UPI_APPS = {
     },
     {
       package_name: 'com.mgs.yesmerchantnative.prod',
-      shortcode: 'app missing on google play',
+      shortcode: 'yesmerchantnative',
     },
     {
       package_name: 'com.dbs.in.digitalbank',
@@ -198,7 +198,7 @@ const UPI_APPS = {
     },
     {
       package_name: 'in.chillr',
-      shortcode: 'app missing on google play',
+      shortcode: 'chillr',
     },
     {
       package_name: 'com.citrus.citruspay',
@@ -218,7 +218,7 @@ const UPI_APPS = {
     },
     {
       package_name: 'com.mipay.wallet.in',
-      shortcode: 'app missing on google play',
+      shortcode: 'mipay_2',
     },
     {
       package_name: 'com.dreamplug.androidapp',
@@ -230,7 +230,7 @@ const UPI_APPS = {
     },
     {
       package_name: 'in.bajajfinservmarkets.app.uat',
-      shortcode: 'app missing on playstore',
+      shortcode: 'finserv-uat',
     },
   ],
 
