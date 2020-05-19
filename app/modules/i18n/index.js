@@ -93,10 +93,11 @@ export function formatTemplateWithLocale(label, data, locale) {
  * Formats the message with the given locale
  * @param {string} label
  * @param {string} locale
+ * @param {string} [defaultValue]
  * @returns {string}
  */
-export function formatMessageWithLocale(label, locale) {
-  return get(t)(label, { locale });
+export function formatMessageWithLocale(label, locale, defaultValue) {
+  return get(t)(label, { locale, default: defaultValue });
 }
 
 /**
@@ -191,10 +192,15 @@ export function getWalletName(walletCode, locale) {
  * Returns the upi app name for the given locale
  * @param {string} shortcode upi app shortcode
  * @param {string} locale the locale in which the string is expected
+ * @param {string} [defaultName]
  * @returns {string} translated upi app name
  */
-export function getUpiIntentAppName(shortcode, locale) {
-  return formatMessageWithLocale(`upi_intent_apps.${shortcode}`, locale);
+export function getUpiIntentAppName(shortcode, locale, defaultName) {
+  return formatMessageWithLocale(
+    `upi_intent_apps.${shortcode}`,
+    locale,
+    defaultName
+  );
 }
 
 /**

@@ -1,7 +1,7 @@
 <script>
   // Svelte imports
   import { createEventDispatcher } from 'svelte';
-  import { _ as t, locale } from 'svelte-i18n';
+  import { t, locale } from 'svelte-i18n';
 
   import { getUpiIntentAppName } from 'i18n';
 
@@ -240,7 +240,7 @@
         name="upi_app"
         value={app.package_name}>
         <div class="ref-title">
-          {getUpiIntentAppName(app.shortcode)}
+          {getUpiIntentAppName(app.shortcode, $locale, app.app_name)}
           {#if i === 0 && showRecommendedUPIApp}
             <span>
               <!-- LABEL: Recommended -->
