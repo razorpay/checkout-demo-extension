@@ -34,7 +34,7 @@
 
   // i18n
   import { locale, t } from 'svelte-i18n';
-  import { getShortBankName } from 'i18n';
+  import { getLongBankName } from 'i18n';
 
   import {
     CHANGE_BANK_BTN,
@@ -196,7 +196,7 @@
 
   let bankName;
   $: {
-    bankName = getShortBankName($selectedBank, $locale);
+    bankName = getLongBankName($selectedBank, $locale);
   }
 
   let active = false;
