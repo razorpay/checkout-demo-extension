@@ -1,7 +1,7 @@
 export const UPI_INTENT_BLOCK_HEADING = 'upi.intent_block_heading';
 export const UPI_REDIRECT_TO_APP = 'upi.redirect_to_app';
 export const UPI_RECOMMENDED = 'upi.recommended';
-export const UPI_SHOW_OTHER_APPS = 'upi.recommended';
+export const UPI_SHOW_OTHER_APPS = 'upi.show_other_apps';
 export const UPI_GPAY_BLOCK_HEADING = 'upi.gpay_block_heading';
 export const UPI_COLLECT_BLOCK_HEADING = 'upi.collect_block_heading';
 export const UPI_COLLECT_BLOCK_SUBHEADING = 'upi.collect_block_subheading';
