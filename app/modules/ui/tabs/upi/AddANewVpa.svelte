@@ -2,6 +2,7 @@
   // Svelte imports
   import { onMount, createEventDispatcher } from 'svelte';
   import { slide } from 'svelte/transition';
+  import { _ as t } from 'svelte-i18n';
 
   // UI Imports
   import Field from 'ui/components/Field.svelte';
@@ -13,6 +14,15 @@
   import { getSession } from 'sessionmanager';
   import { hasFeature, getPrefilledVPA } from 'checkoutstore';
   import { VPA_REGEX } from 'common/constants';
+
+  import {
+    UPI_COLLECT_NEW_VPA_HELP,
+    UPI_COLLECT_ENTER_ID,
+    UPI_COLLECT_SAVE,
+    NEW_VPA_TITLE_LOGGED_OUT,
+    NEW_VPA_TITLE_LOGGED_IN,
+    NEW_VPA_SUBTITLE,
+  } from 'ui/labels/upi';
 
   // Props
   export let selected = false;
@@ -132,9 +142,12 @@
   on:click={focusAfterTimeout}
   {selected}>
   <div id="new-vpa-field" slot="title">
-    {logged && canSaveVpa ? 'Add UPI ID' : 'UPI ID'}
+    <!-- LABEL: UPI ID -->
+    <!-- LABEL: Add UPI ID -->
+    {logged && canSaveVpa ? $t(NEW_VPA_TITLE_LOGGED_IN) : $t(NEW_VPA_TITLE_LOGGED_OUT)}
   </div>
-  <div slot="subtitle">Google Pay, BHIM, PhonePe & more</div>
+  <!-- LABEL: Google Pay, BHIM, PhonePe & more -->
+  <div slot="subtitle">{$t(NEW_VPA_SUBTITLE)}</div>
   <i slot="icon" class="top">
     <Icon icon={session.themeMeta.icons.upi} />
   </i>
@@ -142,10 +155,12 @@
   <div slot="body">
     {#if selected}
       <div transition:slide={{ duration: 200 }}>
+        <!-- LABEL: Please enter a valid VPA of the form username@bank -->
+        <!-- LABEL: Enter your UPI ID -->
         <Field
           formatter={{ type: 'vpa' }}
           {pattern}
-          helpText="Please enter a valid VPA of the form username@bank"
+          helpText={$t(UPI_COLLECT_NEW_VPA_HELP)}
           id="vpa"
           name="vpa"
           type="text"
@@ -153,12 +168,13 @@
           bind:value={newVpa}
           bind:this={vpaField}
           on:blur
-          placeholder="Enter your UPI ID" />
+          placeholder={$t(UPI_COLLECT_ENTER_ID)} />
         {#if logged && canSaveVpa}
           <div class="should-save-vpa-container">
             <label id="should-save-vpa" for="save-vpa">
+              <!-- LABEL: Securely save your UPI ID -->
               <Checkbox bind:checked={rememberVpa} id="save-vpa">
-                Securely save your UPI ID
+                {$t(UPI_COLLECT_SAVE)}
               </Checkbox>
             </label>
           </div>

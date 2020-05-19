@@ -188,6 +188,16 @@ export function getWalletName(walletCode, locale) {
 }
 
 /**
+ * Returns the upi app name for the given locale
+ * @param {string} shortcode upi app shortcode
+ * @param {string} locale the locale in which the string is expected
+ * @returns {string} translated upi app name
+ */
+export function getUpiIntentAppName(shortcode, locale) {
+  return formatMessageWithLocale(`upi_intent_apps.${shortcode}`, locale);
+}
+
+/**
  * Returns the long bank name for the given locale
  * @param {string} bankCode
  * @param {string} locale

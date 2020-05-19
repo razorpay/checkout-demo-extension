@@ -1,4 +1,4 @@
-export const formatters = [
+const formatters = [
   {
     flag: '<strong>',
     type: 'strong',
@@ -17,7 +17,7 @@ export const formatters = [
   },
 ];
 
-export const tokenizeTextForFormatter = (tokenText, formatter) => {
+const tokenizeTextForFormatter = (tokenText, formatter) => {
   return tokenText.split(formatter.flag).map((text, i) => {
     return { text: text, type: i % 2 ? formatter.type : 'plain' };
   });
