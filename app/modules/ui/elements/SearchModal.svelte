@@ -1,7 +1,7 @@
 <script>
   // Svelte imports
   import { createEventDispatcher, onMount, tick } from 'svelte';
-  import { fade, slide, fly } from 'svelte/transition';
+  import { fade, fly } from 'svelte/transition';
 
   // UI imports
   import Stack from 'ui/layouts/Stack.svelte';
@@ -247,9 +247,12 @@
       <div
         class="search-curtain-bg"
         on:click={() => dispatch('close')}
-        in:fade
+        in:fade={{ duration: 200 }}
         out:fade={{ duration: 200 }} />
-      <div class="search-box" in:slide out:fade={{ duration: 200 }}>
+      <div
+        class="search-box"
+        in:fly={{ duration: 200, y: -100 }}
+        out:fade={{ duration: 200 }}>
         <Stack vertical>
           <div class="search-field">
             <div class="icon">
