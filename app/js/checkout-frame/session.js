@@ -5006,6 +5006,7 @@ Session.prototype = {
       'svelteWalletsTab',
       'languageSelectionView',
       'svelteOverlay',
+      'topBar',
       'upiTab',
       'timer',
     ];
