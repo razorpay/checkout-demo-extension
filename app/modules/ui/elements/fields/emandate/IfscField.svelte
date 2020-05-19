@@ -1,6 +1,9 @@
 <script>
   import Field from 'ui/components/Field.svelte';
 
+  import { t } from 'svelte-i18n';
+  import { IFSC_LABEL, IFSC_HELP } from 'ui/labels/emandate';
+
   export let id;
   export let name;
   export let readonly;
@@ -20,8 +23,8 @@
   {id}
   {readonly}
   {value}
-  label="IFSC"
-  helpText="Please enter a valid IFSC"
+  label={$t(IFSC_LABEL)}
+  helpText={$t(IFSC_HELP)}
   maxlength="11"
   required={true}
   formatter={{ type: 'ifsc' }}

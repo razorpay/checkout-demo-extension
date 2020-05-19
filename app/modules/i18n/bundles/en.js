@@ -69,6 +69,28 @@ export default {
         'Visa and Mastercard Credit Cards from all Banks and Debit Cards from ICICI, Kotak, Citibank and Canara Bank are supported for this payment.',
     },
   },
+  emandate: {
+    change_bank_btn: 'Change Bank',
+    auth_type_header: 'Authenticate using',
+    auth_type_debit_title: 'Debit Card',
+    auth_type_debit_description: 'via Bank Account and Debit Card details',
+    auth_type_netbanking_title: 'Netbanking',
+    auth_type_netbanking_description: 'via Bank Account and Netbanking details',
+    account_type_current: 'Current Account',
+    account_type_savings: 'Savings Account',
+
+    account_number_label: 'Bank Account Number',
+    account_number_help: 'Please enter a valid account number',
+
+    ifsc_label: 'IFSC',
+    ifsc_help: 'Please enter a valid IFSC',
+
+    name_label: 'Account Holder Name',
+    name_help: 'Please enter a valid Name as per your account',
+
+    account_type_label: 'Type of Bank Account',
+    account_type_help: 'Please select a bank account type',
+  },
   bank_transfer: {
     loading_message: 'Getting bank details...',
     header: 'To complete the transaction, make NEFT / RTGS / IMPS transfer to',
