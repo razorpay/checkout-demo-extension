@@ -67,8 +67,9 @@ export function getStore() {
 }
 
 /**
- *
- * @param view
+ * Sets the view to be shown in the CTA
+ * @param {string} view the view
+ * @param {boolean} show whether to make CTA visible or not
  * @param {Object} data
  */
 function setView(view, show = false, data = {}) {
@@ -154,11 +155,13 @@ export function showAmountInCta() {
   const session = getSession();
 
   if (!session.get('amount')) {
-    showAuthenticate();
+    setView(CtaViews.AUTHENTICATE, false);
   } else {
     const offer = session.getAppliedOffer();
     const amount = (offer && offer.amount) || session.get('amount');
-    showAmount(displayAmount(session.r, amount));
+    setView(CtaViews.AMOUNT, false, {
+      amount: displayAmount(session.r, amount),
+    });
   }
 }
 
@@ -180,7 +183,7 @@ export function setAppropriateCtaText() {
     }
   } else {
     if (withoutOffer && (tab === 'card' || tab === 'emi')) {
-      showPayWithoutOffer();
+      setView(CtaViews.PAY_WITHOUT_OFFER);
     } else {
       showAmountInCta();
     }
