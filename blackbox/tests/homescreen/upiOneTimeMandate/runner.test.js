@@ -1,4 +1,4 @@
-const createUPICollectTest = require('../../../create/upi-otm.js');
+const createUPIOTMCollectTest = require('../../../create/upi-otm.js');
 const testRunner = require('../../../create/checkout-test-runner');
 
 testRunner
@@ -8,4 +8,4 @@ testRunner
     ['offers', 'downtimeHigh'],
     ['downtimeHigh', 'downtimeLow'],
   ])
-  .runOn(createUPICollectTest);
+  .runOn(createUPIOTMCollectTest);
