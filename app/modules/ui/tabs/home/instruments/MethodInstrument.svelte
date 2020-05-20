@@ -1,4 +1,7 @@
 <script>
+  // Svelte imports
+  import { createEventDispatcher } from 'svelte';
+
   // UI imports
   import Field from 'ui/components/Field.svelte';
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
@@ -20,6 +23,7 @@
   export let name = 'instrument';
 
   const session = getSession();
+  const dispatch = createEventDispatcher();
 
   const method = instrument.method;
   const methodName = getMethodNameForPaymentOption(method, { instrument });
@@ -38,25 +42,10 @@
     $selectedInstrumentId = null;
   }
 
-  function switchToMethod() {
-    let method = instrument.method;
-
-    if (method === 'paypal') {
-      createPaypalPayment();
-      return;
-    } else if (method === 'gpay') {
-      method = 'upi';
-    }
-
-    session.switchTab(method);
-  }
-
-  function createPaypalPayment() {
-    const payload = session.getPayload();
-
-    payload.method = 'paypal';
-
-    session.preSubmit(null, payload);
+  function dispatchSelectMethod() {
+    dispatch('selectMethod', {
+      method: instrument.method,
+    });
   }
 
   function setMethodInstrument() {
@@ -81,7 +70,7 @@
   on:click
   on:click={deselectInstrument}
   on:click={setMethodInstrument}
-  on:click={switchToMethod}>
+  on:click={dispatchSelectMethod}>
   <i slot="icon">
     <Icon {icon} alt={methodName} />
   </i>

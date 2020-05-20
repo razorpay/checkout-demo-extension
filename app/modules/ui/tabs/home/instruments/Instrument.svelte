@@ -85,7 +85,7 @@
 </script>
 
 {#if isGroupedInstrument}
-  <MethodInstrument {instrument} on:click />
+  <MethodInstrument {instrument} on:click on:selectMethod />
 {:else if isSavedCardInstrument}
   <SavedCardInstrument {instrument} on:click />
 {:else}
