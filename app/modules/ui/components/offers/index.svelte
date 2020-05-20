@@ -11,6 +11,7 @@
   } from 'checkoutstore/cta';
   import {
     getOffersForTab,
+    getOffersForMethodWithInstrument,
     getOffersForInstrument,
     getOtherOffers,
   } from 'checkoutframe/offers';
@@ -18,7 +19,10 @@
   import Callout from 'ui/elements/Callout.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
   import OfferItemList from './OfferItemList.svelte';
-  import { selectedInstrument } from 'checkoutstore/screens/home';
+  import {
+    selectedInstrument,
+    methodTabInstrument,
+  } from 'checkoutstore/screens/home';
   import { appliedOffer, isCardValidForOffer } from 'checkoutstore/offers';
   import { customer } from 'checkoutstore/customer';
 
@@ -53,7 +57,8 @@
       }
     }
   }
-  $: switchInstrument($selectedInstrument);
+
+  $: $selectedInstrument, switchInstrument();
 
   $: discount =
     $appliedOffer && $appliedOffer.original_amount - $appliedOffer.amount;
@@ -70,11 +75,24 @@
     if (tab !== currentTab) {
       currentTab = tab;
     }
-    if (!tab && $selectedInstrument) {
-      tab = $selectedInstrument.method;
-      applicableOffers = getOffersForInstrument($selectedInstrument);
+
+    if (!tab) {
+      // Homescreen
+
+      if ($selectedInstrument) {
+        // Instrument is selected, show offers for that instrument
+        tab = $selectedInstrument.method;
+        applicableOffers = getOffersForInstrument($selectedInstrument);
+      } else {
+        // No instrument is selected, show all offers for homescreen
+        applicableOffers = getOffersForTab();
+      }
     } else {
-      applicableOffers = getOffersForTab(tab);
+      // We are in a method tab. Instrument might have been chosen. Show offers accordingly.
+      applicableOffers = getOffersForMethodWithInstrument(
+        tab,
+        $methodTabInstrument
+      );
     }
 
     var invalidateOffer = false;

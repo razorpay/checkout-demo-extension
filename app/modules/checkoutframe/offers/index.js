@@ -87,7 +87,27 @@ export function getOffersForTab(method) {
       return o.payment_method === method;
     });
   }
+
   return allOffers;
+}
+
+/**
+ * Returns the offers for selected method + instrument combo
+ * @param {string} method
+ * @param {Instrument|undefined} instrument
+ *
+ * @returns {Array<Offer>}
+ */
+export function getOffersForMethodWithInstrument(method, instrument) {
+  const methodOffers = getOffersForTab(method);
+
+  if (instrument) {
+    return _Arr.filter(methodOffers, offer =>
+      isOfferEligibleOnInstrument(offer, instrument)
+    );
+  } else {
+    return methodOffers;
+  }
 }
 
 const instrumentKey = {
