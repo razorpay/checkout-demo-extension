@@ -1,6 +1,7 @@
 <script>
   // Svelte imports
   import { createEventDispatcher, onMount, onDestroy } from 'svelte';
+  import { fly } from 'svelte/transition';
 
   // Store
   import { isIRCTC } from 'checkoutstore';
@@ -128,7 +129,10 @@
 </script>
 
 {#if shown}
-  <div id="topbar" class="theme-secondary-highlight">
+  <div
+    id="topbar"
+    class="theme-secondary-highlight"
+    transition:fly={{ y: -46, duration: 200 }}>
     {#if $isContactPresent && userDetailsShown}
       <div
         id="top-right"
