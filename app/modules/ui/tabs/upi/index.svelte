@@ -658,10 +658,7 @@
         </DowntimeCallout>
       {/if}
       {#if isOtm}
-        <Callout
-          type={'warning'}
-          classes={['downtime-callout']}
-          showIcon={false}>
+        <Callout classes={['downtime-callout']} showIcon={false}>
           <strong>{session.formatAmountWithCurrency(getAmount())}</strong>
           will be blocked on your account by clicking pay. Your account will be
           charged {getName() ? 'by ' + getName() : ''} between
