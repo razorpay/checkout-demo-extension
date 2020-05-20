@@ -307,6 +307,7 @@ function setEmiBank(data) {
 
 function makeVisible(subject) {
   $(subject)
+    .attr('data-hidden', null)
     .css('display', 'block')
     .reflow()
     .addClass(shownClass);
@@ -314,9 +315,14 @@ function makeVisible(subject) {
 
 function makeHidden(subject) {
   subject = $(subject);
+  subject.attr('data-hidden', true);
   if (subject[0]) {
     subject.removeClass(shownClass);
-    invoke('hide', subject, null, 200);
+    setTimeout(function() {
+      if (subject.attr('data-hidden')) {
+        subject.hide();
+      }
+    }, 200);
   }
 }
 
@@ -3103,7 +3109,7 @@ Session.prototype = {
      * When the user comes back to the card tab after selecting EMI plan,
      * do not commence OTP again.
      */
-    if (!customer.logged && !this.wants_skip && this.screen !== 'emiplans') {
+    if (!customer.logged && !this.wants_skip && !this.screen) {
       self.commenceOTP('saved cards', true, 'saved_cards_access');
       var smsHash = this.get('send_sms_hash') && this.sms_hash;
       var params = {};
