@@ -102,6 +102,13 @@
   }
 </script>
 
+<style>
+  .card-prefix {
+    color: #777;
+    margin-right: 2px;
+  }
+</style>
+
 <div
   class="saved-card "
   class:checked={selected}
@@ -111,7 +118,10 @@
   <div class="help up">EMI is not available on this card</div>
   <div class="cardtype" cardtype={card.networkCode} />
   <div class="saved-inner">
-    <div class="saved-number">{card.last4}</div>
+    <div class="saved-number">
+      <span class="card-prefix">Card ending with</span>
+      {card.last4}
+    </div>
     <div class="saved-cvv">
       {#if showCvv}
         <CvvField
