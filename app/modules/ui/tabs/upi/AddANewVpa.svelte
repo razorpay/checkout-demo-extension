@@ -142,7 +142,7 @@
 
   <div slot="body">
     {#if selected}
-      <div transition:slide={{ duration: 200 }}>
+      <div id="user-new-vpa-container" transition:slide={{ duration: 200 }}>
         <Field
           formatter={{ type: 'vpa' }}
           {pattern}

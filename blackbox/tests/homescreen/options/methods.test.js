@@ -186,7 +186,7 @@ describe.each(
       await checkEmiMethods(context, [
         'EMI on Cards',
         'ZestMoney',
-        'InstaCred Cardless EMI',
+        'Cardless EMI by InstaCred',
       ]);
     });
   }

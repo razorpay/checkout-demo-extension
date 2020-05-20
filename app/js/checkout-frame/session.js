@@ -997,6 +997,11 @@ Session.prototype = {
 
     var order = Store.getMerchantOrder();
     if (tab && !(order && order.bank) && MethodStore.isMethodEnabled(tab)) {
+      // For method=emandate, we switch to the netbanking tab first if bank
+      // is not prefilled.
+      if (tab === 'emandate' && !this.get('prefill.bank')) {
+        tab = 'netbanking';
+      }
       this.switchTab(tab);
     } else if (tab === '') {
       this.switchTab(tab);
@@ -2138,6 +2143,10 @@ Session.prototype = {
         .reflow()
         .addClass('shake');
     }
+
+    try {
+      window.navigator.vibrate(200);
+    } catch (err) {}
   },
 
   click: function(selector, delegateClass, listener, useCapture) {
@@ -4257,7 +4266,7 @@ Session.prototype = {
 
       // perform the actual validation
       if (screen === 'upi' || screen === 'upi_otm') {
-        var formSelector = '#vpa';
+        var formSelector = '#user-new-vpa-container';
 
         if (data['_[flow]'] === 'directpay') {
           if (data.upi_provider === 'google_pay') {
