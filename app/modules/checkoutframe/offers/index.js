@@ -98,6 +98,40 @@ const instrumentKey = {
 };
 
 /**
+ * Tells if the offer is eligible for the instrument
+ * @param {Offer} offer
+ * @param {Instrument} instrument
+ *
+ * @returns {boolean}
+ */
+function isOfferEligibleOnInstrument(offer, instrument) {
+  if (offer.payment_method !== instrument.method) {
+    return false;
+  }
+
+  const key = instrumentKey[instrument.method];
+
+  if (key) {
+    const offerIssuer = offer.issuer;
+    const instrumentValues = instrument[key];
+
+    // Offer is method-wide
+    if (!offerIssuer) {
+      return true;
+    }
+
+    // Instrument is not scoped down to any specific issuers/banks/wallets/providers
+    if (!instrumentValues) {
+      return true;
+    }
+
+    return _Arr.contains(instrumentValues, offerIssuer);
+  } else {
+    return true;
+  }
+}
+
+/**
  * Returns a list of offers to be used on a given instrument
  * @param {Instrument} instrument Selected instrument
  *
@@ -105,26 +139,10 @@ const instrumentKey = {
  */
 export function getOffersForInstrument(instrument) {
   const offers = getOffersForTab(instrument.method);
-  const key = instrumentKey[instrument.method];
-  if (key) {
-    return offers.filter(offer => {
-      const offerIssuer = offer.issuer;
-      const instrumentValues = instrument[key];
 
-      // Offer is method-wide
-      if (!offerIssuer) {
-        return true;
-      }
-
-      // Instrument is not scoped down to any specific issuers/banks/wallets/providers
-      if (!instrumentValues) {
-        return true;
-      }
-
-      return _Arr.contains(instrumentValues, offerIssuer);
-    });
-  }
-  return offers;
+  return _Arr.filter(offers, offer =>
+    isOfferEligibleOnInstrument(offer, instrument)
+  );
 }
 
 /**
