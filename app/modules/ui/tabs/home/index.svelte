@@ -818,10 +818,10 @@
         <Callout>
           {#if session.get('subscription_id')}
             {#if isDebitCardEnabled() && isCreditCardEnabled()}
-              $t(SUBSCRIPTIONS_CREDIT_DEBIT_CALLOUT)
+              {$t(SUBSCRIPTIONS_CREDIT_DEBIT_CALLOUT)}
             {:else if isDebitCardEnabled()}
-              $t(SUBSCRIPTIONS_DEBIT_ONLY_CALLOUT)
-            {:else}$t(SUBSCRIPTIONS_CREDIT_ONLY_CALLOUT){/if}
+              {$t(SUBSCRIPTIONS_DEBIT_ONLY_CALLOUT)}
+            {:else}{$t(SUBSCRIPTIONS_CREDIT_ONLY_CALLOUT)}{/if}
           {:else if cardOffer}
             {#if isDebitCardEnabled() && isCreditCardEnabled()}
               {formatTemplateWithLocale(CARD_OFFER_CREDIT_DEBIT_CALLOUT, { issuer: cardOffer.issuer }, $locale)}
