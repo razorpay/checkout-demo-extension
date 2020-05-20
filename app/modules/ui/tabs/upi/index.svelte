@@ -664,7 +664,7 @@
           showIcon={false}>
           <strong>{session.formatAmountWithCurrency(getAmount())}</strong>
           will be blocked on your account by clicking pay. Your account will be
-          charged {getName() ? 'by ' + getName() : 'merchant'} between
+          charged {getName() ? 'by ' + getName() : ''} between
           <strong>{toShortFormat(otmStartDate)}</strong>
           to
           <strong>{toShortFormat(otmEndDate)}</strong>
