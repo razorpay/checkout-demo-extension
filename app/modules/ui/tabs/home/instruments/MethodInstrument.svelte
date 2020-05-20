@@ -8,9 +8,9 @@
   import Icon from 'ui/elements/Icon.svelte';
 
   // Utils imports
-  import { getSession } from 'sessionmanager';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
   import { getSubtextForInstrument } from 'subtext';
+  import { getThemeMeta } from 'checkoutstore/theme';
 
   // Store imports
   import {
@@ -22,7 +22,6 @@
   export let instrument = {};
   export let name = 'instrument';
 
-  const session = getSession();
   const dispatch = createEventDispatcher();
 
   const method = instrument.method;
@@ -33,9 +32,9 @@
 
   let icon;
   if (/card$/.test(method)) {
-    icon = session.themeMeta.icons['card'];
+    icon = getThemeMeta().icons['card'];
   } else {
-    icon = session.themeMeta.icons[method];
+    icon = getThemeMeta().icons[method];
   }
 
   function deselectInstrument() {
