@@ -221,7 +221,7 @@
   $: shouldShowCollect = availableFlows.collect || isOtm;
   $: shouldShowOmnichannel = availableFlows.omnichannel && !isOtm;
 
-  // Determine CTA visilibty when selectedToken changes, but only if session.tab is 'upi'
+  // Determine CTA visilibty when selectedToken changes, but only if session.tab is a upi based method
   $: selectedToken,
     _Arr.contains(['upi', 'upi_otm'], session.tab) && determineCtaVisibility();
 
