@@ -2716,7 +2716,11 @@ Session.prototype = {
 
     // Go to the offer's method if we're on homescreen
     if (screen !== offer.payment_method) {
-      this.switchTab(offer.payment_method);
+      this.homeTab.selectMethod({
+        detail: {
+          method: offer.payment_method,
+        },
+      });
       return this.handleOfferSelection(offer, offer.payment_method);
     }
 
@@ -2724,7 +2728,9 @@ Session.prototype = {
 
     if (screen === 'wallet') {
       // Select wallet
-      $('#wallet-radio-' + issuer).click();
+      if (issuer) {
+        this.svelteWalletsTab.setSelectedWallet(issuer);
+      }
     } else if (screen === 'netbanking') {
       // Select bank
       if (issuer) {
