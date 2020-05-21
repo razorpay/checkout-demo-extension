@@ -10,6 +10,13 @@ import {
   getCardlessEMIProviders,
 } from 'checkoutstore/methods';
 
+import { instruments } from 'checkoutstore/screens/home';
+import { get as storeGetter } from 'svelte/store';
+import {
+  isSavedCardInstrument,
+  isInstrumentGrouped,
+} from 'ui/tabs/home/instruments';
+
 /**
  * Checks if offer is eligible.
  *
@@ -205,3 +212,51 @@ const zestMoneyOffer = {
   display_text:
     'Applicable only on EMI tenure of 3 months.\nInterest will be returned as cashback on repayment of each EMI.',
 };
+
+function _getAllInstrumentsForOffer(offer) {
+  const allInstruments = storeGetter(instruments);
+
+  return _Arr.filter(allInstruments, instrument =>
+    isOfferEligibleOnInstrument(offer, instrument)
+  );
+}
+
+function _getInstrumentTypeToSwitch(instrument) {
+  if (instrument._type === 'method') {
+    return 'rzp.method';
+  }
+
+  if (isInstrumentGrouped(instrument)) {
+    return 'instrument.grouped';
+  }
+
+  return 'instrument.single';
+}
+
+/**
+ * Returns the first matching instrument for the offer
+ *
+ * TODO
+ * Improvise this by adding heuristics:
+ * - method instrument should be prioritised
+ *
+ * @param {Offer} offer
+ *
+ * @returns {Instrument|undefined}
+ */
+export function getInstrumentForOffer(offer) {
+  const instruments = _getAllInstrumentsForOffer(offer);
+  const nonSavedCardInstruments = _Arr.filter(
+    instruments,
+    instrument => !isSavedCardInstrument(instrument)
+  );
+
+  const first = nonSavedCardInstruments[0];
+
+  if (first) {
+    return {
+      type: _getInstrumentTypeToSwitch(first),
+      instrument: first,
+    };
+  }
+}
