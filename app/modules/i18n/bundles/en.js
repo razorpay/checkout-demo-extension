@@ -242,6 +242,7 @@ export default {
     JCB: 'JCB',
   },
   paylater: {
+    select_option_title: 'Select an option',
     providers: {
       epaylater: 'ePayLater',
       getsimpl: 'Simpl',
