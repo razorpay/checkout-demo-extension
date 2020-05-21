@@ -6,9 +6,59 @@ export default {
     corporate_label: 'Corporate',
     retail_label: 'Retail',
   },
+  card: {
+    use_saved_cards_btn: 'Use saved cards',
+    add_another_card_btn: 'Add another card',
+
+    card_number_label: 'Card Number',
+    card_number_help: 'Please enter a valid card number.',
+    card_number_help_amex: 'Amex cards are not supported for this transaction.',
+    card_number_help_recurring: 'Card does not support recurring payments.',
+    card_number_help_unsupported: 'This card is not supported for the payment',
+
+    expiry_label: 'Expiry',
+
+    name_label: "Card Holder's name",
+    name_help: 'Please enter name on your card',
+
+    cvv_label: 'CVV',
+    cvv_help: "It's a {length} digit code printed on the back of your card.",
+
+    remember_card_label: 'Remember Card',
+    view_all_emi_plans: 'View all EMI Plans',
+    nocvv_label: "My Maestro Card doesn't have Expiry/CVV",
+
+    auth_type_header: 'Complete Payment Using',
+    auth_type_otp: 'OTP / Password',
+    auth_type_pin: 'ATM PIN',
+
+    saved_card_label: 'Card ending with <b>{last4}<b>',
+
+    recurring_callout:
+      'Future payments on this card will be charged automatically.',
+    subscription_callout:
+      'The charge is to enable subscription on this card and it will be refunded.',
+    subscription_refund_callout:
+      'This card will be linked to the subscription and future payments will be charged automatically.',
+  },
+  emi: {
+    unavailable_help:
+      'EMI is available on {issuers} cards. Enter your credit card to avail.',
+    unavailable_btn: 'EMI unavailable',
+    saved_card_unavailable_help: 'EMI is not available on this card',
+
+    edit_plan_text: '{duration} Months ({amount}/mo)',
+    edit_plan_action: 'Edit',
+
+    available_text: 'EMI Available',
+    available_action: 'Pay with EMI',
+
+    pay_entire_amount_action: 'Pay entire amount',
+    pay_entire_amount_count: '({count} cards available)',
+  },
   home: {
     preferred_block_title: 'Preferred Payment Methods',
-    single_block_title: 'Pay via ${method}',
+    single_block_title: 'Pay via {method}',
 
     contact_label_required: 'Phone with Country Code',
     contact_label_optional: 'Phone with Country Code (Optional)',

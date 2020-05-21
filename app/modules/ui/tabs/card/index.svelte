@@ -38,6 +38,17 @@
   } from 'checkoutstore/methods';
   import { newCardEmiDuration } from 'checkoutstore/emi';
 
+  // i18n
+  import { t, locale } from 'svelte-i18n';
+
+  import {
+    USE_SAVED_CARDS_BTN,
+    ADD_ANOTHER_CARD_BTN,
+    RECURRING_CALLOUT,
+    SUBSCRIPTION_CALLOUT,
+    SUBSCRIPTION_REFUND_CALLOUT,
+  } from 'ui/labels/card';
+
   // Utils imports
   import { getSession } from 'sessionmanager';
   import { getSavedCards, transform } from 'common/token';
@@ -452,7 +463,8 @@
                 class="cardtype"
                 class:multiple={savedCards && savedCards.length > 1}
                 cardtype={lastSavedCard && lastSavedCard.card.networkCode} />
-              Use saved cards
+              <!-- LABEL: Use saved cards -->
+              {$t(USE_SAVED_CARDS_BTN)}
             </div>
           {/if}
 
@@ -493,7 +505,8 @@
             id="show-add-card"
             class="text-btn left-card"
             on:click={showAddCardView}>
-            Add another card
+            <!-- Add another card -->
+            {$t(ADD_ANOTHER_CARD_BTN)}
           </div>
         </div>
       {/if}
@@ -505,13 +518,16 @@
       {#if isRecurring()}
         <Callout>
           {#if !session.subscription}
-            Future payments on this card will be charged automatically.
+            <!-- LABEL: Future payments on this card will be charged automatically. -->
+            {$t(RECURRING_CALLOUT)}
           {:else if session.subscription && session.subscription.type === 0}
-            The charge is to enable subscription on this card and it will be
-            refunded.
+            <!-- LABEL : The charge is to enable subscription on this card and it will be
+            refunded. -->
+            {$t(SUBSCRIPTION_REFUND_CALLOUT)}
           {:else}
-            This card will be linked to the subscription and future payments
-            will be charged automatically.
+            <!-- This card will be linked to the subscription and future payments
+            will be charged automatically. -->
+            {$t(SUBSCRIPTION_CALLOUT)}
           {/if}
         </Callout>
       {/if}

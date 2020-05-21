@@ -426,12 +426,10 @@ function getEmiText(session, amount, plan) {
     plan.interest
   );
 
-  return (
-    plan.duration +
-    ' Months (' +
-    session.formatAmountWithCurrency(amountPerMonth) +
-    '/mo)'
-  );
+  return {
+    duration: plan.duration,
+    amount: session.formatAmountWithCurrency(amountPerMonth),
+  };
 }
 
 function overlayVisible() {
@@ -3340,7 +3338,7 @@ Session.prototype = {
               });
 
               setEmiDurationForSavedCard('');
-              EmiStore.selectedPlanTextForSavedCard.set('');
+              EmiStore.selectedPlanTextForSavedCard.set();
 
               self.switchTab('card');
               self.setScreen('card');
