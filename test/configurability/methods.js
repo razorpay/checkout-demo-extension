@@ -35,7 +35,7 @@ test('Module: configurability/methods', t => {
           instruments: [
             {
               method: 'upi',
-              apps: ['google_pay'],
+              apps: ['com.google.android.apps.nbu.paisa.user'],
               _type: 'instrument',
             },
           ],
@@ -227,7 +227,7 @@ test('Module: configurability/methods', t => {
           instruments: [
             {
               code: 'upi',
-              _type: 'instrument',
+              _type: 'method',
               method: 'upi',
             },
             {
@@ -237,12 +237,12 @@ test('Module: configurability/methods', t => {
             },
             {
               code: 'emi',
-              _type: 'instrument',
+              _type: 'method',
               method: 'emi',
             },
             {
               code: 'cardless_emi',
-              _type: 'instrument',
+              _type: 'method',
               method: 'cardless_emi',
             },
             {
@@ -252,17 +252,17 @@ test('Module: configurability/methods', t => {
             },
             {
               code: 'paylater',
-              _type: 'instrument',
+              _type: 'method',
               method: 'paylater',
             },
             {
               code: 'paypal',
-              _type: 'instrument',
+              _type: 'method',
               method: 'paypal',
             },
             {
               code: 'bank_transfer',
-              _type: 'instrument',
+              _type: 'method',
               method: 'bank_transfer',
             },
             {

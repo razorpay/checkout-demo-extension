@@ -152,11 +152,6 @@ test('Module: configurability/sequence', t => {
           method: 'gpay',
         },
         {
-          code: 'emi',
-          _type: 'rzp_method',
-          method: 'emi',
-        },
-        {
           code: 'cardless_emi',
           _type: 'rzp_method',
           method: 'cardless_emi',
