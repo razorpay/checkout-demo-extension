@@ -9,6 +9,7 @@
 
   // Store
   import { selectedPlanTextForSavedCard } from 'checkoutstore/emi';
+  import { isMethodUsable } from 'checkoutstore/methods';
 
   // UI imports
   import Radio from 'ui/elements/Radio.svelte';
@@ -138,7 +139,7 @@
               <div class="emi-plans-text">{$selectedPlanTextForSavedCard}</div>
               <div class="emi-plans-action theme-highlight">Edit</div>
             </div>
-          {:else if tab !== 'emi'}
+          {:else if tab !== 'emi' && isMethodUsable('emi')}
             <div class="emi-plan-unselected emi-icon-multiple-cards">
               <div class="emi-plans-text">EMI Available</div>
               <div class="emi-plans-action theme-highlight">Pay with EMI</div>
