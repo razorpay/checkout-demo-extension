@@ -2730,7 +2730,7 @@ Session.prototype = {
     if (screen === 'wallet') {
       // Select wallet
       if (issuer) {
-        this.svelteWalletsTab.setSelectedWallet(issuer);
+        this.svelteWalletsTab.onWalletSelection(issuer);
       }
     } else if (screen === 'netbanking') {
       // Select bank
