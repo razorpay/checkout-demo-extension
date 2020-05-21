@@ -250,7 +250,9 @@ export default {
     },
   },
   cardless_emi: {
+    select_option_title: 'Select an option',
     providers: {
+      cards: 'EMI on Credit/Debit cards',
       bajaj: 'Bajaj Finserv',
       earlysalary: 'EarlySalary',
       zestmoney: 'ZestMoney',

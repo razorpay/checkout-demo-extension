@@ -13,6 +13,11 @@
   // Store imports
   import { methodTabInstrument } from 'checkoutstore/screens/home';
 
+  // i18n
+  import { t, locale } from 'svelte-i18n';
+  import { getCardlessEmiProviderName } from 'i18n';
+  import { SELECT_OPTION_TITLE } from 'ui/labels/cardlessemi';
+
   const providers = getAllProviders();
 
   /**
@@ -75,10 +80,13 @@
   <input type="hidden" name="emi_duration" />
   <input type="hidden" name="provider" />
   <input type="hidden" name="ott" />
-  <h3>Select an Option</h3>
+  <!-- TITLE: Select an option -->
+  <h3>{$t(SELECT_OPTION_TITLE)}</h3>
   <div class="options">
     {#each filteredProviders as provider}
-      <NextOption {...provider} on:select>{provider.title}</NextOption>
+      <NextOption {...provider} on:select>
+        {getCardlessEmiProviderName(provider.data.code, $locale)}
+      </NextOption>
     {/each}
   </div>
 </div>
