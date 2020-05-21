@@ -2719,49 +2719,110 @@ Session.prototype = {
   handleOfferSelection: function(offer, screen) {
     screen = screen || this.screen;
 
-    // Go to the offer's method if we're on homescreen
-    if (screen !== offer.payment_method) {
-      this.homeTab.selectMethod(offer.payment_method);
-      return this.handleOfferSelection(offer, offer.payment_method);
+    /**
+     * Current flow:
+     * - Get the first instrument that can work with the offer, select that
+     *
+     * There is a flaw with this approach, wherein if I were already in an instrument
+     * and I choose to apply the offer, it will redirect me to the first instrument.
+     * TODO: Fix this. Maybe getInstrumentForOffer can check the current methodInstrument and return accordingly?
+     */
+
+    var instrumentData = discreet.Offers.getInstrumentForOffer(offer);
+
+    if (!instrumentData) {
+      // TODO: Track analytics
+
+      return;
+    }
+
+    var type = instrumentData.type;
+    var instrument = instrumentData.instrument;
+
+    HomeScreenStore.methodTabInstrument.set(null);
+    HomeScreenStore.selectedInstrumentId.set(null);
+
+    if (type === 'rzp.method') {
+      // Do nothing
+    } else if (type === 'instrument.grouped') {
+      // Set methodTabInstrument
+      HomeScreenStore.methodTabInstrument.set(instrument);
+    } else if (type === 'instrument.single') {
+      // Do nothing
+    } else {
+      // TODO: Track analytics
+
+      return;
+    }
+
+    if (_Arr.contains(['rzp.method', 'instrument.grouped'], type)) {
+      // Go to the offer's method if we're on homescreen
+      if (screen !== offer.payment_method) {
+        this.homeTab.selectMethod(offer.payment_method);
+      }
+    } else if (type === 'instrument.single') {
+      // Switch to homescreen
+      this.switchTab('');
+
+      // Switch to methods tab
+    }
+
+    this.offers.rerenderTab();
+
+    // Doing this after switching because switching on the homescreen deselects all instruments
+    if (type === 'instrument.single') {
+      // Set selectedInstrument
+      HomeScreenStore.selectedInstrumentId.set(instrument.id);
+
+      return;
     }
 
     var issuer = offer.issuer;
 
-    if (screen === 'wallet') {
-      // Select wallet
-      if (issuer) {
-        this.svelteWalletsTab.onWalletSelection(issuer);
-      }
-    } else if (screen === 'netbanking') {
-      // Select bank
-      if (issuer) {
-        NetbankingScreenStore.selectedBank.set(issuer);
-      }
-    } else if (screen === 'emi') {
-      var emiDuration = getEmiDurationForNewCard();
-      var bank = this.emiPlansForNewCard && this.emiPlansForNewCard.code;
+    var session = this;
 
-      if (emiDuration) {
-        var plan = _Arr.find(MethodStore.getEMIBankPlans(bank), function(p) {
-          return p.duration === emiDuration;
-        });
-        if (
-          plan &&
-          offer.id &&
-          offer.emi_subvention &&
-          plan.offer_id !== offer.id
-        ) {
-          // Clear duration
-          setEmiDurationForNewCard('');
+    // Wait for switching to be over
+    setTimeout(function() {
+      if (session.screen === 'wallet') {
+        // Select wallet
+        if (issuer) {
+          session.svelteWalletsTab.onWalletSelection(issuer);
+        }
+      } else if (session.screen === 'netbanking') {
+        // Select bank
+        if (issuer) {
+          NetbankingScreenStore.selectedBank.set(issuer);
+        }
+      } else if (session.screen === 'emi') {
+        var emiDuration = getEmiDurationForNewCard();
+        var bank =
+          session.emiPlansForNewCard && session.emiPlansForNewCard.code;
+
+        if (emiDuration) {
+          var plan = _Arr.find(MethodStore.getEMIBankPlans(bank), function(p) {
+            return p.duration === emiDuration;
+          });
+          if (
+            plan &&
+            offer.id &&
+            offer.emi_subvention &&
+            plan.offer_id !== offer.id
+          ) {
+            // Clear duration
+            setEmiDurationForNewCard('');
+          }
+        }
+      } else if (
+        session.screen === 'cardless_emi' &&
+        session.screen !== 'otp'
+      ) {
+        var provider = offer.provider;
+
+        if (provider) {
+          session.selectCardlessEmiProviderAndAttemptPayment(provider);
         }
       }
-    } else if (screen === 'cardless_emi' && this.screen !== 'otp') {
-      var provider = offer.provider;
-
-      if (provider) {
-        this.selectCardlessEmiProviderAndAttemptPayment(provider);
-      }
-    }
+    }, 300);
   },
 
   /**

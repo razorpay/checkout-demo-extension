@@ -71,6 +71,10 @@
     }
   }
 
+  export function rerenderTab() {
+    renderTab(currentTab);
+  }
+
   export function renderTab(tab) {
     if (tab !== currentTab) {
       currentTab = tab;
