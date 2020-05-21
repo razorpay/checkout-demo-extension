@@ -87,6 +87,7 @@ describe.each(
         netbanking: true,
         wallet: false,
         cardless_emi: true,
+        upi_otm: false,
       },
     },
     preferences: {},
