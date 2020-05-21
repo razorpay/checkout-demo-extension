@@ -4266,7 +4266,7 @@ Session.prototype = {
 
       // perform the actual validation
       if (screen === 'upi' || screen === 'upi_otm') {
-        var formSelector = '#user-new-vpa-container';
+        var formSelector = '#user-new-vpa-container-' + screen;
 
         if (data['_[flow]'] === 'directpay') {
           if (data.upi_provider === 'google_pay') {
@@ -5337,6 +5337,7 @@ Session.prototype = {
   },
 
   setPreferences: function(prefs) {
+    prefs.methods.upi_otm = true;
     this.preferences = prefs;
     preferences = prefs;
     this.tab_titles = tab_titles;

@@ -30,6 +30,7 @@
 
   // Computed
   export let pattern;
+  export let paymentMethod;
   export let subtitleText = 'Google Pay, BHIM, PhonePe & more';
   let rememberVpa = true;
   let newVpa = getPrefilledVPA();
@@ -142,13 +143,15 @@
 
   <div slot="body">
     {#if selected}
-      <div id="user-new-vpa-container" transition:slide={{ duration: 200 }}>
+      <div
+        id={'user-new-vpa-container-' + paymentMethod}
+        transition:slide={{ duration: 200 }}>
         <Field
           formatter={{ type: 'vpa' }}
           {pattern}
           helpText="Please enter a valid VPA of the form username@bank"
-          id="vpa"
-          name="vpa"
+          id={'vpa-' + paymentMethod}
+          name={'vpa-' + paymentMethod}
           type="text"
           required
           bind:value={newVpa}

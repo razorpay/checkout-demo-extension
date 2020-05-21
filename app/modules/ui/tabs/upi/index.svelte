@@ -610,6 +610,7 @@
             </SlottedRadioOption>
           {/each}
           <AddANewVpa
+            paymentMethod={method}
             subtitleText={isOtm ? 'Supported only for BHIM app' : 'Google Pay, BHIM, PhonePe & more'}
             on:click={() => {
               onUpiAppSelection({ detail: { id: 'new' } });
