@@ -37,10 +37,6 @@
     icon = getThemeMeta().icons[method];
   }
 
-  function deselectInstrument() {
-    $selectedInstrumentId = null;
-  }
-
   function dispatchSelectMethod() {
     dispatch('selectMethod', {
       method: instrument.method,
@@ -67,7 +63,6 @@
   className="instrument"
   attributes={{ 'data-type': 'method' }}
   on:click
-  on:click={deselectInstrument}
   on:click={setMethodInstrument}
   on:click={dispatchSelectMethod}>
   <i slot="icon">
