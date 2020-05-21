@@ -2724,7 +2724,9 @@ Session.prototype = {
 
     if (screen === 'wallet') {
       // Select wallet
-      $('#wallet-radio-' + issuer).click();
+      if (issuer) {
+        this.svelteWalletsTab.setSelectedWallet(issuer);
+      }
     } else if (screen === 'netbanking') {
       // Select bank
       if (issuer) {
