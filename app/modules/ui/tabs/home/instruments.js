@@ -38,6 +38,13 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
       return true;
     }
 
+    const hasOnlyOneUngrouped = instrument._ungrouped.length === 1;
+
+    // If there's only one ungrouped instrument, it shows up as a radio. Always allow for non-radio i.e. multiple ungrouped
+    if (!hasOnlyOneUngrouped) {
+      return true;
+    }
+
     switch (preferred.method) {
       case 'netbanking': {
         const hasBanks = Boolean(instrument.banks);
