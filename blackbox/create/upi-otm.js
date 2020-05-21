@@ -137,8 +137,8 @@ module.exports = function(testFeatures) {
           if (downtimeLow) {
             await verifyLowDowntime(context, 'UPI', 'upi_otm');
           }
-          await selectUPIMethod(context, 'new');
-          await enterUPIAccount(context, 'saranshgupta1995@okaxis');
+          await selectUPIMethod(context, 'new', 'upi_otm');
+          await enterUPIAccount(context, 'saranshgupta1995@okaxis', 'upi_otm');
         }
       }
       if (partialPayment) {
