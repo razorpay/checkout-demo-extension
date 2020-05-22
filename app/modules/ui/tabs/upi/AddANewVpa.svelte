@@ -128,7 +128,7 @@
 </style>
 
 <SlottedRadioOption
-  name="payment_type"
+  name={'upi-vpa-input-' + paymentMethod}
   value="full"
   align="top"
   on:click
