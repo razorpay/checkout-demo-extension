@@ -17,7 +17,7 @@
       };
 
       // Keys from config that do not need to be passed to Checkout
-      var deleteFromConfig = ['env', 'frame'];
+      var deleteFromConfig = ['env', 'api', 'frame'];
 
       var queryParams = location.search
         .slice(1)
@@ -67,9 +67,7 @@
           domain: 'checkout.stage.razorpay.in',
           Razorpay: {
             config: {
-              frame:
-                queryParams.frame ||
-                'https://beta-api.stage.razorpay.in/v1/checkout/public',
+              frame: 'https://beta-api.stage.razorpay.in/v1/checkout/public',
             },
           },
         },
@@ -81,6 +79,16 @@
         configMap['func' + i].Razorpay.config.frame =
           'https://api-' + i + '.func.razorpay.in/v1/checkout/public';
       });
+
+      if (queryParams.frame) {
+        for (var environment in configMap) {
+          try {
+            configMap[environment].Razorpay.config.frame = queryParams.frame;
+          } catch (err) {
+            console.log(err);
+          }
+        }
+      }
 
       if (queryParams.api) {
         var Razorpay = {
