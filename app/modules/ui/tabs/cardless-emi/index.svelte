@@ -11,7 +11,7 @@
   } from 'checkoutstore/methods';
 
   // Store imports
-  import { methodTabInstrument } from 'checkoutstore/screens/home';
+  import { methodInstrument } from 'checkoutstore/screens/home';
 
   const providers = getAllProviders();
 
@@ -67,7 +67,7 @@
   let filteredProviders = providers;
   $: filteredProviders = filterProvidersAgainstInstrument(
     providers,
-    $methodTabInstrument
+    $methodInstrument
   );
 </script>
 

@@ -33,7 +33,7 @@ export const selectedInstrument = derived(
 /**
  * Stores the instrument for which method is opened
  */
-export const methodTabInstrument = writable(null);
+export const methodInstrument = writable(null);
 
 /**
  * A contact is said to be present if it has more than three characters,

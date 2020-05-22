@@ -24,7 +24,7 @@
     isContactPresent,
     email,
     selectedInstrumentId,
-    methodTabInstrument,
+    methodInstrument,
     multiTpvOption,
     partialPaymentAmount,
     partialPaymentOption,
@@ -357,7 +357,7 @@
   }
 
   function deselectAllInstruments() {
-    $methodTabInstrument = null;
+    $methodInstrument = null;
     $selectedInstrumentId = null;
   }
 

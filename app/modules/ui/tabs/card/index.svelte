@@ -21,7 +21,7 @@
     remember,
     selectedCard,
   } from 'checkoutstore/screens/card';
-  import { methodTabInstrument } from 'checkoutstore/screens/home';
+  import { methodInstrument } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
 
@@ -179,7 +179,7 @@
 
     _savedCards = filterSavedCardsAgainstInstrument(
       _savedCards,
-      $methodTabInstrument
+      $methodInstrument
     );
 
     savedCards = _savedCards;
@@ -191,12 +191,12 @@
 
   let instrumentSubtext;
   $: {
-    if (!$methodTabInstrument) {
+    if (!$methodInstrument) {
       instrumentSubtext = undefined;
-    } else if ($methodTabInstrument.method !== tab) {
+    } else if ($methodInstrument.method !== tab) {
       instrumentSubtext = undefined;
     } else {
-      instrumentSubtext = getSubtextForInstrument($methodTabInstrument);
+      instrumentSubtext = getSubtextForInstrument($methodInstrument);
     }
   }
 

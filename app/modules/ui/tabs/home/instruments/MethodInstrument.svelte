@@ -15,7 +15,7 @@
   // Store imports
   import {
     selectedInstrumentId,
-    methodTabInstrument,
+    methodInstrument,
   } from 'checkoutstore/screens/home';
 
   // Props
@@ -44,7 +44,7 @@
   }
 
   function setMethodInstrument() {
-    $methodTabInstrument = instrument;
+    $methodInstrument = instrument;
   }
 </script>
 

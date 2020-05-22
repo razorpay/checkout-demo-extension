@@ -45,7 +45,7 @@
   // Store
   import { contact } from 'checkoutstore/screens/home';
   import { customer } from 'checkoutstore/customer';
-  import { methodTabInstrument } from 'checkoutstore/screens/home';
+  import { methodInstrument } from 'checkoutstore/screens/home';
 
   // Props
   export let selectedApp = undefined;
@@ -117,7 +117,7 @@
 
   let availableFlows = getAvailableFlowsFromInstrument();
   $: {
-    availableFlows = getAvailableFlowsFromInstrument($methodTabInstrument);
+    availableFlows = getAvailableFlowsFromInstrument($methodInstrument);
   }
 
   // Set default token value when the available flows change
@@ -153,7 +153,7 @@
   }
 
   let intentApps = getUPIIntentApps().filtered;
-  $: intentApps = getUPIIntentAppsFromInstrument($methodTabInstrument);
+  $: intentApps = getUPIIntentAppsFromInstrument($methodInstrument);
 
   const checkGPay = session => {
     /* disable Web payments API for fee_bearer for now */

@@ -5,7 +5,7 @@
   // Store Imports
   import { getWallets } from 'checkoutstore/methods';
   import { showCta } from 'checkoutstore/cta';
-  import { methodTabInstrument } from 'checkoutstore/screens/home';
+  import { methodInstrument } from 'checkoutstore/screens/home';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -32,7 +32,7 @@
   $: {
     filteredWallets = filterWalletsAgainstInstrument(
       wallets,
-      $methodTabInstrument
+      $methodInstrument
     );
 
     // If a wallet was selected and has been filtered out, deselect it

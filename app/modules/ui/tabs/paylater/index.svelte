@@ -8,7 +8,7 @@
   import { createProvider } from 'common/paylater';
 
   // Store imports
-  import { methodTabInstrument } from 'checkoutstore/screens/home';
+  import { methodInstrument } from 'checkoutstore/screens/home';
 
   const providers = _Arr.map(getPayLaterProviders(), providerObj =>
     createProvider(providerObj.code, providerObj.name)
@@ -42,7 +42,7 @@
   let filteredProviders = providers;
   $: filteredProviders = filterProvidersAgainstInstrument(
     providers,
-    $methodTabInstrument
+    $methodInstrument
   );
 </script>
 

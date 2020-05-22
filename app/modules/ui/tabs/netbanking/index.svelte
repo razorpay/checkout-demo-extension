@@ -5,7 +5,7 @@
 
   // Store
   import { selectedBank } from 'checkoutstore/screens/netbanking';
-  import { methodTabInstrument } from 'checkoutstore/screens/home';
+  import { methodInstrument } from 'checkoutstore/screens/home';
 
   import { t } from 'svelte-i18n';
 
@@ -127,7 +127,7 @@
   }
 
   $: {
-    filteredBanks = filterBanksAgainstInstrument(banks, $methodTabInstrument);
+    filteredBanks = filterBanksAgainstInstrument(banks, $methodInstrument);
 
     // If the currently selected bank is not present in filtered banks, we need to unset it.
     if (!filteredBanks[$selectedBank]) {
