@@ -21,7 +21,7 @@
     remember,
     selectedCard,
   } from 'checkoutstore/screens/card';
-  import { methodInstrument } from 'checkoutstore/screens/home';
+  import { methodInstrument, blocks } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
 
@@ -199,6 +199,28 @@
       instrumentSubtext = getSubtextForInstrument($methodInstrument);
     }
   }
+
+  /**
+   * Determine if subtext should be shown
+   * We don't show subtext if subtext is empty
+   * or if the instrument is a part of rzp.cluster block
+   *
+   * @returns {boolean}
+   */
+  function detemineSubtextShouldBeShown() {
+    if (!instrumentSubtext) {
+      return false;
+    }
+
+    const block = _Arr.find($blocks, block =>
+      _Arr.contains(block.instruments, $methodInstrument)
+    );
+
+    return block && block.code !== 'rzp.cluster';
+  }
+
+  let shouldShowSubtext = detemineSubtextShouldBeShown();
+  $: instrumentSubtext, (shouldShowSubtext = detemineSubtextShouldBeShown());
 
   function getSavedCardsFromCustomer(customer = {}) {
     if (!customer.tokens) {
@@ -457,7 +479,7 @@
             </div>
           {/if}
 
-          {#if instrumentSubtext}
+          {#if shouldShowSubtext}
             <div class="pad instrument-subtext-description">
               {instrumentSubtext}
             </div>
