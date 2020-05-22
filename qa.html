@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <!-- Lives at https://betacdn.razorpay.com/qa/index.html -->
 <html>
   <head>
@@ -42,7 +43,23 @@
             },
           },
         },
+
+        func: {
+          domain: 'checkout.stage.razorpay.in',
+          Razorpay: {
+            config: {
+              frame: 'https://api-web.func.razorpay.in/v1/checkout/public',
+            },
+          },
+        },
       };
+
+      [1, 2, 3, 4, 5, 6].forEach(function(i) {
+        i += 1;
+        configMap['func' + i] = JSON.parse(JSON.stringify(configMap.func));
+        configMap['func' + i].Razorpay.config.frame =
+          'https://api-' + i + '.func.razorpay.in/v1/checkout/public';
+      });
 
       var queryParams = location.search
         .slice(1)
@@ -75,7 +92,15 @@
       }
 
       // Augment defaultParams with queryParams
-      var params = Object.assign({}, defaultParams, queryParams);
+      for (var i in queryParams) {
+        defaultParams[i] = queryParams[i];
+      }
+
+      var params = defaultParams;
+
+      if (params.subscription_id || params.order_id || params.invoice_id) {
+        delete params.key;
+      }
 
       // If env does not have a config, default to prod
       if (!configMap[params.env]) {
