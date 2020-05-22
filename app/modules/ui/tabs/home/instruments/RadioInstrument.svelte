@@ -141,10 +141,6 @@
       dispatch('submit');
     }
   }
-
-  function selectInstrument() {
-    $selectedInstrumentId = instrument.id;
-  }
 </script>
 
 <SlottedRadioOption
@@ -155,7 +151,6 @@
   attributes={{ 'data-type': 'individual' }}
   value={instrument.id}
   on:click
-  on:click={selectInstrument}
   on:keydown={attemptSubmit}>
   <i slot="icon">
     <Icon {icon} {alt} />

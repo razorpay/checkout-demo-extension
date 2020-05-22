@@ -1,4 +1,7 @@
 <script>
+  // Svelte Imports
+  import { createEventDispatcher } from 'svelte';
+
   // Utils imports
   import {
     isInstrumentGrouped,
@@ -12,12 +15,18 @@
 
   // Props
   export let instrument;
+
+  const dispatch = createEventDispatcher();
+
+  function dispatchSelect() {
+    dispatch('selectInstrument', instrument);
+  }
 </script>
 
 {#if isInstrumentGrouped(instrument)}
-  <MethodInstrument {instrument} on:click on:selectMethod />
+  <MethodInstrument {instrument} on:click={dispatchSelect} on:click />
 {:else if isSavedCardInstrument(instrument)}
-  <SavedCardInstrument {instrument} on:click />
+  <SavedCardInstrument {instrument} on:click={dispatchSelect} on:click />
 {:else}
-  <RadioInstrument {instrument} on:click />
+  <RadioInstrument {instrument} on:click={dispatchSelect} on:click />
 {/if}

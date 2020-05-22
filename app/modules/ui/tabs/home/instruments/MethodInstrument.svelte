@@ -1,7 +1,4 @@
 <script>
-  // Svelte imports
-  import { createEventDispatcher } from 'svelte';
-
   // UI imports
   import Field from 'ui/components/Field.svelte';
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
@@ -22,8 +19,6 @@
   export let instrument = {};
   export let name = 'instrument';
 
-  const dispatch = createEventDispatcher();
-
   const method = instrument.method;
   const methodName = getMethodNameForPaymentOption(method, { instrument });
   const title = `Pay using ${methodName}`;
@@ -35,16 +30,6 @@
     icon = getThemeMeta().icons['card'];
   } else {
     icon = getThemeMeta().icons[method];
-  }
-
-  function dispatchSelectMethod() {
-    dispatch('selectMethod', {
-      method: instrument.method,
-    });
-  }
-
-  function setMethodInstrument() {
-    $methodInstrument = instrument;
   }
 </script>
 
@@ -62,9 +47,7 @@
   radio={false}
   className="instrument"
   attributes={{ 'data-type': 'method' }}
-  on:click
-  on:click={setMethodInstrument}
-  on:click={dispatchSelectMethod}>
+  on:click>
   <i slot="icon">
     <Icon {icon} alt={methodName} />
   </i>

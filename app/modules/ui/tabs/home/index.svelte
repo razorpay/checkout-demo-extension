@@ -77,6 +77,7 @@
   import * as AnalyticsTypes from 'analytics-types';
   import { getCardOffer, hasOffersOnHomescreen } from 'checkoutframe/offers';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
+  import { isInstrumentGrouped } from 'configurability/instruments';
 
   import {
     INDIA_COUNTRY_CODE,
@@ -356,13 +357,8 @@
     return true;
   }
 
-  function deselectAllInstruments() {
-    $methodInstrument = null;
-    $selectedInstrumentId = null;
-  }
-
   export function onShown() {
-    deselectAllInstruments();
+    deselectInstrument();
 
     if (view === 'methods') {
       hideCta();
@@ -484,11 +480,7 @@
     // Multi TPV
     if (session.multiTpv) {
       if ($multiTpvOption === 'upi') {
-        selectMethod({
-          detail: {
-            method: 'upi',
-          },
-        });
+        selectMethod('upi');
       } else if ($multiTpvOption === 'netbanking') {
         session.preSubmit();
       }
@@ -497,11 +489,7 @@
 
     // TPV UPI
     if (session.upiTpv) {
-      selectMethod({
-        detail: {
-          method: 'upi',
-        },
-      });
+      selectMethod('upi');
       return;
     }
 
@@ -524,11 +512,7 @@
         showMethods();
         return;
       } else {
-        selectMethod({
-          detail: {
-            method: singleMethod,
-          },
-        });
+        selectMethod(singleMethod);
         return;
       }
     }
@@ -548,22 +532,7 @@
     $selectedInstrumentId = null;
   }
 
-  export function selectMethod(event) {
-    deselectInstrument();
-
-    Analytics.track('payment_method:select', {
-      type: AnalyticsTypes.BEHAV,
-      data: event.detail,
-    });
-
-    let { down, method } = event.detail;
-
-    if (down) {
-      return;
-    }
-
-    $selectedInstrumentId = null;
-
+  export function selectMethod(method) {
     if (method === 'paypal') {
       createPaypalPayment();
       return;
@@ -625,6 +594,16 @@
   $: {
     showUserDetailsStrip =
       ($isContactPresent || $email) && !isContactEmailHidden();
+  }
+
+  function onSelectInstrument(event) {
+    const instrument = event.detail;
+
+    if (isInstrumentGrouped(instrument)) {
+      selectMethod(instrument.method);
+    }
+
+    $selectedInstrumentId = instrument.id;
   }
 </script>
 
@@ -778,7 +757,7 @@
             class="home-methods"
             in:fly={{ delay: 100, duration: 400, y: 80 }}>
             <NewMethodsList
-              on:selectMethod={selectMethod}
+              on:selectInstrument={onSelectInstrument}
               on:submit={attemptPayment} />
           </div>
         </div>
