@@ -603,12 +603,6 @@
           is experiencing low success rates.
         </DowntimeCallout>
       {/if}
-      <DowntimeCallout>
-        Customers with
-        <strong>HDFC bank</strong>
-        account or UPI ID/VPA may encounter failure because of a scheduled
-        maintenance by HDFC bank
-      </DowntimeCallout>
     </Bottom>
   </Screen>
 </Tab>
