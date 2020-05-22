@@ -513,6 +513,7 @@ function errorHandler(response) {
   }
 
   var err_field = error.field;
+  // TODO: Don't rely on this.tab === 'wallet'
   if (err_field && !(this.screen === 'otp' && this.tab === 'wallet')) {
     if (!err_field.indexOf('expiry')) {
       err_field = 'card[expiry]';
@@ -632,12 +633,15 @@ function askOTP(view, text, shouldLimitResend, screenProps) {
   var origText = text; // ಠ_ಠ
   var qpmap = _.getQueryParams();
   var thisSession = SessionManager.getSession();
+  var session = thisSession;
+
+  var isWallet = session.payload && session.payload.method === 'wallet';
 
   // Track if OTP was invalid
   if (origText === discreet.wrongOtpMsg) {
     Analytics.track('otp:invalid', {
       data: {
-        wallet: thisSession.tab === 'wallet',
+        wallet: isWallet,
         headless: thisSession.headless,
       },
     });
@@ -2183,6 +2187,7 @@ Session.prototype = {
     var paymentExists = Boolean(this.r._payment);
     var isCardlessEmiPayment =
       this.payload && this.payload.method === 'cardless_emi';
+    var isWallet = this.payload && this.payload.method === 'wallet';
 
     if (!paymentExists || isCardlessEmiPayment) {
       /**
@@ -2198,7 +2203,7 @@ Session.prototype = {
 
     var otpSentCount = OtpService.getCount(otpProvider);
     var resendEventData = {
-      wallet: this.tab === 'wallet',
+      wallet: isWallet,
       headless: this.headless,
     };
 
@@ -2231,7 +2236,7 @@ Session.prototype = {
       });
     } else if (this.tab === 'paylater') {
       this.askPayLaterOtp('resend');
-    } else if (this.tab === 'wallet') {
+    } else if (isWallet) {
       this.r.resendOTP(this.r.emitter('payment.otp.required'));
     } else {
       var self = this;
@@ -3840,17 +3845,19 @@ Session.prototype = {
       return;
     }
 
+    var isWallet = this.payload && this.payload.method === 'wallet';
+
     Analytics.track('otp:submit', {
       type: AnalyticsTypes.BEHAV,
       data: {
-        wallet: this.tab === 'wallet',
+        wallet: isWallet,
       },
     });
 
     this.showLoadError('Verifying OTP');
     var otp = storeGetter(discreet.OTPScreenStore.otp);
 
-    if (this.tab === 'wallet' || this.headless) {
+    if (isWallet || this.headless) {
       return this.r.submitOTP(otp);
     }
 
@@ -3881,7 +3888,7 @@ Session.prototype = {
           } else {
             this.r.emit('payment.error', discreet.error(msg));
             Analytics.track('behav:otp:incorrect', {
-              wallet: this.tab === 'wallet',
+              wallet: isWallet,
             });
             askOTP(this.otpView, msg, true);
             this.updateCustomerInStore();
@@ -3909,7 +3916,7 @@ Session.prototype = {
             });
           } else {
             Analytics.track('behav:otp:incorrect', {
-              wallet: self.tab === 'wallet',
+              wallet: isWallet,
             });
             askOTP(this.otpView, msg, true);
             self.updateCustomerInStore();
