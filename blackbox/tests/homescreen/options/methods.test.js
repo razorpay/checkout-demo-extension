@@ -54,6 +54,7 @@ describe.each(
         card: false,
         netbanking: false,
         wallet: true,
+        upi_otm: false,
       },
     },
     preferences: {},
