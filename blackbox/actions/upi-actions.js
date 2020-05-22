@@ -120,7 +120,7 @@ async function selectUPIMethod(context, UPIMethod, upiPaymentType = 'upi') {
       elementToBeVisible = '#gpay-phone';
       break;
     case 'new':
-      tokenSelector = '#new-vpa-field';
+      tokenSelector = '#new-vpa-field-' + upiPaymentType;
       elementToBeVisible = '#vpa-' + upiPaymentType;
       break;
     case 'token':
@@ -143,7 +143,9 @@ async function enterUPIAccount(context, UPIAccountId, upiPaymentType = 'upi') {
   if (!context.preferences.customer) {
     return;
   }
-  return await context.page.waitForSelector('#should-save-vpa');
+  return await context.page.waitForSelector(
+    '#should-save-vpa-' + upiPaymentType
+  );
 }
 
 async function selectBankNameFromGooglePayDropDown(context, valuetoBeSelected) {

@@ -108,7 +108,8 @@
   .should-save-vpa-container {
     margin-top: 12px;
 
-    #should-save-vpa span.checkbox {
+    #should-save-vpa-upi span.checkbox,
+    #should-save-vpa-upi_otm span.checkbox {
       display: inline-block;
     }
   }
@@ -133,7 +134,7 @@
   on:click
   on:click={focusAfterTimeout}
   {selected}>
-  <div id="new-vpa-field" slot="title">
+  <div id={'new-vpa-field-' + paymentMethod} slot="title">
     {logged && canSaveVpa ? 'Add UPI ID' : 'UPI ID'}
   </div>
   <div slot="subtitle">{subtitleText}</div>
@@ -160,8 +161,12 @@
           placeholder="Enter your UPI ID" />
         {#if logged && canSaveVpa}
           <div class="should-save-vpa-container">
-            <label id="should-save-vpa" for="save-vpa">
-              <Checkbox bind:checked={rememberVpa} id="save-vpa">
+            <label
+              id={'should-save-vpa-' + paymentMethod}
+              for={'save-vpa-' + paymentMethod}>
+              <Checkbox
+                bind:checked={rememberVpa}
+                id={'save-vpa-' + paymentMethod}>
                 Securely save your UPI ID
               </Checkbox>
             </label>
