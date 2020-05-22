@@ -202,10 +202,16 @@ export function setBlocks(
   );
 
   // Add an ID to all instruments
-  _Arr.loop(allBlocks, block => {
-    _Arr.loop(block.instruments, instrument => {
+  _Arr.loop(allBlocks, (block, blockIndex) => {
+    _Arr.loop(block.instruments, (instrument, instrumentIndex) => {
       if (!instrument.id) {
-        instrument.id = Track.makeUid();
+        instrument.id = generateInstrumentId(
+          customer,
+          block,
+          instrument,
+          blockIndex,
+          instrumentIndex
+        );
       }
     });
   });
@@ -231,6 +237,36 @@ export function setBlocks(
     preferred: preferredBlock,
     all: allBlocks,
   };
+}
+
+/**
+ * Generate an instrument ID.
+ *
+ * We're not using a random IDs because the blocks list is regenerated every time the
+ * customer changes. If the IDs change, the currently selected instrument gets deselected - which should not happen.
+ *
+ * At the time of writing, I don't see any way for these IDs to collide when customer/amount changes. - Umang
+ *
+ * @param {Customer} customer
+ * @param {Block} block
+ * @param {Instrument} instrument
+ * @param {number} blockIndex
+ * @param {number} instrumentIndex
+ */
+function generateInstrumentId(
+  customer,
+  block,
+  instrument,
+  blockIndex,
+  instrumentIndex
+) {
+  let base = `${block.code}_${blockIndex}_${instrumentIndex}_${instrument.method}`;
+
+  if (customer && customer.contact) {
+    base = `${customer.contact}_${base}`;
+  }
+
+  return base;
 }
 
 /**
