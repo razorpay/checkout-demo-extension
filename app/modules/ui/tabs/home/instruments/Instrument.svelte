@@ -3,7 +3,7 @@
   import {
     isInstrumentGrouped,
     isSavedCardInstrument,
-  } from 'ui/tabs/home/instruments';
+  } from 'configurability/instruments';
 
   // UI imports
   import MethodInstrument from './MethodInstrument.svelte';
