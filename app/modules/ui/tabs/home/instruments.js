@@ -8,6 +8,7 @@ import { isInstrumentForEntireMethod } from 'configurability/instruments';
 import { getIndividualInstruments } from 'configurability/ungroup';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
+import { hashFnv32a } from 'checkoutframe/personalization/utils';
 
 function generateBasePreferredBlock(preferred) {
   const preferredBlock = createBlock('rzp.preferred', {
@@ -263,7 +264,7 @@ function generateInstrumentId(
   let base = `${block.code}_${blockIndex}_${instrumentIndex}_${instrument.method}`;
 
   if (customer && customer.contact) {
-    base = `${customer.contact}_${base}`;
+    base = `${hashFnv32a(customer.contact)}_${base}`;
   }
 
   return base;
