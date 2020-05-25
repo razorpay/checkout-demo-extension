@@ -29,16 +29,11 @@
     let providers = [];
 
     _Obj.loop(getCardlessEMIProviders(), providerObj => {
-      providers.push(createProvider(providerObj.code, providerObj.name));
+      providers.push(createProvider(providerObj.code));
     });
 
     if (isMethodEnabled('emi')) {
-      providers.unshift(
-        createProvider(
-          'cards',
-          isDebitEMIEnabled() ? 'EMI on Debit/Credit Cards' : 'EMI on Cards'
-        )
-      );
+      providers.unshift(createProvider('cards'));
     }
 
     return providers;
@@ -74,6 +69,13 @@
     providers,
     $methodTabInstrument
   );
+
+  function getOverriddenProviderCode(code) {
+    if (code === 'cards' && isDebitEMIEnabled()) {
+      code = 'credit_debit_cards';
+    }
+    return code;
+  }
 </script>
 
 <div class="tab-content showable screen pad collapsible" id="form-cardless_emi">
@@ -85,7 +87,7 @@
   <div class="options">
     {#each filteredProviders as provider}
       <NextOption {...provider} on:select>
-        {getCardlessEmiProviderName(provider.data.code, $locale)}
+        {getCardlessEmiProviderName(getOverriddenProviderCode(provider.data.code), $locale)}
       </NextOption>
     {/each}
   </div>
