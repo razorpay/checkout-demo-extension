@@ -3261,7 +3261,9 @@ Session.prototype = {
           cardType
         );
         var plans = MethodStore.getEMIBankPlans(bank);
-        var emiPlans = self.getEmiPlans(bank);
+        var emiPlans = MethodStore.getEligiblePlansBasedOnMinAmount(
+          self.getEmiPlans(bank)
+        );
         var prevTab = self.tab;
         var prevScreen = self.screen;
 
@@ -3348,7 +3350,9 @@ Session.prototype = {
           cardType
         );
         var plans = MethodStore.getEMIBankPlans(bank, cardType);
-        var emiPlans = self.getEmiPlans(bank, cardType);
+        var emiPlans = MethodStore.getEligiblePlansBasedOnMinAmount(
+          self.getEmiPlans(bank, cardType)
+        );
         var $savedCard = $('.saved-card.checked');
         var savedCvv = $savedCard.$('.saved-cvv input').val();
         var prevTab = self.tab;
