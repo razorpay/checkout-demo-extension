@@ -4,7 +4,7 @@
 
   // Store
   import { selectedPlanTextForNewCard } from 'checkoutstore/emi';
-  import { isMethodEnabled } from 'checkoutstore/methods';
+  import { isMethodUsable } from 'checkoutstore/methods';
   import { getEMIBanksText } from 'checkoutframe/paymentmethods';
 
   // Props
@@ -29,7 +29,7 @@
           to avail.
         </span>
         <div class="emi-plans-text">EMI unavailable</div>
-        {#if isMethodEnabled('card')}
+        {#if isMethodUsable('card')}
           <div class="emi-plans-action theme-highlight">Pay entire amount</div>
         {/if}
       </div>
@@ -40,13 +40,13 @@
         <div class="emi-plans-action theme-highlight">Edit</div>
       </div>
     {/if}
-    {#if emiCtaView === 'available'}
+    {#if emiCtaView === 'available' && isMethodUsable('emi')}
       <div class="emi-plan-unselected emi-icon-multiple-cards">
         <div class="emi-plans-text">EMI Available</div>
         <div class="emi-plans-action theme-highlight">Pay with EMI</div>
       </div>
     {/if}
-    {#if emiCtaView === 'pay-without-emi'}
+    {#if emiCtaView === 'pay-without-emi' && isMethodUsable('card')}
       <div class="emi-pay-without emi-icon-single-card">
         <div class="emi-plans-text no-action">
           Pay entire amount

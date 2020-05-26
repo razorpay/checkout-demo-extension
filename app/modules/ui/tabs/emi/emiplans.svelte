@@ -19,6 +19,9 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
 
+  // Utils imports
+  import { isMethodUsable } from 'checkoutstore/methods';
+
   // Props
   export let actions;
   export let branding = null;
@@ -190,7 +193,7 @@
           View all EMI Plans
         </div>
       {/if}
-      {#if actions.payWithoutEmi}
+      {#if actions.payWithoutEmi && isMethodUsable('card')}
         <div
           class="actionlink theme-highlight"
           on:click={event => invoke('payWithoutEmi', event)}>

@@ -75,10 +75,12 @@
 
   export function trackInput(event) {
     if ($otp) {
+      const isWallet = session.payload && session.payload.method === 'wallet';
+
       Analytics.track('otp:input', {
         type: AnalyticsTypes.BEHAV,
         data: {
-          wallet: session.tab === 'wallet',
+          wallet: isWallet,
           headless: session.headless,
         },
       });

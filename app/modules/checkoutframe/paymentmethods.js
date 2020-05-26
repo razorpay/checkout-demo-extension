@@ -6,6 +6,7 @@ import {
   getWallets,
   getCardNetworks,
   getEMIBanks,
+  isMethodUsable,
 } from 'checkoutstore/methods';
 import { getRecurringMethods, isRecurring } from 'checkoutstore';
 import { generateTextFromList } from 'lib/utils';
@@ -57,7 +58,7 @@ const DESCRIPTIONS = {
      * Cardless EMI: EMI via ZestMoney & More
      */
 
-    const cardEmi = isMethodEnabled('emi');
+    const cardEmi = isMethodUsable('emi');
     let providerNames = [];
     _Obj.loop(getCardlessEMIProviders(), providerObj => {
       providerNames.push(providerObj.name);
