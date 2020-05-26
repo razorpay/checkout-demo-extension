@@ -32,6 +32,8 @@ import {
   updateCardIINMetadata,
 } from 'common/card';
 
+import { translatePaymentPopup as t } from 'i18n';
+
 /**
  * Tells if we're being executed from
  * the same domain as the configured API
@@ -560,7 +562,7 @@ Payment.prototype = {
     }
     const isIframe = this.popup instanceof Iframe;
     if (isIframe) {
-      this.popup.write(popupTemplate(this));
+      this.popup.write(popupTemplate(this, t));
     } else {
       // For redirect mode where we do not have a popup, redirect using POST
       this.redirect({ url: this.gotoBankUrl, method: 'post' });
@@ -621,7 +623,7 @@ Payment.prototype = {
   writePopup: function() {
     var popup = this.popup;
     if (popup) {
-      popup.write(popupTemplate(this));
+      popup.write(popupTemplate(this, t));
       popup.window.deserialize = _Doc.obj2formhtml;
     }
   },

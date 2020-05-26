@@ -13,6 +13,8 @@ import en from './bundles/en';
 
 import { getSession } from 'sessionmanager';
 
+import popupLabels from 'ui/labels/popup';
+
 /**
  * Returns the URL for the locale bundle on CDN
  * @param {string} locale
@@ -238,3 +240,16 @@ export function getShortBankName(bankCode, locale) {
 export function getTabTitle(tab, locale) {
   return formatMessageWithLocale(`tab_titles.${tab}`, locale);
 }
+
+export function vanillaJsTranslate(labels) {
+  return (text, data = {}) => {
+    let translated = labels[text];
+    let variables = Object.keys(data);
+    variables.forEach(variable => {
+      translated = translated.replace(`{{${variable}}}`, data[variable]);
+    });
+    return translated;
+  };
+}
+
+export const translatePaymentPopup = vanillaJsTranslate(popupLabels);
