@@ -89,7 +89,7 @@
   const getAllowedPSPs = {
     upi: tokens => tokens,
     upi_otm: tokens => {
-      const allowedPSPs = ['upi'];
+      const allowedPSPs = ['upi', 'hdfcbank'];
 
       return tokens.filter(token => {
         return allowedPSPs.some(psp => token.vpa.handle === psp);
