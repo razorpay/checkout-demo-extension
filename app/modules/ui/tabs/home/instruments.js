@@ -90,9 +90,10 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
       case 'upi': {
         const instrumentHasFlows = Boolean(instrument.flows);
         const instrumentHasApps = Boolean(instrument.apps);
+        const preferredHasApps = Boolean(preferred.apps);
 
         // If there are any apps, check if the app matches
-        if (instrumentHasApps) {
+        if (preferredHasApps && instrumentHasApps) {
           try {
             return _Arr.none(
               instrument._ungrouped,
@@ -113,7 +114,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
 
         // If there are any flows, check if the flows match and is invidiual flow
         if (instrumentHasFlows) {
-          const individualFlows = ['qr', 'intent'];
+          const individualFlows = ['qr'];
 
           return _Arr.none(
             instrument._ungrouped,
