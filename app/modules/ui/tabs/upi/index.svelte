@@ -86,6 +86,17 @@
 
   const session = getSession();
 
+  const getAllowedPSPs = {
+    upi: tokens => tokens,
+    upi_otm: tokens => {
+      const allowedPSPs = ['okaxis'];
+
+      return tokens.filter(token => {
+        return allowedPSPs.some(psp => token.vpa.handle === psp);
+      });
+    },
+  };
+
   let toShortFormat = function(date, delimter = ' ') {
     let month_names = [
       'Jan',
@@ -246,6 +257,7 @@
 
   $: {
     tokens = filterUPITokens(_Obj.getSafely($customer, 'tokens.items', []));
+    tokens = getAllowedPSPs[method](tokens);
     setDefaultTokenValue();
   }
 
