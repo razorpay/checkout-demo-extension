@@ -38,6 +38,13 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
       return true;
     }
 
+    const hasOnlyOneUngrouped = instrument._ungrouped.length === 1;
+
+    // If there's only one ungrouped instrument, it shows up as a radio. Always allow for non-radio i.e. multiple ungrouped
+    if (!hasOnlyOneUngrouped) {
+      return true;
+    }
+
     switch (preferred.method) {
       case 'netbanking': {
         const hasBanks = Boolean(instrument.banks);
@@ -46,7 +53,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
         if (hasBanks) {
           return _Arr.none(
             instrument._ungrouped,
-            ungrouped => ungrouped.bank === preferred.bank
+            ungrouped => ungrouped.bank === preferred.banks[0]
           );
         }
 
@@ -60,7 +67,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
         if (hasWallets) {
           return _Arr.none(
             instrument._ungrouped,
-            ungrouped => ungrouped.wallet === preferred.wallet
+            ungrouped => ungrouped.wallet === preferred.wallets[0]
           );
         }
 
@@ -88,7 +95,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
         if (hasApps) {
           return _Arr.none(
             instrument._ungrouped,
-            ungrouped => ungrouped.app === preferred.app
+            ungrouped => ungrouped.app === preferred.apps[0]
           );
         }
 
@@ -100,7 +107,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
             instrument._ungrouped,
             ungrouped =>
               _Arr.contains(individualFlows, ungrouped.flow) &&
-              ungrouped.flow === preferred.flow
+              ungrouped.flow === preferred.flows[0]
           );
         }
 
@@ -115,7 +122,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
         if (hasProviders) {
           return _Arr.none(
             instrument._ungrouped,
-            ungrouped => ungrouped.provider === preferred.provider
+            ungrouped => ungrouped.provider === preferred.providers[0]
           );
         }
 
