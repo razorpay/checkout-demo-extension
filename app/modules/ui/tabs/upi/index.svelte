@@ -89,7 +89,7 @@
   const getAllowedPSPs = {
     upi: tokens => tokens,
     upi_otm: tokens => {
-      const allowedPSPs = ['okaxis'];
+      const allowedPSPs = ['upi'];
 
       return tokens.filter(token => {
         return allowedPSPs.some(psp => token.vpa.handle === psp);
@@ -671,7 +671,7 @@
         </DowntimeCallout>
       {/if}
       {#if isOtm}
-        <Callout classes={['downtime-callout']} showIcon={false}>
+        <Callout classes={['downtime-callout']} showIcon={true}>
           <strong>{session.formatAmountWithCurrency(getAmount())}</strong>
           will be blocked on your account by clicking pay. Your account will be
           charged {getName() ? 'by ' + getName() : ''} between
