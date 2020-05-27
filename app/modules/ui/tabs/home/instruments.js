@@ -94,22 +94,10 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
 
         // If there are any apps, check if the app matches
         if (preferredHasApps && instrumentHasApps) {
-          try {
-            return _Arr.none(
-              instrument._ungrouped,
-              ungrouped => ungrouped.app === preferred.apps[0]
-            );
-          } catch (err) {
-            Analytics.track('error:index_0_of_undef', {
-              data: {
-                instrument,
-                preferred,
-              },
-              immediately: true,
-            });
-
-            return false;
-          }
+          return _Arr.none(
+            instrument._ungrouped,
+            ungrouped => ungrouped.app === preferred.apps[0]
+          );
         }
 
         // If there are any flows, check if the flows match and is invidiual flow
