@@ -91,23 +91,38 @@ export function getOffersForTab(method) {
 }
 
 const instrumentKey = {
-  cardless_emi: 'provider',
-  wallet: 'wallet',
-  card: 'issuer',
-  netbanking: 'bank',
+  cardless_emi: 'providers',
+  wallet: 'wallets',
+  card: 'issuers',
+  netbanking: 'banks',
 };
 
 /**
  * Returns a list of offers to be used on a given instrument
- * @param {Object} instrument Selected instrument
+ * @param {Instrument} instrument Selected instrument
  *
- * @return {Array} offers List of offers
+ * @return {Array<Offer>} offers List of offers
  */
 export function getOffersForInstrument(instrument) {
   const offers = getOffersForTab(instrument.method);
   const key = instrumentKey[instrument.method];
   if (key) {
-    return offers.filter(o => !o.issuer || o.issuer === instrument[key]);
+    return offers.filter(offer => {
+      const offerIssuer = offer.issuer;
+      const instrumentValues = instrument[key];
+
+      // Offer is method-wide
+      if (!offerIssuer) {
+        return true;
+      }
+
+      // Instrument is not scoped down to any specific issuers/banks/wallets/providers
+      if (!instrumentValues) {
+        return true;
+      }
+
+      return _Arr.contains(instrumentValues, offerIssuer);
+    });
   }
   return offers;
 }

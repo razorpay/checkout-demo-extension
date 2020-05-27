@@ -544,7 +544,13 @@
     session.preSubmit(null, payload);
   }
 
-  function selectMethod(event) {
+  function deselectInstrument() {
+    $selectedInstrumentId = null;
+  }
+
+  export function selectMethod(event) {
+    deselectInstrument();
+
     Analytics.track('payment_method:select', {
       type: AnalyticsTypes.BEHAV,
       data: event.detail,

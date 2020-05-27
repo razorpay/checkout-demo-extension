@@ -20,8 +20,8 @@ test('Module: personalization', t => {
       t.equals(typeof actual, 'object', 'Returns an object');
       t.equals(actual.id, 'EOZESgq122HsIH', 'Returns correct id');
       t.equals(actual.method, 'upi', 'Returns correct method');
-      t.equals(actual.flow, 'collect', 'Returns correct flow');
-      t.equals(actual.vpa, 'success@razorpay', 'Returns correct VPA');
+      t.deepEqual(actual.flows, ['collect'], 'Returns correct flows');
+      t.deepEqual(actual.vpas, ['success@razorpay'], 'Returns correct VPAs');
       t.ok(actual.meta, 'Meta is present');
       t.ok(actual.meta.preferred, 'meta.preferred is truthy');
       t.end();
@@ -45,8 +45,8 @@ test('Module: personalization', t => {
       t.equals(typeof actual, 'object', 'Returns an object');
       t.equals(actual.id, 'EOZESgq122HsIH', 'Returns correct id');
       t.equals(actual.method, 'upi', 'Returns correct method');
-      t.equals(actual.app, 'in.org.npci.upiapp', 'Returns correct app');
-      t.equals(actual.flow, 'intent', 'Returns correct flow');
+      t.deepEqual(actual.apps, ['in.org.npci.upiapp'], 'Returns correct apps');
+      t.deepEqual(actual.flows, ['intent'], 'Returns correct flows');
       t.ok(actual.meta, 'Meta is present');
       t.ok(actual.meta.preferred, 'meta.preferred is truthy');
       t.end();
@@ -70,7 +70,7 @@ test('Module: personalization', t => {
       t.equals(typeof actual, 'object', 'Returns an object');
       t.equals(actual.id, 'EOZESgq122HsIH', 'Returns correct id');
       t.equals(actual.method, 'upi', 'Returns correct method');
-      t.equals(actual.flow, 'qr', 'Returns correct flow');
+      t.deepEqual(actual.flows, ['qr'], 'Returns correct flows');
       t.ok(actual.meta, 'Meta is present');
       t.ok(actual.meta.preferred, 'meta.preferred is truthy');
       t.end();
@@ -95,8 +95,8 @@ test('Module: personalization', t => {
       t.equals(typeof actual, 'object', 'Returns an object');
       t.equals(actual.id, 'Dhh671dR688OWQ', 'Returns correct id');
       t.equals(actual.method, 'card', 'Returns correct method');
-      t.equals(actual.issuer, 'ICIC', 'Returns correct issuer');
-      t.equals(actual.network, 'Visa', 'Returns correct network');
+      t.deepEqual(actual.issuers, ['ICIC'], 'Returns correct issuers');
+      t.deepEqual(actual.networks, ['Visa'], 'Returns correct networks');
       t.equals(
         actual.token_id,
         'token_9AT28Pxxe0Npi9',
@@ -123,7 +123,7 @@ test('Module: personalization', t => {
       t.equals(typeof actual, 'object', 'Returns an object');
       t.equals(actual.id, 'DhoBzK59KicZni', 'Returns correct id');
       t.equals(actual.method, 'wallet', 'Returns correct method');
-      t.equals(actual.wallet, 'freecharge', 'Returns correct wallet');
+      t.deepEqual(actual.wallets, ['freecharge'], 'Returns correct wallets');
       t.ok(actual.meta, 'Meta is present');
       t.ok(actual.meta.preferred, 'meta.preferred is truthy');
       t.end();
@@ -145,7 +145,7 @@ test('Module: personalization', t => {
       t.equals(typeof actual, 'object', 'Returns an object');
       t.equals(actual.id, 'Dhh86QTueOpyWX', 'Returns correct id');
       t.equals(actual.method, 'netbanking', 'Returns correct method');
-      t.equals(actual.bank, 'HDFC', 'Returns correct bank');
+      t.deepEqual(actual.banks, ['HDFC'], 'Returns correct banks');
       t.ok(actual.meta, 'Meta is present');
       t.ok(actual.meta.preferred, 'meta.preferred is truthy');
       t.end();
