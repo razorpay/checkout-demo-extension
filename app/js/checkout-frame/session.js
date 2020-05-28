@@ -2739,14 +2739,14 @@ Session.prototype = {
     var type = instrumentData.type;
     var instrument = instrumentData.instrument;
 
-    HomeScreenStore.methodTabInstrument.set(null);
+    // HomeScreenStore.methodTabInstrument.set(null);
     HomeScreenStore.selectedInstrumentId.set(null);
 
     if (type === 'rzp.method') {
       // Do nothing
     } else if (type === 'instrument.grouped') {
       // Set methodTabInstrument
-      HomeScreenStore.methodTabInstrument.set(instrument);
+      // HomeScreenStore.methodTabInstrument.set(instrument);
     } else if (type === 'instrument.single') {
       // Do nothing
     } else {

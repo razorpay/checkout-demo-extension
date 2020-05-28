@@ -21,7 +21,7 @@
   import OfferItemList from './OfferItemList.svelte';
   import {
     selectedInstrument,
-    methodTabInstrument,
+    methodInstrument,
   } from 'checkoutstore/screens/home';
   import { appliedOffer, isCardValidForOffer } from 'checkoutstore/offers';
   import { customer } from 'checkoutstore/customer';
@@ -95,7 +95,7 @@
       // We are in a method tab. Instrument might have been chosen. Show offers accordingly.
       applicableOffers = getOffersForMethodWithInstrument(
         tab,
-        $methodTabInstrument
+        $methodInstrument
       );
     }
 
