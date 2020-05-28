@@ -10,7 +10,7 @@ import {
   getCardlessEMIProviders,
 } from 'checkoutstore/methods';
 
-import { instruments } from 'checkoutstore/screens/home';
+import { instruments, selectedInstrument } from 'checkoutstore/screens/home';
 import { get as storeGetter } from 'svelte/store';
 import {
   isSavedCardInstrument,
@@ -234,17 +234,42 @@ function _getInstrumentTypeToSwitch(instrument) {
 }
 
 /**
- * Returns the first matching instrument for the offer
+ * Returns a matching instrument for the offer
  *
- * TODO
- * Improvise this by adding heuristics:
- * - method instrument should be prioritised
+ * Heuristics:
+ * - If current instrument can support the offer, return it
+ * - Otherwise, return the first instrument for which offers match (TODO: Improve this?)
  *
  * @param {Offer} offer
  *
  * @returns {Instrument|undefined}
  */
 export function getInstrumentForOffer(offer) {
+  const currentInstrument = storeGetter(selectedInstrument);
+
+  if (currentInstrument) {
+    const isCurrentInsturmentForSavedCard = isSavedCardInstrument(
+      currentInstrument
+    );
+    const isOfferEligibleOnCurrentInstrument = isOfferEligibleOnInstrument(
+      offer,
+      currentInstrument
+    );
+
+    if (
+      !isCurrentInsturmentForSavedCard &&
+      isOfferEligibleOnCurrentInstrument
+    ) {
+      return {
+        type: _getInstrumentTypeToSwitch(currentInstrument),
+        instrument: currentInstrument,
+      };
+    }
+  }
+
+  // Not eligible on currently selected instrument
+  // Search for an eligible instrument
+
   const instruments = _getAllInstrumentsForOffer(offer);
   const nonSavedCardInstruments = _Arr.filter(
     instruments,
