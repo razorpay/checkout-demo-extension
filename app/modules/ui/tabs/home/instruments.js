@@ -88,32 +88,21 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
       // TODO: filter out / remove plans excluding the durations for emi
 
       case 'upi': {
-        const hasFlows = Boolean(instrument.flows);
-        const hasApps = Boolean(instrument.apps);
+        const instrumentHasFlows = Boolean(instrument.flows);
+        const instrumentHasApps = Boolean(instrument.apps);
+        const preferredHasApps = Boolean(preferred.apps);
 
         // If there are any apps, check if the app matches
-        if (hasApps) {
-          try {
-            return _Arr.none(
-              instrument._ungrouped,
-              ungrouped => ungrouped.app === preferred.apps[0]
-            );
-          } catch (err) {
-            Analytics.track('error:index_0_of_undef', {
-              data: {
-                instrument,
-                preferred,
-              },
-              immediately: true,
-            });
-
-            return false;
-          }
+        if (preferredHasApps && instrumentHasApps) {
+          return _Arr.none(
+            instrument._ungrouped,
+            ungrouped => ungrouped.app === preferred.apps[0]
+          );
         }
 
         // If there are any flows, check if the flows match and is invidiual flow
-        if (hasFlows) {
-          const individualFlows = ['qr', 'intent'];
+        if (instrumentHasFlows) {
+          const individualFlows = ['qr'];
 
           return _Arr.none(
             instrument._ungrouped,
