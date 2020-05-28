@@ -2739,42 +2739,46 @@ Session.prototype = {
     var type = instrumentData.type;
     var instrument = instrumentData.instrument;
 
-    // HomeScreenStore.methodTabInstrument.set(null);
-    HomeScreenStore.selectedInstrumentId.set(null);
-
-    if (type === 'rzp.method') {
-      // Do nothing
-    } else if (type === 'instrument.grouped') {
-      // Set methodTabInstrument
-      // HomeScreenStore.methodTabInstrument.set(instrument);
-    } else if (type === 'instrument.single') {
-      // Do nothing
+    if (storeGetter(HomeScreenStore.selectedInstrumentId) === instrument.id) {
+      // Do not switch tabs
     } else {
-      // TODO: Track analytics
+      // HomeScreenStore.methodTabInstrument.set(null);
+      HomeScreenStore.selectedInstrumentId.set(null);
 
-      return;
-    }
+      if (type === 'rzp.method') {
+        // Do nothing
+      } else if (type === 'instrument.grouped') {
+        // Set methodTabInstrument
+        // HomeScreenStore.methodTabInstrument.set(instrument);
+      } else if (type === 'instrument.single') {
+        // Do nothing
+      } else {
+        // TODO: Track analytics
 
-    if (_Arr.contains(['rzp.method', 'instrument.grouped'], type)) {
-      // Go to the offer's method if we're on homescreen
-      if (screen !== offer.payment_method) {
-        this.homeTab.selectMethod(offer.payment_method);
+        return;
       }
-    } else if (type === 'instrument.single') {
-      // Switch to homescreen
-      this.switchTab('');
 
-      // Switch to methods tab
-    }
+      if (_Arr.contains(['rzp.method', 'instrument.grouped'], type)) {
+        // Go to the offer's method if we're on homescreen
+        if (screen !== offer.payment_method) {
+          this.homeTab.selectMethod(offer.payment_method);
+        }
+      } else if (type === 'instrument.single') {
+        // Switch to homescreen
+        this.switchTab('');
 
-    this.offers.rerenderTab();
+        // Switch to methods tab
+      }
 
-    // Doing this after switching because switching on the homescreen deselects all instruments
-    if (type === 'instrument.single') {
-      // Set selectedInstrument
-      HomeScreenStore.selectedInstrumentId.set(instrument.id);
+      this.offers.rerenderTab();
 
-      return;
+      // Doing this after switching because switching on the homescreen deselects all instruments
+      if (type === 'instrument.single') {
+        // Set selectedInstrument
+        HomeScreenStore.selectedInstrumentId.set(instrument.id);
+
+        return;
+      }
     }
 
     var issuer = offer.issuer;
