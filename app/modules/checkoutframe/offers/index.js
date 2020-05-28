@@ -15,7 +15,7 @@ import { get as storeGetter } from 'svelte/store';
 import {
   isSavedCardInstrument,
   isInstrumentGrouped,
-} from 'ui/tabs/home/instruments';
+} from 'configurability/instruments';
 
 /**
  * Checks if offer is eligible.
