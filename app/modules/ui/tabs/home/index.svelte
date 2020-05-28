@@ -599,11 +599,11 @@
   function onSelectInstrument(event) {
     const instrument = event.detail;
 
+    $selectedInstrumentId = instrument.id;
+
     if (isInstrumentGrouped(instrument)) {
       selectMethod(instrument.method);
     }
-
-    $selectedInstrumentId = instrument.id;
   }
 </script>
 
