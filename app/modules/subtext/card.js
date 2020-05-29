@@ -26,34 +26,50 @@ export function generateSubtextForCardInstrument(instrument) {
     |> _Arr.map(bank => getCommonBankName(bank).replace(/ Bank$/, ''));
   const instrumentNetworks = instrument.networks || [];
   const instrumentTypes = instrument.types || [];
+  const instrumentIins = instrument.iins || [];
 
   const issuersLength = instrumentIssuers.length;
   const networksLength = instrumentNetworks.length;
   const typesLength = instrumentTypes.length;
+  const iinsLength = instrumentIins.length;
 
-  const allIssusers = issuersLength === 0;
-  const allNetworks = networksLength === 0;
-  const allTypes = typesLength === 0;
+  const supportAllIssuers = issuersLength === 0;
+  const supportAllNetworks = networksLength === 0;
+  const supportAllTypes = typesLength === 0;
+  const supportAllIins = iinsLength === 0;
 
-  if (allIssusers) {
+  // If IINs are provided, use only IINs to generate subtext
+  if (!supportAllIins) {
+    let iinsString;
+
+    if (iinsLength <= 3) {
+      iinsString = generateTextFromList(instrumentIins);
+    } else {
+      iinsString = 'select BINs';
+    }
+
+    return concatTruthyString(['Only', iinsString, 'accepted']);
+  }
+
+  if (supportAllIssuers) {
     let stringList = ['Only'];
 
     let typesString;
     let cardsString = 'cards';
     let networksString;
 
-    if (!allTypes) {
+    if (!supportAllTypes) {
       typesString = generateTextFromList(instrumentTypes);
     }
 
-    if (allNetworks) {
-      if (allTypes) {
+    if (supportAllNetworks) {
+      if (supportAllTypes) {
         return 'All cards supported';
       }
     } else if (networksLength <= 2) {
       networksString = generateTextFromList(instrumentNetworks, 2);
     } else {
-      if (allTypes) {
+      if (supportAllTypes) {
         networksString = 'select networks';
         cardsString = null;
       } else {
@@ -77,11 +93,11 @@ export function generateSubtextForCardInstrument(instrument) {
     let cardsString = 'cards';
     let networksString;
 
-    if (!allTypes) {
+    if (!supportAllTypes) {
       typesString = generateTextFromList(instrumentTypes);
     }
 
-    if (allNetworks) {
+    if (supportAllNetworks) {
       // Do nothing
     } else if (networksLength === 1) {
       networksString = instrumentNetworks[0];
@@ -106,14 +122,14 @@ export function generateSubtextForCardInstrument(instrument) {
     let cardsString = 'cards';
     let networksString;
 
-    if (!allTypes) {
+    if (!supportAllTypes) {
       typesString = generateTextFromList(instrumentTypes);
     }
 
-    if (allNetworks) {
+    if (supportAllNetworks) {
       // Do nothing
     } else if (networksLength === 1) {
-      if (allTypes) {
+      if (supportAllTypes) {
         networksString = instrumentNetworks[0];
       } else {
         issuersString = `select ${issuersString}`;
@@ -139,11 +155,11 @@ export function generateSubtextForCardInstrument(instrument) {
     let cardsString = 'cards';
     let networksString;
 
-    if (!allTypes) {
+    if (!supportAllTypes) {
       typesString = generateTextFromList(instrumentTypes);
     }
 
-    if (allNetworks) {
+    if (supportAllNetworks) {
       // Do nothing
     } else if (networksLength === 1) {
       networksString = instrumentNetworks[0];

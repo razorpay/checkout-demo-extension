@@ -213,13 +213,13 @@
         let validationPromises = [flowChecker(features), validateCardNumber()];
 
         /**
-         * If there's a card instrument, we check for its validity.
+         * If there's a card/emi instrument, we check for its validity.
          * Otherwise we'll just assume that this is successful validation.
          */
-        if ($methodTabInstrument && $methodTabInstrument.method === 'card') {
+        if ($methodTabInstrument && $methodTabInstrument.method === tab) {
           validationPromises.push(
             isInstrumentValidForPayment($methodTabInstrument, {
-              method: 'card',
+              method: tab,
               'card[number]': $cardNumber,
             })
           );

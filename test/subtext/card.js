@@ -19,6 +19,50 @@ test('Module: subtext/card', t => {
 
       instrument = {
         method: 'card',
+        iins: ['524192'],
+      };
+
+      t.equal(
+        'Only 524192 accepted',
+        CardSubtext.generateSubtextForCardInstrument(instrument),
+        'Iins: 1'
+      );
+
+      instrument = {
+        method: 'card',
+        iins: ['524192', '524193'],
+      };
+
+      t.equal(
+        'Only 524192 and 524193 accepted',
+        CardSubtext.generateSubtextForCardInstrument(instrument),
+        'Iins: 2'
+      );
+
+      instrument = {
+        method: 'card',
+        iins: ['524192', '524193', '524194'],
+      };
+
+      t.equal(
+        'Only 524192, 524193, and 524194 accepted',
+        CardSubtext.generateSubtextForCardInstrument(instrument),
+        'Iins: 3'
+      );
+
+      instrument = {
+        method: 'card',
+        iins: ['524192', '524193', '524194', '524195'],
+      };
+
+      t.equal(
+        'Only select BINs accepted',
+        CardSubtext.generateSubtextForCardInstrument(instrument),
+        'Iins: 3+'
+      );
+
+      instrument = {
+        method: 'card',
         types: ['credit'],
       };
 
