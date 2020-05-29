@@ -26,14 +26,30 @@ export function generateSubtextForCardInstrument(instrument) {
     |> _Arr.map(bank => getCommonBankName(bank).replace(/ Bank$/, ''));
   const instrumentNetworks = instrument.networks || [];
   const instrumentTypes = instrument.types || [];
+  const instrumentIins = instrument.iins || [];
 
   const issuersLength = instrumentIssuers.length;
   const networksLength = instrumentNetworks.length;
   const typesLength = instrumentTypes.length;
+  const iinsLength = instrumentIins.length;
 
   const allIssusers = issuersLength === 0;
   const allNetworks = networksLength === 0;
   const allTypes = typesLength === 0;
+  const allIins = iinsLength === 0;
+
+  // If IINs are provided, use only IINs to generate subtext
+  if (!allIins) {
+    let iinsString;
+
+    if (iinsLength <= 3) {
+      iinsString = generateTextFromList(instrumentIins);
+    } else {
+      iinsString = 'select BINs';
+    }
+
+    return concatTruthyString(['Only', iinsString, 'accepted']);
+  }
 
   if (allIssusers) {
     let stringList = ['Only'];
