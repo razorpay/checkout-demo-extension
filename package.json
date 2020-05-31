@@ -73,7 +73,7 @@
   "devDependencies": {
     "husky": "^1.0.0-rc.14",
     "jest-circus": "^24.9.0",
-    "lint-staged": "^10.2.4",
+    "lint-staged": "^10.2.7",
     "prettier": "^1.19.1",
     "prettier-plugin-svelte": "^1.1.0",
     "pretty-quick": "^2.0.0"
