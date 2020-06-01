@@ -96,7 +96,7 @@ const DESCRIPTIONS = {
       getWallets().map(w => w.name),
       2
     ),
-  upi_otm: () => 'Pay later using BHIM',
+  upi_otm: () => 'Pay later using BHIM and HDFC',
 };
 
 /**
