@@ -2764,16 +2764,13 @@ Session.prototype = {
      * and select it if not already selected
      */
 
-    var instrumentData = discreet.Offers.getInstrumentForOffer(offer);
+    var instrument = discreet.Offers.getInstrumentForOffer(offer);
 
-    if (!instrumentData) {
+    if (!instrument) {
       // TODO: Track analytics
 
       return;
     }
-
-    var type = instrumentData.type;
-    var instrument = instrumentData.instrument;
 
     if (storeGetter(HomeScreenStore.selectedInstrumentId) === instrument.id) {
       // Do not switch tabs

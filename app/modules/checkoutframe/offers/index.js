@@ -12,10 +12,7 @@ import {
 
 import { instruments, selectedInstrument } from 'checkoutstore/screens/home';
 import { get as storeGetter } from 'svelte/store';
-import {
-  isSavedCardInstrument,
-  isInstrumentGrouped,
-} from 'configurability/instruments';
+import { isSavedCardInstrument } from 'configurability/instruments';
 
 /**
  * Checks if offer is eligible.
@@ -221,18 +218,6 @@ function _getAllInstrumentsForOffer(offer) {
   );
 }
 
-function _getInstrumentTypeToSwitch(instrument) {
-  if (instrument._type === 'method') {
-    return 'rzp.method';
-  }
-
-  if (isInstrumentGrouped(instrument)) {
-    return 'instrument.grouped';
-  }
-
-  return 'instrument.single';
-}
-
 /**
  * Returns a matching instrument for the offer
  *
@@ -260,10 +245,7 @@ export function getInstrumentForOffer(offer) {
       !isCurrentInsturmentForSavedCard &&
       isOfferEligibleOnCurrentInstrument
     ) {
-      return {
-        type: _getInstrumentTypeToSwitch(currentInstrument),
-        instrument: currentInstrument,
-      };
+      return currentInstrument;
     }
   }
 
@@ -279,9 +261,6 @@ export function getInstrumentForOffer(offer) {
   const first = nonSavedCardInstruments[0];
 
   if (first) {
-    return {
-      type: _getInstrumentTypeToSwitch(first),
-      instrument: first,
-    };
+    return first;
   }
 }
