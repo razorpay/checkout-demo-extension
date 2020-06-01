@@ -61,6 +61,14 @@ export default {
     pay_entire_amount_action: 'Pay entire amount',
     pay_entire_amount_count: '({count} cards available)',
   },
+  emi_modal: {
+    select_bank_label: 'Select Bank:',
+    emi_tenure_label: 'EMI Tenure',
+    emi_tenure: '{duration} Months',
+    interest_rate_label: 'Interest Rate',
+    installments_label: 'Monthly Installments',
+    total_label: 'Total Money',
+  },
   home: {
     preferred_block_title: 'Preferred Payment Methods',
     single_block_title: 'Pay via {method}',
