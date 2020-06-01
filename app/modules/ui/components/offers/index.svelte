@@ -11,7 +11,6 @@
   } from 'checkoutstore/cta';
   import {
     getOffersForTab,
-    getOffersForMethodWithInstrument,
     getOffersForInstrument,
     getOtherOffers,
   } from 'checkoutframe/offers';
@@ -93,10 +92,7 @@
       }
     } else {
       // We are in a method tab. Instrument might have been chosen. Show offers accordingly.
-      applicableOffers = getOffersForMethodWithInstrument(
-        tab,
-        $methodInstrument
-      );
+      applicableOffers = getOffersForInstrument($methodInstrument);
     }
 
     var invalidateOffer = false;
