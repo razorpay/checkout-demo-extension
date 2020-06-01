@@ -289,7 +289,7 @@
         {#if selectedCurrencyInDisplay}
           <div class="default-currencies">
             <Stack horizonal>
-              {#each displayCurrencies as [code, config]}
+              {#each displayCurrencies as [code, config] (code)}
                 <Radio
                   name="dcc_currency"
                   label={code}
