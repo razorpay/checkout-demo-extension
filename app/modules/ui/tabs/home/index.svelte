@@ -596,7 +596,7 @@
       ($isContactPresent || $email) && !isContactEmailHidden();
   }
 
-  function onSelectInstrument(event) {
+  export function onSelectInstrument(event) {
     const instrument = event.detail;
 
     $selectedInstrumentId = instrument.id;

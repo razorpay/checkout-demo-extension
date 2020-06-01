@@ -2760,12 +2760,8 @@ Session.prototype = {
     screen = screen || this.screen;
 
     /**
-     * Current flow:
-     * - Get the first instrument that can work with the offer, select that
-     *
-     * There is a flaw with this approach, wherein if I were already in an instrument
-     * and I choose to apply the offer, it will redirect me to the first instrument.
-     * TODO: Fix this. Maybe getInstrumentForOffer can check the current methodInstrument and return accordingly?
+     * Get the first instrument that can work with the offer
+     * and select it if not already selected
      */
 
     var instrumentData = discreet.Offers.getInstrumentForOffer(offer);
@@ -2782,46 +2778,16 @@ Session.prototype = {
     if (storeGetter(HomeScreenStore.selectedInstrumentId) === instrument.id) {
       // Do not switch tabs
     } else {
-      // HomeScreenStore.methodTabInstrument.set(null);
-      HomeScreenStore.selectedInstrumentId.set(null);
+      this.switchTab('');
 
-      if (type === 'rzp.method') {
-        // Do nothing
-      } else if (type === 'instrument.grouped') {
-        // Set methodTabInstrument
-        // HomeScreenStore.methodTabInstrument.set(instrument);
-      } else if (type === 'instrument.single') {
-        // Do nothing
-      } else {
-        // TODO: Track analytics
-
-        return;
-      }
-
-      if (_Arr.contains(['rzp.method', 'instrument.grouped'], type)) {
-        // Go to the offer's method if we're on homescreen
-        if (screen !== offer.payment_method) {
-          this.homeTab.selectMethod(offer.payment_method);
-        }
-      } else if (type === 'instrument.single') {
-        // Switch to homescreen
-        this.switchTab('');
-
-        // Switch to methods tab
-      }
-
-      this.offers.rerenderTab();
-
-      // Doing this after switching because switching on the homescreen deselects all instruments
-      if (type === 'instrument.single') {
-        // Set selectedInstrument
-        HomeScreenStore.selectedInstrumentId.set(instrument.id);
-
-        return;
-      }
+      this.homeTab.onSelectInstrument({
+        detail: instrument,
+      });
     }
 
     var session = this;
+
+    session.offers.rerenderTab();
 
     // Wait for switching to be over
     setTimeout(function() {
