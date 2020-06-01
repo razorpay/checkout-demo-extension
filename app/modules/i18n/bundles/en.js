@@ -69,6 +69,12 @@ export default {
     installments_label: 'Monthly Installments',
     total_label: 'Total Money',
   },
+  emi_details: {
+    installment_label: 'EMI',
+    tenure_label: 'Tenure',
+    tenure: '{duration} Months',
+    interest_label: 'Interest',
+  },
   home: {
     preferred_block_title: 'Preferred Payment Methods',
     single_block_title: 'Pay via {method}',
