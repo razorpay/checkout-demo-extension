@@ -207,12 +207,14 @@ export function getUpiIntentAppName(shortcode, locale, defaultName) {
  * Returns the long bank name for the given locale
  * @param {string} bankCode
  * @param {string} locale
+ * @param {string} [defaultValue]
  * @returns {string}
  */
-export function getLongBankName(bankCode, locale) {
+export function getLongBankName(bankCode, locale, defaultValue) {
   return formatMessageWithLocale(
     `banks.long.${bankCode.toUpperCase()}`,
-    locale
+    locale,
+    defaultValue
   );
 }
 
