@@ -2767,7 +2767,12 @@ Session.prototype = {
     var instrument = discreet.Offers.getInstrumentForOffer(offer);
 
     if (!instrument) {
-      // TODO: Track analytics
+      Analytics.track('offer_instrument_undef', {
+        type: AnalyticsTypes.DEBUG,
+        data: {
+          offer: offer,
+        },
+      });
 
       return;
     }
