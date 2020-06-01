@@ -2711,20 +2711,28 @@ Session.prototype = {
     return this.offers && this.offers.renderTab(this.tab);
   },
 
-  _trySelectingOfferInstrument: function(offer) {
+  /**
+   * Tries selecting the bank if netbanking offer,
+   * wallet if wallet offer, and so on
+   * @param {Offer} offer
+   * @param {string} screen
+   */
+  _trySelectingOfferInstrument: function(offer, screen) {
+    screen = screen || this.screen;
+
     var issuer = offer.issuer;
 
-    if (this.screen === 'wallet') {
+    if (screen === 'wallet') {
       // Select wallet
       if (issuer) {
         this.svelteWalletsTab.onWalletSelection(issuer);
       }
-    } else if (this.screen === 'netbanking') {
+    } else if (screen === 'netbanking') {
       // Select bank
       if (issuer) {
         NetbankingScreenStore.selectedBank.set(issuer);
       }
-    } else if (this.screen === 'emi') {
+    } else if (screen === 'emi') {
       var emiDuration = getEmiDurationForNewCard();
       var bank = this.emiPlansForNewCard && this.emiPlansForNewCard.code;
 
@@ -2742,7 +2750,7 @@ Session.prototype = {
           setEmiDurationForNewCard('');
         }
       }
-    } else if (this.screen === 'cardless_emi' && this.screen !== 'otp') {
+    } else if (screen === 'cardless_emi' && screen !== 'otp') {
       var provider = offer.provider;
 
       if (provider) {
@@ -2757,8 +2765,6 @@ Session.prototype = {
    * @param {string} screen
    */
   handleOfferSelection: function(offer, screen) {
-    screen = screen || this.screen;
-
     /**
      * Get the first instrument that can work with the offer
      * and select it if not already selected
@@ -2793,7 +2799,7 @@ Session.prototype = {
 
     // Wait for switching to be over
     setTimeout(function() {
-      session._trySelectingOfferInstrument(offer);
+      session._trySelectingOfferInstrument(offer, screen);
     }, 300);
   },
 
