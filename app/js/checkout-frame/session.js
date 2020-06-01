@@ -2711,6 +2711,46 @@ Session.prototype = {
     return this.offers && this.offers.renderTab(this.tab);
   },
 
+  _trySelectingOfferInstrument: function(offer) {
+    var issuer = offer.issuer;
+
+    if (this.screen === 'wallet') {
+      // Select wallet
+      if (issuer) {
+        this.svelteWalletsTab.onWalletSelection(issuer);
+      }
+    } else if (this.screen === 'netbanking') {
+      // Select bank
+      if (issuer) {
+        NetbankingScreenStore.selectedBank.set(issuer);
+      }
+    } else if (this.screen === 'emi') {
+      var emiDuration = getEmiDurationForNewCard();
+      var bank = this.emiPlansForNewCard && this.emiPlansForNewCard.code;
+
+      if (emiDuration) {
+        var plan = _Arr.find(MethodStore.getEMIBankPlans(bank), function(p) {
+          return p.duration === emiDuration;
+        });
+        if (
+          plan &&
+          offer.id &&
+          offer.emi_subvention &&
+          plan.offer_id !== offer.id
+        ) {
+          // Clear duration
+          setEmiDurationForNewCard('');
+        }
+      }
+    } else if (this.screen === 'cardless_emi' && this.screen !== 'otp') {
+      var provider = offer.provider;
+
+      if (provider) {
+        this.selectCardlessEmiProviderAndAttemptPayment(provider);
+      }
+    }
+  },
+
   /**
    * Handles offer selection
    * @param {Offer} offer
@@ -2781,51 +2821,11 @@ Session.prototype = {
       }
     }
 
-    var issuer = offer.issuer;
-
     var session = this;
 
     // Wait for switching to be over
     setTimeout(function() {
-      if (session.screen === 'wallet') {
-        // Select wallet
-        if (issuer) {
-          session.svelteWalletsTab.onWalletSelection(issuer);
-        }
-      } else if (session.screen === 'netbanking') {
-        // Select bank
-        if (issuer) {
-          NetbankingScreenStore.selectedBank.set(issuer);
-        }
-      } else if (session.screen === 'emi') {
-        var emiDuration = getEmiDurationForNewCard();
-        var bank =
-          session.emiPlansForNewCard && session.emiPlansForNewCard.code;
-
-        if (emiDuration) {
-          var plan = _Arr.find(MethodStore.getEMIBankPlans(bank), function(p) {
-            return p.duration === emiDuration;
-          });
-          if (
-            plan &&
-            offer.id &&
-            offer.emi_subvention &&
-            plan.offer_id !== offer.id
-          ) {
-            // Clear duration
-            setEmiDurationForNewCard('');
-          }
-        }
-      } else if (
-        session.screen === 'cardless_emi' &&
-        session.screen !== 'otp'
-      ) {
-        var provider = offer.provider;
-
-        if (provider) {
-          session.selectCardlessEmiProviderAndAttemptPayment(provider);
-        }
-      }
+      session._trySelectingOfferInstrument(offer);
     }, 300);
   },
 
