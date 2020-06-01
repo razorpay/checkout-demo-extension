@@ -32,6 +32,11 @@ export default {
     auth_type_otp: 'OTP / Password',
     auth_type_pin: 'ATM PIN',
 
+    bank_verification_title: 'Bank verification required',
+    bank_verification_description:
+      'Click continue to complete the payment on the bank page',
+    bank_verification_action_continue: 'Continue',
+
     saved_card_label: 'Card ending with <b>{last4}<b>',
 
     recurring_callout:

@@ -16,6 +16,11 @@ export const NOCVV_LABEL = 'card.nocvv_label';
 export const AUTH_TYPE_HEADER = 'card.auth_type_header';
 export const AUTH_TYPE_OTP = 'card.auth_type_otp';
 export const AUTH_TYPE_PIN = 'card.auth_type_pin';
+export const BANK_VERIFICATION_TITLE = 'card.bank_verification_title';
+export const BANK_VERIFICATION_DESCRIPTION =
+  'card.bank_verification_description';
+export const BANK_VERIFICATION_ACTION_CONTINUE =
+  'card.bank_verification_action_continue';
 export const SAVED_CARD_LABEL = 'card.saved_card_label';
 export const RECURRING_CALLOUT = 'card.recurring_callout';
 export const SUBSCRIPTION_CALLOUT = 'card.subscription_callout';
