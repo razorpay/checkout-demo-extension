@@ -40,7 +40,8 @@ var preferences,
   EmiStore = discreet.EmiStore,
   Cta = discreet.Cta,
   NBHandlers = discreet.NBHandlers,
-  Instruments = discreet.Instruments;
+  Instruments = discreet.Instruments,
+  I18n = discreet.I18n;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -1155,7 +1156,7 @@ Session.prototype = {
 
     this.isOpen = true;
 
-    discreet.initI18n();
+    I18n.init();
     this.setExperiments();
     this.setTpvBanks();
     this.getEl();

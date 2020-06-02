@@ -22,13 +22,13 @@ import NoCostExplainer from 'ui/components/offers/NoCostExplainer.svelte';
 import emiPlansView from 'checkoutframe/emiplans';
 import otpView from 'checkoutframe/otp';
 import languageSelectionView from 'ui/elements/LanguageSelection.svelte';
+import * as I18n from 'i18n';
 import UpiCancelReasonPicker from 'ui/components/UpiCancelReasonPicker.svelte';
 import * as Curtain from 'components/curtain';
 import { setShieldParams } from 'payment/validator';
 import * as P13n from 'checkoutframe/personalization';
 import { commonBanks, getFullBankLogo } from 'common/bank';
 import * as CountryCodesUtil from 'common/countrycodesutil';
-import { init as initI18n } from 'i18n';
 
 /* Required for merchant.js migration */
 import * as Constants from 'common/constants';
@@ -198,5 +198,5 @@ export default {
 
   NBHandlers,
 
-  initI18n,
+  I18n,
 };
