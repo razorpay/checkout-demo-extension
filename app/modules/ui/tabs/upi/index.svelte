@@ -261,8 +261,6 @@
     setDefaultTokenValue();
   }
 
-  $: isOtm = method === 'upi_otm';
-
   function setWebPaymentsApiUsage(to) {
     useWebPaymentsApi = to;
     setDefaultTokenValue();
