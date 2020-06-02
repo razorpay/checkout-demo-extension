@@ -61,12 +61,9 @@ function _translate(options = {}, external) {
   /**
    * RESTRICTIONS
    */
-  const allowedInstruments =
-    allow |> _Arr.map(createInstrument) |> _Arr.filter(Boolean);
-
   // These are coming from the merchant so we need to validate the keys of the instruments
   const allowedBlock = validateAndCreateBlock('rzp.restrict_allow', {
-    instruments: allowedInstruments,
+    instruments: allow,
   });
 
   return {

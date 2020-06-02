@@ -90,7 +90,7 @@
     <b>Fees Breakup</b>
     <br />
     <div class="fees-container">
-      {#each feeBreakup as fee}
+      {#each feeBreakup as fee (fee[0])}
         <div class="fee">
           <div class="fee-title">{fee[0]}</div>
           <div class="fee-amount">{fee[1]}</div>

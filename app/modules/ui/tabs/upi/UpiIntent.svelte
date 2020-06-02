@@ -218,7 +218,7 @@
       <div slot="subtitle">You will be redirected to your UPI app</div>
     </ListHeader>
 
-    {#each showableApps as app, i}
+    {#each showableApps as app, i (app.package_name)}
       <DeprecatedRadioOption
         data={app}
         icon={app.app_icon}

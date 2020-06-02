@@ -146,6 +146,12 @@
       const hasIssuers = Boolean(instrument.issuers);
       const hasNetworks = Boolean(instrument.networks);
       const hasTypes = Boolean(instrument.types);
+      const hasIins = Boolean(instrument.iins);
+
+      // We don't have IIN for a saved card. So if we're requested to support only specific IINs, we can't show saved cards
+      if (hasIins) {
+        return false;
+      }
 
       const issuers = instrument.issuers || [];
       const networks = instrument.networks || [];

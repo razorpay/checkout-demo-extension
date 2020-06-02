@@ -463,7 +463,7 @@
                   </option>
                 {:else}
                   <option value="">Type of Bank Account</option>
-                  {#each accountTypes as type}
+                  {#each accountTypes as type (type)}
                     <option value={type}>{accountTexts[type]}</option>
                   {/each}
                 {/if}

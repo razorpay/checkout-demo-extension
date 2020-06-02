@@ -127,6 +127,7 @@ const config = {
         'issuers',
         'networks',
         'types',
+        'iins',
       ]);
 
       return _Arr.map(combinations, combination =>
