@@ -81,7 +81,7 @@
   let isANewVpa = false;
   let rememberVpaCheckbox;
   let intentAppSelected = null;
-  let isOtm = method === 'upi_otm';
+  const isOtm = method === 'upi_otm';
   let otmStartDate = new Date();
 
   const session = getSession();
