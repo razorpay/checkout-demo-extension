@@ -20,3 +20,12 @@ export const OMNI_BLOCK_HEADING = 'upi.omni_block_heading';
 export const OMNI_GPAY_NUMBER = 'upi.omni_gpay_number';
 export const OMNI_ENTER_NUMBER = 'upi.omni_enter_number';
 export const OMNI_ERROR = 'upi.omni_error';
+
+export const CANCEL_REASON_TITLE = 'upi.cancel_reason_title';
+export const CANCEL_REASON_COLLECT_NOT_RECEIVED =
+  'upi.cancel_reason_collect_not_received';
+export const CANCEL_REASON_FAILED_IN_APP = 'upi.cancel_reason_failed_in_app';
+export const CANCEL_REASON_MONEY_DEDUCTED = 'upi.cancel_reason_money_deducted';
+export const CANCEL_REASON_OTHER = 'upi.cancel_reason_other';
+export const CANCEL_REASON_BACK_ACTION = 'upi.cancel_reason_back_action';
+export const CANCEL_REASON_SUBMIT_ACTION = 'upi.cancel_reason_submit_action';

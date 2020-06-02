@@ -22,6 +22,7 @@ import NoCostExplainer from 'ui/components/offers/NoCostExplainer.svelte';
 import emiPlansView from 'checkoutframe/emiplans';
 import otpView from 'checkoutframe/otp';
 import languageSelectionView from 'ui/elements/LanguageSelection.svelte';
+import UpiCancelReasonPicker from 'ui/components/UpiCancelReasonPicker.svelte';
 import * as Curtain from 'components/curtain';
 import { setShieldParams } from 'payment/validator';
 import * as P13n from 'checkoutframe/personalization';
@@ -165,6 +166,7 @@ export default {
 
   otpView,
   languageSelectionView,
+  UpiCancelReasonPicker,
   PayLaterView,
   Curtain,
   TopBar,

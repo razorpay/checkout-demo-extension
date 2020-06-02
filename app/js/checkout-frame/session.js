@@ -1321,6 +1321,7 @@ Session.prototype = {
 
   setSvelteComponents: function() {
     this.setTopBar();
+    this.setUpiCancelReasonPicker();
     this.setHomeTab();
     this.setSvelteCardTab();
     this.setNetbankingTab();
@@ -3714,6 +3715,12 @@ Session.prototype = {
       props: {},
     });
     this.topBar.$on('back', this.back.bind(this));
+  },
+
+  setUpiCancelReasonPicker: function() {
+    this.upiCancelReasonPicker = new discreet.UpiCancelReasonPicker({
+      target: _Doc.querySelector('#cancel_upi'),
+    });
   },
 
   setSvelteOverlay: function() {

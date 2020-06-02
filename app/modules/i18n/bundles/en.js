@@ -481,6 +481,15 @@ export default {
     omni_enter_number: 'Enter your phone number',
     omni_error:
       'Please ensure the same number is linked to the Google Pay account.',
+
+    cancel_reason_title: 'Please give us a reason before we cancel the payment',
+    cancel_reason_collect_not_received: 'Did not receive collect request',
+    cancel_reason_failed_in_app: 'Payment failed in UPI app',
+    cancel_reason_money_deducted:
+      'Money got deducted but payment is still processing',
+    cancel_reason_other: 'Other',
+    cancel_reason_back_action: 'Back',
+    cancel_reason_submit_action: 'Submit',
   },
   upi_intent_apps: {
     google_pay: 'Google Pay (Tez)',
