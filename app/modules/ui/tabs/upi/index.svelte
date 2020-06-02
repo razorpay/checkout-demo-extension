@@ -609,7 +609,7 @@
             </ListHeader>
           {/if}
 
-          {#each tokens as app, i}
+          {#each tokens as app, i (app.id)}
             <SlottedRadioOption
               name="payment_type"
               ellipsis

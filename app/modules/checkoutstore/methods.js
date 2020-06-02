@@ -418,6 +418,12 @@ export function getEMIBankPlans(code, cardType = 'credit') {
   }
 }
 
+export function getEligiblePlansBasedOnMinAmount(plans) {
+  const amount = getAmount();
+  const eligiblePlans = _Arr.filter(plans, plan => plan.min_amount <= amount);
+  return eligiblePlans;
+}
+
 // @TODO modifies bajaj cardless emi min_amount
 export function getEMIBanks() {
   const emiOptions = getMerchantMethods().emi_options;
