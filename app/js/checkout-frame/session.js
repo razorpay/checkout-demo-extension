@@ -3709,7 +3709,7 @@ Session.prototype = {
 
   setTopBar: function() {
     this.topBar = new discreet.TopBar({
-      target: _Doc.querySelector('#body'),
+      target: _Doc.querySelector('#topbar-wrap'),
     });
     this.topBar.$on('back', this.back.bind(this));
   },
