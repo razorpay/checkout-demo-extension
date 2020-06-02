@@ -100,6 +100,15 @@ export default {
     tenure_label: 'Tenure',
     tenure: '{duration} Months',
     interest_label: 'Interest',
+    no_cost_header: 'How does No Cost EMI work?',
+    no_cost_description:
+      'You are buying a product worth <b>{amount} on a {duration}-month EMI period.<b> The bank used charges <b>{rate}% interest<b> per annum.',
+    normal_emi_label: 'Normal EMI',
+    no_cost_label: 'No Cost EMI',
+    total_amount_label: 'Total Amount',
+    effective_interest_info:
+      '<b>Zero effective interest:<b> you get upfront discount equal to interest charged by the bank.',
+    you_save_info: 'You save {amount}',
   },
   debit_emi: {
     card_box_title: 'SELECTED DEBIT CARD',
