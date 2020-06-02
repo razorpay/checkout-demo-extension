@@ -117,6 +117,15 @@ export default {
       'Enter the mobile number registered with your bank and Debit Card.',
     contact_help: 'Please enter a valid indian mobile number',
   },
+  bajaj_finserv: {
+    card_details_header: 'Enter Card Details',
+    card_number_label: 'Card Number',
+    card_number_help: 'Please enter a valid Bajaj Finserv issued card number',
+    name_label: "Card Holder's Name",
+    name_help: 'Please enter name on your card',
+    callout:
+      'You need to have a <strong>Bajaj Finserv issued card<strong> to continue.',
+  },
   fees: {
     loading_message: 'Loading fees breakup...',
     breakup_title: 'Fees Breakup',
