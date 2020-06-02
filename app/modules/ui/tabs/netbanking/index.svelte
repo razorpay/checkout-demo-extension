@@ -77,8 +77,6 @@
     }
   }
 
-  let isSearchOpened = false; // Is SearchModal opened?
-
   // Refs
   let radioContainer;
   let searchModal;
@@ -119,13 +117,11 @@
   function showSearch() {
     hideCta();
     searchModal.open();
-    isSearchOpened = true;
   }
 
   function hideSearch() {
     searchModal.close();
     determineCtaVisibility();
-    isSearchOpened = false;
 
     // Restore focus
     if (bankSelect) {
@@ -134,13 +130,6 @@
   }
 
   export function onBack() {
-    // Hide SearchModal if it is opened
-    if (isSearchOpened) {
-      hideSearch();
-
-      return true;
-    }
-
     active = false;
   }
 
