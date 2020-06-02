@@ -248,7 +248,7 @@
             <option value="">{$t(NETBANKING_SELECT_LABEL)}</option>
             {#each banksArr as bank}
               <option value={bank.code}>
-                {getLongBankName(bank.code, $locale)}
+                {getLongBankName(bank.code, $locale, bank.name)}
               </option>
             {/each}
           </select>
