@@ -75,6 +75,15 @@ export default {
     tenure: '{duration} Months',
     interest_label: 'Interest',
   },
+  fees: {
+    loading_message: 'Loading fees breakup...',
+    breakup_title: 'Fees Breakup',
+    amount_label: 'Amount',
+    gateway_charges_label: 'Gateway Charges',
+    gst_label: 'GST on {label}',
+    total_charges_label: 'Total Charges',
+    continue_action: 'Continue',
+  },
   home: {
     preferred_block_title: 'Preferred Payment Methods',
     single_block_title: 'Pay via {method}',
