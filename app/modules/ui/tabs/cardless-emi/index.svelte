@@ -77,7 +77,7 @@
   <input type="hidden" name="ott" />
   <h3>Select an Option</h3>
   <div class="options">
-    {#each filteredProviders as provider}
+    {#each filteredProviders as provider (provider.title)}
       <NextOption {...provider} on:select>{provider.title}</NextOption>
     {/each}
   </div>

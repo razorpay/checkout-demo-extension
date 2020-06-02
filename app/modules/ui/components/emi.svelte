@@ -71,7 +71,7 @@
     <div class="col">Select Bank:</div>
     <i class="i select-arrow">&#xe601;</i>
     <select id="emi-bank-select" bind:value={selected}>
-      {#each banksList as bank}
+      {#each banksList as bank (bank.code)}
         <option value={bank.code}>{bank.name}</option>
       {/each}
     </select>
@@ -83,7 +83,7 @@
     <div class="col">Total Money</div>
   </strong>
   <div />
-  {#each plans as [duration, plan]}
+  {#each plans as [duration, plan] (duration)}
     <div class="row emi-option">
       <div class="col">{plan.duration} Months</div>
       <div class="col">{plan.rate}%</div>

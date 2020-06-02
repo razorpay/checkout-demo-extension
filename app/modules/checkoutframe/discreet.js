@@ -76,6 +76,7 @@ import PayoutsInstruments from 'ui/tabs/payout/payout-instruments.svelte';
 import PayoutAccount from 'ui/tabs/payout/payout-account.svelte';
 
 import showTimer from 'checkoutframe/timer';
+import * as es6components from 'checkoutframe/components';
 
 import * as Hacks from 'checkoutframe/hacks';
 
@@ -114,6 +115,7 @@ export default {
   initIframe,
 
   showTimer,
+  es6components,
 
   Constants,
   Bank,
