@@ -8,7 +8,11 @@
   import * as GPay from 'gpay';
   import * as Bridge from 'bridge';
   import { getDowntimes, hasFeature, isCustomerFeeBearer } from 'checkoutstore';
-  import { isMethodEnabled, isUPIFlowEnabled } from 'checkoutstore/methods';
+  import {
+    isMethodEnabled,
+    isUPIFlowEnabled,
+    isUPIOtmFlowEnabled,
+  } from 'checkoutstore/methods';
   import { isVpaValid } from 'common/upi';
   import {
     doesAppExist,
@@ -133,11 +137,13 @@
    * @returns {Object}
    */
   function getAvailableFlowsFromInstrument(instrument) {
+    const isFlowEnabled = isOtm ? isUPIOtmFlowEnabled : isUPIFlowEnabled;
+
     let availableFlows = {
-      omnichannel: isUPIFlowEnabled('omnichannel'),
-      collect: isUPIFlowEnabled('collect'),
-      intent: isUPIFlowEnabled('intent'),
-      qr: isUPIFlowEnabled('qr'),
+      omnichannel: isFlowEnabled('omnichannel'),
+      collect: isFlowEnabled('collect'),
+      intent: isFlowEnabled('intent'),
+      qr: isFlowEnabled('qr'),
     };
 
     if (!instrument || instrument.method !== 'upi') {
@@ -220,17 +226,16 @@
     return session.r.checkPaymentAdapter('gpay');
   };
 
-  $: intent = !isOtm && availableFlows.intent && preferIntent;
+  $: intent = availableFlows.intent && preferIntent;
   $: isGPaySelected = selectedApp === 'gpay' && useWebPaymentsApi;
   $: pspHandle = selectedAppData ? selectedAppData.psp : '';
   $: shouldShowQr =
     availableFlows.qr &&
     isMethodEnabled('qr') &&
     !selectedApp &&
-    selectedApp !== null &&
-    !isOtm;
-  $: shouldShowCollect = availableFlows.collect || isOtm;
-  $: shouldShowOmnichannel = availableFlows.omnichannel && !isOtm;
+    selectedApp !== null;
+  $: shouldShowCollect = availableFlows.collect;
+  $: shouldShowOmnichannel = availableFlows.omnichannel;
 
   // Determine CTA visilibty when selectedToken changes, but only if session.tab is a upi based method
   $: selectedToken,
