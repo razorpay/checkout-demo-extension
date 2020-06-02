@@ -60,6 +60,32 @@ export default {
 
     pay_entire_amount_action: 'Pay entire amount',
     pay_entire_amount_count: '({count} cards available)',
+
+    plan_title: '{duration} months ({amount}/mo)',
+    no_cost_label: 'No Cost',
+
+    plan_list_title: 'Select an EMI Plan',
+    plan_list_title_without_offer: 'Plans without offer',
+    plan_list_view_all_action: 'View all EMI Plans',
+    plan_list_pay_entire_action: 'Pay entire amount',
+    plan_list_callout_agreement:
+      'By clicking on Pay, you agree to the terms of our ',
+    plan_list_callout_agreement_highlight: 'Loan Agreement',
+
+    interest_charged_label: 'Interest charged by the bank',
+    no_cost_discount_label: 'No Cost EMI offer discount',
+    no_cost_explain_action: '+ How does it work?',
+
+    credit_emi_description:
+      'Full amount of {amount} will be deducted from your account, which will be converted into EMI by your bank in 3-4 days.',
+    hdfc_debit_description_min_balance:
+      'No minimum balance is required. There will be no amount blocked on your card. You will pay ',
+    hdfc_debit_description_includes_interest: '(includes interest).',
+    hdfc_debit_description_convenience:
+      ' Convenience Fee of ₹99 + GST applicable for EMI transactions on HDFC Bank Cards.',
+    description_monthly_installment: 'Monthly Installment: {amount}',
+    description_total_amount:
+      'Total Amount: {totalAmount} ({monthlyAmount} x {duration})',
   },
   emi_modal: {
     select_bank_label: 'Select Bank:',
