@@ -75,6 +75,13 @@ export default {
     tenure: '{duration} Months',
     interest_label: 'Interest',
   },
+  debit_emi: {
+    card_box_title: 'SELECTED DEBIT CARD',
+    contact_title: 'MOBILE NUMBER',
+    contact_description:
+      'Enter the mobile number registered with your bank and Debit Card.',
+    contact_help: 'Please enter a valid indian mobile number',
+  },
   fees: {
     loading_message: 'Loading fees breakup...',
     breakup_title: 'Fees Breakup',
