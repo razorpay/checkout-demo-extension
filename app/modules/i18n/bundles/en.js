@@ -192,6 +192,33 @@ export default {
       'Only {extensions} files with size less than {size} MB are allowed',
     confirm_cancel: 'Are you sure you want to stop uploading your NACH form?',
   },
+  payouts: {
+    select_account_title: 'Select an account',
+    select_account_description:
+      '{amount} will be credited to your specified account.',
+    select_upi_title: 'Select a UPI ID',
+    add_upi_action: 'Add UPI ID',
+    select_bank_title: 'Select a Bank Account',
+    add_bank_action: 'Add Bank Account',
+
+    add_upi_button_title: 'UPI',
+    add_upi_button_description: 'Add a UPI ID (BHIM, PhonePe and more)',
+
+    add_bank_button_title: 'BANK',
+    add_bank_button_description: 'Add a Bank Account',
+
+    account_number_label: 'Bank Account Number',
+    account_number_help: 'Please enter a valid account number',
+
+    account_number_confirm_label: 'Re-enter account number',
+    account_number_confirm_help: 'Re-enter account number',
+
+    ifsc_label: 'IFSC',
+    ifsc_help: 'Please enter a valid IFSC',
+
+    name_label: 'Account Holder Name',
+    name_help: 'Please enter a valid account name',
+  },
   offers: {
     not_applicable_card_message: 'Offer is not applicable on this card.',
     offer_applied_message: 'Offer Applied!',
