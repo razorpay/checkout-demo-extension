@@ -623,4 +623,8 @@ export default {
     pay_single_method: 'Pay using {method}',
     upload_nach_form: 'Upload NACH Form',
   },
+  misc: {
+    logout_action: 'Log out',
+    logout_all_devices_action: 'Log out from all devices',
+  },
 };

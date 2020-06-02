@@ -6,8 +6,12 @@
   // Store
   import { isIRCTC } from 'checkoutstore';
   import { isContactPresent } from 'checkoutstore/screens/home';
-  import { locale } from 'svelte-i18n';
+
+  // i18n
+  import { t, locale } from 'svelte-i18n';
   import { getTabTitle } from 'i18n';
+
+  import { LOGOUT_ACTION, LOGOUT_ALL_DEVICES_ACTION } from 'ui/labels/topbar';
 
   // Utils
   import { getSession } from 'sessionmanager';
@@ -141,9 +145,11 @@
         <div id="user">{contact}</div>
         {#if logoutDropdownShown}
           <div id="profile">
-            <li on:click={handleLogoutClick}>Log out</li>
+            <!-- LABEL: Log out -->
+            <li on:click={handleLogoutClick}>{$t(LOGOUT_ACTION)}</li>
+            <!-- LABEL: Log out from all devices -->
             <li on:click={handleLogoutAllDevicesClick}>
-              Log out from all devices
+              {$t(LOGOUT_ALL_DEVICES_ACTION)}
             </li>
           </div>
         {/if}
