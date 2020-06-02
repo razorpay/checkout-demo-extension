@@ -551,7 +551,8 @@ export default {
     omni_enter_number: 'Enter your phone number',
     omni_error:
       'Please ensure the same number is linked to the Google Pay account.',
-
+    omni_verifying_phone: 'Verifying mobile number with Google Pay..',
+    verifying_vpa_info: 'Verifying your VPA',
     cancel_reason_title: 'Please give us a reason before we cancel the payment',
     cancel_reason_collect_not_received: 'Did not receive collect request',
     cancel_reason_failed_in_app: 'Payment failed in UPI app',

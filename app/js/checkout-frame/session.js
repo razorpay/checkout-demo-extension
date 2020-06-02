@@ -4250,7 +4250,10 @@ Session.prototype = {
 
   verifyVpaAndContinue: function(data, params) {
     var self = this;
-    self.showLoadError('Verifying your VPA');
+    var locale = I18n.getCurrentLocale();
+    self.showLoadError(
+      I18n.formatMessageWithLocale('upi.verifying_vpa_info', locale)
+    );
     $('#overlay-close').hide();
 
     var vpa = data.vpa;
