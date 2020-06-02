@@ -8,8 +8,12 @@
   import Icon from 'ui/elements/Icon.svelte';
   import { getMiscIcon } from 'checkoutframe/icons';
 
+  // Store imports
+  import { overlayStack } from 'checkoutstore/back';
+
   // Utils imports
   import { isMobile } from 'common/useragent';
+  import Track from 'tracker';
 
   // Props
   export let placeholder = 'Type to search';
@@ -18,6 +22,8 @@
   export let component;
   export let keys;
   export let all;
+
+  const id = Track.makeUid();
 
   onMount(() => {
     document.querySelector('#modal-inner').appendChild(ref);
@@ -77,10 +83,25 @@
 
     // Wait for UI updates before focusing
     tick().then(focus);
+
+    // Add to $overlayStack
+    $overlayStack = $overlayStack.concat([
+      {
+        id,
+        component: 'SearchModal',
+        back: () => {
+          dispatch('close');
+        },
+      },
+    ]);
   }
 
   export function close() {
     visible = false;
+
+    // Remove the overlay from $overlayStack
+    const overlay = _Arr.find($overlayStack, overlay => overlay.id === id);
+    $overlayStack = _Arr.remove($overlayStack, overlay);
   }
 
   function handleEscape(event) {
