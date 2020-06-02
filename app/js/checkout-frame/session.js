@@ -62,8 +62,6 @@ var strings = {
   otp_resent: 'OTP resent',
 };
 
-var fontTimeout;
-
 /**
  * Temp stores for Cardless EMI & PayLater.
  * Will move to Svelte Store upon migration.
@@ -909,10 +907,6 @@ Session.prototype = {
       classes.push('test');
     }
 
-    if (this.fontLoaded) {
-      classes.push('font-loaded');
-    }
-
     if (getter('theme.hide_topbar')) {
       classes.push('notopbar');
     }
@@ -950,7 +944,6 @@ Session.prototype = {
         cta: storeGetter(Cta.getStore()),
       });
       this.el = div.firstChild;
-      this.applyFont(this.el.querySelector('#powered-link'));
       document.body.appendChild(this.el);
 
       this.el.appendChild(styleEl);
@@ -1195,6 +1188,7 @@ Session.prototype = {
     this.setFormatting();
     this.improvisePaymentOptions();
     this.improvisePrefill();
+    discreet.es6components.render();
     this.setSvelteComponents();
     this.fillData();
     this.setEMI();
@@ -2050,39 +2044,6 @@ Session.prototype = {
     discreet.Theme.setThemeColor(this.r.themeMeta.color);
 
     this.themeMeta = discreet.Theme.getThemeMeta();
-  },
-
-  applyFont: function(anchor, retryCount) {
-    if (!retryCount) {
-      retryCount = 0;
-    }
-    if (anchor.offsetWidth / anchor.offsetHeight > 3) {
-      $(this.el).addClass('font-loaded');
-      this.fontLoaded = true;
-      this.applyPartnershipBranding();
-    } else if (retryCount < 25) {
-      var self = this;
-      fontTimeout = setTimeout(function() {
-        self.applyFont(anchor, ++retryCount);
-      }, 120 + retryCount * 50);
-    }
-  },
-
-  /**
-   * Applies the In Partnership With branding
-   */
-  applyPartnershipBranding: function() {
-    var brand_logo = this.get('partnership_logo');
-
-    if (brand_logo) {
-      var elem = _Doc.querySelector('#powered-by');
-
-      _El.addClass(elem, 'branded');
-      _El.setContents(
-        elem,
-        'In partnership with<br><img src="' + brand_logo + '">'
-      );
-    }
   },
 
   hideErrorMessage: function(confirmedCancel) {
@@ -5095,8 +5056,8 @@ Session.prototype = {
       abortAjax(this.ajax);
       this.clearRequest(cancelReason);
       this.isOpen = false;
-      clearTimeout(fontTimeout);
 
+      discreet.es6components.destroy();
       this.cleanUpSvelteComponents();
 
       try {
