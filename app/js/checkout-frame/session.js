@@ -1314,7 +1314,6 @@ Session.prototype = {
     if (MethodStore.isMethodEnabled('wallet')) {
       this.svelteWalletsTab = new discreet.WalletTab({
         target: gel('wallet-svelte-wrap'),
-        props: {},
       });
     }
   },
@@ -1414,7 +1413,6 @@ Session.prototype = {
     if (MethodStore.isEMandateEnabled()) {
       this.emandateView = new discreet.EmandateTab({
         target: _Doc.querySelector('#form-fields'),
-        props: {},
       });
     }
   },
@@ -3712,7 +3710,6 @@ Session.prototype = {
   setTopBar: function() {
     this.topBar = new discreet.TopBar({
       target: _Doc.querySelector('#body'),
-      props: {},
     });
     this.topBar.$on('back', this.back.bind(this));
   },
@@ -3726,7 +3723,6 @@ Session.prototype = {
   setSvelteOverlay: function() {
     this.svelteOverlay = new discreet.Overlay({
       target: _Doc.querySelector('#modal-inner'),
-      props: {},
     });
   },
 
