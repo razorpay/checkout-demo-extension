@@ -23,7 +23,7 @@
 </style>
 
 <div>
-  {#each items as item}
+  {#each items as item (item.id)}
     <Item
       text={item.text}
       icon={item.icon}
