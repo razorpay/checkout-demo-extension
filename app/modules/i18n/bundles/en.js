@@ -181,6 +181,17 @@ export default {
       'Do not round-off the amount. Transfer the exact amount for the payment to be successful.',
     retry_button_label: 'Retry',
   },
+  nach: {
+    attaching_message: 'Attaching your NACH form',
+    uploading_message: 'Uploading your NACH form',
+    attachment_info:
+      'Please upload a clear and legible copy of your signed NACH form',
+    image_info:
+      'The image should not be <strong>cropped<strong> and should not have any <strong>shadows<strong>',
+    allowed_formats_info:
+      'Only {extensions} files with size less than {size} MB are allowed',
+    confirm_cancel: 'Are you sure you want to stop uploading your NACH form?',
+  },
   offers: {
     not_applicable_card_message: 'Offer is not applicable on this card.',
     offer_applied_message: 'Offer Applied!',
