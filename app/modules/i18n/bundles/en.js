@@ -348,6 +348,38 @@ export default {
       paylater: 'Pay later using {providers}',
     },
   },
+  otp: {
+    add_funds_label: 'Add Funds',
+    try_different_label: 'Try different payment method',
+    retry_label: 'Retry',
+    resend_label: 'Resend OTP',
+    back_label: 'Go Back',
+    otp_field_help: 'Please enter the OTP',
+    skip_text: {
+      complete_bank_page: "Complete on bank's page",
+      skip_saved_cards: 'Skip Saved Cards',
+      skip_saving_card: 'Skip saving card',
+      resend_otp: 'Resend OTP',
+    },
+    title: {
+      loading: 'Loading...',
+      insufficient_wallet_balance: 'Insufficient balance in your wallet',
+      native_otp_sent: 'Enter OTP to complete the payment',
+      resending_otp: 'Resending OTP...',
+      verifying_otp: 'Verifying OTP...',
+      saved_cards_sending: 'Looking for saved cards associated with {phone}',
+      wallet_sending: 'Looking for {wallet} account associated with {phone}',
+      paylater_sending:
+        'Looking for {provider} account associated with {phone}',
+      cardlessemi_sending:
+        'Looking for {provider} account associated with {phone}',
+      otp_sent_save_card: 'Enter OTP sent to {phone} to save your card',
+      otp_sent_access_card: 'Enter OTP sent to {phone} to access Saved Cards',
+      otp_sending_generic: 'Sending OTP to {phone}',
+      otp_sent_generic: 'An OTP has been sent on {phone}',
+      otp_resent_generic: 'OTP Resent',
+    },
+  },
   tab_titles: {
     card: 'Card',
     irctc_card: 'Debit/Credit Card',

@@ -704,7 +704,7 @@ function askOTP(view, text, shouldLimitResend, screenProps) {
             }
 
             view.updateScreen({
-              skipText: "Complete on bank's page",
+              skipTextLabel: 'complete_bank_page',
             });
 
             if (!origText.redirect) {
@@ -3100,7 +3100,7 @@ Session.prototype = {
     this.topBar.setTitleOverride('otp', 'text', 'card');
 
     this.otpView.updateScreen({
-      skipText: 'Skip Saved Cards',
+      skipTextLabel: 'skip_saved_cards',
     });
 
     /**
@@ -4563,7 +4563,7 @@ Session.prototype = {
     if (data.save && !this.getCurrentCustomer().logged) {
       if (this.screen === 'card') {
         this.otpView.updateScreen({
-          skipText: 'Skip saving card',
+          skipTextLabel: 'skip_saving_card',
         });
         Analytics.track('saved_cards:save:otp:ask');
         this.commenceOTP(strings.otpsend, false, 'saved_cards_save');
@@ -4715,7 +4715,7 @@ Session.prototype = {
     ) {
       this.powerwallet = true;
       this.otpView.updateScreen({
-        skipText: 'Resend OTP', // TODO
+        skipTextLabel: 'resend_otp',
         allowSkip: false,
       });
       this.topBar.setTitleOverride('otp', 'image', walletObj.logo);
