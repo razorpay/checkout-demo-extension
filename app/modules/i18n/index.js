@@ -92,10 +92,11 @@ export function getBundle(locale) {
  * @param {string} label
  * @param {Object} data
  * @param {string} locale
+ * @param {string} [defaultValue]
  * @returns {string}
  */
-export function formatTemplateWithLocale(label, data, locale) {
-  return get(t)(label, { locale, values: data });
+export function formatTemplateWithLocale(label, data, locale, defaultValue) {
+  return get(t)(label, { locale, values: data, default: defaultValue });
 }
 
 /**
