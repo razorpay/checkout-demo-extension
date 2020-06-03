@@ -3637,7 +3637,6 @@ Session.prototype = {
     if (this.headless && this.screen === 'card') {
       return;
     }
-    var actionState;
     var loadingState = true;
     if (error) {
       if (this.screen === 'upi' && text === discreet.cancelMsg) {
@@ -3646,32 +3645,15 @@ Session.prototype = {
         }
         return this.hideErrorMessage();
       }
-      actionState = loadingState;
       loadingState = false;
-    } else {
-      actionState = false;
     }
 
     if (!text) {
       text = strings.process;
     }
 
-    if (this.screen === 'otp') {
-      this.body.removeClass('sub');
-      setOtpText(this.otpView, text);
-
-      this.otpView.updateScreen({
-        action: actionState,
-        loading: loadingState,
-      });
-    } else {
-      $('#fd-t').html(text);
-      showOverlay(
-        $('#error-message')[loadingState ? 'addClass' : 'removeClass'](
-          'loading'
-        )
-      );
-    }
+    $('#fd-t').html(text);
+    showOverlay($('#error-message').toggleClass('loading', loadingState));
   },
 
   commenceOTP: function(text, partial, reason) {
@@ -3700,10 +3682,19 @@ Session.prototype = {
       200
     );
 
-    if (text) {
-      if (partial) {
-        text = 'Looking for ' + text + ' associated with ' + getPhone();
-      }
+    // TODO: set values
+    var actionState;
+    var loadingState = true;
+
+    if (this.screen === 'otp') {
+      this.body.removeClass('sub');
+      setOtpText(this.otpView, text);
+
+      this.otpView.updateScreen({
+        action: actionState,
+        loading: loadingState,
+      });
+    } else {
       this.showLoadError(text);
     }
   },
