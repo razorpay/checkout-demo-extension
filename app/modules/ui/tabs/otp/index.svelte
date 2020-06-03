@@ -9,7 +9,7 @@
     loading,
     maxlength,
     otp,
-    skipText,
+    skipTextLabel,
     text,
     mode,
   } from 'checkoutstore/screens/otp';

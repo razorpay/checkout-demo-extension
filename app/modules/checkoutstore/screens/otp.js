@@ -8,6 +8,6 @@ export const allowSkip = writable(true);
 export const loading = writable(false);
 export const maxlength = writable(6);
 export const otp = writable('');
-export const skipText = writable('Skip Saved Cards');
+export const skipTextLabel = writable('skip_saved_cards');
 export const text = writable('');
 export const mode = writable('');
