@@ -5,6 +5,7 @@ import {
   isLoading,
   dictionary,
   t,
+  locale,
 } from 'svelte-i18n';
 
 import { get } from 'svelte/store';
@@ -66,6 +67,14 @@ export function init() {
     fallbackLocale: 'en',
     initialLocale: 'en', // TODO: select from navigator
   });
+}
+
+/**
+ * Returns the currently selected locale
+ * @returns {string}
+ */
+export function getCurrentLocale() {
+  return get(locale);
 }
 
 /**
