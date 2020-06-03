@@ -32,19 +32,24 @@ export const MULTI_TPV_UPI_TITLE = 'home.multi_tpv_upi_title';
 export const MULTI_TPV_UPI_SUBTITLE = 'home.multi_tpv_upi_subtitle';
 
 export const SUBSCRIPTIONS_CREDIT_ONLY_CALLOUT =
-  'subscriptions.credit_only_callout';
+  'callouts.subscriptions.credit_only_callout';
 export const SUBSCRIPTIONS_DEBIT_ONLY_CALLOUT =
-  'subscriptions.debit_only_callout';
+  'callouts.subscriptions.debit_only_callout';
 export const SUBSCRIPTIONS_CREDIT_DEBIT_CALLOUT =
-  'subscriptions.credit_debit_callout';
+  'callouts.subscriptions.credit_debit_callout';
 
-export const CARD_OFFER_CREDIT_ONLY_CALLOUT = 'card_offer.credit_only_callout';
-export const CARD_OFFER_DEBIT_ONLY_CALLOUT = 'card_offer.debit_only_callout';
+export const CARD_OFFER_CREDIT_ONLY_CALLOUT =
+  'callouts.card_offer.credit_only_callout';
+export const CARD_OFFER_DEBIT_ONLY_CALLOUT =
+  'callouts.card_offer.debit_only_callout';
 export const CARD_OFFER_CREDIT_DEBIT_CALLOUT =
-  'card_offer.credit_debit_callout';
+  'callouts.card_offer.credit_debit_callout';
 
-export const RECURRING_CREDIT_ONLY_CALLOUT = 'recurring.credit_only_callout';
-export const RECURRING_DEBIT_ONLY_CALLOUT = 'recurring.debit_only_callout';
-export const RECURRING_CREDIT_DEBIT_CALLOUT = 'recurring.credit_debit_callout';
+export const RECURRING_CREDIT_ONLY_CALLOUT =
+  'callouts.recurring.credit_only_callout';
+export const RECURRING_DEBIT_ONLY_CALLOUT =
+  'callouts.recurring.debit_only_callout';
+export const RECURRING_CREDIT_DEBIT_CALLOUT =
+  'callouts.recurring.credit_debit_callout';
 
 export const SECURED_BY_MESSAGE = 'home.secured_by_message';
