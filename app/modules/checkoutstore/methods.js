@@ -499,6 +499,9 @@ function getUsableMethods() {
 /**
  * Some methods might not be usable because they are hidden
  * from the homescreen
+ *
+ * TODO: Should consider method instruments
+ *
  * @param {string} method
  *
  * @returns {boolean}
