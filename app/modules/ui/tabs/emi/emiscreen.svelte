@@ -3,7 +3,8 @@
   import { createEventDispatcher, onMount } from 'svelte';
 
   //i18n
-  import { t } from 'svelte-i18n';
+  import { t, locale } from 'svelte-i18n';
+  import { formatTemplateWithLocale } from 'i18n';
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
 
   import {
@@ -14,6 +15,8 @@
     NAME_HELP,
     CALLOUT,
   } from 'ui/labels/bajaj-emi';
+
+  import { EDIT_PLAN_TEXT } from 'ui/labels/emi';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -84,7 +87,9 @@
       class="strip emi-plans-info-container emi-plans-trigger details-visible"
       on:click={() => dispatch('editplan')}>
       <div class="emi-plan-selected emi-icon-multiple-cards ">
-        <div class="emi-plans-text">{emiText}</div>
+        <div class="emi-plans-text">
+          {formatTemplateWithLocale(EDIT_PLAN_TEXT, emiText, $locale)}
+        </div>
         <div class="emi-plans-action theme-highlight">Edit</div>
       </div>
     </div>
