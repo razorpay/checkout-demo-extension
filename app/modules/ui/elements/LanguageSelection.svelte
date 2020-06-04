@@ -16,7 +16,7 @@
 <div class="elem select">
   <i class="select-arrow"></i>
   <select bind:value={$locale} class="input">
-    {#each $locales as locale}
+    {#each $locales as locale (locale)}
       <option value={locale}>{locale}</option>
     {/each}
   </select>

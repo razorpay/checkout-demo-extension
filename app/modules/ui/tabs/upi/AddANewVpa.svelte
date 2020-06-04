@@ -154,7 +154,7 @@
 
   <div slot="body">
     {#if selected}
-      <div transition:slide={{ duration: 200 }}>
+      <div id="user-new-vpa-container" transition:slide={{ duration: 200 }}>
         <!-- LABEL: Please enter a valid VPA of the form username@bank -->
         <!-- LABEL: Enter your UPI ID -->
         <Field

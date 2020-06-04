@@ -9,6 +9,7 @@
 
   // Store
   import { selectedPlanTextForSavedCard } from 'checkoutstore/emi';
+  import { isMethodUsable } from 'checkoutstore/methods';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -173,7 +174,7 @@
                 {$t(EDIT_PLAN_ACTION)}
               </div>
             </div>
-          {:else if tab !== 'emi'}
+          {:else if tab !== 'emi' && isMethodUsable('emi')}
             <div class="emi-plan-unselected emi-icon-multiple-cards">
               <!-- LABEL: EMI Available -->
               <div class="emi-plans-text">{$t(AVAILABLE_TEXT)}</div>

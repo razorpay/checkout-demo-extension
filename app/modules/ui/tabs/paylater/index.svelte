@@ -57,7 +57,7 @@
   <!-- LABEL: Select an Option -->
   <h3>{$t(SELECT_OPTION_TITLE)}</h3>
   <div class="options">
-    {#each filteredProviders as provider}
+    {#each filteredProviders as provider (provider.title)}
       <NextOption
         attributes={{ 'data-paylater': provider.data.code }}
         tabindex={0}

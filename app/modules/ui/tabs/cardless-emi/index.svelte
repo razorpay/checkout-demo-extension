@@ -6,7 +6,7 @@
   import { createProvider } from 'common/cardlessemi';
   import {
     getCardlessEMIProviders,
-    isMethodEnabled,
+    isMethodUsable,
     isDebitEMIEnabled,
   } from 'checkoutstore/methods';
 
@@ -32,7 +32,7 @@
       providers.push(createProvider(providerObj.code));
     });
 
-    if (isMethodEnabled('emi')) {
+    if (isMethodUsable('emi')) {
       providers.unshift(createProvider('cards'));
     }
 
@@ -85,7 +85,7 @@
   <!-- TITLE: Select an option -->
   <h3>{$t(SELECT_OPTION_TITLE)}</h3>
   <div class="options">
-    {#each filteredProviders as provider}
+    {#each filteredProviders as provider (provider.title)}
       <NextOption {...provider} on:select>
         {getCardlessEmiProviderName(getOverriddenProviderCode(provider.data.code), $locale)}
       </NextOption>

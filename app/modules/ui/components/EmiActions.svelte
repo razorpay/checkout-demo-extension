@@ -4,7 +4,7 @@
 
   // Store
   import { selectedPlanTextForNewCard } from 'checkoutstore/emi';
-  import { isMethodEnabled } from 'checkoutstore/methods';
+  import { isMethodUsable } from 'checkoutstore/methods';
   import { getEMIBanksText } from 'checkoutframe/paymentmethods';
 
   // i18n
@@ -46,7 +46,7 @@
         </span>
         <!-- LABEL: EMI unavailable -->
         <div class="emi-plans-text">{$t(UNAVAILABLE_BTN)}</div>
-        {#if isMethodEnabled('card')}
+        {#if isMethodUsable('card')}
           <!-- LABEL: Pay entire amount -->
           <div class="emi-plans-action theme-highlight">
             {$t(PAY_ENTIRE_AMOUNT_ACTION)}
@@ -66,7 +66,7 @@
         </div>
       </div>
     {/if}
-    {#if emiCtaView === 'available'}
+    {#if emiCtaView === 'available' && isMethodUsable('emi')}
       <div class="emi-plan-unselected emi-icon-multiple-cards">
         <!-- LABEL: EMI Available -->
         <div class="emi-plans-text">{$t(AVAILABLE_TEXT)}</div>
@@ -76,7 +76,7 @@
         </div>
       </div>
     {/if}
-    {#if emiCtaView === 'pay-without-emi'}
+    {#if emiCtaView === 'pay-without-emi' && isMethodUsable('card')}
       <div class="emi-pay-without emi-icon-single-card">
         <div class="emi-plans-text no-action">
           <!-- LABEL: Pay entire amount -->

@@ -72,7 +72,7 @@
 </style>
 
 <div role="list">
-  {#each offers as offer}
+  {#each offers as offer (offer.id)}
     <div
       role="listitem"
       class="offer-item"

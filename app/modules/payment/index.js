@@ -890,13 +890,14 @@ razorpayProto.topupWallet = function() {
     data: {
       '_[source]': 'checkoutjs',
     },
-    callback: function(response) {
+    callback: response => {
       var request = response.request;
       if (isRedirect && !response.error && request) {
         _Doc.redirect({
           url: request.url,
           content: request.content,
           method: request.method || 'post',
+          target: this.get('target'),
         });
       } else {
         processCoproto.call(payment, response);

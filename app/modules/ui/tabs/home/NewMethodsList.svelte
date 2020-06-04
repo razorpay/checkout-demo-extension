@@ -85,7 +85,8 @@
           <Instrument
             {instrument}
             on:click={() => trackInstrumentSelection(instrument, index)}
-            on:submit />
+            on:submit
+            on:selectMethod />
         {/each}
       </div>
     </div>

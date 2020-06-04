@@ -94,7 +94,7 @@ function sanitizeImage(options) {
 }
 
 function makeCheckoutUrl(rzp) {
-  const CANARY_PERCENTAGE = 0.25;
+  const CANARY_PERCENTAGE = 0.1;
   var url = RazorpayConfig.frame;
 
   const useCanary = _.random() < CANARY_PERCENTAGE;
@@ -404,6 +404,19 @@ CheckoutFrame.prototype = {
   onredirect: function(data) {
     Track.flush();
 
+    /**
+     * redirect top window if no redirection target specified by merchant
+     * else _Doc.redirect will result into an error due to confusion over which
+     * frame to redirect if checkout.js resides within another iframe
+     *
+     * Also, the reason we can't change default value of "target" option itself
+     * to _top is that checkout-frame may not have permission to redirect top
+     * frame due to being sandboxed based on CSP header
+     * so it gotta be checkout.js which triggers the redirect
+     */
+    if (!data.target) {
+      data.target = this.rzp.get('target') || '_top';
+    }
     _Doc.redirect(data);
   },
 

@@ -6,6 +6,7 @@ import {
   getWallets,
   getCardNetworks,
   getEMIBanks,
+  isMethodUsable,
   isDebitEMIEnabled,
 } from 'checkoutstore/methods';
 
@@ -70,7 +71,7 @@ const DESCRIPTIONS = {
      * Cardless EMI: EMI via ZestMoney & More
      */
 
-    const cardEmi = isMethodEnabled('emi');
+    const cardEmi = isMethodUsable('emi');
     let providerNames = [];
     _Obj.loop(getCardlessEMIProviders(), providerObj => {
       let providerCode = providerObj.code;

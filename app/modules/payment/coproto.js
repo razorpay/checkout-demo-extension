@@ -308,6 +308,7 @@ var responseTypes = {
 
   // prettier-ignore
   'return': function (request) {
+    request.target = this.r.get('target');
     _Doc.redirect(request);
   },
 

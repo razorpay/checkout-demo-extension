@@ -83,7 +83,7 @@
     <b>{$t(BREAKUP_TITLE)}</b>
     <br />
     <div class="fees-container">
-      {#each entries(feeBreakup) as [type, amount]}
+      {#each entries(feeBreakup) as [type, amount] (type)}
         {#if contains(allowedKeys, type)}
           <div class="fee">
             <div class="fee-title">

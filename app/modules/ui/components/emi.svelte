@@ -87,7 +87,7 @@
     </div>
     <i class="i select-arrow">&#xe601;</i>
     <select id="emi-bank-select" bind:value={selected}>
-      {#each banksList as bank}
+      {#each banksList as bank (bank.code)}
         <!-- TODO: split into card issuer names instead of bank names -->
         <option value={bank.code}>
           {getLongBankName(bank.code, $locale, bank.name)}
@@ -114,7 +114,7 @@
     </div>
   </strong>
   <div />
-  {#each plans as [duration, plan]}
+  {#each plans as [duration, plan] (duration)}
     <div class="row emi-option">
       <div class="col">
         <!-- LABEL: {duration} Months -->

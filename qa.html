@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <!-- Lives at https://betacdn.razorpay.com/qa/index.html -->
 <html>
   <head>
@@ -16,7 +17,17 @@
       };
 
       // Keys from config that do not need to be passed to Checkout
-      var deleteFromConfig = ['env'];
+      var deleteFromConfig = ['env', 'api', 'frame'];
+
+      var queryParams = location.search
+        .slice(1)
+        .split(/=|&/)
+        .reduce(function(map, param, index, array) {
+          if (index % 2) {
+            map[array[index - 1]] = param;
+          }
+          return map;
+        }, {});
 
       // Env <-> Config map
       var configMap = {
@@ -42,17 +53,42 @@
             },
           },
         },
+
+        func: {
+          domain: 'checkout.func.razorpay.in',
+          Razorpay: {
+            config: {
+              frame: 'https://api-web.func.razorpay.in/v1/checkout/public',
+            },
+          },
+        },
+
+        stage: {
+          domain: 'checkout.stage.razorpay.in',
+          Razorpay: {
+            config: {
+              frame: 'https://beta-api.stage.razorpay.in/v1/checkout/public',
+            },
+          },
+        },
       };
 
-      var queryParams = location.search
-        .slice(1)
-        .split(/=|&/)
-        .reduce(function(map, param, index, array) {
-          if (index % 2) {
-            map[array[index - 1]] = param;
+      [1, 2, 3, 4, 5, 6].forEach(function(i) {
+        i += 1;
+        configMap['func' + i] = JSON.parse(JSON.stringify(configMap.func));
+        configMap['func' + i].Razorpay.config.frame =
+          'https://api-' + i + '.func.razorpay.in/v1/checkout/public';
+      });
+
+      if (queryParams.frame) {
+        for (var environment in configMap) {
+          try {
+            configMap[environment].Razorpay.config.frame = queryParams.frame;
+          } catch (err) {
+            console.log(err);
           }
-          return map;
-        }, {});
+        }
+      }
 
       if (queryParams.api) {
         var Razorpay = {
@@ -75,7 +111,15 @@
       }
 
       // Augment defaultParams with queryParams
-      var params = Object.assign({}, defaultParams, queryParams);
+      for (var i in queryParams) {
+        defaultParams[i] = queryParams[i];
+      }
+
+      var params = defaultParams;
+
+      if (params.subscription_id || params.order_id || params.invoice_id) {
+        delete params.key;
+      }
 
       // If env does not have a config, default to prod
       if (!configMap[params.env]) {

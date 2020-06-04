@@ -17,7 +17,7 @@ const config = {
     min_amount: 90000,
   },
   flexmoney: {
-    name: 'InstaCred Cardless EMI',
+    name: 'Cardless EMI by InstaCred',
     headless: false,
   },
 };

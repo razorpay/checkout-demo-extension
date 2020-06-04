@@ -26,6 +26,9 @@ import { extendConfig } from 'common/cardlessemi';
 import { mobileQuery } from 'common/useragent';
 import { getUPIIntentApps } from 'checkoutstore/native';
 
+import { get as storeGetter } from 'svelte/store';
+import { sequence as SequenceStore } from 'checkoutstore/screens/home';
+
 const DEBIT_EMI_BANKS = ['HDFC_DC'];
 
 const ALL_METHODS = {
@@ -378,6 +381,12 @@ export function getEMIBankPlans(code, cardType = 'credit') {
   }
 }
 
+export function getEligiblePlansBasedOnMinAmount(plans) {
+  const amount = getAmount();
+  const eligiblePlans = _Arr.filter(plans, plan => plan.min_amount <= amount);
+  return eligiblePlans;
+}
+
 // @TODO modifies bajaj cardless emi min_amount
 export function getEMIBanks() {
   const emiOptions = getMerchantMethods().emi_options;
@@ -476,4 +485,24 @@ function addExternalWallets(enabledWallets) {
         }
       }
     });
+}
+
+/**
+ * Returns the usable methods
+ *
+ * @returns {Array<string>}
+ */
+function getUsableMethods() {
+  return storeGetter(SequenceStore);
+}
+
+/**
+ * Some methods might not be usable because they are hidden
+ * from the homescreen
+ * @param {string} method
+ *
+ * @returns {boolean}
+ */
+export function isMethodUsable(method) {
+  return _Arr.contains(getUsableMethods(), method);
 }

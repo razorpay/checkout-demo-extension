@@ -12,7 +12,9 @@ import { createMethodBlock } from './methods';
  *        @prop {Array<string>} methods Hidden methods
  *  @prop {Array<string>} methods Available methods for the merchant
  *
- * @returns {Array<Block>}
+ * @returns {Object}
+ *  @prop {Array<Block>} blocks
+ *  @prop {Array<string>} sequence Generated sequence
  */
 export function getSequencedBlocks(params) {
   const { translated, methods } = params;
@@ -41,6 +43,9 @@ export function getSequencedBlocks(params) {
 
   // Filter the sequence for duplicates
   sequence = _Arr.removeDuplicates(sequence);
+
+  // Copy the sequence
+  const exhaustiveSequence = _Obj.clone(sequence);
 
   /**
    * Cardless EMI and EMI are the same payment option in the UI.
@@ -86,5 +91,8 @@ export function getSequencedBlocks(params) {
     |> _Arr.map(code => _Arr.find(allBlocks, block => block.code === code))
     |> _Arr.filter(Boolean);
 
-  return sequencedBlocks;
+  return {
+    blocks: sequencedBlocks,
+    sequence: exhaustiveSequence,
+  };
 }

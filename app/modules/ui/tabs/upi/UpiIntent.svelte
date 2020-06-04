@@ -230,7 +230,7 @@
       <div slot="subtitle">{$t(UPI_REDIRECT_TO_APP)}</div>
     </ListHeader>
 
-    {#each showableApps as app, i}
+    {#each showableApps as app, i (app.package_name)}
       <DeprecatedRadioOption
         data={app}
         icon={app.app_icon}

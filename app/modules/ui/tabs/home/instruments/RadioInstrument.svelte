@@ -117,7 +117,7 @@
     } else {
       title = getInstrumentTitle(
         'upi',
-        getVpaFromInstrument(instrument),
+        getVpaFromInstrument(individualInstrument),
         locale
       );
       icon = '&#xe70e;';
