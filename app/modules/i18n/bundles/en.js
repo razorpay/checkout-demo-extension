@@ -431,6 +431,22 @@ export default {
     MAES: 'Maestro',
     JCB: 'JCB',
   },
+  emi_issuers: {
+    KKBK: 'Kotak Mahindra Bank',
+    HDFC_DC: 'HDFC Debit Cards',
+    HDFC: 'HDFC Credit Cards',
+    UTIB: 'Axis Bank',
+    INDB: 'Indusind Bank',
+    RATN: 'RBL Bank',
+    ICIC: 'ICICI Bank',
+    SCBL: 'Standard Chartered Bank',
+    YESB: 'Yes Bank',
+    AMEX: 'American Express',
+    SBIN: 'State Bank of India',
+    BARB: 'Bank of Baroda',
+    BAJAJ: 'Bajaj Finserv',
+    CITI: 'CITI Bank',
+  },
   paylater: {
     select_option_title: 'Select an option',
     providers: {

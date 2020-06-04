@@ -194,3 +194,15 @@ export function getTabTitle(tab, locale) {
 export function getOtpScreenTitle(view, data, locale) {
   return formatTemplateWithLocale(`otp.title.${view}`, data, locale, view);
 }
+
+/**
+ * Returns the name for a given EMI issuer
+ * @param {string} issuer
+ * @param {string} locale
+ * @param {string} [defaultValue]
+ *
+ * @returns {string}
+ */
+export function getEmiIssuerName(issuer, locale, defaultValue) {
+  return formatMessageWithLocale(`emi_issuers.${issuer}`, locale, defaultValue);
+}
