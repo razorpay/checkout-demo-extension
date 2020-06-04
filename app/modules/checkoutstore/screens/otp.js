@@ -9,5 +9,6 @@ export const loading = writable(false);
 export const maxlength = writable(6);
 export const otp = writable('');
 export const skipTextLabel = writable('skip_saved_cards');
-export const text = writable('');
+export const templateData = writable({});
+export const textView = writable('');
 export const mode = writable('');

@@ -13,9 +13,10 @@ otpView.prototype = {
     });
   },
 
-  setText(text) {
+  setTextView(textView, templateData = {}) {
     this.updateScreen({
-      text,
+      textView,
+      templateData,
     });
   },
 

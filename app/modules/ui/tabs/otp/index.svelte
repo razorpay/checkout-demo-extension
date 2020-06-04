@@ -10,7 +10,8 @@
     maxlength,
     otp,
     skipTextLabel,
-    text,
+    textView,
+    templateData,
     mode,
   } from 'checkoutstore/screens/otp';
 
@@ -133,11 +134,9 @@
       <div id="otp-prompt">
         {#if $loading}
           <AsyncLoading>
-            {@html $text}
+            {getOtpScreenTitle($textView, $templateData, $locale)}
           </AsyncLoading>
-        {:else}
-          {@html $text}
-        {/if}
+        {:else}{getOtpScreenTitle($textView, $templateData, $locale)}{/if}
       </div>
       {#if $addFunds}
         <div id="add-funds" class="add-funds">

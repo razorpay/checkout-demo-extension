@@ -54,7 +54,6 @@ var DEMO_MERCHANT_KEY = 'rzp_live_ILgsfZCZoFIKMb';
 var shownClass = 'drishy';
 
 var strings = {
-  otpsend: 'Sending OTP to ',
   process: 'Your payment is being processed',
   gpay_omnichannel: 'Verifying mobile number with Google Pay..',
   redirect: 'Redirecting to Bank page',
@@ -599,25 +598,17 @@ function setEmiDurationForSavedCard(duration) {
   EmiStore.setEmiDurationForSavedCard(duration);
 }
 
-function setOtpText(view, text) {
-  view.setText(text);
-}
-
 function elfShowOTP(otp, sender, bank) {
   window.handleOTP(otp);
 }
 
-function askOTP(view, text, shouldLimitResend, screenProps) {
-  if (!screenProps) {
-    screenProps = {};
-  }
-
-  var origText = text; // ಠ_ಠ
+function askOTP(view, textView, shouldLimitResend, templateData) {
+  var origText = textView; // ಠ_ಠ
   var qpmap = _.getQueryParams();
   var thisSession = SessionManager.getSession();
 
   // Track if OTP was invalid
-  if (origText === discreet.wrongOtpMsg) {
+  if (textView === 'incorrect_otp_retry') {
     Analytics.track('otp:invalid', {
       data: {
         wallet: thisSession.tab === 'wallet',
@@ -635,32 +626,25 @@ function askOTP(view, text, shouldLimitResend, screenProps) {
       };
     }
   }
-  if (isNonNullObject(text)) {
-    text = text.error && text.error.description;
+  if (isNonNullObject(textView)) {
+    textView = textView.error && textView.error.description;
   }
 
-  view.updateScreen(
-    _Obj.extend(
-      {
-        loading: false,
-        action: false,
-        otp: '',
-        allowSkip: !Store.isRecurring(),
-        allowResend: shouldLimitResend
-          ? OtpService.canSendOtp('razorpay')
-          : true,
-      },
-      screenProps
-    )
-  );
+  view.updateScreen({
+    loading: false,
+    action: false,
+    otp: '',
+    allowSkip: !Store.isRecurring(),
+    allowResend: shouldLimitResend ? OtpService.canSendOtp('razorpay') : true,
+  });
 
   $('#body').addClass('sub');
 
-  if (!text) {
+  if (!textView) {
     if (thisSession.tab === 'card' || thisSession.tab === 'emi') {
       if (thisSession.headless) {
         Analytics.track('native_otp:otp:ask');
-        text = 'Enter OTP to complete the payment';
+        textView = 'otp_sent_no_phone';
         if (isNonNullObject(origText)) {
           if (origText.metadata) {
             var metadata = origText.metadata;
@@ -732,23 +716,18 @@ function askOTP(view, text, shouldLimitResend, screenProps) {
           }
         }
       } else {
-        text = 'Enter OTP sent on ' + getPhone() + '<br>to ';
         if (thisSession.payload) {
-          text += 'save your card';
+          textView = 'otp_sent_save_card';
         } else {
-          text += 'access Saved Cards';
+          textView = 'otp_sent_access_card';
         }
       }
     } else {
-      text = 'An OTP has been sent on<br>' + getPhone();
+      textView = 'otp_sent_generic';
     }
   }
 
-  setOtpText(view, text);
-}
-
-function debounceAskOTP(view, msg, shouldLimitResend, screenProps) {
-  debounce(askOTP, 750)(view, msg, shouldLimitResend, screenProps);
+  view.setTextView(textView, templateData);
 }
 
 // this === Session
@@ -1304,9 +1283,6 @@ Session.prototype = {
     if (MethodStore.isCardOrEMIEnabled()) {
       this.svelteCardTab = new discreet.CardTab({
         target: gel('form-fields'),
-        props: {
-          askOTP: askOTP,
-        },
       });
     }
   },
@@ -1709,29 +1685,28 @@ Session.prototype = {
     var topbarImages = CardlessEmi.getImageUrl(providerCode);
     this.topBar.setTitleOverride('otp', 'image', topbarImages);
 
-    this.commenceOTP(
-      cardlessEmiProviderObj.name + ' account',
-      true,
-      'cardless_emi_enter'
-    );
+    var locale = I18n.getCurrentLocale();
+    this.commenceOTP('cardlessemi_sending', 'cardless_emi_enter', {
+      provider: I18n.getCardlessEmiProviderName(providerCode, locale),
+    });
 
     if (this.screen !== 'otp' && this.tab !== 'cardless_emi') {
       return;
     }
 
     var callback = function() {
-      var otpMessage =
-        'Enter the OTP sent on ' +
-        getPhone() +
-        '<br>' +
-        ' to get EMI plans for' +
-        cardlessEmiProviderObj.name;
+      var otpMessageView = 'cardlessemi_plans';
 
       if (incorrectOtp) {
-        otpMessage = discreet.wrongOtpMsg;
+        otpMessageView = 'incorrect_otp_retry';
       }
 
-      debounceAskOTP(self.otpView, otpMessage, true, {
+      var locale = I18n.getCurrentLocale();
+      askOTP(self.otpView, otpMessageView, true, {
+        phone: getPhone(),
+        provider: I18n.getCardlessEmiProviderName(providerCode, locale),
+      });
+      self.otpView.updateScreen({
         allowSkip: false,
       });
     };
@@ -1826,16 +1801,15 @@ Session.prototype = {
       self.otpView.setText(discreet.wrongOtpMsg);
       return;
     } else if (action === 'resend') {
-      this.commenceOTP('Resending OTP...', false, 'paylater_resend');
+      this.commenceOTP('resending_otp', 'paylater_resend');
     } else if (action === 'verify') {
-      this.commenceOTP('Verifying OTP...');
+      this.commenceOTP('verifying_otp');
       return;
     } else {
-      this.commenceOTP(
-        payLaterProviderObj.name + ' account',
-        true,
-        'paylater_enter'
-      );
+      var locale = I18n.getCurrentLocale();
+      this.commenceOTP('paylater_sending', 'paylater_enter', {
+        provider: I18n.getPaylaterProviderName(providerCode, locale),
+      });
     }
 
     this.checkCustomerStatus(params, function(error) {
@@ -1847,18 +1821,17 @@ Session.prototype = {
 
       PayLaterStore.userRegistered = true;
 
-      var otpMessage =
-        'Enter the OTP sent on ' +
-        getPhone() +
-        '<br>' +
-        ' to continue with ' +
-        payLaterProviderObj.name;
+      var otpMessageView = 'paylater_continue';
 
       if (action === 'resend') {
-        otpMessage = 'OTP has been resent successfully.';
+        otpMessageView = 'otp_resent_successful';
       }
 
-      askOTP(self.otpView, otpMessage, true);
+      var locale = I18n.getCurrentLocale();
+      askOTP(self.otpView, otpMessageView, true, {
+        phone: getPhone(),
+        provider: I18n.getPaylaterProviderName(providerCode, locale),
+      });
       self.otpView.updateScreen({
         allowSkip: false,
       });
@@ -2182,7 +2155,7 @@ Session.prototype = {
     });
 
     if (this.headless) {
-      this.showLoadError('Resending OTP');
+      this.commenceOTP('resending_otp');
       this.hideTimer();
 
       if (this.headlessMetadata) {
@@ -2194,7 +2167,7 @@ Session.prototype = {
       return this.r.resendOTP(this.r.emitter('payment.otp.required'));
     }
 
-    this.showLoadError(strings.otpsend + getPhone());
+    this.commenceOTP('otp_sending_generic', undefined, { phone: getPhone() });
     if (this.tab === 'cardless_emi') {
       this.fetchCardlessEmiPlans({
         resend: true,
@@ -2206,7 +2179,7 @@ Session.prototype = {
     } else {
       var self = this;
       this.getCurrentCustomer().createOTP(function(message) {
-        debounceAskOTP(self.otpView, message, true);
+        askOTP(self.otpView, message, true, { phone: getPhone() });
         self.updateCustomerInStore();
       });
     }
@@ -2240,7 +2213,7 @@ Session.prototype = {
         this.setScreen('card');
       }
       if (!this.preferences.fee_bearer) {
-        this.showLoadError();
+        this.commenceOTP('payment_processing');
       }
     } else {
       this.showCardTab();
@@ -2255,7 +2228,7 @@ Session.prototype = {
       },
     });
 
-    setOtpText(this.otpView, 'Loading...');
+    this.otpView.setTextView('loading');
     this.otpView.updateScreen({
       action: false,
       loading: true,
@@ -3108,7 +3081,9 @@ Session.prototype = {
      * do not commence OTP again.
      */
     if (!customer.logged && !this.wants_skip && !this.screen) {
-      self.commenceOTP('saved cards', true, 'saved_cards_access');
+      self.commenceOTP('saved_cards_sending', 'saved_cards_access', {
+        phone: getPhone(),
+      });
       var smsHash = this.get('send_sms_hash') && this.sms_hash;
       var params = {};
       if (smsHash) {
@@ -3124,17 +3099,13 @@ Session.prototype = {
         if (Store.isRecurring() && !customer.saved && !customer.logged) {
           self.getCurrentCustomer().createOTP(function() {
             Analytics.track('saved_cards:access:otp:ask');
-            askOTP(
-              self.otpView,
-              'Enter OTP sent on ' +
-                getPhone() +
-                '<br>to save your card for future payments',
-              true
-            );
+            askOTP(self.otpView, 'otp_sent_save_card_recurring', true, {
+              phone: getPhone(),
+            });
             self.updateCustomerInStore();
           });
         } else if (customer.saved && !customer.logged) {
-          askOTP(self.otpView, undefined, true);
+          askOTP(self.otpView, undefined, true, { phone: getPhone() });
         } else {
           self.setScreen('card');
         }
@@ -3656,7 +3627,7 @@ Session.prototype = {
     showOverlay($('#error-message').toggleClass('loading', loadingState));
   },
 
-  commenceOTP: function(text, partial, reason) {
+  commenceOTP: function(textView, reason, templateData) {
     var params = {
       extraProps: {},
     };
@@ -3688,13 +3659,14 @@ Session.prototype = {
 
     if (this.screen === 'otp') {
       this.body.removeClass('sub');
-      setOtpText(this.otpView, text);
+      this.otpView.setTextView(textView, templateData);
 
       this.otpView.updateScreen({
         action: actionState,
         loading: loadingState,
       });
     } else {
+      var text = ''; // TODO: get tab title from i18n
       this.showLoadError(text);
     }
   },
@@ -3810,7 +3782,7 @@ Session.prototype = {
       },
     });
 
-    this.showLoadError('Verifying OTP');
+    this.commenceOTP('verifying_otp');
     var otp = storeGetter(discreet.OTPScreenStore.otp);
 
     if (this.tab === 'wallet' || this.headless) {
@@ -3941,7 +3913,7 @@ Session.prototype = {
           }
         }
       };
-      this.commenceOTP('Verifying OTP...');
+      this.commenceOTP('verifying');
     }
     this.getCurrentCustomer().submitOTP(
       submitPayload,
@@ -4557,8 +4529,10 @@ Session.prototype = {
           skipTextLabel: 'skip_saving_card',
         });
         Analytics.track('saved_cards:save:otp:ask');
-        this.commenceOTP(strings.otpsend, false, 'saved_cards_save');
-        debounceAskOTP(this.otpView, undefined, true);
+        this.commenceOTP('otp_sending_generic', 'saved_cards_save', {
+          phone: getPhone(),
+        });
+        askOTP(this.otpView, undefined, true, { phone: getPhone() });
         this.getCurrentCustomer().createOTP(function() {
           session.updateCustomerInStore();
         });
@@ -4710,9 +4684,16 @@ Session.prototype = {
         allowSkip: false,
       });
       this.topBar.setTitleOverride('otp', 'image', walletObj.logo);
-      this.commenceOTP(wallet + ' account', true, 'wallet_enter');
+      var locale = I18n.getCurrentLocale();
+      this.commenceOTP('wallet_sending', 'wallet_enter', {
+        wallet: I18n.getWalletName(walletObj.code, locale),
+      });
     } else if (!this.isPayout) {
-      this.showLoadError();
+      if (this.screen === 'otp') {
+        this.commenceOTP('payment_processing');
+      } else {
+        this.showLoadError();
+      }
     } else {
       this.showLoadError('Processing...');
     }
@@ -4836,9 +4817,10 @@ Session.prototype = {
     }
 
     if (this.powerwallet) {
-      this.showLoadError(strings.otpsend + getPhone());
+      this.commenceOTP('otp_sending_generic', undefined, { phone: getPhone() });
       this.r.on('payment.otp.required', function(message) {
-        debounceAskOTP(that.otpView, message, false, {
+        askOTP(that.otpView, message, false, { phone: getPhone() });
+        that.otpView.updateScreen({
           allowSkip: false,
         });
       });
@@ -4868,7 +4850,7 @@ Session.prototype = {
             loading: false,
             addFunds: true,
           });
-          setOtpText(this.otpView, insufficient_text);
+          this.otpView.setTextView('wallet_insufficient_balance');
         }, this)
       );
     } else if (data.method === 'upi' && !this.multiTpv) {
