@@ -3944,6 +3944,7 @@ Session.prototype = {
 
     this.isResumedPayment = false;
     this.payload = null;
+    this.powerwallet = false;
 
     Analytics.removeMeta('doneByInstrument');
     Analytics.removeMeta('instrumentMeta');
