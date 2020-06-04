@@ -30,6 +30,10 @@ export const STATE_HELP = 'home.state_help';
 export const MULTI_TPV_TITLE = 'home.multi_tpv_title';
 export const MULTI_TPV_UPI_TITLE = 'home.multi_tpv_upi_title';
 export const MULTI_TPV_UPI_SUBTITLE = 'home.multi_tpv_upi_subtitle';
+export const BANK_DETAILS_HEADING = 'home.bank_details_heading';
+export const ACCOUNT_NUMER_LABEL = 'home.account_numer_label';
+export const CUSTOMER_NAME_LABEL = 'home.customer_name_label';
+export const IFSC_LABEL = 'home.ifsc_label';
 
 export const SUBSCRIPTIONS_CREDIT_ONLY_CALLOUT =
   'callouts.subscriptions.credit_only_callout';
