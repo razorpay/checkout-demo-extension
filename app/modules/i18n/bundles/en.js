@@ -37,8 +37,6 @@ export default {
       'Click continue to complete the payment on the bank page',
     bank_verification_action_continue: 'Continue',
 
-    amex_unsupported_error: 'AMEX cards are not supported',
-
     saved_card_label: 'Card ending with <b>{last4}<b>',
 
     recurring_callout:
@@ -140,7 +138,6 @@ export default {
   home: {
     preferred_block_title: 'Preferred Payment Methods',
     single_block_title: 'Pay via {method}',
-    config_block_default_title: 'Available Payment Methods',
 
     contact_label_required: 'Phone with Country Code',
     contact_label_optional: 'Phone with Country Code (Optional)',
@@ -173,10 +170,6 @@ export default {
     multi_tpv_title: 'Pay Using',
     multi_tpv_upi_title: 'UPI',
     multi_tpv_upi_subtitle: '{bankName} Account {accountNumber}',
-    bank_details_heading: 'Bank Details',
-    account_numer_label: 'Account Number',
-    customer_name_label: 'Customer Name',
-    ifsc_label: 'IFSC Code',
 
     secured_by_message: 'This payment is secured by Razorpay.',
   },
@@ -355,49 +348,6 @@ export default {
       paylater: 'Pay later using {providers}',
     },
   },
-  otp: {
-    add_funds_label: 'Add Funds',
-    try_different_label: 'Try different payment method',
-    retry_label: 'Retry',
-    resend_label: 'Resend OTP',
-    back_label: 'Go Back',
-    otp_field_help: 'Please enter the OTP',
-    skip_text: {
-      complete_bank_page: "Complete on bank's page",
-      skip_saved_cards: 'Skip Saved Cards',
-      skip_saving_card: 'Skip saving card',
-      resend_otp: 'Resend OTP',
-    },
-    title: {
-      loading: 'Loading...',
-      insufficient_wallet_balance: 'Insufficient balance in your wallet',
-      native_otp_sent: 'Enter OTP to complete the payment',
-      resending_otp: 'Resending OTP...',
-      verifying_otp: 'Verifying OTP...',
-      saved_cards_sending: 'Looking for saved cards associated with {phone}',
-      wallet_sending: 'Looking for {wallet} account associated with {phone}',
-      paylater_sending:
-        'Looking for {provider} account associated with {phone}',
-      cardlessemi_sending:
-        'Looking for {provider} account associated with {phone}',
-      cardlessemi_plans:
-        'Enter the OTP sent on {phone} to get EMI plans for {provider}',
-      otp_sent_save_card: 'Enter OTP sent to {phone} to save your card',
-      otp_sent_save_card_recurring:
-        'Enter OTP sent to {phone} to save your card for future payments',
-      otp_sent_access_card: 'Enter OTP sent to {phone} to access Saved Cards',
-      otp_sending_generic: 'Sending OTP to {phone}',
-      otp_sent_generic: 'An OTP has been sent on {phone}',
-      otp_sent_no_phone: 'Enter OTP to complete payment',
-      otp_resent_generic: 'OTP Resent',
-      otp_resent_successful: 'OTP has been resent successfully.',
-      payment_processing: 'Your payment is being processed',
-      wallet_insufficient_balance: 'Insufficient balance in your wallet',
-      incorrect_otp_retry: 'Entered OTP was incorrect. Re-enter to proceed.',
-      paylater_continue:
-        'Enter the OTP sent on {phone} to continue with {provider}',
-    },
-  },
   tab_titles: {
     card: 'Card',
     irctc_card: 'Debit/Credit Card',
@@ -447,7 +397,7 @@ export default {
       bajaj: 'Bajaj Finserv',
       earlysalary: 'EarlySalary',
       zestmoney: 'ZestMoney',
-      flexmoney: 'Cardless EMI by InstaCred',
+      flexmoney: 'InstaCred Cardless EMI',
     },
   },
   wallets: {
@@ -601,7 +551,7 @@ export default {
     omni_enter_number: 'Enter your phone number',
     omni_error:
       'Please ensure the same number is linked to the Google Pay account.',
-    omni_verifying_phone: 'Verifying mobile number with Google Pay...',
+    omni_verifying_phone: 'Verifying mobile number with Google Pay..',
     verifying_vpa_info: 'Verifying your VPA',
     cancel_reason_title: 'Please give us a reason before we cancel the payment',
     cancel_reason_collect_not_received: 'Did not receive collect request',
@@ -674,35 +624,21 @@ export default {
     pay_single_method: 'Pay using {method}',
     upload_nach_form: 'Upload NACH Form',
   },
-  dcc: {
-    search_title: 'Select Currency to Pay',
-    search_placeholder: 'Search for currency or code',
+  misc: {
+    logout_action: 'Log out',
+    logout_all_devices_action: 'Log out from all devices',
   },
   popup: {
     paying: 'PAYING',
-    secured_by: 'Secured by',
-    trying_to_load: 'Still trying to load...',
-    want_to_cancel: 'Do you want to cancel the ongoing payment?',
-    processing: 'Processing, Please Wait...',
+    secured_by: 'Secured by',
+    trying_to_load: 'Still trying to load...',
+    want_to_cancel: 'Do you want to cancel the ongoing payment?',
+    processing: 'Processing, Please Wait...',
     wait_while_we_redirect:
-      'Please wait while we redirect you to your {method} page.',
+      'Please wait while we redirect you to your {method} page.',
     redirecting: 'Redirecting...',
-    loading_method_page: 'Loading {method} page…',
+    loading_method_page: 'Loading {method} page…',
     trying_bank_page_msg:
-      'The bank page is taking time to load. You can either wait or change the payment method.',
-  },
-  misc: {
-    loading: 'Loading',
-    processing: 'Processing...',
-    payment_processing: 'Your payment is being processed',
-    payment_incomplete: 'Payment did not complete.',
-    payment_timeout: 'Payment did not complete on time',
-    redirecting_bank: 'Redirecting to Bank page',
-    acs_load_delay: 'Seems like your bank page is taking time to load.',
-    payment_waiting_on_bank: 'Waiting for payment to complete on bank page',
-    frequently_used_config_title: 'Frequently used methods',
-    search_no_results: 'No results for "{query}"',
-    logout_action: 'Log out',
-    logout_all_devices_action: 'Log out from all devices',
+      'The bank page is taking time to load. You can either wait or change the payment method.',
   },
 };
