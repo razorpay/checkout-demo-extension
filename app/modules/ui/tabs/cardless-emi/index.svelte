@@ -85,7 +85,7 @@
   <!-- TITLE: Select an option -->
   <h3>{$t(SELECT_OPTION_TITLE)}</h3>
   <div class="options">
-    {#each filteredProviders as provider (provider.title)}
+    {#each filteredProviders as provider (provider.data.code)}
       <NextOption {...provider} on:select>
         {getCardlessEmiProviderName(getOverriddenProviderCode(provider.data.code), $locale)}
       </NextOption>
