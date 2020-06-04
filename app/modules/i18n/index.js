@@ -259,5 +259,5 @@ export function getTabTitle(tab, locale) {
  * @returns {string}
  */
 export function getOtpScreenTitle(view, data, locale) {
-  return formatTemplateWithLocale(`otp.title.${view}`, data, locale);
+  return formatTemplateWithLocale(`otp.title.${view}`, data, locale, view);
 }
