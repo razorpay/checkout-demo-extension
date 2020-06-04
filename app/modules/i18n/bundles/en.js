@@ -447,7 +447,7 @@ export default {
       bajaj: 'Bajaj Finserv',
       earlysalary: 'EarlySalary',
       zestmoney: 'ZestMoney',
-      flexmoney: 'InstaCred Cardless EMI',
+      flexmoney: 'Cardless EMI by InstaCred',
     },
   },
   wallets: {
