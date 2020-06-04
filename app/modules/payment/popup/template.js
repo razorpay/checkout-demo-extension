@@ -9,14 +9,25 @@ const cancelError = _Obj.stringify({
   },
 });
 
+import {
+  PAYING,
+  SECURED_BY,
+  TRYING_TO_LOAD,
+  WANT_TO_CANCEL,
+  PROCESSING,
+  WAIT_WHILE_WE_REDIRECT,
+  REDIRECTING,
+  LOADING_METHOD_PAGE,
+  TRYING_BANK_PAGE_MSG,
+} from 'ui/labels/popup';
+
 export default function popupTemplate(_, t) {
   var get = _.r.get;
   var method = _.data && _.data.method === 'wallet' ? 'wallet' : 'bank';
   var color = get('theme.color') || '#3594E2';
   var highlightColor = _.r.themeMeta.highlightColor;
   var title =
-    get('name') || get('description') || t('REDIRECTING')
-    |> sanitizeHtmlEntities;
+    get('name') || get('description') || t(REDIRECTING) |> sanitizeHtmlEntities;
   var amount = displayAmount(
     _.r,
     _.data && _.data.amount,
@@ -38,11 +49,10 @@ export default function popupTemplate(_, t) {
     : '';
 
   var message =
-    _.message || t('WAIT_WHILE_WE_REDIRECT', { method })
-    |> sanitizeHtmlEntities;
+    _.message || t(WAIT_WHILE_WE_REDIRECT, { method }) |> sanitizeHtmlEntities;
 
   return `<!doctype html><html style="height:100%;width:100%;"><head>
-<title>${t('PROCESSING')}</title>
+<title>${t(PROCESSING)}</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="${color}">
 <style>${css}#ldr:after{background:${highlightColor}}#bg{background:${color}}
@@ -53,7 +63,7 @@ export default function popupTemplate(_, t) {
   <div id='name'>${title}</div>
   <div id="amt" style="${hideAmount}">
     <div style="font-size:12px;color:#757575;line-height:15px;margin-bottom:5px;text-align:right">${t(
-      'PAYING'
+      PAYING
     )}</div>
     <div dir="ltr" style="font-size:20px;line-height:24px;">${amount}</div>
   </div>
@@ -61,14 +71,14 @@ export default function popupTemplate(_, t) {
 <div id="ldr"></div>
 <div id="txt">
   <div style="display:inline-block;vertical-align:middle;white-space:normal;">
-    <h2 id='title'>${t('LOADING_METHOD_PAGE', {
+    <h2 id='title'>${t(LOADING_METHOD_PAGE, {
       method,
     })}</h2><p id='msg'>${message}</p>
   </div>
   <div style="display:inline-block;vertical-align:middle;height:100%"></div>
 </div>
 <div id='ftr'>
-  <div style="display:inline-block;">${t('SECURED_BY')}
+  <div style="display:inline-block;">${t(SECURED_BY)}
     <img style="vertical-align:middle;margin-bottom:5px;" height="20px" src="https://cdn.razorpay.com/logo.svg">
   </div>
   <div style="display:inline-block;vertical-align:middle;height:100%"></div>
@@ -80,10 +90,10 @@ var doc = document;
 var gel = doc.getElementById.bind(doc);
 setTimeout(function(){doc.body.className='loaded'}, 10);
 setTimeout(function(){
-  gel('title').innerHTML = '${t('TRYING_TO_LOAD')}';
-  gel('msg').innerHTML = '${t('TRYING_BANK_PAGE_MSG')}';
+  gel('title').innerHTML = '${t(TRYING_TO_LOAD)}';
+  gel('msg').innerHTML = '${t(TRYING_BANK_PAGE_MSG)}';
   gel('cncl').onclick = function(){
-    if(window.confirm("${t('WANT_TO_CANCEL')}")){
+    if(window.confirm("${t(WANT_TO_CANCEL)}")){
       window.close();
       if (CheckoutBridge && CheckoutBridge.oncomplete) {
         CheckoutBridge.oncomplete('${cancelError}');

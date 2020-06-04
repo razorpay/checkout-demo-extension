@@ -454,4 +454,17 @@ export default {
     pay_single_method: 'Pay using {method}',
     upload_nach_form: 'Upload NACH Form',
   },
+  popup: {
+    paying: 'PAYING',
+    secured_by: 'Secured by',
+    trying_to_load: 'Still trying to load...',
+    want_to_cancel: 'Do you want to cancel the ongoing payment?',
+    processing: 'Processing, Please Wait...',
+    wait_while_we_redirect:
+      'Please wait while we redirect you to your {{method}} page.',
+    redirecting: 'Redirecting...',
+    loading_method_page: 'Loading {{method}} page…',
+    trying_bank_page_msg:
+      'The bank page is taking time to load. You can either wait or <span id="cncl">change the payment method</span>.',
+  },
 };

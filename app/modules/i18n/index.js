@@ -232,6 +232,21 @@ export function getShortBankName(bankCode, locale) {
 }
 
 /**
+ * Returns the translated labels for popup
+ * @param {string} tab
+ * @param {string} locale
+ * @returns {string}
+ */
+export function translatePaymentPopup(label, data = {}) {
+  let translated = formatMessageWithLocale(`popup.${label}`, 'en');
+  let variables = Object.keys(data);
+  variables.forEach(variable => {
+    translated = translated.replace(`{{${variable}}}`, data[variable]);
+  });
+  return translated;
+}
+
+/**
  * Returns the tab title for the given locale
  * @param {string} tab
  * @param {string} locale
@@ -240,16 +255,3 @@ export function getShortBankName(bankCode, locale) {
 export function getTabTitle(tab, locale) {
   return formatMessageWithLocale(`tab_titles.${tab}`, locale);
 }
-
-export function vanillaJsTranslate(labels) {
-  return (text, data = {}) => {
-    let translated = labels[text];
-    let variables = Object.keys(data);
-    variables.forEach(variable => {
-      translated = translated.replace(`{{${variable}}}`, data[variable]);
-    });
-    return translated;
-  };
-}
-
-export const translatePaymentPopup = vanillaJsTranslate(popupLabels);
