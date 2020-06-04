@@ -1132,7 +1132,7 @@ Session.prototype = {
 
     this.isOpen = true;
 
-    I18n.init();
+    discreet.initI18n();
     this.setExperiments();
     this.setTpvBanks();
     this.getEl();
