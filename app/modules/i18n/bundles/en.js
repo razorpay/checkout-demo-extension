@@ -171,6 +171,7 @@ export default {
     state_help: 'Select a value from list of states',
 
     multi_tpv_title: 'Pay Using',
+    multi_tpv_netbanking_title: 'A/C: {accountNumber}',
     multi_tpv_upi_title: 'UPI',
     multi_tpv_upi_subtitle: '{bankName} Account {accountNumber}',
     bank_details_heading: 'Bank Details',
