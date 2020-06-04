@@ -1687,6 +1687,7 @@ Session.prototype = {
 
     var locale = I18n.getCurrentLocale();
     this.commenceOTP('cardlessemi_sending', 'cardless_emi_enter', {
+      phone: getPhone(),
       provider: I18n.getCardlessEmiProviderName(providerCode, locale),
     });
 
@@ -1798,7 +1799,7 @@ Session.prototype = {
     }
 
     if (action === 'incorrect') {
-      self.otpView.setText(discreet.wrongOtpMsg);
+      self.otpView.setTextView('incorrect_otp_retry');
       return;
     } else if (action === 'resend') {
       this.commenceOTP('resending_otp', 'paylater_resend');
@@ -1808,6 +1809,7 @@ Session.prototype = {
     } else {
       var locale = I18n.getCurrentLocale();
       this.commenceOTP('paylater_sending', 'paylater_enter', {
+        phone: getPhone(),
         provider: I18n.getPaylaterProviderName(providerCode, locale),
       });
     }
@@ -3608,6 +3610,8 @@ Session.prototype = {
     if (this.headless && this.screen === 'card') {
       return;
     }
+
+    var actionState;
     var loadingState = true;
     if (error) {
       if (this.screen === 'upi' && text === discreet.cancelMsg) {
@@ -3616,18 +3620,29 @@ Session.prototype = {
         }
         return this.hideErrorMessage();
       }
+      actionState = loadingState;
       loadingState = false;
+    } else {
+      actionState = false;
     }
 
     if (!text) {
       text = strings.process;
     }
 
+    if (this.screen === 'otp') {
+      return this.commenceOTP(text, undefined, {}, actionState, loadingState);
+    }
+
     $('#fd-t').html(text);
     showOverlay($('#error-message').toggleClass('loading', loadingState));
   },
 
-  commenceOTP: function(textView, reason, templateData) {
+  commenceOTP: function(textView, reason, templateData, action, loading) {
+    if (typeof loading === 'undefined') {
+      loading = true;
+    }
+
     var params = {
       extraProps: {},
     };
@@ -3642,28 +3657,26 @@ Session.prototype = {
       addFunds: false,
     });
 
-    invoke(
-      function() {
-        if (this.screen === 'otp' && (this.tab !== 'card' || !this.payload)) {
-          Cta.showVerify();
-        }
-      },
-      this,
-      null,
-      200
-    );
-
-    // TODO: set values
-    var actionState;
-    var loadingState = true;
+    if (!action) {
+      invoke(
+        function() {
+          if (this.screen === 'otp' && (this.tab !== 'card' || !this.payload)) {
+            Cta.showVerify();
+          }
+        },
+        this,
+        null,
+        200
+      );
+    }
 
     if (this.screen === 'otp') {
       this.body.removeClass('sub');
       this.otpView.setTextView(textView, templateData);
 
       this.otpView.updateScreen({
-        action: actionState,
-        loading: loadingState,
+        action: action,
+        loading: loading,
       });
     } else {
       var text = ''; // TODO: get tab title from i18n
