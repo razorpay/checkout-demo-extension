@@ -16,7 +16,7 @@
     CALLOUT,
   } from 'ui/labels/bajaj-emi';
 
-  import { EDIT_PLAN_TEXT } from 'ui/labels/emi';
+  import { EDIT_PLAN_TEXT, EDIT_PLAN_ACTION } from 'ui/labels/emi';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -90,7 +90,9 @@
         <div class="emi-plans-text">
           {formatTemplateWithLocale(EDIT_PLAN_TEXT, emiText, $locale)}
         </div>
-        <div class="emi-plans-action theme-highlight">Edit</div>
+        <div class="emi-plans-action theme-highlight">
+          {$t(EDIT_PLAN_ACTION)}
+        </div>
       </div>
     </div>
     <h3>Enter Card Details</h3>
