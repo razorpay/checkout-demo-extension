@@ -4988,6 +4988,7 @@ Session.prototype = {
       'languageSelectionView',
       'svelteOverlay',
       'topBar',
+      'upiCancelReasonPicker',
       'upiTab',
       'timer',
     ];
