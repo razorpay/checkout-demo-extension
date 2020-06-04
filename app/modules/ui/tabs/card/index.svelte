@@ -35,6 +35,7 @@
     isMethodEnabled,
     getEMIBanks,
     getEMIBankPlans,
+    isMethodUsable,
   } from 'checkoutstore/methods';
   import { newCardEmiDuration } from 'checkoutstore/emi';
 
@@ -156,6 +157,12 @@
       const hasIssuers = Boolean(instrument.issuers);
       const hasNetworks = Boolean(instrument.networks);
       const hasTypes = Boolean(instrument.types);
+      const hasIins = Boolean(instrument.iins);
+
+      // We don't have IIN for a saved card. So if we're requested to support only specific IINs, we can't show saved cards
+      if (hasIins) {
+        return false;
+      }
 
       const issuers = instrument.issuers || [];
       const networks = instrument.networks || [];
@@ -367,7 +374,7 @@
     showEmiCta = true;
 
     if (tab === 'card') {
-      if (hasPlans) {
+      if (hasPlans && isMethodUsable('emi')) {
         emiCtaView = 'available';
       } else {
         showEmiCta = false;
@@ -377,7 +384,7 @@
         emiCtaView = 'plans-available';
       } else if (cardLength >= 6 && !hasPlans) {
         emiCtaView = 'plans-unavailable';
-      } else if (isMethodEnabled('card')) {
+      } else if (isMethodUsable('card')) {
         emiCtaView = 'pay-without-emi';
       } else {
         showEmiCta = false;
@@ -391,20 +398,20 @@
       from: session.tab,
     };
 
-    if (emiCtaView === 'available') {
+    if (emiCtaView === 'available' && isMethodUsable('emi')) {
       session.showEmiPlans('new')(e);
       eventName += 'view';
-    } else if (emiCtaView === 'plans-available') {
+    } else if (emiCtaView === 'plans-available' && isMethodUsable('emi')) {
       session.showEmiPlans('new')(e);
       eventName += 'edit';
-    } else if (emiCtaView === 'pay-without-emi') {
+    } else if (emiCtaView === 'pay-without-emi' && isMethodUsable('card')) {
       if (isMethodEnabled('card')) {
         session.setScreen('card');
         session.switchTab('card');
         showLandingView();
         eventName = 'emi:pay_without';
       }
-    } else if (emiCtaView === 'plans-unavailable') {
+    } else if (emiCtaView === 'plans-unavailable' && isMethodUsable('card')) {
       if (isMethodEnabled('card')) {
         session.setScreen('card');
         session.switchTab('card');

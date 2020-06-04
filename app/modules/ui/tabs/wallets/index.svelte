@@ -77,6 +77,10 @@
     return !!selectedWallet;
   }
 
+  export function setSelectedWallet(wallet) {
+    selectedWallet = wallet;
+  }
+
   const walletReferences = {};
 
   export function onWalletSelection(e, code) {
@@ -159,7 +163,7 @@
 </style>
 
 <div class="border-list collapsable">
-  {#each filteredWallets as wallet, i}
+  {#each filteredWallets as wallet, i (wallet.code)}
     <SlottedRadioOption
       name={wallet.code}
       selected={selectedWallet === wallet.code}

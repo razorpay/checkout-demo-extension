@@ -17,7 +17,7 @@ const config = {
     min_amount: 90000,
   },
   flexmoney: {
-    name: 'InstaCred Cardless EMI',
+    name: 'Cardless EMI by InstaCred',
     headless: false,
   },
 };
@@ -25,16 +25,14 @@ const config = {
 /**
  * Create an provider object for rendering on Cardless EMI screen.
  * @param {String} code
- * @param {String} title
  *
  * @return {Object}
  */
-export const createProvider = (code, title) => ({
+export const createProvider = code => ({
   data: {
     code,
   },
   icon: 'https://cdn.razorpay.com/cardless_emi-sq/' + code + '.svg',
-  title,
 });
 
 // Generate provider config

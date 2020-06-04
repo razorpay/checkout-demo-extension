@@ -6,6 +6,8 @@ import {
   getWallets,
   getCardNetworks,
   getEMIBanks,
+  isMethodUsable,
+  isDebitEMIEnabled,
 } from 'checkoutstore/methods';
 
 import { getRecurringMethods, isRecurring } from 'checkoutstore';
@@ -69,10 +71,14 @@ const DESCRIPTIONS = {
      * Cardless EMI: EMI via ZestMoney & More
      */
 
-    const cardEmi = isMethodEnabled('emi');
+    const cardEmi = isMethodUsable('emi');
     let providerNames = [];
     _Obj.loop(getCardlessEMIProviders(), providerObj => {
-      providerNames.push(getCardlessEmiProviderName(providerObj.code, locale));
+      let providerCode = providerObj.code;
+      if (providerCode === 'cards' && isDebitEMIEnabled()) {
+        providerCode = 'credit_debit_cards';
+      }
+      providerNames.push(getCardlessEmiProviderName(providerCode, locale));
     });
 
     if (cardEmi) {

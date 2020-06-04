@@ -221,7 +221,7 @@
   <Screen pad={false}>
     <div>
       <div id="netb-banks" class="clear grid count-3">
-        {#each netbanks as { name, code }}
+        {#each netbanks as { name, code } (code)}
           <GridItem
             name={getShortBankName(code, $locale)}
             {code}
@@ -246,9 +246,9 @@
             use:input>
             <!-- LABEL: Select a different bank -->
             <option value="">{$t(NETBANKING_SELECT_LABEL)}</option>
-            {#each banksArr as bank}
+            {#each banksArr as bank (bank.code)}
               <option value={bank.code}>
-                {getLongBankName(bank.code, $locale)}
+                {getLongBankName(bank.code, $locale, bank.name)}
               </option>
             {/each}
           </select>

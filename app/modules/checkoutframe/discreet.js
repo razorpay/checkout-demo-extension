@@ -22,12 +22,13 @@ import NoCostExplainer from 'ui/components/offers/NoCostExplainer.svelte';
 import emiPlansView from 'checkoutframe/emiplans';
 import otpView from 'checkoutframe/otp';
 import languageSelectionView from 'ui/elements/LanguageSelection.svelte';
+import * as I18n from 'i18n';
+import UpiCancelReasonPicker from 'ui/components/UpiCancelReasonPicker.svelte';
 import * as Curtain from 'components/curtain';
 import { setShieldParams } from 'payment/validator';
 import * as P13n from 'checkoutframe/personalization';
 import { commonBanks, getFullBankLogo } from 'common/bank';
 import * as CountryCodesUtil from 'common/countrycodesutil';
-import { init as initI18n } from 'i18n';
 
 /* Required for merchant.js migration */
 import * as Constants from 'common/constants';
@@ -77,6 +78,7 @@ import PayoutsInstruments from 'ui/tabs/payout/payout-instruments.svelte';
 import PayoutAccount from 'ui/tabs/payout/payout-account.svelte';
 
 import showTimer from 'checkoutframe/timer';
+import * as es6components from 'checkoutframe/components';
 
 import * as Hacks from 'checkoutframe/hacks';
 
@@ -114,6 +116,7 @@ export default {
   initIframe,
 
   showTimer,
+  es6components,
 
   Constants,
   Bank,
@@ -165,6 +168,7 @@ export default {
 
   otpView,
   languageSelectionView,
+  UpiCancelReasonPicker,
   PayLaterView,
   Curtain,
   TopBar,
@@ -196,5 +200,5 @@ export default {
 
   NBHandlers,
 
-  initI18n,
+  I18n,
 };

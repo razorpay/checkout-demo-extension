@@ -842,13 +842,13 @@ i {
 }
 
 #body {
-  position: relative;
   flex: 1;
   border-radius: 0 0 $br $br;
   height: $bodyh;
   flex-basis: $bodyh;
   background: #fff;
   backface-visibility: none;
+  overflow: auto;
 
   // transition: 0.3s height;
   &.emi-focus {
@@ -896,9 +896,8 @@ i {
   transition: 0.3s transform ease-in 0s, 0.3s opacity ease-in 0s, 0.1s color;
   color: #757575;
   position: absolute;
-  top: 0;
-  left: 1px;
-  right: 1px;
+  left: 0;
+  right: 0;
   height: $topbarh;
   z-index: 2;
 

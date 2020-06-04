@@ -11,15 +11,6 @@ export function getIndividualInstruments(instrument, customer) {
   const method = instrument.method;
   const config = InstrumentsConfig[method];
 
-  if (config.isIndividual(instrument)) {
-    return _Obj.extend(
-      {
-        _ungrouped: [instrument],
-      },
-      instrument
-    );
-  }
-
   const individuals = config.groupedToIndividual(instrument, customer);
 
   return _Obj.extend(

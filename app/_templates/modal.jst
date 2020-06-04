@@ -44,7 +44,6 @@ var subscription_will_refund = _.subscription && (_.subscription.type === 0);
 `
 <div id="container" class="mfix animations" tabIndex="0">
   <div id="backdrop"></div>
-  <i id="powered-by"><a id="powered-link" href="https://razorpay.com?ref=org-in-chk" target="_blank" tabindex="-1">&#xe608;</a></i>
   <div id="tnc-wrap"></div>
   <div id="modal" class="mchild">
     <div id="modal-inner">
@@ -64,25 +63,7 @@ var subscription_will_refund = _.subscription && (_.subscription.type === 0);
         <div class="spin spin2"><div></div></div>
         <span class="link"></span>
         <button id="fd-hide" class="btn">Retry</button>
-        <div id="cancel_upi">
-          <p>Please give us a reason before we cancel the payment</p>
-          <label for="upi-1"><input id="upi-1" type="radio" name="_[reason]" value="collect_not_received">
-            Did not receive collect request
-          </label>
-          <label for="upi-2"><input id="upi-2" type="radio" name="_[reason]" value="failed_in_app">
-            Payment failed in UPI app
-          </label>
-          <label for="upi-3"><input id="upi-3" type="radio" name="_[reason]" value="money_deducted">
-            Money got deducted but payment is still processing
-          </label>
-          <label for="upi-4"><input id="upi-4" type="radio" name="_[reason]" value="other">
-            Other
-          </label>
-          <div class="buttons">
-            <button class="back-btn">Back</button>
-            <button class="btn">Submit</button>
-          </div>
-        </div>
+        <div id="cancel_upi"></div>
       </div>
       <div id="content">
         <div id="header">
@@ -113,6 +94,7 @@ var subscription_will_refund = _.subscription && (_.subscription.type === 0);
           `?`
         </div>
         <div id="body" class="sub">
+          <div id="topbar-wrap"></div>
           <div id="curtain">
             <div id="curtain-container-parent"></div>
             <div id="curtain-overlay"></div>

@@ -9,10 +9,24 @@
     loading,
     maxlength,
     otp,
-    skipText,
-    text,
+    skipTextLabel,
+    textView,
+    templateData,
     mode,
   } from 'checkoutstore/screens/otp';
+
+  // i18n
+  import { t, locale } from 'svelte-i18n';
+  import { getOtpScreenTitle } from 'i18n';
+
+  import {
+    ADD_FUNDS_LABEL,
+    BACK_LABEL,
+    RESEND_LABEL,
+    RETRY_LABEL,
+    TRY_DIFFERENT_LABEL,
+    OTP_FIELD_HELP,
+  } from 'ui/labels/otp';
 
   // Utils imports
   import Analytics from 'analytics';
@@ -75,10 +89,12 @@
 
   export function trackInput(event) {
     if ($otp) {
+      const isWallet = session.payload && session.payload.method === 'wallet';
+
       Analytics.track('otp:input', {
         type: AnalyticsTypes.BEHAV,
         data: {
-          wallet: session.tab === 'wallet',
+          wallet: isWallet,
           headless: session.headless,
         },
       });
@@ -120,26 +136,26 @@
       <div id="otp-prompt">
         {#if $loading}
           <AsyncLoading>
-            {@html $text}
+            {getOtpScreenTitle($textView, $templateData, $locale)}
           </AsyncLoading>
-        {:else}
-          {@html $text}
-        {/if}
+        {:else}{getOtpScreenTitle($textView, $templateData, $locale)}{/if}
       </div>
       {#if $addFunds}
         <div id="add-funds" class="add-funds">
+          <!-- LABEL: Add Funds -->
           <div
             id="add-funds-action"
             class="btn"
             on:click={event => invoke('addFunds', event)}>
-            Add Funds
+            {$t(ADD_FUNDS_LABEL)}
           </div>
 
           <div class="text-center" style="margin-top: 20px;">
+            <!-- LABEL: Try different payment method -->
             <LinkButton
               id="choose-payment-method"
               on:click={event => invoke('chooseMethod', event)}>
-              Try different payment method
+              {$t(TRY_DIFFERENT_LABEL)}
             </LinkButton>
           </div>
         </div>
@@ -147,11 +163,12 @@
 
       <div id="otp-section">
         {#if $action}
+          <!-- LABEL: Retry -->
           <div
             id="otp-action"
             class="btn"
             on:click={event => invoke('retry', event)}>
-            Retry
+            {$t(RETRY_LABEL)}
           </div>
         {/if}
 
@@ -159,7 +176,8 @@
           id="otp-elem"
           style="width: {inputWidth};"
           class:hidden={!showInput}>
-          <div class="help">Please enter the OTP</div>
+          <!-- LABEL: Please enter the OTP -->
+          <div class="help">{$t(OTP_FIELD_HELP)}</div>
           <input
             bind:this={input}
             on:blur={trackInput}
@@ -177,23 +195,25 @@
       <div id="otp-sec-outer" class:compact={$mode === 'HDFC_DC'}>
         {#if showInput}
           {#if $allowResend}
+            <!-- LABEL: Resend OTP -->
             <LinkButton
               id="otp-resend"
               on:click={event => invoke('resend', event)}>
-              Resend OTP
+              {$t(RESEND_LABEL)}
             </LinkButton>
           {/if}
           {#if $allowSkip}
             <LinkButton
               id="otp-sec"
               on:click={event => invoke('secondary', event)}>
-              {$skipText}
+              {$t(`otp.skip_text.${$skipTextLabel}`)}
             </LinkButton>
           {:else if $allowBack}
+            <!-- LABEL: Go Back -->
             <LinkButton
               id="otp-sec"
               on:click={event => invoke('secondary', event)}>
-              Go Back
+              {$t(BACK_LABEL)}
             </LinkButton>
           {/if}
         {/if}

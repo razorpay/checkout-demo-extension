@@ -19,6 +19,7 @@
   // Store
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
   import { customer } from 'checkoutstore/customer';
+  import { isDebitEMIEnabled } from 'checkoutstore/methods';
 
   // i18n
   import { locale } from 'svelte-i18n';
@@ -116,7 +117,7 @@
     } else {
       title = getInstrumentTitle(
         'upi',
-        getVpaFromInstrument(instrument),
+        getVpaFromInstrument(individualInstrument),
         locale
       );
       icon = '&#xe70e;';
@@ -132,7 +133,11 @@
 
   function getDetailsForCardlessEmiInstrument(instrument, locale) {
     const provider = getCardlessEmiProvider(individualInstrument.provider);
-    const providerName = getCardlessEmiProviderName(provider.code, $locale);
+    let providerCode = provider.code;
+    if (providerCode === 'cards' && isDebitEMIEnabled()) {
+      providerCode = 'credit_debit_cards';
+    }
+    const providerName = getCardlessEmiProviderName(providerCode, $locale);
     return {
       title: getInstrumentTitle('emi', providerName, locale),
       icon: provider.sqLogo,

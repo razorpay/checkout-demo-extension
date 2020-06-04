@@ -566,7 +566,13 @@
     session.preSubmit(null, payload);
   }
 
-  function selectMethod(event) {
+  function deselectInstrument() {
+    $selectedInstrumentId = null;
+  }
+
+  export function selectMethod(event) {
+    deselectInstrument();
+
     Analytics.track('payment_method:select', {
       type: AnalyticsTypes.BEHAV,
       data: event.detail,
@@ -831,10 +837,10 @@
               {formatTemplateWithLocale(CARD_OFFER_CREDIT_ONLY_CALLOUT, { issuer: cardOffer.issuer }, $locale)}
             {/if}
           {:else if isDebitCardEnabled() && isCreditCardEnabled()}
-            $t(RECURRING_CREDIT_DEBIT_CALLOUT)
+            {$t(RECURRING_CREDIT_DEBIT_CALLOUT)}
           {:else if isDebitCardEnabled()}
-            $t(RECURRING_DEBIT_ONLY_CALLOUT)
-          {:else}$t(RECURRING_CREDIT_ONLY_CALLOUT){/if}
+            {$t(RECURRING_DEBIT_ONLY_CALLOUT)}
+          {:else}{$t(RECURRING_CREDIT_ONLY_CALLOUT)}{/if}
         </Callout>
       {/if}
 

@@ -15,10 +15,24 @@
     showCtaWithDefaultText,
   } from 'checkoutstore/cta';
 
+  // i18n
+  import { t } from 'svelte-i18n';
+  import {
+    PLAN_LIST_TITLE,
+    PLAN_LIST_TITLE_WITHOUT_OFFER,
+    PLAN_LIST_VIEW_ALL_ACTION,
+    PLAN_LIST_PAY_ENTIRE_ACTION,
+    PLAN_LIST_CALLOUT_AGREEMENT,
+    PLAN_LIST_CALLOUT_AGREEMENT_HIGHLIGHT,
+  } from 'ui/labels/emi';
+
   // Util imports
   import { INDIAN_CONTACT_REGEX } from 'common/constants';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
+
+  // Utils imports
+  import { isMethodUsable } from 'checkoutstore/methods';
 
   // Props
   export let actions;
@@ -163,7 +177,9 @@
 
 <div id="form-emiplans" class="tab-content showable screen pad vertical-pad">
   {#if currentView === Views.PLANS}
+    <!-- LABEL: Select an EMI Plan -->
     <EmiPlanCards
+      title={$t(PLAN_LIST_TITLE)}
       plans={otherPlans.length ? offerPlans : plans}
       {bank}
       {amount}
@@ -171,8 +187,9 @@
       {expanded}
       {provider} />
     {#if otherPlans.length}
+      <!-- LABEL: Plan without offer -->
       <EmiPlanCards
-        title="Plans without offer"
+        title={$t(PLAN_LIST_TITLE_WITHOUT_OFFER)}
         plans={otherPlans}
         {bank}
         {amount}
@@ -188,14 +205,16 @@
         <div
           class="actionlink theme-highlight"
           on:click={event => invoke('viewAll', event)}>
-          View all EMI Plans
+          <!-- LABEL: View all EMI Plans -->
+          {$t(PLAN_LIST_VIEW_ALL_ACTION)}
         </div>
       {/if}
-      {#if actions.payWithoutEmi}
+      {#if actions.payWithoutEmi && isMethodUsable('card')}
         <div
           class="actionlink theme-highlight"
           on:click={event => invoke('payWithoutEmi', event)}>
-          Pay entire amount
+          <!-- Pay entire amount -->
+          {$t(PLAN_LIST_PAY_ENTIRE_ACTION)}
         </div>
       {/if}
     </div>
@@ -205,8 +224,13 @@
           class="callout drishy"
           on:click={event => invoke('viewAgreement', event)}>
           <span>&#x2139;</span>
-          By clicking on Pay, you agree to the terms of our&nbsp;
-          <span class="theme-highlight">Loan Agreement</span>
+          <!-- TODO: Support theme highlight through FormattedText and unify -->
+          <!-- LABEL: By clicking on Pay, you agree to the terms of our&nbsp; -->
+          {$t(PLAN_LIST_CALLOUT_AGREEMENT)}
+          <!-- LABEL: Loan Agreement -->
+          <span class="theme-highlight">
+            {$t(PLAN_LIST_CALLOUT_AGREEMENT_HIGHLIGHT)}
+          </span>
         </div>
       {/if}
 

@@ -80,8 +80,8 @@
 
     if (individualInstrument.issuer) {
       // We know stuff about the card.
-      title = getBankText(instrument, false);
-      icon = getIcon(instrument);
+      title = getBankText(individualInstrument, false);
+      icon = getIcon(individualInstrument);
       hasCvv = false;
     } else {
       // We don't know anything about the card.

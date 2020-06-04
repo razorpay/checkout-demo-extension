@@ -10,19 +10,19 @@ function upi(instrument) {
   };
   if (instrument['_[upiqr]']) {
     // QR
-    base.flow = 'qr';
+    base.flows = ['qr'];
   } else if (instrument['_[flow]'] === 'intent') {
     // Intent
-    base.flow = 'intent';
+    base.flows = ['intent'];
 
     if (instrument.upi_app) {
-      base.app = instrument.upi_app;
+      base.apps = [instrument.upi_app];
     }
   } else if (instrument['_[flow]'] === 'directpay') {
-    base.flow = 'collect';
+    base.flows = ['collect'];
 
     if (instrument.vpa) {
-      base.vpa = instrument.vpa;
+      base.vpas = [instrument.vpa];
     }
   }
 
@@ -38,7 +38,7 @@ function upi(instrument) {
 function netbanking(instrument) {
   return {
     method: 'netbanking',
-    bank: instrument.bank,
+    banks: [instrument.bank],
   };
 }
 
@@ -51,9 +51,9 @@ function netbanking(instrument) {
 function card(instrument) {
   return {
     method: 'card',
-    type: instrument.type,
-    issuer: instrument.issuer,
-    network: instrument.network,
+    types: [instrument.type],
+    issuers: [instrument.issuer],
+    networks: [instrument.network],
   };
 }
 
@@ -66,7 +66,7 @@ function card(instrument) {
 function wallet(instrument) {
   return {
     method: 'wallet',
-    wallet: instrument.wallet,
+    wallets: [instrument.wallet],
   };
 }
 

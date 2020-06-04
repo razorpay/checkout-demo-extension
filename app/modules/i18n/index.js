@@ -5,6 +5,7 @@ import {
   isLoading,
   dictionary,
   t,
+  locale,
 } from 'svelte-i18n';
 
 import { get } from 'svelte/store';
@@ -71,6 +72,14 @@ export function init() {
 }
 
 /**
+ * Returns the currently selected locale
+ * @returns {string}
+ */
+export function getCurrentLocale() {
+  return get(locale);
+}
+
+/**
  * Returns the bundle stored for a given locale
  * @param {string} locale
  * @returns {Object}
@@ -85,10 +94,11 @@ export function getBundle(locale) {
  * @param {string} label
  * @param {Object} data
  * @param {string} locale
+ * @param {string} [defaultValue]
  * @returns {string}
  */
-export function formatTemplateWithLocale(label, data, locale) {
-  return get(t)(label, { locale, values: data });
+export function formatTemplateWithLocale(label, data, locale, defaultValue) {
+  return get(t)(label, { locale, values: data, default: defaultValue });
 }
 
 /**
@@ -209,12 +219,14 @@ export function getUpiIntentAppName(shortcode, locale, defaultName) {
  * Returns the long bank name for the given locale
  * @param {string} bankCode
  * @param {string} locale
+ * @param {string} [defaultValue]
  * @returns {string}
  */
-export function getLongBankName(bankCode, locale) {
+export function getLongBankName(bankCode, locale, defaultValue) {
   return formatMessageWithLocale(
     `banks.long.${bankCode.toUpperCase()}`,
-    locale
+    locale,
+    defaultValue
   );
 }
 
@@ -254,4 +266,15 @@ export function translatePaymentPopup(label, data = {}) {
  */
 export function getTabTitle(tab, locale) {
   return formatMessageWithLocale(`tab_titles.${tab}`, locale);
+}
+
+/**
+ * Returns the title to be shown on OTP screen for a given view
+ * @param {string} view
+ * @param {Object} data
+ * @param {string} locale
+ * @returns {string}
+ */
+export function getOtpScreenTitle(view, data, locale) {
+  return formatTemplateWithLocale(`otp.title.${view}`, data, locale, view);
 }

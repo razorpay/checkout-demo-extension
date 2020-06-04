@@ -4,6 +4,14 @@
   import { getThemeColor } from 'checkoutstore/theme';
   import { getMiscIcon } from 'checkoutframe/icons';
 
+  // i18n
+  import { t } from 'svelte-i18n';
+  import {
+    BANK_VERIFICATION_ACTION_CONTINUE,
+    BANK_VERIFICATION_DESCRIPTION,
+    BANK_VERIFICATION_TITLE,
+  } from 'ui/labels/card';
+
   const dispatch = createEventDispatcher();
 
   function onContinue() {
@@ -36,9 +44,14 @@
   <div class="icon">
     <Icon icon={getMiscIcon('lock', getThemeColor())} />
   </div>
-  <b>Bank verification required</b>
+  <!-- LABEL: Bank verification required -->
+  <b>{$t(BANK_VERIFICATION_TITLE)}</b>
   <span class="desc">
-    Click continue to complete the payment on the bank page
+    <!-- LABEL: Click continue to complete the payment on the bank page -->
+    {$t(BANK_VERIFICATION_DESCRIPTION)}
   </span>
-  <button class="btn" on:click={onContinue}>Continue</button>
+  <button class="btn" on:click={onContinue}>
+    <!-- LABEL: Continue -->
+    {$t(BANK_VERIFICATION_ACTION_CONTINUE)}
+  </button>
 </div>

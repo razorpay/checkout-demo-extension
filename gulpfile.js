@@ -196,6 +196,12 @@ gulp.task('watch', cb => {
             'ms'
         );
       case 'ERROR':
+        if (event.error) {
+          event = event.error;
+          if (event.watchFiles) {
+            delete event.watchFiles;
+          }
+        }
         return console.log(event);
     }
   });

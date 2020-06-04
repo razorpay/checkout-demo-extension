@@ -6,7 +6,7 @@
   import { createProvider } from 'common/cardlessemi';
   import {
     getCardlessEMIProviders,
-    isMethodEnabled,
+    isMethodUsable,
     isDebitEMIEnabled,
   } from 'checkoutstore/methods';
 
@@ -29,16 +29,11 @@
     let providers = [];
 
     _Obj.loop(getCardlessEMIProviders(), providerObj => {
-      providers.push(createProvider(providerObj.code, providerObj.name));
+      providers.push(createProvider(providerObj.code));
     });
 
-    if (isMethodEnabled('emi')) {
-      providers.unshift(
-        createProvider(
-          'cards',
-          isDebitEMIEnabled() ? 'EMI on Debit/Credit Cards' : 'EMI on Cards'
-        )
-      );
+    if (isMethodUsable('emi')) {
+      providers.unshift(createProvider('cards'));
     }
 
     return providers;
@@ -74,6 +69,13 @@
     providers,
     $methodTabInstrument
   );
+
+  function getOverriddenProviderCode(code) {
+    if (code === 'cards' && isDebitEMIEnabled()) {
+      code = 'credit_debit_cards';
+    }
+    return code;
+  }
 </script>
 
 <div class="tab-content showable screen pad collapsible" id="form-cardless_emi">
@@ -83,9 +85,9 @@
   <!-- TITLE: Select an option -->
   <h3>{$t(SELECT_OPTION_TITLE)}</h3>
   <div class="options">
-    {#each filteredProviders as provider}
+    {#each filteredProviders as provider (provider.data.code)}
       <NextOption {...provider} on:select>
-        {getCardlessEmiProviderName(provider.data.code, $locale)}
+        {getCardlessEmiProviderName(getOverriddenProviderCode(provider.data.code), $locale)}
       </NextOption>
     {/each}
   </div>

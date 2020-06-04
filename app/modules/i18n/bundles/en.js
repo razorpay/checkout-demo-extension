@@ -32,6 +32,13 @@ export default {
     auth_type_otp: 'OTP / Password',
     auth_type_pin: 'ATM PIN',
 
+    bank_verification_title: 'Bank verification required',
+    bank_verification_description:
+      'Click continue to complete the payment on the bank page',
+    bank_verification_action_continue: 'Continue',
+
+    amex_unsupported_error: 'AMEX cards are not supported',
+
     saved_card_label: 'Card ending with <b>{last4}<b>',
 
     recurring_callout:
@@ -55,10 +62,85 @@ export default {
 
     pay_entire_amount_action: 'Pay entire amount',
     pay_entire_amount_count: '({count} cards available)',
+
+    plan_title: '{duration} months ({amount}/mo)',
+    no_cost_label: 'No Cost',
+
+    plan_list_title: 'Select an EMI Plan',
+    plan_list_title_without_offer: 'Plans without offer',
+    plan_list_view_all_action: 'View all EMI Plans',
+    plan_list_pay_entire_action: 'Pay entire amount',
+    plan_list_callout_agreement:
+      'By clicking on Pay, you agree to the terms of our ',
+    plan_list_callout_agreement_highlight: 'Loan Agreement',
+
+    interest_charged_label: 'Interest charged by the bank',
+    no_cost_discount_label: 'No Cost EMI offer discount',
+    no_cost_explain_action: '+ How does it work?',
+
+    credit_emi_description:
+      'Full amount of {amount} will be deducted from your account, which will be converted into EMI by your bank in 3-4 days.',
+    hdfc_debit_description_min_balance:
+      'No minimum balance is required. There will be no amount blocked on your card. You will pay ',
+    hdfc_debit_description_includes_interest: '(includes interest).',
+    hdfc_debit_description_convenience:
+      ' Convenience Fee of ₹99 + GST applicable for EMI transactions on HDFC Bank Cards.',
+    description_monthly_installment: 'Monthly Installment: {amount}',
+    description_total_amount:
+      'Total Amount: {totalAmount} ({monthlyAmount} x {duration})',
+  },
+  emi_modal: {
+    select_bank_label: 'Select Bank:',
+    emi_tenure_label: 'EMI Tenure',
+    emi_tenure: '{duration} Months',
+    interest_rate_label: 'Interest Rate',
+    installments_label: 'Monthly Installments',
+    total_label: 'Total Money',
+  },
+  emi_details: {
+    installment_label: 'EMI',
+    tenure_label: 'Tenure',
+    tenure: '{duration} Months',
+    interest_label: 'Interest',
+    no_cost_header: 'How does No Cost EMI work?',
+    no_cost_description:
+      'You are buying a product worth <b>{amount} on a {duration}-month EMI period.<b> The bank used charges <b>{rate}% interest<b> per annum.',
+    normal_emi_label: 'Normal EMI',
+    no_cost_label: 'No Cost EMI',
+    total_amount_label: 'Total Amount',
+    effective_interest_info:
+      '<b>Zero effective interest:<b> you get upfront discount equal to interest charged by the bank.',
+    you_save_info: 'You save {amount}',
+  },
+  debit_emi: {
+    card_box_title: 'SELECTED DEBIT CARD',
+    contact_title: 'MOBILE NUMBER',
+    contact_description:
+      'Enter the mobile number registered with your bank and Debit Card.',
+    contact_help: 'Please enter a valid indian mobile number',
+  },
+  bajaj_finserv: {
+    card_details_header: 'Enter Card Details',
+    card_number_label: 'Card Number',
+    card_number_help: 'Please enter a valid Bajaj Finserv issued card number',
+    name_label: "Card Holder's Name",
+    name_help: 'Please enter name on your card',
+    callout:
+      'You need to have a <strong>Bajaj Finserv issued card<strong> to continue.',
+  },
+  fees: {
+    loading_message: 'Loading fees breakup...',
+    breakup_title: 'Fees Breakup',
+    amount_label: 'Amount',
+    gateway_charges_label: 'Gateway Charges',
+    gst_label: 'GST on {label}',
+    total_charges_label: 'Total Charges',
+    continue_action: 'Continue',
   },
   home: {
     preferred_block_title: 'Preferred Payment Methods',
     single_block_title: 'Pay via {method}',
+    config_block_default_title: 'Available Payment Methods',
 
     contact_label_required: 'Phone with Country Code',
     contact_label_optional: 'Phone with Country Code (Optional)',
@@ -91,6 +173,10 @@ export default {
     multi_tpv_title: 'Pay Using',
     multi_tpv_upi_title: 'UPI',
     multi_tpv_upi_subtitle: '{bankName} Account {accountNumber}',
+    bank_details_heading: 'Bank Details',
+    account_numer_label: 'Account Number',
+    customer_name_label: 'Customer Name',
+    ifsc_label: 'IFSC Code',
 
     secured_by_message: 'This payment is secured by Razorpay.',
   },
@@ -153,6 +239,67 @@ export default {
       'Do not round-off the amount. Transfer the exact amount for the payment to be successful.',
     retry_button_label: 'Retry',
   },
+  nach: {
+    attaching_message: 'Attaching your NACH form',
+    uploading_message: 'Uploading your NACH form',
+    attachment_info:
+      'Please upload a clear and legible copy of your signed NACH form',
+    image_info:
+      'The image should not be <strong>cropped<strong> and should not have any <strong>shadows<strong>',
+    allowed_formats_info:
+      'Only {extensions} files with size less than {size} MB are allowed',
+    confirm_cancel: 'Are you sure you want to stop uploading your NACH form?',
+  },
+  payouts: {
+    select_account_title: 'Select an account',
+    select_account_description:
+      '{amount} will be credited to your specified account.',
+    select_upi_title: 'Select a UPI ID',
+    add_upi_action: 'Add UPI ID',
+    select_bank_title: 'Select a Bank Account',
+    add_bank_action: 'Add Bank Account',
+
+    add_upi_button_title: 'UPI',
+    add_upi_button_description: 'Add a UPI ID (BHIM, PhonePe and more)',
+
+    add_bank_button_title: 'BANK',
+    add_bank_button_description: 'Add a Bank Account',
+
+    account_number_label: 'Bank Account Number',
+    account_number_help: 'Please enter a valid account number',
+
+    account_number_confirm_label: 'Re-enter account number',
+    account_number_confirm_help: 'Re-enter account number',
+
+    ifsc_label: 'IFSC',
+    ifsc_help: 'Please enter a valid IFSC',
+
+    name_label: 'Account Holder Name',
+    name_help: 'Please enter a valid account name',
+  },
+  offers: {
+    not_applicable_card_message: 'Offer is not applicable on this card.',
+    offer_applied_message: 'Offer Applied!',
+    you_save_message: 'You save {amount}',
+    offers_available_message: '{count} Offers Available',
+    change_action: 'Change',
+    select_action: 'Select',
+    back_action: 'Back',
+    hide_action: 'Hide',
+    continue_without_offer_action: 'Continue without offer',
+    not_applicable_error: 'The offer is not applicable on {error}',
+    pay_original_message: 'You can pay the original amount.',
+    select_offer_header: 'Select an offer',
+    available_offers_header: 'Available Offers',
+    no_offer_available_method_message:
+      'No offers available for this method. Please look at other offers available below',
+    other_offers_header: 'Other Offers',
+    other_offers_action: '+ OTHER OFFERS',
+    other_offers_count: '({count} more)',
+    no_cost_emi: 'No Cost EMI',
+    cashback_detail: 'Cashback would be credited to source mode of payment.',
+    remove_action: 'Remove Offer',
+  },
   instruments: {
     titles: {
       netbanking: 'Netbanking - {name}',
@@ -208,6 +355,49 @@ export default {
       paylater: 'Pay later using {providers}',
     },
   },
+  otp: {
+    add_funds_label: 'Add Funds',
+    try_different_label: 'Try different payment method',
+    retry_label: 'Retry',
+    resend_label: 'Resend OTP',
+    back_label: 'Go Back',
+    otp_field_help: 'Please enter the OTP',
+    skip_text: {
+      complete_bank_page: "Complete on bank's page",
+      skip_saved_cards: 'Skip Saved Cards',
+      skip_saving_card: 'Skip saving card',
+      resend_otp: 'Resend OTP',
+    },
+    title: {
+      loading: 'Loading...',
+      insufficient_wallet_balance: 'Insufficient balance in your wallet',
+      native_otp_sent: 'Enter OTP to complete the payment',
+      resending_otp: 'Resending OTP...',
+      verifying_otp: 'Verifying OTP...',
+      saved_cards_sending: 'Looking for saved cards associated with {phone}',
+      wallet_sending: 'Looking for {wallet} account associated with {phone}',
+      paylater_sending:
+        'Looking for {provider} account associated with {phone}',
+      cardlessemi_sending:
+        'Looking for {provider} account associated with {phone}',
+      cardlessemi_plans:
+        'Enter the OTP sent on {phone} to get EMI plans for {provider}',
+      otp_sent_save_card: 'Enter OTP sent to {phone} to save your card',
+      otp_sent_save_card_recurring:
+        'Enter OTP sent to {phone} to save your card for future payments',
+      otp_sent_access_card: 'Enter OTP sent to {phone} to access Saved Cards',
+      otp_sending_generic: 'Sending OTP to {phone}',
+      otp_sent_generic: 'An OTP has been sent on {phone}',
+      otp_sent_no_phone: 'Enter OTP to complete payment',
+      otp_resent_generic: 'OTP Resent',
+      otp_resent_successful: 'OTP has been resent successfully.',
+      payment_processing: 'Your payment is being processed',
+      wallet_insufficient_balance: 'Insufficient balance in your wallet',
+      incorrect_otp_retry: 'Entered OTP was incorrect. Re-enter to proceed.',
+      paylater_continue:
+        'Enter the OTP sent on {phone} to continue with {provider}',
+    },
+  },
   tab_titles: {
     card: 'Card',
     irctc_card: 'Debit/Credit Card',
@@ -252,11 +442,12 @@ export default {
   cardless_emi: {
     select_option_title: 'Select an option',
     providers: {
-      cards: 'EMI on Credit/Debit cards',
+      credit_debit_cards: 'EMI on Debit/Credit cards',
+      cards: 'EMI on Cards',
       bajaj: 'Bajaj Finserv',
       earlysalary: 'EarlySalary',
       zestmoney: 'ZestMoney',
-      flexmoney: 'InstaCred Cardless EMI',
+      flexmoney: 'Cardless EMI by InstaCred',
     },
   },
   wallets: {
@@ -338,6 +529,25 @@ export default {
       CORP: 'Union Bank of India (Erstwhile Corporation Bank)',
       VIJB: 'Vijaya Bank',
       YESB: 'Yes Bank',
+      ABPB: 'Aditya Birla Idea Payments Bank',
+      ANDB_C: 'Andhra Bank - Corporate Banking',
+      BACB: 'Bassein Catholic Co-operative Bank',
+      BDBL: 'Bandhan Bank',
+      DLXB_C: 'Dhanlaxmi Bank - Corporate Banking',
+      ESAF: 'ESAF Small Finance Bank',
+      IBKL_C: 'IDBI - Corporate Banking',
+      KCCB: 'Kalupur Commercial Co-operative Bank',
+      KJSB: 'Kalyan Janata Sahakari Bank',
+      MSNU: 'Mehsana Urban Co-operative Bank',
+      NESF: 'North East Small Finance Bank',
+      RATN_C: 'RBL Bank - Corporate Banking',
+      SURY: 'Suryoday Small Finance Bank',
+      SVCB_C: 'Shamrao Vithal Bank - Corporate Banking',
+      TBSB: 'Thane Bharat Sahakari Bank',
+      TJSB: 'Thane Janata Sahakari Bank',
+      VARA: 'Varachha Co-operative Bank',
+      YESB_C: 'Yes Bank - Corporate Banking',
+      ZCBL: 'Zoroastrian Co-operative Bank',
     },
     short: {
       ICIC_C: 'ICICI Corporate',
@@ -391,6 +601,16 @@ export default {
     omni_enter_number: 'Enter your phone number',
     omni_error:
       'Please ensure the same number is linked to the Google Pay account.',
+    omni_verifying_phone: 'Verifying mobile number with Google Pay...',
+    verifying_vpa_info: 'Verifying your VPA',
+    cancel_reason_title: 'Please give us a reason before we cancel the payment',
+    cancel_reason_collect_not_received: 'Did not receive collect request',
+    cancel_reason_failed_in_app: 'Payment failed in UPI app',
+    cancel_reason_money_deducted:
+      'Money got deducted but payment is still processing',
+    cancel_reason_other: 'Other',
+    cancel_reason_back_action: 'Back',
+    cancel_reason_submit_action: 'Submit',
   },
   upi_intent_apps: {
     google_pay: 'Google Pay (Tez)',
@@ -454,6 +674,10 @@ export default {
     pay_single_method: 'Pay using {method}',
     upload_nach_form: 'Upload NACH Form',
   },
+  dcc: {
+    search_title: 'Select Currency to Pay',
+    search_placeholder: 'Search for currency or code',
+  },
   popup: {
     paying: 'PAYING',
     secured_by: 'Secured by',
@@ -461,10 +685,24 @@ export default {
     want_to_cancel: 'Do you want to cancel the ongoing payment?',
     processing: 'Processing, Please Wait...',
     wait_while_we_redirect:
-      'Please wait while we redirect you to your {{method}} page.',
+      'Please wait while we redirect you to your {method} page.',
     redirecting: 'Redirecting...',
-    loading_method_page: 'Loading {{method}} page…',
+    loading_method_page: 'Loading {method} page…',
     trying_bank_page_msg:
-      'The bank page is taking time to load. You can either wait or <span id="cncl">change the payment method</span>.',
+      'The bank page is taking time to load. You can either wait or change the payment method.',
+  },
+  misc: {
+    loading: 'Loading',
+    processing: 'Processing...',
+    payment_processing: 'Your payment is being processed',
+    payment_incomplete: 'Payment did not complete.',
+    payment_timeout: 'Payment did not complete on time',
+    redirecting_bank: 'Redirecting to Bank page',
+    acs_load_delay: 'Seems like your bank page is taking time to load.',
+    payment_waiting_on_bank: 'Waiting for payment to complete on bank page',
+    frequently_used_config_title: 'Frequently used methods',
+    search_no_results: 'No results for "{query}"',
+    logout_action: 'Log out',
+    logout_all_devices_action: 'Log out from all devices',
   },
 };

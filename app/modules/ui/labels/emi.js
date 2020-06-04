@@ -7,3 +7,27 @@ export const AVAILABLE_TEXT = 'emi.available_text';
 export const AVAILABLE_ACTION = 'emi.available_action';
 export const PAY_ENTIRE_AMOUNT_ACTION = 'emi.pay_entire_amount_action';
 export const PAY_ENTIRE_AMOUNT_COUNT = 'emi.pay_entire_amount_count';
+
+export const PLAN_TITLE = 'emi.plan_title';
+export const NO_COST_LABEL = 'emi.no_cost_label';
+export const INTEREST_CHARGED_LABEL = 'emi.interest_charged_label';
+export const NO_COST_DISCOUNT_LABEL = 'emi.no_cost_discount_label';
+export const NO_COST_EXPLAIN_ACTION = 'emi.no_cost_explain_action';
+export const PLAN_LIST_TITLE = 'emi.plan_list_title';
+export const PLAN_LIST_TITLE_WITHOUT_OFFER =
+  'emi.plan_list_title_without_offer';
+export const PLAN_LIST_VIEW_ALL_ACTION = 'emi.plan_list_view_all_action';
+export const PLAN_LIST_PAY_ENTIRE_ACTION = 'emi.plan_list_pay_entire_action';
+export const PLAN_LIST_CALLOUT_AGREEMENT = 'emi.plan_list_callout_agreement';
+export const PLAN_LIST_CALLOUT_AGREEMENT_HIGHLIGHT =
+  'emi.plan_list_callout_agreement_highlight';
+export const CREDIT_EMI_DESCRIPTION = 'emi.credit_emi_description';
+export const HDFC_DEBIT_DESCRIPTION_MIN_BALANCE =
+  'emi.hdfc_debit_description_min_balance';
+export const HDFC_DEBIT_DESCRIPTION_INCLUDES_INTEREST =
+  'emi.hdfc_debit_description_includes_interest';
+export const HDFC_DEBIT_DESCRIPTION_CONVENIENCE =
+  'emi.hdfc_debit_description_convenience';
+export const DESCRIPTION_MONTHLY_INSTALLMENT =
+  'emi.description_monthly_installment';
+export const DESCRIPTION_TOTAL_AMOUNT = 'emi.description_total_amount';

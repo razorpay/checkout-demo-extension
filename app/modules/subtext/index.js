@@ -4,6 +4,7 @@ import { generateSubtextForNetbankingInstrument } from './netbanking';
 
 const INSTRuMENT_SUBTEXT = {
   card: generateSubtextForCardInstrument,
+  emi: generateSubtextForCardInstrument,
   netbanking: generateSubtextForNetbankingInstrument,
   wallet: generateSubtextForWalletInstrument,
 };

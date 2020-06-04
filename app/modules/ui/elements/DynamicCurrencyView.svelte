@@ -18,6 +18,10 @@
 
   import { showAmount, showCtaWithDefaultText } from 'checkoutstore/cta';
 
+  // i18n
+  import { t } from 'svelte-i18n';
+  import { SEARCH_PLACEHOLDER, SEARCH_TITLE } from 'ui/labels/dcc';
+
   // Utils imports
   import { getSession } from 'sessionmanager';
 
@@ -289,7 +293,7 @@
         {#if selectedCurrencyInDisplay}
           <div class="default-currencies">
             <Stack horizonal>
-              {#each displayCurrencies as [code, config]}
+              {#each displayCurrencies as [code, config] (code)}
                 <Radio
                   name="dcc_currency"
                   label={code}
@@ -318,8 +322,8 @@
         <span class="arrow">&#xe604;</span>
       </div>
       <SearchModal
-        title="Select Currency to Pay"
-        placeholder="Search for currency or code"
+        title={$t(SEARCH_TITLE)}
+        placeholder={$t(SEARCH_PLACEHOLDER)}
         autocomplete="transaction-currency"
         items={sortedCurrencies}
         keys={['currency', 'name', 'symbol']}

@@ -483,7 +483,7 @@
                 {:else}
                   <!-- LABEL: Type of Bank Account -->
                   <option value="">{$t(ACCOUNT_TYPE_LABEL)}</option>
-                  {#each accountTypes as type}
+                  {#each accountTypes as type (type)}
                     <option value={type}>{$t(accountTextLabels[type])}</option>
                   {/each}
                 {/if}

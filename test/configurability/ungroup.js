@@ -112,130 +112,182 @@ test('Module: configurability/ungroup', t => {
 
       groupedInstrument = {
         method: 'card',
-        token_ids: ['token_12345', 'token_54321'],
-      };
-
-      block = {
-        code: 'block.test',
-        instruments: [groupedInstrument],
-      };
-
-      expected = {
-        code: 'block.test',
-        instruments: [
-          {
-            method: 'card',
-            token_ids: ['token_12345', 'token_54321'],
-            _ungrouped: [
-              {
-                method: 'card',
-                token_id: 'token_12345',
-                type: 'credit',
-                issuer: 'HDFC',
-                network: 'Visa',
-              },
-              {
-                method: 'card',
-                token_id: 'token_54321',
-                type: 'debit',
-                issuer: 'ICIC',
-                network: 'MasterCard',
-              },
-            ],
-          },
-        ],
-      };
-
-      found = Ungroup.ungroupInstruments(block, customer);
-
-      t.deepEqual(found, expected, 'Works for token_ids');
-
-      groupedInstrument = {
-        method: 'card',
         networks: ['Visa'],
         issuers: ['HDFC', 'ICIC'],
       };
 
       block = {
         code: 'block.test',
-        instruments: [groupedInstrument],
+        instruments: [
+          {
+            method: 'card',
+            types: ['credit'],
+          },
+          {
+            method: 'card',
+            networks: ['Visa', 'RuPay'],
+          },
+          {
+            method: 'card',
+            issuers: ['HDFC', 'ICIC'],
+          },
+          {
+            method: 'card',
+            types: ['credit'],
+            networks: ['Visa', 'RuPay'],
+          },
+          {
+            method: 'card',
+            types: ['credit'],
+            issuers: ['HDFC', 'ICIC'],
+          },
+          {
+            method: 'card',
+            networks: ['Visa', 'RuPay'],
+            issuers: ['HDFC', 'ICIC'],
+          },
+          {
+            method: 'card',
+            types: ['credit'],
+            networks: ['Visa', 'RuPay'],
+            issuers: ['HDFC', 'ICIC'],
+          },
+        ],
       };
 
       expected = {
         code: 'block.test',
         instruments: [
           {
-            method: 'card',
-            networks: ['Visa'],
-            issuers: ['HDFC', 'ICIC'],
             _ungrouped: [
               {
+                type: 'credit',
                 method: 'card',
-                networks: ['Visa'],
-                issuers: ['HDFC', 'ICIC'],
               },
             ],
-          },
-        ],
-      };
-
-      found = Ungroup.ungroupInstruments(block, customer);
-
-      t.deepEqual(
-        found,
-        expected,
-        'Leaves instruments without token_id or token_ids untouched'
-      );
-
-      block = {
-        code: 'block.test',
-        instruments: [
-          {
             method: 'card',
-            token_ids: ['token_12345', 'token_54321'],
+            types: ['credit'],
           },
           {
-            method: 'card',
-            networks: ['Visa'],
-            issuers: ['HDFC', 'ICIC'],
-          },
-        ],
-      };
-
-      expected = {
-        code: 'block.test',
-        instruments: [
-          {
-            method: 'card',
-            token_ids: ['token_12345', 'token_54321'],
             _ungrouped: [
               {
+                network: 'Visa',
                 method: 'card',
-                token_id: 'token_12345',
+              },
+              {
+                network: 'RuPay',
+                method: 'card',
+              },
+            ],
+            method: 'card',
+            networks: ['Visa', 'RuPay'],
+          },
+          {
+            _ungrouped: [
+              {
+                issuer: 'HDFC',
+                method: 'card',
+              },
+              {
+                issuer: 'ICIC',
+                method: 'card',
+              },
+            ],
+            method: 'card',
+            issuers: ['HDFC', 'ICIC'],
+          },
+          {
+            _ungrouped: [
+              {
+                type: 'credit',
+                network: 'Visa',
+                method: 'card',
+              },
+              {
+                type: 'credit',
+                network: 'RuPay',
+                method: 'card',
+              },
+            ],
+            method: 'card',
+            types: ['credit'],
+            networks: ['Visa', 'RuPay'],
+          },
+          {
+            _ungrouped: [
+              {
                 type: 'credit',
                 issuer: 'HDFC',
-                network: 'Visa',
+                method: 'card',
               },
               {
-                method: 'card',
-                token_id: 'token_54321',
-                type: 'debit',
+                type: 'credit',
                 issuer: 'ICIC',
-                network: 'MasterCard',
+                method: 'card',
               },
             ],
+            method: 'card',
+            types: ['credit'],
+            issuers: ['HDFC', 'ICIC'],
           },
           {
-            method: 'card',
-            networks: ['Visa'],
-            issuers: ['HDFC', 'ICIC'],
             _ungrouped: [
               {
+                network: 'Visa',
+                issuer: 'HDFC',
                 method: 'card',
-                networks: ['Visa'],
-                issuers: ['HDFC', 'ICIC'],
+              },
+              {
+                network: 'Visa',
+                issuer: 'ICIC',
+                method: 'card',
+              },
+              {
+                network: 'RuPay',
+                issuer: 'HDFC',
+                method: 'card',
+              },
+              {
+                network: 'RuPay',
+                issuer: 'ICIC',
+                method: 'card',
               },
             ],
+            method: 'card',
+            networks: ['Visa', 'RuPay'],
+            issuers: ['HDFC', 'ICIC'],
+          },
+          {
+            _ungrouped: [
+              {
+                type: 'credit',
+                network: 'Visa',
+                issuer: 'HDFC',
+                method: 'card',
+              },
+              {
+                type: 'credit',
+                network: 'Visa',
+                issuer: 'ICIC',
+                method: 'card',
+              },
+              {
+                type: 'credit',
+                network: 'RuPay',
+                issuer: 'HDFC',
+                method: 'card',
+              },
+              {
+                type: 'credit',
+                network: 'RuPay',
+                issuer: 'ICIC',
+                method: 'card',
+              },
+            ],
+            method: 'card',
+            types: ['credit'],
+            networks: ['Visa', 'RuPay'],
+            issuers: ['HDFC', 'ICIC'],
           },
         ],
       };
@@ -245,7 +297,7 @@ test('Module: configurability/ungroup', t => {
       t.deepEqual(
         found,
         expected,
-        'Works on a mix of instruments with and without token_id(s)'
+        'Works on instruments with issuers, networks and types'
       );
 
       t.end();
@@ -253,38 +305,7 @@ test('Module: configurability/ungroup', t => {
 
     test('method=netbanking', t => {
       let block, expected, found;
-      let individualInstrument, groupedInstrument;
-
-      individualInstrument = {
-        method: 'netbanking',
-        bank: 'HDFC',
-      };
-
-      block = {
-        code: 'block.test',
-        instruments: [individualInstrument],
-      };
-
-      expected = {
-        code: 'block.test',
-        instruments: [
-          {
-            method: 'netbanking',
-            bank: 'HDFC',
-
-            _ungrouped: [
-              {
-                method: 'netbanking',
-                bank: 'HDFC',
-              },
-            ],
-          },
-        ],
-      };
-
-      found = Ungroup.ungroupInstruments(block);
-
-      t.deepEqual(found, expected, 'Leaves individual instruments untouched');
+      let groupedInstrument;
 
       groupedInstrument = {
         method: 'netbanking',
@@ -325,7 +346,7 @@ test('Module: configurability/ungroup', t => {
 
     test('method=upi', t => {
       let block, expected, found;
-      let individualInstrument, groupedInstrument;
+      let groupedInstrument;
 
       const customer = {
         tokens: {
@@ -380,99 +401,6 @@ test('Module: configurability/ungroup', t => {
         },
       };
 
-      individualInstrument = {
-        method: 'upi',
-        flow: 'qr',
-      };
-
-      block = {
-        code: 'block.test',
-        instruments: [individualInstrument],
-      };
-
-      expected = {
-        code: 'block.test',
-        instruments: [
-          {
-            method: 'upi',
-            flow: 'qr',
-            _ungrouped: [
-              {
-                method: 'upi',
-                flow: 'qr',
-              },
-            ],
-          },
-        ],
-      };
-
-      found = Ungroup.ungroupInstruments(block);
-
-      t.deepEqual(found, expected, 'Works for individual instrument: flow');
-
-      individualInstrument = {
-        method: 'upi',
-        app: 'com.google.android.apps.nbu.paisa.user',
-      };
-
-      block = {
-        code: 'block.test',
-        instruments: [individualInstrument],
-      };
-
-      expected = {
-        code: 'block.test',
-        instruments: [
-          {
-            method: 'upi',
-            app: 'com.google.android.apps.nbu.paisa.user',
-
-            _ungrouped: [
-              {
-                method: 'upi',
-                app: 'com.google.android.apps.nbu.paisa.user',
-                flow: 'intent',
-              },
-            ],
-          },
-        ],
-      };
-
-      found = Ungroup.ungroupInstruments(block);
-
-      t.deepEqual(found, expected, 'Works for individual instrument: app');
-
-      individualInstrument = {
-        method: 'upi',
-        token_id: 'token_12345',
-      };
-
-      block = {
-        code: 'block.test',
-        instruments: [individualInstrument],
-      };
-
-      expected = {
-        code: 'block.test',
-        instruments: [
-          {
-            method: 'upi',
-            token_id: 'token_12345',
-            _ungrouped: [
-              {
-                method: 'upi',
-                token_id: 'token_12345',
-                flow: 'collect',
-              },
-            ],
-          },
-        ],
-      };
-
-      found = Ungroup.ungroupInstruments(block, customer);
-
-      t.deepEqual(found, expected, 'Works for individual instrument: token_id');
-
       groupedInstrument = {
         method: 'upi',
         flows: ['qr', 'collect'],
@@ -505,11 +433,12 @@ test('Module: configurability/ungroup', t => {
 
       found = Ungroup.ungroupInstruments(block);
 
-      t.deepEqual(found, expected, 'Works for groupe instrument: flows');
+      t.deepEqual(found, expected, 'Works for grouped instrument: flows');
 
       groupedInstrument = {
         method: 'upi',
         apps: ['com.google.android.apps.nbu.paisa.user', 'com.phonepe.app'],
+        flows: ['intent'],
       };
 
       block = {
@@ -523,6 +452,7 @@ test('Module: configurability/ungroup', t => {
           {
             method: 'upi',
             apps: ['com.google.android.apps.nbu.paisa.user', 'com.phonepe.app'],
+            flows: ['intent'],
             _ungrouped: [
               {
                 method: 'upi',
@@ -545,45 +475,8 @@ test('Module: configurability/ungroup', t => {
 
       groupedInstrument = {
         method: 'upi',
-        token_ids: ['token_12345', 'token_54321'],
-      };
-
-      block = {
-        code: 'block.test',
-        instruments: [groupedInstrument],
-      };
-
-      expected = {
-        code: 'block.test',
-        instruments: [
-          {
-            method: 'upi',
-            token_ids: ['token_12345', 'token_54321'],
-            _ungrouped: [
-              {
-                method: 'upi',
-                token_id: 'token_12345',
-                flow: 'collect',
-              },
-
-              {
-                method: 'upi',
-                token_id: 'token_54321',
-                flow: 'collect',
-              },
-            ],
-          },
-        ],
-      };
-
-      found = Ungroup.ungroupInstruments(block, customer);
-
-      t.deepEqual(found, expected, 'Works for grouped instrument: token_ids');
-
-      groupedInstrument = {
-        method: 'upi',
         apps: ['com.google.android.apps.nbu.paisa.user', 'com.phonepe.app'],
-        flows: ['qr', 'collect'],
+        flows: ['qr', 'collect', 'intent'],
       };
 
       block = {
@@ -597,7 +490,7 @@ test('Module: configurability/ungroup', t => {
           {
             method: 'upi',
             apps: ['com.google.android.apps.nbu.paisa.user', 'com.phonepe.app'],
-            flows: ['qr', 'collect'],
+            flows: ['qr', 'collect', 'intent'],
             _ungrouped: [
               {
                 method: 'upi',
@@ -608,6 +501,14 @@ test('Module: configurability/ungroup', t => {
                 method: 'upi',
                 app: 'com.phonepe.app',
                 flow: 'intent',
+              },
+              {
+                method: 'upi',
+                flow: 'qr',
+              },
+              {
+                method: 'upi',
+                flow: 'collect',
               },
             ],
           },
@@ -627,37 +528,7 @@ test('Module: configurability/ungroup', t => {
 
     test('method=wallet', t => {
       let block, expected, found;
-      let individualInstrument, groupedInstrument;
-
-      individualInstrument = {
-        method: 'wallet',
-        wallet: 'freecharge',
-      };
-
-      block = {
-        code: 'block.test',
-        instruments: [individualInstrument],
-      };
-
-      expected = {
-        code: 'block.test',
-        instruments: [
-          {
-            method: 'wallet',
-            wallet: 'freecharge',
-            _ungrouped: [
-              {
-                method: 'wallet',
-                wallet: 'freecharge',
-              },
-            ],
-          },
-        ],
-      };
-
-      found = Ungroup.ungroupInstruments(block);
-
-      t.deepEqual(found, expected, 'Leaves individual instruments untouched');
+      let groupedInstrument;
 
       groupedInstrument = {
         method: 'wallet',
@@ -698,37 +569,7 @@ test('Module: configurability/ungroup', t => {
 
     test('method=cardless_emi', t => {
       let block, expected, found;
-      let individualInstrument, groupedInstrument;
-
-      individualInstrument = {
-        method: 'cardless_emi',
-        provider: 'zestmoney',
-      };
-
-      block = {
-        code: 'block.test',
-        instruments: [individualInstrument],
-      };
-
-      expected = {
-        code: 'block.test',
-        instruments: [
-          {
-            method: 'cardless_emi',
-            provider: 'zestmoney',
-            _ungrouped: [
-              {
-                method: 'cardless_emi',
-                provider: 'zestmoney',
-              },
-            ],
-          },
-        ],
-      };
-
-      found = Ungroup.ungroupInstruments(block);
-
-      t.deepEqual(found, expected, 'Leaves individual instruments untouched');
+      let groupedInstrument;
 
       groupedInstrument = {
         method: 'cardless_emi',
@@ -769,37 +610,7 @@ test('Module: configurability/ungroup', t => {
 
     test('method=paylater', t => {
       let block, expected, found;
-      let individualInstrument, groupedInstrument;
-
-      individualInstrument = {
-        method: 'paylater',
-        provider: 'epaylater',
-      };
-
-      block = {
-        code: 'block.test',
-        instruments: [individualInstrument],
-      };
-
-      expected = {
-        code: 'block.test',
-        instruments: [
-          {
-            method: 'paylater',
-            provider: 'epaylater',
-            _ungrouped: [
-              {
-                method: 'paylater',
-                provider: 'epaylater',
-              },
-            ],
-          },
-        ],
-      };
-
-      found = Ungroup.ungroupInstruments(block);
-
-      t.deepEqual(found, expected, 'Leaves individual instruments untouched');
+      let groupedInstrument;
 
       groupedInstrument = {
         method: 'paylater',
