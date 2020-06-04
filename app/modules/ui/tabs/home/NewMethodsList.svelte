@@ -22,7 +22,11 @@
 
   // i18n
   import { t } from 'svelte-i18n';
-  import { PREFERRED_BLOCK_TITLE } from 'ui/labels/methods';
+  import {
+    PREFERRED_BLOCK_TITLE,
+    CONFIG_BLOCK_DEFAULT_TITLE,
+    FREQUENTLY_USED_CONFIG_TITLE,
+  } from 'ui/labels/methods';
 
   onDestroy(() => {
     deselectInstrument();
@@ -71,7 +75,10 @@
         {#if block.code === 'rzp.preferred'}
           <!-- LABEL: Preferred Payment Methods -->
           {$t(PREFERRED_BLOCK_TITLE)}
-        {:else}{block.title || 'Available Payment Methods'}{/if}
+          <!-- This is hard-coded because it exists for a lot of merchants, and hence needs translation -->
+        {:else if block.code === 'block.used' && block.title === 'Frequently Used Methods'}
+          {$t(FREQUENTLY_USED_CONFIG_TITLE)}
+        {:else}{block.title || $t(CONFIG_BLOCK_DEFAULT_TITLE)}{/if}
       </h3>
       <div role="list" class="border-list">
         {#each block.instruments as instrument, index (instrument.id)}

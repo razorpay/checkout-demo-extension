@@ -140,6 +140,7 @@ export default {
   home: {
     preferred_block_title: 'Preferred Payment Methods',
     single_block_title: 'Pay via {method}',
+    config_block_default_title: 'Available Payment Methods',
 
     contact_label_required: 'Phone with Country Code',
     contact_label_optional: 'Phone with Country Code (Optional)',
