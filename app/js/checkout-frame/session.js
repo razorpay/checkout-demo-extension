@@ -3679,7 +3679,8 @@ Session.prototype = {
         loading: loading,
       });
     } else {
-      var text = ''; // TODO: get tab title from i18n
+      var locale = I18n.getCurrentLocale();
+      var text = I18n.getOtpScreenTitle(textView, templateData, locale);
       this.showLoadError(text);
     }
   },
