@@ -9,6 +9,7 @@ import paylater from './paylater';
 import paypal from './paypal';
 import bank_transfer from './bank_transfer';
 import contact from './contact';
+import upiOtm from './upi_otm';
 
 import { getAllMethods } from 'checkoutframe/paymentmethods';
 
@@ -52,6 +53,9 @@ function getIconFn(iconName) {
 
     case 'gpay':
       return () => '<i class="gpay-icon" />';
+
+    case 'upi_otm':
+      return upiOtm;
   }
 }
 

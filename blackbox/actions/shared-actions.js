@@ -96,6 +96,9 @@ async function handleMockSuccessDialog(context) {
 async function expectRedirectWithCallback(context, fields) {
   const request = await context.expectRequest();
   const body = querystring.parse(request.body);
+  if (fields.method === 'upi_otm') {
+    fields.method = 'upi';
+  }
   const apiUrl = 'https://api.razorpay.com/v1/payments/create/';
   expect(request.method).toEqual('POST');
   if (fields) {
@@ -106,6 +109,7 @@ async function expectRedirectWithCallback(context, fields) {
     apiSuffix = 'fees';
   } else if (
     context.preferences.methods.upi ||
+    context.preferences.methods.upi_otm ||
     fields.method == 'paylater' ||
     (context.preferences.methods.cardless_emi != undefined &&
       !context.prefilledContact &&

@@ -1120,7 +1120,7 @@ Session.prototype = {
       }
 
       if (pollUrl) {
-        this.switchTab('upi');
+        this.switchTab(self.tab);
         this.showLoadError();
         this.isResumedPayment = true;
 
@@ -1283,6 +1283,17 @@ Session.prototype = {
     }
   },
 
+  setUpiOtmTab: function() {
+    if (MethodStore.isMethodEnabled('upi_otm')) {
+      this.upiOtmTab = new discreet.UpiTab({
+        target: _Doc.querySelector('#form-fields'),
+        props: {
+          method: 'upi_otm',
+        },
+      });
+    }
+  },
+
   setHomeTab: function() {
     this.homeTab = new discreet.HomeTab({
       target: gel('form-fields'),
@@ -1376,6 +1387,7 @@ Session.prototype = {
     this.setPayLater();
     this.setOtpScreen();
     this.setUpiTab();
+    this.setUpiOtmTab();
     this.setPayoutsScreen();
     this.setNach();
     this.setBankTransfer();
@@ -2434,7 +2446,10 @@ Session.prototype = {
       } catch (e) {}
     }
 
-    if (MethodStore.isMethodEnabled('upi')) {
+    if (
+      MethodStore.isMethodEnabled('upi') ||
+      MethodStore.isMethodEnabled('upi_otm')
+    ) {
       this.click('#cancel_upi .btn', function() {
         var upi_radio = $('#cancel_upi input:checked');
         if (!upi_radio[0]) {
@@ -2661,7 +2676,9 @@ Session.prototype = {
       if (this.homeTab && this.homeTab.onDetailsScreen()) {
         invoke('focus', qs(screenEl + ' .invalid input'));
       }
-    } else if (!(screen === 'upi' && this.upi_intents_data)) {
+    } else if (
+      !((screen === 'upi' || screen === 'upi_otm') && this.upi_intents_data)
+    ) {
       invoke('focus', qs(screenEl + ' .invalid input'));
     }
 
@@ -2686,7 +2703,7 @@ Session.prototype = {
 
     if (screen === '' && this.homeTab) {
       this.homeTab.onShown();
-    } else if (screen !== 'upi') {
+    } else if (screen !== 'upi' && screen !== 'upi_otm') {
       this.body.toggleClass('sub', showPaybtn);
     }
 
@@ -2880,8 +2897,13 @@ Session.prototype = {
   },
 
   switchTabAnalytics: function(tab) {
-    if (tab === 'upi') {
-      var upiData = this.upiTab;
+    if (tab === 'upi' || tab === 'upi_otm') {
+      var upiData;
+      if (tab === 'upi') {
+        upiData = this.upiTab;
+      } else if (tab === 'upi_otm') {
+        upiData = this.upiOtmTab;
+      }
 
       if (upiData && upiData.intent) {
         /**
@@ -3055,12 +3077,23 @@ Session.prototype = {
       this.upiTab.onShown();
     }
 
+    if (tab === 'upi_otm') {
+      this.updateCustomerInStore();
+      this.upiOtmTab.onShown();
+    }
+
     if (tab === 'emandate') {
       this.emandateView.onShown();
     }
 
     if (tab === '' && this.tab === 'upi') {
       if (this.upiTab.onBack()) {
+        return;
+      }
+    }
+
+    if (tab === '' && this.tab === 'upi_otm') {
+      if (this.upiOtmTab.onBack()) {
         return;
       }
     }
@@ -3590,7 +3623,13 @@ Session.prototype = {
 
       if (
         !_Arr.contains(
-          ['#form-upi', '#form-card', '#form-wallet', '#form-emandate'],
+          [
+            '#form-upi',
+            '#form-card',
+            '#form-wallet',
+            '#form-emandate',
+            '#form-upi_otm',
+          ],
           activeForm
         )
       ) {
@@ -3618,9 +3657,18 @@ Session.prototype = {
         }
       }
 
-      if (this.screen === 'upi' && this.tab !== 'qr') {
+      if (
+        (this.screen === 'upi' || this.screen === 'upi_otm') &&
+        this.tab !== 'qr'
+      ) {
         /* All tabs should be responsible for their subdata */
-        var upiData = this.upiTab.getPayload();
+        var upiData;
+
+        if (this.screen === 'upi') {
+          upiData = this.upiTab.getPayload();
+        } else if (this.screen === 'upi_otm') {
+          upiData = this.upiOtmTab.getPayload();
+        }
 
         each(upiData, function(key, value) {
           data[key] = value;
@@ -3671,7 +3719,10 @@ Session.prototype = {
     var actionState;
     var loadingState = true;
     if (error) {
-      if (this.screen === 'upi' && text === discreet.cancelMsg) {
+      if (
+        (this.screen === 'upi' || this.screen === 'upi_otm') &&
+        text === discreet.cancelMsg
+      ) {
         if (this.payload && this.payload['_[flow]'] === 'intent') {
           return;
         }
@@ -4213,8 +4264,8 @@ Session.prototype = {
       }
 
       // perform the actual validation
-      if (screen === 'upi') {
-        var formSelector = '#user-new-vpa-container';
+      if (screen === 'upi' || screen === 'upi_otm') {
+        var formSelector = '#user-new-vpa-container-' + screen;
 
         if (data['_[flow]'] === 'directpay') {
           if (data.upi_provider === 'google_pay') {
@@ -5016,6 +5067,7 @@ Session.prototype = {
    */
   cleanUpSvelteComponents: function() {
     var views = [
+      'upiOtmTab',
       'bankTransferView',
       'cardlessEmiView',
       'currentScreen',

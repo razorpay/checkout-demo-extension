@@ -16,6 +16,7 @@
   :global(#form-card.drishy ~ #bottom .bottom[tab='card']),
   :global(#form-netbanking.drishy ~ #bottom .bottom[tab='netbanking']),
   :global(#form-upi.drishy ~ #bottom .bottom[tab='upi']),
+  :global(#form-upi_otm.drishy ~ #bottom .bottom[tab='upi_otm']),
   :global(#form-bank_transfer.drishy ~ #bottom .bottom[tab='bank_transfer']),
   :global(#form-emiplans.drishy ~ #bottom .bottom[tab='emiplans']),
   :global(#form-payouts.drishy ~ #bottom .bottom[tab='payouts']),

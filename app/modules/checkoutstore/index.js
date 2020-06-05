@@ -56,6 +56,9 @@ const getEntityWithAmount = () =>
 export const getAmount = () => {
   return getOption('amount');
 };
+export const getName = () => {
+  return getOption('name');
+};
 
 // @TODO use everywhere
 export const getCurrency = () => {

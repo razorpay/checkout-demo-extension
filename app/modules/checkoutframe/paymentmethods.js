@@ -96,6 +96,7 @@ const DESCRIPTIONS = {
       getWallets().map(w => w.name),
       2
     ),
+  upi_otm: () => 'Pay later using BHIM and HDFC',
 };
 
 /**
@@ -158,6 +159,9 @@ export function getMethodPrefix(method) {
 
     case 'qr':
       return 'UPI QR';
+
+    case 'upi_otm':
+      return 'UPI OTM';
 
     case 'upi':
       return 'UPI';

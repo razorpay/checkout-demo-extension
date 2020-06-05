@@ -146,6 +146,10 @@ const ALL_METHODS = {
   gpay() {
     return isUPIBaseEnabled() && isIRCTC();
   },
+
+  upi_otm() {
+    return isUPIOTMBaseEnabled();
+  },
 };
 
 export function isZestMoneyEnabled() {
@@ -196,6 +200,7 @@ export function getSingleMethod() {
       'netbanking',
       'emandate',
       'nach',
+      'upi_otm',
       'upi',
       'wallet',
       'paypal',
@@ -235,6 +240,14 @@ const UPI_METHODS = {
     getMerchantMethods().upi_intent && getUPIIntentApps().all.length,
 };
 
+// additional checks for each sub-method based on UPI OTM
+const UPI_OTM_METHODS = {
+  collect: () => true,
+  omnichannel: () => false,
+  qr: () => false,
+  intent: () => false,
+};
+
 // check if upi itself is enabled, before checking any
 // of the individual methods
 function isUPIBaseEnabled() {
@@ -251,6 +264,20 @@ function isUPIBaseEnabled() {
   );
 }
 
+function isUPIOTMBaseEnabled() {
+  return (
+    getOption('method.upi_otm') !== false &&
+    getMerchantMethods().upi_otm &&
+    // if amount less than 1L, or order has method=upi
+    // order.method = upi with amount > 1L is passed
+    // by mutual fund who can accept more than the standard limit
+    (getAmount() < 1e7 || getMerchantOrder()?.method === 'upi_otm') &&
+    !isInternational() &&
+    !isRecurring() &&
+    getAmount()
+  );
+}
+
 export function isUPIFlowEnabled(method) {
   // unless method.upi or method.upi.{sub-method} is passed as false by merchant
   // it should be considered enabled from merchant side
@@ -259,6 +286,16 @@ export function isUPIFlowEnabled(method) {
     return false;
   }
   return isUPIBaseEnabled() && UPI_METHODS[method]();
+}
+
+export function isUPIOtmFlowEnabled(method) {
+  // unless method.upi_otm is passed as false by merchant
+  // it should be considered enabled from merchant side
+  const merchantOption = getOption('method.upi_otm');
+  if (_.isNonNullObject(merchantOption) && merchantOption[method] === false) {
+    return false;
+  }
+  return isUPIOTMBaseEnabled() && UPI_OTM_METHODS[method]();
 }
 
 export function getCardNetworks() {
