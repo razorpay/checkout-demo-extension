@@ -2716,10 +2716,20 @@ Session.prototype = {
     } else if (screen === 'emi') {
       emiHandler.call(this);
     } else if (screen === 'cardless_emi' && screen !== 'otp') {
-      var provider = offer.provider;
+      /**
+       * If EMI and Cardless EMI are clubbed, the user will land on the Cardless EMI screen
+       * So, if the offer method is EMI, let's get the user on the EMI screen
+       */
+      if (offer.payment_method === 'emi') {
+        this.selectCardlessEmiProviderAndAttemptPayment('cards');
 
-      if (provider) {
-        this.selectCardlessEmiProviderAndAttemptPayment(provider);
+        emiHandler.call(this);
+      } else {
+        var provider = offer.provider;
+
+        if (provider) {
+          this.selectCardlessEmiProviderAndAttemptPayment(provider);
+        }
       }
     }
   },
