@@ -10,9 +10,16 @@ import {
   getCardlessEMIProviders,
 } from 'checkoutstore/methods';
 
-import { instruments, selectedInstrument } from 'checkoutstore/screens/home';
+import {
+  instruments,
+  selectedInstrument,
+  sequence as sequenceStore,
+} from 'checkoutstore/screens/home';
 import { get as storeGetter } from 'svelte/store';
-import { isSavedCardInstrument } from 'configurability/instruments';
+import {
+  isSavedCardInstrument,
+  isInstrumentForEntireMethod,
+} from 'configurability/instruments';
 
 /**
  * Checks if offer is eligible.
@@ -199,6 +206,40 @@ function _getAllInstrumentsForOffer(offer) {
   );
 }
 
+const INSTRUMENT_TO_SELECT_HANDLERS = {
+  default: offer => {
+    const instruments = _getAllInstrumentsForOffer(offer);
+    const nonSavedCardInstruments = _Arr.filter(
+      instruments,
+      instrument => !isSavedCardInstrument(instrument)
+    );
+
+    const first = nonSavedCardInstruments[0];
+
+    if (first) {
+      return first;
+    }
+  },
+
+  card: offer => {
+    const instruments = _getAllInstrumentsForOffer(offer);
+
+    // Try choosing instrument for entire method
+    const methodInstrument = _Arr.find(
+      instruments,
+      isInstrumentForEntireMethod
+    );
+
+    if (methodInstrument) {
+      return methodInstrument;
+    }
+
+    return INSTRUMENT_TO_SELECT_HANDLERS.default(offer);
+  },
+};
+
+INSTRUMENT_TO_SELECT_HANDLERS.emi = INSTRUMENT_TO_SELECT_HANDLERS.card;
+
 /**
  * Returns a matching instrument for the offer
  *
@@ -231,17 +272,11 @@ export function getInstrumentToSelectForOffer(offer) {
   }
 
   // Not eligible on currently selected instrument
-  // Search for an eligible instrument
+  // Search for other eligible instruments
 
-  const instruments = _getAllInstrumentsForOffer(offer);
-  const nonSavedCardInstruments = _Arr.filter(
-    instruments,
-    instrument => !isSavedCardInstrument(instrument)
-  );
+  const handler =
+    INSTRUMENT_TO_SELECT_HANDLERS[offer.payment_method] ||
+    INSTRUMENT_TO_SELECT_HANDLERS.default;
 
-  const first = nonSavedCardInstruments[0];
-
-  if (first) {
-    return first;
-  }
+  return handler(offer);
 }
