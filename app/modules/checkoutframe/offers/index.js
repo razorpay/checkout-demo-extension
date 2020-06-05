@@ -210,7 +210,7 @@ function _getAllInstrumentsForOffer(offer) {
  *
  * @returns {Instrument|undefined}
  */
-export function getInstrumentForOffer(offer) {
+export function getInstrumentToSelectForOffer(offer) {
   const currentInstrument = storeGetter(selectedInstrument);
 
   if (currentInstrument) {

@@ -2731,7 +2731,7 @@ Session.prototype = {
      * and select it if not already selected
      */
 
-    var instrument = discreet.Offers.getInstrumentForOffer(offer);
+    var instrument = discreet.Offers.getInstrumentToSelectForOffer(offer);
 
     if (!instrument) {
       Analytics.track('offer_instrument_undef', {
