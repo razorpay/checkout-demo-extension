@@ -2683,17 +2683,7 @@ Session.prototype = {
 
     var issuer = offer.issuer;
 
-    if (screen === 'wallet') {
-      // Select wallet
-      if (issuer) {
-        this.svelteWalletsTab.onWalletSelection(issuer);
-      }
-    } else if (screen === 'netbanking') {
-      // Select bank
-      if (issuer) {
-        NetbankingScreenStore.selectedBank.set(issuer);
-      }
-    } else if (screen === 'emi') {
+    var emiHandler = function() {
       var emiDuration = getEmiDurationForNewCard();
       var bank = this.emiPlansForNewCard && this.emiPlansForNewCard.code;
 
@@ -2711,6 +2701,20 @@ Session.prototype = {
           setEmiDurationForNewCard('');
         }
       }
+    };
+
+    if (screen === 'wallet') {
+      // Select wallet
+      if (issuer) {
+        this.svelteWalletsTab.onWalletSelection(issuer);
+      }
+    } else if (screen === 'netbanking') {
+      // Select bank
+      if (issuer) {
+        NetbankingScreenStore.selectedBank.set(issuer);
+      }
+    } else if (screen === 'emi') {
+      emiHandler.call(this);
     } else if (screen === 'cardless_emi' && screen !== 'otp') {
       var provider = offer.provider;
 
