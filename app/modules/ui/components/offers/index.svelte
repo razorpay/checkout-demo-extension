@@ -13,6 +13,7 @@
     getOffersForTab,
     getOffersForInstrument,
     getOtherOffers,
+    getOffersForTabAndInstrument,
   } from 'checkoutframe/offers';
 
   import Callout from 'ui/elements/Callout.svelte';
@@ -92,7 +93,10 @@
       }
     } else {
       // We are in a method tab. Instrument might have been chosen. Show offers accordingly.
-      applicableOffers = getOffersForInstrument($methodInstrument);
+      applicableOffers = getOffersForTabAndInstrument({
+        tab,
+        instrument: $methodInstrument,
+      });
     }
 
     var invalidateOffer = false;

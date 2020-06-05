@@ -88,18 +88,36 @@ export function getOffersForTab(method) {
   const allOffers = getAllOffers();
 
   if (method) {
+    const sequence = storeGetter(sequenceStore);
+    const sessionHasEmi = _Arr.contains(sequence, 'emi');
+
     // EMI plans should have the same offers as EMI
     // TODO: Fix for Cardless EMI
     method = getOfferMethodForTab(method);
     if (method === 'cardless_emi') {
       allOffers.push(zestMoneyOffer);
     }
-    return allOffers.filter(function(o) {
-      return o.payment_method === method;
-    });
+
+    let methods = [method];
+
+    if (sessionHasEmi && method === 'cardless_emi') {
+      methods.push('emi');
+    }
+
+    return allOffers.filter(offer =>
+      _Arr.contains(methods, offer.payment_method)
+    );
   }
 
   return allOffers;
+}
+
+export function getOffersForTabAndInstrument({ tab, instrument }) {
+  if (instrument && instrument.method === tab) {
+    return getOffersForInstrument(instrument);
+  } else {
+    return getOffersForTab(tab);
+  }
 }
 
 const instrumentKey = {
@@ -117,11 +135,22 @@ const instrumentKey = {
  * @returns {boolean}
  */
 function isOfferEligibleOnInstrument(offer, instrument) {
-  if (offer.payment_method !== instrument.method) {
+  let instrumentMethod = instrument.method;
+
+  const sequence = storeGetter(sequenceStore);
+
+  const sessionHasEmi = _Arr.contains(sequence, 'emi');
+  const isOfferForEmi = offer.payment_method === 'emi';
+  const isInstrumentForEmi = instrument.method === 'emi';
+  const isInstrumentForCardlessEmi = instrument.method === 'cardless_emi';
+
+  if (isInstrumentForCardlessEmi && sessionHasEmi && isOfferForEmi) {
+    // Do nothing
+  } else if (offer.payment_method !== instrumentMethod) {
     return false;
   }
 
-  const key = instrumentKey[instrument.method];
+  const key = instrumentKey[instrumentMethod];
 
   if (key) {
     const offerIssuer = offer.issuer;
