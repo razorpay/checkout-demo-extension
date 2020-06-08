@@ -52,10 +52,6 @@ var shownClass = 'drishy';
 var strings = {
   otpsend: 'Sending OTP to ',
   process: 'Your payment is being processed',
-  gpay_omnichannel: 'Verifying mobile number with Google Pay..',
-  redirect: 'Redirecting to Bank page',
-  acs_load_delay: 'Seems like your bank page is taking time to load.',
-  otp_resent: 'OTP resent',
 };
 
 /**
