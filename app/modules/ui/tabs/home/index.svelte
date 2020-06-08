@@ -62,7 +62,7 @@
   } from 'checkoutstore/methods';
 
   import {
-    getTranslatedInstrumentsForCustomer,
+    getTranslatedInstrumentsForCustomerFromStorage,
     getAllInstrumentsForCustomer,
   } from 'checkoutframe/personalization';
 
@@ -239,7 +239,7 @@
   }
 
   function getAllAvailableP13nInstruments() {
-    return getTranslatedInstrumentsForCustomer($customer, {
+    return getTranslatedInstrumentsForCustomerFromStorage($customer, {
       upiApps: session.upi_intents_data,
     });
   }
