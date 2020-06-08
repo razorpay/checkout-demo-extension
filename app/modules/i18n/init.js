@@ -7,6 +7,20 @@ import {
 import en from './bundles/en';
 import { getSession } from '../sessionmanager';
 
+const LOCALES = {
+  en: 'English',
+  hi: 'Hindi',
+};
+
+/**
+ * Returns the display name for a given language.
+ * @param {string} locale
+ * @return {string}
+ */
+export function getLocaleName(locale) {
+  return LOCALES[locale] || locale;
+}
+
 /**
  * Returns the URL for the locale bundle on CDN
  * @param {string} locale
