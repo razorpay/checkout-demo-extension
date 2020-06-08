@@ -8,7 +8,7 @@ import * as strings from 'common/strings';
 import * as OtpService from 'common/otpservice';
 import { isRecurring } from 'checkoutstore';
 
-/* global getPhone */
+import { contact } from 'checkoutstore/screens/home';
 
 let customers = {};
 let qpmap = _.getQueryParams();
@@ -132,7 +132,7 @@ Customer.prototype = {
     let user = this;
 
     // TODO: fix this
-    data.contact = this.contact || getCustomer(getPhone()).contact;
+    data.contact = this.contact || $contact;
     let url = 'otp/verify';
 
     if (queryParams) {
