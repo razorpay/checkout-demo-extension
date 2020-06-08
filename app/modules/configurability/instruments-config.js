@@ -417,6 +417,9 @@ const config = {
 // EMI and Cards are the same for now.
 config.emi = config.card;
 
+// UPI OTM is the same as UPI for now.
+config.upi_otm = config.upi;
+
 _Obj.loop(config, (val, method) => {
   config[method] = _Obj.extend(
     {
