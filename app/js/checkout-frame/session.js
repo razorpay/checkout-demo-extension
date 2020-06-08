@@ -5393,33 +5393,6 @@ Session.prototype = {
     Customer.prototype.r = this.r;
   },
 
-  showModal: function(preferences) {
-    Razorpay.sendMessage({ event: 'render' });
-
-    if (CheckoutBridge) {
-      var containerBox = $('#container')[0];
-      if (containerBox) {
-        var rect = containerBox.getBoundingClientRect();
-        Bridge.checkout.callAndroid(
-          'setDimensions',
-          Math.floor(rect.width),
-          Math.floor(rect.height)
-        );
-      }
-
-      $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
-    }
-
-    var qpmap = _Obj.unflatten(_.getQueryParams());
-    if (qpmap.error) {
-      errorHandler.call(this, qpmap);
-    }
-
-    if (qpmap.tab) {
-      this.switchTab(qpmap.tab);
-    }
-  },
-
   fetchFundAccounts: function() {
     return Payouts.fetchFundAccounts(this.get('contact_id'));
   },
