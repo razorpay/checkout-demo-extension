@@ -29,9 +29,9 @@ const showModal = session => {
   Razorpay.sendMessage({ event: 'render' });
 
   if (CheckoutBridge) {
-    var containerBox = $('#container')[0];
+    const containerBox = _Doc.getElementById('container');
     if (containerBox) {
-      var rect = containerBox.getBoundingClientRect();
+      const rect = containerBox.getBoundingClientRect();
       Bridge.checkout.callAndroid(
         'setDimensions',
         Math.floor(rect.width),
@@ -41,7 +41,7 @@ const showModal = session => {
     _Doc.getElementById('backdrop').style.background = 'rgba(0, 0, 0, 0.6)';
   }
 
-  var qpmap = _Obj.unflatten(_.getQueryParams());
+  const qpmap = _Obj.unflatten(_.getQueryParams());
   if (qpmap.error) {
     errorHandler.call(session, qpmap);
   }
