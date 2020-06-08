@@ -31,6 +31,7 @@
     SELECT_ACTION,
     SELECT_OFFER_HEADER,
     YOU_SAVE_MESSAGE,
+    APPLY_OFFER_CTA,
   } from 'ui/labels/offers';
 
   import Callout from 'ui/elements/Callout.svelte';
@@ -427,5 +428,5 @@
 {#if error}
   <CTA show={false} />
 {:else if listActive}
-  <CTA on:click={onSubmit} show={Boolean(selected)}>Apply Offer</CTA>
+  <CTA on:click={onSubmit} show={Boolean(selected)}>{$t(APPLY_OFFER_CTA)}</CTA>
 {/if}

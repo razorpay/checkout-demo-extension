@@ -20,3 +20,4 @@ export const AVAILABLE_OFFERS_HEADER = 'offers.available_offers_header';
 export const NO_COST_EMI = 'offers.no_cost_emi';
 export const CASHBACK_DETAIL = 'offers.cashback_detail';
 export const REMOVE_ACTION = 'offers.remove_action';
+export const APPLY_OFFER_CTA = 'cta.apply_offer';
