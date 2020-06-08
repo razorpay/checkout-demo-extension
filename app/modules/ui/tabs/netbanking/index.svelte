@@ -16,6 +16,7 @@
   import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
+  import CTA from 'ui/elements/CTA.svelte';
 
   // i18n labels
   import { NETBANKING_SELECT_LABEL, NETBANKING_SELECT_HELP } from 'ui/labels';
@@ -35,14 +36,13 @@
     isCorporateCode,
   } from 'common/bank';
   import { scrollIntoView } from 'lib/utils';
-  import { hideCta, showCtaWithDefaultText } from 'checkoutstore/cta';
+  import { getSession } from 'sessionmanager';
 
   // Props
   export let banks;
   export let downtimes = getDowntimes();
   export let method;
   export let bankOptions;
-  export let active = false;
 
   // Computed
   let filteredBanks = banks; // Always use this to get the banks
@@ -73,21 +73,6 @@
     if (corporateOption) {
       $selectedBank = corporateOption;
     }
-  }
-
-  export function onShown() {
-    active = true;
-    // For emandate, the screen switches as soon as user selects a bank. We do not need to show the CTA
-    // in that case.
-    if (recurring) {
-      hideCta();
-    } else {
-      showCtaWithDefaultText();
-    }
-  }
-
-  export function onBack() {
-    active = false;
   }
 
   function setRetailOption() {
@@ -280,7 +265,7 @@
       {/if}
     </div>
 
-    <Bottom tab="netbanking">
+    <Bottom>
       <!-- Show recurring message for recurring payments -->
       {#if recurring}
         <Callout>
@@ -301,7 +286,10 @@
           {/if}
         </DowntimeCallout>
       {/if}
-    </Bottom>
 
+    </Bottom>
+    {#if !recurring}
+      <CTA on:click={() => getSession().preSubmit()} />
+    {/if}
   </Screen>
 </Tab>

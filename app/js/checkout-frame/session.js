@@ -1326,6 +1326,7 @@ Session.prototype = {
     }
 
     if (method) {
+      this.netbankingTab && this.netbankingTab.$destroy();
       this.netbankingTab = new discreet.NetbankingTab({
         target: gel('form-fields'),
         props: {
@@ -1381,7 +1382,6 @@ Session.prototype = {
   setSvelteComponents: function() {
     this.setHomeTab();
     this.setSvelteCardTab();
-    this.setNetbankingTab();
     this.setEmandate();
     this.setCardlessEmi();
     this.setPayLater();
@@ -2412,6 +2412,7 @@ Session.prototype = {
     }
     this.click('#top-left', this.back);
     this.on('submit', '#form', this.preSubmit);
+    this.on('click', '#footer span', this.preSubmit);
 
     if (MethodStore.isCardOrEMIEnabled()) {
       /**
@@ -2725,7 +2726,12 @@ Session.prototype = {
           method: offer.payment_method,
         },
       });
-      return this.handleOfferSelection(offer, offer.payment_method);
+      var session = this;
+      // setTimeout is applied to let CTA hide through svelte lifecycle
+      setTimeout(function() {
+        session.handleOfferSelection(offer, offer.payment_method);
+      });
+      return;
     }
 
     var issuer = offer.issuer;
@@ -2852,9 +2858,8 @@ Session.prototype = {
         return;
       }
     } else if (this.tab === 'netbanking') {
-      if (this.netbankingTab.onBack()) {
-        return;
-      }
+      this.netbankingTab && this.netbankingTab.$destroy();
+      this.netbankingTab = null;
     } else if (this.tab === 'nach') {
       if (this.nachScreen.onBack()) {
         return;
@@ -3069,7 +3074,7 @@ Session.prototype = {
       this.clearRequest();
     }
     if (tab === 'netbanking') {
-      this.netbankingTab.onShown();
+      this.setNetbankingTab();
     }
 
     if (tab === 'upi') {
@@ -4094,14 +4099,6 @@ Session.prototype = {
     var screen = this.screen;
     var tab = this.tab;
 
-    var isOffersVisible = this.offers && this.offers.isListShown();
-    if (isOffersVisible) {
-      this.offers.onSubmit();
-      if (screen) {
-        return;
-      }
-    }
-
     /**
      * The CTA for home screen is visible only on the new design. If it was
      * clicked, switch to the new payment methods screen.
@@ -4116,9 +4113,6 @@ Session.prototype = {
         }
       } else {
         this.offers && this.offers.clearOffer();
-        return;
-      }
-      if (isOffersVisible) {
         return;
       }
     }
