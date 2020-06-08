@@ -16,7 +16,6 @@ const CtaViews = {
   COPY_DETAILS: 'copy_details',
   COPIED: 'copied',
   AUTHENTICATE: 'authenticate',
-  APPLY_OFFER: 'apply_offer',
   VIEW_EMI_PLANS: 'view_emi_plans',
   SELECT_EMI_PLAN: 'select_emi_plan',
   ENTER_CARD_DETAILS: 'enter_card_details',
@@ -113,10 +112,6 @@ export function showCopied() {
 
 export function showAuthenticate() {
   setView(CtaViews.AUTHENTICATE, true);
-}
-
-export function showApplyOffer() {
-  setView(CtaViews.APPLY_OFFER, true);
 }
 
 export function showViewEmiPlans() {
