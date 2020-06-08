@@ -13,8 +13,7 @@ import { getSession } from '../sessionmanager';
  * @returns {string}
  */
 function makeBundleUrl(locale) {
-  // TODO: change URL once finalized
-  return `https://cdn.razorpay.com/bundles/${locale}.json`;
+  return `https://cdn.razorpay.com/static/i18n-bundles/checkout/${locale}.json`;
 }
 
 /**
