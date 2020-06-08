@@ -61,6 +61,8 @@
     isEMandateBankEnabled,
   } from 'checkoutstore/methods';
 
+  import { getUPIIntentApps } from 'checkoutstore/native';
+
   import {
     getTranslatedInstrumentsForCustomerFromStorage,
     getTranslatedInstrumentsForCustomerFromApi,
@@ -243,11 +245,11 @@
     return new Promise(resolve => {
       const instrumentsRetrievalPromises = [
         getTranslatedInstrumentsForCustomerFromStorage($customer, {
-          upiApps: session.upi_intents_data,
+          upiApps: getUPIIntentApps().filtered,
         }),
 
         getTranslatedInstrumentsForCustomerFromApi($customer, {
-          upiApps: session.upi_intents_data,
+          upiApps: getUPIIntentApps().filtered,
         }),
       ];
 
