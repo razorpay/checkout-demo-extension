@@ -979,7 +979,7 @@ Session.prototype = {
       each(fields, function(optionKey, option) {
         if (valid && !prefill[option] && !optional[option]) {
           valid = false;
-          SessionManager.getSession().errorHandler({
+          errorHandler.call(SessionManager.getSession(), {
             error: {
               field: option,
             },
