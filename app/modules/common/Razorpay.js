@@ -279,6 +279,7 @@ export function makePrefParams(rzp) {
         'account_id',
         'contact_id',
         'checkout_config_id',
+        'amount',
       ],
       function(key) {
         var value = getter(key);
