@@ -28,20 +28,22 @@
     isContactHidden,
     isAddressEnabled,
     getMerchantOrder,
+    getOption,
   } from 'checkoutstore';
+  import { getThemeMeta } from 'checkoutstore/theme';
+
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import { CONTACT_REGEX, EMAIL_REGEX } from 'common/constants';
+  import { CONTACT_REGEX, EMAIL_REGEX, STATES } from 'common/constants';
 
   const entries = _Obj.entries;
 
   // Props
-  export let session;
+  export let tpv;
 
   const order = getMerchantOrder();
-  const bank = session.tpvBank || {};
-  const accountName = session.get('prefill.bank_account[name]');
-  const icons = session.themeMeta.icons;
+  const accountName = getOption('prefill.bank_account[name]');
+  const icons = getThemeMeta().icons;
 
   function trackContactFilled() {
     const valid = CONTACT_REGEX.test($contact);
@@ -109,17 +111,22 @@
         bind:address={$address}
         bind:pincode={$pincode}
         bind:state={$state}
-        states={entries(session.states)} />
+        states={STATES} />
     </div>
   {/if}
 
-  {#if session.multiTpv}
-    <div class="multi-tpv-block">
-      <MultiTpvOptions {bank} {icons} bind:selectedOption={$multiTpvOption} />
-    </div>
-  {:else if session.tpvBank}
-    <div class="tpv-bank-block">
-      <TpvBank {bank} {accountName} showIfsc={isContactEmailOptional()} />
-    </div>
+  {#if tpv}
+    {#if tpv.method}
+      <div class="tpv-bank-block">
+        <TpvBank bank={tpv} {accountName} showIfsc={isContactEmailOptional()} />
+      </div>
+    {:else}
+      <div class="multi-tpv-block">
+        <MultiTpvOptions
+          bank={tpv}
+          {icons}
+          bind:selectedOption={$multiTpvOption} />
+      </div>
+    {/if}
   {/if}
 </div>

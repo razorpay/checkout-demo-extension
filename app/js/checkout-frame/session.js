@@ -993,7 +993,28 @@ Session.prototype = {
     }
 
     var order = Store.getMerchantOrder();
-    if (tab && !(order && order.bank) && MethodStore.isMethodEnabled(tab)) {
+
+    /**
+     * A method needs to be usable in order to prefill to that method
+     */
+    if (tab) {
+      var usableMethod = tab;
+
+      // We're currently bypassing prefill check for emandate and nach.
+      // TODO: We'll need to fix this
+      var methodsToBypassCheckFor = ['emandate', 'nach'];
+      var bypassMethodCheck = _Arr.contains(
+        methodsToBypassCheckFor,
+        usableMethod
+      );
+
+      // Go to homescreen if prefilled method is unusable
+      if (!bypassMethodCheck && !MethodStore.isMethodUsable(usableMethod)) {
+        tab = '';
+      }
+    }
+
+    if (tab && !(order && order.bank)) {
       // For method=emandate, we switch to the netbanking tab first if bank
       // is not prefilled.
       if (tab === 'emandate' && !this.get('prefill.bank')) {
@@ -1099,7 +1120,7 @@ Session.prototype = {
       }
 
       if (pollUrl) {
-        this.switchTab('upi');
+        this.switchTab(self.tab);
         this.showLoadError();
         this.isResumedPayment = true;
 
@@ -1183,7 +1204,6 @@ Session.prototype = {
 
     discreet.initI18n();
     this.setExperiments();
-    this.setTpvBanks();
     this.getEl();
     this.setFormatting();
     this.improvisePaymentOptions();
@@ -1262,6 +1282,17 @@ Session.prototype = {
     }
   },
 
+  setUpiOtmTab: function() {
+    if (MethodStore.isMethodEnabled('upi_otm')) {
+      this.upiOtmTab = new discreet.UpiTab({
+        target: _Doc.querySelector('#form-fields'),
+        props: {
+          method: 'upi_otm',
+        },
+      });
+    }
+  },
+
   setHomeTab: function() {
     this.homeTab = new discreet.HomeTab({
       target: gel('form-fields'),
@@ -1294,6 +1325,7 @@ Session.prototype = {
     }
 
     if (method) {
+      this.netbankingTab && this.netbankingTab.$destroy();
       this.netbankingTab = new discreet.NetbankingTab({
         target: gel('form-fields'),
         props: {
@@ -1349,12 +1381,12 @@ Session.prototype = {
   setSvelteComponents: function() {
     this.setHomeTab();
     this.setSvelteCardTab();
-    this.setNetbankingTab();
     this.setEmandate();
     this.setCardlessEmi();
     this.setPayLater();
     this.setOtpScreen();
     this.setUpiTab();
+    this.setUpiOtmTab();
     this.setPayoutsScreen();
     this.setNach();
     this.setBankTransfer();
@@ -1373,54 +1405,6 @@ Session.prototype = {
     if (!this.get('timeout') && this.timer) {
       this.timer.$destroy();
       this.timer = null;
-    }
-  },
-
-  setTpvBanks: function() {
-    var options = this.get();
-    var bankCode, accountNumber;
-    var order = Store.getMerchantOrder();
-
-    if (order && order.method === 'upi') {
-      this.upiTpv = true;
-    }
-
-    if (options['prefill.bank'] && !options['recurring']) {
-      this.tab = this.oneMethod = 'netbanking';
-    }
-
-    if (order && order.bank) {
-      bankCode = order.bank;
-      accountNumber = order.account_number;
-      if (
-        !order.method &&
-        MethodStore.isMethodEnabled('upi') &&
-        MethodStore.isMethodEnabled('netbanking')
-      ) {
-        this.multiTpv = true;
-      }
-    }
-
-    var banks = Store.getMerchantMethods().netbanking;
-
-    if (bankCode) {
-      // Use bank code as name if netbanking is disabled
-      var bankName;
-      if (banks) {
-        bankName =
-          typeof banks[bankCode] === 'object'
-            ? banks[bankCode].name
-            : banks[bankCode];
-      } else {
-        bankName = bankCode + ' Bank';
-      }
-
-      this.tpvBank = {
-        name: bankName,
-        code: bankCode,
-        account_number: accountNumber,
-        image: 'https://cdn.razorpay.com/bank/' + bankCode + '.gif',
-      };
     }
   },
 
@@ -1949,21 +1933,11 @@ Session.prototype = {
     }
   },
 
-  setOneMethod: function(methodName) {
-    this.oneMethod = methodName;
-
-    $(this.el).addClass('one-method');
-  },
-
   improvisePaymentOptions: function() {
     var oneMethod = MethodStore.getSingleMethod();
     if (oneMethod) {
-      this.setOneMethod(oneMethod);
-      return true;
-    }
-
-    if (this.upiTpv) {
-      this.setOneMethod('upi');
+      this.oneMethod = oneMethod;
+      $(this.el).addClass('one-method');
     }
   },
 
@@ -2379,6 +2353,7 @@ Session.prototype = {
     }
     this.click('#top-left', this.back);
     this.on('submit', '#form', this.preSubmit);
+    this.on('click', '#footer span', this.preSubmit);
 
     if (MethodStore.isCardOrEMIEnabled()) {
       /**
@@ -2413,7 +2388,10 @@ Session.prototype = {
       } catch (e) {}
     }
 
-    if (MethodStore.isMethodEnabled('upi')) {
+    if (
+      MethodStore.isMethodEnabled('upi') ||
+      MethodStore.isMethodEnabled('upi_otm')
+    ) {
       this.click('#cancel_upi .btn', function() {
         var upi_radio = $('#cancel_upi input:checked');
         if (!upi_radio[0]) {
@@ -2640,7 +2618,9 @@ Session.prototype = {
       if (this.homeTab && this.homeTab.onDetailsScreen()) {
         invoke('focus', qs(screenEl + ' .invalid input'));
       }
-    } else if (!(screen === 'upi' && this.upi_intents_data)) {
+    } else if (
+      !((screen === 'upi' || screen === 'upi_otm') && this.upi_intents_data)
+    ) {
       invoke('focus', qs(screenEl + ' .invalid input'));
     }
 
@@ -2665,7 +2645,7 @@ Session.prototype = {
 
     if (screen === '' && this.homeTab) {
       this.homeTab.onShown();
-    } else if (screen !== 'upi') {
+    } else if (screen !== 'upi' && screen !== 'upi_otm') {
       this.body.toggleClass('sub', showPaybtn);
     }
 
@@ -2849,9 +2829,8 @@ Session.prototype = {
         return;
       }
     } else if (this.tab === 'netbanking') {
-      if (this.netbankingTab.onBack()) {
-        return;
-      }
+      this.netbankingTab && this.netbankingTab.$destroy();
+      this.netbankingTab = null;
     } else if (this.tab === 'nach') {
       if (this.nachScreen.onBack()) {
         return;
@@ -2894,8 +2873,13 @@ Session.prototype = {
   },
 
   switchTabAnalytics: function(tab) {
-    if (tab === 'upi') {
-      var upiData = this.upiTab;
+    if (tab === 'upi' || tab === 'upi_otm') {
+      var upiData;
+      if (tab === 'upi') {
+        upiData = this.upiTab;
+      } else if (tab === 'upi_otm') {
+        upiData = this.upiOtmTab;
+      }
 
       if (upiData && upiData.intent) {
         /**
@@ -3061,12 +3045,17 @@ Session.prototype = {
       this.clearRequest();
     }
     if (tab === 'netbanking') {
-      this.netbankingTab.onShown();
+      this.setNetbankingTab();
     }
 
     if (tab === 'upi') {
       this.updateCustomerInStore();
       this.upiTab.onShown();
+    }
+
+    if (tab === 'upi_otm') {
+      this.updateCustomerInStore();
+      this.upiOtmTab.onShown();
     }
 
     if (tab === 'emandate') {
@@ -3075,6 +3064,12 @@ Session.prototype = {
 
     if (tab === '' && this.tab === 'upi') {
       if (this.upiTab.onBack()) {
+        return;
+      }
+    }
+
+    if (tab === '' && this.tab === 'upi_otm') {
+      if (this.upiOtmTab.onBack()) {
         return;
       }
     }
@@ -3117,10 +3112,6 @@ Session.prototype = {
 
     if (tab === 'bank_transfer') {
       this.bankTransferView.onShown();
-    }
-
-    if (!tab && this.multiTpv) {
-      $('#body').addClass('sub');
     }
   },
 
@@ -3604,7 +3595,13 @@ Session.prototype = {
 
       if (
         !_Arr.contains(
-          ['#form-upi', '#form-card', '#form-wallet', '#form-emandate'],
+          [
+            '#form-upi',
+            '#form-card',
+            '#form-wallet',
+            '#form-emandate',
+            '#form-upi_otm',
+          ],
           activeForm
         )
       ) {
@@ -3632,9 +3629,18 @@ Session.prototype = {
         }
       }
 
-      if (this.screen === 'upi' && this.tab !== 'qr') {
+      if (
+        (this.screen === 'upi' || this.screen === 'upi_otm') &&
+        this.tab !== 'qr'
+      ) {
         /* All tabs should be responsible for their subdata */
-        var upiData = this.upiTab.getPayload();
+        var upiData;
+
+        if (this.screen === 'upi') {
+          upiData = this.upiTab.getPayload();
+        } else if (this.screen === 'upi_otm') {
+          upiData = this.upiOtmTab.getPayload();
+        }
 
         each(upiData, function(key, value) {
           data[key] = value;
@@ -3685,7 +3691,10 @@ Session.prototype = {
     var actionState;
     var loadingState = true;
     if (error) {
-      if (this.screen === 'upi' && text === discreet.cancelMsg) {
+      if (
+        (this.screen === 'upi' || this.screen === 'upi_otm') &&
+        text === discreet.cancelMsg
+      ) {
         if (this.payload && this.payload['_[flow]'] === 'intent') {
           return;
         }
@@ -4057,14 +4066,6 @@ Session.prototype = {
     var screen = this.screen;
     var tab = this.tab;
 
-    var isOffersVisible = this.offers && this.offers.isListShown();
-    if (isOffersVisible) {
-      this.offers.onSubmit();
-      if (screen) {
-        return;
-      }
-    }
-
     /**
      * The CTA for home screen is visible only on the new design. If it was
      * clicked, switch to the new payment methods screen.
@@ -4079,9 +4080,6 @@ Session.prototype = {
         }
       } else {
         this.offers && this.offers.clearOffer();
-        return;
-      }
-      if (isOffersVisible) {
         return;
       }
     }
@@ -4122,14 +4120,15 @@ Session.prototype = {
     var merchantOrder = Store.getMerchantOrder();
     var selectedInstrument = this.getSelectedPaymentInstrument();
 
-    if (merchantOrder && merchantOrder.bank && !Store.isRecurring()) {
+    if (MethodStore.getTPV()) {
       if (!this.checkCommonValidAndTrackIfInvalid()) {
+        // TODO check multi TPV with UPI prefill
         return;
       }
       data.method = merchantOrder.method || data.method || 'netbanking';
       data.bank = merchantOrder.bank;
 
-      if (data.method === 'upi' && this.multiTpv) {
+      if (data.method === 'upi') {
         if (tab !== 'upi') {
           return this.switchTab('upi');
         }
@@ -4227,8 +4226,8 @@ Session.prototype = {
       }
 
       // perform the actual validation
-      if (screen === 'upi') {
-        var formSelector = '#user-new-vpa-container';
+      if (screen === 'upi' || screen === 'upi_otm') {
+        var formSelector = '#user-new-vpa-container-' + screen;
 
         if (data['_[flow]'] === 'directpay') {
           if (data.upi_provider === 'google_pay') {
@@ -4242,8 +4241,6 @@ Session.prototype = {
       } else if (this.checkInvalid()) {
         return;
       }
-    } else if (this.oneMethod === 'netbanking') {
-      data.bank = this.get('prefill.bank');
     } else if (selectedInstrument) {
       if (!this.checkCommonValidAndTrackIfInvalid()) {
         return;
@@ -4913,7 +4910,7 @@ Session.prototype = {
           setOtpText(this.otpView, insufficient_text);
         }, this)
       );
-    } else if (data.method === 'upi' && !this.multiTpv) {
+    } else if (data.method === 'upi') {
       sub_link.html('Cancel Payment');
 
       this.r.on('payment.upi.noapp', function(data) {
@@ -5030,6 +5027,7 @@ Session.prototype = {
    */
   cleanUpSvelteComponents: function() {
     var views = [
+      'upiOtmTab',
       'bankTransferView',
       'cardlessEmiView',
       'currentScreen',

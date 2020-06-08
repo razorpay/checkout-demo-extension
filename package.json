@@ -63,7 +63,7 @@
     "rollup-plugin-coverage": "^0.1.4",
     "rollup-plugin-svelte": "^5.2.2",
     "run-sequence": "^2.2.1",
-    "svelte-i18n": "^3.0.3",
+    "svelte-i18n": "^3.0.4",
     "tap-difflet": "^0.7.1",
     "testdouble": "^3.12.5",
     "through": "^2.3.8",
@@ -73,7 +73,7 @@
   "devDependencies": {
     "husky": "^1.0.0-rc.14",
     "jest-circus": "^24.9.0",
-    "lint-staged": "^10.2.7",
+    "lint-staged": "^10.2.8",
     "prettier": "^1.19.1",
     "prettier-plugin-svelte": "^1.1.0",
     "pretty-quick": "^2.0.0"

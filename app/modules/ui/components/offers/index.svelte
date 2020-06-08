@@ -3,20 +3,13 @@
   import { formatAmountWithSymbol } from 'common/currency';
   import { getCurrency } from 'checkoutstore';
   import {
-    showCtaWithText,
-    setAppropriateCtaText,
-    isCtaShown,
-    showCta,
-    hideCta,
-  } from 'checkoutstore/cta';
-  import {
     getOffersForTab,
     getOffersForInstrument,
     getOtherOffers,
   } from 'checkoutframe/offers';
 
   import Callout from 'ui/elements/Callout.svelte';
-  import Bottom from 'ui/layouts/Bottom.svelte';
+  import CTA from 'ui/elements/CTA.svelte';
   import OfferItemList from './OfferItemList.svelte';
   import {
     selectedInstrument,
@@ -32,7 +25,6 @@
   let listActive;
   let otherActive;
   let selected = null; // locally selected offer
-  let wasCtaShown;
   let error;
   let errorCb;
   let otherOffers = [];
@@ -47,15 +39,6 @@
     }
   }
   $: _El.keepClass(_Doc.querySelector('#header'), 'offer-error', error);
-  $: {
-    if (listActive) {
-      if (selected) {
-        showCtaWithText('Apply Offer');
-      } else {
-        hideCta();
-      }
-    }
-  }
 
   $: $selectedInstrument, switchInstrument();
 
@@ -124,8 +107,6 @@
   }
 
   export function showError(description, cb) {
-    wasCtaShown = isCtaShown();
-    hideCta();
     error = description;
     errorCb = cb;
   }
@@ -135,7 +116,6 @@
     if (!withOffer) {
       removeOffer();
     }
-    restoreCta();
     if (errorCb) {
       errorCb(!withOffer);
       errorCb = null;
@@ -151,7 +131,6 @@
   }
 
   function showList() {
-    wasCtaShown = isCtaShown();
     listActive = true;
 
     // select the applied offer
@@ -165,18 +144,6 @@
   function hideList() {
     listActive = false;
     selected = null;
-    restoreCta();
-  }
-
-  function restoreCta() {
-    // wait for hiding animation to complete before changing CTA text
-    if (wasCtaShown) {
-      setAppropriateCtaText();
-      showCta();
-    } else {
-      hideCta();
-      setTimeout(setAppropriateCtaText, 200);
-    }
   }
 
   export function isListShown() {
@@ -192,7 +159,10 @@
     if (offer) {
       previousApplied[offer.payment_method] = offer;
     }
+    // you hide offers view first, to initiate CTA unmount lifecycle
     hideList();
+    // let other view updation take place after offers hide
+    // to maintain CTA lifo stack
     setAppliedOffer(offer, true);
   }
 
@@ -426,3 +396,8 @@
     </main>
   {/if}
 </div>
+{#if error}
+  <CTA show={false} />
+{:else if listActive}
+  <CTA on:click={onSubmit} show={Boolean(selected)}>Apply Offer</CTA>
+{/if}
