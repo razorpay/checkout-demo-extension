@@ -21,9 +21,6 @@ var preferences = _.preferences;
 var gpay_omnichannel = preferences.features && preferences.features.google_pay_omnichannel;
 var invoice = _.invoice;
 
-var bank = _.tpvBank || {};
-var accountName = o('prefill.bank_account[name]');
-
 var amount;
 var amount_figure = _.formatAmountWithCurrency(o('amount'));
 var firstPaymentMinAmount = _.formatAmountWithCurrency(order.first_payment_min_amount);

@@ -310,6 +310,42 @@ export function getNetbankingBanks() {
   return banks;
 }
 
+export function getTPV() {
+  const order = getMerchantOrder();
+  if (!order) {
+    return;
+  }
+
+  const bankCode = order.bank;
+  const accountNumber = order.account_number;
+
+  if (!bankCode || !accountNumber) {
+    return;
+  }
+  const bankName = getNetbankingBanks()[bankCode] || `${bankCode} Bank`;
+
+  let method = order.method;
+  if (!method) {
+    const hasNB = isMethodEnabled('netbanking');
+
+    if (isMethodEnabled('upi')) {
+      if (!hasNB) {
+        method = 'upi';
+      }
+    } else if (hasNB) {
+      method = 'netbanking';
+    }
+  }
+
+  return {
+    name: bankName,
+    code: bankCode,
+    account_number: accountNumber,
+    image: 'https://cdn.razorpay.com/bank/' + bankCode + '.gif',
+    method,
+  };
+}
+
 export function isEMandateEnabled() {
   return isMethodEnabled('emandate');
 }

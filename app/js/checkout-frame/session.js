@@ -1204,7 +1204,6 @@ Session.prototype = {
 
     discreet.initI18n();
     this.setExperiments();
-    this.setTpvBanks();
     this.getEl();
     this.setFormatting();
     this.improvisePaymentOptions();
@@ -1406,54 +1405,6 @@ Session.prototype = {
     if (!this.get('timeout') && this.timer) {
       this.timer.$destroy();
       this.timer = null;
-    }
-  },
-
-  setTpvBanks: function() {
-    var options = this.get();
-    var bankCode, accountNumber;
-    var order = Store.getMerchantOrder();
-
-    if (order && order.method === 'upi') {
-      this.upiTpv = true;
-    }
-
-    if (options['prefill.bank'] && !options['recurring']) {
-      this.tab = this.oneMethod = 'netbanking';
-    }
-
-    if (order && order.bank) {
-      bankCode = order.bank;
-      accountNumber = order.account_number;
-      if (
-        !order.method &&
-        MethodStore.isMethodEnabled('upi') &&
-        MethodStore.isMethodEnabled('netbanking')
-      ) {
-        this.multiTpv = true;
-      }
-    }
-
-    var banks = Store.getMerchantMethods().netbanking;
-
-    if (bankCode) {
-      // Use bank code as name if netbanking is disabled
-      var bankName;
-      if (banks) {
-        bankName =
-          typeof banks[bankCode] === 'object'
-            ? banks[bankCode].name
-            : banks[bankCode];
-      } else {
-        bankName = bankCode + ' Bank';
-      }
-
-      this.tpvBank = {
-        name: bankName,
-        code: bankCode,
-        account_number: accountNumber,
-        image: 'https://cdn.razorpay.com/bank/' + bankCode + '.gif',
-      };
     }
   },
 
@@ -1982,21 +1933,11 @@ Session.prototype = {
     }
   },
 
-  setOneMethod: function(methodName) {
-    this.oneMethod = methodName;
-
-    $(this.el).addClass('one-method');
-  },
-
   improvisePaymentOptions: function() {
     var oneMethod = MethodStore.getSingleMethod();
     if (oneMethod) {
-      this.setOneMethod(oneMethod);
-      return true;
-    }
-
-    if (this.upiTpv) {
-      this.setOneMethod('upi');
+      this.oneMethod = oneMethod;
+      $(this.el).addClass('one-method');
     }
   },
 
@@ -3142,10 +3083,6 @@ Session.prototype = {
     if (tab === 'bank_transfer') {
       this.bankTransferView.onShown();
     }
-
-    if (!tab && this.multiTpv) {
-      $('#body').addClass('sub');
-    }
   },
 
   showCardTab: function(tab) {
@@ -4153,14 +4090,15 @@ Session.prototype = {
     var merchantOrder = Store.getMerchantOrder();
     var selectedInstrument = this.getSelectedPaymentInstrument();
 
-    if (merchantOrder && merchantOrder.bank && !Store.isRecurring()) {
+    if (MethodStore.getTPV()) {
       if (!this.checkCommonValidAndTrackIfInvalid()) {
+        // TODO check multi TPV with UPI prefill
         return;
       }
       data.method = merchantOrder.method || data.method || 'netbanking';
       data.bank = merchantOrder.bank;
 
-      if (data.method === 'upi' && this.multiTpv) {
+      if (data.method === 'upi') {
         if (tab !== 'upi') {
           return this.switchTab('upi');
         }
@@ -4273,8 +4211,6 @@ Session.prototype = {
       } else if (this.checkInvalid()) {
         return;
       }
-    } else if (this.oneMethod === 'netbanking') {
-      data.bank = this.get('prefill.bank');
     } else if (selectedInstrument) {
       if (!this.checkCommonValidAndTrackIfInvalid()) {
         return;
@@ -4944,7 +4880,7 @@ Session.prototype = {
           setOtpText(this.otpView, insufficient_text);
         }, this)
       );
-    } else if (data.method === 'upi' && !this.multiTpv) {
+    } else if (data.method === 'upi') {
       sub_link.html('Cancel Payment');
 
       this.r.on('payment.upi.noapp', function(data) {
