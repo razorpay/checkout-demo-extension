@@ -103,7 +103,6 @@ export default {
   Confirm,
   Currency,
   OtpService,
-  getDecimalAmount: Currency.getDecimalAmount,
   currencies: Currency.displayCurrencies,
   error: _.rzpError,
   Formatter,

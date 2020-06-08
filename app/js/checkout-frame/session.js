@@ -1,5 +1,3 @@
-var RAZORPAY_HOVER_COLOR = '#626A74';
-
 var ua = navigator.userAgent;
 
 var preferences,
@@ -7,7 +5,6 @@ var preferences,
   StorageBridge = window.StorageBridge,
   isIframe = window !== parent,
   ownerWindow = isIframe ? parent : opener,
-  _uid = Track.id,
   tab_titles = Constants.TAB_TITLES,
   freqWallets = Wallet.wallets,
   contactPattern = Constants.CONTACT_REGEX,
@@ -47,7 +44,6 @@ var preferences,
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
 var ua_iPhone = /iPhone/.test(ua);
 var isIE = /MSIE |Trident\//.test(ua);
-var DEMO_MERCHANT_KEY = 'rzp_live_ILgsfZCZoFIKMb';
 
 // .shown has display: none from iOS ad-blocker
 // using दृश्य, which will never be seen by tim cook
@@ -827,8 +823,6 @@ Session.prototype = {
   shouldUseNativeOTP: function() {
     return this.get('nativeotp') && this.r.isLiveMode();
   },
-
-  getDecimalAmount: getDecimalAmount,
 
   formatAmount: function(amount) {
     var displayCurrency = this.r.get('display_currency');
@@ -5321,10 +5315,6 @@ Session.prototype = {
 
     /* set Razorpay instance for customer */
     Customer.prototype.r = this.r;
-  },
-
-  fetchFundAccounts: function() {
-    return Payouts.fetchFundAccounts(this.get('contact_id'));
   },
 
   hideOverlayMessage: hideOverlayMessage,

@@ -1299,9 +1299,6 @@ export function displayAmount(razorpay, payloadAmount, payloadCurrency) {
   );
 }
 
-export const getDecimalAmount = amount =>
-  (amount / 100).toFixed(2).replace('.00', '');
-
 /**
  * Returns the converted amount for the asked currency
  * @param amount
