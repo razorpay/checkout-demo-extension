@@ -348,7 +348,7 @@ export function getAllInstrumentsForCustomer(customer) {
 const getInstrumentsForCustomer = (customer, extra = {}, source) => {
   const { upiApps } = extra;
 
-  let instruments;
+  let instruments = [];
 
   if (source === 'storage') {
     instruments = getAllInstrumentsForCustomer(customer);
@@ -410,6 +410,14 @@ export function getTranslatedInstrumentsForCustomerFromStorage(
   extra
 ) {
   const instruments = getInstrumentsForCustomer(customer, extra, 'storage');
+
+  return (
+    _Arr.map(instruments, translateInstrumentToConfig) |> _Arr.filter(Boolean)
+  );
+}
+
+export function getTranslatedInstrumentsForCustomerFromApi(customer, extra) {
+  const instruments = getInstrumentsForCustomer(customer, extra, 'api');
 
   return (
     _Arr.map(instruments, translateInstrumentToConfig) |> _Arr.filter(Boolean)
