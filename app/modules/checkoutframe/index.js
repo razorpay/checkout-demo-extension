@@ -11,7 +11,7 @@ import {
 import { processNativeMessage } from 'checkoutstore/native';
 import { isEMandateEnabled, getEnabledMethods } from 'checkoutstore/methods';
 import showTimer from 'checkoutframe/timer';
-import { setInstrumentsForCustomer } from 'checkoutframe/personalizatoin/api';
+import { setInstrumentsForCustomer } from 'checkoutframe/personalization/api';
 
 import {
   UPI_POLL_URL,

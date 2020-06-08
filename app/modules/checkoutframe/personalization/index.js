@@ -416,12 +416,24 @@ export function getTranslatedInstrumentsForCustomerFromStorage(
   );
 }
 
+/**
+ * Returns the list of preferred payment modes for the user in a sorted order,
+ * but translated to the Payment Method Configurability spec.
+ * @param {Object} customer
+ * @param {Object} extra
+ *  @prop {Object} methods
+ *  @prop {Array} upiApps List of UPI apps on the device
+ *
+ * @returns {Promise<Array<Instrument>>}
+ */
 export function getTranslatedInstrumentsForCustomerFromApi(customer, extra) {
-  const instruments = getInstrumentsForCustomer(customer, extra, 'api');
+  return Promise.resolve([]);
 
-  return (
-    _Arr.map(instruments, translateInstrumentToConfig) |> _Arr.filter(Boolean)
-  );
+  // const instruments = getInstrumentsForCustomer(customer, extra, 'api');
+
+  // return (
+  //   _Arr.map(instruments, translateInstrumentToConfig) |> _Arr.filter(Boolean)
+  // );
 }
 
 /**
