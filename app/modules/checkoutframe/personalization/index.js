@@ -403,7 +403,7 @@ const getInstrumentsForCustomer = (customer, extra = {}, source) => {
  *  @prop {Object} methods
  *  @prop {Array} upiApps List of UPI apps on the device
  *
- * @returns {Array<Instrument>}
+ * @returns {Promise<Array<Instrument>>}
  */
 export function getTranslatedInstrumentsForCustomerFromStorage(
   customer,
@@ -411,9 +411,10 @@ export function getTranslatedInstrumentsForCustomerFromStorage(
 ) {
   const instruments = getInstrumentsForCustomer(customer, extra, 'storage');
 
-  return (
-    _Arr.map(instruments, translateInstrumentToConfig) |> _Arr.filter(Boolean)
-  );
+  const translated =
+    _Arr.map(instruments, translateInstrumentToConfig) |> _Arr.filter(Boolean);
+
+  return Promise.resolve(translated);
 }
 
 /**

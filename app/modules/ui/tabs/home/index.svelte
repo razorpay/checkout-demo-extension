@@ -241,23 +241,26 @@
 
   function getAllAvailableP13nInstruments() {
     return new Promise(resolve => {
-      const storage = getTranslatedInstrumentsForCustomerFromStorage(
-        $customer,
-        {
+      const instrumentsRetrievalPromises = [
+        getTranslatedInstrumentsForCustomerFromStorage($customer, {
           upiApps: session.upi_intents_data,
+        }),
+
+        getTranslatedInstrumentsForCustomerFromApi($customer, {
+          upiApps: session.upi_intents_data,
+        }),
+      ];
+
+      Promise.all(instrumentsRetrievalPromises).then(
+        ([instrumentsFromStorage, instrumentsFromApi]) => {
+          // TODO: Figure out which source to use
+
+          resolve({
+            instruments: instrumentsFromStorage,
+            source: 'storage',
+          });
         }
       );
-
-      getTranslatedInstrumentsForCustomerFromApi($customer, {
-        upiApps: session.upi_intents_data,
-      }).then(instrumentsFromApi => {
-        // TODO: Figure out which source to use
-
-        resolve({
-          instruments: storage,
-          source: 'storage',
-        });
-      });
     });
   }
 
