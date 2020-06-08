@@ -11,6 +11,7 @@ export const UPI_COLLECT_SAVE = 'upi.collect_securely_save';
 export const NEW_VPA_TITLE_LOGGED_OUT = 'upi.new_vpa_title_logged_out';
 export const NEW_VPA_TITLE_LOGGED_IN = 'upi.new_vpa_title_logged_in';
 export const NEW_VPA_SUBTITLE = 'upi.new_vpa_subtitle';
+export const NEW_VPA_SUBTITLE_UPI_OTM = 'upi.new_vpa_subtitle_upi_otm';
 export const GPAY_WEB_API_TITLE = 'upi.gpay_web_api_title';
 export const QR_BLOCK_HEADING = 'upi.qr_block_heading';
 export const SHOW_QR_CODE = 'upi.show_qr_code';

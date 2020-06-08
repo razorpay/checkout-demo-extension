@@ -40,6 +40,7 @@ const isLowSeverityAndNotScheduled = _Func.negate(isHighSeverityOrScheduled);
 
 const DISABLE_METHOD = {
   upi: isHighSeverityOrScheduled,
+  upi_otm: isHighSeverityOrScheduled,
   qr: isHighSeverityOrScheduled,
   gpay: isHighSeverityOrScheduled,
   netbanking: function(_, preferences) {
@@ -63,6 +64,7 @@ const DISABLE_METHOD = {
 
 const WARN_METHOD = {
   upi: isLowSeverityAndNotScheduled,
+  upi_otm: isLowSeverityAndNotScheduled,
   qr: isLowSeverityAndNotScheduled,
   gpay: isLowSeverityAndNotScheduled,
   netbanking: function(_, preferences) {
