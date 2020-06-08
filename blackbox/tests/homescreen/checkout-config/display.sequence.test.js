@@ -60,7 +60,7 @@ describe('display.sequence', () => {
     // No other methods have UPI or Netbanking in them
     const otherItems = block.items.slice(2);
     otherItems.forEach(item => {
-      expect(item.title.toLowerCase()).not.toContain('upi');
+      expect(item.title.toLowerCase()).not.toBe('upi');
       expect(item.title.toLowerCase()).not.toContain('netbanking');
     });
   });
@@ -208,7 +208,7 @@ describe('display.sequence', () => {
     // No other methods have UPI or Netbanking in them
     const otherMethods = renderedBlocks[3].items;
     otherMethods.forEach(method => {
-      expect(method.title.toLowerCase()).not.toContain('upi');
+      expect(method.title.toLowerCase()).not.toBe('upi');
       expect(method.title.toLowerCase()).not.toContain('netbanking');
     });
   });

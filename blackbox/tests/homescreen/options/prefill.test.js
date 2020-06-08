@@ -44,6 +44,7 @@ describe.each(
     await fillUserDetails(context);
 
     await proceed(context);
+    await selectPaymentMethod(context, 'netbanking');
     await assertInputValue(context, '#bank-select', bankToPreselect);
   });
 });

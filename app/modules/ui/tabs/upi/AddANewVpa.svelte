@@ -30,6 +30,8 @@
 
   // Computed
   export let pattern;
+  export let paymentMethod;
+  export let subtitleText = 'Google Pay, BHIM, PhonePe & more';
   let rememberVpa = true;
   let newVpa = getPrefilledVPA();
   let vpa;
@@ -106,7 +108,8 @@
   .should-save-vpa-container {
     margin-top: 12px;
 
-    #should-save-vpa span.checkbox {
+    #should-save-vpa-upi span.checkbox,
+    #should-save-vpa-upi_otm span.checkbox {
       display: inline-block;
     }
   }
@@ -125,29 +128,31 @@
 </style>
 
 <SlottedRadioOption
-  name="payment_type"
+  name={'upi-vpa-input-' + paymentMethod}
   value="full"
   align="top"
   on:click
   on:click={focusAfterTimeout}
   {selected}>
-  <div id="new-vpa-field" slot="title">
+  <div id={'new-vpa-field-' + paymentMethod} slot="title">
     {logged && canSaveVpa ? 'Add UPI ID' : 'UPI ID'}
   </div>
-  <div slot="subtitle">Google Pay, BHIM, PhonePe & more</div>
+  <div slot="subtitle">{subtitleText}</div>
   <i slot="icon" class="top">
     <Icon icon={session.themeMeta.icons.upi} />
   </i>
 
   <div slot="body">
     {#if selected}
-      <div id="user-new-vpa-container" transition:slide={{ duration: 200 }}>
+      <div
+        id={'user-new-vpa-container-' + paymentMethod}
+        transition:slide={{ duration: 200 }}>
         <Field
           formatter={{ type: 'vpa' }}
           {pattern}
           helpText="Please enter a valid VPA of the form username@bank"
-          id="vpa"
-          name="vpa"
+          id={'vpa-' + paymentMethod}
+          name={'vpa-' + paymentMethod}
           type="text"
           required
           bind:value={newVpa}
@@ -156,8 +161,12 @@
           placeholder="Enter your UPI ID" />
         {#if logged && canSaveVpa}
           <div class="should-save-vpa-container">
-            <label id="should-save-vpa" for="save-vpa">
-              <Checkbox bind:checked={rememberVpa} id="save-vpa">
+            <label
+              id={'should-save-vpa-' + paymentMethod}
+              for={'save-vpa-' + paymentMethod}>
+              <Checkbox
+                bind:checked={rememberVpa}
+                id={'save-vpa-' + paymentMethod}>
                 Securely save your UPI ID
               </Checkbox>
             </label>
