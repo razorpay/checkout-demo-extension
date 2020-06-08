@@ -41,7 +41,7 @@ const showModal = session => {
 
   const qpmap = _Obj.unflatten(_.getQueryParams());
   if (qpmap.error) {
-    session.errorHandler(qmap);
+    session.errorHandler(qpmap);
   }
 
   if (qpmap.tab) {
