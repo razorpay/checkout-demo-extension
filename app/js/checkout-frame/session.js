@@ -979,7 +979,7 @@ Session.prototype = {
       each(fields, function(optionKey, option) {
         if (valid && !prefill[option] && !optional[option]) {
           valid = false;
-          errorHandler.call(SessionManager.getSession(), {
+          SessionManager.getSession().errorHandler({
             error: {
               field: option,
             },
@@ -1139,7 +1139,7 @@ Session.prototype = {
                 response = discreet.error('Payment failed');
               }
 
-              invoke(errorHandler, self, response);
+              self.errorHandler(response);
             }
           },
         }).till(function(response) {
@@ -1223,7 +1223,7 @@ Session.prototype = {
     this.updateCustomerInStore();
     Hacks.initPostRenderHacks();
 
-    errorHandler.call(this, this.params);
+    this.errorHandler(this.params);
 
     if (!this.tab && !this.get('prefill.contact')) {
       $('#contact').focus();
@@ -5398,6 +5398,7 @@ Session.prototype = {
   },
 
   hideOverlayMessage: hideOverlayMessage,
+  errorHandler: errorHandler,
 };
 
 /*

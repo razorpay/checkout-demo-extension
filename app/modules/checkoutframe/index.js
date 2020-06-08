@@ -21,8 +21,6 @@ import {
   ownerWindow,
 } from 'common/constants';
 
-/* global errorHandler */
-
 let CheckoutBridge = window.CheckoutBridge;
 
 const showModal = session => {
@@ -43,7 +41,7 @@ const showModal = session => {
 
   const qpmap = _Obj.unflatten(_.getQueryParams());
   if (qpmap.error) {
-    errorHandler.call(session, qpmap);
+    session.errorHandler(qmap);
   }
 
   if (qpmap.tab) {
