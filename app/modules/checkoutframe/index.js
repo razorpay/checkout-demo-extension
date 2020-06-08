@@ -11,6 +11,7 @@ import {
 import { processNativeMessage } from 'checkoutstore/native';
 import { isEMandateEnabled, getEnabledMethods } from 'checkoutstore/methods';
 import showTimer from 'checkoutframe/timer';
+import { setInstrumentsForCustomer } from 'checkoutframe/personalizatoin/api';
 
 import {
   UPI_POLL_URL,
@@ -322,6 +323,21 @@ function updateAnalytics(preferences) {
       optionalFields |> _Arr.contains('email')
     );
   }
+}
+
+function updatePreferredMethods(preferences) {
+  if (!preferences.customer) {
+    return;
+  }
+
+  if (!preferences.preferred_methods) {
+    return;
+  }
+
+  setInstrumentsForCustomer(
+    preferences.customer,
+    preferences.preferred_methods
+  );
 }
 
 /* expose handleMessage to window for our Mobile SDKs */
