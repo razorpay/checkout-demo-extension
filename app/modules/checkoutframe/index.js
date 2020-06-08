@@ -211,6 +211,7 @@ function setSessionPreferences(session, preferences) {
   updateOptions(preferences);
   updateEmandatePrefill();
   updateAnalytics(preferences);
+  updatePreferredMethods(preferences);
 
   Razorpay.configure(preferences.options);
   session.setPreferences(preferences);
