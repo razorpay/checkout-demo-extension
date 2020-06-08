@@ -38,8 +38,7 @@ const showModal = session => {
         Math.floor(rect.height)
       );
     }
-
-    $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
+    _Doc.getElementById('backdrop').style.background = 'rgba(0, 0, 0, 0.6)';
   }
 
   var qpmap = _Obj.unflatten(_.getQueryParams());
