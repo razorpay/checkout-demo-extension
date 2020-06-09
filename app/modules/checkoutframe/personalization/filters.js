@@ -127,6 +127,10 @@ export const filterInstrumentsForAvailableMethods = _.curry2(
 
 const SANITY_FILTERS = {
   upi: instrument => {
+    if (instrument.source === 'api') {
+      return true;
+    }
+
     if (instrument.vpa && !VPA_REGEX.test(instrument.vpa)) {
       return false;
     }

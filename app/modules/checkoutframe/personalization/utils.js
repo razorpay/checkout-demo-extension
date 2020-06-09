@@ -70,3 +70,9 @@ export function getAllInstruments() {
   // Get instruments for all customers
   return get();
 }
+
+export function markInstrumentSource(instruments, source) {
+  instruments.forEach(instrument => {
+    instrument.source = source;
+  });
+}

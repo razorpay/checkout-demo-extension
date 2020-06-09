@@ -1,3 +1,6 @@
+import { VPA_REGEX } from 'common/constants';
+import { getUPIAppDataFromHandle } from 'common/upi';
+
 const PREFERRED_INSTRUMENTS = {};
 
 /**
@@ -7,10 +10,9 @@ const PREFERRED_INSTRUMENTS = {};
  *
  * @returns {Promise<Array<StorageInstrument>>}
  */
-export function setInstrumentsForCustomer(customer, instruments) {
-  const transformedInstruments = _Arr.map(
-    instruments,
-    transformInstrumentToStorageFormat
+export function setInstrumentsForCustomer(customer, instruments, upiApps) {
+  const transformedInstruments = _Arr.map(instruments, instrument =>
+    transformInstrumentToStorageFormat(instrument, { upiApps })
   );
 
   PREFERRED_INSTRUMENTS[customer.contact] = transformedInstruments;
@@ -28,7 +30,25 @@ export function getInstrumentsForCustomer(customer) {
   return Promise.resolve(PREFERRED_INSTRUMENTS[customer.contact] || []);
 }
 
-function transformInstrumentToStorageFormat(instrument) {
-  // TODO
+const API_INSTRUMENT_PAYMENT_ADDONS = {
+  upi: instrument => {
+    const validVpa = VPA_REGEX.test(instrument.vpa);
+    if (validVpa) {
+      instrument['_[flow]'] = 'directpay';
+    } else {
+      const app = getUPIAppDataFromHandle(instrument.vpa.slice(1));
+      if (app) {
+        debugger;
+        instrument['_[flow]'] = 'intent';
+        instrument['upi_app'] = app.package_name;
+      }
+    }
+  },
+};
+
+function transformInstrumentToStorageFormat(instrument, data = {}) {
+  if (API_INSTRUMENT_PAYMENT_ADDONS[instrument.method]) {
+    API_INSTRUMENT_PAYMENT_ADDONS[instrument.method](instrument, data);
+  }
   return instrument;
 }

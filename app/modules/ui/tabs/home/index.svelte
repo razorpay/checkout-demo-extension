@@ -252,10 +252,9 @@
         upiApps: session.upi_intents_data,
       }).then(instrumentsFromApi => {
         // TODO: Figure out which source to use
-
         resolve({
-          instruments: storage,
-          source: 'storage',
+          instruments: instrumentsFromApi,
+          source: 'api',
         });
       });
     });

@@ -4,9 +4,15 @@ import { getCustomer } from 'checkoutframe/customer';
 import Track from 'tracker';
 import Analytics from 'analytics';
 import { filterInstruments } from './filters';
-import { hashFnv32a, set, getAllInstruments } from './utils';
+import {
+  hashFnv32a,
+  set,
+  getAllInstruments,
+  markInstrumentSource,
+} from './utils';
 import { extendInstruments } from './extend';
 import { translateInstrumentToConfig } from './translation';
+import { getPreferredApiInstruments } from 'checkoutstore';
 
 /* halflife for timestamp, 5 days in ms */
 const TS_HALFLIFE = Math.log(2) / (5 * 86400000);
@@ -352,8 +358,10 @@ const getInstrumentsForCustomer = (customer, extra = {}, source) => {
 
   if (source === 'storage') {
     instruments = getAllInstrumentsForCustomer(customer);
+  } else {
+    instruments = getPreferredApiInstruments();
+    markInstrumentSource(instruments, 'api');
   }
-
   // Filter out the list
   instruments = filterInstruments({
     instruments,
@@ -427,13 +435,12 @@ export function getTranslatedInstrumentsForCustomerFromStorage(
  * @returns {Promise<Array<Instrument>>}
  */
 export function getTranslatedInstrumentsForCustomerFromApi(customer, extra) {
-  return Promise.resolve([]);
+  // return Promise.resolve([]);
 
-  // const instruments = getInstrumentsForCustomer(customer, extra, 'api');
-
-  // return (
-  //   _Arr.map(instruments, translateInstrumentToConfig) |> _Arr.filter(Boolean)
-  // );
+  const instruments = getInstrumentsForCustomer(customer, extra, 'api');
+  return Promise.resolve(
+    _Arr.map(instruments, translateInstrumentToConfig) |> _Arr.filter(Boolean)
+  );
 }
 
 /**
