@@ -47,6 +47,10 @@ const API_INSTRUMENT_PAYMENT_ADDONS = {
     instrument.wallet = instrument.instrument;
     delete instrument.instrument;
   },
+  netbanking: instrument => {
+    instrument.bank = instrument.instrument;
+    delete instrument.instrument;
+  },
 };
 
 function transformInstrumentToStorageFormat(instrument, data = {}) {
