@@ -1139,7 +1139,7 @@ Session.prototype = {
                 response = discreet.error('Payment failed');
               }
 
-              invoke(errorHandler, self, response);
+              self.errorHandler(response);
             }
           },
         }).till(function(response) {
@@ -1222,7 +1222,7 @@ Session.prototype = {
     this.updateCustomerInStore();
     Hacks.initPostRenderHacks();
 
-    errorHandler.call(this, this.params);
+    this.errorHandler(this.params);
 
     if (!this.tab && !this.get('prefill.contact')) {
       $('#contact').focus();
@@ -2656,12 +2656,10 @@ Session.prototype = {
    * Tries selecting the bank if netbanking offer,
    * wallet if wallet offer, and so on
    * @param {Offer} offer
-   * @param {string} screen
    */
-  _trySelectingOfferInstrument: function(offer, screen) {
-    screen = screen || this.screen;
-
+  _trySelectingOfferInstrument: function(offer) {
     var issuer = offer.issuer;
+    var screen = offer.payment_method;
 
     if (screen === 'wallet') {
       // Select wallet
@@ -2703,9 +2701,8 @@ Session.prototype = {
   /**
    * Handles offer selection
    * @param {Offer} offer
-   * @param {string} screen
    */
-  handleOfferSelection: function(offer, screen) {
+  handleOfferSelection: function(offer) {
     /**
      * Get the first instrument that can work with the offer
      * and select it if not already selected
@@ -2740,7 +2737,7 @@ Session.prototype = {
 
     // Wait for switching to be over
     setTimeout(function() {
-      session._trySelectingOfferInstrument(offer, screen);
+      session._trySelectingOfferInstrument(offer);
     }, 300);
   },
 
@@ -5172,11 +5169,9 @@ Session.prototype = {
         props: {
           applicableOffers: allOffers,
           setAppliedOffer: function(offer, shouldNavigate) {
-            if (appliedOffer !== offer) {
-              appliedOffer = offer;
-              if (offer && shouldNavigate) {
-                session.handleOfferSelection(offer);
-              }
+            appliedOffer = offer;
+            if (offer && shouldNavigate) {
+              session.handleOfferSelection(offer);
             }
             session.handleDiscount();
           },
@@ -5353,38 +5348,12 @@ Session.prototype = {
     Customer.prototype.r = this.r;
   },
 
-  showModal: function(preferences) {
-    Razorpay.sendMessage({ event: 'render' });
-
-    if (CheckoutBridge) {
-      var containerBox = $('#container')[0];
-      if (containerBox) {
-        var rect = containerBox.getBoundingClientRect();
-        Bridge.checkout.callAndroid(
-          'setDimensions',
-          Math.floor(rect.width),
-          Math.floor(rect.height)
-        );
-      }
-
-      $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
-    }
-
-    var qpmap = _Obj.unflatten(_.getQueryParams());
-    if (qpmap.error) {
-      errorHandler.call(this, qpmap);
-    }
-
-    if (qpmap.tab) {
-      this.switchTab(qpmap.tab);
-    }
-  },
-
   fetchFundAccounts: function() {
     return Payouts.fetchFundAccounts(this.get('contact_id'));
   },
 
   hideOverlayMessage: hideOverlayMessage,
+  errorHandler: errorHandler,
 };
 
 /*
