@@ -38,7 +38,6 @@ const API_INSTRUMENT_PAYMENT_ADDONS = {
     } else {
       const app = getUPIAppDataFromHandle(instrument.vpa.slice(1));
       if (app) {
-        debugger;
         instrument['_[flow]'] = 'intent';
         instrument['upi_app'] = app.package_name;
       }
