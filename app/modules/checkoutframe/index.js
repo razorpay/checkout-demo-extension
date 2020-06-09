@@ -23,6 +23,32 @@ import {
 
 let CheckoutBridge = window.CheckoutBridge;
 
+const showModal = session => {
+  Razorpay.sendMessage({ event: 'render' });
+
+  if (CheckoutBridge) {
+    const containerBox = _Doc.getElementById('container');
+    if (containerBox) {
+      const rect = containerBox.getBoundingClientRect();
+      Bridge.checkout.callAndroid(
+        'setDimensions',
+        Math.floor(rect.width),
+        Math.floor(rect.height)
+      );
+    }
+    _Doc.getElementById('backdrop').style.background = 'rgba(0, 0, 0, 0.6)';
+  }
+
+  const qpmap = _Obj.unflatten(_.getQueryParams());
+  if (qpmap.error) {
+    session.errorHandler(qpmap);
+  }
+
+  if (qpmap.tab) {
+    session.switchTab(qpmap.tab);
+  }
+};
+
 const validUID = id => {
   /* check only for iFrame because we trust our SDKs */
   if (isIframe && !CheckoutBridge) {
@@ -241,7 +267,7 @@ function setSessionPreferences(session, preferences) {
     return Razorpay.sendMessage({ event: 'fault', data: message });
   }
   session.render();
-  session.showModal(preferences);
+  showModal(session);
 }
 
 function getPreferenecsParams(razorpayInstance) {

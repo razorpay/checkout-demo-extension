@@ -1139,7 +1139,7 @@ Session.prototype = {
                 response = discreet.error('Payment failed');
               }
 
-              invoke(errorHandler, self, response);
+              self.errorHandler(response);
             }
           },
         }).till(function(response) {
@@ -1222,7 +1222,7 @@ Session.prototype = {
     this.updateCustomerInStore();
     Hacks.initPostRenderHacks();
 
-    errorHandler.call(this, this.params);
+    this.errorHandler(this.params);
 
     if (!this.tab && !this.get('prefill.contact')) {
       $('#contact').focus();
@@ -2663,12 +2663,7 @@ Session.prototype = {
     // Go to the offer's method if we're on homescreen
     if (screen !== offer.payment_method) {
       this.homeTab.selectMethod(offer.payment_method);
-      var session = this;
-      // setTimeout is applied to let CTA hide through svelte lifecycle
-      setTimeout(function() {
-        session.handleOfferSelection(offer, offer.payment_method);
-      });
-      return;
+      screen = offer.payment_method;
     }
 
     var issuer = offer.issuer;
@@ -2676,7 +2671,7 @@ Session.prototype = {
     if (screen === 'wallet') {
       // Select wallet
       if (issuer) {
-        this.svelteWalletsTab.setSelectedWallet(issuer);
+        this.svelteWalletsTab.onWalletSelection(issuer);
       }
     } else if (screen === 'netbanking') {
       // Select bank
@@ -5138,11 +5133,9 @@ Session.prototype = {
         props: {
           applicableOffers: allOffers,
           setAppliedOffer: function(offer, shouldNavigate) {
-            if (appliedOffer !== offer) {
-              appliedOffer = offer;
-              if (offer && shouldNavigate) {
-                session.handleOfferSelection(offer);
-              }
+            appliedOffer = offer;
+            if (offer && shouldNavigate) {
+              session.handleOfferSelection(offer);
             }
             session.handleDiscount();
           },
@@ -5319,38 +5312,12 @@ Session.prototype = {
     Customer.prototype.r = this.r;
   },
 
-  showModal: function(preferences) {
-    Razorpay.sendMessage({ event: 'render' });
-
-    if (CheckoutBridge) {
-      var containerBox = $('#container')[0];
-      if (containerBox) {
-        var rect = containerBox.getBoundingClientRect();
-        Bridge.checkout.callAndroid(
-          'setDimensions',
-          Math.floor(rect.width),
-          Math.floor(rect.height)
-        );
-      }
-
-      $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
-    }
-
-    var qpmap = _Obj.unflatten(_.getQueryParams());
-    if (qpmap.error) {
-      errorHandler.call(this, qpmap);
-    }
-
-    if (qpmap.tab) {
-      this.switchTab(qpmap.tab);
-    }
-  },
-
   fetchFundAccounts: function() {
     return Payouts.fetchFundAccounts(this.get('contact_id'));
   },
 
   hideOverlayMessage: hideOverlayMessage,
+  errorHandler: errorHandler,
 };
 
 /*
