@@ -1,4 +1,5 @@
 <script>
+  import { tick } from 'svelte';
   import { fly } from 'svelte/transition';
   import { formatAmountWithSymbol } from 'common/currency';
   import { getCurrency } from 'checkoutstore';
@@ -167,7 +168,7 @@
     hideList();
     // let other view updation take place after offers hide
     // to maintain CTA lifo stack
-    setAppliedOffer(offer, true);
+    tick().then(() => setAppliedOffer(offer, true));
   }
 
   export function clearOffer() {
