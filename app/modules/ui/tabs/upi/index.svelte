@@ -18,7 +18,7 @@
     doesAppExist,
     GOOGLE_PAY_PACKAGE_NAME,
     otherAppsIcon,
-    getUPIAppLogoFromHandle,
+    getUPIAppDataFromHandle,
   } from 'common/upi';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
@@ -620,7 +620,7 @@
               <div slot="title">{app.vpa.username + '@' + app.vpa.handle}</div>
               <i slot="icon">
                 <Icon
-                  icon={getUPIAppLogoFromHandle(app.vpa.handle) || session.themeMeta.icons.upi} />
+                  icon={getUPIAppDataFromHandle(app.vpa.handle).icon || session.themeMeta.icons.upi} />
               </i>
             </SlottedRadioOption>
           {/each}

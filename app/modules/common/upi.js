@@ -487,6 +487,7 @@ const handleData = [
   {
     handles: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],
     icon: 'https://cdn.razorpay.com/app/googlepay.svg',
+    package_name: GOOGLE_PAY_PACKAGE_NAME,
   },
   {
     handles: ['ybl'],
@@ -509,15 +510,15 @@ const handleData = [
  *
  * @returns string url to the app icon
  */
-export const getUPIAppLogoFromHandle = handle => {
-  let icon = null;
+export const getUPIAppDataFromHandle = handle => {
+  let data = {};
   handleData.forEach(handleSet => {
     if (_Arr.contains(handleSet.handles, handle)) {
-      icon = handleSet.icon;
+      data = handleSet;
     }
   });
 
-  return icon;
+  return data;
 };
 
 /**
