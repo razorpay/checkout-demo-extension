@@ -2667,12 +2667,7 @@ Session.prototype = {
           method: offer.payment_method,
         },
       });
-      var session = this;
-      // setTimeout is applied to let CTA hide through svelte lifecycle
-      setTimeout(function() {
-        session.handleOfferSelection(offer, offer.payment_method);
-      });
-      return;
+      screen = offer.payment_method;
     }
 
     var issuer = offer.issuer;
@@ -2680,7 +2675,7 @@ Session.prototype = {
     if (screen === 'wallet') {
       // Select wallet
       if (issuer) {
-        this.svelteWalletsTab.setSelectedWallet(issuer);
+        this.svelteWalletsTab.onWalletSelection(issuer);
       }
     } else if (screen === 'netbanking') {
       // Select bank
@@ -5142,11 +5137,9 @@ Session.prototype = {
         props: {
           applicableOffers: allOffers,
           setAppliedOffer: function(offer, shouldNavigate) {
-            if (appliedOffer !== offer) {
-              appliedOffer = offer;
-              if (offer && shouldNavigate) {
-                session.handleOfferSelection(offer);
-              }
+            appliedOffer = offer;
+            if (offer && shouldNavigate) {
+              session.handleOfferSelection(offer);
             }
             session.handleDiscount();
           },
