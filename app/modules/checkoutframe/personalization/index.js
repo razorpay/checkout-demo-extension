@@ -358,7 +358,7 @@ const getInstrumentsForCustomer = (customer, extra = {}, source) => {
 
   if (source === 'storage') {
     instruments = getAllInstrumentsForCustomer(customer);
-  } else {
+  } else if (source === 'api') {
     instruments = getPreferredApiInstruments();
     markInstrumentSource(instruments, 'api');
   }
