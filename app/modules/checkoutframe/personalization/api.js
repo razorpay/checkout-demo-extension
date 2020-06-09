@@ -43,6 +43,10 @@ const API_INSTRUMENT_PAYMENT_ADDONS = {
       }
     }
   },
+  wallet: instrument => {
+    instrument.wallet = instrument.instrument;
+    delete instrument.instrument;
+  },
 };
 
 function transformInstrumentToStorageFormat(instrument, data = {}) {
