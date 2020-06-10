@@ -117,10 +117,21 @@
     const currentExperimentSet =
       experimentInstrumentSet[instrumentExperimentVersion];
 
+    // get a random experiment for the current session
     const randomExperiment =
       currentExperimentSet[
         Math.floor(Math.random() * currentExperimentSet.length)
       ];
+
+    // if user is in home, track the currently visible experiment
+    if (!session.tab) {
+      Analytics.track('home:p13n:experiment', {
+        type: AnalyticsTypes.METRIC,
+        data: {
+          source: randomExperiment,
+        },
+      });
+    }
 
     return randomExperiment;
   };
