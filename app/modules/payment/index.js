@@ -32,6 +32,8 @@ import {
   updateCardIINMetadata,
 } from 'common/card';
 
+import { translatePaymentPopup as t } from 'i18n';
+
 /**
  * Tells if we're being executed from
  * the same domain as the configured API
@@ -612,7 +614,7 @@ Payment.prototype = {
   writePopup: function() {
     var popup = this.popup;
     if (popup) {
-      popup.write(popupTemplate(this));
+      popup.write(popupTemplate(this, t));
       popup.window.deserialize = _Doc.obj2formhtml;
     }
   },
