@@ -360,7 +360,7 @@ const getInstrumentsForCustomer = (customer, extra = {}, source) => {
     instruments = getAllInstrumentsForCustomer(customer);
   } else if (source === 'api') {
     instruments = getPreferredApiInstruments();
-    markInstrumentSource(instruments, 'api');
+    instruments = markInstrumentSource(instruments, 'api');
   }
   // Filter out the list
   instruments = filterInstruments({

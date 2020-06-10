@@ -127,7 +127,7 @@ export const filterInstrumentsForAvailableMethods = _.curry2(
 
 const SANITY_FILTERS = {
   upi: instrument => {
-    if (instrument.source === 'api') {
+    if (instrument._source === 'api') {
       return true;
     }
 

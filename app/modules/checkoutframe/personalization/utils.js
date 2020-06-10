@@ -72,7 +72,8 @@ export function getAllInstruments() {
 }
 
 export function markInstrumentSource(instruments, source) {
-  instruments.forEach(instrument => {
-    instrument.source = source;
+  return instruments.map(instrument => {
+    instrument._source = source;
+    return instrument;
   });
 }
