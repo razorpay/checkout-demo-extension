@@ -181,14 +181,11 @@ export function getShortBankName(bankCode, locale) {
  * @returns {string}
  */
 export function translatePaymentPopup(label, data = {}) {
-  let translated = formatMessageWithLocale(
+  let translated = formatTemplateWithLocale(
     `popup.${label}`,
+    data,
     getCurrentLocale()
   );
-  let variables = Object.keys(data);
-  variables.forEach(variable => {
-    translated = translated.replace(`{${variable}}`, data[variable]);
-  });
   return translated;
 }
 
