@@ -37,6 +37,7 @@
 
   // Utils imports
   import { getSession } from 'sessionmanager';
+  import { generateSubtextForRecurring } from 'subtext/card';
   import {
     isPartialPayment as getIsPartialPayment,
     isContactOptional,
@@ -55,8 +56,8 @@
   } from 'checkoutstore';
 
   import {
-    isCreditCardEnabled,
-    isDebitCardEnabled,
+    getCardTypesForRecurring,
+    getCardNetworksForRecurring,
     getSingleMethod,
     isEMandateBankEnabled,
     getTPV,
@@ -769,38 +770,12 @@
       {/if}
       {#if showRecurringCallout}
         <Callout>
-          {#if session.get('subscription_id')}
-            {#if isDebitCardEnabled() && isCreditCardEnabled()}
-              Subscription payments are supported on Visa and Mastercard Credit
-              Cards from all Banks and Debit Cards from ICICI, Kotak, Citibank
-              and Canara Bank.
-            {:else if isDebitCardEnabled()}
-              Subscription payments are only supported on Visa and Mastercard
-              Debit Cards from ICICI, Kotak, Citibank and Canara Bank.
-            {:else}
-              Subscription payments are only supported on Mastercard and Visa
-              Credit Cards.
-            {/if}
-          {:else if cardOffer}
-            {#if isDebitCardEnabled() && isCreditCardEnabled()}
-              All {cardOffer.issuer} Cards are supported for this payment
-            {:else if isDebitCardEnabled()}
-              All {cardOffer.issuer} Debit Cards are supported for this payment
-            {:else}
-              All {cardOffer.issuer} Credit Cards are supported for this
-              payment.
-            {/if}
-          {:else if isDebitCardEnabled() && isCreditCardEnabled()}
-            Visa and Mastercard Credit Cards from all Banks and Debit Cards from
-            ICICI, Kotak, Citibank and Canara Bank are supported for this
-            payment.
-          {:else if isDebitCardEnabled()}
-            Only Visa and Mastercard Debit Cards from ICICI, Kotak, Citibank and
-            Canara Bank are supported for this payment.
-          {:else}
-            Only Visa and Mastercard Credit Cards are supported for this
-            payment.
-          {/if}
+          {generateSubtextForRecurring({
+            types: getCardTypesForRecurring(),
+            networks: getCardNetworksForRecurring(),
+            subscription: session.get('subscription_id'),
+            offer: cardOffer,
+          })}
         </Callout>
       {/if}
 
