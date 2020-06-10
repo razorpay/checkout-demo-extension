@@ -417,6 +417,10 @@ export function getTranslatedInstrumentsForCustomerFromStorage(
   customer,
   extra
 ) {
+  if (extra.experiment !== 'storage') {
+    return [];
+  }
+
   const instruments = getInstrumentsForCustomer(customer, extra, 'storage');
 
   return (
@@ -435,7 +439,9 @@ export function getTranslatedInstrumentsForCustomerFromStorage(
  * @returns {Promise<Array<Instrument>>}
  */
 export function getTranslatedInstrumentsForCustomerFromApi(customer, extra) {
-  // return Promise.resolve([]);
+  if (extra.experiment !== 'api') {
+    return Promise.resolve([]);
+  }
 
   const instruments = getInstrumentsForCustomer(customer, extra, 'api');
   return Promise.resolve(

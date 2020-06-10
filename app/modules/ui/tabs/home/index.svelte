@@ -264,28 +264,31 @@
 
   function getAllAvailableP13nInstruments() {
     return new Promise(resolve => {
+      const randomExperiment = getRandomP13nExperiment();
+
+      const data = {
+        upiApps: session.upi_intents_data,
+        experiment: randomExperiment,
+      };
+
       const storage = getTranslatedInstrumentsForCustomerFromStorage(
         $customer,
-        {
-          upiApps: session.upi_intents_data,
-        }
+        data
       );
 
-      getTranslatedInstrumentsForCustomerFromApi($customer, {
-        upiApps: session.upi_intents_data,
-      }).then(instrumentsFromApi => {
-        const randomExperiment = getRandomP13nExperiment();
+      getTranslatedInstrumentsForCustomerFromApi($customer, data).then(
+        instrumentsFromApi => {
+          const instrumentExperimentMap = {
+            api: instrumentsFromApi,
+            storage,
+          };
 
-        const instrumentExperimentMap = {
-          api: instrumentsFromApi,
-          storage,
-        };
-
-        resolve({
-          instruments: instrumentExperimentMap[randomExperiment] || [],
-          source: randomExperiment,
-        });
-      });
+          resolve({
+            instruments: instrumentExperimentMap[randomExperiment] || [],
+            source: randomExperiment,
+          });
+        }
+      );
     });
   }
 
