@@ -22,12 +22,14 @@
     NEW_VPA_TITLE_LOGGED_OUT,
     NEW_VPA_TITLE_LOGGED_IN,
     NEW_VPA_SUBTITLE,
+    NEW_VPA_SUBTITLE_UPI_OTM,
   } from 'ui/labels/upi';
 
   // Props
   export let selected = false;
   export let focusOnCreate = false;
   export let customer;
+  export let paymentMethod = 'upi';
 
   // Refs
   export let vpaField = null;
@@ -116,7 +118,8 @@
   .should-save-vpa-container {
     margin-top: 12px;
 
-    #should-save-vpa span.checkbox {
+    #should-save-vpa-upi span.checkbox,
+    #should-save-vpa-upi_otm span.checkbox {
       display: inline-block;
     }
   }
@@ -135,34 +138,40 @@
 </style>
 
 <SlottedRadioOption
-  name="payment_type"
+  name={'upi-vpa-input-' + paymentMethod}
   value="full"
   align="top"
   on:click
   on:click={focusAfterTimeout}
   {selected}>
-  <div id="new-vpa-field" slot="title">
+  <div id={'new-vpa-field-' + paymentMethod} slot="title">
     <!-- LABEL: UPI ID -->
     <!-- LABEL: Add UPI ID -->
     {logged && canSaveVpa ? $t(NEW_VPA_TITLE_LOGGED_IN) : $t(NEW_VPA_TITLE_LOGGED_OUT)}
   </div>
   <!-- LABEL: Google Pay, BHIM, PhonePe & more -->
-  <div slot="subtitle">{$t(NEW_VPA_SUBTITLE)}</div>
+  <div slot="subtitle">
+    {#if paymentMethod === 'upi_otm'}
+      {$t(NEW_VPA_SUBTITLE)}
+    {:else}{$t(NEW_VPA_SUBTITLE_UPI_OTM)}{/if}
+  </div>
   <i slot="icon" class="top">
     <Icon icon={session.themeMeta.icons.upi} />
   </i>
 
   <div slot="body">
     {#if selected}
-      <div id="user-new-vpa-container" transition:slide={{ duration: 200 }}>
+      <div
+        id={'user-new-vpa-container-' + paymentMethod}
+        transition:slide={{ duration: 200 }}>
         <!-- LABEL: Please enter a valid VPA of the form username@bank -->
         <!-- LABEL: Enter your UPI ID -->
         <Field
           formatter={{ type: 'vpa' }}
           {pattern}
           helpText={$t(UPI_COLLECT_NEW_VPA_HELP)}
-          id="vpa"
-          name="vpa"
+          id={'vpa-' + paymentMethod}
+          name={'vpa-' + paymentMethod}
           type="text"
           required
           bind:value={newVpa}
@@ -171,9 +180,13 @@
           placeholder={$t(UPI_COLLECT_ENTER_ID)} />
         {#if logged && canSaveVpa}
           <div class="should-save-vpa-container">
-            <label id="should-save-vpa" for="save-vpa">
+            <label
+              id={'should-save-vpa-' + paymentMethod}
+              for={'save-vpa-' + paymentMethod}>
               <!-- LABEL: Securely save your UPI ID -->
-              <Checkbox bind:checked={rememberVpa} id="save-vpa">
+              <Checkbox
+                bind:checked={rememberVpa}
+                id={'save-vpa-' + paymentMethod}>
                 {$t(UPI_COLLECT_SAVE)}
               </Checkbox>
             </label>

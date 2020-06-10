@@ -108,10 +108,12 @@
 
   function handleLogoutClick() {
     session.logUserOut(session.getCurrentCustomer());
+    logoutDropdownShown = false;
   }
 
   function handleLogoutAllDevicesClick() {
     session.logUserOutOfAllDevices(session.getCurrentCustomer());
+    logoutDropdownShown = false;
   }
 
   function handleOutsideClick() {

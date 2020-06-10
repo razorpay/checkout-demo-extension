@@ -21,9 +21,6 @@ var preferences = _.preferences;
 var gpay_omnichannel = preferences.features && preferences.features.google_pay_omnichannel;
 var invoice = _.invoice;
 
-var bank = _.tpvBank || {};
-var accountName = o('prefill.bank_account[name]');
-
 var amount;
 var amount_figure = _.formatAmountWithCurrency(o('amount'));
 var firstPaymentMinAmount = _.formatAmountWithCurrency(order.first_payment_min_amount);
@@ -120,12 +117,13 @@ var subscription_will_refund = _.subscription && (_.subscription.type === 0);
               `?`
             </div>
             <div id="bottom"></div>
-            <button id="footer" type="submit" class="button">
+            <button id="footer" type="button" class="button">
               <span>`=cta`</span>
             </button>
             `?o('theme.branding')`
               <img id="cob-rzp" src="https://cdn.razorpay.com/logo.svg">
             `?`
+            <button type="submit"></button>
           </form>
         </div>
       </div>

@@ -10,7 +10,7 @@
 
   // i18n
   import { t, locale } from 'svelte-i18n';
-  import { formatTemplateWithLocale, getLongBankName } from 'i18n';
+  import { formatTemplateWithLocale, getEmiIssuerName } from 'i18n';
 
   import {
     EMI_TENURE,
@@ -88,9 +88,8 @@
     <i class="i select-arrow">&#xe601;</i>
     <select id="emi-bank-select" bind:value={selected}>
       {#each banksList as bank (bank.code)}
-        <!-- TODO: split into card issuer names instead of bank names -->
         <option value={bank.code}>
-          {getLongBankName(bank.code, $locale, bank.name)}
+          {getEmiIssuerName(bank.code, $locale, bank.name)}
         </option>
       {/each}
     </select>

@@ -1,75 +1,6 @@
-import {
-  addMessages,
-  init as initSvelteI18n,
-  register,
-  isLoading,
-  dictionary,
-  t,
-  locale,
-} from 'svelte-i18n';
+import { dictionary, t, locale } from 'svelte-i18n';
 
 import { get } from 'svelte/store';
-
-import en from './bundles/en';
-
-import { getSession } from 'sessionmanager';
-
-import popupLabels from 'ui/labels/popup';
-
-/**
- * Returns the URL for the locale bundle on CDN
- * @param {string} locale
- * @returns {string}
- */
-function makeBundleUrl(locale) {
-  // TODO: change URL once finalized
-  return `https://cdn.razorpay.com/bundles/${locale}.json`;
-}
-
-/**
- * Fetches the bundle for a given locale.
- * @param {string} locale
- * @returns {Promise<Object>}
- */
-function fetchBundle(locale) {
-  return new Promise((resolve, reject) => {
-    fetch({
-      url: makeBundleUrl(locale),
-      callback: response => {
-        if (response.error) {
-          reject(response.error);
-        } else {
-          resolve(response);
-        }
-      },
-    });
-  });
-}
-
-export function init() {
-  // Add bundled messages
-  addMessages('en', en);
-  register('hi', () => fetchBundle('hi'));
-
-  const session = getSession();
-
-  isLoading.subscribe(value => {
-    if (value) {
-      // TODO: lock overlay and prevent dismissal
-      session.showLoadError('Loading');
-    } else {
-      // TODO: fix this and remove try/catch
-      try {
-        session.hideOverlayMessage();
-      } catch (e) {}
-    }
-  });
-
-  initSvelteI18n({
-    fallbackLocale: 'en',
-    initialLocale: 'en', // TODO: select from navigator
-  });
-}
 
 /**
  * Returns the currently selected locale
@@ -280,4 +211,16 @@ export function getTabTitle(tab, locale) {
  */
 export function getOtpScreenTitle(view, data, locale) {
   return formatTemplateWithLocale(`otp.title.${view}`, data, locale, view);
+}
+
+/**
+ * Returns the name for a given EMI issuer
+ * @param {string} issuer
+ * @param {string} locale
+ * @param {string} [defaultValue]
+ *
+ * @returns {string}
+ */
+export function getEmiIssuerName(issuer, locale, defaultValue) {
+  return formatMessageWithLocale(`emi_issuers.${issuer}`, locale, defaultValue);
 }

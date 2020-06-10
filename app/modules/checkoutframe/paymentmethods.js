@@ -122,6 +122,7 @@ const DESCRIPTIONS = {
       getWallets().map(w => getWalletName(w.code, locale)),
       2
     ),
+  upi_otm: locale => getRawMethodDescription('upi_otm', locale),
 };
 
 /**

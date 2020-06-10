@@ -6,6 +6,7 @@
   // i18n
   import {
     MULTI_TPV_TITLE,
+    MULTI_TPV_NETBANKING_TITLE,
     MULTI_TPV_UPI_SUBTITLE,
     MULTI_TPV_UPI_TITLE,
   } from 'ui/labels/home';
@@ -59,7 +60,10 @@
     <i slot="icon">
       <Icon icon="https://cdn.razorpay.com/bank/{bank.code}.gif" />
     </i>
-    <div slot="title">A/C: {bank.account_number}</div>
+    <!-- LABEL: A/C: {accountNumber} -->
+    <div slot="title">
+      {formatTemplateWithLocale(MULTI_TPV_NETBANKING_TITLE, { accountNumber: bank.account_number }, $locale)}
+    </div>
     <div slot="subtitle">{bankName}</div>
   </SlottedRadioOption>
   <SlottedRadioOption

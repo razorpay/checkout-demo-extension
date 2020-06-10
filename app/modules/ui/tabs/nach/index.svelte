@@ -266,7 +266,7 @@
   }
 </style>
 
-<Tab method="nach" overrideMethodCheck="true" pad={false}>
+<Tab method="nach" overrideMethodCheck="true" pad={true}>
   <Screen>
     <div>
       <input

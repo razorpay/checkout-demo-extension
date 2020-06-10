@@ -534,6 +534,10 @@ const handleData = [
     handles: ['icicibank'],
     icon: 'https://cdn.razorpay.com/app/whatsapp.svg',
   },
+  {
+    handles: ['upi'],
+    icon: 'https://cdn.razorpay.com/app/bhim.svg',
+  },
 ];
 
 /**

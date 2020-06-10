@@ -29,6 +29,7 @@ export const STATE_HELP = 'home.state_help';
 
 export const MULTI_TPV_TITLE = 'home.multi_tpv_title';
 export const MULTI_TPV_UPI_TITLE = 'home.multi_tpv_upi_title';
+export const MULTI_TPV_NETBANKING_TITLE = 'home.multi_tpv_netbanking_title';
 export const MULTI_TPV_UPI_SUBTITLE = 'home.multi_tpv_upi_subtitle';
 export const BANK_DETAILS_HEADING = 'home.bank_details_heading';
 export const ACCOUNT_NUMER_LABEL = 'home.account_numer_label';

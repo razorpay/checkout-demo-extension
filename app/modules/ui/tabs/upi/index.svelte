@@ -9,7 +9,11 @@
   import * as GPay from 'gpay';
   import * as Bridge from 'bridge';
   import { getDowntimes, hasFeature, isCustomerFeeBearer } from 'checkoutstore';
-  import { isMethodEnabled, isUPIFlowEnabled } from 'checkoutstore/methods';
+  import {
+    isMethodEnabled,
+    isUPIFlowEnabled,
+    isUPIOtmFlowEnabled,
+  } from 'checkoutstore/methods';
   import { isVpaValid } from 'common/upi';
   import {
     doesAppExist,
@@ -23,6 +27,8 @@
   import { hideCta, showCtaWithDefaultText, showCta } from 'checkoutstore/cta';
   import { filterUPITokens } from 'common/token';
   import { getUPIIntentApps } from 'checkoutstore/native';
+
+  import { getAmount, getName } from 'checkoutstore';
 
   // UI imports
   import UpiIntent from './UpiIntent.svelte';
@@ -43,6 +49,7 @@
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import AddANewVpa from './AddANewVpa.svelte';
   import { getMiscIcon } from 'checkoutframe/icons';
+  import Callout from 'ui/elements/Callout.svelte';
 
   // Store
   import { contact } from 'checkoutstore/screens/home';
@@ -72,6 +79,7 @@
   export let isFirst = true;
   export let vpa = '';
   export let qrIcon;
+  export let method = 'upi';
 
   // Refs
   export let intentView = null;
@@ -93,8 +101,48 @@
   let isANewVpa = false;
   let rememberVpaCheckbox;
   let intentAppSelected = null;
+  const isOtm = method === 'upi_otm';
+  let otmStartDate = new Date();
 
   const session = getSession();
+
+  const getAllowedPSPs = {
+    upi: tokens => tokens,
+    upi_otm: tokens => {
+      const allowedPSPs = ['upi', 'hdfcbank'];
+
+      return tokens.filter(token => {
+        return allowedPSPs.some(psp => token.vpa.handle === psp);
+      });
+    },
+  };
+
+  let toShortFormat = function(date, delimter = ' ') {
+    let month_names = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+
+    let day = date.getDate();
+    let month_index = date.getMonth();
+    let year = date.getFullYear();
+
+    return '' + day + delimter + month_names[month_index] + delimter + year;
+  };
+
+  const addDaysToDate = function(date, days) {
+    return new Date(date.getTime() + days * 1000 * 24 * 3600);
+  };
 
   const { isPayout, showRecommendedUPIApp } = session;
 
@@ -105,11 +153,13 @@
    * @returns {Object}
    */
   function getAvailableFlowsFromInstrument(instrument) {
+    const isFlowEnabled = isOtm ? isUPIOtmFlowEnabled : isUPIFlowEnabled;
+
     let availableFlows = {
-      omnichannel: isUPIFlowEnabled('omnichannel'),
-      collect: isUPIFlowEnabled('collect'),
-      intent: isUPIFlowEnabled('intent'),
-      qr: isUPIFlowEnabled('qr'),
+      omnichannel: isFlowEnabled('omnichannel'),
+      collect: isFlowEnabled('collect'),
+      intent: isFlowEnabled('intent'),
+      qr: isFlowEnabled('qr'),
     };
 
     if (!instrument || instrument.method !== 'upi') {
@@ -171,9 +221,11 @@
   let intentApps = getUPIIntentApps().filtered;
   $: intentApps = getUPIIntentAppsFromInstrument($methodTabInstrument);
 
+  let otmEndDate = addDaysToDate(otmStartDate, 90);
+
   const checkGPay = session => {
-    /* disable Web payments API for fee_bearer for now */
-    if (isCustomerFeeBearer()) {
+    /* disable Web payments API for fee_bearer and OTM for now */
+    if (isCustomerFeeBearer() || isOtm) {
       return Promise.reject();
     }
 
@@ -201,8 +253,9 @@
   $: shouldShowCollect = availableFlows.collect;
   $: shouldShowOmnichannel = availableFlows.omnichannel;
 
-  // Determine CTA visilibty when selectedToken changes, but only if session.tab is 'upi'
-  $: selectedToken, session.tab === 'upi' && determineCtaVisibility();
+  // Determine CTA visilibty when selectedToken changes, but only if session.tab is a upi based method
+  $: selectedToken,
+    _Arr.contains(['upi', 'upi_otm'], session.tab) && determineCtaVisibility();
 
   function setDefaultTokenValue() {
     const hasIntentFlow = availableFlows.intent || useWebPaymentsApi;
@@ -225,6 +278,7 @@
 
   $: {
     tokens = filterUPITokens(_Obj.getSafely($customer, 'tokens.items', []));
+    tokens = getAllowedPSPs[method](tokens);
     setDefaultTokenValue();
   }
 
@@ -260,8 +314,8 @@
 
     const downtimes = getDowntimes();
 
-    down = _Arr.contains(downtimes.low.methods, 'upi');
-    disabled = _Arr.contains(downtimes.high.methods, 'upi');
+    down = _Arr.contains(downtimes.low.methods, method);
+    disabled = _Arr.contains(downtimes.high.methods, method);
     qrIcon = session.themeMeta.icons.qr;
   });
 
@@ -351,6 +405,16 @@
      */
     if (!data['_[flow]']) {
       data['_[flow]'] = 'directpay';
+    }
+
+    if (isOtm) {
+      data.upi = {
+        flow: 'collect',
+        type: 'otm',
+      };
+      if (data.vpa) {
+        data.upi.vpa = data.vpa;
+      }
     }
 
     data.method = 'upi';
@@ -464,6 +528,10 @@
 </script>
 
 <style>
+  strong {
+    font-weight: bolder;
+  }
+
   .legend {
     margin-top: 10px;
     padding: 12px 0 8px 12px;
@@ -508,7 +576,7 @@
   }
 </style>
 
-<Tab method="upi" pad={false}>
+<Tab {method} {down} pad={false}>
   <Screen>
     <div>
 
@@ -575,6 +643,7 @@
             </SlottedRadioOption>
           {/each}
           <AddANewVpa
+            paymentMethod={method}
             on:click={() => {
               onUpiAppSelection({ detail: { id: 'new' } });
             }}
@@ -617,13 +686,25 @@
       {/if}
     </div>
 
-    <Bottom tab="upi">
+    <Bottom tab={method}>
       {#if down || disabled}
         <DowntimeCallout severe={disabled}>
           <!-- LABEL: UPI is experiencing low success rates. -->
           <FormattedText text={$t(UPI_DOWNTIME_TEXT)} />
         </DowntimeCallout>
       {/if}
+      {#if isOtm}
+        <Callout classes={['downtime-callout']} showIcon={true}>
+          <strong>{session.formatAmountWithCurrency(getAmount())}</strong>
+          will be blocked on your account by clicking pay. Your account will be
+          charged {getName() ? 'by ' + getName() : ''} between
+          <strong>{toShortFormat(otmStartDate)}</strong>
+          to
+          <strong>{toShortFormat(otmEndDate)}</strong>
+          .
+        </Callout>
+      {/if}
+
     </Bottom>
   </Screen>
 </Tab>
