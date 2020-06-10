@@ -102,6 +102,29 @@
   // Offers
   const showOffers = hasOffersOnHomescreen();
 
+  // Personalisation
+  const setinstrumentExperimentVersion = Math.floor(Math.random() * 4);
+  const getRandomP13nExperiment = function() {
+    const instrumentExperimentVersion = setinstrumentExperimentVersion;
+
+    const experimentInstrumentSet = [
+      ['storage', 'api'],
+      ['', ''],
+      ['storage', ''],
+      ['api', ''],
+    ];
+
+    const currentExperimentSet =
+      experimentInstrumentSet[instrumentExperimentVersion];
+
+    const randomExperiment =
+      currentExperimentSet[
+        Math.floor(Math.random() * currentExperimentSet.length)
+      ];
+
+    return randomExperiment;
+  };
+
   // Recurring callout
   const showRecurringCallout =
     isRecurring() && session.tab !== 'emandate' && singleMethod === 'card';
@@ -251,10 +274,16 @@
       getTranslatedInstrumentsForCustomerFromApi($customer, {
         upiApps: session.upi_intents_data,
       }).then(instrumentsFromApi => {
-        // TODO: Figure out which source to use
+        const randomExperiment = getRandomP13nExperiment();
+
+        const instrumentExperimentMap = {
+          api: instrumentsFromApi,
+          storage,
+        };
+
         resolve({
-          instruments: instrumentsFromApi,
-          source: 'api',
+          instruments: instrumentExperimentMap[randomExperiment] || [],
+          source: randomExperiment,
         });
       });
     });
