@@ -73,7 +73,7 @@ export const getPrefilledCardNumber = optionGetter('prefill.card[number]');
 export const getPrefilledVPA = optionGetter('prefill.vpa');
 
 export const getPreferredApiInstruments = () =>
-  _Obj.getSafely(preferences, 'preferred_methods');
+  _Obj.getSafely(preferences, 'preferred_methods', []);
 
 export function hasFeature(feature, fallbackValue) {
   return _Obj.getSafely(preferences, `features.${feature}`, fallbackValue);
