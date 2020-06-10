@@ -2353,7 +2353,7 @@ Session.prototype = {
     }
     this.click('#top-left', this.back);
     this.on('submit', '#form', this.preSubmit);
-    this.on('click', '#footer span', this.preSubmit);
+    this.on('click', '#footer-cta', this.preSubmit);
 
     if (MethodStore.isCardOrEMIEnabled()) {
       /**
