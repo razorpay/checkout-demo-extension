@@ -77,13 +77,9 @@
     return !!selectedWallet;
   }
 
-  export function setSelectedWallet(wallet) {
-    selectedWallet = wallet;
-  }
-
   const walletReferences = {};
 
-  export function onWalletSelection(e, code) {
+  export function onWalletSelection(code) {
     const offerError = !session.validateOffers(code, function(removeOffer) {
       if (removeOffer) {
         selectedWallet = code;
@@ -168,7 +164,7 @@
       name={wallet.code}
       selected={selectedWallet === wallet.code}
       align="top"
-      on:click={e => onWalletSelection(e, wallet.code)}>
+      on:click={() => onWalletSelection(wallet.code)}>
       <div
         slot="title"
         bind:this={walletReferences[wallet.code]}

@@ -59,6 +59,7 @@
 
   // Utils imports
   import { getSession } from 'sessionmanager';
+  import { generateSubtextForRecurring } from 'subtext/card';
   import {
     isPartialPayment as getIsPartialPayment,
     isContactOptional,
@@ -77,8 +78,8 @@
   } from 'checkoutstore';
 
   import {
-    isCreditCardEnabled,
-    isDebitCardEnabled,
+    getCardTypesForRecurring,
+    getCardNetworksForRecurring,
     getSingleMethod,
     isEMandateBankEnabled,
     getTPV,
@@ -797,25 +798,12 @@
       {/if}
       {#if showRecurringCallout}
         <Callout>
-          {#if session.get('subscription_id')}
-            {#if isDebitCardEnabled() && isCreditCardEnabled()}
-              {$t(SUBSCRIPTIONS_CREDIT_DEBIT_CALLOUT)}
-            {:else if isDebitCardEnabled()}
-              {$t(SUBSCRIPTIONS_DEBIT_ONLY_CALLOUT)}
-            {:else}{$t(SUBSCRIPTIONS_CREDIT_ONLY_CALLOUT)}{/if}
-          {:else if cardOffer}
-            {#if isDebitCardEnabled() && isCreditCardEnabled()}
-              {formatTemplateWithLocale(CARD_OFFER_CREDIT_DEBIT_CALLOUT, { issuer: cardOffer.issuer }, $locale)}
-            {:else if isDebitCardEnabled()}
-              {formatTemplateWithLocale(CARD_OFFER_DEBIT_ONLY_CALLOUT, { issuer: cardOffer.issuer }, $locale)}
-            {:else}
-              {formatTemplateWithLocale(CARD_OFFER_CREDIT_ONLY_CALLOUT, { issuer: cardOffer.issuer }, $locale)}
-            {/if}
-          {:else if isDebitCardEnabled() && isCreditCardEnabled()}
-            {$t(RECURRING_CREDIT_DEBIT_CALLOUT)}
-          {:else if isDebitCardEnabled()}
-            {$t(RECURRING_DEBIT_ONLY_CALLOUT)}
-          {:else}{$t(RECURRING_CREDIT_ONLY_CALLOUT)}{/if}
+          {generateSubtextForRecurring({
+            types: getCardTypesForRecurring(),
+            networks: getCardNetworksForRecurring(),
+            subscription: session.get('subscription_id'),
+            offer: cardOffer,
+          })}
         </Callout>
       {/if}
 
