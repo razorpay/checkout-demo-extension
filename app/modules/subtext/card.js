@@ -180,8 +180,8 @@ export function generateSubtextForCardInstrument(instrument) {
 }
 
 export function generateSubtextForRecurring({
-  types,
-  networks,
+  types = {},
+  networks = {},
   subscription,
   offer,
 }) {
