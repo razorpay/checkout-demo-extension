@@ -111,6 +111,10 @@
     margin: 10px 0;
   }
 
+  .otp-title {
+    margin: 0 24px;
+  }
+
   .otp-screen-contents {
     display: flex;
     flex-direction: column;
@@ -138,7 +142,11 @@
           <AsyncLoading>
             {getOtpScreenTitle($textView, $templateData, $locale)}
           </AsyncLoading>
-        {:else}{getOtpScreenTitle($textView, $templateData, $locale)}{/if}
+        {:else}
+          <div class="otp-title">
+            {getOtpScreenTitle($textView, $templateData, $locale)}
+          </div>
+        {/if}
       </div>
       {#if $addFunds}
         <div id="add-funds" class="add-funds">
