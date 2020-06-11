@@ -446,25 +446,16 @@ export function getTranslatedInstrumentsForCustomerFromApi(customer, extra) {
         resolve(p13nAPIInstruments[contact]);
       }
 
-      setTimeout(() => {
-        const apiInstruments = [
-          {
-            method: 'upi',
-            vpa: 'saranshgupta1995@okhdfcbank',
-            score: 1,
-          },
-        ];
+      fetch({
+        url,
+        callback: function() {
+          const apiInstruments = [];
 
-        p13nAPIInstruments[contact] = apiInstruments;
+          p13nAPIInstruments[contact] = apiInstruments;
 
-        resolve(apiInstruments);
-      }, 1000);
-      // fetch({
-      //   url,
-      //   callback: function(){
-      //     console.log('callback');
-      //   },
-      // });
+          resolve(apiInstruments);
+        },
+      });
     });
   } else {
     const instruments = getInstrumentsForCustomer(customer, extra, 'api');
