@@ -102,40 +102,6 @@
   // Offers
   const showOffers = hasOffersOnHomescreen();
 
-  // Personalisation
-  const setinstrumentExperimentVersion = Math.floor(Math.random() * 4);
-  const getRandomP13nExperiment = function() {
-    const instrumentExperimentVersion = setinstrumentExperimentVersion;
-
-    const experimentInstrumentSet = [
-      ['storage', 'api'],
-      ['', ''],
-      ['storage', ''],
-      ['api', ''],
-    ];
-
-    const currentExperimentSet =
-      experimentInstrumentSet[instrumentExperimentVersion];
-
-    // get a random experiment for the current session
-    const randomExperiment =
-      currentExperimentSet[
-        Math.floor(Math.random() * currentExperimentSet.length)
-      ];
-
-    // if user is in home, track the currently visible experiment
-    if (!session.tab) {
-      Analytics.track('home:p13n:experiment', {
-        type: AnalyticsTypes.METRIC,
-        data: {
-          source: randomExperiment,
-        },
-      });
-    }
-
-    return randomExperiment;
-  };
-
   // Recurring callout
   const showRecurringCallout =
     isRecurring() && session.tab !== 'emandate' && singleMethod === 'card';
@@ -265,6 +231,40 @@
     return view === 'details';
   }
 
+  function getRandomInstrumentSet(instrumentsFromStorage, instrumentsFromApi) {
+    let instrumentsOnScreen = 'storage';
+
+    const instrumentMap = {
+      api: instrumentsFromApi,
+      storage: instrumentsFromStorage,
+    };
+
+    if (!instrumentsFromStorage.length) {
+      instrumentsOnScreen = 'api';
+    } else if (instrumentsFromApi.length) {
+      instrumentsOnScreen = ['api', 'storage'][Math.floor(Math.random() * 2)];
+    }
+
+    // if user is in home, track the currently visible experiment
+    if (!session.tab) {
+      Analytics.track('home:p13n:experiment', {
+        type: AnalyticsTypes.METRIC,
+        data: {
+          source: instrumentsOnScreen,
+        },
+      });
+    }
+
+    debugger;
+
+    const p13nRenderData = {
+      source: instrumentsOnScreen,
+      instruments: instrumentMap[instrumentsOnScreen],
+    };
+
+    return p13nRenderData;
+  }
+
   function getAllAvailableP13nInstruments() {
     return new Promise(resolve => {
       const instrumentsRetrievalPromises = [
@@ -279,19 +279,11 @@
 
       Promise.all(instrumentsRetrievalPromises).then(
         ([instrumentsFromStorage, instrumentsFromApi]) => {
-          // const instrumentExperimentMap = {
-          //   api: instrumentsFromApi,
-          //   storage,
-          // };
-
-          // resolve({
-          //   instruments: instrumentExperimentMap[randomExperiment] || [],
-          //   source: randomExperiment,
-          // });
-          resolve({
-            instruments: instrumentsFromStorage,
-            source: 'storage',
-          });
+          let instrumentsOnScreen = getRandomInstrumentSet(
+            instrumentsFromStorage,
+            instrumentsFromApi
+          );
+          resolve(instrumentsOnScreen);
         }
       );
     });
