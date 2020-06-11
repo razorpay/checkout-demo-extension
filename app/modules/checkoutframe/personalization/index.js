@@ -28,6 +28,8 @@ const INSTRUMENT_PROPS = {
   paypal: [],
 };
 
+const p13nAPIInstruments = {};
+
 /**
  * Returns extracted details for p13n
  * from a payment payload.
@@ -419,10 +421,10 @@ export function getTranslatedInstrumentsForCustomerFromStorage(
 ) {
   const instruments = getInstrumentsForCustomer(customer, extra, 'storage');
 
-  const translated =
+  const translatedInstruments =
     _Arr.map(instruments, translateInstrumentToConfig) |> _Arr.filter(Boolean);
 
-  return Promise.resolve(translated);
+  return translatedInstruments;
 }
 
 /**
@@ -437,16 +439,25 @@ export function getTranslatedInstrumentsForCustomerFromStorage(
  */
 export function getTranslatedInstrumentsForCustomerFromApi(customer, extra) {
   if (!customer.logged) {
+    const { contact } = customer;
     const url = 'https://jsonplaceholder.typicode.com/todos/1';
     return new Promise(resolve => {
+      if (p13nAPIInstruments[contact]) {
+        resolve(p13nAPIInstruments[contact]);
+      }
+
       setTimeout(() => {
-        resolve([
+        const apiInstruments = [
           {
             method: 'upi',
             vpa: 'saranshgupta1995@okhdfcbank',
             score: 1,
           },
-        ]);
+        ];
+
+        p13nAPIInstruments[contact] = apiInstruments;
+
+        resolve(apiInstruments);
       }, 1000);
       // fetch({
       //   url,
