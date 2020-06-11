@@ -443,10 +443,31 @@ export function getTranslatedInstrumentsForCustomerFromApi(customer, extra) {
     return Promise.resolve([]);
   }
 
-  const instruments = getInstrumentsForCustomer(customer, extra, 'api');
-  return Promise.resolve(
-    _Arr.map(instruments, translateInstrumentToConfig) |> _Arr.filter(Boolean)
-  );
+  if (!customer.logged) {
+    const url = 'https://jsonplaceholder.typicode.com/todos/1';
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve([
+          {
+            method: 'upi',
+            vpa: 'saranshgupta1995@okhdfcbank',
+            score: 1,
+          },
+        ]);
+      }, 1000);
+      // fetch({
+      //   url,
+      //   callback: function(){
+      //     console.log('callback');
+      //   },
+      // });
+    });
+  } else {
+    const instruments = getInstrumentsForCustomer(customer, extra, 'api');
+    return Promise.resolve(
+      _Arr.map(instruments, translateInstrumentToConfig) |> _Arr.filter(Boolean)
+    );
+  }
 }
 
 /**
