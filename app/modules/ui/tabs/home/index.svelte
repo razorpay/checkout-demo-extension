@@ -80,6 +80,7 @@
   import {
     getCardTypesForRecurring,
     getCardNetworksForRecurring,
+    getCardIssuersForRecurring,
     getSingleMethod,
     isEMandateBankEnabled,
     getTPV,
@@ -801,6 +802,7 @@
           {generateSubtextForRecurring({
             types: getCardTypesForRecurring(),
             networks: getCardNetworksForRecurring(),
+            issuers: getCardIssuersForRecurring(),
             subscription: session.get('subscription_id'),
             offer: cardOffer,
           })}
