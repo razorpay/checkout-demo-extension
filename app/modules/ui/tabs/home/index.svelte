@@ -37,6 +37,7 @@
 
   // Utils imports
   import { getSession } from 'sessionmanager';
+  import { generateSubtextForRecurring } from 'subtext/card';
   import {
     isPartialPayment as getIsPartialPayment,
     isContactOptional,
@@ -55,10 +56,11 @@
   } from 'checkoutstore';
 
   import {
-    isCreditCardEnabled,
-    isDebitCardEnabled,
+    getCardTypesForRecurring,
+    getCardNetworksForRecurring,
     getSingleMethod,
     isEMandateBankEnabled,
+    getTPV,
   } from 'checkoutstore/methods';
 
   import { getUPIIntentApps } from 'checkoutstore/native';
@@ -95,11 +97,7 @@
   const singleMethod = getSingleMethod();
 
   // TPV
-  const multiTpv = session.multiTpv;
-  const onlyUpiTpv = session.upiTpv;
-  const onlyNetbankingTpv =
-    session.tpvBank && !onlyUpiTpv && !multiTpv && singleMethod !== 'emandate';
-  const isTpv = multiTpv || onlyUpiTpv || onlyNetbankingTpv;
+  const tpv = getTPV();
 
   // Offers
   const showOffers = hasOffersOnHomescreen();
@@ -123,8 +121,7 @@
     view === 'details' &&
     !showOffers &&
     !showRecurringCallout &&
-    !session.multiTpv &&
-    !session.tpvBank &&
+    !tpv &&
     !isPartialPayment &&
     !session.get('address');
 
@@ -151,7 +148,7 @@
       return true;
     }
 
-    if (session.tpvBank) {
+    if (tpv) {
       return true;
     }
 
@@ -194,17 +191,10 @@
       showCtaWithText('Authenticate');
     } else if (singleMethod) {
       showCtaWithText('Pay by ' + getMethodNameForPaymentOption(singleMethod));
-    } else if (isTpv) {
-      let _method;
-      if (onlyNetbankingTpv) {
-        _method = 'netbanking';
-      } else if (onlyUpiTpv) {
-        _method = 'upi';
-      } else if (multiTpv) {
-        _method = $multiTpvOption;
-      }
-
-      showCtaWithText('Pay by ' + getMethodNameForPaymentOption(_method));
+    } else if (tpv) {
+      showCtaWithText(
+        'Pay by ' + getMethodNameForPaymentOption(tpv.method || $multiTpvOption)
+      );
     } else {
       showCtaWithText('Proceed');
     }
@@ -361,10 +351,8 @@
       return false;
     }
 
-    // TPV bank
-    // TPV UPI
-    // Multi TPV
-    if (session.tpvBank || session.upiTpv || session.multiTpv) {
+    // TPV
+    if (tpv) {
       return false;
     }
 
@@ -449,7 +437,7 @@
     /**
      * Need TPV selection from the details screen.
      */
-    if (session.tpvBank || session.upiTpv || session.multiTpv) {
+    if (tpv) {
       return DETAILS;
     }
 
@@ -512,32 +500,26 @@
     Analytics.track('home:proceed');
 
     // Multi TPV
-    if (session.multiTpv) {
-      if ($multiTpvOption === 'upi') {
+    if (tpv) {
+      if (tpv.method === 'upi') {
         selectMethod({
           detail: {
             method: 'upi',
           },
         });
-      } else if ($multiTpvOption === 'netbanking') {
+      } else if (tpv.method === 'netbanking') {
         session.preSubmit();
+      } else {
+        if ($multiTpvOption === 'upi') {
+          selectMethod({
+            detail: {
+              method: 'upi',
+            },
+          });
+        } else if ($multiTpvOption === 'netbanking') {
+          session.preSubmit();
+        }
       }
-      return;
-    }
-
-    // TPV UPI
-    if (session.upiTpv) {
-      selectMethod({
-        detail: {
-          method: 'upi',
-        },
-      });
-      return;
-    }
-
-    // TPV bank
-    if (session.onlyNetbankingTpv) {
-      session.preSubmit();
       return;
     }
 
@@ -619,16 +601,10 @@
       return false;
     }
 
-    if (multiTpv) {
-      if ($multiTpvOption === 'netbanking') {
+    if (tpv) {
+      if (tpv.method === 'netbanking' || $multiTpvOption === 'netbanking') {
         return false;
-      } else {
-        return true;
       }
-    }
-
-    if (onlyNetbankingTpv) {
-      return false;
     }
 
     return true;
@@ -742,7 +718,7 @@
   <Screen pad={false}>
     <div class="screen-main">
       {#if view === 'details'}
-        <PaymentDetails {session} />
+        <PaymentDetails {tpv} />
       {/if}
       {#if view === 'methods'}
         <div
@@ -824,38 +800,12 @@
       {/if}
       {#if showRecurringCallout}
         <Callout>
-          {#if session.get('subscription_id')}
-            {#if isDebitCardEnabled() && isCreditCardEnabled()}
-              Subscription payments are supported on Visa and Mastercard Credit
-              Cards from all Banks and Debit Cards from ICICI, Kotak, Citibank
-              and Canara Bank.
-            {:else if isDebitCardEnabled()}
-              Subscription payments are only supported on Visa and Mastercard
-              Debit Cards from ICICI, Kotak, Citibank and Canara Bank.
-            {:else}
-              Subscription payments are only supported on Mastercard and Visa
-              Credit Cards.
-            {/if}
-          {:else if cardOffer}
-            {#if isDebitCardEnabled() && isCreditCardEnabled()}
-              All {cardOffer.issuer} Cards are supported for this payment
-            {:else if isDebitCardEnabled()}
-              All {cardOffer.issuer} Debit Cards are supported for this payment
-            {:else}
-              All {cardOffer.issuer} Credit Cards are supported for this
-              payment.
-            {/if}
-          {:else if isDebitCardEnabled() && isCreditCardEnabled()}
-            Visa and Mastercard Credit Cards from all Banks and Debit Cards from
-            ICICI, Kotak, Citibank and Canara Bank are supported for this
-            payment.
-          {:else if isDebitCardEnabled()}
-            Only Visa and Mastercard Debit Cards from ICICI, Kotak, Citibank and
-            Canara Bank are supported for this payment.
-          {:else}
-            Only Visa and Mastercard Credit Cards are supported for this
-            payment.
-          {/if}
+          {generateSubtextForRecurring({
+            types: getCardTypesForRecurring(),
+            networks: getCardNetworksForRecurring(),
+            subscription: session.get('subscription_id'),
+            offer: cardOffer,
+          })}
         </Callout>
       {/if}
 
