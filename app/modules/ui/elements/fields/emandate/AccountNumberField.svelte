@@ -5,6 +5,13 @@
   // Utils
   import { getBankLogo } from 'common/bank';
 
+  // i18n
+  import { t } from 'svelte-i18n';
+  import {
+    ACCOUNT_NUMBER_LABEL,
+    ACCOUNT_NUMBER_HELP,
+  } from 'ui/labels/emandate';
+
   export let id;
   export let name;
   export let readonly;
@@ -52,8 +59,8 @@
     {id}
     {readonly}
     {value}
-    label="Bank Account Number"
-    helpText="Please enter a valid account number"
+    label={$t(ACCOUNT_NUMBER_LABEL)}
+    helpText={$t(ACCOUNT_NUMBER_HELP)}
     maxlength="20"
     required={true}
     formatter={{ type: 'alphanumeric' }}
