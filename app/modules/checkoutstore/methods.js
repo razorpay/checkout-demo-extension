@@ -20,6 +20,7 @@ import {
 
 import { getEligibleProvidersBasedOnMinAmount } from 'common/cardlessemi';
 import { getProvider } from 'common/paylater';
+import { findCodeByNetworkName } from 'common/card';
 
 import { wallets, getSortedWallets } from 'common/wallet';
 import { extendConfig } from 'common/cardlessemi';
@@ -231,6 +232,38 @@ export function isDebitCardEnabled() {
     : getMerchantMethods().debit_card;
 }
 
+export function getCardTypesForRecurring() {
+  if (isRecurring()) {
+    return getRecurringMethods().card;
+  }
+}
+
+export function getCardNetworksForRecurring() {
+  // "recurring": {
+  //   "card": {
+  //     "credit": ["MasterCard", "Visa", "American Express"]
+  //   }
+  // }
+  if (isRecurring()) {
+    // Using only credit cards as debit cards are only supported on some banks.
+    const networks = getRecurringMethods().card?.credit;
+    if (_.isArray(networks) && networks.length) {
+      // Example: "American Express" to "amex"
+      const codes = _Arr.map(networks, findCodeByNetworkName);
+
+      // ["mastercard", "visa"] to { mastercard: true, visa: true }
+      return _Arr.reduce(
+        codes,
+        (acc, code) => {
+          acc[code] = true;
+          return acc;
+        },
+        {}
+      );
+    }
+  }
+}
+
 // additional checks for each sub-method based on UPI
 const UPI_METHODS = {
   collect: () => true,
@@ -308,6 +341,42 @@ export function getNetbankingBanks() {
     return {};
   }
   return banks;
+}
+
+export function getTPV() {
+  const order = getMerchantOrder();
+  if (!order) {
+    return;
+  }
+
+  const bankCode = order.bank;
+  const accountNumber = order.account_number;
+
+  if (!bankCode || !accountNumber) {
+    return;
+  }
+  const bankName = getNetbankingBanks()[bankCode] || `${bankCode} Bank`;
+
+  let method = order.method;
+  if (!method) {
+    const hasNB = isMethodEnabled('netbanking');
+
+    if (isMethodEnabled('upi')) {
+      if (!hasNB) {
+        method = 'upi';
+      }
+    } else if (hasNB) {
+      method = 'netbanking';
+    }
+  }
+
+  return {
+    name: bankName,
+    code: bankCode,
+    account_number: accountNumber,
+    image: 'https://cdn.razorpay.com/bank/' + bankCode + '.gif',
+    method,
+  };
 }
 
 export function isEMandateEnabled() {

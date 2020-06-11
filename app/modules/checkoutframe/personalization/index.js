@@ -411,21 +411,18 @@ const getInstrumentsForCustomer = (customer, extra = {}, source) => {
  *  @prop {Object} methods
  *  @prop {Array} upiApps List of UPI apps on the device
  *
- * @returns {Array<Instrument>}
+ * @returns {Promise<Array<Instrument>>}
  */
 export function getTranslatedInstrumentsForCustomerFromStorage(
   customer,
   extra
 ) {
-  if (extra.experiment !== 'storage') {
-    return [];
-  }
-
   const instruments = getInstrumentsForCustomer(customer, extra, 'storage');
 
-  return (
-    _Arr.map(instruments, translateInstrumentToConfig) |> _Arr.filter(Boolean)
-  );
+  const translated =
+    _Arr.map(instruments, translateInstrumentToConfig) |> _Arr.filter(Boolean);
+
+  return Promise.resolve(translated);
 }
 
 /**
@@ -439,10 +436,6 @@ export function getTranslatedInstrumentsForCustomerFromStorage(
  * @returns {Promise<Array<Instrument>>}
  */
 export function getTranslatedInstrumentsForCustomerFromApi(customer, extra) {
-  if (extra.experiment !== 'api') {
-    return Promise.resolve([]);
-  }
-
   if (!customer.logged) {
     const url = 'https://jsonplaceholder.typicode.com/todos/1';
     return new Promise(resolve => {

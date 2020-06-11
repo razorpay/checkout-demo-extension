@@ -1157,6 +1157,7 @@ $outline = #ddd;
 }
 
 #footer, .submit-button {
+  cursor: pointer;
   opacity: 0;
   position: absolute;
   left: 0;
@@ -1197,6 +1198,11 @@ $outline = #ddd;
     width: 100%;
     height: 100%;
     transition: 0.3s;
+    opacity: 0;
+  }
+
+  > span:last-child {
+    opacity: 1;
   }
 }
 

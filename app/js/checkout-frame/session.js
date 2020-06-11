@@ -1139,7 +1139,7 @@ Session.prototype = {
                 response = discreet.error('Payment failed');
               }
 
-              invoke(errorHandler, self, response);
+              self.errorHandler(response);
             }
           },
         }).till(function(response) {
@@ -1204,7 +1204,6 @@ Session.prototype = {
 
     discreet.initI18n();
     this.setExperiments();
-    this.setTpvBanks();
     this.getEl();
     this.setFormatting();
     this.improvisePaymentOptions();
@@ -1223,7 +1222,7 @@ Session.prototype = {
     this.updateCustomerInStore();
     Hacks.initPostRenderHacks();
 
-    errorHandler.call(this, this.params);
+    this.errorHandler(this.params);
 
     if (!this.tab && !this.get('prefill.contact')) {
       $('#contact').focus();
@@ -1326,6 +1325,7 @@ Session.prototype = {
     }
 
     if (method) {
+      this.netbankingTab && this.netbankingTab.$destroy();
       this.netbankingTab = new discreet.NetbankingTab({
         target: gel('form-fields'),
         props: {
@@ -1381,7 +1381,6 @@ Session.prototype = {
   setSvelteComponents: function() {
     this.setHomeTab();
     this.setSvelteCardTab();
-    this.setNetbankingTab();
     this.setEmandate();
     this.setCardlessEmi();
     this.setPayLater();
@@ -1406,54 +1405,6 @@ Session.prototype = {
     if (!this.get('timeout') && this.timer) {
       this.timer.$destroy();
       this.timer = null;
-    }
-  },
-
-  setTpvBanks: function() {
-    var options = this.get();
-    var bankCode, accountNumber;
-    var order = Store.getMerchantOrder();
-
-    if (order && order.method === 'upi') {
-      this.upiTpv = true;
-    }
-
-    if (options['prefill.bank'] && !options['recurring']) {
-      this.tab = this.oneMethod = 'netbanking';
-    }
-
-    if (order && order.bank) {
-      bankCode = order.bank;
-      accountNumber = order.account_number;
-      if (
-        !order.method &&
-        MethodStore.isMethodEnabled('upi') &&
-        MethodStore.isMethodEnabled('netbanking')
-      ) {
-        this.multiTpv = true;
-      }
-    }
-
-    var banks = Store.getMerchantMethods().netbanking;
-
-    if (bankCode) {
-      // Use bank code as name if netbanking is disabled
-      var bankName;
-      if (banks) {
-        bankName =
-          typeof banks[bankCode] === 'object'
-            ? banks[bankCode].name
-            : banks[bankCode];
-      } else {
-        bankName = bankCode + ' Bank';
-      }
-
-      this.tpvBank = {
-        name: bankName,
-        code: bankCode,
-        account_number: accountNumber,
-        image: 'https://cdn.razorpay.com/bank/' + bankCode + '.gif',
-      };
     }
   },
 
@@ -1982,21 +1933,11 @@ Session.prototype = {
     }
   },
 
-  setOneMethod: function(methodName) {
-    this.oneMethod = methodName;
-
-    $(this.el).addClass('one-method');
-  },
-
   improvisePaymentOptions: function() {
     var oneMethod = MethodStore.getSingleMethod();
     if (oneMethod) {
-      this.setOneMethod(oneMethod);
-      return true;
-    }
-
-    if (this.upiTpv) {
-      this.setOneMethod('upi');
+      this.oneMethod = oneMethod;
+      $(this.el).addClass('one-method');
     }
   },
 
@@ -2412,6 +2353,7 @@ Session.prototype = {
     }
     this.click('#top-left', this.back);
     this.on('submit', '#form', this.preSubmit);
+    this.on('click', '#footer-cta', this.preSubmit);
 
     if (MethodStore.isCardOrEMIEnabled()) {
       /**
@@ -2725,7 +2667,7 @@ Session.prototype = {
           method: offer.payment_method,
         },
       });
-      return this.handleOfferSelection(offer, offer.payment_method);
+      screen = offer.payment_method;
     }
 
     var issuer = offer.issuer;
@@ -2733,7 +2675,7 @@ Session.prototype = {
     if (screen === 'wallet') {
       // Select wallet
       if (issuer) {
-        this.svelteWalletsTab.setSelectedWallet(issuer);
+        this.svelteWalletsTab.onWalletSelection(issuer);
       }
     } else if (screen === 'netbanking') {
       // Select bank
@@ -2852,9 +2794,8 @@ Session.prototype = {
         return;
       }
     } else if (this.tab === 'netbanking') {
-      if (this.netbankingTab.onBack()) {
-        return;
-      }
+      this.netbankingTab && this.netbankingTab.$destroy();
+      this.netbankingTab = null;
     } else if (this.tab === 'nach') {
       if (this.nachScreen.onBack()) {
         return;
@@ -3069,7 +3010,7 @@ Session.prototype = {
       this.clearRequest();
     }
     if (tab === 'netbanking') {
-      this.netbankingTab.onShown();
+      this.setNetbankingTab();
     }
 
     if (tab === 'upi') {
@@ -3136,10 +3077,6 @@ Session.prototype = {
 
     if (tab === 'bank_transfer') {
       this.bankTransferView.onShown();
-    }
-
-    if (!tab && this.multiTpv) {
-      $('#body').addClass('sub');
     }
   },
 
@@ -4094,14 +4031,6 @@ Session.prototype = {
     var screen = this.screen;
     var tab = this.tab;
 
-    var isOffersVisible = this.offers && this.offers.isListShown();
-    if (isOffersVisible) {
-      this.offers.onSubmit();
-      if (screen) {
-        return;
-      }
-    }
-
     /**
      * The CTA for home screen is visible only on the new design. If it was
      * clicked, switch to the new payment methods screen.
@@ -4116,9 +4045,6 @@ Session.prototype = {
         }
       } else {
         this.offers && this.offers.clearOffer();
-        return;
-      }
-      if (isOffersVisible) {
         return;
       }
     }
@@ -4159,14 +4085,15 @@ Session.prototype = {
     var merchantOrder = Store.getMerchantOrder();
     var selectedInstrument = this.getSelectedPaymentInstrument();
 
-    if (merchantOrder && merchantOrder.bank && !Store.isRecurring()) {
+    if (MethodStore.getTPV()) {
       if (!this.checkCommonValidAndTrackIfInvalid()) {
+        // TODO check multi TPV with UPI prefill
         return;
       }
       data.method = merchantOrder.method || data.method || 'netbanking';
       data.bank = merchantOrder.bank;
 
-      if (data.method === 'upi' && this.multiTpv) {
+      if (data.method === 'upi') {
         if (tab !== 'upi') {
           return this.switchTab('upi');
         }
@@ -4279,8 +4206,6 @@ Session.prototype = {
       } else if (this.checkInvalid()) {
         return;
       }
-    } else if (this.oneMethod === 'netbanking') {
-      data.bank = this.get('prefill.bank');
     } else if (selectedInstrument) {
       if (!this.checkCommonValidAndTrackIfInvalid()) {
         return;
@@ -4950,7 +4875,7 @@ Session.prototype = {
           setOtpText(this.otpView, insufficient_text);
         }, this)
       );
-    } else if (data.method === 'upi' && !this.multiTpv) {
+    } else if (data.method === 'upi') {
       sub_link.html('Cancel Payment');
 
       this.r.on('payment.upi.noapp', function(data) {
@@ -5212,11 +5137,9 @@ Session.prototype = {
         props: {
           applicableOffers: allOffers,
           setAppliedOffer: function(offer, shouldNavigate) {
-            if (appliedOffer !== offer) {
-              appliedOffer = offer;
-              if (offer && shouldNavigate) {
-                session.handleOfferSelection(offer);
-              }
+            appliedOffer = offer;
+            if (offer && shouldNavigate) {
+              session.handleOfferSelection(offer);
             }
             session.handleDiscount();
           },
@@ -5393,38 +5316,12 @@ Session.prototype = {
     Customer.prototype.r = this.r;
   },
 
-  showModal: function(preferences) {
-    Razorpay.sendMessage({ event: 'render' });
-
-    if (CheckoutBridge) {
-      var containerBox = $('#container')[0];
-      if (containerBox) {
-        var rect = containerBox.getBoundingClientRect();
-        Bridge.checkout.callAndroid(
-          'setDimensions',
-          Math.floor(rect.width),
-          Math.floor(rect.height)
-        );
-      }
-
-      $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
-    }
-
-    var qpmap = _Obj.unflatten(_.getQueryParams());
-    if (qpmap.error) {
-      errorHandler.call(this, qpmap);
-    }
-
-    if (qpmap.tab) {
-      this.switchTab(qpmap.tab);
-    }
-  },
-
   fetchFundAccounts: function() {
     return Payouts.fetchFundAccounts(this.get('contact_id'));
   },
 
   hideOverlayMessage: hideOverlayMessage,
+  errorHandler: errorHandler,
 };
 
 /*

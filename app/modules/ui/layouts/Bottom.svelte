@@ -1,5 +1,5 @@
 <script>
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount } from 'svelte';
   export let tab;
   let ref;
   onMount(() => {
@@ -8,13 +8,12 @@
 </script>
 
 <style>
-  .bottom {
+  .bottom[tab] {
     display: none;
   }
 
   :global(#form-common.drishy ~ #bottom .bottom[tab='common']),
   :global(#form-card.drishy ~ #bottom .bottom[tab='card']),
-  :global(#form-netbanking.drishy ~ #bottom .bottom[tab='netbanking']),
   :global(#form-upi.drishy ~ #bottom .bottom[tab='upi']),
   :global(#form-upi_otm.drishy ~ #bottom .bottom[tab='upi_otm']),
   :global(#form-bank_transfer.drishy ~ #bottom .bottom[tab='bank_transfer']),
