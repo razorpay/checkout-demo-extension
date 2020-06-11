@@ -343,6 +343,8 @@ export default {
       wallet: 'Wallet',
       bank_transfer: 'Bank Transfer',
       generic: 'Pay using {name}',
+      irctc_card: 'Debit/Credit Card',
+      irctc_upi: 'BHIM/UPI',
     },
     descriptions: {
       emandate: 'Pay with Netbanking',

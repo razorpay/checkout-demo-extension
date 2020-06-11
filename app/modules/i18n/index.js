@@ -59,7 +59,7 @@ export function getMethodPrefix(method, locale) {
  * @param {string} locale
  * @returns {string}
  */
-export function getMethodTitle(method, locale) {
+export function getRawMethodTitle(method, locale) {
   return formatMessageWithLocale(`methods.titles.${method}`, locale);
 }
 
