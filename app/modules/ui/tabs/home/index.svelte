@@ -262,6 +262,63 @@
     }
   }
 
+  function updateBlocks({ preferredInstruments = [] } = {}) {
+    const isPersonalizationEnabled = shouldUsePersonalization();
+    const merchantConfig = getMerchantConfig();
+
+    const blocksThatWereSet = setBlocks(
+      {
+        preferred: preferredInstruments,
+        merchantConfig: merchantConfig.config,
+        configSource: merchantConfig.sources,
+      },
+      $customer
+    );
+
+    const setPreferredInstruments = blocksThatWereSet.preferred.instruments;
+
+    // Get the methods for which a preferred instrument was shown
+    const preferredMethods = _Arr.reduce(
+      setPreferredInstruments,
+      (acc, instrument) => {
+        acc[`_${instrument.method}`] = true;
+        return acc;
+      },
+      {}
+    );
+
+    /**
+     * - `meta.p13n` will only be set when preferred methods are shown in the UI.
+     * - `p13n:instruments:list` will be fired when we attempt to show the list.
+     * - `p13n:instruments:list` with `meta.p13n` set as true will tell you whether or not preferred methods were shown.
+     */
+
+    // meta.p13n should always be set before `p13n:instruments:list`
+    if (setPreferredInstruments.length) {
+      Analytics.setMeta('p13n', true);
+    } else {
+      Analytics.removeMeta('p13n');
+    }
+
+    const allPreferredInstrumentsForCustomer = getAllInstrumentsForCustomer(
+      $customer
+    );
+
+    if (isPersonalizationEnabled && allPreferredInstrumentsForCustomer.length) {
+      // Track preferred-methods related things
+      Analytics.track('p13n:instruments:list', {
+        data: {
+          all: allPreferredInstrumentsForCustomer.length,
+          eligible: preferredInstruments.length,
+          shown: setPreferredInstruments.length,
+          methods: preferredMethods,
+        },
+      });
+    }
+  }
+
+  onMount(updateBlocks);
+
   $: {
     const loggedIn = _Obj.getSafely($customer, 'logged');
     _El.keepClass(_Doc.querySelector('#topbar #top-right'), 'logged', loggedIn);
@@ -272,64 +329,11 @@
       ? getAllAvailableP13nInstruments($customer)
       : Promise.resolve([]);
 
-    eligiblePreferredInstrumentsPromise.then(
-      ({ instruments: eligiblePreferredInstruments }) => {
-        const merchantConfig = getMerchantConfig();
-
-        const blocksThatWereSet = setBlocks(
-          {
-            preferred: eligiblePreferredInstruments,
-            merchantConfig: merchantConfig.config,
-            configSource: merchantConfig.sources,
-          },
-          $customer
-        );
-
-        const setPreferredInstruments = blocksThatWereSet.preferred.instruments;
-
-        // Get the methods for which a preferred instrument was shown
-        const preferredMethods = _Arr.reduce(
-          setPreferredInstruments,
-          (acc, instrument) => {
-            acc[`_${instrument.method}`] = true;
-            return acc;
-          },
-          {}
-        );
-
-        /**
-         * - `meta.p13n` will only be set when preferred methods are shown in the UI.
-         * - `p13n:instruments:list` will be fired when we attempt to show the list.
-         * - `p13n:instruments:list` with `meta.p13n` set as true will tell you whether or not preferred methods were shown.
-         */
-
-        // meta.p13n should always be set before `p13n:instruments:list`
-        if (setPreferredInstruments.length) {
-          Analytics.setMeta('p13n', true);
-        } else {
-          Analytics.removeMeta('p13n');
-        }
-
-        const allPreferredInstrumentsForCustomer = getAllInstrumentsForCustomer(
-          $customer
-        );
-
-        if (
-          isPersonalizationEnabled &&
-          allPreferredInstrumentsForCustomer.length
-        ) {
-          // Track preferred-methods related things
-          Analytics.track('p13n:instruments:list', {
-            data: {
-              all: allPreferredInstrumentsForCustomer.length,
-              eligible: eligiblePreferredInstruments.length,
-              shown: setPreferredInstruments.length,
-              methods: preferredMethods,
-            },
-          });
-        }
-      }
-    );
+    eligiblePreferredInstrumentsPromise.then(({ instruments }) => {
+      updateBlocks({
+        preferredInstruments: instruments,
+      });
+    });
   }
 
   function shouldUsePersonalization() {
