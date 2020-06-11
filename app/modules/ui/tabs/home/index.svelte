@@ -255,8 +255,6 @@
       });
     }
 
-    debugger;
-
     const p13nRenderData = {
       source: instrumentsOnScreen,
       instruments: instrumentMap[instrumentsOnScreen],
