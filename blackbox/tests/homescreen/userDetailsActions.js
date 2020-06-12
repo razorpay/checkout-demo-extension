@@ -16,7 +16,10 @@ const { receiveApiInstruments } = require('./personalization-actions');
  * are the same as those entered.
  */
 async function assertUserDetails(context, apiInstrumentsReadFromCache = false) {
-  if (!context.preferences.customer && context.options.personalization) {
+  if (
+    !context.preferences.customer &&
+    context.options.personalization !== false
+  ) {
     if (!apiInstrumentsReadFromCache) {
       await receiveApiInstruments(context);
     }
