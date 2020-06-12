@@ -1,7 +1,12 @@
 const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
 
-const { fillUserDetails, proceed, selectPaymentMethod } = require('../actions');
+const {
+  fillUserDetails,
+  assertUserDetails,
+  proceed,
+  selectPaymentMethod,
+} = require('../actions');
 
 describe.each(
   getTestData('Negative check for remember_customer', {
@@ -22,6 +27,8 @@ describe.each(
     });
     await fillUserDetails(context);
     await proceed(context);
+    await assertUserDetails(context);
+
     await selectPaymentMethod(context, 'card');
     const el = await page.$('#should-save-card');
 
@@ -48,6 +55,8 @@ describe.each(
     });
     await fillUserDetails(context);
     await proceed(context);
+    await assertUserDetails(context);
+
     await selectPaymentMethod(context, 'card');
     const el = await page.$('#should-save-card');
 
