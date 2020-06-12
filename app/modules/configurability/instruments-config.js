@@ -36,20 +36,6 @@ function genericPaymentPayloadGetter(instrument, payment, customer) {
   return payment;
 }
 
-/**
- * Tells whether or the instrument is on a granular level.
- * These type of instruments can be directly used to make payments.
- * @param {Instrument} instrument
- *
- * @returns {boolean}
- */
-function genericIsIndividual(instrument) {
-  const method = instrument.method;
-  const paymentKeys = config[method].payment;
-
-  return _Arr.any(paymentKeys, key => instrument[key]);
-}
-
 function genericIsValid(instrument) {
   return true;
 }
@@ -58,45 +44,71 @@ function genericGroupedToIndividual(grouped, customer) {
   return [grouped];
 }
 
+/**
+ * Creates a combinations of keys with array-like values
+ * @param {Instrument} instrument
+ * @param {Array<string>} sequence List of keys to make the combinations of
+ *
+ * @returns {Array<Object>}
+ */
+function createCombinations(instrument, sequence) {
+  let soFar = [];
+
+  _Arr.loop(sequence, key => {
+    const values = instrument[key];
+
+    if (!values || !values.length) {
+      return;
+    }
+
+    // "networks" -> "network"
+    const singularKey = key.slice(0, -1);
+
+    // If nothing has been pushed so far, this is the first key to be pushed
+    if (soFar.length === 0) {
+      soFar = _Arr.map(values, value => ({
+        [singularKey]: value,
+      }));
+    } else {
+      // Things have already been pushed so far, extend existing objects
+      const _soFar = _Arr.flatMap(values, value => {
+        return _Arr.map(soFar, s =>
+          _Obj.extend(
+            {
+              [singularKey]: value,
+            },
+            s
+          )
+        );
+      });
+
+      soFar = _soFar;
+    }
+  });
+
+  return soFar;
+}
+
 const config = {
   card: {
-    properties: [
-      'type',
-      'types',
-      'iin',
-      'iins',
-      'issuer',
-      'issuers',
-      'network',
-      'networks',
-      'token_id',
-      'token_ids',
-    ],
+    properties: ['types', 'iins', 'issuers', 'networks', 'token_id'],
     payment: ['token'],
     groupedToIndividual: (grouped, customer) => {
       const tokens = _Obj.getSafely(customer, 'tokens.items', []);
       const base = _Obj.clone(grouped);
-      let token_ids = [];
 
-      // Convert single token_id into token_ids
-      if (grouped.token_ids) {
-        token_ids = grouped.token_ids;
-      } else if (grouped.token_id) {
-        token_ids = [grouped.token_id];
-      }
+      // Remove all extra properties
+      _Arr.loop(['types', 'iins', 'issuers', 'networks', 'token_id'], key => {
+        delete base[key];
+      });
 
-      delete base.token_ids;
+      if (grouped.token_id) {
+        const token_id = grouped.token_id;
+        const token = _Arr.find(tokens, token => token.id === token_id);
 
-      if (token_ids.length > 0) {
-        return (
-          _Arr.map(token_ids, token_id => {
-            const token = _Arr.find(tokens, token => token.id === token_id);
-
-            if (!token) {
-              return;
-            }
-
-            return _Obj.extend(
+        if (token) {
+          let instrumentFromToken = [
+            _Obj.extend(
               {
                 token_id,
                 type: token.card.type,
@@ -104,26 +116,32 @@ const config = {
                 network: token.card.network,
               },
               base
-            );
-          }) |> _Arr.filter(Boolean)
-        );
+            ),
+          ];
+
+          return instrumentFromToken;
+        }
       }
 
-      return [grouped];
+      const combinations = createCombinations(grouped, [
+        'issuers',
+        'networks',
+        'types',
+        'iins',
+      ]);
+
+      return _Arr.map(combinations, combination =>
+        _Obj.extend(combination, base)
+      );
     },
     isValid: instrument => {
       if (instrument.token_id) {
         return true;
       }
 
-      const hasTokens = Boolean(instrument.token_ids);
       const hasIssuers = Boolean(instrument.issuers);
       const hasNetworks = Boolean(instrument.networks);
       const hasTypes = Boolean(instrument.types);
-
-      if (hasTokens && !instrument.token_ids.length) {
-        return false;
-      }
 
       if (hasIssuers && !instrument.issuers.length) {
         return false;
@@ -139,12 +157,10 @@ const config = {
 
       return true;
     },
-    isIndividual: instrument =>
-      instrument.token_id && (instrument.network || instrument.issuer),
   },
 
   netbanking: {
-    properties: ['bank', 'banks'],
+    properties: ['banks'],
     payment: ['bank'],
     groupedToIndividual: grouped => {
       const base = _Obj.clone(grouped);
@@ -159,14 +175,12 @@ const config = {
         );
       });
     },
-    isIndividual: instrument => instrument.bank,
     isValid: instrument =>
-      Boolean(instrument.bank) ||
-      (Boolean(instrument.banks) && instrument.banks.length > 0),
+      Boolean(instrument.banks) && instrument.banks.length > 0,
   },
 
   wallet: {
-    properties: ['wallet', 'wallets'],
+    properties: ['wallets'],
     payment: ['wallet'],
     groupedToIndividual: grouped => {
       const base = _Obj.clone(grouped);
@@ -181,14 +195,12 @@ const config = {
         );
       });
     },
-    isIndividual: instrument => instrument.wallet,
     isValid: instrument =>
-      Boolean(instrument.wallet) ||
-      (Boolean(instrument.wallets) && instrument.wallets.length > 0),
+      Boolean(instrument.wallets) && instrument.wallets.length > 0,
   },
 
   upi: {
-    properties: ['flow', 'flows', 'app', 'apps', 'token_id', 'token_ids'],
+    properties: ['flows', 'apps', 'token_id', 'vpas'],
     payment: ['flow', 'app', 'token', 'vpa'],
     groupedToIndividual: (grouped, customer) => {
       /**
@@ -200,96 +212,102 @@ const config = {
 
       let flows = [];
       let apps = [];
-      let token_ids = [];
+      let vpas = [];
+
+      let ungrouped = [];
 
       const tokens = _Obj.getSafely(customer, 'tokens.items', []);
       const base = _Obj.clone(grouped);
 
       // Remove all extra properties
-      _Arr.loop(
-        ['flow', 'flows', 'app', 'apps', 'token_id', 'token_ids'],
-        key => {
-          delete base[key];
-        }
-      );
+      _Arr.loop(['flows', 'apps', 'token_id', 'vpas'], key => {
+        delete base[key];
+      });
 
-      if (grouped.token_ids) {
-        token_ids = grouped.token_ids;
-      } else if (grouped.token_id) {
-        token_ids = [grouped.token_id];
+      if (grouped.flows) {
+        flows = grouped.flows;
       }
 
-      if (token_ids.length > 0) {
-        return (
-          _Arr.map(token_ids, token_id => {
-            const token = _Arr.find(tokens, token => token.id === token_id);
-
-            if (!token) {
-              return;
-            }
-
-            return _Obj.extend(
-              {
-                token_id,
-                flow: 'collect',
-              },
-              base
-            );
-          }) |> _Arr.filter(Boolean)
-        );
+      if (grouped.vpas) {
+        vpas = grouped.vpas;
       }
 
       if (grouped.apps) {
         apps = grouped.apps;
-      } else if (grouped.app) {
-        apps = [grouped.app];
       }
 
-      if (apps.length > 0) {
-        return _Arr.map(apps, app =>
-          _Obj.extend(
-            {
-              app,
-              flow: 'intent',
-            },
-            base
-          )
-        );
+      if (_Arr.contains(flows, 'collect')) {
+        if (vpas.length) {
+          let individualInstruments = _Arr.map(vpas, vpa => {
+            let individual = _Obj.extend(
+              {
+                vpa,
+                flow: 'collect',
+              },
+              base
+            );
+
+            if (grouped.token_id) {
+              const token_id = grouped.token_id;
+
+              const token = _Arr.find(tokens, token => token.id === token_id);
+
+              if (token) {
+                individual.token_id = token_id;
+              }
+            }
+
+            return individual;
+          });
+
+          ungrouped = _Arr.mergeWith(ungrouped, individualInstruments);
+        }
       }
 
-      if (grouped.flows) {
-        flows = grouped.flows;
-      } else if (grouped.flow) {
-        flows = [grouped.flow];
+      if (_Arr.contains(flows, 'intent')) {
+        if (apps.length) {
+          let individualInstruments = _Arr.map(apps, app =>
+            _Obj.extend(
+              {
+                app,
+                flow: 'intent',
+              },
+              base
+            )
+          );
+
+          ungrouped = _Arr.mergeWith(ungrouped, individualInstruments);
+        }
       }
 
       if (flows.length > 0) {
-        return _Arr.map(flows, flow =>
-          _Obj.extend(
-            {
-              flow,
-            },
-            base
-          )
-        );
+        let individualInstruments =
+          _Arr.map(flows, flow => {
+            let individual = _Obj.extend(
+              {
+                flow,
+              },
+              base
+            );
+
+            // Allow intent only if no apps are present
+            if (flow === 'intent' && apps.length) {
+              return;
+            }
+
+            // Allow collect only if no VPAs are present
+            if (flow === 'collect' && vpas.length) {
+              return;
+            }
+
+            return individual;
+          }) |> _Arr.filter(Boolean);
+
+        ungrouped = _Arr.mergeWith(ungrouped, individualInstruments);
       }
 
-      return [grouped];
+      return ungrouped;
     },
-    isIndividual: instrument => {
-      const singleFlow = instrument.flow;
-
-      const missingApp = !instrument.app && !instrument.apps;
-      const singleApp = instrument.app;
-      const singleorMissingApps = singleApp || missingApp;
-
-      const missingToken = !instrument.token_id && !instrument.token_ids;
-      const singleToken = instrument.token_id;
-      const singleorMissingTokens = singleToken || missingToken;
-
-      return singleFlow && singleorMissingApps && singleorMissingTokens;
-    },
-
     getPaymentPayload: (instrument, payment, customer) => {
       payment = genericPaymentPayloadGetter(instrument, payment, customer);
 
@@ -343,23 +361,17 @@ const config = {
         if (!hasFlows || !_Arr.contains(instrument.flows, 'intent')) {
           return false;
         }
-
-        return true;
       }
 
-      // Individual instrument should have a flow
-      return Boolean(instrument.flow) || Boolean(instrument.flows);
+      return true;
     },
   },
 
-  paypal: {
-    isIndividual: () => true,
-  },
+  paypal: {},
 
   cardless_emi: {
-    properties: ['provider', 'providers'],
+    properties: ['providers'],
     payment: ['provider'],
-    isIndividual: instrument => instrument && instrument.provider,
     groupedToIndividual: grouped => {
       const base = _Obj.clone(grouped);
       delete base.providers;
@@ -374,14 +386,12 @@ const config = {
       });
     },
     isValid: instrument =>
-      Boolean(instrument.provider) ||
-      (Boolean(instrument.providers) && instrument.providers.length > 0),
+      Boolean(instrument.providers) && instrument.providers.length > 0,
   },
 
   paylater: {
-    properties: ['provider', 'providers'],
+    properties: ['providers'],
     payment: ['provider'],
-    isIndividual: instrument => instrument && instrument.provider,
     groupedToIndividual: grouped => {
       const base = _Obj.clone(grouped);
       delete base.providers;
@@ -396,13 +406,10 @@ const config = {
       });
     },
     isValid: instrument =>
-      Boolean(instrument.provider) ||
-      (Boolean(instrument.providers) && instrument.providers.length > 0),
+      Boolean(instrument.providers) && instrument.providers.length > 0,
   },
 
-  bank_transfer: {
-    isIndividual: () => false,
-  },
+  bank_transfer: {},
 
   // TODO: Pending methods: emi, gpay
 };
@@ -414,7 +421,6 @@ _Obj.loop(config, (val, method) => {
   config[method] = _Obj.extend(
     {
       getPaymentPayload: genericPaymentPayloadGetter,
-      isIndividual: genericIsIndividual,
       groupedToIndividual: genericGroupedToIndividual,
       isValid: genericIsValid,
       properties: [],

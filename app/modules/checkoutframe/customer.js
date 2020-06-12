@@ -8,7 +8,7 @@ import * as strings from 'common/strings';
 import * as OtpService from 'common/otpservice';
 import { isRecurring } from 'checkoutstore';
 
-/* global errorHandler, getPhone */
+/* global getPhone */
 
 let customers = {};
 let qpmap = _.getQueryParams();
@@ -67,7 +67,7 @@ Customer.prototype = {
     this.tokens = data.tokens;
 
     if (!session.local) {
-      _Doc.querySelector('#top-right') |> _El.addClass('logged');
+      session.topBar.setLogged(true);
     }
 
     Analytics.setMeta('loggedIn', true);
@@ -164,7 +164,7 @@ Customer.prototype = {
 
         if (data.error) {
           if (data.error.field) {
-            errorHandler.call(getSession(), data);
+            getSession().errorHandler(data);
           } else {
             callback(strings.wrongOtp);
           }

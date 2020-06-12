@@ -9,8 +9,6 @@
     dccCurrency,
   } from 'checkoutstore/screens/card';
 
-  import { t } from 'svelte-i18n';
-
   import {
     selectedInstrument,
     selectedInstrumentId,
@@ -18,7 +16,11 @@
 
   import { customer } from 'checkoutstore/customer';
 
-  import { showCtaWithText, showCtaWithDefaultText } from 'checkoutstore/cta';
+  import { showAmount, showCtaWithDefaultText } from 'checkoutstore/cta';
+
+  // i18n
+  import { t } from 'svelte-i18n';
+  import { SEARCH_PLACEHOLDER, SEARCH_TITLE, SEARCH_ALL } from 'ui/labels/dcc';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -35,13 +37,6 @@
   import SearchModal from 'ui/elements/SearchModal.svelte';
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
   import CurrencySearchItem from 'ui/elements/search-item/Currency.svelte';
-
-  // i18n labels
-  import {
-    DCC_SEARCH_TITLE,
-    DCC_SEARCH_PLACEHOLDER,
-    DCC_SEARCH_ALL,
-  } from 'ui/labels/dcc';
 
   const TOP_CURRENCIES = ['USD', 'GBP', 'EUR'];
   // Constants
@@ -170,7 +165,7 @@
 
   function updateAmountInHeaderAndCTA(displayAmount) {
     if (displayAmount) {
-      showCtaWithText('PAY ' + displayAmount);
+      showAmount(displayAmount);
       getSession().setRawAmountInHeader(displayAmount);
     } else {
       showCtaWithDefaultText();
@@ -298,7 +293,7 @@
         {#if selectedCurrencyInDisplay}
           <div class="default-currencies">
             <Stack horizonal>
-              {#each displayCurrencies as [code, config]}
+              {#each displayCurrencies as [code, config] (code)}
                 <Radio
                   name="dcc_currency"
                   label={code}
@@ -331,9 +326,9 @@
       <!-- LABEL: Search for currency -->
       <!-- LABEL: All currencies -->
       <SearchModal
-        title={$t(DCC_SEARCH_TITLE)}
-        placeholder={$t(DCC_SEARCH_PLACEHOLDER)}
-        all={$t(DCC_SEARCH_ALL)}
+        title={$t(SEARCH_TITLE)}
+        placeholder={$t(SEARCH_PLACEHOLDER)}
+        all={$t(SEARCH_ALL)}
         autocomplete="transaction-currency"
         items={sortedCurrencies}
         keys={['currency', 'name', 'symbol']}

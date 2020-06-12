@@ -32,6 +32,16 @@
   } from 'checkoutstore';
   import { isAMEXEnabled } from 'checkoutstore/methods';
 
+  // i18n
+  import { t, locale } from 'svelte-i18n';
+
+  import {
+    NOCVV_LABEL,
+    VIEW_ALL_EMI_PLANS,
+    REMEMBER_CARD_LABEL,
+    CARD_NUMBER_HELP_UNSUPPORTED,
+  } from 'ui/labels/card';
+
   // Utils
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
@@ -57,7 +67,12 @@
   let showNoCvvCheckbox = false;
   let hideExpiryCvvFields = false;
   let cvvLength = 3;
+  let showCardUnsupported = false;
+
   let cardNumberHelpText;
+  $: cardNumberHelpText = showCardUnsupported
+    ? $t(CARD_NUMBER_HELP_UNSUPPORTED)
+    : undefined;
 
   function setCardNumberValidity(valid) {
     if (numberField) {
@@ -213,13 +228,13 @@
         let validationPromises = [flowChecker(features), validateCardNumber()];
 
         /**
-         * If there's a card instrument, we check for its validity.
+         * If there's a card/emi instrument, we check for its validity.
          * Otherwise we'll just assume that this is successful validation.
          */
-        if ($methodTabInstrument && $methodTabInstrument.method === 'card') {
+        if ($methodTabInstrument && $methodTabInstrument.method === tab) {
           validationPromises.push(
             isInstrumentValidForPayment($methodTabInstrument, {
-              method: 'card',
+              method: tab,
               'card[number]': $cardNumber,
             })
           );
@@ -230,13 +245,7 @@
         return Promise.all(validationPromises);
       })
       .then(([isFlowValid, isCardNumberValid, isInstrumentValid]) => {
-        if (!isInstrumentValid) {
-          cardNumberHelpText = 'This card is not supported for the payment';
-        } else {
-          // Let the default help text kick in
-          cardNumberHelpText = undefined;
-        }
-
+        showCardUnsupported = !isInstrumentValid;
         setCardNumberValidity(
           isCardNumberValid && isFlowValid && isInstrumentValid
         );
@@ -416,7 +425,6 @@
     {/if}
   </div>
   <div class="row remember-check">
-
     <div>
       {#if showRememberCardCheck}
         <label class="first" for="save" id="should-save-card" tabIndex="0">
@@ -429,13 +437,15 @@
             on:change={trackRememberChecked}
             bind:checked={$remember} />
           <span class="checkbox" />
-          Remember Card
+          <!-- LABEL: Remember Card -->
+          {$t(REMEMBER_CARD_LABEL)}
         </label>
       {/if}
     </div>
     {#if tab === 'emi'}
       <div id="view-emi-plans" on:click={showEmiPlans} class="link">
-        View all EMI Plans
+        <!-- LABEL: View all EMI Plans -->
+        {$t(VIEW_ALL_EMI_PLANS)}
       </div>
     {/if}
   </div>
@@ -448,7 +458,8 @@
           id="nocvv"
           bind:checked={noCvvChecked} />
         <span class="checkbox" />
-        My Maestro Card doesn't have Expiry/CVV
+        <!-- LABEL: My Maestro Card doesn't have Expiry/CVV -->
+        {$t(NOCVV_LABEL)}
       </label>
     </div>
   {/if}

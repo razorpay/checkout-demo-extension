@@ -22,8 +22,8 @@ function addTypeAndCategory(instrument) {
  * passed created by the merchant a.k.a public API
  */
 const PUBLIC_API_INSTRUMENT_KEYS = {
-  card: ['issuers', 'networks', 'types', 'iin'],
-  emi: ['issuers', 'networks', 'types', 'iin', 'durations'],
+  card: ['issuers', 'networks', 'types', 'iins'],
+  emi: ['issuers', 'networks', 'types', 'iins', 'durations'],
   netbanking: ['banks'],
   wallet: ['wallets'],
   upi: ['flows', 'apps'],

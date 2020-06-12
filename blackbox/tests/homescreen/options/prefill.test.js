@@ -45,6 +45,7 @@ describe.each(
     await fillUserDetails(context);
 
     await proceed(context);
+    await selectPaymentMethod(context, 'netbanking');
     await assertTrimmedInnerText(
       context,
       '#bank-select',

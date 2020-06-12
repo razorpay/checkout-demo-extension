@@ -343,6 +343,11 @@ const currenciesConfig = {
     minor: 'tetri',
   },
 
+  GHS: {
+    minor: 'pesewas',
+    minimum: 3,
+  },
+
   GIP: {
     minor: 'pence',
     minimum: 10,
@@ -910,6 +915,7 @@ export const supportedCurrencies = [
   'EUR',
   'FJD',
   'GBP',
+  'GHS',
   'GIP',
   'GMD',
   'GTQ',

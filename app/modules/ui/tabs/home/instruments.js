@@ -1,5 +1,5 @@
 import { createBlock } from 'configurability/blocks';
-import { blocks, instruments } from 'checkoutstore/screens/home';
+import { blocks, instruments, sequence } from 'checkoutstore/screens/home';
 import { get as storeGetter } from 'svelte/store';
 import Track from 'tracker';
 import { MAX_PREFERRED_INSTRUMENTS } from 'common/constants';
@@ -38,6 +38,13 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
       return true;
     }
 
+    const hasOnlyOneUngrouped = instrument._ungrouped.length === 1;
+
+    // If there's only one ungrouped instrument, it shows up as a radio. Always allow for non-radio i.e. multiple ungrouped
+    if (!hasOnlyOneUngrouped) {
+      return true;
+    }
+
     switch (preferred.method) {
       case 'netbanking': {
         const hasBanks = Boolean(instrument.banks);
@@ -46,7 +53,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
         if (hasBanks) {
           return _Arr.none(
             instrument._ungrouped,
-            ungrouped => ungrouped.bank === preferred.bank
+            ungrouped => ungrouped.bank === preferred.banks[0]
           );
         }
 
@@ -60,7 +67,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
         if (hasWallets) {
           return _Arr.none(
             instrument._ungrouped,
-            ungrouped => ungrouped.wallet === preferred.wallet
+            ungrouped => ungrouped.wallet === preferred.wallets[0]
           );
         }
 
@@ -81,26 +88,27 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
       // TODO: filter out / remove plans excluding the durations for emi
 
       case 'upi': {
-        const hasFlows = Boolean(instrument.flows);
-        const hasApps = Boolean(instrument.apps);
+        const instrumentHasFlows = Boolean(instrument.flows);
+        const instrumentHasApps = Boolean(instrument.apps);
+        const preferredHasApps = Boolean(preferred.apps);
 
         // If there are any apps, check if the app matches
-        if (hasApps) {
+        if (preferredHasApps && instrumentHasApps) {
           return _Arr.none(
             instrument._ungrouped,
-            ungrouped => ungrouped.app === preferred.app
+            ungrouped => ungrouped.app === preferred.apps[0]
           );
         }
 
         // If there are any flows, check if the flows match and is invidiual flow
-        if (hasFlows) {
-          const individualFlows = ['qr', 'intent'];
+        if (instrumentHasFlows) {
+          const individualFlows = ['qr'];
 
           return _Arr.none(
             instrument._ungrouped,
             ungrouped =>
               _Arr.contains(individualFlows, ungrouped.flow) &&
-              ungrouped.flow === preferred.flow
+              ungrouped.flow === preferred.flows[0]
           );
         }
 
@@ -115,7 +123,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
         if (hasProviders) {
           return _Arr.none(
             instrument._ungrouped,
-            ungrouped => ungrouped.provider === preferred.provider
+            ungrouped => ungrouped.provider === preferred.providers[0]
           );
         }
 
@@ -224,6 +232,7 @@ export function setBlocks(
   });
 
   blocks.set(allBlocks);
+  sequence.set(parsedConfig.display.sequence);
 
   return {
     merchant: parsedConfig,
@@ -284,4 +293,84 @@ export function getInstrumentMeta(instrument) {
   }
 
   return meta;
+}
+
+/**
+ * Tells whether an instrument is for saved cards
+ * @param {Instrument} instrument
+ *
+ * @returns {boolean}
+ */
+export function isSavedCardInstrument(instrument) {
+  return (
+    _Arr.contains(['card', 'emi'], instrument.method) && instrument.token_id
+  );
+}
+
+/**
+ * Tells whether or not the instrument is a card instrument
+ * to be used from inside the card tab
+ * @param {Instrument} instrument
+ *
+ * @returns {boolean}
+ */
+export function isInstrumentGrouped(instrument) {
+  const isMethodInstrument = isInstrumentForEntireMethod(instrument);
+
+  /**
+   * All the methods that have a token.
+   * UPI has tokens, but it needs some more checks on
+   * the flows as well. It's not needed now, but we will eventually need to add it.
+   *
+   * TODO: Check for UPI in isMethodWithToken
+   */
+  const isMethodWithToken = _Arr.contains(['card', 'emi'], instrument.method);
+
+  if (isMethodInstrument) {
+    return true;
+  }
+
+  if (isMethodWithToken) {
+    const doesTokenExist = instrument.token_id;
+
+    return !doesTokenExist;
+  }
+
+  if (instrument.method === 'upi' && instrument.flows) {
+    // More than one flow always needs to go deeper
+    if (instrument.flows.length > 1) {
+      return true;
+    }
+
+    // UPI omnichannel always needs to go deeper
+    if (_Arr.contains(instrument.flows, 'omnichannel')) {
+      return true;
+    }
+
+    /**
+     * Collect needs to go deeper if this is not an individual
+     * instrument with a VPA
+     */
+    if (_Arr.contains(instrument.flows, 'collect')) {
+      let ungrouped = instrument._ungrouped;
+
+      // If individual, check for VPA
+      if (ungrouped.length === 1) {
+        const { flow, vpa } = ungrouped[0];
+
+        if (flow === 'collect' && vpa) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    // If flow is intent and no apps are specified, go deeper
+    if (_Arr.contains(instrument.flows, 'intent') && !instrument.apps) {
+      return true;
+    }
+  }
+
+  return instrument._ungrouped.length > 1;
 }

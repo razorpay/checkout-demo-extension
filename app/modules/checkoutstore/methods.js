@@ -20,11 +20,15 @@ import {
 
 import { getEligibleProvidersBasedOnMinAmount } from 'common/cardlessemi';
 import { getProvider } from 'common/paylater';
+import { findCodeByNetworkName } from 'common/card';
 
 import { wallets, getSortedWallets } from 'common/wallet';
 import { extendConfig } from 'common/cardlessemi';
 import { mobileQuery } from 'common/useragent';
 import { getUPIIntentApps } from 'checkoutstore/native';
+
+import { get as storeGetter } from 'svelte/store';
+import { sequence as SequenceStore } from 'checkoutstore/screens/home';
 
 const DEBIT_EMI_BANKS = ['HDFC_DC'];
 
@@ -143,6 +147,10 @@ const ALL_METHODS = {
   gpay() {
     return isUPIBaseEnabled() && isIRCTC();
   },
+
+  upi_otm() {
+    return isUPIOTMBaseEnabled();
+  },
 };
 
 export function isZestMoneyEnabled() {
@@ -193,6 +201,7 @@ export function getSingleMethod() {
       'netbanking',
       'emandate',
       'nach',
+      'upi_otm',
       'upi',
       'wallet',
       'paypal',
@@ -223,6 +232,54 @@ export function isDebitCardEnabled() {
     : getMerchantMethods().debit_card;
 }
 
+export function getCardTypesForRecurring() {
+  if (isRecurring()) {
+    return getRecurringMethods().card;
+  }
+}
+
+export function getCardNetworksForRecurring() {
+  // "recurring": {
+  //   "card": {
+  //     "credit": ["MasterCard", "Visa", "American Express"]
+  //   }
+  // }
+  if (isRecurring()) {
+    // Using only credit cards as debit cards are only supported on some banks.
+    const networks = getRecurringMethods().card?.credit;
+    if (_.isArray(networks) && networks.length) {
+      // Example: "American Express" to "amex"
+      const codes = _Arr.map(networks, findCodeByNetworkName);
+
+      // ["mastercard", "visa"] to { mastercard: true, visa: true }
+      return _Arr.reduce(
+        codes,
+        (acc, code) => {
+          acc[code] = true;
+          return acc;
+        },
+        {}
+      );
+    }
+  }
+}
+
+export function getCardIssuersForRecurring() {
+  // "recurring": {
+  //   "card": {
+  //     "debit": {
+  //       "CITI": "CITI Bank",
+  //       "CNRB": "Canara Bank",
+  //       "ICIC": "ICICI Bank",
+  //       "KKBK": "Kotak Mahindra Bank"
+  //     }
+  //   }
+  // }
+  if (isRecurring()) {
+    return getRecurringMethods().card?.debit;
+  }
+}
+
 // additional checks for each sub-method based on UPI
 const UPI_METHODS = {
   collect: () => true,
@@ -230,6 +287,14 @@ const UPI_METHODS = {
   qr: () => getOption('method.qr') && !global.matchMedia(mobileQuery).matches,
   intent: () =>
     getMerchantMethods().upi_intent && getUPIIntentApps().all.length,
+};
+
+// additional checks for each sub-method based on UPI OTM
+const UPI_OTM_METHODS = {
+  collect: () => true,
+  omnichannel: () => false,
+  qr: () => false,
+  intent: () => false,
 };
 
 // check if upi itself is enabled, before checking any
@@ -248,6 +313,20 @@ function isUPIBaseEnabled() {
   );
 }
 
+function isUPIOTMBaseEnabled() {
+  return (
+    getOption('method.upi_otm') !== false &&
+    getMerchantMethods().upi_otm &&
+    // if amount less than 1L, or order has method=upi
+    // order.method = upi with amount > 1L is passed
+    // by mutual fund who can accept more than the standard limit
+    (getAmount() < 1e7 || getMerchantOrder()?.method === 'upi_otm') &&
+    !isInternational() &&
+    !isRecurring() &&
+    getAmount()
+  );
+}
+
 export function isUPIFlowEnabled(method) {
   // unless method.upi or method.upi.{sub-method} is passed as false by merchant
   // it should be considered enabled from merchant side
@@ -256,6 +335,16 @@ export function isUPIFlowEnabled(method) {
     return false;
   }
   return isUPIBaseEnabled() && UPI_METHODS[method]();
+}
+
+export function isUPIOtmFlowEnabled(method) {
+  // unless method.upi_otm is passed as false by merchant
+  // it should be considered enabled from merchant side
+  const merchantOption = getOption('method.upi_otm');
+  if (_.isNonNullObject(merchantOption) && merchantOption[method] === false) {
+    return false;
+  }
+  return isUPIOTMBaseEnabled() && UPI_OTM_METHODS[method]();
 }
 
 export function getCardNetworks() {
@@ -268,6 +357,42 @@ export function getNetbankingBanks() {
     return {};
   }
   return banks;
+}
+
+export function getTPV() {
+  const order = getMerchantOrder();
+  if (!order) {
+    return;
+  }
+
+  const bankCode = order.bank;
+  const accountNumber = order.account_number;
+
+  if (!bankCode || !accountNumber) {
+    return;
+  }
+  const bankName = getNetbankingBanks()[bankCode] || `${bankCode} Bank`;
+
+  let method = order.method;
+  if (!method) {
+    const hasNB = isMethodEnabled('netbanking');
+
+    if (isMethodEnabled('upi')) {
+      if (!hasNB) {
+        method = 'upi';
+      }
+    } else if (hasNB) {
+      method = 'netbanking';
+    }
+  }
+
+  return {
+    name: bankName,
+    code: bankCode,
+    account_number: accountNumber,
+    image: 'https://cdn.razorpay.com/bank/' + bankCode + '.gif',
+    method,
+  };
 }
 
 export function isEMandateEnabled() {
@@ -378,6 +503,12 @@ export function getEMIBankPlans(code, cardType = 'credit') {
   }
 }
 
+export function getEligiblePlansBasedOnMinAmount(plans) {
+  const amount = getAmount();
+  const eligiblePlans = _Arr.filter(plans, plan => plan.min_amount <= amount);
+  return eligiblePlans;
+}
+
 // @TODO modifies bajaj cardless emi min_amount
 export function getEMIBanks() {
   const emiOptions = getMerchantMethods().emi_options;
@@ -476,4 +607,27 @@ function addExternalWallets(enabledWallets) {
         }
       }
     });
+}
+
+/**
+ * Returns the usable methods
+ *
+ * @returns {Array<string>}
+ */
+function getUsableMethods() {
+  return storeGetter(SequenceStore);
+}
+
+/**
+ * Some methods might not be usable because they are hidden
+ * from the homescreen
+ *
+ * TODO: Should consider method instruments
+ *
+ * @param {string} method
+ *
+ * @returns {boolean}
+ */
+export function isMethodUsable(method) {
+  return _Arr.contains(getUsableMethods(), method);
 }

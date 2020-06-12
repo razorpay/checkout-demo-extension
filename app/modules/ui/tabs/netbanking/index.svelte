@@ -7,8 +7,6 @@
   import { selectedBank } from 'checkoutstore/screens/netbanking';
   import { methodTabInstrument } from 'checkoutstore/screens/home';
 
-  import { t } from 'svelte-i18n';
-
   // UI imports
   import Tab from 'ui/tabs/Tab.svelte';
   import GridItem from 'ui/tabs/netbanking/GridItem.svelte';
@@ -18,15 +16,22 @@
   import Bottom from 'ui/layouts/Bottom.svelte';
   import SearchModal from 'ui/elements/SearchModal.svelte';
   import BankSearchItem from 'ui/elements/search-item/Bank.svelte';
+  import CTA from 'ui/elements/CTA.svelte';
 
-  // i18n labels
+  // i18n
   import {
     NETBANKING_SELECT_LABEL,
     NETBANKING_SELECT_HELP,
-    NETBANKING_SEARCH_TITLE,
-    NETBANKING_SEARCH_PLACEHOLDER,
-    NETBANKING_SEARCH_ALL,
-  } from 'ui/labels';
+    CORPORATE_RADIO_LABEL,
+    RETAIL_RADIO_LABEL,
+    SELECTION_RADIO_TEXT,
+    SEARCH_TITLE,
+    SEARCH_PLACEHOLDER,
+    SEARCH_ALL,
+  } from 'ui/labels/netbanking';
+
+  import { t, locale } from 'svelte-i18n';
+  import { getShortBankName, getLongBankName } from 'i18n';
 
   // Utils imports
   import Razorpay from 'common/Razorpay';
@@ -43,7 +48,6 @@
     isCorporateCode,
   } from 'common/bank';
   import { scrollIntoView } from 'lib/utils';
-  import { hideCta, showCtaWithDefaultText } from 'checkoutstore/cta';
   import { getSession } from 'sessionmanager';
 
   // Props
@@ -51,7 +55,6 @@
   export let downtimes = getDowntimes();
   export let method;
   export let bankOptions;
-  export let active = false;
 
   // Computed
   let filteredBanks = banks; // Always use this to get the banks
@@ -65,6 +68,7 @@
   let selectedBankHasLowDowntime;
   let selectedBankHasDowntime;
   let selectedBankName;
+  let translatedBanksArr;
 
   $: {
     if ($selectedBank) {
@@ -98,39 +102,17 @@
     }
   }
 
-  function determineCtaVisibility() {
-    // For emandate, the screen switches as soon as user selects a bank. We do not need to show the CTA
-    // in that case.
-    if (recurring) {
-      hideCta();
-    } else {
-      showCtaWithDefaultText();
-    }
-  }
-
-  export function onShown() {
-    active = true;
-
-    determineCtaVisibility();
-  }
-
   function showSearch() {
-    hideCta();
     searchModal.open();
   }
 
   function hideSearch() {
     searchModal.close();
-    determineCtaVisibility();
 
     // Restore focus
     if (bankSelect) {
       bankSelect.focus();
     }
-  }
-
-  export function onBack() {
-    active = false;
   }
 
   /**
@@ -199,6 +181,11 @@
     code: entry[0],
     name: entry[1],
     downtime: downtimes[entry[0]],
+  }));
+  $: translatedBanksArr = _Arr.map(banksArr, bank => ({
+    code: bank.code,
+    original: bank.name,
+    name: getLongBankName(bank.code, $locale, bank.name),
   }));
   $: invalid = method !== 'emandate' && !$selectedBank;
   $: netbanks = getPreferredBanks(filteredBanks, bankOptions).slice(
@@ -280,9 +267,9 @@
   <Screen pad={false}>
     <div>
       <div id="netb-banks" class="clear grid count-3">
-        {#each netbanks as { name, code }}
+        {#each netbanks as { name, code } (code)}
           <GridItem
-            {name}
+            name={getShortBankName(code, $locale)}
             {code}
             fullName={filteredBanks[code]}
             bind:group={$selectedBank} />
@@ -317,7 +304,8 @@
           class="pad ref-radiocontainer"
           bind:this={radioContainer}
           transition:fade={{ duration: 100 }}>
-          <label>Complete Payment Using</label>
+          <!-- LABEL: Complete Payment Using -->
+          <label>{$t(SELECTION_RADIO_TEXT)}</label>
           <div class="input-radio">
             <input
               type="radio"
@@ -327,7 +315,8 @@
               on:click={setRetailOption} />
             <label for="nb_type_retail">
               <div class="radio-display" />
-              <div class="label-content">Retail</div>
+              <!-- LABEL: Retail -->
+              <div class="label-content">{$t(RETAIL_RADIO_LABEL)}</div>
             </label>
           </div>
           <div class="input-radio">
@@ -339,7 +328,8 @@
               on:click={setCorporateOption} />
             <label for="nb_type_corporate">
               <div class="radio-display" />
-              <div class="label-content">Corporate</div>
+              <!-- LABEL: Corporate -->
+              <div class="label-content">{$t(CORPORATE_RADIO_LABEL)}</div>
             </label>
           </div>
         </div>
@@ -350,11 +340,11 @@
     <!-- LABEL: Search for bank -->
     <!-- LABEL: All banks -->
     <SearchModal
-      title={$t(NETBANKING_SEARCH_TITLE)}
-      placeholder={$t(NETBANKING_SEARCH_PLACEHOLDER)}
-      all={$t(NETBANKING_SEARCH_ALL)}
-      items={banksArr}
-      keys={['code', 'name']}
+      title={$t(SEARCH_TITLE)}
+      placeholder={$t(SEARCH_PLACEHOLDER)}
+      all={$t(SEARCH_ALL)}
+      items={translatedBanksArr}
+      keys={['code', 'name', 'original']}
       component={BankSearchItem}
       bind:this={searchModal}
       on:close={hideSearch}
@@ -363,7 +353,7 @@
         hideSearch();
       }} />
 
-    <Bottom tab="netbanking">
+    <Bottom>
       <!-- Show recurring message for recurring payments -->
       {#if recurring}
         <Callout>
@@ -384,7 +374,10 @@
           {/if}
         </DowntimeCallout>
       {/if}
-    </Bottom>
 
+    </Bottom>
+    {#if !recurring}
+      <CTA on:click={() => getSession().preSubmit()} />
+    {/if}
   </Screen>
 </Tab>

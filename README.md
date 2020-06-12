@@ -42,3 +42,23 @@ Format: `key`, `merchant_id`
 2. `cd scripts/emi`
 3. `node local.js <bank_code>`
 4. Copy the regex and paste it in [`app/modules/common/bank.js`](app/modules/common/bank.js)
+
+# post-merge hook
+
+Add this as `.git/hooks/post-merge` and the execute `chmod +x .git/hooks/post-merge`. This will execute `npm install` if you pull a branch that has changes in `package-lock.json`.
+
+```sh
+#/usr/bin/env bash
+# MIT © Sindre Sorhus - sindresorhus.com
+
+# git hook to run a command after `git pull` if a specified file was changed
+# Run `chmod +x post-merge` to make it executable then put it into `.git/hooks/`.
+
+changed_files="$(git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD)"
+
+check_run() {
+	echo "$changed_files" | grep --quiet "$1" && eval "$2"
+}
+
+check_run package-lock.json "npm install"
+```

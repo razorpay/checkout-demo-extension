@@ -1,0 +1,49 @@
+<script>
+  import { onMount, onDestroy, afterUpdate } from 'svelte';
+  import { cta, isCtaShown, showCta, hideCta } from 'checkoutstore/cta';
+
+  // if passed, creates an exclusive control on showing/hiding
+  // of #footer for the lifecycle of <CTA>
+  // expects Boolean
+  export let show = true;
+  let wasCtaShown;
+  let ref;
+
+  /**
+   * on creation, we display the #footer to render this component in
+   * we need to store if #footer was hidden previously or not
+   * this is to hide it again after unmount in case it was hidden previously
+   *
+   * If you render a second <CTA>, wasCtaShown will remain true for it and
+   * no invoking of showCta/hideCta during the lifecycle
+   *
+   * We're assuming stack (LIFO) of <CTA> throughout
+   * e.g. <Netbanking> has a child <CTA>Pay</CTA>
+   * we render <Offers> having <CTA>Apply</CTA> on top of it
+   * can't have <Netbanking> destroyed without <Offers> being destroyed first
+   * that may mess up with wasCtaShown
+   * this is until #footer has been completely migrated to <CTA>
+   * and we're able to determine at any given time if #footer needs to be shown or not
+   */
+  onMount(() => {
+    document.querySelector('#footer').appendChild(ref);
+    wasCtaShown = isCtaShown();
+    if (!wasCtaShown && show) {
+      showCta();
+    } else if (wasCtaShown && !show) {
+      hideCta();
+    }
+  });
+
+  afterUpdate(() => {
+    show ? showCta() : hideCta();
+  });
+
+  onDestroy(() => {
+    wasCtaShown ? showCta() : hideCta();
+  });
+</script>
+
+<span bind:this={ref} on:click>
+  <slot>{$cta}</slot>
+</span>
