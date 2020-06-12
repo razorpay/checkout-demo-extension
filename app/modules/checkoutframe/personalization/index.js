@@ -442,20 +442,25 @@ export function getTranslatedInstrumentsForCustomerFromApi(customer, extra) {
     const { contact } = customer;
     const url = 'https://jsonplaceholder.typicode.com/todos/1';
     return new Promise(resolve => {
-      if (p13nAPIInstruments[contact]) {
+      if (p13nAPIInstruments[contact] && p13nAPIInstruments[contact] !== null) {
         resolve(p13nAPIInstruments[contact]);
+        return;
       }
 
-      fetch({
-        url,
-        callback: function() {
-          const apiInstruments = [];
+      if (p13nAPIInstruments[contact] !== null) {
+        fetch({
+          url,
+          callback: function() {
+            const apiInstruments = [];
 
-          p13nAPIInstruments[contact] = apiInstruments;
+            p13nAPIInstruments[contact] = apiInstruments;
 
-          resolve(apiInstruments);
-        },
-      });
+            resolve(apiInstruments);
+          },
+        });
+      }
+
+      p13nAPIInstruments[contact] = null;
     });
   } else {
     const instruments = getInstrumentsForCustomer(customer, extra, 'api');
