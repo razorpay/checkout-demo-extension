@@ -53,7 +53,14 @@ const API_INSTRUMENT_PAYMENT_ADDONS = {
   },
 };
 
-function transformInstrumentToStorageFormat(instrument, data = {}) {
+/**
+ * To consume the backend representation of the p13n instruments, we need to, currently, convert them into the existing, supported p13n instrument format which is consumed in configurability.
+ * With this, the translation flow looks like Backend format -> localStorage format -> Configurability, which seems fine in the short run.
+ * In the longer run though, when we decide to deprecate v1, it should get consumed directly by configurability.
+ * @param {Object} instrument An instrument recieved from the api
+ * @param {Object} data Any extra data that is needed to transform
+ */
+export function transformInstrumentToStorageFormat(instrument, data = {}) {
   if (API_INSTRUMENT_PAYMENT_ADDONS[instrument.method]) {
     API_INSTRUMENT_PAYMENT_ADDONS[instrument.method](instrument, data);
   }

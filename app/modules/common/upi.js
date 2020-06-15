@@ -504,7 +504,7 @@ const handleData = [
 ];
 
 /**
- * get icon url from handle
+ * get upi app data from handle
  *
  * @param {String} handle eg. okaxis, ybl
  *
