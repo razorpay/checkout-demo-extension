@@ -2,7 +2,7 @@ import { generateSubtextForCardInstrument } from './card';
 import { generateSubtextForWalletInstrument } from './wallet';
 import { generateSubtextForNetbankingInstrument } from './netbanking';
 
-const INSTRuMENT_SUBTEXT = {
+const INSTRUMENT_SUBTEXT = {
   card: generateSubtextForCardInstrument,
   emi: generateSubtextForCardInstrument,
   netbanking: generateSubtextForNetbankingInstrument,
@@ -12,11 +12,12 @@ const INSTRuMENT_SUBTEXT = {
 /**
  * Generates subtext for an instrument
  * @param {Instrument} instrument
+ * @param {string} locale
  *
  * @returns {string}
  */
-export function getSubtextForInstrument(instrument) {
-  if (INSTRuMENT_SUBTEXT[instrument.method]) {
-    return INSTRuMENT_SUBTEXT[instrument.method](instrument);
+export function getSubtextForInstrument(instrument, locale) {
+  if (INSTRUMENT_SUBTEXT[instrument.method]) {
+    return INSTRUMENT_SUBTEXT[instrument.method](instrument, locale);
   }
 }

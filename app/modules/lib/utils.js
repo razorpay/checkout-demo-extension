@@ -1,3 +1,5 @@
+import { formatTemplateWithLocale } from 'i18n';
+
 /**
  * Scrolls the element into view if it is not completely visible.
  * @param el {Element}
@@ -71,10 +73,11 @@ export function sanitizeHtmlEntities(string) {
 /**
  * Returns a stringified version of the list with oxford commas
  * @param {Array<string>} list
+ * @param {string} locale
  *
  * @returns {string}
  */
-function oxfordComma(list) {
+function oxfordComma(list, locale = 'en') {
   const length = list.length;
 
   switch (length) {
@@ -86,10 +89,18 @@ function oxfordComma(list) {
 
     // We do not use an oxford comma for two items
     case 2:
-      return list.join(' and ');
+      return formatTemplateWithLocale(
+        'misc.list_two_combined',
+        { one: list[0], two: list[1] },
+        locale
+      );
 
     default:
-      return `${list.slice(0, length - 1).join(', ')}, and ${list[length - 1]}`;
+      return formatTemplateWithLocale(
+        'misc.list_multiple_combined',
+        { init: list.slice(0, length - 1).join(', '), last: list[length - 1] },
+        locale
+      );
   }
 }
 
@@ -99,15 +110,20 @@ function oxfordComma(list) {
  * Example: list: ['a', 'b'], max: 2 - returns "a and b"
  * Example: list: ['a', 'b', 'c'], max: 3 - returns "a, b, and c"
  * @param {Array} list
- * @param {Number} max
+ * @param {string} locale
+ * @param {number} max
  *
- * @return {String}
+ * @return {string}
  */
-export function generateTextFromList(list, max = Infinity) {
+export function generateTextFromList(list, locale, max = Infinity) {
   if (list.length > max) {
-    return `${list.slice(0, max - 1).join(', ')} & More`;
+    return formatTemplateWithLocale(
+      'misc.and_more',
+      { text: list.slice(0, max - 1).join(', ') },
+      locale
+    );
   } else {
-    return oxfordComma(list);
+    return oxfordComma(list, locale);
   }
 }
 

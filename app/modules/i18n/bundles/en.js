@@ -736,5 +736,9 @@ export default {
     search_no_results: 'No results for "{query}"',
     logout_action: 'Log out',
     logout_all_devices_action: 'Log out from all devices',
+
+    list_two_combined: '{one} and {two}',
+    list_multiple_combined: '{init}, and {last}',
+    and_more: '{text} & More',
   },
 };

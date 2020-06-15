@@ -5,10 +5,11 @@ import { getBanks } from 'checkoutstore';
 /**
  * Generates subtext for netbanking instrument
  * @param {Instrument} instrument
+ * @param {string} locale
  *
  * @returns {string}
  */
-export function generateSubtextForNetbankingInstrument(instrument) {
+export function generateSubtextForNetbankingInstrument(instrument, locale) {
   if (!instrument.banks) {
     return '';
   }
@@ -25,5 +26,5 @@ export function generateSubtextForNetbankingInstrument(instrument) {
     return bankName;
   });
 
-  return generateTextFromList(names, 3);
+  return generateTextFromList(names, locale, 3);
 }

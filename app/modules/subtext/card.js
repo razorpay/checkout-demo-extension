@@ -17,10 +17,11 @@ function concatTruthyString(list) {
  * take a look at the tests, or the document here:
  * https://docs.google.com/spreadsheets/d/1Yqz_4GBT0aSxvYu1xjflQLy2I-PnLq5GZsFY8Pi-3OY/edit?usp=sharing
  * @param {Instrument} instrument
+ * @param {string} locale
  *
  * @returns {string}
  */
-export function generateSubtextForCardInstrument(instrument) {
+export function generateSubtextForCardInstrument(instrument, locale) {
   const instrumentIssuers =
     instrument.issuers || []
     |> _Arr.map(bank => getCommonBankName(bank).replace(/ Bank$/, ''));
@@ -43,7 +44,7 @@ export function generateSubtextForCardInstrument(instrument) {
     let iinsString;
 
     if (iinsLength <= 3) {
-      iinsString = generateTextFromList(instrumentIins);
+      iinsString = generateTextFromList(instrumentIins, locale);
     } else {
       iinsString = 'select BINs';
     }
@@ -59,7 +60,7 @@ export function generateSubtextForCardInstrument(instrument) {
     let networksString;
 
     if (!supportAllTypes) {
-      typesString = generateTextFromList(instrumentTypes);
+      typesString = generateTextFromList(instrumentTypes, locale);
     }
 
     if (supportAllNetworks) {
@@ -67,7 +68,7 @@ export function generateSubtextForCardInstrument(instrument) {
         return 'All cards supported';
       }
     } else if (networksLength <= 2) {
-      networksString = generateTextFromList(instrumentNetworks, 2);
+      networksString = generateTextFromList(instrumentNetworks, locale, 2);
     } else {
       if (supportAllTypes) {
         networksString = 'select networks';
@@ -94,7 +95,7 @@ export function generateSubtextForCardInstrument(instrument) {
     let networksString;
 
     if (!supportAllTypes) {
-      typesString = generateTextFromList(instrumentTypes);
+      typesString = generateTextFromList(instrumentTypes, locale);
     }
 
     if (supportAllNetworks) {
@@ -117,13 +118,13 @@ export function generateSubtextForCardInstrument(instrument) {
   } else if (issuersLength === 2) {
     let stringList = ['Only'];
 
-    let issuersString = generateTextFromList(instrumentIssuers, 2);
+    let issuersString = generateTextFromList(instrumentIssuers, locale, 2);
     let typesString;
     let cardsString = 'cards';
     let networksString;
 
     if (!supportAllTypes) {
-      typesString = generateTextFromList(instrumentTypes);
+      typesString = generateTextFromList(instrumentTypes, locale);
     }
 
     if (supportAllNetworks) {
@@ -156,7 +157,7 @@ export function generateSubtextForCardInstrument(instrument) {
     let networksString;
 
     if (!supportAllTypes) {
-      typesString = generateTextFromList(instrumentTypes);
+      typesString = generateTextFromList(instrumentTypes, locale);
     }
 
     if (supportAllNetworks) {
@@ -177,4 +178,105 @@ export function generateSubtextForCardInstrument(instrument) {
 
     return concatTruthyString(stringList);
   }
+}
+
+export function generateSubtextForRecurring({
+  types = {},
+  networks = {},
+  issuers = {},
+  subscription,
+  offer,
+  locale,
+}) {
+  const { debit, credit } = types;
+  const { mastercard, visa, amex } = networks;
+
+  const debitCardIssuers = generateTextFromList(_Obj.values(issuers), locale);
+  const creditCardsNetworks = generateTextForCardNetwork({
+    mastercard,
+    visa,
+    amex,
+  });
+
+  if (subscription) {
+    const subscriptionText = 'Subscription payments are supported on';
+    if (credit && debit) {
+      // Subscription payments are supported on Mastercard, Visa, and American Express credit cards and debit cards from ICICI, Kotak, Citibank, and Canara Bank.
+      return [
+        subscriptionText,
+        creditCardsNetworks,
+        'credit cards and',
+        'debit cards from',
+        debitCardIssuers + '.',
+      ].join(' ');
+    } else if (debit) {
+      // Subscription payments are supported on debit cards from ICICI, Kotak, Citibank, and Canara Bank.
+      return [
+        subscriptionText,
+        'debit cards from',
+        debitCardIssuers + '.',
+      ].join(' ');
+    } else {
+      // Subscription payments are supported on Mastercard, Visa, and American Express credit cards.
+      return [subscriptionText, creditCardsNetworks, 'credit cards' + '.'].join(
+        ' '
+      );
+    }
+  } else if (offer) {
+    // All issuer cards are supported for this payment.
+    // All issuer credit cards are supported for this payment.
+    // All issuer debit cards are supported for this payment.
+    return [
+      'All',
+      offer.issuer,
+      generateTextForCardType(credit, debit),
+      'are supported for this payment.',
+    ].join(' ');
+  } else {
+    if (credit && debit) {
+      // Mastercard, Visa, and American Express credit cards and debit cards from ICICI, Kotak, Citibank, and Canara Bank are supported for this payment.
+      return [
+        creditCardsNetworks,
+        'credit cards',
+        'and debit cards from',
+        debitCardIssuers,
+        'are supported for this payment.',
+      ].join(' ');
+    } else if (debit) {
+      // Only debit cards from ICICI, Kotak, Citibank, and Canara Bank are supported for this payment.
+      return [
+        'Only debit cards from',
+        debitCardIssuers,
+        'are supported for this payment.',
+      ].join(' ');
+    } else {
+      // Only Mastercard, Visa, and American Express credit cards are supported for this payment.
+      return [
+        'Only',
+        creditCardsNetworks,
+        'credit cards',
+        'are supported for this payment.',
+      ].join(' ');
+    }
+  }
+}
+
+function generateTextForCardType(credit, debit) {
+  if (credit && debit) {
+    return 'cards';
+  } else if (debit) {
+    return 'debit cards';
+  } else {
+    return 'credit cards';
+  }
+}
+
+function generateTextForCardNetwork({ mastercard, visa, amex }, locale) {
+  const networksList =
+    [
+      visa ? 'Visa' : '',
+      mastercard ? 'Mastercard' : '',
+      amex ? 'American Express' : '',
+    ] |> _Arr.filter(Boolean);
+  return generateTextFromList(networksList, locale);
 }

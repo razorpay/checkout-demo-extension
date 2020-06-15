@@ -32,7 +32,7 @@ import {
 function getRecurringCardDescription(locale) {
   // TODO: fix this to return network codes instead of names
   const recurringNetworks = getRecurringMethods().card?.credit || [];
-  const networks = generateTextFromList(recurringNetworks);
+  const networks = generateTextFromList(recurringNetworks, locale);
   return formatTemplateWithLocale(
     DESCRIPTION_RECURRING_CARDS, // LABEL: {networks} credit cards
     { networks },
@@ -57,7 +57,7 @@ const CARD_DESCRIPTION = locale => {
     |> _Arr.filter(network => Boolean(networksFromPrefs[network]))
     |> _Arr.map(network => getNetworkName(network, locale));
 
-  return generateTextFromList(networks, 4);
+  return generateTextFromList(networks, locale, 4);
 };
 
 /**
@@ -85,7 +85,7 @@ const DESCRIPTIONS = {
       providerNames.unshift(getMethodPrefix('card', locale));
     }
 
-    const text = generateTextFromList(providerNames, 3);
+    const text = generateTextFromList(providerNames, locale, 3);
 
     if (cardEmi) {
       return text;
@@ -106,7 +106,7 @@ const DESCRIPTIONS = {
     const providers = getPayLaterProviders().map(p =>
       getPaylaterProviderName(p.code, locale)
     );
-    const text = generateTextFromList(providers, 2);
+    const text = generateTextFromList(providers, locale, 2);
     return formatTemplateWithLocale(
       'methods.descriptions.paylater',
       { providers: text },
@@ -120,6 +120,7 @@ const DESCRIPTIONS = {
   wallet: locale =>
     generateTextFromList(
       getWallets().map(w => getWalletName(w.code, locale)),
+      locale,
       2
     ),
   upi_otm: locale => getRawMethodDescription('upi_otm', locale),
@@ -149,11 +150,11 @@ export function getMethodDescription(method, locale) {
   return fn(locale);
 }
 
-export function getEMIBanksText() {
+export function getEMIBanksText(locale) {
   const emiBanks = getEMIBanks();
   const bankNames =
     emiBanks |> _Obj.keys |> _Arr.map(bank => emiBanks[bank].name);
-  return generateTextFromList(bankNames, 12);
+  return generateTextFromList(bankNames, locale, 12);
 }
 
 /**

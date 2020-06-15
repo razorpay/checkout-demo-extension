@@ -4,10 +4,11 @@ import { getWallets } from 'checkoutstore/methods';
 /**
  * Generates subtext for wallet instrument
  * @param {Instrument} instrument
+ * @param {string} locale
  *
  * @returns {string}
  */
-export function generateSubtextForWalletInstrument(instrument) {
+export function generateSubtextForWalletInstrument(instrument, locale) {
   if (!instrument.wallets) {
     return '';
   }
@@ -21,5 +22,5 @@ export function generateSubtextForWalletInstrument(instrument) {
     wallet => findWallet(wallet).name
   );
 
-  return generateTextFromList(walletNames, 3);
+  return generateTextFromList(walletNames, locale, 3);
 }

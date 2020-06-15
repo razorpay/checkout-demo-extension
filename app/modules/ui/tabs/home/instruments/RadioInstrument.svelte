@@ -70,6 +70,7 @@
   }
 
   function getDetailsForNetbankingInstrument(instrument, locale) {
+    // TODO: Add fallback
     const bankName = getLongBankName(individualInstrument.bank, locale);
     return {
       title: getInstrumentTitle('netbanking', bankName, locale),
