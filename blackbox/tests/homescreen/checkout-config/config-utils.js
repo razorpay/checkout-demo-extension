@@ -23,6 +23,20 @@ function matchAllStringsInList(a, b) {
 }
 
 /**
+ * Tells if a block is full of loader instruments
+ * @param {Block} block
+ *
+ * @returns {boolean}
+ */
+function isBlockFullOfLoaderInstruments(block) {
+  // Remove loader instruments. They don't have a title.
+  const items = block.items.filter(item => item.title);
+
+  // Are we left with instruments that are not loader instruments?
+  return items.length === 0;
+}
+
+/**
  * Parses blocks and returns their text
  * @param {Context} context
  *
@@ -72,6 +86,9 @@ async function parseBlocksFromHomescreen(context) {
         })
     )
   );
+
+  // TODO: Also consider preferred methods block
+  blocks = blocks.filter(block => !isBlockFullOfLoaderInstruments(block));
 
   return blocks;
 }
