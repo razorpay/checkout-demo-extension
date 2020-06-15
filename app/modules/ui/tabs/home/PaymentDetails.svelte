@@ -111,7 +111,7 @@
         bind:address={$address}
         bind:pincode={$pincode}
         bind:state={$state}
-        states={STATES} />
+        states={entries(STATES)} />
     </div>
   {/if}
 

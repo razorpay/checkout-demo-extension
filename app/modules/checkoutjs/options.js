@@ -8,14 +8,14 @@ RazorpayDefaults.nativeotp = true;
 RazorpayDefaults.remember_customer = false;
 RazorpayDefaults.personalization = false;
 RazorpayDefaults.paused = false;
-RazorpayDefaults.fee_label = 'Gateway Charges';
+RazorpayDefaults.fee_label = '';
 
 RazorpayDefaults.min_amount_label = ''; // Added for RBL custom label while Partial Amount
 RazorpayDefaults.partial_payment = {
-  min_amount_label: 'Minimum first amount',
-  full_amount_label: 'Pay in full',
-  partial_amount_label: 'Make payment in parts',
-  partial_amount_description: 'Pay some now and the remaining later',
+  min_amount_label: '',
+  full_amount_label: '',
+  partial_amount_label: '',
+  partial_amount_description: '',
   select_partial: false,
 };
 
