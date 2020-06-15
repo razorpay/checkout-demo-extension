@@ -492,6 +492,7 @@ const handleData = [
   {
     handles: ['ybl'],
     icon: 'https://cdn.razorpay.com/app/phonepe.svg',
+    package_name: 'com.phonepe.app',
   },
   {
     handles: ['icicibank'],
