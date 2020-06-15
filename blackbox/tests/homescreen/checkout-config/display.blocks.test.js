@@ -161,6 +161,8 @@ describe('display.blocks', () => {
     await fillUserDetails(context, '9988776655');
     await assertUserDetails(context);
 
+    await delay(500);
+
     // Get all instruments from block.individual
     const individualInstruments = await context.page.$$(
       `.methods-block[data-block='block.individual'] [role=list] > *`
@@ -203,6 +205,8 @@ describe('display.blocks', () => {
     // User details
     await fillUserDetails(context, '9988776655');
     await assertUserDetails(context);
+
+    await delay(500);
 
     // Get all instruments from block.grouped
     const groupedInstruments = await context.page.$$(
