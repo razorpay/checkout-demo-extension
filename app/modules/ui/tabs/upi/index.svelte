@@ -308,7 +308,7 @@
 
     /* TODO: improve handling of `prefill.vpa` */
     if (session.get('prefill.vpa')) {
-      selectedApp = null;
+      selectedApp = undefined;
       vpa = session.get('prefill.vpa');
     }
 
