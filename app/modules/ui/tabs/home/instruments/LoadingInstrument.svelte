@@ -1,3 +1,7 @@
+<script>
+  import { slide } from 'svelte/transition';
+</script>
+
 <style>
   div {
     box-sizing: content-box;
@@ -31,6 +35,6 @@
   }
 </style>
 
-<div class="loading-instrument uninteractive">
+<div class="loading-instrument uninteractive" out:slide>
   <span />
 </div>
