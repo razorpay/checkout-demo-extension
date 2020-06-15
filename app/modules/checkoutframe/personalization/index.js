@@ -438,13 +438,7 @@ function getAPIInstrumentsFromCache(contact) {
     fetch({
       url,
       callback: function() {
-        const apiInstruments = [
-          {
-            method: 'upi',
-            vpa: 'saranshgupta1995@okhdfcbank',
-            score: 1,
-          },
-        ];
+        const apiInstruments = [];
 
         p13nAPIInstruments[contact] = apiInstruments;
 
