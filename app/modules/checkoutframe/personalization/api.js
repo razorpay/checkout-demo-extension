@@ -25,6 +25,27 @@ export function setInstrumentsForCustomer(customer, instruments) {
   return getInstrumentsForCustomer(customer);
 }
 
+function getInstrumentsFromApi(customer) {
+  const url = 'https://jsonplaceholder.typicode.com/todos/1';
+
+  const promise = new Promise(resolve => {
+    fetch({
+      url,
+      callback: function() {
+        const apiInstruments = [];
+
+        setInstrumentsForCustomer(customer, apiInstruments);
+
+        resolve(getInstrumentsForCustomer(customer));
+      },
+    });
+  });
+
+  PREFERRED_INSTRUMENTS_CACHE[customer.contact] = promise;
+
+  return promise;
+}
+
 /**
  * Returns instruments for customer
  * @param {Customer} customer
@@ -32,7 +53,13 @@ export function setInstrumentsForCustomer(customer, instruments) {
  * @returns {Promise<Array<StorageInstrument>>}
  */
 export function getInstrumentsForCustomer(customer) {
-  return Promise.resolve(PREFERRED_INSTRUMENTS_CACHE[customer.contact] || []);
+  const cached = PREFERRED_INSTRUMENTS_CACHE[customer.contact];
+
+  if (cached) {
+    return cached;
+  } else {
+    return getInstrumentsFromApi(customer);
+  }
 }
 
 const API_INSTRUMENT_PAYMENT_ADDONS = {
