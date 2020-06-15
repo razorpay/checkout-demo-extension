@@ -30,6 +30,6 @@
   }
 </style>
 
-<div class="loading-instrument">
+<div class="loading-instrument uninteractive">
   <span />
 </div>
