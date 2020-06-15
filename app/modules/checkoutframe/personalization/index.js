@@ -427,6 +427,34 @@ export function getTranslatedInstrumentsForCustomerFromStorage(
   return translatedInstruments;
 }
 
+function getAPIInstrumentsFromCache(contact) {
+  const url = 'https://jsonplaceholder.typicode.com/todos/1';
+
+  if (p13nAPIInstruments[contact]) {
+    return p13nAPIInstruments[contact];
+  }
+
+  p13nAPIInstruments[contact] = new Promise(resolve => {
+    fetch({
+      url,
+      callback: function() {
+        const apiInstruments = [
+          {
+            method: 'upi',
+            vpa: 'saranshgupta1995@okhdfcbank',
+            score: 1,
+          },
+        ];
+
+        p13nAPIInstruments[contact] = apiInstruments;
+
+        resolve(apiInstruments);
+      },
+    });
+  });
+  return p13nAPIInstruments[contact];
+}
+
 /**
  * Returns the list of preferred payment modes for the user in a sorted order,
  * but translated to the Payment Method Configurability spec.
@@ -440,39 +468,7 @@ export function getTranslatedInstrumentsForCustomerFromStorage(
 export function getTranslatedInstrumentsForCustomerFromApi(customer, extra) {
   if (!customer.logged) {
     const { contact } = customer;
-    const url = 'https://jsonplaceholder.typicode.com/todos/1';
-
-    if (p13nAPIInstruments[contact]) {
-      return p13nAPIInstruments[contact];
-    }
-
-    p13nAPIInstruments[contact] = new Promise(resolve => {
-      if (p13nAPIInstruments[contact] && p13nAPIInstruments[contact] !== null) {
-        resolve(p13nAPIInstruments[contact]);
-        return;
-      }
-
-      if (p13nAPIInstruments[contact] !== null) {
-        fetch({
-          url,
-          callback: function() {
-            const apiInstruments = [
-              {
-                method: 'upi',
-                vpa: 'saranshgupta1995@okhdfcbank',
-                score: 1,
-              },
-            ];
-
-            p13nAPIInstruments[contact] = apiInstruments;
-
-            resolve(apiInstruments);
-          },
-        });
-      }
-    });
-
-    return p13nAPIInstruments[contact];
+    return getAPIInstrumentsFromCache(contact);
   } else {
     const instruments = getInstrumentsForCustomer(customer, extra, 'api');
     return Promise.resolve(
