@@ -1,7 +1,7 @@
 import { VPA_REGEX } from 'common/constants';
 import { getUPIAppDataFromHandle } from 'common/upi';
 
-const PREFERRED_INSTRUMENTS = {};
+const PREFERRED_INSTRUMENTS_CACHE = {};
 
 /**
  * Sets instruments for customer
@@ -15,7 +15,9 @@ export function setInstrumentsForCustomer(customer, instruments, upiApps) {
     transformInstrumentToStorageFormat(instrument, { upiApps })
   );
 
-  PREFERRED_INSTRUMENTS[customer.contact] = transformedInstruments;
+  PREFERRED_INSTRUMENTS_CACHE[customer.contact] = Promise.resolve(
+    transformedInstruments
+  );
 
   return getInstrumentsForCustomer(customer);
 }
@@ -27,7 +29,7 @@ export function setInstrumentsForCustomer(customer, instruments, upiApps) {
  * @returns {Promise<Array<StorageInstrument>>}
  */
 export function getInstrumentsForCustomer(customer) {
-  return Promise.resolve(PREFERRED_INSTRUMENTS[customer.contact] || []);
+  return Promise.resolve(PREFERRED_INSTRUMENTS_CACHE[customer.contact] || []);
 }
 
 const API_INSTRUMENT_PAYMENT_ADDONS = {
