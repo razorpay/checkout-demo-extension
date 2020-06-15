@@ -58,7 +58,9 @@
   import { formatTemplateWithLocale } from 'i18n';
 
   // Utils imports
+  import Razorpay from 'common/Razorpay';
   import { getSession } from 'sessionmanager';
+  import { generateSubtextForRecurring } from 'subtext/card';
   import {
     isPartialPayment as getIsPartialPayment,
     isContactOptional,
@@ -77,8 +79,9 @@
   } from 'checkoutstore';
 
   import {
-    isCreditCardEnabled,
-    isDebitCardEnabled,
+    getCardTypesForRecurring,
+    getCardNetworksForRecurring,
+    getCardIssuersForRecurring,
     getSingleMethod,
     isEMandateBankEnabled,
     getTPV,
@@ -261,6 +264,11 @@
     }
   }
 
+  // Svelte executes the following block twice. Even if a fault was emitted, it will be emitted again in the second execution.
+  // So, we use this flag to perform no-op if true.
+  // TODO: Do this in a better way by figuring out how to make it execute the block only once.
+  let isInstrumentFaultEmitted = false;
+
   $: {
     const loggedIn = _Obj.getSafely($customer, 'logged');
     session.topBar.setLogged(loggedIn);
@@ -281,45 +289,70 @@
       $customer
     );
 
-    const setPreferredInstruments = blocksThatWereSet.preferred.instruments;
+    const noBlocksWereSet = blocksThatWereSet.all.length === 0;
 
-    // Get the methods for which a preferred instrument was shown
-    const preferredMethods = _Arr.reduce(
-      setPreferredInstruments,
-      (acc, instrument) => {
-        acc[`_${instrument.method}`] = true;
-        return acc;
-      },
-      {}
-    );
-
-    /**
-     * - `meta.p13n` will only be set when preferred methods are shown in the UI.
-     * - `p13n:instruments:list` will be fired when we attempt to show the list.
-     * - `p13n:instruments:list` with `meta.p13n` set as true will tell you whether or not preferred methods were shown.
-     */
-
-    // meta.p13n should always be set before `p13n:instruments:list`
-    if (setPreferredInstruments.length) {
-      Analytics.setMeta('p13n', true);
-    } else {
-      Analytics.removeMeta('p13n');
-    }
-
-    const allPreferredInstrumentsForCustomer = getAllInstrumentsForCustomer(
-      $customer
-    );
-
-    if (isPersonalizationEnabled && allPreferredInstrumentsForCustomer.length) {
-      // Track preferred-methods related things
-      Analytics.track('p13n:instruments:list', {
+    if (isInstrumentFaultEmitted) {
+      // Do nothing, we already signalled a fault
+    } else if (noBlocksWereSet && !singleMethod) {
+      Analytics.track('error', {
+        type: AnalyticsTypes.INTEGRATION,
         data: {
-          all: allPreferredInstrumentsForCustomer.length,
-          eligible: eligiblePreferredInstruments.length,
-          shown: setPreferredInstruments.length,
-          methods: preferredMethods,
+          type: 'no_instruments_to_render',
+          config: merchantConfig,
         },
       });
+
+      Razorpay.sendMessage({
+        event: 'fault',
+        data:
+          'Error in integration. Please contact Razorpay for assistance: no instruments available to show',
+      });
+
+      isInstrumentFaultEmitted = true;
+    } else {
+      const setPreferredInstruments = blocksThatWereSet.preferred.instruments;
+
+      // Get the methods for which a preferred instrument was shown
+      const preferredMethods = _Arr.reduce(
+        setPreferredInstruments,
+        (acc, instrument) => {
+          acc[`_${instrument.method}`] = true;
+          return acc;
+        },
+        {}
+      );
+
+      /**
+       * - `meta.p13n` will only be set when preferred methods are shown in the UI.
+       * - `p13n:instruments:list` will be fired when we attempt to show the list.
+       * - `p13n:instruments:list` with `meta.p13n` set as true will tell you whether or not preferred methods were shown.
+       */
+
+      // meta.p13n should always be set before `p13n:instruments:list`
+      if (setPreferredInstruments.length) {
+        Analytics.setMeta('p13n', true);
+      } else {
+        Analytics.removeMeta('p13n');
+      }
+
+      const allPreferredInstrumentsForCustomer = getAllInstrumentsForCustomer(
+        $customer
+      );
+
+      if (
+        isPersonalizationEnabled &&
+        allPreferredInstrumentsForCustomer.length
+      ) {
+        // Track preferred-methods related things
+        Analytics.track('p13n:instruments:list', {
+          data: {
+            all: allPreferredInstrumentsForCustomer.length,
+            eligible: eligiblePreferredInstruments.length,
+            shown: setPreferredInstruments.length,
+            methods: preferredMethods,
+          },
+        });
+      }
     }
   }
 
@@ -797,25 +830,13 @@
       {/if}
       {#if showRecurringCallout}
         <Callout>
-          {#if session.get('subscription_id')}
-            {#if isDebitCardEnabled() && isCreditCardEnabled()}
-              {$t(SUBSCRIPTIONS_CREDIT_DEBIT_CALLOUT)}
-            {:else if isDebitCardEnabled()}
-              {$t(SUBSCRIPTIONS_DEBIT_ONLY_CALLOUT)}
-            {:else}{$t(SUBSCRIPTIONS_CREDIT_ONLY_CALLOUT)}{/if}
-          {:else if cardOffer}
-            {#if isDebitCardEnabled() && isCreditCardEnabled()}
-              {formatTemplateWithLocale(CARD_OFFER_CREDIT_DEBIT_CALLOUT, { issuer: cardOffer.issuer }, $locale)}
-            {:else if isDebitCardEnabled()}
-              {formatTemplateWithLocale(CARD_OFFER_DEBIT_ONLY_CALLOUT, { issuer: cardOffer.issuer }, $locale)}
-            {:else}
-              {formatTemplateWithLocale(CARD_OFFER_CREDIT_ONLY_CALLOUT, { issuer: cardOffer.issuer }, $locale)}
-            {/if}
-          {:else if isDebitCardEnabled() && isCreditCardEnabled()}
-            {$t(RECURRING_CREDIT_DEBIT_CALLOUT)}
-          {:else if isDebitCardEnabled()}
-            {$t(RECURRING_DEBIT_ONLY_CALLOUT)}
-          {:else}{$t(RECURRING_CREDIT_ONLY_CALLOUT)}{/if}
+          {generateSubtextForRecurring({
+            types: getCardTypesForRecurring(),
+            networks: getCardNetworksForRecurring(),
+            issuers: getCardIssuersForRecurring(),
+            subscription: session.get('subscription_id'),
+            offer: cardOffer,
+          })}
         </Callout>
       {/if}
 

@@ -39,6 +39,7 @@ var preferences,
   CustomerStore = discreet.CustomerStore,
   EmiStore = discreet.EmiStore,
   Cta = discreet.Cta,
+  es6components = discreet.es6components,
   NBHandlers = discreet.NBHandlers,
   Instruments = discreet.Instruments,
   I18n = discreet.I18n;
@@ -1101,7 +1102,7 @@ Session.prototype = {
                 response = discreet.error('Payment failed');
               }
 
-              invoke(errorHandler, self, response);
+              self.errorHandler(response);
             }
           },
         }).till(function(response) {
@@ -1174,7 +1175,7 @@ Session.prototype = {
     this.setFormatting();
     this.improvisePaymentOptions();
     this.improvisePrefill();
-    discreet.es6components.render();
+    es6components.render();
     this.setSvelteComponents();
     this.fillData();
     this.setEMI();
@@ -1188,7 +1189,7 @@ Session.prototype = {
     this.updateCustomerInStore();
     Hacks.initPostRenderHacks();
 
-    errorHandler.call(this, this.params);
+    this.errorHandler(this.params);
 
     if (!this.tab && !this.get('prefill.contact')) {
       $('#contact').focus();
@@ -1263,65 +1264,6 @@ Session.prototype = {
     this.homeTab = new discreet.HomeTab({
       target: gel('form-fields'),
     });
-  },
-
-  setNetbankingTab: function() {
-    var method, banks;
-    var prefilledBank = this.get('prefill.bank');
-
-    if (MethodStore.isEMandateEnabled()) {
-      method = 'emandate';
-      var embanks = MethodStore.getEMandateBanks();
-      banks = _Obj.reduce(
-        embanks,
-        function(banks, bank, code) {
-          banks[code] = bank.name;
-          return banks;
-        },
-        {}
-      );
-    } else if (MethodStore.isMethodEnabled('netbanking')) {
-      method = 'netbanking';
-      banks = Store.getMerchantMethods().netbanking;
-    }
-
-    // Set prefilled bank in store
-    if (prefilledBank) {
-      NetbankingScreenStore.selectedBank.set(prefilledBank);
-    }
-
-    if (method) {
-      this.netbankingTab && this.netbankingTab.$destroy();
-      this.netbankingTab = new discreet.NetbankingTab({
-        target: gel('form-fields'),
-        props: {
-          bankOptions: this.get('method.netbanking'),
-          banks: banks,
-          method: method,
-        },
-      });
-
-      // Add listener for proceeding automatically only if emandate
-      if (method === 'emandate') {
-        this.netbankingTab.$on(
-          'bankSelected',
-          this.proceedAutomaticallyAfterSelectingBank.bind(this)
-        );
-      }
-
-      var session = this;
-
-      this.netbankingTab.$on('bankSelected', function(e) {
-        session.validateOffers(e.detail.bank.code, function(offerRemoved) {
-          if (!offerRemoved) {
-            // If the offer was not removed, revert to the bank in offer issuer
-            NetbankingScreenStore.selectedBank.set(
-              session.getAppliedOffer().issuer
-            );
-          }
-        });
-      });
-    }
   },
 
   setSvelteCardTab: function() {
@@ -2319,7 +2261,7 @@ Session.prototype = {
       });
     }
     this.on('submit', '#form', this.preSubmit);
-    this.on('click', '#footer span', this.preSubmit);
+    this.on('click', '#footer-cta', this.preSubmit);
 
     if (MethodStore.isCardOrEMIEnabled()) {
       /**
@@ -2628,12 +2570,7 @@ Session.prototype = {
           method: offer.payment_method,
         },
       });
-      var session = this;
-      // setTimeout is applied to let CTA hide through svelte lifecycle
-      setTimeout(function() {
-        session.handleOfferSelection(offer, offer.payment_method);
-      });
-      return;
+      screen = offer.payment_method;
     }
 
     var issuer = offer.issuer;
@@ -2641,7 +2578,7 @@ Session.prototype = {
     if (screen === 'wallet') {
       // Select wallet
       if (issuer) {
-        this.svelteWalletsTab.setSelectedWallet(issuer);
+        this.svelteWalletsTab.onWalletSelection(issuer);
       }
     } else if (screen === 'netbanking') {
       // Select bank
@@ -2760,8 +2697,6 @@ Session.prototype = {
         return;
       }
     } else if (this.tab === 'netbanking') {
-      this.netbankingTab && this.netbankingTab.$destroy();
-      this.netbankingTab = null;
     } else if (this.tab === 'nach') {
       if (this.nachScreen.onBack()) {
         return;
@@ -2977,7 +2912,7 @@ Session.prototype = {
       this.clearRequest();
     }
     if (tab === 'netbanking') {
-      this.setNetbankingTab();
+      es6components.setNetbankingTab();
     }
 
     if (tab === 'upi') {
@@ -5025,7 +4960,6 @@ Session.prototype = {
       'feeBearerView',
       'homeTab',
       'nachScreen',
-      'netbankingTab',
       'otpView',
       'payLaterView',
       'payoutsAccountView',
@@ -5079,7 +5013,7 @@ Session.prototype = {
       this.clearRequest(cancelReason);
       this.isOpen = false;
 
-      discreet.es6components.destroy();
+      es6components.destroyAll();
       this.cleanUpSvelteComponents();
 
       try {
@@ -5161,11 +5095,9 @@ Session.prototype = {
         props: {
           applicableOffers: allOffers,
           setAppliedOffer: function(offer, shouldNavigate) {
-            if (appliedOffer !== offer) {
-              appliedOffer = offer;
-              if (offer && shouldNavigate) {
-                session.handleOfferSelection(offer);
-              }
+            appliedOffer = offer;
+            if (offer && shouldNavigate) {
+              session.handleOfferSelection(offer);
             }
             session.handleDiscount();
           },
@@ -5341,38 +5273,12 @@ Session.prototype = {
     Customer.prototype.r = this.r;
   },
 
-  showModal: function(preferences) {
-    Razorpay.sendMessage({ event: 'render' });
-
-    if (CheckoutBridge) {
-      var containerBox = $('#container')[0];
-      if (containerBox) {
-        var rect = containerBox.getBoundingClientRect();
-        Bridge.checkout.callAndroid(
-          'setDimensions',
-          Math.floor(rect.width),
-          Math.floor(rect.height)
-        );
-      }
-
-      $('#backdrop').css('background', 'rgba(0, 0, 0, 0.6)');
-    }
-
-    var qpmap = _Obj.unflatten(_.getQueryParams());
-    if (qpmap.error) {
-      errorHandler.call(this, qpmap);
-    }
-
-    if (qpmap.tab) {
-      this.switchTab(qpmap.tab);
-    }
-  },
-
   fetchFundAccounts: function() {
     return Payouts.fetchFundAccounts(this.get('contact_id'));
   },
 
   hideOverlayMessage: hideOverlayMessage,
+  errorHandler: errorHandler,
 };
 
 /*

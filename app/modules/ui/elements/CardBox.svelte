@@ -6,7 +6,7 @@
 
   // i18n
   import { locale } from 'svelte-i18n';
-  import { getMethodTitle } from 'i18n';
+  import { getRawMethodTitle } from 'i18n';
 
   // Utils imports
   import { getIcon as getNetworkIcon } from 'icons/network';
@@ -26,7 +26,7 @@
   function getCardCaption(issuer = '', type, last4, locale) {
     // HDFC Credit Card - 4321
     return (
-      issuer + ' ' + getMethodTitle(type + '_card', locale) + ' - ' + last4
+      issuer + ' ' + getRawMethodTitle(type + '_card', locale) + ' - ' + last4
     );
   }
 </script>

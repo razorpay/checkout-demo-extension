@@ -10,12 +10,12 @@ import {
   isDebitEMIEnabled,
 } from 'checkoutstore/methods';
 
-import { getRecurringMethods, isRecurring } from 'checkoutstore';
+import { getRecurringMethods, isIRCTC, isRecurring } from 'checkoutstore';
 import { generateTextFromList } from 'lib/utils';
 
 import {
   getMethodPrefix,
-  getMethodTitle,
+  getRawMethodTitle,
   getNetworkName,
   getPaylaterProviderName,
   getCardlessEmiProviderName,
@@ -191,6 +191,26 @@ function getMethodForPrefix(method) {
     default:
       return method;
   }
+}
+
+/**
+ * Returns the overridden method title for some specific merchants
+ * @param {string} method
+ * @param {string} locale
+ *
+ * @returns {string}
+ */
+function getMethodTitle(method, locale) {
+  if (isIRCTC()) {
+    if (method === 'card') {
+      method = 'irctc_card';
+    }
+    if (method === 'upi') {
+      method = 'irctc_upi';
+    }
+  }
+
+  return getRawMethodTitle(method, locale);
 }
 
 /**

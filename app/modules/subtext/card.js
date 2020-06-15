@@ -192,11 +192,14 @@ export function generateSubtextForRecurring({
   const { mastercard, visa, amex } = networks;
 
   const debitCardIssuers = generateTextFromList(_Obj.values(issuers), locale);
-  const creditCardsNetworks = generateTextForCardNetwork({
-    mastercard,
-    visa,
-    amex,
-  });
+  const creditCardsNetworks = generateTextForCardNetwork(
+    {
+      mastercard,
+      visa,
+      amex,
+    },
+    locale
+  );
 
   if (subscription) {
     const subscriptionText = 'Subscription payments are supported on';
