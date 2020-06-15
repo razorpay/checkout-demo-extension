@@ -33,7 +33,7 @@ function getInstrumentsFromApi(customer) {
       setInstrumentsForCustomer(customer, apiInstruments);
 
       resolve(getInstrumentsForCustomer(customer));
-    }, 300);
+    }, 0);
   });
 
   PREFERRED_INSTRUMENTS_CACHE[customer.contact] = promise;
