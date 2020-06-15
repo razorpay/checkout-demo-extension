@@ -26,19 +26,14 @@ export function setInstrumentsForCustomer(customer, instruments) {
 }
 
 function getInstrumentsFromApi(customer) {
-  const url = 'https://google.com/?q=p13n';
-
   const promise = new Promise(resolve => {
-    fetch({
-      url,
-      callback: function() {
-        const apiInstruments = [];
+    setTimeout(() => {
+      const apiInstruments = [];
 
-        setInstrumentsForCustomer(customer, apiInstruments);
+      setInstrumentsForCustomer(customer, apiInstruments);
 
-        resolve(getInstrumentsForCustomer(customer));
-      },
-    });
+      resolve(getInstrumentsForCustomer(customer));
+    }, 300);
   });
 
   PREFERRED_INSTRUMENTS_CACHE[customer.contact] = promise;
