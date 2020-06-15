@@ -439,7 +439,7 @@ export function getTranslatedInstrumentsForCustomerFromStorage(
 export function getTranslatedInstrumentsForCustomerFromApi(customer, extra) {
   return getInstrumentsForCustomerFromApi(customer, extra).then(instruments => {
     return (
-      _Arr.map(instruments, translateInstrumentToConfig) |> _Arr.filter(boolean)
+      _Arr.map(instruments, translateInstrumentToConfig) |> _Arr.filter(Boolean)
     );
   });
 }
