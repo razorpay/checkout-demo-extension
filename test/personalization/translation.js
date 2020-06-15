@@ -1,4 +1,5 @@
 import { translateInstrumentToConfig } from 'checkoutframe/personalization/translation';
+import { transformInstrumentToStorageFormat } from 'checkoutframe/personalization/api';
 
 test('Module: personalization', t => {
   test('translateInstrumentToConfig', t => {
@@ -169,6 +170,86 @@ test('Module: personalization', t => {
       t.end();
     });
 
+    t.end();
+  });
+  test('translate storage instrument to their api equivalent', t => {
+    test('transforms a wallet instrument correctly', t => {
+      const instrument = {
+        method: 'wallet',
+        instrument: 'payzapp',
+        score: 1,
+      };
+
+      const actual = transformInstrumentToStorageFormat(instrument);
+
+      t.equals(typeof actual, 'object', 'Returns an object');
+      t.equals(actual.method, 'wallet', 'Returns the correct method');
+      t.equals(actual.score, 1, 'Returns the correct score');
+      t.equals(actual.wallet, 'payzapp', 'Returns the correct wallet');
+      t.equals(
+        typeof actual.instrument,
+        'undefined',
+        'Prevents duplicate data'
+      );
+
+      t.end();
+    });
+    test('transforms a netbanking instrument correctly', t => {
+      const instrument = {
+        method: 'netbanking',
+        instrument: 'KKBK',
+        score: 1,
+      };
+
+      const actual = transformInstrumentToStorageFormat(instrument);
+
+      t.equals(typeof actual, 'object', 'Returns an object');
+      t.equals(actual.method, 'netbanking', 'Returns the correct method');
+      t.equals(actual.score, 1, 'Returns the correct score');
+      t.equals(actual.bank, 'KKBK', 'Returns the correct bank');
+      t.equals(
+        typeof actual.instrument,
+        'undefined',
+        'Prevents duplicate data'
+      );
+
+      t.end();
+    });
+    test('transforms a upi intent instrument correctly', t => {
+      const instrument = {
+        method: 'upi',
+        vpa: '@ybl',
+        score: 1,
+      };
+
+      const actual = transformInstrumentToStorageFormat(instrument);
+
+      t.equals(typeof actual, 'object', 'Returns an object');
+      t.equals(actual.method, 'upi', 'Returns the correct method');
+      t.equals(actual.score, 1, 'Returns the correct score');
+      t.equals(actual['_[flow]'], 'intent', 'Returns the correct flow');
+      t.equals(actual['upi_app'], 'com.phonepe.app', 'Returns the correct app');
+
+      t.end();
+    });
+    test('transforms a upi collect instrument correctly', t => {
+      const instrument = {
+        method: 'upi',
+        vpa: 'saranshgupta1995@ybl',
+        score: 1,
+      };
+
+      const actual = transformInstrumentToStorageFormat(instrument);
+
+      t.equals(typeof actual, 'object', 'Returns an object');
+      t.equals(actual.method, 'upi', 'Returns the correct method');
+      t.equals(actual.score, 1, 'Returns the correct score');
+      t.equals(actual['_[flow]'], 'directpay', 'Returns the correct flow');
+
+      t.end();
+    });
+
+    // TODO: add for card instrument once we have the correct response
     t.end();
   });
   t.end();
