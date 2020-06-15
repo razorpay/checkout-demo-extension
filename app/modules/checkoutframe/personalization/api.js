@@ -1,5 +1,6 @@
 import { VPA_REGEX } from 'common/constants';
 import { getUPIAppDataFromHandle } from 'common/upi';
+import { getUPIIntentApps } from 'checkoutstore/native';
 
 const PREFERRED_INSTRUMENTS_CACHE = {};
 
@@ -10,9 +11,11 @@ const PREFERRED_INSTRUMENTS_CACHE = {};
  *
  * @returns {Promise<Array<StorageInstrument>>}
  */
-export function setInstrumentsForCustomer(customer, instruments, upiApps) {
+export function setInstrumentsForCustomer(customer, instruments) {
   const transformedInstruments = _Arr.map(instruments, instrument =>
-    transformInstrumentToStorageFormat(instrument, { upiApps })
+    transformInstrumentToStorageFormat(instrument, {
+      upiApps: getUPIIntentApps().filtered,
+    })
   );
 
   PREFERRED_INSTRUMENTS_CACHE[customer.contact] = Promise.resolve(
