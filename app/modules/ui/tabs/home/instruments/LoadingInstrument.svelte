@@ -11,6 +11,7 @@
     overflow: hidden;
     position: relative;
     display: block;
+    background-color: #fafafa;
   }
 
   span::after {

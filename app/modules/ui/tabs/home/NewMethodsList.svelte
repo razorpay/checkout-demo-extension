@@ -56,6 +56,15 @@
   .border-list {
     margin-bottom: 24px;
   }
+
+  /* Add delay for staggering loaders */
+  .border-list > :global(.loading-instrument:nth-child(2n) span)::after {
+    animation-delay: 0.1s;
+    animation-fill-mode: both;
+  }
+  .border-list > :global(.loading-instrument:nth-child(3n) span)::after {
+    animation-delay: 0.2s;
+  }
 </style>
 
 {#each $blocks as block}
