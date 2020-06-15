@@ -4,6 +4,7 @@ import {
   register,
   init as initSvelteI18n,
 } from 'svelte-i18n';
+
 import en from './bundles/en';
 import { getSession } from '../sessionmanager';
 
@@ -50,10 +51,13 @@ function fetchBundle(locale) {
   });
 }
 
+export function addDefaultMessages() {
+  addMessages('en', en);
+}
+
 export function init() {
   // Add bundled messages
-  addMessages('en', en);
-  register('hi', () => fetchBundle('hi'));
+  addDefaultMessages();
 
   const session = getSession();
 
