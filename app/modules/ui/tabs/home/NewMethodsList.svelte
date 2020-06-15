@@ -1,6 +1,8 @@
 <script>
   // Svelte imports
   import { onDestroy } from 'svelte';
+  import { slide } from 'svelte/transition';
+  import { linear } from 'svelte/easing';
 
   // UI imports
   import Instrument from 'ui/tabs/home/instruments/Instrument.svelte';
@@ -64,13 +66,24 @@
   .border-list > :global(.loading-instrument:nth-child(3n) span)::after {
     animation-delay: 0.2s;
   }
+
+  .title {
+    margin-top: 0;
+  }
+
+  .methods-block + .methods-block {
+    margin-top: 28px;
+  }
 </style>
 
 {#each $blocks as block}
   {#if block.code === 'rzp.cluster'}
     <RazorpayCluster {block} on:selectMethod />
   {:else}
-    <div class="methods-block" data-block={block.code}>
+    <div
+      class="methods-block"
+      data-block={block.code}
+      out:slide|local={{ easing: linear, duration: 300 }}>
       <h3 class="title">{block.title || 'Available Payment Methods'}</h3>
       <div role="list" class="border-list">
         {#each block.instruments as instrument, index (instrument.id)}

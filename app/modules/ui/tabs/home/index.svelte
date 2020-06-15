@@ -701,6 +701,7 @@
   .home-methods {
     padding-left: 12px;
     padding-right: 12px;
+    margin-top: 28px;
   }
 
   .details-container {
