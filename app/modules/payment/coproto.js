@@ -17,7 +17,7 @@ export const processOtpResponse = function(response) {
   Track(this.r, 'otp_response', response);
   if (error) {
     if (error.action === 'RETRY') {
-      return this.emit('otp.required', strings.wrongOtp);
+      return this.emit('otp.required', 'incorrect_otp_retry');
     } else if (error.action === 'TOPUP') {
       return this.emit('wallet.topup', error.description);
     }

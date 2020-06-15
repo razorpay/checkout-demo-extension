@@ -7,6 +7,10 @@
   import Icon from 'ui/elements/Icon.svelte';
   import { getMiscIcon } from 'checkoutframe/icons';
 
+  // i18n
+  import { locale } from 'svelte-i18n';
+  import { formatTemplateWithLocale } from 'i18n';
+
   // Props
   export let visible = false;
   export let placeholder = 'Type to search';
@@ -190,7 +194,10 @@
           </div>
         {/each}
       {:else}
-        <div class="no-results">No results for "{query}"</div>
+        <!-- LABEL: No results for "{query}" -->
+        <div class="no-results">
+          {formatTemplateWithLocale('misc.search_no_results', { query }, $locale)}
+        </div>
       {/if}
     </div>
   </div>

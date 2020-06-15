@@ -7,6 +7,10 @@
   import { showCta } from 'checkoutstore/cta';
   import { methodInstrument } from 'checkoutstore/screens/home';
 
+  // i18n
+  import { getWalletName } from 'i18n';
+  import { locale } from 'svelte-i18n';
+
   // Utils imports
   import { getSession } from 'sessionmanager';
   import Analytics from 'analytics';
@@ -165,7 +169,7 @@
         slot="title"
         bind:this={walletReferences[wallet.code]}
         id={`wallet-radio-${wallet.code}`}>
-        <span class="title">{wallet.name}</span>
+        <span class="title">{getWalletName(wallet.code, $locale)}</span>
       </div>
       <div slot="body">
         {#if selectedWallet === wallet.code}

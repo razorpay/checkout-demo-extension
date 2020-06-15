@@ -1,4 +1,11 @@
 <script>
+  import { t } from 'svelte-i18n';
+  import {
+    AUTH_TYPE_HEADER,
+    AUTH_TYPE_OTP,
+    AUTH_TYPE_PIN,
+  } from 'ui/labels/card';
+
   export let value;
 </script>
 
@@ -23,7 +30,8 @@
 </style>
 
 <div class="flow-selection-container">
-  <label>Complete Payment Using</label>
+  <!-- LABEL: Complete Payment Using -->
+  <label>{$t(AUTH_TYPE_HEADER)}</label>
   <div class="flow input-radio">
     <input
       type="radio"
@@ -33,7 +41,8 @@
       bind:group={value} />
     <label for="flow-3ds">
       <div class="radio-display" />
-      <div class="label-content">OTP / Password</div>
+      <!-- LABEL: OTP / Password -->
+      <div class="label-content">{$t(AUTH_TYPE_OTP)}</div>
     </label>
   </div>
   <div class="flow input-radio">
@@ -45,7 +54,8 @@
       bind:group={value} />
     <label for="flow-pin">
       <div class="radio-display" />
-      <div class="label-content">ATM PIN</div>
+      <!-- LABEL: ATM PIN -->
+      <div class="label-content">{$t(AUTH_TYPE_PIN)}</div>
     </label>
   </div>
 </div>

@@ -22,12 +22,14 @@ import NoCostExplainer from 'ui/components/offers/NoCostExplainer.svelte';
 import emiPlansView from 'checkoutframe/emiplans';
 import otpView from 'checkoutframe/otp';
 import languageSelectionView from 'ui/elements/LanguageSelection.svelte';
+import * as I18n from 'i18n';
+import { init as initI18n } from 'i18n/init';
+import UpiCancelReasonPicker from 'ui/components/UpiCancelReasonPicker.svelte';
 import * as Curtain from 'components/curtain';
 import { setShieldParams } from 'payment/validator';
 import * as P13n from 'checkoutframe/personalization';
 import { commonBanks, getFullBankLogo } from 'common/bank';
 import * as CountryCodesUtil from 'common/countrycodesutil';
-import { init as initI18n } from 'i18n';
 
 /* Required for merchant.js migration */
 import * as Constants from 'common/constants';
@@ -71,6 +73,7 @@ import EmandateTab from 'ui/tabs/emandate/index.svelte';
 import NachScreen from 'ui/tabs/nach/index.svelte';
 import CardTab from 'ui/tabs/card/index.svelte';
 import WalletTab from 'ui/tabs/wallets/index.svelte';
+import TopBar from 'ui/components/Topbar.svelte';
 
 import PayoutsInstruments from 'ui/tabs/payout/payout-instruments.svelte';
 import PayoutAccount from 'ui/tabs/payout/payout-account.svelte';
@@ -84,7 +87,6 @@ import { get as storeGetter } from 'svelte/store';
 import * as Experiments from 'experiments';
 
 import * as NBHandlers from 'handlers/netbanking';
-import * as UserHandlers from 'handlers/user';
 
 import * as Instruments from 'configurability/instruments';
 import { getInstrumentMeta } from 'ui/tabs/home/instruments';
@@ -167,8 +169,10 @@ export default {
 
   otpView,
   languageSelectionView,
+  UpiCancelReasonPicker,
   PayLaterView,
   Curtain,
+  TopBar,
   commonBanks,
   timer: _.timer,
   QRScreen,
@@ -196,7 +200,7 @@ export default {
   _,
 
   NBHandlers,
-  UserHandlers,
 
   initI18n,
+  I18n,
 };

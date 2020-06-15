@@ -20,6 +20,7 @@ import {
 
 import { getEligibleProvidersBasedOnMinAmount } from 'common/cardlessemi';
 import { getProvider } from 'common/paylater';
+import { findCodeByNetworkName } from 'common/card';
 
 import { wallets, getSortedWallets } from 'common/wallet';
 import { extendConfig } from 'common/cardlessemi';
@@ -229,6 +230,54 @@ export function isDebitCardEnabled() {
   return isRecurring()
     ? getRecurringMethods().card?.debit
     : getMerchantMethods().debit_card;
+}
+
+export function getCardTypesForRecurring() {
+  if (isRecurring()) {
+    return getRecurringMethods().card;
+  }
+}
+
+export function getCardNetworksForRecurring() {
+  // "recurring": {
+  //   "card": {
+  //     "credit": ["MasterCard", "Visa", "American Express"]
+  //   }
+  // }
+  if (isRecurring()) {
+    // Using only credit cards as debit cards are only supported on some banks.
+    const networks = getRecurringMethods().card?.credit;
+    if (_.isArray(networks) && networks.length) {
+      // Example: "American Express" to "amex"
+      const codes = _Arr.map(networks, findCodeByNetworkName);
+
+      // ["mastercard", "visa"] to { mastercard: true, visa: true }
+      return _Arr.reduce(
+        codes,
+        (acc, code) => {
+          acc[code] = true;
+          return acc;
+        },
+        {}
+      );
+    }
+  }
+}
+
+export function getCardIssuersForRecurring() {
+  // "recurring": {
+  //   "card": {
+  //     "debit": {
+  //       "CITI": "CITI Bank",
+  //       "CNRB": "Canara Bank",
+  //       "ICIC": "ICICI Bank",
+  //       "KKBK": "Kotak Mahindra Bank"
+  //     }
+  //   }
+  // }
+  if (isRecurring()) {
+    return getRecurringMethods().card?.debit;
+  }
 }
 
 // additional checks for each sub-method based on UPI
