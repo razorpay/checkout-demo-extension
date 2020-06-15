@@ -138,7 +138,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
 function makeLoaderInstruments(howMany) {
   const loaderInstrument = {
     _type: 'instrument',
-    _loader: true,
+    _loading: true,
   };
 
   let instruments = [];
@@ -218,13 +218,13 @@ export function setBlocks(
         0,
         MAX_PREFERRED_INSTRUMENTS
       );
-    }
 
     // Convert preferred instruments to ungrouped format
     preferredBlock.instruments = _Arr.map(
       preferredBlock.instruments,
       instrument => getIndividualInstruments(instrument, customer)
     );
+    }
 
     allBlocks = _Arr.mergeWith([preferredBlock], allBlocks);
   }

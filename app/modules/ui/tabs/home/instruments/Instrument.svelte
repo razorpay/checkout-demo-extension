@@ -12,9 +12,13 @@
 
   // Props
   export let instrument;
+
+  const isInstrumentLoading = instrument._loading;
 </script>
 
-{#if isInstrumentGrouped(instrument)}
+{#if isInstrumentLoading}
+  <div>Loading instrument</div>
+{:else if isInstrumentGrouped(instrument)}
   <MethodInstrument {instrument} on:click on:selectMethod />
 {:else if isSavedCardInstrument(instrument)}
   <SavedCardInstrument {instrument} on:click />
