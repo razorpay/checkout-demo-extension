@@ -31,7 +31,8 @@
       #fbfbfb 66.66%,
       #fbfbfb 100%
     );
-    animation: skeleton 2s ease-in-out infinite;
+    animation: instrument-skeleton 2s ease-in-out infinite;
+    animation-fill-mode: both;
   }
 </style>
 
