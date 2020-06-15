@@ -32,6 +32,23 @@
 
   import { getOption } from 'checkoutstore';
 
+  // i18n
+  import { locale, t } from 'svelte-i18n';
+  import { getLongBankName } from 'i18n';
+
+  import {
+    CHANGE_BANK_BTN,
+    AUTH_TYPE_HEADER,
+    AUTH_TYPE_DEBIT_TITLE,
+    AUTH_TYPE_DEBIT_DESCRIPTION,
+    AUTH_TYPE_NETBANKING_TITLE,
+    AUTH_TYPE_NETBANKING_DESCRIPTION,
+    ACCOUNT_TYPE_CURRENT,
+    ACCOUNT_TYPE_SAVINGS,
+    ACCOUNT_TYPE_LABEL,
+    ACCOUNT_TYPE_HELP,
+  } from 'ui/labels/emandate';
+
   // Utils
   import { getBankLogo } from 'common/bank';
   import Analytics from 'analytics';
@@ -62,11 +79,11 @@
     DEBIT_CARD: 'debitcard',
   };
 
-  const accountTexts = {
-    savings: 'Savings Account',
-    current: 'Current Account',
+  const accountTextLabels = {
+    savings: ACCOUNT_TYPE_SAVINGS,
+    current: ACCOUNT_TYPE_CURRENT,
   };
-  const accountTypes = _Obj.keys(accountTexts);
+  const accountTypes = _Obj.keys(accountTextLabels);
 
   if (!_Arr.contains(accountTypes, prefilledAccountType)) {
     prefilledAccountType = false;
@@ -79,13 +96,8 @@
   $accountType = prefilledAccountType;
   $authType = prefilledAuthType;
 
-  // Set tab titles
-  // TODO: move current tab title to store and fix this.
-  session.tab_titles['netbanking'] = 'Bank Account';
-
-  function getBankName(bankCode) {
-    return (banks[bankCode] || {}).name || '';
-  }
+  // Set tab title overrides
+  session.topBar.setTitleOverride('netbanking', 'text', 'emandate_account');
 
   function setInitialState() {
     if (isPrefilledBankAvailable) {
@@ -184,7 +196,7 @@
 
   let bankName;
   $: {
-    bankName = getBankName($selectedBank);
+    bankName = getLongBankName($selectedBank, $locale);
   }
 
   let active = false;
@@ -388,12 +400,14 @@
             <div class="bank-name">{bankName}</div>
             {#if !prefilledBank}
               <div class="btn-change-bank" on:click={resetBank}>
-                Change Bank
+                <!-- LABEL: Change Bank -->
+                {$t(CHANGE_BANK_BTN)}
               </div>
             {/if}
           </div>
 
-          <div class="legend">Authenticate using</div>
+          <!-- LABEL: Authenticate using -->
+          <div class="legend">{$t(AUTH_TYPE_HEADER)}</div>
           <div id="emandate-options">
             {#if isEMandateAuthTypeEnabled($selectedBank, AuthTypes.DEBIT_CARD)}
               <div
@@ -403,9 +417,11 @@
                   <i class="theme">
                     {@html icons.card}
                   </i>
-                  Debit Card
+                  <!-- LABEL: Debit Card -->
+                  {$t(AUTH_TYPE_DEBIT_TITLE)}
                   <span class="desc">
-                    via Bank Account and Debit Card details
+                    <!-- LABEL: via Bank Account and Debit Card details -->
+                    {$t(AUTH_TYPE_DEBIT_DESCRIPTION)}
                   </span>
                 </label>
               </div>
@@ -418,9 +434,11 @@
                   <i class="theme">
                     {@html icons.netbanking}
                   </i>
-                  Netbanking
+                  <!-- LABEL: Netbanking -->
+                  {$t(AUTH_TYPE_NETBANKING_TITLE)}
                   <span class="desc">
-                    via Bank Account and Netbanking details
+                    <!-- LABEL: via Bank Account and Netbanking details -->
+                    {$t(AUTH_TYPE_NETBANKING_DESCRIPTION)}
                   </span>
                 </label>
               </div>
@@ -451,7 +469,8 @@
           <div class="elem-wrap">
             <div class="elem select" class:readonly={prefilledAccountType}>
               <i class="select-arrow"></i>
-              <div class="help">Please select a bank account type</div>
+              <!-- LABEL: Please select a bank account type -->
+              <div class="help">{$t(ACCOUNT_TYPE_HELP)}</div>
               <select
                 name="bank_account[account_type]"
                 required
@@ -459,12 +478,13 @@
                 bind:value={$accountType}>
                 {#if prefilledAccountType}
                   <option value={prefilledAccountType}>
-                    {accountTexts[prefilledAccountType]}
+                    {$t(accountTextLabels[prefilledAccountType])}
                   </option>
                 {:else}
-                  <option value="">Type of Bank Account</option>
+                  <!-- LABEL: Type of Bank Account -->
+                  <option value="">{$t(ACCOUNT_TYPE_LABEL)}</option>
                   {#each accountTypes as type (type)}
-                    <option value={type}>{accountTexts[type]}</option>
+                    <option value={type}>{$t(accountTextLabels[type])}</option>
                   {/each}
                 {/if}
               </select>

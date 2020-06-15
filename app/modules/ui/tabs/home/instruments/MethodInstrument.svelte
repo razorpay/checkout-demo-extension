@@ -8,6 +8,7 @@
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
   import { getSubtextForInstrument } from 'subtext';
   import { getThemeMeta } from 'checkoutstore/theme';
+  import { formatTemplateWithLocale } from 'i18n';
 
   // Store imports
   import {
@@ -15,13 +16,28 @@
     methodInstrument,
   } from 'checkoutstore/screens/home';
 
+  // i18n
+  import { locale } from 'svelte-i18n';
+  import { TITLE_GENERIC } from 'ui/labels/methods';
+
   // Props
   export let instrument = {};
   export let name = 'instrument';
 
   const method = instrument.method;
-  const methodName = getMethodNameForPaymentOption(method, { instrument });
-  const title = `Pay using ${methodName}`;
+
+  let methodName;
+  $: methodName = getMethodNameForPaymentOption(method, $locale, {
+    instrument,
+  });
+
+  let title;
+  $: title = formatTemplateWithLocale(
+    TITLE_GENERIC, // LABEL: Pay using {name}
+    { name: methodName },
+    $locale
+  );
+
   const id = instrument.id;
   const subtext = getSubtextForInstrument(instrument);
 

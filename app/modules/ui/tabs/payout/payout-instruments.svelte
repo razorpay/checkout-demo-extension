@@ -12,6 +12,23 @@
   import Tab from 'ui/tabs/Tab.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
 
+  // i18n
+  import { t, locale } from 'svelte-i18n';
+  import { formatTemplateWithLocale } from 'i18n';
+
+  import {
+    ADD_BANK_ACTION,
+    ADD_BANK_BUTTON_DESCRIPTION,
+    ADD_BANK_BUTTON_TITLE,
+    ADD_UPI_ACTION,
+    ADD_UPI_BUTTON_DESCRIPTION,
+    ADD_UPI_BUTTON_TITLE,
+    SELECT_ACCOUNT_DESCRIPTION,
+    SELECT_ACCOUNT_TITLE,
+    SELECT_BANK_TITLE,
+    SELECT_UPI_TITLE,
+  } from 'ui/labels/payouts';
+
   // Props
   export let upiAccounts;
   export let bankAccounts;
@@ -154,8 +171,12 @@
 <Tab method="payouts" overrideMethodCheck={true} pad={false}>
   <Screen>
     <div class="title">
-      <h3>Select an account</h3>
-      <p>{amount} will be credited to your specified account.</p>
+      <!-- LABEL: Select an account -->
+      <h3>{$t(SELECT_ACCOUNT_TITLE)}</h3>
+      <!-- LABEL: {amount} will be credited to your specified account. -->
+      <p>
+        {formatTemplateWithLocale(SELECT_ACCOUNT_DESCRIPTION, { amount }, $locale)}
+      </p>
     </div>
 
     {#if upiAccountsAvailable}
@@ -164,7 +185,8 @@
           <div class="icon-left">
             <Icon icon={themeMeta.icons['upi']} alt="UPI" />
           </div>
-          <span class="header-text">Select a UPI ID</span>
+          <!-- LABEL: Select a UPI ID -->
+          <span class="header-text">{$t(SELECT_UPI_TITLE)}</span>
         </div>
         <div class="options">
           {#each upiAccounts as account (account.id)}
@@ -179,7 +201,8 @@
             class="instrument-add option next-option secondary-color"
             on:click={() => dispatch('add', { method: 'upi' })}>
             <div class="icon icon-left icon-add">+</div>
-            Add UPI ID
+            <!-- LABEL: Add UPI ID -->
+            {$t(ADD_UPI_ACTION)}
           </div>
         </div>
       </div>
@@ -191,7 +214,8 @@
           <div class="icon-left ref-nbicon">
             <Icon icon={themeMeta.icons['netbanking']} alt="Netbanking" />
           </div>
-          <span class="header-text">Select a Bank Account</span>
+          <!-- LABEL: Select a Bank Account -->
+          <span class="header-text">{$t(SELECT_BANK_TITLE)}</span>
         </div>
         <div class="options">
           {#each bankAccounts as account (account.id)}
@@ -211,7 +235,8 @@
             class="instrument-add option next-option secondary-color"
             on:click={() => dispatch('add', { method: 'bank' })}>
             <div class="icon icon-left icon-add">+</div>
-            Add Bank Account
+            <!-- LABEL: Add Bank Account -->
+            {$t(ADD_BANK_ACTION)}
           </div>
         </div>
 
@@ -220,15 +245,16 @@
 
     {#if !upiAccountsAvailable}
       <div class="options add-option">
-
         <NextOption
           icon={themeMeta.icons.upi}
           tabindex="0"
           attributes={{ role: 'button', 'aria-label': 'Add a UPI ID' }}
           classes={['secondary-color']}
           on:select={() => dispatch('add', { method: 'upi' })}>
-          <div>UPI</div>
-          <div class="desc">Add a UPI ID (BHIM, PhonePe and more)</div>
+          <!-- LABEL: UPI -->
+          <div>{$t(ADD_UPI_BUTTON_TITLE)}</div>
+          <!-- LABEL: Add a UPI ID (BHIM, PhonePe and more) -->
+          <div class="desc">{$t(ADD_UPI_BUTTON_DESCRIPTION)}</div>
         </NextOption>
 
       </div>
@@ -242,8 +268,10 @@
           attributes={{ role: 'button', 'aria-label': 'Add a UPI ID' }}
           classes={['secondary-color']}
           on:select={() => dispatch('add', { method: 'bank' })}>
+          <!-- LABEL: BANK -->
           <div>BANK</div>
-          <div class="desc">Add a Bank Account</div>
+          <!-- LABEL: Add a Bank Account -->
+          <div class="desc">{$t(ADD_BANK_BUTTON_DESCRIPTION)}</div>
         </NextOption>
       </div>
     {/if}
