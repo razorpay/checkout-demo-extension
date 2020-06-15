@@ -9,6 +9,7 @@
   import MethodInstrument from './MethodInstrument.svelte';
   import RadioInstrument from './RadioInstrument.svelte';
   import SavedCardInstrument from './SavedCardInstrument.svelte';
+  import LoadingInstrument from './LoadingInstrument.svelte';
 
   // Props
   export let instrument;
@@ -17,7 +18,7 @@
 </script>
 
 {#if isInstrumentLoading}
-  <div>Loading instrument</div>
+  <LoadingInstrument />
 {:else if isInstrumentGrouped(instrument)}
   <MethodInstrument {instrument} on:click on:selectMethod />
 {:else if isSavedCardInstrument(instrument)}
