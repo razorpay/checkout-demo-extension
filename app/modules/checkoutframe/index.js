@@ -353,18 +353,12 @@ function updateAnalytics(preferences) {
 }
 
 function updatePreferredMethods(preferences) {
-  if (!preferences.customer) {
-    return;
+  if (preferences.preferred_methods) {
+    setInstrumentsForCustomer(
+      preferences.customer,
+      preferences.preferred_methods
+    );
   }
-
-  if (!preferences.preferred_methods) {
-    return;
-  }
-
-  setInstrumentsForCustomer(
-    preferences.customer,
-    preferences.preferred_methods
-  );
 }
 
 /* expose handleMessage to window for our Mobile SDKs */

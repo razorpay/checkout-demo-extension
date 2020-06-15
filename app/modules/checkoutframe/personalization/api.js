@@ -1,7 +1,8 @@
 import { VPA_REGEX } from 'common/constants';
 import { getUPIAppDataFromHandle } from 'common/upi';
+import { getUPIIntentApps } from 'checkoutstore/native';
 
-const PREFERRED_INSTRUMENTS = {};
+const PREFERRED_INSTRUMENTS_CACHE = {};
 
 /**
  * Sets instruments for customer
@@ -10,14 +11,34 @@ const PREFERRED_INSTRUMENTS = {};
  *
  * @returns {Promise<Array<StorageInstrument>>}
  */
-export function setInstrumentsForCustomer(customer, instruments, upiApps) {
+export function setInstrumentsForCustomer(customer, instruments) {
   const transformedInstruments = _Arr.map(instruments, instrument =>
-    transformInstrumentToStorageFormat(instrument, { upiApps })
+    transformInstrumentToStorageFormat(instrument, {
+      upiApps: getUPIIntentApps().filtered,
+    })
   );
 
-  PREFERRED_INSTRUMENTS[customer.contact] = transformedInstruments;
+  PREFERRED_INSTRUMENTS_CACHE[customer.contact] = Promise.resolve(
+    transformedInstruments
+  );
 
   return getInstrumentsForCustomer(customer);
+}
+
+function getInstrumentsFromApi(customer) {
+  const promise = new Promise(resolve => {
+    setTimeout(() => {
+      const apiInstruments = [];
+
+      setInstrumentsForCustomer(customer, apiInstruments);
+
+      resolve(getInstrumentsForCustomer(customer));
+    }, 300);
+  });
+
+  PREFERRED_INSTRUMENTS_CACHE[customer.contact] = promise;
+
+  return promise;
 }
 
 /**
@@ -27,7 +48,13 @@ export function setInstrumentsForCustomer(customer, instruments, upiApps) {
  * @returns {Promise<Array<StorageInstrument>>}
  */
 export function getInstrumentsForCustomer(customer) {
-  return Promise.resolve(PREFERRED_INSTRUMENTS[customer.contact] || []);
+  const cached = PREFERRED_INSTRUMENTS_CACHE[customer.contact];
+
+  if (cached) {
+    return cached;
+  } else {
+    return getInstrumentsFromApi(customer);
+  }
 }
 
 const API_INSTRUMENT_PAYMENT_ADDONS = {

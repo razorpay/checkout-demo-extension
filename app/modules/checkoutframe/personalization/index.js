@@ -13,6 +13,7 @@ import {
 import { extendInstruments } from './extend';
 import { translateInstrumentToConfig } from './translation';
 import { getPreferredApiInstruments } from 'checkoutstore';
+import { getInstrumentsForCustomer as getInstrumentsForCustomerFromApi } from './api';
 
 /* halflife for timestamp, 5 days in ms */
 const TS_HALFLIFE = Math.log(2) / (5 * 86400000);
@@ -27,8 +28,6 @@ const INSTRUMENT_PROPS = {
   upi: ['_[flow]', 'vpa', 'upi_app', '_[upiqr]', 'token'],
   paypal: [],
 };
-
-const p13nAPIInstruments = {};
 
 /**
  * Returns extracted details for p13n
@@ -427,28 +426,6 @@ export function getTranslatedInstrumentsForCustomerFromStorage(
   return translatedInstruments;
 }
 
-function getAPIInstrumentsFromCache(contact) {
-  const url = 'https://jsonplaceholder.typicode.com/todos/1';
-
-  if (p13nAPIInstruments[contact]) {
-    return p13nAPIInstruments[contact];
-  }
-
-  p13nAPIInstruments[contact] = new Promise(resolve => {
-    fetch({
-      url,
-      callback: function() {
-        const apiInstruments = [];
-
-        p13nAPIInstruments[contact] = apiInstruments;
-
-        resolve(apiInstruments);
-      },
-    });
-  });
-  return p13nAPIInstruments[contact];
-}
-
 /**
  * Returns the list of preferred payment modes for the user in a sorted order,
  * but translated to the Payment Method Configurability spec.
@@ -460,15 +437,11 @@ function getAPIInstrumentsFromCache(contact) {
  * @returns {Promise<Array<Instrument>>}
  */
 export function getTranslatedInstrumentsForCustomerFromApi(customer, extra) {
-  if (!customer.logged) {
-    const { contact } = customer;
-    return getAPIInstrumentsFromCache(contact);
-  } else {
-    const instruments = getInstrumentsForCustomer(customer, extra, 'api');
-    return Promise.resolve(
+  return getInstrumentsForCustomerFromApi(customer, extra).then(instruments => {
+    return (
       _Arr.map(instruments, translateInstrumentToConfig) |> _Arr.filter(Boolean)
     );
-  }
+  });
 }
 
 /**
