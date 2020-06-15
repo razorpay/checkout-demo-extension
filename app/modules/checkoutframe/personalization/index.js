@@ -441,7 +441,12 @@ export function getTranslatedInstrumentsForCustomerFromApi(customer, extra) {
   if (!customer.logged) {
     const { contact } = customer;
     const url = 'https://jsonplaceholder.typicode.com/todos/1';
-    return new Promise(resolve => {
+
+    if (p13nAPIInstruments[contact]) {
+      return p13nAPIInstruments[contact];
+    }
+
+    p13nAPIInstruments[contact] = new Promise(resolve => {
       if (p13nAPIInstruments[contact] && p13nAPIInstruments[contact] !== null) {
         resolve(p13nAPIInstruments[contact]);
         return;
@@ -451,7 +456,13 @@ export function getTranslatedInstrumentsForCustomerFromApi(customer, extra) {
         fetch({
           url,
           callback: function() {
-            const apiInstruments = [];
+            const apiInstruments = [
+              {
+                method: 'upi',
+                vpa: 'saranshgupta1995@okhdfcbank',
+                score: 1,
+              },
+            ];
 
             p13nAPIInstruments[contact] = apiInstruments;
 
@@ -459,9 +470,9 @@ export function getTranslatedInstrumentsForCustomerFromApi(customer, extra) {
           },
         });
       }
-
-      p13nAPIInstruments[contact] = null;
     });
+
+    return p13nAPIInstruments[contact];
   } else {
     const instruments = getInstrumentsForCustomer(customer, extra, 'api');
     return Promise.resolve(
