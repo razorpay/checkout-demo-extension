@@ -293,12 +293,16 @@
     }
   }
 
-  function updateBlocks({ preferredInstruments = [] } = {}) {
+  function updateBlocks({
+    preferredInstruments = [],
+    showPreferredLoader = false,
+  } = {}) {
     const isPersonalizationEnabled = shouldUsePersonalization();
     const merchantConfig = getMerchantConfig();
 
     const blocksThatWereSet = setBlocks(
       {
+        showPreferredLoader,
         preferred: preferredInstruments,
         merchantConfig: merchantConfig.config,
         configSource: merchantConfig.sources,
@@ -348,7 +352,11 @@
     }
   }
 
-  onMount(updateBlocks);
+  onMount(() => {
+    updateBlocks({
+      showPreferredLoader: true,
+    });
+  });
 
   $: {
     const loggedIn = _Obj.getSafely($customer, 'logged');
