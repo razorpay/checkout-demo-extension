@@ -11,7 +11,12 @@
 
   span {
     width: 100%;
-    height: 16px;
+
+    /* Fall-back for IE */
+    height: 22px;
+    /* 22px is the image height. 1.25 is the line-height of text. */
+    height: max(22px, 1.25rem);
+
     overflow: hidden;
     position: relative;
     display: block;
