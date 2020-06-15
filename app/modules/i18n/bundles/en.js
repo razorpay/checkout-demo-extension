@@ -591,6 +591,7 @@ export default {
   },
   qr: {
     generating_label: 'Generating QR Code...',
+    payment_status_checking: 'Checking payment status...',
     scan_on_phone:
       'Scan the QR using any UPI app on your phone like BHIM, PhonePe, Google Pay etc.',
     retry: 'Retry',
@@ -624,6 +625,13 @@ export default {
       'Please ensure the same number is linked to the Google Pay account.',
     omni_verifying_phone: 'Verifying mobile number with Google Pay...',
     verifying_vpa_info: 'Verifying your VPA',
+    invalid_vpa_default_message:
+      'Invalid VPA, please try again with correct VPA',
+    intent_no_apps_error:
+      'No UPI App on this device. Select other UPI option to proceed.',
+    intent_select_app: 'Select UPI App in your device',
+    intent_accept_request:
+      "Please accept the request from Razorpay's VPA on your UPI app",
     cancel_reason_title: 'Please give us a reason before we cancel the payment',
     cancel_reason_collect_not_received: 'Did not receive collect request',
     cancel_reason_failed_in_app: 'Payment failed in UPI app',
@@ -717,6 +725,9 @@ export default {
     processing: 'Processing...',
     payment_processing: 'Your payment is being processed',
     payment_incomplete: 'Payment did not complete.',
+    payment_canceled: 'Payment cancelled',
+    payment_waiting_confirmation: 'Waiting for payment confirmation.',
+    error_handling_request: 'There was an error in handling your request.',
     payment_timeout: 'Payment did not complete on time',
     redirecting_bank: 'Redirecting to Bank page',
     acs_load_delay: 'Seems like your bank page is taking time to load.',

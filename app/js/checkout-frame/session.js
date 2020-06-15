@@ -529,9 +529,12 @@ function errorHandler(response) {
     }
   }
 
-  if (this.tab || message !== discreet.cancelMsg) {
+  var locale = I18n.getCurrentLocale();
+  var cancelMsg = I18n.formatMessageWithLocale('misc.payment_canceled', locale);
+  if (this.tab || message !== cancelMsg) {
     this.showLoadError(
-      message || 'There was an error in handling your request',
+      message ||
+        I18n.formatMessageWithLocale('misc.error_handling_request', locale),
       true
     );
   }
@@ -541,6 +544,7 @@ function errorHandler(response) {
 
 /* bound with session */
 function cancelHandler(response) {
+  var locale = I18n.getCurrentLocale();
   if (!this.payload) {
     return;
   }
@@ -553,7 +557,10 @@ function cancelHandler(response) {
       discreet.UPIUtils.trackUPIIntentFailure(this.r._payment.upi_app);
     }
 
-    this.showLoadError('Payment did not complete.', true);
+    this.showLoadError(
+      I18n.formatMessageWithLocale('misc.payment_incomplete', locale),
+      true
+    );
   } else if (
     /^(card|emi)$/.test(this.payload.method) &&
     this.screen &&
@@ -707,10 +714,14 @@ function askOTP(view, textView, shouldLimitResend, templateData) {
                 thisSession.hideTimer();
                 thisSession.back(true);
                 setTimeout(function() {
+                  var locale = I18n.getCurrentLocale();
                   Analytics.track('native_otp:timeout');
                   thisSession.showLoadError(
-                    'Payment was not completed on time',
-                    1
+                    I18n.formatMessageWithLocale(
+                      'misc.payment_timeout',
+                      locale
+                    ),
+                    true
                   );
                 }, 300);
               }
@@ -1098,13 +1109,17 @@ Session.prototype = {
         });
 
         var abortPaymentOnUPIIntentFailure = function() {
+          var locale = I18n.getCurrentLocale();
           self.ajax.abort();
 
           if (self.r._payment && self.r._payment.upi_app) {
             discreet.UPIUtils.trackUPIIntentFailure(self.r._payment.upi_app);
           }
 
-          self.showLoadError('Payment did not complete.', true);
+          self.showLoadError(
+            I18n.formatMessageWithLocale('misc.payment_incomplete', locale),
+            true
+          );
           self.clearRequest(discreet.UPIUtils.upiBackCancel);
         };
 
@@ -2132,13 +2147,16 @@ Session.prototype = {
   },
 
   secAction: function() {
+    var locale = I18n.getCurrentLocale();
     if (this.headless && this.r._payment) {
       Analytics.track('native_otp:gotobank', {
         type: AnalyticsTypes.BEHAV,
         immediately: true,
       });
       this.hideTimer();
-      this.showLoadError('Waiting for payment to complete on bank page');
+      this.showLoadError(
+        I18n.formatMessageWithLocale('misc.payment_waiting_on_bank', locale)
+      );
       return this.r._payment.gotoBank();
     }
     var payload = this.payload;
@@ -4073,8 +4091,15 @@ Session.prototype = {
         // also without this, cardsaving is triggered before API returning unsupported card error
         if (!this.svelteCardTab.isOnSavedCardsScreen()) {
           var cardType = discreet.storeGetter(CardScreenStore.cardType);
+          var locale = I18n.getCurrentLocale();
           if (!MethodStore.isAMEXEnabled() && cardType === 'amex') {
-            return this.showLoadError('AMEX cards are not supported', true);
+            return this.showLoadError(
+              I18n.formatMessageWithLocale(
+                'card.card_number_help_amex',
+                locale
+              ),
+              true
+            );
           }
         } else if (!data['card[cvv]']) {
           var checkedCard = $('.saved-card.checked');
@@ -4244,10 +4269,15 @@ Session.prototype = {
         }, 200);
       })
       .catch(function(vpaValidationError) {
+        var locale = I18n.getCurrentLocale();
+        var defaultErrorMessage = I18n.formatMessageWithLocale(
+          'upi.invalid_vpa_default_message',
+          locale
+        );
         var vpaValidationDescription = _Obj.getSafely(
           vpaValidationError,
           'error.description',
-          'Invalid VPA, please try again with correct VPA'
+          defaultErrorMessage
         );
 
         self.showLoadError(vpaValidationDescription, true);
@@ -4255,6 +4285,7 @@ Session.prototype = {
   },
 
   submit: function(props) {
+    var locale = I18n.getCurrentLocale();
     if (!props) {
       props = {};
     }
@@ -4683,7 +4714,6 @@ Session.prototype = {
         allowSkip: false,
       });
       this.topBar.setTitleOverride('otp', 'image', walletObj.logo);
-      var locale = I18n.getCurrentLocale();
       this.commenceOTP('wallet_sending', 'wallet_enter', {
         wallet: I18n.getWalletName(walletObj.code, locale),
       });
@@ -4694,7 +4724,9 @@ Session.prototype = {
         this.showLoadError();
       }
     } else {
-      this.showLoadError('Processing...');
+      this.showLoadError(
+        I18n.formatMessageWithLocale('misc.processing', locale)
+      );
     }
 
     if (wallet === 'freecharge') {
@@ -4856,8 +4888,9 @@ Session.prototype = {
       sub_link.html('Cancel Payment');
 
       this.r.on('payment.upi.noapp', function(data) {
+        var locale = I18n.getCurrentLocale();
         that.showLoadError(
-          'No UPI App on this device. Select other UPI option to proceed.',
+          I18n.formatMessageWithLocale('upi.intent_no_apps_error', locale),
           true
         );
 
@@ -4865,7 +4898,11 @@ Session.prototype = {
       });
 
       this.r.on('payment.upi.selectapp', function(data) {
-        that.showLoadError('Select UPI App in your device', false);
+        var locale = I18n.getCurrentLocale();
+        that.showLoadError(
+          I18n.formatMessageWithLocale('upi.intent_select_app', locale),
+          false
+        );
       });
 
       this.r.on('payment.upi.coproto_response', function(response) {
@@ -4876,21 +4913,29 @@ Session.prototype = {
       });
 
       this.r.on('payment.upi.pending', function(data) {
+        var locale = I18n.getCurrentLocale();
         if (data && data.flow === 'upi-intent') {
-          return that.showLoadError('Waiting for payment confirmation.');
+          return that.showLoadError(
+            I18n.formatMessageWithLocale(
+              'misc.payment_waiting_confirmation',
+              locale
+            )
+          );
         }
 
         that.showLoadError(
-          "Please accept the request from Razorpay's VPA on your UPI app"
+          I18n.formatMessageWithLocale('upi.intent_accept_request', locale)
         );
       });
     } else {
       if (!this.headless) {
         sub_link.html('Go to payment');
-        this.r.on(
-          'payment.cancel',
-          bind('showLoadError', this, discreet.cancelMsg, true)
-        );
+        this.r.on('payment.cancel', function() {
+          that.showLoadError(
+            I18n.formatMessageWithLocale('misc.payment_canceled', locale),
+            true
+          );
+        });
       }
     }
   },
