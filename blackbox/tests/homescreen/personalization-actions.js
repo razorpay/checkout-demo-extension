@@ -71,7 +71,7 @@ async function selectPersonalizationPaymentMethod(context, optionNumber) {
 
 async function receiveApiInstruments(context) {
   const req = await context.expectRequest();
-  expect(req.url).toContain('https://jsonplaceholder.typicode.com/todos/1');
+  expect(req.url).toContain('https://google.com/?q=p13n');
   await context.respondJSON({});
 }
 

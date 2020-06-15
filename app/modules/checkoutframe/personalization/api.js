@@ -26,7 +26,7 @@ export function setInstrumentsForCustomer(customer, instruments) {
 }
 
 function getInstrumentsFromApi(customer) {
-  const url = 'https://jsonplaceholder.typicode.com/todos/1';
+  const url = 'https://google.com/?q=p13n';
 
   const promise = new Promise(resolve => {
     fetch({
