@@ -1,6 +1,6 @@
 import { generateTextFromList } from 'lib/utils';
-import { getCommonBankName } from 'common/bank';
 import { getBanks } from 'checkoutstore';
+import { getShortBankName } from 'i18n';
 
 /**
  * Generates subtext for netbanking instrument
@@ -15,7 +15,7 @@ export function generateSubtextForNetbankingInstrument(instrument, locale) {
   }
 
   const names = _Arr.map(instrument.banks, bank => {
-    let bankName = getCommonBankName(bank);
+    let bankName = getShortBankName(bank, locale);
 
     if (bank === bankName) {
       bankName = getBanks()[bank];
