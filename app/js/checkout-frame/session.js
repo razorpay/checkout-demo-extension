@@ -5124,13 +5124,10 @@ Session.prototype = {
   },
 
   setLanguageDropdown: function() {
-    var features = this.preferences.features || {};
-    if (features.vernacular) {
-      var target = _Doc.querySelector('#language-dropdown');
-      this.languageSelectionView = new discreet.languageSelectionView({
-        target: target,
-      });
-    }
+    var target = _Doc.querySelector('#language-dropdown');
+    this.languageSelectionView = new discreet.languageSelectionView({
+      target: target,
+    });
   },
 
   /**
