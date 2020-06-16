@@ -230,6 +230,11 @@
     return view === 'details';
   }
 
+  /**
+   * For A/B testing, check if both api and localstorage instruments are present
+   * - if either one is missing, choose the other
+   * - if both are present, choose one randomly
+   */
   function getRandomInstrumentSet(instrumentsFromStorage, instrumentsFromApi) {
     let instrumentsOnScreen = 'storage';
 
@@ -243,6 +248,8 @@
     } else if (instrumentsFromApi.length) {
       instrumentsOnScreen = ['api', 'storage'][Math.floor(Math.random() * 2)];
     }
+
+    instrumentsOnScreen = 'api';
 
     // if user is in home, track the currently visible experiment
     if (!session.tab) {
