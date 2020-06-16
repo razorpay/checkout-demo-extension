@@ -377,7 +377,6 @@ export default {
     title: {
       loading: 'Loading...',
       insufficient_wallet_balance: 'Insufficient balance in your wallet',
-      native_otp_sent: 'Enter OTP to complete the payment',
       resending_otp: 'Resending OTP...',
       verifying_otp: 'Verifying OTP...',
       saved_cards_sending: 'Looking for saved cards associated with {phone}',
