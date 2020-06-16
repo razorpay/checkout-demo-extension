@@ -79,11 +79,8 @@ const API_INSTRUMENT_PAYMENT_ADDONS = {
     delete instrument.instrument;
   },
   card: instrument => {
-    // TODO: add real data once api is ready
-    instrument.issuer = 'UTIB';
-    instrument.network = 'MasterCard';
     instrument.id = instrument.instrument;
-    delete instrument.id;
+    delete instrument.instrument;
   },
 };
 

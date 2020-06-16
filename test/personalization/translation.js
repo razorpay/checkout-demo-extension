@@ -244,12 +244,40 @@ test('Module: personalization', t => {
       t.equals(typeof actual, 'object', 'Returns an object');
       t.equals(actual.method, 'upi', 'Returns the correct method');
       t.equals(actual.score, 1, 'Returns the correct score');
+      t.equals(actual.vpa, 'saranshgupta1995@ybl', 'Returns the correct vpa');
       t.equals(actual['_[flow]'], 'directpay', 'Returns the correct flow');
 
       t.end();
     });
+    test('transforms a card collect instrument correctly', t => {
+      const instrument = {
+        method: 'card',
+        issuer: 'UTIB',
+        network: 'MasterCard',
+        type: 'debit',
+        instrument: 'F1lKrOrLTkTpyJ',
+        score: 1,
+      };
 
-    // TODO: add for card instrument once we have the correct response
+      const actual = transformInstrumentToStorageFormat(instrument);
+
+      t.equals(typeof actual, 'object', 'Returns an object');
+      t.equals(actual.method, 'card', 'Returns the correct method');
+      t.equals(actual.score, 1, 'Returns the correct score');
+      t.equals(actual.issuer, 'UTIB', 'Returns the correct issuer');
+      t.equals(actual.network, 'MasterCard', 'Returns the correct network');
+      t.equals(actual.type, 'debit', 'Returns the correct type');
+      t.equals(actual.id, 'F1lKrOrLTkTpyJ', 'Returns the correct identifier');
+
+      t.equals(
+        typeof actual.instrument,
+        'undefined',
+        'Prevents duplicate data'
+      );
+
+      t.end();
+    });
+
     t.end();
   });
   t.end();
