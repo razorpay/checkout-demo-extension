@@ -343,6 +343,7 @@ export function getAllInstrumentsForCustomer(customer) {
  * @param {Object} customer
  * @param {Object} extra
  *  @prop {Array} upiApps List of UPI apps on the device
+ * @param {"storage"|"api"} source
  *
  * @returns {Promise<Array<Instrument>>}
  */
