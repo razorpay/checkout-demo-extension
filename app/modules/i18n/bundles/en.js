@@ -184,26 +184,27 @@ export default {
   callouts: {
     subscriptions: {
       credit_only_callout:
-        'Subscription payments are only supported on Mastercard and Visa Credit Cards.',
+        'Subscription payments are supported on {issuers} credit cards.',
       debit_only_callout:
-        'Subscription payments are only supported on Visa and Mastercard Debit Cards from ICICI, Kotak, Citibank and Canara Bank.',
+        'Subscription payments are supported on debit cards from {issuers}.',
       credit_debit_callout:
-        'Subscription payments are supported on Visa and Mastercard Credit Cards from all Banks and Debit Cards from ICICI, Kotak, Citibank and Canara Bank.',
+        'Subscription payments are supported on {creditIssuers} credit cards and debit cards from {debitIssuers}.',
     },
     card_offer: {
       credit_only_callout:
-        'All {issuer} Credit Cards are supported for this payment',
+        'All {issuer} credit cards are supported for this payment.',
       debit_only_callout:
-        'All {issuer} Debit Cards are supported for this payment',
-      credit_debit_callout: 'All {issuer} Cards are supported for this payment',
+        'All {issuer} debit cards are supported for this payment.',
+      credit_debit_callout:
+        'All {issuer} cards are supported for this payment.',
     },
     recurring: {
       credit_only_callout:
-        'Only Visa and Mastercard Credit Cards are supported for this payment.',
+        'Only {issuers} credit cards are supported for this payment.',
       debit_only_callout:
-        'Only Visa and Mastercard Debit Cards from ICICI, Kotak, Citibank and Canara Bank are supported for this payment.',
+        'Only debit cards from {issuers} are supported for this payment.',
       credit_debit_callout:
-        'Visa and Mastercard Credit Cards from all Banks and Debit Cards from ICICI, Kotak, Citibank and Canara Bank are supported for this payment.',
+        '{creditIssuers} credit cards and debit cards from {debitIssuers} are supported for this payment.',
     },
   },
   emandate: {

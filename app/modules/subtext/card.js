@@ -1,6 +1,17 @@
 import { generateTextFromList } from 'lib/utils';
 import { getCommonBankName } from 'common/bank';
 import { formatTemplateWithLocale, formatMessageWithLocale } from 'i18n';
+import {
+  CARD_OFFER_CREDIT_DEBIT_CALLOUT,
+  CARD_OFFER_CREDIT_ONLY_CALLOUT,
+  CARD_OFFER_DEBIT_ONLY_CALLOUT,
+  RECURRING_CREDIT_DEBIT_CALLOUT,
+  RECURRING_CREDIT_ONLY_CALLOUT,
+  RECURRING_DEBIT_ONLY_CALLOUT,
+  SUBSCRIPTIONS_CREDIT_DEBIT_CALLOUT,
+  SUBSCRIPTIONS_CREDIT_ONLY_CALLOUT,
+  SUBSCRIPTIONS_DEBIT_ONLY_CALLOUT,
+} from '../ui/labels/home';
 
 /**
  * Generates a string from the list after filtering for truthy values
@@ -222,75 +233,89 @@ export function generateSubtextForRecurring({
   );
 
   if (subscription) {
-    const subscriptionText = 'Subscription payments are supported on';
     if (credit && debit) {
       // Subscription payments are supported on Mastercard, Visa, and American Express credit cards and debit cards from ICICI, Kotak, Citibank, and Canara Bank.
-      return [
-        subscriptionText,
-        creditCardsNetworks,
-        'credit cards and',
-        'debit cards from',
-        debitCardIssuers + '.',
-      ].join(' ');
+      return formatTemplateWithLocale(
+        SUBSCRIPTIONS_CREDIT_DEBIT_CALLOUT,
+        {
+          creditIssuers: creditCardsNetworks,
+          debitIssuers: debitCardIssuers,
+        },
+        locale
+      );
     } else if (debit) {
       // Subscription payments are supported on debit cards from ICICI, Kotak, Citibank, and Canara Bank.
-      return [
-        subscriptionText,
-        'debit cards from',
-        debitCardIssuers + '.',
-      ].join(' ');
+      return formatTemplateWithLocale(
+        SUBSCRIPTIONS_DEBIT_ONLY_CALLOUT,
+        {
+          issuers: debitCardIssuers,
+        },
+        locale
+      );
     } else {
       // Subscription payments are supported on Mastercard, Visa, and American Express credit cards.
-      return [subscriptionText, creditCardsNetworks, 'credit cards' + '.'].join(
-        ' '
+      return formatTemplateWithLocale(
+        SUBSCRIPTIONS_CREDIT_ONLY_CALLOUT,
+        {
+          issuers: creditCardsNetworks,
+        },
+        locale
       );
     }
   } else if (offer) {
     // All issuer cards are supported for this payment.
     // All issuer credit cards are supported for this payment.
     // All issuer debit cards are supported for this payment.
-    return [
-      'All',
-      offer.issuer,
-      generateTextForCardType(credit, debit),
-      'are supported for this payment.',
-    ].join(' ');
+
+    if (credit && debit) {
+      return formatTemplateWithLocale(
+        CARD_OFFER_CREDIT_DEBIT_CALLOUT,
+        { issuer: offer.issuer },
+        locale
+      );
+    } else if (debit) {
+      return formatTemplateWithLocale(
+        CARD_OFFER_DEBIT_ONLY_CALLOUT,
+        { issuer: offer.issuer },
+        locale
+      );
+    } else {
+      return formatTemplateWithLocale(
+        CARD_OFFER_CREDIT_ONLY_CALLOUT,
+        { issuer: offer.issuer },
+        locale
+      );
+    }
   } else {
     if (credit && debit) {
       // Mastercard, Visa, and American Express credit cards and debit cards from ICICI, Kotak, Citibank, and Canara Bank are supported for this payment.
-      return [
-        creditCardsNetworks,
-        'credit cards',
-        'and debit cards from',
-        debitCardIssuers,
-        'are supported for this payment.',
-      ].join(' ');
+      return formatTemplateWithLocale(
+        RECURRING_CREDIT_DEBIT_CALLOUT,
+        {
+          creditIssuers: creditCardsNetworks,
+          debitIssuers: debitCardIssuers,
+        },
+        locale
+      );
     } else if (debit) {
       // Only debit cards from ICICI, Kotak, Citibank, and Canara Bank are supported for this payment.
-      return [
-        'Only debit cards from',
-        debitCardIssuers,
-        'are supported for this payment.',
-      ].join(' ');
+      return formatTemplateWithLocale(
+        RECURRING_DEBIT_ONLY_CALLOUT,
+        {
+          issuers: debitCardIssuers,
+        },
+        locale
+      );
     } else {
       // Only Mastercard, Visa, and American Express credit cards are supported for this payment.
-      return [
-        'Only',
-        creditCardsNetworks,
-        'credit cards',
-        'are supported for this payment.',
-      ].join(' ');
+      return formatTemplateWithLocale(
+        RECURRING_CREDIT_ONLY_CALLOUT,
+        {
+          issuers: creditCardsNetworks,
+        },
+        locale
+      );
     }
-  }
-}
-
-function generateTextForCardType(credit, debit) {
-  if (credit && debit) {
-    return 'cards';
-  } else if (debit) {
-    return 'debit cards';
-  } else {
-    return 'credit cards';
   }
 }
 
