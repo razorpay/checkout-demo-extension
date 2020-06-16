@@ -4865,7 +4865,9 @@ Session.prototype = {
       });
     } else {
       if (!this.headless) {
-        sub_link.html('Go to payment');
+        sub_link.html(
+          I18n.formatMessageWithLocale('misc.go_to_payment', locale)
+        );
         this.r.on('payment.cancel', function() {
           that.showLoadError(
             I18n.formatMessageWithLocale('misc.payment_canceled', locale),
