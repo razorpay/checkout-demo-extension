@@ -517,7 +517,7 @@
         </div>
       {:else}
         <div in:fade={{ duration: 100 }}>
-          {#if instrumentSubtext}
+          {#if shouldShowSubtext}
             <div class="pad instrument-subtext-description">
               {instrumentSubtext}
             </div>
