@@ -352,7 +352,7 @@ export function getAllInstrumentsForCustomer(customer) {
  *
  * @returns {Array<Object>}
  */
-const getInstrumentsForCustomer = (customer, extra = {}, source) => {
+export const getInstrumentsForCustomer = (customer, extra = {}, source) => {
   const { upiApps } = extra;
 
   let instruments = [];
@@ -403,46 +403,6 @@ const getInstrumentsForCustomer = (customer, extra = {}, source) => {
 
   return instruments;
 };
-
-/**
- * Returns the list of preferred payment modes for the user in a sorted order,
- * but translated to the Payment Method Configurability spec.
- * @param {Object} customer
- * @param {Object} extra
- *  @prop {Object} methods
- *  @prop {Array} upiApps List of UPI apps on the device
- *
- * @returns {Promise<Array<Instrument>>}
- */
-export function getTranslatedInstrumentsForCustomerFromStorage(
-  customer,
-  extra
-) {
-  const instruments = getInstrumentsForCustomer(customer, extra, 'storage');
-
-  const translatedInstruments =
-    _Arr.map(instruments, translateInstrumentToConfig) |> _Arr.filter(Boolean);
-
-  return translatedInstruments;
-}
-
-/**
- * Returns the list of preferred payment modes for the user in a sorted order,
- * but translated to the Payment Method Configurability spec.
- * @param {Object} customer
- * @param {Object} extra
- *  @prop {Object} methods
- *  @prop {Array} upiApps List of UPI apps on the device
- *
- * @returns {Promise<Array<Instrument>>}
- */
-export function getTranslatedInstrumentsForCustomerFromApi(customer, extra) {
-  return getInstrumentsForCustomerFromApi(customer, extra).then(instruments => {
-    return (
-      _Arr.map(instruments, translateInstrumentToConfig) |> _Arr.filter(Boolean)
-    );
-  });
-}
 
 /**
  * Appends the data from the selected instrument

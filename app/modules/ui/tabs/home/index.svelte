@@ -66,8 +66,7 @@
   import { getUPIIntentApps } from 'checkoutstore/native';
 
   import {
-    getTranslatedInstrumentsForCustomerFromStorage,
-    getTranslatedInstrumentsForCustomerFromApi,
+    getInstrumentsForCustomer,
     getAllInstrumentsForCustomer,
   } from 'checkoutframe/personalization';
 
@@ -266,13 +265,21 @@
   function getAllAvailableP13nInstruments() {
     return new Promise(resolve => {
       const instrumentsRetrievalPromises = [
-        getTranslatedInstrumentsForCustomerFromStorage($customer, {
-          upiApps: getUPIIntentApps().filtered,
-        }),
+        getInstrumentsForCustomer(
+          $customer,
+          {
+            upiApps: getUPIIntentApps().filtered,
+          },
+          'storage'
+        ),
 
-        getTranslatedInstrumentsForCustomerFromApi($customer, {
-          upiApps: getUPIIntentApps().filtered,
-        }),
+        getInstrumentsForCustomer(
+          $customer,
+          {
+            upiApps: getUPIIntentApps().filtered,
+          },
+          'api'
+        ),
       ];
 
       Promise.all(instrumentsRetrievalPromises).then(
