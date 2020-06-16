@@ -1,4 +1,4 @@
-const { innerText, visible, getAttribute, delay } = require('../../../util');
+const { innerText, visible, getAttribute } = require('../../../util');
 
 /**
  * Matches that all strings in a are also in b.
@@ -275,19 +275,38 @@ async function assertCardScreenAndText(context, text) {
 
 /**
  * Waits for all skeleton instruments to be hidden
+ *
+ * IMPORTANT:
+ * Couldn't use waitForSelector here since it wasn't working properly for all tests (odd).
+ * Had to write a custom waitForSelector functionality.
+ *
  * @param {Context} context
+ *
+ * @returns {Promise}
  */
-async function waitForSkeletonInstrumentsToResolve(context) {
-  await context.page.waitForSelector(
-    '.home-methods .methods-block .skeleton-instrument',
-    {
-      visible: false,
-      timeout: 1000,
-    }
-  );
+function waitForSkeletonInstrumentsToResolve(context) {
+  const TIMEOUT = 2000;
+  const POLL_INTERVAL = 100;
+  const SKELETON_SELECTOR = '.home-methods .methods-block .skeleton-instrument';
 
-  // Wait for animation to complete
-  await delay(500);
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      clearInterval(poll);
+
+      reject();
+    }, TIMEOUT);
+
+    const poll = setInterval(async () => {
+      const skeleton = await context.page.$(SKELETON_SELECTOR);
+
+      if (!skeleton) {
+        clearTimeout(timeout);
+        clearInterval(poll);
+
+        resolve();
+      }
+    }, POLL_INTERVAL);
+  });
 }
 
 module.exports = {
