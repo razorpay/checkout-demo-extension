@@ -273,8 +273,6 @@
       instrumentsOnScreen = ['api', 'storage'][Math.floor(Math.random() * 2)];
     }
 
-    instrumentsOnScreen = 'api';
-
     // if user is in home, track the currently visible experiment
     if (!session.tab) {
       Analytics.track('home:p13n:experiment', {
