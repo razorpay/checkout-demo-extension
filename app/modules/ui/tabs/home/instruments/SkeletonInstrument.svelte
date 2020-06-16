@@ -41,6 +41,6 @@
   }
 </style>
 
-<div class="loading-instrument uninteractive" out:slide>
+<div class="skeleton-instrument uninteractive" data-type="skeleton" out:slide>
   <span />
 </div>

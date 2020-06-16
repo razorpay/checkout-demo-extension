@@ -60,10 +60,10 @@
   }
 
   /* Add delay for staggering loaders */
-  .border-list > :global(.loading-instrument:nth-child(2n) span)::after {
+  .border-list > :global(.skeleton-instrument:nth-child(2n) span)::after {
     animation-delay: 0.1s;
   }
-  .border-list > :global(.loading-instrument:nth-child(3n) span)::after {
+  .border-list > :global(.skeleton-instrument:nth-child(3n) span)::after {
     animation-delay: 0.2s;
   }
 

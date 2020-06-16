@@ -1,4 +1,4 @@
-const { innerText, visible, getAttribute } = require('../../../util');
+const { innerText, visible, getAttribute, delay } = require('../../../util');
 
 /**
  * Matches that all strings in a are also in b.
@@ -28,12 +28,8 @@ function matchAllStringsInList(a, b) {
  *
  * @returns {boolean}
  */
-function isBlockFullOfLoaderInstruments(block) {
-  // Remove loader instruments. They don't have a title.
-  const items = block.items.filter(item => item.title);
-
-  // Are we left with instruments that are not loader instruments?
-  return items.length === 0;
+function isBlockFullOfSkeletonInstruments(block) {
+  return block.items.every(item => item.type === 'skeleton');
 }
 
 /**
@@ -43,6 +39,8 @@ function isBlockFullOfLoaderInstruments(block) {
  * @returns {Array}
  */
 async function parseBlocksFromHomescreen(context) {
+  await waitForSkeletonInstrumentsToResolve(context);
+
   const blockElements = await context.page.$$('.home-methods .methods-block');
   let blocks = await Promise.all(
     blockElements.map(
@@ -88,7 +86,7 @@ async function parseBlocksFromHomescreen(context) {
   );
 
   // TODO: Also consider preferred methods block
-  blocks = blocks.filter(block => !isBlockFullOfLoaderInstruments(block));
+  blocks = blocks.filter(block => !isBlockFullOfSkeletonInstruments(block));
 
   return blocks;
 }
@@ -275,6 +273,23 @@ async function assertCardScreenAndText(context, text) {
   expect(description).toBe(text);
 }
 
+/**
+ * Waits for all skeleton instruments to be hidden
+ * @param {Context} context
+ */
+async function waitForSkeletonInstrumentsToResolve(context) {
+  await context.page.waitForSelector(
+    '.home-methods .methods-block .skeleton-instrument',
+    {
+      visible: false,
+      timeout: 1000,
+    }
+  );
+
+  // Wait for animation to complete
+  await delay(500);
+}
+
 module.exports = {
   parseBlocksFromHomescreen,
   isIndividualInstrument,
@@ -286,4 +301,5 @@ module.exports = {
   assertShownPaylaterProviders,
   assertShownCardlessEmiProviders,
   assertCardScreenAndText,
+  waitForSkeletonInstrumentsToResolve,
 };
