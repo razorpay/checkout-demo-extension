@@ -63,8 +63,7 @@ export function init() {
 
   isLoading.subscribe(value => {
     if (value) {
-      // TODO: lock overlay and prevent dismissal
-      session.showLoadError('Loading');
+      session.showLoadError('Loading', false, true);
     } else {
       // TODO: fix this and remove try/catch
       try {
