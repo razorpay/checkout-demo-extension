@@ -4,12 +4,7 @@ import { getCustomer } from 'checkoutframe/customer';
 import Track from 'tracker';
 import Analytics from 'analytics';
 import { filterInstruments } from './filters';
-import {
-  hashFnv32a,
-  set,
-  getAllInstruments,
-  markInstrumentSource,
-} from './utils';
+import { hashFnv32a, set, getAllInstruments } from './utils';
 import { extendInstruments } from './extend';
 import { translateInstrumentToConfig } from './translation';
 import { getPreferredApiInstruments } from 'checkoutstore';
@@ -364,8 +359,6 @@ export const getInstrumentsForCustomer = (customer, extra = {}, source) => {
   }
 
   return getInstruments.then(instruments => {
-    instruments = markInstrumentSource(instruments, source);
-
     // Filter out the list
     instruments = filterInstruments({
       instruments,

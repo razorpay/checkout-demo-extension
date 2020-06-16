@@ -70,10 +70,3 @@ export function getAllInstruments() {
   // Get instruments for all customers
   return get();
 }
-
-export function markInstrumentSource(instruments, source) {
-  return instruments.map(instrument => {
-    instrument._source = source;
-    return instrument;
-  });
-}
