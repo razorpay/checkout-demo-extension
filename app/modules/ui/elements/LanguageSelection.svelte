@@ -32,10 +32,11 @@
 
 <style>
   .outer {
-    margin: 16px -24px -24px;
+    margin: 0 -24px -24px;
     padding: 6px 24px;
     height: 20px;
     background: rgba(0, 0, 0, 0.1);
+    clear: both;
   }
 
   .selected {
