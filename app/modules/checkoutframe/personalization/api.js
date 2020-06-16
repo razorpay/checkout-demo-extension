@@ -79,7 +79,7 @@ const API_INSTRUMENT_PAYMENT_ADDONS = {
     delete instrument.instrument;
   },
   card: instrument => {
-    instrument.id = instrument.instrument;
+    instrument.token_id = instrument.instrument;
     delete instrument.instrument;
   },
 };

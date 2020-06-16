@@ -267,7 +267,11 @@ test('Module: personalization', t => {
       t.equals(actual.issuer, 'UTIB', 'Returns the correct issuer');
       t.equals(actual.network, 'MasterCard', 'Returns the correct network');
       t.equals(actual.type, 'debit', 'Returns the correct type');
-      t.equals(actual.id, 'F1lKrOrLTkTpyJ', 'Returns the correct identifier');
+      t.equals(
+        actual.token_id,
+        'F1lKrOrLTkTpyJ',
+        'Returns the correct identifier'
+      );
 
       t.equals(
         typeof actual.instrument,
