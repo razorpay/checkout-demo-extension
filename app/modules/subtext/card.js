@@ -1,5 +1,6 @@
 import { generateTextFromList } from 'lib/utils';
 import { getCommonBankName } from 'common/bank';
+
 import { formatTemplateWithLocale, formatMessageWithLocale } from 'i18n';
 import {
   CARD_OFFER_CREDIT_DEBIT_CALLOUT,
@@ -11,7 +12,7 @@ import {
   SUBSCRIPTIONS_CREDIT_DEBIT_CALLOUT,
   SUBSCRIPTIONS_CREDIT_ONLY_CALLOUT,
   SUBSCRIPTIONS_DEBIT_ONLY_CALLOUT,
-} from '../ui/labels/home';
+} from 'ui/labels/home';
 
 /**
  * Generates a string from the list after filtering for truthy values
