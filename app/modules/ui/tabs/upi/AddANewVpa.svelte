@@ -141,6 +141,7 @@
   name={'upi-vpa-input-' + paymentMethod}
   value="full"
   align="top"
+  overflow
   on:click
   on:click={focusAfterTimeout}
   {selected}>
