@@ -2,6 +2,7 @@
   // Svelte imports
   import { onMount } from 'svelte';
   import { slide } from 'svelte/transition';
+  import { _ as t } from 'svelte-i18n';
 
   // Util imports
   import { getSession } from 'sessionmanager';
@@ -37,6 +38,7 @@
   import ListHeader from 'ui/elements/ListHeader.svelte';
   import Field from 'ui/components/Field.svelte';
   import Icon from 'ui/elements/Icon.svelte';
+  import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
   import Collect from './Collect.svelte';
   import GooglePayCollect from './GooglePayCollect.svelte';
@@ -53,6 +55,20 @@
   import { contact } from 'checkoutstore/screens/home';
   import { customer } from 'checkoutstore/customer';
   import { methodTabInstrument } from 'checkoutstore/screens/home';
+
+  import {
+    UPI_GPAY_BLOCK_HEADING,
+    UPI_COLLECT_BLOCK_HEADING,
+    UPI_COLLECT_BLOCK_SUBHEADING,
+    UPI_COLLECT_NEW_VPA_HELP,
+    UPI_COLLECT_ENTER_ID,
+    UPI_COLLECT_SAVE,
+    GPAY_WEB_API_TITLE,
+    QR_BLOCK_HEADING,
+    SHOW_QR_CODE,
+    SCAN_QR_CODE,
+    UPI_DOWNTIME_TEXT,
+  } from 'ui/labels/upi';
 
   // Props
   export let selectedApp = undefined;
@@ -292,7 +308,7 @@
 
     /* TODO: improve handling of `prefill.vpa` */
     if (session.get('prefill.vpa')) {
-      selectedApp = null;
+      selectedApp = undefined;
       vpa = session.get('prefill.vpa');
     }
 
@@ -578,7 +594,8 @@
       {/if}
 
       {#if useWebPaymentsApi}
-        <div class="legend left">Pay using Gpay App</div>
+        <!-- LABEL: Pay using Gpay App -->
+        <div class="legend left">{$t(UPI_GPAY_BLOCK_HEADING)}</div>
         <div class="border-list">
           <SlottedRadioOption
             name="google_pay_web"
@@ -587,7 +604,8 @@
               selectedToken = 'gpay';
               session.preSubmit();
             }}>
-            <div slot="title">Google Pay</div>
+            <!-- LABEL: Google Pay -->
+            <div slot="title">{$t(GPAY_WEB_API_TITLE)}</div>
             <i slot="icon">
               <Icon icon={session.themeMeta.icons.gpay} />
             </i>
@@ -596,16 +614,16 @@
       {/if}
 
       {#if shouldShowCollect}
-        <div class="legend left">Pay using UPI ID</div>
+        <!-- LABEL: Pay using UPI ID -->
+        <div class="legend left">{$t(UPI_COLLECT_BLOCK_HEADING)}</div>
         <div class="border-list" id="upi-collect-list">
           {#if intent}
             <ListHeader>
               <i slot="icon">
                 <Icon icon={getMiscIcon('receive')} />
               </i>
-              <div slot="subtitle">
-                You will receive a payment request on your UPI app
-              </div>
+              <!-- LABEL: You will receive a payment request on your UPI app -->
+              <div slot="subtitle">{$t(UPI_COLLECT_BLOCK_SUBHEADING)}</div>
             </ListHeader>
           {/if}
 
@@ -626,7 +644,6 @@
           {/each}
           <AddANewVpa
             paymentMethod={method}
-            subtitleText={isOtm ? 'Supported only for BHIM and HDFC' : 'Google Pay, BHIM, PhonePe & more'}
             on:click={() => {
               onUpiAppSelection({ detail: { id: 'new' } });
             }}
@@ -652,15 +669,18 @@
       {/if}
 
       {#if shouldShowQr}
-        <div class="legend left">Pay using QR Code</div>
+        <!-- LABEL: Pay using QR Code -->
+        <div class="legend left">{$t(QR_BLOCK_HEADING)}</div>
         <div class="options" id="showQr">
           <NextOption
             icon={qrIcon}
             tabindex="0"
             attributes={{ role: 'button', 'aria-label': 'Show QR Code - Scan the QR code using your UPI app' }}
             on:select={selectQrMethod}>
-            <div>Show QR Code</div>
-            <div class="desc">Scan the QR code using your UPI app</div>
+            <!-- LABEL: Show QR Code -->
+            <div>{$t(SHOW_QR_CODE)}</div>
+            <!-- LABEL: Scan the QR code using your UPI app -->
+            <div class="desc">{$t(SCAN_QR_CODE)}</div>
           </NextOption>
         </div>
       {/if}
@@ -669,8 +689,8 @@
     <Bottom tab={method}>
       {#if down || disabled}
         <DowntimeCallout severe={disabled}>
-          <strong>UPI</strong>
-          is experiencing low success rates.
+          <!-- LABEL: UPI is experiencing low success rates. -->
+          <FormattedText text={$t(UPI_DOWNTIME_TEXT)} />
         </DowntimeCallout>
       {/if}
       {#if isOtm}

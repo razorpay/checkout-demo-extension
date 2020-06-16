@@ -452,9 +452,16 @@ test('Module: subtext/card', t => {
   test('CardSubtext.generateSubtextForRecurring', t => {
     const allNetworks = { mastercard: true, visa: true, amex: true };
     const allTypes = { credit: true, debit: true };
+    const allIssuers = {
+      CITI: 'CITI Bank',
+      CNRB: 'Canara Bank',
+      ICIC: 'ICICI Bank',
+      KKBK: 'Kotak Mahindra Bank',
+    };
 
     const allNetworksText = 'Visa, Mastercard, and American Express';
-    const debitCardBanksText = 'ICICI, Kotak, Citibank, and Canara Bank';
+    const debitCardBanksText =
+      'CITI Bank, Canara Bank, ICICI Bank, and Kotak Mahindra Bank';
 
     test('type: subscription', t => {
       t.equal(
@@ -466,6 +473,7 @@ test('Module: subtext/card', t => {
         CardSubtext.generateSubtextForRecurring({
           types: allTypes,
           networks: allNetworks,
+          issuers: allIssuers,
           subscription: 'subscription_id',
         }),
         'Issuers: all, Networks: 3, Types: all'
@@ -478,6 +486,7 @@ test('Module: subtext/card', t => {
         CardSubtext.generateSubtextForRecurring({
           types: { debit: true },
           networks: allNetworks,
+          issuers: allIssuers,
           subscription: 'subscription_id',
         }),
         'Issuers: all, Networks: 3, Types: all'
@@ -503,7 +512,6 @@ test('Module: subtext/card', t => {
         'All HDFC cards are supported for this payment.',
         CardSubtext.generateSubtextForRecurring({
           types: allTypes,
-          networks: {},
           subscription: false,
           offer: offer,
         }),
@@ -514,7 +522,6 @@ test('Module: subtext/card', t => {
         'All HDFC credit cards are supported for this payment.',
         CardSubtext.generateSubtextForRecurring({
           types: { credit: true },
-          networks: {},
           subscription: false,
           offer: offer,
         }),
@@ -525,7 +532,6 @@ test('Module: subtext/card', t => {
         'All HDFC debit cards are supported for this payment.',
         CardSubtext.generateSubtextForRecurring({
           types: { debit: true },
-          networks: {},
           subscription: false,
           offer: offer,
         }),
@@ -545,6 +551,7 @@ test('Module: subtext/card', t => {
         CardSubtext.generateSubtextForRecurring({
           types: allTypes,
           networks: allNetworks,
+          issuers: allIssuers,
         }),
         'Issuers: all, Networks: 3, Types: all'
       );
@@ -556,6 +563,7 @@ test('Module: subtext/card', t => {
         CardSubtext.generateSubtextForRecurring({
           types: { debit: true },
           networks: allNetworks,
+          issuers: allIssuers,
         }),
         'Issuers: all, Networks: 3, Types: debit'
       );

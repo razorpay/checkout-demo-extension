@@ -105,7 +105,7 @@ module.exports = function(testFeatures) {
           await verifyHighDowntime(
             context,
             'upi',
-            ' UPI\n          is experiencing low success rates.'
+            ' UPI is experiencing low success rates.'
           );
         } else {
           await verifyHighDowntime(

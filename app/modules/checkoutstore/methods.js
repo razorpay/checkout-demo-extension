@@ -264,6 +264,22 @@ export function getCardNetworksForRecurring() {
   }
 }
 
+export function getCardIssuersForRecurring() {
+  // "recurring": {
+  //   "card": {
+  //     "debit": {
+  //       "CITI": "CITI Bank",
+  //       "CNRB": "Canara Bank",
+  //       "ICIC": "ICICI Bank",
+  //       "KKBK": "Kotak Mahindra Bank"
+  //     }
+  //   }
+  // }
+  if (isRecurring()) {
+    return getRecurringMethods().card?.debit;
+  }
+}
+
 // additional checks for each sub-method based on UPI
 const UPI_METHODS = {
   collect: () => true,

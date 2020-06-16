@@ -7,6 +7,24 @@
   // UI imports
   import ExpandableCard from 'ui/elements/ExpandableCard.svelte';
 
+  // i18n
+  import { t, locale } from 'svelte-i18n';
+  import { formatTemplateWithLocale } from 'i18n';
+
+  import {
+    PLAN_TITLE,
+    NO_COST_LABEL,
+    INTEREST_CHARGED_LABEL,
+    NO_COST_DISCOUNT_LABEL,
+    NO_COST_EXPLAIN_ACTION,
+    CREDIT_EMI_DESCRIPTION,
+    HDFC_DEBIT_DESCRIPTION_MIN_BALANCE,
+    HDFC_DEBIT_DESCRIPTION_INCLUDES_INTEREST,
+    HDFC_DEBIT_DESCRIPTION_CONVENIENCE,
+    DESCRIPTION_MONTHLY_INSTALLMENT,
+    DESCRIPTION_TOTAL_AMOUNT,
+  } from 'ui/labels/emi';
+
   // Props
   export let amount;
   export let plan;
@@ -96,43 +114,55 @@
 
 <ExpandableCard showRadio {expanded} on:click>
   <div slot="title">
-    {plan.duration} Months ({formattedAmountPerMonth}/mo)
+    <!-- LABEL: {duration} Months ({amount}/mo) -->
+    {formatTemplateWithLocale(PLAN_TITLE, { duration: plan.duration, amount: formattedAmountPerMonth }, $locale)}
     {#if showInterest}
-      &nbsp;@ {(noCostEmi && 'No Cost') || `${plan.interest}%`}
+      &nbsp;@ {(noCostEmi && $t(NO_COST_LABEL)) || `${plan.interest}%`}
     {/if}
   </div>
   <div slot="detail">
     {#if noCostEmi}
       <ul class="nocost">
         <li>
-          Interest charged by the bank
+          <!-- LABEL: Interest charged by the bank -->
+          {$t(INTEREST_CHARGED_LABEL)}
           <span class="right">{interestChargedByBank}</span>
         </li>
         <li class="theme-highlight">
-          No Cost EMI offer discount
+          <!-- LABEL: No Cost EMI offer discount -->
+          {$t(NO_COST_DISCOUNT_LABEL)}
           <span class="right">- {interestChargedByBank}</span>
         </li>
       </ul>
     {/if}
     {#if isCardEmi}
       {#if bank === HDFC_BANK_DEBIT_CODE}
-        No minimum balance is required. There will be no amount blocked on your
-        card. You will pay
+        <!-- TODO: Combine both labels and allow inline-block from within template -->
+        <!-- LABEL: No minimum balance is required. There will be no amount blocked on your
+        card. You will pay -->
+        {$t(HDFC_DEBIT_DESCRIPTION_MIN_BALANCE)}
         <span class="inline-block">{formattedAmountPerMonth}/mo</span>
-        (includes interest).
+        <!-- LABEL: (includes interest). -->
+        {$t(HDFC_DEBIT_DESCRIPTION_INCLUDES_INTEREST)}
       {:else}
-        Full amount of {formattedAmount} will be deducted from your account,
-        which will be converted into EMI by your bank in 3-4 days.
+        <!-- LABEL: Full amount of {formattedAmount} will be deducted from your account,
+        which will be converted into EMI by your bank in 3-4 days. -->
+        {formatTemplateWithLocale(CREDIT_EMI_DESCRIPTION, { amount: formattedAmount }, $locale)}
       {/if}
       {#if bank === HDFC_BANK_CODE || bank === HDFC_BANK_DEBIT_CODE}
-        Convenience Fee of ₹99 + GST applicable for EMI transactions on HDFC
-        Bank Cards.
+        <!-- LABEL: Convenience Fee of ₹99 + GST applicable for EMI transactions on HDFC
+        Bank Cards. -->
+        {$t(HDFC_DEBIT_DESCRIPTION_CONVENIENCE)}
       {/if}
     {:else}
       <ul>
-        <li>Monthly Installment: {formattedAmountPerMonth}</li>
+        <!-- LABEL: Monthly Installment: {amount} -->
         <li>
-          Total Amount: {formattedFinalAmount} ({formattedAmountPerMonth} x {plan.duration})
+          {formatTemplateWithLocale(DESCRIPTION_MONTHLY_INSTALLMENT, { amount: formattedAmountPerMonth }, $locale)}
+        </li>
+        <!-- LABEL: Total Amount: {formattedFinalAmount} ({formattedAmountPerMonth} x {plan.duration}) -->
+        <li>
+          {formatTemplateWithLocale(DESCRIPTION_TOTAL_AMOUNT, { totalAmount: formattedFinalAmount, monthlyAmount: formattedAmountPerMonth, duration: plan.duration }, $locale)}
         </li>
       </ul>
     {/if}

@@ -43,15 +43,3 @@ export const isContactPresent = derived(
   contact,
   contactValue => contactValue && contactValue !== '+91' && contactValue !== '+'
 );
-
-/**
- * Toggle visibility of contact details in the topbar
- * depending on the presence of contact number.
- */
-isContactPresent.subscribe(value => {
-  const topbar = _Doc.querySelector('#topbar #top-right');
-
-  if (topbar) {
-    _El.keepClass(topbar, 'hidden', !value);
-  }
-});
