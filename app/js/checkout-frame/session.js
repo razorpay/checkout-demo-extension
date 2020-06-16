@@ -393,6 +393,7 @@ function hideFeeWrap() {
 
 function hideOverlayMessage() {
   var session = SessionManager.getSession();
+  session.preventErrorDismissal = false;
   if (!hideEmi() && !hideFeeWrap() && !session.hideSvelteOverlay()) {
     if (session.tab === 'nach') {
       if (!session.nachScreen.shouldHideOverlay()) {
@@ -2340,6 +2341,10 @@ Session.prototype = {
         return;
       }
 
+      if (this.preventErrorDismissal) {
+        return;
+      }
+
       this.hideErrorMessage(e);
     });
     this.click('#fd-hide', this.hideErrorMessage);
@@ -3550,7 +3555,8 @@ Session.prototype = {
     }
   },
 
-  showLoadError: function(text, error) {
+  showLoadError: function(text, error, preventDismissal) {
+    this.preventErrorDismissal = preventDismissal;
     if (this.headless && this.screen === 'card') {
       return;
     }
