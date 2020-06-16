@@ -10,7 +10,7 @@ import { getSession } from '../sessionmanager';
 
 const LOCALES = {
   en: 'English',
-  hi: 'Hindi',
+  hi: 'हिंदी',
 };
 
 /**
@@ -53,6 +53,7 @@ function fetchBundle(locale) {
 
 export function addDefaultMessages() {
   addMessages('en', en);
+  register('hi', () => fetchBundle('hi'));
 }
 
 export function init() {
