@@ -1,5 +1,6 @@
 import { generateTextFromList } from 'lib/utils';
 import { getCommonBankName } from 'common/bank';
+import { formatTemplateWithLocale, formatMessageWithLocale } from 'i18n';
 
 /**
  * Generates a string from the list after filtering for truthy values
@@ -41,19 +42,21 @@ export function generateSubtextForCardInstrument(instrument, locale) {
 
   // If IINs are provided, use only IINs to generate subtext
   if (!supportAllIins) {
-    let iinsString;
-
     if (iinsLength <= 3) {
-      iinsString = generateTextFromList(instrumentIins, locale);
-    } else {
-      iinsString = 'select BINs';
+      return formatTemplateWithLocale(
+        'card_subtext.specific_bins_supported',
+        { bins: generateTextFromList(instrumentIins, locale) },
+        locale
+      );
     }
-
-    return concatTruthyString(['Only', iinsString, 'accepted']);
+    return formatMessageWithLocale(
+      'card_subtext.select_bins_supported',
+      locale
+    );
   }
 
   if (supportAllIssuers) {
-    let stringList = ['Only'];
+    let stringList = [formatMessageWithLocale('card_subtext.only', locale)];
 
     let typesString;
     let cardsString = 'cards';
@@ -65,16 +68,25 @@ export function generateSubtextForCardInstrument(instrument, locale) {
 
     if (supportAllNetworks) {
       if (supportAllTypes) {
-        return 'All cards supported';
+        return formatMessageWithLocale(
+          'card_subtext.all_cards_supported',
+          locale
+        );
       }
     } else if (networksLength <= 2) {
       networksString = generateTextFromList(instrumentNetworks, locale, 2);
     } else {
       if (supportAllTypes) {
-        networksString = 'select networks';
+        networksString = formatMessageWithLocale(
+          'card_subtext.select_networks',
+          locale
+        );
         cardsString = null;
       } else {
-        networksString = 'select network';
+        networksString = formatMessageWithLocale(
+          'card_subtext.select_network',
+          locale
+        );
       }
     }
 
@@ -82,16 +94,16 @@ export function generateSubtextForCardInstrument(instrument, locale) {
       networksString,
       typesString,
       cardsString,
-      'supported',
+      formatMessageWithLocale('card_subtext.supported', locale),
     ]);
 
     return concatTruthyString(stringList);
   } else if (issuersLength === 1) {
-    let stringList = ['Only'];
+    let stringList = [formatMessageWithLocale('card_subtext.only', locale)];
 
     let issuersString = instrumentIssuers[0];
     let typesString;
-    let cardsString = 'cards';
+    let cardsString = formatMessageWithLocale('card_subtext.cards', locale);
     let networksString;
 
     if (!supportAllTypes) {
@@ -103,7 +115,11 @@ export function generateSubtextForCardInstrument(instrument, locale) {
     } else if (networksLength === 1) {
       networksString = instrumentNetworks[0];
     } else {
-      issuersString = `select ${issuersString}`;
+      issuersString = formatTemplateWithLocale(
+        'card_subtext.select_networks_specific_issuers',
+        { issuers: issuersString },
+        locale
+      );
     }
 
     stringList = _Arr.mergeWith(stringList, [
@@ -111,16 +127,16 @@ export function generateSubtextForCardInstrument(instrument, locale) {
       networksString,
       typesString,
       cardsString,
-      'supported',
+      formatMessageWithLocale('card_subtext.supported', locale),
     ]);
 
     return concatTruthyString(stringList);
   } else if (issuersLength === 2) {
-    let stringList = ['Only'];
+    let stringList = [formatMessageWithLocale('card_subtext.only', locale)];
 
     let issuersString = generateTextFromList(instrumentIssuers, locale, 2);
     let typesString;
-    let cardsString = 'cards';
+    let cardsString = formatMessageWithLocale('card_subtext.cards', locale);
     let networksString;
 
     if (!supportAllTypes) {
@@ -133,10 +149,14 @@ export function generateSubtextForCardInstrument(instrument, locale) {
       if (supportAllTypes) {
         networksString = instrumentNetworks[0];
       } else {
-        issuersString = `select ${issuersString}`;
+        issuersString = formatTemplateWithLocale(
+          'card_subtext.select_networks_specific_issuers',
+          { issuers: issuersString },
+          locale
+        );
       }
     } else {
-      issuersString = `select`;
+      issuersString = formatMessageWithLocale('card_subtext.select', locale);
     }
 
     stringList = _Arr.mergeWith(stringList, [
@@ -144,16 +164,16 @@ export function generateSubtextForCardInstrument(instrument, locale) {
       networksString,
       typesString,
       cardsString,
-      'supported',
+      formatMessageWithLocale('card_subtext.supported', locale),
     ]);
 
     return concatTruthyString(stringList);
   } else {
-    let stringList = ['Only'];
+    let stringList = [formatMessageWithLocale('card_subtext.only', locale)];
 
-    let issuersString = 'select';
+    let issuersString = formatMessageWithLocale('card_subtext.select', locale);
     let typesString;
-    let cardsString = 'cards';
+    let cardsString = formatMessageWithLocale('card_subtext.cards', locale);
     let networksString;
 
     if (!supportAllTypes) {
@@ -165,7 +185,7 @@ export function generateSubtextForCardInstrument(instrument, locale) {
     } else if (networksLength === 1) {
       networksString = instrumentNetworks[0];
     } else {
-      issuersString = `select`;
+      issuersString = formatMessageWithLocale('card_subtext.select', locale);
     }
 
     stringList = _Arr.mergeWith(stringList, [
@@ -173,7 +193,7 @@ export function generateSubtextForCardInstrument(instrument, locale) {
       networksString,
       typesString,
       cardsString,
-      'supported',
+      formatMessageWithLocale('card_subtext.supported', locale),
     ]);
 
     return concatTruthyString(stringList);

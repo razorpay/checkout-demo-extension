@@ -743,4 +743,16 @@ export default {
     list_multiple_combined: '{init}, and {last}',
     and_more: '{text} & More',
   },
+  card_subtext: {
+    all_cards_supported: 'All cards supported',
+    select_bins_supported: 'Only select BINs accepted',
+    specific_bins_supported: 'Only {bins} accepted',
+    select: 'select',
+    only: 'Only',
+    select_networks: 'select networks',
+    select_network: 'select network',
+    supported: 'supported',
+    cards: 'cards',
+    select_networks_specific_issuers: 'select {issuers}',
+  },
 };
