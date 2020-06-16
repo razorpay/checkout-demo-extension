@@ -410,7 +410,7 @@
 
   onMount(() => {
     updateBlocks({
-      showPreferredLoader: true,
+      showPreferredLoader: shouldUsePersonalization(),
     });
   });
 
