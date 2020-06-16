@@ -350,58 +350,62 @@ export function getAllInstrumentsForCustomer(customer) {
  * @param {Object} extra
  *  @prop {Array} upiApps List of UPI apps on the device
  *
- * @returns {Array<Object>}
+ * @returns {Promise<Array<Instrument>>}
  */
 export const getInstrumentsForCustomer = (customer, extra = {}, source) => {
   const { upiApps } = extra;
 
-  let instruments = [];
+  let getInstruments = Promise.resolve([]);
 
   if (source === 'storage') {
-    instruments = getAllInstrumentsForCustomer(customer);
+    getInstruments = Promise.resolve(getAllInstrumentsForCustomer(customer));
   } else if (source === 'api') {
-    instruments = getPreferredApiInstruments();
-    instruments = markInstrumentSource(instruments, 'api');
+    getInstruments = getInstrumentsForCustomerFromApi(customer);
   }
-  // Filter out the list
-  instruments = filterInstruments({
-    instruments,
-    upiApps,
-    customer,
-  });
 
-  instruments = extendInstruments({
-    instruments,
-    customer,
-  });
+  return getInstruments.then(instruments => {
+    instruments = markInstrumentSource(instruments, source);
 
-  if (source === 'storage') {
-    // Add score for each instrument
-    _Arr.loop(instruments, instrument => {
-      let timeSincePayment = _.now() - instrument.timestamp;
-      let tsScore = Math.exp(-TS_HALFLIFE * timeSincePayment);
-      let countScore = 1 - Math.exp(-COUNT_HALFLIFE * instrument.frequency);
-      let C = ~~instrument.success * 2 - 1;
-
-      /*
-       * Simplified form for:
-       * - if success is true
-       *   score = 0.7 * tsScore + 0.3 * countScore
-       * - else
-       *   score = 0.3 * tsScore + 0.7 * countScore
-       */
-
-      instrument.score =
-        (tsScore + countScore) / 2.0 + 0.2 * C * (tsScore - countScore);
+    // Filter out the list
+    instruments = filterInstruments({
+      instruments,
+      upiApps,
+      customer,
     });
-  }
 
-  // Sort instruments by their score
-  _Arr.sort(instruments, (a, b) =>
-    a.score > b.score ? -1 : ~~(a.score < b.score)
-  );
+    instruments = extendInstruments({
+      instruments,
+      customer,
+    });
 
-  return instruments;
+    if (source === 'storage') {
+      // Add score for each instrument
+      _Arr.loop(instruments, instrument => {
+        let timeSincePayment = _.now() - instrument.timestamp;
+        let tsScore = Math.exp(-TS_HALFLIFE * timeSincePayment);
+        let countScore = 1 - Math.exp(-COUNT_HALFLIFE * instrument.frequency);
+        let C = ~~instrument.success * 2 - 1;
+
+        /*
+         * Simplified form for:
+         * - if success is true
+         *   score = 0.7 * tsScore + 0.3 * countScore
+         * - else
+         *   score = 0.3 * tsScore + 0.7 * countScore
+         */
+
+        instrument.score =
+          (tsScore + countScore) / 2.0 + 0.2 * C * (tsScore - countScore);
+      });
+    }
+
+    // Sort instruments by their score
+    _Arr.sort(instruments, (a, b) =>
+      a.score > b.score ? -1 : ~~(a.score < b.score)
+    );
+
+    return _Arr.map(instruments, translateInstrumentToConfig);
+  });
 };
 
 /**
