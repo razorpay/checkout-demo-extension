@@ -7,7 +7,6 @@ import { filterInstruments } from './filters';
 import { hashFnv32a, set, getAllInstruments } from './utils';
 import { extendInstruments } from './extend';
 import { translateInstrumentToConfig } from './translation';
-import { getPreferredApiInstruments } from 'checkoutstore';
 import { getInstrumentsForCustomer as getInstrumentsForCustomerFromApi } from './api';
 
 /* halflife for timestamp, 5 days in ms */
