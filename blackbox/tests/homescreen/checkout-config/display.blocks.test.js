@@ -18,6 +18,7 @@ const {
   assertShownPaylaterProviders,
   assertShownCardlessEmiProviders,
   assertCardScreenAndText,
+  waitForSkeletonInstrumentsToResolve,
 } = require('./config-utils');
 
 function augmentPreferences(preferences) {
@@ -161,7 +162,7 @@ describe('display.blocks', () => {
     await fillUserDetails(context, '9988776655');
     await assertUserDetails(context);
 
-    await delay(500);
+    await waitForSkeletonInstrumentsToResolve(context);
 
     // Get all instruments from block.individual
     const individualInstruments = await context.page.$$(
@@ -206,7 +207,7 @@ describe('display.blocks', () => {
     await fillUserDetails(context, '9988776655');
     await assertUserDetails(context);
 
-    await delay(500);
+    await waitForSkeletonInstrumentsToResolve(context);
 
     // Get all instruments from block.grouped
     const groupedInstruments = await context.page.$$(
