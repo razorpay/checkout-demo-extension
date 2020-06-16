@@ -213,7 +213,10 @@
     } else if ($methodTabInstrument.method !== tab) {
       instrumentSubtext = undefined;
     } else {
-      instrumentSubtext = getSubtextForInstrument($methodTabInstrument);
+      instrumentSubtext = getSubtextForInstrument(
+        $methodTabInstrument,
+        $locale
+      );
     }
   }
 
