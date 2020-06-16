@@ -7,8 +7,6 @@
   import { selectedBank } from 'checkoutstore/screens/netbanking';
   import { methodTabInstrument } from 'checkoutstore/screens/home';
 
-  import { t } from 'svelte-i18n';
-
   // UI imports
   import Tab from 'ui/tabs/Tab.svelte';
   import GridItem from 'ui/tabs/netbanking/GridItem.svelte';
@@ -18,8 +16,17 @@
   import Bottom from 'ui/layouts/Bottom.svelte';
   import CTA from 'ui/elements/CTA.svelte';
 
-  // i18n labels
-  import { NETBANKING_SELECT_LABEL, NETBANKING_SELECT_HELP } from 'ui/labels';
+  // i18n
+  import {
+    NETBANKING_SELECT_LABEL,
+    NETBANKING_SELECT_HELP,
+    CORPORATE_RADIO_LABEL,
+    RETAIL_RADIO_LABEL,
+    SELECTION_RADIO_TEXT,
+  } from 'ui/labels/netbanking';
+
+  import { t, locale } from 'svelte-i18n';
+  import { getShortBankName, getLongBankName } from 'i18n';
 
   // Utils imports
   import Razorpay from 'common/Razorpay';
@@ -201,7 +208,7 @@
       <div id="netb-banks" class="clear grid count-3">
         {#each netbanks as { name, code } (code)}
           <GridItem
-            {name}
+            name={getShortBankName(code, $locale)}
             {code}
             fullName={filteredBanks[code]}
             bind:group={$selectedBank} />
@@ -225,7 +232,9 @@
             <!-- LABEL: Select a different bank -->
             <option value="">{$t(NETBANKING_SELECT_LABEL)}</option>
             {#each banksArr as bank (bank.code)}
-              <option value={bank.code}>{bank.name}</option>
+              <option value={bank.code}>
+                {getLongBankName(bank.code, $locale, bank.name)}
+              </option>
             {/each}
           </select>
         </div>
@@ -236,7 +245,8 @@
           class="pad ref-radiocontainer"
           bind:this={radioContainer}
           transition:fade={{ duration: 100 }}>
-          <label>Complete Payment Using</label>
+          <!-- LABEL: Complete Payment Using -->
+          <label>{$t(SELECTION_RADIO_TEXT)}</label>
           <div class="input-radio">
             <input
               type="radio"
@@ -246,7 +256,8 @@
               on:click={setRetailOption} />
             <label for="nb_type_retail">
               <div class="radio-display" />
-              <div class="label-content">Retail</div>
+              <!-- LABEL: Retail -->
+              <div class="label-content">{$t(RETAIL_RADIO_LABEL)}</div>
             </label>
           </div>
           <div class="input-radio">
@@ -258,7 +269,8 @@
               on:click={setCorporateOption} />
             <label for="nb_type_corporate">
               <div class="radio-display" />
-              <div class="label-content">Corporate</div>
+              <!-- LABEL: Corporate -->
+              <div class="label-content">{$t(CORPORATE_RADIO_LABEL)}</div>
             </label>
           </div>
         </div>

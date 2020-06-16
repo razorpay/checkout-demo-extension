@@ -11,6 +11,10 @@ const {
 
 const { receiveApiInstruments } = require('./personalization-actions');
 
+const {
+  waitForSkeletonInstrumentsToResolve,
+} = require('./checkout-config/config-utils');
+
 /**
  * Asserts that the user details in the strip
  * are the same as those entered.
@@ -52,6 +56,8 @@ async function assertUserDetails(context, apiInstrumentsReadFromCache = false) {
       expect(lastInPage).toEqual(last);
     }
   }
+
+  await waitForSkeletonInstrumentsToResolve(context);
 }
 
 /**

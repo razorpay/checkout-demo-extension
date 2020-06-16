@@ -4,6 +4,10 @@
   import { Formatter } from 'formatter';
   import { createEventDispatcher } from 'svelte';
 
+  // i18n
+  import { t } from 'svelte-i18n';
+  import { EXPIRY_LABEL } from 'ui/labels/card';
+
   export let value;
   export let ref = null;
   export let id;
@@ -46,7 +50,7 @@
   formatter={{ type: 'expiry' }}
   {name}
   placeholder="MM / YY"
-  label="Expiry"
+  label={$t(EXPIRY_LABEL)}
   required
   {value}
   type="tel"

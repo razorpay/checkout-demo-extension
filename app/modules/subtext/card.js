@@ -180,20 +180,16 @@ export function generateSubtextForCardInstrument(instrument) {
 }
 
 export function generateSubtextForRecurring({
-  types,
-  networks,
+  types = {},
+  networks = {},
+  issuers = {},
   subscription,
   offer,
 }) {
   const { debit, credit } = types;
   const { mastercard, visa, amex } = networks;
 
-  const debitCardIssuers = generateTextFromList([
-    'ICICI',
-    'Kotak',
-    'Citibank',
-    'Canara Bank',
-  ]);
+  const debitCardIssuers = generateTextFromList(_Obj.values(issuers));
   const creditCardsNetworks = generateTextForCardNetwork({
     mastercard,
     visa,

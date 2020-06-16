@@ -7,7 +7,6 @@ import { filterInstruments } from './filters';
 import { hashFnv32a, set, getAllInstruments } from './utils';
 import { extendInstruments } from './extend';
 import { translateInstrumentToConfig } from './translation';
-import { getPreferredApiInstruments } from 'checkoutstore';
 import { getInstrumentsForCustomer as getInstrumentsForCustomerFromApi } from './api';
 
 /* halflife for timestamp, 5 days in ms */
@@ -344,6 +343,7 @@ export function getAllInstrumentsForCustomer(customer) {
  * @param {Object} customer
  * @param {Object} extra
  *  @prop {Array} upiApps List of UPI apps on the device
+ * @param {"storage"|"api"} source
  *
  * @returns {Promise<Array<Instrument>>}
  */

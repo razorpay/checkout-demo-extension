@@ -23,12 +23,24 @@ function matchAllStringsInList(a, b) {
 }
 
 /**
+ * Tells if a block is full of loader instruments
+ * @param {Block} block
+ *
+ * @returns {boolean}
+ */
+function isBlockFullOfSkeletonInstruments(block) {
+  return block.items.every(item => item.type === 'skeleton');
+}
+
+/**
  * Parses blocks and returns their text
  * @param {Context} context
  *
  * @returns {Array}
  */
 async function parseBlocksFromHomescreen(context) {
+  await waitForSkeletonInstrumentsToResolve(context);
+
   const blockElements = await context.page.$$('.home-methods .methods-block');
   let blocks = await Promise.all(
     blockElements.map(
@@ -72,6 +84,9 @@ async function parseBlocksFromHomescreen(context) {
         })
     )
   );
+
+  // TODO: Also consider preferred methods block
+  blocks = blocks.filter(block => !isBlockFullOfSkeletonInstruments(block));
 
   return blocks;
 }
@@ -258,6 +273,42 @@ async function assertCardScreenAndText(context, text) {
   expect(description).toBe(text);
 }
 
+/**
+ * Waits for all skeleton instruments to be hidden
+ *
+ * IMPORTANT:
+ * Couldn't use waitForSelector here since it wasn't working properly for all tests (odd).
+ * Had to write a custom waitForSelector functionality.
+ *
+ * @param {Context} context
+ *
+ * @returns {Promise}
+ */
+function waitForSkeletonInstrumentsToResolve(context) {
+  const TIMEOUT = 2000;
+  const POLL_INTERVAL = 100;
+  const SKELETON_SELECTOR = '.home-methods .methods-block .skeleton-instrument';
+
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      clearInterval(poll);
+
+      reject();
+    }, TIMEOUT);
+
+    const poll = setInterval(async () => {
+      const skeleton = await context.page.$(SKELETON_SELECTOR);
+
+      if (!skeleton) {
+        clearTimeout(timeout);
+        clearInterval(poll);
+
+        resolve();
+      }
+    }, POLL_INTERVAL);
+  });
+}
+
 module.exports = {
   parseBlocksFromHomescreen,
   isIndividualInstrument,
@@ -269,4 +320,5 @@ module.exports = {
   assertShownPaylaterProviders,
   assertShownCardlessEmiProviders,
   assertCardScreenAndText,
+  waitForSkeletonInstrumentsToResolve,
 };

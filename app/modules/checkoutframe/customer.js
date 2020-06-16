@@ -67,7 +67,7 @@ Customer.prototype = {
     this.tokens = data.tokens;
 
     if (!session.local) {
-      _Doc.querySelector('#top-right') |> _El.addClass('logged');
+      session.topBar.setLogged(true);
     }
 
     Analytics.setMeta('loggedIn', true);

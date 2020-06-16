@@ -35,7 +35,30 @@
   import { customer } from 'checkoutstore/customer';
   import { getOption, isDCCEnabled } from 'checkoutstore';
 
+  // i18n
+  import {
+    EDIT_BUTTON_LABEL,
+    PARTIAL_AMOUNT_EDIT_LABEL,
+    PARTIAL_AMOUNT_STATUS_FULL,
+    PARTIAL_AMOUNT_STATUS_PARTIAL,
+    SECURED_BY_MESSAGE,
+    SUBSCRIPTIONS_CREDIT_DEBIT_CALLOUT,
+    SUBSCRIPTIONS_DEBIT_ONLY_CALLOUT,
+    SUBSCRIPTIONS_CREDIT_ONLY_CALLOUT,
+    CARD_OFFER_CREDIT_DEBIT_CALLOUT,
+    CARD_OFFER_CREDIT_ONLY_CALLOUT,
+    CARD_OFFER_DEBIT_ONLY_CALLOUT,
+    RECURRING_CREDIT_DEBIT_CALLOUT,
+    RECURRING_CREDIT_ONLY_CALLOUT,
+    RECURRING_DEBIT_ONLY_CALLOUT,
+  } from 'ui/labels/home';
+
+  import { t, locale } from 'svelte-i18n';
+
+  import { formatTemplateWithLocale } from 'i18n';
+
   // Utils imports
+  import Razorpay from 'common/Razorpay';
   import { getSession } from 'sessionmanager';
   import { generateSubtextForRecurring } from 'subtext/card';
   import {
@@ -58,6 +81,7 @@
   import {
     getCardTypesForRecurring,
     getCardNetworksForRecurring,
+    getCardIssuersForRecurring,
     getSingleMethod,
     isEMandateBankEnabled,
     getTPV,
@@ -72,9 +96,10 @@
 
   import {
     hideCta,
-    showCta,
-    showCtaWithText,
-    showCtaWithDefaultText,
+    showAuthenticate,
+    showPayViaSingleMethod,
+    showProceed,
+    showNext,
   } from 'checkoutstore/cta';
 
   import Analytics from 'analytics';
@@ -82,10 +107,7 @@
   import { getCardOffer, hasOffersOnHomescreen } from 'checkoutframe/offers';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
 
-  import {
-    INDIA_COUNTRY_CODE,
-    MAX_PREFERRED_INSTRUMENTS,
-  } from 'common/constants';
+  import { INDIA_COUNTRY_CODE } from 'common/constants';
 
   import { setBlocks } from 'ui/tabs/home/instruments';
 
@@ -181,21 +203,23 @@
 
   export function setDetailsCta() {
     if (isPartialPayment) {
-      showCtaWithText('Next');
+      showNext('Next');
 
       return;
     }
 
     if (!session.get('amount')) {
-      showCtaWithText('Authenticate');
+      showAuthenticate();
     } else if (singleMethod) {
-      showCtaWithText('Pay by ' + getMethodNameForPaymentOption(singleMethod));
+      showPayViaSingleMethod(
+        getMethodNameForPaymentOption(singleMethod, $locale)
+      );
     } else if (tpv) {
-      showCtaWithText(
-        'Pay by ' + getMethodNameForPaymentOption(tpv.method || $multiTpvOption)
+      showPayViaSingleMethod(
+        getMethodNameForPaymentOption(tpv.method || $multiTpvOption, $locale)
       );
     } else {
-      showCtaWithText('Proceed');
+      showProceed('Proceed');
     }
   }
 
@@ -307,12 +331,16 @@
     }
   }
 
-  function updateBlocks({ preferredInstruments = [] } = {}) {
+  function updateBlocks({
+    preferredInstruments = [],
+    showPreferredLoader = false,
+  } = {}) {
     const isPersonalizationEnabled = shouldUsePersonalization();
     const merchantConfig = getMerchantConfig();
 
     const blocksThatWereSet = setBlocks(
       {
+        showPreferredLoader,
         preferred: preferredInstruments,
         merchantConfig: merchantConfig.config,
         configSource: merchantConfig.sources,
@@ -320,49 +348,83 @@
       $customer
     );
 
-    const setPreferredInstruments = blocksThatWereSet.preferred.instruments;
+    const noBlocksWereSet = blocksThatWereSet.all.length === 0;
 
-    // Get the methods for which a preferred instrument was shown
-    const preferredMethods = _Arr.reduce(
-      setPreferredInstruments,
-      (acc, instrument) => {
-        acc[`_${instrument.method}`] = true;
-        return acc;
-      },
-      {}
-    );
-
-    /**
-     * - `meta.p13n` will only be set when preferred methods are shown in the UI.
-     * - `p13n:instruments:list` will be fired when we attempt to show the list.
-     * - `p13n:instruments:list` with `meta.p13n` set as true will tell you whether or not preferred methods were shown.
-     */
-
-    // meta.p13n should always be set before `p13n:instruments:list`
-    if (setPreferredInstruments.length) {
-      Analytics.setMeta('p13n', true);
-    } else {
-      Analytics.removeMeta('p13n');
-    }
-
-    const allPreferredInstrumentsForCustomer = getAllInstrumentsForCustomer(
-      $customer
-    );
-
-    if (isPersonalizationEnabled && allPreferredInstrumentsForCustomer.length) {
-      // Track preferred-methods related things
-      Analytics.track('p13n:instruments:list', {
+    if (isInstrumentFaultEmitted) {
+      // Do nothing, we already signalled a fault
+    } else if (noBlocksWereSet && !singleMethod) {
+      Analytics.track('error', {
+        type: AnalyticsTypes.INTEGRATION,
         data: {
-          all: allPreferredInstrumentsForCustomer.length,
-          eligible: preferredInstruments.length,
-          shown: setPreferredInstruments.length,
-          methods: preferredMethods,
+          type: 'no_instruments_to_render',
+          config: merchantConfig,
         },
       });
+
+      Razorpay.sendMessage({
+        event: 'fault',
+        data:
+          'Error in integration. Please contact Razorpay for assistance: no instruments available to show',
+      });
+
+      isInstrumentFaultEmitted = true;
+    } else {
+      const setPreferredInstruments = blocksThatWereSet.preferred.instruments;
+
+      // Get the methods for which a preferred instrument was shown
+      const preferredMethods = _Arr.reduce(
+        setPreferredInstruments,
+        (acc, instrument) => {
+          acc[`_${instrument.method}`] = true;
+          return acc;
+        },
+        {}
+      );
+
+      /**
+       * - `meta.p13n` will only be set when preferred methods are shown in the UI.
+       * - `p13n:instruments:list` will be fired when we attempt to show the list.
+       * - `p13n:instruments:list` with `meta.p13n` set as true will tell you whether or not preferred methods were shown.
+       */
+
+      // meta.p13n should always be set before `p13n:instruments:list`
+      if (setPreferredInstruments.length) {
+        Analytics.setMeta('p13n', true);
+      } else {
+        Analytics.removeMeta('p13n');
+      }
+
+      const allPreferredInstrumentsForCustomer = getAllInstrumentsForCustomer(
+        $customer
+      );
+
+      if (
+        isPersonalizationEnabled &&
+        allPreferredInstrumentsForCustomer.length
+      ) {
+        // Track preferred-methods related things
+        Analytics.track('p13n:instruments:list', {
+          data: {
+            all: allPreferredInstrumentsForCustomer.length,
+            eligible: preferredInstruments.length,
+            shown: setPreferredInstruments.length,
+            methods: preferredMethods,
+          },
+        });
+      }
     }
   }
 
-  onMount(updateBlocks);
+  onMount(() => {
+    updateBlocks({
+      showPreferredLoader: shouldUsePersonalization(),
+    });
+  });
+
+  // Svelte executes the following block twice. Even if a fault was emitted, it will be emitted again in the second execution.
+  // So, we use this flag to perform no-op if true.
+  // TODO: Do this in a better way by figuring out how to make it execute the block only once.
+  let isInstrumentFaultEmitted = false;
 
   $: {
     const loggedIn = _Obj.getSafely($customer, 'logged');
@@ -707,6 +769,7 @@
   .home-methods {
     padding-left: 12px;
     padding-right: 12px;
+    margin-top: 28px;
   }
 
   .details-container {
@@ -797,7 +860,8 @@
                     class="theme-highlight-color"
                     aria-label={contactEmailReadonly ? '' : 'Edit'}>
                     {#if !contactEmailReadonly}
-                      <span>Edit</span>
+                      <!-- LABEL: Edit -->
+                      <span>{$t(EDIT_BUTTON_LABEL)}</span>
                       <span>&#xe604;</span>
                     {/if}
                   </div>
@@ -811,8 +875,12 @@
                     <span>{formattedPartialAmount}</span>
                     <span>
                       {#if $partialPaymentOption === 'full'}
-                        Paying full amount
-                      {:else}Paying in parts{/if}
+                        <!-- LABEL: Paying full amount -->
+                        {$t(PARTIAL_AMOUNT_STATUS_FULL)}
+                      {:else}
+                        <!-- LABEL: Paying in parts -->
+                        {$t(PARTIAL_AMOUNT_STATUS_PARTIAL)}
+                      {/if}
                     </span>
                   </div>
                   <div
@@ -820,7 +888,8 @@
                     class="theme-highlight-color"
                     aria-label={contactEmailReadonly ? '' : 'Edit'}>
                     {#if !contactEmailReadonly}
-                      <span>Change amount</span>
+                      <!-- LABEL: Change amount -->
+                      <span>{$t(PARTIAL_AMOUNT_EDIT_LABEL)}</span>
                       <span>&#xe604;</span>
                     {/if}
                   </div>
@@ -852,6 +921,7 @@
           {generateSubtextForRecurring({
             types: getCardTypesForRecurring(),
             networks: getCardNetworksForRecurring(),
+            issuers: getCardIssuersForRecurring(),
             subscription: session.get('subscription_id'),
             offer: cardOffer,
           })}
@@ -884,7 +954,8 @@
                 fill="#A7A7A7" />
             </svg>
           </i>
-          This payment is secured by Razorpay.
+          <!-- LABEL: This payment is secured by Razorpay. -->
+          {$t(SECURED_BY_MESSAGE)}
         </div>
       {/if}
     </Bottom>

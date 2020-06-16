@@ -1,6 +1,5 @@
 import { writable } from 'svelte/store';
 import { getDowntimes as _getDowntimes } from 'checkoutframe/downtimes';
-import { TAB_TITLES } from 'common/constants';
 import { makeAuthUrl as _makeAuthUrl } from 'common/Razorpay';
 
 let razorpayInstance, preferences;
@@ -11,8 +10,6 @@ export function setRazorpayInstance(_razorpayInstance) {
   preferences = razorpayInstance.preferences;
   razorpayInstanceStore.set(_razorpayInstance);
   if (isIRCTC()) {
-    TAB_TITLES.upi = 'BHIM/UPI';
-    TAB_TITLES.card = 'Debit/Credit Card';
     razorpayInstance.set('theme.image_frame', false);
   }
 }
@@ -74,9 +71,6 @@ export const getPrefilledEmail = optionGetter('prefill.email');
 export const getPrefilledName = optionGetter('prefill.name');
 export const getPrefilledCardNumber = optionGetter('prefill.card[number]');
 export const getPrefilledVPA = optionGetter('prefill.vpa');
-
-export const getPreferredApiInstruments = () =>
-  _Obj.getSafely(preferences, 'preferred_methods', []);
 
 export function hasFeature(feature, fallbackValue) {
   return _Obj.getSafely(preferences, `features.${feature}`, fallbackValue);
