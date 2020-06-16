@@ -1,6 +1,7 @@
 <script>
   import { locale, locales, isLoading } from 'svelte-i18n';
   import { getLocaleName } from 'i18n/init';
+  import { onMount, onDestroy } from 'svelte';
 
   const entries = _Obj.entries;
 
@@ -28,6 +29,17 @@
     $locale = code;
     dropdownShown = false;
   }
+
+  const header = _Doc.querySelector('#header');
+
+  // Since it occupies the bottom of header, we need to remove header's padding
+  onMount(() => {
+    _El.addClass(header, 'has-dropdown');
+  });
+
+  onDestroy(() => {
+    _El.removeClass(header, 'has-dropdown');
+  });
 </script>
 
 <style>
