@@ -3574,7 +3574,8 @@ Session.prototype = {
     }
 
     if (!text) {
-      text = strings.process;
+      var locale = I18n.getCurrentLocale();
+      text = I18n.formatMessageWithLocale('misc.payment_processing', locale);
     }
 
     if (this.screen === 'otp') {
