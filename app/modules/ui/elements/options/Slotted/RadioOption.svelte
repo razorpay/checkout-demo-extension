@@ -13,6 +13,7 @@
   export let align = 'center';
   export let defaultStyles = true;
   export let ellipsis = false; // Should we truncate the text?
+  export let attributes = {};
 
   let radioClasses;
   $: {
@@ -71,7 +72,7 @@
   on:keydown
   type="button"
   role="listitem"
-  {...$$restProps}>
+  {...attributes}>
   <Stack horizontal {reverse}>
     <slot name="icon" />
     <div>
