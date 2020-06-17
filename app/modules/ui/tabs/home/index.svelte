@@ -254,12 +254,22 @@
     return view === 'details';
   }
 
+  const USER_EXPERIMENT_CACHE = {};
+
   /**
    * For A/B testing, check if both api and localstorage instruments are present
    * - if either one is missing, choose the other
    * - if both are present, choose one randomly
    */
-  function getRandomInstrumentSet(instrumentsFromStorage, instrumentsFromApi) {
+  function getRandomInstrumentSet(
+    instrumentsFromStorage,
+    instrumentsFromApi,
+    user
+  ) {
+    if (USER_EXPERIMENT_CACHE[user]) {
+      return USER_EXPERIMENT_CACHE[user];
+    }
+
     let instrumentsOnScreen = 'storage';
 
     const instrumentMap = {
@@ -288,7 +298,9 @@
       instruments: instrumentMap[instrumentsOnScreen],
     };
 
-    return p13nRenderData;
+    USER_EXPERIMENT_CACHE[user] = p13nRenderData;
+
+    return USER_EXPERIMENT_CACHE[user];
   }
 
   function getAllAvailableP13nInstruments() {
@@ -315,7 +327,8 @@
         ([instrumentsFromStorage, instrumentsFromApi]) => {
           let instrumentsOnScreen = getRandomInstrumentSet(
             instrumentsFromStorage,
-            instrumentsFromApi
+            instrumentsFromApi,
+            $customer.contact
           );
           resolve(instrumentsOnScreen);
         }
