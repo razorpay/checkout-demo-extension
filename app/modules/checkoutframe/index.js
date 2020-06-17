@@ -353,17 +353,17 @@ function updateAnalytics(preferences) {
 }
 
 function updatePreferredMethods(preferences) {
-  const { customer, preferred_methods } = preferences;
+  const { preferred_methods } = preferences;
 
   if (preferred_methods) {
-    const contact = customer.contact;
-
-    if (contact && preferred_methods[contact]) {
+    _Obj.loop(preferred_methods, (instruments, contact) => {
       setInstrumentsForCustomer(
-        preferences.customer,
-        preferences.preferred_methods[contact]
+        {
+          contact,
+        },
+        instruments
       );
-    }
+    });
   }
 }
 
