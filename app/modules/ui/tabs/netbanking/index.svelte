@@ -249,6 +249,9 @@
 
   .dropdown-like {
     width: 100%;
+
+    /* Fallback for IE */
+    text-align: left;
     text-align: start;
   }
 
