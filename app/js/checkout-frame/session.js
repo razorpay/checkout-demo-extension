@@ -1843,6 +1843,13 @@ Session.prototype = {
       this.set('prefill.method', 'cardless_emi');
     }
 
+    var forcedOffer = discreet.Offers.getForcedOffer();
+    var method = forcedOffer.payment_method;
+
+    if (forcedOffer && method && Store.isContactEmailOptional()) {
+      this.set('prefill.method', method);
+    }
+
     improvisePrefilledContact(this);
   },
 
