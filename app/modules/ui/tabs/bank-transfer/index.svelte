@@ -7,17 +7,13 @@
   import { getSession } from 'sessionmanager';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import {
-    showCopied,
-    showCopyDetails,
-    showCtaWithDefaultText,
-  } from 'checkoutstore/cta';
 
   // UI imports
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
   import Callout from 'ui/elements/Callout.svelte';
   import Tab from 'ui/tabs/Tab.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
+  import CTA from 'ui/elements/CTA.svelte';
 
   // i18n
   import {
@@ -31,6 +27,7 @@
     RETRY_BUTTON_LABEL,
     ROUND_OFF_CALLOUT,
   } from 'ui/labels/bank-transfer';
+  import { COPY_DETAILS, COPIED } from 'ui/labels/cta';
 
   import { t, locale } from 'svelte-i18n';
 
@@ -44,14 +41,10 @@
   // Refs
   export let neftDetails = null;
 
+  let copied = false;
   const session = getSession();
 
   function init() {
-    if (data !== null) {
-      showCopyDetails();
-      return;
-    }
-
     loading = true;
 
     const submitData = session.getPayload();
@@ -94,27 +87,21 @@
       };
 
       loading = false;
-      showCopyDetails();
     }
   }
 
-  export function onShown() {
-    init();
-  }
-
-  export function onBack() {
-    showCtaWithDefaultText();
-    return false;
-  }
-
-  export function shouldSubmit() {
+  export function copyDetails() {
     copyToClipboard('.neft-details', neftDetails.innerText);
     Analytics.track('bank_transfer:copy:click', {
       type: AnalyticsTypes.BEHAV,
     });
-    showCopied();
-    return false;
+    copied = true;
+    setTimeout(() => {
+      copied = false;
+    }, 3000);
   }
+
+  init();
 </script>
 
 <style>
@@ -167,7 +154,7 @@
   }
 </style>
 
-<Tab method="bank_transfer">
+<Tab method="bank_transfer" shown={true}>
   <div class="bank_transfer-container">
     {#if loading}
       <!-- LABEL: Getting bank details... -->
@@ -207,10 +194,11 @@
         {/if}
       </div>
 
-      <Bottom tab="bank_transfer">
+      <Bottom>
         <!-- LABEL: Do not round-off the amount. Transfer the exact amount for the payment to be successful. -->
         <Callout>{$t(ROUND_OFF_CALLOUT)}</Callout>
       </Bottom>
+      <CTA on:click={copyDetails}>{$t(copied ? COPIED : COPY_DETAILS)}</CTA>
     {:else}
       <div class="error">
         <div class="error-text">{error || 'Error'}</div>

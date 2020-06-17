@@ -1,13 +1,11 @@
 <script>
-  import { onMount, onDestroy, afterUpdate } from 'svelte';
+  import { afterUpdate } from 'svelte';
   import { cta, isCtaShown, showCta, hideCta } from 'checkoutstore/cta';
 
   // if passed, creates an exclusive control on showing/hiding
   // of #footer for the lifecycle of <CTA>
   // expects Boolean
   export let show = true;
-  let wasCtaShown;
-  let ref;
 
   /**
    * on creation, we display the #footer to render this component in
@@ -25,25 +23,28 @@
    * this is until #footer has been completely migrated to <CTA>
    * and we're able to determine at any given time if #footer needs to be shown or not
    */
-  onMount(() => {
-    document.querySelector('#footer').appendChild(ref);
-    wasCtaShown = isCtaShown();
+  function replaceNode(node) {
+    document.querySelector('#footer').appendChild(node);
+    const wasCtaShown = isCtaShown();
     if (!wasCtaShown && show) {
       showCta();
     } else if (wasCtaShown && !show) {
       hideCta();
     }
-  });
+
+    return {
+      destroy() {
+        wasCtaShown ? showCta() : hideCta();
+        _El.detach(node);
+      },
+    };
+  }
 
   afterUpdate(() => {
     show ? showCta() : hideCta();
   });
-
-  onDestroy(() => {
-    wasCtaShown ? showCta() : hideCta();
-  });
 </script>
 
-<span bind:this={ref} on:click>
+<span use:replaceNode on:click>
   <slot>{$cta}</slot>
 </span>

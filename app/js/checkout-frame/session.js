@@ -1280,7 +1280,6 @@ Session.prototype = {
     this.setUpiOtmTab();
     this.setPayoutsScreen();
     this.setNach();
-    this.setBankTransfer();
     this.setWalletsTab();
     this.setOffers();
     this.setLanguageDropdown();
@@ -1410,14 +1409,6 @@ Session.prototype = {
   setNach: function() {
     if (MethodStore.isMethodEnabled('nach')) {
       this.nachScreen = new discreet.NachScreen({
-        target: _Doc.querySelector('#form-fields'),
-      });
-    }
-  },
-
-  setBankTransfer: function() {
-    if (MethodStore.isMethodEnabled('bank_transfer')) {
-      this.bankTransferView = new discreet.BankTransferScreen({
         target: _Doc.querySelector('#form-fields'),
       });
     }
@@ -2679,14 +2670,13 @@ Session.prototype = {
         return;
       }
     } else if (this.tab === 'netbanking') {
+      discreet.netbankingTab.destroy();
     } else if (this.tab === 'nach') {
       if (this.nachScreen.onBack()) {
         return;
       }
     } else if (this.tab === 'bank_transfer') {
-      if (this.bankTransferView.onBack()) {
-        return;
-      }
+      es6components.bankTransferTab.destroy();
     } else if (this.tab === 'emandate') {
       if (this.emandateView.onBack()) {
         return;
@@ -2894,7 +2884,7 @@ Session.prototype = {
       this.clearRequest();
     }
     if (tab === 'netbanking') {
-      es6components.setNetbankingTab();
+      discreet.netbankingTab.render();
     }
 
     if (tab === 'upi') {
@@ -2960,7 +2950,7 @@ Session.prototype = {
     }
 
     if (tab === 'bank_transfer') {
-      this.bankTransferView.onShown();
+      es6components.bankTransferTab.render();
     }
   },
 
@@ -4230,14 +4220,6 @@ Session.prototype = {
       shouldContinue = this.nachScreen.shouldSubmit();
     }
 
-    if (this.tab === 'bank_transfer') {
-      shouldContinue = this.bankTransferView.shouldSubmit();
-    }
-
-    if (this.tab === 'card') {
-      // shouldContinue = this.svelteCardTab.shouldSubmit();
-    }
-
     if (!shouldContinue) {
       return;
     }
@@ -4905,7 +4887,6 @@ Session.prototype = {
   cleanUpSvelteComponents: function() {
     var views = [
       'upiOtmTab',
-      'bankTransferView',
       'cardlessEmiView',
       'currentScreen',
       'emandateView',
