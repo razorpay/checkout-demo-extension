@@ -28,7 +28,9 @@ export function setInstrumentsForCustomer(customer, instruments) {
 function getInstrumentsFromApi(customer) {
   const promise = new Promise(resolve => {
     setTimeout(() => {
-      const apiInstruments = [];
+      const data = {};
+
+      const apiInstruments = data[customer.contact] || [];
 
       setInstrumentsForCustomer(customer, apiInstruments);
 
