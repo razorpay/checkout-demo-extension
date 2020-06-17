@@ -126,3 +126,40 @@ export function toTitleCase(str) {
 
   return str[0].toUpperCase() + str.slice(1);
 }
+
+/**
+ * Checks if an element is completely visible in its tab
+ * @param {Element} element
+ *
+ * @returns {boolean}
+ */
+export function isElementCompletelyVisibleInTab(element) {
+  const tab = _El.closest(element, '.tab-content');
+
+  if (!tab) {
+    return false;
+  }
+
+  const elementRect = element.getBoundingClientRect();
+
+  const elementStartsAtX = elementRect.left;
+  const elementEndsAtX = elementRect.left + elementRect.width;
+  const elementStartsAtY = elementRect.top;
+  const elementEndsAtY = elementRect.top + elementRect.height;
+
+  const tabRect = tab.getBoundingClientRect();
+
+  const tabStartsAtX = tabRect.left;
+  const tabEndsAtX = tabRect.left + tabRect.width;
+  const tabStartsAtY = tabRect.top;
+  const tabEndsAtY = tabRect.top + tabRect.height;
+
+  const isHeightContianed =
+    elementStartsAtY >= tabStartsAtY && elementEndsAtY <= tabEndsAtY;
+  const isWidthContained =
+    elementStartsAtX >= tabStartsAtX && elementEndsAtX <= tabEndsAtX;
+
+  const isElementContained = isHeightContianed && isWidthContained;
+
+  return isElementContained;
+}
