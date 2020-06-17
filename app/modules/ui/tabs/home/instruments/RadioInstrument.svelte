@@ -140,7 +140,7 @@
     }
     const providerName = getCardlessEmiProviderName(providerCode, $locale);
     return {
-      title: getInstrumentTitle('emi', providerName, locale),
+      title: getInstrumentTitle('cardless_emi', providerName, locale),
       icon: provider.sqLogo,
       alt: provider.name,
     };
