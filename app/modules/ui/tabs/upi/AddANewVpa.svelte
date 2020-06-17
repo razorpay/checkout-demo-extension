@@ -141,6 +141,7 @@
   name={'upi-vpa-input-' + paymentMethod}
   value="full"
   align="top"
+  overflow
   on:click
   on:click={focusAfterTimeout}
   {selected}>
@@ -152,8 +153,8 @@
   <!-- LABEL: Google Pay, BHIM, PhonePe & more -->
   <div slot="subtitle">
     {#if paymentMethod === 'upi_otm'}
-      {$t(NEW_VPA_SUBTITLE)}
-    {:else}{$t(NEW_VPA_SUBTITLE_UPI_OTM)}{/if}
+      {$t(NEW_VPA_SUBTITLE_UPI_OTM)}
+    {:else}{$t(NEW_VPA_SUBTITLE)}{/if}
   </div>
   <i slot="icon" class="top">
     <Icon icon={session.themeMeta.icons.upi} />

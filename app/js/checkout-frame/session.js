@@ -39,6 +39,7 @@ var preferences,
   CustomerStore = discreet.CustomerStore,
   EmiStore = discreet.EmiStore,
   Cta = discreet.Cta,
+  es6components = discreet.es6components,
   NBHandlers = discreet.NBHandlers,
   Instruments = discreet.Instruments,
   I18n = discreet.I18n;
@@ -1159,7 +1160,7 @@ Session.prototype = {
     this.setFormatting();
     this.improvisePaymentOptions();
     this.improvisePrefill();
-    discreet.es6components.render();
+    es6components.render();
     this.setSvelteComponents();
     this.fillData();
     this.setEMI();
@@ -1250,65 +1251,6 @@ Session.prototype = {
     });
   },
 
-  setNetbankingTab: function() {
-    var method, banks;
-    var prefilledBank = this.get('prefill.bank');
-
-    if (MethodStore.isEMandateEnabled()) {
-      method = 'emandate';
-      var embanks = MethodStore.getEMandateBanks();
-      banks = _Obj.reduce(
-        embanks,
-        function(banks, bank, code) {
-          banks[code] = bank.name;
-          return banks;
-        },
-        {}
-      );
-    } else if (MethodStore.isMethodEnabled('netbanking')) {
-      method = 'netbanking';
-      banks = Store.getMerchantMethods().netbanking;
-    }
-
-    // Set prefilled bank in store
-    if (prefilledBank) {
-      NetbankingScreenStore.selectedBank.set(prefilledBank);
-    }
-
-    if (method) {
-      this.netbankingTab && this.netbankingTab.$destroy();
-      this.netbankingTab = new discreet.NetbankingTab({
-        target: gel('form-fields'),
-        props: {
-          bankOptions: this.get('method.netbanking'),
-          banks: banks,
-          method: method,
-        },
-      });
-
-      // Add listener for proceeding automatically only if emandate
-      if (method === 'emandate') {
-        this.netbankingTab.$on(
-          'bankSelected',
-          this.proceedAutomaticallyAfterSelectingBank.bind(this)
-        );
-      }
-
-      var session = this;
-
-      this.netbankingTab.$on('bankSelected', function(e) {
-        session.validateOffers(e.detail.bank.code, function(offerRemoved) {
-          if (!offerRemoved) {
-            // If the offer was not removed, revert to the bank in offer issuer
-            NetbankingScreenStore.selectedBank.set(
-              session.getAppliedOffer().issuer
-            );
-          }
-        });
-      });
-    }
-  },
-
   setSvelteCardTab: function() {
     if (MethodStore.isCardOrEMIEnabled()) {
       this.svelteCardTab = new discreet.CardTab({
@@ -1338,7 +1280,6 @@ Session.prototype = {
     this.setUpiOtmTab();
     this.setPayoutsScreen();
     this.setNach();
-    this.setBankTransfer();
     this.setWalletsTab();
     this.setOffers();
     this.setLanguageDropdown();
@@ -1468,14 +1409,6 @@ Session.prototype = {
   setNach: function() {
     if (MethodStore.isMethodEnabled('nach')) {
       this.nachScreen = new discreet.NachScreen({
-        target: _Doc.querySelector('#form-fields'),
-      });
-    }
-  },
-
-  setBankTransfer: function() {
-    if (MethodStore.isMethodEnabled('bank_transfer')) {
-      this.bankTransferView = new discreet.BankTransferScreen({
         target: _Doc.querySelector('#form-fields'),
       });
     }
@@ -2737,16 +2670,13 @@ Session.prototype = {
         return;
       }
     } else if (this.tab === 'netbanking') {
-      this.netbankingTab && this.netbankingTab.$destroy();
-      this.netbankingTab = null;
+      discreet.netbankingTab.destroy();
     } else if (this.tab === 'nach') {
       if (this.nachScreen.onBack()) {
         return;
       }
     } else if (this.tab === 'bank_transfer') {
-      if (this.bankTransferView.onBack()) {
-        return;
-      }
+      es6components.bankTransferTab.destroy();
     } else if (this.tab === 'emandate') {
       if (this.emandateView.onBack()) {
         return;
@@ -2954,7 +2884,7 @@ Session.prototype = {
       this.clearRequest();
     }
     if (tab === 'netbanking') {
-      this.setNetbankingTab();
+      discreet.netbankingTab.render();
     }
 
     if (tab === 'upi') {
@@ -3020,7 +2950,7 @@ Session.prototype = {
     }
 
     if (tab === 'bank_transfer') {
-      this.bankTransferView.onShown();
+      es6components.bankTransferTab.render();
     }
   },
 
@@ -4290,14 +4220,6 @@ Session.prototype = {
       shouldContinue = this.nachScreen.shouldSubmit();
     }
 
-    if (this.tab === 'bank_transfer') {
-      shouldContinue = this.bankTransferView.shouldSubmit();
-    }
-
-    if (this.tab === 'card') {
-      // shouldContinue = this.svelteCardTab.shouldSubmit();
-    }
-
     if (!shouldContinue) {
       return;
     }
@@ -4965,7 +4887,6 @@ Session.prototype = {
   cleanUpSvelteComponents: function() {
     var views = [
       'upiOtmTab',
-      'bankTransferView',
       'cardlessEmiView',
       'currentScreen',
       'emandateView',
@@ -4975,7 +4896,6 @@ Session.prototype = {
       'feeBearerView',
       'homeTab',
       'nachScreen',
-      'netbankingTab',
       'otpView',
       'payLaterView',
       'payoutsAccountView',
@@ -5029,7 +4949,7 @@ Session.prototype = {
       this.clearRequest(cancelReason);
       this.isOpen = false;
 
-      discreet.es6components.destroy();
+      es6components.destroyAll();
       this.cleanUpSvelteComponents();
 
       try {

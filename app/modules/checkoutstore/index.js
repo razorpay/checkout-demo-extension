@@ -1,6 +1,7 @@
 import { writable } from 'svelte/store';
 import { getDowntimes as _getDowntimes } from 'checkoutframe/downtimes';
 import { makeAuthUrl as _makeAuthUrl } from 'common/Razorpay';
+import { displayAmount } from 'common/currency';
 
 let razorpayInstance, preferences;
 export const razorpayInstanceStore = writable();
@@ -24,6 +25,7 @@ const IRCTC_KEYS = [
 
 export const isIRCTC = () => IRCTC_KEYS |> _Arr.contains(getOption('key'));
 
+export const getDisplayAmount = () => displayAmount(razorpayInstance);
 export const getMerchantMethods = () => preferences.methods;
 export const getRecurringMethods = () => preferences.methods.recurring;
 export const getMerchantOrder = () => preferences.order;
