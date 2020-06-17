@@ -199,6 +199,7 @@
 
   .search-field {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     box-shadow: 0px 6px 4px rgba(196, 196, 196, 0.2);
   }
