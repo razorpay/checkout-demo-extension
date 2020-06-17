@@ -241,13 +241,21 @@ var responseTypes = {
 
     var intent_url = (fullResponse.data || {}).intent_url;
 
-    this.on('upi.intent_success_response', data => {
+    var CheckoutBridge = window.CheckoutBridge;
+
+    const startPolling = data => {
       if (data) {
         this.emit('upi.pending', { flow: 'upi-intent', response: data });
       }
 
       this.ajax = ra(data);
-    });
+    };
+
+    if (CheckoutBridge.platform === 'ios') {
+      this.on('upi.intent_success_response', startPolling);
+    } else {
+      startPolling();
+    }
 
     this.on('upi.intent_response', data => {
       if (data |> parseUPIIntentResponse |> didUPIIntentSucceed) {
@@ -259,7 +267,6 @@ var responseTypes = {
 
     this.emit('upi.coproto_response', fullResponse);
 
-    var CheckoutBridge = window.CheckoutBridge;
     if (CheckoutBridge && CheckoutBridge.callNativeIntent) {
       // If there's a UPI App specified, use it.
       if (this.upi_app) {
