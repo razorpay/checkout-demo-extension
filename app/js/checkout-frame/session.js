@@ -1843,6 +1843,19 @@ Session.prototype = {
       this.set('prefill.method', 'cardless_emi');
     }
 
+    var forcedOffer = discreet.Offers.getForcedOffer();
+
+    if (forcedOffer) {
+      var method = forcedOffer.payment_method;
+      /**
+       * For forced offers, we need to skip the home screen if the contact and
+       * email is optional
+       */
+      if (forcedOffer && method && Store.isContactEmailOptional()) {
+        this.set('prefill.method', method);
+      }
+    }
+
     improvisePrefilledContact(this);
   },
 
