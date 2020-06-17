@@ -1,5 +1,4 @@
 import * as GPay from 'gpay';
-import * as strings from 'common/strings';
 import {
   parseUPIIntentResponse,
   didUPIIntentSucceed,
