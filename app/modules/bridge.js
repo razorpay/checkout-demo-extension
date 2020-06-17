@@ -8,11 +8,11 @@ import * as TermsCurtain from 'checkoutframe/termscurtain';
 import { otp as $otp } from 'checkoutstore/screens/otp';
 
 import Track from 'tracker';
-import { confirmCancelMsg } from 'common/strings';
 
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { processPaymentCreate } from 'payment/coproto';
+import { formatMessageWithLocale, getCurrentLocale } from 'i18n';
 
 /* Our primary bridge is CheckoutBridge */
 export const defineIosBridge = () => {
@@ -328,13 +328,14 @@ function shouldHandleBackPresses() {
 
 function closeModal() {
   const session = getSession();
+  const locale = getCurrentLocale();
 
   if (session.get('modal.confirm_close')) {
     Confirm.show({
-      message: confirmCancelMsg,
-      heading: 'Cancel Payment?',
-      positiveBtnTxt: 'Yes, cancel',
-      negativeBtnTxt: 'No',
+      message: formatMessageWithLocale('misc.confirm_cancel', locale),
+      heading: formatMessageWithLocale('misc.cancel_title', locale),
+      positiveBtnTxt: formatMessageWithLocale('misc.cancel_confirm', locale),
+      negativeBtnTxt: formatMessageWithLocale('misc.cancel_back', locale),
       onPositiveClick: function() {
         session.hide();
       },

@@ -111,8 +111,6 @@ export default {
   Formatter,
 
   cancelMsg: strings.cancelMsg,
-  confirmCancelMsg: strings.confirmCancelMsg,
-  wrongOtpMsg: strings.wrongOtp,
 
   initIframe,
 

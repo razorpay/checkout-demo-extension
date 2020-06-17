@@ -728,6 +728,11 @@ export default {
     payment_processing: 'Your payment is being processed',
     payment_incomplete: 'Payment did not complete.',
     payment_canceled: 'Payment cancelled',
+    confirm_cancel:
+      'Your payment is ongoing. Are you sure you want to cancel the payment?',
+    cancel_title: 'Cancel payment?',
+    cancel_confirm: 'Yes, cancel',
+    cancel_back: 'No',
     go_to_payment: 'Go to payment',
     payment_waiting_confirmation: 'Waiting for payment confirmation.',
     error_handling_request: 'There was an error in handling your request.',

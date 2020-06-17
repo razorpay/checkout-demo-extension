@@ -90,7 +90,8 @@ var PayLaterStore = {
 var BackStore = null;
 
 function confirmClose() {
-  return confirm(discreet.confirmCancelMsg);
+  var locale = I18n.getCurrentLocale();
+  return confirm(I18n.formatMessageWithLocale('misc.confirm_cancel', locale));
 }
 
 /**
@@ -451,8 +452,11 @@ function errorHandler(response) {
 
   var error = response.error;
   var message = error.description;
+  var locale = I18n.getCurrentLocale();
+  var cancelMsg = I18n.formatMessageWithLocale('misc.payment_canceled', locale);
 
-  if (message === discreet.cancelMsg) {
+  // Both checks are there because API still returns message in English.
+  if (message === cancelMsg || message === discreet.cancelMsg) {
     if (this.powerwallet) {
       // prevent payment canceled error
       this.powerwallet = null;
@@ -531,9 +535,7 @@ function errorHandler(response) {
     }
   }
 
-  var locale = I18n.getCurrentLocale();
-  var cancelMsg = I18n.formatMessageWithLocale('misc.payment_canceled', locale);
-  if (this.tab || message !== cancelMsg) {
+  if (this.tab || (message !== cancelMsg && message !== discreet.cancelMsg)) {
     this.showLoadError(
       message ||
         I18n.formatMessageWithLocale('misc.error_handling_request', locale),
@@ -2635,6 +2637,7 @@ Session.prototype = {
   },
 
   back: function(confirmedCancel) {
+    var locale = I18n.getCurrentLocale();
     var tab = '';
     var payment = this.r._payment;
     var thisTab = this.tab;
@@ -2646,10 +2649,16 @@ Session.prototype = {
 
     var confirm = function() {
       Confirm.show({
-        message: discreet.confirmCancelMsg,
-        heading: 'Cancel Payment?',
-        positiveBtnTxt: 'Yes, cancel',
-        negativeBtnTxt: 'No',
+        message: I18n.formatMessageWithLocale('misc.confirm_cancel', locale),
+        heading: I18n.formatMessageWithLocale('misc.cancel_title', locale),
+        positiveBtnTxt: I18n.formatMessageWithLocale(
+          'misc.cancel_confirm',
+          locale
+        ),
+        negativeBtnTxt: I18n.formatMessageWithLocale(
+          'misc.cancel_back',
+          locale
+        ),
         onPositiveClick: function() {
           self.back(true);
         },
@@ -3534,14 +3543,21 @@ Session.prototype = {
   },
 
   hide: function(confirmedCancel) {
+    var locale = I18n.getCurrentLocale();
     var self = this;
     if (this.isOpen) {
       if (confirmedCancel !== true && this.r._payment) {
         return Confirm.show({
-          message: discreet.confirmCancelMsg,
-          heading: 'Cancel Payment?',
-          positiveBtnTxt: 'Yes, cancel',
-          negativeBtnTxt: 'No',
+          message: I18n.formatMessageWithLocale('misc.confirm_cancel', locale),
+          heading: I18n.formatMessageWithLocale('misc.cancel_title', locale),
+          positiveBtnTxt: I18n.formatMessageWithLocale(
+            'misc.cancel_confirm',
+            locale
+          ),
+          negativeBtnTxt: I18n.formatMessageWithLocale(
+            'misc.cancel_back',
+            locale
+          ),
           onPositiveClick: function() {
             self.hide(true);
           },
@@ -3563,10 +3579,17 @@ Session.prototype = {
 
     var actionState;
     var loadingState = true;
+
+    var locale = I18n.getCurrentLocale();
+    var cancelMsg = I18n.formatMessageWithLocale(
+      'misc.payment_canceled',
+      locale
+    );
+
     if (error) {
       if (
         (this.screen === 'upi' || this.screen === 'upi_otm') &&
-        text === discreet.cancelMsg
+        (text === cancelMsg || text === discreet.cancelMsg)
       ) {
         if (this.payload && this.payload['_[flow]'] === 'intent') {
           return;
@@ -3580,7 +3603,6 @@ Session.prototype = {
     }
 
     if (!text) {
-      var locale = I18n.getCurrentLocale();
       text = I18n.formatMessageWithLocale('misc.payment_processing', locale);
     }
 
