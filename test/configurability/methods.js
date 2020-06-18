@@ -232,7 +232,7 @@ test('Module: configurability/methods', t => {
             },
             {
               code: 'gpay',
-              _type: 'instrument',
+              _type: 'method',
               method: 'gpay',
             },
             {
@@ -247,7 +247,7 @@ test('Module: configurability/methods', t => {
             },
             {
               code: 'qr',
-              _type: 'instrument',
+              _type: 'method',
               method: 'qr',
             },
             {
@@ -267,7 +267,7 @@ test('Module: configurability/methods', t => {
             },
             {
               code: 'nach',
-              _type: 'instrument',
+              _type: 'method',
               method: 'nach',
             },
           ],
