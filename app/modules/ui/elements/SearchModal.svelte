@@ -45,7 +45,7 @@
 
   // Refs
   let containerRef;
-  let inputField;
+  let inputRef;
 
   function updateResults() {
     if (query) {
@@ -76,7 +76,7 @@
   }
 
   function focus() {
-    if (!inputField) {
+    if (!inputRef) {
       return;
     }
 
@@ -85,13 +85,13 @@
      * Handle focus on the parent on mobile.
      */
     if (isMobile()) {
-      const parent = _El.parent(inputField);
+      const parent = _El.parent(inputRef);
 
       if (parent) {
         parent.focus();
       }
     } else {
-      inputField.focus();
+      inputRef.focus();
     }
   }
 
@@ -353,11 +353,11 @@
               type="text"
               {autocomplete}
               {placeholder}
-              on:focus={() => (inputField.type = inputType)}
+              on:focus={() => (inputRef.type = inputType)}
               on:keyup={escapeHandler}
               on:keydown={arrowKeysHandler}
               bind:value={query}
-              bind:this={inputField} />
+              bind:this={inputRef} />
           </form>
           <div class="search-results" class:has-query={query}>
             {#if query}
