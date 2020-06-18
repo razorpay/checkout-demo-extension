@@ -221,6 +221,7 @@
       return _Obj.extend(
         {
           currency,
+          _key: currency,
         },
         rest
       );

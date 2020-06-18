@@ -186,6 +186,7 @@
     code: bank.code,
     original: bank.name,
     name: getLongBankName(bank.code, $locale, bank.name),
+    _key: bank.code,
   }));
   $: invalid = method !== 'emandate' && !$selectedBank;
   $: netbanks = getPreferredBanks(filteredBanks, bankOptions).slice(
