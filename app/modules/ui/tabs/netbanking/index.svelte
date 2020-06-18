@@ -69,6 +69,7 @@
   let selectedBankHasDowntime;
   let selectedBankName;
   let translatedBanksArr;
+  let searchOpened;
 
   $: {
     if ($selectedBank) {
@@ -104,10 +105,12 @@
 
   function showSearch() {
     searchModal.open();
+    searchOpened = true;
   }
 
   function hideSearch() {
     searchModal.close();
+    searchOpened = false;
 
     // Restore focus
     if (bankSelect) {
@@ -379,7 +382,7 @@
       {/if}
 
     </Bottom>
-    {#if !recurring}
+    {#if !(recurring || searchOpened)}
       <CTA on:click={() => getSession().preSubmit()} />
     {/if}
   </Screen>
