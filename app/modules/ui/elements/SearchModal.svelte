@@ -41,6 +41,7 @@
   let ref;
   let query = '';
   let results = items;
+  let focusedIndex;
 
   // Refs
   let inputField;
@@ -53,6 +54,10 @@
         return item[key].toLowerCase().includes(queryText);
       });
     });
+
+    if (results.length === 1) {
+      focusedIndex = 0;
+    }
   }
 
   $: items, query, keys, updateResults();
@@ -256,7 +261,11 @@
   }
 
   .list-item:hover {
-    background-color: #eff0f1;
+    background-color: #efefef;
+  }
+
+  .list-item.focused {
+    background-color: #e4e4e4;
   }
 
   .no-results {
@@ -299,8 +308,11 @@
             {#if query}
               <div class="list results">
                 {#if results.length}
-                  {#each results as item}
-                    <div class="list-item" on:click={() => onSelect(item)}>
+                  {#each results as item, index}
+                    <div
+                      class="list-item"
+                      class:focused={focusedIndex === index}
+                      on:click={() => onSelect(item)}>
                       <svelte:component this={component} {item} />
                     </div>
                   {/each}
