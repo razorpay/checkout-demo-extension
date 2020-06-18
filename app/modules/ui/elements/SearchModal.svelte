@@ -21,7 +21,8 @@
 
   // Props
   export let placeholder = 'Type to search';
-  export let autocomplete;
+  export let autocomplete = 'off';
+  export let inputType = 'text';
   export let items = [];
   export let component;
   export let keys;
@@ -289,6 +290,7 @@
               type="text"
               {autocomplete}
               {placeholder}
+              on:focus={() => (inputField.type = inputType)}
               on:keyup={handleEscape}
               bind:value={query}
               bind:this={inputField} />
