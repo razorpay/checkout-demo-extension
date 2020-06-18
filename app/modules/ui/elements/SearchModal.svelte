@@ -40,13 +40,14 @@
   let visible = false;
   let ref;
   let query = '';
-  let results = items;
+  let results = [];
   let focusedIndex = null;
 
   // Refs
   let inputField;
 
   function updateResults() {
+    if (query) {
     results = _Arr.filter(items, item => {
       const queryText = query.toLowerCase().trim();
 
@@ -54,6 +55,9 @@
         return item[key].toLowerCase().includes(queryText);
       });
     });
+    } else {
+      results = [];
+    }
 
     if (results.length === 1) {
       focusedIndex = 0;
