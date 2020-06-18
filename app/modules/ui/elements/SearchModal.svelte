@@ -155,10 +155,6 @@
     height: 90%;
   }
 
-  .search-box {
-    font-size: 12px;
-  }
-
   .search-box > :global(.stack) {
     height: 100%;
   }
@@ -171,7 +167,7 @@
   .list-header {
     display: flex;
     align-items: center;
-    font-size: 11px;
+    font-size: 0.8rem;
     line-height: 13px;
     margin-top: 16px;
     margin-bottom: 4px;
@@ -225,7 +221,7 @@
   .search-field input {
     color: #888;
     width: 100%;
-    font-size: 13px;
+    font-size: 1rem;
   }
 
   .search-field input::placeholder {
