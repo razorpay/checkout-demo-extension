@@ -406,7 +406,7 @@
             {#if query}
               <div class="list results">
                 {#if results.length}
-                  {#each results as item, index}
+                  {#each results as item, index (`${item._key}_result_${index}`)}
                     <div
                       class="list-item"
                       class:focused={index === focusedIndex}
@@ -428,7 +428,7 @@
                 <div class="divider" />
               </div>
               <div class="list">
-                {#each items as item, index}
+                {#each items as item, index (`${item._key}_all_${index}`)}
                   <div
                     class="list-item"
                     class:focused={index + results.length === focusedIndex}
