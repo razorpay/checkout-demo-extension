@@ -100,6 +100,10 @@ export function getOffersForTab(method) {
 
     let methods = [method];
 
+    /**
+     * "EMI on Cards" is also present in the Cardless EMI screen.
+     * So, if the tab is cardless_emi, we should need to show offers of "emi" method too.
+     */
     if (sessionHasEmi && method === 'cardless_emi') {
       methods.push('emi');
     }
