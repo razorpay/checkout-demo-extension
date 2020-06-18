@@ -116,7 +116,7 @@
     $overlayStack = _Arr.remove($overlayStack, overlay);
   }
 
-  function handleEscape(event) {
+  function escapeHandler(event) {
     if (_.getKeyFromEvent(event) === 27) {
       // Don't close Checkout!
       event.stopPropagation();
@@ -310,7 +310,7 @@
               {autocomplete}
               {placeholder}
               on:focus={() => (inputField.type = inputType)}
-              on:keyup={handleEscape}
+              on:keyup={escapeHandler}
               bind:value={query}
               bind:this={inputField} />
           </form>
