@@ -149,14 +149,14 @@ export function isElementCompletelyVisibleInContainer(element, container) {
   const containerStartsAtY = containerRect.top;
   const containerEndsAtY = containerRect.top + containerRect.height;
 
-  const isHeightContianed =
+  const isHeightContained =
     elementStartsAtY >= containerStartsAtY &&
     elementEndsAtY <= containerEndsAtY;
   const isWidthContained =
     elementStartsAtX >= containerStartsAtX &&
     elementEndsAtX <= containerEndsAtX;
 
-  const isElementContained = isHeightContianed && isWidthContained;
+  const isElementContained = isHeightContained && isWidthContained;
 
   return isElementContained;
 }
