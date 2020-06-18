@@ -105,6 +105,7 @@
   import { getCardOffer, hasOffersOnHomescreen } from 'checkoutframe/offers';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
   import { isInstrumentGrouped } from 'configurability/instruments';
+  import { isElementCompletelyVisibleInTab } from 'lib/utils';
 
   import { INDIA_COUNTRY_CODE } from 'common/constants';
 
@@ -633,6 +634,19 @@
 
     if (isInstrumentGrouped(instrument)) {
       selectMethod(instrument.method);
+    } else {
+      // Bring instrument into view if it's not visible
+      const domElement = _Doc.querySelector(
+        `.home-methods .methods-block [data-id="${instrument.id}"]`
+      );
+
+      if (domElement && !isElementCompletelyVisibleInTab(domElement)) {
+        domElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'center',
+        });
+      }
     }
   }
 </script>

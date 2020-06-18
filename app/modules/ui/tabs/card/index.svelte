@@ -224,7 +224,7 @@
    *
    * @returns {boolean}
    */
-  function detemineSubtextShouldBeShown() {
+  function detemineIfSubtextShouldBeShown() {
     if (!instrumentSubtext) {
       return false;
     }
@@ -236,8 +236,8 @@
     return block && block.code !== 'rzp.cluster';
   }
 
-  let shouldShowSubtext = detemineSubtextShouldBeShown();
-  $: instrumentSubtext, (shouldShowSubtext = detemineSubtextShouldBeShown());
+  let shouldShowSubtext = detemineIfSubtextShouldBeShown();
+  $: instrumentSubtext, (shouldShowSubtext = detemineIfSubtextShouldBeShown());
 
   function getSavedCardsFromCustomer(customer = {}) {
     if (!customer.tokens) {
@@ -517,7 +517,7 @@
         </div>
       {:else}
         <div in:fade={{ duration: 100 }}>
-          {#if instrumentSubtext}
+          {#if shouldShowSubtext}
             <div class="pad instrument-subtext-description">
               {instrumentSubtext}
             </div>

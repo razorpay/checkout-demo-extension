@@ -2546,17 +2546,7 @@ Session.prototype = {
     var issuer = offer.issuer;
     var screen = offer.payment_method;
 
-    if (screen === 'wallet') {
-      // Select wallet
-      if (issuer) {
-        this.svelteWalletsTab.onWalletSelection(issuer);
-      }
-    } else if (screen === 'netbanking') {
-      // Select bank
-      if (issuer) {
-        NetbankingScreenStore.selectedBank.set(issuer);
-      }
-    } else if (screen === 'emi') {
+    var emiHandler = function() {
       var emiDuration = getEmiDurationForNewCard();
       var bank = this.emiPlansForNewCard && this.emiPlansForNewCard.code;
 
@@ -2574,11 +2564,35 @@ Session.prototype = {
           setEmiDurationForNewCard('');
         }
       }
-    } else if (screen === 'cardless_emi' && screen !== 'otp') {
-      var provider = offer.provider;
+    };
 
-      if (provider) {
-        this.selectCardlessEmiProviderAndAttemptPayment(provider);
+    if (screen === 'wallet') {
+      // Select wallet
+      if (issuer) {
+        this.svelteWalletsTab.onWalletSelection(issuer);
+      }
+    } else if (screen === 'netbanking') {
+      // Select bank
+      if (issuer) {
+        NetbankingScreenStore.selectedBank.set(issuer);
+      }
+    } else if (screen === 'emi') {
+      emiHandler.call(this);
+    } else if (screen === 'cardless_emi' && screen !== 'otp') {
+      /**
+       * If EMI and Cardless EMI are clubbed, the user will land on the Cardless EMI screen
+       * So, if the offer method is EMI, let's get the user on the EMI screen
+       */
+      if (offer.payment_method === 'emi') {
+        this.selectCardlessEmiProviderAndAttemptPayment('cards');
+
+        emiHandler.call(this);
+      } else {
+        var provider = offer.provider;
+
+        if (provider) {
+          this.selectCardlessEmiProviderAndAttemptPayment(provider);
+        }
       }
     }
   },
@@ -2593,7 +2607,7 @@ Session.prototype = {
      * and select it if not already selected
      */
 
-    var instrument = discreet.Offers.getInstrumentForOffer(offer);
+    var instrument = discreet.Offers.getInstrumentToSelectForOffer(offer);
 
     if (!instrument) {
       Analytics.track('offer_instrument_undef', {

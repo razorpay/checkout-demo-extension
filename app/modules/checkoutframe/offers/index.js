@@ -10,9 +10,16 @@ import {
   getCardlessEMIProviders,
 } from 'checkoutstore/methods';
 
-import { instruments, selectedInstrument } from 'checkoutstore/screens/home';
+import {
+  instruments,
+  selectedInstrument,
+  sequence as sequenceStore,
+} from 'checkoutstore/screens/home';
 import { get as storeGetter } from 'svelte/store';
-import { isSavedCardInstrument } from 'configurability/instruments';
+import {
+  isSavedCardInstrument,
+  isInstrumentForEntireMethod,
+} from 'configurability/instruments';
 
 /**
  * Checks if offer is eligible.
@@ -81,18 +88,40 @@ export function getOffersForTab(method) {
   const allOffers = getAllOffers();
 
   if (method) {
+    const sequence = storeGetter(sequenceStore);
+    const sessionHasEmi = _Arr.contains(sequence, 'emi');
+
     // EMI plans should have the same offers as EMI
     // TODO: Fix for Cardless EMI
     method = getOfferMethodForTab(method);
     if (method === 'cardless_emi') {
       allOffers.push(zestMoneyOffer);
     }
-    return allOffers.filter(function(o) {
-      return o.payment_method === method;
-    });
+
+    let methods = [method];
+
+    /**
+     * "EMI on Cards" is also present in the Cardless EMI screen.
+     * So, if the tab is cardless_emi, we should need to show offers of "emi" method too.
+     */
+    if (sessionHasEmi && method === 'cardless_emi') {
+      methods.push('emi');
+    }
+
+    return allOffers.filter(offer =>
+      _Arr.contains(methods, offer.payment_method)
+    );
   }
 
   return allOffers;
+}
+
+export function getOffersForTabAndInstrument({ tab, instrument }) {
+  if (instrument && instrument.method === tab) {
+    return getOffersForInstrument(instrument);
+  } else {
+    return getOffersForTab(tab);
+  }
 }
 
 const instrumentKey = {
@@ -110,11 +139,22 @@ const instrumentKey = {
  * @returns {boolean}
  */
 function isOfferEligibleOnInstrument(offer, instrument) {
-  if (offer.payment_method !== instrument.method) {
+  let instrumentMethod = instrument.method;
+
+  const sequence = storeGetter(sequenceStore);
+
+  const sessionHasEmi = _Arr.contains(sequence, 'emi');
+  const isOfferForEmi = offer.payment_method === 'emi';
+  const isInstrumentForEmi = instrument.method === 'emi';
+  const isInstrumentForCardlessEmi = instrument.method === 'cardless_emi';
+
+  if (isInstrumentForCardlessEmi && sessionHasEmi && isOfferForEmi) {
+    // Do nothing
+  } else if (offer.payment_method !== instrumentMethod) {
     return false;
   }
 
-  const key = instrumentKey[instrument.method];
+  const key = instrumentKey[instrumentMethod];
 
   if (key) {
     const offerIssuer = offer.issuer;
@@ -199,6 +239,40 @@ function _getAllInstrumentsForOffer(offer) {
   );
 }
 
+const INSTRUMENT_TO_SELECT_HANDLERS = {
+  default: offer => {
+    const instruments = _getAllInstrumentsForOffer(offer);
+    const nonSavedCardInstruments = _Arr.filter(
+      instruments,
+      instrument => !isSavedCardInstrument(instrument)
+    );
+
+    const first = nonSavedCardInstruments[0];
+
+    if (first) {
+      return first;
+    }
+  },
+
+  card: offer => {
+    const instruments = _getAllInstrumentsForOffer(offer);
+
+    // Try choosing instrument for entire method
+    const methodInstrument = _Arr.find(
+      instruments,
+      isInstrumentForEntireMethod
+    );
+
+    if (methodInstrument) {
+      return methodInstrument;
+    }
+
+    return INSTRUMENT_TO_SELECT_HANDLERS.default(offer);
+  },
+};
+
+INSTRUMENT_TO_SELECT_HANDLERS.emi = INSTRUMENT_TO_SELECT_HANDLERS.card;
+
 /**
  * Returns a matching instrument for the offer
  *
@@ -210,7 +284,7 @@ function _getAllInstrumentsForOffer(offer) {
  *
  * @returns {Instrument|undefined}
  */
-export function getInstrumentForOffer(offer) {
+export function getInstrumentToSelectForOffer(offer) {
   const currentInstrument = storeGetter(selectedInstrument);
 
   if (currentInstrument) {
@@ -231,17 +305,11 @@ export function getInstrumentForOffer(offer) {
   }
 
   // Not eligible on currently selected instrument
-  // Search for an eligible instrument
+  // Search for other eligible instruments
 
-  const instruments = _getAllInstrumentsForOffer(offer);
-  const nonSavedCardInstruments = _Arr.filter(
-    instruments,
-    instrument => !isSavedCardInstrument(instrument)
-  );
+  const handler =
+    INSTRUMENT_TO_SELECT_HANDLERS[offer.payment_method] ||
+    INSTRUMENT_TO_SELECT_HANDLERS.default;
 
-  const first = nonSavedCardInstruments[0];
-
-  if (first) {
-    return first;
-  }
+  return handler(offer);
 }
