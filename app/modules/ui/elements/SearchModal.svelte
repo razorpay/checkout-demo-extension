@@ -62,16 +62,18 @@
       results = [];
     }
 
-    shownItems = _Arr.mergeWith(results, items);
-
-    if (results.length === 1) {
+    if (results.length) {
       focusedIndex = 0;
     } else {
       focusedIndex = null;
     }
   }
 
-  function bringItemAtIndexIntoView (index) {
+  $: items, query, keys, updateResults();
+  $: shownItems = _Arr.mergeWith(results, items);
+  $: shownItems, focusedIndex, scrollToFocusedItem();
+
+  function bringItemAtIndexIntoView(index) {
     if (!resultsContainerRef) {
       return;
     }
@@ -81,10 +83,18 @@
 
     if (item) {
       if (!isElementCompletelyVisibleInContainer(item, resultsContainerRef)) {
-        item.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-          inline: 'center',
+        /**
+         * setTimeout is needed because UI changes need to be completed.
+         * tick() doesn't work here.
+         */
+        setTimeout(() => {
+          try {
+            item.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center',
+              inline: 'center',
+            });
+          } catch (err) {}
         });
       }
     }
@@ -96,11 +106,10 @@
       return;
     }
 
-    bringItemAtIndexIntoView(focusedIndex);
+    tick().then(() => {
+      bringItemAtIndexIntoView(focusedIndex);
+    });
   }
-
-  $: items, query, keys, updateResults();
-  $: focusedIndex, scrollToFocusedItem();
 
   function onSelect(item) {
     dispatch('select', item);
