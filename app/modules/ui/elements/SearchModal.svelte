@@ -40,13 +40,13 @@
   let visible = false;
   let ref;
   let query = '';
-  let matchingItems = items;
+  let results = items;
 
   // Refs
   let inputField;
 
-  function updateMatches() {
-    matchingItems = _Arr.filter(items, item => {
+  function updateResults() {
+    results = _Arr.filter(items, item => {
       const queryText = query.toLowerCase().trim();
 
       return _Arr.any(keys, key => {
@@ -55,7 +55,7 @@
     });
   }
 
-  $: items, query, keys, updateMatches();
+  $: items, query, keys, updateResults();
 
   function onSelect(item) {
     dispatch('select', item);
@@ -298,8 +298,8 @@
           <div class="search-results" class:has-query={query}>
             {#if query}
               <div class="list results">
-                {#if matchingItems.length}
-                  {#each matchingItems as item}
+                {#if results.length}
+                  {#each results as item}
                     <div class="list-item" on:click={() => onSelect(item)}>
                       <svelte:component this={component} {item} />
                     </div>
