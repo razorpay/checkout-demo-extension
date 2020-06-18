@@ -31,20 +31,20 @@
   const id = Track.makeUid();
 
   onMount(() => {
-    document.querySelector('#modal-inner').appendChild(ref);
+    document.querySelector('#modal-inner').appendChild(containerRef);
   });
 
   const dispatch = createEventDispatcher();
 
   // Variables
   let visible = false;
-  let ref;
   let query = '';
   let results = [];
   let shownItems = items;
   let focusedIndex = null;
 
   // Refs
+  let containerRef;
   let inputField;
 
   function updateResults() {
@@ -331,7 +331,7 @@
   }
 </style>
 
-<div bind:this={ref}>
+<div bind:this={containerRef}>
   {#if visible}
     <div class="search-curtain">
       <div
