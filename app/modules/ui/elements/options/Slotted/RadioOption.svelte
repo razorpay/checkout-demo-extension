@@ -14,6 +14,7 @@
   export let defaultStyles = true;
   export let ellipsis = false; // Should we truncate the text?
   export let attributes = {};
+  export let overflow = false;
 
   let radioClasses;
   $: {
@@ -61,6 +62,10 @@
   .radio.reverse {
     margin-right: 12px;
   }
+
+  .overflow {
+    overflow: visible;
+  }
 </style>
 
 <button
@@ -68,6 +73,7 @@
   class:ellipsis
   class:slotted-radio={defaultStyles}
   class:selected
+  class:overflow
   on:click
   on:keydown
   type="button"

@@ -1,5 +1,5 @@
 import PoweredBy from 'ui/components/PoweredBy.svelte';
-import renderNetbankingTab from './netbanking';
+import BankTransferScreen from 'ui/tabs/bank-transfer/index.svelte';
 
 let componentsMap = {};
 
@@ -14,18 +14,33 @@ export function destroyAll() {
   componentsMap = {};
 }
 
+export function getView(key) {
+  return componentsMap[key];
+}
+
+export function destroyView(key) {
+  setView(key, null);
+}
+
+export function setView(key, view) {
+  destroy(componentsMap[key]);
+  componentsMap[key] = view;
+}
+
 function destroy(c) {
   c && c.$destroy();
 }
 
-function setComponent(key, factory) {
-  return () => {
-    destroy(componentsMap[key]);
-    componentsMap[key] = factory();
-  };
-}
+const BANK_TRANSFER_KEY = 'bankTransferView';
+export const bankTransferTab = {
+  render() {
+    setView(
+      BANK_TRANSFER_KEY,
+      new BankTransferScreen({ target: _Doc.querySelector('#form-fields') })
+    );
+  },
 
-export const setNetbankingTab = setComponent(
-  'netbankingTab',
-  renderNetbankingTab
-);
+  destroy() {
+    destroyView(BANK_TRANSFER_KEY);
+  },
+};
