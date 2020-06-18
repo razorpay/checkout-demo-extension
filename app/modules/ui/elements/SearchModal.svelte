@@ -41,7 +41,7 @@
   let ref;
   let query = '';
   let results = items;
-  let focusedIndex;
+  let focusedIndex = null;
 
   // Refs
   let inputField;
@@ -57,6 +57,8 @@
 
     if (results.length === 1) {
       focusedIndex = 0;
+    } else {
+      focusedIndex = null;
     }
   }
 
