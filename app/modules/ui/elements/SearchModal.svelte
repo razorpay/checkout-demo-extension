@@ -123,6 +123,14 @@
       dispatch('close');
     }
   }
+
+  function submitHandler() {
+    if (_.isNumber(focusedIndex)) {
+      const result = results[focusedIndex];
+
+      onSelect(result);
+    }
+  }
 </script>
 
 <style>
@@ -290,7 +298,7 @@
         in:fly={{ duration: 200, y: -100 }}
         out:fade={{ duration: 200 }}>
         <Stack vertical>
-          <div class="search-field">
+          <form on:submit|preventDefault={submitHandler} class="search-field">
             <div class="icon">
               <Icon icon={getMiscIcon('search')} />
             </div>
@@ -303,7 +311,7 @@
               on:keyup={handleEscape}
               bind:value={query}
               bind:this={inputField} />
-          </div>
+          </form>
           <div class="search-results" class:has-query={query}>
             {#if query}
               <div class="list results">
