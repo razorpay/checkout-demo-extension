@@ -41,6 +41,7 @@
   let ref;
   let query = '';
   let results = [];
+  let shownItems = items;
   let focusedIndex = null;
 
   // Refs
@@ -58,6 +59,8 @@
     } else {
       results = [];
     }
+
+    shownItems = _Arr.mergeWith(results, items);
 
     if (results.length === 1) {
       focusedIndex = 0;
@@ -325,7 +328,7 @@
                   {#each results as item, index}
                     <div
                       class="list-item"
-                      class:focused={focusedIndex === index}
+                      class:focused={index === focusedIndex}
                       on:click={() => onSelect(item)}>
                       <svelte:component this={component} {item} />
                     </div>
@@ -344,8 +347,11 @@
                 <div class="divider" />
               </div>
               <div class="list">
-                {#each items as item}
-                  <div class="list-item" on:click={() => onSelect(item)}>
+                {#each items as item, index}
+                  <div
+                    class="list-item"
+                    class:focused={index + results.length === focusedIndex}
+                    on:click={() => onSelect(item)}>
                     <svelte:component this={component} {item} />
                   </div>
                 {/each}
