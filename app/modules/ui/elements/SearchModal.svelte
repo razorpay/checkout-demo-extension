@@ -133,6 +133,43 @@
     }
   }
 
+  function arrowKeysHandler(event) {
+    const UP_ARROW = 38;
+    const DOWN_ARROW = 40;
+
+    const handleKeys = [UP_ARROW, DOWN_ARROW];
+
+    const key = _.getKeyFromEvent(event);
+
+    if (!_Arr.contains(handleKeys, key)) {
+      return;
+    }
+
+    if (key === UP_ARROW) {
+      if (!_.isNumber(focusedIndex)) {
+        focusedIndex = shownItems.length - 1;
+      } else if (focusedIndex === 0) {
+        focusedIndex = shownItems.length - 1;
+      } else {
+        focusedIndex = focusedIndex - 1;
+      }
+
+      return;
+    }
+
+    if (key === DOWN_ARROW) {
+      if (!_.isNumber(focusedIndex)) {
+        focusedIndex = 0;
+      } else if (focusedIndex === shownItems.length - 1) {
+        focusedIndex = 0;
+      } else {
+        focusedIndex = focusedIndex + 1;
+      }
+
+      return;
+    }
+  }
+
   function submitHandler() {
     if (_.isNumber(focusedIndex)) {
       const result = results[focusedIndex];
@@ -318,6 +355,7 @@
               {placeholder}
               on:focus={() => (inputField.type = inputType)}
               on:keyup={escapeHandler}
+              on:keydown={arrowKeysHandler}
               bind:value={query}
               bind:this={inputField} />
           </form>
