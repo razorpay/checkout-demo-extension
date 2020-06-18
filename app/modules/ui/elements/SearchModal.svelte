@@ -71,14 +71,12 @@
     }
   }
 
-  function scrollToFocusedItem() {
-    // If focusedIndex is not a number, don't go ahead
-    if (!_.isNumber(focusedIndex)) {
+  function bringItemAtIndexIntoView (index) {
+    if (!resultsContainerRef) {
       return;
     }
 
-    const selector = `.list-item:nth-of-type(${focusedIndex + 1})`;
-
+    const selector = `.list-item:nth-of-type(${index + 1})`;
     const item = resultsContainerRef.querySelector(selector);
 
     if (item) {
@@ -90,6 +88,15 @@
         });
       }
     }
+  }
+
+  function scrollToFocusedItem() {
+    // If focusedIndex is not a number, don't go ahead
+    if (!_.isNumber(focusedIndex)) {
+      return;
+    }
+
+    bringItemAtIndexIntoView(focusedIndex);
   }
 
   $: items, query, keys, updateResults();
