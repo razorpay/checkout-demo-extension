@@ -203,7 +203,7 @@
 
   function submitHandler() {
     if (_.isNumber(focusedIndex)) {
-      const result = results[focusedIndex];
+      const result = shownItems[focusedIndex];
 
       onSelect(result);
     }
