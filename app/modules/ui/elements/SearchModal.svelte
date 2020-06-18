@@ -14,6 +14,7 @@
   // Utils imports
   import { isMobile } from 'common/useragent';
   import Track from 'tracker';
+  import { isElementCompletelyVisibleInContainer } from 'lib/utils';
 
   // i18n
   import { locale } from 'svelte-i18n';
@@ -46,16 +47,17 @@
   // Refs
   let containerRef;
   let inputRef;
+  let resultsContainerRef;
 
   function updateResults() {
     if (query) {
-    results = _Arr.filter(items, item => {
-      const queryText = query.toLowerCase().trim();
+      results = _Arr.filter(items, item => {
+        const queryText = query.toLowerCase().trim();
 
-      return _Arr.any(keys, key => {
-        return item[key].toLowerCase().includes(queryText);
+        return _Arr.any(keys, key => {
+          return item[key].toLowerCase().includes(queryText);
+        });
       });
-    });
     } else {
       results = [];
     }
@@ -69,7 +71,29 @@
     }
   }
 
+  function scrollToFocusedItem() {
+    // If focusedIndex is not a number, don't go ahead
+    if (!_.isNumber(focusedIndex)) {
+      return;
+    }
+
+    const selector = `.list-item:nth-of-type(${focusedIndex + 1})`;
+
+    const item = resultsContainerRef.querySelector(selector);
+
+    if (item) {
+      if (!isElementCompletelyVisibleInContainer(item, resultsContainerRef)) {
+        item.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'center',
+        });
+      }
+    }
+  }
+
   $: items, query, keys, updateResults();
+  $: focusedIndex, scrollToFocusedItem();
 
   function onSelect(item) {
     dispatch('select', item);
@@ -359,7 +383,10 @@
               bind:value={query}
               bind:this={inputRef} />
           </form>
-          <div class="search-results" class:has-query={query}>
+          <div
+            class="search-results"
+            bind:this={resultsContainerRef}
+            class:has-query={query}>
             {#if query}
               <div class="list results">
                 {#if results.length}
