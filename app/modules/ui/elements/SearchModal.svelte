@@ -36,8 +36,9 @@
 
   const IDs = {
     overlay: `${identifier}_search_overlay`,
-    resultItem: item => `${item._key}_search_result`,
-    allItem: item => `${item._key}_search_all`,
+    results: `${identifier}_search_results`,
+    resultItem: item => `${identifier}_${item._key}_search_result`,
+    allItem: item => `${identifier}_${item._key}_search_all`,
   };
 
   onMount(() => {
@@ -289,6 +290,12 @@
     overflow: auto;
   }
 
+  ul.search-results {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+  }
+
   .list-header {
     display: flex;
     align-items: center;
@@ -421,16 +428,17 @@
               bind:value={query}
               bind:this={inputRef} />
           </form>
-          <div
+          <ul
             class="search-results"
-            bind:this={resultsContainerRef}
-            class:has-query={query}>
+            class:has-query={query}
+            id={IDs.results}
+            aria-label={formatMessageWithLocale('misc.search_results_label', $locale)}
+            role="listbox"
+            bind:this={resultsContainerRef}>
             {#if query}
                 {#if results.length}
                 <!-- LABEL: Results -->
-                <ul
-                  class="list results"
-                  aria-label={formatMessageWithLocale('misc.search_results_label', $locale)}>
+                <div class="list results">
                   {#each results as item, index (IDs.resultItem(item))}
                     <li
                       class="list-item"
@@ -441,7 +449,7 @@
                       <svelte:component this={component} {item} />
                     </li>
                   {/each}
-                </ul>
+                </div>
                 {:else}
                   <!-- LABEL: No results for "{query}" -->
                   <div class="no-results">
@@ -454,7 +462,7 @@
                 <div class="text">{all}</div>
                 <div class="divider" />
               </div>
-              <ul class="list" aria-label={all}>
+              <div class="list">
                 {#each items as item, index (IDs.allItem(item))}
                   <li
                     class="list-item"
@@ -465,9 +473,9 @@
                     <svelte:component this={component} {item} />
                   </li>
                 {/each}
-              </ul>
+              </div>
             {/if}
-          </div>
+              </ul>
         </Stack>
       </div>
     </div>
