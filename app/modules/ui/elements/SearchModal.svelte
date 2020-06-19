@@ -181,8 +181,17 @@
       event.stopPropagation();
       event.preventDefault();
 
+      /**
+       * ARIA guidelines suggest
+       * - Clear the textbox.
+       * - If the listbox is displayed, close it.
+       */
+      if (query) {
+        query = '';
+      } else {
       dispatch('close');
     }
+  }
   }
 
   function arrowKeysHandler(event) {
