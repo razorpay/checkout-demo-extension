@@ -185,6 +185,9 @@ export default {
     ifsc_label: 'IFSC Code',
 
     secured_by_message: 'This payment is secured by Razorpay.',
+
+    country_search_all: 'All countries',
+    country_search_placeholder: 'Search a country',
   },
   callouts: {
     subscriptions: {
