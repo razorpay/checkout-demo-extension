@@ -53,6 +53,7 @@
   let results = [];
   let shownItems = items;
   let focusedIndex = null;
+  let activeDescendantIdRef;
 
   // Refs
   let containerRef;
@@ -82,6 +83,26 @@
   $: items, query, keys, updateResults();
   $: shownItems = _Arr.mergeWith(results, items);
   $: shownItems, focusedIndex, scrollToFocusedItem();
+  $: shownItems, focusedIndex, updateActiveDescendantInRef(); // TODO: Fix
+
+  function updateActiveDescendantInRef() {
+    tick().then(() => {
+      activeDescendantIdRef = getActiveDescendantIdRef(focusedIndex);
+    });
+  }
+
+  function getActiveDescendantIdRef(index) {
+    if (!_.isNumber(index)) {
+      return;
+    }
+
+    if (index < results.length) {
+      return `#${IDs.resultItem(results[index])}`;
+    } else {
+      index = index - results.length;
+      return `#${IDs.allItem(items[index])}`;
+    }
+  }
 
   function bringItemAtIndexIntoView(index) {
     if (!resultsContainerRef) {
@@ -190,9 +211,9 @@
       if (query) {
         query = '';
       } else {
-      dispatch('close');
+        dispatch('close');
+      }
     }
-  }
   }
 
   function arrowKeysHandler(event) {
@@ -420,6 +441,12 @@
             <input
               class="no-escape"
               type="text"
+              role="combobox"
+              aria-autocomplete="list"
+              aria-haspopup="true"
+              aria-owns={`#${IDs.results}`}
+              aria-expanded="true"
+              aria-activedescendant={activeDescendantIdRef}
               {autocomplete}
               {placeholder}
               on:focus={() => (inputRef.type = inputType)}
@@ -436,7 +463,7 @@
             role="listbox"
             bind:this={resultsContainerRef}>
             {#if query}
-                {#if results.length}
+              {#if results.length}
                 <!-- LABEL: Results -->
                 <div class="list results">
                   {#each results as item, index (IDs.resultItem(item))}
@@ -450,12 +477,12 @@
                     </li>
                   {/each}
                 </div>
-                {:else}
-                  <!-- LABEL: No results for "{query}" -->
-                  <div class="no-results">
-                    {formatTemplateWithLocale('misc.search_no_results', { query }, $locale)}
-                  </div>
-                {/if}
+              {:else}
+                <!-- LABEL: No results for "{query}" -->
+                <div class="no-results">
+                  {formatTemplateWithLocale('misc.search_no_results', { query }, $locale)}
+                </div>
+              {/if}
             {/if}
             {#if all}
               <div class="list-header">
@@ -475,7 +502,7 @@
                 {/each}
               </div>
             {/if}
-              </ul>
+          </ul>
         </Stack>
       </div>
     </div>
