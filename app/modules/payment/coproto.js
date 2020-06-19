@@ -251,7 +251,7 @@ var responseTypes = {
       this.ajax = ra(data);
     };
 
-    if (CheckoutBridge.platform === 'ios') {
+    if (CheckoutBridge && CheckoutBridge.platform === 'ios') {
       this.on('upi.intent_success_response', startPolling);
     } else {
       startPolling();
