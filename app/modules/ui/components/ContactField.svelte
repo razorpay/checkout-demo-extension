@@ -7,6 +7,7 @@
   import Field from 'ui/components/Field.svelte';
   import SearchModal from 'ui/elements/SearchModal.svelte';
   import CountryCodeSearchItem from 'ui/elements/search-item/CountryCode.svelte';
+  import Track from 'tracker';
 
   import { CONTACT_PATTERN } from 'common/constants';
   import { COUNTRY_TO_CODE_MAP } from 'common/countrycodes';
@@ -31,6 +32,7 @@
 
   const isOptional = isContactOptional();
   const CONTACT_REGEX = isOptional ? '.*' : CONTACT_PATTERN;
+  const searchIdentifier = `country_code_select_${Track.makeUid()}`; // Add a UUID since this field can exist in multiple places
 
   let countryCodesList;
   $: $t, (countryCodesList = generateCountryCodesList());
@@ -135,7 +137,7 @@
 <!-- LABEL: Search a country -->
 <!-- LABEL: All countries -->
 <SearchModal
-  identifier="country_code_select"
+  identifier={searchIdentifier}
   placeholder={$t(COUNTRY_SEARCH_PLACEHOLDER)}
   all={$t(COUNTRY_SEARCH_ALL)}
   items={countryCodesList}
