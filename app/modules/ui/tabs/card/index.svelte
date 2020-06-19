@@ -21,7 +21,7 @@
     remember,
     selectedCard,
   } from 'checkoutstore/screens/card';
-  import { methodTabInstrument } from 'checkoutstore/screens/home';
+  import { methodInstrument, blocks } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
 
@@ -196,7 +196,7 @@
 
     _savedCards = filterSavedCardsAgainstInstrument(
       _savedCards,
-      $methodTabInstrument
+      $methodInstrument
     );
 
     savedCards = _savedCards;
@@ -208,14 +208,36 @@
 
   let instrumentSubtext;
   $: {
-    if (!$methodTabInstrument) {
+    if (!$methodInstrument) {
       instrumentSubtext = undefined;
-    } else if ($methodTabInstrument.method !== tab) {
+    } else if ($methodInstrument.method !== tab) {
       instrumentSubtext = undefined;
     } else {
-      instrumentSubtext = getSubtextForInstrument($methodTabInstrument);
+      instrumentSubtext = getSubtextForInstrument($methodInstrument);
     }
   }
+
+  /**
+   * Determine if subtext should be shown
+   * We don't show subtext if subtext is empty
+   * or if the instrument is a part of rzp.cluster block
+   *
+   * @returns {boolean}
+   */
+  function detemineIfSubtextShouldBeShown() {
+    if (!instrumentSubtext) {
+      return false;
+    }
+
+    const block = _Arr.find($blocks, block =>
+      _Arr.contains(block.instruments, $methodInstrument)
+    );
+
+    return block && block.code !== 'rzp.cluster';
+  }
+
+  let shouldShowSubtext = detemineIfSubtextShouldBeShown();
+  $: instrumentSubtext, (shouldShowSubtext = detemineIfSubtextShouldBeShown());
 
   function getSavedCardsFromCustomer(customer = {}) {
     if (!customer.tokens) {
@@ -475,7 +497,7 @@
             </div>
           {/if}
 
-          {#if instrumentSubtext}
+          {#if shouldShowSubtext}
             <div class="pad instrument-subtext-description">
               {instrumentSubtext}
             </div>
@@ -495,7 +517,7 @@
         </div>
       {:else}
         <div in:fade={{ duration: 100 }}>
-          {#if instrumentSubtext}
+          {#if shouldShowSubtext}
             <div class="pad instrument-subtext-description">
               {instrumentSubtext}
             </div>
