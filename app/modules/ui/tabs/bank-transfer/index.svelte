@@ -1,5 +1,10 @@
 <script>
+  // Svelte imports
   import { onDestroy } from 'svelte';
+
+  //Store imports
+  import { getMerchantOrder } from 'checkoutstore';
+
   // Utils imports
   import Razorpay from 'common/Razorpay';
   import { makeAuthUrl } from 'common/Razorpay';
@@ -94,8 +99,10 @@
     }
   }
 
+  const order = getMerchantOrder();
+
   onDestroy(() => {
-    data.amount = session.setAmount(30632800); //hard-coded the order's original amount for now.
+    data.amount = session.setAmount(order.amount); //hard-coded the order's original amount for now.
   });
 
   export function copyDetails() {
