@@ -68,7 +68,7 @@
 
 {#each $blocks as block}
   {#if block.code === 'rzp.cluster'}
-    <RazorpayCluster {block} on:selectMethod />
+    <RazorpayCluster {block} on:selectInstrument />
   {:else}
     <div class="methods-block" data-block={block.code}>
       <h3 class="title">
@@ -85,8 +85,8 @@
           <Instrument
             {instrument}
             on:click={() => trackInstrumentSelection(instrument, index)}
-            on:submit
-            on:selectMethod />
+            on:selectInstrument
+            on:submit />
         {/each}
       </div>
     </div>

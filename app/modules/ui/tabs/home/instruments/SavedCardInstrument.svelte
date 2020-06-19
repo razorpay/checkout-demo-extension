@@ -98,8 +98,6 @@
 
   function selectionHandler() {
     if (cardKnown) {
-      $selectedInstrumentId = instrument.id;
-
       setTimeout(() => {
         // Focus on the input field
         const instrumentInDom = _El.closest(
@@ -113,8 +111,6 @@
         }
       });
     } else {
-      $selectedInstrumentId = null;
-
       // TODO: Someday, preselect the saved card in the saved cards list.
 
       session.switchTab('card');

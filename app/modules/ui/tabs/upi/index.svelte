@@ -54,7 +54,7 @@
   // Store
   import { contact } from 'checkoutstore/screens/home';
   import { customer } from 'checkoutstore/customer';
-  import { methodTabInstrument } from 'checkoutstore/screens/home';
+  import { methodInstrument } from 'checkoutstore/screens/home';
 
   import {
     UPI_GPAY_BLOCK_HEADING,
@@ -183,7 +183,7 @@
 
   let availableFlows = getAvailableFlowsFromInstrument();
   $: {
-    availableFlows = getAvailableFlowsFromInstrument($methodTabInstrument);
+    availableFlows = getAvailableFlowsFromInstrument($methodInstrument);
   }
 
   // Set default token value when the available flows change
@@ -219,7 +219,7 @@
   }
 
   let intentApps = getUPIIntentApps().filtered;
-  $: intentApps = getUPIIntentAppsFromInstrument($methodTabInstrument);
+  $: intentApps = getUPIIntentAppsFromInstrument($methodInstrument);
 
   let otmEndDate = addDaysToDate(otmStartDate, 90);
 
