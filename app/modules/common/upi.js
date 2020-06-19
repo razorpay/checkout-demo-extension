@@ -430,11 +430,26 @@ export const isPreferredApp = packageName =>
 export const getSortedApps = allApps => {
   allApps = _Obj.clone(allApps);
 
-  const isAppInstalled = shortcode =>
-    allApps.some(app => app.shortcode === shortcode);
+  const isAppInstalled = package_name =>
+    allApps.some(app => app.package_name === package_name);
 
   // Get list of package names
   let usableApps = getUsableApps();
+
+  _Arr.loop(allApps, (app, i) => {
+    const appConfig = usableApps.find(usableApp => {
+      if (app.package_name) {
+        return app.package_name === usableApp.package_name;
+      } else if (app.shortcode) {
+        return app.shortcode === usableApp.shortcode;
+      }
+      return false;
+    });
+
+    if (appConfig) {
+      allApps[i] = _Obj.extend(allApps[i], appConfig);
+    }
+  });
 
   // Filter out apps which are installed, but the user isn't registered on them.
   // The check is only performed if verify_registration is true for the app.
@@ -442,34 +457,28 @@ export const getSortedApps = allApps => {
   if (CheckoutBridge && CheckoutBridge.isUserRegisteredOnUPI) {
     usableApps = _Arr.filter(usableApps, app => {
       // Only check for user registration if app is installed.
-      if (app.verify_registration && isAppInstalled(app.shortcode)) {
+      if (app.verify_registration && isAppInstalled(app.package_name)) {
         return CheckoutBridge.isUserRegisteredOnUPI(app.package_name);
       }
       return true;
     });
   }
 
-  const usablePackages = _Arr.map(usableApps, app => app.shortcode);
+  const usablePackages = _Arr.map(usableApps, app => app.package_name);
 
   // Remove blacklisted apps
   allApps = _Arr.filter(
     allApps,
-    app => usablePackages.indexOf(app.shortcode) >= 0
+    app => usablePackages.indexOf(app.package_name) >= 0
   );
 
   // Sort remaining apps
   _Arr.sort(
     allApps,
     (a, b) =>
-      usablePackages.indexOf(a.shortcode) - usablePackages.indexOf(b.shortcode)
+      usablePackages.indexOf(a.package_name) -
+      usablePackages.indexOf(b.package_name)
   );
-
-  // Transform apps to set new name (eg: WhatsApp => WhatsApp UPI).
-  _Arr.loop(allApps, (app, i) => {
-    const index = usablePackages.indexOf(app.shortcode);
-
-    allApps[i] = _Obj.extend(allApps[i], usableApps[index]);
-  });
 
   return allApps;
 };
