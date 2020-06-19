@@ -102,7 +102,7 @@
   const amount = getAmount();
 
   onDestroy(() => {
-    data.amount = session.setAmount(amount); //hard-coded the order's original amount for now.
+    data.amount = session.setAmount(amount);
   });
 
   export function copyDetails() {
