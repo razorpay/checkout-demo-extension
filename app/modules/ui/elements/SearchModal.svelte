@@ -22,7 +22,7 @@
 
   // i18n
   import { locale } from 'svelte-i18n';
-  import { formatTemplateWithLocale } from 'i18n';
+  import { formatTemplateWithLocale, formatMessageWithLocale } from 'i18n';
 
   // Props
   export let placeholder = 'Type to search';
@@ -351,6 +351,7 @@
     box-sizing: border-box;
     overflow-y: auto;
     margin: 0;
+    padding: 0;
   }
 
   .list-item {
@@ -378,7 +379,7 @@
     display: flex;
     justify-content: center;
     text-align: center;
-    padding: 24px;
+    padding: 20px 24px;
     color: #888;
   }
 </style>
@@ -416,39 +417,46 @@
             bind:this={resultsContainerRef}
             class:has-query={query}>
             {#if query}
-              <div class="list results">
                 {#if results.length}
-                  {#each results as item, index (`${item._key}_result_${index}`)}
-                    <div
+                <!-- LABEL: Results -->
+                <ul
+                  class="list results"
+                  aria-label={formatMessageWithLocale('misc.search_results_label', $locale)}>
+                  {#each results as item, index (IDs.resultItem(item))}
+                    <li
                       class="list-item"
                       class:focused={index === focusedIndex}
+                      role="option"
+                      aria-selected={index === focusedIndex}
                       on:click={() => onSelect(item)}>
                       <svelte:component this={component} {item} />
-                    </div>
+                    </li>
                   {/each}
+                </ul>
                 {:else}
                   <!-- LABEL: No results for "{query}" -->
                   <div class="no-results">
                     {formatTemplateWithLocale('misc.search_no_results', { query }, $locale)}
                   </div>
                 {/if}
-              </div>
             {/if}
             {#if all}
               <div class="list-header">
                 <div class="text">{all}</div>
                 <div class="divider" />
               </div>
-              <div class="list">
-                {#each items as item, index (`${item._key}_all_${index}`)}
-                  <div
+              <ul class="list" aria-label={all}>
+                {#each items as item, index (IDs.allItem(item))}
+                  <li
                     class="list-item"
                     class:focused={index + results.length === focusedIndex}
+                    role="option"
+                    aria-selected={index + results.length === focusedIndex}
                     on:click={() => onSelect(item)}>
                     <svelte:component this={component} {item} />
-                  </div>
+                  </li>
                 {/each}
-              </div>
+              </ul>
             {/if}
           </div>
         </Stack>
