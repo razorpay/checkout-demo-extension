@@ -1,4 +1,8 @@
 <script>
+  /**
+   * ARIA guidelines: https://www.w3.org/TR/wai-aria-practices/examples/combobox/aria1.0pattern/combobox-autocomplete-list.html
+   */
+
   // Svelte imports
   import { createEventDispatcher, onMount, tick } from 'svelte';
   import { fade, fly } from 'svelte/transition';
