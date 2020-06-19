@@ -59,7 +59,7 @@ const messageTransformers = {
         app =>
           !_Arr.find(
             filteredApps,
-            filteredApp => filteredApp.package_name === app.package_name
+            filteredApp => filteredApp.shortcode === app.shortcode
           )
       );
 

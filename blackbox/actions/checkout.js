@@ -227,8 +227,16 @@ module.exports = {
       if (apps) {
         if (typeof apps === 'boolean') {
           apps = [
-            { package_name: 'in.org.npci.upiapp', app_name: 'BHIM' },
-            { package_name: 'some.random.app', app_name: 'Some Random App' },
+            {
+              package_name: 'in.org.npci.upiapp',
+              shortcode: 'bhim',
+              app_name: 'BHIM',
+            },
+            {
+              package_name: 'some.random.app',
+              shortcode: 'some.random.app',
+              app_name: 'Some Random App',
+            },
           ];
         }
 

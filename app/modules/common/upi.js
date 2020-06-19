@@ -430,8 +430,8 @@ export const isPreferredApp = packageName =>
 export const getSortedApps = allApps => {
   allApps = _Obj.clone(allApps);
 
-  const isAppInstalled = package_name =>
-    allApps.some(app => app.package_name === package_name);
+  const isAppInstalled = shortcode =>
+    allApps.some(app => app.shortcode === shortcode);
 
   // Get list of package names
   let usableApps = getUsableApps();
@@ -442,32 +442,31 @@ export const getSortedApps = allApps => {
   if (CheckoutBridge && CheckoutBridge.isUserRegisteredOnUPI) {
     usableApps = _Arr.filter(usableApps, app => {
       // Only check for user registration if app is installed.
-      if (app.verify_registration && isAppInstalled(app.package_name)) {
+      if (app.verify_registration && isAppInstalled(app.shortcode)) {
         return CheckoutBridge.isUserRegisteredOnUPI(app.package_name);
       }
       return true;
     });
   }
 
-  const usablePackages = _Arr.map(usableApps, app => app.package_name);
+  const usablePackages = _Arr.map(usableApps, app => app.shortcode);
 
   // Remove blacklisted apps
   allApps = _Arr.filter(
     allApps,
-    app => usablePackages.indexOf(app.package_name) >= 0
+    app => usablePackages.indexOf(app.shortcode) >= 0
   );
 
   // Sort remaining apps
   _Arr.sort(
     allApps,
     (a, b) =>
-      usablePackages.indexOf(a.package_name) -
-      usablePackages.indexOf(b.package_name)
+      usablePackages.indexOf(a.shortcode) - usablePackages.indexOf(b.shortcode)
   );
 
   // Transform apps to set new name (eg: WhatsApp => WhatsApp UPI).
   _Arr.loop(allApps, (app, i) => {
-    const index = usablePackages.indexOf(app.package_name);
+    const index = usablePackages.indexOf(app.shortcode);
 
     allApps[i] = _Obj.extend(allApps[i], usableApps[index]);
   });
