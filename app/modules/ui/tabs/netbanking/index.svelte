@@ -95,6 +95,12 @@
   const recurring = isRecurring();
   const dispatch = createEventDispatcher();
 
+  export function getPayload() {
+    return {
+      bank: $selectedBank,
+    };
+  }
+
   function setCorporateOption() {
     const corporateOption = getCorporateOption($selectedBank, filteredBanks);
 
