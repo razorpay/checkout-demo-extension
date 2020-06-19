@@ -1,4 +1,5 @@
 <script>
+  import { onDestroy } from 'svelte';
   // Utils imports
   import Razorpay from 'common/Razorpay';
   import { makeAuthUrl } from 'common/Razorpay';
@@ -83,12 +84,19 @@
         amount:
           response.amount_expected &&
           session.formatAmountWithCurrency(response.amount_expected),
+        updatedAmount:
+          response.amount_expected &&
+          session.updateAmountInHeader(response.amount_expected),
         close_by: response.close_by && timeConverter(response.close_by),
       };
 
       loading = false;
     }
   }
+
+  onDestroy(() => {
+    data.amount = session.setAmount(30632800); //hard-coded the order's original amount for now.
+  });
 
   export function copyDetails() {
     copyToClipboard('.neft-details', neftDetails.innerText);
