@@ -29,11 +29,16 @@
   export let autocomplete = 'off';
   export let inputType = 'text';
   export let items = [];
+  export let identifier = Track.makeUid();
   export let component;
   export let keys;
   export let all;
 
-  const id = Track.makeUid();
+  const IDs = {
+    overlay: `${identifier}_search_overlay`,
+    resultItem: item => `${item._key}_search_result`,
+    allItem: item => `${item._key}_search_all`,
+  };
 
   onMount(() => {
     document.querySelector('#modal-inner').appendChild(containerRef);
@@ -150,7 +155,7 @@
     // Add to $overlayStack
     $overlayStack = $overlayStack.concat([
       {
-        id,
+        id: IDs.overlay,
         component: 'SearchModal',
         back: () => {
           dispatch('close');
@@ -163,7 +168,10 @@
     visible = false;
 
     // Remove the overlay from $overlayStack
-    const overlay = _Arr.find($overlayStack, overlay => overlay.id === id);
+    const overlay = _Arr.find(
+      $overlayStack,
+      overlay => overlay.id === IDs.overlay
+    );
     $overlayStack = _Arr.remove($overlayStack, overlay);
   }
 
