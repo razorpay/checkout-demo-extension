@@ -50,10 +50,12 @@ const UPI_APPS = {
       app_name: 'PayTM UPI',
       package_name: 'net.one97.paytm',
       shortcode: 'paytm',
+      app_icon: 'https://cdn.razorpay.com/app/paytm.svg',
     },
     {
       package_name: 'in.org.npci.upiapp',
       shortcode: 'bhim',
+      app_icon: 'https://cdn.razorpay.com/app/bhim.svg',
     },
   ],
 
