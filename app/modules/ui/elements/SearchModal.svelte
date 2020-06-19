@@ -470,6 +470,7 @@
                     <li
                       class="list-item"
                       class:focused={index === focusedIndex}
+                      id={IDs.resultItem(item)}
                       role="option"
                       aria-selected={index === focusedIndex}
                       on:click={() => onSelect(item)}>
@@ -494,6 +495,7 @@
                   <li
                     class="list-item"
                     class:focused={index + results.length === focusedIndex}
+                    id={IDs.allItem(item)}
                     role="option"
                     aria-selected={index + results.length === focusedIndex}
                     on:click={() => onSelect(item)}>
