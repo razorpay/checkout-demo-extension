@@ -311,12 +311,6 @@
     overflow: auto;
   }
 
-  ul.search-results {
-    margin: 0;
-    padding: 0;
-    list-style-type: none;
-  }
-
   .list-header {
     display: flex;
     align-items: center;
@@ -455,7 +449,7 @@
               bind:value={query}
               bind:this={inputRef} />
           </form>
-          <ul
+          <div
             class="search-results"
             class:has-query={query}
             id={IDs.results}
@@ -467,7 +461,7 @@
                 <!-- LABEL: Results -->
                 <div class="list results">
                   {#each results as item, index (IDs.resultItem(item))}
-                    <li
+                    <div
                       class="list-item"
                       class:focused={index === focusedIndex}
                       id={IDs.resultItem(item)}
@@ -475,7 +469,7 @@
                       aria-selected={index === focusedIndex}
                       on:click={() => onSelect(item)}>
                       <svelte:component this={component} {item} />
-                    </li>
+                    </div>
                   {/each}
                 </div>
               {:else}
@@ -492,7 +486,7 @@
               </div>
               <div class="list">
                 {#each items as item, index (IDs.allItem(item))}
-                  <li
+                  <div
                     class="list-item"
                     class:focused={index + results.length === focusedIndex}
                     id={IDs.allItem(item)}
@@ -500,11 +494,11 @@
                     aria-selected={index + results.length === focusedIndex}
                     on:click={() => onSelect(item)}>
                     <svelte:component this={component} {item} />
-                  </li>
+                  </div>
                 {/each}
               </div>
             {/if}
-          </ul>
+          </div>
         </Stack>
       </div>
     </div>
