@@ -218,7 +218,7 @@ test('Module: personalization', t => {
     test('transforms a upi intent instrument correctly', t => {
       const instrument = {
         method: 'upi',
-        vpa: '@ybl',
+        instrument: '@ybl',
         score: 1,
       };
 
