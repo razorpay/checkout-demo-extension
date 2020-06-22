@@ -9,7 +9,7 @@
   import CountryCodeSearchItem from 'ui/elements/search-item/CountryCode.svelte';
   import Track from 'tracker';
 
-  import { CONTACT_PATTERN } from 'common/constants';
+  import { CONTACT_PATTERN, COUNTRY_CODE_PATTERN } from 'common/constants';
   import { COUNTRY_TO_CODE_MAP } from 'common/countrycodes';
 
   // i18n
@@ -35,6 +35,7 @@
 
   const isOptional = isContactOptional();
   const CONTACT_REGEX = isOptional ? '.*' : CONTACT_PATTERN;
+  const COUNTRY_CODE_REGEX = isOptional ? '.*' : COUNTRY_CODE_PATTERN;
   const searchIdentifier = `country_code_select_${Track.makeUid()}`; // Add a UUID since this field can exist in multiple places
 
   let countryCodesList;
@@ -140,7 +141,7 @@
     on:blur={appendPlusToCountryCodeAsynchronously}
     required={!isOptional}
     xautocompletetype="phone-country-code"
-    pattern={CONTACT_REGEX}
+    pattern={COUNTRY_CODE_REGEX}
     readonly={isContactReadOnly()}
     formatter={{ type: 'country_code' }}
     label={$t(COUNTRY_LABEL)}
