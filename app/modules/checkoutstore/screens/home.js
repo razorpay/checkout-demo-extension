@@ -1,6 +1,14 @@
 import { derived, writable } from 'svelte/store';
 
-export const contact = writable('+');
+export const country = writable('');
+export const phone = writable('');
+export const contact = derived([country, phone], ([$country, $phone]) => {
+  if ($phone) {
+    return $country + $phone;
+  } else {
+    return '';
+  }
+});
 export const email = writable('');
 export const emiContact = writable('');
 
