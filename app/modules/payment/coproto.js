@@ -287,6 +287,12 @@ var responseTypes = {
       if (androidBrowser) {
         return responseTypes['gpay'].call(this, request, fullResponse);
       }
+    } else {
+      // TODO check if a condition is required
+      return Bridge.checkout.callIos('callNativeIntent', {
+        intent_url,
+        upi_app: this.upi_app,
+      });
     }
   },
 
