@@ -20,6 +20,8 @@
 
   // Store
   import {
+    country,
+    phone,
     contact,
     isContactPresent,
     email,
@@ -104,6 +106,7 @@
   import * as AnalyticsTypes from 'analytics-types';
   import { getCardOffer, hasOffersOnHomescreen } from 'checkoutframe/offers';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
+  import { findCountryCode } from 'common/countrycodes';
 
   import { INDIA_COUNTRY_CODE } from 'common/constants';
 
@@ -129,7 +132,12 @@
   const isPartialPayment = getIsPartialPayment();
   const contactEmailReadonly = isContactEmailReadOnly();
 
-  $contact = getPrefilledContact() || INDIA_COUNTRY_CODE;
+  const parsedPrefilledContact = findCountryCode(getPrefilledContact());
+
+  $country = parsedPrefilledContact.code
+    ? `+${parsedPrefilledContact.code}`
+    : INDIA_COUNTRY_CODE;
+  $phone = parsedPrefilledContact.phone;
   $email = getPrefilledEmail();
 
   // Prop that decides which view to show.

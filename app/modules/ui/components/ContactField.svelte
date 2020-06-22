@@ -28,7 +28,8 @@
   let searchModal;
 
   // Props
-  export let value;
+  export let country;
+  export let phone;
 
   const isOptional = isContactOptional();
   const CONTACT_REGEX = isOptional ? '.*' : CONTACT_PATTERN;
@@ -37,12 +38,10 @@
   let countryCodesList;
   $: $t, (countryCodesList = generateCountryCodesList());
 
-  function appendCountryCodeAsynchronously() {
+  function removeZeroFromPhoneAsynchronously() {
     setTimeout(() => {
-      const internationalFormat = findCountryCode(value);
-
-      if (internationalFormat.code) {
-        value = `+${internationalFormat.code}${internationalFormat.phone}`;
+      if (country === '+91' && _Str.startsWith(phone, '0')) {
+        phone = phone.slice(1);
       }
     });
   }
@@ -108,20 +107,20 @@
     id="contact"
     name="contact"
     type="tel"
-    autocomplete="tel"
-    on:autocomplete={appendCountryCodeAsynchronously}
-    on:paste={appendCountryCodeAsynchronously}
-    on:blur={appendCountryCodeAsynchronously}
+    autocomplete="tel-national"
+    on:autocomplete={removeZeroFromPhoneAsynchronously}
+    on:paste={removeZeroFromPhoneAsynchronously}
+    on:blur={removeZeroFromPhoneAsynchronously}
     required={!isOptional}
-    xautocompletetype="phone-full"
+    xautocompletetype="phone-national"
     pattern={CONTACT_REGEX}
     readonly={isContactReadOnly()}
     formatter={{ type: 'phone' }}
     label={$t(label)}
     icon="&#xe607;"
-    on:input={e => (value = e.target.value)}
+    on:input={e => (phone = e.target.value)}
     on:blur
-    {value}
+    value={phone}
     helpText={$t(CONTACT_HELP_TEXT)} />
   <!-- LABEL: Please enter a valid contact number -->
 </div>

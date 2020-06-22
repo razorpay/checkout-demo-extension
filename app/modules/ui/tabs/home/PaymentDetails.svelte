@@ -9,6 +9,8 @@
 
   // Store
   import {
+    country,
+    phone,
     contact,
     email,
     address,
@@ -89,7 +91,10 @@
   <div class="details-block">
     {#if !isContactHidden()}
       <div class="contact-field">
-        <ContactField bind:value={$contact} on:blur={trackContactFilled} />
+        <ContactField
+          bind:country={$country}
+          bind:phone={$phone}
+          on:blur={trackContactFilled} />
       </div>
     {/if}
     {#if !isEmailHidden()}
