@@ -45,6 +45,7 @@ import * as Offers from 'checkoutframe/offers';
 import * as Flows from 'checkoutframe/flows';
 import * as Payouts from 'checkoutframe/payouts';
 import { initIframe } from 'checkoutframe/iframe';
+import { stopListeningForBackPresses } from 'bridge/back';
 import * as Bridge from 'bridge';
 import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
 import { Formatter } from 'formatter';
@@ -129,6 +130,7 @@ export default {
   SessionManager,
   Checkout,
   Bridge,
+  stopListeningForBackPresses,
   P13n,
   Instruments,
   getInstrumentMeta,
