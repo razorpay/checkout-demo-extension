@@ -39,6 +39,7 @@ describe.each(
     );
     await enterUserDetailsTab.click();
     await assertBasicDetailsScreen(context);
+    await assertSelectorAbsence(context, '#country-code');
     await assertSelectorAbsence(context, '#contact');
     await fillUserDetails(context);
     await proceed(context);

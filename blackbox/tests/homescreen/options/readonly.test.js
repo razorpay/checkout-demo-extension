@@ -45,6 +45,7 @@ describe.each(
     await enterUserDetailsTab.click();
     await assertBasicDetailsScreen(context);
     await assertElementHasAttribute(context, '#email', 'readonly');
+    await assertElementHasAttribute(context, '#country-code', 'readonly');
     await assertElementHasAttribute(context, '#contact', 'readonly');
     await fillUserDetails(context);
     await delay(500);
