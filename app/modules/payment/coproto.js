@@ -252,9 +252,9 @@ var responseTypes = {
     };
 
     if (CheckoutBridge && CheckoutBridge.platform === 'ios') {
-      this.on('upi.intent_success_response', startPolling);
-    } else {
       startPolling();
+    } else {
+      this.on('upi.intent_success_response', startPolling);
     }
 
     this.on('upi.intent_response', data => {
