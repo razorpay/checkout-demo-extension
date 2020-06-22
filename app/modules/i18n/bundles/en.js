@@ -147,8 +147,10 @@ export default {
     single_block_title: 'Pay via {method}',
     config_block_default_title: 'Available Payment Methods',
 
-    contact_label_required: 'Phone with Country Code',
-    contact_label_optional: 'Phone with Country Code (Optional)',
+    country_label: 'Country',
+    country_help_text: 'Please enter a valid country code',
+    contact_label_required: 'Phone',
+    contact_label_optional: 'Phone (Optional)',
     contact_help_text: 'Please enter a valid contact number',
     email_label_required: 'Email',
     email_label_optional: 'Email (Optional)',

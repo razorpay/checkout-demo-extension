@@ -17,6 +17,8 @@
     CONTACT_LABEL_REQUIRED,
     CONTACT_LABEL_OPTIONAL,
     CONTACT_HELP_TEXT,
+    COUNTRY_LABEL,
+    COUNTRY_HELP_TEXT,
     COUNTRY_SEARCH_ALL,
     COUNTRY_SEARCH_PLACEHOLDER,
   } from 'ui/labels/home';
@@ -37,6 +39,14 @@
 
   let countryCodesList;
   $: $t, (countryCodesList = generateCountryCodesList());
+
+  function appendPlusToCountryCodeAsynchronously() {
+    setTimeout(() => {
+      if (!_Str.startsWith(country, '+')) {
+        country = `+${country}`;
+      }
+    });
+  }
 
   function removeZeroFromPhoneAsynchronously() {
     setTimeout(() => {
@@ -102,7 +112,44 @@
   }
 </script>
 
-<div>
+<style>
+  .fields-container {
+    display: flex;
+    outline: red;
+  }
+
+  .fields-container > :global(div:first-child) {
+    flex-shrink: 0;
+    flex-basis: 25%;
+  }
+
+  .fields-container > :global(div:last-child) {
+    flex-grow: 1;
+    margin-left: 16px;
+  }
+</style>
+
+<div class="fields-container">
+  <Field
+    id="country-code"
+    name="country-code"
+    type="tel"
+    autocomplete="tel-country-code"
+    on:autocomplete={appendPlusToCountryCodeAsynchronously}
+    on:paste={appendPlusToCountryCodeAsynchronously}
+    on:blur={appendPlusToCountryCodeAsynchronously}
+    required={!isOptional}
+    xautocompletetype="phone-country-code"
+    pattern={CONTACT_REGEX}
+    readonly={isContactReadOnly()}
+    formatter={{ type: 'country_code' }}
+    label={$t(COUNTRY_LABEL)}
+    on:input={e => (country = e.target.value)}
+    on:blur
+    value={country}
+    helpText={$t(COUNTRY_HELP_TEXT)} />
+  <!-- LABEL: Please enter a valid country code -->
+
   <Field
     id="contact"
     name="contact"
@@ -145,6 +192,6 @@
   bind:this={searchModal}
   on:close={closeSearch}
   on:select={({ detail }) => {
-    console.log(detail);
+    country = `+${detail.country_code}`;
     searchModal.close();
   }} />
