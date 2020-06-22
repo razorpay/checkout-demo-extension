@@ -2,4 +2,4 @@
   export let item;
 </script>
 
-<div>{item.name} (+{item.country_code})</div>
+<div>(+{item.country_code}) {item.name}</div>
