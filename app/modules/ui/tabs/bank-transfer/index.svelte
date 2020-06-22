@@ -83,15 +83,16 @@
 
     let receivers = response.receivers;
 
+    if (response.amount_expected) {
+      session.updateAmountInHeader(response.amount_expected);
+    }
+
     if (receivers && receivers.length !== 0) {
       data = {
         receiver: receivers[0],
         amount:
           response.amount_expected &&
           session.formatAmountWithCurrency(response.amount_expected),
-        updatedAmount:
-          response.amount_expected &&
-          session.updateAmountInHeader(response.amount_expected),
         close_by: response.close_by && timeConverter(response.close_by),
       };
 
