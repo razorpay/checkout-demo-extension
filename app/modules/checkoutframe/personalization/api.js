@@ -61,6 +61,8 @@ export function getInstrumentsForCustomer(customer) {
 
 const API_INSTRUMENT_PAYMENT_ADDONS = {
   upi: instrument => {
+    instrument.vpa = instrument.instrument;
+    delete instrument.instrument;
     const validVpa = VPA_REGEX.test(instrument.vpa);
     if (validVpa) {
       instrument['_[flow]'] = 'directpay';

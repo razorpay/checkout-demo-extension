@@ -235,7 +235,7 @@ test('Module: personalization', t => {
     test('transforms a upi collect instrument correctly', t => {
       const instrument = {
         method: 'upi',
-        vpa: 'saranshgupta1995@ybl',
+        instrument: 'saranshgupta1995@ybl',
         score: 1,
       };
 
@@ -246,6 +246,12 @@ test('Module: personalization', t => {
       t.equals(actual.score, 1, 'Returns the correct score');
       t.equals(actual.vpa, 'saranshgupta1995@ybl', 'Returns the correct vpa');
       t.equals(actual['_[flow]'], 'directpay', 'Returns the correct flow');
+
+      t.equals(
+        typeof actual.instrument,
+        'undefined',
+        'Prevents duplicate data'
+      );
 
       t.end();
     });
