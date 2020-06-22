@@ -11,6 +11,7 @@ import Razorpay from 'common/Razorpay';
 import Analytics from 'analytics';
 import { getSession } from 'sessionmanager';
 import { getBankFromCard } from 'common/bank';
+import * as Bridge from 'bridge';
 
 export const processOtpResponse = function(response) {
   var error = response.error;
@@ -251,7 +252,7 @@ var responseTypes = {
       this.ajax = ra(data);
     };
 
-    if (CheckoutBridge && CheckoutBridge.platform === 'ios') {
+    if (Bridge.checkout.platform === 'ios') {
       startPolling();
     } else {
       this.on('upi.intent_success_response', startPolling);
