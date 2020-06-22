@@ -28,6 +28,8 @@
 
   // Refs
   let searchModal;
+  let countryField;
+  let phoneField;
 
   // Props
   export let country;
@@ -132,10 +134,16 @@
 
 <div class="fields-container">
   <Field
+    bind:this={countryField}
     id="country-code"
     name="country-code"
     type="tel"
     autocomplete="tel-country-code"
+    on:click={event => {
+      event.preventDefault();
+      countryField.blur();
+      searchModal.open();
+    }}
     on:autocomplete={appendPlusToCountryCodeAsynchronously}
     on:paste={appendPlusToCountryCodeAsynchronously}
     on:blur={appendPlusToCountryCodeAsynchronously}
@@ -152,6 +160,7 @@
   <!-- LABEL: Please enter a valid country code -->
 
   <Field
+    bind:this={phoneField}
     id="contact"
     name="contact"
     type="tel"
@@ -173,14 +182,6 @@
   <!-- LABEL: Please enter a valid contact number -->
 </div>
 
-<button
-  type="button"
-  on:click|preventDefault={() => {
-    searchModal.open();
-  }}>
-  Show Modal
-</button>
-
 <!-- LABEL: Search a country -->
 <!-- LABEL: All countries -->
 <SearchModal
@@ -195,4 +196,7 @@
   on:select={({ detail }) => {
     country = `+${detail.country_code}`;
     searchModal.close();
+    if (phoneField) {
+      phoneField.focus();
+    }
   }} />
