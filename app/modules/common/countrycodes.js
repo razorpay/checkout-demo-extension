@@ -1,3 +1,5 @@
+// @ts-check
+
 export const COUNTRY_TO_CODE_MAP = {
   AD: '376',
   AE: '971',
@@ -359,11 +361,11 @@ function getAmericanFormattedNumber(number) {
 
 /**
  * Finds country code for a given phonenumber
- * @param {string} phonenumber
+ * @param {string} phoneNumber
  * @returns {Object} With country code and phonenumber
  */
-export function findCountryCode(phno) {
-  let indian = getIndianNumber(phno);
+export function findCountryCode(phoneNumber) {
+  let indian = getIndianNumber(phoneNumber);
 
   if (indian.success) {
     return {
@@ -372,7 +374,7 @@ export function findCountryCode(phno) {
     };
   }
 
-  let american = getAmericanFormattedNumber(phno);
+  let american = getAmericanFormattedNumber(phoneNumber);
 
   if (american.success) {
     return {
@@ -381,26 +383,26 @@ export function findCountryCode(phno) {
     };
   }
 
-  let number = sanitizeNumber(phno);
+  let number = sanitizeNumber(phoneNumber);
 
-  const intlCode = getCountryCodeFromNumber(number);
+  const code = getCountryCodeFromNumber(number);
 
   let phone = removePlus(number);
 
-  if (intlCode) {
-    phone = phone.slice(intlCode.length);
+  if (code) {
+    phone = phone.slice(code.length);
   }
 
   return {
     phone,
-    code: intlCode,
+    code,
   };
 }
 
 /**
  * Returns country code for a given international phonenumber
- * @param {string} phonenumber
- * @returns {string} country code
+ * @param {string} number
+ * @returns {string|undefined} country code
  */
 function getCountryCodeFromNumber(number) {
   number = removePlus(number);
