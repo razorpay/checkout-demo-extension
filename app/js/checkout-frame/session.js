@@ -3528,7 +3528,7 @@ Session.prototype = {
       $('#modal-inner').removeClass('shake');
       hideOverlayMessage();
       this.modal.hide();
-      discreet.Bridge.stopListeningForBackPresses();
+      discreet.stopListeningForBackPresses();
     }
   },
 

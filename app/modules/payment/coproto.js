@@ -1,5 +1,4 @@
 import * as GPay from 'gpay';
-import * as strings from 'common/strings';
 import {
   parseUPIIntentResponse,
   didUPIIntentSucceed,
@@ -7,7 +6,6 @@ import {
 } from 'common/upi';
 import { androidBrowser } from 'common/useragent';
 import Track from 'tracker';
-import Razorpay from 'common/Razorpay';
 import Analytics from 'analytics';
 import { getSession } from 'sessionmanager';
 import { getBankFromCard } from 'common/bank';
