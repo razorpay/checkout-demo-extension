@@ -228,6 +228,24 @@ Formatter.rules = {
       return /^\+?[0-9]{8,15}$/.test(value);
     },
   },
+
+  country_code: {
+    raw: function(value) {
+      if (!_Str.startsWith(value, '+')) {
+        value = `+${value}`;
+      }
+
+      return value;
+    },
+
+    isValid: function(value) {
+      if (!value) {
+        value = this.value;
+      }
+
+      return /^\+[0-9]{1,6}$/.test(value);
+    },
+  },
 };
 
 let formatterProto = (Formatter.prototype = new Eventer());
