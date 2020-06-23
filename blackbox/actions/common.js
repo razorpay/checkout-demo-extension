@@ -1,5 +1,5 @@
 const { readFileSync } = require('fs');
-const { delay } = require('../util');
+const { delay, innerText } = require('../util');
 const emiActions = require('./emi-actions');
 const homepageActions = require('./home-page-actions');
 const netBankingActions = require('./netbanking-actions');
@@ -46,6 +46,9 @@ module.exports = {
   passRequestNetbanking,
   verifyAutoSelectBankTPV,
   retryPayzappWalletTransaction,
+  goBackFromTopbar,
+  verifyAmountInHeader,
+  getAmountFromHeader,
 };
 
 async function verifyAutoSelectBankTPV(context, bank) {
@@ -131,4 +134,17 @@ async function verifyDiscountText(context, expectedDiscountAmount) {
     el => el.innerText
   );
   expect(discount).toEqual(expectedDiscountAmount);
+}
+
+async function goBackFromTopbar(context) {
+  await context.page.click('#tab-title');
+}
+
+async function verifyAmountInHeader(amount) {
+  expect(await getAmountFromHeader()).toEqual(amount);
+}
+
+async function getAmountFromHeader() {
+  const amountInHeader = (await innerText('#amount')).trim();
+  return amountInHeader;
 }
