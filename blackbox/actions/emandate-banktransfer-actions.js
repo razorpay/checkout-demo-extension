@@ -60,7 +60,7 @@ async function returnVirtualAccounts(context, fee = false) {
   });
 }
 
-async function verifyNeftDetails(context) {
+async function verifyNeftDetails(context, feeBearer) {
   const messageDiv = await context.page.waitForSelector('.neft-details');
   let messageText = await context.page.evaluate(
     messageDiv => messageDiv.textContent,
@@ -73,7 +73,8 @@ async function verifyNeftDetails(context) {
       ifscCode +
       ' Beneficiary Name: ' +
       accountHolderName +
-      ' Amount Expected: ₹ 2,000 '
+      ' Amount Expected: ' +
+      (feeBearer ? '₹ 2,020 ' : '₹ 2,000 ')
   );
 }
 

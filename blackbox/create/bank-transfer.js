@@ -87,9 +87,9 @@ module.exports = function(testFeatures) {
       const amountInHeader = await getAmountFromHeader();
       await selectPaymentMethod(context, 'bank_transfer');
       await returnVirtualAccounts(context, feeBearer);
-      await verifyNeftDetails(context);
+      await verifyNeftDetails(context, feeBearer);
       await verifyRoundOffAlertMessage(context);
-      await verifyAmountInHeader(feeBearer ? '₹ 2,200' : '₹ 2,000');
+      await verifyAmountInHeader(feeBearer ? '₹ 2,020' : '₹ 2,000');
       await goBackFromTopbar(context);
       await verifyAmountInHeader(amountInHeader);
     });
