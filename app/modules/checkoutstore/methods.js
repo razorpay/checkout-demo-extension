@@ -42,6 +42,26 @@ const ALL_METHODS = {
     }
   },
 
+  credit_card() {
+    if (
+      getAmount() &&
+      getOption('method.card') &&
+      getOption('method.credit_card')
+    ) {
+      return getMerchantMethods().credit_card;
+    }
+  },
+
+  debit_card() {
+    if (
+      getAmount() &&
+      getOption('method.card') &&
+      getOption('method.debit_card')
+    ) {
+      return getMerchantMethods().debit_card;
+    }
+  },
+
   netbanking() {
     return (
       getAmount() &&
