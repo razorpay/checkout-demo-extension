@@ -2542,36 +2542,15 @@ Session.prototype = {
   },
 
   /**
-   * Handles offer selection
+   * Tries selecting the bank if netbanking offer,
+   * wallet if wallet offer, and so on
    * @param {Offer} offer
-   * @param {string} screen
    */
-  handleOfferSelection: function(offer, screen) {
-    screen = screen || this.screen;
-
-    // Go to the offer's method if we're on homescreen
-    if (screen !== offer.payment_method) {
-      this.homeTab.selectMethod({
-        detail: {
-          method: offer.payment_method,
-        },
-      });
-      screen = offer.payment_method;
-    }
-
+  _trySelectingOfferInstrument: function(offer) {
     var issuer = offer.issuer;
+    var screen = offer.payment_method;
 
-    if (screen === 'wallet') {
-      // Select wallet
-      if (issuer) {
-        this.svelteWalletsTab.onWalletSelection(issuer);
-      }
-    } else if (screen === 'netbanking') {
-      // Select bank
-      if (issuer) {
-        NetbankingScreenStore.selectedBank.set(issuer);
-      }
-    } else if (screen === 'emi') {
+    var emiHandler = function() {
       var emiDuration = getEmiDurationForNewCard();
       var bank = this.emiPlansForNewCard && this.emiPlansForNewCard.code;
 
@@ -2589,13 +2568,80 @@ Session.prototype = {
           setEmiDurationForNewCard('');
         }
       }
-    } else if (screen === 'cardless_emi' && this.screen !== 'otp') {
-      var provider = offer.provider;
+    };
 
-      if (provider) {
-        this.selectCardlessEmiProviderAndAttemptPayment(provider);
+    if (screen === 'wallet') {
+      // Select wallet
+      if (issuer) {
+        this.svelteWalletsTab.onWalletSelection(issuer);
+      }
+    } else if (screen === 'netbanking') {
+      // Select bank
+      if (issuer) {
+        NetbankingScreenStore.selectedBank.set(issuer);
+      }
+    } else if (screen === 'emi') {
+      emiHandler.call(this);
+    } else if (screen === 'cardless_emi' && screen !== 'otp') {
+      /**
+       * If EMI and Cardless EMI are clubbed, the user will land on the Cardless EMI screen
+       * So, if the offer method is EMI, let's get the user on the EMI screen
+       */
+      if (offer.payment_method === 'emi') {
+        this.selectCardlessEmiProviderAndAttemptPayment('cards');
+
+        emiHandler.call(this);
+      } else {
+        var provider = offer.provider;
+
+        if (provider) {
+          this.selectCardlessEmiProviderAndAttemptPayment(provider);
+        }
       }
     }
+  },
+
+  /**
+   * Handles offer selection
+   * @param {Offer} offer
+   */
+  handleOfferSelection: function(offer) {
+    /**
+     * Get the first instrument that can work with the offer
+     * and select it if not already selected
+     */
+
+    var instrument = discreet.Offers.getInstrumentToSelectForOffer(offer);
+
+    if (!instrument) {
+      Analytics.track('offer_instrument_undef', {
+        type: AnalyticsTypes.DEBUG,
+        data: {
+          offer: offer,
+        },
+      });
+
+      return;
+    }
+
+    if (storeGetter(HomeScreenStore.selectedInstrumentId) === instrument.id) {
+      // Do not switch tabs
+    } else {
+      this.switchTab('');
+
+      this.homeTab.onSelectInstrument({
+        detail: instrument,
+      });
+    }
+
+    var session = this;
+
+    session.offers.rerenderTab();
+
+    // Wait for switching to be over
+    setTimeout(function() {
+      session._trySelectingOfferInstrument(offer);
+    }, 300);
   },
 
   /**

@@ -1,3 +1,5 @@
+import { AVAILABLE_METHODS } from 'common/constants';
+
 /**
  * Get the updated payment payload augmented with the given instrument
  * @param {Instrument} instrument
@@ -136,7 +138,6 @@ const config = {
     },
     isValid: instrument => {
       if (instrument.token_id) {
-        return true;
       }
 
       const hasIssuers = Boolean(instrument.issuers);
@@ -367,8 +368,6 @@ const config = {
     },
   },
 
-  paypal: {},
-
   cardless_emi: {
     properties: ['providers'],
     payment: ['provider'],
@@ -409,13 +408,26 @@ const config = {
       Boolean(instrument.providers) && instrument.providers.length > 0,
   },
 
-  bank_transfer: {},
-
-  // TODO: Pending methods: emi, gpay
+  // TODO: Pending methods: emi
 };
 
 // EMI and Cards are the same for now.
 config.emi = config.card;
+
+// UPI OTM is the same as UPI for now.
+config.upi_otm = config.upi;
+
+/**
+ * This will set config as {} for methods that
+ * do not have a specific config.
+ *
+ * eg: bank_transfer, paypal, gpay
+ */
+_Arr.loop(AVAILABLE_METHODS, method => {
+  if (!config[method]) {
+    config[method] = {};
+  }
+});
 
 _Obj.loop(config, (val, method) => {
   config[method] = _Obj.extend(
