@@ -60,9 +60,9 @@
   let inputRef;
   let resultsContainerRef;
 
-  function updateResults() {
+  function getResults(query, items) {
     if (query) {
-      results = _Arr.filter(items, item => {
+      return _Arr.filter(items, item => {
         const queryText = query.toLowerCase().trim();
 
         return _Arr.any(keys, key => {
@@ -70,17 +70,12 @@
         });
       });
     } else {
-      results = [];
-    }
-
-    if (results.length) {
-      focusedIndex = 0;
-    } else {
-      focusedIndex = null;
+      return [];
     }
   }
 
-  $: items, query, keys, updateResults();
+  $: items, query, keys, (results = getResults(query, items));
+  $: results, (focusedIndex = results.length ? 0 : null);
   $: shownItems = _Arr.mergeWith(results, items);
   $: shownItems, focusedIndex, scrollToFocusedItem();
   $: shownItems, focusedIndex, updateActiveDescendantInRef(); // TODO: Fix
