@@ -1,4 +1,10 @@
 <script>
+  // Svelte imports
+  import { onDestroy } from 'svelte';
+
+  //Store imports
+  import { getAmount } from 'checkoutstore/index.js';
+
   // Utils imports
   import Razorpay from 'common/Razorpay';
   import { makeAuthUrl } from 'common/Razorpay';
@@ -77,6 +83,10 @@
 
     let receivers = response.receivers;
 
+    if (response.amount_expected) {
+      session.updateAmountInHeader(response.amount_expected);
+    }
+
     if (receivers && receivers.length !== 0) {
       data = {
         receiver: receivers[0],
@@ -89,6 +99,12 @@
       loading = false;
     }
   }
+
+  const amount = getAmount();
+
+  onDestroy(() => {
+    data.amount = session.setAmount(amount);
+  });
 
   export function copyDetails() {
     copyToClipboard('.neft-details', neftDetails.innerText);
