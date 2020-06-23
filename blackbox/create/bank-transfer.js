@@ -7,6 +7,7 @@ const {
   verifyNeftDetails,
   verifyRoundOffAlertMessage,
   verifyPartialAmount,
+  verifyAmount,
 } = require('../actions/common');
 
 const {
@@ -75,10 +76,13 @@ module.exports = function(testFeatures) {
       if (partialPayments) {
         await verifyPartialAmount(context, '₹ 2,000');
       }
+
+      await verifyAmount(context, '₹ 2,000');
       await selectPaymentMethod(context, 'bank_transfer');
       await returnVirtualAccounts(context);
       await verifyNeftDetails(context);
       await verifyRoundOffAlertMessage(context);
+      await verifyAmount(context, '₹ 2,200');
     });
   });
 };
