@@ -216,6 +216,26 @@
     }
   }
 
+  function getNextIndexForUpKey(items, currentIndex) {
+    if (!_.isNumber(currentIndex)) {
+      return items.length - 1;
+    } else if (currentIndex === 0) {
+      return items.length - 1;
+    } else {
+      return currentIndex - 1;
+    }
+  }
+
+  function getNextIndexForDownKey(items, currentIndex) {
+    if (!_.isNumber(currentIndex)) {
+      return 0;
+    } else if (currentIndex === items.length - 1) {
+      return 0;
+    } else {
+      return focusedIndex + 1;
+    }
+  }
+
   function arrowKeysHandler(event) {
     const UP_ARROW = 38;
     const DOWN_ARROW = 40;
@@ -229,26 +249,12 @@
     }
 
     if (key === UP_ARROW) {
-      if (!_.isNumber(focusedIndex)) {
-        focusedIndex = shownItems.length - 1;
-      } else if (focusedIndex === 0) {
-        focusedIndex = shownItems.length - 1;
-      } else {
-        focusedIndex = focusedIndex - 1;
-      }
-
+      focusedIndex = getNextIndexForUpKey(shownItems, focusedIndex);
       return;
     }
 
     if (key === DOWN_ARROW) {
-      if (!_.isNumber(focusedIndex)) {
-        focusedIndex = 0;
-      } else if (focusedIndex === shownItems.length - 1) {
-        focusedIndex = 0;
-      } else {
-        focusedIndex = focusedIndex + 1;
-      }
-
+      focusedIndex = getNextIndexForDownKey(shownItems, focusedIndex);
       return;
     }
   }
