@@ -1,6 +1,6 @@
 <script>
   // Svelte imports
-  import { createEventDispatcher, onMount, tick } from 'svelte';
+  import { createEventDispatcher, onMount, tick, onDestroy } from 'svelte';
   import { fade, fly } from 'svelte/transition';
 
   // UI imports
@@ -102,11 +102,15 @@
 
   export function close() {
     visible = false;
+  }
 
+  function removeFromOverlayStack() {
     // Remove the overlay from $overlayStack
     const overlay = _Arr.find($overlayStack, overlay => overlay.id === id);
     $overlayStack = _Arr.remove($overlayStack, overlay);
   }
+
+  onDestroy(removeFromOverlayStack);
 
   function handleEscape(event) {
     if (_.getKeyFromEvent(event) === 27) {
