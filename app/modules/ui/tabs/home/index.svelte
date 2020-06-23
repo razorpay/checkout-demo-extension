@@ -24,7 +24,7 @@
     isContactPresent,
     email,
     selectedInstrumentId,
-    methodTabInstrument,
+    methodInstrument,
     multiTpvOption,
     partialPaymentAmount,
     partialPaymentOption,
@@ -104,6 +104,8 @@
   import * as AnalyticsTypes from 'analytics-types';
   import { getCardOffer, hasOffersOnHomescreen } from 'checkoutframe/offers';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
+  import { isInstrumentGrouped } from 'configurability/instruments';
+  import { isElementCompletelyVisibleInTab } from 'lib/utils';
 
   import { INDIA_COUNTRY_CODE } from 'common/constants';
 
@@ -398,13 +400,8 @@
     return true;
   }
 
-  function deselectAllInstruments() {
-    $methodTabInstrument = null;
-    $selectedInstrumentId = null;
-  }
-
   export function onShown() {
-    deselectAllInstruments();
+    deselectInstrument();
 
     if (view === 'methods') {
       hideCta();
@@ -526,20 +523,12 @@
     // Multi TPV
     if (tpv) {
       if (tpv.method === 'upi') {
-        selectMethod({
-          detail: {
-            method: 'upi',
-          },
-        });
+        selectMethod('upi');
       } else if (tpv.method === 'netbanking') {
         session.preSubmit();
       } else {
         if ($multiTpvOption === 'upi') {
-          selectMethod({
-            detail: {
-              method: 'upi',
-            },
-          });
+          selectMethod('upi');
         } else if ($multiTpvOption === 'netbanking') {
           session.preSubmit();
         }
@@ -560,11 +549,7 @@
         showMethods();
         return;
       } else {
-        selectMethod({
-          detail: {
-            method: singleMethod,
-          },
-        });
+        selectMethod(singleMethod);
         return;
       }
     }
@@ -584,22 +569,7 @@
     $selectedInstrumentId = null;
   }
 
-  export function selectMethod(event) {
-    deselectInstrument();
-
-    Analytics.track('payment_method:select', {
-      type: AnalyticsTypes.BEHAV,
-      data: event.detail,
-    });
-
-    let { down, method } = event.detail;
-
-    if (down) {
-      return;
-    }
-
-    $selectedInstrumentId = null;
-
+  export function selectMethod(method) {
     if (method === 'paypal') {
       createPaypalPayment();
       return;
@@ -655,6 +625,29 @@
   $: {
     showUserDetailsStrip =
       ($isContactPresent || $email) && !isContactEmailHidden();
+  }
+
+  export function onSelectInstrument(event) {
+    const instrument = event.detail;
+
+    $selectedInstrumentId = instrument.id;
+
+    if (isInstrumentGrouped(instrument)) {
+      selectMethod(instrument.method);
+    } else {
+      // Bring instrument into view if it's not visible
+      const domElement = _Doc.querySelector(
+        `.home-methods .methods-block [data-id="${instrument.id}"]`
+      );
+
+      if (domElement && !isElementCompletelyVisibleInTab(domElement)) {
+        domElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'center',
+        });
+      }
+    }
   }
 </script>
 
@@ -814,7 +807,7 @@
             class="home-methods"
             in:fly={{ delay: 100, duration: 400, y: 80 }}>
             <NewMethodsList
-              on:selectMethod={selectMethod}
+              on:selectInstrument={onSelectInstrument}
               on:submit={attemptPayment} />
           </div>
         </div>

@@ -174,5 +174,5 @@ export function isElementCompletelyVisibleInTab(element) {
     return false;
   }
 
-  return isElementCompletelyVisibleIn(element, tab);
+  return isElementCompletelyVisibleInContainer(element, tab);
 }

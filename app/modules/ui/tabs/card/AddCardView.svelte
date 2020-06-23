@@ -21,7 +21,7 @@
     authType,
     cardType,
   } from 'checkoutstore/screens/card';
-  import { methodTabInstrument } from 'checkoutstore/screens/home';
+  import { methodInstrument } from 'checkoutstore/screens/home';
 
   import {
     isNameReadOnly,
@@ -231,9 +231,9 @@
          * If there's a card/emi instrument, we check for its validity.
          * Otherwise we'll just assume that this is successful validation.
          */
-        if ($methodTabInstrument && $methodTabInstrument.method === tab) {
+        if ($methodInstrument && $methodInstrument.method === tab) {
           validationPromises.push(
-            isInstrumentValidForPayment($methodTabInstrument, {
+            isInstrumentValidForPayment($methodInstrument, {
               method: tab,
               'card[number]': $cardNumber,
             })
@@ -251,11 +251,11 @@
         );
 
         // Track validity if instrument was used
-        if ($methodTabInstrument) {
+        if ($methodInstrument) {
           Analytics.track('instrument:input:validate', {
             data: {
-              method: $methodTabInstrument.method,
-              instrument: $methodTabInstrument,
+              method: $methodInstrument.method,
+              instrument: $methodInstrument,
               valid: isInstrumentValid,
             },
           });
@@ -266,14 +266,14 @@
 
   $: {
     /**
-     * When $methodTabInstrument changes and is a card instrument,
+     * When $methodInstrument changes and is a card instrument,
      * we'll need to perform all vaildations again
      */
 
-    const hasCardMethodTabInstrument =
-      $methodTabInstrument && $methodTabInstrument.method === 'card';
-    if ($methodTabInstrument) {
-      if ($methodTabInstrument.method === 'card') {
+    const hasCardMethodInstrument =
+      $methodInstrument && $methodInstrument.method === 'card';
+    if ($methodInstrument) {
+      if ($methodInstrument.method === 'card') {
         onCardNumberChange();
       }
     } else {

@@ -5,7 +5,7 @@
 
   // Store
   import { selectedBank } from 'checkoutstore/screens/netbanking';
-  import { methodTabInstrument } from 'checkoutstore/screens/home';
+  import { methodInstrument } from 'checkoutstore/screens/home';
 
   // UI imports
   import Tab from 'ui/tabs/Tab.svelte';
@@ -69,6 +69,7 @@
   let selectedBankHasDowntime;
   let selectedBankName;
   let translatedBanksArr;
+  let searchOpened;
 
   $: {
     if ($selectedBank) {
@@ -94,6 +95,12 @@
   const recurring = isRecurring();
   const dispatch = createEventDispatcher();
 
+  export function getPayload() {
+    return {
+      bank: $selectedBank,
+    };
+  }
+
   function setCorporateOption() {
     const corporateOption = getCorporateOption($selectedBank, filteredBanks);
 
@@ -104,10 +111,12 @@
 
   function showSearch() {
     searchModal.open();
+    searchOpened = true;
   }
 
   function hideSearch() {
     searchModal.close();
+    searchOpened = false;
 
     // Restore focus
     if (bankSelect) {
@@ -165,7 +174,7 @@
   }
 
   $: {
-    filteredBanks = filterBanksAgainstInstrument(banks, $methodTabInstrument);
+    filteredBanks = filterBanksAgainstInstrument(banks, $methodInstrument);
 
     // If the currently selected bank is not present in filtered banks, we need to unset it.
     if (!filteredBanks[$selectedBank]) {
@@ -381,7 +390,7 @@
       {/if}
 
     </Bottom>
-    {#if !recurring}
+    {#if !(recurring || searchOpened)}
       <CTA on:click={() => getSession().preSubmit()} />
     {/if}
   </Screen>
