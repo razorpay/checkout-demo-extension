@@ -344,6 +344,7 @@
     <!-- LABEL: Search for bank -->
     <!-- LABEL: All banks -->
     <SearchModal
+      identifier="netbanking_bank_select"
       title={$t(SEARCH_TITLE)}
       placeholder={$t(SEARCH_PLACEHOLDER)}
       all={$t(SEARCH_ALL)}

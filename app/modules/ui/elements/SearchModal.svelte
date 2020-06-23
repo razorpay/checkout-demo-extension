@@ -1,4 +1,8 @@
 <script>
+  /**
+   * ARIA guidelines: https://www.w3.org/TR/wai-aria-practices/examples/combobox/aria1.0pattern/combobox-autocomplete-list.html
+   */
+
   // Svelte imports
   import { createEventDispatcher, onMount, tick } from 'svelte';
   import { fade, fly } from 'svelte/transition';
@@ -18,18 +22,24 @@
 
   // i18n
   import { locale } from 'svelte-i18n';
-  import { formatTemplateWithLocale } from 'i18n';
+  import { formatTemplateWithLocale, formatMessageWithLocale } from 'i18n';
 
   // Props
   export let placeholder = 'Type to search';
   export let autocomplete = 'off';
   export let inputType = 'text';
   export let items = [];
+  export let identifier = Track.makeUid();
   export let component;
   export let keys;
   export let all;
 
-  const id = Track.makeUid();
+  const IDs = {
+    overlay: `${identifier}_search_overlay`,
+    results: `${identifier}_search_results`,
+    resultItem: item => `${identifier}_${item._key}_search_result`,
+    allItem: item => `${identifier}_${item._key}_search_all`,
+  };
 
   onMount(() => {
     document.querySelector('#modal-inner').appendChild(containerRef);
@@ -43,6 +53,7 @@
   let results = [];
   let shownItems = items;
   let focusedIndex = null;
+  let activeDescendantIdRef;
 
   // Refs
   let containerRef;
@@ -72,6 +83,26 @@
   $: items, query, keys, updateResults();
   $: shownItems = _Arr.mergeWith(results, items);
   $: shownItems, focusedIndex, scrollToFocusedItem();
+  $: shownItems, focusedIndex, updateActiveDescendantInRef(); // TODO: Fix
+
+  function updateActiveDescendantInRef() {
+    tick().then(() => {
+      activeDescendantIdRef = getActiveDescendantIdRef(focusedIndex);
+    });
+  }
+
+  function getActiveDescendantIdRef(index) {
+    if (!_.isNumber(index)) {
+      return;
+    }
+
+    if (index < results.length) {
+      return `#${IDs.resultItem(results[index])}`;
+    } else {
+      index = index - results.length;
+      return `#${IDs.allItem(items[index])}`;
+    }
+  }
 
   function bringItemAtIndexIntoView(index) {
     if (!resultsContainerRef) {
@@ -146,7 +177,7 @@
     // Add to $overlayStack
     $overlayStack = $overlayStack.concat([
       {
-        id,
+        id: IDs.overlay,
         component: 'SearchModal',
         back: () => {
           dispatch('close');
@@ -159,7 +190,10 @@
     visible = false;
 
     // Remove the overlay from $overlayStack
-    const overlay = _Arr.find($overlayStack, overlay => overlay.id === id);
+    const overlay = _Arr.find(
+      $overlayStack,
+      overlay => overlay.id === IDs.overlay
+    );
     $overlayStack = _Arr.remove($overlayStack, overlay);
   }
 
@@ -169,7 +203,16 @@
       event.stopPropagation();
       event.preventDefault();
 
-      dispatch('close');
+      /**
+       * ARIA guidelines suggest
+       * - Clear the textbox.
+       * - If the listbox is displayed, close it.
+       */
+      if (query) {
+        query = '';
+      } else {
+        dispatch('close');
+      }
     }
   }
 
@@ -339,6 +382,7 @@
     box-sizing: border-box;
     overflow-y: auto;
     margin: 0;
+    padding: 0;
   }
 
   .list-item {
@@ -366,7 +410,7 @@
     display: flex;
     justify-content: center;
     text-align: center;
-    padding: 24px;
+    padding: 20px 24px;
     color: #888;
   }
 </style>
@@ -391,6 +435,12 @@
             <input
               class="no-escape"
               type="text"
+              role="combobox"
+              aria-autocomplete="list"
+              aria-haspopup="true"
+              aria-owns={`#${IDs.results}`}
+              aria-expanded="true"
+              aria-activedescendant={activeDescendantIdRef}
               {autocomplete}
               {placeholder}
               on:focus={() => (inputRef.type = inputType)}
@@ -401,26 +451,33 @@
           </form>
           <div
             class="search-results"
-            bind:this={resultsContainerRef}
-            class:has-query={query}>
+            class:has-query={query}
+            id={IDs.results}
+            aria-label={formatMessageWithLocale('misc.search_results_label', $locale)}
+            role="listbox"
+            bind:this={resultsContainerRef}>
             {#if query}
-              <div class="list results">
-                {#if results.length}
-                  {#each results as item, index (`${item._key}_result_${index}`)}
+              {#if results.length}
+                <!-- LABEL: Results -->
+                <div class="list results">
+                  {#each results as item, index (IDs.resultItem(item))}
                     <div
                       class="list-item"
                       class:focused={index === focusedIndex}
+                      id={IDs.resultItem(item)}
+                      role="option"
+                      aria-selected={index === focusedIndex}
                       on:click={() => onSelect(item)}>
                       <svelte:component this={component} {item} />
                     </div>
                   {/each}
-                {:else}
-                  <!-- LABEL: No results for "{query}" -->
-                  <div class="no-results">
-                    {formatTemplateWithLocale('misc.search_no_results', { query }, $locale)}
-                  </div>
-                {/if}
-              </div>
+                </div>
+              {:else}
+                <!-- LABEL: No results for "{query}" -->
+                <div class="no-results">
+                  {formatTemplateWithLocale('misc.search_no_results', { query }, $locale)}
+                </div>
+              {/if}
             {/if}
             {#if all}
               <div class="list-header">
@@ -428,10 +485,13 @@
                 <div class="divider" />
               </div>
               <div class="list">
-                {#each items as item, index (`${item._key}_all_${index}`)}
+                {#each items as item, index (IDs.allItem(item))}
                   <div
                     class="list-item"
                     class:focused={index + results.length === focusedIndex}
+                    id={IDs.allItem(item)}
+                    role="option"
+                    aria-selected={index + results.length === focusedIndex}
                     on:click={() => onSelect(item)}>
                     <svelte:component this={component} {item} />
                   </div>
