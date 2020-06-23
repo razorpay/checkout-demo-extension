@@ -7,7 +7,9 @@ const {
   verifyNeftDetails,
   verifyRoundOffAlertMessage,
   verifyPartialAmount,
-  verifyAmount,
+  verifyAmountInHeader,
+  goBackFromTopbar,
+  getAmountFromHeader,
 } = require('../actions/common');
 
 const {
@@ -32,7 +34,12 @@ module.exports = function(testFeatures) {
     testFeatures
   );
 
-  const { partialPayments, optionalContact, optionalEmail } = features;
+  const {
+    partialPayments,
+    optionalContact,
+    optionalEmail,
+    feeBearer,
+  } = features;
 
   describe.each(
     getTestData(title, {
@@ -77,12 +84,14 @@ module.exports = function(testFeatures) {
         await verifyPartialAmount(context, '₹ 2,000');
       }
 
-      await verifyAmount(context, '₹ 2,000');
+      const amountInHeader = await getAmountFromHeader();
       await selectPaymentMethod(context, 'bank_transfer');
-      await returnVirtualAccounts(context);
-      await verifyNeftDetails(context);
+      await returnVirtualAccounts(context, feeBearer);
+      await verifyNeftDetails(context, feeBearer);
       await verifyRoundOffAlertMessage(context);
-      await verifyAmount(context, '₹ 2,200');
+      await verifyAmountInHeader(feeBearer ? '₹ 2,200' : '₹ 2,000');
+      await goBackFromTopbar(context);
+      await verifyAmountInHeader(amountInHeader);
     });
   });
 };

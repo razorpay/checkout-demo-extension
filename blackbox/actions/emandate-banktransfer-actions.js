@@ -31,7 +31,7 @@ async function fillEmandateBankDetails(context) {
   await context.page.select('[name="bank_account[account_type]"]', 'savings');
 }
 
-async function returnVirtualAccounts(context) {
+async function returnVirtualAccounts(context, fee = false) {
   await context.expectRequest();
   await context.respondJSON({
     id: 'va_DhhfICdHxgXszs',
@@ -39,7 +39,7 @@ async function returnVirtualAccounts(context) {
     entity: 'virtual_account',
     status: 'active',
     description: null,
-    amount_expected: 200000,
+    amount_expected: fee ? 202000 : 200000,
     notes: [],
     amount_paid: 0,
     customer_id: null,
