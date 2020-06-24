@@ -21,8 +21,12 @@ const {
  */
 async function assertUserDetails(context, apiInstrumentsReadFromCache = false) {
   if (
-    !context.preferences.customer &&
-    context.options.personalization !== false
+    (!context.preferences.customer &&
+      context.options.personalization !== false) ||
+    !(
+      context.preferences.preferred_methods &&
+      context.preferences.preferred_methods[context.preferences.customer]
+    )
   ) {
     if (!apiInstrumentsReadFromCache) {
       await receiveApiInstruments(context);
