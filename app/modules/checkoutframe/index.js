@@ -230,30 +230,6 @@ function fetchPrefs(session) {
 }
 
 function setSessionPreferences(session, preferences) {
-  preferences.preferred_methods = {
-    '+918800844282': [
-      { method: 'upi', instrument: 'saransh@ybl', score: 0.3 },
-      {
-        instrument: 'F1lKrOrLTkTpyJ',
-        method: 'card',
-        issuer: 'UTIB',
-        network: 'MasterCard',
-        type: 'debit',
-        score: 1,
-      },
-    ],
-    '+919999289274': [
-      { method: 'upi', instrument: 'saransh@ybl', score: 0.3 },
-      {
-        instrument: 'F1lKrOrLTkTpyJ',
-        method: 'card',
-        issuer: 'UTIB',
-        network: 'MasterCard',
-        type: 'debit',
-        score: 1,
-      },
-    ],
-  };
   const razorpayInstance = session.r;
   razorpayInstance.preferences = preferences;
   setRazorpayInstance(razorpayInstance);
