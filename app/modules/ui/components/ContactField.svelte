@@ -113,6 +113,38 @@
 
     return list;
   }
+
+  function downArrowHandler(event) {
+    const DOWN_ARROW = 40;
+    const key = _.getKeyFromEvent(event);
+
+    if (key === DOWN_ARROW) {
+      openCountryCodeModal(event);
+    }
+  }
+
+  function openCountryCodeModal(event) {
+    // Don't open the modal if contact is readonly
+    if (isContactReadOnly()) {
+      return;
+    }
+
+    if (event) {
+      event.preventDefault();
+    }
+
+    countryField.blur();
+    searchModal.open();
+  }
+
+  function closeCountryCodeModal() {
+    searchModal.close();
+
+    // TODO: Check if this works with readonly
+    if (phoneField) {
+      phoneField.focus();
+    }
+  }
 </script>
 
 <style>
@@ -124,6 +156,10 @@
   .fields-container > :global(div:first-child) {
     flex-shrink: 0;
     flex-basis: 25%;
+  }
+
+  .fields-container > :global(div:first-child > i) {
+    transform: rotate(-90deg) scale(0.5);
   }
 
   .fields-container > :global(div:last-child) {
@@ -139,18 +175,16 @@
     name="country-code"
     type="tel"
     autocomplete="tel-country-code"
-    on:click={event => {
-      event.preventDefault();
-      countryField.blur();
-      searchModal.open();
-    }}
+    on:click={openCountryCodeModal}
     on:autocomplete={appendPlusToCountryCodeAsynchronously}
     on:paste={appendPlusToCountryCodeAsynchronously}
     on:blur={appendPlusToCountryCodeAsynchronously}
+    on:keydown={downArrowHandler}
     required={!isOptional}
     xautocompletetype="phone-country-code"
     pattern={COUNTRY_CODE_REGEX}
     readonly={isContactReadOnly()}
+    icon="&#xe604;"
     formatter={{ type: 'country_code' }}
     label={$t(COUNTRY_LABEL)}
     on:input={e => (country = e.target.value)}
@@ -195,8 +229,5 @@
   on:close={closeSearch}
   on:select={({ detail }) => {
     country = `+${detail.country_code}`;
-    searchModal.close();
-    if (phoneField) {
-      phoneField.focus();
-    }
+    closeCountryCodeModal();
   }} />
