@@ -4,6 +4,7 @@ import {
   parseUPIIntentResponse,
   didUPIIntentSucceed,
   upiBackCancel,
+  getAppFromPackageName,
 } from 'common/upi';
 import { androidBrowser } from 'common/useragent';
 import Track from 'tracker';
@@ -289,10 +290,13 @@ var responseTypes = {
         return responseTypes['gpay'].call(this, request, fullResponse);
       }
     } else {
+      const app = getAppFromPackageName(this.upi_app);
+
       // TODO check if a condition is required
       return Bridge.checkout.callIos('callNativeIntent', {
         intent_url,
         upi_app: this.upi_app,
+        shortcode: app.shortcode,
       });
     }
   },

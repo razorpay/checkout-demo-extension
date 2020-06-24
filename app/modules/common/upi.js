@@ -23,6 +23,19 @@ export function getPackageNameFromShortcode(shortcode) {
   }
 }
 
+/**
+ * Returns the app corresponding to the package name.
+ * @param {string} shortcode
+ *
+ * @returns {string | undefined}
+ */
+export function getAppFromPackageName(packageName) {
+  const app =
+    getAllApps() |> _Arr.find(app => app.package_name === packageName);
+
+  return app;
+}
+
 const UPI_APPS = {
   /**
    * Preferred apps.
