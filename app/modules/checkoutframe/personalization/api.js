@@ -2,6 +2,10 @@ import { VPA_REGEX } from 'common/constants';
 import { getUPIAppDataFromHandle } from 'common/upi';
 import { getUPIIntentApps } from 'checkoutstore/native';
 
+import { getAmount } from 'checkoutstore';
+
+import { makeUrl } from 'common/Razorpay';
+
 const PREFERRED_INSTRUMENTS_CACHE = {};
 
 /**
@@ -26,16 +30,22 @@ export function setInstrumentsForCustomer(customer, instruments) {
 }
 
 function getInstrumentsFromApi(customer) {
+  const url = _.appendParamsToUrl(makeUrl('personalisation'), {
+    contact: customer.contact,
+    amount: getAmount(),
+  });
+
   const promise = new Promise(resolve => {
-    setTimeout(() => {
-      const data = {};
+    fetch({
+      url,
+      callback: function(data) {
+        const apiInstruments = data[customer.contact] || [];
 
-      const apiInstruments = data[customer.contact] || [];
+        setInstrumentsForCustomer(customer, apiInstruments);
 
-      setInstrumentsForCustomer(customer, apiInstruments);
-
-      resolve(getInstrumentsForCustomer(customer));
-    }, 0);
+        resolve(getInstrumentsForCustomer(customer));
+      },
+    });
   });
 
   PREFERRED_INSTRUMENTS_CACHE[customer.contact] = promise;

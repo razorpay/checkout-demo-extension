@@ -71,7 +71,7 @@ async function selectPersonalizationPaymentMethod(context, optionNumber) {
 
 async function receiveApiInstruments(context) {
   const req = await context.expectRequest();
-  expect(req.url).toContain('https://google.com/?q=p13n');
+  expect(req.url).toContain('/personalisation');
   await context.respondJSON({});
 }
 
