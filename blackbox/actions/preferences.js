@@ -87,6 +87,30 @@ module.exports = {
     const token = randomId();
     return {
       ...makePreferences(overrides),
+      preferred_methods: {
+        '+918888888881': [
+          { method: 'upi', instrument: 'dfs@okicici', score: 0.3 },
+          {
+            instrument: 'F1lKrOrLTkTpyJ',
+            method: 'card',
+            issuer: 'UTIB',
+            network: 'MasterCard',
+            type: 'debit',
+            score: 1,
+          },
+        ],
+        '+919999289274': [
+          { method: 'upi', instrument: 'saransh@ybl', score: 0.3 },
+          {
+            instrument: 'F1lKrOrLTkTpyJ',
+            method: 'card',
+            issuer: 'UTIB',
+            network: 'MasterCard',
+            type: 'debit',
+            score: 1,
+          },
+        ],
+      },
       customer: {
         email: randomEmail(),
         contact: randomContact(),
