@@ -522,6 +522,7 @@ export default {
       INDB: 'Indusind Bank',
       JAKA: 'Jammu and Kashmir Bank',
       JSBP: 'Janata Sahakari Bank (Pune)',
+      JSFB: 'Jana Small Finance Bank',
       KARB: 'Karnataka Bank',
       KVBL: 'Karur Vysya Bank',
       KKBK: 'Kotak Mahindra Bank',
