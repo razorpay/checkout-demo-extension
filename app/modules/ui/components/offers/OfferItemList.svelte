@@ -1,20 +1,16 @@
 <script>
   import { appliedOffer } from 'checkoutstore/offers';
-
   // i18n
   import { t } from 'svelte-i18n';
-
   import {
     NO_COST_EMI,
     CASHBACK_DETAIL,
     REMOVE_ACTION,
   } from 'ui/labels/offers';
-
   export let selected;
   export let offers;
   export let removeOffer;
   export let selectOffer;
-
   function getOfferDescription(offer) {
     // let discount = offer.original_amount - offer.amount;
     return offer.display_text;
@@ -56,7 +52,6 @@
     letter-spacing: 0.5px;
     cursor: pointer;
   }
-
   .badge {
     display: inline-block;
     margin: 0 8px;
@@ -68,6 +63,10 @@
     padding: 0 3px;
     text-transform: uppercase;
     pointer-events: none;
+  }
+  .no-description {
+    height: 0;
+    width: 0;
   }
 </style>
 
@@ -85,7 +84,10 @@
       {/if}
       {#if selected === offer}
         <div class="checkbox" />
-        <div class="offer-detail">{getOfferDescription(offer)}</div>
+        <div
+          class={getOfferDescription(offer) === undefined ? 'no-description' : 'offer-detail'}>
+          {getOfferDescription(offer) === undefined ? '' : getOfferDescription(offer)}
+        </div>
         {#if offer.type === 'deferred'}
           <!-- LABEL: Cashback would be credited to source mode of payment. -->
           <div class="offer-detail">{$t(CASHBACK_DETAIL)}</div>
