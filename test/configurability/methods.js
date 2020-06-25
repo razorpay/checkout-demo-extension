@@ -36,6 +36,7 @@ test('Module: configurability/methods', t => {
             {
               method: 'upi',
               apps: ['com.google.android.apps.nbu.paisa.user'],
+              flows: ['intent'],
               _type: 'instrument',
             },
           ],
@@ -83,11 +84,23 @@ test('Module: configurability/methods', t => {
           _type: 'block',
           instruments: [
             {
+              _ungrouped: [
+                {
+                  method: 'card',
+                  issuer: 'ICIC',
+                },
+              ],
               method: 'card',
               issuers: ['ICIC'],
               _type: 'instrument',
             },
             {
+              _ungrouped: [
+                {
+                  method: 'netbanking',
+                  bank: 'ICIC',
+                },
+              ],
               method: 'netbanking',
               banks: ['ICIC'],
               _type: 'instrument',
@@ -148,8 +161,17 @@ test('Module: configurability/methods', t => {
           _type: 'block',
           instruments: [
             {
+              _ungrouped: [
+                {
+                  app: 'com.google.android.apps.nbu.paisa.user',
+                  flow: 'intent',
+                  method: 'upi',
+                  _type: 'instrument',
+                },
+              ],
               method: 'upi',
               apps: ['com.google.android.apps.nbu.paisa.user'],
+              flows: ['intent'],
               _type: 'instrument',
             },
           ],
@@ -160,6 +182,7 @@ test('Module: configurability/methods', t => {
           _type: 'block',
           instruments: [
             {
+              _ungrouped: [],
               code: 'netbanking',
               _type: 'method',
               method: 'netbanking',
@@ -171,16 +194,37 @@ test('Module: configurability/methods', t => {
           _type: 'block',
           instruments: [
             {
+              _ungrouped: [
+                {
+                  issuer: 'HDFC',
+                  method: 'card',
+                  _type: 'instrument',
+                },
+              ],
               method: 'card',
               issuers: ['HDFC'],
               _type: 'instrument',
             },
             {
+              _ungrouped: [
+                {
+                  bank: 'HDFC',
+                  method: 'netbanking',
+                  _type: 'instrument',
+                },
+              ],
               method: 'netbanking',
               banks: ['HDFC'],
               _type: 'instrument',
             },
             {
+              _ungrouped: [
+                {
+                  wallet: 'payzapp',
+                  method: 'wallet',
+                  _type: 'instrument',
+                },
+              ],
               method: 'wallet',
               wallets: ['payzapp'],
               _type: 'instrument',
@@ -193,11 +237,13 @@ test('Module: configurability/methods', t => {
           _type: 'block',
           instruments: [
             {
+              _ungrouped: [],
               code: 'card',
               _type: 'method',
               method: 'card',
             },
             {
+              _ungrouped: [],
               code: 'wallet',
               _type: 'method',
               method: 'wallet',
@@ -209,11 +255,23 @@ test('Module: configurability/methods', t => {
           _type: 'block',
           instruments: [
             {
+              _ungrouped: [
+                {
+                  method: 'card',
+                  issuer: 'ICIC',
+                },
+              ],
               method: 'card',
               issuers: ['ICIC'],
               _type: 'instrument',
             },
             {
+              _ungrouped: [
+                {
+                  method: 'netbanking',
+                  bank: 'ICIC',
+                },
+              ],
               method: 'netbanking',
               banks: ['ICIC'],
               _type: 'instrument',
@@ -226,46 +284,85 @@ test('Module: configurability/methods', t => {
           _type: 'block',
           instruments: [
             {
+              _ungrouped: [],
               code: 'upi',
               _type: 'method',
               method: 'upi',
             },
             {
+              _ungrouped: [
+                {
+                  code: 'gpay',
+                  _type: 'method',
+                  method: 'gpay',
+                },
+              ],
               code: 'gpay',
               _type: 'method',
               method: 'gpay',
             },
             {
+              _ungrouped: [],
               code: 'emi',
               _type: 'method',
               method: 'emi',
             },
             {
+              _ungrouped: [],
               code: 'cardless_emi',
               _type: 'method',
               method: 'cardless_emi',
             },
             {
+              _ungrouped: [
+                {
+                  code: 'qr',
+                  _type: 'method',
+                  method: 'qr',
+                },
+              ],
               code: 'qr',
               _type: 'method',
               method: 'qr',
             },
             {
+              _ungrouped: [],
               code: 'paylater',
               _type: 'method',
               method: 'paylater',
             },
             {
+              _ungrouped: [
+                {
+                  code: 'paypal',
+                  _type: 'method',
+                  method: 'paypal',
+                },
+              ],
               code: 'paypal',
               _type: 'method',
               method: 'paypal',
             },
             {
+              _ungrouped: [
+                {
+                  code: 'bank_transfer',
+                  _type: 'method',
+                  method: 'bank_transfer',
+                },
+              ],
               code: 'bank_transfer',
               _type: 'method',
               method: 'bank_transfer',
             },
             {
+              _ungrouped: [
+                {
+                  code: 'nach',
+                  _type: 'method',
+                  method: 'nach',
+                },
+              ],
               code: 'nach',
               _type: 'method',
               method: 'nach',
