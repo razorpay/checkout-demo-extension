@@ -182,7 +182,13 @@ test('Module: configurability/methods', t => {
           _type: 'block',
           instruments: [
             {
-              _ungrouped: [],
+              _ungrouped: [
+                {
+                  code: 'netbanking',
+                  _type: 'method',
+                  method: 'netbanking',
+                },
+              ],
               code: 'netbanking',
               _type: 'method',
               method: 'netbanking',
@@ -237,13 +243,25 @@ test('Module: configurability/methods', t => {
           _type: 'block',
           instruments: [
             {
-              _ungrouped: [],
+              _ungrouped: [
+                {
+                  code: 'card',
+                  _type: 'method',
+                  method: 'card',
+                },
+              ],
               code: 'card',
               _type: 'method',
               method: 'card',
             },
             {
-              _ungrouped: [],
+              _ungrouped: [
+                {
+                  code: 'wallet',
+                  _type: 'method',
+                  method: 'wallet',
+                },
+              ],
               code: 'wallet',
               _type: 'method',
               method: 'wallet',
@@ -284,7 +302,13 @@ test('Module: configurability/methods', t => {
           _type: 'block',
           instruments: [
             {
-              _ungrouped: [],
+              _ungrouped: [
+                {
+                  code: 'upi',
+                  _type: 'method',
+                  method: 'upi',
+                },
+              ],
               code: 'upi',
               _type: 'method',
               method: 'upi',
@@ -302,13 +326,25 @@ test('Module: configurability/methods', t => {
               method: 'gpay',
             },
             {
-              _ungrouped: [],
+              _ungrouped: [
+                {
+                  code: 'emi',
+                  _type: 'method',
+                  method: 'emi',
+                },
+              ],
               code: 'emi',
               _type: 'method',
               method: 'emi',
             },
             {
-              _ungrouped: [],
+              _ungrouped: [
+                {
+                  code: 'cardless_emi',
+                  _type: 'method',
+                  method: 'cardless_emi',
+                },
+              ],
               code: 'cardless_emi',
               _type: 'method',
               method: 'cardless_emi',
@@ -326,7 +362,13 @@ test('Module: configurability/methods', t => {
               method: 'qr',
             },
             {
-              _ungrouped: [],
+              _ungrouped: [
+                {
+                  code: 'paylater',
+                  _type: 'method',
+                  method: 'paylater',
+                },
+              ],
               code: 'paylater',
               _type: 'method',
               method: 'paylater',
