@@ -354,6 +354,7 @@ export default {
       qr: 'Pay by scanning QR Code',
       gpay: 'Instant payment using Google Pay App',
       upi: 'Instant payment using UPI App',
+      upi_recurring: 'Supported only on BHIM',
       upi_otm: 'Pay later using BHIM and HDFC',
       cardless_emi: 'EMI via {text}',
       recurring_cards: '{networks} credit cards',
