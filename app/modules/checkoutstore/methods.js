@@ -328,7 +328,6 @@ function isUPIBaseEnabled() {
     // by mutual fund who can accept more than the standard limit
     (getAmount() < 1e7 || getMerchantOrder()?.method === 'upi') &&
     !isInternational() &&
-    !isRecurring() &&
     getAmount()
   );
 }
