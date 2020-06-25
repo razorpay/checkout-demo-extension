@@ -28,7 +28,7 @@
     {/if}
     <!-- LABEL: Bank Details -->
     {#if bank.name}
-      {getLongBankName(bank.code)}
+      {getLongBankName(bank.code, $locale, bank.name)}
     {:else}{$t(BANK_DETAILS_HEADING)}{/if}
   </div>
   {#if bank.account_number}
