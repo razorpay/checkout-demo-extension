@@ -441,7 +441,6 @@
 
     if (isUpiRecurring) {
       data.upi.type = 'recurring';
-      data.upi.end_date = endDate;
       data.recurring = 1;
     }
 
