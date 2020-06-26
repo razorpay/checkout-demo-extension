@@ -333,6 +333,7 @@
   export function onShown() {
     setDefaultTokenValue();
     determineCtaVisibility();
+    sendIntentEvents();
   }
 
   export function getPayload() {
@@ -522,6 +523,35 @@
       data: {
         valid,
         value: omnichannelField.getPhone(),
+      },
+    });
+  }
+
+  function sendIntentEvents() {
+    if (!intent) {
+      return;
+    }
+    Analytics.track('upi:intent', {
+      type: AnalyticsTypes.RENDER,
+      data: {
+        count: {
+          eligible: _.lengthOf(session.upi_intents_data),
+          all: _.lengthOf(session.all_upi_intents_data),
+        },
+        list: {
+          eligible: _Arr.join(
+            _Arr.map(session.upi_intents_data, function(app) {
+              return app.package_name;
+            }),
+            ','
+          ),
+          all: _Arr.join(
+            _Arr.map(session.all_upi_intents_data, function(app) {
+              return app.package_name;
+            }),
+            ','
+          ),
+        },
       },
     });
   }

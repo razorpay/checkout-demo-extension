@@ -1222,18 +1222,6 @@ Session.prototype = {
     document.body.appendChild(script);
   },
 
-  setUpiTab: function() {
-    /**
-     * This is being handled in Tab component as well,
-     * condition won't be needed here once all ported to svelte
-     */
-    if (MethodStore.isMethodEnabled('upi')) {
-      this.upiTab = new discreet.UpiTab({
-        target: _Doc.querySelector('#form-fields'),
-      });
-    }
-  },
-
   setUpiOtmTab: function() {
     if (MethodStore.isMethodEnabled('upi_otm')) {
       this.upiOtmTab = new discreet.UpiTab({
@@ -1276,7 +1264,6 @@ Session.prototype = {
     this.setCardlessEmi();
     this.setPayLater();
     this.setOtpScreen();
-    this.setUpiTab();
     this.setUpiOtmTab();
     this.setPayoutsScreen();
     this.setNach();
@@ -2769,46 +2756,6 @@ Session.prototype = {
     BackStore = null;
   },
 
-  switchTabAnalytics: function(tab) {
-    if (tab === 'upi' || tab === 'upi_otm') {
-      var upiData;
-      if (tab === 'upi') {
-        upiData = this.upiTab;
-      } else if (tab === 'upi_otm') {
-        upiData = this.upiOtmTab;
-      }
-
-      if (upiData && upiData.intent) {
-        /**
-         * If intent, track UPI apps installed and eligible
-         */
-        Analytics.track('upi:intent', {
-          type: AnalyticsTypes.RENDER,
-          data: {
-            count: {
-              eligible: _.lengthOf(this.upi_intents_data || []),
-              all: _.lengthOf(this.all_upi_intents_data || []),
-            },
-            list: {
-              eligible: _Arr.join(
-                _Arr.map(this.upi_intents_data || [], function(app) {
-                  return app.package_name;
-                }),
-                ','
-              ),
-              all: _Arr.join(
-                _Arr.map(this.all_upi_intents_data || [], function(app) {
-                  return app.package_name;
-                }),
-                ','
-              ),
-            },
-          },
-        });
-      }
-    }
-  },
-
   /**
    * Checks if the fields on the homepage are valid or not.
    *
@@ -2892,8 +2839,6 @@ Session.prototype = {
     }
 
     if (tab) {
-      this.switchTabAnalytics(tab);
-
       if (tab === 'credit_card' || tab === 'debit_card') {
         this.cardTab = tab;
         tab = 'card';
@@ -2948,7 +2893,7 @@ Session.prototype = {
 
     if (tab === 'upi') {
       this.updateCustomerInStore();
-      this.upiTab.onShown();
+      discreet.upiTab.render();
     }
 
     if (tab === 'upi_otm') {
@@ -2964,6 +2909,7 @@ Session.prototype = {
       if (this.upiTab.onBack()) {
         return;
       }
+      discreet.upiTab.destroy();
     }
 
     if (tab === '' && this.tab === 'upi_otm') {
@@ -4966,7 +4912,6 @@ Session.prototype = {
       'svelteOverlay',
       'topBar',
       'upiCancelReasonPicker',
-      'upiTab',
       'timer',
     ];
 
