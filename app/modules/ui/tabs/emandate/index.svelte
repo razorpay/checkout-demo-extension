@@ -198,7 +198,7 @@
 
   let bankName;
   $: {
-    const defaultBankName = (banks[selectedBank] || {}).code;
+    const defaultBankName = (banks[selectedBank] || {}).name;
     bankName = getLongBankName($selectedBank, $locale, defaultBankName);
   }
 
