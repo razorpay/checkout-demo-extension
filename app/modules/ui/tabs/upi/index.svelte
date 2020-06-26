@@ -716,7 +716,7 @@
       {/if}
     </div>
 
-    <Bottom tab={method}>
+    <Bottom>
       {#if down || disabled}
         <DowntimeCallout severe={disabled}>
           <!-- LABEL: UPI is experiencing low success rates. -->

@@ -19,8 +19,6 @@
 
   :global(#form-common.drishy ~ #bottom .bottom[tab='common']),
   :global(#form-card.drishy ~ #bottom .bottom[tab='card']),
-  :global(#form-upi.drishy ~ #bottom .bottom[tab='upi']),
-  :global(#form-upi_otm.drishy ~ #bottom .bottom[tab='upi_otm']),
   :global(#form-emiplans.drishy ~ #bottom .bottom[tab='emiplans']),
   :global(#form-payouts.drishy ~ #bottom .bottom[tab='payouts']),
   :global(#form-qr.drishy ~ #bottom .bottom[tab='qr']) {

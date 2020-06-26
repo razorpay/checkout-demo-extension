@@ -1222,17 +1222,6 @@ Session.prototype = {
     document.body.appendChild(script);
   },
 
-  setUpiOtmTab: function() {
-    if (MethodStore.isMethodEnabled('upi_otm')) {
-      this.upiOtmTab = new discreet.UpiTab({
-        target: _Doc.querySelector('#form-fields'),
-        props: {
-          method: 'upi_otm',
-        },
-      });
-    }
-  },
-
   setHomeTab: function() {
     this.homeTab = new discreet.HomeTab({
       target: gel('form-fields'),
@@ -1264,7 +1253,6 @@ Session.prototype = {
     this.setCardlessEmi();
     this.setPayLater();
     this.setOtpScreen();
-    this.setUpiOtmTab();
     this.setPayoutsScreen();
     this.setNach();
     this.setWalletsTab();
@@ -2898,24 +2886,18 @@ Session.prototype = {
 
     if (tab === 'upi_otm') {
       this.updateCustomerInStore();
-      this.upiOtmTab.onShown();
+      discreet.upiTab.render({ method: 'upi_otm' });
     }
 
     if (tab === 'emandate') {
       this.emandateView.onShown();
     }
 
-    if (tab === '' && this.tab === 'upi') {
+    if (tab === '' && (this.tab === 'upi' || this.tab === 'upi_otm')) {
       if (this.upiTab.onBack()) {
         return;
       }
       discreet.upiTab.destroy();
-    }
-
-    if (tab === '' && this.tab === 'upi_otm') {
-      if (this.upiOtmTab.onBack()) {
-        return;
-      }
     }
 
     this.body.attr('tab', tab);
@@ -3479,10 +3461,8 @@ Session.prototype = {
         /* All tabs should be responsible for their subdata */
         var upiData;
 
-        if (this.screen === 'upi') {
+        if (this.screen === 'upi' || this.screen === 'upi_otm') {
           upiData = this.upiTab.getPayload();
-        } else if (this.screen === 'upi_otm') {
-          upiData = this.upiOtmTab.getPayload();
         }
 
         each(upiData, function(key, value) {
@@ -4891,7 +4871,6 @@ Session.prototype = {
    */
   cleanUpSvelteComponents: function() {
     var views = [
-      'upiOtmTab',
       'cardlessEmiView',
       'currentScreen',
       'emandateView',
