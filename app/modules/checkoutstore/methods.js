@@ -303,10 +303,16 @@ export function getCardIssuersForRecurring() {
 // additional checks for each sub-method based on UPI
 const UPI_METHODS = {
   collect: () => true,
-  omnichannel: () => !isPayout() && hasFeature('google_pay_omnichannel'),
-  qr: () => getOption('method.qr') && !global.matchMedia(mobileQuery).matches,
+  omnichannel: () =>
+    !isRecurring() && !isPayout() && hasFeature('google_pay_omnichannel'),
+  qr: () =>
+    !isRecurring() &&
+    getOption('method.qr') &&
+    !global.matchMedia(mobileQuery).matches,
   intent: () =>
-    getMerchantMethods().upi_intent && getUPIIntentApps().all.length,
+    !isRecurring() &&
+    getMerchantMethods().upi_intent &&
+    getUPIIntentApps().all.length,
 };
 
 // additional checks for each sub-method based on UPI OTM
