@@ -33,7 +33,7 @@
   import { filterUPITokens } from 'common/token';
   import { getUPIIntentApps } from 'checkoutstore/native';
 
-  import { getAmount, getName } from 'checkoutstore';
+  import { getAmount, getName, getCurrency } from 'checkoutstore';
 
   // UI imports
   import UpiIntent from './UpiIntent.svelte';
@@ -110,20 +110,24 @@
   const isOtm = method === 'upi_otm';
   let otmStartDate = new Date();
 
+  const merchantName = getName();
+
   const session = getSession();
 
   const merchantOrder = getMerchantOrder();
 
   const isUpiRecurring = isRecurring();
-  let startDate;
-  let endDate;
-  let recurringFrequency;
-  let maxRecurringAmount;
-  let recurring_type;
+  let startDate,
+    endDate,
+    orderAmount,
+    recurringFrequency,
+    recurring_type,
+    maxRecurringAmount;
 
-  if (merchantOrder) {
-    startDate = merchantOrder.token.startDate;
-    endDate = merchantOrder.token.endDate;
+  if (isUpiRecurring) {
+    orderAmount = merchantOrder.amount;
+    startDate = merchantOrder.token.start_time;
+    endDate = merchantOrder.token.end_time;
     recurringFrequency = merchantOrder.token.frequency;
     maxRecurringAmount = merchantOrder.token.max_amount;
     recurring_type = merchantOrder.token.recurringType;
@@ -730,7 +734,7 @@
         <Callout classes={['downtime-callout']} showIcon={true}>
           <strong>{session.formatAmountWithCurrency(getAmount())}</strong>
           will be blocked on your account by clicking pay. Your account will be
-          charged {getName() ? 'by ' + getName() : ''} between
+          charged {merchantName ? 'by ' + merchantName : ''} between
           <strong>{toShortFormat(otmStartDate)}</strong>
           to
           <strong>{toShortFormat(otmEndDate)}</strong>
@@ -738,11 +742,11 @@
         </Callout>
       {/if}
       {#if isUpiRecurring}
-        <!-- Check the amount that has to be shown -->
         <Callout classes={['downtime-callout']} showIcon={true}>
-          This is a recurring payment and INR 799 will be charged now. After
-          this, ACME Corp can charge upto INR {maxRecurringAmount} {recurringFrequency}
-          till {toShortFormat(new Date(endDate))},
+          This is a recurring payment and {session.formatAmountWithCurrency(getAmount())}
+          will be charged now. After this, {!merchantName ? 'The Merchant' : merchantName}
+          can charge upto {session.formatAmountWithCurrency(maxRecurringAmount)}
+          {recurringFrequency} till {toShortFormat(new Date(endDate))},
         </Callout>
       {/if}
 
