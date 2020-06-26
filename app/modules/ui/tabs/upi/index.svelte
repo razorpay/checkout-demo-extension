@@ -122,11 +122,11 @@
   let recurring_type;
 
   if (merchantOrder) {
-    startDate = merchantOrder.startDate;
-    endDate = merchantOrder.endDate;
-    recurringFrequency = merchantOrder.recurringFrequency;
-    maxRecurringAmount = merchantOrder.maxRecurringAmount;
-    recurring_type = merchantOrder.recurringType;
+    startDate = merchantOrder.token.startDate;
+    endDate = merchantOrder.token.endDate;
+    recurringFrequency = merchantOrder.token.frequency;
+    maxRecurringAmount = merchantOrder.token.max_amount;
+    recurring_type = merchantOrder.token.recurringType;
   }
 
   const getAllowedPSPs = {
