@@ -8,7 +8,12 @@
   import { getSession } from 'sessionmanager';
   import * as GPay from 'gpay';
   import * as Bridge from 'bridge';
-  import { getDowntimes, hasFeature, isCustomerFeeBearer } from 'checkoutstore';
+  import {
+    getDowntimes,
+    hasFeature,
+    isCustomerFeeBearer,
+    getMerchantOrder,
+  } from 'checkoutstore';
   import {
     isMethodEnabled,
     isUPIFlowEnabled,
@@ -55,6 +60,7 @@
   import { contact } from 'checkoutstore/screens/home';
   import { customer } from 'checkoutstore/customer';
   import { methodInstrument } from 'checkoutstore/screens/home';
+  import { isRecurring } from 'checkoutstore';
 
   import {
     UPI_GPAY_BLOCK_HEADING,
@@ -105,6 +111,23 @@
   let otmStartDate = new Date();
 
   const session = getSession();
+
+  const merchantOrder = getMerchantOrder();
+
+  const isUpiRecurring = isRecurring();
+  let startDate;
+  let endDate;
+  let recurringFrequency;
+  let maxRecurringAmount;
+  let recurring_type;
+
+  if (merchantOrder) {
+    startDate = merchantOrder.startDate;
+    endDate = merchantOrder.endDate;
+    recurringFrequency = merchantOrder.recurringFrequency;
+    maxRecurringAmount = merchantOrder.maxRecurringAmount;
+    recurring_type = merchantOrder.recurringType;
+  }
 
   const getAllowedPSPs = {
     upi: tokens => tokens,
@@ -400,18 +423,29 @@
         break;
     }
 
+    // The UPI Block is given priority over the rest of the data.
+    // Migrating to have all upi related data in the upi block.
+    data.upi = {};
+
     /**
      * default to directpay for collect requests
      */
     if (!data['_[flow]']) {
       data['_[flow]'] = 'directpay';
+      data.upi.flow = 'collect';
     }
 
     if (isOtm) {
-      data.upi = {
-        flow: 'collect',
-        type: 'otm',
-      };
+      data.upi.type = 'otm';
+    }
+
+    if (isUpiRecurring) {
+      data.upi.type = 'recurring';
+      data.upi.end_date = endDate;
+      data.recurring = 1;
+    }
+
+    if (isOtm || isUpiRecurring) {
       if (data.vpa) {
         data.upi.vpa = data.vpa;
       }
@@ -702,6 +736,14 @@
           to
           <strong>{toShortFormat(otmEndDate)}</strong>
           .
+        </Callout>
+      {/if}
+      {#if isUpiRecurring}
+        <!-- Check the amount that has to be shown -->
+        <Callout classes={['downtime-callout']} showIcon={true}>
+          This is a recurring payment and INR 799 will be charged now. After
+          this, ACME Corp can charge upto INR {maxRecurringAmount} {recurringFrequency}
+          till {toShortFormat(new Date(endDate))},
         </Callout>
       {/if}
 
