@@ -21,29 +21,31 @@ const {
 } = require('../actions');
 
 describe.each(
-  getTestData('Perform upi collect transaction', {
+  getTestData('Perform upi recurring collect transaction', {
     options: {
       order_id: 'order_DfNAO0KJCH5WNY',
-      amount: 0,
       personalization: false,
-      recurring: true,
+      recurring: 1,
+    },
+    preferences: {
+      order: {
+        amount: 20000,
+        currency: 'INR',
+        method: 'upi',
+        token: {
+          max_amount: 2000,
+          frequency: 'weekly',
+          recurring_type: 'after',
+          start_time: Date.now(),
+          end_time: Date.now() + 7 * 24 * 60 * 60 * 1000,
+        },
+      },
     },
   })
 )('UPI tests', ({ preferences, title, options }) => {
   test(title, async () => {
     preferences.methods.upi = true;
-    preferences.order = {
-      amount: 20000,
-      currency: 'INR',
-      method: 'upi',
-      token: {
-        max_amount: 2000,
-        frequency: 'weekly',
-        recurring_type: 'after',
-        start_time: Date.now(),
-        end_time: Date.now() + 7 * 24 * 60 * 60 * 1000,
-      },
-    };
+
     const context = await openCheckoutWithNewHomeScreen({
       page,
       options,
