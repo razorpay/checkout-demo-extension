@@ -558,6 +558,9 @@
   }
 
   function createPaypalPayment() {
+    // Deselct to hide Pay button
+    deselectInstrument();
+
     const payload = session.getPayload();
 
     payload.method = 'paypal';
