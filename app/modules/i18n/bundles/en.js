@@ -339,6 +339,7 @@ export default {
       qr: 'UPI QR',
       upiqr: 'UPI / QR',
       upi: 'UPI',
+      upi_otm: 'UPI OTM',
       gpay: 'Google Pay',
       wallet: 'Wallet',
       bank_transfer: 'Bank Transfer',
