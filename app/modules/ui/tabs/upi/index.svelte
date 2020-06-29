@@ -33,7 +33,12 @@
   import { filterUPITokens } from 'common/token';
   import { getUPIIntentApps } from 'checkoutstore/native';
 
-  import { getAmount, getName, getCurrency } from 'checkoutstore';
+  import {
+    getAmount,
+    getName,
+    getCurrency,
+    isASubscription,
+  } from 'checkoutstore';
 
   // UI imports
   import UpiIntent from './UpiIntent.svelte';
@@ -116,7 +121,8 @@
 
   const merchantOrder = getMerchantOrder();
 
-  const isUpiRecurring = isRecurring();
+  const isUpiRecurringCAW = isRecurring() && merchantOrder;
+  const isUpiRecurringSubscription = isRecurring() && isASubscription('upi');
   let startDate,
     endDate,
     orderAmount,
@@ -124,7 +130,7 @@
     recurring_type,
     maxRecurringAmount;
 
-  if (isUpiRecurring) {
+  if (isUpiRecurringCAW) {
     orderAmount = merchantOrder.amount;
     startDate = merchantOrder.token.start_time;
     endDate = merchantOrder.token.end_time;
@@ -443,12 +449,12 @@
       data.upi.type = 'otm';
     }
 
-    if (isUpiRecurring) {
+    if (isUpiRecurringCAW) {
       data.upi.type = 'recurring';
       data.recurring = 1;
     }
 
-    if (isOtm || isUpiRecurring) {
+    if (isOtm || isUpiRecurringCAW || isUpiRecurringSubscription) {
       if (data.vpa) {
         data.upi.vpa = data.vpa;
       }
@@ -741,12 +747,18 @@
           .
         </Callout>
       {/if}
-      {#if isUpiRecurring}
+      {#if isUpiRecurringCAW}
         <Callout classes={['downtime-callout']} showIcon={true}>
           This is a recurring payment and {session.formatAmountWithCurrency(getAmount())}
           will be charged now. After this, {!merchantName ? 'The Merchant' : merchantName}
           can charge upto {session.formatAmountWithCurrency(maxRecurringAmount)}
           {recurringFrequency} till {toShortFormat(new Date(endDate))},
+        </Callout>
+      {/if}
+      {#if isUpiRecurringSubscription}
+        <Callout classes={['downtime-callout']} showIcon={true}>
+          The charge is to enable subscription on this card and it will be
+          refunded.
         </Callout>
       {/if}
 
