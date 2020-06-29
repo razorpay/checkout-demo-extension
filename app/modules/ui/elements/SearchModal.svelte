@@ -113,6 +113,12 @@
 
   onDestroy(removeFromOverlayStack);
 
+  $: {
+    if (visible === false) {
+      removeFromOverlayStack();
+    }
+  }
+
   function handleEscape(event) {
     if (_.getKeyFromEvent(event) === 27) {
       // Don't close Checkout!
