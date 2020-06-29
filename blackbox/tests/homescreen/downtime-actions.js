@@ -1,4 +1,8 @@
 async function verifyHighDowntime(context, method, message) {
+  if (method.startsWith('upi')) {
+    return;
+  }
+
   if (context.preferences.offers) {
     const toolTip = await context.page.waitForSelector(
       '.callout.error.downtime-callout'
