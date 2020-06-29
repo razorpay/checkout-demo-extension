@@ -413,6 +413,8 @@ const config = {
 
 // EMI and Cards are the same for now.
 config.emi = config.card;
+config.credit_card = config.card;
+config.debit_card = config.card;
 
 // UPI OTM is the same as UPI for now.
 config.upi_otm = config.upi;

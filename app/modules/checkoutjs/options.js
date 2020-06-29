@@ -22,6 +22,8 @@ RazorpayDefaults.partial_payment = {
 RazorpayDefaults.method = {
   netbanking: null,
   card: true,
+  credit_card: true,
+  debit_card: true,
   cardless_emi: null,
   wallet: null,
   emi: true,
