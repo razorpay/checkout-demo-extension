@@ -15,6 +15,10 @@ export function getIndividualInstruments(instrument, customer) {
 
   let individuals = config.groupedToIndividual(instrument, customer);
 
+  /**
+   * For methods like card and upi, they have their own `groupedToIndividual` methods.
+   * However, if they fail to ungroup, we will pass them through the generic function.
+   */
   if (individuals.length === 0) {
     individuals = genericGroupedToIndividual(instrument, customer);
   }
