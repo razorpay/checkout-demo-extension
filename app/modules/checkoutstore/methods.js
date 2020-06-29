@@ -10,6 +10,7 @@ import {
   hasFeature,
   isPayout,
   isOfferForced,
+  isASubscription,
 } from 'checkoutstore';
 
 import {
@@ -115,7 +116,13 @@ const ALL_METHODS = {
   },
 
   upi() {
-    return Object.keys(UPI_METHODS).some(isUPIFlowEnabled);
+    const isAnyUpiFlowEnabled = Object.keys(UPI_METHODS).some(isUPIFlowEnabled);
+    if (isASubscription()) {
+      return isASubscription('upi') && isAnyUpiFlowEnabled;
+    } else if (isRecurring()) {
+      return getRecurringMethods()?.upi && isAnyUpiFlowEnabled;
+    }
+    return isAnyUpiFlowEnabled;
   },
 
   qr() {
