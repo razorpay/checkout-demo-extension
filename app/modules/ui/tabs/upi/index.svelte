@@ -2,7 +2,7 @@
   // Svelte imports
   import { onMount } from 'svelte';
   import { slide } from 'svelte/transition';
-  import { _ as t } from 'svelte-i18n';
+  import { _ as t, locale } from 'svelte-i18n';
 
   // Util imports
   import { getSession } from 'sessionmanager';
@@ -79,7 +79,11 @@
     SHOW_QR_CODE,
     SCAN_QR_CODE,
     UPI_DOWNTIME_TEXT,
+    UPI_RECURRING_CAW_CALLOUT,
+    UPI_RECURRING_SUBSCRIPTION_CALLOUT,
   } from 'ui/labels/upi';
+
+  import { formatTemplateWithLocale } from 'i18n';
 
   // Props
   export let selectedApp = undefined;
@@ -750,16 +754,14 @@
       {/if}
       {#if isUpiRecurringCAW}
         <Callout classes={['downtime-callout']} showIcon={true}>
-          This is a recurring payment and {session.formatAmountWithCurrency(getAmount())}
-          will be charged now. After this, {!merchantName ? 'The Merchant' : merchantName}
-          can charge upto {session.formatAmountWithCurrency(maxRecurringAmount)}
-          {recurringFrequency} till {toShortFormat(new Date(endDate))},
+          <!-- This is a recurring payment and {maxAmount} will be charged now. After this, {merchantName} can charge upto {amount} {recurringFrequency} till {endDate}. -->
+          {formatTemplateWithLocale(UPI_RECURRING_CAW_CALLOUT, { maxAmount: session.formatAmountWithCurrency(getAmount()), merchantName: !merchantName ? 'The Merchant' : merchantName, amount: session.formatAmountWithCurrency(maxRecurringAmount), recurringFrequency, endDate: toShortFormat(new Date(endDate)) }, $locale)}
         </Callout>
       {/if}
       {#if isUpiRecurringSubscription}
+        <!-- LABEL: The charge is to enable subscription on this card and it will be refunded. -->
         <Callout classes={['downtime-callout']} showIcon={true}>
-          The charge is to enable subscription on this card and it will be
-          refunded.
+          {$t(UPI_RECURRING_SUBSCRIPTION_CALLOUT)}
         </Callout>
       {/if}
 

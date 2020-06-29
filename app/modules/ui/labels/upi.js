@@ -17,6 +17,9 @@ export const QR_BLOCK_HEADING = 'upi.qr_block_heading';
 export const SHOW_QR_CODE = 'upi.show_qr_code';
 export const SCAN_QR_CODE = 'upi.scan_qr_code';
 export const UPI_DOWNTIME_TEXT = 'upi.downtime_text';
+export const UPI_RECURRING_SUBSCRIPTION_CALLOUT =
+  'upi.recurring_subscription_callout';
+export const UPI_RECURRING_CAW_CALLOUT = 'upi.recurring_caw_callout';
 export const OMNI_BLOCK_HEADING = 'upi.omni_block_heading';
 export const OMNI_GPAY_NUMBER = 'upi.omni_gpay_number';
 export const OMNI_ENTER_NUMBER = 'upi.omni_enter_number';
