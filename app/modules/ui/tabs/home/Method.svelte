@@ -121,7 +121,6 @@
 
   div[slot='subtitle'] {
     margin: 4px 0 0 0;
-    font-size: 0.8rem;
     line-height: 1rem;
     color: #828282;
   }
