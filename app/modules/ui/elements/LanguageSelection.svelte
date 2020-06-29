@@ -4,6 +4,7 @@
   import { onMount, onDestroy } from 'svelte';
 
   const entries = _Obj.entries;
+  const overlayEl = _Doc.querySelector('#body-overlay');
 
   function handleOutsideClick() {
     if (dropdownShown) {
@@ -17,6 +18,10 @@
     } else {
       document.body.removeEventListener('click', handleOutsideClick);
     }
+  }
+
+  $: {
+    _El.keepClass(overlayEl, 'shown', dropdownShown);
   }
 
   let dropdownShown = false;
