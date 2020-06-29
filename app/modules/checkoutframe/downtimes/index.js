@@ -39,10 +39,10 @@ const isHighSeverityOrScheduled = disableBasedOnSeverityOrScheduled(
 const isLowSeverityAndNotScheduled = _Func.negate(isHighSeverityOrScheduled);
 
 const DISABLE_METHOD = {
-  upi: isHighSeverityOrScheduled,
-  upi_otm: isHighSeverityOrScheduled,
-  qr: isHighSeverityOrScheduled,
-  gpay: isHighSeverityOrScheduled,
+  upi: () => false, // isHighSeverityOrScheduled,
+  upi_otm: () => false, // isHighSeverityOrScheduled,
+  qr: () => false, // isHighSeverityOrScheduled,
+  gpay: () => false, // isHighSeverityOrScheduled,
   netbanking: function(_, preferences) {
     const netbankingObj = preferences.methods.netbanking || {};
     const banks = _Obj.keys(netbankingObj);

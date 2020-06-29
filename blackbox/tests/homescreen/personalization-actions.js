@@ -39,6 +39,7 @@ async function verifyPersonalizationText(context, paymentMode) {
     );
     paymentMethodText = paymentMethodText.toLowerCase();
     if (
+      !paymentMode.startsWith('upi') &&
       context.preferences.payment_downtime &&
       context.preferences.payment_downtime.items[0].severity == 'high'
     ) {
