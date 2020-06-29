@@ -1259,14 +1259,6 @@ Session.prototype = {
     }
   },
 
-  setWalletsTab: function() {
-    if (MethodStore.isMethodEnabled('wallet')) {
-      this.svelteWalletsTab = new discreet.WalletTab({
-        target: gel('wallet-svelte-wrap'),
-      });
-    }
-  },
-
   setSvelteComponents: function() {
     this.setTopBar();
     this.setUpiCancelReasonPicker();
@@ -2110,24 +2102,6 @@ Session.prototype = {
     } else {
       this.showCardTab();
     }
-  },
-
-  addFunds: function(event) {
-    Analytics.track('wallet:balance:add', {
-      type: AnalyticsTypes.BEHAV,
-      data: {
-        wallet: this.payload && this.payload.wallet,
-      },
-    });
-
-    this.otpView.setTextView('loading');
-    this.otpView.updateScreen({
-      action: false,
-      loading: true,
-      addFunds: false,
-    });
-    this.powerwallet = false;
-    this.r.topupWallet();
   },
 
   setAmount: function(amount) {
@@ -2977,7 +2951,7 @@ Session.prototype = {
 
     if (tab === 'wallet') {
       this.setScreen('wallet');
-      this.svelteWalletsTab.onShown();
+      discreet.svelteWalletsTab.render();
     }
 
     if (tab === 'card' || (tab === 'emi' && this.screen !== 'emi')) {
@@ -4961,7 +4935,6 @@ Session.prototype = {
       'payoutsView',
       'savedCardsView',
       'svelteCardTab',
-      'svelteWalletsTab',
       'languageSelectionView',
       'svelteOverlay',
       'topBar',
