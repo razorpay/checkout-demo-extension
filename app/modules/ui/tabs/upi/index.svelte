@@ -686,6 +686,7 @@
             </SlottedRadioOption>
           {/each}
           <AddANewVpa
+            recurring={isUpiRecurringCAW || isUpiRecurringSubscription}
             paymentMethod={method}
             on:click={() => {
               onUpiAppSelection({ detail: { id: 'new' } });
