@@ -11,6 +11,7 @@
   import Stack from 'ui/layouts/Stack.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import { getMiscIcon } from 'checkoutframe/icons';
+  import CTA from 'ui/elements/CTA.svelte';
 
   // Store imports
   import { overlayStack } from 'checkoutstore/back';
@@ -505,3 +506,7 @@
     </div>
   {/if}
 </div>
+
+{#if visible}
+  <CTA show={false} />
+{/if}
