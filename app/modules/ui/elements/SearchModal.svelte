@@ -197,6 +197,12 @@
 
   onDestroy(removeFromOverlayStack);
 
+  $: {
+    if (visible === false) {
+      removeFromOverlayStack();
+    }
+  }
+
   function escapeHandler(event) {
     if (_.getKeyFromEvent(event) === 27) {
       // Don't close Checkout!
