@@ -1272,7 +1272,6 @@ Session.prototype = {
     this.setUpiOtmTab();
     this.setPayoutsScreen();
     this.setNach();
-    this.setWalletsTab();
     this.setOffers();
     this.setLanguageDropdown();
     this.setSvelteOverlay();
