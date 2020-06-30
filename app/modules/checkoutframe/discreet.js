@@ -62,7 +62,7 @@ import * as CustomerStore from 'checkoutstore/customer';
 import * as Theme from 'checkoutstore/theme';
 
 import QRScreen from 'ui/tabs/qr/index.svelte';
-import UpiTab from 'ui/tabs/upi/index.svelte';
+import * as upiTab from 'checkoutframe/components/upi';
 import CardlessEmiView from 'ui/tabs/cardless-emi/index.svelte';
 import emiScreenView from 'ui/tabs/emi/emiscreen.svelte';
 import PayLaterView from 'ui/tabs/paylater/index.svelte';
@@ -178,7 +178,7 @@ export default {
   getFullBankLogo,
 
   HomeTab,
-  UpiTab,
+  upiTab,
   WalletTab,
   netbankingTab,
   EmandateTab,
