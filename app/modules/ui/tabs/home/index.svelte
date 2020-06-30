@@ -201,6 +201,17 @@
     });
   }
 
+  function editUserDetails() {
+    Razorpay.sendMessage({
+      event: 'event',
+      data: {
+        event: 'user_details.edit',
+      },
+    });
+
+    hideMethods();
+  }
+
   export function setDetailsCta() {
     if (isPartialPayment) {
       showNext('Next');
@@ -751,7 +762,7 @@
               class="details-container border-list"
               in:fly={{ duration: 400, y: 80 }}>
               {#if showUserDetailsStrip}
-                <SlottedOption on:click={hideMethods} id="user-details">
+                <SlottedOption on:click={editUserDetails} id="user-details">
                   <i slot="icon">
                     <Icon icon={icons.contact} />
                   </i>
