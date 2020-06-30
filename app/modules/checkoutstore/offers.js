@@ -1,7 +1,7 @@
 import { getBankFromCard } from 'common/bank';
 import { getOrderId, getAmount, makeAuthUrl } from 'checkoutstore';
 import { writable, derived } from 'svelte/store';
-import { cardIin } from 'checkoutstore/screens/card';
+import { cardIin, cardTab } from 'checkoutstore/screens/card';
 import Analytics from 'analytics';
 import { BEHAV } from 'analytics-types';
 
@@ -9,12 +9,19 @@ export const appliedOffer = writable();
 
 let currentRequest;
 export const isCardValidForOffer = derived(
-  [appliedOffer, cardIin],
-  ([$appliedOffer, $cardIin], set) => {
+  [appliedOffer, cardIin, cardTab],
+  ([$appliedOffer, $cardIin, $cardTab], set) => {
     set(true);
+
     if (currentRequest) {
       currentRequest.abort();
     }
+
+    // Validate only for cards
+    if ($cardTab !== 'card') {
+      return;
+    }
+
     if (!($appliedOffer && $cardIin.length > 5)) {
       return;
     }
