@@ -20,6 +20,7 @@
     cardNumber,
     remember,
     selectedCard,
+    cardTab,
   } from 'checkoutstore/screens/card';
   import { methodInstrument, blocks } from 'checkoutstore/screens/home';
 
@@ -73,6 +74,8 @@
   let currentView = Views.SAVED_CARDS;
 
   let tab = '';
+  $: $cardTab = tab;
+
   let allSavedCards = [];
   let savedCards = [];
   let lastSavedCard = null;
