@@ -2103,6 +2103,24 @@ Session.prototype = {
     }
   },
 
+  addFunds: function(event) {
+    Analytics.track('wallet:balance:add', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        wallet: this.payload && this.payload.wallet,
+      },
+    });
+
+    this.otpView.setTextView('loading');
+    this.otpView.updateScreen({
+      action: false,
+      loading: true,
+      addFunds: false,
+    });
+    this.powerwallet = false;
+    this.r.topupWallet();
+  },
+
   setAmount: function(amount) {
     this.get().amount = amount;
     this.updateAmountInHeader(amount);
@@ -2952,6 +2970,10 @@ Session.prototype = {
       this.setScreen('wallet');
       discreet.svelteWalletsTab.render();
     }
+
+    // if(tab !== 'wallet') {
+    //   discreet.svelteWalletsTab.destroy();
+    // }
 
     if (tab === 'card' || (tab === 'emi' && this.screen !== 'emi')) {
       // If we are switching from home tab or cardless emi tab (after choosing
