@@ -531,22 +531,25 @@
     if (!intent) {
       return;
     }
+
+    const apps = getUPIIntentApps();
+
     Analytics.track('upi:intent', {
       type: AnalyticsTypes.RENDER,
       data: {
         count: {
-          eligible: _.lengthOf(session.upi_intents_data),
-          all: _.lengthOf(session.all_upi_intents_data),
+          eligible: apps.filtered.length,
+          all: apps.all.length,
         },
         list: {
           eligible: _Arr.join(
-            _Arr.map(session.upi_intents_data, function(app) {
+            _Arr.map(apps.filtered, function(app) {
               return app.package_name;
             }),
             ','
           ),
           all: _Arr.join(
-            _Arr.map(session.all_upi_intents_data, function(app) {
+            _Arr.map(apps.all, function(app) {
               return app.package_name;
             }),
             ','
