@@ -111,6 +111,7 @@
         scrollIntoView(walletReferences[selectedWallet]);
       }, 200);
     }
+    sendWalletBalanceEvents();
   }
 
   // Called when the user presses the pay button
@@ -118,6 +119,23 @@
     const payload = {
       wallet: selectedWallet,
     };
+
+    function sendWalletBalanceEvents() {
+      Analytics.track('wallet:balance:add', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          wallet: this.payload && this.payload.wallet,
+        },
+      });
+      this.otpView.setTextView('loading');
+      this.otpView.updateScreen({
+        action: false,
+        loading: true,
+        addFunds: false,
+      });
+      this.powerwallet = false;
+      this.r.topupWallet();
+    }
 
     /**
      * Wallets might need to go through intent flow too
