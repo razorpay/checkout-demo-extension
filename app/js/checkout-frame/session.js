@@ -4531,7 +4531,6 @@ Session.prototype = {
       if (selectedInstrument.wallets.includes('phonepe')) {
         data['_[flow]'] = 'intent';
       }
-      console.log(selectedInstrument);
       walletObj = freqWallets[wallet];
 
       if (!walletObj || walletObj.custom) {
