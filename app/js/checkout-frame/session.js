@@ -4347,6 +4347,14 @@ Session.prototype = {
 
             break;
           }
+
+          case 'wallet': {
+            if (selectedInstrument.wallets.includes('phonepe')) {
+              data['_[flow]'] = 'intent';
+            }
+
+            break;
+          }
         }
       }
     }
@@ -4526,11 +4534,8 @@ Session.prototype = {
 
     var wallet = data.wallet;
     var walletObj;
+
     if (data.method === 'wallet') {
-      //If Phonepe is present in the preferred instruments the flow is set to intent.
-      if (selectedInstrument.wallets.includes('phonepe')) {
-        data['_[flow]'] = 'intent';
-      }
       walletObj = freqWallets[wallet];
 
       if (!walletObj || walletObj.custom) {
