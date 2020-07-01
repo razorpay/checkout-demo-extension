@@ -764,7 +764,7 @@
       {#if isUpiRecurringCAW || isUpiRecurringSubscription}
         <Callout classes={['downtime-callout']} showIcon={true}>
           <!-- This is a recurring payment and {maxAmount} will be charged now. After this, {merchantName} can charge upto {amount} {recurringFrequency} till {endDate}. -->
-          {formatTemplateWithLocale(UPI_RECURRING_CAW_CALLOUT, { maxAmount: session.formatAmountWithCurrency(getAmount()), merchantName: !merchantName ? 'The Merchant' : merchantName, amount: session.formatAmountWithCurrency(maxRecurringAmount), recurringFrequency, endDate: toShortFormat(new Date(endDate)) }, $locale)}
+          {formatTemplateWithLocale(UPI_RECURRING_CAW_CALLOUT, { maxAmount: session.formatAmountWithCurrency(getAmount()), merchantName: !merchantName ? 'The Merchant' : merchantName, amount: session.formatAmountWithCurrency(maxRecurringAmount), recurringFrequency, endDate: toShortFormat(new Date(endDate * 1000)) }, $locale)}
         </Callout>
       {/if}
     </Bottom>
