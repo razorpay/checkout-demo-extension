@@ -38,6 +38,7 @@
     getName,
     getCurrency,
     isASubscription,
+    getSubscription,
   } from 'checkoutstore';
 
   // UI imports
@@ -124,6 +125,7 @@
   const session = getSession();
 
   const merchantOrder = getMerchantOrder();
+  const merchantSubscription = getSubscription();
 
   const isUpiRecurringCAW = isRecurring() && merchantOrder;
   const isUpiRecurringSubscription = isRecurring() && isASubscription('upi');
@@ -132,15 +134,22 @@
     orderAmount,
     recurringFrequency,
     recurring_type,
-    maxRecurringAmount;
+    maxRecurringAmount,
+    tokenObject;
 
   if (isUpiRecurringCAW) {
-    orderAmount = merchantOrder.amount;
-    startDate = merchantOrder.token.start_time;
-    endDate = merchantOrder.token.end_time;
-    recurringFrequency = merchantOrder.token.frequency;
-    maxRecurringAmount = merchantOrder.token.max_amount;
-    recurring_type = merchantOrder.token.recurringType;
+    tokenObject = merchantOrder;
+  } else if (isUpiRecurringSubscription) {
+    tokenObject = merchantSubscription;
+  }
+
+  if (isUpiRecurringCAW || isUpiRecurringSubscription) {
+    orderAmount = tokenObject.amount;
+    startDate = tokenObject.token.start_time;
+    endDate = tokenObject.token.end_time;
+    recurringFrequency = tokenObject.token.frequency;
+    maxRecurringAmount = tokenObject.token.max_amount;
+    recurring_type = tokenObject.token.recurringType;
   }
 
   const getAllowedPSPs = {
@@ -453,7 +462,7 @@
       data.upi.type = 'otm';
     }
 
-    if (isUpiRecurringCAW) {
+    if (isUpiRecurringCAW || isUpiRecurringSubscription) {
       data.upi.type = 'recurring';
       data.recurring = 1;
     }
@@ -752,19 +761,12 @@
           .
         </Callout>
       {/if}
-      {#if isUpiRecurringCAW}
+      {#if isUpiRecurringCAW || isUpiRecurringSubscription}
         <Callout classes={['downtime-callout']} showIcon={true}>
           <!-- This is a recurring payment and {maxAmount} will be charged now. After this, {merchantName} can charge upto {amount} {recurringFrequency} till {endDate}. -->
           {formatTemplateWithLocale(UPI_RECURRING_CAW_CALLOUT, { maxAmount: session.formatAmountWithCurrency(getAmount()), merchantName: !merchantName ? 'The Merchant' : merchantName, amount: session.formatAmountWithCurrency(maxRecurringAmount), recurringFrequency, endDate: toShortFormat(new Date(endDate)) }, $locale)}
         </Callout>
       {/if}
-      {#if isUpiRecurringSubscription}
-        <!-- LABEL: The charge is to enable subscription on this card and it will be refunded. -->
-        <Callout classes={['downtime-callout']} showIcon={true}>
-          {$t(UPI_RECURRING_SUBSCRIPTION_CALLOUT)}
-        </Callout>
-      {/if}
-
     </Bottom>
   </Screen>
 </Tab>

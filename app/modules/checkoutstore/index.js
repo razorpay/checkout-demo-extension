@@ -154,6 +154,10 @@ export function isASubscription(method = null) {
   }
 }
 
+export function getSubscription() {
+  return preferences.subscription;
+}
+
 export function isRecurring() {
   if (
     getOption('prefill.method') === 'emandate' &&
