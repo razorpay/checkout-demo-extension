@@ -14,6 +14,9 @@ import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { processPaymentCreate } from 'payment/coproto';
 
+import { get as storeGetter } from 'svelte/store';
+import { overlayStack as overlayStackStore } from 'checkoutstore/back';
+
 /* Our primary bridge is CheckoutBridge */
 export const defineIosBridge = () => {
   let CB = {
@@ -370,6 +373,17 @@ function backPressed(callback) {
     },
   });
 
+  const $overlayStack = storeGetter(overlayStackStore);
+
+  // TODO: All overlays should be hidden using $overlayStack
+
+  if ($overlayStack.length > 0) {
+    const last = $overlayStack[$overlayStack.length - 1];
+
+    last.back();
+
+    return;
+  }
   if (Confirm.isConfirmShown) {
     Confirm.hide(true);
   } else if (TermsCurtain.isVisible()) {

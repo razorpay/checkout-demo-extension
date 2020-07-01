@@ -2,6 +2,11 @@ export default {
   netbanking: {
     select_label: 'Select a different bank',
     select_help: 'Please select a bank',
+
+    search_title: 'Select bank to pay',
+    search_placeholder: 'Search for bank',
+    search_all: 'All banks',
+
     selection_radio_text: 'Complete Payment Using',
     corporate_label: 'Corporate',
     retail_label: 'Retail',
@@ -703,6 +708,7 @@ export default {
     upload_nach_form: 'Upload NACH Form',
   },
   dcc: {
+    search_all: 'All currencies',
     search_title: 'Select Currency to Pay',
     search_placeholder: 'Search for currency or code',
   },

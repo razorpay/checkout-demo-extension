@@ -3480,6 +3480,13 @@ Session.prototype = {
       if (this.tab === 'emandate') {
         _Obj.extend(data, this.emandateView.getPayload());
       }
+
+      if (this.tab === 'netbanking') {
+        _Obj.extend(
+          data,
+          discreet.es6components.getView('netbankingTab').getPayload()
+        );
+      }
     }
 
     return data;
