@@ -1232,29 +1232,6 @@ Session.prototype = {
     document.body.appendChild(script);
   },
 
-  setUpiTab: function() {
-    /**
-     * This is being handled in Tab component as well,
-     * condition won't be needed here once all ported to svelte
-     */
-    if (MethodStore.isMethodEnabled('upi')) {
-      this.upiTab = new discreet.UpiTab({
-        target: _Doc.querySelector('#form-fields'),
-      });
-    }
-  },
-
-  setUpiOtmTab: function() {
-    if (MethodStore.isMethodEnabled('upi_otm')) {
-      this.upiOtmTab = new discreet.UpiTab({
-        target: _Doc.querySelector('#form-fields'),
-        props: {
-          method: 'upi_otm',
-        },
-      });
-    }
-  },
-
   setHomeTab: function() {
     this.homeTab = new discreet.HomeTab({
       target: gel('form-fields'),
@@ -1286,11 +1263,8 @@ Session.prototype = {
     this.setCardlessEmi();
     this.setPayLater();
     this.setOtpScreen();
-    this.setUpiTab();
-    this.setUpiOtmTab();
     this.setPayoutsScreen();
     this.setNach();
-    this.setBankTransfer();
     this.setWalletsTab();
     this.setOffers();
     this.setLanguageDropdown();
@@ -1420,14 +1394,6 @@ Session.prototype = {
   setNach: function() {
     if (MethodStore.isMethodEnabled('nach')) {
       this.nachScreen = new discreet.NachScreen({
-        target: _Doc.querySelector('#form-fields'),
-      });
-    }
-  },
-
-  setBankTransfer: function() {
-    if (MethodStore.isMethodEnabled('bank_transfer')) {
-      this.bankTransferView = new discreet.BankTransferScreen({
         target: _Doc.querySelector('#form-fields'),
       });
     }
@@ -1860,6 +1826,19 @@ Session.prototype = {
       MethodStore.isMethodEnabled('cardless_emi') // Is the method enabled?
     ) {
       this.set('prefill.method', 'cardless_emi');
+    }
+
+    var forcedOffer = discreet.Offers.getForcedOffer();
+
+    if (forcedOffer) {
+      var method = forcedOffer.payment_method;
+      /**
+       * For forced offers, we need to skip the home screen if the contact and
+       * email is optional
+       */
+      if (forcedOffer && method && Store.isContactEmailOptional()) {
+        this.set('prefill.method', method);
+      }
     }
 
     improvisePrefilledContact(this);
@@ -2555,36 +2534,15 @@ Session.prototype = {
   },
 
   /**
-   * Handles offer selection
+   * Tries selecting the bank if netbanking offer,
+   * wallet if wallet offer, and so on
    * @param {Offer} offer
-   * @param {string} screen
    */
-  handleOfferSelection: function(offer, screen) {
-    screen = screen || this.screen;
-
-    // Go to the offer's method if we're on homescreen
-    if (screen !== offer.payment_method) {
-      this.homeTab.selectMethod({
-        detail: {
-          method: offer.payment_method,
-        },
-      });
-      screen = offer.payment_method;
-    }
-
+  _trySelectingOfferInstrument: function(offer) {
     var issuer = offer.issuer;
+    var screen = offer.payment_method;
 
-    if (screen === 'wallet') {
-      // Select wallet
-      if (issuer) {
-        this.svelteWalletsTab.onWalletSelection(issuer);
-      }
-    } else if (screen === 'netbanking') {
-      // Select bank
-      if (issuer) {
-        NetbankingScreenStore.selectedBank.set(issuer);
-      }
-    } else if (screen === 'emi') {
+    var emiHandler = function() {
       var emiDuration = getEmiDurationForNewCard();
       var bank = this.emiPlansForNewCard && this.emiPlansForNewCard.code;
 
@@ -2602,13 +2560,80 @@ Session.prototype = {
           setEmiDurationForNewCard('');
         }
       }
-    } else if (screen === 'cardless_emi' && this.screen !== 'otp') {
-      var provider = offer.provider;
+    };
 
-      if (provider) {
-        this.selectCardlessEmiProviderAndAttemptPayment(provider);
+    if (screen === 'wallet') {
+      // Select wallet
+      if (issuer) {
+        this.svelteWalletsTab.onWalletSelection(issuer);
+      }
+    } else if (screen === 'netbanking') {
+      // Select bank
+      if (issuer) {
+        NetbankingScreenStore.selectedBank.set(issuer);
+      }
+    } else if (screen === 'emi') {
+      emiHandler.call(this);
+    } else if (screen === 'cardless_emi' && screen !== 'otp') {
+      /**
+       * If EMI and Cardless EMI are clubbed, the user will land on the Cardless EMI screen
+       * So, if the offer method is EMI, let's get the user on the EMI screen
+       */
+      if (offer.payment_method === 'emi') {
+        this.selectCardlessEmiProviderAndAttemptPayment('cards');
+
+        emiHandler.call(this);
+      } else {
+        var provider = offer.provider;
+
+        if (provider) {
+          this.selectCardlessEmiProviderAndAttemptPayment(provider);
+        }
       }
     }
+  },
+
+  /**
+   * Handles offer selection
+   * @param {Offer} offer
+   */
+  handleOfferSelection: function(offer) {
+    /**
+     * Get the first instrument that can work with the offer
+     * and select it if not already selected
+     */
+
+    var instrument = discreet.Offers.getInstrumentToSelectForOffer(offer);
+
+    if (!instrument) {
+      Analytics.track('offer_instrument_undef', {
+        type: AnalyticsTypes.DEBUG,
+        data: {
+          offer: offer,
+        },
+      });
+
+      return;
+    }
+
+    if (storeGetter(HomeScreenStore.selectedInstrumentId) === instrument.id) {
+      // Do not switch tabs
+    } else {
+      this.switchTab('');
+
+      this.homeTab.onSelectInstrument({
+        detail: instrument,
+      });
+    }
+
+    var session = this;
+
+    session.offers.rerenderTab();
+
+    // Wait for switching to be over
+    setTimeout(function() {
+      session._trySelectingOfferInstrument(offer);
+    }, 300);
   },
 
   /**
@@ -2703,14 +2728,13 @@ Session.prototype = {
         return;
       }
     } else if (this.tab === 'netbanking') {
+      discreet.netbankingTab.destroy();
     } else if (this.tab === 'nach') {
       if (this.nachScreen.onBack()) {
         return;
       }
     } else if (this.tab === 'bank_transfer') {
-      if (this.bankTransferView.onBack()) {
-        return;
-      }
+      es6components.bankTransferTab.destroy();
     } else if (this.tab === 'emandate') {
       if (this.emandateView.onBack()) {
         return;
@@ -2742,46 +2766,6 @@ Session.prototype = {
     this.switchTab(tab);
 
     BackStore = null;
-  },
-
-  switchTabAnalytics: function(tab) {
-    if (tab === 'upi' || tab === 'upi_otm') {
-      var upiData;
-      if (tab === 'upi') {
-        upiData = this.upiTab;
-      } else if (tab === 'upi_otm') {
-        upiData = this.upiOtmTab;
-      }
-
-      if (upiData && upiData.intent) {
-        /**
-         * If intent, track UPI apps installed and eligible
-         */
-        Analytics.track('upi:intent', {
-          type: AnalyticsTypes.RENDER,
-          data: {
-            count: {
-              eligible: _.lengthOf(this.upi_intents_data || []),
-              all: _.lengthOf(this.all_upi_intents_data || []),
-            },
-            list: {
-              eligible: _Arr.join(
-                _Arr.map(this.upi_intents_data || [], function(app) {
-                  return app.package_name;
-                }),
-                ','
-              ),
-              all: _Arr.join(
-                _Arr.map(this.all_upi_intents_data || [], function(app) {
-                  return app.package_name;
-                }),
-                ','
-              ),
-            },
-          },
-        });
-      }
-    }
   },
 
   /**
@@ -2867,8 +2851,6 @@ Session.prototype = {
     }
 
     if (tab) {
-      this.switchTabAnalytics(tab);
-
       if (tab === 'credit_card' || tab === 'debit_card') {
         this.cardTab = tab;
         tab = 'card';
@@ -2918,33 +2900,28 @@ Session.prototype = {
       this.clearRequest();
     }
     if (tab === 'netbanking') {
-      es6components.setNetbankingTab();
+      discreet.netbankingTab.render();
     }
 
     if (tab === 'upi') {
       this.updateCustomerInStore();
-      this.upiTab.onShown();
+      discreet.upiTab.render();
     }
 
     if (tab === 'upi_otm') {
       this.updateCustomerInStore();
-      this.upiOtmTab.onShown();
+      discreet.upiTab.render({ method: 'upi_otm' });
     }
 
     if (tab === 'emandate') {
       this.emandateView.onShown();
     }
 
-    if (tab === '' && this.tab === 'upi') {
+    if (tab === '' && (this.tab === 'upi' || this.tab === 'upi_otm')) {
       if (this.upiTab.onBack()) {
         return;
       }
-    }
-
-    if (tab === '' && this.tab === 'upi_otm') {
-      if (this.upiOtmTab.onBack()) {
-        return;
-      }
+      discreet.upiTab.destroy();
     }
 
     this.body.attr('tab', tab);
@@ -2984,7 +2961,7 @@ Session.prototype = {
     }
 
     if (tab === 'bank_transfer') {
-      this.bankTransferView.onShown();
+      es6components.bankTransferTab.render();
     }
   },
 
@@ -3508,10 +3485,8 @@ Session.prototype = {
         /* All tabs should be responsible for their subdata */
         var upiData;
 
-        if (this.screen === 'upi') {
+        if (this.screen === 'upi' || this.screen === 'upi_otm') {
           upiData = this.upiTab.getPayload();
-        } else if (this.screen === 'upi_otm') {
-          upiData = this.upiOtmTab.getPayload();
         }
 
         each(upiData, function(key, value) {
@@ -4282,14 +4257,6 @@ Session.prototype = {
       shouldContinue = this.nachScreen.shouldSubmit();
     }
 
-    if (this.tab === 'bank_transfer') {
-      shouldContinue = this.bankTransferView.shouldSubmit();
-    }
-
-    if (this.tab === 'card') {
-      // shouldContinue = this.svelteCardTab.shouldSubmit();
-    }
-
     if (!shouldContinue) {
       return;
     }
@@ -4972,8 +4939,6 @@ Session.prototype = {
    */
   cleanUpSvelteComponents: function() {
     var views = [
-      'upiOtmTab',
-      'bankTransferView',
       'cardlessEmiView',
       'currentScreen',
       'emandateView',
@@ -4994,7 +4959,6 @@ Session.prototype = {
       'svelteOverlay',
       'topBar',
       'upiCancelReasonPicker',
-      'upiTab',
       'timer',
     ];
 

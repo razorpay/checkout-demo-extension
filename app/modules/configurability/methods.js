@@ -1,4 +1,5 @@
 import { createBlock } from './blocks';
+import { ungroupInstruments } from './ungroup';
 
 /**
  * Creates a method block
@@ -40,7 +41,7 @@ export function clusterRazorpayBlocks(blocks) {
     }
   }
 
-  _Arr.loop(blocks, (block) => {
+  _Arr.loop(blocks, block => {
     const isRazorpayMethodBlock = block._type === 'rzp_method';
 
     if (isRazorpayMethodBlock) {
@@ -58,5 +59,5 @@ export function clusterRazorpayBlocks(blocks) {
   // Push any pending clusters
   checkAndPushCluster();
 
-  return clustered;
+  return _Arr.map(clustered, ungroupInstruments);
 }

@@ -24,6 +24,8 @@
     getMethodDescription,
   } from 'checkoutframe/paymentmethods';
   import { getDowntimes } from 'checkoutstore';
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
 
   const session = getSession();
   const dispatch = createEventDispatcher();
@@ -75,11 +77,20 @@
     }
   }
 
-  function select(event) {
-    dispatch('select', {
-      down,
-      method,
+  function select() {
+    Analytics.track('payment_method:select', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        method,
+        down,
+      },
     });
+
+    if (down) {
+      return;
+    }
+
+    dispatch('select');
   }
 </script>
 

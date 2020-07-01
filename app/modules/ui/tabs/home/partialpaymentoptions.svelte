@@ -131,6 +131,7 @@
     value="full"
     align="top"
     reverse
+    overflow
     selected={$partialPaymentOption === 'partial'}
     on:click={_ => handleRadioSelection('partial')}>
     <div slot="title">{partialAmountLabel || $t(PARTIAL_AMOUNT_LABEL)}</div>

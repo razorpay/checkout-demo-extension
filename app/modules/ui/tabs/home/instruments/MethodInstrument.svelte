@@ -1,7 +1,4 @@
 <script>
-  // Svelte imports
-  import { createEventDispatcher } from 'svelte';
-
   // UI imports
   import Field from 'ui/components/Field.svelte';
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
@@ -16,7 +13,7 @@
   // Store imports
   import {
     selectedInstrumentId,
-    methodTabInstrument,
+    methodInstrument,
   } from 'checkoutstore/screens/home';
 
   // i18n
@@ -26,8 +23,6 @@
   // Props
   export let instrument = {};
   export let name = 'instrument';
-
-  const dispatch = createEventDispatcher();
 
   const method = instrument.method;
 
@@ -55,16 +50,6 @@
   } else {
     icon = getThemeMeta().icons[method];
   }
-
-  function dispatchSelectMethod() {
-    dispatch('selectMethod', {
-      method: instrument.method,
-    });
-  }
-
-  function setMethodInstrument() {
-    $methodTabInstrument = instrument;
-  }
 </script>
 
 <style>
@@ -81,9 +66,7 @@
   radio={false}
   className="instrument"
   attributes={{ 'data-type': 'method' }}
-  on:click
-  on:click={setMethodInstrument}
-  on:click={dispatchSelectMethod}>
+  on:click>
   <i slot="icon">
     <Icon {icon} alt={methodName} />
   </i>
