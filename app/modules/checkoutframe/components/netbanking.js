@@ -31,7 +31,7 @@ function render() {
 
   if (method) {
     const netbankingTab = new NetbankingTab({
-      target: gel('form-fields'),
+      target: _Doc.querySelector('#form-fields'),
       props: {
         bankOptions: getOption('method.netbanking'),
         banks: banks,

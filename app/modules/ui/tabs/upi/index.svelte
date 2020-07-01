@@ -379,6 +379,7 @@
   export function onShown() {
     setDefaultTokenValue();
     determineCtaVisibility();
+    sendIntentEvents();
   }
 
   export function getPayload() {
@@ -581,6 +582,38 @@
       },
     });
   }
+
+  function sendIntentEvents() {
+    if (!intent) {
+      return;
+    }
+
+    const apps = getUPIIntentApps();
+
+    Analytics.track('upi:intent', {
+      type: AnalyticsTypes.RENDER,
+      data: {
+        count: {
+          eligible: apps.filtered.length,
+          all: apps.all.length,
+        },
+        list: {
+          eligible: _Arr.join(
+            _Arr.map(apps.filtered, function(app) {
+              return app.package_name;
+            }),
+            ','
+          ),
+          all: _Arr.join(
+            _Arr.map(apps.all, function(app) {
+              return app.package_name;
+            }),
+            ','
+          ),
+        },
+      },
+    });
+  }
 </script>
 
 <style>
@@ -743,7 +776,7 @@
       {/if}
     </div>
 
-    <Bottom tab={method}>
+    <Bottom>
       {#if down || disabled}
         <DowntimeCallout severe={disabled}>
           <!-- LABEL: UPI is experiencing low success rates. -->
