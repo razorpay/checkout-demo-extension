@@ -499,10 +499,10 @@
      * Otherwise, we take the user to the details screen.
      */
     if (singleMethod) {
-      if (!isRecurring() && $instruments.length > 0) {
-        return METHODS;
-      } else {
+      if (isRecurring()) {
         return DETAILS;
+      } else {
+        return METHODS;
       }
     }
 
@@ -547,11 +547,11 @@
         return;
       }
 
-      if (!isRecurring() && $instruments.length > 0) {
-        showMethods();
+      if (isRecurring()) {
+        selectMethod(singleMethod);
         return;
       } else {
-        selectMethod(singleMethod);
+        showMethods();
         return;
       }
     }
