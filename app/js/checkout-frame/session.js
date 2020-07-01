@@ -1780,6 +1780,11 @@ Session.prototype = {
         escape: this.get('modal.escape') && !this.embedded,
         backdropclose: this.get('modal.backdropclose'),
         handleBackdropClick: function() {
+          // The same logic to close overlay using $overlayStack
+          // is present for backpresses.
+          // Don't forget to update it there too if you change something here.
+          // TODO: DRY
+
           var $overlayStack = storeGetter(discreet.overlayStackStore);
 
           if ($overlayStack.length > 0) {

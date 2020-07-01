@@ -373,6 +373,11 @@ function backPressed(callback) {
     },
   });
 
+  // The same logic to close overlays using $overlayStack
+  // is present for Modal.handleBackdropClick
+  // Don't forget to update it there too if you change something here.
+  // TODO: DRY
+
   const $overlayStack = storeGetter(overlayStackStore);
 
   // TODO: All overlays should be hidden using $overlayStack
