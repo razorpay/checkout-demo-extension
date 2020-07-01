@@ -736,6 +736,7 @@ export default {
     payment_waiting_on_bank: 'Waiting for payment to complete on bank page',
     frequently_used_config_title: 'Frequently used methods',
     search_no_results: 'No results for "{query}"',
+    search_results_label: 'Results',
     logout_action: 'Log out',
     logout_all_devices_action: 'Log out from all devices',
   },

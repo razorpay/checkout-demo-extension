@@ -221,6 +221,7 @@
       return _Obj.extend(
         {
           currency,
+          _key: currency,
         },
         rest
       );
@@ -326,6 +327,7 @@
       <!-- LABEL: Search for currency -->
       <!-- LABEL: All currencies -->
       <SearchModal
+        identifier="dcc_currency_select"
         title={$t(SEARCH_TITLE)}
         placeholder={$t(SEARCH_PLACEHOLDER)}
         all={$t(SEARCH_ALL)}

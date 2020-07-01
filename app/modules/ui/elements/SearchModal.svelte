@@ -1,4 +1,8 @@
 <script>
+  /**
+   * ARIA guidelines: https://www.w3.org/TR/wai-aria-practices/examples/combobox/aria1.0pattern/combobox-autocomplete-list.html
+   */
+
   // Svelte imports
   import { createEventDispatcher, onMount, tick, onDestroy } from 'svelte';
   import { fade, fly } from 'svelte/transition';
@@ -15,54 +19,131 @@
   // Utils imports
   import { isMobile } from 'common/useragent';
   import Track from 'tracker';
+  import { isElementCompletelyVisibleInContainer } from 'lib/utils';
 
   // i18n
   import { locale } from 'svelte-i18n';
-  import { formatTemplateWithLocale } from 'i18n';
+  import { formatTemplateWithLocale, formatMessageWithLocale } from 'i18n';
 
   // Props
   export let placeholder = 'Type to search';
-  export let autocomplete;
+  export let autocomplete = 'off';
+  export let inputType = 'text';
   export let items = [];
+  export let identifier = Track.makeUid();
   export let component;
   export let keys;
   export let all;
 
-  const id = Track.makeUid();
+  const IDs = {
+    overlay: `${identifier}_search_overlay`,
+    results: `${identifier}_search_results`,
+    resultItem: item => `${identifier}_${item._key}_search_result`,
+    allItem: item => `${identifier}_${item._key}_search_all`,
+  };
 
   onMount(() => {
-    document.querySelector('#modal-inner').appendChild(ref);
+    document.querySelector('#modal-inner').appendChild(containerRef);
   });
 
   const dispatch = createEventDispatcher();
 
   // Variables
   let visible = false;
-  let ref;
   let query = '';
-  let matchingItems = items;
+  let results = [];
+  let shownItems = items;
+  let focusedIndex = null;
+  let activeDescendantIdRef;
 
   // Refs
-  let inputField;
+  let containerRef;
+  let inputRef;
+  let resultsContainerRef;
 
-  function updateMatches() {
-    matchingItems = _Arr.filter(items, item => {
-      const queryText = query.toLowerCase().trim();
+  function getResults(query, items) {
+    if (query) {
+      return _Arr.filter(items, item => {
+        const queryText = query.toLowerCase().trim();
 
-      return _Arr.any(keys, key => {
-        return item[key].toLowerCase().includes(queryText);
+        return _Arr.any(keys, key => {
+          return item[key].toLowerCase().includes(queryText);
+        });
       });
+    } else {
+      return [];
+    }
+  }
+
+  $: items, query, keys, (results = getResults(query, items));
+  $: results, (focusedIndex = results.length ? 0 : null);
+  $: shownItems = _Arr.mergeWith(results, items);
+  $: shownItems, focusedIndex, scrollToFocusedItem();
+  $: shownItems, focusedIndex, updateActiveDescendantInRef(); // TODO: Fix
+
+  function updateActiveDescendantInRef() {
+    tick().then(() => {
+      activeDescendantIdRef = getActiveDescendantIdRef(focusedIndex);
     });
   }
 
-  $: items, query, keys, updateMatches();
+  function getActiveDescendantIdRef(index) {
+    if (!_.isNumber(index)) {
+      return;
+    }
+
+    if (index < results.length) {
+      return `#${IDs.resultItem(results[index])}`;
+    } else {
+      index = index - results.length;
+      return `#${IDs.allItem(items[index])}`;
+    }
+  }
+
+  function bringItemAtIndexIntoView(index) {
+    if (!resultsContainerRef) {
+      return;
+    }
+
+    const selector = `.list-item:nth-of-type(${index + 1})`;
+    const item = resultsContainerRef.querySelector(selector);
+
+    if (item) {
+      if (!isElementCompletelyVisibleInContainer(item, resultsContainerRef)) {
+        /**
+         * setTimeout is needed because UI changes need to be completed.
+         * tick() doesn't work here.
+         */
+        setTimeout(() => {
+          try {
+            item.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center',
+              inline: 'center',
+            });
+          } catch (err) {}
+        });
+      }
+    }
+  }
+
+  function scrollToFocusedItem() {
+    // If focusedIndex is not a number, don't go ahead
+    if (!_.isNumber(focusedIndex)) {
+      return;
+    }
+
+    tick().then(() => {
+      bringItemAtIndexIntoView(focusedIndex);
+    });
+  }
 
   function onSelect(item) {
     dispatch('select', item);
   }
 
   function focus() {
-    if (!inputField) {
+    if (!inputRef) {
       return;
     }
 
@@ -71,13 +152,13 @@
      * Handle focus on the parent on mobile.
      */
     if (isMobile()) {
-      const parent = _El.parent(inputField);
+      const parent = _El.parent(inputRef);
 
       if (parent) {
         parent.focus();
       }
     } else {
-      inputField.focus();
+      inputRef.focus();
     }
   }
 
@@ -92,7 +173,7 @@
     // Add to $overlayStack
     $overlayStack = $overlayStack.concat([
       {
-        id,
+        id: IDs.overlay,
         component: 'SearchModal',
         back: () => {
           dispatch('close');
@@ -107,7 +188,10 @@
 
   function removeFromOverlayStack() {
     // Remove the overlay from $overlayStack
-    const overlay = _Arr.find($overlayStack, overlay => overlay.id === id);
+    const overlay = _Arr.find(
+      $overlayStack,
+      overlay => overlay.id === IDs.overlay
+    );
     $overlayStack = _Arr.remove($overlayStack, overlay);
   }
 
@@ -119,13 +203,73 @@
     }
   }
 
-  function handleEscape(event) {
+  function escapeHandler(event) {
     if (_.getKeyFromEvent(event) === 27) {
       // Don't close Checkout!
       event.stopPropagation();
       event.preventDefault();
 
-      dispatch('close');
+      /**
+       * ARIA guidelines suggest
+       * - Clear the textbox.
+       * - If the listbox is displayed, close it.
+       */
+      if (query) {
+        query = '';
+      } else {
+        dispatch('close');
+      }
+    }
+  }
+
+  function getNextIndexForUpKey(items, currentIndex) {
+    if (!_.isNumber(currentIndex)) {
+      return items.length - 1;
+    } else if (currentIndex === 0) {
+      return items.length - 1;
+    } else {
+      return currentIndex - 1;
+    }
+  }
+
+  function getNextIndexForDownKey(items, currentIndex) {
+    if (!_.isNumber(currentIndex)) {
+      return 0;
+    } else if (currentIndex === items.length - 1) {
+      return 0;
+    } else {
+      return focusedIndex + 1;
+    }
+  }
+
+  function arrowKeysHandler(event) {
+    const UP_ARROW = 38;
+    const DOWN_ARROW = 40;
+
+    const handleKeys = [UP_ARROW, DOWN_ARROW];
+
+    const key = _.getKeyFromEvent(event);
+
+    if (!_Arr.contains(handleKeys, key)) {
+      return;
+    }
+
+    if (key === UP_ARROW) {
+      focusedIndex = getNextIndexForUpKey(shownItems, focusedIndex);
+      return;
+    }
+
+    if (key === DOWN_ARROW) {
+      focusedIndex = getNextIndexForDownKey(shownItems, focusedIndex);
+      return;
+    }
+  }
+
+  function submitHandler() {
+    if (_.isNumber(focusedIndex)) {
+      const result = shownItems[focusedIndex];
+
+      onSelect(result);
     }
   }
 </script>
@@ -246,6 +390,7 @@
     box-sizing: border-box;
     overflow-y: auto;
     margin: 0;
+    padding: 0;
   }
 
   .list-item {
@@ -262,19 +407,23 @@
   }
 
   .list-item:hover {
-    background-color: #eff0f1;
+    background-color: #efefef;
+  }
+
+  .list-item.focused {
+    background-color: #e4e4e4;
   }
 
   .no-results {
     display: flex;
     justify-content: center;
     text-align: center;
-    padding: 24px;
+    padding: 20px 24px;
     color: #888;
   }
 </style>
 
-<div bind:this={ref}>
+<div bind:this={containerRef}>
   {#if visible}
     <div class="search-curtain">
       <div
@@ -287,35 +436,56 @@
         in:fly={{ duration: 200, y: -100 }}
         out:fade={{ duration: 200 }}>
         <Stack vertical>
-          <div class="search-field">
+          <form on:submit|preventDefault={submitHandler} class="search-field">
             <div class="icon">
               <Icon icon={getMiscIcon('search')} />
             </div>
             <input
               class="no-escape"
               type="text"
+              role="combobox"
+              aria-autocomplete="list"
+              aria-haspopup="true"
+              aria-owns={`#${IDs.results}`}
+              aria-expanded="true"
+              aria-activedescendant={activeDescendantIdRef}
               {autocomplete}
               {placeholder}
-              on:keyup={handleEscape}
+              on:focus={() => (inputRef.type = inputType)}
+              on:keyup={escapeHandler}
+              on:keydown={arrowKeysHandler}
               bind:value={query}
-              bind:this={inputField} />
-          </div>
-          <div class="search-results" class:has-query={query}>
+              bind:this={inputRef} />
+          </form>
+          <div
+            class="search-results"
+            class:has-query={query}
+            id={IDs.results}
+            aria-label={formatMessageWithLocale('misc.search_results_label', $locale)}
+            role="listbox"
+            bind:this={resultsContainerRef}>
             {#if query}
-              <div class="list results">
-                {#if matchingItems.length}
-                  {#each matchingItems as item}
-                    <div class="list-item" on:click={() => onSelect(item)}>
+              {#if results.length}
+                <!-- LABEL: Results -->
+                <div class="list results">
+                  {#each results as item, index (IDs.resultItem(item))}
+                    <div
+                      class="list-item"
+                      class:focused={index === focusedIndex}
+                      id={IDs.resultItem(item)}
+                      role="option"
+                      aria-selected={index === focusedIndex}
+                      on:click={() => onSelect(item)}>
                       <svelte:component this={component} {item} />
                     </div>
                   {/each}
-                {:else}
-                  <!-- LABEL: No results for "{query}" -->
-                  <div class="no-results">
-                    {formatTemplateWithLocale('misc.search_no_results', { query }, $locale)}
-                  </div>
-                {/if}
-              </div>
+                </div>
+              {:else}
+                <!-- LABEL: No results for "{query}" -->
+                <div class="no-results">
+                  {formatTemplateWithLocale('misc.search_no_results', { query }, $locale)}
+                </div>
+              {/if}
             {/if}
             {#if all}
               <div class="list-header">
@@ -323,8 +493,14 @@
                 <div class="divider" />
               </div>
               <div class="list">
-                {#each items as item}
-                  <div class="list-item" on:click={() => onSelect(item)}>
+                {#each items as item, index (IDs.allItem(item))}
+                  <div
+                    class="list-item"
+                    class:focused={index + results.length === focusedIndex}
+                    id={IDs.allItem(item)}
+                    role="option"
+                    aria-selected={index + results.length === focusedIndex}
+                    on:click={() => onSelect(item)}>
                     <svelte:component this={component} {item} />
                   </div>
                 {/each}

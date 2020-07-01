@@ -192,6 +192,7 @@
     code: bank.code,
     original: bank.name,
     name: getLongBankName(bank.code, $locale, bank.name),
+    _key: bank.code,
   }));
   $: invalid = method !== 'emandate' && !$selectedBank;
   $: netbanks = getPreferredBanks(filteredBanks, bankOptions).slice(
@@ -349,6 +350,7 @@
     <!-- LABEL: Search for bank -->
     <!-- LABEL: All banks -->
     <SearchModal
+      identifier="netbanking_bank_select"
       title={$t(SEARCH_TITLE)}
       placeholder={$t(SEARCH_PLACEHOLDER)}
       all={$t(SEARCH_ALL)}
