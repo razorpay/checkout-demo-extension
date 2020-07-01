@@ -206,6 +206,12 @@ export function isContactRequiredForEMI(bank, cardType) {
  * @returns {Array} of enabled methods
  */
 export function getEnabledMethods() {
+  const merchantOrderMethod = getMerchantOrder()?.method;
+
+  if (merchantOrderMethod) {
+    return [merchantOrderMethod];
+  }
+
   return ALL_METHODS |> _Obj.keys |> _Arr.filter(isMethodEnabled);
 }
 
