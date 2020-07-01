@@ -1779,6 +1779,23 @@ Session.prototype = {
       this.modal = new window.Modal(this.el, {
         escape: this.get('modal.escape') && !this.embedded,
         backdropclose: this.get('modal.backdropclose'),
+        handleBackdropClick: function() {
+          var $overlayStack = storeGetter(discreet.overlayStackStore);
+
+          if ($overlayStack.length > 0) {
+            var last = $overlayStack[$overlayStack.length - 1];
+
+            last.back({
+              from: 'overlay',
+            });
+
+            // Signal that we don't want the Modal component to handle click on backdrop
+            return false;
+          }
+
+          // Signal that Modal component should hnadle backdrop click
+          return true;
+        },
         onhide: function() {
           Razorpay.sendMessage({ event: 'dismiss', data: self.dismissReason });
         },
