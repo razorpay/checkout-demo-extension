@@ -138,6 +138,12 @@
     });
   }
 
+  function dispatchClose(meta) {
+    // Consumer can figure out whether or not to actually close
+    // by looking at `event.detail.meta.from`
+    dispatch('close', { meta });
+  }
+
   function onSelect(item) {
     dispatch('select', item);
   }
@@ -175,8 +181,8 @@
       {
         id: IDs.overlay,
         component: 'SearchModal',
-        back: () => {
-          dispatch('close');
+        back: meta => {
+          dispatchClose(meta);
         },
       },
     ]);
@@ -217,7 +223,9 @@
       if (query) {
         query = '';
       } else {
-        dispatch('close');
+        dispatchClose({
+          from: 'escape',
+        });
       }
     }
   }
@@ -428,7 +436,7 @@
     <div class="search-curtain">
       <div
         class="search-curtain-bg"
-        on:click={() => dispatch('close')}
+        on:click={() => dispatchClose({ from: 'overlay' })}
         in:fade={{ duration: 200 }}
         out:fade={{ duration: 200 }} />
       <div

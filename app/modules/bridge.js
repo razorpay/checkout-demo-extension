@@ -380,7 +380,9 @@ function backPressed(callback) {
   if ($overlayStack.length > 0) {
     const last = $overlayStack[$overlayStack.length - 1];
 
-    last.back();
+    last.back({
+      from: 'back',
+    });
 
     return;
   }
