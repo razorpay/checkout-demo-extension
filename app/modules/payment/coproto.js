@@ -287,10 +287,12 @@ var responseTypes = {
       if (androidBrowser) {
         return responseTypes['gpay'].call(this, request, fullResponse);
       }
-    } else {
+    } else if (this.upi_app) {
+      // upi_app will only be set for UPI intent payments.
+      // Check for its existence as this coproto is also used for
+      // UPI QR payments on web, where this is not required.
       const app = getAppFromPackageName(this.upi_app);
 
-      // TODO check if a condition is required
       return Bridge.checkout.callIos('callNativeIntent', {
         intent_url,
         upi_app: this.upi_app,
