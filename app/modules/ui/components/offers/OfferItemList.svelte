@@ -85,9 +85,8 @@
       {#if selected === offer}
         <div class="checkbox" />
         <div
-          class={getOfferDescription(offer) === undefined ? 'no-description' : 'offer-detail'}>
-          {getOfferDescription(offer) === undefined ? '' : getOfferDescription(offer)}
-        </div>
+          class:no-description={getOfferDescription(offer) === undefined}
+          class:offer-detail={getOfferDescription(offer)} />
         {#if offer.type === 'deferred'}
           <!-- LABEL: Cashback would be credited to source mode of payment. -->
           <div class="offer-detail">{$t(CASHBACK_DETAIL)}</div>
