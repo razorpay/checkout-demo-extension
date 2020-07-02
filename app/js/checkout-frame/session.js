@@ -4349,7 +4349,10 @@ Session.prototype = {
           }
 
           case 'wallet': {
-            if (selectedInstrument.wallets.includes('phonepe')) {
+            if (
+              selectedInstrument.wallets.includes('phonepe') &&
+              Store.hasFeature('phonepe_intent')
+            ) {
               data['_[flow]'] = 'intent';
             }
 
