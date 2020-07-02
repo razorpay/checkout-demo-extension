@@ -71,7 +71,7 @@ import netbankingTab from 'checkoutframe/components/netbanking';
 import EmandateTab from 'ui/tabs/emandate/index.svelte';
 import NachScreen from 'ui/tabs/nach/index.svelte';
 import CardTab from 'ui/tabs/card/index.svelte';
-import * as svelteWalletsTab from 'checkoutframe/components/wallet';
+import * as walletTab from 'checkoutframe/components/wallet';
 import TopBar from 'ui/components/Topbar.svelte';
 
 import PayoutsInstruments from 'ui/tabs/payout/payout-instruments.svelte';
@@ -179,7 +179,7 @@ export default {
 
   HomeTab,
   upiTab,
-  svelteWalletsTab,
+  walletTab,
   netbankingTab,
   EmandateTab,
   NachScreen,
