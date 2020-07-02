@@ -381,10 +381,7 @@
     }
 
     // Single method
-    if (
-      singleMethod &&
-      !_Arr.contains(['wallet', 'netbanking', 'upi'], singleMethod)
-    ) {
+    if (singleMethod && isRecurring()) {
       return false;
     }
 
@@ -502,13 +499,10 @@
      * Otherwise, we take the user to the details screen.
      */
     if (singleMethod) {
-      if (
-        _Arr.contains(['wallet', 'netbanking', 'upi'], singleMethod) &&
-        $instruments.length > 0
-      ) {
-        return METHODS;
-      } else {
+      if (isRecurring()) {
         return DETAILS;
+      } else {
+        return METHODS;
       }
     }
 
@@ -553,14 +547,11 @@
         return;
       }
 
-      if (
-        _Arr.contains(['wallet', 'netbanking', 'upi'], singleMethod) &&
-        $instruments.length > 0
-      ) {
-        showMethods();
+      if (isRecurring()) {
+        selectMethod(singleMethod);
         return;
       } else {
-        selectMethod(singleMethod);
+        showMethods();
         return;
       }
     }
