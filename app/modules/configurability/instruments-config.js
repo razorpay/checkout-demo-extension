@@ -42,7 +42,7 @@ function genericIsValid(instrument) {
   return true;
 }
 
-function genericGroupedToIndividual(grouped, customer) {
+export function genericGroupedToIndividual(grouped, customer) {
   return [grouped];
 }
 

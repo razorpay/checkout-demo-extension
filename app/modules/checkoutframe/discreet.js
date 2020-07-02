@@ -29,7 +29,7 @@ import * as Curtain from 'components/curtain';
 import { setShieldParams } from 'payment/validator';
 import * as P13n from 'checkoutframe/personalization';
 import { commonBanks, getFullBankLogo } from 'common/bank';
-import * as CountryCodesUtil from 'common/countrycodesutil';
+import * as CountryCodesUtil from 'common/countrycodes';
 
 /* Required for merchant.js migration */
 import * as Constants from 'common/constants';
@@ -62,7 +62,7 @@ import * as CustomerStore from 'checkoutstore/customer';
 import * as Theme from 'checkoutstore/theme';
 
 import QRScreen from 'ui/tabs/qr/index.svelte';
-import UpiTab from 'ui/tabs/upi/index.svelte';
+import * as upiTab from 'checkoutframe/components/upi';
 import CardlessEmiView from 'ui/tabs/cardless-emi/index.svelte';
 import emiScreenView from 'ui/tabs/emi/emiscreen.svelte';
 import PayLaterView from 'ui/tabs/paylater/index.svelte';
@@ -178,7 +178,7 @@ export default {
   getFullBankLogo,
 
   HomeTab,
-  UpiTab,
+  upiTab,
   svelteWalletsTab,
   netbankingTab,
   EmandateTab,

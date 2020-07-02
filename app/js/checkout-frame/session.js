@@ -1222,29 +1222,6 @@ Session.prototype = {
     document.body.appendChild(script);
   },
 
-  setUpiTab: function() {
-    /**
-     * This is being handled in Tab component as well,
-     * condition won't be needed here once all ported to svelte
-     */
-    if (MethodStore.isMethodEnabled('upi')) {
-      this.upiTab = new discreet.UpiTab({
-        target: _Doc.querySelector('#form-fields'),
-      });
-    }
-  },
-
-  setUpiOtmTab: function() {
-    if (MethodStore.isMethodEnabled('upi_otm')) {
-      this.upiOtmTab = new discreet.UpiTab({
-        target: _Doc.querySelector('#form-fields'),
-        props: {
-          method: 'upi_otm',
-        },
-      });
-    }
-  },
-
   setHomeTab: function() {
     this.homeTab = new discreet.HomeTab({
       target: gel('form-fields'),
@@ -1268,8 +1245,6 @@ Session.prototype = {
     this.setCardlessEmi();
     this.setPayLater();
     this.setOtpScreen();
-    this.setUpiTab();
-    this.setUpiOtmTab();
     this.setPayoutsScreen();
     this.setNach();
     this.setOffers();
@@ -2760,46 +2735,6 @@ Session.prototype = {
     BackStore = null;
   },
 
-  switchTabAnalytics: function(tab) {
-    if (tab === 'upi' || tab === 'upi_otm') {
-      var upiData;
-      if (tab === 'upi') {
-        upiData = this.upiTab;
-      } else if (tab === 'upi_otm') {
-        upiData = this.upiOtmTab;
-      }
-
-      if (upiData && upiData.intent) {
-        /**
-         * If intent, track UPI apps installed and eligible
-         */
-        Analytics.track('upi:intent', {
-          type: AnalyticsTypes.RENDER,
-          data: {
-            count: {
-              eligible: _.lengthOf(this.upi_intents_data || []),
-              all: _.lengthOf(this.all_upi_intents_data || []),
-            },
-            list: {
-              eligible: _Arr.join(
-                _Arr.map(this.upi_intents_data || [], function(app) {
-                  return app.package_name;
-                }),
-                ','
-              ),
-              all: _Arr.join(
-                _Arr.map(this.all_upi_intents_data || [], function(app) {
-                  return app.package_name;
-                }),
-                ','
-              ),
-            },
-          },
-        });
-      }
-    }
-  },
-
   /**
    * Checks if the fields on the homepage are valid or not.
    *
@@ -2883,8 +2818,6 @@ Session.prototype = {
     }
 
     if (tab) {
-      this.switchTabAnalytics(tab);
-
       if (tab === 'credit_card' || tab === 'debit_card') {
         this.cardTab = tab;
         tab = 'card';
@@ -2939,28 +2872,23 @@ Session.prototype = {
 
     if (tab === 'upi') {
       this.updateCustomerInStore();
-      this.upiTab.onShown();
+      discreet.upiTab.render();
     }
 
     if (tab === 'upi_otm') {
       this.updateCustomerInStore();
-      this.upiOtmTab.onShown();
+      discreet.upiTab.render({ method: 'upi_otm' });
     }
 
     if (tab === 'emandate') {
       this.emandateView.onShown();
     }
 
-    if (tab === '' && this.tab === 'upi') {
+    if (tab === '' && (this.tab === 'upi' || this.tab === 'upi_otm')) {
       if (this.upiTab.onBack()) {
         return;
       }
-    }
-
-    if (tab === '' && this.tab === 'upi_otm') {
-      if (this.upiOtmTab.onBack()) {
-        return;
-      }
+      discreet.upiTab.destroy();
     }
 
     this.body.attr('tab', tab);
@@ -3528,10 +3456,8 @@ Session.prototype = {
         /* All tabs should be responsible for their subdata */
         var upiData;
 
-        if (this.screen === 'upi') {
+        if (this.screen === 'upi' || this.screen === 'upi_otm') {
           upiData = this.upiTab.getPayload();
-        } else if (this.screen === 'upi_otm') {
-          upiData = this.upiOtmTab.getPayload();
         }
 
         each(upiData, function(key, value) {
@@ -3548,6 +3474,13 @@ Session.prototype = {
 
       if (this.tab === 'emandate') {
         _Obj.extend(data, this.emandateView.getPayload());
+      }
+
+      if (this.tab === 'netbanking') {
+        _Obj.extend(
+          data,
+          discreet.es6components.getView('netbankingTab').getPayload()
+        );
       }
     }
 
@@ -4940,7 +4873,6 @@ Session.prototype = {
    */
   cleanUpSvelteComponents: function() {
     var views = [
-      'upiOtmTab',
       'cardlessEmiView',
       'currentScreen',
       'emandateView',
@@ -4960,7 +4892,6 @@ Session.prototype = {
       'svelteOverlay',
       'topBar',
       'upiCancelReasonPicker',
-      'upiTab',
       'timer',
     ];
 
