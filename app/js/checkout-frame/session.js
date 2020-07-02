@@ -2539,7 +2539,7 @@ Session.prototype = {
     if (screen === 'wallet') {
       // Select wallet
       if (issuer) {
-        this.svelteWalletsTab.onWalletSelection(issuer);
+        this.walletTab.onWalletSelection(issuer);
       }
     } else if (screen === 'netbanking') {
       // Select bank
@@ -2696,6 +2696,8 @@ Session.prototype = {
       }
     } else if (this.tab === 'netbanking') {
       discreet.netbankingTab.destroy();
+    } else if (this.tab === 'wallet') {
+      discreet.walletTab.destroy();
     } else if (this.tab === 'nach') {
       if (this.nachScreen.onBack()) {
         return;
@@ -2869,6 +2871,9 @@ Session.prototype = {
     if (tab === 'netbanking') {
       discreet.netbankingTab.render();
     }
+    if (tab === 'wallet') {
+      discreet.walletTab.render();
+    }
 
     if (tab === 'upi') {
       this.updateCustomerInStore();
@@ -2896,12 +2901,7 @@ Session.prototype = {
 
     if (tab === 'wallet') {
       this.setScreen('wallet');
-      discreet.svelteWalletsTab.render();
     }
-
-    // if(tab !== 'wallet') {
-    //   discreet.svelteWalletsTab.destroy();
-    // }
 
     if (tab === 'card' || (tab === 'emi' && this.screen !== 'emi')) {
       // If we are switching from home tab or cardless emi tab (after choosing
@@ -3467,8 +3467,8 @@ Session.prototype = {
 
       if (this.screen === 'wallet') {
         /* Wallet tab being responsible for its subdata */
-        if (this.svelteWalletsTab.isAnyWalletSelected()) {
-          _Obj.extend(data, this.svelteWalletsTab.getPayload());
+        if (this.walletTab.isAnyWalletSelected()) {
+          _Obj.extend(data, this.walletTab.getPayload());
         }
       }
 
