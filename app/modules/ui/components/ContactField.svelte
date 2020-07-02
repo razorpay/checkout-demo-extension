@@ -140,7 +140,6 @@
   function closeCountryCodeModal() {
     searchModal.close();
 
-    // TODO: Check if this works with readonly
     if (phoneField) {
       phoneField.focus();
     }
