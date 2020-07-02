@@ -17,6 +17,8 @@
   import * as AnalyticsTypes from 'analytics-types';
   import * as WalletsData from 'common/wallet';
 
+  //UI Imports
+  import Tab from 'ui/tabs/Tab.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import { scrollIntoView } from 'lib/utils';
@@ -150,6 +152,8 @@
 
 <style>
   .border-list {
+    padding-top: 12px;
+    padding-bottom: 12px;
     margin: 0 -12px;
   }
 
@@ -158,35 +162,39 @@
   }
 </style>
 
-<div class="border-list collapsable">
-  {#each filteredWallets as wallet, i (wallet.code)}
-    <SlottedRadioOption
-      name={wallet.code}
-      selected={selectedWallet === wallet.code}
-      align="top"
-      on:click={() => onWalletSelection(wallet.code)}>
-      <div
-        slot="title"
-        bind:this={walletReferences[wallet.code]}
-        id={`wallet-radio-${wallet.code}`}>
-        <span class="title">{getWalletName(wallet.code, $locale)}</span>
-      </div>
-      <div slot="body">
-        {#if selectedWallet === wallet.code}
-          <div transition:slide={{ duration: 200 }}>
-            {#if getApplicableOffer(wallet.code)}
-              <span class="offer">{getApplicableOffer(wallet.code).name}</span>
-              <div class="offer-info">
-                {getApplicableOffer(wallet.code).display_text}
-              </div>
-            {/if}
-          </div>
-        {/if}
-      </div>
-      <i slot="icon" class="top">
-        <Icon icon={wallet.sqLogo} />
-      </i>
-    </SlottedRadioOption>
-  {/each}
+<Tab method="wallet">
+  <div class="border-list collapsable">
+    {#each filteredWallets as wallet, i (wallet.code)}
+      <SlottedRadioOption
+        name={wallet.code}
+        selected={selectedWallet === wallet.code}
+        align="top"
+        on:click={() => onWalletSelection(wallet.code)}>
+        <div
+          slot="title"
+          bind:this={walletReferences[wallet.code]}
+          id={`wallet-radio-${wallet.code}`}>
+          <span class="title">{getWalletName(wallet.code, $locale)}</span>
+        </div>
+        <div slot="body">
+          {#if selectedWallet === wallet.code}
+            <div transition:slide={{ duration: 200 }}>
+              {#if getApplicableOffer(wallet.code)}
+                <span class="offer">
+                  {getApplicableOffer(wallet.code).name}
+                </span>
+                <div class="offer-info">
+                  {getApplicableOffer(wallet.code).display_text}
+                </div>
+              {/if}
+            </div>
+          {/if}
+        </div>
+        <i slot="icon" class="top">
+          <Icon icon={wallet.sqLogo} />
+        </i>
+      </SlottedRadioOption>
+    {/each}
 
-</div>
+  </div>
+</Tab>
