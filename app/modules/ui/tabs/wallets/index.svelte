@@ -119,19 +119,6 @@
       wallet: selectedWallet,
     };
 
-    /**
-     * Wallets might need to go through intent flow too
-     * TODO: Add a feature check here
-     */
-    const shouldTurnWalletToIntent = WalletsData.shouldTurnWalletToIntent(
-      selectedWallet,
-      session.upi_intents_data
-    );
-
-    if (shouldTurnWalletToIntent) {
-      payload.upi_app = WalletsData.getPackageNameForWallet(selectedWallet);
-    }
-
     return payload;
   }
 

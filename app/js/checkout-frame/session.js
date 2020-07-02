@@ -4347,18 +4347,22 @@ Session.prototype = {
 
             break;
           }
-
-          case 'wallet': {
-            if (
-              selectedInstrument.wallets.includes('phonepe') &&
-              Store.hasFeature('phonepe_intent')
-            ) {
-              data['_[flow]'] = 'intent';
-            }
-
-            break;
-          }
         }
+      }
+    }
+
+    if (data.method === 'wallet') {
+      /**
+       * Wallets might need to go through intent flow too
+       * TODO: Add a feature check here
+       */
+      var shouldTurnWalletToIntent = discreet.Wallet.shouldTurnWalletToIntent(
+        data.wallet,
+        this.upi_intents_data
+      );
+
+      if (shouldTurnWalletToIntent) {
+        data.upi_app = discreet.Wallet.getPackageNameForWallet(data.wallet);
       }
     }
 
