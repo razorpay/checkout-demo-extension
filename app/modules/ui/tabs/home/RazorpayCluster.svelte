@@ -49,10 +49,6 @@
 
     return name;
   }
-
-  function selectMethod(event) {
-    dispatch('selectMethod', event.detail);
-  }
 </script>
 
 <style>
@@ -65,7 +61,9 @@
   <h3 class="title">{title}</h3>
   <div role="list" class="border-list">
     {#each block.instruments as instrument, index (instrument.id)}
-      <Method method={instrument.method} on:select={selectMethod} />
+      <Method
+        method={instrument.method}
+        on:select={() => dispatch('selectInstrument', instrument)} />
     {/each}
   </div>
 </div>

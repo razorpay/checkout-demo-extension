@@ -20,7 +20,7 @@
 
   // i18n
   import { t } from 'svelte-i18n';
-  import { SEARCH_PLACEHOLDER, SEARCH_TITLE } from 'ui/labels/dcc';
+  import { SEARCH_PLACEHOLDER, SEARCH_TITLE, SEARCH_ALL } from 'ui/labels/dcc';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -221,6 +221,7 @@
       return _Obj.extend(
         {
           currency,
+          _key: currency,
         },
         rest
       );
@@ -321,15 +322,21 @@
         {#if selectedCurrencyInDisplay}More{:else}Change{/if}
         <span class="arrow">&#xe604;</span>
       </div>
+
+      <!-- LABEL: Select currency to pay -->
+      <!-- LABEL: Search for currency -->
+      <!-- LABEL: All currencies -->
       <SearchModal
+        identifier="dcc_currency_select"
         title={$t(SEARCH_TITLE)}
         placeholder={$t(SEARCH_PLACEHOLDER)}
+        all={$t(SEARCH_ALL)}
         autocomplete="transaction-currency"
         items={sortedCurrencies}
         keys={['currency', 'name', 'symbol']}
         component={CurrencySearchItem}
-        visible={false}
         bind:this={searchModal}
+        on:close={() => searchModal.close()}
         on:select={({ detail }) => onSelect(detail)} />
     </Stack>
   {/if}

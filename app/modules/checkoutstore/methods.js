@@ -42,6 +42,32 @@ const ALL_METHODS = {
     }
   },
 
+  credit_card() {
+    if (
+      getAmount() &&
+      getOption('method.card') &&
+      getOption('method.credit_card')
+    ) {
+      if (isRecurring()) {
+        return getRecurringMethods()?.credit_card;
+      }
+      return getMerchantMethods().credit_card;
+    }
+  },
+
+  debit_card() {
+    if (
+      getAmount() &&
+      getOption('method.card') &&
+      getOption('method.debit_card')
+    ) {
+      if (isRecurring()) {
+        return getRecurringMethods()?.debit_card;
+      }
+      return getMerchantMethods().debit_card;
+    }
+  },
+
   netbanking() {
     return (
       getAmount() &&
@@ -186,7 +212,14 @@ export function isContactRequiredForEMI(bank, cardType) {
  * @returns {Array} of enabled methods
  */
 export function getEnabledMethods() {
-  return ALL_METHODS |> _Obj.keys |> _Arr.filter(isMethodEnabled);
+  const merchantOrderMethod = getMerchantOrder()?.method;
+  let methodsToConsider = ALL_METHODS |> _Obj.keys;
+
+  if (merchantOrderMethod) {
+    methodsToConsider = [merchantOrderMethod];
+  }
+
+  return methodsToConsider |> _Arr.filter(isMethodEnabled);
 }
 
 export function getSingleMethod() {

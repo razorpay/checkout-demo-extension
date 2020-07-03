@@ -2,29 +2,10 @@ import { writable, derived } from 'svelte/store';
 import { getSession } from 'sessionmanager';
 import { displayAmount } from 'common/currency';
 import { isCardValidForOffer } from 'checkoutstore/offers';
+import { CtaViews } from 'ui/labels/cta';
 
 import { locale } from 'svelte-i18n';
-
 import { formatTemplateWithLocale } from 'i18n';
-
-const CtaViews = {
-  AMOUNT: 'amount',
-  CONTINUE: 'continue',
-  SUBMIT: 'submit',
-  NEXT: 'next',
-  PROCEED: 'proceed',
-  COPY_DETAILS: 'copy_details',
-  COPIED: 'copied',
-  AUTHENTICATE: 'authenticate',
-  VIEW_EMI_PLANS: 'view_emi_plans',
-  SELECT_EMI_PLAN: 'select_emi_plan',
-  ENTER_CARD_DETAILS: 'enter_card_details',
-  CONFIRM_ACCOUNT: 'confirm_account',
-  VERIFY: 'verify',
-  PAY_WITHOUT_OFFER: 'pay_without_offer',
-  PAY_SINGLE_METHOD: 'pay_single_method',
-  UPLOAD_NACH_FORM: 'upload_nach_form',
-};
 
 export const ctaInfo = writable({
   view: '',
@@ -100,14 +81,6 @@ export function showNext() {
 
 export function showPayViaSingleMethod(method) {
   setView(CtaViews.PAY_SINGLE_METHOD, true, { method });
-}
-
-export function showCopyDetails() {
-  setView(CtaViews.COPY_DETAILS, true);
-}
-
-export function showCopied() {
-  setView(CtaViews.COPIED, true);
 }
 
 export function showAuthenticate() {

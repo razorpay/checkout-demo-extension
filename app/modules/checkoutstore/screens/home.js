@@ -1,4 +1,8 @@
 import { derived, writable } from 'svelte/store';
+import {
+  isInstrumentGrouped,
+  isInstrumentForEntireMethod,
+} from 'configurability/instruments';
 
 export const contact = writable('+');
 export const email = writable('');
@@ -33,7 +37,24 @@ export const selectedInstrument = derived(
 /**
  * Stores the instrument for which method is opened
  */
-export const methodTabInstrument = writable(null);
+export const methodInstrument = derived(
+  selectedInstrument,
+  $selectedInstrument => {
+    if (!$selectedInstrument) {
+      return null;
+    }
+
+    if (isInstrumentForEntireMethod($selectedInstrument)) {
+      return $selectedInstrument;
+    }
+
+    if (isInstrumentGrouped($selectedInstrument)) {
+      return $selectedInstrument;
+    }
+
+    return null;
+  }
+);
 
 /**
  * A contact is said to be present if it has more than three characters,

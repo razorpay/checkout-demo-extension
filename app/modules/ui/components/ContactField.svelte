@@ -1,7 +1,7 @@
 <script>
   // Utils
   import { isContactReadOnly, isContactOptional } from 'checkoutstore';
-  import { findCountryCode } from 'common/countrycodesutil';
+  import { findCountryCode } from 'common/countrycodes';
 
   // UI imports
   import Field from 'ui/components/Field.svelte';

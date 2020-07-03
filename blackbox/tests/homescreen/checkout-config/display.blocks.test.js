@@ -303,7 +303,9 @@ describe('display.blocks', () => {
     // Assert that all banks are shown
     await assertShownBanks(
       context,
-      CONFIG.display.blocks.grouped.instruments[0].banks
+      CONFIG.display.blocks.grouped.instruments[0].banks.map(
+        code => preferences.methods.netbanking[code]
+      )
     );
   });
 });

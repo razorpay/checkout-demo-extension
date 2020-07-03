@@ -6,6 +6,8 @@ import * as Confirm from 'confirm';
 import * as TermsCurtain from 'checkoutframe/termscurtain';
 import { getCheckoutBridge, storage } from './index';
 import { confirmCancelMsg } from 'common/strings';
+import { get as storeGetter } from 'svelte/store';
+import { overlayStack as overlayStackStore } from 'checkoutstore/back';
 
 /**
  * window.backPressed is called by Android SDK everytime android backbutton is
@@ -32,6 +34,18 @@ export function backPressed(callback) {
       source: 'device',
     },
   });
+
+  const $overlayStack = storeGetter(overlayStackStore);
+
+  // TODO: All overlays should be hidden using $overlayStack
+
+  if ($overlayStack.length > 0) {
+    const last = $overlayStack[$overlayStack.length - 1];
+
+    last.back();
+
+    return;
+  }
 
   if (Confirm.isConfirmShown) {
     Confirm.hide(true);

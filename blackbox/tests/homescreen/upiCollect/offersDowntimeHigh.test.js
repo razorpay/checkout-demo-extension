@@ -97,7 +97,7 @@ describe.each(
     await verifyHighDowntime(
       context,
       'upi',
-      ' UPI is experiencing low success rates.'
+      'UPI is facing temporary issues right now.'
     );
   });
 });

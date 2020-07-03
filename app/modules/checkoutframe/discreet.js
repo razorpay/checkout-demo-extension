@@ -29,7 +29,7 @@ import * as Curtain from 'components/curtain';
 import { setShieldParams } from 'payment/validator';
 import * as P13n from 'checkoutframe/personalization';
 import { commonBanks, getFullBankLogo } from 'common/bank';
-import * as CountryCodesUtil from 'common/countrycodesutil';
+import * as CountryCodesUtil from 'common/countrycodes';
 
 /* Required for merchant.js migration */
 import * as Constants from 'common/constants';
@@ -63,13 +63,12 @@ import * as CustomerStore from 'checkoutstore/customer';
 import * as Theme from 'checkoutstore/theme';
 
 import QRScreen from 'ui/tabs/qr/index.svelte';
-import BankTransferScreen from 'ui/tabs/bank-transfer/index.svelte';
-import UpiTab from 'ui/tabs/upi/index.svelte';
+import * as upiTab from 'checkoutframe/components/upi';
 import CardlessEmiView from 'ui/tabs/cardless-emi/index.svelte';
 import emiScreenView from 'ui/tabs/emi/emiscreen.svelte';
 import PayLaterView from 'ui/tabs/paylater/index.svelte';
 import HomeTab from 'ui/tabs/home/index.svelte';
-import NetbankingTab from 'ui/tabs/netbanking/index.svelte';
+import netbankingTab from 'checkoutframe/components/netbanking';
 import EmandateTab from 'ui/tabs/emandate/index.svelte';
 import NachScreen from 'ui/tabs/nach/index.svelte';
 import CardTab from 'ui/tabs/card/index.svelte';
@@ -178,13 +177,12 @@ export default {
   commonBanks,
   timer: _.timer,
   QRScreen,
-  BankTransferScreen,
   getFullBankLogo,
 
   HomeTab,
-  UpiTab,
+  upiTab,
   WalletTab,
-  NetbankingTab,
+  netbankingTab,
   EmandateTab,
   NachScreen,
   CardTab,

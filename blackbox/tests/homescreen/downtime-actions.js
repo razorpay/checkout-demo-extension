@@ -1,5 +1,5 @@
 async function verifyHighDowntime(context, method, message) {
-  if (context.preferences.offers) {
+  if (context.preferences.offers && method !== 'upi') {
     const toolTip = await context.page.waitForSelector(
       '.callout.error.downtime-callout'
     );
@@ -24,7 +24,9 @@ async function verifyLowDowntime(context, message, method) {
   let selector = '.downtime-callout';
 
   if (method) {
-    selector = `#form-${method}.drishy ~ #bottom .bottom[tab="${method}"] ${selector}`;
+    selector = ['netbanking', 'upi', 'upi_otm'].includes(method)
+      ? `.bottom:not([tab]) ${selector}`
+      : `#form-${method}.drishy ~ #bottom .bottom[tab="${method}"] ${selector}`;
   }
 
   const warningDiv = await context.page.waitForSelector(selector);
