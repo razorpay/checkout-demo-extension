@@ -29,6 +29,7 @@
     getWalletName,
     getCardlessEmiProviderName,
     getPaylaterProviderName,
+    getUpiIntentAppName,
   } from 'i18n';
 
   // Props
@@ -100,6 +101,17 @@
         session.upi_intents_data,
         app => app.package_name === individualInstrument.app
       );
+
+      // In case of ios, app name might be missing if not sent by the sdk
+      app.app_name = app.app_name || 'Unknown app';
+      // shortcode might not be present for existing instruments. Check for backward compatibility.
+      if (app.shortcode) {
+        app.app_name = getUpiIntentAppName(
+          app.shortcode,
+          $locale,
+          app.app_name
+        );
+      }
 
       title = getInstrumentTitle(
         'upi',
