@@ -54,10 +54,6 @@ describe.each(
     await assertBasicDetailsScreen(context);
     await fillUserDetails(context);
     await proceed(context);
-    await assertUserDetails(context);
-    await assertEditUserDetailsAndBack(context);
-    await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'upi');
     await selectUPIMethod(context, 'new');
     await enterUPIAccount(context, 'saranshgupta1995@okaxis');
     await submit(context);
