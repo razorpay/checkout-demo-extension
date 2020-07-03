@@ -12,7 +12,6 @@ var cta = params.cta;
 var o = _.get;
 var address = o('address');
 var method = _.methods;
-var wallet = MethodStore.getWallets();
 var icons = _.themeMeta.icons;
 var html = function(html){return html.replace(/<[^>]*>?/g, "")};
 var attr = function(attr){return attr.replace(/"/g,'')};
@@ -106,14 +105,6 @@ var subscription_will_refund = _.subscription && (_.subscription.type === 0);
               `?`
               `?isMethodEnabled('emi') && emiBanks.BAJAJ`
                 <div class="tab-content showable screen" id="form-emi"></div>
-              `?`
-              `?(wallet && wallet.length)`
-                <div class="tab-content showable screen pad" id="form-wallet">
-                  <div id="wallets">
-                      <div id="wallet-svelte-wrap">
-                    </div>
-                  </div>
-                </div>
               `?`
             </div>
             <div id="bottom"></div>
