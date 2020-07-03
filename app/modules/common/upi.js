@@ -454,7 +454,7 @@ export const getSortedApps = allApps => {
   let usableApps = getUsableApps();
 
   _Arr.loop(allApps, (app, i) => {
-    const appConfig = usableApps.find(usableApp => {
+    const appConfig = _Arr.find(usableApps, usableApp => {
       if (app.package_name) {
         return app.package_name === usableApp.package_name;
       } else if (app.shortcode) {
