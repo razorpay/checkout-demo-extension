@@ -5,62 +5,47 @@
   import Icon from 'ui/elements/Icon.svelte';
 
   // Utils imports
-  import { getSession } from 'sessionmanager';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
   import { getSubtextForInstrument } from 'subtext';
+  import { getThemeMeta } from 'checkoutstore/theme';
+  import { formatTemplateWithLocale } from 'i18n';
 
   // Store imports
   import {
     selectedInstrumentId,
-    methodTabInstrument,
+    methodInstrument,
   } from 'checkoutstore/screens/home';
+
+  // i18n
+  import { locale } from 'svelte-i18n';
+  import { TITLE_GENERIC } from 'ui/labels/methods';
 
   // Props
   export let instrument = {};
   export let name = 'instrument';
 
-  const session = getSession();
-
   const method = instrument.method;
-  const methodName = getMethodNameForPaymentOption(method, { instrument });
-  const title = `Pay using ${methodName}`;
+
+  let methodName;
+  $: methodName = getMethodNameForPaymentOption(method, $locale, {
+    instrument,
+  });
+
+  let title;
+  $: title = formatTemplateWithLocale(
+    TITLE_GENERIC, // LABEL: Pay using {name}
+    { name: methodName },
+    $locale
+  );
+
   const id = instrument.id;
   const subtext = getSubtextForInstrument(instrument);
 
   let icon;
   if (/card$/.test(method)) {
-    icon = session.themeMeta.icons['card'];
+    icon = getThemeMeta().icons['card'];
   } else {
-    icon = session.themeMeta.icons[method];
-  }
-
-  function deselectInstrument() {
-    $selectedInstrumentId = null;
-  }
-
-  function switchToMethod() {
-    let method = instrument.method;
-
-    if (method === 'paypal') {
-      createPaypalPayment();
-      return;
-    } else if (method === 'gpay') {
-      method = 'upi';
-    }
-
-    session.switchTab(method);
-  }
-
-  function createPaypalPayment() {
-    const payload = session.getPayload();
-
-    payload.method = 'paypal';
-
-    session.preSubmit(null, payload);
-  }
-
-  function setMethodInstrument() {
-    $methodTabInstrument = instrument;
+    icon = getThemeMeta().icons[method];
   }
 </script>
 
@@ -78,10 +63,7 @@
   radio={false}
   className="instrument"
   attributes={{ 'data-type': 'method' }}
-  on:click
-  on:click={deselectInstrument}
-  on:click={setMethodInstrument}
-  on:click={switchToMethod}>
+  on:click>
   <i slot="icon">
     <Icon {icon} alt={methodName} />
   </i>

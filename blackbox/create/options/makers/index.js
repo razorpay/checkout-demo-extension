@@ -13,6 +13,7 @@ const omniChannel = require('./omni-channel');
 const payLater = require('./pay-later');
 const savedVPA = require('./saved-vpa');
 const upiCollect = require('./upi-collect');
+const upiOtm = require('./upi-otm');
 const payouts = require('./payouts.js');
 
 module.exports = {
@@ -32,4 +33,5 @@ module.exports = {
   'saved-vpa': savedVPA,
   'upi-collect': upiCollect,
   payouts: payouts,
+  'upi-otm': upiOtm,
 };

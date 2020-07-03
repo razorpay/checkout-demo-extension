@@ -86,7 +86,6 @@ test('Module: configurability', t => {
                   method: 'netbanking',
                 },
               ],
-              title: 'Pay via Netbanking',
             },
             {
               code: 'block.hdfc',
@@ -135,19 +134,9 @@ test('Module: configurability', t => {
                   method: 'gpay',
                 },
                 {
-                  code: 'emi',
-                  _type: 'instrument',
-                  method: 'emi',
-                },
-                {
                   code: 'cardless_emi',
                   _type: 'instrument',
                   method: 'cardless_emi',
-                },
-                {
-                  code: 'qr',
-                  _type: 'instrument',
-                  method: 'qr',
                 },
                 {
                   code: 'paylater',
@@ -170,8 +159,23 @@ test('Module: configurability', t => {
                   method: 'nach',
                 },
               ],
-              title: 'Cards, Wallets & More',
             },
+          ],
+
+          sequence: [
+            'block.gpay',
+            'netbanking',
+            'block.hdfc',
+            'card',
+            'wallet',
+            'upi',
+            'gpay',
+            'emi',
+            'cardless_emi',
+            'paylater',
+            'paypal',
+            'bank_transfer',
+            'nach',
           ],
         },
       };

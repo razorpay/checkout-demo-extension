@@ -1,15 +1,16 @@
+import { writable } from 'svelte/store';
 import { getDowntimes as _getDowntimes } from 'checkoutframe/downtimes';
-import { TAB_TITLES } from 'common/constants';
 import { makeAuthUrl as _makeAuthUrl } from 'common/Razorpay';
+import { displayAmount } from 'common/currency';
 
 let razorpayInstance, preferences;
+export const razorpayInstanceStore = writable();
 
 export function setRazorpayInstance(_razorpayInstance) {
   razorpayInstance = _razorpayInstance;
   preferences = razorpayInstance.preferences;
+  razorpayInstanceStore.set(_razorpayInstance);
   if (isIRCTC()) {
-    TAB_TITLES.upi = 'BHIM/UPI';
-    TAB_TITLES.card = 'Debit/Credit Card';
     razorpayInstance.set('theme.image_frame', false);
   }
 }
@@ -24,6 +25,7 @@ const IRCTC_KEYS = [
 
 export const isIRCTC = () => IRCTC_KEYS |> _Arr.contains(getOption('key'));
 
+export const getDisplayAmount = () => displayAmount(razorpayInstance);
 export const getMerchantMethods = () => preferences.methods;
 export const getRecurringMethods = () => preferences.methods.recurring;
 export const getMerchantOrder = () => preferences.order;
@@ -55,6 +57,9 @@ const getEntityWithAmount = () =>
 // @TODO start using entityWithAmount
 export const getAmount = () => {
   return getOption('amount');
+};
+export const getName = () => {
+  return getOption('name');
 };
 
 // @TODO use everywhere

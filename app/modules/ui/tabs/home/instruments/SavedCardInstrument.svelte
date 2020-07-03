@@ -80,8 +80,8 @@
 
     if (individualInstrument.issuer) {
       // We know stuff about the card.
-      title = getBankText(instrument, false);
-      icon = getIcon(instrument);
+      title = getBankText(individualInstrument, false);
+      icon = getIcon(individualInstrument);
       hasCvv = false;
     } else {
       // We don't know anything about the card.
@@ -98,8 +98,6 @@
 
   function selectionHandler() {
     if (cardKnown) {
-      $selectedInstrumentId = instrument.id;
-
       setTimeout(() => {
         // Focus on the input field
         const instrumentInDom = _El.closest(
@@ -113,8 +111,6 @@
         }
       });
     } else {
-      $selectedInstrumentId = null;
-
       // TODO: Someday, preselect the saved card in the saved cards list.
 
       session.switchTab('card');

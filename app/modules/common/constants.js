@@ -41,31 +41,6 @@ export const STATES = {
   WB: 'West Bengal',
 };
 
-/**
- * TODO: doesn't really fit for `common/constants`
- * Move to `checkout/constants` if and when we create it.
- */
-export const TAB_TITLES = {
-  card: 'Card',
-  cardless_emi: 'EMI',
-  credit_card: 'Credit Card',
-  debit_card: 'Debit Card',
-  emandate: 'Account Details',
-  emi: 'EMI',
-  emiplans: 'EMI Plans',
-  nach: 'NACH',
-  netbanking: 'Netbanking',
-  paylater: 'Pay Later',
-  paypal: 'PayPal',
-  qr: 'UPI QR',
-  upi: 'UPI',
-  gpay: 'Google Pay',
-  wallet: 'Wallet',
-  payout_account: 'Add Bank Account',
-  payout_upi: 'Add UPI ID',
-  bank_transfer: 'Bank Transfer',
-};
-
 /* .shown has display: none from iOS ad-blocker
  * using दृश्य, which will never be seen by tim cook
  */
@@ -107,6 +82,7 @@ export const AVAILABLE_METHODS = [
   'card',
   'netbanking',
   'wallet',
+  'upi_otm',
   'upi',
   'gpay',
   'emi',

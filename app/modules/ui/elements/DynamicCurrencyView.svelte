@@ -16,7 +16,11 @@
 
   import { customer } from 'checkoutstore/customer';
 
-  import { showCtaWithText, showCtaWithDefaultText } from 'checkoutstore/cta';
+  import { showAmount, showCtaWithDefaultText } from 'checkoutstore/cta';
+
+  // i18n
+  import { t } from 'svelte-i18n';
+  import { SEARCH_PLACEHOLDER, SEARCH_TITLE, SEARCH_ALL } from 'ui/labels/dcc';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -32,6 +36,7 @@
   import Radio from 'ui/elements/Radio.svelte';
   import SearchModal from 'ui/elements/SearchModal.svelte';
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
+  import CurrencySearchItem from 'ui/elements/search-item/Currency.svelte';
 
   const TOP_CURRENCIES = ['USD', 'GBP', 'EUR'];
   // Constants
@@ -152,16 +157,15 @@
     ([code]) => code === selectedCurrency
   );
 
-  function onSelect(code) {
-    if (selectedCurrency !== code) {
-      selectedCurrency = code;
-    }
+  function onSelect({ currency }) {
+    selectedCurrency = currency;
+
     searchModal.close();
   }
 
   function updateAmountInHeaderAndCTA(displayAmount) {
     if (displayAmount) {
-      showCtaWithText('PAY ' + displayAmount);
+      showAmount(displayAmount);
       getSession().setRawAmountInHeader(displayAmount);
     } else {
       showCtaWithDefaultText();
@@ -176,43 +180,52 @@
    * 3.) Entity Currency
    * 4.) Rest
    * @param {Object} currencies
-   * @returns {Object} sortedCurrencies
+   * @returns {Array<Object>} sortedCurrencies
    */
   function sortCurrencies(currencies) {
     const CODE = 0;
     const CONFIG = 1;
+
     // Insert entity currency on 3rd position.
     const topCurrencies = _Arr.insertAt(
       TOP_CURRENCIES.slice(),
       getCurrency(),
       2
     );
-    return _Obj
-      .entries(currencies)
-      .sort((_a, _b) => {
-        const a = _a[CODE];
-        const b = _b[CODE];
-        if (a === cardCurrency) {
+
+    const sorted = _Obj.entries(currencies).sort((_a, _b) => {
+      const a = _a[CODE];
+      const b = _b[CODE];
+      if (a === cardCurrency) {
+        return -1;
+      }
+      if (b === cardCurrency) {
+        return 1;
+      }
+      if (_Arr.contains(topCurrencies, a)) {
+        if (_Arr.contains(topCurrencies, b)) {
+          const indexOfA = topCurrencies.indexOf(a);
+          const indexOfB = topCurrencies.indexOf(b);
+          return indexOfA > indexOfB ? 1 : -1;
+        } else {
           return -1;
         }
-        if (b === cardCurrency) {
-          return 1;
-        }
-        if (_Arr.contains(topCurrencies, a)) {
-          if (_Arr.contains(topCurrencies, b)) {
-            const indexOfA = topCurrencies.indexOf(a);
-            const indexOfB = topCurrencies.indexOf(b);
-            return indexOfA > indexOfB ? 1 : -1;
-          } else {
-            return -1;
-          }
-        }
-        return 0;
-      })
-      .reduce((acc, r) => {
-        acc[r[CODE]] = r[CONFIG];
-        return acc;
-      }, {});
+      }
+      return 0;
+    });
+
+    return _Arr.map(sorted, _currency => {
+      const currency = _currency[0];
+      const rest = _currency[1];
+
+      return _Obj.extend(
+        {
+          currency,
+          _key: currency,
+        },
+        rest
+      );
+    });
   }
 
   function showCurrenciesModal() {
@@ -281,7 +294,7 @@
         {#if selectedCurrencyInDisplay}
           <div class="default-currencies">
             <Stack horizonal>
-              {#each displayCurrencies as [code, config]}
+              {#each displayCurrencies as [code, config] (code)}
                 <Radio
                   name="dcc_currency"
                   label={code}
@@ -309,12 +322,21 @@
         {#if selectedCurrencyInDisplay}More{:else}Change{/if}
         <span class="arrow">&#xe604;</span>
       </div>
+
+      <!-- LABEL: Select currency to pay -->
+      <!-- LABEL: Search for currency -->
+      <!-- LABEL: All currencies -->
       <SearchModal
-        title="Select Currency to Pay"
-        inputPlaceholderText="Search for currency or code"
-        currencies={sortedCurrencies}
-        visible={false}
+        identifier="dcc_currency_select"
+        title={$t(SEARCH_TITLE)}
+        placeholder={$t(SEARCH_PLACEHOLDER)}
+        all={$t(SEARCH_ALL)}
+        autocomplete="transaction-currency"
+        items={sortedCurrencies}
+        keys={['currency', 'name', 'symbol']}
+        component={CurrencySearchItem}
         bind:this={searchModal}
+        on:close={() => searchModal.close()}
         on:select={({ detail }) => onSelect(detail)} />
     </Stack>
   {/if}

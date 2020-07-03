@@ -6,12 +6,12 @@
   export let amount;
   export let provider;
   export let expand;
-  export let title = 'Select an EMI Plan';
+  export let title;
 </script>
 
 <h3>{title}</h3>
 <div class="emi-plans-list expandable-card-list">
-  {#each plans as plan, index}
+  {#each plans as plan, index (plan.duration)}
     <EmiPlanCard
       {plan}
       {bank}

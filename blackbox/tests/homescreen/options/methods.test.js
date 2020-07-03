@@ -54,6 +54,7 @@ describe.each(
         card: false,
         netbanking: false,
         wallet: true,
+        upi_otm: false,
       },
     },
     preferences: {},
@@ -87,6 +88,7 @@ describe.each(
         netbanking: true,
         wallet: false,
         cardless_emi: true,
+        upi_otm: false,
       },
     },
     preferences: {},
@@ -186,7 +188,7 @@ describe.each(
       await checkEmiMethods(context, [
         'EMI on Cards',
         'ZestMoney',
-        'InstaCred Cardless EMI',
+        'Cardless EMI by InstaCred',
       ]);
     });
   }

@@ -126,3 +126,53 @@ export function toTitleCase(str) {
 
   return str[0].toUpperCase() + str.slice(1);
 }
+
+/**
+ * Checks if an element is completely visible in container
+ * @param {Element} element
+ * @param {Element} container
+ *
+ * @returns {boolean}
+ */
+export function isElementCompletelyVisibleInContainer(element, container) {
+  const elementRect = element.getBoundingClientRect();
+
+  const elementStartsAtX = elementRect.left;
+  const elementEndsAtX = elementRect.left + elementRect.width;
+  const elementStartsAtY = elementRect.top;
+  const elementEndsAtY = elementRect.top + elementRect.height;
+
+  const containerRect = container.getBoundingClientRect();
+
+  const containerStartsAtX = containerRect.left;
+  const containerEndsAtX = containerRect.left + containerRect.width;
+  const containerStartsAtY = containerRect.top;
+  const containerEndsAtY = containerRect.top + containerRect.height;
+
+  const isHeightContained =
+    elementStartsAtY >= containerStartsAtY &&
+    elementEndsAtY <= containerEndsAtY;
+  const isWidthContained =
+    elementStartsAtX >= containerStartsAtX &&
+    elementEndsAtX <= containerEndsAtX;
+
+  const isElementContained = isHeightContained && isWidthContained;
+
+  return isElementContained;
+}
+
+/**
+ * Checks if an element is completely visible in its tab
+ * @param {Element} element
+ *
+ * @returns {boolean}
+ */
+export function isElementCompletelyVisibleInTab(element) {
+  const tab = _El.closest(element, '.tab-content');
+
+  if (!tab) {
+    return false;
+  }
+
+  return isElementCompletelyVisibleInContainer(element, tab);
+}

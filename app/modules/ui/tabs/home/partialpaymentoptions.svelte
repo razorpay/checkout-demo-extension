@@ -16,6 +16,17 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
 
+  // i18n
+  import {
+    PARTIAL_PAYMENT_TITLE,
+    FULL_AMOUNT_LABEL,
+    MIN_AMOUNT_LABEL,
+    PARTIAL_AMOUNT_DESCRIPTION,
+    PARTIAL_AMOUNT_LABEL,
+  } from 'ui/labels/home';
+
+  import { t } from 'svelte-i18n';
+
   // Props
   export let order = {};
 
@@ -104,7 +115,8 @@
   }
 </style>
 
-<h3 class="title">Select a payment type</h3>
+<!-- LABEL: Select a payment type -->
+<h3 class="title">{$t(PARTIAL_PAYMENT_TITLE)}</h3>
 <div class="border-list">
   <SlottedRadioOption
     name="payment_type"
@@ -112,24 +124,25 @@
     selected={$partialPaymentOption === 'full'}
     reverse
     on:click={_ => handleRadioSelection('full')}>
-    <div slot="title">{fullAmountLabel}</div>
+    <div slot="title">{fullAmountLabel || $t(FULL_AMOUNT_LABEL)}</div>
   </SlottedRadioOption>
   <SlottedRadioOption
     name="payment_type"
     value="full"
     align="top"
     reverse
+    overflow
     selected={$partialPaymentOption === 'partial'}
     on:click={_ => handleRadioSelection('partial')}>
-    <div slot="title">{partialAmountLabel}</div>
+    <div slot="title">{partialAmountLabel || $t(PARTIAL_AMOUNT_LABEL)}</div>
     <div slot="subtitle" bind:this={partialPaymentRef}>
       {#if expanded}
         <PartialPaymentAmountField
           {maxAmount}
           {minAmount}
           {showPartialAmountLabel}
-          {minAmountLabel}
-          {partialDescription}
+          minAmountLabel={minAmountLabel || $t(MIN_AMOUNT_LABEL)}
+          partialDescription={partialDescription || $t(PARTIAL_AMOUNT_DESCRIPTION)}
           on:check={handleCheckboxChecked}
           bind:value={$partialPaymentAmount}
           bind:this={partialAmountField} />
