@@ -29,7 +29,7 @@ import * as Curtain from 'components/curtain';
 import { setShieldParams } from 'payment/validator';
 import * as P13n from 'checkoutframe/personalization';
 import { commonBanks, getFullBankLogo } from 'common/bank';
-import * as CountryCodesUtil from 'common/countrycodesutil';
+import * as CountryCodesUtil from 'common/countrycodes';
 
 /* Required for merchant.js migration */
 import * as Constants from 'common/constants';
