@@ -64,10 +64,6 @@
     text-transform: uppercase;
     pointer-events: none;
   }
-  .no-description {
-    height: 0;
-    width: 0;
-  }
 </style>
 
 <div role="list">
@@ -84,9 +80,9 @@
       {/if}
       {#if selected === offer}
         <div class="checkbox" />
-        <div
-          class:no-description={getOfferDescription(offer) === undefined}
-          class:offer-detail={getOfferDescription(offer)} />
+        {#if getOfferDescription(offer)}
+          <div class="offer-detail">{getOfferDescription(offer)}</div>
+        {/if}
         {#if offer.type === 'deferred'}
           <!-- LABEL: Cashback would be credited to source mode of payment. -->
           <div class="offer-detail">{$t(CASHBACK_DETAIL)}</div>
