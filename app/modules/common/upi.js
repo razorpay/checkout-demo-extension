@@ -57,6 +57,7 @@ const UPI_APPS = {
       package_name: 'com.phonepe.app',
       app_icon: 'https://cdn.razorpay.com/checkout/phonepe.png',
       shortcode: 'phonepe',
+      app_name: 'PhonePe',
     },
     {
       name: 'PayTM',
@@ -69,6 +70,7 @@ const UPI_APPS = {
       package_name: 'in.org.npci.upiapp',
       shortcode: 'bhim',
       app_icon: 'https://cdn.razorpay.com/app/bhim.svg',
+      app_name: 'Bhim',
     },
   ],
 
