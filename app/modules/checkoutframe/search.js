@@ -1,3 +1,5 @@
+/* global Map */
+
 /**
  * Source: https://github.com/umanghome/fuzzysort
  */
@@ -111,6 +113,7 @@ function getPrepared(target, cache) {
 function createCache() {
   return {
     cache: {
+      // eslint-disable-next-line no-restricted-syntax
       prepared: new Map(),
     },
     clear: function() {
@@ -395,14 +398,15 @@ function algorithmWithTypo(searchLowerCodes, prepared, searchLowerCode) {
       // we go as far as possible before trying to transpose
       // then we transpose backwards until we reach the beginning
       for (;;) {
+        var _searchLowerCodeNew;
         if (searchI <= 1) {
           return null;
         } // not allowed to transpose first char
         if (typoSimpleI === 0) {
           // we haven't tried to transpose yet
           --searchI;
-          var searchLowerCodeNew = searchLowerCodes[searchI];
-          if (searchLowerCode === searchLowerCodeNew) {
+          _searchLowerCodeNew = searchLowerCodes[searchI];
+          if (searchLowerCode === _searchLowerCodeNew) {
             continue;
           } // doesn't make sense to transpose a repeat char
           typoSimpleI = searchI;
@@ -413,8 +417,8 @@ function algorithmWithTypo(searchLowerCodes, prepared, searchLowerCode) {
           --typoSimpleI;
           searchI = typoSimpleI;
           searchLowerCode = searchLowerCodes[searchI + 1];
-          var searchLowerCodeNew = searchLowerCodes[searchI];
-          if (searchLowerCode === searchLowerCodeNew) {
+          _searchLowerCodeNew = searchLowerCodes[searchI];
+          if (searchLowerCode === _searchLowerCodeNew) {
             continue;
           } // doesn't make sense to transpose a repeat char
         }
@@ -425,7 +429,8 @@ function algorithmWithTypo(searchLowerCodes, prepared, searchLowerCode) {
     }
   }
 
-  var searchI = 0;
+  searchI = 0;
+
   var typoStrictI = 0;
   var successStrict = false;
   var matchesStrictLen = 0;
@@ -466,7 +471,7 @@ function algorithmWithTypo(searchLowerCodes, prepared, searchLowerCode) {
         var lastMatch = matchesStrict[--matchesStrictLen];
         targetI = nextBeginningIndexes[lastMatch];
       } else {
-        var isMatch =
+        var _isMatch =
           searchLowerCodes[
             typoStrictI === 0
               ? searchI
@@ -476,7 +481,7 @@ function algorithmWithTypo(searchLowerCodes, prepared, searchLowerCode) {
               ? searchI - 1
               : searchI
           ] === targetLowerCodes[targetI];
-        if (isMatch) {
+        if (_isMatch) {
           matchesStrict[matchesStrictLen++] = targetI;
           ++searchI;
           if (searchI === searchLen) {
@@ -492,23 +497,26 @@ function algorithmWithTypo(searchLowerCodes, prepared, searchLowerCode) {
   }
 
   {
+    var matchesBest;
+    var matchesBestLen;
+
     // tally up the score & keep track of matches for highlighting later
     if (successStrict) {
-      var matchesBest = matchesStrict;
-      var matchesBestLen = matchesStrictLen;
+      matchesBest = matchesStrict;
+      matchesBestLen = matchesStrictLen;
     } else {
-      var matchesBest = matchesSimple;
-      var matchesBestLen = matchesSimpleLen;
+      matchesBest = matchesSimple;
+      matchesBestLen = matchesSimpleLen;
     }
     var score = 0;
     var lastTargetI = -1;
     for (var i = 0; i < searchLen; ++i) {
-      var targetI = matchesBest[i];
+      var _targetI = matchesBest[i];
       // score only goes down if they're not consecutive
-      if (lastTargetI !== targetI - 1) {
-        score -= targetI;
+      if (lastTargetI !== _targetI - 1) {
+        score -= _targetI;
       }
-      lastTargetI = targetI;
+      lastTargetI = _targetI;
     }
     if (!successStrict) {
       score *= 1000;
@@ -523,8 +531,8 @@ function algorithmWithTypo(searchLowerCodes, prepared, searchLowerCode) {
     score -= targetLen - searchLen;
     prepared.score = score;
     prepared.indexes = new Array(matchesBestLen);
-    for (var i = matchesBestLen - 1; i >= 0; --i) {
-      prepared.indexes[i] = matchesBest[i];
+    for (var _i = matchesBestLen - 1; _i >= 0; --_i) {
+      prepared.indexes[_i] = matchesBest[_i];
     }
 
     return prepared;
