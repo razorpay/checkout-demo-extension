@@ -128,6 +128,40 @@ export function toTitleCase(str) {
 }
 
 /**
+ * Checks if an element is completely visible in container
+ * @param {Element} element
+ * @param {Element} container
+ *
+ * @returns {boolean}
+ */
+export function isElementCompletelyVisibleInContainer(element, container) {
+  const elementRect = element.getBoundingClientRect();
+
+  const elementStartsAtX = elementRect.left;
+  const elementEndsAtX = elementRect.left + elementRect.width;
+  const elementStartsAtY = elementRect.top;
+  const elementEndsAtY = elementRect.top + elementRect.height;
+
+  const containerRect = container.getBoundingClientRect();
+
+  const containerStartsAtX = containerRect.left;
+  const containerEndsAtX = containerRect.left + containerRect.width;
+  const containerStartsAtY = containerRect.top;
+  const containerEndsAtY = containerRect.top + containerRect.height;
+
+  const isHeightContained =
+    elementStartsAtY >= containerStartsAtY &&
+    elementEndsAtY <= containerEndsAtY;
+  const isWidthContained =
+    elementStartsAtX >= containerStartsAtX &&
+    elementEndsAtX <= containerEndsAtX;
+
+  const isElementContained = isHeightContained && isWidthContained;
+
+  return isElementContained;
+}
+
+/**
  * Checks if an element is completely visible in its tab
  * @param {Element} element
  *
@@ -140,26 +174,5 @@ export function isElementCompletelyVisibleInTab(element) {
     return false;
   }
 
-  const elementRect = element.getBoundingClientRect();
-
-  const elementStartsAtX = elementRect.left;
-  const elementEndsAtX = elementRect.left + elementRect.width;
-  const elementStartsAtY = elementRect.top;
-  const elementEndsAtY = elementRect.top + elementRect.height;
-
-  const tabRect = tab.getBoundingClientRect();
-
-  const tabStartsAtX = tabRect.left;
-  const tabEndsAtX = tabRect.left + tabRect.width;
-  const tabStartsAtY = tabRect.top;
-  const tabEndsAtY = tabRect.top + tabRect.height;
-
-  const isHeightContianed =
-    elementStartsAtY >= tabStartsAtY && elementEndsAtY <= tabEndsAtY;
-  const isWidthContained =
-    elementStartsAtX >= tabStartsAtX && elementEndsAtX <= tabEndsAtX;
-
-  const isElementContained = isHeightContianed && isWidthContained;
-
-  return isElementContained;
+  return isElementCompletelyVisibleInContainer(element, tab);
 }

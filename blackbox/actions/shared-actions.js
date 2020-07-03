@@ -149,7 +149,30 @@ async function failRequestwithErrorMessage(context, errorMessage) {
 }
 
 async function selectBank(context, bank) {
-  await context.page.select('#bank-select', bank);
+  // Open search modal
+  await context.page.click('#bank-select');
+
+  // Wait for modal to open
+  await context.page.waitForSelector('.search-field input');
+
+  // Type bank code
+  await context.page.type('.search-field input', bank);
+
+  // Wait for top result
+  await context.page.waitForSelector(
+    '.search-box .list .list-item:first-child',
+    {
+      timeout: 300,
+    }
+  );
+
+  // Select top result
+  await context.page.click('.search-box .list .list-item:first-child');
+
+  // Wait for modal to be hidden
+  await context.page.waitForSelector('.search-field input', {
+    hidden: true,
+  });
 }
 
 async function retryTransaction(context) {

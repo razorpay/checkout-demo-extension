@@ -116,7 +116,9 @@ emiPlansView.prototype = {
       const session = getSession();
 
       var offer = session.getAppliedOffer();
-      if (offer && offer.id !== plan.offer_id) {
+      const isNoCostEmi = offer && offer.emi_subvention;
+
+      if (isNoCostEmi && offer.id !== plan.offer_id) {
         return session.showOffersError(offerRemoved => {
           if (offerRemoved) {
             on.select(event);
