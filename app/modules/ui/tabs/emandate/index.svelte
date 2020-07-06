@@ -54,6 +54,7 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { hideCta, showCtaWithDefaultText } from 'checkoutstore/cta';
+  import { getAnimationDuration } from 'svelte-utils';
 
   const session = getSession();
 
@@ -390,7 +391,7 @@
       {#if currentView === Views.AUTH_SELECTION}
         <div
           class="emandate-auth-selection"
-          in:fade={{ duration: 200, delay: 200 }}>
+          in:fade={{ duration: getAnimationDuration(200), delay: getAnimationDuration(200) }}>
           <div id="emandate-bank">
             <div class="bank-icon">
               {#if $selectedBank}
@@ -446,7 +447,9 @@
           </div>
         </div>
       {:else if currentView === Views.BANK_DETAILS}
-        <div class="emandate-fields" in:fade={{ duration: 200, delay: 200 }}>
+        <div
+          class="emandate-fields"
+          in:fade={{ duration: getAnimationDuration(200), delay: getAnimationDuration(200) }}>
           <AccountNumberField
             name="bank_account[account_number]"
             id="nb-acc-no"
