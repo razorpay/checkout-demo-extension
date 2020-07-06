@@ -4,7 +4,7 @@ export function get() {
   let details;
 
   try {
-    details = JSON.parse(localStorage.getItem(KEY));
+    details = JSON.parse(global.localStorage.getItem(KEY));
   } catch (err) {}
 
   if (!details) {
@@ -16,7 +16,7 @@ export function get() {
 
 function set(details) {
   try {
-    localStorage.setItem(KEY, JSON.stringify(details));
+    global.localStorage.setItem(KEY, JSON.stringify(details));
   } catch (err) {}
 }
 
