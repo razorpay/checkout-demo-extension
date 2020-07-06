@@ -46,6 +46,10 @@
     ) {
       selectedWallet = null;
     }
+
+    if (!selectedWallet && filteredWallets.length === 1) {
+      onWalletSelection(filteredWallets[0].code);
+    }
   }
 
   /**
