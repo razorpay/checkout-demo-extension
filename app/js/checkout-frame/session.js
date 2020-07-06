@@ -131,8 +131,14 @@ function improvisePrefilledContact(session) {
   var storedUserDetails = discreet.ContactStorage.get();
 
   // Pick details from storage if not given in prefill
-  prefilledContact = prefilledContact || storedUserDetails.contact;
-  prefilledEmail = prefilledEmail || storedUserDetails.email;
+  if (!prefilledContact) {
+    prefilledContact = storedUserDetails.contact;
+    Analytics.setMeta('prefilledFromStorage.contact', true);
+  }
+  if (!prefilledEmail) {
+    prefilledEmail = storedUserDetails.email;
+    Analytics.setMeta('prefilledFromStorage.email', true);
+  }
 
   if (prefilledContact) {
     // Do have invalid characters?
