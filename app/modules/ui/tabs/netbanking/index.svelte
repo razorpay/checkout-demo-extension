@@ -177,6 +177,11 @@
     if (!filteredBanks[$selectedBank]) {
       $selectedBank = '';
     }
+
+    const banksList = _Obj.keys(filteredBanks);
+    if (method === 'netbanking' && !$selectedBank && banksList.length === 1) {
+      $selectedBank = banksList[0];
+    }
   }
 
   $: showCorporateRadio =
