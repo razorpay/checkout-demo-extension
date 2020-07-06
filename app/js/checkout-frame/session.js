@@ -704,7 +704,7 @@ Session.prototype = {
       classes.push('noimage');
     }
 
-    if (isIE) {
+    if (isIE || !getter('modal.animation')) {
       classes.push('noanim');
     }
 
