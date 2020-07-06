@@ -31,7 +31,7 @@ async function fillEmandateBankDetails(context) {
   await context.page.select('[name="bank_account[account_type]"]', 'savings');
 }
 
-async function returnVirtualAccounts(context) {
+async function returnVirtualAccounts(context, fee = false) {
   await context.expectRequest();
   await context.respondJSON({
     id: 'va_DhhfICdHxgXszs',
@@ -39,7 +39,7 @@ async function returnVirtualAccounts(context) {
     entity: 'virtual_account',
     status: 'active',
     description: null,
-    amount_expected: 200000,
+    amount_expected: fee ? 202000 : 200000,
     notes: [],
     amount_paid: 0,
     customer_id: null,
@@ -60,7 +60,7 @@ async function returnVirtualAccounts(context) {
   });
 }
 
-async function verifyNeftDetails(context) {
+async function verifyNeftDetails(context, feeBearer) {
   const messageDiv = await context.page.waitForSelector('.neft-details');
   let messageText = await context.page.evaluate(
     messageDiv => messageDiv.textContent,
@@ -73,13 +73,14 @@ async function verifyNeftDetails(context) {
       ifscCode +
       ' Beneficiary Name: ' +
       accountHolderName +
-      ' Amount Expected: ₹ 2,000 '
+      ' Amount Expected: ' +
+      (feeBearer ? '₹ 2,020 ' : '₹ 2,000 ')
   );
 }
 
 async function verifyRoundOffAlertMessage(context) {
   const messageDiv = await context.page.waitForSelector(
-    `#form-bank_transfer.drishy ~ #bottom .bottom[tab="bank_transfer"]`
+    '#bottom .bottom:last-child'
   );
   let messageText = await context.page.evaluate(
     messageDiv => messageDiv.textContent,

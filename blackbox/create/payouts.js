@@ -55,7 +55,7 @@ module.exports = function(testFeatures) {
       }
       if (VPAWithExistingInstrument || VPAWithoutExistingInstrument) {
         await addInstrument(context, 'VPA');
-        await enterUPIAccount(context, 'BHIM');
+        await enterUPIAccount(context, 'BHIM@upi');
       }
       await submit(context);
       if (bankWithExistingInstrument || bankWithoutExistingInstrument) {

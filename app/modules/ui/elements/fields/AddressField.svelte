@@ -1,6 +1,9 @@
 <script>
   import { input, focus, blur } from 'actions/input';
 
+  import { ADDRESS_LABEL, ADDRESS_HELP } from 'ui/labels/home';
+  import { t } from 'svelte-i18n';
+
   export let value;
 
   const ADDRESS_PATTERN = '[\\s\\S]{10}';
@@ -20,8 +23,10 @@
 </style>
 
 <div class="elem elem-address">
-  <div class="help">Address should be at least 10 characters long</div>
-  <label>Address</label>
+  <!-- LABEL: Address should be at least 10 characters long -->
+  <div class="help">{$t(ADDRESS_HELP)}</div>
+  <!-- LABEL: Address -->
+  <label>{$t(ADDRESS_LABEL)}</label>
   <textarea
     class="input no-validate no-focus no-blur"
     name="address"

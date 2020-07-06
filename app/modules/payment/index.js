@@ -550,27 +550,18 @@ Payment.prototype = {
   },
 
   gotoBankUsingUrl: function() {
-    // We can open the bank URL in either open popup or iframe.
-    if (!this.popup) {
-      if (this.iframe) {
-        // Make popup will actually open an iframe if this.iframe is true.
-        // Ignore the function name.
-        this.makePopup();
-      }
-    }
-    const isIframe = this.popup instanceof Iframe;
-    if (isIframe) {
-      this.popup.write(popupTemplate(this));
-    } else {
+    if (this.r.get('redirect')) {
       // For redirect mode where we do not have a popup, redirect using POST
       this.redirect({ url: this.gotoBankUrl, method: 'post' });
-      return;
-    }
-    _Doc.submitForm(this.gotoBankUrl, null, 'post', this.popup.name);
-    // Iframe is not visible by default.
-    // Popup shows up automatically when created.
-    if (isIframe) {
-      this.popup.show();
+    } else {
+      // Create popup if it doesn't exist.
+      if (!this.popup) {
+        this.makePopup();
+      }
+      // Show loading UI in popup till the bank page loads.
+      this.writePopup();
+      // Open bank url in the popup
+      _Doc.submitForm(this.gotoBankUrl, null, 'post', this.popup.name);
     }
   },
 
@@ -890,13 +881,14 @@ razorpayProto.topupWallet = function() {
     data: {
       '_[source]': 'checkoutjs',
     },
-    callback: function(response) {
+    callback: response => {
       var request = response.request;
       if (isRedirect && !response.error && request) {
         _Doc.redirect({
           url: request.url,
           content: request.content,
           method: request.method || 'post',
+          target: this.get('target'),
         });
       } else {
         processCoproto.call(payment, response);

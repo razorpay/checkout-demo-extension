@@ -6,6 +6,16 @@
   import Field from 'ui/components/Field.svelte';
   import Icon from 'ui/elements/Icon.svelte';
 
+  // i18n
+  import { t } from 'svelte-i18n';
+
+  import {
+    CARD_NUMBER_LABEL,
+    CARD_NUMBER_HELP,
+    CARD_NUMBER_HELP_AMEX,
+    CARD_NUMBER_HELP_RECURRING,
+  } from 'ui/labels/card';
+
   // Utils
   import { getIcon } from 'icons/network';
 
@@ -29,18 +39,21 @@
     dispatchFilledIfValid();
   }
 
-  $: helpText = helpText || getHelpText();
+  $: helpText = helpText || $t(getHelpTextLabel());
 
-  function getHelpText() {
+  function getHelpTextLabel(locale) {
     if (recurring) {
-      return 'Card does not support recurring payments.';
+      // LABEL: Card does not support recurring payments.
+      return CARD_NUMBER_HELP_RECURRING;
     }
 
     if (amexEnabled && type === 'amex') {
-      return 'Amex cards are not supported for this transaction.';
+      // LABEL: Amex cards are not supported for this transaction.
+      return CARD_NUMBER_HELP_AMEX;
     }
 
-    return 'Please enter your card number.';
+    // LABEL: Please enter a valid card number.
+    return CARD_NUMBER_HELP;
   }
 
   export function dispatchFilledIfValid() {
@@ -103,7 +116,7 @@
     {value}
     type="tel"
     autocomplete="cc-number"
-    label="Card Number"
+    label={$t(CARD_NUMBER_LABEL)}
     handleBlur
     handleFocus
     handleInput

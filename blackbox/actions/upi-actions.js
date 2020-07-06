@@ -110,7 +110,7 @@ async function handleSavedTokenValidation(context, vpa) {
   await context.respondJSON({ vpa: vpa, success: true, customer_name: null });
 }
 
-async function selectUPIMethod(context, UPIMethod) {
+async function selectUPIMethod(context, UPIMethod, upiPaymentType = 'upi') {
   let tokenSelector = null;
   let elementToBeVisible = null;
 
@@ -120,8 +120,8 @@ async function selectUPIMethod(context, UPIMethod) {
       elementToBeVisible = '#gpay-phone';
       break;
     case 'new':
-      tokenSelector = '#new-vpa-field';
-      elementToBeVisible = '#vpa';
+      tokenSelector = '#new-vpa-field-' + upiPaymentType;
+      elementToBeVisible = '#vpa-' + upiPaymentType;
       break;
     case 'token':
       tokenSelector = '#form-upi .slotted-radio';
@@ -137,13 +137,15 @@ async function selectUPIMethod(context, UPIMethod) {
   });
 }
 
-async function enterUPIAccount(context, UPIAccountId) {
-  const vpaField = await context.page.waitForSelector('#vpa');
+async function enterUPIAccount(context, UPIAccountId, upiPaymentType = 'upi') {
+  const vpaField = await context.page.waitForSelector('#vpa-' + upiPaymentType);
   await vpaField.type(UPIAccountId);
   if (!context.preferences.customer) {
     return;
   }
-  return await context.page.waitForSelector('#should-save-vpa');
+  return await context.page.waitForSelector(
+    '#should-save-vpa-' + upiPaymentType
+  );
 }
 
 async function selectBankNameFromGooglePayDropDown(context, valuetoBeSelected) {

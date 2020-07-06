@@ -1,22 +1,24 @@
 <script>
-  import { onMount, onDestroy } from 'svelte';
   export let tab;
-  let ref;
-  onMount(() => {
-    document.querySelector('#bottom').appendChild(ref);
-  });
+
+  function replaceNode(node) {
+    document.querySelector('#bottom').appendChild(node);
+
+    return {
+      destroy() {
+        _El.detach(node);
+      },
+    };
+  }
 </script>
 
 <style>
-  .bottom {
+  .bottom[tab] {
     display: none;
   }
 
   :global(#form-common.drishy ~ #bottom .bottom[tab='common']),
   :global(#form-card.drishy ~ #bottom .bottom[tab='card']),
-  :global(#form-netbanking.drishy ~ #bottom .bottom[tab='netbanking']),
-  :global(#form-upi.drishy ~ #bottom .bottom[tab='upi']),
-  :global(#form-bank_transfer.drishy ~ #bottom .bottom[tab='bank_transfer']),
   :global(#form-emiplans.drishy ~ #bottom .bottom[tab='emiplans']),
   :global(#form-payouts.drishy ~ #bottom .bottom[tab='payouts']),
   :global(#form-qr.drishy ~ #bottom .bottom[tab='qr']) {
@@ -24,6 +26,6 @@
   }
 </style>
 
-<div class="bottom" {tab} bind:this={ref}>
+<div class="bottom" {tab} use:replaceNode>
   <slot />
 </div>

@@ -96,6 +96,9 @@ async function handleMockSuccessDialog(context) {
 async function expectRedirectWithCallback(context, fields) {
   const request = await context.expectRequest();
   const body = querystring.parse(request.body);
+  if (fields.method === 'upi_otm') {
+    fields.method = 'upi';
+  }
   const apiUrl = 'https://api.razorpay.com/v1/payments/create/';
   expect(request.method).toEqual('POST');
   if (fields) {
@@ -106,6 +109,7 @@ async function expectRedirectWithCallback(context, fields) {
     apiSuffix = 'fees';
   } else if (
     context.preferences.methods.upi ||
+    context.preferences.methods.upi_otm ||
     fields.method == 'paylater' ||
     (context.preferences.methods.cardless_emi != undefined &&
       !context.prefilledContact &&
@@ -145,7 +149,30 @@ async function failRequestwithErrorMessage(context, errorMessage) {
 }
 
 async function selectBank(context, bank) {
-  await context.page.select('#bank-select', bank);
+  // Open search modal
+  await context.page.click('#bank-select');
+
+  // Wait for modal to open
+  await context.page.waitForSelector('.search-field input');
+
+  // Type bank code
+  await context.page.type('.search-field input', bank);
+
+  // Wait for top result
+  await context.page.waitForSelector(
+    '.search-box .list .list-item:first-child',
+    {
+      timeout: 300,
+    }
+  );
+
+  // Select top result
+  await context.page.click('.search-box .list .list-item:first-child');
+
+  // Wait for modal to be hidden
+  await context.page.waitForSelector('.search-field input', {
+    hidden: true,
+  });
 }
 
 async function retryTransaction(context) {

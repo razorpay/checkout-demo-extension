@@ -2,13 +2,18 @@
   // Svelte imports
   import { onMount } from 'svelte';
   import { slide } from 'svelte/transition';
+  import { _ as t } from 'svelte-i18n';
 
   // Util imports
   import { getSession } from 'sessionmanager';
   import * as GPay from 'gpay';
   import * as Bridge from 'bridge';
   import { getDowntimes, hasFeature, isCustomerFeeBearer } from 'checkoutstore';
-  import { isMethodEnabled, isUPIFlowEnabled } from 'checkoutstore/methods';
+  import {
+    isMethodEnabled,
+    isUPIFlowEnabled,
+    isUPIOtmFlowEnabled,
+  } from 'checkoutstore/methods';
   import { isVpaValid } from 'common/upi';
   import {
     doesAppExist,
@@ -23,6 +28,8 @@
   import { filterUPITokens } from 'common/token';
   import { getUPIIntentApps } from 'checkoutstore/native';
 
+  import { getAmount, getName } from 'checkoutstore';
+
   // UI imports
   import UpiIntent from './UpiIntent.svelte';
   import Tab from 'ui/tabs/Tab.svelte';
@@ -31,6 +38,7 @@
   import ListHeader from 'ui/elements/ListHeader.svelte';
   import Field from 'ui/components/Field.svelte';
   import Icon from 'ui/elements/Icon.svelte';
+  import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
   import Collect from './Collect.svelte';
   import GooglePayCollect from './GooglePayCollect.svelte';
@@ -41,11 +49,26 @@
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import AddANewVpa from './AddANewVpa.svelte';
   import { getMiscIcon } from 'checkoutframe/icons';
+  import Callout from 'ui/elements/Callout.svelte';
 
   // Store
   import { contact } from 'checkoutstore/screens/home';
   import { customer } from 'checkoutstore/customer';
-  import { methodTabInstrument } from 'checkoutstore/screens/home';
+  import { methodInstrument } from 'checkoutstore/screens/home';
+
+  import {
+    UPI_GPAY_BLOCK_HEADING,
+    UPI_COLLECT_BLOCK_HEADING,
+    UPI_COLLECT_BLOCK_SUBHEADING,
+    UPI_COLLECT_NEW_VPA_HELP,
+    UPI_COLLECT_ENTER_ID,
+    UPI_COLLECT_SAVE,
+    GPAY_WEB_API_TITLE,
+    QR_BLOCK_HEADING,
+    SHOW_QR_CODE,
+    SCAN_QR_CODE,
+    UPI_DOWNTIME_TEXT,
+  } from 'ui/labels/upi';
 
   // Props
   export let selectedApp = undefined;
@@ -56,6 +79,7 @@
   export let isFirst = true;
   export let vpa = '';
   export let qrIcon;
+  export let method = 'upi';
 
   // Refs
   export let intentView = null;
@@ -77,8 +101,48 @@
   let isANewVpa = false;
   let rememberVpaCheckbox;
   let intentAppSelected = null;
+  const isOtm = method === 'upi_otm';
+  let otmStartDate = new Date();
 
   const session = getSession();
+
+  const getAllowedPSPs = {
+    upi: tokens => tokens,
+    upi_otm: tokens => {
+      const allowedPSPs = ['upi', 'hdfcbank'];
+
+      return tokens.filter(token => {
+        return allowedPSPs.some(psp => token.vpa.handle === psp);
+      });
+    },
+  };
+
+  let toShortFormat = function(date, delimter = ' ') {
+    let month_names = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+
+    let day = date.getDate();
+    let month_index = date.getMonth();
+    let year = date.getFullYear();
+
+    return '' + day + delimter + month_names[month_index] + delimter + year;
+  };
+
+  const addDaysToDate = function(date, days) {
+    return new Date(date.getTime() + days * 1000 * 24 * 3600);
+  };
 
   const { isPayout, showRecommendedUPIApp } = session;
 
@@ -89,11 +153,13 @@
    * @returns {Object}
    */
   function getAvailableFlowsFromInstrument(instrument) {
+    const isFlowEnabled = isOtm ? isUPIOtmFlowEnabled : isUPIFlowEnabled;
+
     let availableFlows = {
-      omnichannel: isUPIFlowEnabled('omnichannel'),
-      collect: isUPIFlowEnabled('collect'),
-      intent: isUPIFlowEnabled('intent'),
-      qr: isUPIFlowEnabled('qr'),
+      omnichannel: isFlowEnabled('omnichannel'),
+      collect: isFlowEnabled('collect'),
+      intent: isFlowEnabled('intent'),
+      qr: isFlowEnabled('qr'),
     };
 
     if (!instrument || instrument.method !== 'upi') {
@@ -117,7 +183,7 @@
 
   let availableFlows = getAvailableFlowsFromInstrument();
   $: {
-    availableFlows = getAvailableFlowsFromInstrument($methodTabInstrument);
+    availableFlows = getAvailableFlowsFromInstrument($methodInstrument);
   }
 
   // Set default token value when the available flows change
@@ -153,11 +219,13 @@
   }
 
   let intentApps = getUPIIntentApps().filtered;
-  $: intentApps = getUPIIntentAppsFromInstrument($methodTabInstrument);
+  $: intentApps = getUPIIntentAppsFromInstrument($methodInstrument);
+
+  let otmEndDate = addDaysToDate(otmStartDate, 90);
 
   const checkGPay = session => {
-    /* disable Web payments API for fee_bearer for now */
-    if (isCustomerFeeBearer()) {
+    /* disable Web payments API for fee_bearer and OTM for now */
+    if (isCustomerFeeBearer() || isOtm) {
       return Promise.reject();
     }
 
@@ -185,8 +253,9 @@
   $: shouldShowCollect = availableFlows.collect;
   $: shouldShowOmnichannel = availableFlows.omnichannel;
 
-  // Determine CTA visilibty when selectedToken changes, but only if session.tab is 'upi'
-  $: selectedToken, session.tab === 'upi' && determineCtaVisibility();
+  // Determine CTA visilibty when selectedToken changes, but only if session.tab is a upi based method
+  $: selectedToken,
+    _Arr.contains(['upi', 'upi_otm'], session.tab) && determineCtaVisibility();
 
   function setDefaultTokenValue() {
     const hasIntentFlow = availableFlows.intent || useWebPaymentsApi;
@@ -209,6 +278,7 @@
 
   $: {
     tokens = filterUPITokens(_Obj.getSafely($customer, 'tokens.items', []));
+    tokens = getAllowedPSPs[method](tokens);
     setDefaultTokenValue();
   }
 
@@ -238,14 +308,14 @@
 
     /* TODO: improve handling of `prefill.vpa` */
     if (session.get('prefill.vpa')) {
-      selectedApp = null;
+      selectedApp = undefined;
       vpa = session.get('prefill.vpa');
     }
 
     const downtimes = getDowntimes();
 
-    down = _Arr.contains(downtimes.low.methods, 'upi');
-    disabled = _Arr.contains(downtimes.high.methods, 'upi');
+    down = _Arr.contains(downtimes.low.methods, method);
+    disabled = _Arr.contains(downtimes.high.methods, method);
     qrIcon = session.themeMeta.icons.qr;
   });
 
@@ -263,6 +333,7 @@
   export function onShown() {
     setDefaultTokenValue();
     determineCtaVisibility();
+    sendIntentEvents();
   }
 
   export function getPayload() {
@@ -335,6 +406,16 @@
      */
     if (!data['_[flow]']) {
       data['_[flow]'] = 'directpay';
+    }
+
+    if (isOtm) {
+      data.upi = {
+        flow: 'collect',
+        type: 'otm',
+      };
+      if (data.vpa) {
+        data.upi.vpa = data.vpa;
+      }
     }
 
     data.method = 'upi';
@@ -445,9 +526,45 @@
       },
     });
   }
+
+  function sendIntentEvents() {
+    if (!intent) {
+      return;
+    }
+
+    const apps = getUPIIntentApps();
+
+    Analytics.track('upi:intent', {
+      type: AnalyticsTypes.RENDER,
+      data: {
+        count: {
+          eligible: apps.filtered.length,
+          all: apps.all.length,
+        },
+        list: {
+          eligible: _Arr.join(
+            _Arr.map(apps.filtered, function(app) {
+              return app.package_name;
+            }),
+            ','
+          ),
+          all: _Arr.join(
+            _Arr.map(apps.all, function(app) {
+              return app.package_name;
+            }),
+            ','
+          ),
+        },
+      },
+    });
+  }
 </script>
 
 <style>
+  strong {
+    font-weight: bolder;
+  }
+
   .legend {
     margin-top: 10px;
     padding: 12px 0 8px 12px;
@@ -492,7 +609,7 @@
   }
 </style>
 
-<Tab method="upi" pad={false}>
+<Tab {method} {down} pad={false}>
   <Screen>
     <div>
 
@@ -510,7 +627,8 @@
       {/if}
 
       {#if useWebPaymentsApi}
-        <div class="legend left">Pay using Gpay App</div>
+        <!-- LABEL: Pay using Gpay App -->
+        <div class="legend left">{$t(UPI_GPAY_BLOCK_HEADING)}</div>
         <div class="border-list">
           <SlottedRadioOption
             name="google_pay_web"
@@ -519,7 +637,8 @@
               selectedToken = 'gpay';
               session.preSubmit();
             }}>
-            <div slot="title">Google Pay</div>
+            <!-- LABEL: Google Pay -->
+            <div slot="title">{$t(GPAY_WEB_API_TITLE)}</div>
             <i slot="icon">
               <Icon icon={session.themeMeta.icons.gpay} />
             </i>
@@ -528,20 +647,20 @@
       {/if}
 
       {#if shouldShowCollect}
-        <div class="legend left">Pay using UPI ID</div>
+        <!-- LABEL: Pay using UPI ID -->
+        <div class="legend left">{$t(UPI_COLLECT_BLOCK_HEADING)}</div>
         <div class="border-list" id="upi-collect-list">
           {#if intent}
             <ListHeader>
               <i slot="icon">
                 <Icon icon={getMiscIcon('receive')} />
               </i>
-              <div slot="subtitle">
-                You will receive a payment request on your UPI app
-              </div>
+              <!-- LABEL: You will receive a payment request on your UPI app -->
+              <div slot="subtitle">{$t(UPI_COLLECT_BLOCK_SUBHEADING)}</div>
             </ListHeader>
           {/if}
 
-          {#each tokens as app, i}
+          {#each tokens as app, i (app.id)}
             <SlottedRadioOption
               name="payment_type"
               ellipsis
@@ -557,6 +676,7 @@
             </SlottedRadioOption>
           {/each}
           <AddANewVpa
+            paymentMethod={method}
             on:click={() => {
               onUpiAppSelection({ detail: { id: 'new' } });
             }}
@@ -582,27 +702,42 @@
       {/if}
 
       {#if shouldShowQr}
-        <div class="legend left">Pay using QR Code</div>
+        <!-- LABEL: Pay using QR Code -->
+        <div class="legend left">{$t(QR_BLOCK_HEADING)}</div>
         <div class="options" id="showQr">
           <NextOption
             icon={qrIcon}
             tabindex="0"
             attributes={{ role: 'button', 'aria-label': 'Show QR Code - Scan the QR code using your UPI app' }}
             on:select={selectQrMethod}>
-            <div>Show QR Code</div>
-            <div class="desc">Scan the QR code using your UPI app</div>
+            <!-- LABEL: Show QR Code -->
+            <div>{$t(SHOW_QR_CODE)}</div>
+            <!-- LABEL: Scan the QR code using your UPI app -->
+            <div class="desc">{$t(SCAN_QR_CODE)}</div>
           </NextOption>
         </div>
       {/if}
     </div>
 
-    <Bottom tab="upi">
+    <Bottom>
       {#if down || disabled}
         <DowntimeCallout severe={disabled}>
-          <strong>UPI</strong>
-          is experiencing low success rates.
+          <!-- LABEL: UPI is experiencing low success rates. -->
+          <FormattedText text={$t(UPI_DOWNTIME_TEXT)} />
         </DowntimeCallout>
       {/if}
+      {#if isOtm}
+        <Callout classes={['downtime-callout']} showIcon={true}>
+          <strong>{session.formatAmountWithCurrency(getAmount())}</strong>
+          will be blocked on your account by clicking pay. Your account will be
+          charged {getName() ? 'by ' + getName() : ''} between
+          <strong>{toShortFormat(otmStartDate)}</strong>
+          to
+          <strong>{toShortFormat(otmEndDate)}</strong>
+          .
+        </Callout>
+      {/if}
+
     </Bottom>
   </Screen>
 </Tab>

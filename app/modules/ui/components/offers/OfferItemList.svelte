@@ -1,6 +1,15 @@
 <script>
   import { appliedOffer } from 'checkoutstore/offers';
 
+  // i18n
+  import { t } from 'svelte-i18n';
+
+  import {
+    NO_COST_EMI,
+    CASHBACK_DETAIL,
+    REMOVE_ACTION,
+  } from 'ui/labels/offers';
+
   export let selected;
   export let offers;
   export let removeOffer;
@@ -63,7 +72,7 @@
 </style>
 
 <div role="list">
-  {#each offers as offer}
+  {#each offers as offer (offer.id)}
     <div
       role="listitem"
       class="offer-item"
@@ -71,20 +80,21 @@
       on:click={() => selectOffer(offer)}>
       {offer.name}
       {#if offer.emi_subvention}
-        <div class="badge">No Cost EMI</div>
+        <!-- LABEL: No Cost EMI -->
+        <div class="badge">{$t(NO_COST_EMI)}</div>
       {/if}
       {#if selected === offer}
         <div class="checkbox" />
         <div class="offer-detail">{getOfferDescription(offer)}</div>
         {#if offer.type === 'deferred'}
-          <div class="offer-detail">
-            Cashback would be credited to source mode of payment.
-          </div>
+          <!-- LABEL: Cashback would be credited to source mode of payment. -->
+          <div class="offer-detail">{$t(CASHBACK_DETAIL)}</div>
         {/if}
       {/if}
       {#if $appliedOffer === offer}
+        <!-- LABEL: Remove Offer -->
         <div class="text-uppercase remove-offer" on:click={removeOffer}>
-          Remove Offer
+          {$t(REMOVE_ACTION)}
         </div>
       {/if}
     </div>

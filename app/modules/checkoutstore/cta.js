@@ -1,18 +1,40 @@
-import { writable } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 import { getSession } from 'sessionmanager';
 import { displayAmount } from 'common/currency';
-import { TAB_TITLES } from 'common/constants';
 import { isCardValidForOffer } from 'checkoutstore/offers';
+import { CtaViews } from 'ui/labels/cta';
 
-export const cta = writable('');
+import { locale } from 'svelte-i18n';
+import { formatTemplateWithLocale } from 'i18n';
 
-cta.subscribe(text => {
-  const span = _Doc.querySelector('#footer > span');
-
-  if (span) {
-    _El.setContents(span, text);
-  }
+export const ctaInfo = writable({
+  view: '',
+  data: {},
 });
+
+export const cta = derived([ctaInfo, locale], ([$ctaInfo, $locale]) => {
+  const { view, data } = $ctaInfo;
+  if (!view) {
+    return '';
+  }
+  const label = `cta.${view}`;
+  return formatTemplateWithLocale(label, data, $locale);
+});
+
+export function init() {
+  initSuscription();
+  setAppropriateCtaText();
+}
+
+function initSuscription() {
+  cta.subscribe(text => {
+    const span = _Doc.querySelector('#footer > span');
+
+    if (span) {
+      _El.setContents(span, text);
+    }
+  });
+}
 
 let withoutOffer = false;
 isCardValidForOffer.subscribe(value => {
@@ -24,8 +46,73 @@ export function getStore() {
   return cta;
 }
 
-export function updateCta(text) {
-  cta.set(text);
+/**
+ * Sets the view to be shown in the CTA
+ * @param {string} view the view
+ * @param {boolean} show whether to make CTA visible or not
+ * @param {Object} data
+ */
+function setView(view, show = false, data = {}) {
+  ctaInfo.set({ view, data });
+  if (show) {
+    showCta();
+  }
+}
+
+export function showAmount(amount) {
+  setView(CtaViews.AMOUNT, true, { amount });
+}
+
+export function showContinue() {
+  setView(CtaViews.CONTINUE, true);
+}
+
+export function showSubmit() {
+  setView(CtaViews.SUBMIT, true);
+}
+
+export function showProceed() {
+  setView(CtaViews.PROCEED, true);
+}
+
+export function showNext() {
+  setView(CtaViews.NEXT, true);
+}
+
+export function showPayViaSingleMethod(method) {
+  setView(CtaViews.PAY_SINGLE_METHOD, true, { method });
+}
+
+export function showAuthenticate() {
+  setView(CtaViews.AUTHENTICATE, true);
+}
+
+export function showViewEmiPlans() {
+  setView(CtaViews.VIEW_EMI_PLANS, true);
+}
+
+export function showSelectEmiPlan() {
+  setView(CtaViews.SELECT_EMI_PLAN, true);
+}
+
+export function showEnterCardDetails() {
+  setView(CtaViews.ENTER_CARD_DETAILS, true);
+}
+
+export function showConfirmAccount() {
+  setView(CtaViews.CONFIRM_ACCOUNT, true);
+}
+
+export function showVerify() {
+  setView(CtaViews.VERIFY, true);
+}
+
+export function showPayWithoutOffer() {
+  setView(CtaViews.PAY_WITHOUT_OFFER, true);
+}
+
+export function showUploadNachForm() {
+  setView(CtaViews.UPLOAD_NACH_FORM, true);
 }
 
 /**
@@ -36,11 +123,13 @@ export function showAmountInCta() {
   const session = getSession();
 
   if (!session.get('amount')) {
-    updateCta('Authenticate');
+    setView(CtaViews.AUTHENTICATE, false);
   } else {
     const offer = session.getAppliedOffer();
     const amount = (offer && offer.amount) || session.get('amount');
-    updateCta('PAY ' + displayAmount(session.r, amount));
+    setView(CtaViews.AMOUNT, false, {
+      amount: displayAmount(session.r, amount),
+    });
   }
 }
 
@@ -62,7 +151,7 @@ export function setAppropriateCtaText() {
     }
   } else {
     if (withoutOffer && (tab === 'card' || tab === 'emi')) {
-      updateCta('Pay Without Offer');
+      setView(CtaViews.PAY_WITHOUT_OFFER);
     } else {
       showAmountInCta();
     }
@@ -96,20 +185,6 @@ export function isCtaShown() {
   const session = getSession();
 
   return _El.hasClass(session.body[0], 'sub');
-}
-
-/**
- * Updates the CTA with provided text
- * and shows it.
- * @param {string} text
- */
-export function showCtaWithText(text) {
-  if (!text) {
-    return;
-  }
-
-  updateCta(text);
-  showCta();
 }
 
 /**

@@ -16,7 +16,11 @@
 
   import { customer } from 'checkoutstore/customer';
 
-  import { showCtaWithText, showCtaWithDefaultText } from 'checkoutstore/cta';
+  import { showAmount, showCtaWithDefaultText } from 'checkoutstore/cta';
+
+  // i18n
+  import { t } from 'svelte-i18n';
+  import { SEARCH_PLACEHOLDER, SEARCH_TITLE, SEARCH_ALL } from 'ui/labels/dcc';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -161,7 +165,7 @@
 
   function updateAmountInHeaderAndCTA(displayAmount) {
     if (displayAmount) {
-      showCtaWithText('PAY ' + displayAmount);
+      showAmount(displayAmount);
       getSession().setRawAmountInHeader(displayAmount);
     } else {
       showCtaWithDefaultText();
@@ -217,6 +221,7 @@
       return _Obj.extend(
         {
           currency,
+          _key: currency,
         },
         rest
       );
@@ -289,7 +294,7 @@
         {#if selectedCurrencyInDisplay}
           <div class="default-currencies">
             <Stack horizonal>
-              {#each displayCurrencies as [code, config]}
+              {#each displayCurrencies as [code, config] (code)}
                 <Radio
                   name="dcc_currency"
                   label={code}
@@ -317,15 +322,21 @@
         {#if selectedCurrencyInDisplay}More{:else}Change{/if}
         <span class="arrow">&#xe604;</span>
       </div>
+
+      <!-- LABEL: Select currency to pay -->
+      <!-- LABEL: Search for currency -->
+      <!-- LABEL: All currencies -->
       <SearchModal
-        title="Select Currency to Pay"
-        placeholder="Search for currency or code"
+        identifier="dcc_currency_select"
+        title={$t(SEARCH_TITLE)}
+        placeholder={$t(SEARCH_PLACEHOLDER)}
+        all={$t(SEARCH_ALL)}
         autocomplete="transaction-currency"
         items={sortedCurrencies}
         keys={['currency', 'name', 'symbol']}
         component={CurrencySearchItem}
-        visible={false}
         bind:this={searchModal}
+        on:close={() => searchModal.close()}
         on:select={({ detail }) => onSelect(detail)} />
     </Stack>
   {/if}

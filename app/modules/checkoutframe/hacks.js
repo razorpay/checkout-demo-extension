@@ -227,4 +227,9 @@ export function initPostRenderHacks() {
   decreaseWebViewHeightForAndroidTablets();
   reduceUnneededPaddingIfLandscape();
   autoScrollHeaderIfLandscape();
+
+  // overflow: auto; is set on #body as a fix for firefox, which is breaking Checkout on iOS Safari. This is a temporary ~fix~ hack.
+  if (UserAgent.iOS && UserAgent.isMobile()) {
+    _Doc.querySelector('#body').style.overflow = 'unset';
+  }
 }

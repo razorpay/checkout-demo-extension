@@ -9,6 +9,9 @@
   export let subtitle = null; // Override: subtitle. Picked from method if not overridden.
   export let downtime = true; // Should we consider downtime?
 
+  // Store
+  import { locale } from 'svelte-i18n';
+
   // UI imports
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import Icon from 'ui/elements/Icon.svelte';
@@ -21,6 +24,8 @@
     getMethodDescription,
   } from 'checkoutframe/paymentmethods';
   import { getDowntimes } from 'checkoutstore';
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
 
   const session = getSession();
   const dispatch = createEventDispatcher();
@@ -37,35 +42,55 @@
     }
   }
 
-  // Items to display
-  const _title = title || getMethodNameForPaymentOption(method, { session });
-
   const icons = session.themeMeta.icons;
-  let _icon;
-  if (icon) {
-    _icon = icon;
-  } else {
-    if (/card$/.test(method)) {
-      _icon = icons['card'];
+  const _icon = getIconForDisplay();
+
+  let _subtitle;
+  $: _subtitle = getSubtitleForDisplay($locale);
+
+  let _title;
+  $: _title = getTitleForDisplay($locale);
+
+  function getSubtitleForDisplay(locale) {
+    if (subtitle) {
+      return subtitle;
+    } else if (down) {
+      return getMethodDowntimeDescription(method, locale);
     } else {
-      _icon = icons[method];
+      return getMethodDescription(method, locale);
     }
   }
 
-  let _subtitle;
-  if (subtitle) {
-    _subtitle = subtitle;
-  } else if (down) {
-    _subtitle = getMethodDowntimeDescription(method);
-  } else {
-    _subtitle = getMethodDescription(method, { session });
+  function getTitleForDisplay(locale) {
+    return title || getMethodNameForPaymentOption(method, locale);
   }
 
-  function select(event) {
-    dispatch('select', {
-      down,
-      method,
+  function getIconForDisplay() {
+    if (icon) {
+      return icon;
+    } else {
+      if (/card$/.test(method)) {
+        return icons['card'];
+      } else {
+        return icons[method];
+      }
+    }
+  }
+
+  function select() {
+    Analytics.track('payment_method:select', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        method,
+        down,
+      },
     });
+
+    if (down) {
+      return;
+    }
+
+    dispatch('select');
   }
 </script>
 
