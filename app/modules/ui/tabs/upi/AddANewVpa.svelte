@@ -14,7 +14,7 @@
   import { getSession } from 'sessionmanager';
   import { hasFeature, getPrefilledVPA } from 'checkoutstore';
   import { VPA_REGEX } from 'common/constants';
-  import { getAnimationDuration } from 'svelte-utils';
+  import { getAnimationOptions } from 'svelte-utils';
 
   import {
     UPI_COLLECT_NEW_VPA_HELP,
@@ -165,7 +165,7 @@
     {#if selected}
       <div
         id={'user-new-vpa-container-' + paymentMethod}
-        transition:slide={{ duration: getAnimationDuration(200) }}>
+        transition:slide={getAnimationOptions({ duration: 200 })}>
         <!-- LABEL: Please enter a valid VPA of the form username@bank -->
         <!-- LABEL: Enter your UPI ID -->
         <Field

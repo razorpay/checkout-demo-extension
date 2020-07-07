@@ -49,7 +49,7 @@
   } from 'common/bank';
   import { scrollIntoView } from 'lib/utils';
   import { getSession } from 'sessionmanager';
-  import { getAnimationDuration } from 'svelte-utils';
+  import { getAnimationOptions } from 'svelte-utils';
 
   // Props
   export let banks;
@@ -314,7 +314,7 @@
         <div
           class="pad ref-radiocontainer"
           bind:this={radioContainer}
-          transition:fade={{ duration: getAnimationDuration(100) }}>
+          transition:fade={getAnimationOptions({ duration: 100 })}>
           <!-- LABEL: Complete Payment Using -->
           <label>{$t(SELECTION_RADIO_TEXT)}</label>
           <div class="input-radio">

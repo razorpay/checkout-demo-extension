@@ -108,7 +108,7 @@
   import { isElementCompletelyVisibleInTab } from 'lib/utils';
 
   import { INDIA_COUNTRY_CODE } from 'common/constants';
-  import { getAnimationDuration } from 'svelte-utils';
+  import { getAnimationOptions } from 'svelte-utils';
 
   import { setBlocks } from 'ui/tabs/home/instruments';
 
@@ -746,13 +746,13 @@
       {#if view === 'methods'}
         <div
           class="solidbg"
-          in:slide={{ duration: getAnimationDuration(400) }}
-          out:fly={{ duration: getAnimationDuration(200), y: 80 }}>
+          in:slide={getAnimationOptions({ duration: 400 })}
+          out:fly={getAnimationOptions({ duration: 200, y: 80 })}>
           {#if showUserDetailsStrip || isPartialPayment}
             <div
               use:touchfix
               class="details-container border-list"
-              in:fly={{ duration: getAnimationDuration(400), y: 80 }}>
+              in:fly={getAnimationOptions({ duration: 400, y: 80 })}>
               {#if showUserDetailsStrip}
                 <SlottedOption on:click={editUserDetails} id="user-details">
                   <i slot="icon">
@@ -811,7 +811,7 @@
 
           <div
             class="home-methods"
-            in:fly={{ delay: getAnimationDuration(100), duration: getAnimationDuration(400), y: 80 }}>
+            in:fly={getAnimationOptions({ delay: 100, duration: 400, y: 80 })}>
             <NewMethodsList
               on:selectInstrument={onSelectInstrument}
               on:submit={attemptPayment} />
@@ -842,7 +842,7 @@
       {#if showSecuredByMessage}
         <div
           class="secured-message"
-          out:slide={{ duration: getAnimationDuration(100) }}>
+          out:slide={getAnimationOptions({ duration: 100 })}>
           <i>
             <svg
               width="16"

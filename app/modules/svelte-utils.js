@@ -7,7 +7,7 @@ import { getSession } from 'sessionmanager';
  *
  * @returns {number}
  */
-export function getAnimationDuration(duration) {
+function getAnimationDuration(duration) {
   const session = getSession();
   const disableAnimations = session && !session.get('modal.animation');
 
@@ -16,4 +16,24 @@ export function getAnimationDuration(duration) {
   } else {
     return duration;
   }
+}
+
+/**
+ * Returns computed animation options
+ * @param {Object} animationOptions
+ *
+ * @returns {Object}
+ */
+export function getAnimationOptions(animationOptions) {
+  const durations = ['duration', 'delay'];
+
+  _Arr.loop(durations, property => {
+    if (!_.isUndefined(animationOptions[property])) {
+      animationOptions[property] = getAnimationDuration(
+        animationOptions[property]
+      );
+    }
+  });
+
+  return animationOptions;
 }

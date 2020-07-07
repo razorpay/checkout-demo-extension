@@ -15,7 +15,7 @@
 
   // Utils
   import { getSession } from 'sessionmanager';
-  import { getAnimationDuration } from 'svelte-utils';
+  import { getAnimationOptions } from 'svelte-utils';
 
   const session = getSession();
   const dispatch = createEventDispatcher();
@@ -139,7 +139,7 @@
   <div
     id="topbar"
     class="theme-secondary-highlight"
-    transition:fly={{ y: -46, duration: getAnimationDuration(200) }}>
+    transition:fly={getAnimationOptions({ y: -46, duration: 200 })}>
     {#if $isContactPresent && userDetailsShown}
       <div
         id="top-right"

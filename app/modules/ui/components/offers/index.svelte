@@ -3,7 +3,7 @@
   import { fly } from 'svelte/transition';
   import { formatAmountWithSymbol } from 'common/currency';
   import { getCurrency } from 'checkoutstore';
-  import { getAnimationDuration } from 'svelte-utils';
+  import { getAnimationOptions } from 'svelte-utils';
 
   import {
     getOffersForTab,
@@ -397,7 +397,7 @@
   {#if listActive}
     <main
       class="list"
-      transition:fly={{ y: 40, duration: getAnimationDuration(200) }}>
+      transition:fly={getAnimationOptions({ y: 40, duration: 200 })}>
       <header class="close-offerlist" on:click={hideList}>
         <!-- LABEL: Select an offer -->
         {$t(SELECT_OFFER_HEADER)}

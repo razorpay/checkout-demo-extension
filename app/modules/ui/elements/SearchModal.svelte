@@ -20,7 +20,7 @@
   import { isMobile } from 'common/useragent';
   import Track from 'tracker';
   import { isElementCompletelyVisibleInContainer } from 'lib/utils';
-  import { getAnimationDuration } from 'svelte-utils';
+  import { getAnimationOptions } from 'svelte-utils';
 
   // i18n
   import { locale } from 'svelte-i18n';
@@ -430,12 +430,12 @@
       <div
         class="search-curtain-bg"
         on:click={() => dispatch('close')}
-        in:fade={{ duration: getAnimationDuration(200) }}
-        out:fade={{ duration: getAnimationDuration(200) }} />
+        in:fade={getAnimationOptions({ duration: 200 })}
+        out:fade={getAnimationOptions({ duration: 200 })} />
       <div
         class="search-box"
-        in:fly={{ duration: getAnimationDuration(200), y: -100 }}
-        out:fade={{ duration: getAnimationDuration(200) }}>
+        in:fly={getAnimationOptions({ duration: 200, y: -100 })}
+        out:fade={getAnimationOptions({ duration: 200 })}>
         <Stack vertical>
           <form on:submit|preventDefault={submitHandler} class="search-field">
             <div class="icon">
