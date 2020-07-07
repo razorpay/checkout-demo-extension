@@ -4109,6 +4109,21 @@ Session.prototype = {
       }
     }
 
+    if (data.method === 'wallet') {
+      /**
+       * Wallets might need to go through intent flow too
+       * TODO: Add a feature check here
+       */
+      var shouldTurnWalletToIntent = discreet.Wallet.shouldTurnWalletToIntent(
+        data.wallet,
+        this.upi_intents_data
+      );
+
+      if (shouldTurnWalletToIntent) {
+        data.upi_app = discreet.Wallet.getPackageNameForWallet(data.wallet);
+      }
+    }
+
     if (data.method === 'paypal') {
       data.method = 'wallet';
       data.wallet = 'paypal';
@@ -4284,6 +4299,7 @@ Session.prototype = {
 
     var wallet = data.wallet;
     var walletObj;
+
     if (data.method === 'wallet') {
       walletObj = freqWallets[wallet];
 
