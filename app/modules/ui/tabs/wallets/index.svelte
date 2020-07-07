@@ -16,6 +16,7 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import * as WalletsData from 'common/wallet';
+  import { getAnimationOptions } from 'svelte-utils';
 
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import Icon from 'ui/elements/Icon.svelte';
@@ -160,7 +161,7 @@
       </div>
       <div slot="body">
         {#if selectedWallet === wallet.code}
-          <div transition:slide={{ duration: 200 }}>
+          <div transition:slide={getAnimationOptions({ duration: 200 })}>
             {#if getApplicableOffer(wallet.code)}
               <span class="offer">{getApplicableOffer(wallet.code).name}</span>
               <div class="offer-info">
