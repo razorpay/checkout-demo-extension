@@ -9,6 +9,107 @@ const cancelError = _Obj.stringify({
   },
 });
 
+const makeTrackingScript = ({ checkout_id, live }) => {
+  if (!live) {
+    return '';
+  }
+
+  return `
+<script>
+var events = {
+  page: 'checkout_popup',
+  props: {
+    checkout_id: '${checkout_id}',
+  },
+  load: true,
+  unload: true
+};
+(function(window) {
+  window.track = Boolean; // No-op
+  try {
+    if (typeof window.events !== 'object') {
+      return;
+    }
+
+    // Default properties to be sent with every event payload
+    var props = window.events.props;
+
+    var config = window.events;
+
+    var url = 'https://lumberjack.razorpay.com/v1/track';
+    var key = 'MC40OTMwNzgyMDM3MDgwNjI3Nw9YnGzW';
+    var useBeacon = typeof navigator.sendBeacon === 'function';
+    var renderTime = Date.now();
+    var addons = [
+      {
+        name: 'ua_parser',
+        input_key: 'user_agent',
+        output_key: 'user_agent_parsed'
+      }
+    ];
+    var xhr;
+
+    function copyKeys(dest, src) {
+      if (!dest || !src) return;
+      Object.keys(src).forEach(function (key) {
+        dest[key] = src[key];
+      });
+      return dest;
+    }
+
+    function track(event, properties) {
+      properties = properties || {};
+      properties.beacon = useBeacon;
+      properties.time_since_render = Date.now() - renderTime;
+      properties.url = location.href;
+
+      // Copy default properties
+      copyKeys(properties, props);
+
+      var payload = {
+        addons: addons,
+        events: [{
+          event: config.page + ':' + event,
+          properties: properties,
+          timestamp: Date.now()
+        }]
+      };
+
+      var data = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(payload)))));
+      var body = JSON.stringify({ key: key, data: data });
+
+      if (useBeacon) {
+        navigator.sendBeacon(url, body);
+      } else {
+        xhr = new XMLHttpRequest();
+        xhr.open('post', url, true);
+        // Content-type doesn't need to be set, lumberjack parses JSON automatically.
+        xhr.send(body);
+      }
+    }
+
+    track('load');
+
+    window.addEventListener('beforeunload', function () {
+      track('unload');
+    });
+
+    // This is only work if the error occurs after this.
+    window.addEventListener('error', function(event) {
+      var properties = {
+        message: event.message,
+        line: event.line,
+        col: event.col,
+        stack: event.error && event.error.stack
+      };
+      track('error', properties);
+    });
+  } catch (e) {}
+  window.track = track;
+})(window);
+</script>`;
+};
+
 export default function popupTemplate(_) {
   var get = _.r.get;
   var method = _.data && _.data.method === 'wallet' ? 'wallet' : 'bank';
@@ -90,6 +191,7 @@ setTimeout(function(){
 },1e4)
 </script>
 <form></form>
+${makeTrackingScript({ live: _.r.isLiveMode(), checkout_id: _.r.id })}
 </body>
 </html>`;
 }
