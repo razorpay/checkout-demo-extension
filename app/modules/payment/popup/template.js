@@ -37,7 +37,7 @@ var events = {
     var config = window.events;
 
     var url = 'https://lumberjack.razorpay.com/v1/track';
-    var key = 'MC40OTMwNzgyMDM3MDgwNjI3Nw9YnGzW';
+    var key = 'ZmY5N2M0YzVkN2JiYzkyMWM1ZmVmYWJk';
     var useBeacon = typeof navigator.sendBeacon === 'function';
     var renderTime = Date.now();
     var addons = [
