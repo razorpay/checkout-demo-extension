@@ -178,6 +178,16 @@
     if (!filteredBanks[$selectedBank]) {
       $selectedBank = '';
     }
+
+    /**
+     * If the method is netbanking and if there's only
+     * one bank available, select it automatically to reduce a user click.
+     * Of course, do this only when there's nothing preselected.
+     */
+    const banksList = _Obj.keys(filteredBanks);
+    if (method === 'netbanking' && !$selectedBank && banksList.length === 1) {
+      $selectedBank = banksList[0];
+    }
   }
 
   $: showCorporateRadio =

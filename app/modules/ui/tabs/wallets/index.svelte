@@ -47,6 +47,15 @@
     ) {
       selectedWallet = null;
     }
+
+    /**
+     * If there's only one wallet available,
+     * select it automatically to reduce a user click.
+     * Of course, do this only when there's nothing preselected.
+     */
+    if (!selectedWallet && filteredWallets.length === 1) {
+      onWalletSelection(filteredWallets[0].code);
+    }
   }
 
   /**
