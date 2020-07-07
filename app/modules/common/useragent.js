@@ -18,6 +18,18 @@ export const Safari =
 export const firefox = check(/firefox/);
 export const chrome = check(/Chrome/) && checkVendor(/Google Inc/);
 
+export const Instagram = check(/Instagram/);
+
+/**
+ * Facebook User-Agents:
+ * src: https://developers.facebook.com/docs/sharing/best-practices#crawl
+ *
+ * Check for a HTTP User-Agent with the value FB_IAB/FB4A for Android and FBAN/FBIOS for iOS.
+ */
+const Facebook_Android = check(/FB_IAB\/FB4A/);
+const Facebook_iOS = check(/FBAN\/FBIOS/);
+export const Facebook = Facebook_Android || Facebook_iOS;
+
 // android webview: /; wv\) |Gecko\) Version\/[^ ]+ Chrome/
 // ios non safari: ua_iOS && !check(/Safari/)
 // note that chrome-ios also contains "Safari" in ua, but it is covered through "CriOS"
