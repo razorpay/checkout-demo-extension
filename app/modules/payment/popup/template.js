@@ -102,7 +102,7 @@ var events = {
         col: event.col,
         stack: event.error && event.error.stack
       };
-      track('error', properties);
+      track('js_error', properties);
     });
   } catch (e) {}
   window.track = track;
