@@ -33,7 +33,6 @@ import * as CountryCodesUtil from 'common/countrycodes';
 
 /* Required for merchant.js migration */
 import * as Constants from 'common/constants';
-import * as Bank from 'common/bank';
 import * as Card from 'common/card';
 import * as Wallet from 'common/wallet';
 import * as CardlessEmi from 'common/cardlessemi';
@@ -70,7 +69,7 @@ import HomeTab from 'ui/tabs/home/index.svelte';
 import netbankingTab from 'checkoutframe/components/netbanking';
 import EmandateTab from 'ui/tabs/emandate/index.svelte';
 import NachScreen from 'ui/tabs/nach/index.svelte';
-import CardTab from 'ui/tabs/card/index.svelte';
+import * as cardTab from 'checkoutframe/components/card';
 import WalletTab from 'ui/tabs/wallets/index.svelte';
 import TopBar from 'ui/components/Topbar.svelte';
 
@@ -119,7 +118,6 @@ export default {
   es6components,
 
   Constants,
-  Bank,
   Card,
   Wallet,
   CardlessEmi,
@@ -183,7 +181,7 @@ export default {
   netbankingTab,
   EmandateTab,
   NachScreen,
-  CardTab,
+  cardTab,
 
   Hacks,
   storeGetter,
