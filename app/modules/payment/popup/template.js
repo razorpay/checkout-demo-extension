@@ -1,6 +1,7 @@
 import { displayAmount, getConvertedAmount } from 'common/currency';
 import css from './popup.styl';
 import { sanitizeHtmlEntities } from 'lib/utils';
+import Track from 'tracker';
 
 const cancelError = _Obj.stringify({
   error: {
@@ -9,7 +10,7 @@ const cancelError = _Obj.stringify({
   },
 });
 
-const makeTrackingScript = ({ checkout_id, live }) => {
+const makeTrackingScript = ({ checkout_id, live, library }) => {
   if (!live) {
     return '';
   }
@@ -20,6 +21,7 @@ var events = {
   page: 'checkout_popup',
   props: {
     checkout_id: '${checkout_id}',
+    library: ${library},
   },
   load: true,
   unload: true
@@ -191,7 +193,11 @@ setTimeout(function(){
 },1e4)
 </script>
 <form></form>
-${makeTrackingScript({ live: _.r.isLiveMode(), checkout_id: _.r.id })}
+${makeTrackingScript({
+  live: _.r.isLiveMode(),
+  checkout_id: _.r.id,
+  library: Track.props.library,
+})}
 </body>
 </html>`;
 }
