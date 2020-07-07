@@ -28,7 +28,16 @@ export const Instagram = check(/Instagram/);
  */
 const Facebook_Android = check(/FB_IAB\/FB4A/);
 const Facebook_iOS = check(/FBAN\/FBIOS/);
-export const Facebook = Facebook_Android || Facebook_iOS;
+const Facebook = Facebook_Android || Facebook_iOS;
+
+/**
+ * Checks if this is a Facebook WebView.
+ * Instagram is owned by Facebook so
+ * this holds true for Instagram too.
+ */
+export function isFacebookWebView() {
+  return Facebook || Instagram;
+}
 
 // android webview: /; wv\) |Gecko\) Version\/[^ ]+ Chrome/
 // ios non safari: ua_iOS && !check(/Safari/)
