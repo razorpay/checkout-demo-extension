@@ -983,6 +983,7 @@ Session.prototype = {
 
     discreet.initI18n();
     this.setExperiments();
+    this.improviseModalOptions();
     this.getEl();
     this.setFormatting();
     this.improvisePaymentOptions();
@@ -1610,6 +1611,22 @@ Session.prototype = {
           Razorpay.sendMessage({ event: 'hidden' });
         }, this),
       });
+    }
+  },
+
+  improviseModalOptions: function() {
+    /**
+     * We want to disable animations on IRCTC WebView.
+     * IRCTC disables h/w acceleration on their WebViews
+     * which makes our animations stutter.
+     *
+     * There isn't a reliable way to detect h/w acceleration
+     * state in the browser, so we're doing this based on merchants.
+     *
+     * TODO: Move to Checkout feature
+     */
+    if (Store.isIRCTC() && discreet.UserAgent.AndroidWebView) {
+      this.set('modal.animation', false);
     }
   },
 

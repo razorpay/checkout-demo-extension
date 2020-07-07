@@ -17,6 +17,7 @@ export const Safari =
   check(/^((?!chrome|android).)*safari/i) || checkVendor(/Apple/);
 export const firefox = check(/firefox/);
 export const chrome = check(/Chrome/) && checkVendor(/Google Inc/);
+export const AndroidWebView = check(/; wv\) |Gecko\) Version\/[^ ]+ Chrome/);
 
 // android webview: /; wv\) |Gecko\) Version\/[^ ]+ Chrome/
 // ios non safari: ua_iOS && !check(/Safari/)
