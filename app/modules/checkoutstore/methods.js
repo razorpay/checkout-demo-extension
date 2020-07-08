@@ -32,7 +32,7 @@ import { get as storeGetter } from 'svelte/store';
 import { sequence as SequenceStore } from 'checkoutstore/screens/home';
 
 function isNoRedirectFacebookWebViewSession() {
-  return isFacebookWebView() && Boolean(getCallbackUrl());
+  return isFacebookWebView() && !getCallbackUrl();
 }
 
 const DEBIT_EMI_BANKS = ['HDFC_DC'];
