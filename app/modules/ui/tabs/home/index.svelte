@@ -112,6 +112,9 @@
 
   import { setBlocks } from 'ui/tabs/home/instruments';
 
+  import { update as updateContactStorage } from 'checkoutframe/contact-storage';
+  import { isMobile } from 'common/useragent';
+
   const cardOffer = getCardOffer();
   const session = getSession();
   const icons = session.themeMeta.icons;
@@ -523,8 +526,25 @@
     },
   });
 
+  function storeContactDetails() {
+    // Store only on mobile since Desktops can be shared b/w users
+    if (isMobile()) {
+      updateContactStorage({
+        contact: $contact,
+        email: $email,
+      });
+    }
+  }
+
   export function next() {
     Analytics.track('home:proceed');
+
+    /**
+     * - Store contact details only when the user has explicity clicked on the CTA
+     * - `next()` is not invoked if the merchant had prefilled the user's details
+     *    since the user would land directly on the methods view
+     */
+    storeContactDetails();
 
     // Multi TPV
     if (tpv) {
