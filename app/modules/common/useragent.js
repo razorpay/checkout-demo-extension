@@ -19,6 +19,27 @@ export const firefox = check(/firefox/);
 export const chrome = check(/Chrome/) && checkVendor(/Google Inc/);
 export const AndroidWebView = check(/; wv\) |Gecko\) Version\/[^ ]+ Chrome/);
 
+export const Instagram = check(/Instagram/);
+
+/**
+ * Facebook User-Agents:
+ * src: https://developers.facebook.com/docs/sharing/best-practices#crawl
+ *
+ * Check for a HTTP User-Agent with the value FB_IAB/FB4A for Android and FBAN/FBIOS for iOS.
+ */
+const Facebook_Android = check(/FB_IAB\/FB4A/);
+const Facebook_iOS = check(/FBAN\/FBIOS/);
+const Facebook = Facebook_Android || Facebook_iOS;
+
+/**
+ * Checks if this is a Facebook WebView.
+ * Instagram is owned by Facebook so
+ * this holds true for Instagram too.
+ */
+export function isFacebookWebView() {
+  return Facebook || Instagram;
+}
+
 // android webview: /; wv\) |Gecko\) Version\/[^ ]+ Chrome/
 // ios non safari: ua_iOS && !check(/Safari/)
 // note that chrome-ios also contains "Safari" in ua, but it is covered through "CriOS"
