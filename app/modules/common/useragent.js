@@ -45,8 +45,9 @@ export function isFacebookWebView() {
 // note that chrome-ios also contains "Safari" in ua, but it is covered through "CriOS"
 export const shouldRedirect =
   check(
-    /; wv\) |Gecko\) Version\/[^ ]+ Chrome|Windows Phone|Opera Mini|UCBrowser|FBAN|CriOS/
+    /; wv\) |Gecko\) Version\/[^ ]+ Chrome|Windows Phone|Opera Mini|UCBrowser|CriOS/
   ) ||
+  isFacebookWebView() ||
   // can't detect webview reliably
   iOS ||
   check(/Android 4/);
