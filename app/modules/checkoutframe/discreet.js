@@ -88,6 +88,7 @@ import * as NBHandlers from 'handlers/netbanking';
 
 import * as Instruments from 'configurability/instruments';
 import { getInstrumentMeta } from 'ui/tabs/home/instruments';
+import * as ContactStorage from 'checkoutframe/contact-storage';
 
 export default {
   RazorpayConfig,
@@ -198,5 +199,6 @@ export default {
   NBHandlers,
 
   initI18n,
+  ContactStorage,
   I18n,
 };

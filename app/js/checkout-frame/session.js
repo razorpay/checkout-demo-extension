@@ -127,41 +127,54 @@ function fillData(container, returnObj) {
  */
 function improvisePrefilledContact(session) {
   var prefilledContact = session.get('prefill.contact');
+  var prefilledEmail = session.get('prefill.email');
 
+  var storedUserDetails = discreet.ContactStorage.get();
+
+  // Pick details from storage if not given in prefill
   if (!prefilledContact) {
-    return;
+    prefilledContact = storedUserDetails.contact;
+    Analytics.setMeta('prefilledFromStorage.contact', true);
+  }
+  if (!prefilledEmail) {
+    prefilledEmail = storedUserDetails.email;
+    Analytics.setMeta('prefilledFromStorage.email', true);
   }
 
-  // We have some invalid charactes
-  if (!doesContactHaveValidCharacters(prefilledContact)) {
-    Analytics.track('prefill:invalid:chars', {
-      data: {
-        type: 'contact',
-        value: prefilledContact,
-      },
-    });
+  if (prefilledContact) {
+    // Do have invalid characters?
+    if (doesContactHaveValidCharacters(prefilledContact)) {
+      var formattedContact = discreet.CountryCodesUtil.findCountryCode(
+        prefilledContact
+      );
+      var newContact = '+' + formattedContact.code + formattedContact.phone;
 
-    return;
+      if (prefilledContact !== newContact) {
+        prefilledContact = newContact;
+
+        Analytics.setMeta('improvised.prefilledContact', true);
+
+        Analytics.track('prefill:improvise', {
+          data: {
+            type: 'contact',
+            from: prefilledContact,
+            to: newContact,
+          },
+        });
+      }
+    } else {
+      Analytics.track('prefill:invalid:chars', {
+        data: {
+          type: 'contact',
+          value: prefilledContact,
+        },
+      });
+    }
   }
 
-  var formattedContact = discreet.CountryCodesUtil.findCountryCode(
-    prefilledContact
-  );
-  var newContact = '+' + formattedContact.code + formattedContact.phone;
-
-  if (prefilledContact !== newContact) {
-    session.set('prefill.contact', newContact);
-
-    Analytics.setMeta('improvised.prefilledContact', true);
-
-    Analytics.track('prefill:improvise', {
-      data: {
-        type: 'contact',
-        from: prefilledContact,
-        to: newContact,
-      },
-    });
-  }
+  // Update prefills
+  session.set('prefill.contact', prefilledContact);
+  session.set('prefill.email', prefilledEmail);
 }
 
 function setEmiBank(data) {
@@ -704,7 +717,7 @@ Session.prototype = {
       classes.push('noimage');
     }
 
-    if (isIE) {
+    if (isIE || !getter('modal.animation')) {
       classes.push('noanim');
     }
 
@@ -983,6 +996,7 @@ Session.prototype = {
 
     discreet.initI18n();
     this.setExperiments();
+    this.improviseModalOptions();
     this.getEl();
     this.setFormatting();
     this.improvisePaymentOptions();
@@ -1610,6 +1624,22 @@ Session.prototype = {
           Razorpay.sendMessage({ event: 'hidden' });
         }, this),
       });
+    }
+  },
+
+  improviseModalOptions: function() {
+    /**
+     * We want to disable animations on IRCTC WebView.
+     * IRCTC disables h/w acceleration on their WebViews
+     * which makes our animations stutter.
+     *
+     * There isn't a reliable way to detect h/w acceleration
+     * state in the browser, so we're doing this based on merchants.
+     *
+     * TODO: Move to Checkout feature
+     */
+    if (Store.isIRCTC() && discreet.UserAgent.AndroidWebView) {
+      this.set('modal.animation', false);
     }
   },
 
@@ -4109,6 +4139,21 @@ Session.prototype = {
       }
     }
 
+    if (data.method === 'wallet') {
+      /**
+       * Wallets might need to go through intent flow too
+       * TODO: Add a feature check here
+       */
+      var shouldTurnWalletToIntent = discreet.Wallet.shouldTurnWalletToIntent(
+        data.wallet,
+        this.upi_intents_data
+      );
+
+      if (shouldTurnWalletToIntent) {
+        data.upi_app = discreet.Wallet.getPackageNameForWallet(data.wallet);
+      }
+    }
+
     if (data.method === 'paypal') {
       data.method = 'wallet';
       data.wallet = 'paypal';
@@ -4284,12 +4329,8 @@ Session.prototype = {
 
     var wallet = data.wallet;
     var walletObj;
+
     if (data.method === 'wallet') {
-      //If Phonepe is present in the preferred instruments the flow is set to intent.
-      if (selectedInstrument.wallets.includes('phonepe')) {
-        data['_[flow]'] = 'intent';
-      }
-      console.log(selectedInstrument);
       walletObj = freqWallets[wallet];
 
       if (!walletObj || walletObj.custom) {
