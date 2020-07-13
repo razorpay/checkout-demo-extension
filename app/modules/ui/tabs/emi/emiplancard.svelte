@@ -41,6 +41,7 @@
   let noCostEmi;
   let showInterest;
   let isBajajEmi;
+  let showEducation;
 
   let interestChargedByBank;
 
@@ -60,10 +61,6 @@
         plan.interest
       );
     }
-  }
-
-  $: {
-    isBajajEmi = bank === 'BAJAJ';
   }
 
   $: {
@@ -94,6 +91,9 @@
   $: formattedFinalAmount = session.formatAmountWithCurrency(
     plan.duration * amountPerMonth
   );
+
+  $: isBajajEmi = bank === 'BAJAJ';
+  $: showEducation = !isBajajEmi;
 
   function explain() {
     session.showNoCostExplainer(plan);
@@ -127,7 +127,7 @@
     {/if}
   </div>
   <div slot="detail">
-    {#if !isBajajEmi}
+    {#if showEducation}
       {#if noCostEmi}
         <ul class="nocost">
           <li>
