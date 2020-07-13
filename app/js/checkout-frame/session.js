@@ -40,6 +40,7 @@ var preferences,
   EmiStore = discreet.EmiStore,
   Cta = discreet.Cta,
   es6components = discreet.es6components,
+  cardTab = discreet.cardTab,
   NBHandlers = discreet.NBHandlers,
   Instruments = discreet.Instruments,
   I18n = discreet.I18n;
@@ -126,178 +127,58 @@ function fillData(container, returnObj) {
  */
 function improvisePrefilledContact(session) {
   var prefilledContact = session.get('prefill.contact');
+  var prefilledEmail = session.get('prefill.email');
 
+  var storedUserDetails = discreet.ContactStorage.get();
+
+  // Pick details from storage if not given in prefill
   if (!prefilledContact) {
-    return;
+    prefilledContact = storedUserDetails.contact;
+    Analytics.setMeta('prefilledFromStorage.contact', true);
+  }
+  if (!prefilledEmail) {
+    prefilledEmail = storedUserDetails.email;
+    Analytics.setMeta('prefilledFromStorage.email', true);
   }
 
-  // We have some invalid charactes
-  if (!doesContactHaveValidCharacters(prefilledContact)) {
-    Analytics.track('prefill:invalid:chars', {
-      data: {
-        type: 'contact',
-        value: prefilledContact,
-      },
-    });
+  if (prefilledContact) {
+    // Do have invalid characters?
+    if (doesContactHaveValidCharacters(prefilledContact)) {
+      var formattedContact = discreet.CountryCodesUtil.findCountryCode(
+        prefilledContact
+      );
+      var newContact = '+' + formattedContact.code + formattedContact.phone;
 
-    return;
-  }
+      if (prefilledContact !== newContact) {
+        prefilledContact = newContact;
 
-  var formattedContact = discreet.CountryCodesUtil.findCountryCode(
-    prefilledContact
-  );
-  var newContact = '+' + formattedContact.code + formattedContact.phone;
+        Analytics.setMeta('improvised.prefilledContact', true);
 
-  if (prefilledContact !== newContact) {
-    session.set('prefill.contact', newContact);
-
-    Analytics.setMeta('improvised.prefilledContact', true);
-
-    Analytics.track('prefill:improvise', {
-      data: {
-        type: 'contact',
-        from: prefilledContact,
-        to: newContact,
-      },
-    });
-  }
-}
-
-/**
- * Returns the cardType from payload
- *
- * @param {Object} payload
- * @param {Array} tokens
- *
- * @return {String} cardType
- */
-function getCardTypeFromPayload(payload, tokens) {
-  var cardType = '';
-
-  if (payload.token) {
-    if (tokens) {
-      tokens.forEach(function(t) {
-        if (t.token === payload.token) {
-          cardType = t.card.networkCode;
-        }
-      });
-    }
-  } else {
-    cardType = discreet.Card.getCardType(payload['card[number]']);
-  }
-
-  return cardType;
-}
-
-/**
- * Returns the issuer for EMI from Payload
- *
- * @param {Object} payload
- * @param {Array} tokens
- *
- * @return {String} issuer
- */
-function getIssuerForEmiFromPayload(payload, tokens) {
-  var issuer = '';
-
-  if (payload.token) {
-    if (tokens) {
-      tokens.forEach(function(t) {
-        if (t.token === payload.token) {
-          issuer = t.card.issuer;
-
-          // EMI code for HDFC Debit Cards is HDFC_DC
-          if (issuer === 'HDFC' && t.card.type === 'debit') {
-            issuer = 'HDFC_DC';
-          }
-        }
-      });
-    }
-  } else {
-    issuer = _Obj.getSafely(
-      Bank.getBankFromCard(payload['card[number]']),
-      'code',
-      ''
-    );
-  }
-
-  return issuer;
-}
-
-/**
- * Set the "View EMI Plans" CTA as the Pay Button
- * if all the criteria are met.
- *
- * Criteria:
- * Mandatory: tab=emi
- *
- * 1. If saved cards screen, show if selected saved card does not have a plan selected.
- * 2. If new card screen, show if no emi plan is selected.
- */
-function setEmiPlansCta(screen, tab) {
-  var session = SessionManager.getSession();
-  var type = 'pay';
-
-  var isSavedScreen =
-    session.svelteCardTab && session.svelteCardTab.isOnSavedCardsScreen();
-
-  var emiDuration = getEmiDurationForNewCard();
-  var savedCard = $('.saved-card.checked');
-
-  if (screen === 'card' && tab === 'emi') {
-    if (isSavedScreen) {
-      if (savedCard[0]) {
-        var emiDurationForSavedCard = getEmiDurationForSavedCard();
-        if (!emiDurationForSavedCard) {
-          type = 'show';
-        }
-      }
-    } else if (!emiDuration) {
-      type = 'show';
-    }
-  } else if (screen === 'emiplans') {
-    if (isSavedScreen) {
-      var savedCard = $('.saved-card.checked');
-
-      if (savedCard[0]) {
-        if (!savedCard.$('.saved-cvv input').val()) {
-          type = 'select';
-        }
+        Analytics.track('prefill:improvise', {
+          data: {
+            type: 'contact',
+            from: prefilledContact,
+            to: newContact,
+          },
+        });
       }
     } else {
-      type = 'pay';
+      Analytics.track('prefill:invalid:chars', {
+        data: {
+          type: 'contact',
+          value: prefilledContact,
+        },
+      });
     }
-  } else if (screen === 'emi' && tab === 'emiplans') {
-    type = 'emi';
-  } else if (session.isPayout) {
-    type = 'confirm-account';
   }
 
-  switch (type) {
-    case 'pay':
-      Cta.setAppropriateCtaText();
-      break;
-
-    case 'show':
-      Cta.showViewEmiPlans();
-      break;
-
-    case 'select':
-      Cta.showSelectEmiPlan();
-      break;
-
-    case 'emi':
-      Cta.showEnterCardDetails();
-      break;
-
-    case 'confirm-account':
-      Cta.showConfirmAccount();
-      break;
-  }
+  // Update prefills
+  session.set('prefill.contact', prefilledContact);
+  session.set('prefill.email', prefilledEmail);
 }
 
 function setEmiBank(data) {
-  var activeEmiPlan = getEmiDurationForNewCard();
+  var activeEmiPlan = EmiStore.getEmiDurationForNewCard();
   if (activeEmiPlan) {
     data.method = 'emi';
     data.emi_duration = activeEmiPlan;
@@ -409,26 +290,6 @@ function hideOverlayMessage() {
       hideOverlay($('#error-message'));
     }
   }
-}
-
-/**
- * Get the text to show to EMI plan.
- * @param {Number} amount
- * @param {Object} plan
- *
- * @return {Object}
- */
-function getEmiText(session, amount, plan) {
-  var amountPerMonth = Razorpay.emi.calculator(
-    amount,
-    plan.duration,
-    plan.interest
-  );
-
-  return {
-    duration: plan.duration,
-    amount: session.formatAmountWithCurrency(amountPerMonth),
-  };
 }
 
 function overlayVisible() {
@@ -560,12 +421,7 @@ function cancelHandler(response) {
     this.screen &&
     this.screen !== 'card'
   ) {
-    if (
-      getCardTypeFromPayload(
-        this.payload,
-        this.svelteCardTab.getTransformedTokens()
-      ) === 'bajaj'
-    ) {
+    if (cardTab.getCardTypeFromPayload(this.payload) === 'bajaj') {
       this.setScreen('emi');
       this.switchTab('emi');
     } else {
@@ -580,22 +436,6 @@ function getPhone() {
 
 function getEmail() {
   return storeGetter(HomeScreenStore.email);
-}
-
-function getEmiDurationForNewCard() {
-  return storeGetter(EmiStore.newCardEmiDuration);
-}
-
-function setEmiDurationForNewCard(duration) {
-  EmiStore.newCardEmiDuration.set(duration);
-}
-
-function getEmiDurationForSavedCard() {
-  return storeGetter(EmiStore.savedCardEmiDuration);
-}
-
-function setEmiDurationForSavedCard(duration) {
-  EmiStore.setEmiDurationForSavedCard(duration);
 }
 
 function elfShowOTP(otp, sender, bank) {
@@ -877,7 +717,7 @@ Session.prototype = {
       classes.push('noimage');
     }
 
-    if (isIE) {
+    if (isIE || !getter('modal.animation')) {
       classes.push('noanim');
     }
 
@@ -1156,6 +996,7 @@ Session.prototype = {
 
     discreet.initI18n();
     this.setExperiments();
+    this.improviseModalOptions();
     this.getEl();
     this.setFormatting();
     this.improvisePaymentOptions();
@@ -1229,11 +1070,7 @@ Session.prototype = {
   },
 
   setSvelteCardTab: function() {
-    if (MethodStore.isCardOrEMIEnabled()) {
-      this.svelteCardTab = new discreet.CardTab({
-        target: gel('form-fields'),
-      });
-    }
+    this.svelteCardTab = new cardTab.render();
   },
 
   setSvelteComponents: function() {
@@ -1778,6 +1615,22 @@ Session.prototype = {
           Razorpay.sendMessage({ event: 'hidden' });
         }, this),
       });
+    }
+  },
+
+  improviseModalOptions: function() {
+    /**
+     * We want to disable animations on IRCTC WebView.
+     * IRCTC disables h/w acceleration on their WebViews
+     * which makes our animations stutter.
+     *
+     * There isn't a reliable way to detect h/w acceleration
+     * state in the browser, so we're doing this based on merchants.
+     *
+     * TODO: Move to Checkout feature
+     */
+    if (Store.isIRCTC() && discreet.UserAgent.AndroidWebView) {
+      this.set('modal.animation', false);
     }
   },
 
@@ -2413,7 +2266,9 @@ Session.prototype = {
       this.headless = false;
     }
 
-    setEmiPlansCta(screen, this.tab);
+    // TODO remove this from here
+    // check cardTab.setEmiPlansCta for details
+    cardTab.setEmiPlansCta(screen, this.tab);
 
     if (screen === this.screen) {
       return;
@@ -2517,7 +2372,7 @@ Session.prototype = {
     var screen = offer.payment_method;
 
     var emiHandler = function() {
-      var emiDuration = getEmiDurationForNewCard();
+      var emiDuration = EmiStore.getEmiDurationForNewCard();
       var bank = this.emiPlansForNewCard && this.emiPlansForNewCard.code;
 
       if (emiDuration) {
@@ -2531,7 +2386,7 @@ Session.prototype = {
           plan.offer_id !== offer.id
         ) {
           // Clear duration
-          setEmiDurationForNewCard('');
+          EmiStore.newCardEmiDuration.set('');
         }
       }
     };
@@ -2911,7 +2766,7 @@ Session.prototype = {
         this.svelteCardTab.showLandingView();
       }
       this.showCardTab(tab);
-      setEmiPlansCta(this.screen, tab);
+      cardTab.setEmiPlansCta(this.screen, tab);
     } else {
       this.setScreen(tab);
       if (ua_iPhone) {
@@ -3103,7 +2958,7 @@ Session.prototype = {
                 from: prevTab,
               });
 
-              setEmiDurationForNewCard('');
+              EmiStore.newCardEmiDuration.set('');
 
               self.switchTab('card');
               self.setScreen('card');
@@ -3116,14 +2971,14 @@ Session.prototype = {
               });
               EmiStore.selectedPlan.set(plan);
 
-              var text = getEmiText(self, amount, plan) || '';
+              var text = cardTab.getEmiText(amount, plan) || '';
 
               trackEmi('emi:plan:select', {
                 from: prevTab,
                 value: value,
               });
 
-              setEmiDurationForNewCard(value);
+              EmiStore.newCardEmiDuration.set(value);
               EmiStore.selectedPlanTextForNewCard.set(text);
 
               self.switchTab('emi');
@@ -3193,7 +3048,7 @@ Session.prototype = {
                 from: prevTab,
               });
 
-              setEmiDurationForSavedCard('');
+              EmiStore.setEmiDurationForSavedCard('');
               EmiStore.selectedPlanTextForSavedCard.set();
 
               self.switchTab('card');
@@ -3207,14 +3062,14 @@ Session.prototype = {
               });
               EmiStore.selectedPlan.set(plan);
 
-              var text = getEmiText(self, amount, plan) || '';
+              var text = cardTab.getEmiText(amount, plan) || '';
 
               trackEmi('emi:plan:select', {
                 from: prevTab,
                 value: value,
               });
 
-              setEmiDurationForSavedCard(value);
+              EmiStore.setEmiDurationForSavedCard(value);
               EmiStore.selectedPlanTextForSavedCard.set(text);
 
               self.switchTab('emi');
@@ -3273,7 +3128,7 @@ Session.prototype = {
                 return plan.duration === value;
               });
 
-              var text = getEmiText(self, amount, plan) || '';
+              var text = cardTab.getEmiText(amount, plan) || '';
 
               self.emiScreenView.setPlan({
                 duration: plan.duration,
@@ -3293,7 +3148,7 @@ Session.prototype = {
 
         self.switchTab('emiplans');
         $('#body').removeClass('sub');
-        setEmiPlansCta('emi', 'emiplans');
+        cardTab.setEmiPlansCta('emi', 'emiplans');
       };
     }
   },
@@ -3438,7 +3293,7 @@ Session.prototype = {
       if (this.screen === 'card') {
         _Obj.extend(data, this.svelteCardTab.getPayload());
         if (tab === 'emi') {
-          var emiDuration = getEmiDurationForNewCard();
+          var emiDuration = EmiStore.getEmiDurationForNewCard();
           if (emiDuration) {
             data.emi_duration = emiDuration;
           }
@@ -4279,6 +4134,21 @@ Session.prototype = {
       }
     }
 
+    if (data.method === 'wallet') {
+      /**
+       * Wallets might need to go through intent flow too
+       * TODO: Add a feature check here
+       */
+      var shouldTurnWalletToIntent = discreet.Wallet.shouldTurnWalletToIntent(
+        data.wallet,
+        this.upi_intents_data
+      );
+
+      if (shouldTurnWalletToIntent) {
+        data.upi_app = discreet.Wallet.getPackageNameForWallet(data.wallet);
+      }
+    }
+
     if (data.method === 'paypal') {
       data.method = 'wallet';
       data.wallet = 'paypal';
@@ -4454,6 +4324,7 @@ Session.prototype = {
 
     var wallet = data.wallet;
     var walletObj;
+
     if (data.method === 'wallet') {
       walletObj = freqWallets[wallet];
 
@@ -4489,10 +4360,7 @@ Session.prototype = {
 
     var emiCode, emiContact, isHDFCDebitEMI;
     if (data.method === 'emi') {
-      emiCode = getIssuerForEmiFromPayload(
-        data,
-        this.svelteCardTab.getTransformedTokens()
-      );
+      emiCode = cardTab.getIssuerForEmiFromPayload(data);
       isHDFCDebitEMI = emiCode === 'HDFC_DC';
       emiContact = discreet.storeGetter(HomeScreenStore.emiContact);
       if (isHDFCDebitEMI && emiContact) {
@@ -4503,10 +4371,7 @@ Session.prototype = {
     if (data.method === 'card' || data.method === 'emi') {
       this.nativeotp = !!this.shouldUseNativeOTP();
 
-      var cardType = getCardTypeFromPayload(
-        data,
-        this.svelteCardTab.getTransformedTokens()
-      );
+      var cardType = cardTab.getCardTypeFromPayload(data);
       var shouldUseNativeOTP = false;
       if (data.method === 'card') {
         if (
@@ -4887,7 +4752,6 @@ Session.prototype = {
       'payoutsAccountView',
       'payoutsView',
       'savedCardsView',
-      'svelteCardTab',
       'languageSelectionView',
       'svelteOverlay',
       'topBar',

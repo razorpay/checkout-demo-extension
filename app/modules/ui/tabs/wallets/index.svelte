@@ -16,6 +16,7 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import * as WalletsData from 'common/wallet';
+  import { getAnimationOptions } from 'svelte-utils';
 
   //UI Imports
   import Tab from 'ui/tabs/Tab.svelte';
@@ -47,6 +48,15 @@
       !_Arr.any(filteredWallets, wallet => wallet.code === selectedWallet)
     ) {
       selectedWallet = null;
+    }
+
+    /**
+     * If there's only one wallet available,
+     * select it automatically to reduce a user click.
+     * Of course, do this only when there's nothing preselected.
+     */
+    if (!selectedWallet && filteredWallets.length === 1) {
+      onWalletSelection(filteredWallets[0].code);
     }
   }
 
@@ -121,19 +131,6 @@
       wallet: selectedWallet,
     };
 
-    /**
-     * Wallets might need to go through intent flow too
-     * TODO: Add a feature check here
-     */
-    const shouldTurnWalletToIntent = WalletsData.shouldTurnWalletToIntent(
-      selectedWallet,
-      session.upi_intents_data
-    );
-
-    if (shouldTurnWalletToIntent) {
-      payload.upi_app = WalletsData.getPackageNameForWallet(selectedWallet);
-    }
-
     return payload;
   }
 
@@ -178,7 +175,7 @@
         </div>
         <div slot="body">
           {#if selectedWallet === wallet.code}
-            <div transition:slide={{ duration: 200 }}>
+            <div transition:slide={getAnimationOptions({ duration: 200 })}>
               {#if getApplicableOffer(wallet.code)}
                 <span class="offer">
                   {getApplicableOffer(wallet.code).name}
