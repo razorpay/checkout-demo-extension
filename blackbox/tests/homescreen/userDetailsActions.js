@@ -19,7 +19,7 @@ const {
  * Asserts that the user details in the strip
  * are the same as those entered.
  */
-async function assertUserDetails(context, apiInstrumentsReadFromCache = false) {
+async function assertUserDetails(context, apiInstrumentsReadFromCache = true) {
   if (
     !context.preferences.customer &&
     context.options.personalization !== false
