@@ -270,46 +270,44 @@
       return USER_EXPERIMENT_CACHE[user];
     }
 
-    let instrumentsSource = 'storage';
-
     const instrumentMap = {
       api: instrumentsFromApi,
       storage: instrumentsFromStorage,
+      none: [],
     };
 
-    if (!instrumentsFromStorage.length) {
-      instrumentsSource = 'api';
-    } else if (instrumentsFromApi.length) {
-      instrumentsSource = ['api', 'storage'][Math.floor(Math.random() * 2)];
-    }
+    const EXPERIMENT_IDENTIFIERS = {
+      BOTH_AVAILABLE_STORAGE_SHOWN: 1,
+      BOTH_AVAILABLE_API_SHOWN: 2,
+      API_AVAILABLE_API_SHOWN: 3,
+      API_AVAIABLE_NONE_SHOWN: 4,
+    };
 
-    let shouldShow = true;
+    let experimentIdentifier;
+    let instrumentsSource;
 
-    // Do another 50-50 split on API instruments
-    if (instrumentsSource === 'api') {
+    if (instrumentsFromApi.length && instrumentsFromStorage.length) {
       if (Math.random() < 0.5) {
-        shouldShow = false;
-        instrumentMap.api = [];
+        instrumentsSource = 'api';
+        experimentIdentifier = EXPERIMENT_IDENTIFIERS.BOTH_AVAILABLE_API_SHOWN;
+      } else {
+        instrumentsSource = 'storage';
+        experimentIdentifier =
+          EXPERIMENT_IDENTIFIERS.BOTH_AVAILABLE_STORAGE_SHOWN;
+      }
+    } else {
+      instrumentsSource = 'api';
+
+      // Do another 50-50 split on API instruments
+      if (Math.random() < 0.5) {
+        instrumentsSource = 'none';
+        experimentIdentifier = EXPERIMENT_IDENTIFIERS.API_AVAIABLE_NONE_SHOWN;
+      } else {
+        experimentIdentifier = EXPERIMENT_IDENTIFIERS.API_AVAILABLE_API_SHOWN;
       }
     }
 
     let instrumentsToBeShown = instrumentMap[instrumentsSource];
-
-    const EXPERIMENT_IDENTIFIERS = {
-      STORAGE: 1,
-      API_SHOWN: 2,
-      API_NOT_SHOWN: 3,
-    };
-
-    let experimentIdentifier;
-
-    if (instrumentsSource === 'storage') {
-      experimentIdentifier = EXPERIMENT_IDENTIFIERS.STORAGE;
-    } else if (instrumentsSource === 'api') {
-      experimentIdentifier = shouldShow
-        ? EXPERIMENT_IDENTIFIERS.API_SHOWN
-        : EXPERIMENT_IDENTIFIERS.API_NOT_SHOWN;
-    }
 
     // if user is in home, track the currently visible experiment
     if (!session.tab) {
@@ -317,7 +315,6 @@
         type: AnalyticsTypes.METRIC,
         data: {
           source: instrumentsSource,
-          shown: shouldShow,
           experiment: experimentIdentifier,
         },
       });
@@ -328,7 +325,6 @@
     // Cache for user
     const p13nRenderData = {
       source: instrumentsSource,
-      shown: shouldShow,
       instruments: instrumentsToBeShown,
       experiment: experimentIdentifier,
     };
