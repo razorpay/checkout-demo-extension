@@ -33,14 +33,14 @@
   export let expanded;
 
   // Computed
-  export let amountPerMonth;
-  export let formattedAmount;
-  export let formattedAmountPerMonth;
-  export let formattedFinalAmount;
-  export let isCardEmi;
-  export let noCostEmi;
-  export let showInterest;
-  export let isBajajEmi;
+  let amountPerMonth;
+  let formattedAmount;
+  let formattedAmountPerMonth;
+  let formattedFinalAmount;
+  let isCardEmi;
+  let noCostEmi;
+  let showInterest;
+  let isBajajEmi;
 
   let interestChargedByBank;
 
