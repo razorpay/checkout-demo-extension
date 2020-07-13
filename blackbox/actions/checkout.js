@@ -142,6 +142,10 @@ module.exports = {
     page.on('request', checkoutRequestHandler);
     await page.goto(checkoutUrl);
 
+    if (typeof options.personalization === 'undefined') {
+      options.personalization = false;
+    }
+
     await setExperiments(page, experiments);
     if (method && options.personalization) {
       await page.evaluate(method => {
