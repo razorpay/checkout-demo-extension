@@ -80,7 +80,10 @@
     SHOW_QR_CODE,
     SCAN_QR_CODE,
     UPI_DOWNTIME_TEXT,
-    UPI_RECURRING_CAW_CALLOUT,
+    UPI_RECURRING_CAW_CALLOUT_ALL_DATA,
+    UPI_RECURRING_CAW_CALLOUT_NO_NAME,
+    UPI_RECURRING_CAW_CALLOUT_NO_NAME_NO_FREQUENCY,
+    UPI_RECURRING_CAW_CALLOUT_NO_FREQUENCY,
     UPI_RECURRING_SUBSCRIPTION_CALLOUT,
   } from 'ui/labels/upi';
 
@@ -135,7 +138,8 @@
     recurringFrequency,
     recurring_type,
     maxRecurringAmount,
-    tokenObject;
+    tokenObject,
+    recurring_callout;
 
   if (isUpiRecurringCAW) {
     tokenObject = merchantOrder;
@@ -150,6 +154,15 @@
     recurringFrequency = tokenObject.token.frequency;
     maxRecurringAmount = tokenObject.token.max_amount;
     recurring_type = tokenObject.token.recurringType;
+    if (merchantName && recurringFrequency !== 'as_presented') {
+      recurring_callout = UPI_RECURRING_CAW_CALLOUT_ALL_DATA;
+    } else if (merchantName) {
+      recurring_callout = UPI_RECURRING_CAW_CALLOUT_NO_FREQUENCY;
+    } else if (recurringFrequency !== 'as_presented') {
+      recurring_callout = UPI_RECURRING_CAW_CALLOUT_NO_NAME;
+    } else {
+      recurring_callout = UPI_RECURRING_CAW_CALLOUT_NO_NAME_NO_FREQUENCY;
+    }
   }
 
   const getAllowedPSPs = {
@@ -798,7 +811,10 @@
       {#if isUpiRecurringCAW || isUpiRecurringSubscription}
         <Callout classes={['downtime-callout']} showIcon={true}>
           <!-- This is a recurring payment and {maxAmount} will be charged now. After this, {merchantName} can charge upto {amount} {recurringFrequency} till {endDate}. -->
-          {formatTemplateWithLocale(UPI_RECURRING_CAW_CALLOUT, { maxAmount: session.formatAmountWithCurrency(getAmount()), merchantName: !merchantName ? 'The Merchant' : merchantName, amount: session.formatAmountWithCurrency(maxRecurringAmount), recurringFrequency, endDate: toShortFormat(new Date(endDate * 1000)) }, $locale)}
+          <!-- This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} on a {recurringFrequency} basis till {endDate}. -->
+          <!-- This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} anytime till {endDate}. -->
+          <!-- This is a recurring payment and {maxAmount} will be charged now. {merchantName} can charge upto {amount} anytime till {endDate}. -->
+          {formatTemplateWithLocale(recurring_callout, { maxAmount: session.formatAmountWithCurrency(getAmount()), merchantName: !merchantName ? 'The Merchant' : merchantName, amount: session.formatAmountWithCurrency(maxRecurringAmount), recurringFrequency, endDate: toShortFormat(new Date(endDate * 1000)) }, $locale)}
         </Callout>
       {/if}
     </Bottom>

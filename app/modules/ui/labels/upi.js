@@ -19,7 +19,14 @@ export const SCAN_QR_CODE = 'upi.scan_qr_code';
 export const UPI_DOWNTIME_TEXT = 'upi.downtime_text';
 export const UPI_RECURRING_SUBSCRIPTION_CALLOUT =
   'upi.recurring_subscription_callout';
-export const UPI_RECURRING_CAW_CALLOUT = 'upi.recurring_caw_callout';
+export const UPI_RECURRING_CAW_CALLOUT_ALL_DATA =
+  'upi.recurring_caw_callout_all_data';
+export const UPI_RECURRING_CAW_CALLOUT_NO_NAME =
+  'upi.recurring_caw_callout_no_name';
+export const UPI_RECURRING_CAW_CALLOUT_NO_NAME_NO_FREQUENCY =
+  'upi.recurring_caw_callout_no_name_no_frequency';
+export const UPI_RECURRING_CAW_CALLOUT_NO_FREQUENCY =
+  'upi.recurring_caw_callout_no_frequency';
 export const OMNI_BLOCK_HEADING = 'upi.omni_block_heading';
 export const OMNI_GPAY_NUMBER = 'upi.omni_gpay_number';
 export const OMNI_ENTER_NUMBER = 'upi.omni_enter_number';
