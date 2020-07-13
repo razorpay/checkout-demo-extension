@@ -270,7 +270,7 @@
       return USER_EXPERIMENT_CACHE[user];
     }
 
-    let instrumentsOnScreen = 'storage';
+    let instrumentsSource = 'storage';
 
     const instrumentMap = {
       api: instrumentsFromApi,
@@ -278,9 +278,37 @@
     };
 
     if (!instrumentsFromStorage.length) {
-      instrumentsOnScreen = 'api';
+      instrumentsSource = 'api';
     } else if (instrumentsFromApi.length) {
-      instrumentsOnScreen = ['api', 'storage'][Math.floor(Math.random() * 2)];
+      instrumentsSource = ['api', 'storage'][Math.floor(Math.random() * 2)];
+    }
+
+    let shouldShow = true;
+
+    // Do another 50-50 split on API instruments
+    if (instrumentsSource === 'api') {
+      if (Math.random() < 0.5) {
+        shouldShow = false;
+        instrumentMap.api = [];
+      }
+    }
+
+    let instrumentsToBeShown = instrumentMap[instrumentsSource];
+
+    const EXPERIMENT_IDENTIFIERS = {
+      STORAGE: 1,
+      API_SHOWN: 2,
+      API_NOT_SHOWN: 3,
+    };
+
+    let experimentIdentifier;
+
+    if (instrumentsSource === 'storage') {
+      experimentIdentifier = EXPERIMENT_IDENTIFIERS.STORAGE;
+    } else if (instrumentsSource === 'api') {
+      experimentIdentifier = shouldShow
+        ? EXPERIMENT_IDENTIFIERS.API_SHOWN
+        : EXPERIMENT_IDENTIFIERS.API_NOT_SHOWN;
     }
 
     // if user is in home, track the currently visible experiment
@@ -288,14 +316,21 @@
       Analytics.track('home:p13n:experiment', {
         type: AnalyticsTypes.METRIC,
         data: {
-          source: instrumentsOnScreen,
+          source: instrumentsSource,
+          shown: shouldShow,
+          experiment: experimentIdentifier,
         },
       });
+
+      Analytics.setMeta('p13n.experiment', experimentIdentifier);
     }
 
+    // Cache for user
     const p13nRenderData = {
-      source: instrumentsOnScreen,
-      instruments: instrumentMap[instrumentsOnScreen],
+      source: instrumentsSource,
+      shown: shouldShow,
+      instruments: instrumentsToBeShown,
+      experiment: experimentIdentifier,
     };
 
     USER_EXPERIMENT_CACHE[user] = p13nRenderData;
