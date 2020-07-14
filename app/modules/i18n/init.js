@@ -76,21 +76,12 @@ export function init() {
   // Add bundled messages
   addDefaultMessages();
 
-  const session = getSession();
-
-  isLoading.subscribe(value => {
-    if (value) {
-      session.showLoadError('Loading', false, true);
-    } else {
-      // TODO: fix this and remove try/catch
-      try {
-        session.hideOverlayMessage();
-      } catch (e) {}
-    }
-  });
+  const initialLocale = 'en';
 
   initSvelteI18n({
     fallbackLocale: 'en',
-    initialLocale: 'en', // TODO: select from navigator
+    initialLocale, // TODO: select from navigator
   });
+
+  return waitLocale(initialLocale);
 }
