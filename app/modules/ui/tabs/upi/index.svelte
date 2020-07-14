@@ -68,7 +68,10 @@
     SHOW_QR_CODE,
     SCAN_QR_CODE,
     UPI_DOWNTIME_TEXT,
+    UPI_OTM_CALLOUT,
   } from 'ui/labels/upi';
+
+  import { formatTemplateWithLocale } from 'i18n';
 
   // Props
   export let selectedApp = undefined;
@@ -728,13 +731,13 @@
       {/if}
       {#if isOtm}
         <Callout classes={['downtime-callout']} showIcon={true}>
-          <strong>{session.formatAmountWithCurrency(getAmount())}</strong>
-          will be blocked on your account by clicking pay. Your account will be
-          charged {getName() ? 'by ' + getName() : ''} between
-          <strong>{toShortFormat(otmStartDate)}</strong>
-          to
-          <strong>{toShortFormat(otmEndDate)}</strong>
-          .
+          <FormattedText
+            text={formatTemplateWithLocale(UPI_OTM_CALLOUT, {
+              amount: session.formatAmountWithCurrency(getAmount()),
+              nameString: getName() ? 'by ' + getName() : '',
+              startDate: toShortFormat(otmStartDate),
+              endDate: toShortFormat(otmEndDate),
+            })} />
         </Callout>
       {/if}
 
