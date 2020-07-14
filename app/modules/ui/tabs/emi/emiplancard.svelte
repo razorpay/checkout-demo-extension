@@ -174,8 +174,9 @@
         </ul>
       {/if}
       {#if noCostEmi}
+        <!-- LABEL: + How does it work? -->
         <div class="theme-highlight how-it-works" on:click={explain}>
-          + How does it work?
+          {$t(NO_COST_EXPLAIN_ACTION)}
         </div>
       {/if}
     {/if}
