@@ -97,7 +97,7 @@ export function init() {
 
   initSvelteI18n({
     fallbackLocale: 'en',
-    initialLocale, // TODO: select from navigator
+    initialLocale,
   });
 
   // waitLocale returns undefined when the language is already loaded, which is
