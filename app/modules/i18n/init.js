@@ -63,7 +63,7 @@ export function determineInitialLocale() {
 
   // If the user has changed locale earlier, use it.
   // TODO: handle auto option from checkout.
-  return localeFromStorage || getLanguageCode();
+  return localeFromStorage || getLanguageCode() || 'en';
 }
 
 function setLocaleInStorage(locale) {
