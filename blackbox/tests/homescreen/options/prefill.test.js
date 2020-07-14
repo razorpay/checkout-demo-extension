@@ -10,6 +10,7 @@ const {
   getAttribute,
   selectPaymentMethod,
   assertInputValue,
+  assertTrimmedInnerText,
 } = require('../actions');
 
 const bankToPreselect = 'SBIN';
@@ -45,7 +46,11 @@ describe.each(
 
     await proceed(context);
     await selectPaymentMethod(context, 'netbanking');
-    await assertInputValue(context, '#bank-select', bankToPreselect);
+    await assertTrimmedInnerText(
+      context,
+      '#bank-select',
+      preferences.methods.netbanking[bankToPreselect]
+    );
   });
 });
 

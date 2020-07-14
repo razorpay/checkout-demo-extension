@@ -25,7 +25,7 @@ const IRCTC_KEYS = [
 
 export const isIRCTC = () => IRCTC_KEYS |> _Arr.contains(getOption('key'));
 
-export const getDisplayAmount = () => displayAmount(razorpayInstance);
+export const getDisplayAmount = am => displayAmount(razorpayInstance, am);
 export const getMerchantMethods = () => preferences.methods;
 export const getRecurringMethods = () => preferences.methods.recurring;
 export const getMerchantOrder = () => preferences.order;
@@ -39,6 +39,7 @@ export const getLanguageCode = () => getCheckoutConfig()?.language_code;
 const optionGetter = option => () => getOption(option);
 export const getOption = option => razorpayInstance.get(option);
 export const setOption = (option, value) => razorpayInstance.set(option, value);
+export const getCallbackUrl = optionGetter('callback_url');
 export const getCardFeatures = iin => razorpayInstance.getCardFeatures(iin);
 export const getCardCurrencies = ({ iin, tokenId, cardNumber }) =>
   razorpayInstance.getCardCurrencies({

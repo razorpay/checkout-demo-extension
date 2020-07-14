@@ -10,6 +10,7 @@ import {
   hasFeature,
   isPayout,
   isOfferForced,
+  getCallbackUrl,
 } from 'checkoutstore';
 
 import {
@@ -24,11 +25,15 @@ import { findCodeByNetworkName } from 'common/card';
 
 import { wallets, getSortedWallets } from 'common/wallet';
 import { extendConfig } from 'common/cardlessemi';
-import { mobileQuery } from 'common/useragent';
+import { mobileQuery, isFacebookWebView } from 'common/useragent';
 import { getUPIIntentApps } from 'checkoutstore/native';
 
 import { get as storeGetter } from 'svelte/store';
 import { sequence as SequenceStore } from 'checkoutstore/screens/home';
+
+function isNoRedirectFacebookWebViewSession() {
+  return isFacebookWebView() && !getCallbackUrl();
+}
 
 const DEBIT_EMI_BANKS = ['HDFC_DC'];
 
@@ -48,6 +53,9 @@ const ALL_METHODS = {
       getOption('method.card') &&
       getOption('method.credit_card')
     ) {
+      if (isRecurring()) {
+        return getRecurringMethods()?.credit_card;
+      }
       return getMerchantMethods().credit_card;
     }
   },
@@ -58,6 +66,9 @@ const ALL_METHODS = {
       getOption('method.card') &&
       getOption('method.debit_card')
     ) {
+      if (isRecurring()) {
+        return getRecurringMethods()?.debit_card;
+      }
       return getMerchantMethods().debit_card;
     }
   },
@@ -177,10 +188,54 @@ export function isZestMoneyEnabled() {
   return isMethodEnabled('cardless_emi') && getCardlessEMIProviders().zestmoney;
 }
 
+/**
+ * Only some methods are to be used on Facebook Browser
+ * when callback_url is not passed.
+ * This is done because we can't open popups on Facebook Browser.
+ */
+const METHOD_ON_FACEBOOK_BROWSER_NO_REDIRECT_CHECKER = {
+  credit_card() {
+    return true;
+  },
+
+  debit_card() {
+    return true;
+  },
+
+  card() {
+    return true;
+  },
+
+  upi() {
+    return true;
+  },
+
+  wallet() {
+    return getWallets().length > 0;
+  },
+};
+
+function isMethodEnabledForBrowser(method) {
+  // On Facebook browser, we can only use some methods when we have to use popup.
+  if (isNoRedirectFacebookWebViewSession()) {
+    const checker = METHOD_ON_FACEBOOK_BROWSER_NO_REDIRECT_CHECKER[method];
+
+    if (checker) {
+      return checker();
+    } else {
+      return false;
+    }
+  } else {
+    return true;
+  }
+}
+
 export function isMethodEnabled(method) {
   const checker = ALL_METHODS[method];
   if (checker) {
-    return checker();
+    return checker() && isMethodEnabledForBrowser(method);
+  } else {
+    return false;
   }
 }
 
@@ -206,7 +261,14 @@ export function isContactRequiredForEMI(bank, cardType) {
  * @returns {Array} of enabled methods
  */
 export function getEnabledMethods() {
-  return ALL_METHODS |> _Obj.keys |> _Arr.filter(isMethodEnabled);
+  const merchantOrderMethod = getMerchantOrder()?.method;
+  let methodsToConsider = ALL_METHODS |> _Obj.keys;
+
+  if (merchantOrderMethod) {
+    methodsToConsider = [merchantOrderMethod];
+  }
+
+  return methodsToConsider |> _Arr.filter(isMethodEnabled);
 }
 
 export function getSingleMethod() {
@@ -609,10 +671,21 @@ export function getWallets() {
     enabledWallets =
       enabledWallets |> _Arr.filter(wallet => passedWallets[wallet] !== false);
   }
+
+  const noRedirectFacebookWebViewSession = isNoRedirectFacebookWebViewSession();
+
   return (
     enabledWallets
     |> _Arr.map(wallet => wallets[wallet])
     |> _Arr.filter(Boolean)
+    |> _Arr.filter(wallet => {
+      if (noRedirectFacebookWebViewSession) {
+        // Only power wallets are supported on Facebook browser w/o callback_url
+        return wallet.power;
+      } else {
+        return true;
+      }
+    })
     |> getSortedWallets
   );
 }

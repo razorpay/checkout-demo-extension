@@ -58,6 +58,7 @@
   import * as AnalyticsTypes from 'analytics-types';
   import { getCardType } from 'common/card';
   import { getSubtextForInstrument } from 'subtext';
+  import { getAnimationOptions } from 'svelte-utils';
 
   // Transitions
   import { fade } from 'svelte/transition';
@@ -485,7 +486,7 @@
   <Screen pad={false}>
     <div>
       {#if currentView === Views.ADD_CARD}
-        <div in:fade={{ duration: 100, y: 100 }}>
+        <div in:fade={getAnimationOptions({ duration: 100, y: 100 })}>
           {#if showSavedCardsCta}
             <div
               id="show-saved-cards"
@@ -519,7 +520,7 @@
           {/if}
         </div>
       {:else}
-        <div in:fade={{ duration: 100 }}>
+        <div in:fade={getAnimationOptions({ duration: 100 })}>
           {#if shouldShowSubtext}
             <div class="pad instrument-subtext-description">
               {instrumentSubtext}

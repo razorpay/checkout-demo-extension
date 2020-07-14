@@ -334,6 +334,21 @@ Payment.prototype = {
       _Obj.clone(data || {})
     );
 
+    if (this.gpay || this.tez) {
+      if (
+        !(
+          this.r.paymentAdapters &&
+          (this.r.paymentAdapters.gpay ||
+            this.r.paymentAdapters['microapps.gpay'])
+        )
+      ) {
+        return this.r.emit(
+          'payment.error',
+          _.rzpError('GPay is not available')
+        );
+      }
+    }
+
     formatPayment(this);
 
     let setCompleteHandler = _ => {
