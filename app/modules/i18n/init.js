@@ -2,6 +2,7 @@ import {
   addMessages,
   init as initSvelteI18n,
   isLoading,
+  locale,
   register,
   waitLocale,
 } from 'svelte-i18n';
@@ -85,6 +86,9 @@ export function bindI18nEvents() {
         session.hideOverlayMessage();
       } catch (e) {}
     }
+  });
+  locale.subscribe(value => {
+    setLocaleInStorage(value);
   });
 }
 
