@@ -80,6 +80,10 @@
       {/if}
       {#if selected === offer}
         <div class="checkbox" />
+        {#if getOfferDescription(offer)}
+          <!-- Only show the description if offer description is set. -->
+          <div class="offer-detail">{getOfferDescription(offer)}</div>
+        {/if}
         {#if offer.type === 'deferred'}
           <!-- LABEL: Cashback would be credited to source mode of payment. -->
           <div class="offer-detail">{$t(CASHBACK_DETAIL)}</div>
