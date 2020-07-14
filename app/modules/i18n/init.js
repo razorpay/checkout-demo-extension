@@ -1,12 +1,15 @@
 import {
   addMessages,
+  init as initSvelteI18n,
   isLoading,
   register,
-  init as initSvelteI18n,
+  waitLocale,
 } from 'svelte-i18n';
 
 import en from './bundles/en';
+
 import { getSession } from '../sessionmanager';
+import { getLanguageCode } from 'checkoutstore';
 
 const LOCALES = {
   en: 'English',
@@ -70,6 +73,20 @@ function setLocaleInStorage(locale) {
 export function addDefaultMessages() {
   addMessages('en', en);
   register('hi', () => fetchBundle('hi'));
+}
+
+export function bindI18nEvents() {
+  const session = getSession();
+  isLoading.subscribe(value => {
+    if (value) {
+      session.showLoadError('Loading', false, true);
+    } else {
+      // TODO: fix this and remove try/catch
+      try {
+        session.hideOverlayMessage();
+      } catch (e) {}
+    }
+  });
 }
 
 export function init() {
