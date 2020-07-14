@@ -12,6 +12,8 @@ import { processNativeMessage } from 'checkoutstore/native';
 import { isEMandateEnabled, getEnabledMethods } from 'checkoutstore/methods';
 import showTimer from 'checkoutframe/timer';
 
+import { init as initI18n, bindI18nEvents } from 'i18n/init';
+
 import {
   UPI_POLL_URL,
   PENDING_PAYMENT_TS,
@@ -266,8 +268,15 @@ function setSessionPreferences(session, preferences) {
     }
     return Razorpay.sendMessage({ event: 'fault', data: message });
   }
-  session.render();
-  showModal(session);
+
+  initI18n()
+    .then(() => {
+      session.render();
+      showModal(session);
+    })
+    .then(() => {
+      bindI18nEvents();
+    });
 }
 
 function getPreferenecsParams(razorpayInstance) {

@@ -1164,7 +1164,6 @@ Session.prototype = {
 
     this.isOpen = true;
 
-    discreet.initI18n();
     this.setExperiments();
     this.getEl();
     this.setFormatting();

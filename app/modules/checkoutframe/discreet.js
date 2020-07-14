@@ -23,7 +23,6 @@ import emiPlansView from 'checkoutframe/emiplans';
 import otpView from 'checkoutframe/otp';
 import languageSelectionView from 'ui/elements/LanguageSelection.svelte';
 import * as I18n from 'i18n';
-import { init as initI18n } from 'i18n/init';
 import UpiCancelReasonPicker from 'ui/components/UpiCancelReasonPicker.svelte';
 import * as Curtain from 'components/curtain';
 import { setShieldParams } from 'payment/validator';
@@ -197,6 +196,5 @@ export default {
 
   NBHandlers,
 
-  initI18n,
   I18n,
 };
