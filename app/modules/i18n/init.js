@@ -100,5 +100,8 @@ export function init() {
     initialLocale, // TODO: select from navigator
   });
 
-  return waitLocale(initialLocale);
+  // waitLocale returns undefined when the language is already loaded, which is
+  // the case when it is english. We return a promise that immediately resolves
+  // in that case.
+  return waitLocale() || Promise.resolve();
 }
