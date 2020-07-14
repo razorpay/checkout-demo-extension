@@ -55,7 +55,6 @@ function fetchBundle(locale) {
 }
 
 export function determineInitialLocale() {
-  debugger;
   let localeFromStorage;
   try {
     localeFromStorage = global.localStorage.getItem('locale');
@@ -93,7 +92,7 @@ export function init() {
   // Add bundled messages
   addDefaultMessages();
 
-  const initialLocale = 'en';
+  const initialLocale = determineInitialLocale();
 
   initSvelteI18n({
     fallbackLocale: 'en',
