@@ -153,7 +153,7 @@ var responseTypes = {
         url: request.url,
         callback: response => this.complete(response),
       })
-      .till(response => response && response.status);
+      .till(response => response && response.status, 10);
 
     this.emit('upi.pending', fullResponse.data);
   },
@@ -164,7 +164,7 @@ var responseTypes = {
         url: request.url,
         callback: response => this.complete(response),
       })
-      .till(response => response && response.status);
+      .till(response => response && response.status, 10);
 
     this.emit('upi.pending', { flow: 'upi-intent' });
   },
@@ -237,7 +237,7 @@ var responseTypes = {
             this.complete(response);
           },
         })
-        .till(response => response && response.status);
+        .till(response => response && response.status, 10);
 
     var intent_url = (fullResponse.data || {}).intent_url;
 

@@ -85,6 +85,15 @@ module.exports = {
     experiments,
     method,
   }) {
+    // Disable animations for testing
+    options = {
+      ...options,
+      modal: {
+        ...(options.modal || {}),
+        animation: false,
+      },
+    };
+
     let checkoutUrl = checkoutPublic;
     if (params) {
       checkoutUrl += '?' + querystring.stringify(params);

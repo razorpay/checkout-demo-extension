@@ -31,6 +31,7 @@
     getOption,
   } from 'checkoutstore';
   import { getThemeMeta } from 'checkoutstore/theme';
+  import { getAnimationOptions } from 'svelte-utils';
 
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
@@ -85,7 +86,7 @@
   }
 </style>
 
-<div in:fly={{ delay: 100, duration: 200, y: 40 }}>
+<div in:fly={getAnimationOptions({ delay: 100, duration: 200, y: 40 })}>
   <div class="details-block">
     {#if !isContactHidden()}
       <div class="contact-field">

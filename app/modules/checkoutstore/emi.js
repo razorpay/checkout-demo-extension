@@ -13,6 +13,14 @@ export const savedCardEmiDuration = derived(
   ([selectedTokenId, emiDuration]) => emiDuration[selectedTokenId]
 );
 
+export function getEmiDurationForNewCard() {
+  return get(newCardEmiDuration);
+}
+
+export function getEmiDurationForSavedCard() {
+  return get(savedCardEmiDuration);
+}
+
 export function setEmiDurationForSavedCard(duration) {
   const $emiDurations = get(emiDurations);
   const $selectedToken = get(selectedTokenId);

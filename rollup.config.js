@@ -14,6 +14,7 @@ if (process.env.NODE_ENV === 'dev') {
         'app/css/generated',
         'app/templates',
         'app/index.html',
+        'app/checkout.html',
         'app/custom.html',
         'app/config.js',
         'app/sdk.js',
