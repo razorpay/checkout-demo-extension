@@ -17,6 +17,12 @@ const LOCALES = {
   hi: 'हिंदी',
 };
 
+const ALLOWED_LOCALES = _Obj.keys(LOCALES);
+
+function isAllowedLocale(locale) {
+  return _Arr.any(ALLOWED_LOCALES, allowedLocale => locale === allowedLocale);
+}
+
 /**
  * Returns the display name for a given language.
  * @param {string} locale
@@ -63,7 +69,14 @@ export function determineInitialLocale() {
 
   // If the user has changed locale earlier, use it.
   // TODO: handle auto option from checkout.
-  return localeFromStorage || getLanguageCode() || 'en';
+  let locale = localeFromStorage || getLanguageCode() || 'en';
+
+  // If the locale from storage/API is not allowed, use en as the default.
+  if (!isAllowedLocale(locale)) {
+    locale = 'en';
+  }
+
+  return locale;
 }
 
 function setLocaleInStorage(locale) {
