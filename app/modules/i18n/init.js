@@ -51,6 +51,22 @@ function fetchBundle(locale) {
   });
 }
 
+export function determineInitialLocale() {
+  debugger;
+  let localeFromStorage;
+  try {
+    localeFromStorage = global.localStorage.getItem('locale');
+  } catch (e) {}
+
+  // If the user has changed locale earlier, use it.
+  // TODO: handle auto option from checkout.
+  return localeFromStorage || getLanguageCode();
+}
+
+function setLocaleInStorage(locale) {
+  global.localStorage.setItem('locale', locale);
+}
+
 export function addDefaultMessages() {
   addMessages('en', en);
   register('hi', () => fetchBundle('hi'));
