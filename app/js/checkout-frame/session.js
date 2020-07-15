@@ -1763,10 +1763,6 @@ Session.prototype = {
       ) {
         return cancel_upi(this);
       }
-
-      if (Bridge.checkout.platform === 'ios') {
-        Bridge.checkout.callIos('hide_nav_bar');
-      }
     }
 
     if (this.r._payment || this.isResumedPayment) {
@@ -1776,6 +1772,9 @@ Session.prototype = {
 
       if (confirmClose()) {
         this.clearRequest();
+        if (Bridge.checkout.platform === 'ios') {
+          Bridge.checkout.callIos('hide_nav_bar');
+        }
       } else {
         return;
       }
