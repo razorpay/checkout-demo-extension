@@ -92,8 +92,7 @@ describe.each(
 
     const status = await context.page.evaluate(
       selectedWallet =>
-        selectedWallet.parentElement.parentElement.querySelector('input')
-          .checked,
+        selectedWallet.closest('button').querySelector('input').checked,
       selectedWallet
     );
 
