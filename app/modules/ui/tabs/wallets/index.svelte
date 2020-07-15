@@ -4,7 +4,7 @@
 
   // Store Imports
   import { getWallets } from 'checkoutstore/methods';
-  import { showCta } from 'checkoutstore/cta';
+  import { showCta, hideCta } from 'checkoutstore/cta';
   import { methodInstrument } from 'checkoutstore/screens/home';
   import { selectedWallet } from 'checkoutstore/screens/wallet';
 
@@ -121,6 +121,8 @@
       setTimeout(() => {
         scrollIntoView(walletReferences[$selectedWallet]);
       }, 200);
+    } else {
+      hideCta();
     }
   }
 
