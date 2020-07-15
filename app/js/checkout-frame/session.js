@@ -5,6 +5,7 @@ var ua = navigator.userAgent;
 var preferences,
   CheckoutBridge = window.CheckoutBridge,
   StorageBridge = window.StorageBridge,
+  Bridge = discreet.Bridge,
   isIframe = window !== parent,
   ownerWindow = isIframe ? parent : opener,
   _uid = Track.id,
@@ -1762,6 +1763,10 @@ Session.prototype = {
       ) {
         return cancel_upi(this);
       }
+
+      if (Bridge.checkout.platform === 'ios') {
+        Bridge.checkout.callIos('hide_nav_bar');
+      }
     }
 
     if (this.r._payment || this.isResumedPayment) {
@@ -3365,7 +3370,7 @@ Session.prototype = {
       $('#modal-inner').removeClass('shake');
       hideOverlayMessage();
       this.modal.hide();
-      discreet.Bridge.stopListeningForBackPresses();
+      discreet.stopListeningForBackPresses();
     }
   },
 

@@ -1,16 +1,16 @@
 import * as GPay from 'gpay';
-import * as strings from 'common/strings';
 import {
   parseUPIIntentResponse,
   didUPIIntentSucceed,
   upiBackCancel,
+  getAppFromPackageName,
 } from 'common/upi';
 import { androidBrowser } from 'common/useragent';
 import Track from 'tracker';
-import Razorpay from 'common/Razorpay';
 import Analytics from 'analytics';
 import { getSession } from 'sessionmanager';
 import { getBankFromCard } from 'common/bank';
+import * as Bridge from 'bridge';
 
 export const processOtpResponse = function(response) {
   var error = response.error;
@@ -241,13 +241,21 @@ var responseTypes = {
 
     var intent_url = (fullResponse.data || {}).intent_url;
 
-    this.on('upi.intent_success_response', data => {
+    var CheckoutBridge = window.CheckoutBridge;
+
+    const startPolling = data => {
       if (data) {
         this.emit('upi.pending', { flow: 'upi-intent', response: data });
       }
 
       this.ajax = ra(data);
-    });
+    };
+
+    if (Bridge.checkout.platform === 'ios') {
+      startPolling();
+    } else {
+      this.on('upi.intent_success_response', startPolling);
+    }
 
     this.on('upi.intent_response', data => {
       if (data |> parseUPIIntentResponse |> didUPIIntentSucceed) {
@@ -259,7 +267,6 @@ var responseTypes = {
 
     this.emit('upi.coproto_response', fullResponse);
 
-    var CheckoutBridge = window.CheckoutBridge;
     if (CheckoutBridge && CheckoutBridge.callNativeIntent) {
       // If there's a UPI App specified, use it.
       if (this.upi_app) {
@@ -280,6 +287,17 @@ var responseTypes = {
       if (androidBrowser) {
         return responseTypes['gpay'].call(this, request, fullResponse);
       }
+    } else if (this.upi_app) {
+      // upi_app will only be set for UPI intent payments.
+      // Check for its existence as this coproto is also used for
+      // UPI QR payments on web, where this is not required.
+      const app = getAppFromPackageName(this.upi_app);
+
+      return Bridge.checkout.callIos('callNativeIntent', {
+        intent_url,
+        upi_app: this.upi_app,
+        shortcode: app.shortcode,
+      });
     }
   },
 
