@@ -6,6 +6,7 @@
   import { getWallets } from 'checkoutstore/methods';
   import { showCta } from 'checkoutstore/cta';
   import { methodInstrument } from 'checkoutstore/screens/home';
+  import { selectedWallet } from 'checkoutstore/screens/wallet';
 
   // i18n
   import { getWalletName } from 'i18n';
@@ -33,8 +34,6 @@
   const ua = navigator.userAgent;
   const ua_iPhone = /iPhone/.test(ua);
 
-  export let selectedWallet = session.get('prefill.wallet') || null;
-
   let filteredWallets = wallets;
   $: {
     filteredWallets = filterWalletsAgainstInstrument(
@@ -44,10 +43,10 @@
 
     // If a wallet was selected and has been filtered out, deselect it
     if (
-      selectedWallet &&
-      !_Arr.any(filteredWallets, wallet => wallet.code === selectedWallet)
+      $selectedWallet &&
+      !_Arr.any(filteredWallets, wallet => wallet.code === $selectedWallet)
     ) {
-      selectedWallet = null;
+      $selectedWallet = null;
     }
 
     /**
@@ -55,7 +54,7 @@
      * select it automatically to reduce a user click.
      * Of course, do this only when there's nothing preselected.
      */
-    if (!selectedWallet && filteredWallets.length === 1) {
+    if (!$selectedWallet && filteredWallets.length === 1) {
       onWalletSelection(filteredWallets[0].code);
     }
   }
@@ -86,7 +85,7 @@
   }
 
   export function isAnyWalletSelected() {
-    return !!selectedWallet;
+    return !!$selectedWallet;
   }
 
   const walletReferences = {};
@@ -94,12 +93,12 @@
   export function onWalletSelection(code) {
     const offerError = !session.validateOffers(code, function(removeOffer) {
       if (removeOffer) {
-        selectedWallet = code;
+        $selectedWallet = code;
       }
     });
 
     if (!offerError) {
-      selectedWallet = code;
+      $selectedWallet = code;
       showCta();
     }
 
@@ -110,17 +109,17 @@
     Analytics.track('wallet:select', {
       type: AnalyticsTypes.BEHAV,
       data: {
-        wallet: selectedWallet,
-        power: WalletsData.isPowerWallet(selectedWallet),
+        wallet: $selectedWallet,
+        power: WalletsData.isPowerWallet($selectedWallet),
       },
     });
   }
 
   export function onShown() {
-    if (selectedWallet) {
+    if ($selectedWallet) {
       showCta();
       setTimeout(() => {
-        scrollIntoView(walletReferences[selectedWallet]);
+        scrollIntoView(walletReferences[$selectedWallet]);
       }, 200);
     }
   }
@@ -128,7 +127,7 @@
   // Called when the user presses the pay button
   export function getPayload() {
     const payload = {
-      wallet: selectedWallet,
+      wallet: $selectedWallet,
     };
 
     return payload;
@@ -164,7 +163,7 @@
     {#each filteredWallets as wallet, i (wallet.code)}
       <SlottedRadioOption
         name={wallet.code}
-        selected={selectedWallet === wallet.code}
+        selected={$selectedWallet === wallet.code}
         align="top"
         on:click={() => onWalletSelection(wallet.code)}>
         <div
@@ -174,7 +173,7 @@
           <span class="title">{getWalletName(wallet.code, $locale)}</span>
         </div>
         <div slot="body">
-          {#if selectedWallet === wallet.code}
+          {#if $selectedWallet === wallet.code}
             <div transition:slide={getAnimationOptions({ duration: 200 })}>
               {#if getApplicableOffer(wallet.code)}
                 <span class="offer">
