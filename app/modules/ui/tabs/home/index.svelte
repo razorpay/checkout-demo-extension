@@ -281,6 +281,7 @@
       BOTH_AVAILABLE_API_SHOWN: 2,
       API_AVAILABLE_API_SHOWN: 3,
       API_AVAIABLE_NONE_SHOWN: 4,
+      NONE_AVAILABLE: 5,
     };
 
     let experimentIdentifier;
@@ -295,7 +296,7 @@
         experimentIdentifier =
           EXPERIMENT_IDENTIFIERS.BOTH_AVAILABLE_STORAGE_SHOWN;
       }
-    } else {
+    } else if (instrumentsFromApi.length) {
       instrumentsSource = 'api';
 
       // Do another 50-50 split on API instruments
@@ -305,6 +306,9 @@
       } else {
         experimentIdentifier = EXPERIMENT_IDENTIFIERS.API_AVAILABLE_API_SHOWN;
       }
+    } else {
+      instrumentsSource = 'none';
+      experimentIdentifier = EXPERIMENT_IDENTIFIERS.NONE_AVAILABLE;
     }
 
     let instrumentsToBeShown = instrumentMap[instrumentsSource];
