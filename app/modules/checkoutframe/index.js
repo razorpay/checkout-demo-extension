@@ -11,6 +11,7 @@ import {
 import { processNativeMessage } from 'checkoutstore/native';
 import { isEMandateEnabled, getEnabledMethods } from 'checkoutstore/methods';
 import showTimer from 'checkoutframe/timer';
+import { setHistoryAndListenForBackPresses } from 'bridge/back';
 
 import { init as initI18n, bindI18nEvents } from 'i18n/init';
 
@@ -200,7 +201,7 @@ function fetchPrefs(session) {
   session.isOpen = true;
 
   /* Start listening for back presses */
-  Bridge.setHistoryAndListenForBackPresses();
+  setHistoryAndListenForBackPresses();
 
   let closeAt;
   const timeout = session.r.get('timeout');

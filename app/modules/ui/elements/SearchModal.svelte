@@ -20,6 +20,7 @@
   import { isMobile } from 'common/useragent';
   import Track from 'tracker';
   import { isElementCompletelyVisibleInContainer } from 'lib/utils';
+  import * as Search from 'checkoutframe/search';
   import { getAnimationOptions } from 'svelte-utils';
 
   // i18n
@@ -49,6 +50,9 @@
 
   const dispatch = createEventDispatcher();
 
+  // Variables for searching library
+  const cache = Search.createCache();
+
   // Variables
   let visible = false;
   let query = '';
@@ -64,13 +68,15 @@
 
   function getResults(query, items) {
     if (query) {
-      return _Arr.filter(items, item => {
-        const queryText = query.toLowerCase().trim();
+      const queryText = query.toLowerCase().trim();
 
-        return _Arr.any(keys, key => {
-          return item[key].toLowerCase().includes(queryText);
-        });
+      const { results } = Search.search(queryText, items, keys, {
+        cache,
+        algorithm: Search.algorithmWithTypo,
+        threshold: -100,
       });
+
+      return _Arr.map(results, result => result.ref);
     } else {
       return [];
     }
@@ -196,7 +202,10 @@
     $overlayStack = _Arr.remove($overlayStack, overlay);
   }
 
-  onDestroy(removeFromOverlayStack);
+  onDestroy(() => {
+    removeFromOverlayStack();
+    cache.clear();
+  });
 
   $: {
     if (visible === false) {
