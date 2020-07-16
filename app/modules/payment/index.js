@@ -1012,10 +1012,11 @@ function getCardFeatures(cardNumber) {
   CardFeatureRequests.iin[iin] = new Promise((resolve, reject) => {
     let url = makeAuthUrl(this, 'payment/iin');
 
-    // append IIN and source as query
+    // append IIN, source and language_code as query
     url = _.appendParamsToUrl(url, {
       iin,
       '_[source]': Track.props.library,
+      language_code: getCurrentLocale(),
     });
 
     fetch.jsonp({
@@ -1113,6 +1114,8 @@ razorpayProto.getCardCurrencies = function(payload) {
 
     // append requestPayload
     url = _.appendParamsToUrl(url, requestPayload);
+
+    url = _.appendParamsToUrl(url, { language_code: getCurrentLocale() });
 
     fetch.jsonp({
       url,
