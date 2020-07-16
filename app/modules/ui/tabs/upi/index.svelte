@@ -54,7 +54,7 @@
   // Store
   import { contact } from 'checkoutstore/screens/home';
   import { customer } from 'checkoutstore/customer';
-  import { methodTabInstrument } from 'checkoutstore/screens/home';
+  import { methodInstrument } from 'checkoutstore/screens/home';
 
   import {
     UPI_GPAY_BLOCK_HEADING,
@@ -183,7 +183,7 @@
 
   let availableFlows = getAvailableFlowsFromInstrument();
   $: {
-    availableFlows = getAvailableFlowsFromInstrument($methodTabInstrument);
+    availableFlows = getAvailableFlowsFromInstrument($methodInstrument);
   }
 
   // Set default token value when the available flows change
@@ -219,7 +219,7 @@
   }
 
   let intentApps = getUPIIntentApps().filtered;
-  $: intentApps = getUPIIntentAppsFromInstrument($methodTabInstrument);
+  $: intentApps = getUPIIntentAppsFromInstrument($methodInstrument);
 
   let otmEndDate = addDaysToDate(otmStartDate, 90);
 
@@ -333,6 +333,7 @@
   export function onShown() {
     setDefaultTokenValue();
     determineCtaVisibility();
+    sendIntentEvents();
   }
 
   export function getPayload() {
@@ -525,6 +526,38 @@
       },
     });
   }
+
+  function sendIntentEvents() {
+    if (!intent) {
+      return;
+    }
+
+    const apps = getUPIIntentApps();
+
+    Analytics.track('upi:intent', {
+      type: AnalyticsTypes.RENDER,
+      data: {
+        count: {
+          eligible: apps.filtered.length,
+          all: apps.all.length,
+        },
+        list: {
+          eligible: _Arr.join(
+            _Arr.map(apps.filtered, function(app) {
+              return app.package_name;
+            }),
+            ','
+          ),
+          all: _Arr.join(
+            _Arr.map(apps.all, function(app) {
+              return app.package_name;
+            }),
+            ','
+          ),
+        },
+      },
+    });
+  }
 </script>
 
 <style>
@@ -686,7 +719,7 @@
       {/if}
     </div>
 
-    <Bottom tab={method}>
+    <Bottom>
       {#if down || disabled}
         <DowntimeCallout severe={disabled}>
           <!-- LABEL: UPI is experiencing low success rates. -->

@@ -4,13 +4,14 @@
    */
 
   // Svelte imports
-  import { createEventDispatcher, onMount, tick } from 'svelte';
+  import { createEventDispatcher, onMount, tick, onDestroy } from 'svelte';
   import { fade, fly } from 'svelte/transition';
 
   // UI imports
   import Stack from 'ui/layouts/Stack.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import { getMiscIcon } from 'checkoutframe/icons';
+  import CTA from 'ui/elements/CTA.svelte';
 
   // Store imports
   import { overlayStack } from 'checkoutstore/back';
@@ -19,6 +20,8 @@
   import { isMobile } from 'common/useragent';
   import Track from 'tracker';
   import { isElementCompletelyVisibleInContainer } from 'lib/utils';
+  import * as Search from 'checkoutframe/search';
+  import { getAnimationOptions } from 'svelte-utils';
 
   // i18n
   import { locale } from 'svelte-i18n';
@@ -47,6 +50,9 @@
 
   const dispatch = createEventDispatcher();
 
+  // Variables for searching library
+  const cache = Search.createCache();
+
   // Variables
   let visible = false;
   let query = '';
@@ -60,27 +66,24 @@
   let inputRef;
   let resultsContainerRef;
 
-  function updateResults() {
+  function getResults(query, items) {
     if (query) {
-      results = _Arr.filter(items, item => {
-        const queryText = query.toLowerCase().trim();
+      const queryText = query.toLowerCase().trim();
 
-        return _Arr.any(keys, key => {
-          return item[key].toLowerCase().includes(queryText);
-        });
+      const { results } = Search.search(queryText, items, keys, {
+        cache,
+        algorithm: Search.algorithmWithTypo,
+        threshold: -100,
       });
-    } else {
-      results = [];
-    }
 
-    if (results.length) {
-      focusedIndex = 0;
+      return _Arr.map(results, result => result.ref);
     } else {
-      focusedIndex = null;
+      return [];
     }
   }
 
-  $: items, query, keys, updateResults();
+  $: items, query, keys, (results = getResults(query, items));
+  $: results, (focusedIndex = results.length ? 0 : null);
   $: shownItems = _Arr.mergeWith(results, items);
   $: shownItems, focusedIndex, scrollToFocusedItem();
   $: shownItems, focusedIndex, updateActiveDescendantInRef(); // TODO: Fix
@@ -188,13 +191,26 @@
 
   export function close() {
     visible = false;
+  }
 
+  function removeFromOverlayStack() {
     // Remove the overlay from $overlayStack
     const overlay = _Arr.find(
       $overlayStack,
       overlay => overlay.id === IDs.overlay
     );
     $overlayStack = _Arr.remove($overlayStack, overlay);
+  }
+
+  onDestroy(() => {
+    removeFromOverlayStack();
+    cache.clear();
+  });
+
+  $: {
+    if (visible === false) {
+      removeFromOverlayStack();
+    }
   }
 
   function escapeHandler(event) {
@@ -216,6 +232,26 @@
     }
   }
 
+  function getNextIndexForUpKey(items, currentIndex) {
+    if (!_.isNumber(currentIndex)) {
+      return items.length - 1;
+    } else if (currentIndex === 0) {
+      return items.length - 1;
+    } else {
+      return currentIndex - 1;
+    }
+  }
+
+  function getNextIndexForDownKey(items, currentIndex) {
+    if (!_.isNumber(currentIndex)) {
+      return 0;
+    } else if (currentIndex === items.length - 1) {
+      return 0;
+    } else {
+      return focusedIndex + 1;
+    }
+  }
+
   function arrowKeysHandler(event) {
     const UP_ARROW = 38;
     const DOWN_ARROW = 40;
@@ -229,26 +265,12 @@
     }
 
     if (key === UP_ARROW) {
-      if (!_.isNumber(focusedIndex)) {
-        focusedIndex = shownItems.length - 1;
-      } else if (focusedIndex === 0) {
-        focusedIndex = shownItems.length - 1;
-      } else {
-        focusedIndex = focusedIndex - 1;
-      }
-
+      focusedIndex = getNextIndexForUpKey(shownItems, focusedIndex);
       return;
     }
 
     if (key === DOWN_ARROW) {
-      if (!_.isNumber(focusedIndex)) {
-        focusedIndex = 0;
-      } else if (focusedIndex === shownItems.length - 1) {
-        focusedIndex = 0;
-      } else {
-        focusedIndex = focusedIndex + 1;
-      }
-
+      focusedIndex = getNextIndexForDownKey(shownItems, focusedIndex);
       return;
     }
   }
@@ -298,10 +320,6 @@
     height: 90%;
   }
 
-  .search-box {
-    font-size: 12px;
-  }
-
   .search-box > :global(.stack) {
     height: 100%;
   }
@@ -311,16 +329,10 @@
     overflow: auto;
   }
 
-  ul.search-results {
-    margin: 0;
-    padding: 0;
-    list-style-type: none;
-  }
-
   .list-header {
     display: flex;
     align-items: center;
-    font-size: 11px;
+    font-size: 0.8rem;
     line-height: 13px;
     margin-top: 16px;
     margin-bottom: 4px;
@@ -374,7 +386,7 @@
   .search-field input {
     color: #888;
     width: 100%;
-    font-size: 13px;
+    font-size: 1rem;
   }
 
   .search-field input::placeholder {
@@ -427,12 +439,12 @@
       <div
         class="search-curtain-bg"
         on:click={() => dispatch('close')}
-        in:fade={{ duration: 200 }}
-        out:fade={{ duration: 200 }} />
+        in:fade={getAnimationOptions({ duration: 200 })}
+        out:fade={getAnimationOptions({ duration: 200 })} />
       <div
         class="search-box"
-        in:fly={{ duration: 200, y: -100 }}
-        out:fade={{ duration: 200 }}>
+        in:fly={getAnimationOptions({ duration: 200, y: -100 })}
+        out:fade={getAnimationOptions({ duration: 200 })}>
         <Stack vertical>
           <form on:submit|preventDefault={submitHandler} class="search-field">
             <div class="icon">
@@ -455,7 +467,7 @@
               bind:value={query}
               bind:this={inputRef} />
           </form>
-          <ul
+          <div
             class="search-results"
             class:has-query={query}
             id={IDs.results}
@@ -467,7 +479,7 @@
                 <!-- LABEL: Results -->
                 <div class="list results">
                   {#each results as item, index (IDs.resultItem(item))}
-                    <li
+                    <div
                       class="list-item"
                       class:focused={index === focusedIndex}
                       id={IDs.resultItem(item)}
@@ -475,7 +487,7 @@
                       aria-selected={index === focusedIndex}
                       on:click={() => onSelect(item)}>
                       <svelte:component this={component} {item} />
-                    </li>
+                    </div>
                   {/each}
                 </div>
               {:else}
@@ -492,7 +504,7 @@
               </div>
               <div class="list">
                 {#each items as item, index (IDs.allItem(item))}
-                  <li
+                  <div
                     class="list-item"
                     class:focused={index + results.length === focusedIndex}
                     id={IDs.allItem(item)}
@@ -500,13 +512,17 @@
                     aria-selected={index + results.length === focusedIndex}
                     on:click={() => onSelect(item)}>
                     <svelte:component this={component} {item} />
-                  </li>
+                  </div>
                 {/each}
               </div>
             {/if}
-          </ul>
+          </div>
         </Stack>
       </div>
     </div>
   {/if}
 </div>
+
+{#if visible}
+  <CTA show={false} />
+{/if}

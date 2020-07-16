@@ -332,6 +332,21 @@ Payment.prototype = {
       _Obj.clone(data || {})
     );
 
+    if (this.gpay || this.tez) {
+      if (
+        !(
+          this.r.paymentAdapters &&
+          (this.r.paymentAdapters.gpay ||
+            this.r.paymentAdapters['microapps.gpay'])
+        )
+      ) {
+        return this.r.emit(
+          'payment.error',
+          _.rzpError('GPay is not available')
+        );
+      }
+    }
+
     formatPayment(this);
 
     let setCompleteHandler = _ => {
@@ -487,6 +502,14 @@ Payment.prototype = {
     if (data.method === 'wallet' && !(data.contact && data.email)) {
       return;
     }
+
+    // Axis bank requires HTTP Referer field to be non-empty,
+    // If opening bank page from popup, it will be empty.
+    // So use create/checkout route.
+    if (data.method === 'emandate' && data.bank === 'UTIB') {
+      return;
+    }
+
     // else make ajax request
 
     var razorpayInstance = this.r;

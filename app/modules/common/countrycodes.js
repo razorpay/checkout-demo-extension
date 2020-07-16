@@ -1,3 +1,5 @@
+// @ts-check
+
 export const COUNTRY_TO_CODE_MAP = {
   AD: '376',
   AE: '971',
@@ -247,20 +249,17 @@ export const COUNTRY_TO_CODE_MAP = {
 };
 
 /**
- * There are 3 possible scenarios for a given number - 
-    I Starts with + 
-    II Starts with 00
-    III Starts without + or 00
-
-  1) For numbers starting with 00, the leading 2 zeros are converted to +, so that cuts it down to final 2 scenarios(I & III).
-  2) Picking scenario(I) - The + is ignored and the first 3 digits are picked up to be checked against the list of country codes. The maximum length of a country code is 3 digits, hence going for a top-to-bottom approach. 
-  3) The 3 digit country code is checked against all 3 digit country codes - If it matches, function returns country code.
-  4) Next step - Pick first 2 digits and check against all 2 digit country codes - If it matches, function returns country code.
-  5) Next step - Pick first 1 digit and check against all 1 digit country codes - If it matches, function returns country code or else undefined.
-  6) Picking scenario(III) - checking for an Indian number is our 1st priority so checking for 10 or 12 digits.
-  7) If the number is a 10 digit one - and starts with [6-9] - It will be classified as an Indian phone number.
-  8) If the number is a 12 digit one - and starts with 91[6-9] - It will be classified as an Indian phone number.
-  9) Other than these scenarios, numbers starting without  a +  or 00 make it difficult to determine country code from a given number.
+ * There are three possible scenarios for a given number:
+ * 1. Starts with +
+ * 2. Starts with 00
+ * 3. Starts without + or 00
+ *
+ * For numbers starting with 00, the leading two zeroes are converted to +.
+ *
+ * Then, we check if the phone number is Indian or American.
+ * If it's neither, we try to find the country code using this approach:
+ * - Sort all the codes by decreasing length
+ * - For each code, check if the phone number starts using that code. If it does, that is the desired code.
  */
 
 const AMERICAN_REGEX = /^\(\d{3}\)[\s-]?\d{3}-?\d{4}$/;
@@ -359,11 +358,11 @@ function getAmericanFormattedNumber(number) {
 
 /**
  * Finds country code for a given phonenumber
- * @param {string} phonenumber
+ * @param {string} phoneNumber
  * @returns {Object} With country code and phonenumber
  */
-export function findCountryCode(phno) {
-  let indian = getIndianNumber(phno);
+export function findCountryCode(phoneNumber) {
+  let indian = getIndianNumber(phoneNumber);
 
   if (indian.success) {
     return {
@@ -372,7 +371,7 @@ export function findCountryCode(phno) {
     };
   }
 
-  let american = getAmericanFormattedNumber(phno);
+  let american = getAmericanFormattedNumber(phoneNumber);
 
   if (american.success) {
     return {
@@ -381,26 +380,26 @@ export function findCountryCode(phno) {
     };
   }
 
-  let number = sanitizeNumber(phno);
+  let number = sanitizeNumber(phoneNumber);
 
-  const intlCode = getCountryCodeFromNumber(number);
+  const code = getCountryCodeFromNumber(number);
 
   let phone = removePlus(number);
 
-  if (intlCode) {
-    phone = phone.slice(intlCode.length);
+  if (code) {
+    phone = phone.slice(code.length);
   }
 
   return {
     phone,
-    code: intlCode,
+    code,
   };
 }
 
 /**
  * Returns country code for a given international phonenumber
- * @param {string} phonenumber
- * @returns {string} country code
+ * @param {string} number
+ * @returns {string|undefined} country code
  */
 function getCountryCodeFromNumber(number) {
   number = removePlus(number);

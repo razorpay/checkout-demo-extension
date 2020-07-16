@@ -5,7 +5,7 @@
   // Store Imports
   import { getWallets } from 'checkoutstore/methods';
   import { showCta } from 'checkoutstore/cta';
-  import { methodTabInstrument } from 'checkoutstore/screens/home';
+  import { methodInstrument } from 'checkoutstore/screens/home';
 
   // i18n
   import { getWalletName } from 'i18n';
@@ -16,6 +16,7 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import * as WalletsData from 'common/wallet';
+  import { getAnimationOptions } from 'svelte-utils';
 
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import Icon from 'ui/elements/Icon.svelte';
@@ -36,7 +37,7 @@
   $: {
     filteredWallets = filterWalletsAgainstInstrument(
       wallets,
-      $methodTabInstrument
+      $methodInstrument
     );
 
     // If a wallet was selected and has been filtered out, deselect it
@@ -45,6 +46,15 @@
       !_Arr.any(filteredWallets, wallet => wallet.code === selectedWallet)
     ) {
       selectedWallet = null;
+    }
+
+    /**
+     * If there's only one wallet available,
+     * select it automatically to reduce a user click.
+     * Of course, do this only when there's nothing preselected.
+     */
+    if (!selectedWallet && filteredWallets.length === 1) {
+      onWalletSelection(filteredWallets[0].code);
     }
   }
 
@@ -119,19 +129,6 @@
       wallet: selectedWallet,
     };
 
-    /**
-     * Wallets might need to go through intent flow too
-     * TODO: Add a feature check here
-     */
-    const shouldTurnWalletToIntent = WalletsData.shouldTurnWalletToIntent(
-      selectedWallet,
-      session.upi_intents_data
-    );
-
-    if (shouldTurnWalletToIntent) {
-      payload.upi_app = WalletsData.getPackageNameForWallet(selectedWallet);
-    }
-
     return payload;
   }
 
@@ -173,7 +170,7 @@
       </div>
       <div slot="body">
         {#if selectedWallet === wallet.code}
-          <div transition:slide={{ duration: 200 }}>
+          <div transition:slide={getAnimationOptions({ duration: 200 })}>
             {#if getApplicableOffer(wallet.code)}
               <span class="offer">{getApplicableOffer(wallet.code).name}</span>
               <div class="offer-info">

@@ -246,11 +246,16 @@ const util = (module.exports = {
         body: JSON.stringify(body),
       });
 
-    returnObj.respondJSONP = body =>
-      respond({
+    returnObj.respondJSONP = body => {
+      const url = currentRequest.url();
+      const parsedURL = URL.parse(url);
+      const params = querystring.parse(parsedURL.query);
+
+      return respond({
         contentType: 'text/javascript; charset=UTF-8',
-        body: `Razorpay.jsonp0(${JSON.stringify(body)})`,
+        body: `${params.callback}(${JSON.stringify(body)})`,
       });
+    };
 
     returnObj.respondHTML = body =>
       respond({

@@ -26,7 +26,7 @@
     isContactPresent,
     email,
     selectedInstrumentId,
-    methodTabInstrument,
+    methodInstrument,
     multiTpvOption,
     partialPaymentAmount,
     partialPaymentOption,
@@ -107,10 +107,16 @@
   import { getCardOffer, hasOffersOnHomescreen } from 'checkoutframe/offers';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
   import { findCountryCode } from 'common/countrycodes';
+  import { isInstrumentGrouped } from 'configurability/instruments';
+  import { isElementCompletelyVisibleInTab } from 'lib/utils';
 
   import { INDIA_COUNTRY_CODE } from 'common/constants';
+  import { getAnimationOptions } from 'svelte-utils';
 
   import { setBlocks } from 'ui/tabs/home/instruments';
+
+  import { update as updateContactStorage } from 'checkoutframe/contact-storage';
+  import { isMobile } from 'common/useragent';
 
   const cardOffer = getCardOffer();
   const session = getSession();
@@ -205,6 +211,17 @@
     Analytics.track('home:methods:hide', {
       type: AnalyticsTypes.BEHAV,
     });
+  }
+
+  function editUserDetails() {
+    Razorpay.sendMessage({
+      event: 'event',
+      data: {
+        event: 'user_details.edit',
+      },
+    });
+
+    hideMethods();
   }
 
   export function setDetailsCta() {
@@ -376,10 +393,7 @@
     }
 
     // Single method
-    if (
-      singleMethod &&
-      !_Arr.contains(['wallet', 'netbanking', 'upi'], singleMethod)
-    ) {
+    if (singleMethod && isRecurring()) {
       return false;
     }
 
@@ -406,13 +420,8 @@
     return true;
   }
 
-  function deselectAllInstruments() {
-    $methodTabInstrument = null;
-    $selectedInstrumentId = null;
-  }
-
   export function onShown() {
-    deselectAllInstruments();
+    deselectInstrument();
 
     if (view === 'methods') {
       hideCta();
@@ -502,13 +511,10 @@
      * Otherwise, we take the user to the details screen.
      */
     if (singleMethod) {
-      if (
-        _Arr.contains(['wallet', 'netbanking', 'upi'], singleMethod) &&
-        $instruments.length > 0
-      ) {
-        return METHODS;
-      } else {
+      if (isRecurring()) {
         return DETAILS;
+      } else {
+        return METHODS;
       }
     }
 
@@ -528,26 +534,35 @@
     },
   });
 
+  function storeContactDetails() {
+    // Store only on mobile since Desktops can be shared b/w users
+    if (isMobile()) {
+      updateContactStorage({
+        contact: $contact,
+        email: $email,
+      });
+    }
+  }
+
   export function next() {
     Analytics.track('home:proceed');
+
+    /**
+     * - Store contact details only when the user has explicity clicked on the CTA
+     * - `next()` is not invoked if the merchant had prefilled the user's details
+     *    since the user would land directly on the methods view
+     */
+    storeContactDetails();
 
     // Multi TPV
     if (tpv) {
       if (tpv.method === 'upi') {
-        selectMethod({
-          detail: {
-            method: 'upi',
-          },
-        });
+        selectMethod('upi');
       } else if (tpv.method === 'netbanking') {
         session.preSubmit();
       } else {
         if ($multiTpvOption === 'upi') {
-          selectMethod({
-            detail: {
-              method: 'upi',
-            },
-          });
+          selectMethod('upi');
         } else if ($multiTpvOption === 'netbanking') {
           session.preSubmit();
         }
@@ -561,18 +576,11 @@
         return;
       }
 
-      if (
-        _Arr.contains(['wallet', 'netbanking', 'upi'], singleMethod) &&
-        $instruments.length > 0
-      ) {
-        showMethods();
+      if (isRecurring()) {
+        selectMethod(singleMethod);
         return;
       } else {
-        selectMethod({
-          detail: {
-            method: singleMethod,
-          },
-        });
+        showMethods();
         return;
       }
     }
@@ -581,6 +589,9 @@
   }
 
   function createPaypalPayment() {
+    // Deselct to hide Pay button
+    deselectInstrument();
+
     const payload = session.getPayload();
 
     payload.method = 'paypal';
@@ -592,22 +603,7 @@
     $selectedInstrumentId = null;
   }
 
-  export function selectMethod(event) {
-    deselectInstrument();
-
-    Analytics.track('payment_method:select', {
-      type: AnalyticsTypes.BEHAV,
-      data: event.detail,
-    });
-
-    let { down, method } = event.detail;
-
-    if (down) {
-      return;
-    }
-
-    $selectedInstrumentId = null;
-
+  export function selectMethod(method) {
     if (method === 'paypal') {
       createPaypalPayment();
       return;
@@ -663,6 +659,29 @@
   $: {
     showUserDetailsStrip =
       ($isContactPresent || $email) && !isContactEmailHidden();
+  }
+
+  export function onSelectInstrument(event) {
+    const instrument = event.detail;
+
+    $selectedInstrumentId = instrument.id;
+
+    if (isInstrumentGrouped(instrument)) {
+      selectMethod(instrument.method);
+    } else {
+      // Bring instrument into view if it's not visible
+      const domElement = _Doc.querySelector(
+        `.home-methods .methods-block [data-id="${instrument.id}"]`
+      );
+
+      if (domElement && !isElementCompletelyVisibleInTab(domElement)) {
+        domElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'center',
+        });
+      }
+    }
   }
 </script>
 
@@ -755,15 +774,15 @@
       {#if view === 'methods'}
         <div
           class="solidbg"
-          in:slide={{ duration: 400 }}
-          out:fly={{ duration: 200, y: 80 }}>
+          in:slide={getAnimationOptions({ duration: 400 })}
+          out:fly={getAnimationOptions({ duration: 200, y: 80 })}>
           {#if showUserDetailsStrip || isPartialPayment}
             <div
               use:touchfix
               class="details-container border-list"
-              in:fly={{ duration: 400, y: 80 }}>
+              in:fly={getAnimationOptions({ duration: 400, y: 80 })}>
               {#if showUserDetailsStrip}
-                <SlottedOption on:click={hideMethods} id="user-details">
+                <SlottedOption on:click={editUserDetails} id="user-details">
                   <i slot="icon">
                     <Icon icon={icons.contact} />
                   </i>
@@ -820,9 +839,9 @@
 
           <div
             class="home-methods"
-            in:fly={{ delay: 100, duration: 400, y: 80 }}>
+            in:fly={getAnimationOptions({ delay: 100, duration: 400, y: 80 })}>
             <NewMethodsList
-              on:selectMethod={selectMethod}
+              on:selectInstrument={onSelectInstrument}
               on:submit={attemptPayment} />
           </div>
         </div>
@@ -849,7 +868,9 @@
       {/if}
 
       {#if showSecuredByMessage}
-        <div class="secured-message" out:slide={{ duration: 100 }}>
+        <div
+          class="secured-message"
+          out:slide={getAnimationOptions({ duration: 100 })}>
           <i>
             <svg
               width="16"

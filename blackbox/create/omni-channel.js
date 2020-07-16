@@ -101,19 +101,11 @@ module.exports = function(testFeatures) {
 
       await assertPaymentMethods(context);
       if (downtimeHigh) {
-        if (offers) {
-          await verifyHighDowntime(
-            context,
-            'upi',
-            ' UPI is experiencing low success rates.'
-          );
-        } else {
-          await verifyHighDowntime(
-            context,
-            'upi',
-            'UPI is facing temporary issues right now.'
-          );
-        }
+        await verifyHighDowntime(
+          context,
+          'upi',
+          'UPI is facing temporary issues right now.'
+        );
         return;
       }
 

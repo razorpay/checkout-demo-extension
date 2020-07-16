@@ -29,6 +29,7 @@
     getWalletName,
     getCardlessEmiProviderName,
     getPaylaterProviderName,
+    getUpiIntentAppName,
   } from 'i18n';
 
   // Props
@@ -101,15 +102,19 @@
         app => app.package_name === individualInstrument.app
       );
 
-      title = getInstrumentTitle(
-        'upi',
-        app.app_name.replace(/ UPI$/, ''),
-        locale
-      );
+      // In case of ios, app name might be missing if not sent by the sdk
+      let appName = app.app_name || 'Unknown app';
+
+      // shortcode might not be present for existing instruments. Check for backward compatibility.
+      if (app.shortcode) {
+        appName = getUpiIntentAppName(app.shortcode, $locale, appName);
+      }
+
+      title = getInstrumentTitle('upi', appName.replace(/ UPI$/, ''), locale);
 
       if (app.app_icon) {
         icon = app.app_icon;
-        alt = app.app_name;
+        alt = appName;
       } else {
         icon = '&#xe70e;';
         alt = 'UPI App';
@@ -201,10 +206,6 @@
       dispatch('submit');
     }
   }
-
-  function selectInstrument() {
-    $selectedInstrumentId = instrument.id;
-  }
 </script>
 
 <SlottedRadioOption
@@ -212,10 +213,9 @@
   {name}
   {selected}
   className="instrument"
-  attributes={{ 'data-type': 'individual' }}
+  attributes={{ 'data-type': 'individual', 'data-id': instrument.id }}
   value={instrument.id}
   on:click
-  on:click={selectInstrument}
   on:keydown={attemptSubmit}>
   <i slot="icon">
     <Icon {icon} {alt} />

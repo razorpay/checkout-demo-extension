@@ -21,7 +21,7 @@
     authType,
     cardType,
   } from 'checkoutstore/screens/card';
-  import { methodTabInstrument } from 'checkoutstore/screens/home';
+  import { methodInstrument } from 'checkoutstore/screens/home';
 
   import {
     isNameReadOnly,
@@ -30,7 +30,7 @@
     isStrictlyRecurring,
     getCardFeatures,
   } from 'checkoutstore';
-  import { isAMEXEnabled } from 'checkoutstore/methods';
+  import { isAMEXEnabled, getCardNetworks } from 'checkoutstore/methods';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -45,7 +45,12 @@
   // Utils
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import { getIin, getCardDigits, getCardMetadata } from 'common/card';
+  import {
+    getIin,
+    getCardDigits,
+    getCardMetadata,
+    API_NETWORK_CODES_MAP,
+  } from 'common/card';
   import { DEFAULT_AUTH_TYPE_RADIO } from 'common/constants';
   import { Formatter } from 'formatter';
   import { isInstrumentValidForPayment } from 'configurability/validate';
@@ -225,15 +230,19 @@
 
     getCardFeatures(iin)
       .then(features => {
-        let validationPromises = [flowChecker(features), validateCardNumber()];
+        let validationPromises = [
+          flowChecker(features),
+          validateCardNumber(),
+          getCardMetadata(iin),
+        ];
 
         /**
          * If there's a card/emi instrument, we check for its validity.
          * Otherwise we'll just assume that this is successful validation.
          */
-        if ($methodTabInstrument && $methodTabInstrument.method === tab) {
+        if ($methodInstrument && $methodInstrument.method === tab) {
           validationPromises.push(
-            isInstrumentValidForPayment($methodTabInstrument, {
+            isInstrumentValidForPayment($methodInstrument, {
               method: tab,
               'card[number]': $cardNumber,
             })
@@ -244,36 +253,73 @@
 
         return Promise.all(validationPromises);
       })
-      .then(([isFlowValid, isCardNumberValid, isInstrumentValid]) => {
-        showCardUnsupported = !isInstrumentValid;
-        setCardNumberValidity(
-          isCardNumberValid && isFlowValid && isInstrumentValid
-        );
+      .then(
+        ([isFlowValid, isCardNumberValid, cardMetaData, isInstrumentValid]) => {
+          /**
+           * This variable tells whether the network of the current card
+           * is enabled for the merchant.
+           * Assumed true by default so that we let the payment go through
+           * in case we don't fail to validate.
+           */
+          let isCurrentCardsNetworkEnabledForMerchant = true;
 
-        // Track validity if instrument was used
-        if ($methodTabInstrument) {
-          Analytics.track('instrument:input:validate', {
-            data: {
-              method: $methodTabInstrument.method,
-              instrument: $methodTabInstrument,
-              valid: isInstrumentValid,
-            },
-          });
+          // Find the entry in API_NETWORK_CODES_MAP
+          let networkEntry = _Arr.find(
+            _Obj.entries(API_NETWORK_CODES_MAP),
+            map => map[1] === cardMetaData.network
+          );
+
+          if (networkEntry) {
+            const apiNetwork = networkEntry[0]; // Card's network in API-representation
+            const enabledNetworks = getCardNetworks(); // Merchant's enabled networks
+
+            /**
+             * getCardNetworks might return an empty object because API sometimes does not send
+             * methods.card_networks for whatever reason
+             */
+            if (!_.isUndefined(enabledNetworks[apiNetwork])) {
+              isCurrentCardsNetworkEnabledForMerchant = Boolean(
+                enabledNetworks[apiNetwork]
+              );
+            }
+          }
+
+          // Card is unsupported if validation on instrument fails or if network is disabled for merchant
+          showCardUnsupported =
+            !isInstrumentValid || !isCurrentCardsNetworkEnabledForMerchant;
+
+          setCardNumberValidity(
+            isCardNumberValid &&
+              isFlowValid &&
+              isInstrumentValid &&
+              isCurrentCardsNetworkEnabledForMerchant
+          );
+
+          // Track validity if instrument was used
+          if ($methodInstrument) {
+            Analytics.track('instrument:input:validate', {
+              data: {
+                method: $methodInstrument.method,
+                instrument: $methodInstrument,
+                valid: isInstrumentValid,
+              },
+            });
+          }
         }
-      })
+      )
       .catch(_Func.noop); // IIN changed, do nothing
   }
 
   $: {
     /**
-     * When $methodTabInstrument changes and is a card instrument,
+     * When $methodInstrument changes and is a card instrument,
      * we'll need to perform all vaildations again
      */
 
-    const hasCardMethodTabInstrument =
-      $methodTabInstrument && $methodTabInstrument.method === 'card';
-    if ($methodTabInstrument) {
-      if ($methodTabInstrument.method === 'card') {
+    const hasCardMethodInstrument =
+      $methodInstrument && $methodInstrument.method === 'card';
+    if ($methodInstrument) {
+      if ($methodInstrument.method === 'card') {
         onCardNumberChange();
       }
     } else {

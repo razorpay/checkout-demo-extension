@@ -20,8 +20,9 @@
     cardNumber,
     remember,
     selectedCard,
+    cardTab,
   } from 'checkoutstore/screens/card';
-  import { methodTabInstrument } from 'checkoutstore/screens/home';
+  import { methodInstrument, blocks } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
 
@@ -57,6 +58,7 @@
   import * as AnalyticsTypes from 'analytics-types';
   import { getCardType } from 'common/card';
   import { getSubtextForInstrument } from 'subtext';
+  import { getAnimationOptions } from 'svelte-utils';
 
   // Transitions
   import { fade } from 'svelte/transition';
@@ -73,6 +75,8 @@
   let currentView = Views.SAVED_CARDS;
 
   let tab = '';
+  $: $cardTab = tab;
+
   let allSavedCards = [];
   let savedCards = [];
   let lastSavedCard = null;
@@ -196,7 +200,7 @@
 
     _savedCards = filterSavedCardsAgainstInstrument(
       _savedCards,
-      $methodTabInstrument
+      $methodInstrument
     );
 
     savedCards = _savedCards;
@@ -208,14 +212,36 @@
 
   let instrumentSubtext;
   $: {
-    if (!$methodTabInstrument) {
+    if (!$methodInstrument) {
       instrumentSubtext = undefined;
-    } else if ($methodTabInstrument.method !== tab) {
+    } else if ($methodInstrument.method !== tab) {
       instrumentSubtext = undefined;
     } else {
-      instrumentSubtext = getSubtextForInstrument($methodTabInstrument);
+      instrumentSubtext = getSubtextForInstrument($methodInstrument);
     }
   }
+
+  /**
+   * Determine if subtext should be shown
+   * We don't show subtext if subtext is empty
+   * or if the instrument is a part of rzp.cluster block
+   *
+   * @returns {boolean}
+   */
+  function detemineIfSubtextShouldBeShown() {
+    if (!instrumentSubtext) {
+      return false;
+    }
+
+    const block = _Arr.find($blocks, block =>
+      _Arr.contains(block.instruments, $methodInstrument)
+    );
+
+    return block && block.code !== 'rzp.cluster';
+  }
+
+  let shouldShowSubtext = detemineIfSubtextShouldBeShown();
+  $: instrumentSubtext, (shouldShowSubtext = detemineIfSubtextShouldBeShown());
 
   function getSavedCardsFromCustomer(customer = {}) {
     if (!customer.tokens) {
@@ -460,7 +486,7 @@
   <Screen pad={false}>
     <div>
       {#if currentView === Views.ADD_CARD}
-        <div in:fade={{ duration: 100, y: 100 }}>
+        <div in:fade={getAnimationOptions({ duration: 100, y: 100 })}>
           {#if showSavedCardsCta}
             <div
               id="show-saved-cards"
@@ -475,7 +501,7 @@
             </div>
           {/if}
 
-          {#if instrumentSubtext}
+          {#if shouldShowSubtext}
             <div class="pad instrument-subtext-description">
               {instrumentSubtext}
             </div>
@@ -494,8 +520,8 @@
           {/if}
         </div>
       {:else}
-        <div in:fade={{ duration: 100 }}>
-          {#if instrumentSubtext}
+        <div in:fade={getAnimationOptions({ duration: 100 })}>
+          {#if shouldShowSubtext}
             <div class="pad instrument-subtext-description">
               {instrumentSubtext}
             </div>
