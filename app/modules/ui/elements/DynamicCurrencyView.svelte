@@ -150,14 +150,14 @@
   $: currencies = currencyConfig && currencyConfig.all_currencies;
   $: cardCurrency = currencyConfig && currencyConfig.card_currency;
   $: sortedCurrencies = currencies && sortCurrencies(currencies);
-  $: displayCurrencies = _Obj.entries(sortedCurrencies).slice(0, 3);
+  $: displayCurrencies = sortedCurrencies && sortedCurrencies.slice(0, 3);
   $: dccAmount = currencies && currencies[selectedCurrency].amount;
   $: selectedCurrencyInDisplay = _Arr.find(
     displayCurrencies,
-    ([code]) => code === selectedCurrency
+    ({ currency }) => currency === selectedCurrency
   );
 
-  function onSelect({ currency }) {
+  function onSelect(currency) {
     selectedCurrency = currency;
 
     searchModal.close();
@@ -294,14 +294,14 @@
         {#if selectedCurrencyInDisplay}
           <div class="default-currencies">
             <Stack horizonal>
-              {#each displayCurrencies as [code, config] (code)}
+              {#each displayCurrencies as { currency, amount } (currency)}
                 <Radio
                   name="dcc_currency"
-                  label={code}
-                  value={config.amount}
-                  checked={code === selectedCurrency}
-                  on:change={() => onSelect(code)}>
-                  {config.amount}
+                  label={currency}
+                  value={amount}
+                  checked={currency === selectedCurrency}
+                  on:change={() => onSelect(currency)}>
+                  {amount}
                 </Radio>
               {/each}
             </Stack>
@@ -337,7 +337,7 @@
         component={CurrencySearchItem}
         bind:this={searchModal}
         on:close={() => searchModal.close()}
-        on:select={({ detail }) => onSelect(detail)} />
+        on:select={({ detail }) => onSelect(detail.currency)} />
     </Stack>
   {/if}
 </div>

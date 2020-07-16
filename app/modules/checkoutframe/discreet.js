@@ -33,7 +33,6 @@ import * as CountryCodesUtil from 'common/countrycodes';
 
 /* Required for merchant.js migration */
 import * as Constants from 'common/constants';
-import * as Bank from 'common/bank';
 import * as Card from 'common/card';
 import * as Wallet from 'common/wallet';
 import * as CardlessEmi from 'common/cardlessemi';
@@ -45,6 +44,7 @@ import * as Offers from 'checkoutframe/offers';
 import * as Flows from 'checkoutframe/flows';
 import * as Payouts from 'checkoutframe/payouts';
 import { initIframe } from 'checkoutframe/iframe';
+import { stopListeningForBackPresses } from 'bridge/back';
 import * as Bridge from 'bridge';
 import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
 import { Formatter } from 'formatter';
@@ -70,7 +70,7 @@ import HomeTab from 'ui/tabs/home/index.svelte';
 import netbankingTab from 'checkoutframe/components/netbanking';
 import EmandateTab from 'ui/tabs/emandate/index.svelte';
 import NachScreen from 'ui/tabs/nach/index.svelte';
-import CardTab from 'ui/tabs/card/index.svelte';
+import * as cardTab from 'checkoutframe/components/card';
 import WalletTab from 'ui/tabs/wallets/index.svelte';
 import TopBar from 'ui/components/Topbar.svelte';
 
@@ -89,6 +89,7 @@ import * as NBHandlers from 'handlers/netbanking';
 
 import * as Instruments from 'configurability/instruments';
 import { getInstrumentMeta } from 'ui/tabs/home/instruments';
+import * as ContactStorage from 'checkoutframe/contact-storage';
 
 export default {
   RazorpayConfig,
@@ -119,7 +120,6 @@ export default {
   es6components,
 
   Constants,
-  Bank,
   Card,
   Wallet,
   CardlessEmi,
@@ -128,6 +128,7 @@ export default {
   SessionManager,
   Checkout,
   Bridge,
+  stopListeningForBackPresses,
   P13n,
   Instruments,
   getInstrumentMeta,
@@ -183,7 +184,7 @@ export default {
   netbankingTab,
   EmandateTab,
   NachScreen,
-  CardTab,
+  cardTab,
 
   Hacks,
   storeGetter,
@@ -200,5 +201,6 @@ export default {
   NBHandlers,
 
   initI18n,
+  ContactStorage,
   I18n,
 };
