@@ -7,7 +7,7 @@ import * as TermsCurtain from 'checkoutframe/termscurtain';
 import { getCheckoutBridge, storage } from './index';
 import { get as storeGetter } from 'svelte/store';
 import { overlayStack as overlayStackStore } from 'checkoutstore/back';
-import { formatMessageWithLocale, getCurrentLocale } from '../i18n';
+import { format } from 'i18n';
 
 /**
  * window.backPressed is called by Android SDK everytime android backbutton is
@@ -89,14 +89,13 @@ export function backPressed(callback) {
 
 function closeModal() {
   const session = getSession();
-  const locale = getCurrentLocale();
 
   if (session.get('modal.confirm_close')) {
     Confirm.show({
-      message: formatMessageWithLocale('misc.confirm_cancel', locale),
-      heading: formatMessageWithLocale('misc.cancel_title', locale),
-      positiveBtnTxt: formatMessageWithLocale('misc.cancel_confirm', locale),
-      negativeBtnTxt: formatMessageWithLocale('misc.cancel_back', locale),
+      message: format('misc.confirm_cancel'),
+      heading: format('misc.cancel_title'),
+      positiveBtnTxt: format('misc.cancel_confirm'),
+      negativeBtnTxt: format('misc.cancel_back'),
       onPositiveClick: function() {
         session.hide();
       },

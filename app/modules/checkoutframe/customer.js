@@ -6,7 +6,7 @@ import * as AnalyticsTypes from 'analytics-types';
 import * as Bridge from 'bridge';
 import * as OtpService from 'common/otpservice';
 import { isRecurring } from 'checkoutstore';
-import { formatMessageWithLocale, getCurrentLocale } from 'i18n';
+import { format, getCurrentLocale } from 'i18n';
 
 /* global getPhone */
 
@@ -172,10 +172,7 @@ Customer.prototype = {
           if (data.error.field) {
             getSession().errorHandler(data);
           } else {
-            const locale = getCurrentLocale();
-            callback(
-              formatMessageWithLocale('otp.title.incorrect_otp_retry', locale)
-            );
+            callback(format('otp.title.incorrect_otp_retry'));
           }
         } else {
           callback(undefined, data);

@@ -84,8 +84,7 @@ var PayLaterStore = {
 var BackStore = null;
 
 function confirmClose() {
-  var locale = I18n.getCurrentLocale();
-  return confirm(I18n.formatMessageWithLocale('misc.confirm_cancel', locale));
+  return confirm(I18n.format('misc.confirm_cancel'));
 }
 
 /**
@@ -306,8 +305,7 @@ function errorHandler(response) {
 
   var error = response.error;
   var message = error.description;
-  var locale = I18n.getCurrentLocale();
-  var cancelMsg = I18n.formatMessageWithLocale('misc.payment_canceled', locale);
+  var cancelMsg = I18n.format('misc.payment_canceled');
 
   // Both checks are there because API still returns message in English.
   if (message === cancelMsg || message === discreet.cancelMsg) {
@@ -391,8 +389,7 @@ function errorHandler(response) {
 
   if (this.tab || (message !== cancelMsg && message !== discreet.cancelMsg)) {
     this.showLoadError(
-      message ||
-        I18n.formatMessageWithLocale('misc.error_handling_request', locale),
+      message || I18n.format('misc.error_handling_request'),
       true
     );
   }
@@ -402,7 +399,6 @@ function errorHandler(response) {
 
 /* bound with session */
 function cancelHandler(response) {
-  var locale = I18n.getCurrentLocale();
   if (!this.payload) {
     return;
   }
@@ -415,10 +411,7 @@ function cancelHandler(response) {
       discreet.UPIUtils.trackUPIIntentFailure(this.r._payment.upi_app);
     }
 
-    this.showLoadError(
-      I18n.formatMessageWithLocale('misc.payment_incomplete', locale),
-      true
-    );
+    this.showLoadError(I18n.format('misc.payment_incomplete'), true);
   } else if (
     /^(card|emi)$/.test(this.payload.method) &&
     this.screen &&
@@ -551,13 +544,9 @@ function askOTP(view, textView, shouldLimitResend, templateData) {
                 thisSession.hideTimer();
                 thisSession.back(true);
                 setTimeout(function() {
-                  var locale = I18n.getCurrentLocale();
                   Analytics.track('native_otp:timeout');
                   thisSession.showLoadError(
-                    I18n.formatMessageWithLocale(
-                      'misc.payment_timeout',
-                      locale
-                    ),
+                    I18n.format('misc.payment_timeout'),
                     true
                   );
                 }, 300);
@@ -946,17 +935,13 @@ Session.prototype = {
         });
 
         var abortPaymentOnUPIIntentFailure = function() {
-          var locale = I18n.getCurrentLocale();
           self.ajax.abort();
 
           if (self.r._payment && self.r._payment.upi_app) {
             discreet.UPIUtils.trackUPIIntentFailure(self.r._payment.upi_app);
           }
 
-          self.showLoadError(
-            I18n.formatMessageWithLocale('misc.payment_incomplete', locale),
-            true
-          );
+          self.showLoadError(I18n.format('misc.payment_incomplete'), true);
           self.clearRequest(discreet.UPIUtils.upiBackCancel);
         };
 
@@ -1910,16 +1895,13 @@ Session.prototype = {
   },
 
   secAction: function() {
-    var locale = I18n.getCurrentLocale();
     if (this.headless && this.r._payment) {
       Analytics.track('native_otp:gotobank', {
         type: AnalyticsTypes.BEHAV,
         immediately: true,
       });
       this.hideTimer();
-      this.showLoadError(
-        I18n.formatMessageWithLocale('misc.payment_waiting_on_bank', locale)
-      );
+      this.showLoadError(I18n.format('misc.payment_waiting_on_bank'));
       return this.r._payment.gotoBank();
     }
     var payload = this.payload;
@@ -2504,7 +2486,6 @@ Session.prototype = {
   },
 
   back: function(confirmedCancel) {
-    var locale = I18n.getCurrentLocale();
     var tab = '';
     var payment = this.r._payment;
     var thisTab = this.tab;
@@ -2516,16 +2497,10 @@ Session.prototype = {
 
     var confirm = function() {
       Confirm.show({
-        message: I18n.formatMessageWithLocale('misc.confirm_cancel', locale),
-        heading: I18n.formatMessageWithLocale('misc.cancel_title', locale),
-        positiveBtnTxt: I18n.formatMessageWithLocale(
-          'misc.cancel_confirm',
-          locale
-        ),
-        negativeBtnTxt: I18n.formatMessageWithLocale(
-          'misc.cancel_back',
-          locale
-        ),
+        message: I18n.format('misc.confirm_cancel'),
+        heading: I18n.format('misc.cancel_title'),
+        positiveBtnTxt: I18n.format('misc.cancel_confirm'),
+        negativeBtnTxt: I18n.format('misc.cancel_back'),
         onPositiveClick: function() {
           self.back(true);
         },
@@ -3371,21 +3346,14 @@ Session.prototype = {
   },
 
   hide: function(confirmedCancel) {
-    var locale = I18n.getCurrentLocale();
     var self = this;
     if (this.isOpen) {
       if (confirmedCancel !== true && this.r._payment) {
         return Confirm.show({
-          message: I18n.formatMessageWithLocale('misc.confirm_cancel', locale),
-          heading: I18n.formatMessageWithLocale('misc.cancel_title', locale),
-          positiveBtnTxt: I18n.formatMessageWithLocale(
-            'misc.cancel_confirm',
-            locale
-          ),
-          negativeBtnTxt: I18n.formatMessageWithLocale(
-            'misc.cancel_back',
-            locale
-          ),
+          message: I18n.format('misc.confirm_cancel'),
+          heading: I18n.format('misc.cancel_title'),
+          positiveBtnTxt: I18n.format('misc.cancel_confirm'),
+          negativeBtnTxt: I18n.format('misc.cancel_back'),
           onPositiveClick: function() {
             self.hide(true);
           },
@@ -3408,11 +3376,7 @@ Session.prototype = {
     var actionState;
     var loadingState = true;
 
-    var locale = I18n.getCurrentLocale();
-    var cancelMsg = I18n.formatMessageWithLocale(
-      'misc.payment_canceled',
-      locale
-    );
+    var cancelMsg = I18n.format('misc.payment_canceled');
 
     if (error) {
       if (
@@ -3431,7 +3395,7 @@ Session.prototype = {
     }
 
     if (!text) {
-      text = I18n.formatMessageWithLocale('misc.payment_processing', locale);
+      text = I18n.format('misc.payment_processing');
     }
 
     if (this.screen === 'otp') {
@@ -3883,13 +3847,9 @@ Session.prototype = {
         // also without this, cardsaving is triggered before API returning unsupported card error
         if (!this.svelteCardTab.isOnSavedCardsScreen()) {
           var cardType = discreet.storeGetter(CardScreenStore.cardType);
-          var locale = I18n.getCurrentLocale();
           if (!MethodStore.isAMEXEnabled() && cardType === 'amex') {
             return this.showLoadError(
-              I18n.formatMessageWithLocale(
-                'card.card_number_help_amex',
-                locale
-              ),
+              I18n.format('card.card_number_help_amex'),
               true
             );
           }
@@ -4029,10 +3989,7 @@ Session.prototype = {
 
   verifyVpaAndContinue: function(data, params) {
     var self = this;
-    var locale = I18n.getCurrentLocale();
-    self.showLoadError(
-      I18n.formatMessageWithLocale('upi.verifying_vpa_info', locale)
-    );
+    self.showLoadError(I18n.format('upi.verifying_vpa_info'));
     $('#overlay-close').hide();
 
     var vpa = data.vpa;
@@ -4061,10 +4018,8 @@ Session.prototype = {
         }, 200);
       })
       .catch(function(vpaValidationError) {
-        var locale = I18n.getCurrentLocale();
-        var defaultErrorMessage = I18n.formatMessageWithLocale(
-          'upi.invalid_vpa_default_message',
-          locale
+        var defaultErrorMessage = I18n.format(
+          'upi.invalid_vpa_default_message'
         );
         var vpaValidationDescription = _Obj.getSafely(
           vpaValidationError,
@@ -4518,9 +4473,7 @@ Session.prototype = {
         this.showLoadError();
       }
     } else {
-      this.showLoadError(
-        I18n.formatMessageWithLocale('misc.processing', locale)
-      );
+      this.showLoadError(I18n.format('misc.processing'));
     }
 
     if (wallet === 'freecharge') {
@@ -4682,21 +4635,13 @@ Session.prototype = {
       sub_link.html('Cancel Payment');
 
       this.r.on('payment.upi.noapp', function(data) {
-        var locale = I18n.getCurrentLocale();
-        that.showLoadError(
-          I18n.formatMessageWithLocale('upi.intent_no_apps_error', locale),
-          true
-        );
+        that.showLoadError(I18n.format('upi.intent_no_apps_error'), true);
 
         that.body.addClass('upi-noapp');
       });
 
       this.r.on('payment.upi.selectapp', function(data) {
-        var locale = I18n.getCurrentLocale();
-        that.showLoadError(
-          I18n.formatMessageWithLocale('upi.intent_select_app', locale),
-          false
-        );
+        that.showLoadError(I18n.format('upi.intent_select_app'), false);
       });
 
       this.r.on('payment.upi.coproto_response', function(response) {
@@ -4707,30 +4652,19 @@ Session.prototype = {
       });
 
       this.r.on('payment.upi.pending', function(data) {
-        var locale = I18n.getCurrentLocale();
         if (data && data.flow === 'upi-intent') {
           return that.showLoadError(
-            I18n.formatMessageWithLocale(
-              'misc.payment_waiting_confirmation',
-              locale
-            )
+            I18n.format('misc.payment_waiting_confirmation')
           );
         }
 
-        that.showLoadError(
-          I18n.formatMessageWithLocale('upi.intent_accept_request', locale)
-        );
+        that.showLoadError(I18n.format('upi.intent_accept_request'));
       });
     } else {
       if (!this.headless) {
-        sub_link.html(
-          I18n.formatMessageWithLocale('misc.go_to_payment', locale)
-        );
+        sub_link.html(I18n.format('misc.go_to_payment'));
         this.r.on('payment.cancel', function() {
-          that.showLoadError(
-            I18n.formatMessageWithLocale('misc.payment_canceled', locale),
-            true
-          );
+          that.showLoadError(I18n.format('misc.payment_canceled'), true);
         });
       }
     }

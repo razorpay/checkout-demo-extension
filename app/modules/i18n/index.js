@@ -44,6 +44,17 @@ export function formatMessageWithLocale(label, locale, defaultValue) {
 }
 
 /**
+ * Formats the message with the current locale
+ * @param {string} label
+ * @param {string} [defaultValue]
+ * @returns {string}
+ */
+export function format(label, defaultValue) {
+  const locale = getCurrentLocale();
+  return get(t)(label, { locale, default: defaultValue });
+}
+
+/**
  * Returns the method prefix for the given locale
  * @param {string} method
  * @param {string} locale
