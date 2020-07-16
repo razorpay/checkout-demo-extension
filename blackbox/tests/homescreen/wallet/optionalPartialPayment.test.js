@@ -4,3 +4,5 @@ const createWalletTest = require('../../../create/wallet');
 //   partialPayment: true,
 //   optionalContact: true,
 // });
+
+test.skip('Wallet - Optional Contact + Partial', () => {});
