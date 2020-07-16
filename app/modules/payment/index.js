@@ -74,7 +74,7 @@ function onPaymentCancel(metaParam) {
       eventData.payment_id = payment_id;
       var url = makeAuthUrl(razorpay, 'payments/' + payment_id + '/cancel');
       url = _.appendParamsToUrl(url, {
-        language_code: I18n.getCurrentLocale(),
+        language_code: getCurrentLocale(),
       });
 
       if (_.isNonNullObject(metaParam)) {
