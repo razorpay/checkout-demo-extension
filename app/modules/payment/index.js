@@ -748,7 +748,10 @@ razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
     timeout,
   };
 
-  const url = makeAuthUrl(this, 'payments/validate/account');
+  let url = makeAuthUrl(this, 'payments/validate/account');
+
+  url = _.appendParamsToUrl(url, { language_code: getCurrentLocale() });
+
   const cachedVpaResponse = vpaCache[vpa];
 
   if (cachedVpaResponse) {
