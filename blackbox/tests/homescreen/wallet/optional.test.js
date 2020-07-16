@@ -1,5 +1,5 @@
 const createWalletTest = require('../../../create/wallet');
 
-createWalletTest({
-  optionalContact: true,
-});
+// createWalletTest({
+//   optionalContact: true,
+// });
