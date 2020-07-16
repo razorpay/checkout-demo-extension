@@ -1,4 +1,5 @@
 import { makeAuthUrl } from 'common/Razorpay';
+import { getCurrentLocale } from 'i18n';
 
 export const ALLOWED_EXTS = ['.jpg', '.jpeg', '.png'];
 export const ALLOWED_MAX_SIZE_IN_MB = 5;
@@ -91,6 +92,7 @@ export function uploadDocument(razorpay, file) {
     const auth_link_id = razorpay.get('auth_link_id');
 
     data.append('form_uploaded', file);
+    data.append('language_code', getCurrentLocale());
 
     if (order_id) {
       data.append('order_id', order_id);
