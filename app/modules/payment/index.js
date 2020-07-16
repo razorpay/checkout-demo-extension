@@ -32,7 +32,7 @@ import {
   updateCardIINMetadata,
 } from 'common/card';
 
-import { translatePaymentPopup as t } from 'i18n';
+import { getCurrentLocale, translatePaymentPopup as t } from 'i18n';
 
 /**
  * Tells if we're being executed from
@@ -73,6 +73,10 @@ function onPaymentCancel(metaParam) {
     if (payment_id) {
       eventData.payment_id = payment_id;
       var url = makeAuthUrl(razorpay, 'payments/' + payment_id + '/cancel');
+      url = _.appendParamsToUrl(url, {
+        language_code: I18n.getCurrentLocale(),
+      });
+
       if (_.isNonNullObject(metaParam)) {
         url += '&' + _.obj2query(metaParam);
       }
