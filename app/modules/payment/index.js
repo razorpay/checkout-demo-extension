@@ -502,6 +502,14 @@ Payment.prototype = {
     if (data.method === 'wallet' && !(data.contact && data.email)) {
       return;
     }
+
+    // Some banks requires HTTP Referer field to be non-empty,
+    // If opening bank page from popup, it will be empty.
+    // So use create/checkout route.
+    if (data.method === 'emandate' && data.method === 'netbanking') {
+      return;
+    }
+
     // else make ajax request
 
     var razorpayInstance = this.r;
