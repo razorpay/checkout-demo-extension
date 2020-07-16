@@ -4,6 +4,7 @@ import { writable, derived } from 'svelte/store';
 import { cardIin, cardTab } from 'checkoutstore/screens/card';
 import Analytics from 'analytics';
 import { BEHAV } from 'analytics-types';
+import { getCurrentLocale } from 'i18n';
 
 export const appliedOffer = writable();
 
@@ -43,8 +44,13 @@ export const isCardValidForOffer = derived(
       }
       return;
     }
+
+    let url = makeAuthUrl('validate/checkout/offers');
+
+    url = _.appendParamsToUrl(url, { language_code: getCurrentLocale() });
+
     currentRequest = fetch.post({
-      url: makeAuthUrl('validate/checkout/offers'),
+      url,
       data: {
         amount: getAmount(),
         method: 'card',
