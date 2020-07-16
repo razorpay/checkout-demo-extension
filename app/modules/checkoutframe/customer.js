@@ -112,8 +112,10 @@ Customer.prototype = {
   createOTP: function(callback, queryParams) {
     let url = 'otp/create';
 
+    url = _.appendParamsToUrl(url, { language_code: getCurrentLocale() });
+
     if (queryParams) {
-      url = `${url}?${_.obj2query(queryParams)}`;
+      url = _.appendParamsToUrl(url, queryParams);
     }
 
     fetch.post({
@@ -135,8 +137,10 @@ Customer.prototype = {
     data.contact = this.contact || getCustomer(getPhone()).contact;
     let url = 'otp/verify';
 
+    url = _.appendParamsToUrl(url, { language_code: getCurrentLocale() });
+
     if (queryParams) {
-      url = `${url}?${_.obj2query(queryParams)}`;
+      url = _.appendParamsToUrl(url, queryParams);
     }
 
     url = makeAuthUrl(this.r, url);
