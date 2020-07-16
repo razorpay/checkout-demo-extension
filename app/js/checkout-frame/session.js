@@ -133,11 +133,11 @@ function improvisePrefilledContact(session) {
   var storedUserDetails = discreet.ContactStorage.get();
 
   // Pick details from storage if not given in prefill
-  if (!prefilledContact) {
+  if (!prefilledContact && storedUserDetails.contact) {
     prefilledContact = storedUserDetails.contact;
     Analytics.setMeta('prefilledFromStorage.contact', true);
   }
-  if (!prefilledEmail) {
+  if (!prefilledEmail && storedUserDetails.email) {
     prefilledEmail = storedUserDetails.email;
     Analytics.setMeta('prefilledFromStorage.email', true);
   }
