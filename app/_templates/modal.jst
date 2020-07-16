@@ -9,7 +9,6 @@ var emiBanks = MethodStore.getEMIBanks();
 var cta = params.cta;
 
 var o = _.get;
-var wallet = MethodStore.getWallets();
 var html = function(html){return html.replace(/<[^>]*>?/g, "")};
 var attr = function(attr){return attr.replace(/"/g,'')};
 
@@ -87,14 +86,6 @@ else
               `?`
               `?isMethodEnabled('emi') && emiBanks.BAJAJ`
                 <div class="tab-content showable screen" id="form-emi"></div>
-              `?`
-              `?(wallet && wallet.length)`
-                <div class="tab-content showable screen pad" id="form-wallet">
-                  <div id="wallets">
-                      <div id="wallet-svelte-wrap">
-                    </div>
-                  </div>
-                </div>
               `?`
             </div>
             <div id="bottom"></div>
