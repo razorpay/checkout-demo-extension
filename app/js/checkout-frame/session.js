@@ -1074,14 +1074,6 @@ Session.prototype = {
     this.svelteCardTab = new cardTab.render();
   },
 
-  setWalletsTab: function() {
-    if (MethodStore.isMethodEnabled('wallet')) {
-      this.svelteWalletsTab = new discreet.WalletTab({
-        target: gel('wallet-svelte-wrap'),
-      });
-    }
-  },
-
   setSvelteComponents: function() {
     this.setTopBar();
     this.setUpiCancelReasonPicker();
@@ -1093,7 +1085,6 @@ Session.prototype = {
     this.setOtpScreen();
     this.setPayoutsScreen();
     this.setNach();
-    this.setWalletsTab();
     this.setOffers();
     this.setLanguageDropdown();
     this.setSvelteOverlay();
@@ -2353,7 +2344,6 @@ Session.prototype = {
       (this.tab === 'cardless_emi' && screen === 'emiplans') ||
       screen === 'paylater' ||
       screen === 'qr' ||
-      (screen === 'wallet' && !$('.wallet :checked')[0]) ||
       screen === 'bank_transfer' ||
       (screen === 'netbanking' && Store.isRecurring()) ||
       screen === 'emandate'
@@ -2368,6 +2358,8 @@ Session.prototype = {
 
     if (screen === '' && this.homeTab) {
       this.homeTab.onShown();
+    } else if (screen === 'wallet' && this.walletTab) {
+      this.walletTab.onShown();
     } else if (screen !== 'upi' && screen !== 'upi_otm') {
       this.body.toggleClass('sub', showPaybtn);
     }
@@ -2407,7 +2399,7 @@ Session.prototype = {
     if (screen === 'wallet') {
       // Select wallet
       if (issuer) {
-        this.svelteWalletsTab.onWalletSelection(issuer);
+        this.walletTab.onWalletSelection(issuer);
       }
     } else if (screen === 'netbanking') {
       // Select bank
@@ -2564,6 +2556,8 @@ Session.prototype = {
       }
     } else if (this.tab === 'netbanking') {
       discreet.netbankingTab.destroy();
+    } else if (this.tab === 'wallet') {
+      discreet.walletTab.destroy();
     } else if (this.tab === 'nach') {
       if (this.nachScreen.onBack()) {
         return;
@@ -2737,6 +2731,9 @@ Session.prototype = {
     if (tab === 'netbanking') {
       discreet.netbankingTab.render();
     }
+    if (tab === 'wallet') {
+      discreet.walletTab.render();
+    }
 
     if (tab === 'upi') {
       this.updateCustomerInStore();
@@ -2764,7 +2761,6 @@ Session.prototype = {
 
     if (tab === 'wallet') {
       this.setScreen('wallet');
-      this.svelteWalletsTab.onShown();
     }
 
     if (tab === 'card' || (tab === 'emi' && this.screen !== 'emi')) {
@@ -3331,8 +3327,8 @@ Session.prototype = {
 
       if (this.screen === 'wallet') {
         /* Wallet tab being responsible for its subdata */
-        if (this.svelteWalletsTab.isAnyWalletSelected()) {
-          _Obj.extend(data, this.svelteWalletsTab.getPayload());
+        if (this.walletTab.isAnyWalletSelected()) {
+          _Obj.extend(data, this.walletTab.getPayload());
         }
       }
 
@@ -4761,7 +4757,6 @@ Session.prototype = {
       'payoutsAccountView',
       'payoutsView',
       'savedCardsView',
-      'svelteWalletsTab',
       'languageSelectionView',
       'svelteOverlay',
       'topBar',
