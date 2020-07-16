@@ -503,10 +503,10 @@ Payment.prototype = {
       return;
     }
 
-    // Some banks requires HTTP Referer field to be non-empty,
+    // Axis bank requires HTTP Referer field to be non-empty,
     // If opening bank page from popup, it will be empty.
     // So use create/checkout route.
-    if (data.method === 'emandate' && data.method === 'netbanking') {
+    if (data.method === 'emandate' && data.bank === 'UTIB') {
       return;
     }
 
