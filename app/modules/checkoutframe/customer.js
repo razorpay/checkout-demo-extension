@@ -192,13 +192,18 @@ Customer.prototype = {
       },
     });
 
-    let ajaxOpts = {
-      url: makeAuthUrl(this.r, 'apps/logout'),
-      method: 'delete',
-      callback: callback,
-    };
+    let url = makeAuthUrl(this.r, 'apps/logout');
 
-    ajaxOpts.url += '&logout=' + (this_device ? 'app' : 'all');
+    url = _.appendParamsToUrl(url, {
+      language_code: getCurrentLocale(),
+      logout: this_device ? 'app' : 'all',
+    });
+
+    let ajaxOpts = {
+      url,
+      method: 'delete',
+      callback,
+    };
 
     fetch.setSessionId(null);
 
