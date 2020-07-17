@@ -5,6 +5,7 @@ import { ownerWindow } from 'common/constants';
 import Track from 'tracker';
 import { getSession } from 'sessionmanager';
 import Analytics from 'analytics';
+import { defineGlobals as defineGlobalsForBridge } from 'bridge/global';
 
 /**
  * This handles methods of the new iOS SDK Bridge.
@@ -124,6 +125,8 @@ export function initIframe() {
 
       flush();
     });
+
+  defineGlobalsForBridge();
 
   const qpmap = _.getQueryParams();
   const platform = qpmap.platform;

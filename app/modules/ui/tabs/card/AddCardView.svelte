@@ -272,9 +272,16 @@
           if (networkEntry) {
             const apiNetwork = networkEntry[0]; // Card's network in API-representation
             const enabledNetworks = getCardNetworks(); // Merchant's enabled networks
-            isCurrentCardsNetworkEnabledForMerchant = Boolean(
-              enabledNetworks[apiNetwork]
-            );
+
+            /**
+             * getCardNetworks might return an empty object because API sometimes does not send
+             * methods.card_networks for whatever reason
+             */
+            if (!_.isUndefined(enabledNetworks[apiNetwork])) {
+              isCurrentCardsNetworkEnabledForMerchant = Boolean(
+                enabledNetworks[apiNetwork]
+              );
+            }
           }
 
           // Card is unsupported if validation on instrument fails or if network is disabled for merchant

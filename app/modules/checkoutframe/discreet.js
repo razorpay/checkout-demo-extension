@@ -44,6 +44,7 @@ import * as Offers from 'checkoutframe/offers';
 import * as Flows from 'checkoutframe/flows';
 import * as Payouts from 'checkoutframe/payouts';
 import { initIframe } from 'checkoutframe/iframe';
+import { stopListeningForBackPresses } from 'bridge/back';
 import * as Bridge from 'bridge';
 import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
 import { Formatter } from 'formatter';
@@ -70,7 +71,7 @@ import netbankingTab from 'checkoutframe/components/netbanking';
 import EmandateTab from 'ui/tabs/emandate/index.svelte';
 import NachScreen from 'ui/tabs/nach/index.svelte';
 import * as cardTab from 'checkoutframe/components/card';
-import WalletTab from 'ui/tabs/wallets/index.svelte';
+import * as walletTab from 'checkoutframe/components/wallet';
 import TopBar from 'ui/components/Topbar.svelte';
 
 import PayoutsInstruments from 'ui/tabs/payout/payout-instruments.svelte';
@@ -127,6 +128,7 @@ export default {
   SessionManager,
   Checkout,
   Bridge,
+  stopListeningForBackPresses,
   P13n,
   Instruments,
   getInstrumentMeta,
@@ -178,7 +180,7 @@ export default {
 
   HomeTab,
   upiTab,
-  WalletTab,
+  walletTab,
   netbankingTab,
   EmandateTab,
   NachScreen,
