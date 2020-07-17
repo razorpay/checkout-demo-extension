@@ -360,6 +360,7 @@ export default {
       qr: 'Pay by scanning QR Code',
       gpay: 'Instant payment using Google Pay App',
       upi: 'Instant payment using UPI App',
+      upi_recurring: 'Supported only on BHIM and HDFC',
       upi_otm: 'Pay later using BHIM and HDFC',
       cardless_emi: 'EMI via {text}',
       recurring_cards: '{networks} credit cards',
@@ -629,6 +630,16 @@ export default {
     show_qr_code: 'Show QR Code',
     scan_qr_code: 'Scan the QR code using your UPI app',
     downtime_text: '<strong>UPI<strong> is experiencing low success rates.',
+    recurring_subscription_callout:
+      'The charge is to enable subscription on this card and it will be refunded.',
+    recurring_caw_callout_all_data:
+      'This is a recurring payment and {maxAmount} will be charged now. {merchantName} can charge upto {amount} on a {recurringFrequency} basis till {endDate}.',
+    recurring_caw_callout_no_name:
+      'This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} on a {recurringFrequency} basis till {endDate}.',
+    recurring_caw_callout_no_name_no_frequency:
+      'This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} anytime till {endDate}.',
+    recurring_caw_callout_no_frequency:
+      'This is a recurring payment and {maxAmount} will be charged now. {merchantName} can charge upto {amount} anytime till {endDate}.',
     omni_block_heading: 'Or, pay using phone number',
     omni_gpay_number: 'Google Pay phone number',
     omni_enter_number: 'Enter your phone number',
