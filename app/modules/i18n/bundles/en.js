@@ -42,8 +42,6 @@ export default {
       'Click continue to complete the payment on the bank page',
     bank_verification_action_continue: 'Continue',
 
-    amex_unsupported_error: 'AMEX cards are not supported',
-
     saved_card_label: 'Card ending with <b>{last4}<b>',
 
     recurring_callout:
