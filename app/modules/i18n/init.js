@@ -5,12 +5,13 @@ import {
   locale,
   register,
   waitLocale,
+  getLocaleFromNavigator,
 } from 'svelte-i18n';
 
 import en from './bundles/en';
 
 import { getSession } from 'sessionmanager';
-import { getLanguageCode } from 'checkoutstore';
+import { getLanguageCode, getMerchantLanguage } from 'checkoutstore';
 
 const LOCALES = {
   en: 'English',
@@ -61,22 +62,55 @@ function fetchBundle(locale) {
   });
 }
 
-function determineInitialLocale() {
-  let localeFromStorage;
-  try {
-    localeFromStorage = global.localStorage.getItem('locale');
-  } catch (e) {}
+function getValidMerchantLanguage() {
+  let language = getMerchantLanguage();
 
-  // If the user has changed locale earlier, use it.
-  // TODO: handle auto option from checkout.
-  let locale = localeFromStorage || getLanguageCode() || 'en';
-
-  // If the locale from storage/API is not allowed, use en as the default.
-  if (!isAllowedLocale(locale)) {
-    locale = 'en';
+  // If the language is set to "auto", we need to determine it from the browser.
+  if (language === 'auto') {
+    const localeFromNavigator = getLocaleFromNavigator();
+    if (localeFromNavigator) {
+      // Navigator locale is of the form {language}-{country}. We need to
+      // extract the language part of it.
+      language = localeFromNavigator.split('-')[0];
+    }
   }
 
-  return locale;
+  if (isAllowedLocale(language)) {
+    return language;
+  }
+  return null;
+}
+
+function getValidLocaleFromStorage() {
+  try {
+    const localeFromStorage = global.localStorage.getItem('locale');
+    // If the locale from storage is not allowed, use en as the default.
+    if (isAllowedLocale(localeFromStorage)) {
+      return localeFromStorage;
+    }
+  } catch (e) {}
+  return null;
+}
+
+/**
+ * Determines the initial locale to be used for rendering. Order of priority is
+ * as follows:
+ *
+ * 1. Local Storage
+ * 2. Checkout options
+ * 3. Config on API
+ * 4. English
+ *
+ * @returns {string}
+ */
+function determineInitialLocale() {
+  // If the user has changed locale earlier, use it.
+  return (
+    getValidLocaleFromStorage() ||
+    getValidMerchantLanguage() ||
+    getLanguageCode() ||
+    'en'
+  );
 }
 
 function setLocaleInStorage(locale) {

@@ -35,6 +35,7 @@ export const getDowntimes = () => _getDowntimes(preferences);
 export const isCustomerFeeBearer = () => preferences.fee_bearer;
 export const getCheckoutConfig = () => preferences.checkout_config;
 export const getLanguageCode = () => getCheckoutConfig()?.language_code;
+export const getMerchantLanguage = () => getOption('language');
 
 const optionGetter = option => () => getOption(option);
 export const getOption = option => razorpayInstance.get(option);
