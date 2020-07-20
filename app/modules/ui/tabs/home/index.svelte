@@ -276,7 +276,7 @@
           BOTH_AVAILABLE_STORAGE_SHOWN: 1,
           BOTH_AVAILABLE_API_SHOWN: 2,
           API_AVAILABLE_API_SHOWN: 3,
-          API_AVAIABLE_NONE_SHOWN: 4,
+          API_AVAILABLE_NONE_SHOWN: 4,
           NONE_AVAILABLE: 5,
         };
 
@@ -321,7 +321,7 @@
             } else {
               if (instrumentMap.api.length) {
                 experimentIdentifier =
-                  EXPERIMENT_IDENTIFIERS.API_AVAIABLE_NONE_SHOWN;
+                  EXPERIMENT_IDENTIFIERS.API_AVAILABLE_NONE_SHOWN;
               } else {
                 experimentIdentifier = EXPERIMENT_IDENTIFIERS.NONE_AVAILABLE;
               }
