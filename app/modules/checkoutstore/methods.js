@@ -10,6 +10,7 @@ import {
   hasFeature,
   isPayout,
   isOfferForced,
+  isASubscription,
   getCallbackUrl,
 } from 'checkoutstore';
 
@@ -126,7 +127,13 @@ const ALL_METHODS = {
   },
 
   upi() {
-    return Object.keys(UPI_METHODS).some(isUPIFlowEnabled);
+    const isAnyUpiFlowEnabled = Object.keys(UPI_METHODS).some(isUPIFlowEnabled);
+    if (isASubscription()) {
+      return isASubscription('upi') && isAnyUpiFlowEnabled;
+    } else if (isRecurring()) {
+      return getRecurringMethods()?.upi && isAnyUpiFlowEnabled;
+    }
+    return isAnyUpiFlowEnabled;
   },
 
   qr() {
@@ -365,10 +372,16 @@ export function getCardIssuersForRecurring() {
 // additional checks for each sub-method based on UPI
 const UPI_METHODS = {
   collect: () => true,
-  omnichannel: () => !isPayout() && hasFeature('google_pay_omnichannel'),
-  qr: () => getOption('method.qr') && !global.matchMedia(mobileQuery).matches,
+  omnichannel: () =>
+    !isRecurring() && !isPayout() && hasFeature('google_pay_omnichannel'),
+  qr: () =>
+    !isRecurring() &&
+    getOption('method.qr') &&
+    !global.matchMedia(mobileQuery).matches,
   intent: () =>
-    getMerchantMethods().upi_intent && getUPIIntentApps().all.length,
+    !isRecurring() &&
+    getMerchantMethods().upi_intent &&
+    getUPIIntentApps().all.length,
 };
 
 // additional checks for each sub-method based on UPI OTM
@@ -390,7 +403,6 @@ function isUPIBaseEnabled() {
     // by mutual fund who can accept more than the standard limit
     (getAmount() < 1e7 || getMerchantOrder()?.method === 'upi') &&
     !isInternational() &&
-    !isRecurring() &&
     getAmount()
   );
 }
