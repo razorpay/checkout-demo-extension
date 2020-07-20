@@ -144,6 +144,7 @@ export function bindI18nEvents() {
     }
   });
   locale.subscribe(value => {
+    Analytics.setMeta('locale.current', value);
     setLocaleInStorage(value);
   });
 }
@@ -153,6 +154,8 @@ export function init() {
   addDefaultMessages();
 
   const initialLocale = determineInitialLocale();
+
+  Analytics.setMeta('locale.initial', initialLocale);
 
   initSvelteI18n({
     fallbackLocale: 'en',
