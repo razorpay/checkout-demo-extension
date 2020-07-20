@@ -9,7 +9,7 @@ import {
 
 import en from './bundles/en';
 
-import { getSession } from '../sessionmanager';
+import { getSession } from 'sessionmanager';
 import { getLanguageCode } from 'checkoutstore';
 
 const LOCALES = {
