@@ -61,7 +61,7 @@ function fetchBundle(locale) {
   });
 }
 
-export function determineInitialLocale() {
+function determineInitialLocale() {
   let localeFromStorage;
   try {
     localeFromStorage = global.localStorage.getItem('locale');
