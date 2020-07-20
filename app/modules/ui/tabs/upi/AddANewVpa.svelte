@@ -31,6 +31,7 @@
   export let focusOnCreate = false;
   export let customer;
   export let paymentMethod = 'upi';
+  export let recurring = false;
 
   // Refs
   export let vpaField = null;
@@ -153,7 +154,7 @@
   </div>
   <!-- LABEL: Google Pay, BHIM, PhonePe & more -->
   <div slot="subtitle">
-    {#if paymentMethod === 'upi_otm'}
+    {#if paymentMethod === 'upi_otm' || recurring}
       {$t(NEW_VPA_SUBTITLE_UPI_OTM)}
     {:else}{$t(NEW_VPA_SUBTITLE)}{/if}
   </div>

@@ -2475,11 +2475,13 @@ Session.prototype = {
    */
   handleDiscount: function() {
     var offer = this.getAppliedOffer();
-    var hasDiscount =
-      offer &&
-      offer.amount !== offer.original_amount &&
-      this.offers &&
-      this.offers.isCardApplicable();
+    var hasDiscount = offer && offer.amount !== offer.original_amount;
+
+    // this.offers is undefined for forced offers
+    if (hasDiscount && this.offers) {
+      hasDiscount = this.offers.isCardApplicable();
+    }
+
     $('#content').toggleClass('has-discount', hasDiscount);
     $('#amount .discount').html(
       hasDiscount ? this.formatAmountWithCurrency(offer.amount) : ''
@@ -4873,6 +4875,7 @@ Session.prototype = {
         this.walletOffer = forcedOffer;
       }
       Analytics.setMeta('forcedOffer', true);
+      this.handleDiscount();
     } else {
       var appliedOffer;
       this.getAppliedOffer = function() {

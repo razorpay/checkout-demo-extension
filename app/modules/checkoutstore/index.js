@@ -142,6 +142,23 @@ export function isPartialPayment() {
   return preferences.order && preferences.order.partial_payment;
 }
 
+export function isASubscription(method = null) {
+  if (!preferences.subscription) {
+    return false;
+  }
+
+  // return true if no method is specified. This is a subscription session
+  if (!method) {
+    return true;
+  } else {
+    return preferences.subscription[method] !== false;
+  }
+}
+
+export function getSubscription() {
+  return preferences.subscription;
+}
+
 export function isRecurring() {
   if (
     getOption('prefill.method') === 'emandate' &&
