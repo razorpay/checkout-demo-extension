@@ -280,21 +280,27 @@
           NONE_AVAILABLE: 5,
         };
 
+        const SOURCES = {
+          STORAGE: 'storage',
+          API: 'api',
+          NONE: 'none',
+        };
+
         let instrumentsSource;
 
         // First figure out which source to attempt using
         if (instrumentsFromStorage.length) {
           if (Math.random() < 0.5) {
-            instrumentsSource = 'storage';
+            instrumentsSource = SOURCES.STORAGE;
           } else {
-            instrumentsSource = 'api';
+            instrumentsSource = SOURCES.API;
           }
         } else {
           // Do another 50-50 split on API instruments
           if (Math.random() < 0.5) {
-            instrumentsSource = 'none';
+            instrumentsSource = SOURCES.NONE;
           } else {
-            instrumentsSource = 'api';
+            instrumentsSource = SOURCES.API;
           }
         }
 
@@ -307,10 +313,10 @@
 
             let experimentIdentifier;
 
-            if (source === 'storage') {
+            if (source === SOURCES.STORAGE) {
               experimentIdentifier =
                 EXPERIMENT_IDENTIFIERS.BOTH_AVAILABLE_STORAGE_SHOWN;
-            } else if (source === 'api') {
+            } else if (source === SOURCES.API) {
               if (instrumentMap.storage.length) {
                 experimentIdentifier =
                   EXPERIMENT_IDENTIFIERS.BOTH_AVAILABLE_API_SHOWN;
@@ -354,7 +360,7 @@
 
         // if source is api, we need to fetch api instruments and then
         // re-set the source
-        if (instrumentsSource === 'api') {
+        if (instrumentsSource === SOURCES.API) {
           getInstrumentsForCustomer(
             $customer,
             {
@@ -365,7 +371,7 @@
             if (instrumentsFromApi.length) {
               instrumentMap.api = instrumentsFromApi;
             } else {
-              instrumentsSource = 'none';
+              instrumentsSource = SOURCES.NONE;
             }
 
             resolve(returnPromise(instrumentsSource));
