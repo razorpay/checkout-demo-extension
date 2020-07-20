@@ -261,113 +261,136 @@
    * - if either one is missing, choose the other
    * - if both are present, choose one randomly
    */
-  function getRandomInstrumentSet(
-    instrumentsFromStorage,
-    instrumentsFromApi,
-    user
-  ) {
-    if (USER_EXPERIMENT_CACHE[user]) {
-      return USER_EXPERIMENT_CACHE[user];
-    }
+  function getRandomInstrumentSet({ customer, instrumentsFromStorage }) {
+    const user = customer.contact;
 
-    const instrumentMap = {
-      api: instrumentsFromApi,
-      storage: instrumentsFromStorage,
-      none: [],
-    };
+    if (!USER_EXPERIMENT_CACHE[user]) {
+      USER_EXPERIMENT_CACHE[user] = new Promise(resolve => {
+        const instrumentMap = {
+          api: [],
+          storage: instrumentsFromStorage,
+          none: [],
+        };
 
-    const EXPERIMENT_IDENTIFIERS = {
-      BOTH_AVAILABLE_STORAGE_SHOWN: 1,
-      BOTH_AVAILABLE_API_SHOWN: 2,
-      API_AVAILABLE_API_SHOWN: 3,
-      API_AVAIABLE_NONE_SHOWN: 4,
-      NONE_AVAILABLE: 5,
-    };
+        const EXPERIMENT_IDENTIFIERS = {
+          BOTH_AVAILABLE_STORAGE_SHOWN: 1,
+          BOTH_AVAILABLE_API_SHOWN: 2,
+          API_AVAILABLE_API_SHOWN: 3,
+          API_AVAIABLE_NONE_SHOWN: 4,
+          NONE_AVAILABLE: 5,
+        };
 
-    let experimentIdentifier;
-    let instrumentsSource;
+        let instrumentsSource;
 
-    if (instrumentsFromApi.length && instrumentsFromStorage.length) {
-      if (Math.random() < 0.5) {
-        instrumentsSource = 'api';
-        experimentIdentifier = EXPERIMENT_IDENTIFIERS.BOTH_AVAILABLE_API_SHOWN;
-      } else {
-        instrumentsSource = 'storage';
-        experimentIdentifier =
-          EXPERIMENT_IDENTIFIERS.BOTH_AVAILABLE_STORAGE_SHOWN;
-      }
-    } else if (instrumentsFromApi.length) {
-      instrumentsSource = 'api';
+        // First figure out which source to attempt using
+        if (instrumentsFromStorage.length) {
+          if (Math.random() < 0.5) {
+            instrumentsSource = 'storage';
+          } else {
+            instrumentsSource = 'api';
+          }
+        } else {
+          // Do another 50-50 split on API instruments
+          if (Math.random() < 0.5) {
+            instrumentsSource = 'none';
+          } else {
+            instrumentsSource = 'api';
+          }
+        }
 
-      // Do another 50-50 split on API instruments
-      if (Math.random() < 0.5) {
-        instrumentsSource = 'none';
-        experimentIdentifier = EXPERIMENT_IDENTIFIERS.API_AVAIABLE_NONE_SHOWN;
-      } else {
-        experimentIdentifier = EXPERIMENT_IDENTIFIERS.API_AVAILABLE_API_SHOWN;
-      }
-    } else {
-      instrumentsSource = 'none';
-      experimentIdentifier = EXPERIMENT_IDENTIFIERS.NONE_AVAILABLE;
-    }
+        // The function that returns the promise to be returned
+        // This promise shouce set the experiment identifier
+        // and any analytics meta properties
+        const returnPromise = source =>
+          new Promise(resolve => {
+            let instrumentsToBeShown = instrumentMap[source];
 
-    let instrumentsToBeShown = instrumentMap[instrumentsSource];
+            let experimentIdentifier;
 
-    // if user is in home, track the currently visible experiment
-    if (!session.tab) {
-      Analytics.track('home:p13n:experiment', {
-        type: AnalyticsTypes.METRIC,
-        data: {
-          source: instrumentsSource,
-          experiment: experimentIdentifier,
-        },
+            if (source === 'storage') {
+              experimentIdentifier =
+                EXPERIMENT_IDENTIFIERS.BOTH_AVAILABLE_STORAGE_SHOWN;
+            } else if (source === 'api') {
+              if (instrumentMap.storage.length) {
+                experimentIdentifier =
+                  EXPERIMENT_IDENTIFIERS.BOTH_AVAILABLE_API_SHOWN;
+              } else {
+                experimentIdentifier =
+                  EXPERIMENT_IDENTIFIERS.API_AVAILABLE_API_SHOWN;
+              }
+            } else {
+              if (instrumentMap.api.length) {
+                experimentIdentifier =
+                  EXPERIMENT_IDENTIFIERS.API_AVAIABLE_NONE_SHOWN;
+              } else {
+                experimentIdentifier = EXPERIMENT_IDENTIFIERS.NONE_AVAILABLE;
+              }
+            }
+
+            // if user is in home, track the currently visible experiment
+            if (!session.tab) {
+              Analytics.track('home:p13n:experiment', {
+                type: AnalyticsTypes.METRIC,
+                data: {
+                  source: source,
+                  experiment: experimentIdentifier,
+                },
+              });
+
+              Analytics.setMeta('p13n.experiment', experimentIdentifier);
+            }
+
+            // Cache for user
+            const p13nRenderData = {
+              source: source,
+              instruments: instrumentsToBeShown,
+              experiment: experimentIdentifier,
+            };
+
+            USER_EXPERIMENT_CACHE[user] = p13nRenderData;
+
+            resolve(USER_EXPERIMENT_CACHE[user]);
+          });
+
+        // if source is api, we need to fetch api instruments and then
+        // re-set the source
+        if (instrumentsSource === 'api') {
+          getInstrumentsForCustomer(
+            $customer,
+            {
+              upiApps: getUPIIntentApps().filtered,
+            },
+            'api'
+          ).then(instrumentsFromApi => {
+            if (instrumentsFromApi.length) {
+              instrumentMap.api = instrumentsFromApi;
+            } else {
+              instrumentsSource = 'none';
+            }
+
+            resolve(returnPromise(instrumentsSource));
+          });
+        } else {
+          resolve(returnPromise(instrumentsSource));
+        }
       });
-
-      Analytics.setMeta('p13n.experiment', experimentIdentifier);
     }
-
-    // Cache for user
-    const p13nRenderData = {
-      source: instrumentsSource,
-      instruments: instrumentsToBeShown,
-      experiment: experimentIdentifier,
-    };
-
-    USER_EXPERIMENT_CACHE[user] = p13nRenderData;
 
     return USER_EXPERIMENT_CACHE[user];
   }
 
   function getAllAvailableP13nInstruments() {
-    return new Promise(resolve => {
-      const instrumentsRetrievalPromises = [
-        getInstrumentsForCustomer(
-          $customer,
-          {
-            upiApps: getUPIIntentApps().filtered,
-          },
-          'storage'
-        ),
-
-        getInstrumentsForCustomer(
-          $customer,
-          {
-            upiApps: getUPIIntentApps().filtered,
-          },
-          'api'
-        ),
-      ];
-
-      Promise.all(instrumentsRetrievalPromises).then(
-        ([instrumentsFromStorage, instrumentsFromApi]) => {
-          let instrumentsOnScreen = getRandomInstrumentSet(
-            instrumentsFromStorage,
-            instrumentsFromApi,
-            $customer.contact
-          );
-          resolve(instrumentsOnScreen);
-        }
-      );
+    return getInstrumentsForCustomer(
+      $customer,
+      {
+        upiApps: getUPIIntentApps().filtered,
+      },
+      'storage'
+    ).then(instrumentsFromStorage => {
+      return getRandomInstrumentSet({
+        instrumentsFromStorage,
+        customer: $customer,
+      });
     });
   }
 
