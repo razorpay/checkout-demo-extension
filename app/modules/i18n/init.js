@@ -49,12 +49,21 @@ function makeBundleUrl(locale) {
  */
 function fetchBundle(locale) {
   return new Promise((resolve, reject) => {
+    Analytics.track('i18n:bundle:fetch:start', {
+      data: { locale },
+    });
     fetch({
       url: makeBundleUrl(locale),
       callback: response => {
         if (response.error) {
+          Analytics.track('i18n:bundle:fetch:failure', {
+            data: { locale },
+          });
           reject(response.error);
         } else {
+          Analytics.track('i18n:bundle:fetch:success', {
+            data: { locale },
+          });
           resolve(response);
         }
       },
