@@ -110,7 +110,11 @@
   import { isInstrumentGrouped } from 'configurability/instruments';
   import { isElementCompletelyVisibleInTab } from 'lib/utils';
 
-  import { INDIA_COUNTRY_CODE } from 'common/constants';
+  import {
+    INDIA_COUNTRY_CODE,
+    CONTACT_REGEX,
+    EMAIL_REGEX,
+  } from 'common/constants';
   import { getAnimationOptions } from 'svelte-utils';
 
   import { setBlocks } from 'ui/tabs/home/instruments';
@@ -460,11 +464,8 @@
      * If contact and email are mandatory, validate
      */
     if (!isContactEmailOptional()) {
-      const contactRegex = /^\+?[0-9]{8,15}$/;
-      const emailRegex = /^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/;
-
-      isContactValid = isContactValid || contactRegex.test($contact);
-      isEmailValid = isEmailValid || emailRegex.test($email);
+      isContactValid = isContactValid || CONTACT_REGEX.test($contact);
+      isEmailValid = isEmailValid || EMAIL_REGEX.test($email);
     }
 
     /**
