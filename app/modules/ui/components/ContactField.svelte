@@ -53,8 +53,14 @@
 
   function removeZeroFromPhoneAsynchronously() {
     setTimeout(() => {
-      if (country === '+91' && _Str.startsWith(phone, '0')) {
-        phone = phone.slice(1);
+      if (country === '+91') {
+        if (_Str.startsWith(phone, '0')) {
+          phone = phone.slice(1);
+        }
+
+        if (_Str.startsWith(phone, '+91')) {
+          phone = phone.slice(3);
+        }
       }
     });
   }
