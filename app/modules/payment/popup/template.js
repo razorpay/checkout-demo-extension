@@ -1,7 +1,19 @@
 import { displayAmount, getConvertedAmount } from 'common/currency';
 import css from './popup.styl';
-import { sanitizeHtmlEntities } from 'lib/utils';
 import Track from 'tracker';
+
+const map = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#x27;',
+  '/': '&#x2F;',
+};
+
+function sanitizeHtmlEntities(string) {
+  return string.replace(/[&<>"'/]/g, match => map[match]);
+}
 
 const cancelError = _Obj.stringify({
   error: {
