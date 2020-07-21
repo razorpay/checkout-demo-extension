@@ -16,7 +16,7 @@ describe.each(
   getTestData('Check readonly options', {
     options: {
       prefill: {
-        contact: '+91222222222',
+        contact: '+912222222222',
         name: nameToBePrefilled,
         email: 'a@gmail.com',
       },
