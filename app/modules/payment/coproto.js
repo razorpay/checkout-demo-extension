@@ -172,7 +172,11 @@ var responseTypes = {
       })
       .till(response => response && response.status, 10);
 
-    this.emit('upi.pending', fullResponse.data);
+    if (this.data.method === 'app') {
+      this.emit('app.pending', fullResponse);
+    } else {
+      this.emit('upi.pending', fullResponse.data);
+    }
   },
 
   application: function(request, fullResponse) {
@@ -209,7 +213,7 @@ var responseTypes = {
           callback: response =>
             payment.complete(handleAsyncStatusResponse(response)),
         })
-        .till(response => response && response.status);
+        .till(response => response && response.status, 10);
     });
   },
 
@@ -296,7 +300,43 @@ var responseTypes = {
 
     var intent_url = (fullResponse.data || {}).intent_url;
 
-    var CheckoutBridge = window.CheckoutBridge;
+    if (this.data.method === 'app') {
+      this.emit('app.coproto_response', fullResponse);
+
+      if (Bridge.checkout.platform === 'ios') {
+        Bridge.checkout.callIos('callNativeIntent', {
+          intent_url,
+          shortcode: this.data.provider,
+        });
+      } else {
+        var CheckoutBridge = window.CheckoutBridge;
+        CheckoutBridge.callNativeIntent(intent_url);
+      }
+
+      this.on('app.intent_response', response => {
+        if (response.provider === 'CRED') {
+          if (response.data === 0) {
+            // Payment was cancelled on CRED app.
+            this.emit('cancel', {
+              '_[method]': 'app',
+              '_[provider]': 'cred',
+              '_[reason]': 'PAYMENT_CANCEL_ON_APP',
+            });
+
+            return; // Don't poll for status as the payment was cancelled.
+          }
+        }
+        this.ajax = fetch
+          .jsonp({
+            url: request.url,
+            callback: response =>
+              this.complete(handleAsyncStatusResponse(response)),
+          })
+          .till(response => response && response.status, 10);
+      });
+
+      return;
+    }
 
     const startPolling = data => {
       if (data) {
@@ -322,6 +362,7 @@ var responseTypes = {
 
     this.emit('upi.coproto_response', fullResponse);
 
+    var CheckoutBridge = window.CheckoutBridge;
     if (CheckoutBridge && CheckoutBridge.callNativeIntent) {
       // If there's a UPI App specified, use it.
       if (this.upi_app) {

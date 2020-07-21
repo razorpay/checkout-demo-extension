@@ -324,6 +324,10 @@ function errorHandler(response) {
     }
   }
 
+  // Save payload in a variable, as it's going to get cleared and
+  // we need it for something else.
+  var payload = this.payload;
+
   this.clearRequest();
 
   Analytics.track('error', {
@@ -390,6 +394,15 @@ function errorHandler(response) {
         }
       }
     }
+  }
+
+  if (!Store.shouldShowDefaultError(payload, error)) {
+    // For this particular payload & error combination,
+    // we're going to display the error message with some other approach.
+    Store.setMethodErrorForPayload(payload, error);
+    // Don't show the usual overlay, hide it if it's open.
+    this.hideErrorMessage();
+    return;
   }
 
   if (this.tab || message !== discreet.cancelMsg) {
@@ -4147,6 +4160,13 @@ Session.prototype = {
 
             break;
           }
+
+          case 'app': {
+            // TODO: Check if it's possible to move this to instruments-config
+            if (selectedInstrument._ungrouped[0].provider === 'cred') {
+              _Obj.extend(this.payload, MethodStore.getPayloadForCRED());
+            }
+          }
         }
       }
     }
@@ -4698,6 +4718,47 @@ Session.prototype = {
           "Please accept the request from Razorpay's VPA on your UPI app"
         );
       });
+    } else if (data.method === 'app') {
+      var appName = 'app';
+      if (data.provider === 'cred') {
+        appName = 'CRED app';
+      }
+
+      var locale = I18n.getCurrentLocale();
+
+      this.r.on('payment.app.pending', function(coprotoResponse) {
+        // Collect flow
+        // Message: Please complete the payment on the {app}
+        var message = I18n.formatTemplateWithLocale(
+          'misc.complete_payment_on_app',
+          { app: appName },
+          locale
+        );
+        return that.showLoadError(message);
+      });
+
+      this.r.on('payment.app.coproto_response', function(coprotoResponse) {
+        // Intent flow
+        // Message: Redirecting you to the {app}...
+        var message = I18n.formatTemplateWithLocale(
+          'misc.redirecting_to_app',
+          { app: appName },
+          locale
+        );
+        return that.showLoadError(message);
+      });
+
+      this.r.on('payment.app.intent_response', function(intentResponse) {
+        // Message: Checking the payment status...
+        var message = I18n.formatMessageWithLocale(
+          'misc.checking_payment_status',
+          locale
+        );
+        return that.showLoadError(message);
+      });
+
+      // Message: Your payment is being processed
+      return that.showLoadError();
     } else {
       if (!this.headless) {
         sub_link.html('Go to payment');

@@ -207,6 +207,13 @@ export default function Payment(data, params = {}, r) {
   } else if (data.application || data.method === 'app') {
     // Obviously avoid popup if paying with an external application
     avoidPopup = true;
+    if (data.provider === 'cred' && !data.app_present && !isRazorpayFrame()) {
+      // CRED collect flow for razorpay.js
+      avoidPopup = false;
+    }
+  } else if (data.application || data.method === 'app') {
+    // Obviously avoid popup if paying with an external application
+    avoidPopup = true;
   } else if (isRazorpayFrame()) {
     /**
      * data needs to be present. absence of data = placeholder popup in
@@ -500,6 +507,17 @@ Payment.prototype = {
     }
 
     if (!this.avoidPopup && !isRazorpayFrame() && data.method === 'upi') {
+      return;
+    }
+
+    // CRED collect flow for razorpay.js
+    if (
+      !this.avoidPopup &&
+      !isRazorpayFrame() &&
+      data.method === 'app' &&
+      data.provider === 'cred' &&
+      !data.app_present
+    ) {
       return;
     }
 

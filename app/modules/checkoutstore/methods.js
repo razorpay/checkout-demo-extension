@@ -27,8 +27,17 @@ import { findCodeByNetworkName } from 'common/card';
 
 import { wallets, getSortedWallets } from 'common/wallet';
 import { extendConfig } from 'common/cardlessemi';
-import { mobileQuery, isFacebookWebView } from 'common/useragent';
-import { getUPIIntentApps, getCardApps } from 'checkoutstore/native';
+import {
+  mobileQuery,
+  isFacebookWebView,
+  getOS,
+  getDevice,
+} from 'common/useragent';
+import {
+  getUPIIntentApps,
+  getCardApps,
+  getSDKMeta,
+} from 'checkoutstore/native';
 
 import { get as storeGetter } from 'svelte/store';
 import { sequence as SequenceStore } from 'checkoutstore/screens/home';
@@ -462,9 +471,32 @@ export function isApplicationEnabled(app) {
         merchantMethods.google_pay_cards &&
         _Arr.contains(cardApps.all, 'google_pay_cards')
       );
+    case 'cred':
+      return isCREDEnabled();
   }
 
   return false;
+}
+
+function isCREDEnabled() {
+  return getMerchantMethods().app?.cred;
+}
+
+export function isCREDIntentFlowAvailable() {
+  const cardApps = getCardApps();
+  return _Arr.contains(cardApps.all, 'cred');
+}
+
+export function getPayloadForCRED() {
+  const { platform } = getSDKMeta();
+  return {
+    method: 'app',
+    provider: 'cred',
+    app_present: isCREDIntentFlowAvailable() ? 1 : 0,
+    '_[agent][platform]': platform,
+    '_[agent][device]': getDevice(),
+    '_[agent][os]': getOS(),
+  };
 }
 
 export function getAppsForCards() {

@@ -16,6 +16,17 @@ const providers = {
       return platform === 'android';
     },
   },
+  cred: {
+    code: 'cred',
+    name: 'Pay with CRED',
+    subtext: 'Use CRED coins for upto 20%',
+    logo: cdnUrl + 'checkout/cred.png',
+    uri: 'credpay', // credpay://
+    package_name: 'com.dreamplug.androidapp',
+    isCompatibleWithSDK: ({ platform }) => {
+      return platform === 'android' || platform === 'ios';
+    },
+  },
 };
 
 export const getProvider = code => providers[code] || {};
@@ -23,7 +34,7 @@ export const getProvider = code => providers[code] || {};
 export const getAppsForMethod = method => {
   switch (method) {
     case 'card':
-      return [providers.google_pay_cards.code];
+      return [providers.google_pay_cards.code, providers.cred.code];
     default:
       return [];
   }

@@ -26,6 +26,7 @@
     cardTab,
   } from 'checkoutstore/screens/card';
   import { methodInstrument, blocks } from 'checkoutstore/screens/home';
+  import { getSDKMeta } from 'checkoutstore/native';
 
   import { customer } from 'checkoutstore/customer';
 
@@ -34,6 +35,8 @@
     isRecurring,
     shouldRememberCustomer,
     isDCCEnabled,
+    methodErrors,
+    getIdForPaymentPayload,
   } from 'checkoutstore';
   import {
     isMethodEnabled,
@@ -41,6 +44,7 @@
     getEMIBankPlans,
     isMethodUsable,
     getAppsForCards,
+    getPayloadForCRED,
   } from 'checkoutstore/methods';
   import { newCardEmiDuration } from 'checkoutstore/emi';
 
@@ -103,6 +107,7 @@
   // Refs
   let savedCardsView;
   let addCardView;
+  let selectedMethodError;
 
   onMount(() => {
     // Prefill
@@ -110,7 +115,29 @@
     $cardExpiry = session.get('prefill.card[expiry]') || '';
     $cardName = session.get('prefill.name') || '';
     $cardCvv = session.get('prefill.card[cvv]') || '';
+
+    methodErrors.subscribe(updateMethodError);
   });
+
+  function updateMethodError() {
+    // Either we got a new error from API or
+    // the user has changed the selected app.
+    // Show the error from API in the callout.
+    selectedMethodError = null;
+    if ($selectedApp) {
+      const payload = {
+        contact: $contact,
+        ...getPayload(),
+      };
+      const id = getIdForPaymentPayload(payload);
+      if (id && $methodErrors[id]) {
+        selectedMethodError = $methodErrors[id].description;
+      }
+    }
+  }
+
+  $: $selectedApp, updateMethodError();
+  $: $contact, updateMethodError();
 
   $: {
     // Track saved cards
@@ -347,6 +374,8 @@
     // TODO: Keep this mapping stored somewhere else when we add another app.
     if ($selectedApp === 'google_pay_cards') {
       return { method: 'app', provider: 'google_pay_cards' };
+    } else if ($selectedApp === 'cred') {
+      return getPayloadForCRED();
     }
   }
 
@@ -649,6 +678,9 @@
       {/if}
     </div>
     <Bottom tab="card">
+      {#if selectedMethodError}
+        <Callout>{selectedMethodError}</Callout>
+      {/if}
       {#if isDCCEnabled()}
         <DynamicCurrencyView view={currentView} />
       {/if}

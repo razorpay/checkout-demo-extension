@@ -10,6 +10,7 @@ export function defineGlobals() {
   window.handleOTP = handleOTP;
   window.upiIntentResponse = upiIntentResponse;
   window.externalSDKResponse = externalSDKResponse;
+  window.externalAppResponse = externalAppResponse;
 }
 
 /**
@@ -89,5 +90,16 @@ function handleGooglePaySDKResponse(response) {
         processPaymentCreate.call(payment, data.apiResponse);
         break;
     }
+  }
+}
+
+/**
+ * window.externalAppResponse is called when a plugin wants to communicate with
+ * Checkout.
+ */
+function externalAppResponse(response = {}) {
+  var session = getSession();
+  if (response.provider === 'CRED') {
+    session.r.emit('payment.app.intent_response', response);
   }
 }

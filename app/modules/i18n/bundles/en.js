@@ -480,6 +480,10 @@ export default {
         name: 'Pay with Google Pay',
         subtext: 'Use cards saved on Google Pay',
       },
+      cred: {
+        name: 'Pay with CRED',
+        subtext: 'Use CRED coins for upto 20%',
+      },
     },
   },
   cardless_emi: {
@@ -764,6 +768,9 @@ export default {
     search_results_label: 'Results',
     logout_action: 'Log out',
     logout_all_devices_action: 'Log out from all devices',
+    complete_payment_on_app: 'Please complete the payment on the {app}',
+    redirecting_to_app: 'Redirecting you to the {app}...',
+    checking_payment_status: 'Checking the payment status...',
   },
   countries: {
     AD: 'Andorra',
