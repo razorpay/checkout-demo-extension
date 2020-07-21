@@ -3192,6 +3192,10 @@ Session.prototype = {
       var payload = this.payload;
       if (payload && payload.method === 'wallet' && !payload.wallet) {
         return $('#wallets').addClass('invalid');
+      } else if (payload && payload.method === 'app') {
+        // In "Add new card" screen, if we're selecting any application,
+        // Card fields maybe invalid, however,  they should be ignored.
+        return false;
       }
     }
     var invalids = $(parent).find('.invalid');
@@ -3842,10 +3846,16 @@ Session.prototype = {
       }
     } else if (screen) {
       if (screen === 'card') {
-        // TODO: simplify conditions
-        // Do not proceed with amex cards if amex is disabled for merchant
-        // also without this, cardsaving is triggered before API returning unsupported card error
-        if (!this.svelteCardTab.isOnSavedCardsScreen()) {
+        if (data.provider) {
+          // Set method as "app"
+          // By default the method is set to whatever screen you're on. -_-
+          data.method = 'app';
+          // We don't want to validate card fields if we're paying via application.
+          // Do nothing.
+        } else if (!this.svelteCardTab.isOnSavedCardsScreen()) {
+          // TODO: simplify conditions
+          // Do not proceed with amex cards if amex is disabled for merchant
+          // also without this, cardsaving is triggered before API returning unsupported card error
           var cardType = discreet.storeGetter(CardScreenStore.cardType);
           if (!MethodStore.isAMEXEnabled() && cardType === 'amex') {
             return this.showLoadError('AMEX cards are not supported', true);
@@ -4156,6 +4166,17 @@ Session.prototype = {
       }
     }
 
+    /**
+     * Google Pay Cards follows an older format.
+     * Soon it will be changed to method: app + provider: google_pay.
+     * After that happens, this if block can be deleted.
+     */
+    if (data.method === 'app' && data.provider === 'google_pay_cards') {
+      data.method = 'card';
+      data.application = 'google_pay';
+      delete data.provider;
+    }
+
     if (data.method === 'paypal') {
       data.method = 'wallet';
       data.wallet = 'paypal';
@@ -4354,6 +4375,15 @@ Session.prototype = {
       }
     }
 
+    if (
+      data.application === 'google_pay' ||
+      (data.method === 'app' && data.provider === 'google_pay_cards')
+    ) {
+      if (this.hasGooglePaySdk) {
+        request.external.gpay = true;
+      }
+    }
+
     if (this.modal) {
       this.modal.options.backdropclose = false;
     }
@@ -4375,7 +4405,15 @@ Session.prototype = {
       }
     }
 
-    if (data.method === 'card' || data.method === 'emi') {
+    if (data.method === 'app' || data.application) {
+      var provider = data.application || data.provider;
+      Analytics.track('app:attempt', {
+        data: {
+          method: data.method,
+          provider: provider,
+        },
+      });
+    } else if (data.method === 'card' || data.method === 'emi') {
       this.nativeotp = !!this.shouldUseNativeOTP();
 
       var cardType = cardTab.getCardTypeFromPayload(data);

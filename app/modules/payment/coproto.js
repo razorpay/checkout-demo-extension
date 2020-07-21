@@ -51,6 +51,23 @@ export const processPaymentCreate = function(response) {
   processCoproto.call(payment, response);
 };
 
+/**
+ * For async payments where callback_url needs to be sent (example: CRED),
+ * the status API will return a type: return coproto for some reason,
+ * this response is not handled on the SDK-side,
+ * so just consider what's present in the request content.
+ * Usually it will be the razorpay_payment_id & other things.
+ *
+ * @param response
+ * @returns {*}
+ */
+const handleAsyncStatusResponse = function(response) {
+  if (response.type === 'return') {
+    return response.request.content;
+  }
+  return response;
+};
+
 // returns true if coproto handled
 export const processCoproto = function(response) {
   if (response.razorpay_payment_id || response.error) {
@@ -156,6 +173,44 @@ var responseTypes = {
       .till(response => response && response.status, 10);
 
     this.emit('upi.pending', fullResponse.data);
+  },
+
+  application: function(request, fullResponse) {
+    var payment = this;
+
+    // Save request for later use (polling status)
+    payment.request = request;
+
+    // Send the coproto payload to SDK for further processing.
+    payment.emit('externalsdk.process', fullResponse);
+
+    // Set a listener to handle the intent response.
+    payment.on('app.intent_response', response => {
+      // Track intent response
+      Analytics.track('intent_response', { data: { response } });
+
+      // Check the intent response
+      if (response.provider === 'GOOGLE_PAY') {
+        if (response.data.apiResponse.type === 'google_pay_cards') {
+          if (response.resultCode === 0) {
+            // Payment was cancelled on Google Pay app.
+            payment.emit('cancel', GPay.googlePayCardsCancelPayload);
+
+            return;
+          }
+        }
+      }
+
+      // Starting polling API for payment status.
+      var request = payment.request;
+      payment.ajax = fetch
+        .jsonp({
+          url: request.url,
+          callback: response =>
+            payment.complete(handleAsyncStatusResponse(response)),
+        })
+        .till(response => response && response.status);
+    });
   },
 
   gpay_inapp: function(request) {

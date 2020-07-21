@@ -123,6 +123,7 @@
     handleFocus
     handleInput
     bind:this={field}
+    on:focus
     on:blur
     on:autocomplete
     on:input={handleInput}
