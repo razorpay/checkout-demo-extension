@@ -12,6 +12,7 @@ import en from './bundles/en';
 
 import { getSession } from 'sessionmanager';
 import { getLanguageCode, getMerchantLanguage } from 'checkoutstore';
+import Analytics from 'analytics';
 
 const LOCALES = {
   en: 'English',
