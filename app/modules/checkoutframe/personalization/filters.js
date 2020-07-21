@@ -69,10 +69,20 @@ const METHOD_FILTERS = {
     return Boolean(getNetbankingBanks()[bank]);
   },
 
-  upi: instrument => {
+  upi: (instrument, { customer }) => {
     // Only allow directpay instruments that have a VPA
     if (instrument['_[flow]'] === 'directpay') {
-      return Boolean(instrument.vpa);
+      if (instrument.vpa) {
+        // We want to show only saved VPAs
+        const tokens = _Obj.getSafely(customer, 'tokens.items', []);
+        const tokenVpas = tokens
+          .filter(token => token.vpa)
+          .map(token => `${token.vpa.username}@${token.vpa.handle}`);
+
+        return tokenVpas.indexOf(instrument.vpa) >= 0;
+      } else {
+        return false;
+      }
     }
 
     // Allow QR instruments
