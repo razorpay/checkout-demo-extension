@@ -114,6 +114,7 @@
     INDIA_COUNTRY_CODE,
     CONTACT_REGEX,
     EMAIL_REGEX,
+    PHONE_REGEX_INDIA,
   } from 'common/constants';
   import { getAnimationOptions } from 'svelte-utils';
 
@@ -464,7 +465,14 @@
      * If contact and email are mandatory, validate
      */
     if (!isContactEmailOptional()) {
-      isContactValid = isContactValid || CONTACT_REGEX.test($contact);
+      if (!isContactValid) {
+        if ($country === '+91') {
+          isContactValid = PHONE_REGEX_INDIA.test($phone);
+        } else {
+          isContactValid = CONTACT_REGEX.test($contact);
+        }
+      }
+
       isEmailValid = isEmailValid || EMAIL_REGEX.test($email);
     }
 
