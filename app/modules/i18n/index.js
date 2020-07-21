@@ -187,17 +187,12 @@ export function getShortBankName(bankCode, locale) {
 
 /**
  * Returns the translated labels for popup
- * @param {string} tab
- * @param {string} locale
+ * @param {string} label
+ * @param {Object} data
  * @returns {string}
  */
 export function translatePaymentPopup(label, data = {}) {
-  let translated = formatTemplateWithLocale(
-    `popup.${label}`,
-    data,
-    getCurrentLocale()
-  );
-  return translated;
+  return formatTemplateWithLocale(`popup.${label}`, data, getCurrentLocale());
 }
 
 /**
