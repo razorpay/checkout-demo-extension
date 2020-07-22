@@ -11,7 +11,7 @@ import {
 import en from './bundles/en';
 
 import { getSession } from 'sessionmanager';
-import { getLanguageCode, getMerchantLanguage } from 'checkoutstore';
+import { getLanguageCode } from 'checkoutstore';
 import Analytics from 'analytics';
 import { getSegmentOrCreate } from 'experiments';
 
@@ -73,8 +73,8 @@ function fetchBundle(locale) {
   });
 }
 
-function getValidMerchantLanguage() {
-  let language = getMerchantLanguage();
+function getValidLocaleFromConfig() {
+  let language = getLanguageCode();
 
   // If the language is set to "auto", we need to determine it from the browser.
   if (language === 'auto') {
@@ -89,6 +89,7 @@ function getValidMerchantLanguage() {
   if (isAllowedLocale(language)) {
     return language;
   }
+
   return null;
 }
 
@@ -116,12 +117,7 @@ function getValidLocaleFromStorage() {
  */
 function determineInitialLocale() {
   // If the user has changed locale earlier, use it.
-  return (
-    getValidLocaleFromStorage() ||
-    getValidMerchantLanguage() ||
-    getLanguageCode() ||
-    'en'
-  );
+  return getValidLocaleFromStorage() || getValidLocaleFromConfig() || 'en';
 }
 
 function setLocaleInStorage(locale) {

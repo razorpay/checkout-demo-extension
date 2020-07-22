@@ -78,8 +78,8 @@ export const isOfferForced = () => preferences.force_offer;
 export const getDowntimes = () => _getDowntimes(preferences);
 export const isCustomerFeeBearer = () => preferences.fee_bearer;
 export const getCheckoutConfig = () => preferences.checkout_config;
-export const getLanguageCode = () => getCheckoutConfig()?.language_code;
-export const getMerchantLanguage = () => getOption('language');
+export const getLanguageCode = () =>
+  getMerchantConfig().config?.display?.language_code;
 
 const optionGetter = option => () => getOption(option);
 export const getOption = option => razorpayInstance.get(option);
