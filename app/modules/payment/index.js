@@ -32,7 +32,7 @@ import {
   updateCardIINMetadata,
 } from 'common/card';
 
-import { getCurrentLocale, translatePaymentPopup as t } from 'i18n';
+import { getCurrentLocale, translatePaymentPopup as t } from 'i18n/popup';
 
 /**
  * Tells if we're being executed from
@@ -523,7 +523,7 @@ Payment.prototype = {
     this.ajax = fetch.post({
       url: makeUrl('payments/create/ajax'),
       data,
-      callback: _Func.bind(processPaymentCreate, this),
+      // callback: _Func.bind(processPaymentCreate, this),
     });
     return 1;
   },
