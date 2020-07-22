@@ -13,6 +13,7 @@ import en from './bundles/en';
 import { getSession } from 'sessionmanager';
 import { getLanguageCode, getMerchantLanguage } from 'checkoutstore';
 import Analytics from 'analytics';
+import { getSegmentOrCreate } from 'experiments';
 
 const LOCALES = {
   en: 'English',
@@ -154,7 +155,12 @@ export function init() {
   // Add bundled messages
   addDefaultMessages();
 
-  const initialLocale = determineInitialLocale();
+  let initialLocale = 'en';
+
+  // We need to determine a default language only for the experiment.
+  if (getSegmentOrCreate('vernacular_default_selection') === 1) {
+    initialLocale = determineInitialLocale();
+  }
 
   Analytics.setMeta('locale.initial', initialLocale);
 
