@@ -8,6 +8,7 @@
   // Utils imports
   import { formatAmountWithSymbol } from 'common/currency';
   import { getSession } from 'sessionmanager';
+  import { appliedOffer } from 'checkoutstore/offers';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -43,6 +44,8 @@
     tax: GST_LABEL,
     amount: TOTAL_CHARGES_LABEL,
   };
+
+  const offerAmount = session.getAppliedOffer().amount;
 
   onMount(() => {
     fetchFees(paymentData);
@@ -94,7 +97,11 @@
               {:else}{$t(displayLabels[type])}{/if}
             </div>
             <div class="fee-amount">
-              {formatAmountWithSymbol(amount * 100, 'INR')}
+              {#if session.getAppliedOffer()}
+                {session.updateAmountInHeader(formatAmountWithSymbol(offerAmount * 100, 'INR'))}
+              {:else}
+                {session.updateAmountInHeader(formatAmountWithSymbol(amount * 100, 'INR'))}
+              {/if}
             </div>
           </div>
         {/if}
