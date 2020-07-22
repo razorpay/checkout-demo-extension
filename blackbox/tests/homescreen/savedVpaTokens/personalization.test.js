@@ -26,6 +26,7 @@ describe.each(
       personalization: true,
     },
     loggedIn: true,
+    anon: false,
   })
 )('UPI tests', ({ preferences, title, options }) => {
   test(title, async () => {
