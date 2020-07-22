@@ -283,6 +283,8 @@ var responseTypes = {
     }
   },
   intent: function(request, fullResponse) {
+    const CheckoutBridge = global.CheckoutBridge;
+
     var ra = ({ transactionReferenceId } = {}) =>
       fetch
         .jsonp({
@@ -309,7 +311,6 @@ var responseTypes = {
           shortcode: this.data.provider,
         });
       } else {
-        var CheckoutBridge = window.CheckoutBridge;
         CheckoutBridge.callNativeIntent(intent_url);
       }
 
@@ -362,7 +363,6 @@ var responseTypes = {
 
     this.emit('upi.coproto_response', fullResponse);
 
-    var CheckoutBridge = window.CheckoutBridge;
     if (CheckoutBridge && CheckoutBridge.callNativeIntent) {
       // If there's a UPI App specified, use it.
       if (this.upi_app) {
