@@ -25,13 +25,12 @@ describe.each(
       amount: 200,
       personalization: true,
     },
+    loggedIn: true,
   })
 )('UPI tests', ({ preferences, title, options }) => {
   test(title, async () => {
     preferences.methods.upi = true;
-    if (preferences.customer) {
-      preferences.customer.contact = '+918888888881';
-    }
+    preferences.customer.contact = '+918888888881';
 
     const context = await openCheckoutWithNewHomeScreen({
       page,
@@ -48,7 +47,6 @@ describe.each(
     await verifyPersonalizationText(context, 'upi');
     await selectPersonalizationPaymentMethod(context, 1);
     await submit(context);
-    await handleUPIAccountValidation(context, 'dsd@okhdfcbank');
     await respondToUPIAjax(context);
     await respondToUPIPaymentStatus(context);
   });
