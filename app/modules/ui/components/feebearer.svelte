@@ -8,7 +8,6 @@
   // Utils imports
   import { formatAmountWithSymbol } from 'common/currency';
   import { getSession } from 'sessionmanager';
-  import { appliedOffer } from 'checkoutstore/offers';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
