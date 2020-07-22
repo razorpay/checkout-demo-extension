@@ -13,6 +13,7 @@
   import { getWallet } from 'common/wallet';
   import { getProvider as getCardlessEmiProvider } from 'common/cardlessemi';
   import { getProvider as getPaylaterProvider } from 'common/paylater';
+  import { getProvider as getAppProvider } from 'common/apps';
   import Track from 'tracker';
   import { getExtendedSingleInstrument } from 'configurability/instruments';
 
@@ -30,6 +31,7 @@
     getCardlessEmiProviderName,
     getPaylaterProviderName,
     getUpiIntentAppName,
+    getAppProviderName,
   } from 'i18n';
 
   // Props
@@ -60,6 +62,16 @@
     const vpaToken = _Arr.find(tokens, item => item.id === token);
 
     return `${vpaToken.vpa.username}@${vpaToken.vpa.handle}`;
+  }
+
+  function getDetailsForAppInstrument(instrument, locale) {
+    const provider = getAppProvider(individualInstrument.provider);
+    const providerName = getAppProviderName(provider.code, locale);
+    return {
+      title: getInstrumentTitle('app', providerName, locale),
+      icon: provider.logo,
+      alt: provider.name,
+    };
   }
 
   function getDetailsForPaypalInstrument(instrument, locale) {
@@ -180,6 +192,9 @@
 
       case 'paylater':
         return getDetailsForPayLaterInstrument(instrument, locale);
+
+      case 'app':
+        return getDetailsForAppInstrument(instrument, locale);
     }
   }
 

@@ -34,6 +34,7 @@
   {value}
   on:input={handleInput}
   on:blur
+  on:focus
   bind:this={ref}
   handleBlur
   handleFocus

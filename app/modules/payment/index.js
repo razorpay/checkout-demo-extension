@@ -210,6 +210,16 @@ export default function Payment(data, params = {}, r) {
     avoidPopup = true;
   } else if (this.gpay) {
     avoidPopup = true;
+  } else if (data.application || data.method === 'app') {
+    // Obviously avoid popup if paying with an external application
+    avoidPopup = true;
+    if (data.provider === 'cred' && !data.app_present && !isRazorpayFrame()) {
+      // CRED collect flow for razorpay.js
+      avoidPopup = false;
+    }
+  } else if (data.application || data.method === 'app') {
+    // Obviously avoid popup if paying with an external application
+    avoidPopup = true;
   } else if (isRazorpayFrame()) {
     /**
      * data needs to be present. absence of data = placeholder popup in
@@ -365,7 +375,13 @@ Payment.prototype = {
     const isExternalSDKPayment =
       this.isExternalAmazonPayPayment || this.isExternalGooglePayPayment;
 
-    if (isExternalSDKPayment) {
+    const isGooglePayCards =
+      this.isExternalGooglePayPayment && this.data.method === 'card';
+    // Fire external SDK payment process event.
+    // Avoid if it's a Google Pay Cards payment as
+    // we will fire this event after creating the payment on API.
+
+    if (isExternalSDKPayment && !isGooglePayCards) {
       setCompleteHandler();
 
       return window.setTimeout(() => {
@@ -497,6 +513,17 @@ Payment.prototype = {
     }
 
     if (!this.avoidPopup && !isRazorpayFrame() && data.method === 'upi') {
+      return;
+    }
+
+    // CRED collect flow for razorpay.js
+    if (
+      !this.avoidPopup &&
+      !isRazorpayFrame() &&
+      data.method === 'app' &&
+      data.provider === 'cred' &&
+      !data.app_present
+    ) {
       return;
     }
 

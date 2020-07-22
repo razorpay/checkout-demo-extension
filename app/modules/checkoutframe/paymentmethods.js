@@ -116,7 +116,12 @@ const DESCRIPTIONS = {
   paypal: locale => getRawMethodDescription('paypal', locale),
   qr: locale => getRawMethodDescription('qr', locale),
   gpay: locale => getRawMethodDescription('gpay', locale),
-  upi: locale => getRawMethodDescription('upi', locale),
+  upi: locale => {
+    if (isRecurring()) {
+      return getRawMethodDescription('upi_recurring', locale);
+    }
+    return getRawMethodDescription('upi', locale);
+  },
   wallet: locale =>
     generateTextFromList(
       getWallets().map(w => getWalletName(w.code, locale)),
