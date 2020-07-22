@@ -3,7 +3,7 @@
 
   var defaults = {
     escape: true,
-    animation: true,
+    animation: !window.matchMedia('(prefers-reduced-motion: reduce)').matches,
     backdropclose: true,
     onhide: null,
     onhidden: null,
@@ -123,6 +123,11 @@
       if (this.options.escape) {
         this.on('keyup', window, function(e) {
           if ((e.which || e.keyCode) === 27) {
+            // Element wants to handle "Escape" by itself
+            if ($(e.target).hasClass('no-escape')) {
+              return;
+            }
+
             if (!hideEmi() && !overlayVisible()) {
               this.hide();
             }

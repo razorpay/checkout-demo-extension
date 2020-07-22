@@ -13,6 +13,7 @@
   import { getWallet } from 'common/wallet';
   import { getProvider as getCardlessEmiProvider } from 'common/cardlessemi';
   import { getProvider as getPaylaterProvider } from 'common/paylater';
+  import { getProvider as getAppProvider } from 'common/apps';
   import Track from 'tracker';
   import { getExtendedSingleInstrument } from 'configurability/instruments';
 
@@ -29,6 +30,8 @@
     getWalletName,
     getCardlessEmiProviderName,
     getPaylaterProviderName,
+    getUpiIntentAppName,
+    getAppProviderName,
   } from 'i18n';
 
   // Props
@@ -59,6 +62,16 @@
     const vpaToken = _Arr.find(tokens, item => item.id === token);
 
     return `${vpaToken.vpa.username}@${vpaToken.vpa.handle}`;
+  }
+
+  function getDetailsForAppInstrument(instrument, locale) {
+    const provider = getAppProvider(individualInstrument.provider);
+    const providerName = getAppProviderName(provider.code, locale);
+    return {
+      title: getInstrumentTitle('app', providerName, locale),
+      icon: provider.logo,
+      alt: provider.name,
+    };
   }
 
   function getDetailsForPaypalInstrument(instrument, locale) {
@@ -101,15 +114,19 @@
         app => app.package_name === individualInstrument.app
       );
 
-      title = getInstrumentTitle(
-        'upi',
-        app.app_name.replace(/ UPI$/, ''),
-        locale
-      );
+      // In case of ios, app name might be missing if not sent by the sdk
+      let appName = app.app_name || 'Unknown app';
+
+      // shortcode might not be present for existing instruments. Check for backward compatibility.
+      if (app.shortcode) {
+        appName = getUpiIntentAppName(app.shortcode, $locale, appName);
+      }
+
+      title = getInstrumentTitle('upi', appName.replace(/ UPI$/, ''), locale);
 
       if (app.app_icon) {
         icon = app.app_icon;
-        alt = app.app_name;
+        alt = appName;
       } else {
         icon = '&#xe70e;';
         alt = 'UPI App';
@@ -174,6 +191,9 @@
 
       case 'paylater':
         return getDetailsForPayLaterInstrument(instrument, locale);
+
+      case 'app':
+        return getDetailsForAppInstrument(instrument, locale);
     }
   }
 
@@ -201,10 +221,6 @@
       dispatch('submit');
     }
   }
-
-  function selectInstrument() {
-    $selectedInstrumentId = instrument.id;
-  }
 </script>
 
 <SlottedRadioOption
@@ -212,10 +228,9 @@
   {name}
   {selected}
   className="instrument"
-  attributes={{ 'data-type': 'individual' }}
+  attributes={{ 'data-type': 'individual', 'data-id': instrument.id }}
   value={instrument.id}
   on:click
-  on:click={selectInstrument}
   on:keydown={attemptSubmit}>
   <i slot="icon">
     <Icon {icon} {alt} />

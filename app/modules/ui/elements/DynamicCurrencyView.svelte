@@ -20,7 +20,7 @@
 
   // i18n
   import { t } from 'svelte-i18n';
-  import { SEARCH_PLACEHOLDER, SEARCH_TITLE } from 'ui/labels/dcc';
+  import { SEARCH_PLACEHOLDER, SEARCH_TITLE, SEARCH_ALL } from 'ui/labels/dcc';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -150,14 +150,14 @@
   $: currencies = currencyConfig && currencyConfig.all_currencies;
   $: cardCurrency = currencyConfig && currencyConfig.card_currency;
   $: sortedCurrencies = currencies && sortCurrencies(currencies);
-  $: displayCurrencies = _Obj.entries(sortedCurrencies).slice(0, 3);
+  $: displayCurrencies = sortedCurrencies && sortedCurrencies.slice(0, 3);
   $: dccAmount = currencies && currencies[selectedCurrency].amount;
   $: selectedCurrencyInDisplay = _Arr.find(
     displayCurrencies,
-    ([code]) => code === selectedCurrency
+    ({ currency }) => currency === selectedCurrency
   );
 
-  function onSelect({ currency }) {
+  function onSelect(currency) {
     selectedCurrency = currency;
 
     searchModal.close();
@@ -221,6 +221,7 @@
       return _Obj.extend(
         {
           currency,
+          _key: currency,
         },
         rest
       );
@@ -293,14 +294,14 @@
         {#if selectedCurrencyInDisplay}
           <div class="default-currencies">
             <Stack horizonal>
-              {#each displayCurrencies as [code, config] (code)}
+              {#each displayCurrencies as { currency, amount } (currency)}
                 <Radio
                   name="dcc_currency"
-                  label={code}
-                  value={config.amount}
-                  checked={code === selectedCurrency}
-                  on:change={() => onSelect(code)}>
-                  {config.amount}
+                  label={currency}
+                  value={amount}
+                  checked={currency === selectedCurrency}
+                  on:change={() => onSelect(currency)}>
+                  {amount}
                 </Radio>
               {/each}
             </Stack>
@@ -321,16 +322,22 @@
         {#if selectedCurrencyInDisplay}More{:else}Change{/if}
         <span class="arrow">&#xe604;</span>
       </div>
+
+      <!-- LABEL: Select currency to pay -->
+      <!-- LABEL: Search for currency -->
+      <!-- LABEL: All currencies -->
       <SearchModal
+        identifier="dcc_currency_select"
         title={$t(SEARCH_TITLE)}
         placeholder={$t(SEARCH_PLACEHOLDER)}
+        all={$t(SEARCH_ALL)}
         autocomplete="transaction-currency"
         items={sortedCurrencies}
         keys={['currency', 'name', 'symbol']}
         component={CurrencySearchItem}
-        visible={false}
         bind:this={searchModal}
-        on:select={({ detail }) => onSelect(detail)} />
+        on:close={() => searchModal.close()}
+        on:select={({ detail }) => onSelect(detail.currency)} />
     </Stack>
   {/if}
 </div>

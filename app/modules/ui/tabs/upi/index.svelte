@@ -2,13 +2,18 @@
   // Svelte imports
   import { onMount } from 'svelte';
   import { slide } from 'svelte/transition';
-  import { _ as t } from 'svelte-i18n';
+  import { _ as t, locale } from 'svelte-i18n';
 
   // Util imports
   import { getSession } from 'sessionmanager';
   import * as GPay from 'gpay';
   import * as Bridge from 'bridge';
-  import { getDowntimes, hasFeature, isCustomerFeeBearer } from 'checkoutstore';
+  import {
+    getDowntimes,
+    hasFeature,
+    isCustomerFeeBearer,
+    getMerchantOrder,
+  } from 'checkoutstore';
   import {
     isMethodEnabled,
     isUPIFlowEnabled,
@@ -28,7 +33,13 @@
   import { filterUPITokens } from 'common/token';
   import { getUPIIntentApps } from 'checkoutstore/native';
 
-  import { getAmount, getName } from 'checkoutstore';
+  import {
+    getAmount,
+    getName,
+    getCurrency,
+    isASubscription,
+    getSubscription,
+  } from 'checkoutstore';
 
   // UI imports
   import UpiIntent from './UpiIntent.svelte';
@@ -54,7 +65,8 @@
   // Store
   import { contact } from 'checkoutstore/screens/home';
   import { customer } from 'checkoutstore/customer';
-  import { methodTabInstrument } from 'checkoutstore/screens/home';
+  import { methodInstrument } from 'checkoutstore/screens/home';
+  import { isRecurring } from 'checkoutstore';
 
   import {
     UPI_GPAY_BLOCK_HEADING,
@@ -68,7 +80,14 @@
     SHOW_QR_CODE,
     SCAN_QR_CODE,
     UPI_DOWNTIME_TEXT,
+    UPI_RECURRING_CAW_CALLOUT_ALL_DATA,
+    UPI_RECURRING_CAW_CALLOUT_NO_NAME,
+    UPI_RECURRING_CAW_CALLOUT_NO_NAME_NO_FREQUENCY,
+    UPI_RECURRING_CAW_CALLOUT_NO_FREQUENCY,
+    UPI_RECURRING_SUBSCRIPTION_CALLOUT,
   } from 'ui/labels/upi';
+
+  import { formatTemplateWithLocale } from 'i18n';
 
   // Props
   export let selectedApp = undefined;
@@ -104,7 +123,47 @@
   const isOtm = method === 'upi_otm';
   let otmStartDate = new Date();
 
+  const merchantName = getName();
+
   const session = getSession();
+
+  const merchantOrder = getMerchantOrder();
+  const merchantSubscription = getSubscription();
+
+  const isUpiRecurringCAW = isRecurring() && merchantOrder;
+  const isUpiRecurringSubscription = isRecurring() && isASubscription('upi');
+  let startDate,
+    endDate,
+    orderAmount,
+    recurringFrequency,
+    recurring_type,
+    maxRecurringAmount,
+    tokenObject,
+    recurring_callout;
+
+  if (isUpiRecurringCAW) {
+    tokenObject = merchantOrder;
+  } else if (isUpiRecurringSubscription) {
+    tokenObject = merchantSubscription;
+  }
+
+  if (isUpiRecurringCAW || isUpiRecurringSubscription) {
+    orderAmount = tokenObject.amount;
+    startDate = tokenObject.token.start_time;
+    endDate = tokenObject.token.end_time;
+    recurringFrequency = tokenObject.token.frequency;
+    maxRecurringAmount = tokenObject.token.max_amount;
+    recurring_type = tokenObject.token.recurringType;
+    if (merchantName && recurringFrequency !== 'as_presented') {
+      recurring_callout = UPI_RECURRING_CAW_CALLOUT_ALL_DATA;
+    } else if (merchantName) {
+      recurring_callout = UPI_RECURRING_CAW_CALLOUT_NO_FREQUENCY;
+    } else if (recurringFrequency !== 'as_presented') {
+      recurring_callout = UPI_RECURRING_CAW_CALLOUT_NO_NAME;
+    } else {
+      recurring_callout = UPI_RECURRING_CAW_CALLOUT_NO_NAME_NO_FREQUENCY;
+    }
+  }
 
   const getAllowedPSPs = {
     upi: tokens => tokens,
@@ -183,7 +242,7 @@
 
   let availableFlows = getAvailableFlowsFromInstrument();
   $: {
-    availableFlows = getAvailableFlowsFromInstrument($methodTabInstrument);
+    availableFlows = getAvailableFlowsFromInstrument($methodInstrument);
   }
 
   // Set default token value when the available flows change
@@ -219,7 +278,7 @@
   }
 
   let intentApps = getUPIIntentApps().filtered;
-  $: intentApps = getUPIIntentAppsFromInstrument($methodTabInstrument);
+  $: intentApps = getUPIIntentAppsFromInstrument($methodInstrument);
 
   let otmEndDate = addDaysToDate(otmStartDate, 90);
 
@@ -333,6 +392,7 @@
   export function onShown() {
     setDefaultTokenValue();
     determineCtaVisibility();
+    sendIntentEvents();
   }
 
   export function getPayload() {
@@ -400,18 +460,28 @@
         break;
     }
 
+    // The UPI Block is given priority over the rest of the data.
+    // Migrating to have all upi related data in the upi block.
+    data.upi = {};
+
     /**
      * default to directpay for collect requests
      */
     if (!data['_[flow]']) {
       data['_[flow]'] = 'directpay';
+      data.upi.flow = 'collect';
     }
 
     if (isOtm) {
-      data.upi = {
-        flow: 'collect',
-        type: 'otm',
-      };
+      data.upi.type = 'otm';
+    }
+
+    if (isUpiRecurringCAW || isUpiRecurringSubscription) {
+      data.upi.type = 'recurring';
+      data.recurring = 1;
+    }
+
+    if (isOtm || isUpiRecurringCAW || isUpiRecurringSubscription) {
       if (data.vpa) {
         data.upi.vpa = data.vpa;
       }
@@ -522,6 +592,38 @@
       data: {
         valid,
         value: omnichannelField.getPhone(),
+      },
+    });
+  }
+
+  function sendIntentEvents() {
+    if (!intent) {
+      return;
+    }
+
+    const apps = getUPIIntentApps();
+
+    Analytics.track('upi:intent', {
+      type: AnalyticsTypes.RENDER,
+      data: {
+        count: {
+          eligible: apps.filtered.length,
+          all: apps.all.length,
+        },
+        list: {
+          eligible: _Arr.join(
+            _Arr.map(apps.filtered, function(app) {
+              return app.package_name;
+            }),
+            ','
+          ),
+          all: _Arr.join(
+            _Arr.map(apps.all, function(app) {
+              return app.package_name;
+            }),
+            ','
+          ),
+        },
       },
     });
   }
@@ -643,6 +745,7 @@
             </SlottedRadioOption>
           {/each}
           <AddANewVpa
+            recurring={isUpiRecurringCAW || isUpiRecurringSubscription}
             paymentMethod={method}
             on:click={() => {
               onUpiAppSelection({ detail: { id: 'new' } });
@@ -686,7 +789,7 @@
       {/if}
     </div>
 
-    <Bottom tab={method}>
+    <Bottom>
       {#if down || disabled}
         <DowntimeCallout severe={disabled}>
           <!-- LABEL: UPI is experiencing low success rates. -->
@@ -697,14 +800,23 @@
         <Callout classes={['downtime-callout']} showIcon={true}>
           <strong>{session.formatAmountWithCurrency(getAmount())}</strong>
           will be blocked on your account by clicking pay. Your account will be
-          charged {getName() ? 'by ' + getName() : ''} between
+          charged {merchantName ? 'by ' + merchantName : ''} between
           <strong>{toShortFormat(otmStartDate)}</strong>
           to
           <strong>{toShortFormat(otmEndDate)}</strong>
           .
         </Callout>
       {/if}
-
+      <!-- Both CAW and subscriptions show the same callout with the same information -->
+      {#if isUpiRecurringCAW || isUpiRecurringSubscription}
+        <Callout classes={['downtime-callout']} showIcon={true}>
+          <!-- This is a recurring payment and {maxAmount} will be charged now. After this, {merchantName} can charge upto {amount} {recurringFrequency} till {endDate}. -->
+          <!-- This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} on a {recurringFrequency} basis till {endDate}. -->
+          <!-- This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} anytime till {endDate}. -->
+          <!-- This is a recurring payment and {maxAmount} will be charged now. {merchantName} can charge upto {amount} anytime till {endDate}. -->
+          {formatTemplateWithLocale(recurring_callout, { maxAmount: session.formatAmountWithCurrency(getAmount()), merchantName: !merchantName ? '' : merchantName, amount: session.formatAmountWithCurrency(maxRecurringAmount), recurringFrequency, endDate: toShortFormat(new Date(endDate * 1000)) }, $locale)}
+        </Callout>
+      {/if}
     </Bottom>
   </Screen>
 </Tab>

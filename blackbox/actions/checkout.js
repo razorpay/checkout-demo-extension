@@ -128,6 +128,15 @@ module.exports = {
     experiments,
     method,
   }) {
+    // Disable animations for testing
+    options = {
+      ...options,
+      modal: {
+        ...(options.modal || {}),
+        animation: false,
+      },
+    };
+
     let checkoutUrl = checkoutPublic;
     if (params) {
       checkoutUrl += '?' + querystring.stringify(params);
@@ -279,8 +288,16 @@ module.exports = {
       if (apps) {
         if (typeof apps === 'boolean') {
           apps = [
-            { package_name: 'in.org.npci.upiapp', app_name: 'BHIM' },
-            { package_name: 'some.random.app', app_name: 'Some Random App' },
+            {
+              package_name: 'in.org.npci.upiapp',
+              shortcode: 'bhim',
+              app_name: 'BHIM',
+            },
+            {
+              package_name: 'some.random.app',
+              shortcode: 'some.random.app',
+              app_name: 'Some Random App',
+            },
           ];
         }
 

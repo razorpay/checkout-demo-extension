@@ -10,6 +10,8 @@ import {
   hasFeature,
   isPayout,
   isOfferForced,
+  isASubscription,
+  getCallbackUrl,
 } from 'checkoutstore';
 
 import {
@@ -20,15 +22,29 @@ import {
 
 import { getEligibleProvidersBasedOnMinAmount } from 'common/cardlessemi';
 import { getProvider } from 'common/paylater';
+import { getAppsForMethod, getProvider as getAppProvider } from 'common/apps';
 import { findCodeByNetworkName } from 'common/card';
 
 import { wallets, getSortedWallets } from 'common/wallet';
 import { extendConfig } from 'common/cardlessemi';
-import { mobileQuery } from 'common/useragent';
-import { getUPIIntentApps } from 'checkoutstore/native';
+import {
+  mobileQuery,
+  isFacebookWebView,
+  getOS,
+  getDevice,
+} from 'common/useragent';
+import {
+  getUPIIntentApps,
+  getCardApps,
+  getSDKMeta,
+} from 'checkoutstore/native';
 
 import { get as storeGetter } from 'svelte/store';
 import { sequence as SequenceStore } from 'checkoutstore/screens/home';
+
+function isNoRedirectFacebookWebViewSession() {
+  return isFacebookWebView() && !getCallbackUrl();
+}
 
 const DEBIT_EMI_BANKS = ['HDFC_DC'];
 
@@ -39,6 +55,32 @@ const ALL_METHODS = {
         return getRecurringMethods()?.card;
       }
       return getMerchantMethods().card;
+    }
+  },
+
+  credit_card() {
+    if (
+      getAmount() &&
+      getOption('method.card') &&
+      getOption('method.credit_card')
+    ) {
+      if (isRecurring()) {
+        return getRecurringMethods()?.credit_card;
+      }
+      return getMerchantMethods().credit_card;
+    }
+  },
+
+  debit_card() {
+    if (
+      getAmount() &&
+      getOption('method.card') &&
+      getOption('method.debit_card')
+    ) {
+      if (isRecurring()) {
+        return getRecurringMethods()?.debit_card;
+      }
+      return getMerchantMethods().debit_card;
     }
   },
 
@@ -95,7 +137,23 @@ const ALL_METHODS = {
   },
 
   upi() {
-    return Object.keys(UPI_METHODS).some(isUPIFlowEnabled);
+    const isAnyUpiFlowEnabled = Object.keys(UPI_METHODS).some(isUPIFlowEnabled);
+    if (isASubscription()) {
+      return isASubscription('upi') && isAnyUpiFlowEnabled;
+    } else if (isRecurring()) {
+      return getRecurringMethods()?.upi && isAnyUpiFlowEnabled;
+    }
+    return isAnyUpiFlowEnabled;
+  },
+
+  app() {
+    if (_Obj.keys(getMerchantMethods().app).length) {
+      return true;
+    }
+    if (getMerchantMethods().google_pay_cards) {
+      return true;
+    }
+    return false;
   },
 
   qr() {
@@ -157,10 +215,54 @@ export function isZestMoneyEnabled() {
   return isMethodEnabled('cardless_emi') && getCardlessEMIProviders().zestmoney;
 }
 
+/**
+ * Only some methods are to be used on Facebook Browser
+ * when callback_url is not passed.
+ * This is done because we can't open popups on Facebook Browser.
+ */
+const METHOD_ON_FACEBOOK_BROWSER_NO_REDIRECT_CHECKER = {
+  credit_card() {
+    return true;
+  },
+
+  debit_card() {
+    return true;
+  },
+
+  card() {
+    return true;
+  },
+
+  upi() {
+    return true;
+  },
+
+  wallet() {
+    return getWallets().length > 0;
+  },
+};
+
+function isMethodEnabledForBrowser(method) {
+  // On Facebook browser, we can only use some methods when we have to use popup.
+  if (isNoRedirectFacebookWebViewSession()) {
+    const checker = METHOD_ON_FACEBOOK_BROWSER_NO_REDIRECT_CHECKER[method];
+
+    if (checker) {
+      return checker();
+    } else {
+      return false;
+    }
+  } else {
+    return true;
+  }
+}
+
 export function isMethodEnabled(method) {
   const checker = ALL_METHODS[method];
   if (checker) {
-    return checker();
+    return checker() && isMethodEnabledForBrowser(method);
+  } else {
+    return false;
   }
 }
 
@@ -186,7 +288,14 @@ export function isContactRequiredForEMI(bank, cardType) {
  * @returns {Array} of enabled methods
  */
 export function getEnabledMethods() {
-  return ALL_METHODS |> _Obj.keys |> _Arr.filter(isMethodEnabled);
+  const merchantOrderMethod = getMerchantOrder()?.method;
+  let methodsToConsider = ALL_METHODS |> _Obj.keys;
+
+  if (merchantOrderMethod) {
+    methodsToConsider = [merchantOrderMethod];
+  }
+
+  return methodsToConsider |> _Arr.filter(isMethodEnabled);
 }
 
 export function getSingleMethod() {
@@ -283,10 +392,16 @@ export function getCardIssuersForRecurring() {
 // additional checks for each sub-method based on UPI
 const UPI_METHODS = {
   collect: () => true,
-  omnichannel: () => !isPayout() && hasFeature('google_pay_omnichannel'),
-  qr: () => getOption('method.qr') && !global.matchMedia(mobileQuery).matches,
+  omnichannel: () =>
+    !isRecurring() && !isPayout() && hasFeature('google_pay_omnichannel'),
+  qr: () =>
+    !isRecurring() &&
+    getOption('method.qr') &&
+    !global.matchMedia(mobileQuery).matches,
   intent: () =>
-    getMerchantMethods().upi_intent && getUPIIntentApps().all.length,
+    !isRecurring() &&
+    getMerchantMethods().upi_intent &&
+    getUPIIntentApps().all.length,
 };
 
 // additional checks for each sub-method based on UPI OTM
@@ -308,7 +423,6 @@ function isUPIBaseEnabled() {
     // by mutual fund who can accept more than the standard limit
     (getAmount() < 1e7 || getMerchantOrder()?.method === 'upi') &&
     !isInternational() &&
-    !isRecurring() &&
     getAmount()
   );
 }
@@ -345,6 +459,51 @@ export function isUPIOtmFlowEnabled(method) {
     return false;
   }
   return isUPIOTMBaseEnabled() && UPI_OTM_METHODS[method]();
+}
+
+export function isApplicationEnabled(app) {
+  const cardApps = getCardApps();
+  const merchantMethods = getMerchantMethods();
+
+  switch (app) {
+    case 'google_pay_cards':
+      return (
+        merchantMethods.google_pay_cards &&
+        _Arr.contains(cardApps.all, 'google_pay_cards')
+      );
+    case 'cred':
+      return isCREDEnabled();
+  }
+
+  return false;
+}
+
+function isCREDEnabled() {
+  return getMerchantMethods().app?.cred;
+}
+
+export function isCREDIntentFlowAvailable() {
+  const cardApps = getCardApps();
+  return _Arr.contains(cardApps.all, 'cred');
+}
+
+export function getPayloadForCRED() {
+  const { platform } = getSDKMeta();
+  return {
+    method: 'app',
+    provider: 'cred',
+    app_present: isCREDIntentFlowAvailable() ? 1 : 0,
+    '_[agent][platform]': platform,
+    '_[agent][device]': getDevice(),
+    '_[agent][os]': getOS(),
+  };
+}
+
+export function getAppsForCards() {
+  if (!isMethodEnabled('card')) {
+    return [];
+  }
+  return getAppsForMethod('card') |> _Arr.filter(isApplicationEnabled);
 }
 
 export function getCardNetworks() {
@@ -545,7 +704,25 @@ export function getPayLaterProviders() {
   if (paylater |> _Obj.isEmpty) {
     return [];
   }
-  return paylater |> _Obj.keys |> _Arr.map(getProvider) |> _Arr.filter(_ => _);
+  return paylater |> _Obj.keys |> _Arr.map(getProvider) |> _Arr.filter(Boolean);
+}
+
+/*
+  @returns {Array} of providers
+ */
+export function getAppProviders() {
+  const merchantMethods = getMerchantMethods();
+  const apps = _Obj.clone(merchantMethods.app || {});
+  if (merchantMethods.google_pay_cards) {
+    // Older preferences format for Google Pay Cards,
+    // if preferences.app contains google_pay_cards,
+    // then remove this hardcoded flag.
+    apps.google_pay_cards = true;
+  }
+  if (apps |> _Obj.isEmpty) {
+    return [];
+  }
+  return apps |> _Obj.keys |> _Arr.map(getAppProvider) |> _Arr.filter(Boolean);
 }
 
 export function getCardlessEMIProviders() {
@@ -589,10 +766,21 @@ export function getWallets() {
     enabledWallets =
       enabledWallets |> _Arr.filter(wallet => passedWallets[wallet] !== false);
   }
+
+  const noRedirectFacebookWebViewSession = isNoRedirectFacebookWebViewSession();
+
   return (
     enabledWallets
     |> _Arr.map(wallet => wallets[wallet])
     |> _Arr.filter(Boolean)
+    |> _Arr.filter(wallet => {
+      if (noRedirectFacebookWebViewSession) {
+        // Only power wallets are supported on Facebook browser w/o callback_url
+        return wallet.power;
+      } else {
+        return true;
+      }
+    })
     |> getSortedWallets
   );
 }

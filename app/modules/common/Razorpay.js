@@ -73,6 +73,20 @@ export default function Razorpay(overrides) {
     _.throwMessage(message);
   }
 
+  // Add integration details if present
+  const integrationKeys = [
+    'integration',
+    'integration_version',
+    'integration_parent_version',
+  ];
+
+  _Arr.loop(integrationKeys, key => {
+    const value = this.get(`_.${key}`);
+    if (value) {
+      Track.props[key] = value;
+    }
+  });
+
   if (
     backendEntityIds.every(function(prop) {
       return !options.get(prop);

@@ -6,8 +6,13 @@ import {
 } from 'checkoutstore/methods';
 import { selectedBank } from 'checkoutstore/screens/netbanking';
 import { getSession } from 'sessionmanager';
+import { setView, destroyView } from './';
 
-export default function() {
+import NetbankingTab from 'ui/tabs/netbanking/index.svelte';
+
+const NETBANKING_KEY = 'netbankingTab';
+
+function render() {
   const prefilledBank = getOption('prefill.bank');
   var method, banks;
 
@@ -25,8 +30,8 @@ export default function() {
   }
 
   if (method) {
-    const netbankingTab = new discreet.NetbankingTab({
-      target: gel('form-fields'),
+    const netbankingTab = new NetbankingTab({
+      target: _Doc.querySelector('#form-fields'),
       props: {
         bankOptions: getOption('method.netbanking'),
         banks: banks,
@@ -55,6 +60,15 @@ export default function() {
       });
     });
 
-    return netbankingTab;
+    setView(NETBANKING_KEY, netbankingTab);
   }
 }
+
+function destroy() {
+  destroyView(NETBANKING_KEY);
+}
+
+export default {
+  render,
+  destroy,
+};

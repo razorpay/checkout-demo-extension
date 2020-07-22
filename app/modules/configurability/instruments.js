@@ -31,6 +31,7 @@ const PUBLIC_API_INSTRUMENT_KEYS = {
   paylater: ['providers'],
   bank_transfer: [],
   paypal: [],
+  app: ['providers'],
 };
 
 const INSTRUMENT_CREATORS = {
@@ -184,4 +185,84 @@ export function addInstrumentToPaymentData(instrument, payment, customer) {
  */
 export function getExtendedSingleInstrument(instrument) {
   return _Obj.extend(_Obj.extend({}, instrument), instrument._ungrouped[0]);
+}
+
+/**
+ * Tells whether an instrument is for saved cards
+ * @param {Instrument} instrument
+ *
+ * @returns {boolean}
+ */
+export function isSavedCardInstrument(instrument) {
+  return (
+    _Arr.contains(['card', 'emi'], instrument.method) && instrument.token_id
+  );
+}
+
+/**
+ * Tells whether or not the instrument is a card instrument
+ * to be used from inside the card tab
+ * @param {Instrument} instrument
+ *
+ * @returns {boolean}
+ */
+export function isInstrumentGrouped(instrument) {
+  const isMethodInstrument = isInstrumentForEntireMethod(instrument);
+
+  /**
+   * All the methods that have a token.
+   * UPI has tokens, but it needs some more checks on
+   * the flows as well. It's not needed now, but we will eventually need to add it.
+   *
+   * TODO: Check for UPI in isMethodWithToken
+   */
+  const isMethodWithToken = _Arr.contains(['card', 'emi'], instrument.method);
+
+  if (isMethodInstrument) {
+    return true;
+  }
+
+  if (isMethodWithToken) {
+    const doesTokenExist = instrument.token_id;
+
+    return !doesTokenExist;
+  }
+
+  if (instrument.method === 'upi' && instrument.flows) {
+    // More than one flow always needs to go deeper
+    if (instrument.flows.length > 1) {
+      return true;
+    }
+
+    // UPI omnichannel always needs to go deeper
+    if (_Arr.contains(instrument.flows, 'omnichannel')) {
+      return true;
+    }
+
+    /**
+     * Collect needs to go deeper if this is not an individual
+     * instrument with a VPA
+     */
+    if (_Arr.contains(instrument.flows, 'collect')) {
+      let ungrouped = instrument._ungrouped;
+
+      // If individual, check for VPA
+      if (ungrouped.length === 1) {
+        const { flow, vpa } = ungrouped[0];
+
+        if (flow === 'collect' && vpa) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    // If flow is intent and no apps are specified, go deeper
+    if (_Arr.contains(instrument.flows, 'intent') && !instrument.apps) {
+      return true;
+    }
+  }
+
+  return instrument._ungrouped.length > 1;
 }

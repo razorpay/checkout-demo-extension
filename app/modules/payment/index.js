@@ -204,6 +204,16 @@ export default function Payment(data, params = {}, r) {
     avoidPopup = true;
   } else if (this.gpay) {
     avoidPopup = true;
+  } else if (data.application || data.method === 'app') {
+    // Obviously avoid popup if paying with an external application
+    avoidPopup = true;
+    if (data.provider === 'cred' && !data.app_present && !isRazorpayFrame()) {
+      // CRED collect flow for razorpay.js
+      avoidPopup = false;
+    }
+  } else if (data.application || data.method === 'app') {
+    // Obviously avoid popup if paying with an external application
+    avoidPopup = true;
   } else if (isRazorpayFrame()) {
     /**
      * data needs to be present. absence of data = placeholder popup in
@@ -332,6 +342,21 @@ Payment.prototype = {
       _Obj.clone(data || {})
     );
 
+    if (this.gpay || this.tez) {
+      if (
+        !(
+          this.r.paymentAdapters &&
+          (this.r.paymentAdapters.gpay ||
+            this.r.paymentAdapters['microapps.gpay'])
+        )
+      ) {
+        return this.r.emit(
+          'payment.error',
+          _.rzpError('GPay is not available')
+        );
+      }
+    }
+
     formatPayment(this);
 
     let setCompleteHandler = _ => {
@@ -344,7 +369,13 @@ Payment.prototype = {
     const isExternalSDKPayment =
       this.isExternalAmazonPayPayment || this.isExternalGooglePayPayment;
 
-    if (isExternalSDKPayment) {
+    const isGooglePayCards =
+      this.isExternalGooglePayPayment && this.data.method === 'card';
+    // Fire external SDK payment process event.
+    // Avoid if it's a Google Pay Cards payment as
+    // we will fire this event after creating the payment on API.
+
+    if (isExternalSDKPayment && !isGooglePayCards) {
       setCompleteHandler();
 
       return window.setTimeout(() => {
@@ -479,6 +510,17 @@ Payment.prototype = {
       return;
     }
 
+    // CRED collect flow for razorpay.js
+    if (
+      !this.avoidPopup &&
+      !isRazorpayFrame() &&
+      data.method === 'app' &&
+      data.provider === 'cred' &&
+      !data.app_present
+    ) {
+      return;
+    }
+
     // iphone background ajax route
     if (!this.iframe && !this.avoidPopup && ajaxRouteNotSupported) {
       return;
@@ -487,6 +529,14 @@ Payment.prototype = {
     if (data.method === 'wallet' && !(data.contact && data.email)) {
       return;
     }
+
+    // Axis bank requires HTTP Referer field to be non-empty,
+    // If opening bank page from popup, it will be empty.
+    // So use create/checkout route.
+    if (data.method === 'emandate' && data.bank === 'UTIB') {
+      return;
+    }
+
     // else make ajax request
 
     var razorpayInstance = this.r;
