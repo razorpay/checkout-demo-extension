@@ -53,7 +53,7 @@ function getSegment(experiment) {
 /**
  * Creates a segment for the given experiment.
  * @param {string} experiment Experiment name
- * @param {Object} evaluatorArgs Argments for evaluator fn
+ * @param {Object} evaluatorArgs Arguments for evaluator fn
  * @param {Function} overrideFn Function to override evaluation
  *
  * @returns {*}
@@ -84,7 +84,7 @@ function setSegment(experiment, evaluatorArgs, overrideFn) {
  * Retrieves segment for an experiment
  * or creates one if it doesn't exist.
  * @param {string} experiment Experiment name
- * @param {Object} [evaluatorArgs] Argments for evaluator fn
+ * @param {Object} [evaluatorArgs] Arguments for evaluator fn
  * @param {Function} [overrideFn] Function to override evaluation
  *
  * @returns {*}
