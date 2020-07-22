@@ -13,7 +13,6 @@ describe.each(
     keyless: false,
     options: {
       amount: 200,
-      personalization: true,
       remember_customer: false,
     },
     preferences: {},
@@ -41,7 +40,6 @@ describe.each(
     keyless: false,
     options: {
       amount: 200,
-      personalization: true,
       remember_customer: true,
     },
     preferences: {},

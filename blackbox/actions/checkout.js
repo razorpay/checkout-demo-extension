@@ -74,6 +74,49 @@ async function passMessage(page, message) {
   await page.evaluate(message => handleMessage(message), message);
 }
 
+const API_PREFERRED_INSTRUMENTS = {
+  upi: [
+    {
+      method: 'upi',
+      instrument: 'dsd@okhdfcbank',
+      score: 1,
+    },
+
+    {
+      method: 'upi',
+      instrument: 'dfs@okicici',
+      score: 1,
+    },
+  ],
+
+  wallet: [
+    {
+      method: 'wallet',
+      instrument: 'freecharge',
+      score: 1,
+    },
+  ],
+
+  netbanking: [
+    {
+      method: 'netbanking',
+      instrument: 'HDFC',
+      score: 1,
+    },
+  ],
+
+  card: [
+    {
+      method: 'card',
+      issuer: 'ICIC',
+      network: 'Visa',
+      type: 'credit',
+      instrument: 'token_9AT28Pxxe0Npi9',
+      score: 1,
+    },
+  ],
+};
+
 let interceptorOptions;
 module.exports = {
   async openCheckout({
@@ -98,6 +141,10 @@ module.exports = {
 
     page.on('request', checkoutRequestHandler);
     await page.goto(checkoutUrl);
+
+    if (typeof options.personalization === 'undefined') {
+      options.personalization = false;
+    }
 
     await setExperiments(page, experiments);
     if (method && options.personalization) {
@@ -183,6 +230,11 @@ module.exports = {
           }[method]
         );
       }, method);
+
+      // Set preferred methods in preferences too
+      preferences.preferred_methods = {
+        '+918888888881': API_PREFERRED_INSTRUMENTS[method.toLowerCase()],
+      };
     }
 
     page.removeListener('request', checkoutRequestHandler);

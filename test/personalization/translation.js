@@ -172,7 +172,7 @@ test('Module: personalization', t => {
 
     t.end();
   });
-  test('translate storage instrument to their api equivalent', t => {
+  test('translate api instruments to their storage equivalent', t => {
     test('transforms a wallet instrument correctly', t => {
       const instrument = {
         method: 'wallet',

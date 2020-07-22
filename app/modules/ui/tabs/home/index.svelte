@@ -261,78 +261,142 @@
    * - if either one is missing, choose the other
    * - if both are present, choose one randomly
    */
-  function getRandomInstrumentSet(
-    instrumentsFromStorage,
-    instrumentsFromApi,
-    user
-  ) {
-    if (USER_EXPERIMENT_CACHE[user]) {
-      return USER_EXPERIMENT_CACHE[user];
-    }
+  function getRandomInstrumentSet({ customer, instrumentsFromStorage }) {
+    const user = customer.contact;
 
-    let instrumentsOnScreen = 'storage';
+    if (!USER_EXPERIMENT_CACHE[user]) {
+      USER_EXPERIMENT_CACHE[user] = new Promise(resolve => {
+        const instrumentMap = {
+          api: [],
+          storage: instrumentsFromStorage,
+          none: [],
+        };
 
-    const instrumentMap = {
-      api: instrumentsFromApi,
-      storage: instrumentsFromStorage,
-    };
+        const EXPERIMENT_IDENTIFIERS = {
+          BOTH_AVAILABLE_STORAGE_SHOWN: 1,
+          BOTH_AVAILABLE_API_SHOWN: 2,
+          API_AVAILABLE_API_SHOWN: 3,
+          API_AVAILABLE_NONE_SHOWN: 4,
+          NONE_AVAILABLE: 5,
+        };
 
-    if (!instrumentsFromStorage.length) {
-      instrumentsOnScreen = 'api';
-    } else if (instrumentsFromApi.length) {
-      instrumentsOnScreen = ['api', 'storage'][Math.floor(Math.random() * 2)];
-    }
+        const SOURCES = {
+          STORAGE: 'storage',
+          API: 'api',
+          NONE: 'none',
+        };
 
-    // if user is in home, track the currently visible experiment
-    if (!session.tab) {
-      Analytics.track('home:p13n:experiment', {
-        type: AnalyticsTypes.METRIC,
-        data: {
-          source: instrumentsOnScreen,
-        },
+        let instrumentsSource;
+
+        // First figure out which source to attempt using
+        if (instrumentsFromStorage.length) {
+          if (Math.random() < 0.5) {
+            instrumentsSource = SOURCES.STORAGE;
+          } else {
+            instrumentsSource = SOURCES.API;
+          }
+        } else {
+          // Do another 50-50 split on API instruments
+          if (Math.random() < 0.5) {
+            instrumentsSource = SOURCES.NONE;
+          } else {
+            instrumentsSource = SOURCES.API;
+          }
+        }
+
+        // The function that returns the promise to be returned
+        // This promise shouce set the experiment identifier
+        // and any analytics meta properties
+        const returnPromise = source =>
+          new Promise(resolve => {
+            let instrumentsToBeShown = instrumentMap[source];
+
+            let experimentIdentifier;
+
+            if (source === SOURCES.STORAGE) {
+              experimentIdentifier =
+                EXPERIMENT_IDENTIFIERS.BOTH_AVAILABLE_STORAGE_SHOWN;
+            } else if (source === SOURCES.API) {
+              if (instrumentMap.storage.length) {
+                experimentIdentifier =
+                  EXPERIMENT_IDENTIFIERS.BOTH_AVAILABLE_API_SHOWN;
+              } else {
+                experimentIdentifier =
+                  EXPERIMENT_IDENTIFIERS.API_AVAILABLE_API_SHOWN;
+              }
+            } else {
+              if (instrumentMap.api.length) {
+                experimentIdentifier =
+                  EXPERIMENT_IDENTIFIERS.API_AVAILABLE_NONE_SHOWN;
+              } else {
+                experimentIdentifier = EXPERIMENT_IDENTIFIERS.NONE_AVAILABLE;
+              }
+            }
+
+            // if user is in home, track the currently visible experiment
+            if (!session.tab) {
+              Analytics.track('home:p13n:experiment', {
+                type: AnalyticsTypes.METRIC,
+                data: {
+                  source: source,
+                  experiment: experimentIdentifier,
+                },
+              });
+
+              Analytics.setMeta('p13n.experiment', experimentIdentifier);
+            }
+
+            // Cache for user
+            const p13nRenderData = {
+              source: source,
+              instruments: instrumentsToBeShown,
+              experiment: experimentIdentifier,
+            };
+
+            USER_EXPERIMENT_CACHE[user] = p13nRenderData;
+
+            resolve(USER_EXPERIMENT_CACHE[user]);
+          });
+
+        // if source is api, we need to fetch api instruments and then
+        // re-set the source
+        if (instrumentsSource === SOURCES.API) {
+          getInstrumentsForCustomer(
+            $customer,
+            {
+              upiApps: getUPIIntentApps().filtered,
+            },
+            'api'
+          ).then(instrumentsFromApi => {
+            if (instrumentsFromApi.length) {
+              instrumentMap.api = instrumentsFromApi;
+            } else {
+              instrumentsSource = SOURCES.NONE;
+            }
+
+            resolve(returnPromise(instrumentsSource));
+          });
+        } else {
+          resolve(returnPromise(instrumentsSource));
+        }
       });
     }
-
-    const p13nRenderData = {
-      source: instrumentsOnScreen,
-      instruments: instrumentMap[instrumentsOnScreen],
-    };
-
-    USER_EXPERIMENT_CACHE[user] = p13nRenderData;
 
     return USER_EXPERIMENT_CACHE[user];
   }
 
   function getAllAvailableP13nInstruments() {
-    return new Promise(resolve => {
-      const instrumentsRetrievalPromises = [
-        getInstrumentsForCustomer(
-          $customer,
-          {
-            upiApps: getUPIIntentApps().filtered,
-          },
-          'storage'
-        ),
-
-        getInstrumentsForCustomer(
-          $customer,
-          {
-            upiApps: getUPIIntentApps().filtered,
-          },
-          'api'
-        ),
-      ];
-
-      Promise.all(instrumentsRetrievalPromises).then(
-        ([instrumentsFromStorage, instrumentsFromApi]) => {
-          let instrumentsOnScreen = getRandomInstrumentSet(
-            instrumentsFromStorage,
-            instrumentsFromApi,
-            $customer.contact
-          );
-          resolve(instrumentsOnScreen);
-        }
-      );
+    return getInstrumentsForCustomer(
+      $customer,
+      {
+        upiApps: getUPIIntentApps().filtered,
+      },
+      'storage'
+    ).then(instrumentsFromStorage => {
+      return getRandomInstrumentSet({
+        instrumentsFromStorage,
+        customer: $customer,
+      });
     });
   }
 
