@@ -94,6 +94,11 @@
   let tab = '';
   $: $cardTab = tab;
 
+  let showApps = false;
+  // None of the apps support EMI currently,
+  // Don't show it on anything except card tab.
+  $: showApps = tab === 'card' && appsAvailable;
+
   let allSavedCards = [];
   let savedCards = [];
   let lastSavedCard = null;
@@ -563,7 +568,7 @@
                 class="cardtype"
                 class:multiple={savedCards && savedCards.length > 1}
                 cardtype={lastSavedCard && lastSavedCard.card.networkCode} />
-              {#if appsAvailable}
+              {#if showApps}
                 <!-- LABEL: Use saved cards on Razorpay -->
                 {$t(USE_SAVED_CARDS_ON_RZP_BTN)}
               {:else}
@@ -579,7 +584,7 @@
             </div>
           {/if}
 
-          {#if appsAvailable}
+          {#if showApps}
             <!-- LABEL: Cards Saved on Apps -->
             <h3 class="pad">{$t(CARDS_SAVED_ON_APPS_LABEL)}</h3>
             <div id="cards-saved-on-apps" role="list" class="border-list pad">
@@ -630,7 +635,7 @@
             </div>
           {/if}
 
-          {#if appsAvailable}
+          {#if showApps}
             <!-- LABEL: Cards Saved on Apps -->
             <h3 class="pad">{$t(CARDS_SAVED_ON_APPS_LABEL)}</h3>
             <div id="cards-saved-on-apps" role="list" class="border-list pad">
