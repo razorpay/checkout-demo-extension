@@ -47,7 +47,7 @@ describe.each(
     },
   })
 )('UPI tests', ({ preferences, title, options }) => {
-  test(title, async () => {
+  test.skip(title, async () => {
     preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
       page,
