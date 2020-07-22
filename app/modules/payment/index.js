@@ -550,7 +550,7 @@ Payment.prototype = {
     this.ajax = fetch.post({
       url: makeUrl('payments/create/ajax'),
       data,
-      // callback: _Func.bind(processPaymentCreate, this),
+      callback: _Func.bind(processPaymentCreate, this),
     });
     return 1;
   },
