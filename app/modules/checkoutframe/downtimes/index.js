@@ -28,13 +28,15 @@ const isHighSeverityOrScheduled = disableBasedOnSeverityOrScheduled(
 );
 
 /**
- * Checks if the downtime has an instrument.
+ * Checks if the downtime has an instrument. For downtimes without an
+ * instrument, API returns an empty array. For ones with an instrument, API
+ * returns an object.
  *
  * @param {Object} downtime
  * @returns {boolean}
  */
 function withoutInstrument(downtime) {
-  return !downtime.instrument;
+  return _.isArray(downtime.instrument);
 }
 
 // TODO: move to _Func.and
