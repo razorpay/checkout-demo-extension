@@ -28,6 +28,23 @@ const isHighSeverityOrScheduled = disableBasedOnSeverityOrScheduled(
 );
 
 /**
+ * Checks if the downtime has an instrument.
+ *
+ * @param {Object} downtime
+ * @returns {boolean}
+ */
+function withoutInstrument(downtime) {
+  return !downtime.instrument;
+}
+
+// TODO: move to _Func.and
+function fAnd(f, g) {
+  return function anded(arg) {
+    return f(arg) && g(arg);
+  };
+}
+
+/**
  * Checks if the downtime has low severity and is not scheduled.
  *
  * @param {Object} downtime
@@ -35,11 +52,35 @@ const isHighSeverityOrScheduled = disableBasedOnSeverityOrScheduled(
  */
 const isLowSeverityAndNotScheduled = _Func.negate(isHighSeverityOrScheduled);
 
+/**
+ * Checks if the downtime has high severity or is scheduled and does not have
+ * an instrument.
+ *
+ * @param {Object} downtime
+ * @return {boolean}
+ */
+const isHighSeverityOrScheduledWithoutInstrument = fAnd(
+  isHighSeverityOrScheduled,
+  withoutInstrument
+);
+
+/**
+ * Checks if the downtime has low severity and is not scheduled and does not
+ * have an instrument.
+ *
+ * @param {Object} downtime
+ * @return {boolean}
+ */
+const isLowSeverityAndNotScheduledWithoutInstrument = fAnd(
+  isLowSeverityAndNotScheduled,
+  withoutInstrument
+);
+
 const DISABLE_METHOD = {
-  upi: isHighSeverityOrScheduled,
-  upi_otm: isHighSeverityOrScheduled,
-  qr: isHighSeverityOrScheduled,
-  gpay: isHighSeverityOrScheduled,
+  upi: isHighSeverityOrScheduledWithoutInstrument,
+  upi_otm: isHighSeverityOrScheduledWithoutInstrument,
+  qr: isHighSeverityOrScheduledWithoutInstrument,
+  gpay: isHighSeverityOrScheduledWithoutInstrument,
   netbanking: function(_, preferences) {
     const netbankingObj = preferences.methods.netbanking || {};
     const banks = _Obj.keys(netbankingObj);
@@ -60,10 +101,10 @@ const DISABLE_METHOD = {
 };
 
 const WARN_METHOD = {
-  upi: isLowSeverityAndNotScheduled,
-  upi_otm: isLowSeverityAndNotScheduled,
-  qr: isLowSeverityAndNotScheduled,
-  gpay: isLowSeverityAndNotScheduled,
+  upi: isLowSeverityAndNotScheduledWithoutInstrument,
+  upi_otm: isLowSeverityAndNotScheduledWithoutInstrument,
+  qr: isLowSeverityAndNotScheduledWithoutInstrument,
+  gpay: isLowSeverityAndNotScheduledWithoutInstrument,
   netbanking: function(_, preferences) {
     const netbankingObj = preferences.methods.netbanking || {};
     const banks = _Obj.keys(netbankingObj);
