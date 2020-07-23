@@ -46,6 +46,7 @@ const UPI_APPS = {
       app_name: 'Google Pay (Tez)',
       package_name: GOOGLE_PAY_PACKAGE_NAME,
       app_icon: 'https://cdn.razorpay.com/checkout/gpay.png',
+      handles: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],
       /**
        * Call CheckoutBridge to verify that the user is registered on the app
        * and only display if they are.
@@ -58,6 +59,7 @@ const UPI_APPS = {
       app_icon: 'https://cdn.razorpay.com/checkout/phonepe.png',
       shortcode: 'phonepe',
       app_name: 'PhonePe',
+      handles: ['ybl'],
     },
     {
       name: 'PayTM',
@@ -65,12 +67,14 @@ const UPI_APPS = {
       package_name: 'net.one97.paytm',
       shortcode: 'paytm',
       app_icon: 'https://cdn.razorpay.com/app/paytm.svg',
+      handles: ['paytm'],
     },
     {
       package_name: 'in.org.npci.upiapp',
       shortcode: 'bhim',
       app_icon: 'https://cdn.razorpay.com/app/bhim.svg',
       app_name: 'Bhim',
+      handles: ['upi'],
     },
   ],
 
@@ -84,6 +88,8 @@ const UPI_APPS = {
       app_name: 'WhatsApp Business UPI',
       package_name: 'com.whatsapp.w4b',
       shortcode: 'whatsapp-biz',
+      handles: ['icicibank'],
+      app_icon: 'https://cdn.razorpay.com/app/whatsapp.svg',
     },
     {
       package_name: 'com.csam.icici.bank.imobile',
@@ -92,6 +98,7 @@ const UPI_APPS = {
     {
       package_name: 'com.sbi.upi',
       shortcode: 'sbi',
+      handles: ['sbi'],
     },
     {
       package_name: 'com.upi.axispay',
@@ -244,6 +251,7 @@ const UPI_APPS = {
     {
       package_name: 'in.bajajfinservmarkets.app',
       shortcode: 'finserv',
+      handles: ['abfspay'],
     },
     {
       package_name: 'in.bajajfinservmarkets.app.uat',
@@ -560,10 +568,12 @@ const handleData = [
   {
     handles: ['icicibank'],
     icon: 'https://cdn.razorpay.com/app/whatsapp.svg',
+    package_name: 'com.whatsapp.w4b',
   },
   {
     handles: ['upi'],
     icon: 'https://cdn.razorpay.com/app/bhim.svg',
+    package_name: 'in.org.npci.upiapp',
   },
 ];
 
@@ -576,9 +586,10 @@ const handleData = [
  */
 export const getUPIAppDataFromHandle = handle => {
   let data = {};
-  handleData.forEach(handleSet => {
-    if (_Arr.contains(handleSet.handles, handle)) {
-      data = handleSet;
+  const allUsableApps = getUsableApps();
+  allUsableApps.forEach(app => {
+    if (app.handles && _Arr.contains(app.handles, handle)) {
+      data = app;
     }
   });
 
