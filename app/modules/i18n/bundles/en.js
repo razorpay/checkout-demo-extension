@@ -326,6 +326,10 @@ export default {
   methods: {
     prefixes: {
       card: 'Cards',
+      credit_cards: 'Credit cards',
+      debit_cards: 'Debit cards',
+      credit_debit: 'Credit/Debit',
+      credit_debit_cards: 'Credit/Debit cards',
       debit_credit_cards: 'Debit/Credit cards',
       netbanking: 'Netbanking',
       emi: 'EMI',
@@ -358,6 +362,8 @@ export default {
       generic: 'Pay using {name}',
       irctc_card: 'Debit/Credit Card',
       irctc_upi: 'BHIM/UPI',
+      cred: 'CRED',
+      google_pay_cards: 'Google Pay Cards',
     },
     descriptions: {
       emandate: 'Pay with Netbanking',
