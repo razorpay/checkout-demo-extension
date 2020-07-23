@@ -308,46 +308,6 @@ const UPI_APPS_ORDER = ['preferred', 'whitelist'];
 export const otherAppsIcon =
   'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNCA4aDRWNEg0djR6bTYgMTJoNHYtNGgtNHY0em0tNiAwaDR2LTRINHY0em0wLTZoNHYtNEg0djR6bTYgMGg0di00aC00djR6bTYtMTB2NGg0VjRoLTR6bS02IDRoNFY0aC00djR6bTYgNmg0di00aC00djR6bTAgNmg0di00aC00djR6IiBmaWxsPSIjYjBiMGIwIi8+PHBhdGggZD0iTTAgMGgyNHYyNEgweiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==';
 
-export const topUpiApps = [
-  {
-    text: 'Google Pay',
-    icon: 'https://cdn.razorpay.com/app/googlepay.svg',
-    id: 'gpay',
-    psp: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],
-  },
-
-  {
-    text: 'PhonePe',
-    icon: 'https://cdn.razorpay.com/app/phonepe.svg',
-    id: 'phonepe',
-    psp: 'ybl',
-  },
-  {
-    text: 'BHIM',
-    icon: 'https://cdn.razorpay.com/app/bhim.svg',
-    id: 'bhim',
-    psp: 'upi',
-  },
-  {
-    text: 'Paytm',
-    icon: 'https://cdn.razorpay.com/app/paytm.svg',
-    id: 'paytm',
-    psp: 'paytm',
-  },
-  {
-    text: 'Airtel',
-    icon: 'https://cdn.razorpay.com/app/airtel.svg',
-    id: 'airtel',
-    psp: 'airtel',
-  },
-  {
-    text: 'Other Apps',
-    icon: otherAppsIcon,
-    id: null,
-    psp: '',
-  },
-];
-
 /**
  * Parses the response from UPI Intent.
  * @param {Object} intentResponse Response from Intent.
@@ -553,29 +513,6 @@ export const getNumberOfAppsByCategory = allApps => {
 
   return count;
 };
-
-const handleData = [
-  {
-    handles: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],
-    icon: 'https://cdn.razorpay.com/app/googlepay.svg',
-    package_name: GOOGLE_PAY_PACKAGE_NAME,
-  },
-  {
-    handles: ['ybl'],
-    icon: 'https://cdn.razorpay.com/app/phonepe.svg',
-    package_name: 'com.phonepe.app',
-  },
-  {
-    handles: ['icicibank'],
-    icon: 'https://cdn.razorpay.com/app/whatsapp.svg',
-    package_name: 'com.whatsapp.w4b',
-  },
-  {
-    handles: ['upi'],
-    icon: 'https://cdn.razorpay.com/app/bhim.svg',
-    package_name: 'in.org.npci.upiapp',
-  },
-];
 
 /**
  * get upi app data from handle
