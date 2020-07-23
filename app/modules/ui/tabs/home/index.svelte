@@ -32,6 +32,8 @@
     partialPaymentOption,
     instruments,
     blocks,
+    setContact,
+    setEmail,
   } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
@@ -106,12 +108,10 @@
   import * as AnalyticsTypes from 'analytics-types';
   import { getCardOffer, hasOffersOnHomescreen } from 'checkoutframe/offers';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
-  import { findCountryCode } from 'common/countrycodes';
   import { isInstrumentGrouped } from 'configurability/instruments';
   import { isElementCompletelyVisibleInTab } from 'lib/utils';
 
   import {
-    INDIA_COUNTRY_CODE,
     CONTACT_REGEX,
     EMAIL_REGEX,
     PHONE_REGEX_INDIA,
@@ -143,13 +143,8 @@
   const isPartialPayment = getIsPartialPayment();
   const contactEmailReadonly = isContactEmailReadOnly();
 
-  const parsedPrefilledContact = findCountryCode(getPrefilledContact());
-
-  $country = parsedPrefilledContact.code
-    ? `+${parsedPrefilledContact.code}`
-    : INDIA_COUNTRY_CODE;
-  $phone = parsedPrefilledContact.phone;
-  $email = getPrefilledEmail();
+  setContact(getPrefilledContact());
+  setEmail(getPrefilledEmail());
 
   // Prop that decides which view to show.
   // Values: 'details', 'methods'
