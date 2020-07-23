@@ -13,7 +13,12 @@ export default {
   },
   card: {
     use_saved_cards_btn: 'Use saved cards',
+    use_saved_cards_on_rzp_btn: 'Use saved cards on Razorpay',
     add_another_card_btn: 'Add another card',
+
+    cards_saved_on_apps_label: 'Cards saved on apps',
+    cards_saved_on_rzp_label: 'Cards saved on Razorpay',
+    enter_card_details_option_label: 'Or, Enter card details',
 
     card_number_label: 'Card Number',
     card_number_help: 'Please enter a valid card number.',
@@ -147,8 +152,10 @@ export default {
     single_block_title: 'Pay via {method}',
     config_block_default_title: 'Available Payment Methods',
 
-    contact_label_required: 'Phone with Country Code',
-    contact_label_optional: 'Phone with Country Code (Optional)',
+    country_label: 'Country',
+    country_help_text: 'Please enter a valid country code',
+    contact_label_required: 'Phone',
+    contact_label_optional: 'Phone (Optional)',
     contact_help_text: 'Please enter a valid contact number',
     email_label_required: 'Email',
     email_label_optional: 'Email (Optional)',
@@ -318,6 +325,7 @@ export default {
       upi: 'UPI - {name}',
       cardless_emi: 'EMI - {name}',
       paylater: 'Pay Later - {name}',
+      app: '{name}',
     },
   },
   methods: {
@@ -363,6 +371,7 @@ export default {
       qr: 'Pay by scanning QR Code',
       gpay: 'Instant payment using Google Pay App',
       upi: 'Instant payment using UPI App',
+      upi_recurring: 'Supported only on BHIM and HDFC',
       upi_otm: 'Pay later using BHIM and HDFC',
       cardless_emi: 'EMI via {text}',
       recurring_cards: '{networks} credit cards',
@@ -468,6 +477,18 @@ export default {
       epaylater: 'ePayLater',
       getsimpl: 'Simpl',
       icic: 'ICICI Bank PayLater',
+    },
+  },
+  app: {
+    providers: {
+      google_pay_cards: {
+        name: 'Pay with Google Pay',
+        subtext: 'Use cards saved on Google Pay',
+      },
+      cred: {
+        name: 'Pay with CRED',
+        subtext: 'Use CRED coins for upto 20%',
+      },
     },
   },
   cardless_emi: {
@@ -632,6 +653,16 @@ export default {
     show_qr_code: 'Show QR Code',
     scan_qr_code: 'Scan the QR code using your UPI app',
     downtime_text: '<strong>UPI<strong> is experiencing low success rates.',
+    recurring_subscription_callout:
+      'The charge is to enable subscription on this card and it will be refunded.',
+    recurring_caw_callout_all_data:
+      'This is a recurring payment and {maxAmount} will be charged now. {merchantName} can charge upto {amount} on a {recurringFrequency} basis till {endDate}.',
+    recurring_caw_callout_no_name:
+      'This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} on a {recurringFrequency} basis till {endDate}.',
+    recurring_caw_callout_no_name_no_frequency:
+      'This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} anytime till {endDate}.',
+    recurring_caw_callout_no_frequency:
+      'This is a recurring payment and {maxAmount} will be charged now. {merchantName} can charge upto {amount} anytime till {endDate}.',
     omni_block_heading: 'Or, pay using phone number',
     omni_gpay_number: 'Google Pay phone number',
     omni_enter_number: 'Enter your phone number',
@@ -742,6 +773,9 @@ export default {
     search_results_label: 'Results',
     logout_action: 'Log out',
     logout_all_devices_action: 'Log out from all devices',
+    complete_payment_on_app: 'Please complete the payment on the {app}',
+    redirecting_to_app: 'Redirecting you to the {app}...',
+    checking_payment_status: 'Checking the payment status...',
   },
   countries: {
     AD: 'Andorra',

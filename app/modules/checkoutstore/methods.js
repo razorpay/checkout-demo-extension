@@ -10,6 +10,7 @@ import {
   hasFeature,
   isPayout,
   isOfferForced,
+  isASubscription,
   getCallbackUrl,
 } from 'checkoutstore';
 
@@ -21,12 +22,22 @@ import {
 
 import { getEligibleProvidersBasedOnMinAmount } from 'common/cardlessemi';
 import { getProvider } from 'common/paylater';
+import { getAppsForMethod, getProvider as getAppProvider } from 'common/apps';
 import { findCodeByNetworkName } from 'common/card';
 
 import { wallets, getSortedWallets } from 'common/wallet';
 import { extendConfig } from 'common/cardlessemi';
-import { mobileQuery, isFacebookWebView } from 'common/useragent';
-import { getUPIIntentApps } from 'checkoutstore/native';
+import {
+  mobileQuery,
+  isFacebookWebView,
+  getOS,
+  getDevice,
+} from 'common/useragent';
+import {
+  getUPIIntentApps,
+  getCardApps,
+  getSDKMeta,
+} from 'checkoutstore/native';
 
 import { get as storeGetter } from 'svelte/store';
 import { sequence as SequenceStore } from 'checkoutstore/screens/home';
@@ -126,7 +137,23 @@ const ALL_METHODS = {
   },
 
   upi() {
-    return Object.keys(UPI_METHODS).some(isUPIFlowEnabled);
+    const isAnyUpiFlowEnabled = Object.keys(UPI_METHODS).some(isUPIFlowEnabled);
+    if (isASubscription()) {
+      return isASubscription('upi') && isAnyUpiFlowEnabled;
+    } else if (isRecurring()) {
+      return getRecurringMethods()?.upi && isAnyUpiFlowEnabled;
+    }
+    return isAnyUpiFlowEnabled;
+  },
+
+  app() {
+    if (_Obj.keys(getMerchantMethods().app).length) {
+      return true;
+    }
+    if (getMerchantMethods().google_pay_cards) {
+      return true;
+    }
+    return false;
   },
 
   qr() {
@@ -365,10 +392,16 @@ export function getCardIssuersForRecurring() {
 // additional checks for each sub-method based on UPI
 const UPI_METHODS = {
   collect: () => true,
-  omnichannel: () => !isPayout() && hasFeature('google_pay_omnichannel'),
-  qr: () => getOption('method.qr') && !global.matchMedia(mobileQuery).matches,
+  omnichannel: () =>
+    !isRecurring() && !isPayout() && hasFeature('google_pay_omnichannel'),
+  qr: () =>
+    !isRecurring() &&
+    getOption('method.qr') &&
+    !global.matchMedia(mobileQuery).matches,
   intent: () =>
-    getMerchantMethods().upi_intent && getUPIIntentApps().all.length,
+    !isRecurring() &&
+    getMerchantMethods().upi_intent &&
+    getUPIIntentApps().all.length,
 };
 
 // additional checks for each sub-method based on UPI OTM
@@ -390,7 +423,6 @@ function isUPIBaseEnabled() {
     // by mutual fund who can accept more than the standard limit
     (getAmount() < 1e7 || getMerchantOrder()?.method === 'upi') &&
     !isInternational() &&
-    !isRecurring() &&
     getAmount()
   );
 }
@@ -427,6 +459,51 @@ export function isUPIOtmFlowEnabled(method) {
     return false;
   }
   return isUPIOTMBaseEnabled() && UPI_OTM_METHODS[method]();
+}
+
+export function isApplicationEnabled(app) {
+  const cardApps = getCardApps();
+  const merchantMethods = getMerchantMethods();
+
+  switch (app) {
+    case 'google_pay_cards':
+      return (
+        merchantMethods.google_pay_cards &&
+        _Arr.contains(cardApps.all, 'google_pay_cards')
+      );
+    case 'cred':
+      return isCREDEnabled();
+  }
+
+  return false;
+}
+
+function isCREDEnabled() {
+  return getMerchantMethods().app?.cred;
+}
+
+export function isCREDIntentFlowAvailable() {
+  const cardApps = getCardApps();
+  return _Arr.contains(cardApps.all, 'cred');
+}
+
+export function getPayloadForCRED() {
+  const { platform } = getSDKMeta();
+  return {
+    method: 'app',
+    provider: 'cred',
+    app_present: isCREDIntentFlowAvailable() ? 1 : 0,
+    '_[agent][platform]': platform,
+    '_[agent][device]': getDevice(),
+    '_[agent][os]': getOS(),
+  };
+}
+
+export function getAppsForCards() {
+  if (!isMethodEnabled('card')) {
+    return [];
+  }
+  return getAppsForMethod('card') |> _Arr.filter(isApplicationEnabled);
 }
 
 export function getCardNetworks() {
@@ -627,7 +704,25 @@ export function getPayLaterProviders() {
   if (paylater |> _Obj.isEmpty) {
     return [];
   }
-  return paylater |> _Obj.keys |> _Arr.map(getProvider) |> _Arr.filter(_ => _);
+  return paylater |> _Obj.keys |> _Arr.map(getProvider) |> _Arr.filter(Boolean);
+}
+
+/*
+  @returns {Array} of providers
+ */
+export function getAppProviders() {
+  const merchantMethods = getMerchantMethods();
+  const apps = _Obj.clone(merchantMethods.app || {});
+  if (merchantMethods.google_pay_cards) {
+    // Older preferences format for Google Pay Cards,
+    // if preferences.app contains google_pay_cards,
+    // then remove this hardcoded flag.
+    apps.google_pay_cards = true;
+  }
+  if (apps |> _Obj.isEmpty) {
+    return [];
+  }
+  return apps |> _Obj.keys |> _Arr.map(getAppProvider) |> _Arr.filter(Boolean);
 }
 
 export function getCardlessEMIProviders() {

@@ -9,7 +9,11 @@
   import CountryCodeSearchItem from 'ui/elements/search-item/CountryCode.svelte';
   import Track from 'tracker';
 
-  import { CONTACT_PATTERN } from 'common/constants';
+  import {
+    COUNTRY_CODE_PATTERN,
+    PHONE_PATTERN,
+    PHONE_PATTERN_INDIA,
+  } from 'common/constants';
   import { COUNTRY_TO_CODE_MAP } from 'common/countrycodes';
 
   // i18n
@@ -17,6 +21,8 @@
     CONTACT_LABEL_REQUIRED,
     CONTACT_LABEL_OPTIONAL,
     CONTACT_HELP_TEXT,
+    COUNTRY_LABEL,
+    COUNTRY_HELP_TEXT,
     COUNTRY_SEARCH_ALL,
     COUNTRY_SEARCH_PLACEHOLDER,
   } from 'ui/labels/home';
@@ -26,23 +32,51 @@
 
   // Refs
   let searchModal;
+  let countryField;
+  let phoneField;
 
   // Props
-  export let value;
+  export let country;
+  export let phone;
 
   const isOptional = isContactOptional();
-  const CONTACT_REGEX = isOptional ? '.*' : CONTACT_PATTERN;
+  const COUNTRY_CODE_REGEX = isOptional ? '.*' : COUNTRY_CODE_PATTERN;
   const searchIdentifier = `country_code_select_${Track.makeUid()}`; // Add a UUID since this field can exist in multiple places
+
+  let contactRegex = isOptional ? '.*' : PHONE_PATTERN;
+  $: {
+    if (isOptional) {
+      contactRegex = '.*';
+    } else {
+      if (country === '+91') {
+        contactRegex = PHONE_PATTERN_INDIA;
+      } else {
+        contactRegex = PHONE_PATTERN;
+      }
+    }
+  }
 
   let countryCodesList;
   $: $t, (countryCodesList = generateCountryCodesList());
 
-  function appendCountryCodeAsynchronously() {
+  function appendPlusToCountryCodeAsynchronously() {
     setTimeout(() => {
-      const internationalFormat = findCountryCode(value);
+      if (!_Str.startsWith(country, '+')) {
+        country = `+${country}`;
+      }
+    });
+  }
 
-      if (internationalFormat.code) {
-        value = `+${internationalFormat.code}${internationalFormat.phone}`;
+  function removeZeroFromPhoneAsynchronously() {
+    setTimeout(() => {
+      if (country === '+91') {
+        if (_Str.startsWith(phone, '0')) {
+          phone = phone.slice(1);
+        }
+
+        if (_Str.startsWith(phone, '+91')) {
+          phone = phone.slice(3);
+        }
       }
     });
   }
@@ -101,38 +135,107 @@
 
     return list;
   }
+
+  function downArrowHandler(event) {
+    const DOWN_ARROW = 40;
+    const key = _.getKeyFromEvent(event);
+
+    if (key === DOWN_ARROW) {
+      openCountryCodeModal(event);
+    }
+  }
+
+  function openCountryCodeModal(event) {
+    // Don't open the modal if contact is readonly
+    if (isContactReadOnly()) {
+      return;
+    }
+
+    if (event) {
+      event.preventDefault();
+    }
+
+    countryField.blur();
+    searchModal.open();
+  }
+
+  function closeCountryCodeModal() {
+    searchModal.close();
+
+    if (phoneField) {
+      phoneField.focus();
+    }
+  }
 </script>
 
-<div>
+<style>
+  .fields-container {
+    display: flex;
+    outline: red;
+  }
+
+  .fields-container > :global(div:first-child) {
+    flex-shrink: 0;
+    flex-basis: 25%;
+  }
+
+  .fields-container > :global(div:first-child > i) {
+    transform: rotate(-90deg) scale(0.5);
+  }
+
+  .fields-container > :global(div:last-child) {
+    flex-grow: 1;
+    margin-left: 16px;
+  }
+</style>
+
+<div class="fields-container">
   <Field
+    bind:this={countryField}
+    id="country-code"
+    name="country-code"
+    type="tel"
+    autocomplete="tel-country-code"
+    on:click={openCountryCodeModal}
+    on:autocomplete={appendPlusToCountryCodeAsynchronously}
+    on:paste={appendPlusToCountryCodeAsynchronously}
+    on:blur={appendPlusToCountryCodeAsynchronously}
+    on:keydown={downArrowHandler}
+    required={!isOptional}
+    xautocompletetype="phone-country-code"
+    pattern={COUNTRY_CODE_REGEX}
+    readonly={isContactReadOnly()}
+    icon="&#xe604;"
+    formatter={{ type: 'country_code' }}
+    label={$t(COUNTRY_LABEL)}
+    on:input={e => (country = e.target.value)}
+    on:blur
+    value={country}
+    helpText={$t(COUNTRY_HELP_TEXT)} />
+  <!-- LABEL: Please enter a valid country code -->
+
+  <Field
+    bind:this={phoneField}
     id="contact"
     name="contact"
     type="tel"
-    autocomplete="tel"
-    on:autocomplete={appendCountryCodeAsynchronously}
-    on:paste={appendCountryCodeAsynchronously}
-    on:blur={appendCountryCodeAsynchronously}
+    autocomplete="tel-national"
+    on:autocomplete={removeZeroFromPhoneAsynchronously}
+    on:paste={removeZeroFromPhoneAsynchronously}
+    on:blur={removeZeroFromPhoneAsynchronously}
     required={!isOptional}
-    xautocompletetype="phone-full"
-    pattern={CONTACT_REGEX}
+    xautocompletetype="phone-national"
+    pattern={contactRegex}
     readonly={isContactReadOnly()}
     formatter={{ type: 'phone' }}
     label={$t(label)}
     icon="&#xe607;"
-    on:input={e => (value = e.target.value)}
+    on:input={e => (phone = e.target.value)}
     on:blur
-    {value}
+    value={phone}
     helpText={$t(CONTACT_HELP_TEXT)} />
   <!-- LABEL: Please enter a valid contact number -->
 </div>
-
-<button
-  type="button"
-  on:click|preventDefault={() => {
-    searchModal.open();
-  }}>
-  Show Modal
-</button>
 
 <!-- LABEL: Search a country -->
 <!-- LABEL: All countries -->
@@ -146,6 +249,6 @@
   bind:this={searchModal}
   on:close={closeSearch}
   on:select={({ detail }) => {
-    console.log(detail);
-    searchModal.close();
+    country = `+${detail.country_code}`;
+    closeCountryCodeModal();
   }} />

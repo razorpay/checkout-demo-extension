@@ -13,6 +13,10 @@ export const internetExplorer = check(/MSIE |Trident\//);
 export const iPhone = check(/iPhone/);
 export const iOS = iPhone || check(/iPad/);
 export const android = check(/Android/);
+export const iPad = check(/iPad/);
+export const windows = check(/Windows NT/);
+export const linux = check(/Linux/);
+export const macOS = check(/Mac OS/);
 export const Safari =
   check(/^((?!chrome|android).)*safari/i) || checkVendor(/Apple/);
 export const firefox = check(/firefox/);
@@ -87,3 +91,33 @@ export const stockAndroidBrowser = android && !chrome && !firefox;
 
 export const ajaxRouteNotSupported =
   browsersThatPauseTab || iOS || stockAndroidBrowser;
+
+export const getOS = () => {
+  if (iPhone || iPad) {
+    return 'iOS';
+  } else if (android) {
+    return 'android';
+  } else if (windows) {
+    return 'windows';
+  } else if (linux) {
+    return 'linux';
+  } else if (macOS) {
+    return 'macOS';
+  } else {
+    return 'other';
+  }
+};
+
+export const getDevice = () => {
+  if (iPhone) {
+    return 'iPhone';
+  } else if (iPad) {
+    return 'iPad';
+  } else if (android) {
+    return 'android';
+  } else if (isMobile()) {
+    return 'mobile';
+  } else {
+    return 'desktop';
+  }
+};

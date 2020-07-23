@@ -15,6 +15,47 @@ RUN cd /checkout_build \
     && NODE_ENV=production npm test \
     && DIST_DIR=/checkout_build/app/dist/v1 /scripts/compress
 
+FROM razorpay/onggi:aws-cli-v2818
+
+ARG BRANCH
+ENV BRANCH=${BRANCH}
+
+ARG AWS_CDN_BUCKET
+ENV AWS_CDN_BUCKET=${AWS_CDN_BUCKET}
+
+ARG AWS_REGION
+ENV AWS_DEFAULT_REGION=${AWS_REGION}
+
+ARG S3_KEY_ID
+ENV AWS_ACCESS_KEY_ID=${S3_KEY_ID}
+
+ARG S3_KEY_SECRET
+ENV AWS_SECRET_ACCESS_KEY=${S3_KEY_SECRET}
+
+RUN mkdir -p /app/dist/v1 \
+    && mkdir -p /app/dist/v1/css
+
+## Multi stage copy does not currently work with recursive directories. Hence, making explicit copy here for each of the subfolders
+COPY --from=builder /checkout_build/app/dist/v1/* /app/dist/v1/
+COPY --from=builder /checkout_build/app/dist/v1/css/* /app/dist/v1/css/
+
+WORKDIR /app/dist/v1
+
+# Rename *.x.gz to *.x so that we serve gzipped files
+RUN mv checkout.js.gz checkout.js
+RUN mv checkout-frame.js.gz checkout-frame.js
+RUN mv razorpay.js.gz razorpay.js
+RUN mv css/checkout.css.gz css/checkout.css
+
+# Upload to S3
+RUN aws s3 sync /app/dist/v1 s3://$AWS_CDN_BUCKET/_checkout/$BRANCH/v1 \
+    --acl public-read \
+    --cache-control "max-age=2700, must-revalidate" \
+    --content-encoding gzip \
+    --exclude "*" \
+    --include "*.js" \
+    --include "*.css"
+
 FROM razorpay/containers:app-nginx-brotli
 ARG GIT_COMMIT_HASH
 ENV GIT_COMMIT_HASH=${GIT_COMMIT_HASH}
