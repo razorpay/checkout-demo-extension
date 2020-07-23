@@ -205,18 +205,8 @@ Formatter.rules = {
 
   phone: {
     raw: function(value) {
-      /**
-       * Replace "+0" with "+91"
-       * because we show a "+" by default in the input field
-       * and Chrome's autofill enters the local format
-       * of the number, i.e. starting with a "0" instead of "91".
-       *
-       * Fuck Chrome
-       */
-      let returnVal = value
-        .replace('+0', '+91')
-        .slice(0, 15)
-        .replace(/[^+\d]/g, '');
+      let returnVal = value.slice(0, 15).replace(/[^+\d]/g, '');
+
       return `${returnVal}`;
     },
 
@@ -226,6 +216,24 @@ Formatter.rules = {
       }
 
       return /^\+?[0-9]{8,15}$/.test(value);
+    },
+  },
+
+  country_code: {
+    raw: function(value) {
+      if (!_Str.startsWith(value, '+')) {
+        value = `+${value}`;
+      }
+
+      return value;
+    },
+
+    isValid: function(value) {
+      if (!value) {
+        value = this.value;
+      }
+
+      return /^\+[0-9]{1,6}$/.test(value);
     },
   },
 };
