@@ -12,7 +12,7 @@ describe.each(
   getTestData('Check hidden options', {
     options: {
       prefill: {
-        contact: '+91222222222',
+        contact: '+912222222222',
         email: 'a@gmail.com',
       },
       hidden: {
@@ -50,7 +50,7 @@ describe.each(
   getTestData('Check hidden options', {
     options: {
       prefill: {
-        contact: '+91222222222',
+        contact: '+912222222222',
         email: 'a@gmail.com',
       },
       hidden: {
@@ -78,7 +78,7 @@ describe.each(
   getTestData('Check hidden options', {
     options: {
       prefill: {
-        contact: '+91222222222',
+        contact: '+912222222222',
         email: 'a@gmail.com',
       },
       hidden: {

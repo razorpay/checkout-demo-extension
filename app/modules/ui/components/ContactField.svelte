@@ -9,7 +9,11 @@
   import CountryCodeSearchItem from 'ui/elements/search-item/CountryCode.svelte';
   import Track from 'tracker';
 
-  import { CONTACT_PATTERN, COUNTRY_CODE_PATTERN } from 'common/constants';
+  import {
+    COUNTRY_CODE_PATTERN,
+    PHONE_PATTERN,
+    PHONE_PATTERN_INDIA,
+  } from 'common/constants';
   import { COUNTRY_TO_CODE_MAP } from 'common/countrycodes';
 
   // i18n
@@ -36,9 +40,21 @@
   export let phone;
 
   const isOptional = isContactOptional();
-  const CONTACT_REGEX = isOptional ? '.*' : CONTACT_PATTERN;
   const COUNTRY_CODE_REGEX = isOptional ? '.*' : COUNTRY_CODE_PATTERN;
   const searchIdentifier = `country_code_select_${Track.makeUid()}`; // Add a UUID since this field can exist in multiple places
+
+  let contactRegex = isOptional ? '.*' : PHONE_PATTERN;
+  $: {
+    if (isOptional) {
+      contactRegex = '.*';
+    } else {
+      if (country === '+91') {
+        contactRegex = PHONE_PATTERN_INDIA;
+      } else {
+        contactRegex = PHONE_PATTERN;
+      }
+    }
+  }
 
   let countryCodesList;
   $: $t, (countryCodesList = generateCountryCodesList());
@@ -53,8 +69,14 @@
 
   function removeZeroFromPhoneAsynchronously() {
     setTimeout(() => {
-      if (country === '+91' && _Str.startsWith(phone, '0')) {
-        phone = phone.slice(1);
+      if (country === '+91') {
+        if (_Str.startsWith(phone, '0')) {
+          phone = phone.slice(1);
+        }
+
+        if (_Str.startsWith(phone, '+91')) {
+          phone = phone.slice(3);
+        }
       }
     });
   }
@@ -203,7 +225,7 @@
     on:blur={removeZeroFromPhoneAsynchronously}
     required={!isOptional}
     xautocompletetype="phone-national"
-    pattern={CONTACT_REGEX}
+    pattern={contactRegex}
     readonly={isContactReadOnly()}
     formatter={{ type: 'phone' }}
     label={$t(label)}
