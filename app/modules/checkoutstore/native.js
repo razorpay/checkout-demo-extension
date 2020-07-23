@@ -1,11 +1,45 @@
 import Track from 'tracker';
 import { getSortedApps } from 'common/upi';
+import {
+  getCardApps as getSortedCardApps,
+  getAppsForMethod,
+} from 'common/apps';
 
 let message;
 let upiApps = { all: [], filtered: [] };
+let cardApps = { all: getAppsForMethod('card') };
+
+// Store queryParams while bootstrapping as query params could change?
+let qpmap = _.getQueryParams();
+
+/**
+ * Get SDK metadata
+ * @returns {{library: (string), version: (string), platform: (string)}}
+ */
+export function getSDKMeta() {
+  const iOSPlatform = _Obj.getSafely(
+    window,
+    'webkit.messageHandlers.CheckoutBridge'
+  );
+  if (iOSPlatform) {
+    return {
+      platform: 'ios',
+    };
+  }
+  return {
+    platform: qpmap.platform || 'web',
+    library: 'checkoutjs',
+    // eslint-disable-next-line no-undef
+    version: (qpmap.version || __BUILD_NUMBER__ || 0) + '',
+  };
+}
 
 export function getUPIIntentApps() {
   return upiApps;
+}
+
+export function getCardApps() {
+  return cardApps;
 }
 
 export function processNativeMessage(_message) {
@@ -40,6 +74,13 @@ const messageTransformers = {
       transfomed.hasAmazonpaySdk = message.external_sdks.amazonpay;
       transfomed.hasGooglePaySdk = message.external_sdks.googlepay;
     }
+    // Build filtered cardApps array after getting the available external sdks
+    // Because some apps might have external dependencies.
+    cardApps.all = getSortedCardApps(
+      getSDKMeta(),
+      message.external_sdks,
+      message.uri_data
+    );
   },
 
   addSmsHash: (o, message) => {

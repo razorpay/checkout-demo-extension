@@ -1,39 +1,10 @@
 import * as UserAgent from 'common/useragent';
+import { compareSemver } from 'lib/utils';
 
 const Orientation = {
   LANDSCAPE: 'landscape',
   PORTRAIT: 'portrait',
 };
-
-/**
- * Compares versions.
- * https://github.com/substack/semver-compare/blob/master/index.js
- * @param {String} a
- * @param {String} b
- *
- * @return {Integer}
- */
-function compareSemver(a, b) {
-  var pa = a.split('.');
-  var pb = b.split('.');
-  for (var i = 0; i < 3; i++) {
-    var na = Number(pa[i]);
-    var nb = Number(pb[i]);
-    if (na > nb) {
-      return 1;
-    }
-    if (nb > na) {
-      return -1;
-    }
-    if (!isNaN(na) && isNaN(nb)) {
-      return 1;
-    }
-    if (isNaN(na) && !isNaN(nb)) {
-      return -1;
-    }
-  }
-  return 0;
-}
 
 /**
  * Returns the device orientation.

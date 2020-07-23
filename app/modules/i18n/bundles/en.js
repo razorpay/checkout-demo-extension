@@ -13,7 +13,12 @@ export default {
   },
   card: {
     use_saved_cards_btn: 'Use saved cards',
+    use_saved_cards_on_rzp_btn: 'Use saved cards on Razorpay',
     add_another_card_btn: 'Add another card',
+
+    cards_saved_on_apps_label: 'Cards saved on apps',
+    cards_saved_on_rzp_label: 'Cards saved on Razorpay',
+    enter_card_details_option_label: 'Or, Enter card details',
 
     card_number_label: 'Card Number',
     card_number_help: 'Please enter a valid card number.',
@@ -315,6 +320,7 @@ export default {
       upi: 'UPI - {name}',
       cardless_emi: 'EMI - {name}',
       paylater: 'Pay Later - {name}',
+      app: '{name}',
     },
   },
   methods: {
@@ -466,6 +472,18 @@ export default {
       epaylater: 'ePayLater',
       getsimpl: 'Simpl',
       icic: 'ICICI Bank PayLater',
+    },
+  },
+  app: {
+    providers: {
+      google_pay_cards: {
+        name: 'Pay with Google Pay',
+        subtext: 'Use cards saved on Google Pay',
+      },
+      cred: {
+        name: 'Pay with CRED',
+        subtext: 'Use CRED coins for upto 20%',
+      },
     },
   },
   cardless_emi: {
@@ -750,6 +768,9 @@ export default {
     search_results_label: 'Results',
     logout_action: 'Log out',
     logout_all_devices_action: 'Log out from all devices',
+    complete_payment_on_app: 'Please complete the payment on the {app}',
+    redirecting_to_app: 'Redirecting you to the {app}...',
+    checking_payment_status: 'Checking the payment status...',
   },
   countries: {
     AD: 'Andorra',
