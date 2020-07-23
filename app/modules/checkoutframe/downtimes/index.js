@@ -38,6 +38,12 @@ function withoutInstrument(downtime) {
 }
 
 // TODO: move to _Func.and
+/**
+ * Returns a function that ANDs the values returned from f and g
+ * @param {function(*): boolean} f
+ * @param {function(*): boolean} g
+ * @returns {function(*): boolean}
+ */
 function fAnd(f, g) {
   return function anded(arg) {
     return f(arg) && g(arg);
