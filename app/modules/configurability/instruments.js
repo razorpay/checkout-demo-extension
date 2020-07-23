@@ -31,6 +31,7 @@ const PUBLIC_API_INSTRUMENT_KEYS = {
   paylater: ['providers'],
   bank_transfer: [],
   paypal: [],
+  app: ['providers'],
 };
 
 const INSTRUMENT_CREATORS = {
