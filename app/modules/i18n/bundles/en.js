@@ -539,6 +539,7 @@ export default {
       ESFB: 'Equitas Small Finance Bank',
       FDRL: 'Federal Bank',
       HDFC: 'HDFC Bank',
+      HDFC_C: 'HDFC Bank - Corporate Banking',
       HSBC: 'Hongkong & Shanghai Banking Corporation',
       ICIC: 'ICICI Bank',
       ICIC_C: 'ICICI Bank - Corporate Banking',
