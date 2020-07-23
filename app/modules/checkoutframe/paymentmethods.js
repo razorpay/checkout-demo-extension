@@ -82,7 +82,11 @@ const DESCRIPTIONS = {
     });
 
     if (cardEmi) {
-      providerNames.unshift(getMethodPrefix('card', locale));
+      if (isDebitEMIEnabled()) {
+        providerNames.unshift(getMethodPrefix('debit_credit_cards', locale));
+      } else {
+        providerNames.unshift(getMethodPrefix('card', locale));
+      }
     }
 
     const text = generateTextFromList(providerNames, 3);

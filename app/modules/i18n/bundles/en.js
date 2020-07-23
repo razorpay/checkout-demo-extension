@@ -326,6 +326,7 @@ export default {
   methods: {
     prefixes: {
       card: 'Cards',
+      debit_credit_cards: 'Debit/Credit cards',
       netbanking: 'Netbanking',
       emi: 'EMI',
       paylater: 'PayLater',
