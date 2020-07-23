@@ -97,9 +97,9 @@
             </div>
             <div class="fee-amount">
               {#if session.getAppliedOffer()}
-                {session.updateAmountInHeader(formatAmountWithSymbol(offerAmount * 100, 'INR'))}
+                {formatAmountWithSymbol(offerAmount * 100, 'INR')}
               {:else}
-                {session.updateAmountInHeader(formatAmountWithSymbol(amount * 100, 'INR'))}
+                {formatAmountWithSymbol(amount * 100, 'INR'))}
               {/if}
             </div>
           </div>
