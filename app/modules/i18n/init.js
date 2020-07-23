@@ -143,6 +143,9 @@ export function bindI18nEvents() {
   });
   locale.subscribe(value => {
     Analytics.setMeta('locale.current', value);
+    Analytics.track('i18n:locale:switch', {
+      data: { locale: value },
+    });
     setLocaleInStorage(value);
   });
 }
