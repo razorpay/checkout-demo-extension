@@ -1,3 +1,4 @@
+/* global discreet */
 /**
  * Popup template exists for razorpay.js as well. We don't want svelte-i18n to
  * be bundled with razorpay.js just to translate a few strings. These functions
@@ -13,8 +14,8 @@
  * @returns {string}
  */
 export function getCurrentLocale() {
-  if (global.discreet) {
-    return global.discreet.I18n.getCurrentLocale.apply(null, arguments);
+  if (discreet) {
+    return discreet.I18n.getCurrentLocale.apply(null, arguments);
   }
 
   return defaultGetCurrentLocale.apply(null, arguments);
@@ -26,8 +27,8 @@ export function getCurrentLocale() {
  * @returns {string}
  */
 export function translatePaymentPopup() {
-  if (global.discreet) {
-    return global.discreet.I18n.translatePaymentPopup.apply(null, arguments);
+  if (discreet) {
+    return discreet.I18n.translatePaymentPopup.apply(null, arguments);
   }
 
   return defaultTranslatePaymentPopup.apply(null, arguments);
