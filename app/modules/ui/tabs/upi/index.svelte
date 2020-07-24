@@ -740,7 +740,7 @@
               <div slot="title">{app.vpa.username + '@' + app.vpa.handle}</div>
               <i slot="icon">
                 <Icon
-                  icon={getUPIAppDataFromHandle(app.vpa.handle).icon || session.themeMeta.icons.upi} />
+                  icon={getUPIAppDataFromHandle(app.vpa.handle).app_icon || session.themeMeta.icons.upi} />
               </i>
             </SlottedRadioOption>
           {/each}

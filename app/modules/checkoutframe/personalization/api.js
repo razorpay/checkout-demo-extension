@@ -6,6 +6,9 @@ import { getAmount } from 'checkoutstore';
 
 import { makeUrl } from 'common/Razorpay';
 
+import Analytics from 'analytics';
+import * as AnalyticsTypes from 'analytics-types';
+
 const PREFERRED_INSTRUMENTS_CACHE = {};
 
 /**
@@ -78,9 +81,16 @@ const API_INSTRUMENT_PAYMENT_ADDONS = {
       instrument['_[flow]'] = 'directpay';
     } else {
       const app = getUPIAppDataFromHandle(instrument.vpa.slice(1));
-      if (app) {
+      if (app.package_name) {
         instrument['_[flow]'] = 'intent';
         instrument['upi_app'] = app.package_name;
+      } else {
+        Analytics.track('p13n:intent_app_missing', {
+          type: AnalyticsTypes.METRIC,
+          data: {
+            instrument: instrument,
+          },
+        });
       }
     }
   },
