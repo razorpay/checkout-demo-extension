@@ -522,15 +522,14 @@ export const getNumberOfAppsByCategory = allApps => {
  * @returns string url to the app icon
  */
 export const getUPIAppDataFromHandle = handle => {
-  let data = {};
   const allUsableApps = getUsableApps();
-  allUsableApps.forEach(app => {
-    if (app.handles && _Arr.contains(app.handles, handle)) {
-      data = app;
-    }
-  });
 
-  return data;
+  // find the app that uses the handle. If no such app is found, return a nice and safe backward compatible value
+  return (
+    _Arr.find(allUsableApps, app => {
+      return app.handles && _Arr.contains(app.handles, handle);
+    }) || {}
+  );
 };
 
 /**
