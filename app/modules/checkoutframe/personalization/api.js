@@ -4,7 +4,7 @@ import { getUPIIntentApps } from 'checkoutstore/native';
 
 import { getAmount } from 'checkoutstore';
 
-import { makeUrl } from 'common/Razorpay';
+import { makeAuthUrl } from 'common/Razorpay';
 
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
@@ -33,7 +33,7 @@ export function setInstrumentsForCustomer(customer, instruments) {
 }
 
 function getInstrumentsFromApi(customer) {
-  const url = _.appendParamsToUrl(makeUrl('personalisation'), {
+  const url = _.appendParamsToUrl(makeAuthUrl('personalisation'), {
     contact: customer.contact,
     amount: getAmount(),
   });
