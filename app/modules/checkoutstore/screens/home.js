@@ -3,6 +3,8 @@ import {
   isInstrumentGrouped,
   isInstrumentForEntireMethod,
 } from 'configurability/instruments';
+import { findCountryCode } from 'common/countrycodes';
+import { INDIA_COUNTRY_CODE } from 'common/constants';
 
 export const country = writable('');
 export const phone = writable('');
@@ -13,7 +15,33 @@ export const contact = derived([country, phone], ([$country, $phone]) => {
     return '';
   }
 });
+
+/**
+ * Sets $country, $phone, and in turn $contact
+ * @param {string} value contact
+ */
+export function setContact(value) {
+  const parsedContact = findCountryCode(value);
+
+  if (parsedContact.code) {
+    country.set(`+${parsedContact.code}`);
+  } else {
+    country.set(INDIA_COUNTRY_CODE);
+  }
+
+  phone.set(parsedContact.phone);
+}
+
 export const email = writable('');
+
+/**
+ * Sets $email
+ * @param {string} value email
+ */
+export function setEmail(value) {
+  email.set(value);
+}
+
 export const emiContact = writable('');
 
 export const address = writable('');

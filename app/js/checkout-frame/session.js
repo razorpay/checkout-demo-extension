@@ -874,20 +874,13 @@ Session.prototype = {
         NetbankingScreenStore.selectedBank.set(data['bank']);
       }
 
-      each(
-        {
-          contact: 'contact',
-          email: 'email',
-        },
-        function(name, id) {
-          var el = gel(id);
-          var val = data[name];
-          if (el && val) {
-            el.value = val;
-            self.input(el);
-          }
-        }
-      );
+      if (data.email) {
+        HomeScreenStore.setEmail(data.email);
+      }
+
+      if (data.contact) {
+        HomeScreenStore.setContact(data.contact);
+      }
     }
   },
 
