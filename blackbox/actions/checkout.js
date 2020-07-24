@@ -36,6 +36,9 @@ function checkoutRequestHandler(request) {
     return request.respond({ status: 200 });
   } else if (url.startsWith('data')) {
     return;
+  } else if (url.includes('livereload')) {
+    // Livereload URLs come if you have `npm run start` on while testing
+    return request.respond({ status: 200 });
   } else {
     throw new Error(
       `unexpected resource URL while loading checkout-public: ${url}`
