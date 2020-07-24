@@ -34,7 +34,8 @@
     "url": "git@github.com:razorpay/checkout.git"
   },
   "scripts": {
-    "start": "$ gulp watch",
+    "start": "NODE_ENV=dev $ gulp watch",
+    "start:no-reload": "$ gulp watch",
     "build": "$ rollup -c --environment prod && $ gulp && $ lintOutput app/js/generated/entry",
     "lint-fix": "$ lintFix app/modules",
     "clean": "$ ./scripts/clean.sh",

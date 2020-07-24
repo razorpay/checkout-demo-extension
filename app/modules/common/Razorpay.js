@@ -302,6 +302,13 @@ export function makePrefParams(rzp) {
       }
     );
 
+    // To differentiate that preferences is being hit from Checkout
+    // eslint-disable-next-line no-undef
+    params['_[build]'] = __BUILD_NUMBER__ || 0;
+    params['_[checkout_id]'] = rzp.id;
+    params['_[library]'] = Track.props.library;
+    params['_[platform]'] = Track.props.platform;
+
     return params;
   }
 }

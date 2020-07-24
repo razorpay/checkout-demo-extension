@@ -150,8 +150,10 @@ export default {
     single_block_title: 'Pay via {method}',
     config_block_default_title: 'Available Payment Methods',
 
-    contact_label_required: 'Phone with Country Code',
-    contact_label_optional: 'Phone with Country Code (Optional)',
+    country_label: 'Country',
+    country_help_text: 'Please enter a valid country code',
+    contact_label_required: 'Phone',
+    contact_label_optional: 'Phone (Optional)',
     contact_help_text: 'Please enter a valid contact number',
     email_label_required: 'Email',
     email_label_optional: 'Email (Optional)',
@@ -188,6 +190,9 @@ export default {
     ifsc_label: 'IFSC Code',
 
     secured_by_message: 'This payment is secured by Razorpay.',
+
+    country_search_all: 'All countries',
+    country_search_placeholder: 'Search a country',
   },
   callouts: {
     subscriptions: {
@@ -325,6 +330,11 @@ export default {
   methods: {
     prefixes: {
       card: 'Cards',
+      credit_cards: 'Credit cards',
+      debit_cards: 'Debit cards',
+      credit_debit: 'Credit/Debit',
+      credit_debit_cards: 'Credit/Debit cards',
+      debit_credit_cards: 'Debit/Credit cards',
       netbanking: 'Netbanking',
       emi: 'EMI',
       paylater: 'PayLater',
@@ -356,6 +366,8 @@ export default {
       generic: 'Pay using {name}',
       irctc_card: 'Debit/Credit Card',
       irctc_upi: 'BHIM/UPI',
+      cred: 'CRED',
+      google_pay_cards: 'Google Pay Cards',
     },
     descriptions: {
       emandate: 'Pay with Netbanking',
@@ -536,6 +548,7 @@ export default {
       ESFB: 'Equitas Small Finance Bank',
       FDRL: 'Federal Bank',
       HDFC: 'HDFC Bank',
+      HDFC_C: 'HDFC Bank - Corporate Banking',
       HSBC: 'Hongkong & Shanghai Banking Corporation',
       ICIC: 'ICICI Bank',
       ICIC_C: 'ICICI Bank - Corporate Banking',
