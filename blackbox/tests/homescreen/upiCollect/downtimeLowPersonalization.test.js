@@ -39,6 +39,7 @@ describe.each(
             status: 'started',
             scheduled: false,
             severity: 'low',
+            instrument: [],
             created_at: 1567686387,
             updated_at: 1567686387,
           },
