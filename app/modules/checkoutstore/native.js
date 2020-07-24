@@ -6,11 +6,37 @@ import {
 } from 'common/apps';
 
 let message;
-let upiApps = { all: [], filtered: [] };
 let cardApps = { all: getAppsForMethod('card') };
 
 // Store queryParams while bootstrapping as query params could change?
 let qpmap = _.getQueryParams();
+
+let upiApps = { all: [], filtered: [] };
+
+/**
+ * Sets the list of apps.
+ *
+ * TODO: Extend the list under `all` and `filtered`,
+ *       instead of resetting it every time.
+ *
+ * @param {Array<Object>} apps
+ */
+function setUpiApps(apps) {
+  const filteredApps = getSortedApps(apps);
+  const unusedApps = _Arr.filter(
+    apps,
+    app =>
+      !_Arr.find(
+        filteredApps,
+        filteredApp => filteredApp.package_name === app.package_name
+      )
+  );
+
+  upiApps = {
+    all: _Arr.mergeWith(filteredApps, unusedApps),
+    filtered: filteredApps,
+  };
+}
 
 /**
  * Get SDK metadata
@@ -94,23 +120,13 @@ const messageTransformers = {
     if (message.upi_intents_data && message.upi_intents_data.length) {
       // @TODO: used to just send an event. send from here itself
       transfomed.all_upi_intents_data = message.upi_intents_data;
-      const filteredApps = getSortedApps(message.upi_intents_data);
-      const unusedApps = _Arr.filter(
-        message.upi_intents_data,
-        app =>
-          !_Arr.find(
-            filteredApps,
-            filteredApp => filteredApp.package_name === app.package_name
-          )
-      );
 
-      upiApps = {
-        all: _Arr.mergeWith(filteredApps, unusedApps),
-        filtered: filteredApps,
-      };
+      setUpiApps(message.upi_intents_data);
 
-      if (filteredApps.length) {
-        transfomed.upi_intents_data = filteredApps;
+      const upiApps = getUPIIntentApps();
+
+      if (upiApps.filtered.length) {
+        transfomed.upi_intents_data = upiApps.filtered;
       }
     }
   },
