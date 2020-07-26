@@ -2524,7 +2524,12 @@ Session.prototype = {
       });
     };
 
-    if (this.screen === 'otp' && thisTab !== 'card' && thisTab !== 'emi') {
+    if (
+      this.screen === 'otp' &&
+      thisTab !== 'card' &&
+      thisTab !== 'upi' &&
+      thisTab !== 'emi'
+    ) {
       tab = thisTab;
     } else if (
       (thisTab === 'qr' && this.r._payment) ||
@@ -2805,7 +2810,7 @@ Session.prototype = {
       this.emandateView.onShown();
     }
 
-    if (tab === '' && (this.tab === 'upi' || this.tab === 'upi_otm')) {
+    if (tab === '' && (this.screen === 'upi' || this.screen === 'upi_otm')) {
       if (this.upiTab.onBack()) {
         return;
       }
