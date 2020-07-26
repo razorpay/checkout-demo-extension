@@ -2758,6 +2758,7 @@ Session.prototype = {
     if (tab === 'upi') {
       this.updateCustomerInStore();
 
+      // Enforce login flow for UPI Recurring subscriptions
       if (Store.isASubscription() && !customer.logged) {
         this.otpView.updateScreen({
           maxlength: 6,
@@ -2768,10 +2769,6 @@ Session.prototype = {
 
         this.topBar.setTitleOverride('otp', 'text', 'upi');
 
-        this.otpView.updateScreen({
-          skipTextLabel: 'skip_saved_cards',
-        });
-
         self.commenceOTP('saved_cards_sending', 'saved_cards_access', {
           phone: getPhone(),
         });
@@ -2781,21 +2778,13 @@ Session.prototype = {
           params.sms_hash = smsHash;
         }
 
-        customer.checkStatus(function() {
-          /**
-           * 1. If this is a recurring payment and customer doesn't have saved cards,
-           *    create and ask for OTP.
-           * 2. If customer has saved cards and is not logged in, ask for OTP.
-           * 3. If customer doesn't have saved cards, show cards screen.
-           */
-          self.getCurrentCustomer().createOTP(function() {
-            Analytics.track('saved_cards:access:otp:ask');
-            askOTP(self.otpView, 'otp_sent_save_card_recurring', true, {
-              phone: getPhone(),
-            });
-            self.updateCustomerInStore();
+        self.getCurrentCustomer().createOTP(function() {
+          Analytics.track('saved_cards:access:otp:ask');
+          askOTP(self.otpView, 'otp_sent_save_card_recurring', true, {
+            phone: getPhone(),
           });
-        }, params);
+          self.updateCustomerInStore();
+        });
       } else {
         discreet.upiTab.render();
       }
