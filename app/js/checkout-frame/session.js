@@ -2838,7 +2838,7 @@ Session.prototype = {
         !(
           tab === 'upi' &&
           Store.isASubscription() &&
-          !self.getCurrentCustomer().logged
+          !this.getCurrentCustomer().logged
         )
       ) {
         this.setScreen(tab);
