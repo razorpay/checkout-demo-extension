@@ -2829,7 +2829,13 @@ Session.prototype = {
       this.showCardTab(tab);
       cardTab.setEmiPlansCta(this.screen, tab);
     } else {
-      if (!(tab === 'upi' && Store.isASubscription() && !customer.logged)) {
+      if (
+        !(
+          tab === 'upi' &&
+          Store.isASubscription() &&
+          !self.getCurrentCustomer().logged
+        )
+      ) {
         this.setScreen(tab);
       }
       if (ua_iPhone) {
