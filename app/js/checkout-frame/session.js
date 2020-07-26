@@ -3736,9 +3736,10 @@ Session.prototype = {
         if (msg) {
           Analytics.track('behav:otp:incorrect');
           askOTP(this.otpView, msg, true);
-          self.updateCustomerInStore();
+          this.updateCustomerInStore();
         } else {
           discreet.upiTab.render();
+          this.setScreen('upi');
         }
       };
     }
