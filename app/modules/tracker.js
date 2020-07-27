@@ -199,6 +199,7 @@ export default function Track(r, event, data, immediately) {
       'key',
       'method',
       'name',
+      'personalization',
       'prefill',
       'readonly',
       'recurring',
