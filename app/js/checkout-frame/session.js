@@ -2779,7 +2779,7 @@ Session.prototype = {
         }
 
         self.getCurrentCustomer().createOTP(function() {
-          Analytics.track('saved_cards:access:otp:ask');
+          Analytics.track('subscriptions_upi:access:otp:ask');
           askOTP(self.otpView, 'otp_proceed_with_upi_subscription', true, {
             phone: getPhone(),
           });
