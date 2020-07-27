@@ -21,6 +21,7 @@ import {
   isIframe,
   ownerWindow,
 } from 'common/constants';
+import { checkGooglePayWebPayments } from 'checkoutframe/components/upi';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -227,6 +228,12 @@ function fetchPrefs(session) {
       }
     }
   );
+
+  performPrePrefsFetchOperations();
+}
+
+function performPrePrefsFetchOperations() {
+  checkGooglePayWebPayments();
 }
 
 function setSessionPreferences(session, preferences) {

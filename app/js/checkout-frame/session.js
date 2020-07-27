@@ -1649,8 +1649,6 @@ Session.prototype = {
       this.oneMethod = oneMethod;
       $(this.el).addClass('one-method');
     }
-
-    discreet.upiTab.checkGooglePayWebPayments();
   },
 
   /**
