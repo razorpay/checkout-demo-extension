@@ -69,13 +69,11 @@
   import { isRecurring } from 'checkoutstore';
 
   import {
-    UPI_GPAY_BLOCK_HEADING,
     UPI_COLLECT_BLOCK_HEADING,
     UPI_COLLECT_BLOCK_SUBHEADING,
     UPI_COLLECT_NEW_VPA_HELP,
     UPI_COLLECT_ENTER_ID,
     UPI_COLLECT_SAVE,
-    GPAY_WEB_API_TITLE,
     QR_BLOCK_HEADING,
     SHOW_QR_CODE,
     SCAN_QR_CODE,
@@ -432,11 +430,6 @@
           upi_provider: 'google_pay',
         };
         break;
-      case 'gpay':
-        data = {
-          '_[flow]': 'gpay',
-        };
-        break;
 
       default:
         // `selectedToken` can be null if nothing is to be selected by default
@@ -516,7 +509,6 @@
     const getEventValueForFeature = feature => {
       return (
         {
-          gpay: 'gpay web payments',
           'gpay-omni': 'gpay omnichannel',
           new: 'add new',
           intent: 'intent',
@@ -693,26 +685,6 @@
             });
           }}
           {showRecommendedUPIApp} />
-      {/if}
-
-      {#if useWebPaymentsApi}
-        <!-- LABEL: Pay using Gpay App -->
-        <div class="legend left">{$t(UPI_GPAY_BLOCK_HEADING)}</div>
-        <div class="border-list">
-          <SlottedRadioOption
-            name="google_pay_web"
-            selected={selectedToken === 'gpay'}
-            on:click={() => {
-              selectedToken = 'gpay';
-              session.preSubmit();
-            }}>
-            <!-- LABEL: Google Pay -->
-            <div slot="title">{$t(GPAY_WEB_API_TITLE)}</div>
-            <i slot="icon">
-              <Icon icon={session.themeMeta.icons.gpay} />
-            </i>
-          </SlottedRadioOption>
-        </div>
       {/if}
 
       {#if shouldShowCollect}
