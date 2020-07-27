@@ -197,7 +197,7 @@
     return new Date(date.getTime() + days * 1000 * 24 * 3600);
   };
 
-  const { isPayout, showRecommendedUPIApp } = session;
+  const { showRecommendedUPIApp } = session;
 
   /**
    * An instrument might has for some flows to be available

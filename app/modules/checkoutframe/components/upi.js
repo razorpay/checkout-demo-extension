@@ -1,7 +1,5 @@
-import { isMethodEnabled } from 'checkoutstore/methods';
 import { setView, destroyView } from './';
 import { getSession } from 'sessionmanager';
-import { isPayout } from 'checkoutstore';
 import * as Bridge from 'bridge';
 import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi';
 import { setUpiApps } from 'checkoutstore/native';
