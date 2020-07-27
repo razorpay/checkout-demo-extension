@@ -45,15 +45,6 @@
   let otherAppsIcon = session.themeMeta.icons.othermethods;
 
   $: {
-    /* selectedApp is passed by parent for preselecting app */
-    if (selectedApp === 'gpay') {
-      onAppSelect({
-        data: { package_name: GOOGLE_PAY_PACKAGE_NAME },
-      });
-    }
-  }
-
-  $: {
     if (apps.length <= 5 || showAll) {
       showableApps = apps;
     } else {
