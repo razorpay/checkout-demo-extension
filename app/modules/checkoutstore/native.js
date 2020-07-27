@@ -21,7 +21,7 @@ let upiApps = { all: [], filtered: [] };
  *
  * @param {Array<Object>} apps
  */
-function setUpiApps(apps) {
+export function setUpiApps(apps) {
   const filteredApps = getSortedApps(apps);
   const unusedApps = _Arr.filter(
     apps,
