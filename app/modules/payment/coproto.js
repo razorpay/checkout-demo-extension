@@ -8,7 +8,6 @@ import {
 import { androidBrowser } from 'common/useragent';
 import Track from 'tracker';
 import Analytics from 'analytics';
-import { getSession } from 'sessionmanager';
 import { getBankFromCard } from 'common/bank';
 import * as Bridge from 'bridge';
 
@@ -252,14 +251,13 @@ var responseTypes = {
 
             // Since the method is not supported, remove it.
             if (error.code === error.NOT_SUPPORTED_ERR) {
-              const session = getSession();
+              Analytics.track('gpay:not_supported', {
+                data: {
+                  error,
+                },
+              });
 
-              if (session && session.upiTab) {
-                session.upiTab.$set({
-                  useWebPaymentsApi: false,
-                  selectedApp: 'gpay',
-                });
-              }
+              // TODO: (nice to have) Remove the Google Pay app from UI
             }
           }
 
