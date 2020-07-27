@@ -38,6 +38,7 @@
 
   import { customer } from 'checkoutstore/customer';
   import { getOption, isDCCEnabled } from 'checkoutstore';
+  import { getUPIIntentApps } from 'checkoutstore/native';
 
   // i18n
   import {
@@ -279,7 +280,7 @@
 
   function getAllAvailableP13nInstruments() {
     return getTranslatedInstrumentsForCustomer($customer, {
-      upiApps: session.upi_intents_data,
+      upiApps: getUPIIntentApps().filtered,
     });
   }
 

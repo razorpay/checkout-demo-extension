@@ -118,16 +118,9 @@ const messageTransformers = {
   addUpiIntentsData: (transfomed, message) => {
     // @TODO: update better names for these variables
     if (message.upi_intents_data && message.upi_intents_data.length) {
-      // @TODO: used to just send an event. send from here itself
-      transfomed.all_upi_intents_data = message.upi_intents_data;
+      // TODO: Send from here itself
 
       setUpiApps(message.upi_intents_data);
-
-      const upiApps = getUPIIntentApps();
-
-      if (upiApps.filtered.length) {
-        transfomed.upi_intents_data = upiApps.filtered;
-      }
     }
   },
 
