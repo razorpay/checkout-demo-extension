@@ -139,7 +139,11 @@ const ALL_METHODS = {
   upi() {
     const isAnyUpiFlowEnabled = Object.keys(UPI_METHODS).some(isUPIFlowEnabled);
     if (isASubscription()) {
-      return isASubscription('upi') && isAnyUpiFlowEnabled;
+      return (
+        isASubscription('upi') &&
+        getRecurringMethods()?.upi &&
+        isAnyUpiFlowEnabled
+      );
     } else if (isRecurring()) {
       return getRecurringMethods()?.upi && isAnyUpiFlowEnabled;
     }
