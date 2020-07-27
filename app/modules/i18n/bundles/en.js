@@ -816,7 +816,6 @@ export default {
       cardlessemi_sending:
         'Looking for {provider} account associated with {phone}',
       incorrect_otp_retry: 'Entered OTP was incorrect. Re-enter to proceed.',
-      insufficient_wallet_balance: 'Insufficient balance in your wallet',
       loading: 'Loading...',
       otp_resent_generic: 'OTP Resent',
       otp_resent_successful: 'OTP has been resent successfully.',
