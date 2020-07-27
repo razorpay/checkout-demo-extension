@@ -4224,9 +4224,13 @@ Session.prototype = {
       data['_[app]'] = data.upi_app;
     }
 
-    if (data['_[flow]'] === 'gpay') {
+    if (
+      data.method === 'upi' &&
+      data['_[flow]'] === 'intent' &&
+      data.upi_app === UPIUtils.GOOGLE_PAY_PACKAGE_NAME &&
+      discreet.upiTab.isGooglePayWebPaymentsAvailable()
+    ) {
       request.gpay = true;
-      data['_[flow]'] = 'intent';
     }
 
     var appliedOffer = this.getAppliedOffer();
