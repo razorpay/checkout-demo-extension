@@ -4685,7 +4685,7 @@ Session.prototype = {
         }, this)
       );
     } else if (data.method === 'upi') {
-      sub_link.html('Cancel Payment');
+      sub_link.html(I18n.format('misc.cancel_action'));
 
       this.r.on('payment.upi.noapp', function(data) {
         that.showLoadError(I18n.format('upi.intent_no_apps_error'), true);

@@ -784,6 +784,7 @@ export default {
     cancel_title: 'Cancel payment?',
     cancel_confirm: 'Yes, cancel',
     cancel_back: 'No',
+    cancel_action: 'Cancel Payment',
     go_to_payment: 'Go to payment',
     payment_waiting_confirmation: 'Waiting for payment confirmation.',
     error_handling_request: 'There was an error in handling your request.',
