@@ -28,11 +28,6 @@ export function isGooglePayWebPaymentsAvailable() {
 export function checkGooglePayWebPayments() {
   const session = getSession();
 
-  // We're not using Web Payments API for Payouts
-  if (isPayout()) {
-    return;
-  }
-
   /* disable Web payments API for Android SDK as we have intent there */
   if (Bridge.checkout.exists()) {
     return;
