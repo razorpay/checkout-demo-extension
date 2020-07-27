@@ -1,6 +1,6 @@
 import { VPA_REGEX } from 'common/constants';
 import { doesAppExist } from 'common/upi';
-import { getDowntimes } from 'checkoutstore';
+import { getDowntimes, isASubscription } from 'checkoutstore';
 import {
   isCreditCardEnabled,
   isDebitCardEnabled,
@@ -69,7 +69,13 @@ const METHOD_FILTERS = {
     return Boolean(getNetbankingBanks()[bank]);
   },
 
-  upi: instrument => {
+  upi: (instrument, { customer }) => {
+    // hide p13n tokens for anonymous users in case of subscriptions
+    // login needs to be enforced before any payments are made through upi
+    if (isASubscription() && !customer.logged) {
+      return false;
+    }
+
     // Only allow directpay instruments that have a VPA
     if (instrument['_[flow]'] === 'directpay') {
       return Boolean(instrument.vpa);
