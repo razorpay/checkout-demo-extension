@@ -2769,7 +2769,7 @@ Session.prototype = {
 
         this.topBar.setTitleOverride('otp', 'text', 'upi');
 
-        self.commenceOTP('saved_cards_sending', 'saved_cards_access', {
+        self.commenceOTP('otp_sending_generic', '', {
           phone: getPhone(),
         });
         var smsHash = this.get('send_sms_hash') && this.sms_hash;
@@ -2780,7 +2780,7 @@ Session.prototype = {
 
         self.getCurrentCustomer().createOTP(function() {
           Analytics.track('saved_cards:access:otp:ask');
-          askOTP(self.otpView, 'otp_sent_save_card_recurring', true, {
+          askOTP(self.otpView, 'otp_proceed_with_upi_subscription', true, {
             phone: getPhone(),
           });
           self.updateCustomerInStore();
