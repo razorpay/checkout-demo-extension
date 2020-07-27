@@ -5,6 +5,7 @@ var ua = navigator.userAgent;
 var preferences,
   CheckoutBridge = window.CheckoutBridge,
   StorageBridge = window.StorageBridge,
+  Bridge = discreet.Bridge,
   isIframe = window !== parent,
   ownerWindow = isIframe ? parent : opener,
   _uid = Track.id,
@@ -132,11 +133,11 @@ function improvisePrefilledContact(session) {
   var storedUserDetails = discreet.ContactStorage.get();
 
   // Pick details from storage if not given in prefill
-  if (!prefilledContact) {
+  if (!prefilledContact && storedUserDetails.contact) {
     prefilledContact = storedUserDetails.contact;
     Analytics.setMeta('prefilledFromStorage.contact', true);
   }
-  if (!prefilledEmail) {
+  if (!prefilledEmail && storedUserDetails.email) {
     prefilledEmail = storedUserDetails.email;
     Analytics.setMeta('prefilledFromStorage.email', true);
   }
@@ -323,6 +324,10 @@ function errorHandler(response) {
     }
   }
 
+  // Save payload in a variable, as it's going to get cleared and
+  // we need it for something else.
+  var payload = this.payload;
+
   this.clearRequest();
 
   Analytics.track('error', {
@@ -389,6 +394,15 @@ function errorHandler(response) {
         }
       }
     }
+  }
+
+  if (!Store.shouldShowDefaultError(payload, error)) {
+    // For this particular payload & error combination,
+    // we're going to display the error message with some other approach.
+    Store.setMethodErrorForPayload(payload, error);
+    // Don't show the usual overlay, hide it if it's open.
+    this.hideErrorMessage();
+    return;
   }
 
   if (this.tab || message !== discreet.cancelMsg) {
@@ -860,20 +874,13 @@ Session.prototype = {
         NetbankingScreenStore.selectedBank.set(data['bank']);
       }
 
-      each(
-        {
-          contact: 'contact',
-          email: 'email',
-        },
-        function(name, id) {
-          var el = gel(id);
-          var val = data[name];
-          if (el && val) {
-            el.value = val;
-            self.input(el);
-          }
-        }
-      );
+      if (data.email) {
+        HomeScreenStore.setEmail(data.email);
+      }
+
+      if (data.contact) {
+        HomeScreenStore.setContact(data.contact);
+      }
     }
   },
 
@@ -1073,14 +1080,6 @@ Session.prototype = {
     this.svelteCardTab = new cardTab.render();
   },
 
-  setWalletsTab: function() {
-    if (MethodStore.isMethodEnabled('wallet')) {
-      this.svelteWalletsTab = new discreet.WalletTab({
-        target: gel('wallet-svelte-wrap'),
-      });
-    }
-  },
-
   setSvelteComponents: function() {
     this.setTopBar();
     this.setUpiCancelReasonPicker();
@@ -1092,7 +1091,6 @@ Session.prototype = {
     this.setOtpScreen();
     this.setPayoutsScreen();
     this.setNach();
-    this.setWalletsTab();
     this.setOffers();
     this.setLanguageDropdown();
     this.setSvelteOverlay();
@@ -1771,6 +1769,9 @@ Session.prototype = {
 
       if (confirmClose()) {
         this.clearRequest();
+        if (Bridge.checkout.platform === 'ios') {
+          Bridge.checkout.callIos('hide_nav_bar');
+        }
       } else {
         return;
       }
@@ -2349,7 +2350,6 @@ Session.prototype = {
       (this.tab === 'cardless_emi' && screen === 'emiplans') ||
       screen === 'paylater' ||
       screen === 'qr' ||
-      (screen === 'wallet' && !$('.wallet :checked')[0]) ||
       screen === 'bank_transfer' ||
       (screen === 'netbanking' && Store.isRecurring()) ||
       screen === 'emandate'
@@ -2364,6 +2364,8 @@ Session.prototype = {
 
     if (screen === '' && this.homeTab) {
       this.homeTab.onShown();
+    } else if (screen === 'wallet' && this.walletTab) {
+      this.walletTab.onShown();
     } else if (screen !== 'upi' && screen !== 'upi_otm') {
       this.body.toggleClass('sub', showPaybtn);
     }
@@ -2403,7 +2405,7 @@ Session.prototype = {
     if (screen === 'wallet') {
       // Select wallet
       if (issuer) {
-        this.svelteWalletsTab.onWalletSelection(issuer);
+        this.walletTab.onWalletSelection(issuer);
       }
     } else if (screen === 'netbanking') {
       // Select bank
@@ -2479,11 +2481,13 @@ Session.prototype = {
    */
   handleDiscount: function() {
     var offer = this.getAppliedOffer();
-    var hasDiscount =
-      offer &&
-      offer.amount !== offer.original_amount &&
-      this.offers &&
-      this.offers.isCardApplicable();
+    var hasDiscount = offer && offer.amount !== offer.original_amount;
+
+    // this.offers is undefined for forced offers
+    if (hasDiscount && this.offers) {
+      hasDiscount = this.offers.isCardApplicable();
+    }
+
     $('#content').toggleClass('has-discount', hasDiscount);
     $('#amount .discount').html(
       hasDiscount ? this.formatAmountWithCurrency(offer.amount) : ''
@@ -2560,6 +2564,8 @@ Session.prototype = {
       }
     } else if (this.tab === 'netbanking') {
       discreet.netbankingTab.destroy();
+    } else if (this.tab === 'wallet') {
+      discreet.walletTab.destroy();
     } else if (this.tab === 'nach') {
       if (this.nachScreen.onBack()) {
         return;
@@ -2733,6 +2739,9 @@ Session.prototype = {
     if (tab === 'netbanking') {
       discreet.netbankingTab.render();
     }
+    if (tab === 'wallet') {
+      discreet.walletTab.render();
+    }
 
     if (tab === 'upi') {
       this.updateCustomerInStore();
@@ -2760,7 +2769,6 @@ Session.prototype = {
 
     if (tab === 'wallet') {
       this.setScreen('wallet');
-      this.svelteWalletsTab.onShown();
     }
 
     if (tab === 'card' || (tab === 'emi' && this.screen !== 'emi')) {
@@ -3190,6 +3198,10 @@ Session.prototype = {
       var payload = this.payload;
       if (payload && payload.method === 'wallet' && !payload.wallet) {
         return $('#wallets').addClass('invalid');
+      } else if (payload && payload.method === 'app') {
+        // In "Add new card" screen, if we're selecting any application,
+        // Card fields maybe invalid, however,  they should be ignored.
+        return false;
       }
     }
     var invalids = $(parent).find('.invalid');
@@ -3327,8 +3339,8 @@ Session.prototype = {
 
       if (this.screen === 'wallet') {
         /* Wallet tab being responsible for its subdata */
-        if (this.svelteWalletsTab.isAnyWalletSelected()) {
-          _Obj.extend(data, this.svelteWalletsTab.getPayload());
+        if (this.walletTab.isAnyWalletSelected()) {
+          _Obj.extend(data, this.walletTab.getPayload());
         }
       }
 
@@ -3365,7 +3377,7 @@ Session.prototype = {
       $('#modal-inner').removeClass('shake');
       hideOverlayMessage();
       this.modal.hide();
-      discreet.Bridge.stopListeningForBackPresses();
+      discreet.stopListeningForBackPresses();
     }
   },
 
@@ -3840,10 +3852,16 @@ Session.prototype = {
       }
     } else if (screen) {
       if (screen === 'card') {
-        // TODO: simplify conditions
-        // Do not proceed with amex cards if amex is disabled for merchant
-        // also without this, cardsaving is triggered before API returning unsupported card error
-        if (!this.svelteCardTab.isOnSavedCardsScreen()) {
+        if (data.provider) {
+          // Set method as "app"
+          // By default the method is set to whatever screen you're on. -_-
+          data.method = 'app';
+          // We don't want to validate card fields if we're paying via application.
+          // Do nothing.
+        } else if (!this.svelteCardTab.isOnSavedCardsScreen()) {
+          // TODO: simplify conditions
+          // Do not proceed with amex cards if amex is disabled for merchant
+          // also without this, cardsaving is triggered before API returning unsupported card error
           var cardType = discreet.storeGetter(CardScreenStore.cardType);
           if (!MethodStore.isAMEXEnabled() && cardType === 'amex') {
             return this.showLoadError('AMEX cards are not supported', true);
@@ -4135,6 +4153,13 @@ Session.prototype = {
 
             break;
           }
+
+          case 'app': {
+            // TODO: Check if it's possible to move this to instruments-config
+            if (selectedInstrument._ungrouped[0].provider === 'cred') {
+              _Obj.extend(this.payload, MethodStore.getPayloadForCRED());
+            }
+          }
         }
       }
     }
@@ -4152,6 +4177,17 @@ Session.prototype = {
       if (shouldTurnWalletToIntent) {
         data.upi_app = discreet.Wallet.getPackageNameForWallet(data.wallet);
       }
+    }
+
+    /**
+     * Google Pay Cards follows an older format.
+     * Soon it will be changed to method: app + provider: google_pay.
+     * After that happens, this if block can be deleted.
+     */
+    if (data.method === 'app' && data.provider === 'google_pay_cards') {
+      data.method = 'card';
+      data.application = 'google_pay';
+      delete data.provider;
     }
 
     if (data.method === 'paypal') {
@@ -4352,6 +4388,15 @@ Session.prototype = {
       }
     }
 
+    if (
+      data.application === 'google_pay' ||
+      (data.method === 'app' && data.provider === 'google_pay_cards')
+    ) {
+      if (this.hasGooglePaySdk) {
+        request.external.gpay = true;
+      }
+    }
+
     if (this.modal) {
       this.modal.options.backdropclose = false;
     }
@@ -4373,7 +4418,15 @@ Session.prototype = {
       }
     }
 
-    if (data.method === 'card' || data.method === 'emi') {
+    if (data.method === 'app' || data.application) {
+      var provider = data.application || data.provider;
+      Analytics.track('app:attempt', {
+        data: {
+          method: data.method,
+          provider: provider,
+        },
+      });
+    } else if (data.method === 'card' || data.method === 'emi') {
       this.nativeotp = !!this.shouldUseNativeOTP();
 
       var cardType = cardTab.getCardTypeFromPayload(data);
@@ -4658,6 +4711,47 @@ Session.prototype = {
           "Please accept the request from Razorpay's VPA on your UPI app"
         );
       });
+    } else if (data.method === 'app') {
+      var appName = 'app';
+      if (data.provider === 'cred') {
+        appName = 'CRED app';
+      }
+
+      var locale = I18n.getCurrentLocale();
+
+      this.r.on('payment.app.pending', function(coprotoResponse) {
+        // Collect flow
+        // Message: Please complete the payment on the {app}
+        var message = I18n.formatTemplateWithLocale(
+          'misc.complete_payment_on_app',
+          { app: appName },
+          locale
+        );
+        return that.showLoadError(message);
+      });
+
+      this.r.on('payment.app.coproto_response', function(coprotoResponse) {
+        // Intent flow
+        // Message: Redirecting you to the {app}...
+        var message = I18n.formatTemplateWithLocale(
+          'misc.redirecting_to_app',
+          { app: appName },
+          locale
+        );
+        return that.showLoadError(message);
+      });
+
+      this.r.on('payment.app.intent_response', function(intentResponse) {
+        // Message: Checking the payment status...
+        var message = I18n.formatMessageWithLocale(
+          'misc.checking_payment_status',
+          locale
+        );
+        return that.showLoadError(message);
+      });
+
+      // Message: Your payment is being processed
+      return that.showLoadError();
     } else {
       if (!this.headless) {
         sub_link.html('Go to payment');
@@ -4757,7 +4851,6 @@ Session.prototype = {
       'payoutsAccountView',
       'payoutsView',
       'savedCardsView',
-      'svelteWalletsTab',
       'languageSelectionView',
       'svelteOverlay',
       'topBar',
@@ -4874,6 +4967,7 @@ Session.prototype = {
         this.walletOffer = forcedOffer;
       }
       Analytics.setMeta('forcedOffer', true);
+      this.handleDiscount();
     } else {
       var appliedOffer;
       this.getAppliedOffer = function() {

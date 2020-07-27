@@ -11,7 +11,13 @@ export function get() {
     details = {};
   }
 
-  return details;
+  return _Obj.extend(
+    {
+      contact: '',
+      email: '',
+    },
+    details
+  );
 }
 
 function set(details) {

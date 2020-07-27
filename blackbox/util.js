@@ -159,7 +159,7 @@ const util = (module.exports = {
   randomRange,
   randomName,
   randomEmail,
-  randomContact: () => '+91' + String(randomRange(8000000000, 9999999999)),
+  randomContact: () => String(randomRange(8000000000, 9999999999)),
   randomString,
   randomLengthString,
   randomId: randomString(chrlow + chrup + chrnum),
