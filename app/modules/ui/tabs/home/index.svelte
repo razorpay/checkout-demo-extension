@@ -20,6 +20,8 @@
 
   // Store
   import {
+    country,
+    phone,
     contact,
     isContactPresent,
     email,
@@ -30,6 +32,8 @@
     partialPaymentOption,
     instruments,
     blocks,
+    setContact,
+    setEmail,
   } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
@@ -107,7 +111,11 @@
   import { isInstrumentGrouped } from 'configurability/instruments';
   import { isElementCompletelyVisibleInTab } from 'lib/utils';
 
-  import { INDIA_COUNTRY_CODE } from 'common/constants';
+  import {
+    CONTACT_REGEX,
+    EMAIL_REGEX,
+    PHONE_REGEX_INDIA,
+  } from 'common/constants';
   import { getAnimationOptions } from 'svelte-utils';
 
   import { setBlocks } from 'ui/tabs/home/instruments';
@@ -135,8 +143,8 @@
   const isPartialPayment = getIsPartialPayment();
   const contactEmailReadonly = isContactEmailReadOnly();
 
-  $contact = getPrefilledContact() || INDIA_COUNTRY_CODE;
-  $email = getPrefilledEmail();
+  setContact(getPrefilledContact());
+  setEmail(getPrefilledEmail());
 
   // Prop that decides which view to show.
   // Values: 'details', 'methods'
@@ -452,11 +460,15 @@
      * If contact and email are mandatory, validate
      */
     if (!isContactEmailOptional()) {
-      const contactRegex = /^\+?[0-9]{8,15}$/;
-      const emailRegex = /^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/;
+      if (!isContactValid) {
+        if ($country === '+91') {
+          isContactValid = PHONE_REGEX_INDIA.test($phone);
+        } else {
+          isContactValid = CONTACT_REGEX.test($contact);
+        }
+      }
 
-      isContactValid = isContactValid || contactRegex.test($contact);
-      isEmailValid = isEmailValid || emailRegex.test($email);
+      isEmailValid = isEmailValid || EMAIL_REGEX.test($email);
     }
 
     /**
