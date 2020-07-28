@@ -524,7 +524,6 @@ export const getNumberOfAppsByCategory = allApps => {
 export const getUPIAppDataFromHandle = handle => {
   const allUsableApps = getUsableApps();
 
-  // find the app that uses the handle. If no such app is found, return a nice and safe backward compatible value
   return (
     _Arr.find(allUsableApps, app => {
       return app.handles && _Arr.contains(app.handles, handle);

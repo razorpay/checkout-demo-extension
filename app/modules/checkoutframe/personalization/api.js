@@ -81,14 +81,17 @@ const API_INSTRUMENT_PAYMENT_ADDONS = {
     delete instrument.instrument;
     const validVpa = VPA_REGEX.test(instrument.vpa);
     if (validVpa) {
+      // valid collect instrument
       instrument['_[flow]'] = 'directpay';
     } else {
+      // if not a valid vpa, the instrument is expected to be an intent app handle (@okaxis, @ybl)
       const app = getUPIAppDataFromHandle(instrument.vpa.slice(1));
       if (app.package_name) {
         instrument['_[flow]'] = 'intent';
         instrument['upi_app'] = app.package_name;
       } else {
-        Analytics.track('p13n:intent_app_missing', {
+        // If no valid app is found for the handle, track it
+        Analytics.track('p13n:app_missing_for_handle', {
           type: AnalyticsTypes.METRIC,
           data: {
             instrument: instrument,
