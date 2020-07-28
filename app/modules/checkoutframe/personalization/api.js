@@ -33,6 +33,12 @@ export function setInstrumentsForCustomer(customer, instruments) {
   return getInstrumentsForCustomer(customer);
 }
 
+/**
+ * Makes an API call to fetch instruments for the given customer
+ * @param {Customer} customer
+ *
+ * @returns {Promise<Array<ApiInstrument>>}
+ */
 function getInstrumentsFromApi(customer) {
   const session = getSession();
 
@@ -53,9 +59,7 @@ function getInstrumentsFromApi(customer) {
           apiInstruments = data[customer.contact] || apiInstruments;
         }
 
-        setInstrumentsForCustomer(customer, apiInstruments);
-
-        resolve(getInstrumentsForCustomer(customer));
+        resolve(setInstrumentsForCustomer(customer, apiInstruments));
       },
     });
   });

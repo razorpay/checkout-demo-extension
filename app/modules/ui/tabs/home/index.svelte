@@ -322,7 +322,7 @@
         }
 
         // The function that returns the promise to be returned
-        // This promise shouce set the experiment identifier
+        // This promise should set the experiment identifier
         // and any analytics meta properties
         const returnPromise = source =>
           new Promise(resolve => {

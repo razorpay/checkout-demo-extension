@@ -14,6 +14,7 @@
   import * as AnalyticsTypes from 'analytics-types';
   import { getSession } from 'sessionmanager';
   import { getInstrumentMeta } from 'ui/tabs/home/instruments';
+  import { getAnimationOptions } from 'svelte-utils';
 
   // Store
   import {
@@ -91,7 +92,7 @@
     <div
       class="methods-block"
       data-block={block.code}
-      out:slide|local={{ easing: linear, duration: 300 }}>
+      out:slide|local={getAnimationOptions({ easing: linear, duration: 300 })}>
       <h3 class="title">
         {#if block.code === 'rzp.preferred'}
           <!-- LABEL: Preferred Payment Methods -->
