@@ -67,6 +67,10 @@ function onPaymentCancel(metaParam) {
     var payment_id = this.payment_id;
     var razorpay = this.r;
     var eventData = {};
+    var metadata = this.getMetadata();
+    if (metadata) {
+      cancelError.error.metadata = metadata;
+    }
 
     if (payment_id) {
       eventData.payment_id = payment_id;
@@ -684,6 +688,17 @@ Payment.prototype = {
   tryPopup: function() {
     if (this.shouldPopup()) {
       this.makePopup();
+    }
+  },
+
+  getMetadata: function() {
+    const metadata = {};
+    if (this.payment_id) {
+      metadata.payment_id = this.payment_id;
+      if (this.r.get('order_id')) {
+        metadata.order_id = this.r.get('order_id');
+      }
+      return metadata;
     }
   },
 };
