@@ -8,7 +8,6 @@ const {
   bundleUrl,
   lumberjackUrl,
   zestMoneyLoanAgreementUrl,
-  maxmindScriptUrl,
 } = require('./const');
 
 const chrup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -189,8 +188,7 @@ const util = (module.exports = {
         url.startsWith('data') ||
         (url.startsWith(cdnUrl) && !url.startsWith(bundleUrl)) || // Bundles are present on CDN, but need to be intercepted.
         url.startsWith(lumberjackUrl) ||
-        url.includes(zestMoneyLoanAgreementUrl) ||
-        url.includes(maxmindScriptUrl);
+        url.includes(zestMoneyLoanAgreementUrl);
       if (ignoredUrl || (pattern && !pattern.test(url))) {
         return true;
       }

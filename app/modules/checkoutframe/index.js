@@ -280,7 +280,7 @@ function addSiftScript() {
   ];
 
   _El.create('script')
-    |> _Obj.setProp('src', 'https://cdn.sift.com/s.js')
+    |> _Obj.setProp('src', 'https://cdn.razorpay.com/checkout/sift.js')
     |> _El.appendTo(_Doc.documentElement);
 }
 
