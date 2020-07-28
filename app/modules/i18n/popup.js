@@ -68,6 +68,7 @@ function replaceLabels(string, data) {
 
 const labels = {
   paying: 'PAYING',
+  payment_canceled: 'Payment processing cancelled by user',
   secured_by: 'Secured by',
   trying_to_load: 'Still trying to load...',
   want_to_cancel: 'Do you want to cancel the ongoing payment?',

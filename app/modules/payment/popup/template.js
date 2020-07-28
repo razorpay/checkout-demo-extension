@@ -15,13 +15,6 @@ function sanitizeHtmlEntities(string) {
   return string.replace(/[&<>"'/]/g, match => map[match]);
 }
 
-const cancelError = _Obj.stringify({
-  error: {
-    code: 'BAD_REQUEST_ERROR',
-    description: 'Payment processing cancelled by user',
-  },
-});
-
 import {
   PAYING,
   SECURED_BY,
@@ -51,6 +44,12 @@ export default function popupTemplate(_, t) {
   var method = _.data && _.data.method === 'wallet' ? 'wallet' : 'bank';
   var color = get('theme.color') || '#3594E2';
   var highlightColor = _.r.themeMeta.highlightColor;
+  var cancelError = JSON.stringify({
+    error: {
+      code: 'BAD_REQUEST_ERROR',
+      description: t('payment_canceled'),
+    },
+  });
   var title =
     get('name') || get('description') || t(REDIRECTING) |> sanitizeHtmlEntities;
   var amount = displayAmount(

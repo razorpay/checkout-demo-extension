@@ -871,6 +871,7 @@ export default {
   popup: {
     loading_method_page: 'Loading {method} page…',
     paying: 'PAYING',
+    payment_canceled: 'Payment processing cancelled by user',
     processing: 'Processing, Please Wait...',
     redirecting: 'Redirecting...',
     secured_by: 'Secured by',

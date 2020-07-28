@@ -63,7 +63,7 @@ function onPaymentCancel(metaParam) {
     var cancelError = {
       error: {
         code: 'BAD_REQUEST_ERROR',
-        description: 'Payment processing cancelled by user',
+        description: t('payment_canceled'),
       },
     };
     var payment_id = this.payment_id;
