@@ -352,6 +352,19 @@
 
             // if user is in home, track the currently visible experiment
             if (!session.tab) {
+              /**
+               * - `meta.p13n` will only be set when preferred methods are shown in the UI.
+               * - `p13n:instruments:list` will be fired when we attempt to show the list.
+               * - `p13n:instruments:list` with `meta.p13n` set as true will tell you whether or not preferred methods were shown.
+               */
+
+              // meta.p13n should always be set before `p13n:instruments:list`
+              if (instrumentsToBeShown && instrumentsToBeShown.length) {
+                Analytics.setMeta('p13n', true);
+              } else {
+                Analytics.removeMeta('p13n');
+              }
+
               Analytics.track('home:p13n:experiment', {
                 type: AnalyticsTypes.METRIC,
                 data: {
@@ -472,19 +485,6 @@
         },
         {}
       );
-
-      /**
-       * - `meta.p13n` will only be set when preferred methods are shown in the UI.
-       * - `p13n:instruments:list` will be fired when we attempt to show the list.
-       * - `p13n:instruments:list` with `meta.p13n` set as true will tell you whether or not preferred methods were shown.
-       */
-
-      // meta.p13n should always be set before `p13n:instruments:list`
-      if (setPreferredInstruments.length) {
-        Analytics.setMeta('p13n', true);
-      } else {
-        Analytics.removeMeta('p13n');
-      }
 
       const allPreferredInstrumentsForCustomer = getAllInstrumentsForCustomer(
         $customer
