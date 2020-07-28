@@ -210,22 +210,24 @@ export default function Payment(data, params = {}, r) {
     avoidPopup = true;
   } else if (this.gpay) {
     avoidPopup = true;
-  } else if (data.application || data.method === 'app') {
-    // Obviously avoid popup if paying with an external application
-    avoidPopup = true;
-    if (data.provider === 'cred' && !data.app_present && !isRazorpayFrame()) {
-      // CRED collect flow for razorpay.js
-      avoidPopup = false;
-    }
-  } else if (data.application || data.method === 'app') {
-    // Obviously avoid popup if paying with an external application
-    avoidPopup = true;
-  } else if (isRazorpayFrame()) {
+  } else if (data) {
     /**
      * data needs to be present. absence of data = placeholder popup in
      * payment paused state
      */
-    if (data) {
+    if (data.application || data.method === 'app') {
+      // Obviously avoid popup if paying with an external application
+      avoidPopup = true;
+      if (data.provider === 'cred' && !data.app_present && !isRazorpayFrame()) {
+        // CRED collect flow for razorpay.js
+        avoidPopup = false;
+      }
+    } else if (data.application || data.method === 'app') {
+      // Obviously avoid popup if paying with an external application
+      avoidPopup = true;
+    }
+
+    if (isRazorpayFrame()) {
       if (data.method === 'wallet') {
         if (isPowerWallet(data.wallet)) {
           /* If contact or email are missing, we need to ask for it in popup */

@@ -967,6 +967,8 @@ export default {
     scan_qr_code: 'Scan the QR code using your UPI app',
     show_other_apps: 'Show other UPI apps',
     show_qr_code: 'Show QR Code',
+    upi_otm_callout:
+      '<strong>{amount}<strong> will be blocked on your account by clicking pay. Your account will be charged {nameString} between <strong>{startDate}<strong> to <strong>{endDate}<strong>.',
     verifying_vpa_info: 'Verifying your VPA',
   },
   upi_intent_apps: {
