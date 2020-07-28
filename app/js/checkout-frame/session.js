@@ -2772,11 +2772,6 @@ Session.prototype = {
         self.commenceOTP('otp_sending_generic', '', {
           phone: getPhone(),
         });
-        var smsHash = this.get('send_sms_hash') && this.sms_hash;
-        var params = {};
-        if (smsHash) {
-          params.sms_hash = smsHash;
-        }
 
         self.getCurrentCustomer().createOTP(function() {
           Analytics.track('subscriptions_upi:access:otp:ask');
