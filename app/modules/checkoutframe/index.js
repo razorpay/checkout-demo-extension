@@ -275,6 +275,7 @@ function setSessionPreferences(session, preferences) {
 
 function getPreferenecsParams(razorpayInstance) {
   const prefData = makePrefParams(razorpayInstance);
+  prefData.personalisation = 1;
   if (cookieDisabled) {
     prefData.checkcookie = 0;
   } else {
