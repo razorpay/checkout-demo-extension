@@ -44,8 +44,6 @@
     amount: TOTAL_CHARGES_LABEL,
   };
 
-  const offerAmount = session.getAppliedOffer().amount;
-
   onMount(() => {
     fetchFees(paymentData);
   });
@@ -97,7 +95,7 @@
             </div>
             <div class="fee-amount">
               {#if session.getAppliedOffer()}
-                {formatAmountWithSymbol(offerAmount * 100, 'INR')}
+                {formatAmountWithSymbol(session.getAppliedOffer().amount * 100, 'INR')}
               {:else}
                 {formatAmountWithSymbol(amount * 100, 'INR'))}
               {/if}
