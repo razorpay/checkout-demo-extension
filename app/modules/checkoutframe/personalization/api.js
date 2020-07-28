@@ -44,8 +44,14 @@ function getInstrumentsFromApi(customer) {
   const promise = new Promise(resolve => {
     fetch({
       url,
-      callback: function(data) {
-        const apiInstruments = data[customer.contact] || [];
+      callback: function(response) {
+        const data = response.preferred_methods;
+        // default instruments may be provided based on the merchant and amount details
+        let apiInstruments = data.default || [];
+        // preference is given to customer specific data
+        if (customer && customer.contact) {
+          apiInstruments = data[customer.contact] || apiInstruments;
+        }
 
         setInstrumentsForCustomer(customer, apiInstruments);
 
