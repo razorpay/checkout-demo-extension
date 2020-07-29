@@ -742,6 +742,7 @@ export default {
     processing: 'Processing...',
     redirecting_bank: 'Redirecting to Bank page',
     redirecting_to_app: 'Redirecting you to the {app}...',
+    retry: 'Retry',
     search_no_results: 'No results for "{query}"',
     search_results_label: 'Results',
   },

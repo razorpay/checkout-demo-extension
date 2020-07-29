@@ -6,7 +6,10 @@ import {
   register,
   waitLocale,
   getLocaleFromNavigator,
+  t,
 } from 'svelte-i18n';
+
+import { get } from 'svelte/store';
 
 import en from './bundles/en';
 
@@ -147,7 +150,13 @@ export function bindI18nEvents() {
       data: { locale: value },
     });
     setLocaleInStorage(value);
+    updateRetryBtnText();
   });
+}
+
+// TODO: Remove this once overlay is moved to Svelte
+function updateRetryBtnText() {
+  _Doc.querySelector('#fd-hide').innerText = get(t)('misc.retry');
 }
 
 export function init() {
