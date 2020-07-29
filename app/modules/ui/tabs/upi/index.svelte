@@ -76,6 +76,7 @@
     SHOW_QR_CODE,
     SCAN_QR_CODE,
     UPI_DOWNTIME_TEXT,
+    UPI_OTM_CALLOUT,
     UPI_RECURRING_CAW_CALLOUT_ALL_DATA,
     UPI_RECURRING_CAW_CALLOUT_NO_NAME,
     UPI_RECURRING_CAW_CALLOUT_NO_NAME_NO_FREQUENCY,
@@ -726,13 +727,13 @@
       {/if}
       {#if isOtm}
         <Callout classes={['downtime-callout']} showIcon={true}>
-          <strong>{session.formatAmountWithCurrency(getAmount())}</strong>
-          will be blocked on your account by clicking pay. Your account will be
-          charged {merchantName ? 'by ' + merchantName : ''} between
-          <strong>{toShortFormat(otmStartDate)}</strong>
-          to
-          <strong>{toShortFormat(otmEndDate)}</strong>
-          .
+          <FormattedText
+            text={formatTemplateWithLocale(UPI_OTM_CALLOUT, {
+              amount: session.formatAmountWithCurrency(getAmount()),
+              nameString: merchantName ? 'by ' + merchantName : '',
+              startDate: toShortFormat(otmStartDate),
+              endDate: toShortFormat(otmEndDate),
+            })} />
         </Callout>
       {/if}
       <!-- Both CAW and subscriptions show the same callout with the same information -->
