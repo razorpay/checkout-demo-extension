@@ -273,6 +273,7 @@ function setSessionPreferences(session, preferences) {
 }
 
 function addSiftScript() {
+  // https://sift.com/developers/docs/curl/javascript-api/overview
   window._sift = [
     ['_setAccount', '4dbbb1f7b6'],
     ['_setSessionId', Track.id],
