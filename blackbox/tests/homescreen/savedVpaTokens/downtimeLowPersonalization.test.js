@@ -69,7 +69,6 @@ describe.each(
     await verifyPersonalizationText(context, 'upi');
     await selectPersonalizationPaymentMethod(context, 1);
     await submit(context);
-    await handleUPIAccountValidation(context, 'dsd@okhdfcbank');
     await respondToUPIAjax(context);
     await respondToUPIPaymentStatus(context);
   });
