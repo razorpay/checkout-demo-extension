@@ -656,6 +656,8 @@ export default {
     new_vpa_title_logged_in: 'Add UPI ID',
     new_vpa_subtitle: 'Google Pay, BHIM, PhonePe & more',
     new_vpa_subtitle_upi_otm: 'Supported only for BHIM and HDFC',
+    upi_otm_callout:
+      '<strong>{amount}<strong> will be blocked on your account by clicking pay. Your account will be charged {nameString} between <strong>{startDate}<strong> to <strong>{endDate}<strong>.',
     gpay_web_api_title: 'Google Pay',
     qr_block_heading: 'Pay using QR Code',
     show_qr_code: 'Show QR Code',
