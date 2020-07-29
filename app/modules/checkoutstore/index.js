@@ -79,7 +79,7 @@ export const getDowntimes = () => _getDowntimes(preferences);
 export const isCustomerFeeBearer = () => preferences.fee_bearer;
 export const getCheckoutConfig = () => preferences.checkout_config;
 export const getLanguageCode = () =>
-  preferences.language_code || getConfigFromOptions().display?.language;
+  getConfigFromOptions().display?.language || preferences.language_code;
 
 const optionGetter = option => () => getOption(option);
 export const getOption = option => razorpayInstance.get(option);
