@@ -97,7 +97,7 @@
               {#if session.getAppliedOffer()}
                 {formatAmountWithSymbol(session.getAppliedOffer().amount * 100, 'INR')}
               {:else}
-                {formatAmountWithSymbol(amount * 100, 'INR'))}
+                {formatAmountWithSymbol(amount * 100, 'INR')}
               {/if}
             </div>
           </div>
