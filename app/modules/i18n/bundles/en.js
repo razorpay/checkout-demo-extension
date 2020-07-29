@@ -645,7 +645,6 @@ export default {
     redirect_to_app: 'You will be redirected to your UPI app',
     recommended: 'Recommended',
     show_other_apps: 'Show other UPI apps',
-    gpay_block_heading: 'Pay using Gpay App',
     collect_block_heading: 'Pay using UPI ID',
     collect_block_subheading:
       'You will receive a payment request on your UPI app',
@@ -658,7 +657,6 @@ export default {
     new_vpa_subtitle_upi_otm: 'Supported only for BHIM and HDFC',
     upi_otm_callout:
       '<strong>{amount}<strong> will be blocked on your account by clicking pay. Your account will be charged {nameString} between <strong>{startDate}<strong> to <strong>{endDate}<strong>.',
-    gpay_web_api_title: 'Google Pay',
     qr_block_heading: 'Pay using QR Code',
     show_qr_code: 'Show QR Code',
     scan_qr_code: 'Scan the QR code using your UPI app',

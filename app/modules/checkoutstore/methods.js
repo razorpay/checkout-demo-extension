@@ -399,10 +399,12 @@ const UPI_METHODS = {
     !isRecurring() && !isPayout() && hasFeature('google_pay_omnichannel'),
   qr: () =>
     !isRecurring() &&
+    !isPayout() &&
     getOption('method.qr') &&
     !global.matchMedia(mobileQuery).matches,
   intent: () =>
     !isRecurring() &&
+    !isPayout() &&
     getMerchantMethods().upi_intent &&
     getUPIIntentApps().all.length,
 };
