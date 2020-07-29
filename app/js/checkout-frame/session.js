@@ -1021,7 +1021,6 @@ Session.prototype = {
     this.completePendingPayment();
     this.bindEvents();
     this.setEmiScreen();
-    this.runMaxmindScriptIfApplicable();
     this.prefillPostRender();
     this.updateCustomerInStore();
     Hacks.initPostRenderHacks();
@@ -1058,18 +1057,6 @@ Session.prototype = {
       },
     });
     Analytics.setMeta('timeSince.render', discreet.timer());
-  },
-
-  runMaxmindScriptIfApplicable: function() {
-    this.runMaxmindScript();
-  },
-
-  runMaxmindScript: function() {
-    var script = _El.create('script');
-    window.maxmind_user_id = '115820';
-    script.async = true;
-    script.src = 'https://device.maxmind.com/js/device.js';
-    document.body.appendChild(script);
   },
 
   setHomeTab: function() {
