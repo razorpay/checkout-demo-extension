@@ -59,6 +59,7 @@ import * as CardScreenStore from 'checkoutstore/screens/card';
 import * as NetbankingScreenStore from 'checkoutstore/screens/netbanking';
 import * as CustomerStore from 'checkoutstore/customer';
 import * as Theme from 'checkoutstore/theme';
+import * as NativeStore from 'checkoutstore/native';
 
 import QRScreen from 'ui/tabs/qr/index.svelte';
 import * as upiTab from 'checkoutframe/components/upi';
@@ -145,6 +146,7 @@ export default {
   CardScreenStore,
   NetbankingScreenStore,
   EmiStore,
+  NativeStore,
   Cta,
 
   Customer,

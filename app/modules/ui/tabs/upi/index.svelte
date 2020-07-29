@@ -6,8 +6,6 @@
 
   // Util imports
   import { getSession } from 'sessionmanager';
-  import * as GPay from 'gpay';
-  import * as Bridge from 'bridge';
   import {
     getDowntimes,
     hasFeature,
@@ -69,13 +67,11 @@
   import { isRecurring } from 'checkoutstore';
 
   import {
-    UPI_GPAY_BLOCK_HEADING,
     UPI_COLLECT_BLOCK_HEADING,
     UPI_COLLECT_BLOCK_SUBHEADING,
     UPI_COLLECT_NEW_VPA_HELP,
     UPI_COLLECT_ENTER_ID,
     UPI_COLLECT_SAVE,
-    GPAY_WEB_API_TITLE,
     QR_BLOCK_HEADING,
     SHOW_QR_CODE,
     SCAN_QR_CODE,
@@ -93,7 +89,6 @@
   // Props
   export let selectedApp = undefined;
   export let preferIntent = true;
-  export let useWebPaymentsApi = false;
   export let down = false;
   export let retryOmnichannel = false;
   export let isFirst = true;
@@ -109,7 +104,6 @@
   // Computed
   export let selectedAppData = null;
   export let intent = false;
-  export let isGPaySelected;
   export let pspHandle;
   export let shouldShowQr;
   let shouldShowCollect;
@@ -204,7 +198,7 @@
     return new Date(date.getTime() + days * 1000 * 24 * 3600);
   };
 
-  const { isPayout, showRecommendedUPIApp } = session;
+  const { showRecommendedUPIApp } = session;
 
   /**
    * An instrument might has for some flows to be available
@@ -283,27 +277,7 @@
 
   let otmEndDate = addDaysToDate(otmStartDate, 90);
 
-  const checkGPay = session => {
-    /* disable Web payments API for fee_bearer and OTM for now */
-    if (isCustomerFeeBearer() || isOtm) {
-      return Promise.reject();
-    }
-
-    // We're not using Web Payments API for Payouts
-    if (session.isPayout) {
-      return Promise.reject();
-    }
-
-    /* disable Web payments API for Android SDK as we have intent there */
-    if (Bridge.checkout.exists()) {
-      return Promise.reject();
-    }
-
-    return session.r.checkPaymentAdapter('gpay');
-  };
-
   $: intent = availableFlows.intent && preferIntent;
-  $: isGPaySelected = selectedApp === 'gpay' && useWebPaymentsApi;
   $: pspHandle = selectedAppData ? selectedAppData.psp : '';
   $: shouldShowQr =
     availableFlows.qr &&
@@ -318,7 +292,7 @@
     _Arr.contains(['upi', 'upi_otm'], session.tab) && determineCtaVisibility();
 
   function setDefaultTokenValue() {
-    const hasIntentFlow = availableFlows.intent || useWebPaymentsApi;
+    const hasIntentFlow = availableFlows.intent;
     const hasTokens = tokens && tokens.length;
 
     /**
@@ -342,11 +316,6 @@
     setDefaultTokenValue();
   }
 
-  function setWebPaymentsApiUsage(to) {
-    useWebPaymentsApi = to;
-    setDefaultTokenValue();
-  }
-
   function determineCtaVisibility() {
     if (selectedToken) {
       showCta();
@@ -356,16 +325,6 @@
   }
 
   onMount(() => {
-    checkGPay(session)
-      /* Use Google Pay */
-      .then(() => {
-        setWebPaymentsApiUsage(true);
-      })
-      /* Don't use Google Pay */
-      .catch(e => {
-        setWebPaymentsApiUsage(false);
-      });
-
     /* TODO: improve handling of `prefill.vpa` */
     if (session.get('prefill.vpa')) {
       selectedApp = undefined;
@@ -433,11 +392,6 @@
           upi_provider: 'google_pay',
         };
         break;
-      case 'gpay':
-        data = {
-          '_[flow]': 'gpay',
-        };
-        break;
 
       default:
         // `selectedToken` can be null if nothing is to be selected by default
@@ -497,11 +451,6 @@
     isFirst = false;
 
     if (!intent) {
-      if (isGPaySelected) {
-        selectedApp = undefined;
-        return false;
-      }
-
       if (selectedApp !== undefined) {
         selectedApp = undefined;
         return true;
@@ -517,7 +466,6 @@
     const getEventValueForFeature = feature => {
       return (
         {
-          gpay: 'gpay web payments',
           'gpay-omni': 'gpay omnichannel',
           new: 'add new',
           intent: 'intent',
@@ -694,26 +642,6 @@
             });
           }}
           {showRecommendedUPIApp} />
-      {/if}
-
-      {#if useWebPaymentsApi}
-        <!-- LABEL: Pay using Gpay App -->
-        <div class="legend left">{$t(UPI_GPAY_BLOCK_HEADING)}</div>
-        <div class="border-list">
-          <SlottedRadioOption
-            name="google_pay_web"
-            selected={selectedToken === 'gpay'}
-            on:click={() => {
-              selectedToken = 'gpay';
-              session.preSubmit();
-            }}>
-            <!-- LABEL: Google Pay -->
-            <div slot="title">{$t(GPAY_WEB_API_TITLE)}</div>
-            <i slot="icon">
-              <Icon icon={session.themeMeta.icons.gpay} />
-            </i>
-          </SlottedRadioOption>
-        </div>
       {/if}
 
       {#if shouldShowCollect}

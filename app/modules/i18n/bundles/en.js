@@ -916,60 +916,33 @@ export default {
     wallet: 'Wallet',
   },
   upi: {
-    cancel_reason_back_action: 'Back',
-    cancel_reason_collect_not_received: 'Did not receive collect request',
-    cancel_reason_failed_in_app: 'Payment failed in UPI app',
-    cancel_reason_money_deducted:
-      'Money got deducted but payment is still processing',
-    cancel_reason_other: 'Other',
-    cancel_reason_submit_action: 'Submit',
-    cancel_reason_title: 'Please give us a reason before we cancel the payment',
+    intent_block_heading: 'PAY USING APPS',
+    redirect_to_app: 'You will be redirected to your UPI app',
+    recommended: 'Recommended',
+    show_other_apps: 'Show other UPI apps',
     collect_block_heading: 'Pay using UPI ID',
     collect_block_subheading:
       'You will receive a payment request on your UPI app',
-    collect_enter_upi_id: 'Enter your UPI ID',
     collect_new_vpa_help: 'Please enter a valid VPA of the form username@bank',
+    collect_enter_upi_id: 'Enter your UPI ID',
     collect_securely_save: 'Securely save your UPI ID',
-    downtime_text: '<strong>UPI<strong> is experiencing low success rates.',
-    gpay_block_heading: 'Pay using Gpay App',
-    gpay_web_api_title: 'Google Pay',
-    intent_accept_request:
-      "Please accept the request from Razorpay's VPA on your UPI app",
-    intent_block_heading: 'PAY USING APPS',
-    intent_no_apps_error:
-      'No UPI App on this device. Select other UPI option to proceed.',
-    intent_select_app: 'Select UPI App in your device',
-    invalid_vpa_default_message:
-      'Invalid VPA, please try again with correct VPA',
+    new_vpa_title_logged_out: 'UPI ID',
+    new_vpa_title_logged_in: 'Add UPI ID',
     new_vpa_subtitle: 'Google Pay, BHIM, PhonePe & more',
     new_vpa_subtitle_upi_otm: 'Supported only for BHIM and HDFC',
-    new_vpa_title_logged_in: 'Add UPI ID',
-    new_vpa_title_logged_out: 'UPI ID',
-    omni_block_heading: 'Or, pay using phone number',
-    omni_enter_number: 'Enter your phone number',
-    omni_error:
-      'Please ensure the same number is linked to the Google Pay account.',
-    omni_gpay_number: 'Google Pay phone number',
-    omni_verifying_phone: 'Verifying mobile number with Google Pay...',
-    qr_block_heading: 'Pay using QR Code',
-    recommended: 'Recommended',
-    recurring_caw_callout_all_data:
-      'This is a recurring payment and {maxAmount} will be charged now. {merchantName} can charge upto {amount} on a {recurringFrequency} basis till {endDate}.',
-    recurring_caw_callout_no_frequency:
-      'This is a recurring payment and {maxAmount} will be charged now. {merchantName} can charge upto {amount} anytime till {endDate}.',
-    recurring_caw_callout_no_name:
-      'This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} on a {recurringFrequency} basis till {endDate}.',
-    recurring_caw_callout_no_name_no_frequency:
-      'This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} anytime till {endDate}.',
-    recurring_subscription_callout:
-      'The charge is to enable subscription on this card and it will be refunded.',
-    redirect_to_app: 'You will be redirected to your UPI app',
-    scan_qr_code: 'Scan the QR code using your UPI app',
-    show_other_apps: 'Show other UPI apps',
-    show_qr_code: 'Show QR Code',
     upi_otm_callout:
       '<strong>{amount}<strong> will be blocked on your account by clicking pay. Your account will be charged {nameString} between <strong>{startDate}<strong> to <strong>{endDate}<strong>.',
-    verifying_vpa_info: 'Verifying your VPA',
+    qr_block_heading: 'Pay using QR Code',
+    show_qr_code: 'Show QR Code',
+    scan_qr_code: 'Scan the QR code using your UPI app',
+    downtime_text: '<strong>UPI<strong> is experiencing low success rates.',
+    recurring_subscription_callout:
+      'The charge is to enable subscription on this card and it will be refunded.',
+    subscription_refund_callout:
+      'This card will be linked to the subscription and future payments will be charged automatically.',
+    use_saved_cards_btn: 'Use saved cards',
+    use_saved_cards_on_rzp_btn: 'Use saved cards on Razorpay',
+    view_all_emi_plans: 'View all EMI Plans',
   },
   upi_intent_apps: {
     amazon: 'Amazon Shopping',
