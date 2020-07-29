@@ -5,9 +5,12 @@ import {
   getCardlessEMIProviders,
   getWallets,
   getCardNetworks,
+  getAppsForCards,
   getEMIBanks,
   isMethodUsable,
   isDebitEMIEnabled,
+  isCreditCardEnabled,
+  isDebitCardEnabled,
 } from 'checkoutstore/methods';
 
 import { getRecurringMethods, isIRCTC, isRecurring } from 'checkoutstore';
@@ -45,19 +48,58 @@ const CARD_DESCRIPTION = locale => {
     return getRecurringCardDescription(locale);
   }
 
-  // Keep in order that we want to display
-  const NW_ORDER = ['VISA', 'MC', 'RUPAY', 'AMEX', 'DICL', 'MAES', 'JCB'];
+  // Get all apps from preferences.
+  const availableApps = getAppsForCards();
 
-  // Get all networks from preferences.
-  const networksFromPrefs = getCardNetworks();
+  // Show card type instead of card networks if apps are available.
+  if (availableApps.length) {
+    // Keep in order that we want to display
+    const APPS_ORDER = ['cred', 'google_pay_cards'];
+    // Get the app names to show
+    const apps =
+      APPS_ORDER
+      |> _Arr.filter(app => _Arr.contains(availableApps, app))
+      |> _Arr.map(app => getRawMethodTitle(app, locale));
 
-  // Get the network names to show
-  const networks =
-    NW_ORDER
-    |> _Arr.filter(network => Boolean(networksFromPrefs[network]))
-    |> _Arr.map(network => getNetworkName(network, locale));
+    const credit = isCreditCardEnabled();
+    const debit = isDebitCardEnabled();
 
-  return generateTextFromList(networks, 4);
+    let razorpayMethod;
+    if (credit && debit) {
+      if (apps.length > 1) {
+        // LABEL: Credit/Debit
+        razorpayMethod = getMethodPrefix('credit_debit', locale);
+      } else {
+        // LABEL: Credit/Debit cards
+        razorpayMethod = getMethodPrefix('credit_debit_cards', locale);
+      }
+    } else if (credit) {
+      // LABEL: Credit cards
+      razorpayMethod = getMethodPrefix('credit_cards', locale);
+    } else if (debit) {
+      // LABEL: Debit cards
+      razorpayMethod = getMethodPrefix('debit_cards', locale);
+    }
+
+    apps.unshift(razorpayMethod);
+
+    // Credit/Debit, CRED, and Google Pay Cards
+    return generateTextFromList(apps, 4);
+  } else {
+    // Keep in order that we want to display
+    const NW_ORDER = ['VISA', 'MC', 'RUPAY', 'AMEX', 'DICL', 'MAES', 'JCB'];
+
+    // Get all networks from preferences.
+    const networksFromPrefs = getCardNetworks();
+
+    // Get the network names to show
+    const networks =
+      NW_ORDER
+      |> _Arr.filter(network => Boolean(networksFromPrefs[network]))
+      |> _Arr.map(network => getNetworkName(network, locale));
+
+    return generateTextFromList(networks, 4);
+  }
 };
 
 /**
@@ -82,7 +124,11 @@ const DESCRIPTIONS = {
     });
 
     if (cardEmi) {
-      providerNames.unshift(getMethodPrefix('card', locale));
+      if (isDebitEMIEnabled()) {
+        providerNames.unshift(getMethodPrefix('debit_credit_cards', locale));
+      } else {
+        providerNames.unshift(getMethodPrefix('card', locale));
+      }
     }
 
     const text = generateTextFromList(providerNames, 3);

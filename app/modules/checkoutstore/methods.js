@@ -40,7 +40,10 @@ import {
 } from 'checkoutstore/native';
 
 import { get as storeGetter } from 'svelte/store';
-import { sequence as SequenceStore } from 'checkoutstore/screens/home';
+import {
+  sequence as SequenceStore,
+  instruments as InstrumentsStore,
+} from 'checkoutstore/screens/home';
 
 function isNoRedirectFacebookWebViewSession() {
   return isFacebookWebView() && !getCallbackUrl();
@@ -396,10 +399,12 @@ const UPI_METHODS = {
     !isRecurring() && !isPayout() && hasFeature('google_pay_omnichannel'),
   qr: () =>
     !isRecurring() &&
+    !isPayout() &&
     getOption('method.qr') &&
     !global.matchMedia(mobileQuery).matches,
   intent: () =>
     !isRecurring() &&
+    !isPayout() &&
     getMerchantMethods().upi_intent &&
     getUPIIntentApps().all.length,
 };
@@ -803,14 +808,24 @@ function addExternalWallets(enabledWallets) {
  * @returns {Array<string>}
  */
 function getUsableMethods() {
-  return storeGetter(SequenceStore);
+  const instruments = storeGetter(InstrumentsStore);
+  const methodsFromInstruments = instruments
+    .filter(instrument => instrument._type === 'method')
+    .map(instrument => instrument.method);
+
+  // SequenceStore has methods that are available but not shown on the homescreen (eg: EMI on Cards)
+  const sequenceMethods = storeGetter(SequenceStore);
+
+  const methods = methodsFromInstruments.concat(sequenceMethods);
+
+  // Make unique
+  // Array.from(Set) is polyfilled on IE. Safe to use.
+  return Array.from(new Set(methods));
 }
 
 /**
  * Some methods might not be usable because they are hidden
  * from the homescreen
- *
- * TODO: Should consider method instruments
  *
  * @param {string} method
  *

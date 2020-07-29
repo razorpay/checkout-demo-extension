@@ -22,6 +22,7 @@ import {
   isIframe,
   ownerWindow,
 } from 'common/constants';
+import { checkGooglePayWebPayments } from 'checkoutframe/components/upi';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -199,14 +200,13 @@ function fetchPrefs(session) {
   }
   session.isOpen = true;
 
-  /* Start listening for back presses */
-  setHistoryAndListenForBackPresses();
-
   let closeAt;
   const timeout = session.r.get('timeout');
   if (timeout) {
     closeAt = _.now() + timeout * 1000;
   }
+
+  performPrePrefsFetchOperations();
 
   session.prefCall = Razorpay.payment.getPrefs(
     getPreferenecsParams(session.r),
@@ -228,6 +228,13 @@ function fetchPrefs(session) {
       }
     }
   );
+}
+
+function performPrePrefsFetchOperations() {
+  /* Start listening for back presses */
+  setHistoryAndListenForBackPresses();
+
+  checkGooglePayWebPayments();
 }
 
 function setSessionPreferences(session, preferences) {
@@ -271,6 +278,20 @@ function setSessionPreferences(session, preferences) {
   }
   session.render();
   showModal(session);
+  addSiftScript();
+}
+
+function addSiftScript() {
+  // https://sift.com/developers/docs/curl/javascript-api/overview
+  window._sift = [
+    ['_setAccount', '4dbbb1f7b6'],
+    ['_setSessionId', Track.id],
+    ['_trackPageview'],
+  ];
+
+  _El.create('script')
+    |> _Obj.setProp('src', 'https://cdn.razorpay.com/checkout/sift.js')
+    |> _El.appendTo(_Doc.documentElement);
 }
 
 function getPreferenecsParams(razorpayInstance) {

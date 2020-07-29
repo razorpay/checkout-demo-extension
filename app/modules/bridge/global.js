@@ -2,6 +2,7 @@ import { getSession } from 'sessionmanager';
 import { didUPIIntentSucceed, parseUPIIntentResponse } from 'common/upi';
 import { processPaymentCreate } from 'payment/coproto';
 import { otp as $otp } from 'checkoutstore/screens/otp';
+import { getUPIIntentApps } from 'checkoutstore/native';
 
 import { backPressed } from './back';
 
@@ -42,7 +43,7 @@ function handleOTP(otp) {
 function upiIntentResponse(data) {
   var session = getSession();
 
-  if (session.r._payment && session.upi_intents_data) {
+  if (session.r._payment && getUPIIntentApps().all.length) {
     session.r.emit('payment.upi.intent_response', data);
   } else if (session.activity_recreated) {
     /**

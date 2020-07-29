@@ -408,7 +408,7 @@ export const isPreferredApp = packageName =>
 
 /**
  * Returns a list of sorted apps to use.
- * @param {Array} allApps `upi_intents_data` from handleMessage, sent by Android SDK
+ * @param {Array} allApps `getUPIIntentApps().filtered`
  *
  * @return {Array}
  */

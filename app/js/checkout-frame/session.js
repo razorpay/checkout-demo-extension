@@ -44,7 +44,8 @@ var preferences,
   cardTab = discreet.cardTab,
   NBHandlers = discreet.NBHandlers,
   Instruments = discreet.Instruments,
-  I18n = discreet.I18n;
+  I18n = discreet.I18n,
+  NativeStore = discreet.NativeStore;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -874,20 +875,13 @@ Session.prototype = {
         NetbankingScreenStore.selectedBank.set(data['bank']);
       }
 
-      each(
-        {
-          contact: 'contact',
-          email: 'email',
-        },
-        function(name, id) {
-          var el = gel(id);
-          var val = data[name];
-          if (el && val) {
-            el.value = val;
-            self.input(el);
-          }
-        }
-      );
+      if (data.email) {
+        HomeScreenStore.setEmail(data.email);
+      }
+
+      if (data.contact) {
+        HomeScreenStore.setContact(data.contact);
+      }
     }
   },
 
@@ -992,16 +986,19 @@ Session.prototype = {
 
     options = options || {};
 
-    if (this.upi_intents_data) {
+    if (NativeStore.getUPIIntentApps().filtered.length) {
       /**
        * We need to show "(Recommended)" string alongside the app name
        * when there is only 1 preferred app, and 1 or more other apps.
        */
       var count = discreet.UPIUtils.getNumberOfAppsByCategory(
-        this.upi_intents_data
+        NativeStore.getUPIIntentApps().filtered
       );
 
-      if (count.preferred === 1 && this.upi_intents_data.length > 1) {
+      if (
+        count.preferred === 1 &&
+        NativeStore.getUPIIntentApps().filtered.length > 1
+      ) {
         this.showRecommendedUPIApp = true;
       }
     }
@@ -1024,7 +1021,6 @@ Session.prototype = {
     this.completePendingPayment();
     this.bindEvents();
     this.setEmiScreen();
-    this.runMaxmindScriptIfApplicable();
     this.prefillPostRender();
     this.updateCustomerInStore();
     Hacks.initPostRenderHacks();
@@ -1036,13 +1032,11 @@ Session.prototype = {
     }
 
     // Look for new UPI apps.
-    if (this.all_upi_intents_data) {
-      discreet.UPIUtils.findAndReportNewApps(this.all_upi_intents_data);
-    }
+    discreet.UPIUtils.findAndReportNewApps(NativeStore.getUPIIntentApps().all);
 
-    if (this.upi_intents_data) {
-      discreet.UPIUtils.trackAppImpressions(this.upi_intents_data);
-    }
+    discreet.UPIUtils.trackAppImpressions(
+      NativeStore.getUPIIntentApps().filtered
+    );
 
     P13n.trackNumberOfP13nContacts();
 
@@ -1063,18 +1057,6 @@ Session.prototype = {
       },
     });
     Analytics.setMeta('timeSince.render', discreet.timer());
-  },
-
-  runMaxmindScriptIfApplicable: function() {
-    this.runMaxmindScript();
-  },
-
-  runMaxmindScript: function() {
-    var script = _El.create('script');
-    window.maxmind_user_id = '115820';
-    script.async = true;
-    script.src = 'https://device.maxmind.com/js/device.js';
-    document.body.appendChild(script);
   },
 
   setHomeTab: function() {
@@ -2346,7 +2328,10 @@ Session.prototype = {
         invoke('focus', qs(screenEl + ' .invalid input'));
       }
     } else if (
-      !((screen === 'upi' || screen === 'upi_otm') && this.upi_intents_data)
+      !(
+        (screen === 'upi' || screen === 'upi_otm') &&
+        NativeStore.getUPIIntentApps().filtered.length
+      )
     ) {
       invoke('focus', qs(screenEl + ' .invalid input'));
     }
@@ -4178,7 +4163,7 @@ Session.prototype = {
        */
       var shouldTurnWalletToIntent = discreet.Wallet.shouldTurnWalletToIntent(
         data.wallet,
-        this.upi_intents_data
+        NativeStore.getUPIIntentApps().filtered
       );
 
       if (shouldTurnWalletToIntent) {
@@ -4224,9 +4209,13 @@ Session.prototype = {
       data['_[app]'] = data.upi_app;
     }
 
-    if (data['_[flow]'] === 'gpay') {
+    if (
+      data.method === 'upi' &&
+      data['_[flow]'] === 'intent' &&
+      data.upi_app === UPIUtils.GOOGLE_PAY_PACKAGE_NAME &&
+      discreet.upiTab.isGooglePayWebPaymentsAvailable()
+    ) {
       request.gpay = true;
-      data['_[flow]'] = 'intent';
     }
 
     var appliedOffer = this.getAppliedOffer();
