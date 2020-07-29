@@ -4194,20 +4194,18 @@ Session.prototype = {
       data.method = 'wallet';
       data.wallet = 'paypal';
     }
-    if (this.get('address') && !Store.isPartialPayment()) {
-      if (Store.isAddressEnabled()) {
-        var notes = (data.notes = clone(this.get('notes')) || {});
-        // Add address
-        notes.address = storeGetter(HomeScreenStore.address);
-        notes.pincode = storeGetter(HomeScreenStore.pincode);
-        notes.state = storeGetter(HomeScreenStore.state);
+    if (Store.isAddressEnabled()) {
+      var notes = (data.notes = clone(this.get('notes')) || {});
+      // Add address
+      notes.address = storeGetter(HomeScreenStore.address);
+      notes.pincode = storeGetter(HomeScreenStore.pincode);
+      notes.state = storeGetter(HomeScreenStore.state);
 
-        if (Object.keys(notes).length > 15) {
-          delete notes.pincode;
-          delete notes.state;
-          notes.address +=
-            ', ' + Constants.STATES[notes.state] + ' - ' + notes.pincode;
-        }
+      if (Object.keys(notes).length > 15) {
+        delete notes.pincode;
+        delete notes.state;
+        notes.address +=
+          ', ' + Constants.STATES[notes.state] + ' - ' + notes.pincode;
       }
     }
 
