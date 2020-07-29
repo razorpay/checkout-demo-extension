@@ -199,14 +199,13 @@ function fetchPrefs(session) {
   }
   session.isOpen = true;
 
-  /* Start listening for back presses */
-  setHistoryAndListenForBackPresses();
-
   let closeAt;
   const timeout = session.r.get('timeout');
   if (timeout) {
     closeAt = _.now() + timeout * 1000;
   }
+
+  performPrePrefsFetchOperations();
 
   session.prefCall = Razorpay.payment.getPrefs(
     getPreferenecsParams(session.r),
@@ -228,11 +227,12 @@ function fetchPrefs(session) {
       }
     }
   );
-
-  performPrePrefsFetchOperations();
 }
 
 function performPrePrefsFetchOperations() {
+  /* Start listening for back presses */
+  setHistoryAndListenForBackPresses();
+
   checkGooglePayWebPayments();
 }
 
