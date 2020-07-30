@@ -21,6 +21,7 @@
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
   import { customer } from 'checkoutstore/customer';
   import { isDebitEMIEnabled } from 'checkoutstore/methods';
+  import { getUPIIntentApps } from 'checkoutstore/native';
 
   // i18n
   import { locale } from 'svelte-i18n';
@@ -110,7 +111,7 @@
       alt = title;
     } else if (individualInstrument.flow === 'intent') {
       const app = _Arr.find(
-        session.upi_intents_data,
+        getUPIIntentApps().all,
         app => app.package_name === individualInstrument.app
       );
 

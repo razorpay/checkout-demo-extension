@@ -124,7 +124,7 @@ module.exports = {
               token: 'BrLOcWE6Mu9kLB',
               used_at: 1579513972,
               vpa: {
-                username: 'saranshgupta1995',
+                username: 'dsd',
                 handle: 'okhdfcbank',
                 name: null,
               },
