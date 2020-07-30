@@ -2708,7 +2708,6 @@ Session.prototype = {
         return;
       }
       var customer = this.getCustomer(contact);
-      debugger;
       this.updateCustomerInStore();
 
       if (this.getCurrentCustomer().logged && !this.local) {
