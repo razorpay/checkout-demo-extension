@@ -1992,7 +1992,7 @@ Session.prototype = {
 
     this.topBar.setLogged(false);
 
-    CustomerStore.customer.set({});
+    CustomerStore.customer.set(customer);
     if (this.svelteCardTab) {
       this.svelteCardTab.showLandingView();
     }
@@ -2708,6 +2708,7 @@ Session.prototype = {
         return;
       }
       var customer = this.getCustomer(contact);
+      debugger;
       this.updateCustomerInStore();
 
       if (this.getCurrentCustomer().logged && !this.local) {
