@@ -8,7 +8,7 @@ const flags = require('./chrome-flags');
 module.exports = async function() {
   const opts = {
     headless: isProd,
-    // devtools: true,
+    devtools: true,
   };
   if (isProd) {
     opts.args = flags;

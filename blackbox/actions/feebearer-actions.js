@@ -1,6 +1,10 @@
-const { visible } = require('../util');
+const { visible, delay } = require('../util');
 
-async function handleFeeBearer(context, pressContinue) {
+async function handleFeeBearer(
+  context,
+  pressContinue,
+  originalAmount = '₹ 600'
+) {
   let req = await context.expectRequest();
   expect(req.method).toEqual('POST');
   await context.respondJSON({
@@ -32,9 +36,10 @@ async function handleFeeBearer(context, pressContinue) {
       amount: 620.54,
     },
   });
+  await delay(100000);
   const feeAmount11 = await context.page.$$('.fee-amount');
   feeAmount = feeAmount11[0];
-  expectedfeeAmount1 = '₹ 600';
+  expectedfeeAmount1 = originalAmount;
   const feeAmount1 = await context.page.evaluate(
     feeAmount => feeAmount.textContent,
     feeAmount
