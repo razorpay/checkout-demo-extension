@@ -1,3 +1,5 @@
+/* global Set */
+
 import {
   isRecurring,
   isInternational,

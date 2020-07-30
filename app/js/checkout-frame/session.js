@@ -4186,10 +4186,8 @@ Session.prototype = {
       data.method = 'wallet';
       data.wallet = 'paypal';
     }
-
-    if (this.get('address') && !Store.isPartialPayment()) {
+    if (Store.isAddressEnabled()) {
       var notes = (data.notes = clone(this.get('notes')) || {});
-
       // Add address
       notes.address = storeGetter(HomeScreenStore.address);
       notes.pincode = storeGetter(HomeScreenStore.pincode);
