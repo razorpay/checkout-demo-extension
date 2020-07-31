@@ -54,6 +54,13 @@ function getInstrumentsFromApi(customer) {
         const data = response.preferred_methods;
         // default instruments may be provided based on the merchant and amount details
         let apiInstruments = data.default || [];
+
+        Analytics.track('p13n:api:response', {
+          data: {
+            identified: !data.default,
+          },
+        });
+
         // preference is given to customer specific data
         if (customer && customer.contact) {
           apiInstruments = data[customer.contact] || apiInstruments;
