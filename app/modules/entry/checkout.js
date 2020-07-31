@@ -2,9 +2,30 @@ import Razorpay, { optionValidations } from 'common/Razorpay';
 import { RazorpayDefaults } from 'common/options';
 import 'checkoutjs/options';
 import initRazorpayCheckout from 'checkoutjs/open';
-
+import Analytics from 'analytics';
 import Track from 'tracker';
+
 Track.props.library = 'checkoutjs';
+
+window.addEventListener('rzp_error', function(event) {
+  var error = event.detail;
+
+  Analytics.track('cfu_error', {
+    data: {
+      error: error,
+    },
+    immediately: true,
+  });
+});
+
+window.addEventListener('rzp_network_error', function(event) {
+  var detail = event.detail;
+
+  Analytics.track('network_error', {
+    data: detail,
+    immediately: true,
+  });
+});
 
 RazorpayDefaults.handler = function(data) {
   if (_.is(this, Razorpay)) {
