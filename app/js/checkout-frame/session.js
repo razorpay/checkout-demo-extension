@@ -2509,7 +2509,12 @@ Session.prototype = {
       });
     };
 
-    if (this.screen === 'otp' && thisTab !== 'card' && thisTab !== 'emi') {
+    if (
+      this.screen === 'otp' &&
+      thisTab !== 'card' &&
+      thisTab !== 'upi' &&
+      thisTab !== 'emi'
+    ) {
       tab = thisTab;
     } else if (
       (thisTab === 'qr' && this.r._payment) ||
@@ -2737,7 +2742,32 @@ Session.prototype = {
 
     if (tab === 'upi') {
       this.updateCustomerInStore();
-      discreet.upiTab.render();
+
+      // Enforce login flow for UPI Recurring subscriptions
+      if (Store.isASubscription() && !customer.logged) {
+        this.otpView.updateScreen({
+          maxlength: 6,
+        });
+
+        var self = this;
+        var customer = self.getCurrentCustomer();
+
+        this.topBar.setTitleOverride('otp', 'text', 'upi');
+
+        self.commenceOTP('otp_sending_generic', '', {
+          phone: getPhone(),
+        });
+
+        self.getCurrentCustomer().createOTP(function() {
+          Analytics.track('subscriptions_upi:access:otp:ask');
+          askOTP(self.otpView, 'otp_proceed_with_upi_subscription', true, {
+            phone: getPhone(),
+          });
+          self.updateCustomerInStore();
+        });
+      } else {
+        discreet.upiTab.render();
+      }
     }
 
     if (tab === 'upi_otm') {
@@ -2749,7 +2779,7 @@ Session.prototype = {
       this.emandateView.onShown();
     }
 
-    if (tab === '' && (this.tab === 'upi' || this.tab === 'upi_otm')) {
+    if (tab === '' && (this.screen === 'upi' || this.screen === 'upi_otm')) {
       if (this.upiTab.onBack()) {
         return;
       }
@@ -2773,7 +2803,15 @@ Session.prototype = {
       this.showCardTab(tab);
       cardTab.setEmiPlansCta(this.screen, tab);
     } else {
-      this.setScreen(tab);
+      if (
+        !(
+          tab === 'upi' &&
+          Store.isASubscription() &&
+          !this.getCurrentCustomer().logged
+        )
+      ) {
+        this.setScreen(tab);
+      }
       if (ua_iPhone) {
         Razorpay.sendMessage({ event: 'blur' });
       }
@@ -3580,7 +3618,7 @@ Session.prototype = {
 
     var isCardlessEmi = this.payload && this.payload.method === 'cardless_emi';
 
-    if (!isCardlessEmi) {
+    if (!isCardlessEmi && this.tab !== 'upi') {
       // card tab only past this
       // card filled by logged out user + remember me
       if (this.payload) {
@@ -3669,6 +3707,19 @@ Session.prototype = {
             data.lender_branding_url;
 
           this.showCardlessEmiPlans();
+        }
+      };
+    }
+
+    if (this.tab === 'upi') {
+      callback = function(msg, data) {
+        if (msg) {
+          Analytics.track('behav:otp:incorrect');
+          askOTP(this.otpView, msg, true);
+          this.updateCustomerInStore();
+        } else {
+          discreet.upiTab.render();
+          this.setScreen('upi');
         }
       };
     }

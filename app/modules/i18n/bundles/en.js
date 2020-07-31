@@ -415,6 +415,8 @@ export default {
       otp_sent_save_card: 'Enter OTP sent to {phone} to save your card',
       otp_sent_save_card_recurring:
         'Enter OTP sent to {phone} to save your card for future payments',
+      otp_proceed_with_upi_subscription:
+        'Enter OTP sent to {phone} to proceed with the subscription',
       otp_sent_access_card: 'Enter OTP sent to {phone} to access Saved Cards',
       otp_sending_generic: 'Sending OTP to {phone}',
       otp_sent_generic: 'An OTP has been sent on {phone}',
