@@ -60,6 +60,13 @@ function getInstrumentsFromApi(customer) {
     fetch({
       url,
       callback: function(response) {
+        // Empty objects are arrays in PHP
+        if (_.isArray(response)) {
+          response = {
+            preferred_methods: {},
+          };
+        }
+
         const data = response.preferred_methods;
         // default instruments may be provided based on the merchant and amount details
 
