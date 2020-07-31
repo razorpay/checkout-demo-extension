@@ -387,12 +387,6 @@ function updatePreferredMethods(preferences) {
         instruments
       );
     });
-
-    Analytics.track('p13n:api:response', {
-      data: {
-        identified: !preferred_methods.default,
-      },
-    });
   }
 }
 
