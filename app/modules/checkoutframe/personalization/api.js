@@ -17,18 +17,25 @@ const PREFERRED_INSTRUMENTS_CACHE = {};
  * @param {Customer} customer
  * @param {Array<ApiInstrument>} instruments
  *
- * @returns {Promise<Array<StorageInstrument>>}
+ * @returns {Promise<Object>>}
+ *  @prop {boolean} identified
+ *  @prop {Array<StorageInstrument>} instruments
  */
-export function setInstrumentsForCustomer(customer, instruments) {
+export function setInstrumentsForCustomer(
+  customer,
+  instruments,
+  identified = true
+) {
   const transformedInstruments = _Arr.map(instruments, instrument =>
     transformInstrumentToStorageFormat(instrument, {
       upiApps: getUPIIntentApps().filtered,
     })
   );
 
-  PREFERRED_INSTRUMENTS_CACHE[customer.contact] = Promise.resolve(
-    transformedInstruments
-  );
+  PREFERRED_INSTRUMENTS_CACHE[customer.contact] = Promise.resolve({
+    identified,
+    instruments: transformedInstruments,
+  });
 
   return getInstrumentsForCustomer(customer);
 }
@@ -37,7 +44,9 @@ export function setInstrumentsForCustomer(customer, instruments) {
  * Makes an API call to fetch instruments for the given customer
  * @param {Customer} customer
  *
- * @returns {Promise<Array<ApiInstrument>>}
+ * @returns {Promise<Object>>}
+ *  @prop {boolean} identified
+ *  @prop {Array<StorageInstrument>} instruments
  */
 function getInstrumentsFromApi(customer) {
   const session = getSession();
@@ -53,20 +62,19 @@ function getInstrumentsFromApi(customer) {
       callback: function(response) {
         const data = response.preferred_methods;
         // default instruments may be provided based on the merchant and amount details
-        let apiInstruments = data.default || [];
 
-        Analytics.track('p13n:api:response', {
-          data: {
-            identified: !data.default,
-          },
-        });
+        const identified = !data.default;
+
+        let apiInstruments = data.default || [];
 
         // preference is given to customer specific data
         if (customer && customer.contact) {
           apiInstruments = data[customer.contact] || apiInstruments;
         }
 
-        resolve(setInstrumentsForCustomer(customer, apiInstruments));
+        resolve(
+          setInstrumentsForCustomer(customer, apiInstruments, identified)
+        );
       },
     });
   });

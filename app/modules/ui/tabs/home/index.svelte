@@ -311,6 +311,7 @@
         };
 
         let instrumentsSource;
+        let userIdentified = true;
 
         // First figure out which source to attempt using
         if (instrumentsFromStorage.length) {
@@ -372,6 +373,8 @@
                 Analytics.removeMeta('p13n');
               }
 
+              Analytics.setMeta('p13n.userIdentified', userIdentified);
+
               Analytics.track('home:p13n:experiment', {
                 type: AnalyticsTypes.METRIC,
                 data: {
@@ -404,7 +407,9 @@
               upiApps: getUPIIntentApps().filtered,
             },
             'api'
-          ).then(instrumentsFromApi => {
+          ).then(({ identified, instruments: instrumentsFromApi }) => {
+            userIdentified = identified;
+
             if (instrumentsFromApi.length) {
               instrumentMap.api = instrumentsFromApi;
             } else {
@@ -429,7 +434,7 @@
         upiApps: getUPIIntentApps().filtered,
       },
       'storage'
-    ).then(instrumentsFromStorage => {
+    ).then(({ instruments: instrumentsFromStorage }) => {
       return getRandomInstrumentSet({
         instrumentsFromStorage,
         customer: $customer,

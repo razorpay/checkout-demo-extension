@@ -344,7 +344,9 @@ export function getAllInstrumentsForCustomer(customer) {
  *  @prop {Array} upiApps List of UPI apps on the device
  * @param {"storage"|"api"} source
  *
- * @returns {Promise<Array<Instrument>>}
+ * @returns {Promise<Object>>}
+ *  @prop {boolean} identified
+ *  @prop {Array<Instrument>} instruments
  */
 export const getInstrumentsForCustomer = (customer, extra = {}, source) => {
   const { upiApps } = extra;
@@ -352,12 +354,15 @@ export const getInstrumentsForCustomer = (customer, extra = {}, source) => {
   let getInstruments = Promise.resolve([]);
 
   if (source === 'storage') {
-    getInstruments = Promise.resolve(getAllInstrumentsForCustomer(customer));
+    getInstruments = Promise.resolve({
+      identified: true, // storage instruments are always identified based on user
+      instruments: getAllInstrumentsForCustomer(customer),
+    });
   } else if (source === 'api') {
     getInstruments = getInstrumentsForCustomerFromApi(customer);
   }
 
-  return getInstruments.then(instruments => {
+  return getInstruments.then(({ identified, instruments }) => {
     // Filter out the list
     instruments = filterInstruments({
       instruments,
@@ -396,7 +401,10 @@ export const getInstrumentsForCustomer = (customer, extra = {}, source) => {
       a.score > b.score ? -1 : ~~(a.score < b.score)
     );
 
-    return _Arr.map(instruments, translateInstrumentToConfig);
+    return {
+      identified,
+      instruments: _Arr.map(instruments, translateInstrumentToConfig),
+    };
   });
 };
 
