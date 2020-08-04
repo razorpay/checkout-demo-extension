@@ -131,16 +131,18 @@ function improvisePrefilledContact(session) {
   var prefilledContact = session.get('prefill.contact');
   var prefilledEmail = session.get('prefill.email');
 
-  var storedUserDetails = discreet.ContactStorage.get();
+  if (Store.shouldStoreCustomerInStorage()) {
+    var storedUserDetails = discreet.ContactStorage.get();
 
-  // Pick details from storage if not given in prefill
-  if (!prefilledContact && storedUserDetails.contact) {
-    prefilledContact = storedUserDetails.contact;
-    Analytics.setMeta('prefilledFromStorage.contact', true);
-  }
-  if (!prefilledEmail && storedUserDetails.email) {
-    prefilledEmail = storedUserDetails.email;
-    Analytics.setMeta('prefilledFromStorage.email', true);
+    // Pick details from storage if not given in prefill
+    if (!prefilledContact && storedUserDetails.contact) {
+      prefilledContact = storedUserDetails.contact;
+      Analytics.setMeta('prefilledFromStorage.contact', true);
+    }
+    if (!prefilledEmail && storedUserDetails.email) {
+      prefilledEmail = storedUserDetails.email;
+      Analytics.setMeta('prefilledFromStorage.email', true);
+    }
   }
 
   if (prefilledContact) {
