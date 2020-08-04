@@ -59,7 +59,6 @@ module.exports = function(testFeatures) {
     timeout,
     callbackUrl,
     offers,
-    personalization,
     optionalContact,
     optionalEmail,
   } = features;
@@ -71,12 +70,6 @@ module.exports = function(testFeatures) {
     })
   )('Cards tests', ({ preferences, title, options }) => {
     test(title, async () => {
-      if (personalization) {
-        if (preferences.customer) {
-          preferences.customer.contact = '+918888888881';
-        }
-      }
-
       const context = await openCheckoutWithNewHomeScreen({
         page,
         options,
@@ -109,13 +102,8 @@ module.exports = function(testFeatures) {
 
       await assertPaymentMethods(context);
 
-      if (personalization) {
-        await selectPersonalizedCard(context);
-        await enterCardDetails(context);
-      } else {
-        await selectPaymentMethod(context, 'card');
-        await enterCardDetails(context);
-      }
+      await selectPaymentMethod(context, 'card');
+      await enterCardDetails(context);
 
       if (offers) {
         await viewOffers(context);
