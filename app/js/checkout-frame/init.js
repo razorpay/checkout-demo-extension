@@ -53,25 +53,3 @@ window.onerror = function(errorMsg, url, lineNumber, column, errorObj) {
     immediately: true,
   });
 };
-
-window.addEventListener('rzp_error', function(event) {
-  var error = event.detail;
-
-  Analytics.track('cfu_error', {
-    r: SessionManager.getSession().r,
-    data: {
-      error: error,
-    },
-    immediately: true,
-  });
-});
-
-window.addEventListener('rzp_network_error', function(event) {
-  var detail = event.detail;
-
-  Analytics.track('network_error', {
-    r: SessionManager.getSession().r,
-    data: detail,
-    immediately: true,
-  });
-});

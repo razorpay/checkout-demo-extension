@@ -1,6 +1,6 @@
 import Razorpay from 'common/Razorpay';
 import 'payment';
-import Analytics from 'analytics';
+import 'track-errors';
 import Track from 'tracker';
 
 Track.props.library = 'razorpayjs';
@@ -20,25 +20,5 @@ Razorpay.sendMessage = function(message) {
     _Doc.submitForm(data.url, data.content, data.method);
   }
 };
-
-window.addEventListener('rzp_error', function(event) {
-  var error = event.detail;
-
-  Analytics.track('cfu_error', {
-    data: {
-      error: error,
-    },
-    immediately: true,
-  });
-});
-
-window.addEventListener('rzp_network_error', function(event) {
-  var detail = event.detail;
-
-  Analytics.track('network_error', {
-    data: detail,
-    immediately: true,
-  });
-});
 
 export default Razorpay;
