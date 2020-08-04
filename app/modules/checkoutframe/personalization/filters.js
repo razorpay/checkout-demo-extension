@@ -1,6 +1,10 @@
 import { VPA_REGEX } from 'common/constants';
 import { doesAppExist } from 'common/upi';
-import { getDowntimes, isASubscription } from 'checkoutstore';
+import {
+  getDowntimes,
+  isASubscription,
+  shouldRememberCustomer,
+} from 'checkoutstore';
 import {
   isCreditCardEnabled,
   isDebitCardEnabled,
@@ -30,6 +34,11 @@ const METHOD_FILTERS = {
 
     // If the card type is not allowed, filter this out
     if (!isCardTypeAllowed) {
+      return false;
+    }
+
+    // Don't show any cards if saved cards are disabled
+    if (!shouldRememberCustomer()) {
       return false;
     }
 
