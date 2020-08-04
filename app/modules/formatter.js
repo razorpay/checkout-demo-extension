@@ -338,6 +338,11 @@ formatterProto.unbind = function() {
 };
 
 formatterProto.run = function(values) {
+  // Don't do anything if the field is readonly
+  if (this.el.readOnly) {
+    return;
+  }
+
   // domValue is would-be value, if not prevented (keypress, keydown)
   //    we prevent all the time in that case
   //    for events with non-preventable character printing,
