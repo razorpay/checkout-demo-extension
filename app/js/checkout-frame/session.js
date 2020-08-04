@@ -2959,6 +2959,14 @@ Session.prototype = {
       };
     };
 
+    var getBankEMICode = function(issuer, type) {
+      // EMI codes are different from bank codes and have _DC at the end.
+      if (type === 'debit' && !_Str.endsWith(issuer, '_DC')) {
+        return issuer + '_DC';
+      }
+      return issuer;
+    };
+
     if (type === 'new') {
       return function(e) {
         self.topBar.resetTitleOverride('emiplans');
@@ -2966,6 +2974,9 @@ Session.prototype = {
         var bank = self.emiPlansForNewCard && self.emiPlansForNewCard.code;
         var cardIssuer = bank.split('_')[0];
         var cardType = _Str.endsWith(bank, '_DC') ? 'debit' : 'credit';
+
+        bank = getBankEMICode(bank, cardType);
+
         var contactRequiredForEMI = MethodStore.isContactRequiredForEMI(
           bank,
           cardType
@@ -3055,6 +3066,9 @@ Session.prototype = {
         var bank = $trigger.attr('data-bank');
         var cardIssuer = bank;
         var cardType = $trigger.attr('data-card-type');
+
+        bank = getBankEMICode(bank, cardType);
+
         var contactRequiredForEMI = MethodStore.isContactRequiredForEMI(
           bank,
           cardType
