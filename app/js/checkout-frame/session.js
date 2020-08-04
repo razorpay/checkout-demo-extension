@@ -3016,7 +3016,7 @@ Session.prototype = {
 
               self.switchTab('card');
               self.setScreen('card');
-              self.svelteCardTab.showAddCardView();
+              self.svelteCardTab.showLandingView();
             },
 
             select: function(value, contact) {
