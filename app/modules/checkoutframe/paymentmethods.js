@@ -311,11 +311,13 @@ export function getMethodNameForPaymentOption(method, locale, extra = {}) {
 /**
  * Returns the downtime description for the given method.
  * @param {string} method
+ * @param {string} locale
  * @param {Object} param1
  *  @prop {Array} availableMethods
  */
 export function getMethodDowntimeDescription(
   method,
+  locale,
   { availableMethods = [], downMethods = [] } = {}
 ) {
   const prefix = getTranslatedMethodPrefix(method);
