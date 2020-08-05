@@ -92,9 +92,6 @@ import * as Instruments from 'configurability/instruments';
 import { getInstrumentMeta } from 'ui/tabs/home/instruments';
 import * as ContactStorage from 'checkoutframe/contact-storage';
 
-// Import code directly
-import 'track-errors';
-
 export default {
   RazorpayConfig,
   fetch,
