@@ -33,13 +33,15 @@
   export let expanded;
 
   // Computed
-  export let amountPerMonth;
-  export let formattedAmount;
-  export let formattedAmountPerMonth;
-  export let formattedFinalAmount;
-  export let isCardEmi;
-  export let noCostEmi;
-  export let showInterest;
+  let amountPerMonth;
+  let formattedAmount;
+  let formattedAmountPerMonth;
+  let formattedFinalAmount;
+  let isCardEmi;
+  let noCostEmi;
+  let showInterest;
+  let isBajajEmi;
+  let showEducation;
 
   let interestChargedByBank;
 
@@ -62,7 +64,7 @@
   }
 
   $: {
-    if (bank === 'BAJAJ' && amountPerMonth) {
+    if (isBajajEmi && amountPerMonth) {
       amountPerMonth = roundUpToNearestMajor(
         amountPerMonth,
         session.get('currency')
@@ -80,6 +82,7 @@
       );
     }
   }
+
   $: isCardEmi = !provider;
   $: showInterest =
     !isCardEmi || !_Arr.contains(['zestmoney', 'earlysalary'], provider);
@@ -88,6 +91,9 @@
   $: formattedFinalAmount = session.formatAmountWithCurrency(
     plan.duration * amountPerMonth
   );
+
+  $: isBajajEmi = bank === 'BAJAJ';
+  $: showEducation = !isBajajEmi;
 
   function explain() {
     session.showNoCostExplainer(plan);
@@ -121,55 +127,58 @@
     {/if}
   </div>
   <div slot="detail">
-    {#if noCostEmi}
-      <ul class="nocost">
-        <li>
-          <!-- LABEL: Interest charged by the bank -->
-          {$t(INTEREST_CHARGED_LABEL)}
-          <span class="right">{interestChargedByBank}</span>
-        </li>
-        <li class="theme-highlight">
-          <!-- LABEL: No Cost EMI offer discount -->
-          {$t(NO_COST_DISCOUNT_LABEL)}
-          <span class="right">- {interestChargedByBank}</span>
-        </li>
-      </ul>
-    {/if}
-    {#if isCardEmi}
-      {#if bank === HDFC_BANK_DEBIT_CODE}
-        <!-- TODO: Combine both labels and allow inline-block from within template -->
-        <!-- LABEL: No minimum balance is required. There will be no amount blocked on your
+    {#if showEducation}
+      {#if noCostEmi}
+        <ul class="nocost">
+          <li>
+            <!-- LABEL: Interest charged by the bank -->
+            {$t(INTEREST_CHARGED_LABEL)}
+            <span class="right">{interestChargedByBank}</span>
+          </li>
+          <li class="theme-highlight">
+            <!-- LABEL: No Cost EMI offer discount -->
+            {$t(NO_COST_DISCOUNT_LABEL)}
+            <span class="right">- {interestChargedByBank}</span>
+          </li>
+        </ul>
+      {/if}
+      {#if isCardEmi}
+        {#if bank === HDFC_BANK_DEBIT_CODE}
+          <!-- TODO: Combine both labels and allow inline-block from within template -->
+          <!-- LABEL: No minimum balance is required. There will be no amount blocked on your
         card. You will pay -->
-        {$t(HDFC_DEBIT_DESCRIPTION_MIN_BALANCE)}
-        <span class="inline-block">{formattedAmountPerMonth}/mo</span>
-        <!-- LABEL: (includes interest). -->
-        {$t(HDFC_DEBIT_DESCRIPTION_INCLUDES_INTEREST)}
-      {:else}
-        <!-- LABEL: Full amount of {formattedAmount} will be deducted from your account,
+          {$t(HDFC_DEBIT_DESCRIPTION_MIN_BALANCE)}
+          <span class="inline-block">{formattedAmountPerMonth}/mo</span>
+          <!-- LABEL: (includes interest). -->
+          {$t(HDFC_DEBIT_DESCRIPTION_INCLUDES_INTEREST)}
+        {:else}
+          <!-- LABEL: Full amount of {formattedAmount} will be deducted from your account,
         which will be converted into EMI by your bank in 3-4 days. -->
-        {formatTemplateWithLocale(CREDIT_EMI_DESCRIPTION, { amount: formattedAmount }, $locale)}
-      {/if}
-      {#if bank === HDFC_BANK_CODE || bank === HDFC_BANK_DEBIT_CODE}
-        <!-- LABEL: Convenience Fee of ₹99 + GST applicable for EMI transactions on HDFC
+          {formatTemplateWithLocale(CREDIT_EMI_DESCRIPTION, { amount: formattedAmount }, $locale)}
+        {/if}
+        {#if bank === HDFC_BANK_CODE || bank === HDFC_BANK_DEBIT_CODE}
+          <!-- LABEL: Convenience Fee of ₹99 + GST applicable for EMI transactions on HDFC
         Bank Cards. -->
-        {$t(HDFC_DEBIT_DESCRIPTION_CONVENIENCE)}
+          {$t(HDFC_DEBIT_DESCRIPTION_CONVENIENCE)}
+        {/if}
+      {:else}
+        <ul>
+          <!-- LABEL: Monthly Installment: {amount} -->
+          <li>
+            {formatTemplateWithLocale(DESCRIPTION_MONTHLY_INSTALLMENT, { amount: formattedAmountPerMonth }, $locale)}
+          </li>
+          <!-- LABEL: Total Amount: {formattedFinalAmount} ({formattedAmountPerMonth} x {plan.duration}) -->
+          <li>
+            {formatTemplateWithLocale(DESCRIPTION_TOTAL_AMOUNT, { totalAmount: formattedFinalAmount, monthlyAmount: formattedAmountPerMonth, duration: plan.duration }, $locale)}
+          </li>
+        </ul>
       {/if}
-    {:else}
-      <ul>
-        <!-- LABEL: Monthly Installment: {amount} -->
-        <li>
-          {formatTemplateWithLocale(DESCRIPTION_MONTHLY_INSTALLMENT, { amount: formattedAmountPerMonth }, $locale)}
-        </li>
-        <!-- LABEL: Total Amount: {formattedFinalAmount} ({formattedAmountPerMonth} x {plan.duration}) -->
-        <li>
-          {formatTemplateWithLocale(DESCRIPTION_TOTAL_AMOUNT, { totalAmount: formattedFinalAmount, monthlyAmount: formattedAmountPerMonth, duration: plan.duration }, $locale)}
-        </li>
-      </ul>
-    {/if}
-    {#if noCostEmi}
-      <div class="theme-highlight how-it-works" on:click={explain}>
-        + How does it work?
-      </div>
+      {#if noCostEmi}
+        <!-- LABEL: + How does it work? -->
+        <div class="theme-highlight how-it-works" on:click={explain}>
+          {$t(NO_COST_EXPLAIN_ACTION)}
+        </div>
+      {/if}
     {/if}
   </div>
 

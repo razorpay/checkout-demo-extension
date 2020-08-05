@@ -29,6 +29,10 @@ let hideCallback;
 
 export let isConfirmShown = false;
 
+function overlayInUse() {
+  return _Doc.querySelector('.overlay.' + SHOWN_CLASS);
+}
+
 export function hide(invokeCallback = false) {
   if (!isConfirmShown) {
     return;
@@ -37,7 +41,13 @@ export function hide(invokeCallback = false) {
   if (!_El.hasClass(_Doc.querySelector('#error-message'), SHOWN_CLASS)) {
     _Doc.querySelector('#overlay') |> _El.removeClass(SHOWN_CLASS);
     setTimeout(() => {
-      _Doc.querySelector('#overlay') |> _El.setStyle('display', '');
+      if (overlayInUse()) {
+        // I removed the SHOWN_CLASS, but now I regret it,
+        // Add it back as someone else is using it.
+        _Doc.querySelector('#overlay') |> _El.addClass(SHOWN_CLASS);
+      } else {
+        _Doc.querySelector('#overlay') |> _El.setStyle('display', '');
+      }
     }, 300);
   }
 

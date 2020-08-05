@@ -1,4 +1,4 @@
-import { findCountryCode } from 'common/countrycodesutil';
+import { findCountryCode } from 'common/countrycodes';
 
 test('Module: countrycodeutil', t => {
   test('Phone number starting with +91', t => {

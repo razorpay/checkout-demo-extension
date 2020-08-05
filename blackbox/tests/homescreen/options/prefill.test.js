@@ -89,10 +89,13 @@ describe.each(
     const selectedWallet = await context.page.waitForSelector(
       '#wallet-radio-phonepe'
     );
+
     const status = await context.page.evaluate(
-      amountSpan => amountSpan.checked,
+      selectedWallet =>
+        selectedWallet.closest('button').querySelector('input').checked,
       selectedWallet
     );
+
     expect(status).toBe(true);
   });
 });

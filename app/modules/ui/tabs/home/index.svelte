@@ -20,6 +20,8 @@
 
   // Store
   import {
+    country,
+    phone,
     contact,
     isContactPresent,
     email,
@@ -30,10 +32,13 @@
     partialPaymentOption,
     instruments,
     blocks,
+    setContact,
+    setEmail,
   } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
   import { getOption, isDCCEnabled } from 'checkoutstore';
+  import { getUPIIntentApps } from 'checkoutstore/native';
 
   // i18n
   import {
@@ -107,9 +112,17 @@
   import { isInstrumentGrouped } from 'configurability/instruments';
   import { isElementCompletelyVisibleInTab } from 'lib/utils';
 
-  import { INDIA_COUNTRY_CODE } from 'common/constants';
+  import {
+    CONTACT_REGEX,
+    EMAIL_REGEX,
+    PHONE_REGEX_INDIA,
+  } from 'common/constants';
+  import { getAnimationOptions } from 'svelte-utils';
 
   import { setBlocks } from 'ui/tabs/home/instruments';
+
+  import { update as updateContactStorage } from 'checkoutframe/contact-storage';
+  import { isMobile } from 'common/useragent';
 
   const cardOffer = getCardOffer();
   const session = getSession();
@@ -131,8 +144,8 @@
   const isPartialPayment = getIsPartialPayment();
   const contactEmailReadonly = isContactEmailReadOnly();
 
-  $contact = getPrefilledContact() || INDIA_COUNTRY_CODE;
-  $email = getPrefilledEmail();
+  setContact(getPrefilledContact());
+  setEmail(getPrefilledEmail());
 
   // Prop that decides which view to show.
   // Values: 'details', 'methods'
@@ -267,7 +280,7 @@
 
   function getAllAvailableP13nInstruments() {
     return getTranslatedInstrumentsForCustomer($customer, {
-      upiApps: session.upi_intents_data,
+      upiApps: getUPIIntentApps().filtered,
     });
   }
 
@@ -381,10 +394,7 @@
     }
 
     // Single method
-    if (
-      singleMethod &&
-      !_Arr.contains(['wallet', 'netbanking', 'upi'], singleMethod)
-    ) {
+    if (singleMethod && isRecurring()) {
       return false;
     }
 
@@ -451,11 +461,15 @@
      * If contact and email are mandatory, validate
      */
     if (!isContactEmailOptional()) {
-      const contactRegex = /^\+?[0-9]{8,15}$/;
-      const emailRegex = /^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/;
+      if (!isContactValid) {
+        if ($country === '+91') {
+          isContactValid = PHONE_REGEX_INDIA.test($phone);
+        } else {
+          isContactValid = CONTACT_REGEX.test($contact);
+        }
+      }
 
-      isContactValid = isContactValid || contactRegex.test($contact);
-      isEmailValid = isEmailValid || emailRegex.test($email);
+      isEmailValid = isEmailValid || EMAIL_REGEX.test($email);
     }
 
     /**
@@ -502,13 +516,10 @@
      * Otherwise, we take the user to the details screen.
      */
     if (singleMethod) {
-      if (
-        _Arr.contains(['wallet', 'netbanking', 'upi'], singleMethod) &&
-        $instruments.length > 0
-      ) {
-        return METHODS;
-      } else {
+      if (isRecurring()) {
         return DETAILS;
+      } else {
+        return METHODS;
       }
     }
 
@@ -528,8 +539,25 @@
     },
   });
 
+  function storeContactDetails() {
+    // Store only on mobile since Desktops can be shared b/w users
+    if (isMobile()) {
+      updateContactStorage({
+        contact: $contact,
+        email: $email,
+      });
+    }
+  }
+
   export function next() {
     Analytics.track('home:proceed');
+
+    /**
+     * - Store contact details only when the user has explicity clicked on the CTA
+     * - `next()` is not invoked if the merchant had prefilled the user's details
+     *    since the user would land directly on the methods view
+     */
+    storeContactDetails();
 
     // Multi TPV
     if (tpv) {
@@ -553,14 +581,11 @@
         return;
       }
 
-      if (
-        _Arr.contains(['wallet', 'netbanking', 'upi'], singleMethod) &&
-        $instruments.length > 0
-      ) {
-        showMethods();
+      if (isRecurring()) {
+        selectMethod(singleMethod);
         return;
       } else {
-        selectMethod(singleMethod);
+        showMethods();
         return;
       }
     }
@@ -754,13 +779,13 @@
       {#if view === 'methods'}
         <div
           class="solidbg"
-          in:slide={{ duration: 400 }}
-          out:fly={{ duration: 200, y: 80 }}>
+          in:slide={getAnimationOptions({ duration: 400 })}
+          out:fly={getAnimationOptions({ duration: 200, y: 80 })}>
           {#if showUserDetailsStrip || isPartialPayment}
             <div
               use:touchfix
               class="details-container border-list"
-              in:fly={{ duration: 400, y: 80 }}>
+              in:fly={getAnimationOptions({ duration: 400, y: 80 })}>
               {#if showUserDetailsStrip}
                 <SlottedOption on:click={editUserDetails} id="user-details">
                   <i slot="icon">
@@ -819,7 +844,7 @@
 
           <div
             class="home-methods"
-            in:fly={{ delay: 100, duration: 400, y: 80 }}>
+            in:fly={getAnimationOptions({ delay: 100, duration: 400, y: 80 })}>
             <NewMethodsList
               on:selectInstrument={onSelectInstrument}
               on:submit={attemptPayment} />
@@ -848,7 +873,9 @@
       {/if}
 
       {#if showSecuredByMessage}
-        <div class="secured-message" out:slide={{ duration: 100 }}>
+        <div
+          class="secured-message"
+          out:slide={getAnimationOptions({ duration: 100 })}>
           <i>
             <svg
               width="16"

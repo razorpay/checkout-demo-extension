@@ -7,6 +7,7 @@
 
   // Util imports
   import { getSession } from 'sessionmanager';
+  import { getAnimationOptions } from 'svelte-utils';
 
   // UI imports
   import Field from 'ui/components/Field.svelte';
@@ -122,7 +123,7 @@
 
   <div slot="body">
     {#if selected}
-      <div transition:slide={{ duration: 200 }}>
+      <div transition:slide={getAnimationOptions({ duration: 200 })}>
         <!-- LABEL: Enter your phone numbe -->
         <Field
           formatter={{ type: 'number' }}

@@ -49,6 +49,7 @@
   } from 'common/bank';
   import { scrollIntoView } from 'lib/utils';
   import { getSession } from 'sessionmanager';
+  import { getAnimationOptions } from 'svelte-utils';
 
   // Props
   export let banks;
@@ -176,6 +177,16 @@
     // If the currently selected bank is not present in filtered banks, we need to unset it.
     if (!filteredBanks[$selectedBank]) {
       $selectedBank = '';
+    }
+
+    /**
+     * If the method is netbanking and if there's only
+     * one bank available, select it automatically to reduce a user click.
+     * Of course, do this only when there's nothing preselected.
+     */
+    const banksList = _Obj.keys(filteredBanks);
+    if (method === 'netbanking' && !$selectedBank && banksList.length === 1) {
+      $selectedBank = banksList[0];
     }
   }
 
@@ -313,7 +324,7 @@
         <div
           class="pad ref-radiocontainer"
           bind:this={radioContainer}
-          transition:fade={{ duration: 100 }}>
+          transition:fade={getAnimationOptions({ duration: 100 })}>
           <!-- LABEL: Complete Payment Using -->
           <label>{$t(SELECTION_RADIO_TEXT)}</label>
           <div class="input-radio">

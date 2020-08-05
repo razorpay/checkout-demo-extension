@@ -184,6 +184,8 @@
     on:input
     on:autocomplete
     on:paste
+    on:click
+    on:keydown
     class:no-refresh={!refresh}
     class:no-focus={handleFocus}
     class:no-blur={handleBlur}

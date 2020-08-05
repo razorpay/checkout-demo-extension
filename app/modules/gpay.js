@@ -171,3 +171,9 @@ export function payWithMicroapp(intentUrl) {
     return response;
   });
 }
+
+export const googlePayCardsCancelPayload = {
+  '_[method]': 'app',
+  '_[provider]': 'google_pay_cards',
+  '_[reason]': 'PAYMENT_CANCEL_ON_APP',
+};

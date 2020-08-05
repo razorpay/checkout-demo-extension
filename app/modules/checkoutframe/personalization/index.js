@@ -7,6 +7,7 @@ import { filterInstruments } from './filters';
 import { hashFnv32a, set, getAllInstruments } from './utils';
 import { extendInstruments } from './extend';
 import { translateInstrumentToConfig } from './translation';
+import { getUPIIntentApps } from 'checkoutstore/native';
 
 /* halflife for timestamp, 5 days in ms */
 const TS_HALFLIFE = Math.log(2) / (5 * 86400000);
@@ -32,8 +33,6 @@ const INSTRUMENT_PROPS = {
  * @returns {Object|undefined}
  */
 function getExtractedDetails(payment, customer, extra = {}) {
-  const { upi_intents_data = [] } = extra;
-
   const details = {};
 
   let extractable = INSTRUMENT_PROPS[payment.method];
@@ -115,7 +114,7 @@ function getExtractedDetails(payment, customer, extra = {}) {
 
   if (payment.upi_app) {
     let app = _Arr.find(
-      upi_intents_data,
+      getUPIIntentApps().all,
       app => app.package_name === payment.upi_app
     );
     details.app_name = app.app_name;

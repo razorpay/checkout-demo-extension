@@ -1,0 +1,71 @@
+<html>
+  <head>
+    <title>Google Pay Microapps Test</title>
+
+    <script>
+      // Mock required Microapps APIs
+
+      window.microapps = {
+        requestPayment: function(payload) {
+          return new Promise((resolve, reject) => {
+            const succeed = window.confirm('Do you want to make the payment?');
+
+            const response = {
+              apiVersion: 2,
+              apiVersionMinor: 0,
+              paymentMethodData: {
+                type: 'UPI',
+                token: 'somerandomjsonstring',
+              },
+            };
+
+            if (succeed) {
+              resolve(response);
+            } else {
+              reject();
+            }
+          });
+        },
+      };
+    </script>
+
+    <script
+      type="text/javascript"
+      src="http://checkout.razorpay.com/v1/razorpay.js"
+    ></script>
+  </head>
+  <body>
+    <button>Pay</button>
+
+    <script>
+      const razorpay = new Razorpay({
+        // key: 'rzp_live_ILgsfZCZoFIKMb',
+        key: 'rzp_test_1DP5mmOlF5G5ag',
+        amount: 100,
+      });
+
+      const payload = {
+        email: 'void@razorpay.com',
+        contact: '+918888888888',
+        method: 'upi',
+      };
+
+      document.querySelector('button').addEventListener('click', event => {
+        razorpay.createPayment(payload, {
+          microapps: {
+            gpay: true,
+          },
+        });
+      });
+
+      razorpay
+        .checkPaymentAdapter('microapps.gpay')
+        .then(() => {
+          console.log('Google Pay microapps is available');
+        })
+        .catch(() => {
+          console.error('Google Pay microapps is not available');
+        });
+    </script>
+  </body>
+</html>

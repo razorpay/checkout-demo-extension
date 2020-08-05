@@ -1,4 +1,5 @@
 {
+  "upi": true,
   "card": {
     "credit": ["MasterCard", "Visa"]
   },

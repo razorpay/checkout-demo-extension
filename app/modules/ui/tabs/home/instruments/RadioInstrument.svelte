@@ -13,6 +13,7 @@
   import { getWallet } from 'common/wallet';
   import { getProvider as getCardlessEmiProvider } from 'common/cardlessemi';
   import { getProvider as getPaylaterProvider } from 'common/paylater';
+  import { getProvider as getAppProvider } from 'common/apps';
   import Track from 'tracker';
   import { getExtendedSingleInstrument } from 'configurability/instruments';
 
@@ -20,6 +21,7 @@
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
   import { customer } from 'checkoutstore/customer';
   import { isDebitEMIEnabled } from 'checkoutstore/methods';
+  import { getUPIIntentApps } from 'checkoutstore/native';
 
   // i18n
   import { locale } from 'svelte-i18n';
@@ -29,6 +31,8 @@
     getWalletName,
     getCardlessEmiProviderName,
     getPaylaterProviderName,
+    getUpiIntentAppName,
+    getAppProviderName,
   } from 'i18n';
 
   // Props
@@ -61,6 +65,16 @@
     return `${vpaToken.vpa.username}@${vpaToken.vpa.handle}`;
   }
 
+  function getDetailsForAppInstrument(instrument, locale) {
+    const provider = getAppProvider(individualInstrument.provider);
+    const providerName = getAppProviderName(provider.code, locale);
+    return {
+      title: getInstrumentTitle('app', providerName, locale),
+      icon: provider.logo,
+      alt: provider.name,
+    };
+  }
+
   function getDetailsForPaypalInstrument(instrument, locale) {
     return {
       title: getInstrumentTitle('paypal', null, locale),
@@ -70,7 +84,12 @@
   }
 
   function getDetailsForNetbankingInstrument(instrument, locale) {
-    const bankName = getLongBankName(individualInstrument.bank, locale);
+    const banks = getBanks();
+    const bankName = getLongBankName(
+      individualInstrument.bank,
+      locale,
+      banks[instrument.bank]
+    );
     return {
       title: getInstrumentTitle('netbanking', bankName, locale),
       icon: getBankLogo(individualInstrument.bank),
@@ -97,19 +116,23 @@
       alt = title;
     } else if (individualInstrument.flow === 'intent') {
       const app = _Arr.find(
-        session.upi_intents_data,
+        getUPIIntentApps().all,
         app => app.package_name === individualInstrument.app
       );
 
-      title = getInstrumentTitle(
-        'upi',
-        app.app_name.replace(/ UPI$/, ''),
-        locale
-      );
+      // In case of ios, app name might be missing if not sent by the sdk
+      let appName = app.app_name || 'Unknown app';
+
+      // shortcode might not be present for existing instruments. Check for backward compatibility.
+      if (app.shortcode) {
+        appName = getUpiIntentAppName(app.shortcode, $locale, appName);
+      }
+
+      title = getInstrumentTitle('upi', appName.replace(/ UPI$/, ''), locale);
 
       if (app.app_icon) {
         icon = app.app_icon;
-        alt = app.app_name;
+        alt = appName;
       } else {
         icon = '&#xe70e;';
         alt = 'UPI App';
@@ -174,6 +197,9 @@
 
       case 'paylater':
         return getDetailsForPayLaterInstrument(instrument, locale);
+
+      case 'app':
+        return getDetailsForAppInstrument(instrument, locale);
     }
   }
 

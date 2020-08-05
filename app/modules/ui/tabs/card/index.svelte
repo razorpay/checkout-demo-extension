@@ -11,6 +11,8 @@
   import EmiActions from 'ui/components/EmiActions.svelte';
   import SavedCards from 'ui/tabs/card/savedcards.svelte';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
+  import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
+  import Icon from 'ui/elements/Icon.svelte';
 
   // Store
   import {
@@ -20,9 +22,11 @@
     cardNumber,
     remember,
     selectedCard,
+    selectedApp,
     cardTab,
   } from 'checkoutstore/screens/card';
   import { methodInstrument, blocks } from 'checkoutstore/screens/home';
+  import { getSDKMeta } from 'checkoutstore/native';
 
   import { customer } from 'checkoutstore/customer';
 
@@ -31,20 +35,29 @@
     isRecurring,
     shouldRememberCustomer,
     isDCCEnabled,
+    methodErrors,
+    getIdForPaymentPayload,
   } from 'checkoutstore';
   import {
     isMethodEnabled,
     getEMIBanks,
     getEMIBankPlans,
     isMethodUsable,
+    getAppsForCards,
+    getPayloadForCRED,
   } from 'checkoutstore/methods';
   import { newCardEmiDuration } from 'checkoutstore/emi';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
+  import { getAppProviderName, getAppProviderSubtext } from 'i18n';
 
   import {
     USE_SAVED_CARDS_BTN,
+    USE_SAVED_CARDS_ON_RZP_BTN,
+    CARDS_SAVED_ON_APPS_LABEL,
+    CARDS_SAVED_ON_RZP_LABEL,
+    ENTER_CARD_DETAILS_OPTION_LABEL,
     ADD_ANOTHER_CARD_BTN,
     RECURRING_CALLOUT,
     SUBSCRIPTION_CALLOUT,
@@ -58,6 +71,8 @@
   import * as AnalyticsTypes from 'analytics-types';
   import { getCardType } from 'common/card';
   import { getSubtextForInstrument } from 'subtext';
+  import { getProvider as getAppProvider } from 'common/apps';
+  import { getAnimationOptions } from 'svelte-utils';
 
   // Transitions
   import { fade } from 'svelte/transition';
@@ -68,13 +83,39 @@
     ADD_CARD: 'add-card',
   };
 
+  const apps = _Arr.map(getAppsForCards(), code => getAppProvider(code));
+  const appsAvailable = apps.length;
+
   const session = getSession();
   const isSavedCardsEnabled = shouldRememberCustomer();
 
   let currentView = Views.SAVED_CARDS;
+  let lastView;
+
+  // We're showing apps on both saved cards & new card screen,
+  // But if the user switches to new card screen from the saved cards screen,
+  // hide the apps. It clearly indicates that the user doesn't want to use apps.
+  let userWantsApps = true;
+  $: {
+    if (
+      savedCards.length &&
+      lastView === Views.SAVED_CARDS &&
+      currentView === Views.ADD_CARD
+    ) {
+      userWantsApps = false;
+    } else {
+      userWantsApps = true;
+    }
+    lastView = currentView;
+  }
 
   let tab = '';
   $: $cardTab = tab;
+
+  let showApps = false;
+  // None of the apps support EMI currently,
+  // Don't show it on anything except card tab.
+  $: showApps = tab === 'card' && appsAvailable && userWantsApps;
 
   let allSavedCards = [];
   let savedCards = [];
@@ -89,6 +130,7 @@
   // Refs
   let savedCardsView;
   let addCardView;
+  let selectedMethodError;
 
   onMount(() => {
     // Prefill
@@ -96,7 +138,29 @@
     $cardExpiry = session.get('prefill.card[expiry]') || '';
     $cardName = session.get('prefill.name') || '';
     $cardCvv = session.get('prefill.card[cvv]') || '';
+
+    methodErrors.subscribe(updateMethodError);
   });
+
+  function updateMethodError() {
+    // Either we got a new error from API or
+    // the user has changed the selected app.
+    // Show the error from API in the callout.
+    selectedMethodError = null;
+    if ($selectedApp) {
+      const payload = {
+        contact: $contact,
+        ...getPayload(),
+      };
+      const id = getIdForPaymentPayload(payload);
+      if (id && $methodErrors[id]) {
+        selectedMethodError = $methodErrors[id].description;
+      }
+    }
+  }
+
+  $: $selectedApp, updateMethodError();
+  $: $contact, updateMethodError();
 
   $: {
     // Track saved cards
@@ -111,6 +175,12 @@
           count: savedCardsCount,
         },
       });
+    }
+  }
+
+  $: {
+    if ($selectedCard) {
+      $selectedApp = null;
     }
   }
 
@@ -308,11 +378,27 @@
     currentView = view;
   }
 
+  function setSelectedApp(code) {
+    $selectedApp = code;
+    $selectedCard = null;
+  }
+
   export function getPayload() {
-    if (currentView === Views.ADD_CARD) {
+    if ($selectedApp) {
+      return getAppPayload();
+    } else if (currentView === Views.ADD_CARD) {
       return getAddCardPayload();
     } else {
       return getSavedCardPayload();
+    }
+  }
+
+  function getAppPayload() {
+    // TODO: Keep this mapping stored somewhere else when we add another app.
+    if ($selectedApp === 'google_pay_cards') {
+      return { method: 'app', provider: 'google_pay_cards' };
+    } else if ($selectedApp === 'cred') {
+      return getPayloadForCRED();
     }
   }
 
@@ -345,6 +431,10 @@
     });
 
     session.showEmiPlans('saved')(event.detail);
+  }
+
+  function onAddCardViewFocused() {
+    $selectedApp = null;
   }
 
   function onCardInput() {
@@ -467,6 +557,7 @@
     z-index: 1;
     line-height: 24px;
     margin-bottom: -12px;
+    position: relative; /* This is needed because the stupid network icon has position: absolute */
   }
 
   .saved-cards-icon {
@@ -485,7 +576,7 @@
   <Screen pad={false}>
     <div>
       {#if currentView === Views.ADD_CARD}
-        <div in:fade={{ duration: 100, y: 100 }}>
+        <div in:fade={getAnimationOptions({ duration: 100, y: 100 })}>
           {#if showSavedCardsCta}
             <div
               id="show-saved-cards"
@@ -495,8 +586,13 @@
                 class="cardtype"
                 class:multiple={savedCards && savedCards.length > 1}
                 cardtype={lastSavedCard && lastSavedCard.card.networkCode} />
-              <!-- LABEL: Use saved cards -->
-              {$t(USE_SAVED_CARDS_BTN)}
+              {#if showApps}
+                <!-- LABEL: Use saved cards on Razorpay -->
+                {$t(USE_SAVED_CARDS_ON_RZP_BTN)}
+              {:else}
+                <!-- LABEL: Use saved cards -->
+                {$t(USE_SAVED_CARDS_BTN)}
+              {/if}
             </div>
           {/if}
 
@@ -506,9 +602,40 @@
             </div>
           {/if}
 
+          {#if showApps}
+            <!-- LABEL: Cards Saved on Apps -->
+            <h3 class="pad">{$t(CARDS_SAVED_ON_APPS_LABEL)}</h3>
+            <div id="cards-saved-on-apps" role="list" class="border-list pad">
+              {#each apps as app}
+                <SlottedRadioOption
+                  ellipsis
+                  name={app.name}
+                  selected={$selectedApp === app.code}
+                  className="instrument"
+                  value={app.code}
+                  on:click={_ => setSelectedApp(app.code)}>
+                  <i slot="icon">
+                    <Icon icon={app.logo} alt="" />
+                  </i>
+                  <div slot="title">
+                    {getAppProviderName(app.code, $locale)}
+                  </div>
+                  <div slot="subtitle">
+                    {#if getAppProviderSubtext(app.code, $locale)}
+                      {getAppProviderSubtext(app.code, $locale)}
+                    {/if}
+                  </div>
+                </SlottedRadioOption>
+              {/each}
+            </div>
+            <!-- LABEL: Or, Enter card details -->
+            <h3 class="pad">{$t(ENTER_CARD_DETAILS_OPTION_LABEL)}</h3>
+          {/if}
           <AddCardView
             {tab}
             bind:this={addCardView}
+            faded={Boolean($selectedApp)}
+            on:focus={onAddCardViewFocused}
             on:cardinput={onCardInput} />
           {#if showEmiCta}
             <EmiActions
@@ -519,11 +646,41 @@
           {/if}
         </div>
       {:else}
-        <div in:fade={{ duration: 100 }}>
+        <div in:fade={getAnimationOptions({ duration: 100 })}>
           {#if shouldShowSubtext}
             <div class="pad instrument-subtext-description">
               {instrumentSubtext}
             </div>
+          {/if}
+
+          {#if showApps}
+            <!-- LABEL: Cards Saved on Apps -->
+            <h3 class="pad">{$t(CARDS_SAVED_ON_APPS_LABEL)}</h3>
+            <div id="cards-saved-on-apps" role="list" class="border-list pad">
+              {#each apps as app}
+                <SlottedRadioOption
+                  ellipsis
+                  name="application"
+                  selected={$selectedApp === app.code}
+                  className="instrument"
+                  value={app.code}
+                  on:click={_ => setSelectedApp(app.code)}>
+                  <i slot="icon">
+                    <Icon icon={app.logo} alt="" />
+                  </i>
+                  <div slot="title">
+                    {getAppProviderName(app.code, $locale)}
+                  </div>
+                  <div slot="subtitle">
+                    {#if getAppProviderSubtext(app.code, $locale)}
+                      {getAppProviderSubtext(app.code, $locale)}
+                    {/if}
+                  </div>
+                </SlottedRadioOption>
+              {/each}
+            </div>
+            <!-- LABEL: Cards Saved on Apps -->
+            <h3 class="pad">{$t(CARDS_SAVED_ON_RZP_LABEL)}</h3>
           {/if}
 
           <div id="saved-cards-container">
@@ -537,13 +694,16 @@
             id="show-add-card"
             class="text-btn left-card"
             on:click={showAddCardView}>
-            <!-- Add another card -->
+            <!-- LABEL: Add another card -->
             {$t(ADD_ANOTHER_CARD_BTN)}
           </div>
         </div>
       {/if}
     </div>
     <Bottom tab="card">
+      {#if selectedMethodError}
+        <Callout>{selectedMethodError}</Callout>
+      {/if}
       {#if isDCCEnabled()}
         <DynamicCurrencyView view={currentView} />
       {/if}

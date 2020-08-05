@@ -111,18 +111,6 @@ export const formatPayload = function(payload, razorpayInstance, params = {}) {
   }
 
   if (params.tez || params.gpay) {
-    if (
-      !(
-        razorpayInstance.paymentAdapters &&
-        (razorpayInstance.paymentAdapters.gpay ||
-          razorpayInstance.paymentAdapters['microapps.gpay'])
-      )
-    ) {
-      return razorpayInstance.emit(
-        'payment.error',
-        _.rzpError('GPay is not available')
-      );
-    }
     data['_[flow]'] = 'intent';
     data['_[app]'] = GOOGLE_PAY_PACKAGE_NAME;
   }

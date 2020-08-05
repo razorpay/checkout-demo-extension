@@ -5,6 +5,50 @@ import { displayAmount } from 'common/currency';
 
 let razorpayInstance, preferences;
 export const razorpayInstanceStore = writable();
+// We're going to remember payment errors in this variable.
+export const methodErrors = writable({});
+
+/**
+ * Returns an ID for a payment payload.
+ * @param data Payment payload
+ * @returns {string} id
+ */
+export function getIdForPaymentPayload(data) {
+  if (data.method === 'app' && data.provider) {
+    return data.method + '_' + data.provider;
+  }
+}
+
+/**
+ * Remember the error for a particular method.
+ * @param data Payment payload
+ * @param error Error payload from API
+ */
+export function setMethodErrorForPayload(data, error) {
+  const id = getIdForPaymentPayload(data);
+  if (!id) {
+    return;
+  }
+  methodErrors.update(obj => ((obj[id] = error), obj));
+}
+
+/**
+ * Returns whether or not we should show
+ * the default overlay error UI for
+ * a payment payload and error combination.
+ * @param data
+ * @param error
+ * @returns {boolean}
+ */
+export function shouldShowDefaultError(data, error) {
+  if (data?.method === 'app' && data.provider === 'cred') {
+    if (error?.source === 'customer') {
+      return false;
+    }
+  }
+
+  return true;
+}
 
 export function setRazorpayInstance(_razorpayInstance) {
   razorpayInstance = _razorpayInstance;
@@ -25,7 +69,7 @@ const IRCTC_KEYS = [
 
 export const isIRCTC = () => IRCTC_KEYS |> _Arr.contains(getOption('key'));
 
-export const getDisplayAmount = () => displayAmount(razorpayInstance);
+export const getDisplayAmount = am => displayAmount(razorpayInstance, am);
 export const getMerchantMethods = () => preferences.methods;
 export const getRecurringMethods = () => preferences.methods.recurring;
 export const getMerchantOrder = () => preferences.order;
@@ -38,6 +82,7 @@ export const getCheckoutConfig = () => preferences.checkout_config;
 const optionGetter = option => () => getOption(option);
 export const getOption = option => razorpayInstance.get(option);
 export const setOption = (option, value) => razorpayInstance.set(option, value);
+export const getCallbackUrl = optionGetter('callback_url');
 export const getCardFeatures = iin => razorpayInstance.getCardFeatures(iin);
 export const getCardCurrencies = ({ iin, tokenId, cardNumber }) =>
   razorpayInstance.getCardCurrencies({
@@ -141,6 +186,23 @@ export function isPartialPayment() {
   return preferences.order && preferences.order.partial_payment;
 }
 
+export function isASubscription(method = null) {
+  if (!preferences.subscription) {
+    return false;
+  }
+
+  // return true if no method is specified. This is a subscription session
+  if (!method) {
+    return true;
+  } else {
+    return preferences.subscription[method] !== false;
+  }
+}
+
+export function getSubscription() {
+  return preferences.subscription;
+}
+
 export function isRecurring() {
   if (
     getOption('prefill.method') === 'emandate' &&
@@ -177,6 +239,13 @@ export function shouldRememberCustomer() {
     return false;
   }
   return getOption('remember_customer');
+}
+
+export function shouldStoreCustomerInStorage() {
+  const globalCustomer = preferences && preferences.global;
+  const rememberCustomer = razorpayInstance.get().remember_customer;
+
+  return globalCustomer && rememberCustomer;
 }
 
 export function shouldSeparateDebitCard() {

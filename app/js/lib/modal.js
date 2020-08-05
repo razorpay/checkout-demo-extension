@@ -3,7 +3,7 @@
 
   var defaults = {
     escape: true,
-    animation: true,
+    animation: !window.matchMedia('(prefers-reduced-motion: reduce)').matches,
     backdropclose: true,
     onhide: null,
     onhidden: null,

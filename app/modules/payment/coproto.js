@@ -1,16 +1,15 @@
 import * as GPay from 'gpay';
-import * as strings from 'common/strings';
 import {
   parseUPIIntentResponse,
   didUPIIntentSucceed,
   upiBackCancel,
+  getAppFromPackageName,
 } from 'common/upi';
 import { androidBrowser } from 'common/useragent';
 import Track from 'tracker';
-import Razorpay from 'common/Razorpay';
 import Analytics from 'analytics';
-import { getSession } from 'sessionmanager';
 import { getBankFromCard } from 'common/bank';
+import * as Bridge from 'bridge';
 
 export const processOtpResponse = function(response) {
   var error = response.error;
@@ -49,6 +48,23 @@ export const processPaymentCreate = function(response) {
   }
 
   processCoproto.call(payment, response);
+};
+
+/**
+ * For async payments where callback_url needs to be sent (example: CRED),
+ * the status API will return a type: return coproto for some reason,
+ * this response is not handled on the SDK-side,
+ * so just consider what's present in the request content.
+ * Usually it will be the razorpay_payment_id & other things.
+ *
+ * @param response
+ * @returns {*}
+ */
+const handleAsyncStatusResponse = function(response) {
+  if (response.type === 'return') {
+    return response.request.content;
+  }
+  return response;
 };
 
 // returns true if coproto handled
@@ -153,9 +169,51 @@ var responseTypes = {
         url: request.url,
         callback: response => this.complete(response),
       })
-      .till(response => response && response.status);
+      .till(response => response && response.status, 10);
 
-    this.emit('upi.pending', fullResponse.data);
+    if (this.data.method === 'app') {
+      this.emit('app.pending', fullResponse);
+    } else {
+      this.emit('upi.pending', fullResponse.data);
+    }
+  },
+
+  application: function(request, fullResponse) {
+    var payment = this;
+
+    // Save request for later use (polling status)
+    payment.request = request;
+
+    // Send the coproto payload to SDK for further processing.
+    payment.emit('externalsdk.process', fullResponse);
+
+    // Set a listener to handle the intent response.
+    payment.on('app.intent_response', response => {
+      // Track intent response
+      Analytics.track('intent_response', { data: { response } });
+
+      // Check the intent response
+      if (response.provider === 'GOOGLE_PAY') {
+        if (response.data.apiResponse.type === 'google_pay_cards') {
+          if (response.resultCode === 0) {
+            // Payment was cancelled on Google Pay app.
+            payment.emit('cancel', GPay.googlePayCardsCancelPayload);
+
+            return;
+          }
+        }
+      }
+
+      // Starting polling API for payment status.
+      var request = payment.request;
+      payment.ajax = fetch
+        .jsonp({
+          url: request.url,
+          callback: response =>
+            payment.complete(handleAsyncStatusResponse(response)),
+        })
+        .till(response => response && response.status, 10);
+    });
   },
 
   gpay_inapp: function(request) {
@@ -164,7 +222,7 @@ var responseTypes = {
         url: request.url,
         callback: response => this.complete(response),
       })
-      .till(response => response && response.status);
+      .till(response => response && response.status, 10);
 
     this.emit('upi.pending', { flow: 'upi-intent' });
   },
@@ -193,14 +251,13 @@ var responseTypes = {
 
             // Since the method is not supported, remove it.
             if (error.code === error.NOT_SUPPORTED_ERR) {
-              const session = getSession();
+              Analytics.track('gpay:not_supported', {
+                data: {
+                  error,
+                },
+              });
 
-              if (session && session.upiTab) {
-                session.upiTab.$set({
-                  useWebPaymentsApi: false,
-                  selectedApp: 'gpay',
-                });
-              }
+              // TODO: (nice to have) Remove the Google Pay app from UI
             }
           }
 
@@ -224,6 +281,8 @@ var responseTypes = {
     }
   },
   intent: function(request, fullResponse) {
+    const CheckoutBridge = global.CheckoutBridge;
+
     var ra = ({ transactionReferenceId } = {}) =>
       fetch
         .jsonp({
@@ -237,17 +296,60 @@ var responseTypes = {
             this.complete(response);
           },
         })
-        .till(response => response && response.status);
+        .till(response => response && response.status, 10);
 
     var intent_url = (fullResponse.data || {}).intent_url;
 
-    this.on('upi.intent_success_response', data => {
+    if (this.data.method === 'app') {
+      this.emit('app.coproto_response', fullResponse);
+
+      if (Bridge.checkout.platform === 'ios') {
+        Bridge.checkout.callIos('callNativeIntent', {
+          intent_url,
+          shortcode: this.data.provider,
+        });
+      } else {
+        CheckoutBridge.callNativeIntent(intent_url);
+      }
+
+      this.on('app.intent_response', response => {
+        if (response.provider === 'CRED') {
+          if (response.data === 0) {
+            // Payment was cancelled on CRED app.
+            this.emit('cancel', {
+              '_[method]': 'app',
+              '_[provider]': 'cred',
+              '_[reason]': 'PAYMENT_CANCEL_ON_APP',
+            });
+
+            return; // Don't poll for status as the payment was cancelled.
+          }
+        }
+        this.ajax = fetch
+          .jsonp({
+            url: request.url,
+            callback: response =>
+              this.complete(handleAsyncStatusResponse(response)),
+          })
+          .till(response => response && response.status, 10);
+      });
+
+      return;
+    }
+
+    const startPolling = data => {
       if (data) {
         this.emit('upi.pending', { flow: 'upi-intent', response: data });
       }
 
       this.ajax = ra(data);
-    });
+    };
+
+    if (Bridge.checkout.platform === 'ios') {
+      startPolling();
+    } else {
+      this.on('upi.intent_success_response', startPolling);
+    }
 
     this.on('upi.intent_response', data => {
       if (data |> parseUPIIntentResponse |> didUPIIntentSucceed) {
@@ -259,7 +361,6 @@ var responseTypes = {
 
     this.emit('upi.coproto_response', fullResponse);
 
-    var CheckoutBridge = window.CheckoutBridge;
     if (CheckoutBridge && CheckoutBridge.callNativeIntent) {
       // If there's a UPI App specified, use it.
       if (this.upi_app) {
@@ -280,6 +381,17 @@ var responseTypes = {
       if (androidBrowser) {
         return responseTypes['gpay'].call(this, request, fullResponse);
       }
+    } else if (this.upi_app) {
+      // upi_app will only be set for UPI intent payments.
+      // Check for its existence as this coproto is also used for
+      // UPI QR payments on web, where this is not required.
+      const app = getAppFromPackageName(this.upi_app);
+
+      return Bridge.checkout.callIos('callNativeIntent', {
+        intent_url,
+        upi_app: this.upi_app,
+        shortcode: app.shortcode,
+      });
     }
   },
 

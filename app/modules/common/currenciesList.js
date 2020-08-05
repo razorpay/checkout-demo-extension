@@ -33,7 +33,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 80,
     min_auth_value: 100,
-    symbol: '$',
+    symbol: 'ARS',
     name: 'Argentine Peso',
   },
   AUD: {
@@ -41,7 +41,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 50,
     min_auth_value: 100,
-    symbol: '$',
+    symbol: 'A$',
     name: 'Australian Dollar',
   },
   AWG: {
@@ -49,7 +49,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 10,
     min_auth_value: 100,
-    symbol: 'ƒ',
+    symbol: 'Afl.',
     name: 'Aruban or Dutch Guilder',
   },
   BBD: {
@@ -57,7 +57,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 10,
     min_auth_value: 100,
-    symbol: '$',
+    symbol: 'Bds$',
     name: 'Barbadian or Bajan Dollar',
   },
   BDT: {
@@ -81,7 +81,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 10,
     min_auth_value: 100,
-    symbol: 'B$',
+    symbol: 'BND',
     name: 'Bruneian Dollar',
   },
   BOB: {
@@ -97,7 +97,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 10,
     min_auth_value: 100,
-    symbol: 'B$',
+    symbol: 'BSD',
     name: 'Bahamian Dollar',
   },
   BWP: {
@@ -129,7 +129,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 50,
     min_auth_value: 100,
-    symbol: '₣',
+    symbol: 'CHf',
     name: 'Swiss Franc',
   },
   CNY: {
@@ -145,7 +145,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 1000,
     min_auth_value: 100,
-    symbol: '$',
+    symbol: 'COL$',
     name: 'Colombian Peso',
   },
   CRC: {
@@ -161,7 +161,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 53,
     min_auth_value: 100,
-    symbol: '$',
+    symbol: '$MN',
     name: 'Cuban Peso',
   },
   CZK: {
@@ -177,7 +177,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 250,
     min_auth_value: 100,
-    symbol: 'kr',
+    symbol: 'DKK',
     name: 'Danish Krone',
   },
   DOP: {
@@ -185,7 +185,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 102,
     min_auth_value: 100,
-    symbol: '$',
+    symbol: 'RD$',
     name: 'Dominican Peso',
   },
   DZD: {
@@ -201,7 +201,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 35,
     min_auth_value: 100,
-    symbol: '£',
+    symbol: 'E£',
     name: 'Egyptian Pound',
   },
   ETB: {
@@ -241,7 +241,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 10,
     min_auth_value: 100,
-    symbol: '£',
+    symbol: 'GIP',
     name: 'Gibraltar Pound',
   },
   GMD: {
@@ -281,7 +281,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 49,
     min_auth_value: 100,
-    symbol: 'L',
+    symbol: 'HNL',
     name: 'Honduran Lempira',
   },
   HRK: {
@@ -337,7 +337,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 250,
     min_auth_value: 100,
-    symbol: '$',
+    symbol: 'J$',
     name: 'Jamaican Dollar',
   },
   KES: {
@@ -369,7 +369,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 10,
     min_auth_value: 100,
-    symbol: '$',
+    symbol: 'CI$',
     name: 'Caymanian Dollar',
   },
   KZT: {
@@ -417,7 +417,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 29,
     min_auth_value: 100,
-    symbol: 'L',
+    symbol: 'LSL',
     name: 'Basotho Loti',
   },
   MAD: {
@@ -433,7 +433,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 35,
     min_auth_value: 100,
-    symbol: 'L',
+    symbol: 'MDL',
     name: 'Moldovan Leu',
   },
   MKD: {
@@ -449,7 +449,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 1000,
     min_auth_value: 100,
-    symbol: 'K',
+    symbol: 'MMK',
     name: 'Burmese Kyat',
   },
   MNT: {
@@ -465,7 +465,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 17,
     min_auth_value: 100,
-    symbol: 'P',
+    symbol: 'MOP$',
     name: 'Macau Pataca',
   },
   MUR: {
@@ -473,7 +473,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 70,
     min_auth_value: 100,
-    symbol: 'Rs',
+    symbol: '₨',
     name: 'Mauritian Rupee',
   },
   MVR: {
@@ -529,7 +529,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 66,
     min_auth_value: 100,
-    symbol: 'C$',
+    symbol: 'NIO',
     name: 'Nicaraguan Cordoba',
   },
   NOK: {
@@ -537,7 +537,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 300,
     min_auth_value: 100,
-    symbol: 'kr',
+    symbol: 'NOK',
     name: 'Norwegian Krone',
   },
   NPR: {
@@ -553,7 +553,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 50,
     min_auth_value: 100,
-    symbol: '$',
+    symbol: 'NZ$',
     name: 'New Zealand Dollar',
   },
   PEN: {
@@ -569,7 +569,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 10,
     min_auth_value: 100,
-    symbol: 'K',
+    symbol: 'PGK',
     name: 'Papua New Guinean Kina',
   },
   PHP: {
@@ -585,7 +585,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 227,
     min_auth_value: 100,
-    symbol: 'Rs',
+    symbol: '₨',
     name: 'Pakistani Rupee',
   },
   QAR: {
@@ -625,7 +625,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 300,
     min_auth_value: 100,
-    symbol: 'kr',
+    symbol: 'SEK',
     name: 'Swedish Krona',
   },
   SGD: {
@@ -657,7 +657,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 100,
     min_auth_value: 100,
-    symbol: '£',
+    symbol: 'SS£',
     name: 'South Sudanese Pound',
   },
   SVC: {
@@ -665,7 +665,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 18,
     min_auth_value: 100,
-    symbol: '$',
+    symbol: '₡',
     name: 'Salvadoran Colon',
   },
   SZL: {
@@ -673,7 +673,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 29,
     min_auth_value: 100,
-    symbol: 'L',
+    symbol: 'E',
     name: 'Swazi Lilangeni',
   },
   THB: {
@@ -689,7 +689,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 14,
     min_auth_value: 100,
-    symbol: '$',
+    symbol: 'TT$',
     name: 'Trinidadian Dollar',
   },
   TZS: {
@@ -713,7 +713,7 @@ const currenciesList = {
     denomination: 100,
     min_value: 67,
     min_auth_value: 100,
-    symbol: '$',
+    symbol: '$U',
     name: 'Uruguayan Peso',
   },
   UZS: {

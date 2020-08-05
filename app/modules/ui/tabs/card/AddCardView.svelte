@@ -30,7 +30,7 @@
     isStrictlyRecurring,
     getCardFeatures,
   } from 'checkoutstore';
-  import { isAMEXEnabled } from 'checkoutstore/methods';
+  import { isAMEXEnabled, getCardNetworks } from 'checkoutstore/methods';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -45,7 +45,12 @@
   // Utils
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import { getIin, getCardDigits, getCardMetadata } from 'common/card';
+  import {
+    getIin,
+    getCardDigits,
+    getCardMetadata,
+    API_NETWORK_CODES_MAP,
+  } from 'common/card';
   import { DEFAULT_AUTH_TYPE_RADIO } from 'common/constants';
   import { Formatter } from 'formatter';
   import { isInstrumentValidForPayment } from 'configurability/validate';
@@ -73,6 +78,8 @@
   $: cardNumberHelpText = showCardUnsupported
     ? $t(CARD_NUMBER_HELP_UNSUPPORTED)
     : undefined;
+
+  export let faded = false;
 
   function setCardNumberValidity(valid) {
     if (numberField) {
@@ -225,7 +232,11 @@
 
     getCardFeatures(iin)
       .then(features => {
-        let validationPromises = [flowChecker(features), validateCardNumber()];
+        let validationPromises = [
+          flowChecker(features),
+          validateCardNumber(),
+          getCardMetadata(iin),
+        ];
 
         /**
          * If there's a card/emi instrument, we check for its validity.
@@ -244,23 +255,60 @@
 
         return Promise.all(validationPromises);
       })
-      .then(([isFlowValid, isCardNumberValid, isInstrumentValid]) => {
-        showCardUnsupported = !isInstrumentValid;
-        setCardNumberValidity(
-          isCardNumberValid && isFlowValid && isInstrumentValid
-        );
+      .then(
+        ([isFlowValid, isCardNumberValid, cardMetaData, isInstrumentValid]) => {
+          /**
+           * This variable tells whether the network of the current card
+           * is enabled for the merchant.
+           * Assumed true by default so that we let the payment go through
+           * in case we don't fail to validate.
+           */
+          let isCurrentCardsNetworkEnabledForMerchant = true;
 
-        // Track validity if instrument was used
-        if ($methodInstrument) {
-          Analytics.track('instrument:input:validate', {
-            data: {
-              method: $methodInstrument.method,
-              instrument: $methodInstrument,
-              valid: isInstrumentValid,
-            },
-          });
+          // Find the entry in API_NETWORK_CODES_MAP
+          let networkEntry = _Arr.find(
+            _Obj.entries(API_NETWORK_CODES_MAP),
+            map => map[1] === cardMetaData.network
+          );
+
+          if (networkEntry) {
+            const apiNetwork = networkEntry[0]; // Card's network in API-representation
+            const enabledNetworks = getCardNetworks(); // Merchant's enabled networks
+
+            /**
+             * getCardNetworks might return an empty object because API sometimes does not send
+             * methods.card_networks for whatever reason
+             */
+            if (!_.isUndefined(enabledNetworks[apiNetwork])) {
+              isCurrentCardsNetworkEnabledForMerchant = Boolean(
+                enabledNetworks[apiNetwork]
+              );
+            }
+          }
+
+          // Card is unsupported if validation on instrument fails or if network is disabled for merchant
+          showCardUnsupported =
+            !isInstrumentValid || !isCurrentCardsNetworkEnabledForMerchant;
+
+          setCardNumberValidity(
+            isCardNumberValid &&
+              isFlowValid &&
+              isInstrumentValid &&
+              isCurrentCardsNetworkEnabledForMerchant
+          );
+
+          // Track validity if instrument was used
+          if ($methodInstrument) {
+            Analytics.track('instrument:input:validate', {
+              data: {
+                method: $methodInstrument.method,
+                instrument: $methodInstrument,
+                valid: isInstrumentValid,
+              },
+            });
+          }
         }
-      })
+      )
       .catch(_Func.noop); // IIN changed, do nothing
   }
 
@@ -373,9 +421,13 @@
     padding-left: 20px;
     width: 33.33%;
   }
+
+  .faded {
+    opacity: 0.5;
+  }
 </style>
 
-<div class="pad" id="add-card-container">
+<div class="pad" id="add-card-container" class:faded>
   <div class="row card-fields">
     <div class="two-third">
       <NumberField
@@ -386,6 +438,7 @@
         helpText={cardNumberHelpText}
         recurring={isRecurring()}
         type={$cardType}
+        on:focus
         on:filled={_ => handleFilled('numberField')}
         on:autocomplete={trackCardNumberAutoFilled}
         on:input={handleCardInput}
@@ -398,6 +451,7 @@
           name="card[expiry]"
           bind:value={$cardExpiry}
           bind:this={expiryField}
+          on:focus
           on:blur={trackExpiryFilled}
           on:filled={_ => handleFilled('expiryField')} />
       </div>
@@ -411,6 +465,7 @@
         readonly={nameReadonly}
         bind:value={$cardName}
         bind:this={nameField}
+        on:focus
         on:blur={trackNameFilled} />
     </div>
     {#if !hideExpiryCvvFields}
@@ -420,6 +475,7 @@
           length={cvvLength}
           bind:value={$cardCvv}
           bind:this={cvvField}
+          on:focus
           on:blur={trackCvvFilled} />
       </div>
     {/if}
@@ -434,6 +490,7 @@
             id="save"
             name="save"
             value="1"
+            on:focus
             on:change={trackRememberChecked}
             bind:checked={$remember} />
           <span class="checkbox" />

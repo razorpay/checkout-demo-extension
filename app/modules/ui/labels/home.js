@@ -1,3 +1,5 @@
+export const COUNTRY_LABEL = 'home.country_label';
+export const COUNTRY_HELP_TEXT = 'home.country_help_text';
 export const CONTACT_LABEL_REQUIRED = 'home.contact_label_required';
 export const CONTACT_LABEL_OPTIONAL = 'home.contact_label_optional';
 export const CONTACT_HELP_TEXT = 'home.contact_help_text';
@@ -58,3 +60,6 @@ export const RECURRING_CREDIT_DEBIT_CALLOUT =
   'callouts.recurring.credit_debit_callout';
 
 export const SECURED_BY_MESSAGE = 'home.secured_by_message';
+
+export const COUNTRY_SEARCH_PLACEHOLDER = 'home.country_search_placeholder';
+export const COUNTRY_SEARCH_ALL = 'home.country_search_all';

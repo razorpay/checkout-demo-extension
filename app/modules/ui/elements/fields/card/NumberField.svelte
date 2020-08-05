@@ -63,9 +63,11 @@
       /**
        * Focus on expiry elem if we have the entire card number
        * and the cursor is at the end of the input field.
+       * Also focus on expiry elem does not occur if card length is zero.
        */
       if (
         value.length === caretPosition &&
+        value.length !== 0 &&
         document.activeElement === field.input
       ) {
         if (type !== 'maestro') {
@@ -121,6 +123,7 @@
     handleFocus
     handleInput
     bind:this={field}
+    on:focus
     on:blur
     on:autocomplete
     on:input={handleInput}

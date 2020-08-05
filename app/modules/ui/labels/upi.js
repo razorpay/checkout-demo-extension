@@ -2,7 +2,6 @@ export const UPI_INTENT_BLOCK_HEADING = 'upi.intent_block_heading';
 export const UPI_REDIRECT_TO_APP = 'upi.redirect_to_app';
 export const UPI_RECOMMENDED = 'upi.recommended';
 export const UPI_SHOW_OTHER_APPS = 'upi.show_other_apps';
-export const UPI_GPAY_BLOCK_HEADING = 'upi.gpay_block_heading';
 export const UPI_COLLECT_BLOCK_HEADING = 'upi.collect_block_heading';
 export const UPI_COLLECT_BLOCK_SUBHEADING = 'upi.collect_block_subheading';
 export const UPI_COLLECT_NEW_VPA_HELP = 'upi.collect_new_vpa_help';
@@ -12,11 +11,21 @@ export const NEW_VPA_TITLE_LOGGED_OUT = 'upi.new_vpa_title_logged_out';
 export const NEW_VPA_TITLE_LOGGED_IN = 'upi.new_vpa_title_logged_in';
 export const NEW_VPA_SUBTITLE = 'upi.new_vpa_subtitle';
 export const NEW_VPA_SUBTITLE_UPI_OTM = 'upi.new_vpa_subtitle_upi_otm';
-export const GPAY_WEB_API_TITLE = 'upi.gpay_web_api_title';
+export const UPI_OTM_CALLOUT = 'upi.upi_otm_callout';
 export const QR_BLOCK_HEADING = 'upi.qr_block_heading';
 export const SHOW_QR_CODE = 'upi.show_qr_code';
 export const SCAN_QR_CODE = 'upi.scan_qr_code';
 export const UPI_DOWNTIME_TEXT = 'upi.downtime_text';
+export const UPI_RECURRING_SUBSCRIPTION_CALLOUT =
+  'upi.recurring_subscription_callout';
+export const UPI_RECURRING_CAW_CALLOUT_ALL_DATA =
+  'upi.recurring_caw_callout_all_data';
+export const UPI_RECURRING_CAW_CALLOUT_NO_NAME =
+  'upi.recurring_caw_callout_no_name';
+export const UPI_RECURRING_CAW_CALLOUT_NO_NAME_NO_FREQUENCY =
+  'upi.recurring_caw_callout_no_name_no_frequency';
+export const UPI_RECURRING_CAW_CALLOUT_NO_FREQUENCY =
+  'upi.recurring_caw_callout_no_frequency';
 export const OMNI_BLOCK_HEADING = 'upi.omni_block_heading';
 export const OMNI_GPAY_NUMBER = 'upi.omni_gpay_number';
 export const OMNI_ENTER_NUMBER = 'upi.omni_enter_number';

@@ -5,39 +5,19 @@ var Store = params.Store;
 var MethodStore = params.MethodStore;
 var isMethodEnabled = MethodStore.isMethodEnabled;
 var emiBanks = MethodStore.getEMIBanks();
-var emiCsv = Object.keys(emiBanks).join(', ');
 
 var cta = params.cta;
 
 var o = _.get;
-var address = o('address');
-var method = _.methods;
-var wallet = MethodStore.getWallets();
-var icons = _.themeMeta.icons;
 var html = function(html){return html.replace(/<[^>]*>?/g, "")};
 var attr = function(attr){return attr.replace(/"/g,'')};
-var order = _.order || {};
-var preferences = _.preferences;
-var gpay_omnichannel = preferences.features && preferences.features.google_pay_omnichannel;
-var invoice = _.invoice;
 
 var amount;
 var amount_figure = _.formatAmountWithCurrency(o('amount'));
-var firstPaymentMinAmount = _.formatAmountWithCurrency(order.first_payment_min_amount);
 if(o('display_currency'))
   amount = discreet.currencies[o('display_currency')] + html(o('display_amount'));
 else
   amount = amount_figure;
-
-var prefill_email = attr(o('prefill.email'));
-var prefill_contact = attr(o('prefill.contact'));
-var prefill_name = attr(o('prefill.name'));
-
-var contact_readonly = o('readonly.contact') && prefill_contact;
-var email_readonly = o('readonly.email') && prefill_email;
-var name_readonly = o('readonly.name') && prefill_name;
-
-var subscription_will_refund = _.subscription && (_.subscription.type === 0);
 `
 <div id="container" class="mfix animations" tabIndex="0">
   <div id="backdrop"></div>
@@ -106,14 +86,6 @@ var subscription_will_refund = _.subscription && (_.subscription.type === 0);
               `?`
               `?isMethodEnabled('emi') && emiBanks.BAJAJ`
                 <div class="tab-content showable screen" id="form-emi"></div>
-              `?`
-              `?(wallet && wallet.length)`
-                <div class="tab-content showable screen pad" id="form-wallet">
-                  <div id="wallets">
-                      <div id="wallet-svelte-wrap">
-                    </div>
-                  </div>
-                </div>
               `?`
             </div>
             <div id="bottom"></div>

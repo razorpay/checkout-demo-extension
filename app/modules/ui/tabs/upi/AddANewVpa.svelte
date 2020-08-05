@@ -14,6 +14,7 @@
   import { getSession } from 'sessionmanager';
   import { hasFeature, getPrefilledVPA } from 'checkoutstore';
   import { VPA_REGEX } from 'common/constants';
+  import { getAnimationOptions } from 'svelte-utils';
 
   import {
     UPI_COLLECT_NEW_VPA_HELP,
@@ -30,6 +31,7 @@
   export let focusOnCreate = false;
   export let customer;
   export let paymentMethod = 'upi';
+  export let recurring = false;
 
   // Refs
   export let vpaField = null;
@@ -152,7 +154,7 @@
   </div>
   <!-- LABEL: Google Pay, BHIM, PhonePe & more -->
   <div slot="subtitle">
-    {#if paymentMethod === 'upi_otm'}
+    {#if paymentMethod === 'upi_otm' || recurring}
       {$t(NEW_VPA_SUBTITLE_UPI_OTM)}
     {:else}{$t(NEW_VPA_SUBTITLE)}{/if}
   </div>
@@ -164,7 +166,7 @@
     {#if selected}
       <div
         id={'user-new-vpa-container-' + paymentMethod}
-        transition:slide={{ duration: 200 }}>
+        transition:slide={getAnimationOptions({ duration: 200 })}>
         <!-- LABEL: Please enter a valid VPA of the form username@bank -->
         <!-- LABEL: Enter your UPI ID -->
         <Field

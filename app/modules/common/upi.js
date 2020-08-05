@@ -23,6 +23,19 @@ export function getPackageNameFromShortcode(shortcode) {
   }
 }
 
+/**
+ * Returns the app corresponding to the package name.
+ * @param {string} shortcode
+ *
+ * @returns {string | undefined}
+ */
+export function getAppFromPackageName(packageName) {
+  const app =
+    getAllApps() |> _Arr.find(app => app.package_name === packageName);
+
+  return app;
+}
+
 const UPI_APPS = {
   /**
    * Preferred apps.
@@ -44,16 +57,20 @@ const UPI_APPS = {
       package_name: 'com.phonepe.app',
       app_icon: 'https://cdn.razorpay.com/checkout/phonepe.png',
       shortcode: 'phonepe',
+      app_name: 'PhonePe',
     },
     {
       name: 'PayTM',
       app_name: 'PayTM UPI',
       package_name: 'net.one97.paytm',
       shortcode: 'paytm',
+      app_icon: 'https://cdn.razorpay.com/app/paytm.svg',
     },
     {
       package_name: 'in.org.npci.upiapp',
       shortcode: 'bhim',
+      app_icon: 'https://cdn.razorpay.com/app/bhim.svg',
+      app_name: 'Bhim',
     },
   ],
 
@@ -423,7 +440,7 @@ export const isPreferredApp = packageName =>
 
 /**
  * Returns a list of sorted apps to use.
- * @param {Array} allApps `upi_intents_data` from handleMessage, sent by Android SDK
+ * @param {Array} allApps `getUPIIntentApps().filtered`
  *
  * @return {Array}
  */
@@ -435,6 +452,21 @@ export const getSortedApps = allApps => {
 
   // Get list of package names
   let usableApps = getUsableApps();
+
+  _Arr.loop(allApps, (app, i) => {
+    const appConfig = _Arr.find(usableApps, usableApp => {
+      if (app.package_name) {
+        return app.package_name === usableApp.package_name;
+      } else if (app.shortcode) {
+        return app.shortcode === usableApp.shortcode;
+      }
+      return false;
+    });
+
+    if (appConfig) {
+      allApps[i] = _Obj.extend(allApps[i], appConfig);
+    }
+  });
 
   // Filter out apps which are installed, but the user isn't registered on them.
   // The check is only performed if verify_registration is true for the app.
@@ -464,13 +496,6 @@ export const getSortedApps = allApps => {
       usablePackages.indexOf(a.package_name) -
       usablePackages.indexOf(b.package_name)
   );
-
-  // Transform apps to set new name (eg: WhatsApp => WhatsApp UPI).
-  _Arr.loop(allApps, (app, i) => {
-    const index = usablePackages.indexOf(app.package_name);
-
-    allApps[i] = _Obj.extend(allApps[i], usableApps[index]);
-  });
 
   return allApps;
 };
