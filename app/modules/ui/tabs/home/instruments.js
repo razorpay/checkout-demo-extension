@@ -9,6 +9,7 @@ import { getIndividualInstruments } from 'configurability/ungroup';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { hashFnv32a } from 'checkoutframe/personalization/utils';
+import { isMethodUsable } from 'checkoutstore/methods';
 
 function generateBasePreferredBlock(preferred) {
   const preferredBlock = createBlock('rzp.preferred', {
@@ -186,9 +187,6 @@ export function setBlocks(
   const addPreferredInstrumentsBlock =
     !parsedConfig._meta.hasRestrictedInstruments && show_default_blocks;
 
-  // Get all hidden method-instruments
-  const hiddenMethods = parsedConfig.display.hide.methods;
-
   let allBlocks = parsedConfig.display.blocks;
 
   if (addPreferredInstrumentsBlock) {
@@ -203,7 +201,7 @@ export function setBlocks(
       let filteredPreferredInstruments = _Arr.filter(
         preferredInstruments,
         preferredInstrument => {
-          return !_Arr.contains(hiddenMethods, preferredInstrument.method);
+          return isMethodUsable(preferredInstrument.method);
         }
       );
 
