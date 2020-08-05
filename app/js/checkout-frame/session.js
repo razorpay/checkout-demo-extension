@@ -1994,7 +1994,7 @@ Session.prototype = {
 
     this.topBar.setLogged(false);
 
-    CustomerStore.customer.set({});
+    CustomerStore.customer.set(customer);
     if (this.svelteCardTab) {
       this.svelteCardTab.showLandingView();
     }
