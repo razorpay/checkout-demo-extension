@@ -1,3 +1,5 @@
+/* global Set */
+
 import {
   isRecurring,
   isInternational,
@@ -142,7 +144,11 @@ const ALL_METHODS = {
   upi() {
     const isAnyUpiFlowEnabled = Object.keys(UPI_METHODS).some(isUPIFlowEnabled);
     if (isASubscription()) {
-      return isASubscription('upi') && isAnyUpiFlowEnabled;
+      return (
+        isASubscription('upi') &&
+        getRecurringMethods()?.upi &&
+        isAnyUpiFlowEnabled
+      );
     } else if (isRecurring()) {
       return getRecurringMethods()?.upi && isAnyUpiFlowEnabled;
     }
@@ -291,7 +297,11 @@ export function isContactRequiredForEMI(bank, cardType) {
  * @returns {Array} of enabled methods
  */
 export function getEnabledMethods() {
-  const merchantOrderMethod = getMerchantOrder()?.method;
+  const merchantOrder = getMerchantOrder();
+  let merchantOrderMethod = merchantOrder?.method;
+  if (merchantOrder && isRecurring() && getAmount()) {
+    merchantOrderMethod = merchantOrder.method || 'card';
+  }
   let methodsToConsider = ALL_METHODS |> _Obj.keys;
 
   if (merchantOrderMethod) {

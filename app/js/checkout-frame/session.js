@@ -123,16 +123,18 @@ function improvisePrefilledContact(session) {
   var prefilledContact = session.get('prefill.contact');
   var prefilledEmail = session.get('prefill.email');
 
-  var storedUserDetails = discreet.ContactStorage.get();
+  if (Store.shouldStoreCustomerInStorage()) {
+    var storedUserDetails = discreet.ContactStorage.get();
 
-  // Pick details from storage if not given in prefill
-  if (!prefilledContact && storedUserDetails.contact) {
-    prefilledContact = storedUserDetails.contact;
-    Analytics.setMeta('prefilledFromStorage.contact', true);
-  }
-  if (!prefilledEmail && storedUserDetails.email) {
-    prefilledEmail = storedUserDetails.email;
-    Analytics.setMeta('prefilledFromStorage.email', true);
+    // Pick details from storage if not given in prefill
+    if (!prefilledContact && storedUserDetails.contact) {
+      prefilledContact = storedUserDetails.contact;
+      Analytics.setMeta('prefilledFromStorage.contact', true);
+    }
+    if (!prefilledEmail && storedUserDetails.email) {
+      prefilledEmail = storedUserDetails.email;
+      Analytics.setMeta('prefilledFromStorage.email', true);
+    }
   }
 
   if (prefilledContact) {
@@ -1986,7 +1988,7 @@ Session.prototype = {
 
     this.topBar.setLogged(false);
 
-    CustomerStore.customer.set({});
+    CustomerStore.customer.set(customer);
     if (this.svelteCardTab) {
       this.svelteCardTab.showLandingView();
     }
@@ -2507,7 +2509,12 @@ Session.prototype = {
       });
     };
 
-    if (this.screen === 'otp' && thisTab !== 'card' && thisTab !== 'emi') {
+    if (
+      this.screen === 'otp' &&
+      thisTab !== 'card' &&
+      thisTab !== 'upi' &&
+      thisTab !== 'emi'
+    ) {
       tab = thisTab;
     } else if (
       (thisTab === 'qr' && this.r._payment) ||
@@ -2735,7 +2742,32 @@ Session.prototype = {
 
     if (tab === 'upi') {
       this.updateCustomerInStore();
-      discreet.upiTab.render();
+
+      // Enforce login flow for UPI Recurring subscriptions
+      if (Store.isASubscription() && !customer.logged) {
+        this.otpView.updateScreen({
+          maxlength: 6,
+        });
+
+        var self = this;
+        var customer = self.getCurrentCustomer();
+
+        this.topBar.setTitleOverride('otp', 'text', 'upi');
+
+        self.commenceOTP('otp_sending_generic', '', {
+          phone: getPhone(),
+        });
+
+        self.getCurrentCustomer().createOTP(function() {
+          Analytics.track('subscriptions_upi:access:otp:ask');
+          askOTP(self.otpView, 'otp_proceed_with_upi_subscription', true, {
+            phone: getPhone(),
+          });
+          self.updateCustomerInStore();
+        });
+      } else {
+        discreet.upiTab.render();
+      }
     }
 
     if (tab === 'upi_otm') {
@@ -2747,7 +2779,7 @@ Session.prototype = {
       this.emandateView.onShown();
     }
 
-    if (tab === '' && (this.tab === 'upi' || this.tab === 'upi_otm')) {
+    if (tab === '' && (this.screen === 'upi' || this.screen === 'upi_otm')) {
       if (this.upiTab.onBack()) {
         return;
       }
@@ -2771,7 +2803,15 @@ Session.prototype = {
       this.showCardTab(tab);
       cardTab.setEmiPlansCta(this.screen, tab);
     } else {
-      this.setScreen(tab);
+      if (
+        !(
+          tab === 'upi' &&
+          Store.isASubscription() &&
+          !this.getCurrentCustomer().logged
+        )
+      ) {
+        this.setScreen(tab);
+      }
       if (ua_iPhone) {
         Razorpay.sendMessage({ event: 'blur' });
       }
@@ -2919,6 +2959,14 @@ Session.prototype = {
       };
     };
 
+    var getBankEMICode = function(issuer, type) {
+      // EMI codes are different from bank codes and have _DC at the end.
+      if (type === 'debit' && !_Str.endsWith(issuer, '_DC')) {
+        return issuer + '_DC';
+      }
+      return issuer;
+    };
+
     if (type === 'new') {
       return function(e) {
         self.topBar.resetTitleOverride('emiplans');
@@ -2926,6 +2974,9 @@ Session.prototype = {
         var bank = self.emiPlansForNewCard && self.emiPlansForNewCard.code;
         var cardIssuer = bank.split('_')[0];
         var cardType = _Str.endsWith(bank, '_DC') ? 'debit' : 'credit';
+
+        bank = getBankEMICode(bank, cardType);
+
         var contactRequiredForEMI = MethodStore.isContactRequiredForEMI(
           bank,
           cardType
@@ -2965,7 +3016,7 @@ Session.prototype = {
 
               self.switchTab('card');
               self.setScreen('card');
-              self.svelteCardTab.showAddCardView();
+              self.svelteCardTab.showLandingView();
             },
 
             select: function(value, contact) {
@@ -3015,6 +3066,9 @@ Session.prototype = {
         var bank = $trigger.attr('data-bank');
         var cardIssuer = bank;
         var cardType = $trigger.attr('data-card-type');
+
+        bank = getBankEMICode(bank, cardType);
+
         var contactRequiredForEMI = MethodStore.isContactRequiredForEMI(
           bank,
           cardType
@@ -3582,7 +3636,7 @@ Session.prototype = {
 
     var isCardlessEmi = this.payload && this.payload.method === 'cardless_emi';
 
-    if (!isCardlessEmi) {
+    if (!isCardlessEmi && this.tab !== 'upi') {
       // card tab only past this
       // card filled by logged out user + remember me
       if (this.payload) {
@@ -3671,6 +3725,19 @@ Session.prototype = {
             data.lender_branding_url;
 
           this.showCardlessEmiPlans();
+        }
+      };
+    }
+
+    if (this.tab === 'upi') {
+      callback = function(msg, data) {
+        if (msg) {
+          Analytics.track('behav:otp:incorrect');
+          askOTP(this.otpView, msg, true);
+          this.updateCustomerInStore();
+        } else {
+          discreet.upiTab.render();
+          this.setScreen('upi');
         }
       };
     }
@@ -4192,10 +4259,8 @@ Session.prototype = {
       data.method = 'wallet';
       data.wallet = 'paypal';
     }
-
-    if (this.get('address') && !Store.isPartialPayment()) {
+    if (Store.isAddressEnabled()) {
       var notes = (data.notes = clone(this.get('notes')) || {});
-
       // Add address
       notes.address = storeGetter(HomeScreenStore.address);
       notes.pincode = storeGetter(HomeScreenStore.pincode);

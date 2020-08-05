@@ -818,6 +818,8 @@ export default {
         'Looking for {provider} account associated with {phone}',
       incorrect_otp_retry: 'Entered OTP was incorrect. Re-enter to proceed.',
       loading: 'Loading...',
+      otp_proceed_with_upi_subscription:
+        'Enter OTP sent to {phone} to proceed with the subscription',
       otp_resent_generic: 'OTP Resent',
       otp_resent_successful: 'OTP has been resent successfully.',
       otp_sending_generic: 'Sending OTP to {phone}',

@@ -548,6 +548,11 @@ Payment.prototype = {
     if (data.method === 'emandate' && data.bank === 'UTIB') {
       return;
     }
+    //Use create/checkout route when auth_type is not passed,
+    // at the time of payment creation payload for emandate.
+    if (data.method === 'emandate' && !data.auth_type) {
+      return;
+    }
 
     // else make ajax request
 

@@ -84,8 +84,12 @@
   }
 
   function getDetailsForNetbankingInstrument(instrument, locale) {
-    // TODO: Add fallback
-    const bankName = getLongBankName(individualInstrument.bank, locale);
+    const banks = getBanks();
+    const bankName = getLongBankName(
+      individualInstrument.bank,
+      locale,
+      banks[instrument.bank]
+    );
     return {
       title: getInstrumentTitle('netbanking', bankName, locale),
       icon: getBankLogo(individualInstrument.bank),

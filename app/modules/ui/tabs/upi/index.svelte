@@ -311,9 +311,14 @@
   }
 
   $: {
-    tokens = filterUPITokens(_Obj.getSafely($customer, 'tokens.items', []));
-    tokens = getAllowedPSPs[method](tokens);
-    setDefaultTokenValue();
+    // BE does not support saved vpa tokens for recurring payments
+    // conditional support might be added later
+    if (!isRecurring()) {
+      tokens = filterUPITokens(_Obj.getSafely($customer, 'tokens.items', []));
+      tokens = getAllowedPSPs[method](tokens);
+
+      setDefaultTokenValue();
+    }
   }
 
   function determineCtaVisibility() {

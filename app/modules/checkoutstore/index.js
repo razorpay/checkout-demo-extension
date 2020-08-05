@@ -243,6 +243,13 @@ export function shouldRememberCustomer() {
   return getOption('remember_customer');
 }
 
+export function shouldStoreCustomerInStorage() {
+  const global = preferences && preferences.global;
+  const rememberCustomer = razorpayInstance.get().remember_customer;
+
+  return global && rememberCustomer;
+}
+
 export function shouldSeparateDebitCard() {
   return getOption('theme.debit_card');
 }

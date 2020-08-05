@@ -1,18 +1,14 @@
 <script>
   // Svelte imports
   import { createEventDispatcher, onMount } from 'svelte';
-
   // UI imports
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
-
   // Utils imports
   import { formatAmountWithSymbol } from 'common/currency';
   import { getSession } from 'sessionmanager';
-
   // i18n
   import { t, locale } from 'svelte-i18n';
   import { formatTemplateWithLocale } from 'i18n';
-
   import {
     AMOUNT_LABEL,
     LOADING_MESSAGE,
@@ -22,20 +18,16 @@
     GST_LABEL,
     TOTAL_CHARGES_LABEL,
   } from 'ui/labels/fees';
-
   // Props
   export let loading = true;
   export let feeBreakup = null;
   export let bearer = null;
   export let paymentData;
-
   const entries = _Obj.entries;
   const contains = _Arr.contains;
-
   const dispatch = createEventDispatcher();
   const session = getSession();
   const fee_label = session.get('fee_label');
-
   const allowedKeys = ['original_amount', 'razorpay_fee', 'tax', 'amount'];
   const displayLabels = {
     original_amount: AMOUNT_LABEL,
@@ -43,28 +35,22 @@
     tax: GST_LABEL,
     amount: TOTAL_CHARGES_LABEL,
   };
-
   onMount(() => {
     fetchFees(paymentData);
   });
-
   export function onSuccess(response) {
     feeBreakup = response.display;
     loading = false;
     bearer = response.input;
   }
-
   export function onError(response) {
     session.showLoadError(response.error.description, response.error);
     dispatch('error', response.error.description);
   }
-
   export function fetchFees(paymentData) {
     paymentData.amount = session.get('amount');
     paymentData.currency = session.get('currency');
-
     loading = true;
-
     session.r
       .calculateFees(paymentData)
       .then(onSuccess)

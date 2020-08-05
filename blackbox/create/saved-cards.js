@@ -75,6 +75,9 @@ module.exports = function(testFeatures) {
     })
   )('Saved Cards tests', ({ preferences, title, options }) => {
     test(title, async () => {
+      // Enable card saving
+      preferences.options.remember_customer = true;
+
       if (personalization) {
         if (preferences.customer) {
           preferences.customer.contact = '+918888888881';
