@@ -242,10 +242,10 @@ export function shouldRememberCustomer() {
 }
 
 export function shouldStoreCustomerInStorage() {
-  const global = preferences && preferences.global;
+  const globalCustomer = preferences && preferences.global;
   const rememberCustomer = razorpayInstance.get().remember_customer;
 
-  return global && rememberCustomer;
+  return globalCustomer && rememberCustomer;
 }
 
 export function shouldSeparateDebitCard() {
