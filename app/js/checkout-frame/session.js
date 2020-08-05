@@ -5191,6 +5191,42 @@ Session.prototype = {
       this.set('retry', false);
     }
 
+    // Track prefill validity before setting customer
+    var prefilledContact = session_options['prefill.contact'];
+    var prefilledEmail = session_options['prefill.email'];
+
+    if (prefilledContact) {
+      var isContactValid = true;
+
+      if (prefilledContact.indexOf('+91') === 0) {
+        isContactValid = Constants.PHONE_REGEX_INDIA.test(
+          prefilledContact.replace('+91', '')
+        );
+      } else {
+        isContactValid = Constants.CONTACT_REGEX.test(prefilledContact);
+      }
+
+      if (!isContactValid) {
+        Analytics.track('prefill:contact:invalid', {
+          data: {
+            contact: prefilledContact,
+          },
+        });
+      }
+    }
+
+    if (prefilledEmail) {
+      var isEmailValid = Constants.EMAIL_REGEX.test(prefilledEmail);
+
+      if (!isEmailValid) {
+        Analytics.track('prefill:email:invalid', {
+          data: {
+            email: prefilledEmail,
+          },
+        });
+      }
+    }
+
     /* Used previously logged in customer details and saved card tokens */
     if (saved_customer) {
       /* saved card details take priority over prefill */
