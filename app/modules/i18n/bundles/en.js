@@ -725,6 +725,9 @@ export default {
     complete_payment_on_app: 'Please complete the payment on the {app}',
     confirm_cancel:
       'Your payment is ongoing. Are you sure you want to cancel the payment?',
+    downtime_single_method: '{method} is facing temporary issues right now.',
+    downtime_multiple_methods:
+      '{method} are facing temporary issues right now.',
     error_handling_request: 'There was an error in handling your request.',
     frequently_used_config_title: 'Frequently used methods',
     go_to_payment: 'Go to payment',
@@ -745,6 +748,7 @@ export default {
     retry: 'Retry',
     search_no_results: 'No results for "{query}"',
     search_results_label: 'Results',
+    select_another_method: 'Please select another method.',
   },
   nach: {
     allowed_formats_info:

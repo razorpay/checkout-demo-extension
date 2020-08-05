@@ -25,6 +25,7 @@ import {
   getRawMethodDescription,
   getWalletName,
   formatTemplateWithLocale,
+  formatMessageWithLocale,
 } from 'i18n';
 
 import {
@@ -320,13 +321,16 @@ export function getMethodDowntimeDescription(
   locale,
   { availableMethods = [], downMethods = [] } = {}
 ) {
-  const prefix = getTranslatedMethodPrefix(method);
+  const prefix = getTranslatedMethodPrefix(method, locale);
   const pluralPrefix = /s$/i.test(prefix);
 
-  // TODO: use templates
-  const isOrAre = pluralPrefix ? 'are' : 'is';
+  const templateLabel = pluralPrefix
+    ? 'misc.downtime_multiple_methods'
+    : 'misc.downtime_single_method';
 
-  const sentences = [`${prefix} ${isOrAre} facing temporary issues right now.`];
+  const sentences = [
+    formatTemplateWithLocale(templateLabel, { method: prefix }, locale),
+  ];
 
   // Check if there's another method available that is not down.
   const isAnotherMethodAvailable = _Arr.any(
@@ -336,7 +340,9 @@ export function getMethodDowntimeDescription(
 
   // If there's another method available, ask user to select it.
   if (isAnotherMethodAvailable) {
-    sentences.push('Please select another method.');
+    sentences.push(
+      formatMessageWithLocale('misc.select_another_method', locale)
+    );
   }
 
   return sentences.join(' ');
