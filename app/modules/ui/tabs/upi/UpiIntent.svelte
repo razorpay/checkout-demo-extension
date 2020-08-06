@@ -213,7 +213,7 @@
 <!-- LABEL: PAY USING APPS -->
 <div class="legend left">{$t(UPI_INTENT_BLOCK_HEADING)}</div>
 <div id="upi-apps">
-  <div id="svelte-upi-apps-list" class="options options-no-margin">
+  <div id="svelte-upi-apps-list" class="options options-no-margin border-list">
     <ListHeader>
       <i slot="icon">
         <Icon icon={getMiscIcon('redirect')} />
