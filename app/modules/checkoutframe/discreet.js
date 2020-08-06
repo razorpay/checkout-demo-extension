@@ -41,8 +41,8 @@ import * as SessionManager from 'sessionmanager';
 import * as Checkout from 'checkoutframe/index';
 import * as Offers from 'checkoutframe/offers';
 import * as Flows from 'checkoutframe/flows';
-import * as Payouts from 'checkoutframe/payouts';
 import { initIframe } from 'checkoutframe/iframe';
+import * as Form from 'checkoutframe/form';
 import { stopListeningForBackPresses } from 'bridge/back';
 import * as Bridge from 'bridge';
 import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
@@ -50,7 +50,6 @@ import { Formatter } from 'formatter';
 
 import * as Store from 'checkoutstore';
 import * as MethodStore from 'checkoutstore/methods';
-import SessionStore from 'checkoutstore/session';
 import * as EmiStore from 'checkoutstore/emi';
 import * as OTPScreenStore from 'checkoutstore/screens/otp';
 import * as Cta from 'checkoutstore/cta';
@@ -109,6 +108,7 @@ export default {
   currencies: Currency.displayCurrencies,
   error: _.rzpError,
   Formatter,
+  Form,
 
   cancelMsg: strings.cancelMsg,
 
@@ -133,13 +133,11 @@ export default {
   UserAgent,
   Offers,
   Flows,
-  Payouts,
   CountryCodesUtil,
   Theme,
 
   Store,
   MethodStore,
-  SessionStore,
   CustomerStore,
   OTPScreenStore,
   HomeScreenStore,
@@ -163,15 +161,12 @@ export default {
   AuthOverlay,
   OffersView,
   NoCostExplainer,
-  PayoutsInstruments,
-  PayoutAccount,
 
   otpView,
   languageSelectionView,
   UpiCancelReasonPicker,
   PayLaterView,
   Curtain,
-  TopBar,
   commonBanks,
   timer: _.timer,
   QRScreen,

@@ -1,5 +1,12 @@
+// svelte views
 import PoweredBy from 'ui/components/PoweredBy.svelte';
 import BankTransferScreen from 'ui/tabs/bank-transfer/index.svelte';
+import TopBar from 'ui/components/Topbar.svelte';
+
+import { isPayout } from 'checkoutstore';
+import Analytics from 'analytics';
+import { getSession } from 'sessionmanager';
+import createPayoutsView from './payouts';
 
 let componentsMap = {};
 
@@ -7,11 +14,24 @@ export function render() {
   componentsMap.poweredBy = new PoweredBy({
     target: _Doc.querySelector('#container'),
   });
+
+  const topbar = (componentsMap.topbar = new TopBar({
+    target: _Doc.querySelector('#topbar-wrap'),
+  }));
+
+  const session = getSession();
+  session.topBar = topbar;
+  if (isPayout()) {
+    componentsMap.payoutsView = createPayoutsView({ topbar });
+  } else {
+    topbar.$on('back', session.back.bind(session));
+  }
 }
 
 export function destroyAll() {
   componentsMap |> _Obj.loop(destroy);
   componentsMap = {};
+  getSession().topBar = null;
 }
 
 export function getView(key) {

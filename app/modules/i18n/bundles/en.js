@@ -3,7 +3,7 @@ export default {
     providers: {
       cred: {
         name: 'Pay with CRED',
-        subtext: 'Use CRED coins for upto 20%',
+        subtext: 'Use CRED coins for exclusive discounts',
       },
       google_pay_cards: {
         name: 'Pay with Google Pay',
@@ -962,6 +962,14 @@ export default {
     recommended: 'Recommended',
     recurring_subscription_callout:
       'The charge is to enable subscription on this card and it will be refunded.',
+    recurring_caw_callout_all_data:
+      'This is a recurring payment and {maxAmount} will be charged now. {merchantName} can charge upto {amount} on a {recurringFrequency} basis till {endDate}.',
+    recurring_caw_callout_no_frequency:
+      'This is a recurring payment and {maxAmount} will be charged now. {merchantName} can charge upto {amount} anytime till {endDate}.',
+    recurring_caw_callout_no_name:
+      'This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} on a {recurringFrequency} basis till {endDate}.',
+    recurring_caw_callout_no_name_no_frequency:
+      'This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} anytime till {endDate}.',
     redirect_to_app: 'You will be redirected to your UPI app',
     scan_qr_code: 'Scan the QR code using your UPI app',
     show_other_apps: 'Show other UPI apps',
@@ -973,7 +981,7 @@ export default {
     use_saved_cards_btn: 'Use saved cards',
     use_saved_cards_on_rzp_btn: 'Use saved cards on Razorpay',
     view_all_emi_plans: 'View all EMI Plans',
-    verifying_vpa_info: 'Verifying VPA...',
+    verifying_vpa_info: 'Verifying your VPA',
   },
   upi_intent_apps: {
     amazon: 'Amazon Shopping',

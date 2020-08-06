@@ -16,9 +16,10 @@
     NAME_HELP,
   } from 'ui/labels/payouts';
 
-  // Refs
-  export let accountNumberField = null;
-  export let confirmAccountNumberField = null;
+  let accountNumberField;
+  let confirmAccountNumberField;
+  let ifscField;
+  let nameField;
 
   export function validateConfirmAccount() {
     const value = accountNumberField.getValue();
@@ -26,6 +27,17 @@
     if (value !== confirmValue) {
       confirmAccountNumberField.setValid(false);
     }
+  }
+
+  export function getPayload() {
+    return {
+      account_type: 'bank_account',
+      bank_account: {
+        account_number: accountNumberField.getValue(),
+        name: nameField.getValue(),
+        ifsc: ifscField.getValue(),
+      },
+    };
   }
 </script>
 
@@ -35,7 +47,11 @@
   }
 </style>
 
-<Tab method="payout_account" overrideMethodCheck={true} pad={false}>
+<Tab
+  method="payout_account"
+  overrideMethodCheck={true}
+  pad={false}
+  shown={true}>
 
   <div class="fields-container">
 
@@ -72,6 +88,7 @@
       helpText={$t(IFSC_HELP)}
       maxlength="11"
       required={true}
+      bind:this={ifscField}
       formatter={{ type: 'ifsc' }} />
 
     <Field
@@ -82,8 +99,8 @@
       helpText={$t(NAME_HELP)}
       pattern={"^[a-zA-Z. 0-9']{1,100}$"}
       maxlength="100"
-      required={true} />
+      required={true}
+      bind:this={nameField} />
 
   </div>
-
 </Tab>
