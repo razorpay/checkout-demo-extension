@@ -843,22 +843,16 @@ Session.prototype = {
           Cta.showCta();
         }
 
-        var walletsEle = $('#wallets')[0].parentElement;
-
-        selectedWalletEl = selectedWalletEl[0].parentElement;
-
         // TODO: hacky stuff , need to refactor
         // setTimeout with 200ms - waiting for checkout animation to complete
+        var el = selectedWalletEl[0];
         window.setTimeout(function() {
           // scrolling to the selected wallet when checkout is opened
-          var walletsEleBottom =
-              walletsEle.getBoundingClientRect().top + walletsEle.clientHeight,
-            selectedWalletElBottom =
-              selectedWalletEl.getBoundingClientRect().top +
-              selectedWalletEl.clientHeight;
-
-          walletsEle.scrollTop =
-            walletsEle.scrollTop + selectedWalletElBottom - walletsEleBottom;
+          // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoViewIfNeeded
+          const scroll = el.scrollIntoViewIfNeeded || el.scrollIntoView;
+          if (scroll) {
+            scroll.call(el);
+          }
         }, 200);
       }
     }
