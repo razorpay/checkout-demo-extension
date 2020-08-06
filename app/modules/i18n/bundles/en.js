@@ -3,7 +3,7 @@ export default {
     providers: {
       cred: {
         name: 'Pay with CRED',
-        subtext: 'Use CRED coins for exclusive discounts',
+        subtext: 'exclusive discounts with CRED coins',
       },
       google_pay_cards: {
         name: 'Pay with Google Pay',
