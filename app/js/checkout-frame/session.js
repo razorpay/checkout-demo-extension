@@ -849,7 +849,7 @@ Session.prototype = {
         window.setTimeout(function() {
           // scrolling to the selected wallet when checkout is opened
           // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoViewIfNeeded
-          const scroll = el.scrollIntoViewIfNeeded || el.scrollIntoView;
+          var scroll = el.scrollIntoViewIfNeeded || el.scrollIntoView;
           if (scroll) {
             scroll.call(el);
           }
