@@ -36,7 +36,7 @@ const isHighSeverityOrScheduled = disableBasedOnSeverityOrScheduled(
  * @returns {boolean}
  */
 function withoutInstrument(downtime) {
-  return _.isArray(downtime.instrument);
+  return !downtime.instrument || _.isArray(downtime.instrument);
 }
 
 // TODO: move to _Func.and
