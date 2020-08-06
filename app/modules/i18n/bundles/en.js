@@ -496,7 +496,7 @@ export default {
       },
       cred: {
         name: 'Pay with CRED',
-        subtext: 'Use CRED coins for upto 20%',
+        subtext: 'Use CRED coins for exclusive discounts',
       },
     },
   },
