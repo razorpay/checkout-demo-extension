@@ -1,10 +1,12 @@
-import { checkPaymentRequestApi, checkMicroapp } from 'gpay';
+import { gpayPaymentRequestAdapter, checkMicroapp } from 'gpay';
 import { NO_PAYMENT_ADAPTER_ERROR } from 'common/constants';
+import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi';
 
 const ADAPTER_CHECKERS = {
-  gpay: checkPaymentRequestApi,
   'microapps.gpay': checkMicroapp,
 };
+
+ADAPTER_CHECKERS[GOOGLE_PAY_PACKAGE_NAME] = gpayPaymentRequestAdapter;
 
 /**
  * Checks if a payment adapter is present.

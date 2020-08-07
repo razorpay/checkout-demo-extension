@@ -12,7 +12,7 @@ const CHECK_ERROR = {
  * Returns a Promise that resolves if Google Pay is present.
  * @return {Promise}
  */
-export function checkPaymentRequestApi() {
+export function gpayPaymentRequestAdapter() {
   return new Promise((resolve, reject) => {
     try {
       /**
