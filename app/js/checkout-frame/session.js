@@ -2195,6 +2195,10 @@ Session.prototype = {
     // check cardTab.setEmiPlansCta for details
     cardTab.setEmiPlansCta(screen, this.tab);
 
+    if (this.offers) {
+      this.offers.renderTab(this.tab);
+    }
+
     if (screen === this.screen) {
       return;
     }
@@ -2282,7 +2286,7 @@ Session.prototype = {
       this.body.toggleClass('sub', showPaybtn);
     }
 
-    return this.offers && this.offers.renderTab(this.tab);
+    return;
   },
 
   /**
