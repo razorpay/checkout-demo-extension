@@ -7,6 +7,7 @@
   // Util imports
   import { getSession } from 'sessionmanager';
   import {
+    isPayout,
     getDowntimes,
     hasFeature,
     isCustomerFeeBearer,
@@ -632,7 +633,7 @@
   }
 </style>
 
-<Tab {method} {down} pad={false}>
+<Tab {method} {down} pad={false} shown={isPayout()}>
   <Screen>
     <div>
 

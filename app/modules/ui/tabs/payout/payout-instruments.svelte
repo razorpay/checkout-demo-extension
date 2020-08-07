@@ -1,16 +1,18 @@
 <script>
-  // Svelte imports
-  import { createEventDispatcher } from 'svelte';
-
   // Utils imports
-  import { getSession } from 'sessionmanager';
+  import { getThemeMeta } from 'checkoutstore/theme';
+  import Analytics from 'analytics';
+  import { validateForm } from 'checkoutframe/form';
 
   // UI imports
   import Icon from 'ui/elements/Icon.svelte';
   import NextOption from 'ui/elements/options/NextOption.svelte';
   import PayoutInstrument from 'ui/elements/PayoutInstrument.svelte';
+  import PayoutAddAccount from 'ui/tabs/payout/payout-account.svelte';
+  import UPITab from 'ui/tabs/upi/index.svelte';
   import Tab from 'ui/tabs/Tab.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
+  import CTA from 'ui/elements/CTA.svelte';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -29,30 +31,57 @@
     SELECT_UPI_TITLE,
   } from 'ui/labels/payouts';
 
-  // Props
   export let upiAccounts;
   export let bankAccounts;
   export let amount;
-  export let selectedInstrument = null;
+  export let topbar;
+  export let onSubmit;
 
-  // Computed
-  export let upiAccountsAvailable;
-  export let bankAccountsAvailable;
+  const themeMeta = getThemeMeta();
 
-  const dispatch = createEventDispatcher();
-  const { themeMeta } = getSession();
+  let selectedInstrument = null;
+  let childTab = null;
+  let accountTab;
+  topbar.$on('back', () => (childTab = null));
+
+  $: {
+    if (childTab) {
+      topbar.setTab(childTab);
+      topbar.show();
+    } else {
+      topbar.hide();
+    }
+  }
+
+  Analytics.setMeta('payout', true);
+  Analytics.setMeta('count.accounts.upi', upiAccounts.length);
+  Analytics.setMeta('count.accounts.bank', bankAccounts.length);
 
   export function select(instrument) {
     selectedInstrument = instrument;
-    dispatch('selectaccount', instrument);
+    Analytics.track('payout:account:select', instrument);
   }
 
   export function getSelectedInstrument() {
     return selectedInstrument;
   }
 
-  $: upiAccountsAvailable = upiAccounts && upiAccounts.length > 0;
-  $: bankAccountsAvailable = bankAccounts && bankAccounts.length > 0;
+  function submitHandler() {
+    if (validateForm()) {
+      if (childTab === 'payout_account') {
+        onSubmit(accountTab.getPayload());
+      } else if (childTab === 'payout_upi') {
+        onSubmit({
+          account_type: 'vpa',
+          vpa: {
+            address: _Doc.querySelector('#vpa-upi').value,
+          },
+        });
+      } else {
+        onSubmit(selectedInstrument);
+      }
+    }
+  }
 </script>
 
 <style>
@@ -166,10 +195,21 @@
     font-size: 12px;
     color: #999;
   }
+  .instrument-group :global(.option-title) {
+    margin-left: 24px;
+  }
 </style>
 
-<Tab method="payouts" overrideMethodCheck={true} pad={false}>
-  <Screen>
+{#if childTab === 'payout_account'}
+  <PayoutAddAccount bind:this={accountTab} />
+{:else if childTab === 'payout_upi'}
+  <UPITab />
+{:else}
+  <Tab
+    method="payouts"
+    overrideMethodCheck={true}
+    pad={false}
+    shown={!childTab}>
     <div class="title">
       <!-- LABEL: Select an account -->
       <h3>{$t(SELECT_ACCOUNT_TITLE)}</h3>
@@ -179,7 +219,7 @@
       </p>
     </div>
 
-    {#if upiAccountsAvailable}
+    {#if upiAccounts.length}
       <div class="instrument-group">
         <div class="instrument-header">
           <div class="icon-left">
@@ -199,7 +239,7 @@
           {/each}
           <div
             class="instrument-add option next-option secondary-color"
-            on:click={() => dispatch('add', { method: 'upi' })}>
+            on:click={() => (childTab = 'payout_upi')}>
             <div class="icon icon-left icon-add">+</div>
             <!-- LABEL: Add UPI ID -->
             {$t(ADD_UPI_ACTION)}
@@ -208,7 +248,7 @@
       </div>
     {/if}
 
-    {#if bankAccountsAvailable}
+    {#if bankAccounts.length}
       <div class="instrument-group">
         <div class="instrument-header">
           <div class="icon-left ref-nbicon">
@@ -233,7 +273,7 @@
           {/each}
           <div
             class="instrument-add option next-option secondary-color"
-            on:click={() => dispatch('add', { method: 'bank' })}>
+            on:click={() => (childTab = 'payout_account')}>
             <div class="icon icon-left icon-add">+</div>
             <!-- LABEL: Add Bank Account -->
             {$t(ADD_BANK_ACTION)}
@@ -243,14 +283,14 @@
       </div>
     {/if}
 
-    {#if !upiAccountsAvailable}
+    {#if !upiAccounts.length}
       <div class="options add-option">
         <NextOption
           icon={themeMeta.icons.upi}
           tabindex="0"
           attributes={{ role: 'button', 'aria-label': 'Add a UPI ID' }}
           classes={['secondary-color']}
-          on:select={() => dispatch('add', { method: 'upi' })}>
+          on:select={() => (childTab = 'payout_upi')}>
           <!-- LABEL: UPI -->
           <div>{$t(ADD_UPI_BUTTON_TITLE)}</div>
           <!-- LABEL: Add a UPI ID (BHIM, PhonePe and more) -->
@@ -260,14 +300,14 @@
       </div>
     {/if}
 
-    {#if !bankAccountsAvailable}
+    {#if !bankAccounts.length}
       <div class="options add-option">
         <NextOption
           icon={themeMeta.icons.netbanking}
           tabindex="0"
           attributes={{ role: 'button', 'aria-label': 'Add a UPI ID' }}
           classes={['secondary-color']}
-          on:select={() => dispatch('add', { method: 'bank' })}>
+          on:select={() => (childTab = 'payout_account')}>
           <!-- LABEL: BANK -->
           <div>BANK</div>
           <!-- LABEL: Add a Bank Account -->
@@ -275,5 +315,8 @@
         </NextOption>
       </div>
     {/if}
-  </Screen>
-</Tab>
+  </Tab>
+{/if}
+<CTA show={selectedInstrument || childTab} on:click={submitHandler}>
+  Confirm Account
+</CTA>
