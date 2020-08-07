@@ -6,7 +6,7 @@ import * as AnalyticsTypes from 'analytics-types';
 import * as Bridge from 'bridge';
 import * as strings from 'common/strings';
 import * as OtpService from 'common/otpservice';
-import { isRecurring } from 'checkoutstore';
+import { isRecurring, getRecurringMethods } from 'checkoutstore';
 
 /* global getPhone */
 
@@ -38,14 +38,36 @@ export function Customer(contact) {
 
 export const sanitizeTokens = tokens => {
   const recurring = isRecurring();
+  const recurringMethods = getRecurringMethods();
+  const recurringCreditCardNetworks = recurringMethods?.card?.credit ?? [];
+  const recurringDebitCardIssuers = Object.keys(
+    recurringMethods?.card?.debit ?? {}
+  );
 
   if (tokens) {
-    tokens.items = tokens.items.filter(item => {
-      if (recurring && !item.recurring) {
-        return false;
+    tokens.items = tokens.items.filter(token => {
+      if (recurring) {
+        if (!token.recurring) {
+          return false;
+        }
+
+        const card = token.card;
+
+        if (card) {
+          const cardType = card.type;
+
+          if (cardType === 'credit') {
+            return recurringCreditCardNetworks.includes(card.network);
+          } else if (cardType === 'debit') {
+            return recurringDebitCardIssuers.includes(card.issuer);
+          } else {
+            return false;
+          }
+        }
       }
+
       // only allow card and upi tokens
-      if (item.method === 'card' || item.method === 'upi') {
+      if (token.method === 'card' || token.method === 'upi') {
         return true;
       }
     });
