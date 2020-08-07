@@ -35,7 +35,6 @@ export const checkWebPaymentsForApp = app => {
   session.r.checkPaymentAdapter(app).then(() => {
     webPaymentsApps[app] = true;
 
-    // Google Pay is available for web payments
     setUpiApps([
       ...getUPIIntentApps().filtered,
       ...[
