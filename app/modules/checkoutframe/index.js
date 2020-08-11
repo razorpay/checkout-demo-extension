@@ -380,12 +380,14 @@ function updatePreferredMethods(preferences) {
 
   if (preferred_methods) {
     _Obj.loop(preferred_methods, ({ instruments }, contact) => {
-      setInstrumentsForCustomer(
-        {
-          contact,
-        },
-        instruments
-      );
+      if (instruments) {
+        setInstrumentsForCustomer(
+          {
+            contact,
+          },
+          instruments
+        );
+      }
     });
   }
 }
