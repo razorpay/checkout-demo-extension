@@ -245,7 +245,11 @@ module.exports = {
 
       // Set preferred methods in preferences too
       preferences.preferred_methods = {
-        '+918888888881': API_PREFERRED_INSTRUMENTS[method.toLowerCase()],
+        '+918888888881': {
+          instruments: API_PREFERRED_INSTRUMENTS[method.toLowerCase()],
+          is_customer_identified: true,
+          user_aggregates_available: true,
+        },
       };
     }
 
