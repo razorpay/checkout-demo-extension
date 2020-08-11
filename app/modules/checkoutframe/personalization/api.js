@@ -72,12 +72,16 @@ function getInstrumentsFromApi(customer) {
 
         const identified = !data.default;
 
-        let apiInstruments = data.default || [];
+        let apiInstrumentsData = data.default || {
+          instruments: [],
+        };
 
         // preference is given to customer specific data
         if (customer && customer.contact) {
-          apiInstruments = data[customer.contact] || apiInstruments;
+          apiInstrumentsData = data[customer.contact] || apiInstrumentsData;
         }
+
+        const apiInstruments = apiInstrumentsData.instruments;
 
         resolve(
           setInstrumentsForCustomer(customer, apiInstruments, identified)
