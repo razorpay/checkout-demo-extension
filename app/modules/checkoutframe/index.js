@@ -11,7 +11,10 @@ import {
 import { processNativeMessage } from 'checkoutstore/native';
 import { isEMandateEnabled, getEnabledMethods } from 'checkoutstore/methods';
 import showTimer from 'checkoutframe/timer';
-import { setInstrumentsForCustomer } from 'checkoutframe/personalization/api';
+import {
+  setInstrumentsForCustomer,
+  trackP13nMeta,
+} from 'checkoutframe/personalization/api';
 import { setHistoryAndListenForBackPresses } from 'bridge/back';
 
 import {
@@ -390,6 +393,7 @@ function updatePreferredMethods(preferences) {
       }
     });
   }
+  trackP13nMeta(preferred_methods);
 }
 
 /* expose handleMessage to window for our Mobile SDKs */

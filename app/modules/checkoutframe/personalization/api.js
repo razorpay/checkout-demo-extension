@@ -68,6 +68,7 @@ function getInstrumentsFromApi(customer) {
         }
 
         const data = response.preferred_methods;
+        trackP13nMeta(data);
         // default instruments may be provided based on the merchant and amount details
 
         const identified = !data.default;
@@ -162,4 +163,29 @@ export function transformInstrumentToStorageFormat(instrument, data = {}) {
     API_INSTRUMENT_PAYMENT_ADDONS[instrument.method](instrument, data);
   }
   return instrument;
+}
+
+export function trackP13nMeta(data) {
+  const eventData = {};
+  _Obj.loop(
+    data,
+    (
+      { instruments, is_customer_identified, user_aggregates_available },
+      contact
+    ) => {
+      if (instruments) {
+        eventData[contact] = {
+          is_customer_identified,
+          user_aggregates_available,
+          count: instruments && instruments.length,
+        };
+      }
+    }
+  );
+  Analytics.track('p13n:api_data_meta', {
+    type: AnalyticsTypes.METRIC,
+    data: {
+      instrument_data_meta: eventData,
+    },
+  });
 }
