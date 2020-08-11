@@ -1601,6 +1601,18 @@ Session.prototype = {
       this.set('prefill.method', 'cardless_emi');
     }
 
+    /**
+     * For prefilling card apps,
+     * expected options are method: app & provider,
+     * however, we're showing them on cards screen,
+     * so set prefill as card.
+     */
+    if (prefilledMethod === 'app') {
+      if (MethodStore.isApplicationEnabled(prefilledProvider)) {
+        this.set('prefill.method', 'card');
+      }
+    }
+
     var forcedOffer = discreet.Offers.getForcedOffer();
 
     if (forcedOffer) {
