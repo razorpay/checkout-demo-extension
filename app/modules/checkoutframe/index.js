@@ -379,7 +379,7 @@ function updatePreferredMethods(preferences) {
   const { preferred_methods } = preferences;
 
   if (preferred_methods) {
-    _Obj.loop(preferred_methods, (instruments, contact) => {
+    _Obj.loop(preferred_methods, ({ instruments }, contact) => {
       setInstrumentsForCustomer(
         {
           contact,
