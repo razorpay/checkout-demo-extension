@@ -203,6 +203,7 @@ export default function Track(r, event, data, immediately) {
       'readonly',
       'recurring',
       'redirect',
+      'subscription_id',
       'theme',
     ];
 
