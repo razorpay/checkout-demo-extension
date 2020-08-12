@@ -59,6 +59,7 @@ import * as CardScreenStore from 'checkoutstore/screens/card';
 import * as NetbankingScreenStore from 'checkoutstore/screens/netbanking';
 import * as CustomerStore from 'checkoutstore/customer';
 import * as Theme from 'checkoutstore/theme';
+import { overlayStack as overlayStackStore } from 'checkoutstore/back';
 import * as NativeStore from 'checkoutstore/native';
 
 import QRScreen from 'ui/tabs/qr/index.svelte';
@@ -200,4 +201,5 @@ export default {
   initI18n,
   ContactStorage,
   I18n,
+  overlayStackStore,
 };
