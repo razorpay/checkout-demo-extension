@@ -763,6 +763,10 @@ export default {
   },
   netbanking: {
     corporate_label: 'Corporate',
+    downtime_low_callout:
+      '<strong>{bank}</strong> accounts are experiencing low success rates.',
+    downtime_high_callout:
+      '<strong>{bank}</strong> accounts are temporarily unavailable right now. Please select another bank.',
     retail_label: 'Retail',
     search_all: 'All banks',
     search_placeholder: 'Search for bank',

@@ -28,10 +28,16 @@
     SEARCH_TITLE,
     SEARCH_PLACEHOLDER,
     SEARCH_ALL,
+    DOWNTIME_LOW_CALLOUT,
+    DOWNTIME_HIGH_CALLOUT,
   } from 'ui/labels/netbanking';
 
   import { t, locale } from 'svelte-i18n';
-  import { getShortBankName, getLongBankName } from 'i18n';
+  import {
+    getShortBankName,
+    getLongBankName,
+    formatTemplateWithLocale,
+  } from 'i18n';
 
   // Utils imports
   import Razorpay from 'common/Razorpay';
@@ -387,12 +393,9 @@
       {#if selectedBankHasDowntime}
         <DowntimeCallout severe={selectedBankHasSevereDowntime}>
           {#if selectedBankHasSevereDowntime}
-            <strong>{filteredBanks[$selectedBank]}</strong>
-            accounts are temporarily unavailable right now. Please select
-            another bank.
+            {formatTemplateWithLocale(DOWNTIME_HIGH_CALLOUT, { bank: getLongBankName($selectedBank, $locale) }, $locale)}
           {:else}
-            <strong>{filteredBanks[$selectedBank]}</strong>
-            accounts are experiencing low success rates.
+            {formatTemplateWithLocale(DOWNTIME_LOW_CALLOUT, { bank: getLongBankName($selectedBank, $locale) }, $locale)}
           {/if}
         </DowntimeCallout>
       {/if}
