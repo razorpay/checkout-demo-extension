@@ -166,7 +166,7 @@ export function transformInstrumentToStorageFormat(instrument, data = {}) {
 }
 
 export function trackP13nMeta(data) {
-  const eventData = {};
+  const eventData = [];
   _Obj.loop(
     data,
     (
@@ -174,11 +174,12 @@ export function trackP13nMeta(data) {
       contact
     ) => {
       if (instruments) {
-        eventData[contact] = {
+        eventData.push({
+          contact,
           is_customer_identified,
           user_aggregates_available,
           count: instruments && instruments.length,
-        };
+        });
       }
     }
   );
