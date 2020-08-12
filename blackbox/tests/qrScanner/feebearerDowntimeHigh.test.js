@@ -29,6 +29,7 @@ describe('QRCode Downtimepayment payment', () => {
             status: 'started',
             scheduled: false,
             severity: 'high',
+            instrument: [],
             created_at: 1567686387,
             updated_at: 1567686387,
           },

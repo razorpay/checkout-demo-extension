@@ -45,6 +45,7 @@
     isMethodUsable,
     getAppsForCards,
     getPayloadForCRED,
+    isApplicationEnabled,
   } from 'checkoutstore/methods';
   import { newCardEmiDuration } from 'checkoutstore/emi';
 
@@ -138,6 +139,12 @@
     $cardExpiry = session.get('prefill.card[expiry]') || '';
     $cardName = session.get('prefill.name') || '';
     $cardCvv = session.get('prefill.card[cvv]') || '';
+
+    if (session.get('prefill.method') === 'card') {
+      if (isApplicationEnabled(session.get('prefill.provider'))) {
+        $selectedApp = session.get('prefill.provider');
+      }
+    }
 
     methodErrors.subscribe(updateMethodError);
   });

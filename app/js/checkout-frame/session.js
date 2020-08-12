@@ -1540,6 +1540,28 @@ Session.prototype = {
       this.modal = new window.Modal(this.el, {
         escape: this.get('modal.escape') && !this.embedded,
         backdropclose: this.get('modal.backdropclose'),
+        handleBackdropClick: function() {
+          // The same logic to close overlay using $overlayStack
+          // is present for backpresses.
+          // Don't forget to update it there too if you change something here.
+          // TODO: DRY
+
+          var $overlayStack = storeGetter(discreet.overlayStackStore);
+
+          if ($overlayStack.length > 0) {
+            var last = $overlayStack[$overlayStack.length - 1];
+
+            last.back({
+              from: 'overlay',
+            });
+
+            // Signal that we don't want the Modal component to handle click on backdrop
+            return false;
+          }
+
+          // Signal that Modal component should hnadle backdrop click
+          return true;
+        },
         onhide: function() {
           Razorpay.sendMessage({ event: 'dismiss', data: self.dismissReason });
         },
@@ -1593,6 +1615,18 @@ Session.prototype = {
       MethodStore.isMethodEnabled('cardless_emi') // Is the method enabled?
     ) {
       this.set('prefill.method', 'cardless_emi');
+    }
+
+    /**
+     * For prefilling card apps,
+     * expected options are method: app & provider,
+     * however, we're showing them on cards screen,
+     * so set prefill as card.
+     */
+    if (prefilledMethod === 'app') {
+      if (MethodStore.isApplicationEnabled(prefilledProvider)) {
+        this.set('prefill.method', 'card');
+      }
     }
 
     var forcedOffer = discreet.Offers.getForcedOffer();
@@ -2193,6 +2227,10 @@ Session.prototype = {
     // check cardTab.setEmiPlansCta for details
     cardTab.setEmiPlansCta(screen, this.tab);
 
+    if (this.offers) {
+      this.offers.renderTab(this.tab);
+    }
+
     if (screen === this.screen) {
       return;
     }
@@ -2280,7 +2318,7 @@ Session.prototype = {
       this.body.toggleClass('sub', showPaybtn);
     }
 
-    return this.offers && this.offers.renderTab(this.tab);
+    return;
   },
 
   /**
