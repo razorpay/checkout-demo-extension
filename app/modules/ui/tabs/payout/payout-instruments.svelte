@@ -195,7 +195,7 @@
     font-size: 12px;
     color: #999;
   }
-  .instrument-header :global(.option-title) {
+  .instrument-group :global(.option-title) {
     margin-left: 24px;
   }
 </style>

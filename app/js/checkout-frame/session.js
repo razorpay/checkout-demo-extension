@@ -843,22 +843,16 @@ Session.prototype = {
           Cta.showCta();
         }
 
-        var walletsEle = $('#wallets')[0].parentElement;
-
-        selectedWalletEl = selectedWalletEl[0].parentElement;
-
         // TODO: hacky stuff , need to refactor
         // setTimeout with 200ms - waiting for checkout animation to complete
+        var el = selectedWalletEl[0];
         window.setTimeout(function() {
           // scrolling to the selected wallet when checkout is opened
-          var walletsEleBottom =
-              walletsEle.getBoundingClientRect().top + walletsEle.clientHeight,
-            selectedWalletElBottom =
-              selectedWalletEl.getBoundingClientRect().top +
-              selectedWalletEl.clientHeight;
-
-          walletsEle.scrollTop =
-            walletsEle.scrollTop + selectedWalletElBottom - walletsEleBottom;
+          // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoViewIfNeeded
+          var scroll = el.scrollIntoViewIfNeeded || el.scrollIntoView;
+          if (scroll) {
+            scroll.call(el);
+          }
         }, 200);
       }
     }
@@ -1607,6 +1601,18 @@ Session.prototype = {
       this.set('prefill.method', 'cardless_emi');
     }
 
+    /**
+     * For prefilling card apps,
+     * expected options are method: app & provider,
+     * however, we're showing them on cards screen,
+     * so set prefill as card.
+     */
+    if (prefilledMethod === 'app') {
+      if (MethodStore.isApplicationEnabled(prefilledProvider)) {
+        this.set('prefill.method', 'card');
+      }
+    }
+
     var forcedOffer = discreet.Offers.getForcedOffer();
 
     if (forcedOffer) {
@@ -2201,6 +2207,10 @@ Session.prototype = {
     // check cardTab.setEmiPlansCta for details
     cardTab.setEmiPlansCta(screen, this.tab);
 
+    if (this.offers) {
+      this.offers.renderTab(this.tab);
+    }
+
     if (screen === this.screen) {
       return;
     }
@@ -2288,7 +2298,7 @@ Session.prototype = {
       this.body.toggleClass('sub', showPaybtn);
     }
 
-    return this.offers && this.offers.renderTab(this.tab);
+    return;
   },
 
   /**
