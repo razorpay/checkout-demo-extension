@@ -410,7 +410,9 @@
           ).then(({ identified, instruments: instrumentsFromApi }) => {
             userIdentified = identified;
 
-            instrumentMap.api = instrumentsFromApi;
+            if (instrumentsFromApi.length) {
+              instrumentMap.api = instrumentsFromApi;
+            }
             if (Math.random() < 0.5) {
               instrumentsSource = SOURCES.NONE;
             } else {
