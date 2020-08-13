@@ -412,8 +412,11 @@
 
             if (instrumentsFromApi.length) {
               instrumentMap.api = instrumentsFromApi;
-            } else {
+            }
+            if (Math.random() < 0.5) {
               instrumentsSource = SOURCES.NONE;
+            } else {
+              instrumentsSource = SOURCES.API;
             }
 
             resolve(returnPromise(instrumentsSource));
