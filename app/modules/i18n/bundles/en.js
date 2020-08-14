@@ -519,7 +519,7 @@ export default {
     edit_plan_action: 'Edit',
     edit_plan_text: '{duration} Months ({amount}/mo)',
     hdfc_debit_description_convenience:
-      ' Convenience Fee of ₹ 199 + GST applicable for EMI transactions on HDFC Bank Cards.',
+      ' Convenience Fee of ₹199 + GST applicable for EMI transactions on HDFC Bank Cards.',
     hdfc_debit_description_includes_interest: '(includes interest).',
     hdfc_debit_description_min_balance:
       'No minimum balance is required. There will be no amount blocked on your card. You will pay ',
