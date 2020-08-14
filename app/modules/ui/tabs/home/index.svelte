@@ -400,7 +400,10 @@
 
         // if source is api, we need to fetch api instruments and then
         // re-set the source
-        if (instrumentsSource === SOURCES.API) {
+        if (
+          instrumentsSource === SOURCES.API ||
+          instrumentsSource === SOURCES.NONE
+        ) {
           getInstrumentsForCustomer(
             $customer,
             {
@@ -412,11 +415,6 @@
 
             if (instrumentsFromApi.length) {
               instrumentMap.api = instrumentsFromApi;
-            }
-            if (Math.random() < 0.5) {
-              instrumentsSource = SOURCES.NONE;
-            } else {
-              instrumentsSource = SOURCES.API;
             }
 
             resolve(returnPromise(instrumentsSource));
