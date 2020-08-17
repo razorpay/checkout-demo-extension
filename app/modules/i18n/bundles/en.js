@@ -648,10 +648,13 @@ export default {
   instruments: {
     titles: {
       app: '{name}',
+      card_logged_in: '{bank} {type} card - {last4}',
+      card_logged_out: 'Use your {bank} {type} card',
       cardless_emi: 'EMI - {name}',
       netbanking: 'Netbanking - {name}',
       paylater: 'Pay Later - {name}',
       paypal: 'PayPal',
+      saved_cards: 'Use your saved cards',
       upi: 'UPI - {name}',
       upiqr: 'UPI QR',
       wallet: 'Wallet - {name}',

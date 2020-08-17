@@ -17,6 +17,15 @@
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
   import { customer } from 'checkoutstore/customer';
 
+  // i18n
+  import {
+    getLongBankName,
+    formatTemplateWithLocale,
+    formatMessageWithLocale,
+  } from 'i18n';
+
+  import { locale } from 'svelte-i18n';
+
   // Props
   export let instrument = {};
   export let name = 'instrument';
@@ -28,18 +37,34 @@
 
   function getBankText(card, loggedIn) {
     const banks = getBanks() || {};
-    const bank = banks[card.issuer] || '';
+
+    const bank = banks[card.issuer]
+      ? getLongBankName(card.issuer, $locale)
+      : '';
+
     const bankText = bank.replace(/ Bank$/, '');
+
     const cardType = card.type || '';
 
     if (loggedIn) {
-      return `${bank ? `${bankText} ` : ''}${_Str.toTitleCase(
-        cardType
-      )} card - ${card.last4}`;
+      return formatTemplateWithLocale(
+        'instruments.titles.card_logged_in',
+        {
+          bank: bankText,
+          type: _Str.toTitleCase(cardType),
+          last4: card.last4,
+        },
+        $locale
+      );
     } else {
-      return `Use your${bank ? ` ${bankText}` : ''} ${_Str.toTitleCase(
-        cardType
-      )} card`;
+      return formatTemplateWithLocale(
+        'instruments.titles.card_logged_out',
+        {
+          bank: bankText,
+          type: _Str.toTitleCase(cardType),
+        },
+        $locale
+      );
     }
   }
 
@@ -85,7 +110,7 @@
       hasCvv = false;
     } else {
       // We don't know anything about the card.
-      title = 'Use your saved cards';
+      title = formatMessageWithLocale('instrument.titles.saved_cards', $locale);
       icon = getIcon();
       hasCvv = false;
     }
