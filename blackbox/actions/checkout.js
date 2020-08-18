@@ -260,6 +260,16 @@ module.exports = {
         message.external_sdks = { googlepay: true };
       }
 
+      if (apps && apps.includes('cred')) {
+        message.uri_data = [
+          {
+            shortcode: 'cred',
+            package_name: 'com.dreamplug.androidapp',
+            uri: 'credpay',
+          },
+        ];
+      }
+
       await passMessage(page, message);
     }
     if (preferences) {

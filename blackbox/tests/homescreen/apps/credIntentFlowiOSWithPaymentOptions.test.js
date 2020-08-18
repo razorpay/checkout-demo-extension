@@ -1,9 +1,10 @@
 const createAppsTest = require('../../../create/apps');
 
 createAppsTest({
-  app: 'google_pay_cards',
-  platform: 'android',
-  testName: 'Google Pay Cards - with Payment Config',
+  app: 'cred',
+  flow: 'intent',
+  platform: 'ios',
+  testName: 'CRED - Intent Flow - iOS - with Payment Config',
   config: {
     display: {
       blocks: {
@@ -12,7 +13,7 @@ createAppsTest({
           instruments: [
             {
               method: 'app',
-              providers: ['google_pay_cards'],
+              providers: ['cred'],
             },
           ],
         },

@@ -1,7 +1,8 @@
 const createAppsTest = require('../../../create/apps');
 
 createAppsTest({
-  app: 'google_pay_cards',
+  app: 'cred',
+  flow: 'intent',
   platform: 'android',
-  testName: 'Google Pay Cards - Android',
+  testName: 'CRED - Collect Flow',
 });

@@ -30,7 +30,7 @@ module.exports = function(testFeatures) {
     testFeatures
   );
 
-  const { app, config, testName } = testFeatures;
+  const { app, flow, config, platform, testName } = testFeatures;
 
   const {
     partialPayment,
@@ -55,10 +55,33 @@ module.exports = function(testFeatures) {
         preferences.methods.app = { google_pay_cards: true };
         preferences.methods.google_pay_cards = true;
         apps.push('google_pay_cards');
+      } else if (app === 'cred') {
+        preferences.methods.app = { cred: true };
+        if (flow === 'intent') {
+          // This will send cred inside handleMessage under "uri_data"
+          // It essentially means that app is installed on the device.
+          apps.push('cred');
+        }
       }
 
       if (config) {
         options.config = testFeatures.config;
+      }
+
+      let params;
+
+      if (platform === 'android') {
+        params = {
+          platform: 'android',
+          library: 'checkoutjs',
+          version: '1.5.17',
+        };
+      } else if (platform === 'ios') {
+        params = {
+          platform: 'ios',
+          library: 'checkoutjs',
+          version: '?',
+        };
       }
 
       const context = await openSdkCheckoutWithNewHomeScreen({
@@ -67,11 +90,7 @@ module.exports = function(testFeatures) {
         preferences,
         method: 'apps',
         apps,
-        params: {
-          platform: 'android',
-          library: 'checkoutjs',
-          version: '1.5.17',
-        },
+        params,
       });
 
       const missingUserDetails = optionalContact && optionalEmail;
@@ -117,9 +136,9 @@ module.exports = function(testFeatures) {
       // so using #footer directly
       await context.page.click('#footer');
 
-      await handleAppCreatePayment(context, { app });
+      await handleAppCreatePayment(context, { app, flow, platform });
 
-      await handleAppPaymentStatus(context, { app });
+      await handleAppPaymentStatus(context, { app, flow, platform });
     });
   });
 };

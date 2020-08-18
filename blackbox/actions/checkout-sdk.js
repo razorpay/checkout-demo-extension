@@ -59,28 +59,81 @@ async function openSdkCheckout({
     console.error('malformed callback data', data);
   });
 
-  await page.evaluateOnNewDocument(() => {
-    window.CheckoutBridge = {
-      oncomplete(data) {
-        __CheckoutBridge_oncomplete(data);
-      },
-      isUserRegistered(data) {
-        // Note:
-        //   Don't put the following code within page.exposeFunction()
-        //   We don't want this method to return a Promise!
-        data = JSON.parse(data);
-        if (data.method === 'card') {
-          if (data.code === 'google_pay_cards') {
-            return true;
+  if (params && params.platform === 'ios') {
+    await page.evaluateOnNewDocument(options => {
+      window.webkit = { messageHandlers: {} };
+      window.webkit.messageHandlers.CheckoutBridge = {
+        postMessage: function(data) {
+          switch (data.action) {
+            case 'callNativeIntent':
+              setTimeout(function() {
+                window.externalAppResponse({
+                  provider: 'CRED',
+                  data: 1,
+                });
+              });
+              break;
+            default:
+              console.error(`iOSBridge: unhandled action ${data.action}`);
           }
+        },
+      };
+
+      let interval = setInterval(function() {
+        // Wait for Checkout to load...
+        if (window.handleMessage) {
+          clearInterval(interval);
+          handleMessage({
+            options: options,
+            upi_intents_data: [],
+            uri_data: [
+              {
+                shortcode: 'cred',
+                uri: 'credpay',
+              },
+            ],
+          });
         }
-        return false;
-      },
-      processPayment(data) {
-        return __CheckoutBridge_processPayment(data);
-      },
-    };
-  });
+      }, 1500);
+    }, options);
+    // ^ Passing in options from closure to evaluate inside browser
+  } else {
+    await page.evaluateOnNewDocument(() => {
+      window.CheckoutBridge = {
+        oncomplete(data) {
+          __CheckoutBridge_oncomplete(data);
+        },
+        isUserRegistered(data) {
+          // Note:
+          //   Don't put the following code within page.exposeFunction()
+          //   We don't want this method to return a Promise!
+          data = JSON.parse(data);
+          if (data.method === 'card') {
+            if (data.code === 'google_pay_cards') {
+              return true;
+            }
+          }
+          return false;
+        },
+        processPayment(data) {
+          return __CheckoutBridge_processPayment(data);
+        },
+        callNativeIntent(data) {
+          if (data.startsWith('credpay://')) {
+            // setTimeout is necessary!
+            setTimeout(function() {
+              window.externalAppResponse({
+                provider: 'CRED',
+                data: 1,
+              });
+            });
+          } else {
+            throw `Could not handle callNativeIntent for ${data}`;
+          }
+        },
+      };
+    });
+  }
 
   const context = await openCheckout({
     page,
