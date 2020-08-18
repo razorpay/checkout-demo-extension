@@ -3252,23 +3252,22 @@ Session.prototype = {
       delete data.contact;
     }
 
-    var prefillEmail = this.get('prefill.email');
-    var prefillContact = this.get('prefill.contact');
-
-    if (
-      Store.isContactOptional() &&
-      !(prefillContact && contactPattern.test(prefillContact))
-    ) {
-      delete data.contact;
+    if (Store.isContactOptional()) {
+      // Merchant is on contact optional feature
+      if (!contactPattern.test(data.contact)) {
+        // However, payload seems to have an invalid contact, delete it.
+        delete data.contact;
+      }
     } else if (data.contact) {
       data.contact = data.contact.replace(/\ /g, '');
     }
 
-    if (
-      Store.isEmailOptional() &&
-      !(prefillEmail && emailPattern.test(data.email))
-    ) {
-      delete data.email;
+    if (Store.isEmailOptional()) {
+      // Merchant is on email optional feature
+      if (!emailPattern.test(data.email)) {
+        // However, payload seems to have an invalid email, delete it.
+        delete data.email;
+      }
     }
 
     if (tab) {
