@@ -112,6 +112,8 @@ export function getInstrumentsForCustomer(customer) {
   }
 }
 
+// changes needed to translate api format instruments to storage format
+// instrument.instrument contains the primary payment instrument data
 const API_INSTRUMENT_PAYMENT_ADDONS = {
   upi: instrument => {
     instrument.vpa = instrument.instrument;
