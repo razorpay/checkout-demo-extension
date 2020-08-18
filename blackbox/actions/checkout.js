@@ -85,6 +85,7 @@ module.exports = {
     preferences,
     params,
     apps,
+    upiApps,
     experiments,
     method,
   }) {
@@ -236,9 +237,9 @@ module.exports = {
 
     if (options) {
       const message = { options };
-      if (apps) {
-        if (typeof apps === 'boolean') {
-          apps = [
+      if (upiApps) {
+        if (typeof upiApps === 'boolean') {
+          upiApps = [
             {
               package_name: 'in.org.npci.upiapp',
               shortcode: 'bhim',
@@ -252,8 +253,13 @@ module.exports = {
           ];
         }
 
-        message.upi_intents_data = apps;
+        message.upi_intents_data = upiApps;
       }
+
+      if (apps && apps.includes('google_pay_cards')) {
+        message.external_sdks = { googlepay: true };
+      }
+
       await passMessage(page, message);
     }
     if (preferences) {

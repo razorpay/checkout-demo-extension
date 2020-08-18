@@ -257,6 +257,67 @@ async function selectCurrencyAndVerifyAmount(context, currency = 'USD') {
   await verifyAmount(context, currency);
 }
 
+async function handleAppCreatePayment(context, { app } = {}) {
+  const req = await context.expectRequest();
+  expect(req.url).toContain('create/ajax');
+  if (app === 'google_pay_cards') {
+    const body = querystring.parse(req.body);
+    expect(body).toMatchObject({
+      method: 'card',
+      application: 'google_pay',
+    });
+    expect(body).not.toHaveProperty('card[number]');
+    await context.respondJSON({
+      version: '1.0',
+      type: 'application',
+      application_name: 'google_pay',
+      payment_id: 'pay_GqAUUr978elhqA',
+      gateway: '*encrypted gateway value*',
+      request: {
+        url: 'https://api.razorpay.com/v1/payments/pay_GqAUUr978elhqA/status',
+        method: 'sdk',
+        content: {
+          bundle: {
+            apiVersion: '1.0',
+            allowedPaymentMethods: [
+              {
+                type: 'CARD',
+                parameters: {
+                  allowedCardNetworks: ['VISA', 'MASTERCARD'],
+                },
+              },
+            ],
+            tokenizationSpecification: {
+              type: 'PAYMENT_GATEWAY',
+              parameters: {
+                gateway: 'razorpay',
+                gatewayMerchantId: 'Gr978elhqAGqAU',
+                gatewayTransactionId: 'pay_GqAUUr978elhqA',
+              },
+            },
+            transactionInfo: {
+              currencyCode: 'INR',
+              totalPrice: '100',
+              totalPriceStatus: 'FINAL',
+            },
+          },
+        },
+      },
+    });
+  }
+}
+
+async function handleAppPaymentStatus(context) {
+  const req = await context.expectRequest();
+  if (req.url.includes('v1/payments/pay_GqAUUr978elhqA/status')) {
+    if (req.url.includes('Razorpay.jsonp')) {
+      await context.respondJSONP({ razorpay_payment_id: 'pay_' });
+    } else {
+      await context.respondJSON({ razorpay_payment_id: 'pay_' });
+    }
+  }
+}
+
 module.exports = {
   enterCardDetails,
   expectDCCParametersInRequest,
@@ -270,4 +331,6 @@ module.exports = {
   selectCurrencyAndVerifyAmount,
   selectSavedCardAndTypeCvv,
   verifyAmount,
+  handleAppCreatePayment,
+  handleAppPaymentStatus,
 };

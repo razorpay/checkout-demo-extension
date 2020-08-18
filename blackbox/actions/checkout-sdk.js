@@ -4,8 +4,10 @@ async function openSdkCheckout({
   page,
   options,
   preferences,
+  upiApps,
   apps,
   experiments,
+  params,
 }) {
   let paymentResult = null;
   let resolver = null;
@@ -19,6 +21,7 @@ async function openSdkCheckout({
           options,
           preferences,
           experiments,
+          upiApps,
           apps,
           params: {
             'error.description': data.error.description,
@@ -34,10 +37,47 @@ async function openSdkCheckout({
     });
   } catch (err) {}
 
+  await page.exposeFunction('__CheckoutBridge_processPayment', async data => {
+    data = JSON.parse(data);
+    if (data.type === 'application') {
+      if (data.application_name === 'google_pay') {
+        await page.evaluate(() => {
+          window.externalSDKResponse({
+            provider: 'GOOGLE_PAY',
+            resultCode: -1,
+            data: {
+              apiResponse: {
+                type: 'google_pay_cards',
+              },
+            },
+          });
+        });
+        resolver(-1);
+        return;
+      }
+    }
+    console.error('malformed callback data', data);
+  });
+
   await page.evaluateOnNewDocument(() => {
     window.CheckoutBridge = {
       oncomplete(data) {
         __CheckoutBridge_oncomplete(data);
+      },
+      isUserRegistered(data) {
+        // Note:
+        //   Don't put the following code within page.exposeFunction()
+        //   We don't want this method to return a Promise!
+        data = JSON.parse(data);
+        if (data.method === 'card') {
+          if (data.code === 'google_pay_cards') {
+            return true;
+          }
+        }
+        return false;
+      },
+      processPayment(data) {
+        return __CheckoutBridge_processPayment(data);
       },
     };
   });
@@ -46,8 +86,10 @@ async function openSdkCheckout({
     page,
     options,
     preferences,
+    upiApps,
     apps,
     experiments,
+    params,
   });
 
   const returnObj = {

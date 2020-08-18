@@ -51,7 +51,7 @@ describe('Basic upi payment', () => {
       page,
       options,
       preferences,
-      apps: true,
+      upiApps: true,
     });
     await assertBasicDetailsScreen(context);
     await fillUserDetails(context);
