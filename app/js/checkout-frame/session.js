@@ -614,6 +614,13 @@ function cancel_upi(session) {
   });
 }
 
+function cancel_nb(session) {
+  $('#error-message').addClass('cancel_netbanking');
+  session.r.on('payment.error', function() {
+    $('#error-message').removeClass('cancel_netbanking');
+  });
+}
+
 function Session(message) {
   var options = message.options;
   var self = this;
@@ -1068,6 +1075,7 @@ Session.prototype = {
 
   setSvelteComponents: function() {
     this.setUpiCancelReasonPicker();
+    this.setNbCancelReasonPicker();
     if (!Store.isPayout()) {
       this.setHomeTab();
     }
@@ -1725,6 +1733,9 @@ Session.prototype = {
         this.payload['_[flow]'] === 'directpay'
       ) {
         return cancel_upi(this);
+      }
+      if (this.payload && this.payload.method === 'netbanking') {
+        return cancel_nb(this);
       }
     }
 
@@ -3459,6 +3470,34 @@ Session.prototype = {
     });
   },
 
+  setNbCancelReasonPicker: function() {
+    this.nbCancelReasonPicker = new discreet.CancelReasonPicker({
+      target: _Doc.querySelector('#cancel_netbanking'),
+      props: {
+        method: 'netbanking',
+        title: 'Pikachu',
+        reasons: [
+          {
+            value: 'pikachu',
+            label: 'pika pika',
+          },
+          {
+            value: 'pikachu-1',
+            label: 'pika pika',
+          },
+          {
+            value: 'pikachu-2',
+            label: 'pika pika',
+          },
+          {
+            value: 'pikachu-3',
+            label: 'pika pikaij',
+          },
+        ],
+      },
+    });
+  },
+
   setSvelteOverlay: function() {
     this.svelteOverlay = new discreet.Overlay({
       target: _Doc.querySelector('#modal-inner'),
@@ -4767,6 +4806,7 @@ Session.prototype = {
       'languageSelectionView',
       'svelteOverlay',
       'upiCancelReasonPicker',
+      'nbCancelReasonPicker',
       'timer',
     ];
 
