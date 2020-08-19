@@ -60,7 +60,9 @@
   }
 
   export function fetchFees(paymentData) {
-    paymentData.amount = session.get('amount');
+    paymentData.amount = session.getAppliedOffer()
+      ? session.getAppliedOffer().amount
+      : session.get('amount');
     paymentData.currency = session.get('currency');
 
     loading = true;
@@ -94,9 +96,7 @@
               {:else}{$t(displayLabels[type])}{/if}
             </div>
             <div class="fee-amount">
-              {#if session.getAppliedOffer()}
-                {formatAmountWithSymbol(session.getAppliedOffer().amount, 'INR')}
-              {:else}{formatAmountWithSymbol(amount * 100, 'INR')}{/if}
+              {formatAmountWithSymbol(amount * 100, 'INR')}
             </div>
           </div>
         {/if}
