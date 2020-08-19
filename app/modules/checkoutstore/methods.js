@@ -115,7 +115,6 @@ const ALL_METHODS = {
 
   emandate() {
     return (
-      !isMethodEnabled('nach') &&
       getMerchantOrder()?.method === 'emandate' &&
       !isInternational() &&
       !_Obj.isEmpty(getRecurringMethods()?.emandate)
