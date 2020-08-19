@@ -71,7 +71,7 @@
   import { getSavedCards, transform } from 'common/token';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import { getIin, getCardType } from 'common/card';
+  import { getIin, getCardType, getNetworkFromCardNumber } from 'common/card';
   import { getSubtextForInstrument } from 'subtext';
   import { getProvider as getAppProvider } from 'common/apps';
   import { getAnimationOptions } from 'svelte-utils';
@@ -464,7 +464,19 @@
         const hasEmi = (features.flows || {}).emi;
 
         if (hasEmi) {
-          const issuer = features.issuer;
+          let issuer = features.issuer;
+
+          // Handle AMEX
+          if (getNetworkFromCardNumber($cardNumber) === 'amex') {
+            issuer = 'AMEX';
+          }
+
+          // Handle debit cards
+          const type = features.type;
+
+          if (type === 'debit') {
+            issuer += '_DC';
+          }
 
           emiObj = (getEMIBanks() || {})[issuer];
         }
