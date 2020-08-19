@@ -37,6 +37,7 @@
     isDCCEnabled,
     methodErrors,
     getIdForPaymentPayload,
+    getCardFeatures,
   } from 'checkoutstore';
   import {
     isMethodEnabled,
@@ -70,7 +71,7 @@
   import { getSavedCards, transform } from 'common/token';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import { getCardType } from 'common/card';
+  import { getIin, getCardType } from 'common/card';
   import { getSubtextForInstrument } from 'subtext';
   import { getProvider as getAppProvider } from 'common/apps';
   import { getAnimationOptions } from 'svelte-utils';
@@ -447,29 +448,45 @@
   function onCardInput() {
     const cardNumber = $cardNumber;
     const cardType = getCardType(cardNumber);
-    const isMaestro = /^maestro/.test(cardType);
-    const sixDigits = cardNumber.length > 5;
+    const iin = getIin(cardNumber);
+    const sixDigits = iin.length >= 6;
     const trimmedVal = cardNumber.replace(/[ ]/g, '');
 
-    var emiObj;
+    if (sixDigits) {
+      getCardFeatures(cardNumber).then(features => {
+        if (iin !== getIin($cardNumber)) {
+          // $cardNumber's IIN has changed since we started the n/w request, do nothing
+          return;
+        }
 
-    if (sixDigits && !isMaestro) {
-      const emiBanks = _Obj.entries(getEMIBanks());
-      emiObj = _Arr.find(emiBanks, ([bank, emiObjInner]) =>
-        emiObjInner.patt.test(cardNumber.replace(/ /g, ''))
-      );
-    }
+        let emiObj;
 
-    session.emiPlansForNewCard = emiObj && emiObj[1];
+        const hasEmi = (features.flows || {}).emi;
 
-    if (!emiObj) {
+        if (hasEmi) {
+          const issuer = features.issuer;
+
+          emiObj = (getEMIBanks() || {})[issuer];
+        }
+
+        session.emiPlansForNewCard = emiObj && emiObj[1];
+
+        // No EMI plans available. Unset duration.
+        if (!emiObj) {
+          $newCardEmiDuration = '';
+        }
+
+        showAppropriateEmiDetailsForNewCard(
+          session.tab,
+          emiObj,
+          trimmedVal.length
+        );
+      });
+    } else {
+      // Need six digits for EMI. Unset things.
+      session.emiPlansForNewCard = undefined;
       $newCardEmiDuration = '';
-    }
-
-    showAppropriateEmiDetailsForNewCard(session.tab, emiObj, trimmedVal.length);
-
-    if (isMaestro && sixDigits) {
-      showEmiCta = false;
+      showAppropriateEmiDetailsForNewCard(session.tab, null, trimmedVal.length);
     }
   }
 
