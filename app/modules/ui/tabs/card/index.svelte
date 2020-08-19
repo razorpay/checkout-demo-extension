@@ -481,7 +481,7 @@
           emiObj = (getEMIBanks() || {})[issuer];
         }
 
-        session.emiPlansForNewCard = emiObj && emiObj[1];
+        session.emiPlansForNewCard = emiObj;
 
         // No EMI plans available. Unset duration.
         if (!emiObj) {
