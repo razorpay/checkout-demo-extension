@@ -25,12 +25,7 @@ import * as GPay from 'gpay';
 import Analytics from 'analytics';
 import { isProviderHeadless } from 'common/cardlessemi';
 import { updateCurrencies, setCurrenciesRate } from 'common/currency';
-import {
-  getCardEntityFromPayload,
-  getIin,
-  isIinValid,
-  updateCardIINMetadata,
-} from 'common/card';
+import { getCardEntityFromPayload, getCardFeatures } from 'common/card';
 
 /**
  * Tells if we're being executed from
@@ -974,42 +969,6 @@ razorpayProto.topupWallet = function() {
   });
 };
 
-const CardFeatureCache = {
-  iin: {},
-};
-const CardFeatureRequests = {
-  iin: {},
-};
-
-/**
- * Fetches card features from cache.
- * TODO: Remove cache for this when logic to determine Native OTP
- *       flow can be supported using a Promise
- * @param {String} cardNumber
- *
- * @return {Object/undefined}
- */
-export function getCardFeaturesFromCache(cardNumber) {
-  if (!isIinValid(cardNumber)) {
-    return {};
-  }
-
-  const iin = getIin(cardNumber);
-
-  const features = CardFeatureCache.iin[iin];
-
-  if (features) {
-    Analytics.track('features:card:fetch:success', {
-      data: {
-        iin,
-        cache: true,
-      },
-    });
-  }
-
-  return features;
-}
-
 /**
  * Returns card currencies from cache
  *
@@ -1019,12 +978,6 @@ export function getCardCurrenciesFromCache(payload) {
   const entity = getCardEntityFromPayload(payload);
   return CardCurrencyCache[entity] || {};
 }
-/**
- * Store ongoing flow request*
- */
-var ongoingFlowRequest = {
-  iin: {},
-};
 
 /**
  * Store ongoing currency request
@@ -1035,75 +988,6 @@ var CardCurrencyRequests = {};
  * Currency cache for synchronous retrieval
  */
 var CardCurrencyCache = {};
-
-/**
- * Gets the features associated with a card.
- * @param {string} cardNumber
- *
- * @returns {Promise}
- */
-function getCardFeatures(cardNumber) {
-  if (!isIinValid(cardNumber)) {
-    return Promise.resolve({});
-  }
-
-  const iin = getIin(cardNumber);
-
-  const existingRequest = CardFeatureRequests.iin[iin];
-
-  if (existingRequest) {
-    return existingRequest;
-  }
-
-  CardFeatureRequests.iin[iin] = new Promise((resolve, reject) => {
-    let url = makeAuthUrl(this, 'payment/iin');
-
-    // append IIN and source as query
-    url = _.appendParamsToUrl(url, {
-      iin,
-      '_[source]': Track.props.library,
-    });
-
-    fetch.jsonp({
-      url,
-      callback: features => {
-        if (features.error) {
-          Analytics.track('features:card:fetch:failure', {
-            data: {
-              iin,
-              error: features.error,
-            },
-          });
-          return reject(features.error);
-        }
-
-        // Store in cache
-        CardFeatureCache.iin[iin] = features;
-
-        // Update card metadata
-        updateCardIINMetadata(iin, features);
-
-        // Resolve
-        resolve(features);
-
-        Analytics.track('features:card:fetch:success', {
-          data: {
-            iin,
-            features,
-          },
-        });
-      },
-    });
-
-    Analytics.track('features:card:fetch:start', {
-      data: {
-        iin,
-      },
-    });
-  });
-
-  return CardFeatureRequests.iin[iin];
-}
 
 /**
  * [DEPRECATED]

@@ -1,4 +1,7 @@
 import RazorpayConfig from 'common/RazorpayConfig';
+import { makeAuthUrl } from 'common/Razorpay';
+import Analytics from 'analytics';
+import Track from 'tracker';
 
 export const API_NETWORK_CODES_MAP = {
   AMEX: 'amex',
@@ -327,4 +330,110 @@ export function getCardMetadata(entity) {
   const data = { last4: getCardDigits(entity).slice(-4) };
   // Merge { last4 } with other cached details and return.
   return _Obj.extend(data, CardMetadata.iin[iin] || {});
+}
+
+const CardFeatureCache = {
+  iin: {},
+};
+
+const CardFeatureRequests = {
+  iin: {},
+};
+
+/**
+ * Fetches card features from cache.
+ * TODO: Remove cache for this when logic to determine Native OTP
+ *       flow can be supported using a Promise
+ * @param {String} cardNumber
+ *
+ * @return {Object/undefined}
+ */
+export function getCardFeaturesFromCache(cardNumber) {
+  if (!isIinValid(cardNumber)) {
+    return {};
+  }
+
+  const iin = getIin(cardNumber);
+
+  const features = CardFeatureCache.iin[iin];
+
+  if (features) {
+    Analytics.track('features:card:fetch:success', {
+      data: {
+        iin,
+        cache: true,
+      },
+    });
+  }
+
+  return features;
+}
+
+/**
+ * Gets the features associated with a card.
+ * @param {string} cardNumber
+ *
+ * @returns {Promise}
+ */
+export function getCardFeatures(cardNumber) {
+  if (!isIinValid(cardNumber)) {
+    return Promise.resolve({});
+  }
+
+  const iin = getIin(cardNumber);
+
+  const existingRequest = CardFeatureRequests.iin[iin];
+
+  if (existingRequest) {
+    return existingRequest;
+  }
+
+  CardFeatureRequests.iin[iin] = new Promise((resolve, reject) => {
+    let url = makeAuthUrl(this, 'payment/iin');
+
+    // append IIN and source as query
+    url = _.appendParamsToUrl(url, {
+      iin,
+      '_[source]': Track.props.library,
+    });
+
+    fetch.jsonp({
+      url,
+      callback: features => {
+        if (features.error) {
+          Analytics.track('features:card:fetch:failure', {
+            data: {
+              iin,
+              error: features.error,
+            },
+          });
+          return reject(features.error);
+        }
+
+        // Store in cache
+        CardFeatureCache.iin[iin] = features;
+
+        // Update card metadata
+        updateCardIINMetadata(iin, features);
+
+        // Resolve
+        resolve(features);
+
+        Analytics.track('features:card:fetch:success', {
+          data: {
+            iin,
+            features,
+          },
+        });
+      },
+    });
+
+    Analytics.track('features:card:fetch:start', {
+      data: {
+        iin,
+      },
+    });
+  });
+
+  return CardFeatureRequests.iin[iin];
 }
