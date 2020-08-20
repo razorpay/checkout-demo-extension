@@ -15,6 +15,7 @@ const savedVPA = require('./saved-vpa');
 const upiCollect = require('./upi-collect');
 const upiOtm = require('./upi-otm');
 const payouts = require('./payouts.js');
+const internationalPaypal = require('./international/paypal.js');
 
 module.exports = {
   netbanking: netbanking,
@@ -34,4 +35,5 @@ module.exports = {
   'upi-collect': upiCollect,
   payouts: payouts,
   'upi-otm': upiOtm,
+  'international-paypal': internationalPaypal,
 };
