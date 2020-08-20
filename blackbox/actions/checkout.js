@@ -77,6 +77,49 @@ async function passMessage(page, message) {
   await page.evaluate(message => handleMessage(message), message);
 }
 
+const API_PREFERRED_INSTRUMENTS = {
+  upi: [
+    {
+      method: 'upi',
+      instrument: 'dsd@okhdfcbank',
+      score: 1,
+    },
+
+    {
+      method: 'upi',
+      instrument: 'dfs@okicici',
+      score: 1,
+    },
+  ],
+
+  wallet: [
+    {
+      method: 'wallet',
+      instrument: 'freecharge',
+      score: 1,
+    },
+  ],
+
+  netbanking: [
+    {
+      method: 'netbanking',
+      instrument: 'HDFC',
+      score: 1,
+    },
+  ],
+
+  card: [
+    {
+      method: 'card',
+      issuer: 'ICIC',
+      network: 'Visa',
+      type: 'credit',
+      instrument: 'token_9AT28Pxxe0Npi9',
+      score: 1,
+    },
+  ],
+};
+
 let interceptorOptions;
 module.exports = {
   async openCheckout({
@@ -85,6 +128,7 @@ module.exports = {
     preferences,
     params,
     apps,
+    upiApps,
     experiments,
     method,
   }) {
@@ -110,6 +154,10 @@ module.exports = {
 
     page.on('request', checkoutRequestHandler);
     await page.goto(checkoutUrl);
+
+    if (typeof options.personalization === 'undefined') {
+      options.personalization = false;
+    }
 
     await setExperiments(page, experiments);
     if (method && options.personalization) {
@@ -195,6 +243,15 @@ module.exports = {
           }[method]
         );
       }, method);
+
+      // Set preferred methods in preferences too
+      preferences.preferred_methods = {
+        '+918888888881': {
+          instruments: API_PREFERRED_INSTRUMENTS[method.toLowerCase()],
+          is_customer_identified: true,
+          user_aggregates_available: true,
+        },
+      };
     }
 
     page.removeListener('request', checkoutRequestHandler);
@@ -236,9 +293,9 @@ module.exports = {
 
     if (options) {
       const message = { options };
-      if (apps) {
-        if (typeof apps === 'boolean') {
-          apps = [
+      if (upiApps) {
+        if (typeof upiApps === 'boolean') {
+          upiApps = [
             {
               package_name: 'in.org.npci.upiapp',
               shortcode: 'bhim',
@@ -252,8 +309,23 @@ module.exports = {
           ];
         }
 
-        message.upi_intents_data = apps;
+        message.upi_intents_data = upiApps;
       }
+
+      if (apps && apps.includes('google_pay_cards')) {
+        message.external_sdks = { googlepay: true };
+      }
+
+      if (apps && apps.includes('cred')) {
+        message.uri_data = [
+          {
+            shortcode: 'cred',
+            package_name: 'com.dreamplug.androidapp',
+            uri: 'credpay',
+          },
+        ];
+      }
+
       await passMessage(page, message);
     }
     if (preferences) {

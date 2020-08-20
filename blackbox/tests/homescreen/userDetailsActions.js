@@ -9,11 +9,25 @@ const {
   assertVisible,
 } = require('../../util');
 
+const { receiveApiInstruments } = require('./personalization-actions');
+
+const {
+  waitForSkeletonInstrumentsToResolve,
+} = require('./checkout-config/config-utils');
+
 /**
  * Asserts that the user details in the strip
  * are the same as those entered.
  */
-async function assertUserDetails(context) {
+async function assertUserDetails(context, apiInstrumentsReadFromCache = true) {
+  if (
+    !context.preferences.customer &&
+    context.options.personalization !== false
+  ) {
+    if (!apiInstrumentsReadFromCache) {
+      await receiveApiInstruments(context);
+    }
+  }
   if (!context.preferences.customer) {
     let { contact, email } = context.state;
 
@@ -42,6 +56,8 @@ async function assertUserDetails(context) {
       expect(lastInPage).toEqual(last);
     }
   }
+
+  await waitForSkeletonInstrumentsToResolve(context);
 }
 
 /**
@@ -51,7 +67,7 @@ async function assertUserDetails(context) {
 async function assertEditUserDetailsAndBack(context) {
   await context.page.click('#user-details [slot=title]');
   await context.page.click('#footer');
-  await assertUserDetails(context);
+  await assertUserDetails(context, true);
 }
 
 /**

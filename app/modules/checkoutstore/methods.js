@@ -737,7 +737,13 @@ export function getAppProviders() {
   if (apps |> _Obj.isEmpty) {
     return [];
   }
-  return apps |> _Obj.keys |> _Arr.map(getAppProvider) |> _Arr.filter(Boolean);
+  return (
+    apps
+    |> _Obj.keys
+    |> _Arr.filter(isApplicationEnabled)
+    |> _Arr.map(getAppProvider)
+    |> _Arr.filter(Boolean)
+  );
 }
 
 export function getCardlessEMIProviders() {
