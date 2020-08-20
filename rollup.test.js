@@ -34,8 +34,8 @@ execSync('mkdir -p ' + distDir);
 const template = bundleName => `<meta charset='utf-8'>
 <script src="../../../node_modules/testdouble/dist/testdouble.js"></script>
 <script src="../../../test/tape.js"></script>
-<script>test.onFinish(testDone)</script>
-<script src="${bundleName}.js"></script>`;
+<script src="${bundleName}.js"></script>
+<script>test.onFinish(testDone)</script>`;
 
 let plugins = rollupPlugins.concat(coveragePlugin);
 
