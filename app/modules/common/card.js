@@ -184,27 +184,6 @@ export const getCardSpacing = maxLen => {
   }
 };
 
-export const luhnCheck = num => {
-  let sum = 0;
-  let digits = String(num)
-    .split('')
-    .reverse();
-
-  for (var i = 0; i < digits.length; i++) {
-    let digit = digits[i];
-    digit = parseInt(digit, 10);
-    if (i % 2) {
-      digit *= 2;
-    }
-    if (digit > 9) {
-      digit -= 9;
-    }
-    sum += digit;
-  }
-
-  return sum % 10 === 0;
-};
-
 /**
  * Checks if the card network in payment is one among the list provided.
  * @param {Object} paymentData

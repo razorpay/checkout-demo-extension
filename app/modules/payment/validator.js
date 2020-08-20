@@ -2,7 +2,8 @@ import getFingerprint from 'fingerprint';
 import { flattenProp } from 'common/options';
 import Track from 'tracker';
 import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi';
-import { getCardType, luhnCheck } from 'common/card';
+import { getCardType } from 'common/card';
+import { luhnCheck } from 'lib/utils';
 
 /* cotains mapping of sdk keys to shield key names */
 const sdkToShieldMap = {
