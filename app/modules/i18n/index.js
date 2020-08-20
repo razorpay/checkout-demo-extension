@@ -29,7 +29,19 @@ export function getBundle(locale) {
  * @returns {string}
  */
 export function formatTemplateWithLocale(label, data, locale, defaultValue) {
-  return get(t)(label, { locale, values: data, default: defaultValue });
+  try {
+    return get(t)(label, { locale, values: data, default: defaultValue });
+  } catch (e) {
+    Analytics.track('i18n:template:error', {
+      data: {
+        message: e.message,
+        label,
+        locale,
+        data,
+      },
+    });
+    return defaultValue || label;
+  }
 }
 
 /**
