@@ -770,6 +770,8 @@ export default {
       '<strong>{bank}</strong> accounts are experiencing low success rates.',
     downtime_high_callout:
       '<strong>{bank}</strong> accounts are temporarily unavailable right now. Please select another bank.',
+    recurring_callout:
+      'Future payments from your bank account will be charged automatically.',
     retail_label: 'Retail',
     search_all: 'All banks',
     search_placeholder: 'Search for bank',

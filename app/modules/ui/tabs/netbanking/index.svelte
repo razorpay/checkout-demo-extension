@@ -30,9 +30,11 @@
     SEARCH_ALL,
     DOWNTIME_LOW_CALLOUT,
     DOWNTIME_HIGH_CALLOUT,
+    RECURRING_CALLOUT,
   } from 'ui/labels/netbanking';
 
   import { t, locale } from 'svelte-i18n';
+
   import {
     getShortBankName,
     getLongBankName,
@@ -384,9 +386,7 @@
     <Bottom>
       <!-- Show recurring message for recurring payments -->
       {#if recurring}
-        <Callout>
-          Future payments from your bank account will be charged automatically.
-        </Callout>
+        <Callout>{$t(RECURRING_CALLOUT)}</Callout>
       {/if}
 
       <!-- Show downtime message if the selected bank is down -->

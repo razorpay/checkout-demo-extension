@@ -8,3 +8,4 @@ export const SEARCH_PLACEHOLDER = 'netbanking.search_placeholder';
 export const SEARCH_ALL = 'netbanking.search_all';
 export const DOWNTIME_LOW_CALLOUT = 'netbanking.downtime_low_callout';
 export const DOWNTIME_HIGH_CALLOUT = 'netbanking.downtime_high_callout';
+export const RECURRING_CALLOUT = 'netbanking.recurring_callout';
