@@ -56,10 +56,18 @@ function getInstrumentsFromApi(customer) {
     amount: getAmount(),
   });
 
+  const p13nFetchStart = new Date();
   const promise = new Promise(resolve => {
     fetch({
       url,
       callback: function(response) {
+        Analytics.track('p13n:api_data', {
+          type: AnalyticsTypes.METRIC,
+          data: {
+            response,
+            time: new Date() - p13nFetchStart,
+          },
+        });
         // Empty objects are arrays in PHP
         if (_.isArray(response)) {
           response = {
