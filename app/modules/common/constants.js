@@ -90,7 +90,6 @@ export const AVAILABLE_METHODS = [
   'netbanking',
   'wallet',
   'upi_otm',
-  'upi',
   'gpay',
   'emi',
   'cardless_emi',
