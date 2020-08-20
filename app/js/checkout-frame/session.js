@@ -4437,6 +4437,12 @@ Session.prototype = {
         CardScreenStore.currencyRequestId
       );
       data.dcc_currency = discreet.storeGetter(CardScreenStore.dccCurrency);
+
+      // These are undefined/empty if the user uses an Indian card
+      if (!data.currency_request_id) {
+        delete data.currency_request_id;
+        delete data.dcc_currency;
+      }
     }
 
     var emiCode, emiContact, isHDFCDebitEMI;
