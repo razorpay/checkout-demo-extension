@@ -2839,7 +2839,7 @@ Session.prototype = {
      * When the user comes back to the card tab after selecting EMI plan,
      * do not commence OTP again.
      */
-    if (!customer.logged && !this.wants_skip && !this.screen) {
+    if (!customer.logged && !this.wants_skip && this.screen !== 'card') {
       self.commenceOTP('saved_cards_sending', 'saved_cards_access', {
         phone: getPhone(),
       });
