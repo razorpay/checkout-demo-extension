@@ -154,7 +154,7 @@ describe('display.blocks', () => {
       page,
       options,
       preferences,
-      apps: true,
+      upiApps: true,
     });
 
     // User details
@@ -197,7 +197,7 @@ describe('display.blocks', () => {
       page,
       options,
       preferences,
-      apps: true,
+      upiApps: true,
     });
 
     // User details
@@ -239,7 +239,7 @@ describe('display.blocks', () => {
       page,
       options,
       preferences,
-      apps: true,
+      upiApps: true,
     });
 
     // User details
@@ -285,7 +285,7 @@ describe('display.blocks', () => {
       page,
       options,
       preferences,
-      apps: true,
+      upiApps: true,
     });
 
     // User details
@@ -329,7 +329,7 @@ describe('display.blocks', () => {
       page,
       options,
       preferences,
-      apps: true,
+      upiApps: true,
     });
 
     // User details
@@ -371,7 +371,7 @@ describe('display.blocks', () => {
       page,
       options,
       preferences,
-      apps: true,
+      upiApps: true,
     });
 
     // User details
@@ -410,7 +410,7 @@ describe('display.blocks', () => {
       page,
       options,
       preferences,
-      apps: true,
+      upiApps: true,
     });
 
     // User details
@@ -452,7 +452,7 @@ describe('display.blocks', () => {
       page,
       options,
       preferences,
-      apps: true,
+      upiApps: true,
     });
 
     // User details
@@ -494,7 +494,7 @@ describe('display.blocks', () => {
       page,
       options,
       preferences,
-      apps: true,
+      upiApps: true,
     });
 
     // User details

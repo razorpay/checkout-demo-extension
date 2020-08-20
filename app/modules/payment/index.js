@@ -552,6 +552,8 @@ Payment.prototype = {
 
     var razorpayInstance = this.r;
 
+    data['_[request_index]'] = Analytics.updateRequestIndex('submit');
+
     this.ajax = fetch.post({
       url: makeUrl('payments/create/ajax'),
       data,
@@ -577,6 +579,9 @@ Payment.prototype = {
       if (this.iframe) {
         this.popup.show();
       }
+
+      data['_[request_index]'] = Analytics.updateRequestIndex('submit');
+
       _Doc.submitForm(makeRedirectUrl(payment.fees), data, 'post', popup.name);
     }
   },
