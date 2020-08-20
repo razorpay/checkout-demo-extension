@@ -83,7 +83,7 @@ export const STRINGS = {
 };
 
 /* Being used for filtering actual methods from methods object */
-/* The below array determines the list of methods shown in the homescreen */
+/* The below array determines the order of payment methods shown in the homescreen */
 export const AVAILABLE_METHODS = [
   'card',
   'upi',
