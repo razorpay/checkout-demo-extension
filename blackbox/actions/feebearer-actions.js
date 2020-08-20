@@ -1,4 +1,4 @@
-const { visible, delay } = require('../util');
+const { visible } = require('../util');
 
 async function handleFeeBearer(
   context,
@@ -36,7 +36,6 @@ async function handleFeeBearer(
       amount: 620.54,
     },
   });
-  await delay(100000);
   const feeAmount11 = await context.page.$$('.fee-amount');
   feeAmount = feeAmount11[0];
   expectedfeeAmount1 = originalAmount;
