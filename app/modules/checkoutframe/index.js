@@ -355,10 +355,9 @@ function updateEmandatePrefill() {
           setOption(`prefill.bank_account[${key}]`, bank_account[key]);
         }
       });
-
-    if (order.bank) {
-      setOption('prefill.bank', order.bank);
-    }
+  }
+  if (order.bank) {
+    setOption('prefill.bank', order.bank);
   }
 }
 

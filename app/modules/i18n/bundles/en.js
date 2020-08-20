@@ -680,6 +680,7 @@ export default {
     },
     titles: {
       bank_transfer: 'Bank Transfer',
+      emandate: 'Emandate',
       card: 'Card',
       cardless_emi: 'Cardless EMI',
       cred: 'CRED',
