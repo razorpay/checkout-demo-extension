@@ -2,7 +2,6 @@ import getFingerprint from 'fingerprint';
 import { flattenProp } from 'common/options';
 import Track from 'tracker';
 import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi';
-import { getCardType } from 'common/card';
 import { luhnCheck } from 'lib/utils';
 
 /* cotains mapping of sdk keys to shield key names */
@@ -51,7 +50,7 @@ export const formatPayment = function(payment) {
 
 function validateData(data) {
   const cardNum = data |> _Obj.getOwnProp('card[name]');
-  if (cardNum && luhnCheck(cardNum) && getCardType(cardNum)) {
+  if (cardNum && luhnCheck(cardNum)) {
     _.throwMessage(
       'Error in integration. Please contact Razorpay for assistance'
     );
