@@ -121,7 +121,7 @@ export const getBankFromCard = cardNum => {
   const cardFeatures = getCardMetadata(cardNum);
   let issuer = cardFeatures.issuer;
 
-  if (!issuer && getNetworkFromCardNumber(carNum) === 'amex') {
+  if (!issuer && cardFeatures.network === 'amex') {
     issuer = 'AMEX';
   }
 
