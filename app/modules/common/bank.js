@@ -1,4 +1,5 @@
 import RazorpayConfig from 'common/RazorpayConfig';
+import { getCardMetadata } from 'common/card';
 
 // const cdnUrl = '';
 const cdnUrl = RazorpayConfig.cdn;
@@ -131,7 +132,19 @@ export const emiBanks = [
 ];
 
 export const getBankFromCard = cardNum => {
-  let bankObj = _Arr.find(emiBanks, bankObj => bankObj.patt.test(cardNum));
+  const cardFeatures = getCardMetadata(cardNum);
+  let issuer = cardFeatures.issuer;
+
+  if (!issuer && getNetworkFromCardNumber(carNum) === 'amex') {
+    issuer = 'AMEX';
+  }
+
+  if (cardFeatures.type === 'debit') {
+    issuer += '_DC';
+  }
+
+  let bankObj = _Arr.find(emiBanks, bankObj => bankObj.code === issuer);
+
   if (bankObj) {
     return {
       name: bankObj.name,
