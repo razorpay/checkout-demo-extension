@@ -69,6 +69,7 @@ const IRCTC_KEYS = [
 
 export const isIRCTC = () => IRCTC_KEYS |> _Arr.contains(getOption('key'));
 
+export const getPayoutContact = () => preferences.contact;
 export const getDisplayAmount = am => displayAmount(razorpayInstance, am);
 export const getMerchantMethods = () => preferences.methods;
 export const getRecurringMethods = () => preferences.methods.recurring;
@@ -242,10 +243,10 @@ export function shouldRememberCustomer() {
 }
 
 export function shouldStoreCustomerInStorage() {
-  const global = preferences && preferences.global;
+  const globalCustomer = preferences && preferences.global;
   const rememberCustomer = razorpayInstance.get().remember_customer;
 
-  return global && rememberCustomer;
+  return globalCustomer && rememberCustomer;
 }
 
 export function shouldSeparateDebitCard() {

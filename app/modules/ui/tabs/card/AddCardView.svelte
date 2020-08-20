@@ -75,9 +75,10 @@
   let showCardUnsupported = false;
 
   let cardNumberHelpText;
-  $: cardNumberHelpText = showCardUnsupported
-    ? $t(CARD_NUMBER_HELP_UNSUPPORTED)
-    : undefined;
+  $: cardNumberHelpText =
+    showCardUnsupported && $cardNumber.length > 6
+      ? $t(CARD_NUMBER_HELP_UNSUPPORTED)
+      : undefined;
 
   export let faded = false;
 

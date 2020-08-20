@@ -80,6 +80,15 @@
       invoke(this.options.onhide);
     },
 
+    handleBackdropClick: function() {
+      // Let parent handle any clicks
+      var shouldClose = this.options.handleBackdropClick();
+
+      if (shouldClose) {
+        this.backdropHide();
+      }
+    },
+
     backdropHide: function() {
       if (this.options.backdropclose) {
         this.hide();
@@ -134,9 +143,8 @@
           }
         });
       }
-      if (this.options.backdropclose) {
-        this.on('click', gel('backdrop'), this.backdropHide);
-      }
+
+      this.on('click', gel('backdrop'), this.handleBackdropClick);
     },
 
     destroy: function() {

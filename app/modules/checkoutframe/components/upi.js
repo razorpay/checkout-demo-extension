@@ -31,16 +31,19 @@ export function checkGooglePayWebPayments() {
     return;
   }
 
-  session.r.checkPaymentAdapter('gpay').then(() => {
-    googlePayWebPaymentsAvailable = true;
+  session.r
+    .checkPaymentAdapter('gpay')
+    .then(() => {
+      googlePayWebPaymentsAvailable = true;
 
-    // Google Pay is available for web payments
-    setUpiApps([
-      {
-        package_name: GOOGLE_PAY_PACKAGE_NAME,
-      },
-    ]);
-  });
+      // Google Pay is available for web payments
+      setUpiApps([
+        {
+          package_name: GOOGLE_PAY_PACKAGE_NAME,
+        },
+      ]);
+    })
+    .catch(() => {});
 }
 
 export function render(props = {}) {

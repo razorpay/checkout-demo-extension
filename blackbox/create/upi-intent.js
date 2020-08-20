@@ -87,7 +87,7 @@ module.exports = function(testFeatures) {
         page,
         options,
         preferences,
-        apps: true,
+        upiApps: true,
       });
 
       const missingUserDetails = optionalContact && optionalEmail;

@@ -7,8 +7,6 @@ const cdnUrl = RazorpayConfig.cdn;
 const providers = {
   google_pay_cards: {
     code: 'google_pay_cards',
-    name: 'Pay with Google Pay',
-    subtext: 'Use cards saved on Google Pay',
     logo: cdnUrl + 'app/googlepay.svg',
     verify_registration: true,
     externalSDK: 'googlepay',
@@ -18,8 +16,6 @@ const providers = {
   },
   cred: {
     code: 'cred',
-    name: 'Pay with CRED',
-    subtext: 'Use CRED coins for upto 20%',
     logo: cdnUrl + 'checkout/cred.png',
     uri: 'credpay', // credpay://
     package_name: 'com.dreamplug.androidapp',
@@ -43,13 +39,13 @@ export const getAppsForMethod = method => {
 export function getCardApps(sdkMeta, externalSDKs, uriData) {
   const apps = getAppsForMethod('card') |> _Arr.map(getProvider);
   const filteredApps = _Arr.filter(apps, app => {
-    if (
-      app.externalSDK &&
-      _.isNonNullObject(externalSDKs) &&
-      !externalSDKs[app.externalSDK]
-    ) {
-      // Filter out this app as the required external SDK is not available.
-      return false;
+    if (app.externalSDK) {
+      if (!_.isNonNullObject(externalSDKs)) {
+        return false;
+      } else if (!externalSDKs[app.externalSDK]) {
+        // Filter out this app as the required external SDK is not available.
+        return false;
+      }
     }
 
     if (app.isCompatibleWithSDK && !app.isCompatibleWithSDK(sdkMeta)) {
