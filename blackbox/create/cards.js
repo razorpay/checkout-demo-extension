@@ -15,6 +15,9 @@ const {
   handleCardValidation,
   handleMockFailureDialog,
   verifyErrorMessage,
+  handleCustomerCardStatusRequest,
+  typeOTPandSubmit,
+  respondSavedCards,
   retryTransaction,
   selectPersonalizedCard,
 
@@ -61,6 +64,7 @@ module.exports = function(testFeatures) {
     offers,
     optionalContact,
     optionalEmail,
+    recurringOrder,
   } = features;
 
   describe.each(
@@ -95,15 +99,26 @@ module.exports = function(testFeatures) {
         await proceed(context);
       }
 
-      if (!missingUserDetails) {
+      if (recurringOrder) {
+        await handleCustomerCardStatusRequest(context);
+        await typeOTPandSubmit(context);
+        await respondSavedCards(context);
+      }
+
+      if (!missingUserDetails && !recurringOrder) {
         await assertUserDetails(context);
         await assertEditUserDetailsAndBack(context);
       }
 
-      await assertPaymentMethods(context);
+      if (!recurringOrder) {
+        await assertPaymentMethods(context);
 
-      await selectPaymentMethod(context, 'card');
-      await enterCardDetails(context);
+        await selectPaymentMethod(context, 'card');
+      }
+
+      await enterCardDetails(context, {
+        recurring: !!recurringOrder,
+      });
 
       if (offers) {
         await viewOffers(context);

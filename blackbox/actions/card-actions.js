@@ -67,7 +67,10 @@ async function handleBankRequest(context) {
   await context.respondHTML(`<html></html>`);
 }
 
-async function enterCardDetails(context, { cardType, nativeOtp = false } = {}) {
+async function enterCardDetails(
+  context,
+  { cardType, nativeOtp = false, recurring = false } = {}
+) {
   const visa = cardType === 'VISA';
   await context.page.type(
     '#card_number',
@@ -75,7 +78,7 @@ async function enterCardDetails(context, { cardType, nativeOtp = false } = {}) {
   );
   await context.expectRequest(req => {});
   const flows = {
-    recurring: false,
+    recurring,
     iframe: true,
   };
   if (nativeOtp) {
