@@ -1,0 +1,13 @@
+name: Add link to preview build
+on: pull_request
+jobs:
+  comment:
+    name: Add comment
+    runs-on: ubuntu-latest
+    steps:
+      - name: comment PR
+        uses: ./.github/actions/comment-on-pr
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          msg: 'This is a test for {branch_name}'
