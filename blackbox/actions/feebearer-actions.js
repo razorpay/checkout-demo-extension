@@ -1,10 +1,6 @@
 const { visible } = require('../util');
 
-async function handleFeeBearer(
-  context,
-  pressContinue,
-  originalAmount = '₹ 600'
-) {
+async function handleFeeBearer(context, pressContinue) {
   let req = await context.expectRequest();
   expect(req.method).toEqual('POST');
   await context.respondJSON({
