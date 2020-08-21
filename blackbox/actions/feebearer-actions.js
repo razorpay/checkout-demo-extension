@@ -38,7 +38,7 @@ async function handleFeeBearer(
   });
   const feeAmount11 = await context.page.$$('.fee-amount');
   feeAmount = feeAmount11[0];
-  expectedfeeAmount1 = originalAmount;
+  expectedfeeAmount1 = '₹ 600';
   const feeAmount1 = await context.page.evaluate(
     feeAmount => feeAmount.textContent,
     feeAmount

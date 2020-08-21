@@ -44,8 +44,6 @@ const {
   verifyLowDowntime,
 } = require('../tests/homescreen/actions');
 
-const { delay } = require('../util');
-
 module.exports = function(testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'omni-channel',
@@ -134,8 +132,6 @@ module.exports = function(testFeatures) {
       }
 
       await submit(context);
-
-      // await delay(100000);
 
       if (feeBearer) {
         await handleFeeBearer(context, page);
