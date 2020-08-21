@@ -5,6 +5,7 @@ var ua = navigator.userAgent;
 var preferences,
   CheckoutBridge = window.CheckoutBridge,
   StorageBridge = window.StorageBridge,
+  Promise = window.Promise,
   Bridge = discreet.Bridge,
   isIframe = window !== parent,
   ownerWindow = isIframe ? parent : opener,
@@ -1300,6 +1301,9 @@ Session.prototype = {
         back: bind(function() {
           var payment = this.r._payment;
 
+          // TODO: Use this.confirmClose() which returns a promise,
+          // Will need refactoring because there's a dependency
+          // on the return value.
           if (payment && confirmClose()) {
             this.clearRequest({
               '_[reason]': 'PAYMENT_CANCEL_BEFORE_PLAN_SELECT',
@@ -1739,29 +1743,34 @@ Session.prototype = {
       }
     }
 
+    var beforeReturn = function() {
+      // Prevents the overlay from closing and not allowing the user to
+      // attempt payment again incase of corporate netbanking.
+      if (self.isCorporateBanking) {
+        return;
+      }
+
+      $('#overlay-close').hide();
+      hideOverlayMessage();
+    };
+
     if (this.r._payment || this.isResumedPayment) {
       if (confirmedCancel === true) {
         return this.clearRequest();
       }
 
-      if (confirmClose()) {
-        this.clearRequest();
-        if (Bridge.checkout.platform === 'ios') {
-          Bridge.checkout.callIos('hide_nav_bar');
+      self.confirmClose().then(function(close) {
+        if (close) {
+          self.clearRequest();
+          if (Bridge.checkout.platform === 'ios') {
+            Bridge.checkout.callIos('hide_nav_bar');
+          }
+          beforeReturn();
         }
-      } else {
-        return;
-      }
+      });
+    } else {
+      beforeReturn();
     }
-
-    // Prevents the overlay from closing and not allowing the user to
-    // attempt payment again incase of corporate netbanking.
-    if (this.isCorporateBanking) {
-      return;
-    }
-
-    $('#overlay-close').hide();
-    hideOverlayMessage();
   },
 
   click: function(selector, delegateClass, listener, useCapture) {
@@ -2033,10 +2042,19 @@ Session.prototype = {
 
     if (this.get('theme.close_button')) {
       this.click('#modal-close', function() {
-        if (this.get('modal.confirm_close') && !confirmClose()) {
-          return;
+        var beforeReturn = function() {
+          self.hide();
+        };
+
+        if (self.get('modal.confirm_close')) {
+          self.confirmClose().then(function(close) {
+            if (close) {
+              beforeReturn();
+            }
+          });
+        } else {
+          beforeReturn();
         }
-        this.hide();
       });
     }
     this.on('submit', '#form', this.preSubmit);
@@ -2456,6 +2474,23 @@ Session.prototype = {
     Cta.setAppropriateCtaText();
   },
 
+  confirmClose: function() {
+    return new Promise(function(resolve) {
+      Confirm.show({
+        message: discreet.confirmCancelMsg,
+        heading: 'Cancel Payment?',
+        positiveBtnTxt: 'Yes, cancel',
+        negativeBtnTxt: 'No',
+        onPositiveClick: function() {
+          resolve(true);
+        },
+        onNegativeClick: function() {
+          resolve(false);
+        },
+      });
+    });
+  },
+
   back: function(confirmedCancel) {
     var tab = '';
     var payment = this.r._payment;
@@ -2465,18 +2500,6 @@ Session.prototype = {
     Analytics.track('back', {
       type: AnalyticsTypes.BEHAV,
     });
-
-    var confirm = function() {
-      Confirm.show({
-        message: discreet.confirmCancelMsg,
-        heading: 'Cancel Payment?',
-        positiveBtnTxt: 'Yes, cancel',
-        negativeBtnTxt: 'No',
-        onPositiveClick: function() {
-          self.back(true);
-        },
-      });
-    };
 
     if (
       this.screen === 'otp' &&
@@ -2498,7 +2521,12 @@ Session.prototype = {
         this.clearRequest();
         this.otpView.onBack();
       } else {
-        return confirm();
+        this.confirmClose().then(function(close) {
+          if (close) {
+            self.back(true);
+          }
+        });
+        return;
       }
     } else if (this.headless) {
       if (BackStore && BackStore.tab) {
@@ -2549,26 +2577,32 @@ Session.prototype = {
       tab = '';
     }
 
+    var beforeReturn = function() {
+      if (BackStore && BackStore.screen) {
+        self.setScreen(BackStore.screen);
+      }
+
+      self.switchTab(tab);
+
+      BackStore = null;
+    };
+
     var walletOtpPage =
       tab === 'wallet' && this.screen === 'otp' && this.r._payment;
     var cardlessEmiOtpPage =
       tab === 'cardless_emi' && this.screen === 'otp' && this.r._payment;
     if (walletOtpPage || cardlessEmiOtpPage) {
-      if (!confirmClose()) {
-        return;
-      }
-      this.clearRequest({
-        '_[reason]': 'PAYMENT_CANCEL_BEFORE_OTP_VERIFY',
+      self.confirmClose().then(function(close) {
+        if (close) {
+          self.clearRequest({
+            '_[reason]': 'PAYMENT_CANCEL_BEFORE_OTP_VERIFY',
+          });
+          beforeReturn();
+        }
       });
+    } else {
+      beforeReturn();
     }
-
-    if (BackStore && BackStore.screen) {
-      this.setScreen(BackStore.screen);
-    }
-
-    this.switchTab(tab);
-
-    BackStore = null;
   },
 
   /**
@@ -2816,7 +2850,7 @@ Session.prototype = {
      * When the user comes back to the card tab after selecting EMI plan,
      * do not commence OTP again.
      */
-    if (!customer.logged && !this.wants_skip && !this.screen) {
+    if (!customer.logged && !this.wants_skip && this.screen !== 'card') {
       self.commenceOTP('saved_cards_sending', 'saved_cards_access', {
         phone: getPhone(),
       });
@@ -3263,23 +3297,22 @@ Session.prototype = {
       delete data.contact;
     }
 
-    var prefillEmail = this.get('prefill.email');
-    var prefillContact = this.get('prefill.contact');
-
-    if (
-      Store.isContactOptional() &&
-      !(prefillContact && contactPattern.test(prefillContact))
-    ) {
-      delete data.contact;
+    if (Store.isContactOptional()) {
+      // Merchant is on contact optional feature
+      if (!contactPattern.test(data.contact)) {
+        // However, payload seems to have an invalid contact, delete it.
+        delete data.contact;
+      }
     } else if (data.contact) {
       data.contact = data.contact.replace(/\ /g, '');
     }
 
-    if (
-      Store.isEmailOptional() &&
-      !(prefillEmail && emailPattern.test(data.email))
-    ) {
-      delete data.email;
+    if (Store.isEmailOptional()) {
+      // Merchant is on email optional feature
+      if (!emailPattern.test(data.email)) {
+        // However, payload seems to have an invalid email, delete it.
+        delete data.email;
+      }
     }
 
     if (tab) {
@@ -4443,6 +4476,12 @@ Session.prototype = {
         CardScreenStore.currencyRequestId
       );
       data.dcc_currency = discreet.storeGetter(CardScreenStore.dccCurrency);
+
+      // These are undefined/empty if the user uses an Indian card
+      if (!data.currency_request_id) {
+        delete data.currency_request_id;
+        delete data.dcc_currency;
+      }
     }
 
     var emiCode, emiContact, isHDFCDebitEMI;
@@ -5071,6 +5110,42 @@ Session.prototype = {
       this.getCustomer = function() {
         return customer;
       };
+    }
+
+    // Track prefill validity before setting customer
+    var prefilledContact = session_options['prefill.contact'];
+    var prefilledEmail = session_options['prefill.email'];
+
+    if (prefilledContact) {
+      var isContactValid = true;
+
+      if (prefilledContact.indexOf('+91') === 0) {
+        isContactValid = Constants.PHONE_REGEX_INDIA.test(
+          prefilledContact.replace('+91', '')
+        );
+      } else {
+        isContactValid = Constants.CONTACT_REGEX.test(prefilledContact);
+      }
+
+      if (!isContactValid) {
+        Analytics.track('prefill:contact:invalid', {
+          data: {
+            contact: prefilledContact,
+          },
+        });
+      }
+    }
+
+    if (prefilledEmail) {
+      var isEmailValid = Constants.EMAIL_REGEX.test(prefilledEmail);
+
+      if (!isEmailValid) {
+        Analytics.track('prefill:email:invalid', {
+          data: {
+            email: prefilledEmail,
+          },
+        });
+      }
     }
 
     /* Used previously logged in customer details and saved card tokens */

@@ -1,7 +1,8 @@
 import Razorpay from 'common/Razorpay';
 import 'payment';
-
+import 'track-errors';
 import Track from 'tracker';
+
 Track.props.library = 'razorpayjs';
 
 Razorpay.payment.authorize = function(options) {
