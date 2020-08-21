@@ -7,6 +7,7 @@
   // Util imports
   import { getSession } from 'sessionmanager';
   import {
+    isPayout,
     getDowntimes,
     hasFeature,
     isCustomerFeeBearer,
@@ -22,7 +23,7 @@
     doesAppExist,
     GOOGLE_PAY_PACKAGE_NAME,
     otherAppsIcon,
-    getUPIAppLogoFromHandle,
+    getUPIAppDataFromHandle,
   } from 'common/upi';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
@@ -632,7 +633,7 @@
   }
 </style>
 
-<Tab {method} {down} pad={false}>
+<Tab {method} {down} pad={false} shown={isPayout()}>
   <Screen>
     <div>
 
@@ -674,7 +675,7 @@
               <div slot="title">{app.vpa.username + '@' + app.vpa.handle}</div>
               <i slot="icon">
                 <Icon
-                  icon={getUPIAppLogoFromHandle(app.vpa.handle) || session.themeMeta.icons.upi} />
+                  icon={getUPIAppDataFromHandle(app.vpa.handle).app_icon || session.themeMeta.icons.upi} />
               </i>
             </SlottedRadioOption>
           {/each}

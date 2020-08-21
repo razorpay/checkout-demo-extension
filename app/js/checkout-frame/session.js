@@ -5,6 +5,7 @@ var ua = navigator.userAgent;
 var preferences,
   CheckoutBridge = window.CheckoutBridge,
   StorageBridge = window.StorageBridge,
+  Promise = window.Promise,
   Bridge = discreet.Bridge,
   isIframe = window !== parent,
   ownerWindow = isIframe ? parent : opener,
@@ -19,9 +20,7 @@ var preferences,
   sanitizeTokens = discreet.sanitizeTokens,
   Store = discreet.Store,
   MethodStore = discreet.MethodStore,
-  SessionStore = discreet.SessionStore,
   UPIUtils = discreet.UPIUtils,
-  Payouts = discreet.Payouts,
   _Arr = discreet._Arr,
   _Func = discreet._Func,
   _ = discreet._,
@@ -29,6 +28,7 @@ var preferences,
   _Doc = discreet._Doc,
   _El = discreet._El,
   Hacks = discreet.Hacks,
+  Form = discreet.Form,
   CardlessEmi = discreet.CardlessEmi,
   PayLater = discreet.PayLater,
   PayLaterView = discreet.PayLaterView,
@@ -131,16 +131,18 @@ function improvisePrefilledContact(session) {
   var prefilledContact = session.get('prefill.contact');
   var prefilledEmail = session.get('prefill.email');
 
-  var storedUserDetails = discreet.ContactStorage.get();
+  if (Store.shouldStoreCustomerInStorage()) {
+    var storedUserDetails = discreet.ContactStorage.get();
 
-  // Pick details from storage if not given in prefill
-  if (!prefilledContact && storedUserDetails.contact) {
-    prefilledContact = storedUserDetails.contact;
-    Analytics.setMeta('prefilledFromStorage.contact', true);
-  }
-  if (!prefilledEmail && storedUserDetails.email) {
-    prefilledEmail = storedUserDetails.email;
-    Analytics.setMeta('prefilledFromStorage.email', true);
+    // Pick details from storage if not given in prefill
+    if (!prefilledContact && storedUserDetails.contact) {
+      prefilledContact = storedUserDetails.contact;
+      Analytics.setMeta('prefilledFromStorage.contact', true);
+    }
+    if (!prefilledEmail && storedUserDetails.email) {
+      prefilledEmail = storedUserDetails.email;
+      Analytics.setMeta('prefilledFromStorage.email', true);
+    }
   }
 
   if (prefilledContact) {
@@ -390,7 +392,7 @@ function errorHandler(response) {
           if (message) {
             $(help).html(message);
           }
-          this.shake();
+          Form.shake();
           return hideOverlayMessage();
         }
       }
@@ -842,22 +844,16 @@ Session.prototype = {
           Cta.showCta();
         }
 
-        var walletsEle = $('#wallets')[0].parentElement;
-
-        selectedWalletEl = selectedWalletEl[0].parentElement;
-
         // TODO: hacky stuff , need to refactor
         // setTimeout with 200ms - waiting for checkout animation to complete
+        var el = selectedWalletEl[0];
         window.setTimeout(function() {
           // scrolling to the selected wallet when checkout is opened
-          var walletsEleBottom =
-              walletsEle.getBoundingClientRect().top + walletsEle.clientHeight,
-            selectedWalletElBottom =
-              selectedWalletEl.getBoundingClientRect().top +
-              selectedWalletEl.clientHeight;
-
-          walletsEle.scrollTop =
-            walletsEle.scrollTop + selectedWalletElBottom - walletsEleBottom;
+          // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoViewIfNeeded
+          var scroll = el.scrollIntoViewIfNeeded || el.scrollIntoView;
+          if (scroll) {
+            scroll.call(el);
+          }
         }, 200);
       }
     }
@@ -1014,7 +1010,9 @@ Session.prototype = {
     this.improvisePrefill();
     es6components.render();
     this.setSvelteComponents();
-    this.fillData();
+    if (!Store.isPayout()) {
+      this.fillData();
+    }
     this.setEMI();
     Cta.init();
     this.setModal();
@@ -1070,15 +1068,15 @@ Session.prototype = {
   },
 
   setSvelteComponents: function() {
-    this.setTopBar();
     this.setUpiCancelReasonPicker();
-    this.setHomeTab();
+    if (!Store.isPayout()) {
+      this.setHomeTab();
+    }
     this.setSvelteCardTab();
     this.setEmandate();
     this.setCardlessEmi();
     this.setPayLater();
     this.setOtpScreen();
-    this.setPayoutsScreen();
     this.setNach();
     this.setOffers();
     this.setLanguageDropdown();
@@ -1244,60 +1242,6 @@ Session.prototype = {
     this.emiScreenView.$on('editplan', this.showEmiPlans('bajaj'));
   },
 
-  setPayoutsScreen: function() {
-    var session = this;
-    if (!this.isPayout) {
-      return;
-    }
-
-    var accounts =
-      (this.preferences.contact && this.preferences.contact.fund_accounts) ||
-      [];
-
-    var upiAccounts = _Arr.filter(accounts, function(account) {
-      return account.account_type === 'vpa';
-    });
-
-    var bankAccounts = _Arr.filter(accounts, function(account) {
-      return account.account_type === 'bank_account';
-    });
-
-    Analytics.setMeta('count.accounts.upi', upiAccounts.length);
-    Analytics.setMeta('count.accounts.bank', bankAccounts.length);
-
-    this.payoutsView = new discreet.PayoutsInstruments({
-      target: gel('form-fields'),
-      props: {
-        amount: this.formatAmountWithCurrency(this.get('amount')),
-        upiAccounts: upiAccounts,
-        bankAccounts: bankAccounts,
-      },
-    });
-
-    this.payoutsAccountView = new discreet.PayoutAccount({
-      target: gel('form-fields'),
-    });
-
-    this.topBar.hideUserDetails();
-
-    this.payoutsView.$on('selectaccount', function(event) {
-      $('#body').addClass('sub');
-      Analytics.track('payout:account:select', event.detail);
-    });
-
-    this.payoutsView.$on('add', function(event) {
-      var method = event.detail.method;
-
-      if (method === 'upi') {
-        session.switchTab('upi');
-      } else if (method === 'bank') {
-        session.switchTab('payout_account');
-      }
-    });
-
-    this.switchTab('payouts');
-  },
-
   getCardlessEmiPlans: function() {
     var providerCode = CardlessEmiStore.providerCode;
     var plans = CardlessEmiStore.plans[providerCode];
@@ -1349,6 +1293,9 @@ Session.prototype = {
         back: bind(function() {
           var payment = this.r._payment;
 
+          // TODO: Use this.confirmClose() which returns a promise,
+          // Will need refactoring because there's a dependency
+          // on the return value.
           if (payment && confirmClose()) {
             this.clearRequest({
               '_[reason]': 'PAYMENT_CANCEL_BEFORE_PLAN_SELECT',
@@ -1603,6 +1550,28 @@ Session.prototype = {
       this.modal = new window.Modal(this.el, {
         escape: this.get('modal.escape') && !this.embedded,
         backdropclose: this.get('modal.backdropclose'),
+        handleBackdropClick: function() {
+          // The same logic to close overlay using $overlayStack
+          // is present for backpresses.
+          // Don't forget to update it there too if you change something here.
+          // TODO: DRY
+
+          var $overlayStack = storeGetter(discreet.overlayStackStore);
+
+          if ($overlayStack.length > 0) {
+            var last = $overlayStack[$overlayStack.length - 1];
+
+            last.back({
+              from: 'overlay',
+            });
+
+            // Signal that we don't want the Modal component to handle click on backdrop
+            return false;
+          }
+
+          // Signal that Modal component should hnadle backdrop click
+          return true;
+        },
         onhide: function() {
           Razorpay.sendMessage({ event: 'dismiss', data: self.dismissReason });
         },
@@ -1656,6 +1625,18 @@ Session.prototype = {
       MethodStore.isMethodEnabled('cardless_emi') // Is the method enabled?
     ) {
       this.set('prefill.method', 'cardless_emi');
+    }
+
+    /**
+     * For prefilling card apps,
+     * expected options are method: app & provider,
+     * however, we're showing them on cards screen,
+     * so set prefill as card.
+     */
+    if (prefilledMethod === 'app') {
+      if (MethodStore.isApplicationEnabled(prefilledProvider)) {
+        this.set('prefill.method', 'card');
+      }
     }
 
     var forcedOffer = discreet.Offers.getForcedOffer();
@@ -1751,42 +1732,34 @@ Session.prototype = {
       }
     }
 
+    var beforeReturn = function() {
+      // Prevents the overlay from closing and not allowing the user to
+      // attempt payment again incase of corporate netbanking.
+      if (self.isCorporateBanking) {
+        return;
+      }
+
+      $('#overlay-close').hide();
+      hideOverlayMessage();
+    };
+
     if (this.r._payment || this.isResumedPayment) {
       if (confirmedCancel === true) {
         return this.clearRequest();
       }
 
-      if (confirmClose()) {
-        this.clearRequest();
-        if (Bridge.checkout.platform === 'ios') {
-          Bridge.checkout.callIos('hide_nav_bar');
+      self.confirmClose().then(function(close) {
+        if (close) {
+          self.clearRequest();
+          if (Bridge.checkout.platform === 'ios') {
+            Bridge.checkout.callIos('hide_nav_bar');
+          }
+          beforeReturn();
         }
-      } else {
-        return;
-      }
+      });
+    } else {
+      beforeReturn();
     }
-
-    // Prevents the overlay from closing and not allowing the user to
-    // attempt payment again incase of corporate netbanking.
-    if (this.isCorporateBanking) {
-      return;
-    }
-
-    $('#overlay-close').hide();
-    hideOverlayMessage();
-  },
-
-  shake: function() {
-    if (this.el) {
-      $(this.el.querySelector('#modal-inner'))
-        .removeClass('shake')
-        .reflow()
-        .addClass('shake');
-    }
-
-    try {
-      window.navigator.vibrate(200);
-    } catch (err) {}
   },
 
   click: function(selector, delegateClass, listener, useCapture) {
@@ -1992,7 +1965,7 @@ Session.prototype = {
 
     this.topBar.setLogged(false);
 
-    CustomerStore.customer.set({});
+    CustomerStore.customer.set(customer);
     if (this.svelteCardTab) {
       this.svelteCardTab.showLandingView();
     }
@@ -2058,10 +2031,19 @@ Session.prototype = {
 
     if (this.get('theme.close_button')) {
       this.click('#modal-close', function() {
-        if (this.get('modal.confirm_close') && !confirmClose()) {
-          return;
+        var beforeReturn = function() {
+          self.hide();
+        };
+
+        if (self.get('modal.confirm_close')) {
+          self.confirmClose().then(function(close) {
+            if (close) {
+              beforeReturn();
+            }
+          });
+        } else {
+          beforeReturn();
         }
-        this.hide();
       });
     }
     this.on('submit', '#form', this.preSubmit);
@@ -2252,10 +2234,6 @@ Session.prototype = {
     if (screen) {
       var tabForTitle = this.tab === 'emi' ? this.tab : this.cardTab || screen;
 
-      if (screen === 'upi' && this.isPayout) {
-        tabForTitle = 'payout_upi';
-      }
-
       if (tabForTitle) {
         this.topBar.setTab(tabForTitle);
       }
@@ -2268,6 +2246,10 @@ Session.prototype = {
     // TODO remove this from here
     // check cardTab.setEmiPlansCta for details
     cardTab.setEmiPlansCta(screen, this.tab);
+
+    if (this.offers) {
+      this.offers.renderTab(this.tab);
+    }
 
     if (screen === this.screen) {
       return;
@@ -2305,7 +2287,7 @@ Session.prototype = {
     $('#body').attr('screen', screen);
     makeHidden('.screen.' + shownClass);
 
-    if (screen && !(this.isPayout && screen === 'payouts')) {
+    if (screen) {
       this.topBar.show();
       $('.elem-email').addClass('mature');
       $('.elem-contact').addClass('mature');
@@ -2342,16 +2324,10 @@ Session.prototype = {
       (this.tab === 'cardless_emi' && screen === 'emiplans') ||
       screen === 'paylater' ||
       screen === 'qr' ||
-      screen === 'bank_transfer' ||
       (screen === 'netbanking' && Store.isRecurring()) ||
       screen === 'emandate'
     ) {
       showPaybtn = false;
-    }
-
-    if (screen === 'payouts') {
-      var selectedInstrument = this.payoutsView.getSelectedInstrument();
-      showPaybtn = Boolean(selectedInstrument);
     }
 
     if (screen === '' && this.homeTab) {
@@ -2362,7 +2338,7 @@ Session.prototype = {
       this.body.toggleClass('sub', showPaybtn);
     }
 
-    return this.offers && this.offers.renderTab(this.tab);
+    return;
   },
 
   /**
@@ -2487,6 +2463,23 @@ Session.prototype = {
     Cta.setAppropriateCtaText();
   },
 
+  confirmClose: function() {
+    return new Promise(function(resolve) {
+      Confirm.show({
+        message: discreet.confirmCancelMsg,
+        heading: 'Cancel Payment?',
+        positiveBtnTxt: 'Yes, cancel',
+        negativeBtnTxt: 'No',
+        onPositiveClick: function() {
+          resolve(true);
+        },
+        onNegativeClick: function() {
+          resolve(false);
+        },
+      });
+    });
+  },
+
   back: function(confirmedCancel) {
     var tab = '';
     var payment = this.r._payment;
@@ -2496,18 +2489,6 @@ Session.prototype = {
     Analytics.track('back', {
       type: AnalyticsTypes.BEHAV,
     });
-
-    var confirm = function() {
-      Confirm.show({
-        message: discreet.confirmCancelMsg,
-        heading: 'Cancel Payment?',
-        positiveBtnTxt: 'Yes, cancel',
-        negativeBtnTxt: 'No',
-        onPositiveClick: function() {
-          self.back(true);
-        },
-      });
-    };
 
     if (
       this.screen === 'otp' &&
@@ -2529,7 +2510,12 @@ Session.prototype = {
         this.clearRequest();
         this.otpView.onBack();
       } else {
-        return confirm();
+        this.confirmClose().then(function(close) {
+          if (close) {
+            self.back(true);
+          }
+        });
+        return;
       }
     } else if (this.headless) {
       if (BackStore && BackStore.tab) {
@@ -2580,26 +2566,32 @@ Session.prototype = {
       tab = '';
     }
 
+    var beforeReturn = function() {
+      if (BackStore && BackStore.screen) {
+        self.setScreen(BackStore.screen);
+      }
+
+      self.switchTab(tab);
+
+      BackStore = null;
+    };
+
     var walletOtpPage =
       tab === 'wallet' && this.screen === 'otp' && this.r._payment;
     var cardlessEmiOtpPage =
       tab === 'cardless_emi' && this.screen === 'otp' && this.r._payment;
     if (walletOtpPage || cardlessEmiOtpPage) {
-      if (!confirmClose()) {
-        return;
-      }
-      this.clearRequest({
-        '_[reason]': 'PAYMENT_CANCEL_BEFORE_OTP_VERIFY',
+      self.confirmClose().then(function(close) {
+        if (close) {
+          self.clearRequest({
+            '_[reason]': 'PAYMENT_CANCEL_BEFORE_OTP_VERIFY',
+          });
+          beforeReturn();
+        }
       });
+    } else {
+      beforeReturn();
     }
-
-    if (BackStore && BackStore.screen) {
-      this.setScreen(BackStore.screen);
-    }
-
-    this.switchTab(tab);
-
-    BackStore = null;
   },
 
   /**
@@ -2653,21 +2645,12 @@ Session.prototype = {
 
   switchTab: function(tab) {
     /**
-     * Validate fields on common screen. Do not do this for payouts as payouts
-     * tab itself is the initial screen, and we want to switch to it unconditionally.
+     * Validate fields on common screen.
      */
-    if (!this.tab && !this.isPayout) {
+    if (!this.tab) {
       if (!this.checkCommonValidAndTrackIfInvalid()) {
         return;
       }
-    }
-
-    /**
-     * `tab` being empty means that we want to go to the homescreen.
-     * In the case of Payouts, "payouts" is the homescreen.
-     */
-    if (!tab && this.isPayout) {
-      tab = 'payouts';
     }
 
     Analytics.track('tab:switch', {
@@ -2703,11 +2686,8 @@ Session.prototype = {
       });
 
       var contact = getPhone();
-      /**
-       * Validate contact only if it isn't a payout.
-       */
       if (
-        (!contact && !Store.isContactOptional() && !this.isPayout) ||
+        (!contact && !Store.isContactOptional()) ||
         this.get('method.' + tab) === false
       ) {
         return;
@@ -2859,7 +2839,7 @@ Session.prototype = {
      * When the user comes back to the card tab after selecting EMI plan,
      * do not commence OTP again.
      */
-    if (!customer.logged && !this.wants_skip && !this.screen) {
+    if (!customer.logged && !this.wants_skip && this.screen !== 'card') {
       self.commenceOTP('saved_cards_sending', 'saved_cards_access', {
         phone: getPhone(),
       });
@@ -2959,6 +2939,14 @@ Session.prototype = {
       };
     };
 
+    var getBankEMICode = function(issuer, type) {
+      // EMI codes are different from bank codes and have _DC at the end.
+      if (type === 'debit' && !_Str.endsWith(issuer, '_DC')) {
+        return issuer + '_DC';
+      }
+      return issuer;
+    };
+
     if (type === 'new') {
       return function(e) {
         self.topBar.resetTitleOverride('emiplans');
@@ -2966,6 +2954,9 @@ Session.prototype = {
         var bank = self.emiPlansForNewCard && self.emiPlansForNewCard.code;
         var cardIssuer = bank.split('_')[0];
         var cardType = _Str.endsWith(bank, '_DC') ? 'debit' : 'credit';
+
+        bank = getBankEMICode(bank, cardType);
+
         var contactRequiredForEMI = MethodStore.isContactRequiredForEMI(
           bank,
           cardType
@@ -3005,7 +2996,7 @@ Session.prototype = {
 
               self.switchTab('card');
               self.setScreen('card');
-              self.svelteCardTab.showAddCardView();
+              self.svelteCardTab.showLandingView();
             },
 
             select: function(value, contact) {
@@ -3055,6 +3046,9 @@ Session.prototype = {
         var bank = $trigger.attr('data-bank');
         var cardIssuer = bank;
         var cardType = $trigger.attr('data-card-type');
+
+        bank = getBankEMICode(bank, cardType);
+
         var contactRequiredForEMI = MethodStore.isContactRequiredForEMI(
           bank,
           cardType
@@ -3236,7 +3230,7 @@ Session.prototype = {
     }
     var invalids = $(parent).find('.invalid');
     if (invalids && invalids[0]) {
-      this.shake();
+      Form.shake();
       var invalidInput =
         $(invalids[0]).find('.input')[0] ||
         $(invalids[0]).find('input[type=checkbox]')[0];
@@ -3292,23 +3286,22 @@ Session.prototype = {
       delete data.contact;
     }
 
-    var prefillEmail = this.get('prefill.email');
-    var prefillContact = this.get('prefill.contact');
-
-    if (
-      Store.isContactOptional() &&
-      !(prefillContact && contactPattern.test(prefillContact))
-    ) {
-      delete data.contact;
+    if (Store.isContactOptional()) {
+      // Merchant is on contact optional feature
+      if (!contactPattern.test(data.contact)) {
+        // However, payload seems to have an invalid contact, delete it.
+        delete data.contact;
+      }
     } else if (data.contact) {
       data.contact = data.contact.replace(/\ /g, '');
     }
 
-    if (
-      Store.isEmailOptional() &&
-      !(prefillEmail && emailPattern.test(data.email))
-    ) {
-      delete data.email;
+    if (Store.isEmailOptional()) {
+      // Merchant is on email optional feature
+      if (!emailPattern.test(data.email)) {
+        // However, payload seems to have an invalid email, delete it.
+        delete data.email;
+      }
     }
 
     if (tab) {
@@ -3491,13 +3484,6 @@ Session.prototype = {
       var text = I18n.getOtpScreenTitle(textView, templateData, locale);
       this.showLoadError(text);
     }
-  },
-
-  setTopBar: function() {
-    this.topBar = new discreet.TopBar({
-      target: _Doc.querySelector('#topbar-wrap'),
-    });
-    this.topBar.$on('back', this.back.bind(this));
   },
 
   setUpiCancelReasonPicker: function() {
@@ -3820,6 +3806,12 @@ Session.prototype = {
    */
   preSubmit: function(e, payload) {
     preventDefault(e);
+    // let <CTA> handle click, if present
+    // used for keyboard submit in payout screen
+    var cta = _Doc.querySelector('#footer-cta + span');
+    if (cta && e && e.type === 'submit') {
+      return cta.click();
+    }
     var screen = this.screen;
     var tab = this.tab;
 
@@ -3928,7 +3920,7 @@ Session.prototype = {
           ) {
             // no saved card was selected
             Analytics.track('shake:saved-cvv');
-            this.shake();
+            Form.shake();
             return $('.checked .saved-cvv input').focus();
           }
         }
@@ -3945,7 +3937,7 @@ Session.prototype = {
              */
             if (!data.token && !this.emiPlansForNewCard) {
               Analytics.track('shake:no-emi-plans');
-              this.shake();
+              Form.shake();
               return $('#card_number').focus();
             }
 
@@ -4026,7 +4018,7 @@ Session.prototype = {
             data['card[cvv]'] = cvvInput.value;
           } else {
             cvvInput.focus();
-            return this.shake();
+            return Form.shake();
           }
         }
       }
@@ -4043,7 +4035,15 @@ Session.prototype = {
     return storeGetter(HomeScreenStore.selectedInstrument);
   },
 
-  verifyVpaAndContinue: function(data, params) {
+  verifyVpa: function(vpa) {
+    /**
+     * set a timeout of 10s, if the API is taking > 10s to resolove;
+     * attempt payment regardless of verification
+     */
+    return this.r.verifyVpa(vpa, 10000);
+  },
+
+  verifyVpaAndContinue: function(data) {
     var self = this;
     var locale = I18n.getCurrentLocale();
     self.showLoadError(
@@ -4051,22 +4051,8 @@ Session.prototype = {
     );
     $('#overlay-close').hide();
 
-    var vpa = data.vpa;
-
-    /**
-     * Payouts has a different payload format. Extract vpa from payload if it
-     * a payout.
-     */
-    if (this.isPayout) {
-      vpa = data.vpa.address;
-    }
-
-    self.r
-      /**
-       * set a timeout of 10s, if the API is taking > 10s to resolove;
-       * attempt payment regardless of verification
-       */
-      .verifyVpa(vpa, 10000)
+    self
+      .verifyVpa(data.vpa)
       .then(function() {
         $('#overlay-close').show();
         hideOverlaySafely($('#error-message'));
@@ -4371,7 +4357,7 @@ Session.prototype = {
 
     /* VPA verification */
     if (data.vpa && !vpaVerified) {
-      return this.verifyVpaAndContinue(data, request);
+      return this.verifyVpaAndContinue(data);
     }
 
     if (preferences.fee_bearer && this.showFeesUi()) {
@@ -4451,6 +4437,12 @@ Session.prototype = {
         CardScreenStore.currencyRequestId
       );
       data.dcc_currency = discreet.storeGetter(CardScreenStore.dccCurrency);
+
+      // These are undefined/empty if the user uses an Indian card
+      if (!data.currency_request_id) {
+        delete data.currency_request_id;
+        delete data.dcc_currency;
+      }
     }
 
     var emiCode, emiContact, isHDFCDebitEMI;
@@ -4559,14 +4551,12 @@ Session.prototype = {
       this.commenceOTP('wallet_sending', 'wallet_enter', {
         wallet: I18n.getWalletName(walletObj.code, locale),
       });
-    } else if (!this.isPayout) {
+    } else {
       if (this.screen === 'otp') {
         this.commenceOTP('payment_processing');
       } else {
         this.showLoadError();
       }
-    } else {
-      this.showLoadError('Processing...');
     }
 
     if (wallet === 'freecharge') {
@@ -4590,65 +4580,6 @@ Session.prototype = {
     }
 
     this.preferredInstrument = P13n.processInstrument(data, this);
-
-    if (this.isPayout) {
-      Analytics.track('payout:create:start');
-
-      if (this.screen === 'payouts') {
-        /**
-         * If we are on the payouts screen when the submission happened, it
-         * means that the user selected an existing fund account.
-         */
-        var selectedAccount = this.payoutsView.getSelectedInstrument();
-
-        Analytics.track('submit', {
-          data: {
-            account: Payouts.makeTrackingDataFromAccount(selectedAccount),
-            existing: true,
-          },
-          immediately: true,
-        });
-
-        Analytics.track('payout:create:success', {
-          data: Payouts.makeTrackingDataFromAccount(selectedAccount),
-          immediately: true,
-        });
-
-        successHandler.call(session, {
-          razorpay_fund_account_id: selectedAccount.id,
-        });
-      } else {
-        /**
-         * If we are not on the payouts screen, create the fund account using
-         * the payload.
-         */
-
-        Analytics.track('submit', {
-          data: {
-            account: Payouts.makeTrackingDataFromAccount(data),
-            existing: false,
-          },
-          immediately: true,
-        });
-
-        Payouts.createFundAccount(data)
-          .then(function(account) {
-            Analytics.track('payout:create:success', {
-              data: {
-                account: Payouts.makeTrackingDataFromAccount(account),
-                existing: false,
-              },
-              immediately: true,
-            });
-
-            successHandler.call(session, {
-              razorpay_fund_account_id: account.id,
-            });
-          })
-          .catch(bind(errorHandler, this));
-      }
-      return;
-    }
 
     var payment = this.r.createPayment(data, request);
     payment
@@ -4811,28 +4742,6 @@ Session.prototype = {
   getPayload: function() {
     var data = this.getFormData();
 
-    if (this.isPayout && this.screen === 'upi') {
-      return {
-        contact_id: this.get('contact_id'),
-        account_type: 'vpa',
-        vpa: {
-          address: data.vpa,
-        },
-      };
-    }
-
-    if (this.isPayout && this.screen === 'payout_account') {
-      return {
-        contact_id: this.get('contact_id'),
-        account_type: 'bank_account',
-        bank_account: {
-          name: data.name,
-          ifsc: data.ifsc,
-          account_number: data.account_number,
-        },
-      };
-    }
-
     if (this.screen === 'card' && this.tab === 'emi') {
       if (!this.svelteCardTab.isOnSavedCardsScreen()) {
         setEmiBank(data);
@@ -4893,12 +4802,9 @@ Session.prototype = {
       'nachScreen',
       'otpView',
       'payLaterView',
-      'payoutsAccountView',
-      'payoutsView',
       'savedCardsView',
       'languageSelectionView',
       'svelteOverlay',
-      'topBar',
       'upiCancelReasonPicker',
       'timer',
     ];
@@ -5166,13 +5072,40 @@ Session.prototype = {
       };
     }
 
-    this.isPayout = Store.isPayout();
+    // Track prefill validity before setting customer
+    var prefilledContact = session_options['prefill.contact'];
+    var prefilledEmail = session_options['prefill.email'];
 
-    if (this.isPayout) {
-      Analytics.setMeta('payout', true);
+    if (prefilledContact) {
+      var isContactValid = true;
 
-      // We are disabling retries for payouts for now.
-      this.set('retry', false);
+      if (prefilledContact.indexOf('+91') === 0) {
+        isContactValid = Constants.PHONE_REGEX_INDIA.test(
+          prefilledContact.replace('+91', '')
+        );
+      } else {
+        isContactValid = Constants.CONTACT_REGEX.test(prefilledContact);
+      }
+
+      if (!isContactValid) {
+        Analytics.track('prefill:contact:invalid', {
+          data: {
+            contact: prefilledContact,
+          },
+        });
+      }
+    }
+
+    if (prefilledEmail) {
+      var isEmailValid = Constants.EMAIL_REGEX.test(prefilledEmail);
+
+      if (!isEmailValid) {
+        Analytics.track('prefill:email:invalid', {
+          data: {
+            email: prefilledEmail,
+          },
+        });
+      }
     }
 
     /* Used previously logged in customer details and saved card tokens */
@@ -5202,12 +5135,9 @@ Session.prototype = {
     Customer.prototype.r = this.r;
   },
 
-  fetchFundAccounts: function() {
-    return Payouts.fetchFundAccounts(this.get('contact_id'));
-  },
-
   hideOverlayMessage: hideOverlayMessage,
   errorHandler: errorHandler,
+  successHandler: successHandler,
 };
 
 /*

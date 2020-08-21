@@ -1,6 +1,8 @@
 <script>
   // Svelte imports
   import { onDestroy } from 'svelte';
+  import { slide } from 'svelte/transition';
+  import { linear } from 'svelte/easing';
 
   // UI imports
   import Instrument from 'ui/tabs/home/instruments/Instrument.svelte';
@@ -12,6 +14,7 @@
   import * as AnalyticsTypes from 'analytics-types';
   import { getSession } from 'sessionmanager';
   import { getInstrumentMeta } from 'ui/tabs/home/instruments';
+  import { getAnimationOptions } from 'svelte-utils';
 
   // Store
   import {
@@ -64,13 +67,32 @@
   .border-list {
     margin-bottom: 24px;
   }
+
+  /* Add delay for staggering loaders */
+  .border-list > :global(.skeleton-instrument:nth-child(2n) span)::after {
+    animation-delay: 0.1s;
+  }
+  .border-list > :global(.skeleton-instrument:nth-child(3n) span)::after {
+    animation-delay: 0.2s;
+  }
+
+  .title {
+    margin-top: 0;
+  }
+
+  .methods-block + .methods-block {
+    margin-top: 28px;
+  }
 </style>
 
 {#each $blocks as block}
   {#if block.code === 'rzp.cluster'}
     <RazorpayCluster {block} on:selectInstrument />
   {:else}
-    <div class="methods-block" data-block={block.code}>
+    <div
+      class="methods-block"
+      data-block={block.code}
+      out:slide|local={getAnimationOptions({ easing: linear, duration: 300 })}>
       <h3 class="title">
         {#if block.code === 'rzp.preferred'}
           <!-- LABEL: Preferred Payment Methods -->

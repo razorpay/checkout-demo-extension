@@ -51,6 +51,7 @@
   let title;
   let icon;
   let alt;
+  let code;
 
   function getVpaFromInstrument(instrument) {
     const { vpa, token } = instrument;
@@ -72,6 +73,7 @@
       title: getInstrumentTitle('app', providerName, locale),
       icon: provider.logo,
       alt: provider.name,
+      code: provider.code,
     };
   }
 
@@ -84,7 +86,12 @@
   }
 
   function getDetailsForNetbankingInstrument(instrument, locale) {
-    const bankName = getLongBankName(individualInstrument.bank, locale);
+    const banks = getBanks();
+    const bankName = getLongBankName(
+      individualInstrument.bank,
+      locale,
+      banks[instrument.bank]
+    );
     return {
       title: getInstrumentTitle('netbanking', bankName, locale),
       icon: getBankLogo(individualInstrument.bank),
@@ -204,6 +211,7 @@
       title = details.title;
       icon = details.icon;
       alt = details.alt;
+      code = details.code;
     }
   }
 
@@ -229,7 +237,7 @@
   {name}
   {selected}
   className="instrument"
-  attributes={{ 'data-type': 'individual', 'data-id': instrument.id }}
+  attributes={{ 'data-type': 'individual', 'data-id': instrument.id, 'data-code': code }}
   value={instrument.id}
   on:click
   on:keydown={attemptSubmit}>

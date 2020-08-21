@@ -45,6 +45,7 @@
     isMethodUsable,
     getAppsForCards,
     getPayloadForCRED,
+    isApplicationEnabled,
   } from 'checkoutstore/methods';
   import { newCardEmiDuration } from 'checkoutstore/emi';
 
@@ -90,6 +91,24 @@
   const isSavedCardsEnabled = shouldRememberCustomer();
 
   let currentView = Views.SAVED_CARDS;
+  let lastView;
+
+  // We're showing apps on both saved cards & new card screen,
+  // But if the user switches to new card screen from the saved cards screen,
+  // hide the apps. It clearly indicates that the user doesn't want to use apps.
+  let userWantsApps = true;
+  $: {
+    if (
+      savedCards.length &&
+      lastView === Views.SAVED_CARDS &&
+      currentView === Views.ADD_CARD
+    ) {
+      userWantsApps = false;
+    } else {
+      userWantsApps = true;
+    }
+    lastView = currentView;
+  }
 
   let tab = '';
   $: $cardTab = tab;
@@ -97,7 +116,7 @@
   let showApps = false;
   // None of the apps support EMI currently,
   // Don't show it on anything except card tab.
-  $: showApps = tab === 'card' && appsAvailable;
+  $: showApps = tab === 'card' && appsAvailable && userWantsApps;
 
   let allSavedCards = [];
   let savedCards = [];
@@ -120,6 +139,12 @@
     $cardExpiry = session.get('prefill.card[expiry]') || '';
     $cardName = session.get('prefill.name') || '';
     $cardCvv = session.get('prefill.card[cvv]') || '';
+
+    if (session.get('prefill.method') === 'card') {
+      if (isApplicationEnabled(session.get('prefill.provider'))) {
+        $selectedApp = session.get('prefill.provider');
+      }
+    }
 
     methodErrors.subscribe(updateMethodError);
   });

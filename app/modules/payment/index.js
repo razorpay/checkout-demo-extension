@@ -542,10 +542,17 @@ Payment.prototype = {
     if (data.method === 'emandate' && data.bank === 'UTIB') {
       return;
     }
+    //Use create/checkout route when auth_type is not passed,
+    // at the time of payment creation payload for emandate.
+    if (data.method === 'emandate' && !data.auth_type) {
+      return;
+    }
 
     // else make ajax request
 
     var razorpayInstance = this.r;
+
+    data['_[request_index]'] = Analytics.updateRequestIndex('submit');
 
     this.ajax = fetch.post({
       url: makeUrl('payments/create/ajax'),
@@ -572,6 +579,9 @@ Payment.prototype = {
       if (this.iframe) {
         this.popup.show();
       }
+
+      data['_[request_index]'] = Analytics.updateRequestIndex('submit');
+
       _Doc.submitForm(makeRedirectUrl(payment.fees), data, 'post', popup.name);
     }
   },

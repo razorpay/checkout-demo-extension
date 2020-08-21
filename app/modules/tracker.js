@@ -184,46 +184,11 @@ export default function Track(r, event, data, immediately) {
       properties.data = data;
     }
 
-    var trackingOptions = [
-      'amount',
-      'callback_url',
-      'checkout_config_id',
-      'contact_id',
-      'currency',
-      'description',
-      'display_amount',
-      'display_currency',
-      'ecod',
-      'hidden',
-      'image',
-      'key',
-      'method',
-      'name',
-      'prefill',
-      'readonly',
-      'recurring',
-      'redirect',
-      'theme',
-    ];
-
-    _Obj.loop(r.get(), function(value, key) {
-      var keySplit = key.split('.');
-      var rootKey = keySplit[0];
-      if (trackingOptions.indexOf(rootKey) !== -1) {
-        if (keySplit.length > 1) {
-          if (!options.hasOwnProperty(rootKey)) {
-            options[rootKey] = {};
-          }
-          options[rootKey][keySplit[1]] = value;
-        } else {
-          options[key] = value;
-        }
-      }
-    });
+    options = _Obj.extend(options, _Obj.unflatten(r.get()));
 
     // Mask prefilled card details
     if (_Obj.hasProp(options, 'prefill')) {
-      _Arr.loop(['card[number]', 'card[cvv]', 'card[expiry]'], key => {
+      _Arr.loop(['card'], key => {
         if (_Obj.hasProp(options.prefill, key)) {
           options.prefill[key] = true;
         }

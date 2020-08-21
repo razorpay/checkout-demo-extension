@@ -73,7 +73,7 @@ describe.each(
     await fillUserDetails(context);
     await proceed(context);
     await assertUserDetails(context);
-    await checkPaymentMethods(context, ['wallet', 'upi']);
+    await checkPaymentMethods(context, ['upi', 'wallet']);
   });
 });
 

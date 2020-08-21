@@ -260,6 +260,119 @@ async function selectCurrencyAndVerifyAmount(context, currency = 'USD') {
   await verifyAmount(context, currency);
 }
 
+async function handleAppCreatePayment(context, { app, flow } = {}) {
+  const req = await context.expectRequest();
+  expect(req.url).toContain('create/ajax');
+  if (app === 'google_pay_cards') {
+    const body = querystring.parse(req.body);
+    expect(body).toMatchObject({
+      method: 'card',
+      application: 'google_pay',
+    });
+    expect(body).not.toHaveProperty('card[number]');
+    await context.respondJSON({
+      version: '1.0',
+      type: 'application',
+      application_name: 'google_pay',
+      payment_id: 'pay_GqAUUr978elhqA',
+      gateway: '*encrypted gateway value*',
+      request: {
+        url: 'https://api.razorpay.com/v1/payments/pay_GqAUUr978elhqA/status',
+        method: 'sdk',
+        content: {
+          bundle: {
+            apiVersion: '1.0',
+            allowedPaymentMethods: [
+              {
+                type: 'CARD',
+                parameters: {
+                  allowedCardNetworks: ['VISA', 'MASTERCARD'],
+                },
+              },
+            ],
+            tokenizationSpecification: {
+              type: 'PAYMENT_GATEWAY',
+              parameters: {
+                gateway: 'razorpay',
+                gatewayMerchantId: 'Gr978elhqAGqAU',
+                gatewayTransactionId: 'pay_GqAUUr978elhqA',
+              },
+            },
+            transactionInfo: {
+              currencyCode: 'INR',
+              totalPrice: '100',
+              totalPriceStatus: 'FINAL',
+            },
+          },
+        },
+      },
+    });
+
+    return;
+  } else if (app === 'cred' && flow === 'intent') {
+    const body = querystring.parse(req.body);
+    expect(body).toMatchObject({
+      method: 'app',
+      provider: 'cred',
+      app_present: '1',
+    });
+    expect(body).not.toHaveProperty('card[number]');
+    await context.respondJSON({
+      type: 'intent',
+      version: 1,
+      payment_id: 'pay_F2pqrpQCgRS6ae',
+      data: {
+        intent_url:
+          'credpay://checkout?ref_id=22323482-f73f-4c60-85b7-a673d43ffbf9&is_collect=false&redirect_to=https%3A%2F%2Fbeta-api.stage.razorpay.in%2Fv1%2Fpayments%2Fpay_F2pqrpQCgRS6ae%2Fcallback%2F4733245ccd35a14a0a40ea1732fa106b001c0fa8%2Frzp_live_aEZD9dPPpUfCeq',
+      },
+      request: {
+        url: 'https://api.razorpay.com/v1/payments/pay_GqAUUr978elhqA/status',
+        method: 'GET',
+      },
+    });
+
+    return;
+  } else if (app === 'cred' && flow === 'collect') {
+    const body = querystring.parse(req.body);
+    expect(body).toMatchObject({
+      method: 'app',
+      provider: 'cred',
+    });
+    expect(body).not.toMatchObject({
+      app_present: '1',
+    });
+    expect(body).not.toHaveProperty('card[number]');
+    await context.respondJSON({
+      type: 'intent',
+      version: 1,
+      payment_id: 'pay_F2pqrpQCgRS6ae',
+      data: {
+        intent_url:
+          'credpay://checkout?ref_id=22323482-f73f-4c60-85b7-a673d43ffbf9&is_collect=false&redirect_to=https%3A%2F%2Fbeta-api.stage.razorpay.in%2Fv1%2Fpayments%2Fpay_F2pqrpQCgRS6ae%2Fcallback%2F4733245ccd35a14a0a40ea1732fa106b001c0fa8%2Frzp_live_aEZD9dPPpUfCeq',
+      },
+      request: {
+        url: 'https://api.razorpay.com/v1/payments/pay_GqAUUr978elhqA/status',
+        method: 'GET',
+      },
+    });
+
+    return;
+  } else {
+    throw `Payment create not handled for ${app}`;
+  }
+}
+
+async function handleAppPaymentStatus(context) {
+  const req = await context.expectRequest();
+  if (req.url.includes('v1/payments/pay_GqAUUr978elhqA/status')) {
+    if (req.url.includes('Razorpay.jsonp')) {
+      await context.respondJSONP({ razorpay_payment_id: 'pay_' });
+    } else {
+      await context.respondJSON({ razorpay_payment_id: 'pay_' });
+    }
+  }
+}
+
 module.exports = {
   enterCardDetails,
   expectDCCParametersInRequest,
@@ -273,4 +386,6 @@ module.exports = {
   selectCurrencyAndVerifyAmount,
   selectSavedCardAndTypeCvv,
   verifyAmount,
+  handleAppCreatePayment,
+  handleAppPaymentStatus,
 };

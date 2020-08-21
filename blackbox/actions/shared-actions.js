@@ -119,7 +119,18 @@ async function expectRedirectWithCallback(context, fields) {
       !context.isContactOptional &&
       !context.preferences.offers)
   ) {
-    apiSuffix = 'ajax';
+    if (fields.method === 'wallet') {
+      const powerWallets = ['mobikwik', 'freecharge', 'payumoney'];
+      const isPowerWallet = powerWallets.includes(fields.wallet);
+
+      if (isPowerWallet) {
+        apiSuffix = 'ajax';
+      } else {
+        apiSuffix = 'checkout';
+      }
+    } else {
+      apiSuffix = 'ajax';
+    }
   } else if (
     context.preferences.methods.cardless_emi != undefined &&
     context.preferences.customer != undefined

@@ -297,7 +297,11 @@ export function isContactRequiredForEMI(bank, cardType) {
  * @returns {Array} of enabled methods
  */
 export function getEnabledMethods() {
-  const merchantOrderMethod = getMerchantOrder()?.method;
+  const merchantOrder = getMerchantOrder();
+  let merchantOrderMethod = merchantOrder?.method;
+  if (merchantOrder && isRecurring() && getAmount()) {
+    merchantOrderMethod = merchantOrder.method || 'card';
+  }
   let methodsToConsider = ALL_METHODS |> _Obj.keys;
 
   if (merchantOrderMethod) {
@@ -733,7 +737,13 @@ export function getAppProviders() {
   if (apps |> _Obj.isEmpty) {
     return [];
   }
-  return apps |> _Obj.keys |> _Arr.map(getAppProvider) |> _Arr.filter(Boolean);
+  return (
+    apps
+    |> _Obj.keys
+    |> _Arr.filter(isApplicationEnabled)
+    |> _Arr.map(getAppProvider)
+    |> _Arr.filter(Boolean)
+  );
 }
 
 export function getCardlessEMIProviders() {

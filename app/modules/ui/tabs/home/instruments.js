@@ -9,6 +9,7 @@ import { getIndividualInstruments } from 'configurability/ungroup';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { hashFnv32a } from 'checkoutframe/personalization/utils';
+import { isMethodUsable } from 'checkoutstore/methods';
 
 function generateBasePreferredBlock(preferred) {
   const preferredBlock = createBlock('rzp.preferred', {
@@ -136,8 +137,28 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
   });
 }
 
+function makeLoaderInstruments(howMany) {
+  const loaderInstrument = {
+    _type: 'instrument',
+    _loading: true,
+  };
+
+  let instruments = [];
+
+  for (let i = 0; i < howMany; i++) {
+    instruments.push(_Obj.clone(loaderInstrument));
+  }
+
+  return instruments;
+}
+
 export function setBlocks(
-  { preferred = [], merchantConfig = {}, configSource },
+  {
+    showPreferredLoader = false,
+    preferred = [],
+    merchantConfig = {},
+    configSource,
+  },
   customer
 ) {
   const preferredBlock = generateBasePreferredBlock(preferred);
@@ -166,40 +187,43 @@ export function setBlocks(
   const addPreferredInstrumentsBlock =
     !parsedConfig._meta.hasRestrictedInstruments && show_default_blocks;
 
-  // Get all hidden method-instruments
-  const hiddenMethods = parsedConfig.display.hide.methods;
-
   let allBlocks = parsedConfig.display.blocks;
 
   if (addPreferredInstrumentsBlock) {
-    const preferredInstruments = preferredBlock.instruments;
+    if (showPreferredLoader) {
+      preferredBlock.instruments = makeLoaderInstruments(
+        MAX_PREFERRED_INSTRUMENTS
+      );
+    } else {
+      const preferredInstruments = preferredBlock.instruments;
 
-    // Filter out all preferred methods whose methods are asked to be hidden
-    let filteredPreferredInstruments = _Arr.filter(
-      preferredInstruments,
-      preferredInstrument => {
-        return !_Arr.contains(hiddenMethods, preferredInstrument.method);
-      }
-    );
+      // Filter out all preferred methods whose methods are asked to be hidden
+      let filteredPreferredInstruments = _Arr.filter(
+        preferredInstruments,
+        preferredInstrument => {
+          return isMethodUsable(preferredInstrument.method);
+        }
+      );
 
-    // Filter out all preferred methods that are already being shown by the merchant
-    filteredPreferredInstruments = _Arr.filter(
-      filteredPreferredInstruments,
-      instrument =>
-        shouldAllowPreferredInstrument(instrument, shownIndividualInstruments)
-    );
+      // Filter out all preferred methods that are already being shown by the merchant
+      filteredPreferredInstruments = _Arr.filter(
+        filteredPreferredInstruments,
+        instrument =>
+          shouldAllowPreferredInstrument(instrument, shownIndividualInstruments)
+      );
 
-    // Take top 3 preferred
-    preferredBlock.instruments = filteredPreferredInstruments.slice(
-      0,
-      MAX_PREFERRED_INSTRUMENTS
-    );
+      // Take top 3 preferred
+      preferredBlock.instruments = filteredPreferredInstruments.slice(
+        0,
+        MAX_PREFERRED_INSTRUMENTS
+      );
 
-    // Convert preferred instruments to ungrouped format
-    preferredBlock.instruments = _Arr.map(
-      preferredBlock.instruments,
-      instrument => getIndividualInstruments(instrument, customer)
-    );
+      // Convert preferred instruments to ungrouped format
+      preferredBlock.instruments = _Arr.map(
+        preferredBlock.instruments,
+        instrument => getIndividualInstruments(instrument, customer)
+      );
+    }
 
     allBlocks = _Arr.mergeWith([preferredBlock], allBlocks);
   }
