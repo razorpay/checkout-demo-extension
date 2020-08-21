@@ -5,7 +5,10 @@ jobs:
     name: Add comment
     runs-on: ubuntu-latest
     steps:
-      - name: comment PR
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Comment on PR
         uses: ./.github/actions/comment-on-pr
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
