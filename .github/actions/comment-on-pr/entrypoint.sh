@@ -18,7 +18,8 @@ if ARGV[0].empty?
   exit(1)
 end
 
-message = ARGV[0]
+branch = event["pull_request"]["head"]["ref"]     # Get the branch name
+message = ARGV[0].gsub(/{branch_name}/, branch)   # Replace the branch name in the message
 check_duplicate_msg = ARGV[1]
 repo = event["repository"]["full_name"]
 
