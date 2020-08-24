@@ -329,9 +329,6 @@
           }
         }
 
-        // hard override because of intermittent data issue
-        instrumentsSource = SOURCES.STORAGE;
-
         // The function that returns the promise to be returned
         // This promise should set the experiment identifier
         // and any analytics meta properties
