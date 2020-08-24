@@ -399,15 +399,6 @@ function errorHandler(response) {
     }
   }
 
-  if (!Store.shouldShowDefaultError(payload, error)) {
-    // For this particular payload & error combination,
-    // we're going to display the error message with some other approach.
-    Store.setMethodErrorForPayload(payload, error);
-    // Don't show the usual overlay, hide it if it's open.
-    this.hideErrorMessage();
-    return;
-  }
-
   if (this.tab || message !== discreet.cancelMsg) {
     this.showLoadError(
       message || 'There was an error in handling your request',
