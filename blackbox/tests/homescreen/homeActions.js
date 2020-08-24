@@ -40,19 +40,23 @@ function getWalletButtonTexts(context) {
 /**
  * Verify that methods are being shown
  */
-async function assertPaymentMethods(context) {
+async function assertPaymentMethods(context, order) {
+  if (!order) {
+    order = [
+      'card',
+      'netbanking',
+      'wallet',
+      'upi',
+      'emi',
+      'bank_transfer',
+      'paylater',
+      'cardless_emi',
+      'upi_otm',
+    ];
+  }
+
   const methods = await getHomescreenMethods(context);
-  expect([
-    'card',
-    'netbanking',
-    'wallet',
-    'upi',
-    'emi',
-    'bank_transfer',
-    'paylater',
-    'cardless_emi',
-    'upi_otm',
-  ]).toEqual(expect.arrayContaining(methods));
+  expect(order).toEqual(expect.arrayContaining(methods));
 }
 
 /**

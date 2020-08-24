@@ -16,6 +16,7 @@ const upiCollect = require('./upi-collect');
 const upiOtm = require('./upi-otm');
 const payouts = require('./payouts.js');
 const apps = require('./apps.js');
+const internationalPaypal = require('./international/paypal.js');
 
 module.exports = {
   netbanking: netbanking,
@@ -36,4 +37,5 @@ module.exports = {
   payouts: payouts,
   'upi-otm': upiOtm,
   apps: apps,
+  'international-paypal': internationalPaypal,
 };

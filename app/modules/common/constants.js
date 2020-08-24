@@ -73,12 +73,13 @@ export const ownerWindow = isIframe ? global.parent : global.opener;
 export const DEFAULT_AUTH_TYPE_RADIO = 'c3ds';
 
 /* Being used for filtering actual methods from methods object */
+/* The below array determines the order of payment methods shown in the homescreen */
 export const AVAILABLE_METHODS = [
   'card',
+  'upi',
   'netbanking',
   'wallet',
   'upi_otm',
-  'upi',
   'gpay',
   'emi',
   'cardless_emi',

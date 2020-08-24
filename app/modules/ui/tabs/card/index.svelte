@@ -35,8 +35,6 @@
     isRecurring,
     shouldRememberCustomer,
     isDCCEnabled,
-    methodErrors,
-    getIdForPaymentPayload,
   } from 'checkoutstore';
   import {
     isMethodEnabled,
@@ -131,7 +129,6 @@
   // Refs
   let savedCardsView;
   let addCardView;
-  let selectedMethodError;
 
   onMount(() => {
     // Prefill
@@ -145,29 +142,7 @@
         $selectedApp = session.get('prefill.provider');
       }
     }
-
-    methodErrors.subscribe(updateMethodError);
   });
-
-  function updateMethodError() {
-    // Either we got a new error from API or
-    // the user has changed the selected app.
-    // Show the error from API in the callout.
-    selectedMethodError = null;
-    if ($selectedApp) {
-      const payload = {
-        contact: $contact,
-        ...getPayload(),
-      };
-      const id = getIdForPaymentPayload(payload);
-      if (id && $methodErrors[id]) {
-        selectedMethodError = $methodErrors[id].description;
-      }
-    }
-  }
-
-  $: $selectedApp, updateMethodError();
-  $: $contact, updateMethodError();
 
   $: {
     // Track saved cards
@@ -708,9 +683,6 @@
       {/if}
     </div>
     <Bottom tab="card">
-      {#if selectedMethodError}
-        <Callout>{selectedMethodError}</Callout>
-      {/if}
       {#if isDCCEnabled()}
         <DynamicCurrencyView view={currentView} />
       {/if}

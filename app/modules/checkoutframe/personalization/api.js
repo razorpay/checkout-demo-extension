@@ -156,7 +156,9 @@ const API_INSTRUMENT_PAYMENT_ADDONS = {
     delete instrument.instrument;
   },
   card: instrument => {
-    instrument.token_id = instrument.instrument;
+    // Use a dummy value if API returns `null` as this value needs to be truthy to
+    // act as a saved card instrument
+    instrument.token_id = instrument.instrument || 'token_dummy';
     delete instrument.instrument;
   },
 };
