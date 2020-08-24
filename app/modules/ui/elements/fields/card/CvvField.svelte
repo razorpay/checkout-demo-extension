@@ -97,6 +97,7 @@
   on:input={handleInput}
   on:input
   on:blur
+  on:focus
   handleBlur
   handleFocus
   handleInput />

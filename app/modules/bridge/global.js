@@ -2,6 +2,7 @@ import { getSession } from 'sessionmanager';
 import { didUPIIntentSucceed, parseUPIIntentResponse } from 'common/upi';
 import { processPaymentCreate } from 'payment/coproto';
 import { otp as $otp } from 'checkoutstore/screens/otp';
+import { getUPIIntentApps } from 'checkoutstore/native';
 
 import { backPressed } from './back';
 
@@ -10,6 +11,7 @@ export function defineGlobals() {
   window.handleOTP = handleOTP;
   window.upiIntentResponse = upiIntentResponse;
   window.externalSDKResponse = externalSDKResponse;
+  window.externalAppResponse = externalAppResponse;
 }
 
 /**
@@ -41,7 +43,7 @@ function handleOTP(otp) {
 function upiIntentResponse(data) {
   var session = getSession();
 
-  if (session.r._payment && session.upi_intents_data) {
+  if (session.r._payment && getUPIIntentApps().all.length) {
     session.r.emit('payment.upi.intent_response', data);
   } else if (session.activity_recreated) {
     /**
@@ -68,7 +70,7 @@ function upiIntentResponse(data) {
  */
 function externalSDKResponse(response = {}) {
   if (response.provider === 'GOOGLE_PAY') {
-    handleGooglePaySDKResponse(response.data);
+    handleGooglePaySDKResponse(response);
   }
 }
 
@@ -76,9 +78,29 @@ function externalSDKResponse(response = {}) {
  * Handles Google Pay plugin response from Android SDK.
  * @param data the data sent from plugin
  */
-function handleGooglePaySDKResponse(data) {
+function handleGooglePaySDKResponse(response) {
+  const { data } = response;
   const payment = getSession().getPayment();
   if (payment) {
-    processPaymentCreate.call(payment, data.apiResponse);
+    switch (data.apiResponse.type) {
+      case 'google_pay_cards':
+        payment.emit('app.intent_response', response);
+        break;
+      case 'gpay_inapp': // fallthrough intentional
+      default:
+        processPaymentCreate.call(payment, data.apiResponse);
+        break;
+    }
+  }
+}
+
+/**
+ * window.externalAppResponse is called when a plugin wants to communicate with
+ * Checkout.
+ */
+function externalAppResponse(response = {}) {
+  var session = getSession();
+  if (response.provider === 'CRED') {
+    session.r.emit('payment.app.intent_response', response);
   }
 }

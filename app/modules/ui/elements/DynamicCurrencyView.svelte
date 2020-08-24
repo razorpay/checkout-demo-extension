@@ -150,7 +150,7 @@
   $: currencies = currencyConfig && currencyConfig.all_currencies;
   $: cardCurrency = currencyConfig && currencyConfig.card_currency;
   $: sortedCurrencies = currencies && sortCurrencies(currencies);
-  $: displayCurrencies = sortedCurrencies && sortedCurrencies.slice(0, 3);
+  $: displayCurrencies = sortedCurrencies && sortedCurrencies.slice(0, 2);
   $: dccAmount = currencies && currencies[selectedCurrency].amount;
   $: selectedCurrencyInDisplay = _Arr.find(
     displayCurrencies,
@@ -186,11 +186,11 @@
     const CODE = 0;
     const CONFIG = 1;
 
-    // Insert entity currency on 3rd position.
+    // Insert entity currency on 2nd position.
     const topCurrencies = _Arr.insertAt(
       TOP_CURRENCIES.slice(),
       getCurrency(),
-      2
+      1
     );
 
     const sorted = _Obj.entries(currencies).sort((_a, _b) => {
@@ -253,9 +253,8 @@
   .dcc-view {
     display: none;
     border-top: 1px solid #ebedf0;
-    padding: 8px 24px;
+    padding: 10px 24px;
     font-size: 13px;
-    line-height: 20px;
   }
 
   .dcc-view.visible {
@@ -281,7 +280,7 @@
   }
 
   .default-currencies {
-    margin-bottom: 4px;
+    margin-bottom: 6px;
   }
 </style>
 
@@ -311,9 +310,11 @@
         {/if}
         <div dir="ltr">
           <b dir="ltr">{formatAmountWithSymbol(dccAmount, selectedCurrency)}</b>
-          <span class="small-text">
-            ({formatAmountWithSymbol(currencies.INR.amount, 'INR')})
-          </span>
+          {#if selectedCurrency !== 'INR'}
+            <span class="small-text">
+              ({formatAmountWithSymbol(currencies.INR.amount, 'INR')})
+            </span>
+          {/if}
         </div>
       </Stack>
       <div

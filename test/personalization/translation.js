@@ -1,4 +1,5 @@
 import { translateInstrumentToConfig } from 'checkoutframe/personalization/translation';
+import { transformInstrumentToStorageFormat } from 'checkoutframe/personalization/api';
 
 test('Module: personalization', t => {
   test('translateInstrumentToConfig', t => {
@@ -166,6 +167,124 @@ test('Module: personalization', t => {
       const actual = translateInstrumentToConfig(instrument);
 
       t.equals(typeof actual, 'undefined', 'Returns undefined');
+      t.end();
+    });
+
+    t.end();
+  });
+  test('translate api instruments to their storage equivalent', t => {
+    test('transforms a wallet instrument correctly', t => {
+      const instrument = {
+        method: 'wallet',
+        instrument: 'payzapp',
+        score: 1,
+      };
+
+      const actual = transformInstrumentToStorageFormat(instrument);
+
+      t.equals(typeof actual, 'object', 'Returns an object');
+      t.equals(actual.method, 'wallet', 'Returns the correct method');
+      t.equals(actual.score, 1, 'Returns the correct score');
+      t.equals(actual.wallet, 'payzapp', 'Returns the correct wallet');
+      t.equals(
+        typeof actual.instrument,
+        'undefined',
+        'Prevents duplicate data'
+      );
+
+      t.end();
+    });
+    test('transforms a netbanking instrument correctly', t => {
+      const instrument = {
+        method: 'netbanking',
+        instrument: 'KKBK',
+        score: 1,
+      };
+
+      const actual = transformInstrumentToStorageFormat(instrument);
+
+      t.equals(typeof actual, 'object', 'Returns an object');
+      t.equals(actual.method, 'netbanking', 'Returns the correct method');
+      t.equals(actual.score, 1, 'Returns the correct score');
+      t.equals(actual.bank, 'KKBK', 'Returns the correct bank');
+      t.equals(
+        typeof actual.instrument,
+        'undefined',
+        'Prevents duplicate data'
+      );
+
+      t.end();
+    });
+    test('transforms a upi intent instrument correctly', t => {
+      const instrument = {
+        method: 'upi',
+        instrument: '@ybl',
+        score: 1,
+      };
+
+      const actual = transformInstrumentToStorageFormat(instrument);
+
+      t.equals(typeof actual, 'object', 'Returns an object');
+      t.equals(actual.method, 'upi', 'Returns the correct method');
+      t.equals(actual.score, 1, 'Returns the correct score');
+      t.equals(actual['_[flow]'], 'intent', 'Returns the correct flow');
+      t.equals(actual['upi_app'], 'com.phonepe.app', 'Returns the correct app');
+
+      t.end();
+    });
+    test('transforms a upi collect instrument correctly', t => {
+      const instrument = {
+        method: 'upi',
+        instrument: 'saranshgupta1995@ybl',
+        score: 1,
+      };
+
+      const actual = transformInstrumentToStorageFormat(instrument);
+
+      t.equals(typeof actual, 'object', 'Returns an object');
+      t.equals(actual.method, 'upi', 'Returns the correct method');
+      t.equals(actual.score, 1, 'Returns the correct score');
+      t.equals(actual.vpa, 'saranshgupta1995@ybl', 'Returns the correct vpa');
+      t.equals(actual['_[flow]'], 'directpay', 'Returns the correct flow');
+
+      t.equals(
+        typeof actual.instrument,
+        'undefined',
+        'Prevents duplicate data'
+      );
+
+      t.end();
+    });
+    test('transforms a card collect instrument correctly', t => {
+      const instrument = {
+        method: 'card',
+        issuer: 'UTIB',
+        network: 'MasterCard',
+        type: 'debit',
+        instrument: 'F1lKrOrLTkTpyJ',
+        score: 1,
+      };
+
+      const actual = transformInstrumentToStorageFormat(instrument);
+
+      t.equals(typeof actual, 'object', 'Returns an object');
+      t.equals(actual.method, 'card', 'Returns the correct method');
+      t.equals(actual.score, 1, 'Returns the correct score');
+      t.equals(actual.issuer, 'UTIB', 'Returns the correct issuer');
+      t.equals(actual.network, 'MasterCard', 'Returns the correct network');
+      t.equals(actual.type, 'debit', 'Returns the correct type');
+      t.equals(
+        actual.token_id,
+        'F1lKrOrLTkTpyJ',
+        'Returns the correct identifier'
+      );
+
+      t.equals(
+        typeof actual.instrument,
+        'undefined',
+        'Prevents duplicate data'
+      );
+
       t.end();
     });
 

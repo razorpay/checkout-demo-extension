@@ -7,7 +7,6 @@ import {
 import { selectedBank } from 'checkoutstore/screens/netbanking';
 import { getSession } from 'sessionmanager';
 import { setView, destroyView } from './';
-
 import NetbankingTab from 'ui/tabs/netbanking/index.svelte';
 
 const NETBANKING_KEY = 'netbankingTab';

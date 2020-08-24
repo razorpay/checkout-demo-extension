@@ -1,5 +1,10 @@
 export const USE_SAVED_CARDS_BTN = 'card.use_saved_cards_btn';
+export const USE_SAVED_CARDS_ON_RZP_BTN = 'card.use_saved_cards_on_rzp_btn';
 export const ADD_ANOTHER_CARD_BTN = 'card.add_another_card_btn';
+export const CARDS_SAVED_ON_APPS_LABEL = 'card.cards_saved_on_apps_label';
+export const CARDS_SAVED_ON_RZP_LABEL = 'card.cards_saved_on_rzp_label';
+export const ENTER_CARD_DETAILS_OPTION_LABEL =
+  'card.enter_card_details_option_label';
 export const CARD_NUMBER_LABEL = 'card.card_number_label';
 export const CARD_NUMBER_HELP = 'card.card_number_help';
 export const CARD_NUMBER_HELP_AMEX = 'card.card_number_help_amex';

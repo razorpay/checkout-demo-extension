@@ -58,6 +58,7 @@
   maxlength={7}
   bind:this={ref}
   on:input={handleInput}
+  on:focus
   on:blur
   handleBlur
   handleFocus

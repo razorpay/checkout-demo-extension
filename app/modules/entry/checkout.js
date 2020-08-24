@@ -2,8 +2,9 @@ import Razorpay, { optionValidations } from 'common/Razorpay';
 import { RazorpayDefaults } from 'common/options';
 import 'checkoutjs/options';
 import initRazorpayCheckout from 'checkoutjs/open';
-
 import Track from 'tracker';
+import 'track-errors';
+
 Track.props.library = 'checkoutjs';
 
 RazorpayDefaults.handler = function(data) {

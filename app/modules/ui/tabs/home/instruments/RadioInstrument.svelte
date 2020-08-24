@@ -13,6 +13,7 @@
   import { getWallet } from 'common/wallet';
   import { getProvider as getCardlessEmiProvider } from 'common/cardlessemi';
   import { getProvider as getPaylaterProvider } from 'common/paylater';
+  import { getProvider as getAppProvider } from 'common/apps';
   import Track from 'tracker';
   import { getExtendedSingleInstrument } from 'configurability/instruments';
 
@@ -20,6 +21,7 @@
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
   import { customer } from 'checkoutstore/customer';
   import { isDebitEMIEnabled } from 'checkoutstore/methods';
+  import { getUPIIntentApps } from 'checkoutstore/native';
 
   // i18n
   import { locale } from 'svelte-i18n';
@@ -30,6 +32,7 @@
     getCardlessEmiProviderName,
     getPaylaterProviderName,
     getUpiIntentAppName,
+    getAppProviderName,
   } from 'i18n';
 
   // Props
@@ -48,6 +51,7 @@
   let title;
   let icon;
   let alt;
+  let code;
 
   function getVpaFromInstrument(instrument) {
     const { vpa, token } = instrument;
@@ -62,6 +66,17 @@
     return `${vpaToken.vpa.username}@${vpaToken.vpa.handle}`;
   }
 
+  function getDetailsForAppInstrument(instrument, locale) {
+    const provider = getAppProvider(individualInstrument.provider);
+    const providerName = getAppProviderName(provider.code, locale);
+    return {
+      title: getInstrumentTitle('app', providerName, locale),
+      icon: provider.logo,
+      alt: provider.name,
+      code: provider.code,
+    };
+  }
+
   function getDetailsForPaypalInstrument(instrument, locale) {
     return {
       title: getInstrumentTitle('paypal', null, locale),
@@ -71,7 +86,12 @@
   }
 
   function getDetailsForNetbankingInstrument(instrument, locale) {
-    const bankName = getLongBankName(individualInstrument.bank, locale);
+    const banks = getBanks();
+    const bankName = getLongBankName(
+      individualInstrument.bank,
+      locale,
+      banks[instrument.bank]
+    );
     return {
       title: getInstrumentTitle('netbanking', bankName, locale),
       icon: getBankLogo(individualInstrument.bank),
@@ -98,7 +118,7 @@
       alt = title;
     } else if (individualInstrument.flow === 'intent') {
       const app = _Arr.find(
-        session.upi_intents_data,
+        getUPIIntentApps().all,
         app => app.package_name === individualInstrument.app
       );
 
@@ -179,6 +199,9 @@
 
       case 'paylater':
         return getDetailsForPayLaterInstrument(instrument, locale);
+
+      case 'app':
+        return getDetailsForAppInstrument(instrument, locale);
     }
   }
 
@@ -188,6 +211,7 @@
       title = details.title;
       icon = details.icon;
       alt = details.alt;
+      code = details.code;
     }
   }
 
@@ -213,7 +237,7 @@
   {name}
   {selected}
   className="instrument"
-  attributes={{ 'data-type': 'individual', 'data-id': instrument.id }}
+  attributes={{ 'data-type': 'individual', 'data-id': instrument.id, 'data-code': code }}
   value={instrument.id}
   on:click
   on:keydown={attemptSubmit}>

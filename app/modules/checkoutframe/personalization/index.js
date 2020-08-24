@@ -7,6 +7,8 @@ import { filterInstruments } from './filters';
 import { hashFnv32a, set, getAllInstruments } from './utils';
 import { extendInstruments } from './extend';
 import { translateInstrumentToConfig } from './translation';
+import { getInstrumentsForCustomer as getInstrumentsForCustomerFromApi } from './api';
+import { getUPIIntentApps } from 'checkoutstore/native';
 
 /* halflife for timestamp, 5 days in ms */
 const TS_HALFLIFE = Math.log(2) / (5 * 86400000);
@@ -32,8 +34,6 @@ const INSTRUMENT_PROPS = {
  * @returns {Object|undefined}
  */
 function getExtractedDetails(payment, customer, extra = {}) {
-  const { upi_intents_data = [] } = extra;
-
   const details = {};
 
   let extractable = INSTRUMENT_PROPS[payment.method];
@@ -115,7 +115,7 @@ function getExtractedDetails(payment, customer, extra = {}) {
 
   if (payment.upi_app) {
     let app = _Arr.find(
-      upi_intents_data,
+      getUPIIntentApps().all,
       app => app.package_name === payment.upi_app
     );
     details.app_name = app.app_name;
@@ -342,70 +342,71 @@ export function getAllInstrumentsForCustomer(customer) {
  * @param {Object} customer
  * @param {Object} extra
  *  @prop {Array} upiApps List of UPI apps on the device
+ * @param {"storage"|"api"} source
  *
- * @returns {Array<Object>}
+ * @returns {Promise<Object>>}
+ *  @prop {boolean} identified
+ *  @prop {Array<Instrument>} instruments
  */
-export const getInstrumentsForCustomer = (customer, extra = {}) => {
+export const getInstrumentsForCustomer = (customer, extra = {}, source) => {
   const { upiApps } = extra;
 
-  let instruments = getAllInstrumentsForCustomer(customer);
+  let getInstruments = Promise.resolve([]);
 
-  // Filter out the list
-  instruments = filterInstruments({
-    instruments,
-    upiApps,
-    customer,
+  if (source === 'storage') {
+    getInstruments = Promise.resolve({
+      identified: true, // storage instruments are always identified based on user
+      instruments: getAllInstrumentsForCustomer(customer),
+    });
+  } else if (source === 'api') {
+    getInstruments = getInstrumentsForCustomerFromApi(customer);
+  }
+
+  return getInstruments.then(({ identified, instruments }) => {
+    // Filter out the list
+    instruments = filterInstruments({
+      instruments,
+      upiApps,
+      customer,
+    });
+
+    instruments = extendInstruments({
+      instruments,
+      customer,
+    });
+
+    if (source === 'storage') {
+      // Add score for each instrument
+      _Arr.loop(instruments, instrument => {
+        let timeSincePayment = _.now() - instrument.timestamp;
+        let tsScore = Math.exp(-TS_HALFLIFE * timeSincePayment);
+        let countScore = 1 - Math.exp(-COUNT_HALFLIFE * instrument.frequency);
+        let C = ~~instrument.success * 2 - 1;
+
+        /*
+         * Simplified form for:
+         * - if success is true
+         *   score = 0.7 * tsScore + 0.3 * countScore
+         * - else
+         *   score = 0.3 * tsScore + 0.7 * countScore
+         */
+
+        instrument.score =
+          (tsScore + countScore) / 2.0 + 0.2 * C * (tsScore - countScore);
+      });
+    }
+
+    // Sort instruments by their score
+    _Arr.sort(instruments, (a, b) =>
+      a.score > b.score ? -1 : ~~(a.score < b.score)
+    );
+
+    return {
+      identified,
+      instruments: _Arr.map(instruments, translateInstrumentToConfig),
+    };
   });
-
-  instruments = extendInstruments({
-    instruments,
-    customer,
-  });
-
-  // Add score for each instrument
-  _Arr.loop(instruments, instrument => {
-    let timeSincePayment = _.now() - instrument.timestamp;
-    let tsScore = Math.exp(-TS_HALFLIFE * timeSincePayment);
-    let countScore = 1 - Math.exp(-COUNT_HALFLIFE * instrument.frequency);
-    let C = ~~instrument.success * 2 - 1;
-
-    /*
-     * Simplified form for:
-     * - if success is true
-     *   score = 0.7 * tsScore + 0.3 * countScore
-     * - else
-     *   score = 0.3 * tsScore + 0.7 * countScore
-     */
-
-    instrument.score =
-      (tsScore + countScore) / 2.0 + 0.2 * C * (tsScore - countScore);
-  });
-
-  // Sort instruments by their score
-  _Arr.sort(instruments, (a, b) =>
-    a.score > b.score ? -1 : ~~(a.score < b.score)
-  );
-
-  return instruments;
 };
-
-/**
- * Returns the list of preferred payment modes for the user in a sorted order,
- * but translated to the Payment Method Configurability spec.
- * @param {Object} customer
- * @param {Object} extra
- *  @prop {Object} methods
- *  @prop {Array} upiApps List of UPI apps on the device
- *
- * @returns {Array<Instrument>}
- */
-export function getTranslatedInstrumentsForCustomer(customer, extra) {
-  const instruments = getInstrumentsForCustomer(customer, extra);
-
-  return (
-    _Arr.map(instruments, translateInstrumentToConfig) |> _Arr.filter(Boolean)
-  );
-}
 
 /**
  * Appends the data from the selected instrument

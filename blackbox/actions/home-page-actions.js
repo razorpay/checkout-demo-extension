@@ -6,13 +6,21 @@ contents = String(
 );
 
 async function assertHomePage(context) {
+  const $countryCode = await context.page.$('#country-code');
+  expect(await $countryCode.isIntersectingViewport()).toEqual(
+    !context.isContactEmailOptional
+  );
+
   const $contact = await context.page.$('#contact');
   expect(await $contact.isIntersectingViewport()).toEqual(
     !context.isContactEmailOptional
   );
-  expect(await $contact.evaluate(el => el.value)).toEqual(
-    context.prefilledContact
-  );
+
+  const contact = await $contact.evaluate(el => el.value);
+  const countryCode = await $countryCode.evaluate(el => el.value);
+
+  expect(`${countryCode}${contact}`).toEqual(context.prefilledContact);
+
   const $email = await context.page.$('#email');
   expect(await $email.isIntersectingViewport()).toEqual(
     !context.isContactEmailOptional
@@ -20,9 +28,14 @@ async function assertHomePage(context) {
   expect(await $email.evaluate(el => el.value)).toEqual(context.prefilledEmail);
 }
 
-async function fillUserDetails(context, number) {
+async function fillUserDetails(context, number = randomContact()) {
+  // Remove the country code
+  if (number.startsWith('+91')) {
+    number = number.replace('+91', '');
+  }
+
   if (!context.prefilledContact && !context.isContactOptional) {
-    await context.page.type('#contact', number || randomContact());
+    await context.page.type('#contact', number);
   }
   if (!context.prefilledEmail && !context.isEmailOptional) {
     await context.page.type('#email', randomEmail());

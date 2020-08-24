@@ -9,11 +9,25 @@ const {
   assertVisible,
 } = require('../../util');
 
+const { receiveApiInstruments } = require('./personalization-actions');
+
+const {
+  waitForSkeletonInstrumentsToResolve,
+} = require('./checkout-config/config-utils');
+
 /**
  * Asserts that the user details in the strip
  * are the same as those entered.
  */
-async function assertUserDetails(context) {
+async function assertUserDetails(context, apiInstrumentsReadFromCache = true) {
+  if (
+    !context.preferences.customer &&
+    context.options.personalization !== false
+  ) {
+    if (!apiInstrumentsReadFromCache) {
+      await receiveApiInstruments(context);
+    }
+  }
   if (!context.preferences.customer) {
     let { contact, email } = context.state;
 
@@ -42,6 +56,8 @@ async function assertUserDetails(context) {
       expect(lastInPage).toEqual(last);
     }
   }
+
+  await waitForSkeletonInstrumentsToResolve(context);
 }
 
 /**
@@ -51,7 +67,7 @@ async function assertUserDetails(context) {
 async function assertEditUserDetailsAndBack(context) {
   await context.page.click('#user-details [slot=title]');
   await context.page.click('#footer');
-  await assertUserDetails(context);
+  await assertUserDetails(context, true);
 }
 
 /**
@@ -76,7 +92,14 @@ async function fillUserDetails(context, number) {
     !context.isContactOptional &&
     !readonlyContact
   ) {
-    await context.page.type('#contact', contact);
+    let contactToType = contact;
+
+    // Remove the country code
+    if (contactToType && contactToType.startsWith('+91')) {
+      contactToType = contactToType.replace('+91', '');
+    }
+
+    await context.page.type('#contact', contactToType);
   }
 
   if (!context.prefilledEmail && !context.isEmailOptional && !readonlyEmail) {
@@ -106,18 +129,17 @@ async function fillUserDetails(context, number) {
 async function assertBasicDetailsScreen(context) {
   if (!context.prefilledContact && !context.isContactOptional) {
     const $contact = await context.page.$('#contact');
+    const $countryCode = await context.page.$('#country-code');
 
     let contact = context.prefilledContact;
+    let countryCode = '+91';
 
-    // Add the country code if missing
-    if (contact && contact.indexOf('+91') !== 0) {
-      contact = '+91' + contact;
+    // Remove the country code from prefill
+    if (contact && contact.startsWith('+91')) {
+      contact = contact.replace('+91', '');
     }
 
-    if (!contact) {
-      contact = '+91';
-    }
-
+    expect(await $countryCode.evaluate(el => el.value)).toEqual(countryCode);
     expect(await $contact.evaluate(el => el.value)).toEqual(contact);
   }
   if (!context.prefilledEmail && !context.isEmailOptional) {

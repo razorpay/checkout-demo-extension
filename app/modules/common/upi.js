@@ -43,9 +43,10 @@ const UPI_APPS = {
    */
   preferred: [
     {
-      app_name: 'Google Pay (Tez)',
+      app_name: 'Google Pay',
       package_name: GOOGLE_PAY_PACKAGE_NAME,
       app_icon: 'https://cdn.razorpay.com/checkout/gpay.png',
+      handles: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],
       /**
        * Call CheckoutBridge to verify that the user is registered on the app
        * and only display if they are.
@@ -58,6 +59,7 @@ const UPI_APPS = {
       app_icon: 'https://cdn.razorpay.com/checkout/phonepe.png',
       shortcode: 'phonepe',
       app_name: 'PhonePe',
+      handles: ['ybl'],
     },
     {
       name: 'PayTM',
@@ -65,12 +67,14 @@ const UPI_APPS = {
       package_name: 'net.one97.paytm',
       shortcode: 'paytm',
       app_icon: 'https://cdn.razorpay.com/app/paytm.svg',
+      handles: ['paytm'],
     },
     {
       package_name: 'in.org.npci.upiapp',
       shortcode: 'bhim',
       app_icon: 'https://cdn.razorpay.com/app/bhim.svg',
       app_name: 'Bhim',
+      handles: ['upi'],
     },
   ],
 
@@ -84,6 +88,8 @@ const UPI_APPS = {
       app_name: 'WhatsApp Business UPI',
       package_name: 'com.whatsapp.w4b',
       shortcode: 'whatsapp-biz',
+      handles: ['icicibank'],
+      app_icon: 'https://cdn.razorpay.com/app/whatsapp.svg',
     },
     {
       package_name: 'com.csam.icici.bank.imobile',
@@ -92,6 +98,7 @@ const UPI_APPS = {
     {
       package_name: 'com.sbi.upi',
       shortcode: 'sbi',
+      handles: ['sbi'],
     },
     {
       package_name: 'com.upi.axispay',
@@ -244,6 +251,7 @@ const UPI_APPS = {
     {
       package_name: 'in.bajajfinservmarkets.app',
       shortcode: 'finserv',
+      handles: ['abfspay'],
     },
     {
       package_name: 'in.bajajfinservmarkets.app.uat',
@@ -299,46 +307,6 @@ const UPI_APPS_ORDER = ['preferred', 'whitelist'];
 
 export const otherAppsIcon =
   'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNCA4aDRWNEg0djR6bTYgMTJoNHYtNGgtNHY0em0tNiAwaDR2LTRINHY0em0wLTZoNHYtNEg0djR6bTYgMGg0di00aC00djR6bTYtMTB2NGg0VjRoLTR6bS02IDRoNFY0aC00djR6bTYgNmg0di00aC00djR6bTAgNmg0di00aC00djR6IiBmaWxsPSIjYjBiMGIwIi8+PHBhdGggZD0iTTAgMGgyNHYyNEgweiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==';
-
-export const topUpiApps = [
-  {
-    text: 'Google Pay',
-    icon: 'https://cdn.razorpay.com/app/googlepay.svg',
-    id: 'gpay',
-    psp: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],
-  },
-
-  {
-    text: 'PhonePe',
-    icon: 'https://cdn.razorpay.com/app/phonepe.svg',
-    id: 'phonepe',
-    psp: 'ybl',
-  },
-  {
-    text: 'BHIM',
-    icon: 'https://cdn.razorpay.com/app/bhim.svg',
-    id: 'bhim',
-    psp: 'upi',
-  },
-  {
-    text: 'Paytm',
-    icon: 'https://cdn.razorpay.com/app/paytm.svg',
-    id: 'paytm',
-    psp: 'paytm',
-  },
-  {
-    text: 'Airtel',
-    icon: 'https://cdn.razorpay.com/app/airtel.svg',
-    id: 'airtel',
-    psp: 'airtel',
-  },
-  {
-    text: 'Other Apps',
-    icon: otherAppsIcon,
-    id: null,
-    psp: '',
-  },
-];
 
 /**
  * Parses the response from UPI Intent.
@@ -440,7 +408,7 @@ export const isPreferredApp = packageName =>
 
 /**
  * Returns a list of sorted apps to use.
- * @param {Array} allApps `upi_intents_data` from handleMessage, sent by Android SDK
+ * @param {Array} allApps `getUPIIntentApps().filtered`
  *
  * @return {Array}
  */
@@ -546,41 +514,21 @@ export const getNumberOfAppsByCategory = allApps => {
   return count;
 };
 
-const handleData = [
-  {
-    handles: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],
-    icon: 'https://cdn.razorpay.com/app/googlepay.svg',
-  },
-  {
-    handles: ['ybl'],
-    icon: 'https://cdn.razorpay.com/app/phonepe.svg',
-  },
-  {
-    handles: ['icicibank'],
-    icon: 'https://cdn.razorpay.com/app/whatsapp.svg',
-  },
-  {
-    handles: ['upi'],
-    icon: 'https://cdn.razorpay.com/app/bhim.svg',
-  },
-];
-
 /**
- * get icon url from handle
+ * get upi app data from handle
  *
  * @param {String} handle eg. okaxis, ybl
  *
  * @returns string url to the app icon
  */
-export const getUPIAppLogoFromHandle = handle => {
-  let icon = null;
-  handleData.forEach(handleSet => {
-    if (_Arr.contains(handleSet.handles, handle)) {
-      icon = handleSet.icon;
-    }
-  });
+export const getUPIAppDataFromHandle = handle => {
+  const allUsableApps = getUsableApps();
 
-  return icon;
+  return (
+    _Arr.find(allUsableApps, app => {
+      return app.handles && _Arr.contains(app.handles, handle);
+    }) || {}
+  );
 };
 
 /**

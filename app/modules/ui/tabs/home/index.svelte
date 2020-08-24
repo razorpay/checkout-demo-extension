@@ -20,6 +20,8 @@
 
   // Store
   import {
+    country,
+    phone,
     contact,
     isContactPresent,
     email,
@@ -30,10 +32,13 @@
     partialPaymentOption,
     instruments,
     blocks,
+    setContact,
+    setEmail,
   } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
   import { getOption, isDCCEnabled } from 'checkoutstore';
+  import { getUPIIntentApps } from 'checkoutstore/native';
 
   // i18n
   import {
@@ -88,7 +93,7 @@
   } from 'checkoutstore/methods';
 
   import {
-    getTranslatedInstrumentsForCustomer,
+    getInstrumentsForCustomer,
     getAllInstrumentsForCustomer,
   } from 'checkoutframe/personalization';
 
@@ -107,7 +112,11 @@
   import { isInstrumentGrouped } from 'configurability/instruments';
   import { isElementCompletelyVisibleInTab } from 'lib/utils';
 
-  import { INDIA_COUNTRY_CODE } from 'common/constants';
+  import {
+    CONTACT_REGEX,
+    EMAIL_REGEX,
+    PHONE_REGEX_INDIA,
+  } from 'common/constants';
   import { getAnimationOptions } from 'svelte-utils';
 
   import { setBlocks } from 'ui/tabs/home/instruments';
@@ -135,8 +144,8 @@
   const isPartialPayment = getIsPartialPayment();
   const contactEmailReadonly = isContactEmailReadOnly();
 
-  $contact = getPrefilledContact() || INDIA_COUNTRY_CODE;
-  $email = getPrefilledEmail();
+  setContact(getPrefilledContact());
+  setEmail(getPrefilledEmail());
 
   // Prop that decides which view to show.
   // Values: 'details', 'methods'
@@ -269,9 +278,171 @@
     return view === 'details';
   }
 
+  const USER_EXPERIMENT_CACHE = {};
+
+  /**
+   * For A/B testing, check if both api and localstorage instruments are present
+   * - if either one is missing, choose the other
+   * - if both are present, choose one randomly
+   */
+  function getRandomInstrumentSet({ customer, instrumentsFromStorage }) {
+    const user = customer.contact;
+
+    if (!USER_EXPERIMENT_CACHE[user]) {
+      USER_EXPERIMENT_CACHE[user] = new Promise(resolve => {
+        const instrumentMap = {
+          api: [],
+          storage: instrumentsFromStorage,
+          none: [],
+        };
+
+        const EXPERIMENT_IDENTIFIERS = {
+          BOTH_AVAILABLE_STORAGE_SHOWN: 1,
+          BOTH_AVAILABLE_API_SHOWN: 2,
+          API_AVAILABLE_API_SHOWN: 3,
+          API_AVAILABLE_NONE_SHOWN: 4,
+          NONE_AVAILABLE: 5,
+        };
+
+        const SOURCES = {
+          STORAGE: 'storage',
+          API: 'api',
+          NONE: 'none',
+        };
+
+        let instrumentsSource;
+        let userIdentified = true;
+
+        // First figure out which source to attempt using
+        if (instrumentsFromStorage.length) {
+          if (Math.random() < 0.5) {
+            instrumentsSource = SOURCES.STORAGE;
+          } else {
+            instrumentsSource = SOURCES.API;
+          }
+        } else {
+          // Do another 50-50 split on API instruments
+          if (Math.random() < 0.5) {
+            instrumentsSource = SOURCES.NONE;
+          } else {
+            instrumentsSource = SOURCES.API;
+          }
+        }
+
+        // hard override because of intermittent data issue
+        instrumentsSource = SOURCES.STORAGE;
+
+        // The function that returns the promise to be returned
+        // This promise should set the experiment identifier
+        // and any analytics meta properties
+        const returnPromise = source =>
+          new Promise(resolve => {
+            let instrumentsToBeShown = instrumentMap[source];
+
+            let experimentIdentifier;
+
+            if (source === SOURCES.STORAGE) {
+              experimentIdentifier =
+                EXPERIMENT_IDENTIFIERS.BOTH_AVAILABLE_STORAGE_SHOWN;
+            } else if (source === SOURCES.API) {
+              if (instrumentMap.storage.length) {
+                experimentIdentifier =
+                  EXPERIMENT_IDENTIFIERS.BOTH_AVAILABLE_API_SHOWN;
+              } else {
+                experimentIdentifier =
+                  EXPERIMENT_IDENTIFIERS.API_AVAILABLE_API_SHOWN;
+              }
+            } else {
+              if (instrumentMap.api.length) {
+                experimentIdentifier =
+                  EXPERIMENT_IDENTIFIERS.API_AVAILABLE_NONE_SHOWN;
+              } else {
+                experimentIdentifier = EXPERIMENT_IDENTIFIERS.NONE_AVAILABLE;
+              }
+            }
+
+            // if user is in home, track the currently visible experiment
+            if (!session.tab) {
+              /**
+               * - `meta.p13n` will only be set when preferred methods are shown in the UI.
+               * - `p13n:instruments:list` will be fired when we attempt to show the list.
+               * - `p13n:instruments:list` with `meta.p13n` set as true will tell you whether or not preferred methods were shown.
+               */
+
+              // meta.p13n should always be set before `p13n:instruments:list`
+              if (instrumentsToBeShown && instrumentsToBeShown.length) {
+                Analytics.setMeta('p13n', true);
+              } else {
+                Analytics.removeMeta('p13n');
+              }
+
+              Analytics.setMeta('p13n.userIdentified', userIdentified);
+
+              Analytics.track('home:p13n:experiment', {
+                type: AnalyticsTypes.METRIC,
+                data: {
+                  source: source,
+                  experiment: experimentIdentifier,
+                },
+              });
+
+              Analytics.setMeta('p13n.experiment', experimentIdentifier);
+            }
+
+            // Cache for user
+            const p13nRenderData = {
+              source: source,
+              instruments: instrumentsToBeShown,
+              experiment: experimentIdentifier,
+            };
+
+            USER_EXPERIMENT_CACHE[user] = p13nRenderData;
+
+            resolve(USER_EXPERIMENT_CACHE[user]);
+          });
+
+        // if source is api, we need to fetch api instruments and then
+        // re-set the source
+        if (
+          instrumentsSource === SOURCES.API ||
+          instrumentsSource === SOURCES.NONE
+        ) {
+          getInstrumentsForCustomer(
+            $customer,
+            {
+              upiApps: getUPIIntentApps().filtered,
+            },
+            'api'
+          ).then(({ identified, instruments: instrumentsFromApi }) => {
+            userIdentified = identified;
+
+            if (instrumentsFromApi.length) {
+              instrumentMap.api = instrumentsFromApi;
+            }
+
+            resolve(returnPromise(instrumentsSource));
+          });
+        } else {
+          resolve(returnPromise(instrumentsSource));
+        }
+      });
+    }
+
+    return USER_EXPERIMENT_CACHE[user];
+  }
+
   function getAllAvailableP13nInstruments() {
-    return getTranslatedInstrumentsForCustomer($customer, {
-      upiApps: session.upi_intents_data,
+    return getInstrumentsForCustomer(
+      $customer,
+      {
+        upiApps: getUPIIntentApps().filtered,
+      },
+      'storage'
+    ).then(({ instruments: instrumentsFromStorage }) => {
+      return getRandomInstrumentSet({
+        instrumentsFromStorage,
+        customer: $customer,
+      });
     });
   }
 
@@ -281,25 +452,17 @@
     }
   }
 
-  // Svelte executes the following block twice. Even if a fault was emitted, it will be emitted again in the second execution.
-  // So, we use this flag to perform no-op if true.
-  // TODO: Do this in a better way by figuring out how to make it execute the block only once.
-  let isInstrumentFaultEmitted = false;
-
-  $: {
-    const loggedIn = _Obj.getSafely($customer, 'logged');
-    session.topBar.setLogged(loggedIn);
-
+  function updateBlocks({
+    preferredInstruments = [],
+    showPreferredLoader = false,
+  } = {}) {
     const isPersonalizationEnabled = shouldUsePersonalization();
-    const eligiblePreferredInstruments = isPersonalizationEnabled
-      ? getAllAvailableP13nInstruments($customer)
-      : [];
-
     const merchantConfig = getMerchantConfig();
 
     const blocksThatWereSet = setBlocks(
       {
-        preferred: eligiblePreferredInstruments,
+        showPreferredLoader,
+        preferred: preferredInstruments,
         merchantConfig: merchantConfig.config,
         configSource: merchantConfig.sources,
       },
@@ -339,19 +502,6 @@
         {}
       );
 
-      /**
-       * - `meta.p13n` will only be set when preferred methods are shown in the UI.
-       * - `p13n:instruments:list` will be fired when we attempt to show the list.
-       * - `p13n:instruments:list` with `meta.p13n` set as true will tell you whether or not preferred methods were shown.
-       */
-
-      // meta.p13n should always be set before `p13n:instruments:list`
-      if (setPreferredInstruments.length) {
-        Analytics.setMeta('p13n', true);
-      } else {
-        Analytics.removeMeta('p13n');
-      }
-
       const allPreferredInstrumentsForCustomer = getAllInstrumentsForCustomer(
         $customer
       );
@@ -364,13 +514,41 @@
         Analytics.track('p13n:instruments:list', {
           data: {
             all: allPreferredInstrumentsForCustomer.length,
-            eligible: eligiblePreferredInstruments.length,
+            eligible: preferredInstruments.length,
             shown: setPreferredInstruments.length,
             methods: preferredMethods,
           },
         });
       }
     }
+  }
+
+  onMount(() => {
+    updateBlocks({
+      showPreferredLoader: shouldUsePersonalization(),
+    });
+  });
+
+  // Svelte executes the following block twice. Even if a fault was emitted, it will be emitted again in the second execution.
+  // So, we use this flag to perform no-op if true.
+  // TODO: Do this in a better way by figuring out how to make it execute the block only once.
+  let isInstrumentFaultEmitted = false;
+
+  $: {
+    const loggedIn = _Obj.getSafely($customer, 'logged');
+    _El.keepClass(_Doc.querySelector('#topbar #top-right'), 'logged', loggedIn);
+
+    const isPersonalizationEnabled = shouldUsePersonalization();
+
+    const eligiblePreferredInstrumentsPromise = isPersonalizationEnabled
+      ? getAllAvailableP13nInstruments($customer)
+      : Promise.resolve([]);
+
+    eligiblePreferredInstrumentsPromise.then(({ instruments }) => {
+      updateBlocks({
+        preferredInstruments: instruments,
+      });
+    });
   }
 
   function shouldUsePersonalization() {
@@ -452,11 +630,15 @@
      * If contact and email are mandatory, validate
      */
     if (!isContactEmailOptional()) {
-      const contactRegex = /^\+?[0-9]{8,15}$/;
-      const emailRegex = /^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/;
+      if (!isContactValid) {
+        if ($country === '+91') {
+          isContactValid = PHONE_REGEX_INDIA.test($phone);
+        } else {
+          isContactValid = CONTACT_REGEX.test($contact);
+        }
+      }
 
-      isContactValid = isContactValid || contactRegex.test($contact);
-      isEmailValid = isEmailValid || emailRegex.test($email);
+      isEmailValid = isEmailValid || EMAIL_REGEX.test($email);
     }
 
     /**
@@ -701,6 +883,7 @@
   .home-methods {
     padding-left: 12px;
     padding-right: 12px;
+    margin-top: 28px;
   }
 
   .details-container {

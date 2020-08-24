@@ -193,16 +193,17 @@
     BANK_DETAILS: 'bank_details',
   };
 
+  const banks = getEMandateBanks();
+
   let currentView = Views.AUTH_SELECTION;
 
   let bankName;
   $: {
-    bankName = getLongBankName($selectedBank, $locale);
+    const defaultBankName = (banks[selectedBank] || {}).name;
+    bankName = getLongBankName($selectedBank, $locale, defaultBankName);
   }
 
   let active = false;
-
-  const banks = getEMandateBanks();
 
   function resetBank() {
     session.switchTab('netbanking');

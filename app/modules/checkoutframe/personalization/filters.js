@@ -1,6 +1,10 @@
 import { VPA_REGEX } from 'common/constants';
 import { doesAppExist } from 'common/upi';
-import { getDowntimes } from 'checkoutstore';
+import {
+  getDowntimes,
+  isASubscription,
+  shouldRememberCustomer,
+} from 'checkoutstore';
 import {
   isCreditCardEnabled,
   isDebitCardEnabled,
@@ -30,6 +34,11 @@ const METHOD_FILTERS = {
 
     // If the card type is not allowed, filter this out
     if (!isCardTypeAllowed) {
+      return false;
+    }
+
+    // Don't show any cards if saved cards are disabled
+    if (!shouldRememberCustomer()) {
       return false;
     }
 
@@ -69,10 +78,26 @@ const METHOD_FILTERS = {
     return Boolean(getNetbankingBanks()[bank]);
   },
 
-  upi: instrument => {
+  upi: (instrument, { customer }) => {
+    // hide p13n tokens for anonymous users in case of subscriptions
+    // login needs to be enforced before any payments are made through upi
+    if (isASubscription() && !customer.logged) {
+      return false;
+    }
+
     // Only allow directpay instruments that have a VPA
     if (instrument['_[flow]'] === 'directpay') {
-      return Boolean(instrument.vpa);
+      if (instrument.vpa) {
+        // We want to show only saved VPAs
+        const tokens = _Obj.getSafely(customer, 'tokens.items', []);
+        const tokenVpas = tokens
+          .filter(token => token.vpa)
+          .map(token => `${token.vpa.username}@${token.vpa.handle}`);
+
+        return tokenVpas.indexOf(instrument.vpa) >= 0;
+      } else {
+        return false;
+      }
     }
 
     // Allow QR instruments

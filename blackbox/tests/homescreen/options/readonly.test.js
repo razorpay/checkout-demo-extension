@@ -16,7 +16,7 @@ describe.each(
   getTestData('Check readonly options', {
     options: {
       prefill: {
-        contact: '+91222222222',
+        contact: '+912222222222',
         name: nameToBePrefilled,
         email: 'a@gmail.com',
       },
@@ -45,6 +45,7 @@ describe.each(
     await enterUserDetailsTab.click();
     await assertBasicDetailsScreen(context);
     await assertElementHasAttribute(context, '#email', 'readonly');
+    await assertElementHasAttribute(context, '#country-code', 'readonly');
     await assertElementHasAttribute(context, '#contact', 'readonly');
     await fillUserDetails(context);
     await delay(500);

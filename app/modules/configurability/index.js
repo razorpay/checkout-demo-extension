@@ -15,6 +15,7 @@ import {
   getPayLaterProviders,
   getCardlessEMIProviders,
   getCardNetworks,
+  getAppProviders,
 } from 'checkoutstore/methods';
 
 import { shouldSeparateDebitCard, getMerchantMethods } from 'checkoutstore';
@@ -166,6 +167,26 @@ function removeNonApplicableInstrumentFlows(instrument) {
           )
         );
         instrument.providers = shownProviders;
+      }
+
+      return instrument;
+    }
+
+    case 'app': {
+      const hasProviders = Boolean(instrument.providers);
+
+      if (hasProviders) {
+        const enabledProviders = getAppProviders();
+        const shownProviders = _Arr.filter(instrument.providers, provider =>
+          _Arr.any(
+            enabledProviders,
+            enabledProvider => enabledProvider.code === provider
+          )
+        );
+        instrument.providers = shownProviders;
+      } else {
+        // If there are no providers, then exclude this method.
+        return null;
       }
 
       return instrument;

@@ -1,11 +1,71 @@
 import Track from 'tracker';
 import { getSortedApps } from 'common/upi';
+import {
+  getCardApps as getSortedCardApps,
+  getAppsForMethod,
+} from 'common/apps';
 
 let message;
+let cardApps = { all: getAppsForMethod('card') };
+
+// Store queryParams while bootstrapping as query params could change?
+let qpmap = _.getQueryParams();
+
 let upiApps = { all: [], filtered: [] };
+
+/**
+ * Sets the list of apps.
+ *
+ * TODO: Extend the list under `all` and `filtered`,
+ *       instead of resetting it every time.
+ *
+ * @param {Array<Object>} apps
+ */
+export function setUpiApps(apps) {
+  const filteredApps = getSortedApps(apps);
+  const unusedApps = _Arr.filter(
+    apps,
+    app =>
+      !_Arr.find(
+        filteredApps,
+        filteredApp => filteredApp.package_name === app.package_name
+      )
+  );
+
+  upiApps = {
+    all: _Arr.mergeWith(filteredApps, unusedApps),
+    filtered: filteredApps,
+  };
+}
+
+/**
+ * Get SDK metadata
+ * @returns {{library: (string), version: (string), platform: (string)}}
+ */
+export function getSDKMeta() {
+  const iOSPlatform = _Obj.getSafely(
+    window,
+    'webkit.messageHandlers.CheckoutBridge'
+  );
+  if (iOSPlatform) {
+    return {
+      platform: 'ios',
+    };
+  }
+  return {
+    platform: qpmap.platform || 'web',
+    library: 'checkoutjs',
+    // eslint-disable-next-line no-undef
+    version: (qpmap.version || __BUILD_NUMBER__ || 0) + '',
+  };
+}
 
 export function getUPIIntentApps() {
   return upiApps;
+}
+
+export function getCardApps() {
+  return cardApps;
 }
 
 export function processNativeMessage(_message) {
@@ -40,6 +100,13 @@ const messageTransformers = {
       transfomed.hasAmazonpaySdk = message.external_sdks.amazonpay;
       transfomed.hasGooglePaySdk = message.external_sdks.googlepay;
     }
+    // Build filtered cardApps array after getting the available external sdks
+    // Because some apps might have external dependencies.
+    cardApps.all = getSortedCardApps(
+      getSDKMeta(),
+      message.external_sdks,
+      message.uri_data
+    );
   },
 
   addSmsHash: (o, message) => {
@@ -51,26 +118,9 @@ const messageTransformers = {
   addUpiIntentsData: (transfomed, message) => {
     // @TODO: update better names for these variables
     if (message.upi_intents_data && message.upi_intents_data.length) {
-      // @TODO: used to just send an event. send from here itself
-      transfomed.all_upi_intents_data = message.upi_intents_data;
-      const filteredApps = getSortedApps(message.upi_intents_data);
-      const unusedApps = _Arr.filter(
-        message.upi_intents_data,
-        app =>
-          !_Arr.find(
-            filteredApps,
-            filteredApp => filteredApp.package_name === app.package_name
-          )
-      );
+      // TODO: Send from here itself
 
-      upiApps = {
-        all: _Arr.mergeWith(filteredApps, unusedApps),
-        filtered: filteredApps,
-      };
-
-      if (filteredApps.length) {
-        transfomed.upi_intents_data = filteredApps;
-      }
+      setUpiApps(message.upi_intents_data);
     }
   },
 

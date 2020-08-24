@@ -75,9 +75,12 @@
   let showCardUnsupported = false;
 
   let cardNumberHelpText;
-  $: cardNumberHelpText = showCardUnsupported
-    ? $t(CARD_NUMBER_HELP_UNSUPPORTED)
-    : undefined;
+  $: cardNumberHelpText =
+    showCardUnsupported && $cardNumber.length > 6
+      ? $t(CARD_NUMBER_HELP_UNSUPPORTED)
+      : undefined;
+
+  export let faded = false;
 
   function setCardNumberValidity(valid) {
     if (numberField) {
@@ -419,9 +422,13 @@
     padding-left: 20px;
     width: 33.33%;
   }
+
+  .faded {
+    opacity: 0.5;
+  }
 </style>
 
-<div class="pad" id="add-card-container">
+<div class="pad" id="add-card-container" class:faded>
   <div class="row card-fields">
     <div class="two-third">
       <NumberField
@@ -432,6 +439,7 @@
         helpText={cardNumberHelpText}
         recurring={isRecurring()}
         type={$cardType}
+        on:focus
         on:filled={_ => handleFilled('numberField')}
         on:autocomplete={trackCardNumberAutoFilled}
         on:input={handleCardInput}
@@ -444,6 +452,7 @@
           name="card[expiry]"
           bind:value={$cardExpiry}
           bind:this={expiryField}
+          on:focus
           on:blur={trackExpiryFilled}
           on:filled={_ => handleFilled('expiryField')} />
       </div>
@@ -457,6 +466,7 @@
         readonly={nameReadonly}
         bind:value={$cardName}
         bind:this={nameField}
+        on:focus
         on:blur={trackNameFilled} />
     </div>
     {#if !hideExpiryCvvFields}
@@ -466,6 +476,7 @@
           length={cvvLength}
           bind:value={$cardCvv}
           bind:this={cvvField}
+          on:focus
           on:blur={trackCvvFilled} />
       </div>
     {/if}
@@ -480,6 +491,7 @@
             id="save"
             name="save"
             value="1"
+            on:focus
             on:change={trackRememberChecked}
             bind:checked={$remember} />
           <span class="checkbox" />

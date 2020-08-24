@@ -11,6 +11,10 @@ import {
 import { processNativeMessage } from 'checkoutstore/native';
 import { isEMandateEnabled, getEnabledMethods } from 'checkoutstore/methods';
 import showTimer from 'checkoutframe/timer';
+import {
+  setInstrumentsForCustomer,
+  trackP13nMeta,
+} from 'checkoutframe/personalization/api';
 import { setHistoryAndListenForBackPresses } from 'bridge/back';
 
 import {
@@ -21,6 +25,7 @@ import {
   isIframe,
   ownerWindow,
 } from 'common/constants';
+import { checkGooglePayWebPayments } from 'checkoutframe/components/upi';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -109,10 +114,13 @@ const setAnalyticsMeta = message => {
    * Set network-related properties.
    */
   if (_Obj.hasProp(navigator, 'connection')) {
-    const { effectiveType, type } = navigator.connection;
+    const { effectiveType, type, downlink } = navigator.connection;
 
     if (effectiveType || type) {
       Analytics.setMeta('network.type', effectiveType || type);
+    }
+    if (downlink) {
+      Analytics.setMeta('network.downlink', downlink);
     }
   }
 
@@ -198,14 +206,13 @@ function fetchPrefs(session) {
   }
   session.isOpen = true;
 
-  /* Start listening for back presses */
-  setHistoryAndListenForBackPresses();
-
   let closeAt;
   const timeout = session.r.get('timeout');
   if (timeout) {
     closeAt = _.now() + timeout * 1000;
   }
+
+  performPrePrefsFetchOperations();
 
   session.prefCall = Razorpay.payment.getPrefs(
     getPreferenecsParams(session.r),
@@ -229,6 +236,13 @@ function fetchPrefs(session) {
   );
 }
 
+function performPrePrefsFetchOperations() {
+  /* Start listening for back presses */
+  setHistoryAndListenForBackPresses();
+
+  checkGooglePayWebPayments();
+}
+
 function setSessionPreferences(session, preferences) {
   const razorpayInstance = session.r;
   razorpayInstance.preferences = preferences;
@@ -237,6 +251,7 @@ function setSessionPreferences(session, preferences) {
   updateOptions(preferences);
   updateEmandatePrefill();
   updateAnalytics(preferences);
+  updatePreferredMethods(preferences);
 
   Razorpay.configure(preferences.options);
   session.setPreferences(preferences);
@@ -269,10 +284,25 @@ function setSessionPreferences(session, preferences) {
   }
   session.render();
   showModal(session);
+  addSiftScript();
+}
+
+function addSiftScript() {
+  // https://sift.com/developers/docs/curl/javascript-api/overview
+  window._sift = [
+    ['_setAccount', '4dbbb1f7b6'],
+    ['_setSessionId', Track.id],
+    ['_trackPageview'],
+  ];
+
+  _El.create('script')
+    |> _Obj.setProp('src', 'https://cdn.razorpay.com/checkout/sift.js')
+    |> _El.appendTo(_Doc.documentElement);
 }
 
 function getPreferenecsParams(razorpayInstance) {
   const prefData = makePrefParams(razorpayInstance);
+  prefData.personalisation = 1;
   if (cookieDisabled) {
     prefData.checkcookie = 0;
   } else {
@@ -349,6 +379,24 @@ function updateAnalytics(preferences) {
       optionalFields |> _Arr.contains('email')
     );
   }
+}
+
+function updatePreferredMethods(preferences) {
+  const { preferred_methods } = preferences;
+
+  if (preferred_methods) {
+    _Obj.loop(preferred_methods, ({ instruments }, contact) => {
+      if (instruments) {
+        setInstrumentsForCustomer(
+          {
+            contact,
+          },
+          instruments
+        );
+      }
+    });
+  }
+  trackP13nMeta(preferred_methods);
 }
 
 /* expose handleMessage to window for our Mobile SDKs */

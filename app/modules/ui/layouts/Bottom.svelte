@@ -20,7 +20,6 @@
   :global(#form-common.drishy ~ #bottom .bottom[tab='common']),
   :global(#form-card.drishy ~ #bottom .bottom[tab='card']),
   :global(#form-emiplans.drishy ~ #bottom .bottom[tab='emiplans']),
-  :global(#form-payouts.drishy ~ #bottom .bottom[tab='payouts']),
   :global(#form-qr.drishy ~ #bottom .bottom[tab='qr']) {
     display: block;
   }

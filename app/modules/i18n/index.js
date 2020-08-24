@@ -109,6 +109,29 @@ export function getPaylaterProviderName(providerCode, locale) {
 }
 
 /**
+ * Returns the app name for the given locale
+ * @param {string} providerCode
+ * @param {string} locale
+ * @returns {string}
+ */
+export function getAppProviderName(providerCode, locale) {
+  return formatMessageWithLocale(`app.providers.${providerCode}.name`, locale);
+}
+
+/**
+ * Returns the app subtext for the given locale
+ * @param {string} providerCode
+ * @param {string} locale
+ * @returns {string}
+ */
+export function getAppProviderSubtext(providerCode, locale) {
+  return formatMessageWithLocale(
+    `app.providers.${providerCode}.subtext`,
+    locale
+  );
+}
+
+/**
  * Returns the cardless emi provider name for the given locale
  * @param {string} providerCode
  * @param {string} locale
