@@ -1,3 +1,5 @@
+import Analytics from 'analytics';
+
 import { dictionary, t, locale } from 'svelte-i18n';
 
 import { get } from 'svelte/store';
