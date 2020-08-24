@@ -114,10 +114,13 @@ const setAnalyticsMeta = message => {
    * Set network-related properties.
    */
   if (_Obj.hasProp(navigator, 'connection')) {
-    const { effectiveType, type } = navigator.connection;
+    const { effectiveType, type, downlink } = navigator.connection;
 
     if (effectiveType || type) {
       Analytics.setMeta('network.type', effectiveType || type);
+    }
+    if (downlink) {
+      Analytics.setMeta('network.downlink', downlink);
     }
   }
 
