@@ -1,4 +1,4 @@
-import { getBankFromCard } from 'common/bank';
+import { getBankFromCardCache } from 'common/bank';
 import { getOrderId, getAmount, makeAuthUrl } from 'checkoutstore';
 import { writable, derived } from 'svelte/store';
 import { cardIin, cardTab } from 'checkoutstore/screens/card';
@@ -31,7 +31,7 @@ export const isCardValidForOffer = derived(
       return;
     }
     if ($appliedOffer.emi_subvention) {
-      const bank = getBankFromCard($cardIin);
+      const bank = getBankFromCardCache($cardIin);
       if (!bank) {
         set(false);
       } else {

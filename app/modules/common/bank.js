@@ -117,7 +117,7 @@ export const emiBanks = [
   },
 ];
 
-export const getBankFromCard = cardNum => {
+export const getBankFromCardCache = cardNum => {
   const cardFeatures = getCardMetadata(cardNum);
   let issuer = cardFeatures.issuer;
 
