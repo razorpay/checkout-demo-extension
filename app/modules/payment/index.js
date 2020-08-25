@@ -965,7 +965,6 @@ razorpayProto.topupWallet = function() {
   }
 
   let url = makeAuthUrl(this, 'payments/' + payment.payment_id + '/topup/ajax');
-  url = _.appendParamsToUrl(url, { language_code: getCurrentLocale() });
 
   payment.ajax = fetch.post({
     url,
