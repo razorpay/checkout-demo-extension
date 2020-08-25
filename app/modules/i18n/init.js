@@ -15,6 +15,7 @@ import en from './bundles/en';
 
 import { getSession } from 'sessionmanager';
 import { getLanguageCode } from 'checkoutstore';
+import { shouldUseVernacular } from 'checkoutstore/methods';
 import Analytics from 'analytics';
 import { getSegmentOrCreate } from 'experiments';
 
@@ -165,8 +166,12 @@ export function init() {
 
   let initialLocale = 'en';
 
+  const isVernacularEnabled = shouldUseVernacular();
+  const isExperimentEnabled =
+    getSegmentOrCreate('vernacular_default_selection') === 1;
+
   // We need to determine a default language only for the experiment.
-  if (getSegmentOrCreate('vernacular_default_selection') === 1) {
+  if (isVernacularEnabled && isExperimentEnabled) {
     initialLocale = determineInitialLocale();
   }
 

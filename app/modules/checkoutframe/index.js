@@ -285,15 +285,12 @@ function setSessionPreferences(session, preferences) {
     return Razorpay.sendMessage({ event: 'fault', data: message });
   }
 
-  initI18n()
-    .then(() => {
-      session.render();
-      showModal(session);
-      addSiftScript();
-    })
-    .then(() => {
-      bindI18nEvents();
-    });
+  initI18n().then(() => {
+    session.render();
+    showModal(session);
+    addSiftScript();
+    bindI18nEvents();
+  });
 }
 
 function addSiftScript() {

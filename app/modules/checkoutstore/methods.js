@@ -850,3 +850,12 @@ function getUsableMethods() {
 export function isMethodUsable(method) {
   return _Arr.contains(getUsableMethods(), method);
 }
+
+/**
+ * We need to disable vernacular for some methods because the APIs they use
+ * are not ready yet.
+ * @returns {boolean}
+ */
+export function shouldUseVernacular() {
+  return !isPayout() && !isMethodEnabled('nach');
+}

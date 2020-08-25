@@ -2,9 +2,12 @@
   import { locale, locales, isLoading } from 'svelte-i18n';
   import { getLocaleName } from 'i18n/init';
   import { onMount, onDestroy } from 'svelte';
+  import { shouldUseVernacular } from 'checkoutstore/methods';
 
   const entries = _Obj.entries;
   const overlayEl = _Doc.querySelector('#body-overlay');
+
+  const shouldShowDropdown = shouldUseVernacular();
 
   function handleOutsideClick() {
     if (dropdownShown) {
@@ -39,7 +42,9 @@
 
   // Since it occupies the bottom of header, we need to remove header's padding
   onMount(() => {
-    _El.addClass(header, 'has-dropdown');
+    if (shouldShowDropdown) {
+      _El.addClass(header, 'has-dropdown');
+    }
   });
 
   onDestroy(() => {
@@ -117,15 +122,17 @@
   }
 </style>
 
-<div class="outer">
-  <div class="selected" on:click|stopPropagation={toggleDropdown}>
-    {getLocaleName($locale)}
+{#if shouldShowDropdown}
+  <div class="outer">
+    <div class="selected" on:click|stopPropagation={toggleDropdown}>
+      {getLocaleName($locale)}
+    </div>
+    {#if dropdownShown}
+      <ul class="dropdown-options">
+        {#each $locales as locale}
+          <li on:click={() => select(locale)}>{getLocaleName(locale)}</li>
+        {/each}
+      </ul>
+    {/if}
   </div>
-  {#if dropdownShown}
-    <ul class="dropdown-options">
-      {#each $locales as locale}
-        <li on:click={() => select(locale)}>{getLocaleName(locale)}</li>
-      {/each}
-    </ul>
-  {/if}
-</div>
+{/if}
