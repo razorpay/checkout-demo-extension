@@ -12,6 +12,31 @@ import * as AnalyticsTypes from 'analytics-types';
 
 const PREFERRED_INSTRUMENTS_CACHE = {};
 
+export const removeDuplicateApiInstruments = instruments => {
+  const result = [];
+
+  instruments.forEach(instrument => {
+    const uniqueInstrumentsIds = result.map(x => x.method + '-' + x.instrument);
+    const instrumentId = instrument.method + '-' + instrument.instrument;
+
+    if (!uniqueInstrumentsIds.includes(instrumentId)) {
+      result.push(instrument);
+    }
+  });
+
+  if (result.length !== instruments.length) {
+    Analytics.track('p13n:api_non_unique_error', {
+      type: AnalyticsTypes.METRIC,
+      data: {
+        received: instruments.length,
+        unique: result.length,
+      },
+    });
+  }
+
+  return result;
+};
+
 /**
  * Sets instruments for customer
  * @param {Customer} customer
@@ -90,7 +115,9 @@ function getInstrumentsFromApi(customer) {
           apiInstrumentsData = data[customer.contact] || apiInstrumentsData;
         }
 
-        const apiInstruments = apiInstrumentsData.instruments;
+        const apiInstruments = removeDuplicateApiInstruments(
+          apiInstrumentsData.instruments
+        );
 
         resolve(
           setInstrumentsForCustomer(customer, apiInstruments, identified)
