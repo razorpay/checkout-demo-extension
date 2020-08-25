@@ -40,8 +40,6 @@ export function createFundAccount(fundAccount) {
 
   let url = makeAuthUrl(r, 'fund_accounts/public');
 
-  url = _.appendParamsToUrl(url, { language_code: getCurrentLocale() });
-
   return new Promise((resolve, reject) =>
     fetch({
       url,
