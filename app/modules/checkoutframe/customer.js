@@ -159,8 +159,6 @@ Customer.prototype = {
     data.contact = this.contact || getCustomer(getPhone()).contact;
     let url = 'otp/verify';
 
-    url = _.appendParamsToUrl(url, { language_code: getCurrentLocale() });
-
     if (queryParams) {
       url = _.appendParamsToUrl(url, queryParams);
     }
