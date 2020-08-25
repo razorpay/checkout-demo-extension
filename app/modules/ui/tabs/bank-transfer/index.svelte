@@ -69,8 +69,6 @@
       `orders/${session.r.get('order_id')}/virtual_accounts`
     );
 
-    url = _.appendParamsToUrl(url, { language_code: getCurrentLocale() });
-
     fetch.post({
       url,
       callback: getNEFTDetails,
