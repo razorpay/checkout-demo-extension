@@ -97,7 +97,8 @@ async function enterCardDetails(
 
   if (emi) {
     flows.emi = true;
-    (response.issuer = issuer), (response.type = type);
+    response.issuer = issuer;
+    response.type = type;
   }
 
   response.flows = flows;
