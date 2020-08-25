@@ -47,8 +47,6 @@ export const isCardValidForOffer = derived(
 
     let url = makeAuthUrl('validate/checkout/offers');
 
-    url = _.appendParamsToUrl(url, { language_code: getCurrentLocale() });
-
     currentRequest = fetch.post({
       url,
       data: {
