@@ -214,7 +214,6 @@ Customer.prototype = {
     let url = makeAuthUrl(this.r, 'apps/logout');
 
     url = _.appendParamsToUrl(url, {
-      language_code: getCurrentLocale(),
       logout: this_device ? 'app' : 'all',
     });
 
