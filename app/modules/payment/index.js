@@ -947,8 +947,6 @@ razorpayProto.resendOTP = function(callback) {
   var payment = this._payment;
   var url = makeAuthUrl(this, 'payments/' + payment.payment_id + '/otp_resend');
 
-  url = _.appendParamsToUrl(url, { language_code: getCurrentLocale() });
-
   payment.ajax = fetch.post({
     url,
     data: {
