@@ -100,8 +100,6 @@ Customer.prototype = {
     let customer = this;
     let url = 'customers/status/' + (this.contact || contact);
 
-    url = _.appendParamsToUrl(url, { language_code: getCurrentLocale() });
-
     if (queryParams) {
       url = _.appendParamsToUrl(url, queryParams);
     }
