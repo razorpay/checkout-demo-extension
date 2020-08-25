@@ -1847,6 +1847,7 @@ Session.prototype = {
     } else {
       var self = this;
       this.getCurrentCustomer().createOTP(function(message) {
+        // TODO: check how message is being consumed. Possible bug.
         askOTP(self.otpView, message, true, { phone: getPhone() });
         self.updateCustomerInStore();
       });
