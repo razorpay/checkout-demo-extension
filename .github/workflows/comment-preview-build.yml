@@ -1,0 +1,41 @@
+name: Add link to preview build
+on: pull_request
+jobs:
+  comment:
+    name: Add comment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Comment on PR
+        uses: ./.github/actions/comment-on-pr
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          msg: |
+            Once a build for any commit in your branch succeeds, it will be deployed at https://betacdn.razorpay.com/_checkout/{branch_name}/v1/
+
+            ## Files
+            - [razorpay.js](https://betacdn.razorpay.com/_checkout/{branch_name}/v1/razorpay.js)
+            - [checkout.js](https://betacdn.razorpay.com/_checkout/{branch_name}/v1/checkout.js)
+            - [checkout-frame.js](https://betacdn.razorpay.com/_checkout/{branch_name}/v1/checkout-frame.js)
+            - [checkout.css](https://betacdn.razorpay.com/_checkout/{branch_name}/v1/css/checkout.css)
+
+            ## Usage
+
+            ### `layout.php` links for different API environments (opening in incognito mode is recommeded):
+
+            - Production API: https://api.razorpay.com/test/layout.php?branch={branch_name}
+            - Dark API: https://api-dark.razorpay.com/test/layout.php?branch={branch_name}
+            - Beta API: https://beta-api.stage.razorpay.in/test/layout.php?branch={branch_name}
+            - Func API: https://api-web.func.razorpay.in/test/layout.php?branch={branch_name}
+
+            ### `checkout.html` links for different API environments:
+
+            To use this branch on a mobile SDK, point the SDK page to one of these URLs
+
+            - Production API: https://api.razorpay.com/test/checkout.html?branch={branch_name}
+            - Dark API: https://api-dark.razorpay.com/test/checkout.html?branch={branch_name}
+            - Beta API: https://beta-api.stage.razorpay.in/test/checkout.html?branch={branch_name}
+            - Func API: https://api-web.func.razorpay.in/test/checkout.html?branch={branch_name}
