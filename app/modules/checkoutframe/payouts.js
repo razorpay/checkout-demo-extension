@@ -16,8 +16,6 @@ export function fetchFundAccounts(contactId) {
 
   let url = makeAuthUrl(r, `contacts/${contactId}/public`);
 
-  url = _.appendParamsToUrl(url, { language_code: getCurrentLocale() });
-
   return new Promise((resolve, reject) =>
     fetch({
       url,
