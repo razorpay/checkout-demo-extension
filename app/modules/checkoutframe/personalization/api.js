@@ -200,6 +200,9 @@ const API_INSTRUMENT_PAYMENT_ADDONS = {
 export function transformInstrumentToStorageFormat(instrument, data = {}) {
   if (API_INSTRUMENT_PAYMENT_ADDONS[instrument.method]) {
     API_INSTRUMENT_PAYMENT_ADDONS[instrument.method](instrument, data);
+  } else {
+    // if an instrument cannot be transformed to a format supported by FE, return undefined
+    return undefined;
   }
   return instrument;
 }
