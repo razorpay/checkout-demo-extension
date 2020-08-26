@@ -201,10 +201,8 @@ export function transformInstrumentToStorageFormat(instrument, data = {}) {
   if (API_INSTRUMENT_PAYMENT_ADDONS[instrument.method]) {
     API_INSTRUMENT_PAYMENT_ADDONS[instrument.method](instrument, data);
   } else {
-    // if an instrument cannot be transformed to a format supported by FE, remove it's data
-    // This allows it to be filtered in the future flow
-    // because the method would not be recognized and enabled for the merchant.
-    instrument.method = 'UNSUPPORTED';
+    // if an instrument cannot be transformed to a format supported by FE, return undefined
+    return undefined;
   }
   return instrument;
 }

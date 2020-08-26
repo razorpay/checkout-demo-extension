@@ -177,6 +177,16 @@ export function filterInstrumentsForSanity(instruments) {
 }
 
 /**
+ * Filters instruments by are falsy in nature.
+ * @param {Array} instruments List of intruments to be filtered
+ *
+ * @returns {Array} filtered instruments
+ */
+export function filterFalsyInstruments(instruments) {
+  return _Arr.filter(instruments, Boolean);
+}
+
+/**
  * Filters out instruments before listing down instruments for display
  *
  * @param  {Array} instruments is the list of instruments to be filtered.
@@ -250,6 +260,7 @@ const filterInstrumentsByAvailableUpiApps = _.curry2((instruments, apps) => {
 export function filterInstruments({ instruments, upiApps = [], customer }) {
   return (
     instruments
+    |> filterFalsyInstruments
     |> filterInstrumentsForAvailableMethods({ customer })
     |> filterInstrumentsByAvailableUpiApps(upiApps)
     |> filterInstrumentsForSanity
