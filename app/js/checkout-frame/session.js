@@ -442,6 +442,10 @@ function getPhone() {
   return storeGetter(HomeScreenStore.contact);
 }
 
+function getProxyPhone() {
+  return storeGetter(HomeScreenStore.proxyContact);
+}
+
 function getEmail() {
   return storeGetter(HomeScreenStore.email);
 }
@@ -2591,12 +2595,12 @@ Session.prototype = {
    * @returns {boolean} valid
    */
   checkCommonValid: function() {
-    // Only check if we're on the homescreen
-    if (!this.homeTab.onDetailsScreen()) {
-      return true;
-    }
-
     var selector = '#form-common';
+
+    if (this.homeTab.onMethodsScreen()) {
+      // Validate any additional input (like contact)
+      selector = '.instrument.selected';
+    }
 
     var valid = !this.checkInvalid(selector);
 
@@ -3879,6 +3883,10 @@ Session.prototype = {
     } else if (screen) {
       if (screen === 'card') {
         if (data.provider) {
+          // Validate any additional input (like contact).
+          if (this.checkInvalid('.selected.instrument')) {
+            return;
+          }
           // Set method as "app"
           // By default the method is set to whatever screen you're on. -_-
           data.method = 'app';
@@ -4178,6 +4186,12 @@ Session.prototype = {
             // TODO: Check if it's possible to move this to instruments-config
             if (selectedInstrument._ungrouped[0].provider === 'cred') {
               _Obj.extend(this.payload, MethodStore.getPayloadForCRED());
+
+              if (Store.isContactOptional()) {
+                // For contact optional case, we ask for contact separately
+                // which is present in proxyPhone.
+                this.payload.contact = getProxyPhone();
+              }
             }
           }
         }
@@ -4454,6 +4468,12 @@ Session.prototype = {
           provider: provider,
         },
       });
+
+      if (provider === 'cred' && Store.isContactOptional()) {
+        // For contact optional case, we ask for contact separately
+        // which is present in proxyPhone.
+        this.payload.contact = getProxyPhone();
+      }
     } else if (data.method === 'card' || data.method === 'emi') {
       this.nativeotp = !!this.shouldUseNativeOTP();
 

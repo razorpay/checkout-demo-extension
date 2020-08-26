@@ -514,6 +514,26 @@ export function getPayloadForCRED() {
   };
 }
 
+export function isContactRequiredForInstrument(instrument) {
+  if (
+    instrument.method === 'app' &&
+    instrument.providers?.length === 1 &&
+    instrument.providers[0] === 'cred'
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+export function isContactRequiredForAppProvider(code) {
+  if (code === 'cred') {
+    return true;
+  }
+
+  return false;
+}
+
 export function getAppsForCards() {
   if (!isMethodEnabled('card')) {
     return [];

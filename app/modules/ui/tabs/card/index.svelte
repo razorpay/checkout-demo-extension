@@ -10,6 +10,7 @@
   import AddCardView from 'ui/tabs/card/AddCardView.svelte';
   import EmiActions from 'ui/components/EmiActions.svelte';
   import SavedCards from 'ui/tabs/card/savedcards.svelte';
+  import AppInstruments from 'ui/tabs/card/AppInstruments.svelte';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import Icon from 'ui/elements/Icon.svelte';
@@ -588,27 +589,10 @@
             <!-- LABEL: Cards Saved on Apps -->
             <h3 class="pad">{$t(CARDS_SAVED_ON_APPS_LABEL)}</h3>
             <div id="cards-saved-on-apps" role="list" class="border-list pad">
-              {#each apps as app}
-                <SlottedRadioOption
-                  ellipsis
-                  name={app.name}
-                  selected={$selectedApp === app.code}
-                  className="instrument"
-                  value={app.code}
-                  on:click={_ => setSelectedApp(app.code)}>
-                  <i slot="icon">
-                    <Icon icon={app.logo} alt="" />
-                  </i>
-                  <div slot="title">
-                    {getAppProviderName(app.code, $locale)}
-                  </div>
-                  <div slot="subtitle">
-                    {#if getAppProviderSubtext(app.code, $locale)}
-                      {getAppProviderSubtext(app.code, $locale)}
-                    {/if}
-                  </div>
-                </SlottedRadioOption>
-              {/each}
+              <AppInstruments
+                {apps}
+                selectedApp={$selectedApp}
+                on:select={e => setSelectedApp(e.detail)} />
             </div>
             <!-- LABEL: Or, Enter card details -->
             <h3 class="pad">{$t(ENTER_CARD_DETAILS_OPTION_LABEL)}</h3>
@@ -639,27 +623,10 @@
             <!-- LABEL: Cards Saved on Apps -->
             <h3 class="pad">{$t(CARDS_SAVED_ON_APPS_LABEL)}</h3>
             <div id="cards-saved-on-apps" role="list" class="border-list pad">
-              {#each apps as app}
-                <SlottedRadioOption
-                  ellipsis
-                  name="application"
-                  selected={$selectedApp === app.code}
-                  className="instrument"
-                  value={app.code}
-                  on:click={_ => setSelectedApp(app.code)}>
-                  <i slot="icon">
-                    <Icon icon={app.logo} alt="" />
-                  </i>
-                  <div slot="title">
-                    {getAppProviderName(app.code, $locale)}
-                  </div>
-                  <div slot="subtitle">
-                    {#if getAppProviderSubtext(app.code, $locale)}
-                      {getAppProviderSubtext(app.code, $locale)}
-                    {/if}
-                  </div>
-                </SlottedRadioOption>
-              {/each}
+              <AppInstruments
+                {apps}
+                selectedApp={$selectedApp}
+                on:select={e => setSelectedApp(e.detail)} />
             </div>
             <!-- LABEL: Cards Saved on Apps -->
             <h3 class="pad">{$t(CARDS_SAVED_ON_RZP_LABEL)}</h3>

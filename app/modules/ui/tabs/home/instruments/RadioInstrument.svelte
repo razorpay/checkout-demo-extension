@@ -5,11 +5,20 @@
   // UI imports
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import Icon from 'ui/elements/Icon.svelte';
+  import ContactField from 'ui/components/ContactField.svelte';
+
+  // Store
+  import {
+    country,
+    phone,
+    proxyCountry,
+    proxyPhone,
+  } from 'checkoutstore/screens/home';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
   import { getBankLogo } from 'common/bank';
-  import { getBanks } from 'checkoutstore';
+  import { getBanks, isContactOptional } from 'checkoutstore';
   import { getWallet } from 'common/wallet';
   import { getProvider as getCardlessEmiProvider } from 'common/cardlessemi';
   import { getProvider as getPaylaterProvider } from 'common/paylater';
@@ -20,7 +29,10 @@
   // Store
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
   import { customer } from 'checkoutstore/customer';
-  import { isDebitEMIEnabled } from 'checkoutstore/methods';
+  import {
+    isDebitEMIEnabled,
+    isContactRequiredForInstrument,
+  } from 'checkoutstore/methods';
   import { getUPIIntentApps } from 'checkoutstore/native';
 
   // i18n
@@ -44,6 +56,9 @@
 
   let selected = false;
   $: selected = $selectedInstrumentId === instrument.id;
+
+  let contactRequired =
+    isContactRequiredForInstrument(instrument) && isContactOptional();
 
   const session = getSession();
   const dispatch = createEventDispatcher();
@@ -239,10 +254,16 @@
   className="instrument"
   attributes={{ 'data-type': 'individual', 'data-id': instrument.id, 'data-code': code }}
   value={instrument.id}
+  expandOnSelect={contactRequired}
   on:click
   on:keydown={attemptSubmit}>
   <i slot="icon">
     <Icon {icon} {alt} />
   </i>
   <div slot="title">{title}</div>
+  <div slot="body">
+    {#if contactRequired}
+      <ContactField bind:country={$proxyCountry} bind:phone={$proxyPhone} />
+    {/if}
+  </div>
 </SlottedRadioOption>
