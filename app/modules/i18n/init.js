@@ -146,6 +146,10 @@ export function bindI18nEvents() {
       } catch (e) {}
     }
   });
+  // Svelte store always calls the callback with the value of the
+  // store when a subscription is added. We do not want to track the initial
+  // value, and only want to track changes. Hence we ignore the first call to
+  // `handleLocaleChanged`.
   locale.subscribe(ignoreFirstCall(handleLocaleChanged));
 }
 
