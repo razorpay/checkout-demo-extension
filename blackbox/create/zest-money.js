@@ -62,6 +62,11 @@ module.exports = function(testFeatures) {
         flexmoney: true,
       };
 
+      // ZestMoney is disabled on feeBearer merchants
+      if (feeBearer) {
+        return;
+      }
+
       const context = await openCheckoutWithNewHomeScreen({
         page,
         options,
