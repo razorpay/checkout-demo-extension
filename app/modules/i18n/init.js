@@ -18,6 +18,7 @@ import { getLanguageCode, getLanguageCodeFromPrefs } from 'checkoutstore';
 import { shouldUseVernacular } from 'checkoutstore/methods';
 import Analytics from 'analytics';
 import { getSegmentOrCreate } from 'experiments';
+import { ignoreFirstCall } from 'svelte-utils';
 
 const LOCALES = {
   en: 'English',
@@ -145,14 +146,16 @@ export function bindI18nEvents() {
       } catch (e) {}
     }
   });
-  locale.subscribe(value => {
-    Analytics.setMeta('locale.current', value);
-    Analytics.track('i18n:locale:switch', {
-      data: { locale: value },
-    });
-    setLocaleInStorage(value);
-    updateRetryBtnText();
+  locale.subscribe(ignoreFirstCall(handleLocaleChanged));
+}
+
+function handleLocaleChanged(value) {
+  Analytics.setMeta('locale.current', value);
+  Analytics.track('i18n:locale:switch', {
+    data: { locale: value },
   });
+  setLocaleInStorage(value);
+  updateRetryBtnText();
 }
 
 // TODO: Remove this once overlay is moved to Svelte
@@ -177,6 +180,7 @@ export function init() {
   }
 
   Analytics.setMeta('locale.initial', initialLocale);
+  Analytics.setMeta('locale.current', initialLocale);
   Analytics.setMeta('locale.default', getLanguageCodeFromPrefs());
 
   initSvelteI18n({
