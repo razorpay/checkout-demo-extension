@@ -14,7 +14,7 @@ import { get } from 'svelte/store';
 import en from './bundles/en';
 
 import { getSession } from 'sessionmanager';
-import { getLanguageCode } from 'checkoutstore';
+import { getLanguageCode, getLanguageCodeFromPrefs } from 'checkoutstore';
 import { shouldUseVernacular } from 'checkoutstore/methods';
 import Analytics from 'analytics';
 import { getSegmentOrCreate } from 'experiments';
@@ -176,6 +176,7 @@ export function init() {
   }
 
   Analytics.setMeta('locale.initial', initialLocale);
+  Analytics.setMeta('locale.default', getLanguageCodeFromPrefs());
 
   initSvelteI18n({
     fallbackLocale: 'en',
