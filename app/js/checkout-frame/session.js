@@ -420,6 +420,8 @@ function errorHandler(response) {
 
 /* bound with session */
 function cancelHandler(response) {
+  console.log('ouy87fjythdrxcgnvmbhilkgfjtch', this.payload);
+  debugger;
   if (!this.payload) {
     return;
   }
@@ -2095,18 +2097,32 @@ Session.prototype = {
       MethodStore.isMethodEnabled('upi') ||
       MethodStore.isMethodEnabled('upi_otm')
     ) {
+      var metaParam = {};
       this.click('#cancel_upi .btn', function() {
         var upi_radio = $('#cancel_upi input:checked');
         if (!upi_radio[0]) {
           return;
         }
-        var metaParam = {};
         metaParam[upi_radio.prop('name')] = upi_radio.val();
         this.clearRequest(metaParam);
         $('#error-message').removeClass('cancel_upi');
       });
       this.click('#cancel_upi .back-btn', function() {
         $('#error-message').removeClass('cancel_upi');
+      });
+    }
+    if (MethodStore.isMethodEnabled('netbanking')) {
+      this.click('#cancel_netbanking .btn', function() {
+        var netbanking_radio = $('#cancel_netbanking input:checked');
+        if (!netbanking_radio[0]) {
+          return;
+        }
+        metaParam[netbanking_radio.prop('name')] = netbanking_radio.val();
+        this.clearRequest(metaParam);
+        $('#error-message').removeClass('cancel_netbanking');
+      });
+      this.click('#cancel_netbanking .back-btn', function() {
+        $('#error-message').removeClass('cancel_netbanking');
       });
     }
 

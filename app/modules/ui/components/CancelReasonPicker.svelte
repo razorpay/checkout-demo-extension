@@ -27,11 +27,6 @@
     {$t(reason.label)}
   </label>
 {/each}
-<label for="upi-2">
-  <input id="upi-2" type="radio" name="_[reason]" value="failed_in_app" />
-  <!-- LABEL: Payment failed in UPI app -->
-  {$t(CANCEL_REASON_FAILED_IN_APP)}
-</label>
 <div class="buttons">
   <!-- LABEL: Back -->
   <button class="back-btn">{$t(CANCEL_REASON_BACK_ACTION)}</button>
