@@ -136,6 +136,8 @@ export function addDefaultMessages() {
 
 export function bindI18nEvents() {
   const session = getSession();
+
+  // Show loader whenever language bundle is loading
   isLoading.subscribe(value => {
     if (value) {
       session.showLoadError('Loading', false, true);
@@ -146,6 +148,10 @@ export function bindI18nEvents() {
       } catch (e) {}
     }
   });
+
+  // Set retry button to correct language initially
+  updateRetryBtnText();
+
   // Svelte store always calls the callback with the value of the
   // store when a subscription is added. We do not want to track the initial
   // value, and only want to track changes. Hence we ignore the first call to
@@ -183,14 +189,14 @@ export function init() {
     initialLocale = determineInitialLocale();
   }
 
-  Analytics.setMeta('locale.initial', initialLocale);
-  Analytics.setMeta('locale.current', initialLocale);
-  Analytics.setMeta('locale.default', getLanguageCodeFromPrefs());
-
   initSvelteI18n({
     fallbackLocale: 'en',
     initialLocale,
   });
+
+  Analytics.setMeta('locale.initial', initialLocale);
+  Analytics.setMeta('locale.current', initialLocale);
+  Analytics.setMeta('locale.default', getLanguageCodeFromPrefs());
 
   // waitLocale returns undefined when the language is already loaded, which is
   // the case when it is english. We return a promise that immediately resolves
