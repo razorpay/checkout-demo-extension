@@ -34,7 +34,7 @@ const isOfferEligible = offer => {
 
   if (method === 'wallet') {
     return (
-      getWallets() |> _Arr.filter(w => w.code === offer.issuer) |> _.lengthOf
+      getWallets() |> _.lengthOf
     );
   }
 
