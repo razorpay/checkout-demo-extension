@@ -100,7 +100,7 @@ function getValidLocaleFromConfig() {
 function getValidLocaleFromStorage() {
   try {
     const localeFromStorage = global.localStorage.getItem('locale');
-    // If the locale from storage is not allowed, use en as the default.
+    // If the locale from storage is not allowed, do not return it.
     if (isAllowedLocale(localeFromStorage)) {
       return localeFromStorage;
     }
