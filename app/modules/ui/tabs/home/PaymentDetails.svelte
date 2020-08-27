@@ -25,6 +25,7 @@
   // Utils imports
   import {
     isContactEmailOptional,
+    isContactOptional,
     isPartialPayment,
     isEmailHidden,
     isContactHidden,
@@ -95,6 +96,7 @@
         <ContactField
           bind:country={$country}
           bind:phone={$phone}
+          isOptional={isContactOptional()}
           on:blur={trackContactFilled} />
       </div>
     {/if}

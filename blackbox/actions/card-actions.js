@@ -72,6 +72,7 @@ async function enterCardDetails(
   {
     cardType,
     nativeOtp = false,
+    recurring = false,
     emi = true,
     issuer = null,
     type = 'credit',
@@ -87,7 +88,7 @@ async function enterCardDetails(
 
   const response = { http_status_code: 200 };
   const flows = {
-    recurring: false,
+    recurring,
     iframe: true,
   };
 

@@ -952,7 +952,7 @@ export default {
     fino: 'Fino BPay',
     finserv: 'Finserv MARKETS',
     freecharge: 'Freecharge',
-    google_pay: 'Google Pay (Tez)',
+    google_pay: 'Google Pay',
     'hdfc-bank': 'HDFC Bank',
     hike: 'Hike',
     'icici-pocket': 'Pockets-UPI (ICICI Bank)',

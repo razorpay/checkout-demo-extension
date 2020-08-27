@@ -16,6 +16,27 @@ export const contact = derived([country, phone], ([$country, $phone]) => {
   }
 });
 
+export const proxyCountry = writable('');
+export const proxyPhone = writable('');
+export const proxyContact = derived(
+  [proxyCountry, proxyPhone],
+  ([$proxyCountry, $proxyPhone]) => {
+    if ($proxyPhone) {
+      return $proxyCountry + $proxyPhone;
+    } else {
+      return '';
+    }
+  }
+);
+
+country.subscribe(country => {
+  proxyCountry.set(country);
+});
+
+phone.subscribe(phone => {
+  proxyPhone.set(phone);
+});
+
 /**
  * Sets $country, $phone, and in turn $contact
  * @param {string} value contact

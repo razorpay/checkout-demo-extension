@@ -15,7 +15,7 @@
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
 
   // Svelte imports
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { slide, fly } from 'svelte/transition';
 
   // Store
@@ -792,7 +792,11 @@
       }
     }
 
-    session.switchTab(method);
+    tick().then(() => {
+      // Switch tab in the next tick to allow some
+      // other code to run and perform validations.
+      session.switchTab(method);
+    });
   }
 
   export function shouldGoNext() {
