@@ -32,12 +32,6 @@ const isOfferEligible = offer => {
   const method = offer.payment_method;
   let isEnabled;
 
-  if (method === 'wallet') {
-    return (
-      getWallets() |> _.lengthOf
-    );
-  }
-
   if (method === 'cardless_emi') {
     if (offer.provider) {
       return (
