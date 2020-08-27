@@ -171,6 +171,7 @@ export function init() {
     getSegmentOrCreate('vernacular_default_selection') === 1;
 
   // We need to determine a default language only for the experiment.
+  // Otherwise, it will always be English.
   if (isVernacularEnabled && isExperimentEnabled) {
     initialLocale = determineInitialLocale();
   }
