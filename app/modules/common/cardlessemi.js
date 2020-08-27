@@ -11,14 +11,17 @@ const config = {
   },
   earlysalary: {
     name: 'EarlySalary',
+    fee_bearer_customer: false,
   },
   zestmoney: {
     name: 'ZestMoney',
     min_amount: 90000,
+    fee_bearer_customer: false,
   },
   flexmoney: {
     name: 'Cardless EMI by InstaCred',
     headless: false,
+    fee_bearer_customer: false,
   },
 };
 
