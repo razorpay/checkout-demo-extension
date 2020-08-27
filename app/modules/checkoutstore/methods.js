@@ -14,6 +14,7 @@ import {
   isOfferForced,
   isASubscription,
   getCallbackUrl,
+  isCustomerFeeBearer,
 } from 'checkoutstore';
 
 import {
@@ -22,7 +23,10 @@ import {
   getEMIBank,
 } from 'common/emi';
 
-import { getEligibleProvidersBasedOnMinAmount } from 'common/cardlessemi';
+import {
+  getEligibleProvidersBasedOnMinAmount,
+  getEligibleProvidersForFeeBearerCustomer,
+} from 'common/cardlessemi';
 import { getProvider } from 'common/paylater';
 import { getAppsForMethod, getProvider as getAppProvider } from 'common/apps';
 import { findCodeByNetworkName } from 'common/card';
@@ -776,7 +780,13 @@ export function getCardlessEMIProviders() {
     emiMethod.bajaj = true;
   }
 
-  return getEligibleProvidersBasedOnMinAmount(getAmount(), emiMethod);
+  let providers = getEligibleProvidersBasedOnMinAmount(getAmount(), emiMethod);
+
+  if (isCustomerFeeBearer()) {
+    providers = getEligibleProvidersForFeeBearerCustomer(providers);
+  }
+
+  return providers;
 }
 
 export function getWallets() {

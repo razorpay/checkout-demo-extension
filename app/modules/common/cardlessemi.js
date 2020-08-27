@@ -38,7 +38,8 @@ export const createProvider = code => ({
 // Generate provider config
 const defaultConfig = {
   min_amount: 300000,
-  headless: true, // Like PowerWallet, we have a direct integration with them and do not need to open a popup
+  headless: true, // Like PowerWallet, we have a direct integration with them and do not need to open a popup,
+  fee_bearer_customer: true, // Allow for `fee-bearer: true` merchants?
 };
 
 const providers = _Obj.map(config, (details, code) => {
@@ -94,6 +95,25 @@ export function getEligibleProvidersBasedOnMinAmount(amount, enabledProviders) {
       providers[provider].min_amount <= amount
     ) {
       eligible[provider] = getProvider(provider);
+    }
+  });
+
+  return eligible;
+}
+
+/**
+ * Returns the eligible Cardless EMI providers for customer fee bearer
+ * @param {number} amount
+ * @param {Object} enabledProviders
+ *
+ * @returns {Object}
+ */
+export function getEligibleProvidersForFeeBearerCustomer(providers) {
+  let eligible = {};
+
+  Object.keys(providers).forEach(provider => {
+    if (providers[provider].fee_bearer_customer) {
+      eligible[provider] = providers[provider];
     }
   });
 
