@@ -2,9 +2,9 @@ import { NO_PAYMENT_ADAPTER_ERROR } from 'common/constants';
 
 const PaymentRequest = global.PaymentRequest;
 
-const googlePaySupportedMethods = ['https://tez.google.com/pay'];
+export const googlePaySupportedMethods = ['https://tez.google.com/pay'];
 
-const CHECK_ERROR = {
+export const CHECK_ERROR = {
   description: NO_PAYMENT_ADAPTER_ERROR,
 };
 

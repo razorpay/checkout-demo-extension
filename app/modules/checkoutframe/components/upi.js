@@ -1,10 +1,11 @@
 import { setView, destroyView } from './';
 import { getSession } from 'sessionmanager';
 import * as Bridge from 'bridge';
-import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi';
+import { GOOGLE_PAY_PACKAGE_NAME, PHONE_PE_PACKAGE_NAME } from 'common/upi';
 import {
   isWebPaymentsApiAvailable,
   checkWebPaymentsForApp,
+  appsThatSupportWebPayments,
 } from 'common/webPaymentsApi';
 import { setUpiApps } from 'checkoutstore/native';
 
@@ -21,12 +22,14 @@ export function isGooglePayWebPaymentsAvailable() {
 }
 
 /**
- * Checks if Google Pay Web Payments are possible
+ * Checks if Web Payments are possible
  * and sets the app in the list of UPI intent apps
  * if so.
  */
-export function checkGooglePayWebPayments() {
-  checkWebPaymentsForApp(GOOGLE_PAY_PACKAGE_NAME);
+export function checkForPossibleWebPayments() {
+  appsThatSupportWebPayments.forEach(app => {
+    checkWebPaymentsForApp(app);
+  });
 }
 
 export function render(props = {}) {

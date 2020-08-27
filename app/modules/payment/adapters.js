@@ -1,12 +1,17 @@
-import { checkMicroapp } from 'gpay';
+import { checkMicroapp, CHECK_ERROR, googlePaySupportedMethods } from 'gpay';
 import { NO_PAYMENT_ADAPTER_ERROR } from 'common/constants';
-import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi';
+import { GOOGLE_PAY_PACKAGE_NAME, PHONE_PE_PACKAGE_NAME } from 'common/upi';
+
+const PaymentRequest = global.PaymentRequest;
 
 const ADAPTER_CHECKERS = {
   'microapps.gpay': checkMicroapp,
 };
 
+const phonepeSupportedMethods = ['https://mercury-t2.phonepe.com/pay'];
+
 ADAPTER_CHECKERS[GOOGLE_PAY_PACKAGE_NAME] = gpayPaymentRequestAdapter;
+ADAPTER_CHECKERS[PHONE_PE_PACKAGE_NAME] = phonepePaymentRequestAdapter;
 
 /**
  * Checks if a payment adapter is present.
@@ -24,6 +29,48 @@ export function checkPaymentAdapter(adapter, data) {
 
   return Promise.reject({
     description: NO_PAYMENT_ADAPTER_ERROR,
+  });
+}
+
+function phonepePaymentRequestAdapter() {
+  return new Promise((resolve, reject) => {
+    try {
+      /**
+       * PaymentRequest API is only available in the modern browsers which
+       * have Promise API.
+       */
+      new PaymentRequest(
+        [
+          {
+            supportedMethods: phonepeSupportedMethods,
+            data: {
+              url: '',
+            },
+          },
+        ],
+        {
+          total: {
+            label: '_',
+            amount: { currency: 'INR', value: 0 },
+          },
+        }
+      )
+        .canMakePayment()
+        .then(isAvailable => {
+          if (isAvailable) {
+            resolve();
+          } else {
+            reject(CHECK_ERROR);
+          }
+        })
+        /* jshint ignore:start */
+        .catch(e => {
+          reject(CHECK_ERROR);
+        });
+      /* jshint ignore:end */
+    } catch (e) {
+      reject(CHECK_ERROR);
+    }
   });
 }
 
@@ -49,16 +96,18 @@ export function gpayPaymentRequestAdapter() {
           if (isAvailable) {
             resolve();
           } else {
+            console.log('Payment Request not available!!');
             reject(CHECK_ERROR);
           }
         })
         /* jshint ignore:start */
         .catch(e => {
+          console.log('CanmakePayment failed !!');
           reject(CHECK_ERROR);
         });
       /* jshint ignore:end */
     } catch (e) {
-      resolve();
+      console.log('Payment Request api undefined!!');
       reject(CHECK_ERROR);
     }
   });

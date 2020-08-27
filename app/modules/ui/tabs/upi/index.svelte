@@ -251,8 +251,9 @@
    * @returns {Array<Object>}
    */
   function getUPIIntentAppsFromInstrument(instrument) {
+    const apps = getUPIIntentApps().filtered;
     if (!instrument || instrument.method !== 'upi') {
-      return getUPIIntentApps().filtered;
+      return apps;
     }
 
     if (
