@@ -3430,7 +3430,10 @@ Session.prototype = {
       return this.commenceOTP(text, undefined, {}, actionState, loadingState);
     }
 
-    $('#fd-t').html(text);
+    // Break sentences into new lines
+    var formattedText = text.replace(/\.\s/g, '.<br/>');
+
+    $('#fd-t').rawHtml(formattedText);
     showOverlay($('#error-message').toggleClass('loading', loadingState));
   },
 
