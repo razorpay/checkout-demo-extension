@@ -11,6 +11,10 @@ import {
 import { processNativeMessage } from 'checkoutstore/native';
 import { isEMandateEnabled, getEnabledMethods } from 'checkoutstore/methods';
 import showTimer from 'checkoutframe/timer';
+import {
+  setInstrumentsForCustomer,
+  trackP13nMeta,
+} from 'checkoutframe/personalization/api';
 import { setHistoryAndListenForBackPresses } from 'bridge/back';
 
 import {
@@ -113,10 +117,13 @@ const setAnalyticsMeta = message => {
    * Set network-related properties.
    */
   if (_Obj.hasProp(navigator, 'connection')) {
-    const { effectiveType, type } = navigator.connection;
+    const { effectiveType, type, downlink } = navigator.connection;
 
     if (effectiveType || type) {
       Analytics.setMeta('network.type', effectiveType || type);
+    }
+    if (downlink) {
+      Analytics.setMeta('network.downlink', downlink);
     }
   }
 
@@ -247,6 +254,7 @@ function setSessionPreferences(session, preferences) {
   updateOptions(preferences);
   updateEmandatePrefill();
   updateAnalytics(preferences);
+  updatePreferredMethods(preferences);
 
   Razorpay.configure(preferences.options);
   session.setPreferences(preferences);
@@ -297,6 +305,7 @@ function addSiftScript() {
 
 function getPreferenecsParams(razorpayInstance) {
   const prefData = makePrefParams(razorpayInstance);
+  prefData.personalisation = 1;
   if (cookieDisabled) {
     prefData.checkcookie = 0;
   } else {
@@ -373,6 +382,24 @@ function updateAnalytics(preferences) {
       optionalFields |> _Arr.contains('email')
     );
   }
+}
+
+function updatePreferredMethods(preferences) {
+  const { preferred_methods } = preferences;
+
+  if (preferred_methods) {
+    _Obj.loop(preferred_methods, ({ instruments }, contact) => {
+      if (instruments) {
+        setInstrumentsForCustomer(
+          {
+            contact,
+          },
+          instruments
+        );
+      }
+    });
+  }
+  trackP13nMeta(preferred_methods);
 }
 
 /* expose handleMessage to window for our Mobile SDKs */

@@ -14,6 +14,7 @@ import {
   isOfferForced,
   isASubscription,
   getCallbackUrl,
+  isCustomerFeeBearer,
 } from 'checkoutstore';
 
 import {
@@ -22,7 +23,10 @@ import {
   getEMIBank,
 } from 'common/emi';
 
-import { getEligibleProvidersBasedOnMinAmount } from 'common/cardlessemi';
+import {
+  getEligibleProvidersBasedOnMinAmount,
+  getEligibleProvidersForFeeBearerCustomer,
+} from 'common/cardlessemi';
 import { getProvider } from 'common/paylater';
 import { getAppsForMethod, getProvider as getAppProvider } from 'common/apps';
 import { findCodeByNetworkName } from 'common/card';
@@ -514,6 +518,26 @@ export function getPayloadForCRED() {
   };
 }
 
+export function isContactRequiredForInstrument(instrument) {
+  if (
+    instrument.method === 'app' &&
+    instrument.providers?.length === 1 &&
+    instrument.providers[0] === 'cred'
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+export function isContactRequiredForAppProvider(code) {
+  if (code === 'cred') {
+    return true;
+  }
+
+  return false;
+}
+
 export function getAppsForCards() {
   if (!isMethodEnabled('card')) {
     return [];
@@ -737,7 +761,13 @@ export function getAppProviders() {
   if (apps |> _Obj.isEmpty) {
     return [];
   }
-  return apps |> _Obj.keys |> _Arr.map(getAppProvider) |> _Arr.filter(Boolean);
+  return (
+    apps
+    |> _Obj.keys
+    |> _Arr.filter(isApplicationEnabled)
+    |> _Arr.map(getAppProvider)
+    |> _Arr.filter(Boolean)
+  );
 }
 
 export function getCardlessEMIProviders() {
@@ -750,7 +780,13 @@ export function getCardlessEMIProviders() {
     emiMethod.bajaj = true;
   }
 
-  return getEligibleProvidersBasedOnMinAmount(getAmount(), emiMethod);
+  let providers = getEligibleProvidersBasedOnMinAmount(getAmount(), emiMethod);
+
+  if (isCustomerFeeBearer()) {
+    providers = getEligibleProvidersForFeeBearerCustomer(providers);
+  }
+
+  return providers;
 }
 
 export function getWallets() {

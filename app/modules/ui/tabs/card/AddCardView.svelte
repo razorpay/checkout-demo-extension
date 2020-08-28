@@ -75,9 +75,10 @@
   let showCardUnsupported = false;
 
   let cardNumberHelpText;
-  $: cardNumberHelpText = showCardUnsupported
-    ? $t(CARD_NUMBER_HELP_UNSUPPORTED)
-    : undefined;
+  $: cardNumberHelpText =
+    showCardUnsupported && $cardNumber.length > 6
+      ? $t(CARD_NUMBER_HELP_UNSUPPORTED)
+      : undefined;
 
   export let faded = false;
 
@@ -195,8 +196,8 @@
    */
   function onCardNumberChange() {
     const value = $cardNumber;
-    const cardNumber = getCardDigits(value);
-    const iin = getIin(cardNumber);
+    const _cardNumber = getCardDigits(value);
+    const iin = getIin(_cardNumber);
 
     if (iin.length < 6) {
       setDebitPinRadiosVisibility(false);
@@ -206,8 +207,8 @@
     }
 
     const flowChecker = ({ flows = {} } = {}) => {
-      const cardNumber = getCardDigits(value);
-      const isIinSame = getIin(cardNumber) === iin;
+      const _cardNumber = getCardDigits(value);
+      const isIinSame = getIin(_cardNumber) === iin;
       let _validCardNumber = true;
 
       // If the card number was changed before response, do nothing

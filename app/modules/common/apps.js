@@ -39,13 +39,13 @@ export const getAppsForMethod = method => {
 export function getCardApps(sdkMeta, externalSDKs, uriData) {
   const apps = getAppsForMethod('card') |> _Arr.map(getProvider);
   const filteredApps = _Arr.filter(apps, app => {
-    if (
-      app.externalSDK &&
-      _.isNonNullObject(externalSDKs) &&
-      !externalSDKs[app.externalSDK]
-    ) {
-      // Filter out this app as the required external SDK is not available.
-      return false;
+    if (app.externalSDK) {
+      if (!_.isNonNullObject(externalSDKs)) {
+        return false;
+      } else if (!externalSDKs[app.externalSDK]) {
+        // Filter out this app as the required external SDK is not available.
+        return false;
+      }
     }
 
     if (app.isCompatibleWithSDK && !app.isCompatibleWithSDK(sdkMeta)) {

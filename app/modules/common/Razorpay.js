@@ -159,6 +159,10 @@ var razorpayPayment = (Razorpay.payment = {
       type: AnalyticsTypes.METRIC,
     });
 
+    if (_.isNonNullObject(data)) {
+      data['_[request_index]'] = Analytics.updateRequestIndex('preferences');
+    }
+
     return fetch({
       url: _.appendParamsToUrl(makeUrl('preferences'), data),
 
@@ -293,6 +297,7 @@ export function makePrefParams(rzp) {
         'account_id',
         'contact_id',
         'checkout_config_id',
+        'amount',
       ],
       function(key) {
         var value = getter(key);

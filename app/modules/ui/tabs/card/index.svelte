@@ -10,6 +10,7 @@
   import AddCardView from 'ui/tabs/card/AddCardView.svelte';
   import EmiActions from 'ui/components/EmiActions.svelte';
   import SavedCards from 'ui/tabs/card/savedcards.svelte';
+  import AppInstruments from 'ui/tabs/card/AppInstruments.svelte';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import Icon from 'ui/elements/Icon.svelte';
@@ -35,8 +36,6 @@
     isRecurring,
     shouldRememberCustomer,
     isDCCEnabled,
-    methodErrors,
-    getIdForPaymentPayload,
   } from 'checkoutstore';
   import {
     isMethodEnabled,
@@ -131,7 +130,6 @@
   // Refs
   let savedCardsView;
   let addCardView;
-  let selectedMethodError;
 
   onMount(() => {
     // Prefill
@@ -145,29 +143,7 @@
         $selectedApp = session.get('prefill.provider');
       }
     }
-
-    methodErrors.subscribe(updateMethodError);
   });
-
-  function updateMethodError() {
-    // Either we got a new error from API or
-    // the user has changed the selected app.
-    // Show the error from API in the callout.
-    selectedMethodError = null;
-    if ($selectedApp) {
-      const payload = {
-        contact: $contact,
-        ...getPayload(),
-      };
-      const id = getIdForPaymentPayload(payload);
-      if (id && $methodErrors[id]) {
-        selectedMethodError = $methodErrors[id].description;
-      }
-    }
-  }
-
-  $: $selectedApp, updateMethodError();
-  $: $contact, updateMethodError();
 
   $: {
     // Track saved cards
@@ -445,18 +421,18 @@
   }
 
   function onCardInput() {
-    const cardNumber = $cardNumber;
-    const cardType = getCardType(cardNumber);
+    const _cardNumber = $cardNumber;
+    const cardType = getCardType(_cardNumber);
     const isMaestro = /^maestro/.test(cardType);
-    const sixDigits = cardNumber.length > 5;
-    const trimmedVal = cardNumber.replace(/[ ]/g, '');
+    const sixDigits = _cardNumber.length > 5;
+    const trimmedVal = _cardNumber.replace(/[ ]/g, '');
 
     var emiObj;
 
     if (sixDigits && !isMaestro) {
       const emiBanks = _Obj.entries(getEMIBanks());
       emiObj = _Arr.find(emiBanks, ([bank, emiObjInner]) =>
-        emiObjInner.patt.test(cardNumber.replace(/ /g, ''))
+        emiObjInner.patt.test(_cardNumber.replace(/ /g, ''))
       );
     }
 
@@ -613,27 +589,10 @@
             <!-- LABEL: Cards Saved on Apps -->
             <h3 class="pad">{$t(CARDS_SAVED_ON_APPS_LABEL)}</h3>
             <div id="cards-saved-on-apps" role="list" class="border-list pad">
-              {#each apps as app}
-                <SlottedRadioOption
-                  ellipsis
-                  name={app.name}
-                  selected={$selectedApp === app.code}
-                  className="instrument"
-                  value={app.code}
-                  on:click={_ => setSelectedApp(app.code)}>
-                  <i slot="icon">
-                    <Icon icon={app.logo} alt="" />
-                  </i>
-                  <div slot="title">
-                    {getAppProviderName(app.code, $locale)}
-                  </div>
-                  <div slot="subtitle">
-                    {#if getAppProviderSubtext(app.code, $locale)}
-                      {getAppProviderSubtext(app.code, $locale)}
-                    {/if}
-                  </div>
-                </SlottedRadioOption>
-              {/each}
+              <AppInstruments
+                {apps}
+                selectedApp={$selectedApp}
+                on:select={e => setSelectedApp(e.detail)} />
             </div>
             <!-- LABEL: Or, Enter card details -->
             <h3 class="pad">{$t(ENTER_CARD_DETAILS_OPTION_LABEL)}</h3>
@@ -664,27 +623,10 @@
             <!-- LABEL: Cards Saved on Apps -->
             <h3 class="pad">{$t(CARDS_SAVED_ON_APPS_LABEL)}</h3>
             <div id="cards-saved-on-apps" role="list" class="border-list pad">
-              {#each apps as app}
-                <SlottedRadioOption
-                  ellipsis
-                  name="application"
-                  selected={$selectedApp === app.code}
-                  className="instrument"
-                  value={app.code}
-                  on:click={_ => setSelectedApp(app.code)}>
-                  <i slot="icon">
-                    <Icon icon={app.logo} alt="" />
-                  </i>
-                  <div slot="title">
-                    {getAppProviderName(app.code, $locale)}
-                  </div>
-                  <div slot="subtitle">
-                    {#if getAppProviderSubtext(app.code, $locale)}
-                      {getAppProviderSubtext(app.code, $locale)}
-                    {/if}
-                  </div>
-                </SlottedRadioOption>
-              {/each}
+              <AppInstruments
+                {apps}
+                selectedApp={$selectedApp}
+                on:select={e => setSelectedApp(e.detail)} />
             </div>
             <!-- LABEL: Cards Saved on Apps -->
             <h3 class="pad">{$t(CARDS_SAVED_ON_RZP_LABEL)}</h3>
@@ -708,9 +650,6 @@
       {/if}
     </div>
     <Bottom tab="card">
-      {#if selectedMethodError}
-        <Callout>{selectedMethodError}</Callout>
-      {/if}
       {#if isDCCEnabled()}
         <DynamicCurrencyView view={currentView} />
       {/if}
