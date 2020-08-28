@@ -421,18 +421,18 @@
   }
 
   function onCardInput() {
-    const cardNumber = $cardNumber;
-    const cardType = getCardType(cardNumber);
+    const _cardNumber = $cardNumber;
+    const cardType = getCardType(_cardNumber);
     const isMaestro = /^maestro/.test(cardType);
-    const sixDigits = cardNumber.length > 5;
-    const trimmedVal = cardNumber.replace(/[ ]/g, '');
+    const sixDigits = _cardNumber.length > 5;
+    const trimmedVal = _cardNumber.replace(/[ ]/g, '');
 
     var emiObj;
 
     if (sixDigits && !isMaestro) {
       const emiBanks = _Obj.entries(getEMIBanks());
       emiObj = _Arr.find(emiBanks, ([bank, emiObjInner]) =>
-        emiObjInner.patt.test(cardNumber.replace(/ /g, ''))
+        emiObjInner.patt.test(_cardNumber.replace(/ /g, ''))
       );
     }
 
