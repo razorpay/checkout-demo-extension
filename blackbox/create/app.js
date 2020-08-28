@@ -26,7 +26,7 @@ const {
 
 module.exports = function(testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
-    'apps',
+    'app',
     testFeatures
   );
 
@@ -88,7 +88,7 @@ module.exports = function(testFeatures) {
         page,
         options,
         preferences,
-        method: 'apps',
+        method: 'app',
         apps,
         params,
       });
