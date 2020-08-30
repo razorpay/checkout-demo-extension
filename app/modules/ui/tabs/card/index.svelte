@@ -669,7 +669,6 @@
           {/if}
         </Callout>
       {/if}
-      <Callout>Visa cards are experiencing low success rates.</Callout>
     </Bottom>
   </Screen>
 </Tab>
