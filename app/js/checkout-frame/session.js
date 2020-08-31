@@ -123,6 +123,13 @@ function fillData(container, returnObj) {
   });
 }
 
+// TODO: Move to CFU
+function escapeHtml(str) {
+  var escapeDiv = document.createElement('div');
+  escapeDiv.appendChild(document.createTextNode(str));
+  return escapeDiv.innerHTML;
+}
+
 /**
  * Improvise the contact from prefill
  * @param {Session} session
@@ -3430,7 +3437,10 @@ Session.prototype = {
       return this.commenceOTP(text, undefined, {}, actionState, loadingState);
     }
 
-    $('#fd-t').html(text);
+    // Break sentences into new lines
+    var formattedText = escapeHtml(text).replace(/\.\s/g, '.<br/>');
+
+    $('#fd-t').rawHtml(formattedText);
     showOverlay($('#error-message').toggleClass('loading', loadingState));
   },
 
