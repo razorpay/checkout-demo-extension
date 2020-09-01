@@ -422,14 +422,14 @@
   }
 
   function onCardInput() {
-    const cardNumber = $cardNumber;
-    const cardType = getCardType(cardNumber);
-    const iin = getIin(cardNumber);
-    const sixDigits = iin.length >= 6;
-    const trimmedVal = cardNumber.replace(/[ ]/g, '');
+    const _cardNumber = $cardNumber;
+    const cardType = getCardType(_cardNumber);
+    const iin = getIin(_cardNumber);
+    const sixDigits = _cardNumber.length > 5;
+    const trimmedVal = _cardNumber.replace(/[ ]/g, '');
 
     if (sixDigits) {
-      getCardFeatures(cardNumber).then(features => {
+      getCardFeatures(_cardNumber).then(features => {
         if (iin !== getIin($cardNumber)) {
           // $cardNumber's IIN has changed since we started the n/w request, do nothing
           return;

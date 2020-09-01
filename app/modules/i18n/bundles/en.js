@@ -194,9 +194,9 @@ export default {
     remember_card_label: 'Remember Card',
     saved_card_label: 'Card ending with <b>{last4}<b>',
     subscription_callout:
-      'The charge is to enable subscription on this card and it will be refunded.',
-    subscription_refund_callout:
       'This card will be linked to the subscription and future payments will be charged automatically.',
+    subscription_refund_callout:
+      'The charge is to enable subscription on this card and it will be refunded.',
     use_saved_cards_btn: 'Use saved cards',
     use_saved_cards_on_rzp_btn: 'Use saved cards on Razorpay',
     view_all_emi_plans: 'View all EMI Plans',
@@ -585,7 +585,7 @@ export default {
     amount_label: 'Amount',
     breakup_title: 'Fees Breakup',
     continue_action: 'Continue',
-    gateway_charges_label: 'Gateway Charges',
+    gateway_charges_label: 'Convenience Charges',
     gst_label: 'GST on {label}',
     loading_message: 'Loading fees breakup...',
     total_charges_label: 'Total Charges',

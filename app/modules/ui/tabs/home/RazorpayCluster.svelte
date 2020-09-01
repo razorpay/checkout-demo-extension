@@ -41,7 +41,7 @@
       name = formatTemplateWithLocale(
         SINGLE_BLOCK_TITLE, // LABEL: Pay via {method}
         { method: names[0] },
-        $locale
+        locale
       );
     } else {
       name = generateTextFromList(names, 3);

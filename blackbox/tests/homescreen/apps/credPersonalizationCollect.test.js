@@ -2,7 +2,8 @@ const createAppsTest = require('../../../create/app');
 
 createAppsTest({
   app: 'cred',
-  flow: 'intent',
+  flow: 'collect',
   platform: 'android',
-  testName: 'CRED - Intent Flow - Android',
+  testName: 'CRED - Collect Flow - with Personalization',
+  personalization: true,
 });

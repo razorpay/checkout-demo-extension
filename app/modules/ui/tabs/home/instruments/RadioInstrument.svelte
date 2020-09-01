@@ -142,7 +142,7 @@
 
       // shortcode might not be present for existing instruments. Check for backward compatibility.
       if (app.shortcode) {
-        appName = getUpiIntentAppName(app.shortcode, $locale, appName);
+        appName = getUpiIntentAppName(app.shortcode, locale, appName);
       }
 
       title = getInstrumentTitle('upi', appName.replace(/ UPI$/, ''), locale);
@@ -177,7 +177,7 @@
     if (providerCode === 'cards' && isDebitEMIEnabled()) {
       providerCode = 'credit_debit_cards';
     }
-    const providerName = getCardlessEmiProviderName(providerCode, $locale);
+    const providerName = getCardlessEmiProviderName(providerCode, locale);
     return {
       title: getInstrumentTitle('emi', providerName, locale),
       icon: provider.sqLogo,
