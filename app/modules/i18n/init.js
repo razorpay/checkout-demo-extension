@@ -211,6 +211,8 @@ export function init() {
   Analytics.setMeta('locale.current', initialLocale);
   Analytics.setMeta('locale.previous', getValidLocaleFromStorage());
   Analytics.setMeta('locale.default', getLanguageCodeFromPrefs());
+  Analytics.setMeta('count.i18n:bundle:fetch', fetchCount);
+  Analytics.setMeta('count.i18n:locale:switch', localeSwitchCount);
 
   // waitLocale returns undefined when the language is already loaded, which is
   // the case when it is english. We return a promise that immediately resolves
