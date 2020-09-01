@@ -196,6 +196,7 @@ export function init() {
 
   Analytics.setMeta('locale.initial', initialLocale);
   Analytics.setMeta('locale.current', initialLocale);
+  Analytics.setMeta('locale.previous', getValidLocaleFromStorage());
   Analytics.setMeta('locale.default', getLanguageCodeFromPrefs());
 
   // waitLocale returns undefined when the language is already loaded, which is
