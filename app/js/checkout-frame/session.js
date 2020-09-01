@@ -496,7 +496,7 @@ function askOTP(view, textView, shouldLimitResend, templateData) {
     loading: false,
     action: false,
     otp: '',
-    allowSkip: !Store.isRecurring(),
+    allowSkip: true,
     allowResend: shouldLimitResend ? OtpService.canSendOtp('razorpay') : true,
   });
 
@@ -2852,20 +2852,10 @@ Session.prototype = {
       }
       customer.checkStatus(function() {
         /**
-         * 1. If this is a recurring payment and customer doesn't have saved cards,
-         *    create and ask for OTP.
-         * 2. If customer has saved cards and is not logged in, ask for OTP.
-         * 3. If customer doesn't have saved cards, show cards screen.
+         * 1. If customer has saved cards and is not logged in, ask for OTP.
+         * 2. If customer doesn't have saved cards, show cards screen.
          */
-        if (Store.isRecurring() && !customer.saved && !customer.logged) {
-          self.getCurrentCustomer().createOTP(function() {
-            Analytics.track('saved_cards:access:otp:ask');
-            askOTP(self.otpView, 'otp_sent_save_card_recurring', true, {
-              phone: getPhone(),
-            });
-            self.updateCustomerInStore();
-          });
-        } else if (customer.saved && !customer.logged) {
+        if (customer.saved && !customer.logged) {
           askOTP(self.otpView, undefined, true, { phone: getPhone() });
         } else {
           self.setScreen('card');
