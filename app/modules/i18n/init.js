@@ -161,7 +161,7 @@ export function bindI18nEvents() {
 
 function handleLocaleChanged(value) {
   Analytics.track('i18n:locale:switch', {
-    data: { locale: value },
+    data: { to: value },
   });
   Analytics.setMeta('locale.current', value);
   setLocaleInStorage(value);
