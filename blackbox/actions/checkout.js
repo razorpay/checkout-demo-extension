@@ -118,6 +118,14 @@ const API_PREFERRED_INSTRUMENTS = {
       score: 1,
     },
   ],
+
+  app: [
+    {
+      method: 'app',
+      provider: 'cred',
+      score: 1,
+    },
+  ],
 };
 
 let interceptorOptions;
@@ -168,6 +176,7 @@ module.exports = {
         var qrInstruments = {};
         var cardInstruments = {};
         var walletInstruments = {};
+        var appInstruments = {};
         qrInstruments[hashKey] = [
           {
             '_[flow]': 'intent',
@@ -232,6 +241,16 @@ module.exports = {
             id: 'Dhh86QTueOpyWX',
           },
         ];
+        appInstruments[hashKey] = [
+          {
+            provider: 'cred',
+            method: 'app',
+            timestamp: 1574062745851,
+            success: true,
+            frequency: 2,
+            id: 'Dhh86QTueOpTWX',
+          },
+        ];
         localStorage.setItem(
           'rzp_preffered_instruments',
           {
@@ -240,6 +259,7 @@ module.exports = {
             QR: JSON.stringify(qrInstruments),
             Card: JSON.stringify(cardInstruments),
             Wallet: JSON.stringify(walletInstruments),
+            app: JSON.stringify(appInstruments),
           }[method]
         );
       }, method);

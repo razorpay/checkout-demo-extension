@@ -22,6 +22,7 @@ const INSTRUMENT_PROPS = {
   netbanking: 'bank',
   upi: ['_[flow]', 'vpa', 'upi_app', '_[upiqr]', 'token'],
   paypal: [],
+  app: 'provider',
 };
 
 /**
