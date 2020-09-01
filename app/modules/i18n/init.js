@@ -49,12 +49,18 @@ function makeBundleUrl(locale) {
   return `https://betacdn.razorpay.com/static/i18n-bundles/checkout/${locale}.json`;
 }
 
+let fetchCount = 0;
+
 /**
  * Fetches the bundle for a given locale.
  * @param {string} locale
  * @returns {Promise<Object>}
  */
 function fetchBundle(locale) {
+  // Set meta property for counting no. of fetches
+  fetchCount = fetchCount + 1;
+  Analytics.setMeta('count.i18n:bundle:fetch', fetchCount);
+
   return new Promise((resolve, reject) => {
     Analytics.track('i18n:bundle:fetch:start', {
       data: { locale },
@@ -159,10 +165,17 @@ export function bindI18nEvents() {
   locale.subscribe(ignoreFirstCall(handleLocaleChanged));
 }
 
+let localeSwitchCount = 0;
+
 function handleLocaleChanged(value) {
   Analytics.track('i18n:locale:switch', {
     data: { to: value },
   });
+
+  // Set meta property for counting no. of switches
+  localeSwitchCount += 1;
+  Analytics.setMeta('count.i18n:locale:switch', localeSwitchCount);
+
   Analytics.setMeta('locale.current', value);
   setLocaleInStorage(value);
   updateRetryBtnText();
