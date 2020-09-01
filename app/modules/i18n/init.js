@@ -160,10 +160,10 @@ export function bindI18nEvents() {
 }
 
 function handleLocaleChanged(value) {
-  Analytics.setMeta('locale.current', value);
   Analytics.track('i18n:locale:switch', {
     data: { locale: value },
   });
+  Analytics.setMeta('locale.current', value);
   setLocaleInStorage(value);
   updateRetryBtnText();
 }
