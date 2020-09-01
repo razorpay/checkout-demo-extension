@@ -168,13 +168,13 @@ export function bindI18nEvents() {
 let localeSwitchCount = 0;
 
 function handleLocaleChanged(value) {
-  Analytics.track('i18n:locale:switch', {
-    data: { to: value },
-  });
-
   // Set meta property for counting no. of switches
   localeSwitchCount += 1;
   Analytics.setMeta('count.i18n:locale:switch', localeSwitchCount);
+
+  Analytics.track('i18n:locale:switch', {
+    data: { to: value },
+  });
 
   Analytics.setMeta('locale.current', value);
   setLocaleInStorage(value);
