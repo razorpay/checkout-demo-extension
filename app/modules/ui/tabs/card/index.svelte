@@ -36,6 +36,7 @@
     isRecurring,
     shouldRememberCustomer,
     isDCCEnabled,
+    getCardFeatures,
   } from 'checkoutstore';
   import {
     isMethodEnabled,
@@ -69,7 +70,7 @@
   import { getSavedCards, transform } from 'common/token';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import { getCardType } from 'common/card';
+  import { getIin, getCardType, getNetworkFromCardNumber } from 'common/card';
   import { getSubtextForInstrument } from 'subtext';
   import { getProvider as getAppProvider } from 'common/apps';
   import { getAnimationOptions } from 'svelte-utils';
@@ -423,29 +424,57 @@
   function onCardInput() {
     const _cardNumber = $cardNumber;
     const cardType = getCardType(_cardNumber);
-    const isMaestro = /^maestro/.test(cardType);
+    const iin = getIin(_cardNumber);
     const sixDigits = _cardNumber.length > 5;
     const trimmedVal = _cardNumber.replace(/[ ]/g, '');
 
-    var emiObj;
+    if (sixDigits) {
+      getCardFeatures(_cardNumber).then(features => {
+        if (iin !== getIin($cardNumber)) {
+          // $cardNumber's IIN has changed since we started the n/w request, do nothing
+          return;
+        }
 
-    if (sixDigits && !isMaestro) {
-      const emiBanks = _Obj.entries(getEMIBanks());
-      emiObj = _Arr.find(emiBanks, ([bank, emiObjInner]) =>
-        emiObjInner.patt.test(_cardNumber.replace(/ /g, ''))
-      );
-    }
+        let emiObj;
 
-    session.emiPlansForNewCard = emiObj && emiObj[1];
+        const hasEmi = (features.flows || {}).emi;
 
-    if (!emiObj) {
+        if (hasEmi) {
+          let issuer = features.issuer;
+
+          // Handle AMEX
+          if (getNetworkFromCardNumber($cardNumber) === 'amex') {
+            issuer = 'AMEX';
+          }
+
+          // Handle debit cards
+          const type = features.type;
+
+          if (type === 'debit') {
+            issuer += '_DC';
+          }
+
+          emiObj = (getEMIBanks() || {})[issuer];
+        }
+
+        session.emiPlansForNewCard = emiObj;
+
+        // No EMI plans available. Unset duration.
+        if (!emiObj) {
+          $newCardEmiDuration = '';
+        }
+
+        showAppropriateEmiDetailsForNewCard(
+          session.tab,
+          emiObj,
+          trimmedVal.length
+        );
+      });
+    } else {
+      // Need six digits for EMI. Unset things.
+      session.emiPlansForNewCard = undefined;
       $newCardEmiDuration = '';
-    }
-
-    showAppropriateEmiDetailsForNewCard(session.tab, emiObj, trimmedVal.length);
-
-    if (isMaestro && sixDigits) {
-      showEmiCta = false;
+      showAppropriateEmiDetailsForNewCard(session.tab, null, trimmedVal.length);
     }
   }
 

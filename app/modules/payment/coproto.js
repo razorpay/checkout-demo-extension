@@ -8,7 +8,7 @@ import {
 import { androidBrowser } from 'common/useragent';
 import Track from 'tracker';
 import Analytics from 'analytics';
-import { getBankFromCard } from 'common/bank';
+import { getBankFromCardCache } from 'common/bank';
 import * as Bridge from 'bridge';
 
 export const processOtpResponse = function(response) {
@@ -401,7 +401,7 @@ var responseTypes = {
     }
     // TODO: Remove this usage when API starts sending "mode: hdfc_debit_emi"
     const iin = fullResponse.metadata && fullResponse.metadata.iin;
-    const bank = getBankFromCard(iin);
+    const bank = getBankFromCardCache(iin);
     if (this.data.method === 'wallet') {
       this.otpurl = request.url;
       this.emit('otp.required');
