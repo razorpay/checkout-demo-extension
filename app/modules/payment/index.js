@@ -31,6 +31,7 @@ import {
   isIinValid,
   updateCardIINMetadata,
 } from 'common/card';
+import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi';
 
 /**
  * Tells if we're being executed from
@@ -352,7 +353,7 @@ Payment.prototype = {
       if (
         !(
           this.r.paymentAdapters &&
-          (this.r.paymentAdapters.gpay ||
+          (this.r.paymentAdapters[GOOGLE_PAY_PACKAGE_NAME] ||
             this.r.paymentAdapters['microapps.gpay'])
         )
       ) {
