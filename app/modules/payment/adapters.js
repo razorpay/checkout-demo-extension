@@ -8,7 +8,7 @@ const ADAPTER_CHECKERS = {
   'microapps.gpay': checkMicroapp,
 };
 
-const phonepeSupportedMethods = 'https://mercury-t2.phonepe.com/pay';
+const phonepeSupportedMethods = 'https://mercury.phonepe.com/transact/pay';
 
 ADAPTER_CHECKERS[GOOGLE_PAY_PACKAGE_NAME] = gpayPaymentRequestAdapter;
 ADAPTER_CHECKERS[PHONE_PE_PACKAGE_NAME] = phonepePaymentRequestAdapter;
