@@ -653,7 +653,7 @@ export default {
       gpay: 'Instant payment using Google Pay App',
       netbanking: 'All Indian banks',
       paylater: 'Pay later using {providers}',
-      paypal: 'Pay using PayPal wallet',
+      paypal: 'Only PayPal accounts issued outside India accepted',
       qr: 'Pay by scanning QR Code',
       recurring_cards: '{networks} credit cards',
       upi: 'Instant payment using UPI App',
