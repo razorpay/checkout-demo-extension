@@ -78,6 +78,31 @@ function onPaymentCancel(metaParam) {
       if (_.isNonNullObject(metaParam)) {
         url += '&' + _.obj2query(metaParam);
       }
+      if (this.data.method === 'netbanking') {
+        this.cachedPaymentCancelData = {
+          url: url,
+          callback: response => {
+            if (response.razorpay_payment_id) {
+              Analytics.track('cancel_success', {
+                data: response,
+                r: razorpay,
+              });
+            } else if (!response.error) {
+              response = cancelError;
+            }
+            this.complete(response);
+          },
+        };
+        Analytics.track('cancel', {
+          data: eventData,
+          r: razorpay,
+        });
+        $('#error-message').addClass('cancel_netbanking');
+        // debugger;
+        this.clear();
+        this.off();
+        return;
+      }
       fetch({
         url: url,
         callback: response => {

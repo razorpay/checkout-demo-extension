@@ -302,6 +302,7 @@ function overlayVisible() {
 
 // this === Session
 function errorHandler(response) {
+  debugger;
   if (isString(response)) {
     try {
       response = JSON.parse(response);
@@ -326,6 +327,14 @@ function errorHandler(response) {
       return;
     }
   }
+
+  var NB_USER_CANCEL_MSG = 'Payment processing cancelled by user';
+
+  // if (message === NB_USER_CANCEL_MSG) {
+  if (this.payload && this.payload.method === 'netbanking') {
+    return cancel_nb(this);
+  }
+  // }
 
   // Save payload in a variable, as it's going to get cleared and
   // we need it for something else.
@@ -420,7 +429,6 @@ function errorHandler(response) {
 
 /* bound with session */
 function cancelHandler(response) {
-  console.log('ouy87fjythdrxcgnvmbhilkgfjtch', this.payload);
   debugger;
   if (!this.payload) {
     return;
@@ -619,9 +627,6 @@ function cancel_upi(session) {
 
 function cancel_nb(session) {
   $('#error-message').addClass('cancel_netbanking');
-  session.r.on('payment.error', function() {
-    $('#error-message').removeClass('cancel_netbanking');
-  });
 }
 
 function Session(message) {
@@ -1740,9 +1745,6 @@ Session.prototype = {
       ) {
         return cancel_upi(this);
       }
-      if (this.payload && this.payload.method === 'netbanking') {
-        return cancel_nb(this);
-      }
     }
 
     var beforeReturn = function() {
@@ -2111,20 +2113,21 @@ Session.prototype = {
         $('#error-message').removeClass('cancel_upi');
       });
     }
-    if (MethodStore.isMethodEnabled('netbanking')) {
-      this.click('#cancel_netbanking .btn', function() {
-        var netbanking_radio = $('#cancel_netbanking input:checked');
-        if (!netbanking_radio[0]) {
-          return;
-        }
-        metaParam[netbanking_radio.prop('name')] = netbanking_radio.val();
-        this.clearRequest(metaParam);
-        $('#error-message').removeClass('cancel_netbanking');
-      });
-      this.click('#cancel_netbanking .back-btn', function() {
-        $('#error-message').removeClass('cancel_netbanking');
-      });
-    }
+    // if (MethodStore.isMethodEnabled('netbanking')) {
+    //   this.click('#cancel_netbanking .btn', function() {
+    //     debugger;
+    //     var netbanking_radio = $('#cancel_netbanking input:checked');
+    //     if (!netbanking_radio[0]) {
+    //       return;
+    //     }
+    //     metaParam[netbanking_radio.prop('name')] = netbanking_radio.val();
+    //     // this.clearRequest(metaParam);
+    //     $('#error-message').removeClass('cancel_netbanking');
+    //   });
+    //   this.click('#cancel_netbanking .back-btn', function() {
+    //     $('#error-message').removeClass('cancel_netbanking');
+    //   });
+    // }
 
     if (MethodStore.isMethodEnabled('emi')) {
       this.on('click', '#form-card', 'saved-card-pay-without-emi', function(e) {
@@ -3523,6 +3526,35 @@ Session.prototype = {
     this.nbCancelReasonPicker = new discreet.CancelReasonPicker({
       target: _Doc.querySelector('#cancel_netbanking'),
       props: {
+        onBack: () => {
+          console.log('back');
+        },
+        onSubmit: () => {
+          var netbanking_radio = $('#cancel_netbanking input:checked');
+          debugger;
+          if (!netbanking_radio[0]) {
+            return;
+          }
+          $('#error-message').removeClass('cancel_netbanking');
+          hideOverlay($('#error-message'));
+          var metaParam = {};
+          metaParam[netbanking_radio.prop('name')] = netbanking_radio.val();
+          Razorpay;
+          var url = this.r.makeAuthUrl(
+            razorpay,
+            'payments/' + payment_id + '/cancel'
+          );
+          if (_.isNonNullObject(metaParam)) {
+            url += '&' + _.obj2query(metaParam);
+          }
+
+          this.clearRequest(metaParam);
+
+          // if (this.r._payment) {
+          //   hideOverlayMessage();
+          //   this.r.emit('payment.cancel', extra);
+          // }
+        },
         method: 'netbanking',
         title: 'Pikachu',
         reasons: [

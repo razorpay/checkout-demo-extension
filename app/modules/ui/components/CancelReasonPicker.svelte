@@ -14,6 +14,11 @@
   export let method = 'netbanking';
   export let reasons = [];
 
+  export let onBack = () => {};
+  export let onSubmit = () => {};
+
+  let prefixGenerator;
+
   const pg = (prefixGenerator = text => `${method}-${text}`);
 </script>
 
@@ -29,7 +34,11 @@
 {/each}
 <div class="buttons">
   <!-- LABEL: Back -->
-  <button class="back-btn">{$t(CANCEL_REASON_BACK_ACTION)}</button>
+  <button class="back-btn" on:click={onBack}>
+    {$t(CANCEL_REASON_BACK_ACTION)}
+  </button>
   <!-- LABEL: Submit -->
-  <button class="btn">{$t(CANCEL_REASON_SUBMIT_ACTION)}</button>
+  <button class="btn" on:click={onSubmit}>
+    {$t(CANCEL_REASON_SUBMIT_ACTION)}
+  </button>
 </div>
