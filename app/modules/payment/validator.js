@@ -1,4 +1,4 @@
-import getFingerprint from 'fingerprint';
+import { getFingerprint, getDeviceId } from 'fingerprint';
 import { flattenProp } from 'common/options';
 import Track from 'tracker';
 import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi';
@@ -131,6 +131,11 @@ export const formatPayload = function(payload, razorpayInstance, params = {}) {
   let fingerprint = getFingerprint();
   if (fingerprint) {
     data['_[shield][fhash]'] = fingerprint;
+  }
+
+  let deviceId = getDeviceId();
+  if (deviceId) {
+    data['_[device_id]'] = deviceId;
   }
 
   data['_[shield][tz]'] = -new Date().getTimezoneOffset();
