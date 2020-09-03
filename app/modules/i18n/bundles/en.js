@@ -652,7 +652,7 @@ export default {
       emi: 'EMI via Credit & Debit Cards',
       gpay: 'Instant payment using Google Pay App',
       netbanking: 'All Indian banks',
-      paylater: 'Pay later using {providers}',
+      paylater: '{providers}',
       paypal: 'Only PayPal accounts issued outside India accepted',
       qr: 'Pay by scanning QR Code',
       recurring_cards: '{networks} credit cards',
