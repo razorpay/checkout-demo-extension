@@ -49,6 +49,8 @@ import { get as storeGetter } from 'svelte/store';
 import {
   sequence as SequenceStore,
   instruments as InstrumentsStore,
+  hiddenInstruments as HiddenInstrumentsStore,
+  hiddenMethods as HiddenMethodsStore,
 } from 'checkoutstore/screens/home';
 
 function isNoRedirectFacebookWebViewSession() {
@@ -542,7 +544,21 @@ export function getAppsForCards() {
   if (!isMethodEnabled('card')) {
     return [];
   }
-  return getAppsForMethod('card') |> _Arr.filter(isApplicationEnabled);
+
+  const disableAllApps = storeGetter(HiddenMethodsStore).includes('app');
+  if (disableAllApps) {
+    return [];
+  }
+
+  const apps = getAppsForMethod('card') |> _Arr.filter(isApplicationEnabled);
+
+  const disabledApps = storeGetter(HiddenInstrumentsStore)
+    .filter(instrument => instrument.method === 'app' && instrument.provider)
+    .map(instrument => instrument.provider);
+
+  const filteredApps = apps.filter(app => !disabledApps.includes(app));
+
+  return filteredApps;
 }
 
 export function getCardNetworks() {
