@@ -345,6 +345,19 @@
         });
       }
     }
+
+    if (!getCardNetworks().DICL) {
+      const dinersPattern = /^3[0689]/;
+      const iin = getIin(_cardNumber);
+      if (dinersPattern.test(iin)) {
+        Analytics.track('card:diners:notEnabled', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            iin: getIin(_cardNumber),
+          },
+        });
+      }
+    }
     onCardNumberChange();
     dispatch('cardinput');
   }
