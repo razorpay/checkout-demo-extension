@@ -14,6 +14,7 @@ import showTimer from 'checkoutframe/timer';
 import {
   setInstrumentsForCustomer,
   trackP13nMeta,
+  removeDuplicateApiInstruments,
 } from 'checkoutframe/personalization/api';
 import { setHistoryAndListenForBackPresses } from 'bridge/back';
 
@@ -377,7 +378,7 @@ function updatePreferredMethods(preferences) {
           {
             contact,
           },
-          instruments
+          removeDuplicateApiInstruments(instruments)
         );
       }
     });
