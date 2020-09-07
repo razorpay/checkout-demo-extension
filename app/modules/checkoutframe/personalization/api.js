@@ -188,6 +188,10 @@ const API_INSTRUMENT_PAYMENT_ADDONS = {
     instrument.token_id = instrument.instrument || 'token_dummy';
     delete instrument.instrument;
   },
+  app: instrument => {
+    instrument.provider = instrument.instrument;
+    delete instrument.instrument;
+  },
 };
 
 /**

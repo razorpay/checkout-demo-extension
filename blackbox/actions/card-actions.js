@@ -69,22 +69,43 @@ async function handleBankRequest(context) {
 
 async function enterCardDetails(
   context,
-  { cardType, nativeOtp = false, recurring = false } = {}
+  {
+    cardType,
+    nativeOtp = false,
+    recurring = false,
+    emi = true,
+    issuer = null,
+    type = 'credit',
+  } = {}
 ) {
   const visa = cardType === 'VISA';
   await context.page.type(
     '#card_number',
     visa ? '4111111111111111' : '376939393939397'
   );
+
   await context.expectRequest(req => {});
+
+  const response = { http_status_code: 200 };
   const flows = {
     recurring,
     iframe: true,
   };
+
   if (nativeOtp) {
     flows.otp = true;
   }
-  await context.respondJSONP({ http_status_code: 200, flows });
+
+  if (emi) {
+    flows.emi = true;
+    response.issuer = issuer;
+    response.type = type;
+  }
+
+  response.flows = flows;
+
+  await context.respondJSONP(response);
+
   await context.page.type('#card_expiry', '12/55');
   await context.page.type('#card_name', 'SakshiJain');
   await context.page.type('#card_cvv', visa ? '111' : '1111');

@@ -1,4 +1,4 @@
-import { getCardFeaturesFromCache } from 'payment';
+import { getCardFeaturesFromCache } from 'common/card';
 
 const Flows = {
   PIN: 'pin',

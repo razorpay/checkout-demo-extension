@@ -14,6 +14,7 @@ import showTimer from 'checkoutframe/timer';
 import {
   setInstrumentsForCustomer,
   trackP13nMeta,
+  removeDuplicateApiInstruments,
 } from 'checkoutframe/personalization/api';
 import { setHistoryAndListenForBackPresses } from 'bridge/back';
 
@@ -287,20 +288,6 @@ function setSessionPreferences(session, preferences) {
   }
   session.render();
   showModal(session);
-  addSiftScript();
-}
-
-function addSiftScript() {
-  // https://sift.com/developers/docs/curl/javascript-api/overview
-  window._sift = [
-    ['_setAccount', '4dbbb1f7b6'],
-    ['_setSessionId', Track.id],
-    ['_trackPageview'],
-  ];
-
-  _El.create('script')
-    |> _Obj.setProp('src', 'https://cdn.razorpay.com/checkout/sift.js')
-    |> _El.appendTo(_Doc.documentElement);
 }
 
 function getPreferenecsParams(razorpayInstance) {
@@ -394,7 +381,7 @@ function updatePreferredMethods(preferences) {
           {
             contact,
           },
-          instruments
+          removeDuplicateApiInstruments(instruments)
         );
       }
     });

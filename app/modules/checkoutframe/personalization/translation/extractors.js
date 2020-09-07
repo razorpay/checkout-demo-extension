@@ -76,10 +76,18 @@ function paypal(instrument) {
   };
 }
 
+function app(instrument) {
+  return {
+    method: 'app',
+    providers: [instrument.provider],
+  };
+}
+
 export default {
   upi,
   netbanking,
   card,
   wallet,
   paypal,
+  app,
 };

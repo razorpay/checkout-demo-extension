@@ -1,5 +1,11 @@
 import { createBlock } from 'configurability/blocks';
-import { blocks, instruments, sequence } from 'checkoutstore/screens/home';
+import {
+  blocks,
+  instruments,
+  sequence,
+  hiddenMethods,
+  hiddenInstruments,
+} from 'checkoutstore/screens/home';
 import { get as storeGetter } from 'svelte/store';
 import Track from 'tracker';
 import { MAX_PREFERRED_INSTRUMENTS } from 'common/constants';
@@ -262,6 +268,8 @@ export function setBlocks(
     },
   });
 
+  hiddenMethods.set(parsedConfig.display.hide.methods);
+  hiddenInstruments.set(parsedConfig.display.hide.instruments);
   blocks.set(allBlocks);
   sequence.set(parsedConfig.display.sequence);
 
