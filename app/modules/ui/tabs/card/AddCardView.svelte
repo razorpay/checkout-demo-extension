@@ -21,7 +21,6 @@
     authType,
     cardType,
   } from 'checkoutstore/screens/card';
-  import { isAMEXEnabled } from 'checkoutstore/methods.js';
   import { methodInstrument } from 'checkoutstore/screens/home';
 
   import {
