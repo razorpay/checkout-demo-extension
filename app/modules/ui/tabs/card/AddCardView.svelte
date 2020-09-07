@@ -21,6 +21,7 @@
     authType,
     cardType,
   } from 'checkoutstore/screens/card';
+  import { isAMEXEnabled } from 'checkoutstore/methods.js';
   import { methodInstrument } from 'checkoutstore/screens/home';
 
   import {
@@ -331,6 +332,19 @@
   }
 
   function handleCardInput() {
+    //Track AMEX Card input for merchants who don't have AMEX enabled.
+    if (!isAMEXEnabled()) {
+      const amexIINPattern = /^3[47]/;
+      const iin = getIin(_cardNumber);
+      if (amexIINPattern.test(iin)) {
+        Analytics.track('card:amex:notEnabled', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            iin: getIin(_cardNumber),
+          },
+        });
+      }
+    }
     onCardNumberChange();
     dispatch('cardinput');
   }
