@@ -334,6 +334,7 @@
     //Track AMEX Card input for merchants who don't have AMEX enabled.
     if (!isAMEXEnabled()) {
       const amexIINPattern = /^3[47]/;
+      const _cardNumber = getCardDigits($cardNumber);
       const iin = getIin(_cardNumber);
       if (amexIINPattern.test(iin)) {
         Analytics.track('card:amex:notEnabled', {
@@ -347,6 +348,7 @@
 
     if (!getCardNetworks().DICL) {
       const dinersPattern = /^3[0689]/;
+      const _cardNumber = getCardDigits($cardNumber);
       const iin = getIin(_cardNumber);
       if (dinersPattern.test(iin)) {
         Analytics.track('card:diners:notEnabled', {
