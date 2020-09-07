@@ -349,6 +349,15 @@
   }
 
   function trackCardNumberFilled() {
+    //Track invalid card number entered by the customer.
+    Analytics.track('card_number:invalid', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        card: getCardMetadata($cardNumber),
+        invalid: !numberField.isValid(),
+      },
+    });
+
     Analytics.track('card_number:filled', {
       type: AnalyticsTypes.BEHAV,
       data: {
