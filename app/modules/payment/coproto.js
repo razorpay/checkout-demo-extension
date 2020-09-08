@@ -246,6 +246,8 @@ var responseTypes = {
       },
     ];
 
+    console.log(response, data, supportedInstruments, instrumentData);
+
     const details = {
       total: {
         label: 'Payment',
@@ -256,10 +258,13 @@ var responseTypes = {
       },
     };
 
+    console.log(details);
+
     const PaymentRequest = global.PaymentRequest;
 
     try {
       const request = new PaymentRequest(supportedInstruments, details);
+      console.log('Payment Request Worked');
       request
         .show()
         .then(instrument => {
