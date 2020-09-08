@@ -4,6 +4,7 @@ import {
   didUPIIntentSucceed,
   upiBackCancel,
   getAppFromPackageName,
+  GOOGLE_PAY_PACKAGE_NAME,
 } from 'common/upi';
 import { androidBrowser } from 'common/useragent';
 import Track from 'tracker';
@@ -426,7 +427,11 @@ var responseTypes = {
       }
 
       if (androidBrowser) {
-        return responseTypes['web_payments'].call(this, fullResponse);
+        if (this.upi_app === GOOGLE_PAY_PACKAGE_NAME) {
+          return responseTypes['gpay'].call(this, fullResponse);
+        } else {
+          return responseTypes['web_payments'].call(this, fullResponse);
+        }
       }
     } else if (this.upi_app) {
       // upi_app will only be set for UPI intent payments.
