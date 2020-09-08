@@ -185,6 +185,12 @@
 
     if (!isAMEXEnabled() && $cardType === 'amex') {
       isValid = false;
+      Analytics.track('card:amex:disabled', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          iin: getIin($cardNumber),
+        },
+      });
     }
 
     return isValid;
@@ -347,14 +353,11 @@
     }
 
     if (!getCardNetworks().DICL) {
-      const dinersPattern = /^3[0689]/;
-      const _cardNumber = getCardDigits($cardNumber);
-      const iin = getIin(_cardNumber);
-      if (dinersPattern.test(iin)) {
-        Analytics.track('card:diners:notEnabled', {
+      if ($cardType === 'diners') {
+        Analytics.track('card:diners:disabled', {
           type: AnalyticsTypes.BEHAV,
           data: {
-            iin: getIin(_cardNumber),
+            iin: getIin($cardNumber),
           },
         });
       }
@@ -377,20 +380,14 @@
   }
 
   function trackCardNumberFilled() {
-    //Track invalid card number entered by the customer.
-    Analytics.track('card_number:invalid', {
-      type: AnalyticsTypes.BEHAV,
-      data: {
-        card: getCardMetadata($cardNumber),
-        invalid: !numberField.isValid(),
-      },
-    });
+    //Track valid & invalid card number entered by the customer.
 
     Analytics.track('card_number:filled', {
       type: AnalyticsTypes.BEHAV,
       data: {
         card: getCardMetadata($cardNumber),
         valid: numberField.isValid(),
+        invalid: !numberField.isValid(),
       },
     });
   }
