@@ -4,7 +4,7 @@ import { GOOGLE_PAY_PACKAGE_NAME, PHONE_PE_PACKAGE_NAME } from 'common/upi';
 
 const PaymentRequest = global.PaymentRequest;
 
-const ADAPTER_CHECKERS = {
+export const ADAPTER_CHECKERS = {
   'microapps.gpay': checkMicroapp,
 };
 
@@ -71,7 +71,6 @@ function phonepePaymentRequestAdapter() {
         });
       /* jshint ignore:end */
     } catch (e) {
-      console.log('Payment Request api undefined!!');
       reject(CHECK_ERROR);
     }
   });

@@ -10,6 +10,7 @@ import Track from 'tracker';
 import Analytics from 'analytics';
 import { getBankFromCardCache } from 'common/bank';
 import * as Bridge from 'bridge';
+import { ADAPTER_CHECKERS } from 'payment/adapters';
 
 export const processOtpResponse = function(response) {
   var error = response.error;
@@ -227,6 +228,52 @@ var responseTypes = {
     this.emit('upi.pending', { flow: 'upi-intent' });
   },
 
+  web_payments: function(response) {
+    var instrumentData = {};
+    var data = response.data;
+    data.intent_url
+      .replace(/^.*\?/, '')
+      .replace(/([^=&]+)=([^&]*)/g, (m, key, value) => {
+        instrumentData[decodeURIComponent(key)] = decodeURIComponent(value);
+      });
+    instrumentData.url = 'https://razorpay.com';
+
+    const supportedInstruments = [
+      {
+        supportedMethods: ADAPTER_CHECKERS[this.upi_app],
+        data: instrumentData,
+      },
+    ];
+
+    const details = {
+      total: {
+        label: 'Payment',
+        amount: {
+          currency: 'INR',
+          value: parseFloat(instrumentData.am).toFixed(2),
+        },
+      },
+    };
+    try {
+      const request = new PaymentRequest(supportedInstruments, details);
+      request
+        .show()
+        .then(instrument => {
+          console.log('done', instrument);
+
+          return instrument.complete();
+        })
+        /* jshint ignore:start */
+        .catch(e => {
+          console.log('error', e);
+          // errorCallback(e);
+        });
+      /* jshint ignore:end */
+    } catch (e) {
+      errorCallback(e);
+    }
+  },
+
   gpay: function(coprotoRequest, fullResponse, type = 'payment_request') {
     if (type === 'payment_request') {
       GPay.payWithPaymentRequestApi(
@@ -379,7 +426,7 @@ var responseTypes = {
       }
 
       if (androidBrowser) {
-        return responseTypes['gpay'].call(this, request, fullResponse);
+        return responseTypes['web_payments'].call(this, fullResponse);
       }
     } else if (this.upi_app) {
       // upi_app will only be set for UPI intent payments.
