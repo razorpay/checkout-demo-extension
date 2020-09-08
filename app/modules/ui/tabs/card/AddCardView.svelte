@@ -352,15 +352,13 @@
       }
     }
 
-    if (!getCardNetworks().DICL) {
-      if ($cardType === 'diners') {
-        Analytics.track('card:diners:disabled', {
-          type: AnalyticsTypes.BEHAV,
-          data: {
-            iin: getIin($cardNumber),
-          },
-        });
-      }
+    if (!getCardNetworks().DICL && $cardType === 'diners') {
+      Analytics.track('card:diners:disabled', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          iin: getIin($cardNumber),
+        },
+      });
     }
     onCardNumberChange();
     dispatch('cardinput');
