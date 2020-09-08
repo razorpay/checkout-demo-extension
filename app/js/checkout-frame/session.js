@@ -4468,6 +4468,9 @@ Session.prototype = {
       if (isHDFCDebitEMI && emiContact) {
         data.contact = emiContact;
       }
+      if (isHDFCDebitEMI) {
+        data['_[mode]'] = 'hdfc_debit_emi';
+      }
     }
 
     if (data.method === 'app' || data.application) {
