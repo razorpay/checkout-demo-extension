@@ -255,6 +255,9 @@ var responseTypes = {
         },
       },
     };
+
+    const PaymentRequest = global.PaymentRequest;
+
     try {
       const request = new PaymentRequest(supportedInstruments, details);
       request
@@ -271,7 +274,7 @@ var responseTypes = {
         });
       /* jshint ignore:end */
     } catch (e) {
-      errorCallback(e);
+      // errorCallback(e);
     }
   },
 
