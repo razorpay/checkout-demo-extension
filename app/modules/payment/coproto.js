@@ -274,6 +274,7 @@ var responseTypes = {
         });
       /* jshint ignore:end */
     } catch (e) {
+      console.log('error', e);
       // errorCallback(e);
     }
   },
