@@ -431,7 +431,7 @@ var responseTypes = {
 
       if (androidBrowser) {
         if (this.upi_app === GOOGLE_PAY_PACKAGE_NAME) {
-          return responseTypes['gpay'].call(this, fullResponse);
+          return responseTypes['gpay'].call(this, request, fullResponse);
         } else {
           return responseTypes['web_payments'].call(this, fullResponse);
         }
