@@ -193,7 +193,7 @@ export function shouldRememberCustomer() {
     return true;
   }
   if (isContactOptional() && !getPrefilledContact()) {
-    return false;
+    return true;
   }
   return getOption('remember_customer');
 }
