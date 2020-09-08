@@ -13,6 +13,8 @@ import { getBankFromCardCache } from 'common/bank';
 import * as Bridge from 'bridge';
 import { ADAPTER_CHECKERS } from 'payment/adapters';
 
+const PaymentRequest = global.PaymentRequest;
+
 export const processOtpResponse = function(response) {
   var error = response.error;
   Track(this.r, 'otp_response', response);
@@ -259,8 +261,6 @@ var responseTypes = {
     };
 
     console.log(details);
-
-    const PaymentRequest = global.PaymentRequest;
 
     try {
       const request = new PaymentRequest(supportedInstruments, details);
