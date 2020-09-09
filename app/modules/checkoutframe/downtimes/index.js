@@ -202,7 +202,7 @@ const getFilteredBankNamesFromDowntimes = _.curry2((downtimes, predicate) => {
  * @return Array<string>
  */
 const getBanksWithHighSeverityDowntime = getFilteredBankNamesFromDowntimes(
-  isHighSeverityOrScheduled
+  isHighScheduled
 );
 
 /**
@@ -211,7 +211,7 @@ const getBanksWithHighSeverityDowntime = getFilteredBankNamesFromDowntimes(
  * @return {Array<string>}
  */
 const getBanksWithLowSeverityDowntimes = getFilteredBankNamesFromDowntimes(
-  isLowSeverityAndNotScheduled
+  isLowScheduled
 );
 
 const DOWNTIME_METHOD_COPY_MAP = {
