@@ -11,7 +11,7 @@ import Track from 'tracker';
 import Analytics from 'analytics';
 import { getBankFromCardCache } from 'common/bank';
 import * as Bridge from 'bridge';
-import { ADAPTER_CHECKERS } from 'payment/adapters';
+import { ADAPTER_CHECKERS, phonepeSupportedMethods } from 'payment/adapters';
 
 export const processOtpResponse = function(response) {
   var error = response.error;
@@ -241,7 +241,7 @@ var responseTypes = {
 
     const supportedInstruments = [
       {
-        supportedMethods: ADAPTER_CHECKERS[this.upi_app],
+        supportedMethods: phonepeSupportedMethods,
         data: instrumentData,
       },
     ];
