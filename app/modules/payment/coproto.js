@@ -418,6 +418,8 @@ var responseTypes = {
 
     this.emit('upi.coproto_response', fullResponse);
 
+    console.log('checking bridge, gpay', CheckoutBridge, this.gpay);
+
     if (CheckoutBridge && CheckoutBridge.callNativeIntent) {
       // If there's a UPI App specified, use it.
       if (this.upi_app) {
@@ -434,6 +436,8 @@ var responseTypes = {
           'microapp'
         );
       }
+
+      console.log('checking android browser');
 
       if (androidBrowser) {
         if (this.upi_app === GOOGLE_PAY_PACKAGE_NAME) {
