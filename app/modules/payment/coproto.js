@@ -13,8 +13,6 @@ import { getBankFromCardCache } from 'common/bank';
 import * as Bridge from 'bridge';
 import { ADAPTER_CHECKERS } from 'payment/adapters';
 
-const PaymentRequest = global.PaymentRequest;
-
 export const processOtpResponse = function(response) {
   var error = response.error;
   Track(this.r, 'otp_response', response);
@@ -248,7 +246,7 @@ var responseTypes = {
       },
     ];
 
-    console.log(response, data, supportedInstruments, instrumentData);
+    console.error(response, data, supportedInstruments, instrumentData);
 
     const details = {
       total: {
@@ -260,26 +258,28 @@ var responseTypes = {
       },
     };
 
-    console.log(details);
+    console.error(details);
 
     try {
+      const PaymentRequest = global.PaymentRequest;
+
       const request = new PaymentRequest(supportedInstruments, details);
-      console.log('Payment Request Worked');
+      console.error('Payment Request Worked');
       request
         .show()
         .then(instrument => {
-          console.log('done', instrument);
+          console.error('done', instrument);
 
           return instrument.complete();
         })
         /* jshint ignore:start */
         .catch(e => {
-          console.log('error', e);
+          console.error('error', e);
           // errorCallback(e);
         });
       /* jshint ignore:end */
     } catch (e) {
-      console.log('error', e);
+      console.error('error', e);
       // errorCallback(e);
     }
   },
@@ -437,7 +437,7 @@ var responseTypes = {
         );
       }
 
-      console.log('checking android browser');
+      console.error('checking android browser');
 
       if (androidBrowser) {
         if (this.upi_app === GOOGLE_PAY_PACKAGE_NAME) {
