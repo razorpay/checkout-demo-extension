@@ -8,12 +8,7 @@
  * @return {function(downtime: Object): boolean} Says whether or not to disable method.
  */
 function disableBasedOnSeverityOrScheduled(severity = [], scheduled = true) {
-  return function disable(downtime) {
-    return (
-      _Arr.contains(severity, downtime.severity) ||
-      downtime.scheduled === scheduled
-    );
-  };
+  return false;
 }
 
 /**
