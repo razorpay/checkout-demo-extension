@@ -270,17 +270,63 @@ var responseTypes = {
         .then(instrument => {
           console.error('done', instrument);
 
+          Track(this.r, 'web_payments_api_response', {
+            instrument,
+          });
+
+          this.emit('upi.intent_response', {
+            response: instrument.details,
+          });
+
           return instrument.complete();
         })
         /* jshint ignore:start */
-        .catch(e => {
+        .catch(error => {
           console.error('error', e);
-          // errorCallback(e);
+          if (error.code) {
+            if (
+              [error.ABORT_ERR, error.NOT_SUPPORTED_ERR].indexOf(error.code) >=
+              0
+            ) {
+              this.emit('upi.intent_response', {});
+            }
+
+            // Since the method is not supported, remove it.
+            if (error.code === error.NOT_SUPPORTED_ERR) {
+              Analytics.track('gpay:not_supported', {
+                data: {
+                  error,
+                },
+              });
+
+              // TODO: (nice to have) Remove the Google Pay app from UI
+            }
+          }
+
+          Track(this.r, 'gpay_error', error);
         });
       /* jshint ignore:end */
-    } catch (e) {
-      console.error('error', e);
-      // errorCallback(e);
+    } catch (error) {
+      if (error.code) {
+        if (
+          [error.ABORT_ERR, error.NOT_SUPPORTED_ERR].indexOf(error.code) >= 0
+        ) {
+          this.emit('upi.intent_response', {});
+        }
+
+        // Since the method is not supported, remove it.
+        if (error.code === error.NOT_SUPPORTED_ERR) {
+          Analytics.track('gpay:not_supported', {
+            data: {
+              error,
+            },
+          });
+
+          // TODO: (nice to have) Remove the Google Pay app from UI
+        }
+      }
+
+      Track(this.r, 'gpay_error', error);
     }
   },
 
