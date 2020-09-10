@@ -388,7 +388,6 @@
       data: {
         card: getCardMetadata($cardNumber),
         valid: numberField.isValid(),
-        invalid: !numberField.isValid(),
       },
     });
   }
