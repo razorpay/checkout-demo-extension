@@ -20,6 +20,7 @@
     remember,
     authType,
     cardType,
+    cardIin,
   } from 'checkoutstore/screens/card';
   import { methodInstrument } from 'checkoutstore/screens/home';
 
@@ -182,10 +183,21 @@
       value: cardNumberWithoutSpaces,
       type: $cardType,
     });
-
+    //Track AMEX Card input for merchants who don't have AMEX enabled.
     if (!isAMEXEnabled() && $cardType === 'amex') {
       isValid = false;
       Analytics.track('card:amex:disabled', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          iin: getIin($cardNumber),
+        },
+      });
+    }
+
+    //Track Diners Card input for merchants who don't have Diners enabled.
+    if (!getCardNetworks().DICL && $cardType === 'diners') {
+      isValid = false;
+      Analytics.track('card:diners:disabled', {
         type: AnalyticsTypes.BEHAV,
         data: {
           iin: getIin($cardNumber),
@@ -337,27 +349,18 @@
   }
 
   function handleCardInput() {
-    //Track AMEX Card input for merchants who don't have AMEX enabled.
-    if (!isAMEXEnabled()) {
-      const amexIINPattern = /^3[47]/;
-      const _cardNumber = getCardDigits($cardNumber);
-      const iin = getIin(_cardNumber);
-      if (amexIINPattern.test(iin)) {
-        Analytics.track('card:amex:notEnabled', {
-          type: AnalyticsTypes.BEHAV,
-          data: {
-            iin: getIin(_cardNumber),
-          },
-        });
-      }
-    }
-
-    if (!getCardNetworks().DICL && $cardType === 'diners') {
-      Analytics.track('card:diners:disabled', {
-        type: AnalyticsTypes.BEHAV,
-        data: {
-          iin: getIin($cardNumber),
-        },
+    //Track EMI invalid cards
+    if ($cardNumber > 6) {
+      getCardFeatures($cardIin).then(data => {
+        const { emi } = data.flows;
+        if (!emi) {
+          Analytics.track('card:emi:invalid', {
+            type: AnalyticsTypes.BEHAV,
+            data: {
+              iin: $cardIin,
+            },
+          });
+        }
       });
     }
     onCardNumberChange();
