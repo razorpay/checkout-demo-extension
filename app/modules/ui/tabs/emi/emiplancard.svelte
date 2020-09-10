@@ -3,6 +3,9 @@
   import Razorpay from 'common/Razorpay';
   import { getSession } from 'sessionmanager';
   import { roundUpToNearestMajor } from 'common/currency';
+  import { getCardFeatures } from 'common/card';
+
+  import { cardIin } from 'checkoutstore/screens/card';
 
   // UI imports
   import ExpandableCard from 'ui/elements/ExpandableCard.svelte';
@@ -18,6 +21,9 @@
     NO_COST_DISCOUNT_LABEL,
     NO_COST_EXPLAIN_ACTION,
     CREDIT_EMI_DESCRIPTION,
+    CITI_BANK_EMI,
+    CITI_KNOW_MORE,
+    CITI_URL,
     HDFC_DEBIT_DESCRIPTION_MIN_BALANCE,
     HDFC_DEBIT_DESCRIPTION_INCLUDES_INTEREST,
     HDFC_DEBIT_DESCRIPTION_CONVENIENCE,
@@ -46,8 +52,15 @@
   let interestChargedByBank;
 
   const session = getSession();
+  const CITI_BANK_CODE = 'CITI';
   const HDFC_BANK_CODE = 'HDFC';
   const HDFC_BANK_DEBIT_CODE = 'HDFC_DC';
+
+  let issuer;
+  function getCardIssuer() {
+    return getCardFeatures($cardIin).then(data => data.issuer);
+  }
+  issuer = getCardIssuer().then(data => data.issuer);
 
   // amountPerMonth
   $: {
@@ -98,6 +111,13 @@
   function explain() {
     session.showNoCostExplainer(plan);
   }
+
+  let clickLearnMore = false;
+
+  function showDetails() {
+    clickLearnMore = true;
+    document.querySelector('#learn-more').remove();
+  }
 </script>
 
 <style>
@@ -115,6 +135,10 @@
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     margin: -10px 0 6px !important;
     padding-bottom: 6px;
+  }
+  .citi-link:hover {
+    font-weight: bold;
+    color: #626a74;
   }
 </style>
 
@@ -151,6 +175,24 @@
           <span class="inline-block">{formattedAmountPerMonth}/mo</span>
           <!-- LABEL: (includes interest). -->
           {$t(HDFC_DEBIT_DESCRIPTION_INCLUDES_INTEREST)}
+        {:else if bank === CITI_BANK_CODE}
+          <!-- LABEL: Full amount of {formattedAmount} will be deducted from your account.
+          EMI processing may take upto 8 working days. -->
+          {formatTemplateWithLocale(CITI_BANK_EMI, { amount: formattedAmount }, $locale)}
+          <div id="learn-more" class="citi-link" on:click={showDetails}>
+            Learn More
+          </div>
+          {#if clickLearnMore}
+            {$t(CITI_KNOW_MORE)}
+            <a
+              class="citi-link"
+              href="https://www.online.citibank.co.in/portal/newgen/cards/tab/creditcards_tc.htm"
+              target="_blank">
+              <!-- In case the total amount due has not been paid in full, finance charges as applicable (currently, between 3.50%- 3.60% per month i.e. 42-43.2% annualized) on card balances may apply until the EMI is converted & posted to the card. 
+              Latest rates are available at https://www.online.citibank.co.in/portal/newgen/cards/tab/creditcards_tc.htm -->
+              {$t(CITI_URL)}
+            </a>
+          {/if}
         {:else}
           <!-- LABEL: Full amount of {formattedAmount} will be deducted from your account,
         which will be converted into EMI by your bank in 3-4 days. -->
