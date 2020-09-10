@@ -251,6 +251,18 @@
 
     getCardFeatures(iin)
       .then(features => {
+        if ($cardNumber.length === 16) {
+          const { emi } = features.flows;
+          if (!emi) {
+            Analytics.track('card:emi:invalid', {
+              type: AnalyticsTypes.BEHAV,
+              data: {
+                iin: $cardIin,
+              },
+            });
+          }
+        }
+
         let validationPromises = [
           flowChecker(features),
           validateCardNumber(),
@@ -349,20 +361,6 @@
   }
 
   function handleCardInput() {
-    //Track EMI invalid cards
-    if ($cardNumber.length > 6) {
-      getCardFeatures($cardIin).then(data => {
-        const { emi } = data.flows;
-        if (!emi) {
-          Analytics.track('card:emi:invalid', {
-            type: AnalyticsTypes.BEHAV,
-            data: {
-              iin: $cardIin,
-            },
-          });
-        }
-      });
-    }
     onCardNumberChange();
     dispatch('cardinput');
   }
