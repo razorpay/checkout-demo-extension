@@ -518,6 +518,12 @@ export default {
       'Total Amount: {totalAmount} ({monthlyAmount} x {duration})',
     edit_plan_action: 'Edit',
     edit_plan_text: '{duration} Months ({amount}/mo)',
+    citi_bank_emi:
+      'Full amount of {amount} will be deducted from your account. EMI processing may take upto 8 working days.',
+    citi_know_more:
+      'In case the total amount due has not been paid in full, finance charges as applicable (currently, between 3.50%- 3.60% per month i.e. 42-43.2% annualized) on card balances may apply until the EMI is converted & posted to the card. Latest rates are available at ',
+    citi_url:
+      'https://www.online.citibank.co.in/portal/newgen/cards/tab/creditcards_tc.htm',
     hdfc_debit_description_convenience:
       ' Convenience Fee of ₹199 + GST applicable for EMI transactions on HDFC Bank Cards.',
     hdfc_debit_description_includes_interest: '(includes interest).',
