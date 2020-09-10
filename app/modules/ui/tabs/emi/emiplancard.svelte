@@ -53,12 +53,6 @@
   const HDFC_BANK_CODE = 'HDFC';
   const HDFC_BANK_DEBIT_CODE = 'HDFC_DC';
 
-  let issuer;
-  function getCardIssuer() {
-    return getCardFeatures($cardIin).then(data => data.issuer);
-  }
-  issuer = getCardIssuer().then(data => data.issuer);
-
   // amountPerMonth
   $: {
     // Don't calculate if amount_per_month exists
