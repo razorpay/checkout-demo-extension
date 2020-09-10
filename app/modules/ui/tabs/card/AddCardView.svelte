@@ -350,7 +350,7 @@
 
   function handleCardInput() {
     //Track EMI invalid cards
-    if ($cardNumber > 6) {
+    if ($cardNumber.length > 6) {
       getCardFeatures($cardIin).then(data => {
         const { emi } = data.flows;
         if (!emi) {
