@@ -106,8 +106,12 @@
   let clickLearnMore = false;
 
   function showDetails() {
-    clickLearnMore = true;
-    document.querySelector('#learn-more').remove();
+    clickLearnMore = !clickLearnMore;
+    if (clickLearnMore) {
+      document.querySelector('#learn-more').textContent = 'Show less';
+    } else {
+      document.querySelector('#learn-more').textContent = 'Learn More';
+    }
   }
 </script>
 
