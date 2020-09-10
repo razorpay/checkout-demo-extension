@@ -3,9 +3,6 @@
   import Razorpay from 'common/Razorpay';
   import { getSession } from 'sessionmanager';
   import { roundUpToNearestMajor } from 'common/currency';
-  import { getCardFeatures } from 'common/card';
-
-  import { cardIin } from 'checkoutstore/screens/card';
 
   // UI imports
   import ExpandableCard from 'ui/elements/ExpandableCard.svelte';
