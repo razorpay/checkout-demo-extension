@@ -4938,10 +4938,15 @@ Session.prototype = {
     }
 
     if (forcedOffer) {
+      // Set $appliedOffer for Offer Validations to take place
+      discreet.OffersStore.appliedOffer.set(forcedOffer);
+
       if (forcedOffer.payment_method === 'wallet') {
         this.walletOffer = forcedOffer;
       }
+
       Analytics.setMeta('forcedOffer', true);
+
       this.handleDiscount();
     } else {
       var appliedOffer;
