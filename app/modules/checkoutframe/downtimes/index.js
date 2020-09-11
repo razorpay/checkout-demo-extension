@@ -7,9 +7,12 @@
  *
  * @return {function(downtime: Object): boolean} Says whether or not to disable method.
  */
-function disableBasedOnScheduled(scheduled = true) {
+function disableBasedOnSeverityOrScheduled(severity = [], scheduled = true) {
   return function disable(downtime) {
-    return downtime.scheduled === scheduled;
+    return (
+      _Arr.contains(severity, downtime.severity) ||
+      downtime.scheduled === scheduled
+    );
   };
 }
 
@@ -19,7 +22,7 @@ function disableBasedOnScheduled(scheduled = true) {
  * @param {Object} downtime
  * @return {boolean}
  */
-const isHighScheduled = disableBasedOnScheduled(true);
+const isHighScheduled = disableBasedOnSeverityOrScheduled(['high'], true);
 
 /**
  * Checks if the downtime has an instrument. For downtimes without an
@@ -73,37 +76,15 @@ const isHighScheduledWithoutInstrument = fAnd(
  * @param {Object} downtime
  * @return {boolean}
  */
-const isLowScheduledWithoutInstrument = fAnd(isLowScheduled, withoutInstrument);
+const always = () => true;
 
-const DISABLE_METHOD = {
-  upi: isHighScheduledWithoutInstrument,
-  upi_otm: isHighScheduledWithoutInstrument,
-  qr: isHighScheduledWithoutInstrument,
-  gpay: isHighScheduledWithoutInstrument,
-  netbanking: function(_, preferences) {
-    const netbankingObj = preferences.methods.netbanking || {};
-    const banks = _Obj.keys(netbankingObj);
-    const downtimes =
-      (preferences.payment_downtime && preferences.payment_downtime.items) ||
-      [];
-
-    return _Arr.every(banks, bank =>
-      _Arr.any(
-        downtimes,
-        downtime =>
-          downtime.method === 'netbanking' &&
-          downtime.instrument.bank === bank &&
-          isHighScheduled(downtime)
-      )
-    );
-  },
-};
+const DISABLE_METHOD = {};
 
 const WARN_METHOD = {
-  upi: isLowScheduledWithoutInstrument,
-  upi_otm: isLowScheduledWithoutInstrument,
-  qr: isLowScheduledWithoutInstrument,
-  gpay: isLowScheduledWithoutInstrument,
+  upi: always,
+  upi_otm: always,
+  qr: always,
+  gpay: always,
   netbanking: function(_, preferences) {
     const netbankingObj = preferences.methods.netbanking || {};
     const banks = _Obj.keys(netbankingObj);
@@ -202,7 +183,7 @@ const getFilteredBankNamesFromDowntimes = _.curry2((downtimes, predicate) => {
  * @return Array<string>
  */
 const getBanksWithHighSeverityDowntime = getFilteredBankNamesFromDowntimes(
-  isHighSeverityOrScheduled
+  isHighScheduled
 );
 
 /**
@@ -211,7 +192,7 @@ const getBanksWithHighSeverityDowntime = getFilteredBankNamesFromDowntimes(
  * @return {Array<string>}
  */
 const getBanksWithLowSeverityDowntimes = getFilteredBankNamesFromDowntimes(
-  isLowSeverityAndNotScheduled
+  isLowScheduled
 );
 
 const DOWNTIME_METHOD_COPY_MAP = {
