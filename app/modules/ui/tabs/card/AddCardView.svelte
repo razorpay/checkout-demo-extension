@@ -74,6 +74,7 @@
   let hideExpiryCvvFields = false;
   let cvvLength = 3;
   let showCardUnsupported = false;
+  let lastIin = '';
 
   let cardNumberHelpText;
   $: cardNumberHelpText =
@@ -101,6 +102,25 @@
 
   $: {
     cvvLength = getCvvDigits($cardType);
+  }
+
+  $: {
+    if ($cardNumber.length > 6 && lastIin !== getIin($cardNumber)) {
+      lastIin = getIin($cardNumber);
+      if (lastIin) {
+        getCardFeatures($cardNumber).then(data => {
+          const { emi } = data.flows;
+          if (!emi) {
+            Analytics.track('card:emi:invalid', {
+              type: AnalyticsTypes.BEHAV,
+              data: {
+                iin: $cardIin,
+              },
+            });
+          }
+        });
+      }
+    }
   }
 
   export let tab;
@@ -251,18 +271,6 @@
 
     getCardFeatures(iin)
       .then(features => {
-        if ($cardNumber.length === 16) {
-          const { emi } = features.flows;
-          if (!emi) {
-            Analytics.track('card:emi:invalid', {
-              type: AnalyticsTypes.BEHAV,
-              data: {
-                iin: $cardIin,
-              },
-            });
-          }
-        }
-
         let validationPromises = [
           flowChecker(features),
           validateCardNumber(),
