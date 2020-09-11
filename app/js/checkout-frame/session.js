@@ -4087,6 +4087,15 @@ Session.prototype = {
     var vpaVerified = props.vpaVerified;
     var data = this.payload;
 
+    var goto_payment = '#error-message .link';
+    var redirectableMethods = ['card', 'netbanking', 'wallet'];
+    if (
+      this.get('redirect') &&
+      redirectableMethods.includes(this.payload.method)
+    ) {
+      $(goto_payment).hide();
+    }
+
     if (this.r._payment) {
       /**
        * For Cardless EMI, payments are created at the first step,
