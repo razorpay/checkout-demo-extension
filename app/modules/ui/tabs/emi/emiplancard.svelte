@@ -108,9 +108,9 @@
   function showDetails() {
     clickLearnMore = !clickLearnMore;
     if (clickLearnMore) {
-      document.querySelector('#learn-more').textContent = 'Show less';
+      _Doc.querySelector('#show-more').textContent = 'Show less';
     } else {
-      document.querySelector('#learn-more').textContent = 'Learn More';
+      _Doc.querySelector('#show-more').textContent = 'Show More';
     }
   }
 </script>
@@ -131,9 +131,18 @@
     margin: -10px 0 6px !important;
     padding-bottom: 6px;
   }
+  .citi-link {
+    text-decoration: underline;
+  }
   .citi-link:hover {
     font-weight: bold;
     color: #626a74;
+  }
+  .citi-url {
+    color: #528ff0;
+  }
+  .citi-url:hover {
+    color: #0a47c1;
   }
 </style>
 
@@ -174,13 +183,13 @@
           <!-- LABEL: Full amount of {formattedAmount} will be deducted from your account.
           EMI processing may take upto 8 working days. -->
           {formatTemplateWithLocale(CITI_BANK_EMI, { amount: formattedAmount }, $locale)}
-          <div id="learn-more" class="citi-link" on:click={showDetails}>
-            Learn More
+          <div id="show-more" class="citi-link" on:click={showDetails}>
+            Show More
           </div>
           {#if clickLearnMore}
             {$t(CITI_KNOW_MORE)}
             <a
-              class="citi-link"
+              class="citi-url"
               href="https://www.online.citibank.co.in/portal/newgen/cards/tab/creditcards_tc.htm"
               target="_blank">
               <!-- In case the total amount due has not been paid in full, finance charges as applicable (currently, between 3.50%- 3.60% per month i.e. 42-43.2% annualized) on card balances may apply until the EMI is converted & posted to the card. 
