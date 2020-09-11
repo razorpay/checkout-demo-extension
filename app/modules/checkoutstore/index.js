@@ -192,9 +192,7 @@ export function shouldRememberCustomer() {
   if (razorpayInstance.get().remember_customer === true) {
     return true;
   }
-  if (isContactOptional() && !getPrefilledContact()) {
-    return true;
-  }
+
   return getOption('remember_customer');
 }
 
