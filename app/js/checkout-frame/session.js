@@ -3501,14 +3501,14 @@ Session.prototype = {
     this.nbCancelReasonPicker = new discreet.CancelReasonPicker({
       target: _Doc.querySelector('#cancel_netbanking'),
       props: {
-        onBack: () => {
+        onBack: function() {
           $('#error-message').removeClass('cancel_netbanking');
           hideOverlay($('#error-message'));
           var metaParam = {};
           metaParam['_[reason]'] = 'other';
           this.r.emit('payment.cancel', metaParam);
         },
-        onSubmit: () => {
+        onSubmit: function() {
           var netbanking_radio = $('#cancel_netbanking input:checked');
           if (!netbanking_radio[0]) {
             return;
