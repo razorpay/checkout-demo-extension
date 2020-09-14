@@ -20,6 +20,8 @@
     CREDIT_EMI_DESCRIPTION,
     CITI_BANK_EMI,
     CITI_KNOW_MORE,
+    SHOW_MORE,
+    SHOW_LESS,
     CITI_URL,
     HDFC_DEBIT_DESCRIPTION_MIN_BALANCE,
     HDFC_DEBIT_DESCRIPTION_INCLUDES_INTEREST,
@@ -179,7 +181,9 @@
           EMI processing may take upto 8 working days. -->
           {formatTemplateWithLocale(CITI_BANK_EMI, { amount: formattedAmount }, $locale)}
           <div class="citi-link" on:click={toggleCitiBankCardDetails}>
-            {#if citiBankDetailsExpandedView}Show Less{:else}Show More{/if}
+            {#if citiBankDetailsExpandedView}
+              {$t(SHOW_LESS)}
+            {:else}{$t(SHOW_MORE)}{/if}
           </div>
           {#if citiBankDetailsExpandedView}
             {$t(CITI_KNOW_MORE)}
