@@ -328,14 +328,6 @@ function errorHandler(response) {
     }
   }
 
-  var NB_USER_CANCEL_MSG = 'Payment processing cancelled by user';
-
-  // if (message === NB_USER_CANCEL_MSG) {
-  if (this.payload && this.payload.method === 'netbanking') {
-    return cancel_nb(this);
-  }
-  // }
-
   // Save payload in a variable, as it's going to get cleared and
   // we need it for something else.
   var payload = this.payload;
@@ -3539,16 +3531,7 @@ Session.prototype = {
           hideOverlay($('#error-message'));
           var metaParam = {};
           metaParam[netbanking_radio.prop('name')] = netbanking_radio.val();
-          Razorpay;
-          var url = this.r.makeAuthUrl(
-            razorpay,
-            'payments/' + payment_id + '/cancel'
-          );
-          if (_.isNonNullObject(metaParam)) {
-            url += '&' + _.obj2query(metaParam);
-          }
-
-          this.clearRequest(metaParam);
+          this.r.emit('payment.cancel');
 
           // if (this.r._payment) {
           //   hideOverlayMessage();
