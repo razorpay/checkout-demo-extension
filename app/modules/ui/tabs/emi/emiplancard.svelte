@@ -103,15 +103,10 @@
     session.showNoCostExplainer(plan);
   }
 
-  let clickLearnMore = false;
+  let showMore = false;
 
   function showDetails() {
-    clickLearnMore = !clickLearnMore;
-    if (clickLearnMore) {
-      _Doc.querySelector('#show-more').textContent = 'Show less';
-    } else {
-      _Doc.querySelector('#show-more').textContent = 'Show More';
-    }
+    showMore = !showMore;
   }
 </script>
 
@@ -184,9 +179,9 @@
           EMI processing may take upto 8 working days. -->
           {formatTemplateWithLocale(CITI_BANK_EMI, { amount: formattedAmount }, $locale)}
           <div id="show-more" class="citi-link" on:click={showDetails}>
-            Show More
+            {#if showMore}Show Less{:else}Show More{/if}
           </div>
-          {#if clickLearnMore}
+          {#if showMore}
             {$t(CITI_KNOW_MORE)}
             <a
               class="citi-url"
