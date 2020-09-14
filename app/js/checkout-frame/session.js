@@ -3531,31 +3531,26 @@ Session.prototype = {
           hideOverlay($('#error-message'));
           var metaParam = {};
           metaParam[netbanking_radio.prop('name')] = netbanking_radio.val();
-          this.r.emit('payment.cancel');
-
-          // if (this.r._payment) {
-          //   hideOverlayMessage();
-          //   this.r.emit('payment.cancel', extra);
-          // }
+          this.r.emit('payment.cancel', metaParam);
         },
         method: 'netbanking',
-        title: 'Pikachu',
+        title: 'Please share a reason for cancelling this payment',
         reasons: [
           {
-            value: 'pikachu',
-            label: 'pika pika',
+            value: 'wrong_bank_selected',
+            label: 'Wrong bank selected',
           },
           {
-            value: 'pikachu-1',
-            label: 'pika pika',
+            value: 'forgot_bank_details',
+            label: 'Forgot username or password',
           },
           {
-            value: 'pikachu-2',
-            label: 'pika pika',
+            value: 'bank_page_error',
+            label: 'Error on bank page',
           },
           {
-            value: 'pikachu-3',
-            label: 'pika pikaij',
+            value: 'other',
+            label: 'Other',
           },
         ],
       },
