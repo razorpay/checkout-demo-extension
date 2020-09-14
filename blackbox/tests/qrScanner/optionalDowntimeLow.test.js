@@ -4,7 +4,7 @@ const {
   assertHomePage,
   fillUserDetails,
   assertPaymentMethods,
-  verifyLowDowntime,
+  verifyMethodWarned,
   selectPaymentMethod,
   selectUPIApp,
   respondToUPIAjax,
@@ -48,7 +48,7 @@ describe('Basic QRCode Optional Contact Downtime', () => {
     await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await verifyLowDowntime(context, 'UPI', 'upi');
+    await verifyMethodWarned(context, 'UPI', 'upi');
     await selectUPIApp(context, '1');
     await respondToUPIAjax(context, { method: 'qr' });
     await responseWithQRImage(context);

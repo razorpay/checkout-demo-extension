@@ -4,7 +4,7 @@ const {
   assertHomePage,
   fillUserDetails,
   assertPaymentMethods,
-  verifyLowDowntime,
+  verifyMethodWarned,
   selectPaymentMethod,
   submit,
   selectUPIMethod,
@@ -48,7 +48,7 @@ describe('Basic upi payment', () => {
     await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await verifyLowDowntime(context, 'UPI', 'upi');
+    await verifyMethodWarned(context, 'UPI', 'upi');
     await selectUPIMethod(context, 'BHIM');
     await enterUPIAccount(context, 'BHIM');
     await submit(context);

@@ -4,7 +4,7 @@ const {
   assertHomePage,
   fillUserDetails,
   assertPaymentMethods,
-  verifyLowDowntime,
+  verifyMethodWarned,
   selectPaymentMethod,
   submit,
   selectUPIMethod,
@@ -49,6 +49,6 @@ describe('GooglePay Downtimepayment', () => {
     await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await verifyLowDowntime(context, 'UPI', 'upi');
+    await verifyMethodWarned(context, 'UPI', 'upi');
   });
 });

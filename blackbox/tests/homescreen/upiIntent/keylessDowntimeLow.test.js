@@ -5,7 +5,7 @@ const {
   submit,
   respondAndVerifyIntentRequest,
   selectUPIApp,
-  verifyLowDowntime,
+  verifyMethodWarned,
 } = require('../../../actions/common');
 
 const {
@@ -60,7 +60,7 @@ describe('Basic upi payment', () => {
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await verifyLowDowntime(context, 'UPI', 'upi');
+    await verifyMethodWarned(context, 'UPI', 'upi');
     await selectUPIApp(context, '1');
     await submit(context);
     await respondAndVerifyIntentRequest(context);

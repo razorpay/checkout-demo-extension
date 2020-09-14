@@ -1,6 +1,6 @@
 const { delay } = require('../util');
 
-async function verifyHighDowntime(context, message) {
+async function verifyMethodDisabled(context, message) {
   const toolTip = await context.page.waitForSelector('.downtime .tooltip');
   const toolTipText = await context.page.evaluate(
     toolTip => toolTip.textContent,
@@ -9,7 +9,7 @@ async function verifyHighDowntime(context, message) {
   expect(toolTipText).toContain(message);
 }
 
-async function verifyLowDowntime(context, message, method) {
+async function verifyMethodWarned(context, message, method) {
   let selector = '.downtime-callout';
 
   if (method) {
@@ -78,7 +78,7 @@ async function verifyTimeout(context, paymentMode) {
 }
 
 module.exports = {
-  verifyHighDowntime,
-  verifyLowDowntime,
+  verifyMethodDisabled,
+  verifyMethodWarned,
   verifyTimeout,
 };

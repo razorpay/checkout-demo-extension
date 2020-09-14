@@ -8,7 +8,6 @@ const {
   assertUserDetails,
   assertPaymentMethods,
   assertEditUserDetailsAndBack,
-  verifyHighDowntime,
   verifyPersonalizationText,
 } = require('../actions');
 
@@ -62,10 +61,5 @@ describe.each(
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await verifyPersonalizationText(context, 'upi');
-    await verifyHighDowntime(
-      context,
-      'upi',
-      'UPI is facing temporary issues right now.'
-    );
   });
 });

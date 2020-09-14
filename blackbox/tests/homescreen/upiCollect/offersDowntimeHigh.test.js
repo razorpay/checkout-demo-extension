@@ -17,7 +17,6 @@ const {
   assertUserDetails,
   assertPaymentMethods,
   assertEditUserDetailsAndBack,
-  verifyHighDowntime,
 } = require('../actions');
 
 describe.each(
@@ -95,10 +94,5 @@ describe.each(
     await verifyDiscountPaybleAmount(context, '₹ 1,990');
     await verifyDiscountAmountInBanner(context, '₹ 1,990');
     await verifyDiscountText(context, 'You save ₹10');
-    await verifyHighDowntime(
-      context,
-      'upi',
-      'UPI is facing temporary issues right now.'
-    );
   });
 });

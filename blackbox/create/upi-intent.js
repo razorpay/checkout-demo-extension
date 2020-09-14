@@ -46,8 +46,7 @@ const {
   verifyPersonalizationText,
 
   //Downtime
-  verifyHighDowntime,
-  verifyLowDowntime,
+  verifyMethodWarned,
 } = require('../tests/homescreen/actions');
 
 module.exports = function(testFeatures) {
@@ -125,17 +124,8 @@ module.exports = function(testFeatures) {
       } else {
         await selectPaymentMethod(context, 'upi');
 
-        if (downtimeHigh && !offers) {
-          await verifyHighDowntime(
-            context,
-            'upi',
-            'UPI is facing temporary issues right now.'
-          );
-          return;
-        }
-
-        if (downtimeLow) {
-          await verifyLowDowntime(context, 'UPI', 'upi');
+        if (downtimeHigh || downtimeLow) {
+          await verifyMethodWarned(context, 'UPI', 'upi');
           await selectUPIApp(context, '1');
         } else {
           await selectUPIApp(context, '1');
@@ -149,15 +139,6 @@ module.exports = function(testFeatures) {
         await verifyDiscountPaybleAmount(context, '₹ 1,990');
         await verifyDiscountAmountInBanner(context, '₹ 1,990');
         await verifyDiscountText(context, 'You save ₹10');
-      }
-
-      if (downtimeHigh && offers) {
-        await verifyHighDowntime(
-          context,
-          'upi',
-          'UPI is facing temporary issues right now.'
-        );
-        return;
       }
 
       if (partialPayment) {

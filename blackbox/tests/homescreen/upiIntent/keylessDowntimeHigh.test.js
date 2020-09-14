@@ -8,7 +8,8 @@ const {
   assertUserDetails,
   assertPaymentMethods,
   assertEditUserDetailsAndBack,
-  verifyHighDowntime,
+  verifyMethodDisabled,
+  verifyMethodWarned,
 } = require('../actions');
 
 describe('Basic upi payment', () => {
@@ -52,10 +53,5 @@ describe('Basic upi payment', () => {
     await assertUserDetails(context);
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
-    await verifyHighDowntime(
-      context,
-      'upi',
-      'UPI is facing temporary issues right now.'
-    );
   });
 });

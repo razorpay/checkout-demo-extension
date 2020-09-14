@@ -4,7 +4,6 @@ const {
   assertHomePage,
   fillUserDetails,
   assertPaymentMethods,
-  verifyHighDowntime,
 } = require('../../actions/common');
 
 describe('QR Code Downtimepayment', () => {
@@ -40,9 +39,5 @@ describe('QR Code Downtimepayment', () => {
     await assertHomePage(context, true, true);
     await fillUserDetails(context);
     await assertPaymentMethods(context);
-    await verifyHighDowntime(
-      context,
-      'UPI is facing temporary issues right now. Please select another method.'
-    );
   });
 });
