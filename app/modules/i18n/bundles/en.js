@@ -522,6 +522,8 @@ export default {
       'Full amount of {amount} will be deducted from your account. EMI processing may take upto 8 working days.',
     citi_know_more:
       'In case the total amount due has not been paid in full, finance charges as applicable (currently, between 3.50%- 3.60% per month i.e. 42-43.2% annualized) on card balances may apply until the EMI is converted & posted to the card. Latest rates are available at ',
+    show_more: 'Show More',
+    show_less: 'Show Less',
     citi_url:
       'https://www.online.citibank.co.in/portal/newgen/cards/tab/creditcards_tc.htm',
     hdfc_debit_description_convenience:
