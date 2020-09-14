@@ -302,7 +302,6 @@ function overlayVisible() {
 
 // this === Session
 function errorHandler(response) {
-  debugger;
   if (isString(response)) {
     try {
       response = JSON.parse(response);
@@ -421,7 +420,6 @@ function errorHandler(response) {
 
 /* bound with session */
 function cancelHandler(response) {
-  debugger;
   if (!this.payload) {
     return;
   }
@@ -615,10 +613,6 @@ function cancel_upi(session) {
   session.r.on('payment.error', function() {
     $('#error-message').removeClass('cancel_upi');
   });
-}
-
-function cancel_nb(session) {
-  $('#error-message').addClass('cancel_netbanking');
 }
 
 function Session(message) {
@@ -2109,21 +2103,6 @@ Session.prototype = {
         $('#error-message').removeClass('cancel_upi');
       });
     }
-    // if (MethodStore.isMethodEnabled('netbanking')) {
-    //   this.click('#cancel_netbanking .btn', function() {
-    //     debugger;
-    //     var netbanking_radio = $('#cancel_netbanking input:checked');
-    //     if (!netbanking_radio[0]) {
-    //       return;
-    //     }
-    //     metaParam[netbanking_radio.prop('name')] = netbanking_radio.val();
-    //     // this.clearRequest(metaParam);
-    //     $('#error-message').removeClass('cancel_netbanking');
-    //   });
-    //   this.click('#cancel_netbanking .back-btn', function() {
-    //     $('#error-message').removeClass('cancel_netbanking');
-    //   });
-    // }
 
     if (MethodStore.isMethodEnabled('emi')) {
       this.on('click', '#form-card', 'saved-card-pay-without-emi', function(e) {
