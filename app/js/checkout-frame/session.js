@@ -3523,11 +3523,14 @@ Session.prototype = {
       target: _Doc.querySelector('#cancel_netbanking'),
       props: {
         onBack: () => {
-          console.log('back');
+          $('#error-message').removeClass('cancel_netbanking');
+          hideOverlay($('#error-message'));
+          var metaParam = {};
+          metaParam['_[reason]'] = 'other';
+          this.r.emit('payment.cancel', metaParam);
         },
         onSubmit: () => {
           var netbanking_radio = $('#cancel_netbanking input:checked');
-          debugger;
           if (!netbanking_radio[0]) {
             return;
           }
