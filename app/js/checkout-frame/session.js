@@ -1755,6 +1755,10 @@ Session.prototype = {
         return this.clearRequest();
       }
 
+      if (this.payload.method === 'netbanking') {
+        return beforeReturn();
+      }
+
       self.confirmClose().then(function(close) {
         if (close) {
           self.clearRequest();
