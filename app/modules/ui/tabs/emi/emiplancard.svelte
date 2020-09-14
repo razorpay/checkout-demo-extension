@@ -103,10 +103,10 @@
     session.showNoCostExplainer(plan);
   }
 
-  let showMore = false;
+  let citiBankDetailsExpandedView = false;
 
-  function showDetails() {
-    showMore = !showMore;
+  function toggleCitiBankCardDetails() {
+    citiBankDetailsExpandedView = !citiBankDetailsExpandedView;
   }
 </script>
 
@@ -178,10 +178,10 @@
           <!-- LABEL: Full amount of {formattedAmount} will be deducted from your account.
           EMI processing may take upto 8 working days. -->
           {formatTemplateWithLocale(CITI_BANK_EMI, { amount: formattedAmount }, $locale)}
-          <div id="show-more" class="citi-link" on:click={showDetails}>
-            {#if showMore}Show Less{:else}Show More{/if}
+          <div class="citi-link" on:click={toggleCitiBankCardDetails}>
+            {#if citiBankDetailsExpandedView}Show Less{:else}Show More{/if}
           </div>
-          {#if showMore}
+          {#if citiBankDetailsExpandedView}
             {$t(CITI_KNOW_MORE)}
             <a
               class="citi-url"
