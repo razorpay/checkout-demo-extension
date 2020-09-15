@@ -3498,6 +3498,8 @@ Session.prototype = {
   },
 
   setNbCancelReasonPicker: function() {
+    var session = this;
+
     this.nbCancelReasonPicker = new discreet.CancelReasonPicker({
       target: _Doc.querySelector('#cancel_netbanking'),
       props: {
@@ -3506,7 +3508,7 @@ Session.prototype = {
           hideOverlay($('#error-message'));
           var metaParam = {};
           metaParam['_[reason]'] = 'other';
-          this.r.emit('payment.cancel', metaParam);
+          session.r.emit('payment.cancel', metaParam);
         },
         onSubmit: function() {
           var netbanking_radio = $('#cancel_netbanking input:checked');
@@ -3517,7 +3519,7 @@ Session.prototype = {
           hideOverlay($('#error-message'));
           var metaParam = {};
           metaParam[netbanking_radio.prop('name')] = netbanking_radio.val();
-          this.r.emit('payment.cancel', metaParam);
+          session.r.emit('payment.cancel', metaParam);
         },
         method: 'netbanking',
         title: 'Please share a reason for cancelling this payment',

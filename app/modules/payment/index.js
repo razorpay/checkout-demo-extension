@@ -671,7 +671,8 @@ Payment.prototype = {
     if (popup) {
       popup.onClose = () => {
         if (this.data.method === 'netbanking') {
-          $('#error-message').addClass('cancel_netbanking');
+          const modal = _Doc.querySelector('#error-message');
+          _El.addClass(modal, 'cancel_netbanking');
           return;
         }
         this.r.emitter('payment.cancel')();
