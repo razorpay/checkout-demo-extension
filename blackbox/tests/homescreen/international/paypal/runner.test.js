@@ -5,7 +5,7 @@ testRunner
   .setTestFeatures([
     'callbackUrl',
     'feeBearer',
-    // 'optionalContact', // Creates payments on actual API, enable when language_code is supported in prod.
+    'optionalContact',
     // 'optionalEmail', // Need to add an optional email merchant on func env for this to work
   ])
   .setExemptedTestCombinations([
