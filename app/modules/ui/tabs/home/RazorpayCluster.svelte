@@ -44,7 +44,7 @@
         locale
       );
     } else {
-      name = generateTextFromList(names, $locale, 3);
+      name = generateTextFromList(names, locale, 3);
     }
 
     return name;
