@@ -4,7 +4,7 @@ import { getView, setView, destroyView } from './';
 import { get } from 'svelte/store';
 
 import Razorpay from 'common/Razorpay';
-import { getBankFromCard } from 'common/bank';
+import { getBankFromCardCache } from 'common/bank';
 import { getCardType } from 'common/card';
 
 import {
@@ -129,7 +129,7 @@ export function getIssuerForEmiFromPayload(payload) {
     }
   } else {
     issuer = _Obj.getSafely(
-      getBankFromCard(payload['card[number]']),
+      getBankFromCardCache(payload['card[number]']),
       'code',
       ''
     );

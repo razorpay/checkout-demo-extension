@@ -10,6 +10,7 @@
   import AddCardView from 'ui/tabs/card/AddCardView.svelte';
   import EmiActions from 'ui/components/EmiActions.svelte';
   import SavedCards from 'ui/tabs/card/savedcards.svelte';
+  import AppInstruments from 'ui/tabs/card/AppInstruments.svelte';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import Icon from 'ui/elements/Icon.svelte';
@@ -35,6 +36,7 @@
     isRecurring,
     shouldRememberCustomer,
     isDCCEnabled,
+    getCardFeatures,
   } from 'checkoutstore';
   import {
     isMethodEnabled,
@@ -68,7 +70,7 @@
   import { getSavedCards, transform } from 'common/token';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import { getCardType } from 'common/card';
+  import { getIin, getCardType, getNetworkFromCardNumber } from 'common/card';
   import { getSubtextForInstrument } from 'subtext';
   import { getProvider as getAppProvider } from 'common/apps';
   import { getAnimationOptions } from 'svelte-utils';
@@ -420,31 +422,59 @@
   }
 
   function onCardInput() {
-    const cardNumber = $cardNumber;
-    const cardType = getCardType(cardNumber);
-    const isMaestro = /^maestro/.test(cardType);
-    const sixDigits = cardNumber.length > 5;
-    const trimmedVal = cardNumber.replace(/[ ]/g, '');
+    const _cardNumber = $cardNumber;
+    const cardType = getCardType(_cardNumber);
+    const iin = getIin(_cardNumber);
+    const sixDigits = _cardNumber.length > 5;
+    const trimmedVal = _cardNumber.replace(/[ ]/g, '');
 
-    var emiObj;
+    if (sixDigits) {
+      getCardFeatures(_cardNumber).then(features => {
+        if (iin !== getIin($cardNumber)) {
+          // $cardNumber's IIN has changed since we started the n/w request, do nothing
+          return;
+        }
 
-    if (sixDigits && !isMaestro) {
-      const emiBanks = _Obj.entries(getEMIBanks());
-      emiObj = _Arr.find(emiBanks, ([bank, emiObjInner]) =>
-        emiObjInner.patt.test(cardNumber.replace(/ /g, ''))
-      );
-    }
+        let emiObj;
 
-    session.emiPlansForNewCard = emiObj && emiObj[1];
+        const hasEmi = (features.flows || {}).emi;
 
-    if (!emiObj) {
+        if (hasEmi) {
+          let issuer = features.issuer;
+
+          // Handle AMEX
+          if (getNetworkFromCardNumber($cardNumber) === 'amex') {
+            issuer = 'AMEX';
+          }
+
+          // Handle debit cards
+          const type = features.type;
+
+          if (type === 'debit') {
+            issuer += '_DC';
+          }
+
+          emiObj = (getEMIBanks() || {})[issuer];
+        }
+
+        session.emiPlansForNewCard = emiObj;
+
+        // No EMI plans available. Unset duration.
+        if (!emiObj) {
+          $newCardEmiDuration = '';
+        }
+
+        showAppropriateEmiDetailsForNewCard(
+          session.tab,
+          emiObj,
+          trimmedVal.length
+        );
+      });
+    } else {
+      // Need six digits for EMI. Unset things.
+      session.emiPlansForNewCard = undefined;
       $newCardEmiDuration = '';
-    }
-
-    showAppropriateEmiDetailsForNewCard(session.tab, emiObj, trimmedVal.length);
-
-    if (isMaestro && sixDigits) {
-      showEmiCta = false;
+      showAppropriateEmiDetailsForNewCard(session.tab, null, trimmedVal.length);
     }
   }
 
@@ -588,27 +618,10 @@
             <!-- LABEL: Cards Saved on Apps -->
             <h3 class="pad">{$t(CARDS_SAVED_ON_APPS_LABEL)}</h3>
             <div id="cards-saved-on-apps" role="list" class="border-list pad">
-              {#each apps as app}
-                <SlottedRadioOption
-                  ellipsis
-                  name={app.name}
-                  selected={$selectedApp === app.code}
-                  className="instrument"
-                  value={app.code}
-                  on:click={_ => setSelectedApp(app.code)}>
-                  <i slot="icon">
-                    <Icon icon={app.logo} alt="" />
-                  </i>
-                  <div slot="title">
-                    {getAppProviderName(app.code, $locale)}
-                  </div>
-                  <div slot="subtitle">
-                    {#if getAppProviderSubtext(app.code, $locale)}
-                      {getAppProviderSubtext(app.code, $locale)}
-                    {/if}
-                  </div>
-                </SlottedRadioOption>
-              {/each}
+              <AppInstruments
+                {apps}
+                selectedApp={$selectedApp}
+                on:select={e => setSelectedApp(e.detail)} />
             </div>
             <!-- LABEL: Or, Enter card details -->
             <h3 class="pad">{$t(ENTER_CARD_DETAILS_OPTION_LABEL)}</h3>
@@ -639,27 +652,10 @@
             <!-- LABEL: Cards Saved on Apps -->
             <h3 class="pad">{$t(CARDS_SAVED_ON_APPS_LABEL)}</h3>
             <div id="cards-saved-on-apps" role="list" class="border-list pad">
-              {#each apps as app}
-                <SlottedRadioOption
-                  ellipsis
-                  name="application"
-                  selected={$selectedApp === app.code}
-                  className="instrument"
-                  value={app.code}
-                  on:click={_ => setSelectedApp(app.code)}>
-                  <i slot="icon">
-                    <Icon icon={app.logo} alt="" />
-                  </i>
-                  <div slot="title">
-                    {getAppProviderName(app.code, $locale)}
-                  </div>
-                  <div slot="subtitle">
-                    {#if getAppProviderSubtext(app.code, $locale)}
-                      {getAppProviderSubtext(app.code, $locale)}
-                    {/if}
-                  </div>
-                </SlottedRadioOption>
-              {/each}
+              <AppInstruments
+                {apps}
+                selectedApp={$selectedApp}
+                on:select={e => setSelectedApp(e.detail)} />
             </div>
             <!-- LABEL: Cards Saved on Apps -->
             <h3 class="pad">{$t(CARDS_SAVED_ON_RZP_LABEL)}</h3>

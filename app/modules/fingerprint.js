@@ -1,8 +1,19 @@
+import BrowserStorage from 'browserstorage';
+
+const DEVICE_ID_STORAGE_KEY = 'rzp_device_id';
+const DEVICE_ALGO_VERSION = 1; // Increment this when making changes in fingerprint components.
+
 let fingerPrint = '';
+let deviceId = '';
+
 const screen = global.screen;
 
-function getFingerprint() {
-  var components = [
+/**
+ * Generates fingerprint
+ * @returns {PromiseLike<string>}
+ */
+export function generateFingerprint() {
+  const components = [
     // User agent:
     navigator.userAgent,
 
@@ -33,9 +44,12 @@ function getFingerprint() {
     screen.width * screen.height,
 
     global.devicePixelRatio,
+
+    // If you're adding or removing any component,
+    // make sure to increment DEVICE_ALGO_VERSION.
   ];
 
-  sha(components.join());
+  return sha(components.join());
 }
 
 function sha(str) {
@@ -66,8 +80,57 @@ function hex(buffer) {
   return hexCodes.join('');
 }
 
+/**
+ * Generates device ID
+ * Format: <version>.<hash>.<timestamp>.<random-number>
+ * Details: https://docs.google.com/document/d/1IK-EQrhdAdPX3CMu38Z12bOAOu2dPu25NmCS6r88uWo/edit#heading=h.i3rn67z2j8su
+ *
+ * @param version
+ * @param fingerprint
+ * @returns {string}
+ */
+export function generateDeviceId(fingerprint) {
+  if (!fingerprint) {
+    // If we failed to generate a fingerprint,
+    // don't save dummy device id in local storage.
+    return;
+  }
+
+  try {
+    deviceId = BrowserStorage.getItem(DEVICE_ID_STORAGE_KEY);
+  } catch (err) {}
+
+  if (!deviceId) {
+    deviceId = [
+      DEVICE_ALGO_VERSION,
+      fingerprint,
+      Date.now(),
+      Math.random()
+        .toString()
+        .slice(-8),
+    ].join('.');
+
+    try {
+      BrowserStorage.setItem(DEVICE_ID_STORAGE_KEY, deviceId);
+    } catch (err) {}
+  }
+}
+
 try {
-  fingerPrint = getFingerprint();
+  generateFingerprint()
+    .then(fp => {
+      if (fp) {
+        fingerPrint = fp;
+        generateDeviceId(fp);
+      }
+    })
+    .catch(Boolean);
 } catch (e) {}
 
-export default () => fingerPrint;
+export function getFingerprint() {
+  return fingerPrint;
+}
+
+export function getDeviceId() {
+  return deviceId;
+}

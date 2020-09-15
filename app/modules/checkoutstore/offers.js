@@ -1,6 +1,7 @@
-import { getBankFromCard } from 'common/bank';
+import { getBankFromCardCache } from 'common/bank';
+import { getCardFeatures } from 'common/card';
 import { getOrderId, getAmount, makeAuthUrl } from 'checkoutstore';
-import { writable, derived } from 'svelte/store';
+import { writable, derived, get } from 'svelte/store';
 import { cardIin, cardTab } from 'checkoutstore/screens/card';
 import Analytics from 'analytics';
 import { BEHAV } from 'analytics-types';
@@ -32,16 +33,23 @@ export const isCardValidForOffer = derived(
       return;
     }
     if ($appliedOffer.emi_subvention) {
-      const bank = getBankFromCard($cardIin);
-      if (!bank) {
-        set(false);
-      } else {
-        const issuer =
-          $appliedOffer[bank.code === 'AMEX' ? 'payment_network' : 'issuer'];
-        if (!bank || issuer !== bank.code) {
-          set(false);
+      getCardFeatures($cardIin).then(() => {
+        // IIN changed, abort
+        if (get(cardIin) !== $cardIin) {
+          return;
         }
-      }
+
+        const bank = getBankFromCardCache($cardIin);
+        if (!bank) {
+          set(false);
+        } else {
+          const issuer =
+            $appliedOffer[bank.code === 'AMEX' ? 'payment_network' : 'issuer'];
+          if (!bank || issuer !== bank.code) {
+            set(false);
+          }
+        }
+      });
       return;
     }
 

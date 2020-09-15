@@ -115,6 +115,13 @@ function fillData(container, returnObj) {
   });
 }
 
+// TODO: Move to CFU
+function escapeHtml(str) {
+  var escapeDiv = document.createElement('div');
+  escapeDiv.appendChild(document.createTextNode(str));
+  return escapeDiv.innerHTML;
+}
+
 /**
  * Improvise the contact from prefill
  * @param {Session} session
@@ -435,6 +442,10 @@ function cancelHandler(response) {
 
 function getPhone() {
   return storeGetter(HomeScreenStore.contact);
+}
+
+function getProxyPhone() {
+  return storeGetter(HomeScreenStore.proxyContact);
 }
 
 function getEmail() {
@@ -2590,12 +2601,12 @@ Session.prototype = {
    * @returns {boolean} valid
    */
   checkCommonValid: function() {
-    // Only check if we're on the homescreen
-    if (!this.homeTab.onDetailsScreen()) {
-      return true;
-    }
-
     var selector = '#form-common';
+
+    if (this.homeTab.onMethodsScreen()) {
+      // Validate any additional input (like contact)
+      selector = '.instrument.selected';
+    }
 
     var valid = !this.checkInvalid(selector);
 
@@ -3429,7 +3440,10 @@ Session.prototype = {
       return this.commenceOTP(text, undefined, {}, actionState, loadingState);
     }
 
-    $('#fd-t').html(text);
+    // Break sentences into new lines
+    var formattedText = escapeHtml(text).replace(/\.\s/g, '.<br/>');
+
+    $('#fd-t').rawHtml(formattedText);
     showOverlay($('#error-message').toggleClass('loading', loadingState));
   },
 
@@ -3882,6 +3896,10 @@ Session.prototype = {
     } else if (screen) {
       if (screen === 'card') {
         if (data.provider) {
+          // Validate any additional input (like contact).
+          if (this.checkInvalid('.selected.instrument')) {
+            return;
+          }
           // Set method as "app"
           // By default the method is set to whatever screen you're on. -_-
           data.method = 'app';
@@ -4185,6 +4203,12 @@ Session.prototype = {
             // TODO: Check if it's possible to move this to instruments-config
             if (selectedInstrument._ungrouped[0].provider === 'cred') {
               _Obj.extend(this.payload, MethodStore.getPayloadForCRED());
+
+              if (Store.isContactOptional()) {
+                // For contact optional case, we ask for contact separately
+                // which is present in proxyPhone.
+                this.payload.contact = getProxyPhone();
+              }
             }
           }
         }
@@ -4451,6 +4475,9 @@ Session.prototype = {
       if (isHDFCDebitEMI && emiContact) {
         data.contact = emiContact;
       }
+      if (isHDFCDebitEMI) {
+        data['_[mode]'] = 'hdfc_debit_emi';
+      }
     }
 
     if (data.method === 'app' || data.application) {
@@ -4461,6 +4488,12 @@ Session.prototype = {
           provider: provider,
         },
       });
+
+      if (provider === 'cred' && Store.isContactOptional()) {
+        // For contact optional case, we ask for contact separately
+        // which is present in proxyPhone.
+        this.payload.contact = getProxyPhone();
+      }
     } else if (data.method === 'card' || data.method === 'emi') {
       this.nativeotp = !!this.shouldUseNativeOTP();
 
@@ -4911,10 +4944,15 @@ Session.prototype = {
     }
 
     if (forcedOffer) {
+      // Set $appliedOffer for Offer Validations to take place
+      discreet.OffersStore.appliedOffer.set(forcedOffer);
+
       if (forcedOffer.payment_method === 'wallet') {
         this.walletOffer = forcedOffer;
       }
+
       Analytics.setMeta('forcedOffer', true);
+
       this.handleDiscount();
     } else {
       var appliedOffer;

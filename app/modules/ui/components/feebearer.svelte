@@ -48,7 +48,9 @@
     dispatch('error', response.error.description);
   }
   export function fetchFees(paymentData) {
-    paymentData.amount = session.get('amount');
+    paymentData.amount = session.getAppliedOffer()
+      ? session.getAppliedOffer().amount
+      : session.get('amount');
     paymentData.currency = session.get('currency');
     loading = true;
     session.r

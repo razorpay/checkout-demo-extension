@@ -210,3 +210,24 @@ export function compareSemver(a, b) {
   }
   return 0;
 }
+
+export function luhnCheck(num) {
+  let sum = 0;
+  let digits = String(num)
+    .split('')
+    .reverse();
+
+  for (var i = 0; i < digits.length; i++) {
+    let digit = digits[i];
+    digit = parseInt(digit, 10);
+    if (i % 2) {
+      digit *= 2;
+    }
+    if (digit > 9) {
+      digit -= 9;
+    }
+    sum += digit;
+  }
+
+  return sum % 10 === 0;
+}

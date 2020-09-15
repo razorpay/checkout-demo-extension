@@ -5,4 +5,5 @@ createAppsTest({
   flow: 'intent',
   platform: 'android',
   testName: 'CRED - Intent Flow - Android',
+  personalization: true,
 });

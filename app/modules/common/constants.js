@@ -88,6 +88,7 @@ export const AVAILABLE_METHODS = [
   'paypal',
   'bank_transfer',
   'nach',
+  'app',
 ];
 
 /* VPA regex, copied from API */

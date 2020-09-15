@@ -60,6 +60,7 @@ import * as CustomerStore from 'checkoutstore/customer';
 import * as Theme from 'checkoutstore/theme';
 import { overlayStack as overlayStackStore } from 'checkoutstore/back';
 import * as NativeStore from 'checkoutstore/native';
+import * as OffersStore from 'checkoutstore/offers';
 
 import QRScreen from 'ui/tabs/qr/index.svelte';
 import * as upiTab from 'checkoutframe/components/upi';
@@ -146,6 +147,7 @@ export default {
   NetbankingScreenStore,
   EmiStore,
   NativeStore,
+  OffersStore,
   Cta,
 
   Customer,

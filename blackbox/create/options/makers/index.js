@@ -15,7 +15,7 @@ const savedVPA = require('./saved-vpa');
 const upiCollect = require('./upi-collect');
 const upiOtm = require('./upi-otm');
 const payouts = require('./payouts.js');
-const apps = require('./apps.js');
+const app = require('./app.js');
 const internationalPaypal = require('./international/paypal.js');
 
 module.exports = {
@@ -36,6 +36,6 @@ module.exports = {
   'upi-collect': upiCollect,
   payouts: payouts,
   'upi-otm': upiOtm,
-  apps: apps,
+  app: app,
   'international-paypal': internationalPaypal,
 };
