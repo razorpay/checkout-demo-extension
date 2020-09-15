@@ -118,15 +118,14 @@ module.exports = function(testFeatures) {
         await verifyPersonalizationText(context, 'upi');
         await selectPersonalizationPaymentMethod(context, 1);
       } else {
-        if (!offers) {
-          await selectPaymentMethod(context, 'upi');
+        await selectPaymentMethod(context, 'upi');
 
-          if (downtimeHigh || downtimeLow) {
-            await verifyMethodWarned(context, 'UPI', 'upi');
-          }
-          await selectUPIMethod(context, 'token');
+        if (downtimeHigh || downtimeLow) {
+          await verifyMethodWarned(context, 'UPI', 'upi');
         }
+        await selectUPIMethod(context, 'token');
       }
+
       if (partialPayment) {
         await verifyPartialAmount(context, '₹ 100');
       }
@@ -139,6 +138,7 @@ module.exports = function(testFeatures) {
         await verifyDiscountAmountInBanner(context, '₹ 1,990');
         await verifyDiscountText(context, 'You save ₹10');
       }
+
       await submit(context);
 
       if (feeBearer) {
