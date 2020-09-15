@@ -122,7 +122,7 @@ const ALL_METHODS = {
 
   emandate() {
     return (
-      getMerchantOrder()?.method === 'emandate' &&
+      getOrderMethod() === 'emandate' &&
       !isInternational() &&
       !_Obj.isEmpty(getRecurringMethods()?.emandate)
     );

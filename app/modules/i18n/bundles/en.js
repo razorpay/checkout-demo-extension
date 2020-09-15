@@ -680,12 +680,12 @@ export default {
     },
     titles: {
       bank_transfer: 'Bank Transfer',
-      emandate: 'Emandate',
       card: 'Card',
       cardless_emi: 'Cardless EMI',
       cred: 'CRED',
       credit_card: 'Credit Card',
       debit_card: 'Debit Card',
+      emandate: 'Emandate',
       emi: 'EMI',
       generic: 'Pay using {name}',
       google_pay_cards: 'Google Pay Cards',
