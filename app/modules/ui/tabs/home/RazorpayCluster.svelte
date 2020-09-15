@@ -10,7 +10,7 @@
 
   // Util imports
   import { getTranslatedMethodPrefix } from 'checkoutframe/paymentmethods';
-  import { generateTextFromList } from 'lib/utils';
+  import { generateTextFromList } from 'i18n/text-utils';
 
   // i18n
   import { formatTemplateWithLocale } from 'i18n';

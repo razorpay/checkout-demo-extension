@@ -1,4 +1,4 @@
-import { generateTextFromList } from 'lib/utils';
+import { generateTextFromList } from 'i18n/text-utils';
 import { getBanks } from 'checkoutstore';
 import { getShortBankName } from 'i18n';
 

@@ -14,7 +14,7 @@ import {
 } from 'checkoutstore/methods';
 
 import { getRecurringMethods, isIRCTC, isRecurring } from 'checkoutstore';
-import { generateTextFromList } from 'lib/utils';
+import { generateTextFromList } from 'i18n/text-utils';
 
 import {
   getMethodPrefix,

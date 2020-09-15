@@ -1,4 +1,4 @@
-import { generateTextFromList } from 'lib/utils';
+import { generateTextFromList } from 'i18n/text-utils';
 import { getCommonBankName } from 'common/bank';
 
 import { formatTemplateWithLocale, formatMessageWithLocale } from 'i18n';
