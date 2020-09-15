@@ -1,0 +1,42 @@
+<html>
+  <head>
+    <title>Paused Payments Test</title>
+    <script
+      type="text/javascript"
+      src="http://checkout.razorpay.com/v1/razorpay.js"
+    ></script>
+  </head>
+
+  <body>
+    <button id="pay">Pay (paused)</button>
+    <button id="resume">Resume payment</button>
+
+    <script>
+      // Key, amount, name, description can be passed here to populate data for the popup HTML
+      const razorpay = new Razorpay({
+        key: 'rzp_test_1DP5mmOlF5G5ag',
+        amount: 100,
+      });
+
+      // Payment payload
+      const payload = {
+        email: 'void@razorpay.com',
+        contact: '+918888888888',
+        method: 'netbanking',
+        bank: 'HDFC',
+      };
+
+      document.querySelector('#pay').addEventListener('click', event => {
+        // Note the `null` as the first argument
+        razorpay.createPayment(null, {
+          paused: true,
+        });
+      });
+
+      document.querySelector('#resume').addEventListener('click', event => {
+        // Emit "payment.resume" with the payment payload
+        razorpay.emit('payment.resume', payload);
+      });
+    </script>
+  </body>
+</html>

@@ -123,6 +123,13 @@ function fillData(container, returnObj) {
   });
 }
 
+// TODO: Move to CFU
+function escapeHtml(str) {
+  var escapeDiv = document.createElement('div');
+  escapeDiv.appendChild(document.createTextNode(str));
+  return escapeDiv.innerHTML;
+}
+
 /**
  * Improvise the contact from prefill
  * @param {Session} session
@@ -399,15 +406,6 @@ function errorHandler(response) {
     }
   }
 
-  if (!Store.shouldShowDefaultError(payload, error)) {
-    // For this particular payload & error combination,
-    // we're going to display the error message with some other approach.
-    Store.setMethodErrorForPayload(payload, error);
-    // Don't show the usual overlay, hide it if it's open.
-    this.hideErrorMessage();
-    return;
-  }
-
   if (this.tab || message !== discreet.cancelMsg) {
     this.showLoadError(
       message || 'There was an error in handling your request',
@@ -449,6 +447,10 @@ function cancelHandler(response) {
 
 function getPhone() {
   return storeGetter(HomeScreenStore.contact);
+}
+
+function getProxyPhone() {
+  return storeGetter(HomeScreenStore.proxyContact);
 }
 
 function getEmail() {
@@ -2600,12 +2602,12 @@ Session.prototype = {
    * @returns {boolean} valid
    */
   checkCommonValid: function() {
-    // Only check if we're on the homescreen
-    if (!this.homeTab.onDetailsScreen()) {
-      return true;
-    }
-
     var selector = '#form-common';
+
+    if (this.homeTab.onMethodsScreen()) {
+      // Validate any additional input (like contact)
+      selector = '.instrument.selected';
+    }
 
     var valid = !this.checkInvalid(selector);
 
@@ -2839,7 +2841,7 @@ Session.prototype = {
      * When the user comes back to the card tab after selecting EMI plan,
      * do not commence OTP again.
      */
-    if (!customer.logged && !this.wants_skip && !this.screen) {
+    if (!customer.logged && !this.wants_skip && this.screen !== 'card') {
       self.commenceOTP('saved_cards_sending', 'saved_cards_access', {
         phone: getPhone(),
       });
@@ -3435,7 +3437,10 @@ Session.prototype = {
       return this.commenceOTP(text, undefined, {}, actionState, loadingState);
     }
 
-    $('#fd-t').html(text);
+    // Break sentences into new lines
+    var formattedText = escapeHtml(text).replace(/\.\s/g, '.<br/>');
+
+    $('#fd-t').rawHtml(formattedText);
     showOverlay($('#error-message').toggleClass('loading', loadingState));
   },
 
@@ -3888,6 +3893,10 @@ Session.prototype = {
     } else if (screen) {
       if (screen === 'card') {
         if (data.provider) {
+          // Validate any additional input (like contact).
+          if (this.checkInvalid('.selected.instrument')) {
+            return;
+          }
           // Set method as "app"
           // By default the method is set to whatever screen you're on. -_-
           data.method = 'app';
@@ -4187,6 +4196,12 @@ Session.prototype = {
             // TODO: Check if it's possible to move this to instruments-config
             if (selectedInstrument._ungrouped[0].provider === 'cred') {
               _Obj.extend(this.payload, MethodStore.getPayloadForCRED());
+
+              if (Store.isContactOptional()) {
+                // For contact optional case, we ask for contact separately
+                // which is present in proxyPhone.
+                this.payload.contact = getProxyPhone();
+              }
             }
           }
         }
@@ -4437,6 +4452,12 @@ Session.prototype = {
         CardScreenStore.currencyRequestId
       );
       data.dcc_currency = discreet.storeGetter(CardScreenStore.dccCurrency);
+
+      // These are undefined/empty if the user uses an Indian card
+      if (!data.currency_request_id) {
+        delete data.currency_request_id;
+        delete data.dcc_currency;
+      }
     }
 
     var emiCode, emiContact, isHDFCDebitEMI;
@@ -4446,6 +4467,9 @@ Session.prototype = {
       emiContact = discreet.storeGetter(HomeScreenStore.emiContact);
       if (isHDFCDebitEMI && emiContact) {
         data.contact = emiContact;
+      }
+      if (isHDFCDebitEMI) {
+        data['_[mode]'] = 'hdfc_debit_emi';
       }
     }
 
@@ -4457,6 +4481,12 @@ Session.prototype = {
           provider: provider,
         },
       });
+
+      if (provider === 'cred' && Store.isContactOptional()) {
+        // For contact optional case, we ask for contact separately
+        // which is present in proxyPhone.
+        this.payload.contact = getProxyPhone();
+      }
     } else if (data.method === 'card' || data.method === 'emi') {
       this.nativeotp = !!this.shouldUseNativeOTP();
 
@@ -4908,10 +4938,15 @@ Session.prototype = {
     }
 
     if (forcedOffer) {
+      // Set $appliedOffer for Offer Validations to take place
+      discreet.OffersStore.appliedOffer.set(forcedOffer);
+
       if (forcedOffer.payment_method === 'wallet') {
         this.walletOffer = forcedOffer;
       }
+
       Analytics.setMeta('forcedOffer', true);
+
       this.handleDiscount();
     } else {
       var appliedOffer;
@@ -5064,6 +5099,42 @@ Session.prototype = {
       this.getCustomer = function() {
         return customer;
       };
+    }
+
+    // Track prefill validity before setting customer
+    var prefilledContact = session_options['prefill.contact'];
+    var prefilledEmail = session_options['prefill.email'];
+
+    if (prefilledContact) {
+      var isContactValid = true;
+
+      if (prefilledContact.indexOf('+91') === 0) {
+        isContactValid = Constants.PHONE_REGEX_INDIA.test(
+          prefilledContact.replace('+91', '')
+        );
+      } else {
+        isContactValid = Constants.CONTACT_REGEX.test(prefilledContact);
+      }
+
+      if (!isContactValid) {
+        Analytics.track('prefill:contact:invalid', {
+          data: {
+            contact: prefilledContact,
+          },
+        });
+      }
+    }
+
+    if (prefilledEmail) {
+      var isEmailValid = Constants.EMAIL_REGEX.test(prefilledEmail);
+
+      if (!isEmailValid) {
+        Analytics.track('prefill:email:invalid', {
+          data: {
+            email: prefilledEmail,
+          },
+        });
+      }
     }
 
     /* Used previously logged in customer details and saved card tokens */

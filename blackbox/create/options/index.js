@@ -25,6 +25,7 @@ function makeTestOptions({
   timeout,
   callbackUrl,
   personalization,
+  recurringOrder,
 }) {
   const options = {
     key: 'rzp_test_1DP5mmOlF5G5ag',
@@ -36,9 +37,13 @@ function makeTestOptions({
     options.personalization = true;
   }
 
-  if (keyless || partialPayment) {
+  if (keyless || partialPayment || recurringOrder) {
     delete options.key;
     options.order_id = 'rzp_test_1DP5mmOlF5G5ag';
+  }
+
+  if (recurringOrder) {
+    options.recurring = 1;
   }
 
   if (timeout) {
@@ -60,12 +65,10 @@ function makeTestOptions({
  *
  * @returns {Object}
  */
-function makeTestPreferences({
-  partialPayment,
-  feeBearer,
-  optionalContact,
-  optionalEmail,
-}) {
+function makeTestPreferences(
+  { partialPayment, feeBearer, optionalContact, optionalEmail, recurringOrder },
+  { method }
+) {
   const preferences = {};
 
   if (feeBearer) {
@@ -92,6 +95,18 @@ function makeTestPreferences({
       currency: 'INR',
       first_payment_min_amount: null,
       partial_payment: true,
+    };
+  }
+
+  if (recurringOrder && method === 'card') {
+    preferences.order = {
+      amount: 100,
+      amount_due: 100,
+      amount_paid: 0,
+      auth_type: null,
+      currency: 'INR',
+      first_payment_min_amount: null,
+      partial_payment: false,
     };
   }
 
@@ -124,7 +139,9 @@ function makeOptionsAndPreferences(method, features = {}) {
   };
 
   let options = makeTestOptions(features);
-  let preferences = makeTestPreferences(features);
+  let preferences = makeTestPreferences(features, {
+    method,
+  });
 
   const maker = Makers[method];
 

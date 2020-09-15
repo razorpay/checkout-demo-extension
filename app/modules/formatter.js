@@ -1,6 +1,7 @@
 import * as Card from 'common/card';
 import Eventer from 'eventer';
 import EvtHandler from 'evthandler';
+import { luhnCheck } from 'lib/utils';
 
 const alphanumericRaw = function(value) {
   var returnVal = value.replace(/[^a-zA-Z0-9]/g, '');
@@ -85,7 +86,7 @@ Formatter.rules = {
       if (!value) {
         value = this.value;
       }
-      if (!Card.luhnCheck(value)) {
+      if (!luhnCheck(value)) {
         return;
       }
       if (this.type === 'maestro' && value.length === 16) {

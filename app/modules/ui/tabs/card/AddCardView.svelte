@@ -20,6 +20,7 @@
     remember,
     authType,
     cardType,
+    cardIin,
   } from 'checkoutstore/screens/card';
   import { methodInstrument } from 'checkoutstore/screens/home';
 
@@ -73,11 +74,13 @@
   let hideExpiryCvvFields = false;
   let cvvLength = 3;
   let showCardUnsupported = false;
+  let lastIin = '';
 
   let cardNumberHelpText;
-  $: cardNumberHelpText = showCardUnsupported
-    ? $t(CARD_NUMBER_HELP_UNSUPPORTED)
-    : undefined;
+  $: cardNumberHelpText =
+    showCardUnsupported && $cardNumber.length > 6
+      ? $t(CARD_NUMBER_HELP_UNSUPPORTED)
+      : undefined;
 
   export let faded = false;
 
@@ -99,6 +102,25 @@
 
   $: {
     cvvLength = getCvvDigits($cardType);
+  }
+
+  $: {
+    if ($cardNumber.length > 6 && lastIin !== getIin($cardNumber)) {
+      lastIin = getIin($cardNumber);
+      if (lastIin) {
+        getCardFeatures($cardNumber).then(data => {
+          const { emi } = data.flows;
+          if (!emi) {
+            Analytics.track('card:emi:invalid', {
+              type: AnalyticsTypes.BEHAV,
+              data: {
+                iin: $cardIin,
+              },
+            });
+          }
+        });
+      }
+    }
   }
 
   export let tab;
@@ -181,9 +203,26 @@
       value: cardNumberWithoutSpaces,
       type: $cardType,
     });
-
+    //Track AMEX Card input for merchants who don't have AMEX enabled.
     if (!isAMEXEnabled() && $cardType === 'amex') {
       isValid = false;
+      Analytics.track('card:amex:disabled', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          iin: getIin($cardNumber),
+        },
+      });
+    }
+
+    //Track Diners Card input for merchants who don't have Diners enabled.
+    if (!getCardNetworks().DICL && $cardType === 'diners') {
+      isValid = false;
+      Analytics.track('card:diners:disabled', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          iin: getIin($cardNumber),
+        },
+      });
     }
 
     return isValid;
@@ -195,8 +234,8 @@
    */
   function onCardNumberChange() {
     const value = $cardNumber;
-    const cardNumber = getCardDigits(value);
-    const iin = getIin(cardNumber);
+    const _cardNumber = getCardDigits(value);
+    const iin = getIin(_cardNumber);
 
     if (iin.length < 6) {
       setDebitPinRadiosVisibility(false);
@@ -206,8 +245,8 @@
     }
 
     const flowChecker = ({ flows = {} } = {}) => {
-      const cardNumber = getCardDigits(value);
-      const isIinSame = getIin(cardNumber) === iin;
+      const _cardNumber = getCardDigits(value);
+      const isIinSame = getIin(_cardNumber) === iin;
       let _validCardNumber = true;
 
       // If the card number was changed before response, do nothing
@@ -348,6 +387,8 @@
   }
 
   function trackCardNumberFilled() {
+    //Track valid & invalid card number entered by the customer.
+
     Analytics.track('card_number:filled', {
       type: AnalyticsTypes.BEHAV,
       data: {

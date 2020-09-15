@@ -82,6 +82,9 @@ export function getSequencedBlocks(params) {
     }
   }
 
+  // "app" method isn't shown on Checkout yet, so remove it
+  sequence = _Arr.remove(sequence, 'app');
+
   // Get all blocks
   const allBlocks = _Arr.merge(methodBlocks, blocks);
 

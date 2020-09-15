@@ -5,50 +5,6 @@ import { displayAmount } from 'common/currency';
 
 let razorpayInstance, preferences;
 export const razorpayInstanceStore = writable();
-// We're going to remember payment errors in this variable.
-export const methodErrors = writable({});
-
-/**
- * Returns an ID for a payment payload.
- * @param data Payment payload
- * @returns {string} id
- */
-export function getIdForPaymentPayload(data) {
-  if (data.method === 'app' && data.provider) {
-    return data.method + '_' + data.provider;
-  }
-}
-
-/**
- * Remember the error for a particular method.
- * @param data Payment payload
- * @param error Error payload from API
- */
-export function setMethodErrorForPayload(data, error) {
-  const id = getIdForPaymentPayload(data);
-  if (!id) {
-    return;
-  }
-  methodErrors.update(obj => ((obj[id] = error), obj));
-}
-
-/**
- * Returns whether or not we should show
- * the default overlay error UI for
- * a payment payload and error combination.
- * @param data
- * @param error
- * @returns {boolean}
- */
-export function shouldShowDefaultError(data, error) {
-  if (data?.method === 'app' && data.provider === 'cred') {
-    if (error?.source === 'customer') {
-      return false;
-    }
-  }
-
-  return true;
-}
 
 export function setRazorpayInstance(_razorpayInstance) {
   razorpayInstance = _razorpayInstance;

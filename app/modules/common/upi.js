@@ -43,7 +43,7 @@ const UPI_APPS = {
    */
   preferred: [
     {
-      app_name: 'Google Pay (Tez)',
+      app_name: 'Google Pay',
       package_name: GOOGLE_PAY_PACKAGE_NAME,
       app_icon: 'https://cdn.razorpay.com/checkout/gpay.png',
       handles: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],

@@ -8,6 +8,7 @@ async function openSdkCheckout({
   apps,
   experiments,
   params,
+  method,
 }) {
   let paymentResult = null;
   let resolver = null;
@@ -23,6 +24,7 @@ async function openSdkCheckout({
           experiments,
           upiApps,
           apps,
+          method,
           params: {
             'error.description': data.error.description,
           },
@@ -143,6 +145,7 @@ async function openSdkCheckout({
     apps,
     experiments,
     params,
+    method,
   });
 
   const returnObj = {

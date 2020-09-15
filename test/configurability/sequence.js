@@ -88,6 +88,7 @@ test('Module: configurability/sequence', t => {
           'paypal',
           'bank_transfer',
           'nach',
+          'app',
         ],
       };
 
@@ -199,6 +200,7 @@ test('Module: configurability/sequence', t => {
           'paypal',
           'bank_transfer',
           'nach',
+          'app',
         ],
       };
 
@@ -301,6 +303,7 @@ test('Module: configurability/sequence', t => {
           'paypal',
           'bank_transfer',
           'nach',
+          'app',
         ],
       };
 
