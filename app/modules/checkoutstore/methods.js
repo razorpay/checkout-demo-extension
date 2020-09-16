@@ -6,6 +6,7 @@ import {
   getMerchantMethods,
   getRecurringMethods,
   getMerchantOrder,
+  getOrderMethod,
   getOption,
   getAmount,
   isIRCTC,
@@ -121,9 +122,8 @@ const ALL_METHODS = {
 
   emandate() {
     return (
-      !isMethodEnabled('nach') &&
+      getOrderMethod() === 'emandate' &&
       !isInternational() &&
-      !getAmount() &&
       !_Obj.isEmpty(getRecurringMethods()?.emandate)
     );
   },
@@ -273,6 +273,12 @@ function isMethodEnabledForBrowser(method) {
 }
 
 export function isMethodEnabled(method) {
+  if (getOrderMethod()) {
+    if (getOrderMethod() !== method) {
+      return false;
+    }
+  }
+
   const checker = ALL_METHODS[method];
   if (checker) {
     return checker() && isMethodEnabledForBrowser(method);
@@ -318,6 +324,10 @@ export function getEnabledMethods() {
 }
 
 export function getSingleMethod() {
+  if (getOrderMethod()) {
+    return getOrderMethod();
+  }
+
   let oneMethod;
   const methods = getEnabledMethods();
 
