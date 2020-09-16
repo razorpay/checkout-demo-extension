@@ -675,7 +675,7 @@ Payment.prototype = {
           _El.addClass(modal, 'cancel_netbanking');
           return;
         }
-        this.r.emitter('payment.cancel')();
+        this.r.emit('payment.cancel');
       };
     }
     this.popup = popup;
