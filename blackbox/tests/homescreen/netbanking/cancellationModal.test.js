@@ -1,34 +1,16 @@
 const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
-const { delay, innerText } = require('../../../util');
 
 const {
   // Generic
-  verifyTimeout,
-  handleFeeBearer,
   submit,
-  handleValidationRequest,
   passRequestNetbanking,
-  handleMockSuccessDialog,
-  expectRedirectWithCallback,
 
   // Netbanking
   selectBank,
   assertNetbankingPage,
   popupClosedByUser,
   provideCancellationReason,
-
-  // Offers
-  verifyOfferApplied,
-  verifyDiscountPaybleAmount,
-  verifyDiscountAmountInBanner,
-  verifyDiscountText,
-  verifyLowDowntime,
-  viewOffers,
-  selectOffer,
-
-  // Partial Payment
-  verifyPartialAmount,
 } = require('../../../actions/common');
 
 const {
