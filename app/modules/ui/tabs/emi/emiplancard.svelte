@@ -85,7 +85,6 @@
       noCostEmi =
         plan.subvention === 'merchant' ||
         (provider === 'zestmoney' && plan.duration === 3);
-      console.log(noCostEmi);
       if (noCostEmi && plan.merchant_payback) {
         interestChargedByBank = session.formatAmountWithCurrency(
           amount / (1 - plan.merchant_payback / 100) - amount
