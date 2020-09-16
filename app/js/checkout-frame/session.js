@@ -2089,12 +2089,12 @@ Session.prototype = {
       MethodStore.isMethodEnabled('upi') ||
       MethodStore.isMethodEnabled('upi_otm')
     ) {
-      var metaParam = {};
       this.click('#cancel_upi .btn', function() {
         var upi_radio = $('#cancel_upi input:checked');
         if (!upi_radio[0]) {
           return;
         }
+        var metaParam = {};
         metaParam[upi_radio.prop('name')] = upi_radio.val();
         this.clearRequest(metaParam);
         $('#error-message').removeClass('cancel_upi');
