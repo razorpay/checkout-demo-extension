@@ -13,9 +13,7 @@ Promise.all(
           path.relative('.', module)
         );
       });
-      return bundle.write(config).then(() => {
-        return { entry: entryPath, map: data };
-      });
+      return { entry: entryPath, map: data };
     });
   })
 ).then(allEntries => {
