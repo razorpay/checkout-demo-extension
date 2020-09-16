@@ -76,7 +76,9 @@ const isHighScheduledWithoutInstrument = fAnd(
  * @param {Object} downtime
  * @return {boolean}
  */
-const always = () => true;
+const always = downtime => {
+  return downtime.instrument?.vpa_handle === 'ALL';
+};
 
 const DISABLE_METHOD = {};
 
