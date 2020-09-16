@@ -137,7 +137,7 @@
               return;
             }
 
-            if (!hideEmi() && !overlayVisible()) {
+            if (!hideEmi() && !Backdrop.isVisible()) {
               this.hide();
             }
           }

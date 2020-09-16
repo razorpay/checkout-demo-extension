@@ -707,6 +707,11 @@ export default {
     acs_load_delay: 'Seems like your bank page is taking time to load.',
     checking_payment_status: 'Checking the payment status...',
     complete_payment_on_app: 'Please complete the payment on the {app}',
+    confirm_cancel_heading: 'Cancel payment?',
+    confirm_cancel_message:
+      'Your payment is ongoing. Are you sure you want to cancel the payment?',
+    confirm_cancel_positive_text: 'Yes, cancel',
+    confirm_cancel_negative_text: 'No',
     frequently_used_config_title: 'Frequently used methods',
     loading: 'Loading',
     logout_action: 'Log out',

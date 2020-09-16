@@ -45,7 +45,9 @@ var preferences,
   NBHandlers = discreet.NBHandlers,
   Instruments = discreet.Instruments,
   I18n = discreet.I18n,
-  NativeStore = discreet.NativeStore;
+  NativeStore = discreet.NativeStore,
+  Confirm = discreet.Confirm,
+  Backdrop = discreet.Backdrop;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -222,44 +224,14 @@ function toggle(subject, showOrHide) {
 }
 
 function showOverlay($with) {
-  makeVisible('#overlay');
+  Backdrop.show();
   if ($with) {
     makeVisible($with[0]);
-  }
-  $('#overlay').toggleClass('sub', $('#body').hasClass('sub'));
-}
-
-function overlayInUse() {
-  return $$('.overlay.' + shownClass).length;
-}
-
-/**
- * Hides #overlay only if:
- * Some other element with .overlay is not visible
- */
-function hideOverlaySafely($with) {
-  if ($with) {
-    makeHidden($with[0]);
-  }
-  var overlay = $('#overlay');
-  if (overlay[0]) {
-    // Remove shown class to start transition.
-    overlay.removeClass(shownClass);
-    setTimeout(function() {
-      if (overlayInUse()) {
-        // Don't hide overlay
-        // Undo adding shown class
-        overlay.addClass(shownClass);
-      } else {
-        // Hide overlay
-        overlay.hide();
-      }
-    }, 200);
   }
 }
 
 function hideOverlay($with) {
-  makeHidden('#overlay');
+  Backdrop.hide();
   if ($with) {
     makeHidden($with[0]);
   }
@@ -301,10 +273,6 @@ function hideOverlayMessage() {
       hideOverlay($('#error-message'));
     }
   }
-}
-
-function overlayVisible() {
-  return $('#overlay').hasClass(shownClass);
 }
 
 // this === Session
@@ -1018,6 +986,7 @@ Session.prototype = {
     this.setEMI();
     Cta.init();
     this.setModal();
+    this.setBackdrop();
     this.completePendingPayment();
     this.bindEvents();
     this.setEmiScreen();
@@ -1585,6 +1554,22 @@ Session.prototype = {
     }
   },
 
+  setBackdrop: function() {
+    var session = this;
+    Backdrop.setup({
+      target: _Doc.querySelector('#modal-inner'),
+      props: {
+        onClick: function(e) {
+          if (Confirm.isVisible()) {
+            return;
+          }
+
+          session.hideErrorMessage(e);
+        },
+      },
+    });
+  },
+
   improviseModalOptions: function() {
     /**
      * We want to disable animations on IRCTC WebView.
@@ -2123,13 +2108,6 @@ Session.prototype = {
       });
     }
     this.click('#backdrop', this.hideErrorMessage);
-    this.click('#overlay', function(e) {
-      if ($('#confirmation-dialog').hasClass('animate')) {
-        return;
-      }
-
-      this.hideErrorMessage(e);
-    });
     this.click('#fd-hide', this.hideErrorMessage);
     this.click('#overlay-close', this.hideErrorMessage);
 
@@ -2468,10 +2446,6 @@ Session.prototype = {
   confirmClose: function() {
     return new Promise(function(resolve) {
       Confirm.show({
-        message: discreet.confirmCancelMsg,
-        heading: 'Cancel Payment?',
-        positiveBtnTxt: 'Yes, cancel',
-        negativeBtnTxt: 'No',
         onPositiveClick: function() {
           resolve(true);
         },
@@ -3388,15 +3362,8 @@ Session.prototype = {
     var self = this;
     if (this.isOpen) {
       if (confirmedCancel !== true && this.r._payment) {
-        return Confirm.show({
-          message: discreet.confirmCancelMsg,
-          heading: 'Cancel Payment?',
-          positiveBtnTxt: 'Yes, cancel',
-          negativeBtnTxt: 'No',
-          onPositiveClick: function() {
-            self.hide(true);
-          },
-        });
+        self.confirmClose();
+        return;
       }
 
       $('#modal-inner').removeClass('shake');
@@ -3558,7 +3525,7 @@ Session.prototype = {
         this.feeBearerView.$on('continue', function(event) {
           var bearer = event.detail;
 
-          hideOverlaySafely($('#fee-wrap'));
+          hideOverlay($('#fee-wrap'));
 
           // Set the updated amount & fee
           session.payload.amount = bearer.amount;
@@ -3581,6 +3548,16 @@ Session.prototype = {
     }
 
     return false;
+  },
+
+  closeModal: function() {
+    var session = this;
+
+    if (session.get('modal.confirm_close')) {
+      session.confirmClose();
+    } else {
+      session.hide();
+    }
   },
 
   onOtpSubmit: function() {
@@ -4064,7 +4041,7 @@ Session.prototype = {
       .verifyVpa(data.vpa)
       .then(function() {
         $('#overlay-close').show();
-        hideOverlaySafely($('#error-message'));
+        hideOverlay($('#error-message'));
         setTimeout(function() {
           self.submit({
             vpaVerified: true,
