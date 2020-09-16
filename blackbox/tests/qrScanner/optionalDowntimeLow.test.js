@@ -35,7 +35,7 @@ describe('Basic QRCode Optional Contact Downtime', () => {
             status: 'started',
             scheduled: false,
             severity: 'low',
-            instrument: [],
+            instrument: { vpa_handle: 'ALL' },
             created_at: 1567686387,
             updated_at: 1567686387,
           },
