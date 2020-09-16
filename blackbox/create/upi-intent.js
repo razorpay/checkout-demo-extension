@@ -114,7 +114,7 @@ module.exports = function(testFeatures) {
 
       await assertPaymentMethods(context);
 
-      if (downtimeHigh && offers) {
+      if (offers) {
         await viewOffers(context);
         await selectOffer(context, '1');
         await verifyOfferApplied(context);
@@ -123,22 +123,13 @@ module.exports = function(testFeatures) {
         await verifyDiscountText(context, 'You save ₹10');
       } else {
         await selectPaymentMethod(context, 'upi');
-
-        if (downtimeHigh || downtimeLow) {
-          await verifyMethodWarned(context, 'UPI', 'upi');
-          await selectUPIApp(context, '1');
-        } else {
-          await selectUPIApp(context, '1');
-        }
       }
 
-      if (offers && !downtimeHigh) {
-        await viewOffers(context);
-        await selectOffer(context, '1');
-        await verifyOfferApplied(context);
-        await verifyDiscountPaybleAmount(context, '₹ 1,990');
-        await verifyDiscountAmountInBanner(context, '₹ 1,990');
-        await verifyDiscountText(context, 'You save ₹10');
+      if (downtimeHigh || downtimeLow) {
+        await verifyMethodWarned(context, 'UPI', 'upi');
+        await selectUPIApp(context, '1');
+      } else {
+        await selectUPIApp(context, '1');
       }
 
       if (partialPayment) {

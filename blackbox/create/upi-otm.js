@@ -122,15 +122,13 @@ module.exports = function(testFeatures) {
         await verifyPersonalizationText(context, 'upi_otm');
         await selectPersonalizationPaymentMethod(context, 1);
       } else {
-        if (!offers) {
-          await selectPaymentMethod(context, 'upi_otm');
+        await selectPaymentMethod(context, 'upi_otm');
 
-          if (downtimeHigh || downtimeLow) {
-            await verifyMethodWarned(context, 'UPI', 'upi_otm');
-          }
-          await selectUPIMethod(context, 'new', 'upi_otm');
-          await enterUPIAccount(context, 'saranshgupta1995@okaxis', 'upi_otm');
+        if (downtimeHigh || downtimeLow) {
+          await verifyMethodWarned(context, 'UPI', 'upi_otm');
         }
+        await selectUPIMethod(context, 'new', 'upi_otm');
+        await enterUPIAccount(context, 'saranshgupta1995@okaxis', 'upi_otm');
       }
       if (partialPayment) {
         await verifyPartialAmount(context, '₹ 100');
