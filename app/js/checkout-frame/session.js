@@ -5,7 +5,7 @@ var ua = navigator.userAgent;
 var preferences,
   CheckoutBridge = window.CheckoutBridge,
   StorageBridge = window.StorageBridge,
-  Promise = window.Promise,
+  Promise = discreet.Promise,
   Bridge = discreet.Bridge,
   isIframe = window !== parent,
   ownerWindow = isIframe ? parent : opener,

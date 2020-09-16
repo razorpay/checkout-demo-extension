@@ -197,6 +197,7 @@ export default {
   _Obj,
   _Str,
   _,
+  Promise,
 
   NBHandlers,
 
