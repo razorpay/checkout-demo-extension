@@ -74,6 +74,8 @@ const Analytics = () => ({
 
     data.meta = calculatedMeta;
 
+    data.meta.request_index = REQUEST_INDEX[rInstance.id];
+
     // Add type to the name.
     if (type) {
       name = `${type}:${name}`;
