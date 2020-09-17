@@ -58,6 +58,21 @@ function card(instrument) {
 }
 
 /**
+ * Extracts config data related to saved card from the preferred instrument.
+ *
+ * @param {Object} instrument
+ * @return {Object}
+ */
+function emi(instrument) {
+  return {
+    method: 'emi',
+    types: [instrument.type],
+    issuers: [instrument.issuer],
+    networks: [instrument.network],
+  };
+}
+
+/**
  * Extracts config data related to wallet from the preferred instrument.
  *
  * @param {Object} instrument
@@ -89,5 +104,6 @@ export default {
   card,
   wallet,
   paypal,
+  emi,
   app,
 };

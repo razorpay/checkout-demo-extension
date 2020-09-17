@@ -25,6 +25,9 @@ const INSTRUMENT_PROPS = {
   app: 'provider',
 };
 
+// EMI is the same as Card
+INSTRUMENT_PROPS.emi = INSTRUMENT_PROPS.card;
+
 /**
  * Returns extracted details for p13n
  * from a payment payload.
@@ -62,7 +65,6 @@ function getExtractedDetails(payment, customer, extra = {}) {
    * Unset card object if payment not made via saved card
    */
   if (_Arr.contains(['card', 'emi'], payment.method)) {
-    details.method = 'card';
     if (payment.token) {
       if (customer) {
         let cards = (customer.tokens || {}).items || [];

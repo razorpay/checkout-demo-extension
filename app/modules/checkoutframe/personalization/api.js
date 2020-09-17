@@ -194,6 +194,9 @@ const API_INSTRUMENT_PAYMENT_ADDONS = {
   },
 };
 
+// EMI is the same as Card
+API_INSTRUMENT_PAYMENT_ADDONS.emi = API_INSTRUMENT_PAYMENT_ADDONS.card;
+
 /**
  * To consume the backend representation of the p13n instruments, we need to, currently, convert them into the existing, supported p13n instrument format which is consumed in configurability.
  * With this, the translation flow looks like Backend format -> localStorage format -> Configurability, which seems fine in the short run.
