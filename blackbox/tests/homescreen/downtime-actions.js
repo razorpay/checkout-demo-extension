@@ -1,4 +1,4 @@
-async function verifyHighDowntime(context, method, message) {
+async function verifyMethodDisabled(context, method, message) {
   if (context.preferences.offers && method !== 'upi') {
     const toolTip = await context.page.waitForSelector(
       '.callout.error.downtime-callout'
@@ -20,7 +20,7 @@ async function verifyHighDowntime(context, method, message) {
   }
 }
 
-async function verifyLowDowntime(context, message, method) {
+async function verifyMethodWarned(context, message, method) {
   let selector = '.downtime-callout';
 
   if (method) {
@@ -38,6 +38,6 @@ async function verifyLowDowntime(context, message, method) {
 }
 
 module.exports = {
-  verifyHighDowntime,
-  verifyLowDowntime,
+  verifyMethodDisabled,
+  verifyMethodWarned,
 };

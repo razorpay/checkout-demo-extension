@@ -5,7 +5,7 @@ const {
   submit,
   respondAndVerifyIntentRequest,
   selectUPIApp,
-  verifyLowDowntime,
+  verifyMethodWarned,
 } = require('../../../actions/common');
 
 const {
@@ -39,7 +39,7 @@ describe('Basic upi payment', () => {
             status: 'started',
             scheduled: false,
             severity: 'low',
-            instrument: [],
+            instrument: { vpa_handle: 'ALL' },
             created_at: 1567686387,
             updated_at: 1567686387,
           },
@@ -60,7 +60,7 @@ describe('Basic upi payment', () => {
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await verifyLowDowntime(context, 'UPI', 'upi');
+    await verifyMethodWarned(context, 'UPI', 'upi');
     await selectUPIApp(context, '1');
     await submit(context);
     await respondAndVerifyIntentRequest(context);
