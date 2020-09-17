@@ -536,7 +536,11 @@
 
   $: {
     const loggedIn = _Obj.getSafely($customer, 'logged');
-    _El.keepClass(_Doc.querySelector('#topbar #top-right'), 'logged', loggedIn);
+    const topbarRight = _Doc.querySelector('#topbar #top-right');
+
+    if (topbarRight) {
+      _El.keepClass(topbarRight, 'logged', loggedIn);
+    }
 
     const isPersonalizationEnabled = shouldUsePersonalization();
 
