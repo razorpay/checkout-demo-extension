@@ -873,7 +873,7 @@ export default {
     want_to_cancel: 'Do you want to cancel the ongoing payment?',
   },
   qr: {
-    downtime_text: '<strong>UPI QR<strong> is experiencing low success rates.',
+    downtime_text: '<strong>UPI QR<strong> is experiencing low success rate.',
     generating_label: 'Generating QR Code...',
     retry: 'Retry',
     scan_on_phone:
@@ -919,7 +919,7 @@ export default {
     collect_enter_upi_id: 'Enter your UPI ID',
     collect_new_vpa_help: 'Please enter a valid VPA of the form username@bank',
     collect_securely_save: 'Securely save your UPI ID',
-    downtime_text: '<strong>UPI<strong> is experiencing low success rates.',
+    downtime_text: '<strong>UPI<strong> is experiencing low success rate.',
     intent_block_heading: 'PAY USING APPS',
     new_vpa_subtitle: 'Google Pay, BHIM, PhonePe & more',
     new_vpa_subtitle_upi_otm: 'Supported only for BHIM and HDFC',
