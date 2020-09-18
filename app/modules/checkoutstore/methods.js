@@ -899,9 +899,15 @@ export function isMethodUsable(method) {
 
 /**
  * We need to disable vernacular for some methods because the APIs they use
- * are not ready yet.
+ * are not ready yet. We also disable it if the `checkout_disable_vernacular`
+ * flag is present for the merchant.
+ *
  * @returns {boolean}
  */
 export function shouldUseVernacular() {
-  return !isPayout() && !isMethodEnabled('nach');
+  return (
+    !hasFeature('checkout_disable_vernacular') &&
+    !isPayout() &&
+    !isMethodEnabled('nach')
+  );
 }
