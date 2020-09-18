@@ -2727,26 +2727,9 @@ Session.prototype = {
 
       // Enforce login flow for UPI Recurring subscriptions
       if (Store.isASubscription() && !customer.logged) {
-        this.otpView.updateScreen({
-          maxlength: 6,
-        });
-
-        var self = this;
-        var customer = self.getCurrentCustomer();
-
-        this.topBar.setTitleOverride('otp', 'text', 'upi');
-
-        self.commenceOTP('otp_sending_generic', '', {
-          phone: getPhone(),
-        });
-
-        self.getCurrentCustomer().createOTP(function() {
-          Analytics.track('subscriptions_upi:access:otp:ask');
-          askOTP(self.otpView, 'otp_proceed_with_upi_subscription', true, {
-            phone: getPhone(),
-          });
-          self.updateCustomerInStore();
-        });
+        //For the new flow checkout no longer asks for OTP for UPI subscriptions.
+        discreet.upiTab.render();
+        this.setScreen('upi');
       } else {
         discreet.upiTab.render();
       }
