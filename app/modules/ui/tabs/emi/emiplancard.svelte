@@ -4,6 +4,9 @@
   import { getSession } from 'sessionmanager';
   import { roundUpToNearestMajor } from 'common/currency';
 
+  // Store imports
+  import { appliedOffer } from 'checkoutstore/offers';
+
   // UI imports
   import ExpandableCard from 'ui/elements/ExpandableCard.svelte';
 
@@ -73,13 +76,20 @@
   }
 
   $: {
-    noCostEmi =
-      plan.subvention === 'merchant' ||
-      (provider === 'zestmoney' && plan.duration === 3);
-    if (noCostEmi && plan.merchant_payback) {
-      interestChargedByBank = session.formatAmountWithCurrency(
-        amount / (1 - plan.merchant_payback / 100) - amount
-      );
+    //Do not auto apply No-Cost EMI offer if no offer is selected by the customer.
+    if (!$appliedOffer) {
+      noCostEmi = false;
+    } else if ($appliedOffer && $appliedOffer.emi_subvention) {
+      /* No-Cost EMI offers have emi_subvention property which is not present for other offers.
+    Only select No-Cost EMI offer if that is selected by the customer. */
+      noCostEmi =
+        plan.subvention === 'merchant' ||
+        (provider === 'zestmoney' && plan.duration === 3);
+      if (noCostEmi && plan.merchant_payback) {
+        interestChargedByBank = session.formatAmountWithCurrency(
+          amount / (1 - plan.merchant_payback / 100) - amount
+        );
+      }
     }
   }
 
