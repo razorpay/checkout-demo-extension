@@ -25,7 +25,8 @@ import languageSelectionView from 'ui/elements/LanguageSelection.svelte';
 import * as I18n from 'i18n';
 import { init as initI18n } from 'i18n/init';
 import UpiCancelReasonPicker from 'ui/components/UpiCancelReasonPicker.svelte';
-import CancelReasonPicker from 'ui/components/CancelReasonPicker.svelte';
+import CancelReasonPicker from 'ui/components/cancellation-modals/CancelReasonPicker.svelte';
+import NetbankingCancelReasonPicker from 'ui/components/cancellation-modals/NetbankingCancelReasonPicker.svelte';
 import * as Curtain from 'components/curtain';
 import { setShieldParams } from 'payment/validator';
 import * as P13n from 'checkoutframe/personalization';
@@ -171,6 +172,7 @@ export default {
   languageSelectionView,
   UpiCancelReasonPicker,
   CancelReasonPicker,
+  NetbankingCancelReasonPicker,
   PayLaterView,
   Curtain,
   commonBanks,

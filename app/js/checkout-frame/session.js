@@ -3498,50 +3498,8 @@ Session.prototype = {
   },
 
   setNbCancelReasonPicker: function() {
-    var session = this;
-
-    this.nbCancelReasonPicker = new discreet.CancelReasonPicker({
-      target: _Doc.querySelector('#cancel_netbanking'),
-      props: {
-        onBack: function() {
-          $('#error-message').removeClass('cancel_netbanking');
-          hideOverlay($('#error-message'));
-          var metaParam = {};
-          metaParam['_[reason]'] = 'other';
-          session.r.emit('payment.cancel', metaParam);
-        },
-        onSubmit: function() {
-          var netbanking_radio = $('#cancel_netbanking input:checked');
-          if (!netbanking_radio[0]) {
-            return;
-          }
-          $('#error-message').removeClass('cancel_netbanking');
-          hideOverlay($('#error-message'));
-          var metaParam = {};
-          metaParam[netbanking_radio.prop('name')] = netbanking_radio.val();
-          session.r.emit('payment.cancel', metaParam);
-        },
-        method: 'netbanking',
-        title: 'Please share a reason for cancelling this payment',
-        reasons: [
-          {
-            value: 'wrong_bank_selected',
-            label: 'Wrong bank selected',
-          },
-          {
-            value: 'forgot_bank_details',
-            label: 'Forgot username or password',
-          },
-          {
-            value: 'bank_page_error',
-            label: 'Error on bank page',
-          },
-          {
-            value: 'other',
-            label: 'Other',
-          },
-        ],
-      },
+    this.nbCancelReasonPicker = new discreet.NetbankingCancelReasonPicker({
+      target: _Doc.querySelector('#error-message'),
     });
   },
 
@@ -5190,6 +5148,7 @@ Session.prototype = {
   },
 
   hideOverlayMessage: hideOverlayMessage,
+  hideOverlay: hideOverlay,
   errorHandler: errorHandler,
   successHandler: successHandler,
 };
