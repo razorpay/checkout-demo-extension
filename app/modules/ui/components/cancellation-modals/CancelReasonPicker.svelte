@@ -1,4 +1,6 @@
 <script>
+  import { createEventDispatcher } from 'svelte';
+
   import { t } from 'svelte-i18n';
   import {
     CANCEL_REASON_TITLE,
@@ -17,19 +19,23 @@
   export let onBack = () => {};
   export let onSubmit = () => {};
 
+  const dispatch = createEventDispatcher();
+
+  const onReasonSelection = reason => {
+    dispatch('selection', { reason });
+  };
+
   let prefixGenerator;
 
   const pg = (prefixGenerator = text => `${method}-${text}`);
 </script>
 
 <div id={'cancel_' + method} class="cancel_modal">
-  <!-- LABEL: Please give us a reason before we cancel the payment -->
   <p>{$t(title)}</p>
 
   {#each reasons as reason, i (reason.value)}
-    <label for={pg(i)}>
+    <label on:click={() => onReasonSelection(reason.value)} for={pg(i)}>
       <input id={pg(i)} type="radio" name="_[reason]" value={reason.value} />
-      <!-- LABEL: Did not receive collect request -->
       {$t(reason.label)}
     </label>
   {/each}

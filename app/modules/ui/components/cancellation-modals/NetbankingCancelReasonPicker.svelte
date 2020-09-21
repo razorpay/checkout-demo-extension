@@ -25,6 +25,7 @@
       label: 'Other',
     },
   ];
+  let reason = null;
 
   const onBack = function() {
     _El.removeClass(cancellationReasonsContainer, 'cancel_' + method);
@@ -35,16 +36,13 @@
   };
 
   const onSubmit = function() {
-    const netbanking_radio = _Doc.querySelector(
-      '#cancel_netbanking input:checked'
-    );
-    if (!netbanking_radio[0]) {
+    if (!reason) {
       return;
     }
     _El.removeClass(cancellationReasonsContainer, 'cancel_' + method);
     session.hideOverlay(cancellationReasonsContainer);
     const metaParam = {};
-    metaParam[netbanking_radio.prop('name')] = netbanking_radio.val();
+    metaParam['_reason'] = reason;
     session.r.emit('payment.cancel', metaParam);
   };
 </script>
@@ -54,4 +52,7 @@
   reasons={cancellationReasons}
   title="Please share a reason for cancelling this payment"
   {onBack}
-  {onSubmit} />
+  {onSubmit}
+  on:selection={e => {
+    reason = e.detail.reason;
+  }} />
