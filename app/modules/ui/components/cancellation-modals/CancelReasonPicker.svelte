@@ -74,7 +74,7 @@
     }
   }
 
-  :global(#error-message.cancel_netbanking) {
+  :global(div#error-message.cancel_netbanking) {
     height: 260px;
     overflow: hidden;
 
