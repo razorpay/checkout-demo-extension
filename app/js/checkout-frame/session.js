@@ -1749,11 +1749,20 @@ Session.prototype = {
         return this.clearRequest();
       }
 
-      if (this.payload.method === 'netbanking') {
+      if (
+        this.payload.method === 'netbanking' &&
+        _Obj.getSafely(this.r, '_payment.popup.window.closed')
+      ) {
         return;
       }
 
+      var paymentMethod = this.payload.method;
+
       self.confirmClose().then(function(close) {
+        if (paymentMethod == 'netbanking' && close) {
+          self.r._payment.popup.onClose();
+          return;
+        }
         if (close) {
           self.clearRequest();
           if (Bridge.checkout.platform === 'ios') {
