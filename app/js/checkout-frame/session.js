@@ -1750,7 +1750,7 @@ Session.prototype = {
       }
 
       if (this.payload.method === 'netbanking') {
-        return beforeReturn();
+        return;
       }
 
       self.confirmClose().then(function(close) {
