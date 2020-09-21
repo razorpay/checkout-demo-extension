@@ -276,6 +276,8 @@ var responseTypes = {
             data: error,
           });
           this.emit('cancel', upiBackCancel);
+          // Log error for debugging/troubleshooting
+          console.error(error);
         });
     }
   },
