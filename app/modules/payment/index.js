@@ -670,7 +670,7 @@ Payment.prototype = {
 
     if (popup) {
       popup.onClose = () => {
-        if (this.data.method === 'netbanking') {
+        if (this.data.method === 'netbanking' && isRazorpayFrame()) {
           const modal = _Doc.querySelector('#error-message');
           _El.addClass(modal, 'cancel_netbanking');
           return;
