@@ -1,6 +1,14 @@
 <script>
   import { getSession } from 'sessionmanager';
 
+  import {
+    WRONG_BANK_SELECTED,
+    FORGOT_USERNAME_PASSWORD,
+    ERROR_BANK_PAGE,
+    CANCEL_REASON_OTHER,
+    CANCELLATION_MODAL_TITLE,
+  } from 'ui/labels/netbanking';
+
   import CancelReasonPicker from 'ui/components/cancellation-modals/CancelReasonPicker.svelte';
 
   const session = getSession();
@@ -10,19 +18,19 @@
   const cancellationReasons = [
     {
       value: 'wrong_bank_selected',
-      label: 'Wrong bank selected',
+      label: WRONG_BANK_SELECTED,
     },
     {
       value: 'forgot_bank_details',
-      label: 'Forgot username or password',
+      label: FORGOT_USERNAME_PASSWORD,
     },
     {
       value: 'bank_page_error',
-      label: 'Error on bank page',
+      label: ERROR_BANK_PAGE,
     },
     {
       value: 'other',
-      label: 'Other',
+      label: CANCEL_REASON_OTHER,
     },
   ];
   let reason = null;
@@ -50,7 +58,7 @@
 <CancelReasonPicker
   method="netbanking"
   reasons={cancellationReasons}
-  title="Please share a reason for cancelling this payment"
+  title={CANCELLATION_MODAL_TITLE}
   {onBack}
   {onSubmit}
   on:selection={e => {
