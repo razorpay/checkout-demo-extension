@@ -16,7 +16,7 @@
   export let method = 'netbanking';
   export let reasons = [];
 
-  export let onBack = () => {};
+  export let onBack = null;
   export let onSubmit = () => {};
 
   const dispatch = createEventDispatcher();
@@ -94,10 +94,12 @@
     </label>
   {/each}
   <div class="buttons">
-    <!-- LABEL: Back -->
-    <button class="back-btn" on:click={onBack}>
-      {$t(CANCEL_REASON_BACK_ACTION)}
-    </button>
+    {#if onBack}
+      <button class="back-btn" on:click={onBack}>
+        <!-- LABEL: Back -->
+        {$t(CANCEL_REASON_BACK_ACTION)}
+      </button>
+    {/if}
     <!-- LABEL: Submit -->
     <button class="btn" on:click={onSubmit}>
       {$t(CANCEL_REASON_SUBMIT_ACTION)}

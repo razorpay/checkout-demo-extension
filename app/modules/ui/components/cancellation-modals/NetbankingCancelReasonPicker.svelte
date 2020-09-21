@@ -35,14 +35,6 @@
   ];
   let reason = null;
 
-  const onBack = function() {
-    _El.removeClass(cancellationReasonsContainer, 'cancel_' + method);
-    session.hideOverlay(cancellationReasonsContainer);
-    session.r.emit('payment.cancel', {
-      '_[reason]': 'other',
-    });
-  };
-
   const onSubmit = function() {
     if (!reason) {
       return;
@@ -59,7 +51,6 @@
   method="netbanking"
   reasons={cancellationReasons}
   title={CANCELLATION_MODAL_TITLE}
-  {onBack}
   {onSubmit}
   on:selection={e => {
     reason = e.detail.reason;
