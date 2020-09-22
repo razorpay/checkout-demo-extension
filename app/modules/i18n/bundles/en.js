@@ -813,6 +813,7 @@ export default {
       otp_sending_generic: 'Sending OTP to {phone}',
       otp_sent_access_card: 'Enter OTP sent to {phone} to access Saved Cards',
       otp_sent_generic: 'An OTP has been sent on {phone}',
+      otp_sent_phone: 'Enter OTP sent on {phone} to complete the payment',
       otp_sent_no_phone: 'Enter OTP to complete payment',
       otp_sent_save_card: 'Enter OTP sent to {phone} to save your card',
       otp_sent_save_card_recurring:
@@ -829,6 +830,10 @@ export default {
       wallet_sending: 'Looking for {wallet} account associated with {phone}',
     },
     try_different_label: 'Try different payment method',
+    misc: {
+      security_text:
+        'Your transaction is processed through a secure 128 bit https internet connection based on secure socket layer technology. For security purpose, your IP address {ipAddress} and access time {accessTime} have been logged.',
+    },
   },
   paylater: {
     providers: {

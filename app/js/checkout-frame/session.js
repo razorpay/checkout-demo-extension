@@ -434,6 +434,23 @@ function askOTP(view, textView, shouldLimitResend, templateData) {
   var qpmap = _.getQueryParams();
   var thisSession = SessionManager.getSession();
   var session = thisSession;
+  var paymentId = _Obj.getSafely(session, 'r._payment.payment_id');
+  var paymentData = OtpService.getPaymentData(paymentId);
+
+  if (paymentId && !paymentData) {
+    paymentData = {
+      timestamp: Date.now(),
+    };
+    if (isNonNullObject(origText) && !origText.error) {
+      if (thisSession.headless) {
+        paymentData.goToBank = origText.redirect;
+      }
+      if (origText.metadata) {
+        paymentData.metadata = origText.metadata;
+      }
+    }
+    OtpService.setPaymentData(paymentId, paymentData);
+  }
 
   var isWallet = session.payload && session.payload.method === 'wallet';
 
@@ -468,6 +485,17 @@ function askOTP(view, textView, shouldLimitResend, templateData) {
     allowResend: shouldLimitResend ? OtpService.canSendOtp('razorpay') : true,
   });
 
+  if (thisSession.headless) {
+    if (paymentData.goToBank) {
+      view.updateScreen({
+        skipTextLabel: 'complete_bank_page',
+      });
+    }
+    view.updateScreen({
+      allowSkip: paymentData.goToBank,
+    });
+  }
+
   $('#body').addClass('sub');
 
   if (!textView) {
@@ -495,6 +523,22 @@ function askOTP(view, textView, shouldLimitResend, templateData) {
                 bankLogo +
                 '" onerror="this.style.opacity = 0;">';
             }
+
+            view.updateScreen({
+              ipAddress: metadata.ip,
+              accessTime: paymentData.timestamp,
+              resendTimeout:
+                paymentData.timestamp +
+                (Number(metadata.resend_timeout) + 1) * 1000,
+            });
+
+            if (metadata.contact) {
+              textView = 'otp_sent_phone';
+              if (!templateData) {
+                templateData = {};
+              }
+              templateData.phone = metadata.contact;
+            }
           }
 
           if (origText.mode === 'hdfc_debit_emi') {
@@ -514,16 +558,6 @@ function askOTP(view, textView, shouldLimitResend, templateData) {
             if (!origText.next || origText.next.indexOf('otp_resend') === -1) {
               view.updateScreen({
                 allowResend: false,
-              });
-            }
-
-            view.updateScreen({
-              skipTextLabel: 'complete_bank_page',
-            });
-
-            if (!origText.redirect) {
-              view.updateScreen({
-                allowSkip: false,
               });
             }
           }

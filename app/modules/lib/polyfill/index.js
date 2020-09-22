@@ -6,6 +6,31 @@ import getOwnPropertyDescriptor from './getownpropertydescriptors';
 /* global DOMTokenList, CSSStyleSheet, Element, CharacterData, DocumentType, CSSStyleDeclaration */
 
 /**
+ * Fix for Svelte rest + IE11 issue
+ * https://github.com/sveltejs/svelte/issues/4718
+ */
+(function(elements) {
+  elements.forEach(function(el) {
+    if (!el.prototype.hasOwnProperty('disabled')) {
+      Object.defineProperty(el.prototype, 'disabled', {
+        enumerable: true,
+        configurable: true,
+        get: function() {
+          return el.prototype.hasAttribute.call(this, 'disabled');
+        },
+        set: function(value) {
+          if (value) {
+            return el.prototype.setAttribute.call(this, 'disabled', '');
+          } else {
+            return el.prototype.removeAttribute.call(this, 'disabled');
+          }
+        },
+      });
+    }
+  });
+})([HTMLButtonElement, HTMLInputElement]);
+
+/**
  * Because classList.toggle is broken in IE10 and IE11.
  * https://caniuse.com/#feat=classlist
  */
