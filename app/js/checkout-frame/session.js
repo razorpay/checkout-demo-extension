@@ -2694,7 +2694,6 @@ Session.prototype = {
       ) {
         return;
       }
-      var customer = this.getCustomer(contact);
       this.updateCustomerInStore();
 
       if (this.getCurrentCustomer().logged && !this.local) {
@@ -2724,9 +2723,7 @@ Session.prototype = {
 
     if (tab === 'upi') {
       this.updateCustomerInStore();
-
-      // Enforce login flow for UPI Recurring subscriptions
-      if (Store.isASubscription() && !customer.logged) {
+      if (Store.isASubscription()) {
         //For the new flow checkout no longer asks for OTP for UPI subscriptions.
         discreet.upiTab.render();
         this.setScreen('upi');
