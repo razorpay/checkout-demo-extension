@@ -514,6 +514,8 @@ export default {
     credit_emi_description:
       'Full amount of {amount} will be deducted from your account, which will be converted into EMI by your bank in 3-4 days.',
     description_monthly_installment: 'Monthly Installment: {amount}',
+    processing_fee: 'Processing Fee: {amount}',
+    stamp_duty: 'Stamp Duty: {amount}',
     description_total_amount:
       'Total Amount: {totalAmount} ({monthlyAmount} x {duration})',
     edit_plan_action: 'Edit',

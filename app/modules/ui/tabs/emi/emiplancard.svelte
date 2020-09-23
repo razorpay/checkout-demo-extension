@@ -25,6 +25,8 @@
     HDFC_DEBIT_DESCRIPTION_INCLUDES_INTEREST,
     HDFC_DEBIT_DESCRIPTION_CONVENIENCE,
     DESCRIPTION_MONTHLY_INSTALLMENT,
+    PROCESSING_FEE,
+    STAMP_DUTY,
     DESCRIPTION_TOTAL_AMOUNT,
   } from 'ui/labels/emi';
 
@@ -46,11 +48,19 @@
   let isBajajEmi;
   let showEducation;
 
+  let processingFee, processingFeeDisclaimer, stampDuty;
+
   let interestChargedByBank;
 
   const session = getSession();
   const HDFC_BANK_CODE = 'HDFC';
   const HDFC_BANK_DEBIT_CODE = 'HDFC_DC';
+
+  $: {
+    processingFee = session.formatAmountWithCurrency(plan.processing_fee);
+    stampDuty = plan.stamp_duty;
+    processingFeeDisclaimer = plan.processing_fee_disclaimer;
+  }
 
   // amountPerMonth
   $: {
@@ -126,6 +136,12 @@
     margin: -10px 0 6px !important;
     padding-bottom: 6px;
   }
+
+  .processing-fee-disclaimer {
+    padding-top: 8px;
+    margin-top: 8px;
+    border-top: 1px solid #e6e7e8;
+  }
 </style>
 
 <ExpandableCard showRadio {expanded} on:click>
@@ -177,11 +193,24 @@
           <li>
             {formatTemplateWithLocale(DESCRIPTION_MONTHLY_INSTALLMENT, { amount: formattedAmountPerMonth }, $locale)}
           </li>
+          {#if processingFee}
+            <li>
+              {formatTemplateWithLocale(PROCESSING_FEE, { amount: processingFee }, $locale)}
+            </li>
+          {/if}
+          {#if stampDuty}
+            <li>
+              {formatTemplateWithLocale(STAMP_DUTY, { amount: stampDuty }, $locale)}
+            </li>
+          {/if}
           <!-- LABEL: Total Amount: {formattedFinalAmount} ({formattedAmountPerMonth} x {plan.duration}) -->
           <li>
             {formatTemplateWithLocale(DESCRIPTION_TOTAL_AMOUNT, { totalAmount: formattedFinalAmount, monthlyAmount: formattedAmountPerMonth, duration: plan.duration }, $locale)}
           </li>
         </ul>
+        {#if processingFee && processingFeeDisclaimer}
+          <div class="processing-fee-disclaimer">{processingFeeDisclaimer}</div>
+        {/if}
       {/if}
       {#if noCostEmi}
         <!-- LABEL: + How does it work? -->

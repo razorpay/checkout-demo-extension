@@ -30,4 +30,6 @@ export const HDFC_DEBIT_DESCRIPTION_CONVENIENCE =
   'emi.hdfc_debit_description_convenience';
 export const DESCRIPTION_MONTHLY_INSTALLMENT =
   'emi.description_monthly_installment';
+export const PROCESSING_FEE = 'emi.processing_fee';
+export const STAMP_DUTY = 'emi.stamp_duty';
 export const DESCRIPTION_TOTAL_AMOUNT = 'emi.description_total_amount';
