@@ -2127,20 +2127,18 @@ Session.prototype = {
     }
 
     var goto_payment = '#error-message .link';
-    if (this.get('redirect')) {
-      $(goto_payment).hide();
-    } else {
-      this.click(goto_payment, function() {
-        if (this.payload && this.payload.method === 'upi') {
-          if (this.payload['_[flow]'] === 'directpay') {
-            return cancel_upi(this);
-          } else if (this.payload['_[flow]'] === 'intent') {
-            this.hideErrorMessage();
-          }
+
+    this.click(goto_payment, function() {
+      if (this.payload && this.payload.method === 'upi') {
+        if (this.payload['_[flow]'] === 'directpay') {
+          return cancel_upi(this);
+        } else if (this.payload['_[flow]'] === 'intent') {
+          this.hideErrorMessage();
         }
-        this.r.focus();
-      });
-    }
+      }
+      this.r.focus();
+    });
+
     this.click('#backdrop', this.hideErrorMessage);
     this.click('#fd-hide', this.hideErrorMessage);
     this.click('#overlay-close', this.hideErrorMessage);
@@ -4099,6 +4097,15 @@ Session.prototype = {
     }
     var vpaVerified = props.vpaVerified;
     var data = this.payload;
+
+    var goto_payment = '#error-message .link';
+    var redirectableMethods = ['card', 'netbanking', 'wallet'];
+    if (
+      this.get('redirect') &&
+      redirectableMethods.includes(this.payload.method)
+    ) {
+      $(goto_payment).hide();
+    }
 
     if (this.r._payment) {
       /**
