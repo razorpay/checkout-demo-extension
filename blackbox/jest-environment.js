@@ -7,10 +7,7 @@ const { delay } = require('./util');
 class PuppeteerEnvironment extends NodeEnvironment {
   async setup() {
     const browserWSEndpoint = readFileSync(DIR + '/wsEndpoint', 'utf8');
-    const browser = await puppeteer.connect({
-      browserWSEndpoint,
-      devTools: true,
-    });
+    const browser = await puppeteer.connect({ browserWSEndpoint });
     this.global.page = await browser.newPage();
     this.global.delay = delay;
   }
