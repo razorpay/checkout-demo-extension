@@ -33,9 +33,8 @@
       label: CANCEL_REASON_OTHER,
     },
   ];
-  let reason = null;
 
-  const onSubmit = function() {
+  const onSubmit = function(reason) {
     if (!reason) {
       return;
     }
@@ -52,6 +51,4 @@
   reasons={cancellationReasons}
   title={CANCELLATION_MODAL_TITLE}
   {onSubmit}
-  on:selection={e => {
-    reason = e.detail.reason;
-  }} />
+  } />

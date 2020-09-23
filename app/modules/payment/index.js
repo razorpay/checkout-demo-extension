@@ -670,6 +670,7 @@ Payment.prototype = {
 
     if (popup) {
       popup.onClose = () => {
+        Analytics.track(this.data.method + ':popup:closed');
         if (this.data.method === 'netbanking' && isRazorpayFrame()) {
           const modal = _Doc.querySelector('#error-message');
           _El.addClass(modal, 'cancel_netbanking');

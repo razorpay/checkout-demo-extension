@@ -1,6 +1,9 @@
 <script>
   import { createEventDispatcher } from 'svelte';
 
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
+
   import { t } from 'svelte-i18n';
   import {
     CANCEL_REASON_TITLE,
@@ -20,9 +23,10 @@
   export let onSubmit = () => {};
 
   const dispatch = createEventDispatcher();
+  let selectedReason = null;
 
   const onReasonSelection = reason => {
-    dispatch('selection', { reason });
+    selectedReason = reason;
   };
 
   let prefixGenerator;
@@ -101,7 +105,17 @@
       </button>
     {/if}
     <!-- LABEL: Submit -->
-    <button class="btn" on:click={onSubmit}>
+    <button
+      class="btn"
+      on:click={() => {
+        Analytics.track(method + ':cancel_reason_submit', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            selectedReason,
+          },
+        });
+        onSubmit(selectedReason);
+      }}>
       {$t(CANCEL_REASON_SUBMIT_ACTION)}
     </button>
   </div>
