@@ -233,11 +233,6 @@ var responseTypes = {
     var instrumentData = {};
     var data = response.data;
     var intent_url = data.intent_url;
-    data.intent_url
-      .replace(/^.*\?/, '')
-      .replace(/([^=&]+)=([^&]*)/g, (m, key, value) => {
-        instrumentData[decodeURIComponent(key)] = decodeURIComponent(value);
-      });
     instrumentData.url = intent_url;
 
     const supportedInstruments = [
@@ -246,8 +241,6 @@ var responseTypes = {
         data: instrumentData,
       },
     ];
-
-    console.error(response, data, supportedInstruments, instrumentData);
 
     const details = {
       total: {
@@ -258,8 +251,6 @@ var responseTypes = {
         },
       },
     };
-
-    console.error(details);
 
     try {
       const PaymentRequest = global.PaymentRequest;
