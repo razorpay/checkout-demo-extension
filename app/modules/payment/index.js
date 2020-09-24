@@ -345,17 +345,19 @@ Payment.prototype = {
     );
 
     if (this.gpay || this.tez) {
-      if (
-        !(
-          this.r.paymentAdapters &&
-          (this.r.paymentAdapters[GOOGLE_PAY_PACKAGE_NAME] ||
-            this.r.paymentAdapters['microapps.gpay'])
-        )
-      ) {
-        return this.r.emit(
-          'payment.error',
-          _.rzpError('GPay is not available')
-        );
+      if (data['_[app]'] === GOOGLE_PAY_PACKAGE_NAME) {
+        if (
+          !(
+            this.r.paymentAdapters &&
+            (this.r.paymentAdapters[GOOGLE_PAY_PACKAGE_NAME] ||
+              this.r.paymentAdapters['microapps.gpay'])
+          )
+        ) {
+          return this.r.emit(
+            'payment.error',
+            _.rzpError('GPay is not available')
+          );
+        }
       }
     }
 

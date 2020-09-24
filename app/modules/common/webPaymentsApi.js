@@ -2,11 +2,16 @@ import { getSession } from 'sessionmanager';
 import * as Bridge from 'bridge';
 import { GOOGLE_PAY_PACKAGE_NAME, PHONE_PE_PACKAGE_NAME } from 'common/upi';
 import { setUpiApps, getUPIIntentApps } from 'checkoutstore/native';
+import { phonepeSupportedMethods } from 'payment/adapters';
 
 export const appsThatSupportWebPayments = [
   GOOGLE_PAY_PACKAGE_NAME,
   PHONE_PE_PACKAGE_NAME,
 ];
+
+export const supportedWebPaymentsMethodsForApp = {
+  [PHONE_PE_PACKAGE_NAME]: phonepeSupportedMethods,
+};
 
 const webPaymentsApps = {};
 
