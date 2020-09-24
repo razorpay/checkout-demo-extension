@@ -231,9 +231,16 @@ var responseTypes = {
 
   web_payments: function(response) {
     var instrumentData = {};
+    var parsedData = {};
+
     var data = response.data;
     var intent_url = data.intent_url;
     instrumentData.url = intent_url;
+    data.intent_url
+      .replace(/^.*\?/, '')
+      .replace(/([^=&]+)=([^&]*)/g, (m, key, value) => {
+        parsedData[decodeURIComponent(key)] = decodeURIComponent(value);
+      });
 
     const supportedInstruments = [
       {
@@ -247,7 +254,7 @@ var responseTypes = {
         label: 'Payment',
         amount: {
           currency: 'INR',
-          value: parseFloat(instrumentData.am).toFixed(2),
+          value: parseFloat(parsedData.am).toFixed(2),
         },
       },
     };
@@ -274,7 +281,7 @@ var responseTypes = {
         })
         /* jshint ignore:start */
         .catch(error => {
-          console.error('error', e);
+          console.error('error', error);
           if (error.code) {
             if (
               [error.ABORT_ERR, error.NOT_SUPPORTED_ERR].indexOf(error.code) >=
@@ -474,8 +481,6 @@ var responseTypes = {
           'microapp'
         );
       }
-
-      console.error('checking android browser');
 
       if (androidBrowser) {
         if (this.upi_app === GOOGLE_PAY_PACKAGE_NAME) {
