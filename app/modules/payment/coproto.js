@@ -263,12 +263,9 @@ var responseTypes = {
       const PaymentRequest = global.PaymentRequest;
 
       const request = new PaymentRequest(supportedInstruments, details);
-      console.error('Payment Request Worked');
       request
         .show()
         .then(instrument => {
-          console.error('done', instrument);
-
           Track(this.r, 'web_payments_api_response', {
             instrument,
           });
@@ -281,7 +278,6 @@ var responseTypes = {
         })
         /* jshint ignore:start */
         .catch(error => {
-          console.error('error', error);
           if (error.code) {
             if (
               [error.ABORT_ERR, error.NOT_SUPPORTED_ERR].indexOf(error.code) >=

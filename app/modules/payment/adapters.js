@@ -61,13 +61,11 @@ function phonepePaymentRequestAdapter() {
           if (isAvailable) {
             resolve();
           } else {
-            console.log('Payment Request not available!!');
             reject(CHECK_ERROR);
           }
         })
         /* jshint ignore:start */
         .catch(e => {
-          console.log('CanmakePayment failed !!');
           reject(CHECK_ERROR);
         });
       /* jshint ignore:end */
