@@ -232,12 +232,13 @@ var responseTypes = {
   web_payments: function(response) {
     var instrumentData = {};
     var data = response.data;
+    var intent_url = data.intent_url;
     data.intent_url
       .replace(/^.*\?/, '')
       .replace(/([^=&]+)=([^&]*)/g, (m, key, value) => {
         instrumentData[decodeURIComponent(key)] = decodeURIComponent(value);
       });
-    instrumentData.url = 'https://razorpay.com';
+    instrumentData.url = intent_url;
 
     const supportedInstruments = [
       {
