@@ -26,10 +26,7 @@ import {
   isIframe,
   ownerWindow,
 } from 'common/constants';
-import {
-  checkGooglePayWebPayments,
-  checkForPossibleWebPayments,
-} from 'checkoutframe/components/upi';
+import { checkForPossibleWebPayments } from 'checkoutframe/components/upi';
 
 let CheckoutBridge = window.CheckoutBridge;
 
