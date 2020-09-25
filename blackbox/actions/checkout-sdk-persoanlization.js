@@ -45,8 +45,6 @@ async function openSdkCheckoutPersonalization({
       };
 
       show = () => {
-        alert('At this point, your Google Pay app would be invoked');
-
         const successPayload = {
           requestId: 'd16076cc-db82-4ced-8b88-a0608ea37f51',
           methodName: 'https://tez.google.com/pay',
@@ -92,10 +90,7 @@ async function openSdkCheckoutPersonalization({
           payerPhone: null,
         };
 
-        let payload = failurePayload;
-        if (window.confirm('Should payment succeed from Google Pay app?')) {
-          payload = successPayload;
-        }
+        let payload = successPayload;
 
         return Promise.resolve({
           ...payload,
