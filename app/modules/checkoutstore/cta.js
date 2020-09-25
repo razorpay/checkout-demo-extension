@@ -158,6 +158,26 @@ export function setAppropriateCtaText() {
   }
 }
 
+const trackCTAVisibility = _Func.debounce(function() {
+  // To figure out cases when CTA is shown logically
+  // but is not visible physically.
+  setTimeout(function() {
+    const session = getSession();
+
+    const el = _Doc.querySelector('#footer-cta');
+    const bottom = el.getBoundingClientRect().bottom;
+    const windowHeight = window.innerHeight;
+    const ctaVisible = bottom <= windowHeight;
+
+    session.trackEvent('cta:show', {
+      ctaVisible,
+      doctypeMissing: document.doctype === null,
+      windowHeight,
+      bottom,
+    });
+  }, 300);
+}, 300);
+
 /**
  * Shows the CTA
  */
@@ -165,6 +185,10 @@ export function showCta() {
   const session = getSession();
 
   _El.addClass(session.body[0], 'sub');
+
+  try {
+    trackCTAVisibility();
+  } catch (e) {}
 }
 
 /**

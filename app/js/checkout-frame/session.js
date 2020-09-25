@@ -2651,6 +2651,10 @@ Session.prototype = {
     return valid;
   },
 
+  trackEvent: function(eventName, data) {
+    Analytics.track(eventName, data);
+  },
+
   switchTab: function(tab) {
     /**
      * Validate fields on common screen.
