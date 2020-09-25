@@ -170,10 +170,12 @@ const trackCTAVisibility = _Func.debounce(function() {
     const ctaVisible = bottom <= windowHeight;
 
     session.trackEvent('cta:show', {
-      ctaVisible,
-      doctypeMissing: document.doctype === null,
-      windowHeight,
-      bottom,
+      data: {
+        ctaVisible,
+        doctypeMissing: document.doctype === null,
+        windowHeight,
+        bottom,
+      },
     });
   }, 300);
 }, 300);
