@@ -11,7 +11,7 @@
   import ContactField from 'ui/components/ContactField.svelte';
 
   // Util imports
-  import { isContactOptional } from 'checkoutstore';
+  import { isContactOptional, getCustomSubtextForMethod } from 'checkoutstore';
   import { isContactRequiredForAppProvider } from 'checkoutstore/methods';
   import { getProvider as getAppProvider } from 'common/apps';
 
@@ -31,6 +31,14 @@
   function isContactRequired(provider) {
     return isContactOptional() && isContactRequiredForAppProvider(provider);
   }
+
+  function getSubtext(provider) {
+    const customSubtext = getCustomSubtextForMethod(provider);
+    if (customSubtext) {
+      return customSubtext;
+    }
+    return getAppProviderSubtext(provider, $locale);
+  }
 </script>
 
 {#each apps as app}
@@ -47,9 +55,7 @@
     </i>
     <div slot="title">{getAppProviderName(app.code, $locale)}</div>
     <div slot="subtitle">
-      {#if getAppProviderSubtext(app.code, $locale)}
-        {getAppProviderSubtext(app.code, $locale)}
-      {/if}
+      {#if getSubtext(app.code)}{getSubtext(app.code)}{/if}
     </div>
     <div slot="body">
       {#if selectedApp && isContactRequired(app.code)}
