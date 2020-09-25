@@ -1,17 +1,13 @@
 `
 var params = arguments[1];
-
 var Store = params.Store;
 var MethodStore = params.MethodStore;
 var isMethodEnabled = MethodStore.isMethodEnabled;
 var emiBanks = MethodStore.getEMIBanks();
-
 var cta = params.cta;
-
 var o = _.get;
 var html = function(html){return html.replace(/<[^>]*>?/g, "")};
 var attr = function(attr){return attr.replace(/"/g,'')};
-
 var amount;
 var amount_figure = _.formatAmountWithCurrency(o('amount'));
 if(o('display_currency'))
@@ -59,6 +55,8 @@ else
               <div id="amount">
                 <span class="discount"></span>
                 <span class="original-amount">`=amount`&nbsp;&nbsp;</span>
+                <span class="fee"></span>
+                <div class="fee-helper">?</div>
               </div>
             `?`
           </div>
