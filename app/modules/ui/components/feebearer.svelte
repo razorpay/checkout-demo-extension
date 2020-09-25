@@ -42,6 +42,10 @@
     feeBreakup = response.display;
     loading = false;
     bearer = response.input;
+    session.updateAmountInHeader(
+      formatTemplateWithLocale(feeBreakup.amount * 100)
+    );
+    session.clearFee();
   }
   export function onError(response) {
     session.showLoadError(response.error.description, response.error);

@@ -680,9 +680,22 @@ Session.prototype = {
       amount = discreet.currencies[displayCurrency] + ' ' + amount;
     } else {
       amount = discreet.currencies[currency] + ' ' + amountFigure;
+      this.handleFee();
     }
 
     return amount;
+  },
+  clearFee: function() {
+    $('.fee').hide();
+    $('.fee-helper').hide();
+  },
+  handleFee: function() {
+    var isFeeBearer = Store.isCustomerFeeBearer();
+    if (isFeeBearer) {
+      $('.fee').html('+ (Fee)');
+    } else {
+      this.clearFee();
+    }
   },
 
   // so that accessing this.data would not produce error
@@ -1733,6 +1746,8 @@ Session.prototype = {
   },
 
   hideErrorMessage: function(confirmedCancel) {
+    this.setAmount(this.get('amount'));
+    $('.fee').html(' +(Fee)');
     if (this.nocostModal) {
       var modal = this.nocostModal;
       hideOverlay($('#nocost-overlay'));
