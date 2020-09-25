@@ -39,14 +39,12 @@ export const checkWebPaymentsForApp = app => {
 
   session.r.checkPaymentAdapter(app).then(() => {
     webPaymentsApps[app] = true;
-
-    setUpiApps([
-      ...getUPIIntentApps().filtered,
-      ...[
+    setUpiApps(
+      _Arr.mergeWith(getUPIIntentApps().all, [
         {
           package_name: app,
         },
-      ],
-    ]);
+      ])
+    );
   });
 };
