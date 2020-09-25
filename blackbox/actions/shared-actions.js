@@ -30,8 +30,11 @@ async function respondAndVerifyIntentRequest(context) {
   await context.respondPlain(
     `${req.params.callback}(${JSON.stringify(successResult)})`
   );
-  const result = await context.getResult();
-  expect(result).toMatchObject(successResult);
+  // TODO make getResult work for non SDK
+  if (context.getResult) {
+    const result = await context.getResult();
+    expect(result).toMatchObject(successResult);
+  }
 }
 
 async function verifyErrorMessage(context, expectedErrorMeassage) {
