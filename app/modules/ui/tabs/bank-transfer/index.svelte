@@ -96,6 +96,7 @@
 
     if (response.amount_expected) {
       session.updateAmountInHeader(response.amount_expected);
+      session.clearFee();
     }
 
     if (receivers && receivers.length !== 0) {
