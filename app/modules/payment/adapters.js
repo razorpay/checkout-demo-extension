@@ -9,7 +9,7 @@ export const ADAPTER_CHECKERS = {
 };
 
 export const phonepeSupportedMethods =
-  'https://mercury-uat.phonepe.com/transact/pay';
+  'https://mercury.phonepe.com/transact/pay';
 
 ADAPTER_CHECKERS[GOOGLE_PAY_PACKAGE_NAME] = gpayPaymentRequestAdapter;
 ADAPTER_CHECKERS[PHONE_PE_PACKAGE_NAME] = phonepePaymentRequestAdapter;
@@ -61,13 +61,11 @@ function phonepePaymentRequestAdapter() {
           if (isAvailable) {
             resolve();
           } else {
-            console.log('Payment Request not available!!');
             reject(CHECK_ERROR);
           }
         })
         /* jshint ignore:start */
         .catch(e => {
-          console.log('CanmakePayment failed !!');
           reject(CHECK_ERROR);
         });
       /* jshint ignore:end */

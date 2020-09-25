@@ -12,6 +12,7 @@ import Analytics from 'analytics';
 import { getBankFromCardCache } from 'common/bank';
 import * as Bridge from 'bridge';
 import { ADAPTER_CHECKERS, phonepeSupportedMethods } from 'payment/adapters';
+import { supportedWebPaymentsMethodsForApp } from 'common/webPaymentsApi';
 
 export const processOtpResponse = function(response) {
   var error = response.error;
@@ -229,47 +230,65 @@ var responseTypes = {
     this.emit('upi.pending', { flow: 'upi-intent' });
   },
 
-  web_payments: function(response) {
+  web_payments: function(response, app) {
     var instrumentData = {};
+    var parsedData = {};
+
     var data = response.data;
+    var intent_url = data.intent_url;
+    instrumentData.url = intent_url;
     data.intent_url
       .replace(/^.*\?/, '')
       .replace(/([^=&]+)=([^&]*)/g, (m, key, value) => {
-        instrumentData[decodeURIComponent(key)] = decodeURIComponent(value);
+        parsedData[decodeURIComponent(key)] = decodeURIComponent(value);
       });
-    instrumentData.url = 'https://razorpay.com';
 
     const supportedInstruments = [
       {
-        supportedMethods: phonepeSupportedMethods,
+        supportedMethods: supportedWebPaymentsMethodsForApp[app],
         data: instrumentData,
       },
     ];
-
-    console.error(response, data, supportedInstruments, instrumentData);
 
     const details = {
       total: {
         label: 'Payment',
         amount: {
           currency: 'INR',
-          value: parseFloat(instrumentData.am).toFixed(2),
+          value: parseFloat(parsedData.am).toFixed(2),
         },
       },
     };
 
-    console.error(details);
+    const webPaymentOnError = function(app, error) {
+      if (error.code) {
+        if (
+          [error.ABORT_ERR, error.NOT_SUPPORTED_ERR].indexOf(error.code) >= 0
+        ) {
+          this.emit('upi.intent_response', {});
+        }
+
+        // Since the method is not supported, remove it.
+        if (error.code === error.NOT_SUPPORTED_ERR) {
+          Analytics.track('web_payments_api:not_supported', {
+            data: {
+              error,
+              app,
+            },
+          });
+
+          // TODO: (nice to have) Remove the Google Pay app from UI
+        }
+      }
+    };
 
     try {
       const PaymentRequest = global.PaymentRequest;
 
       const request = new PaymentRequest(supportedInstruments, details);
-      console.error('Payment Request Worked');
       request
         .show()
         .then(instrument => {
-          console.error('done', instrument);
-
           Track(this.r, 'web_payments_api_response', {
             instrument,
           });
@@ -282,51 +301,11 @@ var responseTypes = {
         })
         /* jshint ignore:start */
         .catch(error => {
-          console.error('error', e);
-          if (error.code) {
-            if (
-              [error.ABORT_ERR, error.NOT_SUPPORTED_ERR].indexOf(error.code) >=
-              0
-            ) {
-              this.emit('upi.intent_response', {});
-            }
-
-            // Since the method is not supported, remove it.
-            if (error.code === error.NOT_SUPPORTED_ERR) {
-              Analytics.track('gpay:not_supported', {
-                data: {
-                  error,
-                },
-              });
-
-              // TODO: (nice to have) Remove the Google Pay app from UI
-            }
-          }
-
-          Track(this.r, 'gpay_error', error);
+          webPaymentOnError(app, error);
         });
       /* jshint ignore:end */
     } catch (error) {
-      if (error.code) {
-        if (
-          [error.ABORT_ERR, error.NOT_SUPPORTED_ERR].indexOf(error.code) >= 0
-        ) {
-          this.emit('upi.intent_response', {});
-        }
-
-        // Since the method is not supported, remove it.
-        if (error.code === error.NOT_SUPPORTED_ERR) {
-          Analytics.track('gpay:not_supported', {
-            data: {
-              error,
-            },
-          });
-
-          // TODO: (nice to have) Remove the Google Pay app from UI
-        }
-      }
-
-      Track(this.r, 'gpay_error', error);
+      webPaymentOnError(app, error);
     }
   },
 
@@ -464,8 +443,6 @@ var responseTypes = {
 
     this.emit('upi.coproto_response', fullResponse);
 
-    console.log('checking bridge, gpay', CheckoutBridge, this.gpay);
-
     if (CheckoutBridge && CheckoutBridge.callNativeIntent) {
       // If there's a UPI App specified, use it.
       if (this.upi_app) {
@@ -483,13 +460,15 @@ var responseTypes = {
         );
       }
 
-      console.error('checking android browser');
-
       if (androidBrowser) {
         if (this.upi_app === GOOGLE_PAY_PACKAGE_NAME) {
           return responseTypes['gpay'].call(this, request, fullResponse);
         } else {
-          return responseTypes['web_payments'].call(this, fullResponse);
+          return responseTypes['web_payments'].call(
+            this,
+            fullResponse,
+            this.upi_app
+          );
         }
       }
     } else if (this.upi_app) {
