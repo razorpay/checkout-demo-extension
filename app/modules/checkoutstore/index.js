@@ -77,6 +77,8 @@ export const getPrefilledName = optionGetter('prefill.name');
 export const getPrefilledCardNumber = optionGetter('prefill.card[number]');
 export const getPrefilledVPA = optionGetter('prefill.vpa');
 
+export const showFeeLabel = writable(true);
+
 export function hasFeature(feature, fallbackValue) {
   return _Obj.getSafely(preferences, `features.${feature}`, fallbackValue);
 }
