@@ -41,7 +41,7 @@
     _El.removeClass(cancellationReasonsContainer, 'cancel_' + method);
     session.hideOverlay(cancellationReasonsContainer);
     const metaParam = {};
-    metaParam['_reason'] = reason;
+    metaParam['_[reason]'] = reason;
     session.r.emit('payment.cancel', metaParam);
   };
 </script>
