@@ -76,6 +76,7 @@ import * as walletTab from 'checkoutframe/components/wallet';
 import * as Backdrop from 'checkoutframe/components/backdrop';
 import * as Confirm from 'checkoutframe/components/confirm';
 import TopBar from 'ui/components/Topbar.svelte';
+import * as FeeLabel from 'checkoutframe/components/fee';
 
 import PayoutsInstruments from 'ui/tabs/payout/payout-instruments.svelte';
 import PayoutAccount from 'ui/tabs/payout/payout-account.svelte';
@@ -106,6 +107,7 @@ export default {
   Color,
   _PaymentMethodIcons,
   Confirm,
+  FeeLabel,
   Currency,
   OtpService,
   getDecimalAmount: Currency.getDecimalAmount,

@@ -47,7 +47,8 @@ var preferences,
   I18n = discreet.I18n,
   NativeStore = discreet.NativeStore,
   Confirm = discreet.Confirm,
-  Backdrop = discreet.Backdrop;
+  Backdrop = discreet.Backdrop,
+  FeeLabel = discreet.FeeLabel;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -680,19 +681,18 @@ Session.prototype = {
       amount = discreet.currencies[displayCurrency] + ' ' + amount;
     } else {
       amount = discreet.currencies[currency] + ' ' + amountFigure;
-      this.handleFee();
     }
 
     return amount;
   },
   clearFee: function() {
-    $('.fee').hide();
-    $('.fee-helper').hide();
+    FeeLabel.hide();
   },
-  handleFee: function() {
-    var isFeeBearer = Store.isCustomerFeeBearer();
-    if (isFeeBearer) {
-      $('.fee').html('+ (Fee)');
+  setFeeLabel: function() {
+    if (Store.isCustomerFeeBearer()) {
+      FeeLabel.show({
+        isFeeBearer: true,
+      });
     } else {
       this.clearFee();
     }
@@ -1099,6 +1099,7 @@ Session.prototype = {
     this.setOffers();
     this.setLanguageDropdown();
     this.setSvelteOverlay();
+    this.setFeeLabel();
     // make bottom the last element
     gel('form-fields').appendChild(gel('bottom'));
   },
@@ -1746,8 +1747,11 @@ Session.prototype = {
   },
 
   hideErrorMessage: function(confirmedCancel) {
-    this.setAmount(this.get('amount'));
-    $('.fee').html(' +(Fee)');
+    if (Store.isCustomerFeeBearer()) {
+      this.setAmount(this.get('amount'));
+      Store.$showFeeLabel = true;
+    }
+
     if (this.nocostModal) {
       var modal = this.nocostModal;
       hideOverlay($('#nocost-overlay'));
