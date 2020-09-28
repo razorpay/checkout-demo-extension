@@ -4,7 +4,7 @@
   import { fly } from 'svelte/transition';
 
   // Store
-  import { isIRCTC, getAmount } from 'checkoutstore';
+  import { isIRCTC, getAmount, showFeeLabel } from 'checkoutstore';
   import { isContactPresent } from 'checkoutstore/screens/home';
 
   // i18n
@@ -101,6 +101,7 @@
     //For QR Based Feebearer payements, set the amount to the original amount.
     const amount = getAmount();
     session.setAmount(amount);
+    $showFeeLabel = true;
     dispatch('back');
   }
 

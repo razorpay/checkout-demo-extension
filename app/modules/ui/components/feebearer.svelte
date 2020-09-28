@@ -3,6 +3,8 @@
   import { createEventDispatcher, onMount } from 'svelte';
   // UI imports
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
+  //Store imports
+  import { showFeeLabel } from 'checkoutstore/index.js';
   // Utils imports
   import { formatAmountWithSymbol } from 'common/currency';
   import { getSession } from 'sessionmanager';
@@ -42,6 +44,7 @@
     feeBreakup = response.display;
     loading = false;
     bearer = response.input;
+    $showFeeLabel = false;
     session.updateAmountInHeader(
       formatTemplateWithLocale(feeBreakup.amount * 100)
     );
