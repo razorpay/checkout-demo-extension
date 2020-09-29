@@ -18,18 +18,26 @@
   const cancellationReasons = [
     {
       value: 'wrong_bank_selected',
+
+      // LABEL: Wrong bank selected
       label: WRONG_BANK_SELECTED,
     },
     {
       value: 'forgot_bank_details',
+
+      // LABEL: Forgot username or password
       label: FORGOT_USERNAME_PASSWORD,
     },
     {
       value: 'bank_page_error',
+
+      // LABEL: Error on bank page
       label: ERROR_BANK_PAGE,
     },
     {
       value: 'other',
+
+      // LABEL: Other
       label: CANCEL_REASON_OTHER,
     },
   ];
