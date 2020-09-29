@@ -3,7 +3,7 @@
   import { onDestroy } from 'svelte';
 
   //Store imports
-  import { getOption, getAmount } from 'checkoutstore';
+  import { getOption, getAmount, showFeeLabel } from 'checkoutstore';
 
   // Utils imports
   import Razorpay from 'common/Razorpay';
@@ -96,7 +96,7 @@
 
     if (response.amount_expected) {
       session.updateAmountInHeader(response.amount_expected);
-      session.clearFee();
+      $showFeeLabel = false;
     }
 
     if (receivers && receivers.length !== 0) {
