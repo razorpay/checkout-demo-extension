@@ -1,7 +1,10 @@
 const { delay } = require('../util');
 const querystring = require('querystring');
 
-async function respondAndVerifyIntentRequest(context) {
+async function respondAndVerifyIntentRequest(
+  context,
+  { isBrowserIntent = false }
+) {
   const reqorg = await context.expectRequest();
   expect(reqorg.url).toEqual(
     'https://api.razorpay.com/v1/payments/create/ajax'
@@ -30,6 +33,9 @@ async function respondAndVerifyIntentRequest(context) {
   await context.respondPlain(
     `${req.params.callback}(${JSON.stringify(successResult)})`
   );
+  if (isBrowserIntent) {
+    return;
+  }
   const result = await context.getResult();
   expect(result).toMatchObject(successResult);
 }
