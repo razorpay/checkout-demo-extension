@@ -3,7 +3,7 @@ const querystring = require('querystring');
 
 async function respondAndVerifyIntentRequest(
   context,
-  { isBrowserIntent = false }
+  { isBrowserIntent = false } = {}
 ) {
   const reqorg = await context.expectRequest();
   expect(reqorg.url).toEqual(
