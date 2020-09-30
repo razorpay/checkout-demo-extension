@@ -40,6 +40,16 @@
   .fee-helper:hover {
     cursor: pointer;
   }
+
+  :global(.fee-tooltip.tooltip.tooltip-bottom) {
+    position: fixed;
+    white-space: normal;
+    text-align: left;
+    margin: 0;
+    transform: translateX(-50%) translateY(10px);
+    left: unset;
+    right: unset;
+  }
 </style>
 
 {#if isFeeBearer}
@@ -49,7 +59,7 @@
       <span on:click={handleClick} class="fee-helper has-tooltip">
         ?
         <Tooltip
-          class="downtime-tooltip"
+          className="fee-tooltip"
           align={['bottom']}
           shown={showFeeDetails}>
           A convenience fee will be charged depending on your choice of payment
