@@ -29,6 +29,7 @@ export const getPayoutContact = () => preferences.contact;
 export const getDisplayAmount = am => displayAmount(razorpayInstance, am);
 export const getMerchantMethods = () => preferences.methods || {};
 export const getRecurringMethods = () => getMerchantMethods().recurring;
+export const getMethodsCustomText = () => getMerchantMethods().custom_text;
 export const getMerchantOrder = () => preferences.order;
 export const getOrderMethod = () => getMerchantOrder()?.method;
 export const getMerchantOffers = () => preferences.offers;
@@ -287,4 +288,17 @@ export function getMerchantConfig() {
       preferences: configFromPreferences,
     },
   };
+}
+
+/**
+ * CRED wants put ads in instrument subtext.
+ *
+ * @param code
+ * @returns {*}
+ */
+export function getCustomSubtextForMethod(code) {
+  const customText = getMethodsCustomText();
+  if (customText && customText[code]) {
+    return customText[code];
+  }
 }

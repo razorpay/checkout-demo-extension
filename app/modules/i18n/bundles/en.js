@@ -520,6 +520,14 @@ export default {
       'Total Amount: {totalAmount} ({monthlyAmount} x {duration})',
     edit_plan_action: 'Edit',
     edit_plan_text: '{duration} Months ({amount}/mo)',
+    citi_bank_emi:
+      'Full amount of {amount} will be deducted from your account. EMI processing may take upto 8 working days.',
+    citi_know_more:
+      'In case the total amount due has not been paid in full, finance charges as applicable (currently, between 3.50%- 3.60% per month i.e. 42-43.2% annualized) on card balances may apply until the EMI is converted & posted to the card. Latest rates are available at ',
+    show_more: 'Show More',
+    show_less: 'Show Less',
+    citi_url:
+      'https://www.online.citibank.co.in/portal/newgen/cards/tab/creditcards_tc.htm',
     hdfc_debit_description_convenience:
       ' Convenience Fee of ₹199 + GST applicable for EMI transactions on HDFC Bank Cards.',
     hdfc_debit_description_includes_interest: '(includes interest).',
@@ -665,8 +673,8 @@ export default {
       qr: 'Pay by scanning QR Code',
       recurring_cards: '{networks} credit cards',
       upi: 'Instant payment using UPI App',
-      upi_otm: 'Pay later using BHIM and HDFC',
-      upi_recurring: 'Supported only on BHIM and HDFC',
+      upi_otm: 'Pay later using BHIM',
+      upi_recurring: 'Supported only for BHIM UPI App',
     },
     prefixes: {
       bank_transfer: 'Bank Transfer',
@@ -815,6 +823,7 @@ export default {
       otp_sending_generic: 'Sending OTP to {phone}',
       otp_sent_access_card: 'Enter OTP sent to {phone} to access Saved Cards',
       otp_sent_generic: 'An OTP has been sent on {phone}',
+      otp_sent_phone: 'Enter OTP sent on {phone} to complete the payment',
       otp_sent_no_phone: 'Enter OTP to complete payment',
       otp_sent_save_card: 'Enter OTP sent to {phone} to save your card',
       otp_sent_save_card_recurring:
@@ -831,6 +840,10 @@ export default {
       wallet_sending: 'Looking for {wallet} account associated with {phone}',
     },
     try_different_label: 'Try different payment method',
+    misc: {
+      security_text:
+        'Your transaction is processed through a secure 128 bit https internet connection based on secure socket layer technology. For security purpose, your IP address {ipAddress} and access time {accessTime} have been logged.',
+    },
   },
   paylater: {
     providers: {
@@ -924,7 +937,7 @@ export default {
     downtime_text: '<strong>UPI<strong> is experiencing low success rate.',
     intent_block_heading: 'PAY USING APPS',
     new_vpa_subtitle: 'Google Pay, BHIM, PhonePe & more',
-    new_vpa_subtitle_upi_otm: 'Supported only for BHIM and HDFC',
+    new_vpa_subtitle_upi_otm: 'Supported only for BHIM UPI app',
     new_vpa_title_logged_in: 'Add UPI ID',
     new_vpa_title_logged_out: 'UPI ID',
     omni_block_heading: 'Or, pay using phone number',
