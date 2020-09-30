@@ -116,4 +116,4 @@ For example
 - `behav:bank:select`
 - `behav:saved_cards:toggle`
 
-Because we have namespacing, we can even namespace events for specific screens. For example, events for eMandate screen are sent as `${event_type}:emandate:${event_name}`. You get the idea.
+Because we have namespacing, we can even namespace events for specific screens. For example, events for eMandate screen are sent as `${event_type}:emandate:${event_name}`. You get the idea. 

@@ -141,7 +141,7 @@ function transformIntentForMicroappPayload(intentUrl) {
     transactionInfo: {
       countryCode: 'IN',
       totalPriceStatus: 'FINAL',
-      totalPrice: intentParams.am,
+      totalPrice: Number(intentParams.am).toFixed(2),
       currencyCode: intentParams.cu,
       transactionNote: intentParams.tn,
     },

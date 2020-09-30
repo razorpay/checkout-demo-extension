@@ -40,8 +40,8 @@ const {
   handlePartialPayment,
 
   //Downtime
-  verifyLowDowntime,
-  verifyHighDowntime,
+  verifyMethodWarned,
+  verifyMethodDisabled,
 
   // Personalization
   selectPersonalizationPaymentMethod,
@@ -118,24 +118,14 @@ module.exports = function(testFeatures) {
         await verifyPersonalizationText(context, 'upi');
         await selectPersonalizationPaymentMethod(context, 1);
       } else {
-        if (!(downtimeHigh && offers)) {
-          if (downtimeHigh) {
-            await verifyHighDowntime(
-              context,
-              'upi',
-              'UPI is facing temporary issues right now.'
-            );
-            return;
-          }
+        await selectPaymentMethod(context, 'upi');
 
-          await selectPaymentMethod(context, 'upi');
-
-          if (downtimeLow) {
-            await verifyLowDowntime(context, 'UPI', 'upi');
-          }
-          await selectUPIMethod(context, 'token');
+        if (downtimeHigh || downtimeLow) {
+          await verifyMethodWarned(context, 'UPI', 'upi');
         }
+        await selectUPIMethod(context, 'token');
       }
+
       if (partialPayment) {
         await verifyPartialAmount(context, '₹ 100');
       }
@@ -148,13 +138,7 @@ module.exports = function(testFeatures) {
         await verifyDiscountAmountInBanner(context, '₹ 1,990');
         await verifyDiscountText(context, 'You save ₹10');
       }
-      if (downtimeHigh && offers) {
-        await verifyHighDowntime(
-          context,
-          'upi',
-          ' UPI is experiencing low success rates.'
-        );
-      }
+
       await submit(context);
 
       if (feeBearer) {

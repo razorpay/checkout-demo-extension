@@ -8,9 +8,10 @@ const {
   assertUserDetails,
   assertPaymentMethods,
   assertEditUserDetailsAndBack,
-  verifyHighDowntime,
+  verifyMethodDisabled,
   verifyPersonalizationText,
 } = require('../actions');
+const { verifyMethodWarned } = require('../../../actions/common');
 
 describe.each(
   getTestData('Verify UPI downtime - High with personalization enabled', {
@@ -32,7 +33,7 @@ describe.each(
             status: 'started',
             scheduled: false,
             severity: 'high',
-            instrument: [],
+            instrument: { vpa_handle: 'ALL' },
             created_at: 1567686387,
             updated_at: 1567686387,
           },
@@ -56,10 +57,7 @@ describe.each(
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await verifyPersonalizationText(context, 'upi');
-    await verifyHighDowntime(
-      context,
-      'upi',
-      'UPI is facing temporary issues right now.'
-    );
+    await selectPaymentMethod(context, 'upi');
+    await verifyMethodWarned(context, 'upi');
   });
 });

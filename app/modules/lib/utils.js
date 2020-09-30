@@ -206,3 +206,35 @@ export function compareSemver(a, b) {
   }
   return 0;
 }
+
+export function luhnCheck(num) {
+  let sum = 0;
+  let digits = String(num)
+    .split('')
+    .reverse();
+
+  for (var i = 0; i < digits.length; i++) {
+    let digit = digits[i];
+    digit = parseInt(digit, 10);
+    if (i % 2) {
+      digit *= 2;
+    }
+    if (digit > 9) {
+      digit -= 9;
+    }
+    sum += digit;
+  }
+
+  return sum % 10 === 0;
+}
+
+export function getFormattedDateTime(timestamp) {
+  const today = new Date(timestamp);
+  let date = today.toDateString(); // Fri Jun 26 2020
+  date = date.replace(/^\w*\s/, ''); // Jun 26 2020
+
+  let time = today.toTimeString(); // 16:59:09 GMT+0530 (India Standard Time)
+  time = time.replace(/GMT[^\s]*\s/, ''); // 16:59:09 (India Standard Time)
+  time = time.replace('(India Standard Time)', 'IST'); // 16:59:09 IST
+  return date + ' ' + time;
+}

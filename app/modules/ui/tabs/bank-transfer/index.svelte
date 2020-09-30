@@ -3,7 +3,7 @@
   import { onDestroy } from 'svelte';
 
   //Store imports
-  import { getAmount } from 'checkoutstore/index.js';
+  import { getOption, getAmount } from 'checkoutstore';
 
   // Utils imports
   import Razorpay from 'common/Razorpay';
@@ -50,10 +50,20 @@
   let copied = false;
   const session = getSession();
 
+  function getPayloadForVirtualAccounts() {
+    const payload = {};
+    const customer_id = getOption('customer_id');
+    if (customer_id) {
+      payload.customer_id = customer_id;
+    }
+    return payload;
+  }
+
   function init() {
     loading = true;
 
     const submitData = session.getPayload();
+    const data = getPayloadForVirtualAccounts();
 
     Analytics.track('submit', {
       data: submitData,
@@ -69,6 +79,7 @@
         session.r,
         `orders/${session.r.get('order_id')}/virtual_accounts`
       ),
+      data,
       callback: getNEFTDetails,
     });
   }

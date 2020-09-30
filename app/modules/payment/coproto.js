@@ -8,7 +8,6 @@ import {
 import { androidBrowser } from 'common/useragent';
 import Track from 'tracker';
 import Analytics from 'analytics';
-import { getBankFromCard } from 'common/bank';
 import * as Bridge from 'bridge';
 
 export const processOtpResponse = function(response) {
@@ -277,6 +276,8 @@ var responseTypes = {
             data: error,
           });
           this.emit('cancel', upiBackCancel);
+          // Log error for debugging/troubleshooting
+          console.error(error);
         });
     }
   },
@@ -399,13 +400,13 @@ var responseTypes = {
     if (!this.nativeotp && !this.iframe && request.method === 'direct') {
       return responseTypes.first.call(this, request, responseTypes);
     }
-    // TODO: Remove this usage when API starts sending "mode: hdfc_debit_emi"
-    const iin = fullResponse.metadata && fullResponse.metadata.iin;
-    const bank = getBankFromCard(iin);
     if (this.data.method === 'wallet') {
       this.otpurl = request.url;
       this.emit('otp.required');
-    } else if (this.data.method === 'emi' && bank.code === 'HDFC_DC') {
+    } else if (
+      this.data.method === 'emi' &&
+      this.data['_[mode]'] === 'hdfc_debit_emi'
+    ) {
       this.otpurl = fullResponse.submit_url;
       // TODO: Remove this explicit assignment when backend starts sending it.
       fullResponse.mode = 'hdfc_debit_emi';

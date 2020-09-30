@@ -6,6 +6,7 @@ import {
   getMerchantMethods,
   getRecurringMethods,
   getMerchantOrder,
+  getOrderMethod,
   getOption,
   getAmount,
   isIRCTC,
@@ -14,6 +15,7 @@ import {
   isOfferForced,
   isASubscription,
   getCallbackUrl,
+  isCustomerFeeBearer,
 } from 'checkoutstore';
 
 import {
@@ -22,7 +24,10 @@ import {
   getEMIBank,
 } from 'common/emi';
 
-import { getEligibleProvidersBasedOnMinAmount } from 'common/cardlessemi';
+import {
+  getEligibleProvidersBasedOnMinAmount,
+  getEligibleProvidersForFeeBearerCustomer,
+} from 'common/cardlessemi';
 import { getProvider } from 'common/paylater';
 import { getAppsForMethod, getProvider as getAppProvider } from 'common/apps';
 import { findCodeByNetworkName } from 'common/card';
@@ -45,6 +50,8 @@ import { get as storeGetter } from 'svelte/store';
 import {
   sequence as SequenceStore,
   instruments as InstrumentsStore,
+  hiddenInstruments as HiddenInstrumentsStore,
+  hiddenMethods as HiddenMethodsStore,
 } from 'checkoutstore/screens/home';
 
 function isNoRedirectFacebookWebViewSession() {
@@ -115,9 +122,8 @@ const ALL_METHODS = {
 
   emandate() {
     return (
-      !isMethodEnabled('nach') &&
+      getOrderMethod() === 'emandate' &&
       !isInternational() &&
-      !getAmount() &&
       !_Obj.isEmpty(getRecurringMethods()?.emandate)
     );
   },
@@ -267,6 +273,12 @@ function isMethodEnabledForBrowser(method) {
 }
 
 export function isMethodEnabled(method) {
+  if (getOrderMethod()) {
+    if (getOrderMethod() !== method) {
+      return false;
+    }
+  }
+
   const checker = ALL_METHODS[method];
   if (checker) {
     return checker() && isMethodEnabledForBrowser(method);
@@ -312,6 +324,10 @@ export function getEnabledMethods() {
 }
 
 export function getSingleMethod() {
+  if (getOrderMethod()) {
+    return getOrderMethod();
+  }
+
   let oneMethod;
   const methods = getEnabledMethods();
 
@@ -514,11 +530,45 @@ export function getPayloadForCRED() {
   };
 }
 
+export function isContactRequiredForInstrument(instrument) {
+  if (
+    instrument.method === 'app' &&
+    instrument.providers?.length === 1 &&
+    instrument.providers[0] === 'cred'
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+export function isContactRequiredForAppProvider(code) {
+  if (code === 'cred') {
+    return true;
+  }
+
+  return false;
+}
+
 export function getAppsForCards() {
   if (!isMethodEnabled('card')) {
     return [];
   }
-  return getAppsForMethod('card') |> _Arr.filter(isApplicationEnabled);
+
+  const disableAllApps = storeGetter(HiddenMethodsStore).includes('app');
+  if (disableAllApps) {
+    return [];
+  }
+
+  const apps = getAppsForMethod('card') |> _Arr.filter(isApplicationEnabled);
+
+  const disabledApps = storeGetter(HiddenInstrumentsStore)
+    .filter(instrument => instrument.method === 'app' && instrument.provider)
+    .map(instrument => instrument.provider);
+
+  const filteredApps = apps.filter(app => !disabledApps.includes(app));
+
+  return filteredApps;
 }
 
 export function getCardNetworks() {
@@ -756,7 +806,13 @@ export function getCardlessEMIProviders() {
     emiMethod.bajaj = true;
   }
 
-  return getEligibleProvidersBasedOnMinAmount(getAmount(), emiMethod);
+  let providers = getEligibleProvidersBasedOnMinAmount(getAmount(), emiMethod);
+
+  if (isCustomerFeeBearer()) {
+    providers = getEligibleProvidersForFeeBearerCustomer(providers);
+  }
+
+  return providers;
 }
 
 export function getWallets() {

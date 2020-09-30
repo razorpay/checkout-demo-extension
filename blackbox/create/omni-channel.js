@@ -40,8 +40,7 @@ const {
   handlePartialPayment,
 
   //DownTime
-  verifyHighDowntime,
-  verifyLowDowntime,
+  verifyMethodWarned,
 } = require('../tests/homescreen/actions');
 
 module.exports = function(testFeatures) {
@@ -100,19 +99,11 @@ module.exports = function(testFeatures) {
       }
 
       await assertPaymentMethods(context);
-      if (downtimeHigh) {
-        await verifyHighDowntime(
-          context,
-          'upi',
-          'UPI is facing temporary issues right now.'
-        );
-        return;
-      }
 
       await selectPaymentMethod(context, 'upi');
 
-      if (downtimeLow) {
-        await verifyLowDowntime(context, 'UPI', 'upi');
+      if (downtimeHigh || downtimeLow) {
+        await verifyMethodWarned(context, 'UPI', 'upi');
       }
 
       await selectUPIMethod(context, 'omnichannel');

@@ -37,7 +37,7 @@ const {
 
 module.exports = function(testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
-    'zest-money',
+    'cardless-emi',
     testFeatures
   );
 
@@ -47,6 +47,7 @@ module.exports = function(testFeatures) {
     callbackUrl,
     optionalContact,
     optionalEmail,
+    provider = 'zestmoney',
   } = features;
 
   describe.each(
@@ -54,13 +55,18 @@ module.exports = function(testFeatures) {
       options,
       preferences,
     })
-  )('Zest Money tests', ({ preferences, title, options }) => {
+  )(`Cardless EMI - ${provider} tests`, ({ preferences, title, options }) => {
     test(title, async () => {
       preferences.methods.cardless_emi = {
         earlysalary: true,
         zestmoney: true,
         flexmoney: true,
       };
+
+      // ZestMoney is disabled on feeBearer merchants
+      if (feeBearer) {
+        return;
+      }
 
       const context = await openCheckoutWithNewHomeScreen({
         page,
@@ -98,7 +104,7 @@ module.exports = function(testFeatures) {
       if (partialPayment) {
         await verifyPartialAmount(context, '₹ 3,000');
       }
-      await selectCardlessEMIOption(context, 'zestmoney');
+      await selectCardlessEMIOption(context, provider);
       if (feeBearer) {
         await handleFeeBearer(context);
       }

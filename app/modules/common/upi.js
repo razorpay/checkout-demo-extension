@@ -257,6 +257,10 @@ const UPI_APPS = {
       package_name: 'in.bajajfinservmarkets.app.uat',
       shortcode: 'finserv-uat',
     },
+    {
+      package_name: 'com.fampay.in',
+      shortcode: 'fampay',
+    },
   ],
 
   /**

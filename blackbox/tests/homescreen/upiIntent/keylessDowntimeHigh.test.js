@@ -8,7 +8,8 @@ const {
   assertUserDetails,
   assertPaymentMethods,
   assertEditUserDetailsAndBack,
-  verifyHighDowntime,
+  verifyMethodDisabled,
+  verifyMethodWarned,
 } = require('../actions');
 
 describe('Basic upi payment', () => {
@@ -32,7 +33,7 @@ describe('Basic upi payment', () => {
             status: 'started',
             scheduled: false,
             severity: 'high',
-            instrument: [],
+            instrument: { vpa_handle: 'ALL' },
             created_at: 1567686387,
             updated_at: 1567686387,
           },
@@ -52,10 +53,5 @@ describe('Basic upi payment', () => {
     await assertUserDetails(context);
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
-    await verifyHighDowntime(
-      context,
-      'upi',
-      'UPI is facing temporary issues right now.'
-    );
   });
 });

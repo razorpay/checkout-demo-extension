@@ -14,6 +14,7 @@ import showTimer from 'checkoutframe/timer';
 import {
   setInstrumentsForCustomer,
   trackP13nMeta,
+  removeDuplicateApiInstruments,
 } from 'checkoutframe/personalization/api';
 import { setHistoryAndListenForBackPresses } from 'bridge/back';
 
@@ -114,10 +115,13 @@ const setAnalyticsMeta = message => {
    * Set network-related properties.
    */
   if (_Obj.hasProp(navigator, 'connection')) {
-    const { effectiveType, type } = navigator.connection;
+    const { effectiveType, type, downlink } = navigator.connection;
 
     if (effectiveType || type) {
       Analytics.setMeta('network.type', effectiveType || type);
+    }
+    if (downlink) {
+      Analytics.setMeta('network.downlink', downlink);
     }
   }
 
@@ -281,20 +285,6 @@ function setSessionPreferences(session, preferences) {
   }
   session.render();
   showModal(session);
-  addSiftScript();
-}
-
-function addSiftScript() {
-  // https://sift.com/developers/docs/curl/javascript-api/overview
-  window._sift = [
-    ['_setAccount', '4dbbb1f7b6'],
-    ['_setSessionId', Track.id],
-    ['_trackPageview'],
-  ];
-
-  _El.create('script')
-    |> _Obj.setProp('src', 'https://cdn.razorpay.com/checkout/sift.js')
-    |> _El.appendTo(_Doc.documentElement);
 }
 
 function getPreferenecsParams(razorpayInstance) {
@@ -355,15 +345,15 @@ function updateEmandatePrefill() {
           setOption(`prefill.bank_account[${key}]`, bank_account[key]);
         }
       });
-
-    if (order.bank) {
-      setOption('prefill.bank', order.bank);
-    }
+  }
+  if (order.bank) {
+    setOption('prefill.bank', order.bank);
   }
 }
 
 function updateAnalytics(preferences) {
   Analytics.setMeta('features', preferences.features);
+  Analytics.setMeta('merchant_id', preferences.merchant_id);
   // Set optional fields in meta
   const optionalFields = preferences.optional;
   if (optionalFields |> _.isArray) {
@@ -388,7 +378,7 @@ function updatePreferredMethods(preferences) {
           {
             contact,
           },
-          instruments
+          removeDuplicateApiInstruments(instruments)
         );
       }
     });
