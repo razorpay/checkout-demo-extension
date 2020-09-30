@@ -16,7 +16,7 @@
   } from 'ui/labels/upi';
 
   export let title = '';
-  export let method = 'netbanking';
+  export let method = '';
   export let reasons = [];
 
   export let onBack = null;
@@ -29,9 +29,7 @@
     selectedReason = reason;
   };
 
-  let prefixGenerator;
-
-  const pg = (prefixGenerator = text => `${method}-${text}`);
+  const prefixGenerator = text => `${method}-${text}`;
 </script>
 
 <style>
@@ -77,23 +75,20 @@
       font-weight: bold;
     }
   }
-
-  :global(div#error-message.cancel_netbanking) {
-    height: 260px;
-    overflow: hidden;
-
-    #cancel_netbanking {
-      display: block;
-    }
-  }
 </style>
 
 <div id={'cancel_' + method} class="cancel_modal">
   <p>{$t(title)}</p>
 
   {#each reasons as reason, i (reason.value)}
-    <label on:click={() => onReasonSelection(reason.value)} for={pg(i)}>
-      <input id={pg(i)} type="radio" name="_[reason]" value={reason.value} />
+    <label
+      on:click={() => onReasonSelection(reason.value)}
+      for={prefixGenerator(i)}>
+      <input
+        id={prefixGenerator(i)}
+        type="radio"
+        name="_[reason]"
+        value={reason.value} />
       {$t(reason.label)}
     </label>
   {/each}

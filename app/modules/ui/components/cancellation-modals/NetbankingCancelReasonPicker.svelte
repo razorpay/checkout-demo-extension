@@ -54,9 +54,19 @@
   };
 </script>
 
+<style>
+  :global(div#error-message.cancel_netbanking) {
+    height: 260px;
+    overflow: hidden;
+
+    :global(#cancel_netbanking) {
+      display: block;
+    }
+  }
+</style>
+
 <CancelReasonPicker
   method="netbanking"
   reasons={cancellationReasons}
   title={CANCELLATION_MODAL_TITLE}
-  {onSubmit}
-  } />
+  {onSubmit} />

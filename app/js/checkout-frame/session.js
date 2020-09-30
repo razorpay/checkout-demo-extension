@@ -1774,6 +1774,9 @@ Session.prototype = {
         this.payload.method === 'netbanking' &&
         _Obj.getSafely(this.r, '_payment.popup.window.closed')
       ) {
+        // Called when the popup for netbanking has been closed by the user
+        // and the netbanking cancellation modal is open
+        // returning from this point prevents confirmClose from being called because it's not needed
         return;
       }
 

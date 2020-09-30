@@ -24,12 +24,12 @@ const {
 } = require('../actions');
 
 describe.each(
-  getTestData('Verify UPI downtime - High with personalization enabled', {
+  getTestData('Verify cancellation modal flow', {
     options: {
       amount: 200,
     },
   })
-)('Netbanking Cancellation modal test', ({ preferences, title, options }) => {
+)('Netbanking', ({ preferences, title, options }) => {
   test(title, async () => {
     const context = await openCheckoutWithNewHomeScreen({
       page,
