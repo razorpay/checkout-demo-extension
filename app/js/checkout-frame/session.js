@@ -2314,6 +2314,13 @@ Session.prototype = {
       from: this.screen,
       to: screen,
     };
+    if (this.screen === 'otp' && screen !== 'otp') {
+      Store.showFeeLabel.set(false);
+    }
+
+    if (this.screen !== 'otp' && screen === 'otp') {
+      Store.showFeeLabel.set(true);
+    }
 
     if (extraProps) {
       trackingData = _Obj.extend(trackingData, extraProps);
