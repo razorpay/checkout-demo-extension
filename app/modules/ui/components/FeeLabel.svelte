@@ -40,9 +40,6 @@
   .fee-helper:hover {
     cursor: pointer;
   }
-  .tooltip-text {
-    margin-bottom: 8px;
-  }
 </style>
 
 {#if isFeeBearer}
@@ -55,10 +52,8 @@
           class="downtime-tooltip"
           align={['bottom']}
           shown={showFeeDetails}>
-          <div class="tooltip-text">
-            A convenience fee will be charged depending on your choice of
-            payment method.
-          </div>
+          A convenience fee will be charged depending on your choice of payment
+          method.
         </Tooltip>
       </span>
     </div>
