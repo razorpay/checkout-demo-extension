@@ -1,10 +1,8 @@
 <script>
-  import { onMount } from 'svelte';
   //UI imports
   import Tooltip from 'ui/elements/Tooltip.svelte';
   //Store imports
   import { isCustomerFeeBearer, showFeeLabel } from 'checkoutstore/index.js';
-
   //Util imports
   import { getSession } from 'sessionmanager';
 
