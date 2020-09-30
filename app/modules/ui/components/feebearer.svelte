@@ -45,7 +45,6 @@
     loading = false;
     bearer = response.input;
     $showFeeLabel = false;
-    console.log(session.getAppliedOffer());
     if (!session.getAppliedOffer()) {
       session.updateAmountInHeader(
         formatTemplateWithLocale(feeBreakup.amount * 100),
