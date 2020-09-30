@@ -49,17 +49,17 @@
   {#if $showFeeLabel}
     <div class="label">
       <span class="fee">(+ Fee)</span>
-      <span on:click={handleClick} class="fee-helper">
+      <span on:click={handleClick} class="fee-helper has-tooltip">
         ?
-        <!-- <Tooltip
-          className="downtime-tooltip"
+        <Tooltip
+          class="downtime-tooltip"
           align={['bottom']}
           shown={showFeeDetails}>
           <div class="tooltip-text">
             A convenience fee will be charged depending on your choice of
             payment method.
           </div>
-        </Tooltip> -->
+        </Tooltip>
       </span>
     </div>
   {/if}

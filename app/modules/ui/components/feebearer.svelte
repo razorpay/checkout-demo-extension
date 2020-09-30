@@ -4,7 +4,8 @@
   // UI imports
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
   //Store imports
-  import { showFeeLabel } from 'checkoutstore/index.js';
+  import { showFeeLabel, feeTotalAmount } from 'checkoutstore/index.js';
+  import { showAmountInCta } from 'checkoutstore/cta.js';
   // Utils imports
   import { formatAmountWithSymbol } from 'common/currency';
   import { getSession } from 'sessionmanager';
@@ -45,10 +46,22 @@
     loading = false;
     bearer = response.input;
     $showFeeLabel = false;
-    session.updateAmountInHeader(
-      formatTemplateWithLocale(feeBreakup.amount * 100)
-    );
-    session.clearFee();
+    console.log(session.getAppliedOffer());
+    if (!session.getAppliedOffer()) {
+      session.updateAmountInHeader(
+        formatTemplateWithLocale(feeBreakup.amount * 100),
+        false
+      );
+    }
+    if (session.getAppliedOffer()) {
+      session.updateAmountInHeaderForOffer(
+        formatTemplateWithLocale(feeBreakup.amount * 100),
+        true
+      );
+    }
+    $feeTotalAmount = feeBreakup.amount * 100;
+    console.log(feeBreakup);
+    showAmountInCta(feeBreakup.amount);
   }
   export function onError(response) {
     session.showLoadError(response.error.description, response.error);

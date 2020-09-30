@@ -707,10 +707,22 @@ Session.prototype = {
    *
    * @param {Number} amount
    */
-  updateAmountInHeader: function(amount) {
-    $('#amount .original-amount').rawHtml(
-      this.formatAmountWithCurrency(amount)
-    );
+  updateAmountInHeader: function(amount, fee) {
+    if (fee) {
+      $('#amount .original-amount').hide();
+    } else {
+      $('#amount .original-amount').rawHtml(
+        this.formatAmountWithCurrency(amount)
+      );
+      $('#amount .original-amount')[0].removeAttribute('style');
+    }
+  },
+  updateAmountInHeaderForOffer: function(amount, fee) {
+    if (fee) {
+      $('#amount .original-amount').hide();
+    }
+    $('#amount .discount').rawHtml(this.formatAmountWithCurrency(amount));
+    //$('#amount .original-amount').hide();
   },
   /**
    * Set the amount in header.
@@ -1749,7 +1761,6 @@ Session.prototype = {
   hideErrorMessage: function(confirmedCancel) {
     if (Store.isCustomerFeeBearer()) {
       this.setAmount(this.get('amount'));
-      Store.$showFeeLabel = true;
     }
 
     if (this.nocostModal) {
@@ -2485,6 +2496,14 @@ Session.prototype = {
     // this.offers is undefined for forced offers
     if (hasDiscount && this.offers) {
       hasDiscount = this.offers.isCardApplicable();
+    }
+
+    var hasDiscountAndFee = offer && Store.isCustomerFeeBearer();
+
+    if (hasDiscountAndFee) {
+      $('#content').toggleClass('has-fee', hasDiscountAndFee);
+    } else {
+      $('#content').toggleClass('has-fee', false);
     }
 
     $('#content').toggleClass('has-discount', hasDiscount);
