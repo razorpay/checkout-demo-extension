@@ -217,9 +217,8 @@
    * @returns {Element}
    */
   function getHoverParent() {
-    //if Tool
-
     let parent = tooltip;
+    //Do not call this function if Tooltip is destroyed.
     if (!parent) {
       return;
     }
