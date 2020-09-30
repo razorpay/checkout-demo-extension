@@ -217,8 +217,12 @@
    * @returns {Element}
    */
   function getHoverParent() {
-    let parent = tooltip;
+    //if Tool
 
+    let parent = tooltip;
+    if (!parent) {
+      return;
+    }
     while (!_El.hasClass(parent, 'has-tooltip')) {
       parent = _El.parent(parent);
     }
