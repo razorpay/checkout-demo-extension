@@ -4,8 +4,7 @@
   // UI imports
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
   //Store imports
-  import { showFeeLabel, feeTotalAmount } from 'checkoutstore/index.js';
-  import { showAmountInCta } from 'checkoutstore/cta.js';
+  import { showFeeLabel } from 'checkoutstore/index.js';
   // Utils imports
   import { formatAmountWithSymbol } from 'common/currency';
   import { getSession } from 'sessionmanager';
@@ -59,9 +58,6 @@
         true
       );
     }
-    $feeTotalAmount = feeBreakup.amount * 100;
-    console.log(feeBreakup);
-    showAmountInCta(feeBreakup.amount);
   }
   export function onError(response) {
     session.showLoadError(response.error.description, response.error);
