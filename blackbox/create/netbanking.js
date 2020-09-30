@@ -26,6 +26,7 @@ const {
 
   // Partial Payment
   verifyPartialAmount,
+  verifyFooterText,
 } = require('../actions/common');
 
 const {
@@ -138,9 +139,15 @@ module.exports = function(testFeatures) {
         await viewOffers(context);
         await selectOffer(context, '1');
         await verifyOfferApplied(context);
-        await verifyDiscountPaybleAmount(context, '₹ 1,980');
+        if (!feeBearer) {
+          await verifyDiscountPaybleAmount(context, '₹ 1,980');
+        }
         await verifyDiscountAmountInBanner(context, '₹ 1,980');
         await verifyDiscountText(context, 'You save ₹20');
+      }
+
+      if (feeBearer) {
+        await verifyFooterText(context, 'PAY');
       }
 
       if (partialPayment) {
