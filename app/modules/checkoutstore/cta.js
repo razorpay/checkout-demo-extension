@@ -2,6 +2,7 @@ import { writable, derived } from 'svelte/store';
 import { getSession } from 'sessionmanager';
 import { displayAmount } from 'common/currency';
 import { isCardValidForOffer } from 'checkoutstore/offers';
+import { isCustomerFeeBearer } from 'checkoutstore/index';
 import { CtaViews } from 'ui/labels/cta';
 
 import { locale } from 'svelte-i18n';
@@ -125,11 +126,15 @@ export function showAmountInCta() {
   if (!session.get('amount')) {
     setView(CtaViews.AUTHENTICATE, false);
   } else {
-    const offer = session.getAppliedOffer();
-    const amount = (offer && offer.amount) || session.get('amount');
-    setView(CtaViews.AMOUNT, false, {
-      amount: displayAmount(session.r, amount),
-    });
+    if (isCustomerFeeBearer()) {
+      setView(CtaViews.PAY, false);
+    } else {
+      const offer = session.getAppliedOffer();
+      const amount = (offer && offer.amount) || session.get('amount');
+      setView(CtaViews.AMOUNT, false, {
+        amount: displayAmount(session.r, amount),
+      });
+    }
   }
 }
 
