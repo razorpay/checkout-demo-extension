@@ -19,11 +19,19 @@
     overflow: hidden;
 
     & [slot=detail]:not(:empty)
-      border-top: 1px solid transparent;
+      border-top:1px solid #E6E7E8;
+      padding-top: 8px;
+      margin-top: 8px;
 
     ul
       padding-left: 18px;
       margin: 0;
+      li
+        line-height: 1.4em;
+        >span:first-child{
+          width: 60%;
+          display: inline-block;
+      }
 
 .expandable-card--expanded
   .expandable-card-detail [slot=detail]:not(:empty)

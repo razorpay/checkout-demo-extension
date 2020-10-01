@@ -63,8 +63,11 @@
   const HDFC_BANK_DEBIT_CODE = 'HDFC_DC';
 
   $: {
-    processingFee = session.formatAmountWithCurrency(plan.processing_fee);
-    stampDuty = plan.stamp_duty;
+    processingFee =
+      plan.processing_fee &&
+      session.formatAmountWithCurrency(plan.processing_fee);
+    stampDuty =
+      plan.stamp_duty && session.formatAmountWithCurrency(plan.stamp_duty);
     processingFeeDisclaimer = plan.processing_fee_disclaimer;
   }
 
@@ -236,25 +239,35 @@
         <ul>
           <!-- LABEL: Monthly Installment: {amount} -->
           <li>
-            {formatTemplateWithLocale(DESCRIPTION_MONTHLY_INSTALLMENT, { amount: formattedAmountPerMonth }, $locale)}
+            <span>{$t(DESCRIPTION_MONTHLY_INSTALLMENT)}</span>
+            <span>{formattedAmountPerMonth}</span>
           </li>
           {#if processingFee}
             <li>
-              {formatTemplateWithLocale(PROCESSING_FEE, { amount: processingFee }, $locale)}
+              <span>{$t(PROCESSING_FEE)}</span>
+              <span>{processingFee}</span>
+              <!-- TODO: Add label comments -->
             </li>
           {/if}
           {#if stampDuty}
             <li>
-              {formatTemplateWithLocale(STAMP_DUTY, { amount: stampDuty }, $locale)}
+              <span>{$t(STAMP_DUTY)}</span>
+              <span>{stampDuty}</span>
             </li>
           {/if}
           <!-- LABEL: Total Amount: {formattedFinalAmount} ({formattedAmountPerMonth} x {plan.duration}) -->
           <li>
-            {formatTemplateWithLocale(DESCRIPTION_TOTAL_AMOUNT, { totalAmount: formattedFinalAmount, monthlyAmount: formattedAmountPerMonth, duration: plan.duration }, $locale)}
+            <span>{$t(DESCRIPTION_TOTAL_AMOUNT)} {provider}</span>
+            <span>{formattedFinalAmount}</span>
           </li>
         </ul>
-        {#if processingFee && processingFeeDisclaimer}
-          <div class="processing-fee-disclaimer">{processingFeeDisclaimer}</div>
+        <!-- Zestmoney is unable to send us the processing fee disclaimer as of now
+        For that specific provider, show a hardcoded string until it's present in BE
+         -->
+        {#if processingFee && (processingFeeDisclaimer || provider === 'zestmoney')}
+          <div class="processing-fee-disclaimer">
+            {processingFeeDisclaimer || 'Processing Fee will be charged on the 1st month of EMI'}
+          </div>
         {/if}
       {/if}
       {#if noCostEmi}
