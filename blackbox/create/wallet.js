@@ -122,8 +122,14 @@ module.exports = function(testFeatures) {
 
         if (offers || (optionalContact && !callbackUrl)) {
           await selectWallet(context, 'payzapp');
+          if (feeBearer) {
+            await verifyFooterText(context, 'PAY');
+          }
         } else {
           await selectWallet(context, 'freecharge');
+          if (feeBearer) {
+            await verifyFooterText(context, 'PAY');
+          }
         }
       }
 
@@ -138,10 +144,6 @@ module.exports = function(testFeatures) {
         await verifyDiscountText(context, 'You save ₹20');
       }
 
-      if (feeBearer) {
-        await verifyFooterText(context, 'PAY');
-      }
-
       if (partialPayment) {
         await verifyPartialAmount(context, '₹ 100');
       }
@@ -151,7 +153,9 @@ module.exports = function(testFeatures) {
 
         return;
       }
-
+      if (feeBearer) {
+        await verifyFooterText(context, 'PAY');
+      }
       await submit(context);
       if (optionalContact && !callbackUrl) {
         await handleWalletPopUp(context);
@@ -190,6 +194,7 @@ module.exports = function(testFeatures) {
             await verifyDiscountPaybleAmount(context, '₹ 1,980');
           }
           if (feeBearer) {
+            await verifyFooterText(context, 'PAY');
             await verifyDiscountAmountInBanner(context, '₹ 620.54');
           } else {
             await verifyDiscountAmountInBanner(context, '₹ 1,980');
@@ -203,15 +208,14 @@ module.exports = function(testFeatures) {
           return;
         }
 
-        if (feeBearer) {
-          await verifyFooterText(context, 'PAY');
-        }
-
         if (!personalization) {
           await handleOtpVerification(context);
           await typeOTPandSubmit(context);
           await handleValidationRequest(context, 'fail');
           await retryWalletTransaction(context);
+          if (feeBearer) {
+            await verifyFooterText(context, 'PAY');
+          }
           await submit(context);
         }
         if (feeBearer) {
