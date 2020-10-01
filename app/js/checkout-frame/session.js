@@ -685,16 +685,11 @@ Session.prototype = {
 
     return amount;
   },
-  clearFee: function() {
-    FeeLabel.hide();
-  },
   setFeeLabel: function() {
     if (Store.isCustomerFeeBearer()) {
       FeeLabel.show({
         isFeeBearer: true,
       });
-    } else {
-      this.clearFee();
     }
   },
 
