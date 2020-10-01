@@ -149,7 +149,6 @@ async function verifyDiscountPaybleAmount(context, expectedDiscountAmount) {
   );
 
   footerText = footerText.trim();
-  console.log(footerText);
 
   const footerEndsWithDiscountAmount = footerText.endsWith(
     expectedDiscountAmount
