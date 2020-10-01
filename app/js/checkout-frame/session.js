@@ -709,7 +709,9 @@ Session.prototype = {
       $('#amount .original-amount').rawHtml(
         this.formatAmountWithCurrency(amount)
       );
-      $('#amount .original-amount')[0].removeAttribute('style');
+      if ($('#amount .original-amount')[0]) {
+        $('#amount .original-amount')[0].removeAttribute('style');
+      }
     }
   },
   updateAmountInHeaderForOffer: function(amount, fee) {
