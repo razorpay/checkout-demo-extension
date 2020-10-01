@@ -46,16 +46,10 @@
     bearer = response.input;
     $showFeeLabel = false;
     if (!session.getAppliedOffer()) {
-      session.updateAmountInHeader(
-        formatTemplateWithLocale(feeBreakup.amount * 100),
-        false
-      );
+      session.updateAmountInHeader(feeBreakup.amount * 100, false);
     }
     if (session.getAppliedOffer()) {
-      session.updateAmountInHeaderForOffer(
-        formatTemplateWithLocale(feeBreakup.amount * 100),
-        true
-      );
+      session.updateAmountInHeaderForOffer(feeBreakup.amount * 100, true);
     }
   }
   export function onError(response) {
