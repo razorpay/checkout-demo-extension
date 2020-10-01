@@ -1,18 +1,17 @@
-import { checkMicroapp, CHECK_ERROR, googlePaySupportedMethods } from 'gpay';
-import { NO_PAYMENT_ADAPTER_ERROR } from 'common/constants';
+import { checkMicroapp, googlePaySupportedMethods } from 'gpay';
+import { NO_PAYMENT_ADAPTER_ERROR, CHECK_ERROR } from 'common/constants';
 import { GOOGLE_PAY_PACKAGE_NAME, PHONE_PE_PACKAGE_NAME } from 'common/upi';
 
 const PaymentRequest = global.PaymentRequest;
 
 export const ADAPTER_CHECKERS = {
   'microapps.gpay': checkMicroapp,
+  [GOOGLE_PAY_PACKAGE_NAME]: gpayPaymentRequestAdapter,
+  [PHONE_PE_PACKAGE_NAME]: phonepePaymentRequestAdapter,
 };
 
 export const phonepeSupportedMethods =
   'https://mercury.phonepe.com/transact/pay';
-
-ADAPTER_CHECKERS[GOOGLE_PAY_PACKAGE_NAME] = gpayPaymentRequestAdapter;
-ADAPTER_CHECKERS[PHONE_PE_PACKAGE_NAME] = phonepePaymentRequestAdapter;
 
 /**
  * Checks if a payment adapter is present.

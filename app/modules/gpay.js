@@ -1,12 +1,8 @@
-import { NO_PAYMENT_ADAPTER_ERROR } from 'common/constants';
+import { CHECK_ERROR } from 'common/constants';
 
 const PaymentRequest = global.PaymentRequest;
 
 export const googlePaySupportedMethods = ['https://tez.google.com/pay'];
-
-export const CHECK_ERROR = {
-  description: NO_PAYMENT_ADAPTER_ERROR,
-};
 
 /**
  * Checks if Google Pay microapps API is available

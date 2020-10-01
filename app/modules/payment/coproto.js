@@ -275,8 +275,6 @@ var responseTypes = {
               app,
             },
           });
-
-          // TODO: (nice to have) Remove the Google Pay app from UI
         }
       }
     };
