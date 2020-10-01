@@ -180,7 +180,7 @@
   on:click={selectionHandler}
   on:click>
   <i slot="icon">
-    <Icon {icon} alt="Card" />
+    <Icon {icon} alt="" />
   </i>
   <div slot="title">{title}</div>
 
@@ -194,8 +194,6 @@
         required={true}
         tabindex={-1}
         formatter={{ type: 'number' }} />
-    {:else}
-      <span class="theme-highlight-color">&#xe604;</span>
-    {/if}
+    {:else}<span class="theme-highlight-color">&#xe604;</span>{/if}
   </div>
 </svelte:component>

@@ -388,7 +388,6 @@
 <Tab method="emandate" overrideMethodCheck pad={false}>
   <Screen>
     <div id="emandate-inner">
-
       {#if currentView === Views.AUTH_SELECTION}
         <div
           class="emandate-auth-selection"
@@ -396,7 +395,7 @@
           <div id="emandate-bank">
             <div class="bank-icon">
               {#if $selectedBank}
-                <img src={getBankLogo($selectedBank)} alt={bankName} />
+                <img src={getBankLogo($selectedBank)} alt="" />
               {/if}
             </div>
             <div class="bank-name">{bankName}</div>
