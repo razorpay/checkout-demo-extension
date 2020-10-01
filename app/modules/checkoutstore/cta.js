@@ -174,6 +174,9 @@ const trackCTAVisibility = _Func.debounce(function() {
     const session = getSession();
 
     const el = _Doc.querySelector('#footer-cta');
+    if (!el) {
+      return;
+    }
     const bottom = el.getBoundingClientRect().bottom;
     const windowHeight = window.innerHeight;
     const ctaVisible = bottom <= windowHeight;
