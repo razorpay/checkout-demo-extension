@@ -40,7 +40,7 @@
     bind:group />
   <label for="bank-radio-{code}" class="radio-label mfix">
     <div class="mchild item-inner">
-      <img alt="{name} Logo" src="https://cdn.razorpay.com/bank/{code}.gif" />
+      <img alt="" src="https://cdn.razorpay.com/bank/{code}.gif" />
       <div>{name}</div>
     </div>
     {#if disabled}
@@ -49,8 +49,8 @@
           bindTo="#form-netbanking"
           className="downtime-tooltip"
           align={['bottom']}>
-          {fullName} accounts are facing temporary issues right now. Please
-          select another bank.
+          {fullName} accounts are facing temporary issues right now. Please select
+          another bank.
         </Tooltip>
       </span>
     {/if}
