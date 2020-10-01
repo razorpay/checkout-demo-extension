@@ -82,6 +82,11 @@ module.exports = function(testFeatures) {
         await assertBasicDetailsScreen(context);
       }
 
+      if (!isHomeScreenSkipped && feeBearer) {
+        await assertBasicDetailsScreen(context);
+        await verifyFooterText(context, 'PAY');
+      }
+
       if (!missingUserDetails) {
         await fillUserDetails(context, '8888888881');
       }

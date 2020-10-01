@@ -81,7 +81,11 @@ export function showNext() {
 }
 
 export function showPayViaSingleMethod(method) {
-  setView(CtaViews.PAY_SINGLE_METHOD, true, { method });
+  if (isCustomerFeeBearer()) {
+    setView(CtaViews.PAY, false);
+  } else {
+    setView(CtaViews.PAY_SINGLE_METHOD, true, { method });
+  }
 }
 
 export function showAuthenticate() {
