@@ -20,6 +20,7 @@
     remember,
     authType,
     cardType,
+    cardIin,
   } from 'checkoutstore/screens/card';
   import { methodInstrument } from 'checkoutstore/screens/home';
 
@@ -73,6 +74,7 @@
   let hideExpiryCvvFields = false;
   let cvvLength = 3;
   let showCardUnsupported = false;
+  let lastIin = '';
 
   let cardNumberHelpText;
   $: cardNumberHelpText =
@@ -100,6 +102,25 @@
 
   $: {
     cvvLength = getCvvDigits($cardType);
+  }
+
+  $: {
+    if ($cardNumber.length > 6 && lastIin !== getIin($cardNumber)) {
+      lastIin = getIin($cardNumber);
+      if (lastIin) {
+        getCardFeatures($cardNumber).then(data => {
+          const { emi } = data.flows;
+          if (!emi) {
+            Analytics.track('card:emi:invalid', {
+              type: AnalyticsTypes.BEHAV,
+              data: {
+                iin: $cardIin,
+              },
+            });
+          }
+        });
+      }
+    }
   }
 
   export let tab;
@@ -182,9 +203,26 @@
       value: cardNumberWithoutSpaces,
       type: $cardType,
     });
-
+    //Track AMEX Card input for merchants who don't have AMEX enabled.
     if (!isAMEXEnabled() && $cardType === 'amex') {
       isValid = false;
+      Analytics.track('card:amex:disabled', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          iin: getIin($cardNumber),
+        },
+      });
+    }
+
+    //Track Diners Card input for merchants who don't have Diners enabled.
+    if (!getCardNetworks().DICL && $cardType === 'diners') {
+      isValid = false;
+      Analytics.track('card:diners:disabled', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          iin: getIin($cardNumber),
+        },
+      });
     }
 
     return isValid;
@@ -349,6 +387,8 @@
   }
 
   function trackCardNumberFilled() {
+    //Track valid & invalid card number entered by the customer.
+
     Analytics.track('card_number:filled', {
       type: AnalyticsTypes.BEHAV,
       data: {

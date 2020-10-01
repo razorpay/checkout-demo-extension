@@ -22,6 +22,11 @@ export const PLAN_LIST_CALLOUT_AGREEMENT = 'emi.plan_list_callout_agreement';
 export const PLAN_LIST_CALLOUT_AGREEMENT_HIGHLIGHT =
   'emi.plan_list_callout_agreement_highlight';
 export const CREDIT_EMI_DESCRIPTION = 'emi.credit_emi_description';
+export const CITI_BANK_EMI = 'emi.citi_bank_emi';
+export const CITI_KNOW_MORE = 'emi.citi_know_more';
+export const SHOW_MORE = 'emi.show_more';
+export const SHOW_LESS = 'emi.show_less';
+export const CITI_URL = 'emi.citi_url';
 export const HDFC_DEBIT_DESCRIPTION_MIN_BALANCE =
   'emi.hdfc_debit_description_min_balance';
 export const HDFC_DEBIT_DESCRIPTION_INCLUDES_INTEREST =

@@ -27,9 +27,11 @@ export const isIRCTC = () => IRCTC_KEYS |> _Arr.contains(getOption('key'));
 
 export const getPayoutContact = () => preferences.contact;
 export const getDisplayAmount = am => displayAmount(razorpayInstance, am);
-export const getMerchantMethods = () => preferences.methods;
-export const getRecurringMethods = () => preferences.methods.recurring;
+export const getMerchantMethods = () => preferences.methods || {};
+export const getRecurringMethods = () => getMerchantMethods().recurring;
+export const getMethodsCustomText = () => getMerchantMethods().custom_text;
 export const getMerchantOrder = () => preferences.order;
+export const getOrderMethod = () => getMerchantOrder()?.method;
 export const getMerchantOffers = () => preferences.offers;
 export const isOfferForced = () => preferences.force_offer;
 export const getDowntimes = () => _getDowntimes(preferences);
@@ -161,10 +163,7 @@ export function getSubscription() {
 }
 
 export function isRecurring() {
-  if (
-    getOption('prefill.method') === 'emandate' &&
-    (preferences.methods || {}).recurring
-  ) {
+  if (getOrderMethod() === 'emandate' && getRecurringMethods()) {
     return true;
   }
   return preferences.subscription || getOption('recurring');
@@ -192,9 +191,7 @@ export function shouldRememberCustomer() {
   if (razorpayInstance.get().remember_customer === true) {
     return true;
   }
-  if (isContactOptional() && !getPrefilledContact()) {
-    return false;
-  }
+
   return getOption('remember_customer');
 }
 
@@ -291,4 +288,17 @@ export function getMerchantConfig() {
       preferences: configFromPreferences,
     },
   };
+}
+
+/**
+ * CRED wants put ads in instrument subtext.
+ *
+ * @param code
+ * @returns {*}
+ */
+export function getCustomSubtextForMethod(code) {
+  const customText = getMethodsCustomText();
+  if (customText && customText[code]) {
+    return customText[code];
+  }
 }

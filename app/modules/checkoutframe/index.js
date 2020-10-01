@@ -345,15 +345,15 @@ function updateEmandatePrefill() {
           setOption(`prefill.bank_account[${key}]`, bank_account[key]);
         }
       });
-
-    if (order.bank) {
-      setOption('prefill.bank', order.bank);
-    }
+  }
+  if (order.bank) {
+    setOption('prefill.bank', order.bank);
   }
 }
 
 function updateAnalytics(preferences) {
   Analytics.setMeta('features', preferences.features);
+  Analytics.setMeta('merchant_id', preferences.merchant_id);
   // Set optional fields in meta
   const optionalFields = preferences.optional;
   if (optionalFields |> _.isArray) {

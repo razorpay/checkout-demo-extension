@@ -2,7 +2,8 @@ import { getSession } from 'sessionmanager';
 import { SHOWN_CLASS, UPI_POLL_URL } from 'common/constants';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
-import * as Confirm from 'confirm';
+import * as Confirm from 'checkoutframe/components/confirm';
+import * as Backdrop from 'checkoutframe/components/backdrop';
 import * as TermsCurtain from 'checkoutframe/termscurtain';
 import { getCheckoutBridge, storage } from './index';
 import { confirmCancelMsg } from 'common/strings';
@@ -54,7 +55,7 @@ export function backPressed(callback) {
     return;
   }
 
-  if (Confirm.isConfirmShown) {
+  if (Confirm.isVisible()) {
     Confirm.hide(true);
   } else if (TermsCurtain.isVisible()) {
     TermsCurtain.hide();
@@ -65,18 +66,16 @@ export function backPressed(callback) {
     /**
      * When an overlay is visible, there's some message
      * that's being shown to the user in a pop up.
+     * All overlays currently show a backdrop,
+     * if backdrop is present in DOM,
+     * an overlay is visible to the user.
+     *
+     * #frame-backdrop is a Svelte component,
+     * it won't be present in DOM if it's not visible.
      *
      * TODO: Use an overlay manager for this check when implemented.
      */
-    const overlays = [
-      _Doc.querySelector('#fee-wrap'),
-      _Doc.querySelector('#overlay'),
-    ];
-    const visibleOverlays = _Arr.filter(overlays, overlay => {
-      return overlay && _El.hasClass(overlay, SHOWN_CLASS);
-    });
-
-    if (visibleOverlays.length) {
+    if (Backdrop.isVisible()) {
       session.hideErrorMessage();
     } else {
       session.back();
@@ -88,27 +87,9 @@ export function backPressed(callback) {
       CheckoutBridge[callback]();
     } else {
       if (session.get('theme.close_button')) {
-        closeModal();
+        session.closeModal();
       }
     }
-  }
-}
-
-function closeModal() {
-  const session = getSession();
-
-  if (session.get('modal.confirm_close')) {
-    Confirm.show({
-      message: confirmCancelMsg,
-      heading: 'Cancel Payment?',
-      positiveBtnTxt: 'Yes, cancel',
-      negativeBtnTxt: 'No',
-      onPositiveClick: function() {
-        session.hide();
-      },
-    });
-  } else {
-    session.hide();
   }
 }
 

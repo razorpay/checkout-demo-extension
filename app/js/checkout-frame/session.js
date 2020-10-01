@@ -6,7 +6,7 @@ var preferences,
   WebPaymentsApi = discreet.WebPaymentsApi,
   CheckoutBridge = window.CheckoutBridge,
   StorageBridge = window.StorageBridge,
-  Promise = window.Promise,
+  Promise = discreet.Promise,
   Bridge = discreet.Bridge,
   isIframe = window !== parent,
   ownerWindow = isIframe ? parent : opener,
@@ -46,7 +46,9 @@ var preferences,
   NBHandlers = discreet.NBHandlers,
   Instruments = discreet.Instruments,
   I18n = discreet.I18n,
-  NativeStore = discreet.NativeStore;
+  NativeStore = discreet.NativeStore,
+  Confirm = discreet.Confirm,
+  Backdrop = discreet.Backdrop;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -223,44 +225,14 @@ function toggle(subject, showOrHide) {
 }
 
 function showOverlay($with) {
-  makeVisible('#overlay');
+  Backdrop.show();
   if ($with) {
     makeVisible($with[0]);
-  }
-  $('#overlay').toggleClass('sub', $('#body').hasClass('sub'));
-}
-
-function overlayInUse() {
-  return $$('.overlay.' + shownClass).length;
-}
-
-/**
- * Hides #overlay only if:
- * Some other element with .overlay is not visible
- */
-function hideOverlaySafely($with) {
-  if ($with) {
-    makeHidden($with[0]);
-  }
-  var overlay = $('#overlay');
-  if (overlay[0]) {
-    // Remove shown class to start transition.
-    overlay.removeClass(shownClass);
-    setTimeout(function() {
-      if (overlayInUse()) {
-        // Don't hide overlay
-        // Undo adding shown class
-        overlay.addClass(shownClass);
-      } else {
-        // Hide overlay
-        overlay.hide();
-      }
-    }, 200);
   }
 }
 
 function hideOverlay($with) {
-  makeHidden('#overlay');
+  Backdrop.hide();
   if ($with) {
     makeHidden($with[0]);
   }
@@ -302,10 +274,6 @@ function hideOverlayMessage() {
       hideOverlay($('#error-message'));
     }
   }
-}
-
-function overlayVisible() {
-  return $('#overlay').hasClass(shownClass);
 }
 
 // this === Session
@@ -467,6 +435,23 @@ function askOTP(view, textView, shouldLimitResend, templateData) {
   var qpmap = _.getQueryParams();
   var thisSession = SessionManager.getSession();
   var session = thisSession;
+  var paymentId = _Obj.getSafely(session, 'r._payment.payment_id');
+  var paymentData = OtpService.getPaymentData(paymentId);
+
+  if (paymentId && !paymentData) {
+    paymentData = {
+      timestamp: Date.now(),
+    };
+    if (isNonNullObject(origText) && !origText.error) {
+      if (thisSession.headless) {
+        paymentData.goToBank = origText.redirect;
+      }
+      if (origText.metadata) {
+        paymentData.metadata = origText.metadata;
+      }
+    }
+    OtpService.setPaymentData(paymentId, paymentData);
+  }
 
   var isWallet = session.payload && session.payload.method === 'wallet';
 
@@ -501,6 +486,17 @@ function askOTP(view, textView, shouldLimitResend, templateData) {
     allowResend: shouldLimitResend ? OtpService.canSendOtp('razorpay') : true,
   });
 
+  if (thisSession.headless) {
+    if (paymentData.goToBank) {
+      view.updateScreen({
+        skipTextLabel: 'complete_bank_page',
+      });
+    }
+    view.updateScreen({
+      allowSkip: paymentData.goToBank,
+    });
+  }
+
   $('#body').addClass('sub');
 
   if (!textView) {
@@ -528,6 +524,22 @@ function askOTP(view, textView, shouldLimitResend, templateData) {
                 bankLogo +
                 '" onerror="this.style.opacity = 0;">';
             }
+
+            view.updateScreen({
+              ipAddress: metadata.ip,
+              accessTime: paymentData.timestamp,
+              resendTimeout:
+                paymentData.timestamp +
+                (Number(metadata.resend_timeout) + 1) * 1000,
+            });
+
+            if (metadata.contact) {
+              textView = 'otp_sent_phone';
+              if (!templateData) {
+                templateData = {};
+              }
+              templateData.phone = metadata.contact;
+            }
           }
 
           if (origText.mode === 'hdfc_debit_emi') {
@@ -547,16 +559,6 @@ function askOTP(view, textView, shouldLimitResend, templateData) {
             if (!origText.next || origText.next.indexOf('otp_resend') === -1) {
               view.updateScreen({
                 allowResend: false,
-              });
-            }
-
-            view.updateScreen({
-              skipTextLabel: 'complete_bank_page',
-            });
-
-            if (!origText.redirect) {
-              view.updateScreen({
-                allowSkip: false,
               });
             }
           }
@@ -1019,6 +1021,7 @@ Session.prototype = {
     this.setEMI();
     Cta.init();
     this.setModal();
+    this.setBackdrop();
     this.completePendingPayment();
     this.bindEvents();
     this.setEmiScreen();
@@ -1586,6 +1589,22 @@ Session.prototype = {
     }
   },
 
+  setBackdrop: function() {
+    var session = this;
+    Backdrop.setup({
+      target: _Doc.querySelector('#modal-inner'),
+      props: {
+        onClick: function(e) {
+          if (Confirm.isVisible()) {
+            return;
+          }
+
+          session.hideErrorMessage(e);
+        },
+      },
+    });
+  },
+
   improviseModalOptions: function() {
     /**
      * We want to disable animations on IRCTC WebView.
@@ -2109,28 +2128,19 @@ Session.prototype = {
     }
 
     var goto_payment = '#error-message .link';
-    if (this.get('redirect')) {
-      $(goto_payment).hide();
-    } else {
-      this.click(goto_payment, function() {
-        if (this.payload && this.payload.method === 'upi') {
-          if (this.payload['_[flow]'] === 'directpay') {
-            return cancel_upi(this);
-          } else if (this.payload['_[flow]'] === 'intent') {
-            this.hideErrorMessage();
-          }
-        }
-        this.r.focus();
-      });
-    }
-    this.click('#backdrop', this.hideErrorMessage);
-    this.click('#overlay', function(e) {
-      if ($('#confirmation-dialog').hasClass('animate')) {
-        return;
-      }
 
-      this.hideErrorMessage(e);
+    this.click(goto_payment, function() {
+      if (this.payload && this.payload.method === 'upi') {
+        if (this.payload['_[flow]'] === 'directpay') {
+          return cancel_upi(this);
+        } else if (this.payload['_[flow]'] === 'intent') {
+          this.hideErrorMessage();
+        }
+      }
+      this.r.focus();
     });
+
+    this.click('#backdrop', this.hideErrorMessage);
     this.click('#fd-hide', this.hideErrorMessage);
     this.click('#overlay-close', this.hideErrorMessage);
 
@@ -2469,10 +2479,6 @@ Session.prototype = {
   confirmClose: function() {
     return new Promise(function(resolve) {
       Confirm.show({
-        message: discreet.confirmCancelMsg,
-        heading: 'Cancel Payment?',
-        positiveBtnTxt: 'Yes, cancel',
-        negativeBtnTxt: 'No',
         onPositiveClick: function() {
           resolve(true);
         },
@@ -2644,6 +2650,10 @@ Session.prototype = {
     }
 
     return valid;
+  },
+
+  trackEvent: function(eventName, data) {
+    Analytics.track(eventName, data);
   },
 
   switchTab: function(tab) {
@@ -3389,15 +3399,8 @@ Session.prototype = {
     var self = this;
     if (this.isOpen) {
       if (confirmedCancel !== true && this.r._payment) {
-        return Confirm.show({
-          message: discreet.confirmCancelMsg,
-          heading: 'Cancel Payment?',
-          positiveBtnTxt: 'Yes, cancel',
-          negativeBtnTxt: 'No',
-          onPositiveClick: function() {
-            self.hide(true);
-          },
-        });
+        self.confirmClose();
+        return;
       }
 
       $('#modal-inner').removeClass('shake');
@@ -3559,7 +3562,7 @@ Session.prototype = {
         this.feeBearerView.$on('continue', function(event) {
           var bearer = event.detail;
 
-          hideOverlaySafely($('#fee-wrap'));
+          hideOverlay($('#fee-wrap'));
 
           // Set the updated amount & fee
           session.payload.amount = bearer.amount;
@@ -3582,6 +3585,16 @@ Session.prototype = {
     }
 
     return false;
+  },
+
+  closeModal: function() {
+    var session = this;
+
+    if (session.get('modal.confirm_close')) {
+      session.confirmClose();
+    } else {
+      session.hide();
+    }
   },
 
   onOtpSubmit: function() {
@@ -4065,7 +4078,7 @@ Session.prototype = {
       .verifyVpa(data.vpa)
       .then(function() {
         $('#overlay-close').show();
-        hideOverlaySafely($('#error-message'));
+        hideOverlay($('#error-message'));
         setTimeout(function() {
           self.submit({
             vpaVerified: true,
@@ -4089,6 +4102,15 @@ Session.prototype = {
     }
     var vpaVerified = props.vpaVerified;
     var data = this.payload;
+
+    var goto_payment = '#error-message .link';
+    var redirectableMethods = ['card', 'netbanking', 'wallet'];
+    if (
+      this.get('redirect') &&
+      redirectableMethods.includes(this.payload.method)
+    ) {
+      $(goto_payment).hide();
+    }
 
     if (this.r._payment) {
       /**
@@ -4468,6 +4490,9 @@ Session.prototype = {
       emiContact = discreet.storeGetter(HomeScreenStore.emiContact);
       if (isHDFCDebitEMI && emiContact) {
         data.contact = emiContact;
+      }
+      if (isHDFCDebitEMI) {
+        data['_[mode]'] = 'hdfc_debit_emi';
       }
     }
 
@@ -4936,10 +4961,15 @@ Session.prototype = {
     }
 
     if (forcedOffer) {
+      // Set $appliedOffer for Offer Validations to take place
+      discreet.OffersStore.appliedOffer.set(forcedOffer);
+
       if (forcedOffer.payment_method === 'wallet') {
         this.walletOffer = forcedOffer;
       }
+
       Analytics.setMeta('forcedOffer', true);
+
       this.handleDiscount();
     } else {
       var appliedOffer;

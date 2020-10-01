@@ -57,14 +57,18 @@ async function assertInputValue(context, selector, value) {
  *
  * @param {Context} context The test context
  * @param {String} selector selector to match the targeted element
- * @param {String} text Text that is to be asserted
+ * @param {String|RegExp} textOrRegex Text or Regex against which text is to be asserted
  */
-async function assertTrimmedInnerText(context, selector, text) {
+async function assertTrimmedInnerText(context, selector, textOrRegex) {
   const element = await context.page.waitForSelector(selector);
   const elementText = await innerText(element);
   const trimmed = elementText.trim();
 
-  expect(trimmed).toBe(text);
+  if (textOrRegex instanceof RegExp) {
+    expect(trimmed).toMatch(textOrRegex);
+  } else {
+    expect(trimmed).toBe(textOrRegex);
+  }
 }
 
 /**

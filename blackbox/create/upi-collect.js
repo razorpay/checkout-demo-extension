@@ -44,8 +44,8 @@ const {
   handlePartialPayment,
 
   //Downtime
-  verifyLowDowntime,
-  verifyHighDowntime,
+  verifyMethodWarned,
+  verifyMethodDisabled,
 
   // Personalization
   selectPersonalizationPaymentMethod,
@@ -121,19 +121,10 @@ module.exports = function(testFeatures) {
         await selectPersonalizationPaymentMethod(context, 1);
       } else {
         if (!(downtimeHigh && offers)) {
-          if (downtimeHigh) {
-            await verifyHighDowntime(
-              context,
-              'upi',
-              'UPI is facing temporary issues right now.'
-            );
-            return;
-          }
-
           await selectPaymentMethod(context, 'upi');
 
-          if (downtimeLow) {
-            await verifyLowDowntime(context, 'UPI', 'upi');
+          if (downtimeHigh || downtimeLow) {
+            await verifyMethodWarned(context, 'UPI', 'upi');
           }
           await selectUPIMethod(context, 'new');
           await enterUPIAccount(context, 'saranshgupta1995@okaxis');
@@ -152,7 +143,7 @@ module.exports = function(testFeatures) {
         await verifyDiscountText(context, 'You save ₹10');
       }
       if (downtimeHigh && offers) {
-        await verifyHighDowntime(
+        await verifyMethodDisabled(
           context,
           'upi',
           ' UPI is experiencing low success rates.'
