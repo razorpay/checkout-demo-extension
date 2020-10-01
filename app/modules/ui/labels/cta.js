@@ -14,6 +14,7 @@ export const CtaViews = {
   CONFIRM_ACCOUNT: 'confirm_account',
   VERIFY: 'verify',
   PAY_WITHOUT_OFFER: 'pay_without_offer',
+  PAY: 'pay',
   PAY_SINGLE_METHOD: 'pay_single_method',
   UPLOAD_NACH_FORM: 'upload_nach_form',
 };

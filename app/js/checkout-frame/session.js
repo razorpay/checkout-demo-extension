@@ -47,7 +47,8 @@ var preferences,
   I18n = discreet.I18n,
   NativeStore = discreet.NativeStore,
   Confirm = discreet.Confirm,
-  Backdrop = discreet.Backdrop;
+  Backdrop = discreet.Backdrop,
+  FeeLabel = discreet.FeeLabel;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -684,6 +685,13 @@ Session.prototype = {
 
     return amount;
   },
+  setFeeLabel: function() {
+    if (Store.isCustomerFeeBearer()) {
+      FeeLabel.show({
+        isFeeBearer: true,
+      });
+    }
+  },
 
   // so that accessing this.data would not produce error
   data: emo,
@@ -694,10 +702,22 @@ Session.prototype = {
    *
    * @param {Number} amount
    */
-  updateAmountInHeader: function(amount) {
-    $('#amount .original-amount').rawHtml(
-      this.formatAmountWithCurrency(amount)
-    );
+  updateAmountInHeader: function(amount, fee) {
+    if (fee) {
+      $('#amount .original-amount').hide();
+    } else {
+      $('#amount .original-amount').rawHtml(
+        this.formatAmountWithCurrency(amount)
+      );
+      $('#amount .original-amount')[0].removeAttribute('style');
+    }
+  },
+  updateAmountInHeaderForOffer: function(amount, fee) {
+    if (fee) {
+      $('#amount .original-amount').hide();
+    }
+    $('#amount .discount').rawHtml(this.formatAmountWithCurrency(amount));
+    //$('#amount .original-amount').hide();
   },
   /**
    * Set the amount in header.
@@ -1086,6 +1106,7 @@ Session.prototype = {
     this.setOffers();
     this.setLanguageDropdown();
     this.setSvelteOverlay();
+    this.setFeeLabel();
     // make bottom the last element
     gel('form-fields').appendChild(gel('bottom'));
   },
@@ -1733,6 +1754,10 @@ Session.prototype = {
   },
 
   hideErrorMessage: function(confirmedCancel) {
+    if (Store.isCustomerFeeBearer()) {
+      this.setAmount(this.get('amount'));
+    }
+
     if (this.nocostModal) {
       var modal = this.nocostModal;
       hideOverlay($('#nocost-overlay'));
@@ -2284,6 +2309,13 @@ Session.prototype = {
       from: this.screen,
       to: screen,
     };
+    if (this.screen === 'otp' && screen !== 'otp') {
+      Store.showFeeLabel.set(false);
+    }
+
+    if (this.screen !== 'otp' && screen === 'otp') {
+      Store.showFeeLabel.set(true);
+    }
 
     if (extraProps) {
       trackingData = _Obj.extend(trackingData, extraProps);
@@ -2466,6 +2498,14 @@ Session.prototype = {
     // this.offers is undefined for forced offers
     if (hasDiscount && this.offers) {
       hasDiscount = this.offers.isCardApplicable();
+    }
+
+    var hasDiscountAndFee = offer && Store.isCustomerFeeBearer();
+
+    if (hasDiscountAndFee) {
+      $('#content').toggleClass('has-fee', hasDiscountAndFee);
+    } else {
+      $('#content').toggleClass('has-fee', false);
     }
 
     $('#content').toggleClass('has-discount', hasDiscount);

@@ -471,6 +471,7 @@ export default {
     next: 'Next',
     pay_single_method: 'Pay using {method}',
     pay_without_offer: 'Pay Without Offer',
+    pay: 'Pay',
     proceed: 'Proceed',
     select_emi_plan: 'Select EMI Plan',
     submit: 'Submit',

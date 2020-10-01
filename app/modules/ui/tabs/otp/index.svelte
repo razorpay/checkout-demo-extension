@@ -20,6 +20,7 @@
   } from 'checkoutstore/screens/otp';
   import { cardNumber, selectedCard } from 'checkoutstore/screens/card';
   import { selectedInstrument } from 'checkoutstore/screens/home';
+  import { showFeeLabel } from 'checkoutstore/index.js';
 
   // Utils
   import { getFormattedDateTime } from 'lib/utils';
@@ -103,6 +104,9 @@
   }
 
   export function trackInput(event) {
+    if ($otp === '' || $otp.length > 0) {
+      $showFeeLabel = false;
+    }
     if ($otp) {
       const isWallet = session.payload && session.payload.method === 'wallet';
 
