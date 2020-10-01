@@ -140,11 +140,10 @@ module.exports = function(testFeatures) {
         await selectOffer(context, '1');
         await verifyOfferApplied(context);
         if (!feeBearer) {
-          await verifyDiscountPaybleAmount(context, '₹ 1,980');
+          await verifyDiscountPaybleAmount(context, '₹ 1,990');
         }
-        await verifyDiscountAmountInBanner(context, '₹ 1,980');
-        await verifyDiscountText(context, 'You save ₹20');
-        await validateCardForOffer(context);
+        await verifyDiscountAmountInBanner(context, '₹ 1,990');
+        await verifyDiscountText(context, 'You save ₹10');
       }
 
       if (feeBearer) {

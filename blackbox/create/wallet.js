@@ -186,8 +186,14 @@ module.exports = function(testFeatures) {
           await handleValidationRequest(context, 'fail');
           await retryPayzappWalletTransaction(context);
           await verifyOfferApplied(context);
-          await verifyDiscountPaybleAmount(context, '₹ 1,980');
-          await verifyDiscountAmountInBanner(context, '₹ 1,980');
+          if (!feeBearer) {
+            await verifyDiscountPaybleAmount(context, '₹ 1,980');
+          }
+          if (feeBearer) {
+            await verifyDiscountAmountInBanner(context, '₹ 620.54');
+          } else {
+            await verifyDiscountAmountInBanner(context, '₹ 1,980');
+          }
           await verifyDiscountText(context, 'You save ₹20');
           await submit(context);
           if (partialPayment) {
@@ -195,6 +201,10 @@ module.exports = function(testFeatures) {
           }
           await handleValidationRequest(context, 'pass');
           return;
+        }
+
+        if (feeBearer) {
+          await verifyFooterText(context, 'PAY');
         }
 
         if (!personalization) {
