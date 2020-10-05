@@ -43,11 +43,15 @@
   ];
 
   const onSubmit = function(reason) {
+    // if nothing is selected, return
     if (!reason) {
       return;
     }
+    // Hide the 'error_message' component
     _El.removeClass(cancellationReasonsContainer, 'cancel_' + method);
     session.hideOverlay(cancellationReasonsContainer);
+
+    // initiate the payment Cancel process
     const metaParam = {};
     metaParam['_[reason]'] = reason;
     session.r.emit('payment.cancel', metaParam);
