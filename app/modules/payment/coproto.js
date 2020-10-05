@@ -299,11 +299,9 @@ var responseTypes = {
 
           return instrument.complete();
         })
-        /* jshint ignore:start */
         .catch(error => {
           webPaymentOnError(app, error);
         });
-      /* jshint ignore:end */
     } catch (error) {
       webPaymentOnError(app, error);
     }
