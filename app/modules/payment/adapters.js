@@ -63,11 +63,9 @@ function phonepePaymentRequestAdapter() {
             reject(CHECK_ERROR);
           }
         })
-        /* jshint ignore:start */
         .catch(e => {
           reject(CHECK_ERROR);
         });
-      /* jshint ignore:end */
     } catch (e) {
       reject(CHECK_ERROR);
     }
