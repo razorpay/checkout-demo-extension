@@ -13,6 +13,14 @@ import * as Bridge from 'bridge';
 import { ADAPTER_CHECKERS, phonepeSupportedMethods } from 'payment/adapters';
 import { supportedWebPaymentsMethodsForApp } from 'common/webPaymentsApi';
 
+const getParsedDataFromUrl = url => {
+  const parsedData = {};
+  url.replace(/^.*\?/, '').replace(/([^=&]+)=([^&]*)/g, (m, key, value) => {
+    parsedData[decodeURIComponent(key)] = decodeURIComponent(value);
+  });
+  return parsedData;
+};
+
 export const processOtpResponse = function(response) {
   var error = response.error;
   Track(this.r, 'otp_response', response);
@@ -231,16 +239,11 @@ var responseTypes = {
 
   web_payments: function(response, app) {
     var instrumentData = {};
-    var parsedData = {};
 
     var data = response.data;
     var intent_url = data.intent_url;
     instrumentData.url = intent_url;
-    data.intent_url
-      .replace(/^.*\?/, '')
-      .replace(/([^=&]+)=([^&]*)/g, (m, key, value) => {
-        parsedData[decodeURIComponent(key)] = decodeURIComponent(value);
-      });
+    var parsedData = getParsedDataFromUrl(data.intent_url);
 
     const supportedInstruments = [
       {
