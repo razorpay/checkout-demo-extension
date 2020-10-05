@@ -745,15 +745,20 @@ var razorpayProto = Razorpay.prototype;
  * @return {Promise}
  */
 razorpayProto.checkPaymentAdapter = function(adapter, data) {
-  return checkPaymentAdapter(adapter, data).then(success => {
-    if (!this.paymentAdapters) {
-      this.paymentAdapters = {};
+  var adapterPackageNameMap = {
+    gpay: GOOGLE_PAY_PACKAGE_NAME,
+  };
+  return checkPaymentAdapter(adapterPackageNameMap[adapter], data).then(
+    success => {
+      if (!this.paymentAdapters) {
+        this.paymentAdapters = {};
+      }
+
+      this.paymentAdapters[adapter] = true;
+
+      return Promise.resolve(success);
     }
-
-    this.paymentAdapters[adapter] = true;
-
-    return Promise.resolve(success);
-  });
+  );
 };
 
 /**

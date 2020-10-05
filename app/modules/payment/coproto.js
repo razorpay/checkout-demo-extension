@@ -461,7 +461,12 @@ var responseTypes = {
       }
 
       if (androidBrowser) {
-        if (this.upi_app === GOOGLE_PAY_PACKAGE_NAME) {
+        // payment.upi_app does not exist for razorpay.js
+        if (!this.upi_app) {
+          return responseTypes['gpay'].call(this, request, fullResponse);
+        }
+
+        if (this.upi_app === GOOGLE_PAY_PACKAGE_NAME || !this.upi_app) {
           return responseTypes['gpay'].call(this, request, fullResponse);
         } else {
           return responseTypes['web_payments'].call(
