@@ -2723,13 +2723,9 @@ Session.prototype = {
 
     if (tab === 'upi') {
       this.updateCustomerInStore();
-      if (Store.isASubscription()) {
-        //For the new flow checkout no longer asks for OTP for UPI subscriptions.
-        discreet.upiTab.render();
-        this.setScreen('upi');
-      } else {
-        discreet.upiTab.render();
-      }
+      //For the new flow checkout no longer asks for OTP for UPI subscriptions.
+      discreet.upiTab.render();
+      this.setScreen('upi');
     }
 
     if (tab === 'upi_otm') {
@@ -4597,6 +4593,16 @@ Session.prototype = {
           });
         }
       });
+    }
+
+    /** For subscription payments do not show Skip OTP option  **/
+
+    if (Store.isASubscription()) {
+      if (data.method === 'card') {
+        that.otpView.updateScreen({
+          allowSkip: false,
+        });
+      }
     }
 
     /**
