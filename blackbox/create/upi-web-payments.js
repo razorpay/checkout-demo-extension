@@ -44,8 +44,7 @@ const {
   verifyPersonalizationText,
 
   //Downtime
-  verifyHighDowntime,
-  verifyLowDowntime,
+  verifyMethodWarned,
 } = require('../tests/homescreen/actions');
 
 module.exports = function(testFeatures) {
@@ -156,7 +155,7 @@ module.exports = function(testFeatures) {
 
       await assertPaymentMethods(context);
 
-      if (downtimeHigh && offers) {
+      if (offers) {
         await viewOffers(context);
         await selectOffer(context, '1');
         await verifyOfferApplied(context);
@@ -165,40 +164,13 @@ module.exports = function(testFeatures) {
         await verifyDiscountText(context, 'You save ₹10');
       } else {
         await selectPaymentMethod(context, 'upi');
-
-        if (downtimeHigh && !offers) {
-          await verifyHighDowntime(
-            context,
-            'upi',
-            'UPI is facing temporary issues right now.'
-          );
-          return;
-        }
-
-        if (downtimeLow) {
-          await verifyLowDowntime(context, 'UPI', 'upi');
-          await selectUPIApp(context, '1');
-        } else {
-          await selectUPIApp(context, '1');
-        }
       }
 
-      if (offers && !downtimeHigh) {
-        await viewOffers(context);
-        await selectOffer(context, '1');
-        await verifyOfferApplied(context);
-        await verifyDiscountPaybleAmount(context, '₹ 1,990');
-        await verifyDiscountAmountInBanner(context, '₹ 1,990');
-        await verifyDiscountText(context, 'You save ₹10');
-      }
-
-      if (downtimeHigh && offers) {
-        await verifyHighDowntime(
-          context,
-          'upi',
-          'UPI is facing temporary issues right now.'
-        );
-        return;
+      if (downtimeHigh || downtimeLow) {
+        await verifyMethodWarned(context, 'UPI', 'upi');
+        await selectUPIApp(context, '1');
+      } else {
+        await selectUPIApp(context, '1');
       }
 
       if (partialPayment) {
@@ -216,7 +188,14 @@ module.exports = function(testFeatures) {
         await handleFeeBearer(context, page);
       }
 
+      // if (offers) {
+      //   await respondAndVerifyIntentRequest(
+      //     context,
+      //     'offer_id=' + preferences.offers[0].id
+      //   );
+      // } else {
       await respondAndVerifyIntentRequest(context, { isBrowserIntent: true });
+      // }
     });
   });
 };
