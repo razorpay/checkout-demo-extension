@@ -4595,16 +4595,6 @@ Session.prototype = {
       });
     }
 
-    /** For subscription payments do not show Skip OTP option  **/
-
-    if (Store.isASubscription()) {
-      if (data.method === 'card') {
-        that.otpView.updateScreen({
-          allowSkip: false,
-        });
-      }
-    }
-
     /**
      * For Cardless EMI payments,
      * if this is the final payment request,
