@@ -11,6 +11,7 @@ import {
   isMethodEnabled,
   getWallets,
   getNetbankingBanks,
+  isApplicationEnabled,
 } from 'checkoutstore/methods';
 
 /**
@@ -111,6 +112,9 @@ const METHOD_FILTERS = {
     }
 
     return false;
+  },
+  app(instrument) {
+    return isApplicationEnabled(instrument.provider);
   },
 };
 
