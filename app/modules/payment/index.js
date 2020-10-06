@@ -745,6 +745,8 @@ var razorpayProto = Razorpay.prototype;
  * @return {Promise}
  */
 razorpayProto.checkPaymentAdapter = function(adapter, data) {
+  // Hack to support web payments api for voth standard and custom checkout
+  // TODO - Solution web payments for custom checkout to make them more extensible
   var adapterPackageNameMap = {
     gpay: GOOGLE_PAY_PACKAGE_NAME,
     [GOOGLE_PAY_PACKAGE_NAME]: GOOGLE_PAY_PACKAGE_NAME,
