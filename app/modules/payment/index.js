@@ -25,7 +25,7 @@ import * as GPay from 'gpay';
 import Analytics from 'analytics';
 import { isProviderHeadless } from 'common/cardlessemi';
 import { updateCurrencies, setCurrenciesRate } from 'common/currency';
-import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi';
+import { GOOGLE_PAY_PACKAGE_NAME, PHONE_PE_PACKAGE_NAME } from 'common/upi';
 import { getCardEntityFromPayload, getCardFeatures } from 'common/card';
 
 /**
@@ -747,6 +747,8 @@ var razorpayProto = Razorpay.prototype;
 razorpayProto.checkPaymentAdapter = function(adapter, data) {
   var adapterPackageNameMap = {
     gpay: GOOGLE_PAY_PACKAGE_NAME,
+    [GOOGLE_PAY_PACKAGE_NAME]: GOOGLE_PAY_PACKAGE_NAME,
+    [PHONE_PE_PACKAGE_NAME]: PHONE_PE_PACKAGE_NAME,
   };
   return checkPaymentAdapter(adapterPackageNameMap[adapter], data).then(
     success => {

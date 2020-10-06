@@ -466,7 +466,7 @@ var responseTypes = {
           return responseTypes['gpay'].call(this, request, fullResponse);
         }
 
-        if (this.upi_app === GOOGLE_PAY_PACKAGE_NAME || !this.upi_app) {
+        if (this.upi_app === GOOGLE_PAY_PACKAGE_NAME) {
           return responseTypes['gpay'].call(this, request, fullResponse);
         } else {
           return responseTypes['web_payments'].call(
