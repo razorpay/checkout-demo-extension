@@ -24,6 +24,7 @@
 
   // Utils
   import { getFormattedDateTime } from 'lib/utils';
+  import { getOption } from 'checkoutstore';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -66,6 +67,13 @@
   let compact;
 
   const session = getSession();
+
+  const subscriptionCardChange = getOption('subscription_card_change');
+
+  if (subscriptionCardChange) {
+    $allowSkip = false;
+    console.log('True');
+  }
 
   // This flag indicates whether or not the OTP input field will be visible.
   // We don't want to show EMI details on loading state or error state.
