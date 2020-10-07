@@ -26,7 +26,7 @@ import {
   isIframe,
   ownerWindow,
 } from 'common/constants';
-import { checkGooglePayWebPayments } from 'checkoutframe/components/upi';
+import { checkForPossibleWebPayments } from 'checkoutframe/components/upi';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -241,7 +241,7 @@ function performPrePrefsFetchOperations() {
   /* Start listening for back presses */
   setHistoryAndListenForBackPresses();
 
-  checkGooglePayWebPayments();
+  checkForPossibleWebPayments();
 }
 
 function setSessionPreferences(session, preferences) {

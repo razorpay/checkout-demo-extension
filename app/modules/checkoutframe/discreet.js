@@ -32,6 +32,7 @@ import * as CountryCodesUtil from 'common/countrycodes';
 
 /* Required for merchant.js migration */
 import * as Constants from 'common/constants';
+import * as WebPaymentsApi from 'common/webPaymentsApi';
 import * as Card from 'common/card';
 import * as Wallet from 'common/wallet';
 import * as CardlessEmi from 'common/cardlessemi';
@@ -126,6 +127,7 @@ export default {
   es6components,
 
   Constants,
+  WebPaymentsApi,
   Card,
   Wallet,
   CardlessEmi,

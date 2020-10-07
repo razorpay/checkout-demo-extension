@@ -25,6 +25,7 @@ import * as GPay from 'gpay';
 import Analytics from 'analytics';
 import { isProviderHeadless } from 'common/cardlessemi';
 import { updateCurrencies, setCurrenciesRate } from 'common/currency';
+import { GOOGLE_PAY_PACKAGE_NAME, PHONE_PE_PACKAGE_NAME } from 'common/upi';
 import { getCardEntityFromPayload, getCardFeatures } from 'common/card';
 
 /**
@@ -344,17 +345,19 @@ Payment.prototype = {
     );
 
     if (this.gpay || this.tez) {
-      if (
-        !(
-          this.r.paymentAdapters &&
-          (this.r.paymentAdapters.gpay ||
-            this.r.paymentAdapters['microapps.gpay'])
-        )
-      ) {
-        return this.r.emit(
-          'payment.error',
-          _.rzpError('GPay is not available')
-        );
+      if (data['_[app]'] === GOOGLE_PAY_PACKAGE_NAME) {
+        if (
+          !(
+            this.r.paymentAdapters &&
+            (this.r.paymentAdapters[GOOGLE_PAY_PACKAGE_NAME] ||
+              this.r.paymentAdapters['microapps.gpay'])
+          )
+        ) {
+          return this.r.emit(
+            'payment.error',
+            _.rzpError('GPay is not available')
+          );
+        }
       }
     }
 
@@ -742,15 +745,24 @@ var razorpayProto = Razorpay.prototype;
  * @return {Promise}
  */
 razorpayProto.checkPaymentAdapter = function(adapter, data) {
-  return checkPaymentAdapter(adapter, data).then(success => {
-    if (!this.paymentAdapters) {
-      this.paymentAdapters = {};
+  // Hack to support web payments api for voth standard and custom checkout
+  // TODO - Solution web payments for custom checkout to make them more extensible
+  var adapterPackageNameMap = {
+    gpay: GOOGLE_PAY_PACKAGE_NAME,
+    [GOOGLE_PAY_PACKAGE_NAME]: GOOGLE_PAY_PACKAGE_NAME,
+    [PHONE_PE_PACKAGE_NAME]: PHONE_PE_PACKAGE_NAME,
+  };
+  return checkPaymentAdapter(adapterPackageNameMap[adapter], data).then(
+    success => {
+      if (!this.paymentAdapters) {
+        this.paymentAdapters = {};
+      }
+
+      this.paymentAdapters[adapter] = true;
+
+      return Promise.resolve(success);
     }
-
-    this.paymentAdapters[adapter] = true;
-
-    return Promise.resolve(success);
-  });
+  );
 };
 
 /**

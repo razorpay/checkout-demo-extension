@@ -3,6 +3,7 @@ var RAZORPAY_HOVER_COLOR = '#626A74';
 var ua = navigator.userAgent;
 
 var preferences,
+  WebPaymentsApi = discreet.WebPaymentsApi,
   CheckoutBridge = window.CheckoutBridge,
   StorageBridge = window.StorageBridge,
   Promise = discreet.Promise,
@@ -4326,8 +4327,8 @@ Session.prototype = {
     if (
       data.method === 'upi' &&
       data['_[flow]'] === 'intent' &&
-      data.upi_app === UPIUtils.GOOGLE_PAY_PACKAGE_NAME &&
-      discreet.upiTab.isGooglePayWebPaymentsAvailable()
+      WebPaymentsApi.appsThatSupportWebPayments.includes(data.upi_app) &&
+      WebPaymentsApi.isWebPaymentsApiAvailable(data.upi_app)
     ) {
       request.gpay = true;
     }

@@ -1,13 +1,16 @@
 import { setView, destroyView } from './';
 import { getSession } from 'sessionmanager';
 import * as Bridge from 'bridge';
-import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi';
+import { GOOGLE_PAY_PACKAGE_NAME, PHONE_PE_PACKAGE_NAME } from 'common/upi';
+import {
+  isWebPaymentsApiAvailable,
+  checkWebPaymentsForApp,
+  appsThatSupportWebPayments,
+} from 'common/webPaymentsApi';
 import { setUpiApps } from 'checkoutstore/native';
 
 import UpiTab from 'ui/tabs/upi/index.svelte';
 const UPI_KEY = 'upiTab';
-
-let googlePayWebPaymentsAvailable = false;
 
 /**
  * Tells if Google Pay Web Payments are available
@@ -15,35 +18,18 @@ let googlePayWebPaymentsAvailable = false;
  * @returns {boolean}
  */
 export function isGooglePayWebPaymentsAvailable() {
-  return googlePayWebPaymentsAvailable;
+  return isWebPaymentsApiAvailable(GOOGLE_PAY_PACKAGE_NAME);
 }
 
 /**
- * Checks if Google Pay Web Payments are possible
+ * Checks if Web Payments are possible
  * and sets the app in the list of UPI intent apps
  * if so.
  */
-export function checkGooglePayWebPayments() {
-  const session = getSession();
-
-  /* disable Web payments API for SDK as we have native intent there */
-  if (Bridge.checkout.exists()) {
-    return;
-  }
-
-  session.r
-    .checkPaymentAdapter('gpay')
-    .then(() => {
-      googlePayWebPaymentsAvailable = true;
-
-      // Google Pay is available for web payments
-      setUpiApps([
-        {
-          package_name: GOOGLE_PAY_PACKAGE_NAME,
-        },
-      ]);
-    })
-    .catch(() => {});
+export function checkForPossibleWebPayments() {
+  appsThatSupportWebPayments.forEach(app => {
+    checkWebPaymentsForApp(app);
+  });
 }
 
 export function render(props = {}) {
