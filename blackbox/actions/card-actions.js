@@ -20,9 +20,15 @@ async function handleCardValidation(context, { urlShouldContain } = {}) {
 
 async function handleCardValidationForNativeOTP(
   context,
-  { coproto, cardType, urlShouldContain } = {}
+  { coproto, cardType, urlShouldContain, expectCallbackUrl } = {}
 ) {
   const req = await context.expectRequest();
+  const body = querystring.parse(req.body);
+  if (expectCallbackUrl) {
+    expect(body.callback_url).toEqual(
+      'http://www.merchanturl.com/callback?test1=abc&test2=xyz'
+    );
+  }
   expect(req.url).toContain(urlShouldContain || 'create/ajax');
   if (cardType === 'RUPAY' && coproto === 'otp') {
     await context.respondJSON({
