@@ -20,11 +20,10 @@
   } from 'checkoutstore/screens/otp';
   import { cardNumber, selectedCard } from 'checkoutstore/screens/card';
   import { selectedInstrument } from 'checkoutstore/screens/home';
-  import { showFeeLabel } from 'checkoutstore/index.js';
+  import { showFeeLabel, getOption } from 'checkoutstore/index.js';
 
   // Utils
   import { getFormattedDateTime } from 'lib/utils';
-  import { getOption } from 'checkoutstore';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
