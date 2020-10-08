@@ -21,7 +21,6 @@
   import {
     getLongBankName,
     formatTemplateWithLocale,
-    formatMessageWithLocale,
     getInstrumentTitle,
   } from 'i18n';
 
