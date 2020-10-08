@@ -21,7 +21,7 @@
   import {
     getLongBankName,
     formatTemplateWithLocale,
-    formatMessageWithLocale,
+    getInstrumentTitle,
   } from 'i18n';
 
   import { locale } from 'svelte-i18n';
@@ -117,12 +117,8 @@
       hasCvv = false;
     } else {
       // We don't know anything about the card.
-      title = formatMessageWithLocale(
-        isEmiInstrument
-          ? 'instrument.titles.emi_saved_cards'
-          : 'instrument.titles.saved_cards',
-        $locale
-      );
+      const method = isEmiInstrument ? 'emi_saved_cards' : 'saved_cards';
+      title = getInstrumentTitle(method, '', $locale);
       icon = getIcon();
       hasCvv = false;
     }
