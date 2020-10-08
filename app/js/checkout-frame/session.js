@@ -479,17 +479,11 @@ function askOTP(view, textView, shouldLimitResend, templateData) {
     textView = textView.error && textView.error.description;
   }
 
-  if (session.get('subscirption_card_change')) {
-    view.updateScreen({
-      allowSkip: false,
-    });
-  }
-
   view.updateScreen({
     loading: false,
     action: false,
     otp: '',
-    allowSkip: true,
+    allowSkip: session.get('subscription_card_change') ? false : true,
     allowResend: shouldLimitResend ? OtpService.canSendOtp('razorpay') : true,
   });
 
