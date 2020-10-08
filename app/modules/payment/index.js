@@ -751,6 +751,7 @@ razorpayProto.checkPaymentAdapter = function(adapter, data) {
     gpay: GOOGLE_PAY_PACKAGE_NAME,
     [GOOGLE_PAY_PACKAGE_NAME]: GOOGLE_PAY_PACKAGE_NAME,
     [PHONE_PE_PACKAGE_NAME]: PHONE_PE_PACKAGE_NAME,
+    'microapps.gpay': 'microapps.gpay',
   };
   return checkPaymentAdapter(adapterPackageNameMap[adapter], data).then(
     success => {
