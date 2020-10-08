@@ -479,6 +479,12 @@ function askOTP(view, textView, shouldLimitResend, templateData) {
     textView = textView.error && textView.error.description;
   }
 
+  if (session.get('subscirption_card_change')) {
+    view.updateScreen({
+      allowSkip: false,
+    });
+  }
+
   view.updateScreen({
     loading: false,
     action: false,
