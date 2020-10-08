@@ -13,7 +13,11 @@ const {
   typeOTPandSubmit,
   handleOtpVerificationForCardlessEMI,
   selectZestMoneyEMIPlan,
+  selectCardlessEMIPlan,
   handleCardlessEMIPaymentCreation,
+  handleCardValidationForNativeOTP,
+  verifyOTP,
+  resendOTP,
 
   // Partial Payment
   verifyPartialAmount,
@@ -50,6 +54,13 @@ module.exports = function(testFeatures) {
     provider = 'zestmoney',
   } = features;
 
+  if (provider === 'bajaj') {
+    // Because, OTP for Bajaj is asked on Checkout,
+    // Which is called Native OTP internally,
+    // And Native OTP only works on live mode.
+    preferences.mode = 'live';
+  }
+
   describe.each(
     getTestData(title, {
       options,
@@ -61,7 +72,44 @@ module.exports = function(testFeatures) {
         earlysalary: true,
         zestmoney: true,
         flexmoney: true,
+        bajaj: true,
       };
+
+      // Why do the following and not include Bajaj in emi.json file?
+      // When EMI on Cards is available,
+      // we show "EMI" on homescreen, clicking on which takes us to Cards screen
+      // However, if EMI on Bajaj is available,
+      // we show "EMI" on homescreen, clicking on it takes us to Cardless EMI screen
+      // where you'd have a list like
+      // 1. EMI on Debit/Credit cards
+      // 2. Zest Money
+      // 3. Bajaj Finserv
+      // This will mess up tests for EMI, because the selector in selectPaymentMethod()
+      // will now be "cardless_emi" instead of "emi"
+      // God help Razorpay stop adding custom flows and make things complicated.
+      preferences.methods.emi_options.BAJAJ = [
+        {
+          duration: 3,
+          interest: 0,
+          subvention: 'merchant',
+          min_amount: 449900,
+          merchant_payback: '0.00',
+        },
+        {
+          duration: 6,
+          interest: 7,
+          subvention: 'customer',
+          min_amount: 899900,
+          merchant_payback: '0.00',
+        },
+        {
+          duration: 9,
+          interest: 10,
+          subvention: 'customer',
+          min_amount: 1349900,
+          merchant_payback: '0.00',
+        },
+      ];
 
       // ZestMoney is disabled on feeBearer merchants
       if (feeBearer) {
@@ -108,18 +156,45 @@ module.exports = function(testFeatures) {
       if (feeBearer) {
         await handleFeeBearer(context);
       }
-      await handleCardlessEMIValidation(context);
-      await typeOTPandSubmit(context);
-      await handleOtpVerificationForCardlessEMI(context);
-      await selectZestMoneyEMIPlan(context, 1);
-      await submit(context);
+      if (provider === 'zestmoney') {
+        await handleCardlessEMIValidation(context);
+        await typeOTPandSubmit(context);
+        await handleOtpVerificationForCardlessEMI(context);
+        await selectCardlessEMIPlan(context, 1);
+        await submit(context);
+      } else if (provider === 'bajaj') {
+        await selectCardlessEMIPlan(context, 1);
+        await submit(context);
+        // TODO:
+        //  Use enterCardDetails function,
+        //  after BAJAJ code is moved away from session.js
+        await context.page.type(
+          'input[name="card[number]"]',
+          '2030400200339945'
+        );
+        await context.page.type('input[name="card[name]"]', 'Bajaj Customer');
+        await submit(context);
+        await handleCardValidationForNativeOTP(context, {
+          coproto: 'otp',
+          expectCallbackUrl: callbackUrl,
+        });
+        await typeOTPandSubmit(context);
+        await verifyOTP(context, 'fail');
+        await resendOTP(context);
+        await typeOTPandSubmit(context);
+        await verifyOTP(context, 'pass');
+      }
+
       if (feeBearer) {
         await handleFeeBearer(context);
       }
-      if (callbackUrl) {
-        await expectRedirectWithCallback(context, { method: 'cardless_emi' });
-      } else {
-        await handleCardlessEMIPaymentCreation(context);
+
+      if (provider !== 'bajaj') {
+        if (callbackUrl) {
+          await expectRedirectWithCallback(context, { method: 'cardless_emi' });
+        } else {
+          await handleCardlessEMIPaymentCreation(context);
+        }
       }
     });
   });

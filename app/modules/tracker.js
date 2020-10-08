@@ -186,6 +186,16 @@ export default function Track(r, event, data, immediately) {
 
     options = _Obj.extend(options, _Obj.unflatten(r.get()));
 
+    var handler = r.get('handler');
+    if (typeof handler === 'function') {
+      options.handler = true;
+    }
+
+    var callback_url = r.get('callback_url');
+    if (typeof callback_url === 'string') {
+      options.callback_url = true;
+    }
+
     // Mask prefilled card details
     if (_Obj.hasProp(options, 'prefill')) {
       _Arr.loop(['card'], key => {
