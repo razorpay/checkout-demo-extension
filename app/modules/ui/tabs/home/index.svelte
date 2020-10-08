@@ -324,12 +324,7 @@
             instrumentsSource = SOURCES.API;
           }
         } else {
-          // Do another 50-50 split on API instruments
-          if (Math.random() < 0.5) {
-            instrumentsSource = SOURCES.NONE;
-          } else {
-            instrumentsSource = SOURCES.API;
-          }
+          instrumentsSource = SOURCES.API;
         }
 
         // The function that returns the promise to be returned
