@@ -111,6 +111,10 @@ export const shouldTurnWalletToIntent = (wallet, apps = []) => {
     return false;
   }
 
+  if (!(CheckoutBridge && CheckoutBridge.callNativeIntent)) {
+    return false;
+  }
+
   const walletPackage = getPackageNameForWallet(wallet);
 
   if (walletPackage) {
