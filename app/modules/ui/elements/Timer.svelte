@@ -30,6 +30,5 @@
 </script>
 
 <div id="timeout">
-  <i>&#x2139</i>
-  This page will timeout in {displayTime} minutes
+  <i>&#x2139</i> This page will timeout in {displayTime} minutes
 </div>

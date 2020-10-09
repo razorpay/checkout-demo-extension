@@ -74,7 +74,7 @@
       required
       xautocompletetype="phone-full"
       pattern={INDIAN_CONTACT_PATTERN}
-      icon="&#xe607;"
+      icon=""
       on:input
       on:blur
       handleFocus={true}

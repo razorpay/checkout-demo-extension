@@ -191,9 +191,7 @@
     class:no-blur={handleBlur}
     class:no-validate={handleInput}
     class:cvv-input={type === 'cvv'} />
-  {#if label}
-    <label>{label}</label>
-  {/if}
+  {#if label}<label>{label}</label>{/if}
   {#if helpText}
     <div class="help">{helpText}</div>
   {/if}

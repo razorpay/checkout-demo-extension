@@ -236,5 +236,4 @@
       {/if}
     {/if}
   </div>
-
 </ExpandableCard>

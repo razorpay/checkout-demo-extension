@@ -968,9 +968,7 @@
                     {#if $isContactPresent && !isContactHidden()}
                       <span>{$contact}</span>
                     {/if}
-                    {#if $email && !isEmailHidden()}
-                      <span>{$email}</span>
-                    {/if}
+                    {#if $email && !isEmailHidden()}<span>{$email}</span>{/if}
                   </div>
                   <div
                     slot="extra"

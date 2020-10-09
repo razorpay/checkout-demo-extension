@@ -637,7 +637,6 @@
 <Tab {method} {down} pad={false} shown={isPayout()}>
   <Screen>
     <div>
-
       {#if intent}
         <UpiIntent
           bind:this={intentView}

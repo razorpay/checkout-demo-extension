@@ -1,5 +1,3 @@
-var RAZORPAY_HOVER_COLOR = '#626A74';
-
 var ua = navigator.userAgent;
 
 var preferences,
@@ -10,7 +8,7 @@ var preferences,
   Bridge = discreet.Bridge,
   isIframe = window !== parent,
   ownerWindow = isIframe ? parent : opener,
-  _uid = Track.id,
+  tab_titles = Constants.TAB_TITLES,
   freqWallets = Wallet.wallets,
   contactPattern = Constants.CONTACT_REGEX,
   emailPattern = Constants.EMAIL_REGEX,
@@ -55,7 +53,6 @@ var preferences,
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
 var ua_iPhone = /iPhone/.test(ua);
 var isIE = /MSIE |Trident\//.test(ua);
-var DEMO_MERCHANT_KEY = 'rzp_live_ILgsfZCZoFIKMb';
 
 // .shown has display: none from iOS ad-blocker
 // using दृश्य, which will never be seen by tim cook
@@ -63,10 +60,6 @@ var shownClass = 'drishy';
 
 var strings = {
   process: 'Your payment is being processed',
-  gpay_omnichannel: 'Verifying mobile number with Google Pay..',
-  redirect: 'Redirecting to Bank page',
-  acs_load_delay: 'Seems like your bank page is taking time to load.',
-  otp_resent: 'OTP resent',
 };
 
 /**
@@ -652,8 +645,6 @@ Session.prototype = {
   shouldUseNativeOTP: function() {
     return this.get('nativeotp') && this.r.isLiveMode();
   },
-
-  getDecimalAmount: getDecimalAmount,
 
   formatAmount: function(amount) {
     var displayCurrency = this.r.get('display_currency');

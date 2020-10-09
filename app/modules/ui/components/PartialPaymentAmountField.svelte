@@ -146,7 +146,8 @@
       id="min-amount-checkbox"
       on:change={handleCheckboxChange}
       checked={valueInMinor === minAmount}>
-      {minAmountLabel} {session.formatAmountWithCurrency(minAmount)}
+      {minAmountLabel}
+      {session.formatAmountWithCurrency(minAmount)}
     </Checkbox>
   </div>
   <div class="subtitle subtitle--help">{partialDescription}</div>

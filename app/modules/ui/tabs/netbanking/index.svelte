@@ -387,16 +387,14 @@
       {#if selectedBankHasDowntime}
         <DowntimeCallout severe={selectedBankHasSevereDowntime}>
           {#if selectedBankHasSevereDowntime}
-            <strong>{filteredBanks[$selectedBank]}</strong>
-            accounts are temporarily unavailable right now. Please select
-            another bank.
+            <strong>{filteredBanks[$selectedBank]}</strong> accounts are temporarily
+            unavailable right now. Please select another bank.
           {:else}
-            <strong>{filteredBanks[$selectedBank]}</strong>
-            accounts are experiencing low success rates.
+            <strong>{filteredBanks[$selectedBank]}</strong> accounts are experiencing
+            low success rates.
           {/if}
         </DowntimeCallout>
       {/if}
-
     </Bottom>
     {#if !recurring}
       <CTA on:click={() => getSession().preSubmit()} />

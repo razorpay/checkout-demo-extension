@@ -205,7 +205,7 @@
     xautocompletetype="phone-country-code"
     pattern={COUNTRY_CODE_REGEX}
     readonly={isContactReadOnly()}
-    icon="&#xe604;"
+    icon=""
     formatter={{ type: 'country_code' }}
     label={$t(COUNTRY_LABEL)}
     on:input={e => (country = e.target.value)}
@@ -229,7 +229,7 @@
     readonly={isContactReadOnly()}
     formatter={{ type: 'phone' }}
     label={$t(label)}
-    icon="&#xe607;"
+    icon=""
     on:input={e => (phone = e.target.value)}
     on:blur
     value={phone}

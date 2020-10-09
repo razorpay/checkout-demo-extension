@@ -193,6 +193,5 @@
         </i>
       </SlottedRadioOption>
     {/each}
-
   </div>
 </Tab>

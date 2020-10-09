@@ -53,7 +53,5 @@
 
 <LinkButton {id} {disabled} on:click={event => invokeResend(event, 'resend')}>
   {$t(RESEND_LABEL)}
-  {#if secondsLeftText}
-    <span>{secondsLeftText}</span>
-  {/if}
+  {#if secondsLeftText}<span>{secondsLeftText}</span>{/if}
 </LinkButton>
