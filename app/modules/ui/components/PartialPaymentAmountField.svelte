@@ -1,12 +1,28 @@
 <script>
+  // Svelte imports
   import { createEventDispatcher } from 'svelte';
 
+  // UI imports
   import Field from 'ui/components/Field.svelte';
   import Checkbox from 'ui/elements/Checkbox.svelte';
 
+  // i18n
+  import {
+    PARTIAL_AMOUNT_PLACEHOLDER,
+    PARTIAL_AMOUNT_HELP_INVALID,
+    PARTIAL_AMOUNT_HELP_LOWER,
+    PARTIAL_AMOUNT_HELP_HIGHER,
+  } from 'ui/labels/home';
+
+  import { t, locale } from 'svelte-i18n';
+
+  import { formatTemplateWithLocale } from 'i18n';
+
+  // Utils
   import { getSession } from 'sessionmanager';
   import { getCurrencyConfig } from 'common/currency';
 
+  // Props
   export let maxAmount = null;
   export let minAmount = null;
   export let value;
@@ -78,21 +94,19 @@
   const max = getAmountInMajor(maxAmount);
   const min = getAmountInMajor(minAmount);
 
-  let helpText;
+  let helpTextLabel;
+  let helpTextAmount;
 
   $: {
     if (!value) {
-      helpText = `Please enter a valid amount upto ${session.formatAmountWithCurrency(
-        maxAmount
-      )}`;
+      helpTextLabel = PARTIAL_AMOUNT_HELP_INVALID;
+      helpTextAmount = session.formatAmountWithCurrency(maxAmount);
     } else if (valueInMinor < minAmount) {
-      helpText = `Minimum payable amount is ${session.formatAmountWithCurrency(
-        minAmount
-      )}`;
+      helpTextLabel = PARTIAL_AMOUNT_HELP_LOWER;
+      helpTextAmount = session.formatAmountWithCurrency(minAmount);
     } else if (valueInMinor > maxAmount) {
-      helpText = `Amount cannot exceed ${session.formatAmountWithCurrency(
-        maxAmount
-      )}`;
+      helpTextLabel = PARTIAL_AMOUNT_HELP_HIGHER;
+      helpTextAmount = session.formatAmountWithCurrency(maxAmount);
     }
   }
 </script>
@@ -107,7 +121,7 @@
   }
 </style>
 
-<!-- TODO: format amount in helpText -->
+<!-- LABEL: Enter amount -->
 <Field
   elemClasses="mature"
   id="amount-value"
@@ -117,8 +131,8 @@
   required
   {max}
   {min}
-  placeholder="Enter amount"
-  {helpText}
+  placeholder={$t(PARTIAL_AMOUNT_PLACEHOLDER)}
+  helpText={formatTemplateWithLocale(helpTextLabel, { amount: helpTextAmount }, $locale)}
   formatter={{ type: 'amount' }}
   bind:this={field}
   handleFocus={true}
@@ -132,7 +146,8 @@
       id="min-amount-checkbox"
       on:change={handleCheckboxChange}
       checked={valueInMinor === minAmount}>
-      {minAmountLabel} {session.formatAmountWithCurrency(minAmount)}
+      {minAmountLabel}
+      {session.formatAmountWithCurrency(minAmount)}
     </Checkbox>
   </div>
   <div class="subtitle subtitle--help">{partialDescription}</div>

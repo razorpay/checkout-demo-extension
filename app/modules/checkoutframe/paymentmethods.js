@@ -1,50 +1,105 @@
-import { TAB_TITLES, AVAILABLE_METHODS } from 'common/constants';
+import { AVAILABLE_METHODS } from 'common/constants';
 import {
   isMethodEnabled,
   getPayLaterProviders,
   getCardlessEMIProviders,
   getWallets,
   getCardNetworks,
+  getAppsForCards,
   getEMIBanks,
   isMethodUsable,
+  isDebitEMIEnabled,
+  isCreditCardEnabled,
+  isDebitCardEnabled,
 } from 'checkoutstore/methods';
-import { getRecurringMethods, isRecurring } from 'checkoutstore';
+
+import { getRecurringMethods, isIRCTC, isRecurring } from 'checkoutstore';
 import { generateTextFromList } from 'lib/utils';
 
-function getRecurringCardDescription() {
-  if (isRecurring()) {
-    return getRecurringMethods().card?.credit?.join(' and ') + ' credit cards';
-  }
+import {
+  getMethodPrefix,
+  getRawMethodTitle,
+  getNetworkName,
+  getPaylaterProviderName,
+  getCardlessEmiProviderName,
+  getRawMethodDescription,
+  getWalletName,
+  formatTemplateWithLocale,
+} from 'i18n';
+
+import {
+  DESCRIPTION_RECURRING_CARDS,
+  DESCRIPTION_CARDLESS_EMI,
+} from 'ui/labels/methods';
+
+function getRecurringCardDescription(locale) {
+  // TODO: fix this to return network codes instead of names
+  const recurringNetworks = getRecurringMethods().card?.credit || [];
+  const networks = generateTextFromList(recurringNetworks);
+  return formatTemplateWithLocale(
+    DESCRIPTION_RECURRING_CARDS, // LABEL: {networks} credit cards
+    { networks },
+    locale
+  );
 }
 
-const CARD_DESCRIPTION = ({ session }) => {
-  const recurring_text = getRecurringCardDescription();
-  if (recurring_text) {
-    return recurring_text;
+const CARD_DESCRIPTION = locale => {
+  if (isRecurring()) {
+    return getRecurringCardDescription(locale);
   }
 
-  // Keep in order that we want to display
-  const NW_MAP = {
-    VISA: 'Visa',
-    MC: 'MasterCard',
-    RUPAY: 'RuPay',
-    AMEX: 'Amex',
-    DICL: 'Diners Club',
-    MAES: 'Maestro',
-    JCB: 'JCB',
-  };
+  // Get all apps from preferences.
+  const availableApps = getAppsForCards();
 
-  // Get all networks from preferences.
-  const networksFromPrefs = getCardNetworks();
+  // Show card type instead of card networks if apps are available.
+  if (availableApps.length) {
+    // Keep in order that we want to display
+    const APPS_ORDER = ['cred', 'google_pay_cards'];
+    // Get the app names to show
+    const apps =
+      APPS_ORDER
+      |> _Arr.filter(app => _Arr.contains(availableApps, app))
+      |> _Arr.map(app => getRawMethodTitle(app, locale));
 
-  // Get the network names to show
-  const networks =
-    NW_MAP
-    |> _Obj.keys
-    |> _Arr.filter(network => Boolean(networksFromPrefs[network]))
-    |> _Arr.map(network => NW_MAP[network]);
+    const credit = isCreditCardEnabled();
+    const debit = isDebitCardEnabled();
 
-  return generateTextFromList(networks, 4);
+    let razorpayMethod;
+    if (credit && debit) {
+      if (apps.length > 1) {
+        // LABEL: Credit/Debit
+        razorpayMethod = getMethodPrefix('credit_debit', locale);
+      } else {
+        // LABEL: Credit/Debit cards
+        razorpayMethod = getMethodPrefix('credit_debit_cards', locale);
+      }
+    } else if (credit) {
+      // LABEL: Credit cards
+      razorpayMethod = getMethodPrefix('credit_cards', locale);
+    } else if (debit) {
+      // LABEL: Debit cards
+      razorpayMethod = getMethodPrefix('debit_cards', locale);
+    }
+
+    apps.unshift(razorpayMethod);
+
+    // Credit/Debit, CRED, and Google Pay Cards
+    return generateTextFromList(apps, 4);
+  } else {
+    // Keep in order that we want to display
+    const NW_ORDER = ['VISA', 'MC', 'RUPAY', 'AMEX', 'DICL', 'MAES', 'JCB'];
+
+    // Get all networks from preferences.
+    const networksFromPrefs = getCardNetworks();
+
+    // Get the network names to show
+    const networks =
+      NW_ORDER
+      |> _Arr.filter(network => Boolean(networksFromPrefs[network]))
+      |> _Arr.map(network => getNetworkName(network, locale));
+
+    return generateTextFromList(networks, 4);
+  }
 };
 
 /**
@@ -52,7 +107,7 @@ const CARD_DESCRIPTION = ({ session }) => {
  */
 const DESCRIPTIONS = {
   card: CARD_DESCRIPTION,
-  cardless_emi: () => {
+  cardless_emi: locale => {
     /**
      * EMI + Cardless EMI: Cards, ZestMoney, & More
      * Cardless EMI: EMI via ZestMoney & More
@@ -61,11 +116,19 @@ const DESCRIPTIONS = {
     const cardEmi = isMethodUsable('emi');
     let providerNames = [];
     _Obj.loop(getCardlessEMIProviders(), providerObj => {
-      providerNames.push(providerObj.name);
+      let providerCode = providerObj.code;
+      if (providerCode === 'cards' && isDebitEMIEnabled()) {
+        providerCode = 'credit_debit_cards';
+      }
+      providerNames.push(getCardlessEmiProviderName(providerCode, locale));
     });
 
     if (cardEmi) {
-      providerNames.unshift('Cards');
+      if (isDebitEMIEnabled()) {
+        providerNames.unshift(getMethodPrefix('debit_credit_cards', locale));
+      } else {
+        providerNames.unshift(getMethodPrefix('card', locale));
+      }
     }
 
     const text = generateTextFromList(providerNames, 3);
@@ -73,30 +136,44 @@ const DESCRIPTIONS = {
     if (cardEmi) {
       return text;
     } else {
-      return `EMI via ${text}`;
+      return formatTemplateWithLocale(
+        DESCRIPTION_CARDLESS_EMI, // LABEL: EMI via {text}
+        { text },
+        locale
+      );
     }
   },
   credit_card: CARD_DESCRIPTION,
   debit_card: CARD_DESCRIPTION,
-  emandate: () => 'Pay with Netbanking',
-  emi: () => 'EMI via Credit & Debit Cards',
-  netbanking: () => 'All Indian banks',
-  paylater: () => {
-    const providers = getPayLaterProviders().map(p => p.name);
+  emandate: locale => getRawMethodDescription('emandate', locale),
+  emi: locale => getRawMethodDescription('emi', locale),
+  netbanking: locale => getRawMethodDescription('netbanking', locale),
+  paylater: locale => {
+    const providers = getPayLaterProviders().map(p =>
+      getPaylaterProviderName(p.code, locale)
+    );
     const text = generateTextFromList(providers, 2);
-
-    return `Pay later using ${text}`;
+    return formatTemplateWithLocale(
+      'methods.descriptions.paylater',
+      { providers: text },
+      locale
+    );
   },
-  paypal: () => 'Pay using PayPal wallet',
-  qr: () => 'Pay by scanning QR Code',
-  gpay: () => 'Instant payment using Google Pay App',
-  upi: () => 'Instant payment using UPI App',
-  wallet: () =>
+  paypal: locale => getRawMethodDescription('paypal', locale),
+  qr: locale => getRawMethodDescription('qr', locale),
+  gpay: locale => getRawMethodDescription('gpay', locale),
+  upi: locale => {
+    if (isRecurring()) {
+      return getRawMethodDescription('upi_recurring', locale);
+    }
+    return getRawMethodDescription('upi', locale);
+  },
+  wallet: locale =>
     generateTextFromList(
-      getWallets().map(w => w.name),
+      getWallets().map(w => getWalletName(w.code, locale)),
       2
     ),
-  upi_otm: () => 'Pay later using BHIM and HDFC',
+  upi_otm: locale => getRawMethodDescription('upi_otm', locale),
 };
 
 /**
@@ -108,20 +185,19 @@ export const getAllMethods = () => AVAILABLE_METHODS;
 
 /**
  * Returns the method description.
- * @param {String} method
- * @param {Object} props
- *  @prop {Object} session
+ * @param {string} method
+ * @param {string} locale
  *
- * @return {String}
+ * @return {string}
  */
-export function getMethodDescription(method, props) {
+export function getMethodDescription(method, locale) {
   const fn = DESCRIPTIONS[method];
 
   if (!fn) {
     return '';
   }
 
-  return fn(props);
+  return fn(locale);
 }
 
 export function getEMIBanksText() {
@@ -134,59 +210,70 @@ export function getEMIBanksText() {
 /**
  * Returns the prefix for the given method.
  * @param {String} method
+ * @param {string} locale
  * @return {String}
  */
-export function getMethodPrefix(method) {
+export function getTranslatedMethodPrefix(method, locale) {
+  const methodKey = getMethodForPrefix(method);
+  return getMethodPrefix(methodKey, locale);
+}
+
+/**
+ * Returns the method that should be displayed in the prefix for a given method.
+ * Some methods, such as cardless EMI, are displayed as emi on the prefix. This
+ * function handles the translation for cardless_emi -> emi.
+ *
+ * @param {string} method
+ * @returns {string}
+ */
+function getMethodForPrefix(method) {
   switch (method) {
-    case 'card':
     case 'credit_card':
     case 'debit_card':
-      return 'Cards';
+      return 'card';
 
-    case 'netbanking':
     case 'emandate':
-      return 'Netbanking';
+      return 'netbanking';
 
-    case 'emi':
     case 'cardless_emi':
-      return 'EMI';
-
-    case 'paylater':
-      return 'PayLater';
-
-    case 'paypal':
-      return 'PayPal';
-
-    case 'qr':
-      return 'UPI QR';
-
-    case 'upi_otm':
-      return 'UPI OTM';
-
-    case 'upi':
-      return 'UPI';
-
-    case 'wallet':
-      return 'Wallets';
-
-    case 'gpay':
-      return 'Google Pay';
+      return 'emi';
 
     default:
-      return method[0].toUpperCase() + method.slice(1);
+      return method;
   }
+}
+
+/**
+ * Returns the overridden method title for some specific merchants
+ * @param {string} method
+ * @param {string} locale
+ *
+ * @returns {string}
+ */
+function getMethodTitle(method, locale) {
+  if (isIRCTC()) {
+    if (method === 'card') {
+      method = 'irctc_card';
+    }
+    if (method === 'upi') {
+      method = 'irctc_upi';
+    }
+  }
+
+  return getRawMethodTitle(method, locale);
 }
 
 /**
  * Returns the name for the payment method.
  * Used for showing the name with payment icon
  * @param {string} method
+ * @param {string} locale
  * @param {Object} extra
  *  @prop {Session} session
  *
  * @returns {string}
  */
-export function getMethodNameForPaymentOption(method, extra = {}) {
+export function getMethodNameForPaymentOption(method, locale, extra = {}) {
   let hasInstrument = extra.instrument;
   let qrEnabled;
   let hasQr;
@@ -201,28 +288,28 @@ export function getMethodNameForPaymentOption(method, extra = {}) {
       }
 
       if (hasQr) {
-        return 'UPI / QR';
+        return getMethodTitle('upiqr', locale);
       }
 
-      return TAB_TITLES.upi;
+      return getMethodTitle('upi', locale);
     }
 
     case 'cardless_emi': {
       if (hasInstrument) {
-        return 'Cardless EMI';
+        return getMethodTitle('cardless_emi', locale);
       }
 
-      return TAB_TITLES[method];
+      return getMethodTitle('emi', locale);
     }
 
     default:
-      return TAB_TITLES[method];
+      return getMethodTitle(method, locale);
   }
 }
 
 /**
  * Returns the downtime description for the given method.
- * @param {String} method
+ * @param {string} method
  * @param {Object} param1
  *  @prop {Array} availableMethods
  */
@@ -230,8 +317,10 @@ export function getMethodDowntimeDescription(
   method,
   { availableMethods = [], downMethods = [] } = {}
 ) {
-  const prefix = getMethodPrefix(method);
+  const prefix = getTranslatedMethodPrefix(method);
   const pluralPrefix = /s$/i.test(prefix);
+
+  // TODO: use templates
   const isOrAre = pluralPrefix ? 'are' : 'is';
 
   const sentences = [`${prefix} ${isOrAre} facing temporary issues right now.`];

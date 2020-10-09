@@ -5,9 +5,7 @@
 
   // Store
   import { selectedBank } from 'checkoutstore/screens/netbanking';
-  import { methodTabInstrument } from 'checkoutstore/screens/home';
-
-  import { t } from 'svelte-i18n';
+  import { methodInstrument } from 'checkoutstore/screens/home';
 
   // UI imports
   import Tab from 'ui/tabs/Tab.svelte';
@@ -16,10 +14,24 @@
   import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
+  import SearchModal from 'ui/elements/SearchModal.svelte';
+  import BankSearchItem from 'ui/elements/search-item/Bank.svelte';
   import CTA from 'ui/elements/CTA.svelte';
 
-  // i18n labels
-  import { NETBANKING_SELECT_LABEL, NETBANKING_SELECT_HELP } from 'ui/labels';
+  // i18n
+  import {
+    NETBANKING_SELECT_LABEL,
+    NETBANKING_SELECT_HELP,
+    CORPORATE_RADIO_LABEL,
+    RETAIL_RADIO_LABEL,
+    SELECTION_RADIO_TEXT,
+    SEARCH_TITLE,
+    SEARCH_PLACEHOLDER,
+    SEARCH_ALL,
+  } from 'ui/labels/netbanking';
+
+  import { t, locale } from 'svelte-i18n';
+  import { getShortBankName, getLongBankName } from 'i18n';
 
   // Utils imports
   import Razorpay from 'common/Razorpay';
@@ -37,6 +49,7 @@
   } from 'common/bank';
   import { scrollIntoView } from 'lib/utils';
   import { getSession } from 'sessionmanager';
+  import { getAnimationOptions } from 'svelte-utils';
 
   // Props
   export let banks;
@@ -55,9 +68,24 @@
   let selectedBankHasSevereDowntime;
   let selectedBankHasLowDowntime;
   let selectedBankHasDowntime;
+  let selectedBankName;
+  let translatedBanksArr;
+
+  $: {
+    if ($selectedBank) {
+      selectedBankName = _Arr.find(
+        banksArr,
+        bank => bank.code === $selectedBank
+      ).name;
+    } else {
+      selectedBankName = null;
+    }
+  }
 
   // Refs
   let radioContainer;
+  let searchModal;
+  let bankSelect;
 
   // Actions
   const focus = InputActions.focus;
@@ -67,11 +95,43 @@
   const recurring = isRecurring();
   const dispatch = createEventDispatcher();
 
+  export function getPayload() {
+    return {
+      bank: $selectedBank,
+    };
+  }
+
   function setCorporateOption() {
     const corporateOption = getCorporateOption($selectedBank, filteredBanks);
 
     if (corporateOption) {
       $selectedBank = corporateOption;
+    }
+  }
+
+  function showSearch() {
+    searchModal.open();
+  }
+
+  function hideSearch() {
+    searchModal.close();
+
+    // Restore focus
+    if (bankSelect) {
+      bankSelect.focus();
+    }
+  }
+
+  /**
+   * Handle when the user presses Enter while focused
+   * on button#bank-select
+   */
+  function handleEnterOnButton(event) {
+    // 13 = Enter
+    if (_.getKeyFromEvent(event) === 13) {
+      event.preventDefault();
+
+      getSession().preSubmit();
     }
   }
 
@@ -112,11 +172,21 @@
   }
 
   $: {
-    filteredBanks = filterBanksAgainstInstrument(banks, $methodTabInstrument);
+    filteredBanks = filterBanksAgainstInstrument(banks, $methodInstrument);
 
     // If the currently selected bank is not present in filtered banks, we need to unset it.
     if (!filteredBanks[$selectedBank]) {
       $selectedBank = '';
+    }
+
+    /**
+     * If the method is netbanking and if there's only
+     * one bank available, select it automatically to reduce a user click.
+     * Of course, do this only when there's nothing preselected.
+     */
+    const banksList = _Obj.keys(filteredBanks);
+    if (method === 'netbanking' && !$selectedBank && banksList.length === 1) {
+      $selectedBank = banksList[0];
     }
   }
 
@@ -128,6 +198,12 @@
     code: entry[0],
     name: entry[1],
     downtime: downtimes[entry[0]],
+  }));
+  $: translatedBanksArr = _Arr.map(banksArr, bank => ({
+    code: bank.code,
+    original: bank.name,
+    name: getLongBankName(bank.code, $locale, bank.name),
+    _key: bank.code,
   }));
   $: invalid = method !== 'emandate' && !$selectedBank;
   $: netbanks = getPreferredBanks(filteredBanks, bankOptions).slice(
@@ -188,6 +264,19 @@
   .input-radio:first-of-type {
     margin-top: 4px;
   }
+
+  .dropdown-like {
+    width: 100%;
+
+    /* Fallback for IE */
+    text-align: left;
+    text-align: start;
+  }
+
+  #bank-select {
+    padding-top: 0;
+    margin-top: 12px;
+  }
 </style>
 
 <!-- TODO: remove override after fixing method check -->
@@ -201,33 +290,33 @@
       <div id="netb-banks" class="clear grid count-3">
         {#each netbanks as { name, code } (code)}
           <GridItem
-            {name}
+            name={getShortBankName(code, $locale)}
             {code}
             fullName={filteredBanks[code]}
             bind:group={$selectedBank} />
         {/each}
       </div>
 
-      <div class="elem-wrap pad">
+      <div class="elem-wrap pad" style="margin-bottom: 24px;">
         <div id="nb-elem" class="elem select" class:invalid>
           <i class="select-arrow"></i>
           <!-- LABEL: Please select a bank -->
           <div class="help">{$t(NETBANKING_SELECT_HELP)}</div>
-          <select
+          <button
+            aria-label={`${$selectedBank ? `${selectedBankName} - ${$t(NETBANKING_SELECT_LABEL)}` : $t(NETBANKING_SELECT_LABEL)}`}
+            class="input dropdown-like"
+            type="button"
             id="bank-select"
-            name="bank"
-            required
-            class="input no-refresh no-validate no-focus no-blur"
-            bind:value={$selectedBank}
-            use:focus
-            use:blur
-            use:input>
-            <!-- LABEL: Select a different bank -->
-            <option value="">{$t(NETBANKING_SELECT_LABEL)}</option>
-            {#each banksArr as bank (bank.code)}
-              <option value={bank.code}>{bank.name}</option>
-            {/each}
-          </select>
+            bind:this={bankSelect}
+            on:click={showSearch}
+            on:keypress={handleEnterOnButton}>
+            {#if $selectedBank}
+              {selectedBankName}
+            {:else}
+              <!-- LABEL: Select a different bank -->
+              {$t(NETBANKING_SELECT_LABEL)}
+            {/if}
+          </button>
         </div>
       </div>
 
@@ -235,8 +324,9 @@
         <div
           class="pad ref-radiocontainer"
           bind:this={radioContainer}
-          transition:fade={{ duration: 100 }}>
-          <label>Complete Payment Using</label>
+          transition:fade={getAnimationOptions({ duration: 100 })}>
+          <!-- LABEL: Complete Payment Using -->
+          <label>{$t(SELECTION_RADIO_TEXT)}</label>
           <div class="input-radio">
             <input
               type="radio"
@@ -246,7 +336,8 @@
               on:click={setRetailOption} />
             <label for="nb_type_retail">
               <div class="radio-display" />
-              <div class="label-content">Retail</div>
+              <!-- LABEL: Retail -->
+              <div class="label-content">{$t(RETAIL_RADIO_LABEL)}</div>
             </label>
           </div>
           <div class="input-radio">
@@ -258,12 +349,31 @@
               on:click={setCorporateOption} />
             <label for="nb_type_corporate">
               <div class="radio-display" />
-              <div class="label-content">Corporate</div>
+              <!-- LABEL: Corporate -->
+              <div class="label-content">{$t(CORPORATE_RADIO_LABEL)}</div>
             </label>
           </div>
         </div>
       {/if}
     </div>
+
+    <!-- LABEL: Select bank to pay -->
+    <!-- LABEL: Search for bank -->
+    <!-- LABEL: All banks -->
+    <SearchModal
+      identifier="netbanking_bank_select"
+      title={$t(SEARCH_TITLE)}
+      placeholder={$t(SEARCH_PLACEHOLDER)}
+      all={$t(SEARCH_ALL)}
+      items={translatedBanksArr}
+      keys={['code', 'name', 'original']}
+      component={BankSearchItem}
+      bind:this={searchModal}
+      on:close={hideSearch}
+      on:select={({ detail }) => {
+        $selectedBank = detail.code;
+        hideSearch();
+      }} />
 
     <Bottom>
       <!-- Show recurring message for recurring payments -->
@@ -277,16 +387,14 @@
       {#if selectedBankHasDowntime}
         <DowntimeCallout severe={selectedBankHasSevereDowntime}>
           {#if selectedBankHasSevereDowntime}
-            <strong>{filteredBanks[$selectedBank]}</strong>
-            accounts are temporarily unavailable right now. Please select
-            another bank.
+            <strong>{filteredBanks[$selectedBank]}</strong> accounts are temporarily
+            unavailable right now. Please select another bank.
           {:else}
-            <strong>{filteredBanks[$selectedBank]}</strong>
-            accounts are experiencing low success rates.
+            <strong>{filteredBanks[$selectedBank]}</strong> accounts are experiencing
+            low success rates.
           {/if}
         </DowntimeCallout>
       {/if}
-
     </Bottom>
     {#if !recurring}
       <CTA on:click={() => getSession().preSubmit()} />

@@ -10,6 +10,7 @@ const {
   getAttribute,
   selectPaymentMethod,
   assertInputValue,
+  assertTrimmedInnerText,
 } = require('../actions');
 
 const bankToPreselect = 'SBIN';
@@ -45,7 +46,11 @@ describe.each(
 
     await proceed(context);
     await selectPaymentMethod(context, 'netbanking');
-    await assertInputValue(context, '#bank-select', bankToPreselect);
+    await assertTrimmedInnerText(
+      context,
+      '#bank-select',
+      preferences.methods.netbanking[bankToPreselect]
+    );
   });
 });
 
@@ -84,10 +89,13 @@ describe.each(
     const selectedWallet = await context.page.waitForSelector(
       '#wallet-radio-phonepe'
     );
+
     const status = await context.page.evaluate(
-      amountSpan => amountSpan.checked,
+      selectedWallet =>
+        selectedWallet.closest('button').querySelector('input').checked,
       selectedWallet
     );
+
     expect(status).toBe(true);
   });
 });

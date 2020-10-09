@@ -1,6 +1,7 @@
 import Track from './tracker';
 
 const META = {};
+const REQUEST_INDEX = {};
 
 let rInstance;
 
@@ -73,6 +74,8 @@ const Analytics = () => ({
 
     data.meta = calculatedMeta;
 
+    data.meta.request_index = REQUEST_INDEX[rInstance.id];
+
     // Add type to the name.
     if (type) {
       name = `${type}:${name}`;
@@ -101,6 +104,29 @@ const Analytics = () => ({
    */
   getMeta: function() {
     return _Obj.unflatten(META);
+  },
+
+  /**
+   * Updates & returns the request index
+   * @param name
+   * @returns {number}
+   */
+  updateRequestIndex(name) {
+    if (!rInstance || !name) {
+      return 0;
+    }
+
+    if (!_Obj.hasProp(REQUEST_INDEX, rInstance.id)) {
+      REQUEST_INDEX[rInstance.id] = {};
+    }
+
+    const requestIndex = REQUEST_INDEX[rInstance.id];
+    if (!_Obj.hasProp(requestIndex, name)) {
+      requestIndex[name] = -1;
+    }
+
+    requestIndex[name] += 1;
+    return requestIndex[name];
   },
 });
 

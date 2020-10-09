@@ -62,17 +62,6 @@ $gridStagger = 0.05s;
   }
 }
 
-#topbar {
-  opacity: 0;
-  transform: translateY(- $topbarh);
-
-  &.drishy {
-    opacity: 1;
-    transform: translateY(0);
-    transition: $first transform ease-out $first, $first opacity ease-out $first, 0.1s color;
-  }
-}
-
 #form-common {
   .pad {
     transform: none;
@@ -151,5 +140,15 @@ for $i in (1..4) {
 
   100% {
     transform: none;
+  }
+}
+
+@keyframes instrument-skeleton {
+  0% {
+    transform: translateX(-100%);
+  }
+  
+  100% {
+    transform: translateX(100%);
   }
 }

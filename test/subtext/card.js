@@ -449,5 +449,141 @@ test('Module: subtext/card', t => {
     t.end();
   });
 
+  test('CardSubtext.generateSubtextForRecurring', t => {
+    const allNetworks = { mastercard: true, visa: true, amex: true };
+    const allTypes = { credit: true, debit: true };
+    const allIssuers = {
+      CITI: 'CITI Bank',
+      CNRB: 'Canara Bank',
+      ICIC: 'ICICI Bank',
+      KKBK: 'Kotak Mahindra Bank',
+    };
+
+    const allNetworksText = 'Visa, Mastercard, and American Express';
+    const debitCardBanksText =
+      'CITI Bank, Canara Bank, ICICI Bank, and Kotak Mahindra Bank';
+
+    test('type: subscription', t => {
+      t.equal(
+        'Subscription payments are supported on ' +
+          allNetworksText +
+          ' credit cards and debit cards from ' +
+          debitCardBanksText +
+          '.',
+        CardSubtext.generateSubtextForRecurring({
+          types: allTypes,
+          networks: allNetworks,
+          issuers: allIssuers,
+          subscription: 'subscription_id',
+        }),
+        'Issuers: all, Networks: 3, Types: all'
+      );
+
+      t.equal(
+        'Subscription payments are supported on debit cards from ' +
+          debitCardBanksText +
+          '.',
+        CardSubtext.generateSubtextForRecurring({
+          types: { debit: true },
+          networks: allNetworks,
+          issuers: allIssuers,
+          subscription: 'subscription_id',
+        }),
+        'Issuers: all, Networks: 3, Types: all'
+      );
+
+      t.equal(
+        'Subscription payments are supported on Mastercard and American Express credit cards.',
+        CardSubtext.generateSubtextForRecurring({
+          types: { credit: true },
+          networks: { mastercard: true, amex: true },
+          subscription: 'subscription_id',
+        }),
+        'Issuers: all, Networks: 2, Types: all'
+      );
+
+      t.end();
+    });
+
+    test('type: offer', t => {
+      const offer = { issuer: 'HDFC' };
+
+      t.equal(
+        'All HDFC cards are supported for this payment.',
+        CardSubtext.generateSubtextForRecurring({
+          types: allTypes,
+          subscription: false,
+          offer: offer,
+        }),
+        'Issuers: HDFC, Types: all'
+      );
+
+      t.equal(
+        'All HDFC credit cards are supported for this payment.',
+        CardSubtext.generateSubtextForRecurring({
+          types: { credit: true },
+          subscription: false,
+          offer: offer,
+        }),
+        'Issuers: HDFC, Types: credit'
+      );
+
+      t.equal(
+        'All HDFC debit cards are supported for this payment.',
+        CardSubtext.generateSubtextForRecurring({
+          types: { debit: true },
+          subscription: false,
+          offer: offer,
+        }),
+        'Issuers: HDFC, Types: debit'
+      );
+
+      t.end();
+    });
+
+    test('type: without subscription or offer', t => {
+      t.equal(
+        '' +
+          allNetworksText +
+          ' credit cards and debit cards from ' +
+          debitCardBanksText +
+          ' are supported for this payment.',
+        CardSubtext.generateSubtextForRecurring({
+          types: allTypes,
+          networks: allNetworks,
+          issuers: allIssuers,
+        }),
+        'Issuers: all, Networks: 3, Types: all'
+      );
+
+      t.equal(
+        'Only debit cards from ' +
+          debitCardBanksText +
+          ' are supported for this payment.',
+        CardSubtext.generateSubtextForRecurring({
+          types: { debit: true },
+          networks: allNetworks,
+          issuers: allIssuers,
+        }),
+        'Issuers: all, Networks: 3, Types: debit'
+      );
+
+      t.equal(
+        'Only ' +
+          allNetworksText +
+          ' credit cards are supported for this payment.',
+        CardSubtext.generateSubtextForRecurring({
+          types: { credit: true },
+          networks: allNetworks,
+        }),
+        'Issuers: all, Networks: 3, Types: credit'
+      );
+
+      t.end();
+    });
+
+    t.end();
+  });
+
   t.end();
 });

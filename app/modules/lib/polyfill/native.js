@@ -245,8 +245,10 @@
   }
 })();
 
-// Fix Function#name on browsers that do not support it (IE):
-if (!function f() {}.name) {
+// Fix Function#name on browsers that do not support it (IE)
+// We're using `global.alert.name` and not `function f() {}.name` because
+// `function f` becomes an anonymous function in the generated bundle
+if (!global.alert.name) {
   Object.defineProperty(Function.prototype, 'name', {
     get: function() {
       var name = (this.toString()

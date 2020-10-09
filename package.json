@@ -34,14 +34,15 @@
     "url": "git@github.com:razorpay/checkout.git"
   },
   "scripts": {
-    "start": "$ gulp watch",
+    "start": "NODE_ENV=dev $ gulp watch",
+    "start:no-reload": "$ gulp watch",
     "build": "$ rollup -c --environment prod && $ gulp && $ lintOutput app/js/generated/entry",
     "lint-fix": "$ lintFix app/modules",
     "clean": "$ ./scripts/clean.sh",
     "jest:base": "jest blackbox/tests/homescreen/**/base.test.js",
     "jest": "jest blackbox/tests/homescreen --testPathIgnorePatterns ersonalization",
     "jest:p13n": "jest blackbox/tests/homescreen/**/*ersonalization*.test.js --runInBand",
-    "test:all": "npm run test:unit && npm run build && npm run jest && npm run jest:p13n",
+    "test:all": "npm run test:unit && npm run build && npm run jest",
     "test:base": "npm run test:unit && npm run build && npm run jest:base",
     "test:unit": "./rollup.test.js | tap-difflet",
     "test": "npm run test:all"
@@ -51,21 +52,21 @@
   },
   "dependencies": {
     "chalk": "^2.4.1",
-    "fe": "git+https://github.com/razorpay/common-frontend-utils.git#90f5b4a",
+    "fe": "git+https://github.com/razorpay/common-frontend-utils.git#459f56b",
     "gulp": "^4.0.0",
     "gulp-stylus": "^2.7.0",
     "gulp-usemin": "^0.3.29",
     "istanbul": "^0.4.5",
     "jest": "^24.9.0",
-    "jshint": "2.11.1",
+    "jshint": "2.12.0",
     "jshint-stylish": "^2.2.1",
     "puppeteer": "^2.1.1",
     "rollup-plugin-coverage": "^0.1.4",
-    "rollup-plugin-svelte": "^5.2.2",
+    "rollup-plugin-svelte": "^6.0.1",
     "run-sequence": "^2.2.1",
     "svelte-i18n": "^3.0.4",
     "tap-difflet": "^0.7.1",
-    "testdouble": "^3.12.5",
+    "testdouble": "^3.16.1",
     "through": "^2.3.8",
     "through2": "^2.0.3"
   },
@@ -73,10 +74,11 @@
   "devDependencies": {
     "husky": "^1.0.0-rc.14",
     "jest-circus": "^24.9.0",
-    "lint-staged": "^10.2.8",
+    "lint-staged": "^10.4.0",
     "prettier": "^1.19.1",
-    "prettier-plugin-svelte": "^1.1.0",
-    "pretty-quick": "^2.0.0"
+    "prettier-plugin-svelte": "^1.2.1",
+    "pretty-quick": "^2.0.2",
+    "rollup-plugin-livereload": "^2.0.0"
   },
   "husky": {
     "hooks": {

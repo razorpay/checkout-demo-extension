@@ -23,12 +23,24 @@ function matchAllStringsInList(a, b) {
 }
 
 /**
+ * Tells if a block is full of loader instruments
+ * @param {Block} block
+ *
+ * @returns {boolean}
+ */
+function isBlockFullOfSkeletonInstruments(block) {
+  return block.items.every(item => item.type === 'skeleton');
+}
+
+/**
  * Parses blocks and returns their text
  * @param {Context} context
  *
  * @returns {Array}
  */
 async function parseBlocksFromHomescreen(context) {
+  await waitForSkeletonInstrumentsToResolve(context);
+
   const blockElements = await context.page.$$('.home-methods .methods-block');
   let blocks = await Promise.all(
     blockElements.map(
@@ -73,6 +85,9 @@ async function parseBlocksFromHomescreen(context) {
     )
   );
 
+  // TODO: Also consider preferred methods block
+  blocks = blocks.filter(block => !isBlockFullOfSkeletonInstruments(block));
+
   return blocks;
 }
 
@@ -113,15 +128,15 @@ async function assertShownBanks(context, banks) {
   // Dropdown is visible
   expect(await context.page.$eval('#bank-select', visible)).toEqual(true);
 
-  // Get all <option>s except for the first one, since the first one acts as a label
-  const options = await context.page.$$(
-    '#bank-select option:not(:first-child)'
-  );
+  // Get all banks
+  await context.page.click('#bank-select');
+
+  const options = await context.page.$$('.search-box .list .list-item');
 
   // Get the values of all options
-  const values = await Promise.all(
-    options.map(option => getAttribute(context.page, option, 'value'))
-  );
+  let values = await Promise.all(options.map(innerText));
+
+  values = values.map(value => value.trim());
 
   // Verify that all expected banks are present
   expect(matchAllStringsInList(banks, values)).toBe(true);
@@ -258,6 +273,42 @@ async function assertCardScreenAndText(context, text) {
   expect(description).toBe(text);
 }
 
+/**
+ * Waits for all skeleton instruments to be hidden
+ *
+ * IMPORTANT:
+ * Couldn't use waitForSelector here since it wasn't working properly for all tests (odd).
+ * Had to write a custom waitForSelector functionality.
+ *
+ * @param {Context} context
+ *
+ * @returns {Promise}
+ */
+function waitForSkeletonInstrumentsToResolve(context) {
+  const TIMEOUT = 2000;
+  const POLL_INTERVAL = 100;
+  const SKELETON_SELECTOR = '.home-methods .methods-block .skeleton-instrument';
+
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      clearInterval(poll);
+
+      reject();
+    }, TIMEOUT);
+
+    const poll = setInterval(async () => {
+      const skeleton = await context.page.$(SKELETON_SELECTOR);
+
+      if (!skeleton) {
+        clearTimeout(timeout);
+        clearInterval(poll);
+
+        resolve();
+      }
+    }, POLL_INTERVAL);
+  });
+}
+
 module.exports = {
   parseBlocksFromHomescreen,
   isIndividualInstrument,
@@ -269,4 +320,5 @@ module.exports = {
   assertShownPaylaterProviders,
   assertShownCardlessEmiProviders,
   assertCardScreenAndText,
+  waitForSkeletonInstrumentsToResolve,
 };

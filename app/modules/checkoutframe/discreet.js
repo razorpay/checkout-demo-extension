@@ -8,7 +8,6 @@ import * as UPIUtils from 'common/upi';
 import * as GPay from 'gpay';
 import * as Color from 'lib/color';
 import * as _PaymentMethodIcons from 'ui/icons/payment-methods';
-import * as Confirm from 'confirm';
 import * as Currency from 'common/currency';
 import * as OtpService from 'common/otpservice';
 import * as strings from 'common/strings';
@@ -22,16 +21,18 @@ import NoCostExplainer from 'ui/components/offers/NoCostExplainer.svelte';
 import emiPlansView from 'checkoutframe/emiplans';
 import otpView from 'checkoutframe/otp';
 import languageSelectionView from 'ui/elements/LanguageSelection.svelte';
+import * as I18n from 'i18n';
+import { init as initI18n } from 'i18n/init';
+import UpiCancelReasonPicker from 'ui/components/UpiCancelReasonPicker.svelte';
 import * as Curtain from 'components/curtain';
 import { setShieldParams } from 'payment/validator';
 import * as P13n from 'checkoutframe/personalization';
 import { commonBanks, getFullBankLogo } from 'common/bank';
-import * as CountryCodesUtil from 'common/countrycodesutil';
-import { init as initI18n } from 'i18n';
+import * as CountryCodesUtil from 'common/countrycodes';
 
 /* Required for merchant.js migration */
 import * as Constants from 'common/constants';
-import * as Bank from 'common/bank';
+import * as WebPaymentsApi from 'common/webPaymentsApi';
 import * as Card from 'common/card';
 import * as Wallet from 'common/wallet';
 import * as CardlessEmi from 'common/cardlessemi';
@@ -41,15 +42,15 @@ import * as SessionManager from 'sessionmanager';
 import * as Checkout from 'checkoutframe/index';
 import * as Offers from 'checkoutframe/offers';
 import * as Flows from 'checkoutframe/flows';
-import * as Payouts from 'checkoutframe/payouts';
 import { initIframe } from 'checkoutframe/iframe';
+import * as Form from 'checkoutframe/form';
+import { stopListeningForBackPresses } from 'bridge/back';
 import * as Bridge from 'bridge';
 import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
 import { Formatter } from 'formatter';
 
 import * as Store from 'checkoutstore';
 import * as MethodStore from 'checkoutstore/methods';
-import SessionStore from 'checkoutstore/session';
 import * as EmiStore from 'checkoutstore/emi';
 import * as OTPScreenStore from 'checkoutstore/screens/otp';
 import * as Cta from 'checkoutstore/cta';
@@ -58,19 +59,25 @@ import * as CardScreenStore from 'checkoutstore/screens/card';
 import * as NetbankingScreenStore from 'checkoutstore/screens/netbanking';
 import * as CustomerStore from 'checkoutstore/customer';
 import * as Theme from 'checkoutstore/theme';
+import { overlayStack as overlayStackStore } from 'checkoutstore/back';
+import * as NativeStore from 'checkoutstore/native';
+import * as OffersStore from 'checkoutstore/offers';
 
 import QRScreen from 'ui/tabs/qr/index.svelte';
-import BankTransferScreen from 'ui/tabs/bank-transfer/index.svelte';
-import UpiTab from 'ui/tabs/upi/index.svelte';
+import * as upiTab from 'checkoutframe/components/upi';
 import CardlessEmiView from 'ui/tabs/cardless-emi/index.svelte';
 import emiScreenView from 'ui/tabs/emi/emiscreen.svelte';
 import PayLaterView from 'ui/tabs/paylater/index.svelte';
 import HomeTab from 'ui/tabs/home/index.svelte';
-import NetbankingTab from 'ui/tabs/netbanking/index.svelte';
+import netbankingTab from 'checkoutframe/components/netbanking';
 import EmandateTab from 'ui/tabs/emandate/index.svelte';
 import NachScreen from 'ui/tabs/nach/index.svelte';
-import CardTab from 'ui/tabs/card/index.svelte';
-import WalletTab from 'ui/tabs/wallets/index.svelte';
+import * as cardTab from 'checkoutframe/components/card';
+import * as walletTab from 'checkoutframe/components/wallet';
+import * as Backdrop from 'checkoutframe/components/backdrop';
+import * as Confirm from 'checkoutframe/components/confirm';
+import TopBar from 'ui/components/Topbar.svelte';
+import * as FeeLabel from 'checkoutframe/components/fee';
 
 import PayoutsInstruments from 'ui/tabs/payout/payout-instruments.svelte';
 import PayoutAccount from 'ui/tabs/payout/payout-account.svelte';
@@ -84,10 +91,10 @@ import { get as storeGetter } from 'svelte/store';
 import * as Experiments from 'experiments';
 
 import * as NBHandlers from 'handlers/netbanking';
-import * as UserHandlers from 'handlers/user';
 
 import * as Instruments from 'configurability/instruments';
 import { getInstrumentMeta } from 'ui/tabs/home/instruments';
+import * as ContactStorage from 'checkoutframe/contact-storage';
 
 export default {
   RazorpayConfig,
@@ -101,11 +108,13 @@ export default {
   Color,
   _PaymentMethodIcons,
   Confirm,
+  FeeLabel,
   Currency,
   OtpService,
   currencies: Currency.displayCurrencies,
   error: _.rzpError,
   Formatter,
+  Form,
 
   cancelMsg: strings.cancelMsg,
   confirmCancelMsg: strings.confirmCancelMsg,
@@ -117,7 +126,7 @@ export default {
   es6components,
 
   Constants,
-  Bank,
+  WebPaymentsApi,
   Card,
   Wallet,
   CardlessEmi,
@@ -126,25 +135,26 @@ export default {
   SessionManager,
   Checkout,
   Bridge,
+  stopListeningForBackPresses,
   P13n,
   Instruments,
   getInstrumentMeta,
   UserAgent,
   Offers,
   Flows,
-  Payouts,
   CountryCodesUtil,
   Theme,
 
   Store,
   MethodStore,
-  SessionStore,
   CustomerStore,
   OTPScreenStore,
   HomeScreenStore,
   CardScreenStore,
   NetbankingScreenStore,
   EmiStore,
+  NativeStore,
+  OffersStore,
   Cta,
 
   Customer,
@@ -157,30 +167,29 @@ export default {
   emiPlansView,
 
   FeeBearerView,
+  Backdrop,
   Overlay,
   AuthOverlay,
   OffersView,
   NoCostExplainer,
-  PayoutsInstruments,
-  PayoutAccount,
 
   otpView,
   languageSelectionView,
+  UpiCancelReasonPicker,
   PayLaterView,
   Curtain,
   commonBanks,
   timer: _.timer,
   QRScreen,
-  BankTransferScreen,
   getFullBankLogo,
 
   HomeTab,
-  UpiTab,
-  WalletTab,
-  NetbankingTab,
+  upiTab,
+  walletTab,
+  netbankingTab,
   EmandateTab,
   NachScreen,
-  CardTab,
+  cardTab,
 
   Hacks,
   storeGetter,
@@ -193,9 +202,12 @@ export default {
   _Obj,
   _Str,
   _,
+  Promise,
 
   NBHandlers,
-  UserHandlers,
 
   initI18n,
+  ContactStorage,
+  I18n,
+  overlayStackStore,
 };

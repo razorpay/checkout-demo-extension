@@ -22,6 +22,7 @@ const {
 
   // Partial Payment
   verifyPartialAmount,
+  verifyFooterText,
 } = require('../actions/common');
 
 const {
@@ -32,6 +33,7 @@ const {
   // Partial Payments
   handlePartialPayment,
 } = require('../tests/homescreen/actions');
+const { delay } = require('../util.js');
 
 module.exports = function(testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
@@ -80,6 +82,11 @@ module.exports = function(testFeatures) {
         await assertBasicDetailsScreen(context);
       }
 
+      if (!isHomeScreenSkipped && feeBearer) {
+        await assertBasicDetailsScreen(context);
+        await verifyFooterText(context, 'PAY');
+      }
+
       if (!missingUserDetails) {
         await fillUserDetails(context, '8888888881');
       }
@@ -96,9 +103,15 @@ module.exports = function(testFeatures) {
         await viewOffers(context);
         await selectOffer(context, '1');
         await verifyOfferApplied(context);
-        await verifyDiscountPaybleAmount(context, '₹ 1,980');
+        if (!feeBearer) {
+          await verifyDiscountPaybleAmount(context, '₹ 1,980');
+        }
         await verifyDiscountAmountInBanner(context, '₹ 1,980');
         await verifyDiscountText(context, 'You save ₹20');
+      }
+
+      if (feeBearer) {
+        await verifyFooterText(context, 'PAY');
       }
 
       if (partialPayment) {

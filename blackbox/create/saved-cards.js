@@ -29,6 +29,7 @@ const {
 
   // Partial Payment
   verifyPartialAmount,
+  verifyFooterText,
 
   // Personalization
   selectPersonalizedCard,
@@ -75,6 +76,9 @@ module.exports = function(testFeatures) {
     })
   )('Saved Cards tests', ({ preferences, title, options }) => {
     test(title, async () => {
+      // Enable card saving
+      preferences.options.remember_customer = true;
+
       if (personalization) {
         if (preferences.customer) {
           preferences.customer.contact = '+918888888881';
@@ -126,10 +130,16 @@ module.exports = function(testFeatures) {
         await viewOffers(context);
         await selectOffer(context, '1');
         await verifyOfferApplied(context);
-        await verifyDiscountPaybleAmount(context, '₹ 1,980');
+        if (!feeBearer) {
+          await verifyDiscountPaybleAmount(context, '₹ 1,980');
+        }
         await verifyDiscountAmountInBanner(context, '₹ 1,980');
         await verifyDiscountText(context, 'You save ₹20');
         await delay(400);
+      }
+
+      if (feeBearer) {
+        await verifyFooterText(context, 'PAY');
       }
 
       if (partialPayment) {

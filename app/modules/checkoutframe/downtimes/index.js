@@ -7,10 +7,7 @@
  *
  * @return {function(downtime: Object): boolean} Says whether or not to disable method.
  */
-export function disableBasedOnSeverityOrScheduled(
-  severity = [],
-  scheduled = true
-) {
+function disableBasedOnSeverityOrScheduled(severity = [], scheduled = true) {
   return function disable(downtime) {
     return (
       _Arr.contains(severity, downtime.severity) ||
@@ -25,10 +22,32 @@ export function disableBasedOnSeverityOrScheduled(
  * @param {Object} downtime
  * @return {boolean}
  */
-const isHighSeverityOrScheduled = disableBasedOnSeverityOrScheduled(
-  ['high'],
-  true
-);
+const isHighScheduled = disableBasedOnSeverityOrScheduled(['high'], true);
+
+/**
+ * Checks if the downtime has an instrument. For downtimes without an
+ * instrument, API returns an empty array. For ones with an instrument, API
+ * returns an object.
+ *
+ * @param {Object} downtime
+ * @returns {boolean}
+ */
+function withoutInstrument(downtime) {
+  return !downtime.instrument || _.isArray(downtime.instrument);
+}
+
+// TODO: move to _Func.and
+/**
+ * Returns a function that ANDs the values returned from f and g
+ * @param {function(*): boolean} f
+ * @param {function(*): boolean} g
+ * @returns {function(*): boolean}
+ */
+function fAnd(f, g) {
+  return function anded(arg) {
+    return f(arg) && g(arg);
+  };
+}
 
 /**
  * Checks if the downtime has low severity and is not scheduled.
@@ -36,37 +55,38 @@ const isHighSeverityOrScheduled = disableBasedOnSeverityOrScheduled(
  * @param {Object} downtime
  * @return {boolean}
  */
-const isLowSeverityAndNotScheduled = _Func.negate(isHighSeverityOrScheduled);
+const isLowScheduled = _Func.negate(isHighScheduled);
 
-const DISABLE_METHOD = {
-  upi: isHighSeverityOrScheduled,
-  upi_otm: isHighSeverityOrScheduled,
-  qr: isHighSeverityOrScheduled,
-  gpay: isHighSeverityOrScheduled,
-  netbanking: function(_, preferences) {
-    const netbankingObj = preferences.methods.netbanking || {};
-    const banks = _Obj.keys(netbankingObj);
-    const downtimes =
-      (preferences.payment_downtime && preferences.payment_downtime.items) ||
-      [];
+/**
+ * Checks if the downtime has high severity or is scheduled and does not have
+ * an instrument.
+ *
+ * @param {Object} downtime
+ * @return {boolean}
+ */
+const isHighScheduledWithoutInstrument = fAnd(
+  isHighScheduled,
+  withoutInstrument
+);
 
-    return _Arr.every(banks, bank =>
-      _Arr.any(
-        downtimes,
-        downtime =>
-          downtime.method === 'netbanking' &&
-          downtime.instrument.bank === bank &&
-          isHighSeverityOrScheduled(downtime)
-      )
-    );
-  },
+/**
+ * Checks if the downtime has low severity and is not scheduled and does not
+ * have an instrument.
+ *
+ * @param {Object} downtime
+ * @return {boolean}
+ */
+const always = downtime => {
+  return downtime.instrument?.vpa_handle === 'ALL';
 };
 
+const DISABLE_METHOD = {};
+
 const WARN_METHOD = {
-  upi: isLowSeverityAndNotScheduled,
-  upi_otm: isLowSeverityAndNotScheduled,
-  qr: isLowSeverityAndNotScheduled,
-  gpay: isLowSeverityAndNotScheduled,
+  upi: always,
+  upi_otm: always,
+  qr: always,
+  gpay: always,
   netbanking: function(_, preferences) {
     const netbankingObj = preferences.methods.netbanking || {};
     const banks = _Obj.keys(netbankingObj);
@@ -165,7 +185,7 @@ const getFilteredBankNamesFromDowntimes = _.curry2((downtimes, predicate) => {
  * @return Array<string>
  */
 const getBanksWithHighSeverityDowntime = getFilteredBankNamesFromDowntimes(
-  isHighSeverityOrScheduled
+  isHighScheduled
 );
 
 /**
@@ -174,7 +194,7 @@ const getBanksWithHighSeverityDowntime = getFilteredBankNamesFromDowntimes(
  * @return {Array<string>}
  */
 const getBanksWithLowSeverityDowntimes = getFilteredBankNamesFromDowntimes(
-  isLowSeverityAndNotScheduled
+  isLowScheduled
 );
 
 const DOWNTIME_METHOD_COPY_MAP = {

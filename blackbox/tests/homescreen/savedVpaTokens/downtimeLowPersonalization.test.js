@@ -40,6 +40,7 @@ describe.each(
             status: 'started',
             scheduled: false,
             severity: 'low',
+            instrument: { vpa_handle: 'ALL' },
             created_at: 1567686387,
             updated_at: 1567686387,
           },
@@ -69,7 +70,6 @@ describe.each(
     await verifyPersonalizationText(context, 'upi');
     await selectPersonalizationPaymentMethod(context, 1);
     await submit(context);
-    await handleUPIAccountValidation(context, 'dsd@okhdfcbank');
     await respondToUPIAjax(context);
     await respondToUPIPaymentStatus(context);
   });

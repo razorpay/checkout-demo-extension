@@ -1,4 +1,5 @@
 import * as Card from 'common/card';
+import { luhnCheck } from 'lib/utils';
 
 const testCards = {
   amex: '378282246310005',
@@ -181,22 +182,22 @@ test('common/card', t => {
 
   test('luhnCheck', function(t) {
     t.equal(
-      Card.luhnCheck(testCards.visa),
+      luhnCheck(testCards.visa),
       true,
       'Luhn check returns true for correct Visa card'
     );
     t.equal(
-      Card.luhnCheck(testCards.mastercard),
+      luhnCheck(testCards.mastercard),
       true,
       'Luhn check returns true for correct MasterCard card'
     );
     t.equal(
-      Card.luhnCheck(testCards.maestro),
+      luhnCheck(testCards.maestro),
       true,
       'Luhn check returns true for correct Maestro card'
     );
     t.equal(
-      Card.luhnCheck('4242424242424246'),
+      luhnCheck('4242424242424246'),
       false,
       'Luhn check returns false for incorrect card number'
     );

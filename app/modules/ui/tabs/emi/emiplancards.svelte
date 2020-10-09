@@ -6,7 +6,7 @@
   export let amount;
   export let provider;
   export let expand;
-  export let title = 'Select an EMI Plan';
+  export let title;
 </script>
 
 <h3>{title}</h3>

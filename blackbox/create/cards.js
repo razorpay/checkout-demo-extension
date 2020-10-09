@@ -15,6 +15,9 @@ const {
   handleCardValidation,
   handleMockFailureDialog,
   verifyErrorMessage,
+  handleCustomerCardStatusRequest,
+  typeOTPandSubmit,
+  respondSavedCards,
   retryTransaction,
   selectPersonalizedCard,
 
@@ -29,6 +32,7 @@ const {
 
   // Partial Payment
   verifyPartialAmount,
+  verifyFooterText,
 } = require('../actions/common');
 
 const {
@@ -59,9 +63,9 @@ module.exports = function(testFeatures) {
     timeout,
     callbackUrl,
     offers,
-    personalization,
     optionalContact,
     optionalEmail,
+    recurringOrder,
   } = features;
 
   describe.each(
@@ -71,12 +75,6 @@ module.exports = function(testFeatures) {
     })
   )('Cards tests', ({ preferences, title, options }) => {
     test(title, async () => {
-      if (personalization) {
-        if (preferences.customer) {
-          preferences.customer.contact = '+918888888881';
-        }
-      }
-
       const context = await openCheckoutWithNewHomeScreen({
         page,
         options,
@@ -102,29 +100,41 @@ module.exports = function(testFeatures) {
         await proceed(context);
       }
 
-      if (!missingUserDetails) {
+      if (recurringOrder) {
+        await handleCustomerCardStatusRequest(context);
+        await typeOTPandSubmit(context);
+        await respondSavedCards(context);
+      }
+
+      if (!missingUserDetails && !recurringOrder) {
         await assertUserDetails(context);
         await assertEditUserDetailsAndBack(context);
       }
 
-      await assertPaymentMethods(context);
+      if (!recurringOrder) {
+        await assertPaymentMethods(context);
 
-      if (personalization) {
-        await selectPersonalizedCard(context);
-        await enterCardDetails(context);
-      } else {
         await selectPaymentMethod(context, 'card');
-        await enterCardDetails(context);
       }
+
+      await enterCardDetails(context, {
+        recurring: !!recurringOrder,
+      });
 
       if (offers) {
         await viewOffers(context);
         await selectOffer(context, '1');
         await verifyOfferApplied(context);
-        await verifyDiscountPaybleAmount(context, '₹ 1,980');
+        if (!feeBearer) {
+          await verifyDiscountPaybleAmount(context, '₹ 1,980');
+        }
         await verifyDiscountAmountInBanner(context, '₹ 1,980');
         await verifyDiscountText(context, 'You save ₹20');
         await validateCardForOffer(context);
+      }
+
+      if (feeBearer) {
+        await verifyFooterText(context, 'PAY');
       }
 
       if (partialPayment) {

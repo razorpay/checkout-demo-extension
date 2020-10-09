@@ -15,28 +15,57 @@
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
 
   // Svelte imports
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { slide, fly } from 'svelte/transition';
 
   // Store
   import {
+    country,
+    phone,
     contact,
     isContactPresent,
     email,
     selectedInstrumentId,
-    methodTabInstrument,
+    methodInstrument,
     multiTpvOption,
     partialPaymentAmount,
     partialPaymentOption,
     instruments,
     blocks,
+    setContact,
+    setEmail,
   } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
   import { getOption, isDCCEnabled } from 'checkoutstore';
+  import { getUPIIntentApps } from 'checkoutstore/native';
+
+  // i18n
+  import {
+    EDIT_BUTTON_LABEL,
+    PARTIAL_AMOUNT_EDIT_LABEL,
+    PARTIAL_AMOUNT_STATUS_FULL,
+    PARTIAL_AMOUNT_STATUS_PARTIAL,
+    SECURED_BY_MESSAGE,
+    SUBSCRIPTIONS_CREDIT_DEBIT_CALLOUT,
+    SUBSCRIPTIONS_DEBIT_ONLY_CALLOUT,
+    SUBSCRIPTIONS_CREDIT_ONLY_CALLOUT,
+    CARD_OFFER_CREDIT_DEBIT_CALLOUT,
+    CARD_OFFER_CREDIT_ONLY_CALLOUT,
+    CARD_OFFER_DEBIT_ONLY_CALLOUT,
+    RECURRING_CREDIT_DEBIT_CALLOUT,
+    RECURRING_CREDIT_ONLY_CALLOUT,
+    RECURRING_DEBIT_ONLY_CALLOUT,
+  } from 'ui/labels/home';
+
+  import { t, locale } from 'svelte-i18n';
+
+  import { formatTemplateWithLocale } from 'i18n';
 
   // Utils imports
+  import Razorpay from 'common/Razorpay';
   import { getSession } from 'sessionmanager';
+  import { generateSubtextForRecurring } from 'subtext/card';
   import {
     isPartialPayment as getIsPartialPayment,
     isContactOptional,
@@ -55,36 +84,45 @@
   } from 'checkoutstore';
 
   import {
-    isCreditCardEnabled,
-    isDebitCardEnabled,
+    getCardTypesForRecurring,
+    getCardNetworksForRecurring,
+    getCardIssuersForRecurring,
     getSingleMethod,
     isEMandateBankEnabled,
     getTPV,
   } from 'checkoutstore/methods';
 
   import {
-    getTranslatedInstrumentsForCustomer,
+    getInstrumentsForCustomer,
     getAllInstrumentsForCustomer,
   } from 'checkoutframe/personalization';
 
   import {
     hideCta,
-    showCta,
-    showCtaWithText,
-    showCtaWithDefaultText,
+    showAuthenticate,
+    showPayViaSingleMethod,
+    showProceed,
+    showNext,
   } from 'checkoutstore/cta';
 
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getCardOffer, hasOffersOnHomescreen } from 'checkoutframe/offers';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
+  import { isInstrumentGrouped } from 'configurability/instruments';
+  import { isElementCompletelyVisibleInTab } from 'lib/utils';
 
   import {
-    INDIA_COUNTRY_CODE,
-    MAX_PREFERRED_INSTRUMENTS,
+    CONTACT_REGEX,
+    EMAIL_REGEX,
+    PHONE_REGEX_INDIA,
   } from 'common/constants';
+  import { getAnimationOptions } from 'svelte-utils';
 
   import { setBlocks } from 'ui/tabs/home/instruments';
+
+  import { update as updateContactStorage } from 'checkoutframe/contact-storage';
+  import { isMobile } from 'common/useragent';
 
   const cardOffer = getCardOffer();
   const session = getSession();
@@ -106,8 +144,8 @@
   const isPartialPayment = getIsPartialPayment();
   const contactEmailReadonly = isContactEmailReadOnly();
 
-  $contact = getPrefilledContact() || INDIA_COUNTRY_CODE;
-  $email = getPrefilledEmail();
+  setContact(getPrefilledContact());
+  setEmail(getPrefilledEmail());
 
   // Prop that decides which view to show.
   // Values: 'details', 'methods'
@@ -176,23 +214,36 @@
     });
   }
 
+  function editUserDetails() {
+    Razorpay.sendMessage({
+      event: 'event',
+      data: {
+        event: 'user_details.edit',
+      },
+    });
+
+    hideMethods();
+  }
+
   export function setDetailsCta() {
     if (isPartialPayment) {
-      showCtaWithText('Next');
+      showNext('Next');
 
       return;
     }
 
     if (!session.get('amount')) {
-      showCtaWithText('Authenticate');
+      showAuthenticate();
     } else if (singleMethod) {
-      showCtaWithText('Pay by ' + getMethodNameForPaymentOption(singleMethod));
+      showPayViaSingleMethod(
+        getMethodNameForPaymentOption(singleMethod, $locale)
+      );
     } else if (tpv) {
-      showCtaWithText(
-        'Pay by ' + getMethodNameForPaymentOption(tpv.method || $multiTpvOption)
+      showPayViaSingleMethod(
+        getMethodNameForPaymentOption(tpv.method || $multiTpvOption, $locale)
       );
     } else {
-      showCtaWithText('Proceed');
+      showProceed('Proceed');
     }
   }
 
@@ -227,9 +278,166 @@
     return view === 'details';
   }
 
+  const USER_EXPERIMENT_CACHE = {};
+
+  /**
+   * For A/B testing, check if both api and localstorage instruments are present
+   * - if either one is missing, choose the other
+   * - if both are present, choose one randomly
+   */
+  function getRandomInstrumentSet({
+    customer: _customer,
+    instrumentsFromStorage,
+  }) {
+    const user = _customer.contact;
+
+    if (!USER_EXPERIMENT_CACHE[user]) {
+      USER_EXPERIMENT_CACHE[user] = new Promise(resolve => {
+        const instrumentMap = {
+          api: [],
+          storage: instrumentsFromStorage,
+          none: [],
+        };
+
+        const EXPERIMENT_IDENTIFIERS = {
+          BOTH_AVAILABLE_STORAGE_SHOWN: 1,
+          BOTH_AVAILABLE_API_SHOWN: 2,
+          API_AVAILABLE_API_SHOWN: 3,
+          API_AVAILABLE_NONE_SHOWN: 4,
+          NONE_AVAILABLE: 5,
+        };
+
+        const SOURCES = {
+          STORAGE: 'storage',
+          API: 'api',
+          NONE: 'none',
+        };
+
+        let instrumentsSource;
+        let userIdentified = true;
+
+        // First figure out which source to attempt using
+        if (instrumentsFromStorage.length) {
+          if (Math.random() < 0.5) {
+            instrumentsSource = SOURCES.STORAGE;
+          } else {
+            instrumentsSource = SOURCES.API;
+          }
+        } else {
+          instrumentsSource = SOURCES.API;
+        }
+
+        // The function that returns the promise to be returned
+        // This promise should set the experiment identifier
+        // and any analytics meta properties
+        const returnPromise = source =>
+          new Promise(resolve => {
+            let instrumentsToBeShown = instrumentMap[source];
+
+            let experimentIdentifier;
+
+            if (source === SOURCES.STORAGE) {
+              experimentIdentifier =
+                EXPERIMENT_IDENTIFIERS.BOTH_AVAILABLE_STORAGE_SHOWN;
+            } else if (source === SOURCES.API) {
+              if (instrumentMap.storage.length) {
+                experimentIdentifier =
+                  EXPERIMENT_IDENTIFIERS.BOTH_AVAILABLE_API_SHOWN;
+              } else {
+                experimentIdentifier =
+                  EXPERIMENT_IDENTIFIERS.API_AVAILABLE_API_SHOWN;
+              }
+            } else {
+              if (instrumentMap.api.length) {
+                experimentIdentifier =
+                  EXPERIMENT_IDENTIFIERS.API_AVAILABLE_NONE_SHOWN;
+              } else {
+                experimentIdentifier = EXPERIMENT_IDENTIFIERS.NONE_AVAILABLE;
+              }
+            }
+
+            // if user is in home, track the currently visible experiment
+            if (!session.tab) {
+              /**
+               * - `meta.p13n` will only be set when preferred methods are shown in the UI.
+               * - `p13n:instruments:list` will be fired when we attempt to show the list.
+               * - `p13n:instruments:list` with `meta.p13n` set as true will tell you whether or not preferred methods were shown.
+               */
+
+              // meta.p13n should always be set before `p13n:instruments:list`
+              if (instrumentsToBeShown && instrumentsToBeShown.length) {
+                Analytics.setMeta('p13n', true);
+              } else {
+                Analytics.removeMeta('p13n');
+              }
+
+              Analytics.setMeta('p13n.userIdentified', userIdentified);
+
+              Analytics.track('home:p13n:experiment', {
+                type: AnalyticsTypes.METRIC,
+                data: {
+                  source: source,
+                  experiment: experimentIdentifier,
+                },
+              });
+
+              Analytics.setMeta('p13n.experiment', experimentIdentifier);
+            }
+
+            // Cache for user
+            const p13nRenderData = {
+              source: source,
+              instruments: instrumentsToBeShown,
+              experiment: experimentIdentifier,
+            };
+
+            USER_EXPERIMENT_CACHE[user] = p13nRenderData;
+
+            resolve(USER_EXPERIMENT_CACHE[user]);
+          });
+
+        // if source is api, we need to fetch api instruments and then
+        // re-set the source
+        if (
+          instrumentsSource === SOURCES.API ||
+          instrumentsSource === SOURCES.NONE
+        ) {
+          getInstrumentsForCustomer(
+            $customer,
+            {
+              upiApps: getUPIIntentApps().filtered,
+            },
+            'api'
+          ).then(({ identified, instruments: instrumentsFromApi }) => {
+            userIdentified = identified;
+
+            if (instrumentsFromApi.length) {
+              instrumentMap.api = instrumentsFromApi;
+            }
+
+            resolve(returnPromise(instrumentsSource));
+          });
+        } else {
+          resolve(returnPromise(instrumentsSource));
+        }
+      });
+    }
+
+    return USER_EXPERIMENT_CACHE[user];
+  }
+
   function getAllAvailableP13nInstruments() {
-    return getTranslatedInstrumentsForCustomer($customer, {
-      upiApps: session.upi_intents_data,
+    return getInstrumentsForCustomer(
+      $customer,
+      {
+        upiApps: getUPIIntentApps().filtered,
+      },
+      'storage'
+    ).then(({ instruments: instrumentsFromStorage }) => {
+      return getRandomInstrumentSet({
+        instrumentsFromStorage,
+        customer: $customer,
+      });
     });
   }
 
@@ -239,66 +447,107 @@
     }
   }
 
-  $: {
-    const loggedIn = _Obj.getSafely($customer, 'logged');
-    _El.keepClass(_Doc.querySelector('#topbar #top-right'), 'logged', loggedIn);
-
+  function updateBlocks({
+    preferredInstruments = [],
+    showPreferredLoader = false,
+  } = {}) {
     const isPersonalizationEnabled = shouldUsePersonalization();
-    const eligiblePreferredInstruments = isPersonalizationEnabled
-      ? getAllAvailableP13nInstruments($customer)
-      : [];
-
     const merchantConfig = getMerchantConfig();
 
     const blocksThatWereSet = setBlocks(
       {
-        preferred: eligiblePreferredInstruments,
+        showPreferredLoader,
+        preferred: preferredInstruments,
         merchantConfig: merchantConfig.config,
         configSource: merchantConfig.sources,
       },
       $customer
     );
 
-    const setPreferredInstruments = blocksThatWereSet.preferred.instruments;
+    const noBlocksWereSet = blocksThatWereSet.all.length === 0;
 
-    // Get the methods for which a preferred instrument was shown
-    const preferredMethods = _Arr.reduce(
-      setPreferredInstruments,
-      (acc, instrument) => {
-        acc[`_${instrument.method}`] = true;
-        return acc;
-      },
-      {}
-    );
-
-    /**
-     * - `meta.p13n` will only be set when preferred methods are shown in the UI.
-     * - `p13n:instruments:list` will be fired when we attempt to show the list.
-     * - `p13n:instruments:list` with `meta.p13n` set as true will tell you whether or not preferred methods were shown.
-     */
-
-    // meta.p13n should always be set before `p13n:instruments:list`
-    if (setPreferredInstruments.length) {
-      Analytics.setMeta('p13n', true);
-    } else {
-      Analytics.removeMeta('p13n');
-    }
-
-    const allPreferredInstrumentsForCustomer = getAllInstrumentsForCustomer(
-      $customer
-    );
-
-    if (isPersonalizationEnabled && allPreferredInstrumentsForCustomer.length) {
-      // Track preferred-methods related things
-      Analytics.track('p13n:instruments:list', {
+    if (isInstrumentFaultEmitted) {
+      // Do nothing, we already signalled a fault
+    } else if (noBlocksWereSet && !singleMethod) {
+      Analytics.track('error', {
+        type: AnalyticsTypes.INTEGRATION,
         data: {
-          all: allPreferredInstrumentsForCustomer.length,
-          eligible: eligiblePreferredInstruments.length,
-          shown: setPreferredInstruments.length,
-          methods: preferredMethods,
+          type: 'no_instruments_to_render',
+          config: merchantConfig,
         },
       });
+
+      Razorpay.sendMessage({
+        event: 'fault',
+        data:
+          'Error in integration. Please contact Razorpay for assistance: no instruments available to show',
+      });
+
+      isInstrumentFaultEmitted = true;
+    } else {
+      const setPreferredInstruments = blocksThatWereSet.preferred.instruments;
+
+      // Get the methods for which a preferred instrument was shown
+      const preferredMethods = _Arr.reduce(
+        setPreferredInstruments,
+        (acc, instrument) => {
+          acc[`_${instrument.method}`] = true;
+          return acc;
+        },
+        {}
+      );
+
+      const allPreferredInstrumentsForCustomer = getAllInstrumentsForCustomer(
+        $customer
+      );
+
+      if (
+        isPersonalizationEnabled &&
+        allPreferredInstrumentsForCustomer.length
+      ) {
+        // Track preferred-methods related things
+        Analytics.track('p13n:instruments:list', {
+          data: {
+            all: allPreferredInstrumentsForCustomer.length,
+            eligible: preferredInstruments.length,
+            shown: setPreferredInstruments.length,
+            methods: preferredMethods,
+          },
+        });
+      }
     }
+  }
+
+  onMount(() => {
+    updateBlocks({
+      showPreferredLoader: shouldUsePersonalization(),
+    });
+  });
+
+  // Svelte executes the following block twice. Even if a fault was emitted, it will be emitted again in the second execution.
+  // So, we use this flag to perform no-op if true.
+  // TODO: Do this in a better way by figuring out how to make it execute the block only once.
+  let isInstrumentFaultEmitted = false;
+
+  $: {
+    const loggedIn = _Obj.getSafely($customer, 'logged');
+    const topbarRight = _Doc.querySelector('#topbar #top-right');
+
+    if (topbarRight) {
+      _El.keepClass(topbarRight, 'logged', loggedIn);
+    }
+
+    const isPersonalizationEnabled = shouldUsePersonalization();
+
+    const eligiblePreferredInstrumentsPromise = isPersonalizationEnabled
+      ? getAllAvailableP13nInstruments($customer)
+      : Promise.resolve([]);
+
+    eligiblePreferredInstrumentsPromise.then(({ instruments }) => {
+      updateBlocks({
+        preferredInstruments: instruments,
+      });
+    });
   }
 
   function shouldUsePersonalization() {
@@ -313,10 +562,7 @@
     }
 
     // Single method
-    if (
-      singleMethod &&
-      !_Arr.contains(['wallet', 'netbanking', 'upi'], singleMethod)
-    ) {
+    if (singleMethod && isRecurring()) {
       return false;
     }
 
@@ -343,13 +589,8 @@
     return true;
   }
 
-  function deselectAllInstruments() {
-    $methodTabInstrument = null;
-    $selectedInstrumentId = null;
-  }
-
   export function onShown() {
-    deselectAllInstruments();
+    deselectInstrument();
 
     if (view === 'methods') {
       hideCta();
@@ -388,11 +629,15 @@
      * If contact and email are mandatory, validate
      */
     if (!isContactEmailOptional()) {
-      const contactRegex = /^\+?[0-9]{8,15}$/;
-      const emailRegex = /^[^@\s]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/;
+      if (!isContactValid) {
+        if ($country === '+91') {
+          isContactValid = PHONE_REGEX_INDIA.test($phone);
+        } else {
+          isContactValid = CONTACT_REGEX.test($contact);
+        }
+      }
 
-      isContactValid = isContactValid || contactRegex.test($contact);
-      isEmailValid = isEmailValid || emailRegex.test($email);
+      isEmailValid = isEmailValid || EMAIL_REGEX.test($email);
     }
 
     /**
@@ -439,13 +684,10 @@
      * Otherwise, we take the user to the details screen.
      */
     if (singleMethod) {
-      if (
-        _Arr.contains(['wallet', 'netbanking', 'upi'], singleMethod) &&
-        $instruments.length > 0
-      ) {
-        return METHODS;
-      } else {
+      if (isRecurring()) {
         return DETAILS;
+      } else {
+        return METHODS;
       }
     }
 
@@ -465,26 +707,35 @@
     },
   });
 
+  function storeContactDetails() {
+    // Store only on mobile since Desktops can be shared b/w users
+    if (isMobile()) {
+      updateContactStorage({
+        contact: $contact,
+        email: $email,
+      });
+    }
+  }
+
   export function next() {
     Analytics.track('home:proceed');
+
+    /**
+     * - Store contact details only when the user has explicity clicked on the CTA
+     * - `next()` is not invoked if the merchant had prefilled the user's details
+     *    since the user would land directly on the methods view
+     */
+    storeContactDetails();
 
     // Multi TPV
     if (tpv) {
       if (tpv.method === 'upi') {
-        selectMethod({
-          detail: {
-            method: 'upi',
-          },
-        });
+        selectMethod('upi');
       } else if (tpv.method === 'netbanking') {
         session.preSubmit();
       } else {
         if ($multiTpvOption === 'upi') {
-          selectMethod({
-            detail: {
-              method: 'upi',
-            },
-          });
+          selectMethod('upi');
         } else if ($multiTpvOption === 'netbanking') {
           session.preSubmit();
         }
@@ -498,18 +749,11 @@
         return;
       }
 
-      if (
-        _Arr.contains(['wallet', 'netbanking', 'upi'], singleMethod) &&
-        $instruments.length > 0
-      ) {
-        showMethods();
+      if (isRecurring()) {
+        selectMethod(singleMethod);
         return;
       } else {
-        selectMethod({
-          detail: {
-            method: singleMethod,
-          },
-        });
+        showMethods();
         return;
       }
     }
@@ -518,6 +762,9 @@
   }
 
   function createPaypalPayment() {
+    // Deselct to hide Pay button
+    deselectInstrument();
+
     const payload = session.getPayload();
 
     payload.method = 'paypal';
@@ -529,22 +776,7 @@
     $selectedInstrumentId = null;
   }
 
-  export function selectMethod(event) {
-    deselectInstrument();
-
-    Analytics.track('payment_method:select', {
-      type: AnalyticsTypes.BEHAV,
-      data: event.detail,
-    });
-
-    let { down, method } = event.detail;
-
-    if (down) {
-      return;
-    }
-
-    $selectedInstrumentId = null;
-
+  export function selectMethod(method) {
     if (method === 'paypal') {
       createPaypalPayment();
       return;
@@ -562,7 +794,11 @@
       }
     }
 
-    session.switchTab(method);
+    tick().then(() => {
+      // Switch tab in the next tick to allow some
+      // other code to run and perform validations.
+      session.switchTab(method);
+    });
   }
 
   export function shouldGoNext() {
@@ -601,6 +837,29 @@
     showUserDetailsStrip =
       ($isContactPresent || $email) && !isContactEmailHidden();
   }
+
+  export function onSelectInstrument(event) {
+    const instrument = event.detail;
+
+    $selectedInstrumentId = instrument.id;
+
+    if (isInstrumentGrouped(instrument)) {
+      selectMethod(instrument.method);
+    } else {
+      // Bring instrument into view if it's not visible
+      const domElement = _Doc.querySelector(
+        `.home-methods .methods-block [data-id="${instrument.id}"]`
+      );
+
+      if (domElement && !isElementCompletelyVisibleInTab(domElement)) {
+        domElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'center',
+        });
+      }
+    }
+  }
 </script>
 
 <style>
@@ -627,6 +886,7 @@
   .home-methods {
     padding-left: 12px;
     padding-right: 12px;
+    margin-top: 28px;
   }
 
   .details-container {
@@ -692,15 +952,15 @@
       {#if view === 'methods'}
         <div
           class="solidbg"
-          in:slide={{ duration: 400 }}
-          out:fly={{ duration: 200, y: 80 }}>
+          in:slide={getAnimationOptions({ duration: 400 })}
+          out:fly={getAnimationOptions({ duration: 200, y: 80 })}>
           {#if showUserDetailsStrip || isPartialPayment}
             <div
               use:touchfix
               class="details-container border-list"
-              in:fly={{ duration: 400, y: 80 }}>
+              in:fly={getAnimationOptions({ duration: 400, y: 80 })}>
               {#if showUserDetailsStrip}
-                <SlottedOption on:click={hideMethods} id="user-details">
+                <SlottedOption on:click={editUserDetails} id="user-details">
                   <i slot="icon">
                     <Icon icon={icons.contact} />
                   </i>
@@ -708,16 +968,15 @@
                     {#if $isContactPresent && !isContactHidden()}
                       <span>{$contact}</span>
                     {/if}
-                    {#if $email && !isEmailHidden()}
-                      <span>{$email}</span>
-                    {/if}
+                    {#if $email && !isEmailHidden()}<span>{$email}</span>{/if}
                   </div>
                   <div
                     slot="extra"
                     class="theme-highlight-color"
                     aria-label={contactEmailReadonly ? '' : 'Edit'}>
                     {#if !contactEmailReadonly}
-                      <span>Edit</span>
+                      <!-- LABEL: Edit -->
+                      <span>{$t(EDIT_BUTTON_LABEL)}</span>
                       <span>&#xe604;</span>
                     {/if}
                   </div>
@@ -731,8 +990,12 @@
                     <span>{formattedPartialAmount}</span>
                     <span>
                       {#if $partialPaymentOption === 'full'}
-                        Paying full amount
-                      {:else}Paying in parts{/if}
+                        <!-- LABEL: Paying full amount -->
+                        {$t(PARTIAL_AMOUNT_STATUS_FULL)}
+                      {:else}
+                        <!-- LABEL: Paying in parts -->
+                        {$t(PARTIAL_AMOUNT_STATUS_PARTIAL)}
+                      {/if}
                     </span>
                   </div>
                   <div
@@ -740,7 +1003,8 @@
                     class="theme-highlight-color"
                     aria-label={contactEmailReadonly ? '' : 'Edit'}>
                     {#if !contactEmailReadonly}
-                      <span>Change amount</span>
+                      <!-- LABEL: Change amount -->
+                      <span>{$t(PARTIAL_AMOUNT_EDIT_LABEL)}</span>
                       <span>&#xe604;</span>
                     {/if}
                   </div>
@@ -751,9 +1015,9 @@
 
           <div
             class="home-methods"
-            in:fly={{ delay: 100, duration: 400, y: 80 }}>
+            in:fly={getAnimationOptions({ delay: 100, duration: 400, y: 80 })}>
             <NewMethodsList
-              on:selectMethod={selectMethod}
+              on:selectInstrument={onSelectInstrument}
               on:submit={attemptPayment} />
           </div>
         </div>
@@ -769,43 +1033,20 @@
       {/if}
       {#if showRecurringCallout}
         <Callout>
-          {#if session.get('subscription_id')}
-            {#if isDebitCardEnabled() && isCreditCardEnabled()}
-              Subscription payments are supported on Visa and Mastercard Credit
-              Cards from all Banks and Debit Cards from ICICI, Kotak, Citibank
-              and Canara Bank.
-            {:else if isDebitCardEnabled()}
-              Subscription payments are only supported on Visa and Mastercard
-              Debit Cards from ICICI, Kotak, Citibank and Canara Bank.
-            {:else}
-              Subscription payments are only supported on Mastercard and Visa
-              Credit Cards.
-            {/if}
-          {:else if cardOffer}
-            {#if isDebitCardEnabled() && isCreditCardEnabled()}
-              All {cardOffer.issuer} Cards are supported for this payment
-            {:else if isDebitCardEnabled()}
-              All {cardOffer.issuer} Debit Cards are supported for this payment
-            {:else}
-              All {cardOffer.issuer} Credit Cards are supported for this
-              payment.
-            {/if}
-          {:else if isDebitCardEnabled() && isCreditCardEnabled()}
-            Visa and Mastercard Credit Cards from all Banks and Debit Cards from
-            ICICI, Kotak, Citibank and Canara Bank are supported for this
-            payment.
-          {:else if isDebitCardEnabled()}
-            Only Visa and Mastercard Debit Cards from ICICI, Kotak, Citibank and
-            Canara Bank are supported for this payment.
-          {:else}
-            Only Visa and Mastercard Credit Cards are supported for this
-            payment.
-          {/if}
+          {generateSubtextForRecurring({
+            types: getCardTypesForRecurring(),
+            networks: getCardNetworksForRecurring(),
+            issuers: getCardIssuersForRecurring(),
+            subscription: session.get('subscription_id'),
+            offer: cardOffer,
+          })}
         </Callout>
       {/if}
 
       {#if showSecuredByMessage}
-        <div class="secured-message" out:slide={{ duration: 100 }}>
+        <div
+          class="secured-message"
+          out:slide={getAnimationOptions({ duration: 100 })}>
           <i>
             <svg
               width="16"
@@ -830,7 +1071,8 @@
                 fill="#A7A7A7" />
             </svg>
           </i>
-          This payment is secured by Razorpay.
+          <!-- LABEL: This payment is secured by Razorpay. -->
+          {$t(SECURED_BY_MESSAGE)}
         </div>
       {/if}
     </Bottom>

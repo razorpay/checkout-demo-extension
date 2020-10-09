@@ -73,6 +73,20 @@ export default function Razorpay(overrides) {
     _.throwMessage(message);
   }
 
+  // Add integration details if present
+  const integrationKeys = [
+    'integration',
+    'integration_version',
+    'integration_parent_version',
+  ];
+
+  _Arr.loop(integrationKeys, key => {
+    const value = this.get(`_.${key}`);
+    if (value) {
+      Track.props[key] = value;
+    }
+  });
+
   if (
     backendEntityIds.every(function(prop) {
       return !options.get(prop);
@@ -144,6 +158,10 @@ var razorpayPayment = (Razorpay.payment = {
     Analytics.track('prefs:start', {
       type: AnalyticsTypes.METRIC,
     });
+
+    if (_.isNonNullObject(data)) {
+      data['_[request_index]'] = Analytics.updateRequestIndex('preferences');
+    }
 
     return fetch({
       url: _.appendParamsToUrl(makeUrl('preferences'), data),
@@ -279,6 +297,7 @@ export function makePrefParams(rzp) {
         'account_id',
         'contact_id',
         'checkout_config_id',
+        'amount',
       ],
       function(key) {
         var value = getter(key);
@@ -287,6 +306,13 @@ export function makePrefParams(rzp) {
         }
       }
     );
+
+    // To differentiate that preferences is being hit from Checkout
+    // eslint-disable-next-line no-undef
+    params['_[build]'] = __BUILD_NUMBER__ || 0;
+    params['_[checkout_id]'] = rzp.id;
+    params['_[library]'] = Track.props.library;
+    params['_[platform]'] = Track.props.platform;
 
     return params;
   }

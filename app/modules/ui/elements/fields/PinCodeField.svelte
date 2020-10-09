@@ -1,6 +1,9 @@
 <script>
   import Field from 'ui/components/Field.svelte';
 
+  import { PINCODE_HELP, PINCODE_LABEL } from 'ui/labels/home';
+  import { t } from 'svelte-i18n';
+
   export let value;
 
   const PINCODE_PATTERN = '^\\d{6}$';
@@ -10,13 +13,14 @@
   }
 </script>
 
+<!-- LABEL: PIN Code / Enter 6 digit pincode -->
 <Field
   name="pincode"
   required={true}
   pattern={PINCODE_PATTERN}
   maxlength={6}
-  helpText="Enter 6 digit pincode"
-  label="PIN Code"
+  helpText={$t(PINCODE_HELP)}
+  label={$t(PINCODE_LABEL)}
   on:input={handleInput}
   {value}
   handleFocus={true}

@@ -2,12 +2,17 @@
   // Svelte imports
   import { onMount } from 'svelte';
   import { slide } from 'svelte/transition';
+  import { _ as t, locale } from 'svelte-i18n';
 
   // Util imports
   import { getSession } from 'sessionmanager';
-  import * as GPay from 'gpay';
-  import * as Bridge from 'bridge';
-  import { getDowntimes, hasFeature, isCustomerFeeBearer } from 'checkoutstore';
+  import {
+    isPayout,
+    getDowntimes,
+    hasFeature,
+    isCustomerFeeBearer,
+    getMerchantOrder,
+  } from 'checkoutstore';
   import {
     isMethodEnabled,
     isUPIFlowEnabled,
@@ -18,7 +23,7 @@
     doesAppExist,
     GOOGLE_PAY_PACKAGE_NAME,
     otherAppsIcon,
-    getUPIAppLogoFromHandle,
+    getUPIAppDataFromHandle,
   } from 'common/upi';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
@@ -27,7 +32,13 @@
   import { filterUPITokens } from 'common/token';
   import { getUPIIntentApps } from 'checkoutstore/native';
 
-  import { getAmount, getName } from 'checkoutstore';
+  import {
+    getAmount,
+    getName,
+    getCurrency,
+    isASubscription,
+    getSubscription,
+  } from 'checkoutstore';
 
   // UI imports
   import UpiIntent from './UpiIntent.svelte';
@@ -37,6 +48,7 @@
   import ListHeader from 'ui/elements/ListHeader.svelte';
   import Field from 'ui/components/Field.svelte';
   import Icon from 'ui/elements/Icon.svelte';
+  import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
   import Collect from './Collect.svelte';
   import GooglePayCollect from './GooglePayCollect.svelte';
@@ -52,12 +64,32 @@
   // Store
   import { contact } from 'checkoutstore/screens/home';
   import { customer } from 'checkoutstore/customer';
-  import { methodTabInstrument } from 'checkoutstore/screens/home';
+  import { methodInstrument } from 'checkoutstore/screens/home';
+  import { isRecurring } from 'checkoutstore';
+
+  import {
+    UPI_COLLECT_BLOCK_HEADING,
+    UPI_COLLECT_BLOCK_SUBHEADING,
+    UPI_COLLECT_NEW_VPA_HELP,
+    UPI_COLLECT_ENTER_ID,
+    UPI_COLLECT_SAVE,
+    QR_BLOCK_HEADING,
+    SHOW_QR_CODE,
+    SCAN_QR_CODE,
+    UPI_DOWNTIME_TEXT,
+    UPI_OTM_CALLOUT,
+    UPI_RECURRING_CAW_CALLOUT_ALL_DATA,
+    UPI_RECURRING_CAW_CALLOUT_NO_NAME,
+    UPI_RECURRING_CAW_CALLOUT_NO_NAME_NO_FREQUENCY,
+    UPI_RECURRING_CAW_CALLOUT_NO_FREQUENCY,
+    UPI_RECURRING_SUBSCRIPTION_CALLOUT,
+  } from 'ui/labels/upi';
+
+  import { formatTemplateWithLocale } from 'i18n';
 
   // Props
   export let selectedApp = undefined;
   export let preferIntent = true;
-  export let useWebPaymentsApi = false;
   export let down = false;
   export let retryOmnichannel = false;
   export let isFirst = true;
@@ -73,7 +105,6 @@
   // Computed
   export let selectedAppData = null;
   export let intent = false;
-  export let isGPaySelected;
   export let pspHandle;
   export let shouldShowQr;
   let shouldShowCollect;
@@ -88,7 +119,47 @@
   const isOtm = method === 'upi_otm';
   let otmStartDate = new Date();
 
+  const merchantName = getName();
+
   const session = getSession();
+
+  const merchantOrder = getMerchantOrder();
+  const merchantSubscription = getSubscription();
+
+  const isUpiRecurringCAW = isRecurring() && merchantOrder;
+  const isUpiRecurringSubscription = isRecurring() && isASubscription('upi');
+  let startDate,
+    endDate,
+    orderAmount,
+    recurringFrequency,
+    recurring_type,
+    maxRecurringAmount,
+    tokenObject,
+    recurring_callout;
+
+  if (isUpiRecurringCAW) {
+    tokenObject = merchantOrder;
+  } else if (isUpiRecurringSubscription) {
+    tokenObject = merchantSubscription;
+  }
+
+  if (isUpiRecurringCAW || isUpiRecurringSubscription) {
+    orderAmount = tokenObject.amount;
+    startDate = tokenObject.token.start_time;
+    endDate = tokenObject.token.end_time;
+    recurringFrequency = tokenObject.token.frequency;
+    maxRecurringAmount = tokenObject.token.max_amount;
+    recurring_type = tokenObject.token.recurringType;
+    if (merchantName && recurringFrequency !== 'as_presented') {
+      recurring_callout = UPI_RECURRING_CAW_CALLOUT_ALL_DATA;
+    } else if (merchantName) {
+      recurring_callout = UPI_RECURRING_CAW_CALLOUT_NO_FREQUENCY;
+    } else if (recurringFrequency !== 'as_presented') {
+      recurring_callout = UPI_RECURRING_CAW_CALLOUT_NO_NAME;
+    } else {
+      recurring_callout = UPI_RECURRING_CAW_CALLOUT_NO_NAME_NO_FREQUENCY;
+    }
+  }
 
   const getAllowedPSPs = {
     upi: tokens => tokens,
@@ -128,7 +199,7 @@
     return new Date(date.getTime() + days * 1000 * 24 * 3600);
   };
 
-  const { isPayout, showRecommendedUPIApp } = session;
+  const { showRecommendedUPIApp } = session;
 
   /**
    * An instrument might has for some flows to be available
@@ -167,7 +238,7 @@
 
   let availableFlows = getAvailableFlowsFromInstrument();
   $: {
-    availableFlows = getAvailableFlowsFromInstrument($methodTabInstrument);
+    availableFlows = getAvailableFlowsFromInstrument($methodInstrument);
   }
 
   // Set default token value when the available flows change
@@ -180,8 +251,9 @@
    * @returns {Array<Object>}
    */
   function getUPIIntentAppsFromInstrument(instrument) {
+    const apps = getUPIIntentApps().filtered;
     if (!instrument || instrument.method !== 'upi') {
-      return getUPIIntentApps().filtered;
+      return apps;
     }
 
     if (
@@ -203,31 +275,11 @@
   }
 
   let intentApps = getUPIIntentApps().filtered;
-  $: intentApps = getUPIIntentAppsFromInstrument($methodTabInstrument);
+  $: intentApps = getUPIIntentAppsFromInstrument($methodInstrument);
 
   let otmEndDate = addDaysToDate(otmStartDate, 90);
 
-  const checkGPay = session => {
-    /* disable Web payments API for fee_bearer and OTM for now */
-    if (isCustomerFeeBearer() || isOtm) {
-      return Promise.reject();
-    }
-
-    // We're not using Web Payments API for Payouts
-    if (session.isPayout) {
-      return Promise.reject();
-    }
-
-    /* disable Web payments API for Android SDK as we have intent there */
-    if (Bridge.checkout.exists()) {
-      return Promise.reject();
-    }
-
-    return session.r.checkPaymentAdapter('gpay');
-  };
-
   $: intent = availableFlows.intent && preferIntent;
-  $: isGPaySelected = selectedApp === 'gpay' && useWebPaymentsApi;
   $: pspHandle = selectedAppData ? selectedAppData.psp : '';
   $: shouldShowQr =
     availableFlows.qr &&
@@ -242,7 +294,7 @@
     _Arr.contains(['upi', 'upi_otm'], session.tab) && determineCtaVisibility();
 
   function setDefaultTokenValue() {
-    const hasIntentFlow = availableFlows.intent || useWebPaymentsApi;
+    const hasIntentFlow = availableFlows.intent;
     const hasTokens = tokens && tokens.length;
 
     /**
@@ -261,14 +313,14 @@
   }
 
   $: {
-    tokens = filterUPITokens(_Obj.getSafely($customer, 'tokens.items', []));
-    tokens = getAllowedPSPs[method](tokens);
-    setDefaultTokenValue();
-  }
+    // BE does not support saved vpa tokens for recurring payments
+    // conditional support might be added later
+    if (!isRecurring()) {
+      tokens = filterUPITokens(_Obj.getSafely($customer, 'tokens.items', []));
+      tokens = getAllowedPSPs[method](tokens);
 
-  function setWebPaymentsApiUsage(to) {
-    useWebPaymentsApi = to;
-    setDefaultTokenValue();
+      setDefaultTokenValue();
+    }
   }
 
   function determineCtaVisibility() {
@@ -280,19 +332,9 @@
   }
 
   onMount(() => {
-    checkGPay(session)
-      /* Use Google Pay */
-      .then(() => {
-        setWebPaymentsApiUsage(true);
-      })
-      /* Don't use Google Pay */
-      .catch(e => {
-        setWebPaymentsApiUsage(false);
-      });
-
     /* TODO: improve handling of `prefill.vpa` */
     if (session.get('prefill.vpa')) {
-      selectedApp = null;
+      selectedApp = undefined;
       vpa = session.get('prefill.vpa');
     }
 
@@ -317,6 +359,7 @@
   export function onShown() {
     setDefaultTokenValue();
     determineCtaVisibility();
+    sendIntentEvents();
   }
 
   export function getPayload() {
@@ -356,11 +399,6 @@
           upi_provider: 'google_pay',
         };
         break;
-      case 'gpay':
-        data = {
-          '_[flow]': 'gpay',
-        };
-        break;
 
       default:
         // `selectedToken` can be null if nothing is to be selected by default
@@ -384,18 +422,28 @@
         break;
     }
 
+    // The UPI Block is given priority over the rest of the data.
+    // Migrating to have all upi related data in the upi block.
+    data.upi = {};
+
     /**
      * default to directpay for collect requests
      */
     if (!data['_[flow]']) {
       data['_[flow]'] = 'directpay';
+      data.upi.flow = 'collect';
     }
 
     if (isOtm) {
-      data.upi = {
-        flow: 'collect',
-        type: 'otm',
-      };
+      data.upi.type = 'otm';
+    }
+
+    if (isUpiRecurringCAW || isUpiRecurringSubscription) {
+      data.upi.type = 'recurring';
+      data.recurring = 1;
+    }
+
+    if (isOtm || isUpiRecurringCAW || isUpiRecurringSubscription) {
       if (data.vpa) {
         data.upi.vpa = data.vpa;
       }
@@ -410,11 +458,6 @@
     isFirst = false;
 
     if (!intent) {
-      if (isGPaySelected) {
-        selectedApp = undefined;
-        return false;
-      }
-
       if (selectedApp !== undefined) {
         selectedApp = undefined;
         return true;
@@ -430,7 +473,6 @@
     const getEventValueForFeature = feature => {
       return (
         {
-          gpay: 'gpay web payments',
           'gpay-omni': 'gpay omnichannel',
           new: 'add new',
           intent: 'intent',
@@ -509,6 +551,38 @@
       },
     });
   }
+
+  function sendIntentEvents() {
+    if (!intent) {
+      return;
+    }
+
+    const apps = getUPIIntentApps();
+
+    Analytics.track('upi:intent', {
+      type: AnalyticsTypes.RENDER,
+      data: {
+        count: {
+          eligible: apps.filtered.length,
+          all: apps.all.length,
+        },
+        list: {
+          eligible: _Arr.join(
+            _Arr.map(apps.filtered, function(app) {
+              return app.package_name;
+            }),
+            ','
+          ),
+          all: _Arr.join(
+            _Arr.map(apps.all, function(app) {
+              return app.package_name;
+            }),
+            ','
+          ),
+        },
+      },
+    });
+  }
 </script>
 
 <style>
@@ -560,10 +634,9 @@
   }
 </style>
 
-<Tab {method} {down} pad={false}>
+<Tab {method} {down} pad={false} shown={isPayout()}>
   <Screen>
     <div>
-
       {#if intent}
         <UpiIntent
           bind:this={intentView}
@@ -577,35 +650,17 @@
           {showRecommendedUPIApp} />
       {/if}
 
-      {#if useWebPaymentsApi}
-        <div class="legend left">Pay using Gpay App</div>
-        <div class="border-list">
-          <SlottedRadioOption
-            name="google_pay_web"
-            selected={selectedToken === 'gpay'}
-            on:click={() => {
-              selectedToken = 'gpay';
-              session.preSubmit();
-            }}>
-            <div slot="title">Google Pay</div>
-            <i slot="icon">
-              <Icon icon={session.themeMeta.icons.gpay} />
-            </i>
-          </SlottedRadioOption>
-        </div>
-      {/if}
-
       {#if shouldShowCollect}
-        <div class="legend left">Pay using UPI ID</div>
+        <!-- LABEL: Pay using UPI ID -->
+        <div class="legend left">{$t(UPI_COLLECT_BLOCK_HEADING)}</div>
         <div class="border-list" id="upi-collect-list">
           {#if intent}
             <ListHeader>
               <i slot="icon">
                 <Icon icon={getMiscIcon('receive')} />
               </i>
-              <div slot="subtitle">
-                You will receive a payment request on your UPI app
-              </div>
+              <!-- LABEL: You will receive a payment request on your UPI app -->
+              <div slot="subtitle">{$t(UPI_COLLECT_BLOCK_SUBHEADING)}</div>
             </ListHeader>
           {/if}
 
@@ -620,13 +675,13 @@
               <div slot="title">{app.vpa.username + '@' + app.vpa.handle}</div>
               <i slot="icon">
                 <Icon
-                  icon={getUPIAppLogoFromHandle(app.vpa.handle) || session.themeMeta.icons.upi} />
+                  icon={getUPIAppDataFromHandle(app.vpa.handle).app_icon || session.themeMeta.icons.upi} />
               </i>
             </SlottedRadioOption>
           {/each}
           <AddANewVpa
+            recurring={isUpiRecurringCAW || isUpiRecurringSubscription}
             paymentMethod={method}
-            subtitleText={isOtm ? 'Supported only for BHIM and HDFC' : 'Google Pay, BHIM, PhonePe & more'}
             on:click={() => {
               onUpiAppSelection({ detail: { id: 'new' } });
             }}
@@ -652,39 +707,51 @@
       {/if}
 
       {#if shouldShowQr}
-        <div class="legend left">Pay using QR Code</div>
+        <!-- LABEL: Pay using QR Code -->
+        <div class="legend left">{$t(QR_BLOCK_HEADING)}</div>
         <div class="options" id="showQr">
           <NextOption
             icon={qrIcon}
             tabindex="0"
             attributes={{ role: 'button', 'aria-label': 'Show QR Code - Scan the QR code using your UPI app' }}
             on:select={selectQrMethod}>
-            <div>Show QR Code</div>
-            <div class="desc">Scan the QR code using your UPI app</div>
+            <!-- LABEL: Show QR Code -->
+            <div>{$t(SHOW_QR_CODE)}</div>
+            <!-- LABEL: Scan the QR code using your UPI app -->
+            <div class="desc">{$t(SCAN_QR_CODE)}</div>
           </NextOption>
         </div>
       {/if}
     </div>
 
-    <Bottom tab={method}>
+    <Bottom>
       {#if down || disabled}
         <DowntimeCallout severe={disabled}>
-          <strong>UPI</strong>
-          is experiencing low success rates.
+          <!-- LABEL: UPI is experiencing low success rates. -->
+          <FormattedText text={$t(UPI_DOWNTIME_TEXT)} />
         </DowntimeCallout>
       {/if}
       {#if isOtm}
         <Callout classes={['downtime-callout']} showIcon={true}>
-          <strong>{session.formatAmountWithCurrency(getAmount())}</strong>
-          will be blocked on your account by clicking pay. Your account will be
-          charged {getName() ? 'by ' + getName() : ''} between
-          <strong>{toShortFormat(otmStartDate)}</strong>
-          to
-          <strong>{toShortFormat(otmEndDate)}</strong>
-          .
+          <FormattedText
+            text={formatTemplateWithLocale(UPI_OTM_CALLOUT, {
+              amount: session.formatAmountWithCurrency(getAmount()),
+              nameString: merchantName ? 'by ' + merchantName : '',
+              startDate: toShortFormat(otmStartDate),
+              endDate: toShortFormat(otmEndDate),
+            })} />
         </Callout>
       {/if}
-
+      <!-- Both CAW and subscriptions show the same callout with the same information -->
+      {#if isUpiRecurringCAW || isUpiRecurringSubscription}
+        <Callout classes={['downtime-callout']} showIcon={true}>
+          <!-- This is a recurring payment and {maxAmount} will be charged now. After this, {merchantName} can charge upto {amount} {recurringFrequency} till {endDate}. -->
+          <!-- This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} on a {recurringFrequency} basis till {endDate}. -->
+          <!-- This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} anytime till {endDate}. -->
+          <!-- This is a recurring payment and {maxAmount} will be charged now. {merchantName} can charge upto {amount} anytime till {endDate}. -->
+          {formatTemplateWithLocale(recurring_callout, { maxAmount: session.formatAmountWithCurrency(getAmount()), merchantName: !merchantName ? '' : merchantName, amount: session.formatAmountWithCurrency(maxRecurringAmount), recurringFrequency, endDate: toShortFormat(new Date(endDate * 1000)) }, $locale)}
+        </Callout>
+      {/if}
     </Bottom>
   </Screen>
 </Tab>

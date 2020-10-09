@@ -25,12 +25,8 @@ import * as GPay from 'gpay';
 import Analytics from 'analytics';
 import { isProviderHeadless } from 'common/cardlessemi';
 import { updateCurrencies, setCurrenciesRate } from 'common/currency';
-import {
-  getCardEntityFromPayload,
-  getIin,
-  isIinValid,
-  updateCardIINMetadata,
-} from 'common/card';
+import { GOOGLE_PAY_PACKAGE_NAME, PHONE_PE_PACKAGE_NAME } from 'common/upi';
+import { getCardEntityFromPayload, getCardFeatures } from 'common/card';
 
 /**
  * Tells if we're being executed from
@@ -67,6 +63,10 @@ function onPaymentCancel(metaParam) {
     var payment_id = this.payment_id;
     var razorpay = this.r;
     var eventData = {};
+    var metadata = this.getMetadata();
+    if (metadata) {
+      cancelError.error.metadata = metadata;
+    }
 
     if (payment_id) {
       eventData.payment_id = payment_id;
@@ -204,12 +204,24 @@ export default function Payment(data, params = {}, r) {
     avoidPopup = true;
   } else if (this.gpay) {
     avoidPopup = true;
-  } else if (isRazorpayFrame()) {
+  } else if (data) {
     /**
      * data needs to be present. absence of data = placeholder popup in
      * payment paused state
      */
-    if (data) {
+    if (data.application || data.method === 'app') {
+      // Obviously avoid popup if paying with an external application
+      avoidPopup = true;
+      if (data.provider === 'cred' && !data.app_present && !isRazorpayFrame()) {
+        // CRED collect flow for razorpay.js
+        avoidPopup = false;
+      }
+    } else if (data.application || data.method === 'app') {
+      // Obviously avoid popup if paying with an external application
+      avoidPopup = true;
+    }
+
+    if (isRazorpayFrame()) {
       if (data.method === 'wallet') {
         if (isPowerWallet(data.wallet)) {
           /* If contact or email are missing, we need to ask for it in popup */
@@ -332,6 +344,23 @@ Payment.prototype = {
       _Obj.clone(data || {})
     );
 
+    if (this.gpay || this.tez) {
+      if (data['_[app]'] === GOOGLE_PAY_PACKAGE_NAME) {
+        if (
+          !(
+            this.r.paymentAdapters &&
+            (this.r.paymentAdapters[GOOGLE_PAY_PACKAGE_NAME] ||
+              this.r.paymentAdapters['microapps.gpay'])
+          )
+        ) {
+          return this.r.emit(
+            'payment.error',
+            _.rzpError('GPay is not available')
+          );
+        }
+      }
+    }
+
     formatPayment(this);
 
     let setCompleteHandler = _ => {
@@ -344,7 +373,13 @@ Payment.prototype = {
     const isExternalSDKPayment =
       this.isExternalAmazonPayPayment || this.isExternalGooglePayPayment;
 
-    if (isExternalSDKPayment) {
+    const isGooglePayCards =
+      this.isExternalGooglePayPayment && this.data.method === 'card';
+    // Fire external SDK payment process event.
+    // Avoid if it's a Google Pay Cards payment as
+    // we will fire this event after creating the payment on API.
+
+    if (isExternalSDKPayment && !isGooglePayCards) {
       setCompleteHandler();
 
       return window.setTimeout(() => {
@@ -479,6 +514,17 @@ Payment.prototype = {
       return;
     }
 
+    // CRED collect flow for razorpay.js
+    if (
+      !this.avoidPopup &&
+      !isRazorpayFrame() &&
+      data.method === 'app' &&
+      data.provider === 'cred' &&
+      !data.app_present
+    ) {
+      return;
+    }
+
     // iphone background ajax route
     if (!this.iframe && !this.avoidPopup && ajaxRouteNotSupported) {
       return;
@@ -487,9 +533,24 @@ Payment.prototype = {
     if (data.method === 'wallet' && !(data.contact && data.email)) {
       return;
     }
+
+    // Axis bank requires HTTP Referer field to be non-empty,
+    // If opening bank page from popup, it will be empty.
+    // So use create/checkout route.
+    if (data.method === 'emandate' && data.bank === 'UTIB') {
+      return;
+    }
+    //Use create/checkout route when auth_type is not passed,
+    // at the time of payment creation payload for emandate.
+    if (data.method === 'emandate' && !data.auth_type) {
+      return;
+    }
+
     // else make ajax request
 
     var razorpayInstance = this.r;
+
+    data['_[request_index]'] = Analytics.updateRequestIndex('submit');
 
     this.ajax = fetch.post({
       url: makeUrl('payments/create/ajax'),
@@ -516,6 +577,9 @@ Payment.prototype = {
       if (this.iframe) {
         this.popup.show();
       }
+
+      data['_[request_index]'] = Analytics.updateRequestIndex('submit');
+
       _Doc.submitForm(makeRedirectUrl(payment.fees), data, 'post', popup.name);
     }
   },
@@ -634,6 +698,17 @@ Payment.prototype = {
       this.makePopup();
     }
   },
+
+  getMetadata: function() {
+    const metadata = {};
+    if (this.payment_id) {
+      metadata.payment_id = this.payment_id;
+      if (this.r.get('order_id')) {
+        metadata.order_id = this.r.get('order_id');
+      }
+      return metadata;
+    }
+  },
 };
 
 function pollPaymentData(onComplete) {
@@ -670,15 +745,25 @@ var razorpayProto = Razorpay.prototype;
  * @return {Promise}
  */
 razorpayProto.checkPaymentAdapter = function(adapter, data) {
-  return checkPaymentAdapter(adapter, data).then(success => {
-    if (!this.paymentAdapters) {
-      this.paymentAdapters = {};
+  // Hack to support web payments api for voth standard and custom checkout
+  // TODO - Solution web payments for custom checkout to make them more extensible
+  var adapterPackageNameMap = {
+    gpay: GOOGLE_PAY_PACKAGE_NAME,
+    [GOOGLE_PAY_PACKAGE_NAME]: GOOGLE_PAY_PACKAGE_NAME,
+    [PHONE_PE_PACKAGE_NAME]: PHONE_PE_PACKAGE_NAME,
+    'microapps.gpay': 'microapps.gpay',
+  };
+  return checkPaymentAdapter(adapterPackageNameMap[adapter], data).then(
+    success => {
+      if (!this.paymentAdapters) {
+        this.paymentAdapters = {};
+      }
+
+      this.paymentAdapters[adapter] = true;
+
+      return Promise.resolve(success);
     }
-
-    this.paymentAdapters[adapter] = true;
-
-    return Promise.resolve(success);
-  });
+  );
 };
 
 /**
@@ -897,42 +982,6 @@ razorpayProto.topupWallet = function() {
   });
 };
 
-const CardFeatureCache = {
-  iin: {},
-};
-const CardFeatureRequests = {
-  iin: {},
-};
-
-/**
- * Fetches card features from cache.
- * TODO: Remove cache for this when logic to determine Native OTP
- *       flow can be supported using a Promise
- * @param {String} cardNumber
- *
- * @return {Object/undefined}
- */
-export function getCardFeaturesFromCache(cardNumber) {
-  if (!isIinValid(cardNumber)) {
-    return {};
-  }
-
-  const iin = getIin(cardNumber);
-
-  const features = CardFeatureCache.iin[iin];
-
-  if (features) {
-    Analytics.track('features:card:fetch:success', {
-      data: {
-        iin,
-        cache: true,
-      },
-    });
-  }
-
-  return features;
-}
-
 /**
  * Returns card currencies from cache
  *
@@ -942,12 +991,6 @@ export function getCardCurrenciesFromCache(payload) {
   const entity = getCardEntityFromPayload(payload);
   return CardCurrencyCache[entity] || {};
 }
-/**
- * Store ongoing flow request*
- */
-var ongoingFlowRequest = {
-  iin: {},
-};
 
 /**
  * Store ongoing currency request
@@ -958,75 +1001,6 @@ var CardCurrencyRequests = {};
  * Currency cache for synchronous retrieval
  */
 var CardCurrencyCache = {};
-
-/**
- * Gets the features associated with a card.
- * @param {string} cardNumber
- *
- * @returns {Promise}
- */
-function getCardFeatures(cardNumber) {
-  if (!isIinValid(cardNumber)) {
-    return Promise.resolve({});
-  }
-
-  const iin = getIin(cardNumber);
-
-  const existingRequest = CardFeatureRequests.iin[iin];
-
-  if (existingRequest) {
-    return existingRequest;
-  }
-
-  CardFeatureRequests.iin[iin] = new Promise((resolve, reject) => {
-    let url = makeAuthUrl(this, 'payment/iin');
-
-    // append IIN and source as query
-    url = _.appendParamsToUrl(url, {
-      iin,
-      '_[source]': Track.props.library,
-    });
-
-    fetch.jsonp({
-      url,
-      callback: features => {
-        if (features.error) {
-          Analytics.track('features:card:fetch:failure', {
-            data: {
-              iin,
-              error: features.error,
-            },
-          });
-          return reject(features.error);
-        }
-
-        // Store in cache
-        CardFeatureCache.iin[iin] = features;
-
-        // Update card metadata
-        updateCardIINMetadata(iin, features);
-
-        // Resolve
-        resolve(features);
-
-        Analytics.track('features:card:fetch:success', {
-          data: {
-            iin,
-            features,
-          },
-        });
-      },
-    });
-
-    Analytics.track('features:card:fetch:start', {
-      data: {
-        iin,
-      },
-    });
-  });
-
-  return CardFeatureRequests.iin[iin];
-}
 
 /**
  * [DEPRECATED]

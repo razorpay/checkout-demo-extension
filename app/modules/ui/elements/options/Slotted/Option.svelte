@@ -20,8 +20,11 @@
     border: 1px solid #e6e7e8;
     display: block;
     width: 100%;
+
+    /* Fallback for IE */
     text-align: left;
     text-align: start;
+
     transition-duration: 0.15s;
     transition-property: border, background;
     transition-timing-function: linear;

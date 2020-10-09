@@ -32,7 +32,7 @@ describe('UPI Intent tests', () => {
       page,
       options,
       preferences,
-      apps: true,
+      upiApps: true,
     });
     await assertBasicDetailsScreen(context);
     await fillUserDetails(context);

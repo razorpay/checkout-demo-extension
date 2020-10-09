@@ -3,7 +3,7 @@
 
   var defaults = {
     escape: true,
-    animation: true,
+    animation: !window.matchMedia('(prefers-reduced-motion: reduce)').matches,
     backdropclose: true,
     onhide: null,
     onhidden: null,
@@ -80,6 +80,15 @@
       invoke(this.options.onhide);
     },
 
+    handleBackdropClick: function() {
+      // Let parent handle any clicks
+      var shouldClose = this.options.handleBackdropClick();
+
+      if (shouldClose) {
+        this.backdropHide();
+      }
+    },
+
     backdropHide: function() {
       if (this.options.backdropclose) {
         this.hide();
@@ -123,15 +132,19 @@
       if (this.options.escape) {
         this.on('keyup', window, function(e) {
           if ((e.which || e.keyCode) === 27) {
-            if (!hideEmi() && !overlayVisible()) {
+            // Element wants to handle "Escape" by itself
+            if ($(e.target).hasClass('no-escape')) {
+              return;
+            }
+
+            if (!hideEmi() && !Backdrop.isVisible()) {
               this.hide();
             }
           }
         });
       }
-      if (this.options.backdropclose) {
-        this.on('click', gel('backdrop'), this.backdropHide);
-      }
+
+      this.on('click', gel('backdrop'), this.handleBackdropClick);
     },
 
     destroy: function() {

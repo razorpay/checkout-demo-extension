@@ -1,5 +1,21 @@
 <script>
   import { getAmount } from 'checkoutstore';
+
+  // i18n
+  import { t, locale } from 'svelte-i18n';
+  import { formatTemplateWithLocale } from 'i18n';
+  import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
+
+  import {
+    NO_COST_HEADER,
+    NO_COST_DESCRIPTION,
+    NORMAL_EMI_LABEL,
+    NO_COST_LABEL,
+    TOTAL_AMOUNT_LABEL,
+    EFFECTIVE_INTEREST_INFO,
+    YOU_SAVE_INFO,
+  } from 'ui/labels/emi-details';
+
   export let formatter;
   export let plan;
 
@@ -64,52 +80,50 @@
   }
 </style>
 
-<header>How does No Cost EMI work?</header>
+<!-- LABEL: How does No Cost EMI work? -->
+<header>{$t(NO_COST_HEADER)}</header>
 <p>
-  You are buying a product worth
+  <!-- LABEL: You are buying a product worth
   <b>{totalAmountNoCost} on a {duration}-month EMI period.</b>
   The bank used charges
   <b>{rate}% interest</b>
-  per annum.
+  per annum. -->
+  <FormattedText
+    text={formatTemplateWithLocale(NO_COST_DESCRIPTION, { amount: totalAmountNoCost, duration, rate }, $locale)} />
 </p>
 <table>
   <tr>
     <td />
     <td>
-      <b>Normal EMI</b>
+      <!-- LABEL: Normal EMI -->
+      <b>{$t(NORMAL_EMI_LABEL)}</b>
     </td>
     <td>
-      <b>No Cost EMI</b>
+      <!-- LABEL: No Cost EMI -->
+      <b>{$t(NO_COST_LABEL)}</b>
     </td>
   </tr>
   <tr>
-    <td>
-      <b>EMI Amount</b>
-    </td>
-    <td>
-      {monthAmountNoCost} + {rate}%
-      <br />
-      <b>{monthAmountNormal}</b>
-    </td>
-    <td>
-      <b>{monthAmountNoCost}</b>
-    </td>
+    <td><b>EMI Amount</b></td>
+    <td>{monthAmountNoCost} + {rate}% <br /> <b>{monthAmountNormal}</b></td>
+    <td><b>{monthAmountNoCost}</b></td>
   </tr>
   <tr>
     <td>
-      <b>Total Amount</b>
+      <!-- LABEL: Total Amount -->
+      <b>{$t(TOTAL_AMOUNT_LABEL)}</b>
     </td>
-    <td>
-      <b>{totalAmountNormal}</b>
-    </td>
-    <td>
-      <b>{totalAmountNoCost}</b>
-    </td>
+    <td><b>{totalAmountNormal}</b></td>
+    <td><b>{totalAmountNoCost}</b></td>
   </tr>
 </table>
 <p>
-  <b>Zero effective interest:</b>
-  you get upfront discount equal to interest charged by the bank.
+  <!-- LABEL: <b>Zero effective interest:</b>
+  you get upfront discount equal to interest charged by the bank. -->
+  <FormattedText text={$t(EFFECTIVE_INTEREST_INFO)} />
   <br />
-  <span>You save {youSave}</span>
+  <!-- LABEL: You save {amount} -->
+  <span>
+    {formatTemplateWithLocale(YOU_SAVE_INFO, { amount: youSave }, $locale)}
+  </span>
 </p>

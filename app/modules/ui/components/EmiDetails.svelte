@@ -5,7 +5,19 @@
     savedCardEmiDuration,
     selectedPlan,
   } from 'checkoutstore/emi';
+
   import Razorpay from 'common/Razorpay';
+
+  // i18n
+  import { t, locale } from 'svelte-i18n';
+  import { formatTemplateWithLocale } from 'i18n';
+
+  import {
+    INSTALLMENT_LABEL,
+    INTEREST_LABEL,
+    TENURE,
+    TENURE_LABEL,
+  } from 'ui/labels/emi-details';
 
   // Util imports
   import { getAmount, getCurrency } from 'checkoutstore';
@@ -63,15 +75,19 @@
 
 <div class="transaction-details pad">
   <div class="detail">
-    <div>EMI</div>
+    <!-- LABEL: EMI -->
+    <div>{$t(INSTALLMENT_LABEL)}</div>
     <div>{formattedInstallmentAmount}</div>
   </div>
   <div class="detail">
-    <div>Tenure</div>
-    <div>{duration} Months</div>
+    <!-- LABEL: Tenure -->
+    <div>{$t(TENURE_LABEL)}</div>
+    <!-- LABEL: {duration} Months -->
+    <div>{formatTemplateWithLocale(TENURE, { duration }, $locale)}</div>
   </div>
   <div class="detail">
-    <div>Interest</div>
+    <!-- LABEL: Interest -->
+    <div>{$t(INTEREST_LABEL)}</div>
     <div>{interest}%</div>
   </div>
 </div>

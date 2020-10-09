@@ -5,6 +5,15 @@
   // Utils
   import { EMAIL_PATTERN } from 'common/constants';
 
+  // i18n
+  import {
+    EMAIL_HELP_TEXT,
+    EMAIL_LABEL_OPTIONAL,
+    EMAIL_LABEL_REQUIRED,
+  } from 'ui/labels/home';
+
+  import { t } from 'svelte-i18n';
+
   // Props
   export let value;
 
@@ -13,7 +22,9 @@
 
   const isOptional = isEmailOptional();
   const EMAIL_REGEX = isOptional ? '.*' : EMAIL_PATTERN;
-  const label = isOptional ? 'Email (Optional)' : 'Email';
+
+  // LABEL: Email (Optional) / Email
+  const label = isOptional ? EMAIL_LABEL_OPTIONAL : EMAIL_LABEL_REQUIRED;
 </script>
 
 <div>
@@ -25,9 +36,10 @@
     required={!isOptional}
     pattern={EMAIL_REGEX}
     readonly={isEmailReadOnly()}
-    {label}
-    icon="&#xe603;"
+    label={$t(label)}
+    icon=""
     on:input={e => (value = e.target.value)}
     on:blur
-    helpText="Please enter a valid email. Example: you@example.com" />
+    helpText={$t(EMAIL_HELP_TEXT)} />
+  <!-- LABEL: Please enter a valid email. Example: you@example.com -->
 </div>

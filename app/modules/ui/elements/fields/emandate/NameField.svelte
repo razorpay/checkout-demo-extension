@@ -1,6 +1,9 @@
 <script>
   import Field from 'ui/components/Field.svelte';
 
+  import { t } from 'svelte-i18n';
+  import { NAME_LABEL, NAME_HELP } from 'ui/labels/emandate';
+
   export let id;
   export let name;
   export let readonly;
@@ -20,8 +23,8 @@
   {id}
   {readonly}
   {value}
-  label="Account Holder Name"
-  helpText="Please enter a valid Name as per your account"
+  label={$t(NAME_LABEL)}
+  helpText={$t(NAME_HELP)}
   maxlength="100"
   required={true}
   pattern={PATTERN}

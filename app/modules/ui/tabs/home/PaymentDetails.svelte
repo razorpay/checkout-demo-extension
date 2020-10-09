@@ -9,6 +9,8 @@
 
   // Store
   import {
+    country,
+    phone,
     contact,
     email,
     address,
@@ -23,6 +25,7 @@
   // Utils imports
   import {
     isContactEmailOptional,
+    isContactOptional,
     isPartialPayment,
     isEmailHidden,
     isContactHidden,
@@ -31,6 +34,7 @@
     getOption,
   } from 'checkoutstore';
   import { getThemeMeta } from 'checkoutstore/theme';
+  import { getAnimationOptions } from 'svelte-utils';
 
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
@@ -85,11 +89,15 @@
   }
 </style>
 
-<div in:fly={{ delay: 100, duration: 200, y: 40 }}>
+<div in:fly={getAnimationOptions({ delay: 100, duration: 200, y: 40 })}>
   <div class="details-block">
     {#if !isContactHidden()}
       <div class="contact-field">
-        <ContactField bind:value={$contact} on:blur={trackContactFilled} />
+        <ContactField
+          bind:country={$country}
+          bind:phone={$phone}
+          isOptional={isContactOptional()}
+          on:blur={trackContactFilled} />
       </div>
     {/if}
     {#if !isEmailHidden()}
@@ -111,7 +119,7 @@
         bind:address={$address}
         bind:pincode={$pincode}
         bind:state={$state}
-        states={STATES} />
+        states={entries(STATES)} />
     </div>
   {/if}
 

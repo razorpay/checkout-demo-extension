@@ -57,6 +57,24 @@ async function assertInputValue(context, selector, value) {
  *
  * @param {Context} context The test context
  * @param {String} selector selector to match the targeted element
+ * @param {String|RegExp} textOrRegex Text or Regex against which text is to be asserted
+ */
+async function assertTrimmedInnerText(context, selector, textOrRegex) {
+  const element = await context.page.waitForSelector(selector);
+  const elementText = await innerText(element);
+  const trimmed = elementText.trim();
+
+  if (textOrRegex instanceof RegExp) {
+    expect(trimmed).toMatch(textOrRegex);
+  } else {
+    expect(trimmed).toBe(textOrRegex);
+  }
+}
+
+/**
+ *
+ * @param {Context} context The test context
+ * @param {String} selector selector to match the targeted element
  */
 async function assertSelectorAbsence(context, selector) {
   const el = await context.page.$(selector);
@@ -113,6 +131,7 @@ module.exports = {
   proceed,
   handlePartialPayment,
   assertInputValue,
+  assertTrimmedInnerText,
   getAttribute,
   getTextContent,
   assertTextContent,

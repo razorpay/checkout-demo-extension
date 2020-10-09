@@ -17,6 +17,15 @@
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
   import { customer } from 'checkoutstore/customer';
 
+  // i18n
+  import {
+    getLongBankName,
+    formatTemplateWithLocale,
+    getInstrumentTitle,
+  } from 'i18n';
+
+  import { locale } from 'svelte-i18n';
+
   // Props
   export let instrument = {};
   export let name = 'instrument';
@@ -25,21 +34,42 @@
   $: individualInstrument = getExtendedSingleInstrument(instrument);
 
   const session = getSession();
+  const isEmiInstrument = instrument.method === 'emi';
 
   function getBankText(card, loggedIn) {
     const banks = getBanks() || {};
-    const bank = banks[card.issuer] || '';
+
+    const bank = banks[card.issuer]
+      ? getLongBankName(card.issuer, $locale)
+      : '';
+
     const bankText = bank.replace(/ Bank$/, '');
+
     const cardType = card.type || '';
 
     if (loggedIn) {
-      return `${bank ? `${bankText} ` : ''}${_Str.toTitleCase(
-        cardType
-      )} card - ${card.last4}`;
+      return formatTemplateWithLocale(
+        isEmiInstrument
+          ? 'instruments.titles.emi_logged_in'
+          : 'instruments.titles.card_logged_in',
+        {
+          bank: bankText,
+          type: _Str.toTitleCase(cardType),
+          last4: card.last4,
+        },
+        $locale
+      );
     } else {
-      return `Use your${bank ? ` ${bankText}` : ''} ${_Str.toTitleCase(
-        cardType
-      )} card`;
+      return formatTemplateWithLocale(
+        isEmiInstrument
+          ? 'instruments.titles.emi_logged_out'
+          : 'instruments.titles.card_logged_out',
+        {
+          bank: bankText,
+          type: _Str.toTitleCase(cardType),
+        },
+        $locale
+      );
     }
   }
 
@@ -72,7 +102,9 @@
     icon = getIcon(card);
 
     cvvLength = networkCode === 'amex' ? 4 : 3;
-    hasCvv = true;
+
+    // EMI instruments don't have CVV
+    hasCvv = instrument.method === 'card';
 
     cardKnown = true;
   } else {
@@ -85,7 +117,8 @@
       hasCvv = false;
     } else {
       // We don't know anything about the card.
-      title = 'Use your saved cards';
+      const method = isEmiInstrument ? 'emi_saved_cards' : 'saved_cards';
+      title = getInstrumentTitle(method, '', $locale);
       icon = getIcon();
       hasCvv = false;
     }
@@ -97,9 +130,7 @@
   $: selected = cardKnown && $selectedInstrumentId === instrument.id;
 
   function selectionHandler() {
-    if (cardKnown) {
-      $selectedInstrumentId = instrument.id;
-
+    if (hasCvv) {
       setTimeout(() => {
         // Focus on the input field
         const instrumentInDom = _El.closest(
@@ -113,11 +144,9 @@
         }
       });
     } else {
-      $selectedInstrumentId = null;
-
       // TODO: Someday, preselect the saved card in the saved cards list.
 
-      session.switchTab('card');
+      session.switchTab(instrument.method);
     }
   }
 </script>
@@ -147,7 +176,7 @@
   on:click={selectionHandler}
   on:click>
   <i slot="icon">
-    <Icon {icon} alt="Card" />
+    <Icon {icon} alt="" />
   </i>
   <div slot="title">{title}</div>
 
@@ -161,8 +190,6 @@
         required={true}
         tabindex={-1}
         formatter={{ type: 'number' }} />
-    {:else}
-      <span class="theme-highlight-color">&#xe604;</span>
-    {/if}
+    {:else}<span class="theme-highlight-color">&#xe604;</span>{/if}
   </div>
 </svelte:component>

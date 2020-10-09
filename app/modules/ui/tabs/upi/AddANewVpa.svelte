@@ -2,6 +2,7 @@
   // Svelte imports
   import { onMount, createEventDispatcher } from 'svelte';
   import { slide } from 'svelte/transition';
+  import { _ as t } from 'svelte-i18n';
 
   // UI Imports
   import Field from 'ui/components/Field.svelte';
@@ -13,11 +14,24 @@
   import { getSession } from 'sessionmanager';
   import { hasFeature, getPrefilledVPA } from 'checkoutstore';
   import { VPA_REGEX } from 'common/constants';
+  import { getAnimationOptions } from 'svelte-utils';
+
+  import {
+    UPI_COLLECT_NEW_VPA_HELP,
+    UPI_COLLECT_ENTER_ID,
+    UPI_COLLECT_SAVE,
+    NEW_VPA_TITLE_LOGGED_OUT,
+    NEW_VPA_TITLE_LOGGED_IN,
+    NEW_VPA_SUBTITLE,
+    NEW_VPA_SUBTITLE_UPI_OTM,
+  } from 'ui/labels/upi';
 
   // Props
   export let selected = false;
   export let focusOnCreate = false;
   export let customer;
+  export let paymentMethod = 'upi';
+  export let recurring = false;
 
   // Refs
   export let vpaField = null;
@@ -30,8 +44,6 @@
 
   // Computed
   export let pattern;
-  export let paymentMethod;
-  export let subtitleText = 'Google Pay, BHIM, PhonePe & more';
   let rememberVpa = true;
   let newVpa = getPrefilledVPA();
   let vpa;
@@ -131,13 +143,21 @@
   name={'upi-vpa-input-' + paymentMethod}
   value="full"
   align="top"
+  overflow
   on:click
   on:click={focusAfterTimeout}
   {selected}>
   <div id={'new-vpa-field-' + paymentMethod} slot="title">
-    {logged && canSaveVpa ? 'Add UPI ID' : 'UPI ID'}
+    <!-- LABEL: UPI ID -->
+    <!-- LABEL: Add UPI ID -->
+    {logged && canSaveVpa ? $t(NEW_VPA_TITLE_LOGGED_IN) : $t(NEW_VPA_TITLE_LOGGED_OUT)}
   </div>
-  <div slot="subtitle">{subtitleText}</div>
+  <!-- LABEL: Google Pay, BHIM, PhonePe & more -->
+  <div slot="subtitle">
+    {#if paymentMethod === 'upi_otm' || recurring}
+      {$t(NEW_VPA_SUBTITLE_UPI_OTM)}
+    {:else}{$t(NEW_VPA_SUBTITLE)}{/if}
+  </div>
   <i slot="icon" class="top">
     <Icon icon={session.themeMeta.icons.upi} />
   </i>
@@ -146,11 +166,13 @@
     {#if selected}
       <div
         id={'user-new-vpa-container-' + paymentMethod}
-        transition:slide={{ duration: 200 }}>
+        transition:slide={getAnimationOptions({ duration: 200 })}>
+        <!-- LABEL: Please enter a valid VPA of the form username@bank -->
+        <!-- LABEL: Enter your UPI ID -->
         <Field
           formatter={{ type: 'vpa' }}
           {pattern}
-          helpText="Please enter a valid VPA of the form username@bank"
+          helpText={$t(UPI_COLLECT_NEW_VPA_HELP)}
           id={'vpa-' + paymentMethod}
           name={'vpa-' + paymentMethod}
           type="text"
@@ -158,16 +180,17 @@
           bind:value={newVpa}
           bind:this={vpaField}
           on:blur
-          placeholder="Enter your UPI ID" />
+          placeholder={$t(UPI_COLLECT_ENTER_ID)} />
         {#if logged && canSaveVpa}
           <div class="should-save-vpa-container">
             <label
               id={'should-save-vpa-' + paymentMethod}
               for={'save-vpa-' + paymentMethod}>
+              <!-- LABEL: Securely save your UPI ID -->
               <Checkbox
                 bind:checked={rememberVpa}
                 id={'save-vpa-' + paymentMethod}>
-                Securely save your UPI ID
+                {$t(UPI_COLLECT_SAVE)}
               </Checkbox>
             </label>
           </div>

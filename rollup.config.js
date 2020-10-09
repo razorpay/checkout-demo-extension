@@ -1,8 +1,27 @@
 const { stylus, rollupCommon, getPlugins } = require('fe/rollup-plugins');
+const livereload = require('rollup-plugin-livereload');
+
 const plugins = getPlugins({
   src: ['app/modules/', 'node_modules/'],
   svelteCssPath: 'app/css/generated/',
 }).concat(stylus);
+
+if (process.env.NODE_ENV === 'dev') {
+  plugins.push(
+    livereload({
+      watch: [
+        'app/js/generated',
+        'app/css/generated',
+        'app/templates',
+        'app/index.html',
+        'app/checkout.html',
+        'app/custom.html',
+        'app/config.js',
+        'app/sdk.js',
+      ],
+    })
+  );
+}
 
 const modules = {
   'entry/razorpay': 'Razorpay',

@@ -4,7 +4,11 @@ async function selectUPIApp(context, AppNumber) {
   await context.page.click('.option:nth-of-type(' + AppNumber + ')');
 }
 
-async function respondToUPIAjax(context, { method } = {}, offerId = '') {
+async function respondToUPIAjax(
+  context,
+  { method, recurring } = {},
+  offerId = ''
+) {
   var dataValue,
     typeValue = {};
   const req = await context.expectRequest();
@@ -12,6 +16,9 @@ async function respondToUPIAjax(context, { method } = {}, offerId = '') {
     expect(req.body).toContain(offerId);
   }
   expect(req.url).toContain('create/ajax');
+  if (recurring) {
+    expect(req.body).toContain('recurring=1');
+  }
   if (method === 'qr') {
     typeValue = 'intent';
     dataValue = {

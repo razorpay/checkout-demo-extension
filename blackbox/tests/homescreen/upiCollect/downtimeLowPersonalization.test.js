@@ -39,6 +39,7 @@ describe.each(
             status: 'started',
             scheduled: false,
             severity: 'low',
+            instrument: { vpa_handle: 'ALL' },
             created_at: 1567686387,
             updated_at: 1567686387,
           },
@@ -47,7 +48,7 @@ describe.each(
     },
   })
 )('UPI tests', ({ preferences, title, options }) => {
-  test(title, async () => {
+  test.skip(title, async () => {
     preferences.methods.upi = true;
     const context = await openCheckoutWithNewHomeScreen({
       page,

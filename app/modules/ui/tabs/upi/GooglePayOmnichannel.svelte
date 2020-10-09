@@ -3,14 +3,24 @@
   import { createEventDispatcher, onMount } from 'svelte';
   import { slide } from 'svelte/transition';
 
+  import { _ as t } from 'svelte-i18n';
+
   // Util imports
   import { getSession } from 'sessionmanager';
+  import { getAnimationOptions } from 'svelte-utils';
 
   // UI imports
   import Field from 'ui/components/Field.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import Card from 'ui/elements/Card.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
+
+  import {
+    OMNI_BLOCK_HEADING,
+    OMNI_GPAY_NUMBER,
+    OMNI_ENTER_NUMBER,
+    OMNI_ERROR,
+  } from 'ui/labels/upi';
 
   // Props
   export let selected = true;
@@ -96,7 +106,8 @@
   }
 </style>
 
-<div class="legend left">Or, pay using phone number</div>
+<!-- LABEL: Or, pay using phone number -->
+<div class="legend left">{$t(OMNI_BLOCK_HEADING)}</div>
 
 <SlottedRadioOption
   name="payment_type"
@@ -104,14 +115,16 @@
   align="top"
   on:click={onSelection}
   {selected}>
-  <div id="gpay-omnichannel" slot="title">Google Pay phone number</div>
+  <!-- LABEL: Google Pay phone number -->
+  <div id="gpay-omnichannel" slot="title">{$t(OMNI_GPAY_NUMBER)}</div>
   <i slot="icon" class="top">
-    <img src="https://cdn.razorpay.com/app/googlepay.svg" alt="Google Pay" />
+    <img src="https://cdn.razorpay.com/app/googlepay.svg" alt="" />
   </i>
 
   <div slot="body">
     {#if selected}
-      <div transition:slide={{ duration: 200 }}>
+      <div transition:slide={getAnimationOptions({ duration: 200 })}>
+        <!-- LABEL: Enter your phone numbe -->
         <Field
           formatter={{ type: 'number' }}
           elemClasses="mature"
@@ -123,7 +136,7 @@
           bind:this={phoneField}
           on:blur
           value={contact}
-          placeholder="Enter your phone number" />
+          placeholder={$t(OMNI_ENTER_NUMBER)} />
       </div>
     {/if}
   </div>
@@ -131,8 +144,7 @@
 
 {#if selected}
   {#if error}
-    <p class:regular={!isFirst} class:error={isFirst}>
-      Please ensure the same number is linked to the Google Pay account.
-    </p>
+    <!-- LABEL: Please ensure the same number is linked to the Google Pay account. -->
+    <p class:regular={!isFirst} class:error={isFirst}>{$t(OMNI_ERROR)}</p>
   {/if}
 {/if}

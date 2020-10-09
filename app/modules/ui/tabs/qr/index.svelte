@@ -1,10 +1,12 @@
 <script>
   // Svelte imports
   import { onMount } from 'svelte';
+  import { t } from 'svelte-i18n';
 
   // UI imports
   import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
+  import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import FeeBearer from 'ui/components/feebearer.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
   import Tab from 'ui/tabs/Tab.svelte';
@@ -21,6 +23,13 @@
   import { getSession } from 'sessionmanager';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
+
+  import {
+    QR_GENERATING_LABEL,
+    QR_RETRY,
+    QR_SCAN_ON_PHONE,
+    QR_DOWNTIME_TEXT,
+  } from 'ui/labels/qr';
 
   // Props
   export let view = 'qr';
@@ -195,13 +204,14 @@
     <FeeBearer {paymentData} on:continue={createPaymentWithFees} />
   {:else if view === 'qr'}
     {#if loading}
-      <AsyncLoading>Generating QR Code...</AsyncLoading>
+      <!-- LABEL: Generating QR Code... -->
+      <AsyncLoading>{$t(QR_GENERATING_LABEL)}</AsyncLoading>
     {:else}
       <div
         class="message"
         style="background-image: url('{RazorpayConfig.cdn}checkout/upi-apps.png')">
-        Scan the QR using any UPI app on your phone like BHIM, PhonePe, Google
-        Pay etc.
+        <!-- LABEL: Scan the QR using any UPI app on your phone like BHIM, PhonePe, Google Pay etc. -->
+        {$t(QR_SCAN_ON_PHONE)}
       </div>
       {#if qrImage}
         <div class="qr-image">
@@ -213,15 +223,16 @@
     <div class="error mchild">
       <div class="error-text">{error}</div>
       <br />
-      <div class="btn" on:click={init}>Retry</div>
+      <!-- LABEL: Retry -->
+      <div class="btn" on:click={init}>{$t(QR_RETRY)}</div>
     </div>
   {/if}
 
   {#if down || disabled}
     <Bottom tab="qr">
       <DowntimeCallout severe={disabled}>
-        <strong>UPI QR</strong>
-        is experiencing low success rates.
+        <!-- LABEL: UPI QR is experiencing low success rates. -->
+        <FormattedText text={$t(QR_DOWNTIME_TEXT)} />
       </DowntimeCallout>
     </Bottom>
   {/if}

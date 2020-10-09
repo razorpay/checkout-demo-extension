@@ -28,6 +28,7 @@ const {
 
   // Partial Payment
   verifyPartialAmount,
+  verifyFooterText,
 } = require('../actions/common');
 
 const {
@@ -49,6 +50,7 @@ const {
   selectPersonalizationPaymentMethod,
   verifyPersonalizationText,
 } = require('../tests/homescreen/actions');
+const { delay } = require('../util.js');
 
 module.exports = function(testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
@@ -120,8 +122,14 @@ module.exports = function(testFeatures) {
 
         if (offers || (optionalContact && !callbackUrl)) {
           await selectWallet(context, 'payzapp');
+          if (feeBearer) {
+            await verifyFooterText(context, 'PAY');
+          }
         } else {
           await selectWallet(context, 'freecharge');
+          if (feeBearer) {
+            await verifyFooterText(context, 'PAY');
+          }
         }
       }
 
@@ -129,7 +137,9 @@ module.exports = function(testFeatures) {
         await viewOffers(context);
         await selectOffer(context, '1');
         await verifyOfferApplied(context);
-        await verifyDiscountPaybleAmount(context, '₹ 1,980');
+        if (!feeBearer) {
+          await verifyDiscountPaybleAmount(context, '₹ 1,980');
+        }
         await verifyDiscountAmountInBanner(context, '₹ 1,980');
         await verifyDiscountText(context, 'You save ₹20');
       }
@@ -143,7 +153,9 @@ module.exports = function(testFeatures) {
 
         return;
       }
-
+      if (feeBearer) {
+        await verifyFooterText(context, 'PAY');
+      }
       await submit(context);
       if (optionalContact && !callbackUrl) {
         await handleWalletPopUp(context);
@@ -178,8 +190,15 @@ module.exports = function(testFeatures) {
           await handleValidationRequest(context, 'fail');
           await retryPayzappWalletTransaction(context);
           await verifyOfferApplied(context);
-          await verifyDiscountPaybleAmount(context, '₹ 1,980');
-          await verifyDiscountAmountInBanner(context, '₹ 1,980');
+          if (!feeBearer) {
+            await verifyDiscountPaybleAmount(context, '₹ 1,980');
+          }
+          if (feeBearer) {
+            await verifyFooterText(context, 'PAY');
+            await verifyDiscountAmountInBanner(context, '₹ 620.54');
+          } else {
+            await verifyDiscountAmountInBanner(context, '₹ 1,980');
+          }
           await verifyDiscountText(context, 'You save ₹20');
           await submit(context);
           if (partialPayment) {
@@ -194,6 +213,9 @@ module.exports = function(testFeatures) {
           await typeOTPandSubmit(context);
           await handleValidationRequest(context, 'fail');
           await retryWalletTransaction(context);
+          if (feeBearer) {
+            await verifyFooterText(context, 'PAY');
+          }
           await submit(context);
         }
         if (feeBearer) {

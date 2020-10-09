@@ -1,15 +1,21 @@
+/* global Set */
+
 import {
   isRecurring,
   isInternational,
   getMerchantMethods,
   getRecurringMethods,
   getMerchantOrder,
+  getOrderMethod,
   getOption,
   getAmount,
   isIRCTC,
   hasFeature,
   isPayout,
   isOfferForced,
+  isASubscription,
+  getCallbackUrl,
+  isCustomerFeeBearer,
 } from 'checkoutstore';
 
 import {
@@ -18,16 +24,39 @@ import {
   getEMIBank,
 } from 'common/emi';
 
-import { getEligibleProvidersBasedOnMinAmount } from 'common/cardlessemi';
+import {
+  getEligibleProvidersBasedOnMinAmount,
+  getEligibleProvidersForFeeBearerCustomer,
+} from 'common/cardlessemi';
 import { getProvider } from 'common/paylater';
+import { getAppsForMethod, getProvider as getAppProvider } from 'common/apps';
+import { findCodeByNetworkName } from 'common/card';
 
 import { wallets, getSortedWallets } from 'common/wallet';
 import { extendConfig } from 'common/cardlessemi';
-import { mobileQuery } from 'common/useragent';
-import { getUPIIntentApps } from 'checkoutstore/native';
+import {
+  mobileQuery,
+  isFacebookWebView,
+  getOS,
+  getDevice,
+} from 'common/useragent';
+import {
+  getUPIIntentApps,
+  getCardApps,
+  getSDKMeta,
+} from 'checkoutstore/native';
 
 import { get as storeGetter } from 'svelte/store';
-import { sequence as SequenceStore } from 'checkoutstore/screens/home';
+import {
+  sequence as SequenceStore,
+  instruments as InstrumentsStore,
+  hiddenInstruments as HiddenInstrumentsStore,
+  hiddenMethods as HiddenMethodsStore,
+} from 'checkoutstore/screens/home';
+
+function isNoRedirectFacebookWebViewSession() {
+  return isFacebookWebView() && !getCallbackUrl();
+}
 
 const DEBIT_EMI_BANKS = ['HDFC_DC'];
 
@@ -38,6 +67,32 @@ const ALL_METHODS = {
         return getRecurringMethods()?.card;
       }
       return getMerchantMethods().card;
+    }
+  },
+
+  credit_card() {
+    if (
+      getAmount() &&
+      getOption('method.card') &&
+      getOption('method.credit_card')
+    ) {
+      if (isRecurring()) {
+        return getRecurringMethods()?.credit_card;
+      }
+      return getMerchantMethods().credit_card;
+    }
+  },
+
+  debit_card() {
+    if (
+      getAmount() &&
+      getOption('method.card') &&
+      getOption('method.debit_card')
+    ) {
+      if (isRecurring()) {
+        return getRecurringMethods()?.debit_card;
+      }
+      return getMerchantMethods().debit_card;
     }
   },
 
@@ -67,9 +122,8 @@ const ALL_METHODS = {
 
   emandate() {
     return (
-      !isMethodEnabled('nach') &&
+      getOrderMethod() === 'emandate' &&
       !isInternational() &&
-      !getAmount() &&
       !_Obj.isEmpty(getRecurringMethods()?.emandate)
     );
   },
@@ -94,7 +148,27 @@ const ALL_METHODS = {
   },
 
   upi() {
-    return Object.keys(UPI_METHODS).some(isUPIFlowEnabled);
+    const isAnyUpiFlowEnabled = Object.keys(UPI_METHODS).some(isUPIFlowEnabled);
+    if (isASubscription()) {
+      return (
+        isASubscription('upi') &&
+        getRecurringMethods()?.upi &&
+        isAnyUpiFlowEnabled
+      );
+    } else if (isRecurring()) {
+      return getRecurringMethods()?.upi && isAnyUpiFlowEnabled;
+    }
+    return isAnyUpiFlowEnabled;
+  },
+
+  app() {
+    if (_Obj.keys(getMerchantMethods().app).length) {
+      return true;
+    }
+    if (getMerchantMethods().google_pay_cards) {
+      return true;
+    }
+    return false;
   },
 
   qr() {
@@ -156,10 +230,60 @@ export function isZestMoneyEnabled() {
   return isMethodEnabled('cardless_emi') && getCardlessEMIProviders().zestmoney;
 }
 
+/**
+ * Only some methods are to be used on Facebook Browser
+ * when callback_url is not passed.
+ * This is done because we can't open popups on Facebook Browser.
+ */
+const METHOD_ON_FACEBOOK_BROWSER_NO_REDIRECT_CHECKER = {
+  credit_card() {
+    return true;
+  },
+
+  debit_card() {
+    return true;
+  },
+
+  card() {
+    return true;
+  },
+
+  upi() {
+    return true;
+  },
+
+  wallet() {
+    return getWallets().length > 0;
+  },
+};
+
+function isMethodEnabledForBrowser(method) {
+  // On Facebook browser, we can only use some methods when we have to use popup.
+  if (isNoRedirectFacebookWebViewSession()) {
+    const checker = METHOD_ON_FACEBOOK_BROWSER_NO_REDIRECT_CHECKER[method];
+
+    if (checker) {
+      return checker();
+    } else {
+      return false;
+    }
+  } else {
+    return true;
+  }
+}
+
 export function isMethodEnabled(method) {
+  if (getOrderMethod()) {
+    if (getOrderMethod() !== method) {
+      return false;
+    }
+  }
+
   const checker = ALL_METHODS[method];
   if (checker) {
-    return checker();
+    return checker() && isMethodEnabledForBrowser(method);
+  } else {
+    return false;
   }
 }
 
@@ -185,10 +309,25 @@ export function isContactRequiredForEMI(bank, cardType) {
  * @returns {Array} of enabled methods
  */
 export function getEnabledMethods() {
-  return ALL_METHODS |> _Obj.keys |> _Arr.filter(isMethodEnabled);
+  const merchantOrder = getMerchantOrder();
+  let merchantOrderMethod = merchantOrder?.method;
+  if (merchantOrder && isRecurring() && getAmount()) {
+    merchantOrderMethod = merchantOrder.method || 'card';
+  }
+  let methodsToConsider = ALL_METHODS |> _Obj.keys;
+
+  if (merchantOrderMethod) {
+    methodsToConsider = [merchantOrderMethod];
+  }
+
+  return methodsToConsider |> _Arr.filter(isMethodEnabled);
 }
 
 export function getSingleMethod() {
+  if (getOrderMethod()) {
+    return getOrderMethod();
+  }
+
   let oneMethod;
   const methods = getEnabledMethods();
 
@@ -231,13 +370,69 @@ export function isDebitCardEnabled() {
     : getMerchantMethods().debit_card;
 }
 
+export function getCardTypesForRecurring() {
+  if (isRecurring()) {
+    return getRecurringMethods().card;
+  }
+}
+
+export function getCardNetworksForRecurring() {
+  // "recurring": {
+  //   "card": {
+  //     "credit": ["MasterCard", "Visa", "American Express"]
+  //   }
+  // }
+  if (isRecurring()) {
+    // Using only credit cards as debit cards are only supported on some banks.
+    const networks = getRecurringMethods().card?.credit;
+    if (_.isArray(networks) && networks.length) {
+      // Example: "American Express" to "amex"
+      const codes = _Arr.map(networks, findCodeByNetworkName);
+
+      // ["mastercard", "visa"] to { mastercard: true, visa: true }
+      return _Arr.reduce(
+        codes,
+        (acc, code) => {
+          acc[code] = true;
+          return acc;
+        },
+        {}
+      );
+    }
+  }
+}
+
+export function getCardIssuersForRecurring() {
+  // "recurring": {
+  //   "card": {
+  //     "debit": {
+  //       "CITI": "CITI Bank",
+  //       "CNRB": "Canara Bank",
+  //       "ICIC": "ICICI Bank",
+  //       "KKBK": "Kotak Mahindra Bank"
+  //     }
+  //   }
+  // }
+  if (isRecurring()) {
+    return getRecurringMethods().card?.debit;
+  }
+}
+
 // additional checks for each sub-method based on UPI
 const UPI_METHODS = {
   collect: () => true,
-  omnichannel: () => !isPayout() && hasFeature('google_pay_omnichannel'),
-  qr: () => getOption('method.qr') && !global.matchMedia(mobileQuery).matches,
+  omnichannel: () =>
+    !isRecurring() && !isPayout() && hasFeature('google_pay_omnichannel'),
+  qr: () =>
+    !isRecurring() &&
+    !isPayout() &&
+    getOption('method.qr') &&
+    !global.matchMedia(mobileQuery).matches,
   intent: () =>
-    getMerchantMethods().upi_intent && getUPIIntentApps().all.length,
+    !isRecurring() &&
+    !isPayout() &&
+    getMerchantMethods().upi_intent &&
+    getUPIIntentApps().all.length,
 };
 
 // additional checks for each sub-method based on UPI OTM
@@ -259,7 +454,6 @@ function isUPIBaseEnabled() {
     // by mutual fund who can accept more than the standard limit
     (getAmount() < 1e7 || getMerchantOrder()?.method === 'upi') &&
     !isInternational() &&
-    !isRecurring() &&
     getAmount()
   );
 }
@@ -296,6 +490,85 @@ export function isUPIOtmFlowEnabled(method) {
     return false;
   }
   return isUPIOTMBaseEnabled() && UPI_OTM_METHODS[method]();
+}
+
+export function isApplicationEnabled(app) {
+  const cardApps = getCardApps();
+  const merchantMethods = getMerchantMethods();
+
+  switch (app) {
+    case 'google_pay_cards':
+      return (
+        merchantMethods.google_pay_cards &&
+        _Arr.contains(cardApps.all, 'google_pay_cards')
+      );
+    case 'cred':
+      return isCREDEnabled();
+  }
+
+  return false;
+}
+
+function isCREDEnabled() {
+  return getMerchantMethods().app?.cred;
+}
+
+export function isCREDIntentFlowAvailable() {
+  const cardApps = getCardApps();
+  return _Arr.contains(cardApps.all, 'cred');
+}
+
+export function getPayloadForCRED() {
+  const { platform } = getSDKMeta();
+  return {
+    method: 'app',
+    provider: 'cred',
+    app_present: isCREDIntentFlowAvailable() ? 1 : 0,
+    '_[agent][platform]': platform,
+    '_[agent][device]': getDevice(),
+    '_[agent][os]': getOS(),
+  };
+}
+
+export function isContactRequiredForInstrument(instrument) {
+  if (
+    instrument.method === 'app' &&
+    instrument.providers?.length === 1 &&
+    instrument.providers[0] === 'cred'
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+export function isContactRequiredForAppProvider(code) {
+  if (code === 'cred') {
+    return true;
+  }
+
+  return false;
+}
+
+export function getAppsForCards() {
+  if (!isMethodEnabled('card')) {
+    return [];
+  }
+
+  const disableAllApps = storeGetter(HiddenMethodsStore).includes('app');
+  if (disableAllApps) {
+    return [];
+  }
+
+  const apps = getAppsForMethod('card') |> _Arr.filter(isApplicationEnabled);
+
+  const disabledApps = storeGetter(HiddenInstrumentsStore)
+    .filter(instrument => instrument.method === 'app' && instrument.provider)
+    .map(instrument => instrument.provider);
+
+  const filteredApps = apps.filter(app => !disabledApps.includes(app));
+
+  return filteredApps;
 }
 
 export function getCardNetworks() {
@@ -496,7 +769,31 @@ export function getPayLaterProviders() {
   if (paylater |> _Obj.isEmpty) {
     return [];
   }
-  return paylater |> _Obj.keys |> _Arr.map(getProvider) |> _Arr.filter(_ => _);
+  return paylater |> _Obj.keys |> _Arr.map(getProvider) |> _Arr.filter(Boolean);
+}
+
+/*
+  @returns {Array} of providers
+ */
+export function getAppProviders() {
+  const merchantMethods = getMerchantMethods();
+  const apps = _Obj.clone(merchantMethods.app || {});
+  if (merchantMethods.google_pay_cards) {
+    // Older preferences format for Google Pay Cards,
+    // if preferences.app contains google_pay_cards,
+    // then remove this hardcoded flag.
+    apps.google_pay_cards = true;
+  }
+  if (apps |> _Obj.isEmpty) {
+    return [];
+  }
+  return (
+    apps
+    |> _Obj.keys
+    |> _Arr.filter(isApplicationEnabled)
+    |> _Arr.map(getAppProvider)
+    |> _Arr.filter(Boolean)
+  );
 }
 
 export function getCardlessEMIProviders() {
@@ -509,7 +806,13 @@ export function getCardlessEMIProviders() {
     emiMethod.bajaj = true;
   }
 
-  return getEligibleProvidersBasedOnMinAmount(getAmount(), emiMethod);
+  let providers = getEligibleProvidersBasedOnMinAmount(getAmount(), emiMethod);
+
+  if (isCustomerFeeBearer()) {
+    providers = getEligibleProvidersForFeeBearerCustomer(providers);
+  }
+
+  return providers;
 }
 
 export function getWallets() {
@@ -540,10 +843,21 @@ export function getWallets() {
     enabledWallets =
       enabledWallets |> _Arr.filter(wallet => passedWallets[wallet] !== false);
   }
+
+  const noRedirectFacebookWebViewSession = isNoRedirectFacebookWebViewSession();
+
   return (
     enabledWallets
     |> _Arr.map(wallet => wallets[wallet])
     |> _Arr.filter(Boolean)
+    |> _Arr.filter(wallet => {
+      if (noRedirectFacebookWebViewSession) {
+        // Only power wallets are supported on Facebook browser w/o callback_url
+        return wallet.power;
+      } else {
+        return true;
+      }
+    })
     |> getSortedWallets
   );
 }
@@ -566,14 +880,24 @@ function addExternalWallets(enabledWallets) {
  * @returns {Array<string>}
  */
 function getUsableMethods() {
-  return storeGetter(SequenceStore);
+  const instruments = storeGetter(InstrumentsStore);
+  const methodsFromInstruments = instruments
+    .filter(instrument => instrument._type === 'method')
+    .map(instrument => instrument.method);
+
+  // SequenceStore has methods that are available but not shown on the homescreen (eg: EMI on Cards)
+  const sequenceMethods = storeGetter(SequenceStore);
+
+  const methods = methodsFromInstruments.concat(sequenceMethods);
+
+  // Make unique
+  // Array.from(Set) is polyfilled on IE. Safe to use.
+  return Array.from(new Set(methods));
 }
 
 /**
  * Some methods might not be usable because they are hidden
  * from the homescreen
- *
- * TODO: Should consider method instruments
  *
  * @param {string} method
  *

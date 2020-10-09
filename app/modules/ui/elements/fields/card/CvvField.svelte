@@ -1,6 +1,11 @@
 <script>
   import Field from 'ui/components/Field.svelte';
 
+  // i18n
+  import { t, locale } from 'svelte-i18n';
+  import { formatTemplateWithLocale } from 'i18n';
+  import { CVV_LABEL, CVV_HELP } from 'ui/labels/card';
+
   export let ref = null;
 
   function handleInput(event) {
@@ -14,24 +19,26 @@
   export let showHelp = true;
 
   let cvvPattern = '[0-9]{3}';
-  let helpText = `It's a ${length} digit code printed on the back of your card.`;
+  let helpText = formatTemplateWithLocale(CVV_HELP, { length }, $locale);
   let placeholder;
   let label;
 
   $: {
     if (showHelp) {
-      helpText = `It's a ${length} digit code printed on the back of your card.`;
+      // LABEL: It's a {length} digit code printed on the back of your card.
+      helpText = formatTemplateWithLocale(CVV_HELP, { length }, $locale);
     } else {
       helpText = null;
     }
   }
 
   $: {
+    // LABEL: CVV
     if (showPlaceholder) {
       label = null;
-      placeholder = 'CVV';
+      placeholder = $t(CVV_LABEL);
     } else {
-      label = 'CVV';
+      label = $t(CVV_LABEL);
       placeholder = null;
     }
   }
@@ -90,6 +97,7 @@
   on:input={handleInput}
   on:input
   on:blur
+  on:focus
   handleBlur
   handleFocus
   handleInput />

@@ -69,7 +69,14 @@ async function selectPersonalizationPaymentMethod(context, optionNumber) {
   await apiOption[optionNumber - 1].click();
 }
 
+async function receiveApiInstruments(context) {
+  const req = await context.expectRequest();
+  expect(req.url).toContain('/personalisation');
+  await context.respondJSON({});
+}
+
 module.exports = {
   verifyPersonalizationText,
   selectPersonalizationPaymentMethod,
+  receiveApiInstruments,
 };

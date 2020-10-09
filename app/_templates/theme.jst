@@ -37,10 +37,12 @@ var activeStateColor = themeMeta.activeStateColor;
   border-color: `=highlightColor` !important;
 }
 
-.text-btn,
+.hc_border:disabled {
+  border-color: #ccc !important;
+}
+
 #cancel_upi .back-btn,
 .offer-info li:first-child,
-
 .options-list .option:hover,
 .options .option:hover,
 .options .option:focus {
@@ -211,7 +213,7 @@ color: `=c`;
   border-bottom-left-radius: 2px;
 }
 
-.border-list:not(.touchfix) > *:hover:not(:disabled),
+.border-list:not(.touchfix) > *:not(.uninteractive):hover:not(:disabled),
 .border-list > *:focus,
 .border-list > *:focus-within,
 .border-list > .selected {
@@ -223,7 +225,7 @@ color: `=c`;
   border-bottom: none;
 }
 
-.border-list:not(.touchfix) > *:hover:not(:disabled) + *,
+.border-list:not(.touchfix) > *:hover:not(:disabled):not(.uninteractive) + *,
 .border-list > *:focus + *,
 .border-list > *:focus-within + *,
 .border-list > .selected + * {

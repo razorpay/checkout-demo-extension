@@ -1,3 +1,4 @@
+import { tick } from 'svelte';
 import EMIPlansView from 'ui/tabs/emi/emiplans.svelte';
 import * as TermsCurtain from 'checkoutframe/termscurtain';
 import Analytics from 'analytics';
@@ -116,10 +117,16 @@ emiPlansView.prototype = {
       const session = getSession();
 
       var offer = session.getAppliedOffer();
-      if (offer && offer.id !== plan.offer_id) {
+      const isNoCostEmi = offer && offer.emi_subvention;
+
+      if (isNoCostEmi && offer.id !== plan.offer_id) {
         return session.showOffersError(offerRemoved => {
           if (offerRemoved) {
-            on.select(event);
+            // Offer is actually removed after `tick`
+            // So we need to wait as well
+            tick().then(() => {
+              on.select(event);
+            });
           } else {
             this.view.deselectAll();
           }

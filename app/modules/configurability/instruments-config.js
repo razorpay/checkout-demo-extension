@@ -1,3 +1,5 @@
+import { AVAILABLE_METHODS } from 'common/constants';
+
 /**
  * Get the updated payment payload augmented with the given instrument
  * @param {Instrument} instrument
@@ -40,7 +42,7 @@ function genericIsValid(instrument) {
   return true;
 }
 
-function genericGroupedToIndividual(grouped, customer) {
+export function genericGroupedToIndividual(grouped, customer) {
   return [grouped];
 }
 
@@ -136,7 +138,6 @@ const config = {
     },
     isValid: instrument => {
       if (instrument.token_id) {
-        return true;
       }
 
       const hasIssuers = Boolean(instrument.issuers);
@@ -367,8 +368,6 @@ const config = {
     },
   },
 
-  paypal: {},
-
   cardless_emi: {
     properties: ['providers'],
     payment: ['provider'],
@@ -409,13 +408,47 @@ const config = {
       Boolean(instrument.providers) && instrument.providers.length > 0,
   },
 
-  bank_transfer: {},
+  app: {
+    properties: ['providers'],
+    payment: ['provider'],
+    groupedToIndividual: grouped => {
+      const base = _Obj.clone(grouped);
+      delete base.providers;
 
-  // TODO: Pending methods: emi, gpay
+      return _Arr.map(grouped.providers || [], provider => {
+        return _Obj.extend(
+          {
+            provider,
+          },
+          base
+        );
+      });
+    },
+    isValid: instrument =>
+      Boolean(instrument.providers) && instrument.providers.length > 0,
+  },
+  // TODO: Pending methods: emi
 };
 
 // EMI and Cards are the same for now.
 config.emi = config.card;
+config.credit_card = config.card;
+config.debit_card = config.card;
+
+// UPI OTM is the same as UPI for now.
+config.upi_otm = config.upi;
+
+/**
+ * This will set config as {} for methods that
+ * do not have a specific config.
+ *
+ * eg: bank_transfer, paypal, gpay
+ */
+_Arr.loop(AVAILABLE_METHODS, method => {
+  if (!config[method]) {
+    config[method] = {};
+  }
+});
 
 _Obj.loop(config, (val, method) => {
   config[method] = _Obj.extend(

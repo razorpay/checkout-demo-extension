@@ -1,7 +1,10 @@
 const { delay } = require('../util');
 const querystring = require('querystring');
 
-async function respondAndVerifyIntentRequest(context) {
+async function respondAndVerifyIntentRequest(
+  context,
+  { isBrowserIntent = false } = {}
+) {
   const reqorg = await context.expectRequest();
   expect(reqorg.url).toEqual(
     'https://api.razorpay.com/v1/payments/create/ajax'
@@ -30,6 +33,9 @@ async function respondAndVerifyIntentRequest(context) {
   await context.respondPlain(
     `${req.params.callback}(${JSON.stringify(successResult)})`
   );
+  if (isBrowserIntent) {
+    return;
+  }
   const result = await context.getResult();
   expect(result).toMatchObject(successResult);
 }
@@ -119,7 +125,18 @@ async function expectRedirectWithCallback(context, fields) {
       !context.isContactOptional &&
       !context.preferences.offers)
   ) {
-    apiSuffix = 'ajax';
+    if (fields.method === 'wallet') {
+      const powerWallets = ['mobikwik', 'freecharge', 'payumoney'];
+      const isPowerWallet = powerWallets.includes(fields.wallet);
+
+      if (isPowerWallet) {
+        apiSuffix = 'ajax';
+      } else {
+        apiSuffix = 'checkout';
+      }
+    } else {
+      apiSuffix = 'ajax';
+    }
   } else if (
     context.preferences.methods.cardless_emi != undefined &&
     context.preferences.customer != undefined
@@ -149,7 +166,30 @@ async function failRequestwithErrorMessage(context, errorMessage) {
 }
 
 async function selectBank(context, bank) {
-  await context.page.select('#bank-select', bank);
+  // Open search modal
+  await context.page.click('#bank-select');
+
+  // Wait for modal to open
+  await context.page.waitForSelector('.search-field input');
+
+  // Type bank code
+  await context.page.type('.search-field input', bank);
+
+  // Wait for top result
+  await context.page.waitForSelector(
+    '.search-box .list .list-item:first-child',
+    {
+      timeout: 300,
+    }
+  );
+
+  // Select top result
+  await context.page.click('.search-box .list .list-item:first-child');
+
+  // Wait for modal to be hidden
+  await context.page.waitForSelector('.search-field input', {
+    hidden: true,
+  });
 }
 
 async function retryTransaction(context) {

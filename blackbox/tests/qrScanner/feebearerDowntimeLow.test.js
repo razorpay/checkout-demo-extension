@@ -9,7 +9,7 @@ const {
   responseWithQRImage,
   validateQRImage,
   handleFeeBearer,
-  verifyLowDowntime,
+  verifyMethodWarned,
   selectUPIApp,
   respondToUPIPaymentStatus,
 } = require('../../actions/common');
@@ -36,6 +36,7 @@ describe('QR Code Downtime payment', () => {
             status: 'started',
             scheduled: false,
             severity: 'low',
+            instrument: { vpa_handle: 'ALL' },
             created_at: 1567686387,
             updated_at: 1567686387,
           },
@@ -48,7 +49,7 @@ describe('QR Code Downtime payment', () => {
     await fillUserDetails(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await verifyLowDowntime(context, 'UPI', 'upi');
+    await verifyMethodWarned(context, 'UPI', 'upi');
     await selectUPIApp(context, '1');
     await handleFeeBearer(context);
     await respondToUPIAjax(context, { method: 'qr' });

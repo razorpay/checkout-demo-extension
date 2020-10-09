@@ -12,7 +12,7 @@ describe.each(
   getTestData('Check hidden options', {
     options: {
       prefill: {
-        contact: '+91222222222',
+        contact: '+912222222222',
         email: 'a@gmail.com',
       },
       hidden: {
@@ -39,6 +39,7 @@ describe.each(
     );
     await enterUserDetailsTab.click();
     await assertBasicDetailsScreen(context);
+    await assertSelectorAbsence(context, '#country-code');
     await assertSelectorAbsence(context, '#contact');
     await fillUserDetails(context);
     await proceed(context);
@@ -49,7 +50,7 @@ describe.each(
   getTestData('Check hidden options', {
     options: {
       prefill: {
-        contact: '+91222222222',
+        contact: '+912222222222',
         email: 'a@gmail.com',
       },
       hidden: {
@@ -77,7 +78,7 @@ describe.each(
   getTestData('Check hidden options', {
     options: {
       prefill: {
-        contact: '+91222222222',
+        contact: '+912222222222',
         email: 'a@gmail.com',
       },
       hidden: {

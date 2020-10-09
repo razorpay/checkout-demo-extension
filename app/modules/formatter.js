@@ -1,6 +1,7 @@
 import * as Card from 'common/card';
 import Eventer from 'eventer';
 import EvtHandler from 'evthandler';
+import { luhnCheck } from 'lib/utils';
 
 const alphanumericRaw = function(value) {
   var returnVal = value.replace(/[^a-zA-Z0-9]/g, '');
@@ -85,7 +86,7 @@ Formatter.rules = {
       if (!value) {
         value = this.value;
       }
-      if (!Card.luhnCheck(value)) {
+      if (!luhnCheck(value)) {
         return;
       }
       if (this.type === 'maestro' && value.length === 16) {
@@ -205,18 +206,8 @@ Formatter.rules = {
 
   phone: {
     raw: function(value) {
-      /**
-       * Replace "+0" with "+91"
-       * because we show a "+" by default in the input field
-       * and Chrome's autofill enters the local format
-       * of the number, i.e. starting with a "0" instead of "91".
-       *
-       * Fuck Chrome
-       */
-      let returnVal = value
-        .replace('+0', '+91')
-        .slice(0, 15)
-        .replace(/[^+\d]/g, '');
+      let returnVal = value.slice(0, 15).replace(/[^+\d]/g, '');
+
       return `${returnVal}`;
     },
 
@@ -226,6 +217,24 @@ Formatter.rules = {
       }
 
       return /^\+?[0-9]{8,15}$/.test(value);
+    },
+  },
+
+  country_code: {
+    raw: function(value) {
+      if (!_Str.startsWith(value, '+')) {
+        value = `+${value}`;
+      }
+
+      return value;
+    },
+
+    isValid: function(value) {
+      if (!value) {
+        value = this.value;
+      }
+
+      return /^\+[0-9]{1,6}$/.test(value);
     },
   },
 };
@@ -330,6 +339,11 @@ formatterProto.unbind = function() {
 };
 
 formatterProto.run = function(values) {
+  // Don't do anything if the field is readonly
+  if (this.el.readOnly) {
+    return;
+  }
+
   // domValue is would-be value, if not prevented (keypress, keydown)
   //    we prevent all the time in that case
   //    for events with non-preventable character printing,

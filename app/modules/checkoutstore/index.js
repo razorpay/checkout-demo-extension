@@ -1,7 +1,7 @@
 import { writable } from 'svelte/store';
 import { getDowntimes as _getDowntimes } from 'checkoutframe/downtimes';
-import { TAB_TITLES } from 'common/constants';
 import { makeAuthUrl as _makeAuthUrl } from 'common/Razorpay';
+import { displayAmount } from 'common/currency';
 
 let razorpayInstance, preferences;
 export const razorpayInstanceStore = writable();
@@ -11,8 +11,6 @@ export function setRazorpayInstance(_razorpayInstance) {
   preferences = razorpayInstance.preferences;
   razorpayInstanceStore.set(_razorpayInstance);
   if (isIRCTC()) {
-    TAB_TITLES.upi = 'BHIM/UPI';
-    TAB_TITLES.card = 'Debit/Credit Card';
     razorpayInstance.set('theme.image_frame', false);
   }
 }
@@ -27,9 +25,13 @@ const IRCTC_KEYS = [
 
 export const isIRCTC = () => IRCTC_KEYS |> _Arr.contains(getOption('key'));
 
-export const getMerchantMethods = () => preferences.methods;
-export const getRecurringMethods = () => preferences.methods.recurring;
+export const getPayoutContact = () => preferences.contact;
+export const getDisplayAmount = am => displayAmount(razorpayInstance, am);
+export const getMerchantMethods = () => preferences.methods || {};
+export const getRecurringMethods = () => getMerchantMethods().recurring;
+export const getMethodsCustomText = () => getMerchantMethods().custom_text;
 export const getMerchantOrder = () => preferences.order;
+export const getOrderMethod = () => getMerchantOrder()?.method;
 export const getMerchantOffers = () => preferences.offers;
 export const isOfferForced = () => preferences.force_offer;
 export const getDowntimes = () => _getDowntimes(preferences);
@@ -39,6 +41,7 @@ export const getCheckoutConfig = () => preferences.checkout_config;
 const optionGetter = option => () => getOption(option);
 export const getOption = option => razorpayInstance.get(option);
 export const setOption = (option, value) => razorpayInstance.set(option, value);
+export const getCallbackUrl = optionGetter('callback_url');
 export const getCardFeatures = iin => razorpayInstance.getCardFeatures(iin);
 export const getCardCurrencies = ({ iin, tokenId, cardNumber }) =>
   razorpayInstance.getCardCurrencies({
@@ -74,6 +77,8 @@ export const getPrefilledEmail = optionGetter('prefill.email');
 export const getPrefilledName = optionGetter('prefill.name');
 export const getPrefilledCardNumber = optionGetter('prefill.card[number]');
 export const getPrefilledVPA = optionGetter('prefill.vpa');
+
+export const showFeeLabel = writable(true);
 
 export function hasFeature(feature, fallbackValue) {
   return _Obj.getSafely(preferences, `features.${feature}`, fallbackValue);
@@ -142,11 +147,25 @@ export function isPartialPayment() {
   return preferences.order && preferences.order.partial_payment;
 }
 
+export function isASubscription(method = null) {
+  if (!preferences.subscription) {
+    return false;
+  }
+
+  // return true if no method is specified. This is a subscription session
+  if (!method) {
+    return true;
+  } else {
+    return preferences.subscription[method] !== false;
+  }
+}
+
+export function getSubscription() {
+  return preferences.subscription;
+}
+
 export function isRecurring() {
-  if (
-    getOption('prefill.method') === 'emandate' &&
-    (preferences.methods || {}).recurring
-  ) {
+  if (getOrderMethod() === 'emandate' && getRecurringMethods()) {
     return true;
   }
   return preferences.subscription || getOption('recurring');
@@ -174,10 +193,15 @@ export function shouldRememberCustomer() {
   if (razorpayInstance.get().remember_customer === true) {
     return true;
   }
-  if (isContactOptional() && !getPrefilledContact()) {
-    return false;
-  }
+
   return getOption('remember_customer');
+}
+
+export function shouldStoreCustomerInStorage() {
+  const globalCustomer = preferences && preferences.global;
+  const rememberCustomer = razorpayInstance.get().remember_customer;
+
+  return globalCustomer && rememberCustomer;
 }
 
 export function shouldSeparateDebitCard() {
@@ -266,4 +290,17 @@ export function getMerchantConfig() {
       preferences: configFromPreferences,
     },
   };
+}
+
+/**
+ * CRED wants put ads in instrument subtext.
+ *
+ * @param code
+ * @returns {*}
+ */
+export function getCustomSubtextForMethod(code) {
+  const customText = getMethodsCustomText();
+  if (customText && customText[code]) {
+    return customText[code];
+  }
 }

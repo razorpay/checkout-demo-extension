@@ -3,9 +3,23 @@
   import Field from 'ui/components/Field.svelte';
   import Tab from 'ui/tabs/Tab.svelte';
 
-  // Refs
-  export let accountNumberField = null;
-  export let confirmAccountNumberField = null;
+  // i18n
+  import { t } from 'svelte-i18n';
+  import {
+    ACCOUNT_NUMBER_LABEL,
+    ACCOUNT_NUMBER_HELP,
+    ACCOUNT_NUMBER_CONFIRM_LABEL,
+    ACCOUNT_NUMBER_CONFIRM_HELP,
+    IFSC_LABEL,
+    IFSC_HELP,
+    NAME_LABEL,
+    NAME_HELP,
+  } from 'ui/labels/payouts';
+
+  let accountNumberField;
+  let confirmAccountNumberField;
+  let ifscField;
+  let nameField;
 
   export function validateConfirmAccount() {
     const value = accountNumberField.getValue();
@@ -13,6 +27,17 @@
     if (value !== confirmValue) {
       confirmAccountNumberField.setValid(false);
     }
+  }
+
+  export function getPayload() {
+    return {
+      account_type: 'bank_account',
+      bank_account: {
+        account_number: accountNumberField.getValue(),
+        name: nameField.getValue(),
+        ifsc: ifscField.getValue(),
+      },
+    };
   }
 </script>
 
@@ -22,16 +47,18 @@
   }
 </style>
 
-<Tab method="payout_account" overrideMethodCheck={true} pad={false}>
-
+<Tab
+  method="payout_account"
+  overrideMethodCheck={true}
+  pad={false}
+  shown={true}>
   <div class="fields-container">
-
     <Field
       type="text"
       name="account_number"
       id="account_number"
-      placeholder="Account number"
-      helpText="Please enter a valid account number"
+      placeholder={$t(ACCOUNT_NUMBER_LABEL)}
+      helpText={$t(ACCOUNT_NUMBER_HELP)}
       maxlength="20"
       required={true}
       bind:this={accountNumberField}
@@ -42,8 +69,8 @@
       type="text"
       name="account_number_confirm"
       id="account_number_confirm"
-      placeholder="Re-enter account number"
-      helpText="Please confirm the account number"
+      placeholder={$t(ACCOUNT_NUMBER_CONFIRM_LABEL)}
+      helpText={$t(ACCOUNT_NUMBER_CONFIRM_HELP)}
       maxlength="20"
       required={true}
       bind:this={confirmAccountNumberField}
@@ -55,22 +82,22 @@
       type="text"
       name="ifsc"
       id="ifsc"
-      placeholder="IFSC"
-      helpText="Please enter a valid IFSC"
+      placeholder={$t(IFSC_LABEL)}
+      helpText={$t(IFSC_HELP)}
       maxlength="11"
       required={true}
+      bind:this={ifscField}
       formatter={{ type: 'ifsc' }} />
 
     <Field
       type="text"
       name="name"
       id="name"
-      placeholder="Account holder name"
-      helpText="Please enter a valid account name"
+      placeholder={$t(NAME_LABEL)}
+      helpText={$t(NAME_HELP)}
       pattern={"^[a-zA-Z. 0-9']{1,100}$"}
       maxlength="100"
-      required={true} />
-
+      required={true}
+      bind:this={nameField} />
   </div>
-
 </Tab>

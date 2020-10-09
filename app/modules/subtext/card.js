@@ -178,3 +178,103 @@ export function generateSubtextForCardInstrument(instrument) {
     return concatTruthyString(stringList);
   }
 }
+
+export function generateSubtextForRecurring({
+  types = {},
+  networks = {},
+  issuers = {},
+  subscription,
+  offer,
+}) {
+  const { debit, credit } = types;
+  const { mastercard, visa, amex } = networks;
+
+  const debitCardIssuers = generateTextFromList(_Obj.values(issuers));
+  const creditCardsNetworks = generateTextForCardNetwork({
+    mastercard,
+    visa,
+    amex,
+  });
+
+  if (subscription) {
+    const subscriptionText = 'Subscription payments are supported on';
+    if (credit && debit) {
+      // Subscription payments are supported on Mastercard, Visa, and American Express credit cards and debit cards from ICICI, Kotak, Citibank, and Canara Bank.
+      return [
+        subscriptionText,
+        creditCardsNetworks,
+        'credit cards and',
+        'debit cards from',
+        debitCardIssuers + '.',
+      ].join(' ');
+    } else if (debit) {
+      // Subscription payments are supported on debit cards from ICICI, Kotak, Citibank, and Canara Bank.
+      return [
+        subscriptionText,
+        'debit cards from',
+        debitCardIssuers + '.',
+      ].join(' ');
+    } else {
+      // Subscription payments are supported on Mastercard, Visa, and American Express credit cards.
+      return [subscriptionText, creditCardsNetworks, 'credit cards' + '.'].join(
+        ' '
+      );
+    }
+  } else if (offer) {
+    // All issuer cards are supported for this payment.
+    // All issuer credit cards are supported for this payment.
+    // All issuer debit cards are supported for this payment.
+    return [
+      'All',
+      offer.issuer,
+      generateTextForCardType(credit, debit),
+      'are supported for this payment.',
+    ].join(' ');
+  } else {
+    if (credit && debit) {
+      // Mastercard, Visa, and American Express credit cards and debit cards from ICICI, Kotak, Citibank, and Canara Bank are supported for this payment.
+      return [
+        creditCardsNetworks,
+        'credit cards',
+        'and debit cards from',
+        debitCardIssuers,
+        'are supported for this payment.',
+      ].join(' ');
+    } else if (debit) {
+      // Only debit cards from ICICI, Kotak, Citibank, and Canara Bank are supported for this payment.
+      return [
+        'Only debit cards from',
+        debitCardIssuers,
+        'are supported for this payment.',
+      ].join(' ');
+    } else {
+      // Only Mastercard, Visa, and American Express credit cards are supported for this payment.
+      return [
+        'Only',
+        creditCardsNetworks,
+        'credit cards',
+        'are supported for this payment.',
+      ].join(' ');
+    }
+  }
+}
+
+function generateTextForCardType(credit, debit) {
+  if (credit && debit) {
+    return 'cards';
+  } else if (debit) {
+    return 'debit cards';
+  } else {
+    return 'credit cards';
+  }
+}
+
+function generateTextForCardNetwork({ mastercard, visa, amex }) {
+  const networksList =
+    [
+      visa ? 'Visa' : '',
+      mastercard ? 'Mastercard' : '',
+      amex ? 'American Express' : '',
+    ] |> _Arr.filter(Boolean);
+  return generateTextFromList(networksList);
+}

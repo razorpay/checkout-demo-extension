@@ -1,7 +1,68 @@
 import { derived, writable } from 'svelte/store';
+import {
+  isInstrumentGrouped,
+  isInstrumentForEntireMethod,
+} from 'configurability/instruments';
+import { findCountryCode } from 'common/countrycodes';
+import { INDIA_COUNTRY_CODE } from 'common/constants';
 
-export const contact = writable('+');
+export const country = writable('');
+export const phone = writable('');
+export const contact = derived([country, phone], ([$country, $phone]) => {
+  if ($phone) {
+    return $country + $phone;
+  } else {
+    return '';
+  }
+});
+
+export const proxyCountry = writable('');
+export const proxyPhone = writable('');
+export const proxyContact = derived(
+  [proxyCountry, proxyPhone],
+  ([$proxyCountry, $proxyPhone]) => {
+    if ($proxyPhone) {
+      return $proxyCountry + $proxyPhone;
+    } else {
+      return '';
+    }
+  }
+);
+
+country.subscribe(country => {
+  proxyCountry.set(country);
+});
+
+phone.subscribe(phone => {
+  proxyPhone.set(phone);
+});
+
+/**
+ * Sets $country, $phone, and in turn $contact
+ * @param {string} value contact
+ */
+export function setContact(value) {
+  const parsedContact = findCountryCode(value);
+
+  if (parsedContact.code) {
+    country.set(`+${parsedContact.code}`);
+  } else {
+    country.set(INDIA_COUNTRY_CODE);
+  }
+
+  phone.set(parsedContact.phone);
+}
+
 export const email = writable('');
+
+/**
+ * Sets $email
+ * @param {string} value email
+ */
+export function setEmail(value) {
+  email.set(value);
+}
+
 export const emiContact = writable('');
 
 export const address = writable('');
@@ -18,6 +79,9 @@ export const instruments = derived(blocks, allBlocks => {
 
   return allInstruments;
 });
+export const hiddenInstruments = writable([]);
+export const hiddenMethods = writable([]);
+
 export const sequence = writable([]);
 
 export const selectedInstrumentId = writable(null);
@@ -33,7 +97,24 @@ export const selectedInstrument = derived(
 /**
  * Stores the instrument for which method is opened
  */
-export const methodTabInstrument = writable(null);
+export const methodInstrument = derived(
+  selectedInstrument,
+  $selectedInstrument => {
+    if (!$selectedInstrument) {
+      return null;
+    }
+
+    if (isInstrumentForEntireMethod($selectedInstrument)) {
+      return $selectedInstrument;
+    }
+
+    if (isInstrumentGrouped($selectedInstrument)) {
+      return $selectedInstrument;
+    }
+
+    return null;
+  }
+);
 
 /**
  * A contact is said to be present if it has more than three characters,
@@ -43,15 +124,3 @@ export const isContactPresent = derived(
   contact,
   contactValue => contactValue && contactValue !== '+91' && contactValue !== '+'
 );
-
-/**
- * Toggle visibility of contact details in the topbar
- * depending on the presence of contact number.
- */
-isContactPresent.subscribe(value => {
-  const topbar = _Doc.querySelector('#topbar #top-right');
-
-  if (topbar) {
-    _El.keepClass(topbar, 'hidden', !value);
-  }
-});

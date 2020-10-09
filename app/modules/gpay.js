@@ -1,48 +1,8 @@
-import { NO_PAYMENT_ADAPTER_ERROR } from 'common/constants';
+import { CHECK_ERROR } from 'common/constants';
 
 const PaymentRequest = global.PaymentRequest;
 
-const googlePaySupportedMethods = ['https://tez.google.com/pay'];
-
-const CHECK_ERROR = {
-  description: NO_PAYMENT_ADAPTER_ERROR,
-};
-
-/**
- * Returns a Promise that resolves if Google Pay is present.
- * @return {Promise}
- */
-export function checkPaymentRequestApi() {
-  return new Promise((resolve, reject) => {
-    try {
-      /**
-       * PaymentRequest API is only available in the modern browsers which
-       * have Promise API.
-       */
-      new PaymentRequest([{ supportedMethods: googlePaySupportedMethods }], {
-        total: {
-          label: '_',
-          amount: { currency: 'INR', value: 0 },
-        },
-      })
-        .canMakePayment()
-        .then(isAvailable => {
-          if (isAvailable) {
-            resolve();
-          } else {
-            reject(CHECK_ERROR);
-          }
-        })
-        /* jshint ignore:start */
-        .catch(e => {
-          reject(CHECK_ERROR);
-        });
-      /* jshint ignore:end */
-    } catch (e) {
-      reject(CHECK_ERROR);
-    }
-  });
-}
+export const googlePaySupportedMethods = ['https://tez.google.com/pay'];
 
 /**
  * Checks if Google Pay microapps API is available
@@ -141,7 +101,7 @@ function transformIntentForMicroappPayload(intentUrl) {
     transactionInfo: {
       countryCode: 'IN',
       totalPriceStatus: 'FINAL',
-      totalPrice: intentParams.am,
+      totalPrice: Number(intentParams.am).toFixed(2),
       currencyCode: intentParams.cu,
       transactionNote: intentParams.tn,
     },
@@ -171,3 +131,9 @@ export function payWithMicroapp(intentUrl) {
     return response;
   });
 }
+
+export const googlePayCardsCancelPayload = {
+  '_[method]': 'app',
+  '_[provider]': 'google_pay_cards',
+  '_[reason]': 'PAYMENT_CANCEL_ON_APP',
+};

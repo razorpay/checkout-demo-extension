@@ -9,6 +9,15 @@
   import { emiContact, contact } from 'checkoutstore/screens/home';
   import { cardNumber, selectedCard } from 'checkoutstore/screens/card';
 
+  // i18n
+  import { t } from 'svelte-i18n';
+  import {
+    CONTACT_TITLE,
+    CONTACT_DESCRIPTION,
+    CONTACT_HELP,
+    CARD_BOX_TITLE,
+  } from 'ui/labels/debit-emi';
+
   let contactValue = $emiContact || $contact || '';
 
   export let isSavedCard = false;
@@ -47,12 +56,15 @@
 </style>
 
 <div class="emi-contact">
-  <h3 class="title">SELECTED DEBIT CARD</h3>
+  <!-- LABEL: SELECTED DEBIT CARD -->
+  <h3 class="title">{$t(CARD_BOX_TITLE)}</h3>
   <CardBox entity={isSavedCard ? $selectedCard.token : $cardNumber} />
-  <h3 class="title">MOBILE NUMBER</h3>
+  <!-- LABEL: MOBILE NUMBER -->
+  <h3 class="title">{$t(CONTACT_TITLE)}</h3>
   <div class="contact selected no-autofill-overlay">
     <span>
-      Enter the mobile number registered with your bank and Debit Card.
+      <!-- LABEL: Enter the mobile number registered with your bank and Debit Card. -->
+      {$t(CONTACT_DESCRIPTION)}
     </span>
     <Field
       id="emi-contact"
@@ -62,13 +74,13 @@
       required
       xautocompletetype="phone-full"
       pattern={INDIAN_CONTACT_PATTERN}
-      icon="&#xe607;"
+      icon=""
       on:input
       on:blur
       handleFocus={true}
       handleBlur={true}
       handleInput={true}
       value={contactValue}
-      helpText="Please enter a valid indian mobile number" />
+      helpText={$t(CONTACT_HELP)} />
   </div>
 </div>

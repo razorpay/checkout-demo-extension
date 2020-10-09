@@ -36,6 +36,9 @@ function checkoutRequestHandler(request) {
     return request.respond({ status: 200 });
   } else if (url.startsWith('data')) {
     return;
+  } else if (url.includes('livereload')) {
+    // Livereload URLs come if you have `npm run start` on while testing
+    return request.respond({ status: 200 });
   } else {
     throw new Error(
       `unexpected resource URL while loading checkout-public: ${url}`
@@ -74,6 +77,57 @@ async function passMessage(page, message) {
   await page.evaluate(message => handleMessage(message), message);
 }
 
+const API_PREFERRED_INSTRUMENTS = {
+  upi: [
+    {
+      method: 'upi',
+      instrument: 'dsd@okhdfcbank',
+      score: 1,
+    },
+
+    {
+      method: 'upi',
+      instrument: 'dfs@okicici',
+      score: 1,
+    },
+  ],
+
+  wallet: [
+    {
+      method: 'wallet',
+      instrument: 'freecharge',
+      score: 1,
+    },
+  ],
+
+  netbanking: [
+    {
+      method: 'netbanking',
+      instrument: 'HDFC',
+      score: 1,
+    },
+  ],
+
+  card: [
+    {
+      method: 'card',
+      issuer: 'ICIC',
+      network: 'Visa',
+      type: 'credit',
+      instrument: 'token_9AT28Pxxe0Npi9',
+      score: 1,
+    },
+  ],
+
+  app: [
+    {
+      method: 'app',
+      provider: 'cred',
+      score: 1,
+    },
+  ],
+};
+
 let interceptorOptions;
 module.exports = {
   async openCheckout({
@@ -82,9 +136,19 @@ module.exports = {
     preferences,
     params,
     apps,
+    upiApps,
     experiments,
     method,
   }) {
+    // Disable animations for testing
+    options = {
+      ...options,
+      modal: {
+        ...(options.modal || {}),
+        animation: false,
+      },
+    };
+
     let checkoutUrl = checkoutPublic;
     if (params) {
       checkoutUrl += '?' + querystring.stringify(params);
@@ -99,6 +163,10 @@ module.exports = {
     page.on('request', checkoutRequestHandler);
     await page.goto(checkoutUrl);
 
+    if (typeof options.personalization === 'undefined') {
+      options.personalization = false;
+    }
+
     await setExperiments(page, experiments);
     if (method && options.personalization) {
       await page.evaluate(method => {
@@ -108,6 +176,7 @@ module.exports = {
         var qrInstruments = {};
         var cardInstruments = {};
         var walletInstruments = {};
+        var appInstruments = {};
         qrInstruments[hashKey] = [
           {
             '_[flow]': 'intent',
@@ -172,6 +241,16 @@ module.exports = {
             id: 'Dhh86QTueOpyWX',
           },
         ];
+        appInstruments[hashKey] = [
+          {
+            provider: 'cred',
+            method: 'app',
+            timestamp: 1574062745851,
+            success: true,
+            frequency: 2,
+            id: 'Dhh86QTueOpTWX',
+          },
+        ];
         localStorage.setItem(
           'rzp_preffered_instruments',
           {
@@ -180,9 +259,19 @@ module.exports = {
             QR: JSON.stringify(qrInstruments),
             Card: JSON.stringify(cardInstruments),
             Wallet: JSON.stringify(walletInstruments),
+            app: JSON.stringify(appInstruments),
           }[method]
         );
       }, method);
+
+      // Set preferred methods in preferences too
+      preferences.preferred_methods = {
+        '+918888888881': {
+          instruments: API_PREFERRED_INSTRUMENTS[method.toLowerCase()],
+          is_customer_identified: true,
+          user_aggregates_available: true,
+        },
+      };
     }
 
     page.removeListener('request', checkoutRequestHandler);
@@ -224,16 +313,39 @@ module.exports = {
 
     if (options) {
       const message = { options };
-      if (apps) {
-        if (typeof apps === 'boolean') {
-          apps = [
-            { package_name: 'in.org.npci.upiapp', app_name: 'BHIM' },
-            { package_name: 'some.random.app', app_name: 'Some Random App' },
+      if (upiApps) {
+        if (typeof upiApps === 'boolean') {
+          upiApps = [
+            {
+              package_name: 'in.org.npci.upiapp',
+              shortcode: 'bhim',
+              app_name: 'BHIM',
+            },
+            {
+              package_name: 'some.random.app',
+              shortcode: 'some.random.app',
+              app_name: 'Some Random App',
+            },
           ];
         }
 
-        message.upi_intents_data = apps;
+        message.upi_intents_data = upiApps;
       }
+
+      if (apps && apps.includes('google_pay_cards')) {
+        message.external_sdks = { googlepay: true };
+      }
+
+      if (apps && apps.includes('cred')) {
+        message.uri_data = [
+          {
+            shortcode: 'cred',
+            package_name: 'com.dreamplug.androidapp',
+            uri: 'credpay',
+          },
+        ];
+      }
+
       await passMessage(page, message);
     }
     if (preferences) {

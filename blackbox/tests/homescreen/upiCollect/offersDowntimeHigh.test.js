@@ -17,7 +17,6 @@ const {
   assertUserDetails,
   assertPaymentMethods,
   assertEditUserDetailsAndBack,
-  verifyHighDowntime,
 } = require('../actions');
 
 describe.each(
@@ -40,6 +39,7 @@ describe.each(
             status: 'started',
             scheduled: false,
             severity: 'high',
+            instrument: { vpa_handle: 'ALL' },
             created_at: 1567686387,
             updated_at: 1567686387,
           },
@@ -94,10 +94,5 @@ describe.each(
     await verifyDiscountPaybleAmount(context, '₹ 1,990');
     await verifyDiscountAmountInBanner(context, '₹ 1,990');
     await verifyDiscountText(context, 'You save ₹10');
-    await verifyHighDowntime(
-      context,
-      'upi',
-      ' UPI\n          is experiencing low success rates.'
-    );
   });
 });

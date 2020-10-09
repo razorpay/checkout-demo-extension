@@ -11,6 +11,12 @@ import {
 import { processNativeMessage } from 'checkoutstore/native';
 import { isEMandateEnabled, getEnabledMethods } from 'checkoutstore/methods';
 import showTimer from 'checkoutframe/timer';
+import {
+  setInstrumentsForCustomer,
+  trackP13nMeta,
+  removeDuplicateApiInstruments,
+} from 'checkoutframe/personalization/api';
+import { setHistoryAndListenForBackPresses } from 'bridge/back';
 
 import {
   UPI_POLL_URL,
@@ -20,6 +26,7 @@ import {
   isIframe,
   ownerWindow,
 } from 'common/constants';
+import { checkForPossibleWebPayments } from 'checkoutframe/components/upi';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -108,10 +115,13 @@ const setAnalyticsMeta = message => {
    * Set network-related properties.
    */
   if (_Obj.hasProp(navigator, 'connection')) {
-    const { effectiveType, type } = navigator.connection;
+    const { effectiveType, type, downlink } = navigator.connection;
 
     if (effectiveType || type) {
       Analytics.setMeta('network.type', effectiveType || type);
+    }
+    if (downlink) {
+      Analytics.setMeta('network.downlink', downlink);
     }
   }
 
@@ -197,14 +207,13 @@ function fetchPrefs(session) {
   }
   session.isOpen = true;
 
-  /* Start listening for back presses */
-  Bridge.setHistoryAndListenForBackPresses();
-
   let closeAt;
   const timeout = session.r.get('timeout');
   if (timeout) {
     closeAt = _.now() + timeout * 1000;
   }
+
+  performPrePrefsFetchOperations();
 
   session.prefCall = Razorpay.payment.getPrefs(
     getPreferenecsParams(session.r),
@@ -228,6 +237,13 @@ function fetchPrefs(session) {
   );
 }
 
+function performPrePrefsFetchOperations() {
+  /* Start listening for back presses */
+  setHistoryAndListenForBackPresses();
+
+  checkForPossibleWebPayments();
+}
+
 function setSessionPreferences(session, preferences) {
   const razorpayInstance = session.r;
   razorpayInstance.preferences = preferences;
@@ -236,6 +252,7 @@ function setSessionPreferences(session, preferences) {
   updateOptions(preferences);
   updateEmandatePrefill();
   updateAnalytics(preferences);
+  updatePreferredMethods(preferences);
 
   Razorpay.configure(preferences.options);
   session.setPreferences(preferences);
@@ -272,6 +289,7 @@ function setSessionPreferences(session, preferences) {
 
 function getPreferenecsParams(razorpayInstance) {
   const prefData = makePrefParams(razorpayInstance);
+  prefData.personalisation = 1;
   if (cookieDisabled) {
     prefData.checkcookie = 0;
   } else {
@@ -327,15 +345,15 @@ function updateEmandatePrefill() {
           setOption(`prefill.bank_account[${key}]`, bank_account[key]);
         }
       });
-
-    if (order.bank) {
-      setOption('prefill.bank', order.bank);
-    }
+  }
+  if (order.bank) {
+    setOption('prefill.bank', order.bank);
   }
 }
 
 function updateAnalytics(preferences) {
   Analytics.setMeta('features', preferences.features);
+  Analytics.setMeta('merchant_id', preferences.merchant_id);
   // Set optional fields in meta
   const optionalFields = preferences.optional;
   if (optionalFields |> _.isArray) {
@@ -348,6 +366,24 @@ function updateAnalytics(preferences) {
       optionalFields |> _Arr.contains('email')
     );
   }
+}
+
+function updatePreferredMethods(preferences) {
+  const { preferred_methods } = preferences;
+
+  if (preferred_methods) {
+    _Obj.loop(preferred_methods, ({ instruments }, contact) => {
+      if (instruments) {
+        setInstrumentsForCustomer(
+          {
+            contact,
+          },
+          removeDuplicateApiInstruments(instruments)
+        );
+      }
+    });
+  }
+  trackP13nMeta(preferred_methods);
 }
 
 /* expose handleMessage to window for our Mobile SDKs */

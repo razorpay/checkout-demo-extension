@@ -10,7 +10,7 @@
   const timerFn = () => {
     const secLeft = Math.round((expiry - _.now()) / 1000);
     displayTime =
-      Math.floor(secLeft / 60) + ' : ' + ('0' + (secLeft % 60)).slice(-2);
+      Math.floor(secLeft / 60) + ':' + ('0' + (secLeft % 60)).slice(-2);
   };
   timerFn();
 
@@ -30,6 +30,5 @@
 </script>
 
 <div id="timeout">
-  <i>&#x2139</i>
-  This page will timeout in {displayTime} minutes
+  <i>&#x2139</i> This page will timeout in {displayTime} minutes
 </div>

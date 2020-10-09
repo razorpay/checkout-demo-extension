@@ -11,6 +11,28 @@
   import { selectedPlanTextForSavedCard } from 'checkoutstore/emi';
   import { isMethodUsable } from 'checkoutstore/methods';
 
+  // i18n
+  import { t, locale } from 'svelte-i18n';
+  import { formatTemplateWithLocale } from 'i18n';
+
+  import {
+    SAVED_CARD_LABEL,
+    NOCVV_LABEL,
+    AUTH_TYPE_PIN,
+    AUTH_TYPE_OTP,
+  } from 'ui/labels/card';
+
+  import {
+    SAVED_CARD_UNAVAILABLE_HELP,
+    EDIT_PLAN_TEXT,
+    EDIT_PLAN_ACTION,
+    AVAILABLE_TEXT,
+    AVAILABLE_ACTION,
+  } from 'ui/labels/emi';
+  import { TITLE_GENERIC } from 'ui/labels/methods';
+
+  import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
+
   // UI imports
   import Radio from 'ui/elements/Radio.svelte';
   import CvvField from 'ui/elements/fields/card/CvvField.svelte';
@@ -104,15 +126,22 @@
 </script>
 
 <div
-  class="saved-card "
+  class="saved-card"
   class:checked={selected}
   on:click={handleClick}
   tabIndex="0"
   {...attributes}>
-  <div class="help up">EMI is not available on this card</div>
+  <div class="help up">
+    <!-- LABEL: EMI is not available on this card-->
+    {$t(SAVED_CARD_UNAVAILABLE_HELP)}
+  </div>
   <div class="cardtype" cardtype={card.networkCode} />
   <div class="saved-inner">
-    <div class="saved-number">{card.last4}</div>
+    <div class="saved-number">
+      <!-- LABEL: Card ending with {last4} -->
+      <FormattedText
+        text={formatTemplateWithLocale(SAVED_CARD_LABEL, { last4: card.last4 }, $locale)} />
+    </div>
     <div class="saved-cvv">
       {#if showCvv}
         <CvvField
@@ -136,13 +165,23 @@
           on:click={event => dispatch('viewPlans', event)}>
           {#if $selectedPlanTextForSavedCard && tab === 'emi'}
             <div class="emi-plan-selected emi-icon-multiple-cards">
-              <div class="emi-plans-text">{$selectedPlanTextForSavedCard}</div>
-              <div class="emi-plans-action theme-highlight">Edit</div>
+              <!-- LABEL: {duration} Months ({amount}/mo) -->
+              <div class="emi-plans-text">
+                {formatTemplateWithLocale(EDIT_PLAN_TEXT, $selectedPlanTextForSavedCard, $locale)}
+              </div>
+              <!-- LABEL: Edit -->
+              <div class="emi-plans-action theme-highlight">
+                {$t(EDIT_PLAN_ACTION)}
+              </div>
             </div>
           {:else if tab !== 'emi' && isMethodUsable('emi')}
             <div class="emi-plan-unselected emi-icon-multiple-cards">
-              <div class="emi-plans-text">EMI Available</div>
-              <div class="emi-plans-action theme-highlight">Pay with EMI</div>
+              <!-- LABEL: EMI Available -->
+              <div class="emi-plans-text">{$t(AVAILABLE_TEXT)}</div>
+              <!-- LABEL: Pay with EMI -->
+              <div class="emi-plans-action theme-highlight">
+                {$t(AVAILABLE_ACTION)}
+              </div>
             </div>
           {/if}
         </div>
@@ -157,7 +196,8 @@
             id={`nocvv-${token}`}
             bind:checked={noCvvChecked} />
           <span class="checkbox" />
-          My Maestro Card doesn't have Expiry/CVV
+          <!-- My Maestro Card doesn't have Expiry/CVV -->
+          {$t(NOCVV_LABEL)}
         </label>
       {/if}
 
@@ -168,7 +208,7 @@
             containerClass="flow"
             id={`flow-3ds-${token}`}
             inputClass="auth_type_radio"
-            label="Pay using <strong>OTP / Password </strong>"
+            label={formatTemplateWithLocale(TITLE_GENERIC, { method: $t(AUTH_TYPE_OTP) }, $locale)}
             name={`auth_type-${token}`}
             value="c3ds"
             on:change={handleAuthRadioChanged} />
@@ -177,7 +217,7 @@
             checked={authType === 'pin'}
             id={`flow-pin-${token}`}
             inputClass="auth_type_radio"
-            label="Pay using <strong>ATM PIN</strong>"
+            label={formatTemplateWithLocale(TITLE_GENERIC, { method: $t(AUTH_TYPE_PIN) }, $locale)}
             name={`auth_type-${token}`}
             value="pin"
             on:change={handleAuthRadioChanged} />

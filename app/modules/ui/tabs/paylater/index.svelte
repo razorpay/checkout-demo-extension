@@ -8,7 +8,12 @@
   import { createProvider } from 'common/paylater';
 
   // Store imports
-  import { methodTabInstrument } from 'checkoutstore/screens/home';
+  import { methodInstrument } from 'checkoutstore/screens/home';
+
+  // i18n
+  import { t, locale } from 'svelte-i18n';
+  import { getPaylaterProviderName } from 'i18n';
+  import { SELECT_OPTION_TITLE } from 'ui/labels/paylater';
 
   const providers = _Arr.map(getPayLaterProviders(), providerObj =>
     createProvider(providerObj.code, providerObj.name)
@@ -42,14 +47,15 @@
   let filteredProviders = providers;
   $: filteredProviders = filterProvidersAgainstInstrument(
     providers,
-    $methodTabInstrument
+    $methodInstrument
   );
 </script>
 
 <Tab method="paylater">
   <input type="hidden" name="provider" />
   <input type="hidden" name="ott" />
-  <h3>Select an Option</h3>
+  <!-- LABEL: Select an Option -->
+  <h3>{$t(SELECT_OPTION_TITLE)}</h3>
   <div class="options">
     {#each filteredProviders as provider (provider.title)}
       <NextOption
@@ -57,7 +63,7 @@
         tabindex={0}
         {...provider}
         on:select>
-        {provider.title}
+        {getPaylaterProviderName(provider.data.code, $locale)}
       </NextOption>
     {/each}
   </div>

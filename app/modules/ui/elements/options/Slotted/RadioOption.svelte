@@ -3,6 +3,10 @@
   import Stack from 'ui/layouts/Stack.svelte';
   import Radio from 'ui/elements/Radio.svelte';
 
+  // Transitions
+  import { fade } from 'svelte/transition';
+  import { getAnimationOptions } from 'svelte-utils';
+
   // Props
   export let className = '';
   export let name;
@@ -13,6 +17,9 @@
   export let align = 'center';
   export let defaultStyles = true;
   export let ellipsis = false; // Should we truncate the text?
+  export let attributes = {};
+  export let overflow = false;
+  export let expandOnSelect = false;
 
   let radioClasses;
   $: {
@@ -60,6 +67,10 @@
   .radio.reverse {
     margin-right: 12px;
   }
+
+  .overflow {
+    overflow: visible;
+  }
 </style>
 
 <button
@@ -67,17 +78,26 @@
   class:ellipsis
   class:slotted-radio={defaultStyles}
   class:selected
+  class:overflow
   on:click
   on:keydown
   type="button"
   role="listitem"
-  {...$$restProps}>
+  {...attributes}>
   <Stack horizontal {reverse}>
     <slot name="icon" />
     <div>
       <slot name="title" />
       <slot name="subtitle" />
-      <slot name="body" />
+      {#if expandOnSelect}
+        {#if selected}
+          <div in:fade|local={getAnimationOptions({ duration: 100, y: 100 })}>
+            <slot name="body" />
+          </div>
+        {/if}
+      {:else}
+        <slot name="body" />
+      {/if}
     </div>
     <div class="radio" class:reverse class:top={align === 'top'}>
       <Radio

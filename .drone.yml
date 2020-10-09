@@ -8,11 +8,16 @@ pipeline:
   build:
     image: plugins/docker
     repo: razorpay/checkout
-    secrets: [docker_username, docker_password]
+    secrets: [docker_username, docker_password, s3_key_id, s3_key_secret]
     build_args:
+      - AWS_CDN_BUCKET=betacdn
+      - AWS_REGION=ap-south-1
       - GIT_COMMIT_HASH=${DRONE_COMMIT_SHA}
       - BUILD_NUMBER=${DRONE_BUILD_NUMBER}
       - BRANCH=${DRONE_BRANCH}
+    build_args_from_env:
+      - s3_key_id
+      - s3_key_secret
     tags: ${DRONE_COMMIT_SHA}
     when:
       status: [success]

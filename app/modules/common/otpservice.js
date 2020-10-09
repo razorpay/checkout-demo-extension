@@ -14,6 +14,8 @@ const LAST_OTP_SENT_AT = {
   razorpay: undefined,
 };
 
+const PAYMENT_DATA = {};
+
 /**
  * Marks the sending of an OTP.
  * @param {string} provider
@@ -111,4 +113,30 @@ export const getCount = provider => {
   }
 
   return OTPS_SENT[provider] || 0;
+};
+
+/**
+ * Sets the payment data
+ * @param {string} payment_id
+ * @param {Object} data
+ */
+export const setPaymentData = (payment_id, data = {}) => {
+  if (!payment_id) {
+    return;
+  }
+  if (PAYMENT_DATA[payment_id]) {
+    return;
+  }
+  PAYMENT_DATA[payment_id] = data;
+};
+
+/**
+ * Returns the payment data if it was saved earlier
+ * @param {string} payment_id
+ * @returns {*}
+ */
+export const getPaymentData = payment_id => {
+  if (payment_id) {
+    return PAYMENT_DATA[payment_id];
+  }
 };

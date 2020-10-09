@@ -1,4 +1,5 @@
 import RazorpayConfig from 'common/RazorpayConfig';
+import * as Bridge from 'bridge';
 
 const cdnUrl = RazorpayConfig.cdn;
 
@@ -102,6 +103,14 @@ export const getPackageNameForWallet = wallet => walletToIntent[wallet];
  * @returns {boolean}
  */
 export const shouldTurnWalletToIntent = (wallet, apps = []) => {
+  /**
+   * On iOS, PhonePe exists but doesn't support intent on wallet.
+   * Do not allow intent in this case.
+   */
+  if (Bridge.checkout.platform === 'ios') {
+    return false;
+  }
+
   const walletPackage = getPackageNameForWallet(wallet);
 
   if (walletPackage) {

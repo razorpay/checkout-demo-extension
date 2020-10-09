@@ -1,11 +1,16 @@
 <script>
   import { appliedOffer } from 'checkoutstore/offers';
-
+  // i18n
+  import { t } from 'svelte-i18n';
+  import {
+    NO_COST_EMI,
+    CASHBACK_DETAIL,
+    REMOVE_ACTION,
+  } from 'ui/labels/offers';
   export let selected;
   export let offers;
   export let removeOffer;
   export let selectOffer;
-
   function getOfferDescription(offer) {
     // let discount = offer.original_amount - offer.amount;
     return offer.display_text;
@@ -47,7 +52,6 @@
     letter-spacing: 0.5px;
     cursor: pointer;
   }
-
   .badge {
     display: inline-block;
     margin: 0 8px;
@@ -71,20 +75,24 @@
       on:click={() => selectOffer(offer)}>
       {offer.name}
       {#if offer.emi_subvention}
-        <div class="badge">No Cost EMI</div>
+        <!-- LABEL: No Cost EMI -->
+        <div class="badge">{$t(NO_COST_EMI)}</div>
       {/if}
       {#if selected === offer}
         <div class="checkbox" />
-        <div class="offer-detail">{getOfferDescription(offer)}</div>
+        {#if getOfferDescription(offer)}
+          <!-- Only show the description if offer description is set. -->
+          <div class="offer-detail">{getOfferDescription(offer)}</div>
+        {/if}
         {#if offer.type === 'deferred'}
-          <div class="offer-detail">
-            Cashback would be credited to source mode of payment.
-          </div>
+          <!-- LABEL: Cashback would be credited to source mode of payment. -->
+          <div class="offer-detail">{$t(CASHBACK_DETAIL)}</div>
         {/if}
       {/if}
       {#if $appliedOffer === offer}
+        <!-- LABEL: Remove Offer -->
         <div class="text-uppercase remove-offer" on:click={removeOffer}>
-          Remove Offer
+          {$t(REMOVE_ACTION)}
         </div>
       {/if}
     </div>

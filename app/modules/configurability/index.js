@@ -15,6 +15,7 @@ import {
   getPayLaterProviders,
   getCardlessEMIProviders,
   getCardNetworks,
+  getAppProviders,
 } from 'checkoutstore/methods';
 
 import { shouldSeparateDebitCard, getMerchantMethods } from 'checkoutstore';
@@ -27,7 +28,15 @@ import { API_NETWORK_CODES_MAP, networks as CardNetworks } from 'common/card';
  * @returns {Array<string>}
  */
 function getAvailableDefaultMethods() {
-  let available = _Arr.filter(AVAILABLE_METHODS, isMethodEnabled);
+  let available = AVAILABLE_METHODS;
+
+  // Separate out debit and credit cards
+  if (shouldSeparateDebitCard()) {
+    available = _Arr.remove(available, 'card');
+    available = ['credit_card', 'debit_card'].concat(available);
+  }
+
+  available = _Arr.filter(available, isMethodEnabled);
 
   /**
    * We do not want to show QR in the primary list
@@ -36,12 +45,6 @@ function getAvailableDefaultMethods() {
   available = _Arr.remove(available, 'qr');
 
   // TODO: Filter based on amount
-
-  // Separate out debit and credit cards
-  if (shouldSeparateDebitCard()) {
-    available = _Arr.remove(available, 'card');
-    available = ['credit_card', 'debit_card'].concat(available);
-  }
 
   return available;
 }
@@ -164,6 +167,26 @@ function removeNonApplicableInstrumentFlows(instrument) {
           )
         );
         instrument.providers = shownProviders;
+      }
+
+      return instrument;
+    }
+
+    case 'app': {
+      const hasProviders = Boolean(instrument.providers);
+
+      if (hasProviders) {
+        const enabledProviders = getAppProviders();
+        const shownProviders = _Arr.filter(instrument.providers, provider =>
+          _Arr.any(
+            enabledProviders,
+            enabledProvider => enabledProvider.code === provider
+          )
+        );
+        instrument.providers = shownProviders;
+      } else {
+        // If there are no providers, then exclude this method.
+        return null;
       }
 
       return instrument;

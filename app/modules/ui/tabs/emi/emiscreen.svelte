@@ -2,6 +2,22 @@
   // Svelte imports
   import { createEventDispatcher, onMount } from 'svelte';
 
+  //i18n
+  import { t, locale } from 'svelte-i18n';
+  import { formatTemplateWithLocale } from 'i18n';
+  import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
+
+  import {
+    CARD_DETAILS_HEADER,
+    CARD_NUMBER_LABEL,
+    CARD_NUMBER_HELP,
+    NAME_LABEL,
+    NAME_HELP,
+    CALLOUT,
+  } from 'ui/labels/bajaj-emi';
+
+  import { EDIT_PLAN_TEXT, EDIT_PLAN_ACTION } from 'ui/labels/emi';
+
   // Utils imports
   import { getSession } from 'sessionmanager';
   import {
@@ -70,9 +86,13 @@
     <div
       class="strip emi-plans-info-container emi-plans-trigger details-visible"
       on:click={() => dispatch('editplan')}>
-      <div class="emi-plan-selected emi-icon-multiple-cards ">
-        <div class="emi-plans-text">{emiText}</div>
-        <div class="emi-plans-action theme-highlight">Edit</div>
+      <div class="emi-plan-selected emi-icon-multiple-cards">
+        <div class="emi-plans-text">
+          {formatTemplateWithLocale(EDIT_PLAN_TEXT, emiText, $locale)}
+        </div>
+        <div class="emi-plans-action theme-highlight">
+          {$t(EDIT_PLAN_ACTION)}
+        </div>
       </div>
     </div>
     <h3>Enter Card Details</h3>
@@ -80,10 +100,12 @@
       <div class="elem-wrap">
         <div class="elem elem-card">
           <div class="cardtype" />
-          <label>Card Number</label>
+          <!-- LABEL: Card Number -->
+          <label>{$t(CARD_NUMBER_LABEL)}</label>
           <i>&#xe605;</i>
           <span class="help">
-            Please enter a valid Bajaj Finserv issued card number
+            <!-- LABEL: Please enter a valid Bajaj Finserv issued card number -->
+            {$t(CARD_NUMBER_HELP)}
           </span>
           <input
             class="input"
@@ -96,8 +118,10 @@
       </div>
       <div class="elem-wrap" class:readonly={readonly.name}>
         <div class="elem elem-name">
-          <span class="help">Please enter name on your card</span>
-          <label>Card Holder's Name</label>
+          <!-- LABEL: Please enter name on your card -->
+          <span class="help">{$t(NAME_HELP)}</span>
+          <!-- LABEL: Card Holder's Name -->
+          <label>{$t(NAME_LABEL)}</label>
           <i>&#xe602;</i>
           <input
             class="input"
@@ -114,7 +138,8 @@
 </div>
 <div class="pad recurring-message">
   <span>&#x2139;</span>
-  You need to have a
+  <!-- LABEL: You need to have a
   <strong>Bajaj Finserv issued card</strong>
-  to continue.
+  to continue. -->
+  <FormattedText text={$t(CALLOUT)} />
 </div>

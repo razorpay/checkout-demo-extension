@@ -4,6 +4,7 @@
 
   // Utils imports
   import { getSession } from 'sessionmanager';
+
   import {
     ALLOWED_EXTS,
     ALLOWED_MAX_SIZE_IN_MB,
@@ -11,7 +12,12 @@
     getValidityError,
     uploadDocument,
   } from 'checkoutframe/nach';
-  import { updateCta, showAmountInCta } from 'checkoutstore/cta';
+
+  import {
+    showUploadNachForm,
+    showAmountInCta,
+    showSubmit,
+  } from 'checkoutstore/cta';
 
   // UI imports
   import Attachment from 'ui/elements/Attachment.svelte';
@@ -20,6 +26,21 @@
   import Tab from 'ui/tabs/Tab.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
+
+  // i18n
+  import { t, locale } from 'svelte-i18n';
+  import { formatTemplateWithLocale } from 'i18n';
+
+  import {
+    ALLOWED_FORMATS_INFO,
+    ATTACHING_MESSAGE,
+    ATTACHMENT_INFO,
+    CONFIRM_CANCEL,
+    IMAGE_INFO,
+    UPLOADING_MESSAGE,
+  } from 'ui/labels/nach';
+
+  import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
 
   let abortUploadRequest = () => {};
   let uploaded = false;
@@ -36,9 +57,7 @@
   $: view = file ? 'confirm' : 'upload';
   $: {
     if (file) {
-      const text = file ? 'Submit' : 'Upload NACH form';
-
-      updateCta(text);
+      showSubmit();
     }
   }
 
@@ -61,7 +80,7 @@
    * Session calls this method when it switches to "nach" tab
    */
   export function onShown() {
-    updateCta('Upload NACH Form');
+    showUploadNachForm();
   }
 
   /**
@@ -83,9 +102,8 @@
   export function shouldHideOverlay() {
     // If we are still upload, ask for confirmation
     if (uploading) {
-      const cancel = global.confirm(
-        'Are you sure you want to stop uploading your NACH form?'
-      );
+      // LABEL: Are you sure you want to stop uploading your NACH form?
+      const cancel = global.confirm($t(CONFIRM_CANCEL));
 
       if (cancel) {
         abortUpload();
@@ -185,7 +203,8 @@
       return;
     }
 
-    session.showLoadError('Attaching your NACH form');
+    // LABEL: Attaching your NACH form
+    session.showLoadError($t(ATTACHING_MESSAGE));
 
     // Validate
     const inputFile = event.currentTarget.files[0];
@@ -216,7 +235,8 @@
   function upload() {
     uploading = true;
 
-    session.showLoadError('Uploading your NACH form');
+    // LABEL: 'Uploading your NACH form'
+    session.showLoadError($t(UPLOADING_MESSAGE));
 
     const { promise: uploadRequest, abort } = uploadDocument(session.r, file);
 
@@ -246,7 +266,7 @@
   }
 </style>
 
-<Tab method="nach" overrideMethodCheck="true" pad={false}>
+<Tab method="nach" overrideMethodCheck="true" pad={true}>
   <Screen>
     <div>
       <input
@@ -255,8 +275,8 @@
         class="hidden"
         on:change={selectFile}
         accept={ALLOWED_EXTS.join(',')} />
-
-      <p>Please upload a clear and legible copy of your signed NACH form</p>
+      <!-- LABEL: Please upload a clear and legible copy of your signed NACH form -->
+      <p>{$t(ATTACHMENT_INFO)}</p>
 
       {#if view === 'upload'}
         <div class="ref-illustration">
@@ -270,14 +290,14 @@
         <Note>
           <ol>
             <li>
-              The image should not be
-              <strong>cropped</strong>
-              and should not have any
-              <strong>shadows</strong>
+              <!-- LABEL: The image should not be <strong>cropped<strong> and should not have any <strong>shadows<strong> -->
+              <FormattedText text={$t(IMAGE_INFO)} />
             </li>
+            <!-- LABEL: Only {extensions} files with size less than {size} MB are allowed -->
             <li>
-              Only {ALLOWED_EXTS.map(x => x.toUpperCase()).join(', ')} files
-              with size less than {ALLOWED_MAX_SIZE_IN_MB} MB are allowed
+              {formatTemplateWithLocale(ALLOWED_FORMATS_INFO, { extensions: ALLOWED_EXTS.map(
+                    x => x.toUpperCase()
+                  ).join(', '), size: ALLOWED_MAX_SIZE_IN_MB }, $locale)}
             </li>
           </ol>
         </Note>

@@ -1,6 +1,10 @@
 <script>
   import Field from 'ui/components/Field.svelte';
 
+  // i18n
+  import { t } from 'svelte-i18n';
+  import { NAME_LABEL, NAME_HELP } from 'ui/labels/card';
+
   export let value = '';
   export let ref = null;
   export let id;
@@ -19,10 +23,10 @@
 </script>
 
 <Field
-  helpText="Please enter name on your card"
+  helpText={$t(NAME_HELP)}
   {id}
   {name}
-  label="Card Holder's name"
+  label={$t(NAME_LABEL)}
   pattern={NAME_PATTERN}
   required
   type="text"
@@ -30,6 +34,7 @@
   {value}
   on:input={handleInput}
   on:blur
+  on:focus
   bind:this={ref}
   handleBlur
   handleFocus

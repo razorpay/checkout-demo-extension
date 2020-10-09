@@ -1,8 +1,8 @@
-import getFingerprint from 'fingerprint';
+import { getFingerprint, getDeviceId } from 'fingerprint';
 import { flattenProp } from 'common/options';
 import Track from 'tracker';
 import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi';
-import { getCardType, luhnCheck } from 'common/card';
+import { luhnCheck } from 'lib/utils';
 
 /* cotains mapping of sdk keys to shield key names */
 const sdkToShieldMap = {
@@ -50,7 +50,7 @@ export const formatPayment = function(payment) {
 
 function validateData(data) {
   const cardNum = data |> _Obj.getOwnProp('card[name]');
-  if (cardNum && luhnCheck(cardNum) && getCardType(cardNum)) {
+  if (cardNum && luhnCheck(cardNum)) {
     _.throwMessage(
       'Error in integration. Please contact Razorpay for assistance'
     );
@@ -111,20 +111,10 @@ export const formatPayload = function(payload, razorpayInstance, params = {}) {
   }
 
   if (params.tez || params.gpay) {
-    if (
-      !(
-        razorpayInstance.paymentAdapters &&
-        (razorpayInstance.paymentAdapters.gpay ||
-          razorpayInstance.paymentAdapters['microapps.gpay'])
-      )
-    ) {
-      return razorpayInstance.emit(
-        'payment.error',
-        _.rzpError('GPay is not available')
-      );
-    }
     data['_[flow]'] = 'intent';
-    data['_[app]'] = GOOGLE_PAY_PACKAGE_NAME;
+    if (!data['_[app]']) {
+      data['_[app]'] = GOOGLE_PAY_PACKAGE_NAME;
+    }
   }
 
   // Add integration details if present
@@ -143,6 +133,11 @@ export const formatPayload = function(payload, razorpayInstance, params = {}) {
   let fingerprint = getFingerprint();
   if (fingerprint) {
     data['_[shield][fhash]'] = fingerprint;
+  }
+
+  let deviceId = getDeviceId();
+  if (deviceId) {
+    data['_[device_id]'] = deviceId;
   }
 
   data['_[shield][tz]'] = -new Date().getTimezoneOffset();

@@ -11,7 +11,12 @@
   } from 'checkoutstore/methods';
 
   // Store imports
-  import { methodTabInstrument } from 'checkoutstore/screens/home';
+  import { methodInstrument } from 'checkoutstore/screens/home';
+
+  // i18n
+  import { t, locale } from 'svelte-i18n';
+  import { getCardlessEmiProviderName } from 'i18n';
+  import { SELECT_OPTION_TITLE } from 'ui/labels/cardlessemi';
 
   const providers = getAllProviders();
 
@@ -24,16 +29,11 @@
     let providers = [];
 
     _Obj.loop(getCardlessEMIProviders(), providerObj => {
-      providers.push(createProvider(providerObj.code, providerObj.name));
+      providers.push(createProvider(providerObj.code));
     });
 
     if (isMethodUsable('emi')) {
-      providers.unshift(
-        createProvider(
-          'cards',
-          isDebitEMIEnabled() ? 'EMI on Debit/Credit Cards' : 'EMI on Cards'
-        )
-      );
+      providers.unshift(createProvider('cards'));
     }
 
     return providers;
@@ -67,18 +67,28 @@
   let filteredProviders = providers;
   $: filteredProviders = filterProvidersAgainstInstrument(
     providers,
-    $methodTabInstrument
+    $methodInstrument
   );
+
+  function getOverriddenProviderCode(code) {
+    if (code === 'cards' && isDebitEMIEnabled()) {
+      code = 'credit_debit_cards';
+    }
+    return code;
+  }
 </script>
 
 <div class="tab-content showable screen pad collapsible" id="form-cardless_emi">
   <input type="hidden" name="emi_duration" />
   <input type="hidden" name="provider" />
   <input type="hidden" name="ott" />
-  <h3>Select an Option</h3>
+  <!-- TITLE: Select an option -->
+  <h3>{$t(SELECT_OPTION_TITLE)}</h3>
   <div class="options">
-    {#each filteredProviders as provider (provider.title)}
-      <NextOption {...provider} on:select>{provider.title}</NextOption>
+    {#each filteredProviders as provider (provider.data.code)}
+      <NextOption {...provider} on:select>
+        {getCardlessEmiProviderName(getOverriddenProviderCode(provider.data.code), $locale)}
+      </NextOption>
     {/each}
   </div>
 </div>

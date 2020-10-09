@@ -1,5 +1,11 @@
 import { createBlock } from 'configurability/blocks';
-import { blocks, instruments, sequence } from 'checkoutstore/screens/home';
+import {
+  blocks,
+  instruments,
+  sequence,
+  hiddenMethods,
+  hiddenInstruments,
+} from 'checkoutstore/screens/home';
 import { get as storeGetter } from 'svelte/store';
 import Track from 'tracker';
 import { MAX_PREFERRED_INSTRUMENTS } from 'common/constants';
@@ -8,6 +14,8 @@ import { isInstrumentForEntireMethod } from 'configurability/instruments';
 import { getIndividualInstruments } from 'configurability/ungroup';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
+import { hashFnv32a } from 'checkoutframe/personalization/utils';
+import { isMethodUsable } from 'checkoutstore/methods';
 
 function generateBasePreferredBlock(preferred) {
   const preferredBlock = createBlock('rzp.preferred', {
@@ -135,8 +143,28 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
   });
 }
 
+function makeLoaderInstruments(howMany) {
+  const loaderInstrument = {
+    _type: 'instrument',
+    _loading: true,
+  };
+
+  let instruments = [];
+
+  for (let i = 0; i < howMany; i++) {
+    instruments.push(_Obj.clone(loaderInstrument));
+  }
+
+  return instruments;
+}
+
 export function setBlocks(
-  { preferred = [], merchantConfig = {}, configSource },
+  {
+    showPreferredLoader = false,
+    preferred = [],
+    merchantConfig = {},
+    configSource,
+  },
   customer
 ) {
   const preferredBlock = generateBasePreferredBlock(preferred);
@@ -165,40 +193,43 @@ export function setBlocks(
   const addPreferredInstrumentsBlock =
     !parsedConfig._meta.hasRestrictedInstruments && show_default_blocks;
 
-  // Get all hidden method-instruments
-  const hiddenMethods = parsedConfig.display.hide.methods;
-
   let allBlocks = parsedConfig.display.blocks;
 
   if (addPreferredInstrumentsBlock) {
-    const preferredInstruments = preferredBlock.instruments;
+    if (showPreferredLoader) {
+      preferredBlock.instruments = makeLoaderInstruments(
+        MAX_PREFERRED_INSTRUMENTS
+      );
+    } else {
+      const preferredInstruments = preferredBlock.instruments;
 
-    // Filter out all preferred methods whose methods are asked to be hidden
-    let filteredPreferredInstruments = _Arr.filter(
-      preferredInstruments,
-      preferredInstrument => {
-        return !_Arr.contains(hiddenMethods, preferredInstrument.method);
-      }
-    );
+      // Filter out all preferred methods whose methods are asked to be hidden
+      let filteredPreferredInstruments = _Arr.filter(
+        preferredInstruments,
+        preferredInstrument => {
+          return isMethodUsable(preferredInstrument.method);
+        }
+      );
 
-    // Filter out all preferred methods that are already being shown by the merchant
-    filteredPreferredInstruments = _Arr.filter(
-      filteredPreferredInstruments,
-      instrument =>
-        shouldAllowPreferredInstrument(instrument, shownIndividualInstruments)
-    );
+      // Filter out all preferred methods that are already being shown by the merchant
+      filteredPreferredInstruments = _Arr.filter(
+        filteredPreferredInstruments,
+        instrument =>
+          shouldAllowPreferredInstrument(instrument, shownIndividualInstruments)
+      );
 
-    // Take top 3 preferred
-    preferredBlock.instruments = filteredPreferredInstruments.slice(
-      0,
-      MAX_PREFERRED_INSTRUMENTS
-    );
+      // Take top 3 preferred
+      preferredBlock.instruments = filteredPreferredInstruments.slice(
+        0,
+        MAX_PREFERRED_INSTRUMENTS
+      );
 
-    // Convert preferred instruments to ungrouped format
-    preferredBlock.instruments = _Arr.map(
-      preferredBlock.instruments,
-      instrument => getIndividualInstruments(instrument, customer)
-    );
+      // Convert preferred instruments to ungrouped format
+      preferredBlock.instruments = _Arr.map(
+        preferredBlock.instruments,
+        instrument => getIndividualInstruments(instrument, customer)
+      );
+    }
 
     allBlocks = _Arr.mergeWith([preferredBlock], allBlocks);
   }
@@ -210,10 +241,16 @@ export function setBlocks(
   );
 
   // Add an ID to all instruments
-  _Arr.loop(allBlocks, block => {
-    _Arr.loop(block.instruments, instrument => {
+  _Arr.loop(allBlocks, (block, blockIndex) => {
+    _Arr.loop(block.instruments, (instrument, instrumentIndex) => {
       if (!instrument.id) {
-        instrument.id = Track.makeUid();
+        instrument.id = generateInstrumentId(
+          customer,
+          block,
+          instrument,
+          blockIndex,
+          instrumentIndex
+        );
       }
     });
   });
@@ -231,6 +268,8 @@ export function setBlocks(
     },
   });
 
+  hiddenMethods.set(parsedConfig.display.hide.methods);
+  hiddenInstruments.set(parsedConfig.display.hide.instruments);
   blocks.set(allBlocks);
   sequence.set(parsedConfig.display.sequence);
 
@@ -239,6 +278,36 @@ export function setBlocks(
     preferred: preferredBlock,
     all: allBlocks,
   };
+}
+
+/**
+ * Generate an instrument ID.
+ *
+ * We're not using a random IDs because the blocks list is regenerated every time the
+ * customer changes. If the IDs change, the currently selected instrument gets deselected - which should not happen.
+ *
+ * At the time of writing, I don't see any way for these IDs to collide when customer/amount changes. - Umang
+ *
+ * @param {Customer} customer
+ * @param {Block} block
+ * @param {Instrument} instrument
+ * @param {number} blockIndex
+ * @param {number} instrumentIndex
+ */
+function generateInstrumentId(
+  customer,
+  block,
+  instrument,
+  blockIndex,
+  instrumentIndex
+) {
+  let base = `${block.code}_${blockIndex}_${instrumentIndex}_${instrument.method}`;
+
+  if (customer && customer.contact) {
+    base = `${hashFnv32a(customer.contact)}_${base}`;
+  }
+
+  return base;
 }
 
 /**
@@ -293,84 +362,4 @@ export function getInstrumentMeta(instrument) {
   }
 
   return meta;
-}
-
-/**
- * Tells whether an instrument is for saved cards
- * @param {Instrument} instrument
- *
- * @returns {boolean}
- */
-export function isSavedCardInstrument(instrument) {
-  return (
-    _Arr.contains(['card', 'emi'], instrument.method) && instrument.token_id
-  );
-}
-
-/**
- * Tells whether or not the instrument is a card instrument
- * to be used from inside the card tab
- * @param {Instrument} instrument
- *
- * @returns {boolean}
- */
-export function isInstrumentGrouped(instrument) {
-  const isMethodInstrument = isInstrumentForEntireMethod(instrument);
-
-  /**
-   * All the methods that have a token.
-   * UPI has tokens, but it needs some more checks on
-   * the flows as well. It's not needed now, but we will eventually need to add it.
-   *
-   * TODO: Check for UPI in isMethodWithToken
-   */
-  const isMethodWithToken = _Arr.contains(['card', 'emi'], instrument.method);
-
-  if (isMethodInstrument) {
-    return true;
-  }
-
-  if (isMethodWithToken) {
-    const doesTokenExist = instrument.token_id;
-
-    return !doesTokenExist;
-  }
-
-  if (instrument.method === 'upi' && instrument.flows) {
-    // More than one flow always needs to go deeper
-    if (instrument.flows.length > 1) {
-      return true;
-    }
-
-    // UPI omnichannel always needs to go deeper
-    if (_Arr.contains(instrument.flows, 'omnichannel')) {
-      return true;
-    }
-
-    /**
-     * Collect needs to go deeper if this is not an individual
-     * instrument with a VPA
-     */
-    if (_Arr.contains(instrument.flows, 'collect')) {
-      let ungrouped = instrument._ungrouped;
-
-      // If individual, check for VPA
-      if (ungrouped.length === 1) {
-        const { flow, vpa } = ungrouped[0];
-
-        if (flow === 'collect' && vpa) {
-          return false;
-        }
-      }
-
-      return true;
-    }
-
-    // If flow is intent and no apps are specified, go deeper
-    if (_Arr.contains(instrument.flows, 'intent') && !instrument.apps) {
-      return true;
-    }
-  }
-
-  return instrument._ungrouped.length > 1;
 }

@@ -1,17 +1,10 @@
 <script>
-  // Svelte imports
-  import { createEventDispatcher } from 'svelte';
-
   // UI imports
   import DeprecatedRadioOption from 'ui/elements/options/DeprecatedRadioOption.svelte';
 
   // Props
   export let account;
-  export let reverse = true;
   export let selected = false;
-  export let icon;
-
-  const dispatch = createEventDispatcher();
 </script>
 
 <style>
@@ -24,10 +17,9 @@
 <DeprecatedRadioOption
   data={account}
   name="instrument"
-  {reverse}
+  reverse={true}
   {selected}
   value={account.id}
-  {icon}
   on:select>
   <slot />
 </DeprecatedRadioOption>

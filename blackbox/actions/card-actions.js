@@ -1,4 +1,5 @@
 const { delay, innerText } = require('../util');
+const { assertTrimmedInnerText } = require('../tests/homescreen/actions');
 const querystring = require('querystring');
 
 async function handleCardValidation(context, { urlShouldContain } = {}) {
@@ -19,11 +20,44 @@ async function handleCardValidation(context, { urlShouldContain } = {}) {
 
 async function handleCardValidationForNativeOTP(
   context,
-  { coproto, urlShouldContain } = {}
+  { coproto, cardType, urlShouldContain, expectCallbackUrl } = {}
 ) {
   const req = await context.expectRequest();
+  const body = querystring.parse(req.body);
+  if (expectCallbackUrl) {
+    expect(body.callback_url).toEqual(
+      'http://www.merchanturl.com/callback?test1=abc&test2=xyz'
+    );
+  }
   expect(req.url).toContain(urlShouldContain || 'create/ajax');
-  if (coproto === 'otp') {
+  if (cardType === 'RUPAY' && coproto === 'otp') {
+    await context.respondJSON({
+      type: 'otp',
+      request: {
+        method: 'direct',
+        content: '',
+      },
+      version: 1,
+      payment_id: 'pay_Ep1kkNJDzAdvIZ',
+      next: ['otp_submit', 'otp_resend'],
+      gateway:
+        'eyJpdiI6IjVmNmxSN2FrTlE0R2I3QThtSnFLR3c9PSIsInZhbHVlIjoib29IRmFBTWxEaG0xQVp3Tm95U0pNZExGN2lsQnBJWkJlcDJaQ0xmQ1p1UT0iLCJtYWMiOiIzYTZhYTczNWJhN2M4YzBlMDlmODYxMjIxN2Y3Y2FiNjdkNzgyYmZhZTRkMDY3MTNiZjI2YTEzZWMwYjJlOGY3In0=',
+      submit_url: 'https://api.razorpay.com/otp_submit',
+      resend_url: 'https://api.razorpay.com/otp_resend',
+      metadata: {
+        issuer: 'HDFC',
+        network: 'VISA',
+        last4: '0176',
+        iin: '416021',
+        gateway: 'hitachi',
+        contact: '9723461024',
+        ip: '10.2.1.33',
+        resend_timeout: 30,
+      },
+      submit_url_private: 'https://api.razorpay.com/otp_submit',
+      resend_url_private: 'https://api.razorpay.com/otp_resend',
+    });
+  } else if (coproto === 'otp') {
     await context.respondJSON({
       type: 'otp',
       request: {
@@ -67,21 +101,52 @@ async function handleBankRequest(context) {
   await context.respondHTML(`<html></html>`);
 }
 
-async function enterCardDetails(context, { cardType, nativeOtp = false } = {}) {
+async function enterCardDetails(
+  context,
+  {
+    cardType,
+    nativeOtp = false,
+    recurring = false,
+    emi = true,
+    issuer = null,
+    type = 'credit',
+  } = {}
+) {
   const visa = cardType === 'VISA';
-  await context.page.type(
-    '#card_number',
-    visa ? '4111111111111111' : '376939393939397'
-  );
+  const bepg = nativeOtp && cardType === 'RUPAY';
+
+  let cardNumber = '376939393939397';
+
+  if (visa) {
+    cardNumber = '4111111111111111';
+  } else if (bepg) {
+    cardNumber = '7878780000000001';
+  }
+
+  await context.page.type('#card_number', cardNumber);
+
   await context.expectRequest(req => {});
+
+  const response = { http_status_code: 200 };
   const flows = {
-    recurring: false,
+    recurring,
     iframe: true,
   };
+
   if (nativeOtp) {
     flows.otp = true;
   }
-  await context.respondJSONP({ http_status_code: 200, flows });
+
+  if (emi) {
+    flows.emi = true;
+    response.issuer = issuer;
+    response.type = type;
+  }
+
+  response.flows = flows;
+
+  await context.respondJSONP(response);
+
   await context.page.type('#card_expiry', '12/55');
   await context.page.type('#card_name', 'SakshiJain');
   await context.page.type('#card_cvv', visa ? '111' : '1111');
@@ -248,13 +313,138 @@ async function verifyAmount(context, currency) {
   const amountInHeader = (await innerText('#amount')).trim();
   expect(amountInHeader).toEqual(displayAmount);
   const amountInFooter = (await innerText('#footer')).trim();
-  expect(amountInFooter).toEqual('PAY ' + displayAmount);
+  expect(amountInFooter).toEqual('Pay ' + displayAmount);
 }
 
 async function selectCurrencyAndVerifyAmount(context, currency = 'USD') {
   await respondCurrencies(context);
   await selectCurrency(context, currency);
   await verifyAmount(context, currency);
+}
+
+async function handleAppCreatePayment(context, { app, flow } = {}) {
+  const req = await context.expectRequest();
+  expect(req.url).toContain('create/ajax');
+  if (app === 'google_pay_cards') {
+    const body = querystring.parse(req.body);
+    expect(body).toMatchObject({
+      method: 'card',
+      application: 'google_pay',
+    });
+    expect(body).not.toHaveProperty('card[number]');
+    await context.respondJSON({
+      version: '1.0',
+      type: 'application',
+      application_name: 'google_pay',
+      payment_id: 'pay_GqAUUr978elhqA',
+      gateway: '*encrypted gateway value*',
+      request: {
+        url: 'https://api.razorpay.com/v1/payments/pay_GqAUUr978elhqA/status',
+        method: 'sdk',
+        content: {
+          bundle: {
+            apiVersion: '1.0',
+            allowedPaymentMethods: [
+              {
+                type: 'CARD',
+                parameters: {
+                  allowedCardNetworks: ['VISA', 'MASTERCARD'],
+                },
+              },
+            ],
+            tokenizationSpecification: {
+              type: 'PAYMENT_GATEWAY',
+              parameters: {
+                gateway: 'razorpay',
+                gatewayMerchantId: 'Gr978elhqAGqAU',
+                gatewayTransactionId: 'pay_GqAUUr978elhqA',
+              },
+            },
+            transactionInfo: {
+              currencyCode: 'INR',
+              totalPrice: '100',
+              totalPriceStatus: 'FINAL',
+            },
+          },
+        },
+      },
+    });
+
+    return;
+  } else if (app === 'cred' && flow === 'intent') {
+    const body = querystring.parse(req.body);
+    expect(body).toMatchObject({
+      method: 'app',
+      provider: 'cred',
+      app_present: '1',
+    });
+    expect(body).not.toHaveProperty('card[number]');
+    await context.respondJSON({
+      type: 'intent',
+      version: 1,
+      payment_id: 'pay_F2pqrpQCgRS6ae',
+      data: {
+        intent_url:
+          'credpay://checkout?ref_id=22323482-f73f-4c60-85b7-a673d43ffbf9&is_collect=false&redirect_to=https%3A%2F%2Fbeta-api.stage.razorpay.in%2Fv1%2Fpayments%2Fpay_F2pqrpQCgRS6ae%2Fcallback%2F4733245ccd35a14a0a40ea1732fa106b001c0fa8%2Frzp_live_aEZD9dPPpUfCeq',
+      },
+      request: {
+        url: 'https://api.razorpay.com/v1/payments/pay_GqAUUr978elhqA/status',
+        method: 'GET',
+      },
+    });
+
+    return;
+  } else if (app === 'cred' && flow === 'collect') {
+    const body = querystring.parse(req.body);
+    expect(body).toMatchObject({
+      method: 'app',
+      provider: 'cred',
+    });
+    expect(body).not.toMatchObject({
+      app_present: '1',
+    });
+    expect(body).not.toHaveProperty('card[number]');
+    await context.respondJSON({
+      type: 'intent',
+      version: 1,
+      payment_id: 'pay_F2pqrpQCgRS6ae',
+      data: {
+        intent_url:
+          'credpay://checkout?ref_id=22323482-f73f-4c60-85b7-a673d43ffbf9&is_collect=false&redirect_to=https%3A%2F%2Fbeta-api.stage.razorpay.in%2Fv1%2Fpayments%2Fpay_F2pqrpQCgRS6ae%2Fcallback%2F4733245ccd35a14a0a40ea1732fa106b001c0fa8%2Frzp_live_aEZD9dPPpUfCeq',
+      },
+      request: {
+        url: 'https://api.razorpay.com/v1/payments/pay_GqAUUr978elhqA/status',
+        method: 'GET',
+      },
+    });
+
+    return;
+  } else {
+    throw `Payment create not handled for ${app}`;
+  }
+}
+
+async function handleAppPaymentStatus(context) {
+  const req = await context.expectRequest();
+  if (req.url.includes('v1/payments/pay_GqAUUr978elhqA/status')) {
+    if (req.url.includes('Razorpay.jsonp')) {
+      await context.respondJSONP({ razorpay_payment_id: 'pay_' });
+    } else {
+      await context.respondJSON({ razorpay_payment_id: 'pay_' });
+    }
+  }
+}
+
+async function assertOTPElementsForBEPG(context) {
+  await assertTrimmedInnerText(context, '#form-otp .card-box', /Card - 0001$/);
+
+  await assertTrimmedInnerText(context, '#otp-resend', /Resend OTP \(\d{2}\)/);
+
+  await assertTrimmedInnerText(
+    context,
+    '#form-otp .security-text',
+    /^Your transaction/
+  );
 }
 
 module.exports = {
@@ -270,4 +460,7 @@ module.exports = {
   selectCurrencyAndVerifyAmount,
   selectSavedCardAndTypeCvv,
   verifyAmount,
+  handleAppCreatePayment,
+  handleAppPaymentStatus,
+  assertOTPElementsForBEPG,
 };

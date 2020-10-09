@@ -77,3 +77,13 @@ export const extendConfig = (provider, updatedConfig) => {
 
   return providers[provider];
 };
+
+/**
+ * Returns the image URL for the given paylater provider
+ * @param {string} provider
+ * @returns {string}
+ */
+export const getImageUrl = provider => {
+  const { logo } = getProvider(provider);
+  return logo;
+};

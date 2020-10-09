@@ -11,36 +11,38 @@ const config = {
   },
   earlysalary: {
     name: 'EarlySalary',
+    fee_bearer_customer: false,
   },
   zestmoney: {
     name: 'ZestMoney',
     min_amount: 90000,
+    fee_bearer_customer: false,
   },
   flexmoney: {
     name: 'Cardless EMI by InstaCred',
     headless: false,
+    fee_bearer_customer: false,
   },
 };
 
 /**
  * Create an provider object for rendering on Cardless EMI screen.
  * @param {String} code
- * @param {String} title
  *
  * @return {Object}
  */
-export const createProvider = (code, title) => ({
+export const createProvider = code => ({
   data: {
     code,
   },
   icon: 'https://cdn.razorpay.com/cardless_emi-sq/' + code + '.svg',
-  title,
 });
 
 // Generate provider config
 const defaultConfig = {
   min_amount: 300000,
-  headless: true, // Like PowerWallet, we have a direct integration with them and do not need to open a popup
+  headless: true, // Like PowerWallet, we have a direct integration with them and do not need to open a popup,
+  fee_bearer_customer: true, // Allow for `fee-bearer: true` merchants?
 };
 
 const providers = _Obj.map(config, (details, code) => {
@@ -103,6 +105,25 @@ export function getEligibleProvidersBasedOnMinAmount(amount, enabledProviders) {
 }
 
 /**
+ * Returns the eligible Cardless EMI providers for customer fee bearer
+ * @param {number} amount
+ * @param {Object} enabledProviders
+ *
+ * @returns {Object}
+ */
+export function getEligibleProvidersForFeeBearerCustomer(providers) {
+  let eligible = {};
+
+  Object.keys(providers).forEach(provider => {
+    if (providers[provider].fee_bearer_customer) {
+      eligible[provider] = providers[provider];
+    }
+  });
+
+  return eligible;
+}
+
+/**
  * Tells if the provider is headless.
  * @param {string} provider Provider Code
  *
@@ -112,4 +133,14 @@ export const isProviderHeadless = provider => {
   const { headless } = getProvider(provider);
 
   return Boolean(headless);
+};
+
+/**
+ * Returns the image url fot the given cardless EMI provider
+ * @param {string} provider
+ * @returns {string}
+ */
+export const getImageUrl = provider => {
+  const { logo } = getProvider(provider);
+  return logo;
 };

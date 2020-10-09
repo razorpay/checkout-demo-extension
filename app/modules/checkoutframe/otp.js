@@ -13,9 +13,18 @@ otpView.prototype = {
     });
   },
 
-  setText(text) {
+  setTextView(textView, templateData = {}) {
+    /**
+     * IMPORTANT: Do not merge these calls into a single updateScreen call.
+     * We need to ensure that template data is set before rendering the actual
+     * template. Since stores are being updated one by one, svelte-i18n throws
+     * an exception if template variables are missing when text is set.
+     */
     this.updateScreen({
-      text,
+      templateData,
+    });
+    this.updateScreen({
+      textView,
     });
   },
 

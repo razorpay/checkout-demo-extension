@@ -1,18 +1,49 @@
 <script>
+  import { tick } from 'svelte';
   import { fly } from 'svelte/transition';
   import { formatAmountWithSymbol } from 'common/currency';
   import { getCurrency } from 'checkoutstore';
+  import { getAnimationOptions } from 'svelte-utils';
+
   import {
     getOffersForTab,
     getOffersForInstrument,
     getOtherOffers,
+    getOffersForTabAndInstrument,
   } from 'checkoutframe/offers';
+
+  // i18n
+  import { t, locale } from 'svelte-i18n';
+  import { formatTemplateWithLocale } from 'i18n';
+
+  import {
+    AVAILABLE_OFFERS_HEADER,
+    BACK_ACTION,
+    CHANGE_ACTION,
+    CONTINUE_WITHOUT_OFFER_ACTION,
+    HIDE_ACTION,
+    NO_OFFER_AVAILABLE_METHOD_MESSAGE,
+    NOT_APPLICABLE_ERROR,
+    NOT_APPLICABLE_CARD_MESSAGE,
+    OFFER_APPLIED_MESSAGE,
+    OFFERS_AVAILABLE_MESSAGE,
+    OTHER_OFFERS_ACTION,
+    OTHER_OFFERS_COUNT,
+    OTHER_OFFERS_HEADER,
+    PAY_ORIGINAL_MESSAGE,
+    SELECT_ACTION,
+    SELECT_OFFER_HEADER,
+    YOU_SAVE_MESSAGE,
+    APPLY_OFFER_CTA,
+  } from 'ui/labels/offers';
 
   import Callout from 'ui/elements/Callout.svelte';
   import CTA from 'ui/elements/CTA.svelte';
   import OfferItemList from './OfferItemList.svelte';
-
-  import { selectedInstrument } from 'checkoutstore/screens/home';
+  import {
+    selectedInstrument,
+    methodInstrument,
+  } from 'checkoutstore/screens/home';
   import { appliedOffer, isCardValidForOffer } from 'checkoutstore/offers';
   import { customer } from 'checkoutstore/customer';
 
@@ -37,7 +68,8 @@
     }
   }
   $: _El.keepClass(_Doc.querySelector('#header'), 'offer-error', error);
-  $: switchInstrument($selectedInstrument);
+
+  $: $selectedInstrument, switchInstrument();
 
   $: discount =
     $appliedOffer && $appliedOffer.original_amount - $appliedOffer.amount;
@@ -50,15 +82,32 @@
     }
   }
 
+  export function rerenderTab() {
+    renderTab(currentTab);
+  }
+
   export function renderTab(tab) {
     if (tab !== currentTab) {
       currentTab = tab;
     }
-    if (!tab && $selectedInstrument) {
-      tab = $selectedInstrument.method;
-      applicableOffers = getOffersForInstrument($selectedInstrument);
+
+    if (!tab) {
+      // Homescreen
+
+      if ($selectedInstrument) {
+        // Instrument is selected, show offers for that instrument
+        tab = $selectedInstrument.method;
+        applicableOffers = getOffersForInstrument($selectedInstrument);
+      } else {
+        // No instrument is selected, show all offers for homescreen
+        applicableOffers = getOffersForTab();
+      }
     } else {
-      applicableOffers = getOffersForTab(tab);
+      // We are in a method tab. Instrument might have been chosen. Show offers accordingly.
+      applicableOffers = getOffersForTabAndInstrument({
+        tab,
+        instrument: $methodInstrument,
+      });
     }
 
     var invalidateOffer = false;
@@ -146,7 +195,7 @@
     hideList();
     // let other view updation take place after offers hide
     // to maintain CTA lifo stack
-    setAppliedOffer(offer, true);
+    tick().then(() => setAppliedOffer(offer, true));
   }
 
   export function clearOffer() {
@@ -298,49 +347,67 @@
     <span>
       {#if $appliedOffer}
         {#if !$isCardValidForOffer}
-          Offer is not applicable on this card.
+          <!-- LABEL: Offer is not applicable on this card. -->
+          {$t(NOT_APPLICABLE_CARD_MESSAGE)}
         {:else}
-          Offer Applied!
+          <!-- LABEL: Offer Applied! -->
+          {$t(OFFER_APPLIED_MESSAGE)}
           {#if discount}
             <small class="theme-highlight">
-              You save {formatAmountWithSymbol(discount, getCurrency(), false)}
+              <!-- LABEL: You save {amount} -->
+              {formatTemplateWithLocale(YOU_SAVE_MESSAGE, { amount: formatAmountWithSymbol(discount, getCurrency(), false) }, $locale)}
             </small>
           {/if}
         {/if}
       {:else if applicableOffers.length === 1}
         {applicableOffers[0].name}
       {:else}
-        {applicableOffers.length + otherOffers.length} Offers Available
+        <!-- LABEL: {count} Offers Available -->
+        {formatTemplateWithLocale(OFFERS_AVAILABLE_MESSAGE, { count: applicableOffers.length + otherOffers.length }, $locale)}
       {/if}
       <span class="offer-action theme-highlight">
-        {$appliedOffer ? 'Change' : 'Select'}
+        <!-- LABEL: Change / Select -->
+        {$appliedOffer ? $t(CHANGE_ACTION) : $t(SELECT_ACTION)}
       </span>
     </span>
   </header>
   {#if error}
     <div class="error-container">
       <div class="error-desc">
-        <b>The offer is not applicable on {error}.</b>
+        <!-- LABEL: The offer is not applicable on {error}. -->
+        <b>
+          {formatTemplateWithLocale(NOT_APPLICABLE_ERROR, { error }, $locale)}
+        </b>
         <br />
-        <span>You can pay the original amount.</span>
+        <!-- LABEL: You can pay the original amount. -->
+        <span>{$t(PAY_ORIGINAL_MESSAGE)}</span>
       </div>
       <div class="error-btns theme-highlight">
         <span on:click={continueWithoutOffer}>
-          <b>Continue without offer</b>
+          <!-- LABEL: Continue without offer -->
+          <b>{$t(CONTINUE_WITHOUT_OFFER_ACTION)}</b>
         </span>
-        <span class="error-back" on:click={continueWithOffer}>Back</span>
+        <!-- LABEL: Back -->
+        <span class="error-back" on:click={continueWithOffer}>
+          {$t(BACK_ACTION)}
+        </span>
       </div>
     </div>
   {/if}
   {#if listActive}
-    <main class="list" transition:fly={{ y: 40, duration: 200 }}>
+    <main
+      class="list"
+      transition:fly={getAnimationOptions({ y: 40, duration: 200 })}>
       <header class="close-offerlist" on:click={hideList}>
-        Select an offer
-        <span>Hide</span>
+        <!-- LABEL: Select an offer -->
+        {$t(SELECT_OFFER_HEADER)}
+        <!-- LABEL: Hide -->
+        <span>{$t(HIDE_ACTION)}</span>
       </header>
       <div class="offerlist-container">
         {#if applicableOffers.length}
-          <legend>Available Offers</legend>
+          <!-- LABEL: Available Offers -->
+          <legend>{$t(AVAILABLE_OFFERS_HEADER)}</legend>
           <OfferItemList
             {selected}
             offers={applicableOffers}
@@ -348,16 +415,16 @@
             {selectOffer} />
         {:else}
           <legend>
-            <small>
-              No offers available for this method. Please look at other offers
-              available below
-            </small>
+            <!-- LABEL: No offers available for this method. Please look at other offers
+              available below -->
+            <small>{$t(NO_OFFER_AVAILABLE_METHOD_MESSAGE)}</small>
           </legend>
         {/if}
         {#if otherOffers.length}
           {#if otherActive || !applicableOffers.length}
             {#if otherActive}
-              <legend>Other Offers</legend>
+              <!-- LABEL: Other Offers -->
+              <legend>{$t(OTHER_OFFERS_HEADER)}</legend>
             {/if}
             <OfferItemList
               {selected}
@@ -366,11 +433,15 @@
               {selectOffer} />
           {:else}
             <legend>
+              <!-- LABEL: + OTHER OFFERS -->
               <span
                 class="theme-highlight"
                 on:click={() => (otherActive = true)}>
-                + OTHER OFFERS
-                <small>({otherOffers.length} more)</small>
+                {$t(OTHER_OFFERS_ACTION)}
+                <!-- LABEL: ({count} more) -->
+                <small>
+                  {formatTemplateWithLocale(OTHER_OFFERS_COUNT, { count: otherOffers.length }, $locale)}
+                </small>
               </span>
             </legend>
           {/if}
@@ -382,5 +453,5 @@
 {#if error}
   <CTA show={false} />
 {:else if listActive}
-  <CTA on:click={onSubmit} show={Boolean(selected)}>Apply Offer</CTA>
+  <CTA on:click={onSubmit} show={Boolean(selected)}>{$t(APPLY_OFFER_CTA)}</CTA>
 {/if}

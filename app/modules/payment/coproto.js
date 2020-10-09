@@ -1,23 +1,32 @@
 import * as GPay from 'gpay';
-import * as strings from 'common/strings';
 import {
   parseUPIIntentResponse,
   didUPIIntentSucceed,
   upiBackCancel,
+  getAppFromPackageName,
+  GOOGLE_PAY_PACKAGE_NAME,
 } from 'common/upi';
 import { androidBrowser } from 'common/useragent';
 import Track from 'tracker';
-import Razorpay from 'common/Razorpay';
 import Analytics from 'analytics';
-import { getSession } from 'sessionmanager';
-import { getBankFromCard } from 'common/bank';
+import * as Bridge from 'bridge';
+import { ADAPTER_CHECKERS, phonepeSupportedMethods } from 'payment/adapters';
+import { supportedWebPaymentsMethodsForApp } from 'common/webPaymentsApi';
+
+const getParsedDataFromUrl = url => {
+  const parsedData = {};
+  url.replace(/^.*\?/, '').replace(/([^=&]+)=([^&]*)/g, (m, key, value) => {
+    parsedData[decodeURIComponent(key)] = decodeURIComponent(value);
+  });
+  return parsedData;
+};
 
 export const processOtpResponse = function(response) {
   var error = response.error;
   Track(this.r, 'otp_response', response);
   if (error) {
     if (error.action === 'RETRY') {
-      return this.emit('otp.required', strings.wrongOtp);
+      return this.emit('otp.required', 'incorrect_otp_retry');
     } else if (error.action === 'TOPUP') {
       return this.emit('wallet.topup', error.description);
     }
@@ -49,6 +58,23 @@ export const processPaymentCreate = function(response) {
   }
 
   processCoproto.call(payment, response);
+};
+
+/**
+ * For async payments where callback_url needs to be sent (example: CRED),
+ * the status API will return a type: return coproto for some reason,
+ * this response is not handled on the SDK-side,
+ * so just consider what's present in the request content.
+ * Usually it will be the razorpay_payment_id & other things.
+ *
+ * @param response
+ * @returns {*}
+ */
+const handleAsyncStatusResponse = function(response) {
+  if (response.type === 'return') {
+    return response.request.content;
+  }
+  return response;
 };
 
 // returns true if coproto handled
@@ -153,9 +179,51 @@ var responseTypes = {
         url: request.url,
         callback: response => this.complete(response),
       })
-      .till(response => response && response.status);
+      .till(response => response && response.status, 10);
 
-    this.emit('upi.pending', fullResponse.data);
+    if (this.data.method === 'app') {
+      this.emit('app.pending', fullResponse);
+    } else {
+      this.emit('upi.pending', fullResponse.data);
+    }
+  },
+
+  application: function(request, fullResponse) {
+    var payment = this;
+
+    // Save request for later use (polling status)
+    payment.request = request;
+
+    // Send the coproto payload to SDK for further processing.
+    payment.emit('externalsdk.process', fullResponse);
+
+    // Set a listener to handle the intent response.
+    payment.on('app.intent_response', response => {
+      // Track intent response
+      Analytics.track('intent_response', { data: { response } });
+
+      // Check the intent response
+      if (response.provider === 'GOOGLE_PAY') {
+        if (response.data.apiResponse.type === 'google_pay_cards') {
+          if (response.resultCode === 0) {
+            // Payment was cancelled on Google Pay app.
+            payment.emit('cancel', GPay.googlePayCardsCancelPayload);
+
+            return;
+          }
+        }
+      }
+
+      // Starting polling API for payment status.
+      var request = payment.request;
+      payment.ajax = fetch
+        .jsonp({
+          url: request.url,
+          callback: response =>
+            payment.complete(handleAsyncStatusResponse(response)),
+        })
+        .till(response => response && response.status, 10);
+    });
   },
 
   gpay_inapp: function(request) {
@@ -164,9 +232,79 @@ var responseTypes = {
         url: request.url,
         callback: response => this.complete(response),
       })
-      .till(response => response && response.status);
+      .till(response => response && response.status, 10);
 
     this.emit('upi.pending', { flow: 'upi-intent' });
+  },
+
+  web_payments: function(response, app) {
+    var instrumentData = {};
+
+    var data = response.data;
+    var intent_url = data.intent_url;
+    instrumentData.url = intent_url;
+    var parsedData = getParsedDataFromUrl(data.intent_url);
+
+    const supportedInstruments = [
+      {
+        supportedMethods: supportedWebPaymentsMethodsForApp[app],
+        data: instrumentData,
+      },
+    ];
+
+    const details = {
+      total: {
+        label: 'Payment',
+        amount: {
+          currency: 'INR',
+          value: parseFloat(parsedData.am).toFixed(2),
+        },
+      },
+    };
+
+    const webPaymentOnError = function(app, error) {
+      if (error.code) {
+        if (
+          [error.ABORT_ERR, error.NOT_SUPPORTED_ERR].indexOf(error.code) >= 0
+        ) {
+          this.emit('upi.intent_response', {});
+        }
+
+        // Since the method is not supported, remove it.
+        if (error.code === error.NOT_SUPPORTED_ERR) {
+          Analytics.track('web_payments_api:not_supported', {
+            data: {
+              error,
+              app,
+            },
+          });
+        }
+      }
+    };
+
+    try {
+      const PaymentRequest = global.PaymentRequest;
+
+      const request = new PaymentRequest(supportedInstruments, details);
+      request
+        .show()
+        .then(instrument => {
+          Track(this.r, 'web_payments_api_response', {
+            instrument,
+          });
+
+          this.emit('upi.intent_response', {
+            response: instrument.details,
+          });
+
+          return instrument.complete();
+        })
+        .catch(error => {
+          webPaymentOnError(app, error);
+        });
+    } catch (error) {
+      webPaymentOnError(app, error);
+    }
   },
 
   gpay: function(coprotoRequest, fullResponse, type = 'payment_request') {
@@ -193,14 +331,13 @@ var responseTypes = {
 
             // Since the method is not supported, remove it.
             if (error.code === error.NOT_SUPPORTED_ERR) {
-              const session = getSession();
+              Analytics.track('gpay:not_supported', {
+                data: {
+                  error,
+                },
+              });
 
-              if (session && session.upiTab) {
-                session.upiTab.$set({
-                  useWebPaymentsApi: false,
-                  selectedApp: 'gpay',
-                });
-              }
+              // TODO: (nice to have) Remove the Google Pay app from UI
             }
           }
 
@@ -220,10 +357,14 @@ var responseTypes = {
             data: error,
           });
           this.emit('cancel', upiBackCancel);
+          // Log error for debugging/troubleshooting
+          console.error(error);
         });
     }
   },
   intent: function(request, fullResponse) {
+    const CheckoutBridge = global.CheckoutBridge;
+
     var ra = ({ transactionReferenceId } = {}) =>
       fetch
         .jsonp({
@@ -237,17 +378,60 @@ var responseTypes = {
             this.complete(response);
           },
         })
-        .till(response => response && response.status);
+        .till(response => response && response.status, 10);
 
     var intent_url = (fullResponse.data || {}).intent_url;
 
-    this.on('upi.intent_success_response', data => {
+    if (this.data.method === 'app') {
+      this.emit('app.coproto_response', fullResponse);
+
+      if (Bridge.checkout.platform === 'ios') {
+        Bridge.checkout.callIos('callNativeIntent', {
+          intent_url,
+          shortcode: this.data.provider,
+        });
+      } else {
+        CheckoutBridge.callNativeIntent(intent_url);
+      }
+
+      this.on('app.intent_response', response => {
+        if (response.provider === 'CRED') {
+          if (response.data === 0) {
+            // Payment was cancelled on CRED app.
+            this.emit('cancel', {
+              '_[method]': 'app',
+              '_[provider]': 'cred',
+              '_[reason]': 'PAYMENT_CANCEL_ON_APP',
+            });
+
+            return; // Don't poll for status as the payment was cancelled.
+          }
+        }
+        this.ajax = fetch
+          .jsonp({
+            url: request.url,
+            callback: response =>
+              this.complete(handleAsyncStatusResponse(response)),
+          })
+          .till(response => response && response.status, 10);
+      });
+
+      return;
+    }
+
+    const startPolling = data => {
       if (data) {
         this.emit('upi.pending', { flow: 'upi-intent', response: data });
       }
 
       this.ajax = ra(data);
-    });
+    };
+
+    if (Bridge.checkout.platform === 'ios') {
+      startPolling();
+    } else {
+      this.on('upi.intent_success_response', startPolling);
+    }
 
     this.on('upi.intent_response', data => {
       if (data |> parseUPIIntentResponse |> didUPIIntentSucceed) {
@@ -259,7 +443,6 @@ var responseTypes = {
 
     this.emit('upi.coproto_response', fullResponse);
 
-    var CheckoutBridge = window.CheckoutBridge;
     if (CheckoutBridge && CheckoutBridge.callNativeIntent) {
       // If there's a UPI App specified, use it.
       if (this.upi_app) {
@@ -278,8 +461,32 @@ var responseTypes = {
       }
 
       if (androidBrowser) {
-        return responseTypes['gpay'].call(this, request, fullResponse);
+        // payment.upi_app does not exist for razorpay.js
+        if (!this.upi_app) {
+          return responseTypes['gpay'].call(this, request, fullResponse);
+        }
+
+        if (this.upi_app === GOOGLE_PAY_PACKAGE_NAME) {
+          return responseTypes['gpay'].call(this, request, fullResponse);
+        } else {
+          return responseTypes['web_payments'].call(
+            this,
+            fullResponse,
+            this.upi_app
+          );
+        }
       }
+    } else if (this.upi_app) {
+      // upi_app will only be set for UPI intent payments.
+      // Check for its existence as this coproto is also used for
+      // UPI QR payments on web, where this is not required.
+      const app = getAppFromPackageName(this.upi_app);
+
+      return Bridge.checkout.callIos('callNativeIntent', {
+        intent_url,
+        upi_app: this.upi_app,
+        shortcode: app.shortcode,
+      });
     }
   },
 
@@ -287,13 +494,13 @@ var responseTypes = {
     if (!this.nativeotp && !this.iframe && request.method === 'direct') {
       return responseTypes.first.call(this, request, responseTypes);
     }
-    // TODO: Remove this usage when API starts sending "mode: hdfc_debit_emi"
-    const iin = fullResponse.metadata && fullResponse.metadata.iin;
-    const bank = getBankFromCard(iin);
     if (this.data.method === 'wallet') {
       this.otpurl = request.url;
       this.emit('otp.required');
-    } else if (this.data.method === 'emi' && bank.code === 'HDFC_DC') {
+    } else if (
+      this.data.method === 'emi' &&
+      this.data['_[mode]'] === 'hdfc_debit_emi'
+    ) {
       this.otpurl = fullResponse.submit_url;
       // TODO: Remove this explicit assignment when backend starts sending it.
       fullResponse.mode = 'hdfc_debit_emi';
