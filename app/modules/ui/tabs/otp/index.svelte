@@ -20,7 +20,7 @@
   } from 'checkoutstore/screens/otp';
   import { cardNumber, selectedCard } from 'checkoutstore/screens/card';
   import { selectedInstrument } from 'checkoutstore/screens/home';
-  import { showFeeLabel, getOption } from 'checkoutstore/index.js';
+  import { showFeeLabel } from 'checkoutstore/index.js';
 
   // Utils
   import { getFormattedDateTime } from 'lib/utils';
@@ -66,13 +66,6 @@
   let compact;
 
   const session = getSession();
-
-  const subscriptionCardChange = getOption('subscription_card_change');
-
-  if (subscriptionCardChange) {
-    $allowSkip = false;
-    console.log('True');
-  }
 
   // This flag indicates whether or not the OTP input field will be visible.
   // We don't want to show EMI details on loading state or error state.

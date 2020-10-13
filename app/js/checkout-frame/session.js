@@ -483,7 +483,7 @@ function askOTP(view, textView, shouldLimitResend, templateData) {
     loading: false,
     action: false,
     otp: '',
-    allowSkip: true,
+    allowSkip: session.get('subscription_card_change') ? false : true,
     allowResend: shouldLimitResend ? OtpService.canSendOtp('razorpay') : true,
   });
 
@@ -2846,12 +2846,6 @@ Session.prototype = {
   },
 
   showCardTab: function(tab) {
-    if (Store.isASubscription()) {
-      this.otpView.updateScreen({
-        allowSkip: this.get('subscription_card_change') ? false : true,
-      });
-    }
-
     this.otpView.updateScreen({
       maxlength: 6,
     });
