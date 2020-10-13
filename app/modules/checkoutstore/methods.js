@@ -684,7 +684,9 @@ export function getEMandateAuthTypes(bankCode) {
         return type === authTypeFromOrder;
       }
 
-      return type === 'netbanking' || type === 'debitcard';
+      return (
+        type === 'netbanking' || type === 'debitcard' || type === 'aadhaar'
+      );
     }) || []
   );
 }

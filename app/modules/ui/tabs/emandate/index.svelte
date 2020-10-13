@@ -43,6 +43,8 @@
     AUTH_TYPE_DEBIT_DESCRIPTION,
     AUTH_TYPE_NETBANKING_TITLE,
     AUTH_TYPE_NETBANKING_DESCRIPTION,
+    AUTH_TYPE_AADHAAR_TITLE,
+    AUTH_TYPE_AADHAAR_DESCRIPTION,
     ACCOUNT_TYPE_CURRENT,
     ACCOUNT_TYPE_SAVINGS,
     ACCOUNT_TYPE_LABEL,
@@ -78,6 +80,7 @@
   const AuthTypes = {
     NETBANKING: 'netbanking',
     DEBIT_CARD: 'debitcard',
+    AADHAAR: 'aadhaar',
   };
 
   const accountTextLabels = {
@@ -440,6 +443,23 @@
                   <span class="desc">
                     <!-- LABEL: via Bank Account and Netbanking details -->
                     {$t(AUTH_TYPE_NETBANKING_DESCRIPTION)}
+                  </span>
+                </label>
+              </div>
+            {/if}
+            {#if isEMandateAuthTypeEnabled($selectedBank, AuthTypes.AADHAAR)}
+              <div
+                class="auth-option item aadhaar"
+                on:click={() => handleAuthTypeClicked(AuthTypes.AADHAAR)}>
+                <label>
+                  <i class="theme">
+                    {@html icons.aadhaar}
+                  </i>
+                  <!-- LABEL: Aadhaar -->
+                  {$t(AUTH_TYPE_AADHAAR_TITLE)}
+                  <span class="desc">
+                    <!-- LABEL: via Bank Account and Aadhaar VID -->
+                    {$t(AUTH_TYPE_AADHAAR_DESCRIPTION)}
                   </span>
                 </label>
               </div>

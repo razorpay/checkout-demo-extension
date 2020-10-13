@@ -503,6 +503,8 @@ export default {
     auth_type_header: 'Authenticate using',
     auth_type_netbanking_description: 'via Bank Account and Netbanking details',
     auth_type_netbanking_title: 'Netbanking',
+    auth_type_aadhaar_title: 'Aadhaar',
+    auth_type_aadhaar_description: 'via Bank Account and Aadhaar details',
     change_bank_btn: 'Change Bank',
     ifsc_help: 'Please enter a valid IFSC',
     ifsc_label: 'IFSC',
