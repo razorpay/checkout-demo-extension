@@ -521,6 +521,8 @@ export default {
       'Total Amount: {totalAmount} ({monthlyAmount} x {duration})',
     edit_plan_action: 'Edit',
     edit_plan_text: '{duration} Months ({amount}/mo)',
+    axis_bank_emi:
+      'Full amount of Rs {amount} would be deducted from your account, which will be converted into EMI by your bank in 3-4 days. Convenience fee of 1% of transaction amount or Rs 100 whichever is higher + GST applicable for EMI transactions on Axis bank cards.',
     citi_bank_emi:
       'Full amount of {amount} will be deducted from your account. EMI processing may take upto 8 working days.',
     citi_know_more:
