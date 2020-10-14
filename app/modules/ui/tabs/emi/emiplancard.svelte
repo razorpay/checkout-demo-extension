@@ -21,6 +21,7 @@
     NO_COST_DISCOUNT_LABEL,
     NO_COST_EXPLAIN_ACTION,
     CREDIT_EMI_DESCRIPTION,
+    AXIS_BANK_EMI,
     CITI_BANK_EMI,
     CITI_KNOW_MORE,
     SHOW_MORE,
@@ -54,6 +55,7 @@
   let interestChargedByBank;
 
   const session = getSession();
+  const AXIS_BANK_CODE = 'UTIB';
   const CITI_BANK_CODE = 'CITI';
   const HDFC_BANK_CODE = 'HDFC';
   const HDFC_BANK_DEBIT_CODE = 'HDFC_DC';
@@ -201,11 +203,16 @@
               class="citi-url"
               href="https://www.online.citibank.co.in/portal/newgen/cards/tab/creditcards_tc.htm"
               target="_blank">
-              <!-- In case the total amount due has not been paid in full, finance charges as applicable (currently, between 3.50%- 3.60% per month i.e. 42-43.2% annualized) on card balances may apply until the EMI is converted & posted to the card. 
+              <!--LABEL: In case the total amount due has not been paid in full, finance charges as applicable (currently, between 3.50%- 3.60% per month i.e. 42-43.2% annualized) on card balances may apply until the EMI is converted & posted to the card. 
               Latest rates are available at https://www.online.citibank.co.in/portal/newgen/cards/tab/creditcards_tc.htm -->
               {$t(CITI_URL)}
             </a>
           {/if}
+        {:else if bank === AXIS_BANK_CODE}
+          <!--LABEL: Full amount of Rs {amount} would be deducted from your account, 
+        which will be converted into EMI by your bank in 3-4 days. 
+        Convenience fee of 1% of transaction amount or Rs 100 whichever is higher + GST applicable for EMI transactions on Axis bank cards.' -->
+          {formatTemplateWithLocale(AXIS_BANK_EMI, { amount: formattedAmount }, $locale)}
         {:else}
           <!-- LABEL: Full amount of {formattedAmount} will be deducted from your account,
         which will be converted into EMI by your bank in 3-4 days. -->
