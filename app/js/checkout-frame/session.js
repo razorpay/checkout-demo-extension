@@ -3319,36 +3319,10 @@ Session.prototype = {
 
   getFormData: function() {
     var tab = this.tab;
-    var data = {};
     if (!preferences) {
-      return data;
+      return {};
     }
-
-    data.contact = getPhone();
-    data.email = getEmail();
-
-    // If it's the default contact details, do not send them
-    if (data.contact === Constants.INDIA_COUNTRY_CODE || data.contact === '+') {
-      delete data.contact;
-    }
-
-    if (Store.isContactOptional()) {
-      // Merchant is on contact optional feature
-      if (!contactPattern.test(data.contact)) {
-        // However, payload seems to have an invalid contact, delete it.
-        delete data.contact;
-      }
-    } else if (data.contact) {
-      data.contact = data.contact.replace(/\ /g, '');
-    }
-
-    if (Store.isEmailOptional()) {
-      // Merchant is on email optional feature
-      if (!emailPattern.test(data.email)) {
-        // However, payload seems to have an invalid email, delete it.
-        delete data.email;
-      }
-    }
+    var data = HomeScreenStore.getCustomerDetails();
 
     if (tab) {
       data.method = tab;
