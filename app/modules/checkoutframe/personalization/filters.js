@@ -156,7 +156,11 @@ export const filterInstrumentsForAvailableMethods = _.curry2(
 
 const SANITY_FILTERS = {
   upi: instrument => {
-    if (instrument.vpa && !VPA_REGEX.test(instrument.vpa)) {
+    if (
+      instrument['_[flow]'] === 'directpay' &&
+      instrument.vpa &&
+      !VPA_REGEX.test(instrument.vpa)
+    ) {
       return false;
     }
 
