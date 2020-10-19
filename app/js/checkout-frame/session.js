@@ -479,13 +479,20 @@ function askOTP(view, textView, shouldLimitResend, templateData) {
     textView = textView.error && textView.error.description;
   }
 
-  view.updateScreen({
+  var otpProperties = {
     loading: false,
     action: false,
     otp: '',
-    allowSkip: session.get('subscription_card_change') ? false : true,
     allowResend: shouldLimitResend ? OtpService.canSendOtp('razorpay') : true,
-  });
+  };
+
+  if (Store.isASubscription()) {
+    _Obj.extend(otpProperties, {
+      allowSkip: session.get('subscription_card_change') ? false : true,
+    });
+  }
+
+  view.updateScreen(otpProperties);
 
   if (thisSession.headless) {
     if (paymentData.goToBank) {
