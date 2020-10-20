@@ -32,7 +32,14 @@ export const getRecurringMethods = () => getMerchantMethods().recurring;
 export const getMethodsCustomText = () => getMerchantMethods().custom_text;
 export const getMerchantOrder = () => preferences.order;
 export const getOrderMethod = () => getMerchantOrder()?.method;
-export const getMerchantOffers = () => preferences.offers;
+export const getMerchantOffers = () => {
+  // Temporary fix: If customer-feebearer do not show any offers to the user.
+  if (preferences.fee_bearer) {
+    return;
+  } else {
+    return preferences.offers;
+  }
+};
 export const isOfferForced = () => preferences.force_offer;
 export const getDowntimes = () => _getDowntimes(preferences);
 export const isCustomerFeeBearer = () => preferences.fee_bearer;
