@@ -115,7 +115,7 @@ module.exports = function(testFeatures) {
 
       await assertPaymentMethods(context);
 
-      if (offers) {
+      if (!feeBearer && offers) {
         await viewOffers(context);
         await selectOffer(context, '1');
         await verifyOfferApplied(context);

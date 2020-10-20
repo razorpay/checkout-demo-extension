@@ -133,7 +133,7 @@ module.exports = function(testFeatures) {
         }
       }
 
-      if (offers) {
+      if (!feeBearer && offers) {
         await viewOffers(context);
         await selectOffer(context, '1');
         await verifyOfferApplied(context);
@@ -186,7 +186,7 @@ module.exports = function(testFeatures) {
           });
         }
       } else {
-        if (offers) {
+        if (!feeBearer && offers) {
           await handleValidationRequest(context, 'fail');
           await retryPayzappWalletTransaction(context);
           await verifyOfferApplied(context);
