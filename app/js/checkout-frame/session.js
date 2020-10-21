@@ -472,13 +472,20 @@ function askOTP(view, textView, shouldLimitResend, templateData) {
     textView = textView.error && textView.error.description;
   }
 
-  view.updateScreen({
+  var otpProperties = {
     loading: false,
     action: false,
     otp: '',
-    allowSkip: !Store.isRecurring(),
     allowResend: shouldLimitResend ? OtpService.canSendOtp('razorpay') : true,
-  });
+  };
+
+  if (Store.isASubscription()) {
+    _Obj.extend(otpProperties, {
+      allowSkip: session.get('subscription_card_change') ? false : true,
+    });
+  }
+
+  view.updateScreen(otpProperties);
 
   if (thisSession.headless) {
     if (paymentData.goToBank) {
@@ -2738,7 +2745,6 @@ Session.prototype = {
       ) {
         return;
       }
-      var customer = this.getCustomer(contact);
       this.updateCustomerInStore();
 
       if (this.getCurrentCustomer().logged && !this.local) {
@@ -2768,32 +2774,9 @@ Session.prototype = {
 
     if (tab === 'upi') {
       this.updateCustomerInStore();
-
-      // Enforce login flow for UPI Recurring subscriptions
-      if (Store.isASubscription() && !customer.logged) {
-        this.otpView.updateScreen({
-          maxlength: 6,
-        });
-
-        var self = this;
-        var customer = self.getCurrentCustomer();
-
-        this.topBar.setTitleOverride('otp', 'text', 'upi');
-
-        self.commenceOTP('otp_sending_generic', '', {
-          phone: getPhone(),
-        });
-
-        self.getCurrentCustomer().createOTP(function() {
-          Analytics.track('subscriptions_upi:access:otp:ask');
-          askOTP(self.otpView, 'otp_proceed_with_upi_subscription', true, {
-            phone: getPhone(),
-          });
-          self.updateCustomerInStore();
-        });
-      } else {
-        discreet.upiTab.render();
-      }
+      //For the new flow checkout no longer asks for OTP for UPI subscriptions.
+      discreet.upiTab.render();
+      this.setScreen('upi');
     }
 
     if (tab === 'upi_otm') {
@@ -2896,20 +2879,10 @@ Session.prototype = {
       }
       customer.checkStatus(function() {
         /**
-         * 1. If this is a recurring payment and customer doesn't have saved cards,
-         *    create and ask for OTP.
-         * 2. If customer has saved cards and is not logged in, ask for OTP.
-         * 3. If customer doesn't have saved cards, show cards screen.
+         * 1. If customer has saved cards and is not logged in, ask for OTP.
+         * 2. If customer doesn't have saved cards, show cards screen.
          */
-        if (Store.isRecurring() && !customer.saved && !customer.logged) {
-          self.getCurrentCustomer().createOTP(function() {
-            Analytics.track('saved_cards:access:otp:ask');
-            askOTP(self.otpView, 'otp_sent_save_card_recurring', true, {
-              phone: getPhone(),
-            });
-            self.updateCustomerInStore();
-          });
-        } else if (customer.saved && !customer.logged) {
+        if (customer.saved && !customer.logged) {
           askOTP(self.otpView, undefined, true, { phone: getPhone() });
         } else {
           self.setScreen('card');

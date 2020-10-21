@@ -80,12 +80,6 @@ const METHOD_FILTERS = {
   },
 
   upi: (instrument, { customer }) => {
-    // hide p13n tokens for anonymous users in case of subscriptions
-    // login needs to be enforced before any payments are made through upi
-    if (isASubscription() && !customer.logged) {
-      return false;
-    }
-
     // Only allow directpay instruments that have a VPA
     if (instrument['_[flow]'] === 'directpay') {
       if (instrument.vpa) {
