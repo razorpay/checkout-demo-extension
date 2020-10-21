@@ -853,6 +853,7 @@ export default {
       epaylater: 'ePayLater',
       getsimpl: 'Simpl',
       icic: 'ICICI Bank PayLater',
+      hdfc: 'FlexiPay by HDFC Bank',
     },
     select_option_title: 'Select an option',
   },
