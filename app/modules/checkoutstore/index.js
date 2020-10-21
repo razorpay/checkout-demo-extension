@@ -36,7 +36,7 @@ export const getMerchantOffers = () => {
   // Temporary fix: If customer-feebearer do not show any offers to the user.
   if (preferences.fee_bearer) {
     return;
-  } else {
+  } else if (preferences.fee_bearer && preferences.force_offer) {
     return preferences.offers;
   }
 };
