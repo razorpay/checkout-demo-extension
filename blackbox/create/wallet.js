@@ -120,7 +120,7 @@ module.exports = function(testFeatures) {
         await selectPaymentMethod(context, 'wallet');
         await assertWalletPage(context);
 
-        if (offers || (optionalContact && !callbackUrl)) {
+        if ((!feeBearer && offers) || (optionalContact && !callbackUrl)) {
           await selectWallet(context, 'payzapp');
           if (feeBearer) {
             await verifyFooterText(context, 'PAY');
@@ -174,7 +174,7 @@ module.exports = function(testFeatures) {
       }
 
       if (callbackUrl) {
-        if (offers) {
+        if (!feeBearer && offers) {
           await expectRedirectWithCallback(context, {
             method: 'wallet',
             wallet: 'payzapp',
