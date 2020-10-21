@@ -38,6 +38,8 @@ export const getMerchantOffers = () => {
     return;
   } else if (preferences.fee_bearer && preferences.force_offer) {
     return preferences.offers;
+  } else {
+    return preferences.offers;
   }
 };
 export const isOfferForced = () => preferences.force_offer;
