@@ -3236,6 +3236,7 @@ Session.prototype = {
   },
 
   checkInvalid: function(parent) {
+    //Test
     if (!parent) {
       parent = this.getActiveForm();
       var payload = this.payload;
