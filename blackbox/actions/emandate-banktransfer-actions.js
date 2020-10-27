@@ -1,3 +1,5 @@
+const { unflatten, query2obj } = require('../util');
+
 const accountNum = '1112220014911928';
 const ifscCode = 'RAZR0000001';
 const accountHolderName = 'Sakshi Jain';
@@ -32,7 +34,16 @@ async function fillEmandateBankDetails(context) {
 }
 
 async function returnVirtualAccounts(context, fee = false) {
-  await context.expectRequest();
+  const request = await context.expectRequest();
+  const parsedRequestBody = unflatten(query2obj(request.body));
+  const customerDetails = {};
+  if (context.state.contact) {
+    customerDetails.contact = `+91${context.state.contact}`;
+  }
+  if (context.state.email) {
+    customerDetails.email = context.state.email;
+  }
+
   await context.respondJSON({
     id: 'va_DhhfICdHxgXszs',
     name: accountHolderName,
@@ -58,6 +69,7 @@ async function returnVirtualAccounts(context, fee = false) {
     closed_at: null,
     created_at: 1574058924,
   });
+  expect(parsedRequestBody.customer).toEqual(customerDetails);
 }
 
 async function verifyNeftDetails(context, feeBearer) {
