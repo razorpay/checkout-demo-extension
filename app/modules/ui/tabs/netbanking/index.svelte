@@ -4,7 +4,10 @@
   import { fade } from 'svelte/transition';
 
   // Store
-  import { selectedBank } from 'checkoutstore/screens/netbanking';
+  import {
+    selectedBank,
+    hiddenBanksUsingConfig,
+  } from 'checkoutstore/screens/netbanking';
   import { methodInstrument } from 'checkoutstore/screens/home';
 
   // UI imports
@@ -171,8 +174,26 @@
     return filteredBanks;
   }
 
+  /**
+   *
+   *
+   */
+  function filterHiddenBanksUsingConfig(banks, hiddenBanks) {
+    banks = _Obj.clone(banks);
+    hiddenBanks.forEach(hiddenBank => {
+      delete banks[hiddenBank];
+    });
+
+    return banks;
+  }
+
   $: {
     filteredBanks = filterBanksAgainstInstrument(banks, $methodInstrument);
+
+    filteredBanks = filterHiddenBanksUsingConfig(
+      filteredBanks,
+      $hiddenBanksUsingConfig
+    );
 
     // If the currently selected bank is not present in filtered banks, we need to unset it.
     if (!filteredBanks[$selectedBank]) {
