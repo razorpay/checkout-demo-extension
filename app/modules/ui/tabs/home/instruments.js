@@ -28,6 +28,57 @@ function generateBasePreferredBlock(preferred) {
 }
 
 /**
+ * Tells whether a p13n isntrument is usable, i.e.
+ * not hidden using config.
+ *
+ * @param {Instrument} instrument
+ * @param {Array<Instrument>} hiddenInstruments
+ * @param {Customer} customer
+ * @returns {boolean}
+ */
+function isP13nInstrumentUsable(instrument, hiddenInstruments, customer) {
+  const individualInstruments = getIndividualInstruments(instrument, customer)
+    ._ungrouped;
+
+  // For every individual p13n instrument, check if there are any hidden
+  // instruments are present.
+  return _Arr.every(
+    individualInstruments,
+    individualInstrument =>
+      !_Arr.any(hiddenInstruments, hiddenInstrument =>
+        areInstrumentsSame(hiddenInstrument, individualInstrument)
+      )
+  );
+}
+
+/**
+ * Compares two instruments and tells whether they are
+ * the same instrument or not. This only works on ungrouped
+ * instruments.
+ *
+ * @param {Instrument} instrument1
+ * @param {Instrument} instrument2
+ * @returns {boolean}
+ */
+function areInstrumentsSame(instrument1, instrument2) {
+  const comparator =
+    INSTRUMENT_COMPARATORS[instrument1.method] || genericInstrumentComparator;
+
+  return (
+    instrument1.method === instrument2.method &&
+    comparator(instrument1, instrument2)
+  );
+}
+
+const INSTRUMENT_COMPARATORS = {
+  netbanking: (a, b) => a.bank === b.bank,
+};
+
+function genericInstrumentComparator(a, b) {
+  return false;
+}
+
+/**
  * Tells whether a given preferred instrument is allowed
  * Used to filter out preferred methods instruments.
  * @param {Instrument} preferred
@@ -208,6 +259,18 @@ export function setBlocks(
         preferredInstruments,
         preferredInstrument => {
           return isMethodUsable(preferredInstrument.method);
+        }
+      );
+
+      // Filter out all preferred instruments which are hidden using hide in config
+      filteredPreferredInstruments = _Arr.filter(
+        filteredPreferredInstruments,
+        instrument => {
+          return isP13nInstrumentUsable(
+            instrument,
+            parsedConfig.display.hide.instruments,
+            customer
+          );
         }
       );
 
