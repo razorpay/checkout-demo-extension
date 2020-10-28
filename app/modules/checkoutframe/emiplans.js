@@ -75,6 +75,9 @@ const fetchAgreements = (provider, loanUrl, plans, amount) => {
 
   const createUrlHelper = AGREEMENT_HELPER.createUrl[provider];
 
+  // API sometimes sends loan_url for providers other than the ones that need
+  // a loan agreement to be shown. Do not try to fetch the agreement if the
+  // helper for the provider is not defined.
   if (!createUrlHelper) {
     return;
   }
