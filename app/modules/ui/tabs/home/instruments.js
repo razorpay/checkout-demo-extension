@@ -28,21 +28,24 @@ function generateBasePreferredBlock(preferred) {
 }
 
 /**
- * Tells whether a p13n isntrument is usable, i.e.
- * not hidden using config.
+ * Tells whether a p13n instrument is hidden using config.
  *
  * @param {Instrument} instrument
  * @param {Array<Instrument>} hiddenInstruments
  * @param {Customer} customer
  * @returns {boolean}
  */
-function isP13nInstrumentUsable(instrument, hiddenInstruments, customer) {
+function isP13nInstrumentHiddenViaConfig(
+  instrument,
+  hiddenInstruments,
+  customer
+) {
   const individualInstruments = getIndividualInstruments(instrument, customer)
     ._ungrouped;
 
   // For every individual p13n instrument, check if any hidden
   // instruments are present.
-  return _Arr.every(
+  return !_Arr.every(
     individualInstruments,
     individualInstrument =>
       !_Arr.any(hiddenInstruments, hiddenInstrument =>
@@ -265,13 +268,12 @@ export function setBlocks(
       // Filter out all preferred instruments which are hidden using hide in config
       filteredPreferredInstruments = _Arr.filter(
         filteredPreferredInstruments,
-        instrument => {
-          return isP13nInstrumentUsable(
+        instrument =>
+          !isP13nInstrumentHiddenViaConfig(
             instrument,
             parsedConfig.display.hide.instruments,
             customer
-          );
-        }
+          )
       );
 
       // Filter out all preferred methods that are already being shown by the merchant
