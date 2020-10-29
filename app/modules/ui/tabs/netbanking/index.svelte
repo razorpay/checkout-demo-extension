@@ -174,10 +174,6 @@
     return filteredBanks;
   }
 
-  /**
-   *
-   *
-   */
   function filterHiddenBanksUsingConfig(banks, hiddenBanks) {
     banks = _Obj.clone(banks);
     hiddenBanks.forEach(hiddenBank => {
