@@ -40,7 +40,7 @@ function isP13nInstrumentUsable(instrument, hiddenInstruments, customer) {
   const individualInstruments = getIndividualInstruments(instrument, customer)
     ._ungrouped;
 
-  // For every individual p13n instrument, check if there are any hidden
+  // For every individual p13n instrument, check if any hidden
   // instruments are present.
   return _Arr.every(
     individualInstruments,
