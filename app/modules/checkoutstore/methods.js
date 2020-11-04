@@ -892,9 +892,8 @@ function getUsableMethods() {
 
   const methods = methodsFromInstruments.concat(sequenceMethods);
 
-  // Make unique
-  // Array.from(Set) is polyfilled on IE. Safe to use.
-  return Array.from(new Set(methods));
+  // Remove duplicates
+  return _Arr.removeDuplicates(methods);
 }
 
 /**
