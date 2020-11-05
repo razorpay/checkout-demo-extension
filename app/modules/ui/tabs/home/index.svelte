@@ -224,6 +224,10 @@
     hideMethods();
   }
 
+  function showRewards() {
+    // TODO
+  }
+
   export function setDetailsCta() {
     if (isPartialPayment) {
       showNext('Next');
@@ -899,24 +903,6 @@
     flex-grow: 1;
   }
 
-  /* Styles for "Edit v" button */
-  .details-container div[slot='extra'] {
-    display: flex;
-  }
-
-  .details-container div[slot='extra'] span {
-    display: block;
-  }
-
-  .details-container div[slot='extra'] span:first-child {
-    margin: 2px 4px 0;
-    font-size: 1.2em;
-  }
-
-  .details-container div[slot='extra'] span:last-child {
-    transform: rotate(-90deg);
-  }
-
   .details-container div[slot='title'] {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -934,6 +920,18 @@
     margin-left: 8px;
     padding-left: 8px;
     border-left: solid 1px #757575;
+  }
+
+  .details-strip {
+    display: flex;
+  }
+
+  :global(#user-details) {
+    min-width: 0;
+  }
+
+  :global(#rewards-cta) {
+    width: 56px;
   }
 
   .solidbg {
@@ -956,20 +954,27 @@
           {#if showUserDetailsStrip || isPartialPayment}
             <div
               use:touchfix
-              class="details-container border-list"
+              class="details-container"
               in:fly={getAnimationOptions({ duration: 400, y: 80 })}>
               {#if showUserDetailsStrip}
-                <SlottedOption on:click={editUserDetails} id="user-details">
-                  <i slot="icon">
-                    <Icon icon={icons.edit} />
-                  </i>
-                  <div slot="title">
-                    {#if $isContactPresent && !isContactHidden()}
-                      <span>{$contact}</span>
-                    {/if}
-                    {#if $email && !isEmailHidden()}<span>{$email}</span>{/if}
-                  </div>
-                </SlottedOption>
+                <div class="details-strip border-list-horizontal">
+                  <SlottedOption on:click={editUserDetails} id="user-details">
+                    <i slot="icon">
+                      <Icon icon={icons.edit} />
+                    </i>
+                    <div slot="title">
+                      {#if $isContactPresent && !isContactHidden()}
+                        <span>{$contact}</span>
+                      {/if}
+                      {#if $email && !isEmailHidden()}<span>{$email}</span>{/if}
+                    </div>
+                  </SlottedOption>
+                  <SlottedOption on:click={showRewards} id="rewards-cta">
+                    <i slot="icon">
+                      <Icon icon={icons.present} />
+                    </i>
+                  </SlottedOption>
+                </div>
               {/if}
               {#if isPartialPayment}
                 <SlottedOption

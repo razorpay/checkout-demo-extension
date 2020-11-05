@@ -12,6 +12,7 @@ import contact from './contact';
 import upiOtm from './upi_otm';
 import aadhaar from './aadhaar';
 import edit from './edit';
+import present from './present';
 
 import { getAllMethods } from 'checkoutframe/paymentmethods';
 
@@ -20,6 +21,7 @@ const availIconNames = getAllMethods().concat([
   'contact',
   'aadhaar',
   'edit',
+  'present',
 ]);
 
 function getIconFn(iconName) {
@@ -69,6 +71,9 @@ function getIconFn(iconName) {
 
     case 'edit':
       return edit;
+
+    case 'present':
+      return present;
   }
 }
 
