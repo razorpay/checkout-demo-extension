@@ -87,6 +87,7 @@
   function setCardNumberValidity(valid) {
     if (numberField) {
       numberField.setValid(valid);
+      numberField.dispatchFilledIfValid();
     }
   }
 
