@@ -42,7 +42,6 @@
 
   // i18n
   import {
-    EDIT_BUTTON_LABEL,
     PARTIAL_AMOUNT_EDIT_LABEL,
     PARTIAL_AMOUNT_STATUS_FULL,
     PARTIAL_AMOUNT_STATUS_PARTIAL,
@@ -969,16 +968,6 @@
                       <span>{$contact}</span>
                     {/if}
                     {#if $email && !isEmailHidden()}<span>{$email}</span>{/if}
-                  </div>
-                  <div
-                    slot="extra"
-                    class="theme-highlight-color"
-                    aria-label={contactEmailReadonly ? '' : 'Edit'}>
-                    {#if !contactEmailReadonly}
-                      <!-- LABEL: Edit -->
-                      <span>{$t(EDIT_BUTTON_LABEL)}</span>
-                      <span>&#xe604;</span>
-                    {/if}
                   </div>
                 </SlottedOption>
               {/if}

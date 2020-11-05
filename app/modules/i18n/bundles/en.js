@@ -617,7 +617,6 @@ export default {
     country_search_all: 'All countries',
     country_search_placeholder: 'Search a country',
     customer_name_label: 'Customer Name',
-    edit_button_label: 'Edit',
     email_help_text: 'Please enter a valid email. Example: you@example.com',
     email_label_optional: 'Email (Optional)',
     email_label_required: 'Email',
