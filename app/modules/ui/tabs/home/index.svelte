@@ -962,7 +962,7 @@
               {#if showUserDetailsStrip}
                 <SlottedOption on:click={editUserDetails} id="user-details">
                   <i slot="icon">
-                    <Icon icon={icons.contact} />
+                    <Icon icon={icons.edit} />
                   </i>
                   <div slot="title">
                     {#if $isContactPresent && !isContactHidden()}
