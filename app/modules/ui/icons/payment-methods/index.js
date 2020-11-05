@@ -14,7 +14,7 @@ import aadhaar from './aadhaar';
 
 import { getAllMethods } from 'checkoutframe/paymentmethods';
 
-const availPaymentMethods = getAllMethods().concat([
+const availIconNames = getAllMethods().concat([
   'othermethods',
   'contact',
   'aadhaar',
@@ -78,7 +78,7 @@ export const getIcon = (
 
 export const getIcons = options =>
   _Arr.reduce(
-    availPaymentMethods,
+    availIconNames,
     (result, method) => {
       result[method] = getIcon(method, options);
       return result;
