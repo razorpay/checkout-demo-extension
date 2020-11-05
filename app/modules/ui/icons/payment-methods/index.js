@@ -11,6 +11,7 @@ import bank_transfer from './bank_transfer';
 import contact from './contact';
 import upiOtm from './upi_otm';
 import aadhaar from './aadhaar';
+import edit from './edit';
 
 import { getAllMethods } from 'checkoutframe/paymentmethods';
 
@@ -18,6 +19,7 @@ const availIconNames = getAllMethods().concat([
   'othermethods',
   'contact',
   'aadhaar',
+  'edit',
 ]);
 
 function getIconFn(iconName) {
@@ -64,6 +66,9 @@ function getIconFn(iconName) {
 
     case 'aadhaar':
       return aadhaar;
+
+    case 'edit':
+      return edit;
   }
 }
 
