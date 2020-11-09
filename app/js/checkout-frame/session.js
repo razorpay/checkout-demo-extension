@@ -2933,17 +2933,13 @@ Session.prototype = {
     var self = this;
     var amount = this.get('amount');
 
-    var trackEmi = function(name, data) {
-      Analytics.track(name, {
-        type: AnalyticsTypes.BEHAV,
-        data: data,
-      });
-    };
-
     var viewAllPlans = function(tab) {
       return function() {
-        trackEmi('emi:plans:view:all', {
-          from: tab,
+        Analytics.track('emi:plans:view:all', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            from: tab,
+          },
         });
 
         showOverlay($('#emi-wrap'));
@@ -2997,8 +2993,11 @@ Session.prototype = {
         }),
 
         payWithoutEmi: function() {
-          trackEmi('emi:pay_without', {
-            from: prevTab,
+          Analytics.track('emi:pay_without', {
+            type: AnalyticsTypes.BEHAV,
+            data: {
+              from: prevTab,
+            },
           });
 
           EmiStore.newCardEmiDuration.set('');
@@ -3016,9 +3015,12 @@ Session.prototype = {
 
           var text = cardTab.getEmiText(amount, plan) || '';
 
-          trackEmi('emi:plan:select', {
-            from: prevTab,
-            value: value,
+          Analytics.track('emi:plan:select', {
+            type: AnalyticsTypes.BEHAV,
+            data: {
+              from: prevTab,
+              value: value,
+            },
           });
 
           EmiStore.newCardEmiDuration.set(value);
@@ -3051,17 +3053,13 @@ Session.prototype = {
     var self = this;
     var amount = this.get('amount');
 
-    var trackEmi = function(name, data) {
-      Analytics.track(name, {
-        type: AnalyticsTypes.BEHAV,
-        data: data,
-      });
-    };
-
     var viewAllPlans = function(tab) {
       return function() {
-        trackEmi('emi:plans:view:all', {
-          from: tab,
+        Analytics.track('emi:plans:view:all', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            from: tab,
+          },
         });
 
         showOverlay($('#emi-wrap'));
@@ -3118,8 +3116,11 @@ Session.prototype = {
         },
 
         payWithoutEmi: function() {
-          trackEmi('emi:pay_without', {
-            from: prevTab,
+          Analytics.track('emi:pay_without', {
+            type: AnalyticsTypes.BEHAV,
+            data: {
+              from: prevTab,
+            },
           });
 
           EmiStore.setEmiDurationForSavedCard('');
@@ -3138,9 +3139,12 @@ Session.prototype = {
 
           var text = cardTab.getEmiText(amount, plan) || '';
 
-          trackEmi('emi:plan:select', {
-            from: prevTab,
-            value: value,
+          Analytics.track('emi:plan:select', {
+            type: AnalyticsTypes.BEHAV,
+            data: {
+              from: prevTab,
+              value: value,
+            },
           });
 
           EmiStore.setEmiDurationForSavedCard(value);
@@ -3179,13 +3183,6 @@ Session.prototype = {
   showEmiPlansForBajaj: function() {
     var self = this;
     var amount = this.get('amount');
-
-    var trackEmi = function(name, data) {
-      Analytics.track(name, {
-        type: AnalyticsTypes.BEHAV,
-        data: data,
-      });
-    };
 
     self.topBar.resetTitleOverride('emiplans');
 
