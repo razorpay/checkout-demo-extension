@@ -62,7 +62,7 @@
     "jshint-stylish": "^2.2.1",
     "puppeteer": "^2.1.1",
     "rollup-plugin-coverage": "^0.1.4",
-    "rollup-plugin-svelte": "^6.1.0",
+    "rollup-plugin-svelte": "^6.1.1",
     "run-sequence": "^2.2.1",
     "svelte-i18n": "^3.0.4",
     "tap-difflet": "^0.7.1",
