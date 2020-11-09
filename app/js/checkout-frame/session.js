@@ -1156,7 +1156,7 @@ Session.prototype = {
     }
 
     if (providerCode === 'bajaj') {
-      this.showEmiPlans('bajaj')();
+      this.showEmiPlansForBajaj();
       return;
     }
 
@@ -1266,7 +1266,7 @@ Session.prototype = {
       target: _Doc.querySelector('#form-emi'),
     });
 
-    this.emiScreenView.$on('editplan', this.showEmiPlans('bajaj'));
+    this.emiScreenView.$on('editplan', this.showEmiPlansForBajaj.bind(this));
   },
 
   getCardlessEmiPlans: function() {
@@ -2929,17 +2929,9 @@ Session.prototype = {
     return emiPlansSorted;
   },
 
-  /**
-   * Returns a closure to handle showing of EMI plans screen.
-   *
-   * @param {String} type
-   *
-   * @return {Function}
-   */
-  showEmiPlans: function(type) {
+  showEmiPlansForNewCard: function() {
     var self = this;
     var amount = this.get('amount');
-    var tabTitle = 'EMI Plans';
 
     var trackEmi = function(name, data) {
       Analytics.track(name, {
@@ -2966,247 +2958,281 @@ Session.prototype = {
       return issuer;
     };
 
-    if (type === 'new') {
-      return function(e) {
-        self.topBar.resetTitleOverride('emiplans');
+    self.topBar.resetTitleOverride('emiplans');
 
-        var bank = self.emiPlansForNewCard && self.emiPlansForNewCard.code;
-        var cardIssuer = bank.split('_')[0];
-        var cardType = _Str.endsWith(bank, '_DC') ? 'debit' : 'credit';
+    var bank = self.emiPlansForNewCard && self.emiPlansForNewCard.code;
+    var cardIssuer = bank.split('_')[0];
+    var cardType = _Str.endsWith(bank, '_DC') ? 'debit' : 'credit';
 
-        bank = getBankEMICode(bank, cardType);
+    bank = getBankEMICode(bank, cardType);
 
-        var contactRequiredForEMI = MethodStore.isContactRequiredForEMI(
-          bank,
-          cardType
-        );
-        var plans = MethodStore.getEMIBankPlans(bank);
-        var emiPlans = MethodStore.getEligiblePlansBasedOnMinAmount(
-          self.getEmiPlans(bank)
-        );
-        var prevTab = self.tab;
-        var prevScreen = self.screen;
+    var contactRequiredForEMI = MethodStore.isContactRequiredForEMI(
+      bank,
+      cardType
+    );
+    var plans = MethodStore.getEMIBankPlans(bank);
+    var emiPlans = MethodStore.getEligiblePlansBasedOnMinAmount(
+      self.getEmiPlans(bank)
+    );
+    var prevTab = self.tab;
+    var prevScreen = self.screen;
 
-        self.emiPlansView.setPlans({
-          type: type,
-          amount: amount,
-          plans: emiPlans,
-          bank: bank,
-          card: {
-            issuer: cardIssuer,
-            type: cardType,
-          },
-          contactRequiredForEMI: contactRequiredForEMI,
-          on: {
-            back: bind(function() {
-              self.switchTab(prevTab);
-              self.setScreen(prevScreen);
-              self.svelteCardTab.showAddCardView();
+    self.emiPlansView.setPlans({
+      type: 'new',
+      amount: amount,
+      plans: emiPlans,
+      bank: bank,
+      card: {
+        issuer: cardIssuer,
+        type: cardType,
+      },
+      contactRequiredForEMI: contactRequiredForEMI,
+      on: {
+        back: bind(function() {
+          self.switchTab(prevTab);
+          self.setScreen(prevScreen);
+          self.svelteCardTab.showAddCardView();
 
-              return true;
-            }),
+          return true;
+        }),
 
-            payWithoutEmi: function() {
-              trackEmi('emi:pay_without', {
-                from: prevTab,
-              });
+        payWithoutEmi: function() {
+          trackEmi('emi:pay_without', {
+            from: prevTab,
+          });
 
-              EmiStore.newCardEmiDuration.set('');
+          EmiStore.newCardEmiDuration.set('');
 
-              self.switchTab('card');
-              self.setScreen('card');
-              self.svelteCardTab.showLandingView();
-            },
+          self.switchTab('card');
+          self.setScreen('card');
+          self.svelteCardTab.showLandingView();
+        },
 
-            select: function(value, contact) {
-              var plan = _Arr.find(plans, function(p) {
-                return p.duration === value;
-              });
-              EmiStore.selectedPlan.set(plan);
+        select: function(value, contact) {
+          var plan = _Arr.find(plans, function(p) {
+            return p.duration === value;
+          });
+          EmiStore.selectedPlan.set(plan);
 
-              var text = cardTab.getEmiText(amount, plan) || '';
+          var text = cardTab.getEmiText(amount, plan) || '';
 
-              trackEmi('emi:plan:select', {
-                from: prevTab,
-                value: value,
-              });
+          trackEmi('emi:plan:select', {
+            from: prevTab,
+            value: value,
+          });
 
-              EmiStore.newCardEmiDuration.set(value);
-              EmiStore.selectedPlanTextForNewCard.set(text);
+          EmiStore.newCardEmiDuration.set(value);
+          EmiStore.selectedPlanTextForNewCard.set(text);
 
-              self.switchTab('emi');
-              self.svelteCardTab.showAddCardView();
+          self.switchTab('emi');
+          self.svelteCardTab.showAddCardView();
 
-              if (contactRequiredForEMI) {
-                HomeScreenStore.emiContact.set(contact);
-              }
+          if (contactRequiredForEMI) {
+            HomeScreenStore.emiContact.set(contact);
+          }
 
-              self.preSubmit();
-            },
+          self.preSubmit();
+        },
 
-            viewAll: viewAllPlans(prevTab),
-          },
+        viewAll: viewAllPlans(prevTab),
+      },
 
-          actions: {
-            viewAll: true,
-            payWithoutEmi: MethodStore.isMethodEnabled('card'),
-          },
-        });
+      actions: {
+        viewAll: true,
+        payWithoutEmi: MethodStore.isMethodEnabled('card'),
+      },
+    });
 
-        self.switchTab('emiplans');
-        $('#body').removeClass('sub');
-      };
-    } else if (type === 'saved') {
-      return function(e) {
-        self.topBar.resetTitleOverride('emiplans');
+    self.switchTab('emiplans');
+    $('#body').removeClass('sub');
+  },
 
-        var trigger = e.currentTarget;
-        var $trigger = $(trigger);
-        var bank = $trigger.attr('data-bank');
-        var cardIssuer = bank;
-        var cardType = $trigger.attr('data-card-type');
+  showEmiPlansForSavedCard: function(e) {
+    var self = this;
+    var amount = this.get('amount');
 
-        bank = getBankEMICode(bank, cardType);
+    var trackEmi = function(name, data) {
+      Analytics.track(name, {
+        type: AnalyticsTypes.BEHAV,
+        data: data,
+      });
+    };
 
-        var contactRequiredForEMI = MethodStore.isContactRequiredForEMI(
-          bank,
-          cardType
-        );
-        var plans = MethodStore.getEMIBankPlans(bank, cardType);
-        var emiPlans = MethodStore.getEligiblePlansBasedOnMinAmount(
-          self.getEmiPlans(bank, cardType)
-        );
-        var $savedCard = $('.saved-card.checked');
-        var savedCvv = $savedCard.$('.saved-cvv input').val();
-        var prevTab = self.tab;
-        var prevScreen = self.screen;
-
-        self.emiPlansView.setPlans({
-          type: type,
-          amount: amount,
-          plans: emiPlans,
-          card: {
-            issuer: cardIssuer,
-            type: cardType,
-          },
-          bank: bank,
-          contactRequiredForEMI: contactRequiredForEMI,
-          on: {
-            back: function() {
-              self.switchTab(prevTab);
-              self.setScreen(prevScreen);
-
-              return true;
-            },
-
-            payWithoutEmi: function() {
-              trackEmi('emi:pay_without', {
-                from: prevTab,
-              });
-
-              EmiStore.setEmiDurationForSavedCard('');
-              EmiStore.selectedPlanTextForSavedCard.set();
-
-              self.switchTab('card');
-              self.setScreen('card');
-              self.svelteCardTab.showSavedCardsView();
-            },
-
-            select: function(value, contact) {
-              var plan = _Arr.find(plans, function(p) {
-                return p.duration === value;
-              });
-              EmiStore.selectedPlan.set(plan);
-
-              var text = cardTab.getEmiText(amount, plan) || '';
-
-              trackEmi('emi:plan:select', {
-                from: prevTab,
-                value: value,
-              });
-
-              EmiStore.setEmiDurationForSavedCard(value);
-              EmiStore.selectedPlanTextForSavedCard.set(text);
-
-              self.switchTab('emi');
-              self.setScreen('card');
-              self.svelteCardTab.showSavedCardsView();
-
-              if (contactRequiredForEMI) {
-                HomeScreenStore.emiContact.set(contact);
-              }
-
-              if (savedCvv) {
-                self.preSubmit();
-              } else {
-                self.switchTab('emi');
-                self.setScreen('card');
-                self.svelteCardTab.showSavedCardsView();
-              }
-            },
-
-            viewAll: viewAllPlans(prevTab),
-          },
-
-          actions: {
-            viewAll: true,
-            payWithoutEmi: MethodStore.isMethodEnabled('card'),
-          },
-        });
-
-        self.switchTab('emiplans');
-        $('#body').removeClass('sub');
-      };
-    } else if (type === 'bajaj') {
+    var viewAllPlans = function(tab) {
       return function() {
-        self.topBar.resetTitleOverride('emiplans');
-
-        var bank = 'BAJAJ';
-        var plans = MethodStore.getEMIBankPlans(bank);
-        var emiPlans = self.getEmiPlans(bank);
-        var prevTab = self.tab;
-        var prevScreen = self.screen;
-
-        self.emiPlansView.setPlans({
-          type: type,
-          amount: amount,
-          plans: emiPlans,
-          bank: bank,
-          on: {
-            back: function() {
-              self.switchTab(prevTab);
-              self.setScreen(prevScreen);
-              return true;
-            },
-
-            select: function(value) {
-              var plan = _Arr.find(plans, function(plan) {
-                return plan.duration === value;
-              });
-
-              var text = cardTab.getEmiText(amount, plan) || '';
-
-              self.emiScreenView.setPlan({
-                duration: plan.duration,
-                text: text,
-              });
-
-              self.setScreen('emi');
-              self.switchTab('emi');
-            },
-
-            actions: {
-              viewAll: false,
-              payWithoutEmi: false,
-            },
-          },
+        trackEmi('emi:plans:view:all', {
+          from: tab,
         });
 
-        self.switchTab('emiplans');
-        $('#body').removeClass('sub');
-        cardTab.setEmiPlansCta('emi', 'emiplans');
+        showOverlay($('#emi-wrap'));
       };
-    }
+    };
+
+    var getBankEMICode = function(issuer, type) {
+      // EMI codes are different from bank codes and have _DC at the end.
+      if (type === 'debit' && !_Str.endsWith(issuer, '_DC')) {
+        return issuer + '_DC';
+      }
+      return issuer;
+    };
+
+    self.topBar.resetTitleOverride('emiplans');
+
+    var trigger = e.currentTarget;
+    var $trigger = $(trigger);
+    var bank = $trigger.attr('data-bank');
+    var cardIssuer = bank;
+    var cardType = $trigger.attr('data-card-type');
+
+    bank = getBankEMICode(bank, cardType);
+
+    var contactRequiredForEMI = MethodStore.isContactRequiredForEMI(
+      bank,
+      cardType
+    );
+    var plans = MethodStore.getEMIBankPlans(bank, cardType);
+    var emiPlans = MethodStore.getEligiblePlansBasedOnMinAmount(
+      self.getEmiPlans(bank, cardType)
+    );
+    var $savedCard = $('.saved-card.checked');
+    var savedCvv = $savedCard.$('.saved-cvv input').val();
+    var prevTab = self.tab;
+    var prevScreen = self.screen;
+
+    self.emiPlansView.setPlans({
+      type: 'saved',
+      amount: amount,
+      plans: emiPlans,
+      card: {
+        issuer: cardIssuer,
+        type: cardType,
+      },
+      bank: bank,
+      contactRequiredForEMI: contactRequiredForEMI,
+      on: {
+        back: function() {
+          self.switchTab(prevTab);
+          self.setScreen(prevScreen);
+
+          return true;
+        },
+
+        payWithoutEmi: function() {
+          trackEmi('emi:pay_without', {
+            from: prevTab,
+          });
+
+          EmiStore.setEmiDurationForSavedCard('');
+          EmiStore.selectedPlanTextForSavedCard.set();
+
+          self.switchTab('card');
+          self.setScreen('card');
+          self.svelteCardTab.showSavedCardsView();
+        },
+
+        select: function(value, contact) {
+          var plan = _Arr.find(plans, function(p) {
+            return p.duration === value;
+          });
+          EmiStore.selectedPlan.set(plan);
+
+          var text = cardTab.getEmiText(amount, plan) || '';
+
+          trackEmi('emi:plan:select', {
+            from: prevTab,
+            value: value,
+          });
+
+          EmiStore.setEmiDurationForSavedCard(value);
+          EmiStore.selectedPlanTextForSavedCard.set(text);
+
+          self.switchTab('emi');
+          self.setScreen('card');
+          self.svelteCardTab.showSavedCardsView();
+
+          if (contactRequiredForEMI) {
+            HomeScreenStore.emiContact.set(contact);
+          }
+
+          if (savedCvv) {
+            self.preSubmit();
+          } else {
+            self.switchTab('emi');
+            self.setScreen('card');
+            self.svelteCardTab.showSavedCardsView();
+          }
+        },
+
+        viewAll: viewAllPlans(prevTab),
+      },
+
+      actions: {
+        viewAll: true,
+        payWithoutEmi: MethodStore.isMethodEnabled('card'),
+      },
+    });
+
+    self.switchTab('emiplans');
+    $('#body').removeClass('sub');
+  },
+
+  showEmiPlansForBajaj: function() {
+    var self = this;
+    var amount = this.get('amount');
+
+    var trackEmi = function(name, data) {
+      Analytics.track(name, {
+        type: AnalyticsTypes.BEHAV,
+        data: data,
+      });
+    };
+
+    self.topBar.resetTitleOverride('emiplans');
+
+    var bank = 'BAJAJ';
+    var plans = MethodStore.getEMIBankPlans(bank);
+    var emiPlans = self.getEmiPlans(bank);
+    var prevTab = self.tab;
+    var prevScreen = self.screen;
+
+    self.emiPlansView.setPlans({
+      type: 'bajaj',
+      amount: amount,
+      plans: emiPlans,
+      bank: bank,
+      on: {
+        back: function() {
+          self.switchTab(prevTab);
+          self.setScreen(prevScreen);
+          return true;
+        },
+
+        select: function(value) {
+          var plan = _Arr.find(plans, function(plan) {
+            return plan.duration === value;
+          });
+
+          var text = cardTab.getEmiText(amount, plan) || '';
+
+          self.emiScreenView.setPlan({
+            duration: plan.duration,
+            text: text,
+          });
+
+          self.setScreen('emi');
+          self.switchTab('emi');
+        },
+
+        actions: {
+          viewAll: false,
+          payWithoutEmi: false,
+        },
+      },
+    });
+
+    self.switchTab('emiplans');
+    $('#body').removeClass('sub');
+    cardTab.setEmiPlansCta('emi', 'emiplans');
   },
 
   /**
@@ -3956,7 +3982,7 @@ Session.prototype = {
                * show the EMI plans.
                */
               if (data.token) {
-                this.showEmiPlans('saved')({
+                this.showEmiPlansForSavedCard({
                   currentTarget: $(
                     '.saved-card[token="' + data.token + '"] .emi-plans-trigger'
                   )[0],
@@ -3966,7 +3992,7 @@ Session.prototype = {
                  * If this is a new card and no EMI duration is selected,
                  * show the EMI plans.
                  */
-                this.showEmiPlans('new')({
+                this.showEmiPlansForNewCard({
                   delegateTarget: $(
                     '#add-card-container .emi-plans-trigger'
                   )[0],
