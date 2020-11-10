@@ -2394,6 +2394,7 @@ Session.prototype = {
   _trySelectingOfferInstrument: function(offer) {
     var issuer = offer.issuer;
     var screen = offer.payment_method;
+    var isEmiOffer = offer.payment_method === 'emi' && !offer.emi_subvention;
 
     var emiHandler = function() {
       var emiDuration = EmiStore.getEmiDurationForNewCard();
@@ -2401,11 +2402,7 @@ Session.prototype = {
 
       if (emiDuration) {
         var plan = _Arr.find(
-          MethodStore.getEMIBankPlans(
-            bank,
-            'credit',
-            Boolean(offer.emi_subvention)
-          ),
+          MethodStore.getEMIBankPlans(bank, 'credit', !isEmiOffer),
           function(p) {
             return p.duration === emiDuration;
           }
@@ -2931,8 +2928,10 @@ Session.prototype = {
     var bank = self.emiPlansForNewCard && self.emiPlansForNewCard.code;
     var cardIssuer = bank.split('_')[0];
     var cardType = _Str.endsWith(bank, '_DC') ? 'debit' : 'credit';
-    var isNoCostOfferApplied = Boolean(
-      appliedOffer && appliedOffer.emi_subvention
+    var isEmiOfferApplied = Boolean(
+      appliedOffer &&
+        appliedOffer.payment_method === 'emi' &&
+        !appliedOffer.emi_subvention
     );
 
     bank = getBankEMICode(bank, cardType);
@@ -2941,11 +2940,7 @@ Session.prototype = {
       bank,
       cardType
     );
-    var plans = MethodStore.getEMIBankPlans(
-      bank,
-      'credit',
-      isNoCostOfferApplied
-    );
+    var plans = MethodStore.getEMIBankPlans(bank, 'credit', !isEmiOfferApplied);
     var emiPlans = MethodStore.getEligiblePlansBasedOnMinAmount(plans);
     var prevTab = self.tab;
     var prevScreen = self.screen;
@@ -3059,8 +3054,10 @@ Session.prototype = {
     var bank = $trigger.attr('data-bank');
     var cardIssuer = bank;
     var cardType = $trigger.attr('data-card-type');
-    var isNoCostEmiOfferApplied = Boolean(
-      appliedOffer && appliedOffer.emi_subvention
+    var isEmiOfferApplied = Boolean(
+      appliedOffer &&
+        appliedOffer.payment_method === 'emi' &&
+        !appliedOffer.emi_subvention
     );
 
     bank = getBankEMICode(bank, cardType);
@@ -3069,11 +3066,7 @@ Session.prototype = {
       bank,
       cardType
     );
-    var plans = MethodStore.getEMIBankPlans(
-      bank,
-      cardType,
-      isNoCostEmiOfferApplied
-    );
+    var plans = MethodStore.getEMIBankPlans(bank, cardType, !isEmiOfferApplied);
     var emiPlans = MethodStore.getEligiblePlansBasedOnMinAmount(plans);
     var $savedCard = $('.saved-card.checked');
     var savedCvv = $savedCard.$('.saved-cvv input').val();
@@ -3166,17 +3159,17 @@ Session.prototype = {
   showEmiPlansForBajaj: function() {
     var self = this;
     var amount = this.get('amount');
+    var appliedOffer = this.getAppliedOffer();
+    var isEmiOfferApplied = Boolean(
+      appliedOffer &&
+        appliedOffer.method === 'emi' &&
+        !appliedOffer.emi_subvention
+    );
 
     self.topBar.resetTitleOverride('emiplans');
 
     var bank = 'BAJAJ';
-    var plans = MethodStore.getEMIBankPlans(
-      bank,
-      'credit',
-      true
-      // Always use no-cost for bajaj as a special case because offers cannot
-      // be applied on Bajaj EMI and it is okay to always show no-cost EMI plans
-    );
+    var plans = MethodStore.getEMIBankPlans(bank, 'credit', !isEmiOfferApplied);
     var prevTab = self.tab;
     var prevScreen = self.screen;
 
