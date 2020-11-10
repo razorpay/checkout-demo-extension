@@ -3183,7 +3183,7 @@ Session.prototype = {
     self.emiPlansView.setPlans({
       type: 'bajaj',
       amount: amount,
-      plans,
+      plans: plans,
       bank: bank,
       on: {
         back: function() {
