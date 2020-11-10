@@ -75,7 +75,7 @@ module.exports = function(testFeatures) {
         bajaj: true,
       };
 
-      // Why do the following and not include Bajaj in emi.json file?
+      // Why do the following and not include Bajaj in emi_options.json file?
       // When EMI on Cards is available,
       // we show "EMI" on homescreen, clicking on which takes us to Cards screen
       // However, if EMI on Bajaj is available,

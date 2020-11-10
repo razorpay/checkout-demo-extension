@@ -13,7 +13,7 @@ const {
 const netbanking = require('../data/banks.json');
 const wallet = require('../data/wallets.json');
 const recurring = require('../data/recurring.json');
-const emi_options = require('../data/emi.json');
+const emi_options = require('../data/emi_options.json');
 const card = require('../data/cards.json');
 
 const cardNetworks = ['MasterCard', 'Visa'];
