@@ -3206,7 +3206,6 @@ Session.prototype = {
   showEmiPlansForBajaj: function() {
     var self = this;
     var amount = this.get('amount');
-    var appliedOffer = this.getAppliedOffer();
 
     self.topBar.resetTitleOverride('emiplans');
 
@@ -3214,9 +3213,11 @@ Session.prototype = {
     var plans = MethodStore.getEMIBankPlans(
       bank,
       'credit',
-      Boolean(appliedOffer && appliedOffer.emi_subvention)
+      true
+      // Always use no-cost for bajaj as a special case because offers cannot
+      // be applied on Bajaj EMI and it is okay to always show no-cost EMI plans
     );
-    var emiPlans = self.getEmiPlans(bank, 'credit');
+    var emiPlans = self.getEmiPlans(bank, 'credit', true);
     var prevTab = self.tab;
     var prevScreen = self.screen;
 
