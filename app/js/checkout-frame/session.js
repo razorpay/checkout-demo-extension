@@ -2940,6 +2940,9 @@ Session.prototype = {
       bank,
       cardType
     );
+
+    // We need to show plans without no-cost EMI if the applied offer is an
+    // EMI offer because No cost EMI cannot be applied with regular EMI offers.
     var plans = MethodStore.getEMIBankPlans(bank, 'credit', !isEmiOfferApplied);
     var emiPlans = MethodStore.getEligiblePlansBasedOnMinAmount(plans);
     var prevTab = self.tab;
@@ -3066,6 +3069,9 @@ Session.prototype = {
       bank,
       cardType
     );
+
+    // We need to show plans without no-cost EMI if the applied offer is an
+    // EMI offer because No cost EMI cannot be applied with regular EMI offers.
     var plans = MethodStore.getEMIBankPlans(bank, cardType, !isEmiOfferApplied);
     var emiPlans = MethodStore.getEligiblePlansBasedOnMinAmount(plans);
     var $savedCard = $('.saved-card.checked');
@@ -3169,7 +3175,11 @@ Session.prototype = {
     self.topBar.resetTitleOverride('emiplans');
 
     var bank = 'BAJAJ';
+
+    // We need to show plans without no-cost EMI if the applied offer is an
+    // EMI offer because No cost EMI cannot be applied with regular EMI offers.
     var plans = MethodStore.getEMIBankPlans(bank, 'credit', !isEmiOfferApplied);
+
     var prevTab = self.tab;
     var prevScreen = self.screen;
 
