@@ -2900,42 +2900,6 @@ Session.prototype = {
     }
   },
 
-  /**
-   * Returns the EMI plans for a given bank.
-   * @param {String} bank
-   *
-   * @returns {Array}
-   */
-  getEmiPlans: function(bank, cardType, noCost) {
-    var plans = MethodStore.getEMIBankPlans(bank, cardType, noCost);
-    var appliedOffer = this.offers && this.offers.offerSelectedByDrawer;
-
-    var emiPlans = [];
-    _Obj.loop(plans, function(plan, duration) {
-      if (
-        !appliedOffer ||
-        (appliedOffer && !appliedOffer.emi_subvention) ||
-        (appliedOffer && appliedOffer.id && appliedOffer.id === plan.offer_id)
-      ) {
-        emiPlans.push(
-          _Obj.extend(
-            {
-              duration: duration,
-              nocost: plan.subvention === 'merchant',
-            },
-            plan
-          )
-        );
-      }
-    });
-
-    var emiPlansSorted = _Arr.sort(emiPlans, function(a, b) {
-      return a.duration - b.duration;
-    });
-
-    return emiPlansSorted;
-  },
-
   showEmiPlansForNewCard: function() {
     var self = this;
     var amount = this.get('amount');
@@ -2982,9 +2946,7 @@ Session.prototype = {
       'credit',
       isNoCostOfferApplied
     );
-    var emiPlans = MethodStore.getEligiblePlansBasedOnMinAmount(
-      self.getEmiPlans(bank, 'credit', isNoCostOfferApplied)
-    );
+    var emiPlans = MethodStore.getEligiblePlansBasedOnMinAmount(plans);
     var prevTab = self.tab;
     var prevScreen = self.screen;
 
@@ -3112,9 +3074,7 @@ Session.prototype = {
       cardType,
       isNoCostEmiOfferApplied
     );
-    var emiPlans = MethodStore.getEligiblePlansBasedOnMinAmount(
-      self.getEmiPlans(bank, cardType, isNoCostEmiOfferApplied)
-    );
+    var emiPlans = MethodStore.getEligiblePlansBasedOnMinAmount(plans);
     var $savedCard = $('.saved-card.checked');
     var savedCvv = $savedCard.$('.saved-cvv input').val();
     var prevTab = self.tab;
@@ -3217,14 +3177,13 @@ Session.prototype = {
       // Always use no-cost for bajaj as a special case because offers cannot
       // be applied on Bajaj EMI and it is okay to always show no-cost EMI plans
     );
-    var emiPlans = self.getEmiPlans(bank, 'credit', true);
     var prevTab = self.tab;
     var prevScreen = self.screen;
 
     self.emiPlansView.setPlans({
       type: 'bajaj',
       amount: amount,
-      plans: emiPlans,
+      plans,
       bank: bank,
       on: {
         back: function() {
