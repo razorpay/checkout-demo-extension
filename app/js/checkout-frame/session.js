@@ -2400,9 +2400,16 @@ Session.prototype = {
       var bank = this.emiPlansForNewCard && this.emiPlansForNewCard.code;
 
       if (emiDuration) {
-        var plan = _Arr.find(MethodStore.getEMIBankPlans(bank), function(p) {
-          return p.duration === emiDuration;
-        });
+        var plan = _Arr.find(
+          MethodStore.getEMIBankPlans(
+            bank,
+            'credit',
+            Boolean(offer.emi_subvention)
+          ),
+          function(p) {
+            return p.duration === emiDuration;
+          }
+        );
         if (
           plan &&
           offer.id &&
@@ -2899,8 +2906,8 @@ Session.prototype = {
    *
    * @returns {Array}
    */
-  getEmiPlans: function(bank, cardType) {
-    var plans = MethodStore.getEMIBankPlans(bank, cardType);
+  getEmiPlans: function(bank, cardType, noCost) {
+    var plans = MethodStore.getEMIBankPlans(bank, cardType, noCost);
     var appliedOffer = this.offers && this.offers.offerSelectedByDrawer;
 
     var emiPlans = [];
@@ -2932,6 +2939,7 @@ Session.prototype = {
   showEmiPlansForNewCard: function() {
     var self = this;
     var amount = this.get('amount');
+    var appliedOffer = this.getAppliedOffer();
 
     var viewAllPlans = function(tab) {
       return function() {
@@ -2959,6 +2967,9 @@ Session.prototype = {
     var bank = self.emiPlansForNewCard && self.emiPlansForNewCard.code;
     var cardIssuer = bank.split('_')[0];
     var cardType = _Str.endsWith(bank, '_DC') ? 'debit' : 'credit';
+    var isNoCostOfferApplied = Boolean(
+      appliedOffer && appliedOffer.emi_subvention
+    );
 
     bank = getBankEMICode(bank, cardType);
 
@@ -2966,9 +2977,13 @@ Session.prototype = {
       bank,
       cardType
     );
-    var plans = MethodStore.getEMIBankPlans(bank);
+    var plans = MethodStore.getEMIBankPlans(
+      bank,
+      'credit',
+      isNoCostOfferApplied
+    );
     var emiPlans = MethodStore.getEligiblePlansBasedOnMinAmount(
-      self.getEmiPlans(bank)
+      self.getEmiPlans(bank, 'credit', isNoCostOfferApplied)
     );
     var prevTab = self.tab;
     var prevScreen = self.screen;
@@ -3052,6 +3067,7 @@ Session.prototype = {
   showEmiPlansForSavedCard: function(e) {
     var self = this;
     var amount = this.get('amount');
+    var appliedOffer = this.getAppliedOffer();
 
     var viewAllPlans = function(tab) {
       return function() {
@@ -3081,6 +3097,9 @@ Session.prototype = {
     var bank = $trigger.attr('data-bank');
     var cardIssuer = bank;
     var cardType = $trigger.attr('data-card-type');
+    var isNoCostEmiOfferApplied = Boolean(
+      appliedOffer && appliedOffer.emi_subvention
+    );
 
     bank = getBankEMICode(bank, cardType);
 
@@ -3088,9 +3107,13 @@ Session.prototype = {
       bank,
       cardType
     );
-    var plans = MethodStore.getEMIBankPlans(bank, cardType);
+    var plans = MethodStore.getEMIBankPlans(
+      bank,
+      cardType,
+      isNoCostEmiOfferApplied
+    );
     var emiPlans = MethodStore.getEligiblePlansBasedOnMinAmount(
-      self.getEmiPlans(bank, cardType)
+      self.getEmiPlans(bank, cardType, isNoCostEmiOfferApplied)
     );
     var $savedCard = $('.saved-card.checked');
     var savedCvv = $savedCard.$('.saved-cvv input').val();
@@ -3183,12 +3206,17 @@ Session.prototype = {
   showEmiPlansForBajaj: function() {
     var self = this;
     var amount = this.get('amount');
+    var appliedOffer = this.getAppliedOffer();
 
     self.topBar.resetTitleOverride('emiplans');
 
     var bank = 'BAJAJ';
-    var plans = MethodStore.getEMIBankPlans(bank);
-    var emiPlans = self.getEmiPlans(bank);
+    var plans = MethodStore.getEMIBankPlans(
+      bank,
+      'credit',
+      Boolean(appliedOffer && appliedOffer.emi_subvention)
+    );
+    var emiPlans = self.getEmiPlans(bank, 'credit');
     var prevTab = self.tab;
     var prevScreen = self.screen;
 

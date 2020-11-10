@@ -711,22 +711,52 @@ export function isEMandateAuthTypeEnabled(bank, authType) {
   return getEMandateAuthTypes(bank) |> _Arr.contains(authType);
 }
 
-export function getEMIBankPlans(code, cardType = 'credit') {
-  const options = code && getMerchantMethods().emi_options;
-  if (options) {
-    if (cardType === 'debit' && !_Str.endsWith(code, '_DC')) {
-      // For Banks with EMI on Debit Cards,
-      // code will end with "_DC".
-      // Example: If the issuer is HDFC and card type is debit
-      // Then use "HDFC_DC" plans and not "HDFC" plans.
-      // If code is "HDFC_DC" then don't append "_DC" at the end.
-      const debitCode = code + '_DC';
-      if (DEBIT_EMI_BANKS |> _Arr.contains(debitCode)) {
-        return options[debitCode];
-      }
+/**
+ * Returns the EMI plans for the given bank.
+ *
+ * @param {string} code the code for the bank
+ * @param {string} cardType the type of the card (credit or debit)
+ * @param {boolean} noCostEmi whether to include no cost EMI plans
+ * @return {Array<Object>}
+ */
+export function getEMIBankPlans(code, cardType = 'credit', noCostEmi = true) {
+  const options = getMerchantMethods().emi_options;
+  const emiPlans = getMerchantMethods().emi_plans;
+
+  if (cardType === 'debit' && !_Str.endsWith(code, '_DC')) {
+    // For Banks with EMI on Debit Cards,
+    // code will end with "_DC".
+    // Example: If the issuer is HDFC and card type is debit
+    // Then use "HDFC_DC" plans and not "HDFC" plans.
+    // If code is "HDFC_DC" then don't append "_DC" at the end.
+    const debitCode = code + '_DC';
+    if (DEBIT_EMI_BANKS |> _Arr.contains(debitCode)) {
+      code = debitCode;
+    } else {
+      return [];
     }
-    return options[code];
   }
+  const plans = noCostEmi ? options[code] : transformEmiPlans(emiPlans[code]);
+  return plans.sort((a, b) => a.duration - b.duration);
+}
+
+/**
+ * Transforms emi plans from an object with key as the duration and
+ * value as the interest to an array of objects.
+ *
+ * @param {Object} emiPlan
+ * @returns {Array<Object>}
+ */
+function transformEmiPlans(emiPlan) {
+  const plans = emiPlan.plans;
+  return Object.entries(plans).map(([duration, interest]) => {
+    return {
+      duration,
+      interest,
+      subvention: 'customer',
+      min_amount: emiPlan.min_amount,
+    };
+  });
 }
 
 export function getEligiblePlansBasedOnMinAmount(plans) {
