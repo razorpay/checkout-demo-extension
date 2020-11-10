@@ -94,21 +94,13 @@
   }
 
   $: {
-    //Do not auto apply No-Cost EMI offer if no offer is selected by the customer.
-    if (!$appliedOffer) {
-      noCostEmi = false;
-    } else if ($appliedOffer && $appliedOffer.emi_subvention) {
-      /* No-Cost EMI offers have emi_subvention property which is not present for other offers.
-    Only select No-Cost EMI offer if that is selected by the customer. */
-      noCostEmi =
-        plan.subvention === 'merchant' ||
-        (provider === 'zestmoney' && plan.duration === 3);
-      if (noCostEmi && plan.merchant_payback) {
-        interestChargedByBank = session.formatAmountWithCurrency(
-          amountAfterDiscount / (1 - plan.merchant_payback / 100) -
-            amountAfterDiscount
-        );
-      }
+    noCostEmi =
+      plan.subvention === 'merchant' ||
+      (provider === 'zestmoney' && plan.duration === 3);
+    if (noCostEmi && plan.merchant_payback) {
+      interestChargedByBank = session.formatAmountWithCurrency(
+        amount / (1 - plan.merchant_payback / 100) - amount
+      );
     }
   }
 
