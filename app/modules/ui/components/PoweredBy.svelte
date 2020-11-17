@@ -3,6 +3,7 @@
   import { onMount } from 'svelte';
 
   const customLogo = getOption('partnership_logo');
+  const brandLogo = getOption('brand_logo');
   let fontLoaded = false;
   let fontTimeout = null;
   let ref;
@@ -26,9 +27,10 @@
 
 <i id="powered-by" class:branded={customLogo && fontLoaded}>
   {#if customLogo && fontLoaded}
-    In partnership with
-    <br />
+    In partnership with <br />
     <img alt="Logo" src={customLogo} />
+  {:else if brandLogo && fontLoaded}
+    <div class="branding">Powered By <img alt="Logo" src={brandLogo} /></div>
   {:else}
     <a
       bind:this={ref}
