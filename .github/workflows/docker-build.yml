@@ -20,9 +20,4 @@ jobs:
         uses: actions/checkout@v2
         
       - name: build
-        uses: docker/build-push-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: razorpay/api
-          tags: $GITHUB_SHA
+        run: docker build ./ -t plugins/docker
