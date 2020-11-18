@@ -723,6 +723,10 @@ export function getEMIBankPlans(code, cardType = 'credit', noCostEmi = true) {
   const options = getMerchantMethods().emi_options;
   const emiPlans = getMerchantMethods().emi_plans;
 
+  if (!options || !emiPlans) {
+    return [];
+  }
+
   if (cardType === 'debit' && !_Str.endsWith(code, '_DC')) {
     // For Banks with EMI on Debit Cards,
     // code will end with "_DC".
