@@ -9,6 +9,7 @@ import { extendInstruments } from './extend';
 import { translateInstrumentToConfig } from './translation';
 import { getInstrumentsForCustomer as getInstrumentsForCustomerFromApi } from './api';
 import { getUPIIntentApps } from 'checkoutstore/native';
+import { optimizeInstruments } from 'checkoutframe/personalization/optimisations';
 
 /* halflife for timestamp, 5 days in ms */
 const TS_HALFLIFE = Math.log(2) / (5 * 86400000);
@@ -368,6 +369,12 @@ export const getInstrumentsForCustomer = (customer, extra = {}, source) => {
   return getInstruments.then(({ identified, instruments }) => {
     // Filter out the list
     instruments = filterInstruments({
+      instruments,
+      upiApps,
+      customer,
+    });
+
+    instruments = optimizeInstruments({
       instruments,
       upiApps,
       customer,
