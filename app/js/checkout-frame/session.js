@@ -2897,23 +2897,25 @@ Session.prototype = {
     }
   },
 
+  /**
+   * Displays the modal for all EMI plans
+   * @param {string} tab the tab from which the modal was invoked
+   */
+  showAllEmiPlans: function(tab) {
+    Analytics.track('emi:plans:view:all', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        from: tab,
+      },
+    });
+
+    showOverlay($('#emi-wrap'));
+  },
+
   showEmiPlansForNewCard: function() {
     var self = this;
     var amount = self.get('amount');
     var appliedOffer = self.getAppliedOffer();
-
-    var viewAllPlans = function(tab) {
-      return function() {
-        Analytics.track('emi:plans:view:all', {
-          type: AnalyticsTypes.BEHAV,
-          data: {
-            from: tab,
-          },
-        });
-
-        showOverlay($('#emi-wrap'));
-      };
-    };
 
     var getBankEMICode = function(issuer, type) {
       // EMI codes are different from bank codes and have _DC at the end.
@@ -3011,7 +3013,9 @@ Session.prototype = {
           self.preSubmit();
         },
 
-        viewAll: viewAllPlans(prevTab),
+        viewAll: function() {
+          self.showAllEmiPlans(prevTab);
+        },
       },
 
       actions: {
@@ -3028,19 +3032,6 @@ Session.prototype = {
     var self = this;
     var amount = self.get('amount');
     var appliedOffer = self.getAppliedOffer();
-
-    var viewAllPlans = function(tab) {
-      return function() {
-        Analytics.track('emi:plans:view:all', {
-          type: AnalyticsTypes.BEHAV,
-          data: {
-            from: tab,
-          },
-        });
-
-        showOverlay($('#emi-wrap'));
-      };
-    };
 
     var getBankEMICode = function(issuer, type) {
       // EMI codes are different from bank codes and have _DC at the end.
@@ -3149,7 +3140,9 @@ Session.prototype = {
           }
         },
 
-        viewAll: viewAllPlans(prevTab),
+        viewAll: function() {
+          self.showAllEmiPlans(prevTab);
+        },
       },
 
       actions: {
