@@ -2899,8 +2899,8 @@ Session.prototype = {
 
   showEmiPlansForNewCard: function() {
     var self = this;
-    var amount = this.get('amount');
-    var appliedOffer = this.getAppliedOffer();
+    var amount = self.get('amount');
+    var appliedOffer = self.getAppliedOffer();
 
     var viewAllPlans = function(tab) {
       return function() {
@@ -3026,8 +3026,8 @@ Session.prototype = {
 
   showEmiPlansForSavedCard: function(e) {
     var self = this;
-    var amount = this.get('amount');
-    var appliedOffer = this.getAppliedOffer();
+    var amount = self.get('amount');
+    var appliedOffer = self.getAppliedOffer();
 
     var viewAllPlans = function(tab) {
       return function() {
@@ -3164,8 +3164,8 @@ Session.prototype = {
 
   showEmiPlansForBajaj: function() {
     var self = this;
-    var amount = this.get('amount');
-    var appliedOffer = this.getAppliedOffer();
+    var amount = self.get('amount');
+    var appliedOffer = self.getAppliedOffer();
     var isEmiOfferApplied = Boolean(
       appliedOffer &&
         appliedOffer.method === 'emi' &&
