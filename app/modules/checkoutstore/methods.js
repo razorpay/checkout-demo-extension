@@ -752,7 +752,7 @@ export function getEMIBankPlans(code, cardType = 'credit', noCostEmi = true) {
  * @returns {Array<Object>}
  */
 function transformEmiPlans(emiPlan) {
-  const plans = emiPlan.plans;
+  const { plans } = emiPlan;
   return Object.entries(plans).map(([duration, interest]) => {
     return {
       duration,
