@@ -410,7 +410,7 @@ Payment.prototype = {
     this.offmessage = global |> _El.on('message', _Func.bind(onMessage, this));
   },
 
-  complete: function(data) {
+  complete: function(data, event) {
     if (this.done) {
       return;
     }
@@ -430,9 +430,8 @@ Payment.prototype = {
       return processOtpResponse.call(this, data);
     }
 
-    this.clear();
-
     if (data.razorpay_payment_id) {
+      this.clear();
       // Track
       Analytics.track('oncomplete', {
         r: this.r,
@@ -440,6 +439,15 @@ Payment.prototype = {
       });
       this.emit('success', data);
     } else {
+      // We report a generic error if postMessage payload does not have
+      // either razorpay_payment_id or error. We need to do this only if
+      // the message was from Razorpay's domain (because other pages can
+      // invoke postMessage from the popup which needs to be ignored.
+      if (event && !_Str.startsWith(window.location.href, event.origin)) {
+        return;
+      }
+
+      this.clear();
       var errorObj = data.error;
       if (!_.isNonNullObject(errorObj) || !errorObj.description) {
         if (data.request) {
@@ -725,7 +733,7 @@ function pollPaymentData(onComplete) {
 
 function onMessage(e) {
   if (this.popup && this.popup.window === e.source) {
-    this.complete(e.data);
+    this.complete(e.data, e);
   }
 }
 
