@@ -13,8 +13,7 @@ const {
 const netbanking = require('../data/banks.json');
 const wallet = require('../data/wallets.json');
 const recurring = require('../data/recurring.json');
-const emi_options = require('../data/emi_options.json');
-const emi_plans = require('../data/emi_plans.json');
+const emi_options = require('../data/emi.json');
 const card = require('../data/cards.json');
 
 const cardNetworks = ['MasterCard', 'Visa'];
@@ -73,7 +72,6 @@ function makePreferences(overrides) {
       wallet,
       netbanking,
       emi_options,
-      emi_plans,
       recurring,
       upi_intent: true,
     },

@@ -7,6 +7,7 @@
 
   // Store
   import { selectedTokenId, savedCardEmiDuration } from 'checkoutstore/emi';
+  import { getEMIBankPlans } from 'checkoutstore/methods';
   import { selectedCard } from 'checkoutstore/screens/card';
 
   // Utils
