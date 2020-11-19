@@ -443,7 +443,7 @@ Payment.prototype = {
       // either razorpay_payment_id or error. We need to do this only if
       // the message was from Razorpay's domain (because other pages can
       // invoke postMessage from the popup which needs to be ignored.
-      if (event && !_Str.startsWith(window.location.href, event.origin)) {
+      if (event && window.location.origin !== event.origin) {
         return;
       }
 
