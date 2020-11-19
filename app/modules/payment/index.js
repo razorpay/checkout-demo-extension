@@ -443,7 +443,15 @@ Payment.prototype = {
       // either razorpay_payment_id or error. We need to do this only if
       // the message was from Razorpay's domain (because other pages can
       // invoke postMessage from the popup which needs to be ignored.
-      if (event && window.location.origin !== event.origin) {
+      //
+      // Test for 'null' origin is present because puppeteer tests simulate a
+      // callback by loading a data URL on the popup which keeps its location
+      // about:blank, the origin for which is reported as 'null'.
+      if (
+        event &&
+        event.origin !== 'null' &&
+        window.location.origin !== event.origin
+      ) {
         return;
       }
 
