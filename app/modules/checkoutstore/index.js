@@ -173,6 +173,15 @@ export function getSubscription() {
   return preferences.subscription;
 }
 
+export function getSubscriptionId() {
+  if (getOption('subscription_id')) {
+    return getOption('subscription_id'); //returns the subscription_id from checkout options
+  } else if (window.location.pathname.includes('subscriptions')) {
+    return window.location.pathname.substring(20); //returns the subscription_id from the URL incase of subscription links.
+  }
+  return null;
+}
+
 export function isRecurring() {
   if (getOrderMethod() === 'emandate' && getRecurringMethods()) {
     return true;
