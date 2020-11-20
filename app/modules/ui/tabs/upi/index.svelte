@@ -12,6 +12,7 @@
     hasFeature,
     isCustomerFeeBearer,
     getMerchantOrder,
+    getSubscriptionId,
   } from 'checkoutstore';
   import {
     isMethodEnabled,
@@ -350,6 +351,7 @@
       type: AnalyticsTypes.BEHAV,
       data: {
         method: 'qr',
+        subscription_id: getSubscriptionId(),
       },
     });
 
@@ -412,6 +414,7 @@
             data: {
               selectedToken,
               _token,
+              subscription_id: getSubscriptionId(),
             },
             immediately: true,
           });
@@ -487,6 +490,7 @@
       data: {
         app: event.detail.app,
         value: getEventValueForFeature(id),
+        subscription_id: getSubscriptionId(),
       },
     });
 
@@ -513,6 +517,7 @@
         app: selectedApp,
         value: vpa,
         valid,
+        subscription_id: getSubscriptionId(),
       },
     });
   }
@@ -531,6 +536,7 @@
         value: vpa,
         valid,
         handle,
+        subscription_id: getSubscriptionId(),
       },
     });
   }
@@ -548,6 +554,7 @@
       data: {
         valid,
         value: omnichannelField.getPhone(),
+        subscription_id: getSubscriptionId(),
       },
     });
   }
@@ -580,6 +587,7 @@
             ','
           ),
         },
+        subscription_id: getSubscriptionId(),
       },
     });
   }

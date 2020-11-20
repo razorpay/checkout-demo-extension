@@ -37,6 +37,7 @@
     shouldRememberCustomer,
     isDCCEnabled,
     getCardFeatures,
+    getSubscriptionId,
   } from 'checkoutstore';
   import {
     isMethodEnabled,
@@ -157,6 +158,7 @@
         type: AnalyticsTypes.RENDER,
         data: {
           count: savedCardsCount,
+          subscription_id: getSubscriptionId(),
         },
       });
     }
@@ -349,12 +351,22 @@
   }
 
   export function showAddCardView() {
-    Analytics.track('saved_cards:hide');
+    Analytics.track('saved_cards:hide', {
+      type: AnalyticsTypes.RENDER,
+      data: {
+        subscription_id: getSubscriptionId(),
+      },
+    });
     setView(Views.ADD_CARD);
   }
 
   export function showSavedCardsView() {
-    Analytics.track('saved_cards:show');
+    Analytics.track('saved_cards:show', {
+      type: AnalyticsTypes.RENDER,
+      data: {
+        subscription_id: getSubscriptionId(),
+      },
+    });
     setView(Views.SAVED_CARDS);
   }
 
@@ -411,6 +423,7 @@
       type: AnalyticsTypes.BEHAV,
       data: {
         from: session.tab,
+        subscription_id: getSubscriptionId(),
       },
     });
 
