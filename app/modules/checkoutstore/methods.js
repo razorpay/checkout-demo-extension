@@ -719,14 +719,14 @@ export function isEMandateAuthTypeEnabled(bank, authType) {
  * @param {string} code the code for the bank
  * @param {string} cardType the type of the card (credit or debit)
  * @param {boolean} noCostEmi whether to include no cost EMI plans
- * @return {Array<Object>}
+ * @return {Array<Object>|undefined}
  */
 export function getEMIBankPlans(code, cardType = 'credit', noCostEmi = true) {
   const options = getMerchantMethods().emi_options;
   const emiPlans = getMerchantMethods().emi_plans;
 
   if (!options || !emiPlans) {
-    return [];
+    return;
   }
 
   if (cardType === 'debit' && !_Str.endsWith(code, '_DC')) {
@@ -739,10 +739,16 @@ export function getEMIBankPlans(code, cardType = 'credit', noCostEmi = true) {
     if (DEBIT_EMI_BANKS |> _Arr.contains(debitCode)) {
       code = debitCode;
     } else {
-      return [];
+      return;
     }
   }
+
   const plans = noCostEmi ? options[code] : transformEmiPlans(emiPlans[code]);
+
+  if (!plans) {
+    return;
+  }
+
   return plans.sort((a, b) => a.duration - b.duration);
 }
 
