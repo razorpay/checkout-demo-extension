@@ -37,7 +37,7 @@
   } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
-  import { getOption, isDCCEnabled } from 'checkoutstore';
+  import { getOption, isDCCEnabled, getSubscriptionId } from 'checkoutstore';
   import { getUPIIntentApps } from 'checkoutstore/native';
 
   // i18n
@@ -859,6 +859,11 @@
         });
       }
     }
+  }
+
+  $: {
+    //Track subscription_id
+    Analytics.setMeta('subscription_id', getSubscriptionId());
   }
 </script>
 
