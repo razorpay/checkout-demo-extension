@@ -101,8 +101,6 @@
   let currentView = Views.SAVED_CARDS;
   let lastView;
 
-  let showCurrencyConversionChargeCallout = false;
-
   // We're showing apps on both saved cards & new card screen,
   // But if the user switches to new card screen from the saved cards screen,
   // hide the apps. It clearly indicates that the user doesn't want to use apps.
@@ -710,11 +708,6 @@
             {$t(SUBSCRIPTION_CALLOUT)}
           {/if}
         </Callout>
-      {/if}
-      {#if showCurrencyConversionChargeCallout}
-        <div transition:fade={getAnimationOptions({ duration: 100 })}>
-          <Callout>{$t(INTERNATIONAL_CURRENCY_CHARGES)}</Callout>
-        </div>
       {/if}
     </Bottom>
   </Screen>

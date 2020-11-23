@@ -3804,6 +3804,37 @@ Session.prototype = {
     });
   },
 
+  showConversionChargesCallout: function() {
+    var locale = I18n.getCurrentLocale();
+
+    this.svelteOverlay.$set({
+      component: discreet.UserConfirmationOverlay,
+      props: {
+        buttonText: I18n.formatMessageWithLocale('cta.submit', locale),
+        callout: I18n.formatMessageWithLocale(
+          'card.international_currency_charges',
+          locale
+        ),
+      },
+    });
+
+    var that = this;
+
+    this.showSvelteOverlay();
+    var clearActionListener = that.svelteOverlay.$on('action', function(event) {
+      var action = event.detail.action;
+      if (action === 'confirm') {
+        that.hideSvelteOverlay();
+        Backdrop.hide();
+        that.submit();
+      }
+    });
+    var clearHideListener = that.svelteOverlay.$on('hidden', function() {
+      clearActionListener();
+      clearHideListener();
+    });
+  },
+
   /**
    * Attempts a payment
    * @param {Event} e
@@ -4040,36 +4071,7 @@ Session.prototype = {
     if (
       discreet.storeGetter(CardScreenStore.internationalCurrencyCalloutNeeded)
     ) {
-      var locale = I18n.getCurrentLocale();
-
-      this.svelteOverlay.$set({
-        component: discreet.UserConfirmationOverlay,
-        props: {
-          buttonText: I18n.formatMessageWithLocale('cta.submit', locale),
-          callout: I18n.formatMessageWithLocale(
-            'card.international_currency_charges',
-            locale
-          ),
-        },
-      });
-
-      var that = this;
-
-      this.showSvelteOverlay();
-      var clearActionListener = that.svelteOverlay.$on('action', function(
-        event
-      ) {
-        var action = event.detail.action;
-        if (action === 'confirm') {
-          that.hideSvelteOverlay();
-          Backdrop.hide();
-          that.submit();
-        }
-      });
-      var clearHideListener = that.svelteOverlay.$on('hidden', function() {
-        clearActionListener();
-        clearHideListener();
-      });
+      this.showConversionChargesCallout();
       return;
     }
 
