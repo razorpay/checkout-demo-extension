@@ -4040,12 +4040,16 @@ Session.prototype = {
     if (
       discreet.storeGetter(CardScreenStore.internationalCurrencyCalloutNeeded)
     ) {
+      var locale = I18n.getCurrentLocale();
+
       this.svelteOverlay.$set({
         component: discreet.UserConfirmationOverlay,
         props: {
-          buttonText: 'Submit',
-          callout:
-            'Relevant currency conversion charges might be applicable, as Amex will process the transaction in INR. To avoid currency conversion charges please use MasterCard or Visa.',
+          buttonText: I18n.formatMessageWithLocale('cta.submit', locale),
+          callout: I18n.formatMessageWithLocale(
+            'card.international_currency_charges',
+            locale
+          ),
         },
       });
 
