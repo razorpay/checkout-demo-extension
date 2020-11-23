@@ -143,7 +143,7 @@ module.exports = function(testFeatures) {
       }
 
       await submit(context);
-      if (testFeatures.currency) {
+      if (options.currency !== 'INR') {
         await agreeToAMEXCurrencyCharges(context);
       }
 
@@ -168,7 +168,7 @@ module.exports = function(testFeatures) {
         );
         await retryTransaction(context);
         await submit(context);
-        if (testFeatures.currency) {
+        if (options.currency !== 'INR') {
           await agreeToAMEXCurrencyCharges(context);
         }
         if (feeBearer) {
