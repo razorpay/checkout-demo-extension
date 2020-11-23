@@ -15,3 +15,5 @@ export const currencyRequestId = writable('');
 export const cardType = derived(cardNumber, getCardType);
 export const cardIin = derived(cardNumber, getIin);
 export const cardTab = writable(''); // Value of current tab. Values can be one of "card", "emi", "". "" can be considered to be null.
+
+export const internationalCurrencyCalloutNeeded = writable(false);

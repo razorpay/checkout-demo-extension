@@ -16,6 +16,7 @@ import emiView from 'checkoutframe/emi';
 import FeeBearerView from 'ui/components/feebearer.svelte';
 import Overlay from 'ui/components/Overlay.svelte';
 import AuthOverlay from 'ui/components/AuthOverlay.svelte';
+import UserConfirmationOverlay from 'ui/components/overlay/UserConfirmation.svelte';
 import OffersView from 'ui/components/offers/index.svelte';
 import NoCostExplainer from 'ui/components/offers/NoCostExplainer.svelte';
 import emiPlansView from 'checkoutframe/emiplans';
@@ -170,6 +171,7 @@ export default {
   Backdrop,
   Overlay,
   AuthOverlay,
+  UserConfirmationOverlay,
   OffersView,
   NoCostExplainer,
 

@@ -4037,6 +4037,38 @@ Session.prototype = {
       return;
     }
 
+    if (
+      discreet.storeGetter(CardScreenStore.internationalCurrencyCalloutNeeded)
+    ) {
+      this.svelteOverlay.$set({
+        component: discreet.UserConfirmationOverlay,
+        props: {
+          buttonText: 'Submit',
+          callout:
+            'Relevant currency conversion charges might be applicable, as Amex will process the transaction in INR. To avoid currency conversion charges please use MasterCard or Visa.',
+        },
+      });
+
+      var that = this;
+
+      this.showSvelteOverlay();
+      var clearActionListener = that.svelteOverlay.$on('action', function(
+        event
+      ) {
+        var action = event.detail.action;
+        if (action === 'confirm') {
+          that.hideSvelteOverlay();
+          Backdrop.hide();
+          that.submit();
+        }
+      });
+      var clearHideListener = that.svelteOverlay.$on('hidden', function() {
+        clearActionListener();
+        clearHideListener();
+      });
+      return;
+    }
+
     this.submit();
   },
 

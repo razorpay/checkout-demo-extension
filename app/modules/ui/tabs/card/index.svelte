@@ -25,6 +25,7 @@
     selectedCard,
     selectedApp,
     cardTab,
+    internationalCurrencyCalloutNeeded,
   } from 'checkoutstore/screens/card';
   import { methodInstrument, blocks } from 'checkoutstore/screens/home';
   import { getSDKMeta } from 'checkoutstore/native';
@@ -438,7 +439,7 @@
     const trimmedVal = _cardNumber.replace(/[ ]/g, '');
     const amexCard = isAmex($cardNumber);
 
-    showCurrencyConversionChargeCallout = amexCard && isInternational();
+    $internationalCurrencyCalloutNeeded = amexCard && isInternational();
 
     if (sixDigits) {
       getCardFeatures(_cardNumber).then(features => {
