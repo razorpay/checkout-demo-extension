@@ -30,3 +30,5 @@ export const SAVED_CARD_LABEL = 'card.saved_card_label';
 export const RECURRING_CALLOUT = 'card.recurring_callout';
 export const SUBSCRIPTION_CALLOUT = 'card.subscription_callout';
 export const SUBSCRIPTION_REFUND_CALLOUT = 'card.subscription_refund_callout';
+export const INTERNATIONAL_CURRENCY_CHARGES =
+  'card.international_currency_charges';

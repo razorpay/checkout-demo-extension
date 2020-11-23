@@ -37,6 +37,7 @@
     shouldRememberCustomer,
     isDCCEnabled,
     getCardFeatures,
+    isInternational,
   } from 'checkoutstore';
   import {
     isMethodEnabled,
@@ -63,6 +64,7 @@
     RECURRING_CALLOUT,
     SUBSCRIPTION_CALLOUT,
     SUBSCRIPTION_REFUND_CALLOUT,
+    INTERNATIONAL_CURRENCY_CHARGES,
   } from 'ui/labels/card';
 
   // Utils imports
@@ -70,7 +72,12 @@
   import { getSavedCards, transform } from 'common/token';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import { getIin, getCardType, getNetworkFromCardNumber } from 'common/card';
+  import {
+    getIin,
+    getCardType,
+    getNetworkFromCardNumber,
+    isAmex,
+  } from 'common/card';
   import { getSubtextForInstrument } from 'subtext';
   import { getProvider as getAppProvider } from 'common/apps';
   import { getAnimationOptions } from 'svelte-utils';
@@ -92,6 +99,8 @@
 
   let currentView = Views.SAVED_CARDS;
   let lastView;
+
+  let showCurrencyConversionChargeCallout = false;
 
   // We're showing apps on both saved cards & new card screen,
   // But if the user switches to new card screen from the saved cards screen,
@@ -427,6 +436,9 @@
     const iin = getIin(_cardNumber);
     const sixDigits = _cardNumber.length > 5;
     const trimmedVal = _cardNumber.replace(/[ ]/g, '');
+    const amexCard = isAmex($cardNumber);
+
+    showCurrencyConversionChargeCallout = amexCard && isInternational();
 
     if (sixDigits) {
       getCardFeatures(_cardNumber).then(features => {
@@ -443,7 +455,7 @@
           let issuer = features.issuer;
 
           // Handle AMEX
-          if (getNetworkFromCardNumber($cardNumber) === 'amex') {
+          if (amexCard) {
             issuer = 'AMEX';
           }
 
@@ -697,6 +709,11 @@
             {$t(SUBSCRIPTION_CALLOUT)}
           {/if}
         </Callout>
+      {/if}
+      {#if showCurrencyConversionChargeCallout}
+        <div transition:fade={getAnimationOptions({ duration: 100 })}>
+          <Callout>{$t(INTERNATIONAL_CURRENCY_CHARGES)}</Callout>
+        </div>
       {/if}
     </Bottom>
   </Screen>
