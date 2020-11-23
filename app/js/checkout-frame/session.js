@@ -3810,7 +3810,7 @@ Session.prototype = {
     this.svelteOverlay.$set({
       component: discreet.UserConfirmationOverlay,
       props: {
-        buttonText: I18n.formatMessageWithLocale('cta.submit', locale),
+        buttonText: I18n.formatMessageWithLocale('cta.continue', locale),
         callout: I18n.formatMessageWithLocale(
           'card.international_currency_charges',
           locale
