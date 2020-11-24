@@ -1,9 +1,9 @@
 <script>
-  import { getOption } from 'checkoutstore';
+  import { getOption, getOrgDetails } from 'checkoutstore';
   import { onMount } from 'svelte';
 
   const customLogo = getOption('partnership_logo');
-  const brandLogo = getOption('brand_logo');
+  const orgLogo = getOrgDetails().checkout_logo;
   let fontLoaded = false;
   let fontTimeout = null;
   let ref;
@@ -29,8 +29,8 @@
   {#if customLogo && fontLoaded}
     In partnership with <br />
     <img alt="Logo" src={customLogo} />
-  {:else if brandLogo && fontLoaded}
-    <div class="branding">Powered By <img alt="Logo" src={brandLogo} /></div>
+  {:else if orgLogo && fontLoaded}
+    <div class="branding">Powered By <img alt="Logo" src={orgLogo} /></div>
   {:else}
     <a
       bind:this={ref}
