@@ -580,7 +580,6 @@
             ','
           ),
         },
-        subscription_id: getSubscriptionId(),
       },
     });
   }
