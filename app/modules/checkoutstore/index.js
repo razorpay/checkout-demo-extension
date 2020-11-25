@@ -174,12 +174,7 @@ export function getSubscription() {
 }
 
 export function isRecurring() {
-  const orderMethod = getOrderMethod();
-  const recurringMethods = getRecurringMethods();
-  if (
-    (orderMethod === 'emandate' && recurringMethods) ||
-    (orderMethod === 'card' && recurringMethods)
-  ) {
+  if (getOrderMethod() === 'emandate' && getRecurringMethods()) {
     return true;
   }
   return preferences.subscription || getOption('recurring');
