@@ -225,8 +225,6 @@ function fetchPrefs(session) {
           data: preferences.error,
         });
       } else {
-        preferences.partnership_logo =
-          'https://www.axisbank.com/assets/images/logo-white.png';
         setSessionPreferences(session, preferences);
         if (closeAt) {
           session.timer = showTimer(closeAt, () => {
@@ -255,6 +253,7 @@ function setSessionPreferences(session, preferences) {
   updateEmandatePrefill();
   updateAnalytics(preferences);
   updatePreferredMethods(preferences);
+
   Razorpay.configure(preferences.options);
   session.setPreferences(preferences);
 

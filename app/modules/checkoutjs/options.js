@@ -3,7 +3,6 @@ import { RazorpayDefaults } from 'common/options';
 RazorpayDefaults.timeout = 0;
 RazorpayDefaults.name = '';
 RazorpayDefaults.partnership_logo = '';
-RazorpayDefaults.brand_logo = '';
 
 RazorpayDefaults.nativeotp = true;
 RazorpayDefaults.remember_customer = false;
