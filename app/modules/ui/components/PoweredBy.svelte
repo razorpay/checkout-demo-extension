@@ -3,7 +3,7 @@
   import { onMount } from 'svelte';
 
   const customLogo = getOption('partnership_logo');
-  const orgLogo = getOrgDetails().checkout_logo;
+  const orgLogo = getOrgDetails()?.main_logo;
   let fontLoaded = false;
   let fontTimeout = null;
   let ref;
