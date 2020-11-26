@@ -423,7 +423,7 @@ export function validateOverrides(options, skip = []) {
   return valid;
 }
 
-Razorpay.configure = function(overrides, extra) {
+Razorpay.configure = function(overrides, extra = {}) {
   _Obj.loop(flatten(overrides, RazorpayDefaults), function(val, key) {
     var defaultValue = RazorpayDefaults[key];
     if (typeof defaultValue === typeof val) {
