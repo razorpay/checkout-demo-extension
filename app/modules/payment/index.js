@@ -33,7 +33,6 @@ import { getCardEntityFromPayload, getCardFeatures } from 'common/card';
  * the same domain as the configured API
  */
 const isRazorpayFrame = () => {
-  return false;
   return _Str.startsWith(
     RazorpayConfig.api,
     `${location.protocol}//${location.hostname}`
