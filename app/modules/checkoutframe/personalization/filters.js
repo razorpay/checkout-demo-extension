@@ -80,12 +80,6 @@ const METHOD_FILTERS = {
   },
 
   upi: (instrument, { customer }) => {
-    // hide p13n tokens for anonymous users in case of subscriptions
-    // login needs to be enforced before any payments are made through upi
-    if (isASubscription() && !customer.logged) {
-      return false;
-    }
-
     // Only allow directpay instruments that have a VPA
     if (instrument['_[flow]'] === 'directpay') {
       if (instrument.vpa) {
@@ -156,7 +150,11 @@ export const filterInstrumentsForAvailableMethods = _.curry2(
 
 const SANITY_FILTERS = {
   upi: instrument => {
-    if (instrument.vpa && !VPA_REGEX.test(instrument.vpa)) {
+    if (
+      instrument['_[flow]'] === 'directpay' &&
+      instrument.vpa &&
+      !VPA_REGEX.test(instrument.vpa)
+    ) {
       return false;
     }
 

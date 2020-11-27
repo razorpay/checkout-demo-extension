@@ -36,7 +36,6 @@
 
   function handleInput(e) {
     value = e.target.value;
-    dispatchFilledIfValid();
   }
 
   $: helpText = helpText || $t(getHelpTextLabel());

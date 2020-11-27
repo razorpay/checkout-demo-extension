@@ -99,7 +99,7 @@ module.exports = function(testFeatures) {
         await verifyAutoSelectBankTPV(context, 'State Bank of India');
       }
 
-      if (offers) {
+      if (!feeBearer && offers) {
         await viewOffers(context);
         await selectOffer(context, '1');
         await verifyOfferApplied(context);

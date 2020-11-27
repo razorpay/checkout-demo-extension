@@ -472,13 +472,20 @@ function askOTP(view, textView, shouldLimitResend, templateData) {
     textView = textView.error && textView.error.description;
   }
 
-  view.updateScreen({
+  var otpProperties = {
     loading: false,
     action: false,
     otp: '',
-    allowSkip: !Store.isRecurring(),
     allowResend: shouldLimitResend ? OtpService.canSendOtp('razorpay') : true,
-  });
+  };
+
+  if (Store.isASubscription()) {
+    _Obj.extend(otpProperties, {
+      allowSkip: session.get('subscription_card_change') ? false : true,
+    });
+  }
+
+  view.updateScreen(otpProperties);
 
   if (thisSession.headless) {
     if (paymentData.goToBank) {
@@ -2738,7 +2745,6 @@ Session.prototype = {
       ) {
         return;
       }
-      var customer = this.getCustomer(contact);
       this.updateCustomerInStore();
 
       if (this.getCurrentCustomer().logged && !this.local) {
@@ -2768,32 +2774,9 @@ Session.prototype = {
 
     if (tab === 'upi') {
       this.updateCustomerInStore();
-
-      // Enforce login flow for UPI Recurring subscriptions
-      if (Store.isASubscription() && !customer.logged) {
-        this.otpView.updateScreen({
-          maxlength: 6,
-        });
-
-        var self = this;
-        var customer = self.getCurrentCustomer();
-
-        this.topBar.setTitleOverride('otp', 'text', 'upi');
-
-        self.commenceOTP('otp_sending_generic', '', {
-          phone: getPhone(),
-        });
-
-        self.getCurrentCustomer().createOTP(function() {
-          Analytics.track('subscriptions_upi:access:otp:ask');
-          askOTP(self.otpView, 'otp_proceed_with_upi_subscription', true, {
-            phone: getPhone(),
-          });
-          self.updateCustomerInStore();
-        });
-      } else {
-        discreet.upiTab.render();
-      }
+      //For the new flow checkout no longer asks for OTP for UPI subscriptions.
+      discreet.upiTab.render();
+      this.setScreen('upi');
     }
 
     if (tab === 'upi_otm') {
@@ -2896,20 +2879,10 @@ Session.prototype = {
       }
       customer.checkStatus(function() {
         /**
-         * 1. If this is a recurring payment and customer doesn't have saved cards,
-         *    create and ask for OTP.
-         * 2. If customer has saved cards and is not logged in, ask for OTP.
-         * 3. If customer doesn't have saved cards, show cards screen.
+         * 1. If customer has saved cards and is not logged in, ask for OTP.
+         * 2. If customer doesn't have saved cards, show cards screen.
          */
-        if (Store.isRecurring() && !customer.saved && !customer.logged) {
-          self.getCurrentCustomer().createOTP(function() {
-            Analytics.track('saved_cards:access:otp:ask');
-            askOTP(self.otpView, 'otp_sent_save_card_recurring', true, {
-              phone: getPhone(),
-            });
-            self.updateCustomerInStore();
-          });
-        } else if (customer.saved && !customer.logged) {
+        if (customer.saved && !customer.logged) {
           askOTP(self.otpView, undefined, true, { phone: getPhone() });
         } else {
           self.setScreen('card');
@@ -3319,36 +3292,10 @@ Session.prototype = {
 
   getFormData: function() {
     var tab = this.tab;
-    var data = {};
     if (!preferences) {
-      return data;
+      return {};
     }
-
-    data.contact = getPhone();
-    data.email = getEmail();
-
-    // If it's the default contact details, do not send them
-    if (data.contact === Constants.INDIA_COUNTRY_CODE || data.contact === '+') {
-      delete data.contact;
-    }
-
-    if (Store.isContactOptional()) {
-      // Merchant is on contact optional feature
-      if (!contactPattern.test(data.contact)) {
-        // However, payload seems to have an invalid contact, delete it.
-        delete data.contact;
-      }
-    } else if (data.contact) {
-      data.contact = data.contact.replace(/\ /g, '');
-    }
-
-    if (Store.isEmailOptional()) {
-      // Merchant is on email optional feature
-      if (!emailPattern.test(data.email)) {
-        // However, payload seems to have an invalid email, delete it.
-        delete data.email;
-      }
-    }
+    var data = HomeScreenStore.getCustomerDetails();
 
     if (tab) {
       data.method = tab;
@@ -3644,157 +3591,163 @@ Session.prototype = {
       },
     });
 
-    this.commenceOTP('verifying_otp');
     var otp = storeGetter(discreet.OTPScreenStore.otp);
 
-    if (isWallet || this.headless) {
-      return this.r.submitOTP(otp);
-    }
+    if (otp.length > 0) {
+      this.commenceOTP('verifying_otp');
 
-    var queryParams;
-    var callback;
+      if (isWallet || this.headless) {
+        return this.r.submitOTP(otp);
+      }
 
-    var isCardlessEmi = this.payload && this.payload.method === 'cardless_emi';
+      var queryParams;
+      var callback;
 
-    if (!isCardlessEmi && this.tab !== 'upi') {
-      // card tab only past this
-      // card filled by logged out user + remember me
-      if (this.payload) {
-        var isRedirect = this.get('redirect');
-        if (!isRedirect) {
-          this.submit();
-        }
-        callback = function(msg) {
-          if (this.getCurrentCustomer().logged) {
-            // OTP verification successful
-            OtpService.resetCount('razorpay');
+      var isCardlessEmi =
+        this.payload && this.payload.method === 'cardless_emi';
 
-            if (isRedirect) {
-              this.submit();
-            } else {
-              this.r.emit('payment.resume');
-            }
-            this.showLoadError();
-          } else {
-            this.r.emit('payment.error', discreet.error(msg));
-            Analytics.track('behav:otp:incorrect', {
-              wallet: isWallet,
-            });
-            askOTP(this.otpView, msg, true);
-            this.updateCustomerInStore();
-          }
-        };
-      } else {
-        var self = this;
-
+      if (!isCardlessEmi && this.tab !== 'upi') {
+        // card tab only past this
+        // card filled by logged out user + remember me
         if (this.payload) {
-          // OTP verification for saving card
-          Analytics.track('saved_cards:save:otp:submit');
-        } else {
-          // OTP verification for accessing saved cards
-          Analytics.track('saved_cards:access:otp:submit');
-        }
+          var isRedirect = this.get('redirect');
+          if (!isRedirect) {
+            this.submit();
+          }
+          callback = function(msg) {
+            if (this.getCurrentCustomer().logged) {
+              // OTP verification successful
+              OtpService.resetCount('razorpay');
 
-        callback = function(msg) {
-          if (self.getCurrentCustomer().logged) {
+              if (isRedirect) {
+                this.submit();
+              } else {
+                this.r.emit('payment.resume');
+              }
+              this.showLoadError();
+            } else {
+              this.r.emit('payment.error', discreet.error(msg));
+              Analytics.track('behav:otp:incorrect', {
+                wallet: isWallet,
+              });
+              askOTP(this.otpView, msg, true);
+              this.updateCustomerInStore();
+            }
+          };
+        } else {
+          var self = this;
+
+          if (this.payload) {
+            // OTP verification for saving card
+            Analytics.track('saved_cards:save:otp:submit');
+          } else {
+            // OTP verification for accessing saved cards
+            Analytics.track('saved_cards:access:otp:submit');
+          }
+
+          callback = function(msg) {
+            if (self.getCurrentCustomer().logged) {
+              // OTP verification successful
+              OtpService.resetCount('razorpay');
+
+              self.updateCustomerInStore();
+              self.svelteCardTab.showLandingView().then(function() {
+                self.showCardTab();
+              });
+            } else {
+              Analytics.track('behav:otp:incorrect', {
+                wallet: isWallet,
+              });
+              askOTP(this.otpView, msg, true);
+              self.updateCustomerInStore();
+            }
+          };
+        }
+      }
+
+      var submitPayload = {
+        otp: otp,
+        email: getEmail(),
+      };
+
+      if (this.tab === 'cardless_emi') {
+        var providerCode = CardlessEmiStore.providerCode;
+
+        submitPayload = _Obj.extend(submitPayload, {
+          provider: providerCode,
+          method: 'cardless_emi',
+          payment_id: this.r._payment.payment_id,
+        });
+
+        callback = function(msg, data) {
+          if (msg) {
+            this.fetchCardlessEmiPlans({
+              incorrect: true,
+            });
+          } else {
             // OTP verification successful
             OtpService.resetCount('razorpay');
 
-            self.updateCustomerInStore();
-            self.svelteCardTab.showLandingView().then(function() {
-              self.showCardTab();
-            });
-          } else {
-            Analytics.track('behav:otp:incorrect', {
-              wallet: isWallet,
-            });
-            askOTP(this.otpView, msg, true);
-            self.updateCustomerInStore();
+            CardlessEmiStore.plans[providerCode] = data.emi_plans;
+            CardlessEmiStore.loanUrls[providerCode] = data.loan_url;
+            CardlessEmiStore.ott[providerCode] = data.ott;
+            CardlessEmiStore.lenderBranding[providerCode] =
+              data.lender_branding_url;
+
+            this.showCardlessEmiPlans();
           }
         };
       }
-    }
 
-    var submitPayload = {
-      otp: otp,
-      email: getEmail(),
-    };
-
-    if (this.tab === 'cardless_emi') {
-      var providerCode = CardlessEmiStore.providerCode;
-
-      submitPayload = _Obj.extend(submitPayload, {
-        provider: providerCode,
-        method: 'cardless_emi',
-        payment_id: this.r._payment.payment_id,
-      });
-
-      callback = function(msg, data) {
-        if (msg) {
-          this.fetchCardlessEmiPlans({
-            incorrect: true,
-          });
-        } else {
-          // OTP verification successful
-          OtpService.resetCount('razorpay');
-
-          CardlessEmiStore.plans[providerCode] = data.emi_plans;
-          CardlessEmiStore.loanUrls[providerCode] = data.loan_url;
-          CardlessEmiStore.ott[providerCode] = data.ott;
-          CardlessEmiStore.lenderBranding[providerCode] =
-            data.lender_branding_url;
-
-          this.showCardlessEmiPlans();
-        }
-      };
-    }
-
-    if (this.tab === 'upi') {
-      callback = function(msg, data) {
-        if (msg) {
-          Analytics.track('behav:otp:incorrect');
-          askOTP(this.otpView, msg, true);
-          this.updateCustomerInStore();
-        } else {
-          discreet.upiTab.render();
-          this.setScreen('upi');
-        }
-      };
-    }
-
-    if (this.tab === 'paylater') {
-      var providerCode = PayLaterStore.providerCode;
-
-      queryParams = {
-        provider: providerCode,
-        method: 'paylater',
-      };
-
-      callback = function(msg, data) {
-        this.otpView.updateScreen({ loading: false });
-        $('#body').addClass('sub');
-        if (msg) {
-          this.askPayLaterOtp('incorrect');
-        } else {
-          if (data.ott) {
-            // OTP verification successful
-            OtpService.resetCount('razorpay');
-
-            PayLaterStore.otpVerified = true;
-            PayLaterStore.ott[providerCode] = data.ott;
-            PayLaterStore.contact = data.contact;
-            this.switchTab('paylater');
-            this.submitPayLater();
+      if (this.tab === 'upi') {
+        callback = function(msg, data) {
+          if (msg) {
+            Analytics.track('behav:otp:incorrect');
+            askOTP(this.otpView, msg, true);
+            this.updateCustomerInStore();
+          } else {
+            discreet.upiTab.render();
+            this.setScreen('upi');
           }
-        }
-      };
-      this.commenceOTP('verifying');
+        };
+      }
+
+      if (this.tab === 'paylater') {
+        var providerCode = PayLaterStore.providerCode;
+
+        queryParams = {
+          provider: providerCode,
+          method: 'paylater',
+        };
+
+        callback = function(msg, data) {
+          this.otpView.updateScreen({ loading: false });
+          $('#body').addClass('sub');
+          if (msg) {
+            this.askPayLaterOtp('incorrect');
+          } else {
+            if (data.ott) {
+              // OTP verification successful
+              OtpService.resetCount('razorpay');
+
+              PayLaterStore.otpVerified = true;
+              PayLaterStore.ott[providerCode] = data.ott;
+              PayLaterStore.contact = data.contact;
+              this.switchTab('paylater');
+              this.submitPayLater();
+            }
+          }
+        };
+        this.commenceOTP('verifying');
+      }
+      this.getCurrentCustomer().submitOTP(
+        submitPayload,
+        bind(callback, this),
+        queryParams
+      );
+    } else {
+      Form.shake();
     }
-    this.getCurrentCustomer().submitOTP(
-      submitPayload,
-      bind(callback, this),
-      queryParams
-    );
   },
 
   getCurrentCustomer: function(phone) {

@@ -67,7 +67,7 @@
 
   const isSavedCardsEnabled = shouldRememberCustomer();
 
-  const showRememberCardCheck = !isRecurring() && isSavedCardsEnabled;
+  const showRememberCardCheck = isSavedCardsEnabled;
 
   let noCvvChecked = false;
   let showNoCvvCheckbox = false;
@@ -87,6 +87,7 @@
   function setCardNumberValidity(valid) {
     if (numberField) {
       numberField.setValid(valid);
+      numberField.dispatchFilledIfValid();
     }
   }
 

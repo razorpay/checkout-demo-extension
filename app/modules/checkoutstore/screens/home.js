@@ -1,10 +1,45 @@
-import { derived, writable } from 'svelte/store';
+import { derived, writable, get } from 'svelte/store';
+import { isContactOptional, isEmailOptional } from 'checkoutstore';
+import {
+  CONTACT_REGEX,
+  EMAIL_REGEX,
+  INDIA_COUNTRY_CODE,
+} from 'common/constants';
 import {
   isInstrumentGrouped,
   isInstrumentForEntireMethod,
 } from 'configurability/instruments';
 import { findCountryCode } from 'common/countrycodes';
-import { INDIA_COUNTRY_CODE } from 'common/constants';
+
+export const getCustomerDetails = () => {
+  const data = {
+    contact: get(contact),
+    email: get(email),
+  };
+  if (data.contact === INDIA_COUNTRY_CODE || data.contact === '+') {
+    delete data.contact;
+  }
+
+  if (isContactOptional()) {
+    // Merchant is on contact optional feature
+    if (!CONTACT_REGEX.test(data.contact)) {
+      // However, payload seems to have an invalid contact, delete it.
+      delete data.contact;
+    }
+  } else if (data.contact) {
+    data.contact = data.contact.replace(/\ /g, '');
+  }
+
+  if (isEmailOptional()) {
+    // Merchant is on email optional feature
+    if (!EMAIL_REGEX.test(data.email)) {
+      // However, payload seems to have an invalid email, delete it.
+      delete data.email;
+    }
+  }
+
+  return data;
+};
 
 export const country = writable('');
 export const phone = writable('');

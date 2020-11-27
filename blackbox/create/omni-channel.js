@@ -110,7 +110,7 @@ module.exports = function(testFeatures) {
       await selectUPIMethod(context, 'omnichannel');
       await verifyOmnichannelPhoneNumber(context);
 
-      if (offers) {
+      if (!feeBearer && offers) {
         await viewOffers(context);
         await selectOffer(context, '1');
         await verifyOfferApplied(context);
