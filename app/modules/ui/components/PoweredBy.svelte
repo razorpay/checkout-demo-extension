@@ -1,9 +1,12 @@
 <script>
   import { getOption, getOrgDetails } from 'checkoutstore';
   import { onMount } from 'svelte';
+  import { POWERED_BY_LABEL, PARTNERSHIP_LABEL } from 'ui/labels/powered-by';
+
+  import { t, locale } from 'svelte-i18n';
 
   const customLogo = getOption('partnership_logo');
-  const orgLogo = getOrgDetails()?.main_logo;
+  const orgLogo = getOrgDetails()?.checkout_logo;
   let fontLoaded = false;
   let fontTimeout = null;
   let ref;
@@ -27,10 +30,14 @@
 
 <i id="powered-by" class:branded={customLogo && fontLoaded}>
   {#if customLogo && fontLoaded}
-    In partnership with <br />
+    {$t(PARTNERSHIP_LABEL)}
+    <br />
     <img alt="Logo" src={customLogo} />
   {:else if orgLogo && fontLoaded}
-    <div class="branding">Powered By <img alt="Logo" src={orgLogo} /></div>
+    <div class="branding">
+      <span>{$t(POWERED_BY_LABEL)}</span>
+      <img alt="Logo" src={orgLogo} />
+    </div>
   {:else}
     <a
       bind:this={ref}

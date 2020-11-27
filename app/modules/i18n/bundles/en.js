@@ -1029,4 +1029,8 @@ export default {
     sbibuddy: 'SBI Buddy',
     zeta: 'Zeta',
   },
+  powered_by: {
+    partnership_label: 'In partnership with',
+    powered_by_label: 'Powered By',
+  },
 };
