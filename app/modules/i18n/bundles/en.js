@@ -1028,4 +1028,11 @@ export default {
     sbibuddy: 'SBI Buddy',
     zeta: 'Zeta',
   },
+  rewards: {
+    header:
+      'Pay successfully now  & <strong>unlock rewards for free<strong> for your future buys!',
+    sub_text: 'Wait for these rewards from amazing brands.',
+    unlock: 'Unlocks in email',
+    close: 'Close',
+  },
 };
