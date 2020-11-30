@@ -13,7 +13,7 @@
   import Callout from 'ui/elements/Callout.svelte';
   import CardOffer from 'ui/elements/CardOffer.svelte';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
-  import Rewards from 'ui/components/rewards/Rewards.sveltex.svelte';
+  import Rewards from 'ui/components/rewards/index.svelte';
   // import Backdrop from 'ui/components/Backdrop.svelte';
 
   // Svelte imports
@@ -126,6 +126,9 @@
 
   import { update as updateContactStorage } from 'checkoutframe/contact-storage';
   import { isMobile } from 'common/useragent';
+  import Overlay from 'ui/components/Overlay.svelte';
+
+  // console.log(new Rewards({target: null}))
 
   const cardOffer = getCardOffer();
   const session = getSession();
@@ -233,9 +236,8 @@
     session.svelteOverlay.$$set({
       component: Rewards,
     });
-    // showBackdrop();
-    // Backdrop.show()
     session.showSvelteOverlay();
+    showBackdrop();
     isRewardsVisible.update(flag => !flag);
   }
 
@@ -874,12 +876,6 @@
       }
     }
   }
-
-  // export let isRewardsVisible;
-  // $: {
-  //   isRewardsVisible = getIsRewardsVisible();
-  //   console.log('hi', isRewardsVisible)
-  // }
 </script>
 
 <style>
