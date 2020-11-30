@@ -27,6 +27,8 @@ import {
   ownerWindow,
 } from 'common/constants';
 import { checkForPossibleWebPayments } from 'checkoutframe/components/upi';
+import { rewards } from 'checkoutstore/rewards';
+import rewardsRes from '../../mocks/rewards';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -191,6 +193,7 @@ export const handleMessage = function(message) {
 
   if (message.event === 'open' || options) {
     fetchPrefs(session);
+    fetchRewards(session);
   }
 
   try {
@@ -235,6 +238,31 @@ function fetchPrefs(session) {
       }
     }
   );
+}
+
+function fetchRewards(session) {
+  // TODO: reaplce the below call with rewards endpoint
+  // session.prefCall = Razorpay.payment.getPrefs(
+  //   getPreferenecsParams(session.r),
+  //   preferences => {
+  //     session.prefCall = null;
+  //     if (preferences.error) {
+  //       Razorpay.sendMessage({
+  //         event: 'fault',
+  //         data: preferences.error,
+  //       });
+  //     } else {
+  //       setSessionPreferences(session, preferences);
+  //       if (closeAt) {
+  //         session.timer = showTimer(closeAt, () => {
+  //           session.dismissReason = 'timeout';
+  //           session.modal.hide();
+  //         });
+  //       }
+  //     }
+  //   }
+  // );
+  rewards.set(rewardsRes);
 }
 
 function performPrePrefsFetchOperations() {
