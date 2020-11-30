@@ -162,10 +162,13 @@ const ALL_METHODS = {
   },
 
   app() {
-    if (_Obj.keys(getMerchantMethods().app).length) {
-      return true;
-    }
-    if (getMerchantMethods().google_pay_cards) {
+    let areAppsEnabled = false;
+    _Obj.loop(getMerchantMethods().app, val => {
+      if (val) {
+        areAppsEnabled = true;
+      }
+    });
+    if (areAppsEnabled || getMerchantMethods().google_pay_cards) {
       return true;
     }
     return false;
@@ -319,7 +322,6 @@ export function getEnabledMethods() {
   if (merchantOrderMethod) {
     methodsToConsider = [merchantOrderMethod];
   }
-
   return methodsToConsider |> _Arr.filter(isMethodEnabled);
 }
 
