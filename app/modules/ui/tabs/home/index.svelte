@@ -13,6 +13,8 @@
   import Callout from 'ui/elements/Callout.svelte';
   import CardOffer from 'ui/elements/CardOffer.svelte';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
+  import Rewards from 'ui/components/rewards/Rewards.sveltex.svelte';
+  // import Backdrop from 'ui/components/Backdrop.svelte';
 
   // Svelte imports
   import { onMount, tick } from 'svelte';
@@ -35,10 +37,12 @@
     setContact,
     setEmail,
   } from 'checkoutstore/screens/home';
+  import { showBackdrop } from 'checkoutstore/backdrop';
 
   import { customer } from 'checkoutstore/customer';
   import { getOption, isDCCEnabled } from 'checkoutstore';
   import { getUPIIntentApps } from 'checkoutstore/native';
+  import { isRewardsVisible } from 'checkoutstore/rewards';
 
   // i18n
   import {
@@ -226,6 +230,13 @@
 
   function showRewards() {
     // TODO
+    session.svelteOverlay.$$set({
+      component: Rewards,
+    });
+    // showBackdrop();
+    // Backdrop.show()
+    session.showSvelteOverlay();
+    isRewardsVisible.update(flag => !flag);
   }
 
   export function setDetailsCta() {
@@ -863,6 +874,12 @@
       }
     }
   }
+
+  // export let isRewardsVisible;
+  // $: {
+  //   isRewardsVisible = getIsRewardsVisible();
+  //   console.log('hi', isRewardsVisible)
+  // }
 </script>
 
 <style>
