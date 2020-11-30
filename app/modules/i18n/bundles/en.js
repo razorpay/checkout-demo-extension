@@ -738,9 +738,6 @@ export default {
     acs_load_delay: 'Seems like your bank page is taking time to load.',
     and_more: '{text} & More',
     cancel_action: 'Cancel Payment',
-    cancel_back: 'No',
-    cancel_confirm: 'Yes, cancel',
-    cancel_title: 'Cancel payment?',
     checking_payment_status: 'Checking the payment status...',
     complete_payment_on_app: 'Please complete the payment on the {app}',
     confirm_cancel_heading: 'Cancel payment?',
@@ -748,8 +745,6 @@ export default {
       'Your payment is ongoing. Are you sure you want to cancel the payment?',
     confirm_cancel_positive_text: 'Yes, cancel',
     confirm_cancel_negative_text: 'No',
-    confirm_cancel:
-      'Your payment is ongoing. Are you sure you want to cancel the payment?',
     downtime_multiple_methods:
       '{method} are facing temporary issues right now.',
     downtime_single_method: '{method} is facing temporary issues right now.',
