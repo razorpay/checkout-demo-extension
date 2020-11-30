@@ -1,7 +1,8 @@
 <script>
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import RewardCard from './RewardCard.svelte';
-  // Utils imports
+
+  //store
   import { rewards } from 'checkoutstore/rewards';
 
   // i18n
@@ -13,8 +14,8 @@
     REWARDS_CLOSE,
   } from 'ui/labels/rewards';
 
-  // // props
-  // export let rewards = getRewards()
+  //props
+  export let onClick;
 </script>
 
 <style>
@@ -47,6 +48,7 @@
   .rewards-close {
     color: #3f71d7;
     margin-top: 20px;
+    cursor: pointer;
   }
   .rewards-traingle {
     border: 0px solid #fff;
@@ -78,5 +80,5 @@
   </div>
   <div class="rewards-subtext-text rewards-unlock">{$t(REWARDS_UNLOCK)}</div>
   <div class="rewards-divider" />
-  <div class="rewards-close">{$t(REWARDS_CLOSE)}</div>
+  <div class="rewards-close" on:click={onClick}>{$t(REWARDS_CLOSE)}</div>
 </div>

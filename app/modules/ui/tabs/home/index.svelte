@@ -235,6 +235,11 @@
     // TODO
     session.svelteOverlay.$$set({
       component: Rewards,
+      props: {
+        onClick: function(e) {
+          session.hideErrorMessage(e);
+        },
+      },
     });
     session.showSvelteOverlay();
     showBackdrop();
