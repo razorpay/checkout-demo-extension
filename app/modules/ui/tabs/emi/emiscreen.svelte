@@ -86,7 +86,7 @@
     <div
       class="strip emi-plans-info-container emi-plans-trigger details-visible"
       on:click={() => dispatch('editplan')}>
-      <div class="emi-plan-selected emi-icon-multiple-cards ">
+      <div class="emi-plan-selected emi-icon-multiple-cards">
         <div class="emi-plans-text">
           {formatTemplateWithLocale(EDIT_PLAN_TEXT, emiText, $locale)}
         </div>

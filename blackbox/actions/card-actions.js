@@ -1,4 +1,5 @@
 const { delay, innerText } = require('../util');
+const { assertTrimmedInnerText } = require('../tests/homescreen/actions');
 const querystring = require('querystring');
 
 async function handleCardValidation(context, { urlShouldContain } = {}) {
@@ -19,11 +20,44 @@ async function handleCardValidation(context, { urlShouldContain } = {}) {
 
 async function handleCardValidationForNativeOTP(
   context,
-  { coproto, urlShouldContain } = {}
+  { coproto, cardType, urlShouldContain, expectCallbackUrl } = {}
 ) {
   const req = await context.expectRequest();
+  const body = querystring.parse(req.body);
+  if (expectCallbackUrl) {
+    expect(body.callback_url).toEqual(
+      'http://www.merchanturl.com/callback?test1=abc&test2=xyz'
+    );
+  }
   expect(req.url).toContain(urlShouldContain || 'create/ajax');
-  if (coproto === 'otp') {
+  if (cardType === 'RUPAY' && coproto === 'otp') {
+    await context.respondJSON({
+      type: 'otp',
+      request: {
+        method: 'direct',
+        content: '',
+      },
+      version: 1,
+      payment_id: 'pay_Ep1kkNJDzAdvIZ',
+      next: ['otp_submit', 'otp_resend'],
+      gateway:
+        'eyJpdiI6IjVmNmxSN2FrTlE0R2I3QThtSnFLR3c9PSIsInZhbHVlIjoib29IRmFBTWxEaG0xQVp3Tm95U0pNZExGN2lsQnBJWkJlcDJaQ0xmQ1p1UT0iLCJtYWMiOiIzYTZhYTczNWJhN2M4YzBlMDlmODYxMjIxN2Y3Y2FiNjdkNzgyYmZhZTRkMDY3MTNiZjI2YTEzZWMwYjJlOGY3In0=',
+      submit_url: 'https://api.razorpay.com/otp_submit',
+      resend_url: 'https://api.razorpay.com/otp_resend',
+      metadata: {
+        issuer: 'HDFC',
+        network: 'VISA',
+        last4: '0176',
+        iin: '416021',
+        gateway: 'hitachi',
+        contact: '9723461024',
+        ip: '10.2.1.33',
+        resend_timeout: 30,
+      },
+      submit_url_private: 'https://api.razorpay.com/otp_submit',
+      resend_url_private: 'https://api.razorpay.com/otp_resend',
+    });
+  } else if (coproto === 'otp') {
     await context.respondJSON({
       type: 'otp',
       request: {
@@ -79,10 +113,17 @@ async function enterCardDetails(
   } = {}
 ) {
   const visa = cardType === 'VISA';
-  await context.page.type(
-    '#card_number',
-    visa ? '4111111111111111' : '376939393939397'
-  );
+  const bepg = nativeOtp && cardType === 'RUPAY';
+
+  let cardNumber = '376939393939397';
+
+  if (visa) {
+    cardNumber = '4111111111111111';
+  } else if (bepg) {
+    cardNumber = '7878780000000001';
+  }
+
+  await context.page.type('#card_number', cardNumber);
 
   await context.expectRequest(req => {});
 
@@ -394,6 +435,18 @@ async function handleAppPaymentStatus(context) {
   }
 }
 
+async function assertOTPElementsForBEPG(context) {
+  await assertTrimmedInnerText(context, '#form-otp .card-box', /Card - 0001$/);
+
+  await assertTrimmedInnerText(context, '#otp-resend', /Resend OTP \(\d{2}\)/);
+
+  await assertTrimmedInnerText(
+    context,
+    '#form-otp .security-text',
+    /^Your transaction/
+  );
+}
+
 module.exports = {
   enterCardDetails,
   expectDCCParametersInRequest,
@@ -409,4 +462,5 @@ module.exports = {
   verifyAmount,
   handleAppCreatePayment,
   handleAppPaymentStatus,
+  assertOTPElementsForBEPG,
 };

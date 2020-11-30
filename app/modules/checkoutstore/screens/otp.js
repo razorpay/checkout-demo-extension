@@ -12,3 +12,7 @@ export const skipTextLabel = writable('skip_saved_cards');
 export const templateData = writable({});
 export const textView = writable('');
 export const mode = writable('');
+export const phone = writable('');
+export const resendTimeout = writable(0);
+export const ipAddress = writable('');
+export const accessTime = writable(0);

@@ -1,5 +1,5 @@
-const { getTestData } = require('../../../actions');
-const { openCheckoutWithNewHomeScreen } = require('../open');
+const { getTestData } = require('../../../../actions');
+const { openCheckoutWithNewHomeScreen } = require('../../open');
 const {
   selectCardlessEMIOption,
   handleCardlessEMIValidation,
@@ -8,7 +8,7 @@ const {
   expectRedirectWithCallback,
   selectZestMoneyEMIPlan,
   submit,
-} = require('../../../actions/common');
+} = require('../../../../actions/common');
 
 const {
   assertBasicDetailsScreen,
@@ -18,7 +18,7 @@ const {
   assertPaymentMethods,
   selectPaymentMethod,
   assertEditUserDetailsAndBack,
-} = require('../actions');
+} = require('../../actions');
 
 describe.each(
   getTestData(

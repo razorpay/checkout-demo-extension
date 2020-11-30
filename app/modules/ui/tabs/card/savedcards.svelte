@@ -48,7 +48,7 @@
     Analytics.track('saved_card:select', {
       type: AnalyticsTypes.BEHAV,
       data: {
-        card: getCardMetadata(card.token),
+        card: getCardMetadata(card.id),
       },
     });
 

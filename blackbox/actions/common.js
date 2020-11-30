@@ -50,6 +50,7 @@ module.exports = {
   goBackFromTopbar,
   verifyAmountInHeader,
   getAmountFromHeader,
+  verifyFooterText,
 };
 
 async function verifyAutoSelectBankTPV(context, bank) {
@@ -154,6 +155,16 @@ async function verifyDiscountPaybleAmount(context, expectedDiscountAmount) {
   );
 
   expect(footerEndsWithDiscountAmount).toEqual(true);
+}
+
+async function verifyFooterText(context, text) {
+  const footer = await context.page.waitForSelector('#footer-cta');
+  let footerText = await context.page.evaluate(
+    footer => footer.textContent,
+    footer
+  );
+  footerText = footerText.trim().toLowerCase();
+  expect(footerText).toEqual(text.toLowerCase());
 }
 
 async function verifyDiscountText(context, expectedDiscountAmount) {

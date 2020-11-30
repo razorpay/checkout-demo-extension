@@ -164,3 +164,14 @@ export function luhnCheck(num) {
 
   return sum % 10 === 0;
 }
+
+export function getFormattedDateTime(timestamp) {
+  const today = new Date(timestamp);
+  let date = today.toDateString(); // Fri Jun 26 2020
+  date = date.replace(/^\w*\s/, ''); // Jun 26 2020
+
+  let time = today.toTimeString(); // 16:59:09 GMT+0530 (India Standard Time)
+  time = time.replace(/GMT[^\s]*\s/, ''); // 16:59:09 (India Standard Time)
+  time = time.replace('(India Standard Time)', 'IST'); // 16:59:09 IST
+  return date + ' ' + time;
+}

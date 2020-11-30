@@ -118,7 +118,7 @@
   <!-- LABEL: Google Pay phone number -->
   <div id="gpay-omnichannel" slot="title">{$t(OMNI_GPAY_NUMBER)}</div>
   <i slot="icon" class="top">
-    <img src="https://cdn.razorpay.com/app/googlepay.svg" alt="Google Pay" />
+    <img src="https://cdn.razorpay.com/app/googlepay.svg" alt="" />
   </i>
 
   <div slot="body">

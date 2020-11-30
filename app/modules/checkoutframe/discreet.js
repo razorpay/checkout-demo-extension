@@ -8,7 +8,6 @@ import * as UPIUtils from 'common/upi';
 import * as GPay from 'gpay';
 import * as Color from 'lib/color';
 import * as _PaymentMethodIcons from 'ui/icons/payment-methods';
-import * as Confirm from 'confirm';
 import * as Currency from 'common/currency';
 import * as OtpService from 'common/otpservice';
 import * as strings from 'common/strings';
@@ -32,6 +31,7 @@ import * as CountryCodesUtil from 'common/countrycodes';
 
 /* Required for merchant.js migration */
 import * as Constants from 'common/constants';
+import * as WebPaymentsApi from 'common/webPaymentsApi';
 import * as Card from 'common/card';
 import * as Wallet from 'common/wallet';
 import * as CardlessEmi from 'common/cardlessemi';
@@ -73,7 +73,10 @@ import EmandateTab from 'ui/tabs/emandate/index.svelte';
 import NachScreen from 'ui/tabs/nach/index.svelte';
 import * as cardTab from 'checkoutframe/components/card';
 import * as walletTab from 'checkoutframe/components/wallet';
+import * as Backdrop from 'checkoutframe/components/backdrop';
+import * as Confirm from 'checkoutframe/components/confirm';
 import TopBar from 'ui/components/Topbar.svelte';
+import * as FeeLabel from 'checkoutframe/components/fee';
 
 import PayoutsInstruments from 'ui/tabs/payout/payout-instruments.svelte';
 import PayoutAccount from 'ui/tabs/payout/payout-account.svelte';
@@ -104,9 +107,9 @@ export default {
   Color,
   _PaymentMethodIcons,
   Confirm,
+  FeeLabel,
   Currency,
   OtpService,
-  getDecimalAmount: Currency.getDecimalAmount,
   currencies: Currency.displayCurrencies,
   error: _.rzpError,
   Formatter,
@@ -120,6 +123,7 @@ export default {
   es6components,
 
   Constants,
+  WebPaymentsApi,
   Card,
   Wallet,
   CardlessEmi,
@@ -160,6 +164,7 @@ export default {
   emiPlansView,
 
   FeeBearerView,
+  Backdrop,
   Overlay,
   AuthOverlay,
   OffersView,
@@ -194,6 +199,7 @@ export default {
   _Obj,
   _Str,
   _,
+  Promise,
 
   NBHandlers,
 

@@ -6,6 +6,9 @@ export const AUTH_TYPE_DEBIT_DESCRIPTION =
 export const AUTH_TYPE_NETBANKING_TITLE = 'emandate.auth_type_netbanking_title';
 export const AUTH_TYPE_NETBANKING_DESCRIPTION =
   'emandate.auth_type_netbanking_description';
+export const AUTH_TYPE_AADHAAR_TITLE = 'emandate.auth_type_aadhaar_title';
+export const AUTH_TYPE_AADHAAR_DESCRIPTION =
+  'emandate.auth_type_aadhaar_description';
 export const ACCOUNT_NUMBER_LABEL = 'emandate.account_number_label';
 export const ACCOUNT_NUMBER_HELP = 'emandate.account_number_help';
 export const ACCOUNT_TYPE_CURRENT = 'emandate.account_type_current';

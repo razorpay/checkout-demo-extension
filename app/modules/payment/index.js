@@ -25,6 +25,7 @@ import * as GPay from 'gpay';
 import Analytics from 'analytics';
 import { isProviderHeadless } from 'common/cardlessemi';
 import { updateCurrencies, setCurrenciesRate } from 'common/currency';
+import { GOOGLE_PAY_PACKAGE_NAME, PHONE_PE_PACKAGE_NAME } from 'common/upi';
 import { getCardEntityFromPayload, getCardFeatures } from 'common/card';
 
 import { getCurrentLocale, translatePaymentPopup as t } from 'i18n/popup';
@@ -350,17 +351,19 @@ Payment.prototype = {
     );
 
     if (this.gpay || this.tez) {
-      if (
-        !(
-          this.r.paymentAdapters &&
-          (this.r.paymentAdapters.gpay ||
-            this.r.paymentAdapters['microapps.gpay'])
-        )
-      ) {
-        return this.r.emit(
-          'payment.error',
-          _.rzpError('GPay is not available')
-        );
+      if (data['_[app]'] === GOOGLE_PAY_PACKAGE_NAME) {
+        if (
+          !(
+            this.r.paymentAdapters &&
+            (this.r.paymentAdapters[GOOGLE_PAY_PACKAGE_NAME] ||
+              this.r.paymentAdapters['microapps.gpay'])
+          )
+        ) {
+          return this.r.emit(
+            'payment.error',
+            _.rzpError('GPay is not available')
+          );
+        }
       }
     }
 
@@ -413,7 +416,7 @@ Payment.prototype = {
     this.offmessage = global |> _El.on('message', _Func.bind(onMessage, this));
   },
 
-  complete: function(data) {
+  complete: function(data, event) {
     if (this.done) {
       return;
     }
@@ -433,9 +436,8 @@ Payment.prototype = {
       return processOtpResponse.call(this, data);
     }
 
-    this.clear();
-
     if (data.razorpay_payment_id) {
+      this.clear();
       // Track
       Analytics.track('oncomplete', {
         r: this.r,
@@ -443,6 +445,23 @@ Payment.prototype = {
       });
       this.emit('success', data);
     } else {
+      // We report a generic error if postMessage payload does not have
+      // either razorpay_payment_id or error. We need to do this only if
+      // the message was from Razorpay's domain (because other pages can
+      // invoke postMessage from the popup which needs to be ignored.
+      //
+      // Test for 'null' origin is present because puppeteer tests simulate a
+      // callback by loading a data URL on the popup which keeps its location
+      // about:blank, the origin for which is reported as 'null'.
+      if (
+        event &&
+        event.origin !== 'null' &&
+        window.location.origin !== event.origin
+      ) {
+        return;
+      }
+
+      this.clear();
       var errorObj = data.error;
       if (!_.isNonNullObject(errorObj) || !errorObj.description) {
         if (data.request) {
@@ -728,7 +747,7 @@ function pollPaymentData(onComplete) {
 
 function onMessage(e) {
   if (this.popup && this.popup.window === e.source) {
-    this.complete(e.data);
+    this.complete(e.data, e);
   }
 }
 
@@ -748,15 +767,25 @@ var razorpayProto = Razorpay.prototype;
  * @return {Promise}
  */
 razorpayProto.checkPaymentAdapter = function(adapter, data) {
-  return checkPaymentAdapter(adapter, data).then(success => {
-    if (!this.paymentAdapters) {
-      this.paymentAdapters = {};
+  // Hack to support web payments api for voth standard and custom checkout
+  // TODO - Solution web payments for custom checkout to make them more extensible
+  var adapterPackageNameMap = {
+    gpay: GOOGLE_PAY_PACKAGE_NAME,
+    [GOOGLE_PAY_PACKAGE_NAME]: GOOGLE_PAY_PACKAGE_NAME,
+    [PHONE_PE_PACKAGE_NAME]: PHONE_PE_PACKAGE_NAME,
+    'microapps.gpay': 'microapps.gpay',
+  };
+  return checkPaymentAdapter(adapterPackageNameMap[adapter], data).then(
+    success => {
+      if (!this.paymentAdapters) {
+        this.paymentAdapters = {};
+      }
+
+      this.paymentAdapters[adapter] = true;
+
+      return Promise.resolve(success);
     }
-
-    this.paymentAdapters[adapter] = true;
-
-    return Promise.resolve(success);
-  });
+  );
 };
 
 /**

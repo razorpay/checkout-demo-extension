@@ -126,7 +126,7 @@
 </script>
 
 <div
-  class="saved-card "
+  class="saved-card"
   class:checked={selected}
   on:click={handleClick}
   tabIndex="0"

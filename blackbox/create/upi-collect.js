@@ -26,6 +26,7 @@ const {
 
   // Partial Payment
   verifyPartialAmount,
+  verifyFooterText,
 } = require('../actions/common');
 
 const {
@@ -44,8 +45,8 @@ const {
   handlePartialPayment,
 
   //Downtime
-  verifyLowDowntime,
-  verifyHighDowntime,
+  verifyMethodWarned,
+  verifyMethodDisabled,
 
   // Personalization
   selectPersonalizationPaymentMethod,
@@ -121,19 +122,10 @@ module.exports = function(testFeatures) {
         await selectPersonalizationPaymentMethod(context, 1);
       } else {
         if (!(downtimeHigh && offers)) {
-          if (downtimeHigh) {
-            await verifyHighDowntime(
-              context,
-              'upi',
-              'UPI is facing temporary issues right now.'
-            );
-            return;
-          }
-
           await selectPaymentMethod(context, 'upi');
 
-          if (downtimeLow) {
-            await verifyLowDowntime(context, 'UPI', 'upi');
+          if (downtimeHigh || downtimeLow) {
+            await verifyMethodWarned(context, 'UPI', 'upi');
           }
           await selectUPIMethod(context, 'new');
           await enterUPIAccount(context, 'saranshgupta1995@okaxis');
@@ -143,16 +135,23 @@ module.exports = function(testFeatures) {
         await verifyPartialAmount(context, '₹ 100');
       }
 
-      if (offers) {
+      if (!feeBearer && offers) {
         await viewOffers(context);
         await selectOffer(context, '1');
         await verifyOfferApplied(context);
-        await verifyDiscountPaybleAmount(context, '₹ 1,990');
+        if (!feeBearer) {
+          await verifyDiscountPaybleAmount(context, '₹ 1,990');
+        }
         await verifyDiscountAmountInBanner(context, '₹ 1,990');
         await verifyDiscountText(context, 'You save ₹10');
       }
+
+      if (feeBearer) {
+        await verifyFooterText(context, 'PAY');
+      }
+
       if (downtimeHigh && offers) {
-        await verifyHighDowntime(
+        await verifyMethodDisabled(
           context,
           'upi',
           ' UPI is experiencing low success rates.'

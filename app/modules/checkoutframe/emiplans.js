@@ -73,15 +73,26 @@ const fetchAgreements = (provider, loanUrl, plans, amount) => {
     loanUrl += '&';
   }
 
+  const createUrlHelper = AGREEMENT_HELPER.createUrl[provider];
+
+  // API sometimes sends loan_url for providers other than the ones that need
+  // a loan agreement to be shown. Do not try to fetch the agreement if the
+  // helper for the provider is not defined.
+  if (!createUrlHelper) {
+    return;
+  }
+
   _Arr.loop(plans, plan => {
     fetch({
-      url: AGREEMENT_HELPER.createUrl[provider](loanUrl, amount, plan.duration),
+      url: createUrlHelper(loanUrl, amount, plan.duration),
 
       callback: function(response) {
         if (!AGREEMENT_STORE[provider]) {
           AGREEMENT_STORE[provider] = {};
         }
 
+        // TODO: restructure AGREEMENT_HELPER to make the relationship between
+        //  parseResponse and createUrl explicit
         AGREEMENT_STORE[provider][
           plan.duration
         ] = AGREEMENT_HELPER.parseResponse[provider](response);

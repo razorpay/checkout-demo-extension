@@ -2,6 +2,7 @@ import { writable, derived } from 'svelte/store';
 import { getSession } from 'sessionmanager';
 import { displayAmount } from 'common/currency';
 import { isCardValidForOffer } from 'checkoutstore/offers';
+import { isCustomerFeeBearer } from 'checkoutstore/index';
 import { CtaViews } from 'ui/labels/cta';
 
 import { locale } from 'svelte-i18n';
@@ -80,7 +81,11 @@ export function showNext() {
 }
 
 export function showPayViaSingleMethod(method) {
-  setView(CtaViews.PAY_SINGLE_METHOD, true, { method });
+  if (isCustomerFeeBearer()) {
+    setView(CtaViews.PAY, false);
+  } else {
+    setView(CtaViews.PAY_SINGLE_METHOD, true, { method });
+  }
 }
 
 export function showAuthenticate() {
@@ -125,11 +130,15 @@ export function showAmountInCta() {
   if (!session.get('amount')) {
     setView(CtaViews.AUTHENTICATE, false);
   } else {
-    const offer = session.getAppliedOffer();
-    const amount = (offer && offer.amount) || session.get('amount');
-    setView(CtaViews.AMOUNT, false, {
-      amount: displayAmount(session.r, amount),
-    });
+    if (isCustomerFeeBearer()) {
+      setView(CtaViews.PAY, false);
+    } else {
+      const offer = session.getAppliedOffer();
+      const amount = (offer && offer.amount) || session.get('amount');
+      setView(CtaViews.AMOUNT, false, {
+        amount: displayAmount(session.r, amount),
+      });
+    }
   }
 }
 
@@ -158,6 +167,31 @@ export function setAppropriateCtaText() {
   }
 }
 
+const trackCTAVisibility = _Func.debounce(function() {
+  // To figure out cases when CTA is shown logically
+  // but is not visible physically.
+  setTimeout(function() {
+    const session = getSession();
+
+    const el = _Doc.querySelector('#footer-cta');
+    if (!el) {
+      return;
+    }
+    const bottom = el.getBoundingClientRect().bottom;
+    const windowHeight = window.innerHeight;
+    const ctaVisible = bottom <= windowHeight;
+
+    session.trackEvent('cta:show', {
+      data: {
+        ctaVisible,
+        doctypeMissing: document.doctype === null,
+        windowHeight,
+        bottom,
+      },
+    });
+  }, 300);
+}, 300);
+
 /**
  * Shows the CTA
  */
@@ -165,6 +199,10 @@ export function showCta() {
   const session = getSession();
 
   _El.addClass(session.body[0], 'sub');
+
+  try {
+    trackCTAVisibility();
+  } catch (e) {}
 }
 
 /**

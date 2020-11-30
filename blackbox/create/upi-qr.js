@@ -16,7 +16,7 @@ const {
   verifyDiscountPaybleAmount,
   verifyDiscountAmountInBanner,
   verifyDiscountText,
-  verifyLowDowntime,
+  verifyMethodWarned,
   viewOffers,
   selectOffer,
 } = require('../actions/common');

@@ -32,7 +32,6 @@
 </script>
 
 <style>
-
 </style>
 
 <div class="card-box">

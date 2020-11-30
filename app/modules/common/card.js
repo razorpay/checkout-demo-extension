@@ -112,6 +112,10 @@ const cardPatterns = [
   // keep more specific rupay above catchall maestro
   {
     name: 'rupay',
+    regex: /^787878/, // BEPG sample card number
+  },
+  {
+    name: 'rupay',
     regex: /^(508[5-9]|60(80(0|)[^0]|8[1-4]|8500|698[5-9]|699|7[^9]|79[0-7]|798[0-4])|65(2(1[5-9]|[2-9])|30|31[0-4])|817[2-9]|81[89]|820[01])/,
   },
   {
@@ -292,11 +296,11 @@ export function updateCardTokenMetadata(token, data = {}) {
 
 /**
  * Returns card metadata if it was cached earlier
- * @param entity IIN/Token/Card Number
+ * @param entity IIN/Token ID/Card Number
  * @returns {{}}
  */
 export function getCardMetadata(entity) {
-  const isToken = /[a-zA-Z]/.test(entity);
+  const isToken = /^token_/.test(entity);
   if (isToken) {
     return _Obj.clone(CardMetadata.token[entity] || {});
   }

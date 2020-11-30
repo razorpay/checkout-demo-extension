@@ -65,7 +65,6 @@
 
   let title;
   let icon;
-  let alt;
   let code;
 
   function getVpaFromInstrument(instrument) {
@@ -87,7 +86,6 @@
     return {
       title: getInstrumentTitle('app', providerName, locale),
       icon: provider.logo,
-      alt: provider.name,
       code: provider.code,
     };
   }
@@ -96,7 +94,6 @@
     return {
       title: getInstrumentTitle('paypal', null, locale),
       icon: session.themeMeta.icons.paypal,
-      alt: 'PayPal',
     };
   }
 
@@ -110,7 +107,6 @@
     return {
       title: getInstrumentTitle('netbanking', bankName, locale),
       icon: getBankLogo(instrument.bank),
-      alt: bankName,
     };
   }
 
@@ -120,17 +116,15 @@
     return {
       title: getInstrumentTitle('wallet', walletName, locale),
       icon: wallet.sqLogo,
-      alt: wallet.name,
     };
   }
 
   function getDetailsForUpiInstrument(instrument, locale) {
     // TODO: simplify
-    let title, icon, alt;
+    let title, icon;
     if (instrument.flow === 'qr') {
       title = getInstrumentTitle('upiqr', null, locale);
       icon = session.themeMeta.icons['qr'];
-      alt = title;
     } else if (instrument.flow === 'intent') {
       const app = _Arr.find(
         getUPIIntentApps().all,
@@ -149,10 +143,8 @@
 
       if (app.app_icon) {
         icon = app.app_icon;
-        alt = appName;
       } else {
         icon = '&#xe70e;';
-        alt = 'UPI App';
       }
     } else {
       title = getInstrumentTitle(
@@ -161,13 +153,11 @@
         locale
       );
       icon = '&#xe70e;';
-      alt = 'UPI';
     }
 
     return {
       title,
       icon,
-      alt,
     };
   }
 
@@ -181,7 +171,6 @@
     return {
       title: getInstrumentTitle('cardless_emi', providerName, locale),
       icon: provider.sqLogo,
-      alt: provider.name,
     };
   }
 
@@ -191,7 +180,6 @@
     return {
       title: getInstrumentTitle('paylater', providerName, locale),
       icon: provider.sqLogo,
-      alt: provider.name,
     };
   }
 
@@ -225,7 +213,6 @@
     if (details) {
       title = details.title;
       icon = details.icon;
-      alt = details.alt;
       code = details.code;
     }
   }
@@ -258,7 +245,7 @@
   on:click
   on:keydown={attemptSubmit}>
   <i slot="icon">
-    <Icon {icon} {alt} />
+    <Icon {icon} alt="" />
   </i>
   <div slot="title">{title}</div>
   <div slot="body">

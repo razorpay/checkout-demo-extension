@@ -28,7 +28,7 @@ import {
   isIframe,
   ownerWindow,
 } from 'common/constants';
-import { checkGooglePayWebPayments } from 'checkoutframe/components/upi';
+import { checkForPossibleWebPayments } from 'checkoutframe/components/upi';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -139,6 +139,16 @@ const setAnalyticsMeta = message => {
   }
 };
 
+/**
+ * Sets tracking props from the message
+ * @param {Object} message
+ */
+const setTrackingProps = message => {
+  if (message.library) {
+    Track.props.library = message.library;
+  }
+};
+
 export const handleMessage = function(message) {
   if ('id' in message && !validUID(message.id)) {
     return;
@@ -168,6 +178,7 @@ export const handleMessage = function(message) {
   var options = message.options;
 
   setAnalyticsMeta(message);
+  setTrackingProps(message);
 
   if (!session) {
     if (!options) {
@@ -243,7 +254,7 @@ function performPrePrefsFetchOperations() {
   /* Start listening for back presses */
   setHistoryAndListenForBackPresses();
 
-  checkGooglePayWebPayments();
+  checkForPossibleWebPayments();
 }
 
 function setSessionPreferences(session, preferences) {
@@ -351,15 +362,15 @@ function updateEmandatePrefill() {
           setOption(`prefill.bank_account[${key}]`, bank_account[key]);
         }
       });
-
-    if (order.bank) {
-      setOption('prefill.bank', order.bank);
-    }
+  }
+  if (order.bank) {
+    setOption('prefill.bank', order.bank);
   }
 }
 
 function updateAnalytics(preferences) {
   Analytics.setMeta('features', preferences.features);
+  Analytics.setMeta('merchant_id', preferences.merchant_id);
   // Set optional fields in meta
   const optionalFields = preferences.optional;
   if (optionalFields |> _.isArray) {

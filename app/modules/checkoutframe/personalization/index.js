@@ -9,6 +9,7 @@ import { extendInstruments } from './extend';
 import { translateInstrumentToConfig } from './translation';
 import { getInstrumentsForCustomer as getInstrumentsForCustomerFromApi } from './api';
 import { getUPIIntentApps } from 'checkoutstore/native';
+import { optimizeInstruments } from 'checkoutframe/personalization/optimisations';
 
 /* halflife for timestamp, 5 days in ms */
 const TS_HALFLIFE = Math.log(2) / (5 * 86400000);
@@ -24,6 +25,9 @@ const INSTRUMENT_PROPS = {
   paypal: [],
   app: 'provider',
 };
+
+// EMI is the same as Card
+INSTRUMENT_PROPS.emi = INSTRUMENT_PROPS.card;
 
 /**
  * Returns extracted details for p13n
@@ -62,7 +66,6 @@ function getExtractedDetails(payment, customer, extra = {}) {
    * Unset card object if payment not made via saved card
    */
   if (_Arr.contains(['card', 'emi'], payment.method)) {
-    details.method = 'card';
     if (payment.token) {
       if (customer) {
         let cards = (customer.tokens || {}).items || [];
@@ -366,6 +369,12 @@ export const getInstrumentsForCustomer = (customer, extra = {}, source) => {
   return getInstruments.then(({ identified, instruments }) => {
     // Filter out the list
     instruments = filterInstruments({
+      instruments,
+      upiApps,
+      customer,
+    });
+
+    instruments = optimizeInstruments({
       instruments,
       upiApps,
       customer,

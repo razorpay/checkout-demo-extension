@@ -483,6 +483,7 @@ export default {
     next: 'Next',
     pay_single_method: 'Pay using {method}',
     pay_without_offer: 'Pay Without Offer',
+    pay: 'Pay',
     proceed: 'Proceed',
     select_emi_plan: 'Select EMI Plan',
     submit: 'Submit',
@@ -514,6 +515,8 @@ export default {
     auth_type_header: 'Authenticate using',
     auth_type_netbanking_description: 'via Bank Account and Netbanking details',
     auth_type_netbanking_title: 'Netbanking',
+    auth_type_aadhaar_title: 'Aadhaar',
+    auth_type_aadhaar_description: 'via Bank Account and Aadhaar details',
     change_bank_btn: 'Change Bank',
     ifsc_help: 'Please enter a valid IFSC',
     ifsc_label: 'IFSC',
@@ -530,6 +533,16 @@ export default {
       'Total Amount: {totalAmount} ({monthlyAmount} x {duration})',
     edit_plan_action: 'Edit',
     edit_plan_text: '{duration} Months ({amount}/mo)',
+    axis_bank_emi:
+      'Full amount of Rs {amount} would be deducted from your account, which will be converted into EMI by your bank in 3-4 days. Convenience fee of 1% of transaction amount or Rs 100 whichever is higher + GST applicable for EMI transactions on Axis bank cards.',
+    citi_bank_emi:
+      'Full amount of {amount} will be deducted from your account. EMI processing may take upto 8 working days.',
+    citi_know_more:
+      'In case the total amount due has not been paid in full, finance charges as applicable (currently, between 3.50%- 3.60% per month i.e. 42-43.2% annualized) on card balances may apply until the EMI is converted & posted to the card. Latest rates are available at ',
+    show_more: 'Show More',
+    show_less: 'Show Less',
+    citi_url:
+      'https://www.online.citibank.co.in/portal/newgen/cards/tab/creditcards_tc.htm',
     hdfc_debit_description_convenience:
       ' Convenience Fee of ₹199 + GST applicable for EMI transactions on HDFC Bank Cards.',
     hdfc_debit_description_includes_interest: '(includes interest).',
@@ -651,6 +664,9 @@ export default {
       card_logged_in: '{bank} {type} card - {last4}',
       card_logged_out: 'Use your {bank} {type} card',
       cardless_emi: 'EMI - {name}',
+      emi_logged_in: 'EMI - {bank} {type} card - {last4}',
+      emi_logged_out: 'EMI - Use your {bank} {type} card',
+      emi_saved_cards: 'EMI - Use your saved cards',
       netbanking: 'Netbanking - {name}',
       paylater: 'Pay Later - {name}',
       paypal: 'PayPal',
@@ -672,8 +688,8 @@ export default {
       qr: 'Pay by scanning QR Code',
       recurring_cards: '{networks} credit cards',
       upi: 'Instant payment using UPI App',
-      upi_otm: 'Pay later using BHIM and HDFC',
-      upi_recurring: 'Supported only on BHIM and HDFC',
+      upi_otm: 'Pay later using BHIM',
+      upi_recurring: 'Supported only for BHIM UPI App',
     },
     prefixes: {
       bank_transfer: 'Bank Transfer',
@@ -700,6 +716,7 @@ export default {
       cred: 'CRED',
       credit_card: 'Credit Card',
       debit_card: 'Debit Card',
+      emandate: 'Emandate',
       emi: 'EMI',
       generic: 'Pay using {name}',
       google_pay_cards: 'Google Pay Cards',
@@ -726,6 +743,11 @@ export default {
     cancel_title: 'Cancel payment?',
     checking_payment_status: 'Checking the payment status...',
     complete_payment_on_app: 'Please complete the payment on the {app}',
+    confirm_cancel_heading: 'Cancel payment?',
+    confirm_cancel_message:
+      'Your payment is ongoing. Are you sure you want to cancel the payment?',
+    confirm_cancel_positive_text: 'Yes, cancel',
+    confirm_cancel_negative_text: 'No',
     confirm_cancel:
       'Your payment is ongoing. Are you sure you want to cancel the payment?',
     downtime_multiple_methods:
@@ -838,6 +860,7 @@ export default {
       otp_sending_generic: 'Sending OTP to {phone}',
       otp_sent_access_card: 'Enter OTP sent to {phone} to access Saved Cards',
       otp_sent_generic: 'An OTP has been sent on {phone}',
+      otp_sent_phone: 'Enter OTP sent on {phone} to complete the payment',
       otp_sent_no_phone: 'Enter OTP to complete payment',
       otp_sent_save_card: 'Enter OTP sent to {phone} to save your card',
       otp_sent_save_card_recurring:
@@ -854,12 +877,17 @@ export default {
       wallet_sending: 'Looking for {wallet} account associated with {phone}',
     },
     try_different_label: 'Try different payment method',
+    misc: {
+      security_text:
+        'Your transaction is processed through a secure 128 bit https internet connection based on secure socket layer technology. For security purpose, your IP address {ipAddress} and access time {accessTime} have been logged.',
+    },
   },
   paylater: {
     providers: {
       epaylater: 'ePayLater',
       getsimpl: 'Simpl',
       icic: 'ICICI Bank PayLater',
+      hdfc: 'FlexiPay by HDFC Bank',
     },
     select_option_title: 'Select an option',
   },
@@ -899,7 +927,7 @@ export default {
     want_to_cancel: 'Do you want to cancel the ongoing payment?',
   },
   qr: {
-    downtime_text: '<strong>UPI QR<strong> is experiencing low success rates.',
+    downtime_text: '<strong>UPI QR<strong> is experiencing low success rate.',
     generating_label: 'Generating QR Code...',
     payment_status_checking: 'Checking payment status...',
     retry: 'Retry',
@@ -946,7 +974,7 @@ export default {
     collect_enter_upi_id: 'Enter your UPI ID',
     collect_new_vpa_help: 'Please enter a valid VPA of the form username@bank',
     collect_securely_save: 'Securely save your UPI ID',
-    downtime_text: '<strong>UPI<strong> is experiencing low success rates.',
+    downtime_text: '<strong>UPI<strong> is experiencing low success rate.',
     gpay_block_heading: 'Pay using Gpay App',
     gpay_web_api_title: 'Google Pay',
     intent_accept_request:
@@ -958,7 +986,7 @@ export default {
     invalid_vpa_default_message:
       'Invalid VPA, please try again with correct VPA',
     new_vpa_subtitle: 'Google Pay, BHIM, PhonePe & more',
-    new_vpa_subtitle_upi_otm: 'Supported only for BHIM and HDFC',
+    new_vpa_subtitle_upi_otm: 'Supported only for BHIM UPI app',
     new_vpa_title_logged_in: 'Add UPI ID',
     new_vpa_title_logged_out: 'UPI ID',
     omni_block_heading: 'Or, pay using phone number',

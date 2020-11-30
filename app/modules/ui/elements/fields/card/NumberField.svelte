@@ -37,7 +37,6 @@
 
   function handleInput(e) {
     value = e.target.value;
-    dispatchFilledIfValid();
   }
 
   let helpTextToDisplay;

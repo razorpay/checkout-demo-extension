@@ -26,6 +26,7 @@ const {
 
   // Partial Payment
   verifyPartialAmount,
+  verifyFooterText,
 } = require('../actions/common');
 
 const {
@@ -44,8 +45,8 @@ const {
   handlePartialPayment,
 
   //Downtime
-  verifyLowDowntime,
-  verifyHighDowntime,
+  verifyMethodWarned,
+  verifyMethodDisabled,
 
   // Personalization
   selectPersonalizationPaymentMethod,
@@ -122,44 +123,33 @@ module.exports = function(testFeatures) {
         await verifyPersonalizationText(context, 'upi_otm');
         await selectPersonalizationPaymentMethod(context, 1);
       } else {
-        if (!(downtimeHigh && offers)) {
-          if (downtimeHigh) {
-            await verifyHighDowntime(
-              context,
-              'upi_otm',
-              'UPI OTM is facing temporary issues right now.'
-            );
-            return;
-          }
+        await selectPaymentMethod(context, 'upi_otm');
 
-          await selectPaymentMethod(context, 'upi_otm');
-
-          if (downtimeLow) {
-            await verifyLowDowntime(context, 'UPI', 'upi_otm');
-          }
-          await selectUPIMethod(context, 'new', 'upi_otm');
-          await enterUPIAccount(context, 'saranshgupta1995@okaxis', 'upi_otm');
+        if (downtimeHigh || downtimeLow) {
+          await verifyMethodWarned(context, 'UPI', 'upi_otm');
         }
+        await selectUPIMethod(context, 'new', 'upi_otm');
+        await enterUPIAccount(context, 'saranshgupta1995@okaxis', 'upi_otm');
       }
       if (partialPayment) {
         await verifyPartialAmount(context, '₹ 100');
       }
 
-      if (offers) {
+      if (!feeBearer && offers) {
         await viewOffers(context);
         await selectOffer(context, '1');
         await verifyOfferApplied(context);
-        await verifyDiscountPaybleAmount(context, '₹ 1,990');
+        if (!feeBearer) {
+          await verifyDiscountPaybleAmount(context, '₹ 1,990');
+        }
         await verifyDiscountAmountInBanner(context, '₹ 1,990');
         await verifyDiscountText(context, 'You save ₹10');
       }
-      if (downtimeHigh && offers) {
-        await verifyHighDowntime(
-          context,
-          'upi_otm',
-          ' UPI OTM\n          is experiencing low success rates.'
-        );
+
+      if (feeBearer) {
+        await verifyFooterText(context, 'PAY');
       }
+
       await submit(context);
 
       await handleUPIAccountValidation(context, 'BHIM@upi');

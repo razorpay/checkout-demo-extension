@@ -112,7 +112,9 @@ export const formatPayload = function(payload, razorpayInstance, params = {}) {
 
   if (params.tez || params.gpay) {
     data['_[flow]'] = 'intent';
-    data['_[app]'] = GOOGLE_PAY_PACKAGE_NAME;
+    if (!data['_[app]']) {
+      data['_[app]'] = GOOGLE_PAY_PACKAGE_NAME;
+    }
   }
 
   // Add integration details if present

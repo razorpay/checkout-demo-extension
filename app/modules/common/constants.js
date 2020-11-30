@@ -46,9 +46,9 @@ export const STATES = {
  */
 export const SHOWN_CLASS = 'drishy';
 
-export const CONTACT_PATTERN = '^\\+?[0-9]{8,15}$';
+export const CONTACT_PATTERN = '^\\+?[0-9]{7,15}$';
 export const CONTACT_REGEX = new RegExp(CONTACT_PATTERN);
-export const PHONE_PATTERN = '^\\d{8,15}$';
+export const PHONE_PATTERN = '^\\d{7,15}$';
 export const PHONE_PATTERN_INDIA = `^\\d{10}$`;
 export const PHONE_REGEX_INDIA = new RegExp(PHONE_PATTERN_INDIA);
 export const COUNTRY_CODE_PATTERN = '^\\+[0-9]{1,6}$';
@@ -95,6 +95,10 @@ export const AVAILABLE_METHODS = [
 export const VPA_REGEX = /^[a-z0-9][a-z0-9.-]{2,}@[a-z]+$/i;
 
 export const NO_PAYMENT_ADAPTER_ERROR = 'Payment Adapter does not exist.';
+
+export const CHECK_ERROR = {
+  description: NO_PAYMENT_ADAPTER_ERROR,
+};
 
 export const INDIA_COUNTRY_CODE = '+91';
 

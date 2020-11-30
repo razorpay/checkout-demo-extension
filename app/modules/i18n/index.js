@@ -254,6 +254,17 @@ export function getOtpScreenTitle(view, data, locale) {
 }
 
 /**
+ * Returns the miscellaneous text to be shown on OTP screen
+ * @param {string} key
+ * @param {Object} data
+ * @param {string} locale
+ * @returns {string}
+ */
+export function getOtpScreenMiscText(key, data, locale) {
+  return formatTemplateWithLocale(`otp.misc.${key}`, data, locale, key);
+}
+
+/**
  * Returns the name for a given EMI issuer
  * @param {string} issuer
  * @param {string} locale

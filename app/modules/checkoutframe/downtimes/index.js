@@ -22,10 +22,7 @@ function disableBasedOnSeverityOrScheduled(severity = [], scheduled = true) {
  * @param {Object} downtime
  * @return {boolean}
  */
-const isHighSeverityOrScheduled = disableBasedOnSeverityOrScheduled(
-  ['high'],
-  true
-);
+const isHighScheduled = disableBasedOnSeverityOrScheduled(['high'], true);
 
 /**
  * Checks if the downtime has an instrument. For downtimes without an
@@ -58,7 +55,7 @@ function fAnd(f, g) {
  * @param {Object} downtime
  * @return {boolean}
  */
-const isLowSeverityAndNotScheduled = _Func.negate(isHighSeverityOrScheduled);
+const isLowScheduled = _Func.negate(isHighScheduled);
 
 /**
  * Checks if the downtime has high severity or is scheduled and does not have
@@ -67,8 +64,8 @@ const isLowSeverityAndNotScheduled = _Func.negate(isHighSeverityOrScheduled);
  * @param {Object} downtime
  * @return {boolean}
  */
-const isHighSeverityOrScheduledWithoutInstrument = fAnd(
-  isHighSeverityOrScheduled,
+const isHighScheduledWithoutInstrument = fAnd(
+  isHighScheduled,
   withoutInstrument
 );
 
@@ -79,40 +76,17 @@ const isHighSeverityOrScheduledWithoutInstrument = fAnd(
  * @param {Object} downtime
  * @return {boolean}
  */
-const isLowSeverityAndNotScheduledWithoutInstrument = fAnd(
-  isLowSeverityAndNotScheduled,
-  withoutInstrument
-);
-
-const DISABLE_METHOD = {
-  upi: isHighSeverityOrScheduledWithoutInstrument,
-  upi_otm: isHighSeverityOrScheduledWithoutInstrument,
-  qr: isHighSeverityOrScheduledWithoutInstrument,
-  gpay: isHighSeverityOrScheduledWithoutInstrument,
-  netbanking: function(_, preferences) {
-    const netbankingObj = preferences.methods.netbanking || {};
-    const banks = _Obj.keys(netbankingObj);
-    const downtimes =
-      (preferences.payment_downtime && preferences.payment_downtime.items) ||
-      [];
-
-    return _Arr.every(banks, bank =>
-      _Arr.any(
-        downtimes,
-        downtime =>
-          downtime.method === 'netbanking' &&
-          downtime.instrument.bank === bank &&
-          isHighSeverityOrScheduled(downtime)
-      )
-    );
-  },
+const always = downtime => {
+  return downtime.instrument?.vpa_handle === 'ALL';
 };
 
+const DISABLE_METHOD = {};
+
 const WARN_METHOD = {
-  upi: isLowSeverityAndNotScheduledWithoutInstrument,
-  upi_otm: isLowSeverityAndNotScheduledWithoutInstrument,
-  qr: isLowSeverityAndNotScheduledWithoutInstrument,
-  gpay: isLowSeverityAndNotScheduledWithoutInstrument,
+  upi: always,
+  upi_otm: always,
+  qr: always,
+  gpay: always,
   netbanking: function(_, preferences) {
     const netbankingObj = preferences.methods.netbanking || {};
     const banks = _Obj.keys(netbankingObj);
@@ -211,7 +185,7 @@ const getFilteredBankNamesFromDowntimes = _.curry2((downtimes, predicate) => {
  * @return Array<string>
  */
 const getBanksWithHighSeverityDowntime = getFilteredBankNamesFromDowntimes(
-  isHighSeverityOrScheduled
+  isHighScheduled
 );
 
 /**
@@ -220,7 +194,7 @@ const getBanksWithHighSeverityDowntime = getFilteredBankNamesFromDowntimes(
  * @return {Array<string>}
  */
 const getBanksWithLowSeverityDowntimes = getFilteredBankNamesFromDowntimes(
-  isLowSeverityAndNotScheduled
+  isLowScheduled
 );
 
 const DOWNTIME_METHOD_COPY_MAP = {

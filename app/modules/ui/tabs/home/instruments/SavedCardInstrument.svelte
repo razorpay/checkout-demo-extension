@@ -21,6 +21,7 @@
   import {
     getLongBankName,
     formatTemplateWithLocale,
+    getInstrumentTitle,
     formatMessageWithLocale,
   } from 'i18n';
 
@@ -34,6 +35,7 @@
   $: individualInstrument = getExtendedSingleInstrument(instrument);
 
   const session = getSession();
+  const isEmiInstrument = instrument.method === 'emi';
 
   function getBankText(card, loggedIn) {
     const banks = getBanks() || {};
@@ -48,7 +50,9 @@
 
     if (loggedIn) {
       return formatTemplateWithLocale(
-        'instruments.titles.card_logged_in',
+        isEmiInstrument
+          ? 'instruments.titles.emi_logged_in'
+          : 'instruments.titles.card_logged_in',
         {
           bank: bankText,
           type: _Str.toTitleCase(cardType),
@@ -58,7 +62,9 @@
       );
     } else {
       return formatTemplateWithLocale(
-        'instruments.titles.card_logged_out',
+        isEmiInstrument
+          ? 'instruments.titles.emi_logged_out'
+          : 'instruments.titles.card_logged_out',
         {
           bank: bankText,
           type: _Str.toTitleCase(cardType),
@@ -97,7 +103,9 @@
     icon = getIcon(card);
 
     cvvLength = networkCode === 'amex' ? 4 : 3;
-    hasCvv = true;
+
+    // EMI instruments don't have CVV
+    hasCvv = instrument.method === 'card';
 
     cardKnown = true;
   } else {
@@ -110,7 +118,8 @@
       hasCvv = false;
     } else {
       // We don't know anything about the card.
-      title = formatMessageWithLocale('instrument.titles.saved_cards', $locale);
+      const method = isEmiInstrument ? 'emi_saved_cards' : 'saved_cards';
+      title = getInstrumentTitle(method, '', $locale);
       icon = getIcon();
       hasCvv = false;
     }
@@ -122,7 +131,7 @@
   $: selected = cardKnown && $selectedInstrumentId === instrument.id;
 
   function selectionHandler() {
-    if (cardKnown) {
+    if (hasCvv) {
       setTimeout(() => {
         // Focus on the input field
         const instrumentInDom = _El.closest(
@@ -138,7 +147,7 @@
     } else {
       // TODO: Someday, preselect the saved card in the saved cards list.
 
-      session.switchTab('card');
+      session.switchTab(instrument.method);
     }
   }
 </script>
@@ -168,7 +177,7 @@
   on:click={selectionHandler}
   on:click>
   <i slot="icon">
-    <Icon {icon} alt="Card" />
+    <Icon {icon} alt="" />
   </i>
   <div slot="title">{title}</div>
 
@@ -182,8 +191,6 @@
         required={true}
         tabindex={-1}
         formatter={{ type: 'number' }} />
-    {:else}
-      <span class="theme-highlight-color">&#xe604;</span>
-    {/if}
+    {:else}<span class="theme-highlight-color">&#xe604;</span>{/if}
   </div>
 </svelte:component>

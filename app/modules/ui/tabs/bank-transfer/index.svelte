@@ -3,7 +3,8 @@
   import { onDestroy } from 'svelte';
 
   //Store imports
-  import { getOption, getAmount } from 'checkoutstore';
+  import { getOption, getAmount, showFeeLabel } from 'checkoutstore';
+  import { getCustomerDetails } from 'checkoutstore/screens/home';
 
   // Utils imports
   import Razorpay from 'common/Razorpay';
@@ -51,7 +52,9 @@
   const session = getSession();
 
   function getPayloadForVirtualAccounts() {
-    const payload = {};
+    const payload = {
+      customer: getCustomerDetails(),
+    };
     const customer_id = getOption('customer_id');
     if (customer_id) {
       payload.customer_id = customer_id;
@@ -98,6 +101,7 @@
 
     if (response.amount_expected) {
       session.updateAmountInHeader(response.amount_expected);
+      $showFeeLabel = false;
     }
 
     if (receivers && receivers.length !== 0) {
