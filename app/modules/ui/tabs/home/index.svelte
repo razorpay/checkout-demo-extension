@@ -14,7 +14,6 @@
   import CardOffer from 'ui/elements/CardOffer.svelte';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
   import Rewards from 'ui/components/rewards/index.svelte';
-  // import Backdrop from 'ui/components/Backdrop.svelte';
 
   // Svelte imports
   import { onMount, tick } from 'svelte';
@@ -42,7 +41,7 @@
   import { customer } from 'checkoutstore/customer';
   import { getOption, isDCCEnabled } from 'checkoutstore';
   import { getUPIIntentApps } from 'checkoutstore/native';
-  import { isRewardsVisible } from 'checkoutstore/rewards';
+  import { isRewardsVisible, rewards } from 'checkoutstore/rewards';
 
   // i18n
   import {
@@ -987,11 +986,13 @@
                       {#if $email && !isEmailHidden()}<span>{$email}</span>{/if}
                     </div>
                   </SlottedOption>
-                  <SlottedOption on:click={showRewards} id="rewards-cta">
-                    <i slot="icon">
-                      <Icon icon={icons.present} />
-                    </i>
-                  </SlottedOption>
+                  {#if $rewards?.length > 0}
+                    <SlottedOption on:click={showRewards} id="rewards-cta">
+                      <i slot="icon">
+                        <Icon icon={icons.present} />
+                      </i>
+                    </SlottedOption>
+                  {/if}
                 </div>
               {/if}
               {#if isPartialPayment}

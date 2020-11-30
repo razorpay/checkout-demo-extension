@@ -242,23 +242,17 @@ function fetchPrefs(session) {
 
 function fetchRewards(session) {
   // TODO: reaplce the below call with rewards endpoint
-  // session.prefCall = Razorpay.payment.getPrefs(
+  // session.rewardsCall = Razorpay.payment.getRewards(
   //   getPreferenecsParams(session.r),
-  //   preferences => {
-  //     session.prefCall = null;
-  //     if (preferences.error) {
+  //   rewards => {
+  //     session.rewardsCall = null;
+  //     if (rewards.error) {
   //       Razorpay.sendMessage({
   //         event: 'fault',
-  //         data: preferences.error,
+  //         data: rewards.error,
   //       });
   //     } else {
-  //       setSessionPreferences(session, preferences);
-  //       if (closeAt) {
-  //         session.timer = showTimer(closeAt, () => {
-  //           session.dismissReason = 'timeout';
-  //           session.modal.hide();
-  //         });
-  //       }
+  //       rewards.set(rewardsRes);
   //     }
   //   }
   // );
