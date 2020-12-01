@@ -23,9 +23,7 @@
 
 <div class="customer-bank-details">
   <div class="bank-name">
-    {#if bank.image}
-      <img src={bank.image} alt={bank.name} />
-    {/if}
+    {#if bank.image}<img src={bank.image} alt="" />{/if}
     <!-- LABEL: Bank Details -->
     {#if bank.name}
       {getLongBankName(bank.code, $locale, bank.name)}

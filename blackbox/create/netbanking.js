@@ -20,12 +20,13 @@ const {
   verifyDiscountPaybleAmount,
   verifyDiscountAmountInBanner,
   verifyDiscountText,
-  verifyLowDowntime,
+  verifyMethodWarned,
   viewOffers,
   selectOffer,
 
   // Partial Payment
   verifyPartialAmount,
+  verifyFooterText,
 } = require('../actions/common');
 
 const {
@@ -124,9 +125,9 @@ module.exports = function(testFeatures) {
 
         if (downtime) {
           await selectBank(context, 'ICIC');
-          await verifyLowDowntime(context, 'ICICI Bank', 'netbanking');
+          await verifyMethodWarned(context, 'ICICI Bank', 'netbanking');
           await selectBank(context, 'HDFC');
-          await verifyLowDowntime(context, 'HDFC Bank', 'netbanking');
+          await verifyMethodWarned(context, 'HDFC Bank', 'netbanking');
 
           bank = 'HDFC';
         } else {
@@ -134,13 +135,19 @@ module.exports = function(testFeatures) {
         }
       }
 
-      if (offers) {
+      if (!feeBearer && offers) {
         await viewOffers(context);
         await selectOffer(context, '1');
         await verifyOfferApplied(context);
-        await verifyDiscountPaybleAmount(context, '₹ 1,980');
+        if (!feeBearer) {
+          await verifyDiscountPaybleAmount(context, '₹ 1,980');
+        }
         await verifyDiscountAmountInBanner(context, '₹ 1,980');
         await verifyDiscountText(context, 'You save ₹20');
+      }
+
+      if (feeBearer) {
+        await verifyFooterText(context, 'PAY');
       }
 
       if (partialPayment) {

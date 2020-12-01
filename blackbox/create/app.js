@@ -26,7 +26,7 @@ const {
 
 module.exports = function(testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
-    'apps',
+    'app',
     testFeatures
   );
 
@@ -40,6 +40,7 @@ module.exports = function(testFeatures) {
     offers,
     optionalContact,
     optionalEmail,
+    personalization,
   } = features;
 
   describe.each(
@@ -49,6 +50,12 @@ module.exports = function(testFeatures) {
     })
   )(`App - ${testName}`, ({ preferences, title, options }) => {
     test(title, async () => {
+      if (personalization) {
+        if (preferences.customer) {
+          preferences.customer.contact = '+918888888881';
+        }
+      }
+
       const apps = [];
 
       if (app === 'google_pay_cards') {
@@ -88,7 +95,7 @@ module.exports = function(testFeatures) {
         page,
         options,
         preferences,
-        method: 'apps',
+        method: 'app',
         apps,
         params,
       });
@@ -117,7 +124,7 @@ module.exports = function(testFeatures) {
       }
 
       let selector;
-      if (config) {
+      if (config || personalization) {
         // If making payment on the homescreen itself,
         // No need to reach the inner screens.
         selector = `.instrument[data-code=${app}]`;

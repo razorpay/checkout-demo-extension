@@ -43,6 +43,8 @@
     AUTH_TYPE_DEBIT_DESCRIPTION,
     AUTH_TYPE_NETBANKING_TITLE,
     AUTH_TYPE_NETBANKING_DESCRIPTION,
+    AUTH_TYPE_AADHAAR_TITLE,
+    AUTH_TYPE_AADHAAR_DESCRIPTION,
     ACCOUNT_TYPE_CURRENT,
     ACCOUNT_TYPE_SAVINGS,
     ACCOUNT_TYPE_LABEL,
@@ -78,6 +80,7 @@
   const AuthTypes = {
     NETBANKING: 'netbanking',
     DEBIT_CARD: 'debitcard',
+    AADHAAR: 'aadhaar',
   };
 
   const accountTextLabels = {
@@ -388,7 +391,6 @@
 <Tab method="emandate" overrideMethodCheck pad={false}>
   <Screen>
     <div id="emandate-inner">
-
       {#if currentView === Views.AUTH_SELECTION}
         <div
           class="emandate-auth-selection"
@@ -396,7 +398,7 @@
           <div id="emandate-bank">
             <div class="bank-icon">
               {#if $selectedBank}
-                <img src={getBankLogo($selectedBank)} alt={bankName} />
+                <img src={getBankLogo($selectedBank)} alt="" />
               {/if}
             </div>
             <div class="bank-name">{bankName}</div>
@@ -441,6 +443,23 @@
                   <span class="desc">
                     <!-- LABEL: via Bank Account and Netbanking details -->
                     {$t(AUTH_TYPE_NETBANKING_DESCRIPTION)}
+                  </span>
+                </label>
+              </div>
+            {/if}
+            {#if isEMandateAuthTypeEnabled($selectedBank, AuthTypes.AADHAAR)}
+              <div
+                class="auth-option item aadhaar"
+                on:click={() => handleAuthTypeClicked(AuthTypes.AADHAAR)}>
+                <label>
+                  <i class="theme">
+                    {@html icons.aadhaar}
+                  </i>
+                  <!-- LABEL: Aadhaar -->
+                  {$t(AUTH_TYPE_AADHAAR_TITLE)}
+                  <span class="desc">
+                    <!-- LABEL: via Bank Account and Aadhaar VID -->
+                    {$t(AUTH_TYPE_AADHAAR_DESCRIPTION)}
                   </span>
                 </label>
               </div>

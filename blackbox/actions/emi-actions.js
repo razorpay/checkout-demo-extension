@@ -148,6 +148,10 @@ async function handleCardlessEMIPaymentCreation(context) {
 }
 
 async function selectZestMoneyEMIPlan(context, planNumber) {
+  return selectCardlessEMIPlan(context, planNumber);
+}
+
+async function selectCardlessEMIPlan(context, planNumber) {
   await context.page.waitForSelector('.emi-plans-list .expandable-card');
   const emiPlans = await context.page.$x(
     '//div[contains(@class,"emi-plans-list")]/div[contains(@class,"expandable-card")]'
@@ -168,4 +172,5 @@ module.exports = {
   handleOtpVerificationForCardlessEMI,
   handleCardlessEMIPaymentCreation,
   selectZestMoneyEMIPlan,
+  selectCardlessEMIPlan,
 };

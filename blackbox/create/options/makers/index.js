@@ -7,15 +7,16 @@ const cards = require('./cards');
 const emi = require('./emi');
 const tpv = require('./tpv');
 const wallet = require('./wallet');
-const zestMoney = require('./zest-money');
+const cardlessEmi = require('./cardless-emi');
 const upiIntent = require('./upi-intent');
+const upiWebPayments = require('./upi-web-payments');
 const omniChannel = require('./omni-channel');
 const payLater = require('./pay-later');
 const savedVPA = require('./saved-vpa');
 const upiCollect = require('./upi-collect');
 const upiOtm = require('./upi-otm');
 const payouts = require('./payouts.js');
-const apps = require('./apps.js');
+const app = require('./app.js');
 const internationalPaypal = require('./international/paypal.js');
 
 module.exports = {
@@ -28,14 +29,15 @@ module.exports = {
   emi: emi,
   tpv: tpv,
   wallet: wallet,
-  'zest-money': zestMoney,
+  'cardless-emi': cardlessEmi,
   'upi-intent': upiIntent,
+  'upi-web-payments': upiWebPayments,
   'omni-channel': omniChannel,
   'pay-later': payLater,
   'saved-vpa': savedVPA,
   'upi-collect': upiCollect,
   payouts: payouts,
   'upi-otm': upiOtm,
-  apps: apps,
+  app: app,
   'international-paypal': internationalPaypal,
 };

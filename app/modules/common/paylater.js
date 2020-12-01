@@ -15,6 +15,9 @@ const config = {
   icic: {
     name: 'ICICI Bank PayLater',
   },
+  hdfc: {
+    name: 'FlexiPay by HDFC Bank',
+  },
 };
 
 /**
@@ -25,18 +28,11 @@ const config = {
  * @return {Object}
  */
 export const createProvider = (code, title) => {
-  // TODO: get icici.svg renamed to icic.svg and remove if condition
-  let iconCode = code;
-
-  if (code === 'icic') {
-    iconCode = 'icici';
-  }
-
   return {
     data: {
       code,
     },
-    icon: 'https://cdn.razorpay.com/paylater-sq/' + iconCode + '.svg',
+    icon: 'https://cdn.razorpay.com/paylater-sq/' + code + '.svg',
     title,
   };
 };

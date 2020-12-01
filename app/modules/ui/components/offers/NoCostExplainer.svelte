@@ -104,29 +104,17 @@
     </td>
   </tr>
   <tr>
-    <td>
-      <b>EMI Amount</b>
-    </td>
-    <td>
-      {monthAmountNoCost} + {rate}%
-      <br />
-      <b>{monthAmountNormal}</b>
-    </td>
-    <td>
-      <b>{monthAmountNoCost}</b>
-    </td>
+    <td><b>EMI Amount</b></td>
+    <td>{monthAmountNoCost} + {rate}% <br /> <b>{monthAmountNormal}</b></td>
+    <td><b>{monthAmountNoCost}</b></td>
   </tr>
   <tr>
     <td>
       <!-- LABEL: Total Amount -->
       <b>{$t(TOTAL_AMOUNT_LABEL)}</b>
     </td>
-    <td>
-      <b>{totalAmountNormal}</b>
-    </td>
-    <td>
-      <b>{totalAmountNoCost}</b>
-    </td>
+    <td><b>{totalAmountNormal}</b></td>
+    <td><b>{totalAmountNoCost}</b></td>
   </tr>
 </table>
 <p>

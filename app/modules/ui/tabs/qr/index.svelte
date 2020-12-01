@@ -233,7 +233,6 @@
       <DowntimeCallout severe={disabled}>
         <!-- LABEL: UPI QR is experiencing low success rates. -->
         <FormattedText text={$t(QR_DOWNTIME_TEXT)} />
-
       </DowntimeCallout>
     </Bottom>
   {/if}

@@ -15,7 +15,7 @@
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
 
   // Svelte imports
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { slide, fly } from 'svelte/transition';
 
   // Store
@@ -285,8 +285,11 @@
    * - if either one is missing, choose the other
    * - if both are present, choose one randomly
    */
-  function getRandomInstrumentSet({ customer, instrumentsFromStorage }) {
-    const user = customer.contact;
+  function getRandomInstrumentSet({
+    customer: _customer,
+    instrumentsFromStorage,
+  }) {
+    const user = _customer.contact;
 
     if (!USER_EXPERIMENT_CACHE[user]) {
       USER_EXPERIMENT_CACHE[user] = new Promise(resolve => {
@@ -321,12 +324,7 @@
             instrumentsSource = SOURCES.API;
           }
         } else {
-          // Do another 50-50 split on API instruments
-          if (Math.random() < 0.5) {
-            instrumentsSource = SOURCES.NONE;
-          } else {
-            instrumentsSource = SOURCES.API;
-          }
+          instrumentsSource = SOURCES.API;
         }
 
         // The function that returns the promise to be returned
@@ -533,7 +531,11 @@
 
   $: {
     const loggedIn = _Obj.getSafely($customer, 'logged');
-    _El.keepClass(_Doc.querySelector('#topbar #top-right'), 'logged', loggedIn);
+    const topbarRight = _Doc.querySelector('#topbar #top-right');
+
+    if (topbarRight) {
+      _El.keepClass(topbarRight, 'logged', loggedIn);
+    }
 
     const isPersonalizationEnabled = shouldUsePersonalization();
 
@@ -792,7 +794,11 @@
       }
     }
 
-    session.switchTab(method);
+    tick().then(() => {
+      // Switch tab in the next tick to allow some
+      // other code to run and perform validations.
+      session.switchTab(method);
+    });
   }
 
   export function shouldGoNext() {
@@ -962,9 +968,7 @@
                     {#if $isContactPresent && !isContactHidden()}
                       <span>{$contact}</span>
                     {/if}
-                    {#if $email && !isEmailHidden()}
-                      <span>{$email}</span>
-                    {/if}
+                    {#if $email && !isEmailHidden()}<span>{$email}</span>{/if}
                   </div>
                   <div
                     slot="extra"

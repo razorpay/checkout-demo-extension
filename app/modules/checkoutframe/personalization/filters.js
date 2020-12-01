@@ -11,6 +11,7 @@ import {
   isMethodEnabled,
   getWallets,
   getNetbankingBanks,
+  isApplicationEnabled,
 } from 'checkoutstore/methods';
 
 /**
@@ -79,12 +80,6 @@ const METHOD_FILTERS = {
   },
 
   upi: (instrument, { customer }) => {
-    // hide p13n tokens for anonymous users in case of subscriptions
-    // login needs to be enforced before any payments are made through upi
-    if (isASubscription() && !customer.logged) {
-      return false;
-    }
-
     // Only allow directpay instruments that have a VPA
     if (instrument['_[flow]'] === 'directpay') {
       if (instrument.vpa) {
@@ -111,6 +106,9 @@ const METHOD_FILTERS = {
     }
 
     return false;
+  },
+  app(instrument) {
+    return isApplicationEnabled(instrument.provider);
   },
 };
 
@@ -152,7 +150,11 @@ export const filterInstrumentsForAvailableMethods = _.curry2(
 
 const SANITY_FILTERS = {
   upi: instrument => {
-    if (instrument.vpa && !VPA_REGEX.test(instrument.vpa)) {
+    if (
+      instrument['_[flow]'] === 'directpay' &&
+      instrument.vpa &&
+      !VPA_REGEX.test(instrument.vpa)
+    ) {
       return false;
     }
 
@@ -174,6 +176,16 @@ export function filterInstrumentsForSanity(instruments) {
 
     return true;
   });
+}
+
+/**
+ * Filters instruments by are falsy in nature.
+ * @param {Array} instruments List of intruments to be filtered
+ *
+ * @returns {Array} filtered instruments
+ */
+export function filterFalsyInstruments(instruments) {
+  return _Arr.filter(instruments, Boolean);
 }
 
 /**
@@ -250,6 +262,7 @@ const filterInstrumentsByAvailableUpiApps = _.curry2((instruments, apps) => {
 export function filterInstruments({ instruments, upiApps = [], customer }) {
   return (
     instruments
+    |> filterFalsyInstruments
     |> filterInstrumentsForAvailableMethods({ customer })
     |> filterInstrumentsByAvailableUpiApps(upiApps)
     |> filterInstrumentsForSanity

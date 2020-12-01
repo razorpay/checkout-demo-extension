@@ -3,6 +3,14 @@ function makeOptions(features, options) {
     amount: 500000,
   };
 
+  if (features.callbackUrl) {
+    options = {
+      ...options,
+      callback_url: 'http://www.merchanturl.com/callback?test1=abc&test2=xyz',
+      redirect: true,
+    };
+  }
+
   return options;
 }
 

@@ -10,7 +10,6 @@ var UPIUtils = discreet.UPIUtils;
 var GPay = discreet.GPay;
 var Color = discreet.Color;
 var Confirm = discreet.Confirm;
-var getDecimalAmount = discreet.getDecimalAmount;
 var _PaymentMethodIcons = discreet._PaymentMethodIcons;
 var Constants = discreet.Constants;
 var Bank = discreet.Bank;

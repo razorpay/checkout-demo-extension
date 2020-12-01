@@ -223,7 +223,7 @@
       <div class="instrument-group">
         <div class="instrument-header">
           <div class="icon-left">
-            <Icon icon={themeMeta.icons['upi']} alt="UPI" />
+            <Icon icon={themeMeta.icons['upi']} alt="" />
           </div>
           <!-- LABEL: Select a UPI ID -->
           <span class="header-text">{$t(SELECT_UPI_TITLE)}</span>
@@ -252,7 +252,7 @@
       <div class="instrument-group">
         <div class="instrument-header">
           <div class="icon-left ref-nbicon">
-            <Icon icon={themeMeta.icons['netbanking']} alt="Netbanking" />
+            <Icon icon={themeMeta.icons['netbanking']} alt="" />
           </div>
           <!-- LABEL: Select a Bank Account -->
           <span class="header-text">{$t(SELECT_BANK_TITLE)}</span>
@@ -279,7 +279,6 @@
             {$t(ADD_BANK_ACTION)}
           </div>
         </div>
-
       </div>
     {/if}
 
@@ -296,7 +295,6 @@
           <!-- LABEL: Add a UPI ID (BHIM, PhonePe and more) -->
           <div class="desc">{$t(ADD_UPI_BUTTON_DESCRIPTION)}</div>
         </NextOption>
-
       </div>
     {/if}
 

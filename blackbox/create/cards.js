@@ -15,6 +15,9 @@ const {
   handleCardValidation,
   handleMockFailureDialog,
   verifyErrorMessage,
+  handleCustomerCardStatusRequest,
+  typeOTPandSubmit,
+  respondSavedCards,
   retryTransaction,
   selectPersonalizedCard,
 
@@ -29,6 +32,7 @@ const {
 
   // Partial Payment
   verifyPartialAmount,
+  verifyFooterText,
 } = require('../actions/common');
 
 const {
@@ -61,6 +65,7 @@ module.exports = function(testFeatures) {
     offers,
     optionalContact,
     optionalEmail,
+    recurringOrder,
   } = features;
 
   describe.each(
@@ -95,24 +100,41 @@ module.exports = function(testFeatures) {
         await proceed(context);
       }
 
-      if (!missingUserDetails) {
+      if (recurringOrder) {
+        await handleCustomerCardStatusRequest(context);
+        await typeOTPandSubmit(context);
+        await respondSavedCards(context);
+      }
+
+      if (!missingUserDetails && !recurringOrder) {
         await assertUserDetails(context);
         await assertEditUserDetailsAndBack(context);
       }
 
-      await assertPaymentMethods(context);
+      if (!recurringOrder) {
+        await assertPaymentMethods(context);
 
-      await selectPaymentMethod(context, 'card');
-      await enterCardDetails(context);
+        await selectPaymentMethod(context, 'card');
+      }
 
-      if (offers) {
+      await enterCardDetails(context, {
+        recurring: !!recurringOrder,
+      });
+
+      if (!feeBearer && offers) {
         await viewOffers(context);
         await selectOffer(context, '1');
         await verifyOfferApplied(context);
-        await verifyDiscountPaybleAmount(context, '₹ 1,980');
+        if (!feeBearer) {
+          await verifyDiscountPaybleAmount(context, '₹ 1,980');
+        }
         await verifyDiscountAmountInBanner(context, '₹ 1,980');
         await verifyDiscountText(context, 'You save ₹20');
         await validateCardForOffer(context);
+      }
+
+      if (feeBearer) {
+        await verifyFooterText(context, 'PAY');
       }
 
       if (partialPayment) {

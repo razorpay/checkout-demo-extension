@@ -4,6 +4,7 @@ import Analytics from 'analytics';
 import { VPA_REGEX } from 'common/constants';
 
 export const GOOGLE_PAY_PACKAGE_NAME = 'com.google.android.apps.nbu.paisa.user';
+export const PHONE_PE_PACKAGE_NAME = 'com.phonepe.app';
 
 export function isVpaValid(vpa) {
   return VPA_REGEX.test(vpa);
@@ -43,7 +44,7 @@ const UPI_APPS = {
    */
   preferred: [
     {
-      app_name: 'Google Pay (Tez)',
+      app_name: 'Google Pay',
       package_name: GOOGLE_PAY_PACKAGE_NAME,
       app_icon: 'https://cdn.razorpay.com/checkout/gpay.png',
       handles: ['okhdfcbank', 'okicici', 'okaxis', 'oksbi'],
@@ -256,6 +257,10 @@ const UPI_APPS = {
     {
       package_name: 'in.bajajfinservmarkets.app.uat',
       shortcode: 'finserv-uat',
+    },
+    {
+      package_name: 'com.fampay.in',
+      shortcode: 'fampay',
     },
   ],
 

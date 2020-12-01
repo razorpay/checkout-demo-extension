@@ -3,6 +3,8 @@
   import { createEventDispatcher, onMount } from 'svelte';
   // UI imports
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
+  //Store imports
+  import { showFeeLabel } from 'checkoutstore/index.js';
   // Utils imports
   import { formatAmountWithSymbol } from 'common/currency';
   import { getSession } from 'sessionmanager';
@@ -42,13 +44,22 @@
     feeBreakup = response.display;
     loading = false;
     bearer = response.input;
+    $showFeeLabel = false;
+    if (!session.getAppliedOffer()) {
+      session.updateAmountInHeader(feeBreakup.amount * 100, false);
+    }
+    if (session.getAppliedOffer()) {
+      session.updateAmountInHeaderForOffer(feeBreakup.amount * 100, true);
+    }
   }
   export function onError(response) {
     session.showLoadError(response.error.description, response.error);
     dispatch('error', response.error.description);
   }
   export function fetchFees(paymentData) {
-    paymentData.amount = session.get('amount');
+    paymentData.amount = session.getAppliedOffer()
+      ? session.getAppliedOffer().amount
+      : session.get('amount');
     paymentData.currency = session.get('currency');
     loading = true;
     session.r

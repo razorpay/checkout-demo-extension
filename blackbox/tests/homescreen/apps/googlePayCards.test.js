@@ -1,4 +1,4 @@
-const createAppsTest = require('../../../create/apps');
+const createAppsTest = require('../../../create/app');
 
 createAppsTest({
   app: 'google_pay_cards',

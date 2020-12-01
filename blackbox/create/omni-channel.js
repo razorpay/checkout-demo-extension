@@ -16,6 +16,7 @@ const {
 
   // Partial Payment
   verifyPartialAmount,
+  verifyFooterText,
 
   //omnichannel
   verifyOmnichannelPhoneNumber,
@@ -40,8 +41,7 @@ const {
   handlePartialPayment,
 
   //DownTime
-  verifyHighDowntime,
-  verifyLowDowntime,
+  verifyMethodWarned,
 } = require('../tests/homescreen/actions');
 
 module.exports = function(testFeatures) {
@@ -100,31 +100,29 @@ module.exports = function(testFeatures) {
       }
 
       await assertPaymentMethods(context);
-      if (downtimeHigh) {
-        await verifyHighDowntime(
-          context,
-          'upi',
-          'UPI is facing temporary issues right now.'
-        );
-        return;
-      }
 
       await selectPaymentMethod(context, 'upi');
 
-      if (downtimeLow) {
-        await verifyLowDowntime(context, 'UPI', 'upi');
+      if (downtimeHigh || downtimeLow) {
+        await verifyMethodWarned(context, 'UPI', 'upi');
       }
 
       await selectUPIMethod(context, 'omnichannel');
       await verifyOmnichannelPhoneNumber(context);
 
-      if (offers) {
+      if (!feeBearer && offers) {
         await viewOffers(context);
         await selectOffer(context, '1');
         await verifyOfferApplied(context);
-        await verifyDiscountPaybleAmount(context, '₹ 1,980');
+        if (!feeBearer) {
+          await verifyDiscountPaybleAmount(context, '₹ 1,980');
+        }
         // await verifyDiscountAmountInBanner(context, '₹ 1,980'); /* Issue reported CE-963*/
         await verifyDiscountText(context, 'You save ₹20');
+      }
+
+      if (feeBearer) {
+        await verifyFooterText(context, 'PAY');
       }
 
       if (partialPayment) {

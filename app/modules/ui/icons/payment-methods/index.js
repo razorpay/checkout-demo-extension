@@ -10,10 +10,15 @@ import paypal from './paypal';
 import bank_transfer from './bank_transfer';
 import contact from './contact';
 import upiOtm from './upi_otm';
+import aadhaar from './aadhaar';
 
 import { getAllMethods } from 'checkoutframe/paymentmethods';
 
-const availPaymentMethods = getAllMethods().concat(['othermethods', 'contact']);
+const availPaymentMethods = getAllMethods().concat([
+  'othermethods',
+  'contact',
+  'aadhaar',
+]);
 
 function getIconFn(iconName) {
   switch (iconName) {
@@ -56,6 +61,9 @@ function getIconFn(iconName) {
 
     case 'upi_otm':
       return upiOtm;
+
+    case 'aadhaar':
+      return aadhaar;
   }
 }
 

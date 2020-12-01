@@ -218,7 +218,10 @@
    */
   function getHoverParent() {
     let parent = tooltip;
-
+    //Do not call this function if Tooltip is destroyed.
+    if (!parent) {
+      return;
+    }
     while (!_El.hasClass(parent, 'has-tooltip')) {
       parent = _El.parent(parent);
     }

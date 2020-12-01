@@ -12,6 +12,31 @@ import * as AnalyticsTypes from 'analytics-types';
 
 const PREFERRED_INSTRUMENTS_CACHE = {};
 
+export const removeDuplicateApiInstruments = instruments => {
+  const result = [];
+
+  instruments.forEach(instrument => {
+    const uniqueInstrumentsIds = result.map(x => x.method + '-' + x.instrument);
+    const instrumentId = instrument.method + '-' + instrument.instrument;
+
+    if (!uniqueInstrumentsIds.includes(instrumentId)) {
+      result.push(instrument);
+    }
+  });
+
+  if (result.length !== instruments.length) {
+    Analytics.track('p13n:api_non_unique_error', {
+      type: AnalyticsTypes.METRIC,
+      data: {
+        received: instruments.length,
+        unique: result.length,
+      },
+    });
+  }
+
+  return result;
+};
+
 /**
  * Sets instruments for customer
  * @param {Customer} customer
@@ -90,7 +115,9 @@ function getInstrumentsFromApi(customer) {
           apiInstrumentsData = data[customer.contact] || apiInstrumentsData;
         }
 
-        const apiInstruments = apiInstrumentsData.instruments;
+        const apiInstruments = removeDuplicateApiInstruments(
+          apiInstrumentsData.instruments
+        );
 
         resolve(
           setInstrumentsForCustomer(customer, apiInstruments, identified)
@@ -156,10 +183,19 @@ const API_INSTRUMENT_PAYMENT_ADDONS = {
     delete instrument.instrument;
   },
   card: instrument => {
-    instrument.token_id = instrument.instrument;
+    // Use a dummy value if API returns `null` as this value needs to be truthy to
+    // act as a saved card instrument
+    instrument.token_id = instrument.instrument || 'token_dummy';
+    delete instrument.instrument;
+  },
+  app: instrument => {
+    instrument.provider = instrument.instrument;
     delete instrument.instrument;
   },
 };
+
+// EMI is the same as Card
+API_INSTRUMENT_PAYMENT_ADDONS.emi = API_INSTRUMENT_PAYMENT_ADDONS.card;
 
 /**
  * To consume the backend representation of the p13n instruments, we need to, currently, convert them into the existing, supported p13n instrument format which is consumed in configurability.
@@ -171,6 +207,9 @@ const API_INSTRUMENT_PAYMENT_ADDONS = {
 export function transformInstrumentToStorageFormat(instrument, data = {}) {
   if (API_INSTRUMENT_PAYMENT_ADDONS[instrument.method]) {
     API_INSTRUMENT_PAYMENT_ADDONS[instrument.method](instrument, data);
+  } else {
+    // if an instrument cannot be transformed to a format supported by FE, return undefined
+    return undefined;
   }
   return instrument;
 }

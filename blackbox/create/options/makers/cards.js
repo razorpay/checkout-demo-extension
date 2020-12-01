@@ -1,4 +1,6 @@
 function makeOptions(features, options) {
+  options.currency = features.currency || 'INR';
+
   return options;
 }
 

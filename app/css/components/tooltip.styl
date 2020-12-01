@@ -13,8 +13,6 @@ $caretShift = 16px;
   color: #fff;
   padding: 8px 12px;
   pointer-events: none;
-  width: 50vw;
-  max-width: 300px;
 
   &::before
     content: '';
@@ -60,7 +58,6 @@ $caretShift = 16px;
 
   // Done
   &.tooltip-bottom
-    margin "calc(100% + %s) 0 0 0" % $tooltipDistance;
     transform: translateX(-50%);
     left "calc(50% - %s)" % $tooltipDistance;
     &::before
