@@ -1030,9 +1030,8 @@ export default {
   },
   rewards: {
     header:
-      'Pay successfully now  & <strong>unlock rewards for free<strong> for your future buys!',
-    sub_text: 'Wait for these rewards from amazing brands.',
-    unlock: 'Unlocks in email',
+      'Pay successfully now & unlock <strong>exciting rewards for free,<strong> for your future buys!',
+    sub_text: 'Look for these rewards from amazing brands in your mail box!',
     close: 'Close',
   },
 };

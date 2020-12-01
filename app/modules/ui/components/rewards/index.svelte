@@ -10,7 +10,6 @@
   import {
     REWARDS_HEADER,
     REWARDS_SUB_TEXT,
-    REWARDS_UNLOCK,
     REWARDS_CLOSE,
   } from 'ui/labels/rewards';
 
@@ -24,22 +23,18 @@
   }
   .rewards-header {
     line-height: 1.4;
-  }
-  .rewards-subtext-text {
-    font-size: 11px;
-    color: rgba(81, 89, 120, 0.7);
+    font-size: 17px;
+    margin-bottom: 24px;
   }
   .rewards-subtext {
-    margin-top: 18px;
-    margin-bottom: 12px;
+    font-size: 14px;
+    color: rgba(81, 89, 120, 0.7);
+    margin-top: 10px;
+    margin-bottom: 24px;
   }
   .rewards-list {
     display: flex;
     justify-content: space-between;
-  }
-  .rewards-unlock {
-    margin-top: 12px;
-    margin-bottom: 24px;
   }
   .rewards-divider {
     border: 1px solid rgba(0, 0, 0, 0.04);
@@ -72,13 +67,12 @@
   <div class="rewards-header">
     <FormattedText text={$t(REWARDS_HEADER)} />
   </div>
-  <div class="rewards-subtext rewards-subtext-text">{$t(REWARDS_SUB_TEXT)}</div>
   <div class="rewards-list">
     {#each $rewards as rew}
       <RewardCard reward={rew} />
     {/each}
   </div>
-  <div class="rewards-subtext-text rewards-unlock">{$t(REWARDS_UNLOCK)}</div>
+  <div class="rewards-subtext">{$t(REWARDS_SUB_TEXT)}</div>
   <div class="rewards-divider" />
   <div class="rewards-close" on:click={onClick}>{$t(REWARDS_CLOSE)}</div>
 </div>
