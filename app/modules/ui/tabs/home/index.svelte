@@ -14,6 +14,7 @@
   import CardOffer from 'ui/elements/CardOffer.svelte';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
   import Rewards from 'ui/components/rewards/index.svelte';
+  import Tooltip from 'ui/elements/Tooltip.svelte';
 
   // Svelte imports
   import { onMount, tick } from 'svelte';
@@ -59,6 +60,7 @@
     RECURRING_CREDIT_ONLY_CALLOUT,
     RECURRING_DEBIT_ONLY_CALLOUT,
   } from 'ui/labels/home';
+  import { REWARDS_TOOLTIP_TEXT } from 'ui/labels/rewards';
 
   import { t, locale } from 'svelte-i18n';
 
@@ -125,10 +127,6 @@
 
   import { update as updateContactStorage } from 'checkoutframe/contact-storage';
   import { isMobile } from 'common/useragent';
-  import Overlay from 'ui/components/Overlay.svelte';
-
-  // console.log(new Rewards({target: null}))
-
   const cardOffer = getCardOffer();
   const session = getSession();
   const icons = session.themeMeta.icons;
@@ -156,6 +154,7 @@
   // Values: 'details', 'methods'
   let view = 'details';
   let showSecuredByMessage;
+  export let showTooltip = true;
   $: showSecuredByMessage =
     view === 'details' &&
     !showOffers &&
@@ -542,7 +541,16 @@
     updateBlocks({
       showPreferredLoader: shouldUsePersonalization(),
     });
+    setTimeout(() => {
+      removeRewardsAnimation();
+    }, 5000);
   });
+
+  function removeRewardsAnimation() {
+    const rewardsIcon = document.getElementById('rewards-cta');
+    rewardsIcon.classList.remove('border-dashed');
+    showTooltip = false;
+  }
 
   // Svelte executes the following block twice. Even if a fault was emitted, it will be emitted again in the second execution.
   // So, we use this flag to perform no-op if true.
@@ -951,6 +959,23 @@
     width: 56px;
   }
 
+  :global(#rewards-cta.border-dashed) {
+    border-style: dashed;
+  }
+
+  :global(.tooltip.rewards-cta-tooltip) {
+    left: calc(50% - -50px);
+    top: 77px;
+  }
+
+  :global(.rewards-cta-tooltip.tooltip-shown) {
+    opacity: 1;
+  }
+
+  :global(.tooltip.tooltip-bottom.rewards-cta-tooltip::before) {
+    left: calc(50% + 86px);
+  }
+
   .solidbg {
     background: white;
     order: -1;
@@ -987,7 +1012,17 @@
                     </div>
                   </SlottedOption>
                   {#if $rewards?.length > 0}
-                    <SlottedOption on:click={showRewards} id="rewards-cta">
+                    <Tooltip
+                      align={['bottom']}
+                      bindTo="#rewards-cta"
+                      className="rewards-cta-tooltip"
+                      shown={showTooltip}>
+                      {$t(REWARDS_TOOLTIP_TEXT)}
+                    </Tooltip>
+                    <SlottedOption
+                      className="border-dashed"
+                      on:click={showRewards}
+                      id="rewards-cta">
                       <i slot="icon">
                         <Icon icon={icons.present} />
                       </i>

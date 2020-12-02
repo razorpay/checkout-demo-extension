@@ -11,12 +11,16 @@
 
 <style>
   .reward-card {
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     height: 116px;
     width: 72px;
-    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.18);
     border-radius: 5px;
     padding: 10px;
+    background: linear-gradient(199.72deg, #ffffff 1.23%, #f8f8f8 99.45%);
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.18);
+    border-radius: 5px;
   }
   :global(.mobile) .reward-card {
     height: 177px;
@@ -24,4 +28,4 @@
   }
 </style>
 
-<div class="reward-card">{reward.name}</div>
+<div class="reward-card"><img src={reward.logo} alt="Reward Logo" /></div>
