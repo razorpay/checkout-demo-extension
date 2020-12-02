@@ -2,7 +2,7 @@ export default {
   app: {
     providers: {
       cred: {
-        name: 'Pay with CRED',
+        name: 'CRED Pay',
         subtext: 'exclusive discounts with CRED coins',
       },
       google_pay_cards: {
