@@ -6,7 +6,7 @@
   import { t, locale } from 'svelte-i18n';
 
   const customLogo = getOption('partnership_logo');
-  const orgLogo = getOrgDetails()?.checkout_logo;
+  const orgLogo = getOrgDetails()?.checkout_logo_url;
   let fontLoaded = false;
   let fontTimeout = null;
   let ref;
