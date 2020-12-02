@@ -18,4 +18,3 @@ npm-debug.log
 /app/config.js
 /httpd.conf
 .idea
-.husky
