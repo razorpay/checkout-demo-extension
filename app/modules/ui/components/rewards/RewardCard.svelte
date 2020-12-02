@@ -18,6 +18,10 @@
     border-radius: 5px;
     padding: 10px;
   }
+  :global(.mobile) .reward-card {
+    height: 177px;
+    width: 189px;
+  }
 </style>
 
 <div class="reward-card">{reward.name}</div>

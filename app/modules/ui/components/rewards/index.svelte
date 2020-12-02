@@ -45,7 +45,7 @@
     margin-top: 20px;
     cursor: pointer;
   }
-  .rewards-traingle {
+  .rewards-triangle {
     border: 0px solid #fff;
     border-left-width: 12px;
     border-right-width: 12px;
@@ -60,10 +60,25 @@
     right: 28px;
     top: -24px;
   }
+  :global(.mobile) .rewards-header {
+    margin-bottom: 24px;
+  }
+  :global(.mobile) .rewards-subtext {
+    margin-top: 15px;
+    margin-bottom: 30px;
+  }
+  :global(.mobile) .rewards-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+  }
+  :global(.mobile) .rewards-triangle {
+    display: none;
+  }
 </style>
 
 <div class="rewards-wrapper">
-  <div class="rewards-traingle" />
+  <div class="rewards-triangle" />
   <div class="rewards-header">
     <FormattedText text={$t(REWARDS_HEADER)} />
   </div>
