@@ -45,8 +45,7 @@
     "test:all": "npm run test:unit && npm run build && npm run jest",
     "test:base": "npm run test:unit && npm run build && npm run jest:base",
     "test:unit": "./rollup.test.js | tap-difflet",
-    "test": "npm run test:all",
-    "postinstall": "husky install"
+    "test": "npm run test:all"
   },
   "bugs": {
     "url": "https://github.com/razorpay/checkout/issues"
@@ -73,7 +72,7 @@
   },
   "private": true,
   "devDependencies": {
-    "husky": "^5.0.4",
+    "husky": "^1.0.0-rc.14",
     "jest-circus": "^24.9.0",
     "lint-staged": "^10.5.2",
     "prettier": "^1.19.1",
