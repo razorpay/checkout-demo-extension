@@ -154,7 +154,7 @@
   // Values: 'details', 'methods'
   let view = 'details';
   let showSecuredByMessage;
-  export let showTooltip = true;
+  export let showTooltip = false;
   $: showSecuredByMessage =
     view === 'details' &&
     !showOffers &&
@@ -172,6 +172,10 @@
       type: AnalyticsTypes.BEHAV,
     });
   }
+
+  setTimeout(() => {
+    showTooltip = true;
+  }, 1000);
 
   export function canGoBack() {
     if (!onMethodsScreen()) {
@@ -547,8 +551,6 @@
   });
 
   function removeRewardsAnimation() {
-    const rewardsIcon = document.getElementById('rewards-cta');
-    rewardsIcon.classList.remove('border-dashed');
     showTooltip = false;
   }
 
@@ -959,13 +961,9 @@
     width: 56px;
   }
 
-  :global(#rewards-cta.border-dashed) {
-    border-style: dashed;
-  }
-
   :global(.tooltip.rewards-cta-tooltip) {
     left: calc(50% - -50px);
-    top: 77px;
+    top: 68px;
   }
 
   :global(.rewards-cta-tooltip.tooltip-shown) {
@@ -1019,10 +1017,7 @@
                       shown={showTooltip}>
                       {$t(REWARDS_TOOLTIP_TEXT)}
                     </Tooltip>
-                    <SlottedOption
-                      className="border-dashed"
-                      on:click={showRewards}
-                      id="rewards-cta">
+                    <SlottedOption on:click={showRewards} id="rewards-cta">
                       <i slot="icon">
                         <Icon icon={icons.present} />
                       </i>

@@ -256,6 +256,9 @@ function fetchRewards(session) {
   //     }
   //   }
   // );
+  const RazorpayInstance = session.r;
+  RazorpayInstance.rewards = rewardsRes;
+  session.rewards = rewardsRes;
   rewards.set(rewardsRes);
 }
 
