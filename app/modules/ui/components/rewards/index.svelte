@@ -1,6 +1,9 @@
 <script>
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import RewardCard from './RewardCard.svelte';
+  import { isMobile } from 'common/useragent';
+  import Carousel from 'ui/components/carousel/index.svelte';
+  // import Paginator from 'ui/components/carousel/Paginator.svelte';
 
   //store
   import { rewards } from 'checkoutstore/rewards';
@@ -14,6 +17,7 @@
   } from 'ui/labels/rewards';
 
   //props
+  export let visibleindex = 0;
   export let onClick;
 </script>
 
@@ -35,6 +39,7 @@
   .rewards-list {
     display: flex;
     justify-content: space-between;
+    position: relative;
   }
   .rewards-divider {
     border: 1px solid rgba(0, 0, 0, 0.04);
@@ -64,7 +69,7 @@
     margin-bottom: 24px;
   }
   :global(.mobile) .rewards-subtext {
-    margin-top: 15px;
+    margin-top: 30px;
     margin-bottom: 30px;
   }
   :global(.mobile) .rewards-wrapper {
@@ -83,9 +88,15 @@
     <FormattedText text={$t(REWARDS_HEADER)} />
   </div>
   <div class="rewards-list">
-    {#each $rewards as rew}
-      <RewardCard reward={rew} />
-    {/each}
+    {#if isMobile()}
+      <Carousel items={$rewards} let:blah bind:visibleindex>
+        <RewardCard {...blah} />
+      </Carousel>
+    {:else}
+      {#each $rewards as rew}
+        <RewardCard {...rew} />
+      {/each}
+    {/if}
   </div>
   <div class="rewards-subtext">{$t(REWARDS_SUB_TEXT)}</div>
   <div class="rewards-divider" />

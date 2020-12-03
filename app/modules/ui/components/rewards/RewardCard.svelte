@@ -6,7 +6,7 @@
   import { REWARDS_HEADER, REWARDS_SUB_TEXT } from 'ui/labels/rewards';
 
   // // props
-  export let reward;
+  export let logo;
 </script>
 
 <style>
@@ -28,4 +28,4 @@
   }
 </style>
 
-<div class="reward-card"><img src={reward.logo} alt="Reward Logo" /></div>
+<div class="reward-card"><img src={logo} alt="Reward Logo" /></div>
