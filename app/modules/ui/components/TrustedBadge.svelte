@@ -108,7 +108,8 @@
               <Icon icon={icons.tick_filled} />
             </i>
             <div
-              class={`trusted-badge-list-text ${i === 0 ? 'trusted-badge-border-top' : ''}`}>
+              class="trusted-badge-list-text"
+              class:trusted-badge-border-top={i === 0}>
               {point}
             </div>
           </div>
