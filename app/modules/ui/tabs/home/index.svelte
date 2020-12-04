@@ -38,7 +38,12 @@
   } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
-  import { getOption, isDCCEnabled } from 'checkoutstore';
+  import {
+    getOption,
+    isDCCEnabled,
+    getTrustedBadgeHighlights,
+  } from 'checkoutstore';
+
   import { getUPIIntentApps } from 'checkoutstore/native';
 
   // i18n
@@ -144,6 +149,8 @@
   const prefilledBank = getOption('prefill.bank');
   const isPartialPayment = getIsPartialPayment();
   const contactEmailReadonly = isContactEmailReadOnly();
+
+  const trustedBadgeHighlights = getTrustedBadgeHighlights();
 
   setContact(getPrefilledContact());
   setEmail(getPrefilledEmail());
@@ -956,7 +963,9 @@
           class="solidbg"
           in:slide={getAnimationOptions({ duration: 400 })}
           out:fly={getAnimationOptions({ duration: 200, y: 80 })}>
-          <TrustedBadge />
+          {#if trustedBadgeHighlights}
+            <TrustedBadge list={trustedBadgeHighlights} />
+          {/if}
           {#if showUserDetailsStrip || isPartialPayment}
             <div
               use:touchfix

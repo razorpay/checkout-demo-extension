@@ -1,9 +1,9 @@
 <script>
   // svelte imports
-  import Icon from 'ui/elements/Icon.svelte';
+  import { fade } from 'svelte/transition';
 
-  // Store
-  import { getMerchantId } from 'checkoutstore';
+  // Components
+  import Icon from 'ui/elements/Icon.svelte';
 
   //Utils
   import { getSession } from 'sessionmanager';
@@ -15,11 +15,11 @@
   } from 'ui/labels/trusted-badge';
   import { t, locale } from 'svelte-i18n';
 
-  import trustedBadge from 'ui/constants/trusted-badge';
-
   //props
-  export const list = trustedBadge[getMerchantId()].list;
-  const icons = getSession().themeMeta.icons;
+  export let list;
+  const session = getSession();
+  const icons = session.themeMeta.icons;
+
   export let isInfoVisible = false;
 
   function handleInfoClicked() {
@@ -62,8 +62,23 @@
     width: 100%;
   }
   .trusted-badge-border-top {
-    border-top: 1px solid;
     padding-top: 16px;
+  }
+  :global(.screen) > :global(.screen-main) {
+    padding-top: 0 !important;
+  }
+  .arrow {
+    border-width: 0 2px 2px 0;
+    display: inline-block;
+    padding: 3px;
+  }
+  .arrow-up {
+    transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+  }
+  .arrow-down {
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
   }
 </style>
 
@@ -79,12 +94,14 @@
           <div><b>{$t(TRUSTED_BADGE_SELLER_LABEL)}</b></div>
         </div>
         <div class="trusted-badge-arrow" on:click={handleInfoClicked}>
-          {#if isInfoVisible}^{:else}{'>'}{/if}
+          {#if !isInfoVisible}
+            <i class="arrow arrow-down" />
+          {:else}<i class="arrow arrow-up" />{/if}
         </div>
       </div>
     </div>
     {#if isInfoVisible}
-      <div class="trusted-badge-info-section">
+      <div class="trusted-badge-info-section" in:fade out:fade>
         {#each list as point, i}
           <div class="trusted-badge-list-item">
             <i slot="icon">
