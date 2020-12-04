@@ -1029,4 +1029,8 @@ export default {
     sbibuddy: 'SBI Buddy',
     zeta: 'Zeta',
   },
+  trusted_badge: {
+    customer_label: "You're paying a",
+    seller_label: 'Razorpay Verified Seller',
+  },
 };
