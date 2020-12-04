@@ -868,7 +868,6 @@
       }
     }
   }
-  $: console.log('view', view);
 </script>
 
 <style>
