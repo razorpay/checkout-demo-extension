@@ -13,6 +13,7 @@
   import Callout from 'ui/elements/Callout.svelte';
   import CardOffer from 'ui/elements/CardOffer.svelte';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
+  import TrustedBadge from 'ui/components/TrustedBadge.svelte';
 
   // Svelte imports
   import { onMount, tick } from 'svelte';
@@ -860,6 +861,7 @@
       }
     }
   }
+  $: console.log('view', view);
 </script>
 
 <style>
@@ -954,6 +956,7 @@
           class="solidbg"
           in:slide={getAnimationOptions({ duration: 400 })}
           out:fly={getAnimationOptions({ duration: 200, y: 80 })}>
+          <TrustedBadge />
           {#if showUserDetailsStrip || isPartialPayment}
             <div
               use:touchfix
