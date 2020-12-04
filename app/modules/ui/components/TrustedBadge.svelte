@@ -33,7 +33,6 @@
   }
   .trusted-badge-header-section {
     display: flex;
-    align-items: center;
   }
   .trusted-badge-header-labels {
     margin-left: 12px;
