@@ -23,7 +23,6 @@ function getList(customersNo, securedYears, noFraudTime) {
   return [
     `Trusted by ${customersNo} customers`,
     `Secured Razorpay merchant for ${securedYears}`,
-    'Failed transaction will be refunded instantly',
     `No fraud transaction for last ${noFraudTime}`,
   ];
 }

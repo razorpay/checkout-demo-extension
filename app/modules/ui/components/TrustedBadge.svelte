@@ -33,6 +33,7 @@
   }
   .trusted-badge-header-section {
     display: flex;
+    cursor: pointer;
   }
   .trusted-badge-header-labels {
     margin-left: 12px;
@@ -83,7 +84,7 @@
 
 <trusted-badge>
   <div class="trusted-badge-wrapper">
-    <div class="trusted-badge-header-section">
+    <div class="trusted-badge-header-section" on:click={handleInfoClicked}>
       <i slot="icon">
         <Icon icon={icons.trusted_badge} />
       </i>
@@ -92,7 +93,7 @@
           <span>{$t(TRUSTED_BADGE_CUSTOMER_LABEL)}</span>
           <div><b>{$t(TRUSTED_BADGE_SELLER_LABEL)}</b></div>
         </div>
-        <div class="trusted-badge-arrow" on:click={handleInfoClicked}>
+        <div class="trusted-badge-arrow">
           {#if !isInfoVisible}
             <i class="arrow arrow-down" />
           {:else}<i class="arrow arrow-up" />{/if}
