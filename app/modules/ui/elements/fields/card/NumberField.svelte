@@ -38,10 +38,10 @@
     value = e.target.value;
   }
 
-  $: helpText = helpText || $t(getHelpTextLabel());
+  $: helpText = value && helpText ? helpText : $t(getHelpTextLabel());
 
   function getHelpTextLabel(locale) {
-    if (recurring) {
+    if (recurring && value) {
       // LABEL: Card does not support recurring payments.
       return CARD_NUMBER_HELP_RECURRING;
     }
