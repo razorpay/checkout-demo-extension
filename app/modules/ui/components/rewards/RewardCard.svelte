@@ -25,7 +25,10 @@
   :global(.mobile) .reward-card {
     height: 177px;
     width: 189px;
+    margin-right: 20px;
   }
 </style>
 
-<div class="reward-card"><img src={logo} alt="Reward Logo" /></div>
+<div class="carousel-slide reward-card">
+  <img src={logo} alt="Reward Logo" />
+</div>

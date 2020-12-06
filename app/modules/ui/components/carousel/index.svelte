@@ -1,130 +1,90 @@
 <script>
-  export let items;
-  export let visibleindex;
-
-  import { bounceOut as easingfunc } from 'svelte/easing';
-  import { crossfade } from 'svelte/transition';
-  import { flip } from 'svelte/animate';
+  import { fade } from 'svelte/transition';
   import { onMount } from 'svelte';
 
-  let contents;
-  let visible;
-
-  let leftlist = [];
-  let centerlist = [];
-
-  function moveRight() {
-    if (visibleindex < items.length - 1) {
-      visibleindex++;
-      leftlist = centerlist;
-      centerlist = [items[visibleindex]];
-    }
-  }
-
-  function moveLeft() {
-    if (visibleindex < items.length && visibleindex > 0) {
-      visibleindex--;
-      centerlist = [items[visibleindex]];
-      if (visibleindex !== 0) {
-        leftlist = [items[visibleindex - 1]];
-      } else {
-        leftlist = [];
-      }
-    }
-  }
-
-  const [send, receive] = crossfade({
-    fallback(node, params) {
-      const style = getComputedStyle(node);
-      const transform = style.transform === 'none' ? '' : style.transform;
-
-      return {
-        duration: 600,
-        easing: easingfunc,
-        css: t => `transform: ${transform} scale(${t});`,
-      };
-    },
-  });
+  export let activeSlideIndex = 0;
+  export let totalSlides;
 
   onMount(() => {
-    items = items.map((data, i) => {
-      return { index: i, data: { ...data, moveRight } };
-    });
-    centerlist = [items[visibleindex]];
-    leftlist = visibleindex > 0 ? [items[visibleindex - 1]] : [];
+    initSlides();
   });
-  function handleClick(ind) {
-    if (visibleindex > ind) {
-      moveLeft();
-    } else {
-      moveRight();
+
+  function initSlides() {
+    const slides = document.getElementsByClassName('carousel-slide');
+    totalSlides = slides.length;
+    let offset = 0;
+    for (let i = 0; i < totalSlides; i++) {
+      slides[i].style.left = offset + 'px';
+      offset += slides[i].clientWidth + 20;
     }
+  }
+
+  function plusSlides(n) {
+    showSlides((slideIndex += n));
+  }
+
+  export function changeSlide(ind) {
+    activeSlideIndex = ind;
+    const sliderMain = document.getElementsByClassName('carousel-track')[0];
+    sliderMain.style.transform = `translateX(-${220 * ind}px)`;
   }
 </script>
 
 <style>
-  carousel {
-    display: flex;
-    max-width: 60%;
+  /* The dots/bullets/indicators */
+  .dot {
+    cursor: pointer;
+    height: 15px;
+    width: 15px;
+    margin: 0 2px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+    transition: background-color 0.6s ease;
   }
 
-  @media screen and (max-width: 500px) {
-    carousel {
-      max-width: 100%;
-    }
+  .active,
+  .dot:hover {
+    background-color: #717171;
   }
-  @media screen and (max-width: 800px) and (min-width: 500px) {
-    carousel {
-      max-width: 70%;
-    }
-  }
-  .justifycenter {
-    justify-content: flex-end;
-  }
-
-  .justifystart {
-    justify-content: flex-end;
-  }
-  paginator-item:before {
-    content: '\25CF';
-    font-size: 20px;
-  }
-  .active {
-    color: orange;
-  }
-  .paginator-wrapper {
+  .carousel-dots {
+    text-align: center;
+    margin-top: 10px;
     position: absolute;
-    bottom: -30px;
+    bottom: 0;
     left: 45%;
+  }
+  .carousel-wrapper {
+    position: relative;
+    height: 230px;
+    overflow-x: hidden;
+  }
+  .carousel-track {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none;
+    transition: all 1s;
+  }
+  .carousel-track :global(.carousel-slide) {
+    position: absolute;
+  }
+  .carousel-track::-webkit-scrollbar {
+    display: none;
   }
 </style>
 
-<carousel
-  bind:this={contents}
-  class:justifycenter={leftlist.length === 0}
-  class:justifystart={leftlist.length > 0}>
-  {#each leftlist as row (row.index)}
-    <carousel-item
-      in:receive={{ key: row.index }}
-      out:send={{ key: row.index }}
-      animate:flip
-      style={'opacity:0.4'}>
-      <slot blah={row.data}>Missing template</slot>
-    </carousel-item>
-  {/each}
-  {#each centerlist as row (row.index)}
-    <carousel-item
-      in:receive={{ key: row.index }}
-      out:send={{ key: row.index }}
-      animate:flip>
-      <slot blah={row.data}>Missing template</slot>
-    </carousel-item>
-  {/each}
-</carousel>
-<div class="paginator-wrapper">
-  {#each items as item, index}
-    <paginator-item
-      class:active={visibleindex === index}
-      on:click={() => handleClick(index)} />
-  {/each}
+<div class="carousel-wrapper">
+  <div class="carousel-track">
+    <slot />
+  </div>
+  <div class="carousel-dots">
+    {#each Array(totalSlides) as ind, index}
+      <span
+        class="dot"
+        class:active={index === activeSlideIndex}
+        on:click={() => changeSlide(index)} />
+    {/each}
+  </div>
 </div>

@@ -41,6 +41,9 @@
     justify-content: space-between;
     position: relative;
   }
+  :global(.mobile) .rewards-list {
+    display: block;
+  }
   .rewards-divider {
     border: 1px solid rgba(0, 0, 0, 0.04);
     width: 100%;
@@ -89,8 +92,10 @@
   </div>
   <div class="rewards-list">
     {#if isMobile()}
-      <Carousel items={$rewards} let:blah bind:visibleindex>
-        <RewardCard {...blah} />
+      <Carousel items={$rewards}>
+        {#each $rewards as rew}
+          <RewardCard {...rew} />
+        {/each}
       </Carousel>
     {:else}
       {#each $rewards as rew}
