@@ -4277,8 +4277,13 @@ Session.prototype = {
       request.gpay = true;
     }
 
-    var appliedOffer = this.getAppliedOffer();
+    // added rewardIds to the create payment request
+    var rewardIds = this.getRewards();
+    if (rewardIds?.length > 0) {
+      data.reward_ids = rewardIds;
+    }
 
+    var appliedOffer = this.getAppliedOffer();
     if (appliedOffer && (!this.offers || this.offers.shouldSendOfferToApi())) {
       data.offer_id = appliedOffer.id;
       this.r.display_amount = appliedOffer.amount;
@@ -5004,6 +5009,10 @@ Session.prototype = {
    */
   getAppliedOffer: function() {
     return discreet.Offers.getForcedOffer();
+  },
+
+  getRewards: function() {
+    return this.rewards.map(({ id }) => id);
   },
 
   /**
