@@ -25,7 +25,12 @@
   // Utils imports
   import { getSession } from 'sessionmanager';
 
-  import { getAmount, getCurrency, getCardCurrencies } from 'checkoutstore';
+  import {
+    getAmount,
+    getCurrency,
+    getCardCurrencies,
+    getMerchantOrder,
+  } from 'checkoutstore';
 
   import { getIin, getCardDigits } from 'common/card';
 
@@ -55,6 +60,7 @@
   let selectedCurrency = null;
   let searchModal;
   const currencyCache = {};
+  const order = getMerchantOrder();
 
   // Props
   export let classes = [];
@@ -164,12 +170,13 @@
   }
 
   function updateAmountInHeaderAndCTA(displayAmount) {
+    const session = getSession();
     if (displayAmount) {
       showAmount(displayAmount);
-      getSession().setRawAmountInHeader(displayAmount);
-    } else {
+      session.setRawAmountInHeader(displayAmount);
+    } else if (!order || !order.partial_payment) {
       showCtaWithDefaultText();
-      getSession().updateAmountInHeader(originalAmount);
+      session.updateAmountInHeader(originalAmount);
     }
   }
 
