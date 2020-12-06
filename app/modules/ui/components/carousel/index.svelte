@@ -25,8 +25,15 @@
 
   export function changeSlide(ind) {
     activeSlideIndex = ind;
-    const sliderMain = document.getElementsByClassName('carousel-track')[0];
-    sliderMain.style.transform = `translateX(-${220 * ind}px)`;
+    // const sliderMain = document.getElementsByClassName('carousel-track')[0];
+    // sliderMain.style.left = `-${220 * ind}px`;
+    const slides = document.getElementsByClassName('carousel-slide');
+    totalSlides = slides.length;
+    let offset = -220 * ind;
+    for (let i = 0; i < totalSlides; i++) {
+      slides[i].style.left = offset + 'px';
+      offset += slides[i].clientWidth + 20;
+    }
   }
 </script>
 
@@ -65,10 +72,10 @@
     width: 100%;
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none;
-    transition: all 1s;
   }
   .carousel-track :global(.carousel-slide) {
     position: absolute;
+    transition: all 1s;
   }
   .carousel-track::-webkit-scrollbar {
     display: none;
