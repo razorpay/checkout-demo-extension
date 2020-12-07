@@ -4151,6 +4151,11 @@ Session.prototype = {
       paused: this.get().paused,
     };
 
+    var session_options = this.get();
+    if (session_options.force_terminal_id) {
+      data.force_terminal_id = session_options.force_terminal_id;
+    }
+
     if (!this.screen) {
       var selectedInstrument = this.getSelectedPaymentInstrument();
 
