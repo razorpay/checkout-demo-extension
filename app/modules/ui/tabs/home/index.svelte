@@ -173,10 +173,6 @@
     });
   }
 
-  setTimeout(() => {
-    showTooltip = true;
-  }, 1000);
-
   export function canGoBack() {
     if (!onMethodsScreen()) {
       return false;
@@ -545,14 +541,11 @@
     updateBlocks({
       showPreferredLoader: shouldUsePersonalization(),
     });
+    showTooltip = true;
     setTimeout(() => {
-      removeRewardsAnimation();
+      // showTooltip = false;
     }, 5000);
   });
-
-  function removeRewardsAnimation() {
-    showTooltip = false;
-  }
 
   // Svelte executes the following block twice. Even if a fault was emitted, it will be emitted again in the second execution.
   // So, we use this flag to perform no-op if true.
@@ -963,7 +956,7 @@
 
   :global(.tooltip.rewards-cta-tooltip) {
     left: calc(50% - -50px);
-    top: 68px;
+    top: 60px;
   }
 
   :global(.rewards-cta-tooltip.tooltip-shown) {
@@ -971,7 +964,7 @@
   }
 
   :global(.tooltip.tooltip-bottom.rewards-cta-tooltip::before) {
-    left: calc(50% + 86px);
+    left: 86%;
   }
 
   .solidbg {

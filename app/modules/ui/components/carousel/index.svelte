@@ -7,6 +7,10 @@
 
   onMount(() => {
     initSlides();
+    const track = document.getElementsByClassName('carousel-track')[0];
+    track.addEventListener('scroll', e => {
+      activeSlideIndex = parseInt(track.scrollLeft / 180);
+    });
   });
 
   function initSlides() {
@@ -14,8 +18,8 @@
     totalSlides = slides.length;
     let offset = 0;
     for (let i = 0; i < totalSlides; i++) {
-      slides[i].style.left = offset + 'px';
-      offset += slides[i].clientWidth + 20;
+      // slides[i].style.left = offset + 'px';
+      // offset += slides[i].clientWidth + 20;
     }
   }
 
@@ -25,15 +29,9 @@
 
   export function changeSlide(ind) {
     activeSlideIndex = ind;
-    // const sliderMain = document.getElementsByClassName('carousel-track')[0];
-    // sliderMain.style.left = `-${220 * ind}px`;
-    const slides = document.getElementsByClassName('carousel-slide');
-    totalSlides = slides.length;
-    let offset = -220 * ind;
-    for (let i = 0; i < totalSlides; i++) {
-      slides[i].style.left = offset + 'px';
-      offset += slides[i].clientWidth + 20;
-    }
+    const track = document.getElementsByClassName('carousel-track')[0];
+    let offset = 220 * ind;
+    track.scrollLeft = offset;
   }
 </script>
 
@@ -67,31 +65,43 @@
     overflow-x: hidden;
   }
   .carousel-track {
-    position: absolute;
     height: 100%;
     width: 100%;
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
   }
   .carousel-track :global(.carousel-slide) {
-    position: absolute;
-    transition: all 1s;
+    transition: all 0.5s;
+    flex-shrink: 0;
   }
   .carousel-track::-webkit-scrollbar {
     display: none;
+  }
+  .carousel-offset {
+    width: 60px;
+    display: inline-block;
+    height: 100%;
+    flex-shrink: 0;
   }
 </style>
 
 <div class="carousel-wrapper">
   <div class="carousel-track">
+    <div class="carousel-offset" />
     <slot />
+    <div class="carousel-offset" />
   </div>
-  <div class="carousel-dots">
-    {#each Array(totalSlides) as ind, index}
-      <span
-        class="dot"
-        class:active={index === activeSlideIndex}
-        on:click={() => changeSlide(index)} />
-    {/each}
-  </div>
+  {#if totalSlides > 1}
+    <div class="carousel-dots">
+      {#each Array(totalSlides) as ind, index}
+        <span
+          class="dot"
+          class:active={index === activeSlideIndex}
+          on:click={() => changeSlide(index)} />
+      {/each}
+    </div>
+  {/if}
 </div>

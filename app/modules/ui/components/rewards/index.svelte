@@ -38,7 +38,7 @@
   }
   .rewards-list {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     position: relative;
   }
   :global(.mobile) .rewards-list {
