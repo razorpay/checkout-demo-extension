@@ -2,6 +2,7 @@ import { writable } from 'svelte/store';
 import { getDowntimes as _getDowntimes } from 'checkoutframe/downtimes';
 import { makeAuthUrl as _makeAuthUrl } from 'common/Razorpay';
 import { displayAmount } from 'common/currency';
+import trustedBadge from 'ui/constants/trusted-badge';
 
 let razorpayInstance, preferences;
 export const razorpayInstanceStore = writable();
@@ -313,4 +314,9 @@ export function getCustomSubtextForMethod(code) {
   if (customText && customText[code]) {
     return customText[code];
   }
+}
+
+export function getTrustedBadgeHighlights() {
+  const list = trustedBadge[preferences.merchant_id]?.list;
+  return list;
 }

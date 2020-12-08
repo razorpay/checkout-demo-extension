@@ -2,7 +2,7 @@ export default {
   app: {
     providers: {
       cred: {
-        name: 'Pay with CRED',
+        name: 'CRED Pay',
         subtext: 'exclusive discounts with CRED coins',
       },
       google_pay_cards: {
@@ -1032,5 +1032,9 @@ export default {
   powered_by: {
     partnership_label: 'In partnership with',
     powered_by_label: 'Powered By',
+  },
+  trusted_badge: {
+    customer_label: "You're paying a",
+    seller_label: 'Razorpay Verified Seller',
   },
 };
