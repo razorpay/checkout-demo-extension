@@ -83,6 +83,7 @@
     UPI_RECURRING_CAW_CALLOUT_NO_NAME_NO_FREQUENCY,
     UPI_RECURRING_CAW_CALLOUT_NO_FREQUENCY,
     UPI_RECURRING_SUBSCRIPTION_CALLOUT,
+    UPI_SELECT_BANK,
   } from 'ui/labels/upi';
 
   import { formatTemplateWithLocale } from 'i18n';
@@ -128,6 +129,29 @@
 
   const isUpiRecurringCAW = isRecurring() && merchantOrder;
   const isUpiRecurringSubscription = isRecurring() && isASubscription('upi');
+
+  const banksThatSupportRecurring = [
+    {
+      name: 'ICICI Bank',
+      id: 'icic',
+    },
+    {
+      name: 'SBI Bank',
+      id: 'sbi',
+    },
+  ];
+  let requiresBankSelection = !!(
+    isUpiRecurringCAW || isUpiRecurringSubscription
+  );
+  let selectedBankForRecurring = null;
+
+  const screens = {
+    upi: 'upi',
+    preUpiPspBankSelection: 'pre-upi-bank-selection',
+  };
+
+  const currentScreen = 'upi';
+
   let startDate,
     endDate,
     orderAmount,
@@ -324,7 +348,12 @@
   }
 
   function determineCtaVisibility() {
-    if (selectedToken) {
+    if (requiresBankSelection) {
+      hideCta();
+      if (selectedBankForRecurring) {
+        showCta();
+      }
+    } else if (selectedToken) {
       showCta();
     } else {
       hideCta();
@@ -356,13 +385,30 @@
     session.switchTab('qr');
   }
 
+  function checkBankSelection() {
+    return requiresBankSelection;
+  }
+
+  export function shouldSubmit() {
+    return !checkBankSelection();
+  }
+
   export function onShown() {
     setDefaultTokenValue();
     determineCtaVisibility();
     sendIntentEvents();
   }
 
+  export function updateStep() {
+    if (selectedBankForRecurring && requiresBankSelection) {
+      requiresBankSelection = false;
+    }
+  }
+
   export function getPayload() {
+    if (!shouldSubmit()) {
+      return {};
+    }
     /**
      * getPayload is called when the users presses Pay.
      *
@@ -628,6 +674,12 @@
     height: @width;
   }
 
+  .recurring-supported-apps-note {
+    padding: 10px;
+    border: 1px solid #e6e7e8;
+    background: #fcfcfc;
+  }
+
   span :global(img) {
     height: 20px;
     width: 20px;
@@ -635,123 +687,153 @@
 </style>
 
 <Tab {method} {down} pad={false} shown={isPayout()}>
-  <Screen>
-    <div>
-      {#if intent}
-        <UpiIntent
-          bind:this={intentView}
-          apps={intentApps || []}
-          selected={intentAppSelected}
-          on:select={e => {
-            onUpiAppSelection({
-              detail: { id: 'intent', app: e.detail.packageName },
-            });
-          }}
-          {showRecommendedUPIApp} />
-      {/if}
-
-      {#if shouldShowCollect}
-        <!-- LABEL: Pay using UPI ID -->
-        <div class="legend left">{$t(UPI_COLLECT_BLOCK_HEADING)}</div>
-        <div class="border-list" id="upi-collect-list">
-          {#if intent}
-            <ListHeader>
-              <i slot="icon">
-                <Icon icon={getMiscIcon('receive')} />
-              </i>
-              <!-- LABEL: You will receive a payment request on your UPI app -->
-              <div slot="subtitle">{$t(UPI_COLLECT_BLOCK_SUBHEADING)}</div>
-            </ListHeader>
-          {/if}
-
-          {#each tokens as app, i (app.id)}
-            <SlottedRadioOption
-              name="payment_type"
-              ellipsis
-              selected={selectedToken === app.id}
-              on:click={() => {
-                onUpiAppSelection({ detail: { id: app.id } });
-              }}>
-              <div slot="title">{app.vpa.username + '@' + app.vpa.handle}</div>
-              <i slot="icon">
-                <Icon
-                  icon={getUPIAppDataFromHandle(app.vpa.handle).app_icon || session.themeMeta.icons.upi} />
-              </i>
-            </SlottedRadioOption>
-          {/each}
-          <AddANewVpa
-            recurring={isUpiRecurringCAW || isUpiRecurringSubscription}
-            paymentMethod={method}
+  {#if requiresBankSelection}
+    <Screen>
+      <div class="legend left">{$t(UPI_SELECT_BANK)}</div>
+      <div class="border-list" id="upi-recurring-bank-list">
+        {#each banksThatSupportRecurring as bank}
+          <SlottedRadioOption
+            name="upi_recurring_psp_bank"
+            ellipsis
+            selected={selectedBankForRecurring === bank.id}
             on:click={() => {
-              onUpiAppSelection({ detail: { id: 'new' } });
+              selectedBankForRecurring = bank.id;
+            }}>
+            <div slot="title">{bank.name}</div>
+            <i slot="icon">
+              <Icon icon={'https://cdn.razorpay.com/checkout/gpay.png'} />
+            </i>
+          </SlottedRadioOption>
+        {/each}
+      </div>
+
+    </Screen>
+  {:else}
+    <Screen>
+      <div>
+        {#if intent}
+          <UpiIntent
+            bind:this={intentView}
+            apps={intentApps || []}
+            selected={intentAppSelected}
+            on:select={e => {
+              onUpiAppSelection({
+                detail: { id: 'intent', app: e.detail.packageName },
+              });
             }}
-            customer={$customer}
-            on:blur={trackVpaEntry}
-            selected={selectedToken === 'new'}
-            bind:this={vpaField} />
-        </div>
-      {/if}
+            {showRecommendedUPIApp} />
+        {/if}
 
-      {#if shouldShowOmnichannel}
-        <GooglePayOmnichannel
-          error={retryOmnichannel}
-          focusOnCreate={true}
-          {isFirst}
-          retry={retryOmnichannel}
-          selected={selectedToken === 'gpay-omni'}
-          on:blur={trackOmnichannelEntry}
-          on:select={() => {
-            onUpiAppSelection({ detail: { id: 'gpay-omni' } });
-          }}
-          bind:this={omnichannelField} />
-      {/if}
+        {#if shouldShowCollect}
+          <!-- LABEL: Pay using UPI ID -->
+          <div class="legend left">{$t(UPI_COLLECT_BLOCK_HEADING)}</div>
+          <div class="border-list" id="upi-collect-list">
+            {#if intent}
+              <ListHeader>
+                <i slot="icon">
+                  <Icon icon={getMiscIcon('receive')} />
+                </i>
+                <!-- LABEL: You will receive a payment request on your UPI app -->
+                <div slot="subtitle">{$t(UPI_COLLECT_BLOCK_SUBHEADING)}</div>
+              </ListHeader>
+            {/if}
 
-      {#if shouldShowQr}
-        <!-- LABEL: Pay using QR Code -->
-        <div class="legend left">{$t(QR_BLOCK_HEADING)}</div>
-        <div class="options" id="showQr">
-          <NextOption
-            icon={qrIcon}
-            tabindex="0"
-            attributes={{ role: 'button', 'aria-label': 'Show QR Code - Scan the QR code using your UPI app' }}
-            on:select={selectQrMethod}>
-            <!-- LABEL: Show QR Code -->
-            <div>{$t(SHOW_QR_CODE)}</div>
-            <!-- LABEL: Scan the QR code using your UPI app -->
-            <div class="desc">{$t(SCAN_QR_CODE)}</div>
-          </NextOption>
-        </div>
-      {/if}
-    </div>
+            {#each tokens as app, i (app.id)}
+              <SlottedRadioOption
+                name="payment_type"
+                ellipsis
+                selected={selectedToken === app.id}
+                on:click={() => {
+                  onUpiAppSelection({ detail: { id: app.id } });
+                }}>
+                <div slot="title">
+                  {app.vpa.username + '@' + app.vpa.handle}
+                </div>
+                <i slot="icon">
+                  <Icon
+                    icon={getUPIAppDataFromHandle(app.vpa.handle).app_icon || session.themeMeta.icons.upi} />
+                </i>
+              </SlottedRadioOption>
+            {/each}
+            <AddANewVpa
+              recurring={isUpiRecurringCAW || isUpiRecurringSubscription}
+              paymentMethod={method}
+              on:click={() => {
+                onUpiAppSelection({ detail: { id: 'new' } });
+              }}
+              customer={$customer}
+              on:blur={trackVpaEntry}
+              selected={selectedToken === 'new'}
+              bind:this={vpaField} />
+          </div>
+          {#if isUpiRecurringCAW || isUpiRecurringSubscription}
+            <div class="recurring-supported-apps-note">
+              Please note, you need to have BHIM App or PayTM for this payment.
+            </div>
+          {/if}
+        {/if}
 
-    <Bottom>
-      {#if down || disabled}
-        <DowntimeCallout severe={disabled}>
-          <!-- LABEL: UPI is experiencing low success rates. -->
-          <FormattedText text={$t(UPI_DOWNTIME_TEXT)} />
-        </DowntimeCallout>
-      {/if}
-      {#if isOtm}
-        <Callout classes={['downtime-callout']} showIcon={true}>
-          <FormattedText
-            text={formatTemplateWithLocale(UPI_OTM_CALLOUT, {
-              amount: session.formatAmountWithCurrency(getAmount()),
-              nameString: merchantName ? 'by ' + merchantName : '',
-              startDate: toShortFormat(otmStartDate),
-              endDate: toShortFormat(otmEndDate),
-            })} />
-        </Callout>
-      {/if}
-      <!-- Both CAW and subscriptions show the same callout with the same information -->
-      {#if isUpiRecurringCAW || isUpiRecurringSubscription}
-        <Callout classes={['downtime-callout']} showIcon={true}>
-          <!-- This is a recurring payment and {maxAmount} will be charged now. After this, {merchantName} can charge upto {amount} {recurringFrequency} till {endDate}. -->
-          <!-- This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} on a {recurringFrequency} basis till {endDate}. -->
-          <!-- This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} anytime till {endDate}. -->
-          <!-- This is a recurring payment and {maxAmount} will be charged now. {merchantName} can charge upto {amount} anytime till {endDate}. -->
-          {formatTemplateWithLocale(recurring_callout, { maxAmount: session.formatAmountWithCurrency(getAmount()), merchantName: !merchantName ? '' : merchantName, amount: session.formatAmountWithCurrency(maxRecurringAmount), recurringFrequency, endDate: toShortFormat(new Date(endDate * 1000)) }, $locale)}
-        </Callout>
-      {/if}
-    </Bottom>
-  </Screen>
+        {#if shouldShowOmnichannel}
+          <GooglePayOmnichannel
+            error={retryOmnichannel}
+            focusOnCreate={true}
+            {isFirst}
+            retry={retryOmnichannel}
+            selected={selectedToken === 'gpay-omni'}
+            on:blur={trackOmnichannelEntry}
+            on:select={() => {
+              onUpiAppSelection({ detail: { id: 'gpay-omni' } });
+            }}
+            bind:this={omnichannelField} />
+        {/if}
+
+        {#if shouldShowQr}
+          <!-- LABEL: Pay using QR Code -->
+          <div class="legend left">{$t(QR_BLOCK_HEADING)}</div>
+          <div class="options" id="showQr">
+            <NextOption
+              icon={qrIcon}
+              tabindex="0"
+              attributes={{ role: 'button', 'aria-label': 'Show QR Code - Scan the QR code using your UPI app' }}
+              on:select={selectQrMethod}>
+              <!-- LABEL: Show QR Code -->
+              <div>{$t(SHOW_QR_CODE)}</div>
+              <!-- LABEL: Scan the QR code using your UPI app -->
+              <div class="desc">{$t(SCAN_QR_CODE)}</div>
+            </NextOption>
+          </div>
+        {/if}
+      </div>
+
+      <Bottom>
+        {#if down || disabled}
+          <DowntimeCallout severe={disabled}>
+            <!-- LABEL: UPI is experiencing low success rates. -->
+            <FormattedText text={$t(UPI_DOWNTIME_TEXT)} />
+          </DowntimeCallout>
+        {/if}
+        {#if isOtm}
+          <Callout classes={['downtime-callout']} showIcon={true}>
+            <FormattedText
+              text={formatTemplateWithLocale(UPI_OTM_CALLOUT, {
+                amount: session.formatAmountWithCurrency(getAmount()),
+                nameString: merchantName ? 'by ' + merchantName : '',
+                startDate: toShortFormat(otmStartDate),
+                endDate: toShortFormat(otmEndDate),
+              })} />
+          </Callout>
+        {/if}
+        <!-- Both CAW and subscriptions show the same callout with the same information -->
+        {#if isUpiRecurringCAW || isUpiRecurringSubscription}
+          <Callout classes={['downtime-callout']} showIcon={true}>
+            <!-- This is a recurring payment and {maxAmount} will be charged now. After this, {merchantName} can charge upto {amount} {recurringFrequency} till {endDate}. -->
+            <!-- This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} on a {recurringFrequency} basis till {endDate}. -->
+            <!-- This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} anytime till {endDate}. -->
+            <!-- This is a recurring payment and {maxAmount} will be charged now. {merchantName} can charge upto {amount} anytime till {endDate}. -->
+            {formatTemplateWithLocale(recurring_callout, { maxAmount: session.formatAmountWithCurrency(getAmount()), merchantName: !merchantName ? '' : merchantName, amount: session.formatAmountWithCurrency(maxRecurringAmount), recurringFrequency, endDate: toShortFormat(new Date(endDate * 1000)) }, $locale)}
+          </Callout>
+        {/if}
+      </Bottom>
+    </Screen>
+  {/if}
 </Tab>

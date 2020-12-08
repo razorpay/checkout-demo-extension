@@ -964,6 +964,7 @@ export default {
       'The charge is to enable subscription on this card and it will be refunded.',
     redirect_to_app: 'You will be redirected to your UPI app',
     scan_qr_code: 'Scan the QR code using your UPI app',
+    select_bank: 'Select the bank linked to your UPI ID',
     show_other_apps: 'Show other UPI apps',
     show_qr_code: 'Show QR Code',
     upi_otm_callout:

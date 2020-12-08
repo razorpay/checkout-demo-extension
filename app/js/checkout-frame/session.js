@@ -4088,7 +4088,6 @@ Session.prototype = {
     }
     var vpaVerified = props.vpaVerified;
     var data = this.payload;
-
     var goto_payment = '#error-message .link';
     var redirectableMethods = ['card', 'netbanking', 'wallet'];
     if (
@@ -4130,6 +4129,12 @@ Session.prototype = {
 
     if (this.tab === 'nach') {
       shouldContinue = this.nachScreen.shouldSubmit();
+    }
+    if (this.tab === 'upi') {
+      shouldContinue = this.upiTab.shouldSubmit();
+      if (!shouldContinue) {
+        this.upiTab.updateStep();
+      }
     }
 
     if (!shouldContinue) {
