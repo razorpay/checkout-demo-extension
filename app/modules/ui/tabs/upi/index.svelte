@@ -315,6 +315,7 @@
 
   // Determine CTA visilibty when selectedToken changes, but only if session.tab is a upi based method
   $: selectedToken,
+    selectedBankForRecurring,
     _Arr.contains(['upi', 'upi_otm'], session.tab) && determineCtaVisibility();
 
   function setDefaultTokenValue() {
@@ -348,11 +349,8 @@
   }
 
   function determineCtaVisibility() {
-    if (requiresBankSelection) {
+    if (requiresBankSelection && !selectedBankForRecurring) {
       hideCta();
-      if (selectedBankForRecurring) {
-        showCta();
-      }
     } else if (selectedToken) {
       showCta();
     } else {
@@ -399,11 +397,7 @@
     sendIntentEvents();
   }
 
-  export function updateStep() {
-    if (selectedBankForRecurring && requiresBankSelection) {
-      requiresBankSelection = false;
-    }
-  }
+  export function updateStep() {}
 
   export function getPayload() {
     if (!shouldSubmit()) {
@@ -687,8 +681,8 @@
 </style>
 
 <Tab {method} {down} pad={false} shown={isPayout()}>
-  {#if requiresBankSelection}
-    <Screen>
+  <Screen>
+    {#if requiresBankSelection}
       <div class="legend left">{$t(UPI_SELECT_BANK)}</div>
       <div class="border-list" id="upi-recurring-bank-list">
         {#each banksThatSupportRecurring as bank}
@@ -706,10 +700,8 @@
           </SlottedRadioOption>
         {/each}
       </div>
-
-    </Screen>
-  {:else}
-    <Screen>
+    {/if}
+    {#if !(requiresBankSelection && !selectedBankForRecurring)}
       <div>
         {#if intent}
           <UpiIntent
@@ -727,7 +719,7 @@
         {#if shouldShowCollect}
           <!-- LABEL: Pay using UPI ID -->
           <div class="legend left">{$t(UPI_COLLECT_BLOCK_HEADING)}</div>
-          <div class="border-list" id="upi-collect-list">
+          <div transition:slide class="border-list" id="upi-collect-list">
             {#if intent}
               <ListHeader>
                 <i slot="icon">
@@ -804,36 +796,36 @@
           </div>
         {/if}
       </div>
+    {/if}
 
-      <Bottom>
-        {#if down || disabled}
-          <DowntimeCallout severe={disabled}>
-            <!-- LABEL: UPI is experiencing low success rates. -->
-            <FormattedText text={$t(UPI_DOWNTIME_TEXT)} />
-          </DowntimeCallout>
-        {/if}
-        {#if isOtm}
-          <Callout classes={['downtime-callout']} showIcon={true}>
-            <FormattedText
-              text={formatTemplateWithLocale(UPI_OTM_CALLOUT, {
-                amount: session.formatAmountWithCurrency(getAmount()),
-                nameString: merchantName ? 'by ' + merchantName : '',
-                startDate: toShortFormat(otmStartDate),
-                endDate: toShortFormat(otmEndDate),
-              })} />
-          </Callout>
-        {/if}
-        <!-- Both CAW and subscriptions show the same callout with the same information -->
-        {#if isUpiRecurringCAW || isUpiRecurringSubscription}
-          <Callout classes={['downtime-callout']} showIcon={true}>
-            <!-- This is a recurring payment and {maxAmount} will be charged now. After this, {merchantName} can charge upto {amount} {recurringFrequency} till {endDate}. -->
-            <!-- This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} on a {recurringFrequency} basis till {endDate}. -->
-            <!-- This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} anytime till {endDate}. -->
-            <!-- This is a recurring payment and {maxAmount} will be charged now. {merchantName} can charge upto {amount} anytime till {endDate}. -->
-            {formatTemplateWithLocale(recurring_callout, { maxAmount: session.formatAmountWithCurrency(getAmount()), merchantName: !merchantName ? '' : merchantName, amount: session.formatAmountWithCurrency(maxRecurringAmount), recurringFrequency, endDate: toShortFormat(new Date(endDate * 1000)) }, $locale)}
-          </Callout>
-        {/if}
-      </Bottom>
-    </Screen>
-  {/if}
+    <Bottom>
+      {#if down || disabled}
+        <DowntimeCallout severe={disabled}>
+          <!-- LABEL: UPI is experiencing low success rates. -->
+          <FormattedText text={$t(UPI_DOWNTIME_TEXT)} />
+        </DowntimeCallout>
+      {/if}
+      {#if isOtm}
+        <Callout classes={['downtime-callout']} showIcon={true}>
+          <FormattedText
+            text={formatTemplateWithLocale(UPI_OTM_CALLOUT, {
+              amount: session.formatAmountWithCurrency(getAmount()),
+              nameString: merchantName ? 'by ' + merchantName : '',
+              startDate: toShortFormat(otmStartDate),
+              endDate: toShortFormat(otmEndDate),
+            })} />
+        </Callout>
+      {/if}
+      <!-- Both CAW and subscriptions show the same callout with the same information -->
+      {#if isUpiRecurringCAW || isUpiRecurringSubscription}
+        <Callout classes={['downtime-callout']} showIcon={true}>
+          <!-- This is a recurring payment and {maxAmount} will be charged now. After this, {merchantName} can charge upto {amount} {recurringFrequency} till {endDate}. -->
+          <!-- This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} on a {recurringFrequency} basis till {endDate}. -->
+          <!-- This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} anytime till {endDate}. -->
+          <!-- This is a recurring payment and {maxAmount} will be charged now. {merchantName} can charge upto {amount} anytime till {endDate}. -->
+          {formatTemplateWithLocale(recurring_callout, { maxAmount: session.formatAmountWithCurrency(getAmount()), merchantName: !merchantName ? '' : merchantName, amount: session.formatAmountWithCurrency(maxRecurringAmount), recurringFrequency, endDate: toShortFormat(new Date(endDate * 1000)) }, $locale)}
+        </Callout>
+      {/if}
+    </Bottom>
+  </Screen>
 </Tab>
