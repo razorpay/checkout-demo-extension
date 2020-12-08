@@ -3379,7 +3379,11 @@ Session.prototype = {
     var self = this;
     if (this.isOpen) {
       if (confirmedCancel !== true && this.r._payment) {
-        self.confirmClose();
+        self.confirmClose().then(confirmed => {
+          if (confirmed) {
+            self.back(true);
+          }
+        });
         return;
       }
 
