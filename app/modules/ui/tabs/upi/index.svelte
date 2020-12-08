@@ -134,10 +134,12 @@
     {
       name: 'ICICI Bank',
       id: 'icic',
+      img: 'ICIC',
     },
     {
       name: 'SBI Bank',
       id: 'sbi',
+      img: 'SBIN',
     },
   ];
   let requiresBankSelection = !!(
@@ -695,7 +697,7 @@
             }}>
             <div slot="title">{bank.name}</div>
             <i slot="icon">
-              <Icon icon={'https://cdn.razorpay.com/checkout/gpay.png'} />
+              <Icon icon={`https://cdn.razorpay.com/bank/${bank.img}.gif`} />
             </i>
           </SlottedRadioOption>
         {/each}
