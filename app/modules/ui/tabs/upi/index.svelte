@@ -693,9 +693,29 @@
   :global(.upi-selected-bank [slot='extra']) {
     margin-left: auto;
     font-size: 12px;
+    color: rgba(123, 127, 148, 1);
   }
+
+  :global(.upi-selected-bank [slot='extra']:hover) {
+    color: rgba(82, 143, 240, 1);
+  }
+
+  :global(.border-list:not(.touchfix)
+      > *:not(.uninteractive).upi-selected-bank:hover:not(:disabled)) {
+    border-color: #e6e7e8;
+    background-color: #fff;
+    cursor: default;
+  }
+
+  :global(.border-list:not(.touchfix)
+      > *:not(.uninteractive).upi-selected-bank:hover:not(:disabled)
+      [slot='extra']) {
+    cursor: pointer;
+  }
+
   :global(.upi-selected-bank .downward-arrow) {
     transform: rotate(-90deg);
+    font-size: 10px;
   }
 </style>
 
@@ -706,14 +726,9 @@
     <Screen>
       {#if selectedBankForRecurring}
         <div class="legend left">{$t(ID_LINKED_TO_BANK)}</div>
-        <div class="border-list" id="upi-collect-list">
+        <div class="border-list">
 
-          <SlottedOption
-            className="upi-selected-bank"
-            on:click={() => {
-              upiFlowStep = steps.preUpiPspBankSelection;
-            }}
-            id="user-details">
+          <SlottedOption className="upi-selected-bank" id="user-details">
             <i slot="icon">
               <Icon
                 icon={`https://cdn.razorpay.com/bank/${selectedBankForRecurring.img}.gif`} />
@@ -721,7 +736,11 @@
             <div slot="title">
               <span>{selectedBankForRecurring.name}</span>
             </div>
-            <div slot="extra">
+            <div
+              slot="extra"
+              on:click={() => {
+                upiFlowStep = steps.preUpiPspBankSelection;
+              }}>
               <!-- LABEL: Edit -->
               <span>Change Bank</span>
               <span class="downward-arrow">&#xe604;</span>
