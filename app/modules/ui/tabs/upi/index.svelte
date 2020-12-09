@@ -42,6 +42,7 @@
 
   // UI imports
   import UpiIntent from './UpiIntent.svelte';
+  import UpiBottom from './Bottom.svelte';
   import BankSelection from './BankSelection.svelte';
   import Tab from 'ui/tabs/Tab.svelte';
   import Grid from 'ui/layouts/grid/index.svelte';
@@ -56,7 +57,6 @@
   import GooglePayOmnichannel from './GooglePayOmnichannel.svelte';
   import NextOption from 'ui/elements/options/NextOption.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
-  import Bottom from 'ui/layouts/Bottom.svelte';
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import AddANewVpa from './AddANewVpa.svelte';
@@ -199,29 +199,6 @@
         return allowedPSPs.some(psp => token.vpa.handle === psp);
       });
     },
-  };
-
-  let toShortFormat = function(date, delimter = ' ') {
-    let month_names = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-
-    let day = date.getDate();
-    let month_index = date.getMonth();
-    let year = date.getFullYear();
-
-    return '' + day + delimter + month_names[month_index] + delimter + year;
   };
 
   const addDaysToDate = function(date, days) {
@@ -643,31 +620,9 @@
 </script>
 
 <style>
-  strong {
-    font-weight: bolder;
-  }
-
   .legend {
     margin-top: 10px;
     padding: 12px 0 8px 12px;
-  }
-
-  #vpa-wrap {
-    &.phonepe :global(.elem) {
-      padding-right: 44px;
-    }
-
-    &.bhim :global(.elem) {
-      padding-right: 45px;
-    }
-
-    &.whatsapp :global(.elem) {
-      padding-right: 50px;
-    }
-
-    &.paytm :global(.elem) {
-      padding-right: 64px;
-    }
   }
 
   div :global(.input) {
@@ -678,11 +633,6 @@
     display: inline-block;
     vertical-align: middle;
     margin-right: 4px;
-  }
-
-  .ref-iconwrap {
-    width: 20px;
-    height: @width;
   }
 
   span :global(img) {
@@ -700,17 +650,14 @@
     color: rgba(82, 143, 240, 1);
   }
 
-  :global(.border-list:not(.touchfix)
-      > *:not(.uninteractive).upi-selected-bank:hover:not(:disabled)) {
-    border-color: #e6e7e8;
-    background-color: #fff;
-    cursor: default;
+  :global(.border-list > *.upi-selected-bank:hover) {
+    border-color: #e6e7e8 !important;
+    background-color: #fff !important;
+    cursor: default !important;
   }
 
-  :global(.border-list:not(.touchfix)
-      > *:not(.uninteractive).upi-selected-bank:hover:not(:disabled)
-      [slot='extra']) {
-    cursor: pointer;
+  :global(.border-list > *.upi-selected-bank:hover [slot='extra']) {
+    cursor: pointer !important;
   }
 
   :global(.upi-selected-bank .downward-arrow) {
@@ -720,10 +667,10 @@
 </style>
 
 <Tab {method} {down} pad={false} shown={isPayout()}>
-  {#if upiFlowStep === steps.preUpiPspBankSelection}
-    <BankSelection bind:value={selectedBankForRecurring} />
-  {:else if upiFlowStep === steps.upi}
-    <Screen>
+  <Screen>
+    {#if upiFlowStep === steps.preUpiPspBankSelection}
+      <BankSelection bind:value={selectedBankForRecurring} />
+    {:else if upiFlowStep === steps.upi}
       {#if selectedBankForRecurring}
         <div class="legend left">{$t(ID_LINKED_TO_BANK)}</div>
         <div class="border-list">
@@ -838,37 +785,20 @@
           </div>
         {/if}
       </div>
+    {/if}
 
-      <Bottom>
-        {#if down || disabled}
-          <DowntimeCallout severe={disabled}>
-            <!-- LABEL: UPI is experiencing low success rates. -->
-            <FormattedText text={$t(UPI_DOWNTIME_TEXT)} />
-          </DowntimeCallout>
-        {/if}
-        {#if isOtm}
-          <Callout classes={['downtime-callout']} showIcon={true}>
-            <FormattedText
-              text={formatTemplateWithLocale(UPI_OTM_CALLOUT, {
-                amount: session.formatAmountWithCurrency(getAmount()),
-                nameString: merchantName ? 'by ' + merchantName : '',
-                startDate: toShortFormat(otmStartDate),
-                endDate: toShortFormat(otmEndDate),
-              })} />
-          </Callout>
-        {/if}
-        <!-- Both CAW and subscriptions show the same callout with the same information -->
-        {#if isUpiRecurringCAW || isUpiRecurringSubscription}
-          <Callout classes={['downtime-callout']} showIcon={true}>
-            <!-- This is a recurring payment and {maxAmount} will be charged now. After this, {merchantName} can charge upto {amount} {recurringFrequency} till {endDate}. -->
-            <!-- This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} on a {recurringFrequency} basis till {endDate}. -->
-            <!-- This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} anytime till {endDate}. -->
-            <!-- This is a recurring payment and {maxAmount} will be charged now. {merchantName} can charge upto {amount} anytime till {endDate}. -->
-            {formatTemplateWithLocale(recurring_callout, { maxAmount: session.formatAmountWithCurrency(getAmount()), merchantName: !merchantName ? '' : merchantName, amount: session.formatAmountWithCurrency(maxRecurringAmount), recurringFrequency, endDate: toShortFormat(new Date(endDate * 1000)) }, $locale)}
-          </Callout>
-        {/if}
-      </Bottom>
-    </Screen>
-  {/if}
+    <UpiBottom
+      {down}
+      {disabled}
+      {isOtm}
+      {isUpiRecurringCAW}
+      {isUpiRecurringSubscription}
+      {otmStartDate}
+      {otmEndDate}
+      {recurring_callout}
+      {endDate}
+      {maxRecurringAmount}
+      {recurringFrequency} />
+  </Screen>
 
 </Tab>
