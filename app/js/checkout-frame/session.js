@@ -4133,6 +4133,13 @@ Session.prototype = {
       shouldContinue = this.nachScreen.shouldSubmit();
     }
 
+    if (this.tab === 'upi') {
+      shouldContinue = this.upiTab.shouldSubmit();
+      if (!shouldContinue) {
+        this.upiTab.updateStep();
+      }
+    }
+
     if (!shouldContinue) {
       return;
     }

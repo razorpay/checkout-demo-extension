@@ -677,7 +677,7 @@ export default {
       recurring_cards: '{networks} credit cards',
       upi: 'Instant payment using UPI App',
       upi_otm: 'Pay later using BHIM',
-      upi_recurring: 'Supported only for BHIM UPI App',
+      upi_recurring: 'Pay using BHIM or PayTM App',
     },
     prefixes: {
       bank_transfer: 'Bank Transfer',
@@ -941,7 +941,8 @@ export default {
     downtime_text: '<strong>UPI<strong> is experiencing low success rate.',
     intent_block_heading: 'PAY USING APPS',
     new_vpa_subtitle: 'Google Pay, BHIM, PhonePe & more',
-    new_vpa_subtitle_upi_otm: 'Supported only for BHIM UPI app',
+    new_vpa_subtitle_upi_otm:
+      'Please note, you can only complete this payment using <strong>BHIM App<strong> or <strong>PayTM App<strong>',
     new_vpa_title_logged_in: 'Add UPI ID',
     new_vpa_title_logged_out: 'UPI ID',
     omni_block_heading: 'Or, pay using phone number',
@@ -964,7 +965,9 @@ export default {
       'The charge is to enable subscription on this card and it will be refunded.',
     redirect_to_app: 'You will be redirected to your UPI app',
     scan_qr_code: 'Scan the QR code using your UPI app',
-    select_bank: 'Select the bank linked to your UPI ID',
+    supported_banks:
+      'You can only pay using UPI ID linked with either <strong>ICICI Bank<strong> or <strong>SBI Bank<strong>',
+    upi_id_linked_to_bank: 'UPI ID is linked to',
     show_other_apps: 'Show other UPI apps',
     show_qr_code: 'Show QR Code',
     upi_otm_callout:

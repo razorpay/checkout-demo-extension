@@ -39,4 +39,5 @@ export const CANCEL_REASON_MONEY_DEDUCTED = 'upi.cancel_reason_money_deducted';
 export const CANCEL_REASON_OTHER = 'upi.cancel_reason_other';
 export const CANCEL_REASON_BACK_ACTION = 'upi.cancel_reason_back_action';
 export const CANCEL_REASON_SUBMIT_ACTION = 'upi.cancel_reason_submit_action';
-export const UPI_SELECT_BANK = 'upi.select_bank';
+export const ID_LINKED_TO_BANK = 'upi.upi_id_linked_to_bank';
+export const SUPPORTED_BANKS = 'upi.supported_banks';

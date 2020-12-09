@@ -42,6 +42,7 @@
 
   // UI imports
   import UpiIntent from './UpiIntent.svelte';
+  import BankSelection from './BankSelection.svelte';
   import Tab from 'ui/tabs/Tab.svelte';
   import Grid from 'ui/layouts/grid/index.svelte';
   import Card from 'ui/elements/Card.svelte';
@@ -56,6 +57,7 @@
   import NextOption from 'ui/elements/options/NextOption.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
+  import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import AddANewVpa from './AddANewVpa.svelte';
   import { getMiscIcon } from 'checkoutframe/icons';
@@ -83,7 +85,7 @@
     UPI_RECURRING_CAW_CALLOUT_NO_NAME_NO_FREQUENCY,
     UPI_RECURRING_CAW_CALLOUT_NO_FREQUENCY,
     UPI_RECURRING_SUBSCRIPTION_CALLOUT,
-    UPI_SELECT_BANK,
+    ID_LINKED_TO_BANK,
   } from 'ui/labels/upi';
 
   import { formatTemplateWithLocale } from 'i18n';
@@ -142,15 +144,16 @@
       img: 'SBIN',
     },
   ];
-  let requiresBankSelection = !!(
-    isUpiRecurringCAW || isUpiRecurringSubscription
-  );
-  let selectedBankForRecurring = null;
-
-  const screens = {
+  const steps = {
     upi: 'upi',
     preUpiPspBankSelection: 'pre-upi-bank-selection',
   };
+
+  let requiresBankSelection = !!(
+    isUpiRecurringCAW || isUpiRecurringSubscription
+  );
+  let upiFlowStep = steps.upi;
+  let selectedBankForRecurring = null;
 
   const currentScreen = 'upi';
 
@@ -351,8 +354,11 @@
   }
 
   function determineCtaVisibility() {
-    if (requiresBankSelection && !selectedBankForRecurring) {
+    if (requiresBankSelection) {
       hideCta();
+      if (selectedBankForRecurring) {
+        showCta();
+      }
     } else if (selectedToken) {
       showCta();
     } else {
@@ -397,9 +403,18 @@
     setDefaultTokenValue();
     determineCtaVisibility();
     sendIntentEvents();
+    if (requiresBankSelection) {
+      upiFlowStep = steps.preUpiPspBankSelection;
+    }
   }
 
-  export function updateStep() {}
+  export function updateStep() {
+    if (selectedBankForRecurring && requiresBankSelection) {
+      if (upiFlowStep === steps.preUpiPspBankSelection) {
+        upiFlowStep = steps.upi;
+      }
+    }
+  }
 
   export function getPayload() {
     if (!shouldSubmit()) {
@@ -670,40 +685,51 @@
     height: @width;
   }
 
-  .recurring-supported-apps-note {
-    padding: 10px;
-    border: 1px solid #e6e7e8;
-    background: #fcfcfc;
-  }
-
   span :global(img) {
     height: 20px;
     width: 20px;
   }
+
+  :global(.upi-selected-bank [slot='extra']) {
+    margin-left: auto;
+    font-size: 12px;
+  }
+  :global(.upi-selected-bank .downward-arrow) {
+    transform: rotate(-90deg);
+  }
 </style>
 
 <Tab {method} {down} pad={false} shown={isPayout()}>
-  <Screen>
-    {#if requiresBankSelection}
-      <div class="legend left">{$t(UPI_SELECT_BANK)}</div>
-      <div class="border-list" id="upi-recurring-bank-list">
-        {#each banksThatSupportRecurring as bank}
-          <SlottedRadioOption
-            name="upi_recurring_psp_bank"
-            ellipsis
-            selected={selectedBankForRecurring === bank.id}
+  {#if upiFlowStep === steps.preUpiPspBankSelection}
+    <BankSelection bind:value={selectedBankForRecurring} />
+  {:else if upiFlowStep === steps.upi}
+    <Screen>
+      {#if selectedBankForRecurring}
+        <div class="legend left">{$t(ID_LINKED_TO_BANK)}</div>
+        <div class="border-list" id="upi-collect-list">
+
+          <SlottedOption
+            className="upi-selected-bank"
             on:click={() => {
-              selectedBankForRecurring = bank.id;
-            }}>
-            <div slot="title">{bank.name}</div>
+              upiFlowStep = steps.preUpiPspBankSelection;
+            }}
+            id="user-details">
             <i slot="icon">
-              <Icon icon={`https://cdn.razorpay.com/bank/${bank.img}.gif`} />
+              <Icon
+                icon={`https://cdn.razorpay.com/bank/${selectedBankForRecurring.img}.gif`} />
             </i>
-          </SlottedRadioOption>
-        {/each}
-      </div>
-    {/if}
-    {#if !(requiresBankSelection && !selectedBankForRecurring)}
+            <div slot="title">
+              <span>{selectedBankForRecurring.name}</span>
+            </div>
+            <div slot="extra">
+              <!-- LABEL: Edit -->
+              <span>Change Bank</span>
+              <span class="downward-arrow">&#xe604;</span>
+            </div>
+          </SlottedOption>
+        </div>
+      {/if}
+
       <div>
         {#if intent}
           <UpiIntent
@@ -721,7 +747,7 @@
         {#if shouldShowCollect}
           <!-- LABEL: Pay using UPI ID -->
           <div class="legend left">{$t(UPI_COLLECT_BLOCK_HEADING)}</div>
-          <div transition:slide class="border-list" id="upi-collect-list">
+          <div class="border-list" id="upi-collect-list">
             {#if intent}
               <ListHeader>
                 <i slot="icon">
@@ -760,11 +786,6 @@
               selected={selectedToken === 'new'}
               bind:this={vpaField} />
           </div>
-          {#if isUpiRecurringCAW || isUpiRecurringSubscription}
-            <div class="recurring-supported-apps-note">
-              Please note, you need to have BHIM App or PayTM for this payment.
-            </div>
-          {/if}
         {/if}
 
         {#if shouldShowOmnichannel}
@@ -798,36 +819,37 @@
           </div>
         {/if}
       </div>
-    {/if}
 
-    <Bottom>
-      {#if down || disabled}
-        <DowntimeCallout severe={disabled}>
-          <!-- LABEL: UPI is experiencing low success rates. -->
-          <FormattedText text={$t(UPI_DOWNTIME_TEXT)} />
-        </DowntimeCallout>
-      {/if}
-      {#if isOtm}
-        <Callout classes={['downtime-callout']} showIcon={true}>
-          <FormattedText
-            text={formatTemplateWithLocale(UPI_OTM_CALLOUT, {
-              amount: session.formatAmountWithCurrency(getAmount()),
-              nameString: merchantName ? 'by ' + merchantName : '',
-              startDate: toShortFormat(otmStartDate),
-              endDate: toShortFormat(otmEndDate),
-            })} />
-        </Callout>
-      {/if}
-      <!-- Both CAW and subscriptions show the same callout with the same information -->
-      {#if isUpiRecurringCAW || isUpiRecurringSubscription}
-        <Callout classes={['downtime-callout']} showIcon={true}>
-          <!-- This is a recurring payment and {maxAmount} will be charged now. After this, {merchantName} can charge upto {amount} {recurringFrequency} till {endDate}. -->
-          <!-- This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} on a {recurringFrequency} basis till {endDate}. -->
-          <!-- This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} anytime till {endDate}. -->
-          <!-- This is a recurring payment and {maxAmount} will be charged now. {merchantName} can charge upto {amount} anytime till {endDate}. -->
-          {formatTemplateWithLocale(recurring_callout, { maxAmount: session.formatAmountWithCurrency(getAmount()), merchantName: !merchantName ? '' : merchantName, amount: session.formatAmountWithCurrency(maxRecurringAmount), recurringFrequency, endDate: toShortFormat(new Date(endDate * 1000)) }, $locale)}
-        </Callout>
-      {/if}
-    </Bottom>
-  </Screen>
+      <Bottom>
+        {#if down || disabled}
+          <DowntimeCallout severe={disabled}>
+            <!-- LABEL: UPI is experiencing low success rates. -->
+            <FormattedText text={$t(UPI_DOWNTIME_TEXT)} />
+          </DowntimeCallout>
+        {/if}
+        {#if isOtm}
+          <Callout classes={['downtime-callout']} showIcon={true}>
+            <FormattedText
+              text={formatTemplateWithLocale(UPI_OTM_CALLOUT, {
+                amount: session.formatAmountWithCurrency(getAmount()),
+                nameString: merchantName ? 'by ' + merchantName : '',
+                startDate: toShortFormat(otmStartDate),
+                endDate: toShortFormat(otmEndDate),
+              })} />
+          </Callout>
+        {/if}
+        <!-- Both CAW and subscriptions show the same callout with the same information -->
+        {#if isUpiRecurringCAW || isUpiRecurringSubscription}
+          <Callout classes={['downtime-callout']} showIcon={true}>
+            <!-- This is a recurring payment and {maxAmount} will be charged now. After this, {merchantName} can charge upto {amount} {recurringFrequency} till {endDate}. -->
+            <!-- This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} on a {recurringFrequency} basis till {endDate}. -->
+            <!-- This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} anytime till {endDate}. -->
+            <!-- This is a recurring payment and {maxAmount} will be charged now. {merchantName} can charge upto {amount} anytime till {endDate}. -->
+            {formatTemplateWithLocale(recurring_callout, { maxAmount: session.formatAmountWithCurrency(getAmount()), merchantName: !merchantName ? '' : merchantName, amount: session.formatAmountWithCurrency(maxRecurringAmount), recurringFrequency, endDate: toShortFormat(new Date(endDate * 1000)) }, $locale)}
+          </Callout>
+        {/if}
+      </Bottom>
+    </Screen>
+  {/if}
+
 </Tab>
