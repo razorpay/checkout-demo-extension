@@ -53,7 +53,7 @@
       on:click={() => {
         value = bank;
       }}>
-      <div slot="title">{bank.name}</div>
+      <div slot="title" id={`upi-psp-bank-${bank.id}`}>{bank.name}</div>
       <i slot="icon">
         <Icon icon={`https://cdn.razorpay.com/bank/${bank.img}.gif`} />
       </i>

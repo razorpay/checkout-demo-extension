@@ -368,12 +368,8 @@
     session.switchTab('qr');
   }
 
-  function checkBankSelection() {
-    return requiresBankSelection;
-  }
-
   export function shouldSubmit() {
-    return !checkBankSelection();
+    return upiFlowStep === steps.upi;
   }
 
   export function onShown() {
