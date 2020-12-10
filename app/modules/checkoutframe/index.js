@@ -257,10 +257,10 @@ function fetchRewards(session) {
   // TODO: reaplce the below call with rewards endpoint
   session.rewardsCall = Razorpay.payment.getRewards(null, rewardsRes => {
     session.rewardsCall = null;
-    if (rewards.error) {
+    if (rewardsRes.error) {
       Razorpay.sendMessage({
         event: 'fault',
-        data: rewards.error,
+        data: rewardsRes.error,
       });
     } else {
       const RazorpayInstance = session.r;
