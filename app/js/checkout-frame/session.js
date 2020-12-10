@@ -4286,7 +4286,7 @@ Session.prototype = {
 
     // added rewardIds to the create payment request
     var rewardIds = this.getRewards();
-    if (rewardIds?.length > 0) {
+    if (rewardIds && rewardIds.length > 0) {
       data.reward_ids = rewardIds;
     }
 
@@ -5019,7 +5019,9 @@ Session.prototype = {
   },
 
   getRewards: function() {
-    return this.rewards.map(({ id }) => id);
+    return this.rewards.map(function(id) {
+      return id;
+    });
   },
 
   /**

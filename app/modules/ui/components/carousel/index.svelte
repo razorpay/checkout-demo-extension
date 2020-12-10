@@ -23,10 +23,6 @@
     }
   }
 
-  function plusSlides(n) {
-    showSlides((slideIndex += n));
-  }
-
   export function changeSlide(ind) {
     activeSlideIndex = ind;
     const track = document.getElementsByClassName('carousel-track')[0];
