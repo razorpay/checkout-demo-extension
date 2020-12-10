@@ -27,8 +27,7 @@ import {
   ownerWindow,
 } from 'common/constants';
 import { checkForPossibleWebPayments } from 'checkoutframe/components/upi';
-import { rewards } from 'checkoutstore/rewards';
-import rewardsRes from '../../mocks/rewards';
+import { rewards as rewardsStore } from 'checkoutstore/rewards';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -242,7 +241,7 @@ function fetchPrefs(session) {
 
 function fetchRewards(session) {
   // TODO: reaplce the below call with rewards endpoint
-  session.rewardsCall = Razorpay.payment.getRewards(null, rewards => {
+  session.rewardsCall = Razorpay.payment.getRewards(null, rewardsRes => {
     session.rewardsCall = null;
     if (rewards.error) {
       Razorpay.sendMessage({
@@ -253,7 +252,7 @@ function fetchRewards(session) {
       const RazorpayInstance = session.r;
       RazorpayInstance.rewards = rewardsRes;
       session.rewards = rewardsRes;
-      rewards.set(rewardsRes);
+      rewardsStore.set(rewardsRes);
     }
   });
 }
