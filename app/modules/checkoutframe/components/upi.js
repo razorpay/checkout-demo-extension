@@ -26,7 +26,7 @@ export function isGooglePayWebPaymentsAvailable() {
  * and sets the app in the list of UPI intent apps
  * if so.
  */
-export function checkForPossibleWebPayments() {
+export function checkForPossibleWebPaymentsForUpi() {
   appsThatSupportWebPayments
     .filter(app => app.method === 'upi')
     .forEach(app => {

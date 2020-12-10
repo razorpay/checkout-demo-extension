@@ -28,7 +28,7 @@ import {
   isIframe,
   ownerWindow,
 } from 'common/constants';
-import { checkForPossibleWebPayments } from 'checkoutframe/components/upi';
+import { checkForPossibleWebPaymentsForUpi } from 'checkoutframe/components/upi';
 import { rewards, rewardIds } from 'checkoutstore/rewards';
 
 let CheckoutBridge = window.CheckoutBridge;
@@ -264,7 +264,7 @@ function performPrePrefsFetchOperations() {
   /* Start listening for back presses */
   setHistoryAndListenForBackPresses();
 
-  checkForPossibleWebPayments();
+  checkForPossibleWebPaymentsForUpi();
 }
 
 function setSessionPreferences(session, preferences) {
