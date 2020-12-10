@@ -28,8 +28,14 @@ import {
   isIframe,
   ownerWindow,
 } from 'common/constants';
+
 import { checkForPossibleWebPaymentsForUpi } from 'checkoutframe/components/upi';
 import { rewards, rewardIds } from 'checkoutstore/rewards';
+
+import {
+  appsThatSupportWebPayments,
+  checkWebPaymentsForApp,
+} from 'common/webPaymentsApi';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -264,7 +270,18 @@ function performPrePrefsFetchOperations() {
   /* Start listening for back presses */
   setHistoryAndListenForBackPresses();
 
+  checkForPossibleWebPayments();
+}
+
+function checkForPossibleWebPayments() {
   checkForPossibleWebPaymentsForUpi();
+  checkForPossibleWebPaymentsForApps();
+}
+
+function checkForPossibleWebPaymentsForApps() {
+  appsThatSupportWebPayments
+    .filter(app => app.method === 'app')
+    .forEach(app => checkWebPaymentsForApp(app).catch(_Func.noop));
 }
 
 function setSessionPreferences(session, preferences) {
