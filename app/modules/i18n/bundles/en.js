@@ -1034,7 +1034,7 @@ export default {
     sub_text: 'Look for these rewards from amazing brands in your mail box!',
     close: 'Close',
     tooltip_text: 'Unlock free rewards after payment',
-  }  
+  },
   trusted_badge: {
     customer_label: "You're paying a",
     seller_label: 'Razorpay Verified Seller',
