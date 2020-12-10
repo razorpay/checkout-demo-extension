@@ -4366,7 +4366,9 @@ Session.prototype = {
     if (
       data.method === 'upi' &&
       data['_[flow]'] === 'intent' &&
-      WebPaymentsApi.appsThatSupportWebPayments.includes(data.upi_app) &&
+      WebPaymentsApi.appsThatSupportWebPayments.find(
+        app => app.package_name === data.upi_app
+      ) &&
       WebPaymentsApi.isWebPaymentsApiAvailable(data.upi_app)
     ) {
       request.gpay = true;

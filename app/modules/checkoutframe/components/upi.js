@@ -1,13 +1,13 @@
 import { setView, destroyView } from './';
 import { getSession } from 'sessionmanager';
-import * as Bridge from 'bridge';
-import { GOOGLE_PAY_PACKAGE_NAME, PHONE_PE_PACKAGE_NAME } from 'common/upi';
+import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi';
 import {
   isWebPaymentsApiAvailable,
   checkWebPaymentsForApp,
   appsThatSupportWebPayments,
 } from 'common/webPaymentsApi';
-import { setUpiApps } from 'checkoutstore/native';
+
+import { getUPIIntentApps, setUpiApps } from 'checkoutstore/native';
 
 import UpiTab from 'ui/tabs/upi/index.svelte';
 const UPI_KEY = 'upiTab';
@@ -27,9 +27,21 @@ export function isGooglePayWebPaymentsAvailable() {
  * if so.
  */
 export function checkForPossibleWebPayments() {
-  appsThatSupportWebPayments.forEach(app => {
-    checkWebPaymentsForApp(app);
-  });
+  appsThatSupportWebPayments
+    .filter(app => app.method === 'upi')
+    .forEach(app => {
+      checkWebPaymentsForApp(app)
+        .then(() => {
+          setUpiApps(
+            _Arr.mergeWith(getUPIIntentApps().all, [
+              {
+                package_name: app,
+              },
+            ])
+          );
+        })
+        .catch(_Func.noop);
+    });
 }
 
 export function render(props = {}) {

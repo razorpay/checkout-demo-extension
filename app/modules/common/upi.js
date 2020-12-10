@@ -5,6 +5,7 @@ import { VPA_REGEX } from 'common/constants';
 
 export const GOOGLE_PAY_PACKAGE_NAME = 'com.google.android.apps.nbu.paisa.user';
 export const PHONE_PE_PACKAGE_NAME = 'com.phonepe.app';
+export const CRED_PACKAGE_NAME = 'cred';
 
 export function isVpaValid(vpa) {
   return VPA_REGEX.test(vpa);
