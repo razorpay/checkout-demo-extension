@@ -955,8 +955,11 @@
   }
 
   :global(.tooltip.rewards-cta-tooltip) {
+    left: calc(50% - -42px);
+    top: 65px;
+  }
+  :global(.mobile .tooltip.rewards-cta-tooltip) {
     left: calc(50% - -50px);
-    top: 60px;
   }
 
   :global(.rewards-cta-tooltip.tooltip-shown) {
@@ -964,7 +967,7 @@
   }
 
   :global(.tooltip.tooltip-bottom.rewards-cta-tooltip::before) {
-    left: 86%;
+    left: 87%;
   }
 
   .solidbg {

@@ -242,24 +242,20 @@ function fetchPrefs(session) {
 
 function fetchRewards(session) {
   // TODO: reaplce the below call with rewards endpoint
-  // session.rewardsCall = Razorpay.payment.getRewards(
-  //   getPreferenecsParams(session.r),
-  //   rewards => {
-  //     session.rewardsCall = null;
-  //     if (rewards.error) {
-  //       Razorpay.sendMessage({
-  //         event: 'fault',
-  //         data: rewards.error,
-  //       });
-  //     } else {
-  //       rewards.set(rewardsRes);
-  //     }
-  //   }
-  // );
-  const RazorpayInstance = session.r;
-  RazorpayInstance.rewards = rewardsRes;
-  session.rewards = rewardsRes;
-  rewards.set(rewardsRes);
+  session.rewardsCall = Razorpay.payment.getRewards(null, rewards => {
+    session.rewardsCall = null;
+    if (rewards.error) {
+      Razorpay.sendMessage({
+        event: 'fault',
+        data: rewards.error,
+      });
+    } else {
+      const RazorpayInstance = session.r;
+      RazorpayInstance.rewards = rewardsRes;
+      session.rewards = rewardsRes;
+      rewards.set(rewardsRes);
+    }
+  });
 }
 
 function performPrePrefsFetchOperations() {

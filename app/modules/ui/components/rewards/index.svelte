@@ -17,7 +17,6 @@
   } from 'ui/labels/rewards';
 
   //props
-  export let visibleindex = 0;
   export let onClick;
 </script>
 
