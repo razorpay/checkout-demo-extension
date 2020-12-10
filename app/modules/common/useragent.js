@@ -31,8 +31,8 @@ export const Instagram = check(/Instagram/);
  *
  * Check for a HTTP User-Agent with the value FB_IAB/FB4A for Android and FBAN/FBIOS for iOS.
  */
-const Facebook_Android = check(/FB_IAB\/FB4A/);
-const Facebook_iOS = check(/FBAN\/FBIOS/);
+const Facebook_Android = check(/FB_IAB/);
+const Facebook_iOS = check(/FBAN/);
 const Facebook = Facebook_Android || Facebook_iOS;
 
 /**

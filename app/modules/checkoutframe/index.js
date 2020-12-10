@@ -139,6 +139,19 @@ const setAnalyticsMeta = message => {
   }
 };
 
+/**
+ * Sets tracking props from the message
+ * @param {Object} message
+ */
+const setTrackingProps = message => {
+  if (message.library) {
+    Track.props.library = message.library;
+  }
+  if (message.referer) {
+    Track.props.referer = message.referer;
+  }
+};
+
 export const handleMessage = function(message) {
   if ('id' in message && !validUID(message.id)) {
     return;
@@ -168,6 +181,7 @@ export const handleMessage = function(message) {
   var options = message.options;
 
   setAnalyticsMeta(message);
+  setTrackingProps(message);
 
   if (!session) {
     if (!options) {
