@@ -8,6 +8,7 @@ export const ADAPTER_CHECKERS = {
   'microapps.gpay': checkMicroapp,
   [GOOGLE_PAY_PACKAGE_NAME]: gpayPaymentRequestAdapter,
   [PHONE_PE_PACKAGE_NAME]: phonepePaymentRequestAdapter,
+  cred: credPaymentRequestAdapter,
 };
 
 export const phonepeSupportedMethods =
@@ -20,7 +21,7 @@ export const phonepeSupportedMethods =
  *
  * @return {Promise}
  */
-export function checkPaymentAdapter(adapter, data) {
+export function checkPaymentAdapter(adapter, data = {}) {
   const checker = ADAPTER_CHECKERS[adapter];
 
   if (checker) {
@@ -89,6 +90,49 @@ export function gpayPaymentRequestAdapter() {
           amount: { currency: 'INR', value: 0 },
         },
       })
+        .canMakePayment()
+        .then(isAvailable => {
+          if (isAvailable) {
+            resolve();
+          } else {
+            reject(CHECK_ERROR);
+          }
+        })
+        /* jshint ignore:start */
+        .catch(e => {
+          reject(CHECK_ERROR);
+        });
+      /* jshint ignore:end */
+    } catch (e) {
+      reject(CHECK_ERROR);
+    }
+  });
+}
+
+/**
+ * Returns a Promise that resolves if Google Pay is present.
+ * @return {Promise}
+ */
+export function credPaymentRequestAdapter() {
+  return new Promise((resolve, reject) => {
+    try {
+      /**
+       * PaymentRequest API is only available in the modern browsers which
+       * have Promise API.
+       */
+      new PaymentRequest(
+        [
+          {
+            supportedMethods: 'https://cred-web-stg.dreamplug.in/checkout/pay',
+          },
+        ],
+        {
+          total: {
+            label: '_',
+            amount: { currency: 'INR', value: 10 },
+          },
+        }
+      )
         .canMakePayment()
         .then(isAvailable => {
           if (isAvailable) {
