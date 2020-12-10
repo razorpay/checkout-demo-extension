@@ -15,6 +15,7 @@
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
   import Rewards from 'ui/components/rewards/index.svelte';
   import Tooltip from 'ui/elements/Tooltip.svelte';
+  import TrustedBadge from 'ui/components/TrustedBadge.svelte';
 
   // Svelte imports
   import { onMount, tick } from 'svelte';
@@ -40,7 +41,12 @@
   import { showBackdrop } from 'checkoutstore/backdrop';
 
   import { customer } from 'checkoutstore/customer';
-  import { getOption, isDCCEnabled } from 'checkoutstore';
+  import {
+    getOption,
+    isDCCEnabled,
+    getTrustedBadgeHighlights,
+  } from 'checkoutstore';
+
   import { getUPIIntentApps } from 'checkoutstore/native';
   import { isRewardsVisible, rewards } from 'checkoutstore/rewards';
 
@@ -146,6 +152,8 @@
   const prefilledBank = getOption('prefill.bank');
   const isPartialPayment = getIsPartialPayment();
   const contactEmailReadonly = isContactEmailReadOnly();
+
+  const trustedBadgeHighlights = getTrustedBadgeHighlights();
 
   setContact(getPrefilledContact());
   setEmail(getPrefilledEmail());
@@ -987,6 +995,9 @@
           class="solidbg"
           in:slide={getAnimationOptions({ duration: 400 })}
           out:fly={getAnimationOptions({ duration: 200, y: 80 })}>
+          {#if trustedBadgeHighlights}
+            <TrustedBadge list={trustedBadgeHighlights} />
+          {/if}
           {#if showUserDetailsStrip || isPartialPayment}
             <div
               use:touchfix

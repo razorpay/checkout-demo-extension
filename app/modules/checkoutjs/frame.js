@@ -238,8 +238,9 @@ CheckoutFrame.prototype = {
 
     var response = {
       integration: Track.props.integration,
-      referer: location.href,
+      referer: Track.props.referer || location.href,
       options: options,
+      library: Track.props.library,
       id: rzp.id,
     };
 
