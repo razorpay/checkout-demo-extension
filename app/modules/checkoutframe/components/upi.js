@@ -30,12 +30,12 @@ export function checkForPossibleWebPaymentsForUpi() {
   appsThatSupportWebPayments
     .filter(app => app.method === 'upi')
     .forEach(app => {
-      checkWebPaymentsForApp(app)
+      checkWebPaymentsForApp(app.package_name)
         .then(() => {
           setUpiApps(
             _Arr.mergeWith(getUPIIntentApps().all, [
               {
-                package_name: app,
+                package_name: app.package_name,
               },
             ])
           );
