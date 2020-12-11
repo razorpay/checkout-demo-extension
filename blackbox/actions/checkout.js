@@ -1,7 +1,7 @@
 const querystring = require('querystring');
 const { readFileSync } = require('fs');
 const { cdnUrl, lumberjackUrl, bundleUrl } = require('../const');
-const { interceptor } = require('../util');
+const { interceptor, delay } = require('../util');
 const { computed } = require('./options');
 const { callbackHtml } = require('./callback');
 const { sendPreferences } = require('./preferences');
@@ -351,6 +351,7 @@ module.exports = {
     }
     if (preferences) {
       await sendPreferences(returnObj);
+      await delay(200);
       await sendRewards(returnObj);
     }
     // page takes some time to render
