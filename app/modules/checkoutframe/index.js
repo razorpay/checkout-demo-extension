@@ -207,7 +207,6 @@ export const handleMessage = function(message) {
 
   if (message.event === 'open' || options) {
     fetchPrefs(session);
-    fetchRewards(session);
   }
 
   try {
@@ -249,6 +248,7 @@ function fetchPrefs(session) {
             session.modal.hide();
           });
         }
+        fetchRewards(session);
       }
     }
   );

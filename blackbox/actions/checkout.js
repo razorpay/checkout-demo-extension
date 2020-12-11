@@ -351,7 +351,6 @@ module.exports = {
     }
     if (preferences) {
       await sendPreferences(returnObj);
-      await delay(200);
       await sendRewards(returnObj);
     }
     // page takes some time to render
