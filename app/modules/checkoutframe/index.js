@@ -28,6 +28,7 @@ import {
 } from 'common/constants';
 import { checkForPossibleWebPayments } from 'checkoutframe/components/upi';
 import { rewards as rewardsStore } from 'checkoutstore/rewards';
+// import rewardsApi from '../../mocks/rewards'
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -254,21 +255,23 @@ function fetchPrefs(session) {
 }
 
 function fetchRewards(session) {
-  // TODO: reaplce the below call with rewards endpoint
-  session.rewardsCall = Razorpay.payment.getRewards(null, rewardsRes => {
-    session.rewardsCall = null;
-    if (rewardsRes.error) {
-      Razorpay.sendMessage({
-        event: 'fault',
-        data: rewardsRes.error,
-      });
-    } else {
-      const RazorpayInstance = session.r;
-      RazorpayInstance.rewards = rewardsRes;
-      session.rewards = rewardsRes;
-      rewardsStore.set(rewardsRes);
+  session.rewardsCall = Razorpay.payment.getRewards(
+    getPreferenecsParams(session.r),
+    rewardsRes => {
+      session.rewardsCall = null;
+      if (rewardsRes.error) {
+        // Razorpay.sendMessage({
+        //   event: 'fault',
+        //   data: rewardsRes.error,
+        // });
+      } else {
+        const RazorpayInstance = session.r;
+        RazorpayInstance.rewards = rewardsRes;
+        session.rewards = rewardsRes;
+        rewardsStore.set(rewardsRes);
+      }
     }
-  });
+  );
 }
 
 function performPrePrefsFetchOperations() {

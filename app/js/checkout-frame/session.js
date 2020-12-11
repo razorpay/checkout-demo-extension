@@ -5019,6 +5019,9 @@ Session.prototype = {
   },
 
   getRewards: function() {
+    if (!this.rewards) {
+      return;
+    }
     return this.rewards.map(function(id) {
       return id;
     });
