@@ -963,21 +963,21 @@
     position: relative;
   }
 
-  /* :global(.tooltip.rewards-cta-tooltip) {
+  :global(.tooltip.rewards-cta-tooltip) {
     left: calc(50% - -42px);
     top: 65px;
   }
   :global(.mobile .tooltip.rewards-cta-tooltip) {
     left: calc(50% - -50px);
-  } */
+  }
 
   :global(.rewards-cta-tooltip.tooltip-shown) {
     opacity: 1;
   }
 
-  /* :global(.tooltip.tooltip-bottom.rewards-cta-tooltip::before) {
+  :global(.tooltip.tooltip-bottom.rewards-cta-tooltip::before) {
     left: 87%;
-  } */
+  }
 
   .solidbg {
     background: white;
