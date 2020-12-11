@@ -256,7 +256,7 @@ function fetchPrefs(session) {
 
 function fetchRewards(session) {
   session.rewardsCall = Razorpay.payment.getRewards(
-    getPreferenecsParams(session.r),
+    { key_id: session.r.get('key') },
     rewardsRes => {
       session.rewardsCall = null;
       if (rewardsRes.error) {

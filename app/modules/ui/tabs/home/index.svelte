@@ -891,7 +891,6 @@
       }
     }
   }
-  console.log('test');
 </script>
 
 <style>

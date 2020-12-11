@@ -185,12 +185,8 @@ var razorpayPayment = (Razorpay.payment = {
       type: AnalyticsTypes.METRIC,
     });
 
-    if (_.isNonNullObject(data)) {
-      data['_[request_index]'] = Analytics.updateRequestIndex('rewards');
-    }
-
     return fetch({
-      url: _.appendParamsToUrl(makeUrl('rewards'), data),
+      url: _.appendParamsToUrl(makeUrl('checkout/rewards'), data),
 
       callback: function(response) {
         Analytics.track('rewards:end', {
