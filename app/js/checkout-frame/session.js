@@ -5023,7 +5023,7 @@ Session.prototype = {
       return;
     }
     return this.rewards.map(function(reward) {
-      return reward.id;
+      return reward.reward_id;
     });
   },
 
