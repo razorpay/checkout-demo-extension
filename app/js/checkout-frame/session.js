@@ -5022,8 +5022,8 @@ Session.prototype = {
     if (!this.rewards) {
       return;
     }
-    return this.rewards.map(function(id) {
-      return id;
+    return this.rewards.map(function(reward) {
+      return reward.id;
     });
   },
 
