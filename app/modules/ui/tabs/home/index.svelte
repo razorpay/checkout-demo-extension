@@ -471,6 +471,10 @@
   $: {
     if (view === 'methods') {
       $customer = session.getCustomer($contact);
+      showTooltip = true;
+      setTimeout(() => {
+        showTooltip = false;
+      }, 5000);
     }
   }
 
@@ -546,13 +550,10 @@
   }
 
   onMount(() => {
+    console.log('hello');
     updateBlocks({
       showPreferredLoader: shouldUsePersonalization(),
     });
-    showTooltip = true;
-    setTimeout(() => {
-      showTooltip = false;
-    }, 5000);
   });
 
   // Svelte executes the following block twice. Even if a fault was emitted, it will be emitted again in the second execution.

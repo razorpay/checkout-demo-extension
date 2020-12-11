@@ -276,9 +276,11 @@
   });
 </script>
 
-<div
-  class="tooltip {className}"
-  class:tooltip-shown={shown}
-  bind:this={tooltip}>
-  <slot />
-</div>
+{#if shown}
+  <div
+    class="tooltip {className}"
+    class:tooltip-shown={shown}
+    bind:this={tooltip}>
+    <slot />
+  </div>
+{/if}
