@@ -551,7 +551,7 @@
     });
     showTooltip = true;
     setTimeout(() => {
-      // showTooltip = false;
+      showTooltip = false;
     }, 5000);
   });
 
