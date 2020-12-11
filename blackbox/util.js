@@ -257,6 +257,7 @@ const util = (module.exports = {
       }
     }
 
+    // reset the current request
     function reset() {
       currentRequest = resolver = null;
     }
