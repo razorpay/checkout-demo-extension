@@ -21,6 +21,7 @@
   import Tab from 'ui/tabs/Tab.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
   import CTA from 'ui/elements/CTA.svelte';
+  import NeftPrintView from './NeftPrintView.svelte';
 
   // i18n
   import {
@@ -132,6 +133,19 @@
     }, 3000);
   }
 
+  export function handlePrint() {
+    const printWindow = window.open('', '', 'height=400,width=600');
+    const neftPrintView = new NeftPrintView({
+      data: {
+        documentTitle: document.title,
+      },
+      target: printWindow.document.body,
+    });
+
+    printWindow.document.close(); // necessary for IE >= 10
+    printWindow.focus(); // necessary for IE >= 10*/
+  }
+
   init();
 </script>
 
@@ -224,6 +238,7 @@
           </div>
         {/if}
       </div>
+      <div on:click={handlePrint} class="print">Print</div>
 
       <Bottom>
         <!-- LABEL: Do not round-off the amount. Transfer the exact amount for the payment to be successful. -->
