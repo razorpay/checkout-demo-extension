@@ -133,6 +133,7 @@
 
   import { update as updateContactStorage } from 'checkoutframe/contact-storage';
   import { isMobile } from 'common/useragent';
+  import Snackbar from 'ui/components/Snackbar.svelte';
   const cardOffer = getCardOffer();
   const session = getSession();
   const icons = session.themeMeta.icons;
@@ -471,10 +472,10 @@
   $: {
     if (view === 'methods') {
       $customer = session.getCustomer($contact);
-      showTooltip = true;
+      // showTooltip = true;
       setTimeout(() => {
-        showTooltip = false;
-      }, 5000);
+        showTooltip = true;
+      }, 1000);
     }
   }
 
@@ -961,23 +962,6 @@
 
   :global(#rewards-cta) {
     width: 56px;
-    position: relative;
-  }
-
-  :global(.tooltip.rewards-cta-tooltip) {
-    left: calc(50% - -42px);
-    top: 65px;
-  }
-  :global(.mobile .tooltip.rewards-cta-tooltip) {
-    left: calc(50% - -50px);
-  }
-
-  :global(.rewards-cta-tooltip.tooltip-shown) {
-    opacity: 1;
-  }
-
-  :global(.tooltip.tooltip-bottom.rewards-cta-tooltip::before) {
-    left: 87%;
   }
 
   .solidbg {
@@ -997,6 +981,13 @@
           class="solidbg"
           in:slide={getAnimationOptions({ duration: 400 })}
           out:fly={getAnimationOptions({ duration: 200, y: 80 })}>
+          <Snackbar
+            align={['bottom']}
+            parentElem="rewards-cta"
+            shown={showTooltip}
+            timer={5000}>
+            {$t(REWARDS_TOOLTIP_TEXT)}
+          </Snackbar>
           {#if trustedBadgeHighlights}
             <TrustedBadge list={trustedBadgeHighlights} />
           {/if}
@@ -1019,13 +1010,6 @@
                     </div>
                   </SlottedOption>
                   {#if $rewards?.length > 0}
-                    <Tooltip
-                      align={['bottom']}
-                      bindTo="#rewards-cta"
-                      className="rewards-cta-tooltip"
-                      shown={showTooltip}>
-                      {$t(REWARDS_TOOLTIP_TEXT)}
-                    </Tooltip>
                     <SlottedOption on:click={showRewards} id="rewards-cta">
                       <i slot="icon">
                         <Icon icon={icons.present} />
