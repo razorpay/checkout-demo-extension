@@ -139,6 +139,9 @@
       data: {
         documentTitle: document.title,
       },
+      props: {
+        neftDetails: data.receiver,
+      },
       target: printWindow.document.body,
     });
 
