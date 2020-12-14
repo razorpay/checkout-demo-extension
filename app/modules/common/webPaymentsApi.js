@@ -11,11 +11,12 @@ import { checkPaymentAdapter, phonepeSupportedMethods } from 'payment/adapters';
 export const appsThatSupportWebPayments = [
   { package_name: GOOGLE_PAY_PACKAGE_NAME, method: 'upi' },
   { package_name: PHONE_PE_PACKAGE_NAME, method: 'upi' },
-  { package_name: GOOGLE_PAY_PACKAGE_NAME, method: 'app' },
+  { package_name: CRED_PACKAGE_NAME, method: 'app' },
 ];
 
 export const supportedWebPaymentsMethodsForApp = {
   [PHONE_PE_PACKAGE_NAME]: phonepeSupportedMethods,
+  [CRED_PACKAGE_NAME]: 'https://cred-web-stg.dreamplug.in/checkout/pay',
 };
 
 const webPaymentsApps = {};
