@@ -521,7 +521,11 @@ var responseTypes = {
 
   respawn: function(request, fullResponse) {
     // If Cardless EMI, route the coproto
-    if (this.data && this.data.method === 'cardless_emi') {
+    if (
+      this.data &&
+      this.data.method === 'cardless_emi' &&
+      !(this.optional && this.optional.contact)
+    ) {
       return responseTypes.cardless_emi.call(this, request, fullResponse);
     }
 
