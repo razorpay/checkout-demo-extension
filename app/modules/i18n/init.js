@@ -46,7 +46,7 @@ export function getLocaleName(locale) {
  * @returns {string}
  */
 function makeBundleUrl(locale) {
-  return `https://betacdn.razorpay.com/static/i18n-bundles/checkout/${locale}.json`;
+  return `https://cdn.razorpay.com/static/i18n-bundles/checkout/${locale}.json`;
 }
 
 let fetchCount = 0;
