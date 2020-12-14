@@ -11,6 +11,8 @@ import bank_transfer from './bank_transfer';
 import contact from './contact';
 import upiOtm from './upi_otm';
 import aadhaar from './aadhaar';
+import trustedBadge from './trusted_badge';
+import tickFilled from './tick_filled';
 
 import { getAllMethods } from 'checkoutframe/paymentmethods';
 
@@ -18,6 +20,8 @@ const availPaymentMethods = getAllMethods().concat([
   'othermethods',
   'contact',
   'aadhaar',
+  'trusted_badge',
+  'tick_filled',
 ]);
 
 function getIconFn(iconName) {
@@ -64,6 +68,12 @@ function getIconFn(iconName) {
 
     case 'aadhaar':
       return aadhaar;
+
+    case 'trusted_badge':
+      return trustedBadge;
+
+    case 'tick_filled':
+      return tickFilled;
   }
 }
 
