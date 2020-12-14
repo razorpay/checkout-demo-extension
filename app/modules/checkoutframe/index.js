@@ -281,7 +281,7 @@ function checkForPossibleWebPayments() {
 function checkForPossibleWebPaymentsForApps() {
   appsThatSupportWebPayments
     .filter(app => app.method === 'app')
-    .forEach(app => checkWebPaymentsForApp(app).catch(_Func.noop));
+    .forEach(app => checkWebPaymentsForApp(app.package_name).catch(_Func.noop));
 }
 
 function setSessionPreferences(session, preferences) {
