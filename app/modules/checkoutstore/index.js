@@ -34,6 +34,10 @@ export const getMethodsCustomText = () => getMerchantMethods().custom_text;
 export const getMerchantOrder = () => preferences.order;
 export const getOrderMethod = () => getMerchantOrder()?.method;
 export const getMerchantOffers = () => {
+  // Ignore all offers ( including forced offers ) in case of partial payments.
+  if (isPartialPayment()) {
+    return [];
+  }
   // Temporary fix: If customer-feebearer do not show any offers to the user.
   if (preferences.fee_bearer && preferences.force_offer) {
     return preferences.offers;
