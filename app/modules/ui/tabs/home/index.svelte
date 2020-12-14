@@ -64,7 +64,6 @@
     RECURRING_CREDIT_ONLY_CALLOUT,
     RECURRING_DEBIT_ONLY_CALLOUT,
   } from 'ui/labels/home';
-  import { REWARDS_TOOLTIP_TEXT } from 'ui/labels/rewards';
 
   import { t, locale } from 'svelte-i18n';
 
@@ -131,7 +130,6 @@
 
   import { update as updateContactStorage } from 'checkoutframe/contact-storage';
   import { isMobile } from 'common/useragent';
-  import Snackbar from 'ui/components/Snackbar.svelte';
   const cardOffer = getCardOffer();
   const session = getSession();
   const icons = session.themeMeta.icons;
@@ -161,7 +159,6 @@
   // Values: 'details', 'methods'
   let view = 'details';
   let showSecuredByMessage;
-  export let showTooltip = false;
   $: showSecuredByMessage =
     view === 'details' &&
     !showOffers &&
@@ -455,10 +452,6 @@
   $: {
     if (view === 'methods') {
       $customer = session.getCustomer($contact);
-      // showTooltip = true;
-      setTimeout(() => {
-        showTooltip = true;
-      }, 1000);
     }
   }
 
@@ -534,7 +527,6 @@
   }
 
   onMount(() => {
-    console.log('hello');
     updateBlocks({
       showPreferredLoader: shouldUsePersonalization(),
     });
@@ -960,13 +952,6 @@
           class="solidbg"
           in:slide={getAnimationOptions({ duration: 400 })}
           out:fly={getAnimationOptions({ duration: 200, y: 80 })}>
-          <Snackbar
-            align={['bottom']}
-            parentElem="rewards-cta"
-            shown={showTooltip}
-            timer={5000}>
-            {$t(REWARDS_TOOLTIP_TEXT)}
-          </Snackbar>
           {#if trustedBadgeHighlights}
             <TrustedBadge list={trustedBadgeHighlights} />
           {/if}

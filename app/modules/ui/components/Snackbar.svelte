@@ -1,11 +1,11 @@
 <script>
   import { onMount } from 'svelte';
-
   export let align;
   export let parentElem;
-  let snackbar;
+  export let snackbar;
   export let shown;
   export let timer;
+  export let text;
 
   function setAlignmentClass() {
     snackbar.classList.add(`snackbar-${align}`);
@@ -64,7 +64,5 @@
 </style>
 
 {#if shown}
-  <div class="snackbar" bind:this={snackbar}>
-    <slot />
-  </div>
+  <div class="snackbar" bind:this={snackbar}>{text}</div>
 {/if}

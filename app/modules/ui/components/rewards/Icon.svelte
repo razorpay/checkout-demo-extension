@@ -1,9 +1,13 @@
 <script>
   import { onMount } from 'svelte';
+  import { t } from 'svelte-i18n';
 
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import Rewards from './index.svelte';
+  import Snackbar from 'ui/components/Snackbar.svelte';
+
+  import { REWARDS_TOOLTIP_TEXT } from 'ui/labels/rewards';
 
   import { showBackdrop } from 'checkoutstore/backdrop';
 
@@ -19,6 +23,18 @@
     Analytics.track('rewards:icon:show', {
       type: AnalyticsTypes.RENDER,
     });
+    setTimeout(() => {
+      new Snackbar({
+        target: document.getElementsByClassName('screen-comp')[0],
+        props: {
+          align: 'bottom',
+          parentElem: 'rewards-cta',
+          shown: true,
+          timer: 5000,
+          text: $t(REWARDS_TOOLTIP_TEXT),
+        },
+      });
+    }, 1000);
   });
 
   function showRewards() {
