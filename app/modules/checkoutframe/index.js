@@ -258,6 +258,7 @@ function fetchRewards(session) {
   session.rewardsCall = Razorpay.payment.getRewards(
     { key_id: session.r.get('key') },
     rewardsRes => {
+      // rewardsRes = rewardsApi
       session.rewardsCall = null;
       if (rewardsRes.error) {
         // Razorpay.sendMessage({
@@ -269,6 +270,10 @@ function fetchRewards(session) {
         RazorpayInstance.rewards = rewardsRes;
         session.rewards = rewardsRes;
         rewardsStore.set(rewardsRes);
+        const reward_ids = rewardsRes.map(item => item.reward_id);
+        if (reward_ids && reward_ids.length > 0) {
+          Analytics.setMeta('reward_ids', reward_ids);
+        }
       }
     }
   );

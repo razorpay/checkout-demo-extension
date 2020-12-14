@@ -13,9 +13,8 @@
   import Callout from 'ui/elements/Callout.svelte';
   import CardOffer from 'ui/elements/CardOffer.svelte';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
-  import Rewards from 'ui/components/rewards/index.svelte';
-  import Tooltip from 'ui/elements/Tooltip.svelte';
   import TrustedBadge from 'ui/components/TrustedBadge.svelte';
+  import RewardsIcon from 'ui/components/rewards/Icon.svelte';
 
   // Svelte imports
   import { onMount, tick } from 'svelte';
@@ -38,7 +37,6 @@
     setContact,
     setEmail,
   } from 'checkoutstore/screens/home';
-  import { showBackdrop } from 'checkoutstore/backdrop';
 
   import { customer } from 'checkoutstore/customer';
   import {
@@ -48,7 +46,7 @@
   } from 'checkoutstore';
 
   import { getUPIIntentApps } from 'checkoutstore/native';
-  import { isRewardsVisible, rewards } from 'checkoutstore/rewards';
+  import { rewards } from 'checkoutstore/rewards';
 
   // i18n
   import {
@@ -236,21 +234,6 @@
     });
 
     hideMethods();
-  }
-
-  function showRewards() {
-    // TODO
-    session.svelteOverlay.$$set({
-      component: Rewards,
-      props: {
-        onClick: function(e) {
-          session.hideErrorMessage(e);
-        },
-      },
-    });
-    session.showSvelteOverlay();
-    showBackdrop();
-    isRewardsVisible.update(flag => !flag);
   }
 
   export function setDetailsCta() {
@@ -960,10 +943,6 @@
     min-width: 0;
   }
 
-  :global(#rewards-cta) {
-    width: 56px;
-  }
-
   .solidbg {
     background: white;
     order: -1;
@@ -1010,11 +989,7 @@
                     </div>
                   </SlottedOption>
                   {#if $rewards?.length > 0}
-                    <SlottedOption on:click={showRewards} id="rewards-cta">
-                      <i slot="icon">
-                        <Icon icon={icons.present} />
-                      </i>
-                    </SlottedOption>
+                    <RewardsIcon />
                   {/if}
                 </div>
               {/if}

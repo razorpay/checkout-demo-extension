@@ -5,8 +5,21 @@
   import { t } from 'svelte-i18n';
   import { REWARDS_HEADER, REWARDS_SUB_TEXT } from 'ui/labels/rewards';
 
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
+
   // // props
   export let logo;
+  export let reward_id;
+
+  function handleCardClick() {
+    Analytics.track('rewards:icon:show', {
+      type: AnalyticsTypes.RENDER,
+      data: {
+        reward_id,
+      },
+    });
+  }
 </script>
 
 <style>
@@ -30,6 +43,6 @@
   }
 </style>
 
-<div class="carousel-slide reward-card">
+<div class="carousel-slide reward-card" on:click={handleCardClick}>
   <img src={logo} alt="Reward Logo" />
 </div>
