@@ -1,6 +1,12 @@
 import { getBankFromCardCache } from 'common/bank';
 import { getCardFeatures } from 'common/card';
-import { getOrderId, getAmount, makeAuthUrl } from 'checkoutstore';
+import {
+  getOrderId,
+  getAmount,
+  makeAuthUrl,
+  isASubscription,
+  getSubscription,
+} from 'checkoutstore';
 import { writable, derived, get } from 'svelte/store';
 import { cardIin, cardTab } from 'checkoutstore/screens/card';
 import Analytics from 'analytics';
@@ -55,13 +61,21 @@ export const isCardValidForOffer = derived(
 
     let url = makeAuthUrl('validate/checkout/offers');
 
+    let orderId = getOrderId();
+
+    if (isASubscription()) {
+      const subscription = getSubscription();
+
+      orderId = subscription.order_id;
+    }
+
     currentRequest = fetch.post({
       url,
       data: {
         amount: getAmount(),
         method: 'card',
         'card[number]': $cardIin,
-        order_id: getOrderId(),
+        order_id: orderId,
         offers: [$appliedOffer.id],
       },
       callback: data => {

@@ -147,6 +147,9 @@ const setTrackingProps = message => {
   if (message.library) {
     Track.props.library = message.library;
   }
+  if (message.referer) {
+    Track.props.referer = message.referer;
+  }
 };
 
 export const handleMessage = function(message) {

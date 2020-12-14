@@ -414,7 +414,7 @@
       },
     });
 
-    session.showEmiPlans('saved')(event.detail);
+    session.showEmiPlansForSavedCard(event.detail);
   }
 
   function onAddCardViewFocused() {
@@ -526,10 +526,10 @@
     };
 
     if (emiCtaView === 'available' && isMethodUsable('emi')) {
-      session.showEmiPlans('new')(e);
+      session.showEmiPlansForNewCard(e);
       eventName += 'view';
     } else if (emiCtaView === 'plans-available' && isMethodUsable('emi')) {
-      session.showEmiPlans('new')(e);
+      session.showEmiPlansForNewCard(e);
       eventName += 'edit';
     } else if (emiCtaView === 'pay-without-emi' && isMethodUsable('card')) {
       if (isMethodEnabled('card')) {

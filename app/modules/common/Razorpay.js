@@ -433,6 +433,9 @@ Razorpay.configure = function(overrides, extra = {}) {
   if (extra.library) {
     Track.props.library = extra.library;
   }
+  if (extra.referer) {
+    Track.props.referer = extra.referer;
+  }
 };
 
 Razorpay.defaults = RazorpayDefaults;
