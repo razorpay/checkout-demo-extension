@@ -569,9 +569,6 @@ Payment.prototype = {
     }
 
     // else make ajax request
-
-    var razorpayInstance = this.r;
-
     data['_[request_index]'] = Analytics.updateRequestIndex('submit');
 
     this.ajax = fetch.post({
