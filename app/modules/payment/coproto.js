@@ -1,17 +1,22 @@
 import * as GPay from 'gpay';
+
 import {
-  parseUPIIntentResponse,
   didUPIIntentSucceed,
-  upiBackCancel,
   getAppFromPackageName,
   GOOGLE_PAY_PACKAGE_NAME,
+  parseUPIIntentResponse,
+  upiBackCancel,
 } from 'common/upi';
+
 import { androidBrowser } from 'common/useragent';
 import Track from 'tracker';
 import Analytics from 'analytics';
 import * as Bridge from 'bridge';
-import { ADAPTER_CHECKERS, phonepeSupportedMethods } from 'payment/adapters';
-import { supportedWebPaymentsMethodsForApp } from 'common/webPaymentsApi';
+
+import {
+  isWebPaymentsApiAvailable,
+  supportedWebPaymentsMethodsForApp,
+} from 'common/webPaymentsApi';
 
 const getParsedDataFromUrl = url => {
   const parsedData = {};
@@ -238,12 +243,12 @@ var responseTypes = {
   },
 
   web_payments: function(response, app) {
-    var instrumentData = {};
+    const data = response.data;
+    const instrumentData = {
+      url: data.intent_url,
+    };
 
-    var data = response.data;
-    var intent_url = data.intent_url;
-    instrumentData.url = intent_url;
-    var parsedData = getParsedDataFromUrl(data.intent_url);
+    const parsedData = getParsedDataFromUrl(data.intent_url);
 
     const supportedInstruments = [
       {
@@ -252,12 +257,14 @@ var responseTypes = {
       },
     ];
 
+    const amountFromPaymentData = this.data.amount / 100;
+
     const details = {
       total: {
         label: 'Payment',
         amount: {
           currency: 'INR',
-          value: parseFloat(parsedData.am).toFixed(2),
+          value: parseFloat(parsedData.am || amountFromPaymentData).toFixed(2),
         },
       },
     };
@@ -362,6 +369,7 @@ var responseTypes = {
         });
     }
   },
+
   intent: function(request, fullResponse) {
     const CheckoutBridge = global.CheckoutBridge;
 
@@ -385,7 +393,13 @@ var responseTypes = {
     if (this.data.method === 'app') {
       this.emit('app.coproto_response', fullResponse);
 
-      if (Bridge.checkout.platform === 'ios') {
+      if (isWebPaymentsApiAvailable(this.data.provider)) {
+        responseTypes['web_payments'].call(
+          this,
+          fullResponse,
+          this.data.provider
+        );
+      } else if (Bridge.checkout.platform === 'ios') {
         Bridge.checkout.callIos('callNativeIntent', {
           intent_url,
           shortcode: this.data.provider,
