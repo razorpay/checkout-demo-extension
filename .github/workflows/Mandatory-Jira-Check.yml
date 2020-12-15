@@ -14,12 +14,13 @@ jobs:
       - name: Checkout GitHub Action Repo
         uses: actions/checkout@v2
         with:
-          repository: razorpay/check-commit-jira
+          repository: Razorpay/check-commit-jira
           path: .github/actions/check-commit-jira
-          ref: combined_check
+          ref: ignore_status
           token: ${{ secrets.GIT_TOKEN }}
+
       - name: Login
-        uses: ./.github/actions/check-commit-jira/jira-login
+        uses: atlassian/gajira-login@master
         env:
           JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
           JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
@@ -28,7 +29,7 @@ jobs:
       #  Find Issue on JIRA
       - name: Get Issue Key
         id: find
-        uses: ./.github/actions/check-commit-jira/jira-issue-check
+        uses: ./.github/actions/check-commit-jira
         with:
           from: pull_request
       #  Print JIRA ID found on jira
