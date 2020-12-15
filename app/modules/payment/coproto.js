@@ -274,7 +274,11 @@ var responseTypes = {
         if (
           [error.ABORT_ERR, error.NOT_SUPPORTED_ERR].indexOf(error.code) >= 0
         ) {
-          this.emit('upi.intent_response', {});
+          if (this.data && this.data.method === 'upi') {
+            this.emit('upi.intent_response', {});
+          } else if (this.data && this.data.method === 'app') {
+            this.emit('app.intent_response', {});
+          }
         }
 
         // Since the method is not supported, remove it.
@@ -300,9 +304,15 @@ var responseTypes = {
             instrument,
           });
 
-          this.emit('upi.intent_response', {
-            response: instrument.details,
-          });
+          if (this.data && this.data.method === 'upi') {
+            this.emit('upi.intent_response', {
+              response: instrument.details,
+            });
+          } else if (this.data && this.data.method === 'app') {
+            this.emit('app.intent_response', {
+              response: instrument.details,
+            });
+          }
 
           return instrument.complete();
         })
