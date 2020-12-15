@@ -158,9 +158,11 @@ module.exports = function(testFeatures) {
       }
       if (provider === 'zestmoney') {
         await handleCardlessEMIValidation(context);
-        await typeOTPandSubmit(context);
-        await handleOtpVerificationForCardlessEMI(context);
-        await selectCardlessEMIPlan(context, 1);
+        if (!optionalContact) {
+          await typeOTPandSubmit(context);
+          await handleOtpVerificationForCardlessEMI(context);
+          await selectCardlessEMIPlan(context, 1);
+        }
         await submit(context);
       } else if (provider === 'bajaj') {
         await selectCardlessEMIPlan(context, 1);
@@ -178,11 +180,13 @@ module.exports = function(testFeatures) {
           coproto: 'otp',
           expectCallbackUrl: callbackUrl,
         });
-        await typeOTPandSubmit(context);
-        await verifyOTP(context, 'fail');
-        await resendOTP(context);
-        await typeOTPandSubmit(context);
-        await verifyOTP(context, 'pass');
+        if (!optionalContact) {
+          await typeOTPandSubmit(context);
+          await verifyOTP(context, 'fail');
+          await resendOTP(context);
+          await typeOTPandSubmit(context);
+          await verifyOTP(context, 'pass');
+        }
       }
 
       if (feeBearer) {
