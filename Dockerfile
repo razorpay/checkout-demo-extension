@@ -12,7 +12,7 @@ WORKDIR /checkout_build
 
 RUN cd /checkout_build \
     && npm install \
-    && NODE_ENV=production npm test \
+    && NODE_ENV=production npm run build \
     && DIST_DIR=/checkout_build/app/dist/v1 /scripts/compress
 
 FROM c.rzp.io/razorpay/onggi:aws-cli-v2818
@@ -46,6 +46,9 @@ RUN mv checkout.js.gz checkout.js
 RUN mv checkout-frame.js.gz checkout-frame.js
 RUN mv razorpay.js.gz razorpay.js
 RUN mv css/checkout.css.gz css/checkout.css
+
+RUN echo $AWS_CDN_BUCKET
+RUN echo $S3_KEY_ID
 
 # Upload to S3
 RUN aws s3 sync /app/dist/v1 s3://$AWS_CDN_BUCKET/_checkout/$BRANCH/v1 \
