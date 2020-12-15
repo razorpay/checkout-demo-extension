@@ -28,7 +28,7 @@ jobs:
         id: docker_build
         with:
           image: razorpay/checkout
-          registry: docker.io
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          registry: c.rzp.io
+          username: ${{ secrets.HARBOR_DOCKER_USERNAME }}
+          password: ${{ secrets.HARBOR_DOCKER_PASSWORD }}
           buildArgs: AWS_CDN_BUCKET=betacdn, AWS_REGION=ap-south-1, S3_KEY_ID=${{ secrets.AWS_ACCESS_KEY }}, S3_KEY_SECRET=${{ secrets.AWS_ACCESS_SECRET }}, BRANCH=${{ steps.vars.outputs.branch }}, BUILD_NUMBER=${{ github.run_id }}, GIT_COMMIT_HASH=${SHORT_SHA}
