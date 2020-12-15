@@ -31,6 +31,6 @@ jobs:
           password: ${{ secrets.HARBOR_DOCKER_PASSWORD }}
           repository: ${{ github.repository }}
           dockerfile: ./Dockerfile
-          build_args: AWS_CDN_BUCKET=betacdn, AWS_REGION=ap-south-1, S3_KEY_ID=${{ secrets.AWS_ACCESS_KEY }}, S3_KEY_SECRET=${{ secrets.AWS_ACCESS_SECRET }}, BRANCH=${{ steps.vars.outputs.branch }}, BUILD_NUMBER=${{ github.run_id }}, GIT_COMMIT_HASH=${SHORT_SHA}
+          build_args: AWS_CDN_BUCKET=betacdn,AWS_REGION=ap-south-1,S3_KEY_ID=${{ secrets.AWS_ACCESS_KEY }},S3_KEY_SECRET=${{ secrets.AWS_ACCESS_SECRET }},BRANCH=${{ steps.vars.outputs.branch }},BUILD_NUMBER=${{ github.run_id }},GIT_COMMIT_HASH=${SHORT_SHA}
           push: true
           tags: ${{ steps.vars.outputs.branch }}-${{ github.sha }}
