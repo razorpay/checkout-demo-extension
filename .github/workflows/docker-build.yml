@@ -23,12 +23,14 @@ jobs:
       - name: checkout
         id: checkout
         uses: actions/checkout@v2
-      - uses: mr-smithers-excellent/docker-build-push@v5
-        name: Build & push Docker image
-        id: docker_build
+      - name: Build and push
+        uses: docker/build-push-action@v1
         with:
-          image: razorpay/checkout
           registry: c.rzp.io
           username: ${{ secrets.HARBOR_DOCKER_USERNAME }}
           password: ${{ secrets.HARBOR_DOCKER_PASSWORD }}
-          buildArgs: AWS_CDN_BUCKET=betacdn, AWS_REGION=ap-south-1, S3_KEY_ID=${{ secrets.AWS_ACCESS_KEY }}, S3_KEY_SECRET=${{ secrets.AWS_ACCESS_SECRET }}, BRANCH=${{ steps.vars.outputs.branch }}, BUILD_NUMBER=${{ github.run_id }}, GIT_COMMIT_HASH=${SHORT_SHA}
+          repository: ${{ github.repository }}
+          dockerfile: ./Dockerfile
+          build_args: AWS_CDN_BUCKET=betacdn, AWS_REGION=ap-south-1, S3_KEY_ID=${{ secrets.AWS_ACCESS_KEY }}, S3_KEY_SECRET=${{ secrets.AWS_ACCESS_SECRET }}, BRANCH=${{ steps.vars.outputs.branch }}, BUILD_NUMBER=${{ github.run_id }}, GIT_COMMIT_HASH=${SHORT_SHA}
+          push: true
+          tags: ${{ steps.vars.outputs.branch }}-${{ github.sha }}
