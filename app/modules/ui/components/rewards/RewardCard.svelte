@@ -41,8 +41,12 @@
   .full-width {
     width: 100%;
   }
+  .reward-logo {
+    max-width: 50px;
+  }
   :global(.mobile) .reward-logo {
     width: 100px;
+    max-width: 100px;
   }
   :global(.mobile) .reward-text {
     font-size: 16px;
