@@ -28,7 +28,6 @@ import {
 } from 'common/constants';
 import { checkForPossibleWebPayments } from 'checkoutframe/components/upi';
 import { rewards as rewardsStore } from 'checkoutstore/rewards';
-// import rewardsApi from '../../mocks/rewards'
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -258,14 +257,8 @@ function fetchRewards(session) {
   session.rewardsCall = Razorpay.payment.getRewards(
     { key_id: session.r.get('key') },
     rewardsRes => {
-      // rewardsRes = rewardsApi
       session.rewardsCall = null;
-      if (rewardsRes.error) {
-        // Razorpay.sendMessage({
-        //   event: 'fault',
-        //   data: rewardsRes.error,
-        // });
-      } else {
+      if (!rewardsRes.error) {
         const RazorpayInstance = session.r;
         RazorpayInstance.rewards = rewardsRes;
         session.rewards = rewardsRes;

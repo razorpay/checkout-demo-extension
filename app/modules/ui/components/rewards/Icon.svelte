@@ -1,5 +1,8 @@
 <script>
+  // Svelte imports
   import { onMount } from 'svelte';
+
+  //i18n
   import { t } from 'svelte-i18n';
 
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
@@ -9,10 +12,11 @@
 
   import { REWARDS_TOOLTIP_TEXT } from 'ui/labels/rewards';
 
+  //store
   import { showBackdrop } from 'checkoutstore/backdrop';
 
+  // Utils
   import { getSession } from 'sessionmanager';
-
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
 

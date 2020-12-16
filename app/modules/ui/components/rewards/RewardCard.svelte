@@ -1,14 +1,9 @@
 <script>
-  import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
-
-  // i18n
-  import { t } from 'svelte-i18n';
-  import { REWARDS_HEADER, REWARDS_SUB_TEXT } from 'ui/labels/rewards';
-
+  //Utils
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
 
-  // // props
+  // props
   export let logo;
   export let reward_id;
 

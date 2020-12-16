@@ -1,5 +1,3 @@
-import { writable, get } from 'svelte/store';
-
-export const isRewardsVisible = writable(false);
+import { writable } from 'svelte/store';
 
 export const rewards = writable([]);

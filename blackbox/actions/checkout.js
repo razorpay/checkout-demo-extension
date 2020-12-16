@@ -1,7 +1,7 @@
 const querystring = require('querystring');
 const { readFileSync } = require('fs');
 const { cdnUrl, lumberjackUrl, bundleUrl } = require('../const');
-const { interceptor, delay } = require('../util');
+const { interceptor } = require('../util');
 const { computed } = require('./options');
 const { callbackHtml } = require('./callback');
 const { sendPreferences } = require('./preferences');

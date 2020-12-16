@@ -1,5 +1,7 @@
 <script>
+  // Svelte imports
   import { onMount } from 'svelte';
+
   export let align;
   export let parentElem;
   export let snackbar;

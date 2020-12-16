@@ -1,5 +1,5 @@
 <script>
-  import { fade } from 'svelte/transition';
+  // Svelte imports
   import { onMount } from 'svelte';
 
   export let activeSlideIndex = 0;
@@ -16,11 +16,6 @@
   function initSlides() {
     const slides = document.getElementsByClassName('carousel-slide');
     totalSlides = slides.length;
-    let offset = 0;
-    for (let i = 0; i < totalSlides; i++) {
-      // slides[i].style.left = offset + 'px';
-      // offset += slides[i].clientWidth + 20;
-    }
   }
 
   export function changeSlide(ind) {

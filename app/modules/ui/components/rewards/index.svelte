@@ -1,12 +1,14 @@
 <script>
+  // UI imports
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import RewardCard from './RewardCard.svelte';
-  import { isMobile } from 'common/useragent';
   import Carousel from 'ui/components/carousel/index.svelte';
-  // import Paginator from 'ui/components/carousel/Paginator.svelte';
 
   //store
   import { rewards } from 'checkoutstore/rewards';
+
+  //utils
+  import { isMobile } from 'common/useragent';
 
   // i18n
   import { t } from 'svelte-i18n';
