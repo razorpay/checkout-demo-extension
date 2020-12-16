@@ -62,10 +62,13 @@
   :global(#rewards-cta) {
     width: 56px;
   }
+  i.rewards-icon {
+    width: 27px;
+  }
 </style>
 
 <SlottedOption on:click={showRewards} id="rewards-cta">
-  <i slot="icon">
+  <i class="rewards-icon" slot="icon">
     <Icon icon={icons.present} />
   </i>
 </SlottedOption>
