@@ -16,7 +16,7 @@ export const appsThatSupportWebPayments = [
 
 export const supportedWebPaymentsMethodsForApp = {
   [PHONE_PE_PACKAGE_NAME]: phonepeSupportedMethods,
-  [CRED_PACKAGE_NAME]: 'https://cred-web-stg.dreamplug.in/checkout/pay',
+  [CRED_PACKAGE_NAME]: ['https://cred.club/checkout/pay'],
 };
 
 const webPaymentsApps = {};
