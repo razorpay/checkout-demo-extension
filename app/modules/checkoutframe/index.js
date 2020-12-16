@@ -1,5 +1,9 @@
 import * as Bridge from 'bridge';
-import Razorpay, { makePrefParams, validateOverrides } from 'common/Razorpay';
+import Razorpay, {
+  makePrefParams,
+  validateOverrides,
+  makeRewardsParams,
+} from 'common/Razorpay';
 import Analytics from 'analytics';
 import * as SessionManager from 'sessionmanager';
 import Track from 'tracker';
@@ -27,7 +31,7 @@ import {
   ownerWindow,
 } from 'common/constants';
 import { checkForPossibleWebPayments } from 'checkoutframe/components/upi';
-import { rewards as rewardsStore } from 'checkoutstore/rewards';
+import { rewards, rewardIds } from 'checkoutstore/rewards';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -255,15 +259,13 @@ function fetchPrefs(session) {
 
 function fetchRewards(session) {
   session.rewardsCall = Razorpay.payment.getRewards(
-    { key_id: session.r.get('key') },
+    getRewardsParams(session.r),
     rewardsRes => {
       session.rewardsCall = null;
       if (!rewardsRes.error) {
-        const RazorpayInstance = session.r;
-        RazorpayInstance.rewards = rewardsRes;
-        session.rewards = rewardsRes;
-        rewardsStore.set(rewardsRes);
         const reward_ids = rewardsRes.map(item => item.reward_id);
+        rewards.set(rewardsRes);
+        rewardIds.set(reward_ids);
         if (reward_ids && reward_ids.length > 0) {
           Analytics.setMeta('reward_ids', reward_ids);
         }
@@ -335,6 +337,11 @@ function getPreferenecsParams(razorpayInstance) {
     document.cookie = 'checkcookie=1;path=/';
   }
   return prefData;
+}
+
+function getRewardsParams(razorpayInstance) {
+  const rewardsData = makeRewardsParams(razorpayInstance);
+  return rewardsData;
 }
 
 function updateOptions(preferences) {

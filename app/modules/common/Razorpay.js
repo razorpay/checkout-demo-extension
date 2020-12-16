@@ -266,6 +266,29 @@ function isValidAmount(amt, min = 100) {
   return amt >= min;
 }
 
+export function makeRewardsParams(rzp) {
+  if (rzp) {
+    var getter = rzp.get;
+    var params = {};
+
+    /**
+     * Set Key
+     */
+    var key_id = getter('key');
+    if (key_id) {
+      params.key_id = key_id;
+    }
+    // To differentiate that preferences is being hit from Checkout
+    // eslint-disable-next-line no-undef
+    params['_[build]'] = __BUILD_NUMBER__ || 0;
+    params['_[checkout_id]'] = rzp.id;
+    params['_[library]'] = Track.props.library;
+    params['_[platform]'] = Track.props.platform;
+
+    return params;
+  }
+}
+
 export function makePrefParams(rzp) {
   if (rzp) {
     var getter = rzp.get;
