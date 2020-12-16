@@ -34,7 +34,7 @@
   .rewards-subtext {
     font-size: 14px;
     color: rgba(81, 89, 120, 0.7);
-    margin-top: 10px;
+    margin-top: 16px;
     margin-bottom: 24px;
   }
   .rewards-list {

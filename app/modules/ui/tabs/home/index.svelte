@@ -973,7 +973,7 @@
                       {#if $email && !isEmailHidden()}<span>{$email}</span>{/if}
                     </div>
                   </SlottedOption>
-                  {#if $rewards?.length > 0 && !isEmailOptional}
+                  {#if $rewards?.length > 0 && !isEmailOptional()}
                     <RewardsIcon />
                   {/if}
                 </div>
