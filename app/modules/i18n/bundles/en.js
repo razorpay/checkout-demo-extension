@@ -200,6 +200,8 @@ export default {
     use_saved_cards_btn: 'Use saved cards',
     use_saved_cards_on_rzp_btn: 'Use saved cards on Razorpay',
     view_all_emi_plans: 'View all EMI Plans',
+    international_currency_charges:
+      'Relevant currency conversion charges might be applicable, as Amex will process the transaction in INR. To avoid currency conversion charges please use MasterCard or Visa.',
   },
   cardless_emi: {
     providers: {
