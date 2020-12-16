@@ -38,7 +38,7 @@ export function isWebPaymentsApiAvailable(app) {
 export const checkWebPaymentsForApp = app => {
   /* disable Web payments API for SDK as we have native intent there */
   if (Bridge.checkout.exists()) {
-    return;
+    return Promise.resolve(false);
   }
 
   return checkPaymentAdapter(app).then(() => {
