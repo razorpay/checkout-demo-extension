@@ -47,8 +47,8 @@ var preferences,
   NativeStore = discreet.NativeStore,
   Confirm = discreet.Confirm,
   Backdrop = discreet.Backdrop,
-  FeeLabel = discreet.FeeLabel;
-rewardsStore = discreet.rewardsStore;
+  FeeLabel = discreet.FeeLabel,
+  rewardsStore = discreet.rewardsStore;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
