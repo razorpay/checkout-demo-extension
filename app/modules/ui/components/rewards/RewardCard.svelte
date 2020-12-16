@@ -42,16 +42,30 @@
     width: 100%;
   }
   :global(.mobile) .reward-logo {
-    width: 75px;
+    width: 100px;
   }
   :global(.mobile) .reward-text {
     font-size: 16px;
   }
+  .reward-text {
+    font-size: 12px;
+  }
+  .flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .logo-container {
+    height: 80%;
+  }
+  .reward-text {
+    height: 20%;
+  }
 </style>
 
 <div class="carousel-slide reward-card" on:click={handleCardClick}>
-  <div class="full-width">
+  <div class="full-width logo-container flex-center">
     <img class="reward-logo" src={logo} alt="Reward Logo" />
   </div>
-  <div class="full-width reward-text"><b>{name}</b></div>
+  <div class="full-width reward-text flex-center"><b>{name}</b></div>
 </div>
