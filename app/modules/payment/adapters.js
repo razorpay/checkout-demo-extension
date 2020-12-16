@@ -123,7 +123,7 @@ export function credPaymentRequestAdapter() {
       new PaymentRequest(
         [
           {
-            supportedMethods: 'https://cred-web-stg.dreamplug.in/checkout/pay',
+            supportedMethods: ['https://cred.club/checkout/pay'],
           },
         ],
         {
@@ -135,6 +135,7 @@ export function credPaymentRequestAdapter() {
       )
         .canMakePayment()
         .then(isAvailable => {
+          console.log('isAvailable', isAvailable);
           if (isAvailable) {
             resolve();
           } else {
@@ -143,10 +144,12 @@ export function credPaymentRequestAdapter() {
         })
         /* jshint ignore:start */
         .catch(e => {
+          console.log('rejected', e);
           reject(CHECK_ERROR);
         });
       /* jshint ignore:end */
     } catch (e) {
+      console.log('caught', e);
       reject(CHECK_ERROR);
     }
   });
