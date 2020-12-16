@@ -1,9 +1,5 @@
 import * as Bridge from 'bridge';
-import Razorpay, {
-  makePrefParams,
-  validateOverrides,
-  makeRewardsParams,
-} from 'common/Razorpay';
+import Razorpay, { makePrefParams, validateOverrides } from 'common/Razorpay';
 import Analytics from 'analytics';
 import * as SessionManager from 'sessionmanager';
 import Track from 'tracker';
@@ -340,7 +336,7 @@ function getPreferenecsParams(razorpayInstance) {
 }
 
 function getRewardsParams(razorpayInstance) {
-  const rewardsData = makeRewardsParams(razorpayInstance);
+  const rewardsData = makePrefParams(razorpayInstance);
   return rewardsData;
 }
 

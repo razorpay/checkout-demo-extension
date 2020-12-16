@@ -48,6 +48,7 @@ var preferences,
   Confirm = discreet.Confirm,
   Backdrop = discreet.Backdrop,
   FeeLabel = discreet.FeeLabel;
+rewardsStore = discreet.rewardsStore;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -4285,8 +4286,8 @@ Session.prototype = {
     }
 
     // added rewardIds to the create payment request
-    var rewardIds = this.getRewards();
-    if (rewardIds && rewardIds.length > 0 && !Store.isContactEmailOptional) {
+    var rewardIds = storeGetter(rewardsStore);
+    if (rewardIds && rewardIds.length > 0 && !Store.isContactEmailOptional()) {
       data.reward_ids = rewardIds;
     }
 
@@ -5016,15 +5017,6 @@ Session.prototype = {
    */
   getAppliedOffer: function() {
     return discreet.Offers.getForcedOffer();
-  },
-
-  getRewards: function() {
-    if (!this.rewards) {
-      return;
-    }
-    return this.rewards.map(function(reward) {
-      return reward.reward_id;
-    });
   },
 
   /**
