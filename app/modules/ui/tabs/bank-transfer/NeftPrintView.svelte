@@ -41,21 +41,44 @@
   export let expiry;
   const { contact, email, name } = customerDetails;
   const description = getOption('description');
-  const merchant_logo = getOption('image');
+  let merchant_logo = getOption('image');
+  let orgLogoLoaded = false;
+  let merchantLogoLoaded = false;
+
+  const { account_number, ifsc, branch, bank_name } = neftDetails;
   let org_logo =
     'https://cdn.razorpay.com/static/assets/secured_by_razorpay.svg';
 
   onMount(() => {
-    const currentWindow = neftView.ownerDocument.defaultView;
-    // currentWindow.print();
-    // currentWindow.close();
+    if (bank_name === 'HDFC' || !ifsc.startsWith('HDFC')) {
+      org_logo = 'https://cdn.razorpay.com/bank/HDFC.gif';
+    }
+    if (!merchant_logo) {
+      merchantLogoLoaded = true;
+    }
   });
+
+  function printIfLoaded() {
+    if (orgLogoLoaded && merchantLogoLoaded) {
+      const currentWindow = neftView.ownerDocument.defaultView;
+      currentWindow.print();
+      currentWindow.close();
+    }
+  }
+  const setOrgLogoLoaded = () => {
+    orgLogoLoaded = true;
+    printIfLoaded();
+  };
+  const setMerchantLogoLoaded = () => {
+    merchantLogoLoaded = true;
+    printIfLoaded();
+  };
   const tableDetails = {
     [ROW_HEADERS.row1]: neftDetails.name,
-    [ROW_HEADERS.row2]: neftDetails.account_number,
-    [ROW_HEADERS.row3]: neftDetails.ifsc,
-    [ROW_HEADERS.row4]: neftDetails.bank_name,
-    [ROW_HEADERS.row5]: neftDetails.branch,
+    [ROW_HEADERS.row2]: account_number,
+    [ROW_HEADERS.row3]: ifsc,
+    [ROW_HEADERS.row4]: bank_name,
+    [ROW_HEADERS.row5]: branch,
     [ROW_HEADERS.row6]: getAmount(),
     [ROW_HEADERS.row7]: name,
     [ROW_HEADERS.row8]: email,
@@ -110,8 +133,13 @@
     }
   </style>
   <div class="print-view-logos">
-    <img src={org_logo} alt="org Logo" />
-    {#if merchant_logo}<img src={merchant_logo} alt="merchant Logo" />{/if}
+    <img on:load={setOrgLogoLoaded} src={org_logo} alt="org Logo" />
+    {#if merchant_logo}
+      <img
+        on:load={setMerchantLogoLoaded}
+        src={merchant_logo}
+        alt="merchant Logo" />
+    {/if}
   </div>
   <table class="bank-transfer-table">
     <tr>

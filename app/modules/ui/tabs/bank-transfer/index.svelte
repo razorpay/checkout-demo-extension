@@ -35,6 +35,7 @@
     LOADING_MESSAGE,
     RETRY_BUTTON_LABEL,
     ROUND_OFF_CALLOUT,
+    PRINT_DETAILS,
   } from 'ui/labels/bank-transfer';
   import { COPY_DETAILS, COPIED } from 'ui/labels/cta';
 
@@ -204,8 +205,10 @@
     margin-top: 20px;
   }
   .print {
-    margin-top: 20px;
-    text-align: right;
+    margin-top: 14px;
+    text-align: left;
+    color: rgba(57, 100, 168, 1);
+    cursor: pointer;
   }
 </style>
 
@@ -248,11 +251,7 @@
           </div>
         {/if}
       </div>
-      <div on:click={handlePrint} class="print">
-        <i>
-          <Icon icon={icons.print_icon} />
-        </i>
-      </div>
+      <div on:click={handlePrint} class="print">{$t(PRINT_DETAILS)}</div>
 
       <Bottom>
         <!-- LABEL: Do not round-off the amount. Transfer the exact amount for the payment to be successful. -->
