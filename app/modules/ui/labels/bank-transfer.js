@@ -7,3 +7,4 @@ export const AMOUNT_LABEL = 'bank_transfer.amount_label';
 export const DUE_DATE_NOTE = 'bank_transfer.due_date_note';
 export const ROUND_OFF_CALLOUT = 'bank_transfer.round_off_callout';
 export const RETRY_BUTTON_LABEL = 'bank_transfer.retry_button_label';
+export const PRINT_DETAILS = 'bank_transfer.print_details';
