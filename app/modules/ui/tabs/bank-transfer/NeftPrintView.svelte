@@ -1,11 +1,9 @@
 <script>
-  // import store from '../store';
-  // import NeftPrintDetails from './NeftPrintDetails.svelte';
+  //store
   import { getOption, getAmount, showFeeLabel } from 'checkoutstore';
   import { getCustomerDetails } from 'checkoutstore/screens/home';
+  // svelte imports
   import { onMount } from 'svelte';
-
-  import { t } from 'svelte-i18n';
 
   const HEADER = 'For RTGS/NEFT/Funds Transfer';
   const ROW_HEADERS = {
@@ -19,7 +17,7 @@
     row8: 'Customer Email ID',
     row9: 'Customer Mobile No',
     row10: 'Description',
-    row11: 'Merchant Order ID',
+    row11: 'Expiry time',
     row12: 'Disclaimers',
   };
   const OFFICE_USE = {
@@ -40,9 +38,12 @@
   let neftView;
   export let customerDetails = getCustomerDetails();
   export let neftDetails;
+  export let expiry;
   const { contact, email, name } = customerDetails;
-  let description = getOption('description');
-  let orderId = getOption('order_id');
+  const description = getOption('description');
+  const merchant_logo = getOption('image');
+  let org_logo =
+    'https://cdn.razorpay.com/static/assets/secured_by_razorpay.svg';
 
   onMount(() => {
     const currentWindow = neftView.ownerDocument.defaultView;
@@ -60,8 +61,11 @@
     [ROW_HEADERS.row8]: email,
     [ROW_HEADERS.row9]: contact,
     [ROW_HEADERS.row10]: description,
-    [ROW_HEADERS.row11]: orderId,
+    [ROW_HEADERS.row11]: expiry,
   };
+  if (!neftDetails.branch) {
+    delete tableDetails.Branch;
+  }
 </script>
 
 <div class="neft-print-view" bind:this={neftView}>
@@ -94,8 +98,21 @@
     .footer-logo {
       margin-top: 5px;
     }
+    .print-view-logos {
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .print-view-logos img {
+      max-height: 50px;
+    }
   </style>
-  <!-- <img /> Logo -->
+  <div class="print-view-logos">
+    <img src={org_logo} alt="org Logo" />
+    {#if merchant_logo}<img src={merchant_logo} alt="merchant Logo" />{/if}
+  </div>
   <table class="bank-transfer-table">
     <tr>
       <td colspan="2" class="text-center">{HEADER}</td>
@@ -153,7 +170,4 @@
       <th class="text-right" colspan="2">{BRANCH_LABEL}</th>
     </tr>
   </table>
-  <div class="text-right footer-logo">
-    <img src="https://cdn.razorpay.com/static/assets/secured_by_razorpay.svg" />
-  </div>
 </div>

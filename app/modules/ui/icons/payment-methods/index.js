@@ -13,6 +13,7 @@ import upiOtm from './upi_otm';
 import aadhaar from './aadhaar';
 import trustedBadge from './trusted_badge';
 import tickFilled from './tick_filled';
+import printIcon from './print_icon';
 
 import { getAllMethods } from 'checkoutframe/paymentmethods';
 
@@ -22,6 +23,7 @@ const availPaymentMethods = getAllMethods().concat([
   'aadhaar',
   'trusted_badge',
   'tick_filled',
+  'print_icon',
 ]);
 
 function getIconFn(iconName) {
@@ -74,6 +76,9 @@ function getIconFn(iconName) {
 
     case 'tick_filled':
       return tickFilled;
+
+    case 'print_icon':
+      return printIcon;
   }
 }
 

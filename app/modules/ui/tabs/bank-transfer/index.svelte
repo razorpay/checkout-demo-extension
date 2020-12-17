@@ -22,6 +22,7 @@
   import Bottom from 'ui/layouts/Bottom.svelte';
   import CTA from 'ui/elements/CTA.svelte';
   import NeftPrintView from './NeftPrintView.svelte';
+  import Icon from 'ui/elements/Icon.svelte';
 
   // i18n
   import {
@@ -52,6 +53,7 @@
   let copied = false;
   const session = getSession();
 
+  const icons = session.themeMeta.icons;
   function getPayloadForVirtualAccounts() {
     const payload = {
       customer: getCustomerDetails(),
@@ -141,6 +143,7 @@
       },
       props: {
         neftDetails: data.receiver,
+        expiry: data.close_by,
       },
       target: printWindow.document.body,
     });
@@ -200,6 +203,10 @@
     display: inline-block;
     margin-top: 20px;
   }
+  .print {
+    margin-top: 20px;
+    text-align: right;
+  }
 </style>
 
 <Tab method="bank_transfer" shown={true}>
@@ -241,7 +248,11 @@
           </div>
         {/if}
       </div>
-      <div on:click={handlePrint} class="print">Print</div>
+      <div on:click={handlePrint} class="print">
+        <i>
+          <Icon icon={icons.print_icon} />
+        </i>
+      </div>
 
       <Bottom>
         <!-- LABEL: Do not round-off the amount. Transfer the exact amount for the payment to be successful. -->
