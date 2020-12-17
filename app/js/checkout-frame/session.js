@@ -47,7 +47,8 @@ var preferences,
   NativeStore = discreet.NativeStore,
   Confirm = discreet.Confirm,
   Backdrop = discreet.Backdrop,
-  FeeLabel = discreet.FeeLabel;
+  FeeLabel = discreet.FeeLabel,
+  rewardsStore = discreet.rewardsStore;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -4322,8 +4323,13 @@ Session.prototype = {
       request.gpay = true;
     }
 
-    var appliedOffer = this.getAppliedOffer();
+    // added rewardIds to the create payment request
+    var rewardIds = storeGetter(rewardsStore);
+    if (rewardIds && rewardIds.length > 0 && !Store.isContactEmailOptional()) {
+      data.reward_ids = rewardIds;
+    }
 
+    var appliedOffer = this.getAppliedOffer();
     if (appliedOffer && (!this.offers || this.offers.shouldSendOfferToApi())) {
       data.offer_id = appliedOffer.id;
       this.r.display_amount = appliedOffer.amount;

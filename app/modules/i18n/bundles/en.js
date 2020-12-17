@@ -623,7 +623,6 @@ export default {
     country_search_all: 'All countries',
     country_search_placeholder: 'Search a country',
     customer_name_label: 'Customer Name',
-    edit_button_label: 'Edit',
     email_help_text: 'Please enter a valid email. Example: you@example.com',
     email_label_optional: 'Email (Optional)',
     email_label_required: 'Email',
@@ -1034,6 +1033,13 @@ export default {
     phonepe: 'PhonePe',
     sbibuddy: 'SBI Buddy',
     zeta: 'Zeta',
+  },
+  rewards: {
+    header:
+      'Pay successfully now & unlock <strong>exciting rewards for free,<strong> for your future buys!',
+    sub_text: 'Look for these rewards from amazing brands in your mail box!',
+    close: 'Close',
+    tooltip_text: 'Unlock free rewards after payment',
   },
   trusted_badge: {
     customer_label: "You're paying a",

@@ -63,6 +63,7 @@ import * as Theme from 'checkoutstore/theme';
 import { overlayStack as overlayStackStore } from 'checkoutstore/back';
 import * as NativeStore from 'checkoutstore/native';
 import * as OffersStore from 'checkoutstore/offers';
+import { rewardIds as rewardsStore } from 'checkoutstore/rewards';
 
 import QRScreen from 'ui/tabs/qr/index.svelte';
 import * as upiTab from 'checkoutframe/components/upi';
@@ -212,4 +213,5 @@ export default {
   ContactStorage,
   I18n,
   overlayStackStore,
+  rewardsStore,
 };

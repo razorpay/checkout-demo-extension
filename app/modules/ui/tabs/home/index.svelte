@@ -14,6 +14,7 @@
   import CardOffer from 'ui/elements/CardOffer.svelte';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
   import TrustedBadge from 'ui/components/TrustedBadge.svelte';
+  import RewardsIcon from 'ui/components/rewards/Icon.svelte';
 
   // Svelte imports
   import { onMount, tick } from 'svelte';
@@ -45,10 +46,10 @@
   } from 'checkoutstore';
 
   import { getUPIIntentApps } from 'checkoutstore/native';
+  import { rewards } from 'checkoutstore/rewards';
 
   // i18n
   import {
-    EDIT_BUTTON_LABEL,
     PARTIAL_AMOUNT_EDIT_LABEL,
     PARTIAL_AMOUNT_STATUS_FULL,
     PARTIAL_AMOUNT_STATUS_PARTIAL,
@@ -129,7 +130,6 @@
 
   import { update as updateContactStorage } from 'checkoutframe/contact-storage';
   import { isMobile } from 'common/useragent';
-
   const cardOffer = getCardOffer();
   const session = getSession();
   const icons = session.themeMeta.icons;
@@ -908,24 +908,6 @@
     flex-grow: 1;
   }
 
-  /* Styles for "Edit v" button */
-  .details-container div[slot='extra'] {
-    display: flex;
-  }
-
-  .details-container div[slot='extra'] span {
-    display: block;
-  }
-
-  .details-container div[slot='extra'] span:first-child {
-    margin: 2px 4px 0;
-    font-size: 1.2em;
-  }
-
-  .details-container div[slot='extra'] span:last-child {
-    transform: rotate(-90deg);
-  }
-
   .details-container div[slot='title'] {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -943,6 +925,14 @@
     margin-left: 8px;
     padding-left: 8px;
     border-left: solid 1px #757575;
+  }
+
+  .details-strip {
+    display: flex;
+  }
+
+  :global(#user-details) {
+    min-width: 0;
   }
 
   .solidbg {
@@ -968,30 +958,25 @@
           {#if showUserDetailsStrip || isPartialPayment}
             <div
               use:touchfix
-              class="details-container border-list"
+              class="details-container"
               in:fly={getAnimationOptions({ duration: 400, y: 80 })}>
               {#if showUserDetailsStrip}
-                <SlottedOption on:click={editUserDetails} id="user-details">
-                  <i slot="icon">
-                    <Icon icon={icons.contact} />
-                  </i>
-                  <div slot="title">
-                    {#if $isContactPresent && !isContactHidden()}
-                      <span>{$contact}</span>
-                    {/if}
-                    {#if $email && !isEmailHidden()}<span>{$email}</span>{/if}
-                  </div>
-                  <div
-                    slot="extra"
-                    class="theme-highlight-color"
-                    aria-label={contactEmailReadonly ? '' : 'Edit'}>
-                    {#if !contactEmailReadonly}
-                      <!-- LABEL: Edit -->
-                      <span>{$t(EDIT_BUTTON_LABEL)}</span>
-                      <span>&#xe604;</span>
-                    {/if}
-                  </div>
-                </SlottedOption>
+                <div class="details-strip border-list-horizontal">
+                  <SlottedOption on:click={editUserDetails} id="user-details">
+                    <i slot="icon">
+                      <Icon icon={icons.edit} />
+                    </i>
+                    <div slot="title">
+                      {#if $isContactPresent && !isContactHidden()}
+                        <span>{$contact}</span>
+                      {/if}
+                      {#if $email && !isEmailHidden()}<span>{$email}</span>{/if}
+                    </div>
+                  </SlottedOption>
+                  {#if $rewards?.length > 0 && !isEmailOptional()}
+                    <RewardsIcon />
+                  {/if}
+                </div>
               {/if}
               {#if isPartialPayment}
                 <SlottedOption

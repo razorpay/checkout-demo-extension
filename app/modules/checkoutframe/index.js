@@ -27,6 +27,7 @@ import {
   ownerWindow,
 } from 'common/constants';
 import { checkForPossibleWebPayments } from 'checkoutframe/components/upi';
+import { rewards, rewardIds } from 'checkoutstore/rewards';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -246,6 +247,24 @@ function fetchPrefs(session) {
             session.modal.hide();
           });
         }
+        fetchRewards(session);
+      }
+    }
+  );
+}
+
+function fetchRewards(session) {
+  session.rewardsCall = Razorpay.payment.getRewards(
+    getRewardsParams(session.r),
+    rewardsRes => {
+      session.rewardsCall = null;
+      if (!rewardsRes.error) {
+        const reward_ids = rewardsRes.map(item => item.reward_id);
+        rewards.set(rewardsRes);
+        rewardIds.set(reward_ids);
+        if (reward_ids && reward_ids.length > 0) {
+          Analytics.setMeta('reward_ids', reward_ids);
+        }
       }
     }
   );
@@ -314,6 +333,11 @@ function getPreferenecsParams(razorpayInstance) {
     document.cookie = 'checkcookie=1;path=/';
   }
   return prefData;
+}
+
+function getRewardsParams(razorpayInstance) {
+  const rewardsData = makePrefParams(razorpayInstance);
+  return rewardsData;
 }
 
 function updateOptions(preferences) {
