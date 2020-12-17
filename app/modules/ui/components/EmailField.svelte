@@ -37,7 +37,7 @@
     pattern={EMAIL_REGEX}
     readonly={isEmailReadOnly()}
     label={$t(label)}
-    icon="&#xe603;"
+    icon=""
     on:input={e => (value = e.target.value)}
     on:blur
     helpText={$t(EMAIL_HELP_TEXT)} />

@@ -20,6 +20,7 @@ const {
   respondSavedCards,
   retryTransaction,
   selectPersonalizedCard,
+  agreeToAMEXCurrencyCharges,
 
   // Offers
   verifyOfferApplied,
@@ -32,6 +33,7 @@ const {
 
   // Partial Payment
   verifyPartialAmount,
+  verifyFooterText,
 } = require('../actions/common');
 
 const {
@@ -120,14 +122,20 @@ module.exports = function(testFeatures) {
         recurring: !!recurringOrder,
       });
 
-      if (offers) {
+      if (!feeBearer && offers) {
         await viewOffers(context);
         await selectOffer(context, '1');
         await verifyOfferApplied(context);
-        await verifyDiscountPaybleAmount(context, '₹ 1,980');
+        if (!feeBearer) {
+          await verifyDiscountPaybleAmount(context, '₹ 1,980');
+        }
         await verifyDiscountAmountInBanner(context, '₹ 1,980');
         await verifyDiscountText(context, 'You save ₹20');
         await validateCardForOffer(context);
+      }
+
+      if (feeBearer) {
+        await verifyFooterText(context, 'PAY');
       }
 
       if (partialPayment) {
@@ -135,6 +143,9 @@ module.exports = function(testFeatures) {
       }
 
       await submit(context);
+      if (options.currency !== 'INR') {
+        await agreeToAMEXCurrencyCharges(context);
+      }
 
       if (callbackUrl && timeout) {
         await verifyTimeout(context, 'card');
@@ -157,6 +168,9 @@ module.exports = function(testFeatures) {
         );
         await retryTransaction(context);
         await submit(context);
+        if (options.currency !== 'INR') {
+          await agreeToAMEXCurrencyCharges(context);
+        }
         if (feeBearer) {
           await handleFeeBearer(context);
         }

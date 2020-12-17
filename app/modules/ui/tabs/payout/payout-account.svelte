@@ -52,9 +52,7 @@
   overrideMethodCheck={true}
   pad={false}
   shown={true}>
-
   <div class="fields-container">
-
     <Field
       type="text"
       name="account_number"
@@ -101,6 +99,5 @@
       maxlength="100"
       required={true}
       bind:this={nameField} />
-
   </div>
 </Tab>

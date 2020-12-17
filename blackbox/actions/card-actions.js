@@ -20,9 +20,15 @@ async function handleCardValidation(context, { urlShouldContain } = {}) {
 
 async function handleCardValidationForNativeOTP(
   context,
-  { coproto, cardType, urlShouldContain } = {}
+  { coproto, cardType, urlShouldContain, expectCallbackUrl } = {}
 ) {
   const req = await context.expectRequest();
+  const body = querystring.parse(req.body);
+  if (expectCallbackUrl) {
+    expect(body.callback_url).toEqual(
+      'http://www.merchanturl.com/callback?test1=abc&test2=xyz'
+    );
+  }
   expect(req.url).toContain(urlShouldContain || 'create/ajax');
   if (cardType === 'RUPAY' && coproto === 'otp') {
     await context.respondJSON({
@@ -144,6 +150,13 @@ async function enterCardDetails(
   await context.page.type('#card_expiry', '12/55');
   await context.page.type('#card_name', 'SakshiJain');
   await context.page.type('#card_cvv', visa ? '111' : '1111');
+}
+
+async function agreeToAMEXCurrencyCharges(context) {
+  // needed for overlay animation
+  await delay(200);
+  context.page.click('#overlay-wrap .btn');
+  await delay(200);
 }
 
 async function handleCustomerCardStatusRequest(context, cardType) {
@@ -457,4 +470,5 @@ module.exports = {
   handleAppCreatePayment,
   handleAppPaymentStatus,
   assertOTPElementsForBEPG,
+  agreeToAMEXCurrencyCharges,
 };

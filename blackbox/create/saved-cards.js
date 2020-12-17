@@ -29,6 +29,7 @@ const {
 
   // Partial Payment
   verifyPartialAmount,
+  verifyFooterText,
 
   // Personalization
   selectPersonalizedCard,
@@ -125,14 +126,20 @@ module.exports = function(testFeatures) {
       await typeOTPandSubmit(context);
       await respondSavedCards(context, { dcc });
 
-      if (offers) {
+      if (!feeBearer && offers) {
         await viewOffers(context);
         await selectOffer(context, '1');
         await verifyOfferApplied(context);
-        await verifyDiscountPaybleAmount(context, '₹ 1,980');
+        if (!feeBearer) {
+          await verifyDiscountPaybleAmount(context, '₹ 1,980');
+        }
         await verifyDiscountAmountInBanner(context, '₹ 1,980');
         await verifyDiscountText(context, 'You save ₹20');
         await delay(400);
+      }
+
+      if (feeBearer) {
+        await verifyFooterText(context, 'PAY');
       }
 
       if (partialPayment) {

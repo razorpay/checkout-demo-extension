@@ -5,6 +5,7 @@
     backdropVisible,
   } from 'checkoutstore/backdrop';
   import { isCtaShown } from 'checkoutstore/cta';
+  import { showFeeLabel } from 'checkoutstore/index.js';
 
   import { fade } from 'svelte/transition';
 
@@ -21,6 +22,7 @@
 
   export function hide() {
     hideBackdrop();
+    $showFeeLabel = true;
     if (isCtaShown()) {
       sub = !sub;
     }

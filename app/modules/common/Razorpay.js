@@ -178,6 +178,25 @@ var razorpayPayment = (Razorpay.payment = {
       },
     });
   },
+
+  getRewards: function(data, callback) {
+    const rewardsApiTimer = _.timer();
+    Analytics.track('rewards:start', {
+      type: AnalyticsTypes.METRIC,
+    });
+
+    return fetch({
+      url: _.appendParamsToUrl(makeUrl('checkout/rewards'), data),
+
+      callback: function(response) {
+        Analytics.track('rewards:end', {
+          type: AnalyticsTypes.METRIC,
+          data: { time: rewardsApiTimer() },
+        });
+        callback(response);
+      },
+    });
+  },
 });
 
 function base_configure(overrides) {
@@ -423,13 +442,19 @@ export function validateOverrides(options, skip = []) {
   return valid;
 }
 
-Razorpay.configure = function(overrides) {
+Razorpay.configure = function(overrides, extra = {}) {
   _Obj.loop(flatten(overrides, RazorpayDefaults), function(val, key) {
     var defaultValue = RazorpayDefaults[key];
     if (typeof defaultValue === typeof val) {
       RazorpayDefaults[key] = val;
     }
   });
+  if (extra.library) {
+    Track.props.library = extra.library;
+  }
+  if (extra.referer) {
+    Track.props.referer = extra.referer;
+  }
 };
 
 Razorpay.defaults = RazorpayDefaults;

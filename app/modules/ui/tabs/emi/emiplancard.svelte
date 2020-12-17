@@ -21,6 +21,7 @@
     NO_COST_DISCOUNT_LABEL,
     NO_COST_EXPLAIN_ACTION,
     CREDIT_EMI_DESCRIPTION,
+    AXIS_BANK_EMI,
     CITI_BANK_EMI,
     CITI_KNOW_MORE,
     SHOW_MORE,
@@ -52,12 +53,14 @@
   let showInterest;
   let isBajajEmi;
   let showEducation;
+  let amountAfterDiscount;
 
   let processingFee, processingFeeDisclaimer, stampDuty;
 
   let interestChargedByBank;
 
   const session = getSession();
+  const AXIS_BANK_CODE = 'UTIB';
   const CITI_BANK_CODE = 'CITI';
   const HDFC_BANK_CODE = 'HDFC';
   const HDFC_BANK_DEBIT_CODE = 'HDFC_DC';
@@ -78,10 +81,19 @@
       amountPerMonth = plan.amount_per_month;
     } else {
       amountPerMonth = Razorpay.emi.calculator(
-        amount,
+        amountAfterDiscount,
         plan.duration,
         plan.interest
       );
+    }
+  }
+
+  // TODO: move this to a store and consume
+  $: {
+    if ($appliedOffer && $appliedOffer.amount) {
+      amountAfterDiscount = $appliedOffer.amount;
+    } else {
+      amountAfterDiscount = amount;
     }
   }
 
@@ -95,27 +107,20 @@
   }
 
   $: {
-    //Do not auto apply No-Cost EMI offer if no offer is selected by the customer.
-    if (!$appliedOffer) {
-      noCostEmi = false;
-    } else if ($appliedOffer && $appliedOffer.emi_subvention) {
-      /* No-Cost EMI offers have emi_subvention property which is not present for other offers.
-    Only select No-Cost EMI offer if that is selected by the customer. */
-      noCostEmi =
-        plan.subvention === 'merchant' ||
-        (provider === 'zestmoney' && plan.duration === 3);
-      if (noCostEmi && plan.merchant_payback) {
-        interestChargedByBank = session.formatAmountWithCurrency(
-          amount / (1 - plan.merchant_payback / 100) - amount
-        );
-      }
+    noCostEmi =
+      plan.subvention === 'merchant' ||
+      (provider === 'zestmoney' && plan.duration === 3);
+    if (noCostEmi && plan.merchant_payback) {
+      interestChargedByBank = session.formatAmountWithCurrency(
+        amount / (1 - plan.merchant_payback / 100) - amount
+      );
     }
   }
 
   $: isCardEmi = !provider;
   $: showInterest =
     !isCardEmi || !_Arr.contains(['zestmoney', 'earlysalary'], provider);
-  $: formattedAmount = session.formatAmountWithCurrency(amount);
+  $: formattedAmount = session.formatAmountWithCurrency(amountAfterDiscount);
   $: formattedAmountPerMonth = session.formatAmountWithCurrency(amountPerMonth);
   $: formattedFinalAmount = session.formatAmountWithCurrency(
     plan.duration * amountPerMonth
@@ -199,15 +204,13 @@
       {#if isCardEmi}
         {#if bank === HDFC_BANK_DEBIT_CODE}
           <!-- TODO: Combine both labels and allow inline-block from within template -->
-          <!-- LABEL: No minimum balance is required. There will be no amount blocked on your
-        card. You will pay -->
+          <!-- LABEL: No minimum balance is required. There will be no amount blocked on your card. You will pay -->
           {$t(HDFC_DEBIT_DESCRIPTION_MIN_BALANCE)}
           <span class="inline-block">{formattedAmountPerMonth}/mo</span>
           <!-- LABEL: (includes interest). -->
           {$t(HDFC_DEBIT_DESCRIPTION_INCLUDES_INTEREST)}
         {:else if bank === CITI_BANK_CODE}
-          <!-- LABEL: Full amount of {formattedAmount} will be deducted from your account.
-          EMI processing may take upto 8 working days. -->
+          <!-- LABEL: Full amount of {formattedAmount} will be deducted from your account. EMI processing may take upto 8 working days. -->
           {formatTemplateWithLocale(CITI_BANK_EMI, { amount: formattedAmount }, $locale)}
           <div class="citi-link" on:click={toggleCitiBankCardDetails}>
             {#if citiBankDetailsExpandedView}
@@ -220,19 +223,19 @@
               class="citi-url"
               href="https://www.online.citibank.co.in/portal/newgen/cards/tab/creditcards_tc.htm"
               target="_blank">
-              <!-- In case the total amount due has not been paid in full, finance charges as applicable (currently, between 3.50%- 3.60% per month i.e. 42-43.2% annualized) on card balances may apply until the EMI is converted & posted to the card. 
-              Latest rates are available at https://www.online.citibank.co.in/portal/newgen/cards/tab/creditcards_tc.htm -->
+              <!--LABEL: In case the total amount due has not been paid in full, finance charges as applicable (currently, between 3.50%- 3.60% per month i.e. 42-43.2% annualized) on card balances may apply until the EMI is converted & posted to the card. Latest rates are available at https://www.online.citibank.co.in/portal/newgen/cards/tab/creditcards_tc.htm -->
               {$t(CITI_URL)}
             </a>
           {/if}
+        {:else if bank === AXIS_BANK_CODE}
+          <!--LABEL: Full amount of Rs {amount} would be deducted from your account, which will be converted into EMI by your bank in 3-4 days. Convenience fee of 1% of transaction amount or Rs 100 whichever is higher + GST applicable for EMI transactions on Axis bank cards.' -->
+          {formatTemplateWithLocale(AXIS_BANK_EMI, { amount: formattedAmount }, $locale)}
         {:else}
-          <!-- LABEL: Full amount of {formattedAmount} will be deducted from your account,
-        which will be converted into EMI by your bank in 3-4 days. -->
+          <!-- LABEL: Full amount of {formattedAmount} will be deducted from your account, which will be converted into EMI by your bank in 3-4 days. -->
           {formatTemplateWithLocale(CREDIT_EMI_DESCRIPTION, { amount: formattedAmount }, $locale)}
         {/if}
         {#if bank === HDFC_BANK_CODE || bank === HDFC_BANK_DEBIT_CODE}
-          <!-- LABEL: Convenience Fee of ₹99 + GST applicable for EMI transactions on HDFC
-        Bank Cards. -->
+          <!-- LABEL: Convenience Fee of ₹99 + GST applicable for EMI transactions on HDFC Bank Cards. -->
           {$t(HDFC_DEBIT_DESCRIPTION_CONVENIENCE)}
         {/if}
       {:else}
@@ -278,5 +281,4 @@
       {/if}
     {/if}
   </div>
-
 </ExpandableCard>

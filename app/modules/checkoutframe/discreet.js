@@ -16,6 +16,7 @@ import emiView from 'checkoutframe/emi';
 import FeeBearerView from 'ui/components/feebearer.svelte';
 import Overlay from 'ui/components/Overlay.svelte';
 import AuthOverlay from 'ui/components/AuthOverlay.svelte';
+import UserConfirmationOverlay from 'ui/components/overlay/UserConfirmation.svelte';
 import OffersView from 'ui/components/offers/index.svelte';
 import NoCostExplainer from 'ui/components/offers/NoCostExplainer.svelte';
 import emiPlansView from 'checkoutframe/emiplans';
@@ -32,6 +33,7 @@ import * as CountryCodesUtil from 'common/countrycodes';
 
 /* Required for merchant.js migration */
 import * as Constants from 'common/constants';
+import * as WebPaymentsApi from 'common/webPaymentsApi';
 import * as Card from 'common/card';
 import * as Wallet from 'common/wallet';
 import * as CardlessEmi from 'common/cardlessemi';
@@ -61,6 +63,7 @@ import * as Theme from 'checkoutstore/theme';
 import { overlayStack as overlayStackStore } from 'checkoutstore/back';
 import * as NativeStore from 'checkoutstore/native';
 import * as OffersStore from 'checkoutstore/offers';
+import { rewardIds as rewardsStore } from 'checkoutstore/rewards';
 
 import QRScreen from 'ui/tabs/qr/index.svelte';
 import * as upiTab from 'checkoutframe/components/upi';
@@ -76,6 +79,7 @@ import * as walletTab from 'checkoutframe/components/wallet';
 import * as Backdrop from 'checkoutframe/components/backdrop';
 import * as Confirm from 'checkoutframe/components/confirm';
 import TopBar from 'ui/components/Topbar.svelte';
+import * as FeeLabel from 'checkoutframe/components/fee';
 
 import PayoutsInstruments from 'ui/tabs/payout/payout-instruments.svelte';
 import PayoutAccount from 'ui/tabs/payout/payout-account.svelte';
@@ -106,9 +110,9 @@ export default {
   Color,
   _PaymentMethodIcons,
   Confirm,
+  FeeLabel,
   Currency,
   OtpService,
-  getDecimalAmount: Currency.getDecimalAmount,
   currencies: Currency.displayCurrencies,
   error: _.rzpError,
   Formatter,
@@ -124,6 +128,7 @@ export default {
   es6components,
 
   Constants,
+  WebPaymentsApi,
   Card,
   Wallet,
   CardlessEmi,
@@ -167,6 +172,7 @@ export default {
   Backdrop,
   Overlay,
   AuthOverlay,
+  UserConfirmationOverlay,
   OffersView,
   NoCostExplainer,
 
@@ -207,4 +213,5 @@ export default {
   ContactStorage,
   I18n,
   overlayStackStore,
+  rewardsStore,
 };

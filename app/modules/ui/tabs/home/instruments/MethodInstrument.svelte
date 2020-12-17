@@ -65,13 +65,11 @@
   attributes={{ 'data-type': 'method' }}
   on:click>
   <i slot="icon">
-    <Icon {icon} alt={methodName} />
+    <Icon {icon} alt="" />
   </i>
   <div slot="title">{title}</div>
   <div slot="subtitle">
     {#if subtext}{subtext}{/if}
   </div>
-  <div slot="extra">
-    <span class="theme-highlight-color">&#xe604;</span>
-  </div>
+  <div slot="extra"><span class="theme-highlight-color">&#xe604;</span></div>
 </SlottedOption>

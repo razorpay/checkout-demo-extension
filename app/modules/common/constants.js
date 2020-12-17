@@ -106,6 +106,10 @@ export const VPA_REGEX = /^[a-z0-9][a-z0-9.-]{2,}@[a-z]+$/i;
 
 export const NO_PAYMENT_ADAPTER_ERROR = 'Payment Adapter does not exist.';
 
+export const CHECK_ERROR = {
+  description: NO_PAYMENT_ADAPTER_ERROR,
+};
+
 export const INDIA_COUNTRY_CODE = '+91';
 
 export const MAX_PREFERRED_INSTRUMENTS = 3;

@@ -251,8 +251,9 @@
    * @returns {Array<Object>}
    */
   function getUPIIntentAppsFromInstrument(instrument) {
+    const apps = getUPIIntentApps().filtered;
     if (!instrument || instrument.method !== 'upi') {
-      return getUPIIntentApps().filtered;
+      return apps;
     }
 
     if (
@@ -636,7 +637,6 @@
 <Tab {method} {down} pad={false} shown={isPayout()}>
   <Screen>
     <div>
-
       {#if intent}
         <UpiIntent
           bind:this={intentView}

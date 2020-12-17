@@ -2,7 +2,7 @@ export default {
   app: {
     providers: {
       cred: {
-        name: 'Pay with CRED',
+        name: 'CRED Pay',
         subtext: 'exclusive discounts with CRED coins',
       },
       google_pay_cards: {
@@ -200,6 +200,8 @@ export default {
     use_saved_cards_btn: 'Use saved cards',
     use_saved_cards_on_rzp_btn: 'Use saved cards on Razorpay',
     view_all_emi_plans: 'View all EMI Plans',
+    international_currency_charges:
+      'Relevant currency conversion charges might be applicable, as Amex will process the transaction in INR. To avoid currency conversion charges please use MasterCard or Visa.',
   },
   cardless_emi: {
     providers: {
@@ -209,6 +211,10 @@ export default {
       earlysalary: 'EarlySalary',
       flexmoney: 'Cardless EMI by InstaCred',
       zestmoney: 'ZestMoney',
+      fdrl: 'Federal Bank',
+      hdfc: 'FlexiPay by HDFC Bank',
+      idfb: 'IDFC First Bank',
+      kkbk: 'Kotak Mahindra Bank',
     },
     select_option_title: 'Select an option',
   },
@@ -471,6 +477,7 @@ export default {
     next: 'Next',
     pay_single_method: 'Pay using {method}',
     pay_without_offer: 'Pay Without Offer',
+    pay: 'Pay',
     proceed: 'Proceed',
     select_emi_plan: 'Select EMI Plan',
     submit: 'Submit',
@@ -502,6 +509,8 @@ export default {
     auth_type_header: 'Authenticate using',
     auth_type_netbanking_description: 'via Bank Account and Netbanking details',
     auth_type_netbanking_title: 'Netbanking',
+    auth_type_aadhaar_title: 'Aadhaar',
+    auth_type_aadhaar_description: 'via Bank Account and Aadhaar details',
     change_bank_btn: 'Change Bank',
     ifsc_help: 'Please enter a valid IFSC',
     ifsc_label: 'IFSC',
@@ -519,6 +528,8 @@ export default {
     description_total_amount: 'Total Amount',
     edit_plan_action: 'Edit',
     edit_plan_text: '{duration} Months ({amount}/mo)',
+    axis_bank_emi:
+      'Full amount of Rs {amount} would be deducted from your account, which will be converted into EMI by your bank in 3-4 days. Convenience fee of 1% of transaction amount or Rs 100 whichever is higher + GST applicable for EMI transactions on Axis bank cards.',
     citi_bank_emi:
       'Full amount of {amount} will be deducted from your account. EMI processing may take upto 8 working days.',
     citi_know_more:
@@ -613,7 +624,6 @@ export default {
     country_search_all: 'All countries',
     country_search_placeholder: 'Search a country',
     customer_name_label: 'Customer Name',
-    edit_button_label: 'Edit',
     email_help_text: 'Please enter a valid email. Example: you@example.com',
     email_label_optional: 'Email (Optional)',
     email_label_required: 'Email',
@@ -849,6 +859,7 @@ export default {
       epaylater: 'ePayLater',
       getsimpl: 'Simpl',
       icic: 'ICICI Bank PayLater',
+      hdfc: 'FlexiPay by HDFC Bank',
     },
     select_option_title: 'Select an option',
   },
@@ -1023,5 +1034,16 @@ export default {
     phonepe: 'PhonePe',
     sbibuddy: 'SBI Buddy',
     zeta: 'Zeta',
+  },
+  rewards: {
+    header:
+      'Pay successfully now & unlock <strong>exciting rewards for free,<strong> for your future buys!',
+    sub_text: 'Look for these rewards from amazing brands in your mail box!',
+    close: 'Close',
+    tooltip_text: 'Unlock free rewards after payment',
+  },
+  trusted_badge: {
+    customer_label: "You're paying a",
+    seller_label: 'Razorpay Verified Seller',
   },
 };

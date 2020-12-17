@@ -1,15 +1,14 @@
-var RAZORPAY_HOVER_COLOR = '#626A74';
-
 var ua = navigator.userAgent;
 
 var preferences,
+  WebPaymentsApi = discreet.WebPaymentsApi,
   CheckoutBridge = window.CheckoutBridge,
   StorageBridge = window.StorageBridge,
   Promise = discreet.Promise,
   Bridge = discreet.Bridge,
   isIframe = window !== parent,
   ownerWindow = isIframe ? parent : opener,
-  _uid = Track.id,
+  tab_titles = Constants.TAB_TITLES,
   freqWallets = Wallet.wallets,
   contactPattern = Constants.CONTACT_REGEX,
   emailPattern = Constants.EMAIL_REGEX,
@@ -47,13 +46,14 @@ var preferences,
   I18n = discreet.I18n,
   NativeStore = discreet.NativeStore,
   Confirm = discreet.Confirm,
-  Backdrop = discreet.Backdrop;
+  Backdrop = discreet.Backdrop,
+  FeeLabel = discreet.FeeLabel,
+  rewardsStore = discreet.rewardsStore;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
 var ua_iPhone = /iPhone/.test(ua);
 var isIE = /MSIE |Trident\//.test(ua);
-var DEMO_MERCHANT_KEY = 'rzp_live_ILgsfZCZoFIKMb';
 
 // .shown has display: none from iOS ad-blocker
 // using दृश्य, which will never be seen by tim cook
@@ -61,10 +61,6 @@ var shownClass = 'drishy';
 
 var strings = {
   process: 'Your payment is being processed',
-  gpay_omnichannel: 'Verifying mobile number with Google Pay..',
-  redirect: 'Redirecting to Bank page',
-  acs_load_delay: 'Seems like your bank page is taking time to load.',
-  otp_resent: 'OTP resent',
 };
 
 /**
@@ -477,13 +473,20 @@ function askOTP(view, textView, shouldLimitResend, templateData) {
     textView = textView.error && textView.error.description;
   }
 
-  view.updateScreen({
+  var otpProperties = {
     loading: false,
     action: false,
     otp: '',
-    allowSkip: !Store.isRecurring(),
     allowResend: shouldLimitResend ? OtpService.canSendOtp('razorpay') : true,
-  });
+  };
+
+  if (Store.isASubscription()) {
+    _Obj.extend(otpProperties, {
+      allowSkip: session.get('subscription_card_change') ? false : true,
+    });
+  }
+
+  view.updateScreen(otpProperties);
 
   if (thisSession.headless) {
     if (paymentData.goToBank) {
@@ -651,8 +654,6 @@ Session.prototype = {
     return this.get('nativeotp') && this.r.isLiveMode();
   },
 
-  getDecimalAmount: getDecimalAmount,
-
   formatAmount: function(amount) {
     var displayCurrency = this.r.get('display_currency');
     var currency = this.r.get('currency');
@@ -684,6 +685,13 @@ Session.prototype = {
 
     return amount;
   },
+  setFeeLabel: function() {
+    if (Store.isCustomerFeeBearer()) {
+      FeeLabel.show({
+        isFeeBearer: true,
+      });
+    }
+  },
 
   // so that accessing this.data would not produce error
   data: emo,
@@ -694,10 +702,24 @@ Session.prototype = {
    *
    * @param {Number} amount
    */
-  updateAmountInHeader: function(amount) {
-    $('#amount .original-amount').rawHtml(
-      this.formatAmountWithCurrency(amount)
-    );
+  updateAmountInHeader: function(amount, fee) {
+    if (fee) {
+      $('#amount .original-amount').hide();
+    } else {
+      $('#amount .original-amount').rawHtml(
+        this.formatAmountWithCurrency(amount)
+      );
+      if ($('#amount .original-amount')[0]) {
+        $('#amount .original-amount')[0].removeAttribute('style');
+      }
+    }
+  },
+  updateAmountInHeaderForOffer: function(amount, fee) {
+    if (fee) {
+      $('#amount .original-amount').hide();
+    }
+    $('#amount .discount').rawHtml(this.formatAmountWithCurrency(amount));
+    //$('#amount .original-amount').hide();
   },
   /**
    * Set the amount in header.
@@ -1086,6 +1108,7 @@ Session.prototype = {
     this.setOffers();
     this.setLanguageDropdown();
     this.setSvelteOverlay();
+    this.setFeeLabel();
     // make bottom the last element
     gel('form-fields').appendChild(gel('bottom'));
   },
@@ -1134,7 +1157,7 @@ Session.prototype = {
     }
 
     if (providerCode === 'bajaj') {
-      this.showEmiPlans('bajaj')();
+      this.showEmiPlansForBajaj();
       return;
     }
 
@@ -1244,7 +1267,7 @@ Session.prototype = {
       target: _Doc.querySelector('#form-emi'),
     });
 
-    this.emiScreenView.$on('editplan', this.showEmiPlans('bajaj'));
+    this.emiScreenView.$on('editplan', this.showEmiPlansForBajaj.bind(this));
   },
 
   getCardlessEmiPlans: function() {
@@ -1733,6 +1756,10 @@ Session.prototype = {
   },
 
   hideErrorMessage: function(confirmedCancel) {
+    if (Store.isCustomerFeeBearer()) {
+      this.setAmount(this.get('amount'));
+    }
+
     if (this.nocostModal) {
       var modal = this.nocostModal;
       hideOverlay($('#nocost-overlay'));
@@ -2284,6 +2311,13 @@ Session.prototype = {
       from: this.screen,
       to: screen,
     };
+    if (this.screen === 'otp' && screen !== 'otp') {
+      Store.showFeeLabel.set(false);
+    }
+
+    if (this.screen !== 'otp' && screen === 'otp') {
+      Store.showFeeLabel.set(true);
+    }
 
     if (extraProps) {
       trackingData = _Obj.extend(trackingData, extraProps);
@@ -2361,15 +2395,19 @@ Session.prototype = {
   _trySelectingOfferInstrument: function(offer) {
     var issuer = offer.issuer;
     var screen = offer.payment_method;
+    var isEmiOffer = offer.payment_method === 'emi' && !offer.emi_subvention;
 
     var emiHandler = function() {
       var emiDuration = EmiStore.getEmiDurationForNewCard();
       var bank = this.emiPlansForNewCard && this.emiPlansForNewCard.code;
 
       if (emiDuration) {
-        var plan = _Arr.find(MethodStore.getEMIBankPlans(bank), function(p) {
-          return p.duration === emiDuration;
-        });
+        var plan = _Arr.find(
+          MethodStore.getEMIBankPlans(bank, 'credit', !isEmiOffer),
+          function(p) {
+            return p.duration === emiDuration;
+          }
+        );
         if (
           plan &&
           offer.id &&
@@ -2466,6 +2504,14 @@ Session.prototype = {
     // this.offers is undefined for forced offers
     if (hasDiscount && this.offers) {
       hasDiscount = this.offers.isCardApplicable();
+    }
+
+    var hasDiscountAndFee = offer && Store.isCustomerFeeBearer();
+
+    if (hasDiscountAndFee) {
+      $('#content').toggleClass('has-fee', hasDiscountAndFee);
+    } else {
+      $('#content').toggleClass('has-fee', false);
     }
 
     $('#content').toggleClass('has-discount', hasDiscount);
@@ -2704,7 +2750,6 @@ Session.prototype = {
       ) {
         return;
       }
-      var customer = this.getCustomer(contact);
       this.updateCustomerInStore();
 
       if (this.getCurrentCustomer().logged && !this.local) {
@@ -2734,32 +2779,9 @@ Session.prototype = {
 
     if (tab === 'upi') {
       this.updateCustomerInStore();
-
-      // Enforce login flow for UPI Recurring subscriptions
-      if (Store.isASubscription() && !customer.logged) {
-        this.otpView.updateScreen({
-          maxlength: 6,
-        });
-
-        var self = this;
-        var customer = self.getCurrentCustomer();
-
-        this.topBar.setTitleOverride('otp', 'text', 'upi');
-
-        self.commenceOTP('otp_sending_generic', '', {
-          phone: getPhone(),
-        });
-
-        self.getCurrentCustomer().createOTP(function() {
-          Analytics.track('subscriptions_upi:access:otp:ask');
-          askOTP(self.otpView, 'otp_proceed_with_upi_subscription', true, {
-            phone: getPhone(),
-          });
-          self.updateCustomerInStore();
-        });
-      } else {
-        discreet.upiTab.render();
-      }
+      //For the new flow checkout no longer asks for OTP for UPI subscriptions.
+      discreet.upiTab.render();
+      this.setScreen('upi');
     }
 
     if (tab === 'upi_otm') {
@@ -2862,20 +2884,10 @@ Session.prototype = {
       }
       customer.checkStatus(function() {
         /**
-         * 1. If this is a recurring payment and customer doesn't have saved cards,
-         *    create and ask for OTP.
-         * 2. If customer has saved cards and is not logged in, ask for OTP.
-         * 3. If customer doesn't have saved cards, show cards screen.
+         * 1. If customer has saved cards and is not logged in, ask for OTP.
+         * 2. If customer doesn't have saved cards, show cards screen.
          */
-        if (Store.isRecurring() && !customer.saved && !customer.logged) {
-          self.getCurrentCustomer().createOTP(function() {
-            Analytics.track('saved_cards:access:otp:ask');
-            askOTP(self.otpView, 'otp_sent_save_card_recurring', true, {
-              phone: getPhone(),
-            });
-            self.updateCustomerInStore();
-          });
-        } else if (customer.saved && !customer.logged) {
+        if (customer.saved && !customer.logged) {
           askOTP(self.otpView, undefined, true, { phone: getPhone() });
         } else {
           self.setScreen('card');
@@ -2887,69 +2899,24 @@ Session.prototype = {
   },
 
   /**
-   * Returns the EMI plans for a given bank.
-   * @param {String} bank
-   *
-   * @returns {Array}
+   * Displays the modal for all EMI plans
+   * @param {string} tab the tab from which the modal was invoked
    */
-  getEmiPlans: function(bank, cardType) {
-    var plans = MethodStore.getEMIBankPlans(bank, cardType);
-    var appliedOffer = this.offers && this.offers.offerSelectedByDrawer;
-
-    var emiPlans = [];
-    _Obj.loop(plans, function(plan, duration) {
-      if (
-        !appliedOffer ||
-        (appliedOffer && !appliedOffer.emi_subvention) ||
-        (appliedOffer && appliedOffer.id && appliedOffer.id === plan.offer_id)
-      ) {
-        emiPlans.push(
-          _Obj.extend(
-            {
-              duration: duration,
-              nocost: plan.subvention === 'merchant',
-            },
-            plan
-          )
-        );
-      }
+  showAllEmiPlans: function(tab) {
+    Analytics.track('emi:plans:view:all', {
+      type: AnalyticsTypes.BEHAV,
+      data: {
+        from: tab,
+      },
     });
 
-    var emiPlansSorted = _Arr.sort(emiPlans, function(a, b) {
-      return a.duration - b.duration;
-    });
-
-    return emiPlansSorted;
+    showOverlay($('#emi-wrap'));
   },
 
-  /**
-   * Returns a closure to handle showing of EMI plans screen.
-   *
-   * @param {String} type
-   *
-   * @return {Function}
-   */
-  showEmiPlans: function(type) {
+  showEmiPlansForNewCard: function() {
     var self = this;
-    var amount = this.get('amount');
-    var tabTitle = 'EMI Plans';
-
-    var trackEmi = function(name, data) {
-      Analytics.track(name, {
-        type: AnalyticsTypes.BEHAV,
-        data: data,
-      });
-    };
-
-    var viewAllPlans = function(tab) {
-      return function() {
-        trackEmi('emi:plans:view:all', {
-          from: tab,
-        });
-
-        showOverlay($('#emi-wrap'));
-      };
-    };
+    var amount = self.get('amount');
+    var appliedOffer = self.getAppliedOffer();
 
     var getBankEMICode = function(issuer, type) {
       // EMI codes are different from bank codes and have _DC at the end.
@@ -2959,247 +2926,295 @@ Session.prototype = {
       return issuer;
     };
 
-    if (type === 'new') {
-      return function(e) {
-        self.topBar.resetTitleOverride('emiplans');
+    self.topBar.resetTitleOverride('emiplans');
 
-        var bank = self.emiPlansForNewCard && self.emiPlansForNewCard.code;
-        var cardIssuer = bank.split('_')[0];
-        var cardType = _Str.endsWith(bank, '_DC') ? 'debit' : 'credit';
+    var bank = self.emiPlansForNewCard && self.emiPlansForNewCard.code;
+    var cardIssuer = bank.split('_')[0];
+    var cardType = _Str.endsWith(bank, '_DC') ? 'debit' : 'credit';
+    var isEmiOfferApplied = Boolean(
+      appliedOffer &&
+        appliedOffer.payment_method === 'emi' &&
+        !appliedOffer.emi_subvention
+    );
 
-        bank = getBankEMICode(bank, cardType);
+    bank = getBankEMICode(bank, cardType);
 
-        var contactRequiredForEMI = MethodStore.isContactRequiredForEMI(
-          bank,
-          cardType
-        );
-        var plans = MethodStore.getEMIBankPlans(bank);
-        var emiPlans = MethodStore.getEligiblePlansBasedOnMinAmount(
-          self.getEmiPlans(bank)
-        );
-        var prevTab = self.tab;
-        var prevScreen = self.screen;
+    var contactRequiredForEMI = MethodStore.isContactRequiredForEMI(
+      bank,
+      cardType
+    );
 
-        self.emiPlansView.setPlans({
-          type: type,
-          amount: amount,
-          plans: emiPlans,
-          bank: bank,
-          card: {
-            issuer: cardIssuer,
-            type: cardType,
-          },
-          contactRequiredForEMI: contactRequiredForEMI,
-          on: {
-            back: bind(function() {
-              self.switchTab(prevTab);
-              self.setScreen(prevScreen);
-              self.svelteCardTab.showAddCardView();
+    // We need to show plans without no-cost EMI if the applied offer is an
+    // EMI offer because No cost EMI cannot be applied with regular EMI offers.
+    var plans = MethodStore.getEMIBankPlans(bank, 'credit', !isEmiOfferApplied);
+    var emiPlans = MethodStore.getEligiblePlansBasedOnMinAmount(plans);
+    var prevTab = self.tab;
+    var prevScreen = self.screen;
 
-              return true;
-            }),
+    self.emiPlansView.setPlans({
+      type: 'new',
+      amount: amount,
+      plans: emiPlans,
+      bank: bank,
+      card: {
+        issuer: cardIssuer,
+        type: cardType,
+      },
+      contactRequiredForEMI: contactRequiredForEMI,
+      on: {
+        back: bind(function() {
+          self.switchTab(prevTab);
+          self.setScreen(prevScreen);
+          self.svelteCardTab.showAddCardView();
 
-            payWithoutEmi: function() {
-              trackEmi('emi:pay_without', {
-                from: prevTab,
-              });
+          return true;
+        }),
 
-              EmiStore.newCardEmiDuration.set('');
-
-              self.switchTab('card');
-              self.setScreen('card');
-              self.svelteCardTab.showLandingView();
+        payWithoutEmi: function() {
+          Analytics.track('emi:pay_without', {
+            type: AnalyticsTypes.BEHAV,
+            data: {
+              from: prevTab,
             },
+          });
 
-            select: function(value, contact) {
-              var plan = _Arr.find(plans, function(p) {
-                return p.duration === value;
-              });
-              EmiStore.selectedPlan.set(plan);
+          EmiStore.newCardEmiDuration.set('');
 
-              var text = cardTab.getEmiText(amount, plan) || '';
+          self.switchTab('card');
+          self.setScreen('card');
+          self.svelteCardTab.showLandingView();
+        },
 
-              trackEmi('emi:plan:select', {
-                from: prevTab,
-                value: value,
-              });
+        select: function(value, contact) {
+          var plan = _Arr.find(plans, function(p) {
+            return p.duration === value;
+          });
+          EmiStore.selectedPlan.set(plan);
 
-              EmiStore.newCardEmiDuration.set(value);
-              EmiStore.selectedPlanTextForNewCard.set(text);
+          var text = cardTab.getEmiText(amount, plan) || '';
 
-              self.switchTab('emi');
-              self.svelteCardTab.showAddCardView();
-
-              if (contactRequiredForEMI) {
-                HomeScreenStore.emiContact.set(contact);
-              }
-
-              self.preSubmit();
+          Analytics.track('emi:plan:select', {
+            type: AnalyticsTypes.BEHAV,
+            data: {
+              from: prevTab,
+              value: value,
             },
+          });
 
-            viewAll: viewAllPlans(prevTab),
-          },
+          EmiStore.newCardEmiDuration.set(value);
+          EmiStore.selectedPlanTextForNewCard.set(text);
 
-          actions: {
-            viewAll: true,
-            payWithoutEmi: MethodStore.isMethodEnabled('card'),
-          },
-        });
+          self.switchTab('emi');
+          self.svelteCardTab.showAddCardView();
 
-        self.switchTab('emiplans');
-        $('#body').removeClass('sub');
-      };
-    } else if (type === 'saved') {
-      return function(e) {
-        self.topBar.resetTitleOverride('emiplans');
+          if (contactRequiredForEMI) {
+            HomeScreenStore.emiContact.set(contact);
+          }
 
-        var trigger = e.currentTarget;
-        var $trigger = $(trigger);
-        var bank = $trigger.attr('data-bank');
-        var cardIssuer = bank;
-        var cardType = $trigger.attr('data-card-type');
+          self.preSubmit();
+        },
 
-        bank = getBankEMICode(bank, cardType);
+        viewAll: function() {
+          self.showAllEmiPlans(prevTab);
+        },
+      },
 
-        var contactRequiredForEMI = MethodStore.isContactRequiredForEMI(
-          bank,
-          cardType
-        );
-        var plans = MethodStore.getEMIBankPlans(bank, cardType);
-        var emiPlans = MethodStore.getEligiblePlansBasedOnMinAmount(
-          self.getEmiPlans(bank, cardType)
-        );
-        var $savedCard = $('.saved-card.checked');
-        var savedCvv = $savedCard.$('.saved-cvv input').val();
-        var prevTab = self.tab;
-        var prevScreen = self.screen;
+      actions: {
+        viewAll: true,
+        payWithoutEmi: MethodStore.isMethodEnabled('card'),
+      },
+    });
 
-        self.emiPlansView.setPlans({
-          type: type,
-          amount: amount,
-          plans: emiPlans,
-          card: {
-            issuer: cardIssuer,
-            type: cardType,
-          },
-          bank: bank,
-          contactRequiredForEMI: contactRequiredForEMI,
-          on: {
-            back: function() {
-              self.switchTab(prevTab);
-              self.setScreen(prevScreen);
+    self.switchTab('emiplans');
+    $('#body').removeClass('sub');
+  },
 
-              return true;
+  showEmiPlansForSavedCard: function(e) {
+    var self = this;
+    var amount = self.get('amount');
+    var appliedOffer = self.getAppliedOffer();
+
+    var getBankEMICode = function(issuer, type) {
+      // EMI codes are different from bank codes and have _DC at the end.
+      if (type === 'debit' && !_Str.endsWith(issuer, '_DC')) {
+        return issuer + '_DC';
+      }
+      return issuer;
+    };
+
+    self.topBar.resetTitleOverride('emiplans');
+
+    var trigger = e.currentTarget;
+    var $trigger = $(trigger);
+    var bank = $trigger.attr('data-bank');
+    var cardIssuer = bank;
+    var cardType = $trigger.attr('data-card-type');
+    var isEmiOfferApplied = Boolean(
+      appliedOffer &&
+        appliedOffer.payment_method === 'emi' &&
+        !appliedOffer.emi_subvention
+    );
+
+    bank = getBankEMICode(bank, cardType);
+
+    var contactRequiredForEMI = MethodStore.isContactRequiredForEMI(
+      bank,
+      cardType
+    );
+
+    // We need to show plans without no-cost EMI if the applied offer is an
+    // EMI offer because No cost EMI cannot be applied with regular EMI offers.
+    var plans = MethodStore.getEMIBankPlans(bank, cardType, !isEmiOfferApplied);
+    var emiPlans = MethodStore.getEligiblePlansBasedOnMinAmount(plans);
+    var $savedCard = $('.saved-card.checked');
+    var savedCvv = $savedCard.$('.saved-cvv input').val();
+    var prevTab = self.tab;
+    var prevScreen = self.screen;
+
+    self.emiPlansView.setPlans({
+      type: 'saved',
+      amount: amount,
+      plans: emiPlans,
+      card: {
+        issuer: cardIssuer,
+        type: cardType,
+      },
+      bank: bank,
+      contactRequiredForEMI: contactRequiredForEMI,
+      on: {
+        back: function() {
+          self.switchTab(prevTab);
+          self.setScreen(prevScreen);
+
+          return true;
+        },
+
+        payWithoutEmi: function() {
+          Analytics.track('emi:pay_without', {
+            type: AnalyticsTypes.BEHAV,
+            data: {
+              from: prevTab,
             },
+          });
 
-            payWithoutEmi: function() {
-              trackEmi('emi:pay_without', {
-                from: prevTab,
-              });
+          EmiStore.setEmiDurationForSavedCard('');
+          EmiStore.selectedPlanTextForSavedCard.set();
 
-              EmiStore.setEmiDurationForSavedCard('');
-              EmiStore.selectedPlanTextForSavedCard.set();
+          self.switchTab('card');
+          self.setScreen('card');
+          self.svelteCardTab.showSavedCardsView();
+        },
 
-              self.switchTab('card');
-              self.setScreen('card');
-              self.svelteCardTab.showSavedCardsView();
+        select: function(value, contact) {
+          var plan = _Arr.find(plans, function(p) {
+            return p.duration === value;
+          });
+          EmiStore.selectedPlan.set(plan);
+
+          var text = cardTab.getEmiText(amount, plan) || '';
+
+          Analytics.track('emi:plan:select', {
+            type: AnalyticsTypes.BEHAV,
+            data: {
+              from: prevTab,
+              value: value,
             },
+          });
 
-            select: function(value, contact) {
-              var plan = _Arr.find(plans, function(p) {
-                return p.duration === value;
-              });
-              EmiStore.selectedPlan.set(plan);
+          EmiStore.setEmiDurationForSavedCard(value);
+          EmiStore.selectedPlanTextForSavedCard.set(text);
 
-              var text = cardTab.getEmiText(amount, plan) || '';
+          self.switchTab('emi');
+          self.setScreen('card');
+          self.svelteCardTab.showSavedCardsView();
 
-              trackEmi('emi:plan:select', {
-                from: prevTab,
-                value: value,
-              });
+          if (contactRequiredForEMI) {
+            HomeScreenStore.emiContact.set(contact);
+          }
 
-              EmiStore.setEmiDurationForSavedCard(value);
-              EmiStore.selectedPlanTextForSavedCard.set(text);
+          if (savedCvv) {
+            self.preSubmit();
+          } else {
+            self.switchTab('emi');
+            self.setScreen('card');
+            self.svelteCardTab.showSavedCardsView();
+          }
+        },
 
-              self.switchTab('emi');
-              self.setScreen('card');
-              self.svelteCardTab.showSavedCardsView();
+        viewAll: function() {
+          self.showAllEmiPlans(prevTab);
+        },
+      },
 
-              if (contactRequiredForEMI) {
-                HomeScreenStore.emiContact.set(contact);
-              }
+      actions: {
+        viewAll: true,
+        payWithoutEmi: MethodStore.isMethodEnabled('card'),
+      },
+    });
 
-              if (savedCvv) {
-                self.preSubmit();
-              } else {
-                self.switchTab('emi');
-                self.setScreen('card');
-                self.svelteCardTab.showSavedCardsView();
-              }
-            },
+    self.switchTab('emiplans');
+    $('#body').removeClass('sub');
+  },
 
-            viewAll: viewAllPlans(prevTab),
-          },
+  showEmiPlansForBajaj: function() {
+    var self = this;
+    var amount = self.get('amount');
+    var appliedOffer = self.getAppliedOffer();
+    var isEmiOfferApplied = Boolean(
+      appliedOffer &&
+        appliedOffer.method === 'emi' &&
+        !appliedOffer.emi_subvention
+    );
 
-          actions: {
-            viewAll: true,
-            payWithoutEmi: MethodStore.isMethodEnabled('card'),
-          },
-        });
+    self.topBar.resetTitleOverride('emiplans');
 
-        self.switchTab('emiplans');
-        $('#body').removeClass('sub');
-      };
-    } else if (type === 'bajaj') {
-      return function() {
-        self.topBar.resetTitleOverride('emiplans');
+    var bank = 'BAJAJ';
 
-        var bank = 'BAJAJ';
-        var plans = MethodStore.getEMIBankPlans(bank);
-        var emiPlans = self.getEmiPlans(bank);
-        var prevTab = self.tab;
-        var prevScreen = self.screen;
+    // We need to show plans without no-cost EMI if the applied offer is an
+    // EMI offer because No cost EMI cannot be applied with regular EMI offers.
+    var plans = MethodStore.getEMIBankPlans(bank, 'credit', !isEmiOfferApplied);
 
-        self.emiPlansView.setPlans({
-          type: type,
-          amount: amount,
-          plans: emiPlans,
-          bank: bank,
-          on: {
-            back: function() {
-              self.switchTab(prevTab);
-              self.setScreen(prevScreen);
-              return true;
-            },
+    var prevTab = self.tab;
+    var prevScreen = self.screen;
 
-            select: function(value) {
-              var plan = _Arr.find(plans, function(plan) {
-                return plan.duration === value;
-              });
+    self.emiPlansView.setPlans({
+      type: 'bajaj',
+      amount: amount,
+      plans: plans,
+      bank: bank,
+      on: {
+        back: function() {
+          self.switchTab(prevTab);
+          self.setScreen(prevScreen);
+          return true;
+        },
 
-              var text = cardTab.getEmiText(amount, plan) || '';
+        select: function(value) {
+          var plan = _Arr.find(plans, function(plan) {
+            return plan.duration === value;
+          });
 
-              self.emiScreenView.setPlan({
-                duration: plan.duration,
-                text: text,
-              });
+          var text = cardTab.getEmiText(amount, plan) || '';
 
-              self.setScreen('emi');
-              self.switchTab('emi');
-            },
+          self.emiScreenView.setPlan({
+            duration: plan.duration,
+            text: text,
+          });
 
-            actions: {
-              viewAll: false,
-              payWithoutEmi: false,
-            },
-          },
-        });
+          self.setScreen('emi');
+          self.switchTab('emi');
+        },
 
-        self.switchTab('emiplans');
-        $('#body').removeClass('sub');
-        cardTab.setEmiPlansCta('emi', 'emiplans');
-      };
-    }
+        actions: {
+          viewAll: false,
+          payWithoutEmi: false,
+        },
+      },
+    });
+
+    self.switchTab('emiplans');
+    $('#body').removeClass('sub');
+    cardTab.setEmiPlansCta('emi', 'emiplans');
   },
 
   /**
@@ -3285,36 +3300,10 @@ Session.prototype = {
 
   getFormData: function() {
     var tab = this.tab;
-    var data = {};
     if (!preferences) {
-      return data;
+      return {};
     }
-
-    data.contact = getPhone();
-    data.email = getEmail();
-
-    // If it's the default contact details, do not send them
-    if (data.contact === Constants.INDIA_COUNTRY_CODE || data.contact === '+') {
-      delete data.contact;
-    }
-
-    if (Store.isContactOptional()) {
-      // Merchant is on contact optional feature
-      if (!contactPattern.test(data.contact)) {
-        // However, payload seems to have an invalid contact, delete it.
-        delete data.contact;
-      }
-    } else if (data.contact) {
-      data.contact = data.contact.replace(/\ /g, '');
-    }
-
-    if (Store.isEmailOptional()) {
-      // Merchant is on email optional feature
-      if (!emailPattern.test(data.email)) {
-        // However, payload seems to have an invalid email, delete it.
-        delete data.email;
-      }
-    }
+    var data = HomeScreenStore.getCustomerDetails();
 
     if (tab) {
       data.method = tab;
@@ -3610,157 +3599,163 @@ Session.prototype = {
       },
     });
 
-    this.commenceOTP('verifying_otp');
     var otp = storeGetter(discreet.OTPScreenStore.otp);
 
-    if (isWallet || this.headless) {
-      return this.r.submitOTP(otp);
-    }
+    if (otp.length > 0) {
+      this.commenceOTP('verifying_otp');
 
-    var queryParams;
-    var callback;
+      if (isWallet || this.headless) {
+        return this.r.submitOTP(otp);
+      }
 
-    var isCardlessEmi = this.payload && this.payload.method === 'cardless_emi';
+      var queryParams;
+      var callback;
 
-    if (!isCardlessEmi && this.tab !== 'upi') {
-      // card tab only past this
-      // card filled by logged out user + remember me
-      if (this.payload) {
-        var isRedirect = this.get('redirect');
-        if (!isRedirect) {
-          this.submit();
-        }
-        callback = function(msg) {
-          if (this.getCurrentCustomer().logged) {
-            // OTP verification successful
-            OtpService.resetCount('razorpay');
+      var isCardlessEmi =
+        this.payload && this.payload.method === 'cardless_emi';
 
-            if (isRedirect) {
-              this.submit();
-            } else {
-              this.r.emit('payment.resume');
-            }
-            this.showLoadError();
-          } else {
-            this.r.emit('payment.error', discreet.error(msg));
-            Analytics.track('behav:otp:incorrect', {
-              wallet: isWallet,
-            });
-            askOTP(this.otpView, msg, true);
-            this.updateCustomerInStore();
-          }
-        };
-      } else {
-        var self = this;
-
+      if (!isCardlessEmi && this.tab !== 'upi') {
+        // card tab only past this
+        // card filled by logged out user + remember me
         if (this.payload) {
-          // OTP verification for saving card
-          Analytics.track('saved_cards:save:otp:submit');
-        } else {
-          // OTP verification for accessing saved cards
-          Analytics.track('saved_cards:access:otp:submit');
-        }
+          var isRedirect = this.get('redirect');
+          if (!isRedirect) {
+            this.submit();
+          }
+          callback = function(msg) {
+            if (this.getCurrentCustomer().logged) {
+              // OTP verification successful
+              OtpService.resetCount('razorpay');
 
-        callback = function(msg) {
-          if (self.getCurrentCustomer().logged) {
+              if (isRedirect) {
+                this.submit();
+              } else {
+                this.r.emit('payment.resume');
+              }
+              this.showLoadError();
+            } else {
+              this.r.emit('payment.error', discreet.error(msg));
+              Analytics.track('behav:otp:incorrect', {
+                wallet: isWallet,
+              });
+              askOTP(this.otpView, msg, true);
+              this.updateCustomerInStore();
+            }
+          };
+        } else {
+          var self = this;
+
+          if (this.payload) {
+            // OTP verification for saving card
+            Analytics.track('saved_cards:save:otp:submit');
+          } else {
+            // OTP verification for accessing saved cards
+            Analytics.track('saved_cards:access:otp:submit');
+          }
+
+          callback = function(msg) {
+            if (self.getCurrentCustomer().logged) {
+              // OTP verification successful
+              OtpService.resetCount('razorpay');
+
+              self.updateCustomerInStore();
+              self.svelteCardTab.showLandingView().then(function() {
+                self.showCardTab();
+              });
+            } else {
+              Analytics.track('behav:otp:incorrect', {
+                wallet: isWallet,
+              });
+              askOTP(this.otpView, msg, true);
+              self.updateCustomerInStore();
+            }
+          };
+        }
+      }
+
+      var submitPayload = {
+        otp: otp,
+        email: getEmail(),
+      };
+
+      if (this.tab === 'cardless_emi') {
+        var providerCode = CardlessEmiStore.providerCode;
+
+        submitPayload = _Obj.extend(submitPayload, {
+          provider: providerCode,
+          method: 'cardless_emi',
+          payment_id: this.r._payment.payment_id,
+        });
+
+        callback = function(msg, data) {
+          if (msg) {
+            this.fetchCardlessEmiPlans({
+              incorrect: true,
+            });
+          } else {
             // OTP verification successful
             OtpService.resetCount('razorpay');
 
-            self.updateCustomerInStore();
-            self.svelteCardTab.showLandingView().then(function() {
-              self.showCardTab();
-            });
-          } else {
-            Analytics.track('behav:otp:incorrect', {
-              wallet: isWallet,
-            });
-            askOTP(this.otpView, msg, true);
-            self.updateCustomerInStore();
+            CardlessEmiStore.plans[providerCode] = data.emi_plans;
+            CardlessEmiStore.loanUrls[providerCode] = data.loan_url;
+            CardlessEmiStore.ott[providerCode] = data.ott;
+            CardlessEmiStore.lenderBranding[providerCode] =
+              data.lender_branding_url;
+
+            this.showCardlessEmiPlans();
           }
         };
       }
-    }
 
-    var submitPayload = {
-      otp: otp,
-      email: getEmail(),
-    };
-
-    if (this.tab === 'cardless_emi') {
-      var providerCode = CardlessEmiStore.providerCode;
-
-      submitPayload = _Obj.extend(submitPayload, {
-        provider: providerCode,
-        method: 'cardless_emi',
-        payment_id: this.r._payment.payment_id,
-      });
-
-      callback = function(msg, data) {
-        if (msg) {
-          this.fetchCardlessEmiPlans({
-            incorrect: true,
-          });
-        } else {
-          // OTP verification successful
-          OtpService.resetCount('razorpay');
-
-          CardlessEmiStore.plans[providerCode] = data.emi_plans;
-          CardlessEmiStore.loanUrls[providerCode] = data.loan_url;
-          CardlessEmiStore.ott[providerCode] = data.ott;
-          CardlessEmiStore.lenderBranding[providerCode] =
-            data.lender_branding_url;
-
-          this.showCardlessEmiPlans();
-        }
-      };
-    }
-
-    if (this.tab === 'upi') {
-      callback = function(msg, data) {
-        if (msg) {
-          Analytics.track('behav:otp:incorrect');
-          askOTP(this.otpView, msg, true);
-          this.updateCustomerInStore();
-        } else {
-          discreet.upiTab.render();
-          this.setScreen('upi');
-        }
-      };
-    }
-
-    if (this.tab === 'paylater') {
-      var providerCode = PayLaterStore.providerCode;
-
-      queryParams = {
-        provider: providerCode,
-        method: 'paylater',
-      };
-
-      callback = function(msg, data) {
-        this.otpView.updateScreen({ loading: false });
-        $('#body').addClass('sub');
-        if (msg) {
-          this.askPayLaterOtp('incorrect');
-        } else {
-          if (data.ott) {
-            // OTP verification successful
-            OtpService.resetCount('razorpay');
-
-            PayLaterStore.otpVerified = true;
-            PayLaterStore.ott[providerCode] = data.ott;
-            PayLaterStore.contact = data.contact;
-            this.switchTab('paylater');
-            this.submitPayLater();
+      if (this.tab === 'upi') {
+        callback = function(msg, data) {
+          if (msg) {
+            Analytics.track('behav:otp:incorrect');
+            askOTP(this.otpView, msg, true);
+            this.updateCustomerInStore();
+          } else {
+            discreet.upiTab.render();
+            this.setScreen('upi');
           }
-        }
-      };
-      this.commenceOTP('verifying');
+        };
+      }
+
+      if (this.tab === 'paylater') {
+        var providerCode = PayLaterStore.providerCode;
+
+        queryParams = {
+          provider: providerCode,
+          method: 'paylater',
+        };
+
+        callback = function(msg, data) {
+          this.otpView.updateScreen({ loading: false });
+          $('#body').addClass('sub');
+          if (msg) {
+            this.askPayLaterOtp('incorrect');
+          } else {
+            if (data.ott) {
+              // OTP verification successful
+              OtpService.resetCount('razorpay');
+
+              PayLaterStore.otpVerified = true;
+              PayLaterStore.ott[providerCode] = data.ott;
+              PayLaterStore.contact = data.contact;
+              this.switchTab('paylater');
+              this.submitPayLater();
+            }
+          }
+        };
+        this.commenceOTP('verifying');
+      }
+      this.getCurrentCustomer().submitOTP(
+        submitPayload,
+        bind(callback, this),
+        queryParams
+      );
+    } else {
+      Form.shake();
     }
-    this.getCurrentCustomer().submitOTP(
-      submitPayload,
-      bind(callback, this),
-      queryParams
-    );
   },
 
   getCurrentCustomer: function(phone) {
@@ -3814,6 +3809,37 @@ Session.prototype = {
 
     _Obj.loop(CardlessEmiStore, function(value, key) {
       delete value[provider];
+    });
+  },
+
+  showConversionChargesCallout: function() {
+    var locale = I18n.getCurrentLocale();
+
+    this.svelteOverlay.$set({
+      component: discreet.UserConfirmationOverlay,
+      props: {
+        buttonText: I18n.formatMessageWithLocale('cta.continue', locale),
+        callout: I18n.formatMessageWithLocale(
+          'card.international_currency_charges',
+          locale
+        ),
+      },
+    });
+
+    var that = this;
+
+    this.showSvelteOverlay();
+    var clearActionListener = that.svelteOverlay.$on('action', function(event) {
+      var action = event.detail.action;
+      if (action === 'confirm') {
+        that.hideSvelteOverlay();
+        Backdrop.hide();
+        that.submit();
+      }
+    });
+    var clearHideListener = that.svelteOverlay.$on('hidden', function() {
+      clearActionListener();
+      clearHideListener();
     });
   },
 
@@ -3969,7 +3995,7 @@ Session.prototype = {
                * show the EMI plans.
                */
               if (data.token) {
-                this.showEmiPlans('saved')({
+                this.showEmiPlansForSavedCard({
                   currentTarget: $(
                     '.saved-card[token="' + data.token + '"] .emi-plans-trigger'
                   )[0],
@@ -3979,7 +4005,7 @@ Session.prototype = {
                  * If this is a new card and no EMI duration is selected,
                  * show the EMI plans.
                  */
-                this.showEmiPlans('new')({
+                this.showEmiPlansForNewCard({
                   delegateTarget: $(
                     '#add-card-container .emi-plans-trigger'
                   )[0],
@@ -4047,6 +4073,13 @@ Session.prototype = {
     } else if (data.method === 'paypal') {
       // Let method=paypal payments go through directly
     } else {
+      return;
+    }
+
+    if (
+      discreet.storeGetter(CardScreenStore.internationalCurrencyCalloutNeeded)
+    ) {
+      this.showConversionChargesCallout();
       return;
     }
 
@@ -4284,14 +4317,19 @@ Session.prototype = {
     if (
       data.method === 'upi' &&
       data['_[flow]'] === 'intent' &&
-      data.upi_app === UPIUtils.GOOGLE_PAY_PACKAGE_NAME &&
-      discreet.upiTab.isGooglePayWebPaymentsAvailable()
+      WebPaymentsApi.appsThatSupportWebPayments.includes(data.upi_app) &&
+      WebPaymentsApi.isWebPaymentsApiAvailable(data.upi_app)
     ) {
       request.gpay = true;
     }
 
-    var appliedOffer = this.getAppliedOffer();
+    // added rewardIds to the create payment request
+    var rewardIds = storeGetter(rewardsStore);
+    if (rewardIds && rewardIds.length > 0 && !Store.isContactEmailOptional()) {
+      data.reward_ids = rewardIds;
+    }
 
+    var appliedOffer = this.getAppliedOffer();
     if (appliedOffer && (!this.offers || this.offers.shouldSendOfferToApi())) {
       data.offer_id = appliedOffer.id;
       this.r.display_amount = appliedOffer.amount;

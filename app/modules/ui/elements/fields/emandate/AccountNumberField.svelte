@@ -48,9 +48,7 @@
 
 <div class="account-number-field">
   {#if bankCode}
-    <div class="bank-icon">
-      <img src={getBankLogo(bankCode)} alt="" />
-    </div>
+    <div class="bank-icon"><img src={getBankLogo(bankCode)} alt="" /></div>
   {/if}
 
   <Field
@@ -72,5 +70,4 @@
     handleFocus
     handleInput
     on:input={handleInput} />
-
 </div>

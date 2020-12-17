@@ -2,6 +2,7 @@ import { writable } from 'svelte/store';
 import { getDowntimes as _getDowntimes } from 'checkoutframe/downtimes';
 import { makeAuthUrl as _makeAuthUrl } from 'common/Razorpay';
 import { displayAmount } from 'common/currency';
+import trustedBadge from 'ui/constants/trusted-badge';
 
 let razorpayInstance, preferences;
 export const razorpayInstanceStore = writable();
@@ -32,7 +33,20 @@ export const getRecurringMethods = () => getMerchantMethods().recurring;
 export const getMethodsCustomText = () => getMerchantMethods().custom_text;
 export const getMerchantOrder = () => preferences.order;
 export const getOrderMethod = () => getMerchantOrder()?.method;
-export const getMerchantOffers = () => preferences.offers;
+export const getMerchantOffers = () => {
+  // Ignore all offers ( including forced offers ) in case of partial payments.
+  if (isPartialPayment()) {
+    return [];
+  }
+  // Temporary fix: If customer-feebearer do not show any offers to the user.
+  if (preferences.fee_bearer && preferences.force_offer) {
+    return preferences.offers;
+  } else if (preferences.fee_bearer) {
+    return;
+  } else {
+    return preferences.offers;
+  }
+};
 export const isOfferForced = () => preferences.force_offer;
 export const getDowntimes = () => _getDowntimes(preferences);
 export const isCustomerFeeBearer = () => preferences.fee_bearer;
@@ -77,6 +91,8 @@ export const getPrefilledEmail = optionGetter('prefill.email');
 export const getPrefilledName = optionGetter('prefill.name');
 export const getPrefilledCardNumber = optionGetter('prefill.card[number]');
 export const getPrefilledVPA = optionGetter('prefill.vpa');
+
+export const showFeeLabel = writable(true);
 
 export function hasFeature(feature, fallbackValue) {
   return _Obj.getSafely(preferences, `features.${feature}`, fallbackValue);
@@ -301,4 +317,9 @@ export function getCustomSubtextForMethod(code) {
   if (customText && customText[code]) {
     return customText[code];
   }
+}
+
+export function getTrustedBadgeHighlights() {
+  const list = trustedBadge[preferences.merchant_id]?.list;
+  return list;
 }

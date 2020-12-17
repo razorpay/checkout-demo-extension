@@ -64,7 +64,53 @@ const randomName = () => {
   );
 };
 
+const query2obj = string => {
+  // TODO: Support objects and nested objects.
+
+  var obj = {};
+  string.split(/=|&/).forEach((param, index, array) => {
+    if (index % 2) {
+      const key = array[index - 1];
+      obj[decodeURIComponent(key)] = decodeURIComponent(param);
+    }
+  });
+  return obj;
+};
+
+const unflatten = o => {
+  const delimiter = '.';
+  let result = {};
+
+  Object.entries(o).forEach(([key, val]) => {
+    // Remove square brackets and replace them with delimiter.
+    key = key.replace(/\[([^[\]]+)\]/g, `${delimiter}$1`);
+
+    const keys = key.split(delimiter);
+    let _r = result;
+
+    keys.forEach((k, i) => {
+      /**
+       * For all keys except the last, create objects and set to _r.
+       * For the last key, set the value in _r.
+       */
+      if (i < keys.length - 1) {
+        if (!_r[k]) {
+          _r[k] = {};
+        }
+
+        _r = _r[k];
+      } else {
+        _r[k] = val;
+      }
+    });
+  });
+
+  return result;
+};
+
 const util = (module.exports = {
+  unflatten,
+  query2obj,
   /**
    * Sets the state in context
    */

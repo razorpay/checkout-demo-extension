@@ -4,11 +4,22 @@ import {
   didUPIIntentSucceed,
   upiBackCancel,
   getAppFromPackageName,
+  GOOGLE_PAY_PACKAGE_NAME,
 } from 'common/upi';
 import { androidBrowser } from 'common/useragent';
 import Track from 'tracker';
 import Analytics from 'analytics';
 import * as Bridge from 'bridge';
+import { ADAPTER_CHECKERS, phonepeSupportedMethods } from 'payment/adapters';
+import { supportedWebPaymentsMethodsForApp } from 'common/webPaymentsApi';
+
+const getParsedDataFromUrl = url => {
+  const parsedData = {};
+  url.replace(/^.*\?/, '').replace(/([^=&]+)=([^&]*)/g, (m, key, value) => {
+    parsedData[decodeURIComponent(key)] = decodeURIComponent(value);
+  });
+  return parsedData;
+};
 
 export const processOtpResponse = function(response) {
   var error = response.error;
@@ -226,6 +237,76 @@ var responseTypes = {
     this.emit('upi.pending', { flow: 'upi-intent' });
   },
 
+  web_payments: function(response, app) {
+    var instrumentData = {};
+
+    var data = response.data;
+    var intent_url = data.intent_url;
+    instrumentData.url = intent_url;
+    var parsedData = getParsedDataFromUrl(data.intent_url);
+
+    const supportedInstruments = [
+      {
+        supportedMethods: supportedWebPaymentsMethodsForApp[app],
+        data: instrumentData,
+      },
+    ];
+
+    const details = {
+      total: {
+        label: 'Payment',
+        amount: {
+          currency: 'INR',
+          value: parseFloat(parsedData.am).toFixed(2),
+        },
+      },
+    };
+
+    const webPaymentOnError = function(app, error) {
+      if (error.code) {
+        if (
+          [error.ABORT_ERR, error.NOT_SUPPORTED_ERR].indexOf(error.code) >= 0
+        ) {
+          this.emit('upi.intent_response', {});
+        }
+
+        // Since the method is not supported, remove it.
+        if (error.code === error.NOT_SUPPORTED_ERR) {
+          Analytics.track('web_payments_api:not_supported', {
+            data: {
+              error,
+              app,
+            },
+          });
+        }
+      }
+    };
+
+    try {
+      const PaymentRequest = global.PaymentRequest;
+
+      const request = new PaymentRequest(supportedInstruments, details);
+      request
+        .show()
+        .then(instrument => {
+          Track(this.r, 'web_payments_api_response', {
+            instrument,
+          });
+
+          this.emit('upi.intent_response', {
+            response: instrument.details,
+          });
+
+          return instrument.complete();
+        })
+        .catch(error => {
+          webPaymentOnError(app, error);
+        });
+    } catch (error) {
+      webPaymentOnError(app, error);
+    }
+  },
+
   gpay: function(coprotoRequest, fullResponse, type = 'payment_request') {
     if (type === 'payment_request') {
       GPay.payWithPaymentRequestApi(
@@ -380,7 +461,20 @@ var responseTypes = {
       }
 
       if (androidBrowser) {
-        return responseTypes['gpay'].call(this, request, fullResponse);
+        // payment.upi_app does not exist for razorpay.js
+        if (!this.upi_app) {
+          return responseTypes['gpay'].call(this, request, fullResponse);
+        }
+
+        if (this.upi_app === GOOGLE_PAY_PACKAGE_NAME) {
+          return responseTypes['gpay'].call(this, request, fullResponse);
+        } else {
+          return responseTypes['web_payments'].call(
+            this,
+            fullResponse,
+            this.upi_app
+          );
+        }
       }
     } else if (this.upi_app) {
       // upi_app will only be set for UPI intent payments.

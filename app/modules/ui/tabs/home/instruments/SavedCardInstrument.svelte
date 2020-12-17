@@ -21,7 +21,7 @@
   import {
     getLongBankName,
     formatTemplateWithLocale,
-    formatMessageWithLocale,
+    getInstrumentTitle,
   } from 'i18n';
 
   import { locale } from 'svelte-i18n';
@@ -117,12 +117,8 @@
       hasCvv = false;
     } else {
       // We don't know anything about the card.
-      title = formatMessageWithLocale(
-        isEmiInstrument
-          ? 'instrument.titles.emi_saved_cards'
-          : 'instrument.titles.saved_cards',
-        $locale
-      );
+      const method = isEmiInstrument ? 'emi_saved_cards' : 'saved_cards';
+      title = getInstrumentTitle(method, '', $locale);
       icon = getIcon();
       hasCvv = false;
     }
@@ -180,7 +176,7 @@
   on:click={selectionHandler}
   on:click>
   <i slot="icon">
-    <Icon {icon} alt="Card" />
+    <Icon {icon} alt="" />
   </i>
   <div slot="title">{title}</div>
 
@@ -194,8 +190,6 @@
         required={true}
         tabindex={-1}
         formatter={{ type: 'number' }} />
-    {:else}
-      <span class="theme-highlight-color">&#xe604;</span>
-    {/if}
+    {:else}<span class="theme-highlight-color">&#xe604;</span>{/if}
   </div>
 </svelte:component>

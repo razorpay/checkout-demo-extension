@@ -94,7 +94,7 @@ function sanitizeImage(options) {
 }
 
 function makeCheckoutUrl(rzp) {
-  const CANARY_PERCENTAGE = 0.01;
+  const CANARY_PERCENTAGE = 0.1;
   var url = RazorpayConfig.frame;
 
   const useCanary = _.random() < CANARY_PERCENTAGE;
@@ -238,8 +238,9 @@ CheckoutFrame.prototype = {
 
     var response = {
       integration: Track.props.integration,
-      referer: location.href,
+      referer: Track.props.referer || location.href,
       options: options,
+      library: Track.props.library,
       id: rzp.id,
     };
 

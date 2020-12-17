@@ -26,7 +26,8 @@ import {
   isIframe,
   ownerWindow,
 } from 'common/constants';
-import { checkGooglePayWebPayments } from 'checkoutframe/components/upi';
+import { checkForPossibleWebPayments } from 'checkoutframe/components/upi';
+import { rewards, rewardIds } from 'checkoutstore/rewards';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -137,6 +138,19 @@ const setAnalyticsMeta = message => {
   }
 };
 
+/**
+ * Sets tracking props from the message
+ * @param {Object} message
+ */
+const setTrackingProps = message => {
+  if (message.library) {
+    Track.props.library = message.library;
+  }
+  if (message.referer) {
+    Track.props.referer = message.referer;
+  }
+};
+
 export const handleMessage = function(message) {
   if ('id' in message && !validUID(message.id)) {
     return;
@@ -166,6 +180,7 @@ export const handleMessage = function(message) {
   var options = message.options;
 
   setAnalyticsMeta(message);
+  setTrackingProps(message);
 
   if (!session) {
     if (!options) {
@@ -232,6 +247,24 @@ function fetchPrefs(session) {
             session.modal.hide();
           });
         }
+        fetchRewards(session);
+      }
+    }
+  );
+}
+
+function fetchRewards(session) {
+  session.rewardsCall = Razorpay.payment.getRewards(
+    getRewardsParams(session.r),
+    rewardsRes => {
+      session.rewardsCall = null;
+      if (!rewardsRes.error) {
+        const reward_ids = rewardsRes.map(item => item.reward_id);
+        rewards.set(rewardsRes);
+        rewardIds.set(reward_ids);
+        if (reward_ids && reward_ids.length > 0) {
+          Analytics.setMeta('reward_ids', reward_ids);
+        }
       }
     }
   );
@@ -241,7 +274,7 @@ function performPrePrefsFetchOperations() {
   /* Start listening for back presses */
   setHistoryAndListenForBackPresses();
 
-  checkGooglePayWebPayments();
+  checkForPossibleWebPayments();
 }
 
 function setSessionPreferences(session, preferences) {
@@ -300,6 +333,11 @@ function getPreferenecsParams(razorpayInstance) {
     document.cookie = 'checkcookie=1;path=/';
   }
   return prefData;
+}
+
+function getRewardsParams(razorpayInstance) {
+  const rewardsData = makePrefParams(razorpayInstance);
+  return rewardsData;
 }
 
 function updateOptions(preferences) {

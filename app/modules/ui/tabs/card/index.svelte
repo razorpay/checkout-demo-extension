@@ -25,6 +25,7 @@
     selectedCard,
     selectedApp,
     cardTab,
+    internationalCurrencyCalloutNeeded,
   } from 'checkoutstore/screens/card';
   import { methodInstrument, blocks } from 'checkoutstore/screens/home';
   import { getSDKMeta } from 'checkoutstore/native';
@@ -37,6 +38,7 @@
     shouldRememberCustomer,
     isDCCEnabled,
     getCardFeatures,
+    isInternational,
   } from 'checkoutstore';
   import {
     isMethodEnabled,
@@ -63,6 +65,7 @@
     RECURRING_CALLOUT,
     SUBSCRIPTION_CALLOUT,
     SUBSCRIPTION_REFUND_CALLOUT,
+    INTERNATIONAL_CURRENCY_CHARGES,
   } from 'ui/labels/card';
 
   // Utils imports
@@ -70,7 +73,12 @@
   import { getSavedCards, transform } from 'common/token';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import { getIin, getCardType, getNetworkFromCardNumber } from 'common/card';
+  import {
+    getIin,
+    getCardType,
+    getNetworkFromCardNumber,
+    isAmex,
+  } from 'common/card';
   import { getSubtextForInstrument } from 'subtext';
   import { getProvider as getAppProvider } from 'common/apps';
   import { getAnimationOptions } from 'svelte-utils';
@@ -414,7 +422,7 @@
       },
     });
 
-    session.showEmiPlans('saved')(event.detail);
+    session.showEmiPlansForSavedCard(event.detail);
   }
 
   function onAddCardViewFocused() {
@@ -427,6 +435,9 @@
     const iin = getIin(_cardNumber);
     const sixDigits = _cardNumber.length > 5;
     const trimmedVal = _cardNumber.replace(/[ ]/g, '');
+    const amexCard = isAmex($cardNumber);
+
+    $internationalCurrencyCalloutNeeded = amexCard && isInternational();
 
     if (sixDigits) {
       getCardFeatures(_cardNumber).then(features => {
@@ -443,7 +454,7 @@
           let issuer = features.issuer;
 
           // Handle AMEX
-          if (getNetworkFromCardNumber($cardNumber) === 'amex') {
+          if (amexCard) {
             issuer = 'AMEX';
           }
 
@@ -526,10 +537,10 @@
     };
 
     if (emiCtaView === 'available' && isMethodUsable('emi')) {
-      session.showEmiPlans('new')(e);
+      session.showEmiPlansForNewCard(e);
       eventName += 'view';
     } else if (emiCtaView === 'plans-available' && isMethodUsable('emi')) {
-      session.showEmiPlans('new')(e);
+      session.showEmiPlansForNewCard(e);
       eventName += 'edit';
     } else if (emiCtaView === 'pay-without-emi' && isMethodUsable('card')) {
       if (isMethodEnabled('card')) {

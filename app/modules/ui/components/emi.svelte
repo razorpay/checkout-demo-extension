@@ -4,6 +4,9 @@
   // Svelte imports
   import Razorpay from 'common/Razorpay';
 
+  // Store imports
+  import { methodInstrument } from 'checkoutstore/screens/home';
+
   // Util imports
   import { getSession } from 'sessionmanager';
   import { roundUpToNearestMajor } from 'common/currency';
@@ -27,10 +30,24 @@
 
   // Computed
   export let amount;
-  export let banksList;
+  export let banksList = [];
   export let plans;
 
+  let filteredBankList = [];
+
   const session = getSession();
+
+  function filterBanksAgainstInstrument(banks, instrument) {
+    // Absence of issuers means that it is a method instrument for EMI.
+    // We do not need to filter in that case.
+    if (!instrument || instrument.method !== 'emi' || !instrument.issuers) {
+      return banks;
+    }
+
+    return _Arr.filter(banks, bank =>
+      _Arr.contains(instrument.issuers, bank.code)
+    );
+  }
 
   $: {
     let selectedBank = (banks[selected] || {}).code;
@@ -44,6 +61,11 @@
   // Sort the list by bank names
   $: banksList = _Arr.sort(_Obj.values(banks || {}), (a, b) =>
     a.name.localeCompare(b.name)
+  );
+
+  $: filteredBankList = filterBanksAgainstInstrument(
+    banksList,
+    $methodInstrument
   );
 
   $: {
@@ -87,7 +109,7 @@
     </div>
     <i class="i select-arrow">&#xe601;</i>
     <select id="emi-bank-select" bind:value={selected}>
-      {#each banksList as bank (bank.code)}
+      {#each filteredBankList as bank (bank.code)}
         <option value={bank.code}>
           {getEmiIssuerName(bank.code, $locale, bank.name)}
         </option>
