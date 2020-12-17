@@ -977,7 +977,7 @@ export default {
     verifying_vpa_info: 'Verifying your VPA',
   },
   upi_intent_apps: {
-    amazon: 'Amazon Shopping',
+    amazon: 'Amazon Pay UPI',
     axis: 'Axis Mobile',
     axispay: 'Axis Pay',
     'bank-of-baroda': 'Baroda Pay',
