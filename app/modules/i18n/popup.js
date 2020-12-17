@@ -14,9 +14,9 @@
  * @returns {string}
  */
 export function getCurrentLocale() {
-  if (discreet) {
+  try {
     return discreet.I18n.getCurrentLocale.apply(null, arguments);
-  }
+  } catch (e) {}
 
   return defaultGetCurrentLocale.apply(null, arguments);
 }
@@ -27,9 +27,9 @@ export function getCurrentLocale() {
  * @returns {string}
  */
 export function translatePaymentPopup() {
-  if (discreet) {
+  try {
     return discreet.I18n.translatePaymentPopup.apply(null, arguments);
-  }
+  } catch (e) {}
 
   return defaultTranslatePaymentPopup.apply(null, arguments);
 }
