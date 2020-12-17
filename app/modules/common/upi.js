@@ -236,6 +236,7 @@ const UPI_APPS = {
     {
       package_name: 'in.amazon.mShop.android.shopping',
       shortcode: 'amazon',
+      app_icon: 'https://cdn.razorpay.com/app/amazonpay.png',
     },
     {
       package_name: 'com.mipay.in.wallet',
