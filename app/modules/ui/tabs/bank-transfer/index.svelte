@@ -38,7 +38,7 @@
 
   import { t, locale } from 'svelte-i18n';
 
-  import { formatTemplateWithLocale } from 'i18n';
+  import { formatTemplateWithLocale, getCurrentLocale } from 'i18n';
 
   // Props
   export let loading = true;
@@ -77,11 +77,13 @@
       data: submitData,
     });
 
+    let url = makeAuthUrl(
+      session.r,
+      `orders/${session.r.get('order_id')}/virtual_accounts`
+    );
+
     fetch.post({
-      url: makeAuthUrl(
-        session.r,
-        `orders/${session.r.get('order_id')}/virtual_accounts`
-      ),
+      url,
       data,
       callback: getNEFTDetails,
     });

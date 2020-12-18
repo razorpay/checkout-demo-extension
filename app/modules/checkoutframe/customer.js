@@ -4,9 +4,9 @@ import Track from 'tracker';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import * as Bridge from 'bridge';
-import * as strings from 'common/strings';
 import * as OtpService from 'common/otpservice';
 import { isRecurring, getRecurringMethods } from 'checkoutstore';
+import { format, getCurrentLocale } from 'i18n';
 
 /* global getPhone */
 
@@ -101,7 +101,7 @@ Customer.prototype = {
     let url = 'customers/status/' + (this.contact || contact);
 
     if (queryParams) {
-      url = `${url}?${_.obj2query(queryParams)}`;
+      url = _.appendParamsToUrl(url, queryParams);
     }
 
     url = makeAuthUrl(this.r, url);
@@ -135,7 +135,7 @@ Customer.prototype = {
     let url = 'otp/create';
 
     if (queryParams) {
-      url = `${url}?${_.obj2query(queryParams)}`;
+      url = _.appendParamsToUrl(url, queryParams);
     }
 
     fetch.post({
@@ -158,7 +158,7 @@ Customer.prototype = {
     let url = 'otp/verify';
 
     if (queryParams) {
-      url = `${url}?${_.obj2query(queryParams)}`;
+      url = _.appendParamsToUrl(url, queryParams);
     }
 
     url = makeAuthUrl(this.r, url);
@@ -188,7 +188,7 @@ Customer.prototype = {
           if (data.error.field) {
             getSession().errorHandler(data);
           } else {
-            callback(strings.wrongOtp);
+            callback(format('otp.title.incorrect_otp_retry'));
           }
         } else {
           callback(undefined, data);
@@ -205,13 +205,17 @@ Customer.prototype = {
       },
     });
 
-    let ajaxOpts = {
-      url: makeAuthUrl(this.r, 'apps/logout'),
-      method: 'delete',
-      callback: callback,
-    };
+    let url = makeAuthUrl(this.r, 'apps/logout');
 
-    ajaxOpts.url += '&logout=' + (this_device ? 'app' : 'all');
+    url = _.appendParamsToUrl(url, {
+      logout: this_device ? 'app' : 'all',
+    });
+
+    let ajaxOpts = {
+      url,
+      method: 'delete',
+      callback,
+    };
 
     fetch.setSessionId(null);
 

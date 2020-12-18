@@ -1,20 +1,21 @@
-import { generateTextFromList } from 'lib/utils';
-import { getCommonBankName } from 'common/bank';
+import { generateTextFromList } from 'i18n/text-utils';
 import { getBanks } from 'checkoutstore';
+import { getShortBankName } from 'i18n';
 
 /**
  * Generates subtext for netbanking instrument
  * @param {Instrument} instrument
+ * @param {string} locale
  *
  * @returns {string}
  */
-export function generateSubtextForNetbankingInstrument(instrument) {
+export function generateSubtextForNetbankingInstrument(instrument, locale) {
   if (!instrument.banks) {
     return '';
   }
 
   const names = _Arr.map(instrument.banks, bank => {
-    let bankName = getCommonBankName(bank);
+    let bankName = getShortBankName(bank, locale);
 
     if (bank === bankName) {
       bankName = getBanks()[bank];
@@ -25,5 +26,5 @@ export function generateSubtextForNetbankingInstrument(instrument) {
     return bankName;
   });
 
-  return generateTextFromList(names, 3);
+  return generateTextFromList(names, locale, 3);
 }

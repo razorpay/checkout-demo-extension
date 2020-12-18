@@ -142,32 +142,32 @@ export default {
   },
   callouts: {
     card_offer: {
-      credit_debit_callout: 'All {issuer} Cards are supported for this payment',
+      credit_debit_callout:
+        'All {issuer} cards are supported for this payment.',
       credit_only_callout:
-        'All {issuer} Credit Cards are supported for this payment',
+        'All {issuer} credit cards are supported for this payment.',
       debit_only_callout:
-        'All {issuer} Debit Cards are supported for this payment',
+        'All {issuer} debit cards are supported for this payment.',
     },
     recurring: {
       credit_debit_callout:
-        'Visa and Mastercard Credit Cards from all Banks and Debit Cards from ICICI, Kotak, Citibank and Canara Bank are supported for this payment.',
+        '{creditIssuers} credit cards and debit cards from {debitIssuers} are supported for this payment.',
       credit_only_callout:
-        'Only Visa and Mastercard Credit Cards are supported for this payment.',
+        'Only {issuers} credit cards are supported for this payment.',
       debit_only_callout:
-        'Only Visa and Mastercard Debit Cards from ICICI, Kotak, Citibank and Canara Bank are supported for this payment.',
+        'Only debit cards from {issuers} are supported for this payment.',
     },
     subscriptions: {
       credit_debit_callout:
-        'Subscription payments are supported on Visa and Mastercard Credit Cards from all Banks and Debit Cards from ICICI, Kotak, Citibank and Canara Bank.',
+        'Subscription payments are supported on {creditIssuers} credit cards and debit cards from {debitIssuers}.',
       credit_only_callout:
-        'Subscription payments are only supported on Mastercard and Visa Credit Cards.',
+        'Subscription payments are supported on {issuers} credit cards.',
       debit_only_callout:
-        'Subscription payments are only supported on Visa and Mastercard Debit Cards from ICICI, Kotak, Citibank and Canara Bank.',
+        'Subscription payments are supported on debit cards from {issuers}.',
     },
   },
   card: {
     add_another_card_btn: 'Add another card',
-    amex_unsupported_error: 'AMEX cards are not supported',
     auth_type_header: 'Complete Payment Using',
     auth_type_otp: 'OTP / Password',
     auth_type_pin: 'ATM PIN',
@@ -202,6 +202,18 @@ export default {
     view_all_emi_plans: 'View all EMI Plans',
     international_currency_charges:
       'Relevant currency conversion charges might be applicable, as Amex will process the transaction in INR. To avoid currency conversion charges please use MasterCard or Visa.',
+  },
+  card_subtext: {
+    all_cards_supported: 'All cards supported',
+    cards: 'cards',
+    only: 'Only',
+    select: 'select',
+    select_bins_supported: 'Only select BINs accepted',
+    select_network: 'select network',
+    select_networks: 'select networks',
+    select_networks_specific_issuers: 'select {issuers}',
+    specific_bins_supported: 'Only {bins} accepted',
+    supported: 'supported',
   },
   cardless_emi: {
     providers: {
@@ -729,6 +741,8 @@ export default {
   },
   misc: {
     acs_load_delay: 'Seems like your bank page is taking time to load.',
+    and_more: '{text} & More',
+    cancel_action: 'Cancel Payment',
     checking_payment_status: 'Checking the payment status...',
     complete_payment_on_app: 'Please complete the payment on the {app}',
     confirm_cancel_heading: 'Cancel payment?',
@@ -736,19 +750,30 @@ export default {
       'Your payment is ongoing. Are you sure you want to cancel the payment?',
     confirm_cancel_positive_text: 'Yes, cancel',
     confirm_cancel_negative_text: 'No',
+    downtime_multiple_methods:
+      '{method} are facing temporary issues right now.',
+    downtime_single_method: '{method} is facing temporary issues right now.',
+    error_handling_request: 'There was an error in handling your request.',
     frequently_used_config_title: 'Frequently used methods',
+    go_to_payment: 'Go to payment',
+    list_multiple_combined: '{init}, and {last}',
+    list_two_combined: '{one} and {two}',
     loading: 'Loading',
     logout_action: 'Log out',
     logout_all_devices_action: 'Log out from all devices',
+    payment_canceled: 'Payment cancelled',
     payment_incomplete: 'Payment did not complete.',
     payment_processing: 'Your payment is being processed',
     payment_timeout: 'Payment did not complete on time',
+    payment_waiting_confirmation: 'Waiting for payment confirmation.',
     payment_waiting_on_bank: 'Waiting for payment to complete on bank page',
     processing: 'Processing...',
     redirecting_bank: 'Redirecting to Bank page',
     redirecting_to_app: 'Redirecting you to the {app}...',
+    retry: 'Retry',
     search_no_results: 'No results for "{query}"',
     search_results_label: 'Results',
+    select_another_method: 'Please select another method.',
   },
   nach: {
     allowed_formats_info:
@@ -763,6 +788,12 @@ export default {
   },
   netbanking: {
     corporate_label: 'Corporate',
+    downtime_low_callout:
+      '<strong>{bank}</strong> accounts are experiencing low success rates.',
+    downtime_high_callout:
+      '<strong>{bank}</strong> accounts are temporarily unavailable right now. Please select another bank.',
+    recurring_callout:
+      'Future payments from your bank account will be charged automatically.',
     retail_label: 'Retail',
     search_all: 'All banks',
     search_placeholder: 'Search for bank',
@@ -821,9 +852,7 @@ export default {
       cardlessemi_sending:
         'Looking for {provider} account associated with {phone}',
       incorrect_otp_retry: 'Entered OTP was incorrect. Re-enter to proceed.',
-      insufficient_wallet_balance: 'Insufficient balance in your wallet',
       loading: 'Loading...',
-      native_otp_sent: 'Enter OTP to complete the payment',
       otp_proceed_with_upi_subscription:
         'Enter OTP sent to {phone} to proceed with the subscription',
       otp_resent_generic: 'OTP Resent',
@@ -886,6 +915,7 @@ export default {
   popup: {
     loading_method_page: 'Loading {method} page…',
     paying: 'PAYING',
+    payment_canceled: 'Payment processing cancelled by user',
     processing: 'Processing, Please Wait...',
     redirecting: 'Redirecting...',
     secured_by: 'Secured by',
@@ -899,6 +929,7 @@ export default {
   qr: {
     downtime_text: '<strong>UPI QR<strong> is experiencing low success rate.',
     generating_label: 'Generating QR Code...',
+    payment_status_checking: 'Checking payment status...',
     retry: 'Retry',
     scan_on_phone:
       'Scan the QR using any UPI app on your phone like BHIM, PhonePe, Google Pay etc.',
@@ -944,7 +975,16 @@ export default {
     collect_new_vpa_help: 'Please enter a valid VPA of the form username@bank',
     collect_securely_save: 'Securely save your UPI ID',
     downtime_text: '<strong>UPI<strong> is experiencing low success rate.',
+    gpay_block_heading: 'Pay using Gpay App',
+    gpay_web_api_title: 'Google Pay',
+    intent_accept_request:
+      "Please accept the request from Razorpay's VPA on your UPI app",
     intent_block_heading: 'PAY USING APPS',
+    intent_no_apps_error:
+      'No UPI App on this device. Select other UPI option to proceed.',
+    intent_select_app: 'Select UPI App in your device',
+    invalid_vpa_default_message:
+      'Invalid VPA, please try again with correct VPA',
     new_vpa_subtitle: 'Google Pay, BHIM, PhonePe & more',
     new_vpa_subtitle_upi_otm:
       'Please note, you can only complete this payment using <strong>BHIM App<strong> or <strong>PayTM App<strong>',
@@ -955,9 +995,11 @@ export default {
     omni_error:
       'Please ensure the same number is linked to the Google Pay account.',
     omni_gpay_number: 'Google Pay phone number',
-    omni_verifying_phone: 'Verifying mobile number with Google Pay...',
+    omni_verifying_phone: 'Verifying mobile number with Google Pay..',
     qr_block_heading: 'Pay using QR Code',
     recommended: 'Recommended',
+    recurring_subscription_callout:
+      'The charge is to enable subscription on this card and it will be refunded.',
     recurring_caw_callout_all_data:
       'This is a recurring payment and {maxAmount} will be charged now. {merchantName} can charge upto {amount} on a {recurringFrequency} basis till {endDate}.',
     recurring_caw_callout_no_frequency:
@@ -966,8 +1008,6 @@ export default {
       'This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} on a {recurringFrequency} basis till {endDate}.',
     recurring_caw_callout_no_name_no_frequency:
       'This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} anytime till {endDate}.',
-    recurring_subscription_callout:
-      'The charge is to enable subscription on this card and it will be refunded.',
     redirect_to_app: 'You will be redirected to your UPI app',
     scan_qr_code: 'Scan the QR code using your UPI app',
     supported_banks:
@@ -975,8 +1015,13 @@ export default {
     upi_id_linked_to_bank: 'UPI ID is linked to',
     show_other_apps: 'Show other UPI apps',
     show_qr_code: 'Show QR Code',
+    subscription_refund_callout:
+      'This card will be linked to the subscription and future payments will be charged automatically.',
     upi_otm_callout:
       '<strong>{amount}<strong> will be blocked on your account by clicking pay. Your account will be charged {nameString} between <strong>{startDate}<strong> to <strong>{endDate}<strong>.',
+    use_saved_cards_btn: 'Use saved cards',
+    use_saved_cards_on_rzp_btn: 'Use saved cards on Razorpay',
+    view_all_emi_plans: 'View all EMI Plans',
     verifying_vpa_info: 'Verifying your VPA',
   },
   upi_intent_apps: {
