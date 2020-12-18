@@ -34,7 +34,6 @@
 }
 
 h3.title {
-  font-size: 0.8rem;
   line-height: 1rem;
   text-transform: uppercase;
   color: rgba(51, 51, 51, 0.6);
@@ -690,7 +689,7 @@ i {
   color: #fff;
   background: #fff;
   padding: $p;
-  overflow: hidden;
+  overflow: visible;
   max-height: $headerh;
   position: relative;
   z-index: 3;
@@ -714,6 +713,10 @@ i {
   &::after {
     transition: 0.2s;
     background: none;
+  }
+
+  &.has-dropdown {
+    padding-bottom: 0 !important;
   }
 
   &.offer-fade {
@@ -865,6 +868,11 @@ i {
       background: transparent;
     }
   }
+}
+
+#language-dropdown:not(:empty) {
+  padding-top: 16px;
+  clear: both;
 }
 
 #body.sub {
@@ -1388,4 +1396,19 @@ div.callout span{
   text-transform: uppercase;
   letter-spacing: 0.25px;
   margin-bottom: 5px;
+}
+
+#body-overlay {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.1);
+  z-index: 3;
+}
+
+#body-overlay.shown {
+  display: block;
 }
