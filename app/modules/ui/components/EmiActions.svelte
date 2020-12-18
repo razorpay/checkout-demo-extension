@@ -42,7 +42,7 @@
         <span class="help">
           <!-- LABEL: EMI is available on {issuers} cards. Enter your credit card
           to avail. -->
-          {formatTemplateWithLocale(UNAVAILABLE_HELP, { issuers: getEMIBanksText($locale) }, $locale)}
+          {formatTemplateWithLocale(UNAVAILABLE_HELP, { issuers: getEMIBanksText() }, $locale)}
         </span>
         <!-- LABEL: EMI unavailable -->
         <div class="emi-plans-text">{$t(UNAVAILABLE_BTN)}</div>

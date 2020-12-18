@@ -1,18 +1,5 @@
-import { generateTextFromList } from 'i18n/text-utils';
+import { generateTextFromList } from 'lib/utils';
 import { getCommonBankName } from 'common/bank';
-
-import { formatTemplateWithLocale, formatMessageWithLocale } from 'i18n';
-import {
-  CARD_OFFER_CREDIT_DEBIT_CALLOUT,
-  CARD_OFFER_CREDIT_ONLY_CALLOUT,
-  CARD_OFFER_DEBIT_ONLY_CALLOUT,
-  RECURRING_CREDIT_DEBIT_CALLOUT,
-  RECURRING_CREDIT_ONLY_CALLOUT,
-  RECURRING_DEBIT_ONLY_CALLOUT,
-  SUBSCRIPTIONS_CREDIT_DEBIT_CALLOUT,
-  SUBSCRIPTIONS_CREDIT_ONLY_CALLOUT,
-  SUBSCRIPTIONS_DEBIT_ONLY_CALLOUT,
-} from 'ui/labels/home';
 
 /**
  * Generates a string from the list after filtering for truthy values
@@ -30,11 +17,10 @@ function concatTruthyString(list) {
  * take a look at the tests, or the document here:
  * https://docs.google.com/spreadsheets/d/1Yqz_4GBT0aSxvYu1xjflQLy2I-PnLq5GZsFY8Pi-3OY/edit?usp=sharing
  * @param {Instrument} instrument
- * @param {string} locale
  *
  * @returns {string}
  */
-export function generateSubtextForCardInstrument(instrument, locale) {
+export function generateSubtextForCardInstrument(instrument) {
   const instrumentIssuers =
     instrument.issuers || []
     |> _Arr.map(bank => getCommonBankName(bank).replace(/ Bank$/, ''));
@@ -54,51 +40,40 @@ export function generateSubtextForCardInstrument(instrument, locale) {
 
   // If IINs are provided, use only IINs to generate subtext
   if (!supportAllIins) {
+    let iinsString;
+
     if (iinsLength <= 3) {
-      return formatTemplateWithLocale(
-        'card_subtext.specific_bins_supported',
-        { bins: generateTextFromList(instrumentIins, locale) },
-        locale
-      );
+      iinsString = generateTextFromList(instrumentIins);
+    } else {
+      iinsString = 'select BINs';
     }
-    return formatMessageWithLocale(
-      'card_subtext.select_bins_supported',
-      locale
-    );
+
+    return concatTruthyString(['Only', iinsString, 'accepted']);
   }
 
   if (supportAllIssuers) {
-    let stringList = [formatMessageWithLocale('card_subtext.only', locale)];
+    let stringList = ['Only'];
 
     let typesString;
     let cardsString = 'cards';
     let networksString;
 
     if (!supportAllTypes) {
-      typesString = generateTextFromList(instrumentTypes, locale);
+      typesString = generateTextFromList(instrumentTypes);
     }
 
     if (supportAllNetworks) {
       if (supportAllTypes) {
-        return formatMessageWithLocale(
-          'card_subtext.all_cards_supported',
-          locale
-        );
+        return 'All cards supported';
       }
     } else if (networksLength <= 2) {
-      networksString = generateTextFromList(instrumentNetworks, locale, 2);
+      networksString = generateTextFromList(instrumentNetworks, 2);
     } else {
       if (supportAllTypes) {
-        networksString = formatMessageWithLocale(
-          'card_subtext.select_networks',
-          locale
-        );
+        networksString = 'select networks';
         cardsString = null;
       } else {
-        networksString = formatMessageWithLocale(
-          'card_subtext.select_network',
-          locale
-        );
+        networksString = 'select network';
       }
     }
 
@@ -106,20 +81,20 @@ export function generateSubtextForCardInstrument(instrument, locale) {
       networksString,
       typesString,
       cardsString,
-      formatMessageWithLocale('card_subtext.supported', locale),
+      'supported',
     ]);
 
     return concatTruthyString(stringList);
   } else if (issuersLength === 1) {
-    let stringList = [formatMessageWithLocale('card_subtext.only', locale)];
+    let stringList = ['Only'];
 
     let issuersString = instrumentIssuers[0];
     let typesString;
-    let cardsString = formatMessageWithLocale('card_subtext.cards', locale);
+    let cardsString = 'cards';
     let networksString;
 
     if (!supportAllTypes) {
-      typesString = generateTextFromList(instrumentTypes, locale);
+      typesString = generateTextFromList(instrumentTypes);
     }
 
     if (supportAllNetworks) {
@@ -127,11 +102,7 @@ export function generateSubtextForCardInstrument(instrument, locale) {
     } else if (networksLength === 1) {
       networksString = instrumentNetworks[0];
     } else {
-      issuersString = formatTemplateWithLocale(
-        'card_subtext.select_networks_specific_issuers',
-        { issuers: issuersString },
-        locale
-      );
+      issuersString = `select ${issuersString}`;
     }
 
     stringList = _Arr.mergeWith(stringList, [
@@ -139,20 +110,20 @@ export function generateSubtextForCardInstrument(instrument, locale) {
       networksString,
       typesString,
       cardsString,
-      formatMessageWithLocale('card_subtext.supported', locale),
+      'supported',
     ]);
 
     return concatTruthyString(stringList);
   } else if (issuersLength === 2) {
-    let stringList = [formatMessageWithLocale('card_subtext.only', locale)];
+    let stringList = ['Only'];
 
-    let issuersString = generateTextFromList(instrumentIssuers, locale, 2);
+    let issuersString = generateTextFromList(instrumentIssuers, 2);
     let typesString;
-    let cardsString = formatMessageWithLocale('card_subtext.cards', locale);
+    let cardsString = 'cards';
     let networksString;
 
     if (!supportAllTypes) {
-      typesString = generateTextFromList(instrumentTypes, locale);
+      typesString = generateTextFromList(instrumentTypes);
     }
 
     if (supportAllNetworks) {
@@ -161,14 +132,10 @@ export function generateSubtextForCardInstrument(instrument, locale) {
       if (supportAllTypes) {
         networksString = instrumentNetworks[0];
       } else {
-        issuersString = formatTemplateWithLocale(
-          'card_subtext.select_networks_specific_issuers',
-          { issuers: issuersString },
-          locale
-        );
+        issuersString = `select ${issuersString}`;
       }
     } else {
-      issuersString = formatMessageWithLocale('card_subtext.select', locale);
+      issuersString = `select`;
     }
 
     stringList = _Arr.mergeWith(stringList, [
@@ -176,20 +143,20 @@ export function generateSubtextForCardInstrument(instrument, locale) {
       networksString,
       typesString,
       cardsString,
-      formatMessageWithLocale('card_subtext.supported', locale),
+      'supported',
     ]);
 
     return concatTruthyString(stringList);
   } else {
-    let stringList = [formatMessageWithLocale('card_subtext.only', locale)];
+    let stringList = ['Only'];
 
-    let issuersString = formatMessageWithLocale('card_subtext.select', locale);
+    let issuersString = 'select';
     let typesString;
-    let cardsString = formatMessageWithLocale('card_subtext.cards', locale);
+    let cardsString = 'cards';
     let networksString;
 
     if (!supportAllTypes) {
-      typesString = generateTextFromList(instrumentTypes, locale);
+      typesString = generateTextFromList(instrumentTypes);
     }
 
     if (supportAllNetworks) {
@@ -197,7 +164,7 @@ export function generateSubtextForCardInstrument(instrument, locale) {
     } else if (networksLength === 1) {
       networksString = instrumentNetworks[0];
     } else {
-      issuersString = formatMessageWithLocale('card_subtext.select', locale);
+      issuersString = `select`;
     }
 
     stringList = _Arr.mergeWith(stringList, [
@@ -205,7 +172,7 @@ export function generateSubtextForCardInstrument(instrument, locale) {
       networksString,
       typesString,
       cardsString,
-      formatMessageWithLocale('card_subtext.supported', locale),
+      'supported',
     ]);
 
     return concatTruthyString(stringList);
@@ -218,114 +185,96 @@ export function generateSubtextForRecurring({
   issuers = {},
   subscription,
   offer,
-  locale,
 }) {
   const { debit, credit } = types;
   const { mastercard, visa, amex } = networks;
 
-  const debitCardIssuers = generateTextFromList(_Obj.values(issuers), locale);
-  const creditCardsNetworks = generateTextForCardNetwork(
-    {
-      mastercard,
-      visa,
-      amex,
-    },
-    locale
-  );
+  const debitCardIssuers = generateTextFromList(_Obj.values(issuers));
+  const creditCardsNetworks = generateTextForCardNetwork({
+    mastercard,
+    visa,
+    amex,
+  });
 
   if (subscription) {
+    const subscriptionText = 'Subscription payments are supported on';
     if (credit && debit) {
       // Subscription payments are supported on Mastercard, Visa, and American Express credit cards and debit cards from ICICI, Kotak, Citibank, and Canara Bank.
-      return formatTemplateWithLocale(
-        SUBSCRIPTIONS_CREDIT_DEBIT_CALLOUT,
-        {
-          creditIssuers: creditCardsNetworks,
-          debitIssuers: debitCardIssuers,
-        },
-        locale
-      );
+      return [
+        subscriptionText,
+        creditCardsNetworks,
+        'credit cards and',
+        'debit cards from',
+        debitCardIssuers + '.',
+      ].join(' ');
     } else if (debit) {
       // Subscription payments are supported on debit cards from ICICI, Kotak, Citibank, and Canara Bank.
-      return formatTemplateWithLocale(
-        SUBSCRIPTIONS_DEBIT_ONLY_CALLOUT,
-        {
-          issuers: debitCardIssuers,
-        },
-        locale
-      );
+      return [
+        subscriptionText,
+        'debit cards from',
+        debitCardIssuers + '.',
+      ].join(' ');
     } else {
       // Subscription payments are supported on Mastercard, Visa, and American Express credit cards.
-      return formatTemplateWithLocale(
-        SUBSCRIPTIONS_CREDIT_ONLY_CALLOUT,
-        {
-          issuers: creditCardsNetworks,
-        },
-        locale
+      return [subscriptionText, creditCardsNetworks, 'credit cards' + '.'].join(
+        ' '
       );
     }
   } else if (offer) {
     // All issuer cards are supported for this payment.
     // All issuer credit cards are supported for this payment.
     // All issuer debit cards are supported for this payment.
-
-    if (credit && debit) {
-      return formatTemplateWithLocale(
-        CARD_OFFER_CREDIT_DEBIT_CALLOUT,
-        { issuer: offer.issuer },
-        locale
-      );
-    } else if (debit) {
-      return formatTemplateWithLocale(
-        CARD_OFFER_DEBIT_ONLY_CALLOUT,
-        { issuer: offer.issuer },
-        locale
-      );
-    } else {
-      return formatTemplateWithLocale(
-        CARD_OFFER_CREDIT_ONLY_CALLOUT,
-        { issuer: offer.issuer },
-        locale
-      );
-    }
+    return [
+      'All',
+      offer.issuer,
+      generateTextForCardType(credit, debit),
+      'are supported for this payment.',
+    ].join(' ');
   } else {
     if (credit && debit) {
       // Mastercard, Visa, and American Express credit cards and debit cards from ICICI, Kotak, Citibank, and Canara Bank are supported for this payment.
-      return formatTemplateWithLocale(
-        RECURRING_CREDIT_DEBIT_CALLOUT,
-        {
-          creditIssuers: creditCardsNetworks,
-          debitIssuers: debitCardIssuers,
-        },
-        locale
-      );
+      return [
+        creditCardsNetworks,
+        'credit cards',
+        'and debit cards from',
+        debitCardIssuers,
+        'are supported for this payment.',
+      ].join(' ');
     } else if (debit) {
       // Only debit cards from ICICI, Kotak, Citibank, and Canara Bank are supported for this payment.
-      return formatTemplateWithLocale(
-        RECURRING_DEBIT_ONLY_CALLOUT,
-        {
-          issuers: debitCardIssuers,
-        },
-        locale
-      );
+      return [
+        'Only debit cards from',
+        debitCardIssuers,
+        'are supported for this payment.',
+      ].join(' ');
     } else {
       // Only Mastercard, Visa, and American Express credit cards are supported for this payment.
-      return formatTemplateWithLocale(
-        RECURRING_CREDIT_ONLY_CALLOUT,
-        {
-          issuers: creditCardsNetworks,
-        },
-        locale
-      );
+      return [
+        'Only',
+        creditCardsNetworks,
+        'credit cards',
+        'are supported for this payment.',
+      ].join(' ');
     }
   }
 }
 
-function generateTextForCardNetwork({ mastercard, visa, amex }, locale) {
+function generateTextForCardType(credit, debit) {
+  if (credit && debit) {
+    return 'cards';
+  } else if (debit) {
+    return 'debit cards';
+  } else {
+    return 'credit cards';
+  }
+}
+
+function generateTextForCardNetwork({ mastercard, visa, amex }) {
   const networksList =
     [
       visa ? 'Visa' : '',
       mastercard ? 'Mastercard' : '',
       amex ? 'American Express' : '',
     ] |> _Arr.filter(Boolean);
-  return generateTextFromList(networksList, locale);
+  return generateTextFromList(networksList);
 }

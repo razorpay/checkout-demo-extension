@@ -24,8 +24,8 @@
   import { getAnimationOptions } from 'svelte-utils';
 
   // i18n
-  import { t, locale } from 'svelte-i18n';
-  import { formatTemplateWithLocale } from 'i18n';
+  import { locale } from 'svelte-i18n';
+  import { formatTemplateWithLocale, formatMessageWithLocale } from 'i18n';
 
   // Props
   export let placeholder = 'Type to search';
@@ -479,7 +479,7 @@
             class="search-results"
             class:has-query={query}
             id={IDs.results}
-            aria-label={$t('misc.search_results_label')}
+            aria-label={formatMessageWithLocale('misc.search_results_label', $locale)}
             role="listbox"
             bind:this={resultsContainerRef}>
             {#if query}

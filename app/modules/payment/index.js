@@ -28,8 +28,6 @@ import { updateCurrencies, setCurrenciesRate } from 'common/currency';
 import { GOOGLE_PAY_PACKAGE_NAME, PHONE_PE_PACKAGE_NAME } from 'common/upi';
 import { getCardEntityFromPayload, getCardFeatures } from 'common/card';
 
-import { getCurrentLocale, translatePaymentPopup as t } from 'i18n/popup';
-
 /**
  * Tells if we're being executed from
  * the same domain as the configured API
@@ -59,7 +57,7 @@ function onPaymentCancel(metaParam) {
     var cancelError = {
       error: {
         code: 'BAD_REQUEST_ERROR',
-        description: t('payment_canceled'),
+        description: 'Payment processing cancelled by user',
       },
     };
     var payment_id = this.payment_id;
@@ -73,10 +71,6 @@ function onPaymentCancel(metaParam) {
     if (payment_id) {
       eventData.payment_id = payment_id;
       var url = makeAuthUrl(razorpay, 'payments/' + payment_id + '/cancel');
-      url = _.appendParamsToUrl(url, {
-        language_code: getCurrentLocale(),
-      });
-
       if (_.isNonNullObject(metaParam)) {
         url += '&' + _.obj2query(metaParam);
       }
@@ -698,7 +692,7 @@ Payment.prototype = {
   writePopup: function() {
     var popup = this.popup;
     if (popup) {
-      popup.write(popupTemplate(this, t));
+      popup.write(popupTemplate(this));
       popup.window.deserialize = _Doc.obj2formhtml;
     }
   },
@@ -834,10 +828,7 @@ razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
     timeout,
   };
 
-  let url = makeAuthUrl(this, 'payments/validate/account');
-
-  url = _.appendParamsToUrl(url, { language_code: getCurrentLocale() });
-
+  const url = makeAuthUrl(this, 'payments/validate/account');
   const cachedVpaResponse = vpaCache[vpa];
 
   if (cachedVpaResponse) {
@@ -969,10 +960,8 @@ razorpayProto.submitOTP = function(otp) {
 
 razorpayProto.resendOTP = function(callback) {
   var payment = this._payment;
-  var url = makeAuthUrl(this, 'payments/' + payment.payment_id + '/otp_resend');
-
   payment.ajax = fetch.post({
-    url,
+    url: makeAuthUrl(this, 'payments/' + payment.payment_id + '/otp_resend'),
     data: {
       '_[source]': 'checkoutjs',
     },
@@ -988,10 +977,8 @@ razorpayProto.topupWallet = function() {
     payment.writePopup();
   }
 
-  let url = makeAuthUrl(this, 'payments/' + payment.payment_id + '/topup/ajax');
-
   payment.ajax = fetch.post({
-    url,
+    url: makeAuthUrl(this, 'payments/' + payment.payment_id + '/topup/ajax'),
     data: {
       '_[source]': 'checkoutjs',
     },
@@ -1085,8 +1072,6 @@ razorpayProto.getCardCurrencies = function(payload) {
 
     // append requestPayload
     url = _.appendParamsToUrl(url, requestPayload);
-
-    url = _.appendParamsToUrl(url, { language_code: getCurrentLocale() });
 
     fetch.jsonp({
       url,

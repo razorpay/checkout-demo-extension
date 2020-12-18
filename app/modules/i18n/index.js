@@ -1,5 +1,3 @@
-import Analytics from 'analytics';
-
 import { dictionary, t, locale } from 'svelte-i18n';
 
 import { get } from 'svelte/store';
@@ -31,19 +29,7 @@ export function getBundle(locale) {
  * @returns {string}
  */
 export function formatTemplateWithLocale(label, data, locale, defaultValue) {
-  try {
-    return get(t)(label, { locale, values: data, default: defaultValue });
-  } catch (e) {
-    Analytics.track('i18n:template:error', {
-      data: {
-        message: e.message,
-        label,
-        locale,
-        data,
-      },
-    });
-    return defaultValue || label;
-  }
+  return get(t)(label, { locale, values: data, default: defaultValue });
 }
 
 /**
@@ -54,17 +40,6 @@ export function formatTemplateWithLocale(label, data, locale, defaultValue) {
  * @returns {string}
  */
 export function formatMessageWithLocale(label, locale, defaultValue) {
-  return get(t)(label, { locale, default: defaultValue });
-}
-
-/**
- * Formats the message with the current locale
- * @param {string} label
- * @param {string} [defaultValue]
- * @returns {string}
- */
-export function format(label, defaultValue) {
-  const locale = getCurrentLocale();
   return get(t)(label, { locale, default: defaultValue });
 }
 
@@ -220,16 +195,6 @@ export function getShortBankName(bankCode, locale) {
     locale,
     default: getLongBankName(bankCode, locale),
   });
-}
-
-/**
- * Returns the translated labels for popup
- * @param {string} label
- * @param {Object} data
- * @returns {string}
- */
-export function translatePaymentPopup(label, data = {}) {
-  return formatTemplateWithLocale(`popup.${label}`, data, getCurrentLocale());
 }
 
 /**

@@ -18,8 +18,6 @@ import {
 } from 'checkoutframe/personalization/api';
 import { setHistoryAndListenForBackPresses } from 'bridge/back';
 
-import { init as initI18n, bindI18nEvents } from 'i18n/init';
-
 import {
   UPI_POLL_URL,
   PENDING_PAYMENT_TS,
@@ -318,12 +316,8 @@ function setSessionPreferences(session, preferences) {
     }
     return Razorpay.sendMessage({ event: 'fault', data: message });
   }
-
-  initI18n().then(() => {
-    session.render();
-    showModal(session);
-    bindI18nEvents();
-  });
+  session.render();
+  showModal(session);
 }
 
 function getPreferenecsParams(razorpayInstance) {

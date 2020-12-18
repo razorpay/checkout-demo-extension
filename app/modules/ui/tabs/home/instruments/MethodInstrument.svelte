@@ -39,10 +39,7 @@
   );
 
   const id = instrument.id;
-  let subtext;
-  $: {
-    subtext = getSubtextForInstrument(instrument, $locale);
-  }
+  const subtext = getSubtextForInstrument(instrument);
 
   let icon;
   if (/card$/.test(method)) {

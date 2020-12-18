@@ -7,7 +7,7 @@
   import Icon from 'ui/elements/Icon.svelte';
 
   // i18n
-  import { t, locale } from 'svelte-i18n';
+  import { t } from 'svelte-i18n';
 
   import {
     CARD_NUMBER_LABEL,
@@ -18,7 +18,6 @@
 
   // Utils
   import { getIcon } from 'icons/network';
-  import { formatMessageWithLocale } from 'i18n';
 
   export let value = '';
   export let type = null;
@@ -39,22 +38,21 @@
     value = e.target.value;
   }
 
-  let helpTextToDisplay;
-  $: helpTextToDisplay = helpText || getHelpText($locale);
+  $: helpText = helpText || $t(getHelpTextLabel());
 
-  function getHelpText(locale) {
+  function getHelpTextLabel(locale) {
     if (recurring) {
       // LABEL: Card does not support recurring payments.
-      return formatMessageWithLocale(CARD_NUMBER_HELP_RECURRING, locale);
+      return CARD_NUMBER_HELP_RECURRING;
     }
 
     if (amexEnabled && type === 'amex') {
       // LABEL: Amex cards are not supported for this transaction.
-      return formatMessageWithLocale(CARD_NUMBER_HELP_AMEX, locale);
+      return CARD_NUMBER_HELP_AMEX;
     }
 
     // LABEL: Please enter a valid card number.
-    return formatMessageWithLocale(CARD_NUMBER_HELP, locale);
+    return CARD_NUMBER_HELP;
   }
 
   export function dispatchFilledIfValid() {
@@ -113,7 +111,7 @@
   <Field
     {id}
     formatter={{ type: 'card' }}
-    helpText={helpTextToDisplay}
+    {helpText}
     name="card[number]"
     required={true}
     {value}

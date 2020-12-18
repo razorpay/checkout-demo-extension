@@ -1,6 +1,5 @@
-import { makeAuthUrl } from 'common/Razorpay';
+import { makeAuthUrl, makeUrl } from 'common/Razorpay';
 import { getSession } from 'sessionmanager';
-import { getCurrentLocale } from 'i18n';
 
 const _headers = {
   'Content-Type': 'application/x-www-form-urlencoded',
@@ -13,12 +12,9 @@ const _headers = {
  */
 export function fetchFundAccounts(contactId) {
   const { r } = getSession();
-
-  let url = makeAuthUrl(r, `contacts/${contactId}/public`);
-
   return new Promise((resolve, reject) =>
     fetch({
-      url,
+      url: makeAuthUrl(r, `contacts/${contactId}/public`),
       callback: function(result) {
         if (result.error) {
           reject(result);
@@ -37,12 +33,9 @@ export function fetchFundAccounts(contactId) {
  */
 export function createFundAccount(fundAccount) {
   const { r } = getSession();
-
-  let url = makeAuthUrl(r, 'fund_accounts/public');
-
   return new Promise((resolve, reject) =>
     fetch({
-      url,
+      url: makeAuthUrl(r, 'fund_accounts/public'),
       headers: _headers,
       method: 'post',
       data: fundAccount,
