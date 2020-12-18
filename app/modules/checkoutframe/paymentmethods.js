@@ -14,7 +14,7 @@ import {
 } from 'checkoutstore/methods';
 
 import { getRecurringMethods, isIRCTC, isRecurring } from 'checkoutstore';
-import { generateTextFromList } from 'i18n/text-utils';
+import { generateTextFromList } from 'lib/utils';
 
 import {
   getMethodPrefix,
@@ -25,7 +25,6 @@ import {
   getRawMethodDescription,
   getWalletName,
   formatTemplateWithLocale,
-  formatMessageWithLocale,
 } from 'i18n';
 
 import {
@@ -36,7 +35,7 @@ import {
 function getRecurringCardDescription(locale) {
   // TODO: fix this to return network codes instead of names
   const recurringNetworks = getRecurringMethods().card?.credit || [];
-  const networks = generateTextFromList(recurringNetworks, locale);
+  const networks = generateTextFromList(recurringNetworks);
   return formatTemplateWithLocale(
     DESCRIPTION_RECURRING_CARDS, // LABEL: {networks} credit cards
     { networks },
@@ -99,7 +98,7 @@ const CARD_DESCRIPTION = locale => {
       |> _Arr.filter(network => Boolean(networksFromPrefs[network]))
       |> _Arr.map(network => getNetworkName(network, locale));
 
-    return generateTextFromList(networks, locale, 4);
+    return generateTextFromList(networks, 4);
   }
 };
 
@@ -132,7 +131,7 @@ const DESCRIPTIONS = {
       }
     }
 
-    const text = generateTextFromList(providerNames, locale, 3);
+    const text = generateTextFromList(providerNames, 3);
 
     if (cardEmi) {
       return text;
@@ -153,7 +152,7 @@ const DESCRIPTIONS = {
     const providers = getPayLaterProviders().map(p =>
       getPaylaterProviderName(p.code, locale)
     );
-    const text = generateTextFromList(providers, locale, 2);
+    const text = generateTextFromList(providers, 2);
     return formatTemplateWithLocale(
       'methods.descriptions.paylater',
       { providers: text },
@@ -172,7 +171,6 @@ const DESCRIPTIONS = {
   wallet: locale =>
     generateTextFromList(
       getWallets().map(w => getWalletName(w.code, locale)),
-      locale,
       2
     ),
   upi_otm: locale => getRawMethodDescription('upi_otm', locale),
@@ -202,11 +200,11 @@ export function getMethodDescription(method, locale) {
   return fn(locale);
 }
 
-export function getEMIBanksText(locale) {
+export function getEMIBanksText() {
   const emiBanks = getEMIBanks();
   const bankNames =
     emiBanks |> _Obj.keys |> _Arr.map(bank => emiBanks[bank].name);
-  return generateTextFromList(bankNames, locale, 12);
+  return generateTextFromList(bankNames, 12);
 }
 
 /**
@@ -312,25 +310,20 @@ export function getMethodNameForPaymentOption(method, locale, extra = {}) {
 /**
  * Returns the downtime description for the given method.
  * @param {string} method
- * @param {string} locale
  * @param {Object} param1
  *  @prop {Array} availableMethods
  */
 export function getMethodDowntimeDescription(
   method,
-  locale,
   { availableMethods = [], downMethods = [] } = {}
 ) {
-  const prefix = getTranslatedMethodPrefix(method, locale);
+  const prefix = getTranslatedMethodPrefix(method);
   const pluralPrefix = /s$/i.test(prefix);
 
-  const templateLabel = pluralPrefix
-    ? 'misc.downtime_multiple_methods'
-    : 'misc.downtime_single_method';
+  // TODO: use templates
+  const isOrAre = pluralPrefix ? 'are' : 'is';
 
-  const sentences = [
-    formatTemplateWithLocale(templateLabel, { method: prefix }, locale),
-  ];
+  const sentences = [`${prefix} ${isOrAre} facing temporary issues right now.`];
 
   // Check if there's another method available that is not down.
   const isAnotherMethodAvailable = _Arr.any(
@@ -340,9 +333,7 @@ export function getMethodDowntimeDescription(
 
   // If there's another method available, ask user to select it.
   if (isAnotherMethodAvailable) {
-    sentences.push(
-      formatMessageWithLocale('misc.select_another_method', locale)
-    );
+    sentences.push('Please select another method.');
   }
 
   return sentences.join(' ');

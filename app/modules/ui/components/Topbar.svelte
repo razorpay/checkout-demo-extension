@@ -1,6 +1,6 @@
 <script>
   // Svelte imports
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { createEventDispatcher, onMount, onDestroy } from 'svelte';
   import { fly } from 'svelte/transition';
 
   // Store
@@ -127,18 +127,15 @@
     }
   }
 
-  $: {
-    if (logoutDropdownShown) {
-      document.body.addEventListener('click', handleOutsideClick);
-    } else {
-      document.body.removeEventListener('click', handleOutsideClick);
-    }
-  }
-
   onMount(() => {
     if (isIRCTC()) {
       setOverridesForIrctc();
     }
+    document.body.addEventListener('click', handleOutsideClick);
+  });
+
+  onDestroy(() => {
+    document.body.removeEventListener('click', handleOutsideClick);
   });
 </script>
 

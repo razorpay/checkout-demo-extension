@@ -95,7 +95,7 @@
         </div>
       </div>
     </div>
-    <h3>{$t(CARD_DETAILS_HEADER)}</h3>
+    <h3>Enter Card Details</h3>
     <div class="card-fields">
       <div class="elem-wrap">
         <div class="elem elem-card">

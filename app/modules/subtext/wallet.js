@@ -1,15 +1,13 @@
-import { generateTextFromList } from 'i18n/text-utils';
+import { generateTextFromList } from 'lib/utils';
 import { getWallets } from 'checkoutstore/methods';
-import { getWalletName } from 'i18n';
 
 /**
  * Generates subtext for wallet instrument
  * @param {Instrument} instrument
- * @param {string} locale
  *
  * @returns {string}
  */
-export function generateSubtextForWalletInstrument(instrument, locale) {
+export function generateSubtextForWalletInstrument(instrument) {
   if (!instrument.wallets) {
     return '';
   }
@@ -18,9 +16,10 @@ export function generateSubtextForWalletInstrument(instrument, locale) {
 
   const findWallet = code => _Arr.find(wallets, wallet => wallet.code === code);
 
-  const walletNames = _Arr.map(instrument.wallets, wallet =>
-    getWalletName(findWallet(wallet).code, locale)
+  const walletNames = _Arr.map(
+    instrument.wallets,
+    wallet => findWallet(wallet).name
   );
 
-  return generateTextFromList(walletNames, locale, 3);
+  return generateTextFromList(walletNames, 3);
 }

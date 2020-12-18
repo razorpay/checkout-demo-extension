@@ -37,21 +37,3 @@ export function getAnimationOptions(animationOptions) {
 
   return animationOptions;
 }
-
-/**
- * Returns a function that calls fn internally with the provided arguments,
- * all but the first time.
- *
- * @param {function} fn
- * @returns {function}
- */
-export function ignoreFirstCall(fn) {
-  let firstCallCompleted = false;
-  return function ignored() {
-    if (firstCallCompleted) {
-      fn.apply(undefined, arguments);
-    } else {
-      firstCallCompleted = true;
-    }
-  };
-}

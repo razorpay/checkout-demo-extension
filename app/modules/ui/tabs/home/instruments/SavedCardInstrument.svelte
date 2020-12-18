@@ -22,7 +22,6 @@
     getLongBankName,
     formatTemplateWithLocale,
     getInstrumentTitle,
-    formatMessageWithLocale,
   } from 'i18n';
 
   import { locale } from 'svelte-i18n';
