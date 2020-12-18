@@ -2283,7 +2283,9 @@ Session.prototype = {
 
     // TODO remove this from here
     // check cardTab.setEmiPlansCta for details
-    cardTab.setEmiPlansCta(screen, this.tab);
+    if (screen !== 'upi') {
+      cardTab.setEmiPlansCta(screen, this.tab);
+    }
 
     if (this.offers) {
       this.offers.renderTab(this.tab);
@@ -4141,7 +4143,6 @@ Session.prototype = {
     }
     var vpaVerified = props.vpaVerified;
     var data = this.payload;
-
     var goto_payment = '#error-message .link';
     var redirectableMethods = ['card', 'netbanking', 'wallet'];
     if (
@@ -4183,6 +4184,13 @@ Session.prototype = {
 
     if (this.tab === 'nach') {
       shouldContinue = this.nachScreen.shouldSubmit();
+    }
+
+    if (this.tab === 'upi') {
+      shouldContinue = this.upiTab.shouldSubmit();
+      if (!shouldContinue) {
+        this.upiTab.updateStep();
+      }
     }
 
     if (!shouldContinue) {
