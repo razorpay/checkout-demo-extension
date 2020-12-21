@@ -147,7 +147,6 @@
 
   // Refs
   let savedCardsView;
-  let addCardView;
 
   onMount(() => {
     // Prefill
@@ -665,7 +664,6 @@
           {/if}
           <AddCardView
             {tab}
-            bind:this={addCardView}
             faded={Boolean($selectedApp)}
             on:focus={onAddCardViewFocused}
             on:cardinput={onCardInput} />
