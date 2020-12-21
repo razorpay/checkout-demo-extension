@@ -23,7 +23,9 @@
     cardIin,
     showNoCvvCheckbox,
     noCvvChecked,
+    hideExpiryCvvFields,
   } from 'checkoutstore/screens/card';
+
   import { methodInstrument } from 'checkoutstore/screens/home';
 
   import {
@@ -71,7 +73,6 @@
 
   const showRememberCardCheck = isSavedCardsEnabled;
 
-  let hideExpiryCvvFields = false;
   let cvvLength = 3;
   let showCardUnsupported = false;
   let lastIin = '';
@@ -89,10 +90,6 @@
       numberField.setValid(valid);
       numberField.dispatchFilledIfValid();
     }
-  }
-
-  $: {
-    hideExpiryCvvFields = $showNoCvvCheckbox && $noCvvChecked;
   }
 
   $: {
@@ -152,7 +149,7 @@
       'card[name]': $cardName,
     };
     // Fill in dummy values for expiry and CVV if the CVV and expiry fields are hidden
-    if (hideExpiryCvvFields) {
+    if ($hideExpiryCvvFields) {
       payload['card[expiry]'] = '12 / 21';
       payload['card[cvv]'] = '000';
     }
@@ -480,7 +477,7 @@
         on:input={handleCardInput}
         on:blur={trackCardNumberFilled} />
     </div>
-    {#if !hideExpiryCvvFields}
+    {#if !$hideExpiryCvvFields}
       <div class="third">
         <ExpiryField
           id="card_expiry"
@@ -504,7 +501,7 @@
         on:focus
         on:blur={trackNameFilled} />
     </div>
-    {#if !hideExpiryCvvFields}
+    {#if !$hideExpiryCvvFields}
       <div class="third">
         <CvvField
           id="card_cvv"

@@ -24,4 +24,9 @@ export const showNoCvvCheckbox = derived(
 
 export const noCvvChecked = writable(false);
 
+export const hideExpiryCvvFields = derived(
+  [showNoCvvCheckbox, noCvvChecked],
+  ([$showNoCvvCheckbox, $noCvvChecked]) => $showNoCvvCheckbox && $noCvvChecked
+);
+
 export const internationalCurrencyCalloutNeeded = writable(false);
