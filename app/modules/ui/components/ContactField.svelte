@@ -31,7 +31,6 @@
   import { formatMessageWithLocale } from 'i18n';
 
   // Refs
-  let searchModal;
   let countryField;
   let phoneField;
 
@@ -249,7 +248,6 @@
   keys={['country_code', 'country', 'name', 'original']}
   component={CountryCodeSearchItem}
   bind:open={searchModalOpen}
-  bind:this={searchModal}
   on:close={closeSearch}
   on:select={({ detail }) => {
     country = `+${detail.country_code}`;

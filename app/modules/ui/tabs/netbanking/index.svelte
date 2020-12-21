@@ -98,7 +98,6 @@
 
   // Refs
   let radioContainer;
-  let searchModal;
   let bankSelect;
 
   // Actions
@@ -397,7 +396,6 @@
       bind:open={searchModalOpen}
       keys={['code', 'name', 'original']}
       component={BankSearchItem}
-      bind:this={searchModal}
       on:close={hideSearch}
       on:select={({ detail }) => {
         $selectedBank = detail.code;

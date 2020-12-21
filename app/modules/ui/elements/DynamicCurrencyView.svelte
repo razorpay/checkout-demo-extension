@@ -53,7 +53,6 @@
   let currencies = null;
   let originalAmount = getAmount();
   let selectedCurrency = null;
-  let searchModal;
   let searchModalOpen = false;
   const currencyCache = {};
 
@@ -336,7 +335,6 @@
         items={sortedCurrencies}
         keys={['currency', 'name', 'symbol']}
         component={CurrencySearchItem}
-        bind:this={searchModal}
         on:close={() => (searchModalOpen = false)}
         on:select={({ detail }) => onSelect(detail.currency)} />
     </Stack>
