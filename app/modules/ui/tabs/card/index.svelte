@@ -26,13 +26,18 @@
     selectedApp,
     cardTab,
     internationalCurrencyCalloutNeeded,
+    hideExpiryCvvFields,
+    showAuthTypeSelectionRadio,
+    authType,
   } from 'checkoutstore/screens/card';
+
   import { methodInstrument, blocks } from 'checkoutstore/screens/home';
   import { getSDKMeta } from 'checkoutstore/native';
 
   import { customer } from 'checkoutstore/customer';
 
   import { contact } from 'checkoutstore/screens/home';
+
   import {
     isRecurring,
     shouldRememberCustomer,
@@ -40,6 +45,7 @@
     getCardFeatures,
     isInternational,
   } from 'checkoutstore';
+
   import {
     isMethodEnabled,
     getEMIBanks,
@@ -49,6 +55,7 @@
     getPayloadForCRED,
     isApplicationEnabled,
   } from 'checkoutstore/methods';
+
   import { newCardEmiDuration } from 'checkoutstore/emi';
 
   // i18n
@@ -73,12 +80,14 @@
   import { getSavedCards, transform } from 'common/token';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
+
   import {
     getIin,
     getCardType,
     getNetworkFromCardNumber,
     isAmex,
   } from 'common/card';
+
   import { getSubtextForInstrument } from 'subtext';
   import { getProvider as getAppProvider } from 'common/apps';
   import { getAnimationOptions } from 'svelte-utils';
@@ -407,7 +416,24 @@
   }
 
   function getAddCardPayload() {
-    return addCardView.getPayload();
+    const payload = {
+      'card[number]': $cardNumber.replace(/ /g, ''),
+      'card[expiry]': $cardExpiry,
+      'card[cvv]': $cardCvv,
+      'card[name]': $cardName,
+    };
+    // Fill in dummy values for expiry and CVV if the CVV and expiry fields are hidden
+    if ($hideExpiryCvvFields) {
+      payload['card[expiry]'] = '12 / 21';
+      payload['card[cvv]'] = '000';
+    }
+    if ($remember && isSavedCardsEnabled) {
+      payload.save = 1;
+    }
+    if ($showAuthTypeSelectionRadio) {
+      payload.auth_type = $authType;
+    }
+    return payload;
   }
 
   function getSavedCardPayload() {

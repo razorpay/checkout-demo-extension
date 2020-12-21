@@ -140,27 +140,6 @@
     });
   }
 
-  export function getPayload() {
-    const payload = {
-      'card[number]': $cardNumber.replace(/ /g, ''),
-      'card[expiry]': $cardExpiry,
-      'card[cvv]': $cardCvv,
-      'card[name]': $cardName,
-    };
-    // Fill in dummy values for expiry and CVV if the CVV and expiry fields are hidden
-    if ($hideExpiryCvvFields) {
-      payload['card[expiry]'] = '12 / 21';
-      payload['card[cvv]'] = '000';
-    }
-    if ($remember && isSavedCardsEnabled) {
-      payload.save = 1;
-    }
-    if ($showAuthTypeSelectionRadio) {
-      payload.auth_type = $authType;
-    }
-    return payload;
-  }
-
   function setDebitPinRadiosVisibility(visible) {
     if (visible) {
       $authType = DEFAULT_AUTH_TYPE_RADIO;
