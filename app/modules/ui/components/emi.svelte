@@ -44,8 +44,18 @@
       return banks;
     }
 
+    const banksWithDebitEmi = ['HDFC'];
+
+    const debitEmiinclusiveIssuers = instrument.issuers.reduce((pV, cV) => {
+      if (banksWithDebitEmi.includes(cV)) {
+        pV.push(cV + '_DC');
+      }
+      pV.push(cV);
+      return pV;
+    }, []);
+
     return _Arr.filter(banks, bank =>
-      _Arr.contains(instrument.issuers, bank.code)
+      _Arr.contains(debitEmiinclusiveIssuers, bank.code)
     );
   }
 
