@@ -36,6 +36,7 @@
   export let component;
   export let keys;
   export let all;
+  export let open = false;
 
   const IDs = {
     overlay: `${identifier}_search_overlay`,
@@ -54,7 +55,6 @@
   const cache = Search.createCache();
 
   // Variables
-  let visible = false;
   let query = '';
   let results = [];
   let shownItems = items;
@@ -175,30 +175,6 @@
     }
   }
 
-  export function open() {
-    query = '';
-
-    visible = true;
-
-    // Wait for UI updates before focusing
-    tick().then(focus);
-
-    // Add to $overlayStack
-    $overlayStack = $overlayStack.concat([
-      {
-        id: IDs.overlay,
-        component: 'SearchModal',
-        back: meta => {
-          dispatchClose(meta);
-        },
-      },
-    ]);
-  }
-
-  export function close() {
-    visible = false;
-  }
-
   function removeFromOverlayStack() {
     // Remove the overlay from $overlayStack
     const overlay = _Arr.find(
@@ -214,7 +190,22 @@
   });
 
   $: {
-    if (visible === false) {
+    if (open) {
+      query = '';
+      // Wait for UI updates before focusing
+      tick().then(focus);
+
+      // Add to $overlayStack
+      $overlayStack = $overlayStack.concat([
+        {
+          id: IDs.overlay,
+          component: 'SearchModal',
+          back: meta => {
+            dispatchClose(meta);
+          },
+        },
+      ]);
+    } else {
       removeFromOverlayStack();
     }
   }
@@ -442,7 +433,7 @@
 </style>
 
 <div bind:this={containerRef}>
-  {#if visible}
+  {#if open}
     <div class="search-curtain">
       <div
         class="search-curtain-bg"
@@ -531,6 +522,6 @@
   {/if}
 </div>
 
-{#if visible}
+{#if open}
   <CTA show={false} />
 {/if}

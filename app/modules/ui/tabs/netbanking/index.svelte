@@ -93,6 +93,9 @@
     }
   }
 
+  // State
+  let searchModalOpen = false;
+
   // Refs
   let radioContainer;
   let searchModal;
@@ -121,11 +124,11 @@
   }
 
   function showSearch() {
-    searchModal.open();
+    searchModalOpen = true;
   }
 
   function hideSearch() {
-    searchModal.close();
+    searchModalOpen = false;
 
     // Restore focus
     if (bankSelect) {
@@ -391,6 +394,7 @@
       placeholder={$t(SEARCH_PLACEHOLDER)}
       all={$t(SEARCH_ALL)}
       items={translatedBanksArr}
+      bind:open={searchModalOpen}
       keys={['code', 'name', 'original']}
       component={BankSearchItem}
       bind:this={searchModal}

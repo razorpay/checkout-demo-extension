@@ -59,6 +59,8 @@
   let countryCodesList;
   $: $t, (countryCodesList = generateCountryCodesList());
 
+  let searchModalOpen = false;
+
   function appendPlusToCountryCodeAsynchronously() {
     setTimeout(() => {
       if (!_Str.startsWith(country, '+')) {
@@ -85,7 +87,7 @@
   const label = isOptional ? CONTACT_LABEL_OPTIONAL : CONTACT_LABEL_REQUIRED;
 
   function closeSearch() {
-    searchModal.close();
+    searchModalOpen = false;
   }
 
   function generateCountryCodesList() {
@@ -156,11 +158,11 @@
     }
 
     countryField.blur();
-    searchModal.open();
+    searchModalOpen = true;
   }
 
   function closeCountryCodeModal() {
-    searchModal.close();
+    closeSearch();
 
     if (phoneField) {
       phoneField.focus();
@@ -246,6 +248,7 @@
   items={countryCodesList}
   keys={['country_code', 'country', 'name', 'original']}
   component={CountryCodeSearchItem}
+  bind:open={searchModalOpen}
   bind:this={searchModal}
   on:close={closeSearch}
   on:select={({ detail }) => {
