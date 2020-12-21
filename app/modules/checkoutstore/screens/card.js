@@ -29,4 +29,6 @@ export const hideExpiryCvvFields = derived(
   ([$showNoCvvCheckbox, $noCvvChecked]) => $showNoCvvCheckbox && $noCvvChecked
 );
 
+export const showAuthTypeSelectionRadio = writable(false);
+
 export const internationalCurrencyCalloutNeeded = writable(false);

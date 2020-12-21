@@ -24,6 +24,7 @@
     showNoCvvCheckbox,
     noCvvChecked,
     hideExpiryCvvFields,
+    showAuthTypeSelectionRadio,
   } from 'checkoutstore/screens/card';
 
   import { methodInstrument } from 'checkoutstore/screens/home';
@@ -117,8 +118,6 @@
 
   export let tab;
 
-  let showAuthTypeSelectionRadio = false;
-
   function handleFilled(curField) {
     switch (curField) {
       case 'numberField':
@@ -156,7 +155,7 @@
     if ($remember && isSavedCardsEnabled) {
       payload.save = 1;
     }
-    if (showAuthTypeSelectionRadio) {
+    if ($showAuthTypeSelectionRadio) {
       payload.auth_type = $authType;
     }
     return payload;
@@ -167,7 +166,7 @@
       $authType = DEFAULT_AUTH_TYPE_RADIO;
     }
 
-    showAuthTypeSelectionRadio = Boolean(visible);
+    $showAuthTypeSelectionRadio = Boolean(visible);
   }
 
   const Flows = {
@@ -553,7 +552,7 @@
       </label>
     </div>
   {/if}
-  {#if showAuthTypeSelectionRadio}
+  {#if $showAuthTypeSelectionRadio}
     <div class="row">
       <CardFlowSelectionRadio bind:value={$authType} />
     </div>
