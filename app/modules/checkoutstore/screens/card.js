@@ -31,4 +31,7 @@ export const hideExpiryCvvFields = derived(
 
 export const showAuthTypeSelectionRadio = writable(false);
 
+export const currentCvv = writable('');
+export const currentAuthType = writable('');
+
 export const internationalCurrencyCalloutNeeded = writable(false);

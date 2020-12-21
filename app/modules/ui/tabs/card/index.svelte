@@ -29,9 +29,12 @@
     hideExpiryCvvFields,
     showAuthTypeSelectionRadio,
     authType,
+    currentCvv,
+    currentAuthType,
   } from 'checkoutstore/screens/card';
 
   import { methodInstrument, blocks } from 'checkoutstore/screens/home';
+
   import { getSDKMeta } from 'checkoutstore/native';
 
   import { customer } from 'checkoutstore/customer';
@@ -56,7 +59,7 @@
     isApplicationEnabled,
   } from 'checkoutstore/methods';
 
-  import { newCardEmiDuration } from 'checkoutstore/emi';
+  import { newCardEmiDuration, savedCardEmiDuration } from 'checkoutstore/emi';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -144,9 +147,6 @@
 
   let showSavedCardsCta = false;
   $: showSavedCardsCta = savedCards && savedCards.length && isSavedCardsEnabled;
-
-  // Refs
-  let savedCardsView;
 
   onMount(() => {
     // Prefill
@@ -436,7 +436,15 @@
   }
 
   function getSavedCardPayload() {
-    return savedCardsView.getSelectedToken();
+    const selectedToken = $selectedCard || {};
+    const payload = { token: selectedToken.token, 'card[cvv]': $currentCvv };
+    if ($currentAuthType) {
+      payload.auth_type = $currentAuthType;
+    }
+    if ($savedCardEmiDuration) {
+      payload.emi_duration = $savedCardEmiDuration;
+    }
+    return payload;
   }
 
   function handleViewPlans(event) {
@@ -700,7 +708,6 @@
             <SavedCards
               {tab}
               cards={savedCards}
-              bind:this={savedCardsView}
               on:viewPlans={handleViewPlans} />
           </div>
           <div
