@@ -22,4 +22,6 @@ export const showNoCvvCheckbox = derived(
     $cardType === 'maestro' && $cardNumber.length > 5
 );
 
+export const noCvvChecked = writable(false);
+
 export const internationalCurrencyCalloutNeeded = writable(false);

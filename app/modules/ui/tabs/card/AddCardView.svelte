@@ -22,6 +22,7 @@
     cardType,
     cardIin,
     showNoCvvCheckbox,
+    noCvvChecked,
   } from 'checkoutstore/screens/card';
   import { methodInstrument } from 'checkoutstore/screens/home';
 
@@ -70,7 +71,6 @@
 
   const showRememberCardCheck = isSavedCardsEnabled;
 
-  let noCvvChecked = false;
   let hideExpiryCvvFields = false;
   let cvvLength = 3;
   let showCardUnsupported = false;
@@ -92,7 +92,7 @@
   }
 
   $: {
-    hideExpiryCvvFields = $showNoCvvCheckbox && noCvvChecked;
+    hideExpiryCvvFields = $showNoCvvCheckbox && $noCvvChecked;
   }
 
   $: {
@@ -549,7 +549,7 @@
           type="checkbox"
           class="checkbox--square"
           id="nocvv"
-          bind:checked={noCvvChecked} />
+          bind:checked={$noCvvChecked} />
         <span class="checkbox" />
         <!-- LABEL: My Maestro Card doesn't have Expiry/CVV -->
         {$t(NOCVV_LABEL)}
