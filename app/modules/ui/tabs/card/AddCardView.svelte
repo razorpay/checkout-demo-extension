@@ -21,6 +21,7 @@
     authType,
     cardType,
     cardIin,
+    showNoCvvCheckbox,
   } from 'checkoutstore/screens/card';
   import { methodInstrument } from 'checkoutstore/screens/home';
 
@@ -70,7 +71,6 @@
   const showRememberCardCheck = isSavedCardsEnabled;
 
   let noCvvChecked = false;
-  let showNoCvvCheckbox = false;
   let hideExpiryCvvFields = false;
   let cvvLength = 3;
   let showCardUnsupported = false;
@@ -92,13 +92,7 @@
   }
 
   $: {
-    if ($cardType) {
-      showNoCvvCheckbox = $cardType === 'maestro' && $cardNumber.length > 5;
-    }
-  }
-
-  $: {
-    hideExpiryCvvFields = showNoCvvCheckbox && noCvvChecked;
+    hideExpiryCvvFields = $showNoCvvCheckbox && noCvvChecked;
   }
 
   $: {
@@ -548,7 +542,7 @@
       </div>
     {/if}
   </div>
-  {#if showNoCvvCheckbox}
+  {#if $showNoCvvCheckbox}
     <div class="row">
       <label id="nocvv-check" for="nocvv">
         <input

@@ -16,4 +16,10 @@ export const cardType = derived(cardNumber, getCardType);
 export const cardIin = derived(cardNumber, getIin);
 export const cardTab = writable(''); // Value of current tab. Values can be one of "card", "emi", "". "" can be considered to be null.
 
+export const showNoCvvCheckbox = derived(
+  [cardNumber, cardType],
+  ([$cardNumber, $cardType]) =>
+    $cardType === 'maestro' && $cardNumber.length > 5
+);
+
 export const internationalCurrencyCalloutNeeded = writable(false);
