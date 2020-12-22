@@ -1,9 +1,10 @@
 <script>
   //store
-  import { getOption, getAmount, showFeeLabel } from 'checkoutstore';
-  import { getCustomerDetails } from 'checkoutstore/screens/home';
+  import { getOption, getAmount } from 'checkoutstore';
   // svelte imports
   import { onMount } from 'svelte';
+  // utils
+  import { getSession } from 'sessionmanager';
 
   const HEADER = 'For RTGS/NEFT/Funds Transfer';
   const ROW_HEADERS = {
@@ -16,7 +17,7 @@
     row7: 'Customer Name',
     row8: 'Customer Email ID',
     row9: 'Customer Mobile No',
-    row10: 'Description',
+    row10: 'Merchant Order Id',
     row11: 'Expiry time',
     row12: 'Disclaimers',
   };
@@ -36,14 +37,16 @@
   const BRANCH_LABEL = 'Branch Stamp';
 
   let neftView;
-  export let customerDetails = getCustomerDetails();
   export let neftDetails;
   export let expiry;
-  const { contact, email, name } = customerDetails;
   const description = getOption('description');
   let merchant_logo = getOption('image');
   let orgLogoLoaded = false;
   let merchantLogoLoaded = false;
+
+  const name = getOption('prefill.name');
+  const contact = getOption('prefill.contact');
+  const email = getOption('prefill.email');
 
   const { account_number, ifsc, branch, bank_name } = neftDetails;
   let org_logo =
@@ -57,6 +60,27 @@
       merchantLogoLoaded = true;
     }
   });
+
+  const session = getSession();
+  const amount = session.formatAmountWithCurrency(getAmount());
+
+  // TODO: move it to utils or use any currently existing methods for formatting
+  function formatDate(d) {
+    let month = '' + (d.getMonth() + 1),
+      day = '' + d.getDate(),
+      year = d.getFullYear();
+
+    if (month.length < 2) {
+      month = '0' + month;
+    }
+    h;
+    if (day.length < 2) {
+      day = '0' + day;
+    }
+    y;
+
+    return [day, month, year].join('-');
+  }
 
   function printIfLoaded() {
     if (orgLogoLoaded && merchantLogoLoaded) {
@@ -79,7 +103,7 @@
     [ROW_HEADERS.row3]: ifsc,
     [ROW_HEADERS.row4]: bank_name,
     [ROW_HEADERS.row5]: branch,
-    [ROW_HEADERS.row6]: getAmount(),
+    [ROW_HEADERS.row6]: amount,
     [ROW_HEADERS.row7]: name,
     [ROW_HEADERS.row8]: email,
     [ROW_HEADERS.row9]: contact,
@@ -146,7 +170,7 @@
       <td colspan="2" class="text-center">{HEADER}</td>
     </tr>
     <tr>
-      <td colspan="2" class="text-left">Date: 12/12/2020</td>
+      <td colspan="2" class="text-left">Date: {formatDate(new Date())}</td>
     </tr>
     {#each Object.keys(tableDetails) as key}
       <tr>
