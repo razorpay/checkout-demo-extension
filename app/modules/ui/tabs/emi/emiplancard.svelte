@@ -182,7 +182,8 @@
     <!-- LABEL: {duration} Months ({amount}/mo) -->
     {formatTemplateWithLocale(PLAN_TITLE, { duration: plan.duration, amount: formattedAmountPerMonth }, $locale)}
     {#if showInterest}
-      &nbsp;@ {(noCostEmi && $t(NO_COST_LABEL)) || `${plan.interest}%`}
+      &nbsp;@
+      {(noCostEmi && $t(NO_COST_LABEL)) || `${plan.interest}%`}
     {/if}
   </div>
   <div slot="detail">
