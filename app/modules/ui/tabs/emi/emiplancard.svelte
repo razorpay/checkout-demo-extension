@@ -248,20 +248,21 @@
           </li>
           {#if processingFee}
             <li>
+              <!-- LABEL: Processing Fee: {amount} -->
               <span>{$t(PROCESSING_FEE)}</span>
               <span>{processingFee}</span>
-              <!-- TODO: Add label comments -->
             </li>
           {/if}
           {#if stampDuty}
             <li>
+              <!-- LABEL: Stamp Duty: {amount} -->
               <span>{$t(STAMP_DUTY)}</span>
               <span>{stampDuty}</span>
             </li>
           {/if}
           <!-- LABEL: Total Amount: {formattedFinalAmount} ({formattedAmountPerMonth} x {plan.duration}) -->
           <li>
-            <span>{$t(DESCRIPTION_TOTAL_AMOUNT)} {provider}</span>
+            <span>{$t(DESCRIPTION_TOTAL_AMOUNT)}</span>
             <span>{formattedFinalAmount}</span>
           </li>
         </ul>
