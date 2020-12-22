@@ -30,6 +30,7 @@
     getCurrency,
     getCardCurrencies,
     getMerchantOrder,
+    isPartialPayment,
   } from 'checkoutstore';
 
   import { getIin, getCardDigits } from 'common/card';
@@ -174,7 +175,7 @@
     if (displayAmount) {
       showAmount(displayAmount);
       session.setRawAmountInHeader(displayAmount);
-    } else if (!order || !order.partial_payment) {
+    } else if (!isPartialPayment()) {
       showCtaWithDefaultText();
       session.updateAmountInHeader(originalAmount);
     }
