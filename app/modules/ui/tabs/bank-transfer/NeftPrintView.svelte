@@ -73,12 +73,9 @@
     if (month.length < 2) {
       month = '0' + month;
     }
-    h;
     if (day.length < 2) {
       day = '0' + day;
     }
-    y;
-
     return [day, month, year].join('-');
   }
 
