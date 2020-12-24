@@ -200,6 +200,8 @@ export default {
     use_saved_cards_btn: 'Use saved cards',
     use_saved_cards_on_rzp_btn: 'Use saved cards on Razorpay',
     view_all_emi_plans: 'View all EMI Plans',
+    international_currency_charges:
+      'Relevant currency conversion charges might be applicable, as Amex will process the transaction in INR. To avoid currency conversion charges please use MasterCard or Visa.',
   },
   cardless_emi: {
     providers: {
@@ -209,6 +211,10 @@ export default {
       earlysalary: 'EarlySalary',
       flexmoney: 'Cardless EMI by InstaCred',
       zestmoney: 'ZestMoney',
+      fdrl: 'Federal Bank',
+      hdfc: 'FlexiPay by HDFC Bank',
+      idfb: 'IDFC First Bank',
+      kkbk: 'Kotak Mahindra Bank',
     },
     select_option_title: 'Select an option',
   },
@@ -617,7 +623,6 @@ export default {
     country_search_all: 'All countries',
     country_search_placeholder: 'Search a country',
     customer_name_label: 'Customer Name',
-    edit_button_label: 'Edit',
     email_help_text: 'Please enter a valid email. Example: you@example.com',
     email_label_optional: 'Email (Optional)',
     email_label_required: 'Email',
@@ -677,7 +682,7 @@ export default {
       recurring_cards: '{networks} credit cards',
       upi: 'Instant payment using UPI App',
       upi_otm: 'Pay later using BHIM',
-      upi_recurring: 'Supported only for BHIM UPI App',
+      upi_recurring: 'Pay using BHIM or PayTM App',
     },
     prefixes: {
       bank_transfer: 'Bank Transfer',
@@ -941,7 +946,8 @@ export default {
     downtime_text: '<strong>UPI<strong> is experiencing low success rate.',
     intent_block_heading: 'PAY USING APPS',
     new_vpa_subtitle: 'Google Pay, BHIM, PhonePe & more',
-    new_vpa_subtitle_upi_otm: 'Supported only for BHIM UPI app',
+    new_vpa_subtitle_upi_otm:
+      'Please note, you can only complete this payment using <strong>BHIM App<strong> or <strong>PayTM App<strong>',
     new_vpa_title_logged_in: 'Add UPI ID',
     new_vpa_title_logged_out: 'UPI ID',
     omni_block_heading: 'Or, pay using phone number',
@@ -964,6 +970,9 @@ export default {
       'The charge is to enable subscription on this card and it will be refunded.',
     redirect_to_app: 'You will be redirected to your UPI app',
     scan_qr_code: 'Scan the QR code using your UPI app',
+    supported_banks:
+      'You can only pay using UPI ID linked with either <strong>ICICI Bank<strong> or <strong>SBI Bank<strong>',
+    upi_id_linked_to_bank: 'UPI ID is linked to',
     show_other_apps: 'Show other UPI apps',
     show_qr_code: 'Show QR Code',
     upi_otm_callout:
@@ -971,7 +980,7 @@ export default {
     verifying_vpa_info: 'Verifying your VPA',
   },
   upi_intent_apps: {
-    amazon: 'Amazon Shopping',
+    amazon: 'Amazon Pay UPI',
     axis: 'Axis Mobile',
     axispay: 'Axis Pay',
     'bank-of-baroda': 'Baroda Pay',
@@ -1028,5 +1037,16 @@ export default {
     phonepe: 'PhonePe',
     sbibuddy: 'SBI Buddy',
     zeta: 'Zeta',
+  },
+  rewards: {
+    header:
+      'Pay successfully now & unlock <strong>exciting rewards for free,<strong> for your future buys!',
+    sub_text: 'Look for these rewards from amazing brands in your mail box!',
+    close: 'Close',
+    tooltip_text: 'Unlock free rewards after payment',
+  },
+  trusted_badge: {
+    customer_label: "You're paying a",
+    seller_label: 'Razorpay Verified Seller',
   },
 };

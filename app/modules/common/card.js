@@ -176,6 +176,17 @@ export const getNetworkFromCardNumber = cardNumber => {
   return network;
 };
 
+/**
+ * Tells us if the card network is AMEX
+ * @param {string} cardNumber
+ *
+ * @returns {string}
+ */
+export const isAmex = cardNumber => {
+  let network = getCardType(cardNumber);
+  return network === 'amex';
+};
+
 export const getCardMaxLen = cardType => cardLengths[cardType] || 16;
 
 export const getCardSpacing = maxLen => {

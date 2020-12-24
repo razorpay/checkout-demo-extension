@@ -6,7 +6,6 @@ export const CONTACT_HELP_TEXT = 'home.contact_help_text';
 export const EMAIL_LABEL_REQUIRED = 'home.email_label_required';
 export const EMAIL_LABEL_OPTIONAL = 'home.email_label_optional';
 export const EMAIL_HELP_TEXT = 'home.email_help_text';
-export const EDIT_BUTTON_LABEL = 'home.edit_button_label';
 
 export const PARTIAL_PAYMENT_TITLE = 'home.partial_payment_title';
 export const MIN_AMOUNT_LABEL = 'home.min_amount_label';

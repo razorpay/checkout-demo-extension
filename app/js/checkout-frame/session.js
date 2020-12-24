@@ -47,7 +47,8 @@ var preferences,
   NativeStore = discreet.NativeStore,
   Confirm = discreet.Confirm,
   Backdrop = discreet.Backdrop,
-  FeeLabel = discreet.FeeLabel;
+  FeeLabel = discreet.FeeLabel,
+  rewardsStore = discreet.rewardsStore;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -2283,7 +2284,9 @@ Session.prototype = {
 
     // TODO remove this from here
     // check cardTab.setEmiPlansCta for details
-    cardTab.setEmiPlansCta(screen, this.tab);
+    if (screen !== 'upi') {
+      cardTab.setEmiPlansCta(screen, this.tab);
+    }
 
     if (this.offers) {
       this.offers.renderTab(this.tab);
@@ -3811,6 +3814,37 @@ Session.prototype = {
     });
   },
 
+  showConversionChargesCallout: function() {
+    var locale = I18n.getCurrentLocale();
+
+    this.svelteOverlay.$set({
+      component: discreet.UserConfirmationOverlay,
+      props: {
+        buttonText: I18n.formatMessageWithLocale('cta.continue', locale),
+        callout: I18n.formatMessageWithLocale(
+          'card.international_currency_charges',
+          locale
+        ),
+      },
+    });
+
+    var that = this;
+
+    this.showSvelteOverlay();
+    var clearActionListener = that.svelteOverlay.$on('action', function(event) {
+      var action = event.detail.action;
+      if (action === 'confirm') {
+        that.hideSvelteOverlay();
+        Backdrop.hide();
+        that.submit();
+      }
+    });
+    var clearHideListener = that.svelteOverlay.$on('hidden', function() {
+      clearActionListener();
+      clearHideListener();
+    });
+  },
+
   /**
    * Attempts a payment
    * @param {Event} e
@@ -4044,6 +4078,13 @@ Session.prototype = {
       return;
     }
 
+    if (
+      discreet.storeGetter(CardScreenStore.internationalCurrencyCalloutNeeded)
+    ) {
+      this.showConversionChargesCallout();
+      return;
+    }
+
     this.submit();
   },
 
@@ -4095,7 +4136,6 @@ Session.prototype = {
     }
     var vpaVerified = props.vpaVerified;
     var data = this.payload;
-
     var goto_payment = '#error-message .link';
     var redirectableMethods = ['card', 'netbanking', 'wallet'];
     if (
@@ -4137,6 +4177,13 @@ Session.prototype = {
 
     if (this.tab === 'nach') {
       shouldContinue = this.nachScreen.shouldSubmit();
+    }
+
+    if (this.tab === 'upi') {
+      shouldContinue = this.upiTab.shouldSubmit();
+      if (!shouldContinue) {
+        this.upiTab.updateStep();
+      }
     }
 
     if (!shouldContinue) {
@@ -4284,8 +4331,13 @@ Session.prototype = {
       request.gpay = true;
     }
 
-    var appliedOffer = this.getAppliedOffer();
+    // added rewardIds to the create payment request
+    var rewardIds = storeGetter(rewardsStore);
+    if (rewardIds && rewardIds.length > 0 && !Store.isContactEmailOptional()) {
+      data.reward_ids = rewardIds;
+    }
 
+    var appliedOffer = this.getAppliedOffer();
     if (appliedOffer && (!this.offers || this.offers.shouldSendOfferToApi())) {
       data.offer_id = appliedOffer.id;
       this.r.display_amount = appliedOffer.amount;

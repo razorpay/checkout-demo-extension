@@ -16,6 +16,7 @@ import emiView from 'checkoutframe/emi';
 import FeeBearerView from 'ui/components/feebearer.svelte';
 import Overlay from 'ui/components/Overlay.svelte';
 import AuthOverlay from 'ui/components/AuthOverlay.svelte';
+import UserConfirmationOverlay from 'ui/components/overlay/UserConfirmation.svelte';
 import OffersView from 'ui/components/offers/index.svelte';
 import NoCostExplainer from 'ui/components/offers/NoCostExplainer.svelte';
 import emiPlansView from 'checkoutframe/emiplans';
@@ -62,6 +63,7 @@ import * as Theme from 'checkoutstore/theme';
 import { overlayStack as overlayStackStore } from 'checkoutstore/back';
 import * as NativeStore from 'checkoutstore/native';
 import * as OffersStore from 'checkoutstore/offers';
+import { rewardIds as rewardsStore } from 'checkoutstore/rewards';
 
 import QRScreen from 'ui/tabs/qr/index.svelte';
 import * as upiTab from 'checkoutframe/components/upi';
@@ -170,6 +172,7 @@ export default {
   Backdrop,
   Overlay,
   AuthOverlay,
+  UserConfirmationOverlay,
   OffersView,
   NoCostExplainer,
 
@@ -210,4 +213,5 @@ export default {
   ContactStorage,
   I18n,
   overlayStackStore,
+  rewardsStore,
 };
