@@ -276,8 +276,15 @@ var responseTypes = {
         ) {
           if (this.data && this.data.method === 'upi') {
             this.emit('upi.intent_response', {});
-          } else if (this.data && this.data.method === 'app') {
-            this.emit('app.intent_response', {});
+          } else if (
+            this.data &&
+            this.data.method === 'app' &&
+            app === 'cred'
+          ) {
+            this.emit('app.intent_response', {
+              provider: 'CRED',
+              data: 0,
+            });
           }
         }
 
