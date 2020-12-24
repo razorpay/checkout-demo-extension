@@ -42,7 +42,7 @@
     "jest:base": "jest blackbox/tests/homescreen/**/base.test.js",
     "jest": "jest blackbox/tests/homescreen --testPathIgnorePatterns ersonalization",
     "jest:p13n": "jest blackbox/tests/homescreen/**/*ersonalization*.test.js --runInBand",
-    "test:all": "npm run test:unit && npm run build && npm run jest",
+    "test:all": "npm run test:unit && npm run build",
     "test:base": "npm run test:unit && npm run build && npm run jest:base",
     "test:unit": "./rollup.test.js | tap-difflet",
     "test": "npm run test:all"
