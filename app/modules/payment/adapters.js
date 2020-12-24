@@ -1,8 +1,17 @@
 import { checkMicroapp, googlePaySupportedMethods } from 'gpay';
 import { NO_PAYMENT_ADAPTER_ERROR, CHECK_ERROR } from 'common/constants';
-import { GOOGLE_PAY_PACKAGE_NAME, PHONE_PE_PACKAGE_NAME } from 'common/upi';
+import {
+  CRED_PACKAGE_NAME,
+  GOOGLE_PAY_PACKAGE_NAME,
+  PHONE_PE_PACKAGE_NAME,
+} from 'common/upi';
 
 const PaymentRequest = global.PaymentRequest;
+
+export const supportedWebPaymentsMethodsForApp = {
+  [PHONE_PE_PACKAGE_NAME]: 'https://mercury.phonepe.com/transact/pay',
+  [CRED_PACKAGE_NAME]: ['https://cred.club/checkout/pay'],
+};
 
 export const ADAPTER_CHECKERS = {
   'microapps.gpay': checkMicroapp,
@@ -10,9 +19,6 @@ export const ADAPTER_CHECKERS = {
   [PHONE_PE_PACKAGE_NAME]: phonepePaymentRequestAdapter,
   cred: credPaymentRequestAdapter,
 };
-
-export const phonepeSupportedMethods =
-  'https://mercury.phonepe.com/transact/pay';
 
 /**
  * Checks if a payment adapter is present.
@@ -123,9 +129,8 @@ export function credPaymentRequestAdapter() {
       new PaymentRequest(
         [
           {
-            supportedMethods: [
-              'https://cred-web-stg.dreamplug.in/checkout/pay',
-            ],
+            supportedMethods:
+              supportedWebPaymentsMethodsForApp[CRED_PACKAGE_NAME],
           },
         ],
         {

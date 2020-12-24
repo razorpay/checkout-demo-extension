@@ -13,10 +13,9 @@ import Track from 'tracker';
 import Analytics from 'analytics';
 import * as Bridge from 'bridge';
 
-import {
-  isWebPaymentsApiAvailable,
-  supportedWebPaymentsMethodsForApp,
-} from 'common/webPaymentsApi';
+import { isWebPaymentsApiAvailable } from 'common/webPaymentsApi';
+
+import { supportedWebPaymentsMethodsForApp } from 'payment/adapters';
 
 const getParsedDataFromUrl = url => {
   const parsedData = {};
