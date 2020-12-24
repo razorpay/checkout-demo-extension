@@ -29,7 +29,6 @@
     getAmount,
     getCurrency,
     getCardCurrencies,
-    getMerchantOrder,
     isPartialPayment,
   } from 'checkoutstore';
 
@@ -61,7 +60,6 @@
   let selectedCurrency = null;
   let searchModal;
   const currencyCache = {};
-  const order = getMerchantOrder();
 
   // Props
   export let classes = [];
