@@ -123,13 +123,15 @@ export function credPaymentRequestAdapter() {
       new PaymentRequest(
         [
           {
-            supportedMethods: ['https://cred.club/checkout/pay'],
+            supportedMethods: [
+              'https://cred-web-stg.dreamplug.in/checkout/pay',
+            ],
           },
         ],
         {
           total: {
             label: '_',
-            amount: { currency: 'INR', value: 10 },
+            amount: { currency: 'INR', value: '10.00' },
           },
         }
       )
