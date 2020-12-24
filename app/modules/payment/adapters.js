@@ -49,7 +49,8 @@ function phonepePaymentRequestAdapter() {
       new PaymentRequest(
         [
           {
-            supportedMethods: phonepeSupportedMethods,
+            supportedMethods:
+              supportedWebPaymentsMethodsForApp[PHONE_PE_PACKAGE_NAME],
             data: {
               url: '',
             },
