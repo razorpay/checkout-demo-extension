@@ -268,7 +268,11 @@ var responseTypes = {
       },
     };
 
+    window.console.log('details', details);
+
     const webPaymentOnError = (app, error) => {
+      window.console.log('webPaymentOnError');
+      window.console.dir(error);
       if (error.code) {
         if (
           [error.ABORT_ERR, error.NOT_SUPPORTED_ERR].indexOf(error.code) >= 0

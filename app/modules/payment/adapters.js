@@ -143,7 +143,7 @@ export function credPaymentRequestAdapter() {
       )
         .canMakePayment()
         .then(isAvailable => {
-          console.log('isAvailable', isAvailable);
+          window.console.log('isAvailable', isAvailable);
           if (isAvailable) {
             resolve();
           } else {
@@ -152,12 +152,12 @@ export function credPaymentRequestAdapter() {
         })
         /* jshint ignore:start */
         .catch(e => {
-          console.log('rejected', e);
+          window.console.log('rejected', e);
           reject(CHECK_ERROR);
         });
       /* jshint ignore:end */
     } catch (e) {
-      console.log('caught', e);
+      window.console.log('caught', e);
       reject(CHECK_ERROR);
     }
   });
