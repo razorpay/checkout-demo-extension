@@ -3379,6 +3379,7 @@ Session.prototype = {
     var self = this;
     if (this.isOpen) {
       if (confirmedCancel !== true && this.r._payment) {
+        // confirm close returns a promise which is resolved/rejected as per uder's confirmation to close
         self.confirmClose().then(function(confirmed) {
           if (confirmed) {
             self.back(true);
