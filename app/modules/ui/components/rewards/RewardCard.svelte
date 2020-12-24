@@ -9,8 +9,8 @@
   export let name;
 
   function handleCardClick() {
-    Analytics.track('rewards:icon:show', {
-      type: AnalyticsTypes.RENDER,
+    Analytics.track('rewards:card:click', {
+      type: AnalyticsTypes.BEHAV,
       data: {
         reward_id,
       },
