@@ -269,7 +269,7 @@ var responseTypes = {
       },
     };
 
-    const webPaymentOnError = function(app, error) {
+    const webPaymentOnError = (app, error) => {
       if (error.code) {
         if (
           [error.ABORT_ERR, error.NOT_SUPPORTED_ERR].indexOf(error.code) >= 0
