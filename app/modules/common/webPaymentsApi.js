@@ -6,7 +6,8 @@ import {
   CRED_PACKAGE_NAME,
 } from 'common/upi';
 
-import { checkPaymentAdapter, phonepeSupportedMethods } from 'payment/adapters';
+import { phonepeSupportedMethods } from 'payment/adapters';
+import { getSession } from 'sessionmanager';
 
 export const appsThatSupportWebPayments = [
   { package_name: GOOGLE_PAY_PACKAGE_NAME, method: 'upi' },
@@ -36,12 +37,13 @@ export function isWebPaymentsApiAvailable(app) {
 }
 
 export const checkWebPaymentsForApp = app => {
+  const session = getSession();
   /* disable Web payments API for SDK as we have native intent there */
   if (Bridge.checkout.exists()) {
     return Promise.resolve(false);
   }
 
-  return checkPaymentAdapter(app).then(() => {
+  return session.r.checkPaymentAdapter(app).then(() => {
     webPaymentsApps[app] = true;
   });
 };
