@@ -959,7 +959,7 @@ export default {
     qr_block_heading: 'Pay using QR Code',
     recommended: 'Recommended',
     recurring_caw_callout_all_data:
-      'This is a recurring payment and {maxAmount} will be charged now. {merchantName} can charge upto {amount} on a {recurringFrequency} basis till {endDate}.',
+      'This is a recurring payment and upto {maxAmount} will be charged now. {merchantName} can charge upto {amount} on a {recurringFrequency} basis till {endDate}.',
     recurring_caw_callout_no_frequency:
       'This is a recurring payment and {maxAmount} will be charged now. {merchantName} can charge upto {amount} anytime till {endDate}.',
     recurring_caw_callout_no_name:
