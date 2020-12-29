@@ -1038,6 +1038,10 @@ export default {
     sbibuddy: 'SBI Buddy',
     zeta: 'Zeta',
   },
+  powered_by: {
+    partnership_label: 'In partnership with',
+    powered_by_label: 'Powered By',
+  },
   rewards: {
     header:
       'Pay successfully now & unlock <strong>exciting rewards for free,<strong> for your future buys!',
