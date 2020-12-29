@@ -112,6 +112,7 @@
   let shouldShowCollect;
   let shouldShowOmnichannel;
   let vpaEntered;
+  let rememberVpa = true;
 
   let disabled = false;
   let tokens = [];
@@ -416,7 +417,7 @@
       case 'new':
         data = {
           vpa: getFullVpa(),
-          save: vpaField.shouldRememberVpa(),
+          save: shouldRememberVpa(),
         };
         break;
       case 'intent':
@@ -545,6 +546,14 @@
         valid,
       },
     });
+  }
+
+  export function shouldRememberVpa() {
+    return _Obj.getSafely($customer, 'logged') &&
+      hasFeature('save_vpa') &&
+      rememberVpa
+      ? 1
+      : 0;
   }
 
   export function trackHandleSelection(event) {
@@ -761,6 +770,7 @@
               on:blur={trackVpaEntry}
               selected={selectedToken === 'new'}
               bind:value={vpaEntered}
+              bind:rememberVpa
               bind:this={vpaField} />
           </div>
         {/if}
