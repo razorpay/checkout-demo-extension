@@ -113,6 +113,7 @@
   let shouldShowOmnichannel;
   let vpaEntered;
   let rememberVpa = true;
+  let omnichannelPhone = '';
 
   let disabled = false;
   let tokens = [];
@@ -426,7 +427,7 @@
       case 'gpay-omni':
         data = {
           '_[flow]': 'intent',
-          contact: omnichannelField.getPhone(),
+          contact: omnichannelPhone,
           upi_provider: 'google_pay',
         };
         break;
@@ -575,7 +576,7 @@
   }
 
   export function trackOmnichannelEntry() {
-    const contact = omnichannelField.getPhone();
+    const contact = omnichannelPhone;
     let valid = false;
 
     if (contact) {
@@ -586,7 +587,7 @@
       type: AnalyticsTypes.BEHAV,
       data: {
         valid,
-        value: omnichannelField.getPhone(),
+        value: omnichannelPhone,
       },
     });
   }
@@ -786,7 +787,7 @@
             on:select={() => {
               onUpiAppSelection({ detail: { id: 'gpay-omni' } });
             }}
-            bind:this={omnichannelField} />
+            bind:value={omnichannelPhone} />
         {/if}
 
         {#if shouldShowQr}

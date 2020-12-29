@@ -28,6 +28,7 @@
   export let isFirst = true;
   export let contact = '';
   export let focusOnCreate = false;
+  export let value = '';
 
   // Refs
   export let phoneField = null;
@@ -59,8 +60,8 @@
     });
   }
 
-  export function getPhone() {
-    return phoneField.getValue();
+  function handlePhoneValueInput() {
+    value = phoneField.getValue();
   }
 
   export function focus() {
@@ -135,6 +136,7 @@
           required
           bind:this={phoneField}
           on:blur
+          on:input={handlePhoneValueInput}
           value={contact}
           placeholder={$t(OMNI_ENTER_NUMBER)} />
       </div>
