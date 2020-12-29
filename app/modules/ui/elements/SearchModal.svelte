@@ -189,22 +189,26 @@
     cache.clear();
   });
 
+  function openWithOverlay() {
+    query = '';
+    // Wait for UI updates before focusing
+    tick().then(focus);
+
+    // Add to $overlayStack
+    $overlayStack = $overlayStack.concat([
+      {
+        id: IDs.overlay,
+        component: 'SearchModal',
+        back: meta => {
+          dispatchClose(meta);
+        },
+      },
+    ]);
+  }
+
   $: {
     if (open) {
-      query = '';
-      // Wait for UI updates before focusing
-      tick().then(focus);
-
-      // Add to $overlayStack
-      $overlayStack = $overlayStack.concat([
-        {
-          id: IDs.overlay,
-          component: 'SearchModal',
-          back: meta => {
-            dispatchClose(meta);
-          },
-        },
-      ]);
+      openWithOverlay();
     } else {
       removeFromOverlayStack();
     }
