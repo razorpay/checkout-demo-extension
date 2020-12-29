@@ -28,7 +28,8 @@ export default function popupTemplate(_) {
   var color = get('theme.color') || '#3594E2';
   var highlightColor = _.r.themeMeta.highlightColor;
   var logo =
-    _.r.preferences.org?.checkout_logo_url ?? 'https://cdn.razorpay.com/logo.svg';
+    _.r.preferences?.org?.checkout_logo_url ??
+    'https://cdn.razorpay.com/logo.svg';
   var title =
     get('name') || get('description') || 'Redirecting...'
     |> sanitizeHtmlEntities;
