@@ -111,6 +111,7 @@
   export let shouldShowQr;
   let shouldShowCollect;
   let shouldShowOmnichannel;
+  let vpaEntered;
 
   let disabled = false;
   let tokens = [];
@@ -524,8 +525,8 @@
   }
 
   export function getFullVpa() {
-    if (vpaField) {
-      return vpaField.getVpa();
+    if (vpaEntered) {
+      return vpaEntered;
     }
     return '';
   }
@@ -549,7 +550,7 @@
   export function trackHandleSelection(event) {
     const handle = event.detail;
 
-    const vpa = vpaField.getVpa();
+    const vpa = vpaEntered;
 
     const valid = vpa ? isVpaValid(vpa) : false;
 
@@ -587,7 +588,7 @@
     if (intentAppSelected === 'directpay') {
       data = {
         '_[flow]': 'directpay',
-        vpa: vpaField.getValue(),
+        vpa: vpaEntered,
       };
     } else {
       data = {
@@ -759,6 +760,7 @@
               customer={$customer}
               on:blur={trackVpaEntry}
               selected={selectedToken === 'new'}
+              bind:value={vpaEntered}
               bind:this={vpaField} />
           </div>
         {/if}
