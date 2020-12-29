@@ -16,6 +16,7 @@ import emiView from 'checkoutframe/emi';
 import FeeBearerView from 'ui/components/feebearer.svelte';
 import Overlay from 'ui/components/Overlay.svelte';
 import AuthOverlay from 'ui/components/AuthOverlay.svelte';
+import UserConfirmationOverlay from 'ui/components/overlay/UserConfirmation.svelte';
 import OffersView from 'ui/components/offers/index.svelte';
 import NoCostExplainer from 'ui/components/offers/NoCostExplainer.svelte';
 import emiPlansView from 'checkoutframe/emiplans';
@@ -24,6 +25,8 @@ import languageSelectionView from 'ui/elements/LanguageSelection.svelte';
 import * as I18n from 'i18n';
 import { init as initI18n } from 'i18n/init';
 import UpiCancelReasonPicker from 'ui/components/UpiCancelReasonPicker.svelte';
+import CancelReasonPicker from 'ui/components/cancellation-modals/CancelReasonPicker.svelte';
+import NetbankingCancelReasonPicker from 'ui/components/cancellation-modals/NetbankingCancelReasonPicker.svelte';
 import * as Curtain from 'components/curtain';
 import { setShieldParams } from 'payment/validator';
 import * as P13n from 'checkoutframe/personalization';
@@ -62,6 +65,7 @@ import * as Theme from 'checkoutstore/theme';
 import { overlayStack as overlayStackStore } from 'checkoutstore/back';
 import * as NativeStore from 'checkoutstore/native';
 import * as OffersStore from 'checkoutstore/offers';
+import { rewardIds as rewardsStore } from 'checkoutstore/rewards';
 
 import QRScreen from 'ui/tabs/qr/index.svelte';
 import * as upiTab from 'checkoutframe/components/upi';
@@ -170,12 +174,15 @@ export default {
   Backdrop,
   Overlay,
   AuthOverlay,
+  UserConfirmationOverlay,
   OffersView,
   NoCostExplainer,
 
   otpView,
   languageSelectionView,
   UpiCancelReasonPicker,
+  CancelReasonPicker,
+  NetbankingCancelReasonPicker,
   PayLaterView,
   Curtain,
   commonBanks,
@@ -210,4 +217,5 @@ export default {
   ContactStorage,
   I18n,
   overlayStackStore,
+  rewardsStore,
 };
