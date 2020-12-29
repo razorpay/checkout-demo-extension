@@ -963,7 +963,7 @@ export default {
     recurring_caw_callout_no_frequency:
       'This is a recurring payment and {maxAmount} will be charged now. {merchantName} can charge upto {amount} anytime till {endDate}.',
     recurring_caw_callout_no_name:
-      'This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} on a {recurringFrequency} basis till {endDate}.',
+      'This is a recurring payment and upto {maxAmount} will be charged now. You will be charged upto {amount} on a {recurringFrequency} basis till {endDate}.',
     recurring_caw_callout_no_name_no_frequency:
       'This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} anytime till {endDate}.',
     recurring_subscription_callout:
