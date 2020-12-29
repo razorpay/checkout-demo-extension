@@ -6,3 +6,11 @@ export const RETAIL_RADIO_LABEL = 'netbanking.retail_label';
 export const SEARCH_TITLE = 'netbanking.search_title';
 export const SEARCH_PLACEHOLDER = 'netbanking.search_placeholder';
 export const SEARCH_ALL = 'netbanking.search_all';
+
+// Cancellation modal
+export const CANCELLATION_MODAL_TITLE =
+  'Please share a reason for cancelling this payment';
+export const WRONG_BANK_SELECTED = 'Wrong bank selected';
+export const FORGOT_USERNAME_PASSWORD = 'Forgot username or password';
+export const ERROR_BANK_PAGE = 'Error on bank page';
+export const CANCEL_REASON_OTHER = 'Other';
