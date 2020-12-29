@@ -101,7 +101,6 @@
   export let method = 'upi';
 
   // Refs
-  export let intentView = null;
   export let omnichannelField = null;
   export let vpaField = null;
 
@@ -420,7 +419,7 @@
         };
         break;
       case 'intent':
-        data = intentView.getPayload();
+        data = getPayloadForUpiIntent();
         break;
       case 'gpay-omni':
         data = {
@@ -582,6 +581,24 @@
     });
   }
 
+  export function getPayloadForUpiIntent() {
+    let data;
+
+    if (intentAppSelected === 'directpay') {
+      data = {
+        '_[flow]': 'directpay',
+        vpa: vpaField.getValue(),
+      };
+    } else {
+      data = {
+        '_[flow]': 'intent',
+        upi_app: intentAppSelected,
+      };
+    }
+
+    return data;
+  }
+
   function sendIntentEvents() {
     if (!intent) {
       return;
@@ -670,15 +687,12 @@
       {#if selectedBankForRecurring}
         <div class="legend left">{$t(ID_LINKED_TO_BANK)}</div>
         <div class="border-list">
-
           <SlottedOption className="upi-selected-bank" id="user-details">
             <i slot="icon">
               <Icon
                 icon={`https://cdn.razorpay.com/bank/${selectedBankForRecurring.img}.gif`} />
             </i>
-            <div slot="title">
-              <span>{selectedBankForRecurring.name}</span>
-            </div>
+            <div slot="title"><span>{selectedBankForRecurring.name}</span></div>
             <div
               slot="extra"
               on:click={() => {
@@ -695,7 +709,6 @@
       <div>
         {#if intent}
           <UpiIntent
-            bind:this={intentView}
             apps={intentApps || []}
             selected={intentAppSelected}
             on:select={e => {
@@ -796,5 +809,4 @@
       {maxRecurringAmount}
       {recurringFrequency} />
   </Screen>
-
 </Tab>

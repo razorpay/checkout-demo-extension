@@ -52,32 +52,6 @@
     }
   }
 
-  function getVpa() {
-    if (vpaField) {
-      return vpaField.getValue();
-    }
-    return '';
-  }
-
-  function trackVpaEntry() {
-    const vpa = getVpa();
-
-    if (!vpa) {
-      return;
-    }
-
-    const valid = isVpaValid(vpa);
-
-    Analytics.track('vpa:fill', {
-      type: AnalyticsTypes.BEHAV,
-      data: {
-        app: selectedApp,
-        value: vpa,
-        valid,
-      },
-    });
-  }
-
   export function getPayload() {
     let data = {};
 
