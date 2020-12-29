@@ -212,7 +212,7 @@ export default {
       flexmoney: 'Cardless EMI by InstaCred',
       zestmoney: 'ZestMoney',
       fdrl: 'Federal Bank',
-      hdfc: 'FlexiPay by HDFC Bank',
+      hdfc: 'HDFC Bank',
       idfb: 'IDFC First Bank',
       kkbk: 'Kotak Mahindra Bank',
     },
