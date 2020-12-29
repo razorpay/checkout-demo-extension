@@ -4152,6 +4152,12 @@ Session.prototype = {
       $(goto_payment).hide();
     }
 
+    if (this.data && this.data.method === 'netbanking' && !this.data.bank) {
+      Analytics.track('netbanking:bank:empty', {
+        type: AnalyticsTypes.DEBUG,
+      });
+    }
+
     if (this.r._payment) {
       /**
        * For Cardless EMI, payments are created at the first step,
