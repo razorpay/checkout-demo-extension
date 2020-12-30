@@ -16,10 +16,7 @@
     NAME_LABEL,
   } from 'ui/labels/payouts';
 
-  let accountNumberField;
   let confirmAccountNumberField;
-  let ifscField;
-  let nameField;
 
   let accountNumber;
   let confirmAccountNumber;
@@ -64,7 +61,6 @@
       helpText={$t(ACCOUNT_NUMBER_HELP)}
       maxlength="20"
       required={true}
-      bind:this={accountNumberField}
       bind:readonlyValue={accountNumber}
       formatter={{ type: 'number' }}
       on:blur={validateConfirmAccount} />
@@ -91,7 +87,6 @@
       helpText={$t(IFSC_HELP)}
       maxlength="11"
       required={true}
-      bind:this={ifscField}
       bind:readonlyValue={ifsc}
       formatter={{ type: 'ifsc' }} />
 
@@ -104,7 +99,6 @@
       pattern={"^[a-zA-Z. 0-9']{1,100}$"}
       maxlength="100"
       required={true}
-      bind:this={nameField}
       bind:readonlyValue={name} />
   </div>
 </Tab>
