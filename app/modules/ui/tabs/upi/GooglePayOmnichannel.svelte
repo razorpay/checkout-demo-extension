@@ -60,10 +60,6 @@
     });
   }
 
-  function handlePhoneValueInput() {
-    value = phoneField.getValue();
-  }
-
   export function focus() {
     signalSelect();
     //TODO check if there is a better way
@@ -136,8 +132,8 @@
           required
           bind:this={phoneField}
           on:blur
-          on:input={handlePhoneValueInput}
           value={contact}
+          bind:readonlyValue={value}
           placeholder={$t(OMNI_ENTER_NUMBER)} />
       </div>
     {/if}
