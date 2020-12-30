@@ -9,6 +9,7 @@
   const orgDetails = getOrgDetails();
   const orgLogo =
     orgDetails?.id !== '100000razorpay' ? orgDetails?.checkout_logo_url : null;
+
   let fontLoaded = false;
   let fontTimeout = null;
   let ref;
