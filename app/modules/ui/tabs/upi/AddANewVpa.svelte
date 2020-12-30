@@ -62,7 +62,6 @@
   });
 
   function handleVpaInput() {
-    const vpa = vpaField.getValue();
     if (isVpaValid(vpa) || !pspHandle) {
       value = vpa;
     } else {
@@ -181,6 +180,7 @@
           type="text"
           required
           bind:this={vpaField}
+          bind:readonlyValue={vpa}
           on:input={handleVpaInput}
           on:blur
           placeholder={$t(UPI_COLLECT_ENTER_ID)} />
