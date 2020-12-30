@@ -1096,6 +1096,7 @@ Session.prototype = {
 
   setSvelteComponents: function() {
     this.setUpiCancelReasonPicker();
+    this.setNbCancelReasonPicker();
     if (!Store.isPayout()) {
       this.setHomeTab();
     }
@@ -1796,7 +1797,23 @@ Session.prototype = {
         return this.clearRequest();
       }
 
+      if (
+        this.payload.method === 'netbanking' &&
+        _Obj.getSafely(this.r, '_payment.popup.window.closed')
+      ) {
+        // Called when the popup for netbanking has been closed by the user
+        // and the netbanking cancellation modal is open
+        // returning from this point prevents confirmClose from being called because it's not needed
+        return;
+      }
+
+      var paymentMethod = this.payload.method;
+
       self.confirmClose().then(function(close) {
+        if (paymentMethod == 'netbanking' && close) {
+          self.r._payment.popup.onClose();
+          return;
+        }
         if (close) {
           self.clearRequest();
           if (Bridge.checkout.platform === 'ios') {
@@ -3389,7 +3406,12 @@ Session.prototype = {
     var self = this;
     if (this.isOpen) {
       if (confirmedCancel !== true && this.r._payment) {
-        self.confirmClose();
+        // confirm close returns a promise which is resolved/rejected as per uder's confirmation to close
+        self.confirmClose().then(function(confirmed) {
+          if (confirmed) {
+            self.back(true);
+          }
+        });
         return;
       }
 
@@ -3488,6 +3510,12 @@ Session.prototype = {
   setUpiCancelReasonPicker: function() {
     this.upiCancelReasonPicker = new discreet.UpiCancelReasonPicker({
       target: _Doc.querySelector('#cancel_upi'),
+    });
+  },
+
+  setNbCancelReasonPicker: function() {
+    this.nbCancelReasonPicker = new discreet.NetbankingCancelReasonPicker({
+      target: _Doc.querySelector('#error-message'),
     });
   },
 
@@ -4898,6 +4926,7 @@ Session.prototype = {
       'languageSelectionView',
       'svelteOverlay',
       'upiCancelReasonPicker',
+      'nbCancelReasonPicker',
       'timer',
     ];
 
@@ -5233,6 +5262,7 @@ Session.prototype = {
   },
 
   hideOverlayMessage: hideOverlayMessage,
+  hideOverlay: hideOverlay,
   errorHandler: errorHandler,
   successHandler: successHandler,
 };

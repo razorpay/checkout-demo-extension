@@ -320,6 +320,19 @@ function setSessionPreferences(session, preferences) {
   showModal(session);
 }
 
+function markRelevantPreferencesPayload(prefData) {
+  const preferencesPayloadToBeMarked = [
+    'subscription_id',
+    'order_id',
+    'key_id',
+  ];
+  preferencesPayloadToBeMarked.forEach(prop => {
+    if (prefData[prop]) {
+      Analytics.setMeta(prop, prefData[prop]);
+    }
+  });
+}
+
 function getPreferenecsParams(razorpayInstance) {
   const prefData = makePrefParams(razorpayInstance);
   prefData.personalisation = 1;
@@ -332,6 +345,8 @@ function getPreferenecsParams(razorpayInstance) {
     prefData.checkcookie = 1;
     document.cookie = 'checkcookie=1;path=/';
   }
+  markRelevantPreferencesPayload(prefData);
+
   return prefData;
 }
 

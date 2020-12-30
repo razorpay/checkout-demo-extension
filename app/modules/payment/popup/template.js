@@ -27,6 +27,8 @@ export default function popupTemplate(_) {
   var method = _.data && _.data.method === 'wallet' ? 'wallet' : 'bank';
   var color = get('theme.color') || '#3594E2';
   var highlightColor = _.r.themeMeta.highlightColor;
+  var logo =
+    _.r.preferences.org?.checkout_logo_url ?? 'https://cdn.razorpay.com/logo.svg';
   var title =
     get('name') || get('description') || 'Redirecting...'
     |> sanitizeHtmlEntities;
@@ -79,7 +81,7 @@ export default function popupTemplate(_) {
 </div>
 <div id='ftr'>
   <div style="display:inline-block;">Secured by
-    <img style="vertical-align:middle;margin-bottom:5px;" height="20px" src="https://cdn.razorpay.com/logo.svg">
+    <img style="vertical-align:middle;margin-bottom:5px;" height="20px" src=${logo}>
   </div>
   <div style="display:inline-block;vertical-align:middle;height:100%"></div>
 </div>
