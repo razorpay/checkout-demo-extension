@@ -142,6 +142,9 @@
   }
 
   function showEmiPlans() {
+    if (!numberField.isValid()) {
+      return;
+    }
     // TODO: Update showOverlay once session.js is refactored.
     showOverlay({ 0: _Doc.querySelector('#emi-wrap') });
 
