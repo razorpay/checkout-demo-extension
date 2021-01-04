@@ -282,7 +282,14 @@ function errorHandler(response) {
   }
 
   var error = response.error;
-  var message = error.description;
+  var untranslatedMessage = error.description;
+
+  var message = I18n.translateErrorDescription(
+    untranslatedMessage,
+    I18n.getCurrentLocale()
+  );
+
+  error.description = message;
   var cancelMsg = I18n.format('misc.payment_canceled');
 
   // Both checks are there because API still returns message in English.
@@ -1503,9 +1510,10 @@ Session.prototype = {
     }
 
     this.checkCustomerStatus(params, function(error) {
+      var locale = I18n.getCurrentLocale();
       if (error) {
         PayLaterStore.userRegistered = false;
-        self.showLoadError(error, true);
+        self.showLoadError(I18n.translateErrorDescription(error, locale), true);
         return;
       }
 
@@ -1517,7 +1525,6 @@ Session.prototype = {
         otpMessageView = 'otp_resent_successful';
       }
 
-      var locale = I18n.getCurrentLocale();
       askOTP(self.otpView, otpMessageView, true, {
         phone: getPhone(),
         provider: I18n.getPaylaterProviderName(providerCode, locale),
