@@ -22,6 +22,7 @@
 
   // Computed
   export let pattern;
+  let vpaValue;
 
   function isVpaValid(vpa) {
     return VPA_REGEX.test(vpa);
@@ -37,7 +38,7 @@
   });
 
   export function getVpa() {
-    const vpa = vpaField.getValue();
+    const vpa = vpaValue;
     if (isVpaValid(vpa) || !pspHandle) {
       return vpa;
     }
@@ -82,7 +83,8 @@
       type="text"
       value={selectedApp === null ? vpa : ''}
       on:blur
-      bind:this={vpaField} />
+      bind:this={vpaField}
+      bind:readonlyValue={vpaValue} />
     {#if pspHandle}
       <div class="ref-pspName">@{pspHandle}</div>
     {/if}

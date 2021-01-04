@@ -101,7 +101,6 @@
   export let method = 'upi';
 
   // Refs
-  export let intentView = null;
   export let omnichannelField = null;
   export let vpaField = null;
 
@@ -112,6 +111,9 @@
   export let shouldShowQr;
   let shouldShowCollect;
   let shouldShowOmnichannel;
+  let vpaEntered;
+  let rememberVpa = true;
+  let omnichannelPhone = '';
 
   let disabled = false;
   let tokens = [];
@@ -416,16 +418,16 @@
       case 'new':
         data = {
           vpa: getFullVpa(),
-          save: vpaField.shouldRememberVpa(),
+          save: shouldRememberVpa(),
         };
         break;
       case 'intent':
-        data = intentView.getPayload();
+        data = getPayloadForUpiIntentView();
         break;
       case 'gpay-omni':
         data = {
           '_[flow]': 'intent',
-          contact: omnichannelField.getPhone(),
+          contact: omnichannelPhone,
           upi_provider: 'google_pay',
         };
         break;
@@ -525,8 +527,8 @@
   }
 
   export function getFullVpa() {
-    if (vpaField) {
-      return vpaField.getVpa();
+    if (vpaEntered) {
+      return vpaEntered;
     }
     return '';
   }
@@ -547,10 +549,18 @@
     });
   }
 
+  export function shouldRememberVpa() {
+    return _Obj.getSafely($customer, 'logged') &&
+      hasFeature('save_vpa') &&
+      rememberVpa
+      ? 1
+      : 0;
+  }
+
   export function trackHandleSelection(event) {
     const handle = event.detail;
 
-    const vpa = vpaField.getVpa();
+    const vpa = vpaEntered;
 
     const valid = vpa ? isVpaValid(vpa) : false;
 
@@ -566,7 +576,7 @@
   }
 
   export function trackOmnichannelEntry() {
-    const contact = omnichannelField.getPhone();
+    const contact = omnichannelPhone;
     let valid = false;
 
     if (contact) {
@@ -577,9 +587,27 @@
       type: AnalyticsTypes.BEHAV,
       data: {
         valid,
-        value: omnichannelField.getPhone(),
+        value: omnichannelPhone,
       },
     });
+  }
+
+  export function getPayloadForUpiIntentView() {
+    let data;
+
+    if (intentAppSelected === 'directpay') {
+      data = {
+        '_[flow]': 'directpay',
+        vpa: vpaEntered,
+      };
+    } else {
+      data = {
+        '_[flow]': 'intent',
+        upi_app: intentAppSelected,
+      };
+    }
+
+    return data;
   }
 
   function sendIntentEvents() {
@@ -670,15 +698,12 @@
       {#if selectedBankForRecurring}
         <div class="legend left">{$t(ID_LINKED_TO_BANK)}</div>
         <div class="border-list">
-
           <SlottedOption className="upi-selected-bank" id="user-details">
             <i slot="icon">
               <Icon
                 icon={`https://cdn.razorpay.com/bank/${selectedBankForRecurring.img}.gif`} />
             </i>
-            <div slot="title">
-              <span>{selectedBankForRecurring.name}</span>
-            </div>
+            <div slot="title"><span>{selectedBankForRecurring.name}</span></div>
             <div
               slot="extra"
               on:click={() => {
@@ -695,7 +720,6 @@
       <div>
         {#if intent}
           <UpiIntent
-            bind:this={intentView}
             apps={intentApps || []}
             selected={intentAppSelected}
             on:select={e => {
@@ -746,6 +770,8 @@
               customer={$customer}
               on:blur={trackVpaEntry}
               selected={selectedToken === 'new'}
+              bind:value={vpaEntered}
+              bind:rememberVpa
               bind:this={vpaField} />
           </div>
         {/if}
@@ -761,7 +787,7 @@
             on:select={() => {
               onUpiAppSelection({ detail: { id: 'gpay-omni' } });
             }}
-            bind:this={omnichannelField} />
+            bind:value={omnichannelPhone} />
         {/if}
 
         {#if shouldShowQr}
@@ -796,5 +822,4 @@
       {maxRecurringAmount}
       {recurringFrequency} />
   </Screen>
-
 </Tab>

@@ -58,7 +58,7 @@
   let currencies = null;
   let originalAmount = getAmount();
   let selectedCurrency = null;
-  let searchModal;
+  let searchModalOpen = false;
   const currencyCache = {};
 
   // Props
@@ -164,8 +164,7 @@
 
   function onSelect(currency) {
     selectedCurrency = currency;
-
-    searchModal.close();
+    searchModalOpen = false;
   }
 
   function updateAmountInHeaderAndCTA(displayAmount) {
@@ -235,7 +234,7 @@
   }
 
   function showCurrenciesModal() {
-    searchModal.open();
+    searchModalOpen = true;
   }
 
   function getCardByTokenId(tokenId) {
@@ -342,8 +341,8 @@
         items={sortedCurrencies}
         keys={['currency', 'name', 'symbol']}
         component={CurrencySearchItem}
-        bind:this={searchModal}
-        on:close={() => searchModal.close()}
+        bind:open={searchModalOpen}
+        on:close={() => (searchModalOpen = false)}
         on:select={({ detail }) => onSelect(detail.currency)} />
     </Stack>
   {/if}

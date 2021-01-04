@@ -53,12 +53,12 @@ function getSegment(experiment) {
 /**
  * Creates a segment for the given experiment.
  * @param {string} experiment Experiment name
- * @param {Object} evaluatorArgs Argments for evaluator fn
+ * @param {*} evaluatorArg Argument for evaluator fn
  * @param {Function} overrideFn Function to override evaluation
  *
  * @returns {*}
  */
-function setSegment(experiment, evaluatorArgs, overrideFn) {
+function setSegment(experiment, evaluatorArg, overrideFn) {
   const config = _Arr.find(CurrentExperiments, ex => ex.name === experiment);
 
   // Sanity check
@@ -70,7 +70,7 @@ function setSegment(experiment, evaluatorArgs, overrideFn) {
   const evaluator = _.isFunction(overrideFn) ? overrideFn : config.evaluator;
 
   // Get segment
-  const segment = evaluator(evaluatorArgs);
+  const segment = evaluator(evaluatorArg);
 
   // Set in storage
   const all = getExperimentsFromStorage();
@@ -84,16 +84,16 @@ function setSegment(experiment, evaluatorArgs, overrideFn) {
  * Retrieves segment for an experiment
  * or creates one if it doesn't exist.
  * @param {string} experiment Experiment name
- * @param {Object} evaluatorArgs Argments for evaluator fn
- * @param {Function} overrideFn Function to override evaluation
+ * @param {*} [evaluatorArg] Argument for evaluator fn
+ * @param {Function} [overrideFn] Function to override evaluation
  *
  * @returns {*}
  */
-export function getSegmentOrCreate(experiment, evaluatorArgs, overrideFn) {
+export function getSegmentOrCreate(experiment, evaluatorArg, overrideFn) {
   const existing = getSegment(experiment);
 
   if (_.isUndefined(existing)) {
-    return setSegment(experiment, evaluatorArgs, overrideFn);
+    return setSegment(experiment, evaluatorArg, overrideFn);
   } else {
     return existing;
   }

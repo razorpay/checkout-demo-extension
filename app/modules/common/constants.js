@@ -69,18 +69,8 @@ export const cookieDisabled = !navigator.cookieEnabled;
 export const isIframe = global !== global.parent;
 export const ownerWindow = isIframe ? global.parent : global.opener;
 
-export const EMI_HELP_TEXT =
-  'EMI is available on HDFC, ICICI, RBL, Kotak, IndusInd, Yes Bank, ' +
-  'Standard Chartered and Axis Bank Credit Cards. Enter your credit card ' +
-  'to avail.';
-
 // Change this when running experiment 2 for Debit + Pin: Select ATM PIN by default.
 export const DEFAULT_AUTH_TYPE_RADIO = 'c3ds';
-
-export const STRINGS = {
-  process: 'Your payment is being processed',
-  redirect: 'Redirecting to Bank page',
-};
 
 /* Being used for filtering actual methods from methods object */
 /* The below array determines the order of payment methods shown in the homescreen */

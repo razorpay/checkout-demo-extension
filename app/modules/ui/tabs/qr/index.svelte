@@ -1,7 +1,6 @@
 <script>
   // Svelte imports
   import { onMount } from 'svelte';
-  import { t } from 'svelte-i18n';
 
   // UI imports
   import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
@@ -20,12 +19,17 @@
     isCustomerFeeBearer,
     getOptionalObject,
   } from 'checkoutstore';
+
   import { getSession } from 'sessionmanager';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
 
+  // i18n
+  import { t } from 'svelte-i18n';
+
   import {
     QR_GENERATING_LABEL,
+    PAYMENT_CHECKING_STATUS,
     QR_RETRY,
     QR_SCAN_ON_PHONE,
     QR_DOWNTIME_TEXT,
@@ -81,7 +85,7 @@
   }
 
   function checkStatus() {
-    session.showLoadError('Checking payment status...');
+    session.showLoadError($t(PAYMENT_CHECKING_STATUS));
   }
 
   function onError(data) {
