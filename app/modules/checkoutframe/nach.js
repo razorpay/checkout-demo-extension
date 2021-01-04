@@ -1,5 +1,4 @@
 import { makeAuthUrl } from 'common/Razorpay';
-import { getCurrentLocale } from 'i18n';
 
 export const ALLOWED_EXTS = ['.jpg', '.jpeg', '.png'];
 export const ALLOWED_MAX_SIZE_IN_MB = 5;

@@ -8,7 +8,6 @@ import * as TermsCurtain from 'checkoutframe/termscurtain';
 import { getCheckoutBridge, storage } from './index';
 import { get as storeGetter } from 'svelte/store';
 import { overlayStack as overlayStackStore } from 'checkoutstore/back';
-import { format } from 'i18n';
 
 /**
  * window.backPressed is called by Android SDK everytime android backbutton is

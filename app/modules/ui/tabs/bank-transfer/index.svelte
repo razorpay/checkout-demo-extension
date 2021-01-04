@@ -34,11 +34,12 @@
     RETRY_BUTTON_LABEL,
     ROUND_OFF_CALLOUT,
   } from 'ui/labels/bank-transfer';
+
   import { COPY_DETAILS, COPIED } from 'ui/labels/cta';
 
   import { t, locale } from 'svelte-i18n';
 
-  import { formatTemplateWithLocale, getCurrentLocale } from 'i18n';
+  import { formatTemplateWithLocale } from 'i18n';
 
   // Props
   export let loading = true;
