@@ -4890,10 +4890,6 @@ Session.prototype = {
     // data.amount needed by external libraries relying on `onsubmit` postMessage
     data.amount = this.get('amount');
 
-    // language_code is required to get the error message from API in the
-    // correct locale.
-    data.language_code = I18n.getCurrentLocale();
-
     if (this.oneMethod && this.oneMethod === 'paypal') {
       data.method = 'paypal';
     }
