@@ -143,6 +143,7 @@
 
   function showEmiPlans() {
     if (!numberField.isValid()) {
+      numberField.field.focus();
       return;
     }
     // TODO: Update showOverlay once session.js is refactored.
