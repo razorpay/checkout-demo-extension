@@ -28,7 +28,7 @@ const config = {
     headless: false,
   },
   hdfc: {
-    name: 'FlexiPay by HDFC Bank',
+    name: 'HDFC Bank',
     headless: false,
   },
   idfb: {

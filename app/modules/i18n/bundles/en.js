@@ -224,7 +224,7 @@ export default {
       flexmoney: 'Cardless EMI by InstaCred',
       zestmoney: 'ZestMoney',
       fdrl: 'Federal Bank',
-      hdfc: 'FlexiPay by HDFC Bank',
+      hdfc: 'HDFC Bank',
       idfb: 'IDFC First Bank',
       kkbk: 'Kotak Mahindra Bank',
     },
@@ -1001,11 +1001,11 @@ export default {
     recurring_subscription_callout:
       'The charge is to enable subscription on this card and it will be refunded.',
     recurring_caw_callout_all_data:
-      'This is a recurring payment and {maxAmount} will be charged now. {merchantName} can charge upto {amount} on a {recurringFrequency} basis till {endDate}.',
+      'This is a recurring payment and upto {maxAmount} will be charged now. {merchantName} can charge upto {amount} on a {recurringFrequency} basis till {endDate}.',
     recurring_caw_callout_no_frequency:
       'This is a recurring payment and {maxAmount} will be charged now. {merchantName} can charge upto {amount} anytime till {endDate}.',
     recurring_caw_callout_no_name:
-      'This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} on a {recurringFrequency} basis till {endDate}.',
+      'This is a recurring payment and upto {maxAmount} will be charged now. You will be charged upto {amount} on a {recurringFrequency} basis till {endDate}.',
     recurring_caw_callout_no_name_no_frequency:
       'This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} anytime till {endDate}.',
     redirect_to_app: 'You will be redirected to your UPI app',
@@ -1082,6 +1082,10 @@ export default {
     phonepe: 'PhonePe',
     sbibuddy: 'SBI Buddy',
     zeta: 'Zeta',
+  },
+  powered_by: {
+    partnership_label: 'In partnership with',
+    powered_by_label: 'Powered By',
   },
   rewards: {
     header:

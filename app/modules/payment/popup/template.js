@@ -44,12 +44,17 @@ export default function popupTemplate(_, t) {
   var method = _.data && _.data.method === 'wallet' ? 'wallet' : 'bank';
   var color = get('theme.color') || '#3594E2';
   var highlightColor = _.r.themeMeta.highlightColor;
+  var logo =
+    _.r.preferences?.org?.checkout_logo_url ??
+    'https://cdn.razorpay.com/logo.svg';
+
   var cancelError = JSON.stringify({
     error: {
       code: 'BAD_REQUEST_ERROR',
       description: t('payment_canceled'),
     },
   });
+
   var title =
     get('name') || get('description') || t(REDIRECTING) |> sanitizeHtmlEntities;
   var amount = displayAmount(
@@ -103,7 +108,7 @@ export default function popupTemplate(_, t) {
 </div>
 <div id='ftr'>
   <div style="display:inline-block;">${t(SECURED_BY)}
-    <img style="vertical-align:middle;margin-bottom:5px;" height="20px" src="https://cdn.razorpay.com/logo.svg">
+    <img style="vertical-align:middle;margin-bottom:5px;" height="20px" src=${logo}>
   </div>
   <div style="display:inline-block;vertical-align:middle;height:100%"></div>
 </div>

@@ -689,7 +689,18 @@ Payment.prototype = {
     }
 
     if (popup) {
-      popup.onClose = this.r.emitter('payment.cancel');
+      popup.onClose = () => {
+        Analytics.track(this.data.method + ':popup:closed');
+        if (
+          this.data.method === 'netbanking' &&
+          Track.props.library === 'checkoutjs'
+        ) {
+          const modal = _Doc.querySelector('#error-message');
+          _El.addClass(modal, 'cancel_netbanking');
+          return;
+        }
+        this.r.emit('payment.cancel');
+      };
     }
     this.popup = popup;
     return popup;
