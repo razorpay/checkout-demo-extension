@@ -422,7 +422,7 @@
         };
         break;
       case 'intent':
-        data = getPayloadForUpiIntent();
+        data = getPayloadForUpiIntentView();
         break;
       case 'gpay-omni':
         data = {
@@ -592,7 +592,7 @@
     });
   }
 
-  export function getPayloadForUpiIntent() {
+  export function getPayloadForUpiIntentView() {
     let data;
 
     if (intentAppSelected === 'directpay') {
