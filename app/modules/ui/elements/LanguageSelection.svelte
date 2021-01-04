@@ -113,7 +113,7 @@
   }
 
   li:first-child::after {
-    margin-top: 1.5px;
+    margin-top: 1px;
     border-color: transparent transparent #fff;
   }
 
