@@ -25,7 +25,12 @@
   // Utils imports
   import { getSession } from 'sessionmanager';
 
-  import { getAmount, getCurrency, getCardCurrencies } from 'checkoutstore';
+  import {
+    getAmount,
+    getCurrency,
+    getCardCurrencies,
+    isPartialPayment,
+  } from 'checkoutstore';
 
   import { getIin, getCardDigits } from 'common/card';
 
@@ -164,12 +169,13 @@
   }
 
   function updateAmountInHeaderAndCTA(displayAmount) {
+    const session = getSession();
     if (displayAmount) {
       showAmount(displayAmount);
-      getSession().setRawAmountInHeader(displayAmount);
-    } else {
+      session.setRawAmountInHeader(displayAmount);
+    } else if (!isPartialPayment()) {
       showCtaWithDefaultText();
-      getSession().updateAmountInHeader(originalAmount);
+      session.updateAmountInHeader(originalAmount);
     }
   }
 
