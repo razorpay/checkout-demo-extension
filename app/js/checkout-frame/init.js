@@ -54,7 +54,7 @@ window.onerror = function(errorMsg, url, lineNumber, column, errorObj) {
 };
 
 window.addEventListener('unhandledrejection', function(event) {
-  let { reason } = event;
+  var reason = event.reason;
 
   if (reason instanceof Error) {
     reason = {
@@ -67,7 +67,7 @@ window.addEventListener('unhandledrejection', function(event) {
   Analytics.track('unhandled_rejection', {
     r: SessionManager.getSession().r,
     data: {
-      reason,
+      reason: reason,
     },
     immediately: true,
   });
