@@ -47,7 +47,8 @@ var preferences,
   NativeStore = discreet.NativeStore,
   Confirm = discreet.Confirm,
   Backdrop = discreet.Backdrop,
-  FeeLabel = discreet.FeeLabel;
+  FeeLabel = discreet.FeeLabel,
+  rewardsStore = discreet.rewardsStore;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -57,10 +58,6 @@ var isIE = /MSIE |Trident\//.test(ua);
 // .shown has display: none from iOS ad-blocker
 // using दृश्य, which will never be seen by tim cook
 var shownClass = 'drishy';
-
-var strings = {
-  process: 'Your payment is being processed',
-};
 
 /**
  * Temp stores for Cardless EMI & PayLater.
@@ -90,7 +87,7 @@ var PayLaterStore = {
 var BackStore = null;
 
 function confirmClose() {
-  return confirm(discreet.confirmCancelMsg);
+  return confirm(I18n.format('misc.confirm_cancel'));
 }
 
 /**
@@ -252,6 +249,7 @@ function hideFeeWrap() {
 
 function hideOverlayMessage() {
   var session = SessionManager.getSession();
+  session.preventErrorDismissal = false;
   if (!hideEmi() && !hideFeeWrap() && !session.hideSvelteOverlay()) {
     if (session.tab === 'nach') {
       if (!session.nachScreen.shouldHideOverlay()) {
@@ -285,8 +283,10 @@ function errorHandler(response) {
 
   var error = response.error;
   var message = error.description;
+  var cancelMsg = I18n.format('misc.payment_canceled');
 
-  if (message === discreet.cancelMsg) {
+  // Both checks are there because API still returns message in English.
+  if (message === cancelMsg || message === discreet.cancelMsg) {
     if (this.powerwallet) {
       // prevent payment canceled error
       this.powerwallet = null;
@@ -369,9 +369,9 @@ function errorHandler(response) {
     }
   }
 
-  if (this.tab || message !== discreet.cancelMsg) {
+  if (this.tab || (message !== cancelMsg && message !== discreet.cancelMsg)) {
     this.showLoadError(
-      message || 'There was an error in handling your request',
+      message || I18n.format('misc.error_handling_request'),
       true
     );
   }
@@ -393,7 +393,7 @@ function cancelHandler(response) {
       discreet.UPIUtils.trackUPIIntentFailure(this.r._payment.upi_app);
     }
 
-    this.showLoadError('Payment did not complete.', true);
+    this.showLoadError(I18n.format('misc.payment_incomplete'), true);
   } else if (
     /^(card|emi)$/.test(this.payload.method) &&
     this.screen &&
@@ -573,8 +573,8 @@ function askOTP(view, textView, shouldLimitResend, templateData) {
                 setTimeout(function() {
                   Analytics.track('native_otp:timeout');
                   thisSession.showLoadError(
-                    'Payment was not completed on time',
-                    1
+                    I18n.format('misc.payment_timeout'),
+                    true
                   );
                 }, 300);
               }
@@ -974,7 +974,7 @@ Session.prototype = {
             discreet.UPIUtils.trackUPIIntentFailure(self.r._payment.upi_app);
           }
 
-          self.showLoadError('Payment did not complete.', true);
+          self.showLoadError(I18n.format('misc.payment_incomplete'), true);
           self.clearRequest(discreet.UPIUtils.upiBackCancel);
         };
 
@@ -1026,7 +1026,6 @@ Session.prototype = {
 
     this.isOpen = true;
 
-    discreet.initI18n();
     this.setExperiments();
     this.improviseModalOptions();
     this.getEl();
@@ -1095,6 +1094,7 @@ Session.prototype = {
 
   setSvelteComponents: function() {
     this.setUpiCancelReasonPicker();
+    this.setNbCancelReasonPicker();
     if (!Store.isPayout()) {
       this.setHomeTab();
     }
@@ -1795,7 +1795,23 @@ Session.prototype = {
         return this.clearRequest();
       }
 
+      if (
+        this.payload.method === 'netbanking' &&
+        _Obj.getSafely(this.r, '_payment.popup.window.closed')
+      ) {
+        // Called when the popup for netbanking has been closed by the user
+        // and the netbanking cancellation modal is open
+        // returning from this point prevents confirmClose from being called because it's not needed
+        return;
+      }
+
+      var paymentMethod = this.payload.method;
+
       self.confirmClose().then(function(close) {
+        if (paymentMethod == 'netbanking' && close) {
+          self.r._payment.popup.onClose();
+          return;
+        }
         if (close) {
           self.clearRequest();
           if (Bridge.checkout.platform === 'ios') {
@@ -1909,6 +1925,7 @@ Session.prototype = {
     } else {
       var self = this;
       this.getCurrentCustomer().createOTP(function(message) {
+        // TODO: check how message is being consumed. Possible bug.
         askOTP(self.otpView, message, true, { phone: getPhone() });
         self.updateCustomerInStore();
       });
@@ -1922,7 +1939,7 @@ Session.prototype = {
         immediately: true,
       });
       this.hideTimer();
-      this.showLoadError('Waiting for payment to complete on bank page');
+      this.showLoadError(I18n.format('misc.payment_waiting_on_bank'));
       return this.r._payment.gotoBank();
     }
     var payload = this.payload;
@@ -2283,7 +2300,9 @@ Session.prototype = {
 
     // TODO remove this from here
     // check cardTab.setEmiPlansCta for details
-    cardTab.setEmiPlansCta(screen, this.tab);
+    if (screen !== 'upi') {
+      cardTab.setEmiPlansCta(screen, this.tab);
+    }
 
     if (this.offers) {
       this.offers.renderTab(this.tab);
@@ -3386,7 +3405,12 @@ Session.prototype = {
     var self = this;
     if (this.isOpen) {
       if (confirmedCancel !== true && this.r._payment) {
-        self.confirmClose();
+        // confirm close returns a promise which is resolved/rejected as per uder's confirmation to close
+        self.confirmClose().then(function(confirmed) {
+          if (confirmed) {
+            self.back(true);
+          }
+        });
         return;
       }
 
@@ -3397,17 +3421,21 @@ Session.prototype = {
     }
   },
 
-  showLoadError: function(text, error) {
+  showLoadError: function(text, error, preventDismissal) {
+    this.preventErrorDismissal = preventDismissal;
     if (this.headless && this.screen === 'card') {
       return;
     }
 
     var actionState;
     var loadingState = true;
+
+    var cancelMsg = I18n.format('misc.payment_canceled');
+
     if (error) {
       if (
         (this.screen === 'upi' || this.screen === 'upi_otm') &&
-        text === discreet.cancelMsg
+        (text === cancelMsg || text === discreet.cancelMsg)
       ) {
         if (this.payload && this.payload['_[flow]'] === 'intent') {
           return;
@@ -3421,7 +3449,7 @@ Session.prototype = {
     }
 
     if (!text) {
-      text = strings.process;
+      text = I18n.format('misc.payment_processing');
     }
 
     if (this.screen === 'otp') {
@@ -3485,6 +3513,12 @@ Session.prototype = {
   setUpiCancelReasonPicker: function() {
     this.upiCancelReasonPicker = new discreet.UpiCancelReasonPicker({
       target: _Doc.querySelector('#cancel_upi'),
+    });
+  },
+
+  setNbCancelReasonPicker: function() {
+    this.nbCancelReasonPicker = new discreet.NetbankingCancelReasonPicker({
+      target: _Doc.querySelector('#error-message'),
     });
   },
 
@@ -3811,6 +3845,37 @@ Session.prototype = {
     });
   },
 
+  showConversionChargesCallout: function() {
+    var locale = I18n.getCurrentLocale();
+
+    this.svelteOverlay.$set({
+      component: discreet.UserConfirmationOverlay,
+      props: {
+        buttonText: I18n.formatMessageWithLocale('cta.continue', locale),
+        callout: I18n.formatMessageWithLocale(
+          'card.international_currency_charges',
+          locale
+        ),
+      },
+    });
+
+    var that = this;
+
+    this.showSvelteOverlay();
+    var clearActionListener = that.svelteOverlay.$on('action', function(event) {
+      var action = event.detail.action;
+      if (action === 'confirm') {
+        that.hideSvelteOverlay();
+        Backdrop.hide();
+        that.submit();
+      }
+    });
+    var clearHideListener = that.svelteOverlay.$on('hidden', function() {
+      clearActionListener();
+      clearHideListener();
+    });
+  },
+
   /**
    * Attempts a payment
    * @param {Event} e
@@ -3915,7 +3980,10 @@ Session.prototype = {
           // also without this, cardsaving is triggered before API returning unsupported card error
           var cardType = discreet.storeGetter(CardScreenStore.cardType);
           if (!MethodStore.isAMEXEnabled() && cardType === 'amex') {
-            return this.showLoadError('AMEX cards are not supported', true);
+            return this.showLoadError(
+              I18n.format('card.card_number_help_amex'),
+              true
+            );
           }
         } else if (!data['card[cvv]']) {
           var checkedCard = $('.saved-card.checked');
@@ -4044,6 +4112,13 @@ Session.prototype = {
       return;
     }
 
+    if (
+      discreet.storeGetter(CardScreenStore.internationalCurrencyCalloutNeeded)
+    ) {
+      this.showConversionChargesCallout();
+      return;
+    }
+
     this.submit();
   },
 
@@ -4061,10 +4136,7 @@ Session.prototype = {
 
   verifyVpaAndContinue: function(data) {
     var self = this;
-    var locale = I18n.getCurrentLocale();
-    self.showLoadError(
-      I18n.formatMessageWithLocale('upi.verifying_vpa_info', locale)
-    );
+    self.showLoadError(I18n.format('upi.verifying_vpa_info'));
     $('#overlay-close').hide();
 
     self
@@ -4079,10 +4151,13 @@ Session.prototype = {
         }, 200);
       })
       .catch(function(vpaValidationError) {
+        var defaultErrorMessage = I18n.format(
+          'upi.invalid_vpa_default_message'
+        );
         var vpaValidationDescription = _Obj.getSafely(
           vpaValidationError,
           'error.description',
-          'Invalid VPA, please try again with correct VPA'
+          defaultErrorMessage
         );
 
         self.showLoadError(vpaValidationDescription, true);
@@ -4090,12 +4165,12 @@ Session.prototype = {
   },
 
   submit: function(props) {
+    var locale = I18n.getCurrentLocale();
     if (!props) {
       props = {};
     }
     var vpaVerified = props.vpaVerified;
     var data = this.payload;
-
     var goto_payment = '#error-message .link';
     var redirectableMethods = ['card', 'netbanking', 'wallet'];
     if (
@@ -4103,6 +4178,12 @@ Session.prototype = {
       redirectableMethods.includes(this.payload.method)
     ) {
       $(goto_payment).hide();
+    }
+
+    if (this.data && this.data.method === 'netbanking' && !this.data.bank) {
+      Analytics.track('netbanking:bank:empty', {
+        type: AnalyticsTypes.DEBUG,
+      });
     }
 
     if (this.r._payment) {
@@ -4137,6 +4218,13 @@ Session.prototype = {
 
     if (this.tab === 'nach') {
       shouldContinue = this.nachScreen.shouldSubmit();
+    }
+
+    if (this.tab === 'upi') {
+      shouldContinue = this.upiTab.shouldSubmit();
+      if (!shouldContinue) {
+        this.upiTab.updateStep();
+      }
     }
 
     if (!shouldContinue) {
@@ -4284,8 +4372,13 @@ Session.prototype = {
       request.gpay = true;
     }
 
-    var appliedOffer = this.getAppliedOffer();
+    // added rewardIds to the create payment request
+    var rewardIds = storeGetter(rewardsStore);
+    if (rewardIds && rewardIds.length > 0 && !Store.isContactEmailOptional()) {
+      data.reward_ids = rewardIds;
+    }
 
+    var appliedOffer = this.getAppliedOffer();
     if (appliedOffer && (!this.offers || this.offers.shouldSendOfferToApi())) {
       data.offer_id = appliedOffer.id;
       this.r.display_amount = appliedOffer.amount;
@@ -4587,7 +4680,6 @@ Session.prototype = {
         allowSkip: false,
       });
       this.topBar.setTitleOverride('otp', 'image', walletObj.logo);
-      var locale = I18n.getCurrentLocale();
       this.commenceOTP('wallet_sending', 'wallet_enter', {
         wallet: I18n.getWalletName(walletObj.code, locale),
       });
@@ -4696,19 +4788,16 @@ Session.prototype = {
         }, this)
       );
     } else if (data.method === 'upi') {
-      sub_link.html('Cancel Payment');
+      sub_link.html(I18n.format('misc.cancel_action'));
 
       this.r.on('payment.upi.noapp', function(data) {
-        that.showLoadError(
-          'No UPI App on this device. Select other UPI option to proceed.',
-          true
-        );
+        that.showLoadError(I18n.format('upi.intent_no_apps_error'), true);
 
         that.body.addClass('upi-noapp');
       });
 
       this.r.on('payment.upi.selectapp', function(data) {
-        that.showLoadError('Select UPI App in your device', false);
+        that.showLoadError(I18n.format('upi.intent_select_app'), false);
       });
 
       this.r.on('payment.upi.coproto_response', function(response) {
@@ -4720,12 +4809,12 @@ Session.prototype = {
 
       this.r.on('payment.upi.pending', function(data) {
         if (data && data.flow === 'upi-intent') {
-          return that.showLoadError('Waiting for payment confirmation.');
+          return that.showLoadError(
+            I18n.format('misc.payment_waiting_confirmation')
+          );
         }
 
-        that.showLoadError(
-          "Please accept the request from Razorpay's VPA on your UPI app"
-        );
+        that.showLoadError(I18n.format('upi.intent_accept_request'));
       });
     } else if (data.method === 'app') {
       var appName = 'app';
@@ -4770,11 +4859,10 @@ Session.prototype = {
       return that.showLoadError();
     } else {
       if (!this.headless) {
-        sub_link.html('Go to payment');
-        this.r.on(
-          'payment.cancel',
-          bind('showLoadError', this, discreet.cancelMsg, true)
-        );
+        sub_link.html(I18n.format('misc.go_to_payment'));
+        this.r.on('payment.cancel', function() {
+          that.showLoadError(I18n.format('misc.payment_canceled'), true);
+        });
       }
     }
   },
@@ -4794,6 +4882,10 @@ Session.prototype = {
 
     // data.amount needed by external libraries relying on `onsubmit` postMessage
     data.amount = this.get('amount');
+
+    // language_code is required to get the error message from API in the
+    // correct locale.
+    data.language_code = I18n.getCurrentLocale();
 
     if (this.oneMethod && this.oneMethod === 'paypal') {
       data.method = 'paypal';
@@ -4846,6 +4938,7 @@ Session.prototype = {
       'languageSelectionView',
       'svelteOverlay',
       'upiCancelReasonPicker',
+      'nbCancelReasonPicker',
       'timer',
     ];
 
@@ -4995,13 +5088,10 @@ Session.prototype = {
   },
 
   setLanguageDropdown: function() {
-    var features = this.preferences.features || {};
-    if (features.vernacular) {
-      var target = _Doc.querySelector('#language-dropdown');
-      this.languageSelectionView = new discreet.languageSelectionView({
-        target: target,
-      });
-    }
+    var target = _Doc.querySelector('#language-dropdown');
+    this.languageSelectionView = new discreet.languageSelectionView({
+      target: target,
+    });
   },
 
   /**
@@ -5181,6 +5271,7 @@ Session.prototype = {
   },
 
   hideOverlayMessage: hideOverlayMessage,
+  hideOverlay: hideOverlay,
   errorHandler: errorHandler,
   successHandler: successHandler,
 };

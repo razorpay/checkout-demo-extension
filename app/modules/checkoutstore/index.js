@@ -51,6 +51,12 @@ export const isOfferForced = () => preferences.force_offer;
 export const getDowntimes = () => _getDowntimes(preferences);
 export const isCustomerFeeBearer = () => preferences.fee_bearer;
 export const getCheckoutConfig = () => preferences.checkout_config;
+export const getOrgDetails = () => preferences.org;
+export const getLanguageCodeFromPrefs = () => preferences.language_code;
+export const getLanguageCodeFromOptions = () =>
+  getConfigFromOptions().display?.language;
+export const getLanguageCode = () =>
+  getLanguageCodeFromOptions() || getLanguageCodeFromPrefs();
 
 const optionGetter = option => () => getOption(option);
 export const getOption = option => razorpayInstance.get(option);
