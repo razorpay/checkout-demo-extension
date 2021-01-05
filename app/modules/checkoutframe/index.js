@@ -224,12 +224,6 @@ function fetchPrefs(session) {
   }
   session.isOpen = true;
 
-  let closeAt;
-  const timeout = session.r.get('timeout');
-  if (timeout) {
-    closeAt = _.now() + timeout * 1000;
-  }
-
   performPrePrefsFetchOperations();
 
   session.prefCall = Razorpay.payment.getPrefs(
@@ -243,12 +237,6 @@ function fetchPrefs(session) {
         });
       } else {
         setSessionPreferences(session, preferences);
-        if (closeAt) {
-          session.timer = showTimer(closeAt, () => {
-            session.dismissReason = 'timeout';
-            session.modal.hide();
-          });
-        }
         fetchRewards(session);
       }
     }
@@ -322,6 +310,18 @@ function setSessionPreferences(session, preferences) {
   initI18n().then(() => {
     session.render();
     showModal(session);
+    let closeAt;
+    const timeout = session.r.get('timeout');
+    if (timeout) {
+      closeAt = _.now() + timeout * 1000;
+    }
+    if (closeAt) {
+      session.timer = showTimer(closeAt, () => {
+        session.dismissReason = 'timeout';
+        session.modal.hide();
+      });
+    }
+
     bindI18nEvents();
   });
 }
