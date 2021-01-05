@@ -22,8 +22,8 @@ pipeline:
     when:
       status: [success]
       event:
-        exclude: [deployment]
-        include: [push]
+        exclude: [deployment, push]
+        include: []
   deploy-stage:
     image: razorpay/drone-kubernetes
     pull: true
