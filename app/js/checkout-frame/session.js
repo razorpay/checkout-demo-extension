@@ -1803,6 +1803,7 @@ Session.prototype = {
       }
 
       if (
+        this.payload &&
         this.payload.method === 'netbanking' &&
         _Obj.getSafely(this.r, '_payment.popup.window.closed')
       ) {
