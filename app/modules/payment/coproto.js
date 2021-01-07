@@ -269,6 +269,7 @@ var responseTypes = {
     };
 
     window.console.log('details', details);
+    window.console.log('supportedInstruments', supportedInstruments);
 
     const webPaymentOnError = (app, error) => {
       window.console.log('webPaymentOnError');
