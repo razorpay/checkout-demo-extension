@@ -1,4 +1,5 @@
 class CheckoutTestRunner {
+  // TODO - make runner support overrides
   constructor() {
     this.globalFeatureList = [
       'callbackUrl',
