@@ -144,7 +144,7 @@
   function showEmiPlans() {
     if (!numberField.isValid()) {
       numberField.field.focus();
-      // assuming Form global variable
+      // TODO remove Form global usage
       Form.shake();
       return;
     }
