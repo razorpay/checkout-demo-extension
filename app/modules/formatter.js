@@ -45,7 +45,6 @@ Formatter.events = {
   change: 'format',
   blur: 'format',
   keydown: 'backFormat',
-  focus: 'backFormat',
 };
 
 Formatter.rules = {
