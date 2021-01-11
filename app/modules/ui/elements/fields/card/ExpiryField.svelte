@@ -25,15 +25,20 @@
 
   function handleInput(event) {
     value = event.target.value;
-    onChange();
+    onChange(event);
   }
 
-  function onChange() {
+  function onChange(event) {
     let isValid = Formatter.rules.expiry.isValid.call({
       value: ref.getRawValue() || '',
     });
 
     valid = isValid;
+    if (!valid) {
+      _El.keepClass(event.target.parentNode, 'invalid', !valid);
+    } else {
+      event.target.parentNode.classList.remove('invalid');
+    }
 
     if (isValid && value.length === ref.getCaretPosition()) {
       dispatch('filled');
