@@ -85,7 +85,7 @@ const CARD_DESCRIPTION = locale => {
     apps.unshift(razorpayMethod);
 
     // Credit/Debit, CRED, and Google Pay Cards
-    return generateTextFromList(apps, 4);
+    return generateTextFromList(apps, locale, 4);
   } else {
     // Keep in order that we want to display
     const NW_ORDER = ['VISA', 'MC', 'RUPAY', 'AMEX', 'DICL', 'MAES', 'JCB'];
