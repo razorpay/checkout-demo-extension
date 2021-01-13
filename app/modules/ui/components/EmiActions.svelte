@@ -3,6 +3,7 @@
   import { createEventDispatcher } from 'svelte';
 
   // Store
+  import { getMerchantConfig } from 'checkoutstore';
   import { selectedPlanTextForNewCard } from 'checkoutstore/emi';
   import { isMethodUsable } from 'checkoutstore/methods';
   import { getEMIBanksText } from 'checkoutframe/paymentmethods';
@@ -13,6 +14,7 @@
 
   import {
     UNAVAILABLE_HELP,
+    UNAVAILABLE_HELP_RESTRICTED,
     UNAVAILABLE_BTN,
     EDIT_PLAN_TEXT,
     EDIT_PLAN_ACTION,
@@ -31,6 +33,17 @@
   function handleEmiCtaClick(event) {
     dispatch('click', event.detail);
   }
+
+  const restrictions = getMerchantConfig()?.config?.restrictions || {};
+  let isRestrictedIssuers = false;
+  if (restrictions) {
+    const emiRestriction = (restrictions?.allow || []).find(
+      conf => conf.method === 'emi'
+    );
+    if (emiRestriction && emiRestriction?.issuers?.length > 0) {
+      isRestrictedIssuers = true;
+    }
+  }
 </script>
 
 <div id="elem-emi">
@@ -42,7 +55,11 @@
         <span class="help">
           <!-- LABEL: EMI is available on {issuers} cards. Enter your credit card
           to avail. -->
-          {formatTemplateWithLocale(UNAVAILABLE_HELP, { issuers: getEMIBanksText($locale) }, $locale)}
+          {#if isRestrictedIssuers}
+            {formatTemplateWithLocale(UNAVAILABLE_HELP_RESTRICTED, {}, $locale)}
+          {:else}
+            {formatTemplateWithLocale(UNAVAILABLE_HELP, { issuers: getEMIBanksText($locale) }, $locale)}
+          {/if}
         </span>
         <!-- LABEL: EMI unavailable -->
         <div class="emi-plans-text">{$t(UNAVAILABLE_BTN)}</div>

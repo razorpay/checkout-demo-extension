@@ -572,6 +572,7 @@ export default {
     unavailable_btn: 'EMI unavailable',
     unavailable_help:
       'EMI is available on {issuers} cards. Enter your credit card to avail.',
+    unavailable_help_restricted: 'EMI is available on certain cards only.',
   },
   emi_details: {
     effective_interest_info:
