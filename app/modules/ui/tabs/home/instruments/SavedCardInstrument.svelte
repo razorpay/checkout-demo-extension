@@ -87,46 +87,42 @@
   let cvvLength = 3;
   let cardKnown = false;
 
-  const updateInstrument = customer => {
-    const savedCards = _Obj.getSafely(customer, 'tokens.items', []);
-    const savedCard = _Arr.find(
-      savedCards,
-      card => card.id === individualInstrument.token_id
-    );
+  const savedCards = _Obj.getSafely($customer, 'tokens.items', []);
+  const savedCard = _Arr.find(
+    savedCards,
+    card => card.id === individualInstrument.token_id
+  );
 
-    if (savedCard) {
-      // User is logged in
-      const card = savedCard.card || {};
-      const networkCode = findCodeByNetworkName(card.network);
+  if (savedCard) {
+    // User is logged in
+    const card = savedCard.card || {};
+    const networkCode = findCodeByNetworkName(card.network);
 
-      title = getBankText(card, true);
-      icon = getIcon(card);
+    title = getBankText(card, true);
+    icon = getIcon(card);
 
-      cvvLength = networkCode === 'amex' ? 4 : 3;
+    cvvLength = networkCode === 'amex' ? 4 : 3;
 
-      // EMI instruments don't have CVV
-      hasCvv = instrument.method === 'card';
+    // EMI instruments don't have CVV
+    hasCvv = instrument.method === 'card';
 
-      cardKnown = true;
+    cardKnown = true;
+  } else {
+    // User is logged out.
+
+    if (individualInstrument.issuer) {
+      // We know stuff about the card.
+      title = getBankText(individualInstrument, false);
+      icon = getIcon(individualInstrument);
+      hasCvv = false;
     } else {
-      // User is logged out.
-
-      if (individualInstrument.issuer) {
-        // We know stuff about the card.
-        title = getBankText(individualInstrument, false);
-        icon = getIcon(individualInstrument);
-        hasCvv = false;
-      } else {
-        // We don't know anything about the card.
-        const method = isEmiInstrument ? 'emi_saved_cards' : 'saved_cards';
-        title = getInstrumentTitle(method, '', $locale);
-        icon = getIcon();
-        hasCvv = false;
-      }
+      // We don't know anything about the card.
+      const method = isEmiInstrument ? 'emi_saved_cards' : 'saved_cards';
+      title = getInstrumentTitle(method, '', $locale);
+      icon = getIcon();
+      hasCvv = false;
     }
-  };
-
-  $: updateInstrument($customer);
+  }
 
   const component = cardKnown ? SlottedRadioOption : SlottedOption;
 
