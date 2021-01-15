@@ -33,7 +33,7 @@
   const dispatch = createEventDispatcher();
 
   // Refs
-  export let field = null;
+  let field = null;
 
   function handleInput(e) {
     value = e.target.value;
