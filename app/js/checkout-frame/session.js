@@ -2502,6 +2502,8 @@ Session.prototype = {
 
     if (storeGetter(HomeScreenStore.selectedInstrumentId) === instrument.id) {
       // Do not switch tabs
+    } else if (offer && offer.payment_method === 'emi') {
+      this.switchTab('emi');
     } else {
       this.switchTab('');
 
