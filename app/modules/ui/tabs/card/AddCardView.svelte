@@ -142,12 +142,6 @@
   }
 
   function showEmiPlans() {
-    if (!numberField.isValid()) {
-      numberField.field.focus();
-      // TODO remove Form global usage
-      Form.shake();
-      return;
-    }
     // TODO: Update showOverlay once session.js is refactored.
     showOverlay({ 0: _Doc.querySelector('#emi-wrap') });
 
