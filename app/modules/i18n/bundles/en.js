@@ -34,6 +34,7 @@ export default {
   },
   banks: {
     long: {
+      ABHY: 'Abhyudaya Co-operative Bank',
       ABPB: 'Aditya Birla Idea Payments Bank',
       AIRP: 'Airtel Payments Bank',
       ALLA: 'Allahabad Bank',
@@ -48,6 +49,7 @@ export default {
       BKDN: 'Dena Bank',
       BKID: 'Bank of India',
       CBIN: 'Central Bank of India',
+      CITI: 'Citibank',
       CIUB: 'City Union Bank',
       CNRB: 'Canara Bank',
       CORP: 'Union Bank of India (Erstwhile Corporation Bank)',
