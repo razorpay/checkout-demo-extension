@@ -182,8 +182,7 @@
     <!-- LABEL: {duration} Months ({amount}/mo) -->
     {formatTemplateWithLocale(PLAN_TITLE, { duration: plan.duration, amount: formattedAmountPerMonth }, $locale)}
     {#if showInterest}
-      &nbsp;@
-      {(noCostEmi && $t(NO_COST_LABEL)) || `${plan.interest}%`}
+      &nbsp;@ {(noCostEmi && $t(NO_COST_LABEL)) || `${plan.interest}%`}
     {/if}
   </div>
   <div slot="detail">
@@ -240,36 +239,44 @@
           {$t(HDFC_DEBIT_DESCRIPTION_CONVENIENCE)}
         {/if}
       {:else}
-        <ul>
+        <ul class="cardless-emi-plan-details">
           <!-- LABEL: Monthly Installment: {amount} -->
           <li>
-            <span>{$t(DESCRIPTION_MONTHLY_INSTALLMENT)}</span>
-            <span>{formattedAmountPerMonth}</span>
+            <div>
+              <span>{$t(DESCRIPTION_MONTHLY_INSTALLMENT)}</span>
+              <span>{formattedAmountPerMonth}</span>
+            </div>
           </li>
           {#if processingFee}
             <li>
-              <!-- LABEL: Processing Fee: {amount} -->
-              <span>{$t(PROCESSING_FEE)}</span>
-              <span>{processingFee}</span>
+              <div>
+                <!-- LABEL: Processing Fee: {amount} -->
+                <span>{$t(PROCESSING_FEE)}</span>
+                <span>{processingFee}</span>
+              </div>
             </li>
           {/if}
           {#if stampDuty}
             <li>
-              <!-- LABEL: Stamp Duty: {amount} -->
-              <span>{$t(STAMP_DUTY)}</span>
-              <span>{stampDuty}</span>
+              <div>
+                <!-- LABEL: Stamp Duty: {amount} -->
+                <span>{$t(STAMP_DUTY)}</span>
+                <span>{stampDuty}</span>
+              </div>
             </li>
           {/if}
           <!-- LABEL: Total Amount: {formattedFinalAmount} ({formattedAmountPerMonth} x {plan.duration}) -->
           <li>
-            <span>{$t(DESCRIPTION_TOTAL_AMOUNT)}</span>
-            <span>{formattedFinalAmount}</span>
+            <div>
+              <span>{$t(DESCRIPTION_TOTAL_AMOUNT)}</span>
+              <span>{formattedFinalAmount}</span>
+            </div>
           </li>
         </ul>
         <!-- Zestmoney is unable to send us the processing fee disclaimer as of now
         For that specific provider, show a hardcoded string until it's present in BE
          -->
-        {#if processingFee && (processingFeeDisclaimer || provider === 'zestmoney')}
+        {#if processingFee && (processingFeeDisclaimer || provider === 'zestmoney' || provider === 'earlysalary')}
           <div class="processing-fee-disclaimer">
             {processingFeeDisclaimer || 'Processing Fee will be charged on the 1st month of EMI'}
           </div>
