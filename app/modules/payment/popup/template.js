@@ -1,14 +1,31 @@
 import { displayAmount, getConvertedAmount } from 'common/currency';
 import css from './popup.styl';
-import { sanitizeHtmlEntities } from 'lib/utils';
 import Track from 'tracker';
 
-const cancelError = _Obj.stringify({
-  error: {
-    code: 'BAD_REQUEST_ERROR',
-    description: 'Payment processing cancelled by user',
-  },
-});
+const map = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#x27;',
+  '/': '&#x2F;',
+};
+
+function sanitizeHtmlEntities(string) {
+  return string.replace(/[&<>"'/]/g, match => map[match]);
+}
+
+import {
+  PAYING,
+  SECURED_BY,
+  TRYING_TO_LOAD,
+  WANT_TO_CANCEL,
+  PROCESSING,
+  WAIT_WHILE_WE_REDIRECT,
+  REDIRECTING,
+  LOADING_METHOD_PAGE,
+  TRYING_BANK_PAGE_MSG,
+} from 'ui/labels/popup';
 
 const makeTrackingScript = ({ checkout_id, live, library }) => {
   if (!live) {
@@ -22,16 +39,24 @@ const makeTrackingScript = ({ checkout_id, live, library }) => {
   `;
 };
 
-export default function popupTemplate(_) {
+export default function popupTemplate(_, t) {
   var get = _.r.get;
   var method = _.data && _.data.method === 'wallet' ? 'wallet' : 'bank';
   var color = get('theme.color') || '#3594E2';
   var highlightColor = _.r.themeMeta.highlightColor;
   var logo =
-    _.r.preferences.org?.checkout_logo_url ?? 'https://cdn.razorpay.com/logo.svg';
+    _.r.preferences?.org?.checkout_logo_url ??
+    'https://cdn.razorpay.com/logo.svg';
+
+  var cancelError = JSON.stringify({
+    error: {
+      code: 'BAD_REQUEST_ERROR',
+      description: t('payment_canceled'),
+    },
+  });
+
   var title =
-    get('name') || get('description') || 'Redirecting...'
-    |> sanitizeHtmlEntities;
+    get('name') || get('description') || t(REDIRECTING) |> sanitizeHtmlEntities;
   var amount = displayAmount(
     _.r,
     _.data && _.data.amount,
@@ -53,12 +78,10 @@ export default function popupTemplate(_) {
     : '';
 
   var message =
-    _.message ||
-      'Please wait while we redirect you to your ' + method + ' page.'
-    |> sanitizeHtmlEntities;
+    _.message || t(WAIT_WHILE_WE_REDIRECT, { method }) |> sanitizeHtmlEntities;
 
   return `<!doctype html><html style="height:100%;width:100%;"><head>
-<title>Processing, Please Wait...</title>
+<title>${t(PROCESSING)}</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="${color}">
 <style>${css}#ldr:after{background:${highlightColor}}#bg{background:${color}}
@@ -68,19 +91,23 @@ export default function popupTemplate(_) {
 <div id="hdr">${image}
   <div id='name'>${title}</div>
   <div id="amt" style="${hideAmount}">
-    <div style="font-size:12px;color:#757575;line-height:15px;margin-bottom:5px;text-align:right">PAYING</div>
+    <div style="font-size:12px;color:#757575;line-height:15px;margin-bottom:5px;text-align:right">${t(
+      PAYING
+    )}</div>
     <div dir="ltr" style="font-size:20px;line-height:24px;">${amount}</div>
   </div>
 </div>
 <div id="ldr"></div>
 <div id="txt">
   <div style="display:inline-block;vertical-align:middle;white-space:normal;">
-    <h2 id='title'>Loading ${method} page…</h2><p id='msg'>${message}</p>
+    <h2 id='title'>${t(LOADING_METHOD_PAGE, {
+      method,
+    })}</h2><p id='msg'>${message}</p>
   </div>
   <div style="display:inline-block;vertical-align:middle;height:100%"></div>
 </div>
 <div id='ftr'>
-  <div style="display:inline-block;">Secured by
+  <div style="display:inline-block;">${t(SECURED_BY)}
     <img style="vertical-align:middle;margin-bottom:5px;" height="20px" src=${logo}>
   </div>
   <div style="display:inline-block;vertical-align:middle;height:100%"></div>
@@ -92,10 +119,10 @@ var doc = document;
 var gel = doc.getElementById.bind(doc);
 setTimeout(function(){doc.body.className='loaded'}, 10);
 setTimeout(function(){
-  gel('title').innerHTML = 'Still trying to load...';
-  gel('msg').innerHTML = 'The bank page is taking time to load. You can either wait or <span id="cncl">change the payment method</span>.';
+  gel('title').innerHTML = '${t(TRYING_TO_LOAD)}';
+  gel('msg').innerHTML = '${t(TRYING_BANK_PAGE_MSG)}';
   gel('cncl').onclick = function(){
-    if(window.confirm("Do you want to cancel the ongoing payment?")){
+    if(window.confirm("${t(WANT_TO_CANCEL)}")){
       window.close();
       if (CheckoutBridge && CheckoutBridge.oncomplete) {
         CheckoutBridge.oncomplete('${cancelError}');

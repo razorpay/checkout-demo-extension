@@ -23,7 +23,6 @@ import emiPlansView from 'checkoutframe/emiplans';
 import otpView from 'checkoutframe/otp';
 import languageSelectionView from 'ui/elements/LanguageSelection.svelte';
 import * as I18n from 'i18n';
-import { init as initI18n } from 'i18n/init';
 import UpiCancelReasonPicker from 'ui/components/UpiCancelReasonPicker.svelte';
 import CancelReasonPicker from 'ui/components/cancellation-modals/CancelReasonPicker.svelte';
 import NetbankingCancelReasonPicker from 'ui/components/cancellation-modals/NetbankingCancelReasonPicker.svelte';
@@ -121,8 +120,6 @@ export default {
   Form,
 
   cancelMsg: strings.cancelMsg,
-  confirmCancelMsg: strings.confirmCancelMsg,
-  wrongOtpMsg: strings.wrongOtp,
 
   initIframe,
 
@@ -213,7 +210,6 @@ export default {
 
   NBHandlers,
 
-  initI18n,
   ContactStorage,
   I18n,
   overlayStackStore,

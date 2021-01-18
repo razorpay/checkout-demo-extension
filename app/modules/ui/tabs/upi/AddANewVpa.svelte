@@ -33,6 +33,8 @@
   export let customer;
   export let paymentMethod = 'upi';
   export let recurring = false;
+  export let value = '';
+  export let rememberVpa = true;
 
   // Refs
   export let vpaField = null;
@@ -45,7 +47,6 @@
 
   // Computed
   export let pattern;
-  let rememberVpa = true;
   let newVpa = getPrefilledVPA();
   let vpa;
   let pspHandle;
@@ -60,20 +61,12 @@
     }
   });
 
-  export function getVpa() {
-    const vpa = vpaField.getValue();
+  function handleVpaInput() {
     if (isVpaValid(vpa) || !pspHandle) {
-      return vpa;
+      value = vpa;
+    } else {
+      value = `${vpa}@${pspHandle}`;
     }
-    return `${vpa}@${pspHandle}`;
-  }
-
-  export function shouldRememberVpa() {
-    return _Obj.getSafely(customer, 'logged') &&
-      hasFeature('save_vpa') &&
-      rememberVpa
-      ? 1
-      : 0;
   }
 
   export function blur() {
@@ -186,8 +179,9 @@
           name={'vpa-' + paymentMethod}
           type="text"
           required
-          bind:value={newVpa}
           bind:this={vpaField}
+          bind:readonlyValue={vpa}
+          on:input={handleVpaInput}
           on:blur
           placeholder={$t(UPI_COLLECT_ENTER_ID)} />
         {#if logged && canSaveVpa}

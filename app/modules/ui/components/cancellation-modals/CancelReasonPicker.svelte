@@ -114,5 +114,4 @@
       {$t(CANCEL_REASON_SUBMIT_ACTION)}
     </button>
   </div>
-
 </div>

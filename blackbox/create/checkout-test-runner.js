@@ -77,7 +77,7 @@ class CheckoutTestRunner {
    * Used to run all valid test combinations
    * @param {Object} paymentMethodTestMaker takes a payment method test creation object on which tests are to be run
    */
-  runOn(paymentMethodTestMaker) {
+  runOn(paymentMethodTestMaker, overrides = {}) {
     let runnables = this.allRunnableCombinations.map(comb =>
       comb.reduce((acc, cV) => {
         acc[cV] = true;
@@ -88,7 +88,7 @@ class CheckoutTestRunner {
       runnables = runnables.filter(runnable => runnable[this.targetFeature]);
     }
     runnables.forEach(runnable => {
-      paymentMethodTestMaker(runnable);
+      paymentMethodTestMaker({ ...runnable, ...overrides });
     });
     return this;
   }

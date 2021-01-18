@@ -52,6 +52,8 @@
   import ResendButton from 'ui/elements/ResendButton.svelte';
   import CardBox from 'ui/elements/CardBox.svelte';
 
+  import { Safari } from 'common/useragent';
+
   // Props
   export let on = {};
 
@@ -66,6 +68,12 @@
   let compact;
 
   const session = getSession();
+
+  // As of Jan 2021, Safari is the only browser that supports one-time-code
+  let autoCompleteMethod = 'off';
+  if (Safari) {
+    autoCompleteMethod = 'one-time-code';
+  }
 
   // This flag indicates whether or not the OTP input field will be visible.
   // We don't want to show EMI details on loading state or error state.
@@ -249,7 +257,7 @@
             id="otp"
             bind:value={$otp}
             maxlength={$maxlength || 6}
-            autocomplete="one-time-code"
+            autocomplete={autoCompleteMethod}
             required />
         </div>
       </div>

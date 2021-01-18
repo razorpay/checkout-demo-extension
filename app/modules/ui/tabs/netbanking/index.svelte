@@ -31,10 +31,18 @@
     SEARCH_TITLE,
     SEARCH_PLACEHOLDER,
     SEARCH_ALL,
+    DOWNTIME_LOW_CALLOUT,
+    DOWNTIME_HIGH_CALLOUT,
+    RECURRING_CALLOUT,
   } from 'ui/labels/netbanking';
 
   import { t, locale } from 'svelte-i18n';
-  import { getShortBankName, getLongBankName } from 'i18n';
+
+  import {
+    getShortBankName,
+    getLongBankName,
+    formatTemplateWithLocale,
+  } from 'i18n';
 
   // Utils imports
   import Razorpay from 'common/Razorpay';
@@ -85,9 +93,11 @@
     }
   }
 
+  // State
+  let searchModalOpen = false;
+
   // Refs
   let radioContainer;
-  let searchModal;
   let bankSelect;
 
   // Actions
@@ -113,11 +123,11 @@
   }
 
   function showSearch() {
-    searchModal.open();
+    searchModalOpen = true;
   }
 
   function hideSearch() {
-    searchModal.close();
+    searchModalOpen = false;
 
     // Restore focus
     if (bankSelect) {
@@ -383,9 +393,9 @@
       placeholder={$t(SEARCH_PLACEHOLDER)}
       all={$t(SEARCH_ALL)}
       items={translatedBanksArr}
+      bind:open={searchModalOpen}
       keys={['code', 'name', 'original']}
       component={BankSearchItem}
-      bind:this={searchModal}
       on:close={hideSearch}
       on:select={({ detail }) => {
         $selectedBank = detail.code;
@@ -395,21 +405,16 @@
     <Bottom>
       <!-- Show recurring message for recurring payments -->
       {#if recurring}
-        <Callout>
-          Future payments from your bank account will be charged automatically.
-        </Callout>
+        <Callout>{$t(RECURRING_CALLOUT)}</Callout>
       {/if}
 
       <!-- Show downtime message if the selected bank is down -->
       {#if selectedBankHasDowntime}
         <DowntimeCallout severe={selectedBankHasSevereDowntime}>
           {#if selectedBankHasSevereDowntime}
-            <strong>{filteredBanks[$selectedBank]}</strong>
-            accounts are temporarily unavailable right now. Please select
-            another bank.
+            {formatTemplateWithLocale(DOWNTIME_HIGH_CALLOUT, { bank: getLongBankName($selectedBank, $locale) }, $locale)}
           {:else}
-            <strong>{filteredBanks[$selectedBank]}</strong>
-            accounts are experiencing low success rates.
+            {formatTemplateWithLocale(DOWNTIME_LOW_CALLOUT, { bank: getLongBankName($selectedBank, $locale) }, $locale)}
           {/if}
         </DowntimeCallout>
       {/if}
