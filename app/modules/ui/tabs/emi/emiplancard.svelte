@@ -107,9 +107,7 @@
   }
 
   $: {
-    noCostEmi =
-      plan.subvention === 'merchant' ||
-      (provider === 'zestmoney' && plan.duration === 3);
+    noCostEmi = plan.subvention === 'merchant';
     if (noCostEmi && plan.merchant_payback) {
       interestChargedByBank = session.formatAmountWithCurrency(
         amount / (1 - plan.merchant_payback / 100) - amount
@@ -182,7 +180,8 @@
     <!-- LABEL: {duration} Months ({amount}/mo) -->
     {formatTemplateWithLocale(PLAN_TITLE, { duration: plan.duration, amount: formattedAmountPerMonth }, $locale)}
     {#if showInterest}
-      &nbsp;@ {(noCostEmi && $t(NO_COST_LABEL)) || `${plan.interest}%`}
+      &nbsp;@
+      {(noCostEmi && $t(NO_COST_LABEL)) || `${plan.interest}%`}
     {/if}
   </div>
   <div slot="detail">
