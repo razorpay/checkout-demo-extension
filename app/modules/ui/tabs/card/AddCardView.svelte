@@ -231,12 +231,12 @@
       if (isStrictlyRecurring()) {
         const validCardNetworksForTransaction =
           getCardNetworksForRecurring() || {};
-        const isRecurringCardAllowed = validCardNetworksForTransaction.hasOwnProperty(
+        const isRecurringCardNetworkAllowed = validCardNetworksForTransaction.hasOwnProperty(
           $cardType
         );
         _validCardNumber =
           _validCardNumber &&
-          isRecurringCardAllowed &&
+          isRecurringCardNetworkAllowed &&
           isFlowApplicable(flows, Flows.RECURRING);
       } else {
         // Debit-PIN is not supposed to work in case of recurring
