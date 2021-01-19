@@ -4035,6 +4035,10 @@ Session.prototype = {
               return $('#card_number').focus();
             }
 
+            if (this.checkInvalid()) {
+              return;
+            }
+
             if (!data.emi_duration) {
               /**
                * If this is a saved ard and no EMI duration is selected,
