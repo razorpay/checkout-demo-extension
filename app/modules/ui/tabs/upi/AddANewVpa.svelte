@@ -35,6 +35,7 @@
   export let recurring = false;
   export let value = '';
   export let rememberVpa = true;
+  export let defaultValue = '';
 
   // Refs
   export let vpaField = null;
@@ -59,6 +60,7 @@
     if (focusOnCreate) {
       focus();
     }
+    value = defaultValue;
   });
 
   function handleVpaInput() {
@@ -179,6 +181,7 @@
           name={'vpa-' + paymentMethod}
           type="text"
           required
+          bind:value
           bind:this={vpaField}
           bind:readonlyValue={vpa}
           on:input={handleVpaInput}
