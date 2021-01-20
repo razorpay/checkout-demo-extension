@@ -56,11 +56,20 @@
     return VPA_REGEX.test(vpa);
   }
 
+  let defaultValueSet = false;
+
+  $: {
+    if (!value && !defaultValueSet && defaultValue) {
+      // run only once
+      value = defaultValue;
+      defaultValueSet = true;
+    }
+  }
+
   onMount(() => {
     if (focusOnCreate) {
       focus();
     }
-    value = defaultValue;
   });
 
   function handleVpaInput() {

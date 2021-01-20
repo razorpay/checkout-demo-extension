@@ -767,7 +767,7 @@
                 onUpiAppSelection({ detail: { id: 'new' } });
               }}
               customer={$customer}
-              defaultValue={getPrefilledVPA()}
+              defaultValue={vpa}
               on:blur={trackVpaEntry}
               selected={selectedToken === 'new'}
               bind:value={vpaEntered}
