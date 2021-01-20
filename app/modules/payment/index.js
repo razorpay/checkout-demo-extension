@@ -77,9 +77,6 @@ function onPaymentCancel(metaParam) {
     if (payment_id) {
       eventData.payment_id = payment_id;
       var url = makeAuthUrl(razorpay, 'payments/' + payment_id + '/cancel');
-      url = _.appendParamsToUrl(url, {
-        language_code: getCurrentLocale(),
-      });
 
       if (_.isNonNullObject(metaParam)) {
         url += '&' + _.obj2query(metaParam);
@@ -849,8 +846,6 @@ razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
 
   let url = makeAuthUrl(this, 'payments/validate/account');
 
-  url = _.appendParamsToUrl(url, { language_code: getCurrentLocale() });
-
   const cachedVpaResponse = vpaCache[vpa];
 
   if (cachedVpaResponse) {
@@ -1098,8 +1093,6 @@ razorpayProto.getCardCurrencies = function(payload) {
 
     // append requestPayload
     url = _.appendParamsToUrl(url, requestPayload);
-
-    url = _.appendParamsToUrl(url, { language_code: getCurrentLocale() });
 
     fetch.jsonp({
       url,

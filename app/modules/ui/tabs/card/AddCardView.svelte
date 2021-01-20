@@ -36,7 +36,11 @@
     isStrictlyRecurring,
     getCardFeatures,
   } from 'checkoutstore';
-  import { isAMEXEnabled, getCardNetworks } from 'checkoutstore/methods';
+  import {
+    isAMEXEnabled,
+    getCardNetworks,
+    getCardNetworksForRecurring,
+  } from 'checkoutstore/methods';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -225,8 +229,15 @@
       }
 
       if (isStrictlyRecurring()) {
+        const validCardNetworksForTransaction =
+          getCardNetworksForRecurring() || {};
+        const isRecurringCardNetworkAllowed = validCardNetworksForTransaction.hasOwnProperty(
+          $cardType
+        );
         _validCardNumber =
-          _validCardNumber && isFlowApplicable(flows, Flows.RECURRING);
+          _validCardNumber &&
+          isRecurringCardNetworkAllowed &&
+          isFlowApplicable(flows, Flows.RECURRING);
       } else {
         // Debit-PIN is not supposed to work in case of recurring
         if (isFlowApplicable(flows, Flows.PIN)) {

@@ -282,7 +282,14 @@ function errorHandler(response) {
   }
 
   var error = response.error;
-  var message = error.description;
+  var untranslatedMessage = error.description;
+
+  var message = I18n.translateErrorDescription(
+    untranslatedMessage,
+    I18n.getCurrentLocale()
+  );
+
+  error.description = message;
   var cancelMsg = I18n.format('misc.payment_canceled');
 
   // Both checks are there because API still returns message in English.
@@ -1503,9 +1510,10 @@ Session.prototype = {
     }
 
     this.checkCustomerStatus(params, function(error) {
+      var locale = I18n.getCurrentLocale();
       if (error) {
         PayLaterStore.userRegistered = false;
-        self.showLoadError(error, true);
+        self.showLoadError(I18n.translateErrorDescription(error, locale), true);
         return;
       }
 
@@ -1517,7 +1525,6 @@ Session.prototype = {
         otpMessageView = 'otp_resent_successful';
       }
 
-      var locale = I18n.getCurrentLocale();
       askOTP(self.otpView, otpMessageView, true, {
         phone: getPhone(),
         provider: I18n.getPaylaterProviderName(providerCode, locale),
@@ -1796,6 +1803,7 @@ Session.prototype = {
       }
 
       if (
+        this.payload &&
         this.payload.method === 'netbanking' &&
         _Obj.getSafely(this.r, '_payment.popup.window.closed')
       ) {
@@ -2494,6 +2502,8 @@ Session.prototype = {
 
     if (storeGetter(HomeScreenStore.selectedInstrumentId) === instrument.id) {
       // Do not switch tabs
+    } else if (offer && offer.payment_method === 'emi') {
+      this.switchTab('emi');
     } else {
       this.switchTab('');
 
@@ -4025,6 +4035,10 @@ Session.prototype = {
               return $('#card_number').focus();
             }
 
+            if (this.checkInvalid()) {
+              return;
+            }
+
             if (!data.emi_duration) {
               /**
                * If this is a saved ard and no EMI duration is selected,
@@ -4884,10 +4898,6 @@ Session.prototype = {
 
     // data.amount needed by external libraries relying on `onsubmit` postMessage
     data.amount = this.get('amount');
-
-    // language_code is required to get the error message from API in the
-    // correct locale.
-    data.language_code = I18n.getCurrentLocale();
 
     if (this.oneMethod && this.oneMethod === 'paypal') {
       data.method = 'paypal';

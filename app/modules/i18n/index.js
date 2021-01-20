@@ -275,3 +275,19 @@ export function getOtpScreenMiscText(key, data, locale) {
 export function getEmiIssuerName(issuer, locale, defaultValue) {
   return formatMessageWithLocale(`emi_issuers.${issuer}`, locale, defaultValue);
 }
+
+/**
+ * Translates error description that is returned from API. Falls back to the
+ * passed description if a translation is not available.
+ *
+ * @param {string} description
+ * @param {string} locale
+ * @return {string}
+ */
+export function translateErrorDescription(description, locale) {
+  return formatMessageWithLocale(
+    `errors.descriptions.${description}`,
+    locale,
+    description
+  );
+}

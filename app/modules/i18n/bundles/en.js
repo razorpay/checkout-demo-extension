@@ -34,6 +34,8 @@ export default {
   },
   banks: {
     long: {
+      ABHY: 'Abhyudaya Co-operative Bank',
+      ABNA: 'Royal Bank of Scotland N.V.',
       ABPB: 'Aditya Birla Idea Payments Bank',
       AIRP: 'Airtel Payments Bank',
       ALLA: 'Allahabad Bank',
@@ -48,6 +50,7 @@ export default {
       BKDN: 'Dena Bank',
       BKID: 'Bank of India',
       CBIN: 'Central Bank of India',
+      CITI: 'Citibank',
       CIUB: 'City Union Bank',
       CNRB: 'Canara Bank',
       CORP: 'Union Bank of India (Erstwhile Corporation Bank)',
@@ -61,6 +64,7 @@ export default {
       ESAF: 'ESAF Small Finance Bank',
       ESFB: 'Equitas Small Finance Bank',
       FDRL: 'Federal Bank',
+      FSFB: 'Fincare Small Finance Bank',
       HDFC: 'HDFC Bank',
       HDFC_C: 'HDFC Bank - Corporate Banking',
       HSBC: 'Hongkong & Shanghai Banking Corporation',
@@ -79,6 +83,7 @@ export default {
       KCCB: 'Kalupur Commercial Co-operative Bank',
       KJSB: 'Kalyan Janata Sahakari Bank',
       KKBK: 'Kotak Mahindra Bank',
+      KKBK_C: 'Kotak Mahindra Bank - Corporate Banking',
       KVBL: 'Karur Vysya Bank',
       LAVB_C: 'Lakshmi Vilas Bank - Corporate Banking',
       LAVB_R: 'Lakshmi Vilas Bank - Retail Banking',
