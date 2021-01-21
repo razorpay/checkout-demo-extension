@@ -1,3 +1,5 @@
+import Analytics from 'analytics';
+
 export const score = {
   savedInstrument: 2,
   paymentSuccess: 5,
@@ -26,4 +28,31 @@ export const keys = {
   cancelledPayment: 'Cancelled Payment',
 };
 
-// export default score;
+const getTimeSinceOpen = () => {
+  return Analytics.getMeta().timeSince.open();
+};
+
+export const utils = {
+  getTimeToSubmitScore: function(meta) {
+    const timeSinceOpen = getTimeSinceOpen();
+    if (timeSinceOpen < 20) {
+      return 5;
+    }
+    if (timeSinceOpen < 30) {
+      return 3.5;
+    }
+    if (timeSinceOpen < 40) {
+      return 2;
+    }
+    if (timeSinceOpen > 90) {
+      return -5;
+    }
+    if (timeSinceOpen > 70) {
+      return -3.5;
+    }
+    if (timeSinceOpen > 60) {
+      return -2;
+    }
+    return 0;
+  },
+};
