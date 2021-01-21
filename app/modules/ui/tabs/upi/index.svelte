@@ -547,7 +547,11 @@
     if (!vpa) {
       return;
     }
+
     const valid = isVpaValid(vpa);
+    if (!valid) {
+      updateScore('invalidVpaBlur');
+    }
     Analytics.track('vpa:fill', {
       type: AnalyticsTypes.BEHAV,
       data: {

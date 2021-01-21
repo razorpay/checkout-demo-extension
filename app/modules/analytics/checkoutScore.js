@@ -58,6 +58,26 @@ const score = {
     }
     return 0;
   },
+  instrumentSelected: function() {
+    const timeSinceOpen = getTimeSinceOpen();
+    if (timeSinceOpen < 5) {
+      return 5;
+    }
+    if (timeSinceOpen < 8) {
+      return 3;
+    }
+    if (timeSinceOpen < 10) {
+      return 0;
+    }
+    if (timeSinceOpen >= 20) {
+      return -3;
+    }
+    if (timeSinceOpen >= 10) {
+      return -1;
+    }
+    return 0;
+  },
+  invalidVpaBlur: -2.5,
 };
 
 const reasons = {
@@ -92,6 +112,8 @@ const reasons = {
       return 'Switched more then 9 tabs';
     }
   },
+  instrumentSelected: () => 'User selected an instrument',
+  invalidVpaBlur: 'Filled an invalid vpa, moved away',
 };
 
 let calculatedScore = 0;
