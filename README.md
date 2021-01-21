@@ -9,7 +9,14 @@
 
 This application runs on standalone node server in development environment.
 
-1. `npm i` to install the dependencies.
+- Repository Configuration
+
+1. Copy `app/index.sample.html` -> `app/index.html`
+1. Copy over `app/config.sample.js` -> `app/config.js` to specify API URL
+1. `npm run build` to generate required assets/files for application initialization.
+
+- Running Application
+
 1. `npm run dev-start` to start development server with mock-api configuration.
 1. `npm run live-start` to start development server with live(test) api configuration.
 1. `npm run build` for production build
