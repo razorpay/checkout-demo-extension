@@ -1,7 +1,13 @@
 import Analytics from 'analytics';
 
 const getTimeSinceOpen = () => {
-  return Analytics.getMeta().timeSince.open() / 1000;
+  // 40 because it causes a score diff of 0
+  let time = 40;
+  // timeSince.open is not a function -- check why that's happening
+  if (Analytics.getMeta().timeSince && Analytics.getMeta().timeSince.open) {
+    time = Analytics.getMeta().timeSince.open() / 1000;
+  }
+  return time;
 };
 
 const score = {
