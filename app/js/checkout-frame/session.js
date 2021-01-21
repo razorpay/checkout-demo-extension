@@ -363,6 +363,7 @@ function errorHandler(response) {
           if (message) {
             $(help).html(message);
           }
+          updateScore('clickOnSubmitWithoutDetails');
           Form.shake();
           return hideOverlayMessage();
         }
@@ -3294,6 +3295,7 @@ Session.prototype = {
     }
     var invalids = $(parent).find('.invalid');
     if (invalids && invalids[0]) {
+      updateScore('clickOnSubmitWithoutDetails');
       Form.shake();
       var invalidInput =
         $(invalids[0]).find('.input')[0] ||
@@ -3806,6 +3808,7 @@ Session.prototype = {
         queryParams
       );
     } else {
+      updateScore('clickOnSubmitWithoutDetails');
       Form.shake();
     }
   },
@@ -4023,6 +4026,7 @@ Session.prototype = {
           ) {
             // no saved card was selected
             Analytics.track('shake:saved-cvv');
+            updateScore('clickOnSubmitWithoutDetails');
             Form.shake();
             return $('.checked .saved-cvv input').focus();
           }
@@ -4040,6 +4044,7 @@ Session.prototype = {
              */
             if (!data.token && !this.emiPlansForNewCard) {
               Analytics.track('shake:no-emi-plans');
+              updateScore('clickOnSubmitWithoutDetails');
               Form.shake();
               return $('#card_number').focus();
             }
@@ -4121,6 +4126,7 @@ Session.prototype = {
             data['card[cvv]'] = cvvInput.value;
           } else {
             cvvInput.focus();
+            updateScore('clickOnSubmitWithoutDetails');
             return Form.shake();
           }
         }
