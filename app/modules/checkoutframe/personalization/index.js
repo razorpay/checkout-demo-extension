@@ -276,15 +276,12 @@ export function processInstrument(payment, extra) {
  * @param {Object} instrument Instrument to record success of
  * @param {Customer} customer
  */
-export const recordSuccess = (instrument, customer, checkoutScore) => {
+export const recordSuccess = (instrument, customer) => {
   if (!instrument || !customer) {
     return;
   }
 
   instrument.success = true;
-  const score = checkoutScore + score.savedInstrument;
-  Analytics.setMeta('checkoutScore', score);
-  Analytics.setMeta('checkoutScoreReason', keys.savedInstrument);
   Analytics.track('p13n:instrument:success', {
     data: {
       instrument,

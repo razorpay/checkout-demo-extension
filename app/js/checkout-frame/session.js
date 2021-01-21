@@ -303,9 +303,7 @@ function errorHandler(response) {
   var payload = this.payload;
 
   this.clearRequest();
-  const score = this.checkoutScore + checkoutScore.score.failedPayment;
-  Analytics.setMeta('checkoutScore', score);
-  Analytics.setMeta('checkoutScoreReason', checkoutScore.keys.failedPayment);
+  this.setCheckoutScore('failedPayment');
   Analytics.track('error', {
     data: response,
   });
@@ -387,9 +385,7 @@ function cancelHandler(response) {
   if (!this.payload) {
     return;
   }
-  const score = this.checkoutScore + checkoutScore.score.cancelledPayment;
-  Analytics.setMeta('checkoutScore', score);
-  Analytics.setMeta('checkoutScoreReason', checkoutScore.keys.cancelledPayment);
+  this.setCheckoutScore('cancelledPayment');
   Analytics.setMeta('payment.cancelled', true);
   this.markHeadlessFailed();
 
@@ -604,16 +600,13 @@ function askOTP(view, textView, shouldLimitResend, templateData) {
 // this === Session
 function successHandler(response) {
   if (this.preferredInstrument) {
+    this.setCheckoutScore('savedInstrument');
     P13n.recordSuccess(
       this.preferredInstrument,
-      this.getCurrentCustomer(this.payload && this.payload.contact),
-      this.checkoutScore
+      this.getCurrentCustomer(this.payload && this.payload.contact)
     );
   }
-  const score = this.checkoutScore + checkoutScore.score.paymentSuccess;
-  Analytics.setMeta('checkoutScore', score);
-  Analytics.setMeta('checkoutScoreReason', checkoutScore.keys.paymentSuccess);
-
+  this.setCheckoutScore('paymentSuccess');
   this.clearRequest();
   // prevent dismiss event
   this.modal.options.onhide = noop;
@@ -658,6 +651,12 @@ function Session(message) {
 }
 
 Session.prototype = {
+  setCheckoutScore: function(type) {
+    var score = this.checkoutScore + checkoutScore.score[type];
+    Analytics.setMeta('checkoutScore', score);
+    Analytics.setMeta('checkoutScoreReason', checkoutScore.keys[type]);
+  },
+
   shouldUseNativeOTP: function() {
     return this.get('nativeotp') && this.r.isLiveMode();
   },
@@ -2740,10 +2739,10 @@ Session.prototype = {
       Analytics.setMeta('checkoutScore', this.checkoutScore);
       Analytics.setMeta(
         'checkoutScoreReason',
-        this.checkoutScore.keys.switching3Tabs
+        checkoutScore.keys.switching3Tabs
       );
     }
-    let diff = 0;
+    var diff = 0;
     if (this.tabSwitchStart > 0) {
       diff = (Date.now() - this.tabSwitchStart) / 1000;
     }
