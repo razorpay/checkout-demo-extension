@@ -34,8 +34,8 @@
     "url": "git@github.com:razorpay/checkout.git"
   },
   "scripts": {
-    "mockstart": "NODE_ENV=dev API_SERVER=https://api.razorpay.com node server | $ gulp watch",
-    "start": "NODE_ENV=dev $ gulp watch",
+    "mockstart": "NODE_ENV=dev API_SERVER=127.0.0.1 node server & node mock-api/index & $ gulp watch",
+    "start": "NODE_ENV=dev API_SERVER=https://api.razorpay.com node server | $ gulp watch",
     "start:no-reload": "$ gulp watch",
     "build": "$ rollup -c --environment prod && $ gulp && $ lintOutput app/js/generated/entry",
     "lint-fix": "$ lintFix app/modules",
