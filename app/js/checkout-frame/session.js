@@ -4887,7 +4887,6 @@ Session.prototype = {
       // Message: Your payment is being processed
       return that.showLoadError();
     } else {
-      console.log('cancelled');
       if (!this.headless) {
         sub_link.html(I18n.format('misc.go_to_payment'));
         this.r.on('payment.cancel', function() {
