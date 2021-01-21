@@ -10,6 +10,7 @@ import { translateInstrumentToConfig } from './translation';
 import { getInstrumentsForCustomer as getInstrumentsForCustomerFromApi } from './api';
 import { getUPIIntentApps } from 'checkoutstore/native';
 import { optimizeInstruments } from 'checkoutframe/personalization/optimisations';
+import score from 'checkoutframe/checkoutScore';
 
 /* halflife for timestamp, 5 days in ms */
 const TS_HALFLIFE = Math.log(2) / (5 * 86400000);
@@ -275,13 +276,14 @@ export function processInstrument(payment, extra) {
  * @param {Object} instrument Instrument to record success of
  * @param {Customer} customer
  */
-export const recordSuccess = (instrument, customer) => {
+export const recordSuccess = (instrument, customer, checkoutScore) => {
   if (!instrument || !customer) {
     return;
   }
 
   instrument.success = true;
-
+  const score = this.checkoutScore + score.savedInstrument;
+  Analytics.setMeta('checkoutScore', score);
   Analytics.track('p13n:instrument:success', {
     data: {
       instrument,

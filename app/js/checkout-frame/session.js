@@ -48,7 +48,8 @@ var preferences,
   Confirm = discreet.Confirm,
   Backdrop = discreet.Backdrop,
   FeeLabel = discreet.FeeLabel,
-  rewardsStore = discreet.rewardsStore;
+  rewardsStore = discreet.rewardsStore,
+  score = discreet.score;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -601,7 +602,8 @@ function successHandler(response) {
   if (this.preferredInstrument) {
     P13n.recordSuccess(
       this.preferredInstrument,
-      this.getCurrentCustomer(this.payload && this.payload.contact)
+      this.getCurrentCustomer(this.payload && this.payload.contact),
+      this.checkoutScore
     );
   }
 
@@ -2718,11 +2720,22 @@ Session.prototype = {
   trackEvent: function(eventName, data) {
     Analytics.track(eventName, data);
   },
-
+  tabSwitchStart: 0,
+  checkoutScore: 0,
+  tabCount: 0,
   switchTab: function(tab) {
     /**
      * Validate fields on common screen.
      */
+    this.tabCount++;
+    if (this.tabCount > 3) {
+      this.checkoutScore -= score.switching3Tabs;
+    }
+    let diff = 0;
+    if (this.tabSwitchStart > 0) {
+      diff = Date.now() - this.tabSwitchStart;
+    }
+    this.tabSwitchStart = Date.now();
     if (!this.tab) {
       if (!this.checkCommonValidAndTrackIfInvalid()) {
         return;
@@ -2735,8 +2748,9 @@ Session.prototype = {
         to: tab,
       },
     });
-
     Analytics.setMeta('tab', tab);
+    Analytics.setMeta('diff', diff > 0 ? diff : 'NA');
+    Analytics.setMeta('checkoutScore', this.checkoutScore);
     Analytics.setMeta('timeSince.tab', discreet.timer());
 
     if (tab === '') {
@@ -4185,7 +4199,6 @@ Session.prototype = {
         type: AnalyticsTypes.DEBUG,
       });
     }
-
     if (this.r._payment) {
       /**
        * For Cardless EMI, payments are created at the first step,
@@ -4858,6 +4871,7 @@ Session.prototype = {
       // Message: Your payment is being processed
       return that.showLoadError();
     } else {
+      console.log('cancelled');
       if (!this.headless) {
         sub_link.html(I18n.format('misc.go_to_payment'));
         this.r.on('payment.cancel', function() {
