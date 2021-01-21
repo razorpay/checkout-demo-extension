@@ -303,7 +303,7 @@ function errorHandler(response) {
   var payload = this.payload;
 
   this.clearRequest();
-  const score = this.checkoutScore + checkoutScore.score.failedPayment;
+  var score = this.checkoutScore + checkoutScore.score.failedPayment;
   Analytics.setMeta('checkoutScore', score);
   Analytics.setMeta('checkoutScoreReason', checkoutScore.keys.failedPayment);
   Analytics.track('error', {
@@ -387,7 +387,7 @@ function cancelHandler(response) {
   if (!this.payload) {
     return;
   }
-  const score = this.checkoutScore + checkoutScore.score.cancelledPayment;
+  var score = this.checkoutScore + checkoutScore.score.cancelledPayment;
   Analytics.setMeta('checkoutScore', score);
   Analytics.setMeta('checkoutScoreReason', checkoutScore.keys.cancelledPayment);
   Analytics.setMeta('payment.cancelled', true);
@@ -610,7 +610,7 @@ function successHandler(response) {
       this.checkoutScore
     );
   }
-  const score = this.checkoutScore + checkoutScore.score.paymentSuccess;
+  var score = this.checkoutScore + checkoutScore.score.paymentSuccess;
   Analytics.setMeta('checkoutScore', score);
   Analytics.setMeta('checkoutScoreReason', checkoutScore.keys.paymentSuccess);
 
