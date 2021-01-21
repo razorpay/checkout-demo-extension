@@ -2738,9 +2738,11 @@ Session.prototype = {
     /**
      * Validate fields on common screen.
      */
-    this.tabCount++;
+    if (this.tab !== '') {
+      this.tabCount++;
+    }
     if (this.tabCount > 3) {
-      updateScore('switching3Tabs');
+      updateScore('switchingTabs', this.tabCount);
     }
     var diff = 0;
     if (this.tabSwitchStart > 0) {
