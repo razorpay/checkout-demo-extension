@@ -29,11 +29,13 @@ const reasons = {
 };
 
 let calculatedScore = 0;
+let reasonEncountered = '';
 
 const updateScore = function(type) {
   calculatedScore += score[type];
+  reasonEncountered += reasons[type] + ' | ';
   Analytics.setMeta('checkoutScore', calculatedScore);
-  Analytics.setMeta('checkoutScoreReason', reasons[type]);
+  Analytics.setMeta('checkoutScoreReason', reasonEncountered);
 };
 
 const getTimeSinceOpen = () => {
