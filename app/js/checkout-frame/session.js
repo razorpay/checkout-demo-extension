@@ -611,6 +611,9 @@ function successHandler(response) {
     );
   }
 
+  Analytics.setMeta('checkoutScore', checkoutScore.score.paymentSuccess);
+  Analytics.setMeta('checkoutScoreReason', checkoutScore.keys.paymentSuccess);
+
   this.clearRequest();
   // prevent dismiss event
   this.modal.options.onhide = noop;
