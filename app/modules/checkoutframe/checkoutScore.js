@@ -1,6 +1,6 @@
 import Analytics from 'analytics';
 
-export const score = {
+const score = {
   savedInstrument: 2,
   paymentSuccess: 5,
   affordability: 2,
@@ -14,7 +14,7 @@ export const score = {
   cancelledPayment: -3,
 };
 
-export const keys = {
+const reasons = {
   savedInstrument: 'Saved Instrument',
   paymentSuccess: 'Payment Success',
   affordability: 'Affordability',
@@ -26,6 +26,14 @@ export const keys = {
   timeToRender4s: 'Rendered in more then 4 secs',
   failedPayment: 'Failed Payment',
   cancelledPayment: 'Cancelled Payment',
+};
+
+let calculatedScore = 0;
+
+const updateScore = function(type) {
+  calculatedScore += score[type];
+  Analytics.setMeta('checkoutScore', calculatedScore);
+  Analytics.setMeta('checkoutScoreReason', reasons[type]);
 };
 
 const getTimeSinceOpen = () => {
@@ -56,3 +64,5 @@ export const utils = {
     return 0;
   },
 };
+
+export default updateScore;

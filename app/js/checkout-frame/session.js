@@ -49,7 +49,7 @@ var preferences,
   Backdrop = discreet.Backdrop,
   FeeLabel = discreet.FeeLabel,
   rewardsStore = discreet.rewardsStore,
-  checkoutScore = discreet.checkoutScore;
+  updateScore = discreet.updateScore;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -303,7 +303,7 @@ function errorHandler(response) {
   var payload = this.payload;
 
   this.clearRequest();
-  this.setCheckoutScore('failedPayment');
+  updateScore('failedPayment');
   Analytics.track('error', {
     data: response,
   });
@@ -385,7 +385,7 @@ function cancelHandler(response) {
   if (!this.payload) {
     return;
   }
-  this.setCheckoutScore('cancelledPayment');
+  updateScore('cancelledPayment');
   Analytics.setMeta('payment.cancelled', true);
   this.markHeadlessFailed();
 
@@ -600,13 +600,13 @@ function askOTP(view, textView, shouldLimitResend, templateData) {
 // this === Session
 function successHandler(response) {
   if (this.preferredInstrument) {
-    this.setCheckoutScore('savedInstrument');
+    updateScore('savedInstrument');
     P13n.recordSuccess(
       this.preferredInstrument,
       this.getCurrentCustomer(this.payload && this.payload.contact)
     );
   }
-  this.setCheckoutScore('paymentSuccess');
+  updateScore('paymentSuccess');
   this.clearRequest();
   // prevent dismiss event
   this.modal.options.onhide = noop;
@@ -651,12 +651,6 @@ function Session(message) {
 }
 
 Session.prototype = {
-  setCheckoutScore: function(type) {
-    var score = this.checkoutScore + checkoutScore.score[type];
-    Analytics.setMeta('checkoutScore', score);
-    Analytics.setMeta('checkoutScoreReason', checkoutScore.keys[type]);
-  },
-
   shouldUseNativeOTP: function() {
     return this.get('nativeotp') && this.r.isLiveMode();
   },
@@ -2727,7 +2721,6 @@ Session.prototype = {
     Analytics.track(eventName, data);
   },
   tabSwitchStart: 0,
-  checkoutScore: 0,
   tabCount: 0,
   switchTab: function(tab) {
     /**
@@ -2735,12 +2728,7 @@ Session.prototype = {
      */
     this.tabCount++;
     if (this.tabCount > 3) {
-      this.checkoutScore -= checkoutScore.score.switching3Tabs;
-      Analytics.setMeta('checkoutScore', this.checkoutScore);
-      Analytics.setMeta(
-        'checkoutScoreReason',
-        checkoutScore.keys.switching3Tabs
-      );
+      updateScore('switching3Tabs');
     }
     var diff = 0;
     if (this.tabSwitchStart > 0) {

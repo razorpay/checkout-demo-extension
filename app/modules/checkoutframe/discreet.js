@@ -84,7 +84,7 @@ import * as FeeLabel from 'checkoutframe/components/fee';
 
 import PayoutsInstruments from 'ui/tabs/payout/payout-instruments.svelte';
 import PayoutAccount from 'ui/tabs/payout/payout-account.svelte';
-import * as checkoutScore from 'checkoutframe/checkoutScore';
+import updateScore from 'checkoutframe/checkoutScore';
 
 import showTimer from 'checkoutframe/timer';
 import * as es6components from 'checkoutframe/components';
@@ -195,7 +195,7 @@ export default {
   EmandateTab,
   NachScreen,
   cardTab,
-  checkoutScore,
+  updateScore,
 
   Hacks,
   storeGetter,
