@@ -2740,7 +2740,7 @@ Session.prototype = {
       Analytics.setMeta('checkoutScore', this.checkoutScore);
       Analytics.setMeta(
         'checkoutScoreReason',
-        this.checkoutScore.keys.switching3Tabs
+        checkoutScore.keys.switching3Tabs
       );
     }
     var diff = 0;
