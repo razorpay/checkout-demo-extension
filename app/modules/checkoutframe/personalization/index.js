@@ -284,7 +284,7 @@ export const recordSuccess = (instrument, customer, checkoutScore) => {
   instrument.success = true;
   const score = checkoutScore + score.savedInstrument;
   Analytics.setMeta('checkoutScore', score);
-  Analytics.setMeta('checkoutScore', keys.savedInstrument);
+  Analytics.setMeta('checkoutScoreReason', keys.savedInstrument);
   Analytics.track('p13n:instrument:success', {
     data: {
       instrument,
