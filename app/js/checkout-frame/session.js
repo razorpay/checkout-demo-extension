@@ -2745,7 +2745,7 @@ Session.prototype = {
     }
     let diff = 0;
     if (this.tabSwitchStart > 0) {
-      diff = Date.now() - this.tabSwitchStart;
+      diff = (Date.now() - this.tabSwitchStart) / 1000;
     }
     this.tabSwitchStart = Date.now();
     if (!this.tab) {
@@ -2758,10 +2758,10 @@ Session.prototype = {
       data: {
         from: this.tab,
         to: tab,
+        timeSpentInTab: diff > 0 ? diff : 'NA',
       },
     });
     Analytics.setMeta('tab', tab);
-    Analytics.setMeta('diff', diff > 0 ? diff : 'NA');
     Analytics.setMeta('timeSince.tab', discreet.timer());
 
     if (tab === '') {
