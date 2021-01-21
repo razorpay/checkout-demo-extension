@@ -64,6 +64,7 @@ const score = {
     }
     return 0;
   },
+  invalidVpaBlur: -2.5,
 };
 
 const reasons = {
@@ -86,6 +87,7 @@ const reasons = {
   vpaPrefilled: 'Had his vpa prefilled',
   hadMethodPrefilled: 'Render had the method pre-decided',
   instrumentSelected: () => 'User selected an instrument',
+  invalidVpaBlur: 'Filled an invalid vpa, moved away',
 };
 
 let calculatedScore = 0;
