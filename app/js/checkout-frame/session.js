@@ -2733,7 +2733,12 @@ Session.prototype = {
      */
     this.tabCount++;
     if (this.tabCount > 3) {
-      this.checkoutScore -= score.switching3Tabs;
+      this.checkoutScore -= checkoutScore.score.switching3Tabs;
+      Analytics.setMeta('checkoutScore', this.checkoutScore);
+      Analytics.setMeta(
+        'checkoutScoreReason',
+        this.checkoutScore.keys.switching3Tabs
+      );
     }
     let diff = 0;
     if (this.tabSwitchStart > 0) {
@@ -2754,7 +2759,6 @@ Session.prototype = {
     });
     Analytics.setMeta('tab', tab);
     Analytics.setMeta('diff', diff > 0 ? diff : 'NA');
-    Analytics.setMeta('checkoutScore', this.checkoutScore);
     Analytics.setMeta('timeSince.tab', discreet.timer());
 
     if (tab === '') {
