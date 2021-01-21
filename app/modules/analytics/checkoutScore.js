@@ -45,6 +45,25 @@ const score = {
     }
     return 0;
   },
+  instrumentSelected: function() {
+    const timeSinceOpen = getTimeSinceOpen();
+    if (timeSinceOpen < 5) {
+      return 5;
+    }
+    if (timeSinceOpen < 8) {
+      return 3;
+    }
+    if (timeSinceOpen < 10) {
+      return 0;
+    }
+    if (timeSinceOpen >= 20) {
+      return -3;
+    }
+    if (timeSinceOpen >= 10) {
+      return -1;
+    }
+    return 0;
+  },
 };
 
 const reasons = {
@@ -66,6 +85,7 @@ const reasons = {
   paidViaSavedVpa: 'Used a saved vpa',
   vpaPrefilled: 'Had his vpa prefilled',
   hadMethodPrefilled: 'Render had the method pre-decided',
+  instrumentSelected: () => 'User selected an instrument',
 };
 
 let calculatedScore = 0;

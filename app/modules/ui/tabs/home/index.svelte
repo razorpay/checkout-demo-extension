@@ -114,6 +114,8 @@
 
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
+  import updateScore from 'analytics/checkoutScore';
+
   import { getCardOffer, hasOffersOnHomescreen } from 'checkoutframe/offers';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
   import { isInstrumentGrouped } from 'configurability/instruments';
@@ -848,6 +850,8 @@
 
   export function onSelectInstrument(event) {
     const instrument = event.detail;
+
+    updateScore('instrumentSelected');
 
     $selectedInstrumentId = instrument.id;
 
