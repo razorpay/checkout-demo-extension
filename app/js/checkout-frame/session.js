@@ -2743,7 +2743,7 @@ Session.prototype = {
         this.checkoutScore.keys.switching3Tabs
       );
     }
-    let diff = 0;
+    var diff = 0;
     if (this.tabSwitchStart > 0) {
       diff = (Date.now() - this.tabSwitchStart) / 1000;
     }
