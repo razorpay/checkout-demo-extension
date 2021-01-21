@@ -18,6 +18,7 @@ const score = {
   cancelledPayment: -3,
   wentBack: -1,
   saveThisVpa: 1.5,
+  paidViaSavedVpa: 2,
   // was the user logged in when checkout was rendered
   loggedInUser: 1,
   timeToSubmit: () => {
@@ -60,6 +61,7 @@ const reasons = {
   timeToSubmit: () => `Time taken to submit - ${getTimeSinceOpen()}`,
   wentBack: 'Back',
   saveThisVpa: 'Chose to save vpa in payment',
+  paidViaSavedVpa: 'Used a saved vpa',
 };
 
 let calculatedScore = 0;

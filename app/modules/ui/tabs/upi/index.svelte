@@ -451,6 +451,7 @@
           });
 
           data = { token: _token.token };
+          updateScore('paidViaSavedVpa');
         }
 
         break;
