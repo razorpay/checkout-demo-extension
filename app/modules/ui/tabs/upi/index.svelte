@@ -63,6 +63,8 @@
   import { getMiscIcon } from 'checkoutframe/icons';
   import Callout from 'ui/elements/Callout.svelte';
 
+  import updateScore from 'analytics/checkoutScore';
+
   // Store
   import { contact } from 'checkoutstore/screens/home';
   import { customer } from 'checkoutstore/customer';
@@ -486,6 +488,7 @@
   }
 
   export function onBack() {
+    updateScore('wentBack');
     // User has gone back, set isFirst as false
     isFirst = false;
 

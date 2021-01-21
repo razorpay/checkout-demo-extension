@@ -16,6 +16,7 @@ const score = {
   timeToRender4s: -1,
   failedPayment: -3,
   cancelledPayment: -3,
+  wentBack: -1,
   // was the user logged in when checkout was rendered
   loggedInUser: 1,
   timeToSubmit: () => {
@@ -56,6 +57,7 @@ const reasons = {
   cancelledPayment: 'Cancelled Payment',
   loggedInUser: 'User was logged in',
   timeToSubmit: () => `Time taken to submit - ${getTimeSinceOpen()}`,
+  wentBack: 'Back',
 };
 
 let calculatedScore = 0;
