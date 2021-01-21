@@ -26,6 +26,7 @@
     NEW_VPA_SUBTITLE,
     NEW_VPA_SUBTITLE_UPI_OTM,
   } from 'ui/labels/upi';
+  import { phone } from 'checkoutstore/screens/home';
 
   // Props
   export let selected = false;
@@ -42,6 +43,35 @@
 
   const PATTERN_WITH_HANDLE = '.+@.+';
   const PATTERN_WITHOUT_HANDLE = '.+';
+
+  const suggestionVPA = [
+    'apl',
+    'abfspay',
+    'fbl',
+    'axisb',
+    'yesbank',
+    'okaxis',
+    'okhdfcbank',
+    'okicici',
+    'oksbi',
+    'hdfcbankjd',
+    'kmbl',
+    'icici',
+    'myicici',
+    'ikwik',
+    'yesbank',
+    'yesbank',
+    'ybl',
+    'ibl',
+    'axl',
+    'rmhdfcbank',
+    'pingpay',
+    'icici',
+    'barodapay',
+    'idfcbank',
+    'icici',
+    'yesbank',
+  ];
 
   const session = getSession();
 
@@ -174,6 +204,27 @@
         <Field
           formatter={{ type: 'vpa' }}
           {pattern}
+          prediction={currentVaue => {
+            const phoneInput = $phone;
+            const atIndex = currentVaue.indexOf('@');
+            if (currentVaue?.length > 1 && phoneInput && phoneInput.startsWith(currentVaue) && atIndex === -1) {
+              return phoneInput;
+            }
+            if (currentVaue.length > 2 && currentVaue.includes('@') && atIndex < currentVaue.length - 1) {
+              const predictionInput = currentVaue.substr(atIndex + 1);
+              const predictions = suggestionVPA.filter(vpa =>
+                vpa.startsWith(predictionInput)
+              );
+              const value = `${currentVaue.substr(0, atIndex)}@${predictions?.[0] || ''}`;
+              if (predictions?.length > 0) {
+                return { value, suggestions: predictions.map(x => `@${x}`), onSelect: data => {
+                    return `${currentVaue.substr(0, atIndex)}${data}`;
+                  } };
+              }
+            }
+            return '';
+          }}
+          showDropdownPredictions
           helpText={$t(UPI_COLLECT_NEW_VPA_HELP)}
           id={'vpa-' + paymentMethod}
           name={'vpa-' + paymentMethod}
