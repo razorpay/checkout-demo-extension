@@ -3,7 +3,7 @@ import Analytics from 'analytics';
 const score = {
   savedInstrument: 2,
   paymentSuccess: 5,
-  affordability: 2,
+  affordability_offers: 2,
   under40Sec: 3,
   timeToRender: 2,
   clickOnSubmitWithoutDetails: -2,
@@ -17,7 +17,7 @@ const score = {
 const reasons = {
   savedInstrument: 'Saved Instrument',
   paymentSuccess: 'Payment Success',
-  affordability: 'Affordability',
+  affordability_offers: 'Offers Applied',
   under40Sec: 'Payment Completed Under 40 secs',
   timeToRender: 'Rendered under 2.8 secs',
   clickOnSubmitWithoutDetails: 'Clicked on submit without details',
