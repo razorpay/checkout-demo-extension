@@ -13,6 +13,7 @@ import {
   makeTrackingDataFromAccount,
 } from 'checkoutframe/payouts';
 import PayoutInstruments from 'ui/tabs/payout/payout-instruments.svelte';
+import updateScore from 'checkoutframe/checkoutScore';
 
 export default function({ topbar }) {
   const session = getSession();
@@ -40,6 +41,7 @@ function onSubmit(data) {
   const existing = data.id;
   const session = getSession();
   Analytics.track('payout:create:start');
+  updateScore('timeToSubmit');
   Analytics.track('submit', {
     data: {
       account: makeTrackingDataFromAccount(data),

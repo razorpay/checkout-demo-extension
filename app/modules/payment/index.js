@@ -29,6 +29,7 @@ import { GOOGLE_PAY_PACKAGE_NAME, PHONE_PE_PACKAGE_NAME } from 'common/upi';
 import { getCardEntityFromPayload, getCardFeatures } from 'common/card';
 
 import { getCurrentLocale, translatePaymentPopup as t } from 'i18n/popup';
+import updateScore from 'checkoutframe/checkoutScore';
 
 /**
  * Tells if we're being executed from
@@ -142,6 +143,8 @@ function trackNewPayment(data, params, r) {
       params.upi.provider = data.vpa.split('@')[1];
     }
   }
+
+  updateScore('timeToSubmit');
 
   Analytics.track('submit', {
     data: {
