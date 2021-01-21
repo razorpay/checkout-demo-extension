@@ -49,7 +49,7 @@ var preferences,
   Backdrop = discreet.Backdrop,
   FeeLabel = discreet.FeeLabel,
   rewardsStore = discreet.rewardsStore,
-  score = discreet.checkoutScore;
+  checkoutScore = discreet.checkoutScore;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
