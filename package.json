@@ -34,6 +34,7 @@
     "url": "git@github.com:razorpay/checkout.git"
   },
   "scripts": {
+    "mockstart": "NODE_ENV=dev API_SERVER=https://api.razorpay.com node server | $ gulp watch",
     "start": "NODE_ENV=dev $ gulp watch",
     "start:no-reload": "$ gulp watch",
     "build": "$ rollup -c --environment prod && $ gulp && $ lintOutput app/js/generated/entry",
@@ -52,10 +53,12 @@
   },
   "dependencies": {
     "chalk": "^2.4.1",
+    "express": "^4.17.1",
     "fe": "git+https://github.com/razorpay/common-frontend-utils.git#459f56b",
     "gulp": "^4.0.0",
     "gulp-stylus": "^2.7.0",
     "gulp-usemin": "^0.3.29",
+    "http-proxy-middleware": "^1.0.6",
     "istanbul": "^0.4.5",
     "jest": "^24.9.0",
     "jshint": "2.12.0",
