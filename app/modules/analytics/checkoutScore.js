@@ -16,6 +16,8 @@ const score = {
   timeToRender4s: -1,
   failedPayment: -3,
   cancelledPayment: -3,
+  // was the user logged in when checkout was rendered
+  loggedInUser: 1,
   timeToSubmit: () => {
     const timeSinceOpen = getTimeSinceOpen();
     if (timeSinceOpen < 20) {
@@ -52,6 +54,7 @@ const reasons = {
   timeToRender4s: 'Rendered in more then 4 secs',
   failedPayment: 'Failed Payment',
   cancelledPayment: 'Cancelled Payment',
+  loggedInUser: 'User was logged in',
   timeToSubmit: () => `Time taken to submit - ${getTimeSinceOpen()}`,
 };
 
@@ -59,14 +62,22 @@ let calculatedScore = 0;
 let reasonEncountered = '';
 
 const updateScore = function(type) {
+  if (!score[type]) {
+    // sanity check if we send the wrong key
+    console.warn('incorrect key sent for score updatation');
+    return;
+  }
+
+  // Most scores are numbers
   if (score[type] === 'number') {
     calculatedScore += score[type];
     reasonEncountered += reasons[type] + ' | ';
-    // if not number it's a function
+    // Some scores are functions which depend on other data
   } else {
     calculatedScore += score[type]();
     reasonEncountered += reasons[type]() + ' | ';
   }
+
   Analytics.setMeta('checkoutScore', calculatedScore);
   Analytics.setMeta('checkoutScoreReason', reasonEncountered);
 };

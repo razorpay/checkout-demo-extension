@@ -29,7 +29,7 @@ import { GOOGLE_PAY_PACKAGE_NAME, PHONE_PE_PACKAGE_NAME } from 'common/upi';
 import { getCardEntityFromPayload, getCardFeatures } from 'common/card';
 
 import { getCurrentLocale, translatePaymentPopup as t } from 'i18n/popup';
-import updateScore from 'checkoutframe/checkoutScore';
+import updateScore from 'analytics/checkoutScore';
 
 /**
  * Tells if we're being executed from

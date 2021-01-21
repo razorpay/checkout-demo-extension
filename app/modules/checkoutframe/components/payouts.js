@@ -13,7 +13,7 @@ import {
   makeTrackingDataFromAccount,
 } from 'checkoutframe/payouts';
 import PayoutInstruments from 'ui/tabs/payout/payout-instruments.svelte';
-import updateScore from 'checkoutframe/checkoutScore';
+import updateScore from 'analytics/checkoutScore';
 
 export default function({ topbar }) {
   const session = getSession();
