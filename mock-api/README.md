@@ -7,9 +7,4 @@
 
 ### Instructions
 
-1. Point Checkout to `localhost:5000` instead of `api.razorpay.com`
-
-### Setup & Run
-
-1. `npm i`
-1. `npm run start`
+    Please run `npm run dev-start` command to utilize.

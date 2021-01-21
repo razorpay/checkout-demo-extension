@@ -1,36 +1,43 @@
 // include dependencies
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+
+const mockAPIRouter = require('./mock-api/router');
+const { logger } = require('./mock-api/utils');
 
 const API_ROUTE = '/api';
 const PORT = 8000;
 const app = express();
 
-// proxy middleware options
-// create the proxy (without context)
-app.use(
-  API_ROUTE,
-  createProxyMiddleware({
-    target: process.env.API_SERVER,
-    changeOrigin: true,
-    pathRewrite: path => {
-      return path.replace('/api/', '/');
-    },
-  })
-);
+if (process.env.API_SERVER.includes('localhost')) {
+  app.use(cors());
+  app.use(bodyParser.json());
+  app.use(
+    bodyParser.urlencoded({
+      extended: true,
+      limit: '1mb',
+      encoding: 'utf8', // Remove if you want a buffer
+    })
+  );
+  app.use(API_ROUTE, mockAPIRouter);
+  logger(`Running on Mock-API`);
+} else {
+  app.use(
+    API_ROUTE,
+    createProxyMiddleware({
+      target: process.env.API_SERVER,
+      changeOrigin: true,
+      pathRewrite: path => {
+        return path.replace('/api/', '/');
+      },
+    })
+  );
+  logger(`Running on Live Server`);
+}
 
-// // for reverse proxy
-// app.use(
-//   API_SERVER_URL,
-//   createProxyMiddleware({
-//     target: API_ROUTE,
-//     changeOrigin: true,
-//   })
-// );
 app.use(express.static('./app'));
 app.listen(PORT, null, () =>
-  console.log(
-    '\x1b[33m%s\x1b[0m',
-    `\nCheckout Server started at http://localhost:${PORT}`
-  )
+  logger(`Checkout Server started at http://localhost:${PORT}`)
 );
