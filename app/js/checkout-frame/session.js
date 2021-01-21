@@ -305,7 +305,7 @@ function errorHandler(response) {
   this.clearRequest();
   const score = this.checkoutScore + checkoutScore.score.failedPayment;
   Analytics.setMeta('checkoutScore', score);
-  Analytics.setMeta('scoreReason', checkoutScore.keys.failedPayment);
+  Analytics.setMeta('checkoutScoreReason', checkoutScore.keys.failedPayment);
   Analytics.setMeta();
   Analytics.track('error', {
     data: response,
@@ -388,8 +388,9 @@ function cancelHandler(response) {
   if (!this.payload) {
     return;
   }
-  const score = this.checkoutScore + score.cancelledPayment;
+  const score = this.checkoutScore + checkoutScore.score.cancelledPayment;
   Analytics.setMeta('checkoutScore', score);
+  Analytics.setMeta('checkoutScoreReason', checkoutScore.keys.cancelledPayment);
   Analytics.setMeta('payment.cancelled', true);
   this.markHeadlessFailed();
 
@@ -610,8 +611,8 @@ function successHandler(response) {
       this.checkoutScore
     );
   }
-
-  Analytics.setMeta('checkoutScore', checkoutScore.score.paymentSuccess);
+  const score = this.checkoutScore + checkoutScore.score.paymentSuccess;
+  Analytics.setMeta('checkoutScore', score);
   Analytics.setMeta('checkoutScoreReason', checkoutScore.keys.paymentSuccess);
 
   this.clearRequest();
