@@ -1081,6 +1081,13 @@ Session.prototype = {
         embedded: this.embedded,
       },
     });
+    var timeSinceRendered = Analytics.getMeta().timeSince.open();
+    if (timeSinceRendered <= 2800) {
+      updateScore('timeToRender');
+    }
+    if (timeSinceRendered > 4000) {
+      updateScore('timeToRender4s');
+    }
     Analytics.setMeta('timeSince.render', discreet.timer());
   },
 
