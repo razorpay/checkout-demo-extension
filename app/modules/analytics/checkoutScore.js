@@ -22,6 +22,7 @@ const score = {
   vpaPrefilled: 3,
   // was the user logged in when checkout was rendered
   loggedInUser: 1,
+  hadMethodPrefilled: 4,
   timeToSubmit: () => {
     const timeSinceOpen = getTimeSinceOpen();
     if (timeSinceOpen < 20) {
@@ -64,6 +65,7 @@ const reasons = {
   saveThisVpa: 'Chose to save vpa in payment',
   paidViaSavedVpa: 'Used a saved vpa',
   vpaPrefilled: 'Had his vpa prefilled',
+  hadMethodPrefilled: 'Render had the method pre-decided',
 };
 
 let calculatedScore = 0;
