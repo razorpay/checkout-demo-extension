@@ -801,6 +801,10 @@ Session.prototype = {
     var tab = oldMethod || this.get('prefill.method');
 
     if (tab) {
+      updateScore('hadMethodPrefilled');
+    }
+
+    if (tab) {
       var optional = {
         contact: Store.isContactOptional(),
         email: Store.isEmailOptional(),
