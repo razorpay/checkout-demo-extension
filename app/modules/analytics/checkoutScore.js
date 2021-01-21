@@ -79,7 +79,7 @@ const updateScore = function(type) {
   }
 
   // Most scores are numbers
-  if (score[type] === 'number') {
+  if (typeof score[type] === 'number') {
     calculatedScore += score[type];
     reasonEncountered += reasons[type] + ' | ';
     // Some scores are functions which depend on other data
