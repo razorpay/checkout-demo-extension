@@ -19,6 +19,7 @@ const score = {
   wentBack: -1,
   saveThisVpa: 1.5,
   paidViaSavedVpa: 2,
+  vpaPrefilled: 3,
   // was the user logged in when checkout was rendered
   loggedInUser: 1,
   timeToSubmit: () => {
@@ -62,6 +63,7 @@ const reasons = {
   wentBack: 'Back',
   saveThisVpa: 'Chose to save vpa in payment',
   paidViaSavedVpa: 'Used a saved vpa',
+  vpaPrefilled: 'Had his vpa prefilled',
 };
 
 let calculatedScore = 0;

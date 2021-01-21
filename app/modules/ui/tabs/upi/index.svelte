@@ -352,6 +352,7 @@
     if (session.get('prefill.vpa')) {
       selectedApp = undefined;
       vpa = session.get('prefill.vpa');
+      updateScore('vpaPrefilled');
     }
 
     const downtimes = getDowntimes();
