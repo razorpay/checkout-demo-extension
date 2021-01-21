@@ -3,7 +3,7 @@ const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const API_ROUTE = '/api';
-
+const PORT = 8000;
 const app = express();
 
 // proxy middleware options
@@ -28,4 +28,9 @@ app.use(
 //   })
 // );
 app.use(express.static('./app'));
-app.listen(8000);
+app.listen(PORT, null, () =>
+  console.log(
+    '\x1b[33m%s\x1b[0m',
+    `\nCheckout Server started at http://localhost:${PORT}`
+  )
+);
