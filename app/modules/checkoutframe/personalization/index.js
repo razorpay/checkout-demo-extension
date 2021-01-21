@@ -10,7 +10,6 @@ import { translateInstrumentToConfig } from './translation';
 import { getInstrumentsForCustomer as getInstrumentsForCustomerFromApi } from './api';
 import { getUPIIntentApps } from 'checkoutstore/native';
 import { optimizeInstruments } from 'checkoutframe/personalization/optimisations';
-import { score, keys } from 'checkoutframe/checkoutScore';
 
 /* halflife for timestamp, 5 days in ms */
 const TS_HALFLIFE = Math.log(2) / (5 * 86400000);
