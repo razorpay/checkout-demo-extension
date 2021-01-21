@@ -49,7 +49,7 @@ var preferences,
   Backdrop = discreet.Backdrop,
   FeeLabel = discreet.FeeLabel,
   rewardsStore = discreet.rewardsStore,
-  score = discreet.score;
+  score = discreet.checkoutScore;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -303,7 +303,10 @@ function errorHandler(response) {
   var payload = this.payload;
 
   this.clearRequest();
-
+  const score = this.checkoutScore + checkoutScore.score.failedPayment;
+  Analytics.setMeta('checkoutScore', score);
+  Analytics.setMeta('scoreReason', checkoutScore.keys.failedPayment);
+  Analytics.setMeta();
   Analytics.track('error', {
     data: response,
   });
@@ -385,7 +388,8 @@ function cancelHandler(response) {
   if (!this.payload) {
     return;
   }
-
+  const score = this.checkoutScore + score.cancelledPayment;
+  Analytics.setMeta('checkoutScore', score);
   Analytics.setMeta('payment.cancelled', true);
   this.markHeadlessFailed();
 
