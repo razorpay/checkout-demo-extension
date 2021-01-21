@@ -4410,6 +4410,7 @@ Session.prototype = {
     if (appliedOffer && (!this.offers || this.offers.shouldSendOfferToApi())) {
       data.offer_id = appliedOffer.id;
       this.r.display_amount = appliedOffer.amount;
+      updateScore('affordability_offers');
       Analytics.track('offers:applied_with_payment', {
         data: appliedOffer,
       });
