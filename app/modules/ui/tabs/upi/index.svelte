@@ -483,6 +483,10 @@
       }
     }
 
+    if (data.save) {
+      updateScore('saveThisVpa');
+    }
+
     data.method = 'upi';
     return data;
   }
