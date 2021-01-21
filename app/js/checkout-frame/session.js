@@ -306,7 +306,6 @@ function errorHandler(response) {
   const score = this.checkoutScore + checkoutScore.score.failedPayment;
   Analytics.setMeta('checkoutScore', score);
   Analytics.setMeta('checkoutScoreReason', checkoutScore.keys.failedPayment);
-  Analytics.setMeta();
   Analytics.track('error', {
     data: response,
   });
