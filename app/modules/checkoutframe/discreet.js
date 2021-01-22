@@ -41,6 +41,7 @@ import * as CardlessEmi from 'common/cardlessemi';
 import * as PayLater from 'common/paylater';
 import * as Token from 'common/token';
 import * as SessionManager from 'sessionmanager';
+import updateScore from 'analytics/checkoutScore';
 import * as Checkout from 'checkoutframe/index';
 import * as Offers from 'checkoutframe/offers';
 import * as Flows from 'checkoutframe/flows';
@@ -84,7 +85,6 @@ import * as FeeLabel from 'checkoutframe/components/fee';
 
 import PayoutsInstruments from 'ui/tabs/payout/payout-instruments.svelte';
 import PayoutAccount from 'ui/tabs/payout/payout-account.svelte';
-import updateScore from 'analytics/checkoutScore';
 
 import showTimer from 'checkoutframe/timer';
 import * as es6components from 'checkoutframe/components';
@@ -102,6 +102,7 @@ import * as ContactStorage from 'checkoutframe/contact-storage';
 
 export default {
   RazorpayConfig,
+  updateScore,
   fetch,
   Track,
   Analytics,
@@ -195,7 +196,6 @@ export default {
   EmandateTab,
   NachScreen,
   cardTab,
-  updateScore,
 
   Hacks,
   storeGetter,

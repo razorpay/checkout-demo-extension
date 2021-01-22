@@ -1086,13 +1086,7 @@ Session.prototype = {
         embedded: this.embedded,
       },
     });
-    var timeSinceRendered = Analytics.getMeta().timeSince.open();
-    if (timeSinceRendered <= 2800) {
-      updateScore('timeToRender');
-    }
-    if (timeSinceRendered > 4000) {
-      updateScore('timeToRender4s');
-    }
+    updateScore('timeToRender');
     Analytics.setMeta('timeSince.render', discreet.timer());
   },
 
@@ -2733,16 +2727,14 @@ Session.prototype = {
     Analytics.track(eventName, data);
   },
   tabSwitchStart: 0,
-  tabCount: 0,
+  tabsCount: 0,
   switchTab: function(tab) {
     /**
      * Validate fields on common screen.
      */
-    if (this.tab !== '') {
-      this.tabCount++;
-    }
-    if (this.tabCount > 3) {
-      updateScore('switchingTabs', this.tabCount);
+    this.tabsCount++;
+    if (this.tabsCount > 3) {
+      updateScore('switchingTabs', { tabsCount: this.tabsCount });
     }
     var diff = 0;
     if (this.tabSwitchStart > 0) {

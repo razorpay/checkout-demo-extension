@@ -3,7 +3,7 @@ import Analytics from 'analytics';
 const sessionStartTime = new Date().getTime();
 
 const getTimeSinceOpen = () => {
-  const time = (new Date().getTime() - sessionStartTime) / 1000;
+  const time = new Date().getTime() - sessionStartTime;
   return time;
 };
 
@@ -12,7 +12,15 @@ const score = {
   paymentSuccess: 5,
   affordability_offers: 2,
   under40Sec: 3,
-  timeToRender: 2,
+  timeToRender: () => {
+    const timeSinceOpen = getTimeSinceOpen();
+    if (timeSinceOpen <= 2800) {
+      return 2;
+    }
+    if (timeSinceOpen > 4000) {
+      return -1;
+    }
+  },
   clickOnSubmitWithoutDetails: -2,
   more60Sec: -1,
   timeToRender4s: -1,
@@ -25,7 +33,7 @@ const score = {
   // was the user logged in when checkout was rendered
   loggedInUser: 1,
   hadMethodPrefilled: 4,
-  switchingTabs: tabsCount => {
+  switchingTabs: ({ tabsCount }) => {
     if (tabsCount > 3 && tabsCount <= 5) {
       return -1;
     }
@@ -88,7 +96,15 @@ const reasons = {
   paymentSuccess: 'Payment Success',
   affordability_offers: 'Offers Applied',
   under40Sec: 'Payment Completed Under 40 secs',
-  timeToRender: 'Rendered under 2.8 secs',
+  timeToRender: () => {
+    const timeSinceOpen = getTimeSinceOpen();
+    if (timeSinceOpen <= 2800) {
+      return 'Rendered in under 2.8 secs';
+    }
+    if (timeSinceOpen > 4000) {
+      return 'Rendered in more then 4 secs';
+    }
+  },
   clickOnSubmitWithoutDetails: 'Clicked on submit without details',
   more60Sec: 'Payment completed in more then 60 secs',
   timeToRender4s: 'Rendered in more then 4 secs',
@@ -101,8 +117,8 @@ const reasons = {
   paidViaSavedVpa: 'Used a saved vpa',
   vpaPrefilled: 'Had his vpa prefilled',
   hadMethodPrefilled: 'Render had the method pre-decided',
-  switchingTabs: tabsCount => {
-    if (tabsCount === 3 && tabsCount <= 5) {
+  switchingTabs: ({ tabsCount }) => {
+    if (tabsCount > 3 && tabsCount <= 5) {
       return 'Switched more then 3 tabs';
     }
     if (tabsCount > 5 && tabsCount <= 7) {
@@ -122,7 +138,7 @@ const reasons = {
 let calculatedScore = 0;
 let reasonEncountered = '';
 
-const updateScore = function(type, arg) {
+const updateScore = function(type, obj) {
   if (!score[type]) {
     // sanity check if we send the wrong key
     console.warn('incorrect key sent for score updatation');
@@ -135,8 +151,8 @@ const updateScore = function(type, arg) {
     reasonEncountered += reasons[type] + ' | ';
     // Some scores are functions which depend on other data
   } else {
-    calculatedScore += score[type](arg);
-    reasonEncountered += reasons[type](arg) + ' | ';
+    calculatedScore += score[type](obj);
+    reasonEncountered += reasons[type](obj) + ' | ';
   }
 
   Analytics.setMeta('checkoutScore', calculatedScore);
