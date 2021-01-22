@@ -60,8 +60,6 @@
     'myicici',
     'ikwik',
     'ybl',
-    'ibl',
-    'axl',
     'rmhdfcbank',
     'pingpay',
     'barodapay',
