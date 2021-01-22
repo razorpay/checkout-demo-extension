@@ -59,18 +59,13 @@
     'icici',
     'myicici',
     'ikwik',
-    'yesbank',
-    'yesbank',
     'ybl',
     'ibl',
     'axl',
     'rmhdfcbank',
     'pingpay',
-    'icici',
     'barodapay',
     'idfcbank',
-    'icici',
-    'yesbank',
   ];
 
   const session = getSession();
