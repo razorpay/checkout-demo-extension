@@ -2733,7 +2733,7 @@ Session.prototype = {
      * Validate fields on common screen.
      */
     this.tabsCount++;
-    if (this.tabsCount > 3) {
+    if (this.tabsCount > 5) {
       updateScore('switchingTabs', { tabsCount: this.tabsCount });
     }
     var diff = 0;
