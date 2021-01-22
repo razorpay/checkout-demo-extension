@@ -51,19 +51,21 @@
     'axisb',
     'yesbank',
     'okaxis',
-    'okhdfcbank',
-    'okicici',
     'oksbi',
+    'okicici',
+    'okhdfcbank',
     'hdfcbankjd',
     'kmbl',
     'icici',
     'myicici',
     'ikwik',
     'ybl',
+    'paytm',
     'rmhdfcbank',
     'pingpay',
     'barodapay',
     'idfcbank',
+    'upi',
   ];
 
   const session = getSession();
