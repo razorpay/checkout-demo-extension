@@ -34,6 +34,7 @@
   1.  Set up apache vhost using `httpd.sample.conf` maintaining `app` folder as web root.
       Use the following command to access the `httpd.conf`
       `sh sudo nano /private/etc/apache2/httpd.conf`
+
       Add following lines to the config,
 
       ```sh
