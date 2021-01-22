@@ -8,7 +8,6 @@
 
 # dependencies
 /node_modules
-/mock-api/node_modules
 
 # misc
 *.orig

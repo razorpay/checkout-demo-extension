@@ -7,19 +7,83 @@
 
 # Setup Instructions
 
-This application runs on standalone node server in development environment.
+## Legacy Setup
 
 - Repository Configuration
 
-1. Copy `app/index.sample.html` -> `app/index.html`
-1. Copy over `app/config.sample.js` -> `app/config.js` to specify API URL
-1. `npm run build` to generate required assets/files for application initialization.
+  1. Copy `app/index.sample.html` -> `app/index.html`
+  1. copy over `app/config.sample.js` -> `app/config.js` to specify API URL
+  1. `npm i` to install all dependencies.
+  1. `npm run build` to generate required assets/files for application initialization.
+
+  > Note : It is important to
+  >
+  > - change the directory permissions accessible for everyone(`chmod 777`)
+  >   or
+  > - maintain the repo at `Users/<user-name>/<repo-anme>` path
+
+- Apache Server Configuration
+
+  1.  Add the checkout.local to loopback address in hosts configuration using `sudo nano /etc/hosts`
+      The configuration should look like
+      ```sh
+      127.0.0.1	localhost checkout.local
+      255.255.255.255	broadcasthost
+      ::1             localhost
+      ```
+  1.  Set up apache vhost using `httpd.sample.conf` maintaining `app` folder as web root.
+      Use the following command to access the `httpd.conf`
+      `sh sudo nano /private/etc/apache2/httpd.conf`
+      Add following lines to the config,
+
+          ```sh
+          <Directory "<full-path-to-repo>">
+            AllowOverride None
+            Require all granted
+          </Directory>
+
+          <VirtualHost *:80>
+            ServerName checkout.local
+            # paste configuration parameters from httpd.sample.conf
+            SSLProxyEngine On
+            ProxyPass #ProxyPass Config
+            ProxyPassReverse #ProxyPassReverse Config
+            Header edit Set-Cookie #Cookie Config
+
+            Header set Access-Control-Allow-Origin: *
+            DocumentRoot "<full-path-to-repo>/app"
+          </VirtualHost>
+          ```
+          >Note : This configuration can also be added to `/private/etc/apache2/extra/httpd-vhosts.conf` if a separate vhost config is being maintained.
+
+- Running local server
+
+  - Apache Server
+    1. `sudo apachectl start` to start the apache server.
+    1. `sudo apachectl restart` to restart the apache server.
+    1. `sudo apachectl stop` to stop the apache server.
+  - Running Repo App
+    1. `npm i`
+    1. `npm start` for watching while development
+    1. `npm run build` for production build
+
+  [This](https://github.com/razorpay/armory/tree/master/checkout-utils/mock-api) project can be used as mock-server for development purpose.
+
+## Standalone Setup
+
+Standalone application runs on node server in development environment.
+
+- Repository Configuration
+
+  1. Copy `app/index.sample.html` -> `app/index.html`
+  1. Copy over `app/config.sample.js` -> `app/config.js` to specify API URL
+  1. `npm run build` to generate required assets/files for application initialization.
 
 - Running Application
 
-1. `npm run dev-start` to start development server with mock-api configuration.
-1. `npm run live-start` to start development server with live(test) api configuration.
-1. `npm run build` for production build
+  1. `npm run dev-start` to start development server with mock-api configuration.
+  1. `npm run live-start` to start development server with live(test) api configuration.
+  1. `npm run build` for production build
 
 > Note: Run `npm run build` to generate required assets/files for application initialization (if any errors faced in dev server setup).
 
