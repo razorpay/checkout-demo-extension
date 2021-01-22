@@ -1,12 +1,9 @@
 import Analytics from 'analytics';
 
+const sessionStartTime = new Date().getTime();
+
 const getTimeSinceOpen = () => {
-  // 40 because it causes a score diff of 0
-  let time = 40;
-  // timeSince.open is not a function -- check why that's happening
-  if (Analytics.getMeta().timeSince && Analytics.getMeta().timeSince.open) {
-    time = Analytics.getMeta().timeSince.open() / 1000;
-  }
+  const time = (new Date().getTime() - sessionStartTime) / 1000;
   return time;
 };
 
