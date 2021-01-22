@@ -14,17 +14,19 @@ const score = {
   under40Sec: 3,
   timeToRender: () => {
     const timeSinceOpen = getTimeSinceOpen();
-    if (timeSinceOpen <= 2800) {
-      return 2;
+    if (timeSinceOpen > 6000) {
+      return -5;
     }
     if (timeSinceOpen > 4000) {
-      return -1;
+      return -2;
+    }
+    if (timeSinceOpen <= 2800) {
+      return 2;
     }
   },
   clickOnSubmitWithoutDetails: -2,
   more60Sec: -1,
-  timeToRender4s: -1,
-  failedPayment: -3,
+  failedPayment: -5,
   cancelledPayment: -3,
   wentBack: -1,
   saveThisVpa: 1.5,
@@ -34,17 +36,17 @@ const score = {
   loggedInUser: 1,
   hadMethodPrefilled: 4,
   switchingTabs: ({ tabsCount }) => {
-    if (tabsCount > 3 && tabsCount <= 5) {
-      return -1;
-    }
-    if (tabsCount > 5 && tabsCount <= 7) {
-      return -1.5;
-    }
-    if (tabsCount > 7 && tabsCount <= 9) {
-      return -2;
-    }
     if (tabsCount > 9) {
       return -3;
+    }
+    if (tabsCount > 7) {
+      return -2;
+    }
+    if (tabsCount > 5) {
+      return -1.5;
+    }
+    if (tabsCount > 3) {
+      return -1;
     }
   },
   timeToSubmit: () => {
