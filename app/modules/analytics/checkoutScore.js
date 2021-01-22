@@ -36,17 +36,17 @@ const score = {
   loggedInUser: 1,
   hadMethodPrefilled: 4,
   switchingTabs: ({ tabsCount }) => {
-    if (tabsCount > 11) {
-      return -3;
-    }
-    if (tabsCount > 9) {
+    if (tabsCount > 20) {
       return -2;
     }
-    if (tabsCount > 7) {
+    if (tabsCount > 15) {
       return -1.5;
     }
-    if (tabsCount > 5) {
+    if (tabsCount > 10) {
       return -1;
+    }
+    if (tabsCount > 5) {
+      return -0.5;
     }
   },
   timeToSubmit: () => {
