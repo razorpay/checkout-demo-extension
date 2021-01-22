@@ -28,7 +28,7 @@ const score = {
   more60Sec: -1,
   failedPayment: -5,
   cancelledPayment: -3,
-  wentBack: -1,
+  wentBack: -0.5,
   saveThisVpa: 1.5,
   paidViaSavedVpa: 2,
   vpaPrefilled: 3,
@@ -36,21 +36,21 @@ const score = {
   loggedInUser: 1,
   hadMethodPrefilled: 4,
   switchingTabs: ({ tabsCount }) => {
-    if (tabsCount > 9) {
+    if (tabsCount > 11) {
       return -3;
     }
-    if (tabsCount > 7) {
+    if (tabsCount > 9) {
       return -2;
     }
-    if (tabsCount > 5) {
+    if (tabsCount > 7) {
       return -1.5;
     }
-    if (tabsCount > 3) {
+    if (tabsCount > 5) {
       return -1;
     }
   },
   timeToSubmit: () => {
-    const timeSinceOpen = getTimeSinceOpen();
+    const timeSinceOpen = getTimeSinceOpen() / 1000;
     if (timeSinceOpen < 20) {
       return 5;
     }
@@ -72,7 +72,7 @@ const score = {
     return 0;
   },
   instrumentSelected: function() {
-    const timeSinceOpen = getTimeSinceOpen();
+    const timeSinceOpen = getTimeSinceOpen() / 1000;
     if (timeSinceOpen < 5) {
       return 5;
     }
@@ -113,7 +113,7 @@ const reasons = {
   failedPayment: 'Failed Payment',
   cancelledPayment: 'Cancelled Payment',
   loggedInUser: 'User was logged in',
-  timeToSubmit: () => `Time taken to submit - ${getTimeSinceOpen()}`,
+  timeToSubmit: () => `Time taken to submit - ${getTimeSinceOpen() / 1000}`,
   wentBack: 'Back',
   saveThisVpa: 'Chose to save vpa in payment',
   paidViaSavedVpa: 'Used a saved vpa',
