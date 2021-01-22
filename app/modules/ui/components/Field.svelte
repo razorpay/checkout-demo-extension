@@ -52,6 +52,20 @@
   let dropdownRef = null;
   let dropdownArrowIndex = -1;
   let mainInputScrollLeft = 0;
+  let dropDownPosition = {
+    left: 'auto',
+    right: 'auto',
+  };
+
+  $: {
+    if (readonlyValue) {
+      const estimateWidth = 7 * readonlyValue.length;
+      dropDownPosition = {
+        left: estimateWidth > 180 ? 'auto' : estimateWidth,
+        right: estimateWidth > 180 ? '0' : 'auto',
+      };
+    }
+  }
 
   $: isPredictionEnable = typeof prediction === 'function';
 
@@ -358,7 +372,10 @@
     <div class="help">{helpText}</div>
   {/if}
   {#if showDropdownPredictions && dropDownSuggestion?.length > 0}
-    <ul bind:this={dropdownRef} class="suggestion-dropdown">
+    <ul
+      style={`left: ${dropDownPosition.left}px; right: ${dropDownPosition.right}px;`}
+      bind:this={dropdownRef}
+      class="suggestion-dropdown">
       {#each dropDownSuggestion as suggestion, index (suggestion)}
         <li
           class:hover={dropdownArrowIndex === index}

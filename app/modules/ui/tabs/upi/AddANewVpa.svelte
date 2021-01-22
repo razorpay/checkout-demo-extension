@@ -13,7 +13,7 @@
 
   // Util imports
   import { getSession } from 'sessionmanager';
-  import { hasFeature, getPrefilledVPA } from 'checkoutstore';
+  import { hasFeature, getPrefilledVPA, getPrefilledName } from 'checkoutstore';
   import { VPA_REGEX } from 'common/constants';
   import { getAnimationOptions } from 'svelte-utils';
 
@@ -206,9 +206,16 @@
           {pattern}
           prediction={currentVaue => {
             const phoneInput = $phone;
+            const prefillName = getPrefilledName() || '';
             const atIndex = currentVaue.indexOf('@');
             if (currentVaue?.length > 1 && phoneInput && phoneInput.startsWith(currentVaue) && atIndex === -1) {
               return phoneInput;
+            }
+            if (currentVaue?.length > 1 && prefillName && prefillName
+                ?.toLowerCase()
+                ?.startsWith(currentVaue) && atIndex === -1) {
+              // handle mismatch case of suggestion and input
+              return currentVaue + prefillName.substr(currentVaue.length);
             }
             if (currentVaue.length > 2 && currentVaue.includes('@') && atIndex < currentVaue.length - 1) {
               const predictionInput = currentVaue.substr(atIndex + 1);
