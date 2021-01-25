@@ -28,6 +28,7 @@
   export let isFirst = true;
   export let contact = '';
   export let focusOnCreate = false;
+  export let value = '';
 
   // Refs
   export let phoneField = null;
@@ -57,10 +58,6 @@
     dispatch('select', {
       type: 'phone',
     });
-  }
-
-  export function getPhone() {
-    return phoneField.getValue();
   }
 
   export function focus() {
@@ -136,6 +133,7 @@
           bind:this={phoneField}
           on:blur
           value={contact}
+          bind:readonlyValue={value}
           placeholder={$t(OMNI_ENTER_NUMBER)} />
       </div>
     {/if}

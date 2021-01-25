@@ -9,6 +9,7 @@
   import Icon from 'ui/elements/Icon.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import Checkbox from 'ui/elements/Checkbox.svelte';
+  import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
 
   // Util imports
   import { getSession } from 'sessionmanager';
@@ -32,6 +33,8 @@
   export let customer;
   export let paymentMethod = 'upi';
   export let recurring = false;
+  export let value = '';
+  export let rememberVpa = true;
 
   // Refs
   export let vpaField = null;
@@ -44,7 +47,6 @@
 
   // Computed
   export let pattern;
-  let rememberVpa = true;
   let newVpa = getPrefilledVPA();
   let vpa;
   let pspHandle;
@@ -59,20 +61,12 @@
     }
   });
 
-  export function getVpa() {
-    const vpa = vpaField.getValue();
+  function handleVpaInput() {
     if (isVpaValid(vpa) || !pspHandle) {
-      return vpa;
+      value = vpa;
+    } else {
+      value = `${vpa}@${pspHandle}`;
     }
-    return `${vpa}@${pspHandle}`;
-  }
-
-  export function shouldRememberVpa() {
-    return _Obj.getSafely(customer, 'logged') &&
-      hasFeature('save_vpa') &&
-      rememberVpa
-      ? 1
-      : 0;
   }
 
   export function blur() {
@@ -137,6 +131,12 @@
   div[slot='body'] {
     margin-top: 5px;
   }
+
+  .less-focus-smaller {
+    font-size: 12px;
+    line-height: 16px;
+    color: rgba(81, 89, 120, 0.7);
+  }
 </style>
 
 <SlottedRadioOption
@@ -153,9 +153,11 @@
     {logged && canSaveVpa ? $t(NEW_VPA_TITLE_LOGGED_IN) : $t(NEW_VPA_TITLE_LOGGED_OUT)}
   </div>
   <!-- LABEL: Google Pay, BHIM, PhonePe & more -->
-  <div slot="subtitle">
+  <div
+    slot="subtitle"
+    class:less-focus-smaller={paymentMethod === 'upi_otm' || recurring}>
     {#if paymentMethod === 'upi_otm' || recurring}
-      {$t(NEW_VPA_SUBTITLE_UPI_OTM)}
+      <FormattedText text={$t(NEW_VPA_SUBTITLE_UPI_OTM)} />
     {:else}{$t(NEW_VPA_SUBTITLE)}{/if}
   </div>
   <i slot="icon" class="top">
@@ -177,8 +179,9 @@
           name={'vpa-' + paymentMethod}
           type="text"
           required
-          bind:value={newVpa}
           bind:this={vpaField}
+          bind:readonlyValue={vpa}
+          on:input={handleVpaInput}
           on:blur
           placeholder={$t(UPI_COLLECT_ENTER_ID)} />
         {#if logged && canSaveVpa}

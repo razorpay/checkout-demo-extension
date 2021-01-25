@@ -178,6 +178,25 @@ var razorpayPayment = (Razorpay.payment = {
       },
     });
   },
+
+  getRewards: function(data, callback) {
+    const rewardsApiTimer = _.timer();
+    Analytics.track('rewards:start', {
+      type: AnalyticsTypes.METRIC,
+    });
+
+    return fetch({
+      url: _.appendParamsToUrl(makeUrl('checkout/rewards'), data),
+
+      callback: function(response) {
+        Analytics.track('rewards:end', {
+          type: AnalyticsTypes.METRIC,
+          data: { time: rewardsApiTimer() },
+        });
+        callback(response);
+      },
+    });
+  },
 });
 
 function base_configure(overrides) {

@@ -81,7 +81,7 @@
   }
 
   function getDetailsForAppInstrument(instrument, locale) {
-    const provider = getAppProvider(individualInstrument.provider);
+    const provider = getAppProvider(instrument.provider);
     const providerName = getAppProviderName(provider.code, locale);
     return {
       title: getInstrumentTitle('app', providerName, locale),
@@ -100,18 +100,18 @@
   function getDetailsForNetbankingInstrument(instrument, locale) {
     const banks = getBanks();
     const bankName = getLongBankName(
-      individualInstrument.bank,
+      instrument.bank,
       locale,
       banks[instrument.bank]
     );
     return {
       title: getInstrumentTitle('netbanking', bankName, locale),
-      icon: getBankLogo(individualInstrument.bank),
+      icon: getBankLogo(instrument.bank),
     };
   }
 
   function getDetailsForWalletInstrument(instrument, locale) {
-    const wallet = getWallet(individualInstrument.wallet);
+    const wallet = getWallet(instrument.wallet);
     const walletName = getWalletName(wallet.code, locale);
     return {
       title: getInstrumentTitle('wallet', walletName, locale),
@@ -122,13 +122,13 @@
   function getDetailsForUpiInstrument(instrument, locale) {
     // TODO: simplify
     let title, icon;
-    if (individualInstrument.flow === 'qr') {
+    if (instrument.flow === 'qr') {
       title = getInstrumentTitle('upiqr', null, locale);
       icon = session.themeMeta.icons['qr'];
-    } else if (individualInstrument.flow === 'intent') {
+    } else if (instrument.flow === 'intent') {
       const app = _Arr.find(
         getUPIIntentApps().all,
-        app => app.package_name === individualInstrument.app
+        app => app.package_name === instrument.app
       );
 
       // In case of ios, app name might be missing if not sent by the sdk
@@ -149,7 +149,7 @@
     } else {
       title = getInstrumentTitle(
         'upi',
-        getVpaFromInstrument(individualInstrument),
+        getVpaFromInstrument(instrument),
         locale
       );
       icon = '&#xe70e;';
@@ -162,20 +162,20 @@
   }
 
   function getDetailsForCardlessEmiInstrument(instrument, locale) {
-    const provider = getCardlessEmiProvider(individualInstrument.provider);
+    const provider = getCardlessEmiProvider(instrument.provider);
     let providerCode = provider.code;
     if (providerCode === 'cards' && isDebitEMIEnabled()) {
       providerCode = 'credit_debit_cards';
     }
     const providerName = getCardlessEmiProviderName(providerCode, locale);
     return {
-      title: getInstrumentTitle('emi', providerName, locale),
+      title: getInstrumentTitle('cardless_emi', providerName, locale),
       icon: provider.sqLogo,
     };
   }
 
   function getDetailsForPayLaterInstrument(instrument, locale) {
-    const provider = getPaylaterProvider(individualInstrument.provider);
+    const provider = getPaylaterProvider(instrument.provider);
     const providerName = getPaylaterProviderName(provider.code, locale);
     return {
       title: getInstrumentTitle('paylater', providerName, locale),
@@ -184,7 +184,7 @@
   }
 
   function getDetailsForInstrument(instrument, locale) {
-    switch (individualInstrument.method) {
+    switch (instrument.method) {
       case 'paypal':
         return getDetailsForPaypalInstrument(instrument, locale);
 

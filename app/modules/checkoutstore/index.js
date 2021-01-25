@@ -34,6 +34,10 @@ export const getMethodsCustomText = () => getMerchantMethods().custom_text;
 export const getMerchantOrder = () => preferences.order;
 export const getOrderMethod = () => getMerchantOrder()?.method;
 export const getMerchantOffers = () => {
+  // Ignore all offers ( including forced offers ) in case of partial payments.
+  if (isPartialPayment()) {
+    return [];
+  }
   // Temporary fix: If customer-feebearer do not show any offers to the user.
   if (preferences.fee_bearer && preferences.force_offer) {
     return preferences.offers;
@@ -47,6 +51,12 @@ export const isOfferForced = () => preferences.force_offer;
 export const getDowntimes = () => _getDowntimes(preferences);
 export const isCustomerFeeBearer = () => preferences.fee_bearer;
 export const getCheckoutConfig = () => preferences.checkout_config;
+export const getOrgDetails = () => preferences.org;
+export const getLanguageCodeFromPrefs = () => preferences.language_code;
+export const getLanguageCodeFromOptions = () =>
+  getConfigFromOptions().display?.language;
+export const getLanguageCode = () =>
+  getLanguageCodeFromOptions() || getLanguageCodeFromPrefs();
 
 const optionGetter = option => () => getOption(option);
 export const getOption = option => razorpayInstance.get(option);

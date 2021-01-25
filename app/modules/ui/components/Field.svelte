@@ -38,6 +38,7 @@
   export let spellcheck = 'false';
   export let autocorrect = 'off';
   export let autocapitalize = 'off';
+  export let readonlyValue = value;
 
   // Computed
   let identifier;
@@ -105,6 +106,10 @@
     } else {
       placeholderToShow = placeholder;
     }
+  }
+
+  function handleInputEvent(e) {
+    readonlyValue = e.target.value;
   }
 
   function handleInputFocus(event) {
@@ -179,6 +184,7 @@
     use:inputAction={handleInput}
     on:focus={handleInputFocus}
     on:blur={handleInputBlur}
+    on:input={handleInputEvent}
     on:focus
     on:blur
     on:input

@@ -94,6 +94,40 @@ async function handleMockFailureDialog(context) {
   });
 }
 
+async function popupClosedByUser(context) {
+  let popup = await context.popup();
+  await popup.page.close();
+}
+
+async function provideCancellationReason(context, method) {
+  await delay(500);
+  const reasonOther = await context.page.$(
+    '#cancel_' + method + ' input[value=other]'
+  );
+  await reasonOther.click();
+  const submitCancellationReasonButton = await context.page.$(
+    '#cancel_netbanking button.btn'
+  );
+  await submitCancellationReasonButton.click();
+  await respondToCancellationRequest(context);
+}
+
+async function respondToCancellationRequest(context) {
+  const reqorg = await context.expectRequest();
+  expect(reqorg.url).toContain('/cancel');
+  expect(reqorg.method).toEqual('GET');
+  await context.respondJSON({
+    error: {
+      code: 'BAD_REQUEST_ERROR',
+      description: 'Payment processing cancelled by user',
+      source: 'customer',
+      step: 'payment_authentication',
+      reason: 'payment_cancelled',
+      metadata: { payment_id: 'pay_FdfZ3QnaBCid1G' },
+    },
+  });
+}
+
 async function handleMockSuccessDialog(context) {
   let popup = await context.popup();
   await popup.callback({ razorpay_payment_id: 'pay_123465' });
@@ -213,4 +247,6 @@ module.exports = {
   submit,
   respondAndVerifyIntentRequest,
   retryTransaction,
+  popupClosedByUser,
+  provideCancellationReason,
 };

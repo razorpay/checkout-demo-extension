@@ -144,6 +144,10 @@ async function selectUPIMethod(context, UPIMethod, upiPaymentType = 'upi') {
   });
 }
 
+async function selectUPIPspBank(context) {
+  return await context.page.click('#upi-psp-bank-icic');
+}
+
 async function enterUPIAccount(context, UPIAccountId, upiPaymentType = 'upi') {
   const vpaField = await context.page.waitForSelector('#vpa-' + upiPaymentType);
   await vpaField.type(UPIAccountId);
@@ -181,4 +185,5 @@ module.exports = {
   respondToUPIAjaxWithFailure,
   handleSaveVpaRequest,
   handleSavedTokenValidation,
+  selectUPIPspBank,
 };

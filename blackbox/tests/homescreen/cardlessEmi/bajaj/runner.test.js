@@ -9,8 +9,4 @@ testRunner
     'partialPayment',
   ])
   .setExemptedTestCombinations([['callbackUrl', 'optionalContact']])
-  .runOn(testFeatures =>
-    createCardlessEMITest(
-      Object.assign({}, testFeatures, { provider: 'bajaj' })
-    )
-  );
+  .runOn(createCardlessEMITest, { provider: 'bajaj' });
