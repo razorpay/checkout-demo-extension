@@ -7,7 +7,7 @@ import ApiDowntimeBanner from 'ui/elements/ApiDowntimeBanner.svelte';
  */
 export default function showDowntimeBanner() {
   const banner = new ApiDowntimeBanner({
-    target: _Doc.querySelector('#modal-inner'),
+    target: _Doc.querySelector('#form-fields'),
   });
   return banner;
 }
