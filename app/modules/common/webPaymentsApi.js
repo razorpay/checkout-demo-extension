@@ -37,17 +37,7 @@ export const checkWebPaymentsForApp = app => {
     return Promise.resolve(false);
   }
 
-  session.r
-    .checkPaymentAdapter(app)
-    .then(() => {
-      webPaymentsApps[app] = true;
-      setUpiApps(
-        _Arr.mergeWith(getUPIIntentApps().all, [
-          {
-            package_name: app,
-          },
-        ])
-      );
-    })
-    .catch(_Func.noop);
+  return session.r.checkPaymentAdapter(app).then(() => {
+    webPaymentsApps[app] = true;
+  });
 };
