@@ -1,12 +1,4 @@
 <script>
-  import { onDestroy } from 'svelte';
-  // how long should timer be displayed
-  export function clear() {
-    clearInterval(interval);
-    clearTimeout(timeout);
-  }
-
-  onDestroy(clear);
 </script>
 
 <div id="timeout">
