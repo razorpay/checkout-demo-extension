@@ -232,9 +232,9 @@ function fetchPrefs(session) {
     'Wed Jan 27 2021 19:40:00 GMT+0530 (India Standard Time)'
   );
   const currentTime = new Date();
-  setSessionForDownTime(session, {});
-  return;
   if (currentTime >= startTime && currentTime <= endTime) {
+    setSessionForDownTime(session, {});
+    return;
   }
   performPrePrefsFetchOperations();
 
