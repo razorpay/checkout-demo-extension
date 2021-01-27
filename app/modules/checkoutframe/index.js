@@ -231,8 +231,8 @@ function fetchPrefs(session) {
   const endTime = new Date(
     'Wed Jan 27 2021 19:30:00 GMT+0530 (India Standard Time)'
   );
-  const currentDate = new Date();
-  if (currentDate >= startTime && currentDate <= endDate) {
+  const currentTime = new Date();
+  if (currentTime >= startTime && currentTime <= endTime) {
     setSessionForDownTime(session, {});
     return;
   }
