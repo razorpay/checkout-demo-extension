@@ -53,7 +53,7 @@
     'https://cdn.razorpay.com/static/assets/secured_by_razorpay.svg';
 
   onMount(() => {
-    if (bank_name === 'HDFC' || !ifsc.startsWith('HDFC')) {
+    if (bank_name.startsWith('HDFC') || ifsc.startsWith('HDFC')) {
       org_logo = 'https://cdn.razorpay.com/bank/HDFC.gif';
     }
     if (!merchant_logo) {
