@@ -196,9 +196,6 @@ export function isStrictlyRecurring() {
 }
 
 export function shouldRememberCustomer() {
-  if (isRecurring()) {
-    return true;
-  }
   if (!navigator.cookieEnabled) {
     return false;
   }
