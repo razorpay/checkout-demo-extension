@@ -341,8 +341,7 @@ function markRelevantPreferencesPayload(prefData) {
 
 function getPreferenecsParams(razorpayInstance) {
   const prefData = makePrefParams(razorpayInstance);
-  // Do not send personalisation for now
-  // prefData.personalisation = 1;
+  prefData.personalisation = 1;
   if (cookieDisabled) {
     prefData.checkcookie = 0;
   } else {
