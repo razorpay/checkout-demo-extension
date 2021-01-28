@@ -95,11 +95,8 @@
       }
     }, 200);
   }
-
   const canSaveVpa = hasFeature('save_vpa') && shouldRememberCustomer('upi');
-
   let logged;
-
   $: logged = _Obj.getSafely(customer, 'logged');
 
   $: pattern = PATTERN_WITH_HANDLE;
