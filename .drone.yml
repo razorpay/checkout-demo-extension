@@ -4,7 +4,7 @@ pipeline:
     when:
       event:
         exclude: [deployment]
-        include: [custom]
+        include: [push]
   build:
     image: plugins/docker
     repo: razorpay/checkout
@@ -23,7 +23,7 @@ pipeline:
       status: [success]
       event:
         exclude: [deployment]
-        include: [custom]
+        include: [push]
   deploy-stage:
     image: razorpay/drone-kubernetes
     pull: true
@@ -117,4 +117,4 @@ pipeline:
     when:
       event:
         exclude: [deployment]
-        include: [custom]
+        include: [push]
