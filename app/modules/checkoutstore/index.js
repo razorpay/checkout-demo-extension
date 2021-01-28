@@ -195,11 +195,15 @@ export function isStrictlyRecurring() {
   return isRecurring() && getOption('recurring') !== 'preferred';
 }
 
-export function shouldRememberCustomer() {
+export function shouldRememberCustomer(method = 'card') {
   if (!navigator.cookieEnabled) {
     return false;
   }
-  if (!getOption('features.cardsaving')) {
+  if (method === 'card' && !getOption('features.cardsaving')) {
+    return false;
+  }
+
+  if (method === 'upi' && !getOption('features.save_vpa')) {
     return false;
   }
 

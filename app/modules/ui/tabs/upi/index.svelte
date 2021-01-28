@@ -12,6 +12,7 @@
     hasFeature,
     isCustomerFeeBearer,
     getMerchantOrder,
+    shouldRememberCustomer,
   } from 'checkoutstore';
   import {
     isMethodEnabled,
@@ -112,7 +113,7 @@
   let shouldShowCollect;
   let shouldShowOmnichannel;
   let vpaEntered;
-  let rememberVpa = true;
+  let rememberVpa = shouldRememberCustomer('upi');
   let omnichannelPhone = '';
 
   let disabled = false;

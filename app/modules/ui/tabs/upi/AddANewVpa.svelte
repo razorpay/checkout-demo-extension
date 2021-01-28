@@ -13,7 +13,11 @@
 
   // Util imports
   import { getSession } from 'sessionmanager';
-  import { hasFeature, getPrefilledVPA } from 'checkoutstore';
+  import {
+    hasFeature,
+    getPrefilledVPA,
+    shouldRememberCustomer,
+  } from 'checkoutstore';
   import { VPA_REGEX } from 'common/constants';
   import { getAnimationOptions } from 'svelte-utils';
 
@@ -92,7 +96,7 @@
     }, 200);
   }
 
-  const canSaveVpa = hasFeature('save_vpa');
+  const canSaveVpa = hasFeature('save_vpa') && shouldRememberCustomer('upi');
 
   let logged;
 
