@@ -273,7 +273,13 @@
           <!-- LABEL: Total Amount: {formattedFinalAmount} ({formattedAmountPerMonth} x {plan.duration}) -->
           <li>
             <div>
-              <span>{$t(DESCRIPTION_TOTAL_AMOUNT)}</span>
+              <span>
+                {$t(DESCRIPTION_TOTAL_AMOUNT)}
+                ({formattedAmountPerMonth}
+                x
+                {plan.duration}
+                )
+              </span>
               <span>{formattedFinalAmount}</span>
             </div>
           </li>
