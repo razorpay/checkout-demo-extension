@@ -17,6 +17,9 @@ const badges_text = {
   GUHRJkzqlJHB95: {
     list: getList('2000+', '9 months', '8 months'),
   },
+  CQb8Hvj0vXJHqR: {
+    list: getList('2000+', '10 months', '9 months'),
+  },
   '10000000000000': {
     list: getList('2000+', '9 months', '8 months'),
   },
