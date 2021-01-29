@@ -108,6 +108,10 @@ export function isPayout() {
   return getOption('payout');
 }
 
+export function isBlockedDeactivated() {
+  return preferences.blocked || !preferences.activated;
+}
+
 export function isAddressEnabled() {
   return hasFeature('customer_address', false);
 }
