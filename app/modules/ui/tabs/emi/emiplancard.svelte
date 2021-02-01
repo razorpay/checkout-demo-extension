@@ -59,7 +59,7 @@
 
   let interestChargedByBank;
 
-  let zestMoneyFakeEmiOffer = null;
+  let zestMoneyForcedEmiOffer = null;
 
   const session = getSession();
   const AXIS_BANK_CODE = 'UTIB';
@@ -68,7 +68,7 @@
   const HDFC_BANK_DEBIT_CODE = 'HDFC_DC';
 
   $: {
-    zestMoneyFakeEmiOffer = provider === 'zestmoney' && plan.duration === 3;
+    zestMoneyForcedEmiOffer = provider === 'zestmoney' && plan.duration === 3;
   }
 
   $: {
@@ -113,7 +113,7 @@
   }
 
   $: {
-    noCostEmi = plan.subvention === 'merchant' || zestMoneyFakeEmiOffer;
+    noCostEmi = plan.subvention === 'merchant' || zestMoneyForcedEmiOffer;
     if (noCostEmi && plan.merchant_payback) {
       interestChargedByBank = session.formatAmountWithCurrency(
         amount / (1 - plan.merchant_payback / 100) - amount
@@ -192,7 +192,7 @@
   </div>
   <div slot="detail">
     {#if showEducation}
-      {#if noCostEmi && !zestMoneyFakeEmiOffer}
+      {#if noCostEmi && !zestMoneyForcedEmiOffer}
         <ul class="nocost">
           <li>
             <!-- LABEL: Interest charged by the bank -->
@@ -293,7 +293,7 @@
           </div>
         {/if}
       {/if}
-      {#if noCostEmi && !zestMoneyFakeEmiOffer}
+      {#if noCostEmi && !zestMoneyForcedEmiOffer}
         <!-- LABEL: + How does it work? -->
         <div class="theme-highlight how-it-works" on:click={explain}>
           {$t(NO_COST_EXPLAIN_ACTION)}
