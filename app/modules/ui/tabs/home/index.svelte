@@ -956,7 +956,7 @@
           in:slide={getAnimationOptions({ duration: 400 })}
           out:fly={getAnimationOptions({ duration: 200, y: 80 })}>
           {#if trustedBadgeHighlights}
-            <TrustedBadge list={trustedBadgeHighlights} />
+            <TrustedBadge nos={trustedBadgeHighlights} />
           {/if}
           {#if showUserDetailsStrip || isPartialPayment}
             <div
