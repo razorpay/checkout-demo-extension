@@ -203,10 +203,6 @@ export function shouldRememberCustomer(method = 'card') {
     return false;
   }
 
-  if (method === 'upi' && !getOption('features.save_vpa')) {
-    return false;
-  }
-
   // if merchant passed options.remember_customer as true,
   // that take precedence over optional contact
   // it should not be the case

@@ -44,7 +44,6 @@ function makeTestOptions({
 
   if (recurringOrder) {
     options.recurring = 1;
-    options.remember_customer = true;
   }
 
   if (timeout) {
