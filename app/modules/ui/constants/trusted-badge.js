@@ -1,25 +1,33 @@
 const badges_text = {
   FjZg37JOiJDI0K: {
-    list: { customersNo: '50+', securedMonths: '3', noFraudTime: '3' },
+    list: getList('50+', '3', '3'),
   },
   FnsHdtMjq1a7j7: {
-    list: { customersNo: '150+', securedMonths: '3', noFraudTime: '3' },
+    list: getList('150+', '3', '3'),
   },
   FhZlzY1EMcTImZ: {
-    list: { customersNo: '300+', securedMonths: '3', noFraudTime: '3' },
+    list: getList('300+', '3', '3'),
   },
   FFsK7Ojsv5B8cb: {
-    list: { customersNo: '400+', securedMonths: '4', noFraudTime: '4' },
+    list: getList('400+', '4', '4'),
   },
   CDa7YMwXiWqCZz: {
-    list: { customersNo: '600+', securedMonths: '20', noFraudTime: '20' },
+    list: getList('600+', '20', '20'),
   },
   GUHRJkzqlJHB95: {
-    list: { customersNo: '2000+', securedMonths: '9', noFraudTime: '8' },
+    list: getList('2000+', '9', '8'),
   },
   '10000000000000': {
-    list: { customersNo: '2000+', securedMonths: '9', noFraudTime: '8' },
+    list: getList('2000+', '9', '8'),
   },
 };
+
+function getList(customersNo, securedMonths, noFraudTime) {
+  return {
+    customersNo,
+    securedMonths,
+    noFraudTime,
+  };
+}
 
 export default badges_text;
