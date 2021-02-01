@@ -35,7 +35,7 @@
 
     valid = isValid;
     if (!valid) {
-      _El.keepClass(event.target.parentNode, 'invalid', !valid);
+      event.target.parentNode.classList.add('invalid');
     } else {
       event.target.parentNode.classList.remove('invalid');
     }
