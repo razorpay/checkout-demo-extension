@@ -215,6 +215,10 @@ export function transformInstrumentToStorageFormat(instrument, data = {}) {
 }
 
 export function trackP13nMeta(data) {
+  // sanity checkout for missing data
+  if (!data) {
+    return;
+  }
   const eventData = [];
   _Obj.loop(
     data,

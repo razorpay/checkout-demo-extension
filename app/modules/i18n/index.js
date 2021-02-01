@@ -1,3 +1,5 @@
+import Analytics from 'analytics';
+
 import { dictionary, t, locale } from 'svelte-i18n';
 
 import { get } from 'svelte/store';
@@ -29,7 +31,19 @@ export function getBundle(locale) {
  * @returns {string}
  */
 export function formatTemplateWithLocale(label, data, locale, defaultValue) {
-  return get(t)(label, { locale, values: data, default: defaultValue });
+  try {
+    return get(t)(label, { locale, values: data, default: defaultValue });
+  } catch (e) {
+    Analytics.track('i18n:template:error', {
+      data: {
+        message: e.message,
+        label,
+        locale,
+        data,
+      },
+    });
+    return defaultValue || label;
+  }
 }
 
 /**
@@ -40,6 +54,17 @@ export function formatTemplateWithLocale(label, data, locale, defaultValue) {
  * @returns {string}
  */
 export function formatMessageWithLocale(label, locale, defaultValue) {
+  return get(t)(label, { locale, default: defaultValue });
+}
+
+/**
+ * Formats the message with the current locale
+ * @param {string} label
+ * @param {string} [defaultValue]
+ * @returns {string}
+ */
+export function format(label, defaultValue) {
+  const locale = getCurrentLocale();
   return get(t)(label, { locale, default: defaultValue });
 }
 
@@ -198,6 +223,16 @@ export function getShortBankName(bankCode, locale) {
 }
 
 /**
+ * Returns the translated labels for popup
+ * @param {string} label
+ * @param {Object} data
+ * @returns {string}
+ */
+export function translatePaymentPopup(label, data = {}) {
+  return formatTemplateWithLocale(`popup.${label}`, data, getCurrentLocale());
+}
+
+/**
  * Returns the tab title for the given locale
  * @param {string} tab
  * @param {string} locale
@@ -239,4 +274,20 @@ export function getOtpScreenMiscText(key, data, locale) {
  */
 export function getEmiIssuerName(issuer, locale, defaultValue) {
   return formatMessageWithLocale(`emi_issuers.${issuer}`, locale, defaultValue);
+}
+
+/**
+ * Translates error description that is returned from API. Falls back to the
+ * passed description if a translation is not available.
+ *
+ * @param {string} description
+ * @param {string} locale
+ * @return {string}
+ */
+export function translateErrorDescription(description, locale) {
+  return formatMessageWithLocale(
+    `errors.descriptions.${description}`,
+    locale,
+    description
+  );
 }

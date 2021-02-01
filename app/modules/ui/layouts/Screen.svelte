@@ -65,6 +65,7 @@
     flex-direction: column;
     height: 100%;
     overflow: auto;
+    position: relative;
   }
 
   // @TODO

@@ -201,7 +201,7 @@ color: `=c`;
 }
 
 
-/** Start: Styles for borders for a list of items */
+/** Start: Styles for borders for a vertical list of items */
 
 .border-list > *:first-child {
   border-top-left-radius: 2px;
@@ -230,6 +230,51 @@ color: `=c`;
 .border-list > *:focus-within + *,
 .border-list > .selected + * {
   border-top-color: `=highlightColor`;
+}
+
+.trusted-badge-wrapper {
+  background: `=activeStateColor`
+}
+
+.trusted-badge-border-top {
+  border-top: 2px solid `=activeStateColor`
+}
+
+.arrow {
+  border: solid `=backgroundColor`
+}
+
+/** End */
+
+/** Start: Styles for borders for a horizontal list of items */
+
+.border-list-horizontal > *:first-child {
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
+}
+
+.border-list-horizontal > *:last-child {
+  border-bottom-right-radius: 2px;
+  border-top-right-radius: 2px;
+}
+
+.border-list-horizontal:not(.touchfix) > *:not(.uninteractive):hover:not(:disabled),
+.border-list-horizontal > *:focus,
+.border-list-horizontal > *:focus-within,
+.border-list-horizontal > .selected {
+  border-color: `=highlightColor`;
+  background-color: `=hoverStateColor`;
+}
+
+.border-list-horizontal > *:not(:last-child) {
+  border-right: none;
+}
+
+.border-list-horizontal:not(.touchfix) > *:hover:not(:disabled):not(.uninteractive) + *,
+.border-list-horizontal > *:focus + *,
+.border-list-horizontal > *:focus-within + *,
+.border-list-horizontal > .selected + * {
+  border-left-color: `=highlightColor`;
 }
 
 /** End */

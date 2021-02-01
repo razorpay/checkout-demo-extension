@@ -2,7 +2,10 @@
   import { tokenizeTextForFormatters } from './tokenizer';
 
   export let text = '';
-  const splitTextTokens = tokenizeTextForFormatters(text);
+  let splitTextTokens = [];
+  $: {
+    splitTextTokens = tokenizeTextForFormatters(text);
+  }
 </script>
 
 {#each splitTextTokens as token}

@@ -7,7 +7,12 @@
 
   // Store
   import { selectedTokenId, savedCardEmiDuration } from 'checkoutstore/emi';
-  import { selectedCard } from 'checkoutstore/screens/card';
+
+  import {
+    selectedCard,
+    currentAuthType,
+    currentCvv,
+  } from 'checkoutstore/screens/card';
 
   // Utils
   import { getSession } from 'sessionmanager';
@@ -22,9 +27,6 @@
   const session = getSession();
 
   $selectedCard = null; // Refresh selection when landing again
-
-  let currentCvv = '';
-  let currentAuthType = '';
 
   const dispatch = createEventDispatcher();
 
@@ -52,29 +54,17 @@
     });
 
     dispatch('select', { token: card });
-    currentCvv = cvv;
-    currentAuthType = authType;
+    $currentCvv = cvv;
+    $currentAuthType = authType;
     $selectedCard = card;
   }
 
   function handleCvvChange(event) {
-    currentCvv = event.detail.cvv;
+    $currentCvv = event.detail.cvv;
   }
 
   function handleAuthTypeChange(event) {
-    currentAuthType = event.detail.authType;
-  }
-
-  export function getSelectedToken() {
-    const selectedToken = $selectedCard || {};
-    const payload = { token: selectedToken.token, 'card[cvv]': currentCvv };
-    if (currentAuthType) {
-      payload.auth_type = currentAuthType;
-    }
-    if ($savedCardEmiDuration) {
-      payload.emi_duration = $savedCardEmiDuration;
-    }
-    return payload;
+    $currentAuthType = event.detail.authType;
   }
 </script>
 

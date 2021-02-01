@@ -25,7 +25,12 @@
   // Utils imports
   import { getSession } from 'sessionmanager';
 
-  import { getAmount, getCurrency, getCardCurrencies } from 'checkoutstore';
+  import {
+    getAmount,
+    getCurrency,
+    getCardCurrencies,
+    isPartialPayment,
+  } from 'checkoutstore';
 
   import { getIin, getCardDigits } from 'common/card';
 
@@ -53,7 +58,7 @@
   let currencies = null;
   let originalAmount = getAmount();
   let selectedCurrency = null;
-  let searchModal;
+  let searchModalOpen = false;
   const currencyCache = {};
 
   // Props
@@ -159,17 +164,17 @@
 
   function onSelect(currency) {
     selectedCurrency = currency;
-
-    searchModal.close();
+    searchModalOpen = false;
   }
 
   function updateAmountInHeaderAndCTA(displayAmount) {
+    const session = getSession();
     if (displayAmount) {
       showAmount(displayAmount);
-      getSession().setRawAmountInHeader(displayAmount);
-    } else {
+      session.setRawAmountInHeader(displayAmount);
+    } else if (!isPartialPayment()) {
       showCtaWithDefaultText();
-      getSession().updateAmountInHeader(originalAmount);
+      session.updateAmountInHeader(originalAmount);
     }
   }
 
@@ -229,7 +234,7 @@
   }
 
   function showCurrenciesModal() {
-    searchModal.open();
+    searchModalOpen = true;
   }
 
   function getCardByTokenId(tokenId) {
@@ -336,8 +341,8 @@
         items={sortedCurrencies}
         keys={['currency', 'name', 'symbol']}
         component={CurrencySearchItem}
-        bind:this={searchModal}
-        on:close={() => searchModal.close()}
+        bind:open={searchModalOpen}
+        on:close={() => (searchModalOpen = false)}
         on:select={({ detail }) => onSelect(detail.currency)} />
     </Stack>
   {/if}

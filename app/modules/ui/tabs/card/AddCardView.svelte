@@ -21,7 +21,12 @@
     authType,
     cardType,
     cardIin,
+    showNoCvvCheckbox,
+    noCvvChecked,
+    hideExpiryCvvFields,
+    showAuthTypeSelectionRadio,
   } from 'checkoutstore/screens/card';
+
   import { methodInstrument } from 'checkoutstore/screens/home';
 
   import {
@@ -31,7 +36,11 @@
     isStrictlyRecurring,
     getCardFeatures,
   } from 'checkoutstore';
-  import { isAMEXEnabled, getCardNetworks } from 'checkoutstore/methods';
+  import {
+    isAMEXEnabled,
+    getCardNetworks,
+    getCardNetworksForRecurring,
+  } from 'checkoutstore/methods';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -69,9 +78,6 @@
 
   const showRememberCardCheck = isSavedCardsEnabled;
 
-  let noCvvChecked = false;
-  let showNoCvvCheckbox = false;
-  let hideExpiryCvvFields = false;
   let cvvLength = 3;
   let showCardUnsupported = false;
   let lastIin = '';
@@ -89,16 +95,6 @@
       numberField.setValid(valid);
       numberField.dispatchFilledIfValid();
     }
-  }
-
-  $: {
-    if ($cardType) {
-      showNoCvvCheckbox = $cardType === 'maestro' && $cardNumber.length > 5;
-    }
-  }
-
-  $: {
-    hideExpiryCvvFields = showNoCvvCheckbox && noCvvChecked;
   }
 
   $: {
@@ -126,8 +122,6 @@
 
   export let tab;
 
-  let showAuthTypeSelectionRadio = false;
-
   function handleFilled(curField) {
     switch (curField) {
       case 'numberField':
@@ -150,33 +144,12 @@
     });
   }
 
-  export function getPayload() {
-    const payload = {
-      'card[number]': $cardNumber.replace(/ /g, ''),
-      'card[expiry]': $cardExpiry,
-      'card[cvv]': $cardCvv,
-      'card[name]': $cardName,
-    };
-    // Fill in dummy values for expiry and CVV if the CVV and expiry fields are hidden
-    if (hideExpiryCvvFields) {
-      payload['card[expiry]'] = '12 / 21';
-      payload['card[cvv]'] = '000';
-    }
-    if ($remember && isSavedCardsEnabled) {
-      payload.save = 1;
-    }
-    if (showAuthTypeSelectionRadio) {
-      payload.auth_type = $authType;
-    }
-    return payload;
-  }
-
   function setDebitPinRadiosVisibility(visible) {
     if (visible) {
       $authType = DEFAULT_AUTH_TYPE_RADIO;
     }
 
-    showAuthTypeSelectionRadio = Boolean(visible);
+    $showAuthTypeSelectionRadio = Boolean(visible);
   }
 
   const Flows = {
@@ -256,8 +229,15 @@
       }
 
       if (isStrictlyRecurring()) {
+        const validCardNetworksForTransaction =
+          getCardNetworksForRecurring() || {};
+        const isRecurringCardNetworkAllowed = validCardNetworksForTransaction.hasOwnProperty(
+          $cardType
+        );
         _validCardNumber =
-          _validCardNumber && isFlowApplicable(flows, Flows.RECURRING);
+          _validCardNumber &&
+          isRecurringCardNetworkAllowed &&
+          isFlowApplicable(flows, Flows.RECURRING);
       } else {
         // Debit-PIN is not supposed to work in case of recurring
         if (isFlowApplicable(flows, Flows.PIN)) {
@@ -486,7 +466,7 @@
         on:input={handleCardInput}
         on:blur={trackCardNumberFilled} />
     </div>
-    {#if !hideExpiryCvvFields}
+    {#if !$hideExpiryCvvFields}
       <div class="third">
         <ExpiryField
           id="card_expiry"
@@ -510,7 +490,7 @@
         on:focus
         on:blur={trackNameFilled} />
     </div>
-    {#if !hideExpiryCvvFields}
+    {#if !$hideExpiryCvvFields}
       <div class="third">
         <CvvField
           id="card_cvv"
@@ -548,21 +528,21 @@
       </div>
     {/if}
   </div>
-  {#if showNoCvvCheckbox}
+  {#if $showNoCvvCheckbox}
     <div class="row">
       <label id="nocvv-check" for="nocvv">
         <input
           type="checkbox"
           class="checkbox--square"
           id="nocvv"
-          bind:checked={noCvvChecked} />
+          bind:checked={$noCvvChecked} />
         <span class="checkbox" />
         <!-- LABEL: My Maestro Card doesn't have Expiry/CVV -->
         {$t(NOCVV_LABEL)}
       </label>
     </div>
   {/if}
-  {#if showAuthTypeSelectionRadio}
+  {#if $showAuthTypeSelectionRadio}
     <div class="row">
       <CardFlowSelectionRadio bind:value={$authType} />
     </div>

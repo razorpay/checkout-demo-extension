@@ -47,7 +47,7 @@ function makeTestOptions({
   }
 
   if (timeout) {
-    options.timeout = 2;
+    options.timeout = 200;
   }
 
   if (callbackUrl) {
