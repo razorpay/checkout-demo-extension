@@ -348,7 +348,9 @@
     /* TODO: improve handling of `prefill.vpa` */
     if (getPrefilledVPA()) {
       selectedApp = undefined;
-      vpa = getPrefilledVPA();
+      if (!vpaEntered) {
+        vpaEntered = getPrefilledVPA();
+      }
     }
 
     const downtimes = getDowntimes();
@@ -767,7 +769,6 @@
                 onUpiAppSelection({ detail: { id: 'new' } });
               }}
               customer={$customer}
-              defaultValue={vpa}
               on:blur={trackVpaEntry}
               selected={selectedToken === 'new'}
               bind:value={vpaEntered}

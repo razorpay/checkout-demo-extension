@@ -35,7 +35,6 @@
   export let recurring = false;
   export let value = '';
   export let rememberVpa = true;
-  export let defaultValue = '';
 
   // Refs
   export let vpaField = null;
@@ -54,16 +53,6 @@
 
   function isVpaValid(vpa) {
     return VPA_REGEX.test(vpa);
-  }
-
-  let defaultValueSet = false;
-
-  $: {
-    if (!value && !defaultValueSet && defaultValue) {
-      // run only once
-      value = defaultValue;
-      defaultValueSet = true;
-    }
   }
 
   onMount(() => {
