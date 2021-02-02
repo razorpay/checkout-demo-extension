@@ -1102,7 +1102,7 @@ export default {
   trusted_badge: {
     header: 'Razorpay Verified Seller',
     highlight1: 'Trusted by {customersNo} customers',
-    highlight2: 'Secured Razorpay merchant for {securedYears} months',
+    highlight2: 'Secured Razorpay merchant for {securedTime} months',
     highlight3: 'No fraud transaction for last {noFraudTime} months',
   },
 };
