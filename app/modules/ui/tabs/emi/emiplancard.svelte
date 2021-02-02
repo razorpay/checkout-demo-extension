@@ -31,7 +31,10 @@
     HDFC_DEBIT_DESCRIPTION_INCLUDES_INTEREST,
     HDFC_DEBIT_DESCRIPTION_CONVENIENCE,
     DESCRIPTION_MONTHLY_INSTALLMENT,
+    PROCESSING_FEE,
+    STAMP_DUTY,
     DESCRIPTION_TOTAL_AMOUNT,
+    DEFAULT_PROCESSING_FEE_DISCLAIMER,
   } from 'ui/labels/emi';
 
   // Props
@@ -53,13 +56,30 @@
   let showEducation;
   let amountAfterDiscount;
 
+  let processingFee, processingFeeDisclaimer, stampDuty;
+
   let interestChargedByBank;
+
+  let zestMoneyForcedEmiOffer = null;
 
   const session = getSession();
   const AXIS_BANK_CODE = 'UTIB';
   const CITI_BANK_CODE = 'CITI';
   const HDFC_BANK_CODE = 'HDFC';
   const HDFC_BANK_DEBIT_CODE = 'HDFC_DC';
+
+  $: {
+    zestMoneyForcedEmiOffer = provider === 'zestmoney' && plan.duration === 3;
+  }
+
+  $: {
+    processingFee =
+      plan.processing_fee &&
+      session.formatAmountWithCurrency(plan.processing_fee);
+    stampDuty =
+      plan.stamp_duty && session.formatAmountWithCurrency(plan.stamp_duty);
+    processingFeeDisclaimer = plan.processing_fee_disclaimer;
+  }
 
   // amountPerMonth
   $: {
@@ -94,9 +114,7 @@
   }
 
   $: {
-    noCostEmi =
-      plan.subvention === 'merchant' ||
-      (provider === 'zestmoney' && plan.duration === 3);
+    noCostEmi = plan.subvention === 'merchant' || zestMoneyForcedEmiOffer;
     if (noCostEmi && plan.merchant_payback) {
       interestChargedByBank = session.formatAmountWithCurrency(
         amount / (1 - plan.merchant_payback / 100) - amount
@@ -143,6 +161,12 @@
     margin: -10px 0 6px !important;
     padding-bottom: 6px;
   }
+
+  .processing-fee-disclaimer {
+    padding-top: 8px;
+    margin-top: 8px;
+    border-top: 1px solid #e6e7e8;
+  }
   .citi-link {
     text-decoration: underline;
   }
@@ -169,7 +193,7 @@
   </div>
   <div slot="detail">
     {#if showEducation}
-      {#if noCostEmi}
+      {#if noCostEmi && !zestMoneyForcedEmiOffer}
         <ul class="nocost">
           <li>
             <!-- LABEL: Interest charged by the bank -->
@@ -221,18 +245,56 @@
           {$t(HDFC_DEBIT_DESCRIPTION_CONVENIENCE)}
         {/if}
       {:else}
-        <ul>
+        <ul class="cardless-emi-plan-details">
           <!-- LABEL: Monthly Installment: {amount} -->
           <li>
-            {formatTemplateWithLocale(DESCRIPTION_MONTHLY_INSTALLMENT, { amount: formattedAmountPerMonth }, $locale)}
+            <div>
+              <span>{$t(DESCRIPTION_MONTHLY_INSTALLMENT)}</span>
+              <span>{formattedAmountPerMonth}</span>
+            </div>
           </li>
+          {#if processingFee}
+            <li>
+              <div>
+                <!-- LABEL: Processing Fee: {amount} -->
+                <span>{$t(PROCESSING_FEE)}</span>
+                <span>{processingFee}</span>
+              </div>
+            </li>
+          {/if}
+          {#if stampDuty}
+            <li>
+              <div>
+                <!-- LABEL: Stamp Duty: {amount} -->
+                <span>{$t(STAMP_DUTY)}</span>
+                <span>{stampDuty}</span>
+              </div>
+            </li>
+          {/if}
           <!-- LABEL: Total Amount: {formattedFinalAmount} ({formattedAmountPerMonth} x {plan.duration}) -->
           <li>
-            {formatTemplateWithLocale(DESCRIPTION_TOTAL_AMOUNT, { totalAmount: formattedFinalAmount, monthlyAmount: formattedAmountPerMonth, duration: plan.duration }, $locale)}
+            <div>
+              <span>
+                {$t(DESCRIPTION_TOTAL_AMOUNT)}
+                ({formattedAmountPerMonth}
+                x
+                {plan.duration}
+                )
+              </span>
+              <span>{formattedFinalAmount}</span>
+            </div>
           </li>
         </ul>
+        <!-- Zestmoney is unable to send us the processing fee disclaimer as of now
+        For that specific provider, show a hardcoded string until it's present in BE
+         -->
+        {#if processingFee && (processingFeeDisclaimer || provider === 'zestmoney' || provider === 'earlysalary')}
+          <div class="processing-fee-disclaimer">
+            {processingFeeDisclaimer || $t(DEFAULT_PROCESSING_FEE_DISCLAIMER)}
+          </div>
+        {/if}
       {/if}
-      {#if noCostEmi}
+      {#if noCostEmi && !zestMoneyForcedEmiOffer}
         <!-- LABEL: + How does it work? -->
         <div class="theme-highlight how-it-works" on:click={explain}>
           {$t(NO_COST_EXPLAIN_ACTION)}

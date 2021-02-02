@@ -539,9 +539,12 @@ export default {
     available_text: 'EMI Available',
     credit_emi_description:
       'Full amount of {amount} will be deducted from your account, which will be converted into EMI by your bank in 3-4 days.',
-    description_monthly_installment: 'Monthly Installment: {amount}',
-    description_total_amount:
-      'Total Amount: {totalAmount} ({monthlyAmount} x {duration})',
+    default_processing_fee_disclaimer:
+      'Processing Fee will be charged on the 1st month of EMI',
+    description_monthly_installment: 'Monthly Installment',
+    processing_fee: 'Processing Fee',
+    stamp_duty: 'Stamp Duty',
+    description_total_amount: 'Total Amount',
     edit_plan_action: 'Edit',
     edit_plan_text: '{duration} Months ({amount}/mo)',
     axis_bank_emi:
