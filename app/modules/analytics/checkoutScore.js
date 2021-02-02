@@ -157,6 +157,7 @@ const updateScore = function(type, obj) {
     reasonEncountered += reasons[type](obj) + ' | ';
   }
 
+  Analytics.setMeta('scoreVersion', 1.0);
   Analytics.setMeta('checkoutScore', calculatedScore);
   Analytics.setMeta('checkoutScoreReason', reasonEncountered);
 };
