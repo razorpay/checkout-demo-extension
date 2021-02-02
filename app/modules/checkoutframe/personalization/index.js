@@ -281,7 +281,6 @@ export const recordSuccess = (instrument, customer) => {
   }
 
   instrument.success = true;
-
   Analytics.track('p13n:instrument:success', {
     data: {
       instrument,
