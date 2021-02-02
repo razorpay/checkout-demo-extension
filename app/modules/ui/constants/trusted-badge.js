@@ -18,7 +18,7 @@ const badges_text = {
     list: getHighlightsNos('2000+', '9', '8'),
   },
   CQb8Hvj0vXJHqR: {
-    list: getHighlightsNos('2000+', '10 months', '9 months'),
+    list: getHighlightsNos('2000+', '10', '9'),
   },
   '10000000000000': {
     list: getHighlightsNos('2000+', '9', '8'),

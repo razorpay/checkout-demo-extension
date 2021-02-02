@@ -41,6 +41,7 @@ import * as CardlessEmi from 'common/cardlessemi';
 import * as PayLater from 'common/paylater';
 import * as Token from 'common/token';
 import * as SessionManager from 'sessionmanager';
+import updateScore from 'analytics/checkoutScore';
 import * as Checkout from 'checkoutframe/index';
 import * as Offers from 'checkoutframe/offers';
 import * as Flows from 'checkoutframe/flows';
@@ -101,6 +102,7 @@ import * as ContactStorage from 'checkoutframe/contact-storage';
 
 export default {
   RazorpayConfig,
+  updateScore,
   fetch,
   Track,
   Analytics,
