@@ -20,7 +20,7 @@
 
   //props
   export let nos;
-  const { customersNo, securedMonths, noFraudTime } = nos;
+  const { customersNo, securedTime, noFraudTime } = nos;
   let list;
   $: {
     list = [
@@ -31,7 +31,7 @@
       ),
       formatTemplateWithLocale(
         TRUSTED_BADGE_HIGHLIGHT2,
-        { securedYears: securedMonths },
+        { securedTime },
         $locale
       ),
       formatTemplateWithLocale(
