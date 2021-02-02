@@ -348,9 +348,7 @@
     /* TODO: improve handling of `prefill.vpa` */
     if (getPrefilledVPA()) {
       selectedApp = undefined;
-      if (!vpaEntered) {
-        vpaEntered = getPrefilledVPA();
-      }
+      vpaEntered = getPrefilledVPA();
     }
 
     const downtimes = getDowntimes();
