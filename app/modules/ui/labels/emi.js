@@ -39,3 +39,5 @@ export const DESCRIPTION_MONTHLY_INSTALLMENT =
 export const PROCESSING_FEE = 'emi.processing_fee';
 export const STAMP_DUTY = 'emi.stamp_duty';
 export const DESCRIPTION_TOTAL_AMOUNT = 'emi.description_total_amount';
+export const DEFAULT_PROCESSING_FEE_DISCLAIMER =
+  'emi.default_processing_fee_disclaimer';

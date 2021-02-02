@@ -34,6 +34,7 @@
     PROCESSING_FEE,
     STAMP_DUTY,
     DESCRIPTION_TOTAL_AMOUNT,
+    DEFAULT_PROCESSING_FEE_DISCLAIMER,
   } from 'ui/labels/emi';
 
   // Props
@@ -289,7 +290,7 @@
          -->
         {#if processingFee && (processingFeeDisclaimer || provider === 'zestmoney' || provider === 'earlysalary')}
           <div class="processing-fee-disclaimer">
-            {processingFeeDisclaimer || 'Processing Fee will be charged on the 1st month of EMI'}
+            {processingFeeDisclaimer || $t(DEFAULT_PROCESSING_FEE_DISCLAIMER)}
           </div>
         {/if}
       {/if}
