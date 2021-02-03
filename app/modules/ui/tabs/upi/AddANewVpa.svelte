@@ -179,6 +179,7 @@
           name={'vpa-' + paymentMethod}
           type="text"
           required
+          bind:value
           bind:this={vpaField}
           bind:readonlyValue={vpa}
           on:input={handleVpaInput}

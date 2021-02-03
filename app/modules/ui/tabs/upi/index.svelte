@@ -10,8 +10,8 @@
     isPayout,
     getDowntimes,
     hasFeature,
-    isCustomerFeeBearer,
     getMerchantOrder,
+    getPrefilledVPA,
   } from 'checkoutstore';
   import {
     isMethodEnabled,
@@ -103,7 +103,6 @@
   export let method = 'upi';
 
   // Refs
-  export let omnichannelField = null;
   export let vpaField = null;
 
   // Computed
@@ -349,9 +348,9 @@
 
   onMount(() => {
     /* TODO: improve handling of `prefill.vpa` */
-    if (session.get('prefill.vpa')) {
+    if (getPrefilledVPA()) {
       selectedApp = undefined;
-      vpa = session.get('prefill.vpa');
+      vpaEntered = getPrefilledVPA();
       updateScore('vpaPrefilled');
     }
 
