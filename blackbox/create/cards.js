@@ -101,7 +101,7 @@ module.exports = function(testFeatures) {
         await proceed(context);
       }
 
-      if (recurringOrder) {
+      if (recurringOrder && options.remember_customer) {
         await handleCustomerCardStatusRequest(context);
         await typeOTPandSubmit(context);
         await respondSavedCards(context);

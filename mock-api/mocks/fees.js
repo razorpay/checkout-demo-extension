@@ -9,7 +9,7 @@ const getFees = _ => {
       amount: 100,
       fee: 20,
     },
-  }
-}
+  };
+};
 
-module.exports = { getFees }
+module.exports = { getFees };

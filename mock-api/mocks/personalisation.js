@@ -33,5 +33,5 @@ const preferredInsturments = {
       user_aggregates_available: false,
     },
   },
-}
-module.exports = { preferredInsturments }
+};
+module.exports = { preferredInsturments };

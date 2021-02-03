@@ -223,45 +223,45 @@
           url: 'http://localhost:5000/v1/payments/pay_GqAUUr978elhqA/status',
           method: 'get',
         },
-      }
+      };
       // Async Payment data //
 
       try {
-        CheckoutBridge.setPaymentID(data.payment_id)
+        CheckoutBridge.setPaymentID(data.payment_id);
       } catch (e) {}
 
-      var request_url = data.request.url
-      var key_id = 'rzp_live_b50Z3m216Xnncp'
-      var payment_base = ENDPOINT + '/v1/payments/' + data.payment_id
-      var cancel_url = payment_base + '/cancel?key_id=' + key_id
-      var callback_url = payment_base + '/redirect_callback?key_id=' + key_id
+      var request_url = data.request.url;
+      var key_id = 'rzp_live_b50Z3m216Xnncp';
+      var payment_base = ENDPOINT + '/v1/payments/' + data.payment_id;
+      var cancel_url = payment_base + '/cancel?key_id=' + key_id;
+      var callback_url = payment_base + '/redirect_callback?key_id=' + key_id;
 
       var $ = function(id) {
-        return document.getElementById(id)
-      }
+        return document.getElementById(id);
+      };
 
       if (!Date.now) {
         Date.now = function() {
-          return +new Date()
-        }
+          return +new Date();
+        };
       }
 
-      var form = $('form')
-      var CheckoutBridge = window.CheckoutBridge
-      var isIntentFlow = CheckoutBridge && data.type === 'intent'
+      var form = $('form');
+      var CheckoutBridge = window.CheckoutBridge;
+      var isIntentFlow = CheckoutBridge && data.type === 'intent';
 
-      var lastXhr, lastPollTS, lastPollUrl
-      var threshold = 1000 * 20
-      var pollRetriesOnError = 5
-      var pollRetriesSoFar = 0
+      var lastXhr, lastPollTS, lastPollUrl;
+      var threshold = 1000 * 20;
+      var pollRetriesOnError = 5;
+      var pollRetriesSoFar = 0;
 
       onfocus = function(e) {
         if (lastPollTS) {
-          var timeSince = Date.now() - lastPollTS
+          var timeSince = Date.now() - lastPollTS;
 
           if (lastPollUrl === request_url && timeSince > threshold) {
-            lastXhr.abort()
-            fetch(request_url, 1)
+            lastXhr.abort();
+            fetch(request_url, 1);
             track('ajax_periodic_retry', {
               last: {
                 status: lastXhr.status,
@@ -270,22 +270,22 @@
               },
               focus: !!e,
               time: timeSince,
-            })
+            });
           }
         }
-      }
+      };
 
-      setInterval(onfocus, 1000)
+      setInterval(onfocus, 1000);
 
       function track(name, properties, cb) {
         setTimeout(function() {
-          properties.CheckoutBridge = !!CheckoutBridge
+          properties.CheckoutBridge = !!CheckoutBridge;
           properties.pageData = {
             type: data.type,
             data: data.data,
             key: key_id,
             payment_id: data.payment_id,
-          }
+          };
           var payload = {
             context: {
               user_agent: null,
@@ -297,101 +297,101 @@
                 timestamp: Date.now(),
               },
             ],
-          }
+          };
 
-          if (1 || key_id.slice(0, 5) === 'rzp_t') return console.log(payload)
-          var call = new XMLHttpRequest()
-          call.open('post', 'https://lumberjack.razorpay.com/v1/track', true)
+          if (1 || key_id.slice(0, 5) === 'rzp_t') return console.log(payload);
+          var call = new XMLHttpRequest();
+          call.open('post', 'https://lumberjack.razorpay.com/v1/track', true);
           call.setRequestHeader(
             'Content-Type',
             'application/x-www-form-urlencoded'
-          )
+          );
 
           if (cb) {
             call.onreadystatechange = function() {
               if (call.readyState === 2) {
-                cb()
+                cb();
               }
-            }
-            setTimeout(cb, 4e3)
+            };
+            setTimeout(cb, 4e3);
           }
 
           call.send(
             'key=MC40OTMwNzgyMDM3MDgwNjI3Nw9YnGzW&data=' +
               encodeURIComponent(btoa(JSON.stringify(payload)))
-          )
-        })
+          );
+        });
       }
 
-      var submitted_count = 0
+      var submitted_count = 0;
 
       function submitForm(response) {
         setTimeout(function() {
           track('no_redirect', {
             count: ++submitted_count,
-          })
+          });
           if (
             submitted_count &&
             !(submitted_count % 2) &&
             submitted_count < 10
           ) {
-            submitForm(response)
+            submitForm(response);
           }
-        }, 10000)
+        }, 10000);
         if (isIntentFlow) {
-          CheckoutBridge.oncomplete(JSON.stringify(response))
+          CheckoutBridge.oncomplete(JSON.stringify(response));
         } else {
           if (response && response.type === 'return') {
-            var req = response.request
-            var content = req.content
-            form.action = req.url
-            form.method = req.method
+            var req = response.request;
+            var content = req.content;
+            form.action = req.url;
+            form.method = req.method;
             form.innerHTML = Object.keys(content)
               .map(function(name) {
                 return (
                   '<input name="' + name + '" value="' + content[name] + '">'
-                )
+                );
               })
-              .join('')
+              .join('');
           } else {
-            form.action = callback_url
+            form.action = callback_url;
           }
-          form.submit()
+          form.submit();
         }
       }
 
       function fetch(url, immediate) {
-        var totalCalls = 0
+        var totalCalls = 0;
 
         function fetchAgain(timeout) {
-          totalCalls++
+          totalCalls++;
 
           if (totalCalls > 50 && !(totalCalls % 10)) {
             track('call_count', {
               count: totalCalls,
               url: url,
-            })
+            });
           }
 
           if (totalCalls > 180) {
-            return submitForm()
+            return submitForm();
           }
 
           setTimeout(function() {
             // If polling, set timestamp.
-            lastPollUrl = url
-            lastPollTS = Date.now()
+            lastPollUrl = url;
+            lastPollTS = Date.now();
 
-            lastXhr = new XMLHttpRequest()
-            lastXhr.open('get', url, true)
+            lastXhr = new XMLHttpRequest();
+            lastXhr.open('get', url, true);
 
             lastXhr.onreadystatechange = function() {
               if (lastXhr.readyState === 4 && lastXhr.status) {
-                var json
+                var json;
                 try {
-                  json = JSON.parse(lastXhr.responseText)
+                  json = JSON.parse(lastXhr.responseText);
                   if (!json || typeof json !== 'object') {
-                    throw 'non object:' + json
+                    throw 'non object:' + json;
                   }
                 } catch (e) {
                   json = {
@@ -404,10 +404,10 @@
                       text: lastXhr.responseText,
                       url: url,
                     },
-                  }
+                  };
                 }
                 if (json.status === 'created') {
-                  return fetchAgain()
+                  return fetchAgain();
                 } else {
                   try {
                     if (
@@ -415,33 +415,33 @@
                       json.error ||
                       json.version === 1
                     ) {
-                      return submitForm(json)
+                      return submitForm(json);
                     }
                   } catch (e) {
-                    return handleAjaxError(e)
+                    return handleAjaxError(e);
                   }
                 }
-                handleAjaxError()
+                handleAjaxError();
               }
-            }
-            lastXhr.onerror = handleAjaxError
-            lastXhr.send(null)
-          }, timeout || 4000)
+            };
+            lastXhr.onerror = handleAjaxError;
+            lastXhr.send(null);
+          }, timeout || 4000);
         }
 
-        fetchAgain(immediate)
+        fetchAgain(immediate);
       }
 
       if (isIntentFlow) {
-        var intent_url = data.data.intent_url
+        var intent_url = data.data.intent_url;
 
         function initUpiActivity() {
           try {
-            CheckoutBridge.callNativeIntent(intent_url)
-            $('spinner').className = 'hide'
-            $('retry-btn').className = 'hide'
+            CheckoutBridge.callNativeIntent(intent_url);
+            $('spinner').className = 'hide';
+            $('retry-btn').className = 'hide';
             $('message-txt').innerHTML =
-              "<b>Select UPI App</b>Payment will be made to Razorpay's VPA"
+              "<b>Select UPI App</b>Payment will be made to Razorpay's VPA";
             window.pollStatus = function(resp) {
               if (
                 !Object.keys(resp).length ||
@@ -450,19 +450,19 @@
                   Object.keys(resp).indexOf('bleTxId') < 0)
               ) {
                 // if (resp.isWebviewVisible === false || key_id === 'rzp_live_5WqsyF9dNRzsmf') {
-                fetchWait(cancel_url)
+                fetchWait(cancel_url);
                 // }
                 //   $('cancel-btn').className = '';
                 //   $('retry-btn').className = '';
                 //   $('message-txt').innerHTML = 'Payment did not complete';
                 //   $('spinner').className = 'hide';
 
-                $('message-txt').innerHTML = 'Please wait..'
-                $('spinner').className = ''
+                $('message-txt').innerHTML = 'Please wait..';
+                $('spinner').className = '';
               } else {
-                fetchWait(request_url)
+                fetchWait(request_url);
               }
-            }
+            };
           } catch (e) {
             track(
               'android_error',
@@ -470,25 +470,25 @@
                 error: e.message,
               },
               submitForm
-            )
+            );
           }
         }
 
-        initUpiActivity()
+        initUpiActivity();
       } else {
-        fetch(request_url)
+        fetch(request_url);
       }
 
       $('cancel-btn').onclick = function() {
-        fetchWait(cancel_url)
-      }
+        fetchWait(cancel_url);
+      };
 
       function fetchWait(url) {
-        $('spinner').className = ''
-        $('cancel-btn').className = 'hide'
-        $('retry-btn').className = 'hide'
-        $('message-txt').innerHTML = 'Please wait...'
-        fetch(url, 1)
+        $('spinner').className = '';
+        $('cancel-btn').className = 'hide';
+        $('retry-btn').className = 'hide';
+        $('message-txt').innerHTML = 'Please wait...';
+        fetch(url, 1);
       }
 
       function handleAjaxError(e) {
@@ -496,16 +496,16 @@
           text: lastXhr.responseText,
           status: lastXhr.status,
           url: lastPollUrl,
-        }
+        };
         if (e) {
-          props.message = e.message
+          props.message = e.message;
         }
 
-        track('ajax_error', props, !e && submitForm)
+        track('ajax_error', props, !e && submitForm);
 
         if (e && pollRetriesSoFar < pollRetriesOnError) {
-          pollRetriesSoFar++
-          fetch(lastPollUrl)
+          pollRetriesSoFar++;
+          fetch(lastPollUrl);
         }
       }
     </script>

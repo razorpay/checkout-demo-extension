@@ -1,6 +1,6 @@
-const { ENDPOINT } = global
+const { ENDPOINT } = global;
 
-const Customer = require('./customer.js')
+const Customer = require('./customer.js');
 
 const misc = {
   zestmoney: {
@@ -46,10 +46,10 @@ const misc = {
     success: 1,
     tokens: Customer.getTokens(),
   },
-}
+};
 
 const getMisc = type => {
-  return misc[type]
-}
+  return misc[type];
+};
 
-module.exports = { getMisc }
+module.exports = { getMisc };

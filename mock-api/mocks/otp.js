@@ -1,4 +1,4 @@
-const { ENDPOINT } = global
+const { ENDPOINT } = global;
 
 const submit = {
   success: {
@@ -16,7 +16,7 @@ const submit = {
     },
     next: { bank: 'HDFC', type: 'otp', next: ['submit_otp', 'resend_otp'] },
   },
-}
+};
 
 const resend = {
   hdfc: {
@@ -50,14 +50,14 @@ const resend = {
     submit_url_private: ENDPOINT + '/v1/payments/pay_Ep1kkNJDzAdvIZ/otp/submit',
     resend_url_private: ENDPOINT + '/v1/payments/pay_Ep1kkNJDzAdvIZ/otp/resend',
   },
-}
+};
 
 const getOtpSubmit = type => {
-  return submit[type]
-}
+  return submit[type];
+};
 
 const getOtpResend = type => {
-  return resend[type]
-}
+  return resend[type];
+};
 
-module.exports = { getOtpSubmit, getOtpResend }
+module.exports = { getOtpSubmit, getOtpResend };

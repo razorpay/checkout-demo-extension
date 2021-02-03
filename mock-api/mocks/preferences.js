@@ -1,4 +1,4 @@
-const { ENDPOINT } = global
+const { ENDPOINT } = global;
 
 const preferences = {
   dcc2: {
@@ -9103,8 +9103,8 @@ const preferences = {
       },
     },
   },
-}
+};
 
-const getPreferences = type => preferences[type]
+const getPreferences = type => preferences[type];
 
-module.exports = { getPreferences }
+module.exports = { getPreferences };

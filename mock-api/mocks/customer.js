@@ -84,10 +84,10 @@ const tokens = {
       },
     ],
   },
-}
+};
 
 const getTokens = (name = 'card_upi') => {
-  return tokens[name]
-}
+  return tokens[name];
+};
 
-module.exports = { getTokens }
+module.exports = { getTokens };

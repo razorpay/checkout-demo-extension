@@ -11,6 +11,7 @@
     getDowntimes,
     hasFeature,
     getMerchantOrder,
+    shouldRememberCustomer,
     getPrefilledVPA,
   } from 'checkoutstore';
   import {
@@ -113,7 +114,7 @@
   let shouldShowCollect;
   let shouldShowOmnichannel;
   let vpaEntered;
-  let rememberVpa = true;
+  let rememberVpa = shouldRememberCustomer('upi');
   let omnichannelPhone = '';
 
   let disabled = false;

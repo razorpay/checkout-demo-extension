@@ -1,5 +1,5 @@
-const fs = require('fs')
-const { ENDPOINT } = global
+const fs = require('fs');
+const { ENDPOINT } = global;
 
 const ajax = {
   hdfc_dc: {
@@ -323,7 +323,7 @@ const ajax = {
     submit_url_private: ENDPOINT + '/v1/payments/pay_Ep1kkNJDzAdvIZ/otp/submit',
     resend_url_private: ENDPOINT + '/v1/payments/pay_Ep1kkNJDzAdvIZ/otp/resend',
   },
-}
+};
 
 const checkout = {
   hdfc: fs.readFileSync(__dirname + '/../html/bank.html', 'utf8'),
@@ -331,43 +331,43 @@ const checkout = {
     __dirname + '/../html/cred_collect.html',
     'utf8'
   ),
-}
+};
 
 const getAjax = body => {
   if (body.method === 'app' && body.provider === 'cred') {
     if (Number(body.app_present)) {
-      return ajax.cred_intent
+      return ajax.cred_intent;
     }
-    return ajax.cred_collect
+    return ajax.cred_collect;
   }
   if (body.application === 'google_pay') {
-    return ajax.gpay_cards
+    return ajax.gpay_cards;
   }
   if (body.method === 'wallet') {
-    return ajax.wallet
+    return ajax.wallet;
   }
   if (body.method === 'emi') {
-    return ajax.hdfc_dc
+    return ajax.hdfc_dc;
   }
   if (body.method === 'card') {
-    return ajax.hdfc_otp
+    return ajax.hdfc_otp;
   }
   return {
     error: {
       description: 'Unsupported payload/method',
     },
-  }
-}
+  };
+};
 
 const getCheckout = body => {
   if (body.method === 'card') {
-    return checkout.hdfc
+    return checkout.hdfc;
   }
   return {
     error: {
       description: 'Unsupported payload/method',
     },
-  }
-}
+  };
+};
 
-module.exports = { getAjax, getCheckout }
+module.exports = { getAjax, getCheckout };

@@ -1,7 +1,7 @@
 const getFlows = query => {
   if (query.currency) {
-    const { amount } = query
-    const normalizer = amount / 50000
+    const { amount } = query;
+    const normalizer = amount / 50000;
     return {
       recurring: false,
       all_currencies: {
@@ -845,15 +845,15 @@ const getFlows = query => {
       },
       currency_request_id: 'EW1CiHoC8eARvW',
       card_currency: 'USD',
-    }
+    };
   } else {
     return {
       recurring: false,
       otp: true,
       emi: false,
-    }
+    };
   }
-}
+};
 
 const getIin = query => {
   const response = {
@@ -866,9 +866,9 @@ const getIin = query => {
     type: 'debit',
     issuer: 'HDFC',
     http_status_code: 200,
-  }
+  };
 
-  return response
-}
+  return response;
+};
 
-module.exports = { getFlows, getIin }
+module.exports = { getFlows, getIin };

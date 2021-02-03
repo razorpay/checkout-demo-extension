@@ -18,8 +18,8 @@ const status = {
   success: {
     razorpay_payment_id: 'pay_',
   },
-}
+};
 
-const getStatus = type => status[type]
+const getStatus = type => status[type];
 
-module.exports = { getStatus }
+module.exports = { getStatus };
