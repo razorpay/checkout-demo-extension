@@ -24,6 +24,7 @@ export const chrome = check(/Chrome/) && checkVendor(/Google Inc/);
 export const AndroidWebView = check(/; wv\) |Gecko\) Version\/[^ ]+ Chrome/);
 
 export const Instagram = check(/Instagram/);
+export const samsungBrowser = check(/SamsungBrowser/);
 
 /**
  * Facebook User-Agents:
@@ -81,6 +82,20 @@ export const isMobile = () => {
     shouldFixFixed ||
     global.matchMedia(mobileQuery).matches
   );
+};
+
+// This does not consume user agent because brave uses the same user agent as chrome.
+// Brave enough! https://www.reddit.com/r/brave_browser/comments/dueif0/detect_brave_browser/
+export const isBraveBrowser = () => {
+  return new Promise(res => {
+    if (navigator.brave) {
+      navigator.brave.isBrave().then(r => {
+        res(r);
+      });
+    } else {
+      res(false);
+    }
+  });
 };
 
 // Some stock android browsers that pause the checkout tab
