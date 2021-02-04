@@ -1,5 +1,4 @@
 export const UNAVAILABLE_HELP = 'emi.unavailable_help';
-export const UNAVAILABLE_HELP_RESTRICTED = 'emi.unavailable_help_restricted';
 export const UNAVAILABLE_BTN = 'emi.unavailable_btn';
 export const SAVED_CARD_UNAVAILABLE_HELP = 'emi.saved_card_unavailable_help';
 export const EDIT_PLAN_TEXT = 'emi.edit_plan_text';

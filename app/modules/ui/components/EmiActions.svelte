@@ -7,6 +7,7 @@
   import { selectedPlanTextForNewCard } from 'checkoutstore/emi';
   import { isMethodUsable } from 'checkoutstore/methods';
   import { getEMIBanksText } from 'checkoutframe/paymentmethods';
+  import { methodInstrument } from 'checkoutstore/screens/home';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -14,7 +15,6 @@
 
   import {
     UNAVAILABLE_HELP,
-    UNAVAILABLE_HELP_RESTRICTED,
     UNAVAILABLE_BTN,
     EDIT_PLAN_TEXT,
     EDIT_PLAN_ACTION,
@@ -23,6 +23,7 @@
     PAY_ENTIRE_AMOUNT_ACTION,
     PAY_ENTIRE_AMOUNT_COUNT,
   } from 'ui/labels/emi';
+  import { getSubtextForInstrument } from 'subtext';
 
   // Props
   export let emiCtaView;
@@ -44,6 +45,15 @@
       isRestrictedIssuers = true;
     }
   }
+
+  let instrumentSubtext;
+  $: {
+    if (!$methodInstrument) {
+      instrumentSubtext = undefined;
+    } else {
+      instrumentSubtext = getSubtextForInstrument($methodInstrument, $locale);
+    }
+  }
 </script>
 
 <div id="elem-emi">
@@ -56,7 +66,7 @@
           <!-- LABEL: EMI is available on {issuers} cards. Enter your credit card
           to avail. -->
           {#if isRestrictedIssuers}
-            {formatTemplateWithLocale(UNAVAILABLE_HELP_RESTRICTED, {}, $locale)}
+            {instrumentSubtext}
           {:else}
             {formatTemplateWithLocale(UNAVAILABLE_HELP, { issuers: getEMIBanksText($locale) }, $locale)}
           {/if}
