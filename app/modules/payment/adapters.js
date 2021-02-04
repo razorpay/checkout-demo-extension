@@ -87,7 +87,7 @@ export function gpayPaymentRequestAdapter() {
       }
       isBraveBrowser().then(result => {
         if (!result) {
-          resolve(true);
+          resolve();
         } else {
           // Reject because of the same reason as Samsung
           // Gpay Mweb intent does not work with Brave Browser
@@ -112,13 +112,11 @@ export function gpayPaymentRequestAdapter() {
         .canMakePayment()
         .then(isAvailable => {
           if (isAvailable) {
-            isGpayAllowed().then(result => {
-              if (result) {
-                resolve();
-              } else {
+            isGpayAllowed()
+              .then(resolve)
+              .catch(e => {
                 reject(CHECK_ERROR);
-              }
-            });
+              });
           } else {
             reject(CHECK_ERROR);
           }
