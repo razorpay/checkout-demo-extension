@@ -78,7 +78,7 @@ function phonepePaymentRequestAdapter() {
  * @return {Promise}
  */
 export function gpayPaymentRequestAdapter() {
-  const isGpayAllowed = () => {
+  const isBrowserAllowedByGpay = () => {
     return new Promise((resolve, reject) => {
       if (samsungBrowser) {
         // reject because Gpay does not work with samsung browser
@@ -112,7 +112,7 @@ export function gpayPaymentRequestAdapter() {
         .canMakePayment()
         .then(isAvailable => {
           if (isAvailable) {
-            isGpayAllowed()
+            isBrowserAllowedByGpay()
               .then(resolve)
               .catch(e => {
                 reject(CHECK_ERROR);
