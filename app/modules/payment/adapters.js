@@ -79,11 +79,6 @@ function phonepePaymentRequestAdapter() {
  */
 export function gpayPaymentRequestAdapter() {
   return new Promise((resolve, reject) => {
-    if (samsungBrowser) {
-      // reject because Gpay does not work with samsung browser
-      // The Gpay app opens and the payment fails at Gpay's end
-      reject(CHECK_ERROR);
-    }
     try {
       /**
        * PaymentRequest API is only available in the modern browsers which
@@ -98,12 +93,17 @@ export function gpayPaymentRequestAdapter() {
         .canMakePayment()
         .then(isAvailable => {
           if (isAvailable) {
-            // Reject because of the same reason as Samsung
-            // Gpay Mweb intent does not work with Brave Browser
+            if (samsungBrowser) {
+              // reject because Gpay does not work with samsung browser
+              // The Gpay app opens and the payment fails at Gpay's end
+              reject(CHECK_ERROR);
+            }
             isBraveBrowser().then(result => {
               if (!result) {
                 resolve();
               } else {
+                // Reject because of the same reason as Samsung
+                // Gpay Mweb intent does not work with Brave Browser
                 reject(CHECK_ERROR);
               }
             });
