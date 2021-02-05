@@ -109,6 +109,8 @@ function makeTestPreferences(
       partial_payment: false,
     };
   }
+  preferences.blocked = false;
+  preferences.activated = true;
 
   return preferences;
 }
