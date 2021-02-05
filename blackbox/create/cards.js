@@ -20,6 +20,7 @@ const {
   respondSavedCards,
   retryTransaction,
   selectPersonalizedCard,
+  agreeToAMEXCurrencyCharges,
 
   // Offers
   verifyOfferApplied,
@@ -100,7 +101,7 @@ module.exports = function(testFeatures) {
         await proceed(context);
       }
 
-      if (recurringOrder) {
+      if (recurringOrder && options.remember_customer) {
         await handleCustomerCardStatusRequest(context);
         await typeOTPandSubmit(context);
         await respondSavedCards(context);
@@ -142,6 +143,9 @@ module.exports = function(testFeatures) {
       }
 
       await submit(context);
+      if (options.currency !== 'INR') {
+        await agreeToAMEXCurrencyCharges(context);
+      }
 
       if (callbackUrl && timeout) {
         await verifyTimeout(context, 'card');
@@ -164,6 +168,9 @@ module.exports = function(testFeatures) {
         );
         await retryTransaction(context);
         await submit(context);
+        if (options.currency !== 'INR') {
+          await agreeToAMEXCurrencyCharges(context);
+        }
         if (feeBearer) {
           await handleFeeBearer(context);
         }

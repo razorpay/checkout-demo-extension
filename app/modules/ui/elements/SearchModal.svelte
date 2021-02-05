@@ -24,8 +24,8 @@
   import { getAnimationOptions } from 'svelte-utils';
 
   // i18n
-  import { locale } from 'svelte-i18n';
-  import { formatTemplateWithLocale, formatMessageWithLocale } from 'i18n';
+  import { t, locale } from 'svelte-i18n';
+  import { formatTemplateWithLocale } from 'i18n';
 
   // Props
   export let placeholder = 'Type to search';
@@ -36,6 +36,7 @@
   export let component;
   export let keys;
   export let all;
+  export let open = false;
 
   const IDs = {
     overlay: `${identifier}_search_overlay`,
@@ -54,7 +55,6 @@
   const cache = Search.createCache();
 
   // Variables
-  let visible = false;
   let query = '';
   let results = [];
   let shownItems = items;
@@ -175,11 +175,22 @@
     }
   }
 
-  export function open() {
+  function removeFromOverlayStack() {
+    // Remove the overlay from $overlayStack
+    const overlay = _Arr.find(
+      $overlayStack,
+      overlay => overlay.id === IDs.overlay
+    );
+    $overlayStack = _Arr.remove($overlayStack, overlay);
+  }
+
+  onDestroy(() => {
+    removeFromOverlayStack();
+    cache.clear();
+  });
+
+  function openWithOverlay() {
     query = '';
-
-    visible = true;
-
     // Wait for UI updates before focusing
     tick().then(focus);
 
@@ -195,26 +206,10 @@
     ]);
   }
 
-  export function close() {
-    visible = false;
-  }
-
-  function removeFromOverlayStack() {
-    // Remove the overlay from $overlayStack
-    const overlay = _Arr.find(
-      $overlayStack,
-      overlay => overlay.id === IDs.overlay
-    );
-    $overlayStack = _Arr.remove($overlayStack, overlay);
-  }
-
-  onDestroy(() => {
-    removeFromOverlayStack();
-    cache.clear();
-  });
-
   $: {
-    if (visible === false) {
+    if (open) {
+      openWithOverlay();
+    } else {
       removeFromOverlayStack();
     }
   }
@@ -442,7 +437,7 @@
 </style>
 
 <div bind:this={containerRef}>
-  {#if visible}
+  {#if open}
     <div class="search-curtain">
       <div
         class="search-curtain-bg"
@@ -479,7 +474,7 @@
             class="search-results"
             class:has-query={query}
             id={IDs.results}
-            aria-label={formatMessageWithLocale('misc.search_results_label', $locale)}
+            aria-label={$t('misc.search_results_label')}
             role="listbox"
             bind:this={resultsContainerRef}>
             {#if query}
@@ -531,6 +526,6 @@
   {/if}
 </div>
 
-{#if visible}
+{#if open}
   <CTA show={false} />
 {/if}

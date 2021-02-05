@@ -52,3 +52,23 @@ window.onerror = function(errorMsg, url, lineNumber, column, errorObj) {
     immediately: true,
   });
 };
+
+window.addEventListener('unhandledrejection', function(event) {
+  var reason = event.reason;
+
+  if (reason instanceof Error) {
+    reason = {
+      name: reason.name,
+      message: reason.message,
+      stack: reason.stack,
+    };
+  }
+
+  Analytics.track('unhandled_rejection', {
+    r: SessionManager.getSession().r,
+    data: {
+      reason: reason,
+    },
+    immediately: true,
+  });
+});

@@ -25,19 +25,30 @@
     selectedCard,
     selectedApp,
     cardTab,
+    internationalCurrencyCalloutNeeded,
+    hideExpiryCvvFields,
+    showAuthTypeSelectionRadio,
+    authType,
+    currentCvv,
+    currentAuthType,
   } from 'checkoutstore/screens/card';
+
   import { methodInstrument, blocks } from 'checkoutstore/screens/home';
+
   import { getSDKMeta } from 'checkoutstore/native';
 
   import { customer } from 'checkoutstore/customer';
 
   import { contact } from 'checkoutstore/screens/home';
+
   import {
     isRecurring,
     shouldRememberCustomer,
     isDCCEnabled,
     getCardFeatures,
+    isInternational,
   } from 'checkoutstore';
+
   import {
     isMethodEnabled,
     getEMIBanks,
@@ -47,7 +58,8 @@
     getPayloadForCRED,
     isApplicationEnabled,
   } from 'checkoutstore/methods';
-  import { newCardEmiDuration } from 'checkoutstore/emi';
+
+  import { newCardEmiDuration, savedCardEmiDuration } from 'checkoutstore/emi';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -63,6 +75,7 @@
     RECURRING_CALLOUT,
     SUBSCRIPTION_CALLOUT,
     SUBSCRIPTION_REFUND_CALLOUT,
+    INTERNATIONAL_CURRENCY_CHARGES,
   } from 'ui/labels/card';
 
   // Utils imports
@@ -70,7 +83,14 @@
   import { getSavedCards, transform } from 'common/token';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import { getIin, getCardType, getNetworkFromCardNumber } from 'common/card';
+
+  import {
+    getIin,
+    getCardType,
+    getNetworkFromCardNumber,
+    isAmex,
+  } from 'common/card';
+
   import { getSubtextForInstrument } from 'subtext';
   import { getProvider as getAppProvider } from 'common/apps';
   import { getAnimationOptions } from 'svelte-utils';
@@ -127,10 +147,6 @@
 
   let showSavedCardsCta = false;
   $: showSavedCardsCta = savedCards && savedCards.length && isSavedCardsEnabled;
-
-  // Refs
-  let savedCardsView;
-  let addCardView;
 
   onMount(() => {
     // Prefill
@@ -270,7 +286,7 @@
     } else if ($methodInstrument.method !== tab) {
       instrumentSubtext = undefined;
     } else {
-      instrumentSubtext = getSubtextForInstrument($methodInstrument);
+      instrumentSubtext = getSubtextForInstrument($methodInstrument, $locale);
     }
   }
 
@@ -399,11 +415,36 @@
   }
 
   function getAddCardPayload() {
-    return addCardView.getPayload();
+    const payload = {
+      'card[number]': $cardNumber.replace(/ /g, ''),
+      'card[expiry]': $cardExpiry,
+      'card[cvv]': $cardCvv,
+      'card[name]': $cardName,
+    };
+    // Fill in dummy values for expiry and CVV if the CVV and expiry fields are hidden
+    if ($hideExpiryCvvFields) {
+      payload['card[expiry]'] = '12 / 21';
+      payload['card[cvv]'] = '000';
+    }
+    if ($remember && isSavedCardsEnabled) {
+      payload.save = 1;
+    }
+    if ($showAuthTypeSelectionRadio) {
+      payload.auth_type = $authType;
+    }
+    return payload;
   }
 
   function getSavedCardPayload() {
-    return savedCardsView.getSelectedToken();
+    const selectedToken = $selectedCard || {};
+    const payload = { token: selectedToken.token, 'card[cvv]': $currentCvv };
+    if ($currentAuthType) {
+      payload.auth_type = $currentAuthType;
+    }
+    if ($savedCardEmiDuration) {
+      payload.emi_duration = $savedCardEmiDuration;
+    }
+    return payload;
   }
 
   function handleViewPlans(event) {
@@ -427,6 +468,9 @@
     const iin = getIin(_cardNumber);
     const sixDigits = _cardNumber.length > 5;
     const trimmedVal = _cardNumber.replace(/[ ]/g, '');
+    const amexCard = isAmex($cardNumber);
+
+    $internationalCurrencyCalloutNeeded = amexCard && isInternational();
 
     if (sixDigits) {
       getCardFeatures(_cardNumber).then(features => {
@@ -443,7 +487,7 @@
           let issuer = features.issuer;
 
           // Handle AMEX
-          if (getNetworkFromCardNumber($cardNumber) === 'amex') {
+          if (amexCard) {
             issuer = 'AMEX';
           }
 
@@ -628,7 +672,6 @@
           {/if}
           <AddCardView
             {tab}
-            bind:this={addCardView}
             faded={Boolean($selectedApp)}
             on:focus={onAddCardViewFocused}
             on:cardinput={onCardInput} />
@@ -665,7 +708,6 @@
             <SavedCards
               {tab}
               cards={savedCards}
-              bind:this={savedCardsView}
               on:viewPlans={handleViewPlans} />
           </div>
           <div

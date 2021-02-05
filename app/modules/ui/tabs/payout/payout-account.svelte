@@ -6,25 +6,25 @@
   // i18n
   import { t } from 'svelte-i18n';
   import {
-    ACCOUNT_NUMBER_LABEL,
-    ACCOUNT_NUMBER_HELP,
-    ACCOUNT_NUMBER_CONFIRM_LABEL,
     ACCOUNT_NUMBER_CONFIRM_HELP,
-    IFSC_LABEL,
+    ACCOUNT_NUMBER_CONFIRM_LABEL,
+    ACCOUNT_NUMBER_HELP,
+    ACCOUNT_NUMBER_LABEL,
     IFSC_HELP,
-    NAME_LABEL,
+    IFSC_LABEL,
     NAME_HELP,
+    NAME_LABEL,
   } from 'ui/labels/payouts';
 
-  let accountNumberField;
   let confirmAccountNumberField;
-  let ifscField;
-  let nameField;
+
+  let accountNumber;
+  let confirmAccountNumber;
+  let ifsc;
+  let name;
 
   export function validateConfirmAccount() {
-    const value = accountNumberField.getValue();
-    const confirmValue = confirmAccountNumberField.getValue();
-    if (value !== confirmValue) {
+    if (accountNumber !== confirmAccountNumber) {
       confirmAccountNumberField.setValid(false);
     }
   }
@@ -33,9 +33,9 @@
     return {
       account_type: 'bank_account',
       bank_account: {
-        account_number: accountNumberField.getValue(),
-        name: nameField.getValue(),
-        ifsc: ifscField.getValue(),
+        account_number: accountNumber,
+        name: name,
+        ifsc: ifsc,
       },
     };
   }
@@ -61,7 +61,7 @@
       helpText={$t(ACCOUNT_NUMBER_HELP)}
       maxlength="20"
       required={true}
-      bind:this={accountNumberField}
+      bind:readonlyValue={accountNumber}
       formatter={{ type: 'number' }}
       on:blur={validateConfirmAccount} />
 
@@ -74,6 +74,7 @@
       maxlength="20"
       required={true}
       bind:this={confirmAccountNumberField}
+      bind:readonlyValue={confirmAccountNumber}
       refresh={false}
       formatter={{ type: 'number' }}
       on:blur={validateConfirmAccount} />
@@ -86,7 +87,7 @@
       helpText={$t(IFSC_HELP)}
       maxlength="11"
       required={true}
-      bind:this={ifscField}
+      bind:readonlyValue={ifsc}
       formatter={{ type: 'ifsc' }} />
 
     <Field
@@ -98,6 +99,6 @@
       pattern={"^[a-zA-Z. 0-9']{1,100}$"}
       maxlength="100"
       required={true}
-      bind:this={nameField} />
+      bind:readonlyValue={name} />
   </div>
 </Tab>

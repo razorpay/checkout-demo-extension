@@ -37,14 +37,23 @@ export const checkWebPaymentsForApp = app => {
     return;
   }
 
-  session.r.checkPaymentAdapter(app).then(() => {
-    webPaymentsApps[app] = true;
-    setUpiApps(
-      _Arr.mergeWith(getUPIIntentApps().all, [
-        {
-          package_name: app,
-        },
-      ])
-    );
-  });
+  // do nothing if the check has been done in the past
+  // happens when checkout is closed and then re-opened
+  if (webPaymentsApps[app]) {
+    return;
+  }
+
+  session.r
+    .checkPaymentAdapter(app)
+    .then(() => {
+      webPaymentsApps[app] = true;
+      setUpiApps(
+        _Arr.mergeWith(getUPIIntentApps().all, [
+          {
+            package_name: app,
+          },
+        ])
+      );
+    })
+    .catch(_Func.noop);
 };

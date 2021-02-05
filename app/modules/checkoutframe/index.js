@@ -18,6 +18,8 @@ import {
 } from 'checkoutframe/personalization/api';
 import { setHistoryAndListenForBackPresses } from 'bridge/back';
 
+import { init as initI18n, bindI18nEvents } from 'i18n/init';
+
 import {
   UPI_POLL_URL,
   PENDING_PAYMENT_TS,
@@ -27,6 +29,8 @@ import {
   ownerWindow,
 } from 'common/constants';
 import { checkForPossibleWebPayments } from 'checkoutframe/components/upi';
+import { rewards, rewardIds } from 'checkoutstore/rewards';
+import updateScore from 'analytics/checkoutScore';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -221,12 +225,6 @@ function fetchPrefs(session) {
   }
   session.isOpen = true;
 
-  let closeAt;
-  const timeout = session.r.get('timeout');
-  if (timeout) {
-    closeAt = _.now() + timeout * 1000;
-  }
-
   performPrePrefsFetchOperations();
 
   session.prefCall = Razorpay.payment.getPrefs(
@@ -240,11 +238,23 @@ function fetchPrefs(session) {
         });
       } else {
         setSessionPreferences(session, preferences);
-        if (closeAt) {
-          session.timer = showTimer(closeAt, () => {
-            session.dismissReason = 'timeout';
-            session.modal.hide();
-          });
+        fetchRewards(session);
+      }
+    }
+  );
+}
+
+function fetchRewards(session) {
+  session.rewardsCall = Razorpay.payment.getRewards(
+    getRewardsParams(session.r),
+    rewardsRes => {
+      session.rewardsCall = null;
+      if (!rewardsRes.error) {
+        const reward_ids = rewardsRes.map(item => item.reward_id);
+        rewards.set(rewardsRes);
+        rewardIds.set(reward_ids);
+        if (reward_ids && reward_ids.length > 0) {
+          Analytics.setMeta('reward_ids', reward_ids);
         }
       }
     }
@@ -259,6 +269,9 @@ function performPrePrefsFetchOperations() {
 }
 
 function setSessionPreferences(session, preferences) {
+  if (preferences.customer && preferences.customer.contact) {
+    updateScore('loggedInUser');
+  }
   const razorpayInstance = session.r;
   razorpayInstance.preferences = preferences;
   setRazorpayInstance(razorpayInstance);
@@ -297,8 +310,37 @@ function setSessionPreferences(session, preferences) {
     }
     return Razorpay.sendMessage({ event: 'fault', data: message });
   }
-  session.render();
-  showModal(session);
+
+  initI18n().then(() => {
+    session.render();
+    showModal(session);
+    let closeAt;
+    const timeout = session.r.get('timeout');
+    if (timeout) {
+      closeAt = _.now() + timeout * 1000;
+    }
+    if (closeAt) {
+      session.timer = showTimer(closeAt, () => {
+        session.dismissReason = 'timeout';
+        session.modal.hide();
+      });
+    }
+
+    bindI18nEvents();
+  });
+}
+
+function markRelevantPreferencesPayload(prefData) {
+  const preferencesPayloadToBeMarked = [
+    'subscription_id',
+    'order_id',
+    'key_id',
+  ];
+  preferencesPayloadToBeMarked.forEach(prop => {
+    if (prefData[prop]) {
+      Analytics.setMeta(prop, prefData[prop]);
+    }
+  });
 }
 
 function getPreferenecsParams(razorpayInstance) {
@@ -313,7 +355,14 @@ function getPreferenecsParams(razorpayInstance) {
     prefData.checkcookie = 1;
     document.cookie = 'checkcookie=1;path=/';
   }
+  markRelevantPreferencesPayload(prefData);
+
   return prefData;
+}
+
+function getRewardsParams(razorpayInstance) {
+  const rewardsData = makePrefParams(razorpayInstance);
+  return rewardsData;
 }
 
 function updateOptions(preferences) {

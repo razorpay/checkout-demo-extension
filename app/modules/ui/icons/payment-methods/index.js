@@ -11,16 +11,20 @@ import bank_transfer from './bank_transfer';
 import contact from './contact';
 import upiOtm from './upi_otm';
 import aadhaar from './aadhaar';
+import edit from './edit';
+import present from './present';
 import trustedBadge from './trusted_badge';
 import tickFilled from './tick_filled';
 import printIcon from './print_icon';
 
 import { getAllMethods } from 'checkoutframe/paymentmethods';
 
-const availPaymentMethods = getAllMethods().concat([
+const availIconNames = getAllMethods().concat([
   'othermethods',
   'contact',
   'aadhaar',
+  'edit',
+  'present',
   'trusted_badge',
   'tick_filled',
   'print_icon',
@@ -71,6 +75,11 @@ function getIconFn(iconName) {
     case 'aadhaar':
       return aadhaar;
 
+    case 'edit':
+      return edit;
+
+    case 'present':
+      return present;
     case 'trusted_badge':
       return trustedBadge;
 
@@ -93,7 +102,7 @@ export const getIcon = (
 
 export const getIcons = options =>
   _Arr.reduce(
-    availPaymentMethods,
+    availIconNames,
     (result, method) => {
       result[method] = getIcon(method, options);
       return result;

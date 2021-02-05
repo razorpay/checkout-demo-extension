@@ -37,6 +37,7 @@
     ROUND_OFF_CALLOUT,
     PRINT_DETAILS,
   } from 'ui/labels/bank-transfer';
+
   import { COPY_DETAILS, COPIED } from 'ui/labels/cta';
 
   import { t, locale } from 'svelte-i18n';
@@ -81,11 +82,13 @@
       data: submitData,
     });
 
+    let url = makeAuthUrl(
+      session.r,
+      `orders/${session.r.get('order_id')}/virtual_accounts`
+    );
+
     fetch.post({
-      url: makeAuthUrl(
-        session.r,
-        `orders/${session.r.get('order_id')}/virtual_accounts`
-      ),
+      url,
       data,
       callback: getNEFTDetails,
     });

@@ -949,3 +949,18 @@ function getUsableMethods() {
 export function isMethodUsable(method) {
   return _Arr.contains(getUsableMethods(), method);
 }
+
+/**
+ * We need to disable vernacular for some methods because the APIs they use
+ * are not ready yet. We also disable it if the `checkout_disable_i18n`
+ * flag is present for the merchant.
+ *
+ * @returns {boolean}
+ */
+export function shouldUseVernacular() {
+  return (
+    !hasFeature('checkout_disable_i18n') &&
+    !isPayout() &&
+    !isMethodEnabled('nach')
+  );
+}
