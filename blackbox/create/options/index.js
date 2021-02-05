@@ -109,6 +109,7 @@ function makeTestPreferences(
       partial_payment: false,
     };
   }
+
   return preferences;
 }
 
@@ -146,9 +147,6 @@ function makeOptionsAndPreferences(method, features = {}) {
 
   options = maker.makeOptions(features, options);
   preferences = maker.makePreferences(features, preferences);
-
-  preferences.blocked = false;
-  preferences.activated = true;
 
   return {
     options,
