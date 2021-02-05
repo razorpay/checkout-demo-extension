@@ -539,9 +539,12 @@ export default {
     available_text: 'EMI Available',
     credit_emi_description:
       'Full amount of {amount} will be deducted from your account, which will be converted into EMI by your bank in 3-4 days.',
-    description_monthly_installment: 'Monthly Installment: {amount}',
-    description_total_amount:
-      'Total Amount: {totalAmount} ({monthlyAmount} x {duration})',
+    default_processing_fee_disclaimer:
+      'Processing Fee will be charged on the 1st month of EMI',
+    description_monthly_installment: 'Monthly Installment',
+    processing_fee: 'Processing Fee',
+    stamp_duty: 'Stamp Duty',
+    description_total_amount: 'Total Amount',
     edit_plan_action: 'Edit',
     edit_plan_text: '{duration} Months ({amount}/mo)',
     axis_bank_emi:
@@ -1100,7 +1103,9 @@ export default {
     tooltip_text: 'Unlock free rewards after payment',
   },
   trusted_badge: {
-    customer_label: "You're paying a",
-    seller_label: 'Razorpay Verified Seller',
+    header: 'Razorpay Verified Seller',
+    highlight1: 'Trusted by {customersNo} customers',
+    highlight2: 'Secured Razorpay merchant for {securedTime} months',
+    highlight3: 'No fraud transaction for last {noFraudTime} months',
   },
 };

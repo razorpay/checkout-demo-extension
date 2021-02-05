@@ -40,10 +40,10 @@
   }
 
   let helpTextToDisplay;
-  $: helpTextToDisplay = helpText || getHelpText($locale);
+  $: helpTextToDisplay = value && helpText || getHelpText($locale);
 
   function getHelpText(locale) {
-    if (recurring) {
+    if (recurring && value) {
       // LABEL: Card does not support recurring payments.
       return formatMessageWithLocale(CARD_NUMBER_HELP_RECURRING, locale);
     }
