@@ -194,8 +194,6 @@ export function init() {
 
   const isVernacularEnabled = shouldUseVernacular();
 
-  // We need to determine a default language only for the experiment.
-  // Otherwise, it will always be English.
   if (isVernacularEnabled) {
     initialLocale = determineInitialLocale();
   }
