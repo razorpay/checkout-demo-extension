@@ -109,6 +109,12 @@ export function isPayout() {
 }
 
 export function isBlockedDeactivated() {
+  if (
+    !preferences.hasOwnProperty('blocked') ||
+    !preferences.hasOwnProperty('activated')
+  ) {
+    return false;
+  }
   return preferences.blocked || !preferences.activated;
 }
 
