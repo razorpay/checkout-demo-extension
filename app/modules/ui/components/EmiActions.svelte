@@ -35,6 +35,9 @@
     dispatch('click', event.detail);
   }
 
+  /**
+   * Checking if Allowed issuers are restricted or not
+   */
   const restrictions = getMerchantConfig()?.config?.restrictions || {};
   let isRestrictedIssuers = false;
   if (restrictions) {
@@ -47,6 +50,7 @@
   }
 
   let instrumentSubtext;
+
   $: {
     if (!$methodInstrument) {
       instrumentSubtext = undefined;
@@ -63,11 +67,12 @@
     {#if emiCtaView === 'plans-unavailable'}
       <div class="emi-plan-unavailable emi-icon-multiple-cards">
         <span class="help">
-          <!-- LABEL: EMI is available on {issuers} cards. Enter your credit card
-          to avail. -->
-          {#if isRestrictedIssuers}
+          {#if isRestrictedIssuers && instrumentSubtext}
+            <!-- LABEL: According to subText logic -->
             {instrumentSubtext}
           {:else}
+            <!-- LABEL: EMI is available on {issuers} cards. Enter your credit card
+            to avail. -->
             {formatTemplateWithLocale(UNAVAILABLE_HELP, { issuers: getEMIBanksText($locale) }, $locale)}
           {/if}
         </span>
