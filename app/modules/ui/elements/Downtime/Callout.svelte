@@ -13,8 +13,8 @@
 
 <style>
   .downtime-callout {
-    width: 80%;
-    margin-left: 6%;
+    width: 81%;
+    margin: auto;
     padding: 10px;
     background: rgba(255, 219, 92, 0.4);
     color: #f99d27;

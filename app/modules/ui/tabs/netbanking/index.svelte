@@ -3,6 +3,7 @@
   import { createEventDispatcher } from 'svelte';
   import { fade } from 'svelte/transition';
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
+  import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
 
   // Store
   import {
@@ -311,6 +312,11 @@
     text-align: left;
     text-align: start;
   }
+  .dropdown-bank {
+    display: flex;
+    justify-content: space-between;
+    width: 90%;
+  }
 
   #bank-select {
     padding-top: 0;
@@ -343,14 +349,17 @@
           <div class="help">{$t(NETBANKING_SELECT_HELP)}</div>
           <button
             aria-label={`${$selectedBank ? `${selectedBankName} - ${$t(NETBANKING_SELECT_LABEL)}` : $t(NETBANKING_SELECT_LABEL)}`}
-            class="input dropdown-like"
+            class="input dropdown-like dropdown-bank"
             type="button"
             id="bank-select"
             bind:this={bankSelect}
             on:click={showSearch}
             on:keypress={handleEnterOnButton}>
             {#if $selectedBank}
-              {selectedBankName}
+              <div>{selectedBankName}</div>
+              <div>
+                <DowntimeIcon severe={selectedBankDowntimeSeverity} />
+              </div>
             {:else}
               <!-- LABEL: Select a different bank -->
               {$t(NETBANKING_SELECT_LABEL)}
