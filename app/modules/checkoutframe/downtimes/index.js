@@ -1,5 +1,3 @@
-import { methodInstrument } from 'checkoutstore/screens/home';
-
 /**
  * Checks downtime for provided severity or scheduled,
  * and decides to disable.

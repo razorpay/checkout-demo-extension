@@ -15,7 +15,7 @@
   import Tab from 'ui/tabs/Tab.svelte';
   import GridItem from 'ui/tabs/netbanking/GridItem.svelte';
   import Callout from 'ui/elements/Callout.svelte';
-  import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
+  import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
   import SearchModal from 'ui/elements/SearchModal.svelte';
@@ -396,7 +396,7 @@
       {/if}
       <!-- Show downtime message if the selected bank is down -->
       {#if selectedBankHasDowntime}
-        <DowntimeCallout severe={selectedBankDowntimeSeverity}>
+        <DowntimeCallout showIcon={false} severe={selectedBankDowntimeSeverity}>
           <FormattedText
             text={formatTemplateWithLocale(downtimeText, { bank: getLongBankName($selectedBank, $locale) }, $locale)} />
         </DowntimeCallout>

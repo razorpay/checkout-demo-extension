@@ -1,5 +1,5 @@
 <script>
-  import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
+  import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import Callout from 'ui/elements/Callout.svelte';

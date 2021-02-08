@@ -52,7 +52,7 @@
   import Field from 'ui/components/Field.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
-  import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
+  import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
   import Collect from './Collect.svelte';
   import GooglePayCollect from './GooglePayCollect.svelte';
   import GooglePayOmnichannel from './GooglePayOmnichannel.svelte';

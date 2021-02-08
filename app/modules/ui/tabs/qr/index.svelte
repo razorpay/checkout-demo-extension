@@ -3,7 +3,7 @@
   import { onMount } from 'svelte';
 
   // UI imports
-  import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
+  import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import FeeBearer from 'ui/components/feebearer.svelte';
