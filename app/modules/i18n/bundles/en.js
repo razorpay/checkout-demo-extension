@@ -797,9 +797,11 @@ export default {
   netbanking: {
     corporate_label: 'Corporate',
     downtime_low_callout:
-      '<strong>{bank}<strong> accounts are experiencing low success rates.',
+      'This payment might fail because {bank} is facing technical difficulties',
     downtime_high_callout:
-      '<strong>{bank}<strong> accounts are temporarily unavailable right now. Please select another bank.',
+      'This payment might fail because {bank} is facing technical difficulties',
+    downtime_medium_callout:
+      'This payment might fail because {bank} is facing technical difficulties',
     recurring_callout:
       'Future payments from your bank account will be charged automatically.',
     retail_label: 'Retail',

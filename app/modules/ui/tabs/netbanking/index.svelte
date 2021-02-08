@@ -2,6 +2,7 @@
   // Svelte imports
   import { createEventDispatcher } from 'svelte';
   import { fade } from 'svelte/transition';
+  import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
 
   // Store
   import {
@@ -33,6 +34,7 @@
     SEARCH_ALL,
     DOWNTIME_LOW_CALLOUT,
     DOWNTIME_HIGH_CALLOUT,
+    DOWNTIME_MEDIUM_CALLOUT,
     RECURRING_CALLOUT,
   } from 'ui/labels/netbanking';
 
@@ -76,8 +78,8 @@
   let banksArr;
   let invalid;
   let netbanks;
-  let selectedBankHasSevereDowntime;
-  let selectedBankHasLowDowntime;
+  let selectedBankDowntimeSeverity = false;
+  let downtimeText = '';
   let selectedBankHasDowntime;
   let selectedBankName;
   let translatedBanksArr;
@@ -237,14 +239,24 @@
     0,
     maxGridCount
   );
-  $: selectedBankHasSevereDowntime =
-    method === 'netbanking' &&
-    _Arr.contains(downtimes.high.banks, $selectedBank);
-  $: selectedBankHasLowDowntime =
-    method === 'netbanking' &&
-    _Arr.contains(downtimes.low.banks, $selectedBank);
-  $: selectedBankHasDowntime =
-    selectedBankHasSevereDowntime || selectedBankHasLowDowntime;
+
+  $: {
+    if (method === 'netbanking') {
+      if (_Arr.contains(downtimes.high.banks, $selectedBank)) {
+        selectedBankDowntimeSeverity = 'high';
+        selectedBankHasDowntime = true;
+        downtimeText = DOWNTIME_HIGH_CALLOUT;
+      } else if (_Arr.contains(downtimes.medium.banks, $selectedBank)) {
+        selectedBankDowntimeSeverity = 'medium';
+        selectedBankHasDowntime = true;
+        downtimeText = DOWNTIME_MEDIUM_CALLOUT;
+      } else if (_Arr.contains(downtimes.low.banks, $selectedBank)) {
+        selectedBankDowntimeSeverity = 'low';
+        selectedBankHasDowntime = true;
+        downtimeText = DOWNTIME_LOW_CALLOUT;
+      }
+    }
+  }
 
   $: {
     const selected = corporateSelected;
@@ -324,7 +336,7 @@
         {/each}
       </div>
 
-      <div class="elem-wrap pad" style="margin-bottom: 24px;">
+      <div class="elem-wrap pad">
         <div id="nb-elem" class="elem select" class:invalid>
           <i class="select-arrow"></i>
           <!-- LABEL: Please select a bank -->
@@ -382,6 +394,13 @@
           </div>
         </div>
       {/if}
+      <!-- Show downtime message if the selected bank is down -->
+      {#if selectedBankHasDowntime}
+        <DowntimeCallout severe={selectedBankDowntimeSeverity}>
+          <FormattedText
+            text={formatTemplateWithLocale(downtimeText, { bank: getLongBankName($selectedBank, $locale) }, $locale)} />
+        </DowntimeCallout>
+      {/if}
     </div>
 
     <!-- LABEL: Select bank to pay -->
@@ -406,17 +425,6 @@
       <!-- Show recurring message for recurring payments -->
       {#if recurring}
         <Callout>{$t(RECURRING_CALLOUT)}</Callout>
-      {/if}
-
-      <!-- Show downtime message if the selected bank is down -->
-      {#if selectedBankHasDowntime}
-        <DowntimeCallout severe={selectedBankHasSevereDowntime}>
-          {#if selectedBankHasSevereDowntime}
-            {formatTemplateWithLocale(DOWNTIME_HIGH_CALLOUT, { bank: getLongBankName($selectedBank, $locale) }, $locale)}
-          {:else}
-            {formatTemplateWithLocale(DOWNTIME_LOW_CALLOUT, { bank: getLongBankName($selectedBank, $locale) }, $locale)}
-          {/if}
-        </DowntimeCallout>
       {/if}
     </Bottom>
     {#if !recurring}

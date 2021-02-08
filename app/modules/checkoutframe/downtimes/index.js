@@ -1,3 +1,5 @@
+import { methodInstrument } from 'checkoutstore/screens/home';
+
 /**
  * Checks downtime for provided severity or scheduled,
  * and decides to disable.
@@ -23,6 +25,14 @@ function disableBasedOnSeverityOrScheduled(severity = [], scheduled = true) {
  * @return {boolean}
  */
 const isHighScheduled = disableBasedOnSeverityOrScheduled(['high'], true);
+
+/**
+ * Checks if the downtime has high severity or is scheduled.
+ *
+ * @param {Object} downtime
+ * @return {boolean}
+ */
+const isMediumScheduled = disableBasedOnSeverityOrScheduled(['medium'], true);
 
 /**
  * Checks if the downtime has an instrument. For downtimes without an
@@ -119,6 +129,7 @@ const WARN_METHOD = {
 function getMethodDowntimes(downtimes, preferences) {
   const high = [];
   const low = [];
+  const medium = [];
 
   // Loop through all methods
   _Obj.loop(downtimes, (methodDowntimes, method) => {
@@ -144,7 +155,7 @@ function getMethodDowntimes(downtimes, preferences) {
     }
   });
 
-  return { high, low };
+  return { high, low, medium };
 }
 
 /**
@@ -157,6 +168,8 @@ function getMethodDowntimes(downtimes, preferences) {
 function getBankDowntimes(downtimes) {
   return {
     high: getBanksWithHighSeverityDowntime(downtimes) |> _Arr.removeDuplicates,
+    medium:
+      getBanksWithMediumSeverityDowntime(downtimes) |> _Arr.removeDuplicates,
     low: getBanksWithLowSeverityDowntimes(downtimes) |> _Arr.removeDuplicates,
   };
 }
@@ -186,6 +199,10 @@ const getFilteredBankNamesFromDowntimes = _.curry2((downtimes, predicate) => {
  */
 const getBanksWithHighSeverityDowntime = getFilteredBankNamesFromDowntimes(
   isHighScheduled
+);
+
+const getBanksWithMediumSeverityDowntime = getFilteredBankNamesFromDowntimes(
+  isMediumScheduled
 );
 
 /**
@@ -267,11 +284,16 @@ export function getDowntimes(preferences) {
 
   const methodDowntimes = getMethodDowntimes(groupedDowntimes, preferences);
   const bankDowntimes = getBankDowntimes(groupedDowntimes);
+  console.log(methodDowntimes, bankDowntimes);
 
   return {
     high: {
       methods: methodDowntimes.high,
       banks: bankDowntimes.high,
+    },
+    medium: {
+      methods: methodDowntimes.medium,
+      banks: bankDowntimes.medium,
     },
     low: {
       methods: methodDowntimes.low,
