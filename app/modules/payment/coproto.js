@@ -242,6 +242,7 @@ var responseTypes = {
   },
 
   web_payments: function(response, app) {
+    console.log('entered web payments co proto');
     const data = response.data;
     const instrumentData = {
       url: data.intent_url,
@@ -328,9 +329,11 @@ var responseTypes = {
           return instrument.complete();
         })
         .catch(error => {
+          console.log('web payments error 1', app, error);
           webPaymentOnError(app, error);
         });
     } catch (error) {
+      console.log('web payments error 2', app, error);
       webPaymentOnError(app, error);
     }
   },
