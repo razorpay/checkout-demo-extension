@@ -2,7 +2,8 @@
   // Svelte imports
   import { onMount, createEventDispatcher } from 'svelte';
   import { slide } from 'svelte/transition';
-  import { _ as t } from 'svelte-i18n';
+  import { _ as t, locale } from 'svelte-i18n';
+  import { formatTemplateWithLocale } from 'i18n';
 
   // UI Imports
   import Field from 'ui/components/Field.svelte';
@@ -10,6 +11,8 @@
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import Checkbox from 'ui/elements/Checkbox.svelte';
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
+  import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
+  import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
 
   // Util imports
   import { getSession } from 'sessionmanager';
@@ -17,6 +20,7 @@
     hasFeature,
     getPrefilledVPA,
     shouldRememberCustomer,
+    getDowntimes,
   } from 'checkoutstore';
   import { VPA_REGEX } from 'common/constants';
   import { getAnimationOptions } from 'svelte-utils';
@@ -29,6 +33,7 @@
     NEW_VPA_TITLE_LOGGED_IN,
     NEW_VPA_SUBTITLE,
     NEW_VPA_SUBTITLE_UPI_OTM,
+    UPI_DOWNTIME_TEXT,
   } from 'ui/labels/upi';
 
   // Props
@@ -54,6 +59,11 @@
   let newVpa = getPrefilledVPA();
   let vpa;
   let pspHandle;
+  export let downtimeVisible = false;
+  export let downtimeVisibleSeverity = '';
+  let downEntity = '';
+
+  let upiDowntimes = getDowntimes().upi;
 
   function isVpaValid(vpa) {
     return VPA_REGEX.test(vpa);
@@ -65,7 +75,43 @@
     }
   });
 
+  function filterDowntime(downtimeArr, vpaEntered) {
+    return downtimeArr.filter(item => {
+      if (item.instrument?.vpa_handle === vpaEntered) {
+        downEntity = vpaEntered;
+        downtimeVisible = true;
+        return item;
+      }
+    });
+  }
+
+  function checkDowntime() {
+    if (pspHandle) {
+    } else {
+      console.log('hello');
+      const vpaEntered = vpa.split('@')[1];
+      let matched = [];
+      if (vpaEntered) {
+        matched = filterDowntime(upiDowntimes.high, vpaEntered);
+        if (matched?.length > 0) {
+          downtimeVisibleSeverity = 'high';
+        } else {
+          matched = filterDowntime(upiDowntimes.medium, vpaEntered);
+          if (matched?.length > 0) {
+            downtimeVisibleSeverity = 'medium';
+          } else {
+            matched = filterDowntime(upiDowntimes.low, vpaEntered);
+            if (matched?.length > 0) {
+              downtimeVisibleSeverity = 'low';
+            }
+          }
+        }
+      }
+    }
+  }
+
   function handleVpaInput() {
+    checkDowntime();
     if (isVpaValid(vpa) || !pspHandle) {
       value = vpa;
     } else {
@@ -186,6 +232,11 @@
           on:input={handleVpaInput}
           on:blur
           placeholder={$t(UPI_COLLECT_ENTER_ID)} />
+        {#if downtimeVisible}
+          <DowntimeCallout showIcon={false} severe={downtimeVisibleSeverity}>
+            {formatTemplateWithLocale(UPI_DOWNTIME_TEXT, { vpa: downEntity }, $locale)}
+          </DowntimeCallout>
+        {/if}
         {#if logged && canSaveVpa}
           <div class="should-save-vpa-container">
             <label

@@ -171,6 +171,42 @@ function getBankDowntimes(downtimes) {
     low: getBanksWithLowSeverityDowntimes(downtimes) |> _Arr.removeDuplicates,
   };
 }
+/**
+ * Returns the list of banks with high and low severity downtimes. Scheduled
+ * downtimes are considered as high severity.
+ *
+ * @param downtimes
+ * @return {{warn: Array<string>, disable: Array<string>}}
+ */
+function getUPIDowntimes(downtimes) {
+  const upiDowntimes = downtimes?.upi;
+  let high = [];
+  let medium = [];
+  let low = [];
+  if (upiDowntimes?.length) {
+    upiDowntimes.forEach(downtime => {
+      switch (downtime.severity) {
+        case 'high':
+          high.push(downtime);
+          break;
+        case 'medium':
+          medium.push(downtime);
+          break;
+        case 'low':
+          low.push(downtime);
+          break;
+      }
+    });
+  }
+  return { high, medium, low };
+
+  // return {
+  //   high: getUPIWithHighSeverityDowntime(downtimes) |> _Arr.removeDuplicates,
+  //   medium:
+  //     getUPIWithMediumSeverityDowntime(downtimes) |> _Arr.removeDuplicates,
+  //   low: getUPIWithLowSeverityDowntimes(downtimes) |> _Arr.removeDuplicates,
+  // };
+}
 
 /**
  * Returns bank names from downtimes after filtering them using predicate
@@ -199,6 +235,11 @@ const getBanksWithHighSeverityDowntime = getFilteredBankNamesFromDowntimes(
   isHighScheduled
 );
 
+/**
+ * Returns the list of banks with medium downtime
+ * @param downtimes
+ * @return Array<string>
+ */
 const getBanksWithMediumSeverityDowntime = getFilteredBankNamesFromDowntimes(
   isMediumScheduled
 );
@@ -211,6 +252,27 @@ const getBanksWithMediumSeverityDowntime = getFilteredBankNamesFromDowntimes(
 const getBanksWithLowSeverityDowntimes = getFilteredBankNamesFromDowntimes(
   isLowScheduled
 );
+
+/**
+ * Returns the list of UPI with high downtime.
+ * @param downtimes
+ * @return Array<string>
+ */
+const getUPIWithHighSeverityDowntime = function() {};
+
+/**
+ * Returns the list of UPI with medium downtime
+ * @param downtimes
+ * @return Array<string>
+ */
+const getUPIWithMediumSeverityDowntime = function() {};
+
+/**
+ * Returns the list of banks for which there should be a warning displayed.
+ * @param downtimes
+ * @return {Array<string>}
+ */
+const getUPIWithLowSeverityDowntimes = function() {};
 
 const DOWNTIME_METHOD_COPY_MAP = {
   qr: 'upi',
@@ -282,9 +344,9 @@ export function getDowntimes(preferences) {
 
   const methodDowntimes = getMethodDowntimes(groupedDowntimes, preferences);
   const bankDowntimes = getBankDowntimes(groupedDowntimes);
-  console.log(methodDowntimes, bankDowntimes);
-
+  const UPIDowntimes = getUPIDowntimes(groupedDowntimes);
   return {
+    upi: { ...UPIDowntimes },
     high: {
       methods: methodDowntimes.high,
       banks: bankDowntimes.high,

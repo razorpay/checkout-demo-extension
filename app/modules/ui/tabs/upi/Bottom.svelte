@@ -1,5 +1,4 @@
 <script>
-  import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import Callout from 'ui/elements/Callout.svelte';
@@ -67,12 +66,6 @@
 </script>
 
 <Bottom>
-  {#if down || disabled}
-    <DowntimeCallout severe={disabled}>
-      <!-- LABEL: UPI is experiencing low success rates. -->
-      <FormattedText text={$t(UPI_DOWNTIME_TEXT)} />
-    </DowntimeCallout>
-  {/if}
   {#if isOtm}
     <Callout classes={['downtime-callout']} showIcon={true}>
       <FormattedText

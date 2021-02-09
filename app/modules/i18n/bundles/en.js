@@ -984,7 +984,8 @@ export default {
     collect_enter_upi_id: 'Enter your UPI ID',
     collect_new_vpa_help: 'Please enter a valid VPA of the form username@bank',
     collect_securely_save: 'Securely save your UPI ID',
-    downtime_text: '<strong>UPI<strong> is experiencing low success rate.',
+    downtime_text:
+      'This payment might fail because {vpa} is facing technical difficulties',
     gpay_block_heading: 'Pay using Gpay App',
     gpay_web_api_title: 'Google Pay',
     intent_accept_request:

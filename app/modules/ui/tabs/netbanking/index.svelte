@@ -322,6 +322,10 @@
     padding-top: 0;
     margin-top: 12px;
   }
+  .downtime-wrapper {
+    width: 86%;
+    margin: auto;
+  }
 </style>
 
 <!-- TODO: remove override after fixing method check -->
@@ -405,10 +409,14 @@
       {/if}
       <!-- Show downtime message if the selected bank is down -->
       {#if selectedBankHasDowntime}
-        <DowntimeCallout showIcon={false} severe={selectedBankDowntimeSeverity}>
-          <FormattedText
-            text={formatTemplateWithLocale(downtimeText, { bank: getLongBankName($selectedBank, $locale) }, $locale)} />
-        </DowntimeCallout>
+        <div class="downtime-wrapper">
+          <DowntimeCallout
+            showIcon={false}
+            severe={selectedBankDowntimeSeverity}>
+            <FormattedText
+              text={formatTemplateWithLocale(downtimeText, { bank: getLongBankName($selectedBank, $locale) }, $locale)} />
+          </DowntimeCallout>
+        </div>
       {/if}
     </div>
 
