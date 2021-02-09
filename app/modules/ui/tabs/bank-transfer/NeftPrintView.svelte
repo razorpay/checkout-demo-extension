@@ -6,35 +6,18 @@
   // utils
   import { getSession } from 'sessionmanager';
 
-  const HEADER = 'For RTGS/NEFT/Funds Transfer';
-  const ROW_HEADERS = {
-    row1: 'Beneficiary Name',
-    row2: 'Account No.',
-    row3: 'IFSC Code',
-    row4: 'Bank',
-    row5: 'Branch',
-    row6: 'Amount',
-    row7: 'Customer Name',
-    row8: 'Customer Email ID',
-    row9: 'Customer Mobile No',
-    row10: 'Merchant Order Id',
-    row11: 'Expiry time',
-    row12: 'Disclaimers',
-  };
-  const OFFICE_USE = {
-    header: '(FOR BANK USE ONLY)',
-    list: ['Amount (Rs.)', 'Debit A/C No.', 'UTR No.'],
-  };
-  const DISCLAIMERS = [
-    'This challan can be used only for electronic funds transfer to provided account no. fromHDFC Bank and Other Banks through intra bank Funds Transfer or RTGS / NEFT.',
-    "It is remitter's responsibility to remit the funds to correct account no. with correctamount as provided above. Incase of any mismatch in account no or amount, the transaction willbe rejected and funds will be refunded back to remitter account by next working day.",
-    'IMPS transactions are not allowed into provided account no. Bank shall not be liable incaseof IMPS transactions are not updated successfully or not refunded back to remitter. (This isrequired as solution for refund of IMPS rejections is yet to be finalized)',
-    'This challan is valid for only one transaction hence Remitter has to generate new challanfor every payment.',
-  ];
-  const DISCLAIMER_LABEL = 'Disclaimer';
-  const DIPOSITOR_SIGN_LABEL = 'Signature of Depositor';
-  const AUTH_SIGN_LABEL = 'Authorised Signatory';
-  const BRANCH_LABEL = 'Branch Stamp';
+  import { labels, rzpLogo, hdfcLogo } from './challanConstants';
+
+  const {
+    HEADER,
+    ROW_HEADERS,
+    OFFICE_USE,
+    DISCLAIMERS,
+    DISCLAIMER_LABEL,
+    DIPOSITOR_SIGN_LABEL,
+    AUTH_SIGN_LABEL,
+    BRANCH_LABEL,
+  } = labels;
 
   let neftView;
   export let neftDetails;
@@ -49,12 +32,11 @@
   const email = getOption('prefill.email');
 
   const { account_number, ifsc, branch, bank_name } = neftDetails;
-  let org_logo =
-    'https://cdn.razorpay.com/static/assets/secured_by_razorpay.svg';
+  let org_logo = rzpLogo;
 
   onMount(() => {
     if (bank_name.startsWith('HDFC') || ifsc.startsWith('HDFC')) {
-      org_logo = 'https://cdn.razorpay.com/bank/HDFC.gif';
+      org_logo = hdfcLogo;
     }
     if (!merchant_logo) {
       merchantLogoLoaded = true;
@@ -170,10 +152,12 @@
       <td colspan="2" class="text-left">Date: {formatDate(new Date())}</td>
     </tr>
     {#each Object.keys(tableDetails) as key}
-      <tr>
-        <th class="text-left" width="30%">{key}:</th>
-        <td class="text-left">{tableDetails[key] || ''}</td>
-      </tr>
+      {#if tableDetails[key]}
+        <tr>
+          <th class="text-left" width="30%">{key}</th>
+          <td class="text-left">{tableDetails[key] || ''}</td>
+        </tr>
+      {/if}
     {/each}
     <tr>
       <th colspan="2" class="text-left">{DISCLAIMER_LABEL}:</th>
