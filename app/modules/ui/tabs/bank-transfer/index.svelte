@@ -22,7 +22,6 @@
   import Bottom from 'ui/layouts/Bottom.svelte';
   import CTA from 'ui/elements/CTA.svelte';
   import NeftPrintView from './NeftPrintView.svelte';
-  import Icon from 'ui/elements/Icon.svelte';
 
   // i18n
   import {
@@ -55,7 +54,6 @@
   let copied = false;
   const session = getSession();
 
-  const icons = session.themeMeta.icons;
   function getPayloadForVirtualAccounts() {
     const payload = {
       customer: getCustomerDetails(),

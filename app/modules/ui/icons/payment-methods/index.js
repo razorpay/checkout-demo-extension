@@ -78,7 +78,6 @@ function getIconFn(iconName) {
 
     case 'present':
       return present;
-
     case 'trusted_badge':
       return trustedBadge;
 
