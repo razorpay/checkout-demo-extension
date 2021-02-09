@@ -10,7 +10,7 @@ const PaymentRequest = global.PaymentRequest;
 
 export const supportedWebPaymentsMethodsForApp = {
   [PHONE_PE_PACKAGE_NAME]: 'https://mercury.phonepe.com/transact/pay',
-  [CRED_PACKAGE_NAME]: ['https://cred-web-stg.dreamplug.in/checkout/pay'],
+  [CRED_PACKAGE_NAME]: ['https://cred.club/checkout/pay'],
 };
 
 export const ADAPTER_CHECKERS = {
