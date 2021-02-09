@@ -431,6 +431,7 @@ var responseTypes = {
 
       this.on('app.intent_response', response => {
         if (response.provider === 'CRED') {
+          console.trace('app', response);
           if (response.data === 0) {
             // Payment was cancelled on CRED app.
             this.emit('cancel', {
