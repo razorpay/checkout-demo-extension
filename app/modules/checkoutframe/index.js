@@ -31,6 +31,7 @@ import {
 import { checkForPossibleWebPayments } from 'checkoutframe/components/upi';
 import { rewards, rewardIds } from 'checkoutstore/rewards';
 import updateScore from 'analytics/checkoutScore';
+import { isBraveBrowser } from 'common/useragent';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -139,6 +140,13 @@ const setAnalyticsMeta = message => {
       Analytics.setMeta('sdk.version', qpmap.version);
     }
   }
+
+  /**
+   * Browser related meta properties
+   */
+  isBraveBrowser().then(result => {
+    Analytics.setMeta('brave_browser', result);
+  });
 };
 
 /**
