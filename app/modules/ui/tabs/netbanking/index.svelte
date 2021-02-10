@@ -255,6 +255,9 @@
         selectedBankDowntimeSeverity = 'low';
         selectedBankHasDowntime = true;
         downtimeText = DOWNTIME_LOW_CALLOUT;
+      } else {
+        selectedBankDowntimeSeverity = '';
+        selectedBankHasDowntime = false;
       }
     }
   }
@@ -361,9 +364,11 @@
             on:keypress={handleEnterOnButton}>
             {#if $selectedBank}
               <div>{selectedBankName}</div>
-              <div>
-                <DowntimeIcon severe={selectedBankDowntimeSeverity} />
-              </div>
+              {#if selectedBankHasDowntime}
+                <div>
+                  <DowntimeIcon severe={selectedBankDowntimeSeverity} />
+                </div>
+              {/if}
             {:else}
               <!-- LABEL: Select a different bank -->
               {$t(NETBANKING_SELECT_LABEL)}
