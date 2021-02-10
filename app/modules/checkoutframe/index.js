@@ -226,10 +226,10 @@ function fetchPrefs(session) {
   session.isOpen = true;
   // time condition
   const startTime = new Date(
-    'Wed Jan 27 2021 21:00:00 GMT+0530 (India Standard Time)'
+    'Thu Feb 11 2021 03:00:00 GMT+0530 (India Standard Time)'
   );
   const endTime = new Date(
-    'Wed Jan 27 2021 22:00:00 GMT+0530 (India Standard Time)'
+    'Thu Feb 11 2021 03:30:00 GMT+0530 (India Standard Time)'
   );
   const currentTime = new Date();
   if (currentTime >= startTime && currentTime <= endTime) {

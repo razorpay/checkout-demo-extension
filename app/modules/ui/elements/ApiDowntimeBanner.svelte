@@ -28,7 +28,7 @@
   <strong>We'll be back in a bit!</strong>
   <div>
     We are undergoing scheduled maintenance to ensure you get the best
-    experience. We'll be back at 28th Jan'21 03:30 AM IST
+    experience. We'll be back at 11th Feb'21 03:30 AM IST
   </div>
   <CTA on:click={onCloseCick}>CLOSE</CTA>
 </div>
