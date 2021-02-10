@@ -13,6 +13,7 @@
     ROW_HEADERS,
     OFFICE_USE,
     DISCLAIMERS,
+    NON_HDFC_DISCLAIMERS,
     DISCLAIMER_LABEL,
     DIPOSITOR_SIGN_LABEL,
     AUTH_SIGN_LABEL,
@@ -26,6 +27,8 @@
   let merchant_logo = getOption('image');
   let orgLogoLoaded = false;
   let merchantLogoLoaded = false;
+  let isHDFC = false;
+  let disclaimers = NON_HDFC_DISCLAIMERS;
 
   const name = getOption('prefill.name');
   const contact = getOption('prefill.contact');
@@ -36,7 +39,9 @@
 
   onMount(() => {
     if (bank_name.startsWith('HDFC') || ifsc.startsWith('HDFC')) {
+      isHDFC = true;
       org_logo = hdfcLogo;
+      disclaimers = DISCLAIMERS;
     }
     if (!merchant_logo) {
       merchantLogoLoaded = true;
@@ -86,7 +91,7 @@
     [ROW_HEADERS.row7]: name,
     [ROW_HEADERS.row8]: email,
     [ROW_HEADERS.row9]: contact,
-    [ROW_HEADERS.row10]: description,
+    [ROW_HEADERS.row10]: isHDFC ? description : '',
     [ROW_HEADERS.row11]: expiry,
   };
   if (!neftDetails.branch) {
@@ -165,7 +170,7 @@
     <tr>
       <td colspan="2">&nbsp;</td>
     </tr>
-    {#each DISCLAIMERS as dis, ind}
+    {#each disclaimers as dis, ind}
       <tr>
         <td colspan="2">{`${ind + 1}.) ${dis}`}</td>
       </tr>
