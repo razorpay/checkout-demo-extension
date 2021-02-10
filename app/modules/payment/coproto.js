@@ -281,16 +281,18 @@ var responseTypes = {
         ) {
           if (this.data && this.data.method === 'upi') {
             this.emit('upi.intent_response', {});
-          } else if (
-            this.data &&
-            this.data.method === 'app' &&
-            app === 'cred'
-          ) {
-            this.emit('app.intent_response', {
-              provider: 'CRED',
-              data: 0,
-            });
           }
+          // Commenting this because CRED throws incorrect error codes
+          // else if (
+          //   this.data &&
+          //   this.data.method === 'app' &&
+          //   app === 'cred'
+          // ) {
+          //   this.emit('app.intent_response', {
+          //     provider: 'CRED',
+          //     data: 0,
+          //   });
+          // }
         }
 
         // Since the method is not supported, remove it.
