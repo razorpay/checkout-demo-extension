@@ -1016,6 +1016,20 @@ Session.prototype = {
     discreet.Experiments.clearOldExperiments();
   },
 
+  renderBanner: function(options) {
+    var that = this;
+
+    options = options || {};
+
+    this.isOpen = true;
+
+    this.improviseModalOptions();
+    this.getEl();
+    es6components.render();
+    this.setModal();
+    this.setBackdrop();
+  },
+
   render: function(options) {
     var that = this;
 

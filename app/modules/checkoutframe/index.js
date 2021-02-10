@@ -17,6 +17,7 @@ import {
   removeDuplicateApiInstruments,
 } from 'checkoutframe/personalization/api';
 import { setHistoryAndListenForBackPresses } from 'bridge/back';
+import showApiDowntimeBanner from './api-downtime-banner';
 
 import { init as initI18n, bindI18nEvents } from 'i18n/init';
 
@@ -232,7 +233,18 @@ function fetchPrefs(session) {
     return;
   }
   session.isOpen = true;
-
+  // time condition
+  const startTime = new Date(
+    'Thu Feb 11 2021 03:00:00 GMT+0530 (India Standard Time)'
+  );
+  const endTime = new Date(
+    'Thu Feb 11 2021 03:30:00 GMT+0530 (India Standard Time)'
+  );
+  const currentTime = new Date();
+  if (currentTime >= startTime && currentTime <= endTime) {
+    setSessionForDownTime(session, {});
+    return;
+  }
   performPrePrefsFetchOperations();
 
   session.prefCall = Razorpay.payment.getPrefs(
@@ -274,6 +286,38 @@ function performPrePrefsFetchOperations() {
   setHistoryAndListenForBackPresses();
 
   checkForPossibleWebPayments();
+}
+
+function setSessionForDownTime(session, preferences) {
+  const razorpayInstance = session.r;
+  razorpayInstance.preferences = preferences;
+  setRazorpayInstance(razorpayInstance);
+
+  updateOptions(preferences);
+  updateEmandatePrefill();
+  updateAnalytics(preferences);
+  updatePreferredMethods(preferences);
+
+  Razorpay.configure(preferences.options);
+  session.setPreferences(preferences);
+
+  // session.setPreferences updates razorpay options.
+  // validate options now
+  try {
+    validateOverrides(razorpayInstance);
+  } catch (e) {
+    return Razorpay.sendMessage({
+      event: 'fault',
+      data: e.message,
+    });
+  }
+
+  initI18n().then(() => {
+    session.renderBanner();
+    showModal(session);
+    showApiDowntimeBanner();
+    _Doc.getElementById('header').remove();
+  });
 }
 
 function setSessionPreferences(session, preferences) {
