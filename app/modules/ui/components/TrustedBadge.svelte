@@ -10,13 +10,37 @@
 
   //i18n
   import {
-    TRUSTED_BADGE_CUSTOMER_LABEL,
-    TRUSTED_BADGE_SELLER_LABEL,
+    TRUSTED_BADGE_HEADER,
+    TRUSTED_BADGE_HIGHLIGHT1,
+    TRUSTED_BADGE_HIGHLIGHT2,
+    TRUSTED_BADGE_HIGHLIGHT3,
   } from 'ui/labels/trusted-badge';
   import { t, locale } from 'svelte-i18n';
+  import { formatTemplateWithLocale } from 'i18n';
 
   //props
-  export let list;
+  export let nos;
+  const { customersNo, securedTime, noFraudTime } = nos;
+  let list;
+  $: {
+    list = [
+      formatTemplateWithLocale(
+        TRUSTED_BADGE_HIGHLIGHT1,
+        { customersNo },
+        $locale
+      ),
+      formatTemplateWithLocale(
+        TRUSTED_BADGE_HIGHLIGHT2,
+        { securedTime },
+        $locale
+      ),
+      formatTemplateWithLocale(
+        TRUSTED_BADGE_HIGHLIGHT3,
+        { noFraudTime },
+        $locale
+      ),
+    ];
+  }
   const session = getSession();
   const icons = session.themeMeta.icons;
 
@@ -29,13 +53,15 @@
 
 <style>
   .trusted-badge-wrapper {
-    padding: 16px 32px;
+    padding: 8px 32px;
   }
   .trusted-badge-header-section {
     display: flex;
     cursor: pointer;
   }
   .trusted-badge-header-labels {
+    font-size: 16px;
+    margin-top: 4px;
     margin-left: 12px;
     display: inline-block;
     line-height: 16px;
@@ -90,8 +116,7 @@
       </i>
       <div class="trusted-badge-full-width">
         <div class="trusted-badge-header-labels">
-          <span>{$t(TRUSTED_BADGE_CUSTOMER_LABEL)}</span>
-          <div><b>{$t(TRUSTED_BADGE_SELLER_LABEL)}</b></div>
+          <div><b>{$t(TRUSTED_BADGE_HEADER)}</b></div>
         </div>
         <div class="trusted-badge-arrow">
           {#if !isInfoVisible}

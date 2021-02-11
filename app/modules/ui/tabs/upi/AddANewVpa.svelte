@@ -13,7 +13,12 @@
 
   // Util imports
   import { getSession } from 'sessionmanager';
-  import { hasFeature, getPrefilledVPA, getPrefilledName } from 'checkoutstore';
+  import {
+    hasFeature,
+    getPrefilledVPA,
+    getPrefilledName,
+    shouldRememberCustomer,
+  } from 'checkoutstore';
   import { VPA_REGEX } from 'common/constants';
   import { getAnimationOptions } from 'svelte-utils';
 
@@ -116,11 +121,8 @@
       }
     }, 200);
   }
-
-  const canSaveVpa = hasFeature('save_vpa');
-
+  const canSaveVpa = hasFeature('save_vpa') && shouldRememberCustomer('upi');
   let logged;
-
   $: logged = _Obj.getSafely(customer, 'logged');
 
   $: pattern = PATTERN_WITH_HANDLE;
@@ -232,6 +234,7 @@
           name={'vpa-' + paymentMethod}
           type="text"
           required
+          bind:value
           bind:this={vpaField}
           bind:readonlyValue={vpa}
           on:input={handleVpaInput}
