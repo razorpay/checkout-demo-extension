@@ -1,6 +1,8 @@
 <script>
   //store
   import { getOption, getAmount } from 'checkoutstore';
+  import { phone, email } from 'checkoutstore/screens/home';
+
   // svelte imports
   import { onMount } from 'svelte';
   // utils
@@ -25,14 +27,14 @@
   export let expiry;
   const description = getOption('description');
   let merchant_logo = getOption('image');
+  const merchantName = getOption('name');
   let orgLogoLoaded = false;
   let merchantLogoLoaded = false;
   let isHDFC = false;
   let disclaimers = NON_HDFC_DISCLAIMERS;
+  let orgName = 'Razorpay';
 
   const name = getOption('prefill.name');
-  const contact = getOption('prefill.contact');
-  const email = getOption('prefill.email');
 
   const { account_number, ifsc, branch, bank_name } = neftDetails;
   let org_logo = rzpLogo;
@@ -42,6 +44,7 @@
       isHDFC = true;
       org_logo = hdfcLogo;
       disclaimers = DISCLAIMERS;
+      orgName = 'HDFC';
     }
     if (!merchant_logo) {
       merchantLogoLoaded = true;
@@ -89,8 +92,8 @@
     [ROW_HEADERS.row5]: branch,
     [ROW_HEADERS.row6]: amount,
     [ROW_HEADERS.row7]: name,
-    [ROW_HEADERS.row8]: email,
-    [ROW_HEADERS.row9]: contact,
+    [ROW_HEADERS.row8]: $email,
+    [ROW_HEADERS.row9]: $phone,
     [ROW_HEADERS.row10]: isHDFC ? description : '',
     [ROW_HEADERS.row11]: expiry,
   };
@@ -141,12 +144,12 @@
     }
   </style>
   <div class="print-view-logos">
-    <img on:load={setOrgLogoLoaded} src={org_logo} alt="org Logo" />
+    <img on:load={setOrgLogoLoaded} src={org_logo} alt={orgName} />
     {#if merchant_logo}
       <img
         on:load={setMerchantLogoLoaded}
         src={merchant_logo}
-        alt="merchant Logo" />
+        alt={merchantName} />
     {/if}
   </div>
   <table class="bank-transfer-table">
@@ -160,7 +163,7 @@
       {#if tableDetails[key]}
         <tr>
           <th class="text-left" width="30%">{key}</th>
-          <td class="text-left">{tableDetails[key] || ''}</td>
+          <td class="text-left">{tableDetails[key]}</td>
         </tr>
       {/if}
     {/each}
