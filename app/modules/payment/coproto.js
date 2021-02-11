@@ -242,7 +242,7 @@ var responseTypes = {
   },
 
   web_payments: function(response, app) {
-    console.log('entered web payments co proto');
+    window.console.log('entered web payments co proto');
     const data = response.data;
     const instrumentData = {
       url: data.intent_url,
@@ -323,6 +323,10 @@ var responseTypes = {
               response: instrument.details,
             });
           } else if (this.data && this.data.method === 'app') {
+            window.console.trace(
+              'emmiting app.intent_response',
+              instrument.details
+            );
             this.emit('app.intent_response', {
               response: instrument.details,
             });
@@ -435,8 +439,9 @@ var responseTypes = {
       }
 
       this.on('app.intent_response', response => {
+        window.console.log("got the app's intent response");
         if (response.provider === 'CRED') {
-          console.trace('app', response);
+          window.console.trace('app', response);
           if (response.data === 0) {
             // Payment was cancelled on CRED app.
             this.emit('cancel', {
