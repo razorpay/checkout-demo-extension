@@ -14,7 +14,7 @@
     HEADER,
     ROW_HEADERS,
     OFFICE_USE,
-    DISCLAIMERS,
+    HDFC_DISCLAIMERS,
     NON_HDFC_DISCLAIMERS,
     DISCLAIMER_LABEL,
     DIPOSITOR_SIGN_LABEL,
@@ -43,7 +43,7 @@
     if (bank_name?.startsWith('HDFC') || ifsc?.startsWith('HDFC')) {
       isHDFC = true;
       org_logo = hdfcLogo;
-      disclaimers = DISCLAIMERS;
+      disclaimers = HDFC_DISCLAIMERS;
       orgName = 'HDFC';
     }
     if (!merchant_logo) {
