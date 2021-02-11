@@ -32,6 +32,7 @@
     NEW_VPA_SUBTITLE_UPI_OTM,
   } from 'ui/labels/upi';
   import { phone } from 'checkoutstore/screens/home';
+  import { suggestionVPA } from 'common/upi';
 
   // Props
   export let selected = false;
@@ -48,30 +49,6 @@
 
   const PATTERN_WITH_HANDLE = '.+@.+';
   const PATTERN_WITHOUT_HANDLE = '.+';
-
-  const suggestionVPA = [
-    'apl',
-    'abfspay',
-    'fbl',
-    'axisb',
-    'yesbank',
-    'okaxis',
-    'oksbi',
-    'okicici',
-    'okhdfcbank',
-    'hdfcbankjd',
-    'kmbl',
-    'icici',
-    'myicici',
-    'ikwik',
-    'ybl',
-    'paytm',
-    'rmhdfcbank',
-    'pingpay',
-    'barodapay',
-    'idfcbank',
-    'upi',
-  ];
 
   const session = getSession();
 

@@ -57,12 +57,18 @@
     right: 'auto',
   };
 
+  const singleCharacterWidth = 7;
+  const maxLeftPositionOfDropdown = 180;
+
   $: {
     if (readonlyValue) {
-      const estimateWidth = 7 * readonlyValue.length;
+      const estimateWidth = singleCharacterWidth * readonlyValue.length;
       dropDownPosition = {
-        left: estimateWidth > 180 ? 'auto' : estimateWidth,
-        right: estimateWidth > 180 ? '0' : 'auto',
+        left:
+          estimateWidth > maxLeftPositionOfDropdown
+            ? 'auto'
+            : `${estimateWidth}px`,
+        right: estimateWidth > maxLeftPositionOfDropdown ? '0' : 'auto',
       };
     }
   }
@@ -373,7 +379,7 @@
   {/if}
   {#if showDropdownPredictions && dropDownSuggestion?.length > 0}
     <ul
-      style={`left: ${dropDownPosition.left}px; right: ${dropDownPosition.right}px;`}
+      style={`left: ${dropDownPosition.left}; right: ${dropDownPosition.right};`}
       bind:this={dropdownRef}
       class="suggestion-dropdown">
       {#each dropDownSuggestion as suggestion, index (suggestion)}
