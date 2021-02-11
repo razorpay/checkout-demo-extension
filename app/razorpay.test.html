@@ -26,37 +26,44 @@
 
       <button type="submit">Pay</button>
     </form>
+    <div id="status"></div>
+    <div id="response"></div>
     <script>
       document.forms[0].onsubmit = function(e) {
         e.preventDefault();
-        var rp = new Razorpay({
+        window.rp = new Razorpay({
           key: 'rzp_test_1DP5mmOlF5G5ag',
           amount: 200,
         })
           .on('payment.error', function(resp) {
-            console.log(resp);
+            document.getElementById('status').innerText = 'failed';
+            document.getElementById('response').innerText = JSON.stringify(
+              resp
+            );
           })
           .on('payment.success', function(resp) {
-            console.log(resp);
+            document.getElementById('status').innerText = 'success';
+            document.getElementById('response').innerText = JSON.stringify(
+              resp
+            );
           });
-        window.rp = rp;
         rp.createPayment(null, { paused: true, message: 'loading' });
-        setTimeout(function() {
-          var data = {
-            amount: 200,
-            currency: 'INR',
-          };
-          data.method = 'card';
-          data['card[number]'] = '4111111111111111';
-          data['card[expiry_month]'] = '04';
-          data['card[expiry_year]'] = '22';
-          data['card[name]'] = 'arsh';
-          data['card[cvv]'] = '123';
-          // data.bank = 'SBIN';
-          data.email = 'a@s.d';
-          data.contact = 9999922222;
-          rp.emit('payment.resume', data);
-        });
+        // setTimeout(function() {
+        //   var data = {
+        //     amount: 200,
+        //     currency: 'INR',
+        //   };
+        //   data.method = 'card';
+        //   data['card[number]'] = '4111111111111111';
+        //   data['card[expiry_month]'] = '04';
+        //   data['card[expiry_year]'] = '22';
+        //   data['card[name]'] = 'arsh';
+        //   data['card[cvv]'] = '123';
+        //   // data.bank = 'SBIN';
+        //   data.email = 'a@s.d';
+        //   data.contact = 9999922222;
+        //   rp.emit('payment.resume', data);
+        // });
       };
     </script>
   </body>
