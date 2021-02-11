@@ -58,7 +58,10 @@
   };
 
   const singleCharacterWidth = 7;
-  const maxLeftPositionOfDropdown = 180;
+  /**
+   * default 180 but can be modify using prediction function output
+   */
+  let maxLeftPositionOfDropdown = 180;
 
   $: {
     if (readonlyValue) {
@@ -160,6 +163,8 @@
           dropdownArrowIndex = -1;
           dropDownSuggestion = suggestion?.suggestions || [];
           dropDownSelection = suggestion?.onSelect;
+          maxLeftPositionOfDropdown =
+            suggestion.maxLeftPositionOfDropdown || 180;
         }
       }
     }

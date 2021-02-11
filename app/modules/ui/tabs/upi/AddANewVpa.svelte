@@ -198,7 +198,7 @@
               );
               const value = `${currentVaue.substr(0, atIndex)}@${predictions?.[0] || ''}`;
               if (predictions?.length > 0) {
-                return { value, suggestions: predictions.map(x => `@${x}`), onSelect: data => {
+                return { value, maxLeftPositionOfDropdown: 180, suggestions: predictions.map(x => `@${x}`), onSelect: data => {
                     return `${currentVaue.substr(0, atIndex)}${data}`;
                   } };
               }
