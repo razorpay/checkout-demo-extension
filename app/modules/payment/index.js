@@ -1072,6 +1072,9 @@ razorpayProto.getCardCurrencies = function(payload) {
   };
 
   const entity = getCardEntityFromPayload(payload);
+
+  const entityWithAmount = `${entity}-${payload.amount}`;
+
   if (entity.length === 6) {
     requestPayload.iin = entity;
   } else {
@@ -1084,12 +1087,12 @@ razorpayProto.getCardCurrencies = function(payload) {
     requestPayload.currency = currency;
   }
 
-  const existingRequest = CardCurrencyRequests[entity];
+  const existingRequest = CardCurrencyRequests[entityWithAmount];
   if (existingRequest) {
     return existingRequest;
   }
 
-  CardCurrencyRequests[entity] = new Promise((resolve, reject) => {
+  CardCurrencyRequests[entityWithAmount] = new Promise((resolve, reject) => {
     let url = makeAuthUrl(this, 'payment/flows');
 
     // append requestPayload
@@ -1114,7 +1117,7 @@ razorpayProto.getCardCurrencies = function(payload) {
         }
 
         // Store in cache
-        CardCurrencyCache[entity] = response;
+        CardCurrencyCache[entityWithAmount] = response;
 
         // Resolve
         resolve(response);
@@ -1134,5 +1137,5 @@ razorpayProto.getCardCurrencies = function(payload) {
     });
   });
 
-  return CardCurrencyRequests[entity];
+  return CardCurrencyRequests[entityWithAmount];
 };
