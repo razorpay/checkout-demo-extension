@@ -38,7 +38,7 @@
   let org_logo = rzpLogo;
 
   onMount(() => {
-    if (bank_name.startsWith('HDFC') || ifsc.startsWith('HDFC')) {
+    if (bank_name?.startsWith('HDFC') || ifsc?.startsWith('HDFC')) {
       isHDFC = true;
       org_logo = hdfcLogo;
       disclaimers = DISCLAIMERS;
