@@ -31,6 +31,7 @@ export default {
     retry_button_label: 'Retry',
     round_off_callout:
       'Do not round-off the amount. Transfer the exact amount for the payment to be successful.',
+    print_details: 'Print Details',
   },
   banks: {
     long: {
