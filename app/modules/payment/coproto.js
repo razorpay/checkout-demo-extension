@@ -285,6 +285,15 @@ var responseTypes = {
     try {
       const PaymentRequest = global.PaymentRequest;
 
+      Analytics.track('upi.trigger_mweb_intent_open', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          app,
+        },
+      });
+
+      debugger;
+
       const request = new PaymentRequest(supportedInstruments, details);
       request
         .show()
