@@ -21,6 +21,7 @@
   import Tab from 'ui/tabs/Tab.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
   import CTA from 'ui/elements/CTA.svelte';
+  import NeftPrintView from './NeftPrintView.svelte';
 
   // i18n
   import {
@@ -33,6 +34,7 @@
     LOADING_MESSAGE,
     RETRY_BUTTON_LABEL,
     ROUND_OFF_CALLOUT,
+    PRINT_DETAILS,
   } from 'ui/labels/bank-transfer';
 
   import { COPY_DETAILS, COPIED } from 'ui/labels/cta';
@@ -135,6 +137,23 @@
     }, 3000);
   }
 
+  export function handlePrint() {
+    const printWindow = window.open('', '', 'height=400,width=600');
+    const neftPrintView = new NeftPrintView({
+      data: {
+        documentTitle: document.title,
+      },
+      props: {
+        neftDetails: data.receiver,
+        expiry: data.close_by,
+      },
+      target: printWindow.document.body,
+    });
+
+    printWindow.document.close(); // necessary for IE >= 10
+    printWindow.focus(); // necessary for IE >= 10*/
+  }
+
   init();
 </script>
 
@@ -186,6 +205,12 @@
     display: inline-block;
     margin-top: 20px;
   }
+  .print {
+    margin-top: 14px;
+    text-align: left;
+    color: rgba(57, 100, 168, 1);
+    cursor: pointer;
+  }
 </style>
 
 <Tab method="bank_transfer" shown={true}>
@@ -227,6 +252,7 @@
           </div>
         {/if}
       </div>
+      <div on:click={handlePrint} class="print">{$t(PRINT_DETAILS)}</div>
 
       <Bottom>
         <!-- LABEL: Do not round-off the amount. Transfer the exact amount for the payment to be successful. -->
