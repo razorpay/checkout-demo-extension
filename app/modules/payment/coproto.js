@@ -292,8 +292,6 @@ var responseTypes = {
         },
       });
 
-      debugger;
-
       const request = new PaymentRequest(supportedInstruments, details);
       request
         .show()
