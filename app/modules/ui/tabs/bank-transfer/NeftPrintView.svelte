@@ -29,6 +29,7 @@
   const description = getOption('description');
   let merchant_logo = getOption('image');
   const merchantName = getOption('name');
+  const orderId = getOption('order_id');
   let orgLogoLoaded = false;
   let merchantLogoLoaded = false;
   let isHDFC = false;
@@ -39,6 +40,7 @@
 
   const { account_number, ifsc, branch, bank_name } = neftDetails;
   let org_logo = rzpLogo;
+  let tableDetails = {};
 
   onMount(() => {
     if (bank_name?.startsWith('HDFC') || ifsc?.startsWith('HDFC')) {
@@ -50,6 +52,22 @@
     if (!merchant_logo) {
       merchantLogoLoaded = true;
     }
+    if (!isHDFC) {
+      labels.ROW_HEADERS.row10 = 'Razorpay Order ID';
+    }
+    tableDetails = {
+      [ROW_HEADERS.row1]: neftDetails.name,
+      [ROW_HEADERS.row2]: account_number,
+      [ROW_HEADERS.row3]: ifsc,
+      [ROW_HEADERS.row4]: bank_name,
+      [ROW_HEADERS.row5]: branch,
+      [ROW_HEADERS.row6]: amount,
+      [ROW_HEADERS.row7]: name,
+      [ROW_HEADERS.row8]: $email,
+      [ROW_HEADERS.row9]: $phone,
+      [ROW_HEADERS.row10]: isHDFC ? description : orderId,
+      [ROW_HEADERS.row11]: expiry,
+    };
   });
 
   const session = getSession();
@@ -83,19 +101,6 @@
   const setMerchantLogoLoaded = () => {
     merchantLogoLoaded = true;
     printIfLoaded();
-  };
-  const tableDetails = {
-    [ROW_HEADERS.row1]: neftDetails.name,
-    [ROW_HEADERS.row2]: account_number,
-    [ROW_HEADERS.row3]: ifsc,
-    [ROW_HEADERS.row4]: bank_name,
-    [ROW_HEADERS.row5]: branch,
-    [ROW_HEADERS.row6]: amount,
-    [ROW_HEADERS.row7]: name,
-    [ROW_HEADERS.row8]: $email,
-    [ROW_HEADERS.row9]: $phone,
-    [ROW_HEADERS.row10]: isHDFC ? description : '',
-    [ROW_HEADERS.row11]: expiry,
   };
   if (!neftDetails.branch) {
     delete tableDetails.Branch;
