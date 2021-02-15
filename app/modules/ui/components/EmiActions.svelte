@@ -3,9 +3,11 @@
   import { createEventDispatcher } from 'svelte';
 
   // Store
+  import { getMerchantConfig } from 'checkoutstore';
   import { selectedPlanTextForNewCard } from 'checkoutstore/emi';
   import { isMethodUsable } from 'checkoutstore/methods';
   import { getEMIBanksText } from 'checkoutframe/paymentmethods';
+  import { methodInstrument } from 'checkoutstore/screens/home';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -21,6 +23,7 @@
     PAY_ENTIRE_AMOUNT_ACTION,
     PAY_ENTIRE_AMOUNT_COUNT,
   } from 'ui/labels/emi';
+  import { getSubtextForInstrument } from 'subtext';
 
   // Props
   export let emiCtaView;
@@ -31,6 +34,30 @@
   function handleEmiCtaClick(event) {
     dispatch('click', event.detail);
   }
+
+  /**
+   * Checking if Allowed issuers are restricted or not
+   */
+  const restrictions = getMerchantConfig()?.config?.restrictions || {};
+  let isRestrictedIssuers = false;
+  if (restrictions) {
+    const emiRestriction = (restrictions?.allow || []).find(
+      conf => conf.method === 'emi'
+    );
+    if (emiRestriction && emiRestriction?.issuers?.length > 0) {
+      isRestrictedIssuers = true;
+    }
+  }
+
+  let instrumentSubtext;
+
+  $: {
+    if (!$methodInstrument) {
+      instrumentSubtext = undefined;
+    } else {
+      instrumentSubtext = getSubtextForInstrument($methodInstrument, $locale);
+    }
+  }
 </script>
 
 <div id="elem-emi">
@@ -40,9 +67,14 @@
     {#if emiCtaView === 'plans-unavailable'}
       <div class="emi-plan-unavailable emi-icon-multiple-cards">
         <span class="help">
-          <!-- LABEL: EMI is available on {issuers} cards. Enter your credit card
-          to avail. -->
-          {formatTemplateWithLocale(UNAVAILABLE_HELP, { issuers: getEMIBanksText($locale) }, $locale)}
+          {#if isRestrictedIssuers && instrumentSubtext}
+            <!-- LABEL: According to subText logic -->
+            {instrumentSubtext}
+          {:else}
+            <!-- LABEL: EMI is available on {issuers} cards. Enter your credit card
+            to avail. -->
+            {formatTemplateWithLocale(UNAVAILABLE_HELP, { issuers: getEMIBanksText($locale) }, $locale)}
+          {/if}
         </span>
         <!-- LABEL: EMI unavailable -->
         <div class="emi-plans-text">{$t(UNAVAILABLE_BTN)}</div>
