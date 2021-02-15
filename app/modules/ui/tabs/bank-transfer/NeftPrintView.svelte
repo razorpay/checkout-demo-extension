@@ -74,17 +74,7 @@
 
   // TODO: move it to utils or use any currently existing methods for formatting
   function formatDate(d) {
-    let month = '' + (d.getMonth() + 1),
-      day = '' + d.getDate(),
-      year = d.getFullYear();
-
-    if (month.length < 2) {
-      month = '0' + month;
-    }
-    if (day.length < 2) {
-      day = '0' + day;
-    }
-    return [day, month, year].join('-');
+    return `${d.toLocaleDateString()} ${d.toLocaleTimeString()}`;
   }
 
   function printIfLoaded() {
