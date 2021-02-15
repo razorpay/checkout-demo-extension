@@ -62,7 +62,7 @@
       [ROW_HEADERS.row4]: bank_name,
       [ROW_HEADERS.row5]: branch,
       [ROW_HEADERS.row6]: amount,
-      [ROW_HEADERS.row7]: name,
+      [ROW_HEADERS.row7]: name.trim(),
       [ROW_HEADERS.row8]: $email,
       [ROW_HEADERS.row9]: $phone,
       [ROW_HEADERS.row10]: isHDFC ? description : orderId,
