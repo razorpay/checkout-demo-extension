@@ -33,9 +33,7 @@
     SEARCH_TITLE,
     SEARCH_PLACEHOLDER,
     SEARCH_ALL,
-    DOWNTIME_LOW_CALLOUT,
-    DOWNTIME_HIGH_CALLOUT,
-    DOWNTIME_MEDIUM_CALLOUT,
+    DOWNTIME_CALLOUT,
     RECURRING_CALLOUT,
   } from 'ui/labels/netbanking';
 
@@ -54,6 +52,7 @@
   import { iPhone } from 'common/useragent';
   import { getPreferredBanks } from 'common/bank';
   import { getDowntimes, isRecurring } from 'checkoutstore';
+  import { checkDowntime } from 'checkoutframe/downtimes';
   import * as InputActions from 'actions/input';
   import {
     hasMultipleOptions,
@@ -243,22 +242,20 @@
 
   $: {
     if (method === 'netbanking') {
-      if (_Arr.contains(downtimes.high.banks, $selectedBank)) {
-        selectedBankDowntimeSeverity = 'high';
+      const netBankingDowntimes = downtimes.netbanking;
+      const currentDowntime = checkDowntime(
+        netBankingDowntimes,
+        'bank',
+        $selectedBank
+      );
+      if (currentDowntime) {
         selectedBankHasDowntime = true;
-        downtimeText = DOWNTIME_HIGH_CALLOUT;
-      } else if (_Arr.contains(downtimes.medium.banks, $selectedBank)) {
-        selectedBankDowntimeSeverity = 'medium';
-        selectedBankHasDowntime = true;
-        downtimeText = DOWNTIME_MEDIUM_CALLOUT;
-      } else if (_Arr.contains(downtimes.low.banks, $selectedBank)) {
-        selectedBankDowntimeSeverity = 'low';
-        selectedBankHasDowntime = true;
-        downtimeText = DOWNTIME_LOW_CALLOUT;
+        selectedBankDowntimeSeverity = currentDowntime;
       } else {
-        selectedBankDowntimeSeverity = '';
         selectedBankHasDowntime = false;
       }
+    } else {
+      selectedBankHasDowntime = false;
     }
   }
 
@@ -419,7 +416,7 @@
             showIcon={false}
             severe={selectedBankDowntimeSeverity}>
             <FormattedText
-              text={formatTemplateWithLocale(downtimeText, { bank: getLongBankName($selectedBank, $locale) }, $locale)} />
+              text={formatTemplateWithLocale(DOWNTIME_CALLOUT, { bank: getLongBankName($selectedBank, $locale) }, $locale)} />
           </DowntimeCallout>
         </div>
       {/if}
