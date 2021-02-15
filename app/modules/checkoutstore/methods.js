@@ -77,7 +77,7 @@ const ALL_METHODS = {
       getOption('method.credit_card')
     ) {
       if (isRecurring()) {
-        return getRecurringMethods()?.credit_card;
+        return getRecurringMethods()?.card?.credit;
       }
       return getMerchantMethods().credit_card;
     }
@@ -90,7 +90,7 @@ const ALL_METHODS = {
       getOption('method.debit_card')
     ) {
       if (isRecurring()) {
-        return getRecurringMethods()?.debit_card;
+        return getRecurringMethods()?.card?.debit;
       }
       return getMerchantMethods().debit_card;
     }

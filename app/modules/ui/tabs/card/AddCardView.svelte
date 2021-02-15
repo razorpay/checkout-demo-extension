@@ -35,11 +35,13 @@
     isRecurring,
     isStrictlyRecurring,
     getCardFeatures,
+    getRecurringMethods,
   } from 'checkoutstore';
   import {
     isAMEXEnabled,
     getCardNetworks,
     getCardNetworksForRecurring,
+    isMethodEnabled,
   } from 'checkoutstore/methods';
 
   // i18n
@@ -218,7 +220,7 @@
       return;
     }
 
-    const flowChecker = ({ flows = {} } = {}) => {
+    const flowChecker = ({ flows = {}, type, issuer } = {}) => {
       const _cardNumber = getCardDigits(value);
       const isIinSame = getIin(_cardNumber) === iin;
       let _validCardNumber = true;
@@ -229,14 +231,31 @@
       }
 
       if (isStrictlyRecurring()) {
-        const validCardNetworksForTransaction =
-          getCardNetworksForRecurring() || {};
-        const isRecurringCardNetworkAllowed = validCardNetworksForTransaction.hasOwnProperty(
-          $cardType
-        );
+        let reccuringCardSecondaryCheck = false; // Network for credit, issuer for debit
+        let isCardTypeAllowed = false;
+
+        // API sends credit/debit. Mapping it here so that it fits into existing FE contracts
+        const cardTypeMap = {
+          debit: 'debit_card',
+          credit: 'credit_card',
+        };
+        isCardTypeAllowed = isMethodEnabled(cardTypeMap[type]);
+        if (isCardTypeAllowed) {
+          const allowedRecurringCardsData = getRecurringMethods().card || {};
+          if (type === 'debit') {
+            reccuringCardSecondaryCheck = issuer
+              ? !!allowedRecurringCardsData[type][issuer]
+              : true;
+          } else if (type === 'credit') {
+            reccuringCardSecondaryCheck = !!getCardNetworksForRecurring().includes(
+              $cardType
+            );
+          }
+        }
+
         _validCardNumber =
           _validCardNumber &&
-          isRecurringCardNetworkAllowed &&
+          reccuringCardSecondaryCheck &&
           isFlowApplicable(flows, Flows.RECURRING);
       } else {
         // Debit-PIN is not supposed to work in case of recurring
