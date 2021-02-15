@@ -1,6 +1,6 @@
 <script>
   //store
-  import { getOption, getAmount } from 'checkoutstore';
+  import { getOption } from 'checkoutstore';
   import { phone, email } from 'checkoutstore/screens/home';
 
   // svelte imports
@@ -25,6 +25,7 @@
   let neftView;
   export let neftDetails;
   export let expiry;
+  export let amount;
   const description = getOption('description');
   let merchant_logo = getOption('image');
   const merchantName = getOption('name');
@@ -52,7 +53,6 @@
   });
 
   const session = getSession();
-  const amount = session.formatAmountWithCurrency(getAmount());
 
   // TODO: move it to utils or use any currently existing methods for formatting
   function formatDate(d) {
