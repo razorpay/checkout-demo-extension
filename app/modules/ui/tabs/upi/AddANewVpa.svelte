@@ -23,6 +23,7 @@
     shouldRememberCustomer,
     getDowntimes,
   } from 'checkoutstore';
+  import { checkDowntime } from 'checkoutframe/downtimes';
   import { VPA_REGEX } from 'common/constants';
   import { getAnimationOptions } from 'svelte-utils';
 
@@ -78,43 +79,30 @@
     }
   });
 
-  function filterDowntime(downtimeArr, vpaEntered) {
-    return downtimeArr.filter(item => {
-      if (item.instrument?.vpa_handle === vpaEntered) {
-        downEntity = vpaEntered;
-        downtimeVisible = true;
-        return item;
-      }
-    });
-  }
-
-  function checkDowntime() {
+  function isDowntime() {
     if (pspHandle) {
     } else {
-      console.log('hello');
       const vpaEntered = vpa.split('@')[1];
-      let matched = [];
       if (vpaEntered) {
-        matched = filterDowntime(upiDowntimes.high, vpaEntered);
-        if (matched?.length > 0) {
-          downtimeVisibleSeverity = 'high';
+        const currentDowntime = checkDowntime(
+          upiDowntimes,
+          'vpa_handle',
+          vpaEntered
+        );
+        if (currentDowntime) {
+          downtimeVisible = true;
+          downtimeVisibleSeverity = currentDowntime;
         } else {
-          matched = filterDowntime(upiDowntimes.medium, vpaEntered);
-          if (matched?.length > 0) {
-            downtimeVisibleSeverity = 'medium';
-          } else {
-            matched = filterDowntime(upiDowntimes.low, vpaEntered);
-            if (matched?.length > 0) {
-              downtimeVisibleSeverity = 'low';
-            }
-          }
+          downtimeVisible = false;
         }
+      } else {
+        downtimeVisible = false;
       }
     }
   }
 
   function handleVpaInput() {
-    checkDowntime();
+    isDowntime();
     if (isVpaValid(vpa) || !pspHandle) {
       value = vpa;
     } else {
@@ -186,6 +174,14 @@
     font-size: 12px;
     line-height: 16px;
     color: rgba(81, 89, 120, 0.7);
+  }
+
+  .downtime-upi {
+    margin-top: 4px;
+  }
+  .downtime-upi-icon {
+    position: absolute;
+    right: 20px;
   }
 </style>
 
@@ -263,10 +259,15 @@
           on:input={handleVpaInput}
           on:blur
           placeholder={$t(UPI_COLLECT_ENTER_ID)} />
+        <div class="downtime-upi-icon">
+          <DowntimeIcon severe={downtimeVisibleSeverity} />
+        </div>
         {#if downtimeVisible}
-          <DowntimeCallout showIcon={false} severe={downtimeVisibleSeverity}>
-            {formatTemplateWithLocale(UPI_DOWNTIME_TEXT, { vpa: downEntity }, $locale)}
-          </DowntimeCallout>
+          <div class="downtime-upi">
+            <DowntimeCallout showIcon={false} severe={downtimeVisibleSeverity}>
+              {formatTemplateWithLocale(UPI_DOWNTIME_TEXT, { vpa: downEntity }, $locale)}
+            </DowntimeCallout>
+          </div>
         {/if}
         {#if logged && canSaveVpa}
           <div class="should-save-vpa-container">

@@ -171,20 +171,14 @@ function getBankDowntimes(downtimes) {
     low: getBanksWithLowSeverityDowntimes(downtimes) |> _Arr.removeDuplicates,
   };
 }
-/**
- * Returns the list of banks with high and low severity downtimes. Scheduled
- * downtimes are considered as high severity.
- *
- * @param downtimes
- * @return {{warn: Array<string>, disable: Array<string>}}
- */
-function getUPIDowntimes(downtimes) {
-  const upiDowntimes = downtimes?.upi;
+
+function getDowntimesByMethod(downtimes, method) {
+  const filteredDowntimes = downtimes && downtimes[method];
   let high = [];
   let medium = [];
   let low = [];
-  if (upiDowntimes?.length) {
-    upiDowntimes.forEach(downtime => {
+  if (filteredDowntimes?.length) {
+    filteredDowntimes.forEach(downtime => {
       switch (downtime.severity) {
         case 'high':
           high.push(downtime);
@@ -199,15 +193,7 @@ function getUPIDowntimes(downtimes) {
     });
   }
   return { high, medium, low };
-
-  // return {
-  //   high: getUPIWithHighSeverityDowntime(downtimes) |> _Arr.removeDuplicates,
-  //   medium:
-  //     getUPIWithMediumSeverityDowntime(downtimes) |> _Arr.removeDuplicates,
-  //   low: getUPIWithLowSeverityDowntimes(downtimes) |> _Arr.removeDuplicates,
-  // };
 }
-
 /**
  * Returns bank names from downtimes after filtering them using predicate
  *
@@ -344,9 +330,10 @@ export function getDowntimes(preferences) {
 
   const methodDowntimes = getMethodDowntimes(groupedDowntimes, preferences);
   const bankDowntimes = getBankDowntimes(groupedDowntimes);
-  const UPIDowntimes = getUPIDowntimes(groupedDowntimes);
   return {
-    upi: { ...UPIDowntimes },
+    cards: { ...getDowntimesByMethod(groupedDowntimes, 'card') },
+    upi: { ...getDowntimesByMethod(groupedDowntimes, 'upi') },
+    netbanking: { ...getDowntimesByMethod(groupedDowntimes, 'netbanking') },
     high: {
       methods: methodDowntimes.high,
       banks: bankDowntimes.high,
@@ -361,3 +348,25 @@ export function getDowntimes(preferences) {
     },
   };
 }
+
+const filterDowntimeArr = (downtimeArr, instrumentKey, value) => {
+  return downtimeArr.filter(item => {
+    if (item.instrument && item.instrument[instrumentKey] === value) {
+      return item;
+    }
+  });
+};
+
+export const checkDowntime = (downtime, instrumentKey, value) => {
+  if (filterDowntimeArr(downtime.high, instrumentKey, value)?.length > 0) {
+    return 'high';
+  } else if (
+    filterDowntimeArr(downtime.medium, instrumentKey, value)?.length > 0
+  ) {
+    return 'medium';
+  }
+  if (filterDowntimeArr(downtime.low, instrumentKey, value)?.length > 0) {
+    return 'low';
+  }
+  return false;
+};

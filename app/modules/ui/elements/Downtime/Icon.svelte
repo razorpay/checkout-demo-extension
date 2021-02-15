@@ -13,4 +13,6 @@
   $: arrowColor = severe !== 'low' ? highSeverityColor : lowSeverityColor;
 </script>
 
-<Icon loadableIcon={false} icon={downTimeIcon(circleColor, arrowColor)} />
+{#if severe}
+  <Icon loadableIcon={false} icon={downTimeIcon(circleColor, arrowColor)} />
+{/if}

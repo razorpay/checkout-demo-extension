@@ -5,7 +5,6 @@
   // Props
   export let severe;
   export let showIcon = false;
-  console.log(showIcon);
   // Computed
   let downtimeClasses = 'downtime-callout';
   // let
