@@ -19,6 +19,7 @@
   import {
     hasFeature,
     getPrefilledVPA,
+    getPrefilledName,
     shouldRememberCustomer,
     getDowntimes,
   } from 'checkoutstore';
@@ -35,6 +36,8 @@
     NEW_VPA_SUBTITLE_UPI_OTM,
     UPI_DOWNTIME_TEXT,
   } from 'ui/labels/upi';
+  import { phone } from 'checkoutstore/screens/home';
+  import { suggestionVPA } from 'common/upi';
 
   // Props
   export let selected = false;
@@ -221,6 +224,34 @@
         <Field
           formatter={{ type: 'vpa' }}
           {pattern}
+          prediction={currentVaue => {
+            const phoneInput = $phone;
+            const prefillName = getPrefilledName() || '';
+            const atIndex = currentVaue.indexOf('@');
+            if (currentVaue?.length > 1 && phoneInput && phoneInput.startsWith(currentVaue) && atIndex === -1) {
+              return phoneInput;
+            }
+            if (currentVaue?.length > 1 && prefillName && prefillName
+                ?.toLowerCase()
+                ?.startsWith(currentVaue) && atIndex === -1) {
+              // handle mismatch case of suggestion and input
+              return currentVaue + prefillName.substr(currentVaue.length);
+            }
+            if (currentVaue.length > 2 && currentVaue.includes('@') && atIndex < currentVaue.length - 1) {
+              const predictionInput = currentVaue.substr(atIndex + 1);
+              const predictions = suggestionVPA.filter(vpa =>
+                vpa.startsWith(predictionInput)
+              );
+              const value = `${currentVaue.substr(0, atIndex)}@${predictions?.[0] || ''}`;
+              if (predictions?.length > 0) {
+                return { value, maxLeftPositionOfDropdown: 180, suggestions: predictions.map(x => `@${x}`), onSelect: data => {
+                    return `${currentVaue.substr(0, atIndex)}${data}`;
+                  } };
+              }
+            }
+            return '';
+          }}
+          showDropdownPredictions
           helpText={$t(UPI_COLLECT_NEW_VPA_HELP)}
           id={'vpa-' + paymentMethod}
           name={'vpa-' + paymentMethod}
