@@ -326,26 +326,34 @@ export function getEnabledMethods() {
 }
 
 export function getSingleMethod() {
+  /* Please don't change the order, this code is order senstive */
+  const consolidated_methods = [
+    'card',
+    'emi',
+    'netbanking',
+    'emandate',
+    'nach',
+    'upi_otm',
+    'upi',
+    'wallet',
+    'paypal',
+  ];
+
   if (getOrderMethod()) {
     return getOrderMethod();
   }
 
   let oneMethod;
-  const methods = getEnabledMethods();
+  let methods = getEnabledMethods();
+
+  /**
+   * @description This filtering is needed because we sub-divide methods as well, even though they are not valid instruments
+   * @example credit_card for the card instrument
+   */
+  methods = methods.filter(method => consolidated_methods.includes(method));
 
   if (methods.length === 1) {
-    /* Please don't change the order, this code is order senstive */
-    [
-      'card',
-      'emi',
-      'netbanking',
-      'emandate',
-      'nach',
-      'upi_otm',
-      'upi',
-      'wallet',
-      'paypal',
-    ]
+    consolidated_methods
       |> _Arr.any(m => {
         if (m === methods[0]) {
           oneMethod = m;
