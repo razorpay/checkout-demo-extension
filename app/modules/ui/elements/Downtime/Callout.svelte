@@ -18,6 +18,8 @@
     color: #f99d27;
     display: flex;
     align-items: center;
+    font-size: 12px;
+    line-height: 14px;
   }
   .downtime-high {
     color: #e95555;

@@ -77,11 +77,9 @@
   let expiryField = null;
   let nameField = null;
   let cvvField = null;
-  const cardDowntimes = getDowntimes().cards;
   const nameReadonly = isNameReadOnly();
-  let downtimeVisible = false;
-  let downtimeVisibleSeverity = '';
-
+  export let downtimeVisible;
+  export let downtimeVisibleSeverity;
   const isSavedCardsEnabled = shouldRememberCustomer();
 
   const showRememberCardCheck = isSavedCardsEnabled;
@@ -218,7 +216,6 @@
     const value = $cardNumber;
     const _cardNumber = getCardDigits(value);
     const iin = getIin(_cardNumber);
-    isDowntime('network', $cardType);
     if (iin.length < 6) {
       setDebitPinRadiosVisibility(false);
       setCardNumberValidity(validateCardNumber());
@@ -260,7 +257,6 @@
 
     getCardFeatures(iin)
       .then(features => {
-        isDowntime('issuer', features.issuer);
         let validationPromises = [
           flowChecker(features),
           validateCardNumber(),
@@ -355,20 +351,6 @@
       }
     } else {
       onCardNumberChange();
-    }
-  }
-
-  function isDowntime(instrument, value) {
-    if (!value || !instrument) {
-      downtimeVisible = false;
-      return;
-    }
-    const currentDowntime = checkDowntime(cardDowntimes, instrument, value);
-    if (currentDowntime) {
-      downtimeVisible = true;
-      downtimeVisibleSeverity = currentDowntime;
-    } else {
-      downtimeVisible = false;
     }
   }
 

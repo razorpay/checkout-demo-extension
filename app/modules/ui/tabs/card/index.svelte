@@ -14,6 +14,7 @@
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import Icon from 'ui/elements/Icon.svelte';
+  import { checkDowntime } from 'checkoutframe/downtimes';
 
   // Store
   import {
@@ -47,6 +48,7 @@
     isDCCEnabled,
     getCardFeatures,
     isInternational,
+    getDowntimes,
   } from 'checkoutstore';
 
   import {
@@ -60,7 +62,6 @@
   } from 'checkoutstore/methods';
 
   import { newCardEmiDuration, savedCardEmiDuration } from 'checkoutstore/emi';
-
   // i18n
   import { t, locale } from 'svelte-i18n';
   import { getAppProviderName, getAppProviderSubtext } from 'i18n';
@@ -89,6 +90,7 @@
     getCardType,
     getNetworkFromCardNumber,
     isAmex,
+    addDowntimesToSavedCards,
   } from 'common/card';
 
   import { getSubtextForInstrument } from 'subtext';
@@ -109,6 +111,13 @@
 
   const session = getSession();
   const isSavedCardsEnabled = shouldRememberCustomer();
+  const cardDowntimes = getDowntimes().cards;
+  let downtime = {
+    network: false,
+    issuer: false,
+  };
+  let downtimeVisible;
+  let downtimeVisibleSeverity;
 
   let currentView = Views.SAVED_CARDS;
   let lastView;
@@ -332,7 +341,8 @@
       }
     });
 
-    return transformTokens(tokenList);
+    const transformed = transformTokens(tokenList);
+    return addDowntimesToSavedCards(transformed, cardDowntimes);
   }
 
   function transformTokens(tokens) {
@@ -471,12 +481,15 @@
     const amexCard = isAmex($cardNumber);
 
     $internationalCurrencyCalloutNeeded = amexCard && isInternational();
-
+    isDowntime('network', cardType);
     if (sixDigits) {
       getCardFeatures(_cardNumber).then(features => {
         if (iin !== getIin($cardNumber)) {
           // $cardNumber's IIN has changed since we started the n/w request, do nothing
           return;
+        }
+        if (features?.issuer) {
+          isDowntime('issuer', features.issuer);
         }
 
         let emiObj;
@@ -600,6 +613,20 @@
     tab = session.tab;
     onCardInput();
   }
+  function isDowntime(instrument, value) {
+    const currentDowntime = checkDowntime(cardDowntimes, instrument, value);
+    if (currentDowntime) {
+      downtime[instrument] = true;
+      downtimeVisibleSeverity = currentDowntime;
+    } else {
+      downtime[instrument] = false;
+    }
+    if (downtime.network || downtime.issuer) {
+      downtimeVisible = true;
+    } else {
+      downtimeVisible = false;
+    }
+  }
 </script>
 
 <style>
@@ -674,7 +701,9 @@
             {tab}
             faded={Boolean($selectedApp)}
             on:focus={onAddCardViewFocused}
-            on:cardinput={onCardInput} />
+            on:cardinput={onCardInput}
+            {downtimeVisible}
+            {downtimeVisibleSeverity} />
           {#if showEmiCta}
             <EmiActions
               {showEmiCta}

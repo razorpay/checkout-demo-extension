@@ -29,13 +29,14 @@
     AVAILABLE_TEXT,
     AVAILABLE_ACTION,
   } from 'ui/labels/emi';
+  import { DOWNTIME_CALLOUT } from 'ui/labels/card';
   import { TITLE_GENERIC } from 'ui/labels/methods';
-
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
 
   // UI imports
   import Radio from 'ui/elements/Radio.svelte';
   import CvvField from 'ui/elements/fields/card/CvvField.svelte';
+  import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
 
   // Props
   export let card;
@@ -45,6 +46,8 @@
   export let cvvDigits;
   export let selected;
   export let tab;
+  let cardClicked = false;
+  let { downtimeVisible, downtimeVisibleSeverity, downtimeCause } = card;
 
   // Computed
   let attributes;
@@ -108,8 +111,8 @@
   }
 
   function handleClick() {
+    cardClicked = true;
     const payload = { cvv: cvvValue };
-
     // Focus on next tick because the CVV field might not have rendered right now.
     tick().then(_ => {
       if (cvvInput) {
@@ -124,6 +127,12 @@
     dispatch('click', payload);
   }
 </script>
+
+<style>
+  .downtime-saved-cards {
+    margin-bottom: 8px;
+  }
+</style>
 
 <div
   class="saved-card"
@@ -223,6 +232,13 @@
             on:change={handleAuthRadioChanged} />
         </div>
       {/if}
+    </div>
+  {/if}
+  {#if downtimeVisible && cardClicked}
+    <div class="downtime-saved-cards">
+      <DowntimeCallout showIcon={false} severe={downtimeVisibleSeverity}>
+        {formatTemplateWithLocale(DOWNTIME_CALLOUT, { bank: downtimeCause }, $locale)}
+      </DowntimeCallout>
     </div>
   {/if}
 </div>

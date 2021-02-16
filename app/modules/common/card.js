@@ -2,6 +2,7 @@ import RazorpayConfig from 'common/RazorpayConfig';
 import { makeAuthUrl } from 'common/Razorpay';
 import Analytics from 'analytics';
 import Track from 'tracker';
+import { checkDowntime } from 'checkoutframe/downtimes';
 
 export const API_NETWORK_CODES_MAP = {
   AMEX: 'amex',
@@ -430,4 +431,29 @@ export function getCardFeatures(cardNumber) {
   });
 
   return CardFeatureRequests.iin[iin];
+}
+
+/**
+ * Gets the saved cards as an array and cards downtimes as an obj.
+ * @param {array} cards
+ * @param {object} cards
+ *
+ * @returns {array}
+ */
+export function addDowntimesToSavedCards(cards, downtimes) {
+  const newCards = [...cards];
+  newCards.map(item => {
+    const { network, issuer } = item.card;
+    let networkDowntime = checkDowntime(downtimes, 'network', network);
+    let issuerDowntime = checkDowntime(downtimes, 'issuer', issuer);
+    if (!networkDowntime && !issuerDowntime) {
+      item.card.downtimeVisible = false;
+      return item;
+    }
+    item.card.downtimeVisible = true;
+    item.card.downtimeVisibleSeverity = networkDowntime || issuerDowntime;
+    item.card.downtimeCause = networkDowntime ? network : issuer;
+    return item;
+  });
+  return newCards;
 }
