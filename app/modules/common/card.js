@@ -373,6 +373,7 @@ export function getCardFeatures(cardNumber) {
   if (!isIinValid(cardNumber)) {
     return Promise.resolve({});
   }
+  cardNumber = cardNumber.toString();
 
   const iin = getIin(cardNumber);
 

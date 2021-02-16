@@ -58,21 +58,22 @@ function popupRequestHandler(request) {
   } else if (
     url.startsWith(
       'https://api.razorpay.com/v1/gateway/mocksharp/payment/submit'
-    )
+    ) ||
+    url.startsWith('https://walletapi.mobikwik.com/wallet')
   ) {
     const postData = request.postData();
-    if (postData.includes('success=S')) {
-      var successMock = callback.replace(
-        '// Callback data //',
-        "{ razorpay_payment_id: 'pay_123465' }"
-      );
-      return request.respond({ contentType: 'text/html', body: successMock });
-    } else {
+    if (postData.includes('success=F')) {
       var failureMock = callback.replace(
         '// Callback data //',
         '{"error":{"code":"BAD_REQUEST_ERROR","description":"The payment has already been processed","source":"internal","step":"payment_authorization","reason":"bank_technical_error","metadata":{}},"http_status_code":400,"org_logo":"","org_name":"Razorpay Software Private Ltd","checkout_logo":"https://dashboard-activation.s3.amazonaws.com/org_100000razorpay/checkout_logo/phpnHMpJe","custom_branding":false};'
       );
       return request.respond({ contentType: 'text/html', body: failureMock });
+    } else {
+      var successMock = callback.replace(
+        '// Callback data //',
+        "{ razorpay_payment_id: 'pay_123465' }"
+      );
+      return request.respond({ contentType: 'text/html', body: successMock });
     }
   } else if (url === otpBundle) {
     return request.respond({ body: otpPageBundle });

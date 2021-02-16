@@ -3718,4 +3718,43 @@ module.exports = {
       'https://api.razorpay.com/v1/payments/pay_GcDqre4nqakb46/otp/resend',
   }),
   submitOTP: () => ({ razorpay_payment_id: 'pay_123465' }),
+  iinResponse: () => ({
+    flows: {
+      recurring: false,
+      iframe: false,
+      emi: false,
+    },
+    http_status_code: 200,
+  }),
+  topupAjax: () => ({
+    type: 'first',
+    request: {
+      url: 'https://walletapi.mobikwik.com/wallet',
+      method: 'post',
+      content: {
+        amount: 200,
+        cell: '9999999999',
+        orderid: 'GcJ3O6Xz1iatEQ',
+        merchantname: 'Razorpay',
+        mid: 'MBK41482',
+        redirecturl:
+          'https://api.razorpay.com/v1/payments/pay_GcGmzHFHZZzq74/callback/341d1287743d11a2c9be2239d31b5bee661eb22c/rzp_live_ILgsfZCZoFIKMb',
+        checksum:
+          'e2959fb2fb798f097b41f1a5fb4e78a2f216ebed0fae2c56b252cf40229a823a',
+        merchantAlias: 'Razorpay',
+      },
+    },
+    version: 1,
+    payment_id: 'pay_GcGmzHFHZZzq74',
+    gateway:
+      'eyJpdiI6IjNEKzV3TWFtTVFzUmh5bW1zdTIyVFE9PSIsInZhbHVlIjoidWx1WVwvZWh2cnhxa2hwVU5FQytia0E4ZnpJNVA5Rmkrb0VCeXNjcDgyeFU9IiwibWFjIjoiMjAyYzE1ZTA5YmM4YjQxNGRjMTkxOTk2OTA1MDUzZjYyNTcxMjM5YzI4ZjQyMzA2MzY4MDNlZDM4ZWM0YzgzNyJ9',
+    amount: '₹ 200',
+    image: null,
+    magic: false,
+    org_logo: '',
+    org_name: 'Razorpay Software Private Ltd',
+    checkout_logo:
+      'https://dashboard-activation.s3.amazonaws.com/org_100000razorpay/checkout_logo/phpnHMpJe',
+    custom_branding: false,
+  }),
 };
