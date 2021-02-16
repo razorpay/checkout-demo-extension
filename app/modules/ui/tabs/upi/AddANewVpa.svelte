@@ -259,9 +259,11 @@
           on:input={handleVpaInput}
           on:blur
           placeholder={$t(UPI_COLLECT_ENTER_ID)} />
-        <div class="downtime-upi-icon">
-          <DowntimeIcon severe={downtimeVisibleSeverity} />
-        </div>
+        {#if downtimeVisible}
+          <div class="downtime-upi-icon">
+            <DowntimeIcon severe={downtimeVisibleSeverity} />
+          </div>
+        {/if}
         {#if downtimeVisible}
           <div class="downtime-upi">
             <DowntimeCallout showIcon={false} severe={downtimeVisibleSeverity}>

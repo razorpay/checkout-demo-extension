@@ -351,7 +351,10 @@ export function getDowntimes(preferences) {
 
 const filterDowntimeArr = (downtimeArr, instrumentKey, value) => {
   return downtimeArr.filter(item => {
-    if (item.instrument && item.instrument[instrumentKey] === value) {
+    if (
+      item.instrument &&
+      item.instrument[instrumentKey]?.toLowerCase() === value.toLowerCase()
+    ) {
       return item;
     }
   });

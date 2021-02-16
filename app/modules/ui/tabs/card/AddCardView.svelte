@@ -7,6 +7,7 @@
   import CvvField from 'ui/elements/fields/card/CvvField.svelte';
   import CardFlowSelectionRadio from 'ui/elements/CardFlowSelectionRadio.svelte';
   import NameField from 'ui/elements/fields/card/NameField.svelte';
+  import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
 
   // Svelte imports
   import { createEventDispatcher } from 'svelte';
@@ -29,12 +30,15 @@
 
   import { methodInstrument } from 'checkoutstore/screens/home';
 
+  import { checkDowntime } from 'checkoutframe/downtimes';
+
   import {
     isNameReadOnly,
     shouldRememberCustomer,
     isRecurring,
     isStrictlyRecurring,
     getCardFeatures,
+    getDowntimes,
   } from 'checkoutstore';
   import {
     isAMEXEnabled,
@@ -44,12 +48,14 @@
 
   // i18n
   import { t, locale } from 'svelte-i18n';
+  import { formatTemplateWithLocale } from 'i18n';
 
   import {
     NOCVV_LABEL,
     VIEW_ALL_EMI_PLANS,
     REMEMBER_CARD_LABEL,
     CARD_NUMBER_HELP_UNSUPPORTED,
+    DOWNTIME_CALLOUT,
   } from 'ui/labels/card';
 
   // Utils
@@ -71,8 +77,10 @@
   let expiryField = null;
   let nameField = null;
   let cvvField = null;
-
+  const cardDowntimes = getDowntimes().cards;
   const nameReadonly = isNameReadOnly();
+  let downtimeVisible = false;
+  let downtimeVisibleSeverity = '';
 
   const isSavedCardsEnabled = shouldRememberCustomer();
 
@@ -210,7 +218,7 @@
     const value = $cardNumber;
     const _cardNumber = getCardDigits(value);
     const iin = getIin(_cardNumber);
-
+    isDowntime('network', $cardType);
     if (iin.length < 6) {
       setDebitPinRadiosVisibility(false);
       setCardNumberValidity(validateCardNumber());
@@ -252,6 +260,7 @@
 
     getCardFeatures(iin)
       .then(features => {
+        isDowntime('issuer', features.issuer);
         let validationPromises = [
           flowChecker(features),
           validateCardNumber(),
@@ -346,6 +355,20 @@
       }
     } else {
       onCardNumberChange();
+    }
+  }
+
+  function isDowntime(instrument, value) {
+    if (!value || !instrument) {
+      downtimeVisible = false;
+      return;
+    }
+    const currentDowntime = checkDowntime(cardDowntimes, instrument, value);
+    if (currentDowntime) {
+      downtimeVisible = true;
+      downtimeVisibleSeverity = currentDowntime;
+    } else {
+      downtimeVisible = false;
     }
   }
 
@@ -447,6 +470,9 @@
   .faded {
     opacity: 0.5;
   }
+  .downtime-cards {
+    margin-top: 4px;
+  }
 </style>
 
 <div class="pad" id="add-card-container" class:faded>
@@ -502,6 +528,13 @@
       </div>
     {/if}
   </div>
+  {#if downtimeVisible}
+    <div class="downtime-cards">
+      <DowntimeCallout showIcon={true} severe={downtimeVisibleSeverity}>
+        {formatTemplateWithLocale(DOWNTIME_CALLOUT, { bank: $cardType }, $locale)}
+      </DowntimeCallout>
+    </div>
+  {/if}
   <div class="row remember-check">
     <div>
       {#if showRememberCardCheck}
