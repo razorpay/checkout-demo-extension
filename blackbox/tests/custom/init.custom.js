@@ -3,7 +3,7 @@ const { callbackHtml } = require('../../actions/callback.js');
 const { readFileSync } = require('fs');
 const API = require('./mockApi');
 
-const prefix = 'https://api-web.func.razorpay.in/v1/checkout';
+const prefix = 'https://api.razorpay.in/v1/checkout';
 
 const customCheckout = `${prefix}/custom`;
 const config = `${prefix}/config.js`;
@@ -18,7 +18,6 @@ const htmlContent = readFileSync('app/razorpay.test.html');
 
 function checkoutRequestHandler(request) {
   const url = request.url();
-  console.log(url);
   if (url.startsWith(customCheckout)) {
     return request.respond({ body: htmlContent });
   } else if (url.startsWith(config)) {
@@ -44,9 +43,10 @@ function checkoutRequestHandler(request) {
     //   headers: { 'Access-Control-Allow-Origin': '*' },
     //   body: JSON.stringify(API.ajaxResponse),
     // });
-  } else {
-    request.continue();
   }
+  //  else {
+  //   request.continue();
+  // }
 }
 
 // after page load request interceptor
@@ -70,7 +70,7 @@ function popupRequestHandler(request) {
 }
 
 let interceptorOptions;
-module.exports = async ({ page, data = {} }) => {
+module.exports = async ({ page, mockPaymentRequest = false, data = {} }) => {
   if (interceptorOptions) {
     interceptorOptions.disableInterceptor();
   } else {
@@ -78,20 +78,30 @@ module.exports = async ({ page, data = {} }) => {
   }
 
   page.on('request', checkoutRequestHandler);
+  if (mockPaymentRequest) {
+    await page.evaluateOnNewDocument(() => {
+      class PaymentRequestMock {
+        constructor() {}
+
+        canMakePayment() {
+          return Promise.resolve(true);
+        }
+      }
+
+      window.microapps = {
+        requestPayment: PaymentRequestMock,
+      };
+
+      window.PaymentRequest = PaymentRequestMock;
+    });
+  }
   await page.goto(customCheckout);
 
-  if (interceptorOptions) {
-    interceptorOptions.enableInterceptor();
-  } else {
-    interceptorOptions = interceptor(page);
-  }
+  interceptorOptions = interceptor(page);
+  interceptorOptions.enableInterceptor();
 
   const pageTarget = page.target();
 
-  //   page.removeListener('request', checkoutRequestHandler);
-
-  //   await page.setRequestInterception(true);
-  //   page.on('request', postLoadRequestHandler);
 
   const returnObj = {
     page,
