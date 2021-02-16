@@ -146,6 +146,7 @@
       props: {
         neftDetails: data.receiver,
         expiry: data.close_by,
+        amount: data.amount
       },
       target: printWindow.document.body,
     });

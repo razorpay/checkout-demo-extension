@@ -27,7 +27,6 @@ export const labels = {
   NON_HDFC_DISCLAIMERS: [
     'This challan can be used only for electronic funds transfer to provided account number through intra bank Funds Transfer or RTGS / NEFT/ IMPS.',
     "It is remitter's responsibility to remit the funds to correct account no. with correctamount as provided above. Incase of any mismatch in account no or amount, the transaction willbe rejected and funds will be refunded back to remitter account by next working day.",
-    'IMPS transactions are not allowed into provided account no. Bank shall not be liable incaseof IMPS transactions are not updated successfully or not refunded back to remitter. (This isrequired as solution for refund of IMPS rejections is yet to be finalized)',
     'This challan is valid for only one transaction hence Remitter has to generate new challanfor every payment.',
   ],
   DISCLAIMER_LABEL: 'Disclaimer',
