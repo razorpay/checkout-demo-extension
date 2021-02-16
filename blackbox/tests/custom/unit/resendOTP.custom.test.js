@@ -4,14 +4,14 @@ const mockAPI = require('blackbox/tests/custom/mockApi.js');
 
 let context;
 
-describe('submitOTP - Custom Checkout UT', () => {
+describe('resendOTP - Custom Checkout UT', () => {
   beforeEach(async () => {
     context = await initCustomCheckout({ page });
   });
   afterEach(async () => {
     page.removeAllListeners('request');
   });
-  test('submitOTP flow', async () => {
+  test('resendOTP flow', async () => {
     /**
      * Trigger payment flow
      */
@@ -43,34 +43,27 @@ describe('submitOTP - Custom Checkout UT', () => {
 
     await popupPage.waitForNavigation();
 
-    // trigger submitOTP
-    await page.evaluate(async response => {
+    // trigger resendOTP
+    await page.evaluate(async () => {
       if (window.rp) {
-        window.rp._payment.otpurl = response.submit_url;
-        window.rp
-          .on('payment.error', function(resp) {
-            document.getElementById('status').innerText = 'failed';
-            document.getElementById('response').innerText = JSON.stringify(
-              resp
-            );
-          })
-          .on('payment.success', function(resp) {
-            document.getElementById('status').innerText = 'success';
-            document.getElementById('response').innerText = JSON.stringify(
-              resp
-            );
-          });
-        window.rp.submitOTP(123456);
+        window.rp.resendOTP();
       }
-    }, createPaymentResponse);
+    });
     await context.expectRequest(req => {});
     const req = await context.getRequest();
-    // verify payload of request
-    expect(req.postData()).toBe("type=otp&otp=123456");
+    expect(
+      req
+        .url()
+        .includes(
+          `payments/${createPaymentResponse.payment_id}/otp_resend?key_id=rzp_test_1DP5mmOlF5G5ag`
+        )
+    ).toBeTruthy();
+
     // mock resendOTP api
-    await context.respondJSON(mockAPI.submitOTP());
-    await page.waitForSelector('#status');
-    const data = await getInnerText(page, '#status');
-    expect(data).toBe('success');
+    await context.respondJSON(mockAPI.otpResend());
+
+    await popupPage.waitForSelector('#resend-action');
+    const data = await getInnerText(popupPage, '#resend-action');
+    expect(data).toBe('Resend OTP');
   });
 });

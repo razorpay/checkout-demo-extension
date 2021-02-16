@@ -63,6 +63,9 @@ const randomName = () => {
     randomString(chrlow)(4, 12)
   );
 };
+const getElementForSelector = async (page, selector) => {
+  return (await page.$(selector)) || undefined;
+};
 
 const query2obj = string => {
   // TODO: Support objects and nested objects.
@@ -224,6 +227,7 @@ const util = (module.exports = {
     const returnObj = {
       disableInterceptor: () => (interceptorEnabled = null),
       enableInterceptor: () => (interceptorEnabled = true),
+      getRequest: () => currentRequest,
     };
 
     function shouldIgnore(interceptedRequest) {
@@ -320,5 +324,18 @@ const util = (module.exports = {
       });
 
     return returnObj;
+  },
+  getInnerText: async (page, selector) => {
+    const elementForSelector = await getElementForSelector(page, selector);
+    try {
+      if (elementForSelector)
+        return (
+          (await elementForSelector.evaluate(element => {
+            return element.innerText;
+          })) || ''
+        );
+    } catch {
+      return '';
+    }
   },
 });

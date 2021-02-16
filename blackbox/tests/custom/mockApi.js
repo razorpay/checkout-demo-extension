@@ -1,30 +1,46 @@
 module.exports = {
-  ajaxResponse: {
+  ajaxResponse: (override = {}) => ({
     type: 'first',
     request: {
-      url:
-        'https://api.razorpay.com/v1/gateway/mocksharp/payment?key_id=rzp_test_1DP5mmOlF5G5ag&action=authorize&amount=200&method=card&payment_id=GZ7c6a2d9mfWAG&callback_url=https%3A%2F%2Fapi.razorpay.com%2Fv1%2Fpayments%2Fpay_GZ7c6a2d9mfWAG%2Fcallback%2F003a66d043ae11dc4cb2b29a3f089c465628b794%2Frzp_test_1DP5mmOlF5G5ag&recurring=0&card_number=eyJpdiI6ImJNT0cyQWdHbzliRGtMWVNBNHk3SVE9PSIsInZhbHVlIjoiZ0Vodkx3UmlVcUczS2NlK09OZFwvQmgzR1NXSWRLXC9LUVJLQUdsYzg1OTRjPSIsIm1hYyI6Ijk0ZjM2ODM4MzQzNGYzNTVjOWVjNWFiMWRjYjJiZWJiOWQ2MzhkMzQzOGFlNDc4MWU5NmZlOTEwYzNlNGE0YjEifQ%3D%3D&encrypt=1',
+      url: 'about:blank',
       method: 'get',
       content: [],
     },
     version: 1,
-    payment_id: 'pay_GZ7c6a2d9mfWAG',
+    payment_id: 'pay_GcGmzHFHZZzq74',
+    next: ['otp_submit', 'otp_resend'],
     gateway:
-      'eyJpdiI6IkJhNEQrb0cwcWpoZEIwYmU2UVNDNkE9PSIsInZhbHVlIjoiRnA0SXpXV3NUNXdmSDlVQ3p1MWhyZDlNT05oRTZkQzN0WjJhd2VNeTlydz0iLCJtYWMiOiI5Y2Y3NzVlN2M2OTc2NTIwN2JiM2ZkMGYzMGZhZmFhY2I0YTJiNTRiNjA2NTJlNTMxODM2MDNjZGY5NmIzZTMxIn0=',
-    amount: '₹ 2',
-    image: 'https://cdn.razorpay.com/logos/GS8xtzE45HDhNT_medium.png',
-    magic: false,
+      'eyJpdiI6InFVZ3hWbTdzWjR4aDBGZUFCUDJldEE9PSIsInZhbHVlIjoiVTVkSTFhZHlIU1VcL2IzUHFlYkk3em9GYzhyN2dHR3Fqd0hOWHVlN2UzcTQ9IiwibWFjIjoiNzBiMzA1NGZmODE0ZDYyMTVlZWM0M2E3MTU3ZWVkMzZlYjJhNzYyZjVhNGI1MmQzMDkzZDVmNzIxNWRlOGZkOSJ9',
+    submit_url:
+      'https://api.razorpay.com/v1/payments/pay_GcGmzHFHZZzq74/otp_submit/5c032824cafd8fc967bb515cd0c68be971193be5?key_id=rzp_live_ILgsfZCZoFIKMb',
+    resend_url:
+      'https://api.razorpay.com/v1/payments/pay_GcGmzHFHZZzq74/otp_resend?key_id=rzp_live_ILgsfZCZoFIKMb',
+    metadata: {
+      issuer: 'ICIC',
+      network: 'VISA',
+      last4: '1234',
+      iin: '444551',
+    },
+    redirect:
+      'https://api.razorpay.com/v1/payments/pay_GcGmzHFHZZzq74/authentication/redirect?key_id=rzp_live_ILgsfZCZoFIKMb',
+    resend_url_json:
+      'https://api.razorpay.com/v1/payments/pay_GcGmzHFHZZzq74/otp_resend/json?key_id=rzp_live_ILgsfZCZoFIKMb',
+    submit_url_private:
+      'https://api.razorpay.com/v1/payments/pay_GcGmzHFHZZzq74/otp/submit',
+    resend_url_private:
+      'https://api.razorpay.com/v1/payments/pay_GcGmzHFHZZzq74/otp/resend',
     org_logo: '',
     org_name: 'Razorpay Software Private Ltd',
     checkout_logo:
       'https://dashboard-activation.s3.amazonaws.com/org_100000razorpay/checkout_logo/phpnHMpJe',
     custom_branding: false,
-  },
+    ...override,
+  }),
   validVPAResponse: (vpa, override = {}) => ({
     customer_name: null,
     success: true,
     vpa,
-    ...override
+    ...override,
   }),
   invalidVPAResponse: () => ({
     error: {
@@ -3675,4 +3691,31 @@ module.exports = {
     org_features: [],
     ...override,
   }),
+  otpResend: () => ({
+    type: 'otp',
+    request: {
+      method: 'direct',
+      content:
+        '<!doctype html>\n<html>\n<head>\n  <title></title>\n  <meta http-equiv="X-UA-Compatible" content="IE=edge">\n  <meta charset="utf-8" />\n  <meta name="viewport" content="width=device-width, initial-scale=1">\n  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>\n  <link href="https://fonts.googleapis.com/css?family=Muli:400,600,800" rel="stylesheet"/>\n</head>\n<script>\n  var events = {\n    page: \'gateway_otp_postform\',\n    props: {\n          payment_id: \'pay_GcDqre4nqakb46\',\n              merchant_id: \'2aTeFCKTYWwfrF\',\n        },\n    load: true,\n    unload: true\n  }\n</script>\n<script>\n!function(e){e.track=Boolean;try{if(/razorpay\\.in$/.test(location.origin))return;if("object"!=typeof e.events)return;var n=e.events.props;if(0===Object.keys(n).length)return;var t,o=e.events,r=o.page,a=o.load,s=o.unload,i=o.error,c="https://lumberjack.razorpay.com/v1/track",u="MC40OTMwNzgyMDM3MDgwNjI3Nw9YnGzW",p="function"==typeof navigator.sendBeacon,d=Date.now(),f=[{name:"ua_parser",input_key:"user_agent",output_key:"user_agent_parsed"}];function l(e,o){(o=o||{}).beacon=p,o.time_since_render=Date.now()-d,o.url=location.href,function(e,n){if(e&&n)Object.keys(n).forEach(function(t){e[t]=n[t]})}(o,n);var a={addons:f,events:[{event:r+":"+e,properties:o,timestamp:Date.now()}]},s=encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(a))))),i=JSON.stringify({key:u,data:s});p?navigator.sendBeacon(c,i):((t=new XMLHttpRequest).open("post",c,!0),t.send(i))}a&&l("load"),s&&e.addEventListener("unload",function(){l("unload")}),i&&e.addEventListener("error",function(e){l("error",{message:e.message,line:e.line,col:e.col,stack:e.error&&e.error.stack})})}catch(e){}e.track=l}(window);\n</script>\n\n<body>\n    <div id="preloading">\n        <style>\n            body {\n                background: #f4f4f4;\n            }\n        </style>\n        <style>\n@keyframes  lo{to{transform:rotate(360deg)}}@-webkit-keyframes lo{to{-webkit-transform:rotate(360deg)}}\n.loader{height:24px;width:24px;border-radius:50%;display:inline-block;\n  animation:lo .8s infinite linear;-webkit-animation:lo .8s infinite linear;\n  transition:0.3s;-webkit-transition:0.3s;\n  opacity:0;border:2px solid #3395FF;border-top-color:transparent}\n.vis{opacity:1}\n</style>\n<div class="loader vis" style="position:absolute;top:115px;left:50%;margin-left:-12px"></div>\n        <img src="https://cdn.razorpay.com/logo.svg" id="logo" height="35px" style="margin:30px auto 10px; display:block">\n    </div>\n  <script type="text/javascript">\n    // input data //\n    var data = {"type":"otp","request":{"content":{"next":["resend_otp"]},"method":"post","url":"https:\\/\\/api.razorpay.com\\/v1\\/payments\\/pay_GcDqre4nqakb46\\/otp_submit\\/e27b8e1ccf8c4bd7dbe2186e032d8424a80a8de4?key_id=rzp_live_ILgsfZCZoFIKMb"},"version":1,"payment_id":"pay_GcDqre4nqakb46","gateway":"eyJpdiI6Im5PTTZoNXJtRHpYM1dIU0ZcL0J5VHhBPT0iLCJ2YWx1ZSI6IjVteE9tYzNCRWFkU0JmSHo0UmQyY2RsbjJBbCtwcE8zV0dRaUVEUkN0eTQ9IiwibWFjIjoiZjBiMmUxMjRhZGQ3NGUwYjRhZWI2ZTlhNGFmNzM5NTY0MzVhNDE1Yzc2ZjVkNzBiNWViYjhmNzNhZmVkZDNjNSJ9","contact":"+919257316342","amount":"1.00","formatted_amount":"₹ 1","wallet":null,"merchant":"Razorpay","merchant_id":"2aTeFCKTYWwfrF","theme_color":"#528FF0","nobranding":false,"redirect":"https:\\/\\/api.razorpay.com\\/v1\\/payments\\/pay_GcDqre4nqakb46\\/authentication\\/redirect?key_id=rzp_live_ILgsfZCZoFIKMb","metadata":{"issuer":"ICIC","network":"VISA","last4":"1234","iin":"444551"}};\n    // input data //\n    try { CheckoutBridge.setPaymentID(data.payment_id) } catch(e){}\n  </script>\n  <div id="app"></div>\n  <script type="text/javascript" src="https://cdn.razorpay.com/static/otp/bundle.js" charset="utf-8"></script>\n  \n  <form class="card" id="otpform" name="otpform" action="https://api.razorpay.com/v1/payments/pay_GcDqre4nqakb46/otp_submit/e27b8e1ccf8c4bd7dbe2186e032d8424a80a8de4?key_id=rzp_live_ILgsfZCZoFIKMb" method="post">\n    <input id=\'otp\' type="hidden" name="otp" maxlength="6">\n  </form>\n  <form id="form2" name="form2">\n    <input type="hidden" name="type" value="otp">\n    <input type="hidden" name="gateway" value="eyJpdiI6Im5PTTZoNXJtRHpYM1dIU0ZcL0J5VHhBPT0iLCJ2YWx1ZSI6IjVteE9tYzNCRWFkU0JmSHo0UmQyY2RsbjJBbCtwcE8zV0dRaUVEUkN0eTQ9IiwibWFjIjoiZjBiMmUxMjRhZGQ3NGUwYjRhZWI2ZTlhNGFmNzM5NTY0MzVhNDE1Yzc2ZjVkNzBiNWViYjhmNzNhZmVkZDNjNSJ9">\n  </form>\n</body>\n</html>\n',
+    },
+    version: 1,
+    payment_id: 'pay_GcDqre4nqakb46',
+    next: ['otp_submit', 'otp_resend'],
+    gateway:
+      'eyJpdiI6Im5PTTZoNXJtRHpYM1dIU0ZcL0J5VHhBPT0iLCJ2YWx1ZSI6IjVteE9tYzNCRWFkU0JmSHo0UmQyY2RsbjJBbCtwcE8zV0dRaUVEUkN0eTQ9IiwibWFjIjoiZjBiMmUxMjRhZGQ3NGUwYjRhZWI2ZTlhNGFmNzM5NTY0MzVhNDE1Yzc2ZjVkNzBiNWViYjhmNzNhZmVkZDNjNSJ9',
+    submit_url:
+      'https://api.razorpay.com/v1/payments/pay_GcDqre4nqakb46/otp_submit/e27b8e1ccf8c4bd7dbe2186e032d8424a80a8de4?key_id=rzp_live_ILgsfZCZoFIKMb',
+    resend_url:
+      'https://api.razorpay.com/v1/payments/pay_GcDqre4nqakb46/otp_resend?key_id=rzp_live_ILgsfZCZoFIKMb',
+    metadata: { issuer: 'ICIC', network: 'VISA', last4: '1234', iin: '437552' },
+    redirect:
+      'https://api.razorpay.com/v1/payments/pay_GcDqre4nqakb46/authentication/redirect?key_id=rzp_live_ILgsfZCZoFIKMb',
+    resend_url_json:
+      'https://api.razorpay.com/v1/payments/pay_GcDqre4nqakb46/otp_resend/json?key_id=rzp_live_ILgsfZCZoFIKMb',
+    submit_url_private:
+      'https://api.razorpay.com/v1/payments/pay_GcDqre4nqakb46/otp/submit',
+    resend_url_private:
+      'https://api.razorpay.com/v1/payments/pay_GcDqre4nqakb46/otp/resend',
+  }),
+  submitOTP: () => ({ razorpay_payment_id: 'pay_123465' }),
 };

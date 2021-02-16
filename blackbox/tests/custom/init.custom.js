@@ -1,13 +1,14 @@
 const { interceptor } = require('../../util');
-const { callbackHtml } = require('../../actions/callback.js');
 const { readFileSync } = require('fs');
 const API = require('./mockApi');
 
 const prefix = 'https://api.razorpay.in/v1/checkout';
 
 const customCheckout = `${prefix}/custom`;
+const popupInitialPage = `${prefix}/mockup`;
 const config = `${prefix}/config.js`;
 const razorpayJS = `${prefix}/js/generated/entry/razorpay.js`;
+const otpBundle = 'https://cdn.razorpay.com/static/otp/bundle.js';
 
 const popupCallbackRequest =
   'https://api.razorpay.com/v1/payments/pay_GZ7c6a2d9mfWAG';
@@ -15,6 +16,12 @@ const popupCallbackRequest =
 const jsContent = readFileSync('app/js/generated/entry/razorpay.js');
 const configContent = readFileSync('app/config.js');
 const htmlContent = readFileSync('app/razorpay.test.html');
+const popupHtmlContent = readFileSync('blackbox/fixtures/mockSFPage.html');
+const otpPageBundle = readFileSync('blackbox/fixtures/otpbundle.js');
+const callback = readFileSync('blackbox/fixtures/callback.html', {
+  encoding: 'utf8',
+  flag: 'r',
+});
 
 function checkoutRequestHandler(request) {
   const url = request.url();
@@ -33,20 +40,7 @@ function checkoutRequestHandler(request) {
   } else if (url.includes('livereload')) {
     // Livereload URLs come if you have `npm run start` on while testing
     return request.respond({ status: 200 });
-  } else if (url.includes('create/ajax')) {
-    request.continue({
-      url: 'https://api-web.func.razorpay.in/v1/payments/create/ajax',
-    });
-
-    // request.respond({
-    //   content: 'application/json',
-    //   headers: { 'Access-Control-Allow-Origin': '*' },
-    //   body: JSON.stringify(API.ajaxResponse),
-    // });
   }
-  //  else {
-  //   request.continue();
-  // }
 }
 
 // after page load request interceptor
@@ -57,16 +51,36 @@ function checkoutRequestHandler(request) {
 
 function popupRequestHandler(request) {
   const url = request.url();
-  console.log('amigo', url);
-  if (
+  if (url.startsWith(popupInitialPage)) {
+    return request.respond({ body: popupHtmlContent });
+  } else if (url.includes('favicon.ico')) {
+    return request.respond({ status: 204 });
+  } else if (
     url.startsWith(
       'https://api.razorpay.com/v1/gateway/mocksharp/payment/submit'
     )
   ) {
-    console.log(request.postData());
+    const postData = request.postData();
+    if (postData.includes('success=S')) {
+      var successMock = callback.replace(
+        '// Callback data //',
+        "{ razorpay_payment_id: 'pay_123465' }"
+      );
+      return request.respond({ contentType: 'text/html', body: successMock });
+    } else {
+      var failureMock = callback.replace(
+        '// Callback data //',
+        '{"error":{"code":"BAD_REQUEST_ERROR","description":"The payment has already been processed","source":"internal","step":"payment_authorization","reason":"bank_technical_error","metadata":{}},"http_status_code":400,"org_logo":"","org_name":"Razorpay Software Private Ltd","checkout_logo":"https://dashboard-activation.s3.amazonaws.com/org_100000razorpay/checkout_logo/phpnHMpJe","custom_branding":false};'
+      );
+      return request.respond({ contentType: 'text/html', body: failureMock });
+    }
+  } else if (url === otpBundle) {
+    return request.respond({ body: otpPageBundle });
+  } else if (checkoutRequestHandler(request)) {
+    return;
   } else {
+    request.continue();
   }
-  request.continue();
 }
 
 let interceptorOptions;
@@ -102,7 +116,6 @@ module.exports = async ({ page, mockPaymentRequest = false, data = {} }) => {
 
   const pageTarget = page.target();
 
-
   const returnObj = {
     page,
     data,
@@ -112,8 +125,9 @@ module.exports = async ({ page, mockPaymentRequest = false, data = {} }) => {
         .browser()
         .waitForTarget(t => t.opener() === pageTarget);
       const popupPage = await target.page();
-      //   await popupPage.setRequestInterception(true);
-      //   popupPage.on('request', popupRequestHandler.bind(data));
+      await popupPage.setRequestInterception(true);
+      popupPage.on('request', popupRequestHandler.bind(data));
+      popupPage.goto(popupInitialPage);
       return {
         page: popupPage,
         async callback(response) {
