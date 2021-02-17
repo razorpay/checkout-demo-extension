@@ -6,7 +6,6 @@ const prefix = 'https://api.razorpay.in/v1/checkout';
 
 const customCheckout = `${prefix}/custom`;
 const popupInitialPage = `${prefix}/mockup`;
-const config = `${prefix}/config.js`;
 const razorpayJS = `${prefix}/js/generated/entry/razorpay.js`;
 const otpBundle = 'https://cdn.razorpay.com/static/otp/bundle.js';
 
@@ -14,7 +13,6 @@ const popupCallbackRequest =
   'https://api.razorpay.com/v1/payments/pay_GZ7c6a2d9mfWAG';
 
 const jsContent = readFileSync('app/js/generated/entry/razorpay.js');
-const configContent = readFileSync('app/config.js');
 const htmlContent = readFileSync('app/razorpay.test.html');
 const popupHtmlContent = readFileSync('blackbox/fixtures/mockSFPage.html');
 const otpPageBundle = readFileSync('blackbox/fixtures/otpbundle.js');
@@ -27,8 +25,6 @@ function checkoutRequestHandler(request) {
   const url = request.url();
   if (url.startsWith(customCheckout)) {
     return request.respond({ body: htmlContent });
-  } else if (url.startsWith(config)) {
-    return request.respond({ body: configContent });
   } else if (url.includes('favicon.ico')) {
     return request.respond({ status: 204 });
   } else if (url === razorpayJS) {
