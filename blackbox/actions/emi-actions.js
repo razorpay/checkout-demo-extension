@@ -2,7 +2,7 @@ const { delay, visible } = require('../util');
 const { readFileSync } = require('fs');
 const { handleCardValidation } = require('./card-actions');
 
-contents = String(
+const contents = String(
   readFileSync(__dirname + '/../fixtures/mockSuccessandFailPage.html')
 );
 

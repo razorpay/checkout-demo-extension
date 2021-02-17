@@ -1,7 +1,7 @@
 const { visible, randomContact, randomEmail, delay } = require('../util');
 const { readFileSync } = require('fs');
 
-contents = String(
+const contents = String(
   readFileSync(__dirname + '/../fixtures/mockSuccessandFailPage.html')
 );
 

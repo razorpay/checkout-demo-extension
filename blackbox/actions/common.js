@@ -18,7 +18,7 @@ const paylaterActions = require('./paylater-actions');
 const personalizationActions = require('./personalization-actions');
 const payoutActions = require('./payout-actions');
 
-contents = String(
+const contents = String(
   readFileSync(__dirname + '/../fixtures/mockSuccessandFailPage.html')
 );
 

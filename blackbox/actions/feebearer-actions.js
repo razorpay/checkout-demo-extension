@@ -1,5 +1,7 @@
 const { visible } = require('../util');
 
+let feeAmount;
+let expectedfeeAmount1;
 async function handleFeeBearer(context, pressContinue) {
   let req = await context.expectRequest();
   expect(req.method).toEqual('POST');
