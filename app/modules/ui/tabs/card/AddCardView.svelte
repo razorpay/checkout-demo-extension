@@ -252,9 +252,9 @@
                 ? !!allowedRecurringCardsData[type][issuer]
                 : true;
             } else if (type === 'credit') {
-              reccuringCardSecondaryCheck = !!getCardNetworksForRecurring().includes(
+              reccuringCardSecondaryCheck = !!getCardNetworksForRecurring()[
                 $cardType
-              );
+              ];
             }
           }
         }
