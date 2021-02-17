@@ -9,6 +9,8 @@
     dccCurrency,
   } from 'checkoutstore/screens/card';
 
+  import { amountAfterOffer } from 'checkoutstore/offers';
+
   import {
     selectedInstrument,
     selectedInstrumentId,
@@ -59,6 +61,8 @@
   let originalAmount = getAmount();
   let selectedCurrency = null;
   let searchModalOpen = false;
+  let entityWithAmount = null;
+
   const currencyCache = {};
 
   // Props
@@ -117,10 +121,10 @@
 
   $: {
     if (entity) {
-      if (!currencyCache[entity]) {
+      if (!currencyCache[entityWithAmount]) {
         currencies = null;
         getCardCurrencies(prop).then(currencyPayload => {
-          currencyCache[entity] = currencyPayload;
+          currencyCache[entityWithAmount] = currencyPayload;
         });
       }
     } else {
@@ -151,7 +155,7 @@
     $dccCurrency = selectedCurrency;
   }
 
-  $: currencyConfig = entity && currencyCache[entity];
+  $: currencyConfig = entity && currencyCache[entityWithAmount];
   $: currencies = currencyConfig && currencyConfig.all_currencies;
   $: cardCurrency = currencyConfig && currencyConfig.card_currency;
   $: sortedCurrencies = currencies && sortCurrencies(currencies);
@@ -161,6 +165,7 @@
     displayCurrencies,
     ({ currency }) => currency === selectedCurrency
   );
+  $: entityWithAmount = `${entity}-${$amountAfterOffer}`;
 
   function onSelect(currency) {
     selectedCurrency = currency;
