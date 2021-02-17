@@ -22,9 +22,8 @@
 
 <div id="deactivated-blocked">
   <div>
-    There is a temporary block placed on the account currently because of which
-    new payment operations are put on hold. If you are seeing this message
-    unexpectedly, please contact the site admin regarding the issue.
+    This payment has failed due to an issue with the merchant. Do get in touch
+    with site/app admin regarding the issue.
   </div>
   <CTA on:click={onCloseCick}>CLOSE</CTA>
 </div>
