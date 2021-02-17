@@ -239,17 +239,23 @@
           debit: 'debit_card',
           credit: 'credit_card',
         };
-        isCardTypeAllowed = isMethodEnabled(cardTypeMap[type]);
-        if (isCardTypeAllowed) {
-          const allowedRecurringCardsData = getRecurringMethods().card || {};
-          if (type === 'debit') {
-            reccuringCardSecondaryCheck = issuer
-              ? !!allowedRecurringCardsData[type][issuer]
-              : true;
-          } else if (type === 'credit') {
-            reccuringCardSecondaryCheck = !!getCardNetworksForRecurring().includes(
-              $cardType
-            );
+        if (!type) {
+          // We do not have enough data to validate
+          isCardTypeAllowed = true;
+          reccuringCardSecondaryCheck = true;
+        } else {
+          isCardTypeAllowed = isMethodEnabled(cardTypeMap[type]);
+          if (isCardTypeAllowed) {
+            const allowedRecurringCardsData = getRecurringMethods().card || {};
+            if (type === 'debit') {
+              reccuringCardSecondaryCheck = issuer
+                ? !!allowedRecurringCardsData[type][issuer]
+                : true;
+            } else if (type === 'credit') {
+              reccuringCardSecondaryCheck = !!getCardNetworksForRecurring().includes(
+                $cardType
+              );
+            }
           }
         }
 
