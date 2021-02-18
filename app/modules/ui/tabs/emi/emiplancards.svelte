@@ -7,6 +7,15 @@
   export let provider;
   export let expand;
   export let title;
+
+  $: {
+    plans = (plans || []).sort((a, b) => {
+      if (a.duration < b.duration) {
+        return -1;
+      }
+      return 1;
+    });
+  }
 </script>
 
 <h3>{title}</h3>

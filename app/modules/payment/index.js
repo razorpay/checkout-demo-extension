@@ -29,6 +29,7 @@ import { GOOGLE_PAY_PACKAGE_NAME, PHONE_PE_PACKAGE_NAME } from 'common/upi';
 import { getCardEntityFromPayload, getCardFeatures } from 'common/card';
 
 import { getCurrentLocale, translatePaymentPopup as t } from 'i18n/popup';
+import updateScore from 'analytics/checkoutScore';
 
 /**
  * Tells if we're being executed from
@@ -139,6 +140,8 @@ function trackNewPayment(data, params, r) {
       params.upi.provider = data.vpa.split('@')[1];
     }
   }
+
+  updateScore('timeToSubmit');
 
   Analytics.track('submit', {
     data: {
@@ -1069,6 +1072,9 @@ razorpayProto.getCardCurrencies = function(payload) {
   };
 
   const entity = getCardEntityFromPayload(payload);
+
+  const entityWithAmount = `${entity}-${payload.amount}`;
+
   if (entity.length === 6) {
     requestPayload.iin = entity;
   } else {
@@ -1081,12 +1087,12 @@ razorpayProto.getCardCurrencies = function(payload) {
     requestPayload.currency = currency;
   }
 
-  const existingRequest = CardCurrencyRequests[entity];
+  const existingRequest = CardCurrencyRequests[entityWithAmount];
   if (existingRequest) {
     return existingRequest;
   }
 
-  CardCurrencyRequests[entity] = new Promise((resolve, reject) => {
+  CardCurrencyRequests[entityWithAmount] = new Promise((resolve, reject) => {
     let url = makeAuthUrl(this, 'payment/flows');
 
     // append requestPayload
@@ -1111,7 +1117,7 @@ razorpayProto.getCardCurrencies = function(payload) {
         }
 
         // Store in cache
-        CardCurrencyCache[entity] = response;
+        CardCurrencyCache[entityWithAmount] = response;
 
         // Resolve
         resolve(response);
@@ -1131,5 +1137,5 @@ razorpayProto.getCardCurrencies = function(payload) {
     });
   });
 
-  return CardCurrencyRequests[entity];
+  return CardCurrencyRequests[entityWithAmount];
 };

@@ -1,33 +1,36 @@
 const badges_text = {
   FjZg37JOiJDI0K: {
-    list: getList('50+', '3 months', '3 months'),
+    list: getHighlightsNos('50+', '3', '3'),
   },
   FnsHdtMjq1a7j7: {
-    list: getList('150+', '3 months', '3 months'),
+    list: getHighlightsNos('150+', '3', '3'),
   },
   FhZlzY1EMcTImZ: {
-    list: getList('300+', '3 months', '3 months'),
+    list: getHighlightsNos('300+', '3', '3'),
   },
   FFsK7Ojsv5B8cb: {
-    list: getList('400+', '4 months', '4 months'),
+    list: getHighlightsNos('400+', '4', '4'),
   },
   CDa7YMwXiWqCZz: {
-    list: getList('600+', '20 months', '20 months'),
+    list: getHighlightsNos('600+', '20', '20'),
   },
   GUHRJkzqlJHB95: {
-    list: getList('2000+', '9 months', '8 months'),
+    list: getHighlightsNos('2000+', '9', '8'),
+  },
+  CQb8Hvj0vXJHqR: {
+    list: getHighlightsNos('2000+', '10', '9'),
   },
   '10000000000000': {
-    list: getList('2000+', '9 months', '8 months'),
+    list: getHighlightsNos('2000+', '9', '8'),
   },
 };
 
-function getList(customersNo, securedYears, noFraudTime) {
-  return [
-    `Trusted by ${customersNo} customers`,
-    `Secured Razorpay merchant for ${securedYears}`,
-    `No fraud transaction for last ${noFraudTime}`,
-  ];
+function getHighlightsNos(customersNo, securedTime, noFraudTime) {
+  return {
+    customersNo,
+    securedTime,
+    noFraudTime,
+  };
 }
 
 export default badges_text;

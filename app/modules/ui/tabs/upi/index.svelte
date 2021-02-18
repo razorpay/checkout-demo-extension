@@ -10,8 +10,9 @@
     isPayout,
     getDowntimes,
     hasFeature,
-    isCustomerFeeBearer,
     getMerchantOrder,
+    shouldRememberCustomer,
+    getPrefilledVPA,
   } from 'checkoutstore';
   import {
     isMethodEnabled,
@@ -63,6 +64,8 @@
   import { getMiscIcon } from 'checkoutframe/icons';
   import Callout from 'ui/elements/Callout.svelte';
 
+  import updateScore from 'analytics/checkoutScore';
+
   // Store
   import { contact } from 'checkoutstore/screens/home';
   import { customer } from 'checkoutstore/customer';
@@ -101,7 +104,6 @@
   export let method = 'upi';
 
   // Refs
-  export let omnichannelField = null;
   export let vpaField = null;
 
   // Computed
@@ -112,7 +114,7 @@
   let shouldShowCollect;
   let shouldShowOmnichannel;
   let vpaEntered;
-  let rememberVpa = true;
+  let rememberVpa = shouldRememberCustomer('upi');
   let omnichannelPhone = '';
 
   let disabled = false;
@@ -347,9 +349,10 @@
 
   onMount(() => {
     /* TODO: improve handling of `prefill.vpa` */
-    if (session.get('prefill.vpa')) {
+    if (getPrefilledVPA()) {
       selectedApp = undefined;
-      vpa = session.get('prefill.vpa');
+      vpaEntered = getPrefilledVPA();
+      updateScore('vpaPrefilled');
     }
 
     const downtimes = getDowntimes();
@@ -449,6 +452,7 @@
           });
 
           data = { token: _token.token };
+          updateScore('paidViaSavedVpa');
         }
 
         break;
@@ -481,11 +485,16 @@
       }
     }
 
+    if (data.save) {
+      updateScore('saveThisVpa');
+    }
+
     data.method = 'upi';
     return data;
   }
 
   export function onBack() {
+    updateScore('wentBack');
     // User has gone back, set isFirst as false
     isFirst = false;
 
@@ -538,7 +547,11 @@
     if (!vpa) {
       return;
     }
+
     const valid = isVpaValid(vpa);
+    if (!valid) {
+      updateScore('invalidVpaBlur');
+    }
     Analytics.track('vpa:fill', {
       type: AnalyticsTypes.BEHAV,
       data: {

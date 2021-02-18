@@ -94,3 +94,10 @@ export const isCardValidForOffer = derived(
     });
   }
 );
+
+export const amountAfterOffer = derived(appliedOffer, () => {
+  if (get(appliedOffer)) {
+    return get(appliedOffer).amount;
+  }
+  return getAmount();
+});

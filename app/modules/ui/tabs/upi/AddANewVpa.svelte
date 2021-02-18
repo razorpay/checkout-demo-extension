@@ -13,7 +13,12 @@
 
   // Util imports
   import { getSession } from 'sessionmanager';
-  import { hasFeature, getPrefilledVPA } from 'checkoutstore';
+  import {
+    hasFeature,
+    getPrefilledVPA,
+    getPrefilledName,
+    shouldRememberCustomer,
+  } from 'checkoutstore';
   import { VPA_REGEX } from 'common/constants';
   import { getAnimationOptions } from 'svelte-utils';
 
@@ -26,6 +31,8 @@
     NEW_VPA_SUBTITLE,
     NEW_VPA_SUBTITLE_UPI_OTM,
   } from 'ui/labels/upi';
+  import { phone } from 'checkoutstore/screens/home';
+  import { suggestionVPA } from 'common/upi';
 
   // Props
   export let selected = false;
@@ -91,11 +98,8 @@
       }
     }, 200);
   }
-
-  const canSaveVpa = hasFeature('save_vpa');
-
+  const canSaveVpa = hasFeature('save_vpa') && shouldRememberCustomer('upi');
   let logged;
-
   $: logged = _Obj.getSafely(customer, 'logged');
 
   $: pattern = PATTERN_WITH_HANDLE;
@@ -174,11 +178,40 @@
         <Field
           formatter={{ type: 'vpa' }}
           {pattern}
+          prediction={currentVaue => {
+            const phoneInput = $phone;
+            const prefillName = getPrefilledName() || '';
+            const atIndex = currentVaue.indexOf('@');
+            if (currentVaue?.length > 1 && phoneInput && phoneInput.startsWith(currentVaue) && atIndex === -1) {
+              return phoneInput;
+            }
+            if (currentVaue?.length > 1 && prefillName && prefillName
+                ?.toLowerCase()
+                ?.startsWith(currentVaue) && atIndex === -1) {
+              // handle mismatch case of suggestion and input
+              return currentVaue + prefillName.substr(currentVaue.length);
+            }
+            if (currentVaue.length > 2 && currentVaue.includes('@') && atIndex < currentVaue.length - 1) {
+              const predictionInput = currentVaue.substr(atIndex + 1);
+              const predictions = suggestionVPA.filter(vpa =>
+                vpa.startsWith(predictionInput)
+              );
+              const value = `${currentVaue.substr(0, atIndex)}@${predictions?.[0] || ''}`;
+              if (predictions?.length > 0) {
+                return { value, maxLeftPositionOfDropdown: 180, suggestions: predictions.map(x => `@${x}`), onSelect: data => {
+                    return `${currentVaue.substr(0, atIndex)}${data}`;
+                  } };
+              }
+            }
+            return '';
+          }}
+          showDropdownPredictions
           helpText={$t(UPI_COLLECT_NEW_VPA_HELP)}
           id={'vpa-' + paymentMethod}
           name={'vpa-' + paymentMethod}
           type="text"
           required
+          bind:value
           bind:this={vpaField}
           bind:readonlyValue={vpa}
           on:input={handleVpaInput}
