@@ -242,7 +242,6 @@ var responseTypes = {
   },
 
   web_payments: function(response, app) {
-    window.console.log('entered web payments co proto');
     const data = response.data;
     const instrumentData = {
       url: data.intent_url,
@@ -269,12 +268,7 @@ var responseTypes = {
       },
     };
 
-    window.console.log('details', details);
-    window.console.log('supportedInstruments', supportedInstruments);
-
     const webPaymentOnError = (app, error) => {
-      window.console.log('webPaymentOnError');
-      window.console.dir(error);
       if (error.code) {
         if (
           [error.ABORT_ERR, error.NOT_SUPPORTED_ERR].indexOf(error.code) >= 0
@@ -323,10 +317,6 @@ var responseTypes = {
               response: instrument.details,
             });
           } else if (this.data && this.data.method === 'app') {
-            window.console.trace(
-              'emmiting app.intent_response',
-              instrument.details
-            );
             this.emit('app.intent_response', {
               response: instrument.details,
             });
@@ -439,9 +429,7 @@ var responseTypes = {
       }
 
       this.on('app.intent_response', response => {
-        window.console.log("got the app's intent response");
         if (response.provider === 'CRED') {
-          window.console.trace('app', response);
           if (response.data === 0) {
             // Payment was cancelled on CRED app.
             this.emit('cancel', {

@@ -3811,7 +3811,6 @@ Session.prototype = {
     if (powerotp) {
       powerotp.value = '';
     }
-    console.trace('clearing request');
     if (this.r._payment) {
       hideOverlayMessage();
       this.r.emit('payment.cancel', extra);
@@ -4877,7 +4876,6 @@ Session.prototype = {
       if (!this.headless) {
         sub_link.html(I18n.format('misc.go_to_payment'));
         this.r.on('payment.cancel', function() {
-          console.trace('payment cancelled');
           that.showLoadError(I18n.format('misc.payment_canceled'), true);
         });
       }
