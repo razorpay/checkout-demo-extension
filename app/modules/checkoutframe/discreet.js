@@ -100,6 +100,8 @@ import * as Instruments from 'configurability/instruments';
 import { getInstrumentMeta } from 'ui/tabs/home/instruments';
 import * as ContactStorage from 'checkoutframe/contact-storage';
 
+import downtimeAlertView from 'checkoutframe/downtimes/alert';
+
 export default {
   RazorpayConfig,
   updateScore,
@@ -216,4 +218,6 @@ export default {
   I18n,
   overlayStackStore,
   rewardsStore,
+
+  downtimeAlertView,
 };

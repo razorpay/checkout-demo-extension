@@ -239,6 +239,16 @@ function hideEmi() {
   return wasShown;
 }
 
+function hideDowntimeAlert() {
+  var downtimeWrap = $('#downtime-wrap');
+  console.log(downtimeWrap);
+  var wasShown = downtimeWrap.hasClass(shownClass);
+  if (wasShown) {
+    hideOverlay(downtimeWrap);
+  }
+  return wasShown;
+}
+
 function hideFeeWrap() {
   var feeWrap = $('#fee-wrap');
   var wasShown = feeWrap.hasClass(shownClass);
@@ -251,7 +261,12 @@ function hideFeeWrap() {
 function hideOverlayMessage() {
   var session = SessionManager.getSession();
   session.preventErrorDismissal = false;
-  if (!hideEmi() && !hideFeeWrap() && !session.hideSvelteOverlay()) {
+  if (
+    !hideEmi() &&
+    !hideFeeWrap() &&
+    !hideDowntimeAlert() &&
+    !session.hideSvelteOverlay()
+  ) {
     if (session.tab === 'nach') {
       if (!session.nachScreen.shouldHideOverlay()) {
         return;
@@ -4169,8 +4184,30 @@ Session.prototype = {
       this.showConversionChargesCallout();
       return;
     }
+    this.checkForDowntime();
+  },
 
-    this.submit();
+  checkForDowntime: function() {
+    var downtimeVisible = this.payload.downtimeVisible;
+    var downtimeVisibleSeverity = this.payload.downtimeVisibleSeverity;
+    delete this.payload.downtimeVisible;
+    delete this.payload.downtimeVisibleSeverity;
+
+    // this.submit();
+    if (downtimeVisible && downtimeVisibleSeverity === 'high') {
+      this.showDowntimeAlert();
+    } else {
+      this.submit();
+    }
+  },
+
+  showDowntimeAlert: function() {
+    if (!this.downtimeAlert) {
+      this.downtimeAlert = new discreet.downtimeAlertView();
+    } else {
+      this.downtimeAlert.view.handleChange('SBI Bank');
+    }
+    showOverlay($('#downtime-wrap'));
   },
 
   getSelectedPaymentInstrument: function() {

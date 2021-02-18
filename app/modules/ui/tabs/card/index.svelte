@@ -424,6 +424,8 @@
       'card[expiry]': $cardExpiry,
       'card[cvv]': $cardCvv,
       'card[name]': $cardName,
+      downtimeVisible: downtimeVisible,
+      downtimeSeverity: downtimeVisibleSeverity,
     };
     // Fill in dummy values for expiry and CVV if the CVV and expiry fields are hidden
     if ($hideExpiryCvvFields) {
@@ -441,13 +443,19 @@
 
   function getSavedCardPayload() {
     const selectedToken = $selectedCard || {};
-    const payload = { token: selectedToken.token, 'card[cvv]': $currentCvv };
+    const payload = {
+      token: selectedToken.token,
+      'card[cvv]': $currentCvv,
+      downtimeVisible: selectedToken.downtimeVisible,
+      downtimeSeverity: selectedToken.downtimeVisibleSeverity,
+    };
     if ($currentAuthType) {
       payload.auth_type = $currentAuthType;
     }
     if ($savedCardEmiDuration) {
       payload.emi_duration = $savedCardEmiDuration;
     }
+
     return payload;
   }
 

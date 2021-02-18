@@ -79,7 +79,6 @@
   let invalid;
   let netbanks;
   let selectedBankDowntimeSeverity = false;
-  let downtimeText = '';
   let selectedBankHasDowntime;
   let selectedBankName;
   let translatedBanksArr;
@@ -113,6 +112,8 @@
   export function getPayload() {
     return {
       bank: $selectedBank,
+      downtimeVisibleSeverity: selectedBankDowntimeSeverity,
+      downtimeVisible: selectedBankHasDowntime,
     };
   }
 

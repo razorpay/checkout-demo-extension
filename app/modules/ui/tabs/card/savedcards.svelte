@@ -57,6 +57,9 @@
     $currentCvv = cvv;
     $currentAuthType = authType;
     $selectedCard = card;
+    $selectedCard.downtimeCause = card.card.downtimeCause;
+    $selectedCard.downtimeVisible = card.card.downtimeVisible;
+    $selectedCard.downtimeVisibleSeverity = card.card.downtimeVisibleSeverity;
   }
 
   function handleCvvChange(event) {

@@ -46,7 +46,6 @@
   export let cvvDigits;
   export let selected;
   export let tab;
-  let cardClicked = false;
   let { downtimeVisible, downtimeVisibleSeverity, downtimeCause } = card;
 
   // Computed
@@ -111,7 +110,6 @@
   }
 
   function handleClick() {
-    cardClicked = true;
     const payload = { cvv: cvvValue };
     // Focus on next tick because the CVV field might not have rendered right now.
     tick().then(_ => {
@@ -234,7 +232,7 @@
       {/if}
     </div>
   {/if}
-  {#if downtimeVisible && cardClicked}
+  {#if downtimeVisible && selected}
     <div class="downtime-saved-cards">
       <DowntimeCallout showIcon={false} severe={downtimeVisibleSeverity}>
         {formatTemplateWithLocale(DOWNTIME_CALLOUT, { bank: downtimeCause }, $locale)}
