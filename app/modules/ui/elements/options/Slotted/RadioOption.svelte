@@ -109,4 +109,5 @@
     </div>
     <slot name="extra" />
   </Stack>
+  <slot name="downtime" />
 </button>

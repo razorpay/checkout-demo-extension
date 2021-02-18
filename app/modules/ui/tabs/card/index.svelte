@@ -12,8 +12,6 @@
   import SavedCards from 'ui/tabs/card/savedcards.svelte';
   import AppInstruments from 'ui/tabs/card/AppInstruments.svelte';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
-  import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
-  import Icon from 'ui/elements/Icon.svelte';
   import { checkDowntime } from 'checkoutframe/downtimes';
 
   // Store
@@ -36,11 +34,7 @@
 
   import { methodInstrument, blocks } from 'checkoutstore/screens/home';
 
-  import { getSDKMeta } from 'checkoutstore/native';
-
   import { customer } from 'checkoutstore/customer';
-
-  import { contact } from 'checkoutstore/screens/home';
 
   import {
     isRecurring,

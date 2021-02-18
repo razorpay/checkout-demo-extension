@@ -30,15 +30,12 @@
 
   import { methodInstrument } from 'checkoutstore/screens/home';
 
-  import { checkDowntime } from 'checkoutframe/downtimes';
-
   import {
     isNameReadOnly,
     shouldRememberCustomer,
     isRecurring,
     isStrictlyRecurring,
     getCardFeatures,
-    getDowntimes,
   } from 'checkoutstore';
   import {
     isAMEXEnabled,

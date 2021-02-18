@@ -16,6 +16,8 @@ import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { hashFnv32a } from 'checkoutframe/personalization/utils';
 import { isMethodUsable } from 'checkoutstore/methods';
+import { getDowntimes } from 'checkoutstore';
+import { checkDowntime } from 'checkoutframe/downtimes';
 
 function generateBasePreferredBlock(preferred) {
   const preferredBlock = createBlock('rzp.preferred', {
@@ -296,6 +298,11 @@ export function setBlocks(
       );
     }
 
+    //Add downtime to preferred blocks
+    preferredBlock.instruments = preferredBlock.instruments.map(
+      addDowntimeToBlock
+    );
+
     allBlocks = _Arr.mergeWith([preferredBlock], allBlocks);
   }
 
@@ -427,4 +434,44 @@ export function getInstrumentMeta(instrument) {
   }
 
   return meta;
+}
+
+function addDowntimeToBlock(block) {
+  downtimes = getDowntimes();
+  let downtimeVisibleSeverity = '';
+  let downtimeInstrument = '';
+  switch (block.method) {
+    case 'netbanking':
+      downtimeVisibleSeverity = checkDowntime(
+        downtimes.netbanking,
+        'bank',
+        block.banks[0]
+      );
+      downtimeInstrument = block.banks[0];
+      break;
+    case 'upi':
+      downtimeVisibleSeverity = checkDowntime(
+        downtimes.upi,
+        'vpa_handle',
+        block.vpas[0].split('@')[1]
+      );
+      downtimeInstrument = block.vpas[0].split('@')[1];
+      break;
+    case 'card':
+      downtimeVisibleSeverity = checkDowntime(
+        downtimes.cards,
+        'issuer',
+        block.issuers[0]
+      );
+      downtimeInstrument = block.issuers[0];
+      break;
+  }
+  if (downtimeVisibleSeverity) {
+    block.downtimeVisibleSeverity = downtimeVisibleSeverity;
+    block.downtimeVisible = true;
+    block.downtimeInstrument = downtimeInstrument;
+  } else {
+    block.downtimeVisible = false;
+  }
+  return block;
 }

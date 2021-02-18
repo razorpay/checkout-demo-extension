@@ -6,14 +6,10 @@
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import ContactField from 'ui/components/ContactField.svelte';
+  import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
 
   // Store
-  import {
-    country,
-    phone,
-    proxyCountry,
-    proxyPhone,
-  } from 'checkoutstore/screens/home';
+  import { proxyCountry, proxyPhone } from 'checkoutstore/screens/home';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -23,7 +19,6 @@
   import { getProvider as getCardlessEmiProvider } from 'common/cardlessemi';
   import { getProvider as getPaylaterProvider } from 'common/paylater';
   import { getProvider as getAppProvider } from 'common/apps';
-  import Track from 'tracker';
   import { getExtendedSingleInstrument } from 'configurability/instruments';
 
   // Store
@@ -45,11 +40,16 @@
     getPaylaterProviderName,
     getUpiIntentAppName,
     getAppProviderName,
+    formatTemplateWithLocale,
   } from 'i18n';
+  import { DOWNTIME_CALLOUT } from 'ui/labels/callouts';
 
   // Props
   export let instrument = {};
   export let name = 'instrument';
+  let downtimeVisible = false;
+  let downtimeVisibleSeverity;
+  let downtimeInstrument = '';
 
   let individualInstrument = getExtendedSingleInstrument(instrument);
   $: individualInstrument = getExtendedSingleInstrument(instrument);
@@ -232,7 +232,22 @@
       dispatch('submit');
     }
   }
+  $: {
+    if (selected) {
+      downtimeVisible = instrument.downtimeVisible;
+      downtimeVisibleSeverity = instrument.downtimeVisibleSeverity;
+      downtimeInstrument = instrument.downtimeInstrument;
+    } else {
+      downtimeVisible = false;
+    }
+  }
 </script>
+
+<style>
+  .downtime-preferred-method {
+    margin-top: 8px;
+  }
+</style>
 
 <SlottedRadioOption
   ellipsis
@@ -251,6 +266,13 @@
   <div slot="body">
     {#if contactRequired}
       <ContactField bind:country={$proxyCountry} bind:phone={$proxyPhone} />
+    {/if}
+  </div>
+  <div slot="downtime" class="downtime-preferred-method">
+    {#if downtimeVisible}
+      <DowntimeCallout showIcon={false} severe={downtimeVisibleSeverity}>
+        {formatTemplateWithLocale(DOWNTIME_CALLOUT, { instrument: downtimeInstrument }, $locale)}
+      </DowntimeCallout>
     {/if}
   </div>
 </SlottedRadioOption>
