@@ -447,7 +447,7 @@
       token: selectedToken.token,
       'card[cvv]': $currentCvv,
       downtimeVisible: selectedToken.downtimeVisible,
-      downtimeSeverity: selectedToken.downtimeVisibleSeverity,
+      downtimeVisibleSeverity: selectedToken.downtimeVisibleSeverity,
     };
     if ($currentAuthType) {
       payload.auth_type = $currentAuthType;

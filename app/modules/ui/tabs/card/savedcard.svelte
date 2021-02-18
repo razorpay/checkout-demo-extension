@@ -37,6 +37,7 @@
   import Radio from 'ui/elements/Radio.svelte';
   import CvvField from 'ui/elements/fields/card/CvvField.svelte';
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
+  import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
 
   // Props
   export let card;
@@ -130,6 +131,10 @@
   .downtime-saved-cards {
     margin-bottom: 8px;
   }
+  .downtime-saved-cards-icon {
+    margin-right: 8px;
+    margin-top: 2px;
+  }
 </style>
 
 <div
@@ -149,6 +154,11 @@
       <FormattedText
         text={formatTemplateWithLocale(SAVED_CARD_LABEL, { last4: card.last4 }, $locale)} />
     </div>
+    {#if downtimeVisible && selected}
+      <div class="downtime-saved-cards-icon">
+        <DowntimeIcon severe={downtimeVisibleSeverity} />
+      </div>
+    {/if}
     <div class="saved-cvv">
       {#if showCvv}
         <CvvField
