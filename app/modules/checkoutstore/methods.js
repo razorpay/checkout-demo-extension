@@ -277,7 +277,7 @@ function isMethodEnabledForBrowser(method) {
 
 export function isMethodEnabled(method) {
   if (getOrderMethod()) {
-    if (getOrderMethod() !== method) {
+    if (getOrderMethod() !== method && !(getOrderMethod() === 'upi' && method === 'qr')) {
       return false;
     }
   }
