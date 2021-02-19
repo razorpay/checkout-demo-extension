@@ -268,7 +268,7 @@
   </div>
   <div slot="downtime" class="downtime-preferred-method">
     {#if !!downtimeSeverity}
-      <DowntimeCallout showIcon={false} severe={downtimeSeverity}>
+      <DowntimeCallout showIcon={true} severe={downtimeSeverity}>
         {formatTemplateWithLocale(DOWNTIME_CALLOUT, { instrument: downtimeInstrument }, $locale)}
       </DowntimeCallout>
     {/if}
