@@ -4187,23 +4187,23 @@ Session.prototype = {
   },
 
   checkForDowntime: function() {
-    var downtimeVisible = this.payload.downtimeVisible;
-    var downtimeVisibleSeverity = this.payload.downtimeVisibleSeverity;
-    delete this.payload.downtimeVisible;
-    delete this.payload.downtimeVisibleSeverity;
+    var downtimeSeverity = this.payload.downtimeSeverity;
+    var downtimeInstrument = this.payload.downtimeInstrument;
+    delete this.payload.downtimeSeverity;
+    delete this.payload.downtimeInstrument;
 
-    if (downtimeVisible && downtimeVisibleSeverity === 'high') {
-      this.showDowntimeAlert();
+    if (!!downtimeSeverity && downtimeSeverity === 'high') {
+      this.showDowntimeAlert(downtimeInstrument);
     } else {
       this.submit();
     }
   },
 
-  showDowntimeAlert: function() {
+  showDowntimeAlert: function(downtimeInstrument) {
     if (!this.downtimeAlert) {
       this.downtimeAlert = new discreet.downtimeAlertView();
     } else {
-      this.downtimeAlert.view.handleChange('SBI Bank');
+      this.downtimeAlert.view.handleChange(downtimeInstrument);
     }
     showOverlay($('#downtime-wrap'));
   },

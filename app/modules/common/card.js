@@ -447,12 +447,11 @@ export function addDowntimesToSavedCards(cards, downtimes) {
     let networkDowntime = checkDowntime(downtimes, 'network', network);
     let issuerDowntime = checkDowntime(downtimes, 'issuer', issuer);
     if (!networkDowntime && !issuerDowntime) {
-      item.card.downtimeVisible = false;
+      item.card.downtimeSeverity = false;
       return item;
     }
-    item.card.downtimeVisible = true;
-    item.card.downtimeVisibleSeverity = networkDowntime || issuerDowntime;
-    item.card.downtimeVisibleInstrument = networkDowntime ? network : issuer;
+    item.card.downtimeSeverity = networkDowntime || issuerDowntime;
+    item.card.downtimeInstrument = networkDowntime ? network : issuer;
     return item;
   });
   return newCards;

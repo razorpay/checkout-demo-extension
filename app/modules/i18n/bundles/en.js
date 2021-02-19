@@ -799,8 +799,6 @@ export default {
   },
   netbanking: {
     corporate_label: 'Corporate',
-    downtime_callout:
-      'This payment might fail because {bank} is facing technical difficulties',
     recurring_callout:
       'Future payments from your bank account will be charged automatically.',
     retail_label: 'Retail',

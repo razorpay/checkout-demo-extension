@@ -47,11 +47,7 @@
   export let cvvDigits;
   export let selected;
   export let tab;
-  let {
-    downtimeVisible,
-    downtimeVisibleSeverity,
-    downtimeVisibleInstrument,
-  } = card;
+  let { downtimeSeverity, downtimeInstrument } = card;
 
   // Computed
   let attributes;
@@ -158,9 +154,9 @@
       <FormattedText
         text={formatTemplateWithLocale(SAVED_CARD_LABEL, { last4: card.last4 }, $locale)} />
     </div>
-    {#if downtimeVisible && selected}
+    {#if !!downtimeSeverity && selected}
       <div class="downtime-saved-cards-icon">
-        <DowntimeIcon severe={downtimeVisibleSeverity} />
+        <DowntimeIcon severe={downtimeSeverity} />
       </div>
     {/if}
     <div class="saved-cvv">
@@ -246,10 +242,10 @@
       {/if}
     </div>
   {/if}
-  {#if downtimeVisible && selected}
+  {#if !!downtimeSeverity && selected}
     <div class="downtime-saved-cards">
-      <DowntimeCallout showIcon={false} severe={downtimeVisibleSeverity}>
-        {formatTemplateWithLocale(DOWNTIME_CALLOUT, { instrument: downtimeVisibleInstrument }, $locale)}
+      <DowntimeCallout showIcon={false} severe={downtimeSeverity}>
+        {formatTemplateWithLocale(DOWNTIME_CALLOUT, { instrument: downtimeInstrument }, $locale)}
       </DowntimeCallout>
     </div>
   {/if}

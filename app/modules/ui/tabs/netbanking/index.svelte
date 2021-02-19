@@ -33,9 +33,10 @@
     SEARCH_TITLE,
     SEARCH_PLACEHOLDER,
     SEARCH_ALL,
-    DOWNTIME_CALLOUT,
     RECURRING_CALLOUT,
   } from 'ui/labels/netbanking';
+
+  import { DOWNTIME_CALLOUT } from 'ui/labels/callouts';
 
   import { t, locale } from 'svelte-i18n';
 
@@ -78,8 +79,7 @@
   let banksArr;
   let invalid;
   let netbanks;
-  let selectedBankDowntimeSeverity = false;
-  let selectedBankHasDowntime;
+  let downtimeSeverity = false;
   let selectedBankName;
   let translatedBanksArr;
 
@@ -112,8 +112,8 @@
   export function getPayload() {
     return {
       bank: $selectedBank,
-      downtimeVisibleSeverity: selectedBankDowntimeSeverity,
-      downtimeVisible: selectedBankHasDowntime,
+      downtimeSeverity,
+      downtimeInstrument: $selectedBank,
     };
   }
 
@@ -250,13 +250,12 @@
         $selectedBank
       );
       if (currentDowntime) {
-        selectedBankHasDowntime = true;
-        selectedBankDowntimeSeverity = currentDowntime;
+        downtimeSeverity = currentDowntime;
       } else {
-        selectedBankHasDowntime = false;
+        downtimeSeverity = false;
       }
     } else {
-      selectedBankHasDowntime = false;
+      downtimeSeverity = false;
     }
   }
 
@@ -334,7 +333,7 @@
   method="netbanking"
   pad={false}
   overrideMethodCheck
-  hasMessage={selectedBankHasDowntime}>
+  hasMessage={!!downtimeSeverity}>
   <Screen pad={false}>
     <div>
       <div id="netb-banks" class="clear grid count-3">
@@ -362,9 +361,9 @@
             on:keypress={handleEnterOnButton}>
             {#if $selectedBank}
               <div>{selectedBankName}</div>
-              {#if selectedBankHasDowntime}
+              {#if !!downtimeSeverity}
                 <div>
-                  <DowntimeIcon severe={selectedBankDowntimeSeverity} />
+                  <DowntimeIcon severe={downtimeSeverity} />
                 </div>
               {/if}
             {:else}
@@ -411,13 +410,11 @@
         </div>
       {/if}
       <!-- Show downtime message if the selected bank is down -->
-      {#if selectedBankHasDowntime}
+      {#if !!downtimeSeverity}
         <div class="downtime-wrapper">
-          <DowntimeCallout
-            showIcon={false}
-            severe={selectedBankDowntimeSeverity}>
+          <DowntimeCallout showIcon={false} severe={downtimeSeverity}>
             <FormattedText
-              text={formatTemplateWithLocale(DOWNTIME_CALLOUT, { bank: getLongBankName($selectedBank, $locale) }, $locale)} />
+              text={formatTemplateWithLocale(DOWNTIME_CALLOUT, { instrument: getLongBankName($selectedBank, $locale) }, $locale)} />
           </DowntimeCallout>
         </div>
       {/if}

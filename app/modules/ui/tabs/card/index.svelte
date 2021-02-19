@@ -107,9 +107,9 @@
     network: false,
     issuer: false,
   };
-  let downtimeVisible;
-  let downtimeVisibleSeverity;
-  let downtimeVisibleInstrument;
+  let downtimeVisible = false;
+  let downtimeSeverity;
+  let downtimeInstrument;
 
   let currentView = Views.SAVED_CARDS;
   let lastView;
@@ -422,9 +422,8 @@
       'card[expiry]': $cardExpiry,
       'card[cvv]': $cardCvv,
       'card[name]': $cardName,
-      downtimeVisible,
-      downtimeVisibleSeverity,
-      downtimeVisibleInstrument,
+      downtimeSeverity,
+      downtimeInstrument,
     };
     // Fill in dummy values for expiry and CVV if the CVV and expiry fields are hidden
     if ($hideExpiryCvvFields) {
@@ -442,17 +441,12 @@
 
   function getSavedCardPayload() {
     const selectedToken = $selectedCard || {};
-    const {
-      downtimeVisible,
-      downtimeVisibleSeverity,
-      downtimeVisibleInstrument,
-    } = selectedToken.card;
+    const { downtimeSeverity, downtimeInstrument } = selectedToken.card;
     const payload = {
       token: selectedToken.token,
       'card[cvv]': $currentCvv,
-      downtimeVisible,
-      downtimeVisibleSeverity,
-      downtimeVisibleInstrument,
+      downtimeSeverity,
+      downtimeInstrument,
     };
     if ($currentAuthType) {
       payload.auth_type = $currentAuthType;
@@ -624,8 +618,8 @@
     const currentDowntime = checkDowntime(cardDowntimes, instrument, value);
     if (currentDowntime) {
       downtime[instrument] = true;
-      downtimeVisibleSeverity = currentDowntime;
-      downtimeVisibleInstrument = value;
+      downtimeSeverity = currentDowntime;
+      downtimeInstrument = value;
     } else {
       downtime[instrument] = false;
     }
@@ -711,8 +705,8 @@
             on:focus={onAddCardViewFocused}
             on:cardinput={onCardInput}
             {downtimeVisible}
-            {downtimeVisibleSeverity}
-            {downtimeVisibleInstrument} />
+            {downtimeSeverity}
+            {downtimeInstrument} />
           {#if showEmiCta}
             <EmiActions
               {showEmiCta}

@@ -77,8 +77,8 @@
   let cvvField = null;
   const nameReadonly = isNameReadOnly();
   export let downtimeVisible;
-  export let downtimeVisibleSeverity;
-  export let downtimeVisibleInstrument;
+  export let downtimeSeverity;
+  export let downtimeInstrument;
   const isSavedCardsEnabled = shouldRememberCustomer();
 
   const showRememberCardCheck = isSavedCardsEnabled;
@@ -511,8 +511,8 @@
   </div>
   {#if downtimeVisible}
     <div class="downtime-cards">
-      <DowntimeCallout showIcon={true} severe={downtimeVisibleSeverity}>
-        {formatTemplateWithLocale(DOWNTIME_CALLOUT, { instrument: downtimeVisibleInstrument }, $locale)}
+      <DowntimeCallout showIcon={true} severe={downtimeSeverity}>
+        {formatTemplateWithLocale(DOWNTIME_CALLOUT, { instrument: downtimeInstrument }, $locale)}
       </DowntimeCallout>
     </div>
   {/if}
