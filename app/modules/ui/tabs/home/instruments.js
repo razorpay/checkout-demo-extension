@@ -437,7 +437,7 @@ export function getInstrumentMeta(instrument) {
 }
 
 function addDowntimeToBlock(block) {
-  downtimes = getDowntimes();
+  const downtimes = getDowntimes();
   let downtimeSeverity = '';
   let downtimeInstrument = '';
   switch (block.method) {
