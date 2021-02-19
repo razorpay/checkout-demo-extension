@@ -438,11 +438,11 @@ export function getInstrumentMeta(instrument) {
 
 function addDowntimeToBlock(block) {
   downtimes = getDowntimes();
-  let downtimeVisibleSeverity = '';
+  let downtimeSeverity = '';
   let downtimeInstrument = '';
   switch (block.method) {
     case 'netbanking':
-      downtimeVisibleSeverity = checkDowntime(
+      downtimeSeverity = checkDowntime(
         downtimes.netbanking,
         'bank',
         block.banks[0]
@@ -450,7 +450,7 @@ function addDowntimeToBlock(block) {
       downtimeInstrument = block.banks[0];
       break;
     case 'upi':
-      downtimeVisibleSeverity = checkDowntime(
+      downtimeSeverity = checkDowntime(
         downtimes.upi,
         'vpa_handle',
         block.vpas[0].split('@')[1]
@@ -458,20 +458,39 @@ function addDowntimeToBlock(block) {
       downtimeInstrument = block.vpas[0].split('@')[1];
       break;
     case 'card':
-      downtimeVisibleSeverity = checkDowntime(
+      const downtimesArr = ['low', 'medium', 'high'];
+      const issuerDowntime = checkDowntime(
         downtimes.cards,
         'issuer',
         block.issuers[0]
       );
-      downtimeInstrument = block.issuers[0];
+      const networkDowntime = checkDowntime(
+        downtimes.cards,
+        'network',
+        block.networks[0]
+      );
+      if (issuerDowntime && networkDowntime) {
+        if (
+          downtimesArr.indexOf(networkDowntime) >=
+          downtimesArr.indexOf(issuerDowntime)
+        ) {
+          downtimeSeverity = networkDowntime;
+          downtimeInstrument = block.networks[0];
+        } else {
+          downtimeSeverity = issuerDowntime;
+          downtimeInstrument = block.issuers[0];
+        }
+      } else {
+        downtimeSeverity = issuerDowntime || networkDowntime;
+        downtimeInstrument = issuerDowntime
+          ? block.issuers[0]
+          : block.networks[0];
+      }
       break;
   }
-  if (downtimeVisibleSeverity) {
-    block.downtimeVisibleSeverity = downtimeVisibleSeverity;
-    block.downtimeVisible = true;
+  if (downtimeSeverity) {
+    block.downtimeSeverity = downtimeSeverity;
     block.downtimeInstrument = downtimeInstrument;
-  } else {
-    block.downtimeVisible = false;
   }
   return block;
 }

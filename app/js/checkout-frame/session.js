@@ -4187,10 +4187,17 @@ Session.prototype = {
   },
 
   checkForDowntime: function() {
-    var downtimeSeverity = this.payload.downtimeSeverity;
-    var downtimeInstrument = this.payload.downtimeInstrument;
-    delete this.payload.downtimeSeverity;
-    delete this.payload.downtimeInstrument;
+    var selectedInstrument = this.getSelectedPaymentInstrument();
+    var payload;
+    if (selectedInstrument) {
+      payload = selectedInstrument;
+    } else {
+      payload = this.payload;
+    }
+    var downtimeSeverity = payload.downtimeSeverity;
+    var downtimeInstrument = payload.downtimeInstrument;
+    delete payload.downtimeSeverity;
+    delete payload.downtimeInstrument;
 
     if (!!downtimeSeverity && downtimeSeverity === 'high') {
       this.showDowntimeAlert(downtimeInstrument);

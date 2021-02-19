@@ -47,8 +47,7 @@
   // Props
   export let instrument = {};
   export let name = 'instrument';
-  let downtimeVisible = false;
-  let downtimeVisibleSeverity;
+  let downtimeSeverity;
   let downtimeInstrument = '';
 
   let individualInstrument = getExtendedSingleInstrument(instrument);
@@ -234,11 +233,10 @@
   }
   $: {
     if (selected) {
-      downtimeVisible = instrument.downtimeVisible;
-      downtimeVisibleSeverity = instrument.downtimeVisibleSeverity;
+      downtimeSeverity = instrument.downtimeSeverity;
       downtimeInstrument = instrument.downtimeInstrument;
     } else {
-      downtimeVisible = false;
+      downtimeSeverity = false;
     }
   }
 </script>
@@ -269,8 +267,8 @@
     {/if}
   </div>
   <div slot="downtime" class="downtime-preferred-method">
-    {#if downtimeVisible}
-      <DowntimeCallout showIcon={false} severe={downtimeVisibleSeverity}>
+    {#if !!downtimeSeverity}
+      <DowntimeCallout showIcon={false} severe={downtimeSeverity}>
         {formatTemplateWithLocale(DOWNTIME_CALLOUT, { instrument: downtimeInstrument }, $locale)}
       </DowntimeCallout>
     {/if}
