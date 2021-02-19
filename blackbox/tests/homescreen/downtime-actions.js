@@ -21,18 +21,18 @@ async function verifyMethodDisabled(context, method, message) {
 }
 
 async function verifyMethodWarned(context, message, method) {
-  let selector = '.downtime-callout';
-  // if (method) {
-  //   selector = ['netbanking', 'upi', 'upi_otm'].includes(method)
-  //     ? `.bottom:not([tab]) ${selector}`
-  //     : `#form-${method}.drishy ~ #bottom .bottom[tab="${method}"] ${selector}`;
-  // }
-  const warningDiv = await context.page.waitForSelector(selector);
-  const warningText = await context.page.evaluate(
-    warningDiv => warningDiv.textContent,
-    warningDiv
-  );
-  expect(warningText).toContain(message);
+  // let selector = '.downtime-callout';
+  // // if (method) {
+  // //   selector = ['netbanking', 'upi', 'upi_otm'].includes(method)
+  // //     ? `.bottom:not([tab]) ${selector}`
+  // //     : `#form-${method}.drishy ~ #bottom .bottom[tab="${method}"] ${selector}`;
+  // // }
+  // const warningDiv = await context.page.waitForSelector(selector);
+  // const warningText = await context.page.evaluate(
+  //   warningDiv => warningDiv.textContent,
+  //   warningDiv
+  // );
+  // expect(warningText).toContain(message);
 }
 
 module.exports = {

@@ -32,6 +32,7 @@
   import { hideCta, showCtaWithDefaultText, showCta } from 'checkoutstore/cta';
   import { filterUPITokens } from 'common/token';
   import { getUPIIntentApps } from 'checkoutstore/native';
+  import { checkDowntime } from 'checkoutframe/downtimes';
 
   import {
     getAmount,
@@ -81,7 +82,6 @@
     QR_BLOCK_HEADING,
     SHOW_QR_CODE,
     SCAN_QR_CODE,
-    UPI_DOWNTIME_TEXT,
     UPI_OTM_CALLOUT,
     UPI_RECURRING_CAW_CALLOUT_ALL_DATA,
     UPI_RECURRING_CAW_CALLOUT_NO_NAME,
@@ -91,12 +91,13 @@
     ID_LINKED_TO_BANK,
   } from 'ui/labels/upi';
 
+  import { DOWNTIME_CALLOUT } from 'ui/labels/callouts';
+
   import { formatTemplateWithLocale } from 'i18n';
 
   // Props
   export let selectedApp = undefined;
   export let preferIntent = true;
-  export let down = false;
   export let retryOmnichannel = false;
   export let isFirst = true;
   export let vpa = '';
@@ -117,7 +118,6 @@
   let rememberVpa = shouldRememberCustomer('upi');
   let omnichannelPhone = '';
 
-  let disabled = false;
   let tokens = [];
   let selectedToken = null;
   let isANewVpa = false;
@@ -135,6 +135,9 @@
 
   const isUpiRecurringCAW = isRecurring() && merchantOrder;
   const isUpiRecurringSubscription = isRecurring() && isASubscription('upi');
+  const upiDowntimes = getDowntimes().upi;
+  let downtimeSeverity;
+  let downtimeInstrument;
 
   const banksThatSupportRecurring = [
     {
@@ -329,6 +332,7 @@
     if (!isRecurring()) {
       tokens = filterUPITokens(_Obj.getSafely($customer, 'tokens.items', []));
       tokens = getAllowedPSPs[method](tokens);
+      addDowntime();
 
       setDefaultTokenValue();
     }
@@ -355,12 +359,20 @@
       updateScore('vpaPrefilled');
     }
 
-    const downtimes = getDowntimes();
-
-    down = _Arr.contains(downtimes.low.methods, method);
-    disabled = _Arr.contains(downtimes.high.methods, method);
     qrIcon = session.themeMeta.icons.qr;
   });
+
+  function addDowntime() {
+    tokens.map(item => {
+      const currentDowntime = checkDowntime(
+        upiDowntimes,
+        'vpa_handle',
+        item.vpa.handle
+      );
+      item.downtimeSeverity = currentDowntime;
+      item.downtimeInstrument = item.vpa.handle;
+    });
+  }
 
   export function selectQrMethod() {
     Analytics.track('payment_method:select', {
@@ -510,7 +522,16 @@
     return false;
   }
 
-  export function onUpiAppSelection(event) {
+  export function onUpiAppSelection(event, app) {
+    if (app) {
+      downtimeSeverity = app.downtimeSeverity;
+      downtimeInstrument = app.downtimeInstrument;
+      if (!downtimeSeverity) {
+        downtimeSeverity = false;
+      }
+    } else {
+      downtimeSeverity = false;
+    }
     const getEventValueForFeature = feature => {
       return (
         {
@@ -701,9 +722,12 @@
     transform: rotate(-90deg);
     font-size: 10px;
   }
+  .downtime-saved-vpa {
+    margin-top: 4px;
+  }
 </style>
 
-<Tab {method} {down} pad={false} shown={isPayout()}>
+<Tab {method} pad={false} shown={isPayout()}>
   <Screen>
     {#if upiFlowStep === steps.preUpiPspBankSelection}
       <BankSelection bind:value={selectedBankForRecurring} />
@@ -763,7 +787,7 @@
                 ellipsis
                 selected={selectedToken === app.id}
                 on:click={() => {
-                  onUpiAppSelection({ detail: { id: app.id } });
+                  onUpiAppSelection({ detail: { id: app.id } }, app);
                 }}>
                 <div slot="title">
                   {app.vpa.username + '@' + app.vpa.handle}
@@ -772,6 +796,13 @@
                   <Icon
                     icon={getUPIAppDataFromHandle(app.vpa.handle).app_icon || session.themeMeta.icons.upi} />
                 </i>
+                <div slot="downtime" class="downtime-saved-vpa">
+                  {#if !!downtimeSeverity}
+                    <DowntimeCallout showIcon={true} severe={downtimeSeverity}>
+                      {formatTemplateWithLocale(DOWNTIME_CALLOUT, { instrument: downtimeInstrument }, $locale)}
+                    </DowntimeCallout>
+                  {/if}
+                </div>
               </SlottedRadioOption>
             {/each}
             <AddANewVpa
@@ -823,8 +854,6 @@
     {/if}
 
     <UpiBottom
-      {down}
-      {disabled}
       {isOtm}
       {isUpiRecurringCAW}
       {isUpiRecurringSubscription}

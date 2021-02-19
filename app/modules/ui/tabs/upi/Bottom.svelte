@@ -9,7 +9,6 @@
   import { formatTemplateWithLocale } from 'i18n';
 
   import {
-    UPI_DOWNTIME_TEXT,
     UPI_OTM_CALLOUT,
     UPI_RECURRING_CAW_CALLOUT_ALL_DATA,
     UPI_RECURRING_CAW_CALLOUT_NO_NAME,
@@ -26,8 +25,6 @@
     getSubscription,
   } from 'checkoutstore';
 
-  export let down = false;
-  export let disabled = false;
   export let isOtm = false;
   export let isUpiRecurringCAW = false;
   export let isUpiRecurringSubscription = false;

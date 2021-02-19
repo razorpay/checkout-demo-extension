@@ -35,8 +35,8 @@
     NEW_VPA_TITLE_LOGGED_IN,
     NEW_VPA_SUBTITLE,
     NEW_VPA_SUBTITLE_UPI_OTM,
-    UPI_DOWNTIME_TEXT,
   } from 'ui/labels/upi';
+  import { DOWNTIME_CALLOUT } from 'ui/labels/callouts';
   import { phone } from 'checkoutstore/screens/home';
   import { suggestionVPA } from 'common/upi';
 
@@ -63,9 +63,8 @@
   let newVpa = getPrefilledVPA();
   let vpa;
   let pspHandle;
-  export let downtimeVisible = false;
-  export let downtimeVisibleSeverity = '';
-  let downEntity = '';
+  export let downtimeSeverity = '';
+  let downtimeInstrument = '';
 
   let upiDowntimes = getDowntimes().upi;
 
@@ -90,13 +89,13 @@
           vpaEntered
         );
         if (currentDowntime) {
-          downtimeVisible = true;
-          downtimeVisibleSeverity = currentDowntime;
+          downtimeSeverity = currentDowntime;
+          downtimeInstrument = vpaEntered;
         } else {
-          downtimeVisible = false;
+          downtimeSeverity = false;
         }
       } else {
-        downtimeVisible = false;
+        downtimeSeverity = false;
       }
     }
   }
@@ -259,15 +258,10 @@
           on:input={handleVpaInput}
           on:blur
           placeholder={$t(UPI_COLLECT_ENTER_ID)} />
-        {#if downtimeVisible}
-          <div class="downtime-upi-icon">
-            <DowntimeIcon severe={downtimeVisibleSeverity} />
-          </div>
-        {/if}
-        {#if downtimeVisible}
+        {#if !!downtimeSeverity}
           <div class="downtime-upi">
-            <DowntimeCallout showIcon={false} severe={downtimeVisibleSeverity}>
-              {formatTemplateWithLocale(UPI_DOWNTIME_TEXT, { vpa: downEntity }, $locale)}
+            <DowntimeCallout showIcon={true} severe={downtimeSeverity}>
+              {formatTemplateWithLocale(DOWNTIME_CALLOUT, { instrument: downtimeInstrument }, $locale)}
             </DowntimeCallout>
           </div>
         {/if}
