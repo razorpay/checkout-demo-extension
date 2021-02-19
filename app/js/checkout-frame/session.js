@@ -241,7 +241,6 @@ function hideEmi() {
 
 function hideDowntimeAlert() {
   var downtimeWrap = $('#downtime-wrap');
-  console.log(downtimeWrap);
   var wasShown = downtimeWrap.hasClass(shownClass);
   if (wasShown) {
     hideOverlay(downtimeWrap);
@@ -4193,7 +4192,6 @@ Session.prototype = {
     delete this.payload.downtimeVisible;
     delete this.payload.downtimeVisibleSeverity;
 
-    // this.submit();
     if (downtimeVisible && downtimeVisibleSeverity === 'high') {
       this.showDowntimeAlert();
     } else {

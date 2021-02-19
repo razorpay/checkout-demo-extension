@@ -210,8 +210,6 @@ export default {
     view_all_emi_plans: 'View all EMI Plans',
     international_currency_charges:
       'Relevant currency conversion charges might be applicable, as Amex will process the transaction in INR. To avoid currency conversion charges please use MasterCard or Visa.',
-    downtime_callout:
-      'This payment might fail because {bank} is facing technical difficulties',
   },
   card_subtext: {
     all_cards_supported: 'All cards supported',

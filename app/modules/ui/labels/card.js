@@ -32,4 +32,3 @@ export const SUBSCRIPTION_CALLOUT = 'card.subscription_callout';
 export const SUBSCRIPTION_REFUND_CALLOUT = 'card.subscription_refund_callout';
 export const INTERNATIONAL_CURRENCY_CHARGES =
   'card.international_currency_charges';
-export const DOWNTIME_CALLOUT = 'card.downtime_callout';

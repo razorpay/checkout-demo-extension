@@ -52,8 +52,9 @@
     VIEW_ALL_EMI_PLANS,
     REMEMBER_CARD_LABEL,
     CARD_NUMBER_HELP_UNSUPPORTED,
-    DOWNTIME_CALLOUT,
   } from 'ui/labels/card';
+
+  import { DOWNTIME_CALLOUT } from 'ui/labels/callouts';
 
   // Utils
   import Analytics from 'analytics';
@@ -77,6 +78,7 @@
   const nameReadonly = isNameReadOnly();
   export let downtimeVisible;
   export let downtimeVisibleSeverity;
+  export let downtimeVisibleInstrument;
   const isSavedCardsEnabled = shouldRememberCustomer();
 
   const showRememberCardCheck = isSavedCardsEnabled;
@@ -510,7 +512,7 @@
   {#if downtimeVisible}
     <div class="downtime-cards">
       <DowntimeCallout showIcon={true} severe={downtimeVisibleSeverity}>
-        {formatTemplateWithLocale(DOWNTIME_CALLOUT, { bank: $cardType }, $locale)}
+        {formatTemplateWithLocale(DOWNTIME_CALLOUT, { instrument: downtimeVisibleInstrument }, $locale)}
       </DowntimeCallout>
     </div>
   {/if}

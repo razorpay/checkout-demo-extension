@@ -15,7 +15,6 @@
   } from 'checkoutstore/screens/card';
 
   // Utils
-  import { getSession } from 'sessionmanager';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getCardMetadata } from 'common/card';
@@ -23,8 +22,6 @@
   // Props
   export let cards = [];
   export let tab;
-
-  const session = getSession();
 
   $selectedCard = null; // Refresh selection when landing again
 
@@ -57,9 +54,6 @@
     $currentCvv = cvv;
     $currentAuthType = authType;
     $selectedCard = card;
-    $selectedCard.downtimeCause = card.card.downtimeCause;
-    $selectedCard.downtimeVisible = card.card.downtimeVisible;
-    $selectedCard.downtimeVisibleSeverity = card.card.downtimeVisibleSeverity;
   }
 
   function handleCvvChange(event) {

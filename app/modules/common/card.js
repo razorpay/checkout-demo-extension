@@ -452,7 +452,7 @@ export function addDowntimesToSavedCards(cards, downtimes) {
     }
     item.card.downtimeVisible = true;
     item.card.downtimeVisibleSeverity = networkDowntime || issuerDowntime;
-    item.card.downtimeCause = networkDowntime ? network : issuer;
+    item.card.downtimeVisibleInstrument = networkDowntime ? network : issuer;
     return item;
   });
   return newCards;

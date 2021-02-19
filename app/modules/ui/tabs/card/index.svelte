@@ -58,7 +58,6 @@
   import { newCardEmiDuration, savedCardEmiDuration } from 'checkoutstore/emi';
   // i18n
   import { t, locale } from 'svelte-i18n';
-  import { getAppProviderName, getAppProviderSubtext } from 'i18n';
 
   import {
     USE_SAVED_CARDS_BTN,
@@ -70,7 +69,6 @@
     RECURRING_CALLOUT,
     SUBSCRIPTION_CALLOUT,
     SUBSCRIPTION_REFUND_CALLOUT,
-    INTERNATIONAL_CURRENCY_CHARGES,
   } from 'ui/labels/card';
 
   // Utils imports
@@ -82,7 +80,6 @@
   import {
     getIin,
     getCardType,
-    getNetworkFromCardNumber,
     isAmex,
     addDowntimesToSavedCards,
   } from 'common/card';
@@ -112,6 +109,7 @@
   };
   let downtimeVisible;
   let downtimeVisibleSeverity;
+  let downtimeVisibleInstrument;
 
   let currentView = Views.SAVED_CARDS;
   let lastView;
@@ -424,8 +422,9 @@
       'card[expiry]': $cardExpiry,
       'card[cvv]': $cardCvv,
       'card[name]': $cardName,
-      downtimeVisible: downtimeVisible,
-      downtimeSeverity: downtimeVisibleSeverity,
+      downtimeVisible,
+      downtimeVisibleSeverity,
+      downtimeVisibleInstrument,
     };
     // Fill in dummy values for expiry and CVV if the CVV and expiry fields are hidden
     if ($hideExpiryCvvFields) {
@@ -443,11 +442,17 @@
 
   function getSavedCardPayload() {
     const selectedToken = $selectedCard || {};
+    const {
+      downtimeVisible,
+      downtimeVisibleSeverity,
+      downtimeVisibleInstrument,
+    } = selectedToken.card;
     const payload = {
       token: selectedToken.token,
       'card[cvv]': $currentCvv,
-      downtimeVisible: selectedToken.downtimeVisible,
-      downtimeVisibleSeverity: selectedToken.downtimeVisibleSeverity,
+      downtimeVisible,
+      downtimeVisibleSeverity,
+      downtimeVisibleInstrument,
     };
     if ($currentAuthType) {
       payload.auth_type = $currentAuthType;
@@ -620,6 +625,7 @@
     if (currentDowntime) {
       downtime[instrument] = true;
       downtimeVisibleSeverity = currentDowntime;
+      downtimeVisibleInstrument = value;
     } else {
       downtime[instrument] = false;
     }
@@ -705,7 +711,8 @@
             on:focus={onAddCardViewFocused}
             on:cardinput={onCardInput}
             {downtimeVisible}
-            {downtimeVisibleSeverity} />
+            {downtimeVisibleSeverity}
+            {downtimeVisibleInstrument} />
           {#if showEmiCta}
             <EmiActions
               {showEmiCta}

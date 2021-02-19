@@ -29,7 +29,7 @@
     AVAILABLE_TEXT,
     AVAILABLE_ACTION,
   } from 'ui/labels/emi';
-  import { DOWNTIME_CALLOUT } from 'ui/labels/card';
+  import { DOWNTIME_CALLOUT } from 'ui/labels/callouts';
   import { TITLE_GENERIC } from 'ui/labels/methods';
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
 
@@ -47,7 +47,11 @@
   export let cvvDigits;
   export let selected;
   export let tab;
-  let { downtimeVisible, downtimeVisibleSeverity, downtimeCause } = card;
+  let {
+    downtimeVisible,
+    downtimeVisibleSeverity,
+    downtimeVisibleInstrument,
+  } = card;
 
   // Computed
   let attributes;
@@ -245,7 +249,7 @@
   {#if downtimeVisible && selected}
     <div class="downtime-saved-cards">
       <DowntimeCallout showIcon={false} severe={downtimeVisibleSeverity}>
-        {formatTemplateWithLocale(DOWNTIME_CALLOUT, { bank: downtimeCause }, $locale)}
+        {formatTemplateWithLocale(DOWNTIME_CALLOUT, { instrument: downtimeVisibleInstrument }, $locale)}
       </DowntimeCallout>
     </div>
   {/if}
