@@ -6,7 +6,6 @@ jobs:
   Find-Jira-Id:
     name: Find-Jira-Id
     runs-on: [self-hosted]
-
     steps:
       - name: Checkout
         uses: actions/checkout@master
@@ -16,11 +15,10 @@ jobs:
         with:
           repository: Razorpay/check-commit-jira
           path: .github/actions/check-commit-jira
-          ref: ignore_status
+          ref: combined_check
           token: ${{ secrets.GIT_TOKEN }}
-
       - name: Login
-        uses: atlassian/gajira-login@master
+        uses: ./.github/actions/check-commit-jira/jira-login
         env:
           JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
           JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
@@ -29,7 +27,7 @@ jobs:
       #  Find Issue on JIRA
       - name: Get Issue Key
         id: find
-        uses: ./.github/actions/check-commit-jira
+        uses: ./.github/actions/check-commit-jira/jira-issue-check
         with:
           from: pull_request
       #  Print JIRA ID found on jira

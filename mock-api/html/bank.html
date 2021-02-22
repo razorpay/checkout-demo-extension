@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <script>
+    var events = {
+      page: 'gateway_otp_postform',
+      props: {
+        payment_id: 'pay_EfZEwe28YBctRJ',
+        merchant_id: '2aTeFCKTYWwfrF',
+      },
+      load: true,
+      unload: true,
+    };
+  </script>
+  <script></script>
+
+  <body>
+    <div id="preloading">
+      <style>
+        body {
+          background: #f4f4f4;
+        }
+      </style>
+      <style>
+        @keyframes lo {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        @-webkit-keyframes lo {
+          to {
+            -webkit-transform: rotate(360deg);
+          }
+        }
+
+        .loader {
+          height: 24px;
+          width: 24px;
+          border-radius: 50%;
+          display: inline-block;
+          animation: lo 0.8s infinite linear;
+          -webkit-animation: lo 0.8s infinite linear;
+          transition: 0.3s;
+          -webkit-transition: 0.3s;
+          opacity: 0;
+          border: 2px solid #3395ff;
+          border-top-color: transparent;
+        }
+
+        .vis {
+          opacity: 1;
+        }
+      </style>
+      <div
+        class="loader vis"
+        style="position:absolute;top:115px;left:50%;margin-left:-12px"
+      ></div>
+      <img
+        src="https://cdn.razorpay.com/bank-lg/HDFC.svg"
+        id="logo"
+        height="35px"
+        style="margin:30px auto 10px; display:block"
+      />
+    </div>
+    <script type="text/javascript"></script>
+  </body>
+</html>

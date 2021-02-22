@@ -1,2 +1,4 @@
-export const TRUSTED_BADGE_CUSTOMER_LABEL = 'trusted_badge.customer_label';
-export const TRUSTED_BADGE_SELLER_LABEL = 'trusted_badge.seller_label';
+export const TRUSTED_BADGE_HEADER = 'trusted_badge.header';
+export const TRUSTED_BADGE_HIGHLIGHT1 = 'trusted_badge.highlight1';
+export const TRUSTED_BADGE_HIGHLIGHT2 = 'trusted_badge.highlight2';
+export const TRUSTED_BADGE_HIGHLIGHT3 = 'trusted_badge.highlight3';

@@ -1,4 +1,7 @@
 import { setView, destroyView } from './';
+
+import Analytics from 'analytics';
+
 import { getSession } from 'sessionmanager';
 import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi';
 import {
@@ -39,6 +42,7 @@ export function checkForPossibleWebPaymentsForUpi() {
               },
             ])
           );
+          Analytics.setMeta('upi.intent_on_mweb', true);
         })
         .catch(_Func.noop);
     });
