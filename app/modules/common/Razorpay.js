@@ -257,6 +257,22 @@ RazorProto.calculateFees = function(payload) {
   });
 };
 
+RazorProto.fetchVirtualAccount = function(order_id) {
+  return new Promise((resolve, reject) => {
+    const url = makeUrl(`orders/${order_id}/virtual_accounts?x_entity_id=${order_id}`)
+    fetch.post({
+      url,
+      callback: function(response) {
+        if (response.error) {
+          return reject(response);
+        } else {
+          return resolve(response);
+        }
+      },
+    });
+  });
+}
+
 function isValidAmount(amt, min = 100) {
   if (/[^0-9]/.test(amt)) {
     return false;
