@@ -1,4 +1,4 @@
-const initCustomCheckout = require('blackbox/tests/custom/init.custom.js');
+const initCustomCheckout = require('blackbox/tests/custom/init.js');
 const { describe } = require('jest-circus');
 
 const GOOGLE_PAY_PACKAGE_NAME = 'com.google.android.apps.nbu.paisa.user';
@@ -25,9 +25,7 @@ describe('checkPaymentAdapter - Custom Checkout UT', () => {
   describe.each(supportedAdapter)('supported adapter case(%s)', adapter => {
     test(`adapter - ${adapter}`, async () => {
       const adapterStatus = await page.evaluate(async adapaterInput => {
-        const rp = new Razorpay({
-          key: 'rzp_test_1DP5mmOlF5G5ag',
-        });
+        const rp = window.rp;
         let status = false;
         try {
           await rp.checkPaymentAdapter(adapaterInput);
@@ -44,9 +42,7 @@ describe('checkPaymentAdapter - Custom Checkout UT', () => {
   describe.each(unsupportedAdapter)('unsupported adapter case(%s)', adapter => {
     test(`adapter - ${adapter}`, async () => {
       const adapterStatus = await page.evaluate(async adapaterInput => {
-        const rp = new Razorpay({
-          key: 'rzp_test_1DP5mmOlF5G5ag',
-        });
+        const rp = window.rp;
         let status = false;
         try {
           await rp.checkPaymentAdapter(adapaterInput);
@@ -62,9 +58,7 @@ describe('checkPaymentAdapter - Custom Checkout UT', () => {
 
   test('isTezAvailable', async () => {
     const adapterStatus = await page.evaluate(async () => {
-      const rp = new Razorpay({
-        key: 'rzp_test_1DP5mmOlF5G5ag',
-      });
+      const rp = window.rp;
       let status = false;
       try {
         await rp.isTezAvailable();

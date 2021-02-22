@@ -1,4 +1,4 @@
-const initCustomCheckout = require('blackbox/tests/custom/init.custom.js');
+const initCustomCheckout = require('blackbox/tests/custom/init.js');
 const mockAPI = require('blackbox/tests/custom/mockApi.js');
 
 let context;
@@ -17,10 +17,7 @@ describe('verifyVPA - Custom Checkout UT', () => {
     describe.each(validVPA)('valid VPA', vpa => {
       test(`validate input ${vpa}`, async () => {
         const verifyVPAPromise = page.evaluate(async vpaInput => {
-          const rp = new Razorpay({
-            key: 'rzp_test_1DP5mmOlF5G5ag',
-          });
-          return await rp.verifyVpa(vpaInput);
+          return await window.rp.verifyVpa(vpaInput);
         }, vpa);
         await context.expectRequest(req => {});
         await context.respondJSON(mockAPI.validVPAResponse(vpa));
@@ -33,12 +30,9 @@ describe('verifyVPA - Custom Checkout UT', () => {
   describe.each(inValidVPA)('invalid VPA', vpa => {
     test(`validate input ${vpa}`, async () => {
       const verifyVPAPromise = page.evaluate(async vpaInput => {
-        const rp = new Razorpay({
-          key: 'rzp_test_1DP5mmOlF5G5ag',
-        });
         let response;
         try {
-          response = await rp.verifyVpa(vpaInput);
+          response = await window.rp.verifyVpa(vpaInput);
         } catch (e) {
           response = e;
         }

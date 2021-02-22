@@ -32,6 +32,8 @@
         var rp = new Razorpay({
           key: 'rzp_test_1DP5mmOlF5G5ag',
           amount: 200,
+          callback_url: "https://checkout.local/razorpay",
+          redirect: true
         })
           .on('payment.error', function(resp) {
             console.log(resp);
@@ -44,8 +46,7 @@
         setTimeout(function() {
           var data = {
             amount: 200,
-            currency: 'INR',
-          };
+            currency: 'INR'          };
           data.method = 'card';
           data['card[number]'] = '4111111111111111';
           data['card[expiry_month]'] = '04';

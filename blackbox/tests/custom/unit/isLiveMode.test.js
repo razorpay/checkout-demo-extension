@@ -1,4 +1,4 @@
-const initCustomCheckout = require('blackbox/tests/custom/init.custom.js');
+const initCustomCheckout = require('blackbox/tests/custom/init.js');
 
 describe('isLiveMode - Custom Checkout UT', () => {
   beforeEach(async () => {
@@ -9,20 +9,17 @@ describe('isLiveMode - Custom Checkout UT', () => {
   });
   test('Test Key', async () => {
     const isLiveMode = await page.evaluate(async () => {
-      const rp = new Razorpay({
-        key: 'rzp_test_1DP5mmOlF5G5ag',
-      });
-      return rp.isLiveMode();
+      return window.rp.isLiveMode();
     });
     expect(isLiveMode).toBeFalsy();
   });
 
   test('Live Key', async () => {
     const isLiveMode = await page.evaluate(async () => {
-      const rp = new Razorpay({
+      window.rp = new Razorpay({
         key: 'rzp_live_1DP5mmOlF5G5ag',
       });
-      return rp.isLiveMode();
+      return window.rp.isLiveMode();
     });
     expect(isLiveMode).toBeTruthy();
   });

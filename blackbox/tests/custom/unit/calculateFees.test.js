@@ -1,4 +1,4 @@
-const initCustomCheckout = require('blackbox/tests/custom/init.custom.js');
+const initCustomCheckout = require('blackbox/tests/custom/init.js');
 const mockAPI = require('blackbox/tests/custom/mockApi.js');
 
 let context;
@@ -28,10 +28,7 @@ describe('calculateFees - Custom Checkout UT', () => {
      * Expected preference response in callback
      */
     const calculateFeesPromise = page.evaluate(async payload => {
-      const rp = new Razorpay({
-        key: 'rzp_test_1DP5mmOlF5G5ag',
-      });
-      return await rp.calculateFees(payload);
+      return await window.rp.calculateFees(payload);
     }, calculateFeesPayload);
     await context.expectRequest(req => {});
     await context.respondJSON(mockAPI.calculateFees());

@@ -1,5 +1,6 @@
-const initCustomCheckout = require('blackbox/tests/custom/init.custom.js');
+const initCustomCheckout = require('blackbox/tests/custom/init.js');
 const mockAPI = require('blackbox/tests/custom/mockApi.js');
+const { getPaymentPayload } = require('blackbox/tests/custom/utils.js');
 
 let context;
 
@@ -14,24 +15,9 @@ describe('focus - Custom Checkout UT', () => {
     /**
      * Trigger payment flow
      */
-    await page.evaluate(async () => {
-      window.rp = new Razorpay({
-        key: 'rzp_test_1DP5mmOlF5G5ag',
-      });
-      var data = {
-        amount: 100,
-        currency: 'INR',
-      };
-      data.method = 'card';
-      data['card[number]'] = '4111111111111111';
-      data['card[expiry_month]'] = '04';
-      data['card[expiry_year]'] = '22';
-      data['card[name]'] = 'arsh';
-      data['card[cvv]'] = '123';
-      data.email = 'a@s.com';
-      data.contact = 9999922222;
+    await page.evaluate(async (data) => {
       window.rp.createPayment(data);
-    });
+    }, getPaymentPayload('card'));
     await context.expectRequest(req => {});
     // mock create payment
     const createPaymentResponse = mockAPI.ajaxResponse();

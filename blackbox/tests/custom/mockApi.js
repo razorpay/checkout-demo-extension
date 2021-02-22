@@ -3757,4 +3757,14 @@ module.exports = {
       'https://dashboard-activation.s3.amazonaws.com/org_100000razorpay/checkout_logo/phpnHMpJe',
     custom_branding: false,
   }),
+  cancelPayment: () => ({
+    error: {
+      code: 'BAD_REQUEST_ERROR',
+      description: 'Payment processing cancelled by user',
+      source: 'customer',
+      step: 'payment_authentication',
+      reason: 'payment_cancelled',
+      metadata: { payment_id: 'pay_GeYuLoWTuUGbyK' },
+    },
+  }),
 };

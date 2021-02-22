@@ -1,4 +1,4 @@
-const initCustomCheckout = require('blackbox/tests/custom/init.custom.js');
+const initCustomCheckout = require('blackbox/tests/custom/init.js');
 
 const DEFAULT_THEME_META = {
   color: '#528FF0',
@@ -23,9 +23,7 @@ describe('postInit - Custom Checkout UT', () => {
   });
   test('Default', async () => {
     const meta = await page.evaluate(async () => {
-      const rp = new Razorpay({
-        key: 'rzp_test_1DP5mmOlF5G5ag',
-      });
+      const rp = window.rp;
       rp.postInit();
       const { themeMeta } = rp;
       return themeMeta;
@@ -35,9 +33,7 @@ describe('postInit - Custom Checkout UT', () => {
 
   test('Custom Theme', async () => {
     const meta = await page.evaluate(async () => {
-      const rp = new Razorpay({
-        key: 'rzp_test_1DP5mmOlF5G5ag',
-      });
+      const rp = window.rp;
       rp.set('theme.color', '#000000');
       rp.postInit();
       const { themeMeta } = rp;

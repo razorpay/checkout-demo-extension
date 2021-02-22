@@ -1,13 +1,16 @@
 const { interceptor } = require('../../util');
 const { readFileSync } = require('fs');
-const API = require('./mockApi');
 
-const prefix = 'https://api.razorpay.in/v1/checkout';
+const prefix = 'https://api.razorpay.com/v1/checkout';
 
 const customCheckout = `${prefix}/custom`;
+const callbackURL = `${prefix}/callback_response`;
 const popupInitialPage = `${prefix}/mockup`;
 const razorpayJS = `${prefix}/js/generated/entry/razorpay.js`;
 const otpBundle = 'https://cdn.razorpay.com/static/otp/bundle.js';
+const redirectPage = 'v1/payments/create/checkout';
+const mockPageSubmit =
+  'https://api.razorpay.com/v1/gateway/mocksharp/payment/submit';
 
 const popupCallbackRequest =
   'https://api.razorpay.com/v1/payments/pay_GZ7c6a2d9mfWAG';
@@ -16,6 +19,13 @@ const jsContent = readFileSync('app/js/generated/entry/razorpay.js');
 const htmlContent = readFileSync('app/razorpay.test.html');
 const popupHtmlContent = readFileSync('blackbox/fixtures/mockSFPage.html');
 const otpPageBundle = readFileSync('blackbox/fixtures/otpbundle.js');
+const redirectingCallbackPage = readFileSync(
+  'blackbox/fixtures/mockRedirectCallback.html',
+  {
+    encoding: 'utf8',
+    flag: 'r',
+  }
+);
 const callback = readFileSync('blackbox/fixtures/callback.html', {
   encoding: 'utf8',
   flag: 'r',
@@ -36,6 +46,26 @@ function checkoutRequestHandler(request) {
   } else if (url.includes('livereload')) {
     // Livereload URLs come if you have `npm run start` on while testing
     return request.respond({ status: 200 });
+  } else if (url.includes(redirectPage)) {
+    return request.respond({ body: popupHtmlContent });
+  } else if (url.startsWith(mockPageSubmit)) {
+    const postData = request.postData();
+    let responsePage = redirectingCallbackPage;
+    if (postData.includes('success=F')) {
+      responsePage = responsePage.replace(
+        'document.forms[0].submit()',
+        'document.forms[1].submit()'
+      );
+    }
+    return request.respond({
+      contentType: 'text/html',
+      body: responsePage.replace(/{{callback_url}}/gi, callbackURL),
+    });
+  } else if (url.includes(callbackURL)) {
+    return request.respond({
+      contentType: 'text/html',
+      body: `<h1>${request.postData()}</h1>`,
+    });
   }
 }
 
@@ -52,9 +82,7 @@ function popupRequestHandler(request) {
   } else if (url.includes('favicon.ico')) {
     return request.respond({ status: 204 });
   } else if (
-    url.startsWith(
-      'https://api.razorpay.com/v1/gateway/mocksharp/payment/submit'
-    ) ||
+    url.startsWith(mockPageSubmit) ||
     url.startsWith('https://walletapi.mobikwik.com/wallet')
   ) {
     const postData = request.postData();
@@ -73,6 +101,7 @@ function popupRequestHandler(request) {
     }
   } else if (url === otpBundle) {
     return request.respond({ body: otpPageBundle });
+  } else if (url.startsWith(callbackURL)) {
   } else if (checkoutRequestHandler(request)) {
     return;
   } else {
@@ -81,7 +110,12 @@ function popupRequestHandler(request) {
 }
 
 let interceptorOptions;
-module.exports = async ({ page, mockPaymentRequest = false, data = {} }) => {
+module.exports = async ({
+  page,
+  mockPaymentRequest = false,
+  isCallbackURL = false,
+  data = {},
+}) => {
   if (interceptorOptions) {
     interceptorOptions.disableInterceptor();
   } else {
@@ -112,6 +146,30 @@ module.exports = async ({ page, mockPaymentRequest = false, data = {} }) => {
   interceptorOptions.enableInterceptor();
 
   const pageTarget = page.target();
+
+  // initialize Razorpay Instance
+  await page.evaluate(
+    async (config = {}) => {
+      const { isCallbackURL, callbackURL: callback_url } = config;
+      const rzp = {
+        key: 'rzp_test_1DP5mmOlF5G5ag',
+      };
+      if (isCallbackURL) {
+        rzp.redirect = true;
+        rzp.callback_url = callback_url;
+      }
+      window.rp = new Razorpay(rzp)
+        .on('payment.error', function(resp) {
+          document.getElementById('status').innerText = 'failed';
+          document.getElementById('response').innerText = JSON.stringify(resp);
+        })
+        .on('payment.success', function(resp) {
+          document.getElementById('status').innerText = 'success';
+          document.getElementById('response').innerText = JSON.stringify(resp);
+        });
+    },
+    { isCallbackURL, callbackURL }
+  );
 
   const returnObj = {
     page,
