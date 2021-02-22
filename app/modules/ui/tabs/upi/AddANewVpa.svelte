@@ -260,9 +260,7 @@
           placeholder={$t(UPI_COLLECT_ENTER_ID)} />
         {#if !!downtimeSeverity}
           <div class="downtime-upi">
-            <DowntimeCallout showIcon={true} severe={downtimeSeverity}>
-              {formatTemplateWithLocale(DOWNTIME_CALLOUT, { instrument: downtimeInstrument }, $locale)}
-            </DowntimeCallout>
+            <DowntimeCallout showIcon={true} severe={downtimeSeverity} {downtimeInstrument} />
           </div>
         {/if}
         {#if logged && canSaveVpa}

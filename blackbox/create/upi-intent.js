@@ -132,11 +132,9 @@ module.exports = function(testFeatures) {
         await verifyFooterText(context, 'PAY');
       }
 
+      await selectUPIApp(context, '1');
       if (downtimeHigh || downtimeLow) {
         await verifyMethodWarned(context, 'UPI', 'upi');
-        await selectUPIApp(context, '1');
-      } else {
-        await selectUPIApp(context, '1');
       }
 
       if (partialPayment) {

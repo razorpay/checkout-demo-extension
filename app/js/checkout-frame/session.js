@@ -4196,8 +4196,8 @@ Session.prototype = {
     }
     var downtimeSeverity = payload.downtimeSeverity;
     var downtimeInstrument = payload.downtimeInstrument;
-    delete payload.downtimeSeverity;
-    delete payload.downtimeInstrument;
+    delete this.payload.downtimeSeverity;
+    delete this.payload.downtimeInstrument;
 
     if (!!downtimeSeverity && downtimeSeverity === 'high') {
       this.showDowntimeAlert(downtimeInstrument);

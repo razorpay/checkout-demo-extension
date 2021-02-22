@@ -1,10 +1,13 @@
 <script>
   // UI imports
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
-
+  import { DOWNTIME_CALLOUT } from 'ui/labels/callouts';
+  import { locale } from 'svelte-i18n';
+  import { formatTemplateWithLocale } from 'i18n';
   // Props
   export let severe;
   export let showIcon = false;
+  export let downtimeInstrument;
   // Computed
   let downtimeClasses = 'downtime-callout';
   // let
@@ -27,6 +30,9 @@
   .downtime-icon {
     margin-right: 10px;
   }
+  .downtime-callout div {
+    white-space: normal;
+  }
 </style>
 
 <div class={`downtime-callout downtime-${severe}`}>
@@ -36,6 +42,6 @@
     </div>
   {/if}
   <div>
-    <slot />
+    {formatTemplateWithLocale(DOWNTIME_CALLOUT, { instrument: downtimeInstrument }, $locale)}
   </div>
 </div>
