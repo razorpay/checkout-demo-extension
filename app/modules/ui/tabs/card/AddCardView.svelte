@@ -45,7 +45,6 @@
 
   // i18n
   import { t, locale } from 'svelte-i18n';
-  import { formatTemplateWithLocale } from 'i18n';
 
   import {
     NOCVV_LABEL,
@@ -53,8 +52,6 @@
     REMEMBER_CARD_LABEL,
     CARD_NUMBER_HELP_UNSUPPORTED,
   } from 'ui/labels/card';
-
-  import { DOWNTIME_CALLOUT } from 'ui/labels/callouts';
 
   // Utils
   import Analytics from 'analytics';
@@ -511,9 +508,7 @@
   </div>
   {#if downtimeVisible}
     <div class="downtime-cards">
-      <DowntimeCallout showIcon={true} severe={downtimeSeverity}>
-        {formatTemplateWithLocale(DOWNTIME_CALLOUT, { instrument: downtimeInstrument }, $locale)}
-      </DowntimeCallout>
+      <DowntimeCallout showIcon={true} severe={downtimeSeverity} {downtimeInstrument} />
     </div>
   {/if}
   <div class="row remember-check">

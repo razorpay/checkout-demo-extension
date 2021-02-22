@@ -40,9 +40,7 @@
     getPaylaterProviderName,
     getUpiIntentAppName,
     getAppProviderName,
-    formatTemplateWithLocale,
   } from 'i18n';
-  import { DOWNTIME_CALLOUT } from 'ui/labels/callouts';
 
   // Props
   export let instrument = {};
@@ -268,9 +266,7 @@
   </div>
   <div slot="downtime" class="downtime-preferred-method">
     {#if !!downtimeSeverity}
-      <DowntimeCallout showIcon={true} severe={downtimeSeverity}>
-        {formatTemplateWithLocale(DOWNTIME_CALLOUT, { instrument: downtimeInstrument }, $locale)}
-      </DowntimeCallout>
+      <DowntimeCallout showIcon={true} severe={downtimeSeverity} { downtimeInstrument } />
     {/if}
   </div>
 </SlottedRadioOption>

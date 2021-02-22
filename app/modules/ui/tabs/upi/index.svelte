@@ -52,7 +52,6 @@
   import ListHeader from 'ui/elements/ListHeader.svelte';
   import Field from 'ui/components/Field.svelte';
   import Icon from 'ui/elements/Icon.svelte';
-  import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
   import Collect from './Collect.svelte';
   import GooglePayCollect from './GooglePayCollect.svelte';
@@ -63,7 +62,6 @@
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import AddANewVpa from './AddANewVpa.svelte';
   import { getMiscIcon } from 'checkoutframe/icons';
-  import Callout from 'ui/elements/Callout.svelte';
 
   import updateScore from 'analytics/checkoutScore';
 
@@ -90,10 +88,6 @@
     UPI_RECURRING_SUBSCRIPTION_CALLOUT,
     ID_LINKED_TO_BANK,
   } from 'ui/labels/upi';
-
-  import { DOWNTIME_CALLOUT } from 'ui/labels/callouts';
-
-  import { formatTemplateWithLocale } from 'i18n';
 
   // Props
   export let selectedApp = undefined;
@@ -798,9 +792,7 @@
                 </i>
                 <div slot="downtime" class="downtime-saved-vpa">
                   {#if !!downtimeSeverity}
-                    <DowntimeCallout showIcon={true} severe={downtimeSeverity}>
-                      {formatTemplateWithLocale(DOWNTIME_CALLOUT, { instrument: downtimeInstrument }, $locale)}
-                    </DowntimeCallout>
+                    <DowntimeCallout showIcon={true} severe={downtimeSeverity} { downtimeInstrument } />
                   {/if}
                 </div>
               </SlottedRadioOption>

@@ -27,7 +27,6 @@
   } from 'i18n';
 
   import { locale } from 'svelte-i18n';
-  import { DOWNTIME_CALLOUT } from 'ui/labels/callouts';
   // Props
   export let instrument = {};
   export let name = 'instrument';
@@ -221,9 +220,7 @@
   </div>
   <div slot="downtime" class="downtime-saved-card">
     {#if !!downtimeSeverity}
-      <DowntimeCallout showIcon={false} severe={downtimeSeverity}>
-        {formatTemplateWithLocale(DOWNTIME_CALLOUT, { instrument: downtimeInstrument }, $locale)}
-      </DowntimeCallout>
+      <DowntimeCallout showIcon={false} severe={downtimeSeverity} { downtimeInstrument } />
     {/if}
   </div>
 </svelte:component>

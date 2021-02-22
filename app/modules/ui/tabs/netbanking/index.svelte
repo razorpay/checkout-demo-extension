@@ -36,14 +36,11 @@
     RECURRING_CALLOUT,
   } from 'ui/labels/netbanking';
 
-  import { DOWNTIME_CALLOUT } from 'ui/labels/callouts';
-
   import { t, locale } from 'svelte-i18n';
 
   import {
     getShortBankName,
     getLongBankName,
-    formatTemplateWithLocale,
   } from 'i18n';
 
   // Utils imports
@@ -412,10 +409,7 @@
       <!-- Show downtime message if the selected bank is down -->
       {#if !!downtimeSeverity}
         <div class="downtime-wrapper">
-          <DowntimeCallout showIcon={false} severe={downtimeSeverity}>
-            <FormattedText
-              text={formatTemplateWithLocale(DOWNTIME_CALLOUT, { instrument: getLongBankName($selectedBank, $locale) }, $locale)} />
-          </DowntimeCallout>
+          <DowntimeCallout showIcon={false} severe={downtimeSeverity} downtimeInstrument={getLongBankName($selectedBank, $locale)} />
         </div>
       {/if}
     </div>

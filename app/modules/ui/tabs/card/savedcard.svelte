@@ -29,7 +29,6 @@
     AVAILABLE_TEXT,
     AVAILABLE_ACTION,
   } from 'ui/labels/emi';
-  import { DOWNTIME_CALLOUT } from 'ui/labels/callouts';
   import { TITLE_GENERIC } from 'ui/labels/methods';
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
 
@@ -244,9 +243,7 @@
   {/if}
   {#if !!downtimeSeverity && selected}
     <div class="downtime-saved-cards">
-      <DowntimeCallout showIcon={false} severe={downtimeSeverity}>
-        {formatTemplateWithLocale(DOWNTIME_CALLOUT, { instrument: downtimeInstrument }, $locale)}
-      </DowntimeCallout>
+      <DowntimeCallout showIcon={false} severe={downtimeSeverity} { downtimeInstrument } />
     </div>
   {/if}
 </div>
