@@ -95,13 +95,12 @@ describe('Card Payment - Custom Checkout FTs', () => {
     await page.waitForNavigation();
     await page.click('button.success');
     await page.waitForNavigation();
-    const status = await page.evaluate(() => {
+    await page.waitForFunction(() => {
       return (
         document.querySelector('h1').innerText ===
         'razorpay_payment_id=pay_GeiWKMc4BAbqc1'
       );
     });
-    expect(status).toBeTruthy();
   });
 
   test('basic Card Flow - Redirect Callback URL - Failed - Custom Checkout', async () => {
@@ -117,11 +116,10 @@ describe('Card Payment - Custom Checkout FTs', () => {
     await page.waitForNavigation();
     await page.click('button.danger');
     await page.waitForNavigation();
-    const status = await page.evaluate(() => {
+    await page.waitForFunction(() => {
       return decodeURI(document.querySelector('h1').innerText).includes(
         'error[code]=BAD_REQUEST_ERROR'
       );
     });
-    expect(status).toBeTruthy();
   });
 });
