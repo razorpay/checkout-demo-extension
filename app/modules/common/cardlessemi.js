@@ -7,44 +7,44 @@ const sqPrefix = cdnUrl + 'cardless_emi-sq/';
 
 const config = {
   bajaj: {
-    name: "Bajaj Finserv",
+    name: 'Bajaj Finserv',
   },
   earlysalary: {
-    name: "EarlySalary",
+    name: 'EarlySalary',
     fee_bearer_customer: false,
   },
   zestmoney: {
-    name: "ZestMoney",
+    name: 'ZestMoney',
     min_amount: 90000,
     fee_bearer_customer: false,
   },
   flexmoney: {
-    name: "Cardless EMI by InstaCred",
+    name: 'Cardless EMI by InstaCred',
     headless: false,
     fee_bearer_customer: false,
   },
   fdrl: {
-    name: "Federal Bank",
+    name: 'Federal Bank',
     headless: false,
   },
   hdfc: {
-    name: "HDFC Bank",
+    name: 'HDFC Bank',
     headless: false,
   },
   idfb: {
-    name: "IDFC First Bank",
+    name: 'IDFC First Bank',
     headless: false,
   },
   kkbk: {
-    name: "Kotak Mahindra Bank",
+    name: 'Kotak Mahindra Bank',
     headless: false,
   },
   icic: {
-    name: "ICICI Bank",
+    name: 'ICICI Bank',
     headless: false,
   },
   hcin: {
-    name: "Home Credit Ujjwal Card",
+    name: 'Home Credit Ujjwal Card',
     headless: false,
   },
 };
