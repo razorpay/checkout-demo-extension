@@ -257,11 +257,12 @@ RazorProto.calculateFees = function(payload) {
   });
 };
 
-RazorProto.fetchVirtualAccount = function(order_id) {
+RazorProto.fetchVirtualAccount = function({ customer_id, order_id, notes }) {
   return new Promise((resolve, reject) => {
-    const url = makeUrl(`orders/${order_id}/virtual_accounts?x_entity_id=${order_id}`)
+    const url = makeUrl(`orders/${order_id}/virtual_accounts`)
     fetch.post({
       url,
+      data: {customer_id, notes},
       callback: function(response) {
         if (response.error) {
           return reject(response);
