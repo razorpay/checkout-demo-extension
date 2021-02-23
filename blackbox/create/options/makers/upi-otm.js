@@ -13,7 +13,7 @@ function makePreferences(features, preferences) {
         {
           id: 'down_DEW7D9S10PEsl1',
           entity: 'payment.downtime',
-          method: 'upi_otm',
+          method: 'upi',
           begin: 1567686386,
           end: null,
           status: 'started',
@@ -35,7 +35,7 @@ function makePreferences(features, preferences) {
         {
           id: 'down_DEW7D9S10PEsl1',
           entity: 'payment.downtime',
-          method: 'upi_otm',
+          method: 'upi',
           begin: 1567686386,
           end: null,
           status: 'started',

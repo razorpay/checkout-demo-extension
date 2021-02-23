@@ -363,8 +363,10 @@
         'vpa_handle',
         item.vpa.handle
       );
-      item.downtimeSeverity = currentDowntime;
-      item.downtimeInstrument = item.vpa.handle;
+      if(currentDowntime) {
+        item.downtimeSeverity = currentDowntime;
+        item.downtimeInstrument = item.vpa.handle;
+      }
     });
   }
 
