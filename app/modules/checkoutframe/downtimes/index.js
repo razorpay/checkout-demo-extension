@@ -332,7 +332,7 @@ export function getDowntimes(preferences) {
   const bankDowntimes = getBankDowntimes(groupedDowntimes);
   return {
     cards: { ...getDowntimesByMethod(groupedDowntimes, 'card') },
-    upi: { ...getDowntimesByMethod(groupedDowntimes, 'upi') },
+    upi: { ...getDowntimesByMethod(groupedDowntimes, 'upi'), ...getDowntimesByMethod(groupedDowntimes, 'upi_otm') },
     netbanking: { ...getDowntimesByMethod(groupedDowntimes, 'netbanking') },
     high: {
       methods: methodDowntimes.high,

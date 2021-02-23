@@ -20,19 +20,17 @@ async function verifyMethodDisabled(context, method, message) {
   // }
 }
 
-async function verifyMethodWarned(context, message, method) {
-  let selector = '.downtime-callout';
-  // // if (method) {
-  // //   selector = ['netbanking', 'upi', 'upi_otm'].includes(method)
-  // //     ? `.bottom:not([tab]) ${selector}`
-  // //     : `#form-${method}.drishy ~ #bottom .bottom[tab="${method}"] ${selector}`;
-  // // }
+async function verifyMethodWarned(context, message, method, instrumentKey) {
+  const downtime = context.preferences.payment_downtime.items.filter(item => item.method === method)[0];
+  const downtimeSeverity = downtime.severity;
+  let instrument = downtime.instrument[instrumentKey];
+  let selector = `.downtime-${downtimeSeverity}`;
   const warningDiv = await context.page.waitForSelector(selector);
   const warningText = await context.page.evaluate(
     warningDiv => warningDiv.textContent,
     warningDiv
   );
-  expect(warningText).toContain(message);
+  expect(warningText).toContain(instrument);
 }
 
 module.exports = {

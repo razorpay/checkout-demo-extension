@@ -125,11 +125,11 @@ module.exports = function(testFeatures) {
       } else {
         await selectPaymentMethod(context, 'upi_otm');
 
-        if (downtimeHigh || downtimeLow) {
-          await verifyMethodWarned(context, 'UPI', 'upi_otm');
-        }
         await selectUPIMethod(context, 'new', 'upi_otm');
         await enterUPIAccount(context, 'saranshgupta1995@okaxis', 'upi_otm');
+        if (downtimeHigh || downtimeLow) {
+          await verifyMethodWarned(context, 'UPI', 'upi_otm', 'vpa_handle');
+        }
       }
       if (partialPayment) {
         await verifyPartialAmount(context, '₹ 100');

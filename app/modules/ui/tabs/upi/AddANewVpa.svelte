@@ -257,10 +257,11 @@
           bind:readonlyValue={vpa}
           on:input={handleVpaInput}
           on:blur
-          placeholder={$t(UPI_COLLECT_ENTER_ID)} />
+          placeholder={$t(UPI_COLLECT_ENTER_ID)}
+          {downtimeSeverity} />
         {#if !!downtimeSeverity}
           <div class="downtime-upi">
-            <DowntimeCallout showIcon={true} severe={downtimeSeverity} {downtimeInstrument} />
+            <DowntimeCallout showIcon={false} severe={downtimeSeverity} {downtimeInstrument} />
           </div>
         {/if}
         {#if logged && canSaveVpa}

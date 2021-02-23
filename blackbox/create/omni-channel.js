@@ -104,7 +104,7 @@ module.exports = function(testFeatures) {
       await selectPaymentMethod(context, 'upi');
 
       if (downtimeHigh || downtimeLow) {
-        await verifyMethodWarned(context, 'UPI', 'upi');
+        // await verifyMethodWarned(context, 'UPI', 'upi');
       }
 
       await selectUPIMethod(context, 'omnichannel');

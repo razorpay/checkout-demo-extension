@@ -119,11 +119,10 @@ module.exports = function(testFeatures) {
         await selectPersonalizationPaymentMethod(context, 1);
       } else {
         await selectPaymentMethod(context, 'upi');
-
-        if (downtimeHigh || downtimeLow) {
-          await verifyMethodWarned(context, 'UPI', 'upi');
-        }
         await selectUPIMethod(context, 'token');
+        if (downtimeHigh || downtimeLow) {
+          await verifyMethodWarned(context, 'UPI', 'upi', 'vpa_handle');
+        }
       }
 
       if (partialPayment) {

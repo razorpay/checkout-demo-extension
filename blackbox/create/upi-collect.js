@@ -124,11 +124,11 @@ module.exports = function(testFeatures) {
         if (!(downtimeHigh && offers)) {
           await selectPaymentMethod(context, 'upi');
 
-          if (downtimeHigh || downtimeLow) {
-            await verifyMethodWarned(context, 'UPI', 'upi');
-          }
           await selectUPIMethod(context, 'new');
           await enterUPIAccount(context, 'saranshgupta1995@okaxis');
+          if (downtimeHigh || downtimeLow) {
+            await verifyMethodWarned(context, 'UPI', 'upi', 'vpa_handle');
+          }
         }
       }
       if (partialPayment) {
