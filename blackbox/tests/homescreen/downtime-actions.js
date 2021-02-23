@@ -30,7 +30,7 @@ async function verifyMethodWarned(context, message, method, instrumentKey) {
     warningDiv => warningDiv.textContent,
     warningDiv
   );
-  expect(warningText).toContain(instrument);
+  expect(warningText.toLowerCase()).toContain(instrument.toLowerCase());
 }
 
 module.exports = {
