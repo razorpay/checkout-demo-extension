@@ -1,6 +1,7 @@
-export const verifyPopupLoadingScreen = (popup, razorpayInstance) => {};
 
-export const getPaymentPayload = (method = 'card', override = {}) => {
+exports.verifyPopupLoadingScreen = (popup, razorpayInstance) => {};
+
+exports.getPaymentPayload = (method = 'card', override = {}) => {
   var data = {
     amount: 100,
     currency: 'INR',
