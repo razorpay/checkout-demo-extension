@@ -4,6 +4,9 @@ import { makeAuthUrl as _makeAuthUrl } from 'common/Razorpay';
 import { displayAmount } from 'common/currency';
 import trustedBadge from 'ui/constants/trusted-badge';
 
+import { amountAfterOffer } from 'checkoutstore/offers';
+import { get } from 'svelte/store';
+
 let razorpayInstance, preferences;
 export const razorpayInstanceStore = writable();
 
@@ -63,14 +66,15 @@ export const getOption = option => razorpayInstance.get(option);
 export const setOption = (option, value) => razorpayInstance.set(option, value);
 export const getCallbackUrl = optionGetter('callback_url');
 export const getCardFeatures = iin => razorpayInstance.getCardFeatures(iin);
-export const getCardCurrencies = ({ iin, tokenId, cardNumber }) =>
-  razorpayInstance.getCardCurrencies({
+export const getCardCurrencies = ({ iin, tokenId, cardNumber }) => {
+  return razorpayInstance.getCardCurrencies({
     iin,
     tokenId,
     cardNumber,
-    amount: getAmount(),
+    amount: get(amountAfterOffer),
     currency: getCurrency(), // Entity currency
   });
+};
 
 const entityWithAmount = ['order', 'invoice', 'subscription'];
 const getEntityWithAmount = () =>

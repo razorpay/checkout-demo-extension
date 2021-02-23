@@ -1,6 +1,6 @@
 <script>
   //store
-  import { getOption, getAmount } from 'checkoutstore';
+  import { getOption } from 'checkoutstore';
   import { phone, email } from 'checkoutstore/screens/home';
 
   // svelte imports
@@ -25,9 +25,11 @@
   let neftView;
   export let neftDetails;
   export let expiry;
+  export let amount;
   const description = getOption('description');
   let merchant_logo = getOption('image');
   const merchantName = getOption('name');
+  const orderId = getOption('order_id');
   let orgLogoLoaded = false;
   let merchantLogoLoaded = false;
   let isHDFC = false;
@@ -38,6 +40,7 @@
 
   const { account_number, ifsc, branch, bank_name } = neftDetails;
   let org_logo = rzpLogo;
+  let tableDetails = {};
 
   onMount(() => {
     if (bank_name?.startsWith('HDFC') || ifsc?.startsWith('HDFC')) {
@@ -49,24 +52,29 @@
     if (!merchant_logo) {
       merchantLogoLoaded = true;
     }
+    if (!isHDFC) {
+      labels.ROW_HEADERS.row10 = 'Razorpay Order ID';
+    }
+    tableDetails = {
+      [ROW_HEADERS.row1]: neftDetails.name,
+      [ROW_HEADERS.row2]: account_number,
+      [ROW_HEADERS.row3]: ifsc,
+      [ROW_HEADERS.row4]: bank_name,
+      [ROW_HEADERS.row5]: branch,
+      [ROW_HEADERS.row6]: amount,
+      [ROW_HEADERS.row7]: name.trim(),
+      [ROW_HEADERS.row8]: $email,
+      [ROW_HEADERS.row9]: $phone,
+      [ROW_HEADERS.row10]: isHDFC ? description : orderId,
+      [ROW_HEADERS.row11]: expiry,
+    };
   });
 
   const session = getSession();
-  const amount = session.formatAmountWithCurrency(getAmount());
 
   // TODO: move it to utils or use any currently existing methods for formatting
   function formatDate(d) {
-    let month = '' + (d.getMonth() + 1),
-      day = '' + d.getDate(),
-      year = d.getFullYear();
-
-    if (month.length < 2) {
-      month = '0' + month;
-    }
-    if (day.length < 2) {
-      day = '0' + day;
-    }
-    return [day, month, year].join('-');
+    return `${d.toLocaleDateString()} ${d.toLocaleTimeString()}`;
   }
 
   function printIfLoaded() {
@@ -83,19 +91,6 @@
   const setMerchantLogoLoaded = () => {
     merchantLogoLoaded = true;
     printIfLoaded();
-  };
-  const tableDetails = {
-    [ROW_HEADERS.row1]: neftDetails.name,
-    [ROW_HEADERS.row2]: account_number,
-    [ROW_HEADERS.row3]: ifsc,
-    [ROW_HEADERS.row4]: bank_name,
-    [ROW_HEADERS.row5]: branch,
-    [ROW_HEADERS.row6]: amount,
-    [ROW_HEADERS.row7]: name,
-    [ROW_HEADERS.row8]: $email,
-    [ROW_HEADERS.row9]: $phone,
-    [ROW_HEADERS.row10]: isHDFC ? description : '',
-    [ROW_HEADERS.row11]: expiry,
   };
   if (!neftDetails.branch) {
     delete tableDetails.Branch;
