@@ -176,7 +176,7 @@
   }
 
   .downtime-upi {
-    margin-top: 4px;
+    margin-top: 8px;
   }
   .downtime-upi-icon {
     position: absolute;
@@ -257,13 +257,7 @@
           bind:readonlyValue={vpa}
           on:input={handleVpaInput}
           on:blur
-          placeholder={$t(UPI_COLLECT_ENTER_ID)}
-          {downtimeSeverity} />
-        {#if !!downtimeSeverity}
-          <div class="downtime-upi">
-            <DowntimeCallout showIcon={false} severe={downtimeSeverity} {downtimeInstrument} />
-          </div>
-        {/if}
+          placeholder={$t(UPI_COLLECT_ENTER_ID)} />
         {#if logged && canSaveVpa}
           <div class="should-save-vpa-container">
             <label
@@ -280,5 +274,10 @@
         {/if}
       </div>
     {/if}
+  </div>
+  <div slot="downtime" class="downtime-upi">
+    {#if selected && !!downtimeSeverity}
+      <DowntimeCallout showIcon={true} severe={downtimeSeverity} {downtimeInstrument} />
+      {/if}
   </div>
 </SlottedRadioOption>

@@ -48,7 +48,7 @@
   }
   .buttons {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     font-size: 16px;
   }
   .container {
@@ -60,7 +60,7 @@
     color: #5aa4f5;
   }
   .continue-button {
-    padding: 12px 54px;
+    padding: 12px 60px;
     background: linear-gradient(
         97.84deg,
         rgba(255, 255, 255, 0.2) 0%,

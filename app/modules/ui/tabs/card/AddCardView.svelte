@@ -449,7 +449,7 @@
     opacity: 0.5;
   }
   .downtime-cards {
-    margin-top: 4px;
+    margin-top: 16px;
   }
 </style>
 

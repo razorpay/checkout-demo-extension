@@ -18,6 +18,7 @@ import { hashFnv32a } from 'checkoutframe/personalization/utils';
 import { isMethodUsable } from 'checkoutstore/methods';
 import { getDowntimes } from 'checkoutstore';
 import { checkDowntime } from 'checkoutframe/downtimes';
+import { getAppFromPackageName } from 'common/upi'
 
 function generateBasePreferredBlock(preferred) {
   const preferredBlock = createBlock('rzp.preferred', {
@@ -302,6 +303,7 @@ export function setBlocks(
     preferredBlock.instruments = preferredBlock.instruments.map(
       addDowntimeToBlock
     );
+    console.log(preferredBlock.instruments)
 
     allBlocks = _Arr.mergeWith([preferredBlock], allBlocks);
   }
@@ -450,12 +452,22 @@ function addDowntimeToBlock(block) {
       downtimeInstrument = block.banks[0];
       break;
     case 'upi':
-      downtimeSeverity = checkDowntime(
-        downtimes.upi,
-        'vpa_handle',
-        block.vpas[0].split('@')[1]
-      );
-      downtimeInstrument = block.vpas[0].split('@')[1];
+      if(block.apps && block.apps.length > 0) {
+        const appName = getAppFromPackageName(block.apps[0]).app_name;
+        downtimeSeverity = checkDowntime(
+          downtimes.upi,
+          'psp_handle',
+          appName
+        );
+        downtimeInstrument = appName;
+      } else {
+        downtimeSeverity = checkDowntime(
+          downtimes.upi,
+          'vpa_handle',
+          block.vpas && block.vpas[0]?.split('@')[1]
+        );
+        downtimeInstrument = block.vpas && block.vpas[0]?.split('@')[1];
+      }
       break;
     case 'card':
       const downtimesArr = ['low', 'medium', 'high'];

@@ -357,14 +357,14 @@ const filterDowntimeArr = (downtimeArr, instrumentKey, value) => {
     ) {
       return item;
     }
-    if(instrumentKey === 'vpa_handle' || instrumentKey === 'psp_handle') {
-      item[instrumentKey] === 'all'
+    if((instrumentKey === 'vpa_handle' || instrumentKey === 'psp_handle') && item[instrumentKey] === 'all'){
       return item
     }
   });
 };
 
 export const checkDowntime = (downtime, instrumentKey, value) => {
+  if(!value) return false;
   if (filterDowntimeArr(downtime.high, instrumentKey, value)?.length > 0) {
     return 'high';
   } else if (

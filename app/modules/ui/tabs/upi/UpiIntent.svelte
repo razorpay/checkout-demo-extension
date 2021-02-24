@@ -192,7 +192,13 @@
     margin-top: 10px;
   }
   .downtime-upi-intent {
-    margin-top: 4px;
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    top: 46%;
+  }
+  .downtime-upi-intent-wrapper {
+    margin-bottom: 54px;
   }
   .downtime-upi-intent-icon {
     float: right;
@@ -220,24 +226,26 @@
         selected={app.package_name === selected}
         on:select={onAppSelect}
         name="upi_app"
-        value={app.package_name}>
+        value={"app.package_name"}>
         <div class="ref-title">
           {getUpiIntentAppName(app.shortcode, $locale, app.app_name)}
-          {#if downtimeSeverity && app.package_name === selected}
+          <!-- {#if downtimeSeverity && app.package_name === selected}
             <div class="downtime-upi-intent-icon"><DowntimeIcon severe={downtimeSeverity} /></div>
-          {/if}
+          {/if} -->
           {#if i === 0 && showRecommendedUPIApp}
             <span>
               <!-- LABEL: Recommended -->
               <em>({$t(UPI_RECOMMENDED)})</em>
             </span>
           {/if}
-          {#if downtimeSeverity && app.package_name === selected}
-            <div class="downtime-upi-intent">
-              <DowntimeCallout severe={downtimeSeverity} {downtimeInstrument} />
-            </div>
-          {/if}
         </div>
+        {#if !!downtimeSeverity && app.package_name === selected}
+          <div class="downtime-upi-intent-wrapper">
+            <div class="downtime-upi-intent">
+              <DowntimeCallout showIcon={true} severe={downtimeSeverity} {downtimeInstrument} />
+            </div>
+          </div>
+        {/if}
       </DeprecatedRadioOption>
     {/each}
 
