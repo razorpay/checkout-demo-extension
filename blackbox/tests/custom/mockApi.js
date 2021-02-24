@@ -1,41 +1,78 @@
 module.exports = {
-  ajaxResponse: (override = {}) => ({
-    type: 'first',
-    request: {
-      url: 'about:blank',
-      method: 'get',
-      content: [],
-    },
-    version: 1,
-    payment_id: 'pay_GcGmzHFHZZzq74',
-    next: ['otp_submit', 'otp_resend'],
-    gateway:
-      'eyJpdiI6InFVZ3hWbTdzWjR4aDBGZUFCUDJldEE9PSIsInZhbHVlIjoiVTVkSTFhZHlIU1VcL2IzUHFlYkk3em9GYzhyN2dHR3Fqd0hOWHVlN2UzcTQ9IiwibWFjIjoiNzBiMzA1NGZmODE0ZDYyMTVlZWM0M2E3MTU3ZWVkMzZlYjJhNzYyZjVhNGI1MmQzMDkzZDVmNzIxNWRlOGZkOSJ9',
-    submit_url:
-      'https://api.razorpay.com/v1/payments/pay_GcGmzHFHZZzq74/otp_submit/5c032824cafd8fc967bb515cd0c68be971193be5?key_id=rzp_live_ILgsfZCZoFIKMb',
-    resend_url:
-      'https://api.razorpay.com/v1/payments/pay_GcGmzHFHZZzq74/otp_resend?key_id=rzp_live_ILgsfZCZoFIKMb',
-    metadata: {
-      issuer: 'ICIC',
-      network: 'VISA',
-      last4: '1234',
-      iin: '444551',
-    },
-    redirect:
-      'https://api.razorpay.com/v1/payments/pay_GcGmzHFHZZzq74/authentication/redirect?key_id=rzp_live_ILgsfZCZoFIKMb',
-    resend_url_json:
-      'https://api.razorpay.com/v1/payments/pay_GcGmzHFHZZzq74/otp_resend/json?key_id=rzp_live_ILgsfZCZoFIKMb',
-    submit_url_private:
-      'https://api.razorpay.com/v1/payments/pay_GcGmzHFHZZzq74/otp/submit',
-    resend_url_private:
-      'https://api.razorpay.com/v1/payments/pay_GcGmzHFHZZzq74/otp/resend',
-    org_logo: '',
-    org_name: 'Razorpay Software Private Ltd',
-    checkout_logo:
-      'https://dashboard-activation.s3.amazonaws.com/org_100000razorpay/checkout_logo/phpnHMpJe',
-    custom_branding: false,
-    ...override,
-  }),
+  ajaxResponse: (method = '', override = {}) => {
+    switch (method) {
+      case 'wallet':
+        return {
+          type: 'first',
+          request: {
+            url:
+              'https://api.razorpay.com/v1/gateway/mocksharp/payment?key_id=rzp_test_1DP5mmOlF5G5ag',
+            method: 'post',
+            content: {
+              action: 'authorize',
+              amount: 1000,
+              method: 'wallet',
+              payment_id: 'GfP2XSCEReNSk4',
+              callback_url:
+                'https://api.razorpay.com/v1/payments/pay_GfP2XSCEReNSk4/callback/8ec08badbd9a9a14071511d2841bacd026e8c243/rzp_test_1DP5mmOlF5G5ag',
+              recurring: 0,
+            },
+          },
+          version: 1,
+          payment_id: 'pay_GfP2XSCEReNSk4',
+          gateway:
+            'eyJpdiI6IlhwT0I1TkNZSUZKMEhkYjdVcGl2RkE9PSIsInZhbHVlIjoidFdsRHpuUG1rb0piWmRsZ0IyQW1lVytGY2VBem1KOW5HXC9rbGhWdkpad1k9IiwibWFjIjoiZTUzNTk3ZWIxYmIzY2Q2OTAwMzc5YzQwMjc0NDhlNzA5M2VmZWI2NTg4YmE4NTI0ZTNhZDBlOGM1ZTVkNWM5ZiJ9',
+          amount: '₹ 10',
+          image: 'https://cdn.razorpay.com/logos/GS8xtzE45HDhNT_medium.png',
+          magic: false,
+          org_logo: '',
+          org_name: 'Razorpay Software Private Ltd',
+          checkout_logo:
+            'https://dashboard-activation.s3.amazonaws.com/org_100000razorpay/checkout_logo/phpnHMpJe',
+          custom_branding: false,
+          ...override,
+        };
+      case 'card':
+      default:
+        return {
+          type: 'first',
+          request: {
+            url: 'about:blank',
+            method: 'get',
+            content: [],
+          },
+          version: 1,
+          payment_id: 'pay_GcGmzHFHZZzq74',
+          next: ['otp_submit', 'otp_resend'],
+          gateway:
+            'eyJpdiI6InFVZ3hWbTdzWjR4aDBGZUFCUDJldEE9PSIsInZhbHVlIjoiVTVkSTFhZHlIU1VcL2IzUHFlYkk3em9GYzhyN2dHR3Fqd0hOWHVlN2UzcTQ9IiwibWFjIjoiNzBiMzA1NGZmODE0ZDYyMTVlZWM0M2E3MTU3ZWVkMzZlYjJhNzYyZjVhNGI1MmQzMDkzZDVmNzIxNWRlOGZkOSJ9',
+          submit_url:
+            'https://api.razorpay.com/v1/payments/pay_GcGmzHFHZZzq74/otp_submit/5c032824cafd8fc967bb515cd0c68be971193be5?key_id=rzp_live_ILgsfZCZoFIKMb',
+          resend_url:
+            'https://api.razorpay.com/v1/payments/pay_GcGmzHFHZZzq74/otp_resend?key_id=rzp_live_ILgsfZCZoFIKMb',
+          metadata: {
+            issuer: 'ICIC',
+            network: 'VISA',
+            last4: '1234',
+            iin: '444551',
+          },
+          redirect:
+            'https://api.razorpay.com/v1/payments/pay_GcGmzHFHZZzq74/authentication/redirect?key_id=rzp_live_ILgsfZCZoFIKMb',
+          resend_url_json:
+            'https://api.razorpay.com/v1/payments/pay_GcGmzHFHZZzq74/otp_resend/json?key_id=rzp_live_ILgsfZCZoFIKMb',
+          submit_url_private:
+            'https://api.razorpay.com/v1/payments/pay_GcGmzHFHZZzq74/otp/submit',
+          resend_url_private:
+            'https://api.razorpay.com/v1/payments/pay_GcGmzHFHZZzq74/otp/resend',
+          org_logo: '',
+          org_name: 'Razorpay Software Private Ltd',
+          checkout_logo:
+            'https://dashboard-activation.s3.amazonaws.com/org_100000razorpay/checkout_logo/phpnHMpJe',
+          custom_branding: false,
+          ...override,
+        };
+    }
+  },
   validVPAResponse: (vpa, override = {}) => ({
     customer_name: null,
     success: true,
