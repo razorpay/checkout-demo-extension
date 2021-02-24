@@ -4418,7 +4418,7 @@ Session.prototype = {
 
     // added rewardIds to the create payment request
     var rewardIds = storeGetter(rewardsStore);
-    if (rewardIds && rewardIds.length > 0 && !Store.isContactEmailOptional()) {
+    if (rewardIds && rewardIds.length > 0 && !Store.isEmailOptional()) {
       data.reward_ids = rewardIds;
     }
 
