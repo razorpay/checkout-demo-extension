@@ -4189,7 +4189,7 @@ Session.prototype = {
   checkForDowntime: function() {
     var selectedInstrument = this.getSelectedPaymentInstrument();
     var payload;
-    if (selectedInstrument && selectedInstrument?.id.indexOf('rzp.cluster') === -1) {
+    if (selectedInstrument && selectedInstrument.id && selectedInstrument.id.indexOf('rzp.cluster') === -1) {
       payload = selectedInstrument;
     } else {
       payload = this.payload;
