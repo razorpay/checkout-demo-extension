@@ -364,7 +364,9 @@ const filterDowntimeArr = (downtimeArr, instrumentKey, value) => {
 };
 
 export const checkDowntime = (downtime, instrumentKey, value) => {
-  if(!value) return false;
+  if(!value) {
+    return false;
+  }
   if (filterDowntimeArr(downtime.high, instrumentKey, value)?.length > 0) {
     return 'high';
   } else if (
