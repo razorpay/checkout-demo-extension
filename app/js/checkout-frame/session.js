@@ -49,6 +49,7 @@ var preferences,
   Backdrop = discreet.Backdrop,
   FeeLabel = discreet.FeeLabel,
   rewardsStore = discreet.rewardsStore,
+  BlockedDeactivatedMerchant = discreet.BlockedDeactivatedMerchant,
   updateScore = discreet.updateScore;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
@@ -1016,20 +1017,6 @@ Session.prototype = {
     discreet.Experiments.clearOldExperiments();
   },
 
-  renderBanner: function(options) {
-    var that = this;
-
-    options = options || {};
-
-    this.isOpen = true;
-
-    this.improviseModalOptions();
-    this.getEl();
-    es6components.render();
-    this.setModal();
-    this.setBackdrop();
-  },
-
   render: function(options) {
     var that = this;
 
@@ -1061,14 +1048,21 @@ Session.prototype = {
     this.improvisePaymentOptions();
     this.improvisePrefill();
     es6components.render();
+    this.setModal();
+    this.setBackdrop();
+    if (Store.isBlockedDeactivated()) {
+      new BlockedDeactivatedMerchant({
+        target: _Doc.querySelector('#form-fields'),
+      });
+      _Doc.getElementById('header').remove();
+      return;
+    }
     this.setSvelteComponents();
     if (!Store.isPayout()) {
       this.fillData();
     }
     this.setEMI();
     Cta.init();
-    this.setModal();
-    this.setBackdrop();
     this.completePendingPayment();
     this.bindEvents();
     this.setEmiScreen();

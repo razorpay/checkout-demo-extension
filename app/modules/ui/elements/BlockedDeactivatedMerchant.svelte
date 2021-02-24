@@ -1,7 +1,6 @@
 <script>
   import CTA from 'ui/elements/CTA.svelte';
   import { getSession } from 'sessionmanager';
-
   const session = getSession();
   function onCloseCick() {
     session.closeAndDismiss();
@@ -9,7 +8,7 @@
 </script>
 
 <style>
-  #downtime-banner {
+  #deactivated-blocked {
     padding: 20px;
     font-size: 16px;
     line-height: 20px;
@@ -19,16 +18,12 @@
     justify-content: center;
     height: 100%;
   }
-  #downtime-banner div {
-    margin-top: 20px;
-  }
 </style>
 
-<div id="downtime-banner">
-  <strong>We'll be back in a bit!</strong>
+<div id="deactivated-blocked">
   <div>
-    We are undergoing scheduled maintenance to ensure you get the best
-    experience. We'll be back at 11th Feb'21 03:30 AM IST
+    This payment has failed due to an issue with the merchant. Do get in touch
+    with site/app admin regarding the issue.
   </div>
   <CTA on:click={onCloseCick}>CLOSE</CTA>
 </div>
