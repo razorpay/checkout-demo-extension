@@ -257,8 +257,19 @@ RazorProto.calculateFees = function(payload) {
   });
 };
 
+/**
+ * Used for creating and fetching the VA.
+ * Resolves and rejects with a JSON.
+ * @param {payload} Object
+ *
+ * @returns {Promise}
+ */
 RazorProto.fetchVirtualAccount = function({ customer_id, order_id, notes }) {
   return new Promise((resolve, reject) => {
+    if(!order_id) {
+      reject("Order ID is required to fetch the account details")
+      return
+    }
     const url = makeUrl(`orders/${order_id}/virtual_accounts`)
     fetch.post({
       url,
