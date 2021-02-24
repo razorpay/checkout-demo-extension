@@ -128,7 +128,7 @@ module.exports = function(testFeatures) {
         await selectUPIMethod(context, 'new', 'upi_otm');
         await enterUPIAccount(context, 'saranshgupta1995@okaxis', 'upi_otm');
         if (downtimeHigh || downtimeLow) {
-          await verifyMethodWarned(context, 'UPI', 'upi_otm', 'vpa_handle');
+          await verifyMethodWarned(context, 'UPI', 'upi', 'vpa_handle');
         }
       }
       if (partialPayment) {
