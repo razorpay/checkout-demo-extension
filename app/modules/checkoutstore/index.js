@@ -114,12 +114,11 @@ export function isPayout() {
 
 export function isBlockedDeactivated() {
   if (
-    !preferences.hasOwnProperty('blocked') ||
-    !preferences.hasOwnProperty('activated')
+    !preferences.hasOwnProperty('blocked')
   ) {
     return false;
   }
-  return preferences.blocked || !preferences.activated;
+  return preferences.blocked
 }
 
 export function isAddressEnabled() {
