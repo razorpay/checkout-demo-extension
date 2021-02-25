@@ -14,7 +14,7 @@ import {
 } from 'common/currency';
 
 export function makeUrl(path = '') {
-  return 'https://beta-api.razorpay.in/' + RazorpayConfig.version + path;
+  return RazorpayConfig.api + RazorpayConfig.version + path;
 }
 
 const backendEntityIds = [
