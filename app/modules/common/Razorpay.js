@@ -14,7 +14,7 @@ import {
 } from 'common/currency';
 
 export function makeUrl(path = '') {
-  return RazorpayConfig.api + RazorpayConfig.version + path;
+  return 'https://beta-api.razorpay.in/' + RazorpayConfig.version + path;
 }
 
 const backendEntityIds = [
@@ -270,10 +270,17 @@ RazorProto.fetchVirtualAccount = function({ customer_id, order_id, notes }) {
       reject("Order ID is required to fetch the account details")
       return
     }
-    const url = makeUrl(`orders/${order_id}/virtual_accounts`)
+    let data = { customer_id, notes };
+    if(!customer_id) {
+      delete data.customer_id;
+    }
+    if (!notes) {
+      delete data.notes;
+    }
+    const url = makeUrl(`orders/${order_id}/virtual_accounts?x_entity_id=${order_id}`)
     fetch.post({
       url,
-      data: {customer_id, notes},
+      data,
       callback: function(response) {
         if (response.error) {
           return reject(response);
