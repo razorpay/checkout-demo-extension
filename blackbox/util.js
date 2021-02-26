@@ -288,10 +288,11 @@ const util = (module.exports = {
 
     returnObj.respondPlain = body => respond({ body });
 
-    returnObj.respondJSON = body =>
+    returnObj.respondJSON = (body, status = 200) =>
       respond({
         contentType: 'application/json',
         body: JSON.stringify(body),
+        status
       });
 
     returnObj.respondJSONP = body => {

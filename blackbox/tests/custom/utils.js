@@ -47,6 +47,13 @@ exports.getPaymentPayload = (method = 'card', override = {}) => {
         wallet: 'phonepe',
       };
     }
+    case 'powerwallet': {
+      data = {
+        ...data,
+        method: 'wallet',
+        wallet: 'freecharge',
+      };
+    }
     default:
       break;
   }
