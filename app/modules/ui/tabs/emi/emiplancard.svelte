@@ -176,7 +176,6 @@
   }
   .citi-url {
     color: #528ff0;
-    word-break: break-word;
   }
   .citi-url:hover {
     color: #0a47c1;
