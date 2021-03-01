@@ -41,11 +41,15 @@ COPY --from=builder /checkout_build/app/dist/v1/css/* /app/dist/v1/css/
 
 WORKDIR /app/dist/v1
 
+RUN echo I am here
+
 # Rename *.x.gz to *.x so that we serve gzipped files
 RUN mv checkout.js.gz checkout.js
 RUN mv checkout-frame.js.gz checkout-frame.js
 RUN mv razorpay.js.gz razorpay.js
 RUN mv css/checkout.css.gz css/checkout.css
+
+RUN echo I am heres
 
 # Upload to S3
 RUN aws s3 sync /app/dist/v1 s3://$AWS_CDN_BUCKET/_checkout/$BRANCH/v1 \
