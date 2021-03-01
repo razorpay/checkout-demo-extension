@@ -68,8 +68,8 @@ RUN wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/
     && mkdir -p /app/dist/v1/css
 
 ## Multi stage copy does not currently work with recursive directories. Hence, making explicit copy here for each of the subfolders
-COPY --from=builder /checkout_build/app/dist/v1/* /app/dist/v1/
-COPY --from=builder /checkout_build/app/dist/v1/css/* /app/dist/v1/css/
+COPY --from=builder2 /app/dist/v1/* /app/dist/v1/
+COPY --from=builder2 /app/dist/v1/css/* /app/dist/v1/css/
 
 WORKDIR /app
 
