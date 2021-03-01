@@ -15,9 +15,7 @@ RUN cd /checkout_build \
     && NODE_ENV=production npm run build \
     && DIST_DIR=/checkout_build/app/dist/v1 /scripts/compress
 
-FROM c.rzp.io/razorpay/onggi:aws-cli-v2818
-
-RUN echo "Hola"
+FROM razorpay/onggi:aws-cli-v2818
 
 ARG BRANCH
 ENV BRANCH=${BRANCH}
