@@ -15,6 +15,8 @@ import edit from './edit';
 import present from './present';
 import trustedBadge from './trusted_badge';
 import tickFilled from './tick_filled';
+import warning from './warning';
+import refund from './refund';
 
 import { getAllMethods } from 'checkoutframe/paymentmethods';
 
@@ -26,6 +28,8 @@ const availIconNames = getAllMethods().concat([
   'present',
   'trusted_badge',
   'tick_filled',
+  'warning',
+  'refund'
 ]);
 
 function getIconFn(iconName) {
@@ -83,6 +87,12 @@ function getIconFn(iconName) {
 
     case 'tick_filled':
       return tickFilled;
+
+    case 'warning':
+      return warning;
+
+    case 'refund':
+        return refund;
   }
 }
 

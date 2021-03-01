@@ -2,13 +2,14 @@
   // UI imports
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
   import { getSession } from 'sessionmanager';
+  import Icon from 'ui/elements/Icon.svelte';
 
   let instrument = 'HDFC Bank';
   let point2;
+  const session = getSession();
+  const icons = session.themeMeta.icons;
 
   $: point2 = `${instrument} are facing some technical issues at the moment`;
-
-  const session = getSession();
 
   const handleContinue = () => {
     session.hideOverlayMessage();
@@ -69,21 +70,26 @@
       #3a97fc;
     color: #ffffff;
   }
+  .icon-wrapper {
+    min-width: 25px;
+    text-align: right;
+    margin-top: 2px;
+  }
 </style>
 
 <div class="container">
   <ul class="list">
     <li class="line1">
-      <DowntimeIcon severe="high" />
+      <div class="icon-wrapper"><DowntimeIcon severe="high" /></div>
       <div>There is a high chance this payment might fail</div>
     </li>
     <li class="line2">
-      <DowntimeIcon severe="high" />
+      <div class="icon-wrapper"><Icon icon={icons.warning} /></div>
       <div>{point2}</div>
     </li>
     <li class="line3">
-      <DowntimeIcon severe="high" />
-      <div>Incase of failure, any amount deducted will be refunded shortly</div>
+      <div class="icon-wrapper"><Icon icon={icons.refund} /></div>
+      <div>Incase of failure, any <b>amount deducted</b> will be <b>refunded shortly</b></div>
     </li>
   </ul>
   <div class="buttons">
