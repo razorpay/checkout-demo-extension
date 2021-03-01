@@ -12,10 +12,12 @@ WORKDIR /checkout_build
 
 RUN cd /checkout_build \
     && npm install \
-    && NODE_ENV=production npm test \
+    && NODE_ENV=production npm run build \
     && DIST_DIR=/checkout_build/app/dist/v1 /scripts/compress
 
 FROM c.rzp.io/razorpay/onggi:aws-cli-v2818
+
+RUN echo "Hola"
 
 ARG BRANCH
 ENV BRANCH=${BRANCH}
