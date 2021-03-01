@@ -26,7 +26,8 @@ jobs:
         with:
           version: latest
           buildkitd-flags: --debug
-          install: true
+      - name: clear cache
+        run: docker builder prune --all
       - name: Login to Harbor
         uses: docker/login-action@v1
         with:
