@@ -15,7 +15,7 @@ RUN cd /checkout_build \
     && NODE_ENV=production npm run build \
     && DIST_DIR=/checkout_build/app/dist/v1 /scripts/compress
 
-FROM c.rzp.io/razorpay/onggi:aws-cli-v2818
+FROM c.rzp.io/razorpay/onggi:aws-cli-v2818 as s3Sync
 
 ARG BRANCH
 ENV BRANCH=${BRANCH}
@@ -60,7 +60,10 @@ RUN aws s3 sync /app/dist/v1 s3://$AWS_CDN_BUCKET/_checkout/$BRANCH/v1 \
     --include "*.js" \
     --include "*.css"
 
-FROM c.rzp.io/razorpay/containers:app-nginx-brotli
+FROM c.rzp.io/razorpay/containers:app-nginx-brotli as nginx
+
+RUN echo I am here
+
 ARG GIT_COMMIT_HASH
 ENV GIT_COMMIT_HASH=${GIT_COMMIT_HASH}
 
