@@ -43,3 +43,4 @@ jobs:
             "GIT_COMMIT_HASH=${{ github.sha }}"
           push: true
           tags: c.rzp.io/razorpay/checkout:${{ github.sha }}
+          no-cache: true
