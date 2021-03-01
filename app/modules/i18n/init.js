@@ -20,9 +20,13 @@ import Analytics from 'analytics';
 import { getSegmentOrCreate } from 'experiments';
 import { ignoreFirstCall } from 'svelte-utils';
 
+// To find the correct language code for a locale, use
+// https://www.metamodpro.com/browser-language-codes
 const LOCALES = {
   en: 'English',
   hi: 'हिंदी',
+  mr: 'मराठी',
+  gu: 'પાસ',
 };
 
 const ALLOWED_LOCALES = _Obj.keys(LOCALES);
@@ -138,6 +142,8 @@ function setLocaleInStorage(locale) {
 export function addDefaultMessages() {
   addMessages('en', en);
   register('hi', () => fetchBundle('hi'));
+  register('mr', () => fetchBundle('mar'));
+  register('gu', () => fetchBundle('guj'));
 }
 
 export function bindI18nEvents() {
