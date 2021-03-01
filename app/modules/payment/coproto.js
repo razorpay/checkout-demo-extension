@@ -9,6 +9,8 @@ import {
 import { androidBrowser } from 'common/useragent';
 import Track from 'tracker';
 import Analytics from 'analytics';
+import * as AnalyticsTypes from 'analytics-types';
+
 import * as Bridge from 'bridge';
 import { ADAPTER_CHECKERS, phonepeSupportedMethods } from 'payment/adapters';
 import { supportedWebPaymentsMethodsForApp } from 'common/webPaymentsApi';
@@ -284,6 +286,13 @@ var responseTypes = {
 
     try {
       const PaymentRequest = global.PaymentRequest;
+
+      Analytics.track('upi.trigger_mweb_intent_open', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          app,
+        },
+      });
 
       const request = new PaymentRequest(supportedInstruments, details);
       request

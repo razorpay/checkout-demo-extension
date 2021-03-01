@@ -4,6 +4,8 @@ import { GOOGLE_PAY_PACKAGE_NAME, PHONE_PE_PACKAGE_NAME } from 'common/upi';
 import { setUpiApps, getUPIIntentApps } from 'checkoutstore/native';
 import { phonepeSupportedMethods } from 'payment/adapters';
 
+import Analytics from 'analytics';
+
 export const appsThatSupportWebPayments = [
   GOOGLE_PAY_PACKAGE_NAME,
   PHONE_PE_PACKAGE_NAME,
@@ -54,6 +56,7 @@ export const checkWebPaymentsForApp = app => {
           },
         ])
       );
+      Analytics.setMeta('upi.intent_on_mweb', true);
     })
     .catch(_Func.noop);
 };
