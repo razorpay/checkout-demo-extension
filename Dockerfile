@@ -15,7 +15,14 @@ RUN cd /checkout_build \
     && NODE_ENV=production npm run build \
     && DIST_DIR=/checkout_build/app/dist/v1 /scripts/compress
 
-FROM amazon/aws-cli
+FROM c.rzp.io/razorpay/onggi:aws-cli-v2818
+
+RUN mkdir -p /app/dist/v1 \
+    && mkdir -p /app/dist/v1/css
+
+## Multi stage copy does not currently work with recursive directories. Hence, making explicit copy here for each of the subfolders
+COPY --from=builder /checkout_build/app/dist/v1/* /app/dist/v1/
+COPY --from=builder /checkout_build/app/dist/v1/css/* /app/dist/v1/css/
 
 ARG BRANCH
 ENV BRANCH=${BRANCH}
@@ -31,13 +38,6 @@ ENV AWS_ACCESS_KEY_ID=${S3_KEY_ID}
 
 ARG S3_KEY_SECRET
 ENV AWS_SECRET_ACCESS_KEY=${S3_KEY_SECRET}
-
-RUN mkdir -p /app/dist/v1 \
-    && mkdir -p /app/dist/v1/css
-
-## Multi stage copy does not currently work with recursive directories. Hence, making explicit copy here for each of the subfolders
-COPY --from=builder /checkout_build/app/dist/v1/* /app/dist/v1/
-COPY --from=builder /checkout_build/app/dist/v1/css/* /app/dist/v1/css/
 
 WORKDIR /app/dist/v1
 
