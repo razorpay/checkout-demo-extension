@@ -31,8 +31,6 @@ jobs:
           password: ${{ secrets.HARBOR_DOCKER_PASSWORD }}
       - name: Build and push
         uses: docker/build-push-action@v2
-        env:
-          DOCKER_BUILDKIT: 0
         with:
           file: ./Dockerfile
           secrets: |
@@ -45,4 +43,3 @@ jobs:
             "GIT_COMMIT_HASH=${{ github.sha }}"
           push: true
           tags: c.rzp.io/razorpay/checkout:${{ github.sha }}
-          no-cache: true
