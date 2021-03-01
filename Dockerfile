@@ -15,7 +15,7 @@ RUN cd /checkout_build \
     && NODE_ENV=production npm run build \
     && DIST_DIR=/checkout_build/app/dist/v1 /scripts/compress
 
-FROM c.rzp.io/razorpay/onggi:aws-cli-v2818
+FROM c.rzp.io/razorpay/onggi:aws-cli-v2818 as builder2
 
 RUN mkdir -p /app/dist/v1 \
     && mkdir -p /app/dist/v1/css
