@@ -3,6 +3,9 @@ FROM pronav/chrome:checkout as builder
 ARG BUILD_NUMBER
 ENV BUILD_NUMBER=${BUILD_NUMBER}
 
+RUN echo $BUILD_NUMBER
+RUN echo ${GIT_COMMIT_HASH}
+
 ARG BRANCH
 ENV BRANCH=${BRANCH}
 
@@ -15,7 +18,7 @@ RUN cd /checkout_build \
     && NODE_ENV=production npm run build \
     && DIST_DIR=/checkout_build/app/dist/v1 /scripts/compress
 
-FROM razorpay/onggi:aws-cli-v2818
+FROM c.rzp.io/razorpay/onggi:aws-cli-v2818
 
 ARG BRANCH
 ENV BRANCH=${BRANCH}
