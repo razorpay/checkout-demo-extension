@@ -263,6 +263,10 @@ const UPI_APPS = {
       package_name: 'com.fampay.in',
       shortcode: 'fampay',
     },
+    {
+      package_name: 'com.mobikwik_new',
+      shortcode: 'mobikwik',
+    },
   ],
 
   /**

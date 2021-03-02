@@ -112,16 +112,6 @@ export function isPayout() {
   return getOption('payout');
 }
 
-export function isBlockedDeactivated() {
-  if (
-    !preferences.hasOwnProperty('blocked') ||
-    !preferences.hasOwnProperty('activated')
-  ) {
-    return false;
-  }
-  return preferences.blocked || !preferences.activated;
-}
-
 export function isAddressEnabled() {
   return hasFeature('customer_address', false);
 }
