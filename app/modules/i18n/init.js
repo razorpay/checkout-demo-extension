@@ -210,11 +210,16 @@ function setupMissingMessageInterception() {
     const targetString = args[0];
     const isFromSveltei18n = targetString.includes('[svelte-i18n]');
     if (isFromSveltei18n) {
-      Analytics.track('i18n:translation_missing', {
-        data: {
-          targetString,
-        },
-      });
+      const pattern = /".*?"/g;
+      const data = targetString.match(pattern);
+      if (data && data[0]) {
+        Analytics.track('i18n:translation_missing', {
+          data: {
+            string: data[0],
+            callout: targetString,
+          },
+        });
+      }
     }
 
     const allowDefaultBehaviour = !isFromSveltei18n;
