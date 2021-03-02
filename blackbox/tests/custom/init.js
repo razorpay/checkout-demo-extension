@@ -31,6 +31,22 @@ const callback = readFileSync('blackbox/fixtures/callback.html', {
   flag: 'r',
 });
 
+/**
+ * forceTargetInitialization its hack to detect popup created. There is issue in popup detection with window.open("")
+ * https://github.com/puppeteer/puppeteer/issues/2810
+ * @param {BrowserContext} browser
+ */
+function forceTargetInitialization(browser) {
+  Array.from(browser._targets.values()).forEach((t, i) => {
+    if (!t._isInitialized) {
+      console.log('Forcing target initialization');
+      browser._targetInfoChanged({
+        targetInfo: { ...t._targetInfo, url: ' ' },
+      });
+    }
+  });
+}
+
 function checkoutRequestHandler(request) {
   const url = request.url();
   if (url.startsWith(customCheckout)) {
@@ -46,7 +62,10 @@ function checkoutRequestHandler(request) {
   } else if (url.includes('livereload')) {
     // Livereload URLs come if you have `npm run start` on while testing
     return request.respond({ status: 200 });
-  } else if (url.includes(redirectPage)) {
+  } else if (
+    url.includes(redirectPage) ||
+    url.startsWith('https://walletapi.mobikwik.com/wallet')
+  ) {
     return request.respond({ body: popupHtmlContent });
   } else if (url.startsWith(mockPageSubmit)) {
     const postData = request.postData();
@@ -175,6 +194,7 @@ module.exports = async ({
     page,
     data,
     ...interceptorOptions,
+    forceTargetInitialization,
     async popup() {
       const target = await page
         .browser()
