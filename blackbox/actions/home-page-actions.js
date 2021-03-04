@@ -1,9 +1,4 @@
 const { visible, randomContact, randomEmail, delay } = require('../util');
-const { readFileSync } = require('fs');
-
-const contents = String(
-  readFileSync(__dirname + '/../fixtures/mockSuccessandFailPage.html')
-);
 
 async function assertHomePage(context) {
   const $countryCode = await context.page.$('#country-code');

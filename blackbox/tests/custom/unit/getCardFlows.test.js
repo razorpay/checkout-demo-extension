@@ -3,6 +3,8 @@ const mockAPI = require('blackbox/tests/custom/mockApi.js');
 
 let context;
 
+const cardNumber = '41111111111111111';
+
 describe('getCardFlows - Custom Checkout UT', () => {
   beforeEach(async () => {
     context = await initCustomCheckout({ page });
@@ -11,14 +13,13 @@ describe('getCardFlows - Custom Checkout UT', () => {
     page.removeAllListeners('request');
   });
   test('getCardFlows', async () => {
-    const cardFlowPromise = page.evaluate(async () => {
-      const rp = window.rp;
+    const cardFlowPromise = page.evaluate(async (card) => {
       return await new Promise(resolve => {
-        rp.getCardFlows('41111111111111111', response => {
+        window.rp.getCardFlows(card, response => {
           resolve(response);
         });
       });
-    });
+    }, cardNumber);
     await context.expectRequest(req => {});
     await context.respondJSONP(mockAPI.iinResponse());
     const cardFlow = await cardFlowPromise;
@@ -28,10 +29,10 @@ describe('getCardFlows - Custom Checkout UT', () => {
   });
 
   test('getCardFeatures', async () => {
-    const cardFlowPromise = page.evaluate(async () => {
+    const cardFlowPromise = page.evaluate(async (card) => {
       const rp = window.rp;
-      return await rp.getCardFeatures('41111111111111111');
-    });
+      return await rp.getCardFeatures(card);
+    }, cardNumber);
     await context.expectRequest(req => {});
     await context.respondJSONP(mockAPI.iinResponse());
     const cardFlow = await cardFlowPromise;

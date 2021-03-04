@@ -1,5 +1,4 @@
 const NodeEnvironment = require('jest-environment-node');
-// const JsdomEnvironment = require('jest-environment-jsdom');
 const puppeteer = require('puppeteer');
 const DIR = require('./tmpdir');
 const { readFileSync } = require('fs');

@@ -274,6 +274,7 @@ const util = (module.exports = {
     returnObj.expectRequest = async () => {
       await waitForRequest();
       const url = currentRequest.url();
+      debugger;
       const parsedURL = URL.parse(url);
       return {
         headers: currentRequest.headers(),

@@ -1,4 +1,3 @@
-const { readFileSync } = require('fs');
 const { delay, innerText } = require('../util');
 const emiActions = require('./emi-actions');
 const homepageActions = require('./home-page-actions');
@@ -17,10 +16,6 @@ const emandateBanktransferActions = require('./emandate-banktransfer-actions');
 const paylaterActions = require('./paylater-actions');
 const personalizationActions = require('./personalization-actions');
 const payoutActions = require('./payout-actions');
-
-const contents = String(
-  readFileSync(__dirname + '/../fixtures/mockSuccessandFailPage.html')
-);
 
 module.exports = {
   ...offerActions,

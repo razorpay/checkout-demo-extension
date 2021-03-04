@@ -1,21 +1,8 @@
 const initCustomCheckout = require('blackbox/tests/custom/init.js');
 const mockAPI = require('blackbox/tests/custom/mockApi.js');
+const { getPaymentPayload } = require('blackbox/tests/custom/utils.js');
 
 let context;
-
-const calculateFeesPayload = {
-  amount: 6000,
-  'card[cvv]': '123',
-  'card[expiry]': '11 / 22',
-  'card[name]': 'arshpreet',
-  'card[number]': '4111111111111111',
-  contact: '+919999999999',
-  currency: 'INR',
-  email: 'qa.testing@razorpay.com',
-  method: 'card',
-  save: 1,
-};
-
 describe('calculateFees - Custom Checkout UT', () => {
   beforeEach(async () => {
     context = await initCustomCheckout({ page });
@@ -29,7 +16,7 @@ describe('calculateFees - Custom Checkout UT', () => {
      */
     const calculateFeesPromise = page.evaluate(async payload => {
       return await window.rp.calculateFees(payload);
-    }, calculateFeesPayload);
+    }, getPaymentPayload('card', { amount: 6000 }));
     await context.expectRequest(req => {});
     await context.respondJSON(mockAPI.calculateFees());
     const feesResponse = await calculateFeesPromise;
