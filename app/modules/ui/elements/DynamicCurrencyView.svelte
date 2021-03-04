@@ -9,6 +9,8 @@
     dccCurrency,
   } from 'checkoutstore/screens/card';
 
+  import { amountAfterOffer } from 'checkoutstore/offers';
+
   import {
     selectedInstrument,
     selectedInstrumentId,
@@ -25,7 +27,12 @@
   // Utils imports
   import { getSession } from 'sessionmanager';
 
-  import { getAmount, getCurrency, getCardCurrencies } from 'checkoutstore';
+  import {
+    getAmount,
+    getCurrency,
+    getCardCurrencies,
+    isPartialPayment,
+  } from 'checkoutstore';
 
   import { getIin, getCardDigits } from 'common/card';
 
@@ -53,7 +60,9 @@
   let currencies = null;
   let originalAmount = getAmount();
   let selectedCurrency = null;
-  let searchModal;
+  let searchModalOpen = false;
+  let entityWithAmount = null;
+
   const currencyCache = {};
 
   // Props
@@ -112,10 +121,10 @@
 
   $: {
     if (entity) {
-      if (!currencyCache[entity]) {
+      if (!currencyCache[entityWithAmount]) {
         currencies = null;
         getCardCurrencies(prop).then(currencyPayload => {
-          currencyCache[entity] = currencyPayload;
+          currencyCache[entityWithAmount] = currencyPayload;
         });
       }
     } else {
@@ -146,7 +155,7 @@
     $dccCurrency = selectedCurrency;
   }
 
-  $: currencyConfig = entity && currencyCache[entity];
+  $: currencyConfig = entity && currencyCache[entityWithAmount];
   $: currencies = currencyConfig && currencyConfig.all_currencies;
   $: cardCurrency = currencyConfig && currencyConfig.card_currency;
   $: sortedCurrencies = currencies && sortCurrencies(currencies);
@@ -156,20 +165,21 @@
     displayCurrencies,
     ({ currency }) => currency === selectedCurrency
   );
+  $: entityWithAmount = `${entity}-${$amountAfterOffer}`;
 
   function onSelect(currency) {
     selectedCurrency = currency;
-
-    searchModal.close();
+    searchModalOpen = false;
   }
 
   function updateAmountInHeaderAndCTA(displayAmount) {
+    const session = getSession();
     if (displayAmount) {
       showAmount(displayAmount);
-      getSession().setRawAmountInHeader(displayAmount);
-    } else {
+      session.setRawAmountInHeader(displayAmount);
+    } else if (!isPartialPayment()) {
       showCtaWithDefaultText();
-      getSession().updateAmountInHeader(originalAmount);
+      session.updateAmountInHeader(originalAmount);
     }
   }
 
@@ -229,7 +239,7 @@
   }
 
   function showCurrenciesModal() {
-    searchModal.open();
+    searchModalOpen = true;
   }
 
   function getCardByTokenId(tokenId) {
@@ -336,8 +346,8 @@
         items={sortedCurrencies}
         keys={['currency', 'name', 'symbol']}
         component={CurrencySearchItem}
-        bind:this={searchModal}
-        on:close={() => searchModal.close()}
+        bind:open={searchModalOpen}
+        on:close={() => (searchModalOpen = false)}
         on:select={({ detail }) => onSelect(detail.currency)} />
     </Stack>
   {/if}

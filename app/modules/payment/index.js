@@ -28,6 +28,9 @@ import { updateCurrencies, setCurrenciesRate } from 'common/currency';
 import { GOOGLE_PAY_PACKAGE_NAME, PHONE_PE_PACKAGE_NAME } from 'common/upi';
 import { getCardEntityFromPayload, getCardFeatures } from 'common/card';
 
+import { getCurrentLocale, translatePaymentPopup as t } from 'i18n/popup';
+import updateScore from 'analytics/checkoutScore';
+
 /**
  * Tells if we're being executed from
  * the same domain as the configured API
@@ -57,7 +60,7 @@ function onPaymentCancel(metaParam) {
     var cancelError = {
       error: {
         code: 'BAD_REQUEST_ERROR',
-        description: 'Payment processing cancelled by user',
+        description: t('payment_canceled'),
       },
     };
     var payment_id = this.payment_id;
@@ -71,6 +74,7 @@ function onPaymentCancel(metaParam) {
     if (payment_id) {
       eventData.payment_id = payment_id;
       var url = makeAuthUrl(razorpay, 'payments/' + payment_id + '/cancel');
+
       if (_.isNonNullObject(metaParam)) {
         url += '&' + _.obj2query(metaParam);
       }
@@ -136,6 +140,8 @@ function trackNewPayment(data, params, r) {
       params.upi.provider = data.vpa.split('@')[1];
     }
   }
+
+  updateScore('timeToSubmit');
 
   Analytics.track('submit', {
     data: {
@@ -683,7 +689,18 @@ Payment.prototype = {
     }
 
     if (popup) {
-      popup.onClose = this.r.emitter('payment.cancel');
+      popup.onClose = () => {
+        Analytics.track(this.data.method + ':popup:closed');
+        if (
+          this.data.method === 'netbanking' &&
+          Track.props.library === 'checkoutjs'
+        ) {
+          const modal = _Doc.querySelector('#error-message');
+          _El.addClass(modal, 'cancel_netbanking');
+          return;
+        }
+        this.r.emit('payment.cancel');
+      };
     }
     this.popup = popup;
     return popup;
@@ -692,7 +709,7 @@ Payment.prototype = {
   writePopup: function() {
     var popup = this.popup;
     if (popup) {
-      popup.write(popupTemplate(this));
+      popup.write(popupTemplate(this, t));
       popup.window.deserialize = _Doc.obj2formhtml;
     }
   },
@@ -828,7 +845,8 @@ razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
     timeout,
   };
 
-  const url = makeAuthUrl(this, 'payments/validate/account');
+  let url = makeAuthUrl(this, 'payments/validate/account');
+
   const cachedVpaResponse = vpaCache[vpa];
 
   if (cachedVpaResponse) {
@@ -960,8 +978,10 @@ razorpayProto.submitOTP = function(otp) {
 
 razorpayProto.resendOTP = function(callback) {
   var payment = this._payment;
+  var url = makeAuthUrl(this, 'payments/' + payment.payment_id + '/otp_resend');
+
   payment.ajax = fetch.post({
-    url: makeAuthUrl(this, 'payments/' + payment.payment_id + '/otp_resend'),
+    url,
     data: {
       '_[source]': 'checkoutjs',
     },
@@ -977,8 +997,10 @@ razorpayProto.topupWallet = function() {
     payment.writePopup();
   }
 
+  let url = makeAuthUrl(this, 'payments/' + payment.payment_id + '/topup/ajax');
+
   payment.ajax = fetch.post({
-    url: makeAuthUrl(this, 'payments/' + payment.payment_id + '/topup/ajax'),
+    url,
     data: {
       '_[source]': 'checkoutjs',
     },
@@ -1050,6 +1072,9 @@ razorpayProto.getCardCurrencies = function(payload) {
   };
 
   const entity = getCardEntityFromPayload(payload);
+
+  const entityWithAmount = `${entity}-${payload.amount}`;
+
   if (entity.length === 6) {
     requestPayload.iin = entity;
   } else {
@@ -1062,12 +1087,12 @@ razorpayProto.getCardCurrencies = function(payload) {
     requestPayload.currency = currency;
   }
 
-  const existingRequest = CardCurrencyRequests[entity];
+  const existingRequest = CardCurrencyRequests[entityWithAmount];
   if (existingRequest) {
     return existingRequest;
   }
 
-  CardCurrencyRequests[entity] = new Promise((resolve, reject) => {
+  CardCurrencyRequests[entityWithAmount] = new Promise((resolve, reject) => {
     let url = makeAuthUrl(this, 'payment/flows');
 
     // append requestPayload
@@ -1092,7 +1117,7 @@ razorpayProto.getCardCurrencies = function(payload) {
         }
 
         // Store in cache
-        CardCurrencyCache[entity] = response;
+        CardCurrencyCache[entityWithAmount] = response;
 
         // Resolve
         resolve(response);
@@ -1112,5 +1137,5 @@ razorpayProto.getCardCurrencies = function(payload) {
     });
   });
 
-  return CardCurrencyRequests[entity];
+  return CardCurrencyRequests[entityWithAmount];
 };

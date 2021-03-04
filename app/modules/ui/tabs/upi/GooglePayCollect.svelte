@@ -16,6 +16,8 @@
   export let vpaField = null;
   export let googlePayPspHandle = null;
 
+  let vpaValue;
+
   const dispatch = createEventDispatcher();
 
   onMount(() => {
@@ -48,7 +50,7 @@
   }
 
   export function getVpa() {
-    return `${vpaField.getValue()}@${pspHandle}`;
+    return `${vpaValue}@${pspHandle}`;
   }
 
   export function focus() {
@@ -68,7 +70,8 @@
 </style>
 
 <div class="legend left" style="margin-top: 18px">
-  {retry ? 'Or' : ''} Enter your UPI ID
+  {retry ? 'Or' : ''}
+  Enter your UPI ID
 </div>
 
 <div id="upi-gpay-vpa" class="upi-gpay">
@@ -86,7 +89,8 @@
         placeholder="Enter UPI ID"
         required={true}
         on:focus={focus}
-        bind:this={vpaField} />
+        bind:this={vpaField}
+        bind:readonlyValue={vpaValue} />
       <div class="elem at-separator">@</div>
       <div class="elem" style="padding-right:20px;">
         <select

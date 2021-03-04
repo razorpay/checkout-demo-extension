@@ -236,6 +236,7 @@ const UPI_APPS = {
     {
       package_name: 'in.amazon.mShop.android.shopping',
       shortcode: 'amazon',
+      app_icon: 'https://cdn.razorpay.com/app/amazonpay.svg',
     },
     {
       package_name: 'com.mipay.in.wallet',
@@ -261,6 +262,10 @@ const UPI_APPS = {
     {
       package_name: 'com.fampay.in',
       shortcode: 'fampay',
+    },
+    {
+      package_name: 'com.mobikwik_new',
+      shortcode: 'mobikwik',
     },
   ],
 
@@ -565,3 +570,27 @@ export const upiBackCancel = {
   '_[flow]': 'intent',
   '_[reason]': 'UPI_INTENT_BACK_BUTTON',
 };
+
+export const suggestionVPA = [
+  'apl',
+  'abfspay',
+  'fbl',
+  'axisb',
+  'yesbank',
+  'okaxis',
+  'oksbi',
+  'okicici',
+  'okhdfcbank',
+  'hdfcbankjd',
+  'kmbl',
+  'icici',
+  'myicici',
+  'ikwik',
+  'ybl',
+  'paytm',
+  'rmhdfcbank',
+  'pingpay',
+  'barodapay',
+  'idfcbank',
+  'upi',
+];

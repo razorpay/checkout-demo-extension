@@ -5,6 +5,7 @@ const { interceptor } = require('../util');
 const { computed } = require('./options');
 const { callbackHtml } = require('./callback');
 const { sendPreferences } = require('./preferences');
+const { sendRewards } = require('./rewards');
 const { setExperiments } = require('./experiments');
 
 const checkoutPublic = 'https://api.razorpay.com/v1/checkout/public';
@@ -350,6 +351,7 @@ module.exports = {
     }
     if (preferences) {
       await sendPreferences(returnObj);
+      await sendRewards(returnObj);
     }
     // page takes some time to render
     await delay(200);

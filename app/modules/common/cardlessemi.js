@@ -23,6 +23,30 @@ const config = {
     headless: false,
     fee_bearer_customer: false,
   },
+  fdrl: {
+    name: 'Federal Bank',
+    headless: false,
+  },
+  hdfc: {
+    name: 'HDFC Bank',
+    headless: false,
+  },
+  idfb: {
+    name: 'IDFC First Bank',
+    headless: false,
+  },
+  kkbk: {
+    name: 'Kotak Mahindra Bank',
+    headless: false,
+  },
+  icic: {
+    name: 'ICICI Bank',
+    headless: false,
+  },
+  hcin: {
+    name: 'Home Credit Ujjwal Card',
+    headless: false,
+  },
 };
 
 /**

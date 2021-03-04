@@ -58,6 +58,8 @@ export const isCardValidForOffer = derived(
       return;
     }
 
+    let url = makeAuthUrl('validate/checkout/offers');
+
     let orderId = getOrderId();
 
     if (isASubscription()) {
@@ -67,7 +69,7 @@ export const isCardValidForOffer = derived(
     }
 
     currentRequest = fetch.post({
-      url: makeAuthUrl('validate/checkout/offers'),
+      url,
       data: {
         amount: getAmount(),
         method: 'card',
@@ -92,3 +94,10 @@ export const isCardValidForOffer = derived(
     });
   }
 );
+
+export const amountAfterOffer = derived(appliedOffer, () => {
+  if (get(appliedOffer)) {
+    return get(appliedOffer).amount;
+  }
+  return getAmount();
+});

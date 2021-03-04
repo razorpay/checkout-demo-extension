@@ -15,7 +15,7 @@ RUN cd /checkout_build \
     && NODE_ENV=production npm test \
     && DIST_DIR=/checkout_build/app/dist/v1 /scripts/compress
 
-FROM razorpay/onggi:aws-cli-v2818
+FROM c.rzp.io/razorpay/onggi:aws-cli-v2818 as aws
 
 ARG BRANCH
 ENV BRANCH=${BRANCH}
@@ -39,6 +39,12 @@ RUN mkdir -p /app/dist/v1 \
 COPY --from=builder /checkout_build/app/dist/v1/* /app/dist/v1/
 COPY --from=builder /checkout_build/app/dist/v1/css/* /app/dist/v1/css/
 
+RUN mkdir -p /app/dist/original \
+    && mkdir -p /app/dist/original/css
+
+COPY --from=builder /checkout_build/app/dist/v1/* /app/dist/original/
+COPY --from=builder /checkout_build/app/dist/v1/css/* /app/dist/original/css/
+
 WORKDIR /app/dist/v1
 
 # Rename *.x.gz to *.x so that we serve gzipped files
@@ -56,7 +62,7 @@ RUN aws s3 sync /app/dist/v1 s3://$AWS_CDN_BUCKET/_checkout/$BRANCH/v1 \
     --include "*.js" \
     --include "*.css"
 
-FROM razorpay/containers:app-nginx-brotli
+FROM c.rzp.io/razorpay/containers:app-nginx-brotli
 ARG GIT_COMMIT_HASH
 ENV GIT_COMMIT_HASH=${GIT_COMMIT_HASH}
 
@@ -68,8 +74,8 @@ RUN wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/
     && mkdir -p /app/dist/v1/css
 
 ## Multi stage copy does not currently work with recursive directories. Hence, making explicit copy here for each of the subfolders
-COPY --from=builder /checkout_build/app/dist/v1/* /app/dist/v1/
-COPY --from=builder /checkout_build/app/dist/v1/css/* /app/dist/v1/css/
+COPY --from=aws /app/dist/original/* /app/dist/v1/
+COPY --from=aws /app/dist/original/css/* /app/dist/v1/css/
 
 WORKDIR /app
 

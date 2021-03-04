@@ -6,7 +6,6 @@ import * as Confirm from 'checkoutframe/components/confirm';
 import * as Backdrop from 'checkoutframe/components/backdrop';
 import * as TermsCurtain from 'checkoutframe/termscurtain';
 import { getCheckoutBridge, storage } from './index';
-import { confirmCancelMsg } from 'common/strings';
 import { get as storeGetter } from 'svelte/store';
 import { overlayStack as overlayStackStore } from 'checkoutstore/back';
 

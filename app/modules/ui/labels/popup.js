@@ -1,0 +1,9 @@
+export const PAYING = 'paying';
+export const SECURED_BY = 'secured_by';
+export const TRYING_TO_LOAD = 'trying_to_load';
+export const WANT_TO_CANCEL = 'want_to_cancel';
+export const PROCESSING = 'processing';
+export const WAIT_WHILE_WE_REDIRECT = 'wait_while_we_redirect';
+export const REDIRECTING = 'redirecting';
+export const LOADING_METHOD_PAGE = 'loading_method_page';
+export const TRYING_BANK_PAGE_MSG = 'trying_bank_page_msg';

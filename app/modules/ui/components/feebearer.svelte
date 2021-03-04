@@ -1,16 +1,20 @@
 <script>
   // Svelte imports
   import { createEventDispatcher, onMount } from 'svelte';
+
   // UI imports
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
-  //Store imports
+
+  // Store imports
   import { showFeeLabel } from 'checkoutstore/index.js';
+
   // Utils imports
   import { formatAmountWithSymbol } from 'common/currency';
   import { getSession } from 'sessionmanager';
+
   // i18n
   import { t, locale } from 'svelte-i18n';
-  import { formatTemplateWithLocale } from 'i18n';
+  import { formatTemplateWithLocale, translateErrorDescription } from 'i18n';
   import {
     AMOUNT_LABEL,
     LOADING_MESSAGE,
@@ -20,11 +24,13 @@
     GST_LABEL,
     TOTAL_CHARGES_LABEL,
   } from 'ui/labels/fees';
+
   // Props
   export let loading = true;
   export let feeBreakup = null;
   export let bearer = null;
   export let paymentData;
+
   const entries = _Obj.entries;
   const contains = _Arr.contains;
   const dispatch = createEventDispatcher();
@@ -37,9 +43,11 @@
     tax: GST_LABEL,
     amount: TOTAL_CHARGES_LABEL,
   };
+
   onMount(() => {
     fetchFees(paymentData);
   });
+
   export function onSuccess(response) {
     feeBreakup = response.display;
     loading = false;
@@ -52,10 +60,16 @@
       session.updateAmountInHeaderForOffer(feeBreakup.amount * 100, true);
     }
   }
+
   export function onError(response) {
-    session.showLoadError(response.error.description, response.error);
-    dispatch('error', response.error.description);
+    const errorMessage = translateErrorDescription(
+      response.error.description,
+      $locale
+    );
+    session.showLoadError(errorMessage, response.error);
+    dispatch('error', errorMessage);
   }
+
   export function fetchFees(paymentData) {
     paymentData.amount = session.getAppliedOffer()
       ? session.getAppliedOffer().amount

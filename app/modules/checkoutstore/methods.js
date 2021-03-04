@@ -77,7 +77,7 @@ const ALL_METHODS = {
       getOption('method.credit_card')
     ) {
       if (isRecurring()) {
-        return getRecurringMethods()?.credit_card;
+        return getRecurringMethods()?.card?.credit;
       }
       return getMerchantMethods().credit_card;
     }
@@ -90,7 +90,7 @@ const ALL_METHODS = {
       getOption('method.debit_card')
     ) {
       if (isRecurring()) {
-        return getRecurringMethods()?.debit_card;
+        return getRecurringMethods()?.card?.debit;
       }
       return getMerchantMethods().debit_card;
     }
@@ -277,7 +277,7 @@ function isMethodEnabledForBrowser(method) {
 
 export function isMethodEnabled(method) {
   if (getOrderMethod()) {
-    if (getOrderMethod() !== method) {
+    if (getOrderMethod() !== method && !(getOrderMethod() === 'upi' && method === 'qr')) {
       return false;
     }
   }
@@ -326,26 +326,34 @@ export function getEnabledMethods() {
 }
 
 export function getSingleMethod() {
+  /* Please don't change the order, this code is order senstive */
+  const consolidated_methods = [
+    'card',
+    'emi',
+    'netbanking',
+    'emandate',
+    'nach',
+    'upi_otm',
+    'upi',
+    'wallet',
+    'paypal',
+  ];
+
   if (getOrderMethod()) {
     return getOrderMethod();
   }
 
   let oneMethod;
-  const methods = getEnabledMethods();
+  let methods = getEnabledMethods();
+
+  /**
+   * @description This filtering is needed because we sub-divide methods as well, even though they are not valid instruments
+   * @example credit_card for the card instrument
+   */
+  methods = methods.filter(method => consolidated_methods.includes(method));
 
   if (methods.length === 1) {
-    /* Please don't change the order, this code is order senstive */
-    [
-      'card',
-      'emi',
-      'netbanking',
-      'emandate',
-      'nach',
-      'upi_otm',
-      'upi',
-      'wallet',
-      'paypal',
-    ]
+    consolidated_methods
       |> _Arr.any(m => {
         if (m === methods[0]) {
           oneMethod = m;
@@ -948,4 +956,19 @@ function getUsableMethods() {
  */
 export function isMethodUsable(method) {
   return _Arr.contains(getUsableMethods(), method);
+}
+
+/**
+ * We need to disable vernacular for some methods because the APIs they use
+ * are not ready yet. We also disable it if the `checkout_disable_i18n`
+ * flag is present for the merchant.
+ *
+ * @returns {boolean}
+ */
+export function shouldUseVernacular() {
+  return (
+    !hasFeature('checkout_disable_i18n') &&
+    !isPayout() &&
+    !isMethodEnabled('nach')
+  );
 }

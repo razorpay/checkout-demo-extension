@@ -38,9 +38,6 @@
   // Computed
   export let showableApps;
 
-  // Refs
-  export let vpaField = null;
-
   const session = getSession();
   let otherAppsIcon = session.themeMeta.icons.othermethods;
 
@@ -50,50 +47,6 @@
     } else {
       showableApps = _Arr.slice(apps, 0, 4);
     }
-  }
-
-  function getVpa() {
-    if (vpaField) {
-      return vpaField.getValue();
-    }
-    return '';
-  }
-
-  function trackVpaEntry() {
-    const vpa = getVpa();
-
-    if (!vpa) {
-      return;
-    }
-
-    const valid = isVpaValid(vpa);
-
-    Analytics.track('vpa:fill', {
-      type: AnalyticsTypes.BEHAV,
-      data: {
-        app: selectedApp,
-        value: vpa,
-        valid,
-      },
-    });
-  }
-
-  export function getPayload() {
-    let data = {};
-
-    if (selected === 'directpay') {
-      data = {
-        '_[flow]': 'directpay',
-        vpa: vpaField.getValue(),
-      };
-    } else {
-      data = {
-        '_[flow]': 'intent',
-        upi_app: selected,
-      };
-    }
-
-    return data;
   }
 
   const dispatch = createEventDispatcher();

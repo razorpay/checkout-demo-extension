@@ -15,3 +15,23 @@ export const currencyRequestId = writable('');
 export const cardType = derived(cardNumber, getCardType);
 export const cardIin = derived(cardNumber, getIin);
 export const cardTab = writable(''); // Value of current tab. Values can be one of "card", "emi", "". "" can be considered to be null.
+
+export const showNoCvvCheckbox = derived(
+  [cardNumber, cardType],
+  ([$cardNumber, $cardType]) =>
+    $cardType === 'maestro' && $cardNumber.length > 5
+);
+
+export const noCvvChecked = writable(false);
+
+export const hideExpiryCvvFields = derived(
+  [showNoCvvCheckbox, noCvvChecked],
+  ([$showNoCvvCheckbox, $noCvvChecked]) => $showNoCvvCheckbox && $noCvvChecked
+);
+
+export const showAuthTypeSelectionRadio = writable(false);
+
+export const currentCvv = writable('');
+export const currentAuthType = writable('');
+
+export const internationalCurrencyCalloutNeeded = writable(false);

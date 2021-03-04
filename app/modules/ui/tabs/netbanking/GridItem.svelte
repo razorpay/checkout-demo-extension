@@ -37,7 +37,10 @@
     name="bank"
     type="radio"
     value={code}
-    bind:group />
+    on:change={({ target: { value } }) => {
+      group = value;
+    }}
+    checked={group?.replace('_C', '') === code} />
   <label for="bank-radio-{code}" class="radio-label mfix">
     <div class="mchild item-inner">
       <img alt="" src="https://cdn.razorpay.com/bank/{code}.gif" />
@@ -49,8 +52,9 @@
           bindTo="#form-netbanking"
           className="downtime-tooltip"
           align={['bottom']}>
-          {fullName} accounts are facing temporary issues right now. Please select
-          another bank.
+          {fullName}
+          accounts are facing temporary issues right now. Please select another
+          bank.
         </Tooltip>
       </span>
     {/if}

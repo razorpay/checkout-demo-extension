@@ -47,7 +47,9 @@ var preferences,
   NativeStore = discreet.NativeStore,
   Confirm = discreet.Confirm,
   Backdrop = discreet.Backdrop,
-  FeeLabel = discreet.FeeLabel;
+  FeeLabel = discreet.FeeLabel,
+  rewardsStore = discreet.rewardsStore,
+  updateScore = discreet.updateScore;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -57,10 +59,6 @@ var isIE = /MSIE |Trident\//.test(ua);
 // .shown has display: none from iOS ad-blocker
 // using दृश्य, which will never be seen by tim cook
 var shownClass = 'drishy';
-
-var strings = {
-  process: 'Your payment is being processed',
-};
 
 /**
  * Temp stores for Cardless EMI & PayLater.
@@ -90,7 +88,7 @@ var PayLaterStore = {
 var BackStore = null;
 
 function confirmClose() {
-  return confirm(discreet.confirmCancelMsg);
+  return confirm(I18n.format('misc.confirm_cancel'));
 }
 
 /**
@@ -252,6 +250,7 @@ function hideFeeWrap() {
 
 function hideOverlayMessage() {
   var session = SessionManager.getSession();
+  session.preventErrorDismissal = false;
   if (!hideEmi() && !hideFeeWrap() && !session.hideSvelteOverlay()) {
     if (session.tab === 'nach') {
       if (!session.nachScreen.shouldHideOverlay()) {
@@ -284,9 +283,18 @@ function errorHandler(response) {
   }
 
   var error = response.error;
-  var message = error.description;
+  var untranslatedMessage = error.description;
 
-  if (message === discreet.cancelMsg) {
+  var message = I18n.translateErrorDescription(
+    untranslatedMessage,
+    I18n.getCurrentLocale()
+  );
+
+  error.description = message;
+  var cancelMsg = I18n.format('misc.payment_canceled');
+
+  // Both checks are there because API still returns message in English.
+  if (message === cancelMsg || message === discreet.cancelMsg) {
     if (this.powerwallet) {
       // prevent payment canceled error
       this.powerwallet = null;
@@ -302,7 +310,7 @@ function errorHandler(response) {
   var payload = this.payload;
 
   this.clearRequest();
-
+  updateScore('failedPayment');
   Analytics.track('error', {
     data: response,
   });
@@ -362,6 +370,7 @@ function errorHandler(response) {
           if (message) {
             $(help).html(message);
           }
+          updateScore('clickOnSubmitWithoutDetails');
           Form.shake();
           return hideOverlayMessage();
         }
@@ -369,9 +378,9 @@ function errorHandler(response) {
     }
   }
 
-  if (this.tab || message !== discreet.cancelMsg) {
+  if (this.tab || (message !== cancelMsg && message !== discreet.cancelMsg)) {
     this.showLoadError(
-      message || 'There was an error in handling your request',
+      message || I18n.format('misc.error_handling_request'),
       true
     );
   }
@@ -384,7 +393,7 @@ function cancelHandler(response) {
   if (!this.payload) {
     return;
   }
-
+  updateScore('cancelledPayment');
   Analytics.setMeta('payment.cancelled', true);
   this.markHeadlessFailed();
 
@@ -393,7 +402,7 @@ function cancelHandler(response) {
       discreet.UPIUtils.trackUPIIntentFailure(this.r._payment.upi_app);
     }
 
-    this.showLoadError('Payment did not complete.', true);
+    this.showLoadError(I18n.format('misc.payment_incomplete'), true);
   } else if (
     /^(card|emi)$/.test(this.payload.method) &&
     this.screen &&
@@ -573,8 +582,8 @@ function askOTP(view, textView, shouldLimitResend, templateData) {
                 setTimeout(function() {
                   Analytics.track('native_otp:timeout');
                   thisSession.showLoadError(
-                    'Payment was not completed on time',
-                    1
+                    I18n.format('misc.payment_timeout'),
+                    true
                   );
                 }, 300);
               }
@@ -599,12 +608,13 @@ function askOTP(view, textView, shouldLimitResend, templateData) {
 // this === Session
 function successHandler(response) {
   if (this.preferredInstrument) {
+    updateScore('savedInstrument');
     P13n.recordSuccess(
       this.preferredInstrument,
       this.getCurrentCustomer(this.payload && this.payload.contact)
     );
   }
-
+  updateScore('paymentSuccess');
   this.clearRequest();
   // prevent dismiss event
   this.modal.options.onhide = noop;
@@ -798,6 +808,10 @@ Session.prototype = {
     var tab = oldMethod || this.get('prefill.method');
 
     if (tab) {
+      updateScore('hadMethodPrefilled');
+    }
+
+    if (tab) {
       var optional = {
         contact: Store.isContactOptional(),
         email: Store.isEmailOptional(),
@@ -974,7 +988,7 @@ Session.prototype = {
             discreet.UPIUtils.trackUPIIntentFailure(self.r._payment.upi_app);
           }
 
-          self.showLoadError('Payment did not complete.', true);
+          self.showLoadError(I18n.format('misc.payment_incomplete'), true);
           self.clearRequest(discreet.UPIUtils.upiBackCancel);
         };
 
@@ -1026,7 +1040,6 @@ Session.prototype = {
 
     this.isOpen = true;
 
-    discreet.initI18n();
     this.setExperiments();
     this.improviseModalOptions();
     this.getEl();
@@ -1080,6 +1093,7 @@ Session.prototype = {
         embedded: this.embedded,
       },
     });
+    updateScore('timeToRender');
     Analytics.setMeta('timeSince.render', discreet.timer());
   },
 
@@ -1095,6 +1109,7 @@ Session.prototype = {
 
   setSvelteComponents: function() {
     this.setUpiCancelReasonPicker();
+    this.setNbCancelReasonPicker();
     if (!Store.isPayout()) {
       this.setHomeTab();
     }
@@ -1503,9 +1518,10 @@ Session.prototype = {
     }
 
     this.checkCustomerStatus(params, function(error) {
+      var locale = I18n.getCurrentLocale();
       if (error) {
         PayLaterStore.userRegistered = false;
-        self.showLoadError(error, true);
+        self.showLoadError(I18n.translateErrorDescription(error, locale), true);
         return;
       }
 
@@ -1517,7 +1533,6 @@ Session.prototype = {
         otpMessageView = 'otp_resent_successful';
       }
 
-      var locale = I18n.getCurrentLocale();
       askOTP(self.otpView, otpMessageView, true, {
         phone: getPhone(),
         provider: I18n.getPaylaterProviderName(providerCode, locale),
@@ -1795,7 +1810,24 @@ Session.prototype = {
         return this.clearRequest();
       }
 
+      if (
+        this.payload &&
+        this.payload.method === 'netbanking' &&
+        _Obj.getSafely(this.r, '_payment.popup.window.closed')
+      ) {
+        // Called when the popup for netbanking has been closed by the user
+        // and the netbanking cancellation modal is open
+        // returning from this point prevents confirmClose from being called because it's not needed
+        return;
+      }
+
+      var paymentMethod = this.payload.method;
+
       self.confirmClose().then(function(close) {
+        if (paymentMethod == 'netbanking' && close) {
+          self.r._payment.popup.onClose();
+          return;
+        }
         if (close) {
           self.clearRequest();
           if (Bridge.checkout.platform === 'ios') {
@@ -1909,6 +1941,7 @@ Session.prototype = {
     } else {
       var self = this;
       this.getCurrentCustomer().createOTP(function(message) {
+        // TODO: check how message is being consumed. Possible bug.
         askOTP(self.otpView, message, true, { phone: getPhone() });
         self.updateCustomerInStore();
       });
@@ -1922,7 +1955,7 @@ Session.prototype = {
         immediately: true,
       });
       this.hideTimer();
-      this.showLoadError('Waiting for payment to complete on bank page');
+      this.showLoadError(I18n.format('misc.payment_waiting_on_bank'));
       return this.r._payment.gotoBank();
     }
     var payload = this.payload;
@@ -2283,7 +2316,9 @@ Session.prototype = {
 
     // TODO remove this from here
     // check cardTab.setEmiPlansCta for details
-    cardTab.setEmiPlansCta(screen, this.tab);
+    if (screen !== 'upi') {
+      cardTab.setEmiPlansCta(screen, this.tab);
+    }
 
     if (this.offers) {
       this.offers.renderTab(this.tab);
@@ -2475,6 +2510,8 @@ Session.prototype = {
 
     if (storeGetter(HomeScreenStore.selectedInstrumentId) === instrument.id) {
       // Do not switch tabs
+    } else if (offer && offer.payment_method === 'emi') {
+      this.switchTab('emi');
     } else {
       this.switchTab('');
 
@@ -2699,11 +2736,21 @@ Session.prototype = {
   trackEvent: function(eventName, data) {
     Analytics.track(eventName, data);
   },
-
+  tabSwitchStart: 0,
+  tabsCount: 0,
   switchTab: function(tab) {
     /**
      * Validate fields on common screen.
      */
+    this.tabsCount++;
+    if (this.tabsCount > 5) {
+      updateScore('switchingTabs', { tabsCount: this.tabsCount });
+    }
+    var diff = 0;
+    if (this.tabSwitchStart > 0) {
+      diff = (Date.now() - this.tabSwitchStart) / 1000;
+    }
+    this.tabSwitchStart = Date.now();
     if (!this.tab) {
       if (!this.checkCommonValidAndTrackIfInvalid()) {
         return;
@@ -2714,9 +2761,9 @@ Session.prototype = {
       data: {
         from: this.tab,
         to: tab,
+        timeSpentInTab: diff > 0 ? diff : 'NA',
       },
     });
-
     Analytics.setMeta('tab', tab);
     Analytics.setMeta('timeSince.tab', discreet.timer());
 
@@ -3256,6 +3303,7 @@ Session.prototype = {
     }
     var invalids = $(parent).find('.invalid');
     if (invalids && invalids[0]) {
+      updateScore('clickOnSubmitWithoutDetails');
       Form.shake();
       var invalidInput =
         $(invalids[0]).find('.input')[0] ||
@@ -3386,7 +3434,12 @@ Session.prototype = {
     var self = this;
     if (this.isOpen) {
       if (confirmedCancel !== true && this.r._payment) {
-        self.confirmClose();
+        // confirm close returns a promise which is resolved/rejected as per uder's confirmation to close
+        self.confirmClose().then(function(confirmed) {
+          if (confirmed) {
+            self.back(true);
+          }
+        });
         return;
       }
 
@@ -3397,17 +3450,21 @@ Session.prototype = {
     }
   },
 
-  showLoadError: function(text, error) {
+  showLoadError: function(text, error, preventDismissal) {
+    this.preventErrorDismissal = preventDismissal;
     if (this.headless && this.screen === 'card') {
       return;
     }
 
     var actionState;
     var loadingState = true;
+
+    var cancelMsg = I18n.format('misc.payment_canceled');
+
     if (error) {
       if (
         (this.screen === 'upi' || this.screen === 'upi_otm') &&
-        text === discreet.cancelMsg
+        (text === cancelMsg || text === discreet.cancelMsg)
       ) {
         if (this.payload && this.payload['_[flow]'] === 'intent') {
           return;
@@ -3421,7 +3478,7 @@ Session.prototype = {
     }
 
     if (!text) {
-      text = strings.process;
+      text = I18n.format('misc.payment_processing');
     }
 
     if (this.screen === 'otp') {
@@ -3485,6 +3542,12 @@ Session.prototype = {
   setUpiCancelReasonPicker: function() {
     this.upiCancelReasonPicker = new discreet.UpiCancelReasonPicker({
       target: _Doc.querySelector('#cancel_upi'),
+    });
+  },
+
+  setNbCancelReasonPicker: function() {
+    this.nbCancelReasonPicker = new discreet.NetbankingCancelReasonPicker({
+      target: _Doc.querySelector('#error-message'),
     });
   },
 
@@ -3753,6 +3816,7 @@ Session.prototype = {
         queryParams
       );
     } else {
+      updateScore('clickOnSubmitWithoutDetails');
       Form.shake();
     }
   },
@@ -3808,6 +3872,37 @@ Session.prototype = {
 
     _Obj.loop(CardlessEmiStore, function(value, key) {
       delete value[provider];
+    });
+  },
+
+  showConversionChargesCallout: function() {
+    var locale = I18n.getCurrentLocale();
+
+    this.svelteOverlay.$set({
+      component: discreet.UserConfirmationOverlay,
+      props: {
+        buttonText: I18n.formatMessageWithLocale('cta.continue', locale),
+        callout: I18n.formatMessageWithLocale(
+          'card.international_currency_charges',
+          locale
+        ),
+      },
+    });
+
+    var that = this;
+
+    this.showSvelteOverlay();
+    var clearActionListener = that.svelteOverlay.$on('action', function(event) {
+      var action = event.detail.action;
+      if (action === 'confirm') {
+        that.hideSvelteOverlay();
+        Backdrop.hide();
+        that.submit();
+      }
+    });
+    var clearHideListener = that.svelteOverlay.$on('hidden', function() {
+      clearActionListener();
+      clearHideListener();
     });
   },
 
@@ -3915,7 +4010,10 @@ Session.prototype = {
           // also without this, cardsaving is triggered before API returning unsupported card error
           var cardType = discreet.storeGetter(CardScreenStore.cardType);
           if (!MethodStore.isAMEXEnabled() && cardType === 'amex') {
-            return this.showLoadError('AMEX cards are not supported', true);
+            return this.showLoadError(
+              I18n.format('card.card_number_help_amex'),
+              true
+            );
           }
         } else if (!data['card[cvv]']) {
           var checkedCard = $('.saved-card.checked');
@@ -3936,6 +4034,7 @@ Session.prototype = {
           ) {
             // no saved card was selected
             Analytics.track('shake:saved-cvv');
+            updateScore('clickOnSubmitWithoutDetails');
             Form.shake();
             return $('.checked .saved-cvv input').focus();
           }
@@ -3953,8 +4052,13 @@ Session.prototype = {
              */
             if (!data.token && !this.emiPlansForNewCard) {
               Analytics.track('shake:no-emi-plans');
+              updateScore('clickOnSubmitWithoutDetails');
               Form.shake();
               return $('#card_number').focus();
+            }
+
+            if (this.checkInvalid()) {
+              return;
             }
 
             if (!data.emi_duration) {
@@ -4034,6 +4138,7 @@ Session.prototype = {
             data['card[cvv]'] = cvvInput.value;
           } else {
             cvvInput.focus();
+            updateScore('clickOnSubmitWithoutDetails');
             return Form.shake();
           }
         }
@@ -4041,6 +4146,13 @@ Session.prototype = {
     } else if (data.method === 'paypal') {
       // Let method=paypal payments go through directly
     } else {
+      return;
+    }
+
+    if (
+      discreet.storeGetter(CardScreenStore.internationalCurrencyCalloutNeeded)
+    ) {
+      this.showConversionChargesCallout();
       return;
     }
 
@@ -4061,10 +4173,7 @@ Session.prototype = {
 
   verifyVpaAndContinue: function(data) {
     var self = this;
-    var locale = I18n.getCurrentLocale();
-    self.showLoadError(
-      I18n.formatMessageWithLocale('upi.verifying_vpa_info', locale)
-    );
+    self.showLoadError(I18n.format('upi.verifying_vpa_info'));
     $('#overlay-close').hide();
 
     self
@@ -4079,10 +4188,13 @@ Session.prototype = {
         }, 200);
       })
       .catch(function(vpaValidationError) {
+        var defaultErrorMessage = I18n.format(
+          'upi.invalid_vpa_default_message'
+        );
         var vpaValidationDescription = _Obj.getSafely(
           vpaValidationError,
           'error.description',
-          'Invalid VPA, please try again with correct VPA'
+          defaultErrorMessage
         );
 
         self.showLoadError(vpaValidationDescription, true);
@@ -4090,12 +4202,12 @@ Session.prototype = {
   },
 
   submit: function(props) {
+    var locale = I18n.getCurrentLocale();
     if (!props) {
       props = {};
     }
     var vpaVerified = props.vpaVerified;
     var data = this.payload;
-
     var goto_payment = '#error-message .link';
     var redirectableMethods = ['card', 'netbanking', 'wallet'];
     if (
@@ -4105,6 +4217,11 @@ Session.prototype = {
       $(goto_payment).hide();
     }
 
+    if (this.data && this.data.method === 'netbanking' && !this.data.bank) {
+      Analytics.track('netbanking:bank:empty', {
+        type: AnalyticsTypes.DEBUG,
+      });
+    }
     if (this.r._payment) {
       /**
        * For Cardless EMI, payments are created at the first step,
@@ -4137,6 +4254,13 @@ Session.prototype = {
 
     if (this.tab === 'nach') {
       shouldContinue = this.nachScreen.shouldSubmit();
+    }
+
+    if (this.tab === 'upi') {
+      shouldContinue = this.upiTab.shouldSubmit();
+      if (!shouldContinue) {
+        this.upiTab.updateStep();
+      }
     }
 
     if (!shouldContinue) {
@@ -4289,11 +4413,17 @@ Session.prototype = {
       request.gpay = true;
     }
 
-    var appliedOffer = this.getAppliedOffer();
+    // added rewardIds to the create payment request
+    var rewardIds = storeGetter(rewardsStore);
+    if (rewardIds && rewardIds.length > 0 && !Store.isContactEmailOptional()) {
+      data.reward_ids = rewardIds;
+    }
 
+    var appliedOffer = this.getAppliedOffer();
     if (appliedOffer && (!this.offers || this.offers.shouldSendOfferToApi())) {
       data.offer_id = appliedOffer.id;
       this.r.display_amount = appliedOffer.amount;
+      updateScore('affordability_offers');
       Analytics.track('offers:applied_with_payment', {
         data: appliedOffer,
       });
@@ -4592,7 +4722,6 @@ Session.prototype = {
         allowSkip: false,
       });
       this.topBar.setTitleOverride('otp', 'image', walletObj.logo);
-      var locale = I18n.getCurrentLocale();
       this.commenceOTP('wallet_sending', 'wallet_enter', {
         wallet: I18n.getWalletName(walletObj.code, locale),
       });
@@ -4701,19 +4830,16 @@ Session.prototype = {
         }, this)
       );
     } else if (data.method === 'upi') {
-      sub_link.html('Cancel Payment');
+      sub_link.html(I18n.format('misc.cancel_action'));
 
       this.r.on('payment.upi.noapp', function(data) {
-        that.showLoadError(
-          'No UPI App on this device. Select other UPI option to proceed.',
-          true
-        );
+        that.showLoadError(I18n.format('upi.intent_no_apps_error'), true);
 
         that.body.addClass('upi-noapp');
       });
 
       this.r.on('payment.upi.selectapp', function(data) {
-        that.showLoadError('Select UPI App in your device', false);
+        that.showLoadError(I18n.format('upi.intent_select_app'), false);
       });
 
       this.r.on('payment.upi.coproto_response', function(response) {
@@ -4725,12 +4851,12 @@ Session.prototype = {
 
       this.r.on('payment.upi.pending', function(data) {
         if (data && data.flow === 'upi-intent') {
-          return that.showLoadError('Waiting for payment confirmation.');
+          return that.showLoadError(
+            I18n.format('misc.payment_waiting_confirmation')
+          );
         }
 
-        that.showLoadError(
-          "Please accept the request from Razorpay's VPA on your UPI app"
-        );
+        that.showLoadError(I18n.format('upi.intent_accept_request'));
       });
     } else if (data.method === 'app') {
       var appName = 'app';
@@ -4775,11 +4901,10 @@ Session.prototype = {
       return that.showLoadError();
     } else {
       if (!this.headless) {
-        sub_link.html('Go to payment');
-        this.r.on(
-          'payment.cancel',
-          bind('showLoadError', this, discreet.cancelMsg, true)
-        );
+        sub_link.html(I18n.format('misc.go_to_payment'));
+        this.r.on('payment.cancel', function() {
+          that.showLoadError(I18n.format('misc.payment_canceled'), true);
+        });
       }
     }
   },
@@ -4851,6 +4976,7 @@ Session.prototype = {
       'languageSelectionView',
       'svelteOverlay',
       'upiCancelReasonPicker',
+      'nbCancelReasonPicker',
       'timer',
     ];
 
@@ -5000,13 +5126,10 @@ Session.prototype = {
   },
 
   setLanguageDropdown: function() {
-    var features = this.preferences.features || {};
-    if (features.vernacular) {
-      var target = _Doc.querySelector('#language-dropdown');
-      this.languageSelectionView = new discreet.languageSelectionView({
-        target: target,
-      });
-    }
+    var target = _Doc.querySelector('#language-dropdown');
+    this.languageSelectionView = new discreet.languageSelectionView({
+      target: target,
+    });
   },
 
   /**
@@ -5186,6 +5309,7 @@ Session.prototype = {
   },
 
   hideOverlayMessage: hideOverlayMessage,
+  hideOverlay: hideOverlay,
   errorHandler: errorHandler,
   successHandler: successHandler,
 };

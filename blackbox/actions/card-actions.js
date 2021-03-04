@@ -152,6 +152,13 @@ async function enterCardDetails(
   await context.page.type('#card_cvv', visa ? '111' : '1111');
 }
 
+async function agreeToAMEXCurrencyCharges(context) {
+  // needed for overlay animation
+  await delay(200);
+  context.page.click('#overlay-wrap .btn');
+  await delay(200);
+}
+
 async function handleCustomerCardStatusRequest(context, cardType) {
   const req = await context.expectRequest();
   expect(req.url).toContain('customers/status');
@@ -463,4 +470,5 @@ module.exports = {
   handleAppCreatePayment,
   handleAppPaymentStatus,
   assertOTPElementsForBEPG,
+  agreeToAMEXCurrencyCharges,
 };
