@@ -2453,10 +2453,10 @@ Session.prototype = {
         }
       }
     };
-
+    
     if (screen === 'wallet') {
       // Select wallet
-      if (issuer) {
+      if (issuer && this.walletTab) {
         this.walletTab.onWalletSelection(issuer);
       }
     } else if (screen === 'netbanking') {
@@ -2494,7 +2494,6 @@ Session.prototype = {
      * Get the first instrument that can work with the offer
      * and select it if not already selected
      */
-
     var instrument = discreet.Offers.getInstrumentToSelectForOffer(offer);
 
     if (!instrument) {
