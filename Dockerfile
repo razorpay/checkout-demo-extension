@@ -39,6 +39,12 @@ RUN mkdir -p /app/dist/v1 \
 COPY --from=builder /checkout_build/app/dist/v1/* /app/dist/v1/
 COPY --from=builder /checkout_build/app/dist/v1/css/* /app/dist/v1/css/
 
+RUN mkdir -p /app/dist/original \
+    && mkdir -p /app/dist/original/css
+
+COPY --from=builder /checkout_build/app/dist/v1/* /app/dist/original/
+COPY --from=builder /checkout_build/app/dist/v1/css/* /app/dist/original/css/
+
 WORKDIR /app/dist/v1
 
 # Rename *.x.gz to *.x so that we serve gzipped files
@@ -68,8 +74,8 @@ RUN wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/
     && mkdir -p /app/dist/v1/css
 
 ## Multi stage copy does not currently work with recursive directories. Hence, making explicit copy here for each of the subfolders
-COPY --from=aws /app/dist/v1/* /app/dist/v1/
-COPY --from=aws /app/dist/v1/css/* /app/dist/v1/css/
+COPY --from=aws /app/dist/original/* /app/dist/v1/
+COPY --from=aws /app/dist/original/css/* /app/dist/v1/css/
 
 WORKDIR /app
 
