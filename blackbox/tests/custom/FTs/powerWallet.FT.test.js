@@ -11,25 +11,24 @@ describe('FreeCharge - Custom Checkout FTs', () => {
     const { currentTestName } = expect.getState();
     let isCallbackURL = currentTestName.toLowerCase().includes('callback url');
     context = await initCustomCheckout({ page, isCallbackURL });
+    const paymentData = getPaymentPayload(flow);
+    await page.evaluate(async data => {
+      window.rp.createPayment(data);
+    }, paymentData);
   });
   afterEach(async () => {
     page.removeAllListeners('request');
   });
 
   test('powerwallet Freecharge - Success - Custom Checkout', async () => {
-    const paymentData = getPaymentPayload(flow);
-    await page.evaluate(async data => {
-      window.rp.createPayment(data);
-    }, paymentData);
-
     await context.expectRequest(req => {});
     // mock create payment and trigger send OTP
     const createPaymentResponse = mockAPI.ajaxResponse(flow);
     await context.respondJSON(createPaymentResponse);
 
-    await page.evaluate(async data => {
+    await page.evaluate(async () => {
       window.rp.submitOTP(123456);
-    }, paymentData);
+    });
     await context.expectRequest(req => {});
     const req = await context.getRequest();
     // verify payload of request
@@ -42,19 +41,14 @@ describe('FreeCharge - Custom Checkout FTs', () => {
   });
 
   test('powerwallet Freecharge - Insufficient Fund - Custom Checkout', async () => {
-    const paymentData = getPaymentPayload(flow);
-    await page.evaluate(async data => {
-      window.rp.createPayment(data);
-    }, paymentData);
-
     await context.expectRequest(req => {});
     // mock create payment and trigger send OTP
     const createPaymentResponse = mockAPI.ajaxResponse(flow);
     await context.respondJSON(createPaymentResponse);
 
-    await page.evaluate(async data => {
+    await page.evaluate(async () => {
       window.rp.submitOTP(123456);
-    }, paymentData);
+    });
     await context.expectRequest(req => {});
     let req = await context.getRequest();
     // verify payload of request
@@ -86,19 +80,14 @@ describe('FreeCharge - Custom Checkout FTs', () => {
   });
 
   test('powerwallet Freecharge - Insufficient Fund - Redirect Callback URL - Custom Checkout', async () => {
-    const paymentData = getPaymentPayload(flow);
-    await page.evaluate(async data => {
-      window.rp.createPayment(data);
-    }, paymentData);
-
     await context.expectRequest(req => {});
     // mock create payment and trigger send OTP
     const createPaymentResponse = mockAPI.ajaxResponse(flow);
     await context.respondJSON(createPaymentResponse);
 
-    await page.evaluate(async data => {
+    await page.evaluate(async () => {
       window.rp.submitOTP(123456);
-    }, paymentData);
+    });
     await context.expectRequest(req => {});
     let req = await context.getRequest();
     // verify payload of request

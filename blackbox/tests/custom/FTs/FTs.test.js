@@ -14,7 +14,15 @@ describe.each(flowTests)('Validate Flow', flow => {
       let isCallbackURL = currentTestName
         .toLowerCase()
         .includes('callback url');
-      context = await initCustomCheckout({ page, isCallbackURL });
+      context = await initCustomCheckout({
+        page,
+        isCallbackURL,
+        flowName: flow.type,
+      });
+      const paymentData = getPaymentPayload(flow.type);
+      await page.evaluate(async data => {
+        window.rp.createPayment(data);
+      }, paymentData);
     });
     afterEach(async () => {
       page.removeAllListeners('request');
@@ -23,10 +31,6 @@ describe.each(flowTests)('Validate Flow', flow => {
       /**
        * Trigger payment flow
        */
-      const paymentData = getPaymentPayload(flow.type);
-      await page.evaluate(async data => {
-        window.rp.createPayment(data);
-      }, paymentData);
       await context.expectRequest(req => {});
       // mock create payment
       const createPaymentResponse = mockAPI.ajaxResponse(flow.type);
@@ -58,10 +62,7 @@ describe.each(flowTests)('Validate Flow', flow => {
       /**
        * Trigger payment flow
        */
-      const paymentData = getPaymentPayload(flow.type);
-      await page.evaluate(async data => {
-        window.rp.createPayment(data);
-      }, paymentData);
+
       await context.expectRequest(req => {});
       // mock create payment
       const createPaymentResponse = mockAPI.ajaxResponse(flow.type);
@@ -97,10 +98,6 @@ describe.each(flowTests)('Validate Flow', flow => {
 
       await context.disableInterceptor();
 
-      const paymentData = getPaymentPayload(flow.type);
-      await page.evaluate(async data => {
-        window.rp.createPayment(data);
-      }, paymentData);
       await page.waitForNavigation();
       await page.click('button.success');
       await page.waitForNavigation();
@@ -119,10 +116,6 @@ describe.each(flowTests)('Validate Flow', flow => {
 
       await context.disableInterceptor();
 
-      const paymentData = getPaymentPayload(flow.type);
-      await page.evaluate(async data => {
-        window.rp.createPayment(data);
-      }, paymentData);
       await page.waitForNavigation();
       await page.click('button.danger');
       await page.waitForNavigation();

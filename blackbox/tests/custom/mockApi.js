@@ -1,6 +1,38 @@
 module.exports = {
   ajaxResponse: (method = '', override = {}) => {
+    const defaultResponse = {
+      version: 1,
+      payment_id: 'pay_GcGmzHFHZZzq74',
+      gateway:
+        'eyJpdiI6IjhBM3dFWTkyZk5laHl2a0ZtRkZJZWc9PSIsInZhbHVlIjoiS2FaREFUZGo5QjZua0orUlFHVjRjQzk3TXNGbFdiVE9aZ3U5djRnN2VXTzRBd0t5Q3VTcEdRNndOM0FjcEVUOCIsIm1hYyI6IjY4OGRmOGUzNjhjNTM4YjBjODY0MGM2MGEwOTgwY2ZmMDQyNjljZGVjMDI5NzAwZmE1M2UzNmI4OTRkM2FkNTEifQ==',
+      contact: '+919257316342',
+      amount: '1.00',
+      formatted_amount: '₹ 1',
+      merchant: 'Razorpay',
+      merchant_id: '2aTeFCKTYWwfrF',
+      theme_color: '#528FF0',
+      nobranding: false,
+      org_logo: '',
+      org_name: 'Razorpay Software Private Ltd',
+      checkout_logo:
+        'https://dashboard-activation.s3.amazonaws.com/org_100000razorpay/checkout_logo/phpnHMpJe',
+      custom_branding: false,
+      ...override,
+    };
     switch (method) {
+      case 'upicollect': {
+        return {
+          type: 'async',
+          method: 'upi',
+          provider: null,
+          request: {
+            url:
+              'https://api.razorpay.com/v1/payments/pay_GicHVTbH92uewn/status?key_id=rzp_test_1DP5mmOlF5G5ag',
+            method: 'GET',
+          },
+          ...defaultResponse,
+        };
+      }
       case 'wallet':
         return {
           type: 'first',
@@ -10,7 +42,7 @@ module.exports = {
             method: 'post',
             content: {
               action: 'authorize',
-              amount: 1000,
+              amount: 100,
               method: 'wallet',
               payment_id: 'GfP2XSCEReNSk4',
               callback_url:
@@ -18,19 +50,9 @@ module.exports = {
               recurring: 0,
             },
           },
-          version: 1,
-          payment_id: 'pay_GfP2XSCEReNSk4',
-          gateway:
-            'eyJpdiI6IlhwT0I1TkNZSUZKMEhkYjdVcGl2RkE9PSIsInZhbHVlIjoidFdsRHpuUG1rb0piWmRsZ0IyQW1lVytGY2VBem1KOW5HXC9rbGhWdkpad1k9IiwibWFjIjoiZTUzNTk3ZWIxYmIzY2Q2OTAwMzc5YzQwMjc0NDhlNzA5M2VmZWI2NTg4YmE4NTI0ZTNhZDBlOGM1ZTVkNWM5ZiJ9',
-          amount: '₹ 10',
           image: 'https://cdn.razorpay.com/logos/GS8xtzE45HDhNT_medium.png',
           magic: false,
-          org_logo: '',
-          org_name: 'Razorpay Software Private Ltd',
-          checkout_logo:
-            'https://dashboard-activation.s3.amazonaws.com/org_100000razorpay/checkout_logo/phpnHMpJe',
-          custom_branding: false,
-          ...override,
+          ...defaultResponse,
         };
       case 'powerwallet':
         return {
@@ -41,24 +63,8 @@ module.exports = {
             method: 'post',
             content: { next: ['resend_otp'] },
           },
-          version: 1,
-          payment_id: 'pay_GcGmzHFHZZzq74',
-          gateway:
-            'eyJpdiI6IjhBM3dFWTkyZk5laHl2a0ZtRkZJZWc9PSIsInZhbHVlIjoiS2FaREFUZGo5QjZua0orUlFHVjRjQzk3TXNGbFdiVE9aZ3U5djRnN2VXTzRBd0t5Q3VTcEdRNndOM0FjcEVUOCIsIm1hYyI6IjY4OGRmOGUzNjhjNTM4YjBjODY0MGM2MGEwOTgwY2ZmMDQyNjljZGVjMDI5NzAwZmE1M2UzNmI4OTRkM2FkNTEifQ==',
-          contact: '+919257316342',
-          amount: '1.00',
-          formatted_amount: '₹ 1',
           wallet: 'freecharge',
-          merchant: 'Razorpay',
-          merchant_id: '2aTeFCKTYWwfrF',
-          theme_color: '#528FF0',
-          nobranding: false,
-          org_logo: '',
-          org_name: 'Razorpay Software Private Ltd',
-          checkout_logo:
-            'https://dashboard-activation.s3.amazonaws.com/org_100000razorpay/checkout_logo/phpnHMpJe',
-          custom_branding: false,
-          ...override,
+          ...defaultResponse,
         };
       case 'card':
       default:
@@ -69,11 +75,7 @@ module.exports = {
             method: 'get',
             content: [],
           },
-          version: 1,
-          payment_id: 'pay_GcGmzHFHZZzq74',
           next: ['otp_submit', 'otp_resend'],
-          gateway:
-            'eyJpdiI6InFVZ3hWbTdzWjR4aDBGZUFCUDJldEE9PSIsInZhbHVlIjoiVTVkSTFhZHlIU1VcL2IzUHFlYkk3em9GYzhyN2dHR3Fqd0hOWHVlN2UzcTQ9IiwibWFjIjoiNzBiMzA1NGZmODE0ZDYyMTVlZWM0M2E3MTU3ZWVkMzZlYjJhNzYyZjVhNGI1MmQzMDkzZDVmNzIxNWRlOGZkOSJ9',
           submit_url:
             'https://api.razorpay.com/v1/payments/pay_GcGmzHFHZZzq74/otp_submit/5c032824cafd8fc967bb515cd0c68be971193be5?key_id=rzp_test_1DP5mmOlF5G5ag',
           resend_url:
@@ -92,12 +94,7 @@ module.exports = {
             'https://api.razorpay.com/v1/payments/pay_GcGmzHFHZZzq74/otp/submit',
           resend_url_private:
             'https://api.razorpay.com/v1/payments/pay_GcGmzHFHZZzq74/otp/resend',
-          org_logo: '',
-          org_name: 'Razorpay Software Private Ltd',
-          checkout_logo:
-            'https://dashboard-activation.s3.amazonaws.com/org_100000razorpay/checkout_logo/phpnHMpJe',
-          custom_branding: false,
-          ...override,
+          ...defaultResponse,
         };
     }
   },
@@ -3782,7 +3779,7 @@ module.exports = {
     resend_url_private:
       'https://api.razorpay.com/v1/payments/pay_GcDqre4nqakb46/otp/resend',
   }),
-  submitOTP: () => ({ razorpay_payment_id: 'pay_123465' }),
+  submitOTP: () => ({ http_status_code: 200, razorpay_payment_id: 'pay_123465' }),
   iinResponse: () => ({
     flows: {
       recurring: false,

@@ -27,6 +27,7 @@ exports.getPaymentPayload = (method = 'card', override = {}) => {
     case 'netbanking': {
       data.method = 'netbanking';
       data.bank = 'SBIN';
+      break;
     }
     case 'emi': {
       data = {
@@ -39,6 +40,7 @@ exports.getPaymentPayload = (method = 'card', override = {}) => {
         'card[expiry_month]': '10',
         'card[expiry_year]': '22',
       };
+      break;
     }
     case 'wallet': {
       data = {
@@ -46,6 +48,7 @@ exports.getPaymentPayload = (method = 'card', override = {}) => {
         method: 'wallet',
         wallet: 'phonepe',
       };
+      break;
     }
     case 'powerwallet': {
       data = {
@@ -53,6 +56,18 @@ exports.getPaymentPayload = (method = 'card', override = {}) => {
         method: 'wallet',
         wallet: 'freecharge',
       };
+      break;
+    }
+    case 'upicollect': {
+      data = {
+        ...data,
+        method: 'upi',
+        upi: {
+          vpa: 'testing@ybl',
+          flow: 'collect',
+        },
+      };
+      break;
     }
     default:
       break;
