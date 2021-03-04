@@ -233,6 +233,8 @@ export default {
       hdfc: 'HDFC Bank',
       idfb: 'IDFC First Bank',
       kkbk: 'Kotak Mahindra Bank',
+      icic: 'ICICI Bank',
+      hcin: 'Home Credit Ujjwal Card',
     },
     select_option_title: 'Select an option',
   },
