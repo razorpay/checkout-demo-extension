@@ -625,6 +625,7 @@ function Session(message) {
   var options = message.options;
   var self = this;
 
+
   this.r = Razorpay(options);
   this.get = this.r.get;
   this.set = this.r.set;
