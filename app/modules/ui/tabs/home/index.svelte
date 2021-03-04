@@ -114,6 +114,8 @@
 
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
+  import updateScore from 'analytics/checkoutScore';
+
   import { getCardOffer, hasOffersOnHomescreen } from 'checkoutframe/offers';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
   import { isInstrumentGrouped } from 'configurability/instruments';
@@ -333,6 +335,10 @@
           }
         } else {
           instrumentsSource = SOURCES.API;
+        }
+        // Prevent p13n v2 from being used for anonnymous users
+        if (!$customer.logged) {
+          instrumentsSource = SOURCES.STORAGE;
         }
 
         // The function that returns the promise to be returned
@@ -849,6 +855,8 @@
   export function onSelectInstrument(event) {
     const instrument = event.detail;
 
+    updateScore('instrumentSelected');
+
     $selectedInstrumentId = instrument.id;
 
     if (isInstrumentGrouped(instrument)) {
@@ -953,7 +961,7 @@
           in:slide={getAnimationOptions({ duration: 400 })}
           out:fly={getAnimationOptions({ duration: 200, y: 80 })}>
           {#if trustedBadgeHighlights}
-            <TrustedBadge list={trustedBadgeHighlights} />
+            <TrustedBadge nos={trustedBadgeHighlights} />
           {/if}
           {#if showUserDetailsStrip || isPartialPayment}
             <div

@@ -29,7 +29,7 @@
 
   // i18n
   import { t, locale } from 'svelte-i18n';
-  import { formatTemplateWithLocale } from 'i18n';
+  import { formatTemplateWithLocale, translateErrorDescription } from 'i18n';
 
   import {
     ALLOWED_FORMATS_INFO,
@@ -186,7 +186,10 @@
 
     // Wait for overlay to be hidden before showing it again
     setTimeout(() => {
-      session.showLoadError(error.description, true);
+      session.showLoadError(
+        translateErrorDescription(error.description, $locale),
+        true
+      );
     }, 300);
   }
 

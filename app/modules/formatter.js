@@ -163,6 +163,10 @@ Formatter.rules = {
 
     isValid: function() {
       if (this.value.length === 4) {
+        let monthValue = parseInt(this.value.slice(0, 2), 10);
+        if (monthValue > 12) {
+          return false;
+        }
         let yearValue = parseInt(this.value.slice(2), 10);
         let currentTime = new Date();
         let currentYear = currentTime.getFullYear() - 2000;

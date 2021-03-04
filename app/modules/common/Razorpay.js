@@ -257,6 +257,41 @@ RazorProto.calculateFees = function(payload) {
   });
 };
 
+/**
+ * Used for creating and fetching the VA.
+ * Resolves and rejects with a JSON.
+ * @param {payload} Object
+ *
+ * @returns {Promise}
+ */
+RazorProto.fetchVirtualAccount = function({ customer_id, order_id, notes }) {
+  return new Promise((resolve, reject) => {
+    if(!order_id) {
+      reject("Order ID is required to fetch the account details")
+      return
+    }
+    let data = { customer_id, notes };
+    if(!customer_id) {
+      delete data.customer_id;
+    }
+    if (!notes) {
+      delete data.notes;
+    }
+    const url = makeUrl(`orders/${order_id}/virtual_accounts?x_entity_id=${order_id}`)
+    fetch.post({
+      url,
+      data,
+      callback: function(response) {
+        if (response.error) {
+          return reject(response);
+        } else {
+          return resolve(response);
+        }
+      },
+    });
+  });
+}
+
 function isValidAmount(amt, min = 100) {
   if (/[^0-9]/.test(amt)) {
     return false;

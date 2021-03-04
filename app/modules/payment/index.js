@@ -29,6 +29,7 @@ import { GOOGLE_PAY_PACKAGE_NAME, PHONE_PE_PACKAGE_NAME } from 'common/upi';
 import { getCardEntityFromPayload, getCardFeatures } from 'common/card';
 
 import { getCurrentLocale, translatePaymentPopup as t } from 'i18n/popup';
+import updateScore from 'analytics/checkoutScore';
 
 /**
  * Tells if we're being executed from
@@ -73,9 +74,6 @@ function onPaymentCancel(metaParam) {
     if (payment_id) {
       eventData.payment_id = payment_id;
       var url = makeAuthUrl(razorpay, 'payments/' + payment_id + '/cancel');
-      url = _.appendParamsToUrl(url, {
-        language_code: getCurrentLocale(),
-      });
 
       if (_.isNonNullObject(metaParam)) {
         url += '&' + _.obj2query(metaParam);
@@ -142,6 +140,8 @@ function trackNewPayment(data, params, r) {
       params.upi.provider = data.vpa.split('@')[1];
     }
   }
+
+  updateScore('timeToSubmit');
 
   Analytics.track('submit', {
     data: {
@@ -850,8 +850,6 @@ razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
 
   let url = makeAuthUrl(this, 'payments/validate/account');
 
-  url = _.appendParamsToUrl(url, { language_code: getCurrentLocale() });
-
   const cachedVpaResponse = vpaCache[vpa];
 
   if (cachedVpaResponse) {
@@ -1077,6 +1075,9 @@ razorpayProto.getCardCurrencies = function(payload) {
   };
 
   const entity = getCardEntityFromPayload(payload);
+
+  const entityWithAmount = `${entity}-${payload.amount}`;
+
   if (entity.length === 6) {
     requestPayload.iin = entity;
   } else {
@@ -1089,18 +1090,16 @@ razorpayProto.getCardCurrencies = function(payload) {
     requestPayload.currency = currency;
   }
 
-  const existingRequest = CardCurrencyRequests[entity];
+  const existingRequest = CardCurrencyRequests[entityWithAmount];
   if (existingRequest) {
     return existingRequest;
   }
 
-  CardCurrencyRequests[entity] = new Promise((resolve, reject) => {
+  CardCurrencyRequests[entityWithAmount] = new Promise((resolve, reject) => {
     let url = makeAuthUrl(this, 'payment/flows');
 
     // append requestPayload
     url = _.appendParamsToUrl(url, requestPayload);
-
-    url = _.appendParamsToUrl(url, { language_code: getCurrentLocale() });
 
     fetch.jsonp({
       url,
@@ -1121,7 +1120,7 @@ razorpayProto.getCardCurrencies = function(payload) {
         }
 
         // Store in cache
-        CardCurrencyCache[entity] = response;
+        CardCurrencyCache[entityWithAmount] = response;
 
         // Resolve
         resolve(response);
@@ -1141,5 +1140,5 @@ razorpayProto.getCardCurrencies = function(payload) {
     });
   });
 
-  return CardCurrencyRequests[entity];
+  return CardCurrencyRequests[entityWithAmount];
 };

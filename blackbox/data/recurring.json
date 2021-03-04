@@ -1,7 +1,7 @@
 {
   "upi": true,
   "card": {
-    "credit": ["MasterCard", "Visa"]
+    "credit": ["MasterCard", "Visa", "American Express"]
   },
   "emandate": {
     "UTIB": {

@@ -48,7 +48,8 @@ var preferences,
   Confirm = discreet.Confirm,
   Backdrop = discreet.Backdrop,
   FeeLabel = discreet.FeeLabel,
-  rewardsStore = discreet.rewardsStore;
+  rewardsStore = discreet.rewardsStore,
+  updateScore = discreet.updateScore;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -282,7 +283,14 @@ function errorHandler(response) {
   }
 
   var error = response.error;
-  var message = error.description;
+  var untranslatedMessage = error.description;
+
+  var message = I18n.translateErrorDescription(
+    untranslatedMessage,
+    I18n.getCurrentLocale()
+  );
+
+  error.description = message;
   var cancelMsg = I18n.format('misc.payment_canceled');
 
   // Both checks are there because API still returns message in English.
@@ -302,7 +310,7 @@ function errorHandler(response) {
   var payload = this.payload;
 
   this.clearRequest();
-
+  updateScore('failedPayment');
   Analytics.track('error', {
     data: response,
   });
@@ -362,6 +370,7 @@ function errorHandler(response) {
           if (message) {
             $(help).html(message);
           }
+          updateScore('clickOnSubmitWithoutDetails');
           Form.shake();
           return hideOverlayMessage();
         }
@@ -384,7 +393,7 @@ function cancelHandler(response) {
   if (!this.payload) {
     return;
   }
-
+  updateScore('cancelledPayment');
   Analytics.setMeta('payment.cancelled', true);
   this.markHeadlessFailed();
 
@@ -599,12 +608,13 @@ function askOTP(view, textView, shouldLimitResend, templateData) {
 // this === Session
 function successHandler(response) {
   if (this.preferredInstrument) {
+    updateScore('savedInstrument');
     P13n.recordSuccess(
       this.preferredInstrument,
       this.getCurrentCustomer(this.payload && this.payload.contact)
     );
   }
-
+  updateScore('paymentSuccess');
   this.clearRequest();
   // prevent dismiss event
   this.modal.options.onhide = noop;
@@ -797,6 +807,10 @@ Session.prototype = {
       this.wants_skip = true;
     }
     var tab = oldMethod || this.get('prefill.method');
+
+    if (tab) {
+      updateScore('hadMethodPrefilled');
+    }
 
     if (tab) {
       var optional = {
@@ -1080,6 +1094,7 @@ Session.prototype = {
         embedded: this.embedded,
       },
     });
+    updateScore('timeToRender');
     Analytics.setMeta('timeSince.render', discreet.timer());
   },
 
@@ -1504,9 +1519,10 @@ Session.prototype = {
     }
 
     this.checkCustomerStatus(params, function(error) {
+      var locale = I18n.getCurrentLocale();
       if (error) {
         PayLaterStore.userRegistered = false;
-        self.showLoadError(error, true);
+        self.showLoadError(I18n.translateErrorDescription(error, locale), true);
         return;
       }
 
@@ -1518,7 +1534,6 @@ Session.prototype = {
         otpMessageView = 'otp_resent_successful';
       }
 
-      var locale = I18n.getCurrentLocale();
       askOTP(self.otpView, otpMessageView, true, {
         phone: getPhone(),
         provider: I18n.getPaylaterProviderName(providerCode, locale),
@@ -1797,6 +1812,7 @@ Session.prototype = {
       }
 
       if (
+        this.payload &&
         this.payload.method === 'netbanking' &&
         _Obj.getSafely(this.r, '_payment.popup.window.closed')
       ) {
@@ -2495,6 +2511,8 @@ Session.prototype = {
 
     if (storeGetter(HomeScreenStore.selectedInstrumentId) === instrument.id) {
       // Do not switch tabs
+    } else if (offer && offer.payment_method === 'emi') {
+      this.switchTab('emi');
     } else {
       this.switchTab('');
 
@@ -2719,11 +2737,21 @@ Session.prototype = {
   trackEvent: function(eventName, data) {
     Analytics.track(eventName, data);
   },
-
+  tabSwitchStart: 0,
+  tabsCount: 0,
   switchTab: function(tab) {
     /**
      * Validate fields on common screen.
      */
+    this.tabsCount++;
+    if (this.tabsCount > 5) {
+      updateScore('switchingTabs', { tabsCount: this.tabsCount });
+    }
+    var diff = 0;
+    if (this.tabSwitchStart > 0) {
+      diff = (Date.now() - this.tabSwitchStart) / 1000;
+    }
+    this.tabSwitchStart = Date.now();
     if (!this.tab) {
       if (!this.checkCommonValidAndTrackIfInvalid()) {
         return;
@@ -2734,9 +2762,9 @@ Session.prototype = {
       data: {
         from: this.tab,
         to: tab,
+        timeSpentInTab: diff > 0 ? diff : 'NA',
       },
     });
-
     Analytics.setMeta('tab', tab);
     Analytics.setMeta('timeSince.tab', discreet.timer());
 
@@ -3276,6 +3304,7 @@ Session.prototype = {
     }
     var invalids = $(parent).find('.invalid');
     if (invalids && invalids[0]) {
+      updateScore('clickOnSubmitWithoutDetails');
       Form.shake();
       var invalidInput =
         $(invalids[0]).find('.input')[0] ||
@@ -3788,6 +3817,7 @@ Session.prototype = {
         queryParams
       );
     } else {
+      updateScore('clickOnSubmitWithoutDetails');
       Form.shake();
     }
   },
@@ -4005,6 +4035,7 @@ Session.prototype = {
           ) {
             // no saved card was selected
             Analytics.track('shake:saved-cvv');
+            updateScore('clickOnSubmitWithoutDetails');
             Form.shake();
             return $('.checked .saved-cvv input').focus();
           }
@@ -4022,8 +4053,13 @@ Session.prototype = {
              */
             if (!data.token && !this.emiPlansForNewCard) {
               Analytics.track('shake:no-emi-plans');
+              updateScore('clickOnSubmitWithoutDetails');
               Form.shake();
               return $('#card_number').focus();
+            }
+
+            if (this.checkInvalid()) {
+              return;
             }
 
             if (!data.emi_duration) {
@@ -4103,6 +4139,7 @@ Session.prototype = {
             data['card[cvv]'] = cvvInput.value;
           } else {
             cvvInput.focus();
+            updateScore('clickOnSubmitWithoutDetails');
             return Form.shake();
           }
         }
@@ -4186,7 +4223,6 @@ Session.prototype = {
         type: AnalyticsTypes.DEBUG,
       });
     }
-
     if (this.r._payment) {
       /**
        * For Cardless EMI, payments are created at the first step,
@@ -4383,6 +4419,7 @@ Session.prototype = {
     if (appliedOffer && (!this.offers || this.offers.shouldSendOfferToApi())) {
       data.offer_id = appliedOffer.id;
       this.r.display_amount = appliedOffer.amount;
+      updateScore('affordability_offers');
       Analytics.track('offers:applied_with_payment', {
         data: appliedOffer,
       });
@@ -4883,10 +4920,6 @@ Session.prototype = {
 
     // data.amount needed by external libraries relying on `onsubmit` postMessage
     data.amount = this.get('amount');
-
-    // language_code is required to get the error message from API in the
-    // correct locale.
-    data.language_code = I18n.getCurrentLocale();
 
     if (this.oneMethod && this.oneMethod === 'paypal') {
       data.method = 'paypal';

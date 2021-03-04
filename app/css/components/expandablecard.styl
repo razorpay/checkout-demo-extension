@@ -19,17 +19,27 @@
     overflow: hidden;
 
     & [slot=detail]:not(:empty)
-      border-top: 1px solid transparent;
+      border-top:1px solid #E6E7E8;
+      padding-top: 8px;
+      margin-top: 8px;
+      &:first-child
+        border-top: 1px solid transparent;
 
     ul
       padding-left: 18px;
       margin: 0;
+      li>div
+        display: flex
+        justify-content: space-between
+      &.cardless-emi-plan-details
+        li
+          line-height: 1.4em;
 
 .expandable-card--expanded
   .expandable-card-detail [slot=detail]:not(:empty)
     border-top-color: #E6E7E8;
-    padding-top: 16px;
-    margin-top: 16px;
+    padding-top: 8px;
+    margin-top: 8px;
 
 .expandable-card-list
   .expandable-card

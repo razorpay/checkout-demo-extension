@@ -1,6 +1,7 @@
 import { checkMicroapp, googlePaySupportedMethods } from 'gpay';
 import { NO_PAYMENT_ADAPTER_ERROR, CHECK_ERROR } from 'common/constants';
 import { GOOGLE_PAY_PACKAGE_NAME, PHONE_PE_PACKAGE_NAME } from 'common/upi';
+import { isBraveBrowser, samsungBrowser } from 'common/useragent';
 
 const PaymentRequest = global.PaymentRequest;
 
@@ -77,6 +78,25 @@ function phonepePaymentRequestAdapter() {
  * @return {Promise}
  */
 export function gpayPaymentRequestAdapter() {
+  const isBrowserAllowedByGpay = () => {
+    return new Promise((resolve, reject) => {
+      if (samsungBrowser) {
+        // reject because Gpay does not work with samsung browser
+        // The Gpay app opens and the payment fails at Gpay's end
+        reject();
+      }
+      isBraveBrowser().then(result => {
+        if (!result) {
+          resolve();
+        } else {
+          // Reject because of the same reason as Samsung
+          // Gpay Mweb intent does not work with Brave Browser
+          reject();
+        }
+      });
+    });
+  };
+
   return new Promise((resolve, reject) => {
     try {
       /**
@@ -92,7 +112,11 @@ export function gpayPaymentRequestAdapter() {
         .canMakePayment()
         .then(isAvailable => {
           if (isAvailable) {
-            resolve();
+            isBrowserAllowedByGpay()
+              .then(resolve)
+              .catch(e => {
+                reject(CHECK_ERROR);
+              });
           } else {
             reject(CHECK_ERROR);
           }

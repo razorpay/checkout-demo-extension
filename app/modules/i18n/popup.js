@@ -15,7 +15,8 @@
  */
 export function getCurrentLocale() {
   try {
-    return discreet.I18n.getCurrentLocale.apply(null, arguments);
+    // eslint-disable-next-line no-undef
+    return discreet.I18n.getCurrentLocale.apply(null, arguments); // jshint ignore:line
   } catch (e) {}
 
   return defaultGetCurrentLocale.apply(null, arguments);
@@ -28,7 +29,8 @@ export function getCurrentLocale() {
  */
 export function translatePaymentPopup() {
   try {
-    return discreet.I18n.translatePaymentPopup.apply(null, arguments);
+    // eslint-disable-next-line no-undef
+    return discreet.I18n.translatePaymentPopup.apply(null, arguments); // jshint ignore:line
   } catch (e) {}
 
   return defaultTranslatePaymentPopup.apply(null, arguments);

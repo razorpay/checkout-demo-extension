@@ -30,6 +30,8 @@ import {
 } from 'common/constants';
 import { checkForPossibleWebPayments } from 'checkoutframe/components/upi';
 import { rewards, rewardIds } from 'checkoutstore/rewards';
+import updateScore from 'analytics/checkoutScore';
+import { isBraveBrowser } from 'common/useragent';
 
 let CheckoutBridge = window.CheckoutBridge;
 
@@ -138,6 +140,13 @@ const setAnalyticsMeta = message => {
       Analytics.setMeta('sdk.version', qpmap.version);
     }
   }
+
+  /**
+   * Browser related meta properties
+   */
+  isBraveBrowser().then(result => {
+    Analytics.setMeta('brave_browser', result);
+  });
 };
 
 /**
@@ -268,6 +277,9 @@ function performPrePrefsFetchOperations() {
 }
 
 function setSessionPreferences(session, preferences) {
+  if (preferences.customer && preferences.customer.contact) {
+    updateScore('loggedInUser');
+  }
   const razorpayInstance = session.r;
   razorpayInstance.preferences = preferences;
   setRazorpayInstance(razorpayInstance);
