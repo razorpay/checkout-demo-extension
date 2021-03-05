@@ -139,6 +139,10 @@ module.exports = function(testFeatures) {
       }
 
       await submit(context);
+      if(downtimeHigh) {
+        const alertPromise = context.page.click('.continue-button');
+        await alertPromise;
+      }
 
       if (feeBearer) {
         await handleFeeBearer(context);
