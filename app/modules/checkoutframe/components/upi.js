@@ -35,13 +35,12 @@ export function checkForPossibleWebPaymentsForUpi() {
     .forEach(app => {
       checkWebPaymentsForApp(app.package_name)
         .then(() => {
-          setUpiApps(
-            _Arr.mergeWith(getUPIIntentApps().all, [
-              {
-                package_name: app.package_name,
-              },
-            ])
-          );
+          setUpiApps([
+            ...getUPIIntentApps().all,
+            {
+              package_name: app.package_name,
+            },
+          ]);
           Analytics.setMeta('upi.intent_on_mweb', true);
         })
         .catch(_Func.noop);
