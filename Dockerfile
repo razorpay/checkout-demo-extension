@@ -15,7 +15,7 @@ RUN cd /checkout_build \
     && NODE_ENV=production npm test \
     && DIST_DIR=/checkout_build/app/dist/v1 /scripts/compress
 
-FROM c.rzp.io/razorpay/onggi:aws-cli-v2818
+FROM c.rzp.io/razorpay/onggi:aws-cli-v2818 as aws
 
 ARG BRANCH
 ENV BRANCH=${BRANCH}
@@ -38,6 +38,12 @@ RUN mkdir -p /app/dist/v1 \
 ## Multi stage copy does not currently work with recursive directories. Hence, making explicit copy here for each of the subfolders
 COPY --from=builder /checkout_build/app/dist/v1/* /app/dist/v1/
 COPY --from=builder /checkout_build/app/dist/v1/css/* /app/dist/v1/css/
+
+RUN mkdir -p /app/dist/original \
+    && mkdir -p /app/dist/original/css
+
+COPY --from=builder /checkout_build/app/dist/v1/* /app/dist/original/
+COPY --from=builder /checkout_build/app/dist/v1/css/* /app/dist/original/css/
 
 WORKDIR /app/dist/v1
 
@@ -68,8 +74,8 @@ RUN wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/
     && mkdir -p /app/dist/v1/css
 
 ## Multi stage copy does not currently work with recursive directories. Hence, making explicit copy here for each of the subfolders
-COPY --from=builder /checkout_build/app/dist/v1/* /app/dist/v1/
-COPY --from=builder /checkout_build/app/dist/v1/css/* /app/dist/v1/css/
+COPY --from=aws /app/dist/original/* /app/dist/v1/
+COPY --from=aws /app/dist/original/css/* /app/dist/v1/css/
 
 WORKDIR /app
 

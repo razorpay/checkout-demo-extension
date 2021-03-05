@@ -17,7 +17,6 @@ import {
   removeDuplicateApiInstruments,
 } from 'checkoutframe/personalization/api';
 import { setHistoryAndListenForBackPresses } from 'bridge/back';
-import showApiDowntimeBanner from './api-downtime-banner';
 
 import { init as initI18n, bindI18nEvents } from 'i18n/init';
 
@@ -239,18 +238,7 @@ function fetchPrefs(session) {
     return;
   }
   session.isOpen = true;
-  // time condition
-  const startTime = new Date(
-    'Thu Feb 11 2021 03:00:00 GMT+0530 (India Standard Time)'
-  );
-  const endTime = new Date(
-    'Thu Feb 11 2021 03:30:00 GMT+0530 (India Standard Time)'
-  );
-  const currentTime = new Date();
-  if (currentTime >= startTime && currentTime <= endTime) {
-    setSessionForDownTime(session, {});
-    return;
-  }
+
   performPrePrefsFetchOperations();
 
   session.prefCall = Razorpay.payment.getPrefs(
