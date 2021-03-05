@@ -303,7 +303,6 @@ export function setBlocks(
     preferredBlock.instruments = preferredBlock.instruments.map(
       addDowntimeToBlock
     );
-    console.log(preferredBlock.instruments)
 
     allBlocks = _Arr.mergeWith([preferredBlock], allBlocks);
   }

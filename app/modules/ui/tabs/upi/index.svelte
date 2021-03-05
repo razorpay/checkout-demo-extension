@@ -427,6 +427,7 @@
     let _token = [];
     switch (selectedToken) {
       case 'new':
+        _token = vpaField
         data = {
           vpa: getFullVpa(),
           save: shouldRememberVpa(),
@@ -469,7 +470,11 @@
     // The UPI Block is given priority over the rest of the data.
     // Migrating to have all upi related data in the upi block.
     data.upi = {};
-
+    const { downtimeSeverity, downtimeInstrument } = _token;
+    if(downtimeSeverity) {
+      data.downtimeSeverity = downtimeSeverity;
+      data.downtimeInstrument = downtimeInstrument;
+    }
     /**
      * default to directpay for collect requests
      */

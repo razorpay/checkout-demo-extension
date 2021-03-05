@@ -357,7 +357,7 @@ const filterDowntimeArr = (downtimeArr, instrumentKey, value) => {
     ) {
       return item;
     }
-    if((instrumentKey === 'vpa_handle' || instrumentKey === 'psp_handle') && item[instrumentKey] === 'all'){
+    if((instrumentKey === 'vpa_handle' || instrumentKey === 'psp_handle') && item.instrument[instrumentKey] === 'all'){
       return item
     }
   });
