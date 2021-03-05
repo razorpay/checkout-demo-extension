@@ -24,6 +24,8 @@ import {
   getEMIBank,
 } from 'common/emi';
 
+import { CRED_PACKAGE_NAME } from 'common/upi';
+
 import {
   getEligibleProvidersBasedOnMinAmount,
   getEligibleProvidersForFeeBearerCustomer,
@@ -534,7 +536,8 @@ function isCREDEnabled() {
 export function isCREDIntentFlowAvailable() {
   const cardApps = getCardApps();
   return (
-    _Arr.contains(cardApps.all, 'cred') || isWebPaymentsApiAvailable('cred')
+    _Arr.contains(cardApps.all, 'cred') ||
+    isWebPaymentsApiAvailable(CRED_PACKAGE_NAME)
   );
 }
 

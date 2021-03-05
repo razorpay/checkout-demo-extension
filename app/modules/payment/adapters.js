@@ -18,7 +18,7 @@ export const ADAPTER_CHECKERS = {
   'microapps.gpay': checkMicroapp,
   [GOOGLE_PAY_PACKAGE_NAME]: gpayPaymentRequestAdapter,
   [PHONE_PE_PACKAGE_NAME]: phonepePaymentRequestAdapter,
-  cred: credPaymentRequestAdapter,
+  [CRED_PACKAGE_NAME]: credPaymentRequestAdapter,
 };
 
 /**

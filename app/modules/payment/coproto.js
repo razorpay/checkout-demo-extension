@@ -334,11 +334,9 @@ var responseTypes = {
           return instrument.complete();
         })
         .catch(error => {
-          console.log('web payments error 1', app, error);
           webPaymentOnError(app, error);
         });
     } catch (error) {
-      console.log('web payments error 2', app, error);
       webPaymentOnError(app, error);
     }
   },

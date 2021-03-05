@@ -786,7 +786,9 @@ razorpayProto.checkPaymentAdapter = function(adapter, data) {
     [GOOGLE_PAY_PACKAGE_NAME]: GOOGLE_PAY_PACKAGE_NAME,
     [PHONE_PE_PACKAGE_NAME]: PHONE_PE_PACKAGE_NAME,
     'microapps.gpay': 'microapps.gpay',
+    // Allow merchant to send both shortcode and package name
     cred: CRED_PACKAGE_NAME,
+    [CRED_PACKAGE_NAME]: CRED_PACKAGE_NAME,
   };
   return checkPaymentAdapter(adapterPackageNameMap[adapter], data).then(
     success => {

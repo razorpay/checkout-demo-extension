@@ -293,38 +293,6 @@ function checkForPossibleWebPaymentsForApps() {
     .forEach(app => checkWebPaymentsForApp(app.package_name).catch(_Func.noop));
 }
 
-function setSessionForDownTime(session, preferences) {
-  const razorpayInstance = session.r;
-  razorpayInstance.preferences = preferences;
-  setRazorpayInstance(razorpayInstance);
-
-  updateOptions(preferences);
-  updateEmandatePrefill();
-  updateAnalytics(preferences);
-  updatePreferredMethods(preferences);
-
-  Razorpay.configure(preferences.options);
-  session.setPreferences(preferences);
-
-  // session.setPreferences updates razorpay options.
-  // validate options now
-  try {
-    validateOverrides(razorpayInstance);
-  } catch (e) {
-    return Razorpay.sendMessage({
-      event: 'fault',
-      data: e.message,
-    });
-  }
-
-  initI18n().then(() => {
-    session.renderBanner();
-    showModal(session);
-    showApiDowntimeBanner();
-    _Doc.getElementById('header').remove();
-  });
-}
-
 function setSessionPreferences(session, preferences) {
   if (preferences.customer && preferences.customer.contact) {
     updateScore('loggedInUser');
