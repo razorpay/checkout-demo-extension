@@ -1050,7 +1050,7 @@ Session.prototype = {
     es6components.render();
     this.setModal();
     this.setBackdrop();
-    if (Store.isBlockedDeactivated()) {
+    if (Store.isBlockedDeactivated() && this.r.isLiveMode()) {
       new BlockedDeactivatedMerchant({
         target: _Doc.querySelector('#form-fields'),
       });
