@@ -27,6 +27,10 @@ appsThatSupportWebPayments.forEach(app => {
  * @returns {boolean}
  */
 export function isWebPaymentsApiAvailable(app) {
+  // BE sends cred as provider, which needs to be checked here
+  if (app === 'cred') {
+    app = CRED_PACKAGE_NAME;
+  }
   return webPaymentsApps[app];
 }
 
