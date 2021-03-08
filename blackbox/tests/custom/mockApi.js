@@ -3779,7 +3779,10 @@ module.exports = {
     resend_url_private:
       'https://api.razorpay.com/v1/payments/pay_GcDqre4nqakb46/otp/resend',
   }),
-  submitOTP: () => ({ http_status_code: 200, razorpay_payment_id: 'pay_123465' }),
+  submitOTP: () => ({
+    http_status_code: 200,
+    razorpay_payment_id: 'pay_123465',
+  }),
   iinResponse: () => ({
     flows: {
       recurring: false,
@@ -3839,5 +3842,5 @@ module.exports = {
       metadata: { payment_id: 'pay_GcGmzHFHZZzq74' },
       action: 'TOPUP',
     },
-  }),
+  })
 };

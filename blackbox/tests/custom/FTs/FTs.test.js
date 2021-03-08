@@ -19,7 +19,7 @@ describe.each(flowTests)('Validate Flow', flow => {
         isCallbackURL,
         flowName: flow.type,
       });
-      const paymentData = getPaymentPayload(flow.type);
+      const paymentData = getPaymentPayload(flow.type, flow.override || {});
       await page.evaluate(async data => {
         window.rp.createPayment(data);
       }, paymentData);
@@ -31,10 +31,12 @@ describe.each(flowTests)('Validate Flow', flow => {
       /**
        * Trigger payment flow
        */
-      await context.expectRequest(req => {});
-      // mock create payment
-      const createPaymentResponse = mockAPI.ajaxResponse(flow.type);
-      await context.respondJSON(createPaymentResponse);
+      if (!flow.skipAjax) {
+        await context.expectRequest(req => {});
+        // mock create payment
+        const createPaymentResponse = mockAPI.ajaxResponse(flow.type);
+        await context.respondJSON(createPaymentResponse);
+      }
       // mock popup
       const popup = await context.popup();
       const popupPage = popup.page;
@@ -63,10 +65,12 @@ describe.each(flowTests)('Validate Flow', flow => {
        * Trigger payment flow
        */
 
-      await context.expectRequest(req => {});
-      // mock create payment
-      const createPaymentResponse = mockAPI.ajaxResponse(flow.type);
-      await context.respondJSON(createPaymentResponse);
+      if (!flow.skipAjax) {
+        await context.expectRequest(req => {});
+        // mock create payment
+        const createPaymentResponse = mockAPI.ajaxResponse(flow.type);
+        await context.respondJSON(createPaymentResponse);
+      }
       // mock popup
       const popup = await context.popup();
       const popupPage = popup.page;

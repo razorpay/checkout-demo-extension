@@ -5,6 +5,31 @@ exports.flowTests = [
   { name: 'Card EMI Payment', type: 'emi' },
   { name: 'NetBanking', type: 'netbanking' },
   { name: 'Wallets', type: 'wallet' },
+  { name: 'UPI Collect', type: 'upicollect', skipAjax: true },
+  {
+    name: 'Powerwallet',
+    type: 'wallet',
+    skipAjax: true,
+    override: { wallet: 'freecharge' },
+  },
+  {
+    name: 'Cardless EMI',
+    type: 'cardless_emi',
+    skipAjax: true,
+    override: { provider: 'zestmoney' },
+  },
+  {
+    name: 'Paylater',
+    type: 'paylater',
+    skipAjax: true,
+    override: { provider: 'icic' },
+  },
+  { // hdfc paylater handle differently based on create/ajax request
+    name: 'Paylater - HDFC',
+    type: 'paylater',
+    skipAjax: false,
+    override: { provider: 'hdfc' },
+  },
 ];
 
 exports.getPaymentPayload = (method = 'card', override = {}) => {
@@ -50,14 +75,6 @@ exports.getPaymentPayload = (method = 'card', override = {}) => {
       };
       break;
     }
-    case 'powerwallet': {
-      data = {
-        ...data,
-        method: 'wallet',
-        wallet: 'freecharge',
-      };
-      break;
-    }
     case 'upicollect': {
       data = {
         ...data,
@@ -66,6 +83,22 @@ exports.getPaymentPayload = (method = 'card', override = {}) => {
           vpa: 'testing@ybl',
           flow: 'collect',
         },
+      };
+      break;
+    }
+    case 'cardless_emi': {
+      data = {
+        ...data,
+        method: 'cardless_emi',
+        amount: 900000,
+      };
+      break;
+    }
+    case 'paylater': {
+      data = {
+        ...data,
+        method: 'paylater',
+        amount: 900000,
       };
       break;
     }
