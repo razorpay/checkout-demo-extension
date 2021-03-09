@@ -39,6 +39,14 @@ const config = {
     name: 'Kotak Mahindra Bank',
     headless: false,
   },
+  icic: {
+    name: 'ICICI Bank',
+    headless: false,
+  },
+  hcin: {
+    name: 'Home Credit Ujjwal Card',
+    headless: false,
+  },
 };
 
 /**
