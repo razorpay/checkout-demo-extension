@@ -17,7 +17,6 @@ describe.each(flowTests)('Validate Flow', flow => {
       context = await initCustomCheckout({
         page,
         isCallbackURL,
-        flowName: flow.type,
       });
       const paymentData = getPaymentPayload(flow.type, flow.override || {});
       await page.evaluate(async data => {
@@ -37,6 +36,7 @@ describe.each(flowTests)('Validate Flow', flow => {
         const createPaymentResponse = mockAPI.ajaxResponse(flow.type);
         await context.respondJSON(createPaymentResponse);
       }
+      
       // mock popup
       const popup = await context.popup();
       const popupPage = popup.page;

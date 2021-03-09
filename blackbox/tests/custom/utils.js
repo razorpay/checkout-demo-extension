@@ -24,11 +24,22 @@ exports.flowTests = [
     skipAjax: true,
     override: { provider: 'icic' },
   },
-  { // hdfc paylater handle differently based on create/ajax request
+  {
+    // hdfc paylater handle differently based on create/ajax request
     name: 'Paylater - HDFC',
     type: 'paylater',
     skipAjax: false,
     override: { provider: 'hdfc' },
+  },
+  {
+    name: 'Emandate',
+    type: 'emandate',
+    skipAjax: false,
+  },
+  {
+    name: 'Emandate Card',
+    type: 'emandate-card',
+    skipAjax: false,
   },
 ];
 
@@ -101,6 +112,36 @@ exports.getPaymentPayload = (method = 'card', override = {}) => {
         amount: 900000,
       };
       break;
+    }
+    case 'emandate': {
+      data = {
+        ...data,
+        order_id: 'order_EAbtuXPh24LrEc',
+        customer_id: 'cust_E9penp7VGhT5yt',
+        recurring: '1',
+        method: 'emandate',
+        bank: 'HDFC',
+        auth_type: 'netbanking',
+        'bank_account[name]': 'Gaurav Kumar',
+        'bank_account[account_number]': '1121431121541121',
+        'bank_account[account_type]': 'savings',
+        'bank_account[ifsc]': 'HDFC0000001',
+      };
+      break;
+    }
+    case 'emandate-card': {
+      data = {
+        ...data,
+        order_id: 'order_EAbtuXPh24LrE0',
+        customer_id: 'cust_E9penp7VGhTkeD',
+        recurring: '1',
+        method: 'card',
+        'card[number]': '4111111111111111',
+        'card[cvv]': '123',
+        'card[expiry_month]': '01',
+        'card[expiry_year]': '22',
+        'card[name]': 'Gaurav Kumar',
+      };
     }
     default:
       break;

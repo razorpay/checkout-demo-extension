@@ -20,6 +20,27 @@ module.exports = {
       ...override,
     };
     switch (method) {
+      case 'emandate': {
+        return {
+          type: 'first',
+          request: {
+            url:
+              'https://api.razorpay.com/v1/gateway/mocksharp/payment?key_id=rzp_test_tLtZXhTdaphIKd',
+            method: 'post',
+            content: {
+              action: 'authorize',
+              amount: 1000000,
+              method: 'emandate',
+              payment_id: 'GcGmzHFHZZzq74',
+              callback_url:
+                'https://api.razorpay.com/v1/payments/pay_GcGmzHFHZZzq74/callback/f4b768d79e75fd3838b46d68a00765633f6d8fb3/rzp_test_tLtZXhTdaphIKd',
+              recurring: 1,
+              auth_type: 'netbanking',
+            },
+          },
+          ...defaultResponse,
+        };
+      }
       case 'upicollect': {
         return {
           type: 'async',
@@ -3842,5 +3863,5 @@ module.exports = {
       metadata: { payment_id: 'pay_GcGmzHFHZZzq74' },
       action: 'TOPUP',
     },
-  })
+  }),
 };
