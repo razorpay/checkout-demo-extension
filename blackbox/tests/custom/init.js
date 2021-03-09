@@ -1,8 +1,8 @@
 const { interceptor } = require('../../util');
 const { readFileSync } = require('fs');
 
-const prefix = 'https://api.razorpay.com/v1/checkout';
-
+const prefix = 'https://api-custom.razorpay.com/v1/checkout';
+const apiPrefix = 'https://api.razorpay.com/v1/checkout';
 const customCheckout = `${prefix}/custom`;
 const callbackURL = `${prefix}/callback_response`;
 const popupInitialPage = `${prefix}/mockup`;
@@ -11,9 +11,9 @@ const otpBundle = 'https://cdn.razorpay.com/static/otp/bundle.js';
 const redirectPage = 'v1/payments/create/checkout';
 const mockPageSubmit =
   'https://api.razorpay.com/v1/gateway/mocksharp/payment/submit';
+const mockSubmitPageCardlessEMI = 'https://api.razorpay.com/v1/otp/verify';
 
-const popupCallbackRequest =
-  'https://api.razorpay.com/v1/payments/pay_GZ7c6a2d9mfWAG';
+const walletTopUpURL = 'https://walletapi.mobikwik.com/wallet';
 
 const jsContent = readFileSync('app/js/generated/entry/razorpay.js');
 const htmlContent = readFileSync('app/razorpay.test.html');
@@ -31,6 +31,22 @@ const callback = readFileSync('blackbox/fixtures/callback.html', {
   flag: 'r',
 });
 
+/**
+ * forceTargetInitialization its hack to detect popup created. There is issue in popup detection with window.open("")
+ * https://github.com/puppeteer/puppeteer/issues/2810
+ * @param {BrowserContext} browser
+ */
+function forceTargetInitialization(browser) {
+  Array.from(browser._targets.values()).forEach((t, i) => {
+    if (!t._isInitialized) {
+      console.log('Forcing target initialization');
+      browser._targetInfoChanged({
+        targetInfo: { ...t._targetInfo, url: ' ' },
+      });
+    }
+  });
+}
+
 function checkoutRequestHandler(request) {
   const url = request.url();
   if (url.startsWith(customCheckout)) {
@@ -46,7 +62,12 @@ function checkoutRequestHandler(request) {
   } else if (url.includes('livereload')) {
     // Livereload URLs come if you have `npm run start` on while testing
     return request.respond({ status: 200 });
-  } else if (url.includes(redirectPage)) {
+  } else if (
+    url.includes(redirectPage) ||
+    url.startsWith(walletTopUpURL) ||
+    url.startsWith(mockSubmitPageCardlessEMI)
+  ) {
+    debugger;
     return request.respond({ body: popupHtmlContent });
   } else if (url.startsWith(mockPageSubmit)) {
     const postData = request.postData();
@@ -77,14 +98,12 @@ function checkoutRequestHandler(request) {
 
 function popupRequestHandler(request) {
   const url = request.url();
+  debugger;
   if (url.startsWith(popupInitialPage)) {
     return request.respond({ body: popupHtmlContent });
   } else if (url.includes('favicon.ico')) {
     return request.respond({ status: 204 });
-  } else if (
-    url.startsWith(mockPageSubmit) ||
-    url.startsWith('https://walletapi.mobikwik.com/wallet')
-  ) {
+  } else if (url.startsWith(mockPageSubmit) || url.startsWith(walletTopUpURL)) {
     const postData = request.postData();
     if (postData.includes('success=F')) {
       var failureMock = callback.replace(
@@ -175,6 +194,7 @@ module.exports = async ({
     page,
     data,
     ...interceptorOptions,
+    forceTargetInitialization,
     async popup() {
       const target = await page
         .browser()

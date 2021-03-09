@@ -9,6 +9,7 @@ class PuppeteerEnvironment extends NodeEnvironment {
     const browserWSEndpoint = readFileSync(DIR + '/wsEndpoint', 'utf8');
     const browser = await puppeteer.connect({ browserWSEndpoint });
     this.global.page = await browser.newPage();
+    this.global.browser = browser;
     this.global.delay = delay;
   }
 

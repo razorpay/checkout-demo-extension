@@ -30,10 +30,10 @@
       document.forms[0].onsubmit = function(e) {
         e.preventDefault();
         var rp = new Razorpay({
-          key: 'rzp_test_1DP5mmOlF5G5ag',
+          key: 'rzp_test_l3ckHAHlkpYUqe',
           amount: 200,
-          callback_url: "https://checkout.local/razorpay",
-          redirect: true
+          // callback_url: 'https://checkout.local/razorpay',
+          // redirect: true,
         })
           .on('payment.error', function(resp) {
             console.log(resp);
@@ -46,7 +46,8 @@
         setTimeout(function() {
           var data = {
             amount: 200,
-            currency: 'INR'          };
+            currency: 'INR',
+          };
           data.method = 'card';
           data['card[number]'] = '4111111111111111';
           data['card[expiry_month]'] = '04';
@@ -56,6 +57,16 @@
           // data.bank = 'SBIN';
           data.email = 'a@s.d';
           data.contact = 9999922222;
+
+          var data = {
+            amount: 100000,
+            currency: 'INR',
+            email: 'gaurav.kumar@example.com',
+            contact: '9123456780',
+            method: 'cardless_emi',
+            // method specific fields
+            provider: 'zestmoney',
+          };
           rp.emit('payment.resume', data);
         });
       };
