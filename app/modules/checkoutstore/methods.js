@@ -536,8 +536,7 @@ function isCREDEnabled() {
 export function isCREDIntentFlowAvailable() {
   const cardApps = getCardApps();
   return (
-    _Arr.contains(cardApps.all, 'cred') ||
-    isWebPaymentsApiAvailable(CRED_PACKAGE_NAME)
+    _Arr.contains(cardApps.all, 'cred') || isWebPaymentsApiAvailable('cred')
   );
 }
 

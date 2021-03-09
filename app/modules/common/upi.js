@@ -5,7 +5,9 @@ import { VPA_REGEX } from 'common/constants';
 
 export const GOOGLE_PAY_PACKAGE_NAME = 'com.google.android.apps.nbu.paisa.user';
 export const PHONE_PE_PACKAGE_NAME = 'com.phonepe.app';
-export const CRED_PACKAGE_NAME = 'com.dreamplug.androidapp';
+// Not the real package name. We're using this because api returns 'cred' instead of the real package name
+// TODO: get this fixed
+export const CRED_PACKAGE_NAME = 'cred';
 
 export function isVpaValid(vpa) {
   return VPA_REGEX.test(vpa);
