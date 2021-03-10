@@ -65,8 +65,9 @@ if (chromeVersion) {
 
 export const androidBrowser = android && (chromeVersion || firefox); // Chrome or firefox on Android
 
+// The largest screen size that we have found is One Plus 5T - 455px
 export const mobileQuery =
-  '(max-device-height: 450px),(max-device-width: 450px)';
+  '(max-device-height: 475px),(max-device-width: 475px)';
 
 /**
  * Says whether or not we're on mobile.
@@ -78,7 +79,7 @@ export const mobileQuery =
  */
 export const isMobile = () => {
   return (
-    (global.innerWidth && global.innerWidth < 450) ||
+    (global.innerWidth && global.innerWidth < 475) ||
     shouldFixFixed ||
     global.matchMedia(mobileQuery).matches
   );
