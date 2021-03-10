@@ -812,6 +812,12 @@ export default {
     select_help: 'Please select a bank',
     select_label: 'Select a different bank',
     selection_radio_text: 'Complete Payment Using',
+    cancellation_modal_title:
+      'Please share a reason for cancelling this payment',
+    wrong_bank_selected: 'Wrong bank selected',
+    forgot_username_password: 'Forgot username or password',
+    bank_page_error: 'Error on bank page',
+    other: 'Other',
   },
   networks: {
     AMEX: 'Amex',
