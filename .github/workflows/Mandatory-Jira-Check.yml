@@ -1,9 +1,8 @@
 on:
   pull_request:
-    types: [ opened, reopened, edited, synchronize]
+    types: [opened, reopened, edited, synchronize]
 name: Mandatory-Jira-Check
 jobs:
-
   Find-Jira-Id:
     name: Find-Jira-Id
     runs-on: [self-hosted]
@@ -16,7 +15,7 @@ jobs:
         with:
           repository: Razorpay/check-commit-jira
           path: .github/actions/check-commit-jira
-          ref:  combined_check
+          ref: combined_check
           token: ${{ secrets.GIT_TOKEN }}
       - name: Login
         uses: ./.github/actions/check-commit-jira/jira-login
