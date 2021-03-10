@@ -38,6 +38,7 @@ import {
   mobileQuery,
   isFacebookWebView,
   getOS,
+  isMobile,
   getDevice,
 } from 'common/useragent';
 import {
@@ -277,7 +278,10 @@ function isMethodEnabledForBrowser(method) {
 
 export function isMethodEnabled(method) {
   if (getOrderMethod()) {
-    if (getOrderMethod() !== method && !(getOrderMethod() === 'upi' && method === 'qr')) {
+    if (
+      getOrderMethod() !== method &&
+      !(getOrderMethod() === 'upi' && method === 'qr')
+    ) {
       return false;
     }
   }
@@ -434,10 +438,7 @@ const UPI_METHODS = {
   omnichannel: () =>
     !isRecurring() && !isPayout() && hasFeature('google_pay_omnichannel'),
   qr: () =>
-    !isRecurring() &&
-    !isPayout() &&
-    getOption('method.qr') &&
-    !global.matchMedia(mobileQuery).matches,
+    !isRecurring() && !isPayout() && getOption('method.qr') && !isMobile(),
   intent: () =>
     !isRecurring() &&
     !isPayout() &&

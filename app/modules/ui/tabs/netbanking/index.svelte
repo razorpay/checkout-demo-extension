@@ -20,6 +20,7 @@
   import SearchModal from 'ui/elements/SearchModal.svelte';
   import BankSearchItem from 'ui/elements/search-item/Bank.svelte';
   import CTA from 'ui/elements/CTA.svelte';
+  import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
 
   // i18n
   import {
@@ -412,9 +413,11 @@
       {#if selectedBankHasDowntime}
         <DowntimeCallout severe={selectedBankHasSevereDowntime}>
           {#if selectedBankHasSevereDowntime}
-            {formatTemplateWithLocale(DOWNTIME_HIGH_CALLOUT, { bank: getLongBankName($selectedBank, $locale) }, $locale)}
+            <FormattedText
+              text={formatTemplateWithLocale(DOWNTIME_HIGH_CALLOUT, { bank: getLongBankName($selectedBank, $locale) }, $locale)} />
           {:else}
-            {formatTemplateWithLocale(DOWNTIME_LOW_CALLOUT, { bank: getLongBankName($selectedBank, $locale) }, $locale)}
+            <FormattedText
+              text={formatTemplateWithLocale(DOWNTIME_LOW_CALLOUT, { bank: getLongBankName($selectedBank, $locale) }, $locale)} />
           {/if}
         </DowntimeCallout>
       {/if}
