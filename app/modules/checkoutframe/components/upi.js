@@ -1,13 +1,16 @@
 import { setView, destroyView } from './';
+
+import Analytics from 'analytics';
+
 import { getSession } from 'sessionmanager';
-import * as Bridge from 'bridge';
-import { GOOGLE_PAY_PACKAGE_NAME, PHONE_PE_PACKAGE_NAME } from 'common/upi';
+import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi';
 import {
   isWebPaymentsApiAvailable,
   checkWebPaymentsForApp,
   appsThatSupportWebPayments,
 } from 'common/webPaymentsApi';
-import { setUpiApps } from 'checkoutstore/native';
+
+import { getUPIIntentApps, setUpiApps } from 'checkoutstore/native';
 
 import UpiTab from 'ui/tabs/upi/index.svelte';
 const UPI_KEY = 'upiTab';
@@ -26,10 +29,22 @@ export function isGooglePayWebPaymentsAvailable() {
  * and sets the app in the list of UPI intent apps
  * if so.
  */
-export function checkForPossibleWebPayments() {
-  appsThatSupportWebPayments.forEach(app => {
-    checkWebPaymentsForApp(app);
-  });
+export function checkForPossibleWebPaymentsForUpi() {
+  appsThatSupportWebPayments
+    .filter(app => app.method === 'upi')
+    .forEach(app => {
+      checkWebPaymentsForApp(app.package_name)
+        .then(() => {
+          setUpiApps([
+            ...getUPIIntentApps().all,
+            {
+              package_name: app.package_name,
+            },
+          ]);
+          Analytics.setMeta('upi.intent_on_mweb', true);
+        })
+        .catch(_Func.noop);
+    });
 }
 
 export function render(props = {}) {
