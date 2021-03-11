@@ -41,6 +41,11 @@ exports.flowTests = [
     type: 'emandate-card',
     skipAjax: false,
   },
+  {
+    name: 'Cred',
+    type: 'cred',
+    skipAjax: true,
+  },
 ];
 
 exports.getPaymentPayload = (method = 'card', override = {}) => {
@@ -149,7 +154,17 @@ exports.getPaymentPayload = (method = 'card', override = {}) => {
         amount: 10000,
         method: 'upi',
         contact: '9123456789',
-        upi_app: 'gpay'
+        upi_app: 'gpay',
+      };
+    }
+    case 'cred': {
+      data = {
+        ...data,
+        amount: 10000,
+        currency: 'INR',
+        order_id: 'order_GlKOgdVF51O8li',
+        method: 'app',
+        provider: 'cred',
       };
     }
     default:
