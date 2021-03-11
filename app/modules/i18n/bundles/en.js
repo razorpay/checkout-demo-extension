@@ -1028,7 +1028,7 @@ export default {
     redirect_to_app: 'You will be redirected to your UPI app',
     scan_qr_code: 'Scan the QR code using your UPI app',
     supported_banks:
-      'You can only pay using UPI ID linked with either <strong>ICICI Bank<strong> or <strong>SBI Bank<strong>',
+      'You can only pay using UPI ID linked with either <strong>ICICI Bank<strong>, <strong>HDFC Bank<strong> or <strong>SBI Bank<strong>',
     upi_id_linked_to_bank: 'UPI ID is linked to',
     show_other_apps: 'Show other UPI apps',
     show_qr_code: 'Show QR Code',
