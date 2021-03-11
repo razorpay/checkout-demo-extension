@@ -24,6 +24,8 @@ import {
   getEMIBank,
 } from 'common/emi';
 
+import { CRED_PACKAGE_NAME } from 'common/upi';
+
 import {
   getEligibleProvidersBasedOnMinAmount,
   getEligibleProvidersForFeeBearerCustomer,
@@ -34,6 +36,7 @@ import { findCodeByNetworkName } from 'common/card';
 
 import { wallets, getSortedWallets } from 'common/wallet';
 import { extendConfig } from 'common/cardlessemi';
+
 import {
   mobileQuery,
   isFacebookWebView,
@@ -41,6 +44,7 @@ import {
   isMobile,
   getDevice,
 } from 'common/useragent';
+
 import {
   getUPIIntentApps,
   getCardApps,
@@ -48,12 +52,15 @@ import {
 } from 'checkoutstore/native';
 
 import { get as storeGetter } from 'svelte/store';
+
 import {
   sequence as SequenceStore,
   instruments as InstrumentsStore,
   hiddenInstruments as HiddenInstrumentsStore,
   hiddenMethods as HiddenMethodsStore,
 } from 'checkoutstore/screens/home';
+
+import { isWebPaymentsApiAvailable } from 'common/webPaymentsApi';
 
 function isNoRedirectFacebookWebViewSession() {
   return isFacebookWebView() && !getCallbackUrl();
@@ -526,7 +533,9 @@ function isCREDEnabled() {
 
 export function isCREDIntentFlowAvailable() {
   const cardApps = getCardApps();
-  return _Arr.contains(cardApps.all, 'cred');
+  return (
+    _Arr.contains(cardApps.all, 'cred') || isWebPaymentsApiAvailable('cred')
+  );
 }
 
 export function getPayloadForCRED() {

@@ -3838,7 +3838,6 @@ Session.prototype = {
     if (powerotp) {
       powerotp.value = '';
     }
-
     if (this.r._payment) {
       hideOverlayMessage();
       this.r.emit('payment.cancel', extra);
@@ -4409,7 +4408,9 @@ Session.prototype = {
     if (
       data.method === 'upi' &&
       data['_[flow]'] === 'intent' &&
-      WebPaymentsApi.appsThatSupportWebPayments.includes(data.upi_app) &&
+      WebPaymentsApi.appsThatSupportWebPayments.find(function(app) {
+        return app.package_name === data.upi_app;
+      }) &&
       WebPaymentsApi.isWebPaymentsApiAvailable(data.upi_app)
     ) {
       request.gpay = true;

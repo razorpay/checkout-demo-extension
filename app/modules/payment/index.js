@@ -25,7 +25,11 @@ import * as GPay from 'gpay';
 import Analytics from 'analytics';
 import { isProviderHeadless } from 'common/cardlessemi';
 import { updateCurrencies, setCurrenciesRate } from 'common/currency';
-import { GOOGLE_PAY_PACKAGE_NAME, PHONE_PE_PACKAGE_NAME } from 'common/upi';
+import {
+  CRED_PACKAGE_NAME,
+  GOOGLE_PAY_PACKAGE_NAME,
+  PHONE_PE_PACKAGE_NAME,
+} from 'common/upi';
 import { getCardEntityFromPayload, getCardFeatures } from 'common/card';
 
 import { getCurrentLocale, translatePaymentPopup as t } from 'i18n/popup';
@@ -569,9 +573,6 @@ Payment.prototype = {
     }
 
     // else make ajax request
-
-    var razorpayInstance = this.r;
-
     data['_[request_index]'] = Analytics.updateRequestIndex('submit');
 
     this.ajax = fetch.post({
@@ -785,6 +786,7 @@ razorpayProto.checkPaymentAdapter = function(adapter, data) {
     [GOOGLE_PAY_PACKAGE_NAME]: GOOGLE_PAY_PACKAGE_NAME,
     [PHONE_PE_PACKAGE_NAME]: PHONE_PE_PACKAGE_NAME,
     'microapps.gpay': 'microapps.gpay',
+    cred: CRED_PACKAGE_NAME,
   };
   return checkPaymentAdapter(adapterPackageNameMap[adapter], data).then(
     success => {
