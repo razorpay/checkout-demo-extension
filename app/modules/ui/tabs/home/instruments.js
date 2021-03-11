@@ -299,11 +299,6 @@ export function setBlocks(
       );
     }
 
-    //Add downtime to preferred blocks
-    preferredBlock.instruments = preferredBlock.instruments.map(
-      addDowntimeToBlock
-    );
-
     allBlocks = _Arr.mergeWith([preferredBlock], allBlocks);
   }
 
@@ -312,10 +307,11 @@ export function setBlocks(
     allBlocks,
     block => _Obj.getSafely(block, 'instruments', []).length > 0
   );
-
+  
   // Add an ID to all instruments
   _Arr.loop(allBlocks, (block, blockIndex) => {
     _Arr.loop(block.instruments, (instrument, instrumentIndex) => {
+      addDowntimeToBlock(instrument)
       if (!instrument.id) {
         instrument.id = generateInstrumentId(
           customer,
@@ -327,6 +323,7 @@ export function setBlocks(
       }
     });
   });
+  console.log(allBlocks)
 
   const hasCustomConfig = parsedConfig._meta.hasCustomizations;
   Analytics.setMeta('config.custom', hasCustomConfig);
@@ -470,16 +467,25 @@ function addDowntimeToBlock(block) {
       break;
     case 'card':
       const downtimesArr = ['low', 'medium', 'high'];
-      const issuerDowntime = checkDowntime(
-        downtimes.cards,
-        'issuer',
-        block.issuers[0]
-      );
-      const networkDowntime = checkDowntime(
-        downtimes.cards,
-        'network',
-        block.networks[0]
-      );
+      let issuerDowntime;
+      let networkDowntime
+      if(block.issuers && block.issuers.length > 0){
+        issuerDowntime = checkDowntime(
+          downtimes.cards,
+          'issuer',
+          block.issuers[0]
+        );
+      }
+      if(block.networks && block.networks.length > 0){
+        networkDowntime = checkDowntime(
+          downtimes.cards,
+          'network',
+          block.networks[0]
+        );
+      }
+      if(!issuerDowntime && !networkDowntime) {
+        return block
+      }
       if (issuerDowntime && networkDowntime) {
         if (
           downtimesArr.indexOf(networkDowntime) >=
