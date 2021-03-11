@@ -20,6 +20,25 @@ module.exports = {
       ...override,
     };
     switch (method) {
+      case 'gpay-web': {
+        return {
+          type: 'intent',
+          method: 'upi',
+          provider: null,
+          gateway:
+            'eyJpdiI6Iis2OGRWNjNhSzV6V3Y0SUkrME1IR2c9PSIsInZhbHVlIjoicTJvZkF0TnlyR0dcL1hnYm9oaEE2ZElDTzB2UGNPeHpGc1dMWEhNTEIwanM9IiwibWFjIjoiYzkyYWQwZWQzNjk4YWY1NTZkNDFmMWNjOTk1Mjc1ZDU3OTAxNWE4ZWRmYTk2ZjQ5Y2I3NTEyZjY5YWUyNjY1ZCJ9',
+          data: {
+            intent_url:
+              'upi://pay?pa=upi@razopay&pn=hhgdhd&tr=Lbon0ZQBgtuiRdr&tn=razorpay&am=1&cu=INR&mc=5411',
+          },
+          request: {
+            url:
+              'https://beta-api.stage.razorpay.in/v1/payments/pay_Gl4bNBKNmFCEre/status?key_id=rzp_test_tLtZXhTdaphIKd',
+            method: 'GET',
+          },
+          ...defaultResponse,
+        };
+      }
       case 'emandate': {
         return {
           type: 'first',

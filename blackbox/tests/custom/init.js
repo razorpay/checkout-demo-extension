@@ -1,5 +1,6 @@
 const { interceptor } = require('../../util');
 const { readFileSync } = require('fs');
+const devices = require('puppeteer/DeviceDescriptors');
 
 const prefix = 'https://api-custom.razorpay.com/v1/checkout';
 const apiPrefix = 'https://api.razorpay.com/v1/checkout';
@@ -67,7 +68,6 @@ function checkoutRequestHandler(request) {
     url.startsWith(walletTopUpURL) ||
     url.startsWith(mockSubmitPageCardlessEMI)
   ) {
-    debugger;
     return request.respond({ body: popupHtmlContent });
   } else if (url.startsWith(mockPageSubmit)) {
     const postData = request.postData();
@@ -98,7 +98,6 @@ function checkoutRequestHandler(request) {
 
 function popupRequestHandler(request) {
   const url = request.url();
-  debugger;
   if (url.startsWith(popupInitialPage)) {
     return request.respond({ body: popupHtmlContent });
   } else if (url.includes('favicon.ico')) {
@@ -134,6 +133,7 @@ module.exports = async ({
   mockPaymentRequest = false,
   isCallbackURL = false,
   data = {},
+  emulate,
 }) => {
   if (interceptorOptions) {
     interceptorOptions.disableInterceptor();
@@ -150,6 +150,16 @@ module.exports = async ({
         canMakePayment() {
           return Promise.resolve(true);
         }
+
+        show() {
+          return Promise.resolve({
+            details: {
+              txnId: 123456,
+              transactionReferenceId: 1234,
+            },
+            complete: () => null,
+          });
+        }
       }
 
       window.microapps = {
@@ -158,6 +168,9 @@ module.exports = async ({
 
       window.PaymentRequest = PaymentRequestMock;
     });
+  }
+  if (emulate) {
+    await page.emulate(devices[emulate]);
   }
   await page.goto(customCheckout);
 

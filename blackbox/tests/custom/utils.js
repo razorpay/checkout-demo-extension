@@ -143,6 +143,15 @@ exports.getPaymentPayload = (method = 'card', override = {}) => {
         'card[name]': 'Gaurav Kumar',
       };
     }
+    case 'gpay-web': {
+      data = {
+        ...data,
+        amount: 10000,
+        method: 'upi',
+        contact: '9123456789',
+        upi_app: 'gpay'
+      };
+    }
     default:
       break;
   }
