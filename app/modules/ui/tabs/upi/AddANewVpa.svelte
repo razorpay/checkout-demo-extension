@@ -64,7 +64,7 @@
   let vpa;
   let pspHandle;
   export let downtimeSeverity = '';
-  let downtimeInstrument = '';
+  export let downtimeInstrument = '';
 
   let upiDowntimes = getDowntimes().upi;
 
