@@ -42,7 +42,7 @@ export function setUpiApps(apps) {
   );
 
   upiApps = {
-    all: _Arr.mergeWith(filteredUniqueApps, unusedApps),
+    all: [...filteredUniqueApps, ...unusedApps],
     filtered: filteredUniqueApps,
   };
 }
