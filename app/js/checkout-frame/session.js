@@ -4169,7 +4169,7 @@ Session.prototype = {
       this.showConversionChargesCallout();
       return;
     }
-    const downtimeInstrument = this.checkForDowntime();
+    var downtimeInstrument = this.checkForDowntime();
     if(!downtimeInstrument) {
       this.submit();
     } else {
@@ -4180,7 +4180,6 @@ Session.prototype = {
   checkForDowntime: function() {
     var selectedInstrument = this.getSelectedPaymentInstrument();
     var payload;
-    debugger
     if (selectedInstrument && selectedInstrument.id && selectedInstrument.id.indexOf('rzp.cluster') === -1) {
       payload = selectedInstrument;
     } else {
