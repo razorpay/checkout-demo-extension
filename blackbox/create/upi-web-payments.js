@@ -176,7 +176,7 @@ module.exports = function(testFeatures) {
 
       await selectUPIApp(context, '1');
       if (downtimeHigh || downtimeLow) {
-        await verifyMethodWarned(context, 'UPI', 'upi', 'psp_handle');
+        await verifyMethodWarned(context, 'UPI', 'upi', 'psp');
       }
 
       if (partialPayment) {
