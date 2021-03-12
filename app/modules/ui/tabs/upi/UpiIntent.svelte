@@ -65,7 +65,7 @@
     if (pspHandle) {
       const currentDowntime = checkDowntime(
         upiDowntimes,
-        'psp_handle',
+        'psp',
         pspHandle
       );
       if (currentDowntime) {
@@ -81,7 +81,7 @@
 
   export function onAppSelect({ detail }) {
     const packageName = detail.package_name;
-    const psp = detail.app_name;
+    const psp = detail.shortcode;
     isDowntime(psp);
 
     session.onUpiAppSelect(packageName);

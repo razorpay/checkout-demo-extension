@@ -440,6 +440,9 @@ function addDowntimeToBlock(block) {
   let downtimeInstrument = '';
   switch (block.method) {
     case 'netbanking':
+      if(!block.banks || block.banks.length === 0) {
+        return block
+      }
       downtimeSeverity = checkDowntime(
         downtimes.netbanking,
         'bank',

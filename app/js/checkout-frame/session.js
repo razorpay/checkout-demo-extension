@@ -4169,12 +4169,18 @@ Session.prototype = {
       this.showConversionChargesCallout();
       return;
     }
-    this.checkForDowntime();
+    const downtimeInstrument = this.checkForDowntime();
+    if(!downtimeInstrument) {
+      this.submit();
+    } else {
+      this.showDowntimeAlert(downtimeInstrument);
+    }
   },
 
   checkForDowntime: function() {
     var selectedInstrument = this.getSelectedPaymentInstrument();
     var payload;
+    debugger
     if (selectedInstrument && selectedInstrument.id && selectedInstrument.id.indexOf('rzp.cluster') === -1) {
       payload = selectedInstrument;
     } else {
@@ -4186,10 +4192,9 @@ Session.prototype = {
     delete this.payload.downtimeInstrument;
 
     if (!!downtimeSeverity && downtimeSeverity === 'high') {
-      this.showDowntimeAlert(downtimeInstrument);
-    } else {
-      this.submit();
-    }
+      return downtimeInstrument;
+    } 
+    return false;
   },
 
   showDowntimeAlert: function(downtimeInstrument) {
