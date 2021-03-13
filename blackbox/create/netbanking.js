@@ -168,6 +168,7 @@ module.exports = function(testFeatures) {
       }
 
       if (feeBearer) {
+        await delay(200)
         await handleFeeBearer(context);
       }
 
