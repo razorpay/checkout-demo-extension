@@ -82,10 +82,18 @@
   export function onAppSelect({ detail }) {
     const packageName = detail.package_name;
     const psp = detail.shortcode;
-    isDowntime(psp);
+    params = {
+      packageName,
+      psp
+    }
+    isDowntime(psp)
+    if(downtimeSeverity) {
+      params.downtimeInstrument = psp;
+      params.downtimeSeverity = downtimeSeverity
+    }
 
     session.onUpiAppSelect(packageName);
-    dispatch('select', { packageName, psp });
+    dispatch('select', params);
   }
 </script>
 

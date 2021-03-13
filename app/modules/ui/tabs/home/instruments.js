@@ -323,7 +323,6 @@ export function setBlocks(
       }
     });
   });
-  console.log(allBlocks)
 
   const hasCustomConfig = parsedConfig._meta.hasCustomizations;
   Analytics.setMeta('config.custom', hasCustomConfig);

@@ -523,13 +523,11 @@
     return false;
   }
 
-  export function onUpiAppSelection(event, app) {
-    if (app) {
-      downtimeSeverity = app.downtimeSeverity;
-      downtimeInstrument = app.downtimeInstrument;
-      if (!downtimeSeverity) {
-        downtimeSeverity = false;
-      }
+  export function onUpiAppSelection(event) {
+    const { severity, instrument, id } = event.detail;
+    if(severity) {
+      downtimeSeverity = severity;
+      downtimeInstrument = instrument;
     } else {
       downtimeSeverity = false;
     }
@@ -542,8 +540,6 @@
         }[feature] || 'saved vpa'
       );
     };
-
-    const id = event.detail.id;
 
     Analytics.track('vpa:option:click', {
       type: AnalyticsTypes.BEHAV,
@@ -629,7 +625,6 @@
 
   export function getPayloadForUpiIntentView() {
     let data;
-
     if (intentAppSelected === 'directpay') {
       data = {
         '_[flow]': 'directpay',
@@ -639,6 +634,8 @@
       data = {
         '_[flow]': 'intent',
         upi_app: intentAppSelected,
+        downtimeSeverity,
+        downtimeInstrument
       };
     }
 
@@ -761,8 +758,9 @@
             apps={intentApps || []}
             selected={intentAppSelected}
             on:select={e => {
+              const { downtimeInstrument, downtimeSeverity, packageName } = e.detail;
               onUpiAppSelection({
-                detail: { id: 'intent', app: e.detail.packageName },
+                detail: { id: 'intent', app: packageName, severity: downtimeSeverity, instrument: downtimeInstrument },
               });
             }}
             {showRecommendedUPIApp} />
@@ -788,7 +786,8 @@
                 ellipsis
                 selected={selectedToken === app.id}
                 on:click={() => {
-                  onUpiAppSelection({ detail: { id: app.id } }, app);
+                  const { downtimeSeverity, downtimeInstrument } = app;
+                  onUpiAppSelection({ detail: { id: app.id, severity: downtimeSeverity, instrument: downtimeInstrument } });
                 }}>
                 <div slot="title">
                   {app.vpa.username + '@' + app.vpa.handle}

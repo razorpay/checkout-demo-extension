@@ -1,6 +1,8 @@
 /* global CheckoutBridge */
 
 import Analytics from 'analytics';
+import { checkDowntime } from 'checkoutframe/downtimes';
+import { getDowntimes } from 'checkoutstore';
 import { VPA_REGEX } from 'common/constants';
 
 export const GOOGLE_PAY_PACKAGE_NAME = 'com.google.android.apps.nbu.paisa.user';
@@ -466,6 +468,14 @@ export const getSortedApps = allApps => {
     allApps,
     app => usablePackages.indexOf(app.package_name) >= 0
   );
+  allApps = allApps.map(item => {
+    const currDowntime = checkDowntime(getDowntimes().upi, 'psp', item.shortcode);
+    if(currDowntime) {
+      item.downtimeSeverity = currDowntime;
+      item.downtimeInstrument = item.shortcode;
+    }
+    return item;
+  })
 
   // Sort remaining apps
   _Arr.sort(
