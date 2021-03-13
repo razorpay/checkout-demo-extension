@@ -82,7 +82,7 @@
   export function onAppSelect({ detail }) {
     const packageName = detail.package_name;
     const psp = detail.shortcode;
-    params = {
+    const params = {
       packageName,
       psp
     }
