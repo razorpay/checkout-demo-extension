@@ -237,9 +237,6 @@
         value={"app.package_name"}>
         <div class="ref-title">
           {getUpiIntentAppName(app.shortcode, $locale, app.app_name)}
-          <!-- {#if downtimeSeverity && app.package_name === selected}
-            <div class="downtime-upi-intent-icon"><DowntimeIcon severe={downtimeSeverity} /></div>
-          {/if} -->
           {#if i === 0 && showRecommendedUPIApp}
             <span>
               <!-- LABEL: Recommended -->

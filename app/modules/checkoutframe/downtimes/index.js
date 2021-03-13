@@ -173,26 +173,9 @@ function getBankDowntimes(downtimes) {
 }
 
 function getDowntimesByMethod(downtimes, method) {
-  const filteredDowntimes = downtimes && downtimes[method];
-  let high = [];
-  let medium = [];
-  let low = [];
-  if (filteredDowntimes?.length) {
-    filteredDowntimes.forEach(downtime => {
-      switch (downtime.severity) {
-        case 'high':
-          high.push(downtime);
-          break;
-        case 'medium':
-          medium.push(downtime);
-          break;
-        case 'low':
-          low.push(downtime);
-          break;
-      }
-    });
-  }
-  return { high, medium, low };
+  const methods= {high:[], medium:[], low:[]};
+  downtimes[method]?.forEach(downtime=>methods[downtime.severity].push(downtime));
+  return methods;
 }
 /**
  * Returns bank names from downtimes after filtering them using predicate

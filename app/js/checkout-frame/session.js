@@ -4199,10 +4199,8 @@ Session.prototype = {
   showDowntimeAlert: function(downtimeInstrument) {
     if (!this.downtimeAlert) {
       this.downtimeAlert = new discreet.downtimeAlertView();
-      this.downtimeAlert.view.handleChange(downtimeInstrument);
-    } else {
-      this.downtimeAlert.view.handleChange(downtimeInstrument);
     }
+    this.downtimeAlert.view.handleChange(downtimeInstrument);
     showOverlay($('#downtime-wrap'));
   },
 

@@ -4,7 +4,7 @@
   import { getSession } from 'sessionmanager';
   import Icon from 'ui/elements/Icon.svelte';
 
-  let instrument = 'HDFC Bank';
+  let instrument;
   let point2;
   const session = getSession();
   const icons = session.themeMeta.icons;
@@ -96,6 +96,6 @@
     <button class="back-button" on:click={handleBack}>Back</button>
     <button
       class="continue-button"
-      on:click={() => handleContinue()}>Continue</button>
+      on:click={handleContinue}>Continue</button>
   </div>
 </div>

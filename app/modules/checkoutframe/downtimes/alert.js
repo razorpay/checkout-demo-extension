@@ -6,10 +6,5 @@ export default function downtimeAlertView(session) {
 
   this.view = new Alert({
     target: wrap,
-    props: {
-      showIcon: false,
-      severe: 'High',
-      session,
-    },
   });
 }

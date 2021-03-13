@@ -4,13 +4,11 @@
   import { DOWNTIME_CALLOUT } from 'ui/labels/callouts';
   import { locale } from 'svelte-i18n';
   import { formatTemplateWithLocale } from 'i18n';
+  import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   // Props
   export let severe;
   export let showIcon = false;
   export let downtimeInstrument;
-  // Computed
-  let downtimeClasses = 'downtime-callout';
-  // let
 </script>
 
 <style>
@@ -42,6 +40,7 @@
     </div>
   {/if}
   <div>
-    {formatTemplateWithLocale(DOWNTIME_CALLOUT, { instrument: downtimeInstrument }, $locale)}
+    <FormattedText
+      text={formatTemplateWithLocale(DOWNTIME_CALLOUT, { instrument: downtimeInstrument }, $locale)} />
   </div>
 </div>
