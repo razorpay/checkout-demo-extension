@@ -176,7 +176,7 @@ module.exports = function(testFeatures) {
 
       await selectUPIApp(context, '1');
       if (downtimeHigh || downtimeLow) {
-        await verifyMethodWarned(context, 'UPI', 'upi', 'psp');
+        await verifyMethodWarned(context, 'upi', 'psp');
       }
 
       if (partialPayment) {
@@ -189,7 +189,12 @@ module.exports = function(testFeatures) {
         return;
       }
 
-      await submit(context);
+      await submit(context, downtimeHigh);
+
+      if(downtimeHigh) {
+        await downtimeHighAlert(context);
+      }
+
       if (feeBearer) {
         await handleFeeBearer(context, page);
       }

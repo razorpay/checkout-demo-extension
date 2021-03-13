@@ -9,7 +9,7 @@ const feebearerActions = require('./feebearer-actions');
 const upiActions = require('./upi-actions');
 const offerActions = require('./offers-actions');
 const cardActions = require('./card-actions');
-const downtimeTimoutActions = require('./downtime-timeout-actions');
+const downtimeActions = require('./downtime-actions');
 const walletActions = require('./wallet-actions');
 const sharedActions = require('./shared-actions');
 const qrActions = require('./qr-actions');
@@ -32,7 +32,7 @@ module.exports = {
   ...netBankingActions,
   ...partialPaymentActions,
   ...feebearerActions,
-  ...downtimeTimoutActions,
+  ...downtimeActions,
   ...walletActions,
   ...sharedActions,
   ...qrActions,

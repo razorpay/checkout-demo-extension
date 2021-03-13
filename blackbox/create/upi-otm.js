@@ -46,7 +46,7 @@ const {
 
   //Downtime
   verifyMethodWarned,
-  verifyMethodDisabled,
+  downtimeHighAlert,
 
   // Personalization
   selectPersonalizationPaymentMethod,
@@ -150,11 +150,10 @@ module.exports = function(testFeatures) {
         await verifyFooterText(context, 'PAY');
       }
 
-      await submit(context);
+      await submit(context, downtimeHigh);
 
       if(downtimeHigh) {
-        const alertPromise = context.page.click('.continue-button');
-        await alertPromise;
+        await downtimeHighAlert(context);
       }
 
       await handleUPIAccountValidation(context, 'BHIM@upi');

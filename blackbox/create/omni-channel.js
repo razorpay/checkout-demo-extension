@@ -129,7 +129,7 @@ module.exports = function(testFeatures) {
         await verifyPartialAmount(context, '₹ 100');
       }
 
-      await submit(context);
+      await submit(context, downtimeHigh);
 
       if (feeBearer) {
         await handleFeeBearer(context, page);

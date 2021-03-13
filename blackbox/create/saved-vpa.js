@@ -41,7 +41,7 @@ const {
 
   //Downtime
   verifyMethodWarned,
-  verifyMethodDisabled,
+  downtimeHighAlert,
 
   // Personalization
   selectPersonalizationPaymentMethod,
@@ -138,10 +138,10 @@ module.exports = function(testFeatures) {
         await verifyDiscountText(context, 'You save ₹10');
       }
 
-      await submit(context);
+      await submit(context, downtimeHigh);
+
       if(downtimeHigh) {
-        const alertPromise = context.page.click('.continue-button');
-        await alertPromise;
+        await downtimeHighAlert(context);
       }
 
       if (feeBearer) {
