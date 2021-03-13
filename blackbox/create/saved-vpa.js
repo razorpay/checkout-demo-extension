@@ -121,7 +121,7 @@ module.exports = function(testFeatures) {
         await selectPaymentMethod(context, 'upi');
         await selectUPIMethod(context, 'token');
         if (downtimeHigh || downtimeLow) {
-          await verifyMethodWarned(context, 'UPI', 'upi', 'vpa_handle');
+          await verifyMethodWarned(context, 'upi', 'vpa_handle');
         }
       }
 

@@ -47,6 +47,7 @@ const {
 
   //Downtime
   verifyMethodWarned,
+  downtimeHighAlert
 } = require('../tests/homescreen/actions');
 
 module.exports = function(testFeatures) {
@@ -196,6 +197,7 @@ module.exports = function(testFeatures) {
       }
 
       if (feeBearer) {
+        await delay(200)
         await handleFeeBearer(context, page);
       }
 
