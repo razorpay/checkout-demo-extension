@@ -99,6 +99,7 @@ import * as NBHandlers from 'handlers/netbanking';
 import * as Instruments from 'configurability/instruments';
 import { getInstrumentMeta } from 'ui/tabs/home/instruments';
 import * as ContactStorage from 'checkoutframe/contact-storage';
+import BlockedDeactivatedMerchant from 'ui/elements/BlockedDeactivatedMerchant.svelte';
 
 import downtimeAlertView from 'checkoutframe/downtimes/alert';
 
@@ -190,6 +191,7 @@ export default {
   timer: _.timer,
   QRScreen,
   getFullBankLogo,
+  BlockedDeactivatedMerchant,
 
   HomeTab,
   upiTab,

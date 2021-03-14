@@ -235,6 +235,8 @@ export default {
       hdfc: 'HDFC Bank',
       idfb: 'IDFC First Bank',
       kkbk: 'Kotak Mahindra Bank',
+      icic: 'ICICI Bank',
+      hcin: 'Home Credit Ujjwal Card',
     },
     select_option_title: 'Select an option',
   },
@@ -555,7 +557,7 @@ export default {
     citi_bank_emi:
       'Full amount of {amount} will be deducted from your account. EMI processing may take upto 8 working days.',
     citi_know_more:
-      'In case the total amount due has not been paid in full, finance charges as applicable (currently, between 3.50%- 3.60% per month i.e. 42-43.2% annualized) on card balances may apply until the EMI is converted & posted to the card. Latest rates are available at ',
+      'EMI processing may take upto 8 working days. In case the total amount due has not been paid in full, finance charges as applicable (currently 3.75% per month i.e. 45% annualized) on card balances may apply until the EMI is converted & posted to the card. Latest rates are available at ',
     show_more: 'Show More',
     show_less: 'Show Less',
     citi_url:
@@ -808,6 +810,12 @@ export default {
     select_help: 'Please select a bank',
     select_label: 'Select a different bank',
     selection_radio_text: 'Complete Payment Using',
+    cancellation_modal_title:
+      'Please share a reason for cancelling this payment',
+    wrong_bank_selected: 'Wrong bank selected',
+    forgot_username_password: 'Forgot username or password',
+    bank_page_error: 'Error on bank page',
+    other: 'Other',
   },
   networks: {
     AMEX: 'Amex',

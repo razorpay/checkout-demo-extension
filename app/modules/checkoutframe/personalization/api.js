@@ -151,6 +151,13 @@ export function getInstrumentsForCustomer(customer) {
 // instrument.instrument contains the primary payment instrument data
 const API_INSTRUMENT_PAYMENT_ADDONS = {
   upi: instrument => {
+    if (!instrument.instrument) {
+      // API sends null
+      // Keep a sanity value allow this to go forward.
+      // The filtering logic in filters.js will remove this instrument.
+      instrument.instrument = '';
+      return;
+    }
     instrument.vpa = instrument.instrument;
     delete instrument.instrument;
     const validVpa = VPA_REGEX.test(instrument.vpa);

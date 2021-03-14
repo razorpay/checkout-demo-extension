@@ -266,18 +266,20 @@ RazorProto.calculateFees = function(payload) {
  */
 RazorProto.fetchVirtualAccount = function({ customer_id, order_id, notes }) {
   return new Promise((resolve, reject) => {
-    if(!order_id) {
-      reject("Order ID is required to fetch the account details")
-      return
+    if (!order_id) {
+      reject('Order ID is required to fetch the account details');
+      return;
     }
     let data = { customer_id, notes };
-    if(!customer_id) {
+    if (!customer_id) {
       delete data.customer_id;
     }
     if (!notes) {
       delete data.notes;
     }
-    const url = makeUrl(`orders/${order_id}/virtual_accounts?x_entity_id=${order_id}`)
+    const url = makeUrl(
+      `orders/${order_id}/virtual_accounts?x_entity_id=${order_id}`
+    );
     fetch.post({
       url,
       data,
@@ -290,7 +292,7 @@ RazorProto.fetchVirtualAccount = function({ customer_id, order_id, notes }) {
       },
     });
   });
-}
+};
 
 function isValidAmount(amt, min = 100) {
   if (/[^0-9]/.test(amt)) {

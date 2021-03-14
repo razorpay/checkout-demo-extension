@@ -49,6 +49,7 @@ var preferences,
   Backdrop = discreet.Backdrop,
   FeeLabel = discreet.FeeLabel,
   rewardsStore = discreet.rewardsStore,
+  BlockedDeactivatedMerchant = discreet.BlockedDeactivatedMerchant,
   updateScore = discreet.updateScore;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
@@ -1061,14 +1062,21 @@ Session.prototype = {
     this.improvisePaymentOptions();
     this.improvisePrefill();
     es6components.render();
+    this.setModal();
+    this.setBackdrop();
+    if (Store.isBlockedDeactivated() && this.r.isLiveMode()) {
+      new BlockedDeactivatedMerchant({
+        target: _Doc.querySelector('#form-fields'),
+      });
+      _Doc.getElementById('header').remove();
+      return;
+    }
     this.setSvelteComponents();
     if (!Store.isPayout()) {
       this.fillData();
     }
     this.setEMI();
     Cta.init();
-    this.setModal();
-    this.setBackdrop();
     this.completePendingPayment();
     this.bindEvents();
     this.setEmiScreen();
@@ -2467,10 +2475,10 @@ Session.prototype = {
         }
       }
     };
-
+    
     if (screen === 'wallet') {
       // Select wallet
-      if (issuer) {
+      if (issuer && this.walletTab) {
         this.walletTab.onWalletSelection(issuer);
       }
     } else if (screen === 'netbanking') {
@@ -2508,7 +2516,6 @@ Session.prototype = {
      * Get the first instrument that can work with the offer
      * and select it if not already selected
      */
-
     var instrument = discreet.Offers.getInstrumentToSelectForOffer(offer);
 
     if (!instrument) {
@@ -3845,7 +3852,6 @@ Session.prototype = {
     if (powerotp) {
       powerotp.value = '';
     }
-
     if (this.r._payment) {
       hideOverlayMessage();
       this.r.emit('payment.cancel', extra);
@@ -4447,7 +4453,9 @@ Session.prototype = {
     if (
       data.method === 'upi' &&
       data['_[flow]'] === 'intent' &&
-      WebPaymentsApi.appsThatSupportWebPayments.includes(data.upi_app) &&
+      WebPaymentsApi.appsThatSupportWebPayments.find(function(app) {
+        return app.package_name === data.upi_app;
+      }) &&
       WebPaymentsApi.isWebPaymentsApiAvailable(data.upi_app)
     ) {
       request.gpay = true;
@@ -4455,7 +4463,7 @@ Session.prototype = {
 
     // added rewardIds to the create payment request
     var rewardIds = storeGetter(rewardsStore);
-    if (rewardIds && rewardIds.length > 0 && !Store.isContactEmailOptional()) {
+    if (rewardIds && rewardIds.length > 0 && !Store.isEmailOptional()) {
       data.reward_ids = rewardIds;
     }
 

@@ -8,10 +8,8 @@ export const SEARCH_PLACEHOLDER = 'netbanking.search_placeholder';
 export const SEARCH_ALL = 'netbanking.search_all';
 export const RECURRING_CALLOUT = 'netbanking.recurring_callout';
 
-// Cancellation modal
-export const CANCELLATION_MODAL_TITLE =
-  'Please share a reason for cancelling this payment';
-export const WRONG_BANK_SELECTED = 'Wrong bank selected';
-export const FORGOT_USERNAME_PASSWORD = 'Forgot username or password';
-export const ERROR_BANK_PAGE = 'Error on bank page';
-export const CANCEL_REASON_OTHER = 'Other';
+export const CANCELLATION_MODAL_TITLE = 'netbanking.cancellation_modal_title';
+export const WRONG_BANK_SELECTED = 'netbanking.wrong_bank_selected';
+export const FORGOT_USERNAME_PASSWORD = 'netbanking.forgot_username_password';
+export const ERROR_BANK_PAGE = 'netbanking.bank_page_error';
+export const CANCEL_REASON_OTHER = 'netbanking.other';
