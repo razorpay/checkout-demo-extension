@@ -22,7 +22,6 @@
   import SearchModal from 'ui/elements/SearchModal.svelte';
   import BankSearchItem from 'ui/elements/search-item/Bank.svelte';
   import CTA from 'ui/elements/CTA.svelte';
-  import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
 
   // i18n
   import {
