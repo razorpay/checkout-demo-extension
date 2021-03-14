@@ -5,10 +5,14 @@
   import { locale } from 'svelte-i18n';
   import { formatTemplateWithLocale } from 'i18n';
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
+  import { selectedInstrument } from 'checkoutstore/screens/home';
   // Props
   export let severe;
   export let showIcon = false;
   export let downtimeInstrument;
+  let downtimeInstrumentText;
+
+  $: downtimeInstrumentText = $selectedInstrument?.method === 'card' ? `${downtimeInstrument} cards are` : `${downtimeInstrument} is`
 </script>
 
 <style>
@@ -41,6 +45,6 @@
   {/if}
   <div>
     <FormattedText
-      text={formatTemplateWithLocale(DOWNTIME_CALLOUT, { instrument: downtimeInstrument }, $locale)} />
+      text={formatTemplateWithLocale(DOWNTIME_CALLOUT, { instrument: downtimeInstrumentText }, $locale)} />
   </div>
 </div>

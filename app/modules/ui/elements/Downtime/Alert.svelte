@@ -3,13 +3,17 @@
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
   import { getSession } from 'sessionmanager';
   import Icon from 'ui/elements/Icon.svelte';
+  import { selectedInstrument } from 'checkoutstore/screens/home';
 
   let instrument;
   let point2;
   const session = getSession();
   const icons = session.themeMeta.icons;
 
-  $: point2 = `${instrument} are facing some technical issues at the moment`;
+  $: {
+    const instrumentText = $selectedInstrument?.method === 'card' ? `${instrument} cards are` : `${instrument} is`;
+    point2 = `${instrumentText} facing some technical issues at the moment`;
+  }
 
   const handleContinue = () => {
     session.hideOverlayMessage();

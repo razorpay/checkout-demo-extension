@@ -4198,7 +4198,7 @@ Session.prototype = {
 
     if (!!downtimeSeverity && downtimeSeverity === 'high') {
       return downtimeInstrument;
-    } 
+    }
     return false;
   },
 

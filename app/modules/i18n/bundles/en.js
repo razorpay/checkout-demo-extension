@@ -172,7 +172,7 @@ export default {
         'Subscription payments are supported on debit cards from {issuers}.',
     },
     downtime_callout:
-      'This payment might fail because {instrument} is facing technical difficulties',
+      'This payment might fail because {instrument} facing technical difficulties',
   },
   card: {
     add_another_card_btn: 'Add another card',
