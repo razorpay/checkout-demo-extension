@@ -93,6 +93,7 @@ import * as Hacks from 'checkoutframe/hacks';
 
 import { get as storeGetter } from 'svelte/store';
 import * as Experiments from 'experiments';
+import BrowserStorage from 'browserstorage';
 
 import * as NBHandlers from 'handlers/netbanking';
 
@@ -202,6 +203,7 @@ export default {
   Hacks,
   storeGetter,
   Experiments,
+  BrowserStorage,
 
   _Arr,
   _Doc,

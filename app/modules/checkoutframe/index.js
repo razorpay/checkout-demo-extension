@@ -1,6 +1,7 @@
 import * as Bridge from 'bridge';
 import Razorpay, { makePrefParams, validateOverrides } from 'common/Razorpay';
 import Analytics from 'analytics';
+import BrowserStorage from 'browserstorage';
 import * as SessionManager from 'sessionmanager';
 import Track from 'tracker';
 import {
@@ -379,6 +380,11 @@ function getPreferenecsParams(razorpayInstance) {
      * cardsaving */
     prefData.checkcookie = 1;
     document.cookie = 'checkcookie=1;path=/';
+  }
+  // TODO: make this a const
+  const CREDExperiment = BrowserStorage.getItem('cred_offer_experiment');
+  if (CREDExperiment) {
+    prefData.cred_offer_experiment = CREDExperiment;
   }
   markRelevantPreferencesPayload(prefData);
 

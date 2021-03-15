@@ -1024,19 +1024,23 @@ Session.prototype = {
 
     Object.keys(metaApps).forEach(function(app) {
       if (metaApps[app].offer) {
-        metaAppOffers.push({
-          id: Track.makeUid(),
-          name: app.toUpperCase() + ' Offer',
-          display_text: metaApps[app].offer.description,
-          payment_method: 'card',
-          type: 'read_only',
-        });
+        if (app === 'cred') {
+          metaAppOffers.push({
+            id: 'CRED_experimental_offer',
+            name: app.toUpperCase() + ' Offer',
+            display_text: metaApps[app].offer.description,
+            payment_method: 'card',
+            type: 'read_only',
+          });
+        }
       }
     });
 
     return metaAppOffers;
   },
 
+  // allow a easier setup of read only offers
+  // read_only offers can come from many sources ( as they have in the past )
   addReadOnlyOffers: function(preferences) {
     var metaAppOffers = this.getReadOnlyAppOffers(preferences);
     if (!preferences.offers) {
@@ -5259,8 +5263,33 @@ Session.prototype = {
     }
   },
 
-  setPreferences: function(prefs) {
+  /**
+   * @description Unlike the standard experiments on checkout, for CRED,
+   * the entire logic for the A/B resides in BE. BE either sends us the meta offer or the cred subtext
+   * @param {Object} prefs the preferences response
+   */
+  setupCREDExperiment: function(prefs) {
     this.addReadOnlyOffers(prefs);
+    var experimentType = null;
+    prefs.offers.forEach(function(offer) {
+      if (offer.id === 'CRED_experimental_offer') {
+        experimentType = 'offer_tile';
+      }
+    });
+    if (!experimentType) {
+      if (prefs.methods && prefs.methods.custom_text) {
+        if (prefs.methods && prefs.methods.custom_text.cred) {
+          experimentType = 'subtext';
+        }
+      }
+    }
+    if (experimentType) {
+      discreet.BrowserStorage.setItem('cred_offer_experiment', experimentType);
+    }
+  },
+
+  setPreferences: function(prefs) {
+    this.setupCREDExperiment(prefs);
     this.preferences = prefs;
     preferences = prefs;
 
