@@ -4452,12 +4452,14 @@ Session.prototype = {
 
     var appliedOffer = this.getAppliedOffer();
     if (appliedOffer && (!this.offers || this.offers.shouldSendOfferToApi())) {
-      data.offer_id = appliedOffer.id;
-      this.r.display_amount = appliedOffer.amount;
-      updateScore('affordability_offers');
-      Analytics.track('offers:applied_with_payment', {
-        data: appliedOffer,
-      });
+      if (appliedOffer.type !== 'read_only') {
+        data.offer_id = appliedOffer.id;
+        this.r.display_amount = appliedOffer.amount;
+        updateScore('affordability_offers');
+        Analytics.track('offers:applied_with_payment', {
+          data: appliedOffer,
+        });
+      }
     } else {
       delete this.r.display_amount;
       var selectedPlan = this.emiPlansView.selectedPlan;
