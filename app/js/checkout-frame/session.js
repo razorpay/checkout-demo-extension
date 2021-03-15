@@ -1017,6 +1017,34 @@ Session.prototype = {
     discreet.Experiments.clearOldExperiments();
   },
 
+  getReadOnlyAppOffers: function(preferences) {
+    var metaApps = (preferences.methods || {}).app_meta || {};
+
+    var metaAppOffers = [];
+
+    Object.keys(metaApps).forEach(function(app) {
+      metaAppOffers.push({
+        id: Track.makeUid(),
+        name: app + ' Offer',
+        display_text: app + ' Offer',
+        payment_method: 'card',
+        type: 'read_only',
+      });
+    });
+
+    return metaAppOffers;
+  },
+
+  addReadOnlyOffers: function(preferences) {
+    var metaAppOffers = this.getReadOnlyAppOffers(preferences);
+    if (!preferences.offers) {
+      preferences.offers = [];
+    }
+    metaAppOffers.forEach(function(offer) {
+      preferences.offers.push(offer);
+    });
+  },
+
   render: function(options) {
     var that = this;
 
@@ -2461,7 +2489,7 @@ Session.prototype = {
         }
       }
     };
-    
+
     if (screen === 'wallet') {
       // Select wallet
       if (issuer && this.walletTab) {
@@ -5228,6 +5256,7 @@ Session.prototype = {
   },
 
   setPreferences: function(prefs) {
+    this.addReadOnlyOffers(prefs);
     this.preferences = prefs;
     preferences = prefs;
 
