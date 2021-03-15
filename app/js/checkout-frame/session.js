@@ -1023,13 +1023,15 @@ Session.prototype = {
     var metaAppOffers = [];
 
     Object.keys(metaApps).forEach(function(app) {
-      metaAppOffers.push({
-        id: Track.makeUid(),
-        name: app + ' Offer',
-        display_text: app + ' Offer',
-        payment_method: 'card',
-        type: 'read_only',
-      });
+      if (metaApps[app].offer) {
+        metaAppOffers.push({
+          id: Track.makeUid(),
+          name: app.toUpperCase() + ' Offer',
+          display_text: metaApps[app].offer.description,
+          payment_method: 'card',
+          type: 'read_only',
+        });
+      }
     });
 
     return metaAppOffers;
