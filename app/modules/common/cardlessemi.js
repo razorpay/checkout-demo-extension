@@ -28,7 +28,7 @@ const config = {
     headless: false,
   },
   hdfc: {
-    name: 'HDFC Bank',
+    name: 'HDFC Bank Cardless EMI',
     headless: false,
   },
   idfb: {
@@ -36,11 +36,11 @@ const config = {
     headless: false,
   },
   kkbk: {
-    name: 'Kotak Mahindra Bank',
+    name: 'Kotak Mahindra Bank Cardless EMI',
     headless: false,
   },
   icic: {
-    name: 'ICICI Bank',
+    name: 'ICICI Bank Cardless EMI',
     headless: false,
   },
   hcin: {
