@@ -50,6 +50,7 @@ import * as Form from 'checkoutframe/form';
 import { stopListeningForBackPresses } from 'bridge/back';
 import * as Bridge from 'bridge';
 import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
+import * as CRED from 'checkoutframe/cred';
 import { Formatter } from 'formatter';
 
 import * as Store from 'checkoutstore';
@@ -220,4 +221,5 @@ export default {
   I18n,
   overlayStackStore,
   rewardsStore,
+  CRED,
 };

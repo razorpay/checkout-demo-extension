@@ -35,3 +35,5 @@ export const currentCvv = writable('');
 export const currentAuthType = writable('');
 
 export const internationalCurrencyCalloutNeeded = writable(false);
+
+export const hitCREDEligibility = writable(true);

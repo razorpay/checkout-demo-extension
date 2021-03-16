@@ -4403,6 +4403,23 @@ Session.prototype = {
       }
     }
 
+    var session = this;
+
+    if (data.method === 'app' && data.provider === 'cred') {
+      if (discreet.CRED.isUserEligible('8800844282') === undefined) {
+        session.showLoadError('Checking you eligibility status on CRED');
+        discreet.CRED.checkCREDEligibility('8800844282')
+          .then(function(res) {
+            session.hideErrorMessage();
+            session.submit();
+          })
+          .catch(function() {
+            session.showLoadError('User does not have a CRED account', true);
+          });
+        return;
+      }
+    }
+
     /**
      * Google Pay Cards follows an older format.
      * Soon it will be changed to method: app + provider: google_pay.
