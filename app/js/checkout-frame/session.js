@@ -4405,21 +4405,6 @@ Session.prototype = {
 
     var session = this;
 
-    if (data.method === 'app' && data.provider === 'cred') {
-      if (discreet.CRED.isUserEligible('8800844282') === undefined) {
-        session.showLoadError('Checking you eligibility status on CRED');
-        discreet.CRED.checkCREDEligibility('8800844282')
-          .then(function(res) {
-            session.hideErrorMessage();
-            session.submit();
-          })
-          .catch(function() {
-            session.showLoadError('User does not have a CRED account', true);
-          });
-        return;
-      }
-    }
-
     /**
      * Google Pay Cards follows an older format.
      * Soon it will be changed to method: app + provider: google_pay.
@@ -4689,10 +4674,24 @@ Session.prototype = {
         },
       });
 
-      if (provider === 'cred' && Store.isContactOptional()) {
-        // For contact optional case, we ask for contact separately
-        // which is present in proxyPhone.
-        this.payload.contact = getProxyPhone();
+      if (provider === 'cred') {
+        if (Store.isContactOptional()) {
+          // For contact optional case, we ask for contact separately
+          // which is present in proxyPhone.
+          this.payload.contact = getProxyPhone();
+        }
+        if (discreet.CRED.isUserEligible(this.payload.contact) === undefined) {
+          session.showLoadError('Checking you eligibility status on CRED');
+          discreet.CRED.checkCREDEligibility(this.payload.contact)
+            .then(function(res) {
+              session.hideErrorMessage();
+              session.submit();
+            })
+            .catch(function() {
+              session.showLoadError('User does not have a CRED account', true);
+            });
+          return;
+        }
       }
     } else if (data.method === 'card' || data.method === 'emi') {
       this.nativeotp = !!this.shouldUseNativeOTP();
