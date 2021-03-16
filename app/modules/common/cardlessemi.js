@@ -24,7 +24,7 @@ const config = {
     fee_bearer_customer: false,
   },
   fdrl: {
-    name: 'Federal Bank',
+    name: 'Federal Bank Cardless EMI',
     headless: false,
   },
   hdfc: {
@@ -32,7 +32,7 @@ const config = {
     headless: false,
   },
   idfb: {
-    name: 'IDFC First Bank',
+    name: 'IDFC First Bank Cardless EMI',
     headless: false,
   },
   kkbk: {
