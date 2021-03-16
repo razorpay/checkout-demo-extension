@@ -14,6 +14,7 @@
   import { getSession } from 'sessionmanager';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
+  import { isMobile } from 'common/useragent';
 
   // UI imports
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
@@ -253,8 +254,9 @@
           </div>
         {/if}
       </div>
-      <div on:click={handlePrint} class="print">{$t(PRINT_DETAILS)}</div>
-
+      {#if !isMobile()}
+        <div on:click={handlePrint} class="print">{$t(PRINT_DETAILS)}</div>
+      {/if}
       <Bottom>
         <!-- LABEL: Do not round-off the amount. Transfer the exact amount for the payment to be successful. -->
         <Callout>{$t(ROUND_OFF_CALLOUT)}</Callout>

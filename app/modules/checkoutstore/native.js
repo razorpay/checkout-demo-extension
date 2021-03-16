@@ -22,19 +22,28 @@ let upiApps = { all: [], filtered: [] };
  * @param {Array<Object>} apps
  */
 export function setUpiApps(apps) {
-  const filteredApps = getSortedApps(apps);
+  const sortedApps = getSortedApps(apps);
+
+  // Have a unique check in place
+  const filteredUniqueApps = sortedApps.reduce((pV, cV) => {
+    const allPackageNames = pV.map(app => app.package_name);
+    if (allPackageNames.includes(cV.package_name)) {
+      return pV;
+    }
+    return [...pV, cV];
+  }, []);
   const unusedApps = _Arr.filter(
     apps,
     app =>
       !_Arr.find(
-        filteredApps,
+        filteredUniqueApps,
         filteredApp => filteredApp.package_name === app.package_name
       )
   );
 
   upiApps = {
-    all: _Arr.mergeWith(filteredApps, unusedApps),
-    filtered: filteredApps,
+    all: [...filteredUniqueApps, ...unusedApps],
+    filtered: filteredUniqueApps,
   };
 }
 
@@ -119,7 +128,6 @@ const messageTransformers = {
     // @TODO: update better names for these variables
     if (message.upi_intents_data && message.upi_intents_data.length) {
       // TODO: Send from here itself
-
       setUpiApps(message.upi_intents_data);
     }
   },
