@@ -39,7 +39,7 @@ exports.flowTests = [
   {
     name: 'Emandate Card',
     type: 'emandate-card',
-    skipAjax: false,
+    skipAjax: true,
   },
   {
     name: 'Cred',
@@ -156,6 +156,7 @@ exports.getPaymentPayload = (method = 'card', override = {}) => {
         contact: '9123456789',
         upi_app: 'gpay',
       };
+      break;
     }
     case 'cred': {
       data = {
@@ -166,6 +167,7 @@ exports.getPaymentPayload = (method = 'card', override = {}) => {
         method: 'app',
         provider: 'cred',
       };
+      break;
     }
     default:
       break;
