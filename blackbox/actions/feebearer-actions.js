@@ -1,5 +1,7 @@
 const { visible } = require('../util');
 
+let feeAmount;
+let expectedAmount;
 async function handleFeeBearer(context, pressContinue) {
   let req = await context.expectRequest();
   expect(req.method).toEqual('POST');
@@ -34,33 +36,33 @@ async function handleFeeBearer(context, pressContinue) {
   });
   const feeAmount11 = await context.page.$$('.fee-amount');
   feeAmount = feeAmount11[0];
-  expectedfeeAmount1 = '₹ 600';
+  expectedAmount = '₹ 600';
   const feeAmount1 = await context.page.evaluate(
     feeAmount => feeAmount.textContent,
     feeAmount
   );
-  expect(feeAmount1).toEqual(expectedfeeAmount1);
+  expect(feeAmount1).toEqual(expectedAmount);
   feeAmount = feeAmount11[1];
-  expectedfeeAmount1 = '₹ 17.40';
+  expectedAmount = '₹ 17.40';
   const feeAmount2 = await context.page.evaluate(
     feeAmount => feeAmount.textContent,
     feeAmount
   );
-  expect(feeAmount2).toEqual(expectedfeeAmount1);
+  expect(feeAmount2).toEqual(expectedAmount);
   feeAmount = feeAmount11[2];
-  expectedfeeAmount1 = '₹ 3.14';
+  expectedAmount = '₹ 3.14';
   const feeAmount3 = await context.page.evaluate(
     feeAmount => feeAmount.textContent,
     feeAmount
   );
-  expect(feeAmount3).toEqual(expectedfeeAmount1);
+  expect(feeAmount3).toEqual(expectedAmount);
   feeAmount = feeAmount11[3];
-  expectedfeeAmount1 = '₹ 620.54';
+  expectedAmount = '₹ 620.54';
   const feeAmount4 = await context.page.evaluate(
     feeAmount => feeAmount.textContent,
     feeAmount
   );
-  expect(feeAmount4).toEqual(expectedfeeAmount1);
+  expect(feeAmount4).toEqual(expectedAmount);
   if (pressContinue != false) {
     context.page.click('.fee-bearer .btn');
     await delay(400);

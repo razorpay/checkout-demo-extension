@@ -8,6 +8,8 @@ const flags = require('./chrome-flags');
 module.exports = async function() {
   const opts = {
     headless: isProd,
+    devtools: !isProd,
+    args: ['--disable-web-security'],
   };
   if (isProd) {
     opts.args = flags;
