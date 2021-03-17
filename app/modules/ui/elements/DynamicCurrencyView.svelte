@@ -1,5 +1,4 @@
 <script>
-  import { onDestroy } from 'svelte';
 
   // Store
   import {
@@ -13,7 +12,6 @@
 
   import {
     selectedInstrument,
-    selectedInstrumentId,
   } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
@@ -34,7 +32,7 @@
     isPartialPayment,
   } from 'checkoutstore';
 
-  import { getIin, getCardDigits } from 'common/card';
+  import { getIin } from 'common/card';
 
   import { formatAmountWithSymbol } from 'common/currency';
 
@@ -42,7 +40,6 @@
   import Stack from 'ui/layouts/Stack.svelte';
   import Radio from 'ui/elements/Radio.svelte';
   import SearchModal from 'ui/elements/SearchModal.svelte';
-  import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
   import CurrencySearchItem from 'ui/elements/search-item/Currency.svelte';
 
   const TOP_CURRENCIES = ['USD', 'GBP', 'EUR'];
@@ -60,8 +57,11 @@
   let currencies = null;
   let originalAmount = getAmount();
   let selectedCurrency = null;
-  let searchModalOpen = false;
+  let searchModalOpen = null;
   let entityWithAmount = null;
+
+  let currencyConfig;
+  let displayCurrencies = [];
 
   const currencyCache = {};
 
@@ -69,6 +69,7 @@
   export let classes = [];
   export let visible = false;
   export let view = null;
+  export let tabVisible = null;
 
   // Computed
   export let allClasses;
@@ -141,18 +142,32 @@
   }
 
   $: {
-    if (currencies && selectedCurrency) {
-      updateAmountInHeaderAndCTA(
-        formatAmountWithSymbol(dccAmount, selectedCurrency)
-      );
-    } else {
-      updateAmountInHeaderAndCTA();
+    if(tabVisible) {
+      if (currencies && selectedCurrency) {
+        updateAmountInHeaderAndCTA(
+          formatAmountWithSymbol(dccAmount, selectedCurrency)
+        );
+      } else {
+        updateAmountInHeaderAndCTA();
+      }
     }
   }
 
   $: {
     $currencyRequestId = currencyConfig && currencyConfig.currency_request_id;
     $dccCurrency = selectedCurrency;
+  }
+
+  function onSelect(currency) {
+    selectedCurrency = currency;
+    searchModalOpen = false;
+  }
+
+  $: {
+    if(tabVisible) {
+      console.log('view', view);
+      onSelect($dccCurrency);
+    }
   }
 
   $: currencyConfig = entity && currencyCache[entityWithAmount];
@@ -167,10 +182,6 @@
   );
   $: entityWithAmount = `${entity}-${$amountAfterOffer}`;
 
-  function onSelect(currency) {
-    selectedCurrency = currency;
-    searchModalOpen = false;
-  }
 
   function updateAmountInHeaderAndCTA(displayAmount) {
     const session = getSession();

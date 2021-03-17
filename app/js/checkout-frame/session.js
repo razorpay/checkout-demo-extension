@@ -2902,6 +2902,7 @@ Session.prototype = {
   },
 
   showCardTab: function(tab) {
+    var sessionContext = this;
     this.otpView.updateScreen({
       maxlength: 6,
     });
@@ -2943,6 +2944,7 @@ Session.prototype = {
         if (customer.saved && !customer.logged) {
           askOTP(self.otpView, undefined, true, { phone: getPhone() });
         } else {
+          sessionContext.svelteCardTab.setTabVisible(true);
           self.setScreen('card');
         }
       }, params);

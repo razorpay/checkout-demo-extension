@@ -113,6 +113,15 @@
   let currentView = Views.SAVED_CARDS;
   let lastView;
 
+  /**
+   * tabVisible {Boolean}
+   * used by DCC component to allow preselect last currency selection and update the CTA accordingly
+   * 
+   * why? component not destroyed when we go back state remains so when we come back no update trigger
+   * CTA need to update.
+  */
+  let tabVisible = false;
+
   // We're showing apps on both saved cards & new card screen,
   // But if the user switches to new card screen from the saved cards screen,
   // hide the apps. It clearly indicates that the user doesn't want to use apps.
@@ -191,7 +200,7 @@
    */
   export function onBack() {
     $selectedCard = null; // De-select saved card
-
+    tabVisible = false;
     return false;
   }
 
@@ -471,7 +480,6 @@
     const amexCard = isAmex($cardNumber);
 
     $internationalCurrencyCalloutNeeded = amexCard && isInternational();
-
     if (sixDigits) {
       getCardFeatures(_cardNumber).then(features => {
         if (iin !== getIin($cardNumber)) {
@@ -600,6 +608,10 @@
     tab = session.tab;
     onCardInput();
   }
+
+  export function setTabVisible(status = true) {
+    tabVisible = status;
+  }
 </script>
 
 <style>
@@ -722,7 +734,7 @@
     </div>
     <Bottom tab="card">
       {#if isDCCEnabled()}
-        <DynamicCurrencyView view={currentView} />
+        <DynamicCurrencyView tabVisible={tabVisible} view={currentView} />
       {/if}
       {#if isRecurring()}
         <Callout>
