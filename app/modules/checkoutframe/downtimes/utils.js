@@ -12,7 +12,6 @@ export const checkForDowntime = function(payload) {
 
 export const showDowntimeAlert = function(downtimeInstrument) {
   if (!downtimeAlertModal) {
-    console.log('hello')
     downtimeAlertModal = new downtimeAlertView();
   }
   downtimeAlertModal.view.handleChange(downtimeInstrument);
