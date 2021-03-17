@@ -1,6 +1,24 @@
 const { delay, randomContact } = require('../util');
 
 async function selectUPIApp(context, AppNumber) {
+  const allApps = await context.page.evaluate(() =>
+    Array.from(
+      document.querySelectorAll('[data-name]'),
+      element => element.dataset.name
+    )
+  );
+  const counter = {};
+  allApps.forEach(app => {
+    if (!counter[app]) {
+      counter[app] = 0;
+    }
+    counter[app] += 1;
+  });
+
+  for (const [_, count] of Object.entries(counter)) {
+    expect(count).toEqual(1);
+  }
+
   await context.page.click('.option:nth-of-type(' + AppNumber + ')');
 }
 
