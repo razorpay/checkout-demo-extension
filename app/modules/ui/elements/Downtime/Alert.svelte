@@ -79,27 +79,45 @@
     text-align: right;
     margin-top: 2px;
   }
+  #downtime-wrap {
+  border-radius: 0 0 3px 3px;
+  background: #fff;
+  bottom: -55px;
+  position: absolute;
+  width: 100%;
+  display: none;
+  -webkit-box-shadow: 0 -2px 8px rgba(0 0 0 0.16);
+  box-shadow: 0 -2px 8px rgba(0 0 0 0.16);
+  height: 250px;
+  -webkit-transition: 0.2s;
+  -o-transition: 0.2s;
+  transition: 0.2s;
+  padding-top: 20px;
+  z-index: 100;
+}
 </style>
 
-<div class="container">
-  <ul class="list">
-    <li class="line1">
-      <div class="icon-wrapper"><DowntimeIcon severe="high" /></div>
-      <div>There is a high chance this payment might fail</div>
-    </li>
-    <li class="line2">
-      <div class="icon-wrapper"><Icon icon={icons.warning} /></div>
-      <div>{point2}</div>
-    </li>
-    <li class="line3">
-      <div class="icon-wrapper"><Icon icon={icons.refund} /></div>
-      <div>Incase of failure, any <b>amount deducted</b> will be <b>refunded shortly</b></div>
-    </li>
-  </ul>
-  <div class="buttons">
-    <button class="back-button" on:click={handleBack}>Back</button>
-    <button
-      class="continue-button"
-      on:click={handleContinue}>Continue</button>
+<div id="downtime-wrap">
+  <div class="container">
+    <ul class="list">
+      <li class="line1">
+        <div class="icon-wrapper"><DowntimeIcon severe="high" /></div>
+        <div>There is a high chance this payment might fail</div>
+      </li>
+      <li class="line2">
+        <div class="icon-wrapper"><Icon icon={icons.warning} /></div>
+        <div>{point2}</div>
+      </li>
+      <li class="line3">
+        <div class="icon-wrapper"><Icon icon={icons.refund} /></div>
+        <div>Incase of failure, any <b>amount deducted</b> will be <b>refunded shortly</b></div>
+      </li>
+    </ul>
+    <div class="buttons">
+      <button class="back-button" on:click={handleBack}>Back</button>
+      <button
+        class="continue-button"
+        on:click={handleContinue}>Continue</button>
+    </div>
   </div>
 </div>

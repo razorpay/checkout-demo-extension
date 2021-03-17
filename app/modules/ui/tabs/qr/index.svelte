@@ -3,7 +3,6 @@
   import { onMount } from 'svelte';
 
   // UI imports
-  import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import FeeBearer from 'ui/components/feebearer.svelte';
@@ -31,8 +30,7 @@
     QR_GENERATING_LABEL,
     PAYMENT_CHECKING_STATUS,
     QR_RETRY,
-    QR_SCAN_ON_PHONE,
-    QR_DOWNTIME_TEXT,
+    QR_SCAN_ON_PHONE
   } from 'ui/labels/qr';
 
   // Props
@@ -69,11 +67,6 @@
     } else {
       createPayment();
     }
-
-    const downtimes = getDowntimes();
-
-    down = _Arr.contains(downtimes.low.methods, 'qr');
-    disabled = _Arr.contains(downtimes.high.methods, 'qr');
   }
 
   function handleResponse({ data }) {
@@ -232,12 +225,4 @@
     </div>
   {/if}
 
-  {#if down || disabled}
-    <Bottom tab="qr">
-      <DowntimeCallout severe={disabled}>
-        <!-- LABEL: UPI QR is experiencing low success rates. -->
-        <FormattedText text={$t(QR_DOWNTIME_TEXT)} />
-      </DowntimeCallout>
-    </Bottom>
-  {/if}
 </Tab>

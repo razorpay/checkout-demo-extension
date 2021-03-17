@@ -222,27 +222,6 @@ const getBanksWithLowSeverityDowntimes = getFilteredBankNamesFromDowntimes(
   isLowScheduled
 );
 
-/**
- * Returns the list of UPI with high downtime.
- * @param downtimes
- * @return Array<string>
- */
-const getUPIWithHighSeverityDowntime = function() {};
-
-/**
- * Returns the list of UPI with medium downtime
- * @param downtimes
- * @return Array<string>
- */
-const getUPIWithMediumSeverityDowntime = function() {};
-
-/**
- * Returns the list of banks for which there should be a warning displayed.
- * @param downtimes
- * @return {Array<string>}
- */
-const getUPIWithLowSeverityDowntimes = function() {};
-
 const DOWNTIME_METHOD_COPY_MAP = {
   qr: 'upi',
   gpay: 'upi',
@@ -317,18 +296,6 @@ export function getDowntimes(preferences) {
     cards: { ...getDowntimesByMethod(groupedDowntimes, 'card') },
     upi: { ...getDowntimesByMethod(groupedDowntimes, 'upi')},
     netbanking: { ...getDowntimesByMethod(groupedDowntimes, 'netbanking') },
-    high: {
-      methods: methodDowntimes.high,
-      banks: bankDowntimes.high,
-    },
-    medium: {
-      methods: methodDowntimes.medium,
-      banks: bankDowntimes.medium,
-    },
-    low: {
-      methods: methodDowntimes.low,
-      banks: bankDowntimes.low,
-    },
   };
 }
 

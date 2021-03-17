@@ -3572,6 +3572,10 @@ Session.prototype = {
     });
   },
 
+  getDowntimeAlertDialog: function() {
+    return $("#downtime-wrap")
+  },
+
   setSvelteOverlay: function() {
     this.svelteOverlay = new discreet.Overlay({
       target: _Doc.querySelector('#modal-inner'),
@@ -4175,39 +4179,17 @@ Session.prototype = {
       this.showConversionChargesCallout();
       return;
     }
-    var downtimeInstrument = this.checkForDowntime();
+    var payload = this.payload; 
+    if (selectedInstrument && selectedInstrument.id && selectedInstrument.id.indexOf('rzp.cluster') === -1) {
+      payload = selectedInstrument;
+    }
+    var downtimeInstrument = discreet.checkForDowntime(payload);
     if(!downtimeInstrument) {
       this.submit();
     } else {
-      this.showDowntimeAlert(downtimeInstrument);
+      discreet.showDowntimeAlert(downtimeInstrument);
+      showOverlay(this.getDowntimeAlertDialog())
     }
-  },
-
-  checkForDowntime: function() {
-    var selectedInstrument = this.getSelectedPaymentInstrument();
-    var payload;
-    if (selectedInstrument && selectedInstrument.id && selectedInstrument.id.indexOf('rzp.cluster') === -1) {
-      payload = selectedInstrument;
-    } else {
-      payload = this.payload;
-    }
-    var downtimeSeverity = payload.downtimeSeverity;
-    var downtimeInstrument = payload.downtimeInstrument;
-    delete this.payload.downtimeSeverity;
-    delete this.payload.downtimeInstrument;
-
-    if (!!downtimeSeverity && downtimeSeverity === 'high') {
-      return downtimeInstrument;
-    }
-    return false;
-  },
-
-  showDowntimeAlert: function(downtimeInstrument) {
-    if (!this.downtimeAlert) {
-      this.downtimeAlert = new discreet.downtimeAlertView();
-    }
-    this.downtimeAlert.view.handleChange(downtimeInstrument);
-    showOverlay($('#downtime-wrap'));
   },
 
   getSelectedPaymentInstrument: function() {

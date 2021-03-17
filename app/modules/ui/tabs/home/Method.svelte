@@ -7,7 +7,6 @@
   export let icon = null; // Override: icon. Picked from method if not overridden.
   export let title = null; // Override: title. Picked from method if not overridden.
   export let subtitle = null; // Override: subtitle. Picked from method if not overridden.
-  export let downtime = true; // Should we consider downtime?
 
   // Store
   import { locale } from 'svelte-i18n';
@@ -30,18 +29,6 @@
   const session = getSession();
   const dispatch = createEventDispatcher();
 
-  const downtimes = getDowntimes().high.methods;
-  let down = false;
-  if (downtime) {
-    if (/card$/.test(method)) {
-      down = _Arr.contains(downtimes, 'card');
-    } else if (method === 'gpay') {
-      down = _Arr.contains(downtimes, 'upi');
-    } else {
-      down = _Arr.contains(downtimes, method);
-    }
-  }
-
   const icons = session.themeMeta.icons;
   const _icon = getIconForDisplay();
 
@@ -54,8 +41,6 @@
   function getSubtitleForDisplay(locale) {
     if (subtitle) {
       return subtitle;
-    } else if (down) {
-      return getMethodDowntimeDescription(method, locale);
     } else {
       return getMethodDescription(method, locale);
     }
@@ -81,14 +66,9 @@
     Analytics.track('payment_method:select', {
       type: AnalyticsTypes.BEHAV,
       data: {
-        method,
-        down,
+        method
       },
     });
-
-    if (down) {
-      return;
-    }
 
     dispatch('select');
   }
@@ -141,7 +121,6 @@
   className="new-method"
   defaultStyles={false}
   on:click={select}
-  disabled={down}
   attributes={{ method }}>
   <i slot="icon">
     <Icon icon={_icon} />
