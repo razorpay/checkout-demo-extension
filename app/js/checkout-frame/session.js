@@ -4188,6 +4188,8 @@ Session.prototype = {
       this.submit();
     } else {
       discreet.showDowntimeAlert(downtimeInstrument);
+      delete this.payload.downtimeSeverity;
+      delete this.payload.downtimeInstrument;
       showOverlay(this.getDowntimeAlertDialog())
     }
   },
