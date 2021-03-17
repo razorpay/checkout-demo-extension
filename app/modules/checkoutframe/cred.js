@@ -3,6 +3,18 @@ import { getSession } from 'sessionmanager';
 
 const CRED_ELIGIBILITY_CACHE = {};
 
+const setCREDEligibility = (contact, value) => {
+  CRED_ELIGIBILITY_CACHE[contact] = value;
+};
+
+export const setCREDEligibilityFromPreferences = preferences => {
+  const contact = preferences.customer?.contact;
+  const eligible = preferences.methods?.app_meta?.cred?.user_eligible;
+  if (eligible !== undefined && contact) {
+    setCREDEligibility(contact, eligible);
+  }
+};
+
 export const checkCREDEligibility = contact => {
   const session = getSession();
 
