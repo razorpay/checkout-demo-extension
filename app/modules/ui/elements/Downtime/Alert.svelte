@@ -49,7 +49,7 @@
   .list li div {
     margin-left: 4px;
     text-align: left;
-    white-space: break-spaces;
+    white-space: normal;
   }
   .buttons {
     display: flex;
