@@ -78,30 +78,27 @@
     }
   });
 
-  function isDowntime() {
-    if (pspHandle) {
-    } else {
-      const vpaEntered = vpa.split('@')[1];
-      if (vpaEntered) {
-        const currentDowntime = checkDowntime(
-          upiDowntimes,
-          'vpa_handle',
-          vpaEntered
-        );
-        if (currentDowntime) {
-          downtimeSeverity = currentDowntime;
-          downtimeInstrument = vpaEntered;
-        } else {
-          downtimeSeverity = false;
-        }
+  function checkAndAddDowntime() {  
+    const vpaEntered = vpa.split('@')[1];
+    if (vpaEntered) {
+      const currentDowntime = checkDowntime(
+        upiDowntimes,
+        'vpa_handle',
+        vpaEntered
+      );
+      if (currentDowntime) {
+        downtimeSeverity = currentDowntime;
+        downtimeInstrument = vpaEntered;
       } else {
         downtimeSeverity = false;
       }
+    } else {
+      downtimeSeverity = false;
     }
   }
 
   function handleVpaInput() {
-    isDowntime();
+    checkAndAddDowntime();
     if (isVpaValid(vpa) || !pspHandle) {
       value = vpa;
     } else {
