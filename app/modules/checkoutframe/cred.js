@@ -22,27 +22,23 @@ export const checkCREDEligibility = contact => {
     makeAuthUrl(session.r, 'payments/validate/account')
   );
 
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      CRED_ELIGIBILITY_CACHE[contact] = false;
-      reject();
-    }, 2000);
-  });
-
   const promise = new Promise((resolve, reject) => {
-    fetch
-      .post(url, {
+    fetch.post({
+      url,
+      data: {
         entity: 'cred',
-        value: '+919671967950',
-      })
-      .then(response => {
-        console.log(response);
-        if (response.state === 'ELIGIBLE') {
+        value: contact,
+      },
+      callback: response => {
+        if (response.data?.state === 'ELIGIBLE') {
+          setCREDEligibility(contact, true);
           resolve();
         } else {
-          reject();
+          setCREDEligibility(contact, false);
+          reject('User not eligible');
         }
-      });
+      },
+    });
   });
 
   return promise;
