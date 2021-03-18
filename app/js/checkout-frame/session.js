@@ -242,6 +242,9 @@ function hideEmi() {
 
 function hideDowntimeAlert() {
   var downtimeWrap = $('#downtime-wrap');
+  if(!downtimeWrap || !downtimeWrap[0]) {
+    return false;
+  }
   var wasShown = downtimeWrap.hasClass(shownClass);
   if (wasShown) {
     hideOverlay(downtimeWrap);
@@ -4188,8 +4191,6 @@ Session.prototype = {
       this.submit();
     } else {
       discreet.showDowntimeAlert(downtimeInstrument);
-      delete this.payload.downtimeSeverity;
-      delete this.payload.downtimeInstrument;
       showOverlay(this.getDowntimeAlertDialog())
     }
   },
@@ -4243,6 +4244,10 @@ Session.prototype = {
     }
     var vpaVerified = props.vpaVerified;
     var data = this.payload;
+    // deleting downtimeSeverity & downtimeInstrument from data
+    delete data.downtimeSeverity;
+    delete data.downtimeInstrument;
+      
     var goto_payment = '#error-message .link';
     var redirectableMethods = ['card', 'netbanking', 'wallet'];
     if (
