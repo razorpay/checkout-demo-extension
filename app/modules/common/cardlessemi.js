@@ -24,23 +24,23 @@ const config = {
     fee_bearer_customer: false,
   },
   fdrl: {
-    name: 'Federal Bank',
+    name: 'Federal Bank Cardless EMI',
     headless: false,
   },
   hdfc: {
-    name: 'HDFC Bank',
+    name: 'HDFC Bank Cardless EMI',
     headless: false,
   },
   idfb: {
-    name: 'IDFC First Bank',
+    name: 'IDFC First Bank Cardless EMI',
     headless: false,
   },
   kkbk: {
-    name: 'Kotak Mahindra Bank',
+    name: 'Kotak Mahindra Bank Cardless EMI',
     headless: false,
   },
   icic: {
-    name: 'ICICI Bank',
+    name: 'ICICI Bank Cardless EMI',
     headless: false,
   },
   hcin: {
