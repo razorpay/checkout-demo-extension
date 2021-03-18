@@ -1328,7 +1328,7 @@ Session.prototype = {
       plans: plansList,
 
       actions: {
-        showAgreement: CardlessEmiStore.providerCode === 'zestmoney',
+        showAgreement: false,
       },
 
       amount: this.get('amount'),
