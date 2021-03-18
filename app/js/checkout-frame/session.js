@@ -2318,6 +2318,10 @@ Session.prototype = {
       }
     }
 
+    if(screen === 'card' && this.svelteCardTab) {
+      this.svelteCardTab.setTabVisible(true);
+    }
+
     if (screen !== 'otp') {
       this.headless = false;
     }
@@ -2914,7 +2918,6 @@ Session.prototype = {
     var remember = Store.shouldRememberCustomer();
 
     if (!remember) {
-      sessionContext.svelteCardTab.setTabVisible(true);
       return self.setScreen('card');
     }
 
@@ -2946,12 +2949,10 @@ Session.prototype = {
         if (customer.saved && !customer.logged) {
           askOTP(self.otpView, undefined, true, { phone: getPhone() });
         } else {
-          sessionContext.svelteCardTab.setTabVisible(true);
           self.setScreen('card');
         }
       }, params);
     } else {
-      sessionContext.svelteCardTab.setTabVisible(true);
       self.setScreen('card');
     }
   },
