@@ -2902,6 +2902,7 @@ Session.prototype = {
   },
 
   showCardTab: function(tab) {
+    var sessionContext = this;
     this.otpView.updateScreen({
       maxlength: 6,
     });
@@ -2913,6 +2914,7 @@ Session.prototype = {
     var remember = Store.shouldRememberCustomer();
 
     if (!remember) {
+      sessionContext.svelteCardTab.setTabVisible(true);
       return self.setScreen('card');
     }
 
@@ -2922,7 +2924,7 @@ Session.prototype = {
       skipTextLabel: 'skip_saved_cards',
     });
 
-    this.svelteCardTab.setTabVisible(true);
+    
     /**
      * When the user comes back to the card tab after selecting EMI plan,
      * do not commence OTP again.
@@ -2944,10 +2946,12 @@ Session.prototype = {
         if (customer.saved && !customer.logged) {
           askOTP(self.otpView, undefined, true, { phone: getPhone() });
         } else {
+          sessionContext.svelteCardTab.setTabVisible(true);
           self.setScreen('card');
         }
       }, params);
     } else {
+      sessionContext.svelteCardTab.setTabVisible(true);
       self.setScreen('card');
     }
   },
