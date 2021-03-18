@@ -6,6 +6,7 @@ const {
 } = require('../tests/homescreen/open');
 const {
   handleAppCreatePayment,
+  handleCREDUserValidation,
   handleAppPaymentStatus,
 } = require('../actions/common');
 const {
@@ -188,7 +189,9 @@ module.exports = function(testFeatures) {
       // but it is present in DOM for some reason,
       // so using #footer directly
       await context.page.click('#footer');
-
+      if (app === 'cred') {
+        await handleCREDUserValidation(context);
+      }
       await handleAppCreatePayment(context, { app, flow, platform });
 
       await handleAppPaymentStatus(context, { app, flow, platform });
