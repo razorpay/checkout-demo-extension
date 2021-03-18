@@ -5,15 +5,21 @@
   import Icon from 'ui/elements/Icon.svelte';
   import { selectedInstrument } from 'checkoutstore/screens/home';
 
+  import { t, locale } from 'svelte-i18n';
+  import { formatTemplateWithLocale } from 'i18n';
+  import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
+
+  import {
+    DOWNTIME_HIGHLIGHT1,
+    DOWNTIME_CARD_HIGHLIGHT2,
+    DOWNTIME_HIGHLIGHT2,
+    DOWNTIME_HIGHLIGHT3
+  } from 'ui/labels/downtime';
+
   let instrument;
   let point2;
   const session = getSession();
   const icons = session.themeMeta.icons;
-
-  $: {
-    const instrumentText = $selectedInstrument?.method === 'card' ? `${instrument} cards are` : `${instrument} is`;
-    point2 = `${instrumentText} facing some technical issues at the moment`;
-  }
 
   const handleContinue = () => {
     session.hideOverlayMessage();
@@ -102,15 +108,24 @@
     <ul class="list">
       <li class="line1">
         <div class="icon-wrapper"><DowntimeIcon severe="high" /></div>
-        <div>There is a high chance this payment might fail</div>
+        <div>{$t(DOWNTIME_HIGHLIGHT1)}</div>
       </li>
       <li class="line2">
         <div class="icon-wrapper"><Icon icon={icons.warning} /></div>
-        <div>{point2}</div>
+        <div>
+          {#if $selectedInstrument?.method === 'card'}
+            <FormattedText
+              text={formatTemplateWithLocale(DOWNTIME_CARD_HIGHLIGHT2, { instrument }, $locale)} />
+          {:else}
+            <FormattedText
+              text={formatTemplateWithLocale(DOWNTIME_HIGHLIGHT2, { instrument }, $locale)} />
+          {/if}
+        </div>
       </li>
       <li class="line3">
         <div class="icon-wrapper"><Icon icon={icons.refund} /></div>
-        <div>Incase of failure, any <b>amount deducted</b> will be <b>refunded shortly</b></div>
+        <div>
+          <FormattedText text={$t(DOWNTIME_HIGHLIGHT3)} /></div>
       </li>
     </ul>
     <div class="buttons">

@@ -172,7 +172,9 @@ export default {
         'Subscription payments are supported on debit cards from {issuers}.',
     },
     downtime_callout:
-      'This payment might fail because {instrument} facing technical difficulties',
+    'This payment might fail because {instrument} is facing technical difficulties',
+    downtime_callout_cards:
+      'This payment might fail because {instrument} cards are facing technical difficulties',
   },
   card: {
     add_another_card_btn: 'Add another card',
@@ -1114,4 +1116,10 @@ export default {
     highlight2: 'Secured Razorpay merchant for {securedTime} months',
     highlight3: 'No fraud transaction for last {noFraudTime} months',
   },
+  downtime_alert: {
+    highlight1: 'There is a high chance this payment might fail',
+    card_highlight2: '{instrument} cards are facing some technical issues at the moment',
+    highlight2: '{instrument} is facing some technical issues at the moment',
+    highlight3: 'Incase of failure, any <strong>amount deducted<strong> will be <strong>refunded shortly<strong>'
+  }
 };

@@ -1,7 +1,7 @@
 <script>
   // UI imports
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
-  import { DOWNTIME_CALLOUT } from 'ui/labels/callouts';
+  import { DOWNTIME_CALLOUT, DOWNTIME_CALLOUT_CARDS } from 'ui/labels/callouts';
   import { locale } from 'svelte-i18n';
   import { formatTemplateWithLocale } from 'i18n';
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
@@ -10,9 +10,6 @@
   export let severe;
   export let showIcon = false;
   export let downtimeInstrument;
-  let downtimeInstrumentText;
-
-  $: downtimeInstrumentText = $selectedInstrument?.method === 'card' ? `${downtimeInstrument} cards are` : `${downtimeInstrument} is`
 </script>
 
 <style>
@@ -44,7 +41,12 @@
     </div>
   {/if}
   <div>
-    <FormattedText
-      text={formatTemplateWithLocale(DOWNTIME_CALLOUT, { instrument: downtimeInstrumentText }, $locale)} />
+    {#if $selectedInstrument?.method === 'card'}
+      <FormattedText
+        text={formatTemplateWithLocale(DOWNTIME_CALLOUT_CARDS, { instrument: downtimeInstrument }, $locale)} />
+    {:else}
+      <FormattedText
+        text={formatTemplateWithLocale(DOWNTIME_CALLOUT, { instrument: downtimeInstrument }, $locale)} />
+    {/if}
   </div>
 </div>
