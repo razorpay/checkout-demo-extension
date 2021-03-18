@@ -1,10 +1,10 @@
 import downtimeAlertView from 'checkoutframe/downtimes/alert';
 let downtimeAlertModal;
 export const checkForDowntime = function(payload) {
-  var downtimeSeverity = payload.downtimeSeverity;
-  var downtimeInstrument = payload.downtimeInstrument;
+  const downtimeSeverity = payload.downtimeSeverity;
+  const downtimeInstrument = payload.downtimeInstrument;
 
-  if (!!downtimeSeverity && downtimeSeverity === 'high') {
+  if (downtimeSeverity === 'high') {
     return downtimeInstrument;
   }
   return false;

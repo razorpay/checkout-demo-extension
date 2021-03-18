@@ -17,7 +17,6 @@
   } from 'ui/labels/downtime';
 
   let instrument;
-  let point2;
   const session = getSession();
   const icons = session.themeMeta.icons;
 

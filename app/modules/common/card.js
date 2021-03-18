@@ -441,7 +441,7 @@ export function getCardFeatures(cardNumber) {
  * @returns {array}
  */
 export function addDowntimesToSavedCards(cards, downtimes) {
-  const newCards = cards.map(item => {
+  const cardsWithDowntime = cards.map(item => {
     const { network, issuer } = item.card;
     let networkDowntime = checkDowntime(downtimes, 'network', network);
     let issuerDowntime = checkDowntime(downtimes, 'issuer', issuer);
@@ -453,5 +453,5 @@ export function addDowntimesToSavedCards(cards, downtimes) {
     item.card.downtimeInstrument = networkDowntime ? network : issuer;
     return item;
   });
-  return newCards;
+  return cardsWithDowntime;
 }

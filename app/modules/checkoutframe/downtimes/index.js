@@ -104,15 +104,10 @@ export const checkDowntime = (downtime, instrumentKey, value) => {
   if(!value) {
     return false;
   }
-  if (filterDowntimeArr(downtime.high, instrumentKey, value)?.length > 0) {
-    return 'high';
-  } else if (
-    filterDowntimeArr(downtime.medium, instrumentKey, value)?.length > 0
-  ) {
-    return 'medium';
-  }
-  if (filterDowntimeArr(downtime.low, instrumentKey, value)?.length > 0) {
-    return 'low';
+  for (const key in downtime) {
+    if (filterDowntimeArr(downtime[key], instrumentKey, value)?.length > 0) {
+      return key;
+    }
   }
   return false;
 };
