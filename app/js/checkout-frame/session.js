@@ -4183,14 +4183,15 @@ Session.prototype = {
       return;
     }
     var payload = this.payload; 
+    // checking if the method selected is from the preferred method or from the method screen as this.payload is null in preferred methods 
     if (selectedInstrument && selectedInstrument.id && selectedInstrument.id.indexOf('rzp.cluster') === -1) {
       payload = selectedInstrument;
     }
-    var downtimeInstrument = discreet.checkForDowntime(payload);
+    var downtimeInstrument = discreet.downtimeUtils.checkForDowntime(payload);
     if(!downtimeInstrument) {
       this.submit();
     } else {
-      discreet.showDowntimeAlert(downtimeInstrument);
+      discreet.downtimeUtils.showDowntimeAlert(downtimeInstrument);
       showOverlay(this.getDowntimeAlertDialog())
     }
   },

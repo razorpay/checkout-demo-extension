@@ -101,7 +101,7 @@ import { getInstrumentMeta } from 'ui/tabs/home/instruments';
 import * as ContactStorage from 'checkoutframe/contact-storage';
 import BlockedDeactivatedMerchant from 'ui/elements/BlockedDeactivatedMerchant.svelte';
 
-import { checkForDowntime, showDowntimeAlert } from 'checkoutframe/downtimes/utils';
+import * as downtimeUtils from 'checkoutframe/downtimes/utils';
 
 export default {
   RazorpayConfig,
@@ -221,6 +221,5 @@ export default {
   overlayStackStore,
   rewardsStore,
 
-  checkForDowntime,
-  showDowntimeAlert
+  downtimeUtils
 };

@@ -23,7 +23,7 @@
 
   const handleContinue = () => {
     session.hideOverlayMessage();
-    session.submit.call(session);
+    session.submit();
   };
   const handleBack = () => {
     session.hideOverlayMessage();

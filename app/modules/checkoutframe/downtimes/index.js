@@ -6,7 +6,7 @@
  * @return {Object}
  */
 function getDowntimesByMethod(downtimes, method) {
-  const downtimeBySeverity= {high:[], medium:[], low:[]};
+  const downtimeBySeverity= { high:[], medium:[], low:[] };
   downtimes[method]?.forEach(downtime=>downtimeBySeverity[downtime.severity].push(downtime));
   return downtimeBySeverity;
 }
