@@ -321,7 +321,7 @@
   }
   .downtime-icon {
     float: right;
-    margin-top: -24px;
+    margin-top:-24px;
   }
 </style>
 
