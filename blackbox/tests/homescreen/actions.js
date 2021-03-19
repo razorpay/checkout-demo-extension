@@ -23,7 +23,7 @@ const { proceed } = sharedActions;
  * and enters an amount
  */
 async function handlePartialPayment(context, amount) {
-  await context.page.click('.partial-payment-block button:nth-of-type(2)');
+  await context.page.click('.partial-payment-block .radio-option:nth-of-type(2)');
 
   setState(context, {
     partial: true,
