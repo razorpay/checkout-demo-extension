@@ -4187,6 +4187,7 @@ Session.prototype = {
     if (selectedInstrument && selectedInstrument.id && selectedInstrument.id.indexOf('rzp.cluster') === -1) {
       payload = selectedInstrument;
     }
+    this.downtimeSeverity = payload.downtimeSeverity;
     var downtimeInstrument = discreet.downtimeUtils.checkForDowntime(payload);
     if(!downtimeInstrument) {
       this.submit();
@@ -4245,7 +4246,7 @@ Session.prototype = {
     }
     var vpaVerified = props.vpaVerified;
     var data = this.payload;
-    // deleting downtimeSeverity & downtimeInstrument from data
+    // deleting downtimeSeverity & downtimeInstrument from data & saving downtimeSeverity for analytics
     delete data.downtimeSeverity;
     delete data.downtimeInstrument;
       
@@ -4314,6 +4315,7 @@ Session.prototype = {
       optional: Store.getOptionalObject(),
       external: {},
       paused: this.get().paused,
+      downtimeSeverity: this.downtimeSeverity
     };
 
     if (!this.screen) {
@@ -4793,7 +4795,7 @@ Session.prototype = {
 
     this.preferredInstrument = P13n.processInstrument(data, this);
 
-    var payment = this.r.createPayment(data, request);
+    var payment = this.r.createPayment(data, request, this.downtimeSeverity);
     payment
       .on('payment.success', bind(successHandler, this))
       .on('payment.error', bind(errorHandler, this))

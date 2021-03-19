@@ -1,4 +1,6 @@
 <script>
+  // Svelte imports
+  import { onMount } from 'svelte';
   // UI imports
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
   import { DOWNTIME_CALLOUT, DOWNTIME_CALLOUT_CARDS } from 'ui/labels/callouts';
@@ -10,6 +12,16 @@
   export let severe;
   export let showIcon = false;
   export let downtimeInstrument;
+
+  onMount(() => {
+    Analytics.track('downtime:callout:show', {
+      type: AnalyticsTypes.RENDER,
+      data: {
+        instrument: downtimeInstrument,
+        downtimeSeverity: severe
+      }
+    });
+  });
 </script>
 
 <style>

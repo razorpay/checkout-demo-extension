@@ -5,6 +5,7 @@
   import Icon from 'ui/elements/Icon.svelte';
   import { selectedInstrument } from 'checkoutstore/screens/home';
 
+  // i18
   import { t, locale } from 'svelte-i18n';
   import { formatTemplateWithLocale } from 'i18n';
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
@@ -29,6 +30,12 @@
   };
   export const handleChange = function(param) {
     instrument = param;
+    Analytics.track('downtime:alert:show', {
+      type: AnalyticsTypes.RENDER,
+      data: {
+        instrument
+      }
+    });
   };
 </script>
 

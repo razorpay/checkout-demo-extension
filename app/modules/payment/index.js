@@ -147,9 +147,14 @@ function trackNewPayment(data, params, r) {
 
   updateScore('timeToSubmit');
 
+  var trackingData = getTrackingData(data);
+  if(params.downtimeSeverity) {
+    trackingData.downtimeSeverity = params.downtimeSeverity;
+  }
+
   Analytics.track('submit', {
     data: {
-      data: getTrackingData(data),
+      data: trackingData,
       params: params,
       count: createdPaymentsCount,
     },
