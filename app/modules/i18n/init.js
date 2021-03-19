@@ -132,7 +132,9 @@ function determineInitialLocale() {
 }
 
 function setLocaleInStorage(locale) {
-  global.localStorage.setItem('locale', locale);
+  try {
+    global.localStorage.setItem('locale', locale);
+  } catch (e) {}
 }
 
 export function addDefaultMessages() {
