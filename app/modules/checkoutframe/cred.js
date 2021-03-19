@@ -1,5 +1,6 @@
 import { makeAuthUrl } from 'common/Razorpay';
 import { getSession } from 'sessionmanager';
+import Analytics from 'analytics';
 
 const CRED_ELIGIBILITY_CACHE = {};
 
@@ -11,6 +12,9 @@ export const setCREDEligibilityFromPreferences = preferences => {
   const contact = preferences.customer?.contact;
   const eligible = preferences.methods?.app_meta?.cred?.user_eligible;
   if (eligible !== undefined && contact) {
+    Analytics.track('cred:eligibility_check', {
+      data: 'preferences',
+    });
     setCREDEligibility(contact, eligible);
   }
 };
@@ -30,7 +34,11 @@ export const checkCREDEligibility = contact => {
         value: contact,
       },
       callback: response => {
-        if (response.data?.state === 'ELIGIBLE') {
+        const eligibility = response.data?.state === 'ELIGIBLE';
+        Analytics.track('cred:eligibility_check', {
+          data: 'validate_api',
+        });
+        if (eligibility) {
           setCREDEligibility(contact, true);
           resolve();
         } else {

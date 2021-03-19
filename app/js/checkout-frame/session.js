@@ -5299,6 +5299,11 @@ Session.prototype = {
         }
       }
     }
+    Analytics.track('cred:subtext_offer_experiment', {
+      data: {
+        experiment: experimentType,
+      },
+    });
     if (experimentType) {
       discreet.BrowserStorage.setItem('cred_offer_experiment', experimentType);
     }

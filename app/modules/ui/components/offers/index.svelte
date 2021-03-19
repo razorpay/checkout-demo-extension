@@ -5,6 +5,9 @@
   import { getCurrency } from 'checkoutstore';
   import { getAnimationOptions } from 'svelte-utils';
 
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
+
   import {
     getOffersForTab,
     getOffersForInstrument,
@@ -187,6 +190,11 @@
   }
 
   function applyOffer(offer) {
+    if (offer.id === 'CRED_experimental_offer') {
+      Analytics.track('cred:experiment_offer_selected', {
+        type: AnalyticsTypes.BEHAV,
+      });
+    }
     $appliedOffer = offer;
     if (offer) {
       previousApplied[offer.payment_method] = offer;
