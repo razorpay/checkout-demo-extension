@@ -4681,14 +4681,14 @@ Session.prototype = {
           this.payload.contact = getProxyPhone();
         }
         if (discreet.CRED.isUserEligible(this.payload.contact) === undefined) {
-          session.showLoadError('Checking you eligibility status on CRED');
+          session.showLoadError(I18n.format('card.checking_cred_eligibility'));
           discreet.CRED.checkCREDEligibility(this.payload.contact)
             .then(function(res) {
               session.hideErrorMessage();
               session.submit();
             })
             .catch(function() {
-              session.showLoadError('User does not have a CRED account', true);
+              session.showLoadError(I18n.format('card.no_cred_account'), true);
             });
           return;
         }
