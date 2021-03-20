@@ -20,6 +20,8 @@ import Analytics from 'analytics';
 import { getSegmentOrCreate } from 'experiments';
 import { ignoreFirstCall } from 'svelte-utils';
 
+import BrowserStorage from 'browserstorage';
+
 const LOCALES = {
   en: 'English',
   hi: 'हिंदी',
@@ -133,7 +135,7 @@ function determineInitialLocale() {
 
 function setLocaleInStorage(locale) {
   try {
-    global.localStorage.setItem('locale', locale);
+    BrowserStorage.setItem('locale', locale);
   } catch (e) {}
 }
 
