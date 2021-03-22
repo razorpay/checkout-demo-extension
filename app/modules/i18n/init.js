@@ -134,9 +134,7 @@ function determineInitialLocale() {
 }
 
 function setLocaleInStorage(locale) {
-  try {
-    BrowserStorage.setItem('locale', locale);
-  } catch (e) {}
+  BrowserStorage.setItem('locale', locale);
 }
 
 export function addDefaultMessages() {
