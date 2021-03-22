@@ -5,14 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta http-equiv="pragma" content="no-cache" />
     <meta http-equiv="cache-control" content="no-cache" />
-    <script src="config.js"></script>
+    <script type="text/javascript">
+      const base = location.protocol + '//api.razorpay.com:' + location.port;
+      const test_key = 'rzp_test_1DP5mmOlF5G5ag';
+      Razorpay = {
+        config: {
+          key_id: 'rzp_test_1DP5mmOlF5G5ag',
+          key_secret: 'thisissupersecret',
+          app_user: 'rzp_test_10000000000000',
+          app_secret: 'RANDOM_DASH_PASSWORD',
+          api: base + '/api/',
+          frameApi: base + '/api/',
+
+          // path for iframe, if set
+          frame: '/checkout.html',
+
+          // path for view/checkout to load js from
+          js: 'http://checkout.pronav.in/dist/',
+        },
+      };
+    </script>
     <!-- build:js razorpay.js -->
     <script src="js/generated/entry/razorpay.js"></script>
     <!-- endbuild -->
   </head>
   <body>
+    <h2>Custom Checkout</h2>
     <form>
-      <input type="radio" name="method" value="card" checked />Card
+      <!-- <input type="radio" name="method" value="card" checked />Card
       <input type="radio" name="method" value="netbanking" />Netbanking
       <input type="radio" name="method" value="wallet" />Wallet
 
@@ -22,53 +42,32 @@
         <input type="text" name="card[name]" placeholder="Cardholder's name" />
         <input type="tel" name="card[cvv]" placeholder="CVV" />
         <input type="checkbox" name="method" value="emi" /> EMI
-      </div>
+      </div> -->
 
       <button type="submit">Pay</button>
     </form>
+    <div id="status"></div>
+    <div id="response"></div>
     <script>
       document.forms[0].onsubmit = function(e) {
         e.preventDefault();
-        var rp = new Razorpay({
-          key: 'rzp_test_l3ckHAHlkpYUqe',
+        window.rp = new Razorpay({
+          key: 'rzp_test_1DP5mmOlF5G5ag',
           amount: 200,
-          // callback_url: 'https://checkout.local/razorpay',
-          // redirect: true,
         })
           .on('payment.error', function(resp) {
-            console.log(resp);
+            document.getElementById('status').innerText = 'failed';
+            document.getElementById('response').innerText = JSON.stringify(
+              resp
+            );
           })
           .on('payment.success', function(resp) {
-            console.log(resp);
+            document.getElementById('status').innerText = 'success';
+            document.getElementById('response').innerText = JSON.stringify(
+              resp
+            );
           });
-        window.rp = rp;
         rp.createPayment(null, { paused: true, message: 'loading' });
-        setTimeout(function() {
-          var data = {
-            amount: 200,
-            currency: 'INR',
-          };
-          data.method = 'card';
-          data['card[number]'] = '4111111111111111';
-          data['card[expiry_month]'] = '04';
-          data['card[expiry_year]'] = '22';
-          data['card[name]'] = 'arsh';
-          data['card[cvv]'] = '123';
-          // data.bank = 'SBIN';
-          data.email = 'a@s.d';
-          data.contact = 9999922222;
-
-          var data = {
-            amount: 100000,
-            currency: 'INR',
-            email: 'gaurav.kumar@example.com',
-            contact: '9123456780',
-            method: 'cardless_emi',
-            // method specific fields
-            provider: 'zestmoney',
-          };
-          rp.emit('payment.resume', data);
-        });
       };
     </script>
   </body>

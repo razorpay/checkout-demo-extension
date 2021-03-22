@@ -37,7 +37,7 @@ const getTestData = (
 ) => {
   keyless = false;
   let tests = [];
-  preferencesLoggedIn = makePreferencesLogged(preferences);
+  const preferencesLoggedIn = makePreferencesLogged(preferences);
   preferences = makePreferences(preferences);
   options = makeOptions(options);
   if (loggedIn) {
