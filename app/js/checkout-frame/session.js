@@ -4185,7 +4185,7 @@ Session.prototype = {
     }
     var payload = this.payload; 
     // checking if the method selected is from the preferred method or from the method screen as this.payload is null in preferred methods 
-    if (selectedInstrument && selectedInstrument.id && selectedInstrument.id.indexOf('rzp.cluster') === -1) {
+    if (selectedInstrument && selectedInstrument.id && selectedInstrument.id.indexOf('rzp.cluster') === -1 && !payload.downtimeSeverity) {
       payload = selectedInstrument;
     }
     this.downtimeSeverity = payload.downtimeSeverity;

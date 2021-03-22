@@ -441,7 +441,11 @@
 
   function getSavedCardPayload() {
     const selectedToken = $selectedCard || {};
-    const { downtimeSeverity, downtimeInstrument } = selectedToken.card;
+    let downtimeSeverity, downtimeInstrument;
+    if(selectedToken.card) {
+      downtimeSeverity = selectedToken.card.downtimeSeverity;
+      downtimeInstrument = selectedToken.card.downtimeInstrument;
+    }
     const payload = {
       token: selectedToken.token,
       'card[cvv]': $currentCvv,
