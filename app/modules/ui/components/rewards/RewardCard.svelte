@@ -23,8 +23,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 116px;
-    width: 72px;
+    height: 125px;
+    width: 132px;
     border-radius: 5px;
     padding: 10px;
     background: linear-gradient(199.72deg, #ffffff 1.23%, #f8f8f8 99.45%);
@@ -32,11 +32,6 @@
     border-radius: 5px;
     flex-shrink: 0;
     flex-wrap: wrap;
-  }
-  :global(.mobile) .reward-card {
-    height: 177px;
-    width: 189px;
-    margin-right: 20px;
   }
   .full-width {
     width: 100%;
@@ -53,6 +48,7 @@
   }
   .reward-text {
     font-size: 12px;
+    margin: 10px 0;
   }
   .flex-center {
     display: flex;
@@ -65,11 +61,16 @@
   .reward-text {
     height: 20%;
   }
+  .reward-card-container {
+    background: url('../../../../images/checkout/m2m_bg.gif');
+  }
 </style>
 
-<div class="carousel-slide reward-card" on:click={handleCardClick}>
-  <div class="full-width logo-container flex-center">
-    <img class="reward-logo" src={logo} alt="Reward Logo" />
+<div class="full-width reward-card-container flex-center">
+  <div class="reward-card" on:click={handleCardClick}>
+    <div class="full-width logo-container flex-center">
+      <img class="reward-logo" src={logo} alt="Reward Logo" />
+    </div>
   </div>
-  <div class="full-width reward-text flex-center"><b>{name}</b></div>
 </div>
+<div class="full-width reward-text flex-center"><b>{name}</b></div>

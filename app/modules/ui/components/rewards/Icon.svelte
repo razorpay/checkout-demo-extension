@@ -39,12 +39,6 @@
         },
       });
     }, 1000);
-  });
-
-  function showRewards() {
-    Analytics.track('rewards:icon:click', {
-      type: AnalyticsTypes.BEHAV,
-    });
     session.svelteOverlay.$$set({
       component: Rewards,
       props: {
@@ -55,6 +49,12 @@
     });
     session.showSvelteOverlay();
     showBackdrop();
+  });
+
+  function showRewards() {
+    Analytics.track('rewards:icon:click', {
+      type: AnalyticsTypes.BEHAV,
+    });
   }
 </script>
 
