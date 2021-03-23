@@ -1,5 +1,5 @@
 <script>
-  import { onDestroy } from 'svelte';
+  import { onDestroy, tick } from 'svelte';
 
   // Store
   import {
@@ -175,13 +175,15 @@
 
   function updateAmountInHeaderAndCTA(displayAmount) {
     const session = getSession();
-    if (displayAmount) {
-      showAmount(displayAmount);
-      session.setRawAmountInHeader(displayAmount);
-    } else if (!isPartialPayment()) {
-      showCtaWithDefaultText();
-      session.updateAmountInHeader(originalAmount);
-    }
+    tick().then(() => {
+      if (displayAmount) {
+        showAmount(displayAmount);
+        session.setRawAmountInHeader(displayAmount);
+      } else if (!isPartialPayment()) {
+        showCtaWithDefaultText();
+        session.updateAmountInHeader(originalAmount);
+      }
+    });
   }
 
   /**
