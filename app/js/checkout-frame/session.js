@@ -863,14 +863,15 @@ Session.prototype = {
       }
     }
 
-    if (tab && !(order && order.bank)) {
+    // Switch to the respective tab/ prefilled method if exists
+    // If tab is empty, then it will switche to home
+    if (tab === 'emandate' && !this.get('prefill.bank')) {
       // For method=emandate, we switch to the netbanking tab first if bank
       // is not prefilled.
-      if (tab === 'emandate' && !this.get('prefill.bank')) {
-        tab = 'netbanking';
-      }
-      this.switchTab(tab);
-    } else if (tab === '') {
+      tab = 'netbanking';
+    }
+
+    if (tab || tab === '') {
       this.switchTab(tab);
     }
 
@@ -1327,7 +1328,7 @@ Session.prototype = {
       plans: plansList,
 
       actions: {
-        showAgreement: CardlessEmiStore.providerCode === 'zestmoney',
+        showAgreement: false,
       },
 
       amount: this.get('amount'),
