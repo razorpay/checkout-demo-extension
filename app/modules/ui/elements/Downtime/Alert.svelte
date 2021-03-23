@@ -33,7 +33,8 @@
     Analytics.track('downtime:alert:show', {
       type: AnalyticsTypes.RENDER,
       data: {
-        instrument
+        instrument,
+        downtimeMethod: $selectedInstrument.method
       }
     });
   };

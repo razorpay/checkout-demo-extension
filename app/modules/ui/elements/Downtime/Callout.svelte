@@ -18,7 +18,8 @@
       type: AnalyticsTypes.RENDER,
       data: {
         instrument: downtimeInstrument,
-        downtimeSeverity: severe
+        downtimeSeverity: severe,
+        downtimeMethod: $selectedInstrument.method
       }
     });
   });
