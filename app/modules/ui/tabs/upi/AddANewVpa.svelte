@@ -78,7 +78,11 @@
     }
   });
 
-  function checkAndAddDowntime() {  
+  function checkAndAddDowntime() {
+    if(!vpa){
+      downtimeSeverity = false;
+      return;
+    }
     const vpaEntered = vpa.split('@')[1];
     if (vpaEntered) {
       const currentDowntime = checkDowntime(
