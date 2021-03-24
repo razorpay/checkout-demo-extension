@@ -43,6 +43,7 @@
   import { t, locale } from 'svelte-i18n';
 
   import { formatTemplateWithLocale } from 'i18n';
+import virtual_accounts from '../../../../mocks/virtual_accounts';
 
   // Props
   export let loading = true;
@@ -94,6 +95,7 @@
   }
 
   function getNEFTDetails(response) {
+    response = virtual_accounts
     if (response.error) {
       loading = false;
       error = response.error.description;
@@ -255,13 +257,17 @@
         {/if}
       </div>
       {#if !isMobile()}
-        <div on:click={handlePrint} class="print">{$t(PRINT_DETAILS)}</div>
+        <div on:click={copyDetails} class="print">{$t(copied ? COPIED : COPY_DETAILS)}</div>
       {/if}
       <Bottom>
         <!-- LABEL: Do not round-off the amount. Transfer the exact amount for the payment to be successful. -->
         <Callout>{$t(ROUND_OFF_CALLOUT)}</Callout>
       </Bottom>
-      <CTA on:click={copyDetails}>{$t(copied ? COPIED : COPY_DETAILS)}</CTA>
+      {#if !isMobile()}
+        <CTA on:click={handlePrint}>{$t(PRINT_DETAILS)}</CTA>
+      {:else}
+        <CTA on:click={copyDetails}>{$t(copied ? COPIED : COPY_DETAILS)}</CTA>
+      {/if}
     {:else}
       <div class="error">
         <div class="error-text">{error || 'Error'}</div>
