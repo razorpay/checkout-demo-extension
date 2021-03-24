@@ -48,7 +48,7 @@
       return formatMessageWithLocale(CARD_NUMBER_HELP_RECURRING, locale);
     }
 
-    if (amexEnabled && type === 'amex') {
+    if (!amexEnabled && type === 'amex') {
       // LABEL: Amex cards are not supported for this transaction.
       return formatMessageWithLocale(CARD_NUMBER_HELP_AMEX, locale);
     }
