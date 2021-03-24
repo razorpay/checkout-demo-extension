@@ -162,7 +162,7 @@
   init();
 
   const fetchFees = () => {
-    const feeWrapDiv = document.getElementById('fee-wrap')
+    const feeWrapDiv = document.getElementById('fee-wrap');
     if(!feeBearerView){
       feeBearerView = new FeeBearerView({
         target: feeWrapDiv,
@@ -175,11 +175,11 @@
           }
         }
       });
-    }
-    showOverlay([feeWrapDiv])
+    };
+    showOverlay([feeWrapDiv]);
     feeBearerView.$on('continue', function(event) {
       hideOverlayMessage();
-    })
+    });
   }
 </script>
 
@@ -279,9 +279,6 @@
                 <div class="fee-breakup" on:click={fetchFees}>{$t(FEE_BREAKUP)}</div>
               {/if}
             </div>
-          </div>
-          <div class="ct-tr">
-            <!-- LABEL: Amount Expected -->
           </div>
         </div>
 
