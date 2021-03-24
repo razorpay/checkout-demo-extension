@@ -14,6 +14,7 @@
   export let downtimeInstrument;
 
   onMount(() => {
+    Analytics.setMeta('downtime.calloutShown', true);
     Analytics.track('downtime:callout:show', {
       type: AnalyticsTypes.RENDER,
       data: {

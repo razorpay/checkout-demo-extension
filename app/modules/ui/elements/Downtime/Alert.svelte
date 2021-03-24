@@ -30,6 +30,7 @@
   };
   export const handleChange = function(param) {
     instrument = param;
+    Analytics.setMeta('downtime.alertShown', true);
     Analytics.track('downtime:alert:show', {
       type: AnalyticsTypes.RENDER,
       data: {
