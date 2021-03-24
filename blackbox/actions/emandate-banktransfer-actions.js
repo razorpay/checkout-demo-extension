@@ -88,7 +88,7 @@ async function verifyNeftDetails(context, feeBearer) {
       ' Amount Expected: ' +
       (feeBearer ? '₹ 2,020 See Fee Breakup' : '₹ 2,000')
   );
-};
+}
 
 async function verifyRoundOffAlertMessage(context) {
   const messageDiv = await context.page.waitForSelector(
