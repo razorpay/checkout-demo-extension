@@ -41,7 +41,7 @@ import {
   mobileQuery,
   isFacebookWebView,
   getOS,
-  isMobile,
+  isMobileByMediaQuery,
   getDevice,
 } from 'common/useragent';
 
@@ -445,7 +445,10 @@ const UPI_METHODS = {
   omnichannel: () =>
     !isRecurring() && !isPayout() && hasFeature('google_pay_omnichannel'),
   qr: () =>
-    !isRecurring() && !isPayout() && getOption('method.qr') && !isMobile(),
+    !isRecurring() &&
+    !isPayout() &&
+    getOption('method.qr') &&
+    !isMobileByMediaQuery(),
   intent: () =>
     !isRecurring() &&
     !isPayout() &&
