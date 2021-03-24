@@ -70,6 +70,15 @@ export const mobileQuery =
   '(max-device-height: 475px),(max-device-width: 475px)';
 
 /**
+ * This method works on device width and height to determine is mobile or not
+ * {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/matchMedia Reference}
+ * @returns {boolean}
+ */
+export const isMobileByMediaQuery = () => {
+  return global.matchMedia(mobileQuery).matches;
+};
+
+/**
  * Says whether or not we're on mobile.
  *
  * This is a function instead of a constant because
@@ -81,7 +90,7 @@ export const isMobile = () => {
   return (
     (global.innerWidth && global.innerWidth < 475) ||
     shouldFixFixed ||
-    global.matchMedia(mobileQuery).matches
+    isMobileByMediaQuery()
   );
 };
 

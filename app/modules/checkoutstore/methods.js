@@ -41,7 +41,7 @@ import {
   mobileQuery,
   isFacebookWebView,
   getOS,
-  isMobile,
+  isMobileByMediaQuery,
   getDevice,
 } from 'common/useragent';
 
@@ -448,7 +448,7 @@ const UPI_METHODS = {
     !isRecurring() &&
     !isPayout() &&
     getOption('method.qr') &&
-    !global.matchMedia(mobileQuery).matches,
+    !isMobileByMediaQuery(),
   intent: () =>
     !isRecurring() &&
     !isPayout() &&
