@@ -5315,8 +5315,7 @@ Session.prototype = {
   hideOverlayMessage: hideOverlayMessage,
   hideOverlay: hideOverlay,
   errorHandler: errorHandler,
-  successHandler: successHandler,
-  showOverlay: showOverlay
+  successHandler: successHandler
 };
 
 /*
