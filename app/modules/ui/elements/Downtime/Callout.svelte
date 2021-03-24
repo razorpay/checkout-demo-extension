@@ -19,7 +19,7 @@
       data: {
         instrument: downtimeInstrument,
         downtimeSeverity: severe,
-        downtimeMethod: $selectedInstrument.method
+        downtimeMethod: $selectedInstrument?.method
       }
     });
   });

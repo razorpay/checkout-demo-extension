@@ -34,7 +34,7 @@
       type: AnalyticsTypes.RENDER,
       data: {
         instrument,
-        downtimeMethod: $selectedInstrument.method
+        downtimeMethod: $selectedInstrument?.method
       }
     });
   };
