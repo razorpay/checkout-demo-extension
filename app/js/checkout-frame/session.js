@@ -3645,15 +3645,6 @@ Session.prototype = {
     return false;
   },
 
-  showOverlayById: function(id) {
-    showOverlay($(id))
-  },
-
-  hideOverlayById: function(id) {
-    hideOverlay($(id))
-    hideOverlayMessage()
-  },
-
   closeModal: function() {
     var session = this;
 
@@ -5325,6 +5316,7 @@ Session.prototype = {
   hideOverlay: hideOverlay,
   errorHandler: errorHandler,
   successHandler: successHandler,
+  showOverlay: showOverlay
 };
 
 /*

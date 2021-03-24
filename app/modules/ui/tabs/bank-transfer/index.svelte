@@ -3,7 +3,7 @@
   import { onDestroy } from 'svelte';
 
   //Store imports
-  import { getOption, getAmount, showFeeLabel } from 'checkoutstore';
+  import { getOption, getAmount, showFeeLabel, isCustomerFeeBearer } from 'checkoutstore';
   import { getCustomerDetails } from 'checkoutstore/screens/home';
 
   // Utils imports
@@ -162,9 +162,10 @@
   init();
 
   const fetchFees = () => {
+    const feeWrapDiv = document.getElementById('fee-wrap')
     if(!feeBearerView){
       feeBearerView = new FeeBearerView({
-        target: gel('fee-wrap'),
+        target: feeWrapDiv,
         props: {
           paymentData: {
             "currency": "INR",
@@ -175,9 +176,9 @@
         }
       });
     }
-    session.showOverlayById('#fee-wrap')
+    showOverlay([feeWrapDiv])
     feeBearerView.$on('continue', function(event) {
-      session.hideOverlayById('#fee-wrap');
+      hideOverlayMessage();
     })
   }
 </script>
@@ -272,10 +273,15 @@
           <div class="ct-tr">
             <!-- LABEL: Amount Expected -->
             <span class="ct-th">{$t(AMOUNT_LABEL)}:</span>
-            <span class="ct-td">
+            <div class="ct-td">
               {data.amount}
-              <div class="fee-breakup" on:click={fetchFees}>{$t(FEE_BREAKUP)}</div>
-            </span>
+              {#if isCustomerFeeBearer()}
+                <div class="fee-breakup" on:click={fetchFees}>{$t(FEE_BREAKUP)}</div>
+              {/if}
+            </div>
+          </div>
+          <div class="ct-tr">
+            <!-- LABEL: Amount Expected -->
           </div>
         </div>
 
