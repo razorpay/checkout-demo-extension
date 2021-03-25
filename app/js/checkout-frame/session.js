@@ -636,7 +636,6 @@ function Session(message) {
   var options = message.options;
   var self = this;
 
-
   this.r = Razorpay(options);
   this.get = this.r.get;
   this.set = this.r.set;
@@ -4689,8 +4688,12 @@ Session.prototype = {
               session.hideErrorMessage();
               session.submit();
             })
-            .catch(function() {
-              session.showLoadError(I18n.format('card.no_cred_account'), true);
+            .catch(function(e) {
+              var userFacingError = I18n.format('card.no_cred_account');
+              if (e.error && e.error.description) {
+                userFacingError = e.error.description;
+              }
+              session.showLoadError(userFacingError, true);
             });
           return;
         }
