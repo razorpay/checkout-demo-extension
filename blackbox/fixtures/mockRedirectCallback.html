@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Processing, Please wait...</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="referrer" content="origin" />
+    <meta name="viewport" content="width=device-width" />
+    <meta charset="utf-8" />
+    <style>
+      @keyframes lo {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @-webkit-keyframes lo {
+        to {
+          -webkit-transform: rotate(360deg);
+        }
+      }
+      .loader {
+        height: 24px;
+        width: 24px;
+        border-radius: 50%;
+        display: inline-block;
+        animation: lo 0.8s infinite linear;
+        -webkit-animation: lo 0.8s infinite linear;
+        transition: 0.3s;
+        -webkit-transition: 0.3s;
+        opacity: 0;
+        border: 2px solid #3395ff;
+        border-top-color: transparent;
+      }
+      .vis {
+        opacity: 1;
+      }
+    </style>
+    <div
+      class="loader vis"
+      style="position:absolute;top:115px;left:50%;margin-left:-12px"
+    ></div>
+  </head>
+  <body onload="document.forms[0].submit()">
+    <!-- Success Mock Form -->
+    <form action="{{callback_url}}" method="post">
+      <input
+        type="hidden"
+        name="razorpay_payment_id"
+        value="pay_GeiWKMc4BAbqc1"
+      />
+      <!-- <input type="submit" /> -->
+    </form>
+    <!-- Failure Mock Form -->
+    <form action="{{callback_url}}" method="post">
+      <input type="hidden" name="error[code]" value="BAD_REQUEST_ERROR" />
+      <input
+        type="hidden"
+        name="error[description]"
+        value="The payment has already been processed"
+      />
+      <input type="hidden" name="error[source]" value="gateway" />
+      <input type="hidden" name="error[step]" value="payment_authorization" />
+      <input
+        type="hidden"
+        name="error[reason]"
+        value="gateway_technical_error"
+      />
+      <input type="hidden" name="error[metadata]" value="{}" />
+      <!-- <input type="submit" /> -->
+    </form>
+
+    <form id="form2" name="form2">
+      <input type="hidden" name="type" value="return" />
+    </form>
+  </body>
+</html>

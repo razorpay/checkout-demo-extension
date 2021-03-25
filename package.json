@@ -42,9 +42,10 @@
     "lint-fix": "$ lintFix app/modules",
     "clean": "$ ./scripts/clean.sh",
     "jest:base": "jest blackbox/tests/homescreen/**/base.test.js",
+    "jest:custom": "jest blackbox/tests/custom/**/*.test.js",
     "jest": "jest blackbox/tests/homescreen --testPathIgnorePatterns ersonalization",
     "jest:p13n": "jest blackbox/tests/homescreen/**/*ersonalization*.test.js --runInBand",
-    "test:all": "npm run test:unit && npm run build && npm run jest",
+    "test:all": "npm run test:unit && npm run build && npm run jest && npm run jest:custom",
     "test:base": "npm run test:unit && npm run build && npm run jest:base",
     "test:unit": "./rollup.test.js | tap-difflet",
     "test": "npm run test:all"
@@ -79,6 +80,7 @@
   },
   "private": true,
   "devDependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.12.13",
     "husky": "^5.1.3",
     "jest-circus": "^24.9.0",
     "lint-staged": "^10.5.4",

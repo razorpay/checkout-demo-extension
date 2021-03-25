@@ -1,10 +1,5 @@
-const { delay, visible } = require('../util');
-const { readFileSync } = require('fs');
 const { handleCardValidation } = require('./card-actions');
 
-contents = String(
-  readFileSync(__dirname + '/../fixtures/mockSuccessandFailPage.html')
-);
 
 async function verifyEMIPlansWithOffers(context, offerNumber) {
   const lists = await context.page.$$('.emi-plans-list');

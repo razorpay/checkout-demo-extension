@@ -184,7 +184,7 @@
         on:select={onAppSelect}
         name="upi_app"
         value={app.package_name}>
-        <div class="ref-title">
+        <div class="ref-title" data-name={app.shortcode}>
           {getUpiIntentAppName(app.shortcode, $locale, app.app_name)}
           {#if i === 0 && showRecommendedUPIApp}
             <span>
