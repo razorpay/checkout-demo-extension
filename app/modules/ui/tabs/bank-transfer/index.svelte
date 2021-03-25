@@ -14,7 +14,7 @@
   import { getSession } from 'sessionmanager';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import { isMobile } from 'common/useragent';
+  import { isMobileByMediaQuery } from 'common/useragent';
 
   // UI imports
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
@@ -254,14 +254,18 @@
           </div>
         {/if}
       </div>
-      {#if !isMobile()}
-        <div on:click={handlePrint} class="print">{$t(PRINT_DETAILS)}</div>
+      {#if !isMobileByMediaQuery()}
+        <div on:click={copyDetails} class="print">{$t(copied ? COPIED : COPY_DETAILS)}</div>
       {/if}
       <Bottom>
         <!-- LABEL: Do not round-off the amount. Transfer the exact amount for the payment to be successful. -->
         <Callout>{$t(ROUND_OFF_CALLOUT)}</Callout>
       </Bottom>
-      <CTA on:click={copyDetails}>{$t(copied ? COPIED : COPY_DETAILS)}</CTA>
+      {#if !isMobileByMediaQuery()}
+        <CTA on:click={handlePrint}>{$t(PRINT_DETAILS)}</CTA>
+      {:else}
+        <CTA on:click={copyDetails}>{$t(copied ? COPIED : COPY_DETAILS)}</CTA>
+      {/if}
     {:else}
       <div class="error">
         <div class="error-text">{error || 'Error'}</div>

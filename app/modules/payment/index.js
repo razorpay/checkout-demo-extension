@@ -561,7 +561,10 @@ Payment.prototype = {
       return;
     }
 
-    if (data.method === 'wallet' && !(data.contact && data.email)) {
+    if (
+      (data.method === 'wallet' || data.method === 'cardless_emi') &&
+      !(data.contact && data.email)
+    ) {
       return;
     }
 
