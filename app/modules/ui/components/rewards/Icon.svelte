@@ -39,16 +39,6 @@
         },
       });
     }, 1000);
-    session.svelteOverlay.$$set({
-      component: Rewards,
-      props: {
-        onClick: function(e) {
-          session.hideErrorMessage(e);
-        },
-      },
-    });
-    session.showSvelteOverlay();
-    showBackdrop();
   });
 
   function showRewards() {
