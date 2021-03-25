@@ -2907,7 +2907,6 @@ Session.prototype = {
   },
 
   showCardTab: function(tab) {
-    var sessionContext = this;
     this.otpView.updateScreen({
       maxlength: 6,
     });
@@ -2927,7 +2926,6 @@ Session.prototype = {
     this.otpView.updateScreen({
       skipTextLabel: 'skip_saved_cards',
     });
-
     
     /**
      * When the user comes back to the card tab after selecting EMI plan,

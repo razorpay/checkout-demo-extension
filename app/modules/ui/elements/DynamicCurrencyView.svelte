@@ -167,7 +167,6 @@
 
   $: {
     if(tabVisible) {
-      console.log('view', view);
       onSelect($dccCurrency);
     }
   }
