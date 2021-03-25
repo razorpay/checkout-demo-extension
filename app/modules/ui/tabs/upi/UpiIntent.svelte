@@ -70,7 +70,7 @@
       );
       if (currentDowntime) {
         downtimeSeverity = currentDowntime;
-        downtimeInstrument = pspHandle + ' UPI';
+        downtimeInstrument = pspHandle;
       } else {
         downtimeSeverity = false;
       }
