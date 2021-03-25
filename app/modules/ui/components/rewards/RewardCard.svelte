@@ -32,6 +32,8 @@
     border-radius: 5px;
     flex-shrink: 0;
     flex-wrap: wrap;
+    z-index: 100;
+    position: relative;
   }
   .full-width {
     width: 100%;
@@ -60,9 +62,6 @@
   }
   .reward-text {
     height: 20%;
-  }
-  .reward-card-container {
-    background: url('../../../../images/checkout/m2m_bg.gif');
   }
 </style>
 

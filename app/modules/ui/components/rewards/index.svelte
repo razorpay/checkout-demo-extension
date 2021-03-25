@@ -2,12 +2,10 @@
   // UI imports
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import RewardCard from './RewardCard.svelte';
+  import Animation from './Animation.svelte';
 
   //store
   import { rewards } from 'checkoutstore/rewards';
-
-  //utils
-  import { isMobile } from 'common/useragent';
 
   $rewards = [$rewards[0]];
 
@@ -25,6 +23,7 @@
 <style>
   .rewards-wrapper {
     white-space: normal;
+    position: relative;
   }
   .rewards-header {
     line-height: 1.4;
@@ -51,6 +50,7 @@
 </style>
 
 <div class="rewards-wrapper">
+  <Animation />
   <div class="rewards-header">
     <FormattedText text={$t(REWARDS_HEADER)} />
   </div>
