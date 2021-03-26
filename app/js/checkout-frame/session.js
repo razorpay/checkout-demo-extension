@@ -4696,6 +4696,10 @@ Session.prototype = {
               session.showLoadError(userFacingError, true);
             });
           return;
+        } else if (!discreet.CRED.isUserEligible(this.payload.contact)) {
+          var userFacingError = I18n.format('card.no_cred_account');
+          session.showLoadError(userFacingError, true);
+          return;
         }
       }
     } else if (data.method === 'card' || data.method === 'emi') {

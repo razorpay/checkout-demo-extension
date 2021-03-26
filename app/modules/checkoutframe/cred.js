@@ -43,7 +43,7 @@ export const checkCREDEligibility = contact => {
           resolve();
         } else {
           setCREDEligibility(contact, false);
-          reject('User not eligible');
+          reject(response);
         }
       },
     });
