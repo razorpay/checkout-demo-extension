@@ -194,8 +194,7 @@ function updateRetryBtnText() {
 
 function setupMissingMessageInterception() {
   function proxy(context, method, callback) {
-    return function() {
-      const args = Array.prototype.slice.apply(arguments);
+    return function(...args) {
       // Maybe think of a better name because this is not really a callback
       if (callback(args)) {
         method.apply(context, args);
