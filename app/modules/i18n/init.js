@@ -141,9 +141,12 @@ function setLocaleInStorage(locale) {
 
 export function addDefaultMessages() {
   addMessages('en', en);
-  register('hi', () => fetchBundle('hi'));
-  register('mar', () => fetchBundle('mar'));
-  register('guj', () => fetchBundle('guj'));
+
+  Object.keys(LOCALES).forEach(locale => {
+    if (locale !== 'en') {
+      register(locale, () => fetchBundle(locale));
+    }
+  });
 }
 
 export function bindI18nEvents() {
