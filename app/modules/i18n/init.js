@@ -25,8 +25,8 @@ import { ignoreFirstCall } from 'svelte-utils';
 const LOCALES = {
   en: 'English',
   hi: 'हिंदी',
-  mr: 'मराठी',
-  gu: 'પાસ',
+  mar: 'मराठी',
+  guj: 'પાસ',
 };
 
 const ALLOWED_LOCALES = _Obj.keys(LOCALES);
@@ -142,8 +142,8 @@ function setLocaleInStorage(locale) {
 export function addDefaultMessages() {
   addMessages('en', en);
   register('hi', () => fetchBundle('hi'));
-  register('mr', () => fetchBundle('mar'));
-  register('gu', () => fetchBundle('guj'));
+  register('mar', () => fetchBundle('mar'));
+  register('guj', () => fetchBundle('guj'));
 }
 
 export function bindI18nEvents() {
