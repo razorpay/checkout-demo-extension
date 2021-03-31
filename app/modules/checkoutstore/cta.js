@@ -134,9 +134,18 @@ export function showAmountInCta() {
       setView(CtaViews.PAY, false);
     } else {
       const offer = session.getAppliedOffer();
-      const amount = (offer && offer.amount) || session.get('amount');
+      let amount = (offer && offer.amount) || session.get('amount');
+      let currency = 'INR';
+      if (offer) {
+        if(session.dccPayload.enable && session.dccPayload.currency) {
+          currency = session.dccPayload.currency;
+        }
+        if(session.dccPayload.enable && session.dccPayload.currencyPayload && session.dccPayload.currencyPayload.all_currencies) {
+          amount = session.dccPayload.currencyPayload.all_currencies[currency].amount;
+        }
+      }
       setView(CtaViews.AMOUNT, false, {
-        amount: displayAmount(session.r, amount),
+        amount: displayAmount(session.r, amount, currency),
       });
     }
   }

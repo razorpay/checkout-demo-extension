@@ -2542,13 +2542,44 @@ Session.prototype = {
       session._trySelectingOfferInstrument(offer);
     }, 300);
   },
-
+  /**
+   * set Currency Data used by offer & trigger apply discount
+   * @param {Object} payload dcc related payload (selected currency & flow api response)
+   * @param {boolean} reset if true, replace existing value with new else override
+   */
+  setDCCPayload: function(payload, reset) {
+    if (reset) {
+      this.dccPayload = payload;
+    } else {
+      this.dccPayload = Object.assign(this.dccPayload || {}, payload);
+    }
+    var offer = this.getAppliedOffer();
+    // if offer applied
+    if(offer) {
+      this.handleDiscount();
+    }
+  },
   /**
    * Show the discount amount.
    */
   handleDiscount: function() {
     var offer = this.getAppliedOffer();
     var hasDiscount = offer && offer.amount !== offer.original_amount;
+    var currency = 'INR';
+    var amount;
+    if(offer) {
+      amount = offer.amount;
+    }
+    if(this.dccPayload.enable && this.dccPayload.currency) {
+      currency = this.dccPayload.currency;
+    }
+    /**
+     * check dcc amount we have it is for discounted amount
+     * as flow api may take time we can't show original amount we can show discount amount in INR
+     */
+    if(this.dccPayload.enable && this.dccPayload.currencyPayload && this.dccPayload.currencyPayload.all_currencies && this.dccPayload.entityWithAmount.indexOf(amount) !== -1) {
+      amount = this.dccPayload.currencyPayload.all_currencies[currency].amount;
+    }
 
     // this.offers is undefined for forced offers
     if (hasDiscount && this.offers) {
@@ -2565,7 +2596,7 @@ Session.prototype = {
 
     $('#content').toggleClass('has-discount', hasDiscount);
     $('#amount .discount').html(
-      hasDiscount ? this.formatAmountWithCurrency(offer.amount) : ''
+      hasDiscount ? discreet.Currency.formatAmountWithSymbol(amount, currency) : ''
     );
     Cta.setAppropriateCtaText();
   },

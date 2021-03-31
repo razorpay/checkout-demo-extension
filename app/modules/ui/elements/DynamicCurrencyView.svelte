@@ -61,10 +61,12 @@
   let originalCurrency = getCurrency();
   let searchModalOpen = false;
   let entityWithAmount = null;
+  let cardCurrency;
+  const session = getSession();
 
   let currencyConfig;
   let displayCurrencies = [];
-
+  let prevCurrency;
   const currencyCache = {};
 
   // Props
@@ -128,7 +130,12 @@
         currencies = null;
         getCardCurrencies(prop).then(currencyPayload => {
           currencyCache[entityWithAmount] = currencyPayload;
+          // update selected currency payload [only used by offers in session.js]
+          session.setDCCPayload({ currencyPayload, entityWithAmount });
         });
+      } else if(tabVisible) {
+        // update selected currency payload [only used by offers in session.js]
+        session.setDCCPayload({ currencyPayload: currencyCache[entityWithAmount], entityWithAmount });
       }
     } else {
       currencies = null;
@@ -144,12 +151,24 @@
   }
 
   $: {
-    if(tabVisible) {
+    const offer = session.getAppliedOffer();
+    if(tabVisible && (!offer || selectedCurrency !== prevCurrency)) {
       if (currencies && selectedCurrency) {
+        prevCurrency = selectedCurrency;
+        let amount = dccAmount;
+        /**
+         * if offer is applied update original amount in requested currency
+        */
+        if(offer) {
+          const currencyData = currencyCache[entityWithOriginalAmount];
+          if(currencyData && currencyData.all_currencies) {
+            amount = currencyData.all_currencies[selectedCurrency].amount;
+          }
+        }
         updateAmountInHeaderAndCTA(
-          formatAmountWithSymbol(dccAmount, selectedCurrency)
+          formatAmountWithSymbol(amount, selectedCurrency), formatAmountWithSymbol(dccAmount, selectedCurrency)
         );
-      } else {
+      } else if(!offer) {
         updateAmountInHeaderAndCTA();
       }
     }
@@ -163,11 +182,24 @@
   function onSelect(currency) {
     selectedCurrency = currency;
     searchModalOpen = false;
+    session.setDCCPayload({ currency });
   }
 
   $: {
     if(tabVisible) {
       onSelect($dccCurrency);
+    }
+  }
+
+  $: {
+    if(!tabVisible) {
+      // reset dcc data in session if tab is close
+      session.setDCCPayload({}, true);
+      // reset currency to INR as dcc amount to be shown only where dcc is not selected
+      // this case happen when from card screen to go another screen
+      prevCurrency = 'INR';
+    } else {
+      session.setDCCPayload({ enable: Boolean(visible) });
     }
   }
 
@@ -182,14 +214,14 @@
     ({ currency }) => currency === selectedCurrency
   );
   $: entityWithAmount = `${entity}-${$amountAfterOffer}`;
+  $: entityWithOriginalAmount = `${entity}-${originalAmount}`;
 
 
-  function updateAmountInHeaderAndCTA(displayAmount) {
-    const session = getSession();
+  function updateAmountInHeaderAndCTA(displayAmount, ctaAmount) {
     tick().then(() => {
       if (displayAmount) {
-        showAmount(displayAmount);
         session.setRawAmountInHeader(displayAmount);
+        showAmount(ctaAmount);
       } else if (!isPartialPayment()) {
         showCtaWithDefaultText();
         session.updateAmountInHeader(originalAmount);
