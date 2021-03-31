@@ -2319,7 +2319,10 @@ Session.prototype = {
         this.topBar.setTab(tabForTitle);
       }
     }
-
+    /**
+    * onShown is different from tabVisible. As in case of card onShown trigger even we are asking for saved card OTP.
+    * tabVisible will trigger on actual tab shown only.
+    */
     if(screen === 'card' && this.svelteCardTab) {
       this.svelteCardTab.setTabVisible(true);
     }
