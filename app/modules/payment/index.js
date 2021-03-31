@@ -556,7 +556,10 @@ Payment.prototype = {
       return;
     }
 
-    if (data.method === 'wallet' && !(data.contact && data.email)) {
+    if (
+      (data.method === 'wallet' || data.method === 'cardless_emi') &&
+      !(data.contact && data.email)
+    ) {
       return;
     }
 
@@ -1052,7 +1055,8 @@ var CardCurrencyCache = {};
  * @param {Function} callback
  */
 razorpayProto.getCardFlows = function(cardNumber = '', callback = _Func.noop) {
-  getCardFeatures(cardNumber)
+  getCardFeatures
+    .bind(this)(cardNumber)
     .then(({ flows = {} }) => {
       callback(flows);
     })

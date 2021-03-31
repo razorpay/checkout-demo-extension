@@ -1,5 +1,6 @@
 module.exports = [
   // '--single-process',
+  '--disable-web-security',
   '--no-sandbox', // Disables the sandbox for all process types that are normally sandboxed. ↪
   '--disable-dev-profile',
   '--disable-setuid-sandbox',

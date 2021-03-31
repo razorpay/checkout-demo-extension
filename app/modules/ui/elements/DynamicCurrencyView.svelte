@@ -1,5 +1,5 @@
 <script>
-  import { onDestroy } from 'svelte';
+  import { onDestroy, tick } from 'svelte';
 
   // Store
   import {
@@ -60,6 +60,7 @@
   let currencies = null;
   let originalAmount = getAmount();
   let selectedCurrency = null;
+  let originalCurrency = getCurrency();
   let searchModalOpen = false;
   let entityWithAmount = null;
 
@@ -174,13 +175,15 @@
 
   function updateAmountInHeaderAndCTA(displayAmount) {
     const session = getSession();
-    if (displayAmount) {
-      showAmount(displayAmount);
-      session.setRawAmountInHeader(displayAmount);
-    } else if (!isPartialPayment()) {
-      showCtaWithDefaultText();
-      session.updateAmountInHeader(originalAmount);
-    }
+    tick().then(() => {
+      if (displayAmount) {
+        showAmount(displayAmount);
+        session.setRawAmountInHeader(displayAmount);
+      } else if (!isPartialPayment()) {
+        showCtaWithDefaultText();
+        session.updateAmountInHeader(originalAmount);
+      }
+    });
   }
 
   /**
@@ -320,9 +323,9 @@
         {/if}
         <div dir="ltr">
           <b dir="ltr">{formatAmountWithSymbol(dccAmount, selectedCurrency)}</b>
-          {#if selectedCurrency !== 'INR'}
+          {#if selectedCurrency !== originalCurrency}
             <span class="small-text">
-              ({formatAmountWithSymbol(currencies.INR.amount, 'INR')})
+              ({formatAmountWithSymbol(currencies[originalCurrency].amount, originalCurrency)})
             </span>
           {/if}
         </div>

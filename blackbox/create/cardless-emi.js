@@ -157,6 +157,10 @@ module.exports = function(testFeatures) {
         await handleFeeBearer(context);
       }
       if (provider === 'zestmoney') {
+        if (!context.state.contact) {
+          // await context.popup();
+          return;
+        }
         await handleCardlessEMIValidation(context);
         await typeOTPandSubmit(context);
         await handleOtpVerificationForCardlessEMI(context);
