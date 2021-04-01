@@ -292,7 +292,7 @@ const util = (module.exports = {
       respond({
         contentType: 'application/json',
         body: JSON.stringify(body),
-        status
+        status,
       });
 
     returnObj.respondJSONP = body => {
@@ -329,12 +329,13 @@ const util = (module.exports = {
   getInnerText: async (page, selector) => {
     const elementForSelector = await getElementForSelector(page, selector);
     try {
-      if (elementForSelector)
+      if (elementForSelector) {
         return (
           (await elementForSelector.evaluate(element => {
             return element.innerText;
           })) || ''
         );
+      }
     } catch {
       return '';
     }

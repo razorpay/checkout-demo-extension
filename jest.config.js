@@ -9,11 +9,7 @@ module.exports = {
   // testRunner: 'jest-circus/runner',
   verbose: true,
   setupFilesAfterEnv: ['./blackbox/jestSetupFileAfterENV'],
-  "roots": [
-    "<rootDir>"
-  ],
-  "modulePaths": [
-    "<rootDir>",
-  ],
-  "moduleDirectories": ["node_modules", "app/modules"],
+  roots: ['<rootDir>'],
+  modulePaths: ['<rootDir>'],
+  moduleDirectories: ['node_modules', 'app/modules'],
 };

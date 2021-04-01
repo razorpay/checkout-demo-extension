@@ -636,7 +636,6 @@ function Session(message) {
   var options = message.options;
   var self = this;
 
-
   this.r = Razorpay(options);
   this.get = this.r.get;
   this.set = this.r.set;
@@ -2470,7 +2469,7 @@ Session.prototype = {
         }
       }
     };
-    
+
     if (screen === 'wallet') {
       // Select wallet
       if (issuer && this.walletTab) {

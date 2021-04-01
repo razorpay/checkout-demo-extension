@@ -14,18 +14,18 @@ describe('verifyVPA - Custom Checkout UT', () => {
     page.removeAllListeners('request');
   });
 
-    describe.each(validVPA)('valid VPA', vpa => {
-      test(`validate input ${vpa}`, async () => {
-        const verifyVPAPromise = page.evaluate(async vpaInput => {
-          return await window.rp.verifyVpa(vpaInput);
-        }, vpa);
-        await context.expectRequest(req => {});
-        await context.respondJSON(mockAPI.validVPAResponse(vpa));
-        const vpaResponse = await verifyVPAPromise;
-        expect(vpaResponse.success).toBeTruthy();
-        expect(vpaResponse.vpa).toBe(vpa);
-      });
+  describe.each(validVPA)('valid VPA', vpa => {
+    test(`validate input ${vpa}`, async () => {
+      const verifyVPAPromise = page.evaluate(async vpaInput => {
+        return await window.rp.verifyVpa(vpaInput);
+      }, vpa);
+      await context.expectRequest(req => {});
+      await context.respondJSON(mockAPI.validVPAResponse(vpa));
+      const vpaResponse = await verifyVPAPromise;
+      expect(vpaResponse.success).toBeTruthy();
+      expect(vpaResponse.vpa).toBe(vpa);
     });
+  });
 
   describe.each(inValidVPA)('invalid VPA', vpa => {
     test(`validate input ${vpa}`, async () => {
