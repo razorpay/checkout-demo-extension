@@ -11,9 +11,7 @@
 
   import { amountAfterOffer } from 'checkoutstore/offers';
 
-  import {
-    selectedInstrument,
-  } from 'checkoutstore/screens/home';
+  import { selectedInstrument } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
 
@@ -51,7 +49,6 @@
     HOME_SCREEN: 'home-screen',
   };
 
-  let currentEntity = null;
   let prop = null;
   let entity = null;
   let loading = true;
@@ -113,7 +110,7 @@
       entity = null;
     }
   }
-
+  
   $: {
     if (view === Views.ADD_CARD) {
       // Don't show "Loading currencies..." in add card screen,
@@ -133,9 +130,12 @@
           // update selected currency payload [only used by offers in session.js]
           session.setDCCPayload({ currencyPayload, entityWithAmount });
         });
-      } else if(tabVisible) {
+      } else if (tabVisible) {
         // update selected currency payload [only used by offers in session.js]
-        session.setDCCPayload({ currencyPayload: currencyCache[entityWithAmount], entityWithAmount });
+        session.setDCCPayload({
+          currencyPayload: currencyCache[entityWithAmount],
+          entityWithAmount,
+        });
       }
     } else {
       currencies = null;
@@ -152,25 +152,44 @@
 
   $: {
     const offer = session.getAppliedOffer();
-    if(tabVisible && (!offer || selectedCurrency !== prevCurrency)) {
+    if (tabVisible && (!offer || selectedCurrency !== prevCurrency)) {
       if (currencies && selectedCurrency) {
         prevCurrency = selectedCurrency;
         let amount = dccAmount;
         /**
          * if offer is applied update original amount in requested currency
-        */
-        if(offer) {
+         */
+        if (offer) {
           const currencyData = currencyCache[entityWithOriginalAmount];
-          if(currencyData && currencyData.all_currencies) {
+          if (currencyData && currencyData.all_currencies) {
             amount = currencyData.all_currencies[selectedCurrency].amount;
           }
         }
         updateAmountInHeaderAndCTA(
-          formatAmountWithSymbol(amount, selectedCurrency), formatAmountWithSymbol(dccAmount, selectedCurrency)
+          formatAmountWithSymbol(amount, selectedCurrency),
+          formatAmountWithSymbol(dccAmount, selectedCurrency)
         );
-      } else if(!offer) {
+      } else if (!offer) {
         updateAmountInHeaderAndCTA();
       }
+    }
+  }
+
+
+  function updateCurrencyCache(key, value) {
+    currencyCache[key] = value;
+  }
+
+  $: {
+    /**
+     * this case happen if we apply offer before selecting card (saved card)
+     * we don't have data of original currency amount we need that to show in header
+    */
+    if(visible && entityWithOriginalAmount !== entityWithAmount && !currencyCache[entityWithOriginalAmount]) {
+      getCardCurrencies({...prop, amount: originalAmount}).then(currencyPayload => {
+        updateCurrencyCache(entityWithOriginalAmount, currencyPayload);
+        prevCurrency = '';
+      })
     }
   }
 
@@ -186,18 +205,19 @@
   }
 
   $: {
-    if(tabVisible) {
+    if (tabVisible) {
       onSelect($dccCurrency);
     }
   }
 
   $: {
-    if(!tabVisible) {
+    if (!visible || !tabVisible) {
       // reset dcc data in session if tab is close
       session.setDCCPayload({}, true);
       // reset currency to INR as dcc amount to be shown only where dcc is not selected
       // this case happen when from card screen to go another screen
       prevCurrency = 'INR';
+      updateAmountInHeaderAndCTA();
     } else {
       session.setDCCPayload({ enable: Boolean(visible) });
     }
@@ -215,7 +235,6 @@
   );
   $: entityWithAmount = `${entity}-${$amountAfterOffer}`;
   $: entityWithOriginalAmount = `${entity}-${originalAmount}`;
-
 
   function updateAmountInHeaderAndCTA(displayAmount, ctaAmount) {
     tick().then(() => {
@@ -355,7 +374,8 @@
                   label={currency}
                   value={amount}
                   checked={currency === selectedCurrency}
-                  on:change={() => onSelect(currency)}>
+                  on:change={() => onSelect(currency)}
+                >
                   {amount}
                 </Radio>
               {/each}
@@ -368,14 +388,18 @@
           <b dir="ltr">{formatAmountWithSymbol(dccAmount, selectedCurrency)}</b>
           {#if selectedCurrency !== originalCurrency}
             <span class="small-text">
-              ({formatAmountWithSymbol(currencies[originalCurrency].amount, originalCurrency)})
+              ({formatAmountWithSymbol(
+                currencies[originalCurrency].amount,
+                originalCurrency
+              )})
             </span>
           {/if}
         </div>
       </Stack>
       <div
         class="more-btn theme-highlight-color"
-        on:click={showCurrenciesModal}>
+        on:click={showCurrenciesModal}
+      >
         {#if selectedCurrencyInDisplay}More{:else}Change{/if}
         <span class="arrow">&#xe604;</span>
       </div>
@@ -394,7 +418,8 @@
         component={CurrencySearchItem}
         bind:open={searchModalOpen}
         on:close={() => (searchModalOpen = false)}
-        on:select={({ detail }) => onSelect(detail.currency)} />
+        on:select={({ detail }) => onSelect(detail.currency)}
+      />
     </Stack>
   {/if}
 </div>
