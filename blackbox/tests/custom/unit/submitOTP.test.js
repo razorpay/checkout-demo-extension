@@ -16,7 +16,7 @@ describe('submitOTP - Custom Checkout UT', () => {
     /**
      * Trigger payment flow
      */
-    await page.evaluate(async (data) => {
+    await page.evaluate(async data => {
       window.rp.createPayment(data);
     }, getPaymentPayload('card'));
     await context.expectRequest(req => {});

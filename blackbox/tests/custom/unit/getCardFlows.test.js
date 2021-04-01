@@ -13,7 +13,7 @@ describe('getCardFlows - Custom Checkout UT', () => {
     page.removeAllListeners('request');
   });
   test('getCardFlows', async () => {
-    const cardFlowPromise = page.evaluate(async (card) => {
+    const cardFlowPromise = page.evaluate(async card => {
       return await new Promise(resolve => {
         window.rp.getCardFlows(card, response => {
           resolve(response);
@@ -29,7 +29,7 @@ describe('getCardFlows - Custom Checkout UT', () => {
   });
 
   test('getCardFeatures', async () => {
-    const cardFlowPromise = page.evaluate(async (card) => {
+    const cardFlowPromise = page.evaluate(async card => {
       const rp = window.rp;
       return await rp.getCardFeatures(card);
     }, cardNumber);

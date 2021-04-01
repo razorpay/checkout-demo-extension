@@ -1,6 +1,5 @@
 const { handleCardValidation } = require('./card-actions');
 
-
 async function verifyEMIPlansWithOffers(context, offerNumber) {
   const lists = await context.page.$$('.emi-plans-list');
   expect(lists.length).toBe(2);

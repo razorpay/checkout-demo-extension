@@ -36,7 +36,7 @@ describe.each(flowTests)('Validate Flow', flow => {
         const createPaymentResponse = mockAPI.ajaxResponse(flow.type);
         await context.respondJSON(createPaymentResponse);
       }
-      
+
       // mock popup
       const popup = await context.popup();
       const popupPage = popup.page;

@@ -1055,7 +1055,8 @@ var CardCurrencyCache = {};
  * @param {Function} callback
  */
 razorpayProto.getCardFlows = function(cardNumber = '', callback = _Func.noop) {
-  getCardFeatures.bind(this)(cardNumber)
+  getCardFeatures
+    .bind(this)(cardNumber)
     .then(({ flows = {} }) => {
       callback(flows);
     })
