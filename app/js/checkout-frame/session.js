@@ -2572,15 +2572,17 @@ Session.prototype = {
     if(offer) {
       amount = offer.amount;
     }
-    if(this.dccPayload.enable && this.dccPayload.currency) {
-      currency = this.dccPayload.currency;
-    }
-    /**
-     * check dcc amount we have it is for discounted amount
-     * as flow api may take time we can't show original amount we can show discount amount in INR
-     */
-    if(this.dccPayload.enable && this.dccPayload.currencyPayload && this.dccPayload.currencyPayload.all_currencies && this.dccPayload.entityWithAmount.indexOf(amount) !== -1) {
-      amount = this.dccPayload.currencyPayload.all_currencies[currency].amount;
+    if (this.dccPayload) {
+      if(this.dccPayload.enable && this.dccPayload.currency) {
+        currency = this.dccPayload.currency;
+      }
+      /**
+       * check dcc amount we have it is for discounted amount
+       * as flow api may take time we can't show original amount we can show discount amount in INR
+       */
+      if(this.dccPayload.enable && this.dccPayload.currencyPayload && this.dccPayload.currencyPayload.all_currencies && this.dccPayload.entityWithAmount.indexOf(amount) !== -1) {
+        amount = this.dccPayload.currencyPayload.all_currencies[currency].amount;
+      }
     }
 
     // this.offers is undefined for forced offers
