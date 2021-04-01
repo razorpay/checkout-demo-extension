@@ -136,7 +136,7 @@ export function showAmountInCta() {
       const offer = session.getAppliedOffer();
       let amount = (offer && offer.amount) || session.get('amount');
       let currency = 'INR';
-      if (offer) {
+      if (offer && session.dccPayload) {
         if(session.dccPayload.enable && session.dccPayload.currency) {
           currency = session.dccPayload.currency;
         }
