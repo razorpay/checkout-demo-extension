@@ -255,7 +255,9 @@
         {/if}
       </div>
       {#if !isMobileByMediaQuery()}
-        <div on:click={copyDetails} class="print">{$t(copied ? COPIED : COPY_DETAILS)}</div>
+        <div on:click={copyDetails} class="print">
+          {$t(copied ? COPIED : COPY_DETAILS)}
+        </div>
       {/if}
       <Bottom>
         <!-- LABEL: Do not round-off the amount. Transfer the exact amount for the payment to be successful. -->

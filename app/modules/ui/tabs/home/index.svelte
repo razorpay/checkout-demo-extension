@@ -1035,7 +1035,7 @@
       {#if isDCCEnabled()}
         <DynamicCurrencyView view="home-screen" />
       {/if}
-      {#if showRecurringCallout}
+      <!-- {#if showRecurringCallout}
         <Callout>
           {generateSubtextForRecurring({
             types: getCardTypesForRecurring(),
@@ -1045,7 +1045,7 @@
             offer: cardOffer,
           })}
         </Callout>
-      {/if}
+      {/if} -->
 
       {#if showSecuredByMessage}
         <div
