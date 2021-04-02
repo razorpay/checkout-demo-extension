@@ -1,4 +1,4 @@
-import { writable, derived } from 'svelte/store';
+import { writable, derived, get } from 'svelte/store';
 import { getSession } from 'sessionmanager';
 import { displayAmount } from 'common/currency';
 import { isCardValidForOffer } from 'checkoutstore/offers';
@@ -135,6 +135,13 @@ export function showAmountInCta() {
     } else {
       const offer = session.getAppliedOffer();
       let amount = (offer && offer.amount) || session.get('amount');
+
+      if((offer && offer.payment_method === 'card') && !get(isCardValidForOffer)) {
+        /**
+         * invalid card offer use original amount
+         */
+        amount = session.get('amount');
+      }
       let currency = 'INR';
       if (offer && session.dccPayload) {
         if(session.dccPayload.enable && session.dccPayload.currency) {
