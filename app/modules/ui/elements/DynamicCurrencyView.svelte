@@ -9,7 +9,10 @@
     dccCurrency,
   } from 'checkoutstore/screens/card';
 
-  import { amountAfterOffer } from 'checkoutstore/offers';
+  import {
+    amountAfterOffer,
+    appliedOffer
+  } from 'checkoutstore/offers';
 
   import { selectedInstrument } from 'checkoutstore/screens/home';
 
@@ -110,7 +113,7 @@
       entity = null;
     }
   }
-  
+
   $: {
     if (view === Views.ADD_CARD) {
       // Don't show "Loading currencies..." in add card screen,
@@ -151,7 +154,7 @@
   }
 
   $: {
-    const offer = session.getAppliedOffer();
+    const offer = $appliedOffer;
     if (tabVisible && (!offer || selectedCurrency !== prevCurrency)) {
       if (currencies && selectedCurrency) {
         prevCurrency = selectedCurrency;
@@ -175,7 +178,6 @@
     }
   }
 
-
   function updateCurrencyCache(key, value) {
     currencyCache[key] = value;
   }
@@ -184,12 +186,18 @@
     /**
      * this case happen if we apply offer before selecting card (saved card)
      * we don't have data of original currency amount we need that to show in header
-    */
-    if(visible && entityWithOriginalAmount !== entityWithAmount && !currencyCache[entityWithOriginalAmount]) {
-      getCardCurrencies({...prop, amount: originalAmount}).then(currencyPayload => {
-        updateCurrencyCache(entityWithOriginalAmount, currencyPayload);
-        prevCurrency = '';
-      })
+     */
+    if (
+      visible &&
+      entityWithOriginalAmount !== entityWithAmount &&
+      !currencyCache[entityWithOriginalAmount]
+    ) {
+      getCardCurrencies({ ...prop, amount: originalAmount }).then(
+        currencyPayload => {
+          updateCurrencyCache(entityWithOriginalAmount, currencyPayload);
+          prevCurrency = '';
+        }
+      );
     }
   }
 
@@ -318,47 +326,6 @@
   }
 </script>
 
-<style>
-  .arrow {
-    display: inline-block;
-    font-size: 8px;
-    transform: rotate(180deg);
-  }
-
-  .dcc-view {
-    display: none;
-    border-top: 1px solid #ebedf0;
-    padding: 10px 24px;
-    font-size: 13px;
-  }
-
-  .dcc-view.visible {
-    display: block;
-  }
-
-  .dcc-view > :global(.stack) {
-    justify-content: space-between;
-  }
-
-  .dcc-view :global(.input-radio):not(:last-child) {
-    margin-right: 16px;
-  }
-
-  .small-text {
-    font-size: 12px;
-  }
-
-  .more-btn {
-    text-transform: none;
-    letter-spacing: normal;
-    cursor: pointer;
-  }
-
-  .default-currencies {
-    margin-bottom: 6px;
-  }
-</style>
-
 <div class={allClasses} class:visible>
   {#if loading}
     Loading currencies...
@@ -423,3 +390,44 @@
     </Stack>
   {/if}
 </div>
+
+<style>
+  .arrow {
+    display: inline-block;
+    font-size: 8px;
+    transform: rotate(180deg);
+  }
+
+  .dcc-view {
+    display: none;
+    border-top: 1px solid #ebedf0;
+    padding: 10px 24px;
+    font-size: 13px;
+  }
+
+  .dcc-view.visible {
+    display: block;
+  }
+
+  .dcc-view > :global(.stack) {
+    justify-content: space-between;
+  }
+
+  .dcc-view :global(.input-radio):not(:last-child) {
+    margin-right: 16px;
+  }
+
+  .small-text {
+    font-size: 12px;
+  }
+
+  .more-btn {
+    text-transform: none;
+    letter-spacing: normal;
+    cursor: pointer;
+  }
+
+  .default-currencies {
+    margin-bottom: 6px;
+  }
+</style>

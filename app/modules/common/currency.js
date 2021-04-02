@@ -1276,7 +1276,7 @@ export function formatAmountWithSymbol(amount, currency, space = true) {
   );
 }
 
-export function displayAmount(razorpay, payloadAmount, payloadCurrency) {
+export function displayAmount(razorpay, payloadAmount, payloadCurrency, isDCC) {
   let get = razorpay.get;
   let displayCurrency = get('display_currency');
   if (displayCurrency) {
@@ -1293,8 +1293,12 @@ export function displayAmount(razorpay, payloadAmount, payloadCurrency) {
       formatAmount(displayAmount, displayCurrency)
     );
   }
+  let amount = razorpay.display_amount || payloadAmount || get('amount');
+  if(isDCC && payloadAmount) {
+    amount = payloadAmount;
+  }
   return formatAmountWithSymbol(
-    razorpay.display_amount || payloadAmount || get('amount'),
+    amount,
     payloadCurrency || get('currency')
   );
 }
