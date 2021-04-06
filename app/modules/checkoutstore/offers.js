@@ -95,8 +95,8 @@ export const isCardValidForOffer = derived(
   }
 );
 
-export const amountAfterOffer = derived(appliedOffer, () => {
-  if (get(appliedOffer)) {
+export const amountAfterOffer = derived([appliedOffer, isCardValidForOffer], ([$appliedOffer, $isCardValidForOffer]) => {
+  if ($appliedOffer && $isCardValidForOffer) {
     return get(appliedOffer).amount;
   }
   return getAmount();

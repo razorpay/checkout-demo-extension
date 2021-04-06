@@ -66,12 +66,12 @@ export const getOption = option => razorpayInstance.get(option);
 export const setOption = (option, value) => razorpayInstance.set(option, value);
 export const getCallbackUrl = optionGetter('callback_url');
 export const getCardFeatures = iin => razorpayInstance.getCardFeatures(iin);
-export const getCardCurrencies = ({ iin, tokenId, cardNumber }) => {
+export const getCardCurrencies = ({ iin, tokenId, cardNumber, amount }) => {
   return razorpayInstance.getCardCurrencies({
     iin,
     tokenId,
     cardNumber,
-    amount: get(amountAfterOffer),
+    amount: amount || get(amountAfterOffer),
     currency: getCurrency(), // Entity currency
   });
 };
