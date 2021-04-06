@@ -99,7 +99,7 @@ module.exports = function(testFeatures) {
           duration: 6,
           interest: 7,
           subvention: 'customer',
-          min_amount: 899900,
+          min_amount: 499900,
           merchant_payback: '0.00',
         },
         {
@@ -167,7 +167,7 @@ module.exports = function(testFeatures) {
         await selectCardlessEMIPlan(context, 1);
         await submit(context);
       } else if (provider === 'bajaj') {
-        await selectCardlessEMIPlan(context, 1);
+        await selectCardlessEMIPlan(context, 1, partialPayment ? 1 : 2);
         await submit(context);
         // TODO:
         //  Use enterCardDetails function,
