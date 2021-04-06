@@ -135,7 +135,7 @@ module.exports = function(testFeatures) {
       }
 
       if (partialPayment) {
-        await handlePartialPayment(context, '3000');
+        await handlePartialPayment(context, '4500');
       } else if (!isHomeScreenSkipped) {
         await proceed(context);
       }
@@ -150,7 +150,7 @@ module.exports = function(testFeatures) {
       await selectPaymentMethod(context, 'cardless_emi');
 
       if (partialPayment) {
-        await verifyPartialAmount(context, '₹ 3,000');
+        await verifyPartialAmount(context, '₹ 4,500');
       }
       await selectCardlessEMIOption(context, provider);
       if (feeBearer) {
