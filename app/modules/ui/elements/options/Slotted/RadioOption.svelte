@@ -50,7 +50,7 @@
       elementClass += ' overflow';
     }
     if(as === 'div') {
-      elementClass += ' div-element';
+      elementClass += ' div-radio-container';
     }
   }
 </script>
@@ -67,7 +67,7 @@
     cursor: pointer;
   }
 
-  :global(.div-element) {
+  :global(.div-radio-container) {
     width: auto;
   }
 
