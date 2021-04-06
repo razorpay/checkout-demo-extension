@@ -144,6 +144,7 @@ export function showAmountInCta() {
       }
       let currency = 'INR';
       if (offer && session.dccPayload) {
+        /** value of dccPayload set via DynamicCurrencyView.svelte */
         if(session.dccPayload.enable && session.dccPayload.currency) {
           currency = session.dccPayload.currency;
         }

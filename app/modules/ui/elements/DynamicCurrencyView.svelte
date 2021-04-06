@@ -78,6 +78,24 @@
   // Computed
   export let allClasses;
 
+  /**
+   * set Currency Data used by offer & trigger apply discount
+   * @param {Object} payload dcc related payload (selected currency & flow api response)
+   * @param {boolean} reset if true, replace existing value with new else override
+   */
+  function setDCCPayload(payload, reset) {
+    if (reset) {
+      session.dccPayload = payload;
+    } else {
+      session.dccPayload = Object.assign(session.dccPayload || {}, payload);
+    }
+    var offer = session.getAppliedOffer();
+    // if offer applied
+    if(offer) {
+      session.handleDiscount();
+    }
+  }
+
   $: allClasses = ['dcc-view'].concat(classes).join(' ');
 
   $: {
@@ -131,11 +149,11 @@
         getCardCurrencies(prop).then(currencyPayload => {
           currencyCache[entityWithAmount] = currencyPayload;
           // update selected currency payload [only used by offers in session.js]
-          session.setDCCPayload({ currencyPayload, entityWithAmount });
+          setDCCPayload({ currencyPayload, entityWithAmount });
         });
       } else if (tabVisible) {
         // update selected currency payload [only used by offers in session.js]
-        session.setDCCPayload({
+        setDCCPayload({
           currencyPayload: currencyCache[entityWithAmount],
           entityWithAmount,
         });
@@ -209,7 +227,7 @@
   function onSelect(currency) {
     selectedCurrency = currency;
     searchModalOpen = false;
-    session.setDCCPayload({ currency });
+    setDCCPayload({ currency });
   }
 
   $: {
@@ -221,13 +239,13 @@
   $: {
     if (!visible || !tabVisible) {
       // reset dcc data in session if tab is close
-      session.setDCCPayload({}, true);
+      setDCCPayload({}, true);
       // reset currency to INR as dcc amount to be shown only where dcc is not selected
       // this case happen when from card screen to go another screen
       prevCurrency = 'INR';
       updateAmountInHeaderAndCTA();
     } else {
-      session.setDCCPayload({ enable: Boolean(visible) });
+      setDCCPayload({ enable: Boolean(visible) });
     }
   }
 
@@ -324,6 +342,9 @@
     }
     return _Arr.find($customer.tokens.items, token => token.id === tokenId);
   }
+
+  
+
 </script>
 
 <div class={allClasses} class:visible>

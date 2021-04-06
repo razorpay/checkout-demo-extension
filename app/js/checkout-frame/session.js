@@ -2545,23 +2545,6 @@ Session.prototype = {
     }, 300);
   },
   /**
-   * set Currency Data used by offer & trigger apply discount
-   * @param {Object} payload dcc related payload (selected currency & flow api response)
-   * @param {boolean} reset if true, replace existing value with new else override
-   */
-  setDCCPayload: function(payload, reset) {
-    if (reset) {
-      this.dccPayload = payload;
-    } else {
-      this.dccPayload = Object.assign(this.dccPayload || {}, payload);
-    }
-    var offer = this.getAppliedOffer();
-    // if offer applied
-    if(offer) {
-      this.handleDiscount();
-    }
-  },
-  /**
    * Show the discount amount.
    */
   handleDiscount: function() {
@@ -2573,6 +2556,7 @@ Session.prototype = {
       amount = offer.amount;
     }
     if (this.dccPayload) {
+      /** value of dccPayload set via DynamicCurrencyView.svelte */
       if(this.dccPayload.enable && this.dccPayload.currency) {
         currency = this.dccPayload.currency;
       }
