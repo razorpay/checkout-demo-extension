@@ -99,7 +99,7 @@ module.exports = function(testFeatures) {
           duration: 6,
           interest: 7,
           subvention: 'customer',
-          min_amount: 899900,
+          min_amount: 499900,
           merchant_payback: '0.00',
         },
         {
@@ -135,7 +135,7 @@ module.exports = function(testFeatures) {
       }
 
       if (partialPayment) {
-        await handlePartialPayment(context, '3000');
+        await handlePartialPayment(context, '4500');
       } else if (!isHomeScreenSkipped) {
         await proceed(context);
       }
@@ -150,7 +150,7 @@ module.exports = function(testFeatures) {
       await selectPaymentMethod(context, 'cardless_emi');
 
       if (partialPayment) {
-        await verifyPartialAmount(context, '₹ 3,000');
+        await verifyPartialAmount(context, '₹ 4,500');
       }
       await selectCardlessEMIOption(context, provider);
       if (feeBearer) {
@@ -167,7 +167,7 @@ module.exports = function(testFeatures) {
         await selectCardlessEMIPlan(context, 1);
         await submit(context);
       } else if (provider === 'bajaj') {
-        await selectCardlessEMIPlan(context, 1);
+        await selectCardlessEMIPlan(context, 1, partialPayment ? 1 : 2);
         await submit(context);
         // TODO:
         //  Use enterCardDetails function,

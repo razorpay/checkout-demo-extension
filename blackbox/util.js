@@ -224,11 +224,23 @@ const util = (module.exports = {
     let resolver;
     let currentRequest = null;
 
+    let allRequests = {};
+
     const returnObj = {
       disableInterceptor: () => (interceptorEnabled = null),
       enableInterceptor: () => (interceptorEnabled = true),
-      getRequest: () => currentRequest,
+      getRequest: url => {
+        if (url) {
+          currentRequest = allRequests[url];
+        }
+        return currentRequest;
+      },
     };
+
+    function getRequestPath(request) {
+      const parsedURL = URL.parse(request.url());
+      return parsedURL.pathname;
+    }
 
     function shouldIgnore(interceptedRequest) {
       const url = interceptedRequest.url();
@@ -248,8 +260,11 @@ const util = (module.exports = {
       if (shouldIgnore(interceptedRequest)) {
         return;
       }
-      expect(currentRequest).toBeNull();
+      const urlPath = getRequestPath(interceptedRequest);
+
+      expect(allRequests[urlPath]).toBeFalsy();
       currentRequest = interceptedRequest;
+      allRequests[urlPath] = interceptedRequest;
       resolver && resolver(currentRequest);
     });
 
@@ -262,6 +277,8 @@ const util = (module.exports = {
     }
 
     function reset() {
+      const urlPath = getRequestPath(currentRequest);
+      delete allRequests[urlPath];
       currentRequest = resolver = null;
     }
 

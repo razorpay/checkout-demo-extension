@@ -1033,7 +1033,7 @@
         <CardOffer offer={cardOffer} />
       {/if}
       {#if isDCCEnabled()}
-        <DynamicCurrencyView view="home-screen" />
+        <DynamicCurrencyView tabVisible view="home-screen" />
       {/if}
       <!-- {#if showRecurringCallout}
         <Callout>

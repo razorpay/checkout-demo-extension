@@ -145,7 +145,17 @@ async function selectZestMoneyEMIPlan(context, planNumber) {
   return selectCardlessEMIPlan(context, planNumber);
 }
 
-async function selectCardlessEMIPlan(context, planNumber) {
+async function assertCardlessEMIPlansList(page, expected) {
+  const list = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('.emi-plans-list .expandable-card'))
+  );
+  expect(list.length).toBe(expected);
+}
+
+async function selectCardlessEMIPlan(context, planNumber, numOfPlansExpected) {
+  if (numOfPlansExpected) {
+    await assertCardlessEMIPlansList(context.page, numOfPlansExpected);
+  }
   await context.page.waitForSelector('.emi-plans-list .expandable-card');
   const emiPlans = await context.page.$x(
     '//div[contains(@class,"emi-plans-list")]/div[contains(@class,"expandable-card")]'

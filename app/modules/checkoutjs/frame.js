@@ -94,7 +94,7 @@ function sanitizeImage(options) {
 }
 
 function makeCheckoutUrl(rzp) {
-  const CANARY_PERCENTAGE = 0.2;
+  const CANARY_PERCENTAGE = 0.5;
   var url = RazorpayConfig.frame;
 
   const useCanary = _.random() < CANARY_PERCENTAGE;

@@ -2335,6 +2335,13 @@ Session.prototype = {
         this.topBar.setTab(tabForTitle);
       }
     }
+    /**
+    * onShown is different from tabVisible. As in case of card onShown trigger even we are asking for saved card OTP.
+    * tabVisible will trigger on actual tab shown only.
+    */
+    if(screen === 'card' && this.svelteCardTab) {
+      this.svelteCardTab.setTabVisible(true);
+    }
 
     if (screen !== 'otp') {
       this.headless = false;
@@ -2554,13 +2561,30 @@ Session.prototype = {
       session._trySelectingOfferInstrument(offer);
     }, 300);
   },
-
   /**
    * Show the discount amount.
    */
   handleDiscount: function() {
     var offer = this.getAppliedOffer();
     var hasDiscount = offer && offer.amount !== offer.original_amount;
+    var currency = 'INR';
+    var amount;
+    if(offer) {
+      amount = offer.amount;
+    }
+    if (this.dccPayload) {
+      /** value of dccPayload set via DynamicCurrencyView.svelte */
+      if(this.dccPayload.enable && this.dccPayload.currency) {
+        currency = this.dccPayload.currency;
+      }
+      /**
+       * check dcc amount we have it is for discounted amount
+       * as flow api may take time we can't show original amount we can show discount amount in INR
+       */
+      if(this.dccPayload.enable && this.dccPayload.currencyPayload && this.dccPayload.currencyPayload.all_currencies && this.dccPayload.entityWithAmount.indexOf(amount) !== -1) {
+        amount = this.dccPayload.currencyPayload.all_currencies[currency].amount;
+      }
+    }
 
     // this.offers is undefined for forced offers
     if (hasDiscount && this.offers) {
@@ -2577,7 +2601,7 @@ Session.prototype = {
 
     $('#content').toggleClass('has-discount', hasDiscount);
     $('#amount .discount').html(
-      hasDiscount ? this.formatAmountWithCurrency(offer.amount) : ''
+      hasDiscount ? discreet.Currency.formatAmountWithSymbol(amount, currency) : ''
     );
     Cta.setAppropriateCtaText();
   },
@@ -2939,7 +2963,7 @@ Session.prototype = {
     this.otpView.updateScreen({
       skipTextLabel: 'skip_saved_cards',
     });
-
+    
     /**
      * When the user comes back to the card tab after selecting EMI plan,
      * do not commence OTP again.
@@ -3244,14 +3268,14 @@ Session.prototype = {
     // We need to show plans without no-cost EMI if the applied offer is an
     // EMI offer because No cost EMI cannot be applied with regular EMI offers.
     var plans = MethodStore.getEMIBankPlans(bank, 'credit', !isEmiOfferApplied);
-
+    var emiPlans = MethodStore.getEligiblePlansBasedOnMinAmount(plans);
     var prevTab = self.tab;
     var prevScreen = self.screen;
 
     self.emiPlansView.setPlans({
       type: 'bajaj',
       amount: amount,
-      plans: plans,
+      plans: emiPlans,
       bank: bank,
       on: {
         back: function() {
@@ -4318,6 +4342,11 @@ Session.prototype = {
       paused: this.get().paused,
       downtimeSeverity: this.downtimeSeverity
     };
+
+    var session_options = this.get();
+    if (session_options.force_terminal_id) {
+      data.force_terminal_id = session_options.force_terminal_id;
+    }
 
     if (!this.screen) {
       var selectedInstrument = this.getSelectedPaymentInstrument();
