@@ -451,10 +451,10 @@ function addDowntimeToBlock(block) {
       break;
     case 'upi':
       if(block.apps && block.apps.length > 0) {
-        const appName = getAppFromPackageName(block.apps[0]).app_name;
+        const appName = getAppFromPackageName(block.apps[0]).shortcode;
         downtimeSeverity = checkDowntime(
           downtimes.upi,
-          'psp_handle',
+          'psp',
           appName
         );
         downtimeInstrument = appName;
