@@ -7,7 +7,7 @@
 
   // i18
   import { t, locale } from 'svelte-i18n';
-  import { formatTemplateWithLocale } from 'i18n';
+  import { formatTemplateWithLocale, getLongBankName } from 'i18n';
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
 
   import {
@@ -38,6 +38,9 @@
         downtimeMethod: $selectedInstrument?.method
       }
     });
+    if($selectedInstrument?.method === 'netbanking') {
+      instrument = getLongBankName(instrument, $locale)
+    }
   };
 </script>
 

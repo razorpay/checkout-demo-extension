@@ -5,7 +5,7 @@
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
   import { DOWNTIME_CALLOUT, DOWNTIME_CALLOUT_CARDS } from 'ui/labels/callouts';
   import { locale } from 'svelte-i18n';
-  import { formatTemplateWithLocale } from 'i18n';
+  import { formatTemplateWithLocale, getLongBankName } from 'i18n';
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import { selectedInstrument } from 'checkoutstore/screens/home';
   // Props
@@ -23,6 +23,9 @@
         downtimeMethod: $selectedInstrument?.method
       }
     });
+    if($selectedInstrument?.method === 'netbanking') {
+      downtimeInstrument = getLongBankName(downtimeInstrument, $locale)
+    }
   });
 </script>
 

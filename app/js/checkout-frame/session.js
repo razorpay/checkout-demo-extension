@@ -4825,7 +4825,7 @@ Session.prototype = {
 
     this.preferredInstrument = P13n.processInstrument(data, this);
 
-    var payment = this.r.createPayment(data, request, this.downtimeSeverity);
+    var payment = this.r.createPayment(data, request);
     payment
       .on('payment.success', bind(successHandler, this))
       .on('payment.error', bind(errorHandler, this))

@@ -409,7 +409,7 @@
       <!-- Show downtime message if the selected bank is down -->
       {#if !!downtimeSeverity}
         <div class="downtime-wrapper">
-          <DowntimeCallout showIcon={false} severe={downtimeSeverity} downtimeInstrument={getLongBankName($selectedBank, $locale)} />
+          <DowntimeCallout showIcon={false} severe={downtimeSeverity} downtimeInstrument={$selectedBank} />
         </div>
       {/if}
     </div>
