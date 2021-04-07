@@ -37,6 +37,7 @@ export function isWebPaymentsApiAvailable(app) {
 export const checkWebPaymentsForApp = app => {
   const session = getSession();
   /* disable Web payments API for SDK as we have native intent there */
+  window.console.log({ exists: Bridge.checkout.exists() });
   if (Bridge.checkout.exists()) {
     return Promise.resolve(false);
   }
