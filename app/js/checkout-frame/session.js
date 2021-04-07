@@ -3251,14 +3251,14 @@ Session.prototype = {
     // We need to show plans without no-cost EMI if the applied offer is an
     // EMI offer because No cost EMI cannot be applied with regular EMI offers.
     var plans = MethodStore.getEMIBankPlans(bank, 'credit', !isEmiOfferApplied);
-
+    var emiPlans = MethodStore.getEligiblePlansBasedOnMinAmount(plans);
     var prevTab = self.tab;
     var prevScreen = self.screen;
 
     self.emiPlansView.setPlans({
       type: 'bajaj',
       amount: amount,
-      plans: plans,
+      plans: emiPlans,
       bank: bank,
       on: {
         back: function() {
