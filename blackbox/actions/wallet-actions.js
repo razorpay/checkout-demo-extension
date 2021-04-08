@@ -18,6 +18,9 @@ async function assertWalletPage(context) {
   expect(
     await context.page.$eval('div#wallet-radio-mobikwik', visible)
   ).toEqual(true);
+  expect(
+    await context.page.$eval('div#wallet-radio-paytm', visible)
+  ).toEqual(true);
 }
 
 async function selectWallet(context, walletName) {

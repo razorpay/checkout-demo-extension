@@ -8,6 +8,7 @@ const {
   submit,
   handleValidationRequest,
   expectRedirectWithCallback,
+  handleAJAXRequest,
 
   // Wallet
   assertWalletPage,
@@ -67,6 +68,8 @@ module.exports = function(testFeatures) {
     personalization,
     optionalContact,
     optionalEmail,
+    popupIframe,
+    emulate,
   } = features;
 
   describe.each(
@@ -87,6 +90,7 @@ module.exports = function(testFeatures) {
         options,
         preferences,
         method: 'Wallet',
+        emulate
       });
       const missingUserDetails = optionalContact && optionalEmail;
 
@@ -112,7 +116,6 @@ module.exports = function(testFeatures) {
       }
 
       await assertPaymentMethods(context);
-
       if (personalization) {
         await verifyPersonalizationText(context, 'wallet');
         await selectPersonalizationPaymentMethod(context, '1');
@@ -120,16 +123,15 @@ module.exports = function(testFeatures) {
         await selectPaymentMethod(context, 'wallet');
         await assertWalletPage(context);
 
-        if ((!feeBearer && offers) || (optionalContact && !callbackUrl)) {
+        if(popupIframe) {
+          await selectWallet(context, 'paytm');
+        } else if ((!feeBearer && offers) || (optionalContact && !callbackUrl)) {
           await selectWallet(context, 'payzapp');
-          if (feeBearer) {
-            await verifyFooterText(context, 'PAY');
-          }
         } else {
           await selectWallet(context, 'freecharge');
-          if (feeBearer) {
-            await verifyFooterText(context, 'PAY');
-          }
+        }
+        if (feeBearer) {
+          await verifyFooterText(context, 'PAY');
         }
       }
 
@@ -186,6 +188,39 @@ module.exports = function(testFeatures) {
           });
         }
       } else {
+        if(popupIframe) {
+          // handle create/ajax request
+          context.forceTargetInitialization(browser);
+          const popup = await context.popup();
+          const popupPage = popup.page;
+          await handleAJAXRequest(context, 'wallet');
+          // mock popup
+          /**
+           * validate iframe exist in popup & confirm the opening url
+           * in this case we are opening mocksharp page
+           *  */
+
+          await popupPage.waitForFunction((device) => {
+            const iframe = document.getElementById('frame');
+            window.emulate = device;
+            if(!device) {
+              return iframe === null;
+            }
+            return typeof iframe !== null && iframe.contentWindow.location.href === 'https://api.razorpay.com/v1/gateway/mocksharp/payment?key_id=rzp_test_1DP5mmOlF5G5ag';
+          }, {}, emulate);
+
+          // trigger success payment
+          if(!emulate) {
+            await popupPage.click('button.success');
+          } else {
+            await popupPage.evaluate(()=>{
+              const iframe = document.getElementById('frame');
+              debugger;
+              iframe.contentWindow.document.querySelector('button.success').click();
+            })
+          }
+          return;
+        }
         if (!feeBearer && offers) {
           await handleValidationRequest(context, 'fail');
           await retryPayzappWalletTransaction(context);

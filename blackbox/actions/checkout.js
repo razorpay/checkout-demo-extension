@@ -1,9 +1,10 @@
 const querystring = require('querystring');
 const { readFileSync } = require('fs');
+const devices = require('puppeteer/DeviceDescriptors');
 const { cdnUrl, lumberjackUrl, bundleUrl } = require('../const');
 const { interceptor } = require('../util');
 const { computed } = require('./options');
-const { callbackHtml } = require('./callback');
+const { callbackHtml, getMockResponse } = require('./callback');
 const { sendPreferences } = require('./preferences');
 const { sendRewards } = require('./rewards');
 const { setExperiments } = require('./experiments');
@@ -12,11 +13,14 @@ const checkoutPublic = 'https://api.razorpay.com/v1/checkout/public';
 const checkoutCss = 'https://checkout.razorpay.com/v1/css/checkout.css';
 const checkoutFont = cdnUrl + 'lato.woff2';
 const checkoutJs = 'https://checkout.razorpay.com/v1/checkout-frame.js';
+const mockPageSubmit =
+  'https://api.razorpay.com/v1/gateway/mocksharp/payment/submit';
 
 const htmlContent = readFileSync('blackbox/fixtures/checkout-public.html');
 const jsContent = readFileSync('app/dist/v1/checkout-frame.js');
 const cssContent = readFileSync('app/dist/v1/css/checkout.css');
 const fontContent = readFileSync('app/fonts/lato.woff2');
+const popupHtmlContent = readFileSync('blackbox/fixtures/mockSFPage.html');
 
 function checkoutRequestHandler(request) {
   const url = request.url();
@@ -47,6 +51,36 @@ function checkoutRequestHandler(request) {
   }
 }
 
+/**
+ * forceTargetInitialization its hack to detect popup created. There is issue in popup detection with window.open("")
+ * https://github.com/puppeteer/puppeteer/issues/2810
+ * @param {BrowserContext} browser
+ */
+function forceTargetInitialization(browser) {
+  Array.from(browser._targets.values()).forEach((t, i) => {
+    if (!t._isInitialized) {
+      console.log('Forcing target initialization');
+      browser._targetInfoChanged({
+        targetInfo: { ...t._targetInfo, url: ' ' },
+      });
+    }
+  });
+}
+
+function popupRequestHandler(request) {
+  const url = request.url();
+  if (url.includes('v1/gateway/mocksharp/payment')) {
+    return request.respond({ body: popupHtmlContent });
+  } else if (url.startsWith(mockPageSubmit)) {
+    const postData = request.postData();
+    return request.respond({
+      contentType: 'text/html',
+      body: getMockResponse(!postData.includes('success=F')),
+    });
+  } else {
+    request.continue();
+  }
+}
 /**
  * @param  {Request} puppeteer intercepted request
  */
@@ -140,7 +174,9 @@ module.exports = {
     upiApps,
     experiments,
     method,
+    emulate,
   }) {
+
     // Disable animations for testing
     options = {
       ...options,
@@ -159,6 +195,10 @@ module.exports = {
       page.removeListener('request', cdnRequestHandler);
     } else {
       await page.setRequestInterception(true);
+    }
+
+    if (emulate) {
+      await page.emulate(devices[emulate]);
     }
 
     page.on('request', checkoutRequestHandler);
@@ -291,11 +331,14 @@ module.exports = {
       preferences,
       ...computed(options, preferences),
       ...interceptorOptions,
+      forceTargetInitialization,
       async popup() {
         const target = await page
           .browser()
           .waitForTarget(t => t.opener() === pageTarget);
         const popupPage = await target.page();
+        await popupPage.setRequestInterception(true);
+        popupPage.on('request', popupRequestHandler);
         return {
           page: popupPage,
           async callback(response) {
