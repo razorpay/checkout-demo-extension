@@ -489,7 +489,7 @@ var responseTypes = {
     if (
       CheckoutBridge &&
       CheckoutBridge.callNativeIntent &&
-      this?.data['_[upiqr]'] !== '1'
+      this.data['_[upiqr]'] !== '1'
     ) {
       // If there's a UPI App specified, use it.
       if (this.upi_app) {
