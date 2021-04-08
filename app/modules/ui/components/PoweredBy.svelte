@@ -6,9 +6,8 @@
   import { t, locale } from 'svelte-i18n';
 
   const customLogo = getOption('partnership_logo');
-  const orgDetails = getOrgDetails();
-  const orgLogo =
-    orgDetails?.id !== '100000razorpay' ? orgDetails?.checkout_logo_url : null;
+  const { isOrgRazorpay, checkout_logo_url } = getOrgDetails();
+  const orgLogo = isOrgRazorpay ? null : checkout_logo_url;
 
   let fontLoaded = false;
   let fontTimeout = null;
@@ -46,7 +45,8 @@
       bind:this={ref}
       href="https://razorpay.com?ref=org-in-chk"
       target="_blank"
-      tabindex="-1">
+      tabindex="-1"
+    >
       &#xe608;
     </a>
   {/if}
