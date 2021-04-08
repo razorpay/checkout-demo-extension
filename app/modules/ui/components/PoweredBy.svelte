@@ -6,7 +6,7 @@
   import { t, locale } from 'svelte-i18n';
 
   const customLogo = getOption('partnership_logo');
-  const { isOrgRazorpay, checkout_logo_url } = getOrgDetails();
+  const { isOrgRazorpay, checkout_logo_url } = getOrgDetails() || {};
   const orgLogo = isOrgRazorpay ? null : checkout_logo_url;
 
   let fontLoaded = false;
