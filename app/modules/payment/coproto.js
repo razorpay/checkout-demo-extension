@@ -157,17 +157,17 @@ function popupIframeCheck(request) {
     `);
     const popupIframe = popupDocument.querySelector('#frame');
     // To hide about:blank in popup just pushing url for display purpose only
-    if(popup.window.history) {
+    if (popup.window.history) {
       // url should be of same origin
       const popupUrl = `razorpay.html?url=${request.url}`;
-      popup.window.history.pushState({Url: popupUrl}, 'Razorpay', popupUrl);
+      popup.window.history.pushState({ Url: popupUrl }, 'Razorpay', popupUrl);
     }
-    submitForm(
-      popupIframe.contentWindow.document,
-      request.url,
-      request.content,
-      request.method
-    );
+    submitForm({
+      doc: popupIframe.contentWindow.document,
+      path: request.url,
+      params: request.content,
+      method: request.method,
+    });
     return true;
   }
   return false;
