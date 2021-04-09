@@ -39,7 +39,7 @@ describe('Basic upi payment', () => {
             status: 'started',
             scheduled: false,
             severity: 'low',
-            instrument: { psp: 'google_pay' },
+            instrument: { psp: 'bhim' },
             created_at: 1567686387,
             updated_at: 1567686387,
           },
@@ -61,7 +61,7 @@ describe('Basic upi payment', () => {
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
     await selectUPIApp(context, '1');
-    await verifyMethodWarned(context, 'upi', 'psp', 'google_pay');
+    await verifyMethodWarned(context, 'upi', 'psp', 'bhim');
     await submit(context);
     await respondAndVerifyIntentRequest(context);
   });
