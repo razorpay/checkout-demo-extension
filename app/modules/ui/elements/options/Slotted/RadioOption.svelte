@@ -34,9 +34,11 @@
     radioClasses = _classes.join(' ');
   }
 
-  let elementClass = `${className} radio-option`;
+  let elementClass = '';
 
   $: {
+    elementClass = `${className} radio-option`;
+    
     if(ellipsis) {
       elementClass += ' ellipsis';
     }
