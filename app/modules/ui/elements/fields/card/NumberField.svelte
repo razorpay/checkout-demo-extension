@@ -40,7 +40,7 @@
   }
 
   let helpTextToDisplay;
-  $: helpTextToDisplay = (value && helpText) || getHelpText($locale);
+  $: helpTextToDisplay = (value && helpText) || (!valid ? getHelpText($locale) : undefined);
 
   function getHelpText(locale) {
     if (recurring && value) {

@@ -34,7 +34,10 @@ export function checkForPossibleWebPaymentsForUpi() {
     .filter(app => app.method === 'upi')
     .forEach(app => {
       checkWebPaymentsForApp(app.package_name)
-        .then(() => {
+        .then(status => {
+          if (status === false) {
+            return;
+          }
           setUpiApps([
             ...getUPIIntentApps().all,
             {

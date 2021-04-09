@@ -484,7 +484,13 @@ var responseTypes = {
 
     this.emit('upi.coproto_response', fullResponse);
 
-    if (CheckoutBridge && CheckoutBridge.callNativeIntent) {
+    // if the chosen mode is QR code, then intent flow should be avoided.
+    // this.data["_[upiqr]"] will be "1" if it is QR method
+    if (
+      CheckoutBridge &&
+      CheckoutBridge.callNativeIntent &&
+      this.data['_[upiqr]'] !== '1'
+    ) {
       // If there's a UPI App specified, use it.
       if (this.upi_app) {
         CheckoutBridge.callNativeIntent(intent_url, this.upi_app);
