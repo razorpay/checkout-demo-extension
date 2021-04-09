@@ -25,7 +25,7 @@ const LOCALES = {
   en: 'English',
   hi: 'हिंदी',
   mar: 'मराठी',
-  guj: 'પાસ',
+  guj: 'ગુજરાતી',
 };
 
 const ALLOWED_LOCALES = _Obj.keys(LOCALES);
