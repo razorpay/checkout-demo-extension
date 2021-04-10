@@ -441,7 +441,12 @@ function updateEmandatePrefill() {
 
 function updateAnalytics(preferences) {
   Analytics.setMeta('features', preferences.features);
-  Analytics.setMeta('merchant_id', preferences.merchant_id);
+  if (preferences && preferences.merchant_id) {
+    Analytics.setMeta('merchant_id', preferences.merchant_id);
+  }
+  if (preferences && preferences.merchant_key) {
+    Analytics.setMeta('merchant_key', preferences.merchant_key);
+  }
   // Set optional fields in meta
   const optionalFields = preferences.optional;
   if (optionalFields |> _.isArray) {
