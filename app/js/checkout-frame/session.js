@@ -2550,7 +2550,7 @@ Session.prototype = {
   handleDiscount: function() {
     var offer = this.getAppliedOffer();
     var hasDiscount = offer && offer.amount !== offer.original_amount;
-    var currency = 'INR';
+    var currency = this.get('currency') || 'INR';
     var amount;
     if(offer) {
       amount = offer.amount;
