@@ -631,7 +631,6 @@ export default {
     amount_label: 'Amount',
     breakup_title: 'Fees Breakup',
     continue_action: 'Continue',
-    close_action: 'Close',
     gateway_charges_label: 'Convenience Charges',
     gst_label: 'GST on {label}',
     loading_message: 'Loading fees breakup...',

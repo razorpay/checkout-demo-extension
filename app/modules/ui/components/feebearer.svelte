@@ -23,7 +23,6 @@
     GATEWAY_CHARGES_LABEL,
     GST_LABEL,
     TOTAL_CHARGES_LABEL,
-    CLOSE_ACTION
   } from 'ui/labels/fees';
 
   // Props
@@ -31,7 +30,6 @@
   export let feeBreakup = null;
   export let bearer = null;
   export let paymentData;
-  export let isCTAClose;
 
   const entries = _Obj.entries;
   const contains = _Arr.contains;
@@ -115,7 +113,7 @@
     </div>
     <div class="btn" on:click={() => dispatch('continue', bearer)}>
       <!-- LABEL: Continue -->
-      {!isCTAClose ? $t(CONTINUE_ACTION) : $t(CLOSE_ACTION)}
+      {$t(CONTINUE_ACTION)}
     </div>
   {/if}
 </div>
