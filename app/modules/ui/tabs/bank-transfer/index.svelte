@@ -3,7 +3,7 @@
   import { onDestroy } from 'svelte';
 
   //Store imports
-  import { getOption, getAmount, showFeeLabel, isCustomerFeeBearer } from 'checkoutstore';
+  import { getOption, getAmount, showFeeLabel } from 'checkoutstore';
   import { getCustomerDetails } from 'checkoutstore/screens/home';
 
   // Utils imports
@@ -23,7 +23,6 @@
   import Bottom from 'ui/layouts/Bottom.svelte';
   import CTA from 'ui/elements/CTA.svelte';
   import NeftPrintView from './NeftPrintView.svelte';
-  import FeeBearerView from 'ui/components/feebearer.svelte'; 
 
   // i18n
   import {
@@ -37,7 +36,6 @@
     RETRY_BUTTON_LABEL,
     ROUND_OFF_CALLOUT,
     PRINT_DETAILS,
-    FEE_BREAKUP
   } from 'ui/labels/bank-transfer';
 
   import { COPY_DETAILS, COPIED } from 'ui/labels/cta';
@@ -55,10 +53,7 @@
   export let neftDetails = null;
 
   let copied = false;
-  let feeBearerView;
   const session = getSession();
-  const order_id = getOption('order_id');
-  const customerFeeBearerFlag = isCustomerFeeBearer();
 
   function getPayloadForVirtualAccounts() {
     const payload = {
@@ -88,7 +83,7 @@
 
     let url = makeAuthUrl(
       session.r,
-      `orders/${order_id}/virtual_accounts`
+      `orders/${session.r.get('order_id')}/virtual_accounts`
     );
 
     fetch.post({
@@ -102,6 +97,7 @@
     if (response.error) {
       loading = false;
       error = response.error.description;
+
       return;
     }
 
@@ -161,27 +157,6 @@
   }
 
   init();
-
-  const fetchFees = () => {
-    const feeWrapDiv = document.getElementById('fee-wrap');
-    if(!feeBearerView){
-      feeBearerView = new FeeBearerView({
-        target: feeWrapDiv,
-        props: {
-          paymentData: {
-            "currency": "INR",
-            "method": "bank_transfer",
-            order_id,
-            "amount": data.amount
-          }
-        }
-      });
-    };
-    showOverlay([feeWrapDiv]);
-    feeBearerView.$on('continue', function(event) {
-      hideOverlayMessage();
-    });
-  }
 </script>
 
 <style>
@@ -238,12 +213,6 @@
     color: rgba(57, 100, 168, 1);
     cursor: pointer;
   }
-  .fee-breakup {
-    margin-top: 6px;
-    text-align: left;
-    color: rgba(57, 100, 168, 1);
-    cursor: pointer;
-  }
 </style>
 
 <Tab method="bank_transfer" shown={true}>
@@ -274,12 +243,7 @@
           <div class="ct-tr">
             <!-- LABEL: Amount Expected -->
             <span class="ct-th">{$t(AMOUNT_LABEL)}:</span>
-            <div class="ct-td">
-              {data.amount}
-              {#if customerFeeBearerFlag}
-                <div class="fee-breakup" on:click={fetchFees}>{$t(FEE_BREAKUP)}</div>
-              {/if}
-            </div>
+            <span class="ct-td">{data.amount}</span>
           </div>
         </div>
 
