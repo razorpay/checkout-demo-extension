@@ -15,7 +15,6 @@
   } from 'checkoutstore/screens/card';
 
   // Utils
-  import { getSession } from 'sessionmanager';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getCardMetadata } from 'common/card';
@@ -23,8 +22,6 @@
   // Props
   export let cards = [];
   export let tab;
-
-  const session = getSession();
 
   $selectedCard = null; // Refresh selection when landing again
 

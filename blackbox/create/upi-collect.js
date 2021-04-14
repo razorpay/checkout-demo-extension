@@ -46,7 +46,7 @@ const {
 
   //Downtime
   verifyMethodWarned,
-  verifyMethodDisabled,
+  downtimeHighAlert,
 
   // Personalization
   selectPersonalizationPaymentMethod,
@@ -124,11 +124,11 @@ module.exports = function(testFeatures) {
         if (!(downtimeHigh && offers)) {
           await selectPaymentMethod(context, 'upi');
 
-          if (downtimeHigh || downtimeLow) {
-            await verifyMethodWarned(context, 'UPI', 'upi');
-          }
           await selectUPIMethod(context, 'new');
           await enterUPIAccount(context, 'saranshgupta1995@okaxis');
+          if (downtimeHigh || downtimeLow) {
+            await verifyMethodWarned(context, 'upi', 'vpa_handle');
+          }
         }
       }
       if (partialPayment) {
@@ -150,14 +150,11 @@ module.exports = function(testFeatures) {
         await verifyFooterText(context, 'PAY');
       }
 
-      if (downtimeHigh && offers) {
-        await verifyMethodDisabled(
-          context,
-          'upi',
-          ' UPI is experiencing low success rates.'
-        );
+      await submit(context, downtimeHigh);
+
+      if(downtimeHigh) {
+        await downtimeHighAlert(context);
       }
-      await submit(context);
 
       await handleUPIAccountValidation(context, 'BHIM@upi');
       if (feeBearer) {

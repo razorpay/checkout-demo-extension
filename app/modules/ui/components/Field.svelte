@@ -2,6 +2,7 @@
   // Utils imports
   import { getSession } from 'sessionmanager';
   import Track from 'tracker';
+  import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte'
 
   // Actions
   import {
@@ -40,6 +41,7 @@
   export let autocapitalize = 'off';
   export let readonlyValue = value;
   export let prediction = false;
+  export let downtimeSeverity;
   /**
    * To show prediction as dropdown
    */
@@ -317,6 +319,10 @@
       }
     }
   }
+  .downtime-icon {
+    float: right;
+    margin-top: -24px;
+  }
 </style>
 
 <div
@@ -381,6 +387,9 @@
   {#if label}<label>{label}</label>{/if}
   {#if helpText}
     <div class="help">{helpText}</div>
+  {/if}
+  {#if downtimeSeverity}
+    <div class="downtime-icon"><DowntimeIcon severe={downtimeSeverity} /></div>
   {/if}
   {#if showDropdownPredictions && dropDownSuggestion?.length > 0}
     <ul

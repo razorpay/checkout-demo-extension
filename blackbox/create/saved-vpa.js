@@ -41,7 +41,7 @@ const {
 
   //Downtime
   verifyMethodWarned,
-  verifyMethodDisabled,
+  downtimeHighAlert,
 
   // Personalization
   selectPersonalizationPaymentMethod,
@@ -119,11 +119,10 @@ module.exports = function(testFeatures) {
         await selectPersonalizationPaymentMethod(context, 1);
       } else {
         await selectPaymentMethod(context, 'upi');
-
-        if (downtimeHigh || downtimeLow) {
-          await verifyMethodWarned(context, 'UPI', 'upi');
-        }
         await selectUPIMethod(context, 'token');
+        if (downtimeHigh || downtimeLow) {
+          await verifyMethodWarned(context, 'upi', 'vpa_handle');
+        }
       }
 
       if (partialPayment) {
@@ -139,7 +138,11 @@ module.exports = function(testFeatures) {
         await verifyDiscountText(context, 'You save ₹10');
       }
 
-      await submit(context);
+      await submit(context, downtimeHigh);
+
+      if(downtimeHigh) {
+        await downtimeHighAlert(context);
+      }
 
       if (feeBearer) {
         await handleFeeBearer(context);

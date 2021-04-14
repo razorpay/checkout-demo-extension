@@ -240,6 +240,18 @@ function hideEmi() {
   return wasShown;
 }
 
+function hideDowntimeAlert() {
+  var downtimeWrap = $('#downtime-wrap');
+  if(!downtimeWrap || !downtimeWrap[0]) {
+    return false;
+  }
+  var wasShown = downtimeWrap.hasClass(shownClass);
+  if (wasShown) {
+    hideOverlay(downtimeWrap);
+  }
+  return wasShown;
+}
+
 function hideFeeWrap() {
   var feeWrap = $('#fee-wrap');
   var wasShown = feeWrap.hasClass(shownClass);
@@ -252,7 +264,12 @@ function hideFeeWrap() {
 function hideOverlayMessage() {
   var session = SessionManager.getSession();
   session.preventErrorDismissal = false;
-  if (!hideEmi() && !hideFeeWrap() && !session.hideSvelteOverlay()) {
+  if (
+    !hideEmi() &&
+    !hideFeeWrap() &&
+    !hideDowntimeAlert() &&
+    !session.hideSvelteOverlay()
+  ) {
     if (session.tab === 'nach') {
       if (!session.nachScreen.shouldHideOverlay()) {
         return;
@@ -3583,6 +3600,10 @@ Session.prototype = {
     });
   },
 
+  getDowntimeAlertDialog: function() {
+    return $("#downtime-wrap")
+  },
+
   setSvelteOverlay: function() {
     this.svelteOverlay = new discreet.Overlay({
       target: _Doc.querySelector('#modal-inner'),
@@ -4186,8 +4207,19 @@ Session.prototype = {
       this.showConversionChargesCallout();
       return;
     }
-
-    this.submit();
+    var payload = this.payload; 
+    // checking if the method selected is from the preferred method or from the method screen as this.payload is null in preferred methods 
+    if (selectedInstrument && selectedInstrument.id && selectedInstrument.id.indexOf('rzp.cluster') === -1 && !payload.downtimeSeverity) {
+      payload = selectedInstrument;
+    }
+    this.downtimeSeverity = payload.downtimeSeverity;
+    var downtimeInstrument = discreet.downtimeUtils.checkForDowntime(payload);
+    if(!downtimeInstrument) {
+      this.submit();
+    } else {
+      discreet.downtimeUtils.showDowntimeAlert(downtimeInstrument);
+      showOverlay(this.getDowntimeAlertDialog())
+    }
   },
 
   getSelectedPaymentInstrument: function() {
@@ -4239,6 +4271,10 @@ Session.prototype = {
     }
     var vpaVerified = props.vpaVerified;
     var data = this.payload;
+    // deleting downtimeSeverity & downtimeInstrument from data & saving downtimeSeverity for analytics
+    delete data.downtimeSeverity;
+    delete data.downtimeInstrument;
+      
     var goto_payment = '#error-message .link';
     var redirectableMethods = ['card', 'netbanking', 'wallet'];
     if (
@@ -4304,6 +4340,7 @@ Session.prototype = {
       optional: Store.getOptionalObject(),
       external: {},
       paused: this.get().paused,
+      downtimeSeverity: this.downtimeSeverity
     };
 
     var session_options = this.get();

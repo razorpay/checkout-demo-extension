@@ -17,7 +17,6 @@ const {
   assertUserDetails,
   assertPaymentMethods,
   assertEditUserDetailsAndBack,
-  verifyMethodDisabled,
 } = require('../actions');
 
 describe.each(

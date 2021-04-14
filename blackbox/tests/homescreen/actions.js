@@ -9,7 +9,7 @@ const {
 } = require('../../util');
 
 const personalizationActions = require('./personalization-actions');
-const downtimeTimeoutActions = require('./downtime-actions');
+const downtimeActions = require('../../actions/downtime-actions');
 const emandateActions = require('./emandate-actions');
 const paylaterActions = require('./paylater-actions');
 const homeScreenActions = require('./homeActions');
@@ -139,7 +139,7 @@ module.exports = {
   assertElementHasAttribute,
   ...homeScreenActions,
   ...personalizationActions,
-  ...downtimeTimeoutActions,
+  ...downtimeActions,
   ...emandateActions,
   ...paylaterActions,
   ...userDetailsActions,
