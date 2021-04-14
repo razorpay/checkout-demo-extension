@@ -2,6 +2,7 @@
   // UI imports
   import Stack from 'ui/layouts/Stack.svelte';
   import Radio from 'ui/elements/Radio.svelte';
+  import DynamicTag from 'ui/elements/DynamicTag.svelte';
 
   // Transitions
   import { fade } from 'svelte/transition';
@@ -20,6 +21,7 @@
   export let attributes = {};
   export let overflow = false;
   export let expandOnSelect = false;
+  export let as = 'button';
 
   let radioClasses;
   $: {
@@ -31,24 +33,51 @@
 
     radioClasses = _classes.join(' ');
   }
+
+  let elementClass = '';
+
+  $: {
+    elementClass = `${className} radio-option`;
+    
+    if(ellipsis) {
+      elementClass += ' ellipsis';
+    }
+    if(defaultStyles) {
+      elementClass += ' slotted-radio';
+    }
+    if(selected) {
+      elementClass += ' selected';
+    }
+    if(overflow) {
+      elementClass += ' overflow';
+    }
+    if(as === 'div') {
+      elementClass += ' div-radio-container';
+    }
+  }
 </script>
 
 <style>
-  button {
+  :global(.radio-option) {
     background: #ffffff;
     border: 1px solid #e6e7e8;
-    display: block;
     width: 100%;
+    display: block;
     transition-duration: 0.15s;
     transition-property: border, background;
     transition-timing-function: linear;
+    cursor: pointer;
+  }
+
+  :global(.div-radio-container) {
+    width: auto;
   }
 
   div {
     flex-grow: 1;
   }
 
-  button :global(.input-radio.slotted .radio-display) {
+  :global(.radio-option .input-radio.slotted .radio-display) {
     position: static;
     top: 0;
 
@@ -67,18 +96,14 @@
   .radio.reverse {
     margin-right: 12px;
   }
-
-  .overflow {
+  :global(.radio-option.overflow) {
     overflow: visible;
   }
 </style>
 
-<button
-  class={className}
-  class:ellipsis
-  class:slotted-radio={defaultStyles}
-  class:selected
-  class:overflow
+<DynamicTag
+  class={elementClass}
+  as={as}
   on:click
   on:keydown
   type="button"
@@ -110,4 +135,4 @@
     <slot name="extra" />
   </Stack>
   <slot name="downtime" />
-</button>
+</DynamicTag>

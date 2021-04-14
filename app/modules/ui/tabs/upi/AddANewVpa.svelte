@@ -185,10 +185,12 @@
   }
 </style>
 
+<!-- as="div" sent because in IE insider button we cannot add any other on:click action -->
 <SlottedRadioOption
   name={'upi-vpa-input-' + paymentMethod}
   value="full"
   align="top"
+  as="div" 
   overflow
   on:click
   on:click={focusAfterTimeout}

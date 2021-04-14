@@ -237,7 +237,7 @@
     // tab key
     if (
       e.target.selectionStart === e.target.value?.length &&
-      (e.keyCode === 9 || e.key === 'ArrowRight')
+      (e.keyCode === 9 || e.keyCode === 39)
     ) {
       e.preventDefault();
       value = predictedValue;
@@ -250,7 +250,7 @@
      */
     if (showDropdownPredictions && dropDownSuggestion?.length > 0) {
       if (
-        e.key === 'Enter' &&
+        e.keyCode === 13 &&
         dropdownArrowIndex !== -1 &&
         typeof dropDownSelection === 'function'
       ) {
@@ -258,12 +258,12 @@
         value = dropDownSelection(dropDownSuggestion[dropdownArrowIndex]);
         readonlyValue = value;
       } else if (
-        e.key === 'ArrowDown' &&
+        e.keyCode === 40 &&
         dropdownArrowIndex + 1 < dropDownSuggestion?.length
       ) {
         e.preventDefault();
         dropdownArrowIndex = dropdownArrowIndex + 1;
-      } else if (e.key === 'ArrowUp' && dropdownArrowIndex - 1 >= 0) {
+      } else if (e.keyCode === 38 && dropdownArrowIndex - 1 >= 0) {
         e.preventDefault();
         dropdownArrowIndex = dropdownArrowIndex - 1;
       }

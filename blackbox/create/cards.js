@@ -154,6 +154,10 @@ module.exports = function(testFeatures) {
         await verifyPartialAmount(context, '₹ 100');
       }
 
+      if(options.currency === 'USD') {
+        await verifyFooterText(context, 'Pay $ 2');
+      }
+
       await submit(context);
       if (options.currency !== 'INR') {
         await agreeToAMEXCurrencyCharges(context);
