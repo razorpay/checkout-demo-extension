@@ -57,7 +57,8 @@
   let copied = false;
   let feeBearerView;
   const session = getSession();
-  const order_id = session.r.get('order_id');
+  const order_id = getOption('order_id');
+  const customerFeeBearerFlag = isCustomerFeeBearer();
 
   function getPayloadForVirtualAccounts() {
     const payload = {
@@ -275,7 +276,7 @@
             <span class="ct-th">{$t(AMOUNT_LABEL)}:</span>
             <div class="ct-td">
               {data.amount}
-              {#if isCustomerFeeBearer()}
+              {#if customerFeeBearerFlag}
                 <div class="fee-breakup" on:click={fetchFees}>{$t(FEE_BREAKUP)}</div>
               {/if}
             </div>
