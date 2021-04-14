@@ -173,8 +173,8 @@
             "method": "bank_transfer",
             order_id,
             "amount": data.amount,
-            isCTAClose: true
-          }
+          },
+          isCTAClose: true
         }
       });
     };
