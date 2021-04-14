@@ -78,7 +78,7 @@ async function verifyNeftDetails(context, feeBearer) {
     messageDiv => messageDiv.textContent,
     messageDiv
   );
-  expect(messageText).toEqual(
+  expect(messageText.trim()).toEqual(
     'Account: ' +
       accountNum +
       ' IFSC: ' +
@@ -86,7 +86,7 @@ async function verifyNeftDetails(context, feeBearer) {
       ' Beneficiary Name: ' +
       accountHolderName +
       ' Amount Expected: ' +
-      (feeBearer ? '₹ 2,020 ' : '₹ 2,000 ')
+      (feeBearer ? '₹ 2,020 See Fee Breakup' : '₹ 2,000')
   );
 }
 
