@@ -27,9 +27,9 @@
     width: 132px;
     border-radius: 5px;
     padding: 10px;
-    background: linear-gradient(199.72deg, #ffffff 1.23%, #f8f8f8 99.45%);
-    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.18);
-    border-radius: 5px;
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+    background: linear-gradient(222.44deg, #F0F0F0 3.74%, #FBFBFB 98.79%);
     flex-shrink: 0;
     flex-wrap: wrap;
     z-index: 100;
@@ -65,11 +65,13 @@
   }
 </style>
 
-<div class="full-width reward-card-container flex-center">
-  <div class="reward-card" on:click={handleCardClick}>
-    <div class="full-width logo-container flex-center">
-      <img class="reward-logo" src={logo} alt="Reward Logo" />
+<div class="reward-card-container">
+  <div class="full-width reward-card-container flex-center">
+    <div class="reward-card" on:click={handleCardClick}>
+      <div class="full-width logo-container flex-center">
+        <img class="reward-logo" src={logo} alt="Reward Logo" />
+      </div>
     </div>
   </div>
+  <div class="full-width reward-text flex-center"><b>{name}</b></div>
 </div>
-<div class="full-width reward-text flex-center"><b>{name}</b></div>

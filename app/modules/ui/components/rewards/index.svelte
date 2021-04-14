@@ -23,6 +23,9 @@
   .rewards-wrapper {
     white-space: normal;
     position: relative;
+    background: url('../../../../images/checkout/rewards_bg.svg');
+    background-position-y: -60px;
+    background-repeat: no-repeat;
   }
   .rewards-header {
     line-height: 1.4;
