@@ -6,8 +6,6 @@
   //store
   import { rewards } from 'checkoutstore/rewards';
 
-  $rewards = [$rewards[0]];
-
   // i18n
   import { t } from 'svelte-i18n';
   import {
@@ -40,6 +38,7 @@
     color: #3f71d7;
     margin-top: 20px;
     cursor: pointer;
+    text-align: left;
   }
   :global(.mobile) .rewards-header {
     margin-bottom: 24px;

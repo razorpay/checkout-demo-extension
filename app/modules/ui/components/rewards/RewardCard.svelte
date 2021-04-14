@@ -49,8 +49,8 @@
     font-size: 16px;
   }
   .reward-text {
-    font-size: 12px;
-    margin: 10px 0;
+    font-size: 14px;
+    margin: 20px 0;
   }
   .flex-center {
     display: flex;
@@ -60,8 +60,8 @@
   .logo-container {
     height: 80%;
   }
-  .reward-text {
-    height: 20%;
+  .rewards-desc {
+    width: 90%;
   }
 </style>
 
@@ -73,5 +73,5 @@
       </div>
     </div>
   </div>
-  <div class="full-width reward-text flex-center"><b>{name}</b></div>
+  <div class="full-width reward-text flex-center"><div class="rewards-desc">{name}</div></div>
 </div>
