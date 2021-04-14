@@ -172,9 +172,8 @@
             "currency": "INR",
             "method": "bank_transfer",
             order_id,
-            "amount": data.amount,
-          },
-          isCTAClose: true
+            "amount": data.amount
+          }
         }
       });
     };
