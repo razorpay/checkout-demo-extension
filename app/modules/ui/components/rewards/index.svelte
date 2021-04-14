@@ -2,7 +2,6 @@
   // UI imports
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import RewardCard from './RewardCard.svelte';
-  import Animation from './Animation.svelte';
 
   //store
   import { rewards } from 'checkoutstore/rewards';
@@ -50,7 +49,6 @@
 </style>
 
 <div class="rewards-wrapper">
-  <Animation />
   <div class="rewards-header">
     <FormattedText text={$t(REWARDS_HEADER)} />
   </div>
