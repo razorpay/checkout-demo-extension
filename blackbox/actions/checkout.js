@@ -323,6 +323,10 @@ module.exports = {
               app_name: 'BHIM',
             },
             {
+              shortcode: 'phonepe',
+              app_name: 'Phonepe',
+            },
+            {
               package_name: 'some.random.app',
               shortcode: 'some.random.app',
               app_name: 'Some Random App',
