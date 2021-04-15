@@ -1,5 +1,9 @@
 const { delay, randomContact } = require('../util');
 
+async function expectNoUPIApps(context) {
+  await expect('[data-name="phonepe"]').selectorToBeAbsent(context);
+}
+
 async function selectUPIApp(context, AppNumber) {
   const allApps = await context.page.evaluate(() =>
     Array.from(
@@ -204,4 +208,5 @@ module.exports = {
   handleSaveVpaRequest,
   handleSavedTokenValidation,
   selectUPIPspBank,
+  expectNoUPIApps,
 };
