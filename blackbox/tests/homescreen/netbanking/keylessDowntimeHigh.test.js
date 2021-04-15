@@ -1,6 +1,6 @@
 const createNetbankingTest = require('../../../create/netbanking');
 
 createNetbankingTest({
-  feeBearer: true,
-  downtime: true,
+  downtimeHigh: true,
+  keyless: true,
 });

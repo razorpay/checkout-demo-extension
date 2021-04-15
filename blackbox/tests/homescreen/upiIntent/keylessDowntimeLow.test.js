@@ -39,7 +39,7 @@ describe('Basic upi payment', () => {
             status: 'started',
             scheduled: false,
             severity: 'low',
-            instrument: { vpa_handle: 'ALL' },
+            instrument: { psp: 'bhim' },
             created_at: 1567686387,
             updated_at: 1567686387,
           },
@@ -60,8 +60,8 @@ describe('Basic upi payment', () => {
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
     await selectPaymentMethod(context, 'upi');
-    await verifyMethodWarned(context, 'UPI', 'upi');
     await selectUPIApp(context, '1');
+    await verifyMethodWarned(context, 'upi', 'psp', 'bhim');
     await submit(context);
     await respondAndVerifyIntentRequest(context);
   });

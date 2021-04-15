@@ -20,9 +20,12 @@ const {
   verifyDiscountPaybleAmount,
   verifyDiscountAmountInBanner,
   verifyDiscountText,
-  verifyMethodWarned,
   viewOffers,
   selectOffer,
+
+  //Downtime
+  verifyMethodWarned,
+  downtimeHighAlert,
 
   // Partial Payment
   verifyPartialAmount,
@@ -60,7 +63,8 @@ module.exports = function(testFeatures) {
     feeBearer,
     timeout,
     callbackUrl,
-    downtime,
+    downtimeHigh,
+    downtimeLow,
     offers,
     personalization,
     optionalContact,
@@ -123,11 +127,9 @@ module.exports = function(testFeatures) {
         await selectPaymentMethod(context, 'netbanking');
         await assertNetbankingPage(context);
 
-        if (downtime) {
-          await selectBank(context, 'ICIC');
-          await verifyMethodWarned(context, 'ICICI Bank', 'netbanking');
+        if (downtimeHigh || downtimeLow) {
           await selectBank(context, 'HDFC');
-          await verifyMethodWarned(context, 'HDFC Bank', 'netbanking');
+          await verifyMethodWarned(context, 'netbanking', 'bank', 'HDFC');
 
           bank = 'HDFC';
         } else {
@@ -156,13 +158,17 @@ module.exports = function(testFeatures) {
 
       if (callbackUrl && timeout) {
         await verifyTimeout(context, 'netbanking');
-
         return;
       }
-
-      await submit(context);
+      
+      await submit(context, downtimeHigh);
+      
+      if(downtimeHigh) {
+        await downtimeHighAlert(context);
+      }
 
       if (feeBearer) {
+        await delay(200)
         await handleFeeBearer(context);
       }
 

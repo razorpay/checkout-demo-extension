@@ -48,6 +48,7 @@ const {
 
   //Downtime
   verifyMethodWarned,
+  downtimeHighAlert,
 } = require('../tests/homescreen/actions');
 
 module.exports = function(testFeatures) {
@@ -132,11 +133,9 @@ module.exports = function(testFeatures) {
         await verifyFooterText(context, 'PAY');
       }
 
+      await selectUPIApp(context, '1');
       if (downtimeHigh || downtimeLow) {
-        await verifyMethodWarned(context, 'UPI', 'upi');
-        await selectUPIApp(context, '1');
-      } else {
-        await selectUPIApp(context, '1');
+        await verifyMethodWarned(context, 'upi', 'psp');
       }
 
       if (partialPayment) {
@@ -149,8 +148,14 @@ module.exports = function(testFeatures) {
         return;
       }
 
-      await submit(context);
+      await submit(context, downtimeHigh);
+
+      if(downtimeHigh) {
+        await downtimeHighAlert(context);
+      }
+
       if (feeBearer) {
+        await delay(200)
         await handleFeeBearer(context, page);
       }
 

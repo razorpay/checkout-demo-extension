@@ -9,7 +9,7 @@ const {
 } = require('../../util');
 
 const personalizationActions = require('./personalization-actions');
-const downtimeTimeoutActions = require('./downtime-actions');
+const downtimeActions = require('../../actions/downtime-actions');
 const emandateActions = require('./emandate-actions');
 const paylaterActions = require('./paylater-actions');
 const homeScreenActions = require('./homeActions');
@@ -23,7 +23,7 @@ const { proceed } = sharedActions;
  * and enters an amount
  */
 async function handlePartialPayment(context, amount) {
-  await context.page.click('.partial-payment-block button:nth-of-type(2)');
+  await context.page.click('.partial-payment-block .radio-option:nth-of-type(2)');
 
   setState(context, {
     partial: true,
@@ -139,7 +139,7 @@ module.exports = {
   assertElementHasAttribute,
   ...homeScreenActions,
   ...personalizationActions,
-  ...downtimeTimeoutActions,
+  ...downtimeActions,
   ...emandateActions,
   ...paylaterActions,
   ...userDetailsActions,

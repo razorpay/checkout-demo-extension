@@ -6,8 +6,6 @@ export const RETAIL_RADIO_LABEL = 'netbanking.retail_label';
 export const SEARCH_TITLE = 'netbanking.search_title';
 export const SEARCH_PLACEHOLDER = 'netbanking.search_placeholder';
 export const SEARCH_ALL = 'netbanking.search_all';
-export const DOWNTIME_LOW_CALLOUT = 'netbanking.downtime_low_callout';
-export const DOWNTIME_HIGH_CALLOUT = 'netbanking.downtime_high_callout';
 export const RECURRING_CALLOUT = 'netbanking.recurring_callout';
 
 export const CANCELLATION_MODAL_TITLE = 'netbanking.cancellation_modal_title';

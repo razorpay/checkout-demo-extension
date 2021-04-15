@@ -3,12 +3,12 @@ function makeOptions(features, options) {
 }
 
 function makePreferences(features, preferences) {
-  const { downtime, offers } = features;
+  const { downtimeLow, downtimeHigh, offers } = features;
 
-  if (downtime) {
+  if (downtimeLow) {
     preferences.payment_downtime = {
       entity: 'collection',
-      count: 2,
+      count: 1,
       items: [
         {
           id: 'down_DEW7D9S10PEsl1',
@@ -18,13 +18,21 @@ function makePreferences(features, preferences) {
           end: null,
           status: 'started',
           scheduled: false,
-          severity: 'high',
+          severity: 'low',
           instrument: {
-            bank: 'ICIC',
+            bank: 'HDFC',
           },
           created_at: 1567686387,
           updated_at: 1567686387,
         },
+      ],
+    };
+  }
+  if (downtimeHigh) {
+    preferences.payment_downtime = {
+      entity: 'collection',
+      count: 1,
+      items: [
         {
           id: 'down_DEW7D9S10PEsl2',
           entity: 'payment.downtime',
@@ -33,7 +41,7 @@ function makePreferences(features, preferences) {
           end: null,
           status: 'started',
           scheduled: false,
-          severity: 'low',
+          severity: 'high',
           instrument: {
             bank: 'HDFC',
           },

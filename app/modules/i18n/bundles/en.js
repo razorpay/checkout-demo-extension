@@ -171,6 +171,10 @@ export default {
       debit_only_callout:
         'Subscription payments are supported on debit cards from {issuers}.',
     },
+    downtime_callout:
+    'This payment might fail because {instrument} is facing technical difficulties',
+    downtime_callout_cards:
+      'This payment might fail because {instrument} cards are facing technical difficulties',
   },
   card: {
     add_another_card_btn: 'Add another card',
@@ -799,10 +803,6 @@ export default {
   },
   netbanking: {
     corporate_label: 'Corporate',
-    downtime_low_callout:
-      '<strong>{bank}<strong> accounts are experiencing low success rates.',
-    downtime_high_callout:
-      '<strong>{bank}<strong> accounts are temporarily unavailable right now. Please select another bank.',
     recurring_callout:
       'Future payments from your bank account will be charged automatically.',
     retail_label: 'Retail',
@@ -991,7 +991,6 @@ export default {
     collect_enter_upi_id: 'Enter your UPI ID',
     collect_new_vpa_help: 'Please enter a valid VPA of the form username@bank',
     collect_securely_save: 'Securely save your UPI ID',
-    downtime_text: '<strong>UPI<strong> is experiencing low success rate.',
     gpay_block_heading: 'Pay using Gpay App',
     gpay_web_api_title: 'Google Pay',
     intent_accept_request:
@@ -1117,4 +1116,10 @@ export default {
     highlight2: 'Secured Razorpay merchant for {securedTime} months',
     highlight3: 'No fraud transaction for last {noFraudTime} months',
   },
+  downtime_alert: {
+    highlight1: 'There is a high chance this payment might fail',
+    card_highlight2: '{instrument} cards are facing some technical issues at the moment',
+    highlight2: '{instrument} is facing some technical issues at the moment',
+    highlight3: 'Incase of failure, any <strong>amount deducted<strong> will be <strong>refunded shortly<strong>'
+  }
 };

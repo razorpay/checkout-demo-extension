@@ -2,6 +2,8 @@
   // Svelte imports
   import { createEventDispatcher } from 'svelte';
   import { fade } from 'svelte/transition';
+  import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
+  import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
 
   // Store
   import {
@@ -14,13 +16,12 @@
   import Tab from 'ui/tabs/Tab.svelte';
   import GridItem from 'ui/tabs/netbanking/GridItem.svelte';
   import Callout from 'ui/elements/Callout.svelte';
-  import DowntimeCallout from 'ui/elements/DowntimeCallout.svelte';
+  import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
   import SearchModal from 'ui/elements/SearchModal.svelte';
   import BankSearchItem from 'ui/elements/search-item/Bank.svelte';
   import CTA from 'ui/elements/CTA.svelte';
-  import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
 
   // i18n
   import {
@@ -32,8 +33,6 @@
     SEARCH_TITLE,
     SEARCH_PLACEHOLDER,
     SEARCH_ALL,
-    DOWNTIME_LOW_CALLOUT,
-    DOWNTIME_HIGH_CALLOUT,
     RECURRING_CALLOUT,
   } from 'ui/labels/netbanking';
 
@@ -42,7 +41,6 @@
   import {
     getShortBankName,
     getLongBankName,
-    formatTemplateWithLocale,
   } from 'i18n';
 
   // Utils imports
@@ -52,6 +50,7 @@
   import { iPhone } from 'common/useragent';
   import { getPreferredBanks } from 'common/bank';
   import { getDowntimes, isRecurring } from 'checkoutstore';
+  import { checkDowntime } from 'checkoutframe/downtimes';
   import * as InputActions from 'actions/input';
   import {
     hasMultipleOptions,
@@ -77,9 +76,7 @@
   let banksArr;
   let invalid;
   let netbanks;
-  let selectedBankHasSevereDowntime;
-  let selectedBankHasLowDowntime;
-  let selectedBankHasDowntime;
+  let downtimeSeverity = false;
   let selectedBankName;
   let translatedBanksArr;
 
@@ -112,6 +109,8 @@
   export function getPayload() {
     return {
       bank: $selectedBank,
+      downtimeSeverity,
+      downtimeInstrument: $selectedBank,
     };
   }
 
@@ -238,14 +237,24 @@
     0,
     maxGridCount
   );
-  $: selectedBankHasSevereDowntime =
-    method === 'netbanking' &&
-    _Arr.contains(downtimes.high.banks, $selectedBank);
-  $: selectedBankHasLowDowntime =
-    method === 'netbanking' &&
-    _Arr.contains(downtimes.low.banks, $selectedBank);
-  $: selectedBankHasDowntime =
-    selectedBankHasSevereDowntime || selectedBankHasLowDowntime;
+
+  $: {
+    if (method === 'netbanking') {
+      const netBankingDowntimes = downtimes.netbanking;
+      const currentDowntime = checkDowntime(
+        netBankingDowntimes,
+        'bank',
+        $selectedBank
+      );
+      if (currentDowntime) {
+        downtimeSeverity = currentDowntime;
+      } else {
+        downtimeSeverity = false;
+      }
+    } else {
+      downtimeSeverity = false;
+    }
+  }
 
   $: {
     const selected = corporateSelected;
@@ -300,10 +309,19 @@
     text-align: left;
     text-align: start;
   }
+  .dropdown-bank {
+    display: flex;
+    justify-content: space-between;
+    width: 90%;
+  }
 
   #bank-select {
     padding-top: 0;
     margin-top: 12px;
+  }
+  .downtime-wrapper {
+    width: 86%;
+    margin: auto;
   }
 </style>
 
@@ -312,7 +330,7 @@
   method="netbanking"
   pad={false}
   overrideMethodCheck
-  hasMessage={selectedBankHasDowntime}>
+  hasMessage={!!downtimeSeverity}>
   <Screen pad={false}>
     <div>
       <div id="netb-banks" class="clear grid count-3">
@@ -325,21 +343,26 @@
         {/each}
       </div>
 
-      <div class="elem-wrap pad" style="margin-bottom: 24px;">
+      <div class="elem-wrap pad">
         <div id="nb-elem" class="elem select" class:invalid>
           <i class="select-arrow"></i>
           <!-- LABEL: Please select a bank -->
           <div class="help">{$t(NETBANKING_SELECT_HELP)}</div>
           <button
             aria-label={`${$selectedBank ? `${selectedBankName} - ${$t(NETBANKING_SELECT_LABEL)}` : $t(NETBANKING_SELECT_LABEL)}`}
-            class="input dropdown-like"
+            class="input dropdown-like dropdown-bank"
             type="button"
             id="bank-select"
             bind:this={bankSelect}
             on:click={showSearch}
             on:keypress={handleEnterOnButton}>
             {#if $selectedBank}
-              {selectedBankName}
+              <div>{selectedBankName}</div>
+              {#if !!downtimeSeverity}
+                <div>
+                  <DowntimeIcon severe={downtimeSeverity} />
+                </div>
+              {/if}
             {:else}
               <!-- LABEL: Select a different bank -->
               {$t(NETBANKING_SELECT_LABEL)}
@@ -383,6 +406,12 @@
           </div>
         </div>
       {/if}
+      <!-- Show downtime message if the selected bank is down -->
+      {#if !!downtimeSeverity}
+        <div class="downtime-wrapper">
+          <DowntimeCallout showIcon={false} severe={downtimeSeverity} downtimeInstrument={$selectedBank} />
+        </div>
+      {/if}
     </div>
 
     <!-- LABEL: Select bank to pay -->
@@ -407,19 +436,6 @@
       <!-- Show recurring message for recurring payments -->
       {#if recurring}
         <Callout>{$t(RECURRING_CALLOUT)}</Callout>
-      {/if}
-
-      <!-- Show downtime message if the selected bank is down -->
-      {#if selectedBankHasDowntime}
-        <DowntimeCallout severe={selectedBankHasSevereDowntime}>
-          {#if selectedBankHasSevereDowntime}
-            <FormattedText
-              text={formatTemplateWithLocale(DOWNTIME_HIGH_CALLOUT, { bank: getLongBankName($selectedBank, $locale) }, $locale)} />
-          {:else}
-            <FormattedText
-              text={formatTemplateWithLocale(DOWNTIME_LOW_CALLOUT, { bank: getLongBankName($selectedBank, $locale) }, $locale)} />
-          {/if}
-        </DowntimeCallout>
       {/if}
     </Bottom>
     {#if !recurring}

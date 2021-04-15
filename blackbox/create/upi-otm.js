@@ -46,7 +46,7 @@ const {
 
   //Downtime
   verifyMethodWarned,
-  verifyMethodDisabled,
+  downtimeHighAlert,
 
   // Personalization
   selectPersonalizationPaymentMethod,
@@ -125,11 +125,11 @@ module.exports = function(testFeatures) {
       } else {
         await selectPaymentMethod(context, 'upi_otm');
 
-        if (downtimeHigh || downtimeLow) {
-          await verifyMethodWarned(context, 'UPI', 'upi_otm');
-        }
         await selectUPIMethod(context, 'new', 'upi_otm');
         await enterUPIAccount(context, 'saranshgupta1995@okaxis', 'upi_otm');
+        if (downtimeHigh || downtimeLow) {
+          await verifyMethodWarned(context, 'upi', 'vpa_handle');
+        }
       }
       if (partialPayment) {
         await verifyPartialAmount(context, '₹ 100');
@@ -150,7 +150,11 @@ module.exports = function(testFeatures) {
         await verifyFooterText(context, 'PAY');
       }
 
-      await submit(context);
+      await submit(context, downtimeHigh);
+
+      if(downtimeHigh) {
+        await downtimeHighAlert(context);
+      }
 
       await handleUPIAccountValidation(context, 'BHIM@upi');
       if (feeBearer) {

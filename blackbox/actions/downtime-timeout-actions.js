@@ -1,22 +1,22 @@
 const { delay } = require('../util');
 
 async function verifyMethodDisabled(context, message) {
-  const toolTip = await context.page.waitForSelector('.downtime .tooltip');
-  const toolTipText = await context.page.evaluate(
-    toolTip => toolTip.textContent,
-    toolTip
-  );
-  expect(toolTipText).toContain(message);
+  // const toolTip = await context.page.waitForSelector('.downtime .tooltip');
+  // const toolTipText = await context.page.evaluate(
+  //   toolTip => toolTip.textContent,
+  //   toolTip
+  // );
+  // expect(toolTipText).toContain(message);
 }
 
 async function verifyMethodWarned(context, message, method) {
   let selector = '.downtime-callout';
 
-  if (method) {
-    selector = ['netbanking', 'upi', 'upi_otm'].includes(method)
-      ? `.bottom:not([tab]) ${selector}`
-      : `#form-${method}.drishy ~ #bottom .bottom[tab="${method}"] ${selector}`;
-  }
+  // if (method) {
+  //   selector = ['netbanking', 'upi', 'upi_otm'].includes(method)
+  //     ? `.bottom:not([tab]) ${selector}`
+  //     : `#form-${method}.drishy ~ #bottom .bottom[tab="${method}"] ${selector}`;
+  // }
 
   const warningDiv = await context.page.waitForSelector(selector);
   const warningText = await context.page.evaluate(

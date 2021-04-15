@@ -8,8 +8,6 @@ const {
   assertUserDetails,
   assertPaymentMethods,
   assertEditUserDetailsAndBack,
-  verifyMethodDisabled,
-  verifyMethodWarned,
 } = require('../actions');
 
 describe('Basic upi payment', () => {

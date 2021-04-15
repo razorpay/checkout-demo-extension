@@ -8,7 +8,6 @@ const {
   assertUserDetails,
   assertPaymentMethods,
   assertEditUserDetailsAndBack,
-  verifyMethodDisabled,
   verifyPersonalizationText,
 } = require('../actions');
 const { verifyMethodWarned } = require('../../../actions/common');

@@ -11,6 +11,8 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
 
+  import { getDowntimes } from 'checkoutstore';
+
   // UI imports
   import DeprecatedRadioOption from 'ui/elements/options/DeprecatedRadioOption.svelte';
   import NextOption from 'ui/elements/options/NextOption.svelte';
@@ -18,8 +20,11 @@
   import Field from 'ui/components/Field.svelte';
   import ListHeader from 'ui/elements/ListHeader.svelte';
   import Icon from 'ui/elements/Icon.svelte';
+  import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
+  import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
 
   import { getMiscIcon } from 'checkoutframe/icons';
+  import { checkDowntime } from 'checkoutframe/downtimes';
 
   import {
     UPI_INTENT_BLOCK_HEADING,
@@ -38,6 +43,11 @@
   // Computed
   export let showableApps;
 
+  let downtimeSeverity = false;
+  let downtimeInstrument;
+
+  let upiDowntimes = getDowntimes().upi;
+  
   const session = getSession();
   let otherAppsIcon = session.themeMeta.icons.othermethods;
 
@@ -51,11 +61,39 @@
 
   const dispatch = createEventDispatcher();
 
+  function isDowntime(pspHandle) {
+    if (pspHandle) {
+      const currentDowntime = checkDowntime(
+        upiDowntimes,
+        'psp',
+        pspHandle
+      );
+      if (currentDowntime) {
+        downtimeSeverity = currentDowntime;
+        downtimeInstrument = pspHandle;
+      } else {
+        downtimeSeverity = false;
+      }
+    } else {
+      downtimeSeverity = false;
+    }
+  }
+
   export function onAppSelect({ detail }) {
     const packageName = detail.package_name;
+    const psp = detail.shortcode;
+    const params = {
+      packageName,
+      psp
+    }
+    isDowntime(psp)
+    if(downtimeSeverity) {
+      params.downtimeInstrument = psp;
+      params.downtimeSeverity = downtimeSeverity
+    }
 
     session.onUpiAppSelect(packageName);
-    dispatch('select', { packageName });
+    dispatch('select', params);
   }
 </script>
 
@@ -161,6 +199,19 @@
     padding: 12px 0 8px 12px;
     margin-top: 10px;
   }
+  .downtime-upi-intent {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    top: 46%;
+  }
+  .downtime-upi-intent-wrapper {
+    margin-bottom: 54px;
+  }
+  .downtime-upi-intent-icon {
+    float: right;
+    margin-right: 8px;
+  }
 </style>
 
 <!-- LABEL: PAY USING APPS -->
@@ -193,6 +244,13 @@
             </span>
           {/if}
         </div>
+        {#if !!downtimeSeverity && app.package_name === selected}
+          <div class="downtime-upi-intent-wrapper">
+            <div class="downtime-upi-intent">
+              <DowntimeCallout showIcon={true} severe={downtimeSeverity} {downtimeInstrument} />
+            </div>
+          </div>
+        {/if}
       </DeprecatedRadioOption>
     {/each}
 
