@@ -98,10 +98,11 @@ function popupIframeCheck(request) {
   if (typeof popupDocument.write !== 'function') {
     return false;
   }
+  const isPaytmWallet = data.method === 'wallet' && data.wallet === 'paytm';
   /**
    * For Paytm in Mobile Web only
    */
-  if (data.method === 'wallet' && data.wallet === 'paytm' && isMobileWebOnly) {
+  if (isMobileWebOnly && isPaytmWallet) {
     popupDocument.write(`
       <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
       <html xmlns="http://www.w3.org/1999/xhtml">
@@ -251,12 +252,13 @@ var responseTypes = {
         popup.write(content);
       } else {
         if (!popupIframeCheck.call(this, request)) {
-          _Doc.submitForm(
-            request.url,
-            request.content,
-            request.method,
-            popup.name
-          );
+          submitForm({
+            doc: window.document,
+            path: request.url,
+            params: request.content,
+            method: request.method,
+            target: popup.name,
+          });
         }
       }
       // popup blocking addons close popup once we set a url

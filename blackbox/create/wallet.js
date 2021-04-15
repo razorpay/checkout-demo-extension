@@ -215,7 +215,6 @@ module.exports = function(testFeatures) {
           } else {
             await popupPage.evaluate(()=>{
               const iframe = document.getElementById('frame');
-              debugger;
               iframe.contentWindow.document.querySelector('button.success').click();
             })
           }
