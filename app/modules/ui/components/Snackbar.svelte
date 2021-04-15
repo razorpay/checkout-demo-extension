@@ -47,6 +47,7 @@
     padding: 8px 12px;
     right: 10px;
     pointer-events: none;
+    top: -54px;
   }
   .snackbar::before {
     content: '';
