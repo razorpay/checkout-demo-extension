@@ -1,7 +1,7 @@
 <script>
   // UI imports
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
-  import RewardCard from './RewardCard.svelte';
+  import RewardCard from 'ui/components/rewards/RewardCard.svelte';
 
   //store
   import { rewards } from 'checkoutstore/rewards';
