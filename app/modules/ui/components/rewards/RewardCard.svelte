@@ -23,7 +23,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 125px;
+    height: 132px;
     width: 132px;
     border-radius: 5px;
     padding: 10px;
@@ -39,17 +39,12 @@
     width: 100%;
   }
   .reward-logo {
-    max-width: 50px;
-  }
-  :global(.mobile) .reward-logo {
-    width: 100px;
-    max-width: 100px;
-  }
-  :global(.mobile) .reward-text {
-    font-size: 16px;
+    max-width: 100%;
+    max-height: 100%;
   }
   .reward-text {
-    font-size: 14px;
+    font-size: 16px;
+    line-height: 1.4;
     margin: 20px 0;
   }
   .flex-center {
@@ -58,10 +53,11 @@
     justify-content: center;
   }
   .logo-container {
-    height: 80%;
+    max-width: 68%;
+    max-height: 68%;
   }
   .rewards-desc {
-    width: 90%;
+    width: 85%;
   }
 </style>
 

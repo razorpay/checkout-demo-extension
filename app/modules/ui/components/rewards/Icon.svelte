@@ -60,8 +60,8 @@
 
 <style>
   :global(#rewards-cta) {
-    width: 56px;
-    padding: 12px 20px 12px 14px;
+    width: 52px;
+    padding: 12px 20px 12px 12px;
   }
   i.rewards-icon {
     width: 27px;

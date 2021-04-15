@@ -27,8 +27,13 @@
   }
   .rewards-header {
     line-height: 1.4;
-    font-size: 17px;
+    font-size: 16px;
     margin-bottom: 24px;
+    color: #757575;
+  }
+  :global(.rewards-header strong) {
+    font-weight: normal;
+    color: #363636;
   }
   .rewards-divider {
     border: 1px solid rgba(0, 0, 0, 0.04);

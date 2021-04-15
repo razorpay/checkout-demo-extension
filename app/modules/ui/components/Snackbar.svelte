@@ -16,7 +16,7 @@
   function getPosition() {
     const top = document.getElementById(parentElem).offsetTop;
     const left = document.getElementById(parentElem).offsetLeft;
-    snackbar.style.top = `${top + 40}px`;
+    snackbar.style.top = `${top + 42}px`;
   }
 
   $: {
