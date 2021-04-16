@@ -1,4 +1,5 @@
 const { delay } = require('../util');
+const mockAPI = require('blackbox/tests/custom/mockApi.js');
 const querystring = require('querystring');
 
 async function respondAndVerifyIntentRequest(
@@ -198,6 +199,11 @@ async function failRequestwithErrorMessage(context, errorMessage) {
   await context.failRequest({ error: errorMessage });
 }
 
+async function handleAJAXRequest(context, method = 'card') {
+  await context.expectRequest();
+  await context.respondJSON(mockAPI.ajaxResponse(method));
+}
+
 async function selectBank(context, bank) {
   // Open search modal
   await context.page.click('#bank-select');
@@ -234,6 +240,7 @@ async function retryTransaction(context) {
   await retryButton.click();
 }
 
+
 module.exports = {
   handleMockFailureDialog,
   handleMockSuccessDialog,
@@ -248,4 +255,5 @@ module.exports = {
   retryTransaction,
   popupClosedByUser,
   provideCancellationReason,
+  handleAJAXRequest,
 };

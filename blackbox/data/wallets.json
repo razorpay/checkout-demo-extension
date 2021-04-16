@@ -6,5 +6,6 @@
   "amazonpay": true,
   "freecharge": true,
   "jiomoney": true,
-  "phonepe": true
+  "phonepe": true,
+  "paytm": true
 }
