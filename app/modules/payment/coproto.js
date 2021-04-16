@@ -8,6 +8,8 @@ import {
   upiBackCancel,
 } from 'common/upi';
 
+import Config from 'config/index.js';
+
 import { androidBrowser, iOS, android } from 'common/useragent';
 import Track from 'tracker';
 import Analytics from 'analytics';
@@ -98,11 +100,11 @@ function popupIframeCheck(request) {
   if (typeof popupDocument.write !== 'function') {
     return false;
   }
-  const isPaytmWallet = data.method === 'wallet' && data.wallet === 'paytm';
+  const isValidFlow = Config?.[data.method]?.[data.wallet]?.popupIframe;
   /**
-   * For Paytm in Mobile Web only
+   * For Mobile Web only for Valid flow like Paytm
    */
-  if (isMobileWebOnly && isPaytmWallet) {
+  if (isMobileWebOnly && isValidFlow) {
     popupDocument.write(`
       <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
       <html xmlns="http://www.w3.org/1999/xhtml">
