@@ -2378,7 +2378,7 @@ Session.prototype = {
       from: this.screen,
       to: screen,
     };
-    if (this.screen === 'otp' && screen !== 'otp') {
+    if (this.screen === 'otp' && (screen !== 'otp' && screen !== 'card')) {
       Store.showFeeLabel.set(false);
     }
 
@@ -2591,7 +2591,7 @@ Session.prototype = {
       hasDiscount = this.offers.isCardApplicable();
     }
 
-    var hasDiscountAndFee = offer && Store.isCustomerFeeBearer();
+    var hasDiscountAndFee = offer && Store.isCustomerFeeBearer() && amount;
 
     if (hasDiscountAndFee) {
       $('#content').toggleClass('has-fee', hasDiscountAndFee);
