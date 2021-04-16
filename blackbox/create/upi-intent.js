@@ -185,9 +185,9 @@ module.exports = function(testFeatures) {
         await verifyFooterText(context, 'PAY');
       }
 
-      await selectUPIApp(context, '1');
+      await selectUPIApp(context, '1', 'bhim');
       if (downtimeHigh || downtimeLow) {
-        await verifyMethodWarned(context, 'upi', 'psp');
+        await verifyMethodWarned(context, 'upi', 'psp', 'bhim');
       }
 
       if (partialPayment) {

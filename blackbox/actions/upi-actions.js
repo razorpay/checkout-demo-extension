@@ -4,7 +4,7 @@ async function expectNoUPIApps(context) {
   await expect('[data-name="phonepe"]').selectorToBeAbsent(context);
 }
 
-async function selectUPIApp(context, AppNumber) {
+async function selectUPIApp(context, AppNumber, appWithDowntime) {
   const allApps = await context.page.evaluate(() =>
     Array.from(
       document.querySelectorAll('[data-name]'),
@@ -21,6 +21,10 @@ async function selectUPIApp(context, AppNumber) {
 
   for (const [_, count] of Object.entries(counter)) {
     expect(count).toEqual(1);
+  }
+
+  if(appWithDowntime) {
+    AppNumber = allApps.indexOf(appWithDowntime) + 1;
   }
 
   await context.page.click('.option:nth-of-type(' + AppNumber + ')');
