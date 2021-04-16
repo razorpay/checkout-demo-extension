@@ -213,14 +213,6 @@ export const getAllOffers = () => {
   }
 };
 
-const zestMoneyOffer = {
-  name: 'ZestMoney: 0% Interest available',
-  payment_method: 'cardless_emi',
-  provider: 'zestmoney',
-  display_text:
-    'Applicable only on EMI tenure of 3 months.\nInterest will be returned as cashback on repayment of each EMI.',
-};
-
 function _getAllInstrumentsForOffer(offer) {
   const allInstruments = storeGetter(instruments);
 
