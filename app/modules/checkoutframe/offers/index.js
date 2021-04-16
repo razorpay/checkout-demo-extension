@@ -88,10 +88,6 @@ export function getOffersForTab(method) {
     // EMI plans should have the same offers as EMI
     // TODO: Fix for Cardless EMI
     method = getOfferMethodForTab(method);
-    if (method === 'cardless_emi') {
-      allOffers.push(zestMoneyOffer);
-    }
-
     let methods = [method];
 
     /**
