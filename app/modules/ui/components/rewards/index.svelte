@@ -2,12 +2,15 @@
   // UI imports
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import RewardCard from 'ui/components/rewards/RewardCard.svelte';
+  import { formatTemplateWithLocale } from 'i18n';
 
   //store
   import { rewards } from 'checkoutstore/rewards';
 
+  let { brand_name } = $rewards[0];
+
   // i18n
-  import { t } from 'svelte-i18n';
+  import { t, locale } from 'svelte-i18n';
   import {
     REWARDS_HEADER,
     REWARDS_CLOSE,
@@ -57,7 +60,7 @@
 
 <div class="rewards-wrapper">
   <div class="rewards-header">
-    <FormattedText text={$t(REWARDS_HEADER)} />
+    <FormattedText text={formatTemplateWithLocale(REWARDS_HEADER, { brandName: brand_name }, $locale)} />
   </div>
   {#each $rewards as rew}
     <RewardCard {...rew} />

@@ -1106,7 +1106,7 @@ export default {
   },
   rewards: {
     header:
-      'Pay successfully now & unlock <strong>exciting rewards for free,<strong> in your mailbox',
+      'Pay successfully now & unlock <strong>exciting rewards for free,<strong> from <strong>{brandName}<strong> in your mailbox',
     sub_text: 'Look for these rewards from amazing brands in your mail box!',
     close: 'Close',
     tooltip_text: 'Unlock free rewards after payment',
