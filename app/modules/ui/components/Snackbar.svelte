@@ -8,6 +8,7 @@
   export let shown;
   export let timer;
   export let text;
+  let timeout;
 
   function setAlignmentClass() {
     snackbar.classList.add(`snackbar-${align}`);
@@ -16,7 +17,12 @@
   function getPosition() {
     const top = document.getElementById(parentElem).offsetTop;
     const left = document.getElementById(parentElem).offsetLeft;
-    snackbar.style.top = `${top + 40}px`;
+    snackbar.style.top = `${top + 42}px`;
+  }
+
+  export function removeSnackBar() {
+    shown = false;
+    clearTimeout(timeout)
   }
 
   $: {
@@ -24,7 +30,7 @@
       setTimeout(() => {
         setAlignmentClass();
         getPosition();
-        setTimeout(() => {
+        timeout = setTimeout(() => {
           shown = false;
         }, timer);
       });
@@ -47,6 +53,7 @@
     padding: 8px 12px;
     right: 10px;
     pointer-events: none;
+    top: -54px;
   }
   .snackbar::before {
     content: '';
