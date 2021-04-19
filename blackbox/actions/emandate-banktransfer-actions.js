@@ -79,14 +79,7 @@ async function verifyNeftDetails(context, feeBearer) {
     messageDiv
   );
   expect(messageText.trim()).toEqual(
-    'Account: ' +
-      accountNum +
-      ' IFSC: ' +
-      ifscCode +
-      ' Beneficiary Name: ' +
-      accountHolderName +
-      ' Amount Expected: ' +
-      (feeBearer ? '₹ 2,020 See Fee Breakup' : '₹ 2,000')
+    `Account: ${accountNum} IFSC: ${ifscCode} Beneficiary Name: ${accountHolderName} Amount Expected: ${feeBearer ? '₹ 2,020 See Fee Breakup' : '₹ 2,000'}`
   );
 }
 
