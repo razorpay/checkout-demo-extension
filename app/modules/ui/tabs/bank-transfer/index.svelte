@@ -3,7 +3,12 @@
   import { onDestroy } from 'svelte';
 
   //Store imports
-  import { getOption, getAmount, showFeeLabel, isCustomerFeeBearer } from 'checkoutstore';
+  import {
+    getOption,
+    getAmount,
+    showFeeLabel,
+    isCustomerFeeBearer,
+  } from 'checkoutstore';
   import { getCustomerDetails } from 'checkoutstore/screens/home';
 
   // Utils imports
@@ -23,7 +28,7 @@
   import Bottom from 'ui/layouts/Bottom.svelte';
   import CTA from 'ui/elements/CTA.svelte';
   import NeftPrintView from './NeftPrintView.svelte';
-  import FeeBearerView from 'ui/components/feebearer.svelte'; 
+  import FeeBearerView from 'ui/components/feebearer.svelte';
 
   // i18n
   import {
@@ -37,7 +42,7 @@
     RETRY_BUTTON_LABEL,
     ROUND_OFF_CALLOUT,
     PRINT_DETAILS,
-    FEE_BREAKUP
+    FEE_BREAKUP,
   } from 'ui/labels/bank-transfer';
 
   import { COPY_DETAILS, COPIED } from 'ui/labels/cta';
@@ -86,10 +91,7 @@
       data: submitData,
     });
 
-    let url = makeAuthUrl(
-      session.r,
-      `orders/${order_id}/virtual_accounts`
-    );
+    let url = makeAuthUrl(session.r, `orders/${order_id}/virtual_accounts`);
 
     fetch.post({
       url,
@@ -164,25 +166,111 @@
 
   const fetchFees = () => {
     const feeWrapDiv = document.getElementById('fee-wrap');
-    if(!feeBearerView){
+    let feeBearerDiv = document.getElementsByClassName('fee-bearer');
+    let feeBearerBankTransferDiv = document.getElementsByClassName(
+      'fee-bearer-bank-transfer'
+    );
+    if (feeBearerDiv.length > 0) {
+      feeBearerDiv[0].style.display = 'none';
+    }
+    if (feeBearerBankTransferDiv.length > 0) {
+      feeBearerBankTransferDiv[0].removeAttribute('style');
+    }
+    if (!feeBearerView) {
       feeBearerView = new FeeBearerView({
         target: feeWrapDiv,
         props: {
           paymentData: {
-            "currency": "INR",
-            "method": "bank_transfer",
+            currency: 'INR',
+            method: 'bank_transfer',
             order_id,
-            "amount": data.amount
-          }
-        }
+            amount: data.amount,
+          },
+          isBankTransferView: true,
+        },
       });
-    };
+    }
     showOverlay([feeWrapDiv]);
     feeBearerView.$on('continue', function(event) {
       hideOverlayMessage();
     });
-  }
+  };
 </script>
+
+<Tab method="bank_transfer" shown={true}>
+  <div class="bank_transfer-container">
+    {#if loading}
+      <!-- LABEL: Getting bank details... -->
+      <AsyncLoading>{$t(LOADING_MESSAGE)}</AsyncLoading>
+    {:else if data}
+      <!-- LABEL: To complete the transaction, make NEFT / RTGS / IMPS transfer to -->
+      <div class="bank_transfer-message">{$t(HEADER)}</div>
+      <div class="neft-details">
+        <div bind:this={neftDetails}>
+          <div class="ct-tr">
+            <!-- LABEL: Account -->
+            <span class="ct-th">{$t(ACCOUNT_LABEL)}:</span>
+            <span class="ct-td">{data.receiver.account_number}</span>
+          </div>
+          <div class="ct-tr">
+            <!-- LABEL: IFSC -->
+            <span class="ct-th">{$t(IFSC_LABEL)}:</span>
+            <span class="ct-td">{data.receiver.ifsc}</span>
+          </div>
+          <div class="ct-tr">
+            <!-- LABEL: Beneficiary Name -->
+            <span class="ct-th">{$t(BENEFICIARY_LABEL)}:</span>
+            <span class="ct-td">{data.receiver.name}</span>
+          </div>
+          <div class="ct-tr">
+            <!-- LABEL: Amount Expected -->
+            <span class="ct-th">{$t(AMOUNT_LABEL)}:</span>
+            <div class="ct-td">
+              {data.amount}
+              {#if customerFeeBearerFlag}
+                <div class="fee-breakup" on:click={fetchFees}>
+                  {$t(FEE_BREAKUP)}
+                </div>
+              {/if}
+            </div>
+          </div>
+        </div>
+
+        {#if data.close_by}
+          <!-- LABEL: Note: Please complete the transaction before {date} -->
+          <div class="ct-tr ct-note">
+            {formatTemplateWithLocale(
+              DUE_DATE_NOTE,
+              { date: data.close_by },
+              $locale
+            )}
+          </div>
+        {/if}
+      </div>
+      {#if !isMobileByMediaQuery()}
+        <div on:click={copyDetails} class="print">
+          {$t(copied ? COPIED : COPY_DETAILS)}
+        </div>
+      {/if}
+      <Bottom>
+        <!-- LABEL: Do not round-off the amount. Transfer the exact amount for the payment to be successful. -->
+        <Callout>{$t(ROUND_OFF_CALLOUT)}</Callout>
+      </Bottom>
+      {#if !isMobileByMediaQuery()}
+        <CTA on:click={handlePrint}>{$t(PRINT_DETAILS)}</CTA>
+      {:else}
+        <CTA on:click={copyDetails}>{$t(copied ? COPIED : COPY_DETAILS)}</CTA>
+      {/if}
+    {:else}
+      <div class="error">
+        <div class="error-text">{error || 'Error'}</div>
+        <br />
+        <!-- LABEL: Retry -->
+        <div class="btn" on:click={init}>{$t(RETRY_BUTTON_LABEL)}</div>
+      </div>
+    {/if}
+  </div>
+</Tab>
 
 <style>
   .loading {
@@ -245,72 +333,3 @@
     cursor: pointer;
   }
 </style>
-
-<Tab method="bank_transfer" shown={true}>
-  <div class="bank_transfer-container">
-    {#if loading}
-      <!-- LABEL: Getting bank details... -->
-      <AsyncLoading>{$t(LOADING_MESSAGE)}</AsyncLoading>
-    {:else if data}
-      <!-- LABEL: To complete the transaction, make NEFT / RTGS / IMPS transfer to -->
-      <div class="bank_transfer-message">{$t(HEADER)}</div>
-      <div class="neft-details">
-        <div bind:this={neftDetails}>
-          <div class="ct-tr">
-            <!-- LABEL: Account -->
-            <span class="ct-th">{$t(ACCOUNT_LABEL)}:</span>
-            <span class="ct-td">{data.receiver.account_number}</span>
-          </div>
-          <div class="ct-tr">
-            <!-- LABEL: IFSC -->
-            <span class="ct-th">{$t(IFSC_LABEL)}:</span>
-            <span class="ct-td">{data.receiver.ifsc}</span>
-          </div>
-          <div class="ct-tr">
-            <!-- LABEL: Beneficiary Name -->
-            <span class="ct-th">{$t(BENEFICIARY_LABEL)}:</span>
-            <span class="ct-td">{data.receiver.name}</span>
-          </div>
-          <div class="ct-tr">
-            <!-- LABEL: Amount Expected -->
-            <span class="ct-th">{$t(AMOUNT_LABEL)}:</span>
-            <div class="ct-td">
-              {data.amount}
-              {#if customerFeeBearerFlag}
-                <div class="fee-breakup" on:click={fetchFees}>{$t(FEE_BREAKUP)}</div>
-              {/if}
-            </div>
-          </div>
-        </div>
-
-        {#if data.close_by}
-          <!-- LABEL: Note: Please complete the transaction before {date} -->
-          <div class="ct-tr ct-note">
-            {formatTemplateWithLocale(DUE_DATE_NOTE, { date: data.close_by }, $locale)}
-          </div>
-        {/if}
-      </div>
-      {#if !isMobileByMediaQuery()}
-        <div on:click={copyDetails} class="print">
-          {$t(copied ? COPIED : COPY_DETAILS)}
-        </div>
-      {/if}
-      <Bottom>
-        <!-- LABEL: Do not round-off the amount. Transfer the exact amount for the payment to be successful. -->
-        <Callout>{$t(ROUND_OFF_CALLOUT)}</Callout>
-      </Bottom>
-      {#if !isMobileByMediaQuery()}
-        <CTA on:click={handlePrint}>{$t(PRINT_DETAILS)}</CTA>
-      {:else}
-        <CTA on:click={copyDetails}>{$t(copied ? COPIED : COPY_DETAILS)}</CTA>
-      {/if}
-    {:else}
-      <div class="error">
-        <div class="error-text">{error || 'Error'}</div>
-        <br />
-        <!-- LABEL: Retry -->
-        <div class="btn" on:click={init}>{$t(RETRY_BUTTON_LABEL)}</div>
-      </div>
-    {/if}
-  </div>
-</Tab>
