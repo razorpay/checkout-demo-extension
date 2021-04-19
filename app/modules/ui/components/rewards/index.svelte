@@ -11,22 +11,38 @@
 
   // i18n
   import { t, locale } from 'svelte-i18n';
-  import {
-    REWARDS_HEADER,
-    REWARDS_CLOSE,
-  } from 'ui/labels/rewards';
+  import { REWARDS_HEADER, REWARDS_CLOSE } from 'ui/labels/rewards';
 
   //props
   export let onClick;
 </script>
 
+<div class="rewards-wrapper">
+  <div class="rewards-header">
+    <FormattedText
+      text={formatTemplateWithLocale(
+        REWARDS_HEADER,
+        { brandName: brand_name },
+        $locale
+      )}
+    />
+  </div>
+  {#each $rewards as rew}
+    <RewardCard {...rew} />
+  {/each}
+  <div class="rewards-divider" />
+  <div class="rewards-close" on:click={onClick}>{$t(REWARDS_CLOSE)}</div>
+</div>
+
 <style>
   .rewards-wrapper {
     white-space: normal;
     position: relative;
-    background: url('/images/checkout/rewards_bg.svg');
+    background: url('https://cdn.razorpay.com/checkout/rewards_bg.svg');
     background-position-y: -60px;
     background-repeat: no-repeat;
+    background-position-x: -50px;
+    background-size: 400px 400px;
   }
   .rewards-header {
     line-height: 1.4;
@@ -57,14 +73,3 @@
     justify-content: space-around;
   }
 </style>
-
-<div class="rewards-wrapper">
-  <div class="rewards-header">
-    <FormattedText text={formatTemplateWithLocale(REWARDS_HEADER, { brandName: brand_name }, $locale)} />
-  </div>
-  {#each $rewards as rew}
-    <RewardCard {...rew} />
-  {/each}
-  <div class="rewards-divider" />
-  <div class="rewards-close" on:click={onClick}>{$t(REWARDS_CLOSE)}</div>
-</div>
