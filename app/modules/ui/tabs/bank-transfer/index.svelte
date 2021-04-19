@@ -181,7 +181,7 @@
         target: feeWrapDiv,
         props: {
           paymentData: {
-            currency: 'INR',
+            currency: getOption('currency') || 'INR',
             method: 'bank_transfer',
             order_id,
             amount: data.amount,
