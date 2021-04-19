@@ -32,6 +32,7 @@ export default {
     round_off_callout:
       'Do not round-off the amount. Transfer the exact amount for the payment to be successful.',
     print_details: 'Print Details',
+    fee_breakup: 'See Fee Breakup'
   },
   banks: {
     long: {
@@ -172,7 +173,7 @@ export default {
         'Subscription payments are supported on debit cards from {issuers}.',
     },
     downtime_callout:
-    'This payment might fail because {instrument} is facing technical difficulties',
+      'This payment might fail because {instrument} is facing technical difficulties',
     downtime_callout_cards:
       'This payment might fail because {instrument} cards are facing technical difficulties',
   },
@@ -631,6 +632,7 @@ export default {
     amount_label: 'Amount',
     breakup_title: 'Fees Breakup',
     continue_action: 'Continue',
+    close_action: 'Close',
     gateway_charges_label: 'Convenience Charges',
     gst_label: 'GST on {label}',
     loading_message: 'Loading fees breakup...',
