@@ -2378,13 +2378,15 @@ Session.prototype = {
       from: this.screen,
       to: screen,
     };
-    if (this.screen === 'otp' && screen !== 'otp') {
-      Store.showFeeLabel.set(false);
-    }
 
-    if (this.screen !== 'otp' && screen === 'otp') {
-      Store.showFeeLabel.set(true);
-    }
+    // removed causing issue during OTP screen & non OTP screen
+    // if (this.screen === 'otp' && (screen !== 'otp' && screen !== 'card')) {
+    //   Store.showFeeLabel.set(false);
+    // }
+
+    // if (this.screen !== 'otp' && screen === 'otp') {
+    //   Store.showFeeLabel.set(true);
+    // }
 
     if (extraProps) {
       trackingData = _Obj.extend(trackingData, extraProps);
@@ -2591,7 +2593,7 @@ Session.prototype = {
       hasDiscount = this.offers.isCardApplicable();
     }
 
-    var hasDiscountAndFee = offer && Store.isCustomerFeeBearer();
+    var hasDiscountAndFee = offer && Store.isCustomerFeeBearer() && amount;
 
     if (hasDiscountAndFee) {
       $('#content').toggleClass('has-fee', hasDiscountAndFee);

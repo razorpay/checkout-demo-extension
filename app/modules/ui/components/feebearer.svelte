@@ -55,10 +55,12 @@
     loading = false;
     bearer = response.input;
     $showFeeLabel = false;
-    if (!session.getAppliedOffer()) {
+    const offer = session.getAppliedOffer();
+    if (!offer || !offer.amount) {
       session.updateAmountInHeader(feeBreakup.amount * 100, false);
+      return;
     }
-    if (session.getAppliedOffer()) {
+    if (offer) {
       session.updateAmountInHeaderForOffer(feeBreakup.amount * 100, true);
     }
   }
