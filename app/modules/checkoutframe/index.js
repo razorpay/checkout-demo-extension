@@ -266,11 +266,12 @@ function fetchRewards(session) {
       if (!rewardsRes.error) {
         const rewardObj = rewardsRes[0]
         if (rewardObj) {
-          const { reward_id, variant } = rewardObj;
+          const { reward_id, variant = false } = rewardObj;
           if (reward_id) {
             reward.set(rewardObj);
             Analytics.setMeta('reward_ids', reward_id);
           }
+          // Exp variation, true if the particular checkout falls under the experiment, false if checkout is not part of that experiment
           Analytics.setMeta('reward_exp_variant', variant);
         }
       }
