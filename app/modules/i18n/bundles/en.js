@@ -514,6 +514,12 @@ export default {
     search_all: 'All currencies',
     search_placeholder: 'Search for currency or code',
     search_title: 'Select Currency to Pay',
+    change: 'Change',
+    loading_currencies: 'Loading currencies...',
+    more: 'More',
+    pay_conversion_fee: 'Pay currency conversion fee',
+    pay_in: 'Pay in',
+    pay_in_inr: 'Pay in INR',
   },
   debit_emi: {
     card_box_title: 'SELECTED DEBIT CARD',

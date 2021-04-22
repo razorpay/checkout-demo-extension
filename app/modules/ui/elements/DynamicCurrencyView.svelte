@@ -9,10 +9,7 @@
     dccCurrency,
   } from 'checkoutstore/screens/card';
 
-  import {
-    amountAfterOffer,
-    appliedOffer
-  } from 'checkoutstore/offers';
+  import { amountAfterOffer, appliedOffer } from 'checkoutstore/offers';
 
   import { selectedInstrument } from 'checkoutstore/screens/home';
 
@@ -22,7 +19,16 @@
 
   // i18n
   import { t } from 'svelte-i18n';
-  import { SEARCH_PLACEHOLDER, SEARCH_TITLE, SEARCH_ALL } from 'ui/labels/dcc';
+  import {
+    CHANGE,
+    LOADING_CURRENCIES,
+    MORE,
+    SEARCH_TITLE,
+    SEARCH_PLACEHOLDER,
+    SEARCH_ALL,
+    PAY_CONVERSION_FEE,
+    PAY_IN_INR,
+  } from 'ui/labels/dcc';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -36,7 +42,7 @@
 
   import { getIin } from 'common/card';
 
-  import { formatAmountWithSymbol } from 'common/currency';
+  import { formatAmount, formatAmountWithSymbol } from 'common/currency';
 
   // UI imports
   import Stack from 'ui/layouts/Stack.svelte';
@@ -59,6 +65,7 @@
   let originalAmount = getAmount();
   let selectedCurrency = null;
   let originalCurrency = getCurrency();
+  let payFee;
   let searchModalOpen = false;
   let entityWithAmount = null;
   let cardCurrency;
@@ -91,7 +98,7 @@
     }
     var offer = session.getAppliedOffer();
     // if offer applied
-    if(offer) {
+    if (offer) {
       session.handleDiscount();
     }
   }
@@ -169,6 +176,10 @@
 
   $: {
     selectedCurrency = cardCurrency;
+  }
+
+  $: {
+    payFee = selectedCurrency !== 'INR';
   }
 
   $: {
@@ -342,14 +353,11 @@
     }
     return _Arr.find($customer.tokens.items, token => token.id === tokenId);
   }
-
-  
-
 </script>
 
 <div class={allClasses} class:visible>
   {#if loading}
-    Loading currencies...
+    {$t(LOADING_CURRENCIES)}
   {:else}
     <Stack horizontal>
       <Stack vertical>
@@ -359,28 +367,53 @@
               {#each displayCurrencies as { currency, amount } (currency)}
                 <Radio
                   name="dcc_currency"
-                  label={currency}
+                  label={`${currency} ${formatAmount(amount, currency)}`}
                   value={amount}
                   checked={currency === selectedCurrency}
                   on:change={() => onSelect(currency)}
                 >
-                  {amount}
+                  Pay in {currency}
                 </Radio>
               {/each}
             </Stack>
           </div>
         {:else}
-          <div>Pay in {selectedCurrency}</div>
+          <div class='dcc-other-currency'>Pay in {selectedCurrency} ({formatAmountWithSymbol(dccAmount, selectedCurrency)})</div>
         {/if}
         <div dir="ltr">
-          <b dir="ltr">{formatAmountWithSymbol(dccAmount, selectedCurrency)}</b>
-          {#if selectedCurrency !== originalCurrency}
+          <!-- <b dir="ltr">{formatAmountWithSymbol(dccAmount, selectedCurrency)}</b> -->
+          <!-- {#if selectedCurrency !== originalCurrency}
             <span class="small-text">
               ({formatAmountWithSymbol(
                 currencies[originalCurrency].amount,
                 originalCurrency
               )})
             </span>
+          {/if} -->
+          {#if selectedCurrency !== 'INR'}
+            <label
+              class="child"
+              for="dcc-fee-accept"
+              id="dcc-fee-accept-label"
+              tabIndex="0"
+            >
+              <input
+                type="checkbox"
+                class="checkbox--square"
+                id="dcc-fee-accept"
+                name="dcc-fee-accept"
+                value="1"
+                on:focus
+                on:change={() => onSelect('INR')}
+                bind:checked={payFee}
+              />
+              <span class="checkbox" />
+              <!-- LABEL: Pay currency conversion fee -->
+              {$t(PAY_CONVERSION_FEE)}
+            </label>
+          {:else}
+              <!-- LABEL: Pay in INR -->
+            <b dir="ltr">{$t(PAY_IN_INR)}</b>
           {/if}
         </div>
       </Stack>
@@ -388,10 +421,16 @@
         class="more-btn theme-highlight-color"
         on:click={showCurrenciesModal}
       >
-        {#if selectedCurrencyInDisplay}More{:else}Change{/if}
+        {#if selectedCurrencyInDisplay}
+          <!-- LABEL: More -->
+          {$t(MORE)}
+        {:else}
+          <!-- LABEL: Change -->
+          {$t(CHANGE)}
+        {/if}
         <span class="arrow">&#xe604;</span>
       </div>
-
+      
       <!-- LABEL: Select currency to pay -->
       <!-- LABEL: Search for currency -->
       <!-- LABEL: All currencies -->
@@ -409,6 +448,11 @@
         on:select={({ detail }) => onSelect(detail.currency)}
       />
     </Stack>
+    {#if selectedCurrency !== 'INR'}
+      <div class='dcc-charges'>
+        1 {selectedCurrency} = 74.87 INR (incl. 5% conversion charges)
+      </div>
+    {/if}
   {/if}
 </div>
 
@@ -450,5 +494,14 @@
 
   .default-currencies {
     margin-bottom: 6px;
+  }
+
+  .dcc-other-currency {
+    margin-bottom: 6px;
+  }
+
+  .dcc-charges {
+    font-size: 12px;
+    margin-top: 6px;
   }
 </style>
