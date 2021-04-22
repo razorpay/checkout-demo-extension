@@ -4494,9 +4494,9 @@ Session.prototype = {
     }
 
     // added rewardIds to the create payment request
-    var rewardIds = storeGetter(rewardsStore);
-    if (rewardIds && rewardIds.length > 0 && !Store.isEmailOptional()) {
-      data.reward_ids = rewardIds;
+    var reward = storeGetter(rewardsStore);
+    if (reward?.reward_id && !Store.isEmailOptional()) {
+      data.reward_ids = [reward.reward_id];
     }
 
     var appliedOffer = this.getAppliedOffer();
