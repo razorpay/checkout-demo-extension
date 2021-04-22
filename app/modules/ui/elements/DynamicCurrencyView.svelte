@@ -27,7 +27,7 @@
     SEARCH_PLACEHOLDER,
     SEARCH_ALL,
     PAY_CONVERSION_FEE,
-    PAY_IN_INR,
+    PAY_IN,
   } from 'ui/labels/dcc';
 
   // Utils imports
@@ -75,6 +75,8 @@
   let displayCurrencies = [];
   let prevCurrency;
   const currencyCache = {};
+  let forexRate;
+  let fee;
 
   // Props
   export let classes = [];
@@ -179,7 +181,7 @@
   }
 
   $: {
-    payFee = selectedCurrency !== 'INR';
+    payFee = selectedCurrency !== originalCurrency;
   }
 
   $: {
@@ -266,6 +268,14 @@
   $: sortedCurrencies = currencies && sortCurrencies(currencies);
   $: displayCurrencies = sortedCurrencies && sortedCurrencies.slice(0, 2);
   $: dccAmount = currencies && currencies[selectedCurrency].amount;
+  $: forexRate = currencies && currencies[selectedCurrency].forex_rate;
+
+  $: {
+    if(forexRate) {
+      forexRate = parseFloat(1 / forexRate).toFixed(2);
+    }
+  }
+  $: fee = currencies && currencies[selectedCurrency].fee;
   $: selectedCurrencyInDisplay = _Arr.find(
     displayCurrencies,
     ({ currency }) => currency === selectedCurrency
@@ -390,7 +400,7 @@
               )})
             </span>
           {/if} -->
-          {#if selectedCurrency !== 'INR'}
+          {#if selectedCurrency !== originalCurrency}
             <label
               class="child"
               for="dcc-fee-accept"
@@ -404,7 +414,7 @@
                 name="dcc-fee-accept"
                 value="1"
                 on:focus
-                on:change={() => onSelect('INR')}
+                on:change={() => onSelect(originalCurrency)}
                 bind:checked={payFee}
               />
               <span class="checkbox" />
@@ -412,8 +422,8 @@
               {$t(PAY_CONVERSION_FEE)}
             </label>
           {:else}
-              <!-- LABEL: Pay in INR -->
-            <b dir="ltr">{$t(PAY_IN_INR)}</b>
+              <!-- LABEL: Pay in {originalCurrency} -->
+            <b dir="ltr">{$t(PAY_IN)} {originalCurrency}</b>
           {/if}
         </div>
       </Stack>
@@ -448,9 +458,9 @@
         on:select={({ detail }) => onSelect(detail.currency)}
       />
     </Stack>
-    {#if selectedCurrency !== 'INR'}
+    {#if selectedCurrency !== originalCurrency}
       <div class='dcc-charges'>
-        1 {selectedCurrency} = 74.87 INR (incl. 5% conversion charges)
+        1 {selectedCurrency} = {forexRate} {originalCurrency} (incl. {formatAmountWithSymbol(fee, selectedCurrency)} conversion charges)
       </div>
     {/if}
   {/if}

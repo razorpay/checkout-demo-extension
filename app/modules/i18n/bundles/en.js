@@ -519,7 +519,6 @@ export default {
     more: 'More',
     pay_conversion_fee: 'Pay currency conversion fee',
     pay_in: 'Pay in',
-    pay_in_inr: 'Pay in INR',
   },
   debit_emi: {
     card_box_title: 'SELECTED DEBIT CARD',
