@@ -5,9 +5,9 @@
   import { formatTemplateWithLocale } from 'i18n';
 
   //store
-  import { rewards } from 'checkoutstore/rewards';
+  import { reward } from 'checkoutstore/rewards';
 
-  let { brand_name } = $rewards[0];
+  let { brand_name } = $reward;
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -27,9 +27,7 @@
       )}
     />
   </div>
-  {#each $rewards as rew}
-    <RewardCard {...rew} />
-  {/each}
+  <RewardCard {...$reward} />
   <div class="rewards-divider" />
   <div class="rewards-close" on:click={onClick}>{$t(REWARDS_CLOSE)}</div>
 </div>
