@@ -30,7 +30,7 @@ import {
 } from 'common/constants';
 
 import { checkForPossibleWebPaymentsForUpi } from 'checkoutframe/components/upi';
-import { rewards, rewardIds } from 'checkoutstore/rewards';
+import { reward } from 'checkoutstore/rewards';
 import updateScore from 'analytics/checkoutScore';
 import { isBraveBrowser } from 'common/useragent';
 
@@ -77,7 +77,7 @@ const validUID = id => {
   return true;
 };
 
-Razorpay.sendMessage = function(message) {
+Razorpay.sendMessage = function (message) {
   if (Bridge.hasCheckoutBridge()) {
     return Bridge.notifyBridge(message);
   }
@@ -168,7 +168,7 @@ const setTrackingProps = message => {
   }
 };
 
-export const handleMessage = function(message) {
+export const handleMessage = function (message) {
   if ('id' in message && !validUID(message.id)) {
     return;
   }
@@ -228,9 +228,9 @@ export const handleMessage = function(message) {
   try {
     if (_.isNonNullObject(CheckoutBridge)) {
       CheckoutBridge.sendAnalyticsData = Track.parseAnalyticsData;
-      CheckoutBridge.sendExtraAnalyticsData = e => {};
+      CheckoutBridge.sendExtraAnalyticsData = e => { };
     }
-  } catch (e) {}
+  } catch (e) { }
 };
 
 function fetchPrefs(session) {
@@ -264,11 +264,14 @@ function fetchRewards(session) {
     rewardsRes => {
       session.rewardsCall = null;
       if (!rewardsRes.error) {
-        const reward_ids = rewardsRes.map(item => item.reward_id);
-        rewards.set(rewardsRes);
-        rewardIds.set(reward_ids);
-        if (reward_ids && reward_ids.length > 0) {
-          Analytics.setMeta('reward_ids', reward_ids);
+        const rewardObj = rewardsRes[0]
+        if (rewardObj) {
+          const { reward_id, variant } = rewardObj;
+          if (reward_id) {
+            reward.set(rewardObj);
+            Analytics.setMeta('reward_ids', reward_id);
+          }
+          Analytics.setMeta('reward_exp_variant', variant);
         }
       }
     }

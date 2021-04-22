@@ -46,7 +46,7 @@
   } from 'checkoutstore';
 
   import { getUPIIntentApps } from 'checkoutstore/native';
-  import { rewards } from 'checkoutstore/rewards';
+  import { reward } from 'checkoutstore/rewards';
 
   // i18n
   import {
@@ -878,6 +878,149 @@
   }
 </script>
 
+<Tab method="common" overrideMethodCheck={true} shown={true} pad={false}>
+  <Screen pad={false}>
+    <div class="screen-main">
+      {#if view === 'details'}
+        <PaymentDetails {tpv} />
+      {/if}
+      {#if view === 'methods'}
+        <div
+          class="solidbg"
+          in:slide={getAnimationOptions({ duration: 400 })}
+          out:fly={getAnimationOptions({ duration: 200, y: 80 })}
+        >
+          {#if trustedBadgeHighlights}
+            <TrustedBadge nos={trustedBadgeHighlights} />
+          {/if}
+          {#if showUserDetailsStrip || isPartialPayment}
+            <div
+              use:touchfix
+              class="details-container"
+              in:fly={getAnimationOptions({ duration: 400, y: 80 })}
+            >
+              {#if showUserDetailsStrip}
+                <div class="details-strip border-list-horizontal">
+                  <SlottedOption on:click={editUserDetails} id="user-details">
+                    <i slot="icon">
+                      <Icon icon={icons.edit} />
+                    </i>
+                    <div slot="title">
+                      {#if $isContactPresent && !isContactHidden()}
+                        <span>{$contact}</span>
+                      {/if}
+                      {#if $email && !isEmailHidden()}<span>{$email}</span>{/if}
+                    </div>
+                  </SlottedOption>
+                  {#if $reward?.reward_id && !isEmailOptional()}
+                    <RewardsIcon />
+                  {/if}
+                </div>
+              {/if}
+              {#if isPartialPayment}
+                <SlottedOption
+                  on:click={hideMethods}
+                  id="partial-payment-details"
+                >
+                  <div slot="title">
+                    <span>{formattedPartialAmount}</span>
+                    <span>
+                      {#if $partialPaymentOption === 'full'}
+                        <!-- LABEL: Paying full amount -->
+                        {$t(PARTIAL_AMOUNT_STATUS_FULL)}
+                      {:else}
+                        <!-- LABEL: Paying in parts -->
+                        {$t(PARTIAL_AMOUNT_STATUS_PARTIAL)}
+                      {/if}
+                    </span>
+                  </div>
+                  <div
+                    slot="extra"
+                    class="theme-highlight-color"
+                    aria-label={contactEmailReadonly ? '' : 'Edit'}
+                  >
+                    {#if !contactEmailReadonly}
+                      <!-- LABEL: Change amount -->
+                      <span>{$t(PARTIAL_AMOUNT_EDIT_LABEL)}</span>
+                      <span>&#xe604;</span>
+                    {/if}
+                  </div>
+                </SlottedOption>
+              {/if}
+            </div>
+          {/if}
+
+          <div
+            class="home-methods"
+            in:fly={getAnimationOptions({ delay: 100, duration: 400, y: 80 })}
+          >
+            <NewMethodsList
+              on:selectInstrument={onSelectInstrument}
+              on:submit={attemptPayment}
+            />
+          </div>
+        </div>
+      {/if}
+    </div>
+
+    <Bottom tab="common">
+      {#if cardOffer}
+        <CardOffer offer={cardOffer} />
+      {/if}
+      {#if isDCCEnabled()}
+        <DynamicCurrencyView tabVisible view="home-screen" />
+      {/if}
+      <!-- {#if showRecurringCallout}
+        <Callout>
+          {generateSubtextForRecurring({
+            types: getCardTypesForRecurring(),
+            networks: getCardNetworksForRecurring(),
+            issuers: getCardIssuersForRecurring(),
+            subscription: session.get('subscription_id'),
+            offer: cardOffer,
+          })}
+        </Callout>
+      {/if} -->
+
+      {#if showSecuredByMessage}
+        <div
+          class="secured-message"
+          out:slide={getAnimationOptions({ duration: 100 })}
+        >
+          <i>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M12 5.33335H11.3333V4.00002C11.3333 2.16002 9.83999 0.666687
+                7.99999 0.666687C6.15999 0.666687 4.66666 2.16002 4.66666
+                4.00002V5.33335H3.99999C3.26666 5.33335 2.66666 5.93335 2.66666
+                6.66669V13.3334C2.66666 14.0667 3.26666 14.6667 3.99999
+                14.6667H12C12.7333 14.6667 13.3333 14.0667 13.3333
+                13.3334V6.66669C13.3333 5.93335 12.7333 5.33335 12
+                5.33335ZM7.99999 11.3334C7.26666 11.3334 6.66666 10.7334 6.66666
+                10C6.66666 9.26669 7.26666 8.66669 7.99999 8.66669C8.73332
+                8.66669 9.33332 9.26669 9.33332 10C9.33332 10.7334 8.73332
+                11.3334 7.99999 11.3334ZM6 4V5.33334H10V4C10 2.89334 9.10666 2 8
+                2C6.89333 2 6 2.89334 6 4Z"
+                fill="#A7A7A7"
+              />
+            </svg>
+          </i>
+          <!-- LABEL: This payment is secured by Razorpay. -->
+          {$t(SECURED_BY_MESSAGE)}
+        </div>
+      {/if}
+    </Bottom>
+  </Screen>
+</Tab>
+
 <style>
   .screen-main {
     padding-top: 12px;
@@ -948,137 +1091,3 @@
     order: -1;
   }
 </style>
-
-<Tab method="common" overrideMethodCheck={true} shown={true} pad={false}>
-  <Screen pad={false}>
-    <div class="screen-main">
-      {#if view === 'details'}
-        <PaymentDetails {tpv} />
-      {/if}
-      {#if view === 'methods'}
-        <div
-          class="solidbg"
-          in:slide={getAnimationOptions({ duration: 400 })}
-          out:fly={getAnimationOptions({ duration: 200, y: 80 })}>
-          {#if trustedBadgeHighlights}
-            <TrustedBadge nos={trustedBadgeHighlights} />
-          {/if}
-          {#if showUserDetailsStrip || isPartialPayment}
-            <div
-              use:touchfix
-              class="details-container"
-              in:fly={getAnimationOptions({ duration: 400, y: 80 })}>
-              {#if showUserDetailsStrip}
-                <div class="details-strip border-list-horizontal">
-                  <SlottedOption on:click={editUserDetails} id="user-details">
-                    <i slot="icon">
-                      <Icon icon={icons.edit} />
-                    </i>
-                    <div slot="title">
-                      {#if $isContactPresent && !isContactHidden()}
-                        <span>{$contact}</span>
-                      {/if}
-                      {#if $email && !isEmailHidden()}<span>{$email}</span>{/if}
-                    </div>
-                  </SlottedOption>
-                  {#if $rewards?.length > 0 && !isEmailOptional()}
-                    <RewardsIcon />
-                  {/if}
-                </div>
-              {/if}
-              {#if isPartialPayment}
-                <SlottedOption
-                  on:click={hideMethods}
-                  id="partial-payment-details">
-                  <div slot="title">
-                    <span>{formattedPartialAmount}</span>
-                    <span>
-                      {#if $partialPaymentOption === 'full'}
-                        <!-- LABEL: Paying full amount -->
-                        {$t(PARTIAL_AMOUNT_STATUS_FULL)}
-                      {:else}
-                        <!-- LABEL: Paying in parts -->
-                        {$t(PARTIAL_AMOUNT_STATUS_PARTIAL)}
-                      {/if}
-                    </span>
-                  </div>
-                  <div
-                    slot="extra"
-                    class="theme-highlight-color"
-                    aria-label={contactEmailReadonly ? '' : 'Edit'}>
-                    {#if !contactEmailReadonly}
-                      <!-- LABEL: Change amount -->
-                      <span>{$t(PARTIAL_AMOUNT_EDIT_LABEL)}</span>
-                      <span>&#xe604;</span>
-                    {/if}
-                  </div>
-                </SlottedOption>
-              {/if}
-            </div>
-          {/if}
-
-          <div
-            class="home-methods"
-            in:fly={getAnimationOptions({ delay: 100, duration: 400, y: 80 })}>
-            <NewMethodsList
-              on:selectInstrument={onSelectInstrument}
-              on:submit={attemptPayment} />
-          </div>
-        </div>
-      {/if}
-    </div>
-
-    <Bottom tab="common">
-      {#if cardOffer}
-        <CardOffer offer={cardOffer} />
-      {/if}
-      {#if isDCCEnabled()}
-        <DynamicCurrencyView tabVisible view="home-screen" />
-      {/if}
-      <!-- {#if showRecurringCallout}
-        <Callout>
-          {generateSubtextForRecurring({
-            types: getCardTypesForRecurring(),
-            networks: getCardNetworksForRecurring(),
-            issuers: getCardIssuersForRecurring(),
-            subscription: session.get('subscription_id'),
-            offer: cardOffer,
-          })}
-        </Callout>
-      {/if} -->
-
-      {#if showSecuredByMessage}
-        <div
-          class="secured-message"
-          out:slide={getAnimationOptions({ duration: 100 })}>
-          <i>
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg">
-              <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
-                d="M12 5.33335H11.3333V4.00002C11.3333 2.16002 9.83999 0.666687
-                7.99999 0.666687C6.15999 0.666687 4.66666 2.16002 4.66666
-                4.00002V5.33335H3.99999C3.26666 5.33335 2.66666 5.93335 2.66666
-                6.66669V13.3334C2.66666 14.0667 3.26666 14.6667 3.99999
-                14.6667H12C12.7333 14.6667 13.3333 14.0667 13.3333
-                13.3334V6.66669C13.3333 5.93335 12.7333 5.33335 12
-                5.33335ZM7.99999 11.3334C7.26666 11.3334 6.66666 10.7334 6.66666
-                10C6.66666 9.26669 7.26666 8.66669 7.99999 8.66669C8.73332
-                8.66669 9.33332 9.26669 9.33332 10C9.33332 10.7334 8.73332
-                11.3334 7.99999 11.3334ZM6 4V5.33334H10V4C10 2.89334 9.10666 2 8
-                2C6.89333 2 6 2.89334 6 4Z"
-                fill="#A7A7A7" />
-            </svg>
-          </i>
-          <!-- LABEL: This payment is secured by Razorpay. -->
-          {$t(SECURED_BY_MESSAGE)}
-        </div>
-      {/if}
-    </Bottom>
-  </Screen>
-</Tab>
