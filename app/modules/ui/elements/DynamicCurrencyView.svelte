@@ -275,7 +275,7 @@
       forexRate = parseFloat(1 / forexRate).toFixed(2);
     }
   }
-  $: fee = currencies && currencies[selectedCurrency].fee;
+  $: fee = currencies && currencies[selectedCurrency].conversion_percentage || 0;
   $: selectedCurrencyInDisplay = _Arr.find(
     displayCurrencies,
     ({ currency }) => currency === selectedCurrency
@@ -460,7 +460,7 @@
     </Stack>
     {#if selectedCurrency !== originalCurrency}
       <div class='dcc-charges'>
-        1 {selectedCurrency} = {forexRate} {originalCurrency} (incl. {formatAmountWithSymbol(fee, selectedCurrency)} conversion charges)
+        1 {selectedCurrency} = {forexRate} {originalCurrency} (incl. {fee}% conversion charges)
       </div>
     {/if}
   {/if}
