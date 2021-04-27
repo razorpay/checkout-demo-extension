@@ -382,13 +382,13 @@
                   checked={currency === selectedCurrency}
                   on:change={() => onSelect(currency)}
                 >
-                  Pay in {currency}
+                  {$t(PAY_IN)} {currency}
                 </Radio>
               {/each}
             </Stack>
           </div>
         {:else}
-          <div class='dcc-other-currency'>Pay in {selectedCurrency} ({formatAmountWithSymbol(dccAmount, selectedCurrency)})</div>
+          <div class='dcc-other-currency'>{$t(PAY_IN)} {selectedCurrency} ({formatAmountWithSymbol(dccAmount, selectedCurrency)})</div>
         {/if}
         <div dir="ltr">
           <!-- <b dir="ltr">{formatAmountWithSymbol(dccAmount, selectedCurrency)}</b> -->
@@ -460,7 +460,7 @@
     </Stack>
     {#if selectedCurrency !== originalCurrency}
       <div class='dcc-charges'>
-        1 {selectedCurrency} = {forexRate} {originalCurrency} (incl. {fee}% conversion charges)
+        {`1 ${selectedCurrency} = ${forexRate} ${originalCurrency} (incl. ${fee}% conversion charges)`}
       </div>
     {/if}
   {/if}
