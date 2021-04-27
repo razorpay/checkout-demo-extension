@@ -306,14 +306,15 @@
    */
   function sortCurrencies(currencies) {
     const CODE = 0;
-    const CONFIG = 1;
 
     // Insert entity currency on 2nd position.
-    const topCurrencies = _Arr.insertAt(
-      TOP_CURRENCIES.slice(),
-      getCurrency(),
-      1
-    );
+    const topCurrencies = [cardCurrency, originalCurrency];
+    let i = 0;
+    while(topCurrencies[0] === topCurrencies[1]) {
+      topCurrencies[1] = TOP_CURRENCIES[i];
+      i++;
+    }
+    
 
     const sorted = _Obj.entries(currencies).sort((_a, _b) => {
       const a = _a[CODE];
