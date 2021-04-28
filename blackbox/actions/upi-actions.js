@@ -23,7 +23,7 @@ async function selectUPIApp(context, AppNumber, appWithDowntime) {
     expect(count).toEqual(1);
   }
 
-  if(appWithDowntime) {
+  if (appWithDowntime) {
     AppNumber = allApps.indexOf(appWithDowntime) + 1;
   }
 
@@ -116,8 +116,14 @@ async function respondToUPIPaymentStatus(context) {
   await context.respondPlain(
     `${req.params.callback}(${JSON.stringify(successResult)})`
   );
+  let timeout = 2000;
+  if (context.preferences.show_donation) {
+    timeout += 10000;
+    let selector = '#covid-wrap';
+    await context.page.waitForSelector(selector);
+  }
   await context.page.waitFor('#modal-inner', {
-    timeout: 2000,
+    timeout,
     hidden: true,
   });
   expect(await context.page.$('#modal-inner')).toEqual(null);

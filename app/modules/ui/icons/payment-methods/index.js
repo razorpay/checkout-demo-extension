@@ -15,8 +15,10 @@ import edit from './edit';
 import present from './present';
 import trustedBadge from './trusted_badge';
 import tickFilled from './tick_filled';
+import tickFilledDonate from './tick_filled_donate';
 import warning from './warning';
 import refund from './refund';
+import donationHeart from './donate_heart';
 
 import { getAllMethods } from 'checkoutframe/paymentmethods';
 
@@ -28,8 +30,10 @@ const availIconNames = getAllMethods().concat([
   'present',
   'trusted_badge',
   'tick_filled',
+  'tick_filled_donate',
   'warning',
-  'refund'
+  'refund',
+  'donate_heart'
 ]);
 
 function getIconFn(iconName) {
@@ -88,11 +92,16 @@ function getIconFn(iconName) {
     case 'tick_filled':
       return tickFilled;
 
+    case 'tick_filled_donate':
+      return tickFilledDonate;
     case 'warning':
       return warning;
 
     case 'refund':
-        return refund;
+      return refund;
+
+    case 'donate_heart':
+      return donationHeart;
   }
 }
 

@@ -3,7 +3,7 @@ function makeOptions(features, options) {
 }
 
 function makePreferences(features, preferences) {
-  const { downtimeHigh, downtimeLow, offers } = features;
+  const { downtimeHigh, downtimeLow, offers, showDonation } = features;
 
   if (downtimeHigh) {
     preferences.payment_downtime = {
@@ -76,6 +76,10 @@ function makePreferences(features, preferences) {
         display_text: 'UPI Offer Display Text 3',
       },
     ];
+  }
+
+  if (showDonation) {
+    preferences.show_donation = true;
   }
 
   return preferences;

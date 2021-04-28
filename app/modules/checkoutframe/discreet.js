@@ -103,6 +103,8 @@ import BlockedDeactivatedMerchant from 'ui/elements/BlockedDeactivatedMerchant.s
 
 import * as downtimeUtils from 'checkoutframe/downtimes/utils';
 
+import * as CovidDonations from 'checkoutframe/components/covidWrap';
+
 export default {
   RazorpayConfig,
   updateScore,
@@ -221,5 +223,6 @@ export default {
   overlayStackStore,
   rewardsStore,
 
-  downtimeUtils
+  downtimeUtils,
+  CovidDonations
 };

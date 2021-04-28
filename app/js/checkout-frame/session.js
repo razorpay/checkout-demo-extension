@@ -50,7 +50,8 @@ var preferences,
   FeeLabel = discreet.FeeLabel,
   rewardsStore = discreet.rewardsStore,
   BlockedDeactivatedMerchant = discreet.BlockedDeactivatedMerchant,
-  updateScore = discreet.updateScore;
+  updateScore = discreet.updateScore,
+  CovidDonationView = discreet.CovidDonations;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -638,8 +639,18 @@ function successHandler(response) {
   this.modal.options.onhide = noop;
 
   // sending oncomplete event because CheckoutBridge.oncomplete
-  Razorpay.sendMessage({ event: 'complete', data: response });
-  this.hide();
+
+  function completeCheckoutFlow() {
+    Razorpay.sendMessage({ event: 'complete', data: response });
+    this.hide();
+  }
+  hideOverlayMessage();
+  if (this.preferences.show_donation) {
+    new CovidDonationView.render(completeCheckoutFlow.bind(this))
+  } else {
+    completeCheckoutFlow.call(this);
+  }
+  showOverlay(this.getCovidDonationDialog())
 }
 
 function cancel_upi(session) {
@@ -1660,7 +1671,7 @@ Session.prototype = {
           if (Confirm.isVisible()) {
             return;
           }
-
+          session.r.emit('backDropClicked')
           session.hideErrorMessage(e);
         },
       },
@@ -3604,6 +3615,10 @@ Session.prototype = {
 
   getDowntimeAlertDialog: function () {
     return $("#downtime-wrap")
+  },
+
+  getCovidDonationDialog: function () {
+    return $("#covid-wrap")
   },
 
   setSvelteOverlay: function () {
