@@ -6,6 +6,9 @@ import trustedBadge from 'ui/constants/trusted-badge';
 
 import { amountAfterOffer } from 'checkoutstore/offers';
 import { get } from 'svelte/store';
+import {
+  phone,
+} from 'checkoutstore/screens/home';
 
 let razorpayInstance, preferences;
 export const razorpayInstanceStore = writable();
@@ -210,13 +213,14 @@ export function isStrictlyRecurring() {
 }
 
 export function shouldRememberCustomer(method = 'card') {
-  if (!navigator.cookieEnabled) {
+  if (
+    !navigator.cookieEnabled ||
+    (method === 'card' && !getOption('features.cardsaving')) ||
+    (isContactOptional() && !get(phone))
+  ) {
     return false;
   }
-  if (method === 'card' && !getOption('features.cardsaving')) {
-    return false;
-  }
-
+  
   // if merchant passed options.remember_customer as true,
   // that take precedence over optional contact
   // it should not be the case

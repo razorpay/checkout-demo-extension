@@ -70,6 +70,7 @@ module.exports = function(testFeatures) {
     optionalEmail,
     recurringOrder,
     dcc,
+    remember_customer,
   } = features;
 
   describe.each(
@@ -78,6 +79,9 @@ module.exports = function(testFeatures) {
       preferences,
     })
   )('Cards tests', ({ preferences, title, options }) => {
+    if (remember_customer) {
+      options.remember_customer = remember_customer;
+    }
     test(title, async () => {
       const context = await openCheckoutWithNewHomeScreen({
         page,
@@ -85,11 +89,9 @@ module.exports = function(testFeatures) {
         preferences,
         method: 'Card',
       });
-
       const missingUserDetails = optionalContact && optionalEmail;
 
       const isHomeScreenSkipped = missingUserDetails && !partialPayment; // and not TPV
-
       if (!isHomeScreenSkipped) {
         await assertBasicDetailsScreen(context);
       }
@@ -119,6 +121,12 @@ module.exports = function(testFeatures) {
         await assertPaymentMethods(context);
 
         await selectPaymentMethod(context, 'card');
+      }
+      if(optionalContact) {
+        // check remember me should be hide
+        await page.waitForFunction(() => {
+          return !document.getElementById('should-save-card');
+        })
       }
 
       await enterCardDetails(context, {
