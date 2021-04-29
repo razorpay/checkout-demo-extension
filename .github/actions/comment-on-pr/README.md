@@ -18,7 +18,7 @@ on: pull_request
 jobs:
   example:
     name: sample comment
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted]
     steps:
       - name: comment PR
         uses: unsplash/comment-on-pr@master
