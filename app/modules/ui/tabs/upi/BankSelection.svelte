@@ -26,6 +26,11 @@
       id: 'sbi',
       img: 'SBIN',
     },
+    {
+      name: 'AXIS Bank',
+      id: 'axis',
+      img: 'UTIB',
+    },
   ];
 </script>
 
