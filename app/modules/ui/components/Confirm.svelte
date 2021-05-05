@@ -27,14 +27,18 @@
 
   let visible = false;
 
+  function setConfirmDialog(state) {
+    visible = state;
+  }
+
   export function show() {
     showBackdrop();
-    visible = true;
+    setConfirmDialog(true);
   }
 
   export function hide() {
     hideBackdrop();
-    visible = false;
+    setConfirmDialog(false);
   }
 
   export function isVisible() {
@@ -47,10 +51,31 @@
   }
 
   function clickedNegative() {
-    hide();
+    setConfirmDialog(false);
     onNegativeClick();
   }
 </script>
+
+{#if visible}
+  <div
+    id="confirmation-dialog"
+    class={`confirm-position-${position}`}
+    transition:fly|local={{ duration: 200, y: -24 }}
+  >
+    <div class="confirm-container overlay">
+      <div class="confirm-heading">{heading}</div>
+      <div class="confirm-message">{message}</div>
+      <div class="confirm-buttons" class:reverse={layout === 'rtl'}>
+        <div id="positiveBtn" class="text-btn" on:click={clickedPositive}>
+          {positiveText}
+        </div>
+        <div id="negativeBtn" class="text-btn" on:click={clickedNegative}>
+          {negativeText}
+        </div>
+      </div>
+    </div>
+  </div>
+{/if}
 
 <style>
   #confirmation-dialog {
@@ -117,23 +142,3 @@
     line-height: 40px;
   }
 </style>
-
-{#if visible}
-  <div
-    id="confirmation-dialog"
-    class={`confirm-position-${position}`}
-    transition:fly|local={{ duration: 200, y: -24 }}>
-    <div class="confirm-container overlay">
-      <div class="confirm-heading">{heading}</div>
-      <div class="confirm-message">{message}</div>
-      <div class="confirm-buttons" class:reverse={layout === 'rtl'}>
-        <div id="positiveBtn" class="text-btn" on:click={clickedPositive}>
-          {positiveText}
-        </div>
-        <div id="negativeBtn" class="text-btn" on:click={clickedNegative}>
-          {negativeText}
-        </div>
-      </div>
-    </div>
-  </div>
-{/if}
