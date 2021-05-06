@@ -88,10 +88,6 @@ export function getOffersForTab(method) {
     // EMI plans should have the same offers as EMI
     // TODO: Fix for Cardless EMI
     method = getOfferMethodForTab(method);
-    if (method === 'cardless_emi') {
-      allOffers.push(zestMoneyOffer);
-    }
-
     let methods = [method];
 
     /**
@@ -215,14 +211,6 @@ export const getAllOffers = () => {
   } else {
     return getMerchantOffers() || [] |> _Arr.filter(isOfferEligible);
   }
-};
-
-const zestMoneyOffer = {
-  name: 'ZestMoney: 0% Interest available',
-  payment_method: 'cardless_emi',
-  provider: 'zestmoney',
-  display_text:
-    'Applicable only on EMI tenure of 3 months.\nInterest will be returned as cashback on repayment of each EMI.',
 };
 
 function _getAllInstrumentsForOffer(offer) {

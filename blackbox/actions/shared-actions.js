@@ -1,4 +1,5 @@
 const { delay } = require('../util');
+const mockAPI = require('blackbox/tests/custom/mockApi.js');
 const querystring = require('querystring');
 
 async function respondAndVerifyIntentRequest(
@@ -73,12 +74,11 @@ async function validateHelpMessage(context, message) {
   expect(text).toEqual(message);
 }
 
-async function submit(context) {
+async function submit(context, downtimeHigh) {
   // needed for wallet screen animation
   await delay(300);
   const clickPromise = context.page.click('#footer');
-
-  if (context.options.redirect) {
+  if (context.options.redirect && !downtimeHigh) {
     await delay(600);
   } else {
     await clickPromise;
@@ -199,6 +199,11 @@ async function failRequestwithErrorMessage(context, errorMessage) {
   await context.failRequest({ error: errorMessage });
 }
 
+async function handleAJAXRequest(context, method = 'card') {
+  await context.expectRequest();
+  await context.respondJSON(mockAPI.ajaxResponse(method));
+}
+
 async function selectBank(context, bank) {
   // Open search modal
   await context.page.click('#bank-select');
@@ -235,6 +240,7 @@ async function retryTransaction(context) {
   await retryButton.click();
 }
 
+
 module.exports = {
   handleMockFailureDialog,
   handleMockSuccessDialog,
@@ -249,4 +255,5 @@ module.exports = {
   retryTransaction,
   popupClosedByUser,
   provideCancellationReason,
+  handleAJAXRequest,
 };

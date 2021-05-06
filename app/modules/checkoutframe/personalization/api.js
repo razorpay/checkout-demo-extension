@@ -166,7 +166,7 @@ const API_INSTRUMENT_PAYMENT_ADDONS = {
       instrument['_[flow]'] = 'directpay';
     } else {
       // if not a valid vpa, the instrument is expected to be an intent app handle (@okaxis, @ybl)
-      const app = getUPIAppDataFromHandle(instrument.vpa.slice(1));
+      const app = getUPIAppDataFromHandle(instrument.vpa?.slice(1));
       if (app.package_name) {
         instrument['_[flow]'] = 'intent';
         instrument['upi_app'] = app.package_name;

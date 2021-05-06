@@ -66,7 +66,7 @@ import * as Theme from 'checkoutstore/theme';
 import { overlayStack as overlayStackStore } from 'checkoutstore/back';
 import * as NativeStore from 'checkoutstore/native';
 import * as OffersStore from 'checkoutstore/offers';
-import { rewardIds as rewardsStore } from 'checkoutstore/rewards';
+import { reward as rewardsStore } from 'checkoutstore/rewards';
 
 import QRScreen from 'ui/tabs/qr/index.svelte';
 import * as upiTab from 'checkoutframe/components/upi';
@@ -102,6 +102,10 @@ import * as Instruments from 'configurability/instruments';
 import { getInstrumentMeta } from 'ui/tabs/home/instruments';
 import * as ContactStorage from 'checkoutframe/contact-storage';
 import BlockedDeactivatedMerchant from 'ui/elements/BlockedDeactivatedMerchant.svelte';
+
+import * as downtimeUtils from 'checkoutframe/downtimes/utils';
+
+import * as CovidDonations from 'checkoutframe/components/covidWrap';
 
 export default {
   RazorpayConfig,
@@ -222,4 +226,6 @@ export default {
   overlayStackStore,
   rewardsStore,
   CRED,
+  downtimeUtils,
+  CovidDonations,
 };

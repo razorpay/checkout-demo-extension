@@ -32,6 +32,7 @@ export default {
     round_off_callout:
       'Do not round-off the amount. Transfer the exact amount for the payment to be successful.',
     print_details: 'Print Details',
+    fee_breakup: 'See Fee Breakup'
   },
   banks: {
     long: {
@@ -171,6 +172,10 @@ export default {
       debit_only_callout:
         'Subscription payments are supported on debit cards from {issuers}.',
     },
+    downtime_callout:
+      'This payment might fail because {instrument} is facing technical difficulties',
+    downtime_callout_cards:
+      'This payment might fail because {instrument} cards are facing technical difficulties',
   },
   card: {
     add_another_card_btn: 'Add another card',
@@ -629,6 +634,7 @@ export default {
     amount_label: 'Amount',
     breakup_title: 'Fees Breakup',
     continue_action: 'Continue',
+    close_action: 'Close',
     gateway_charges_label: 'Convenience Charges',
     gst_label: 'GST on {label}',
     loading_message: 'Loading fees breakup...',
@@ -801,10 +807,6 @@ export default {
   },
   netbanking: {
     corporate_label: 'Corporate',
-    downtime_low_callout:
-      '<strong>{bank}<strong> accounts are experiencing low success rates.',
-    downtime_high_callout:
-      '<strong>{bank}<strong> accounts are temporarily unavailable right now. Please select another bank.',
     recurring_callout:
       'Future payments from your bank account will be charged automatically.',
     retail_label: 'Retail',
@@ -993,7 +995,6 @@ export default {
     collect_enter_upi_id: 'Enter your UPI ID',
     collect_new_vpa_help: 'Please enter a valid VPA of the form username@bank',
     collect_securely_save: 'Securely save your UPI ID',
-    downtime_text: '<strong>UPI<strong> is experiencing low success rate.',
     gpay_block_heading: 'Pay using Gpay App',
     gpay_web_api_title: 'Google Pay',
     intent_accept_request:
@@ -1030,7 +1031,7 @@ export default {
     redirect_to_app: 'You will be redirected to your UPI app',
     scan_qr_code: 'Scan the QR code using your UPI app',
     supported_banks:
-      'You can only pay using UPI ID linked with either <strong>ICICI Bank<strong> or <strong>SBI Bank<strong>',
+      'You can only pay using UPI ID linked with either <strong>ICICI Bank<strong>, <strong>HDFC Bank<strong>, <strong>SBI Bank<strong> or <strong>Axis Bank<strong>',
     upi_id_linked_to_bank: 'UPI ID is linked to',
     show_other_apps: 'Show other UPI apps',
     show_qr_code: 'Show QR Code',
@@ -1108,7 +1109,7 @@ export default {
   },
   rewards: {
     header:
-      'Pay successfully now & unlock <strong>exciting rewards for free,<strong> for your future buys!',
+      'Pay successfully now & unlock <strong>exciting rewards from {brandName} for free, <strong> in your mailbox',
     sub_text: 'Look for these rewards from amazing brands in your mail box!',
     close: 'Close',
     tooltip_text: 'Unlock free rewards after payment',
@@ -1119,4 +1120,17 @@ export default {
     highlight2: 'Secured Razorpay merchant for {securedTime} months',
     highlight3: 'No fraud transaction for last {noFraudTime} months',
   },
+  downtime_alert: {
+    highlight1: 'There is a high chance this payment might fail',
+    card_highlight2: '{instrument} cards are facing some technical issues at the moment',
+    highlight2: '{instrument} is facing some technical issues at the moment',
+    highlight3: 'Incase of failure, any <strong>amount deducted<strong> will be <strong>refunded shortly<strong>'
+  },
+  covid_donations: {
+    payment_success: "Your payment was successful!",
+    header: 'Help Organizations Fight COVID-19',
+    cta_text: 'Donate Now',
+    sub_text: 'Help people in need of oxygen cylinders or food by sharing a small contribution towards organisations like Hemkunt Foundation and others.',
+    redirection_text: 'Redirecting to {merchantName} in {secondsRemaining} seconds'
+  }
 };

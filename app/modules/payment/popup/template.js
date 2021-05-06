@@ -65,8 +65,8 @@ export default function popupTemplate(_, t) {
 
   var dccCurrency = _.data && _.data.dcc_currency;
   if (dccCurrency) {
-    var dccAmount = getConvertedAmount(_.data.amount, dccCurrency);
-    amount = displayAmount(_.r, dccAmount, dccCurrency);
+    var dccAmount = getConvertedAmount(_.r.display_amount || _.data.amount, dccCurrency);
+    amount = displayAmount(_.r, dccAmount, dccCurrency, true);
   }
 
   var hideAmount =

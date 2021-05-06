@@ -23,6 +23,7 @@
     GATEWAY_CHARGES_LABEL,
     GST_LABEL,
     TOTAL_CHARGES_LABEL,
+    CLOSE_ACTION,
   } from 'ui/labels/fees';
 
   // Props
@@ -30,6 +31,7 @@
   export let feeBreakup = null;
   export let bearer = null;
   export let paymentData;
+  export let isBankTransferView;
 
   const entries = _Obj.entries;
   const contains = _Arr.contains;
@@ -53,10 +55,12 @@
     loading = false;
     bearer = response.input;
     $showFeeLabel = false;
-    if (!session.getAppliedOffer()) {
+    const offer = session.getAppliedOffer();
+    if (!offer || !offer.amount) {
       session.updateAmountInHeader(feeBreakup.amount * 100, false);
+      return;
     }
-    if (session.getAppliedOffer()) {
+    if (offer) {
       session.updateAmountInHeaderForOffer(feeBreakup.amount * 100, true);
     }
   }
@@ -83,7 +87,7 @@
   }
 </script>
 
-<div class="fee-bearer">
+<div class={isBankTransferView ? 'fee-bearer-bank-transfer' : 'fee-bearer'}>
   {#if loading}
     <AsyncLoading>
       <!-- LABEL: Loading fees breakup... -->
@@ -101,7 +105,11 @@
               {#if type === 'razorpay_fee'}
                 {fee_label || $t(GATEWAY_CHARGES_LABEL)}
               {:else if type === 'tax'}
-                {formatTemplateWithLocale(displayLabels[type], { label: fee_label || $t(GATEWAY_CHARGES_LABEL) }, $locale)}
+                {formatTemplateWithLocale(
+                  displayLabels[type],
+                  { label: fee_label || $t(GATEWAY_CHARGES_LABEL) },
+                  $locale
+                )}
               {:else}{$t(displayLabels[type])}{/if}
             </div>
             <div class="fee-amount">
@@ -113,7 +121,7 @@
     </div>
     <div class="btn" on:click={() => dispatch('continue', bearer)}>
       <!-- LABEL: Continue -->
-      {$t(CONTINUE_ACTION)}
+      {!isBankTransferView ? $t(CONTINUE_ACTION) : $t(CLOSE_ACTION)}
     </div>
   {/if}
 </div>

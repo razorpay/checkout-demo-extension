@@ -6,6 +6,7 @@
   // Svelte imports
   import { createEventDispatcher, onMount, tick, onDestroy } from 'svelte';
   import { fade, fly } from 'svelte/transition';
+  import { showCta, hideCta } from 'checkoutstore/cta';
 
   // UI imports
   import Stack from 'ui/layouts/Stack.svelte';
@@ -177,10 +178,7 @@
 
   function removeFromOverlayStack() {
     // Remove the overlay from $overlayStack
-    const overlay = _Arr.find(
-      $overlayStack,
-      overlay => overlay.id === IDs.overlay
-    );
+    const overlay = $overlayStack.find(overlay => overlay.id === IDs.overlay);
     $overlayStack = _Arr.remove($overlayStack, overlay);
   }
 
@@ -209,8 +207,12 @@
   $: {
     if (open) {
       openWithOverlay();
+      hideCta();
     } else {
       removeFromOverlayStack();
+      if(open === false) {
+        showCta();
+      }
     }
   }
 
@@ -525,7 +527,3 @@
     </div>
   {/if}
 </div>
-
-{#if open}
-  <CTA show={false} />
-{/if}

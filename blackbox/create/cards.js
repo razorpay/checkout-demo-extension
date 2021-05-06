@@ -8,6 +8,8 @@ const {
   submit,
   handleValidationRequest,
   handleMockSuccessDialog,
+  selectCurrencyAndVerifyAmount,
+  expectDCCParametersInRequest,
   expectRedirectWithCallback,
 
   // Card Payment
@@ -67,6 +69,7 @@ module.exports = function(testFeatures) {
     optionalContact,
     optionalEmail,
     recurringOrder,
+    dcc,
   } = features;
 
   describe.each(
@@ -120,7 +123,16 @@ module.exports = function(testFeatures) {
 
       await enterCardDetails(context, {
         recurring: !!recurringOrder,
+        dcc,
       });
+
+      if (dcc) {
+        await selectCurrencyAndVerifyAmount(context);
+        await submit(context);
+        await expectDCCParametersInRequest(context);
+
+        return;
+      }
 
       if (!feeBearer && offers) {
         await viewOffers(context);
@@ -140,6 +152,10 @@ module.exports = function(testFeatures) {
 
       if (partialPayment) {
         await verifyPartialAmount(context, '₹ 100');
+      }
+
+      if(options.currency === 'USD') {
+        await verifyFooterText(context, 'Pay $ 2');
       }
 
       await submit(context);

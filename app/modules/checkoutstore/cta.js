@@ -1,4 +1,4 @@
-import { writable, derived } from 'svelte/store';
+import { writable, derived, get } from 'svelte/store';
 import { getSession } from 'sessionmanager';
 import { displayAmount } from 'common/currency';
 import { isCardValidForOffer } from 'checkoutstore/offers';
@@ -134,9 +134,26 @@ export function showAmountInCta() {
       setView(CtaViews.PAY, false);
     } else {
       const offer = session.getAppliedOffer();
-      const amount = (offer && offer.amount) || session.get('amount');
+      let amount = (offer && offer.amount) || session.get('amount');
+
+      if((offer && offer.payment_method === 'card') && !get(isCardValidForOffer)) {
+        /**
+         * invalid card offer use original amount
+         */
+        amount = session.get('amount');
+      }
+      let currency = session.get('currency') || 'INR';
+      if (offer && session.dccPayload) {
+        /** value of dccPayload set via DynamicCurrencyView.svelte */
+        if(session.dccPayload.enable && session.dccPayload.currency) {
+          currency = session.dccPayload.currency;
+        }
+        if(session.dccPayload.enable && session.dccPayload.currencyPayload && session.dccPayload.currencyPayload.all_currencies) {
+          amount = session.dccPayload.currencyPayload.all_currencies[currency].amount;
+        }
+      }
       setView(CtaViews.AMOUNT, false, {
-        amount: displayAmount(session.r, amount),
+        amount: displayAmount(session.r, amount, currency),
       });
     }
   }

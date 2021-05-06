@@ -25,6 +25,7 @@ describe('Basic upi payment', () => {
       amount: 200,
       personalization: false,
     };
+    const appWithDowntime = 'bhim';
     const preferences = makePreferences({
       payment_downtime: {
         entity: 'collection',
@@ -39,7 +40,7 @@ describe('Basic upi payment', () => {
             status: 'started',
             scheduled: false,
             severity: 'low',
-            instrument: { vpa_handle: 'ALL' },
+            instrument: { psp: appWithDowntime },
             created_at: 1567686387,
             updated_at: 1567686387,
           },
@@ -59,9 +60,9 @@ describe('Basic upi payment', () => {
     await assertUserDetails(context);
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'upi');
-    await verifyMethodWarned(context, 'UPI', 'upi');
-    await selectUPIApp(context, '1');
+    await selectPaymentMethod(context, 'upi'); 
+    await selectUPIApp(context, '1', appWithDowntime);
+    await verifyMethodWarned(context, 'upi', 'psp', appWithDowntime);
     await submit(context);
     await respondAndVerifyIntentRequest(context);
   });

@@ -32,7 +32,7 @@ import {
 
 import { checkForPossibleWebPaymentsForUpi } from 'checkoutframe/components/upi';
 import { setCREDEligibilityFromPreferences } from 'checkoutframe/cred';
-import { rewards, rewardIds } from 'checkoutstore/rewards';
+import { reward } from 'checkoutstore/rewards';
 import updateScore from 'analytics/checkoutScore';
 import { isBraveBrowser } from 'common/useragent';
 
@@ -266,11 +266,15 @@ function fetchRewards(session) {
     rewardsRes => {
       session.rewardsCall = null;
       if (!rewardsRes.error) {
-        const reward_ids = rewardsRes.map(item => item.reward_id);
-        rewards.set(rewardsRes);
-        rewardIds.set(reward_ids);
-        if (reward_ids && reward_ids.length > 0) {
-          Analytics.setMeta('reward_ids', reward_ids);
+        const rewardObj = rewardsRes[0];
+        if (rewardObj) {
+          const { reward_id, variant = false } = rewardObj;
+          if (reward_id) {
+            reward.set(rewardObj);
+            Analytics.setMeta('reward_ids', reward_id);
+          }
+          // Exp variation, true if the particular checkout falls under the experiment, false if checkout is not part of that experiment
+          Analytics.setMeta('reward_exp_variant', variant);
         }
       }
     }
@@ -449,7 +453,12 @@ function updateEmandatePrefill() {
 
 function updateAnalytics(preferences) {
   Analytics.setMeta('features', preferences.features);
-  Analytics.setMeta('merchant_id', preferences.merchant_id);
+  if (preferences && preferences.merchant_id) {
+    Analytics.setMeta('merchant_id', preferences.merchant_id);
+  }
+  if (preferences && preferences.merchant_key) {
+    Analytics.setMeta('merchant_key', preferences.merchant_key);
+  }
   // Set optional fields in meta
   const optionalFields = preferences.optional;
   if (optionalFields |> _.isArray) {

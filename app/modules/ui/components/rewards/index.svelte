@@ -1,49 +1,56 @@
 <script>
   // UI imports
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
-  import RewardCard from './RewardCard.svelte';
-  import Carousel from 'ui/components/carousel/index.svelte';
+  import RewardCard from 'ui/components/rewards/RewardCard.svelte';
+  import { formatTemplateWithLocale } from 'i18n';
 
   //store
-  import { rewards } from 'checkoutstore/rewards';
+  import { reward } from 'checkoutstore/rewards';
 
-  //utils
-  import { isMobile } from 'common/useragent';
+  let { brand_name } = $reward;
 
   // i18n
-  import { t } from 'svelte-i18n';
-  import {
-    REWARDS_HEADER,
-    REWARDS_SUB_TEXT,
-    REWARDS_CLOSE,
-  } from 'ui/labels/rewards';
+  import { t, locale } from 'svelte-i18n';
+  import { REWARDS_HEADER, REWARDS_CLOSE } from 'ui/labels/rewards';
 
   //props
   export let onClick;
 </script>
 
+<div class="rewards-wrapper">
+  <div class="rewards-header">
+    <FormattedText
+      text={formatTemplateWithLocale(
+        REWARDS_HEADER,
+        { brandName: brand_name },
+        $locale
+      )}
+    />
+  </div>
+  <RewardCard {...$reward} />
+  <div class="rewards-divider" />
+  <div class="rewards-close" on:click={onClick}>{$t(REWARDS_CLOSE)}</div>
+</div>
+
 <style>
   .rewards-wrapper {
     white-space: normal;
+    position: relative;
+    background: url('https://cdn.razorpay.com/checkout/rewards_bg.svg');
+    background-position-y: -60px;
+    background-repeat: no-repeat;
+    background-position-x: -50px;
+    background-size: 400px 400px;
   }
   .rewards-header {
     line-height: 1.4;
-    font-size: 17px;
+    font-size: 16px;
     margin-bottom: 24px;
+    color: #757575;
   }
-  .rewards-subtext {
-    font-size: 14px;
-    color: rgba(81, 89, 120, 0.7);
-    margin-top: 16px;
-    margin-bottom: 24px;
-  }
-  .rewards-list {
-    display: flex;
-    justify-content: space-around;
-    position: relative;
-  }
-  :global(.mobile) .rewards-list {
-    display: block;
+  :global(.rewards-header strong) {
+    font-weight: normal;
+    color: #363636;
   }
   .rewards-divider {
     border: 1px solid rgba(0, 0, 0, 0.04);
@@ -53,58 +60,14 @@
     color: #3f71d7;
     margin-top: 20px;
     cursor: pointer;
-  }
-  .rewards-triangle {
-    border: 0px solid #fff;
-    border-left-width: 12px;
-    border-right-width: 12px;
-    border-top-width: 12px;
-    border-bottom-width: 12px;
-    border-top-color: transparent;
-    border-left-color: transparent;
-    border-right-color: transparent;
-    width: 0px;
-    height: 0px;
-    position: absolute;
-    right: 28px;
-    top: -24px;
+    text-align: left;
   }
   :global(.mobile) .rewards-header {
     margin-bottom: 24px;
-  }
-  :global(.mobile) .rewards-subtext {
-    margin-top: 30px;
-    margin-bottom: 30px;
   }
   :global(.mobile) .rewards-wrapper {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
   }
-  :global(.mobile) .rewards-triangle {
-    display: none;
-  }
 </style>
-
-<div class="rewards-wrapper">
-  <div class="rewards-triangle" />
-  <div class="rewards-header">
-    <FormattedText text={$t(REWARDS_HEADER)} />
-  </div>
-  <div class="rewards-list">
-    {#if isMobile()}
-      <Carousel items={$rewards}>
-        {#each $rewards as rew}
-          <RewardCard {...rew} />
-        {/each}
-      </Carousel>
-    {:else}
-      {#each $rewards as rew}
-        <RewardCard {...rew} />
-      {/each}
-    {/if}
-  </div>
-  <div class="rewards-subtext">{$t(REWARDS_SUB_TEXT)}</div>
-  <div class="rewards-divider" />
-  <div class="rewards-close" on:click={onClick}>{$t(REWARDS_CLOSE)}</div>
-</div>

@@ -7,6 +7,7 @@
   import CvvField from 'ui/elements/fields/card/CvvField.svelte';
   import CardFlowSelectionRadio from 'ui/elements/CardFlowSelectionRadio.svelte';
   import NameField from 'ui/elements/fields/card/NameField.svelte';
+  import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
 
   // Svelte imports
   import { createEventDispatcher } from 'svelte';
@@ -73,9 +74,10 @@
   let expiryField = null;
   let nameField = null;
   let cvvField = null;
-
   const nameReadonly = isNameReadOnly();
-
+  export let downtimeVisible;
+  export let downtimeSeverity;
+  export let downtimeInstrument;
   const isSavedCardsEnabled = shouldRememberCustomer();
 
   const showRememberCardCheck = isSavedCardsEnabled;
@@ -212,7 +214,6 @@
     const value = $cardNumber;
     const _cardNumber = getCardDigits(value);
     const iin = getIin(_cardNumber);
-
     if (iin.length < 6) {
       setDebitPinRadiosVisibility(false);
       setCardNumberValidity(validateCardNumber());
@@ -472,6 +473,9 @@
   .faded {
     opacity: 0.5;
   }
+  .downtime-cards {
+    margin-top: 16px;
+  }
 </style>
 
 <div class="pad" id="add-card-container" class:faded>
@@ -527,6 +531,11 @@
       </div>
     {/if}
   </div>
+  {#if downtimeVisible}
+    <div class="downtime-cards">
+      <DowntimeCallout showIcon={true} severe={downtimeSeverity} {downtimeInstrument} />
+    </div>
+  {/if}
   <div class="row remember-check">
     <div>
       {#if showRememberCardCheck}

@@ -4,6 +4,8 @@
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import Icon from 'ui/elements/Icon.svelte';
+  import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
+  import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
 
   // Utils imports
   import { findCodeByNetworkName } from 'common/card';
@@ -25,10 +27,12 @@
   } from 'i18n';
 
   import { locale } from 'svelte-i18n';
-
   // Props
   export let instrument = {};
   export let name = 'instrument';
+
+  let downtimeSeverity;
+  let downtimeInstrument = '';
 
   let individualInstrument = getExtendedSingleInstrument(instrument);
   $: individualInstrument = getExtendedSingleInstrument(instrument);
@@ -129,6 +133,15 @@
   let selected = false;
   $: selected = cardKnown && $selectedInstrumentId === instrument.id;
 
+  $: {
+    if (selected) {
+      downtimeSeverity = instrument.downtimeSeverity;
+      downtimeInstrument = instrument.downtimeInstrument;
+    } else {
+      downtimeSeverity = false;
+    }
+  }
+
   function selectionHandler() {
     if (hasCvv) {
       setTimeout(() => {
@@ -163,6 +176,15 @@
     letter-spacing: -3px;
     font-family: rzpcvv;
   }
+  .downtime-saved-card {
+    margin-top: 4px;
+  }
+  .downtime-saved-card-icon {
+    margin-right: 8px;
+  }
+  .slots-extra {
+    display: flex;
+  }
 </style>
 
 <svelte:component
@@ -179,8 +201,12 @@
     <Icon {icon} alt="" />
   </i>
   <div slot="title">{title}</div>
-
-  <div slot="extra">
+  <div slot="extra" class="slots-extra">
+    {#if !!downtimeSeverity}
+      <div class="downtime-saved-card-icon">
+        <DowntimeIcon severe={downtimeSeverity} />
+      </div>
+    {/if}
     {#if hasCvv}
       <Field
         type="cvv"
@@ -191,5 +217,10 @@
         tabindex={-1}
         formatter={{ type: 'number' }} />
     {:else}<span class="theme-highlight-color">&#xe604;</span>{/if}
+  </div>
+  <div slot="downtime" class="downtime-saved-card">
+    {#if !!downtimeSeverity}
+      <DowntimeCallout showIcon={false} severe={downtimeSeverity} { downtimeInstrument } />
+    {/if}
   </div>
 </svelte:component>

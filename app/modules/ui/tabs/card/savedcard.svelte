@@ -30,12 +30,13 @@
     AVAILABLE_ACTION,
   } from 'ui/labels/emi';
   import { TITLE_GENERIC } from 'ui/labels/methods';
-
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
 
   // UI imports
   import Radio from 'ui/elements/Radio.svelte';
   import CvvField from 'ui/elements/fields/card/CvvField.svelte';
+  import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
+  import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
 
   // Props
   export let card;
@@ -45,6 +46,7 @@
   export let cvvDigits;
   export let selected;
   export let tab;
+  let { downtimeSeverity, downtimeInstrument } = card;
 
   // Computed
   let attributes;
@@ -109,7 +111,6 @@
 
   function handleClick() {
     const payload = { cvv: cvvValue };
-
     // Focus on next tick because the CVV field might not have rendered right now.
     tick().then(_ => {
       if (cvvInput) {
@@ -124,6 +125,16 @@
     dispatch('click', payload);
   }
 </script>
+
+<style>
+  .downtime-saved-cards {
+    margin-bottom: 8px;
+  }
+  .downtime-saved-cards-icon {
+    margin-right: 8px;
+    margin-top: 2px;
+  }
+</style>
 
 <div
   class="saved-card"
@@ -142,6 +153,11 @@
       <FormattedText
         text={formatTemplateWithLocale(SAVED_CARD_LABEL, { last4: card.last4 }, $locale)} />
     </div>
+    {#if !!downtimeSeverity && selected}
+      <div class="downtime-saved-cards-icon">
+        <DowntimeIcon severe={downtimeSeverity} />
+      </div>
+    {/if}
     <div class="saved-cvv">
       {#if showCvv}
         <CvvField
@@ -223,6 +239,11 @@
             on:change={handleAuthRadioChanged} />
         </div>
       {/if}
+    </div>
+  {/if}
+  {#if !!downtimeSeverity && selected}
+    <div class="downtime-saved-cards">
+      <DowntimeCallout showIcon={false} severe={downtimeSeverity} { downtimeInstrument } />
     </div>
   {/if}
 </div>

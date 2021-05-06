@@ -16,6 +16,9 @@ import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { hashFnv32a } from 'checkoutframe/personalization/utils';
 import { isMethodUsable } from 'checkoutstore/methods';
+import { getDowntimes } from 'checkoutstore';
+import { checkDowntime } from 'checkoutframe/downtimes';
+import { getAppFromPackageName } from 'common/upi'
 
 function generateBasePreferredBlock(preferred) {
   const preferredBlock = createBlock('rzp.preferred', {
@@ -304,10 +307,11 @@ export function setBlocks(
     allBlocks,
     block => _Obj.getSafely(block, 'instruments', []).length > 0
   );
-
+  
   // Add an ID to all instruments
   _Arr.loop(allBlocks, (block, blockIndex) => {
     _Arr.loop(block.instruments, (instrument, instrumentIndex) => {
+      addDowntimeToBlock(instrument)
       if (!instrument.id) {
         instrument.id = generateInstrumentId(
           customer,
@@ -427,4 +431,85 @@ export function getInstrumentMeta(instrument) {
   }
 
   return meta;
+}
+
+function addDowntimeToBlock(block) {
+  const downtimes = getDowntimes();
+  let downtimeSeverity = '';
+  let downtimeInstrument = '';
+  switch (block.method) {
+    case 'netbanking':
+      if(!block.banks || block.banks.length === 0) {
+        return block
+      }
+      downtimeSeverity = checkDowntime(
+        downtimes.netbanking,
+        'bank',
+        block.banks[0]
+      );
+      downtimeInstrument = block.banks[0];
+      break;
+    case 'upi':
+      if(block.apps && block.apps.length > 0) {
+        const appName = getAppFromPackageName(block.apps[0]).shortcode;
+        downtimeSeverity = checkDowntime(
+          downtimes.upi,
+          'psp',
+          appName
+        );
+        downtimeInstrument = appName;
+      } else {
+        downtimeSeverity = checkDowntime(
+          downtimes.upi,
+          'vpa_handle',
+          block.vpas && block.vpas[0]?.split('@')[1]
+        );
+        downtimeInstrument = block.vpas && block.vpas[0]?.split('@')[1];
+      }
+      break;
+    case 'card':
+      const downtimesArr = ['low', 'medium', 'high'];
+      let issuerDowntime;
+      let networkDowntime
+      if(block.issuers && block.issuers.length > 0){
+        issuerDowntime = checkDowntime(
+          downtimes.cards,
+          'issuer',
+          block.issuers[0]
+        );
+      }
+      if(block.networks && block.networks.length > 0){
+        networkDowntime = checkDowntime(
+          downtimes.cards,
+          'network',
+          block.networks[0]
+        );
+      }
+      if(!issuerDowntime && !networkDowntime) {
+        return block
+      }
+      if (issuerDowntime && networkDowntime) {
+        if (
+          downtimesArr.indexOf(networkDowntime) >=
+          downtimesArr.indexOf(issuerDowntime)
+        ) {
+          downtimeSeverity = networkDowntime;
+          downtimeInstrument = block.networks[0];
+        } else {
+          downtimeSeverity = issuerDowntime;
+          downtimeInstrument = block.issuers[0];
+        }
+      } else {
+        downtimeSeverity = issuerDowntime || networkDowntime;
+        downtimeInstrument = issuerDowntime
+          ? block.issuers[0]
+          : block.networks[0];
+      }
+      break;
+  }
+  if (downtimeSeverity) {
+    block.downtimeSeverity = downtimeSeverity;
+    block.downtimeInstrument = downtimeInstrument;
+  }
+  return block;
 }

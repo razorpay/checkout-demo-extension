@@ -110,12 +110,37 @@ async function enterCardDetails(
     emi = true,
     issuer = null,
     type = 'credit',
+    dcc = false,
   } = {}
 ) {
   const visa = cardType === 'VISA';
   const bepg = nativeOtp && cardType === 'RUPAY';
 
   let cardNumber = '376939393939397';
+
+  async function respondToIin(context) {
+    await context.expectRequest(req => {});
+
+    const response = { http_status_code: 200 };
+    const flows = {
+      recurring,
+      iframe: true,
+    };
+
+    if (nativeOtp) {
+      flows.otp = true;
+    }
+
+    if (emi) {
+      flows.emi = true;
+      response.issuer = issuer;
+      response.type = type;
+    }
+
+    response.flows = flows;
+
+    await context.respondJSONP(response);
+  }
 
   if (visa) {
     cardNumber = '4111111111111111';
@@ -124,28 +149,8 @@ async function enterCardDetails(
   }
 
   await context.page.type('#card_number', cardNumber);
-
-  await context.expectRequest(req => {});
-
-  const response = { http_status_code: 200 };
-  const flows = {
-    recurring,
-    iframe: true,
-  };
-
-  if (nativeOtp) {
-    flows.otp = true;
-  }
-
-  if (emi) {
-    flows.emi = true;
-    response.issuer = issuer;
-    response.type = type;
-  }
-
-  response.flows = flows;
-
-  await context.respondJSONP(response);
+  await context.getRequest(`/v1/payment/iin`);
+  await respondToIin(context);
 
   await context.page.type('#card_expiry', '12/55');
   await context.page.type('#card_name', 'SakshiJain');
@@ -280,6 +285,7 @@ const getDisplayAmount = currencyConfig => {
 };
 
 async function respondCurrencies(context) {
+  await context.getRequest(`/v1/payment/flows`);
   const req = await context.expectRequest();
   expect(req.url).toContain('/flows');
   expect(req.params).toHaveProperty('amount');

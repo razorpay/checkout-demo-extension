@@ -118,7 +118,6 @@ gulp.task('uglify', done => {
         pure_funcs: [
           'console.log',
           'console.info',
-          'console.warn',
           'console.error',
           'console.time',
           'console.timeEnd',

@@ -71,6 +71,10 @@ const DEBIT_EMI_BANKS = ['HDFC_DC'];
 const ALL_METHODS = {
   card() {
     if (getAmount() && getOption('method.card')) {
+      if (isASubscription()) {
+        return isASubscription('card') && getRecurringMethods()?.card;
+      }
+
       if (isRecurring()) {
         return getRecurringMethods()?.card;
       }

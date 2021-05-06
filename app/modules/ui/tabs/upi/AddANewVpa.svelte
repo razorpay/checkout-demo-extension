@@ -2,7 +2,8 @@
   // Svelte imports
   import { onMount, createEventDispatcher } from 'svelte';
   import { slide } from 'svelte/transition';
-  import { _ as t } from 'svelte-i18n';
+  import { _ as t, locale } from 'svelte-i18n';
+  import { formatTemplateWithLocale } from 'i18n';
 
   // UI Imports
   import Field from 'ui/components/Field.svelte';
@@ -10,6 +11,8 @@
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import Checkbox from 'ui/elements/Checkbox.svelte';
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
+  import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
+  import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
 
   // Util imports
   import { getSession } from 'sessionmanager';
@@ -18,7 +21,9 @@
     getPrefilledVPA,
     getPrefilledName,
     shouldRememberCustomer,
+    getDowntimes,
   } from 'checkoutstore';
+  import { checkDowntime } from 'checkoutframe/downtimes';
   import { VPA_REGEX } from 'common/constants';
   import { getAnimationOptions } from 'svelte-utils';
 
@@ -31,6 +36,7 @@
     NEW_VPA_SUBTITLE,
     NEW_VPA_SUBTITLE_UPI_OTM,
   } from 'ui/labels/upi';
+  import { DOWNTIME_CALLOUT } from 'ui/labels/callouts';
   import { phone } from 'checkoutstore/screens/home';
   import { suggestionVPA } from 'common/upi';
 
@@ -57,6 +63,10 @@
   let newVpa = getPrefilledVPA();
   let vpa;
   let pspHandle;
+  export let downtimeSeverity = '';
+  export let downtimeInstrument = '';
+
+  let upiDowntimes = getDowntimes().upi;
 
   function isVpaValid(vpa) {
     return VPA_REGEX.test(vpa);
@@ -68,7 +78,31 @@
     }
   });
 
+  function checkAndAddDowntime() {
+    if(!vpa){
+      downtimeSeverity = false;
+      return;
+    }
+    const vpaEntered = vpa.split('@')[1];
+    if (vpaEntered) {
+      const currentDowntime = checkDowntime(
+        upiDowntimes,
+        'vpa_handle',
+        vpaEntered
+      );
+      if (currentDowntime) {
+        downtimeSeverity = currentDowntime;
+        downtimeInstrument = vpaEntered;
+      } else {
+        downtimeSeverity = false;
+      }
+    } else {
+      downtimeSeverity = false;
+    }
+  }
+
   function handleVpaInput() {
+    checkAndAddDowntime();
     if (isVpaValid(vpa) || !pspHandle) {
       value = vpa;
     } else {
@@ -141,12 +175,22 @@
     line-height: 16px;
     color: rgba(81, 89, 120, 0.7);
   }
+
+  .downtime-upi {
+    margin-top: 8px;
+  }
+  .downtime-upi-icon {
+    position: absolute;
+    right: 20px;
+  }
 </style>
 
+<!-- as="div" sent because in IE insider button we cannot add any other on:click action -->
 <SlottedRadioOption
   name={'upi-vpa-input-' + paymentMethod}
   value="full"
   align="top"
+  as="div" 
   overflow
   on:click
   on:click={focusAfterTimeout}
@@ -233,5 +277,10 @@
         {/if}
       </div>
     {/if}
+  </div>
+  <div slot="downtime" class="downtime-upi">
+    {#if selected && !!downtimeSeverity}
+      <DowntimeCallout showIcon={true} severe={downtimeSeverity} {downtimeInstrument} />
+      {/if}
   </div>
 </SlottedRadioOption>

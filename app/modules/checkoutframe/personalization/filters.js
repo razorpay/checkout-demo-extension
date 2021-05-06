@@ -1,10 +1,6 @@
 import { VPA_REGEX } from 'common/constants';
 import { doesAppExist } from 'common/upi';
-import {
-  getDowntimes,
-  isASubscription,
-  shouldRememberCustomer,
-} from 'checkoutstore';
+import { shouldRememberCustomer } from 'checkoutstore';
 import {
   isCreditCardEnabled,
   isDebitCardEnabled,
@@ -189,39 +185,6 @@ export function filterFalsyInstruments(instruments) {
 }
 
 /**
- * Filters out instruments before listing down instruments for display
- *
- * @param  {Array} instruments is the list of instruments to be filtered.
- * @return {Array} filtered our instruments
- */
-export function filterInstrumentsForDowntime(instruments) {
-  const {
-    high: {
-      methods: methodsWithHighDowntime = [],
-      banks: banksWithHighDowntime = [],
-    },
-  } = getDowntimes();
-
-  return _Arr.filter(instruments, instrument => {
-    // Remove instruments for which there is a high severity downtime
-    if (_Arr.contains(methodsWithHighDowntime, instrument.method)) {
-      return false;
-    }
-
-    switch (instrument.method) {
-      case 'netbanking':
-        // If the instrument is netbanking, remove it if it has a severe downtime
-        if (_Arr.contains(banksWithHighDowntime, instrument.bank)) {
-          return false;
-        }
-        break;
-    }
-
-    return true;
-  });
-}
-
-/**
  * Returns the list of instruments filtered for available UPI apps
  * @param {Array} instruments List of instruments
  * @param {Array} apps List of UPI apps
@@ -266,6 +229,5 @@ export function filterInstruments({ instruments, upiApps = [], customer }) {
     |> filterInstrumentsForAvailableMethods({ customer })
     |> filterInstrumentsByAvailableUpiApps(upiApps)
     |> filterInstrumentsForSanity
-    |> filterInstrumentsForDowntime
   );
 }

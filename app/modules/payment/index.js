@@ -6,22 +6,18 @@ import {
 
 import * as cookie from 'lib/cookie';
 import * as Color from 'lib/color';
-import * as strings from 'common/strings';
 
 import Track from 'tracker';
 import popupTemplate from 'payment/popup/template';
 import Popup from 'payment/popup';
-import Redir from 'payment/redir';
 import Iframe from 'payment/iframe';
 import { formatPayment, formatPayload } from 'payment/validator';
-import { formatAmountWithSymbol } from 'common/currency';
 import { FormatDelegator } from 'formatter';
 import Razorpay, { makeAuthUrl, makeUrl } from 'common/Razorpay';
 import RazorpayConfig from 'common/RazorpayConfig';
-import { internetExplorer, ajaxRouteNotSupported } from 'common/useragent';
+import { ajaxRouteNotSupported } from 'common/useragent';
 import { isPowerWallet } from 'common/wallet';
 import { checkPaymentAdapter } from 'payment/adapters';
-import * as GPay from 'gpay';
 import Analytics from 'analytics';
 import { isProviderHeadless } from 'common/cardlessemi';
 import { updateCurrencies, setCurrenciesRate } from 'common/currency';
@@ -32,7 +28,7 @@ import {
 } from 'common/upi';
 import { getCardEntityFromPayload, getCardFeatures } from 'common/card';
 
-import { getCurrentLocale, translatePaymentPopup as t } from 'i18n/popup';
+import { translatePaymentPopup as t } from 'i18n/popup';
 import updateScore from 'analytics/checkoutScore';
 
 /**
@@ -147,9 +143,14 @@ function trackNewPayment(data, params, r) {
 
   updateScore('timeToSubmit');
 
+  var trackingData = getTrackingData(data);
+  if(params.downtimeSeverity) {
+    trackingData.downtimeSeverity = params.downtimeSeverity;
+  }
+
   Analytics.track('submit', {
     data: {
-      data: getTrackingData(data),
+      data: trackingData,
       params: params,
       count: createdPaymentsCount,
     },
@@ -1055,7 +1056,8 @@ var CardCurrencyCache = {};
  * @param {Function} callback
  */
 razorpayProto.getCardFlows = function(cardNumber = '', callback = _Func.noop) {
-  getCardFeatures.bind(this)(cardNumber)
+  getCardFeatures
+    .bind(this)(cardNumber)
     .then(({ flows = {} }) => {
       callback(flows);
     })

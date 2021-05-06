@@ -3,7 +3,7 @@ function makeOptions(features, options) {
 }
 
 function makePreferences(features, preferences) {
-  const { downtimeHigh, downtimeLow, offers } = features;
+  const { downtimeHigh, downtimeLow, offers, showDonation } = features;
 
   if (downtimeHigh) {
     preferences.payment_downtime = {
@@ -19,7 +19,7 @@ function makePreferences(features, preferences) {
           status: 'started',
           scheduled: false,
           severity: 'high',
-          instrument: { vpa_handle: 'ALL' },
+          instrument: { vpa_handle: 'okhdfcbank' },
           created_at: 1567686387,
           updated_at: 1567686387,
         },
@@ -41,7 +41,7 @@ function makePreferences(features, preferences) {
           status: 'started',
           scheduled: false,
           severity: 'low',
-          instrument: { vpa_handle: 'ALL' },
+          instrument: { vpa_handle: 'okhdfcbank' },
           created_at: 1567686387,
           updated_at: 1567686387,
         },
@@ -76,6 +76,10 @@ function makePreferences(features, preferences) {
         display_text: 'UPI Offer Display Text 3',
       },
     ];
+  }
+
+  if (showDonation) {
+    preferences.show_donation = true;
   }
 
   return preferences;

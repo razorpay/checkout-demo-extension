@@ -17,9 +17,19 @@
       img: 'ICIC',
     },
     {
+      name: 'HDFC Bank',
+      id: 'hdfc',
+      img: 'HDFC',
+    },
+    {
       name: 'SBI Bank',
       id: 'sbi',
       img: 'SBIN',
+    },
+    {
+      name: 'AXIS Bank',
+      id: 'axis',
+      img: 'UTIB',
     },
   ];
 </script>

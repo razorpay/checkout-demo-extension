@@ -22,20 +22,22 @@
 
   const session = getSession();
   const icons = session.themeMeta.icons;
+  let snackBar;
+  let shown = true;
 
   onMount(() => {
     Analytics.track('rewards:icon:show', {
       type: AnalyticsTypes.RENDER,
     });
     setTimeout(() => {
-      new Snackbar({
+      snackBar = new Snackbar({
         target: document.getElementsByClassName('screen-comp')[0],
         props: {
           align: 'bottom',
           parentElem: 'rewards-cta',
-          shown: true,
+          shown,
           timer: 5000,
-          text: $t(REWARDS_TOOLTIP_TEXT),
+          text: $t(REWARDS_TOOLTIP_TEXT)
         },
       });
     }, 1000);
@@ -45,6 +47,10 @@
     Analytics.track('rewards:icon:click', {
       type: AnalyticsTypes.BEHAV,
     });
+    shown = false;
+    if(snackBar) {
+      snackBar.removeSnackBar();
+    }
     session.svelteOverlay.$$set({
       component: Rewards,
       props: {
@@ -60,7 +66,8 @@
 
 <style>
   :global(#rewards-cta) {
-    width: 56px;
+    width: 50px;
+    padding: 12px 20px 12px 11px;
   }
   i.rewards-icon {
     width: 27px;

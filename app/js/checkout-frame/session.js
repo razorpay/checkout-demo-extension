@@ -50,7 +50,8 @@ var preferences,
   FeeLabel = discreet.FeeLabel,
   rewardsStore = discreet.rewardsStore,
   BlockedDeactivatedMerchant = discreet.BlockedDeactivatedMerchant,
-  updateScore = discreet.updateScore;
+  updateScore = discreet.updateScore,
+  CovidDonationView = discreet.CovidDonations;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -240,6 +241,18 @@ function hideEmi() {
   return wasShown;
 }
 
+function hideDowntimeAlert() {
+  var downtimeWrap = $('#downtime-wrap');
+  if (!downtimeWrap || !downtimeWrap[0]) {
+    return false;
+  }
+  var wasShown = downtimeWrap.hasClass(shownClass);
+  if (wasShown) {
+    hideOverlay(downtimeWrap);
+  }
+  return wasShown;
+}
+
 function hideFeeWrap() {
   var feeWrap = $('#fee-wrap');
   var wasShown = feeWrap.hasClass(shownClass);
@@ -252,7 +265,12 @@ function hideFeeWrap() {
 function hideOverlayMessage() {
   var session = SessionManager.getSession();
   session.preventErrorDismissal = false;
-  if (!hideEmi() && !hideFeeWrap() && !session.hideSvelteOverlay()) {
+  if (
+    !hideEmi() &&
+    !hideFeeWrap() &&
+    !hideDowntimeAlert() &&
+    !session.hideSvelteOverlay()
+  ) {
     if (session.tab === 'nach') {
       if (!session.nachScreen.shouldHideOverlay()) {
         return;
@@ -621,8 +639,18 @@ function successHandler(response) {
   this.modal.options.onhide = noop;
 
   // sending oncomplete event because CheckoutBridge.oncomplete
-  Razorpay.sendMessage({ event: 'complete', data: response });
-  this.hide();
+
+  function completeCheckoutFlow() {
+    Razorpay.sendMessage({ event: 'complete', data: response });
+    this.hide();
+  }
+  hideOverlayMessage();
+  if (this.preferences.show_donation) {
+    new CovidDonationView.render(completeCheckoutFlow.bind(this));
+  } else {
+    completeCheckoutFlow.call(this);
+  }
+  showOverlay(this.getCovidDonationDialog());
 }
 
 function cancel_upi(session) {
@@ -1677,7 +1705,7 @@ Session.prototype = {
           if (Confirm.isVisible()) {
             return;
           }
-
+          session.r.emit('backDropClicked');
           session.hideErrorMessage(e);
         },
       },
@@ -2352,6 +2380,13 @@ Session.prototype = {
         this.topBar.setTab(tabForTitle);
       }
     }
+    /**
+     * onShown is different from tabVisible. As in case of card onShown trigger even we are asking for saved card OTP.
+     * tabVisible will trigger on actual tab shown only.
+     */
+    if (screen === 'card' && this.svelteCardTab) {
+      this.svelteCardTab.setTabVisible(true);
+    }
 
     if (screen !== 'otp') {
       this.headless = false;
@@ -2388,13 +2423,15 @@ Session.prototype = {
       from: this.screen,
       to: screen,
     };
-    if (this.screen === 'otp' && screen !== 'otp') {
-      Store.showFeeLabel.set(false);
-    }
 
-    if (this.screen !== 'otp' && screen === 'otp') {
-      Store.showFeeLabel.set(true);
-    }
+    // removed causing issue during OTP screen & non OTP screen
+    // if (this.screen === 'otp' && (screen !== 'otp' && screen !== 'card')) {
+    //   Store.showFeeLabel.set(false);
+    // }
+
+    // if (this.screen !== 'otp' && screen === 'otp') {
+    //   Store.showFeeLabel.set(true);
+    // }
 
     if (extraProps) {
       trackingData = _Obj.extend(trackingData, extraProps);
@@ -2571,20 +2608,43 @@ Session.prototype = {
       session._trySelectingOfferInstrument(offer);
     }, 300);
   },
-
   /**
    * Show the discount amount.
    */
   handleDiscount: function() {
     var offer = this.getAppliedOffer();
     var hasDiscount = offer && offer.amount !== offer.original_amount;
+    var currency = this.get('currency') || 'INR';
+    var amount;
+    if (offer) {
+      amount = offer.amount;
+    }
+    if (this.dccPayload) {
+      /** value of dccPayload set via DynamicCurrencyView.svelte */
+      if (this.dccPayload.enable && this.dccPayload.currency) {
+        currency = this.dccPayload.currency;
+      }
+      /**
+       * check dcc amount we have it is for discounted amount
+       * as flow api may take time we can't show original amount we can show discount amount in INR
+       */
+      if (
+        this.dccPayload.enable &&
+        this.dccPayload.currencyPayload &&
+        this.dccPayload.currencyPayload.all_currencies &&
+        this.dccPayload.entityWithAmount.indexOf(amount) !== -1
+      ) {
+        amount = this.dccPayload.currencyPayload.all_currencies[currency]
+          .amount;
+      }
+    }
 
     // this.offers is undefined for forced offers
     if (hasDiscount && this.offers) {
       hasDiscount = this.offers.isCardApplicable();
     }
 
-    var hasDiscountAndFee = offer && Store.isCustomerFeeBearer();
+    var hasDiscountAndFee = offer && Store.isCustomerFeeBearer() && amount;
 
     if (hasDiscountAndFee) {
       $('#content').toggleClass('has-fee', hasDiscountAndFee);
@@ -2594,7 +2654,9 @@ Session.prototype = {
 
     $('#content').toggleClass('has-discount', hasDiscount);
     $('#amount .discount').html(
-      hasDiscount ? this.formatAmountWithCurrency(offer.amount) : ''
+      hasDiscount
+        ? discreet.Currency.formatAmountWithSymbol(amount, currency)
+        : ''
     );
     Cta.setAppropriateCtaText();
   },
@@ -3261,14 +3323,14 @@ Session.prototype = {
     // We need to show plans without no-cost EMI if the applied offer is an
     // EMI offer because No cost EMI cannot be applied with regular EMI offers.
     var plans = MethodStore.getEMIBankPlans(bank, 'credit', !isEmiOfferApplied);
-
+    var emiPlans = MethodStore.getEligiblePlansBasedOnMinAmount(plans);
     var prevTab = self.tab;
     var prevScreen = self.screen;
 
     self.emiPlansView.setPlans({
       type: 'bajaj',
       amount: amount,
-      plans: plans,
+      plans: emiPlans,
       bank: bank,
       on: {
         back: function() {
@@ -3593,6 +3655,14 @@ Session.prototype = {
     });
   },
 
+  getDowntimeAlertDialog: function() {
+    return $('#downtime-wrap');
+  },
+
+  getCovidDonationDialog: function() {
+    return $('#covid-wrap');
+  },
+
   setSvelteOverlay: function() {
     this.svelteOverlay = new discreet.Overlay({
       target: _Doc.querySelector('#modal-inner'),
@@ -3626,6 +3696,16 @@ Session.prototype = {
     var session = this;
     var data = session.payload;
     var isFeeMissing = !('fee' in data);
+    var feeBearerDiv = document.getElementsByClassName('fee-bearer');
+    var feeBearerBankTransferDiv = document.getElementsByClassName(
+      'fee-bearer-bank-transfer'
+    );
+    if (feeBearerBankTransferDiv.length > 0) {
+      feeBearerBankTransferDiv[0].style.display = 'none';
+    }
+    if (feeBearerDiv.length > 0) {
+      feeBearerDiv[0].removeAttribute('style');
+    }
 
     /**
      * Check here if 'fee' is set in payload,
@@ -4196,8 +4276,24 @@ Session.prototype = {
       this.showConversionChargesCallout();
       return;
     }
-
-    this.submit();
+    var payload = this.payload;
+    // checking if the method selected is from the preferred method or from the method screen as this.payload is null in preferred methods
+    if (
+      selectedInstrument &&
+      selectedInstrument.id &&
+      selectedInstrument.id.indexOf('rzp.cluster') === -1 &&
+      !payload.downtimeSeverity
+    ) {
+      payload = selectedInstrument;
+    }
+    this.downtimeSeverity = payload.downtimeSeverity;
+    var downtimeInstrument = discreet.downtimeUtils.checkForDowntime(payload);
+    if (!downtimeInstrument) {
+      this.submit();
+    } else {
+      discreet.downtimeUtils.showDowntimeAlert(downtimeInstrument);
+      showOverlay(this.getDowntimeAlertDialog());
+    }
   },
 
   getSelectedPaymentInstrument: function() {
@@ -4249,6 +4345,10 @@ Session.prototype = {
     }
     var vpaVerified = props.vpaVerified;
     var data = this.payload;
+    // deleting downtimeSeverity & downtimeInstrument from data & saving downtimeSeverity for analytics
+    delete data.downtimeSeverity;
+    delete data.downtimeInstrument;
+
     var goto_payment = '#error-message .link';
     var redirectableMethods = ['card', 'netbanking', 'wallet'];
     if (
@@ -4314,7 +4414,13 @@ Session.prototype = {
       optional: Store.getOptionalObject(),
       external: {},
       paused: this.get().paused,
+      downtimeSeverity: this.downtimeSeverity,
     };
+
+    var session_options = this.get();
+    if (session_options.force_terminal_id) {
+      data.force_terminal_id = session_options.force_terminal_id;
+    }
 
     if (!this.screen) {
       var selectedInstrument = this.getSelectedPaymentInstrument();
@@ -4454,9 +4560,9 @@ Session.prototype = {
     }
 
     // added rewardIds to the create payment request
-    var rewardIds = storeGetter(rewardsStore);
-    if (rewardIds && rewardIds.length > 0 && !Store.isEmailOptional()) {
-      data.reward_ids = rewardIds;
+    var reward = storeGetter(rewardsStore);
+    if (reward && reward.reward_id && !Store.isEmailOptional()) {
+      data.reward_ids = [reward.reward_id];
     }
 
     var appliedOffer = this.getAppliedOffer();

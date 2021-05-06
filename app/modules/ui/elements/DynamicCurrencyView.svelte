@@ -1,5 +1,5 @@
 <script>
-  import { onDestroy, tick } from 'svelte';
+  import { tick } from 'svelte';
 
   // Store
   import {
@@ -9,12 +9,12 @@
     dccCurrency,
   } from 'checkoutstore/screens/card';
 
-  import { amountAfterOffer } from 'checkoutstore/offers';
-
   import {
-    selectedInstrument,
-    selectedInstrumentId,
-  } from 'checkoutstore/screens/home';
+    amountAfterOffer,
+    appliedOffer
+  } from 'checkoutstore/offers';
+
+  import { selectedInstrument } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
 
@@ -34,7 +34,7 @@
     isPartialPayment,
   } from 'checkoutstore';
 
-  import { getIin, getCardDigits } from 'common/card';
+  import { getIin } from 'common/card';
 
   import { formatAmountWithSymbol } from 'common/currency';
 
@@ -42,7 +42,6 @@
   import Stack from 'ui/layouts/Stack.svelte';
   import Radio from 'ui/elements/Radio.svelte';
   import SearchModal from 'ui/elements/SearchModal.svelte';
-  import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
   import CurrencySearchItem from 'ui/elements/search-item/Currency.svelte';
 
   const TOP_CURRENCIES = ['USD', 'GBP', 'EUR'];
@@ -53,7 +52,6 @@
     HOME_SCREEN: 'home-screen',
   };
 
-  let currentEntity = null;
   let prop = null;
   let entity = null;
   let loading = true;
@@ -63,16 +61,40 @@
   let originalCurrency = getCurrency();
   let searchModalOpen = false;
   let entityWithAmount = null;
+  let cardCurrency;
+  const session = getSession();
 
+  let currencyConfig;
+  let displayCurrencies = [];
+  let prevCurrency;
   const currencyCache = {};
 
   // Props
   export let classes = [];
   export let visible = false;
   export let view = null;
+  export let tabVisible = null;
 
   // Computed
   export let allClasses;
+
+  /**
+   * set Currency Data used by offer & trigger apply discount
+   * @param {Object} payload dcc related payload (selected currency & flow api response)
+   * @param {boolean} reset if true, replace existing value with new else override
+   */
+  function setDCCPayload(payload, reset) {
+    if (reset) {
+      session.dccPayload = payload;
+    } else {
+      session.dccPayload = Object.assign(session.dccPayload || {}, payload);
+    }
+    var offer = session.getAppliedOffer();
+    // if offer applied
+    if(offer) {
+      session.handleDiscount();
+    }
+  }
 
   $: allClasses = ['dcc-view'].concat(classes).join(' ');
 
@@ -126,6 +148,14 @@
         currencies = null;
         getCardCurrencies(prop).then(currencyPayload => {
           currencyCache[entityWithAmount] = currencyPayload;
+          // update selected currency payload [only used by offers in session.js]
+          setDCCPayload({ currencyPayload, entityWithAmount });
+        });
+      } else if (tabVisible) {
+        // update selected currency payload [only used by offers in session.js]
+        setDCCPayload({
+          currencyPayload: currencyCache[entityWithAmount],
+          entityWithAmount,
         });
       }
     } else {
@@ -142,18 +172,81 @@
   }
 
   $: {
-    if (currencies && selectedCurrency) {
-      updateAmountInHeaderAndCTA(
-        formatAmountWithSymbol(dccAmount, selectedCurrency)
+    const offer = $appliedOffer;
+    if (tabVisible && (!offer || selectedCurrency !== prevCurrency)) {
+      if (currencies && selectedCurrency) {
+        prevCurrency = selectedCurrency;
+        let amount = dccAmount;
+        /**
+         * if offer is applied update original amount in requested currency
+         */
+        if (offer) {
+          const currencyData = currencyCache[entityWithOriginalAmount];
+          if (currencyData && currencyData.all_currencies) {
+            amount = currencyData.all_currencies[selectedCurrency].amount;
+          }
+        }
+        updateAmountInHeaderAndCTA(
+          formatAmountWithSymbol(amount, selectedCurrency),
+          formatAmountWithSymbol(dccAmount, selectedCurrency)
+        );
+      } else if (!offer) {
+        updateAmountInHeaderAndCTA();
+      }
+    }
+  }
+
+  function updateCurrencyCache(key, value) {
+    currencyCache[key] = value;
+  }
+
+  $: {
+    /**
+     * this case happen if we apply offer before selecting card (saved card)
+     * we don't have data of original currency amount we need that to show in header
+     */
+    if (
+      visible &&
+      entityWithOriginalAmount !== entityWithAmount &&
+      !currencyCache[entityWithOriginalAmount]
+    ) {
+      getCardCurrencies({ ...prop, amount: originalAmount }).then(
+        currencyPayload => {
+          updateCurrencyCache(entityWithOriginalAmount, currencyPayload);
+          prevCurrency = '';
+        }
       );
-    } else {
-      updateAmountInHeaderAndCTA();
     }
   }
 
   $: {
     $currencyRequestId = currencyConfig && currencyConfig.currency_request_id;
     $dccCurrency = selectedCurrency;
+  }
+
+  function onSelect(currency) {
+    selectedCurrency = currency;
+    searchModalOpen = false;
+    setDCCPayload({ currency });
+  }
+
+  $: {
+    if (tabVisible) {
+      onSelect($dccCurrency);
+    }
+  }
+
+  $: {
+    if (!visible || !tabVisible) {
+      // reset dcc data in session if tab is close
+      setDCCPayload({}, true);
+      // reset currency to INR as dcc amount to be shown only where dcc is not selected
+      // this case happen when from card screen to go another screen
+      prevCurrency = 'INR';
+      updateAmountInHeaderAndCTA();
+    } else {
+      setDCCPayload({ enable: Boolean(visible) });
+    }
   }
 
   $: currencyConfig = entity && currencyCache[entityWithAmount];
@@ -167,18 +260,13 @@
     ({ currency }) => currency === selectedCurrency
   );
   $: entityWithAmount = `${entity}-${$amountAfterOffer}`;
+  $: entityWithOriginalAmount = `${entity}-${originalAmount}`;
 
-  function onSelect(currency) {
-    selectedCurrency = currency;
-    searchModalOpen = false;
-  }
-
-  function updateAmountInHeaderAndCTA(displayAmount) {
-    const session = getSession();
+  function updateAmountInHeaderAndCTA(displayAmount, ctaAmount) {
     tick().then(() => {
       if (displayAmount) {
-        showAmount(displayAmount);
         session.setRawAmountInHeader(displayAmount);
+        showAmount(ctaAmount);
       } else if (!isPartialPayment()) {
         showCtaWithDefaultText();
         session.updateAmountInHeader(originalAmount);
@@ -254,7 +342,75 @@
     }
     return _Arr.find($customer.tokens.items, token => token.id === tokenId);
   }
+
+  
+
 </script>
+
+<div class={allClasses} class:visible>
+  {#if loading}
+    Loading currencies...
+  {:else}
+    <Stack horizontal>
+      <Stack vertical>
+        {#if selectedCurrencyInDisplay}
+          <div class="default-currencies">
+            <Stack horizonal>
+              {#each displayCurrencies as { currency, amount } (currency)}
+                <Radio
+                  name="dcc_currency"
+                  label={currency}
+                  value={amount}
+                  checked={currency === selectedCurrency}
+                  on:change={() => onSelect(currency)}
+                >
+                  {amount}
+                </Radio>
+              {/each}
+            </Stack>
+          </div>
+        {:else}
+          <div>Pay in {selectedCurrency}</div>
+        {/if}
+        <div dir="ltr">
+          <b dir="ltr">{formatAmountWithSymbol(dccAmount, selectedCurrency)}</b>
+          {#if selectedCurrency !== originalCurrency}
+            <span class="small-text">
+              ({formatAmountWithSymbol(
+                currencies[originalCurrency].amount,
+                originalCurrency
+              )})
+            </span>
+          {/if}
+        </div>
+      </Stack>
+      <div
+        class="more-btn theme-highlight-color"
+        on:click={showCurrenciesModal}
+      >
+        {#if selectedCurrencyInDisplay}More{:else}Change{/if}
+        <span class="arrow">&#xe604;</span>
+      </div>
+
+      <!-- LABEL: Select currency to pay -->
+      <!-- LABEL: Search for currency -->
+      <!-- LABEL: All currencies -->
+      <SearchModal
+        identifier="dcc_currency_select"
+        title={$t(SEARCH_TITLE)}
+        placeholder={$t(SEARCH_PLACEHOLDER)}
+        all={$t(SEARCH_ALL)}
+        autocomplete="transaction-currency"
+        items={sortedCurrencies}
+        keys={['currency', 'name', 'symbol']}
+        component={CurrencySearchItem}
+        bind:open={searchModalOpen}
+        on:close={() => (searchModalOpen = false)}
+        on:select={({ detail }) => onSelect(detail.currency)}
+      />
+    </Stack>
+  {/if}
+</div>
 
 <style>
   .arrow {
@@ -296,62 +452,3 @@
     margin-bottom: 6px;
   }
 </style>
-
-<div class={allClasses} class:visible>
-  {#if loading}
-    Loading currencies...
-  {:else}
-    <Stack horizontal>
-      <Stack vertical>
-        {#if selectedCurrencyInDisplay}
-          <div class="default-currencies">
-            <Stack horizonal>
-              {#each displayCurrencies as { currency, amount } (currency)}
-                <Radio
-                  name="dcc_currency"
-                  label={currency}
-                  value={amount}
-                  checked={currency === selectedCurrency}
-                  on:change={() => onSelect(currency)}>
-                  {amount}
-                </Radio>
-              {/each}
-            </Stack>
-          </div>
-        {:else}
-          <div>Pay in {selectedCurrency}</div>
-        {/if}
-        <div dir="ltr">
-          <b dir="ltr">{formatAmountWithSymbol(dccAmount, selectedCurrency)}</b>
-          {#if selectedCurrency !== originalCurrency}
-            <span class="small-text">
-              ({formatAmountWithSymbol(currencies[originalCurrency].amount, originalCurrency)})
-            </span>
-          {/if}
-        </div>
-      </Stack>
-      <div
-        class="more-btn theme-highlight-color"
-        on:click={showCurrenciesModal}>
-        {#if selectedCurrencyInDisplay}More{:else}Change{/if}
-        <span class="arrow">&#xe604;</span>
-      </div>
-
-      <!-- LABEL: Select currency to pay -->
-      <!-- LABEL: Search for currency -->
-      <!-- LABEL: All currencies -->
-      <SearchModal
-        identifier="dcc_currency_select"
-        title={$t(SEARCH_TITLE)}
-        placeholder={$t(SEARCH_PLACEHOLDER)}
-        all={$t(SEARCH_ALL)}
-        autocomplete="transaction-currency"
-        items={sortedCurrencies}
-        keys={['currency', 'name', 'symbol']}
-        component={CurrencySearchItem}
-        bind:open={searchModalOpen}
-        on:close={() => (searchModalOpen = false)}
-        on:select={({ detail }) => onSelect(detail.currency)} />
-    </Stack>
-  {/if}
-</div>

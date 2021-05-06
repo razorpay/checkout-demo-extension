@@ -12,8 +12,7 @@
   import SavedCards from 'ui/tabs/card/savedcards.svelte';
   import AppInstruments from 'ui/tabs/card/AppInstruments.svelte';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
-  import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
-  import Icon from 'ui/elements/Icon.svelte';
+  import { checkDowntime } from 'checkoutframe/downtimes';
 
   // Store
   import {
@@ -35,11 +34,7 @@
 
   import { methodInstrument, blocks } from 'checkoutstore/screens/home';
 
-  import { getSDKMeta } from 'checkoutstore/native';
-
   import { customer } from 'checkoutstore/customer';
-
-  import { contact } from 'checkoutstore/screens/home';
 
   import {
     isRecurring,
@@ -47,6 +42,7 @@
     isDCCEnabled,
     getCardFeatures,
     isInternational,
+    getDowntimes,
   } from 'checkoutstore';
 
   import {
@@ -60,10 +56,8 @@
   } from 'checkoutstore/methods';
 
   import { newCardEmiDuration, savedCardEmiDuration } from 'checkoutstore/emi';
-
   // i18n
   import { t, locale } from 'svelte-i18n';
-  import { getAppProviderName, getAppProviderSubtext } from 'i18n';
 
   import {
     USE_SAVED_CARDS_BTN,
@@ -75,7 +69,6 @@
     RECURRING_CALLOUT,
     SUBSCRIPTION_CALLOUT,
     SUBSCRIPTION_REFUND_CALLOUT,
-    INTERNATIONAL_CURRENCY_CHARGES,
   } from 'ui/labels/card';
 
   // Utils imports
@@ -87,8 +80,8 @@
   import {
     getIin,
     getCardType,
-    getNetworkFromCardNumber,
     isAmex,
+    addDowntimesToSavedCards,
   } from 'common/card';
 
   import { getSubtextForInstrument } from 'subtext';
@@ -109,9 +102,26 @@
 
   const session = getSession();
   const isSavedCardsEnabled = shouldRememberCustomer();
+  const cardDowntimes = getDowntimes().cards;
+  let downtime = {
+    network: false,
+    issuer: false,
+  };
+  let downtimeVisible = false;
+  let downtimeSeverity;
+  let downtimeInstrument;
 
   let currentView = Views.SAVED_CARDS;
   let lastView;
+
+  /**
+   * tabVisible {Boolean}
+   * used by DCC component to allow preselect last currency selection and update the CTA accordingly
+   * 
+   * why? component not destroyed when we go back state remains so when we come back no update trigger
+   * CTA need to update.
+  */
+  let tabVisible = false;
 
   // We're showing apps on both saved cards & new card screen,
   // But if the user switches to new card screen from the saved cards screen,
@@ -191,7 +201,7 @@
    */
   export function onBack() {
     $selectedCard = null; // De-select saved card
-
+    tabVisible = false;
     return false;
   }
 
@@ -332,7 +342,8 @@
       }
     });
 
-    return transformTokens(tokenList);
+    const transformed = transformTokens(tokenList);
+    return addDowntimesToSavedCards(transformed, cardDowntimes);
   }
 
   function transformTokens(tokens) {
@@ -420,6 +431,8 @@
       'card[expiry]': $cardExpiry,
       'card[cvv]': $cardCvv,
       'card[name]': $cardName,
+      downtimeSeverity,
+      downtimeInstrument,
     };
     // Fill in dummy values for expiry and CVV if the CVV and expiry fields are hidden
     if ($hideExpiryCvvFields) {
@@ -437,13 +450,24 @@
 
   function getSavedCardPayload() {
     const selectedToken = $selectedCard || {};
-    const payload = { token: selectedToken.token, 'card[cvv]': $currentCvv };
+    let downtimeSeverity, downtimeInstrument;
+    if(selectedToken.card) {
+      downtimeSeverity = selectedToken.card.downtimeSeverity;
+      downtimeInstrument = selectedToken.card.downtimeInstrument;
+    }
+    const payload = {
+      token: selectedToken.token,
+      'card[cvv]': $currentCvv,
+      downtimeSeverity,
+      downtimeInstrument,
+    };
     if ($currentAuthType) {
       payload.auth_type = $currentAuthType;
     }
     if ($savedCardEmiDuration) {
       payload.emi_duration = $savedCardEmiDuration;
     }
+
     return payload;
   }
 
@@ -471,12 +495,15 @@
     const amexCard = isAmex($cardNumber);
 
     $internationalCurrencyCalloutNeeded = amexCard && isInternational();
-
+    isDowntime('network', cardType);
     if (sixDigits) {
       getCardFeatures(_cardNumber).then(features => {
         if (iin !== getIin($cardNumber)) {
           // $cardNumber's IIN has changed since we started the n/w request, do nothing
           return;
+        }
+        if (features?.issuer) {
+          isDowntime('issuer', features.issuer);
         }
 
         let emiObj;
@@ -600,6 +627,25 @@
     tab = session.tab;
     onCardInput();
   }
+  function isDowntime(instrument, value) {
+    const currentDowntime = checkDowntime(cardDowntimes, instrument, value);
+    if (currentDowntime) {
+      downtime[instrument] = true;
+      downtimeSeverity = currentDowntime;
+      downtimeInstrument = value;
+    } else {
+      downtime[instrument] = false;
+    }
+    if (downtime.network || downtime.issuer) {
+      downtimeVisible = true;
+    } else {
+      downtimeVisible = false;
+    }
+  }
+
+  export function setTabVisible(status = true) {
+    tabVisible = status;
+  }
 </script>
 
 <style>
@@ -674,7 +720,10 @@
             {tab}
             faded={Boolean($selectedApp)}
             on:focus={onAddCardViewFocused}
-            on:cardinput={onCardInput} />
+            on:cardinput={onCardInput}
+            {downtimeVisible}
+            {downtimeSeverity}
+            {downtimeInstrument} />
           {#if showEmiCta}
             <EmiActions
               {showEmiCta}
@@ -722,7 +771,7 @@
     </div>
     <Bottom tab="card">
       {#if isDCCEnabled()}
-        <DynamicCurrencyView view={currentView} />
+        <DynamicCurrencyView tabVisible={tabVisible} view={currentView} />
       {/if}
       {#if isRecurring()}
         <Callout>

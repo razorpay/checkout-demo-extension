@@ -1,6 +1,10 @@
 const { delay, randomContact } = require('../util');
 
-async function selectUPIApp(context, AppNumber) {
+async function expectNoUPIApps(context) {
+  await expect('[data-name="phonepe"]').selectorToBeAbsent(context);
+}
+
+async function selectUPIApp(context, AppNumber, appWithDowntime) {
   const allApps = await context.page.evaluate(() =>
     Array.from(
       document.querySelectorAll('[data-name]'),
@@ -17,6 +21,10 @@ async function selectUPIApp(context, AppNumber) {
 
   for (const [_, count] of Object.entries(counter)) {
     expect(count).toEqual(1);
+  }
+
+  if (appWithDowntime) {
+    AppNumber = allApps.indexOf(appWithDowntime) + 1;
   }
 
   await context.page.click('.option:nth-of-type(' + AppNumber + ')');
@@ -108,8 +116,14 @@ async function respondToUPIPaymentStatus(context) {
   await context.respondPlain(
     `${req.params.callback}(${JSON.stringify(successResult)})`
   );
+  let timeout = 2000;
+  if (context.preferences.show_donation) {
+    timeout += 10000;
+    let selector = '#covid-wrap';
+    await context.page.waitForSelector(selector);
+  }
   await context.page.waitFor('#modal-inner', {
-    timeout: 2000,
+    timeout,
     hidden: true,
   });
   expect(await context.page.$('#modal-inner')).toEqual(null);
@@ -204,4 +218,5 @@ module.exports = {
   handleSaveVpaRequest,
   handleSavedTokenValidation,
   selectUPIPspBank,
+  expectNoUPIApps,
 };
