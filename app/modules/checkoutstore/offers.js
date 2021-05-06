@@ -29,6 +29,16 @@ export const isCardValidForOffer = derived(
       return;
     }
 
+    // After applying Cred offer,
+    // FE should not hit the offer API as Cred is a view only offer
+    // which resides at CRED and not in Razorpay system.
+    if (
+      $appliedOffer?.id === 'CRED_experimental_offer' &&
+      $cardTab === $appliedOffer?.payment_method
+    ) {
+      return;
+    }
+
     if (!($appliedOffer && $cardIin.length > 5)) {
       return;
     }

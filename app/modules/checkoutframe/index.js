@@ -1,6 +1,7 @@
 import * as Bridge from 'bridge';
 import Razorpay, { makePrefParams, validateOverrides } from 'common/Razorpay';
 import Analytics from 'analytics';
+import BrowserStorage from 'browserstorage';
 import * as SessionManager from 'sessionmanager';
 import Track from 'tracker';
 import {
@@ -30,6 +31,7 @@ import {
 } from 'common/constants';
 
 import { checkForPossibleWebPaymentsForUpi } from 'checkoutframe/components/upi';
+import { setCREDEligibilityFromPreferences } from 'checkoutframe/cred';
 import { reward } from 'checkoutstore/rewards';
 import updateScore from 'analytics/checkoutScore';
 import { isBraveBrowser } from 'common/useragent';
@@ -77,7 +79,7 @@ const validUID = id => {
   return true;
 };
 
-Razorpay.sendMessage = function (message) {
+Razorpay.sendMessage = function(message) {
   if (Bridge.hasCheckoutBridge()) {
     return Bridge.notifyBridge(message);
   }
@@ -168,7 +170,7 @@ const setTrackingProps = message => {
   }
 };
 
-export const handleMessage = function (message) {
+export const handleMessage = function(message) {
   if ('id' in message && !validUID(message.id)) {
     return;
   }
@@ -228,9 +230,9 @@ export const handleMessage = function (message) {
   try {
     if (_.isNonNullObject(CheckoutBridge)) {
       CheckoutBridge.sendAnalyticsData = Track.parseAnalyticsData;
-      CheckoutBridge.sendExtraAnalyticsData = e => { };
+      CheckoutBridge.sendExtraAnalyticsData = e => {};
     }
-  } catch (e) { }
+  } catch (e) {}
 };
 
 function fetchPrefs(session) {
@@ -264,7 +266,7 @@ function fetchRewards(session) {
     rewardsRes => {
       session.rewardsCall = null;
       if (!rewardsRes.error) {
-        const rewardObj = rewardsRes[0]
+        const rewardObj = rewardsRes[0];
         if (rewardObj) {
           const { reward_id, variant = false } = rewardObj;
           if (reward_id) {
@@ -309,6 +311,7 @@ function setSessionPreferences(session, preferences) {
   updateEmandatePrefill();
   updateAnalytics(preferences);
   updatePreferredMethods(preferences);
+  setCREDEligibilityFromPreferences(preferences);
 
   Razorpay.configure(preferences.options);
   session.setPreferences(preferences);
@@ -383,6 +386,11 @@ function getPreferenecsParams(razorpayInstance) {
      * cardsaving */
     prefData.checkcookie = 1;
     document.cookie = 'checkcookie=1;path=/';
+  }
+  // TODO: make this a const
+  const CREDExperiment = BrowserStorage.getItem('cred_offer_experiment');
+  if (CREDExperiment) {
+    prefData.cred_offer_experiment = CREDExperiment;
   }
   markRelevantPreferencesPayload(prefData);
 

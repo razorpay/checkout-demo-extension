@@ -335,6 +335,26 @@ async function selectCurrencyAndVerifyAmount(context, currency = 'USD') {
   await verifyAmount(context, currency);
 }
 
+async function handleCREDUserValidation(context) {
+  const req = await context.expectRequest();
+  expect(req.url).toContain('/validate/account');
+  const body = querystring.parse(req.body);
+  expect(body).toMatchObject({
+    entity: 'cred',
+    value: '+91' + context.state.contact,
+  });
+  await context.respondJSON({
+    success: true,
+    data: {
+      state: 'ELIGIBLE',
+      tracking_id: 'abhdd-hshhus-skjss-shiiw-jshdjhs',
+      offer: {
+        description: 'Pay with Cred with 15% off!!',
+      },
+    },
+  });
+}
+
 async function handleAppCreatePayment(context, { app, flow } = {}) {
   const req = await context.expectRequest();
   expect(req.url).toContain('create/ajax');
@@ -477,4 +497,5 @@ module.exports = {
   handleAppPaymentStatus,
   assertOTPElementsForBEPG,
   agreeToAMEXCurrencyCharges,
+  handleCREDUserValidation,
 };

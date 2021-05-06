@@ -50,6 +50,7 @@ import * as Form from 'checkoutframe/form';
 import { stopListeningForBackPresses } from 'bridge/back';
 import * as Bridge from 'bridge';
 import { Customer, getCustomer, sanitizeTokens } from 'checkoutframe/customer';
+import * as CRED from 'checkoutframe/cred';
 import { Formatter } from 'formatter';
 
 import * as Store from 'checkoutstore';
@@ -93,6 +94,7 @@ import * as Hacks from 'checkoutframe/hacks';
 
 import { get as storeGetter } from 'svelte/store';
 import * as Experiments from 'experiments';
+import BrowserStorage from 'browserstorage';
 
 import * as NBHandlers from 'handlers/netbanking';
 
@@ -206,6 +208,7 @@ export default {
   Hacks,
   storeGetter,
   Experiments,
+  BrowserStorage,
 
   _Arr,
   _Doc,
@@ -222,7 +225,7 @@ export default {
   I18n,
   overlayStackStore,
   rewardsStore,
-
+  CRED,
   downtimeUtils,
-  CovidDonations
+  CovidDonations,
 };
