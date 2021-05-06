@@ -5408,10 +5408,12 @@ Session.prototype = {
       }
     });
     if (!experimentType) {
-      if (prefs.methods && prefs.methods.custom_text) {
-        if (prefs.methods && prefs.methods.custom_text.cred) {
-          experimentType = 'subtext';
-        }
+      if (
+        prefs.methods &&
+        prefs.methods.custom_text &&
+        prefs.methods.custom_text.cred
+      ) {
+        experimentType = 'subtext';
       }
     }
     Analytics.track('cred:subtext_offer_experiment', {
