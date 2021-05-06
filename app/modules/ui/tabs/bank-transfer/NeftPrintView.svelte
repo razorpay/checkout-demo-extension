@@ -8,7 +8,7 @@
   // utils
   import { getSession } from 'sessionmanager';
 
-  import { labels, rzpLogo, hdfcLogo } from './challanConstants';
+  import { labels, rzpLogo, hdfcLogo, rupeeDataUrl } from './challanConstants';
 
   const {
     HEADER,
@@ -28,13 +28,20 @@
   export let amount;
   const description = getOption('description');
   let merchant_logo = getOption('image');
-  const merchantName = getOption('name');
   const orderId = getOption('order_id');
-  let orgLogoLoaded = false;
-  let merchantLogoLoaded = false;
+  let merchantLogoUrl;
+  let orgLogoUrl;
   let isHDFC = false;
   let disclaimers = NON_HDFC_DISCLAIMERS;
   let orgName = 'Razorpay';
+  const pdfStartX = 10;
+  const pdfEndX = 200;
+  const pdfColumnHeight = 8;
+  const pdfTextPaddingTop = 5;
+  const pdfTextBaddingBottom = 3;
+  const pdfColumnSepX = 70;
+  let top = 40;
+  let doc;
 
   const name = getOption('prefill.name');
 
@@ -49,9 +56,6 @@
       disclaimers = HDFC_DISCLAIMERS;
       orgName = 'HDFC';
     }
-    if (!merchant_logo) {
-      merchantLogoLoaded = true;
-    }
     if (!isHDFC) {
       labels.ROW_HEADERS.row10 = 'Razorpay Order ID';
     }
@@ -61,14 +65,56 @@
       [ROW_HEADERS.row3]: ifsc,
       [ROW_HEADERS.row4]: bank_name,
       [ROW_HEADERS.row5]: branch,
-      [ROW_HEADERS.row6]: amount,
+      [ROW_HEADERS.row6]: `${amount}`,
       [ROW_HEADERS.row7]: name.trim(),
       [ROW_HEADERS.row8]: $email,
       [ROW_HEADERS.row9]: $phone,
       [ROW_HEADERS.row10]: isHDFC ? description : orderId,
       [ROW_HEADERS.row11]: expiry,
     };
+    printIfLoaded();
   });
+
+  /**
+   * converts a image to dataUrl and calls a callback
+   * @param {String} src
+   * @param {Func} callback
+   * @param {String} outputFormat
+   * @param {String} logoType
+   * @returns null
+   */
+  function toDataUrl(src, callback, outputFormat, logoType) {
+    var img = new window.Image();
+    img.setAttribute('crossOrigin', 'anonymous');
+    img.src = src;
+    if (!img) {
+      onComplete();
+    }
+
+    img.onload = function() {
+      /*image completely converted to base64string */
+      var canvas = document.createElement('CANVAS');
+      var ctx = canvas.getContext('2d');
+      var dataURL;
+      canvas.height = this.height;
+      canvas.width = this.width;
+      ctx.drawImage(this, 0, 0);
+      dataURL = canvas.toDataURL(outputFormat);
+      /* call back function */
+      onComplete(dataURL);
+    };
+
+    function onComplete(dataURL) {
+      if (logoType === 'merchantLogo') {
+        merchantLogoUrl = dataURL || false;
+      } else {
+        orgLogoUrl = dataURL || false;
+      }
+      if (callback) {
+        callback();
+      }
+    }
+  }
 
   const session = getSession();
 
@@ -77,133 +123,158 @@
     return `${d.toLocaleDateString()} ${d.toLocaleTimeString()}`;
   }
 
-  function printIfLoaded() {
-    if (orgLogoLoaded && merchantLogoLoaded) {
-      const currentWindow = neftView.ownerDocument.defaultView;
-      currentWindow.print();
-      currentWindow.close();
+  function addHorizintalLine() {
+    doc.line(pdfStartX, top, pdfEndX, top);
+  }
+
+  function addVerticalLine(x, extraLinePadding) {
+    doc.line(x, top, x, top + pdfColumnHeight + extraLinePadding);
+  }
+
+  function addRow(
+    column1,
+    column2,
+    middleLine,
+    extraLinePadding = 0,
+    extraTextPadding = 0,
+    extraBottomPadding = 0
+  ) {
+    addVerticalLine(pdfStartX, extraLinePadding);
+    addVerticalLine(pdfEndX, extraLinePadding);
+    const columnsLength = column1 && column2 ? 2 : column1 ? 1 : 0;
+    if (middleLine) {
+      addVerticalLine(pdfColumnSepX, extraLinePadding);
+    }
+    top += pdfTextPaddingTop + extraTextPadding;
+    for (let i = 0; i < columnsLength; i++) {
+      let { text, bold, x, imgUrl } = arguments[i];
+      if (bold) {
+        doc.setFontType('bold');
+      }
+      if (imgUrl) {
+        doc.addImage(imgUrl, 'png', x, top - 2.5, 2.5, 2.5);
+        x += 3;
+      }
+      if (text) {
+        doc.text(text, x, top);
+      }
+      doc.setFontType('normal');
+    }
+    top += pdfTextBaddingBottom + extraBottomPadding;
+    addHorizintalLine(doc, top);
+  }
+  /**
+   * Using pdfjs for creating pdf
+   * not using HTML to pdf conversion provided by jspdf as it increases the pdf size
+   * Docs : http://raw.githack.com/MrRio/jsPDF/master/docs/
+   */
+  function pdfInit() {
+    if ((merchantLogoUrl || merchantLogoUrl === false) && orgLogoUrl) {
+      doc = new window.jsPDF();
+      doc.setLineWidth(0.5);
+
+      // merchant logo
+      if (merchantLogoUrl) {
+        doc.addImage(merchantLogoUrl, 'png', 10, 10, 20, 20);
+      }
+
+      // org logo
+      if (isHDFC) {
+        doc.addImage(orgLogoUrl, 'png', 180, 10, 20, 20);
+      } else {
+        doc.addImage(orgLogoUrl, 'png', 145, 21, 55, 9);
+      }
+      addHorizintalLine(doc);
+      doc.setFontSize(10);
+
+      // adding headers
+      addRow({ text: HEADER, x: 80 });
+      // adding date
+      addRow({ text: `Date: ${formatDate(new Date())}`, x: 15 });
+
+      for (let key in tableDetails) {
+        if (!tableDetails[key]) {
+          continue;
+        }
+        if (key === 'Amount') {
+          addRow(
+            { text: key, bold: true, x: 15 },
+            {
+              text: tableDetails[key],
+              imgUrl: rupeeDataUrl,
+              bold: false,
+              x: 80,
+            },
+            true
+          );
+        } else {
+          addRow(
+            { text: key, bold: true, x: 15 },
+            { text: tableDetails[key], bold: false, x: 80 },
+            true
+          );
+        }
+      }
+
+      addRow({ text: `${DISCLAIMER_LABEL}:`, bold: true, x: 15 });
+
+      addRow(null, null);
+
+      for (let i = 0; i < disclaimers.length; i++) {
+        const text = doc.splitTextToSize(`${i + 1}.) ${disclaimers[i]}`, 180);
+        let extraBottomPadding = 5;
+        if (i !== 0 && i !== disclaimers.length - 1) {
+          extraBottomPadding += 7;
+        }
+        addRow(
+          { text, bold: false, x: 15 },
+          null,
+          false,
+          16,
+          0,
+          extraBottomPadding
+        );
+      }
+
+      addRow(null, null, true);
+
+      addRow(
+        { text: DIPOSITOR_SIGN_LABEL, bold: true, x: 150 },
+        null,
+        false,
+        12,
+        12
+      );
+
+      addRow(null, null, true);
+
+      addRow({ text: OFFICE_USE.header, bold: false, x: 15 });
+
+      for (let i = 0; i < OFFICE_USE.list.length; i++) {
+        addRow({ text: OFFICE_USE.list[i], bold: true, x: 15 });
+      }
+
+      addRow({ text: AUTH_SIGN_LABEL, bold: true, x: 155 });
+
+      addRow({ text: BRANCH_LABEL, bold: true, x: 172 });
+
+      doc.save('challan.pdf');
+      session.hideErrorMessage();
+      neftView.ownerDocument.defaultView.close();
     }
   }
-  const setOrgLogoLoaded = () => {
-    orgLogoLoaded = true;
-    printIfLoaded();
-  };
-  const setMerchantLogoLoaded = () => {
-    merchantLogoLoaded = true;
-    printIfLoaded();
-  };
+
+  function printIfLoaded() {
+    if (!merchant_logo) {
+      merchantLogoUrl = false;
+    } else {
+      toDataUrl(merchant_logo, pdfInit, 'image/png', 'merchantLogo');
+    }
+    toDataUrl(org_logo, pdfInit, 'image/png', 'orgLogo');
+  }
   if (!neftDetails.branch) {
     delete tableDetails.Branch;
   }
 </script>
 
-<div class="neft-print-view" bind:this={neftView}>
-  <style>
-    .neft-print-view,
-    div,
-    p,
-    table {
-      font-family: 'PT Mono', 'Monospace', 'Consolas', 'sans-serif';
-      font-size: 14px;
-    }
-    .text-center {
-      text-align: center;
-    }
-    .text-left {
-      text-align: left;
-    }
-    .text-right {
-      text-align: right;
-    }
-    .bank-transfer-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    td,
-    th {
-      padding: 5px;
-      border: 1px solid;
-    }
-    .footer-logo {
-      margin-top: 5px;
-    }
-    .print-view-logos {
-      display: flex;
-      flex-direction: row-reverse;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    .print-view-logos img {
-      max-height: 50px;
-    }
-  </style>
-  <div class="print-view-logos">
-    <img on:load={setOrgLogoLoaded} src={org_logo} alt={orgName} />
-    {#if merchant_logo}
-      <img
-        on:load={setMerchantLogoLoaded}
-        src={merchant_logo}
-        alt={merchantName} />
-    {/if}
-  </div>
-  <table class="bank-transfer-table">
-    <tr>
-      <td colspan="2" class="text-center">{HEADER}</td>
-    </tr>
-    <tr>
-      <td colspan="2" class="text-left">Date: {formatDate(new Date())}</td>
-    </tr>
-    {#each Object.keys(tableDetails) as key}
-      {#if tableDetails[key]}
-        <tr>
-          <th class="text-left" width="30%">{key}</th>
-          <td class="text-left">{tableDetails[key]}</td>
-        </tr>
-      {/if}
-    {/each}
-    <tr>
-      <th colspan="2" class="text-left">{DISCLAIMER_LABEL}:</th>
-    </tr>
-    <tr>
-      <td colspan="2">&nbsp;</td>
-    </tr>
-    {#each disclaimers as dis, ind}
-      <tr>
-        <td colspan="2">{`${ind + 1}.) ${dis}`}</td>
-      </tr>
-    {/each}
-    <tr>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-    </tr>
-    <tr>
-      <th colspan="2" class="text-right">
-        <br /><br /><br />{DIPOSITOR_SIGN_LABEL}
-      </th>
-    </tr>
-    <tr>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-    </tr>
-    <tr>
-      <td colspan="2">{OFFICE_USE.header}</td>
-    </tr>
-    <tr>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-    </tr>
-    {#each OFFICE_USE.list as off}
-      <tr>
-        <th class="text-left">{off}</th>
-        <td>&nbsp;</td>
-      </tr>
-    {/each}
-    <tr>
-      <th class="text-right" colspan="2">{AUTH_SIGN_LABEL}</th>
-    </tr>
-    <tr>
-      <th class="text-right" colspan="2">{BRANCH_LABEL}</th>
-    </tr>
-  </table>
-</div>
+<div id="challan-div" class="neft-print-view" bind:this={neftView} />

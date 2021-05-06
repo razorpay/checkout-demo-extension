@@ -19,7 +19,6 @@
   import { getSession } from 'sessionmanager';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import { isMobileByMediaQuery } from 'common/useragent';
 
   // UI imports
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
@@ -43,13 +42,27 @@
     ROUND_OFF_CALLOUT,
     PRINT_DETAILS,
     FEE_BREAKUP,
+    WAIT_TEXT,
   } from 'ui/labels/bank-transfer';
+
+  import { jsPdfUrl } from './challanConstants';
 
   import { COPY_DETAILS, COPIED } from 'ui/labels/cta';
 
   import { t, locale } from 'svelte-i18n';
 
   import { formatTemplateWithLocale } from 'i18n';
+
+  // adding 3rd party script for printing, adding here to not increase unnecessary bundle size
+  function addScript(url, content) {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      document.head.appendChild(script);
+      script.type = 'application/javascript';
+      script.src = url;
+      script.onload = resolve;
+    });
+  }
 
   // Props
   export let loading = true;
@@ -145,21 +158,24 @@
   }
 
   export function handlePrint() {
-    const printWindow = window.open('', '', 'height=400,width=600');
-    const neftPrintView = new NeftPrintView({
-      data: {
-        documentTitle: document.title,
-      },
-      props: {
-        neftDetails: data.receiver,
-        expiry: data.close_by,
-        amount: data.amount,
-      },
-      target: printWindow.document.body,
-    });
-
-    printWindow.document.close(); // necessary for IE >= 10
-    printWindow.focus(); // necessary for IE >= 10*/
+    const html2pdfUrl = jsPdfUrl;
+    const scriptPromise = addScript(html2pdfUrl);
+    session.showLoadError($t(WAIT_TEXT));
+    scriptPromise
+      .then(() => {
+        const neftPrintView = new NeftPrintView({
+          data: {
+            documentTitle: document.title,
+          },
+          props: {
+            neftDetails: data.receiver,
+            expiry: data.close_by,
+            amount: parseFloat(data.amount.substring(2).replace(',', '')),
+          },
+          target: document.getElementById('challan-wrapper'),
+        });
+      })
+      .catch(err => console.log(err));
   }
 
   init();
@@ -247,20 +263,16 @@
           </div>
         {/if}
       </div>
-      {#if !isMobileByMediaQuery()}
-        <div on:click={copyDetails} class="print">
-          {$t(copied ? COPIED : COPY_DETAILS)}
-        </div>
-      {/if}
+      <div on:click={copyDetails} class="print">
+        <!-- LABEL: Copy Details or Copied -->
+        {$t(copied ? COPIED : COPY_DETAILS)}
+      </div>
       <Bottom>
         <!-- LABEL: Do not round-off the amount. Transfer the exact amount for the payment to be successful. -->
         <Callout>{$t(ROUND_OFF_CALLOUT)}</Callout>
       </Bottom>
-      {#if !isMobileByMediaQuery()}
-        <CTA on:click={handlePrint}>{$t(PRINT_DETAILS)}</CTA>
-      {:else}
-        <CTA on:click={copyDetails}>{$t(copied ? COPIED : COPY_DETAILS)}</CTA>
-      {/if}
+      <!-- LABEL: Print Details -->
+      <CTA on:click={handlePrint}>{$t(PRINT_DETAILS)}</CTA>
     {:else}
       <div class="error">
         <div class="error-text">{error || 'Error'}</div>
@@ -269,6 +281,7 @@
         <div class="btn" on:click={init}>{$t(RETRY_BUTTON_LABEL)}</div>
       </div>
     {/if}
+    <div id="challan-wrapper" />
   </div>
 </Tab>
 
@@ -331,5 +344,8 @@
     text-align: left;
     color: rgba(57, 100, 168, 1);
     cursor: pointer;
+  }
+  .challan-wrapper {
+    display: none;
   }
 </style>

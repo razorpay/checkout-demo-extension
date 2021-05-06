@@ -32,7 +32,8 @@ export default {
     round_off_callout:
       'Do not round-off the amount. Transfer the exact amount for the payment to be successful.',
     print_details: 'Print Details',
-    fee_breakup: 'See Fee Breakup'
+    fee_breakup: 'See Fee Breakup',
+    wait_text: 'Please wait while we download the pdf'
   },
   banks: {
     long: {

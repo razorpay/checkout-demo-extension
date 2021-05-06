@@ -9,3 +9,4 @@ export const ROUND_OFF_CALLOUT = 'bank_transfer.round_off_callout';
 export const RETRY_BUTTON_LABEL = 'bank_transfer.retry_button_label';
 export const PRINT_DETAILS = 'bank_transfer.print_details';
 export const FEE_BREAKUP = 'bank_transfer.fee_breakup';
+export const WAIT_TEXT = 'bank_transfer.wait_text';
