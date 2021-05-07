@@ -4,7 +4,7 @@ module.exports = {
   globalSetup: './blackbox/setup',
   globalTeardown: './blackbox/teardown',
   testEnvironment: './blackbox/jest-environment',
-  testTimeout: 40 * 1000,
+  testTimeout: 100 * 1000,
   maxWorkers: 6,
   // testRunner: 'jest-circus/runner',
   verbose: true,
