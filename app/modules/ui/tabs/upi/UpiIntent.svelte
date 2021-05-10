@@ -47,7 +47,7 @@
   let downtimeInstrument;
 
   let upiDowntimes = getDowntimes().upi;
-  
+
   const session = getSession();
   let otherAppsIcon = session.themeMeta.icons.othermethods;
 
@@ -63,11 +63,7 @@
 
   function isDowntime(pspHandle) {
     if (pspHandle) {
-      const currentDowntime = checkDowntime(
-        upiDowntimes,
-        'psp',
-        pspHandle
-      );
+      const currentDowntime = checkDowntime(upiDowntimes, 'psp', pspHandle);
       if (currentDowntime) {
         downtimeSeverity = currentDowntime;
         downtimeInstrument = pspHandle;
@@ -84,18 +80,72 @@
     const psp = detail.shortcode;
     const params = {
       packageName,
-      psp
-    }
-    isDowntime(psp)
-    if(downtimeSeverity) {
+      psp,
+    };
+    isDowntime(psp);
+    if (downtimeSeverity) {
       params.downtimeInstrument = psp;
-      params.downtimeSeverity = downtimeSeverity
+      params.downtimeSeverity = downtimeSeverity;
     }
 
     session.onUpiAppSelect(packageName);
     dispatch('select', params);
   }
 </script>
+
+<!-- LABEL: PAY USING APPS -->
+<div class="legend left">{$t(UPI_INTENT_BLOCK_HEADING)}</div>
+<div id="upi-apps">
+  <div id="svelte-upi-apps-list" class="options options-no-margin border-list">
+    <ListHeader>
+      <i slot="icon">
+        <Icon icon={getMiscIcon('redirect')} />
+      </i>
+      <!-- LABEL: You will be redirected to your UPI app -->
+      <div slot="subtitle">{$t(UPI_REDIRECT_TO_APP)}</div>
+    </ListHeader>
+
+    {#each showableApps as app, i (app.package_name)}
+      <DeprecatedRadioOption
+        data={app}
+        icon={app.app_icon}
+        iconPlaceholder=".placeholder"
+        selected={app.package_name === selected}
+        on:select={onAppSelect}
+        name="upi_app"
+        value={app.package_name}
+      >
+        <div class="ref-title" data-name={app.shortcode}>
+          {getUpiIntentAppName(app.shortcode, $locale, app.app_name)}
+          {#if i === 0 && showRecommendedUPIApp}
+            <span>
+              <!-- LABEL: Recommended -->
+              <em>({$t(UPI_RECOMMENDED)})</em>
+            </span>
+          {/if}
+        </div>
+        {#if !!downtimeSeverity && app.package_name === selected}
+          <div class="downtime-upi-intent-wrapper">
+            <div class="downtime-upi-intent">
+              <DowntimeCallout
+                showIcon={true}
+                severe={downtimeSeverity}
+                {downtimeInstrument}
+              />
+            </div>
+          </div>
+        {/if}
+      </DeprecatedRadioOption>
+    {/each}
+
+    {#if apps.length > 5 && !showAll}
+      <NextOption on:select={() => (showAll = true)} icon={otherAppsIcon}>
+        <!-- LABEL: Show other UPI apps -->
+        {$t(UPI_SHOW_OTHER_APPS)}
+      </NextOption>
+    {/if}
+  </div>
+</div>
 
 <style>
   /**
@@ -107,6 +157,7 @@
     :global(.radio-option),
     :global(.next-option) {
       padding: 18px 40px 18px 60px;
+      box-sizing: border-box;
     }
 
     :global(.placeholder) {
@@ -213,52 +264,3 @@
     margin-right: 8px;
   }
 </style>
-
-<!-- LABEL: PAY USING APPS -->
-<div class="legend left">{$t(UPI_INTENT_BLOCK_HEADING)}</div>
-<div id="upi-apps">
-  <div id="svelte-upi-apps-list" class="options options-no-margin border-list">
-    <ListHeader>
-      <i slot="icon">
-        <Icon icon={getMiscIcon('redirect')} />
-      </i>
-      <!-- LABEL: You will be redirected to your UPI app -->
-      <div slot="subtitle">{$t(UPI_REDIRECT_TO_APP)}</div>
-    </ListHeader>
-
-    {#each showableApps as app, i (app.package_name)}
-      <DeprecatedRadioOption
-        data={app}
-        icon={app.app_icon}
-        iconPlaceholder=".placeholder"
-        selected={app.package_name === selected}
-        on:select={onAppSelect}
-        name="upi_app"
-        value={app.package_name}>
-        <div class="ref-title" data-name={app.shortcode}>
-          {getUpiIntentAppName(app.shortcode, $locale, app.app_name)}
-          {#if i === 0 && showRecommendedUPIApp}
-            <span>
-              <!-- LABEL: Recommended -->
-              <em>({$t(UPI_RECOMMENDED)})</em>
-            </span>
-          {/if}
-        </div>
-        {#if !!downtimeSeverity && app.package_name === selected}
-          <div class="downtime-upi-intent-wrapper">
-            <div class="downtime-upi-intent">
-              <DowntimeCallout showIcon={true} severe={downtimeSeverity} {downtimeInstrument} />
-            </div>
-          </div>
-        {/if}
-      </DeprecatedRadioOption>
-    {/each}
-
-    {#if apps.length > 5 && !showAll}
-      <NextOption on:select={() => (showAll = true)} icon={otherAppsIcon}>
-        <!-- LABEL: Show other UPI apps -->
-        {$t(UPI_SHOW_OTHER_APPS)}
-      </NextOption>
-    {/if}
-  </div>
-</div>
