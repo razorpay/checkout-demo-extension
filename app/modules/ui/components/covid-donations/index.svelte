@@ -26,7 +26,8 @@
 
   export let onCompletionHandler;
   let interval;
-  const covidPageLink = 'https://razorpay.com/links/covid19#hs_cos_wrapper_widget_1585571452797';
+  const covidPageLink =
+    'https://razorpay.com/links/covid19?ref=checkout_covid_donations#hs_cos_wrapper_widget_1585571452797';
 
   const session = getSession();
   const icons = session.themeMeta.icons;

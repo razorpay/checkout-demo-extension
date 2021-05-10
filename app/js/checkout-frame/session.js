@@ -1158,6 +1158,8 @@ Session.prototype = {
       Analytics.setMeta('safari', true);
     }
 
+    Analytics.setMeta('is_donation_checkout', this.get('is_donation_checkout'))
+
     Analytics.track('complete', {
       type: AnalyticsTypes.RENDER,
       data: {
