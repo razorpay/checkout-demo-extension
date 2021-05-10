@@ -32,7 +32,7 @@
     currentAuthType,
   } from 'checkoutstore/screens/card';
 
-  import { methodInstrument, blocks } from 'checkoutstore/screens/home';
+  import { methodInstrument, blocks, phone } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
 
@@ -101,7 +101,8 @@
   const appsAvailable = apps.length;
 
   const session = getSession();
-  const isSavedCardsEnabled = shouldRememberCustomer();
+  let isSavedCardsEnabled = shouldRememberCustomer();
+
   const cardDowntimes = getDowntimes().cards;
   let downtime = {
     network: false,
@@ -117,10 +118,10 @@
   /**
    * tabVisible {Boolean}
    * used by DCC component to allow preselect last currency selection and update the CTA accordingly
-   * 
+   *
    * why? component not destroyed when we go back state remains so when we come back no update trigger
    * CTA need to update.
-  */
+   */
   let tabVisible = false;
 
   // We're showing apps on both saved cards & new card screen,
@@ -170,6 +171,10 @@
         $selectedApp = session.get('prefill.provider');
       }
     }
+
+    phone.subscribe(() => {
+      isSavedCardsEnabled = shouldRememberCustomer();
+    });
   });
 
   $: {
@@ -451,7 +456,7 @@
   function getSavedCardPayload() {
     const selectedToken = $selectedCard || {};
     let downtimeSeverity, downtimeInstrument;
-    if(selectedToken.card) {
+    if (selectedToken.card) {
       downtimeSeverity = selectedToken.card.downtimeSeverity;
       downtimeInstrument = selectedToken.card.downtimeInstrument;
     }
@@ -648,6 +653,133 @@
   }
 </script>
 
+<Tab method="card" pad={false} overrideMethodCheck>
+  <Screen pad={false}>
+    <div>
+      {#if currentView === Views.ADD_CARD}
+        <div in:fade={getAnimationOptions({ duration: 100, y: 100 })}>
+          {#if showSavedCardsCta}
+            <div
+              id="show-saved-cards"
+              on:click={showSavedCardsView}
+              class="text-btn left-card"
+            >
+              <div
+                class="cardtype"
+                class:multiple={savedCards && savedCards.length > 1}
+                cardtype={lastSavedCard && lastSavedCard.card.networkCode}
+              />
+              {#if showApps}
+                <!-- LABEL: Use saved cards on Razorpay -->
+                {$t(USE_SAVED_CARDS_ON_RZP_BTN)}
+              {:else}
+                <!-- LABEL: Use saved cards -->
+                {$t(USE_SAVED_CARDS_BTN)}
+              {/if}
+            </div>
+          {/if}
+
+          {#if shouldShowSubtext}
+            <div class="pad instrument-subtext-description">
+              {instrumentSubtext}
+            </div>
+          {/if}
+
+          {#if showApps}
+            <!-- LABEL: Cards Saved on Apps -->
+            <h3 class="pad">{$t(CARDS_SAVED_ON_APPS_LABEL)}</h3>
+            <div id="cards-saved-on-apps" role="list" class="border-list pad">
+              <AppInstruments
+                {apps}
+                selectedApp={$selectedApp}
+                on:select={e => setSelectedApp(e.detail)}
+              />
+            </div>
+            <!-- LABEL: Or, Enter card details -->
+            <h3 class="pad">{$t(ENTER_CARD_DETAILS_OPTION_LABEL)}</h3>
+          {/if}
+          <AddCardView
+            {tab}
+            faded={Boolean($selectedApp)}
+            on:focus={onAddCardViewFocused}
+            on:cardinput={onCardInput}
+            {downtimeVisible}
+            {downtimeSeverity}
+            {downtimeInstrument}
+          />
+          {#if showEmiCta}
+            <EmiActions
+              {showEmiCta}
+              {emiCtaView}
+              savedCount={allSavedCards.length}
+              on:click={handleEmiCtaClick}
+            />
+          {/if}
+        </div>
+      {:else}
+        <div in:fade={getAnimationOptions({ duration: 100 })}>
+          {#if shouldShowSubtext}
+            <div class="pad instrument-subtext-description">
+              {instrumentSubtext}
+            </div>
+          {/if}
+
+          {#if showApps}
+            <!-- LABEL: Cards Saved on Apps -->
+            <h3 class="pad">{$t(CARDS_SAVED_ON_APPS_LABEL)}</h3>
+            <div id="cards-saved-on-apps" role="list" class="border-list pad">
+              <AppInstruments
+                {apps}
+                selectedApp={$selectedApp}
+                on:select={e => setSelectedApp(e.detail)}
+              />
+            </div>
+            <!-- LABEL: Cards Saved on Apps -->
+            <h3 class="pad">{$t(CARDS_SAVED_ON_RZP_LABEL)}</h3>
+          {/if}
+
+          <div id="saved-cards-container">
+            <SavedCards
+              {tab}
+              cards={savedCards}
+              on:viewPlans={handleViewPlans}
+            />
+          </div>
+          <div
+            id="show-add-card"
+            class="text-btn left-card"
+            on:click={showAddCardView}
+          >
+            <!-- LABEL: Add another card -->
+            {$t(ADD_ANOTHER_CARD_BTN)}
+          </div>
+        </div>
+      {/if}
+    </div>
+    <Bottom tab="card">
+      {#if isDCCEnabled()}
+        <DynamicCurrencyView {tabVisible} view={currentView} />
+      {/if}
+      {#if isRecurring()}
+        <Callout>
+          {#if !session.subscription}
+            <!-- LABEL: Future payments on this card will be charged automatically. -->
+            {$t(RECURRING_CALLOUT)}
+          {:else if session.subscription && session.subscription.type === 0}
+            <!-- LABEL : The charge is to enable subscription on this card and it will be
+            refunded. -->
+            {$t(SUBSCRIPTION_REFUND_CALLOUT)}
+          {:else}
+            <!-- This card will be linked to the subscription and future payments
+            will be charged automatically. -->
+            {$t(SUBSCRIPTION_CALLOUT)}
+          {/if}
+        </Callout>
+      {/if}
+    </Bottom>
+  </Screen>
+</Tab>
+
 <style>
   #show-saved-cards {
     padding-top: 12px;
@@ -673,122 +805,3 @@
     margin: 12px 0;
   }
 </style>
-
-<Tab method="card" pad={false} overrideMethodCheck>
-  <Screen pad={false}>
-    <div>
-      {#if currentView === Views.ADD_CARD}
-        <div in:fade={getAnimationOptions({ duration: 100, y: 100 })}>
-          {#if showSavedCardsCta}
-            <div
-              id="show-saved-cards"
-              on:click={showSavedCardsView}
-              class="text-btn left-card">
-              <div
-                class="cardtype"
-                class:multiple={savedCards && savedCards.length > 1}
-                cardtype={lastSavedCard && lastSavedCard.card.networkCode} />
-              {#if showApps}
-                <!-- LABEL: Use saved cards on Razorpay -->
-                {$t(USE_SAVED_CARDS_ON_RZP_BTN)}
-              {:else}
-                <!-- LABEL: Use saved cards -->
-                {$t(USE_SAVED_CARDS_BTN)}
-              {/if}
-            </div>
-          {/if}
-
-          {#if shouldShowSubtext}
-            <div class="pad instrument-subtext-description">
-              {instrumentSubtext}
-            </div>
-          {/if}
-
-          {#if showApps}
-            <!-- LABEL: Cards Saved on Apps -->
-            <h3 class="pad">{$t(CARDS_SAVED_ON_APPS_LABEL)}</h3>
-            <div id="cards-saved-on-apps" role="list" class="border-list pad">
-              <AppInstruments
-                {apps}
-                selectedApp={$selectedApp}
-                on:select={e => setSelectedApp(e.detail)} />
-            </div>
-            <!-- LABEL: Or, Enter card details -->
-            <h3 class="pad">{$t(ENTER_CARD_DETAILS_OPTION_LABEL)}</h3>
-          {/if}
-          <AddCardView
-            {tab}
-            faded={Boolean($selectedApp)}
-            on:focus={onAddCardViewFocused}
-            on:cardinput={onCardInput}
-            {downtimeVisible}
-            {downtimeSeverity}
-            {downtimeInstrument} />
-          {#if showEmiCta}
-            <EmiActions
-              {showEmiCta}
-              {emiCtaView}
-              savedCount={allSavedCards.length}
-              on:click={handleEmiCtaClick} />
-          {/if}
-        </div>
-      {:else}
-        <div in:fade={getAnimationOptions({ duration: 100 })}>
-          {#if shouldShowSubtext}
-            <div class="pad instrument-subtext-description">
-              {instrumentSubtext}
-            </div>
-          {/if}
-
-          {#if showApps}
-            <!-- LABEL: Cards Saved on Apps -->
-            <h3 class="pad">{$t(CARDS_SAVED_ON_APPS_LABEL)}</h3>
-            <div id="cards-saved-on-apps" role="list" class="border-list pad">
-              <AppInstruments
-                {apps}
-                selectedApp={$selectedApp}
-                on:select={e => setSelectedApp(e.detail)} />
-            </div>
-            <!-- LABEL: Cards Saved on Apps -->
-            <h3 class="pad">{$t(CARDS_SAVED_ON_RZP_LABEL)}</h3>
-          {/if}
-
-          <div id="saved-cards-container">
-            <SavedCards
-              {tab}
-              cards={savedCards}
-              on:viewPlans={handleViewPlans} />
-          </div>
-          <div
-            id="show-add-card"
-            class="text-btn left-card"
-            on:click={showAddCardView}>
-            <!-- LABEL: Add another card -->
-            {$t(ADD_ANOTHER_CARD_BTN)}
-          </div>
-        </div>
-      {/if}
-    </div>
-    <Bottom tab="card">
-      {#if isDCCEnabled()}
-        <DynamicCurrencyView tabVisible={tabVisible} view={currentView} />
-      {/if}
-      {#if isRecurring()}
-        <Callout>
-          {#if !session.subscription}
-            <!-- LABEL: Future payments on this card will be charged automatically. -->
-            {$t(RECURRING_CALLOUT)}
-          {:else if session.subscription && session.subscription.type === 0}
-            <!-- LABEL : The charge is to enable subscription on this card and it will be
-            refunded. -->
-            {$t(SUBSCRIPTION_REFUND_CALLOUT)}
-          {:else}
-            <!-- This card will be linked to the subscription and future payments
-            will be charged automatically. -->
-            {$t(SUBSCRIPTION_CALLOUT)}
-          {/if}
-        </Callout>
-      {/if}
-    </Bottom>
-  </Screen>
-</Tab>
