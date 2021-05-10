@@ -103,12 +103,6 @@
   const session = getSession();
   let isSavedCardsEnabled = shouldRememberCustomer();
 
-  $: {
-    if ($phone) {
-      isSavedCardsEnabled = shouldRememberCustomer();
-    }
-  }
-
   const cardDowntimes = getDowntimes().cards;
   let downtime = {
     network: false,
@@ -177,6 +171,10 @@
         $selectedApp = session.get('prefill.provider');
       }
     }
+
+    phone.subscribe(() => {
+      isSavedCardsEnabled = shouldRememberCustomer();
+    });
   });
 
   $: {
