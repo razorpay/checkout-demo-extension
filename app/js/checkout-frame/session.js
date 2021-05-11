@@ -751,6 +751,8 @@ Session.prototype = {
         $('#amount .original-amount')[0].removeAttribute('style');
       }
     }
+
+    this.updateAmountFontSize();
   },
   updateAmountInHeaderForOffer: function(amount, fee) {
     if (fee) {
@@ -758,7 +760,60 @@ Session.prototype = {
     }
     $('#amount .discount').rawHtml(this.formatAmountWithCurrency(amount));
     //$('#amount .original-amount').hide();
+    this.updateAmountFontSize();
   },
+
+  /**
+   * Get the font size depending on the number of digits in amount, customer fee bearer and offer.
+   * 
+   * @param {Number|String} amount
+   * @param {Boolean} hasFee
+   * @param {Boolean} hasOffer
+   */
+  getNormalizedAmountFontSize: function(amount, hasFee = false, hasOffer = false) {
+    if (!amount) return;
+
+    // start decreasing fontsize when number of digits exceed this
+    let autoscaleThreasholdChars = 10;
+
+    if (hasFee) autoscaleThreasholdChars = 10;
+    if (hasOffer) autoscaleThreasholdChars = 7;
+    if (hasFee && hasOffer) autoscaleThreasholdChars = 6;
+
+    const MIN_FONT_SIZE = 17;
+    const MAX_FONT_SIZE = 24;
+    const AUTOSCALE_STEP = 1.5; // decrease fontsize by 2px for every digit over threshold
+
+    return Math.max(
+      MIN_FONT_SIZE,
+      Math.min(
+        MAX_FONT_SIZE,
+        MAX_FONT_SIZE - (String(amount).length - autoscaleThreasholdChars) * AUTOSCALE_STEP
+      ));
+  },
+
+  /**
+   * Fit original amount or discount amount in header by scaling the font size
+   * 
+   */
+   updateAmountFontSize: function() {
+
+    var hasFee = Store.isCustomerFeeBearer();
+    var offer = this.getAppliedOffer();
+    var hasOffer = offer && offer.amount !== offer.original_amount;
+
+    var discountString = $('#amount .discount').html();
+    var originalAmountString = $('#amount .original-amount').html();
+
+    var amount_figure = discountString ? discountString : originalAmountString;
+    // to get the actual sense of length, remove chars which barely take any space
+    amount_figure = String(amount_figure).replace(/,|\.| /g, '');
+
+    var fontSize = this.getNormalizedAmountFontSize(amount_figure, hasFee, hasOffer);
+
+    $('#amount').css({'font-size': fontSize+'px'});
+   },
+
   /**
    * Set the amount in header.
    *
@@ -1131,6 +1186,7 @@ Session.prototype = {
     this.setEmiScreen();
     this.prefillPostRender();
     this.updateCustomerInStore();
+    this.updateAmountFontSize();
     Hacks.initPostRenderHacks();
 
     this.errorHandler(this.params);
