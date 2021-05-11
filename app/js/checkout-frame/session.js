@@ -764,7 +764,7 @@ Session.prototype = {
   },
 
   /**
-   * Get the font size depending on the number of digits in amount, customer fee bearer and offer.
+   * Get the font size depending on the number of chars in amount, customer fee bearer and offer.
    * 
    * @param {Number|String} amount
    * @param {Boolean} hasFee
@@ -773,7 +773,7 @@ Session.prototype = {
   getNormalizedAmountFontSize: function(amount, hasFee = false, hasOffer = false) {
     if (!amount) return;
 
-    // start decreasing fontsize when number of digits exceed this
+    // start decreasing fontsize when number of chars exceed this
     let autoscaleThreasholdChars = 12;
 
     if (hasFee) autoscaleThreasholdChars = 10;
@@ -782,7 +782,7 @@ Session.prototype = {
 
     const MIN_FONT_SIZE = 17;
     const MAX_FONT_SIZE = 24;
-    const AUTOSCALE_STEP = 1.5; // decrease fontsize by this for every digit over threshold
+    const AUTOSCALE_STEP = 1.5; // decrease fontsize by this for every char over threshold
 
     return Math.max(
       MIN_FONT_SIZE,
