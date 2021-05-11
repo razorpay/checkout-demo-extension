@@ -778,7 +778,7 @@ Session.prototype = {
     if (!amount) return MAX_FONT_SIZE;
 
     // start decreasing fontsize when number of chars exceed this
-    let autoscaleThreasholdChars = 12;
+    var autoscaleThreasholdChars = 12;
 
     if (hasFee) autoscaleThreasholdChars = 10;
     if (hasOffer) autoscaleThreasholdChars = 7;
