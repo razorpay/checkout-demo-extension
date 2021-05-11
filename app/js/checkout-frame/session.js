@@ -770,10 +770,10 @@ Session.prototype = {
    * @param {Boolean} hasFee
    * @param {Boolean} hasOffer
    */
-  getNormalizedAmountFontSize: function(amount, hasFee = false, hasOffer = false) {
-    const MIN_FONT_SIZE = 17;
-    const MAX_FONT_SIZE = 24;
-    const AUTOSCALE_STEP = 1.5; // decrease fontsize by this for every char over threshold
+  getNormalizedAmountFontSize: function(amount, hasFee, hasOffer) {
+    var MIN_FONT_SIZE = 17;
+    var MAX_FONT_SIZE = 24;
+    var AUTOSCALE_STEP = 1.5; // decrease fontsize by this for every char over threshold
 
     if (!amount) return MAX_FONT_SIZE;
 
