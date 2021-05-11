@@ -774,7 +774,7 @@ Session.prototype = {
     if (!amount) return;
 
     // start decreasing fontsize when number of digits exceed this
-    let autoscaleThreasholdChars = 10;
+    let autoscaleThreasholdChars = 12;
 
     if (hasFee) autoscaleThreasholdChars = 10;
     if (hasOffer) autoscaleThreasholdChars = 7;
@@ -782,7 +782,7 @@ Session.prototype = {
 
     const MIN_FONT_SIZE = 17;
     const MAX_FONT_SIZE = 24;
-    const AUTOSCALE_STEP = 1.5; // decrease fontsize by 2px for every digit over threshold
+    const AUTOSCALE_STEP = 1.5; // decrease fontsize by this for every digit over threshold
 
     return Math.max(
       MIN_FONT_SIZE,
