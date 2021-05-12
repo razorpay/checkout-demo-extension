@@ -134,6 +134,9 @@
           response.amount_expected &&
           session.formatAmountWithCurrency(response.amount_expected),
         close_by: response.close_by && timeConverter(response.close_by),
+        amount_expected:
+          response.amount_expected &&
+          session.formatAmount(response.amount_expected),
       };
 
       loading = false;
@@ -170,7 +173,7 @@
           props: {
             neftDetails: data.receiver,
             expiry: data.close_by,
-            amount: parseFloat(data.amount.substring(2).replace(',', '')),
+            amount: data.amount_expected,
           },
           target: document.getElementById('challan-wrapper'),
         });
