@@ -30,10 +30,24 @@ async function validateCardForOffer(context) {
   await context.respondJSON([1]);
 }
 
+async function removeOffer(context, offernumber) {
+  await context.page.click(
+    '.offer-item:nth-of-type(' + offernumber + ') .remove-offer'
+  );
+}
+
+async function verifyOfferNotApplied(context) {
+  expect(await context.page.$eval('.offer-action', el => el.innerText)).toEqual(
+    'Select'
+  );
+}
+
 module.exports = {
   viewOffers,
   selectOffer,
   verifyOfferApplied,
   setPreferenceForOffer,
   validateCardForOffer,
+  removeOffer,
+  verifyOfferNotApplied,
 };

@@ -32,7 +32,8 @@ const {
   viewOffers,
   validateCardForOffer,
   selectOffer,
-
+  removeOffer,
+  verifyOfferNotApplied,
   // Partial Payment
   verifyPartialAmount,
   verifyFooterText,
@@ -71,8 +72,8 @@ module.exports = function(testFeatures) {
     recurringOrder,
     dcc,
     remember_customer,
+    validateRemoveOfferCta,
   } = features;
-
   describe.each(
     getTestData(title, {
       options,
@@ -122,11 +123,11 @@ module.exports = function(testFeatures) {
 
         await selectPaymentMethod(context, 'card');
       }
-      if(optionalContact) {
+      if (optionalContact) {
         // check remember me should be hide
         await page.waitForFunction(() => {
           return !document.getElementById('should-save-card');
-        })
+        });
       }
 
       await enterCardDetails(context, {
@@ -143,9 +144,24 @@ module.exports = function(testFeatures) {
       }
 
       if (!feeBearer && offers) {
+        if (validateRemoveOfferCta) {
+          //apply
+          await viewOffers(context);
+          await selectOffer(context, '1');
+          await verifyOfferApplied(context);
+          // since there is a validation going on, missing it causes test case failure
+          await validateCardForOffer(context);
+
+          // remove
+          await viewOffers(context);
+          await removeOffer(context, '1');
+          await verifyOfferNotApplied(context);
+        }
+
         await viewOffers(context);
         await selectOffer(context, '1');
         await verifyOfferApplied(context);
+
         if (!feeBearer) {
           await verifyDiscountPaybleAmount(context, '₹ 1,980');
         }
@@ -162,7 +178,7 @@ module.exports = function(testFeatures) {
         await verifyPartialAmount(context, '₹ 100');
       }
 
-      if(options.currency === 'USD') {
+      if (options.currency === 'USD') {
         await verifyFooterText(context, 'Pay $ 2');
       }
 

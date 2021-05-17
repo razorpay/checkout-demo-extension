@@ -15,7 +15,50 @@
     // let discount = offer.original_amount - offer.amount;
     return offer.display_text;
   }
+
+  function handleRemoveOffer(event) {
+    if (event?.stopPropagation) {
+      event.stopPropagation();
+    }
+    removeOffer();
+  }
 </script>
+
+<div role="list">
+  {#each offers as offer (offer.id)}
+    <div
+      role="listitem"
+      class="offer-item"
+      class:selected={selected === offer}
+      on:click={() => {
+        selectOffer(offer);
+      }}
+    >
+      {offer.name}
+      {#if offer.emi_subvention}
+        <!-- LABEL: No Cost EMI -->
+        <div class="badge">{$t(NO_COST_EMI)}</div>
+      {/if}
+      {#if selected === offer}
+        <div class="checkbox" />
+        {#if getOfferDescription(offer)}
+          <!-- Only show the description if offer description is set. -->
+          <div class="offer-detail">{getOfferDescription(offer)}</div>
+        {/if}
+        {#if offer.type === 'deferred'}
+          <!-- LABEL: Cashback would be credited to source mode of payment. -->
+          <div class="offer-detail">{$t(CASHBACK_DETAIL)}</div>
+        {/if}
+      {/if}
+      {#if $appliedOffer === offer}
+        <!-- LABEL: Remove Offer -->
+        <div class="text-uppercase remove-offer" on:click={handleRemoveOffer}>
+          {$t(REMOVE_ACTION)}
+        </div>
+      {/if}
+    </div>
+  {/each}
+</div>
 
 <style>
   .offer-item {
@@ -65,36 +108,3 @@
     pointer-events: none;
   }
 </style>
-
-<div role="list">
-  {#each offers as offer (offer.id)}
-    <div
-      role="listitem"
-      class="offer-item"
-      class:selected={selected === offer}
-      on:click={() => selectOffer(offer)}>
-      {offer.name}
-      {#if offer.emi_subvention}
-        <!-- LABEL: No Cost EMI -->
-        <div class="badge">{$t(NO_COST_EMI)}</div>
-      {/if}
-      {#if selected === offer}
-        <div class="checkbox" />
-        {#if getOfferDescription(offer)}
-          <!-- Only show the description if offer description is set. -->
-          <div class="offer-detail">{getOfferDescription(offer)}</div>
-        {/if}
-        {#if offer.type === 'deferred'}
-          <!-- LABEL: Cashback would be credited to source mode of payment. -->
-          <div class="offer-detail">{$t(CASHBACK_DETAIL)}</div>
-        {/if}
-      {/if}
-      {#if $appliedOffer === offer}
-        <!-- LABEL: Remove Offer -->
-        <div class="text-uppercase remove-offer" on:click={removeOffer}>
-          {$t(REMOVE_ACTION)}
-        </div>
-      {/if}
-    </div>
-  {/each}
-</div>
