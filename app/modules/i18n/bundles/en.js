@@ -201,7 +201,8 @@ export default {
     expiry_label: 'Expiry',
     name_help: 'Please enter name on your card',
     name_label: "Card Holder's name",
-    no_cred_account: 'User does not have a CRED account',
+    no_cred_account:
+      "You're currently not a CRED member. Become a CRED member to pay via CRED Pay and earn special perks. To proceed for now, try a different payment method.",
     nocvv_label: "My Maestro Card doesn't have Expiry/CVV",
     recurring_callout:
       'Future payments on this card will be charged automatically.',
