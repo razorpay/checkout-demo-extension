@@ -545,15 +545,23 @@ export function isCREDIntentFlowAvailable() {
   );
 }
 
-export function getPayloadForCRED() {
+export function getAgentPayload() {
   const { platform } = getSDKMeta();
+  return {
+    '_[agent][platform]': platform,
+    '_[agent][device]': getDevice(),
+    '_[agent][os]': getOS(),
+  };
+}
+
+export function getPayloadForCRED() {
+  const agentPayload = getAgentPayload() || {};
+
   return {
     method: 'app',
     provider: 'cred',
     app_present: isCREDIntentFlowAvailable() ? 1 : 0,
-    '_[agent][platform]': platform,
-    '_[agent][device]': getDevice(),
-    '_[agent][os]': getOS(),
+    ...agentPayload,
   };
 }
 

@@ -1,6 +1,7 @@
 import { makeAuthUrl } from 'common/Razorpay';
 import { getSession } from 'sessionmanager';
 import Analytics from 'analytics';
+import { getAgentPayload } from 'checkoutstore/methods';
 
 const CRED_ELIGIBILITY_CACHE = {};
 
@@ -21,6 +22,7 @@ export const setCREDEligibilityFromPreferences = preferences => {
 
 export const checkCREDEligibility = contact => {
   const session = getSession();
+  const agentPayload = getAgentPayload() || {};
 
   const url = _.appendParamsToUrl(
     makeAuthUrl(session.r, 'payments/validate/account')
@@ -32,6 +34,8 @@ export const checkCREDEligibility = contact => {
       data: {
         entity: 'cred',
         value: contact,
+        '_[checkout_id]': session?.id,
+        ...agentPayload,
       },
       callback: response => {
         const eligibility = response.data?.state === 'ELIGIBLE';

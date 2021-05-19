@@ -12,6 +12,7 @@ import {
   getCurrencyConfig,
   formatAmountWithSymbol,
 } from 'common/currency';
+import { getAgentPayload } from 'checkoutstore/methods';
 
 export function makeUrl(path = '') {
   return RazorpayConfig.api + RazorpayConfig.version + path;
@@ -370,6 +371,9 @@ export function makePrefParams(rzp) {
     params['_[library]'] = Track.props.library;
     params['_[platform]'] = Track.props.platform;
 
+    // adding agent details
+    const agentPayload = getAgentPayload() || {};
+    params = { ...params, ...agentPayload };
     return params;
   }
 }

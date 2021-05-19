@@ -140,7 +140,7 @@ export const getDevice = () => {
     return 'iPad';
   } else if (android) {
     return 'android';
-  } else if (isMobile()) {
+  } else if (isMobileByMediaQuery()) {
     return 'mobile';
   } else {
     return 'desktop';
