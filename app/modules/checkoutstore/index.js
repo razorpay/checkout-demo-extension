@@ -39,6 +39,7 @@ export const getRecurringMethods = () => getMerchantMethods().recurring;
 export const getMethodsCustomText = () => getMerchantMethods().custom_text;
 export const getMerchantOrder = () => preferences.order;
 export const getOrderMethod = () => getMerchantOrder()?.method;
+export const getMerchantKey = () => preferences.merchant_key;
 export const getMerchantOffers = () => {
   // Ignore all offers ( including forced offers ) in case of partial payments.
   if (isPartialPayment()) {
@@ -220,7 +221,7 @@ export function shouldRememberCustomer(method = 'card') {
   ) {
     return false;
   }
-  
+
   // if merchant passed options.remember_customer as true,
   // that take precedence over optional contact
   // it should not be the case

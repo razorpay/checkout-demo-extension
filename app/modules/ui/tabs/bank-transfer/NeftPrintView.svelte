@@ -1,6 +1,6 @@
 <script>
   //store
-  import { getOption } from 'checkoutstore';
+  import { getOption, getMerchantKey } from 'checkoutstore';
   import { phone, email } from 'checkoutstore/screens/home';
 
   // svelte imports
@@ -8,7 +8,14 @@
   // utils
   import { getSession } from 'sessionmanager';
 
-  import { labels, rzpLogo, hdfcLogo, rupeeDataUrl } from './challanConstants';
+  import {
+    labels,
+    rzpLogo,
+    hdfcLogo,
+    rupeeDataUrl,
+    csdKey,
+    csdDisclaimer,
+  } from './challanConstants';
 
   const {
     HEADER,
@@ -42,6 +49,7 @@
   const pdfColumnSepX = 70;
   let top = 40;
   let doc;
+  const key = getMerchantKey();
 
   const name = getOption('prefill.name');
 
@@ -55,6 +63,9 @@
       org_logo = hdfcLogo;
       disclaimers = HDFC_DISCLAIMERS;
       orgName = 'HDFC';
+    }
+    if (key === csdKey) {
+      disclaimers.push(csdDisclaimer);
     }
     if (!isHDFC) {
       labels.ROW_HEADERS.row10 = 'Razorpay Order ID';
@@ -225,6 +236,9 @@
         let extraBottomPadding = 5;
         if (i !== 0 && i !== disclaimers.length - 1) {
           extraBottomPadding += 7;
+        }
+        if (key === csdKey && i === disclaimers.length - 1) {
+          extraBottomPadding += 5;
         }
         addRow(
           { text, bold: false, x: 15 },
