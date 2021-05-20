@@ -65,7 +65,7 @@
       orgName = 'HDFC';
     }
     if (key === csdKey) {
-      disclaimers.push(csdDisclaimer);
+      disclaimers.push({ text: csdDisclaimer, padding: 9 });
     }
     if (!isHDFC) {
       labels.ROW_HEADERS.row10 = 'Razorpay Order ID';
@@ -232,28 +232,15 @@
       addRow(null, null);
 
       for (let i = 0; i < disclaimers.length; i++) {
-        const text = doc.splitTextToSize(`${i + 1}.) ${disclaimers[i]}`, 180);
-        let extraBottomPadding = 5;
-        if (i !== 0 && i !== disclaimers.length - 1) {
-          extraBottomPadding += 7;
-        }
-        if (key === csdKey && i === disclaimers.length - 1) {
-          extraBottomPadding += 5;
-        }
-        addRow(
-          { text, bold: false, x: 15 },
-          null,
-          false,
-          16,
-          0,
-          extraBottomPadding
-        );
+        const dis = disclaimers[i];
+        const text = doc.splitTextToSize(`${i + 1}.) ${dis.text}`, 180);
+        addRow({ text, bold: false, x: 15 }, null, false, 16, 0, dis.padding);
       }
 
       addRow(null, null, true);
 
       addRow(
-        { text: DIPOSITOR_SIGN_LABEL, bold: true, x: 150 },
+        { text: DIPOSITOR_SIGN_LABEL, bold: true, x: 154 },
         null,
         false,
         12,
@@ -270,7 +257,7 @@
 
       addRow({ text: AUTH_SIGN_LABEL, bold: true, x: 155 });
 
-      addRow({ text: BRANCH_LABEL, bold: true, x: 172 });
+      addRow({ text: BRANCH_LABEL, bold: true, x: 167 });
 
       doc.save('challan.pdf');
       session.hideErrorMessage();
