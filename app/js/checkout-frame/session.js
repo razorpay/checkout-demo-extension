@@ -1060,6 +1060,7 @@ Session.prototype = {
             display_text: metaApps[app].offer.description,
             payment_method: 'card',
             type: 'read_only',
+            issuer: 'cred',
           });
         }
       }
@@ -1158,7 +1159,7 @@ Session.prototype = {
       Analytics.setMeta('safari', true);
     }
 
-    Analytics.setMeta('is_donation_checkout', this.get('is_donation_checkout'))
+    Analytics.setMeta('is_donation_checkout', this.get('is_donation_checkout'));
 
     Analytics.track('complete', {
       type: AnalyticsTypes.RENDER,
@@ -2563,6 +2564,11 @@ Session.prototype = {
         if (provider) {
           this.selectCardlessEmiProviderAndAttemptPayment(provider);
         }
+      }
+    } else if (screen === 'card') {
+      // currently in cards, we have google pay and cred apps, so based on provider code, we can select them
+      if (offer && offer.issuer) {
+        CardScreenStore.selectedApp.set(offer.issuer);
       }
     }
   },

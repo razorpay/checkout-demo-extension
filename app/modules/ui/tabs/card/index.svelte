@@ -197,6 +197,15 @@
     if ($selectedCard) {
       $selectedApp = null;
     }
+
+    if (session?.getAppliedOffer()?.id) {
+      session.validateOffers($selectedApp, offerRemoved => {
+        if (!offerRemoved) {
+          // If the offer was not removed, revert to the app in offer issuer
+          setSelectedApp(session?.getAppliedOffer()?.issuer);
+        }
+      });
+    }
   }
 
   /**
