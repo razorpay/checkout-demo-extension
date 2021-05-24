@@ -256,6 +256,7 @@
             name="otp"
             id="otp"
             bind:value={$otp}
+            pattern="[0-9]"
             maxlength={$maxlength || 6}
             autocomplete={autoCompleteMethod}
             required />
