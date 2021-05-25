@@ -86,6 +86,7 @@
 
   import { getSubtextForInstrument } from 'subtext';
   import { getProvider as getAppProvider } from 'common/apps';
+  import { getCardApps } from 'checkoutstore/native';
   import { getAnimationOptions } from 'svelte-utils';
 
   // Transitions
@@ -197,8 +198,15 @@
     if ($selectedCard) {
       $selectedApp = null;
     }
+    // validate offer only for card-apps, to avoid breaks in existing flow.
+    const appliedOffer = session?.getAppliedOffer();
+    const appsAvailable = (getCardApps() || {})?.all;
 
-    if (session?.getAppliedOffer()?.id) {
+    if (
+      appliedOffer?.payment_method === 'card' &&
+      appliedOffer?.id &&
+      appsAvailable.includes(appliedOffer.issuer)
+    ) {
       session.validateOffers($selectedApp, offerRemoved => {
         if (!offerRemoved) {
           // If the offer was not removed, revert to the app in offer issuer

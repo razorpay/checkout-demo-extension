@@ -2567,8 +2567,15 @@ Session.prototype = {
       }
     } else if (screen === 'card') {
       // currently in cards, we have google pay and cred apps, so based on provider code, we can select them
-      if (offer && offer.issuer) {
-        CardScreenStore.selectedApp.set(offer.issuer);
+      if (offer && offer.issuer && offer.payment_method === 'card') {
+        var cardApps = discreet.NativeStore.getCardApps() || [];
+        var isCardAppOffer =
+          _Arr.findIndex(cardApps, function(app) {
+            return app && app.issuer === offer.issuer;
+          }) !== -1;
+        if (isCardAppOffer) {
+          CardScreenStore.selectedApp.set(offer.issuer);
+        }
       }
     }
   },
