@@ -1,4 +1,4 @@
-const { stylus, rollupCommon, getPlugins } = require('fe/rollup-plugins');
+const { stylus, rollupCommon, getPlugins } = require('./cfu/rollup-plugins');
 const livereload = require('rollup-plugin-livereload');
 
 const plugins = getPlugins({

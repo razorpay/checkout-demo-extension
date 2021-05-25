@@ -9,7 +9,7 @@ const { execSync } = require('child_process');
 const { Collector, Reporter } = require('istanbul');
 const coverage = require('rollup-plugin-coverage');
 const puppeteer = require('puppeteer');
-const { stylus, rollupCommon, getPlugins } = require('fe/rollup-plugins');
+const { stylus, rollupCommon, getPlugins } = require('./cfu/rollup-plugins');
 const rollupPlugins = getPlugins({
   src: 'app/modules',
   lint: false,

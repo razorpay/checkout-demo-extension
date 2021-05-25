@@ -5,6 +5,7 @@
 /app/templates
 /app/index.html
 /coverage
+/app/mocks
 
 # dependencies
 /node_modules
