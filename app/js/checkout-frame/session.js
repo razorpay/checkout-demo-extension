@@ -51,7 +51,8 @@ var preferences,
   rewardsStore = discreet.rewardsStore,
   BlockedDeactivatedMerchant = discreet.BlockedDeactivatedMerchant,
   updateScore = discreet.updateScore,
-  CovidDonationView = discreet.CovidDonations;
+  CovidDonationView = discreet.CovidDonations,
+  Header = discreet.Header;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -751,8 +752,7 @@ Session.prototype = {
         $('#amount .original-amount')[0].removeAttribute('style');
       }
     }
-
-    this.updateAmountFontSize();
+    Header.updateAmountFontSize();
   },
   updateAmountInHeaderForOffer: function(amount, fee) {
     if (fee) {
@@ -760,59 +760,8 @@ Session.prototype = {
     }
     $('#amount .discount').rawHtml(this.formatAmountWithCurrency(amount));
     //$('#amount .original-amount').hide();
-    this.updateAmountFontSize();
+    Header.updateAmountFontSize();
   },
-
-  /**
-   * Get the font size depending on the number of chars in amount, customer fee bearer and offer.
-   * 
-   * @param {Number|String} amount
-   * @param {Boolean} hasFee
-   * @param {Boolean} hasOffer
-   */
-  getNormalizedAmountFontSize: function(amount, hasFee, hasOffer) {
-    var MIN_FONT_SIZE = 17;
-    var MAX_FONT_SIZE = 24;
-    var AUTOSCALE_STEP = 1.5; // decrease fontsize by this for every char over threshold
-
-    if (!amount) return MAX_FONT_SIZE;
-
-    // start decreasing fontsize when number of chars exceed this
-    var autoscaleThreasholdChars = 12;
-
-    if (hasFee) autoscaleThreasholdChars = 10;
-    if (hasOffer) autoscaleThreasholdChars = 7;
-    if (hasFee && hasOffer) autoscaleThreasholdChars = 6;
-
-    return Math.max(
-      MIN_FONT_SIZE,
-      Math.min(
-        MAX_FONT_SIZE,
-        MAX_FONT_SIZE - (String(amount).length - autoscaleThreasholdChars) * AUTOSCALE_STEP
-      ));
-  },
-
-  /**
-   * Fit original amount or discount amount in header by scaling the font size
-   * 
-   */
-   updateAmountFontSize: function() {
-
-    var hasFee = Store.isCustomerFeeBearer();
-    var offer = this.getAppliedOffer();
-    var hasOffer = offer && offer.amount !== offer.original_amount;
-
-    var discountString = $('#amount .discount').html();
-    var originalAmountString = $('#amount .original-amount').html();
-
-    var amount_figure = discountString ? discountString : originalAmountString;
-    // to get the actual sense of length, remove chars which barely take any space
-    amount_figure = String(amount_figure).replace(/,|\.| /g, '');
-
-    var fontSize = this.getNormalizedAmountFontSize(amount_figure, hasFee, hasOffer);
-
-    $('#amount').css({'font-size': fontSize+'px'});
-   },
 
   /**
    * Set the amount in header.
@@ -1186,7 +1135,7 @@ Session.prototype = {
     this.setEmiScreen();
     this.prefillPostRender();
     this.updateCustomerInStore();
-    this.updateAmountFontSize();
+    Header.updateAmountFontSize();
     Hacks.initPostRenderHacks();
 
     this.errorHandler(this.params);
@@ -2717,6 +2666,7 @@ Session.prototype = {
         : ''
     );
     Cta.setAppropriateCtaText();
+    Header.updateAmountFontSize();
   },
 
   confirmClose: function() {
