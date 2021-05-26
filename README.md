@@ -79,7 +79,8 @@ Standalone application runs on node server in development environment.
 
   1. Copy `app/index.sample.html` -> `app/index.html`
   1. Copy over `app/config.sample.js` -> `app/config.js` to specify API URL
-  1. `npm run build` to generate required assets/files for application initialization.
+  2. `npm i` to install all dependencies.
+  3. `npm run build` to generate required assets/files for application initialization.
 
 - Running Application
 
