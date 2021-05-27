@@ -123,7 +123,7 @@ export default {
       UTBI: 'PNB (Erstwhile-United Bank of India)',
       UTIB: 'Axis Bank',
       VARA: 'Varachha Co-operative Bank',
-      VIJB: 'Vijaya Bank',
+      VIJB: 'Bank of Baroda - Retail Banking (Erstwhile Vijaya Bank)',
       YESB: 'Yes Bank',
       YESB_C: 'Yes Bank - Corporate Banking',
       ZCBL: 'Zoroastrian Co-operative Bank',
