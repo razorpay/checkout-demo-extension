@@ -65,9 +65,9 @@ if (chromeVersion) {
 
 export const androidBrowser = android && (chromeVersion || firefox); // Chrome or firefox on Android
 
-// The largest screen size that we have found is One Plus 5T - 455px
+// The largest screen size that we have found is Samsung Galaxy S10+ - 480px
 export const mobileQuery =
-  '(max-device-height: 475px),(max-device-width: 475px)';
+  '(max-device-height: 485px),(max-device-width: 485px)';
 
 /**
  * This method works on device width and height to determine is mobile or not
@@ -88,7 +88,7 @@ export const isMobileByMediaQuery = () => {
  */
 export const isMobile = () => {
   return (
-    (global.innerWidth && global.innerWidth < 475) ||
+    (global.innerWidth && global.innerWidth < 485) ||
     shouldFixFixed ||
     isMobileByMediaQuery()
   );
