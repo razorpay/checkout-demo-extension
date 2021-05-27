@@ -95,7 +95,8 @@
     "tap-difflet": "^0.7.1",
     "testdouble": "^3.16.1",
     "through": "^2.3.8",
-    "through2": "^2.0.3"
+    "through2": "^2.0.3",
+    "uglify-js": "^3.13.8"
   },
   "private": true,
   "devDependencies": {
