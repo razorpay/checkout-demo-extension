@@ -51,7 +51,8 @@ var preferences,
   rewardsStore = discreet.rewardsStore,
   BlockedDeactivatedMerchant = discreet.BlockedDeactivatedMerchant,
   updateScore = discreet.updateScore,
-  CovidDonationView = discreet.CovidDonations;
+  CovidDonationView = discreet.CovidDonations,
+  Header = discreet.Header;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -751,6 +752,7 @@ Session.prototype = {
         $('#amount .original-amount')[0].removeAttribute('style');
       }
     }
+    Header.updateAmountFontSize();
   },
   updateAmountInHeaderForOffer: function(amount, fee) {
     if (fee) {
@@ -758,7 +760,9 @@ Session.prototype = {
     }
     $('#amount .discount').rawHtml(this.formatAmountWithCurrency(amount));
     //$('#amount .original-amount').hide();
+    Header.updateAmountFontSize();
   },
+
   /**
    * Set the amount in header.
    *
@@ -1132,6 +1136,7 @@ Session.prototype = {
     this.setEmiScreen();
     this.prefillPostRender();
     this.updateCustomerInStore();
+    Header.updateAmountFontSize();
     Hacks.initPostRenderHacks();
 
     this.errorHandler(this.params);
@@ -2674,6 +2679,7 @@ Session.prototype = {
         : ''
     );
     Cta.setAppropriateCtaText();
+    Header.updateAmountFontSize();
   },
 
   confirmClose: function() {
