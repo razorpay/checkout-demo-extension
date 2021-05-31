@@ -265,6 +265,7 @@
   }
 
   $: currencyConfig = entity && currencyCache[entityWithAmount];
+  $: explicitUI = currencyConfig?.show_markup;
   $: currencies = currencyConfig && currencyConfig.all_currencies;
   $: cardCurrency = currencyConfig && currencyConfig.card_currency;
   $: sortedCurrencies = currencies && sortCurrencies(currencies);
