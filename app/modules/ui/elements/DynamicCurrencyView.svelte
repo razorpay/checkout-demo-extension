@@ -87,6 +87,8 @@
   // Computed
   export let allClasses;
 
+  let explicitUI = false;
+
   /**
    * set Currency Data used by offer & trigger apply discount
    * @param {Object} payload dcc related payload (selected currency & flow api response)
@@ -263,6 +265,7 @@
   }
 
   $: currencyConfig = entity && currencyCache[entityWithAmount];
+  $: explicitUI = currencyConfig?.show_markup;
   $: currencies = currencyConfig && currencyConfig.all_currencies;
   $: cardCurrency = currencyConfig && currencyConfig.card_currency;
   $: sortedCurrencies = currencies && sortCurrencies(currencies);
@@ -378,53 +381,66 @@
               {#each displayCurrencies as { currency, amount } (currency)}
                 <Radio
                   name="dcc_currency"
-                  label={`${currency} ${formatAmount(amount, currency)}`}
+                  label={explicitUI
+                    ? `${currency} ${formatAmount(amount, currency)}`
+                    : currency}
                   value={amount}
                   checked={currency === selectedCurrency}
                   on:change={() => onSelect(currency)}
                 >
-                  {$t(PAY_IN)} {currency}
+                  {explicitUI ? `${$t(PAY_IN)} ${currency}` : amount}
                 </Radio>
               {/each}
             </Stack>
           </div>
         {:else}
-          <div class='dcc-other-currency'>{$t(PAY_IN)} {selectedCurrency} ({formatAmountWithSymbol(dccAmount, selectedCurrency)})</div>
+          <div class="dcc-other-currency">
+            {$t(PAY_IN)}
+            {selectedCurrency}
+            {explicitUI
+              ? `(${formatAmountWithSymbol(dccAmount, selectedCurrency)})`
+              : ""}
+          </div>
         {/if}
         <div dir="ltr">
-          <!-- <b dir="ltr">{formatAmountWithSymbol(dccAmount, selectedCurrency)}</b> -->
-          <!-- {#if selectedCurrency !== originalCurrency}
-            <span class="small-text">
-              ({formatAmountWithSymbol(
-                currencies[originalCurrency].amount,
-                originalCurrency
-              )})
-            </span>
-          {/if} -->
-          {#if selectedCurrency !== originalCurrency}
-            <label
-              class="child"
-              for="dcc-fee-accept"
-              id="dcc-fee-accept-label"
-              tabIndex="0"
-            >
-              <input
-                type="checkbox"
-                class="checkbox--square"
-                id="dcc-fee-accept"
-                name="dcc-fee-accept"
-                value="1"
-                on:focus
-                on:change={() => onSelect(originalCurrency)}
-                bind:checked={payFee}
-              />
-              <span class="checkbox" />
-              <!-- LABEL: Pay currency conversion fee -->
-              {$t(PAY_CONVERSION_FEE)}
-            </label>
-          {:else}
+          {#if explicitUI}
+            {#if selectedCurrency !== originalCurrency}
+              <label
+                class="child"
+                for="dcc-fee-accept"
+                id="dcc-fee-accept-label"
+                tabIndex="0"
+              >
+                <input
+                  type="checkbox"
+                  class="checkbox--square"
+                  id="dcc-fee-accept"
+                  name="dcc-fee-accept"
+                  value="1"
+                  on:focus
+                  on:change={() => onSelect(originalCurrency)}
+                  bind:checked={payFee}
+                />
+                <span class="checkbox" />
+                <!-- LABEL: Pay currency conversion fee -->
+                {$t(PAY_CONVERSION_FEE)}
+              </label>
+            {:else}
               <!-- LABEL: Pay in {originalCurrency} -->
-            <b dir="ltr">{$t(PAY_IN)} {originalCurrency}</b>
+              <b dir="ltr">{$t(PAY_IN)} {originalCurrency}</b>
+            {/if}
+          {:else}
+            <b dir="ltr"
+              >{formatAmountWithSymbol(dccAmount, selectedCurrency)}</b
+            >
+            {#if selectedCurrency !== originalCurrency}
+              <span class="small-text">
+                ({formatAmountWithSymbol(
+                  currencies[originalCurrency].amount,
+                  originalCurrency
+                )})
+              </span>
+            {/if}
           {/if}
         </div>
       </Stack>
@@ -441,7 +457,7 @@
         {/if}
         <span class="arrow">&#xe604;</span>
       </div>
-      
+
       <!-- LABEL: Select currency to pay -->
       <!-- LABEL: Search for currency -->
       <!-- LABEL: All currencies -->
@@ -452,15 +468,15 @@
         all={$t(SEARCH_ALL)}
         autocomplete="transaction-currency"
         items={sortedCurrencies}
-        keys={['currency', 'name', 'symbol']}
+        keys={["currency", "name", "symbol"]}
         component={CurrencySearchItem}
         bind:open={searchModalOpen}
         on:close={() => (searchModalOpen = false)}
         on:select={({ detail }) => onSelect(detail.currency)}
       />
     </Stack>
-    {#if selectedCurrency !== originalCurrency}
-      <div class='dcc-charges'>
+    {#if explicitUI && selectedCurrency !== originalCurrency}
+      <div class="dcc-charges">
         {`1 ${selectedCurrency} = ${forexRate} ${originalCurrency} (incl. ${fee}% conversion charges)`}
       </div>
     {/if}
