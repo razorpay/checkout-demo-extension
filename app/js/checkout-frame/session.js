@@ -355,7 +355,7 @@ function errorHandler(response) {
     this.modal.options.backdropclose = this.get('modal.backdropclose');
   }
 
-  if (this.get('retry') === false) {
+  if (this.get('retry') === false && !this.get('redirect')) {
     return this.modal.hide();
   }
 

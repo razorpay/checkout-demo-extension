@@ -481,6 +481,21 @@ CheckoutFrame.prototype = {
     Track.flush();
 
     try {
+      const callbackUrl = this.rzp.get('callback_url');
+      const redirect = this.rzp.get('redirect') || shouldRedirect;
+      const retry = this.rzp.get('retry');
+
+      if (redirect && callbackUrl && retry === false) {
+        _Doc.redirect({
+          url: callbackUrl,
+          content: data,
+          method: 'post',
+          target: this.rzp.get('target') || '_top',
+        });
+
+        return;
+      }
+
       this.rzp.emit('payment.error', data);
       this.rzp.emit('payment.failed', data);
     } catch (e) {}
