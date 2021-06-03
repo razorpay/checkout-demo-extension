@@ -106,7 +106,6 @@ import BlockedDeactivatedMerchant from 'ui/elements/BlockedDeactivatedMerchant.s
 import * as downtimeUtils from 'checkoutframe/downtimes/utils';
 
 import * as CovidDonations from 'checkoutframe/components/covidWrap';
-import * as Header from 'checkoutframe/components/header';
 
 export default {
   RazorpayConfig,
@@ -229,5 +228,4 @@ export default {
   CRED,
   downtimeUtils,
   CovidDonations,
-  Header,
 };

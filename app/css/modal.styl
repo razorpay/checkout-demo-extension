@@ -678,8 +678,8 @@ i {
         font-size: 0.6em;
         text-decoration: line-through;
         position: absolute;
-        margin-left: 3em;
-        bottom: 0;
+        margin-left: 64px;
+        margin-top: 11px;
       }
     }
 }
@@ -770,7 +770,7 @@ i {
   border-radius: $br;
   line-height: 62px;
   float: left;
-  margin-right: 14px;
+  margin-right: $p;
   box-shadow: $bs;
 
   img {
@@ -799,11 +799,6 @@ i {
 }
 
 #amount {
-  /**
-   * font-size is being auto scaled with Header.updateAmountFontSize() in session.js
-   * this was done to fit large number in the header by reducing the size
-   * as the characters increased.
-   */
   font-size: 24px;
   margin-top: 10px;
 

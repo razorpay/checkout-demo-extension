@@ -25,10 +25,21 @@
     font-size: 0.6em;
   }
   .fee-helper {
+    font-size: 11px;
+    color: #528ff0;
+    background: #fff;
+    border-radius: 50%;
+    height: 16px;
+    width: 16px;
+    text-align: center;
+    display: inline-block;
+    margin-bottom: 1em;
+  }
+  .fee-helper:hover {
     cursor: pointer;
   }
+
   :global(.fee-tooltip.tooltip.tooltip-bottom) {
-    font-size: 11px;
     position: fixed;
     white-space: normal;
     text-align: left;
@@ -42,8 +53,9 @@
 {#if isFeeBearer}
   {#if $showFeeLabel}
     <div class="label">
+      <span class="fee">(+ Fee)</span>
       <span on:click={handleClick} class="fee-helper has-tooltip">
-        <span class="fee"><u>+Fee</u></span>
+        ?
         <Tooltip
           className="fee-tooltip"
           align={['bottom']}
