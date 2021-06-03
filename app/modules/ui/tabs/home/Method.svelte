@@ -66,13 +66,26 @@
     Analytics.track('payment_method:select', {
       type: AnalyticsTypes.BEHAV,
       data: {
-        method
+        method,
       },
     });
 
     dispatch('select');
   }
 </script>
+
+<SlottedOption
+  className="new-method"
+  defaultStyles={false}
+  on:click={select}
+  attributes={{ method }}
+>
+  <i slot="icon">
+    <Icon icon={_icon} />
+  </i>
+  <div slot="title">{_title}</div>
+  <div slot="subtitle">{_subtitle}</div>
+</SlottedOption>
 
 <style>
   /* Container styles */
@@ -116,15 +129,3 @@
     color: #828282;
   }
 </style>
-
-<SlottedOption
-  className="new-method"
-  defaultStyles={false}
-  on:click={select}
-  attributes={{ method }}>
-  <i slot="icon">
-    <Icon icon={_icon} />
-  </i>
-  <div slot="title">{_title}</div>
-  <div slot="subtitle">{_subtitle}</div>
-</SlottedOption>

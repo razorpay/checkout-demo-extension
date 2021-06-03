@@ -89,6 +89,7 @@ export const AVAILABLE_METHODS = [
   'bank_transfer',
   'nach',
   'app',
+  'emandate'
 ];
 
 /* VPA regex, copied from API */

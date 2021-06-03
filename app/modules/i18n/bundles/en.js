@@ -695,6 +695,7 @@ export default {
       card_logged_in: '{bank} {type} card - {last4}',
       card_logged_out: 'Use your {bank} {type} card',
       cardless_emi: 'EMI - {name}',
+      emandate: 'Bank Account',
       emi_logged_in: 'EMI - {bank} {type} card - {last4}',
       emi_logged_out: 'EMI - Use your {bank} {type} card',
       emi_saved_cards: 'EMI - Use your saved cards',
@@ -710,7 +711,7 @@ export default {
   methods: {
     descriptions: {
       cardless_emi: 'EMI via {text}',
-      emandate: 'Pay with Netbanking',
+      emandate: 'All Indian banks',
       emi: 'EMI via Credit & Debit Cards',
       gpay: 'Instant payment using Google Pay App',
       netbanking: 'All Indian banks',
@@ -747,7 +748,7 @@ export default {
       cred: 'CRED',
       credit_card: 'Credit Card',
       debit_card: 'Debit Card',
-      emandate: 'Emandate',
+      emandate: 'Bank Account',
       emi: 'EMI',
       generic: 'Pay using {name}',
       google_pay_cards: 'Google Pay Cards',

@@ -111,10 +111,10 @@ const ALL_METHODS = {
   netbanking() {
     return (
       getAmount() &&
-        !isRecurring() &&
-        !isInternational() &&
-        getOption('method.netbanking') !== false &&
-        getNetbankingBanks()
+      !isRecurring() &&
+      !isInternational() &&
+      getOption('method.netbanking') !== false &&
+      getNetbankingBanks()
       |> _Obj.keys
       |> _.lengthOf
     );
@@ -133,6 +133,9 @@ const ALL_METHODS = {
   },
 
   emandate() {
+    if (isASubscription() && !isInternational()) {
+      return isASubscription('emandate') && getRecurringMethods()?.emandate;
+    }
     return (
       getOrderMethod() === 'emandate' &&
       !isInternational() &&
@@ -296,7 +299,6 @@ export function isMethodEnabled(method) {
       return false;
     }
   }
-
   const checker = ALL_METHODS[method];
   if (checker) {
     return checker() && isMethodEnabledForBrowser(method);

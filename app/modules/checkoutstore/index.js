@@ -194,7 +194,7 @@ export function isASubscription(method = null) {
   if (!method) {
     return true;
   } else {
-    return preferences.subscription[method] !== false;
+    return preferences.subscription[method] && preferences.subscription[method] !== false;
   }
 }
 

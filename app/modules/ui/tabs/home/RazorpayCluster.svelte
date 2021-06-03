@@ -51,19 +51,20 @@
   }
 </script>
 
-<style>
-  .border-list {
-    margin-bottom: 24px;
-  }
-</style>
-
 <div class="methods-block" data-block={block.code}>
   <h3 class="title">{title}</h3>
   <div role="list" class="border-list">
     {#each block.instruments as instrument, index (instrument.id)}
       <Method
         method={instrument.method}
-        on:select={() => dispatch('selectInstrument', instrument)} />
+        on:select={() => dispatch('selectInstrument', instrument)}
+      />
     {/each}
   </div>
 </div>
+
+<style>
+  .border-list {
+    margin-bottom: 24px;
+  }
+</style>

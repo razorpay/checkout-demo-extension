@@ -307,7 +307,7 @@ export function setBlocks(
     allBlocks,
     block => _Obj.getSafely(block, 'instruments', []).length > 0
   );
-  
+
   // Add an ID to all instruments
   _Arr.loop(allBlocks, (block, blockIndex) => {
     _Arr.loop(block.instruments, (instrument, instrumentIndex) => {
@@ -439,7 +439,7 @@ function addDowntimeToBlock(block) {
   let downtimeInstrument = '';
   switch (block.method) {
     case 'netbanking':
-      if(!block.banks || block.banks.length === 0) {
+      if (!block.banks || block.banks.length === 0) {
         return block
       }
       downtimeSeverity = checkDowntime(
@@ -450,7 +450,7 @@ function addDowntimeToBlock(block) {
       downtimeInstrument = block.banks[0];
       break;
     case 'upi':
-      if(block.apps && block.apps.length > 0) {
+      if (block.apps && block.apps.length > 0) {
         const appName = getAppFromPackageName(block.apps[0]).shortcode;
         downtimeSeverity = checkDowntime(
           downtimes.upi,
@@ -471,21 +471,21 @@ function addDowntimeToBlock(block) {
       const downtimesArr = ['low', 'medium', 'high'];
       let issuerDowntime;
       let networkDowntime
-      if(block.issuers && block.issuers.length > 0){
+      if (block.issuers && block.issuers.length > 0) {
         issuerDowntime = checkDowntime(
           downtimes.cards,
           'issuer',
           block.issuers[0]
         );
       }
-      if(block.networks && block.networks.length > 0){
+      if (block.networks && block.networks.length > 0) {
         networkDowntime = checkDowntime(
           downtimes.cards,
           'network',
           block.networks[0]
         );
       }
-      if(!issuerDowntime && !networkDowntime) {
+      if (!issuerDowntime && !networkDowntime) {
         return block
       }
       if (issuerDowntime && networkDowntime) {

@@ -304,6 +304,10 @@ export function getMethodNameForPaymentOption(method, locale, extra = {}) {
       return getMethodTitle('emi', locale);
     }
 
+    case 'emandate': {
+      return getMethodTitle('emandate', locale);
+    }
+
     default:
       return getMethodTitle(method, locale);
   }
