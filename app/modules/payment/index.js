@@ -147,6 +147,10 @@ function trackNewPayment(data, params, r) {
   if(params.downtimeSeverity) {
     trackingData.downtimeSeverity = params.downtimeSeverity;
   }
+  // default dcc currency use for only analytics by standard checkout only for now 
+  if(data.default_dcc_currency) {
+    delete data.default_dcc_currency;
+  }
 
   Analytics.track('submit', {
     data: {
@@ -1069,29 +1073,28 @@ razorpayProto.getCardFlows = function(cardNumber = '', callback = _Func.noop) {
 razorpayProto.getCardFeatures = getCardFeatures;
 
 /**
- * Gets the currencies associated with a card.
- * @param payload Payload which contains amount, currency and either Card Number, IIN or Token
- * @returns {*}
+ * getCurrencyData responsible for making api call for fetch currency extracted to new function
+ * to commonly use by card & wallet currency fetch
+ * @param {*} payload 
+ * @returns {PROMISE}
  */
-razorpayProto.getCardCurrencies = function(payload) {
-  const requestPayload = {
+function getCurrencyData(payload) {
+  const requestPayload = payload.requestPayload || {
     '_[source]': Track.props.library,
   };
 
-  const entity = getCardEntityFromPayload(payload);
+  const entity = payload.entity;
 
   const entityWithAmount = `${entity}-${payload.amount}`;
-
-  if (entity.length === 6) {
-    requestPayload.iin = entity;
-  } else {
-    requestPayload.token = entity;
-  }
 
   const { amount, currency } = payload;
   if (amount && currency) {
     requestPayload.amount = amount;
     requestPayload.currency = currency;
+  }
+
+  if (payload.wallet) {
+    requestPayload.wallet = payload.wallet;
   }
 
   const existingRequest = CardCurrencyRequests[entityWithAmount];
@@ -1104,7 +1107,7 @@ razorpayProto.getCardCurrencies = function(payload) {
 
     // append requestPayload
     url = _.appendParamsToUrl(url, requestPayload);
-
+    
     fetch.jsonp({
       url,
       callback: response => {
@@ -1145,4 +1148,38 @@ razorpayProto.getCardCurrencies = function(payload) {
   });
 
   return CardCurrencyRequests[entityWithAmount];
+}
+
+/**
+ * Gets the currencies associated with a card.
+ * @param payload Payload which contains amount, currency and either Card Number, IIN or Token
+ * @returns {*}
+ */
+razorpayProto.getCardCurrencies = function(payload) {
+  const requestPayload = {
+    '_[source]': Track.props.library,
+  };
+
+  const entity = getCardEntityFromPayload(payload);
+
+  if (entity.length === 6) {
+    requestPayload.iin = entity;
+  } else {
+    requestPayload.token = entity;
+  }
+
+  return getCurrencyData.call(this, { ...payload, requestPayload, entity });
+};
+
+/**
+ * extended getCard currency to add support of wallet & card
+ */
+razorpayProto.getCurrencies = function(payload) {
+  const entity = getCardEntityFromPayload(payload);
+  if (entity) {
+    return razorpayProto.getCardCurrencies.call(this, payload);
+  } else if (payload.walletCode) {
+    return getCurrencyData.call(this, { ...payload, entity: payload.walletCode, wallet: payload.walletCode });
+  }
+  return null;
 };

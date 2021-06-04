@@ -30,6 +30,9 @@ const {
   // Partial Payment
   verifyPartialAmount,
   verifyFooterText,
+  
+  // internation Currency
+  selectCurrencyAndVerifyAmount,
 } = require('../actions/common');
 
 const {
@@ -53,11 +56,12 @@ const {
 } = require('../tests/homescreen/actions');
 const { delay } = require('../util.js');
 
-module.exports = function(testFeatures) {
+module.exports = function(testFeatures = {}) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'wallet',
     testFeatures
   );
+  
 
   const {
     partialPayment,
@@ -71,6 +75,16 @@ module.exports = function(testFeatures) {
     popupIframe,
     emulate,
   } = features;
+
+  // Paypal Currency Conversion
+  const isPaypalCC = testFeatures.paypalcc;
+  if(isPaypalCC && personalization) {
+    options.isPaypalCC = true;
+  }
+
+  if(isPaypalCC) {
+    preferences.features = { paypal_cc: true };
+  }
 
   describe.each(
     getTestData(title, {
@@ -95,7 +109,6 @@ module.exports = function(testFeatures) {
       const missingUserDetails = optionalContact && optionalEmail;
 
       const isHomeScreenSkipped = missingUserDetails && !partialPayment; // and not TPV
-
       if (!isHomeScreenSkipped) {
         await assertBasicDetailsScreen(context);
       }
@@ -119,6 +132,10 @@ module.exports = function(testFeatures) {
       if (personalization) {
         await verifyPersonalizationText(context, 'wallet');
         await selectPersonalizationPaymentMethod(context, '1');
+        if(isPaypalCC) {
+          // handle DCC flow
+          await selectCurrencyAndVerifyAmount(context);
+        }
       } else {
         await selectPaymentMethod(context, 'wallet');
         await assertWalletPage(context);
@@ -127,6 +144,17 @@ module.exports = function(testFeatures) {
           await selectWallet(context, 'paytm');
         } else if ((!feeBearer && offers) || (optionalContact && !callbackUrl)) {
           await selectWallet(context, 'payzapp');
+          if (feeBearer) {
+            await verifyFooterText(context, 'PAY');
+          }
+        } else if(isPaypalCC) {
+          // paypal currency
+          await selectWallet(context, 'paypal');
+          if (feeBearer) {
+            await verifyFooterText(context, 'PAY');
+          }
+          // handle DCC flow
+          await selectCurrencyAndVerifyAmount(context);
         } else {
           await selectWallet(context, 'freecharge');
         }
@@ -134,7 +162,6 @@ module.exports = function(testFeatures) {
           await verifyFooterText(context, 'PAY');
         }
       }
-
       if (!feeBearer && offers) {
         await viewOffers(context);
         await selectOffer(context, '1');
@@ -180,6 +207,11 @@ module.exports = function(testFeatures) {
           await expectRedirectWithCallback(context, {
             method: 'wallet',
             wallet: 'payzapp',
+          });
+        } else if(isPaypalCC) {
+          await expectRedirectWithCallback(context, {
+            method: 'wallet',
+            wallet: 'paypal',
           });
         } else {
           await expectRedirectWithCallback(context, {
@@ -238,6 +270,11 @@ module.exports = function(testFeatures) {
           if (partialPayment) {
             await verifyPartialAmount(context, '₹ 100');
           }
+          await handleValidationRequest(context, 'pass');
+          return;
+        }
+
+        if(isPaypalCC) {
           await handleValidationRequest(context, 'pass');
           return;
         }

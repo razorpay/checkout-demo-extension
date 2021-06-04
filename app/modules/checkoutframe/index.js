@@ -378,6 +378,13 @@ function markRelevantPreferencesPayload(prefData) {
 function getPreferenecsParams(razorpayInstance) {
   const prefData = makePrefParams(razorpayInstance);
   prefData.personalisation = 1;
+  /**
+   * TODO: REMOVE THIS only added for testing
+   * Disable Personalization using localstorage
+   */
+  if(localStorage && localStorage.getItem('personalisation') === 'false') {
+    prefData.personalisation = 0;
+  }
   if (cookieDisabled) {
     prefData.checkcookie = 0;
   } else {

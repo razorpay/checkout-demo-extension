@@ -7,5 +7,6 @@
   "freecharge": true,
   "jiomoney": true,
   "phonepe": true,
+  "paypal": true,
   "paytm": true
 }

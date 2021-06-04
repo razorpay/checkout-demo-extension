@@ -1,13 +1,10 @@
 <script>
-  // Svelte imports
-  import { onMount } from 'svelte';
-
   // Store Imports
   import { getWallets } from 'checkoutstore/methods';
   import { showCta, hideCta } from 'checkoutstore/cta';
   import { methodInstrument } from 'checkoutstore/screens/home';
   import { selectedWallet } from 'checkoutstore/screens/wallet';
-
+  import Bottom from 'ui/layouts/Bottom.svelte';
   // i18n
   import { getWalletName } from 'i18n';
   import { locale } from 'svelte-i18n';
@@ -27,6 +24,8 @@
 
   // Transitions
   import { slide } from 'svelte/transition';
+import { hasFeature } from 'checkoutstore';
+import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
 
   const session = getSession();
   const wallets = getWallets();
@@ -194,4 +193,10 @@
       </SlottedRadioOption>
     {/each}
   </div>
+  <Bottom tab="wallet">
+    <!-- skip dcc check as paypal cc doesn't depend upon dcc -->
+    {#if $selectedWallet === 'paypal' && hasFeature('paypal_cc')}
+      <DynamicCurrencyView tabVisible view={$selectedWallet} />
+    {/if}
+  </Bottom>
 </Tab>

@@ -4771,17 +4771,19 @@ Session.prototype = {
     if (this.modal) {
       this.modal.options.backdropclose = false;
     }
-
-    if (data.method === 'card' && Store.isDCCEnabled()) {
+    // for paypal dcc enable is not required
+    if (discreet.storeGetter(CardScreenStore.currencyRequestId) && ((data.method === 'card' && Store.isDCCEnabled()) || (data.method === 'wallet' && data.wallet === 'paypal'))) {
       data.currency_request_id = discreet.storeGetter(
         CardScreenStore.currencyRequestId
       );
       data.dcc_currency = discreet.storeGetter(CardScreenStore.dccCurrency);
+      data.default_dcc_currency = discreet.storeGetter(CardScreenStore.defaultDCCCurrency);
 
       // These are undefined/empty if the user uses an Indian card
       if (!data.currency_request_id) {
         delete data.currency_request_id;
         delete data.dcc_currency;
+        delete data.default_dcc_currency;
       }
     }
 

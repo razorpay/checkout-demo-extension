@@ -275,6 +275,7 @@ const getCardCurrencies = amount => {
     },
     currency_request_id: 'EW1CiHoC8eARvW',
     card_currency: 'USD',
+    wallet_currency: 'USD',
   };
 };
 

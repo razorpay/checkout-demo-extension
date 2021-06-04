@@ -10,6 +10,7 @@ export const authType = writable('c3ds');
 export const selectedCard = writable(null);
 export const selectedApp = writable(null);
 export const dccCurrency = writable('');
+export const defaultDCCCurrency = writable(''); // store default currency given by flow api
 export const currencyRequestId = writable('');
 
 export const cardType = derived(cardNumber, getCardType);

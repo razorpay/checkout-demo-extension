@@ -52,9 +52,9 @@ async function assertPaymentMethods(context, order) {
       'paylater',
       'cardless_emi',
       'upi_otm',
+      'paypal',
     ];
   }
-
   const methods = await getHomescreenMethods(context);
   expect(order).toEqual(expect.arrayContaining(methods));
 }

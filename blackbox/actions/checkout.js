@@ -210,7 +210,7 @@ module.exports = {
 
     await setExperiments(page, experiments);
     if (method && options.personalization) {
-      await page.evaluate(method => {
+      await page.evaluate((method, opt) => {
         const hashKey = '4d184816';
         var upiInstruments = {};
         var netbankingInstruments = {};
@@ -244,7 +244,7 @@ module.exports = {
         ];
         walletInstruments[hashKey] = [
           {
-            wallet: 'freecharge',
+            wallet: opt.isPaypalCC ? 'paypal': 'freecharge',
             method: 'wallet',
             timestamp: 1574081911355,
             success: true,
@@ -303,7 +303,7 @@ module.exports = {
             app: JSON.stringify(appInstruments),
           }[method]
         );
-      }, method);
+      }, method, options);
 
       // Set preferred methods in preferences too
       preferences.preferred_methods = {

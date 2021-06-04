@@ -1,5 +1,5 @@
 <script>
-  import { tick } from 'svelte';
+  import { tick, onDestroy } from 'svelte';
 
   // Store
   import {
@@ -7,6 +7,7 @@
     selectedCard,
     currencyRequestId,
     dccCurrency,
+    defaultDCCCurrency,
   } from 'checkoutstore/screens/card';
 
   import { amountAfterOffer, appliedOffer } from 'checkoutstore/offers';
@@ -36,7 +37,7 @@
   import {
     getAmount,
     getCurrency,
-    getCardCurrencies,
+    getCurrencies,
     isPartialPayment,
   } from 'checkoutstore';
 
@@ -56,6 +57,7 @@
     SAVED_CARDS: 'saved-cards',
     ADD_CARD: 'add-card',
     HOME_SCREEN: 'home-screen',
+    PAYPAL_WALLET: 'paypal'
   };
 
   let prop = null;
@@ -130,6 +132,8 @@
       } else {
         prop = null;
       }
+    } else if(view === Views.PAYPAL_WALLET) {
+      prop = { walletCode: 'paypal' };
     } else {
       prop = null;
     }
@@ -137,7 +141,7 @@
 
   $: {
     if (prop) {
-      entity = prop.iin || prop.tokenId || null;
+      entity = prop.iin || prop.tokenId || prop.walletCode || null;
     } else {
       entity = null;
     }
@@ -153,11 +157,19 @@
     }
   }
 
+  /**
+   * It will only trigger in case of wallet as parent gets destroyed on back
+  */
+  onDestroy(()=>{
+    updateAmountInHeaderAndCTA();
+    setDCCPayload({ view });
+  })
+
   $: {
     if (entity) {
       if (!currencyCache[entityWithAmount]) {
         currencies = null;
-        getCardCurrencies(prop).then(currencyPayload => {
+        getCurrencies(prop).then(currencyPayload => {
           currencyCache[entityWithAmount] = currencyPayload;
           // update selected currency payload [only used by offers in session.js]
           setDCCPayload({ currencyPayload, entityWithAmount });
@@ -178,8 +190,16 @@
     loading = !currencies;
   }
 
+  $: selectedCurrency = cardCurrency;
+
   $: {
-    selectedCurrency = cardCurrency;
+    /**
+     * This is require to preselect last selected currency in case of wallet
+     * as this component get destroyed with state
+    */
+    if(session?.dccPayload?.view === Views.PAYPAL_WALLET && session?.dccPayload?.currency) {
+      selectedCurrency = session.dccPayload.currency;
+    }
   }
 
   $: {
@@ -225,7 +245,7 @@
       entityWithOriginalAmount !== entityWithAmount &&
       !currencyCache[entityWithOriginalAmount]
     ) {
-      getCardCurrencies({ ...prop, amount: originalAmount }).then(
+      getCurrencies({ ...prop, amount: originalAmount }).then(
         currencyPayload => {
           updateCurrencyCache(entityWithOriginalAmount, currencyPayload);
           prevCurrency = '';
@@ -267,12 +287,16 @@
   $: currencyConfig = entity && currencyCache[entityWithAmount];
   $: explicitUI = currencyConfig?.show_markup;
   $: currencies = currencyConfig && currencyConfig.all_currencies;
-  $: cardCurrency = currencyConfig && currencyConfig.card_currency;
+  $: cardCurrency = currencyConfig && (currencyConfig.card_currency || currencyConfig.wallet_currency);
   $: sortedCurrencies = currencies && sortCurrencies(currencies);
   $: displayCurrencies = sortedCurrencies && sortedCurrencies.slice(0, 2);
   $: dccAmount = currencies && currencies[selectedCurrency].amount;
   $: forexRate = currencies && currencies[selectedCurrency].forex_rate;
-
+  
+  $: {
+    $defaultDCCCurrency = currencyConfig && (currencyConfig.card_currency || currencyConfig.wallet_currency);
+  }
+  
   $: {
     if(forexRate) {
       forexRate = parseFloat(1 / forexRate).toFixed(2);
@@ -367,6 +391,8 @@
     }
     return _Arr.find($customer.tokens.items, token => token.id === tokenId);
   }
+
+  $: console.log(cardCurrency);
 </script>
 
 <div class={allClasses} class:visible>
@@ -403,37 +429,41 @@
           </div>
         {/if}
         <div dir="ltr">
+          <!-- explicitUI(new UI) -->
           {#if explicitUI}
-            {#if selectedCurrency !== originalCurrency}
-              <label
-                class="child"
-                for="dcc-fee-accept"
-                id="dcc-fee-accept-label"
-                tabIndex="0"
-              >
-                <input
-                  type="checkbox"
-                  class="checkbox--square"
-                  id="dcc-fee-accept"
-                  name="dcc-fee-accept"
-                  value="1"
-                  on:focus
-                  on:change={() => onSelect(originalCurrency)}
-                  bind:checked={payFee}
-                />
-                <span class="checkbox" />
-                <!-- LABEL: Pay currency conversion fee -->
-                {$t(PAY_CONVERSION_FEE)}
-              </label>
-            {:else}
-              <!-- LABEL: Pay in {originalCurrency} -->
-              <b dir="ltr">{$t(PAY_IN)} {originalCurrency}</b>
+            <!-- original currency should supported -->
+            {#if currencies[originalCurrency]}
+              {#if selectedCurrency !== originalCurrency}
+                <label
+                  class="child"
+                  for="dcc-fee-accept"
+                  id="dcc-fee-accept-label"
+                  tabIndex="0"
+                >
+                  <input
+                    type="checkbox"
+                    class="checkbox--square"
+                    id="dcc-fee-accept"
+                    name="dcc-fee-accept"
+                    value="1"
+                    on:focus
+                    on:change={() => onSelect(originalCurrency)}
+                    bind:checked={payFee}
+                  />
+                  <span class="checkbox" />
+                  <!-- LABEL: Pay currency conversion fee -->
+                  {$t(PAY_CONVERSION_FEE)}
+                </label>
+              {:else}
+                <!-- LABEL: Pay in {originalCurrency} -->
+                <b dir="ltr">{$t(PAY_IN)} {originalCurrency}</b>
+              {/if}
             {/if}
           {:else}
             <b dir="ltr"
               >{formatAmountWithSymbol(dccAmount, selectedCurrency)}</b
             >
-            {#if selectedCurrency !== originalCurrency}
+            {#if selectedCurrency !== originalCurrency && currencies[originalCurrency]}
               <span class="small-text">
                 ({formatAmountWithSymbol(
                   currencies[originalCurrency].amount,
@@ -488,6 +518,7 @@
     display: inline-block;
     font-size: 8px;
     transform: rotate(180deg);
+    border: none;
   }
 
   .dcc-view {

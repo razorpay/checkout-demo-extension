@@ -43,6 +43,7 @@
     getOption,
     isDCCEnabled,
     getTrustedBadgeHighlights,
+    hasFeature,
   } from 'checkoutstore';
 
   import { getUPIIntentApps } from 'checkoutstore/native';
@@ -852,12 +853,19 @@
       ($isContactPresent || $email) && !isContactEmailHidden();
   }
 
+  let dccView = 'home-screen';
+
   export function onSelectInstrument(event) {
     const instrument = event.detail;
 
     updateScore('instrumentSelected');
 
     $selectedInstrumentId = instrument.id;
+    if(instrument.method === 'wallet' && instrument.wallets?.length > 0) {
+      dccView = instrument.wallets[0];
+    } else {
+      dccView = 'home-screen';
+    }
 
     if (isInstrumentGrouped(instrument)) {
       selectMethod(instrument.method);
@@ -967,8 +975,8 @@
       {#if cardOffer}
         <CardOffer offer={cardOffer} />
       {/if}
-      {#if isDCCEnabled()}
-        <DynamicCurrencyView tabVisible view="home-screen" />
+      {#if isDCCEnabled() || (dccView === 'paypal' && hasFeature('paypal_cc'))}
+        <DynamicCurrencyView tabVisible view={dccView} />
       {/if}
       <!-- {#if showRecurringCallout}
         <Callout>
