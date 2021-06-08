@@ -115,6 +115,10 @@
       onComplete(dataURL);
     };
 
+    img.onerror = function() {
+      onComplete(false);
+    };
+
     function onComplete(dataURL) {
       if (logoType === 'merchantLogo') {
         merchantLogoUrl = dataURL || false;
