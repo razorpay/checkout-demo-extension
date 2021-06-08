@@ -337,10 +337,8 @@
         } else {
           instrumentsSource = SOURCES.API;
         }
-        // Prevent p13n v2 from being used for anonnymous users
-        if (!$customer.logged) {
-          instrumentsSource = SOURCES.STORAGE;
-        }
+        // always use p13n v2
+        instrumentsSource = SOURCES.API;
 
         // The function that returns the promise to be returned
         // This promise should set the experiment identifier
