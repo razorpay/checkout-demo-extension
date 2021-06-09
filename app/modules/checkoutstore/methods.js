@@ -876,14 +876,19 @@ export function getAppProviders() {
 }
 
 export function getCardlessEMIProviders() {
-  let emiMethod = getMerchantMethods().cardless_emi;
+  let emiMethod = {};
+  if (getEMIBanks().BAJAJ) {
+    emiMethod.bajaj = true;
+  }
+  emiMethod = {
+    ...emiMethod,
+    ...getMerchantMethods().cardless_emi
+  }
   if (emiMethod |> _Obj.isEmpty) {
     emiMethod = {};
   }
 
-  if (getEMIBanks().BAJAJ) {
-    emiMethod.bajaj = true;
-  }
+
 
   let providers = getEligibleProvidersBasedOnMinAmount(getAmount(), emiMethod);
 
