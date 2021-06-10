@@ -33,7 +33,7 @@ export default {
       'Do not round-off the amount. Transfer the exact amount for the payment to be successful.',
     print_details: 'Print Details',
     fee_breakup: 'See Fee Breakup',
-    wait_text: 'Please wait while we download the pdf'
+    wait_text: 'Please wait while we download the pdf',
   },
   banks: {
     long: {
@@ -1038,8 +1038,6 @@ export default {
       'This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} anytime till {endDate}.',
     redirect_to_app: 'You will be redirected to your UPI app',
     scan_qr_code: 'Scan the QR code using your UPI app',
-    supported_banks:
-      'You can only pay using UPI ID linked with either <strong>ICICI Bank<strong>, <strong>HDFC Bank<strong>, <strong>SBI Bank<strong> or <strong>Axis Bank<strong>',
     upi_id_linked_to_bank: 'UPI ID is linked to',
     show_other_apps: 'Show other UPI apps',
     show_qr_code: 'Show QR Code',
@@ -1130,15 +1128,19 @@ export default {
   },
   downtime_alert: {
     highlight1: 'There is a high chance this payment might fail',
-    card_highlight2: '{instrument} cards are facing some technical issues at the moment',
+    card_highlight2:
+      '{instrument} cards are facing some technical issues at the moment',
     highlight2: '{instrument} is facing some technical issues at the moment',
-    highlight3: 'Incase of failure, any <strong>amount deducted<strong> will be <strong>refunded shortly<strong>'
+    highlight3:
+      'Incase of failure, any <strong>amount deducted<strong> will be <strong>refunded shortly<strong>',
   },
   covid_donations: {
-    payment_success: "Your payment was successful!",
+    payment_success: 'Your payment was successful!',
     header: 'Help Organizations Fight COVID-19',
     cta_text: 'Donate Now',
-    sub_text: 'Help people in need of oxygen cylinders or food by sharing a small contribution towards organisations like Hemkunt Foundation and others.',
-    redirection_text: 'Redirecting to {merchantName} in {secondsRemaining} seconds'
-  }
+    sub_text:
+      'Help people in need of oxygen cylinders or food by sharing a small contribution towards organisations like Hemkunt Foundation and others.',
+    redirection_text:
+      'Redirecting to {merchantName} in {secondsRemaining} seconds',
+  },
 };
