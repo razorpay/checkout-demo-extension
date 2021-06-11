@@ -486,6 +486,13 @@ CheckoutFrame.prototype = {
       const retry = this.rzp.get('retry');
 
       if (redirect && callbackUrl && retry === false) {
+        // NOTE: backend does json_encode() on the error metadata to send object string
+        // replicating the same behaviour here otherwise callback endpoint will
+        // recieve inconsistent data.
+        if (data?.error?.metadata) {
+          data.error.metadata = JSON.stringify(data.error.metadata);
+        }
+
         _Doc.redirect({
           url: callbackUrl,
           content: data,
