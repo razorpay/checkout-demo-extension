@@ -2,7 +2,6 @@ import { writable } from 'svelte/store';
 import { getDowntimes as _getDowntimes } from 'checkoutframe/downtimes';
 import { makeAuthUrl as _makeAuthUrl } from 'common/Razorpay';
 import { displayAmount } from 'common/currency';
-import trustedBadge from 'ui/constants/trusted-badge';
 
 import { amountAfterOffer } from 'checkoutstore/offers';
 import { get } from 'svelte/store';
@@ -343,6 +342,5 @@ export function getCustomSubtextForMethod(code) {
 }
 
 export function getTrustedBadgeHighlights() {
-  const list = trustedBadge[preferences.merchant_id]?.list;
-  return list;
+  return preferences.rtb;
 }
