@@ -235,6 +235,10 @@ const UPI_APPS = {
       shortcode: 'lazypay',
     },
     {
+      package_name: 'money.bullet',
+      shortcode: 'bullet',
+    },
+    {
       package_name: 'com.SIBMobile',
       shortcode: 'sibmirror',
     },

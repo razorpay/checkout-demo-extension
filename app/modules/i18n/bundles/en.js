@@ -1056,6 +1056,7 @@ export default {
     axispay: 'Axis Pay',
     'bank-of-baroda': 'Baroda Pay',
     bhim: 'BHIM',
+    bullet: 'Bullet',
     cred: 'CRED',
     'dcb-bank': 'DCB Bank',
     dena: 'Dena UPI',
