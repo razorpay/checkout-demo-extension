@@ -337,9 +337,7 @@
         } else {
           instrumentsSource = SOURCES.API;
         }
-        // always use p13n v2
-        instrumentsSource = SOURCES.API;
-
+        
         // The function that returns the promise to be returned
         // This promise should set the experiment identifier
         // and any analytics meta properties
