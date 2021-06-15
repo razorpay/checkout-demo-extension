@@ -10,8 +10,7 @@ import { getSession } from 'sessionmanager';
 
 export const appsThatSupportWebPayments = [
   { package_name: GOOGLE_PAY_PACKAGE_NAME, method: 'upi' },
-  // disabling phonepe due to failures on mweb
-  // { package_name: PHONE_PE_PACKAGE_NAME, method: 'upi' },
+  { package_name: PHONE_PE_PACKAGE_NAME, method: 'upi' },
   { package_name: CRED_PACKAGE_NAME, method: 'app' },
 ];
 
