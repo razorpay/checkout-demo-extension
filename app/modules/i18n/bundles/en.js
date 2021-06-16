@@ -569,7 +569,7 @@ export default {
     citi_bank_emi:
       'Full amount of {amount} will be deducted from your account. EMI processing may take upto 8 working days.',
     citi_know_more:
-      'EMI processing may take upto 8 working days. In case the total amount due has not been paid in full, finance charges as applicable (currently 3.75% per month i.e. 45% annualized) on card balances may apply until the EMI is converted & posted to the card. Latest rates are available at ',
+      'EMI processing may take upto 8 working days. In case the total amount due has not been paid in full, finance charges as per the interest rate applicable, which currently is 3.75% per month (i.e. 45% annualized) for all other cards and 1% per month (i.e. 12% annualized) for Ultima, on card balances may apply until the EMI is converted & posted on the card. Latest rates are available at ',
     show_more: 'Show More',
     show_less: 'Show Less',
     citi_url:
