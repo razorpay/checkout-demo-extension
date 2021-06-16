@@ -231,10 +231,6 @@ const UPI_APPS = {
       shortcode: 'chillr',
     },
     {
-      package_name: 'com.citrus.citruspay',
-      shortcode: 'lazypay',
-    },
-    {
       package_name: 'money.bullet',
       shortcode: 'bullet',
     },
@@ -315,6 +311,10 @@ const UPI_APPS = {
     },
     {
       package_name: 'com.angelbroking.angelwealth',
+    },
+    {
+      package_name: 'com.citrus.citruspay',
+      shortcode: 'lazypay',
     },
   ],
 };
