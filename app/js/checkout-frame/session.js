@@ -5435,14 +5435,18 @@ Session.prototype = {
         experimentType = 'offer_tile';
       }
     });
-    if (!experimentType) {
-      if (
-        prefs.methods &&
-        prefs.methods.custom_text &&
-        prefs.methods.custom_text.cred
-      ) {
-        experimentType = 'subtext';
-      }
+    var customTextAvailable =
+      prefs.methods &&
+      prefs.methods.custom_text &&
+      prefs.methods.custom_text.cred;
+    var offerAvailable =
+      prefs.methods &&
+      prefs.methods.app_meta &&
+      prefs.methods.app_meta.cred &&
+      prefs.methods.app_meta.cred.offer;
+
+    if (!experimentType && customTextAvailable && !offerAvailable) {
+      experimentType = 'subtext';
     }
     Analytics.track('cred:subtext_offer_experiment', {
       data: {

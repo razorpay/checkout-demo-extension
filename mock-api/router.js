@@ -14,7 +14,11 @@ const { preferredInsturments } = require('./mocks/personalisation');
 const { getStatus } = require('./mocks/status');
 
 router.get('/v1/preferences', function(request, response) {
-  const preferences = getPreferences('hdfc_dc');
+  const preferences = getPreferences(
+    request.query.cred_offer_experiment
+      ? `cred_${request.query.cred_offer_experiment}`
+      : 'hdfc_dc'
+  );
   respondJSON(preferences, request, response);
 });
 
