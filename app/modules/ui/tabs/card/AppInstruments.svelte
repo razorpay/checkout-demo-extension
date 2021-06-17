@@ -11,14 +11,14 @@
   import ContactField from 'ui/components/ContactField.svelte';
 
   // Util imports
-  import { isContactOptional, getCustomSubtextForMethod } from 'checkoutstore';
+  import { isContactOptional } from 'checkoutstore';
   import { isContactRequiredForAppProvider } from 'checkoutstore/methods';
-  import { getProvider as getAppProvider } from 'common/apps';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
-  import { getAppProviderName, getAppProviderSubtext } from 'i18n';
+  import { getAppProviderName } from 'i18n';
 
+  import { getAppInstrumentSubtext } from 'ui/tabs/card/utils';
   const dispatch = createEventDispatcher();
 
   export let apps = [];
@@ -31,14 +31,6 @@
   function isContactRequired(provider) {
     return isContactOptional() && isContactRequiredForAppProvider(provider);
   }
-
-  function getSubtext(provider) {
-    const customSubtext = getCustomSubtextForMethod(provider);
-    if (customSubtext) {
-      return customSubtext;
-    }
-    return getAppProviderSubtext(provider, $locale);
-  }
 </script>
 
 {#each apps as app}
@@ -49,13 +41,17 @@
     className="instrument"
     value={app.code}
     expandable={selectedApp && isContactRequired(app.code)}
-    on:click={_ => select(app.code)}>
+    on:click={_ => select(app.code)}
+  >
     <i slot="icon">
       <Icon icon={app.logo} alt="" />
     </i>
     <div slot="title">{getAppProviderName(app.code, $locale)}</div>
     <div slot="subtitle">
-      {#if getSubtext(app.code)}{getSubtext(app.code)}{/if}
+      {#if getAppInstrumentSubtext(app.code, $locale)}{getAppInstrumentSubtext(
+          app.code,
+          $locale
+        )}{/if}
     </div>
     <div slot="body">
       {#if selectedApp && isContactRequired(app.code)}

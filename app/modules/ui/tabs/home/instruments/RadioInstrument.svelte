@@ -20,6 +20,7 @@
   import { getProvider as getPaylaterProvider } from 'common/paylater';
   import { getProvider as getAppProvider } from 'common/apps';
   import { getExtendedSingleInstrument } from 'configurability/instruments';
+  import { getAppInstrumentSubtext } from 'ui/tabs/card/utils';
 
   // Store
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
@@ -63,7 +64,7 @@
   let title;
   let icon;
   let code;
-
+  let subtitle;
   function getVpaFromInstrument(instrument) {
     const { vpa, token } = instrument;
 
@@ -84,6 +85,10 @@
       title: getInstrumentTitle('app', providerName, locale),
       icon: provider.logo,
       code: provider.code,
+      subtitle:
+        provider?.code === 'cred'
+          ? getAppInstrumentSubtext(provider.code, locale) || ''
+          : '',
     };
   }
 
@@ -211,6 +216,9 @@
       title = details.title;
       icon = details.icon;
       code = details.code;
+      if (details?.subtitle) {
+        subtitle = details?.subtitle;
+      }
     }
   }
 
@@ -239,22 +247,21 @@
   }
 </script>
 
-<style>
-  .downtime-preferred-method {
-    margin-top: 8px;
-  }
-</style>
-
 <SlottedRadioOption
   ellipsis
   {name}
   {selected}
   className="instrument"
-  attributes={{ 'data-type': 'individual', 'data-id': instrument.id, 'data-code': code }}
+  attributes={{
+    'data-type': 'individual',
+    'data-id': instrument.id,
+    'data-code': code,
+  }}
   value={instrument.id}
   expandOnSelect={contactRequired}
   on:click
-  on:keydown={attemptSubmit}>
+  on:keydown={attemptSubmit}
+>
   <i slot="icon">
     <Icon {icon} alt="" />
   </i>
@@ -264,9 +271,24 @@
       <ContactField bind:country={$proxyCountry} bind:phone={$proxyPhone} />
     {/if}
   </div>
+  <div slot="subtitle">
+    {#if subtitle}
+      {subtitle}
+    {/if}
+  </div>
   <div slot="downtime" class="downtime-preferred-method">
     {#if !!downtimeSeverity}
-      <DowntimeCallout showIcon={true} severe={downtimeSeverity} { downtimeInstrument } />
+      <DowntimeCallout
+        showIcon={true}
+        severe={downtimeSeverity}
+        {downtimeInstrument}
+      />
     {/if}
   </div>
 </SlottedRadioOption>
+
+<style>
+  .downtime-preferred-method {
+    margin-top: 8px;
+  }
+</style>
