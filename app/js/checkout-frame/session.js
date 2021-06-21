@@ -2488,7 +2488,17 @@ Session.prototype = {
         NativeStore.getUPIIntentApps().filtered.length
       )
     ) {
-      invoke('focus', qs(screenEl + ' .invalid input'));
+      var appliedOffer = this.getAppliedOffer() || {};
+
+      if (
+        !Boolean(
+          appliedOffer &&
+            appliedOffer.issuer === 'cred' &&
+            this.tab === appliedOffer.payment_method
+        )
+      ) {
+        invoke('focus', qs(screenEl + ' .invalid input'));
+      }
     }
 
     var showPaybtn = screen;
@@ -2578,10 +2588,10 @@ Session.prototype = {
     } else if (screen === 'card') {
       // currently in cards, we have google pay and cred apps, so based on provider code, we can select them
       if (offer && offer.issuer && offer.payment_method === 'card') {
-        var cardApps = discreet.NativeStore.getCardApps() || [];
+        var cardApps = discreet.Apps.getAppsForMethod('card') || [];
         var isCardAppOffer =
           _Arr.findIndex(cardApps, function(app) {
-            return app && app.issuer === offer.issuer;
+            return app === offer.issuer;
           }) !== -1;
         if (isCardAppOffer) {
           CardScreenStore.selectedApp.set(offer.issuer);

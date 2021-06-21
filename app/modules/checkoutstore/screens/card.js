@@ -9,6 +9,7 @@ export const remember = writable(true);
 export const authType = writable('c3ds');
 export const selectedCard = writable(null);
 export const selectedApp = writable(null);
+export const newCardInputFocused = writable(false);
 export const dccCurrency = writable('');
 export const defaultDCCCurrency = writable(''); // store default currency given by flow api
 export const currencyRequestId = writable('');

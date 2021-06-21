@@ -1,6 +1,6 @@
 <script>
   // Svelte imports
-  import { onMount, tick } from 'svelte';
+  import { onMount, tick, onDestroy } from 'svelte';
 
   // UI Imports
   import Tab from 'ui/tabs/Tab.svelte';
@@ -23,6 +23,7 @@
     remember,
     selectedCard,
     selectedApp,
+    newCardInputFocused,
     cardTab,
     internationalCurrencyCalloutNeeded,
     hideExpiryCvvFields,
@@ -85,8 +86,7 @@
   } from 'common/card';
 
   import { getSubtextForInstrument } from 'subtext';
-  import { getProvider as getAppProvider } from 'common/apps';
-  import { getCardApps } from 'checkoutstore/native';
+  import { getProvider as getAppProvider, getAppsForMethod } from 'common/apps';
   import { getAnimationOptions } from 'svelte-utils';
 
   // Transitions
@@ -178,6 +178,10 @@
     });
   });
 
+  onDestroy(() => {
+    $newCardInputFocused = false;
+  });
+
   $: {
     // Track saved cards
     const savedCardsCount = allSavedCards.length;
@@ -197,22 +201,24 @@
   $: {
     if ($selectedCard) {
       $selectedApp = null;
+      $newCardInputFocused = false;
     }
-    // validate offer only for card-apps, to avoid breaks in existing flow.
-    const appliedOffer = session?.getAppliedOffer();
-    const appsAvailable = (getCardApps() || {})?.all;
-
-    if (
-      appliedOffer?.payment_method === 'card' &&
-      appliedOffer?.id &&
-      appsAvailable.includes(appliedOffer.issuer)
-    ) {
-      session.validateOffers($selectedApp, offerRemoved => {
-        if (!offerRemoved) {
-          // If the offer was not removed, revert to the app in offer issuer
-          setSelectedApp(session?.getAppliedOffer()?.issuer);
-        }
-      });
+    if ($selectedApp || $selectedCard || $newCardInputFocused) {
+      // validate offer only for card-apps, to avoid breaks in existing flow.
+      const appliedOffer = session?.getAppliedOffer();
+      const appsAvailable = getAppsForMethod('card') || [];
+      if (
+        appliedOffer?.payment_method === 'card' &&
+        appliedOffer?.id &&
+        appsAvailable.includes(appliedOffer.issuer)
+      ) {
+        session.validateOffers($selectedApp, offerRemoved => {
+          if (!offerRemoved) {
+            // If the offer was not removed, revert to the app in offer issuer
+            setSelectedApp(session?.getAppliedOffer()?.issuer);
+          }
+        });
+      }
     }
   }
 
@@ -224,6 +230,7 @@
   export function onBack() {
     $selectedCard = null; // De-select saved card
     tabVisible = false;
+    $newCardInputFocused = false;
     return false;
   }
 
@@ -414,6 +421,7 @@
   function setSelectedApp(code) {
     $selectedApp = code;
     $selectedCard = null;
+    $newCardInputFocused = false;
   }
 
   export function getPayload() {
@@ -504,8 +512,9 @@
     session.showEmiPlansForSavedCard(event.detail);
   }
 
-  function onAddCardViewFocused() {
+  function onAddCardViewFocused(event) {
     $selectedApp = null;
+    $newCardInputFocused = true;
   }
 
   function onCardInput() {
