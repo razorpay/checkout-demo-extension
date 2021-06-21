@@ -97,6 +97,7 @@ import * as Experiments from 'experiments';
 import BrowserStorage from 'browserstorage';
 
 import * as NBHandlers from 'handlers/netbanking';
+import * as CommonHandlers from 'handlers/common';
 
 import * as Instruments from 'configurability/instruments';
 import { getInstrumentMeta } from 'ui/tabs/home/instruments';
@@ -221,6 +222,7 @@ export default {
   Promise,
 
   NBHandlers,
+  CommonHandlers,
 
   ContactStorage,
   I18n,

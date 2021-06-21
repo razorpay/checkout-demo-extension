@@ -42,6 +42,7 @@ var preferences,
   es6components = discreet.es6components,
   cardTab = discreet.cardTab,
   NBHandlers = discreet.NBHandlers,
+  CommonHandlers = discreet.CommonHandlers,
   Instruments = discreet.Instruments,
   I18n = discreet.I18n,
   NativeStore = discreet.NativeStore,
@@ -403,6 +404,10 @@ function errorHandler(response) {
       message || I18n.format('misc.error_handling_request'),
       true
     );
+  }
+
+  if (this.get('retry') === false && this.get('redirect')) {
+    return CommonHandlers.replaceRetryButtonToDismissErrorMessage(this, 'OK');
   }
 
   NBHandlers.replaceRetryIfCorporateNetbanking(this, message);

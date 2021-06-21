@@ -1,3 +1,5 @@
+import { replaceRetryButtonToDismissErrorMessage } from './common';
+
 const AUTH_PENDING_MSG =
   'Payment is pending authorization. Request for authorization from approver.';
 
@@ -11,18 +13,8 @@ export function replaceRetryIfCorporateNetbanking(session, message) {
   if (message === AUTH_PENDING_MSG) {
     session.isCorporateBanking = true;
 
-    _El.detach(_Doc.querySelector('#fd-hide'));
+    replaceRetryButtonToDismissErrorMessage(session, 'OK');
 
-    const okButton =
-      _El.create('button')
-      |> _El.addClass('btn')
-      |> _El.setContents('OK')
-      |> _El.setAttribute('id', 'fd-ok')
-      |> _El.appendTo(_Doc.querySelector('#error-message'));
-
-    okButton.addEventListener('click', () => {
-      session.hide();
-    });
   } else {
     _Doc.querySelector('#fd-hide').focus();
   }
