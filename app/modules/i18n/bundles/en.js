@@ -70,7 +70,7 @@ export default {
       FSFB: 'Fincare Small Finance Bank',
       HDFC: 'HDFC Bank',
       HDFC_C: 'HDFC Bank - Corporate Banking',
-      HSBC: 'Hongkong & Shanghai Banking Corporation',
+      HSBC: 'HSBC',
       IBKL: 'IDBI',
       IBKL_C: 'IDBI - Corporate Banking',
       ICIC: 'ICICI Bank',

@@ -3591,7 +3591,7 @@ module.exports = {
           HDFC: { auth_types: ['netbanking', 'debitcard'], name: 'HDFC Bank' },
           HSBC: {
             auth_types: ['netbanking'],
-            name: 'Hongkong & Shanghai Banking Corporation',
+            name: 'HSBC',
           },
           ICIC: { auth_types: ['netbanking', 'debitcard'], name: 'ICICI Bank' },
           IBKL: { auth_types: ['netbanking'], name: 'IDBI' },
