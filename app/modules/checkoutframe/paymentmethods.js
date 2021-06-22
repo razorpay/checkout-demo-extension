@@ -124,6 +124,14 @@ const DESCRIPTIONS = {
       providerNames.push(getCardlessEmiProviderName(providerCode, locale));
     });
 
+    // special treatment to walnut 369
+    const walnut369Name = getCardlessEmiProviderName('walnut369', locale);
+    const walnutPosition = providerNames.indexOf(walnut369Name);
+    if (walnutPosition >= 1) {
+      providerNames.splice(walnutPosition, 1);
+      providerNames.unshift(walnut369Name);
+    }
+
     if (cardEmi) {
       if (isDebitEMIEnabled()) {
         providerNames.unshift(getMethodPrefix('debit_credit_cards', locale));

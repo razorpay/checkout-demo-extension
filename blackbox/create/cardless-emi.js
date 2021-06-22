@@ -1,3 +1,4 @@
+const mockAPI = require('blackbox/tests/custom/mockApi.js');
 const makeOptionsAndPreferences = require('./options/index.js');
 const { getTestData } = require('../actions');
 const { openCheckoutWithNewHomeScreen } = require('../tests/homescreen/open');
@@ -73,8 +74,8 @@ module.exports = function(testFeatures) {
         zestmoney: true,
         flexmoney: true,
         bajaj: true,
+        walnut369: true,
       };
-
       // Why do the following and not include Bajaj in emi_options.json file?
       // When EMI on Cards is available,
       // we show "EMI" on homescreen, clicking on which takes us to Cards screen
@@ -115,7 +116,6 @@ module.exports = function(testFeatures) {
       if (feeBearer) {
         return;
       }
-
       const context = await openCheckoutWithNewHomeScreen({
         page,
         options,
@@ -187,6 +187,37 @@ module.exports = function(testFeatures) {
         await resendOTP(context);
         await typeOTPandSubmit(context);
         await verifyOTP(context, 'pass');
+      } else if (provider === 'walnut369') {
+        // expect request
+        if (!optionalContact) {
+          await context.expectRequest();
+          await context.respondJSON(mockAPI.ajaxResponse('cardless_emi'));
+        }
+        // verifying iframe created ,modal hidden & url open is correct
+        await page.waitForFunction(() => {
+          const iframe = document.getElementById('iframeFlow');
+          const modal = document.getElementById('modal');
+          const isModalHidden = modal ? modal.style.display === 'none' : false;
+          return iframe && isModalHidden;
+        });
+        const frame = await page
+          .frames()
+          .find(fr => fr.name() === 'iframeFlow');
+        // mock success
+        await frame.evaluate(() => {
+          try {
+            (window.opener || window.parent).postMessage(
+              JSON.stringify({ razorpay_payment_id: 'pay_123465' }),
+              '*'
+            );
+          } catch (e) {}
+        });
+
+        // wait for response
+        await new Promise(function(resolve) {
+          setTimeout(resolve, 1000);
+        });
+        return;
       }
 
       if (feeBearer) {

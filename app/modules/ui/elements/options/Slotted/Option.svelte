@@ -61,4 +61,5 @@
     </div>
     <slot name="extra" />
   </Stack>
+    <slot name="banner" />
 </button>

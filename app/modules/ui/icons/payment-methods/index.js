@@ -19,6 +19,8 @@ import tickFilledDonate from './tick_filled_donate';
 import warning from './warning';
 import refund from './refund';
 import donationHeart from './donate_heart';
+import newWindow from './new_window';
+import tickFlag from './tick_flag';
 
 import { getAllMethods } from 'checkoutframe/paymentmethods';
 
@@ -33,7 +35,9 @@ const availIconNames = getAllMethods().concat([
   'tick_filled_donate',
   'warning',
   'refund',
-  'donate_heart'
+  'donate_heart',
+  'tick_flag',
+  'new_window',
 ]);
 
 function getIconFn(iconName) {
@@ -105,6 +109,12 @@ function getIconFn(iconName) {
 
     case 'donate_heart':
       return donationHeart;
+
+    case 'tick_flag':
+      return tickFlag;
+
+    case 'new_window':
+      return newWindow;
   }
 }
 

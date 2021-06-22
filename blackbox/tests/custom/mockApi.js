@@ -73,6 +73,7 @@ module.exports = {
           ...defaultResponse,
         };
       }
+      case 'cardless_emi':
       case 'wallet':
         return {
           type: 'first',

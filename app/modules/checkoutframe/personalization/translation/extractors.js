@@ -97,6 +97,12 @@ function app(instrument) {
     providers: [instrument.provider],
   };
 }
+function cardless_emi(instrument) {
+  return {
+    method: 'cardless_emi',
+    providers: [instrument.provider],
+  };
+}
 
 export default {
   upi,
@@ -106,4 +112,5 @@ export default {
   paypal,
   emi,
   app,
+  cardless_emi,
 };

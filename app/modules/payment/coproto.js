@@ -21,6 +21,10 @@ import { isWebPaymentsApiAvailable } from 'common/webPaymentsApi';
 import { submitForm } from 'common/form';
 
 import { supportedWebPaymentsMethodsForApp } from 'payment/adapters';
+import popupTemplate from './popup/template';
+import { translatePaymentPopup } from 'i18n/popup';
+import { checkValidFlow, createIframe, isRazorpayFrame } from './utils';
+import FLOWS from 'config/FLOWS';
 
 const getParsedDataFromUrl = url => {
   const parsedData = {};
@@ -100,7 +104,7 @@ function popupIframeCheck(request) {
   if (typeof popupDocument.write !== 'function') {
     return false;
   }
-  const isValidPopupFlow = Config?.[data.method]?.[data.wallet]?.popupIframe;
+  const isValidPopupFlow = checkValidFlow(data, FLOWS.POPUP_IFRAME);
   /**
    * For Mobile Web only for Valid flow like Paytm
    */
@@ -214,7 +218,6 @@ var responseTypes = {
     if (this.data && this.data.wallet === 'amazonpay') {
       request.content = {};
     }
-
     if (this.nativeotp) {
       Analytics.track('native_otp:error', {
         data: {
@@ -245,6 +248,28 @@ var responseTypes = {
         }
         return this.emit('3ds.required');
       }
+    } else if (
+      /** check for forceIframe feature use by walnut 369 & its only for Standard checkout */
+      isRazorpayFrame() &&
+      checkValidFlow(this.data, FLOWS.FORCE_IFRAME)
+    ) {
+      // create an iframe
+      const IframeElement = this.forceIframeElement || createIframe(true);
+      if (!this.forceIframeElement) {
+        this.forceIframeElement = IframeElement;
+      }
+      // hide modal & show iframe
+      IframeElement?.window?.focus();
+      this.popup = IframeElement;
+      const template = popupTemplate(this, translatePaymentPopup);
+      IframeElement.contentDocument.write(template);
+      // post submit to iframe
+      submitForm({
+        doc: IframeElement.contentDocument,
+        path: request.url,
+        params: request.content,
+        method: request.method,
+      });
     } else if (popup) {
       if (this.iframe) {
         popup.show();

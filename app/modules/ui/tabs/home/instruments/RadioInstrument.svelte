@@ -41,6 +41,7 @@
     getPaylaterProviderName,
     getUpiIntentAppName,
     getAppProviderName,
+    getCardlessEmiProviderData,
   } from 'i18n';
 
   // Props
@@ -170,9 +171,18 @@
       providerCode = 'credit_debit_cards';
     }
     const providerName = getCardlessEmiProviderName(providerCode, locale);
+    let subtitle = getCardlessEmiProviderData(providerCode, 'subtitle', locale);
+    // for walnut 369 & amount > 2k (not required in 1st phase)
+    // if (providerCode === 'walnut369' && getAmount() >= provider?.min_amount) {
+    //   const walnutNCEnabled = hasFeature('walnut369_nc_emi', false);
+    //   if (walnutNCEnabled) {
+    //     subtitle = 'No cost EMI available';
+    //   }
+    // }
     return {
       title: getInstrumentTitle('cardless_emi', providerName, locale),
       icon: provider.sqLogo,
+      subtitle,
     };
   }
 
@@ -216,9 +226,7 @@
       title = details.title;
       icon = details.icon;
       code = details.code;
-      if (details?.subtitle) {
-        subtitle = details?.subtitle;
-      }
+      subtitle = details.subtitle || '';
     }
   }
 
@@ -266,6 +274,9 @@
     <Icon {icon} alt="" />
   </i>
   <div slot="title">{title}</div>
+  <div slot="subtitle" style={`display:${subtitle ? '' : 'none'}`}>
+    {subtitle}
+  </div>
   <div slot="body">
     {#if contactRequired}
       <ContactField bind:country={$proxyCountry} bind:phone={$proxyPhone} />

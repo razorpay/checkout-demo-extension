@@ -236,6 +236,7 @@ export default {
       cards: 'EMI on Cards',
       credit_debit_cards: 'EMI on Debit/Credit cards',
       earlysalary: 'EarlySalary',
+      walnut369: 'Walnut 369',
       flexmoney: 'Cardless EMI by InstaCred',
       zestmoney: 'ZestMoney',
       fdrl: 'Federal Bank Cardless EMI',
@@ -245,7 +246,15 @@ export default {
       icic: 'ICICI Bank Cardless EMI',
       hcin: 'Home Credit Ujjwal Card',
     },
+    walnut369: {
+      subtitle: 'Quick and easy EMI approvals',
+      highlightLabel: 'Quicker and higher chances of getting an EMI',
+      sideLabel: '(Easy Signup)'
+    },
     select_option_title: 'Select an option',
+    select_recommended_title: 'Recommended',
+    other_options: 'Other Options',
+    walnut_banner_text: 'Get No Cost EMI quickly with Walnut 369',
   },
   countries: {
     AD: 'Andorra',

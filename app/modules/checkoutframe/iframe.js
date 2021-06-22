@@ -92,7 +92,12 @@ export function initIframe() {
     /* not concerned about adding/removing listeners,
      * iframe is razorpay's fiefdom */
     var data = e.data;
-    if (e.source && e.source !== ownerWindow) {
+    const session = getSession();
+    const iframeFlow = session?.r?._payment?.forceIframeElement || {};
+    if (
+      e.source &&
+      e.source !== ownerWindow && e.source !== iframeFlow?.contentWindow
+    ) {
       return;
     }
 

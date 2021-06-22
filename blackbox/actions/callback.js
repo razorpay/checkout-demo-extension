@@ -16,12 +16,13 @@ async function callbackPage(context, response) {
   await context.respondHTML(callbackHtml(response));
 }
 
-
 const getMockResponse = (success = true) => {
   if (success) {
     return callbackHtml("{ razorpay_payment_id: 'pay_123465' }");
   } else {
-    return callbackHtml('{"error":{"code":"BAD_REQUEST_ERROR","description":"The payment has already been processed","source":"internal","step":"payment_authorization","reason":"bank_technical_error","metadata":{}},"http_status_code":400,"org_logo":"","org_name":"Razorpay Software Private Ltd","checkout_logo":"https://dashboard-activation.s3.amazonaws.com/org_100000razorpay/checkout_logo/phpnHMpJe","custom_branding":false};');
+    return callbackHtml(
+      '{"error":{"code":"BAD_REQUEST_ERROR","description":"The payment has already been processed","source":"internal","step":"payment_authorization","reason":"bank_technical_error","metadata":{}},"http_status_code":400,"org_logo":"","org_name":"Razorpay Software Private Ltd","checkout_logo":"https://dashboard-activation.s3.amazonaws.com/org_100000razorpay/checkout_logo/phpnHMpJe","custom_branding":false};'
+    );
   }
 };
 

@@ -39,8 +39,9 @@ async function sendPreferences({
   respondJSON,
   options,
   preferences,
+  getRequest,
 }) {
-  await expectRequest(({ URL, params }) => {
+  const reqData = await expectRequest(({ URL, params }) => {
     expect(URL.pathname).toEqual('/v1/preferences');
 
     if (options.key) {
@@ -57,6 +58,7 @@ async function sendPreferences({
       }
     });
   });
+  getRequest(reqData.URL.pathname);
   await respondJSON(preferences);
 }
 
@@ -84,6 +86,7 @@ function makePreferences(overrides) {
 module.exports = {
   sendPreferences,
   makePreferences,
+  preferencesParams,
 
   makePreferencesLogged(overrides) {
     const token = randomId();

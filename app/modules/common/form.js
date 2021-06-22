@@ -9,18 +9,18 @@
  */
 
 export function submitForm(formData) {
-  const {
-    doc = window.document,
-    path,
-    params,
-    method = 'post',
-    target,
-  } = formData;
+  const { doc = window.document, path, method = 'post', target } = formData;
+  let { params } = formData;
+  if(params) {
+    params = flatten(params);
+  }
 
   if (method && method.toLowerCase() === 'get') {
-    const action = appendParamsToUrl(path, params);
+    const action = appendParamsToUrl(path, params || '');
     if (target) {
       window.open(action, target);
+    } else if(doc !== window.document) {
+      doc.location = action;
     } else {
       window.location = action;
     }
@@ -74,11 +74,34 @@ export function appendParamsToUrl(url, params) {
  *
  * @returns {string}
  */
- export function serialize(obj) {
+export function serialize(obj) {
   var str = [];
   for (var p in obj)
     if (obj.hasOwnProperty(p)) {
-      str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+      str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]));
     }
-  return str.join("&");
+  return str.join('&');
+}
+
+export function flatten(data = {}) {
+  var result = {};
+  if(Object.keys(data).length === 0) return '';
+  function recurse(cur, prop) {
+    if (Object(cur) !== cur) {
+      result[prop] = cur;
+    } else if (Array.isArray(cur)) {
+      for (var i = 0, l = cur.length; i < l; i++)
+        recurse(cur[i], prop + '[' + i + ']');
+      if (l == 0) result[prop] = [];
+    } else {
+      var isEmpty = true;
+      for (var p in cur) {
+        isEmpty = false;
+        recurse(cur[p], prop ? prop + '[' + p + ']' : p);
+      }
+      if (isEmpty && prop) result[prop] = {};
+    }
+  }
+  recurse(data, '');
+  return result;
 }

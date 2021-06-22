@@ -6,15 +6,15 @@ import {
 
 import * as cookie from 'lib/cookie';
 import * as Color from 'lib/color';
+import { submitForm } from 'common/form';
 
 import Track from 'tracker';
 import popupTemplate from 'payment/popup/template';
 import Popup from 'payment/popup';
 import Iframe from 'payment/iframe';
-import { formatPayment, formatPayload } from 'payment/validator';
+import { formatPayment } from 'payment/validator';
 import { FormatDelegator } from 'formatter';
 import Razorpay, { makeAuthUrl, makeUrl } from 'common/Razorpay';
-import RazorpayConfig from 'common/RazorpayConfig';
 import { ajaxRouteNotSupported } from 'common/useragent';
 import { isPowerWallet } from 'common/wallet';
 import { checkPaymentAdapter } from 'payment/adapters';
@@ -30,16 +30,9 @@ import { getCardEntityFromPayload, getCardFeatures } from 'common/card';
 
 import { translatePaymentPopup as t } from 'i18n/popup';
 import updateScore from 'analytics/checkoutScore';
+import { checkValidFlow, createIframe, isRazorpayFrame } from './utils';
+import FLOWS from 'config/FLOWS';
 
-/**
- * Tells if we're being executed from
- * the same domain as the configured API
- */
-const isRazorpayFrame = () => {
-  return RazorpayConfig.api.startsWith(
-    `${location.protocol}//${location.hostname}`
-  );
-};
 
 const RAZORPAY_COLOR = '#528FF0';
 var pollingInterval;
@@ -236,6 +229,9 @@ export default function Payment(data, params = {}, r) {
     }
 
     if (isRazorpayFrame()) {
+      // Its used by Iframe flow like walnut 369 to trigger complete event
+      this.on('complete', this.complete);
+
       if (data.method === 'wallet') {
         if (isPowerWallet(data.wallet)) {
           /* If contact or email are missing, we need to ask for it in popup */
@@ -298,8 +294,9 @@ export default function Payment(data, params = {}, r) {
       }
     }
   }
-
-  this.avoidPopup = avoidPopup;
+  // in force iframe always avoid popup
+  const forceIframeFlow = checkValidFlow(data, FLOWS.FORCE_IFRAME);
+  this.avoidPopup = forceIframeFlow || avoidPopup;
   this.message = params.message;
 
   this.tryPopup();
@@ -412,7 +409,6 @@ Payment.prototype = {
 
     // show loading screen in popup
     this.writePopup();
-
     if (!this.tryAjax()) {
       this.trySubmit();
     }
@@ -442,6 +438,20 @@ Payment.prototype = {
 
     if (data.error && data.error.action === 'TOPUP') {
       return processOtpResponse.call(this, data);
+    }
+
+    // for iframe mode manually handle redirect flow
+    if (this.forceIframeElement && this.r.get('redirect') && this.r.get('callback_url')) {
+      const url = this.r.get('callback_url');
+      const doc = window?.parent?.document || window.document;
+      submitForm({
+        doc,
+        path: url,
+        params: data,
+        method: 'POST',
+        target: this.r.get('target') || '_top'
+      });
+      return;
     }
 
     if (data.razorpay_payment_id) {
@@ -494,6 +504,11 @@ Payment.prototype = {
       this.popup.close();
     } catch (e) {}
 
+    try {
+      // delete iframe if created for flows like capital flow
+      this.popup.window.destroy();
+    } catch (e) {}
+
     this.done = true;
 
     // unbind listener
@@ -502,7 +517,6 @@ Payment.prototype = {
     }
 
     clearPollingInterval();
-
     this.r._payment = null;
 
     if (this.ajax) {
@@ -523,7 +537,11 @@ Payment.prototype = {
         return;
       }
     }
-
+    const isForceIframeFlow = checkValidFlow(this.data, FLOWS.FORCE_IFRAME);
+    if (isForceIframeFlow) {
+      this.forceIframeElement = createIframe();
+      delete this.data.callback_url;
+    }
     /**
      * type: otp is not handled on razorpayjs
      * which is sent for some of the wallets, unidentifiable from
@@ -560,12 +578,12 @@ Payment.prototype = {
       return;
     }
 
-    if (
-      (data.method === 'wallet' || data.method === 'cardless_emi') &&
-      !(data.contact && data.email)
-    ) {
-      return;
-    }
+      if (
+        (data.method === 'wallet' || data.method === 'cardless_emi') &&
+        !(data.contact && data.email)
+      ) {
+        return;
+      }
 
     // Axis bank requires HTTP Referer field to be non-empty,
     // If opening bank page from popup, it will be empty.
@@ -595,7 +613,7 @@ Payment.prototype = {
     var popup = payment.popup;
 
     // no ajax route was available
-    if (popup) {
+    if (popup || this.forceIframeElement) {
       var data = payment.data;
 
       // fix long notes
@@ -609,7 +627,20 @@ Payment.prototype = {
       }
 
       data['_[request_index]'] = Analytics.updateRequestIndex('submit');
-
+      if (this.forceIframeElement) {
+        // show iframe in view and hide modal
+        this.forceIframeElement?.window?.focus();
+        // show loading screen in iframe
+        this.forceIframeElement.contentDocument.write(popupTemplate(this, t));
+        data['_[iframe_mode]'] = true;
+        submitForm({
+          doc: this.forceIframeElement.contentWindow.document,
+          path: makeRedirectUrl(payment.fees),
+          params: data,
+          method: 'POST',
+        });
+        return;
+      }
       _Doc.submitForm(makeRedirectUrl(payment.fees), data, 'post', popup.name);
     }
   },
@@ -969,6 +1000,9 @@ razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
 
 razorpayProto.focus = function() {
   try {
+    if (this._payment.forceIframeElement) {
+      this._payment.forceIframeElement.window.focus();
+    }
     this._payment.popup.window.focus();
   } catch (e) {}
 };

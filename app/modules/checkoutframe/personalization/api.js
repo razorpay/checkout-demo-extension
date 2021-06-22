@@ -199,6 +199,10 @@ const API_INSTRUMENT_PAYMENT_ADDONS = {
     instrument.provider = instrument.instrument;
     delete instrument.instrument;
   },
+  cardless_emi: instrument => {
+    instrument.provider = instrument.instrument;
+    delete instrument.instrument;
+  },
 };
 
 // EMI is the same as Card

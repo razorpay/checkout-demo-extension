@@ -44,7 +44,7 @@ function checkoutRequestHandler(request) {
   } else if (url.includes('livereload')) {
     // Livereload URLs come if you have `npm run start` on while testing
     return request.respond({ status: 200 });
-  } else {
+  }  else {
     throw new Error(
       `unexpected resource URL while loading checkout-public: ${url}`
     );
@@ -69,14 +69,14 @@ function forceTargetInitialization(browser) {
 
 function popupRequestHandler(request) {
   const url = request.url();
-  if (url.includes('v1/gateway/mocksharp/payment')) {
-    return request.respond({ body: popupHtmlContent });
-  } else if (url.startsWith(mockPageSubmit)) {
+  if (url.startsWith(mockPageSubmit)) {
     const postData = request.postData();
     return request.respond({
       contentType: 'text/html',
       body: getMockResponse(!postData.includes('success=F')),
     });
+  } else if (url.includes('v1/gateway/mocksharp/payment')) {
+    return request.respond({ body: popupHtmlContent });
   } else {
     request.continue();
   }
@@ -105,7 +105,7 @@ function cdnRequestHandler(request) {
         request.respond({ status: 500 });
       }
     }
-  }
+  } 
 }
 
 async function passMessage(page, message) {
@@ -176,7 +176,6 @@ module.exports = {
     method,
     emulate,
   }) {
-
     // Disable animations for testing
     options = {
       ...options,
@@ -192,6 +191,7 @@ module.exports = {
     }
     if (interceptorOptions) {
       interceptorOptions.disableInterceptor();
+      interceptorOptions.resetAllRequest();
       page.removeListener('request', cdnRequestHandler);
     } else {
       await page.setRequestInterception(true);

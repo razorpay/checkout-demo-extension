@@ -7,6 +7,7 @@
   export let icon = null; // Override: icon. Picked from method if not overridden.
   export let title = null; // Override: title. Picked from method if not overridden.
   export let subtitle = null; // Override: subtitle. Picked from method if not overridden.
+  export let instrument = null;
 
   // Store
   import { locale } from 'svelte-i18n';
@@ -18,13 +19,13 @@
   // Utils imports
   import { getSession } from 'sessionmanager';
   import {
-    getMethodDowntimeDescription,
     getMethodNameForPaymentOption,
     getMethodDescription,
   } from 'checkoutframe/paymentmethods';
-  import { getDowntimes } from 'checkoutstore';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
+  import { formatMessageWithLocale } from 'i18n';
+  import { getThemeColor } from 'checkoutstore/theme';
 
   const session = getSession();
   const dispatch = createEventDispatcher();
@@ -72,6 +73,15 @@
 
     dispatch('select');
   }
+
+  // disabled for phase 1 of Walnut369
+  // let showWalnutBanner = false;
+  // $: showWalnutBanner = instrument.showWalnutBanner;
+  let walnutBannerText = '';
+  $: walnutBannerText = formatMessageWithLocale(
+    'cardless_emi.walnut_banner_text',
+    $locale
+  );
 </script>
 
 <SlottedOption
@@ -85,12 +95,52 @@
   </i>
   <div slot="title">{_title}</div>
   <div slot="subtitle">{_subtitle}</div>
+  <!-- <div slot="banner">
+    {#if showWalnutBanner}
+      <div
+        class="banner"
+        style={`background:${getThemeColor()}1a; color:${getThemeColor()}`}
+      >
+        <img
+          class="banner-img"
+          src={'https://cdn.razorpay.com/cardless_emi/walnut369.svg'}
+          alt=""
+        />
+        <span>{walnutBannerText}</span>
+        <Icon icon={icons.new_window} />
+      </div>
+    {/if}
+  </div> -->
 </SlottedOption>
 
 <style>
   /* Container styles */
   :global(.new-method) {
     padding: 16px;
+  }
+
+  .banner-img {
+    height: 10px;
+    margin-right: 10px;
+  }
+
+  .banner {
+    position: relative;
+    top: 16px;
+    height: 26px;
+    left: -16px;
+    background: rgba(58, 151, 252, 0.1);
+    width: calc(100% + 32px);
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    box-sizing: border-box;
+    font-size: 10px;
+    line-height: 12px;
+  }
+
+  .banner span {
+    margin-right: 4px;
   }
 
   /* Icon styles */

@@ -18,7 +18,7 @@ import { hashFnv32a } from 'checkoutframe/personalization/utils';
 import { isMethodUsable } from 'checkoutstore/methods';
 import { getDowntimes } from 'checkoutstore';
 import { checkDowntime } from 'checkoutframe/downtimes';
-import { getAppFromPackageName } from 'common/upi'
+import { getAppFromPackageName } from 'common/upi';
 
 function generateBasePreferredBlock(preferred) {
   const preferredBlock = createBlock('rzp.preferred', {
@@ -302,16 +302,38 @@ export function setBlocks(
     allBlocks = _Arr.mergeWith([preferredBlock], allBlocks);
   }
 
-  // Filter out blocks with no instruments
-  allBlocks = _Arr.filter(
-    allBlocks,
-    block => _Obj.getSafely(block, 'instruments', []).length > 0
-  );
+  // if walnut 369 is highlight in block
+  let walnut369Visible = false;
+  // (not releasing in 1st phase of walnut 369)
+  // const walnut369Enabled = isWalnut369Enabled();
+  // const walnutNCEnabled = hasFeature('walnut369_nc_emi', false);
+  // Filter out blocks with no instruments & check for walnut 369 exist in block
+  allBlocks = allBlocks.filter(block => {
+    const _instruments = block?.instruments || [];
+    _instruments.forEach(instrument => {
+      if (instrument?._ungrouped?.[0]?.provider === 'walnut369') {
+        walnut369Visible = true;
+      }
+    });
+    // check for walnut 369
+    return _instruments.length > 0;
+  });
 
   // Add an ID to all instruments
   _Arr.loop(allBlocks, (block, blockIndex) => {
     _Arr.loop(block.instruments, (instrument, instrumentIndex) => {
-      addDowntimeToBlock(instrument)
+      // set banner boolean (not releasing in 1st phase of walnut 369)
+      // check for walnut369 enable, NC emi feature enable & walnut 369 not in any of other blocks
+      // if (
+      //   instrument?.method === 'cardless_emi' &&
+      //   walnut369Enabled &&
+      //   walnutNCEnabled &&
+      //   !walnut369Visible &&
+      //   block.code === 'rzp.cluster'
+      // ) {
+      //   instrument.showWalnutBanner = true;
+      // }
+      addDowntimeToBlock(instrument);
       if (!instrument.id) {
         instrument.id = generateInstrumentId(
           customer,
@@ -440,7 +462,7 @@ function addDowntimeToBlock(block) {
   switch (block.method) {
     case 'netbanking':
       if (!block.banks || block.banks.length === 0) {
-        return block
+        return block;
       }
       downtimeSeverity = checkDowntime(
         downtimes.netbanking,
@@ -452,11 +474,7 @@ function addDowntimeToBlock(block) {
     case 'upi':
       if (block.apps && block.apps.length > 0) {
         const appName = getAppFromPackageName(block.apps[0]).shortcode;
-        downtimeSeverity = checkDowntime(
-          downtimes.upi,
-          'psp',
-          appName
-        );
+        downtimeSeverity = checkDowntime(downtimes.upi, 'psp', appName);
         downtimeInstrument = appName;
       } else {
         downtimeSeverity = checkDowntime(
@@ -470,7 +488,7 @@ function addDowntimeToBlock(block) {
     case 'card':
       const downtimesArr = ['low', 'medium', 'high'];
       let issuerDowntime;
-      let networkDowntime
+      let networkDowntime;
       if (block.issuers && block.issuers.length > 0) {
         issuerDowntime = checkDowntime(
           downtimes.cards,
@@ -486,7 +504,7 @@ function addDowntimeToBlock(block) {
         );
       }
       if (!issuerDowntime && !networkDowntime) {
-        return block
+        return block;
       }
       if (issuerDowntime && networkDowntime) {
         if (

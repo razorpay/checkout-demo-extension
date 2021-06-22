@@ -6,6 +6,15 @@ const prefix = cdnUrl + 'cardless_emi/';
 const sqPrefix = cdnUrl + 'cardless_emi-sq/';
 
 const config = {
+  walnut369: {
+    name: 'Walnut369',
+    fee_bearer_customer: false,
+    headless: false,
+    // section: 'recommended',
+    // highlightLabel: 'cardlessemi.walnut369.hightlightlabel', // use i18n
+    pushToFirst: true, // later introduce order if more than one
+    min_amount: 200000,
+  },
   bajaj: {
     name: 'Bajaj Finserv',
   },
@@ -46,7 +55,7 @@ const config = {
   hcin: {
     name: 'Home Credit Ujjwal Card',
     headless: false,
-  },
+  }
 };
 
 /**
@@ -55,10 +64,12 @@ const config = {
  *
  * @return {Object}
  */
-export const createProvider = code => ({
+export const createProvider = (code, provider) => ({
   data: {
     code,
   },
+  section: provider?.section,
+  highlightLabel: provider?.highlightLabel,
   icon: 'https://cdn.razorpay.com/cardless_emi-sq/' + code + '.svg',
 });
 

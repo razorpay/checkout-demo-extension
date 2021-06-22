@@ -1,14 +1,4 @@
-const {
-  interceptor,
-  chrnum,
-  randomBool,
-  randomItem,
-  randomEmail,
-  randomContact,
-  randomId,
-  randomName,
-  randomString,
-} = require('../util');
+const { preferencesParams } = require('./preferences');
 
 async function sendRewards({ expectRequest, respondJSON, options, rewards }) {
   await expectRequest(({ URL, params }) => {

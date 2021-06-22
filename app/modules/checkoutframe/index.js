@@ -178,6 +178,13 @@ export const handleMessage = function(message) {
   var id = message.id || Track.id;
   var session = SessionManager.getSession(id);
 
+  // response will come here only in case of iframe
+  if (('razorpay_payment_id' in message || 'error' in message) && session) {
+    // call coproto to complete the process
+    session.r.emit('payment.complete', message);
+    return;
+  }
+
   if (message.event === 'close') {
     if (session) {
       session.closeAndDismiss();

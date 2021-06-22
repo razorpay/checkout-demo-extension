@@ -235,9 +235,14 @@ const util = (module.exports = {
         }
         return currentRequest;
       },
+      resetAllRequest: () => {
+        allRequests = {};
+        reset();
+      },
     };
 
     function getRequestPath(request) {
+      if (!request) return '';
       const parsedURL = URL.parse(request.url());
       return parsedURL.pathname;
     }

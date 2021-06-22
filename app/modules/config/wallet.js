@@ -1,5 +1,7 @@
+import FLOWS from './FLOWS';
+
 export default {
-    paytm: {
-        popupIframe: true
-    }
-}
+  paytm: {
+    [FLOWS.POPUP_IFRAME]: true,
+  },
+};

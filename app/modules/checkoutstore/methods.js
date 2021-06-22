@@ -875,6 +875,10 @@ export function getAppProviders() {
   );
 }
 
+export function isWalnut369Enabled() {
+  return Boolean(getMerchantMethods()?.cardless_emi?.walnut369);
+}
+
 export function getCardlessEMIProviders() {
   let emiMethod = {};
   if (getEMIBanks().BAJAJ) {
@@ -895,7 +899,6 @@ export function getCardlessEMIProviders() {
   if (isCustomerFeeBearer()) {
     providers = getEligibleProvidersForFeeBearerCustomer(providers);
   }
-
   return providers;
 }
 

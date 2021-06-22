@@ -57,8 +57,8 @@
     {#each block.instruments as instrument, index (instrument.id)}
       <Method
         method={instrument.method}
-        on:select={() => dispatch('selectInstrument', instrument)}
-      />
+        {instrument}
+        on:select={() => dispatch('selectInstrument', instrument)} />
     {/each}
   </div>
 </div>

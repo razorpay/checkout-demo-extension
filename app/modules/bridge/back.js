@@ -56,6 +56,7 @@ export function backPressed(callback) {
 
   if (Confirm.isVisible()) {
     Confirm.hide(true);
+    Backdrop.show();
   } else if (TermsCurtain.isVisible()) {
     TermsCurtain.hide();
   } else if (
@@ -107,6 +108,7 @@ export function stopListeningForBackPresses() {
 }
 
 function backHandlerForWeb() {
+  const session = getSession();
   if (!isModalVisible()) {
     // If still fetching the preferences, abort.
     const session = getSession();
@@ -119,6 +121,14 @@ function backHandlerForWeb() {
   }
 
   backPressed();
+
+  // Hide iframe if created for flows like capital flow & trigger cancel flow
+  if (
+    session &&
+    typeof session?.r?._payment?.forceIframeElement?.window?.hide === 'function'
+  ) {
+    session.r._payment.forceIframeElement.window.hide();
+  }
 
   /**
    * The modal may have closed.
