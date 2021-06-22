@@ -14,6 +14,7 @@
   import { getIcon as getNetworkIcon } from 'icons/network';
   import Track from 'tracker';
   import { getExtendedSingleInstrument } from 'configurability/instruments';
+  import { toTitleCase } from 'lib/utils';
 
   // Store
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
@@ -58,7 +59,7 @@
           : 'instruments.titles.card_logged_in',
         {
           bank: bankText,
-          type: _Str.toTitleCase(cardType),
+          type: toTitleCase(cardType),
           last4: card.last4,
         },
         $locale
@@ -70,7 +71,7 @@
           : 'instruments.titles.card_logged_out',
         {
           bank: bankText,
-          type: _Str.toTitleCase(cardType),
+          type: toTitleCase(cardType),
         },
         $locale
       );

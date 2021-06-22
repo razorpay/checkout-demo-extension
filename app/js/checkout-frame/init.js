@@ -22,7 +22,6 @@ var Bridge = discreet.Bridge;
 var Curtain = discreet.Curtain;
 var P13n = discreet.P13n;
 var Store = discreet.Store;
-var _Str = discreet._Str;
 var _Arr = discreet._Arr;
 
 var ERROR_TRACKING_URLS = [
@@ -32,7 +31,7 @@ var ERROR_TRACKING_URLS = [
 
 function isUrlApplicableForErrorTracking(url) {
   return _Arr.any(ERROR_TRACKING_URLS, function(availableUrl) {
-    return _Str.startsWith(url, availableUrl);
+    return url.startsWith(availableUrl);
   });
 }
 

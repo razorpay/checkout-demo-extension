@@ -264,7 +264,7 @@ export const COUNTRY_TO_CODE_MAP = {
 
 const AMERICAN_REGEX = /^\(\d{3}\)[\s-]?\d{3}-?\d{4}$/;
 
-const hasPlus = number => _Str.startsWith(number, '+');
+const hasPlus = number => number.startsWith('+');
 const removePlus = number => number.replace(/^\+/, '');
 
 function hasAtLeastTwoLeadingZeroes(number) {
@@ -289,7 +289,7 @@ function sanitizeNumber(number) {
     number = removeLeadingZeroes(number);
   }
 
-  const startsWithPlus = _Str.startsWith(number, '+');
+  const startsWithPlus = number.startsWith('+');
 
   let sanitized = number.replace(/\D/g, '');
 
@@ -310,7 +310,7 @@ function getIndianNumber(number) {
   number = sanitizeNumber(number);
 
   // If it starts with + and is not followed by 91, it's not Indian
-  if (hasPlus(number) && !_Str.startsWith(number, '+91')) {
+  if (hasPlus(number) && !number.startsWith('+91')) {
     return {
       success: false,
     };
@@ -319,7 +319,7 @@ function getIndianNumber(number) {
   let phone = removePlus(number);
   let success = false;
 
-  if (phone.length === 12 && _Str.startsWith(number, '91')) {
+  if (phone.length === 12 && number.startsWith('91')) {
     phone = phone.slice(2);
   }
 
@@ -421,7 +421,7 @@ function getCountryCodeFromNumber(number) {
   for (let i = 0; i < codesByLength.length; i++) {
     const codes = codesByLength[i];
 
-    const code = _Arr.find(codes, _code => _Str.startsWith(number, _code));
+    const code = _Arr.find(codes, _code => number.startsWith(_code));
 
     if (code) {
       return code;

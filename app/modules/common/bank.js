@@ -151,11 +151,9 @@ export const getPreferredBanks = (availBanks, bankOptions) => {
     commonBanks
     |> _Arr.filter(currBank => {
       return (
-        availBanks[currBank.code] &&
-        !availBanks[currBank.code |> _Str.slice(0, -2)]
+        availBanks[currBank.code] && !availBanks[currBank.code.slice(0, -2)]
       );
     });
-
   if (_.isArray(order)) {
     const availBanksList = transformBanks(availBanks);
 

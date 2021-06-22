@@ -56,12 +56,20 @@ function bringIntoView(el) {
   return el;
 }
 
-export function toTitleCase(str) {
-  if (!str) {
-    return str;
-  }
-
-  return str[0].toUpperCase() + str.slice(1);
+/**
+ * Turns A Sentence To Title Case
+ * also known as CapitalCase
+ * @param {string} sentence
+ *
+ * @returns {string}
+ */
+export function toTitleCase(sentence) {
+  return String(sentence)
+    ?.split(' ')
+    ?.map(
+      word => `${word.slice(0, 1).toUpperCase()}${word.slice(1).toLowerCase()}`
+    )
+    ?.join(' ');
 }
 
 /**

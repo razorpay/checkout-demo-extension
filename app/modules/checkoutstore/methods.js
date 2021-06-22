@@ -764,7 +764,7 @@ export function getEMIBankPlans(code, cardType = 'credit', noCostEmi = true) {
     return;
   }
 
-  if (cardType === 'debit' && !_Str.endsWith(code, '_DC')) {
+  if (cardType === 'debit' && !code.endsWith('_DC')) {
     // For Banks with EMI on Debit Cards,
     // code will end with "_DC".
     // Example: If the issuer is HDFC and card type is debit

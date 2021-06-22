@@ -17,7 +17,6 @@ let injects = {
   _: ['fe/implicit/_', '*'],
   Promise: 'fe/implicit/Promise',
   _Arr: ['fe/implicit/_Arr', '*'],
-  _Str: ['fe/implicit/_Str', '*'],
   _Func: ['fe/implicit/_Func', '*'],
   _Obj: ['fe/implicit/_Obj', '*'],
   _El: ['fe/implicit/_El', '*'],

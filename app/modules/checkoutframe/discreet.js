@@ -218,7 +218,6 @@ export default {
   _El,
   _Func,
   _Obj,
-  _Str,
   _,
   Promise,
 

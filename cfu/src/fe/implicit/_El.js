@@ -1,5 +1,4 @@
 import * as _ from './_';
-import * as _Str from './_Str';
 import * as _Obj from './_Obj';
 
 export const ElementConstructor = global.Element;
@@ -160,7 +159,7 @@ export const submit =
  */
 export const hasClass =
   ((el, className) => {
-    return _Str.contains(_Str.pad(el.className), _Str.pad(className));
+    return (' ' + el.className + ' ').includes(' ' + className + ' ');
   })
   |> elementString
   |> _.curry2;

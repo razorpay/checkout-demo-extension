@@ -7,7 +7,7 @@ const alphanumericRaw = function(value) {
   var returnVal = value.replace(/[^a-zA-Z0-9]/g, '');
 
   if (this.el.maxLength > 0) {
-    returnVal = _Str.slice(returnVal, 0, this.el.maxLength);
+    returnVal = returnVal.slice(0, this.el.maxLength);
   }
 
   return returnVal;
@@ -55,7 +55,7 @@ Formatter.rules = {
       if (currentType !== this.type) {
         this.maxLen = Card.getCardMaxLen(currentType);
       }
-      this.value = _Str.slice(value, 0, this.maxLen);
+      this.value = value.slice(0, this.maxLen);
     },
 
     pretty: function(value, shouldTrim) {
@@ -184,7 +184,7 @@ Formatter.rules = {
     raw: function(value) {
       let returnVal = value.replace(/\D/g, '');
       if (this.el.maxLength > 0) {
-        returnVal = _Str.slice(returnVal, 0, this.el.maxLength);
+        returnVal = returnVal.slice(0, this.el.maxLength);
       }
       return returnVal;
     },
@@ -226,7 +226,7 @@ Formatter.rules = {
 
   country_code: {
     raw: function(value) {
-      if (!_Str.startsWith(value, '+')) {
+      if (!value.startsWith('+')) {
         value = `+${value}`;
       }
 
@@ -260,12 +260,12 @@ formatterProto.backFormat = function(e) {
     caret.start -= 1;
   }
 
-  let left = _Str.slice(value, 0, caret.start);
+  let left = value.slice(0, caret.start);
 
   this.run({
     e: e,
     left: left,
-    value: left + _Str.sliceFrom(value, caret.end),
+    value: left + value.slice(caret.end),
   });
 };
 
@@ -301,8 +301,8 @@ formatterProto.fwdFormat = function(e) {
   }
   let caret = this.getCaret();
   let value = this.el.value;
-  let left = _Str.slice(value, 0, caret.start) + newChar;
-  value = left + _Str.sliceFrom(value, caret.end);
+  let left = value.slice(0, caret.start) + newChar;
+  value = left + value.slice(caret.end);
 
   this.run({
     e: e,
@@ -323,7 +323,7 @@ formatterProto.format = function(e) {
 
   this.run({
     value: value,
-    left: _Str.slice(value, 0, caretPosition),
+    left: value.slice(0, caretPosition),
   });
 };
 

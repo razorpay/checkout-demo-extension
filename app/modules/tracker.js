@@ -21,7 +21,7 @@ function makeUid() {
   var num =
     toBase62(
       String(_.now() - 1388534400000) +
-        _Str.sliceFrom('000000' + _.floor(1000000 * _.random()), -6)
+        String('000000' + _.floor(1000000 * _.random())).slice(-6)
     ) +
     toBase62(_.floor(238328 * _.random())) +
     '0';
@@ -45,7 +45,7 @@ function makeUid() {
   if (tempdigit) {
     tempdigit = base62Chars[62 - tempdigit];
   }
-  return _Str.slice(num, 0, 13) + tempdigit;
+  return String(num).slice(0, 13) + tempdigit;
 }
 
 var _uid = makeUid();

@@ -62,7 +62,7 @@
 
   function appendPlusToCountryCodeAsynchronously() {
     setTimeout(() => {
-      if (!_Str.startsWith(country, '+')) {
+      if (!country.startsWith( '+')) {
         country = `+${country}`;
       }
     });
@@ -71,11 +71,11 @@
   function removeZeroFromPhoneAsynchronously() {
     setTimeout(() => {
       if (country === '+91') {
-        if (_Str.startsWith(phone, '0')) {
+        if (phone.startsWith( '0')) {
           phone = phone.slice(1);
         }
 
-        if (_Str.startsWith(phone, '+91')) {
+        if (phone.startsWith( '+91')) {
           phone = phone.slice(3);
         }
       }

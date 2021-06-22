@@ -36,8 +36,7 @@ import updateScore from 'analytics/checkoutScore';
  * the same domain as the configured API
  */
 const isRazorpayFrame = () => {
-  return _Str.startsWith(
-    RazorpayConfig.api,
+  return RazorpayConfig.api.startsWith(
     `${location.protocol}//${location.hostname}`
   );
 };
@@ -136,7 +135,7 @@ function trackNewPayment(data, params, r) {
       params.upi = {};
     }
 
-    if (_Str.contains(data.vpa, '@')) {
+    if (data.vpa?.includes('@')) {
       params.upi.provider = data.vpa.split('@')[1];
     }
   }
@@ -144,7 +143,7 @@ function trackNewPayment(data, params, r) {
   updateScore('timeToSubmit');
 
   var trackingData = getTrackingData(data);
-  if(params.downtimeSeverity) {
+  if (params.downtimeSeverity) {
     trackingData.downtimeSeverity = params.downtimeSeverity;
   }
   // default dcc currency use for only analytics by standard checkout only for now 

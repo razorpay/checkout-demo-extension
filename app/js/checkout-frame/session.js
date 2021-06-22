@@ -3106,7 +3106,7 @@ Session.prototype = {
 
     var getBankEMICode = function (issuer, type) {
       // EMI codes are different from bank codes and have _DC at the end.
-      if (type === 'debit' && !_Str.endsWith(issuer, '_DC')) {
+      if (type === 'debit' && !issuer.endsWith('_DC')) {
         return issuer + '_DC';
       }
       return issuer;
@@ -3116,7 +3116,7 @@ Session.prototype = {
 
     var bank = self.emiPlansForNewCard && self.emiPlansForNewCard.code;
     var cardIssuer = bank.split('_')[0];
-    var cardType = _Str.endsWith(bank, '_DC') ? 'debit' : 'credit';
+    var cardType = bank.endsWith('_DC') ? 'debit' : 'credit';
     var isEmiOfferApplied = Boolean(
       appliedOffer &&
       appliedOffer.payment_method === 'emi' &&
@@ -3222,7 +3222,7 @@ Session.prototype = {
 
     var getBankEMICode = function (issuer, type) {
       // EMI codes are different from bank codes and have _DC at the end.
-      if (type === 'debit' && !_Str.endsWith(issuer, '_DC')) {
+      if (type === 'debit' && !issuer.endsWith('_DC')) {
         return issuer + '_DC';
       }
       return issuer;

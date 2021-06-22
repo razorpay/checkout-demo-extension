@@ -1,5 +1,7 @@
 import { makeAuthUrl } from 'common/Razorpay';
 
+import { toTitleCase } from 'lib/utils';
+
 export const ALLOWED_EXTS = ['.jpg', '.jpeg', '.png'];
 export const ALLOWED_MAX_SIZE_IN_MB = 5;
 
@@ -11,7 +13,7 @@ export const ALLOWED_MAX_SIZE_IN_MB = 5;
  * @returns {boolean}
  */
 function hasValidExtension(filename, extensions) {
-  return _Arr.any(extensions, extension => _Str.endsWith(filename, extension));
+  return _Arr.any(extensions, extension => filename.endsWith(extension));
 }
 
 /**
@@ -22,7 +24,7 @@ function hasValidExtension(filename, extensions) {
  * @returns {string} Foo Bar Baz
  */
 function entityToWords(word) {
-  const words = _Arr.map(word.split(/_|\./g), _Str.toTitleCase);
+  const words = _Arr.map(word.split(/_|\./g), toTitleCase);
 
   let prev;
 
