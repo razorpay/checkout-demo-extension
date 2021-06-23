@@ -274,9 +274,6 @@
     <Icon {icon} alt="" />
   </i>
   <div slot="title">{title}</div>
-  <div slot="subtitle" style={`display:${subtitle ? '' : 'none'}`}>
-    {subtitle}
-  </div>
   <div slot="body">
     {#if contactRequired}
       <ContactField bind:country={$proxyCountry} bind:phone={$proxyPhone} />
