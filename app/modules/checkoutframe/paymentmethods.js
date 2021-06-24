@@ -28,6 +28,9 @@ import {
   formatMessageWithLocale,
 } from 'i18n';
 
+import { LOCALE_CODES } from 'constants/i18n';
+import { isUpiSubtextExperimentEnabled } from 'experiments/all/upiSubtext';
+
 import {
   DESCRIPTION_RECURRING_CARDS,
   DESCRIPTION_CARDLESS_EMI,
@@ -175,6 +178,11 @@ const DESCRIPTIONS = {
     if (isRecurring()) {
       return getRawMethodDescription('upi_recurring', locale);
     }
+
+    if (locale === LOCALE_CODES.ENGLISH && isUpiSubtextExperimentEnabled()) {
+      return 'Google Pay, PhonePe & more';
+    }
+
     return getRawMethodDescription('upi', locale);
   },
   wallet: locale =>
