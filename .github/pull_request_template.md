@@ -27,6 +27,10 @@
 - [ ] Added explanatory comment for tricky code explaining "why".
 - [ ] Tested on major browsers (Chrome, Firefox, Safari, Edge) and Webview.
 - [ ] Manual testing or integration testing done.
+- [ ] Added string translations for all the supported languages
+
+## Vernacularization
+<!-- List of new strings that are added -->
 
 ## Screenshots / Animated GIFs
 | Before                | After
