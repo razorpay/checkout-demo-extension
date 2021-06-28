@@ -1,4 +1,4 @@
-import Track from './tracker';
+import Track from '../tracker';
 
 const META = {};
 const REQUEST_INDEX = {};
@@ -40,7 +40,7 @@ const Analytics = () => ({
   /**
    * @param {Razorpay} r
    */
-  setR: function(r) {
+  setR: function (r) {
     rInstance = r;
     Track.dispatchPendingEvents(r);
   },
@@ -53,7 +53,7 @@ const Analytics = () => ({
    *  @prop {Razorpay} r
    *  @prop {Boolean} immediately
    */
-  track: function(
+  track: function (
     name,
     { type, data = {}, r = rInstance, immediately = false } = {}
   ) {
@@ -88,21 +88,21 @@ const Analytics = () => ({
    * @param {String} key
    * @param {*} val
    */
-  setMeta: function(key, val) {
+  setMeta: function (key, val) {
     _Obj.setProp(META, key, val);
   },
 
   /**
    * @param {String} key
    */
-  removeMeta: function(key) {
+  removeMeta: function (key) {
     _Obj.deleteProp(META, key);
   },
 
   /**
    * @return {Object}
    */
-  getMeta: function() {
+  getMeta: function () {
     return _Obj.unflatten(META);
   },
 

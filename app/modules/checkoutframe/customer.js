@@ -8,6 +8,8 @@ import * as OtpService from 'common/otpservice';
 import { isRecurring, getRecurringMethods } from 'checkoutstore';
 import { format, getCurrentLocale } from 'i18n';
 
+import { MetaProperties, Events } from 'analytics/index'
+
 /* global getPhone */
 
 let customers = {};
@@ -80,7 +82,7 @@ Customer.prototype = {
   saved: false,
   logged: false,
 
-  mark_logged: function(data) {
+  mark_logged: function (data) {
     var session = getSession();
     this.logged = true;
 
@@ -92,11 +94,11 @@ Customer.prototype = {
       session.topBar.setLogged(true);
     }
 
-    Analytics.setMeta('loggedIn', true);
+    Events.setMeta(MetaProperties.LOGGEDIN, true);
   },
 
   // NOTE: status check api also sends otp if customer exist
-  checkStatus: function(callback, queryParams, contact) {
+  checkStatus: function (callback, queryParams, contact) {
     let customer = this;
     let url = 'customers/status/' + (this.contact || contact);
 
@@ -115,7 +117,7 @@ Customer.prototype = {
 
     fetch({
       url: url,
-      callback: function(data) {
+      callback: function (data) {
         customer.saved = !!data.saved;
 
         if (customer.saved) {
@@ -131,7 +133,7 @@ Customer.prototype = {
     });
   },
 
-  createOTP: function(callback, queryParams) {
+  createOTP: function (callback, queryParams) {
     let url = 'otp/create';
 
     if (queryParams) {
@@ -143,14 +145,14 @@ Customer.prototype = {
       data: {
         contact: this.contact,
       },
-      callback: function(data) {
+      callback: function (data) {
         OtpService.markOtpSent('razorpay');
         callback && callback(data);
       },
     });
   },
 
-  submitOTP: function(data, callback, queryParams) {
+  submitOTP: function (data, callback, queryParams) {
     let user = this;
 
     // TODO: fix this
@@ -172,7 +174,7 @@ Customer.prototype = {
     fetch.post({
       url: url,
       data: data,
-      callback: function(data) {
+      callback: function (data) {
         if (data.success) {
           user.mark_logged(data);
         }
@@ -197,7 +199,7 @@ Customer.prototype = {
     });
   },
 
-  logout: function(this_device, callback) {
+  logout: function (this_device, callback) {
     Analytics.track('logout', {
       type: AnalyticsTypes.BEHAV,
       data: {

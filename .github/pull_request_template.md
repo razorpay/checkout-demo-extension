@@ -27,6 +27,7 @@
 - [ ] Added explanatory comment for tricky code explaining "why".
 - [ ] Tested on major browsers (Chrome, Firefox, Safari, Edge) and Webview.
 - [ ] Manual testing or integration testing done.
+- [ ] Add new event details in https://docs.google.com/spreadsheets/d/1OiRC5TLE_IfuEB_LvUJ6smgKbsxKdmoKx7B0k9aqGz0/edit#gid=0
 
 ## Screenshots / Animated GIFs
 | Before                | After
