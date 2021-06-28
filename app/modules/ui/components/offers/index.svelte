@@ -5,7 +5,7 @@
   import { getCurrency } from 'checkoutstore';
   import { getAnimationOptions } from 'svelte-utils';
 
-  import Analytics from 'analytics';
+  import Analytics, { OfferEvents, Events } from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
 
   import {
@@ -40,7 +40,6 @@
     APPLY_OFFER_CTA,
   } from 'ui/labels/offers';
 
-  import Callout from 'ui/elements/Callout.svelte';
   import CTA from 'ui/elements/CTA.svelte';
   import OfferItemList from './OfferItemList.svelte';
   import {
@@ -48,8 +47,7 @@
     methodInstrument,
   } from 'checkoutstore/screens/home';
   import { appliedOffer, isCardValidForOffer } from 'checkoutstore/offers';
-  import { customer } from 'checkoutstore/customer';
-
+  
   export let applicableOffers; // eligible offers array
   export let setAppliedOffer;
   export let onShown;
@@ -190,6 +188,7 @@
   }
 
   function applyOffer(offer) {
+    Events.TrackBehav(OfferEvents.APPLY, { offer })
     if (offer?.id === 'CRED_experimental_offer') {
       Analytics.track('cred:experiment_offer_selected', {
         type: AnalyticsTypes.BEHAV,

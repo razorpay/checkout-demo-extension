@@ -56,8 +56,7 @@
   } from 'ui/labels/card';
 
   // Utils
-  import { CardEvents, Events } from 'analytics/index'
-  import Analytics from 'analytics';
+  import Analytics, { CardEvents, Events } from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import {
     getIin,
