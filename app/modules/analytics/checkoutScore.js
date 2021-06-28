@@ -71,7 +71,7 @@ const score = {
     }
     return 0;
   },
-  instrumentSelected: function() {
+  instrumentSelected: function () {
     const timeSinceOpen = getTimeSinceOpen() / 1000;
     if (timeSinceOpen < 5) {
       return 5;
@@ -140,7 +140,7 @@ const reasons = {
 let calculatedScore = 0;
 let reasonEncountered = '';
 
-const updateScore = function(type, obj) {
+const updateScore = function (type, obj) {
   if (!score[type]) {
     // sanity check if we send the wrong key
     console.warn('incorrect key sent for score updatation');

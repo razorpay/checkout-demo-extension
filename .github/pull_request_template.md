@@ -31,10 +31,11 @@
 - [ ] Tested on major browsers (Chrome, Firefox, Safari, Edge) and Webview.
 - [ ] Manual testing or integration testing done.
 - [ ] Added string translations in [all the bundles](https://github.com/razorpay/static/tree/master/src/i18n-bundles/checkout) of supported languages
+- [ ] Add new event details in https://docs.google.com/spreadsheets/d/1OiRC5TLE_IfuEB_LvUJ6smgKbsxKdmoKx7B0k9aqGz0/edit#gid=0
 
 ## Vernacularization
 
-<!-- List of strings that are added or modified -->
+List of strings that are added or modified
 
 ## Screenshots / Animated GIFs
 

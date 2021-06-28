@@ -10,7 +10,7 @@
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
 
   // Svelte imports
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
 
   // Store
   import {
@@ -56,6 +56,7 @@
   } from 'ui/labels/card';
 
   // Utils
+  import { CardEvents, Events } from 'analytics/index'
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import {
@@ -93,6 +94,10 @@
       : undefined;
 
   export let faded = false;
+
+  onMount(() => {
+    Events.TrackBehav(CardEvents.ADD_NEW_CARD);
+  })
 
   function setCardNumberValidity(valid) {
     if (numberField) {
@@ -442,6 +447,121 @@
   }
 </script>
 
+<div class="pad" id="add-card-container" class:faded>
+  <div class="row card-fields">
+    <div class="two-third">
+      <NumberField
+        id="card_number"
+        bind:value={$cardNumber}
+        bind:this={numberField}
+        amexEnabled={isAMEXEnabled()}
+        helpText={cardNumberHelpText}
+        recurring={isRecurring()}
+        type={$cardType}
+        on:focus
+        on:filled={_ => handleFilled('numberField')}
+        on:autocomplete={trackCardNumberAutoFilled}
+        on:input={handleCardInput}
+        on:blur={trackCardNumberFilled}
+      />
+    </div>
+    {#if !$hideExpiryCvvFields}
+      <div class="third">
+        <ExpiryField
+          id="card_expiry"
+          name="card[expiry]"
+          bind:value={$cardExpiry}
+          bind:this={expiryField}
+          on:focus
+          on:blur={trackExpiryFilled}
+          on:filled={_ => handleFilled('expiryField')}
+        />
+      </div>
+    {/if}
+  </div>
+  <div class="row card-fields">
+    <div class="two-third">
+      <NameField
+        id="card_name"
+        name="card[name]"
+        readonly={nameReadonly}
+        bind:value={$cardName}
+        bind:this={nameField}
+        on:focus
+        on:blur={trackNameFilled}
+      />
+    </div>
+    {#if !$hideExpiryCvvFields}
+      <div class="third">
+        <CvvField
+          id="card_cvv"
+          length={cvvLength}
+          bind:value={$cardCvv}
+          bind:this={cvvField}
+          on:focus
+          on:blur={trackCvvFilled}
+        />
+      </div>
+    {/if}
+  </div>
+  {#if downtimeVisible}
+    <div class="downtime-cards">
+      <DowntimeCallout
+        showIcon={true}
+        severe={downtimeSeverity}
+        {downtimeInstrument}
+      />
+    </div>
+  {/if}
+  <div class="row remember-check">
+    <div>
+      {#if showRememberCardCheck}
+        <label class="first" for="save" id="should-save-card" tabIndex="0">
+          <input
+            type="checkbox"
+            class="checkbox--square"
+            id="save"
+            name="save"
+            value="1"
+            on:focus
+            on:change={trackRememberChecked}
+            bind:checked={$remember}
+          />
+          <span class="checkbox" />
+          <!-- LABEL: Remember Card -->
+          {$t(REMEMBER_CARD_LABEL)}
+        </label>
+      {/if}
+    </div>
+    {#if tab === 'emi'}
+      <div id="view-emi-plans" on:click={showEmiPlans} class="link">
+        <!-- LABEL: View all EMI Plans -->
+        {$t(VIEW_ALL_EMI_PLANS)}
+      </div>
+    {/if}
+  </div>
+  {#if $showNoCvvCheckbox}
+    <div class="row">
+      <label id="nocvv-check" for="nocvv">
+        <input
+          type="checkbox"
+          class="checkbox--square"
+          id="nocvv"
+          bind:checked={$noCvvChecked}
+        />
+        <span class="checkbox" />
+        <!-- LABEL: My Maestro Card doesn't have Expiry/CVV -->
+        {$t(NOCVV_LABEL)}
+      </label>
+    </div>
+  {/if}
+  {#if $showAuthTypeSelectionRadio}
+    <div class="row">
+      <CardFlowSelectionRadio bind:value={$authType} />
+    </div>
+  {/if}
+</div>
+
 <style>
   .row {
     display: flex;
@@ -477,108 +597,3 @@
     margin-top: 16px;
   }
 </style>
-
-<div class="pad" id="add-card-container" class:faded>
-  <div class="row card-fields">
-    <div class="two-third">
-      <NumberField
-        id="card_number"
-        bind:value={$cardNumber}
-        bind:this={numberField}
-        amexEnabled={isAMEXEnabled()}
-        helpText={cardNumberHelpText}
-        recurring={isRecurring()}
-        type={$cardType}
-        on:focus
-        on:filled={_ => handleFilled('numberField')}
-        on:autocomplete={trackCardNumberAutoFilled}
-        on:input={handleCardInput}
-        on:blur={trackCardNumberFilled} />
-    </div>
-    {#if !$hideExpiryCvvFields}
-      <div class="third">
-        <ExpiryField
-          id="card_expiry"
-          name="card[expiry]"
-          bind:value={$cardExpiry}
-          bind:this={expiryField}
-          on:focus
-          on:blur={trackExpiryFilled}
-          on:filled={_ => handleFilled('expiryField')} />
-      </div>
-    {/if}
-  </div>
-  <div class="row card-fields">
-    <div class="two-third">
-      <NameField
-        id="card_name"
-        name="card[name]"
-        readonly={nameReadonly}
-        bind:value={$cardName}
-        bind:this={nameField}
-        on:focus
-        on:blur={trackNameFilled} />
-    </div>
-    {#if !$hideExpiryCvvFields}
-      <div class="third">
-        <CvvField
-          id="card_cvv"
-          length={cvvLength}
-          bind:value={$cardCvv}
-          bind:this={cvvField}
-          on:focus
-          on:blur={trackCvvFilled} />
-      </div>
-    {/if}
-  </div>
-  {#if downtimeVisible}
-    <div class="downtime-cards">
-      <DowntimeCallout showIcon={true} severe={downtimeSeverity} {downtimeInstrument} />
-    </div>
-  {/if}
-  <div class="row remember-check">
-    <div>
-      {#if showRememberCardCheck}
-        <label class="first" for="save" id="should-save-card" tabIndex="0">
-          <input
-            type="checkbox"
-            class="checkbox--square"
-            id="save"
-            name="save"
-            value="1"
-            on:focus
-            on:change={trackRememberChecked}
-            bind:checked={$remember} />
-          <span class="checkbox" />
-          <!-- LABEL: Remember Card -->
-          {$t(REMEMBER_CARD_LABEL)}
-        </label>
-      {/if}
-    </div>
-    {#if tab === 'emi'}
-      <div id="view-emi-plans" on:click={showEmiPlans} class="link">
-        <!-- LABEL: View all EMI Plans -->
-        {$t(VIEW_ALL_EMI_PLANS)}
-      </div>
-    {/if}
-  </div>
-  {#if $showNoCvvCheckbox}
-    <div class="row">
-      <label id="nocvv-check" for="nocvv">
-        <input
-          type="checkbox"
-          class="checkbox--square"
-          id="nocvv"
-          bind:checked={$noCvvChecked} />
-        <span class="checkbox" />
-        <!-- LABEL: My Maestro Card doesn't have Expiry/CVV -->
-        {$t(NOCVV_LABEL)}
-      </label>
-    </div>
-  {/if}
-  {#if $showAuthTypeSelectionRadio}
-    <div class="row">
-      <CardFlowSelectionRadio bind:value={$authType} />
-    </div>
-  {/if}
-</div>
