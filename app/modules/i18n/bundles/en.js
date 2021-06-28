@@ -1119,6 +1119,9 @@ export default {
     sbibuddy: 'SBI Buddy',
     zeta: 'Zeta',
   },
+  wallets_subtitle: {
+    paypal: 'Only accounts issued outside India accepted'
+  },
   powered_by: {
     partnership_label: 'In partnership with',
     powered_by_label: 'Powered By',

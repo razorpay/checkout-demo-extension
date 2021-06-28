@@ -42,6 +42,7 @@
     getUpiIntentAppName,
     getAppProviderName,
     getCardlessEmiProviderData,
+    getWalletSubtitle,
   } from 'i18n';
 
   // Props
@@ -97,6 +98,7 @@
     return {
       title: getInstrumentTitle('paypal', null, locale),
       icon: session.themeMeta.icons.paypal,
+      subtitle: getWalletSubtitle('paypal', locale),
     };
   }
 
@@ -119,6 +121,7 @@
     return {
       title: getInstrumentTitle('wallet', walletName, locale),
       icon: wallet.sqLogo,
+      subtitle: getWalletSubtitle(wallet.code, locale),
     };
   }
 
@@ -279,7 +282,7 @@
       <ContactField bind:country={$proxyCountry} bind:phone={$proxyPhone} />
     {/if}
   </div>
-  <div slot="subtitle">
+  <div slot="subtitle" class='subtitle'>
     {#if subtitle}
       {subtitle}
     {/if}
@@ -298,5 +301,10 @@
 <style>
   .downtime-preferred-method {
     margin-top: 8px;
+  }
+
+  .subtitle {
+    white-space: pre-wrap;
+    font-size: 10px;
   }
 </style>

@@ -199,6 +199,16 @@ export function getWalletName(walletCode, locale) {
 }
 
 /**
+ * Returns the wallet subtitle for the given locale
+ * @param {string} walletCode
+ * @param {string} locale
+ * @returns {string}
+ */
+export function getWalletSubtitle(walletCode, locale) {
+  return formatMessageWithLocale(`wallets_subtitle.${walletCode}`, locale, '');
+}
+
+/**
  * Returns the upi app name for the given locale
  * @param {string} shortcode upi app shortcode
  * @param {string} locale the locale in which the string is expected

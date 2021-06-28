@@ -6,7 +6,7 @@
   import { selectedWallet } from 'checkoutstore/screens/wallet';
   import Bottom from 'ui/layouts/Bottom.svelte';
   // i18n
-  import { getWalletName } from 'i18n';
+  import { getWalletName, getWalletSubtitle } from 'i18n';
   import { locale } from 'svelte-i18n';
 
   // Utils imports
@@ -157,6 +157,15 @@ import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
   [slot='icon'].top {
     align-self: flex-start;
   }
+
+  .title-container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .subtitle {
+    font-size: 10px;
+  }
 </style>
 
 <Tab method="wallet">
@@ -168,10 +177,12 @@ import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
         align="top"
         on:click={() => onWalletSelection(wallet.code)}>
         <div
+          class='title-container'
           slot="title"
           bind:this={walletReferences[wallet.code]}
           id={`wallet-radio-${wallet.code}`}>
           <span class="title">{getWalletName(wallet.code, $locale)}</span>
+          <span class="subtitle">{getWalletSubtitle(wallet.code, $locale)}</span>
         </div>
         <div slot="body">
           {#if $selectedWallet === wallet.code}
