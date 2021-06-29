@@ -1,0 +1,48 @@
+name: cdn
+
+on: deployment
+
+# on:
+#   # Trigger the workflow on push or pull request,
+#   # but only for the main branch
+#   push:
+#     branches:
+#       - master
+
+env:
+  APP_NAME: razorpay/checkout
+
+jobs:
+  prod-deploy:
+    name: CDN Deploy
+    runs-on: [self-hosted]
+    if: github.event.deployment.environment == 'prod'
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v2
+
+      - name: Configure AWS credentials For saving the artifacts to stage bucket
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.PROD_AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.PROD_AWS_ACCESS_SECRET }}
+          aws-region: us-east-1
+
+      - name: Deploy to Prod Environment
+        run: |
+          if [ "$(ls -A cdn)" ]; then
+              echo ${{ github.ref }} ${{ github.event.deployment.environment }} checkout
+              aws s3 cp cdn s3://checkout-live/ --recursive
+          fi
+
+      - name: Mark Deployment Success on GitHub
+        if: ${{ success() }}
+        run: |
+          curl --location --request POST 'https://api.github.com/repos/razorpay/checkout/deployments/${{ github.event.deployment.id }}/statuses' \
+          --header 'Authorization: token ${{ github.token }}' \
+          --header 'Accept: application/vnd.github.everest-preview+json' \
+          --header 'Content-Type: application/json' \
+          --data-raw '{
+            "environment": "prod",
+            "state": "success"
+          }'
