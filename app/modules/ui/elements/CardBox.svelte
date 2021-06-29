@@ -25,17 +25,24 @@
 
   function getCardCaption(issuer = '', type, last4, locale) {
     // HDFC Credit Card - 4321
+    const method = type ? `${type}_card` : 'card';
     return (
-      issuer + ' ' + getRawMethodTitle(type + '_card', locale) + ' - ' + last4
+      issuer + ' ' + getRawMethodTitle(method, locale) + ' - ' + last4
     );
   }
 </script>
 
-<style>
-</style>
-
 <div class="card-box">
   <SelectedOption
     icon={getNetworkIcon(metadata.network)}
-    title={getCardCaption(metadata.issuer, metadata.type, metadata.last4, $locale)} />
+    title={getCardCaption(
+      metadata.issuer,
+      metadata.type,
+      metadata.last4,
+      $locale
+    )}
+  />
 </div>
+
+<style>
+</style>
