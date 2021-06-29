@@ -19,3 +19,4 @@ npm-debug.log
 /app/config.js
 /httpd.conf
 .idea
+.vscode/settings.json

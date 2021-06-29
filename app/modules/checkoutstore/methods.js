@@ -66,6 +66,12 @@ function isNoRedirectFacebookWebViewSession() {
   return isFacebookWebView() && !getCallbackUrl();
 }
 
+const AUTH_TYPES = {
+  NET_BANKING: 'netbanking',
+  DEBIT_CARD: 'debitcard',
+  ADHAAR: 'aadhaar',
+};
+
 const DEBIT_EMI_BANKS = ['HDFC_DC'];
 
 const ALL_METHODS = {
@@ -111,10 +117,10 @@ const ALL_METHODS = {
   netbanking() {
     return (
       getAmount() &&
-      !isRecurring() &&
-      !isInternational() &&
-      getOption('method.netbanking') !== false &&
-      getNetbankingBanks()
+        !isRecurring() &&
+        !isInternational() &&
+        getOption('method.netbanking') !== false &&
+        getNetbankingBanks()
       |> _Obj.keys
       |> _.lengthOf
     );
@@ -666,14 +672,15 @@ export function getEMandateBanks() {
   if (banks) {
     const authTypeFromOrder = getMerchantOrder()?.auth_type;
     if (authTypeFromOrder) {
-      banks =
-        banks
-        |> _Obj.reduce((filteredBanks, bank, bankCode) => {
-          if (bank.auth_types |> _Arr.contains(authTypeFromOrder)) {
+      banks = Object.entries(banks).reduce(
+        (filteredBanks, [bankCode, bank]) => {
+          if (bank.auth_types.includes(authTypeFromOrder)) {
             filteredBanks[bankCode] = bank;
           }
           return filteredBanks;
-        }, {});
+        },
+        {}
+      );
     }
   }
 
@@ -686,21 +693,18 @@ export function getEMandateBanks() {
  * @returns {Object}
  */
 function filterBanksOnAllowedAuthTypes(banks) {
-  const allowedAuthTypes = ['netbanking', 'debitcard'];
+  const allowedAuthTypes = [
+    AUTH_TYPES.NET_BANKING,
+    AUTH_TYPES.DEBIT_CARD,
+    AUTH_TYPES.ADHAAR,
+  ];
 
-  return (
-    banks
-    |> _Obj.reduce((filteredBanks, bank, bankCode) => {
-      if (
-        _Arr.any(bank.auth_types, authType =>
-          _Arr.contains(allowedAuthTypes, authType)
-        )
-      ) {
-        filteredBanks[bankCode] = bank;
-      }
-      return filteredBanks;
-    }, {})
-  );
+  return Object.entries(banks).reduce((filteredBanks, [bankCode, bank]) => {
+    if (bank.auth_types.some(authType => allowedAuthTypes.includes(authType))) {
+      filteredBanks[bankCode] = bank;
+    }
+    return filteredBanks;
+  }, {});
 }
 
 export function getEMandateAuthTypes(bankCode) {
@@ -886,13 +890,11 @@ export function getCardlessEMIProviders() {
   }
   emiMethod = {
     ...emiMethod,
-    ...getMerchantMethods().cardless_emi
-  }
+    ...getMerchantMethods().cardless_emi,
+  };
   if (emiMethod |> _Obj.isEmpty) {
     emiMethod = {};
   }
-
-
 
   let providers = getEligibleProvidersBasedOnMinAmount(getAmount(), emiMethod);
 
