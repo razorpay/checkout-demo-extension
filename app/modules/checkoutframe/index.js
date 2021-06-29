@@ -155,6 +155,21 @@ const setAnalyticsMeta = message => {
   isBraveBrowser().then(result => {
     Analytics.setMeta('brave_browser', result);
   });
+
+  /**
+   * Set screen details.
+   */
+   if (window?.top?.screen) {
+    const {availHeight, availWidth, height, width, pixelDepth} = window.top.screen;
+
+    Analytics.setMeta('screen', {
+      availHeight,
+      availWidth,
+      height,
+      width,
+      pixelDepth,
+    });
+  }
 };
 
 /**
