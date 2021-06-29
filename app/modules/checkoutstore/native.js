@@ -1,4 +1,4 @@
-import Track from 'tracker';
+import { Track } from 'analytics';
 import { getSortedApps } from 'common/upi';
 import {
   getCardApps as getSortedCardApps,
@@ -138,7 +138,7 @@ const messageTransformers = {
       if (_.isString(data)) {
         try {
           data = JSON.parse(data);
-        } catch (e) {}
+        } catch (e) { }
       }
       if (_.isNonNullObject(data)) {
         transfomed.data = data;

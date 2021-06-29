@@ -1,6 +1,5 @@
-import Analytics from 'analytics';
+import Analytics, { Track } from 'analytics';
 import Eventer from 'eventer';
-import Track from 'tracker';
 import CheckoutOptions, { flatten, RazorpayDefaults } from 'common/options';
 import * as AnalyticsTypes from 'analytics-types';
 import { formatPayload } from 'payment/validator';
@@ -89,7 +88,7 @@ export default function Razorpay(overrides) {
   });
 
   if (
-    backendEntityIds.every(function(prop) {
+    backendEntityIds.every(function (prop) {
       return !options.get(prop);
     })
   ) {
@@ -103,7 +102,7 @@ var RazorProto = (Razorpay.prototype = new Eventer());
 
 RazorProto.postInit = _Func.noop;
 
-RazorProto.onNew = function(event, callback) {
+RazorProto.onNew = function (event, callback) {
   if (event === 'ready') {
     if (this.prefs) {
       callback(event, this.prefs);
@@ -119,12 +118,12 @@ RazorProto.onNew = function(event, callback) {
   }
 };
 
-RazorProto.emi_calculator = function(length, rate) {
+RazorProto.emi_calculator = function (length, rate) {
   return Razorpay.emi.calculator(this.get('amount') / 100, length, rate);
 };
 
 Razorpay.emi = {
-  calculator: function(principle, length, rate) {
+  calculator: function (principle, length, rate) {
     if (!rate) {
       return Math.ceil(principle / length);
     }
@@ -143,18 +142,18 @@ function getPrefsJsonp(data, callback) {
 }
 
 var razorpayPayment = (Razorpay.payment = {
-  getMethods: function(callback) {
+  getMethods: function (callback) {
     return getPrefsJsonp(
       {
         key_id: Razorpay.defaults.key,
       },
-      function(response) {
+      function (response) {
         callback(response.methods || response);
       }
     );
   },
 
-  getPrefs: function(data, callback) {
+  getPrefs: function (data, callback) {
     const prefsApiTimer = _.timer();
     Analytics.track('prefs:start', {
       type: AnalyticsTypes.METRIC,
@@ -167,7 +166,7 @@ var razorpayPayment = (Razorpay.payment = {
     return fetch({
       url: _.appendParamsToUrl(makeUrl('preferences'), data),
 
-      callback: function(response) {
+      callback: function (response) {
         Analytics.track('prefs:end', {
           type: AnalyticsTypes.METRIC,
           data: { time: prefsApiTimer() },
@@ -180,7 +179,7 @@ var razorpayPayment = (Razorpay.payment = {
     });
   },
 
-  getRewards: function(data, callback) {
+  getRewards: function (data, callback) {
     const rewardsApiTimer = _.timer();
     Analytics.track('rewards:start', {
       type: AnalyticsTypes.METRIC,
@@ -189,7 +188,7 @@ var razorpayPayment = (Razorpay.payment = {
     return fetch({
       url: _.appendParamsToUrl(makeUrl('checkout/rewards'), data),
 
-      callback: function(response) {
+      callback: function (response) {
         Analytics.track('rewards:end', {
           type: AnalyticsTypes.METRIC,
           data: { time: rewardsApiTimer() },
@@ -213,7 +212,7 @@ function base_configure(overrides) {
 
 function setNotes(options) {
   var notes = options.get('notes');
-  _Obj.loop(notes, function(val, key) {
+  _Obj.loop(notes, function (val, key) {
     if (_.isString(val)) {
       if (val.length > 254) {
         notes[key] = val.slice(0, 254);
@@ -224,7 +223,7 @@ function setNotes(options) {
   });
 }
 
-RazorProto.isLiveMode = function() {
+RazorProto.isLiveMode = function () {
   var preferences = this.preferences;
 
   return (
@@ -240,14 +239,14 @@ RazorProto.isLiveMode = function() {
  *
  * @returns {Promise}
  */
-RazorProto.calculateFees = function(payload) {
+RazorProto.calculateFees = function (payload) {
   return new Promise((resolve, reject) => {
     payload = formatPayload(payload, this);
 
     fetch.post({
       url: makeUrl('payments/calculate/fees'),
       data: payload,
-      callback: function(response) {
+      callback: function (response) {
         if (response.error) {
           return reject(response);
         } else {
@@ -265,7 +264,7 @@ RazorProto.calculateFees = function(payload) {
  *
  * @returns {Promise}
  */
-RazorProto.fetchVirtualAccount = function({ customer_id, order_id, notes }) {
+RazorProto.fetchVirtualAccount = function ({ customer_id, order_id, notes }) {
   return new Promise((resolve, reject) => {
     if (!order_id) {
       reject('Order ID is required to fetch the account details');
@@ -284,7 +283,7 @@ RazorProto.fetchVirtualAccount = function({ customer_id, order_id, notes }) {
     fetch.post({
       url,
       data,
-      callback: function(response) {
+      callback: function (response) {
         if (response.error) {
           return reject(response);
         } else {
@@ -356,7 +355,7 @@ export function makePrefParams(rzp) {
         'checkout_config_id',
         'amount',
       ],
-      function(key) {
+      function (key) {
         var value = getter(key);
         if (value) {
           params[key] = value;
@@ -379,13 +378,13 @@ export function makePrefParams(rzp) {
 }
 
 var discreet = {
-  isBase64Image: function(image) {
+  isBase64Image: function (image) {
     return /data:image\/[^;]+;base64/.test(image);
   },
 
   cancelMsg: 'Payment cancelled',
 
-  error: function(message) {
+  error: function (message) {
     return {
       error: {
         description: message || discreet.cancelMsg,
@@ -395,13 +394,13 @@ var discreet = {
 };
 
 export const optionValidations = {
-  notes: function(notes) {
+  notes: function (notes) {
     if (_.isNonNullObject(notes) && _.lengthOf(_Obj.keys(notes)) > 15) {
       return 'At most 15 notes are allowed';
     }
   },
 
-  amount: function(amount, options) {
+  amount: function (amount, options) {
     const currency = options.display_currency || options.currency || 'INR';
     const config = getCurrencyConfig(currency);
     const minimum = config.minimum;
@@ -425,13 +424,13 @@ export const optionValidations = {
     }
   },
 
-  currency: function(currency) {
+  currency: function (currency) {
     if (!_Arr.contains(supportedCurrencies, currency)) {
       return 'The provided currency is not currently supported';
     }
   },
 
-  display_currency: function(currency) {
+  display_currency: function (currency) {
     if (
       !(currency in displayCurrencies) &&
       currency !== Razorpay.defaults.display_currency
@@ -440,7 +439,7 @@ export const optionValidations = {
     }
   },
 
-  display_amount: function(amount) {
+  display_amount: function (amount) {
     // TODO: display_amount is only valid when display_currency is present. Add a check for this.
     amount = String(amount).replace(/([^0-9.])/g, '');
     if (!amount && amount !== Razorpay.defaults.display_amount) {
@@ -448,7 +447,7 @@ export const optionValidations = {
     }
   },
 
-  payout: function(payout, options) {
+  payout: function (payout, options) {
     if (payout) {
       if (!options.key) {
         return 'key is required for a Payout';
@@ -466,7 +465,7 @@ export function validateOverrides(options, skip = []) {
 
   options = options.get();
 
-  _Obj.loop(optionValidations, function(validation, key) {
+  _Obj.loop(optionValidations, function (validation, key) {
     if (_Arr.contains(skip, key)) {
       return;
     }
@@ -483,8 +482,8 @@ export function validateOverrides(options, skip = []) {
   return valid;
 }
 
-Razorpay.configure = function(overrides, extra = {}) {
-  _Obj.loop(flatten(overrides, RazorpayDefaults), function(val, key) {
+Razorpay.configure = function (overrides, extra = {}) {
+  _Obj.loop(flatten(overrides, RazorpayDefaults), function (val, key) {
     var defaultValue = RazorpayDefaults[key];
     if (typeof defaultValue === typeof val) {
       RazorpayDefaults[key] = val;

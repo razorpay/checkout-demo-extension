@@ -19,7 +19,7 @@
 
   // Utils imports
   import { isMobile } from 'common/useragent';
-  import Track from 'tracker';
+  import { Track } from 'analytics';
   import { isElementCompletelyVisibleInContainer } from 'lib/utils';
   import * as Search from 'checkoutframe/search';
   import { getAnimationOptions } from 'svelte-utils';
@@ -289,6 +289,106 @@
   }
 </script>
 
+<div bind:this={containerRef}>
+  {#if open}
+    <div class="search-curtain">
+      <div
+        class="search-curtain-bg"
+        on:click={() => dispatchClose({ from: 'overlay' })}
+        in:fade={getAnimationOptions({ duration: 200 })}
+        out:fade={getAnimationOptions({ duration: 200 })}
+      />
+      <div
+        class="search-box"
+        in:fly={getAnimationOptions({ duration: 200, y: -100 })}
+        out:fade={getAnimationOptions({ duration: 200 })}
+      >
+        <Stack vertical>
+          <form on:submit|preventDefault={submitHandler} class="search-field">
+            <div class="icon">
+              <Icon icon={getMiscIcon('search')} />
+            </div>
+            <input
+              class="no-escape"
+              type="text"
+              role="combobox"
+              aria-autocomplete="list"
+              aria-haspopup="true"
+              aria-owns={`#${IDs.results}`}
+              aria-expanded="true"
+              aria-activedescendant={activeDescendantIdRef}
+              {autocomplete}
+              {placeholder}
+              on:focus={() => (inputRef.type = inputType)}
+              on:keyup={escapeHandler}
+              on:keydown={arrowKeysHandler}
+              bind:value={query}
+              bind:this={inputRef}
+            />
+          </form>
+          <div
+            class="search-results"
+            class:has-query={query}
+            id={IDs.results}
+            aria-label={$t('misc.search_results_label')}
+            role="listbox"
+            bind:this={resultsContainerRef}
+          >
+            {#if query}
+              {#if results.length}
+                <!-- LABEL: Results -->
+                <div class="list results">
+                  {#each results as item, index (IDs.resultItem(item))}
+                    <div
+                      class="list-item"
+                      class:focused={index === focusedIndex}
+                      id={IDs.resultItem(item)}
+                      role="option"
+                      aria-selected={index === focusedIndex}
+                      on:click={() => onSelect(item)}
+                    >
+                      <svelte:component this={component} {item} />
+                    </div>
+                  {/each}
+                </div>
+              {:else}
+                <!-- LABEL: No results for "{query}" -->
+                <div class="no-results">
+                  {formatTemplateWithLocale(
+                    'misc.search_no_results',
+                    { query },
+                    $locale
+                  )}
+                </div>
+              {/if}
+            {/if}
+            {#if all}
+              <div class="list-header">
+                <div class="text">{all}</div>
+                <div class="divider" />
+              </div>
+              <div class="list">
+                {#each items as item, index (IDs.allItem(item))}
+                  <div
+                    class="list-item"
+                    class:focused={index + results.length === focusedIndex}
+                    id={IDs.allItem(item)}
+                    role="option"
+                    aria-selected={index + results.length === focusedIndex}
+                    on:click={() => onSelect(item)}
+                  >
+                    <svelte:component this={component} {item} />
+                  </div>
+                {/each}
+              </div>
+            {/if}
+          </div>
+        </Stack>
+      </div>
+    </div>
+  {/if}
+</div>
+
 <style>
   .search-curtain {
     justify-content: center;
@@ -437,93 +537,3 @@
     color: #888;
   }
 </style>
-
-<div bind:this={containerRef}>
-  {#if open}
-    <div class="search-curtain">
-      <div
-        class="search-curtain-bg"
-        on:click={() => dispatchClose({ from: 'overlay' })}
-        in:fade={getAnimationOptions({ duration: 200 })}
-        out:fade={getAnimationOptions({ duration: 200 })} />
-      <div
-        class="search-box"
-        in:fly={getAnimationOptions({ duration: 200, y: -100 })}
-        out:fade={getAnimationOptions({ duration: 200 })}>
-        <Stack vertical>
-          <form on:submit|preventDefault={submitHandler} class="search-field">
-            <div class="icon">
-              <Icon icon={getMiscIcon('search')} />
-            </div>
-            <input
-              class="no-escape"
-              type="text"
-              role="combobox"
-              aria-autocomplete="list"
-              aria-haspopup="true"
-              aria-owns={`#${IDs.results}`}
-              aria-expanded="true"
-              aria-activedescendant={activeDescendantIdRef}
-              {autocomplete}
-              {placeholder}
-              on:focus={() => (inputRef.type = inputType)}
-              on:keyup={escapeHandler}
-              on:keydown={arrowKeysHandler}
-              bind:value={query}
-              bind:this={inputRef} />
-          </form>
-          <div
-            class="search-results"
-            class:has-query={query}
-            id={IDs.results}
-            aria-label={$t('misc.search_results_label')}
-            role="listbox"
-            bind:this={resultsContainerRef}>
-            {#if query}
-              {#if results.length}
-                <!-- LABEL: Results -->
-                <div class="list results">
-                  {#each results as item, index (IDs.resultItem(item))}
-                    <div
-                      class="list-item"
-                      class:focused={index === focusedIndex}
-                      id={IDs.resultItem(item)}
-                      role="option"
-                      aria-selected={index === focusedIndex}
-                      on:click={() => onSelect(item)}>
-                      <svelte:component this={component} {item} />
-                    </div>
-                  {/each}
-                </div>
-              {:else}
-                <!-- LABEL: No results for "{query}" -->
-                <div class="no-results">
-                  {formatTemplateWithLocale('misc.search_no_results', { query }, $locale)}
-                </div>
-              {/if}
-            {/if}
-            {#if all}
-              <div class="list-header">
-                <div class="text">{all}</div>
-                <div class="divider" />
-              </div>
-              <div class="list">
-                {#each items as item, index (IDs.allItem(item))}
-                  <div
-                    class="list-item"
-                    class:focused={index + results.length === focusedIndex}
-                    id={IDs.allItem(item)}
-                    role="option"
-                    aria-selected={index + results.length === focusedIndex}
-                    on:click={() => onSelect(item)}>
-                    <svelte:component this={component} {item} />
-                  </div>
-                {/each}
-              </div>
-            {/if}
-          </div>
-        </Stack>
-      </div>
-    </div>
-  {/if}
-</div>

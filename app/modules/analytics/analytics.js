@@ -1,4 +1,4 @@
-import Track from '../tracker';
+import Track from './tracker';
 
 const META = {};
 const REQUEST_INDEX = {};
@@ -131,5 +131,7 @@ const Analytics = () => ({
 });
 
 const analytics = Analytics();
+
+export { Track };
 
 export default analytics;

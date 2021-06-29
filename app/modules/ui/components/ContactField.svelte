@@ -7,7 +7,7 @@
   import Field from 'ui/components/Field.svelte';
   import SearchModal from 'ui/elements/SearchModal.svelte';
   import CountryCodeSearchItem from 'ui/elements/search-item/CountryCode.svelte';
-  import Track from 'tracker';
+  import { Track } from 'analytics';
 
   import {
     COUNTRY_CODE_PATTERN,
@@ -169,27 +169,6 @@
   }
 </script>
 
-<style>
-  .fields-container {
-    display: flex;
-    outline: red;
-  }
-
-  .fields-container > :global(div:first-child) {
-    flex-shrink: 0;
-    flex-basis: 25%;
-  }
-
-  .fields-container > :global(div:first-child > i) {
-    transform: rotate(-90deg) scale(0.5);
-  }
-
-  .fields-container > :global(div:last-child) {
-    flex-grow: 1;
-    margin-left: 16px;
-  }
-</style>
-
 <div class="fields-container">
   <Field
     bind:this={countryField}
@@ -212,7 +191,8 @@
     on:input={e => (country = e.target.value)}
     on:blur
     value={country}
-    helpText={$t(COUNTRY_HELP_TEXT)} />
+    helpText={$t(COUNTRY_HELP_TEXT)}
+  />
   <!-- LABEL: Please enter a valid country code -->
 
   <Field
@@ -234,7 +214,8 @@
     on:input={e => (phone = e.target.value)}
     on:blur
     value={phone}
-    helpText={$t(CONTACT_HELP_TEXT)} />
+    helpText={$t(CONTACT_HELP_TEXT)}
+  />
   <!-- LABEL: Please enter a valid contact number -->
 </div>
 
@@ -252,4 +233,26 @@
   on:select={({ detail }) => {
     country = `+${detail.country_code}`;
     closeCountryCodeModal();
-  }} />
+  }}
+/>
+
+<style>
+  .fields-container {
+    display: flex;
+    outline: red;
+  }
+
+  .fields-container > :global(div:first-child) {
+    flex-shrink: 0;
+    flex-basis: 25%;
+  }
+
+  .fields-container > :global(div:first-child > i) {
+    transform: rotate(-90deg) scale(0.5);
+  }
+
+  .fields-container > :global(div:last-child) {
+    flex-grow: 1;
+    margin-left: 16px;
+  }
+</style>

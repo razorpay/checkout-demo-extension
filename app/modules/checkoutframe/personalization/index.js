@@ -1,8 +1,7 @@
 /* Personalization module for user's payment method preferences */
 
 import { getCustomer } from 'checkoutframe/customer';
-import Track from 'tracker';
-import Analytics from 'analytics';
+import Analytics, { Track } from 'analytics';
 import { filterInstruments } from './filters';
 import { hashFnv32a, set, getAllInstruments } from './utils';
 import { extendInstruments } from './extend';
@@ -477,7 +476,7 @@ export function addInstrumentToPaymentData(payment, instrument, customer) {
 export function hasAnyInstrumentsOnDevice() {
   try {
     return _Obj.keys(getAllInstruments()).length > 0;
-  } catch (err) {}
+  } catch (err) { }
 
   return false;
 }

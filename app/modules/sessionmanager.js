@@ -1,4 +1,4 @@
-import Track from 'tracker';
+import { Track } from 'analytics';
 
 /* global Session */
 

@@ -7,7 +7,6 @@ import {
   hiddenInstruments,
 } from 'checkoutstore/screens/home';
 import { get as storeGetter } from 'svelte/store';
-import Track from 'tracker';
 import { MAX_PREFERRED_INSTRUMENTS } from 'common/constants';
 import { getBlockConfig } from 'configurability';
 import { isInstrumentForEntireMethod } from 'configurability/instruments';

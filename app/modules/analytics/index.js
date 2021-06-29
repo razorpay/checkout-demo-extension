@@ -2,7 +2,7 @@ import CardEvents from './card/events';
 import OfferEvents from './offers/events';
 import { getTrackMethods, addAnalyticsMethods } from './helpers';
 import MetaProperties from './metaProperties';
-import Analytics from './analytics';
+import Analytics, { Track } from './analytics';
 
 let Events = getTrackMethods();
 Events = addAnalyticsMethods(Events);
@@ -13,5 +13,6 @@ export {
   CardEvents,
   OfferEvents,
   Events,
-  MetaProperties
+  MetaProperties,
+  Track
 };

@@ -1,6 +1,6 @@
 <script>
   // Util imports
-  import Track from 'tracker';
+  import { Track } from 'analytics';
 
   // Props
   export let id = '';
@@ -19,12 +19,6 @@
   $: classesToApply = `input-radio ${classes}`;
 </script>
 
-<style>
-  label {
-    min-width: 18px;
-  }
-</style>
-
 <div class={classesToApply}>
   <input
     type="radio"
@@ -33,7 +27,8 @@
     {name}
     {value}
     on:change
-    {tabindex} />
+    {tabindex}
+  />
   <label for={identifier}>
     <div class="radio-display" />
     {#if label}
@@ -43,3 +38,9 @@
     {/if}
   </label>
 </div>
+
+<style>
+  label {
+    min-width: 18px;
+  }
+</style>

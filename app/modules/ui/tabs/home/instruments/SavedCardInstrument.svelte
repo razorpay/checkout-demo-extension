@@ -12,7 +12,6 @@
   import { getSession } from 'sessionmanager';
   import { getBanks } from 'checkoutstore';
   import { getIcon as getNetworkIcon } from 'icons/network';
-  import Track from 'tracker';
   import { getExtendedSingleInstrument } from 'configurability/instruments';
   import { toTitleCase } from 'lib/utils';
 
@@ -165,6 +164,50 @@
   }
 </script>
 
+<svelte:component
+  this={component}
+  ellipsis
+  {name}
+  {selected}
+  className="instrument"
+  radio={false}
+  value={instrument.id}
+  on:click={selectionHandler}
+  on:click
+>
+  <i slot="icon">
+    <Icon {icon} alt="" />
+  </i>
+  <div slot="title">{title}</div>
+  <div slot="extra" class="slots-extra">
+    {#if !!downtimeSeverity}
+      <div class="downtime-saved-card-icon">
+        <DowntimeIcon severe={downtimeSeverity} />
+      </div>
+    {/if}
+    {#if hasCvv}
+      <Field
+        type="cvv"
+        name="cvv"
+        placeholder="CVV"
+        maxlength={cvvLength}
+        required={true}
+        tabindex={-1}
+        formatter={{ type: 'number' }}
+      />
+    {:else}<span class="theme-highlight-color">&#xe604;</span>{/if}
+  </div>
+  <div slot="downtime" class="downtime-saved-card">
+    {#if !!downtimeSeverity}
+      <DowntimeCallout
+        showIcon={false}
+        severe={downtimeSeverity}
+        {downtimeInstrument}
+      />
+    {/if}
+  </div>
+</svelte:component>
+
 <style>
   span {
     display: inline-block;
@@ -187,41 +230,3 @@
     display: flex;
   }
 </style>
-
-<svelte:component
-  this={component}
-  ellipsis
-  {name}
-  {selected}
-  className="instrument"
-  radio={false}
-  value={instrument.id}
-  on:click={selectionHandler}
-  on:click>
-  <i slot="icon">
-    <Icon {icon} alt="" />
-  </i>
-  <div slot="title">{title}</div>
-  <div slot="extra" class="slots-extra">
-    {#if !!downtimeSeverity}
-      <div class="downtime-saved-card-icon">
-        <DowntimeIcon severe={downtimeSeverity} />
-      </div>
-    {/if}
-    {#if hasCvv}
-      <Field
-        type="cvv"
-        name="cvv"
-        placeholder="CVV"
-        maxlength={cvvLength}
-        required={true}
-        tabindex={-1}
-        formatter={{ type: 'number' }} />
-    {:else}<span class="theme-highlight-color">&#xe604;</span>{/if}
-  </div>
-  <div slot="downtime" class="downtime-saved-card">
-    {#if !!downtimeSeverity}
-      <DowntimeCallout showIcon={false} severe={downtimeSeverity} { downtimeInstrument } />
-    {/if}
-  </div>
-</svelte:component>

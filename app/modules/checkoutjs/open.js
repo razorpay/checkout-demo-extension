@@ -1,5 +1,5 @@
 import Razorpay, { makeUrl } from 'common/Razorpay';
-import Track from 'tracker';
+import { Track } from 'analytics';
 import CheckoutFrame from './frame';
 import { Safari } from 'common/useragent';
 
@@ -26,7 +26,7 @@ function needBody(func) {
 
 const currentScript =
   document.currentScript ||
-  (function() {
+  (function () {
     var scripts = _Doc.querySelectorAll('script');
     return scripts[scripts.length - 1];
   })();
@@ -45,18 +45,18 @@ function defaultAutoPostHandler(data) {
     |> _El.submit;
 }
 
-var addAutoCheckoutButton = function(rzp) {
+var addAutoCheckoutButton = function (rzp) {
   currentScript
     |> _El.parent
     |> _El.append(
       _El.create('input')
-        |> _Obj.extend({
-          type: 'submit',
-          value: rzp.get('buttontext'),
-          className: 'razorpay-payment-button',
-        })
+      |> _Obj.extend({
+        type: 'submit',
+        value: rzp.get('buttontext'),
+        className: 'razorpay-payment-button',
+      })
     )
-    |> _Obj.setProp('onsubmit', function(e) {
+    |> _Obj.setProp('onsubmit', function (e) {
       e.preventDefault();
       let form = this;
       let { action, method, target } = form;
@@ -85,7 +85,7 @@ var addAutoCheckoutButton = function(rzp) {
           );
 
           options.callback_url = makeUrl('checkout/onyx') + '?data=' + data;
-        } catch (err) {}
+        } catch (err) { }
       }
       rzp.open();
       return false;
@@ -98,7 +98,7 @@ var addAutoCheckoutButton = function(rzp) {
  */
 function initAutomaticCheckout() {
   var opts = {};
-  _Obj.loop(currentScript.attributes, function(attr) {
+  _Obj.loop(currentScript.attributes, function (attr) {
     var name = attr.name.toLowerCase();
     if (/^data-/.test(name)) {
       var rootObj = opts;
@@ -226,11 +226,11 @@ function getPreloadedFrame(rzp) {
   return preloadedFrame;
 }
 
-Razorpay.open = function(options) {
+Razorpay.open = function (options) {
   return Razorpay(options).open();
 };
 
-RazorProto.postInit = function() {
+RazorProto.postInit = function () {
   this.modal = { options: {} };
 
   if (this.get('parent')) {
@@ -240,7 +240,7 @@ RazorProto.postInit = function() {
 
 var onNew = RazorProto.onNew;
 
-RazorProto.onNew = function(event, callback) {
+RazorProto.onNew = function (event, callback) {
   if (event === 'payment.error') {
     Track(this, 'event_paymenterror', location.href);
   }
@@ -249,7 +249,7 @@ RazorProto.onNew = function(event, callback) {
   }
 };
 
-RazorProto.open = needBody(function() {
+RazorProto.open = needBody(function () {
   if (!this.metadata) {
     this.metadata = {};
   }
@@ -278,7 +278,7 @@ RazorProto.open = needBody(function() {
  * Invokes `payment.resume` on the frame.
  * @param {Object} data
  */
-RazorProto.resume = function(data) {
+RazorProto.resume = function (data) {
   const frame = this.checkoutFrame;
 
   if (frame) {
@@ -289,14 +289,14 @@ RazorProto.resume = function(data) {
   }
 };
 
-RazorProto.close = function() {
+RazorProto.close = function () {
   var frame = this.checkoutFrame;
   if (frame) {
     frame.postMessage({ event: 'close' });
   }
 };
 
-var initRazorpayCheckout = needBody(function() {
+var initRazorpayCheckout = needBody(function () {
   createFrameContainer();
 
   /**
@@ -315,7 +315,7 @@ var initRazorpayCheckout = needBody(function() {
   // Get the ball rolling in case we are in manual mode
   try {
     initAutomaticCheckout();
-  } catch (e) {}
+  } catch (e) { }
 });
 
 export default initRazorpayCheckout;

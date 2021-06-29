@@ -1,6 +1,6 @@
 import { displayAmount, getConvertedAmount } from 'common/currency';
 import css from './popup.styl';
-import Track from 'tracker';
+import { Track } from 'analytics';
 
 const map = {
   '&': '&amp;',
@@ -92,8 +92,8 @@ export default function popupTemplate(_, t) {
   <div id='name'>${title}</div>
   <div id="amt" style="${hideAmount}">
     <div style="font-size:12px;color:#757575;line-height:15px;margin-bottom:5px;text-align:right">${t(
-      PAYING
-    )}</div>
+    PAYING
+  )}</div>
     <div dir="ltr" style="font-size:20px;line-height:24px;">${amount}</div>
   </div>
 </div>
@@ -101,8 +101,8 @@ export default function popupTemplate(_, t) {
 <div id="txt">
   <div style="display:inline-block;vertical-align:middle;white-space:normal;">
     <h2 id='title'>${t(LOADING_METHOD_PAGE, {
-      method,
-    })}</h2><p id='msg'>${message}</p>
+    method,
+  })}</h2><p id='msg'>${message}</p>
   </div>
   <div style="display:inline-block;vertical-align:middle;height:100%"></div>
 </div>
@@ -133,10 +133,10 @@ setTimeout(function(){
 </script>
 <form></form>
 ${makeTrackingScript({
-  live: _.r.isLiveMode(),
-  checkout_id: _.r.id,
-  library: Track.props.library,
-})}
+    live: _.r.isLiveMode(),
+    checkout_id: _.r.id,
+    library: Track.props.library,
+  })}
 </body>
 </html>`;
 }

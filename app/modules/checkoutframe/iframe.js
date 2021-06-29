@@ -2,9 +2,8 @@ import { handleMessage } from 'checkoutframe/index';
 import * as Bridge from 'bridge';
 import Razorpay from 'common/Razorpay';
 import { ownerWindow } from 'common/constants';
-import Track from 'tracker';
+import Analytics, { Track } from 'analytics';
 import { getSession } from 'sessionmanager';
-import Analytics from 'analytics';
 import { defineGlobals as defineGlobalsForBridge } from 'bridge/global';
 
 /**
@@ -24,7 +23,7 @@ function handleNewIOSMethods(method, data) {
   };
   try {
     data = JSON.parse(data);
-  } catch (e) {}
+  } catch (e) { }
 
   data = data || {};
 
@@ -106,7 +105,7 @@ export function initIframe() {
         data = _Obj.parse(data) || {};
       }
       handleMessage(data);
-    } catch (err) {}
+    } catch (err) { }
   };
 
   window |> _El.on('message', parseMessage);

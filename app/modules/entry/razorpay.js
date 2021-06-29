@@ -1,11 +1,11 @@
 import Razorpay from 'common/Razorpay';
 import 'payment';
-import 'track-errors';
-import Track from 'tracker';
+import 'analytics/track-errors';
+import { Track } from 'analytics';
 
 Track.props.library = 'razorpayjs';
 
-Razorpay.payment.authorize = function(options) {
+Razorpay.payment.authorize = function (options) {
   var r = Razorpay({ amount: options.data.amount }).createPayment(options.data);
   r.on('payment.success', options.success);
   r.on('payment.error', options.error);
@@ -14,7 +14,7 @@ Razorpay.payment.authorize = function(options) {
 
 Razorpay.payment.validate = _Func.noop;
 
-Razorpay.sendMessage = function(message) {
+Razorpay.sendMessage = function (message) {
   if (message && message.event === 'redirect') {
     var data = message.data;
     _Doc.submitForm(data.url, data.content, data.method);

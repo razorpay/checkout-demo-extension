@@ -1,8 +1,7 @@
 import 'entry/checkout-frame';
 import RazorpayConfig from 'common/RazorpayConfig';
 
-import Track from 'tracker';
-import Analytics from 'analytics';
+import Analytics, { Track } from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import * as UPIUtils from 'common/upi';
 import * as GPay from 'gpay';

@@ -1,9 +1,8 @@
 import * as Bridge from 'bridge';
 import Razorpay, { makePrefParams, validateOverrides } from 'common/Razorpay';
-import Analytics from 'analytics';
+import Analytics, { Track } from 'analytics';
 import BrowserStorage from 'browserstorage';
 import * as SessionManager from 'sessionmanager';
-import Track from 'tracker';
 import {
   setRazorpayInstance,
   getMerchantOrder,
@@ -79,7 +78,7 @@ const validUID = id => {
   return true;
 };
 
-Razorpay.sendMessage = function(message) {
+Razorpay.sendMessage = function (message) {
   if (Bridge.hasCheckoutBridge()) {
     return Bridge.notifyBridge(message);
   }
@@ -185,7 +184,7 @@ const setTrackingProps = message => {
   }
 };
 
-export const handleMessage = function(message) {
+export const handleMessage = function (message) {
   if ('id' in message && !validUID(message.id)) {
     return;
   }
@@ -252,9 +251,9 @@ export const handleMessage = function(message) {
   try {
     if (_.isNonNullObject(CheckoutBridge)) {
       CheckoutBridge.sendAnalyticsData = Track.parseAnalyticsData;
-      CheckoutBridge.sendExtraAnalyticsData = e => {};
+      CheckoutBridge.sendExtraAnalyticsData = e => { };
     }
-  } catch (e) {}
+  } catch (e) { }
 };
 
 function fetchPrefs(session) {

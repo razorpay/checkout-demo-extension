@@ -1,7 +1,6 @@
 import { getSession } from 'sessionmanager';
 import { makeAuthUrl } from 'common/Razorpay';
-import Track from 'tracker';
-import Analytics from 'analytics';
+import Analytics, { Track } from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import * as Bridge from 'bridge';
 import * as OtpService from 'common/otpservice';

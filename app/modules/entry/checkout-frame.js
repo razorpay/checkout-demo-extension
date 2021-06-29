@@ -2,8 +2,8 @@ import Razorpay from 'common/Razorpay';
 import RazorpayConfig from 'common/RazorpayConfig';
 import 'checkoutjs/options';
 import 'payment';
-import 'track-errors';
-import Track from 'tracker';
+import 'analytics/track-errors';
+import { Track } from 'analytics';
 import 'lib/polyfill';
 
 Track.props.library = 'checkoutjs';

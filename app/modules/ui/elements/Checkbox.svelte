@@ -1,6 +1,6 @@
 <script>
   // UI imports
-  import Track from 'tracker';
+  import { Track } from 'analytics';
   import Stack from 'ui/layouts/Stack.svelte';
 
   // Props
@@ -22,6 +22,30 @@
 
   let focused = false;
 </script>
+
+<label
+  for={htmlFor}
+  class="sv-checkbox"
+  class:checked
+  class:focused
+  class:invalid={required && !checked}
+>
+  <Stack inline horizontal>
+    <input
+      {id}
+      type="checkbox"
+      on:change
+      bind:checked
+      {required}
+      on:focus={handleInputFocus}
+      on:blur={handleInputBlur}
+    />
+    <slot />
+  </Stack>
+  {#if helpText}
+    <div class="help">{helpText}</div>
+  {/if}
+</label>
 
 <style>
   label {
@@ -85,25 +109,3 @@
     z-index: 1;
   }
 </style>
-
-<label
-  for={htmlFor}
-  class="sv-checkbox"
-  class:checked
-  class:focused
-  class:invalid={required && !checked}>
-  <Stack inline horizontal>
-    <input
-      {id}
-      type="checkbox"
-      on:change
-      bind:checked
-      {required}
-      on:focus={handleInputFocus}
-      on:blur={handleInputBlur} />
-    <slot />
-  </Stack>
-  {#if helpText}
-    <div class="help">{helpText}</div>
-  {/if}
-</label>

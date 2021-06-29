@@ -8,7 +8,7 @@ import * as cookie from 'lib/cookie';
 import * as Color from 'lib/color';
 import { submitForm } from 'common/form';
 
-import Track from 'tracker';
+import { Track } from 'analytics';
 import popupTemplate from 'payment/popup/template';
 import Popup from 'payment/popup';
 import Iframe from 'payment/iframe';
@@ -140,7 +140,7 @@ function trackNewPayment(data, params, r) {
     trackingData.downtimeSeverity = params.downtimeSeverity;
   }
   // default dcc currency use for only analytics by standard checkout only for now 
-  if(data.default_dcc_currency) {
+  if (data.default_dcc_currency) {
     delete data.default_dcc_currency;
   }
 
@@ -304,7 +304,7 @@ export default function Payment(data, params = {}, r) {
   if (params.paused) {
     try {
       this.writePopup();
-    } catch (e) {}
+    } catch (e) { }
     this.data = data;
     this.on('resume', _Func.bind('generate', this));
   } else {
@@ -313,19 +313,19 @@ export default function Payment(data, params = {}, r) {
 }
 
 Payment.prototype = {
-  on: function(event, handler) {
+  on: function (event, handler) {
     return this.r.on('payment.' + event, _Func.bind(handler, this));
   },
 
-  emit: function(event, arg) {
+  emit: function (event, arg) {
     this.r.emit('payment.' + event, arg);
   },
 
-  off: function() {
+  off: function () {
     this.r.off('payment');
   },
 
-  checkRedirect: function() {
+  checkRedirect: function () {
     var getOption = this.r.get;
 
     if (!this.iframe && getOption('redirect')) {
@@ -348,7 +348,7 @@ Payment.prototype = {
     }
   },
 
-  generate: function(data) {
+  generate: function (data) {
     // Append `data` to `this.data`
     this.data = _Obj.extend(
       _Obj.clone(this.data || {}),
@@ -420,7 +420,7 @@ Payment.prototype = {
     this.offmessage = global |> _El.on('message', _Func.bind(onMessage, this));
   },
 
-  complete: function(data, event) {
+  complete: function (data, event) {
     if (this.done) {
       return;
     }
@@ -498,16 +498,16 @@ Payment.prototype = {
     this.off();
   },
 
-  clear: function() {
+  clear: function () {
     try {
       this.popup.onClose = null;
       this.popup.close();
-    } catch (e) {}
+    } catch (e) { }
 
     try {
       // delete iframe if created for flows like capital flow
       this.popup.window.destroy();
-    } catch (e) {}
+    } catch (e) { }
 
     this.done = true;
 
@@ -524,7 +524,7 @@ Payment.prototype = {
     }
   },
 
-  tryAjax: function() {
+  tryAjax: function () {
     var data = this.data;
     // virtually all the time, unless there isn't an ajax based route
     if (this.feesRedirect) {
@@ -578,12 +578,12 @@ Payment.prototype = {
       return;
     }
 
-      if (
-        (data.method === 'wallet' || data.method === 'cardless_emi') &&
-        !(data.contact && data.email)
-      ) {
-        return;
-      }
+    if (
+      (data.method === 'wallet' || data.method === 'cardless_emi') &&
+      !(data.contact && data.email)
+    ) {
+      return;
+    }
 
     // Axis bank requires HTTP Referer field to be non-empty,
     // If opening bank page from popup, it will be empty.
@@ -608,7 +608,7 @@ Payment.prototype = {
     return 1;
   },
 
-  trySubmit: function() {
+  trySubmit: function () {
     var payment = this;
     var popup = payment.popup;
 
@@ -645,7 +645,7 @@ Payment.prototype = {
     }
   },
 
-  redirect: function({ url, content, method = 'get' }) {
+  redirect: function ({ url, content, method = 'get' }) {
     // If we're in SDK and not in an iframe, redirect directly
     // Not using Bridge.hasCheckoutBridge since bridge.js imports session
     if (global.CheckoutBridge) {
@@ -664,7 +664,7 @@ Payment.prototype = {
     }
   },
 
-  gotoBank: function() {
+  gotoBank: function () {
     if (this.gotoBankRequest) {
       this.gotoBankUsingRequest();
     } else if (this.gotoBankHtml) {
@@ -674,7 +674,7 @@ Payment.prototype = {
     }
   },
 
-  gotoBankUsingUrl: function() {
+  gotoBankUsingUrl: function () {
     if (this.r.get('redirect')) {
       // For redirect mode where we do not have a popup, redirect using POST
       this.redirect({ url: this.gotoBankUrl, method: 'post' });
@@ -690,7 +690,7 @@ Payment.prototype = {
     }
   },
 
-  gotoBankUsingHtml: function() {
+  gotoBankUsingHtml: function () {
     // Create popup if it doesn't exist.
     if (!this.popup) {
       this.makePopup();
@@ -700,7 +700,7 @@ Payment.prototype = {
     this.popup.write(this.gotoBankHtml);
   },
 
-  gotoBankUsingRequest: function() {
+  gotoBankUsingRequest: function () {
     // Create popup if it doesn't exist.
     if (!this.popup) {
       this.makePopup();
@@ -716,7 +716,7 @@ Payment.prototype = {
     );
   },
 
-  makePopup: function() {
+  makePopup: function () {
     let Medium = Popup;
     if (this.iframe) {
       Medium = Iframe;
@@ -745,7 +745,7 @@ Payment.prototype = {
     return popup;
   },
 
-  writePopup: function() {
+  writePopup: function () {
     var popup = this.popup;
     if (popup) {
       popup.write(popupTemplate(this, t));
@@ -753,7 +753,7 @@ Payment.prototype = {
     }
   },
 
-  shouldPopup: function() {
+  shouldPopup: function () {
     if (this.iframe) {
       return true;
     }
@@ -765,13 +765,13 @@ Payment.prototype = {
     return !(this.r.get('redirect') || this.avoidPopup);
   },
 
-  tryPopup: function() {
+  tryPopup: function () {
     if (this.shouldPopup()) {
       this.makePopup();
     }
   },
 
-  getMetadata: function() {
+  getMetadata: function () {
     const metadata = {};
     if (this.payment_id) {
       metadata.payment_id = this.payment_id;
@@ -785,7 +785,7 @@ Payment.prototype = {
 
 function pollPaymentData(onComplete) {
   clearPollingInterval(true);
-  pollingInterval = setInterval(function() {
+  pollingInterval = setInterval(function () {
     var paymentData = cookie.get('onComplete');
 
     if (paymentData) {
@@ -816,7 +816,7 @@ var razorpayProto = Razorpay.prototype;
  *
  * @return {Promise}
  */
-razorpayProto.checkPaymentAdapter = function(adapter, data) {
+razorpayProto.checkPaymentAdapter = function (adapter, data) {
   // Hack to support web payments api for voth standard and custom checkout
   // TODO - Solution web payments for custom checkout to make them more extensible
   var adapterPackageNameMap = {
@@ -845,13 +845,13 @@ razorpayProto.checkPaymentAdapter = function(adapter, data) {
  * @param {Function} successCallback
  * @param {Function} errorCallback
  */
-razorpayProto.isTezAvailable = function(success, error) {
+razorpayProto.isTezAvailable = function (success, error) {
   this.checkPaymentAdapter('gpay')
     .then(success)
     .catch(error);
 };
 
-razorpayProto.postInit = function() {
+razorpayProto.postInit = function () {
   var themeColor = this.get('theme.color') || RAZORPAY_COLOR;
 
   this.themeMeta = {
@@ -861,7 +861,7 @@ razorpayProto.postInit = function() {
   };
 };
 
-razorpayProto.createPayment = function(data, params) {
+razorpayProto.createPayment = function (data, params) {
   if (data && 'data' in data) {
     data = data.data;
     params = data;
@@ -879,7 +879,7 @@ razorpayProto.createPayment = function(data, params) {
  */
 let vpaCache = {};
 
-razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
+razorpayProto.verifyVpa = function (vpa = '', timeout = 0) {
   const eventData = {
     vpa,
     timeout,
@@ -944,7 +944,7 @@ razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
         entity: 'vpa',
         value: vpa,
       },
-      callback: function(response) {
+      callback: function (response) {
         clearInterval(timeoutId);
 
         // Track that we got a response
@@ -998,16 +998,16 @@ razorpayProto.verifyVpa = function(vpa = '', timeout = 0) {
   });
 };
 
-razorpayProto.focus = function() {
+razorpayProto.focus = function () {
   try {
     if (this._payment.forceIframeElement) {
       this._payment.forceIframeElement.window.focus();
     }
     this._payment.popup.window.focus();
-  } catch (e) {}
+  } catch (e) { }
 };
 
-razorpayProto.submitOTP = function(otp) {
+razorpayProto.submitOTP = function (otp) {
   var payment = this._payment;
   payment.ajax = fetch.post({
     url: payment.otpurl,
@@ -1019,7 +1019,7 @@ razorpayProto.submitOTP = function(otp) {
   });
 };
 
-razorpayProto.resendOTP = function(callback) {
+razorpayProto.resendOTP = function (callback) {
   var payment = this._payment;
   var url = makeAuthUrl(this, 'payments/' + payment.payment_id + '/otp_resend');
 
@@ -1032,7 +1032,7 @@ razorpayProto.resendOTP = function(callback) {
   });
 };
 
-razorpayProto.topupWallet = function() {
+razorpayProto.topupWallet = function () {
   var payment = this._payment;
   var isRedirect = this.get('redirect');
   if (!isRedirect) {
@@ -1092,7 +1092,7 @@ var CardCurrencyCache = {};
  * @param {string} cardNumber
  * @param {Function} callback
  */
-razorpayProto.getCardFlows = function(cardNumber = '', callback = _Func.noop) {
+razorpayProto.getCardFlows = function (cardNumber = '', callback = _Func.noop) {
   getCardFeatures
     .bind(this)(cardNumber)
     .then(({ flows = {} }) => {
@@ -1140,7 +1140,7 @@ function getCurrencyData(payload) {
 
     // append requestPayload
     url = _.appendParamsToUrl(url, requestPayload);
-    
+
     fetch.jsonp({
       url,
       callback: response => {
@@ -1188,7 +1188,7 @@ function getCurrencyData(payload) {
  * @param payload Payload which contains amount, currency and either Card Number, IIN or Token
  * @returns {*}
  */
-razorpayProto.getCardCurrencies = function(payload) {
+razorpayProto.getCardCurrencies = function (payload) {
   const requestPayload = {
     '_[source]': Track.props.library,
   };
@@ -1207,7 +1207,7 @@ razorpayProto.getCardCurrencies = function(payload) {
 /**
  * extended getCard currency to add support of wallet & card
  */
-razorpayProto.getCurrencies = function(payload) {
+razorpayProto.getCurrencies = function (payload) {
   const entity = getCardEntityFromPayload(payload);
   if (entity) {
     return razorpayProto.getCardCurrencies.call(this, payload);

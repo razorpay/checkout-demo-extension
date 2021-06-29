@@ -11,8 +11,7 @@ import {
 import Config from 'config/index.js';
 
 import { androidBrowser, iOS, android } from 'common/useragent';
-import Track from 'tracker';
-import Analytics from 'analytics';
+import Analytics, { Track } from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 
 import * as Bridge from 'bridge';
@@ -34,7 +33,7 @@ const getParsedDataFromUrl = url => {
   return parsedData;
 };
 
-export const processOtpResponse = function(response) {
+export const processOtpResponse = function (response) {
   var error = response.error;
   Track(this.r, 'otp_response', response);
   if (error) {
@@ -48,7 +47,7 @@ export const processOtpResponse = function(response) {
   processCoproto.call(this, response);
 };
 
-export const processPaymentCreate = function(response) {
+export const processPaymentCreate = function (response) {
   var payment = this;
   var r = payment.r;
 
@@ -83,7 +82,7 @@ export const processPaymentCreate = function(response) {
  * @param response
  * @returns {*}
  */
-const handleAsyncStatusResponse = function(response) {
+const handleAsyncStatusResponse = function (response) {
   if (response.type === 'return') {
     return response.request.content;
   }
@@ -181,7 +180,7 @@ function popupIframeCheck(request) {
 }
 
 // returns true if coproto handled
-export const processCoproto = function(response) {
+export const processCoproto = function (response) {
   if (response.razorpay_payment_id || response.error) {
     this.complete(response);
   } else {
@@ -200,14 +199,14 @@ export const processCoproto = function(response) {
 var responseTypes = {
   // this === payment
 
-  cardless_emi: function(request, fullResponse) {
+  cardless_emi: function (request, fullResponse) {
     this.emit('process', {
       request,
       response: fullResponse,
     });
   },
 
-  first: function(request, fullResponse) {
+  first: function (request, fullResponse) {
     if (request.method === 'redirect') {
       request.method = 'post';
     }
@@ -300,7 +299,7 @@ var responseTypes = {
     }
   },
 
-  async: function(request, fullResponse) {
+  async: function (request, fullResponse) {
     this.ajax = fetch
       .jsonp({
         url: request.url,
@@ -315,7 +314,7 @@ var responseTypes = {
     }
   },
 
-  application: function(request, fullResponse) {
+  application: function (request, fullResponse) {
     var payment = this;
 
     // Save request for later use (polling status)
@@ -353,7 +352,7 @@ var responseTypes = {
     });
   },
 
-  gpay_inapp: function(request) {
+  gpay_inapp: function (request) {
     this.ajax = fetch
       .jsonp({
         url: request.url,
@@ -364,7 +363,7 @@ var responseTypes = {
     this.emit('upi.pending', { flow: 'upi-intent' });
   },
 
-  web_payments: function(response, app) {
+  web_payments: function (response, app) {
     const data = response.data;
     const instrumentData = {
       url: data.intent_url,
@@ -462,7 +461,7 @@ var responseTypes = {
     }
   },
 
-  gpay: function(coprotoRequest, fullResponse, type = 'payment_request') {
+  gpay: function (coprotoRequest, fullResponse, type = 'payment_request') {
     if (type === 'payment_request') {
       GPay.payWithPaymentRequestApi(
         fullResponse.data,
@@ -518,7 +517,7 @@ var responseTypes = {
     }
   },
 
-  intent: function(request, fullResponse) {
+  intent: function (request, fullResponse) {
     const CheckoutBridge = global.CheckoutBridge;
 
     var ra = ({ transactionReferenceId } = {}) =>
@@ -658,7 +657,7 @@ var responseTypes = {
     }
   },
 
-  otp: function(request, fullResponse) {
+  otp: function (request, fullResponse) {
     if (!this.nativeotp && !this.iframe && request.method === 'direct') {
       return responseTypes.first.call(this, request, responseTypes);
     }
@@ -687,7 +686,7 @@ var responseTypes = {
     _Doc.redirect(request);
   },
 
-  respawn: function(request, fullResponse) {
+  respawn: function (request, fullResponse) {
     // If Cardless EMI, route the coproto
     if (this.data && this.data.method === 'cardless_emi' && this.data.contact) {
       return responseTypes.cardless_emi.call(this, request, fullResponse);

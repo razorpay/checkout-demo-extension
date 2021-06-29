@@ -2,12 +2,12 @@ import Razorpay, { optionValidations } from 'common/Razorpay';
 import { RazorpayDefaults } from 'common/options';
 import 'checkoutjs/options';
 import initRazorpayCheckout from 'checkoutjs/open';
-import Track from 'tracker';
-import 'track-errors';
+import { Track } from 'analytics';
+import 'analytics/track-errors';
 
 Track.props.library = 'checkoutjs';
 
-RazorpayDefaults.handler = function(data) {
+RazorpayDefaults.handler = function (data) {
   if (_.is(this, Razorpay)) {
     var callback_url = this.get('callback_url');
     if (callback_url) {
@@ -19,7 +19,7 @@ RazorpayDefaults.handler = function(data) {
 RazorpayDefaults.buttontext = 'Pay Now';
 RazorpayDefaults.parent = null;
 
-optionValidations.parent = function(parent) {
+optionValidations.parent = function (parent) {
   if (!_Doc.resolveElement(parent)) {
     return "parent provided for embedded mode doesn't exist";
   }

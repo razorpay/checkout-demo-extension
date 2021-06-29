@@ -1,6 +1,6 @@
 import { getFingerprint, getDeviceId } from 'fingerprint';
 import { flattenProp } from 'common/options';
-import Track from 'tracker';
+import { Track } from 'analytics';
 import { GOOGLE_PAY_PACKAGE_NAME } from 'common/upi';
 import { luhnCheck } from 'lib/utils';
 
@@ -34,7 +34,7 @@ export const setShieldParams = params => {
     });
 };
 
-export const formatPayment = function(payment) {
+export const formatPayment = function (payment) {
   let params =
     ['feesRedirect', 'tez', 'gpay', 'avoidPopup']
     |> _Arr.reduce((allParams, param) => {
@@ -58,7 +58,7 @@ function validateData(data) {
   }
 }
 
-export const formatPayload = function(payload, razorpayInstance, params = {}) {
+export const formatPayload = function (payload, razorpayInstance, params = {}) {
   var data = _Obj.clone(payload);
 
   // Set view for fees.

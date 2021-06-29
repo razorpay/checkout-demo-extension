@@ -1,7 +1,7 @@
 <script>
   // Utils imports
   import { getSession } from 'sessionmanager';
-  import Track from 'tracker';
+  import { Track } from 'analytics';
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte'
 
   // Actions
@@ -272,6 +272,102 @@
   }
 </script>
 
+<div
+  bind:this={wrap}
+  class={`elem ${elemClasses}`}
+  class:readonly
+  class:with-prediction={isPredictionEnable}
+>
+  {#if icon}
+    <i>
+      {@html icon}
+    </i>
+  {/if}
+  {#if isPredictionEnable}
+    <input
+      bind:this={suggestionInputRef}
+      bind:value={predictedValue}
+      class="input prediction-input"
+    />
+  {/if}
+  <input
+    class="input main"
+    bind:this={input}
+    id={identifier}
+    type={inputType}
+    {name}
+    {inputmode}
+    {value}
+    {required}
+    {autocomplete}
+    x-autocompletetype={xautocompletetype}
+    placeholder={placeholderToShow}
+    {pattern}
+    {readonly}
+    {min}
+    {max}
+    {tabindex}
+    {autocapitalize}
+    {autocorrect}
+    {spellcheck}
+    use:formatterAction={formatter}
+    use:focusAction={handleFocus}
+    use:blurAction={handleBlur}
+    use:inputAction={handleInput}
+    on:focus={handleInputFocus}
+    on:blur={handleInputBlur}
+    on:input={handleInputEvent}
+    on:focus
+    on:blur
+    on:input
+    on:autocomplete
+    on:paste
+    on:click
+    on:keydown={onKeyDown}
+    on:keydown
+    on:scroll={e => {
+      mainInputScrollLeft = e.target.scrollLeft;
+    }}
+    class:no-refresh={!refresh}
+    class:no-focus={handleFocus}
+    class:no-blur={handleBlur}
+    class:no-validate={handleInput}
+    class:cvv-input={type === 'cvv'}
+  />
+  {#if label}<label>{label}</label>{/if}
+  {#if helpText}
+    <div class="help">{helpText}</div>
+  {/if}
+  {#if downtimeSeverity}
+    <div class="downtime-icon"><DowntimeIcon severe={downtimeSeverity} /></div>
+  {/if}
+  {#if showDropdownPredictions && dropDownSuggestion?.length > 0}
+    <ul
+      style={`left: ${dropDownPosition.left}; right: ${dropDownPosition.right};`}
+      bind:this={dropdownRef}
+      class="suggestion-dropdown"
+    >
+      {#each dropDownSuggestion as suggestion, index (suggestion)}
+        <li
+          class:hover={dropdownArrowIndex === index}
+          tabindex={index}
+          on:click={() => {
+            if (typeof dropDownSelection === 'function') {
+              const updatedValue = dropDownSelection(suggestion);
+              if (typeof updatedValue === 'string') {
+                value = updatedValue;
+                readonlyValue = updatedValue;
+              }
+            }
+          }}
+        >
+          {suggestion}
+        </li>
+      {/each}
+    </ul>
+  {/if}
+</div>
+
 <style>
   div:not(.help) {
     input {
@@ -324,94 +420,3 @@
     margin-top: -24px;
   }
 </style>
-
-<div
-  bind:this={wrap}
-  class={`elem ${elemClasses}`}
-  class:readonly
-  class:with-prediction={isPredictionEnable}>
-  {#if icon}
-    <i>
-      {@html icon}
-    </i>
-  {/if}
-  {#if isPredictionEnable}
-    <input
-      bind:this={suggestionInputRef}
-      bind:value={predictedValue}
-      class="input prediction-input" />
-  {/if}
-  <input
-    class="input main"
-    bind:this={input}
-    id={identifier}
-    type={inputType}
-    {name}
-    {inputmode}
-    {value}
-    {required}
-    {autocomplete}
-    x-autocompletetype={xautocompletetype}
-    placeholder={placeholderToShow}
-    {pattern}
-    {readonly}
-    {min}
-    {max}
-    {tabindex}
-    {autocapitalize}
-    {autocorrect}
-    {spellcheck}
-    use:formatterAction={formatter}
-    use:focusAction={handleFocus}
-    use:blurAction={handleBlur}
-    use:inputAction={handleInput}
-    on:focus={handleInputFocus}
-    on:blur={handleInputBlur}
-    on:input={handleInputEvent}
-    on:focus
-    on:blur
-    on:input
-    on:autocomplete
-    on:paste
-    on:click
-    on:keydown={onKeyDown}
-    on:keydown
-    on:scroll={e => {
-      mainInputScrollLeft = e.target.scrollLeft;
-    }}
-    class:no-refresh={!refresh}
-    class:no-focus={handleFocus}
-    class:no-blur={handleBlur}
-    class:no-validate={handleInput}
-    class:cvv-input={type === 'cvv'} />
-  {#if label}<label>{label}</label>{/if}
-  {#if helpText}
-    <div class="help">{helpText}</div>
-  {/if}
-  {#if downtimeSeverity}
-    <div class="downtime-icon"><DowntimeIcon severe={downtimeSeverity} /></div>
-  {/if}
-  {#if showDropdownPredictions && dropDownSuggestion?.length > 0}
-    <ul
-      style={`left: ${dropDownPosition.left}; right: ${dropDownPosition.right};`}
-      bind:this={dropdownRef}
-      class="suggestion-dropdown">
-      {#each dropDownSuggestion as suggestion, index (suggestion)}
-        <li
-          class:hover={dropdownArrowIndex === index}
-          tabindex={index}
-          on:click={() => {
-            if (typeof dropDownSelection === 'function') {
-              const updatedValue = dropDownSelection(suggestion);
-              if (typeof updatedValue === 'string') {
-                value = updatedValue;
-                readonlyValue = updatedValue;
-              }
-            }
-          }}>
-          {suggestion}
-        </li>
-      {/each}
-    </ul>
-  {/if}
-</div>

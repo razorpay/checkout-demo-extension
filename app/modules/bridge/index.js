@@ -1,6 +1,6 @@
 /* global confirm */
 
-import Track from 'tracker';
+import { Track } from 'analytics';
 import Bridge from './bridge';
 
 /* Our primary bridge is CheckoutBridge */
@@ -9,12 +9,12 @@ export const defineIosBridge = () => {
     /* unique id for ios to retieve resources */
     index: 0,
     map: {},
-    get: function(index) {
+    get: function (index) {
       var val = this.map[this.index];
       delete this.map[this.index];
       return val;
     },
-    getUID: function() {
+    getUID: function () {
       return Track.id;
     },
   };
@@ -35,7 +35,7 @@ export const iosLegacyMethod = method => {
   let CheckoutBridge = getCheckoutBridge();
   let doc = _Doc.documentElement;
 
-  return function(data) {
+  return function (data) {
     /* setting up js → ios communication by loading custom protocol inside
      * hidden iframe */
     var iF = _El.create('iframe');

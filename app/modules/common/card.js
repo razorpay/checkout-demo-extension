@@ -1,7 +1,6 @@
 import RazorpayConfig from 'common/RazorpayConfig';
 import { makeAuthUrl } from 'common/Razorpay';
-import Analytics from 'analytics';
-import Track from 'tracker';
+import Analytics, { Track } from 'analytics';
 import { checkDowntime } from 'checkoutframe/downtimes';
 
 export const API_NETWORK_CODES_MAP = {

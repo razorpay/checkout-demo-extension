@@ -1,8 +1,7 @@
 import { makeUrl, makePrefParams } from 'common/Razorpay';
 import RazorpayConfig from 'common/RazorpayConfig';
-import Track from 'tracker';
 import { iPhone, shouldRedirect } from 'common/useragent';
-import Analytics from 'analytics';
+import Analytics, { Track } from 'analytics';
 
 const { screen, scrollTo } = global;
 
@@ -15,12 +14,12 @@ var containerHeight = 460;
 var merchantMarkup = {
   overflow: '',
   metas: null,
-  orientationchange: function() {
+  orientationchange: function () {
     merchantMarkup.resize.call(this);
     merchantMarkup.scroll.call(this);
   },
 
-  resize: function() {
+  resize: function () {
     var height = global.innerHeight || screen.height;
     CheckoutFrame.container.style.position =
       height < 450 ? 'absolute' : 'fixed';
@@ -28,7 +27,7 @@ var merchantMarkup = {
   },
 
   // scroll manually in iPhone
-  scroll: function() {
+  scroll: function () {
     if (typeof global.pageYOffset !== 'number') {
       return;
     }
@@ -125,7 +124,7 @@ function setBackdropColor(value) {
   // setting unsupported value throws error in IE
   try {
     CheckoutFrame.backdrop.style.background = value;
-  } catch (e) {}
+  } catch (e) { }
 }
 
 function setTestRibbonVisible() {
@@ -156,7 +155,7 @@ function appendLoader($parent, parent) {
       }
       loader.setAttribute('style', style);
       loader |> _El.appendTo($parent);
-    } catch (e) {}
+    } catch (e) { }
   }
 }
 
@@ -173,7 +172,7 @@ export default function CheckoutFrame(rzp) {
 }
 
 CheckoutFrame.prototype = {
-  getEl: function(rzp) {
+  getEl: function (rzp) {
     if (!this.el) {
       var style =
         'opacity: 1; height: 100%; position: relative; background: none; display: block; border: 0 none transparent; margin: 0px; padding: 0px; z-index: 2;';
@@ -193,7 +192,7 @@ CheckoutFrame.prototype = {
     return this.el;
   },
 
-  openRzp: function(rzp) {
+  openRzp: function (rzp) {
     var el =
       this.el
       |> _El.setStyles({
@@ -232,7 +231,7 @@ CheckoutFrame.prototype = {
     this.onload();
   },
 
-  makeMessage: function() {
+  makeMessage: function () {
     var rzp = this.rzp;
     var options = rzp.get();
 
@@ -248,7 +247,7 @@ CheckoutFrame.prototype = {
       response.metadata = rzp.metadata;
     }
 
-    _Obj.loop(rzp.modal.options, function(option, i) {
+    _Obj.loop(rzp.modal.options, function (option, i) {
       options['modal.' + i] = option;
     });
 
@@ -261,7 +260,7 @@ CheckoutFrame.prototype = {
     return response;
   },
 
-  close: function() {
+  close: function () {
     setBackdropColor('');
     setTestRibbonInvisible();
     restoreMetas(this.$metas);
@@ -276,7 +275,7 @@ CheckoutFrame.prototype = {
     Track.flush();
   },
 
-  bind: function() {
+  bind: function () {
     if (!this.listeners) {
       this.listeners = [];
       var eventPairs = {};
@@ -298,12 +297,12 @@ CheckoutFrame.prototype = {
     }
   },
 
-  unbind: function() {
+  unbind: function () {
     this.listeners |> _Arr.callAll;
     this.listeners = null;
   },
 
-  setMetaAndOverflow: function() {
+  setMetaAndOverflow: function () {
     if (!head) {
       return;
     }
@@ -312,16 +311,16 @@ CheckoutFrame.prototype = {
 
     this.$metas = [
       _El.create('meta')
-        |> _El.setAttributes({
-          name: 'viewport',
-          content:
-            'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no',
-        }),
+      |> _El.setAttributes({
+        name: 'viewport',
+        content:
+          'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no',
+      }),
       _El.create('meta')
-        |> _El.setAttributes({
-          name: 'theme-color',
-          content: this.rzp.get('theme.color'),
-        }),
+      |> _El.setAttributes({
+        name: 'theme-color',
+        content: this.rzp.get('theme.color'),
+      }),
     ];
 
     _Arr.loop(this.$metas, _El.appendTo(head));
@@ -336,7 +335,7 @@ CheckoutFrame.prototype = {
     }
   },
 
-  postMessage: function(response) {
+  postMessage: function (response) {
     if (typeof response !== 'object') {
       // TODO roll
     }
@@ -345,7 +344,7 @@ CheckoutFrame.prototype = {
     this.el.contentWindow.postMessage(response, '*');
   },
 
-  onmessage: function(e) {
+  onmessage: function (e) {
     var data = _Obj.parse(e.data);
     if (!data) {
       return;
@@ -375,22 +374,22 @@ CheckoutFrame.prototype = {
     }
   },
 
-  onload: function() {
+  onload: function () {
     if (this.rzp) {
       this.postMessage(this.makeMessage());
     }
   },
 
-  onfocus: function() {
+  onfocus: function () {
     this.isFocused = true;
   },
 
-  onblur: function() {
+  onblur: function () {
     this.isFocused = false;
     merchantMarkup.orientationchange.call(this);
   },
 
-  onrender: function() {
+  onrender: function () {
     if (loader) {
       loader |> _El.detach;
       loader = null;
@@ -398,11 +397,11 @@ CheckoutFrame.prototype = {
     this.rzp.emit('render');
   },
 
-  onevent: function(data) {
+  onevent: function (data) {
     this.rzp.emit(data.event, data.data);
   },
 
-  onredirect: function(data) {
+  onredirect: function (data) {
     Track.flush();
 
     /**
@@ -421,14 +420,14 @@ CheckoutFrame.prototype = {
     _Doc.redirect(data);
   },
 
-  onsubmit: function(data) {
+  onsubmit: function (data) {
     Track.flush();
 
     var rzp = this.rzp;
 
     // check if it was one of the external wallets
     if (data.method === 'wallet') {
-      _Arr.loop(rzp.get('external.wallets'), function(walletName) {
+      _Arr.loop(rzp.get('external.wallets'), function (walletName) {
         if (walletName === data.wallet) {
           try {
             rzp.get('external.handler').call(rzp, data);
@@ -443,7 +442,7 @@ CheckoutFrame.prototype = {
     });
   },
 
-  ondismiss: function(data) {
+  ondismiss: function (data) {
     this.close();
     let dismiss = this.rzp.get('modal.ondismiss');
     if (_.isFunction(dismiss)) {
@@ -451,7 +450,7 @@ CheckoutFrame.prototype = {
     }
   },
 
-  onhidden: function() {
+  onhidden: function () {
     Track.flush();
     this.afterClose();
     let hidden = this.rzp.get('modal.onhidden');
@@ -461,7 +460,7 @@ CheckoutFrame.prototype = {
   },
 
   // this is onsuccess method
-  oncomplete: function(data) {
+  oncomplete: function (data) {
     this.close();
     var rzp = this.rzp;
     var handler = rzp.get('handler');
@@ -471,13 +470,13 @@ CheckoutFrame.prototype = {
       immediately: true,
     });
     if (_.isFunction(handler)) {
-      setTimeout(function() {
+      setTimeout(function () {
         handler.call(rzp, data);
       }, 200);
     }
   },
 
-  onpaymenterror: function(data) {
+  onpaymenterror: function (data) {
     Track.flush();
 
     try {
@@ -505,16 +504,16 @@ CheckoutFrame.prototype = {
 
       this.rzp.emit('payment.error', data);
       this.rzp.emit('payment.failed', data);
-    } catch (e) {}
+    } catch (e) { }
   },
 
-  onfailure: function(data) {
+  onfailure: function (data) {
     this.ondismiss();
     global.alert('Payment Failed.\n' + data.error.description);
     this.onhidden();
   },
 
-  onfault: function(data) {
+  onfault: function (data) {
     let message = 'Something went wrong.';
 
     if (_.isString(data)) {
@@ -543,11 +542,11 @@ CheckoutFrame.prototype = {
     this.afterClose();
   },
 
-  afterClose: function() {
+  afterClose: function () {
     CheckoutFrame.container.style.display = 'none';
   },
 
-  onflush: function(e) {
+  onflush: function (e) {
     Track.flush();
   },
 };
