@@ -1,8 +1,4 @@
 import { getExperimentsFromStorage } from 'experiments';
-import {
-  getDevice,
-  isMobileBrowser,
-} from 'common/useragent';
 
 const base62Chars =
   '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
@@ -58,8 +54,6 @@ var trackingProps = {
   library: 'checkoutjs',
   platform: 'browser',
   referer: location.href,
-  device: getDevice(),
-  browser_type: isMobileBrowser() ? 'mobile' : 'desktop',
 };
 
 function getCommonTrackingData(r) {
@@ -69,7 +63,6 @@ function getCommonTrackingData(r) {
 
   [
     'device',
-    'browser_type',
     'env',
     'integration',
     'library',
@@ -175,7 +168,7 @@ export default function Track(r, event, data, immediately) {
     }
 
     var context = getCommonTrackingData(r);
-    context.user_agent = navigator?.userAgent;
+    context.user_agent = null;
     context.mode = 'live';
     var order_id = r.get('order_id');
     if (order_id) {
