@@ -74,6 +74,7 @@ module.exports = function(testFeatures = {}) {
     optionalEmail,
     popupIframe,
     emulate,
+    amountAboveLimit = false,
   } = features;
 
   // Paypal Currency Conversion
@@ -84,6 +85,10 @@ module.exports = function(testFeatures = {}) {
 
   if(isPaypalCC) {
     preferences.features = { paypal_cc: true };
+  }
+
+  if(amountAboveLimit) {
+    options.amount = 110000 * 100 // 1.1L
   }
 
   describe.each(
@@ -138,7 +143,7 @@ module.exports = function(testFeatures = {}) {
         }
       } else {
         await selectPaymentMethod(context, 'wallet');
-        await assertWalletPage(context);
+        await assertWalletPage(context, isPaypalCC);
 
         if(popupIframe) {
           await selectWallet(context, 'paytm');

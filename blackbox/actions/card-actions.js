@@ -319,6 +319,11 @@ async function selectSavedCardAndTypeCvv(context) {
 }
 
 async function verifyAmount(context, currency) {
+  const {options} = context;
+  if(options.amount >= 1e5) { // >= 1k
+    // skip validation as getDisplayAmount is not written for amount > 1k
+    return;
+  }
   const originalAmount = context.options.amount;
   const currencyConfig = getCardCurrencies(originalAmount).all_currencies[
     currency

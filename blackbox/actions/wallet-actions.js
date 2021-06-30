@@ -6,6 +6,13 @@ async function retryWalletTransaction(context) {
 }
 
 async function assertWalletPage(context) {
+  const { options } = context;
+  expect(
+    await context.page.$eval('div#wallet-radio-paypal', visible)
+  ).toEqual(true);
+  if(options.amount >= 1e7) { // >= 1 lakh
+    return;  
+  }
   expect(
     await context.page.$eval('div#wallet-radio-freecharge', visible)
   ).toEqual(true);

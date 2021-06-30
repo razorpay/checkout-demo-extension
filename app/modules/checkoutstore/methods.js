@@ -1,4 +1,5 @@
 /* global Set */
+import Config, { FLOWS } from 'config';
 
 import {
   isRecurring,
@@ -904,6 +905,17 @@ export function getCardlessEMIProviders() {
   return providers;
 }
 
+// * - amount > 1L filter
+function filterWalletByAmount(wallets) {
+  const amountGreaterThan1Lac = getAmount() >= 1e5 * 100;
+  if (!amountGreaterThan1Lac) { // if amount is not greater than 1 lacs we return all wallets
+    return wallets;
+  }
+  return wallets.filter(wallet => {
+    return Boolean(Config.wallet?.[wallet]?.[FLOWS.DISABLE_WALLET_AMOUNT_CHECK]);
+  });
+}
+
 export function getWallets() {
   /**
    * disable wallets if:
@@ -914,41 +926,45 @@ export function getWallets() {
    * Also, enable/disable wallets on the basis of merchant options
    */
   const passedWallets = getOption('method.wallet');
-  let enabledWallets = getMerchantMethods().wallet |> _Obj.keys;
+  const allWallets = getMerchantMethods().wallet; // get all wallets
+  let enabledWallets = filterWalletByAmount(Object.keys(allWallets));
 
   addExternalWallets(enabledWallets);
 
   if (
     !getAmount() ||
     passedWallets === false ||
-    getAmount() >= 1e5 * 100 ||
+    enabledWallets.length === 0 || // length will become 0 if amount check fails for all
     isRecurring() ||
     isInternational()
   ) {
     return [];
   }
+  
 
-  if (_.isNonNullObject(passedWallets)) {
-    enabledWallets =
-      enabledWallets |> _Arr.filter(wallet => passedWallets[wallet] !== false);
+  if (passedWallets && typeof passedWallets === 'object') {
+    enabledWallets = enabledWallets.filter(
+      wallet => passedWallets[wallet] !== false
+    );
   }
 
   const noRedirectFacebookWebViewSession = isNoRedirectFacebookWebViewSession();
 
-  return (
-    enabledWallets
-    |> _Arr.map(wallet => wallets[wallet])
-    |> _Arr.filter(Boolean)
-    |> _Arr.filter(wallet => {
+  const result = enabledWallets
+    .map(wallet => wallets[wallet])
+    .filter(wallet => {
+      if (!Boolean(wallet)) {
+        return false;
+      }
       if (noRedirectFacebookWebViewSession) {
         // Only power wallets are supported on Facebook browser w/o callback_url
         return wallet.power;
       } else {
         return true;
       }
-    })
-    |> getSortedWallets
-  );
+    });
+    
+  return getSortedWallets(result);
 }
 
 function addExternalWallets(enabledWallets) {
