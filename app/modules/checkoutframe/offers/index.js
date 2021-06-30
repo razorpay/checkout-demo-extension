@@ -68,6 +68,8 @@ export const hasOffersOnHomescreen = () => {
 export function getOfferMethodForTab(tab) {
   if (tab === 'emiplans') {
     tab = 'emi';
+  } else if (tab === 'qr') {
+    tab = 'upi';
   }
   return tab;
 }

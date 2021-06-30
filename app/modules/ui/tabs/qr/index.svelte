@@ -109,7 +109,11 @@
     loading = true;
 
     session.preferredInstrument = processInstrument(paymentData);
-
+    const offer = session.getAppliedOffer();
+    // UPI offer applicable to QR also
+    if(offer && offer.payment_method === 'upi') {
+      paymentData.offer_id = offer.id; 
+    }
     /**
      * TODO:
      * We should call session.submit from here
