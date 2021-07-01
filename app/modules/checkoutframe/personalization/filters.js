@@ -1,6 +1,6 @@
 import { VPA_REGEX } from 'common/constants';
 import { doesAppExist } from 'common/upi';
-import { shouldRememberCustomer } from 'checkoutstore';
+import { getAmount, shouldRememberCustomer } from 'checkoutstore';
 import {
   isCreditCardEnabled,
   isDebitCardEnabled,
@@ -9,6 +9,7 @@ import {
   getNetbankingBanks,
   isApplicationEnabled,
 } from 'checkoutstore/methods';
+import { getProvider as getCardlessEMIProvider } from 'common/cardlessemi';
 
 /**
  * Map of filter fn for each method
@@ -156,6 +157,13 @@ const SANITY_FILTERS = {
 
     return true;
   },
+  cardless_emi: instrument => {
+    // check for min_amount for cardless_emi
+    const provider = getCardlessEMIProvider(instrument.provider);
+    const minAmount = provider.min_amount || 0;
+    const amount = getAmount();
+    return amount >= minAmount;
+  }
 };
 
 /**
