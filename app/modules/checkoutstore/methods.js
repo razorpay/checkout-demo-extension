@@ -906,7 +906,7 @@ export function getCardlessEMIProviders() {
 }
 
 // * - amount > 1L filter
-function filterWalletByAmount(wallets) {
+function filterWalletByAmount(wallets = []) {
   const amountGreaterThan1Lac = getAmount() >= 1e5 * 100;
   if (!amountGreaterThan1Lac) { // if amount is not greater than 1 lacs we return all wallets
     return wallets;
@@ -926,7 +926,7 @@ export function getWallets() {
    * Also, enable/disable wallets on the basis of merchant options
    */
   const passedWallets = getOption('method.wallet');
-  const allWallets = getMerchantMethods().wallet; // get all wallets
+  const allWallets = getMerchantMethods()?.wallet || {}; // get all wallets
   let enabledWallets = filterWalletByAmount(Object.keys(allWallets));
 
   addExternalWallets(enabledWallets);
