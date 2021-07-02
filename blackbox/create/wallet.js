@@ -83,10 +83,6 @@ module.exports = function(testFeatures = {}) {
     options.isPaypalCC = true;
   }
 
-  if(isPaypalCC) {
-    preferences.features = { paypal_cc: true };
-  }
-
   if(amountAboveLimit) {
     options.amount = 110000 * 100 // 1.1L
   }

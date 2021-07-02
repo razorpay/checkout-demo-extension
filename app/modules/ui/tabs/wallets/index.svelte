@@ -24,7 +24,6 @@
 
   // Transitions
   import { slide } from 'svelte/transition';
-import { hasFeature } from 'checkoutstore';
 import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
 
   const session = getSession();
@@ -206,7 +205,7 @@ import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
   </div>
   <Bottom tab="wallet">
     <!-- skip dcc check as paypal cc doesn't depend upon dcc -->
-    {#if $selectedWallet === 'paypal' && hasFeature('paypal_cc')}
+    {#if $selectedWallet === 'paypal'}
       <DynamicCurrencyView tabVisible view={$selectedWallet} />
     {/if}
   </Bottom>

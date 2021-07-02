@@ -43,7 +43,6 @@
     getOption,
     isDCCEnabled,
     getTrustedBadgeHighlights,
-    hasFeature,
   } from 'checkoutstore';
 
   import { getUPIIntentApps } from 'checkoutstore/native';
@@ -971,7 +970,7 @@
       {#if cardOffer}
         <CardOffer offer={cardOffer} />
       {/if}
-      {#if isDCCEnabled() || (dccView === 'paypal' && hasFeature('paypal_cc'))}
+      {#if isDCCEnabled() || dccView === 'paypal'}
         <DynamicCurrencyView tabVisible view={dccView} />
       {/if}
       <!-- {#if showRecurringCallout}
