@@ -294,6 +294,10 @@ export default function Payment(data, params = {}, r) {
       }
     }
   }
+  // adding a check for given flow requires popup for custom checkout (e.g twid)
+  if (checkValidFlow(data, FLOWS.FORCE_POPUP) && !isRazorpayFrame()) {
+    avoidPopup = false;
+  }
   // in force iframe always avoid popup
   const forceIframeFlow = checkValidFlow(data, FLOWS.FORCE_IFRAME);
   this.avoidPopup = forceIframeFlow || avoidPopup;
