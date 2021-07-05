@@ -38,7 +38,7 @@ export const getRecurringMethods = () => getMerchantMethods().recurring;
 export const getMethodsCustomText = () => getMerchantMethods().custom_text;
 export const getMerchantOrder = () => preferences.order;
 export const getOrderMethod = () => getMerchantOrder()?.method;
-export const getMerchantKey = () => preferences.merchant_key;
+export const getMerchantKey = () => preferences?.merchant_key;
 export const getMerchantOffers = () => {
   // Ignore all offers ( including forced offers ) in case of partial payments.
   if (isPartialPayment()) {

@@ -85,3 +85,48 @@ export const banksThatSupportRecurring = [
     img: 'JIOP',
   },
 ];
+
+/**
+ * On Special Ask we are enabling some banks to specific merchants
+ * This will be removed once business confirms
+ * Object with { merchantId:merchantKey } structure is used only for readability
+ */
+export const experimentingMerchants = [
+  'rzp_live_nQFVYbN7L7JL60',
+  'rzp_live_Y3dhHoJtn6iIlc',
+  'rzp_live_Lt3Eq20Xpej9Ok',
+];
+
+export const banksForSpecificMerchants = [
+  {
+    name: 'HSBC',
+    id: 'hsbc',
+    img: 'HSBC',
+  },
+  {
+    name: 'Bank of Baroda',
+    id: 'barb',
+    img: 'BARB',
+  },
+  {
+    name: 'Bank of India',
+    id: 'bkid',
+    img: 'BKID',
+  },
+
+  {
+    name: 'IDFC FIRST Bank',
+    id: 'idfb',
+    img: 'IDFB',
+  },
+  {
+    name: 'Federal Bank',
+    id: 'fdrl',
+    img: 'FDRL',
+  },
+  {
+    name: 'RBL',
+    id: 'ratn',
+    img: 'RATN',
+  },
+];

@@ -3,10 +3,10 @@
   import Icon from 'ui/elements/Icon.svelte';
   import { _ as t } from 'svelte-i18n';
   import { ID_LINKED_TO_BANK } from 'ui/labels/upi';
-  import { banksThatSupportRecurring } from './constants'
+  import { getSupportedBankForUPIRecurring } from './helpers';
 
   export let value = null;
-
+  const banksThatSupportRecurring = getSupportedBankForUPIRecurring();
 </script>
 
 <div class="legend left">{$t(ID_LINKED_TO_BANK)}</div>
