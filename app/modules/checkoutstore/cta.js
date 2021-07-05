@@ -82,7 +82,7 @@ export function showNext() {
 
 export function showPayViaSingleMethod(method) {
   if (isCustomerFeeBearer()) {
-    setView(CtaViews.PAY, false);
+    setView(CtaViews.PAY, true);
   } else {
     setView(CtaViews.PAY_SINGLE_METHOD, true, { method });
   }
@@ -131,7 +131,7 @@ export function showAmountInCta() {
     setView(CtaViews.AUTHENTICATE, false);
   } else {
     if (isCustomerFeeBearer()) {
-      setView(CtaViews.PAY, false);
+      setView(CtaViews.PAY, true);
     } else {
       const offer = session.getAppliedOffer();
       let amount = (offer && offer.amount) || session.get('amount');
