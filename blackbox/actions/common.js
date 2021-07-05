@@ -16,6 +16,7 @@ const emandateBanktransferActions = require('./emandate-banktransfer-actions');
 const paylaterActions = require('./paylater-actions');
 const personalizationActions = require('./personalization-actions');
 const payoutActions = require('./payout-actions');
+const automaticCheckoutAction = require('./automatic-checkout');
 
 module.exports = {
   ...offerActions,
@@ -35,6 +36,7 @@ module.exports = {
   ...paylaterActions,
   ...personalizationActions,
   ...payoutActions,
+  ...automaticCheckoutAction,
   verifyDiscountPaybleAmount,
   verifyDiscountText,
   verifyDiscountAmountInBanner,

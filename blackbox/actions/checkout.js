@@ -5,33 +5,41 @@ const { cdnUrl, lumberjackUrl, bundleUrl } = require('../const');
 const { interceptor } = require('../util');
 const { computed } = require('./options');
 const { callbackHtml, getMockResponse } = require('./callback');
-const { sendPreferences } = require('./preferences');
+const { sendPreferences, makePreferencesLogged } = require('./preferences');
 const { sendRewards } = require('./rewards');
 const { setExperiments } = require('./experiments');
 
 const checkoutPublic = 'https://api.razorpay.com/v1/checkout/public';
+const automaticCheckoutPublic = 'https://api.razorpay.com/v1/checkout/public/automatic';
 const checkoutCss = 'https://checkout.razorpay.com/v1/css/checkout.css';
 const checkoutFont = cdnUrl + 'lato.woff2';
-const checkoutJs = 'https://checkout.razorpay.com/v1/checkout-frame.js';
+const checkoutFrameJs = 'https://checkout.razorpay.com/v1/checkout-frame.js';
+const checkoutJs = 'https://checkout.razorpay.com/v1/checkout.js';
 const mockPageSubmit =
   'https://api.razorpay.com/v1/gateway/mocksharp/payment/submit';
 
 const htmlContent = readFileSync('blackbox/fixtures/checkout-public.html');
+const autoHtmlContent = readFileSync('blackbox/fixtures/automatic-checkout.html');
 const jsContent = readFileSync('app/dist/v1/checkout-frame.js');
+const checkoutJsContent = readFileSync('app/dist/v1/checkout.js');
 const cssContent = readFileSync('app/dist/v1/css/checkout.css');
 const fontContent = readFileSync('app/fonts/lato.woff2');
 const popupHtmlContent = readFileSync('blackbox/fixtures/mockSFPage.html');
 
 function checkoutRequestHandler(request) {
   const url = request.url();
-  if (url.startsWith(checkoutPublic)) {
+  if (url.startsWith(automaticCheckoutPublic)) {
+    return request.respond({ body: autoHtmlContent });
+  } if (url.startsWith(checkoutPublic)) {
     return request.respond({ body: htmlContent });
   } else if (url.endsWith('favicon.ico')) {
     return request.respond({ status: 204 });
   } else if (url === checkoutCss) {
     return request.respond({ body: cssContent });
-  } else if (url === checkoutJs) {
+  } else if (url === checkoutFrameJs) {
     return request.respond({ body: jsContent });
+  } else if (url === checkoutJs) {
+    return request.respond({ body: checkoutJsContent });
   } else if (url === checkoutFont) {
     return request.respond({
       body: fontContent,
@@ -44,7 +52,7 @@ function checkoutRequestHandler(request) {
   } else if (url.includes('livereload')) {
     // Livereload URLs come if you have `npm run start` on while testing
     return request.respond({ status: 200 });
-  }  else {
+  } else {
     throw new Error(
       `unexpected resource URL while loading checkout-public: ${url}`
     );
@@ -105,7 +113,7 @@ function cdnRequestHandler(request) {
         request.respond({ status: 500 });
       }
     }
-  } 
+  }
 }
 
 async function passMessage(page, message) {
@@ -244,7 +252,7 @@ module.exports = {
         ];
         walletInstruments[hashKey] = [
           {
-            wallet: opt.isPaypalCC ? 'paypal': 'freecharge',
+            wallet: opt.isPaypalCC ? 'paypal' : 'freecharge',
             method: 'wallet',
             timestamp: 1574081911355,
             success: true,
@@ -400,6 +408,40 @@ module.exports = {
       await sendPreferences(returnObj);
       await sendRewards(returnObj);
     }
+    // page takes some time to render
+    await delay(200);
+    return returnObj;
+  },
+  async openAutoCheckout({ page, preferences }) {
+    // Disable animations for testing
+    let checkoutUrl = automaticCheckoutPublic;
+    if (interceptorOptions) {
+      interceptorOptions.disableInterceptor();
+      interceptorOptions.resetAllRequest();
+      page.removeListener('request', cdnRequestHandler);
+    } else {
+      await page.setRequestInterception(true);
+    }
+
+    page.on('request', checkoutRequestHandler);
+    await page.goto(checkoutUrl);
+
+    page.removeListener('request', checkoutRequestHandler);
+    page.on('request', cdnRequestHandler);
+
+    if (interceptorOptions) {
+      interceptorOptions.enableInterceptor();
+    } else {
+      interceptorOptions = interceptor(page);
+    }
+
+    const returnObj = {
+      page,
+      preferences,
+      ...interceptorOptions,
+      sendPreferences,
+      sendRewards
+    };
     // page takes some time to render
     await delay(200);
     return returnObj;

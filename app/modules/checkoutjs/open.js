@@ -1,7 +1,6 @@
 import Razorpay, { makeUrl } from 'common/Razorpay';
-import { Track } from 'analytics';
+import { Events, Track, MiscEvents } from 'analytics';
 import CheckoutFrame from './frame';
-import { Safari } from 'common/useragent';
 
 const RazorProto = _.prototypeOf(Razorpay);
 
@@ -87,6 +86,7 @@ var addAutoCheckoutButton = function (rzp) {
           options.callback_url = makeUrl('checkout/onyx') + '?data=' + data;
         } catch (err) { }
       }
+      Events.TrackBehav(MiscEvents.AUTOMATIC_CHECKOUT_CLICK, rzp)
       rzp.open();
       return false;
     });
@@ -127,6 +127,7 @@ function initAutomaticCheckout() {
     opts.handler = defaultAutoPostHandler;
     var rzp = Razorpay(opts);
     if (!opts.parent) {
+      Events.TrackRender(MiscEvents.AUTOMATIC_CHECKOUT_OPEN, rzp)
       addAutoCheckoutButton(rzp);
     }
   }
