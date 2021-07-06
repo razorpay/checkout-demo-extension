@@ -66,7 +66,7 @@ jobs:
       - name: Mark workflow status as success
         if: steps.failed.conclusion == 'skipped'
         run: |
-          echo 'Status check has passed!'
+          echo 'Status check has passed! Build number ${{ github.run_id }} , commit-id: ${{ github.sha }} '
           curl -X POST -H "Content-Type: application/json" -H "Authorization: token ${{ github.token }}" \
           -d '{ "state" : "success" , "context" : "github/combined-status-check" , "description" : "github/combined-status-check", "target_url" : "https://github.com/${{ github.repository }}" }' \
           https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}
