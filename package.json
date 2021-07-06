@@ -74,7 +74,7 @@
     "gulp": "^4.0.0",
     "gulp-stylus": "^2.7.0",
     "gulp-usemin": "^0.3.29",
-    "http-proxy-middleware": "^2.0.0",
+    "http-proxy-middleware": "^2.0.1",
     "istanbul": "^0.4.5",
     "jest": "^27.0.3",
     "jshint": "^2.13.0",
