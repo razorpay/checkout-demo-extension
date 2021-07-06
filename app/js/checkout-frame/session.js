@@ -4144,16 +4144,27 @@ Session.prototype = {
       delete data.partial_payment;
     }
 
-    var merchantOrder = Store.getMerchantOrder();
     var selectedInstrument = this.getSelectedPaymentInstrument();
+    var tpv = MethodStore.getTPV();
+    if (tpv && tpv.invalid && this.homeTab && this.homeTab.validateTPVOrder) {
+      return this.homeTab.validateTPVOrder(tpv, true);
+    }
 
-    if (MethodStore.getTPV()) {
+    if (tpv) {
       if (!this.checkCommonValidAndTrackIfInvalid()) {
         // TODO check multi TPV with UPI prefill
         return;
       }
-      data.method = merchantOrder.method || data.method || 'netbanking';
-      data.bank = merchantOrder.bank;
+      /**
+       * This logic gets executed only if TPV order is valid
+       * tpv.method can be undefined if both UPI & NB enabled
+       * - for this case we will be auto-selecting NB in radio list in home screen defaults for TPV
+       * - if user directly clicks pay in home screen, data.method will be undefined and
+       * - getSelectedTPVOrderMethod returns the approriate method chosen
+       */
+
+      data.method = data.method || this.homeTab.getSelectedTPVOrderMethod();
+      data.bank = tpv.code;
 
       if (data.method === 'upi') {
         if (tab !== 'upi') {

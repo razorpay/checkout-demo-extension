@@ -74,21 +74,6 @@
   const showAddress = isAddressEnabled() && !isPartialPayment();
 </script>
 
-<style>
-  .details-block {
-    padding: 0 24px;
-  }
-  .partial-payment-block {
-    padding: 0 12px 12px 12px;
-  }
-  .multi-tpv-block {
-    padding: 0 12px 12px;
-  }
-  .contact-field > :global(*) {
-    margin-bottom: 16px;
-  }
-</style>
-
 <div in:fly={getAnimationOptions({ delay: 100, duration: 200, y: 40 })}>
   <div class="details-block">
     {#if !isContactHidden()}
@@ -97,7 +82,8 @@
           bind:country={$country}
           bind:phone={$phone}
           isOptional={isContactOptional()}
-          on:blur={trackContactFilled} />
+          on:blur={trackContactFilled}
+        />
       </div>
     {/if}
     {#if !isEmailHidden()}
@@ -119,11 +105,12 @@
         bind:address={$address}
         bind:pincode={$pincode}
         bind:state={$state}
-        states={entries(STATES)} />
+        states={entries(STATES)}
+      />
     </div>
   {/if}
 
-  {#if tpv}
+  {#if tpv && !tpv.invalid}
     {#if tpv.method}
       <div class="tpv-bank-block">
         <TpvBank bank={tpv} {accountName} showIfsc={isContactEmailOptional()} />
@@ -133,8 +120,24 @@
         <MultiTpvOptions
           bank={tpv}
           {icons}
-          bind:selectedOption={$multiTpvOption} />
+          bind:selectedOption={$multiTpvOption}
+        />
       </div>
     {/if}
   {/if}
 </div>
+
+<style>
+  .details-block {
+    padding: 0 24px;
+  }
+  .partial-payment-block {
+    padding: 0 12px 12px 12px;
+  }
+  .multi-tpv-block {
+    padding: 0 12px 12px;
+  }
+  .contact-field > :global(*) {
+    margin-bottom: 16px;
+  }
+</style>

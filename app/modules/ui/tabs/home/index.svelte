@@ -3,14 +3,12 @@
   import Tab from 'ui/tabs/Tab.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
-  import Field from 'ui/components/Field.svelte';
-
+  import { replaceRetryButtonToDismissErrorMessage } from 'handlers/common';
+  import { OrderEvents, Events } from 'analytics'
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import NewMethodsList from 'ui/tabs/home/NewMethodsList.svelte';
   import Icon from 'ui/elements/Icon.svelte';
-  import Address from 'ui/elements/address.svelte';
   import PaymentDetails from 'ui/tabs/home/PaymentDetails.svelte';
-  import Callout from 'ui/elements/Callout.svelte';
   import CardOffer from 'ui/elements/CardOffer.svelte';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
   import TrustedBadge from 'ui/components/TrustedBadge.svelte';
@@ -63,6 +61,7 @@
     RECURRING_CREDIT_DEBIT_CALLOUT,
     RECURRING_CREDIT_ONLY_CALLOUT,
     RECURRING_DEBIT_ONLY_CALLOUT,
+    TPV_METHODS_NOT_AVAILABLE
   } from 'ui/labels/home';
 
   import { t, locale } from 'svelte-i18n';
@@ -137,9 +136,11 @@
   const icons = session.themeMeta.icons;
   const order = getMerchantOrder();
   const singleMethod = getSingleMethod();
-
+  
   // TPV
   const tpv = getTPV();
+
+  validateTPVOrder(tpv)
 
   // Offers
   const showOffers = hasOffersOnHomescreen();
@@ -206,6 +207,36 @@
     }
 
     return true;
+  }
+
+  function setTpvError() {
+    
+      Events.TrackMetric(OrderEvents.INVALID_TPV,tpv);
+      session.showLoadError(
+          $t(TPV_METHODS_NOT_AVAILABLE),
+          true,
+      );
+      replaceRetryButtonToDismissErrorMessage(session, 'OK');
+  }
+
+  // Same functionality has to reused at pre-submit, 
+  // hence wrapping here as it can be called in sessionjs as well
+  export function validateTPVOrder(tpv, immediate = false) {
+      if (tpv && tpv.invalid) {
+          if (immediate) {
+              setTpvError()
+          } else {
+              tick().then(setTpvError)
+          }
+      }
+      return;
+  }
+
+  export function getSelectedTPVOrderMethod() {
+      if (tpv && !tpv.invalid) {
+          return tpv.method || $multiTpvOption;
+      }
+      return null
   }
 
   export function hideMethods() {

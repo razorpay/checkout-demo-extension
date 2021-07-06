@@ -249,7 +249,7 @@ export default {
     walnut369: {
       subtitle: 'Quick and easy EMI approvals',
       highlightLabel: 'Quicker and higher chances of getting an EMI',
-      sideLabel: '(Easy Signup)'
+      sideLabel: '(Easy Signup)',
     },
     select_option_title: 'Select an option',
     select_recommended_title: 'Recommended',
@@ -697,6 +697,8 @@ export default {
     single_block_title: 'Pay via {method}',
     state_help: 'Select a value from list of states',
     state_label: 'Select State',
+    tpv_methods_not_available:
+      'There seems to be an issue with this order, please try with another bank.',
   },
   instruments: {
     titles: {
@@ -1120,7 +1122,7 @@ export default {
     zeta: 'Zeta',
   },
   wallets_subtitle: {
-    paypal: 'Only accounts issued outside India accepted'
+    paypal: 'Only accounts issued outside India accepted',
   },
   powered_by: {
     partnership_label: 'In partnership with',

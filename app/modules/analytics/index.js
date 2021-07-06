@@ -1,5 +1,6 @@
 import CardEvents from './card/events';
 import OfferEvents from './offers/events';
+import OrderEvents from './order/events';
 import MiscEvents from './misc/events';
 import { getTrackMethods, addAnalyticsMethods } from './helpers';
 import MetaProperties from './metaProperties';
@@ -16,5 +17,6 @@ export {
   MiscEvents,
   Events,
   MetaProperties,
-  Track
+  Track,
+  OrderEvents,
 };

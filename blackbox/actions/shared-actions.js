@@ -240,6 +240,14 @@ async function retryTransaction(context) {
   await retryButton.click();
 }
 
+async function respondToErrorMessage(context) {
+  await context.page.waitFor('#fd-ok', {
+    timeout: 2000,
+    visible: true,
+  });
+  const okButton = await context.page.waitForSelector('#fd-ok');
+  await okButton.click();
+}
 
 module.exports = {
   handleMockFailureDialog,
@@ -253,6 +261,7 @@ module.exports = {
   submit,
   respondAndVerifyIntentRequest,
   retryTransaction,
+  respondToErrorMessage,
   popupClosedByUser,
   provideCancellationReason,
   handleAJAXRequest,

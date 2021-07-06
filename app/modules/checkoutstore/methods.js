@@ -627,6 +627,20 @@ export function getNetbankingBanks() {
   return banks;
 }
 
+/**
+ * @typedef {Object} TPVResponse
+ * @property {string} name Full name of the banks
+ * @property {string} code Bank Code (should be used for transaction)
+ * @property {string} account_number Bank Accounter number to verify
+ * @property {URL} image logo/image of the bank
+ * @property {string|undefined} method method to be used for transaction(which is validated against allowed methods) and will be undefined if both NB & UPI are allowed
+ * @property {boolean} invalid boolean defining whether the TPV order has an error or not
+ */
+
+/**
+ * This method returns the necessary payload required for transaction if the order is TPV order
+ * @returns {undefined|TPVResponse}
+ */
 export function getTPV() {
   const order = getMerchantOrder();
   if (!order) {
@@ -642,15 +656,23 @@ export function getTPV() {
   const bankName = getNetbankingBanks()[bankCode] || `${bankCode} Bank`;
 
   let method = order.method;
+  let invalid;
   if (!method) {
     const hasNB = isMethodEnabled('netbanking');
+    const hasUPI = isMethodEnabled('upi');
+    const isOrderBankAllowedForNB = Boolean(getNetbankingBanks()[bankCode]);
+    // if all the above three are true, keep method undefined as user can opt between NB & UPI
 
-    if (isMethodEnabled('upi')) {
-      if (!hasNB) {
+    switch (true) {
+      case hasNB && isOrderBankAllowedForNB && !hasUPI:
+        method = 'netbanking';
+        break;
+      case hasUPI && !(hasNB && isOrderBankAllowedForNB):
         method = 'upi';
-      }
-    } else if (hasNB) {
-      method = 'netbanking';
+        break;
+      case !(hasUPI && hasNB && isOrderBankAllowedForNB):
+        invalid = true;
+        break;
     }
   }
 
@@ -660,6 +682,7 @@ export function getTPV() {
     account_number: accountNumber,
     image: 'https://cdn.razorpay.com/bank/' + bankCode + '.gif',
     method,
+    invalid,
   };
 }
 

@@ -62,3 +62,5 @@ export const SECURED_BY_MESSAGE = 'home.secured_by_message';
 
 export const COUNTRY_SEARCH_PLACEHOLDER = 'home.country_search_placeholder';
 export const COUNTRY_SEARCH_ALL = 'home.country_search_all';
+
+export const TPV_METHODS_NOT_AVAILABLE = 'home.tpv_methods_not_available';

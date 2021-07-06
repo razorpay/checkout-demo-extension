@@ -8,6 +8,7 @@ const {
   passRequestNetbanking,
   handleMockSuccessDialog,
   expectRedirectWithCallback,
+  respondToErrorMessage,
 
   //TPV
   verifyAutoSelectBankTPV,
@@ -49,6 +50,7 @@ module.exports = function(testFeatures) {
     personalization,
     optionalContact,
     optionalEmail,
+    invalidOrder,
   } = features;
 
   describe.each(
@@ -68,6 +70,14 @@ module.exports = function(testFeatures) {
         preferences.order.method = 'netbanking';
       }
 
+      if (invalidOrder) {
+        preferences.methods = {
+          ...preferences.methods,
+          upi: false,
+          netbanking: undefined,
+        };
+      }
+
       const context = await openCheckoutWithNewHomeScreen({
         page,
         options,
@@ -80,6 +90,12 @@ module.exports = function(testFeatures) {
 
       if (!isHomeScreenSkipped) {
         await assertBasicDetailsScreen(context);
+      }
+
+      if (invalidOrder) {
+        // for invalid order the retry option will not be available, and closes checkout on click instead
+        await respondToErrorMessage(context);
+        return;
       }
 
       if (!isHomeScreenSkipped && feeBearer) {
