@@ -36,6 +36,7 @@ var preferences,
   HomeScreenStore = discreet.HomeScreenStore,
   CardScreenStore = discreet.CardScreenStore,
   NetbankingScreenStore = discreet.NetbankingScreenStore,
+  UpiScreenStore = discreet.UpiScreenStore,
   CustomerStore = discreet.CustomerStore,
   EmiStore = discreet.EmiStore,
   Cta = discreet.Cta,
@@ -52,6 +53,7 @@ var preferences,
   rewardsStore = discreet.rewardsStore,
   BlockedDeactivatedMerchant = discreet.BlockedDeactivatedMerchant,
   updateScore = discreet.updateScore,
+  trackUpiIntentInstrumentPaymentAttempted = discreet.trackUpiIntentInstrumentPaymentAttempted,
   CovidDonationView = discreet.CovidDonations,
   Header = discreet.Header;
 
@@ -4424,6 +4426,12 @@ Session.prototype = {
         type: AnalyticsTypes.DEBUG,
       });
     }
+
+    // [ANALYTICS]
+    if (data && data.method === 'upi') {
+      trackUpiIntentInstrumentPaymentAttempted(discreet.storeGetter(UpiScreenStore.intentVpaPrefilledFromPreferences));
+    }
+
     if (this.r._payment) {
       /**
        * For Cardless EMI, payments are created at the first step,

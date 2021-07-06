@@ -1,6 +1,6 @@
 <script>
   // Svelte imports
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { slide } from 'svelte/transition';
   import { _ as t, locale } from 'svelte-i18n';
 
@@ -32,6 +32,7 @@
   import { hideCta, showCtaWithDefaultText, showCta } from 'checkoutstore/cta';
   import { filterUPITokens } from 'common/token';
   import { getUPIIntentApps } from 'checkoutstore/native';
+  import { intentVpaPrefill, intentVpaPrefilledFromPreferences } from 'checkoutstore/screens/upi';
   import { checkDowntime } from 'checkoutframe/downtimes';
 
   import {
@@ -345,6 +346,24 @@
     }
   }
 
+  function prefillVpaFromIntentInstrument() {
+    if ($intentVpaPrefill) {
+      tick().then(() => {
+        onUpiAppSelection({ detail: { id: 'new' } });
+        vpaEntered = $intentVpaPrefill;
+        $intentVpaPrefill = '';
+        $intentVpaPrefilledFromPreferences = true;
+      }).then(() => {
+        if (vpaField) {
+          vpaField.focus();
+          vpaField.setSelectionRange(0, 0);
+        }
+      });
+    } else {
+      $intentVpaPrefilledFromPreferences = false;
+    }
+  }
+
   onMount(() => {
     /* TODO: improve handling of `prefill.vpa` */
     if (getPrefilledVPA()) {
@@ -352,6 +371,8 @@
       vpaEntered = getPrefilledVPA();
       updateScore('vpaPrefilled');
     }
+      
+    prefillVpaFromIntentInstrument();
 
     qrIcon = session.themeMeta.icons.qr;
   });

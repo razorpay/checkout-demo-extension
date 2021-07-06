@@ -135,7 +135,7 @@
       const app = _Arr.find(
         getUPIIntentApps().all,
         app => app.package_name === instrument.app
-      );
+      ) || {};
 
       // In case of ios, app name might be missing if not sent by the sdk
       let appName = app.app_name || 'Unknown app';

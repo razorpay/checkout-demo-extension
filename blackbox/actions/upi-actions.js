@@ -191,6 +191,10 @@ async function enterUPIAccount(context, UPIAccountId, upiPaymentType = 'upi') {
   );
 }
 
+async function verifyVpaFilled(context, UPIAccountId) {
+  expect(await context.page.$eval('#vpa-upi', el => el.value)).toEqual(UPIAccountId);
+}
+
 async function selectBankNameFromGooglePayDropDown(context, valuetoBeSelected) {
   await context.page.select('select[name="gpay_bank"]', valuetoBeSelected);
 }
@@ -207,6 +211,7 @@ async function enterOmnichannelPhoneNumber(context) {
 module.exports = {
   selectUPIMethod,
   enterUPIAccount,
+  verifyVpaFilled,
   handleUPIAccountValidation,
   respondToUPIAjax,
   respondToUPIPaymentStatus,

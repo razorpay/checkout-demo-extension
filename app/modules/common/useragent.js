@@ -146,3 +146,5 @@ export const getDevice = () => {
     return 'desktop';
   }
 };
+
+export const isDesktop = () => getDevice() === 'desktop';

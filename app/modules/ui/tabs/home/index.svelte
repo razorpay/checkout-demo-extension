@@ -34,6 +34,7 @@
     blocks,
     setContact,
     setEmail,
+    upiIntentInstrumentsForAnalytics,
   } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
@@ -111,9 +112,12 @@
     showNext,
   } from 'checkoutstore/cta';
 
+  import { intentVpaPrefill } from 'checkoutstore/screens/upi';
+
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import updateScore from 'analytics/checkoutScore';
+  import {trackUpiIntentInstrumentSelected, trackUpiIntentInstrumentAvailable} from 'analytics/highlightUpiIntentAnalytics';
 
   import { getCardOffer, hasOffersOnHomescreen } from 'checkoutframe/offers';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
@@ -488,6 +492,23 @@
     }
   }
 
+  // NOTE: updateBlocks is called multiple times (while showing loading, updating actual instrument)
+  // but the analytics should be sent only once (when the preferred instruments displayed changes)
+  // so maintaining a store with last updated vpas that updates only when the value changes
+  function sendHighlightUpiIntentInstrumentAnalytics(preferredInstruments) {
+    if (Array.isArray(preferredInstruments) && preferredInstruments.length > 0) {
+      let upiIntentInstrumentForDesktop = preferredInstruments.map(instrument => instrument.vendor_vpa).filter(instrument => !!instrument);
+
+      if (
+        Array.isArray($upiIntentInstrumentsForAnalytics) &&
+        $upiIntentInstrumentsForAnalytics.toString() !== upiIntentInstrumentForDesktop.toString()
+        ) {
+        $upiIntentInstrumentsForAnalytics = upiIntentInstrumentForDesktop.slice();
+        trackUpiIntentInstrumentAvailable(upiIntentInstrumentForDesktop);
+      }
+    }
+  }
+
   function updateBlocks({
     preferredInstruments = [],
     showPreferredLoader = false,
@@ -527,6 +548,8 @@
       isInstrumentFaultEmitted = true;
     } else {
       const setPreferredInstruments = blocksThatWereSet.preferred.instruments;
+
+      sendHighlightUpiIntentInstrumentAnalytics(setPreferredInstruments);
 
       // Get the methods for which a preferred instrument was shown
       const preferredMethods = _Arr.reduce(
@@ -895,6 +918,10 @@
 
     if (isInstrumentGrouped(instrument)) {
       selectMethod(instrument.method);
+    } else if (instrument.vendor_vpa) {
+      trackUpiIntentInstrumentSelected(instrument.vendor_vpa);
+      $intentVpaPrefill = instrument.vendor_vpa;
+      selectMethod(instrument.method, instrument.vendor_vpa);
     } else {
       // Bring instrument into view if it's not visible
       const domElement = _Doc.querySelector(

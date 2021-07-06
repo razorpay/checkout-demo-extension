@@ -11,6 +11,8 @@ import {
 } from 'checkoutstore/methods';
 import { getProvider as getCardlessEMIProvider } from 'common/cardlessemi';
 
+import { isHighlightUpiIntentInstrumentExperimentEnabled } from 'experiments/all/highlightUpiIntentInstrumentOnDesktop';
+
 /**
  * Map of filter fn for each method
  * that says whether or not a given instrument
@@ -163,7 +165,7 @@ const SANITY_FILTERS = {
     const minAmount = provider.min_amount || 0;
     const amount = getAmount();
     return amount >= minAmount;
-  }
+  },
 };
 
 /**
@@ -206,6 +208,13 @@ const filterInstrumentsByAvailableUpiApps = _.curry2((instruments, apps) => {
     }
 
     if (instrument['_[flow]'] !== 'intent') {
+      return true;
+    }
+
+    if (
+      instrument?.vendor_vpa &&
+      isHighlightUpiIntentInstrumentExperimentEnabled()
+    ) {
       return true;
     }
 

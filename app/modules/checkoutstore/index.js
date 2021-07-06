@@ -1,13 +1,13 @@
-import { writable } from 'svelte/store';
-import { getDowntimes as _getDowntimes } from 'checkoutframe/downtimes';
-import { makeAuthUrl as _makeAuthUrl } from 'common/Razorpay';
-import { displayAmount } from 'common/currency';
-
-import { amountAfterOffer } from 'checkoutstore/offers';
 import { get } from 'svelte/store';
-import {
-  phone,
-} from 'checkoutstore/screens/home';
+import { writable } from 'svelte/store';
+
+import { phone } from 'checkoutstore/screens/home';
+import { amountAfterOffer } from 'checkoutstore/offers';
+
+import { displayAmount } from 'common/currency';
+import { makeAuthUrl as _makeAuthUrl } from 'common/Razorpay';
+
+import { getDowntimes as _getDowntimes } from 'checkoutframe/downtimes';
 
 let razorpayInstance, preferences;
 export const razorpayInstanceStore = writable();

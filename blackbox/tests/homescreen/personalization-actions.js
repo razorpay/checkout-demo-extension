@@ -69,6 +69,21 @@ async function selectPersonalizationPaymentMethod(context, optionNumber) {
   await apiOption[optionNumber - 1].click();
 }
 
+async function verifyUpiAppPersonalizationText(context, text, optionNumber) {
+  var paymentMethods = await context.page.$$(
+    '.home-methods .methods-block[data-block="rzp.preferred"] .instrument'
+  );
+
+  let currentPaymentMethod = paymentMethods[optionNumber - 1];
+
+  let paymentMethodText = await context.page.evaluate(
+    currentPaymentMethod => currentPaymentMethod.textContent,
+    currentPaymentMethod
+  );
+
+  expect(paymentMethodText).toContain(text);
+}
+
 async function receiveApiInstruments(context) {
   const req = await context.expectRequest();
   expect(req.url).toContain('/personalisation');
@@ -78,5 +93,6 @@ async function receiveApiInstruments(context) {
 module.exports = {
   verifyPersonalizationText,
   selectPersonalizationPaymentMethod,
+  verifyUpiAppPersonalizationText,
   receiveApiInstruments,
 };

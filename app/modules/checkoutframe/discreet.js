@@ -42,6 +42,7 @@ import * as Token from 'common/token';
 import * as Apps from 'common/apps';
 import * as SessionManager from 'sessionmanager';
 import updateScore from 'analytics/checkoutScore';
+import { trackUpiIntentInstrumentPaymentAttempted } from 'analytics/highlightUpiIntentAnalytics';
 import * as Checkout from 'checkoutframe/index';
 import * as Offers from 'checkoutframe/offers';
 import * as Flows from 'checkoutframe/flows';
@@ -61,6 +62,7 @@ import * as Cta from 'checkoutstore/cta';
 import * as HomeScreenStore from 'checkoutstore/screens/home';
 import * as CardScreenStore from 'checkoutstore/screens/card';
 import * as NetbankingScreenStore from 'checkoutstore/screens/netbanking';
+import * as UpiScreenStore from 'checkoutstore/screens/upi';
 import * as CustomerStore from 'checkoutstore/customer';
 import * as Theme from 'checkoutstore/theme';
 import { overlayStack as overlayStackStore } from 'checkoutstore/back';
@@ -164,6 +166,7 @@ export default {
   HomeScreenStore,
   CardScreenStore,
   NetbankingScreenStore,
+  UpiScreenStore,
   EmiStore,
   NativeStore,
   OffersStore,
@@ -222,6 +225,8 @@ export default {
 
   NBHandlers,
   CommonHandlers,
+
+  trackUpiIntentInstrumentPaymentAttempted,
 
   ContactStorage,
   I18n,

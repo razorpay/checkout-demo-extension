@@ -13,6 +13,7 @@
   import RadioInstrument from './RadioInstrument.svelte';
   import SavedCardInstrument from './SavedCardInstrument.svelte';
   import SkeletonInstrument from './SkeletonInstrument.svelte';
+  import UpiAppMethodInstrument from './UpiAppMethodInstrument.svelte';
 
   // Props
   export let instrument;
@@ -31,6 +32,8 @@
   <MethodInstrument {instrument} on:click={dispatchSelect} on:click />
 {:else if isSavedCardInstrument(instrument)}
   <SavedCardInstrument {instrument} on:click={dispatchSelect} on:click />
+{:else if instrument.vendor_vpa}
+  <UpiAppMethodInstrument {instrument} on:click={dispatchSelect} on:click />
 {:else}
   <RadioInstrument {instrument} on:click={dispatchSelect} on:click />
 {/if}

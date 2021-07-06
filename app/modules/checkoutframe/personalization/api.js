@@ -9,6 +9,7 @@ import { getSession } from 'sessionmanager';
 
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
+import { isDesktop } from 'common/useragent';
 
 const PREFERRED_INSTRUMENTS_CACHE = {};
 
@@ -170,6 +171,13 @@ const API_INSTRUMENT_PAYMENT_ADDONS = {
       if (app.package_name) {
         instrument['_[flow]'] = 'intent';
         instrument['upi_app'] = app.package_name;
+
+        // to show intent instrument on desktop `vendor_vpa` is used to diffrentiate
+        // from normal intent instrument that'd only show on phone
+        if (isDesktop()) {
+          instrument['vendor_vpa'] = instrument.vpa
+        }
+
       } else {
         // If no valid app is found for the handle, track it
         Analytics.track('p13n:app_missing_for_handle', {

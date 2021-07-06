@@ -159,3 +159,5 @@ export const isContactPresent = derived(
   contact,
   contactValue => contactValue && contactValue !== '+91' && contactValue !== '+'
 );
+
+export const upiIntentInstrumentsForAnalytics = writable([]);

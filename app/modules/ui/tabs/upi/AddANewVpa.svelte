@@ -125,6 +125,10 @@
     vpaField.focus();
   }
 
+  export function setSelectionRange(selectionStart, selectionEnd, selectionDirection = "none") {
+    vpaField.setSelectionRange(selectionStart, selectionEnd, selectionDirection);
+  }
+
   function focusAfterTimeout() {
     setTimeout(() => {
       if (vpaField) {

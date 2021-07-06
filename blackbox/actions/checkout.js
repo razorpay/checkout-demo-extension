@@ -127,7 +127,6 @@ const API_PREFERRED_INSTRUMENTS = {
       instrument: 'dsd@okhdfcbank',
       score: 1,
     },
-
     {
       method: 'upi',
       instrument: 'dfs@okicici',

@@ -18,6 +18,10 @@ function upi(instrument) {
     if (instrument.upi_app) {
       base.apps = [instrument.upi_app];
     }
+
+    if (instrument.vendor_vpa) {
+      base.vendor_vpa = instrument.vendor_vpa;
+    }
   } else if (instrument['_[flow]'] === 'directpay') {
     base.flows = ['collect'];
 

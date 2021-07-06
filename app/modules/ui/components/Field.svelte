@@ -206,6 +206,10 @@
     input.blur();
   }
 
+  export function setSelectionRange(selectionStart, selectionEnd, selectionDirection = "none") {
+    input.setSelectionRange(selectionStart, selectionEnd, selectionDirection);
+  }
+
   export function getValue() {
     return input.value;
   }
