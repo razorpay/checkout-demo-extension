@@ -1,6 +1,6 @@
 import * as Bridge from 'bridge';
 import Razorpay, { makePrefParams, validateOverrides } from 'common/Razorpay';
-import Analytics, { Track } from 'analytics';
+import Analytics, { Track, MiscEvents } from 'analytics';
 import BrowserStorage from 'browserstorage';
 import * as SessionManager from 'sessionmanager';
 import {
@@ -21,9 +21,6 @@ import { setHistoryAndListenForBackPresses } from 'bridge/back';
 import { init as initI18n, bindI18nEvents } from 'i18n/init';
 
 import {
-  UPI_POLL_URL,
-  PENDING_PAYMENT_TS,
-  MINUTES_TO_WAIT_FOR_PENDING_PAYMENT,
   cookieDisabled,
   isIframe,
   ownerWindow,
@@ -230,6 +227,10 @@ export const handleMessage = function (message) {
   }
 
   if (message.event === 'open' || options) {
+    // triggering the open event, adding a safe check for sdk 
+    if (Bridge.hasCheckoutBridge()) {
+      Track(session.r, MiscEvents.OPEN)
+    }
     fetchPrefs(session);
   }
 
