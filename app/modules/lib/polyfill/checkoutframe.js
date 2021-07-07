@@ -1,7 +1,8 @@
 import { internetExplorer } from 'common/useragent';
+import './prototypes/object';
 import Analytics from 'analytics';
 import { getSession } from 'sessionmanager';
-import getOwnPropertyDescriptor from './getownpropertydescriptors';
+import getOwnPropertyDescriptor from './prototypes/getownpropertydescriptors';
 
 /* global DOMTokenList, CSSStyleSheet, Element, CharacterData, DocumentType, CSSStyleDeclaration */
 
@@ -9,16 +10,16 @@ import getOwnPropertyDescriptor from './getownpropertydescriptors';
  * Fix for Svelte rest + IE11 issue
  * https://github.com/sveltejs/svelte/issues/4718
  */
-(function(elements) {
-  elements.forEach(function(el) {
+(function (elements) {
+  elements.forEach(function (el) {
     if (!el.prototype.hasOwnProperty('disabled')) {
       Object.defineProperty(el.prototype, 'disabled', {
         enumerable: true,
         configurable: true,
-        get: function() {
+        get: function () {
           return el.prototype.hasAttribute.call(this, 'disabled');
         },
-        set: function(value) {
+        set: function (value) {
           if (value) {
             return el.prototype.setAttribute.call(this, 'disabled', '');
           } else {
@@ -35,7 +36,7 @@ import getOwnPropertyDescriptor from './getownpropertydescriptors';
  * https://caniuse.com/#feat=classlist
  */
 if (internetExplorer && DOMTokenList) {
-  DOMTokenList.prototype.toggle = function(val) {
+  DOMTokenList.prototype.toggle = function (val) {
     if (arguments.length > 1) {
       return this[arguments[1] ? 'add' : 'remove'](val), !!arguments[1];
     }
@@ -95,14 +96,14 @@ function overrideInsertRule() {
 
   const originalInsertRule = CSSStyleSheet.prototype.insertRule;
 
-  CSSStyleSheet.prototype.insertRule = function(rule, index) {
+  CSSStyleSheet.prototype.insertRule = function (rule, index) {
     if (rule.indexOf('@keyframes') === 0) {
       rule = rule.replace('@keyframes', '@-webkit-keyframes');
     }
 
     try {
       originalInsertRule.call(this, rule, index);
-    } catch (err) {}
+    } catch (err) { }
   };
 
   try {
@@ -112,14 +113,14 @@ function overrideInsertRule() {
 
     CSSStyleDeclaration.prototype.animation =
       CSSStyleDeclaration.prototype.webkitAnimation;
-  } catch (e) {}
+  } catch (e) { }
 }
 overrideInsertRule();
 
 /**
  * Element.remove polyfill
  */
-(function() {
+(function () {
   _Arr.loop(
     [Element.prototype, CharacterData.prototype, DocumentType.prototype],
     item => {
@@ -144,9 +145,9 @@ overrideInsertRule();
  * Polyfill for window.performance.now
  * Source: https://gist.github.com/paulirish/5438650#gistcomment-2940646
  */
-(function() {
+(function () {
   if (!window.performance || !window.performance.now) {
-    (window.performance || (window.performance = {})).now = function() {
+    (window.performance || (window.performance = {})).now = function () {
       return Date.now() - offset;
     };
 
@@ -164,7 +165,7 @@ if (!_.isFunction(Object.getOwnPropertyDescriptors)) {
 // https://tc39.github.io/ecma262/#sec-array.prototype.find
 if (!Array.prototype.find) {
   Object.defineProperty(Array.prototype, 'find', {
-    value: function(predicate) {
+    value: function (predicate) {
       if (this == null) {
         throw TypeError('"this" is null or not defined');
       }
@@ -196,6 +197,6 @@ if (!Array.prototype.find) {
   });
 }
 
-import './native';
-import './customelements';
+import './prototypes/native';
+import './prototypes/customelements';
 // import './getownpropertydescriptors';
