@@ -4,7 +4,6 @@
   import Screen from 'ui/layouts/Screen.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
   import { replaceRetryButtonToDismissErrorMessage } from 'handlers/common';
-  import { OrderEvents, Events } from 'analytics'
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import NewMethodsList from 'ui/tabs/home/NewMethodsList.svelte';
   import Icon from 'ui/elements/Icon.svelte';
@@ -26,12 +25,9 @@
     isContactPresent,
     email,
     selectedInstrumentId,
-    methodInstrument,
     multiTpvOption,
     partialPaymentAmount,
     partialPaymentOption,
-    instruments,
-    blocks,
     setContact,
     setEmail,
     upiIntentInstrumentsForAnalytics,
@@ -53,26 +49,14 @@
     PARTIAL_AMOUNT_STATUS_FULL,
     PARTIAL_AMOUNT_STATUS_PARTIAL,
     SECURED_BY_MESSAGE,
-    SUBSCRIPTIONS_CREDIT_DEBIT_CALLOUT,
-    SUBSCRIPTIONS_DEBIT_ONLY_CALLOUT,
-    SUBSCRIPTIONS_CREDIT_ONLY_CALLOUT,
-    CARD_OFFER_CREDIT_DEBIT_CALLOUT,
-    CARD_OFFER_CREDIT_ONLY_CALLOUT,
-    CARD_OFFER_DEBIT_ONLY_CALLOUT,
-    RECURRING_CREDIT_DEBIT_CALLOUT,
-    RECURRING_CREDIT_ONLY_CALLOUT,
-    RECURRING_DEBIT_ONLY_CALLOUT,
     TPV_METHODS_NOT_AVAILABLE
   } from 'ui/labels/home';
 
   import { t, locale } from 'svelte-i18n';
 
-  import { formatTemplateWithLocale } from 'i18n';
-
   // Utils imports
   import Razorpay from 'common/Razorpay';
   import { getSession } from 'sessionmanager';
-  import { generateSubtextForRecurring } from 'subtext/card';
   import {
     isPartialPayment as getIsPartialPayment,
     isContactOptional,
@@ -86,14 +70,10 @@
     getPrefilledEmail,
     isAddressEnabled,
     isRecurring,
-    getMerchantOrder,
     getMerchantConfig,
   } from 'checkoutstore';
 
   import {
-    getCardTypesForRecurring,
-    getCardNetworksForRecurring,
-    getCardIssuersForRecurring,
     getSingleMethod,
     isEMandateBankEnabled,
     getTPV,
@@ -112,10 +92,9 @@
     showNext,
   } from 'checkoutstore/cta';
 
+  import { P13NEvents, OrderEvents, Events, HomeEvents, MetaProperties, MiscEvents } from 'analytics';
   import { intentVpaPrefill } from 'checkoutstore/screens/upi';
 
-  import Analytics from 'analytics';
-  import * as AnalyticsTypes from 'analytics-types';
   import updateScore from 'analytics/checkoutScore';
   import {trackUpiIntentInstrumentSelected, trackUpiIntentInstrumentAvailable} from 'analytics/highlightUpiIntentAnalytics';
 
@@ -138,7 +117,6 @@
   const cardOffer = getCardOffer();
   const session = getSession();
   const icons = session.themeMeta.icons;
-  const order = getMerchantOrder();
   const singleMethod = getSingleMethod();
   
   // TPV
@@ -158,6 +136,7 @@
   const contactEmailReadonly = isContactEmailReadOnly();
 
   const trustedBadgeHighlights = getTrustedBadgeHighlights();
+  let expSourceSet = false;
 
   setContact(getPrefilledContact());
   setEmail(getPrefilledEmail());
@@ -179,9 +158,7 @@
 
     onShown();
 
-    Analytics.track('home:methods:show', {
-      type: AnalyticsTypes.BEHAV,
-    });
+    Events.TrackBehav(HomeEvents.METHODS_SHOWN);
   }
 
   export function canGoBack() {
@@ -254,9 +231,7 @@
 
     setDetailsCta();
 
-    Analytics.track('home:methods:hide', {
-      type: AnalyticsTypes.BEHAV,
-    });
+    Events.TrackBehav(HomeEvents.METHODS_HIDE);
   }
 
   function editUserDetails() {
@@ -411,22 +386,16 @@
 
               // meta.p13n should always be set before `p13n:instruments:list`
               if (instrumentsToBeShown && instrumentsToBeShown.length) {
-                Analytics.setMeta('p13n', true);
+                Events.setMeta(MetaProperties.P13N, true);
               } else {
-                Analytics.removeMeta('p13n');
+                Events.removeMeta(MetaProperties.P13N);
               }
 
-              Analytics.setMeta('p13n.userIdentified', userIdentified);
+              Events.setMeta(MetaProperties.P13N_USERIDENTIFIED, userIdentified);
+              expSourceSet = source;
+              Events.TrackMetric(HomeEvents.P13N_EXPERIMENT, {source, experiment: experimentIdentifier});
 
-              Analytics.track('home:p13n:experiment', {
-                type: AnalyticsTypes.METRIC,
-                data: {
-                  source: source,
-                  experiment: experimentIdentifier,
-                },
-              });
-
-              Analytics.setMeta('p13n.experiment', experimentIdentifier);
+              Events.setMeta(MetaProperties.P13N_EXPERIMENT, experimentIdentifier);
             }
 
             // Cache for user
@@ -531,13 +500,11 @@
     if (isInstrumentFaultEmitted) {
       // Do nothing, we already signalled a fault
     } else if (noBlocksWereSet && !singleMethod) {
-      Analytics.track('error', {
-        type: AnalyticsTypes.INTEGRATION,
-        data: {
+      Events.TrackIntegration(MiscEvents.ERROR,{
           type: 'no_instruments_to_render',
           config: merchantConfig,
         },
-      });
+      );
 
       Razorpay.sendMessage({
         event: 'fault',
@@ -548,6 +515,11 @@
       isInstrumentFaultEmitted = true;
     } else {
       const setPreferredInstruments = blocksThatWereSet.preferred.instruments;
+      const instrumentsShown = setPreferredInstruments.map(item => item?._ungrouped?.length ? item._ungrouped[0]: []);
+      if(expSourceSet) {
+        Events.TrackMetric(P13NEvents.INSTRUMENTS_SHOWN, {source: expSourceSet, instrumentsShown})
+        expSourceSet = false;
+      }
 
       sendHighlightUpiIntentInstrumentAnalytics(setPreferredInstruments);
 
@@ -570,14 +542,12 @@
         allPreferredInstrumentsForCustomer.length
       ) {
         // Track preferred-methods related things
-        Analytics.track('p13n:instruments:list', {
-          data: {
-            all: allPreferredInstrumentsForCustomer.length,
-            eligible: preferredInstruments.length,
-            shown: setPreferredInstruments.length,
-            methods: preferredMethods,
-          },
-        });
+        Events.Track(P13NEvents.INSTRUMENTS_LIST, {
+          all: allPreferredInstrumentsForCustomer.length,
+          eligible: preferredInstruments.length,
+          shown: setPreferredInstruments.length,
+          methods: preferredMethods,
+        })
       }
     }
   }
@@ -764,13 +734,11 @@
   }
 
   view = determineLandingView();
-  Analytics.track('home:landing', {
-    data: {
-      view,
-      oneMethod: singleMethod,
-    },
+  Events.Track(HomeEvents.LANDING, {
+    view,
+    oneMethod: singleMethod,
   });
-
+  
   function storeContactDetails() {
     // Store only on mobile since Desktops can be shared b/w users
     if (isMobile()) {
@@ -782,7 +750,7 @@
   }
 
   export function next() {
-    Analytics.track('home:proceed');
+    Events.Track(HomeEvents.PROCEED);
 
     /**
      * - Store contact details only when the user has explicity clicked on the CTA

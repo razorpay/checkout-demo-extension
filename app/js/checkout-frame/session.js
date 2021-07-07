@@ -5527,7 +5527,7 @@ Session.prototype = {
         return customer;
       };
     }
-
+    Analytics.setMeta('global', preferences.global)
     // Track prefill validity before setting customer
     var prefilledContact = session_options['prefill.contact'];
     var prefilledEmail = session_options['prefill.email'];

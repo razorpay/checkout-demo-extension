@@ -1,5 +1,7 @@
 import CardEvents from './card/events';
 import OfferEvents from './offers/events';
+import P13NEvents from './p13n/events';
+import HomeEvents from './home/events';
 import OrderEvents from './order/events';
 import MiscEvents from './misc/events';
 import { getTrackMethods, addAnalyticsMethods } from './helpers';
@@ -12,11 +14,13 @@ Events = addAnalyticsMethods(Events);
 export default Analytics;
 
 export {
+  Events,
   CardEvents,
   OfferEvents,
   MiscEvents,
-  Events,
   MetaProperties,
-  Track,
+  P13NEvents,
+  HomeEvents,
   OrderEvents,
+  Track,
 };
