@@ -17,12 +17,12 @@ import { getSession } from 'sessionmanager';
 import { getLanguageCode, getLanguageCodeFromPrefs } from 'checkoutstore';
 import { shouldUseVernacular } from 'checkoutstore/methods';
 import Analytics from 'analytics';
-import { getSegmentOrCreate } from 'experiments';
 import { ignoreFirstCall } from 'svelte-utils';
 import BrowserStorage from 'browserstorage';
 
 const LOCALES = {
   en: 'English',
+  ben: 'বাংলা',
   hi: 'हिंदी',
   mar: 'मराठी',
   guj: 'ગુજરાતી',
