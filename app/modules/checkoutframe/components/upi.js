@@ -1,5 +1,5 @@
 import { setView, destroyView } from './';
-
+import { returnAsIs } from 'lib/utils';
 import Analytics from 'analytics';
 
 import { getSession } from 'sessionmanager';
@@ -46,7 +46,7 @@ export function checkForPossibleWebPaymentsForUpi() {
           ]);
           Analytics.setMeta('upi.intent_on_mweb', true);
         })
-        .catch(_Func.noop);
+        .catch(returnAsIs);
     });
 }
 

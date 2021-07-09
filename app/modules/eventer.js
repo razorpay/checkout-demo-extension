@@ -1,3 +1,4 @@
+import { returnAsIs } from 'lib/utils';
 export default function Eventer() {
   // constructor is also called for resetting
   this._evts = {};
@@ -9,7 +10,7 @@ export default function Eventer() {
 }
 
 Eventer.prototype = {
-  onNew: _Func.noop,
+  onNew: returnAsIs,
 
   def: function(event, callback) {
     this._defs[event] = callback;

@@ -1,4 +1,5 @@
 import { RazorpayDefaults } from 'common/options';
+import { returnAsIs } from 'lib/utils';
 
 RazorpayDefaults.timeout = 0;
 RazorpayDefaults.name = '';
@@ -75,8 +76,8 @@ RazorpayDefaults.hidden = {
 
 RazorpayDefaults.modal = {
   confirm_close: false,
-  ondismiss: _Func.noop,
-  onhidden: _Func.noop,
+  ondismiss: returnAsIs,
+  onhidden: returnAsIs,
   escape: true,
   animation: !global.matchMedia('(prefers-reduced-motion: reduce)').matches,
   backdropclose: false,
@@ -85,7 +86,7 @@ RazorpayDefaults.modal = {
 
 RazorpayDefaults.external = {
   wallets: [],
-  handler: _Func.noop,
+  handler: returnAsIs,
 };
 
 RazorpayDefaults.theme = {

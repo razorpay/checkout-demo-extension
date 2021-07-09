@@ -129,9 +129,9 @@
         optional: getOptionalObject(),
         paused: session.get().paused,
       })
-      .on('payment.upi.coproto_response', _Func.bind(handleResponse, this))
+      .on('payment.upi.coproto_response', handleResponse.bind(this))
       .on('payment.success', onSuccess)
-      .on('payment.error', _Func.bind(onError, this));
+      .on('payment.error', onError.bind(this));
   }
 </script>
 

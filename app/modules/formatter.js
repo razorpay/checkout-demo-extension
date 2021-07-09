@@ -1,7 +1,7 @@
 import * as Card from 'common/card';
 import Eventer from 'eventer';
 import EvtHandler from 'evthandler';
-import { luhnCheck } from 'lib/utils';
+import { luhnCheck, returnAsIs } from 'lib/utils';
 
 const alphanumericRaw = function(value) {
   var returnVal = value.replace(/[^a-zA-Z0-9]/g, '');
@@ -205,7 +205,7 @@ Formatter.rules = {
         .join('.');
     },
 
-    pretty: _Func.noop,
+    pretty: returnAsIs,
   },
 
   phone: {
@@ -269,7 +269,7 @@ formatterProto.backFormat = function(e) {
   });
 };
 
-formatterProto.pretty = formatterProto.isValid = _Func.noop;
+formatterProto.pretty = formatterProto.isValid = returnAsIs;
 formatterProto.prettyValue = '';
 
 formatterProto.raw = value => value.replace(/\D/g, '');

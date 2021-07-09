@@ -5,6 +5,7 @@ import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { getSession } from 'sessionmanager';
 import { INDIAN_CONTACT_REGEX } from 'common/constants';
+import { returnAsIs } from 'lib/utils';
 
 const TARGET_QS = '#form-fields';
 const AGREEMENT_STORE = {};
@@ -119,8 +120,8 @@ emiPlansView.prototype = {
       fetchAgreements(provider, loanUrl, plans, amount);
     }
 
-    this.onSelect = on.select || _Func.noop;
-    this.back = on.back || _Func.noop;
+    this.onSelect = on.select || returnAsIs;
+    this.back = on.back || returnAsIs;
     this.contactRequiredForEMI = contactRequiredForEMI;
 
     on.select = event => {

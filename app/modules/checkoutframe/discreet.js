@@ -107,6 +107,7 @@ import * as ContactStorage from 'checkoutframe/contact-storage';
 import BlockedDeactivatedMerchant from 'ui/elements/BlockedDeactivatedMerchant.svelte';
 
 import * as downtimeUtils from 'checkoutframe/downtimes/utils';
+import * as UTILS from 'lib/utils.js';
 
 import * as CovidDonations from 'checkoutframe/components/covidWrap';
 import * as Header from 'checkoutframe/components/header';
@@ -119,6 +120,7 @@ export default {
   Analytics,
   AnalyticsTypes,
   UPIUtils,
+  UTILS,
   setShieldParams,
   GPay,
   Color,
@@ -218,7 +220,6 @@ export default {
   _Arr,
   _Doc,
   _El,
-  _Func,
   _Obj,
   _,
   Promise,

@@ -20,8 +20,8 @@ var preferences,
   Store = discreet.Store,
   MethodStore = discreet.MethodStore,
   UPIUtils = discreet.UPIUtils,
+  UTILS = discreet.UTILS,
   _Arr = discreet._Arr,
-  _Func = discreet._Func,
   _ = discreet._,
   _Obj = discreet._Obj,
   _Doc = discreet._Doc,
@@ -644,7 +644,7 @@ function successHandler(response) {
   updateScore('paymentSuccess');
   this.clearRequest();
   // prevent dismiss event
-  this.modal.options.onhide = noop;
+  this.modal.options.onhide = UTILS.returnAsIs;
 
   // sending oncomplete event because CheckoutBridge.oncomplete
 
@@ -1057,12 +1057,12 @@ Session.prototype = {
     discreet.Experiments.clearOldExperiments();
   },
 
-  getReadOnlyAppOffers: function (preferences) {
+  getReadOnlyAppOffers: function(preferences) {
     var metaApps = (preferences.methods || {}).app_meta || {};
 
     var metaAppOffers = [];
 
-    Object.keys(metaApps).forEach(function (app) {
+    Object.keys(metaApps).forEach(function(app) {
       if (metaApps[app].offer) {
         if (app === 'cred') {
           metaAppOffers.push({
@@ -1082,17 +1082,17 @@ Session.prototype = {
 
   // allow a easier setup of read only offers
   // read_only offers can come from many sources ( as they have in the past )
-  addReadOnlyOffers: function (preferences) {
+  addReadOnlyOffers: function(preferences) {
     var metaAppOffers = this.getReadOnlyAppOffers(preferences);
     if (!preferences.offers) {
       preferences.offers = [];
     }
-    metaAppOffers.forEach(function (offer) {
+    metaAppOffers.forEach(function(offer) {
       preferences.offers.push(offer);
     });
   },
 
-  render: function (options) {
+  render: function(options) {
     var that = this;
 
     options = options || {};
@@ -2172,9 +2172,9 @@ Session.prototype = {
 
     // cultgear.com bug: no events register unless
     // https://stackoverflow.com/questions/41869122/touch-events-within-iframe-are-not-working-on-ios
-    document.addEventListener('touchstart', noop);
+    document.addEventListener('touchstart', UTILS.returnAsIs);
     this.listeners.push(function() {
-      document.removeEventListener('touchstart', noop);
+      document.removeEventListener('touchstart', UTILS.returnAsIs);
     });
 
     this.on('focus', '#body', 'input', 'focus', true);
@@ -3707,11 +3707,11 @@ Session.prototype = {
     });
   },
 
-  getDowntimeAlertDialog: function () {
+  getDowntimeAlertDialog: function() {
     return $('#downtime-wrap');
   },
 
-  getCovidDonationDialog: function () {
+  getCovidDonationDialog: function() {
     return $('#covid-wrap');
   },
 
@@ -4492,7 +4492,8 @@ Session.prototype = {
     }
     if (this.tab === 'emandate' && Store.isASubscription('emandate')) {
       // recurring token
-      data.recurring_token = preferences.subscription && preferences.subscription.recurring_token;
+      data.recurring_token =
+        preferences.subscription && preferences.subscription.recurring_token;
       data.amount = 0;
     }
 
@@ -4820,12 +4821,18 @@ Session.prototype = {
       this.modal.options.backdropclose = false;
     }
     // for paypal dcc enable is not required
-    if (discreet.storeGetter(CardScreenStore.currencyRequestId) && ((data.method === 'card' && Store.isDCCEnabled()) || (data.method === 'wallet' && data.wallet === 'paypal'))) {
+    if (
+      discreet.storeGetter(CardScreenStore.currencyRequestId) &&
+      ((data.method === 'card' && Store.isDCCEnabled()) ||
+        (data.method === 'wallet' && data.wallet === 'paypal'))
+    ) {
       data.currency_request_id = discreet.storeGetter(
         CardScreenStore.currencyRequestId
       );
       data.dcc_currency = discreet.storeGetter(CardScreenStore.dccCurrency);
-      data.default_dcc_currency = discreet.storeGetter(CardScreenStore.defaultDCCCurrency);
+      data.default_dcc_currency = discreet.storeGetter(
+        CardScreenStore.defaultDCCCurrency
+      );
 
       // These are undefined/empty if the user uses an Indian card
       if (!data.currency_request_id) {
@@ -4866,11 +4873,11 @@ Session.prototype = {
         if (discreet.CRED.isUserEligible(this.payload.contact) === undefined) {
           session.showLoadError(I18n.format('card.checking_cred_eligibility'));
           discreet.CRED.checkCREDEligibility(this.payload.contact)
-            .then(function (res) {
+            .then(function(res) {
               session.hideErrorMessage();
               session.submit();
             })
-            .catch(function (e) {
+            .catch(function(e) {
               var userFacingError = I18n.format('card.no_cred_account');
               if (e.error && e.error.description) {
                 userFacingError = e.error.description;
@@ -5475,10 +5482,10 @@ Session.prototype = {
    * the entire logic for the A/B resides in BE. BE either sends us the meta offer or the cred subtext
    * @param {Object} prefs the preferences response
    */
-  setupCREDExperiment: function (prefs) {
+  setupCREDExperiment: function(prefs) {
     this.addReadOnlyOffers(prefs);
     var experimentType = null;
-    prefs.offers.forEach(function (offer) {
+    prefs.offers.forEach(function(offer) {
       if (offer.id === 'CRED_experimental_offer') {
         experimentType = 'offer_tile';
       }
@@ -5506,7 +5513,7 @@ Session.prototype = {
     }
   },
 
-  setPreferences: function (prefs) {
+  setPreferences: function(prefs) {
     this.setupCREDExperiment(prefs);
     this.preferences = prefs;
     preferences = prefs;

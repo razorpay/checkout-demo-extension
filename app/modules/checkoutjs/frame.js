@@ -291,7 +291,7 @@ CheckoutFrame.prototype = {
 
       _Obj.loop(eventPairs, (listener, event) => {
         this.listeners.push(
-          window |> _El.on(event, _Func.bind(listener, this))
+          window |> _El.on(event, listener.bind(this))
         );
       });
     }

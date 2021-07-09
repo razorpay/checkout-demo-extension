@@ -5,6 +5,8 @@ import * as AnalyticsTypes from 'analytics-types';
 import { formatPayload } from 'payment/validator';
 import RazorpayConfig from 'common/RazorpayConfig';
 
+import { returnAsIs } from 'lib/utils';
+
 import {
   supportedCurrencies,
   displayCurrencies,
@@ -100,7 +102,7 @@ export default function Razorpay(overrides) {
 
 var RazorProto = (Razorpay.prototype = new Eventer());
 
-RazorProto.postInit = _Func.noop;
+RazorProto.postInit = returnAsIs;
 
 RazorProto.onNew = function (event, callback) {
   if (event === 'ready') {

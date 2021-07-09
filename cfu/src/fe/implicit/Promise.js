@@ -5,7 +5,9 @@ const isPromise = p => _.is(p, Promise);
 function Promise(fn) {
   if (!isPromise(this)) throw 'new Promise';
 
-  _Func.ensureFunction(fn);
+  if (typeof fn !== 'function') {
+    throw new TypeError('not a function');
+  }
   /** @type {!number} */
   this._state = 0;
   /** @type {!boolean} */
@@ -56,7 +58,7 @@ function resolve(self, newValue) {
         finale(self);
         return;
       } else if (_.isFunction(then)) {
-        doResolve(_Func.bind(then, newValue), self);
+        doResolve(then.bind(newValue), self);
         return;
       }
     }
@@ -131,7 +133,7 @@ Promise.prototype
     },
 
     then: function(onFulfilled, onRejected) {
-      var prom = new Promise(_Func.noop);
+      var prom = new Promise(_ => _);
       handle(this, new Handler(onFulfilled, onRejected, prom));
       return prom;
     },

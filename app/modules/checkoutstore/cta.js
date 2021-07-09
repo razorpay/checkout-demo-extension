@@ -7,6 +7,7 @@ import { CtaViews } from 'ui/labels/cta';
 
 import { locale } from 'svelte-i18n';
 import { formatTemplateWithLocale } from 'i18n';
+import { debounce } from 'lib/utils';
 
 export const ctaInfo = writable({
   view: '',
@@ -184,7 +185,7 @@ export function setAppropriateCtaText() {
   }
 }
 
-const trackCTAVisibility = _Func.debounce(function() {
+const trackCTAVisibility = debounce(function() {
   // To figure out cases when CTA is shown logically
   // but is not visible physically.
   setTimeout(function() {

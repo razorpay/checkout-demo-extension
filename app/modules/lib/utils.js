@@ -183,3 +183,32 @@ export function getFormattedDateTime(timestamp) {
   time = time.replace('(India Standard Time)', 'IST'); // 16:59:09 IST
   return date + ' ' + time;
 }
+
+/**
+ * Creates and returns a debounced version of the function.
+ * @param {Function} cb
+ * @param {number} delay
+ *
+ * @returns {Function}
+ */
+
+export function debounce(cb, delay) {
+  let timeout;
+  return function() {
+    const context = this;
+    const args = arguments;
+    clearTimeout(timeout);
+    timeout = setTimeout(cb.bind(context, ...args), delay);
+  };
+}
+
+/**
+ * Returns whatever is passed to it,
+ * without doing anything at all.
+ * @param {*} _
+ *
+ * @returns {*} _
+ */
+export function returnAsIs(_) {
+  return _;
+}

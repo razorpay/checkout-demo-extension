@@ -1,4 +1,3 @@
-import * as _Func from './_Func';
 import * as _ from './_';
 import * as _Arr from './_Arr';
 import * as _El from './_El';
@@ -12,10 +11,10 @@ export const pageYOffset = global.pageYOffset;
 export const scrollBy = global.scrollBy;
 export const scrollTo = global.scrollTo;
 export const requestAnimationFrame = global.requestAnimationFrame;
-export const querySelector = _Func.bind('querySelector', document);
-export const querySelectorAll = _Func.bind('querySelectorAll', document);
-export const getElementById = _Func.bind('getElementById', document);
-export const getComputedStyle = _Func.bind('getComputedStyle', global);
+export const querySelector = document.querySelector.bind(document);
+export const querySelectorAll = document.querySelectorAll.bind(document);
+export const getElementById = document.getElementById.bind(document);
+export const getComputedStyle = global.getComputedStyle.bind(global);
 export const EventConstructor = global.Event;
 var link;
 

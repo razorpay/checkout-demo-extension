@@ -74,7 +74,7 @@ export default function Popup(src, name) {
 
   this.window.focus();
   this.listeners = [];
-  this.interval = setInterval(_Func.bind('checkClose', this), 200);
+  this.interval = setInterval(this.checkClose.bind(this), 200);
 
   this.on('beforeunload', this.beforeunload);
   this.on('unload', this.close);

@@ -20,6 +20,8 @@ import { setHistoryAndListenForBackPresses } from 'bridge/back';
 
 import { init as initI18n, bindI18nEvents } from 'i18n/init';
 
+import { returnAsIs } from 'lib/utils';
+
 import {
   cookieDisabled,
   isIframe,
@@ -303,7 +305,7 @@ function checkForPossibleWebPayments() {
 function checkForPossibleWebPaymentsForApps() {
   appsThatSupportWebPayments
     .filter(app => app.method === 'app')
-    .forEach(app => checkWebPaymentsForApp(app.package_name).catch(_Func.noop));
+    .forEach(app => checkWebPaymentsForApp(app.package_name).catch(returnAsIs));
 }
 
 function setSessionPreferences(session, preferences) {

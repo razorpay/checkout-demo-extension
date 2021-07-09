@@ -2,7 +2,6 @@ const sessionIdHeader = 'X-Razorpay-SessionId';
 const trackIdHeader = 'X-Razorpay-TrackId';
 const Xhr = XMLHttpRequest;
 import * as _ from './_';
-import * as _Func from './_Func';
 import * as _El from './_El';
 import * as _Doc from './_Doc';
 import * as _Obj from './_Obj';
@@ -45,7 +44,7 @@ export default function fetch(options) {
   this.defer();
 }
 
-_Func.setPrototype(fetch, {
+const fetchPrototype = {
   setReq: function(type, value) {
     this.abort();
     this.type = type;
@@ -84,7 +83,7 @@ _Func.setPrototype(fetch, {
     if (type === 'ajax') {
       this.req.abort();
     } else if (type === 'jsonp') {
-      global.Razorpay[this.req] = _Func.noop;
+      global.Razorpay[this.req] = _ => _;
     } else {
       clearTimeout(this.req);
     }
@@ -161,7 +160,10 @@ _Func.setPrototype(fetch, {
 
     xhr.send(data);
   },
-});
+};
+
+fetchPrototype.constructor = fetch;
+fetch.prototype = fetchPrototype;
 
 function normalizeOptions(options) {
   if (_.isString(options)) {
@@ -178,7 +180,7 @@ function normalizeOptions(options) {
     options.method = 'get';
   }
   if (!callback) {
-    options.callback = _Func.noop;
+    options.callback = _ => _;
   }
   if (_.isNonNullObject(data) && !_.is(data, FormData)) {
     data = _.obj2query(data);

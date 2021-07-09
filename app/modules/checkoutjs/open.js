@@ -1,6 +1,7 @@
 import Razorpay, { makeUrl } from 'common/Razorpay';
 import { Events, Track, MiscEvents } from 'analytics';
 import CheckoutFrame from './frame';
+import { returnAsIs } from 'lib/utils';
 
 const RazorProto = _.prototypeOf(Razorpay);
 
@@ -16,7 +17,7 @@ setBody();
 function needBody(func) {
   return function bodyInsurance() {
     if (!body) {
-      setTimeout(_Func.bind(bodyInsurance, this), 99);
+      setTimeout(bodyInsurance.bind(this), 99);
       return this;
     }
     return func.call(this);
@@ -40,7 +41,7 @@ function defaultAutoPostHandler(data) {
   currentScript
     |> _El.parent
     |> _El.append(_El.create() |> _El.setContents(_Doc.obj2formhtml(data)))
-    |> _Obj.setProp('onsubmit', _Func.noop)
+    |> _Obj.setProp('onsubmit', returnAsIs)
     |> _El.submit;
 }
 
@@ -49,11 +50,11 @@ var addAutoCheckoutButton = function (rzp) {
     |> _El.parent
     |> _El.append(
       _El.create('input')
-      |> _Obj.extend({
-        type: 'submit',
-        value: rzp.get('buttontext'),
-        className: 'razorpay-payment-button',
-      })
+        |> _Obj.extend({
+          type: 'submit',
+          value: rzp.get('buttontext'),
+          className: 'razorpay-payment-button',
+        })
     )
     |> _Obj.setProp('onsubmit', function (e) {
       e.preventDefault();
@@ -84,9 +85,9 @@ var addAutoCheckoutButton = function (rzp) {
           );
 
           options.callback_url = makeUrl('checkout/onyx') + '?data=' + data;
-        } catch (err) { }
+        } catch (err) {}
       }
-      Events.TrackBehav(MiscEvents.AUTOMATIC_CHECKOUT_CLICK, rzp)
+      Events.TrackBehav(MiscEvents.AUTOMATIC_CHECKOUT_CLICK, rzp);
       rzp.open();
       return false;
     });
@@ -127,7 +128,7 @@ function initAutomaticCheckout() {
     opts.handler = defaultAutoPostHandler;
     var rzp = Razorpay(opts);
     if (!opts.parent) {
-      Events.TrackRender(MiscEvents.AUTOMATIC_CHECKOUT_OPEN, rzp)
+      Events.TrackRender(MiscEvents.AUTOMATIC_CHECKOUT_OPEN, rzp);
       addAutoCheckoutButton(rzp);
     }
   }
@@ -221,7 +222,7 @@ function getPreloadedFrame(rzp) {
     preloadedFrame.openRzp(rzp);
   } else {
     preloadedFrame = new CheckoutFrame(rzp);
-    global |> _El.on('message', _Func.bind('onmessage', preloadedFrame));
+    global |> _El.on('message', preloadedFrame.onmessage.bind(preloadedFrame));
     frameContainer |> _El.append(preloadedFrame.el);
   }
   return preloadedFrame;
@@ -316,7 +317,7 @@ var initRazorpayCheckout = needBody(function () {
   // Get the ball rolling in case we are in manual mode
   try {
     initAutomaticCheckout();
-  } catch (e) { }
+  } catch (e) {}
 });
 
 export default initRazorpayCheckout;

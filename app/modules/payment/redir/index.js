@@ -1,3 +1,4 @@
+import { returnAsIs } from 'lib/utils';
 export default function Redir(src, name, payment) {
   this.name = name;
   this.payment = payment;
@@ -13,6 +14,6 @@ Redir.prototype = {
     }
   },
 
-  show: _Func.noop,
-  close: _Func.noop,
+  show: returnAsIs,
+  close: returnAsIs,
 };

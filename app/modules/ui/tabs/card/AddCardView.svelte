@@ -8,6 +8,8 @@
   import CardFlowSelectionRadio from 'ui/elements/CardFlowSelectionRadio.svelte';
   import NameField from 'ui/elements/fields/card/NameField.svelte';
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
+  import { returnAsIs } from 'lib/utils';
+
 
   // Svelte imports
   import { createEventDispatcher, onMount } from 'svelte';
@@ -359,7 +361,7 @@
           }
         }
       )
-      .catch(_Func.noop); // IIN changed, do nothing
+      .catch(returnAsIs); // IIN changed, do nothing
   }
 
   $: {
