@@ -92,7 +92,7 @@
     "jest": "^27.0.3",
     "jshint": "^2.13.0",
     "jshint-stylish": "^2.2.1",
-    "nodemon": "^2.0.7",
+    "nodemon": "^2.0.12",
     "puppeteer": "^2.1.1",
     "rollup": "^1.21.2",
     "rollup-plugin-babel": "^4.3.3",
