@@ -1,6 +1,6 @@
 import * as Bridge from 'bridge';
 import Razorpay, { makePrefParams, validateOverrides } from 'common/Razorpay';
-import Analytics, { Track, MiscEvents } from 'analytics';
+import { Events, MetaProperties, Track, MiscEvents } from 'analytics';
 import BrowserStorage from 'browserstorage';
 import * as SessionManager from 'sessionmanager';
 import {
@@ -103,8 +103,8 @@ const setAnalyticsMeta = message => {
    * Set time-related properties.
    */
   if (message.metadata && message.metadata.openedAt) {
-    Analytics.setMeta(
-      'timeSince.open',
+    Events.setMeta(
+      MetaProperties.TIME_SINCE_OPEN,
       () => _.now() - message.metadata.openedAt
     );
   }
@@ -116,8 +116,7 @@ const setAnalyticsMeta = message => {
     _Obj.hasProp(navigator, 'language') ||
     _Obj.hasProp(navigator, 'userLanguage')
   ) {
-    Analytics.setMeta(
-      'navigator.language',
+    Events.setMeta(MetaProperties.NAVIGATOR_LANGUAGE,
       navigator.language || navigator.userLanguage
     );
   }
@@ -129,10 +128,10 @@ const setAnalyticsMeta = message => {
     const { effectiveType, type, downlink } = navigator.connection;
 
     if (effectiveType || type) {
-      Analytics.setMeta('network.type', effectiveType || type);
+      Events.setMeta(MetaProperties.NETWORK_TYPE, effectiveType || type);
     }
     if (downlink) {
-      Analytics.setMeta('network.downlink', downlink);
+      Events.setMeta(MetaProperties.NETWORK_DOWNLINK, downlink);
     }
   }
 
@@ -140,10 +139,10 @@ const setAnalyticsMeta = message => {
    * Set SDK details.
    */
   if (qpmap.platform && _Arr.contains(['android', 'ios'], qpmap.platform)) {
-    Analytics.setMeta('sdk.platform', qpmap.platform);
+    Events.setMeta(MetaProperties.SDK_PLATFORM, qpmap.platform);
 
     if (qpmap.version) {
-      Analytics.setMeta('sdk.version', qpmap.version);
+      Events.setMeta(MetaProperties.SDK_VERSION, qpmap.version);
     }
   }
 
@@ -151,7 +150,7 @@ const setAnalyticsMeta = message => {
    * Browser related meta properties
    */
   isBraveBrowser().then(result => {
-    Analytics.setMeta('brave_browser', result);
+    Events.setMeta(MetaProperties.BRAVE_BROWSER, result);
   });
 };
 
@@ -280,10 +279,10 @@ function fetchRewards(session) {
           const { reward_id, variant = false } = rewardObj;
           if (reward_id) {
             reward.set(rewardObj);
-            Analytics.setMeta('reward_ids', reward_id);
+            Events.setMeta(MetaProperties.REWARD_IDS, reward_id);
           }
           // Exp variation, true if the particular checkout falls under the experiment, false if checkout is not part of that experiment
-          Analytics.setMeta('reward_exp_variant', variant);
+          Events.setMeta(MetaProperties.REWARD_EXP_VARIANT, variant);
         }
       }
     }
@@ -379,7 +378,7 @@ function markRelevantPreferencesPayload(prefData) {
   ];
   preferencesPayloadToBeMarked.forEach(prop => {
     if (prefData[prop]) {
-      Analytics.setMeta(prop, prefData[prop]);
+      Events.setMeta(prop, prefData[prop]);
     }
   });
 }
@@ -461,22 +460,20 @@ function updateEmandatePrefill() {
 }
 
 function updateAnalytics(preferences) {
-  Analytics.setMeta('features', preferences.features);
+  Events.setMeta(MetaProperties.FEATURES, preferences.features);
   if (preferences && preferences.merchant_id) {
-    Analytics.setMeta('merchant_id', preferences.merchant_id);
+    Events.setMeta(MetaProperties.MERCHANT_ID, preferences.merchant_id);
   }
   if (preferences && preferences.merchant_key) {
-    Analytics.setMeta('merchant_key', preferences.merchant_key);
+    Events.setMeta(MetaProperties.MERCHANT_KEY, preferences.merchant_key);
   }
   // Set optional fields in meta
   const optionalFields = preferences.optional;
   if (optionalFields |> _.isArray) {
-    Analytics.setMeta(
-      'optional.contact',
+    Events.setMeta(MetaProperties.OPTIONAL_CONTACT,
       optionalFields |> _Arr.contains('contact')
     );
-    Analytics.setMeta(
-      'optional.email',
+    Events.setMeta(MetaProperties.OPTIONAL_EMAIL,
       optionalFields |> _Arr.contains('email')
     );
   }
