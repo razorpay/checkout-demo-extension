@@ -1036,6 +1036,12 @@ $outline = #ddd;
   height: $topbarh + 1px;
 }
 
+@media (max-width: 320px) {
+  #tab-title {
+    font-size: 15px
+  }
+}
+
 .back {
   float: left;
   margin: 0 6px 0 0;
@@ -1055,6 +1061,7 @@ $outline = #ddd;
   white-space: nowrap;
   line-height: 46px;
   height: $topbarh;
+  margin-top: -4px;
 
   &::before {
     content: '\e602';
