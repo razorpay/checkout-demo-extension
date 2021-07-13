@@ -1079,7 +1079,6 @@
 
   .details-container {
     margin: 12px;
-    overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
   }

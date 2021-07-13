@@ -31,7 +31,7 @@
     });
     setTimeout(() => {
       snackBar = new Snackbar({
-        target: document.getElementsByClassName('screen-comp')[0],
+        target: document.getElementById('rewards-cta'),
         props: {
           align: 'bottom',
           parentElem: 'rewards-cta',
@@ -64,8 +64,15 @@
   }
 </script>
 
+<SlottedOption on:click={showRewards} id="rewards-cta">
+  <i class="rewards-icon" slot="icon">
+    <Icon icon={icons.present} />
+  </i>
+</SlottedOption>
+
 <style>
   :global(#rewards-cta) {
+    position: relative;
     width: 50px;
     padding: 12px 20px 12px 11px;
   }
@@ -73,9 +80,3 @@
     width: 27px;
   }
 </style>
-
-<SlottedOption on:click={showRewards} id="rewards-cta">
-  <i class="rewards-icon" slot="icon">
-    <Icon icon={icons.present} />
-  </i>
-</SlottedOption>

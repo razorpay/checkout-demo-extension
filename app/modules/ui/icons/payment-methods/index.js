@@ -14,7 +14,6 @@ import aadhaar from './aadhaar';
 import edit from './edit';
 import present from './present';
 import trustedBadge from './trusted_badge';
-import tickFilled from './tick_filled';
 import tickFilledDonate from './tick_filled_donate';
 import warning from './warning';
 import refund from './refund';
@@ -31,7 +30,6 @@ const availIconNames = getAllMethods().concat([
   'edit',
   'present',
   'trusted_badge',
-  'tick_filled',
   'tick_filled_donate',
   'warning',
   'refund',
@@ -95,9 +93,6 @@ function getIconFn(iconName) {
       return present;
     case 'trusted_badge':
       return trustedBadge;
-
-    case 'tick_filled':
-      return tickFilled;
 
     case 'tick_filled_donate':
       return tickFilledDonate;

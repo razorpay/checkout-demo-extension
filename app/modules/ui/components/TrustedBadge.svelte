@@ -104,14 +104,11 @@
       <div class="trusted-badge-info-section" in:fade out:fade>
         {#each list as point, i}
           <div class="trusted-badge-list-item">
-            <i slot="icon">
-              <Icon icon={icons.tick_filled} />
-            </i>
             <div
               class="trusted-badge-list-text"
               class:trusted-badge-border-top={i === 0}
             >
-              {point}
+              <div class="trusted-badge-list-point">{point}</div>
             </div>
           </div>
         {/each}
@@ -123,9 +120,10 @@
 <style>
   .trusted-badge-info-section {
     margin-top: -6px;
+    padding-bottom: 8px;
   }
   .trusted-badge-wrapper {
-    padding: 8px 32px;
+    padding: 8px 20px;
   }
   .trusted-badge-header-section {
     display: flex;
@@ -148,6 +146,7 @@
   }
   .trusted-badge-list-item {
     margin-left: 12px;
+    position: relative;
   }
   .trusted-badge-header-labels > span {
     font-size: 11px;
@@ -162,6 +161,9 @@
   }
   .trusted-badge-border-top {
     padding-top: 16px;
+  }
+  .trusted-badge-list-item > .trusted-badge-border-top::before {
+    top: 32px !important;
   }
   :global(.screen) > :global(.screen-main) {
     padding-top: 0 !important;
@@ -178,5 +180,19 @@
   .arrow-down {
     transform: rotate(45deg);
     -webkit-transform: rotate(45deg);
+  }
+  .trusted-badge-list-point {
+    display: inline-block;
+  }
+  .trusted-badge-list-text::before {
+    display: inline-block;
+    position: absolute;
+    content: '';
+    height: 9px;
+    width: 9px;
+    background: url('https://cdn.razorpay.com/rtb/ticks_filled.svg');
+    background-repeat: no-repeat;
+    top: 16px;
+    left: 0;
   }
 </style>

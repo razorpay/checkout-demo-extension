@@ -1,9 +1,5 @@
 <script>
-  // Svelte imports
-  import { onMount } from 'svelte';
-
   export let align;
-  export let parentElem;
   export let snackbar;
   export let shown;
   export let timer;
@@ -12,12 +8,6 @@
 
   function setAlignmentClass() {
     snackbar.classList.add(`snackbar-${align}`);
-  }
-
-  function getPosition() {
-    const top = document.getElementById(parentElem).offsetTop;
-    const left = document.getElementById(parentElem).offsetLeft;
-    snackbar.style.top = `${top + 42}px`;
   }
 
   export function removeSnackBar() {
@@ -29,7 +19,6 @@
     if (shown) {
       setTimeout(() => {
         setAlignmentClass();
-        getPosition();
         timeout = setTimeout(() => {
           shown = false;
         }, timer);
@@ -38,8 +27,13 @@
   }
 </script>
 
+{#if shown}
+  <div class="snackbar" bind:this={snackbar}>{text}</div>
+{/if}
+
 <style>
   .snackbar {
+    top: 42px;
     z-index: 1;
     -webkit-transition: opacity 0.15s ease-in;
     -o-transition: opacity 0.15s ease-in;
@@ -51,9 +45,8 @@
     border-radius: 3px;
     color: #fff;
     padding: 8px 12px;
-    right: 10px;
+    right: -5px;
     pointer-events: none;
-    top: -54px;
   }
   .snackbar::before {
     content: '';
@@ -71,7 +64,3 @@
     right: 26px;
   }
 </style>
-
-{#if shown}
-  <div class="snackbar" bind:this={snackbar}>{text}</div>
-{/if}
