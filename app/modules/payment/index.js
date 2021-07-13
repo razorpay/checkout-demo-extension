@@ -405,10 +405,6 @@ Payment.prototype = {
       this.r.set('redirect', true);
     }
 
-    if(this.data && this.data.account_id) {
-      this.account_id = this.data.account_id;
-      delete this.data.account_id;
-    }
     // redirect if specified
     if (this.checkRedirect()) {
       return;
