@@ -16,7 +16,12 @@
 
   import { customer } from 'checkoutstore/customer';
 
-  import { showAmount, showCtaWithDefaultText } from 'checkoutstore/cta';
+  import {
+    isCtaShown,
+    showAmount,
+    showCtaWithDefaultText,
+    setAppropriateCtaText,
+  } from 'checkoutstore/cta';
 
   // i18n
   import { t } from 'svelte-i18n';
@@ -57,7 +62,7 @@
     SAVED_CARDS: 'saved-cards',
     ADD_CARD: 'add-card',
     HOME_SCREEN: 'home-screen',
-    PAYPAL_WALLET: 'paypal'
+    PAYPAL_WALLET: 'paypal',
   };
 
   let prop = null;
@@ -132,7 +137,7 @@
       } else {
         prop = null;
       }
-    } else if(view === Views.PAYPAL_WALLET) {
+    } else if (view === Views.PAYPAL_WALLET) {
       prop = { walletCode: 'paypal' };
     } else {
       prop = null;
@@ -159,17 +164,17 @@
 
   /**
    * It will only trigger in case of wallet as parent gets destroyed on back
-  */
-  onDestroy(()=>{
+   */
+  onDestroy(() => {
     updateAmountInHeaderAndCTA();
     setDCCPayload({ view });
-  })
+  });
 
   $: {
     if (entity) {
       if (!currencyCache[entityWithAmount]) {
         currencies = null;
-        getCurrencies(prop).then(currencyPayload => {
+        getCurrencies(prop).then((currencyPayload) => {
           currencyCache[entityWithAmount] = currencyPayload;
           // update selected currency payload [only used by offers in session.js]
           setDCCPayload({ currencyPayload, entityWithAmount });
@@ -196,8 +201,11 @@
     /**
      * This is require to preselect last selected currency in case of wallet
      * as this component get destroyed with state
-    */
-    if(session?.dccPayload?.view === Views.PAYPAL_WALLET && session?.dccPayload?.currency) {
+     */
+    if (
+      session?.dccPayload?.view === Views.PAYPAL_WALLET &&
+      session?.dccPayload?.currency
+    ) {
       selectedCurrency = session.dccPayload.currency;
     }
   }
@@ -246,7 +254,7 @@
       !currencyCache[entityWithOriginalAmount]
     ) {
       getCurrencies({ ...prop, amount: originalAmount }).then(
-        currencyPayload => {
+        (currencyPayload) => {
           updateCurrencyCache(entityWithOriginalAmount, currencyPayload);
           prevCurrency = '';
         }
@@ -287,22 +295,27 @@
   $: currencyConfig = entity && currencyCache[entityWithAmount];
   $: explicitUI = currencyConfig?.show_markup;
   $: currencies = currencyConfig && currencyConfig.all_currencies;
-  $: cardCurrency = currencyConfig && (currencyConfig.card_currency || currencyConfig.wallet_currency);
+  $: cardCurrency =
+    currencyConfig &&
+    (currencyConfig.card_currency || currencyConfig.wallet_currency);
   $: sortedCurrencies = currencies && sortCurrencies(currencies);
   $: displayCurrencies = sortedCurrencies && sortedCurrencies.slice(0, 2);
   $: dccAmount = currencies && currencies[selectedCurrency].amount;
   $: forexRate = currencies && currencies[selectedCurrency].forex_rate;
-  
+
   $: {
-    $defaultDCCCurrency = currencyConfig && (currencyConfig.card_currency || currencyConfig.wallet_currency);
+    $defaultDCCCurrency =
+      currencyConfig &&
+      (currencyConfig.card_currency || currencyConfig.wallet_currency);
   }
-  
+
   $: {
-    if(forexRate) {
+    if (forexRate) {
       forexRate = parseFloat(1 / forexRate).toFixed(2);
     }
   }
-  $: fee = currencies && currencies[selectedCurrency].conversion_percentage || 0;
+  $: fee =
+    (currencies && currencies[selectedCurrency].conversion_percentage) || 0;
   $: selectedCurrencyInDisplay = _Arr.find(
     displayCurrencies,
     ({ currency }) => currency === selectedCurrency
@@ -316,7 +329,11 @@
         session.setRawAmountInHeader(displayAmount);
         showAmount(ctaAmount);
       } else if (!isPartialPayment()) {
-        showCtaWithDefaultText();
+        if (isCtaShown()) {
+          showCtaWithDefaultText();
+        } else {
+          setAppropriateCtaText();
+        }
         session.updateAmountInHeader(originalAmount);
       }
     });
@@ -337,11 +354,10 @@
     // Insert entity currency on 2nd position.
     const topCurrencies = [cardCurrency, originalCurrency];
     let i = 0;
-    while(topCurrencies[0] === topCurrencies[1]) {
+    while (topCurrencies[0] === topCurrencies[1]) {
       topCurrencies[1] = TOP_CURRENCIES[i];
       i++;
     }
-    
 
     const sorted = _Obj.entries(currencies).sort((_a, _b) => {
       const a = _a[CODE];
@@ -364,7 +380,7 @@
       return 0;
     });
 
-    return _Arr.map(sorted, _currency => {
+    return _Arr.map(sorted, (_currency) => {
       const currency = _currency[0];
       const rest = _currency[1];
 
@@ -389,7 +405,7 @@
     if (!$customer.tokens.items) {
       return;
     }
-    return _Arr.find($customer.tokens.items, token => token.id === tokenId);
+    return _Arr.find($customer.tokens.items, (token) => token.id === tokenId);
   }
 
   $: console.log(cardCurrency);
@@ -425,7 +441,7 @@
             {selectedCurrency}
             {explicitUI
               ? `(${formatAmountWithSymbol(dccAmount, selectedCurrency)})`
-              : ""}
+              : ''}
           </div>
         {/if}
         <div dir="ltr">
@@ -498,7 +514,7 @@
         all={$t(SEARCH_ALL)}
         autocomplete="transaction-currency"
         items={sortedCurrencies}
-        keys={["currency", "name", "symbol"]}
+        keys={['currency', 'name', 'symbol']}
         component={CurrencySearchItem}
         bind:open={searchModalOpen}
         on:close={() => (searchModalOpen = false)}

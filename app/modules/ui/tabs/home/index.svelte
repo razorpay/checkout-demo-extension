@@ -49,7 +49,7 @@
     PARTIAL_AMOUNT_STATUS_FULL,
     PARTIAL_AMOUNT_STATUS_PARTIAL,
     SECURED_BY_MESSAGE,
-    TPV_METHODS_NOT_AVAILABLE
+    TPV_METHODS_NOT_AVAILABLE,
   } from 'ui/labels/home';
 
   import { t, locale } from 'svelte-i18n';
@@ -92,11 +92,21 @@
     showNext,
   } from 'checkoutstore/cta';
 
-  import { P13NEvents, OrderEvents, Events, HomeEvents, MetaProperties, MiscEvents } from 'analytics';
+  import {
+    P13NEvents,
+    OrderEvents,
+    Events,
+    HomeEvents,
+    MetaProperties,
+    MiscEvents,
+  } from 'analytics';
   import { intentVpaPrefill } from 'checkoutstore/screens/upi';
 
   import updateScore from 'analytics/checkoutScore';
-  import {trackUpiIntentInstrumentSelected, trackUpiIntentInstrumentAvailable} from 'analytics/highlightUpiIntentAnalytics';
+  import {
+    trackUpiIntentInstrumentSelected,
+    trackUpiIntentInstrumentAvailable,
+  } from 'analytics/highlightUpiIntentAnalytics';
 
   import { getCardOffer, hasOffersOnHomescreen } from 'checkoutframe/offers';
   import { getMethodNameForPaymentOption } from 'checkoutframe/paymentmethods';
@@ -118,11 +128,11 @@
   const session = getSession();
   const icons = session.themeMeta.icons;
   const singleMethod = getSingleMethod();
-  
+
   // TPV
   const tpv = getTPV();
 
-  validateTPVOrder(tpv)
+  validateTPVOrder(tpv);
 
   // Offers
   const showOffers = hasOffersOnHomescreen();
@@ -191,33 +201,29 @@
   }
 
   function setTpvError() {
-    
-      Events.TrackMetric(OrderEvents.INVALID_TPV,tpv);
-      session.showLoadError(
-          $t(TPV_METHODS_NOT_AVAILABLE),
-          true,
-      );
-      replaceRetryButtonToDismissErrorMessage(session, 'OK');
+    Events.TrackMetric(OrderEvents.INVALID_TPV, tpv);
+    session.showLoadError($t(TPV_METHODS_NOT_AVAILABLE), true);
+    replaceRetryButtonToDismissErrorMessage(session, 'OK');
   }
 
-  // Same functionality has to reused at pre-submit, 
+  // Same functionality has to reused at pre-submit,
   // hence wrapping here as it can be called in sessionjs as well
   export function validateTPVOrder(tpv, immediate = false) {
-      if (tpv && tpv.invalid) {
-          if (immediate) {
-              setTpvError()
-          } else {
-              tick().then(setTpvError)
-          }
+    if (tpv && tpv.invalid) {
+      if (immediate) {
+        setTpvError();
+      } else {
+        tick().then(setTpvError);
       }
-      return;
+    }
+    return;
   }
 
   export function getSelectedTPVOrderMethod() {
-      if (tpv && !tpv.invalid) {
-          return tpv.method || $multiTpvOption;
-      }
-      return null
+    if (tpv && !tpv.invalid) {
+      return tpv.method || $multiTpvOption;
+    }
+    return null;
   }
 
   export function hideMethods() {
@@ -312,7 +318,7 @@
     const user = _customer.contact;
 
     if (!USER_EXPERIMENT_CACHE[user]) {
-      USER_EXPERIMENT_CACHE[user] = new Promise(resolve => {
+      USER_EXPERIMENT_CACHE[user] = new Promise((resolve) => {
         const instrumentMap = {
           api: [],
           storage: instrumentsFromStorage,
@@ -346,12 +352,12 @@
         } else {
           instrumentsSource = SOURCES.API;
         }
-        
+
         // The function that returns the promise to be returned
         // This promise should set the experiment identifier
         // and any analytics meta properties
-        const returnPromise = source =>
-          new Promise(resolve => {
+        const returnPromise = (source) =>
+          new Promise((resolve) => {
             let instrumentsToBeShown = instrumentMap[source];
 
             let experimentIdentifier;
@@ -391,11 +397,20 @@
                 Events.removeMeta(MetaProperties.P13N);
               }
 
-              Events.setMeta(MetaProperties.P13N_USERIDENTIFIED, userIdentified);
+              Events.setMeta(
+                MetaProperties.P13N_USERIDENTIFIED,
+                userIdentified
+              );
               expSourceSet = source;
-              Events.TrackMetric(HomeEvents.P13N_EXPERIMENT, {source, experiment: experimentIdentifier});
+              Events.TrackMetric(HomeEvents.P13N_EXPERIMENT, {
+                source,
+                experiment: experimentIdentifier,
+              });
 
-              Events.setMeta(MetaProperties.P13N_EXPERIMENT, experimentIdentifier);
+              Events.setMeta(
+                MetaProperties.P13N_EXPERIMENT,
+                experimentIdentifier
+              );
             }
 
             // Cache for user
@@ -465,14 +480,21 @@
   // but the analytics should be sent only once (when the preferred instruments displayed changes)
   // so maintaining a store with last updated vpas that updates only when the value changes
   function sendHighlightUpiIntentInstrumentAnalytics(preferredInstruments) {
-    if (Array.isArray(preferredInstruments) && preferredInstruments.length > 0) {
-      let upiIntentInstrumentForDesktop = preferredInstruments.map(instrument => instrument.vendor_vpa).filter(instrument => !!instrument);
+    if (
+      Array.isArray(preferredInstruments) &&
+      preferredInstruments.length > 0
+    ) {
+      let upiIntentInstrumentForDesktop = preferredInstruments
+        .map((instrument) => instrument.vendor_vpa)
+        .filter((instrument) => !!instrument);
 
       if (
         Array.isArray($upiIntentInstrumentsForAnalytics) &&
-        $upiIntentInstrumentsForAnalytics.toString() !== upiIntentInstrumentForDesktop.toString()
-        ) {
-        $upiIntentInstrumentsForAnalytics = upiIntentInstrumentForDesktop.slice();
+        $upiIntentInstrumentsForAnalytics.toString() !==
+          upiIntentInstrumentForDesktop.toString()
+      ) {
+        $upiIntentInstrumentsForAnalytics =
+          upiIntentInstrumentForDesktop.slice();
         trackUpiIntentInstrumentAvailable(upiIntentInstrumentForDesktop);
       }
     }
@@ -500,24 +522,27 @@
     if (isInstrumentFaultEmitted) {
       // Do nothing, we already signalled a fault
     } else if (noBlocksWereSet && !singleMethod) {
-      Events.TrackIntegration(MiscEvents.ERROR,{
-          type: 'no_instruments_to_render',
-          config: merchantConfig,
-        },
-      );
+      Events.TrackIntegration(MiscEvents.ERROR, {
+        type: 'no_instruments_to_render',
+        config: merchantConfig,
+      });
 
       Razorpay.sendMessage({
         event: 'fault',
-        data:
-          'Error in integration. Please contact Razorpay for assistance: no instruments available to show',
+        data: 'Error in integration. Please contact Razorpay for assistance: no instruments available to show',
       });
 
       isInstrumentFaultEmitted = true;
     } else {
       const setPreferredInstruments = blocksThatWereSet.preferred.instruments;
-      const instrumentsShown = setPreferredInstruments.map(item => item?._ungrouped?.length ? item._ungrouped[0]: []);
-      if(expSourceSet) {
-        Events.TrackMetric(P13NEvents.INSTRUMENTS_SHOWN, {source: expSourceSet, instrumentsShown})
+      const instrumentsShown = setPreferredInstruments.map((item) =>
+        item?._ungrouped?.length ? item._ungrouped[0] : []
+      );
+      if (expSourceSet) {
+        Events.TrackMetric(P13NEvents.INSTRUMENTS_SHOWN, {
+          source: expSourceSet,
+          instrumentsShown,
+        });
         expSourceSet = false;
       }
 
@@ -533,9 +558,8 @@
         {}
       );
 
-      const allPreferredInstrumentsForCustomer = getAllInstrumentsForCustomer(
-        $customer
-      );
+      const allPreferredInstrumentsForCustomer =
+        getAllInstrumentsForCustomer($customer);
 
       if (
         isPersonalizationEnabled &&
@@ -547,7 +571,7 @@
           eligible: preferredInstruments.length,
           shown: setPreferredInstruments.length,
           methods: preferredMethods,
-        })
+        });
       }
     }
   }
@@ -702,7 +726,10 @@
     if (isAddressEnabled()) {
       return DETAILS;
     }
-
+    if (isContactEmailHidden() && isContactEmailOptional()) {
+      // when both are hidden details screen will be empty hence avoid it
+      return METHODS;
+    }
     /**
      * If there's just one method available,
      * we want to land on the details screen.
@@ -724,7 +751,6 @@
         return METHODS;
       }
     }
-
     /**
      * If there are multple methods
      * and no validations have failed,
@@ -738,7 +764,7 @@
     view,
     oneMethod: singleMethod,
   });
-  
+
   function storeContactDetails() {
     // Store only on mobile since Desktops can be shared b/w users
     if (isMobile()) {
@@ -878,7 +904,7 @@
     updateScore('instrumentSelected');
 
     $selectedInstrumentId = instrument.id;
-    if(instrument.method === 'wallet' && instrument.wallets?.length > 0) {
+    if (instrument.method === 'wallet' && instrument.wallets?.length > 0) {
       dccView = instrument.wallets[0];
     } else {
       dccView = 'home-screen';
