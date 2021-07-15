@@ -1,0 +1,47 @@
+#!/bin/sh
+
+RED="\033[1;31m"
+GREEN="\033[1;32m"
+YELLOW="\033[1;33m"
+CYAN="\033[1;36m"
+linter_exit_code=1
+
+# if its a merge commit , pre-merge-commit will pass true on $1
+
+# avoid running lint on merge 
+if [ $1 ];then
+  echo "${YELLOW} skipping lint due to merge-commit!"
+  exit 0
+fi
+
+fileList=$(git diff --diff-filter=d --cached --name-only | grep -E '\.(js|svelte)$')
+
+if [ ${#fileList} -lt 1 ]; then
+    echo -e "${YELLOW} You have no staged .js or .svelte files to test\n"
+    exit
+fi
+
+echo "${CYAN} Linting...🔍" 
+./node_modules/.bin/eslint --fix ${fileList[*]}
+if [ $? -ne 0 ]
+then  
+  echo "${YELLOW} Surpassing lint errors please fix ASAP"
+  # enable the following when eslint failure has to stop commiting
+  # echo -e "\nPlease fix the above linting issues before committing.\n"
+fi 
+
+
+echo "${CYAN} Formatting...🔧" 
+./node_modules/.bin/prettier --write --plugin-search-dir=. ${fileList[*]}
+#store exit code as we have to stage file before showing success/error
+exitCode=$?
+# stage all changes done by eslint/prettier
+git add -f ${fileList[*]}
+
+if [ $exitCode -ne 0 ]; then
+  echo "${RED} ❌ Erors have occurred!"
+  exit 1
+els
+  echo "${GREEN} ✔ Did not find any errors"
+  exit 0
+fi
