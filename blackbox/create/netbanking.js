@@ -1,3 +1,4 @@
+const querystring = require('querystring');
 const makeOptionsAndPreferences = require('./options/index.js');
 const { getTestData } = require('../actions');
 const { openCheckoutWithNewHomeScreen } = require('../tests/homescreen/open');
@@ -52,7 +53,13 @@ const {
   verifyPersonalizationText,
 } = require('../tests/homescreen/actions');
 
-module.exports = function(testFeatures) {
+const PARTNER_CONFIG = {
+  KEY_ID: 'rzp_live_partner_BOD2gzSGkmxqyZ',
+  ORDER_ID: 'order_HXFrTfbcka1JDT',
+  ACCOUNT_ID: 'acc_BPKlDRz7RMvA4A',
+};
+
+module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'netbanking',
     testFeatures
@@ -69,6 +76,7 @@ module.exports = function(testFeatures) {
     personalization,
     optionalContact,
     optionalEmail,
+    verifyPartnerMerchantPayload,
   } = features;
 
   describe.each(
@@ -82,6 +90,12 @@ module.exports = function(testFeatures) {
         if (preferences.customer) {
           preferences.customer.contact = '+918888888881';
         }
+      }
+
+      if (verifyPartnerMerchantPayload) {
+        options.key = PARTNER_CONFIG.KEY_ID;
+        options.order_id = PARTNER_CONFIG.ORDER_ID;
+        options.account_id = PARTNER_CONFIG.ACCOUNT_ID;
       }
 
       let bank = 'SBIN';
@@ -160,15 +174,15 @@ module.exports = function(testFeatures) {
         await verifyTimeout(context, 'netbanking');
         return;
       }
-      
+
       await submit(context, downtimeHigh);
-      
-      if(downtimeHigh) {
+
+      if (downtimeHigh) {
         await downtimeHighAlert(context);
       }
 
       if (feeBearer) {
-        await delay(200)
+        await delay(200);
         await handleFeeBearer(context);
       }
 
@@ -177,6 +191,14 @@ module.exports = function(testFeatures) {
         await verifyTimeout(context, 'netbanking');
 
         return;
+      }
+
+      if (verifyPartnerMerchantPayload) {
+        const req = await context.expectRequest();
+        const body = querystring.parse(req.body);
+        expect(body.account_id).toEqual(PARTNER_CONFIG.ACCOUNT_ID);
+        expect(body.key_id).toEqual(PARTNER_CONFIG.KEY_ID);
+        expect(body.order_id).toEqual(PARTNER_CONFIG.ORDER_ID);
       }
 
       if (callbackUrl) {
