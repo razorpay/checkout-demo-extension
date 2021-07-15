@@ -3,7 +3,7 @@
 name: 'Build & push to registry'
 
 # Controls when the action will run. Triggers the workflow on every push
-on: [push]
+on: [push, deployment]
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build-and-push-image:
@@ -19,6 +19,7 @@ jobs:
         run: |
           echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
           echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
+          echo "Canary Percentage ${{ github.event.deployment.payload.canary_percentage }}"
       - name: Set up Docker Buildx
         id: docker
         uses: docker/setup-buildx-action@v1
@@ -43,6 +44,7 @@ jobs:
             "S3_KEY_SECRET=${{ secrets.AWS_ACCESS_SECRET }}"
             "BRANCH=${{ steps.vars.outputs.branch }}"
             "BUILD_NUMBER=${{ github.run_id }}"
+            "CANARY_PERCENTAGE=${{ github.event.deployment.payload.canary_percentage }}"
             "GIT_COMMIT_HASH=${{ github.sha }}"
           secrets: |
             "AWS_CDN_BUCKET=betacdn"
@@ -66,7 +68,7 @@ jobs:
       - name: Mark workflow status as success
         if: steps.failed.conclusion == 'skipped'
         run: |
-          echo 'Status check has passed! Build number ${{ github.run_id }} , commit-id: ${{ github.sha }} '
+          echo 'Status check has passed! Build number ${{ github.run_id }} , commit-id: ${{ github.sha }} with canary-percentage ${{ github.event.deployment.payload.canary_percentage }} '
           curl -X POST -H "Content-Type: application/json" -H "Authorization: token ${{ github.token }}" \
           -d '{ "state" : "success" , "context" : "github/combined-status-check" , "description" : "github/combined-status-check", "target_url" : "https://github.com/${{ github.repository }}" }' \
           https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}

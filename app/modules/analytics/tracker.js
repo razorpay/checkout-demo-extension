@@ -30,7 +30,7 @@ function makeUid() {
     tempdigit;
 
   num
-    |> _Arr.loop(function(v, i) {
+    |> _Arr.loop(function (v, i) {
       tempdigit = map62[num[num.length - 1 - i]];
       if ((num.length - i) % 2) {
         tempdigit *= 2;
@@ -73,7 +73,8 @@ function getCommonTrackingData(r) {
     'referer',
   ]
     |> _Arr.loop(
-      propName => props |> _Obj.setTruthyProp(propName, trackingProps[propName])
+      (propName) =>
+        props |> _Obj.setTruthyProp(propName, trackingProps[propName])
     );
 
   return props;
@@ -83,8 +84,8 @@ const EVT_Q = [];
 let PENDING_EVT_Q = [];
 let EVT_CTX;
 
-const pushToEventQ = evt => EVT_Q.push(evt);
-const setEventContext = ctx => {
+const pushToEventQ = (evt) => EVT_Q.push(evt);
+const setEventContext = (ctx) => {
   EVT_CTX = ctx;
 };
 
@@ -161,7 +162,7 @@ export default function Track(r, event, data, immediately) {
     return;
   }
   // defer makes tracking async
-  setTimeout(function() {
+  setTimeout(function () {
     // convert error to plain object
     if (data instanceof Error) {
       data = { message: data.message, stack: data.stack };
@@ -198,7 +199,7 @@ export default function Track(r, event, data, immediately) {
 
     // Mask prefilled card details
     if (_Obj.hasProp(options, 'prefill')) {
-      _Arr.loop(['card'], key => {
+      _Arr.loop(['card'], (key) => {
         if (_Obj.hasProp(options.prefill, key)) {
           options.prefill[key] = true;
         }
@@ -228,6 +229,7 @@ export default function Track(r, event, data, immediately) {
     // eslint-disable-next-line no-undef
     properties.build_number = __BUILD_NUMBER__ || 0;
 
+    // Add canary_percentage
     // Add current experiments
     properties.experiments = getExperimentsFromStorage();
 
@@ -245,17 +247,17 @@ export default function Track(r, event, data, immediately) {
   });
 }
 
-Track.dispatchPendingEvents = r => {
+Track.dispatchPendingEvents = (r) => {
   if (!r) {
     return;
   }
   const track = Track.bind(Track, r);
-  PENDING_EVT_Q.splice(0, PENDING_EVT_Q.length).forEach(e => {
+  PENDING_EVT_Q.splice(0, PENDING_EVT_Q.length).forEach((e) => {
     track.apply(Track, e);
   });
 };
 
-Track.parseAnalyticsData = data => {
+Track.parseAnalyticsData = (data) => {
   if (!_.isNonNullObject(data)) {
     return;
   }
@@ -270,7 +272,7 @@ Track.makeUid = makeUid;
 Track.common = getCommonTrackingData;
 Track.props = trackingProps;
 Track.id = _uid;
-Track.updateUid = uid => {
+Track.updateUid = (uid) => {
   _uid = uid;
   Track.id = uid;
 };

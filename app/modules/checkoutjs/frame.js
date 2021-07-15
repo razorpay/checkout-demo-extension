@@ -93,7 +93,10 @@ function sanitizeImage(options) {
 }
 
 function makeCheckoutUrl(rzp) {
-  const CANARY_PERCENTAGE = 0.25;
+  let CANARY_PERCENTAGE = isNaN(parseInt(__CANARY_PERCENTAGE__))
+    ? 0.25 // default value
+    : parseInt(__CANARY_PERCENTAGE__) / 100;
+
   var url = RazorpayConfig.frame;
 
   const useCanary = _.random() < CANARY_PERCENTAGE;
@@ -124,7 +127,7 @@ function setBackdropColor(value) {
   // setting unsupported value throws error in IE
   try {
     CheckoutFrame.backdrop.style.background = value;
-  } catch (e) { }
+  } catch (e) {}
 }
 
 function setTestRibbonVisible() {
@@ -155,7 +158,7 @@ function appendLoader($parent, parent) {
       }
       loader.setAttribute('style', style);
       loader |> _El.appendTo($parent);
-    } catch (e) { }
+    } catch (e) {}
   }
 }
 
@@ -290,9 +293,7 @@ CheckoutFrame.prototype = {
       }
 
       _Obj.loop(eventPairs, (listener, event) => {
-        this.listeners.push(
-          window |> _El.on(event, listener.bind(this))
-        );
+        this.listeners.push(window |> _El.on(event, listener.bind(this)));
       });
     }
   },
@@ -307,20 +308,20 @@ CheckoutFrame.prototype = {
       return;
     }
 
-    _Arr.loop(getMetas(), meta => _El.detach(meta));
+    _Arr.loop(getMetas(), (meta) => _El.detach(meta));
 
     this.$metas = [
       _El.create('meta')
-      |> _El.setAttributes({
-        name: 'viewport',
-        content:
-          'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no',
-      }),
+        |> _El.setAttributes({
+          name: 'viewport',
+          content:
+            'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no',
+        }),
       _El.create('meta')
-      |> _El.setAttributes({
-        name: 'theme-color',
-        content: this.rzp.get('theme.color'),
-      }),
+        |> _El.setAttributes({
+          name: 'theme-color',
+          content: this.rzp.get('theme.color'),
+        }),
     ];
 
     _Arr.loop(this.$metas, _El.appendTo(head));
@@ -504,7 +505,7 @@ CheckoutFrame.prototype = {
 
       this.rzp.emit('payment.error', data);
       this.rzp.emit('payment.failed', data);
-    } catch (e) { }
+    } catch (e) {}
   },
 
   onfailure: function (data) {

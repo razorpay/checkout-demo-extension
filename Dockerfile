@@ -3,6 +3,9 @@ FROM pronav/chrome:checkout as builder
 ARG BUILD_NUMBER
 ENV BUILD_NUMBER=${BUILD_NUMBER}
 
+ARG CANARY_PERCENTAGE
+ENV CANARY_PERCENTAGE=${CANARY_PERCENTAGE}
+
 ARG BRANCH
 ENV BRANCH=${BRANCH}
 
@@ -10,10 +13,18 @@ COPY . /checkout_build
 
 WORKDIR /checkout_build
 
-RUN cd /checkout_build \
-    && npm install \
-    && NODE_ENV=production npm test \
-    && DIST_DIR=/checkout_build/app/dist/v1 /scripts/compress
+SHELL ["/bin/bash", "-c"]
+RUN if [[ -n $CANARY_PERCENTAGE ]]; then \
+        cd /checkout_build \
+        && npm install \
+        && NODE_ENV=production npm run build \
+        && DIST_DIR=/checkout_build/app/dist/v1 /scripts/compress; \
+    else \
+        cd /checkout_build \
+        && npm install \
+        && NODE_ENV=production npm test \
+        && DIST_DIR=/checkout_build/app/dist/v1 /scripts/compress; \
+    fi
 
 FROM c.rzp.io/razorpay/onggi:aws-cli-v2818 as aws
 

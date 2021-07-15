@@ -20,7 +20,7 @@ const commonFeDir = './cfu/src';
 const resolveSrc = (importerFile, srcPath) =>
   resolve(dirname(importerFile), srcPath);
 
-const getSrcContent = file =>
+const getSrcContent = (file) =>
   new Promise((resolve, reject) => {
     readFile(file, (error, data) => {
       if (error) reject(error);
@@ -56,10 +56,7 @@ const getPlugins = ({
   if (!Array.isArray(src)) {
     src = [src];
   }
-  const paths = src.concat(
-    commonFeDir,
-    'node_modules'
-  );
+  const paths = src.concat(commonFeDir, 'node_modules');
 
   if (lint) {
     eslint.lint(isWatching)(paths);
@@ -72,9 +69,11 @@ const getPlugins = ({
     resolve({
       browser: true,
     }),
-
+    // __CANARY_PERCENTAGE__ : don't set null on default, pass as is
+    // isNaN(null) gives true, hence isNaN(parseInt()) is used
     replace({
       __BUILD_NUMBER__: process.env.BUILD_NUMBER || null,
+      __CANARY_PERCENTAGE__: process.env.CANARY_PERCENTAGE,
     }),
 
     include({
@@ -86,9 +85,9 @@ const getPlugins = ({
       extensions: ['.svelte'],
       preprocess: {
         style: ({ content }) => {
-          return stylus.stylusToCss(content)
+          return stylus.stylusToCss(content);
         },
-        script: async svelteFile => {
+        script: async (svelteFile) => {
           setTimeout(() => eslint.lint(false)([svelteFile.filename]));
 
           const { content, dependencies } = await parseFile(svelteFile);
@@ -100,7 +99,7 @@ const getPlugins = ({
         },
       },
       dev: !isProd,
-      css: css => {
+      css: (css) => {
         if (svelteCssPath) {
           css.write(`${svelteCssPath}/svelte.styl`);
         }
