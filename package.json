@@ -54,7 +54,8 @@
     "test:unit": "./rollup.test.js | tap-difflet",
     "test": "npm run test:all",
     "testC": "node ./cfu/scripts/lintOutput.js app/js/generated/entry",
-    "postinstall": "chmod -R +x ./git-hooks/ && git config core.hooksPath ./git-hooks"
+    "postinstall": "chmod -R +x ./git-hooks/ && git config core.hooksPath ./git-hooks",
+    "pretty-lint": "exec ./git-hooks/pre-commit"
   },
   "bugs": {
     "url": "https://github.com/razorpay/checkout/issues"
