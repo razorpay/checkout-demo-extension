@@ -1,5 +1,7 @@
 export default {
   "LOGGEDIN": 'loggedIn',
+  "DOWNTIME_ALERTSHOWN": "downtime.alertShown",
+  "DOWNTIME_CALLOUTSHOWN": "downtime.calloutShown",
   "TIME_SINCE_OPEN": "timeSince.open",
   "NAVIGATOR_LANGUAGE": "navigator.language",
   "NETWORK_TYPE": "network.type",

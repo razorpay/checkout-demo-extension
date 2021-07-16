@@ -4,6 +4,7 @@ import P13NEvents from './p13n/events';
 import HomeEvents from './home/events';
 import OrderEvents from './order/events';
 import MiscEvents from './misc/events';
+import DowntimeEvents from './downtime/events';
 import { getTrackMethods, addAnalyticsMethods } from './helpers';
 import MetaProperties from './metaProperties';
 import Analytics, { Track } from './analytics';
@@ -16,8 +17,9 @@ export default Analytics;
 export {
   Events,
   CardEvents,
-  OfferEvents,
+  DowntimeEvents,
   MiscEvents,
+  OfferEvents,
   MetaProperties,
   P13NEvents,
   HomeEvents,

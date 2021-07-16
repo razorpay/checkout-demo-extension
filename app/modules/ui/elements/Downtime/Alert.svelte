@@ -17,6 +17,8 @@
     DOWNTIME_HIGHLIGHT3
   } from 'ui/labels/downtime';
 
+  import { Events, DowntimeEvents, MetaProperties } from 'analytics';
+
   let instrument;
   const session = getSession();
   const icons = session.themeMeta.icons;
@@ -30,19 +32,60 @@
   };
   export const handleChange = function(param) {
     instrument = param;
-    Analytics.setMeta('downtime.alertShown', true);
-    Analytics.track('downtime:alert:show', {
-      type: AnalyticsTypes.RENDER,
-      data: {
-        instrument,
-        downtimeMethod: $selectedInstrument?.method
-      }
+    Events.setMeta(MetaProperties.DOWNTIME_ALERTSHOWN, true);
+    Events.TrackRender(DowntimeEvents.DOWNTIME_ALERTSHOW, {
+      instrument,
+      downtimeMethod: $selectedInstrument?.method
     });
     if($selectedInstrument?.method === 'netbanking') {
       instrument = getLongBankName(instrument, $locale)
     }
   };
 </script>
+
+<div id="downtime-wrap">
+  <div class="container">
+    <ul class="list">
+      <li class="line1">
+        <div class="icon-wrapper"><DowntimeIcon severe="high" /></div>
+        <div>{$t(DOWNTIME_HIGHLIGHT1)}</div>
+      </li>
+      <li class="line2">
+        <div class="icon-wrapper"><Icon icon={icons.warning} /></div>
+        <div>
+          {#if $selectedInstrument?.method === 'card'}
+            <FormattedText
+              text={formatTemplateWithLocale(
+                DOWNTIME_CARD_HIGHLIGHT2,
+                { instrument },
+                $locale
+              )}
+            />
+          {:else}
+            <FormattedText
+              text={formatTemplateWithLocale(
+                DOWNTIME_HIGHLIGHT2,
+                { instrument },
+                $locale
+              )}
+            />
+          {/if}
+        </div>
+      </li>
+      <li class="line3">
+        <div class="icon-wrapper"><Icon icon={icons.refund} /></div>
+        <div>
+          <FormattedText text={$t(DOWNTIME_HIGHLIGHT3)} />
+        </div>
+      </li>
+    </ul>
+    <div class="buttons">
+      <button class="back-button" on:click={handleBack}>Back</button>
+      <button class="continue-button" on:click={handleContinue}>Continue</button
+      >
+    </div>
+  </div>
+</div>
 
 <style>
   .line1 {
@@ -97,53 +140,19 @@
     margin-top: 2px;
   }
   #downtime-wrap {
-  border-radius: 0 0 3px 3px;
-  background: #fff;
-  bottom: -55px;
-  position: absolute;
-  width: 100%;
-  display: none;
-  -webkit-box-shadow: 0 -2px 8px rgba(0 0 0 0.16);
-  box-shadow: 0 -2px 8px rgba(0 0 0 0.16);
-  height: 250px;
-  -webkit-transition: 0.2s;
-  -o-transition: 0.2s;
-  transition: 0.2s;
-  padding-top: 20px;
-  z-index: 100;
-}
+    border-radius: 0 0 3px 3px;
+    background: #fff;
+    bottom: -55px;
+    position: absolute;
+    width: 100%;
+    display: none;
+    -webkit-box-shadow: 0 -2px 8px rgba(0 0 0 0.16);
+    box-shadow: 0 -2px 8px rgba(0 0 0 0.16);
+    height: 250px;
+    -webkit-transition: 0.2s;
+    -o-transition: 0.2s;
+    transition: 0.2s;
+    padding-top: 20px;
+    z-index: 100;
+  }
 </style>
-
-<div id="downtime-wrap">
-  <div class="container">
-    <ul class="list">
-      <li class="line1">
-        <div class="icon-wrapper"><DowntimeIcon severe="high" /></div>
-        <div>{$t(DOWNTIME_HIGHLIGHT1)}</div>
-      </li>
-      <li class="line2">
-        <div class="icon-wrapper"><Icon icon={icons.warning} /></div>
-        <div>
-          {#if $selectedInstrument?.method === 'card'}
-            <FormattedText
-              text={formatTemplateWithLocale(DOWNTIME_CARD_HIGHLIGHT2, { instrument }, $locale)} />
-          {:else}
-            <FormattedText
-              text={formatTemplateWithLocale(DOWNTIME_HIGHLIGHT2, { instrument }, $locale)} />
-          {/if}
-        </div>
-      </li>
-      <li class="line3">
-        <div class="icon-wrapper"><Icon icon={icons.refund} /></div>
-        <div>
-          <FormattedText text={$t(DOWNTIME_HIGHLIGHT3)} /></div>
-      </li>
-    </ul>
-    <div class="buttons">
-      <button class="back-button" on:click={handleBack}>Back</button>
-      <button
-        class="continue-button"
-        on:click={handleContinue}>Continue</button>
-    </div>
-  </div>
-</div>
