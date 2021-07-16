@@ -7,7 +7,7 @@ const { rollup } = require('rollup');
 const { execSync } = require('child_process');
 
 const { Collector, Reporter } = require('istanbul');
-const coverage = require('rollup-plugin-coverage');
+const coverage = require('rollup-plugin-istanbul');
 const puppeteer = require('puppeteer');
 const { stylus, rollupCommon, getPlugins } = require('./cfu/rollup-plugins');
 const rollupPlugins = getPlugins({
@@ -17,12 +17,12 @@ const rollupPlugins = getPlugins({
 }).concat(stylus);
 
 const coveragePlugin = coverage({
-  preserveComments: true,
-  noCompact: true,
-  noAutoWrap: true,
   include: 'app/modules/**/*.js',
   instrumenterConfig: {
     embedSource: true,
+    preserveComments: true,
+    noCompact: true,
+    noAutoWrap: true,
   },
 });
 
