@@ -91,12 +91,12 @@ function sanitizeImage(options) {
     }
   }
 }
-/* global __CANARY_PERCENTAGE__ */
+
 // this will be replaced with env value by rollup
 function makeCheckoutUrl(rzp) {
-  let CANARY_PERCENTAGE = isNaN(parseInt(__CANARY_PERCENTAGE__))
+  const CANARY_PERCENTAGE = isNaN(parseInt(__CANARY_PERCENTAGE__)) // eslint-disable-line no-undef
     ? 0.25 // default value
-    : parseInt(__CANARY_PERCENTAGE__) / 100;
+    : parseInt(__CANARY_PERCENTAGE__) / 100; // eslint-disable-line no-undef
 
   var url = RazorpayConfig.frame;
 
