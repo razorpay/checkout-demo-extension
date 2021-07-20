@@ -4449,16 +4449,21 @@ Session.prototype = {
         }, 200);
       })
       .catch(function (vpaValidationError) {
-        var defaultErrorMessage = I18n.format(
-          'upi.invalid_vpa_default_message'
-        );
-        var vpaValidationDescription = _Obj.getSafely(
+        var errorDescription = _Obj.getSafely(
           vpaValidationError,
-          'error.description',
-          defaultErrorMessage
-        );
+          'error.description'
+        ); 
+        
+        var errorMessage = errorDescription 
+          ? I18n.translateErrorDescription (
+              errorDescription,
+              I18n.getCurrentLocale()
+            ) 
+          : I18n.format(
+              'upi.invalid_vpa_default_message'
+            )
 
-        self.showLoadError(vpaValidationDescription, true);
+        self.showLoadError(errorMessage, true);
       });
   },
 
