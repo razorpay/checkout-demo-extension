@@ -1210,6 +1210,18 @@ Session.prototype = {
       Analytics.setMeta('safari', true);
     }
 
+    Analytics.setMeta('is_mobile', discreet.UserAgent.isMobile());
+
+    if (window && window.screen) {
+      Analytics.setMeta('device.screen', {
+        availHeight: window.screen.availHeight,
+        availWidth: window.screen.availWidth,
+        height: window.screen.height,
+        width: window.screen.width,
+        pixelDepth: window.screen.pixelDepth,
+      });
+    }
+
     Analytics.setMeta('is_donation_checkout', this.get('is_donation_checkout'));
 
     Analytics.track('complete', {
