@@ -41,6 +41,7 @@
     isRecurring,
     shouldRememberCustomer,
     isDCCEnabled,
+    isShowMORTncEnabled,
     getCardFeatures,
     isInternational,
     getDowntimes,
@@ -780,6 +781,14 @@
             {$t(ADD_ANOTHER_CARD_BTN)}
           </div>
         </div>
+      {/if}
+      {#if isShowMORTncEnabled()}
+        <p class="pad">
+          By completing your order, you will checkout with Razorpay Inc. as the
+          merchant of record and agree with the <a href="#"
+            >terms and conditions</a
+          >.
+        </p>
       {/if}
     </div>
     <Bottom tab="card">
