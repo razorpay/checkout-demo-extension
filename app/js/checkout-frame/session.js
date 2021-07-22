@@ -3869,7 +3869,11 @@ Session.prototype = {
     var session = this;
 
     if (session.get('modal.confirm_close')) {
-      session.confirmClose();
+      session.confirmClose().then(function (close) {
+        if (close) {
+          session.hide();
+        }
+      });
     } else {
       session.hide();
     }
