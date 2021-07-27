@@ -18,7 +18,11 @@ import {
   getAppProviders,
 } from 'checkoutstore/methods';
 
-import { shouldSeparateDebitCard, getMerchantMethods } from 'checkoutstore';
+import {
+  shouldSeparateDebitCard,
+  getMerchantMethods,
+  isRecurring,
+} from 'checkoutstore';
 import wallet from 'ui/icons/payment-methods/wallet';
 import { API_NETWORK_CODES_MAP, networks as CardNetworks } from 'common/card';
 
@@ -29,6 +33,13 @@ import { API_NETWORK_CODES_MAP, networks as CardNetworks } from 'common/card';
  */
 function getAvailableDefaultMethods() {
   let available = AVAILABLE_METHODS;
+
+  // Only international cards are allowed in recurring as of now,
+  // so give it low priority and show it in the end of list
+  if (isRecurring() && available.includes('card')) {
+    available = available.filter((method) => method !== 'card');
+    available = [...available, 'card'];
+  }
 
   // Separate out debit and credit cards
   if (shouldSeparateDebitCard()) {
@@ -79,7 +90,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
           }
         });
 
-        instrument.networks = _Arr.filter(instrument.networks, network =>
+        instrument.networks = _Arr.filter(instrument.networks, (network) =>
           _Arr.contains(availableNetworks, network)
         );
       }
@@ -113,7 +124,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
         const enabledBanks = getNetbankingBanks();
         const shownBanks = _Arr.filter(
           instrument.banks,
-          bank => enabledBanks[bank]
+          (bank) => enabledBanks[bank]
         );
 
         instrument.banks = shownBanks;
@@ -127,10 +138,10 @@ function removeNonApplicableInstrumentFlows(instrument) {
 
       if (hasWallets) {
         const enabledWallets = getWallets();
-        const shownWallets = _Arr.filter(instrument.wallets, wallet =>
+        const shownWallets = _Arr.filter(instrument.wallets, (wallet) =>
           _Arr.any(
             enabledWallets,
-            enabledWallet => enabledWallet.code === wallet
+            (enabledWallet) => enabledWallet.code === wallet
           )
         );
 
@@ -147,7 +158,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
         const enabledProviders = getCardlessEMIProviders();
         const shownProviders = _Arr.filter(
           instrument.providers,
-          provider => enabledProviders[provider]
+          (provider) => enabledProviders[provider]
         );
         instrument.providers = shownProviders;
       }
@@ -160,10 +171,10 @@ function removeNonApplicableInstrumentFlows(instrument) {
 
       if (hasProviders) {
         const enabledProviders = getPayLaterProviders();
-        const shownProviders = _Arr.filter(instrument.providers, provider =>
+        const shownProviders = _Arr.filter(instrument.providers, (provider) =>
           _Arr.any(
             enabledProviders,
-            enabledProvider => enabledProvider.code === provider
+            (enabledProvider) => enabledProvider.code === provider
           )
         );
         instrument.providers = shownProviders;
@@ -177,10 +188,10 @@ function removeNonApplicableInstrumentFlows(instrument) {
 
       if (hasProviders) {
         const enabledProviders = getAppProviders();
-        const shownProviders = _Arr.filter(instrument.providers, provider =>
+        const shownProviders = _Arr.filter(instrument.providers, (provider) =>
           _Arr.any(
             enabledProviders,
-            enabledProvider => enabledProvider.code === provider
+            (enabledProvider) => enabledProvider.code === provider
           )
         );
         instrument.providers = shownProviders;
@@ -207,10 +218,10 @@ function removeNonApplicableInstrumentFlows(instrument) {
           const allUpiAppsOnDevice = getUPIIntentApps().all;
 
           // Keep only those apps which are present on the device
-          instrument.apps = _Arr.filter(instrument.apps, app =>
+          instrument.apps = _Arr.filter(instrument.apps, (app) =>
             _Arr.find(
               allUpiAppsOnDevice,
-              deviceApp => deviceApp.package_name === app
+              (deviceApp) => deviceApp.package_name === app
             )
           );
         }
@@ -276,7 +287,7 @@ export function getBlockConfig(options, customer) {
   const hasTranslatedBlocks = translated.display.blocks.length > 0;
   const hasConfiguredBlocks =
     hasTranslatedBlocks &&
-    _Arr.any(translated.display.blocks.length, block =>
+    _Arr.any(translated.display.blocks.length, (block) =>
       _Arr.contains(translated.display.sequence, block.code)
     );
 
@@ -295,19 +306,19 @@ export function getBlockConfig(options, customer) {
   translated.display.blocks =
     translated.display.blocks
     |> _Arr.map(removeDisabledInstrumentsFromBlock)
-    |> _Arr.map(block => ungroupInstruments(block, customer));
+    |> _Arr.map((block) => ungroupInstruments(block, customer));
 
   // Remove empty blocks
   translated.display.blocks = _Arr.filter(
     translated.display.blocks,
-    block => block.instruments.length > 0
+    (block) => block.instruments.length > 0
   );
 
   // Ungroup hidden instrument as well
   translated.display.hide.instruments =
     translated.display.hide.instruments
     |> _Arr.flatMap(
-      group => getIndividualInstruments(group, customer)._ungrouped
+      (group) => getIndividualInstruments(group, customer)._ungrouped
     );
 
   // Reorder blocks
