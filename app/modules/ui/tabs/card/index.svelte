@@ -31,6 +31,7 @@
     authType,
     currentCvv,
     currentAuthType,
+    dccCurrency
   } from 'checkoutstore/screens/card';
 
   import { methodInstrument, blocks, phone } from 'checkoutstore/screens/home';
@@ -787,11 +788,11 @@
           </div>
         </div>
       {/if}
-      {#if isShowMORTncEnabled()}
+      {#if isShowMORTncEnabled() && $dccCurrency === 'USD'}
         <p class="pad">
           {$t(MERCHANT_OF_RECORD)}
           <a href="/tnc-link-need-to-be-updated" target="_blank" rel="noopener">
-            {$t(DCC_TERMS_AND_CONDITIONS)}
+            {$t(DCC_TERMS_AND_CONDITIONS)}.
           </a>
         </p>
       {/if}
