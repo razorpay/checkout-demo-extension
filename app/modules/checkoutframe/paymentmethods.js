@@ -28,9 +28,6 @@ import {
   formatMessageWithLocale,
 } from 'i18n';
 
-import { LOCALE_CODES } from 'constants/i18n';
-import { isUpiSubtextExperimentEnabled } from 'experiments/all/upiSubtext';
-
 import {
   DESCRIPTION_RECURRING_CARDS,
   DESCRIPTION_CARDLESS_EMI,
@@ -47,7 +44,7 @@ function getRecurringCardDescription(locale) {
   );
 }
 
-const CARD_DESCRIPTION = locale => {
+const CARD_DESCRIPTION = (locale) => {
   if (isRecurring()) {
     return getRecurringCardDescription(locale);
   }
@@ -62,8 +59,8 @@ const CARD_DESCRIPTION = locale => {
     // Get the app names to show
     const apps =
       APPS_ORDER
-      |> _Arr.filter(app => _Arr.contains(availableApps, app))
-      |> _Arr.map(app => getRawMethodTitle(app, locale));
+      |> _Arr.filter((app) => _Arr.contains(availableApps, app))
+      |> _Arr.map((app) => getRawMethodTitle(app, locale));
 
     const credit = isCreditCardEnabled();
     const debit = isDebitCardEnabled();
@@ -99,8 +96,8 @@ const CARD_DESCRIPTION = locale => {
     // Get the network names to show
     const networks =
       NW_ORDER
-      |> _Arr.filter(network => Boolean(networksFromPrefs[network]))
-      |> _Arr.map(network => getNetworkName(network, locale));
+      |> _Arr.filter((network) => Boolean(networksFromPrefs[network]))
+      |> _Arr.map((network) => getNetworkName(network, locale));
 
     return generateTextFromList(networks, locale, 4);
   }
@@ -111,7 +108,7 @@ const CARD_DESCRIPTION = locale => {
  */
 const DESCRIPTIONS = {
   card: CARD_DESCRIPTION,
-  cardless_emi: locale => {
+  cardless_emi: (locale) => {
     /**
      * EMI + Cardless EMI: Cards, ZestMoney, & More
      * Cardless EMI: EMI via ZestMoney & More
@@ -119,7 +116,7 @@ const DESCRIPTIONS = {
 
     const cardEmi = isMethodUsable('emi');
     let providerNames = [];
-    _Obj.loop(getCardlessEMIProviders(), providerObj => {
+    _Obj.loop(getCardlessEMIProviders(), (providerObj) => {
       let providerCode = providerObj.code;
       if (providerCode === 'cards' && isDebitEMIEnabled()) {
         providerCode = 'credit_debit_cards';
@@ -157,11 +154,11 @@ const DESCRIPTIONS = {
   },
   credit_card: CARD_DESCRIPTION,
   debit_card: CARD_DESCRIPTION,
-  emandate: locale => getRawMethodDescription('emandate', locale),
-  emi: locale => getRawMethodDescription('emi', locale),
-  netbanking: locale => getRawMethodDescription('netbanking', locale),
-  paylater: locale => {
-    const providers = getPayLaterProviders().map(p =>
+  emandate: (locale) => getRawMethodDescription('emandate', locale),
+  emi: (locale) => getRawMethodDescription('emi', locale),
+  netbanking: (locale) => getRawMethodDescription('netbanking', locale),
+  paylater: (locale) => {
+    const providers = getPayLaterProviders().map((p) =>
       getPaylaterProviderName(p.code, locale)
     );
     const text = generateTextFromList(providers, locale, 2);
@@ -171,27 +168,23 @@ const DESCRIPTIONS = {
       locale
     );
   },
-  paypal: locale => getRawMethodDescription('paypal', locale),
-  qr: locale => getRawMethodDescription('qr', locale),
-  gpay: locale => getRawMethodDescription('gpay', locale),
-  upi: locale => {
+  paypal: (locale) => getRawMethodDescription('paypal', locale),
+  qr: (locale) => getRawMethodDescription('qr', locale),
+  gpay: (locale) => getRawMethodDescription('gpay', locale),
+  upi: (locale) => {
     if (isRecurring()) {
       return getRawMethodDescription('upi_recurring', locale);
     }
 
-    if (locale === LOCALE_CODES.ENGLISH && isUpiSubtextExperimentEnabled()) {
-      return 'Google Pay, PhonePe & more';
-    }
-
     return getRawMethodDescription('upi', locale);
   },
-  wallet: locale =>
+  wallet: (locale) =>
     generateTextFromList(
-      getWallets().map(w => getWalletName(w.code, locale)),
+      getWallets().map((w) => getWalletName(w.code, locale)),
       locale,
       2
     ),
-  upi_otm: locale => getRawMethodDescription('upi_otm', locale),
+  upi_otm: (locale) => getRawMethodDescription('upi_otm', locale),
 };
 
 /**
@@ -221,7 +214,7 @@ export function getMethodDescription(method, locale) {
 export function getEMIBanksText(locale) {
   const emiBanks = getEMIBanks();
   const bankNames =
-    emiBanks |> _Obj.keys |> _Arr.map(bank => emiBanks[bank].name);
+    emiBanks |> _Obj.keys |> _Arr.map((bank) => emiBanks[bank].name);
   return generateTextFromList(bankNames, locale, 12);
 }
 
@@ -355,7 +348,7 @@ export function getMethodDowntimeDescription(
   // Check if there's another method available that is not down.
   const isAnotherMethodAvailable = _Arr.any(
     availableMethods,
-    enabledMethod => !_Arr.contains(downMethods, enabledMethod)
+    (enabledMethod) => !_Arr.contains(downMethods, enabledMethod)
   );
 
   // If there's another method available, ask user to select it.

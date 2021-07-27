@@ -730,7 +730,7 @@ export default {
       paypal: 'Only PayPal accounts issued outside India accepted',
       qr: 'Pay by scanning QR Code',
       recurring_cards: '{networks} credit cards',
-      upi: 'Instant payment using UPI App',
+      upi: 'Google Pay, PhonePe & more',
       upi_otm: 'Pay later using BHIM',
       upi_recurring: 'Pay using BHIM or PayTM App',
     },
