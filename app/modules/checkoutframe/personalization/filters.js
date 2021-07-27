@@ -1,6 +1,6 @@
 import { VPA_REGEX } from 'common/constants';
 import { doesAppExist } from 'common/upi';
-import { getAmount, shouldRememberCustomer } from 'checkoutstore';
+import { getAmount, shouldRememberCustomer, isRecurring } from 'checkoutstore';
 import {
   isCreditCardEnabled,
   isDebitCardEnabled,
@@ -23,6 +23,12 @@ import { isHighlightUpiIntentInstrumentExperimentEnabled } from 'experiments/all
  */
 const METHOD_FILTERS = {
   card: (instrument, { customer }) => {
+    // Only international cards are supported as of now for recurring
+    // but in p13n any card can come, so this should be filtered out
+    if (isRecurring()) {
+      return false;
+    }
+
     const logged = _Obj.getSafely(customer, 'logged');
 
     const allowedTypes = {
@@ -50,10 +56,10 @@ const METHOD_FILTERS = {
     const tokens = _Obj.getSafely(customer, 'tokens.items', []);
 
     // Allow this instrument only if a token for this exists on the customer
-    return _Arr.any(tokens, token => instrument.token_id === token.id);
+    return _Arr.any(tokens, (token) => instrument.token_id === token.id);
   },
 
-  wallet: instrument => {
+  wallet: (instrument) => {
     const wallets = getWallets();
 
     if (!wallets) {
@@ -62,13 +68,13 @@ const METHOD_FILTERS = {
 
     const enabledWallet = _Arr.any(
       wallets,
-      wallet => wallet.code === instrument.wallet
+      (wallet) => wallet.code === instrument.wallet
     );
 
     return enabledWallet;
   },
 
-  netbanking: instrument => {
+  netbanking: (instrument) => {
     const { bank } = instrument;
 
     if (!isMethodEnabled('netbanking')) {
@@ -79,14 +85,24 @@ const METHOD_FILTERS = {
   },
 
   upi: (instrument, { customer }) => {
+    // We allow upi id linked to only few banks for recurring.
+    // In p13n intent and qr user can attempt payment with
+    // non supported apps, so this should be filtered out.
+    if (
+      isRecurring() &&
+      (instrument['_[upiqr]'] || instrument['_[flow]'] === 'intent')
+    ) {
+      return false;
+    }
+
     // Only allow directpay instruments that have a VPA
     if (instrument['_[flow]'] === 'directpay') {
       if (instrument.vpa) {
         // We want to show only saved VPAs
         const tokens = _Obj.getSafely(customer, 'tokens.items', []);
         const tokenVpas = tokens
-          .filter(token => token.vpa)
-          .map(token => `${token.vpa.username}@${token.vpa.handle}`);
+          .filter((token) => token.vpa)
+          .map((token) => `${token.vpa.username}@${token.vpa.handle}`);
 
         return tokenVpas.indexOf(instrument.vpa) >= 0;
       } else {
@@ -106,6 +122,7 @@ const METHOD_FILTERS = {
 
     return false;
   },
+
   app(instrument) {
     return isApplicationEnabled(instrument.provider);
   },
@@ -125,7 +142,7 @@ export const filterInstrumentsForAvailableMethods = _.curry2(
   (instruments, { customer }) => {
     // TODO: Move Downtime logic to this function
 
-    const allowed = _Arr.filter(instruments, instrument => {
+    const allowed = _Arr.filter(instruments, (instrument) => {
       let { method } = instrument;
 
       if (instrument['_[upiqr]']) {
@@ -148,7 +165,7 @@ export const filterInstrumentsForAvailableMethods = _.curry2(
 );
 
 const SANITY_FILTERS = {
-  upi: instrument => {
+  upi: (instrument) => {
     if (
       instrument['_[flow]'] === 'directpay' &&
       instrument.vpa &&
@@ -159,7 +176,7 @@ const SANITY_FILTERS = {
 
     return true;
   },
-  cardless_emi: instrument => {
+  cardless_emi: (instrument) => {
     // check for min_amount for cardless_emi
     const provider = getCardlessEMIProvider(instrument.provider);
     const minAmount = provider.min_amount || 0;
@@ -175,7 +192,7 @@ const SANITY_FILTERS = {
  * @returns {Array} filtered instruments
  */
 export function filterInstrumentsForSanity(instruments) {
-  return _Arr.filter(instruments, instrument => {
+  return _Arr.filter(instruments, (instrument) => {
     if (SANITY_FILTERS[instrument.method]) {
       return SANITY_FILTERS[instrument.method](instrument);
     }
@@ -202,7 +219,7 @@ export function filterFalsyInstruments(instruments) {
  * @returns {Array}
  */
 const filterInstrumentsByAvailableUpiApps = _.curry2((instruments, apps) => {
-  return _Arr.filter(instruments, instrument => {
+  return _Arr.filter(instruments, (instrument) => {
     if (instrument.method !== 'upi') {
       return true;
     }
