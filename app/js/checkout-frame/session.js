@@ -4452,16 +4452,14 @@ Session.prototype = {
         var errorDescription = _Obj.getSafely(
           vpaValidationError,
           'error.description'
-        ); 
-        
-        var errorMessage = errorDescription 
-          ? I18n.translateErrorDescription (
+        );
+
+        var errorMessage = errorDescription
+          ? I18n.translateErrorDescription(
               errorDescription,
               I18n.getCurrentLocale()
-            ) 
-          : I18n.format(
-              'upi.invalid_vpa_default_message'
             )
+          : I18n.format('upi.invalid_vpa_default_message');
 
         self.showLoadError(errorMessage, true);
       });

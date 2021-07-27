@@ -91,7 +91,6 @@
     "jest-circus": "^27.0.4",
     "jshint": "^2.13.0",
     "jshint-stylish": "^2.2.1",
-    "lint-staged": "^11.0.1",
     "nodemon": "^2.0.12",
     "prettier": "^2.3.2",
     "prettier-plugin-svelte": "^2.3.1",
