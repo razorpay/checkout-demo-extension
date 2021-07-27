@@ -73,6 +73,11 @@
     SUBSCRIPTION_REFUND_CALLOUT,
   } from 'ui/labels/card';
 
+  import {
+    MERCHANT_OF_RECORD,
+    DCC_TERMS_AND_CONDITIONS,
+  } from 'ui/labels/dcc';
+
   // Utils imports
   import { getSession } from 'sessionmanager';
   import { getSavedCards, transform } from 'common/token';
@@ -784,10 +789,10 @@
       {/if}
       {#if isShowMORTncEnabled()}
         <p class="pad">
-          By completing your order, you will checkout with Razorpay Inc. as the
-          merchant of record and agree with the <a href="#"
-            >terms and conditions</a
-          >.
+          {$t(MERCHANT_OF_RECORD)}
+          <a href="/tnc-link-need-to-be-updated" target="_blank" rel="noopener">
+            {$t(DCC_TERMS_AND_CONDITIONS)}
+          </a>
         </p>
       {/if}
     </div>
