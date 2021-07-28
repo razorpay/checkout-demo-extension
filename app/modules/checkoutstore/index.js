@@ -134,6 +134,10 @@ export function isDCCEnabled() {
   return hasFeature('dcc', false);
 }
 
+export function isShowMORTncEnabled() {
+  return hasFeature('show_mor_tnc', false);
+}
+
 export function isContactOptional() {
   return preferences.optional || [] |> _Arr.contains('contact');
 }

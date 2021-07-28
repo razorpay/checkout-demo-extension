@@ -31,6 +31,7 @@
     authType,
     currentCvv,
     currentAuthType,
+    defaultDCCCurrency
   } from 'checkoutstore/screens/card';
 
   import { methodInstrument, blocks, phone } from 'checkoutstore/screens/home';
@@ -41,6 +42,7 @@
     isRecurring,
     shouldRememberCustomer,
     isDCCEnabled,
+    isShowMORTncEnabled,
     getCardFeatures,
     isInternational,
     getDowntimes,
@@ -71,6 +73,11 @@
     SUBSCRIPTION_CALLOUT,
     SUBSCRIPTION_REFUND_CALLOUT,
   } from 'ui/labels/card';
+
+  import {
+    MERCHANT_OF_RECORD,
+    DCC_TERMS_AND_CONDITIONS,
+  } from 'ui/labels/dcc';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -781,6 +788,14 @@
           </div>
         </div>
       {/if}
+      {#if isShowMORTncEnabled() && $defaultDCCCurrency === 'USD'}
+        <p class="pad">
+          {$t(MERCHANT_OF_RECORD)}
+          <a class="theme-highlight" href="https://razorpay.com/mor_terms/" target="_blank" rel="noopener">
+            {$t(DCC_TERMS_AND_CONDITIONS)}.
+          </a>
+        </p>
+      {/if}
     </div>
     <Bottom tab="card">
       {#if isDCCEnabled()}
@@ -825,6 +840,10 @@
     left: 24px;
     top: 10px;
     border: 1px solid red;
+  }
+
+  .tnc-link {
+    text-decoration: underline;
   }
 
   .instrument-subtext-description {
