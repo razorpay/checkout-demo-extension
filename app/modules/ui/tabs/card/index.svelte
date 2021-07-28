@@ -791,7 +791,7 @@
       {#if isShowMORTncEnabled() && $defaultDCCCurrency === 'USD'}
         <p class="pad">
           {$t(MERCHANT_OF_RECORD)}
-          <a class="theme-highlight" href="/tnc-link-need-to-be-updated" target="_blank" rel="noopener">
+          <a class="theme-highlight" href="https://razorpay.com/mor_terms/" target="_blank" rel="noopener">
             {$t(DCC_TERMS_AND_CONDITIONS)}.
           </a>
         </p>
