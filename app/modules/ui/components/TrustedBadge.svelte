@@ -30,7 +30,7 @@
     active_since: securedTime,
     latest_dispute_at: noFraudTime,
   } = nos || {};
-  noFraudTime = noFraudTime || securedTime
+  noFraudTime = noFraudTime || securedTime;
   securedTime = getMonthDiff(securedTime);
   noFraudTime = getMonthDiff(noFraudTime);
 
@@ -77,8 +77,8 @@
     Analytics.track('RTB:click', {
       type: AnalyticsTypes.BEHAV,
       data: {
-        highlightsVisible: isInfoVisible
-      }
+        highlightsVisible: isInfoVisible,
+      },
     });
   }
 </script>

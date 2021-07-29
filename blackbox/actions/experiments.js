@@ -1,5 +1,6 @@
 const defaultExperiments = {
   home_2019: 0,
+  cards_separation: 0,
 };
 
 /**
@@ -13,11 +14,23 @@ async function setExperiments(page, experiments = {}) {
     ...experiments,
   };
 
-  await page.evaluate(experiments => {
+  await page.evaluate((experiments) => {
     localStorage.setItem('rzp_checkout_exp', JSON.stringify(experiments));
   }, finalExperiments);
+}
+/**
+ * Get experiments from localStorage
+ * @param {Page} page
+ * @returns {Object} experiments Overridden experiments
+ */
+async function getExperiments(context) {
+  const experiments = await page.evaluate(() => {
+    localStorage.getItem('rzp_checkout_exp');
+  });
+  return experiments ? JSON.parse(experiments) : {};
 }
 
 module.exports = {
   setExperiments,
+  getExperiments,
 };

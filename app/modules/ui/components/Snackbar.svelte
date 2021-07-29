@@ -12,7 +12,7 @@
 
   export function removeSnackBar() {
     shown = false;
-    clearTimeout(timeout)
+    clearTimeout(timeout);
   }
 
   $: {

@@ -12,7 +12,6 @@ async function openSdkCheckout({
 }) {
   let paymentResult = null;
   let resolver = null;
-
   try {
     await page.exposeFunction('__CheckoutBridge_oncomplete', async data => {
       data = JSON.parse(data);
@@ -38,7 +37,6 @@ async function openSdkCheckout({
       }
     });
   } catch (err) {}
-
   await page.exposeFunction('__CheckoutBridge_processPayment', async data => {
     data = JSON.parse(data);
     if (data.type === 'application') {

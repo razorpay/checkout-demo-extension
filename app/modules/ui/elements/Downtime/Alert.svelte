@@ -14,7 +14,7 @@
     DOWNTIME_HIGHLIGHT1,
     DOWNTIME_CARD_HIGHLIGHT2,
     DOWNTIME_HIGHLIGHT2,
-    DOWNTIME_HIGHLIGHT3
+    DOWNTIME_HIGHLIGHT3,
   } from 'ui/labels/downtime';
 
   import { Events, DowntimeEvents, MetaProperties } from 'analytics';
@@ -30,15 +30,15 @@
   const handleBack = () => {
     session.hideOverlayMessage();
   };
-  export const handleChange = function(param) {
+  export const handleChange = function (param) {
     instrument = param;
     Events.setMeta(MetaProperties.DOWNTIME_ALERTSHOWN, true);
     Events.TrackRender(DowntimeEvents.DOWNTIME_ALERTSHOW, {
       instrument,
-      downtimeMethod: $selectedInstrument?.method
+      downtimeMethod: $selectedInstrument?.method,
     });
-    if($selectedInstrument?.method === 'netbanking') {
-      instrument = getLongBankName(instrument, $locale)
+    if ($selectedInstrument?.method === 'netbanking') {
+      instrument = getLongBankName(instrument, $locale);
     }
   };
 </script>

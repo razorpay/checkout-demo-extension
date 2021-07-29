@@ -31,7 +31,7 @@ const distDir = 'app/dist/test';
 
 execSync('mkdir -p ' + distDir);
 
-const template = bundleName => `<meta charset='utf-8'>
+const template = (bundleName) => `<meta charset='utf-8'>
 <script src="../../../node_modules/testdouble/dist/testdouble.js"></script>
 <script src="../../../test/tape.js"></script>
 <script src="${bundleName}.js"></script>
@@ -41,16 +41,16 @@ let plugins = rollupPlugins.concat(coveragePlugin);
 
 Promise.all(
   glob('test/*/*.js').map(
-    input =>
+    (input) =>
       new Promise((resolve, reject) => {
         rollup({ input, plugins, ...rollupCommon })
-          .then(bundle =>
+          .then((bundle) =>
             bundle.generate({
               format: 'iife',
               name: 'test',
             })
           )
-          .then(async resp => {
+          .then(async (resp) => {
             const { code } = resp.output[0];
 
             /**
@@ -75,10 +75,10 @@ Promise.all(
               // devtools: true,
             });
             const page = await browser.newPage();
-            page.on('console', msg => {
+            page.on('console', (msg) => {
               console.log(msg.text());
             });
-            await page.exposeFunction('testDone', async _ => {
+            await page.exposeFunction('testDone', async (_) => {
               let cov = await page.evaluate(
                 'window.__coverage__ && JSON.stringify(window.__coverage__)'
               );
@@ -90,16 +90,16 @@ Promise.all(
       })
   )
 )
-  .then(coverages => {
+  .then((coverages) => {
     execSync('rm -rf coverage');
     if (coverages) {
       let collector = new Collector();
       let reporter = new Reporter(false, 'coverage/final');
-      coverages.forEach(c => c && collector.add(c));
+      coverages.forEach((c) => c && collector.add(c));
 
       // add `text` or `text-summary` reporter to report in console
       reporter.add('html');
-      reporter.write(collector, true, _ => _);
+      reporter.write(collector, true, (_) => _);
     }
   })
-  .catch(e => console.error(e));
+  .catch((e) => console.error(e));

@@ -6,6 +6,7 @@ import {
   hiddenMethods,
   hiddenInstruments,
 } from 'checkoutstore/screens/home';
+import { updateBlocksForExperiments } from './helpers';
 import { get as storeGetter } from 'svelte/store';
 import { MAX_PREFERRED_INSTRUMENTS } from 'common/constants';
 import { getBlockConfig } from 'configurability';
@@ -42,15 +43,17 @@ function isP13nInstrumentHiddenViaConfig(
   hiddenInstruments,
   customer
 ) {
-  const individualInstruments = getIndividualInstruments(instrument, customer)
-    ._ungrouped;
+  const individualInstruments = getIndividualInstruments(
+    instrument,
+    customer
+  )._ungrouped;
 
   // For every individual p13n instrument, check if any hidden
   // instruments are present.
   return !_Arr.every(
     individualInstruments,
-    individualInstrument =>
-      !_Arr.any(hiddenInstruments, hiddenInstrument =>
+    (individualInstrument) =>
+      !_Arr.any(hiddenInstruments, (hiddenInstrument) =>
         areInstrumentsSame(hiddenInstrument, individualInstrument)
       )
   );
@@ -92,7 +95,7 @@ function genericInstrumentComparator(a, b) {
  * @returns {boolean}
  */
 function shouldAllowPreferredInstrument(preferred, instruments) {
-  return _Arr.every(instruments, instrument => {
+  return _Arr.every(instruments, (instrument) => {
     if (preferred.method !== instrument.method) {
       return true;
     }
@@ -117,7 +120,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
         if (hasBanks) {
           return _Arr.none(
             instrument._ungrouped,
-            ungrouped => ungrouped.bank === preferred.banks[0]
+            (ungrouped) => ungrouped.bank === preferred.banks[0]
           );
         }
 
@@ -131,7 +134,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
         if (hasWallets) {
           return _Arr.none(
             instrument._ungrouped,
-            ungrouped => ungrouped.wallet === preferred.wallets[0]
+            (ungrouped) => ungrouped.wallet === preferred.wallets[0]
           );
         }
 
@@ -160,7 +163,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
         if (preferredHasApps && instrumentHasApps) {
           return _Arr.none(
             instrument._ungrouped,
-            ungrouped => ungrouped.app === preferred.apps[0]
+            (ungrouped) => ungrouped.app === preferred.apps[0]
           );
         }
 
@@ -170,7 +173,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
 
           return _Arr.none(
             instrument._ungrouped,
-            ungrouped =>
+            (ungrouped) =>
               _Arr.contains(individualFlows, ungrouped.flow) &&
               ungrouped.flow === preferred.flows[0]
           );
@@ -187,7 +190,7 @@ function shouldAllowPreferredInstrument(preferred, instruments) {
         if (hasProviders) {
           return _Arr.none(
             instrument._ungrouped,
-            ungrouped => ungrouped.provider === preferred.providers[0]
+            (ungrouped) => ungrouped.provider === preferred.providers[0]
           );
         }
 
@@ -229,14 +232,14 @@ export function setBlocks(
   // Remove rzp block instruments and method instruments
   const shownIndividualInstruments =
     parsedConfig.display.blocks
-    |> _Arr.filter(block => block.code !== 'rzp.cluster')
-    |> _Arr.flatMap(block => {
+    |> _Arr.filter((block) => block.code !== 'rzp.cluster')
+    |> _Arr.flatMap((block) => {
       return _Arr.filter(
         block.instruments,
-        instrument => instrument._ungrouped.length === 1
+        (instrument) => instrument._ungrouped.length === 1
       );
     })
-    |> _Arr.filter(instrument => !isInstrumentForEntireMethod(instrument));
+    |> _Arr.filter((instrument) => !isInstrumentForEntireMethod(instrument));
 
   // show_default_blocks defaults to true
   const show_default_blocks = _Obj.getSafely(
@@ -251,6 +254,9 @@ export function setBlocks(
 
   let allBlocks = parsedConfig.display.blocks;
 
+  // CREDIT/DEBIT experiment is enabled then set the blocks here
+  updateBlocksForExperiments(allBlocks);
+
   if (addPreferredInstrumentsBlock) {
     if (showPreferredLoader) {
       preferredBlock.instruments = makeLoaderInstruments(
@@ -262,7 +268,7 @@ export function setBlocks(
       // Filter out all preferred methods whose methods are asked to be hidden
       let filteredPreferredInstruments = _Arr.filter(
         preferredInstruments,
-        preferredInstrument => {
+        (preferredInstrument) => {
           return isMethodUsable(preferredInstrument.method);
         }
       );
@@ -270,7 +276,7 @@ export function setBlocks(
       // Filter out all preferred instruments which are hidden using hide in config
       filteredPreferredInstruments = _Arr.filter(
         filteredPreferredInstruments,
-        instrument =>
+        (instrument) =>
           !isP13nInstrumentHiddenViaConfig(
             instrument,
             parsedConfig.display.hide.instruments,
@@ -281,7 +287,7 @@ export function setBlocks(
       // Filter out all preferred methods that are already being shown by the merchant
       filteredPreferredInstruments = _Arr.filter(
         filteredPreferredInstruments,
-        instrument =>
+        (instrument) =>
           shouldAllowPreferredInstrument(instrument, shownIndividualInstruments)
       );
 
@@ -294,7 +300,7 @@ export function setBlocks(
       // Convert preferred instruments to ungrouped format
       preferredBlock.instruments = _Arr.map(
         preferredBlock.instruments,
-        instrument => getIndividualInstruments(instrument, customer)
+        (instrument) => getIndividualInstruments(instrument, customer)
       );
     }
 
@@ -307,9 +313,9 @@ export function setBlocks(
   // const walnut369Enabled = isWalnut369Enabled();
   // const walnutNCEnabled = hasFeature('walnut369_nc_emi', false);
   // Filter out blocks with no instruments & check for walnut 369 exist in block
-  allBlocks = allBlocks.filter(block => {
+  allBlocks = allBlocks.filter((block) => {
     const _instruments = block?.instruments || [];
-    _instruments.forEach(instrument => {
+    _instruments.forEach((instrument) => {
       if (instrument?._ungrouped?.[0]?.provider === 'walnut369') {
         walnut369Visible = true;
       }
@@ -317,7 +323,6 @@ export function setBlocks(
     // check for walnut 369
     return _instruments.length > 0;
   });
-
   // Add an ID to all instruments
   _Arr.loop(allBlocks, (block, blockIndex) => {
     _Arr.loop(block.instruments, (instrument, instrumentIndex) => {
@@ -408,10 +413,10 @@ function generateInstrumentId(
  * @returns {Block|undefined}
  */
 function getInstrumentBlock(instrument, blocks) {
-  return _Arr.find(blocks, block => {
+  return _Arr.find(blocks, (block) => {
     return _Arr.any(
       block.instruments,
-      blockInstrument => blockInstrument.id === instrument.id
+      (blockInstrument) => blockInstrument.id === instrument.id
     );
   });
 }
@@ -436,13 +441,13 @@ export function getInstrumentMeta(instrument) {
     meta.indexInBlock =
       _Arr.findIndex(
         block.instruments,
-        blockInstrument => blockInstrument.id === instrument.id
+        (blockInstrument) => blockInstrument.id === instrument.id
       ) + 1;
 
     meta.indexInInstruments =
       _Arr.findIndex(
         storeGetter(instruments),
-        storeInstrument => storeInstrument.id === instrument.id
+        (storeInstrument) => storeInstrument.id === instrument.id
       ) + 1;
 
     meta.block = {

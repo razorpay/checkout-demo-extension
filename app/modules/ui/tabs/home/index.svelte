@@ -900,7 +900,6 @@
 
   export function onSelectInstrument(event) {
     const instrument = event.detail;
-
     updateScore('instrumentSelected');
 
     $selectedInstrumentId = instrument.id;

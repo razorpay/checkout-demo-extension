@@ -20,7 +20,7 @@ export function setRazorpayInstance(_razorpayInstance) {
     razorpayInstance.set('theme.image_frame', false);
   }
 }
-export const makeAuthUrl = url => _makeAuthUrl(razorpayInstance, url);
+export const makeAuthUrl = (url) => _makeAuthUrl(razorpayInstance, url);
 
 const IRCTC_KEYS = [
   'rzp_test_mZcDnA8WJMFQQD',
@@ -32,7 +32,7 @@ const IRCTC_KEYS = [
 export const isIRCTC = () => IRCTC_KEYS |> _Arr.contains(getOption('key'));
 
 export const getPayoutContact = () => preferences.contact;
-export const getDisplayAmount = am => displayAmount(razorpayInstance, am);
+export const getDisplayAmount = (am) => displayAmount(razorpayInstance, am);
 export const getMerchantMethods = () => preferences.methods || {};
 export const getRecurringMethods = () => getMerchantMethods().recurring;
 export const getMethodsCustomText = () => getMerchantMethods().custom_text;
@@ -64,12 +64,18 @@ export const getLanguageCodeFromOptions = () =>
 export const getLanguageCode = () =>
   getLanguageCodeFromOptions() || getLanguageCodeFromPrefs();
 
-const optionGetter = option => () => getOption(option);
-export const getOption = option => razorpayInstance.get(option);
+const optionGetter = (option) => () => getOption(option);
+export const getOption = (option) => razorpayInstance.get(option);
 export const setOption = (option, value) => razorpayInstance.set(option, value);
 export const getCallbackUrl = optionGetter('callback_url');
-export const getCardFeatures = iin => razorpayInstance.getCardFeatures(iin);
-export const getCurrencies = ({ iin, tokenId, cardNumber, walletCode, amount }) => {
+export const getCardFeatures = (iin) => razorpayInstance.getCardFeatures(iin);
+export const getCurrencies = ({
+  iin,
+  tokenId,
+  cardNumber,
+  walletCode,
+  amount,
+}) => {
   return razorpayInstance.getCurrencies({
     iin,
     tokenId,
@@ -82,7 +88,8 @@ export const getCurrencies = ({ iin, tokenId, cardNumber, walletCode, amount }) 
 
 const entityWithAmount = ['order', 'invoice', 'subscription'];
 const getEntityWithAmount = () =>
-  entityWithAmount |> _Arr.find(entity => preferences |> _Obj.hasProp(entity));
+  entityWithAmount
+  |> _Arr.find((entity) => preferences |> _Obj.hasProp(entity));
 
 // @TODO return amount based on partial payment
 // @TODO use everywhere instead of session.get('amount')
@@ -198,7 +205,10 @@ export function isASubscription(method = null) {
   if (!method) {
     return true;
   } else {
-    return preferences.subscription[method] && preferences.subscription[method] !== false;
+    return (
+      preferences.subscription[method] &&
+      preferences.subscription[method] !== false
+    );
   }
 }
 

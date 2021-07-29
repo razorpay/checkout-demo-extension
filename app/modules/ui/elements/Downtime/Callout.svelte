@@ -19,11 +19,11 @@
     Events.TrackRender(DowntimeEvents.CALLOUT_SHOW, {
       instrument: downtimeInstrument,
       downtimeSeverity: severe,
-      downtimeMethod: $selectedInstrument?.method
+      downtimeMethod: $selectedInstrument?.method,
     });
 
-    if($selectedInstrument?.method === 'netbanking') {
-      downtimeInstrument = getLongBankName(downtimeInstrument, $locale)
+    if ($selectedInstrument?.method === 'netbanking') {
+      downtimeInstrument = getLongBankName(downtimeInstrument, $locale);
     }
   });
 </script>

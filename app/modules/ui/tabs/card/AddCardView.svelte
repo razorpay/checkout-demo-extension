@@ -10,7 +10,6 @@
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
   import { returnAsIs } from 'lib/utils';
 
-
   // Svelte imports
   import { createEventDispatcher, onMount } from 'svelte';
 
@@ -98,7 +97,7 @@
 
   onMount(() => {
     Events.TrackBehav(CardEvents.ADD_NEW_CARD);
-  })
+  });
 
   function setCardNumberValidity(valid) {
     if (numberField) {
@@ -115,7 +114,7 @@
     if ($cardNumber.length > 6 && lastIin !== getIin($cardNumber)) {
       lastIin = getIin($cardNumber);
       if (lastIin) {
-        getCardFeatures($cardNumber).then(data => {
+        getCardFeatures($cardNumber).then((data) => {
           const { emi } = data.flows;
           if (!emi) {
             Analytics.track('card:emi:invalid', {
@@ -228,6 +227,8 @@
     }
 
     const flowChecker = ({ flows = {}, type, issuer } = {}) => {
+      // recreating type as _type as we need to override while running cards-separation exeriment
+      let _type = type;
       const _cardNumber = getCardDigits(value);
       const isIinSame = getIin(_cardNumber) === iin;
       let _validCardNumber = true;
@@ -246,22 +247,24 @@
           debit: 'debit_card',
           credit: 'credit_card',
         };
-        if (!type) {
+        if (!_type && $methodInstrument?.method?.includes('_card')) {
+          _type = $methodInstrument?.method;
+        }
+        if (!_type) {
           // We do not have enough data to validate
           isCardTypeAllowed = true;
           reccuringCardSecondaryCheck = true;
         } else {
-          isCardTypeAllowed = isMethodEnabled(cardTypeMap[type]);
+          isCardTypeAllowed = isMethodEnabled(cardTypeMap[_type]);
           if (isCardTypeAllowed) {
             const allowedRecurringCardsData = getRecurringMethods().card || {};
-            if (type === 'debit') {
+            if (_type === 'debit') {
               reccuringCardSecondaryCheck = issuer
-                ? !!allowedRecurringCardsData[type][issuer]
+                ? !!allowedRecurringCardsData[_type][issuer]
                 : true;
-            } else if (type === 'credit') {
-              reccuringCardSecondaryCheck = !!getCardNetworksForRecurring()[
-                $cardType
-              ];
+            } else if (_type === 'credit') {
+              reccuringCardSecondaryCheck =
+                !!getCardNetworksForRecurring()[$cardType];
             }
           }
         }
@@ -283,7 +286,7 @@
     };
 
     getCardFeatures(iin)
-      .then(features => {
+      .then((features) => {
         let validationPromises = [
           flowChecker(features),
           validateCardNumber(),
@@ -320,7 +323,7 @@
           // Find the entry in API_NETWORK_CODES_MAP
           let networkEntry = _Arr.find(
             _Obj.entries(API_NETWORK_CODES_MAP),
-            map => map[1] === cardMetaData.network
+            (map) => map[1] === cardMetaData.network
           );
 
           if (networkEntry) {
@@ -460,7 +463,7 @@
         recurring={isRecurring()}
         type={$cardType}
         on:focus
-        on:filled={_ => handleFilled('numberField')}
+        on:filled={(_) => handleFilled('numberField')}
         on:autocomplete={trackCardNumberAutoFilled}
         on:input={handleCardInput}
         on:blur={trackCardNumberFilled}
@@ -475,7 +478,7 @@
           bind:this={expiryField}
           on:focus
           on:blur={trackExpiryFilled}
-          on:filled={_ => handleFilled('expiryField')}
+          on:filled={(_) => handleFilled('expiryField')}
         />
       </div>
     {/if}

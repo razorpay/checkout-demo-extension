@@ -37,7 +37,7 @@
           parentElem: 'rewards-cta',
           shown,
           timer: 5000,
-          text: $t(REWARDS_TOOLTIP_TEXT)
+          text: $t(REWARDS_TOOLTIP_TEXT),
         },
       });
     }, 1000);
@@ -48,13 +48,13 @@
       type: AnalyticsTypes.BEHAV,
     });
     shown = false;
-    if(snackBar) {
+    if (snackBar) {
       snackBar.removeSnackBar();
     }
     session.svelteOverlay.$$set({
       component: Rewards,
       props: {
-        onClick: function(e) {
+        onClick: function (e) {
           session.hideErrorMessage(e);
         },
       },

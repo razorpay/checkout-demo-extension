@@ -54,8 +54,9 @@ const {
   // Partial Payments
   handlePartialPayment,
 } = require('../tests/homescreen/actions');
+const { delay } = require('../../mock-api/utils.js');
 
-module.exports = function(testFeatures) {
+module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'cards',
     testFeatures
@@ -89,7 +90,11 @@ module.exports = function(testFeatures) {
         options,
         preferences,
         method: 'Card',
+        experiments: {
+          cards_separation: 0,
+        },
       });
+
       const missingUserDetails = optionalContact && optionalEmail;
 
       const isHomeScreenSkipped = missingUserDetails && !partialPayment; // and not TPV
@@ -100,7 +105,7 @@ module.exports = function(testFeatures) {
       if (!missingUserDetails) {
         await fillUserDetails(context, '8888888881');
       }
-
+      await delay(20000);
       if (partialPayment) {
         await handlePartialPayment(context, '100');
       } else if (!isHomeScreenSkipped) {

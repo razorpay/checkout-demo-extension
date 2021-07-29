@@ -532,7 +532,8 @@ export default {
     more: 'More',
     pay_conversion_fee: 'Pay currency conversion fee',
     pay_in: 'Pay in',
-    merchant_of_record: 'By completing your order, you will checkout with Razorpay Inc. as the merchant of record and agree with the',
+    merchant_of_record:
+      'By completing your order, you will checkout with Razorpay Inc. as the merchant of record and agree with the',
     terms_and_conditions: 'terms and conditions',
   },
   debit_emi: {

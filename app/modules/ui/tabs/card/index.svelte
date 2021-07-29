@@ -31,7 +31,7 @@
     authType,
     currentCvv,
     currentAuthType,
-    defaultDCCCurrency
+    defaultDCCCurrency,
   } from 'checkoutstore/screens/card';
 
   import { methodInstrument, blocks, phone } from 'checkoutstore/screens/home';
@@ -74,10 +74,7 @@
     SUBSCRIPTION_REFUND_CALLOUT,
   } from 'ui/labels/card';
 
-  import {
-    MERCHANT_OF_RECORD,
-    DCC_TERMS_AND_CONDITIONS,
-  } from 'ui/labels/dcc';
+  import { MERCHANT_OF_RECORD, DCC_TERMS_AND_CONDITIONS } from 'ui/labels/dcc';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -105,7 +102,7 @@
     ADD_CARD: 'add-card',
   };
 
-  const apps = _Arr.map(getAppsForCards(), code => getAppProvider(code));
+  const apps = _Arr.map(getAppsForCards(), (code) => getAppProvider(code));
   const appsAvailable = apps.length;
 
   const session = getSession();
@@ -219,7 +216,7 @@
         appliedOffer?.id &&
         appsAvailable.includes(appliedOffer.issuer)
       ) {
-        session.validateOffers($selectedApp, offerRemoved => {
+        session.validateOffers($selectedApp, (offerRemoved) => {
           if (!offerRemoved) {
             // If the offer was not removed, revert to the app in offer issuer
             setSelectedApp(session?.getAppliedOffer()?.issuer);
@@ -268,24 +265,31 @@
       return tokens;
     }
 
-    if (instrument.method !== tab) {
+    if (instrument.method !== tab && !instrument.method.includes('_card')) {
       return tokens;
     }
 
-    const eligibleTokens = _Arr.filter(tokens, token => {
+    const eligibleTokens = _Arr.filter(tokens, (token) => {
       const hasIssuers = Boolean(instrument.issuers);
       const hasNetworks = Boolean(instrument.networks);
-      const hasTypes = Boolean(instrument.types);
+
       const hasIins = Boolean(instrument.iins);
+      const issuers = instrument.issuers || [];
+      const networks = instrument.networks || [];
+
+      let hasTypes = Boolean(instrument.types);
+      let types = instrument.types || [];
+      if (instrument?.method?.includes('_card')) {
+        //credit_card, debit_card
+        hasTypes = true;
+        // adds ['credit'] for credit and ['debit'] for debit
+        types = [instrument.method.split('_')[0]];
+      }
 
       // We don't have IIN for a saved card. So if we're requested to support only specific IINs, we can't show saved cards
       if (hasIins) {
         return false;
       }
-
-      const issuers = instrument.issuers || [];
-      const networks = instrument.networks || [];
-      const types = instrument.types || [];
 
       // If there is no issuer present, it means match all issuers.
       const issuerMatches = hasIssuers
@@ -302,10 +306,8 @@
 
       return issuerMatches && networkMatches && typeMatches;
     });
-
     return eligibleTokens;
   }
-
   $: {
     allSavedCards = getSavedCardsFromCustomer($customer);
   }
@@ -348,7 +350,7 @@
       return false;
     }
 
-    const block = _Arr.find($blocks, block =>
+    const block = _Arr.find($blocks, (block) =>
       _Arr.contains(block.instruments, $methodInstrument)
     );
 
@@ -391,16 +393,16 @@
   }
 
   function filterSavedCardsForRecurring(tokens) {
-    return _Arr.filter(tokens, token => token.recurring);
+    return _Arr.filter(tokens, (token) => token.recurring);
   }
 
   function filterSavedCardsForEmi(tokens) {
-    return _Arr.filter(tokens, token => token.plans);
+    return _Arr.filter(tokens, (token) => token.plans);
   }
 
   export function showLandingView() {
     return tick()
-      .then(_ => {
+      .then((_) => {
         let viewToSet = Views.ADD_CARD;
 
         if (savedCards && savedCards.length > 0 && isSavedCardsEnabled) {
@@ -535,7 +537,7 @@
     $internationalCurrencyCalloutNeeded = amexCard && isInternational();
     isDowntime('network', cardType);
     if (sixDigits) {
-      getCardFeatures(_cardNumber).then(features => {
+      getCardFeatures(_cardNumber).then((features) => {
         if (iin !== getIin($cardNumber)) {
           // $cardNumber's IIN has changed since we started the n/w request, do nothing
           return;
@@ -725,7 +727,7 @@
               <AppInstruments
                 {apps}
                 selectedApp={$selectedApp}
-                on:select={e => setSelectedApp(e.detail)}
+                on:select={(e) => setSelectedApp(e.detail)}
               />
             </div>
             <!-- LABEL: Or, Enter card details -->
@@ -764,7 +766,7 @@
               <AppInstruments
                 {apps}
                 selectedApp={$selectedApp}
-                on:select={e => setSelectedApp(e.detail)}
+                on:select={(e) => setSelectedApp(e.detail)}
               />
             </div>
             <!-- LABEL: Cards Saved on Apps -->
@@ -791,7 +793,12 @@
       {#if isShowMORTncEnabled() && $defaultDCCCurrency === 'USD'}
         <p class="pad">
           {$t(MERCHANT_OF_RECORD)}
-          <a class="theme-highlight" href="https://razorpay.com/mor_terms/" target="_blank" rel="noopener">
+          <a
+            class="theme-highlight"
+            href="https://razorpay.com/mor_terms/"
+            target="_blank"
+            rel="noopener"
+          >
             {$t(DCC_TERMS_AND_CONDITIONS)}.
           </a>
         </p>

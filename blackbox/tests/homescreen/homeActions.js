@@ -44,6 +44,8 @@ async function assertPaymentMethods(context, order) {
   if (!order) {
     order = [
       'card',
+      'credit_card',
+      'debit_card',
       'netbanking',
       'wallet',
       'upi',

@@ -122,7 +122,7 @@ export const getIcon = (
   return iconFn && iconFn(foregroundColor, backgroundColor);
 };
 
-export const getIcons = options =>
+export const getIcons = (options) =>
   _Arr.reduce(
     availIconNames,
     (result, method) => {

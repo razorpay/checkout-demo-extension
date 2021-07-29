@@ -22,11 +22,7 @@ import { init as initI18n, bindI18nEvents } from 'i18n/init';
 
 import { returnAsIs } from 'lib/utils';
 
-import {
-  cookieDisabled,
-  isIframe,
-  ownerWindow,
-} from 'common/constants';
+import { cookieDisabled, isIframe, ownerWindow } from 'common/constants';
 
 import { checkForPossibleWebPaymentsForUpi } from 'checkoutframe/components/upi';
 import { setCREDEligibilityFromPreferences } from 'checkoutframe/cred';
@@ -41,7 +37,7 @@ import {
 
 let CheckoutBridge = window.CheckoutBridge;
 
-const showModal = session => {
+const showModal = (session) => {
   Razorpay.sendMessage({ event: 'render' });
 
   if (CheckoutBridge) {
@@ -67,7 +63,7 @@ const showModal = session => {
   }
 };
 
-const validUID = id => {
+const validUID = (id) => {
   /* check only for iFrame because we trust our SDKs */
   if (isIframe && !CheckoutBridge) {
     if (!_.isString(id) || id.length < 14 || !/[0-9a-z]/i.test(id)) {
@@ -96,7 +92,7 @@ Razorpay.sendMessage = function (message) {
  * Set meta for Analytics.
  * @param {Object} message
  */
-const setAnalyticsMeta = message => {
+const setAnalyticsMeta = (message) => {
   const qpmap = _.getQueryParams();
 
   /**
@@ -116,7 +112,8 @@ const setAnalyticsMeta = message => {
     _Obj.hasProp(navigator, 'language') ||
     _Obj.hasProp(navigator, 'userLanguage')
   ) {
-    Events.setMeta(MetaProperties.NAVIGATOR_LANGUAGE,
+    Events.setMeta(
+      MetaProperties.NAVIGATOR_LANGUAGE,
       navigator.language || navigator.userLanguage
     );
   }
@@ -149,7 +146,7 @@ const setAnalyticsMeta = message => {
   /**
    * Browser related meta properties
    */
-  isBraveBrowser().then(result => {
+  isBraveBrowser().then((result) => {
     Events.setMeta(MetaProperties.BRAVE_BROWSER, result);
   });
 };
@@ -158,7 +155,7 @@ const setAnalyticsMeta = message => {
  * Sets tracking props from the message
  * @param {Object} message
  */
-const setTrackingProps = message => {
+const setTrackingProps = (message) => {
   if (message.library) {
     Track.props.library = message.library;
   }
@@ -228,9 +225,9 @@ export const handleMessage = function (message) {
   }
 
   if (message.event === 'open' || options) {
-    // triggering the open event, adding a safe check for sdk 
+    // triggering the open event, adding a safe check for sdk
     if (Bridge.hasCheckoutBridge()) {
-      Track(session.r, MiscEvents.OPEN)
+      Track(session.r, MiscEvents.OPEN);
     }
     fetchPrefs(session);
   }
@@ -238,9 +235,9 @@ export const handleMessage = function (message) {
   try {
     if (_.isNonNullObject(CheckoutBridge)) {
       CheckoutBridge.sendAnalyticsData = Track.parseAnalyticsData;
-      CheckoutBridge.sendExtraAnalyticsData = e => { };
+      CheckoutBridge.sendExtraAnalyticsData = (e) => {};
     }
-  } catch (e) { }
+  } catch (e) {}
 };
 
 function fetchPrefs(session) {
@@ -253,7 +250,7 @@ function fetchPrefs(session) {
 
   session.prefCall = Razorpay.payment.getPrefs(
     getPreferenecsParams(session.r),
-    preferences => {
+    (preferences) => {
       session.prefCall = null;
       if (preferences.error) {
         Razorpay.sendMessage({
@@ -271,7 +268,7 @@ function fetchPrefs(session) {
 function fetchRewards(session) {
   session.rewardsCall = Razorpay.payment.getRewards(
     getRewardsParams(session.r),
-    rewardsRes => {
+    (rewardsRes) => {
       session.rewardsCall = null;
       if (!rewardsRes.error) {
         const rewardObj = rewardsRes[0];
@@ -303,8 +300,10 @@ function checkForPossibleWebPayments() {
 
 function checkForPossibleWebPaymentsForApps() {
   appsThatSupportWebPayments
-    .filter(app => app.method === 'app')
-    .forEach(app => checkWebPaymentsForApp(app.package_name).catch(returnAsIs));
+    .filter((app) => app.method === 'app')
+    .forEach((app) =>
+      checkWebPaymentsForApp(app.package_name).catch(returnAsIs)
+    );
 }
 
 function setSessionPreferences(session, preferences) {
@@ -376,7 +375,7 @@ function markRelevantPreferencesPayload(prefData) {
     'order_id',
     'key_id',
   ];
-  preferencesPayloadToBeMarked.forEach(prop => {
+  preferencesPayloadToBeMarked.forEach((prop) => {
     if (prefData[prop]) {
       Events.setMeta(prop, prefData[prop]);
     }
@@ -415,7 +414,7 @@ function updateOptions(preferences) {
   const orderKey =
     ['order', 'invoice', 'subscription']
     |> _Arr.find(
-      key => preferences[key] && _.isNumber(preferences[key].amount)
+      (key) => preferences[key] && _.isNumber(preferences[key].amount)
     );
 
   if (orderKey) {
@@ -448,7 +447,7 @@ function updateEmandatePrefill() {
   const bank_account = order.bank_account;
   if (bank_account) {
     ['ifsc', 'name', 'account_number', 'account_type']
-      |> _Arr.loop(key => {
+      |> _Arr.loop((key) => {
         if (bank_account[key]) {
           setOption(`prefill.bank_account[${key}]`, bank_account[key]);
         }
@@ -470,10 +469,12 @@ function updateAnalytics(preferences) {
   // Set optional fields in meta
   const optionalFields = preferences.optional;
   if (optionalFields |> _.isArray) {
-    Events.setMeta(MetaProperties.OPTIONAL_CONTACT,
+    Events.setMeta(
+      MetaProperties.OPTIONAL_CONTACT,
       optionalFields |> _Arr.contains('contact')
     );
-    Events.setMeta(MetaProperties.OPTIONAL_EMAIL,
+    Events.setMeta(
+      MetaProperties.OPTIONAL_EMAIL,
       optionalFields |> _Arr.contains('email')
     );
   }
