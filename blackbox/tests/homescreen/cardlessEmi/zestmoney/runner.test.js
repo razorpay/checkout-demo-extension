@@ -3,5 +3,8 @@ const testRunner = require('../../../../create/checkout-test-runner');
 
 testRunner
   .setTestFeatures(['callbackUrl', 'optionalContact', 'feeBearer'])
-  .setExemptedTestCombinations([['callbackUrl', 'optionalContact']])
+  .setExemptedTestCombinations([
+    ['callbackUrl', 'optionalContact'],
+    ['offers', 'feeBearer'],
+  ])
   .runOn(createCardlessEMITest);

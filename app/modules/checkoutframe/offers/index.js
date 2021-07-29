@@ -50,7 +50,7 @@ const isOfferEligible = offer => {
  * @return {Object} offer Forced offer
  */
 export const getForcedOffer = () => {
-  return isOfferForced() && getMerchantOffers()[0];
+  return isOfferForced() && getMerchantOffers()?.[0];
 };
 
 export const getCardOffer = () => {

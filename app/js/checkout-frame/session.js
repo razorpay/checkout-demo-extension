@@ -2154,7 +2154,11 @@ Session.prototype = {
 
   setAmount: function (amount) {
     this.get().amount = amount;
+    var offer = this.getAppliedOffer();
     this.updateAmountInHeader(amount);
+    if(offer && offer.amount) {
+      this.updateAmountInHeaderForOffer(offer.amount);
+    }
   },
 
   fixLandscapeBug: function () {
@@ -4337,6 +4341,18 @@ Session.prototype = {
           } else {
             // This is not the EMI tab, delete duration if it exists.
             delete data.emi_duration;
+          }
+        }
+        var forcedOffer = discreet.Offers.getForcedOffer();
+        var offer = this.getAppliedOffer();
+        if(forcedOffer && offer) {
+          var isCardOfferValid = discreet.storeGetter(discreet.OffersStore.isCardValidForOffer);
+          // check if its valid offer or not
+          if(!isCardOfferValid) {
+            Form.shake();
+            // if saved card screen 
+            $('.checked .saved-cvv input').focus();
+            return $('#card_number').focus();
           }
         }
       } else if (/^emiplans/.test(screen)) {

@@ -8,5 +8,8 @@ testRunner
     'feeBearer',
     'partialPayment',
   ])
-  .setExemptedTestCombinations([['callbackUrl', 'optionalContact']])
+  .setExemptedTestCombinations([
+    ['callbackUrl', 'optionalContact'],
+    ['offers', 'feeBearer'],
+  ])
   .runOn(createCardlessEMITest, { provider: 'bajaj' });

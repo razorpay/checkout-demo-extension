@@ -14,6 +14,7 @@
     CARD_NUMBER_HELP,
     CARD_NUMBER_HELP_AMEX,
     CARD_NUMBER_HELP_RECURRING,
+    CARD_NUMBER_HELP_UNSUPPORTED_OFFER,
   } from 'ui/labels/card';
 
   // Utils
@@ -26,6 +27,7 @@
   export let amexEnabled = false;
   export let recurring = false;
   export let helpText;
+  export let validCardForOffer = true;
 
   // State
   let valid = false;
@@ -52,6 +54,10 @@
     if (!amexEnabled && type === 'amex') {
       // LABEL: Amex cards are not supported for this transaction.
       return formatMessageWithLocale(CARD_NUMBER_HELP_AMEX, locale);
+    }
+
+    if (!validCardForOffer) {
+      return formatMessageWithLocale(CARD_NUMBER_HELP_UNSUPPORTED_OFFER, locale);
     }
 
     // LABEL: Please enter a valid card number.
@@ -91,20 +97,6 @@
   }
 </script>
 
-<style>
-  .field-container {
-    position: relative;
-  }
-
-  .icon {
-    position: absolute;
-    right: 4px;
-    top: 30px;
-    bottom: 0;
-    width: 24px;
-  }
-</style>
-
 <div class="field-container">
   {#if type}
     <div class="icon">
@@ -129,5 +121,20 @@
     on:blur
     on:autocomplete
     on:input={handleInput}
-    on:input />
+    on:input
+  />
 </div>
+
+<style>
+  .field-container {
+    position: relative;
+  }
+
+  .icon {
+    position: absolute;
+    right: 4px;
+    top: 30px;
+    bottom: 0;
+    width: 24px;
+  }
+</style>

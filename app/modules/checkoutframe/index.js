@@ -252,10 +252,19 @@ function fetchPrefs(session) {
     getPreferenecsParams(session.r),
     (preferences) => {
       session.prefCall = null;
+      
       if (preferences.error) {
         Razorpay.sendMessage({
           event: 'fault',
           data: preferences.error,
+        });
+      } else if((preferences.fee_bearer && preferences.offers && preferences.offers.length > 0)) {
+        /**
+         * Failed Payment in offer+cfb fail opening of checkout
+         */
+         Razorpay.sendMessage({
+          event: 'fault',
+          data: 'Payment Failed',
         });
       } else {
         setSessionPreferences(session, preferences);

@@ -6,5 +6,6 @@ testRunner
   .setExemptedTestCombinations([
     ['offers', 'partialPayment'],
     ['downtimeHigh', 'downtimeLow'],
+    ['offers', 'feeBearer'],
   ])
   .runOn(createWebPaymentsTests);

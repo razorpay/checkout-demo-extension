@@ -7,5 +7,6 @@ testRunner
     ['offers', 'partialPayment'],
     ['offers', 'downtimeHigh'],
     ['downtimeHigh', 'downtimeLow'],
+    ['offers', 'feeBearer'],
   ])
   .runOn(createUPICollectTest);

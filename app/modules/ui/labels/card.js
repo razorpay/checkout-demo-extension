@@ -10,6 +10,7 @@ export const CARD_NUMBER_HELP = 'card.card_number_help';
 export const CARD_NUMBER_HELP_AMEX = 'card.card_number_help_amex';
 export const CARD_NUMBER_HELP_RECURRING = 'card.card_number_help_recurring';
 export const CARD_NUMBER_HELP_UNSUPPORTED = 'card.card_number_help_unsupported';
+export const CARD_NUMBER_HELP_UNSUPPORTED_OFFER = 'offers.not_applicable_card_message';
 export const EXPIRY_LABEL = 'card.expiry_label';
 export const NAME_LABEL = 'card.name_label';
 export const NAME_HELP = 'card.name_help';

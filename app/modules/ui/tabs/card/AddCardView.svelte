@@ -38,6 +38,7 @@
     isStrictlyRecurring,
     getCardFeatures,
     getRecurringMethods,
+    isOfferForced,
   } from 'checkoutstore';
   import {
     isAMEXEnabled,
@@ -68,6 +69,7 @@
   import { DEFAULT_AUTH_TYPE_RADIO } from 'common/constants';
   import { Formatter } from 'formatter';
   import { isInstrumentValidForPayment } from 'configurability/validate';
+  import { isCardValidForOffer } from 'checkoutstore/offers';
 
   const dispatch = createEventDispatcher();
 
@@ -95,13 +97,27 @@
 
   export let faded = false;
 
+  let validCardForOffer = true;
+  $: {
+    if (!$isCardValidForOffer && isOfferForced()) {
+      validCardForOffer = false;
+      setCardNumberValidity(false);
+    } else {
+      validCardForOffer = true;
+    }
+  }
+  
   onMount(() => {
     Events.TrackBehav(CardEvents.ADD_NEW_CARD);
   });
 
   function setCardNumberValidity(valid) {
+    let isValid = valid;
+    if (!validCardForOffer) {
+      isValid = false;
+    }
     if (numberField) {
-      numberField.setValid(valid);
+      numberField.setValid(isValid);
       numberField.dispatchFilledIfValid();
     }
   }
@@ -461,6 +477,7 @@
         amexEnabled={isAMEXEnabled()}
         helpText={cardNumberHelpText}
         recurring={isRecurring()}
+        {validCardForOffer}
         type={$cardType}
         on:focus
         on:filled={(_) => handleFilled('numberField')}

@@ -2,7 +2,7 @@ import { writable, derived, get } from 'svelte/store';
 import { getSession } from 'sessionmanager';
 import { displayAmount } from 'common/currency';
 import { isCardValidForOffer } from 'checkoutstore/offers';
-import { isCustomerFeeBearer } from 'checkoutstore/index';
+import { isCustomerFeeBearer, isOfferForced } from 'checkoutstore/index';
 import { CtaViews } from 'ui/labels/cta';
 
 import { locale } from 'svelte-i18n';
@@ -178,6 +178,10 @@ export function setAppropriateCtaText() {
     }
   } else {
     if (withoutOffer && (tab === 'card' || tab === 'emi')) {
+      if(isOfferForced()) {
+        setView(CtaViews.PAY);
+        return;
+      }
       setView(CtaViews.PAY_WITHOUT_OFFER);
     } else {
       showAmountInCta();
