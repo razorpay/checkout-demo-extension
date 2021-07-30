@@ -29,7 +29,7 @@ export function init() {
 }
 
 function initSuscription() {
-  cta.subscribe(text => {
+  cta.subscribe((text) => {
     const span = _Doc.querySelector('#footer > span');
 
     if (span) {
@@ -39,7 +39,7 @@ function initSuscription() {
 }
 
 let withoutOffer = false;
-isCardValidForOffer.subscribe(value => {
+isCardValidForOffer.subscribe((value) => {
   withoutOffer = !value;
   setAppropriateCtaText();
 });
@@ -137,7 +137,11 @@ export function showAmountInCta() {
       const offer = session.getAppliedOffer();
       let amount = (offer && offer.amount) || session.get('amount');
 
-      if((offer && offer.payment_method === 'card') && !get(isCardValidForOffer)) {
+      if (
+        offer &&
+        offer.payment_method === 'card' &&
+        !get(isCardValidForOffer)
+      ) {
         /**
          * invalid card offer use original amount
          */
@@ -146,11 +150,16 @@ export function showAmountInCta() {
       let currency = session.get('currency') || 'INR';
       if (session.dccPayload) {
         /** value of dccPayload set via DynamicCurrencyView.svelte */
-        if(session.dccPayload.enable && session.dccPayload.currency) {
+        if (session.dccPayload.enable && session.dccPayload.currency) {
           currency = session.dccPayload.currency;
         }
-        if(session.dccPayload.enable && session.dccPayload.currencyPayload && session.dccPayload.currencyPayload.all_currencies) {
-          amount = session.dccPayload.currencyPayload.all_currencies[currency].amount;
+        if (
+          session.dccPayload.enable &&
+          session.dccPayload.currencyPayload &&
+          session.dccPayload.currencyPayload.all_currencies
+        ) {
+          amount =
+            session.dccPayload.currencyPayload.all_currencies[currency].amount;
         }
       }
       setView(CtaViews.AMOUNT, false, {
@@ -178,7 +187,7 @@ export function setAppropriateCtaText() {
     }
   } else {
     if (withoutOffer && (tab === 'card' || tab === 'emi')) {
-      if(isOfferForced()) {
+      if (isOfferForced()) {
         setView(CtaViews.PAY);
         return;
       }
@@ -189,10 +198,10 @@ export function setAppropriateCtaText() {
   }
 }
 
-const trackCTAVisibility = debounce(function() {
+const trackCTAVisibility = debounce(function () {
   // To figure out cases when CTA is shown logically
   // but is not visible physically.
-  setTimeout(function() {
+  setTimeout(function () {
     const session = getSession();
 
     const el = _Doc.querySelector('#footer-cta');

@@ -185,7 +185,7 @@ const ALL_METHODS = {
 
   app() {
     let areAppsEnabled = false;
-    _Obj.loop(getMerchantMethods().app, val => {
+    _Obj.loop(getMerchantMethods().app, (val) => {
       if (val) {
         areAppsEnabled = true;
       }
@@ -320,7 +320,7 @@ export function isCardOrEMIEnabled() {
 
 export function isDebitEMIEnabled() {
   const emiBanks = getEMIBanks();
-  return DEBIT_EMI_BANKS |> _Arr.any(bank => emiBanks[bank]);
+  return DEBIT_EMI_BANKS |> _Arr.any((bank) => emiBanks[bank]);
 }
 
 export function isContactRequiredForEMI(bank, cardType) {
@@ -374,11 +374,11 @@ export function getSingleMethod() {
    * @description This filtering is needed because we sub-divide methods as well, even though they are not valid instruments
    * @example credit_card for the card instrument
    */
-  methods = methods.filter(method => consolidated_methods.includes(method));
+  methods = methods.filter((method) => consolidated_methods.includes(method));
 
   if (methods.length === 1) {
     consolidated_methods
-      |> _Arr.any(m => {
+      |> _Arr.any((m) => {
         if (m === methods[0]) {
           oneMethod = m;
           return true;
@@ -607,10 +607,10 @@ export function getAppsForCards() {
   const apps = getAppsForMethod('card') |> _Arr.filter(isApplicationEnabled);
 
   const disabledApps = storeGetter(HiddenInstrumentsStore)
-    .filter(instrument => instrument.method === 'app' && instrument.provider)
-    .map(instrument => instrument.provider);
+    .filter((instrument) => instrument.method === 'app' && instrument.provider)
+    .map((instrument) => instrument.provider);
 
-  const filteredApps = apps.filter(app => !disabledApps.includes(app));
+  const filteredApps = apps.filter((app) => !disabledApps.includes(app));
 
   return filteredApps;
 }
@@ -724,7 +724,9 @@ function filterBanksOnAllowedAuthTypes(banks) {
   ];
 
   return Object.entries(banks).reduce((filteredBanks, [bankCode, bank]) => {
-    if (bank.auth_types.some(authType => allowedAuthTypes.includes(authType))) {
+    if (
+      bank.auth_types.some((authType) => allowedAuthTypes.includes(authType))
+    ) {
       filteredBanks[bankCode] = bank;
     }
     return filteredBanks;
@@ -740,7 +742,7 @@ export function getEMandateAuthTypes(bankCode) {
    * netbanking and debitcard as auth types.
    */
   return (
-    getEMandateBanks()[bankCode]?.auth_types.filter(type => {
+    getEMandateBanks()[bankCode]?.auth_types.filter((type) => {
       /**
        * If an auth_type is there in order,
        * we only show banks with that auth_type
@@ -836,7 +838,7 @@ function transformEmiPlans(emiPlan) {
 
 export function getEligiblePlansBasedOnMinAmount(plans) {
   const amount = getAmount();
-  const eligiblePlans = _Arr.filter(plans, plan => plan.min_amount <= amount);
+  const eligiblePlans = _Arr.filter(plans, (plan) => plan.min_amount <= amount);
   return eligiblePlans;
 }
 
@@ -931,11 +933,14 @@ export function getCardlessEMIProviders() {
 // * - amount > 1L filter
 function filterWalletByAmount(wallets = []) {
   const amountGreaterThan1Lac = getAmount() >= 1e5 * 100;
-  if (!amountGreaterThan1Lac) { // if amount is not greater than 1 lacs we return all wallets
+  if (!amountGreaterThan1Lac) {
+    // if amount is not greater than 1 lacs we return all wallets
     return wallets;
   }
-  return wallets.filter(wallet => {
-    return Boolean(Config.wallet?.[wallet]?.[FLOWS.DISABLE_WALLET_AMOUNT_CHECK]);
+  return wallets.filter((wallet) => {
+    return Boolean(
+      Config.wallet?.[wallet]?.[FLOWS.DISABLE_WALLET_AMOUNT_CHECK]
+    );
   });
 }
 
@@ -963,19 +968,19 @@ export function getWallets() {
   ) {
     return [];
   }
-  
 
   if (passedWallets && typeof passedWallets === 'object') {
     enabledWallets = enabledWallets.filter(
-      wallet => passedWallets[wallet] !== false
+      (wallet) => passedWallets[wallet] !== false
     );
   }
 
   const noRedirectFacebookWebViewSession = isNoRedirectFacebookWebViewSession();
 
   const result = enabledWallets
-    .map(wallet => wallets[wallet])
-    .filter(wallet => {
+    .map((wallet) => wallets[wallet])
+    .filter((wallet) => {
+      // eslint-disable-next-line no-extra-boolean-cast
       if (!Boolean(wallet)) {
         return false;
       }
@@ -986,13 +991,13 @@ export function getWallets() {
         return true;
       }
     });
-    
+
   return getSortedWallets(result);
 }
 
 function addExternalWallets(enabledWallets) {
   getOption('external.wallets')
-    |> _Obj.loop(externalWallet => {
+    |> _Obj.loop((externalWallet) => {
       if (wallets[externalWallet]) {
         wallets[externalWallet].custom = true;
         if (!(enabledWallets |> _Arr.contains(externalWallet))) {
@@ -1010,8 +1015,8 @@ function addExternalWallets(enabledWallets) {
 function getUsableMethods() {
   const instruments = storeGetter(InstrumentsStore);
   const methodsFromInstruments = instruments
-    .filter(instrument => instrument._type === 'method')
-    .map(instrument => instrument.method);
+    .filter((instrument) => instrument._type === 'method')
+    .map((instrument) => instrument.method);
 
   // SequenceStore has methods that are available but not shown on the homescreen (eg: EMI on Cards)
   const sequenceMethods = storeGetter(SequenceStore);

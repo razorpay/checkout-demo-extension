@@ -87,7 +87,7 @@ export const isCardValidForOffer = derived(
         order_id: orderId,
         offers: [$appliedOffer.id],
       },
-      callback: data => {
+      callback: (data) => {
         currentRequest = null;
         if (data.error || (_.isArray(data) && !data.length)) {
           // set card invalid for offer
@@ -105,9 +105,12 @@ export const isCardValidForOffer = derived(
   }
 );
 
-export const amountAfterOffer = derived([appliedOffer, isCardValidForOffer], ([$appliedOffer, $isCardValidForOffer]) => {
-  if ($appliedOffer && $isCardValidForOffer) {
-    return get(appliedOffer).amount;
+export const amountAfterOffer = derived(
+  [appliedOffer, isCardValidForOffer],
+  ([$appliedOffer, $isCardValidForOffer]) => {
+    if ($appliedOffer && $isCardValidForOffer) {
+      return get(appliedOffer).amount;
+    }
+    return getAmount();
   }
-  return getAmount();
-});
+);

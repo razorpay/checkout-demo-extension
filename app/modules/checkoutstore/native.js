@@ -26,7 +26,7 @@ export function setUpiApps(apps) {
 
   // Have a unique check in place
   const filteredUniqueApps = sortedApps.reduce((pV, cV) => {
-    const allPackageNames = pV.map(app => app.package_name);
+    const allPackageNames = pV.map((app) => app.package_name);
     if (allPackageNames.includes(cV.package_name)) {
       return pV;
     }
@@ -34,10 +34,10 @@ export function setUpiApps(apps) {
   }, []);
   const unusedApps = _Arr.filter(
     apps,
-    app =>
+    (app) =>
       !_Arr.find(
         filteredUniqueApps,
-        filteredApp => filteredApp.package_name === app.package_name
+        (filteredApp) => filteredApp.package_name === app.package_name
       )
   );
 
@@ -79,7 +79,7 @@ export function getCardApps() {
 
 export function processNativeMessage(_message) {
   message = {};
-  messageTransformers |> _Obj.loop(fn => fn(message, _message));
+  messageTransformers |> _Obj.loop((fn) => fn(message, _message));
   return message;
 }
 
@@ -92,7 +92,7 @@ const messageTransformers = {
     const features = ['activity_recreated', 'embedded', 'params'];
     const options = message.options;
 
-    _Obj.loop(features, feature => {
+    _Obj.loop(features, (feature) => {
       if (!(message[feature] |> _.isUndefined)) {
         transfomed[feature] = message[feature];
       }
@@ -138,7 +138,7 @@ const messageTransformers = {
       if (_.isString(data)) {
         try {
           data = JSON.parse(data);
-        } catch (e) { }
+        } catch (e) {}
       }
       if (_.isNonNullObject(data)) {
         transfomed.data = data;
@@ -149,7 +149,7 @@ const messageTransformers = {
   useTrackingProps: (transfomed, message) => {
     var props = ['referer', 'integration'];
 
-    _Obj.loop(props, prop => {
+    _Obj.loop(props, (prop) => {
       if (!(message[prop] |> _.isUndefined)) {
         Track.props[prop] = message[prop];
       }

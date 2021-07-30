@@ -64,11 +64,11 @@ export const proxyContact = derived(
   }
 );
 
-country.subscribe(country => {
+country.subscribe((country) => {
   proxyCountry.set(country);
 });
 
-phone.subscribe(phone => {
+phone.subscribe((phone) => {
   proxyPhone.set(phone);
 });
 
@@ -109,8 +109,8 @@ export const partialPaymentOption = writable();
 export const partialPaymentAmount = writable('');
 
 export const blocks = writable([]);
-export const instruments = derived(blocks, allBlocks => {
-  const allInstruments = _Arr.flatMap(allBlocks, block => block.instruments);
+export const instruments = derived(blocks, (allBlocks) => {
+  const allInstruments = _Arr.flatMap(allBlocks, (block) => block.instruments);
 
   return allInstruments;
 });
@@ -125,7 +125,7 @@ export const selectedInstrument = derived(
   ([$instruments = [], $selectedInstrumentId = null]) =>
     _Arr.find(
       $instruments,
-      instrument => instrument.id === $selectedInstrumentId
+      (instrument) => instrument.id === $selectedInstrumentId
     )
 );
 
@@ -134,7 +134,7 @@ export const selectedInstrument = derived(
  */
 export const methodInstrument = derived(
   selectedInstrument,
-  $selectedInstrument => {
+  ($selectedInstrument) => {
     if (!$selectedInstrument) {
       return null;
     }
@@ -157,7 +157,8 @@ export const methodInstrument = derived(
  */
 export const isContactPresent = derived(
   contact,
-  contactValue => contactValue && contactValue !== '+91' && contactValue !== '+'
+  (contactValue) =>
+    contactValue && contactValue !== '+91' && contactValue !== '+'
 );
 
 export const upiIntentInstrumentsForAnalytics = writable([]);
