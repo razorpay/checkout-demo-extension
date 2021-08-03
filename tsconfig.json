@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "target": "es5",
+    "lib": ["es2015", "dom", "es2017"],
+    "module": "es6",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "strictNullChecks": true,
+    "baseUrl": "app/modules",
+  },
+  "extends": "@tsconfig/svelte/tsconfig.json",
+  "include": ["app/modules/**/*", "./global.d.ts"],
+  "exclude": ["node_modules/*", "blackbox/*", "mock-api/*"],
+  "paths": {
+    "types": ["types"]
+  }
+}

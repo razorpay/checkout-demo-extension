@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // Svelte imports
   import { createEventDispatcher } from 'svelte';
 
@@ -44,12 +44,13 @@
     getCardlessEmiProviderData,
     getWalletSubtitle,
   } from 'i18n';
+  import type { DownTimeSeverity, Instrument } from 'types';
 
   // Props
-  export let instrument = {};
+  export let instrument: Instrument = {};
   export let name = 'instrument';
-  let downtimeSeverity;
-  let downtimeInstrument = '';
+  let downtimeSeverity: DownTimeSeverity;
+  let downtimeInstrument: string = '';
 
   let individualInstrument = getExtendedSingleInstrument(instrument);
   $: individualInstrument = getExtendedSingleInstrument(instrument);
@@ -63,11 +64,11 @@
   const session = getSession();
   const dispatch = createEventDispatcher();
 
-  let title;
-  let icon;
-  let code;
-  let subtitle;
-  function getVpaFromInstrument(instrument) {
+  let title: string;
+  let icon: string;
+  let code: string;
+  let subtitle: string;
+  function getVpaFromInstrument(instrument: Instrument) {
     const { vpa, token } = instrument;
 
     if (vpa) {
@@ -80,7 +81,7 @@
     return `${vpaToken.vpa.username}@${vpaToken.vpa.handle}`;
   }
 
-  function getDetailsForAppInstrument(instrument, locale) {
+  function getDetailsForAppInstrument(instrument: Instrument, locale: string) {
     const provider = getAppProvider(instrument.provider);
     const providerName = getAppProviderName(provider.code, locale);
     return {
@@ -94,7 +95,10 @@
     };
   }
 
-  function getDetailsForPaypalInstrument(instrument, locale) {
+  function getDetailsForPaypalInstrument(
+    instrument: Instrument,
+    locale: string
+  ) {
     return {
       title: getInstrumentTitle('paypal', null, locale),
       icon: session.themeMeta.icons.paypal,
@@ -102,7 +106,10 @@
     };
   }
 
-  function getDetailsForNetbankingInstrument(instrument, locale) {
+  function getDetailsForNetbankingInstrument(
+    instrument: Instrument,
+    locale: string
+  ) {
     const banks = getBanks();
     const bankName = getLongBankName(
       instrument.bank,
@@ -115,7 +122,10 @@
     };
   }
 
-  function getDetailsForWalletInstrument(instrument, locale) {
+  function getDetailsForWalletInstrument(
+    instrument: Instrument,
+    locale: string
+  ) {
     const wallet = getWallet(instrument.wallet);
     const walletName = getWalletName(wallet.code, locale);
     return {
@@ -125,7 +135,7 @@
     };
   }
 
-  function getDetailsForUpiInstrument(instrument, locale) {
+  function getDetailsForUpiInstrument(instrument: Instrument, locale: string) {
     // TODO: simplify
     let title, icon;
     if (instrument.flow === 'qr') {
@@ -168,7 +178,10 @@
     };
   }
 
-  function getDetailsForCardlessEmiInstrument(instrument, locale) {
+  function getDetailsForCardlessEmiInstrument(
+    instrument: Instrument,
+    locale: string
+  ) {
     const provider = getCardlessEmiProvider(instrument.provider);
     let providerCode = provider.code;
     if (providerCode === 'cards' && isDebitEMIEnabled()) {
@@ -190,7 +203,10 @@
     };
   }
 
-  function getDetailsForPayLaterInstrument(instrument, locale) {
+  function getDetailsForPayLaterInstrument(
+    instrument: Instrument,
+    locale: string
+  ) {
     const provider = getPaylaterProvider(instrument.provider);
     const providerName = getPaylaterProviderName(provider.code, locale);
     return {
@@ -199,7 +215,7 @@
     };
   }
 
-  function getDetailsForInstrument(instrument, locale) {
+  function getDetailsForInstrument(instrument: Instrument, locale: string) {
     switch (instrument.method) {
       case 'paypal':
         return getDetailsForPaypalInstrument(instrument, locale);
@@ -238,7 +254,7 @@
    * If the instrument is selected, and the user
    * presses enter, mark this as a submission
    */
-  function attemptSubmit(event) {
+  function attemptSubmit(event: Event) {
     if (!selected) {
       return;
     }
