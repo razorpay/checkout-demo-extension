@@ -5,7 +5,7 @@
  * Polyfill for Custom Elements v1
  * Source: https://cdnjs.cloudflare.com/ajax/libs/custom-elements/1.3.0/custom-elements.min.js
  */
-(function() {
+(function () {
   /*
  Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
  This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
@@ -54,7 +54,7 @@
   var qa = new Set();
   'annotation-xml color-profile font-face font-face-src font-face-uri font-face-format font-face-name missing-glyph'
     .split(' ')
-    .forEach(function(a) {
+    .forEach(function (a) {
       return qa.add(a);
     });
   function ra(a) {
@@ -126,7 +126,7 @@
   function ua(a) {
     a.b && a.b.disconnect();
   }
-  ta.prototype.f = function(a) {
+  ta.prototype.f = function (a) {
     var b = this.a.readyState;
     ('interactive' !== b && 'complete' !== b) || ua(this);
     for (b = 0; b < a.length; b++)
@@ -135,7 +135,7 @@
   function va() {
     var a = this;
     this.b = this.a = void 0;
-    this.c = new Promise(function(b) {
+    this.c = new Promise(function (b) {
       a.b = b;
       a.a && b(a.a);
     });
@@ -152,14 +152,14 @@
     this.i = !1;
     this.b = a;
     this.j = new Map();
-    this.c = function(b) {
+    this.c = function (b) {
       return b();
     };
     this.a = !1;
     this.h = [];
     this.m = a.f ? new ta(a) : void 0;
   }
-  O.prototype.o = function(a, b) {
+  O.prototype.o = function (a, b) {
     var c = this;
     if (!(b instanceof Function))
       throw new TypeError(
@@ -170,11 +170,11 @@
     this.h.push(a);
     this.a ||
       ((this.a = !0),
-      this.c(function() {
+      this.c(function () {
         return ya(c);
       }));
   };
-  O.prototype.define = function(a, b) {
+  O.prototype.define = function (a, b) {
     var c = this;
     if (!(b instanceof Function))
       throw new TypeError('Custom element constructors must be functions.');
@@ -183,7 +183,7 @@
     this.h.push(a);
     this.a ||
       ((this.a = !0),
-      this.c(function() {
+      this.c(function () {
         return ya(c);
       }));
   };
@@ -200,7 +200,7 @@
     a.i = !0;
     var f;
     try {
-      var d = function(m) {
+      var d = function (m) {
           var w = e[m];
           if (void 0 !== w && !(w instanceof Function))
             throw Error("The '" + m + "' callback must be a function.");
@@ -235,7 +235,7 @@
     a.l.set(c.constructorFunction, c);
     return c;
   }
-  O.prototype.upgrade = function(a) {
+  O.prototype.upgrade = function (a) {
     N(this.b, a);
   };
   function ya(a) {
@@ -244,7 +244,7 @@
       for (var b = [], c = a.h, f = new Map(), d = 0; d < c.length; d++)
         f.set(c[d], []);
       N(a.b, document, {
-        upgrade: function(k) {
+        upgrade: function (k) {
           if (void 0 === k.__CE_state) {
             var l = k.localName,
               m = f.get(l);
@@ -260,10 +260,10 @@
       c.length = 0;
     }
   }
-  O.prototype.get = function(a) {
+  O.prototype.get = function (a) {
     if ((a = P(this, a))) return a.constructorFunction;
   };
-  O.prototype.whenDefined = function(a) {
+  O.prototype.whenDefined = function (a) {
     if (!ra(a))
       return Promise.reject(
         new SyntaxError("'" + a + "' is not a valid custom element name.")
@@ -277,11 +277,11 @@
     c && a && wa(b);
     return b.c;
   };
-  O.prototype.polyfillWrapFlushCallback = function(a) {
+  O.prototype.polyfillWrapFlushCallback = function (a) {
     this.m && ua(this.m);
     var b = this.c;
-    this.c = function(c) {
-      return a(function() {
+    this.c = function (c) {
+      return a(function () {
         return b(c);
       });
     };
@@ -336,7 +336,7 @@
   }
   function V(a, b) {
     a.a &&
-      U(a, b, function(c) {
+      U(a, b, function (c) {
         return W(a, c);
       });
   }
@@ -349,7 +349,7 @@
   }
   function X(a, b) {
     var c = [];
-    U(a, b, function(d) {
+    U(a, b, function (d) {
       return c.push(d);
     });
     for (b = 0; b < c.length; b++) {
@@ -359,7 +359,7 @@
   }
   function Y(a, b) {
     var c = [];
-    U(a, b, function(d) {
+    U(a, b, function (d) {
       return c.push(d);
     });
     for (b = 0; b < c.length; b++) {
@@ -372,14 +372,14 @@
     var f = c.s,
       d =
         c.upgrade ||
-        function(g) {
+        function (g) {
           return Q(a, g);
         },
       e = [];
     U(
       a,
       b,
-      function(g) {
+      function (g) {
         a.a && W(a, g);
         if ('link' === g.localName && 'import' === g.getAttribute('rel')) {
           var h = g.import;
@@ -388,13 +388,13 @@
             (h.__CE_registry = document.__CE_registry));
           h && 'complete' === h.readyState
             ? (h.__CE_documentLoadHandled = !0)
-            : g.addEventListener('load', function() {
+            : g.addEventListener('load', function () {
                 var k = g.import;
                 if (!k.__CE_documentLoadHandled) {
                   k.__CE_documentLoadHandled = !0;
                   var l = new Set();
                   f &&
-                    (f.forEach(function(m) {
+                    (f.forEach(function (m) {
                       return l.add(m);
                     }),
                     l.delete(k));
@@ -445,7 +445,7 @@
       R(k);
     }
   }
-  S.prototype.connectedCallback = function(a) {
+  S.prototype.connectedCallback = function (a) {
     var b = a.__CE_definition;
     if (b.connectedCallback)
       try {
@@ -454,7 +454,7 @@
         R(c);
       }
   };
-  S.prototype.disconnectedCallback = function(a) {
+  S.prototype.disconnectedCallback = function (a) {
     var b = a.__CE_definition;
     if (b.disconnectedCallback)
       try {
@@ -463,7 +463,7 @@
         R(c);
       }
   };
-  S.prototype.attributeChangedCallback = function(a, b, c, f, d) {
+  S.prototype.attributeChangedCallback = function (a, b, c, f, d) {
     var e = a.__CE_definition;
     if (e.attributeChangedCallback && -1 < e.observedAttributes.indexOf(b))
       try {
@@ -556,10 +556,10 @@
         }))
       : ((e = document.createEvent('ErrorEvent')),
         e.initErrorEvent('error', !1, !0, b, c, f),
-        (e.preventDefault = function() {
+        (e.preventDefault = function () {
           Object.defineProperty(this, 'defaultPrevented', {
             configurable: !0,
-            get: function() {
+            get: function () {
               return !0;
             },
           });
@@ -568,16 +568,16 @@
       Object.defineProperty(e, 'error', {
         configurable: !0,
         enumerable: !0,
-        get: function() {
+        get: function () {
           return a;
         },
       });
     window.dispatchEvent(e);
     e.defaultPrevented || console.error(a);
   }
-  var Da = new (function() {})();
+  var Da = new (function () {})();
   function Ea(a) {
-    window.HTMLElement = (function() {
+    window.HTMLElement = (function () {
       function b() {
         var c = this.constructor;
         var f = document.__CE_registry.l.get(c);
@@ -620,7 +620,7 @@
   }
   function Z(a, b, c) {
     function f(d) {
-      return function(e) {
+      return function (e) {
         for (var g = [], h = 0; h < arguments.length; ++h) g[h] = arguments[h];
         h = [];
         for (var k = [], l = 0; l < g.length; l++) {
@@ -641,15 +641,15 @@
     void 0 !== c.append && M(b, 'append', f(c.append));
   }
   function Fa(a) {
-    M(Document.prototype, 'createElement', function(b) {
+    M(Document.prototype, 'createElement', function (b) {
       return Ca(a, this, b, null);
     });
-    M(Document.prototype, 'importNode', function(b, c) {
+    M(Document.prototype, 'importNode', function (b, c) {
       b = aa.call(this, b, !!c);
       this.__CE_registry ? N(a, b) : V(a, b);
       return b;
     });
-    M(Document.prototype, 'createElementNS', function(b, c) {
+    M(Document.prototype, 'createElementNS', function (b, c) {
       return Ca(a, this, c, b);
     });
     Z(a, Document.prototype, { prepend: ba, append: ca });
@@ -660,7 +660,7 @@
         enumerable: f.enumerable,
         configurable: !0,
         get: f.get,
-        set: function(d) {
+        set: function (d) {
           if (this.nodeType === Node.TEXT_NODE) f.set.call(this, d);
           else {
             var e = void 0;
@@ -678,7 +678,7 @@
         },
       });
     }
-    M(Node.prototype, 'insertBefore', function(c, f) {
+    M(Node.prototype, 'insertBefore', function (c, f) {
       if (c instanceof DocumentFragment) {
         var d = J(c);
         c = t.call(this, c, f);
@@ -691,7 +691,7 @@
       I(this) && X(a, c);
       return f;
     });
-    M(Node.prototype, 'appendChild', function(c) {
+    M(Node.prototype, 'appendChild', function (c) {
       if (c instanceof DocumentFragment) {
         var f = J(c);
         c = r.call(this, c);
@@ -704,18 +704,18 @@
       I(this) && X(a, c);
       return d;
     });
-    M(Node.prototype, 'cloneNode', function(c) {
+    M(Node.prototype, 'cloneNode', function (c) {
       c = q.call(this, !!c);
       this.ownerDocument.__CE_registry ? N(a, c) : V(a, c);
       return c;
     });
-    M(Node.prototype, 'removeChild', function(c) {
+    M(Node.prototype, 'removeChild', function (c) {
       var f = c instanceof Element && I(c),
         d = u.call(this, c);
       f && Y(a, c);
       return d;
     });
-    M(Node.prototype, 'replaceChild', function(c, f) {
+    M(Node.prototype, 'replaceChild', function (c, f) {
       if (c instanceof DocumentFragment) {
         var d = J(c);
         c = v.call(this, c, f);
@@ -732,16 +732,16 @@
     });
     x && x.get
       ? b(Node.prototype, x)
-      : Aa(a, function(c) {
+      : Aa(a, function (c) {
           b(c, {
             enumerable: !0,
             configurable: !0,
-            get: function() {
+            get: function () {
               for (var f = [], d = this.firstChild; d; d = d.nextSibling)
                 d.nodeType !== Node.COMMENT_NODE && f.push(d.textContent);
               return f.join('');
             },
-            set: function(f) {
+            set: function (f) {
               for (; this.firstChild; ) u.call(this, this.firstChild);
               null != f && '' !== f && r.call(this, document.createTextNode(f));
             },
@@ -750,7 +750,7 @@
   }
   function Ha(a) {
     function b(f) {
-      return function(d) {
+      return function (d) {
         for (var e = [], g = 0; g < arguments.length; ++g) e[g] = arguments[g];
         g = [];
         for (var h = [], k = 0; k < e.length; k++) {
@@ -771,7 +771,7 @@
     void 0 !== ja && M(c, 'before', b(ja));
     void 0 !== ka && M(c, 'after', b(ka));
     void 0 !== la &&
-      M(c, 'replaceWith', function(f) {
+      M(c, 'replaceWith', function (f) {
         for (var d = [], e = 0; e < arguments.length; ++e) d[e] = arguments[e];
         e = [];
         for (var g = [], h = 0; h < d.length; h++) {
@@ -789,7 +789,7 @@
             (g = e[d]), g instanceof Element && X(a, g);
       });
     void 0 !== ma &&
-      M(c, 'remove', function() {
+      M(c, 'remove', function () {
         var f = I(this);
         ma.call(this);
         f && Y(a, this);
@@ -801,12 +801,12 @@
         enumerable: e.enumerable,
         configurable: !0,
         get: e.get,
-        set: function(g) {
+        set: function (g) {
           var h = this,
             k = void 0;
           I(this) &&
             ((k = []),
-            U(a, this, function(w) {
+            U(a, this, function (w) {
               w !== h && k.push(w);
             }));
           e.set.call(this, g);
@@ -821,7 +821,7 @@
       });
     }
     function c(d, e) {
-      M(d, 'insertAdjacentElement', function(g, h) {
+      M(d, 'insertAdjacentElement', function (g, h) {
         var k = I(h);
         g = e.call(this, g, h);
         k && Y(a, h);
@@ -834,7 +834,7 @@
         for (var l = []; h !== k; h = h.nextSibling) l.push(h);
         for (k = 0; k < l.length; k++) N(a, l[k]);
       }
-      M(d, 'insertAdjacentHTML', function(h, k) {
+      M(d, 'insertAdjacentHTML', function (h, k) {
         h = h.toLowerCase();
         if ('beforebegin' === h) {
           var l = this.previousSibling;
@@ -857,7 +857,7 @@
       });
     }
     y &&
-      M(Element.prototype, 'attachShadow', function(d) {
+      M(Element.prototype, 'attachShadow', function (d) {
         d = y.call(this, d);
         if (a.a && !d.__CE_patched) {
           d.__CE_patched = !0;
@@ -869,14 +869,14 @@
       ? b(Element.prototype, z)
       : H && H.get
       ? b(HTMLElement.prototype, H)
-      : Ba(a, function(d) {
+      : Ba(a, function (d) {
           b(d, {
             enumerable: !0,
             configurable: !0,
-            get: function() {
+            get: function () {
               return q.call(this, !0).innerHTML;
             },
-            set: function(e) {
+            set: function (e) {
               var g = 'template' === this.localName,
                 h = g ? this.content : this,
                 k = p.call(document, this.namespaceURI, this.localName);
@@ -887,27 +887,27 @@
             },
           });
         });
-    M(Element.prototype, 'setAttribute', function(d, e) {
+    M(Element.prototype, 'setAttribute', function (d, e) {
       if (1 !== this.__CE_state) return B.call(this, d, e);
       var g = A.call(this, d);
       B.call(this, d, e);
       e = A.call(this, d);
       a.attributeChangedCallback(this, d, g, e, null);
     });
-    M(Element.prototype, 'setAttributeNS', function(d, e, g) {
+    M(Element.prototype, 'setAttributeNS', function (d, e, g) {
       if (1 !== this.__CE_state) return E.call(this, d, e, g);
       var h = D.call(this, d, e);
       E.call(this, d, e, g);
       g = D.call(this, d, e);
       a.attributeChangedCallback(this, e, h, g, d);
     });
-    M(Element.prototype, 'removeAttribute', function(d) {
+    M(Element.prototype, 'removeAttribute', function (d) {
       if (1 !== this.__CE_state) return C.call(this, d);
       var e = A.call(this, d);
       C.call(this, d);
       null !== e && a.attributeChangedCallback(this, d, e, null, null);
     });
-    M(Element.prototype, 'removeAttributeNS', function(d, e) {
+    M(Element.prototype, 'removeAttributeNS', function (d, e) {
       if (1 !== this.__CE_state) return F.call(this, d, e);
       var g = D.call(this, d, e);
       F.call(this, d, e);

@@ -7,10 +7,10 @@ function partition(array, isValid) {
   );
 }
 
-const optimiseForIntent = instruments => {
+const optimiseForIntent = (instruments) => {
   const [intent, nonIntent] = partition(
     instruments,
-    instrument => instrument['_[flow]'] === 'intent'
+    (instrument) => instrument['_[flow]'] === 'intent'
   );
 
   // sort them to ensure that the highest score comes first
@@ -20,7 +20,7 @@ const optimiseForIntent = instruments => {
 
   // reduce to unique apps with the highest score per app
   const uniqueIntentInstruments = sortedIntentInstruments.reduce((pV, cV) => {
-    let apps = pV.map(x => x.upi_app);
+    let apps = pV.map((x) => x.upi_app);
     if (apps.includes(cV.upi_app)) {
       return pV;
     }

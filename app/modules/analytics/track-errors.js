@@ -1,6 +1,6 @@
 import Analytics from 'analytics';
 
-global.addEventListener('rzp_error', event => {
+global.addEventListener('rzp_error', (event) => {
   const error = event.detail;
 
   Analytics.track('cfu_error', {
@@ -11,7 +11,7 @@ global.addEventListener('rzp_error', event => {
   });
 });
 
-global.addEventListener('rzp_network_error', event => {
+global.addEventListener('rzp_network_error', (event) => {
   const detail = event.detail;
 
   if (detail && detail.baseUrl === 'https://lumberjack.razorpay.com/v1/track') {

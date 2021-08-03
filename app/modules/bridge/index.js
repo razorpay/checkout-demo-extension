@@ -9,7 +9,7 @@ export const defineIosBridge = () => {
     /* unique id for ios to retieve resources */
     index: 0,
     map: {},
-    get: function (index) {
+    get: function () {
       var val = this.map[this.index];
       delete this.map[this.index];
       return val;
@@ -31,7 +31,7 @@ export const getCheckoutBridge = () => window.CheckoutBridge;
 
 export const hasCheckoutBridge = () => Boolean(getCheckoutBridge());
 
-export const iosLegacyMethod = method => {
+export const iosLegacyMethod = (method) => {
   let CheckoutBridge = getCheckoutBridge();
   let doc = _Doc.documentElement;
 
@@ -60,7 +60,7 @@ export const storage = new Bridge('StorageBridge');
  * This function is only called if CheckoutBridge exists
  * @param  {object} message to be sent to bridge
  */
-export const notifyBridge = message => {
+export const notifyBridge = (message) => {
   /*
    * Use CheckoutBridge here and not instance of Bridge.
    * checkout instance of Bridge is instantiated at the time of first execution

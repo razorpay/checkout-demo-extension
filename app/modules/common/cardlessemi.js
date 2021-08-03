@@ -55,7 +55,7 @@ const config = {
   hcin: {
     name: 'Home Credit Ujjwal Card',
     headless: false,
-  }
+  },
 };
 
 /**
@@ -93,7 +93,7 @@ const providers = _Obj.map(config, (details, code) => {
   );
 });
 
-export const getProvider = code => providers[code] || {};
+export const getProvider = (code) => providers[code] || {};
 
 /**
  * Extends the config of the given with the updated config
@@ -149,7 +149,7 @@ export function getEligibleProvidersBasedOnMinAmount(amount, enabledProviders) {
 export function getEligibleProvidersForFeeBearerCustomer(providers) {
   let eligible = {};
 
-  Object.keys(providers).forEach(provider => {
+  Object.keys(providers).forEach((provider) => {
     if (providers[provider].fee_bearer_customer) {
       eligible[provider] = providers[provider];
     }
@@ -164,7 +164,7 @@ export function getEligibleProvidersForFeeBearerCustomer(providers) {
  *
  * @returns {boolean}
  */
-export const isProviderHeadless = provider => {
+export const isProviderHeadless = (provider) => {
   const { headless } = getProvider(provider);
 
   return Boolean(headless);
@@ -175,7 +175,7 @@ export const isProviderHeadless = provider => {
  * @param {string} provider
  * @returns {string}
  */
-export const getImageUrl = provider => {
+export const getImageUrl = (provider) => {
   const { logo } = getProvider(provider);
   return logo;
 };

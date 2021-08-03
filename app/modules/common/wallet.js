@@ -80,8 +80,8 @@ export const wallets = _Obj.map(list, (details, code) => ({
   sqLogo: sqPrefix + code + '.png',
 }));
 
-export const isPowerWallet = code => wallets[code] && wallets[code].power;
-export const getWallet = code => wallets[code];
+export const isPowerWallet = (code) => wallets[code] && wallets[code].power;
+export const getWallet = (code) => wallets[code];
 
 const walletToIntent = {
   phonepe: 'com.phonepe.app',
@@ -93,7 +93,7 @@ const walletToIntent = {
  *
  * @returns {string}
  */
-export const getPackageNameForWallet = wallet => walletToIntent[wallet];
+export const getPackageNameForWallet = (wallet) => walletToIntent[wallet];
 
 /**
  * We want to turn some wallets into intent.
@@ -121,7 +121,7 @@ export const shouldTurnWalletToIntent = (wallet, apps = []) => {
   const walletPackage = getPackageNameForWallet(wallet);
 
   if (walletPackage) {
-    return _Arr.any(apps, app => app.package_name === walletPackage);
+    return _Arr.any(apps, (app) => app.package_name === walletPackage);
   }
 
   return false;

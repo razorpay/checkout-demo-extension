@@ -85,7 +85,7 @@
   function handleRadioSelection(type) {
     if ($partialPaymentOption !== type) {
       if (type === 'partial') {
-        setTimeout(_ => {
+        setTimeout((_) => {
           partialAmountField && partialAmountField.focus();
         }, 200); // TODO: Fix this
       } else {
@@ -109,12 +109,6 @@
   }
 </script>
 
-<style>
-  div[slot='subtitle']:not(:empty) {
-    padding-bottom: 16px;
-  }
-</style>
-
 <!-- LABEL: Select a payment type -->
 <h3 class="title">{$t(PARTIAL_PAYMENT_TITLE)}</h3>
 <div class="border-list">
@@ -123,7 +117,8 @@
     value="partial"
     selected={$partialPaymentOption === 'full'}
     reverse
-    on:click={_ => handleRadioSelection('full')}>
+    on:click={(_) => handleRadioSelection('full')}
+  >
     <div slot="title">{fullAmountLabel || $t(FULL_AMOUNT_LABEL)}</div>
   </SlottedRadioOption>
   <SlottedRadioOption
@@ -133,7 +128,8 @@
     reverse
     overflow
     selected={$partialPaymentOption === 'partial'}
-    on:click={_ => handleRadioSelection('partial')}>
+    on:click={(_) => handleRadioSelection('partial')}
+  >
     <div slot="title">{partialAmountLabel || $t(PARTIAL_AMOUNT_LABEL)}</div>
     <div slot="subtitle" bind:this={partialPaymentRef}>
       {#if expanded}
@@ -142,11 +138,19 @@
           {minAmount}
           {showPartialAmountLabel}
           minAmountLabel={minAmountLabel || $t(MIN_AMOUNT_LABEL)}
-          partialDescription={partialDescription || $t(PARTIAL_AMOUNT_DESCRIPTION)}
+          partialDescription={partialDescription ||
+            $t(PARTIAL_AMOUNT_DESCRIPTION)}
           on:check={handleCheckboxChecked}
           bind:value={$partialPaymentAmount}
-          bind:this={partialAmountField} />
+          bind:this={partialAmountField}
+        />
       {/if}
     </div>
   </SlottedRadioOption>
 </div>
+
+<style>
+  div[slot='subtitle']:not(:empty) {
+    padding-bottom: 16px;
+  }
+</style>

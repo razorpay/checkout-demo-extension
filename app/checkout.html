@@ -58,7 +58,7 @@
     name: 'Innerchef',
     description: 'JEE Main & Advanced',
     image: 'http://i.imgur.com/n5tjHFD.png',
-    handler: function(transaction) {
+    handler: function (transaction) {
       alert('You have successfully purchased ' + options.description);
     },
     method: {
@@ -71,7 +71,7 @@
     // parent: '#x',
     external: {
       // wallets: ['payumoney'],
-      handler: function(data) {
+      handler: function (data) {
         console.log(this, data);
       },
     },
@@ -96,10 +96,10 @@
       color: '#1abc9c',
     },
     modal: {
-      ondismiss: function() {
+      ondismiss: function () {
         console.log(1);
       },
-      onhidden: function() {
+      onhidden: function () {
         console.log(2);
       },
     },

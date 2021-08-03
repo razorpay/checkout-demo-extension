@@ -30,7 +30,7 @@
     QR_GENERATING_LABEL,
     PAYMENT_CHECKING_STATUS,
     QR_RETRY,
-    QR_SCAN_ON_PHONE
+    QR_SCAN_ON_PHONE,
   } from 'ui/labels/qr';
 
   // Props
@@ -111,8 +111,8 @@
     session.preferredInstrument = processInstrument(paymentData);
     const offer = session.getAppliedOffer();
     // UPI offer applicable to QR also
-    if(offer && offer.payment_method === 'upi') {
-      paymentData.offer_id = offer.id; 
+    if (offer && offer.payment_method === 'upi') {
+      paymentData.offer_id = offer.id;
     }
     /**
      * TODO:
@@ -134,6 +134,37 @@
       .on('payment.error', onError.bind(this));
   }
 </script>
+
+<Tab method="qr">
+  {#if view === 'fee'}
+    <FeeBearer {paymentData} on:continue={createPaymentWithFees} />
+  {:else if view === 'qr'}
+    {#if loading}
+      <!-- LABEL: Generating QR Code... -->
+      <AsyncLoading>{$t(QR_GENERATING_LABEL)}</AsyncLoading>
+    {:else}
+      <div
+        class="message"
+        style="background-image: url('{RazorpayConfig.cdn}checkout/upi-apps.png')"
+      >
+        <!-- LABEL: Scan the QR using any UPI app on your phone like BHIM, PhonePe, Google Pay etc. -->
+        {$t(QR_SCAN_ON_PHONE)}
+      </div>
+      {#if qrImage}
+        <div class="qr-image">
+          <img alt="QR" src={qrImage} on:load={qrLoaded} />
+        </div>
+      {/if}
+    {/if}
+  {:else if view === 'error'}
+    <div class="error mchild">
+      <div class="error-text">{error}</div>
+      <br />
+      <!-- LABEL: Retry -->
+      <div class="btn" on:click={init}>{$t(QR_RETRY)}</div>
+    </div>
+  {/if}
+</Tab>
 
 <style>
   :global(#form-qr) {
@@ -199,34 +230,3 @@
     margin-top: 20px;
   }
 </style>
-
-<Tab method="qr">
-  {#if view === 'fee'}
-    <FeeBearer {paymentData} on:continue={createPaymentWithFees} />
-  {:else if view === 'qr'}
-    {#if loading}
-      <!-- LABEL: Generating QR Code... -->
-      <AsyncLoading>{$t(QR_GENERATING_LABEL)}</AsyncLoading>
-    {:else}
-      <div
-        class="message"
-        style="background-image: url('{RazorpayConfig.cdn}checkout/upi-apps.png')">
-        <!-- LABEL: Scan the QR using any UPI app on your phone like BHIM, PhonePe, Google Pay etc. -->
-        {$t(QR_SCAN_ON_PHONE)}
-      </div>
-      {#if qrImage}
-        <div class="qr-image">
-          <img alt="QR" src={qrImage} on:load={qrLoaded} />
-        </div>
-      {/if}
-    {/if}
-  {:else if view === 'error'}
-    <div class="error mchild">
-      <div class="error-text">{error}</div>
-      <br />
-      <!-- LABEL: Retry -->
-      <div class="btn" on:click={init}>{$t(QR_RETRY)}</div>
-    </div>
-  {/if}
-
-</Tab>

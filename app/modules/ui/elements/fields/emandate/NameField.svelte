@@ -34,4 +34,5 @@
   handleBlur
   handleFocus
   handleInput
-  on:input={handleInput} />
+  on:input={handleInput}
+/>

@@ -1,9 +1,3 @@
-<style>
-  svg {
-    max-height: 114px;
-  }
-</style>
-
 <svg viewBox="0 0 256 116" version="1" xmlns="http://www.w3.org/2000/svg">
   <g fill="none" fill-rule="evenodd">
     <rect fill="#F4F7FA" width="256" height="115" rx="1" />
@@ -41,11 +35,19 @@
       79.1999986,95.9561407"
       stroke="#BCCBE2"
       stroke-linecap="round"
-      stroke-linejoin="round" />
+      stroke-linejoin="round"
+    />
     <path
       fill="#F0F4F9"
       d="M9 9H11V18H9zM238 9H240V16H238zM238 97H240V104H238zM9 97H11V106H9zM13
       16H18V18H13zM239 16H241V18H239zM239 104H244V106H239zM245 16H247V18H245zM13
-      101H18V103H13z" />
+      101H18V103H13z"
+    />
   </g>
 </svg>
+
+<style>
+  svg {
+    max-height: 114px;
+  }
+</style>

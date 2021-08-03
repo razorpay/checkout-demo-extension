@@ -7,7 +7,7 @@ export default function Redir(src, name, payment) {
 }
 
 Redir.prototype = {
-  write: function(html) {
+  write: function (html) {
     if (this.writable) {
       global.document.write(html);
       global.document.close();

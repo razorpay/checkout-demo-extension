@@ -5,6 +5,12 @@
     "node": true,
     "jest": true
   },
+  "globals": {
+    "_Obj": true,
+    "_El": true,
+    "_Arr": true,
+    "_": true
+  },
   "parser": "babel-eslint",
   "parserOptions": {
     "ecmaVersion": 2019,

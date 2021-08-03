@@ -1,8 +1,8 @@
 import * as Translate from 'configurability/translate';
 
-test('Module: configurability/translate', t => {
-  test('Translate.translateExternal', t => {
-    test('Translates external options properly', t => {
+test('Module: configurability/translate', (t) => {
+  test('Translate.translateExternal', (t) => {
+    test('Translates external options properly', (t) => {
       let config, expected, found;
 
       config = {

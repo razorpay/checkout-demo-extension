@@ -47,7 +47,7 @@
 
     session.delegator
       .add('card', emi_el_card)
-      .on('network', function() {
+      .on('network', function () {
         const type = this.type;
 
         // card icon element
@@ -55,7 +55,7 @@
           .querySelector('.cardtype')
           .setAttribute('cardtype', type);
       })
-      .on('change', function() {
+      .on('change', function () {
         let isValid = this.isValid();
 
         if (this.type !== 'bajaj') {
@@ -85,7 +85,8 @@
     <div class="clear" />
     <div
       class="strip emi-plans-info-container emi-plans-trigger details-visible"
-      on:click={() => dispatch('editplan')}>
+      on:click={() => dispatch('editplan')}
+    >
       <div class="emi-plan-selected emi-icon-multiple-cards">
         <div class="emi-plans-text">
           {formatTemplateWithLocale(EDIT_PLAN_TEXT, emiText, $locale)}
@@ -113,7 +114,8 @@
             name="card[number]"
             autocomplete="off"
             maxlength="19"
-            value={prefill['card[number]']} />
+            value={prefill['card[number]']}
+          />
         </div>
       </div>
       <div class="elem-wrap" class:readonly={readonly.name}>
@@ -130,7 +132,8 @@
             required
             value={prefill.name}
             pattern={"^[a-zA-Z. 0-9'-]{1,100}$"}
-            readonly={readonly.name} />
+            readonly={readonly.name}
+          />
         </div>
       </div>
     </div>

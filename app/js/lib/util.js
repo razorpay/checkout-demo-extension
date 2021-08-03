@@ -7,13 +7,13 @@ function raise(message) {
 
 var arrayProto = Array.prototype;
 var slice = arrayProto.slice;
-var roll = function() {};
+var roll = function () {};
 var noop = roll;
 var emo = {};
 
 var now =
   Date.now ||
-  function() {
+  function () {
     return new Date().getTime();
   };
 
@@ -63,7 +63,7 @@ function arr2obj(array) {
   var obj = {};
   return (
     (array &&
-      array.reduce(function(prev, next) {
+      array.reduce(function (prev, next) {
         prev[next] = 1;
         return prev;
       }, obj)) ||
@@ -142,7 +142,7 @@ function findBy(arr, prop, value) {
     arr = [];
   }
 
-  return find(arr, function(item) {
+  return find(arr, function (item) {
     return item[prop] === value;
   });
 }
@@ -155,11 +155,11 @@ function bind(func, thisArg, arg) {
   }
   var args = arguments;
   if (args.length >= 3) {
-    return function() {
+    return function () {
       func.apply(thisArg, slice.call(args, 2));
     };
   }
-  return function() {
+  return function () {
     return func.apply(thisArg, arguments);
   };
 }
@@ -172,7 +172,7 @@ function defer(func, timeout) {
     setTimeout(func, timeout);
   } else {
     var args = arguments;
-    setTimeout(function() {
+    setTimeout(function () {
       func.apply(null, slice.call(args, 2));
     }, timeout);
   }
@@ -180,7 +180,7 @@ function defer(func, timeout) {
 
 function invoke(handler, thisArg, param, timeout) {
   if (isNumber(timeout)) {
-    return setTimeout(function() {
+    return setTimeout(function () {
       invoke(handler, thisArg, param);
     }, timeout);
   }
@@ -208,7 +208,7 @@ function debounce(func, wait) {
   }
   var basetime = now();
 
-  return function() {
+  return function () {
     var args = arguments;
 
     function later() {
@@ -227,7 +227,7 @@ function debounce(func, wait) {
 function invokeEach(iteratee, thisArg) {
   each(
     iteratee,
-    function(key, func) {
+    function (key, func) {
       func.call(thisArg);
     },
     thisArg
@@ -235,7 +235,7 @@ function invokeEach(iteratee, thisArg) {
 }
 
 function invokeOnEach(func, map) {
-  each(map, function(key, val) {
+  each(map, function (key, val) {
     if (isString(func)) {
       func = val[func];
     }
@@ -261,7 +261,7 @@ function invokeEachWith(map, func) {
   if (isString(func)) {
     func = thisArg[func];
   }
-  each(map, function(key, val) {
+  each(map, function (key, val) {
     func.apply(thisArg, [key, val].concat(slice.call(args, declaredArgs)));
   });
 }
@@ -313,7 +313,7 @@ function submitForm(action, data, method, target) {
 function deserialize(data, key) {
   if (isNonNullObject(data)) {
     var str = '';
-    each(data, function(name, value) {
+    each(data, function (name, value) {
       if (key) {
         name = key + '[' + name + ']';
       }

@@ -34,6 +34,59 @@
   const totalAmountNoCost = formatter(amount);
 </script>
 
+<!-- LABEL: How does No Cost EMI work? -->
+<header>{$t(NO_COST_HEADER)}</header>
+<p>
+  <!-- LABEL: You are buying a product worth
+  <b>{totalAmountNoCost} on a {duration}-month EMI period.</b>
+  The bank used charges
+  <b>{rate}% interest</b>
+  per annum. -->
+  <FormattedText
+    text={formatTemplateWithLocale(
+      NO_COST_DESCRIPTION,
+      { amount: totalAmountNoCost, duration, rate },
+      $locale
+    )}
+  />
+</p>
+<table>
+  <tr>
+    <td />
+    <td>
+      <!-- LABEL: Normal EMI -->
+      <b>{$t(NORMAL_EMI_LABEL)}</b>
+    </td>
+    <td>
+      <!-- LABEL: No Cost EMI -->
+      <b>{$t(NO_COST_LABEL)}</b>
+    </td>
+  </tr>
+  <tr>
+    <td><b>EMI Amount</b></td>
+    <td>{monthAmountNoCost} + {rate}% <br /> <b>{monthAmountNormal}</b></td>
+    <td><b>{monthAmountNoCost}</b></td>
+  </tr>
+  <tr>
+    <td>
+      <!-- LABEL: Total Amount -->
+      <b>{$t(TOTAL_AMOUNT_LABEL)}</b>
+    </td>
+    <td><b>{totalAmountNormal}</b></td>
+    <td><b>{totalAmountNoCost}</b></td>
+  </tr>
+</table>
+<p>
+  <!-- LABEL: <b>Zero effective interest:</b>
+  you get upfront discount equal to interest charged by the bank. -->
+  <FormattedText text={$t(EFFECTIVE_INTEREST_INFO)} />
+  <br />
+  <!-- LABEL: You save {amount} -->
+  <span>
+    {formatTemplateWithLocale(YOU_SAVE_INFO, { amount: youSave }, $locale)}
+  </span>
+</p>
+
 <style>
   td {
     border: 1px solid #ccc;
@@ -79,51 +132,3 @@
     color: #333;
   }
 </style>
-
-<!-- LABEL: How does No Cost EMI work? -->
-<header>{$t(NO_COST_HEADER)}</header>
-<p>
-  <!-- LABEL: You are buying a product worth
-  <b>{totalAmountNoCost} on a {duration}-month EMI period.</b>
-  The bank used charges
-  <b>{rate}% interest</b>
-  per annum. -->
-  <FormattedText
-    text={formatTemplateWithLocale(NO_COST_DESCRIPTION, { amount: totalAmountNoCost, duration, rate }, $locale)} />
-</p>
-<table>
-  <tr>
-    <td />
-    <td>
-      <!-- LABEL: Normal EMI -->
-      <b>{$t(NORMAL_EMI_LABEL)}</b>
-    </td>
-    <td>
-      <!-- LABEL: No Cost EMI -->
-      <b>{$t(NO_COST_LABEL)}</b>
-    </td>
-  </tr>
-  <tr>
-    <td><b>EMI Amount</b></td>
-    <td>{monthAmountNoCost} + {rate}% <br /> <b>{monthAmountNormal}</b></td>
-    <td><b>{monthAmountNoCost}</b></td>
-  </tr>
-  <tr>
-    <td>
-      <!-- LABEL: Total Amount -->
-      <b>{$t(TOTAL_AMOUNT_LABEL)}</b>
-    </td>
-    <td><b>{totalAmountNormal}</b></td>
-    <td><b>{totalAmountNoCost}</b></td>
-  </tr>
-</table>
-<p>
-  <!-- LABEL: <b>Zero effective interest:</b>
-  you get upfront discount equal to interest charged by the bank. -->
-  <FormattedText text={$t(EFFECTIVE_INTEREST_INFO)} />
-  <br />
-  <!-- LABEL: You save {amount} -->
-  <span>
-    {formatTemplateWithLocale(YOU_SAVE_INFO, { amount: youSave }, $locale)}
-  </span>
-</p>

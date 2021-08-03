@@ -9,6 +9,39 @@
   export let value;
 </script>
 
+<div class="flow-selection-container">
+  <!-- LABEL: Complete Payment Using -->
+  <label>{$t(AUTH_TYPE_HEADER)}</label>
+  <div class="flow input-radio">
+    <input
+      type="radio"
+      name="auth_type"
+      id="flow-3ds"
+      value="c3ds"
+      bind:group={value}
+    />
+    <label for="flow-3ds">
+      <div class="radio-display" />
+      <!-- LABEL: OTP / Password -->
+      <div class="label-content">{$t(AUTH_TYPE_OTP)}</div>
+    </label>
+  </div>
+  <div class="flow input-radio">
+    <input
+      type="radio"
+      name="auth_type"
+      id="flow-pin"
+      value="pin"
+      bind:group={value}
+    />
+    <label for="flow-pin">
+      <div class="radio-display" />
+      <!-- LABEL: ATM PIN -->
+      <div class="label-content">{$t(AUTH_TYPE_PIN)}</div>
+    </label>
+  </div>
+</div>
+
 <style>
   .flow-selection-container {
     margin: 16px 0 8px 0;
@@ -28,34 +61,3 @@
     margin-bottom: 4px;
   }
 </style>
-
-<div class="flow-selection-container">
-  <!-- LABEL: Complete Payment Using -->
-  <label>{$t(AUTH_TYPE_HEADER)}</label>
-  <div class="flow input-radio">
-    <input
-      type="radio"
-      name="auth_type"
-      id="flow-3ds"
-      value="c3ds"
-      bind:group={value} />
-    <label for="flow-3ds">
-      <div class="radio-display" />
-      <!-- LABEL: OTP / Password -->
-      <div class="label-content">{$t(AUTH_TYPE_OTP)}</div>
-    </label>
-  </div>
-  <div class="flow input-radio">
-    <input
-      type="radio"
-      name="auth_type"
-      id="flow-pin"
-      value="pin"
-      bind:group={value} />
-    <label for="flow-pin">
-      <div class="radio-display" />
-      <!-- LABEL: ATM PIN -->
-      <div class="label-content">{$t(AUTH_TYPE_PIN)}</div>
-    </label>
-  </div>
-</div>

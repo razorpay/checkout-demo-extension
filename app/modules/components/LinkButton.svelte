@@ -3,6 +3,10 @@
   export let disabled = false;
 </script>
 
+<button {type} {...$$props} on:click class="hc_border" {disabled}>
+  <slot />
+</button>
+
 <style>
   button {
     padding: 3px 1px;
@@ -14,7 +18,3 @@
     cursor: default;
   }
 </style>
-
-<button {type} {...$$props} on:click class="hc_border" {disabled}>
-  <slot />
-</button>

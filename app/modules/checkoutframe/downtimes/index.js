@@ -1,13 +1,15 @@
 /**
  * Copy downtimes between methods if needed.
- * @param {Array<Object>} downtimes 
+ * @param {Array<Object>} downtimes
  * @param {Method} method
  *
  * @return {Object}
  */
 function getDowntimesByMethod(downtimes, method) {
-  const downtimeBySeverity= { high:[], medium:[], low:[] };
-  downtimes[method]?.forEach(downtime=>downtimeBySeverity[downtime.severity].push(downtime));
+  const downtimeBySeverity = { high: [], medium: [], low: [] };
+  downtimes[method]?.forEach((downtime) =>
+    downtimeBySeverity[downtime.severity].push(downtime)
+  );
   return downtimeBySeverity;
 }
 
@@ -42,7 +44,7 @@ function copyMethodsIfNeeded(downtimes) {
 function groupDowntimesByMethod(allDowntimes) {
   const downtimes = {};
 
-  _Arr.loop(allDowntimes, downtime => {
+  _Arr.loop(allDowntimes, (downtime) => {
     const { method } = downtime;
 
     if (!_Obj.hasProp(downtimes, method)) {
@@ -81,27 +83,30 @@ export function getDowntimes(preferences) {
 
   return {
     cards: { ...getDowntimesByMethod(groupedDowntimes, 'card') },
-    upi: { ...getDowntimesByMethod(groupedDowntimes, 'upi')},
+    upi: { ...getDowntimesByMethod(groupedDowntimes, 'upi') },
     netbanking: { ...getDowntimesByMethod(groupedDowntimes, 'netbanking') },
   };
 }
 
 const filterDowntimeArr = (downtimeArr, instrumentKey, value) => {
-  return downtimeArr.filter(item => {
+  return downtimeArr.filter((item) => {
     if (
       item.instrument &&
       item.instrument[instrumentKey]?.toLowerCase() === value.toLowerCase()
     ) {
       return item;
     }
-    if((instrumentKey === 'vpa_handle' || instrumentKey === 'psp') && (item.instrument['vpa_handle'] === 'all')){
-      return item
+    if (
+      (instrumentKey === 'vpa_handle' || instrumentKey === 'psp') &&
+      item.instrument['vpa_handle'] === 'all'
+    ) {
+      return item;
     }
   });
 };
 
 export const checkDowntime = (downtime, instrumentKey, value) => {
-  if(!value) {
+  if (!value) {
     return false;
   }
   for (const key in downtime) {

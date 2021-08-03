@@ -57,13 +57,13 @@ export const payWithPaymentRequestApi = (
     const request = new PaymentRequest(supportedInstruments, details);
     request
       .show()
-      .then(instrument => {
+      .then((instrument) => {
         successCallback(instrument);
 
         return instrument.complete();
       })
       /* jshint ignore:start */
-      .catch(e => {
+      .catch((e) => {
         errorCallback(e);
       });
     /* jshint ignore:end */
@@ -118,14 +118,14 @@ function transformIntentForMicroappPayload(intentUrl) {
  */
 export function payWithMicroapp(intentUrl) {
   const payload = transformIntentForMicroappPayload(intentUrl);
-  const {
-    transactionReferenceId,
-  } = payload.allowedPaymentMethods[0].parameters;
+  const { transactionReferenceId } =
+    payload.allowedPaymentMethods[0].parameters;
 
-  return global.microapps.requestPayment(payload).then(response => {
+  return global.microapps.requestPayment(payload).then((response) => {
     // Add Transaction reference ID in the response.
     if (response.paymentMethodData) {
-      response.paymentMethodData.transactionReferenceId = transactionReferenceId;
+      response.paymentMethodData.transactionReferenceId =
+        transactionReferenceId;
     }
 
     return response;

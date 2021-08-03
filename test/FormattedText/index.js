@@ -1,8 +1,8 @@
 import { tokenizeTextForFormatters } from 'ui/elements/FormattedText/tokenizer';
 
-test('Module: FormattedText', t => {
-  test('tokenizeTextForFormatters', t => {
-    test('Tokenizes the text correctly upto one level of token nesting', t => {
+test('Module: FormattedText', (t) => {
+  test('tokenizeTextForFormatters', (t) => {
+    test('Tokenizes the text correctly upto one level of token nesting', (t) => {
       let textToBeFormatted;
 
       // -----------------

@@ -2156,7 +2156,7 @@ Session.prototype = {
     this.get().amount = amount;
     var offer = this.getAppliedOffer();
     this.updateAmountInHeader(amount);
-    if(offer && offer.amount) {
+    if (offer && offer.amount) {
       this.updateAmountInHeaderForOffer(offer.amount);
     }
   },
@@ -4345,12 +4345,14 @@ Session.prototype = {
         }
         var forcedOffer = discreet.Offers.getForcedOffer();
         var offer = this.getAppliedOffer();
-        if(forcedOffer && offer) {
-          var isCardOfferValid = discreet.storeGetter(discreet.OffersStore.isCardValidForOffer);
+        if (forcedOffer && offer) {
+          var isCardOfferValid = discreet.storeGetter(
+            discreet.OffersStore.isCardValidForOffer
+          );
           // check if its valid offer or not
-          if(!isCardOfferValid) {
+          if (!isCardOfferValid) {
             Form.shake();
-            // if saved card screen 
+            // if saved card screen
             $('.checked .saved-cvv input').focus();
             return $('#card_number').focus();
           }

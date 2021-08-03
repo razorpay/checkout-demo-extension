@@ -11,7 +11,7 @@
 export function submitForm(formData) {
   const { doc = window.document, path, method = 'post', target } = formData;
   let { params } = formData;
-  if(params) {
+  if (params) {
     params = flatten(params);
   }
 
@@ -19,7 +19,7 @@ export function submitForm(formData) {
     const action = appendParamsToUrl(path, params || '');
     if (target) {
       window.open(action, target);
-    } else if(doc !== window.document) {
+    } else if (doc !== window.document) {
       doc.location = action;
     } else {
       window.location = action;
@@ -85,7 +85,7 @@ export function serialize(obj) {
 
 export function flatten(data = {}) {
   var result = {};
-  if(Object.keys(data).length === 0) return '';
+  if (Object.keys(data).length === 0) return '';
   function recurse(cur, prop) {
     if (Object(cur) !== cur) {
       result[prop] = cur;

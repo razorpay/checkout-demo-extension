@@ -14,6 +14,27 @@
   }
 </script>
 
+<button
+  type="button"
+  class={className}
+  class:slotted-option={defaultStyles}
+  role="listitem"
+  {disabled}
+  {id}
+  {...attributes}
+  on:click
+>
+  <Stack horizontal>
+    <slot name="icon" />
+    <div>
+      <slot name="title" />
+      <slot name="subtitle" />
+    </div>
+    <slot name="extra" />
+  </Stack>
+  <slot name="banner" />
+</button>
+
 <style>
   button {
     background: #ffffff;
@@ -43,23 +64,3 @@
     overflow: hidden;
   }
 </style>
-
-<button
-  type="button"
-  class={className}
-  class:slotted-option={defaultStyles}
-  role="listitem"
-  {disabled}
-  {id}
-  {...attributes}
-  on:click>
-  <Stack horizontal>
-    <slot name="icon" />
-    <div>
-      <slot name="title" />
-      <slot name="subtitle" />
-    </div>
-    <slot name="extra" />
-  </Stack>
-    <slot name="banner" />
-</button>

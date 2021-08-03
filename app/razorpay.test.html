@@ -49,23 +49,21 @@
     <div id="status"></div>
     <div id="response"></div>
     <script>
-      document.forms[0].onsubmit = function(e) {
+      document.forms[0].onsubmit = function (e) {
         e.preventDefault();
         window.rp = new Razorpay({
           key: 'rzp_test_1DP5mmOlF5G5ag',
           amount: 200,
         })
-          .on('payment.error', function(resp) {
+          .on('payment.error', function (resp) {
             document.getElementById('status').innerText = 'failed';
-            document.getElementById('response').innerText = JSON.stringify(
-              resp
-            );
+            document.getElementById('response').innerText =
+              JSON.stringify(resp);
           })
-          .on('payment.success', function(resp) {
+          .on('payment.success', function (resp) {
             document.getElementById('status').innerText = 'success';
-            document.getElementById('response').innerText = JSON.stringify(
-              resp
-            );
+            document.getElementById('response').innerText =
+              JSON.stringify(resp);
           });
         rp.createPayment(null, { paused: true, message: 'loading' });
       };

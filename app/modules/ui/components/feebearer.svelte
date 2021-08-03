@@ -80,10 +80,7 @@
       : session.get('amount');
     paymentData.currency = session.get('currency');
     loading = true;
-    session.r
-      .calculateFees(paymentData)
-      .then(onSuccess)
-      .catch(onError);
+    session.r.calculateFees(paymentData).then(onSuccess).catch(onError);
   }
 </script>
 

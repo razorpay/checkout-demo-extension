@@ -13,11 +13,13 @@ import { isDesktop } from 'common/useragent';
 
 const PREFERRED_INSTRUMENTS_CACHE = {};
 
-export const removeDuplicateApiInstruments = instruments => {
+export const removeDuplicateApiInstruments = (instruments) => {
   const result = [];
 
-  instruments.forEach(instrument => {
-    const uniqueInstrumentsIds = result.map(x => x.method + '-' + x.instrument);
+  instruments.forEach((instrument) => {
+    const uniqueInstrumentsIds = result.map(
+      (x) => x.method + '-' + x.instrument
+    );
     const instrumentId = instrument.method + '-' + instrument.instrument;
 
     if (!uniqueInstrumentsIds.includes(instrumentId)) {
@@ -52,7 +54,7 @@ export function setInstrumentsForCustomer(
   instruments,
   identified = true
 ) {
-  const transformedInstruments = _Arr.map(instruments, instrument =>
+  const transformedInstruments = _Arr.map(instruments, (instrument) =>
     transformInstrumentToStorageFormat(instrument, {
       upiApps: getUPIIntentApps().filtered,
     })
@@ -83,10 +85,10 @@ function getInstrumentsFromApi(customer) {
   });
 
   const p13nFetchStart = new Date();
-  const promise = new Promise(resolve => {
+  const promise = new Promise((resolve) => {
     fetch({
       url,
-      callback: function(response) {
+      callback: function (response) {
         Analytics.track('p13n:api_data', {
           type: AnalyticsTypes.METRIC,
           data: {
@@ -151,7 +153,7 @@ export function getInstrumentsForCustomer(customer) {
 // changes needed to translate api format instruments to storage format
 // instrument.instrument contains the primary payment instrument data
 const API_INSTRUMENT_PAYMENT_ADDONS = {
-  upi: instrument => {
+  upi: (instrument) => {
     if (!instrument.instrument) {
       // API sends null
       // Keep a sanity value allow this to go forward.
@@ -175,9 +177,8 @@ const API_INSTRUMENT_PAYMENT_ADDONS = {
         // to show intent instrument on desktop `vendor_vpa` is used to diffrentiate
         // from normal intent instrument that'd only show on phone
         if (isDesktop()) {
-          instrument['vendor_vpa'] = instrument.vpa
+          instrument['vendor_vpa'] = instrument.vpa;
         }
-
       } else {
         // If no valid app is found for the handle, track it
         Analytics.track('p13n:app_missing_for_handle', {
@@ -189,25 +190,25 @@ const API_INSTRUMENT_PAYMENT_ADDONS = {
       }
     }
   },
-  wallet: instrument => {
+  wallet: (instrument) => {
     instrument.wallet = instrument.instrument;
     delete instrument.instrument;
   },
-  netbanking: instrument => {
+  netbanking: (instrument) => {
     instrument.bank = instrument.instrument;
     delete instrument.instrument;
   },
-  card: instrument => {
+  card: (instrument) => {
     // Use a dummy value if API returns `null` as this value needs to be truthy to
     // act as a saved card instrument
     instrument.token_id = instrument.instrument || 'token_dummy';
     delete instrument.instrument;
   },
-  app: instrument => {
+  app: (instrument) => {
     instrument.provider = instrument.instrument;
     delete instrument.instrument;
   },
-  cardless_emi: instrument => {
+  cardless_emi: (instrument) => {
     instrument.provider = instrument.instrument;
     delete instrument.instrument;
   },

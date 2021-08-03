@@ -56,6 +56,30 @@
   }
 </script>
 
+<!-- TODO: make helpText support an image as well -->
+<Field
+  formatter={{ type: 'number' }}
+  {helpText}
+  {id}
+  {label}
+  {placeholder}
+  name="card[cvv]"
+  pattern={cvvPattern}
+  required
+  type="cvv"
+  autocomplete="cc-csc"
+  maxlength={length}
+  {value}
+  bind:this={ref}
+  on:input={handleInput}
+  on:input
+  on:blur
+  on:focus
+  handleBlur
+  handleFocus
+  handleInput
+/>
+
 <style>
   /* TODO: find a better way */
   :global(#card_cvv) {
@@ -78,26 +102,3 @@
     right: 50px;
   }
 </style>
-
-<!-- TODO: make helpText support an image as well -->
-<Field
-  formatter={{ type: 'number' }}
-  {helpText}
-  {id}
-  {label}
-  {placeholder}
-  name="card[cvv]"
-  pattern={cvvPattern}
-  required
-  type="cvv"
-  autocomplete="cc-csc"
-  maxlength={length}
-  {value}
-  bind:this={ref}
-  on:input={handleInput}
-  on:input
-  on:blur
-  on:focus
-  handleBlur
-  handleFocus
-  handleInput />

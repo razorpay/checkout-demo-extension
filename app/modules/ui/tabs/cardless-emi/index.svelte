@@ -64,16 +64,15 @@
     if (isMethodUsable('emi')) {
       providers = [createProvider('cards')];
     }
-    
-    _Obj.loop(getCardlessEMIProviders(), providerObj => {
-      if(providerObj.pushToFirst) { // higher priority then cardemi
+
+    _Obj.loop(getCardlessEMIProviders(), (providerObj) => {
+      if (providerObj.pushToFirst) {
+        // higher priority then cardemi
         providers.unshift(createProvider(providerObj.code, providerObj));
       } else {
         providers.push(createProvider(providerObj.code, providerObj));
       }
     });
-
-    
 
     return providers;
   }
@@ -95,7 +94,7 @@
     if (!instrument.providers) {
       return providers;
     }
-    const filteredProviders = _Arr.filter(providers, provider =>
+    const filteredProviders = _Arr.filter(providers, (provider) =>
       _Arr.contains(instrument.providers, provider.data.code)
     );
 
@@ -105,7 +104,7 @@
   let filteredProviders = sectionProviderMap;
   let sections = Object.keys(filteredProviders);
   $: {
-    Object.keys(filteredProviders).forEach(sectionId => {
+    Object.keys(filteredProviders).forEach((sectionId) => {
       filteredProviders[sectionId] = filterProvidersAgainstInstrument(
         filteredProviders[sectionId],
         $methodInstrument
@@ -154,7 +153,7 @@
             <span class="cm-side-label"
               >{getCardlessEmiProviderData(
                 provider.data.code,
-                "sideLabel",
+                'sideLabel',
                 $locale
               )}</span
             >
@@ -165,7 +164,7 @@
               style={`background:${getThemeColor()}1a;`}
             >
               <Icon icon={icons.tick_flag} />
-              <span>{$t(provider.highlightLabel) || ""}</span>
+              <span>{$t(provider.highlightLabel) || ''}</span>
             </div>
           {/if}
         </div>

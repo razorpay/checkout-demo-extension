@@ -15,7 +15,7 @@
   import { getPaylaterProviderName } from 'i18n';
   import { SELECT_OPTION_TITLE } from 'ui/labels/paylater';
 
-  const providers = _Arr.map(getPayLaterProviders(), providerObj =>
+  const providers = _Arr.map(getPayLaterProviders(), (providerObj) =>
     createProvider(providerObj.code, providerObj.name)
   );
 
@@ -37,7 +37,7 @@
       return providers;
     }
 
-    let filteredProviders = _Arr.filter(providers, provider =>
+    let filteredProviders = _Arr.filter(providers, (provider) =>
       _Arr.contains(instrument.providers, provider.data.code)
     );
 
@@ -62,7 +62,8 @@
         attributes={{ 'data-paylater': provider.data.code }}
         tabindex={0}
         {...provider}
-        on:select>
+        on:select
+      >
         {getPaylaterProviderName(provider.data.code, $locale)}
       </NextOption>
     {/each}

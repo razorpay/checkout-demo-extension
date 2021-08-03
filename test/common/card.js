@@ -19,8 +19,8 @@ const testCardsWithSpacing = {
   visa: '4242 4242 4242 4242',
 };
 
-test('common/card', t => {
-  test('getCardType', function(t) {
+test('common/card', (t) => {
+  test('getCardType', function (t) {
     t.equal(Card.getCardType(testCards.bajaj), 'bajaj', 'Detected Bajaj Card');
     t.equal(Card.getCardType(testCards.visa), 'visa', 'Detected Visa Card');
     t.equal(
@@ -49,7 +49,7 @@ test('common/card', t => {
     t.end();
   });
 
-  test('getNetworkFromCardNumber', function(t) {
+  test('getNetworkFromCardNumber', function (t) {
     t.equal(
       Card.getNetworkFromCardNumber(testCards.bajaj),
       'bajaj',
@@ -94,7 +94,7 @@ test('common/card', t => {
     t.end();
   });
 
-  test('getCardMaxLen', function(t) {
+  test('getCardMaxLen', function (t) {
     t.equal(
       Card.getCardMaxLen(Card.getCardType(testCards.bajaj)),
       16,
@@ -139,8 +139,8 @@ test('common/card', t => {
     t.end();
   });
 
-  test('getCardSpacing', function(t) {
-    const addSpacingToCard = cardNumber => {
+  test('getCardSpacing', function (t) {
+    const addSpacingToCard = (cardNumber) => {
       let spacing = Card.getCardSpacing(
         Card.getCardMaxLen(Card.getCardType(cardNumber))
       );
@@ -180,7 +180,7 @@ test('common/card', t => {
     t.end();
   });
 
-  test('luhnCheck', function(t) {
+  test('luhnCheck', function (t) {
     t.equal(
       luhnCheck(testCards.visa),
       true,

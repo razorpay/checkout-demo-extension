@@ -4,15 +4,15 @@
 const BrowserStorage = {
   _storage: {},
 
-  setItem: function(key, value) {
+  setItem: function (key, value) {
     this._storage[key] = value;
   },
 
-  getItem: function(key) {
+  getItem: function (key) {
     return this._storage[key] || null;
   },
 
-  removeItem: function(key) {
+  removeItem: function (key) {
     delete this._storage[key];
   },
 };

@@ -2,7 +2,7 @@
   // Utils imports
   import { getSession } from 'sessionmanager';
   import { Track } from 'analytics';
-  import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte'
+  import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
 
   // Actions
   import {
@@ -206,7 +206,11 @@
     input.blur();
   }
 
-  export function setSelectionRange(selectionStart, selectionEnd, selectionDirection = "none") {
+  export function setSelectionRange(
+    selectionStart,
+    selectionEnd,
+    selectionDirection = 'none'
+  ) {
     input.setSelectionRange(selectionStart, selectionEnd, selectionDirection);
   }
 
@@ -219,7 +223,7 @@
   }
 
   export function setValid(isValid) {
-    setTimeout(_ => {
+    setTimeout((_) => {
       _El.keepClass(wrap, 'invalid', !isValid);
     });
   }
@@ -329,7 +333,7 @@
     on:click
     on:keydown={onKeyDown}
     on:keydown
-    on:scroll={e => {
+    on:scroll={(e) => {
       mainInputScrollLeft = e.target.scrollLeft;
     }}
     class:no-refresh={!refresh}

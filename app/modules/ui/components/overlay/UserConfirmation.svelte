@@ -15,6 +15,11 @@
   }
 </script>
 
+<div class="auth-overlay">
+  <span class="desc">{callout}</span>
+  <button class="btn" on:click={onConfirm}>{buttonText}</button>
+</div>
+
 <style>
   .auth-overlay {
     display: flex;
@@ -32,8 +37,3 @@
     margin-top: 16px;
   }
 </style>
-
-<div class="auth-overlay">
-  <span class="desc">{callout}</span>
-  <button class="btn" on:click={onConfirm}>{buttonText}</button>
-</div>

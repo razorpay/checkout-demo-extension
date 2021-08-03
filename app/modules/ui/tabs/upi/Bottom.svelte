@@ -38,7 +38,7 @@
   const session = getSession();
   const merchantName = getName();
 
-  let toShortFormat = function(date, delimter = ' ') {
+  let toShortFormat = function (date, delimter = ' ') {
     let month_names = [
       'Jan',
       'Feb',
@@ -71,7 +71,8 @@
           nameString: merchantName ? 'by ' + merchantName : '',
           startDate: toShortFormat(otmStartDate),
           endDate: toShortFormat(otmEndDate),
-        })} />
+        })}
+      />
     </Callout>
   {/if}
   <!-- Both CAW and subscriptions show the same callout with the same information -->
@@ -81,7 +82,17 @@
       <!-- This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} on a {recurringFrequency} basis till {endDate}. -->
       <!-- This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} anytime till {endDate}. -->
       <!-- This is a recurring payment and {maxAmount} will be charged now. {merchantName} can charge upto {amount} anytime till {endDate}. -->
-      {formatTemplateWithLocale(recurring_callout, { maxAmount: session.formatAmountWithCurrency(getAmount()), merchantName: !merchantName ? '' : merchantName, amount: session.formatAmountWithCurrency(maxRecurringAmount), recurringFrequency, endDate: toShortFormat(new Date(endDate * 1000)) }, $locale)}
+      {formatTemplateWithLocale(
+        recurring_callout,
+        {
+          maxAmount: session.formatAmountWithCurrency(getAmount()),
+          merchantName: !merchantName ? '' : merchantName,
+          amount: session.formatAmountWithCurrency(maxRecurringAmount),
+          recurringFrequency,
+          endDate: toShortFormat(new Date(endDate * 1000)),
+        },
+        $locale
+      )}
     </Callout>
   {/if}
 </Bottom>

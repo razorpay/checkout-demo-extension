@@ -6,8 +6,8 @@ const cdnUrl = RazorpayConfig.cdn;
 const prefix = cdnUrl + 'bank/';
 const fullPrefix = cdnUrl + 'bank-lg/';
 
-export const getBankLogo = code => `${prefix}${code.slice(0, 4)}.gif`;
-export const getFullBankLogo = code => `${fullPrefix}${code.slice(0, 4)}.svg`;
+export const getBankLogo = (code) => `${prefix}${code.slice(0, 4)}.gif`;
+export const getFullBankLogo = (code) => `${fullPrefix}${code.slice(0, 4)}.svg`;
 
 const _commonBanks = {
   ICIC_C: 'ICICI Corporate',
@@ -48,9 +48,9 @@ export function getCommonBankName(code) {
  * @param {Object} bankObj
  * @return {Array<{name: string, code: string, logo: string}>}
  */
-const transformBanks = bankObj =>
+const transformBanks = (bankObj) =>
   _Obj.entries(bankObj)
-  |> _Arr.map(entry => ({
+  |> _Arr.map((entry) => ({
     name: entry[1],
     code: entry[0],
     logo: getBankLogo(entry[0]),
@@ -117,7 +117,7 @@ export const emiBanks = [
   },
 ];
 
-export const getBankFromCardCache = cardNum => {
+export const getBankFromCardCache = (cardNum) => {
   const cardFeatures = getCardMetadata(cardNum);
   let issuer = cardFeatures.issuer;
 
@@ -129,7 +129,7 @@ export const getBankFromCardCache = cardNum => {
     issuer += '_DC';
   }
 
-  let bankObj = _Arr.find(emiBanks, bankObj => bankObj.code === issuer);
+  let bankObj = _Arr.find(emiBanks, (bankObj) => bankObj.code === issuer);
 
   if (bankObj) {
     return {
@@ -149,7 +149,7 @@ export const getPreferredBanks = (availBanks, bankOptions) => {
 
   let bankList =
     commonBanks
-    |> _Arr.filter(currBank => {
+    |> _Arr.filter((currBank) => {
       return (
         availBanks[currBank.code] && !availBanks[currBank.code.slice(0, -2)]
       );
@@ -158,14 +158,14 @@ export const getPreferredBanks = (availBanks, bankOptions) => {
     const availBanksList = transformBanks(availBanks);
 
     /* Indexing to avoid search */
-    var bankIndexMap = availBanksList.reduce(function(map, bank, index) {
+    var bankIndexMap = availBanksList.reduce(function (map, bank, index) {
       map[bank.code] = bank;
       return map;
     }, {});
 
     bankList = order
       /* convert strings given in order to bank object */
-      .map(function(b) {
+      .map(function (b) {
         return bankIndexMap[b];
       })
 
@@ -173,7 +173,7 @@ export const getPreferredBanks = (availBanks, bankOptions) => {
       .concat(bankList)
 
       /* remove empty and duplicated banks */
-      .filter(function(bankObj) {
+      .filter(function (bankObj) {
         var bankVal = bankObj && bankIndexMap[bankObj.code];
         if (bankVal) {
           /* remove from index to avoid repetition */

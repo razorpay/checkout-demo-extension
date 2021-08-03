@@ -62,7 +62,7 @@
 
   function appendPlusToCountryCodeAsynchronously() {
     setTimeout(() => {
-      if (!country.startsWith( '+')) {
+      if (!country.startsWith('+')) {
         country = `+${country}`;
       }
     });
@@ -71,11 +71,11 @@
   function removeZeroFromPhoneAsynchronously() {
     setTimeout(() => {
       if (country === '+91') {
-        if (phone.startsWith( '0')) {
+        if (phone.startsWith('0')) {
           phone = phone.slice(1);
         }
 
-        if (phone.startsWith( '+91')) {
+        if (phone.startsWith('+91')) {
           phone = phone.slice(3);
         }
       }
@@ -188,7 +188,7 @@
     icon=""
     formatter={{ type: 'country_code' }}
     label={$t(COUNTRY_LABEL)}
-    on:input={e => (country = e.target.value)}
+    on:input={(e) => (country = e.target.value)}
     on:blur
     value={country}
     helpText={$t(COUNTRY_HELP_TEXT)}
@@ -211,7 +211,7 @@
     formatter={{ type: 'phone' }}
     label={$t(label)}
     icon=""
-    on:input={e => (phone = e.target.value)}
+    on:input={(e) => (phone = e.target.value)}
     on:blur
     value={phone}
     helpText={$t(CONTACT_HELP_TEXT)}

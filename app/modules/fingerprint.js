@@ -59,7 +59,7 @@ function sha(str) {
   // doesn't work on "http"
   return global.crypto.subtle
     .digest('SHA-1', buffer)
-    .then(hash => (fingerPrint = hex(hash)));
+    .then((hash) => (fingerPrint = hex(hash)));
 }
 
 function hex(buffer) {
@@ -105,9 +105,7 @@ export function generateDeviceId(fingerprint) {
       DEVICE_ALGO_VERSION,
       fingerprint,
       Date.now(),
-      Math.random()
-        .toString()
-        .slice(-8),
+      Math.random().toString().slice(-8),
     ].join('.');
 
     try {
@@ -118,7 +116,7 @@ export function generateDeviceId(fingerprint) {
 
 try {
   generateFingerprint()
-    .then(fp => {
+    .then((fp) => {
       if (fp) {
         fingerPrint = fp;
         generateDeviceId(fp);

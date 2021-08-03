@@ -1,8 +1,8 @@
 import * as Sequence from 'configurability/sequence';
 
-test('Module: configurability/sequence', t => {
-  test('Sequence.getSequencedBlocks', t => {
-    test('Sequences blocks properly with default blocks', t => {
+test('Module: configurability/sequence', (t) => {
+  test('Sequence.getSequencedBlocks', (t) => {
+    test('Sequences blocks properly with default blocks', (t) => {
       let params, expected, found;
 
       params = {
@@ -215,7 +215,7 @@ test('Module: configurability/sequence', t => {
       t.end();
     });
 
-    test('Sequences blocks properly without default blocks', t => {
+    test('Sequences blocks properly without default blocks', (t) => {
       let params, expected, found;
 
       params = {

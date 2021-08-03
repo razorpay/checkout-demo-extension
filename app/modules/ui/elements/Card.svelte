@@ -4,6 +4,10 @@
   export let error = false;
 </script>
 
+<div class:theme-border={selected} class:error-border={error} on:click>
+  <slot />
+</div>
+
 <style>
   div {
     display: block;
@@ -15,7 +19,3 @@
     position: relative;
   }
 </style>
-
-<div class:theme-border={selected} class:error-border={error} on:click>
-  <slot />
-</div>

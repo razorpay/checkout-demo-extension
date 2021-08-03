@@ -6,7 +6,7 @@ export function render(cb) {
   return new CovidDonation({
     target: wrap,
     props: {
-      onCompletionHandler: cb
-    }
+      onCompletionHandler: cb,
+    },
   });
 }

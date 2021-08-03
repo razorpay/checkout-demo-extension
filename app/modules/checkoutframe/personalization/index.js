@@ -52,7 +52,7 @@ function getExtractedDetails(payment, customer, extra = {}) {
 
   extractable.push('method');
 
-  _Arr.loop(extractable, item => {
+  _Arr.loop(extractable, (item) => {
     if (typeof payment[item] !== 'undefined') {
       details[item] = payment[item];
     }
@@ -68,7 +68,7 @@ function getExtractedDetails(payment, customer, extra = {}) {
     if (payment.token) {
       if (customer) {
         let cards = (customer.tokens || {}).items || [];
-        let token = _Arr.find(cards, card => card.token === details.token);
+        let token = _Arr.find(cards, (card) => card.token === details.token);
 
         if (!token) {
           return;
@@ -79,7 +79,7 @@ function getExtractedDetails(payment, customer, extra = {}) {
         details.token_id = token.id;
         delete details.token;
 
-        _Arr.loop(['type', 'issuer', 'network'], key => {
+        _Arr.loop(['type', 'issuer', 'network'], (key) => {
           if (cardDetails[key]) {
             details[key] = cardDetails[key];
           }
@@ -98,7 +98,7 @@ function getExtractedDetails(payment, customer, extra = {}) {
   if (payment.method === 'upi') {
     if (payment.token && customer) {
       let tokens = _Obj.getSafely(customer, 'tokens.items', []);
-      let token = _Arr.find(tokens, token => token.token === details.token);
+      let token = _Arr.find(tokens, (token) => token.token === details.token);
 
       if (!token) {
         return;
@@ -119,7 +119,7 @@ function getExtractedDetails(payment, customer, extra = {}) {
   if (payment.upi_app) {
     let app = _Arr.find(
       getUPIIntentApps().all,
-      app => app.package_name === payment.upi_app
+      (app) => app.package_name === payment.upi_app
     );
     details.app_name = app.app_name;
     details.app_icon = app.app_icon;
@@ -180,7 +180,7 @@ const MAPPERS = {
     // Find an instrument with the same VPA
     const existingInstrumentWithVpa = _Arr.find(
       instruments,
-      instrument => instrument.vpa === vpa
+      (instrument) => instrument.vpa === vpa
     );
 
     // Add token to the existing instrument if it doesn't have a token already
@@ -197,7 +197,7 @@ const MAPPERS = {
 
   // Works to extract instruments based on a unique key
   default: (extracted, instruments) => {
-    return _Arr.find(instruments, instrument => {
+    return _Arr.find(instruments, (instrument) => {
       let same = true;
 
       _Obj.loop(extracted, (val, key) => {
@@ -305,7 +305,7 @@ function updateInstrumentForCustomer(instrument, customer) {
 
   const existing = _Arr.find(
     instruments,
-    _instrument => _instrument.id === instrument.id
+    (_instrument) => _instrument.id === instrument.id
   );
 
   // Replace existing instrument with new one
@@ -385,7 +385,7 @@ export const getInstrumentsForCustomer = (customer, extra = {}, source) => {
 
     if (source === 'storage') {
       // Add score for each instrument
-      _Arr.loop(instruments, instrument => {
+      _Arr.loop(instruments, (instrument) => {
         let timeSincePayment = _.now() - instrument.timestamp;
         let tsScore = Math.exp(-TS_HALFLIFE * timeSincePayment);
         let countScore = 1 - Math.exp(-COUNT_HALFLIFE * instrument.frequency);
@@ -442,7 +442,7 @@ export function addInstrumentToPaymentData(payment, instrument, customer) {
 
   propsToExtract = ['method'].concat(propsToExtract);
 
-  _Arr.loop(propsToExtract, prop => {
+  _Arr.loop(propsToExtract, (prop) => {
     if (!_.isUndefined(instrument[prop])) {
       payment[prop] = instrument[prop];
       added = true;
@@ -453,7 +453,10 @@ export function addInstrumentToPaymentData(payment, instrument, customer) {
   if (_Arr.contains(['card', 'upi'], payment.method)) {
     const tokens = customer && _Obj.getSafely(customer, 'tokens.items', []);
 
-    const token = _Arr.find(tokens, token => token.id === instrument.token_id);
+    const token = _Arr.find(
+      tokens,
+      (token) => token.id === instrument.token_id
+    );
 
     if (token) {
       payment.token = token.token;
@@ -476,7 +479,7 @@ export function addInstrumentToPaymentData(payment, instrument, customer) {
 export function hasAnyInstrumentsOnDevice() {
   try {
     return _Obj.keys(getAllInstruments()).length > 0;
-  } catch (err) { }
+  } catch (err) {}
 
   return false;
 }

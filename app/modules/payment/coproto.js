@@ -25,7 +25,7 @@ import { translatePaymentPopup } from 'i18n/popup';
 import { checkValidFlow, createIframe, isRazorpayFrame } from './utils';
 import FLOWS from 'config/FLOWS';
 
-const getParsedDataFromUrl = url => {
+const getParsedDataFromUrl = (url) => {
   const parsedData = {};
   url.replace(/^.*\?/, '').replace(/([^=&]+)=([^&]*)/g, (m, key, value) => {
     parsedData[decodeURIComponent(key)] = decodeURIComponent(value);
@@ -303,9 +303,9 @@ var responseTypes = {
     this.ajax = fetch
       .jsonp({
         url: request.url,
-        callback: response => this.complete(response),
+        callback: (response) => this.complete(response),
       })
-      .till(response => response && response.status, 10);
+      .till((response) => response && response.status, 10);
 
     if (this.data.method === 'app') {
       this.emit('app.pending', fullResponse);
@@ -324,7 +324,7 @@ var responseTypes = {
     payment.emit('externalsdk.process', fullResponse);
 
     // Set a listener to handle the intent response.
-    payment.on('app.intent_response', response => {
+    payment.on('app.intent_response', (response) => {
       // Track intent response
       Analytics.track('intent_response', { data: { response } });
 
@@ -345,10 +345,10 @@ var responseTypes = {
       payment.ajax = fetch
         .jsonp({
           url: request.url,
-          callback: response =>
+          callback: (response) =>
             payment.complete(handleAsyncStatusResponse(response)),
         })
-        .till(response => response && response.status, 10);
+        .till((response) => response && response.status, 10);
     });
   },
 
@@ -356,9 +356,9 @@ var responseTypes = {
     this.ajax = fetch
       .jsonp({
         url: request.url,
-        callback: response => this.complete(response),
+        callback: (response) => this.complete(response),
       })
-      .till(response => response && response.status, 10);
+      .till((response) => response && response.status, 10);
 
     this.emit('upi.pending', { flow: 'upi-intent' });
   },
@@ -436,7 +436,7 @@ var responseTypes = {
       const request = new PaymentRequest(supportedInstruments, details);
       request
         .show()
-        .then(instrument => {
+        .then((instrument) => {
           Track(this.r, 'web_payments_api_response', {
             instrument,
           });
@@ -453,7 +453,7 @@ var responseTypes = {
 
           return instrument.complete();
         })
-        .catch(error => {
+        .catch((error) => {
           webPaymentOnError(app, error);
         });
     } catch (error) {
@@ -465,7 +465,7 @@ var responseTypes = {
     if (type === 'payment_request') {
       GPay.payWithPaymentRequestApi(
         fullResponse.data,
-        instrument => {
+        (instrument) => {
           Track(this.r, 'gpay_pay_response', {
             instrument,
           });
@@ -474,7 +474,7 @@ var responseTypes = {
             response: instrument.details,
           });
         },
-        error => {
+        (error) => {
           if (error.code) {
             if (
               [error.ABORT_ERR, error.NOT_SUPPORTED_ERR].indexOf(error.code) >=
@@ -500,13 +500,13 @@ var responseTypes = {
       );
     } else if (type === 'microapp') {
       GPay.payWithMicroapp(fullResponse.data.intent_url)
-        .then(response => {
+        .then((response) => {
           Analytics.track('gpay_pay_response', {
             data: response.paymentMethodData,
           });
           this.emit('upi.intent_success_response', response.paymentMethodData);
         })
-        .catch(error => {
+        .catch((error) => {
           Analytics.track('gpay_error', {
             data: error,
           });
@@ -524,7 +524,7 @@ var responseTypes = {
       fetch
         .jsonp({
           url: request.url,
-          callback: response => {
+          callback: (response) => {
             // transactionReferenceId is required for Google Pay microapps payments
             if (transactionReferenceId) {
               response.transaction_reference = transactionReferenceId; // This is snake_case to maintain convention
@@ -533,7 +533,7 @@ var responseTypes = {
             this.complete(response);
           },
         })
-        .till(response => response && response.status, 10);
+        .till((response) => response && response.status, 10);
 
     var intent_url = (fullResponse.data || {}).intent_url;
 
@@ -555,7 +555,7 @@ var responseTypes = {
         CheckoutBridge.callNativeIntent(intent_url);
       }
 
-      this.on('app.intent_response', response => {
+      this.on('app.intent_response', (response) => {
         if (response.provider === 'CRED') {
           if (response.data === 0) {
             // Payment was cancelled on CRED app.
@@ -571,16 +571,16 @@ var responseTypes = {
         this.ajax = fetch
           .jsonp({
             url: request.url,
-            callback: response =>
+            callback: (response) =>
               this.complete(handleAsyncStatusResponse(response)),
           })
-          .till(response => response && response.status, 10);
+          .till((response) => response && response.status, 10);
       });
 
       return;
     }
 
-    const startPolling = data => {
+    const startPolling = (data) => {
       if (data) {
         this.emit('upi.pending', { flow: 'upi-intent', response: data });
       }
@@ -594,7 +594,7 @@ var responseTypes = {
       this.on('upi.intent_success_response', startPolling);
     }
 
-    this.on('upi.intent_response', data => {
+    this.on('upi.intent_response', (data) => {
       if (data |> parseUPIIntentResponse |> didUPIIntentSucceed) {
         this.emit('upi.intent_success_response', data);
       } else {

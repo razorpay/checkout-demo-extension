@@ -112,7 +112,7 @@
   function handleClick() {
     const payload = { cvv: cvvValue };
     // Focus on next tick because the CVV field might not have rendered right now.
-    tick().then(_ => {
+    tick().then((_) => {
       if (cvvInput) {
         cvvInput.focus();
       }
@@ -126,22 +126,13 @@
   }
 </script>
 
-<style>
-  .downtime-saved-cards {
-    margin-bottom: 8px;
-  }
-  .downtime-saved-cards-icon {
-    margin-right: 8px;
-    margin-top: 2px;
-  }
-</style>
-
 <div
   class="saved-card"
   class:checked={selected}
   on:click={handleClick}
   tabIndex="0"
-  {...attributes}>
+  {...attributes}
+>
   <div class="help up">
     <!-- LABEL: EMI is not available on this card-->
     {$t(SAVED_CARD_UNAVAILABLE_HELP)}
@@ -151,7 +142,12 @@
     <div class="saved-number">
       <!-- LABEL: Card ending with {last4} -->
       <FormattedText
-        text={formatTemplateWithLocale(SAVED_CARD_LABEL, { last4: card.last4 }, $locale)} />
+        text={formatTemplateWithLocale(
+          SAVED_CARD_LABEL,
+          { last4: card.last4 },
+          $locale
+        )}
+      />
     </div>
     {#if !!downtimeSeverity && selected}
       <div class="downtime-saved-cards-icon">
@@ -162,11 +158,12 @@
       {#if showCvv}
         <CvvField
           bind:value={cvvValue}
-          on:input={_ => dispatch('cvvchange', { cvv: cvvValue })}
+          on:input={(_) => dispatch('cvvchange', { cvv: cvvValue })}
           bind:this={cvvInput}
           length={cvvDigits}
           showHelp={false}
-          showPlaceholder />
+          showPlaceholder
+        />
       {/if}
     </div>
   </div>
@@ -178,12 +175,17 @@
           class="emi-plans-info-container emi-plans-trigger"
           data-bank={card.issuer}
           data-card-type={card.type}
-          on:click={event => dispatch('viewPlans', event)}>
+          on:click={(event) => dispatch('viewPlans', event)}
+        >
           {#if $selectedPlanTextForSavedCard && tab === 'emi'}
             <div class="emi-plan-selected emi-icon-multiple-cards">
               <!-- LABEL: {duration} Months ({amount}/mo) -->
               <div class="emi-plans-text">
-                {formatTemplateWithLocale(EDIT_PLAN_TEXT, $selectedPlanTextForSavedCard, $locale)}
+                {formatTemplateWithLocale(
+                  EDIT_PLAN_TEXT,
+                  $selectedPlanTextForSavedCard,
+                  $locale
+                )}
               </div>
               <!-- LABEL: Edit -->
               <div class="emi-plans-action theme-highlight">
@@ -210,7 +212,8 @@
             class="nocvv-checkbox"
             type="checkbox"
             id={`nocvv-${token}`}
-            bind:checked={noCvvChecked} />
+            bind:checked={noCvvChecked}
+          />
           <span class="checkbox" />
           <!-- My Maestro Card doesn't have Expiry/CVV -->
           {$t(NOCVV_LABEL)}
@@ -224,26 +227,50 @@
             containerClass="flow"
             id={`flow-3ds-${token}`}
             inputClass="auth_type_radio"
-            label={formatTemplateWithLocale(TITLE_GENERIC, { method: $t(AUTH_TYPE_OTP) }, $locale)}
+            label={formatTemplateWithLocale(
+              TITLE_GENERIC,
+              { method: $t(AUTH_TYPE_OTP) },
+              $locale
+            )}
             name={`auth_type-${token}`}
             value="c3ds"
-            on:change={handleAuthRadioChanged} />
+            on:change={handleAuthRadioChanged}
+          />
           <Radio
             contaierClass="flow"
             checked={authType === 'pin'}
             id={`flow-pin-${token}`}
             inputClass="auth_type_radio"
-            label={formatTemplateWithLocale(TITLE_GENERIC, { method: $t(AUTH_TYPE_PIN) }, $locale)}
+            label={formatTemplateWithLocale(
+              TITLE_GENERIC,
+              { method: $t(AUTH_TYPE_PIN) },
+              $locale
+            )}
             name={`auth_type-${token}`}
             value="pin"
-            on:change={handleAuthRadioChanged} />
+            on:change={handleAuthRadioChanged}
+          />
         </div>
       {/if}
     </div>
   {/if}
   {#if !!downtimeSeverity && selected}
     <div class="downtime-saved-cards">
-      <DowntimeCallout showIcon={false} severe={downtimeSeverity} { downtimeInstrument } />
+      <DowntimeCallout
+        showIcon={false}
+        severe={downtimeSeverity}
+        {downtimeInstrument}
+      />
     </div>
   {/if}
 </div>
+
+<style>
+  .downtime-saved-cards {
+    margin-bottom: 8px;
+  }
+  .downtime-saved-cards-icon {
+    margin-right: 8px;
+    margin-top: 2px;
+  }
+</style>

@@ -57,7 +57,10 @@
     }
 
     if (!validCardForOffer) {
-      return formatMessageWithLocale(CARD_NUMBER_HELP_UNSUPPORTED_OFFER, locale);
+      return formatMessageWithLocale(
+        CARD_NUMBER_HELP_UNSUPPORTED_OFFER,
+        locale
+      );
     }
 
     // LABEL: Please enter a valid card number.

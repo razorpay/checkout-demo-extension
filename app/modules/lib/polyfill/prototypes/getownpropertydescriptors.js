@@ -9,7 +9,7 @@
  * Get a collection of keys from an object.
  * @param object
  */
-var getKeys = function(object) {
+var getKeys = function (object) {
   return Object.getOwnPropertyNames(object);
 };
 /**
@@ -17,11 +17,11 @@ var getKeys = function(object) {
  * @param object
  */
 
-var getDescriptors = function(object) {
+var getDescriptors = function (object) {
   if (object === null || object === undefined) {
     throw new TypeError('Cannot convert undefined or null to object');
   }
-  return getKeys(object).reduce(function(descriptors, key) {
+  return getKeys(object).reduce(function (descriptors, key) {
     var descriptor = Object.getOwnPropertyDescriptor(object, key);
     if (descriptor) {
       descriptors[key] = descriptor;

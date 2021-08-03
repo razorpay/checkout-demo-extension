@@ -258,6 +258,146 @@
   const icons = session.themeMeta.icons;
 </script>
 
+<Tab method="emandate" overrideMethodCheck pad={false}>
+  <Screen>
+    <div id="emandate-inner">
+      {#if currentView === Views.AUTH_SELECTION}
+        <div
+          class="emandate-auth-selection"
+          in:fade={getAnimationOptions({ duration: 200, delay: 200 })}
+        >
+          <div id="emandate-bank">
+            <div class="bank-icon">
+              {#if $selectedBank}
+                <img src={getBankLogo($selectedBank)} alt="" />
+              {/if}
+            </div>
+            <div class="bank-name">{bankName}</div>
+            {#if !prefilledBank}
+              <div class="btn-change-bank" on:click={resetBank}>
+                <!-- LABEL: Change Bank -->
+                {$t(CHANGE_BANK_BTN)}
+              </div>
+            {/if}
+          </div>
+
+          <!-- LABEL: Authenticate using -->
+          <div class="legend">{$t(AUTH_TYPE_HEADER)}</div>
+          <div id="emandate-options">
+            {#if isEMandateAuthTypeEnabled($selectedBank, AuthTypes.DEBIT_CARD)}
+              <div
+                class="auth-option item debitcard"
+                on:click={() => handleAuthTypeClicked(AuthTypes.DEBIT_CARD)}
+              >
+                <label>
+                  <i class="theme">
+                    {@html icons.card}
+                  </i>
+                  <!-- LABEL: Debit Card -->
+                  {$t(AUTH_TYPE_DEBIT_TITLE)}
+                  <span class="desc">
+                    <!-- LABEL: via Bank Account and Debit Card details -->
+                    {$t(AUTH_TYPE_DEBIT_DESCRIPTION)}
+                  </span>
+                </label>
+              </div>
+            {/if}
+            {#if isEMandateAuthTypeEnabled($selectedBank, AuthTypes.NETBANKING)}
+              <div
+                class="auth-option item netbanking"
+                on:click={() => handleAuthTypeClicked(AuthTypes.NETBANKING)}
+              >
+                <label>
+                  <i class="theme">
+                    {@html icons.netbanking}
+                  </i>
+                  <!-- LABEL: Netbanking -->
+                  {$t(AUTH_TYPE_NETBANKING_TITLE)}
+                  <span class="desc">
+                    <!-- LABEL: via Bank Account and Netbanking details -->
+                    {$t(AUTH_TYPE_NETBANKING_DESCRIPTION)}
+                  </span>
+                </label>
+              </div>
+            {/if}
+            {#if isEMandateAuthTypeEnabled($selectedBank, AuthTypes.AADHAAR)}
+              <div
+                class="auth-option item aadhaar"
+                on:click={() => handleAuthTypeClicked(AuthTypes.AADHAAR)}
+              >
+                <label>
+                  <i class="theme">
+                    {@html icons.aadhaar}
+                  </i>
+                  <!-- LABEL: Aadhaar -->
+                  {$t(AUTH_TYPE_AADHAAR_TITLE)}
+                  <span class="desc">
+                    <!-- LABEL: via Bank Account and Aadhaar VID -->
+                    {$t(AUTH_TYPE_AADHAAR_DESCRIPTION)}
+                  </span>
+                </label>
+              </div>
+            {/if}
+          </div>
+        </div>
+      {:else if currentView === Views.BANK_DETAILS}
+        <div
+          class="emandate-fields"
+          in:fade={getAnimationOptions({ duration: 200, delay: 200 })}
+        >
+          <AccountNumberField
+            name="bank_account[account_number]"
+            id="nb-acc-no"
+            bankCode={$selectedBank}
+            readonly={Boolean(prefillledBankAccount)}
+            bind:value={$accountNumber}
+          />
+
+          <IfscField
+            id="nb-acc-ifsc"
+            name="bank_account[ifsc]"
+            readonly={Boolean(prefilledIfsc)}
+            bind:value={$ifsc}
+          />
+
+          <NameField
+            id="nb-acc-name"
+            name="bank_account[name]"
+            readonly={Boolean(prefilledName)}
+            bind:value={$name}
+          />
+
+          <div class="elem-wrap">
+            <div class="elem select" class:readonly={prefilledAccountType}>
+              <i class="select-arrow"></i>
+              <!-- LABEL: Please select a bank account type -->
+              <div class="help">{$t(ACCOUNT_TYPE_HELP)}</div>
+              <select
+                name="bank_account[account_type]"
+                required
+                class="input"
+                bind:value={$accountType}
+              >
+                {#if prefilledAccountType}
+                  <option value={prefilledAccountType}>
+                    {$t(accountTextLabels[prefilledAccountType])}
+                  </option>
+                {:else}
+                  <!-- LABEL: Type of Bank Account -->
+                  <option value="">{$t(ACCOUNT_TYPE_LABEL)}</option>
+                  {#each accountTypes as type (type)}
+                    <option value={type}>{$t(accountTextLabels[type])}</option>
+                  {/each}
+                {/if}
+              </select>
+            </div>
+          </div>
+        </div>
+      {/if}
+    </div>
+  </Screen>
+</Tab>
+
 <style>
   .legend {
     text-align: left;
@@ -387,134 +527,3 @@
     max-height: 100%;
   }
 </style>
-
-<Tab method="emandate" overrideMethodCheck pad={false}>
-  <Screen>
-    <div id="emandate-inner">
-      {#if currentView === Views.AUTH_SELECTION}
-        <div
-          class="emandate-auth-selection"
-          in:fade={getAnimationOptions({ duration: 200, delay: 200 })}>
-          <div id="emandate-bank">
-            <div class="bank-icon">
-              {#if $selectedBank}
-                <img src={getBankLogo($selectedBank)} alt="" />
-              {/if}
-            </div>
-            <div class="bank-name">{bankName}</div>
-            {#if !prefilledBank}
-              <div class="btn-change-bank" on:click={resetBank}>
-                <!-- LABEL: Change Bank -->
-                {$t(CHANGE_BANK_BTN)}
-              </div>
-            {/if}
-          </div>
-
-          <!-- LABEL: Authenticate using -->
-          <div class="legend">{$t(AUTH_TYPE_HEADER)}</div>
-          <div id="emandate-options">
-            {#if isEMandateAuthTypeEnabled($selectedBank, AuthTypes.DEBIT_CARD)}
-              <div
-                class="auth-option item debitcard"
-                on:click={() => handleAuthTypeClicked(AuthTypes.DEBIT_CARD)}>
-                <label>
-                  <i class="theme">
-                    {@html icons.card}
-                  </i>
-                  <!-- LABEL: Debit Card -->
-                  {$t(AUTH_TYPE_DEBIT_TITLE)}
-                  <span class="desc">
-                    <!-- LABEL: via Bank Account and Debit Card details -->
-                    {$t(AUTH_TYPE_DEBIT_DESCRIPTION)}
-                  </span>
-                </label>
-              </div>
-            {/if}
-            {#if isEMandateAuthTypeEnabled($selectedBank, AuthTypes.NETBANKING)}
-              <div
-                class="auth-option item netbanking"
-                on:click={() => handleAuthTypeClicked(AuthTypes.NETBANKING)}>
-                <label>
-                  <i class="theme">
-                    {@html icons.netbanking}
-                  </i>
-                  <!-- LABEL: Netbanking -->
-                  {$t(AUTH_TYPE_NETBANKING_TITLE)}
-                  <span class="desc">
-                    <!-- LABEL: via Bank Account and Netbanking details -->
-                    {$t(AUTH_TYPE_NETBANKING_DESCRIPTION)}
-                  </span>
-                </label>
-              </div>
-            {/if}
-            {#if isEMandateAuthTypeEnabled($selectedBank, AuthTypes.AADHAAR)}
-              <div
-                class="auth-option item aadhaar"
-                on:click={() => handleAuthTypeClicked(AuthTypes.AADHAAR)}>
-                <label>
-                  <i class="theme">
-                    {@html icons.aadhaar}
-                  </i>
-                  <!-- LABEL: Aadhaar -->
-                  {$t(AUTH_TYPE_AADHAAR_TITLE)}
-                  <span class="desc">
-                    <!-- LABEL: via Bank Account and Aadhaar VID -->
-                    {$t(AUTH_TYPE_AADHAAR_DESCRIPTION)}
-                  </span>
-                </label>
-              </div>
-            {/if}
-          </div>
-        </div>
-      {:else if currentView === Views.BANK_DETAILS}
-        <div
-          class="emandate-fields"
-          in:fade={getAnimationOptions({ duration: 200, delay: 200 })}>
-          <AccountNumberField
-            name="bank_account[account_number]"
-            id="nb-acc-no"
-            bankCode={$selectedBank}
-            readonly={Boolean(prefillledBankAccount)}
-            bind:value={$accountNumber} />
-
-          <IfscField
-            id="nb-acc-ifsc"
-            name="bank_account[ifsc]"
-            readonly={Boolean(prefilledIfsc)}
-            bind:value={$ifsc} />
-
-          <NameField
-            id="nb-acc-name"
-            name="bank_account[name]"
-            readonly={Boolean(prefilledName)}
-            bind:value={$name} />
-
-          <div class="elem-wrap">
-            <div class="elem select" class:readonly={prefilledAccountType}>
-              <i class="select-arrow"></i>
-              <!-- LABEL: Please select a bank account type -->
-              <div class="help">{$t(ACCOUNT_TYPE_HELP)}</div>
-              <select
-                name="bank_account[account_type]"
-                required
-                class="input"
-                bind:value={$accountType}>
-                {#if prefilledAccountType}
-                  <option value={prefilledAccountType}>
-                    {$t(accountTextLabels[prefilledAccountType])}
-                  </option>
-                {:else}
-                  <!-- LABEL: Type of Bank Account -->
-                  <option value="">{$t(ACCOUNT_TYPE_LABEL)}</option>
-                  {#each accountTypes as type (type)}
-                    <option value={type}>{$t(accountTextLabels[type])}</option>
-                  {/each}
-                {/if}
-              </select>
-            </div>
-          </div>
-        </div>
-      {/if}
-    </div>
-  </Screen>
-</Tab>

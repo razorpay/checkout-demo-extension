@@ -1,8 +1,8 @@
-import Analytics from "analytics";
+import Analytics from 'analytics';
 
-import { dictionary, t, locale } from "svelte-i18n";
+import { dictionary, t, locale } from 'svelte-i18n';
 
-import { get } from "svelte/store";
+import { get } from 'svelte/store';
 
 /**
  * Returns the currently selected locale
@@ -34,13 +34,13 @@ export function formatTemplateWithLocale(label, data, locale, defaultValue) {
   try {
     return get(t)(label, { locale, values: data, default: defaultValue });
   } catch (e) {
-    Analytics.track("i18n:template:error", {
+    Analytics.track('i18n:template:error', {
       data: {
         message: e.message,
         label,
         locale,
-        data
-      }
+        data,
+      },
     });
     return defaultValue || label;
   }
@@ -55,7 +55,7 @@ export function formatTemplateWithLocale(label, data, locale, defaultValue) {
  */
 export function formatMessageWithLocale(label, locale, defaultValue) {
   const value = get(t)(label, { locale, default: defaultValue });
-  if (value === label && typeof defaultValue !== "undefined") {
+  if (value === label && typeof defaultValue !== 'undefined') {
     return defaultValue;
   }
   return value;
@@ -173,7 +173,6 @@ export function getCardlessEmiProviderName(providerCode, locale) {
   );
 }
 
-
 /**
  * Returns the cardless emi provider data like subtitle, sideLabel, highlightLabel
  * @param {string} providerCode
@@ -184,7 +183,8 @@ export function getCardlessEmiProviderName(providerCode, locale) {
 export function getCardlessEmiProviderData(providerCode, dataKey, locale) {
   return formatMessageWithLocale(
     `cardless_emi.${providerCode}.${dataKey}`,
-    locale, ''
+    locale,
+    ''
   );
 }
 
@@ -247,7 +247,7 @@ export function getLongBankName(bankCode, locale, defaultValue) {
 export function getShortBankName(bankCode, locale) {
   return get(t)(`banks.short.${bankCode.toUpperCase()}`, {
     locale,
-    default: getLongBankName(bankCode, locale)
+    default: getLongBankName(bankCode, locale),
   });
 }
 

@@ -8,7 +8,7 @@
   onMount(() => {
     initSlides();
     const track = document.getElementsByClassName('carousel-track')[0];
-    track.addEventListener('scroll', e => {
+    track.addEventListener('scroll', (e) => {
       activeSlideIndex = parseInt(track.scrollLeft / 180);
     });
   });
@@ -25,6 +25,25 @@
     track.scrollLeft = offset;
   }
 </script>
+
+<div class="carousel-wrapper">
+  <div class="carousel-track">
+    <div class="carousel-offset" />
+    <slot />
+    <div class="carousel-offset" />
+  </div>
+  {#if totalSlides > 1}
+    <div class="carousel-dots">
+      {#each Array(totalSlides) as ind, index}
+        <span
+          class="dot"
+          class:active={index === activeSlideIndex}
+          on:click={() => changeSlide(index)}
+        />
+      {/each}
+    </div>
+  {/if}
+</div>
 
 <style>
   /* The dots/bullets/indicators */
@@ -78,21 +97,3 @@
     flex-shrink: 0;
   }
 </style>
-
-<div class="carousel-wrapper">
-  <div class="carousel-track">
-    <div class="carousel-offset" />
-    <slot />
-    <div class="carousel-offset" />
-  </div>
-  {#if totalSlides > 1}
-    <div class="carousel-dots">
-      {#each Array(totalSlides) as ind, index}
-        <span
-          class="dot"
-          class:active={index === activeSlideIndex}
-          on:click={() => changeSlide(index)} />
-      {/each}
-    </div>
-  {/if}
-</div>

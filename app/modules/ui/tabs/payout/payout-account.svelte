@@ -41,17 +41,12 @@
   }
 </script>
 
-<style>
-  .fields-container {
-    padding: 16px;
-  }
-</style>
-
 <Tab
   method="payout_account"
   overrideMethodCheck={true}
   pad={false}
-  shown={true}>
+  shown={true}
+>
   <div class="fields-container">
     <Field
       type="text"
@@ -63,7 +58,8 @@
       required={true}
       bind:readonlyValue={accountNumber}
       formatter={{ type: 'number' }}
-      on:blur={validateConfirmAccount} />
+      on:blur={validateConfirmAccount}
+    />
 
     <Field
       type="text"
@@ -77,7 +73,8 @@
       bind:readonlyValue={confirmAccountNumber}
       refresh={false}
       formatter={{ type: 'number' }}
-      on:blur={validateConfirmAccount} />
+      on:blur={validateConfirmAccount}
+    />
 
     <Field
       type="text"
@@ -88,7 +85,8 @@
       maxlength="11"
       required={true}
       bind:readonlyValue={ifsc}
-      formatter={{ type: 'ifsc' }} />
+      formatter={{ type: 'ifsc' }}
+    />
 
     <Field
       type="text"
@@ -99,6 +97,13 @@
       pattern={"^[a-zA-Z. 0-9']{1,100}$"}
       maxlength="100"
       required={true}
-      bind:readonlyValue={name} />
+      bind:readonlyValue={name}
+    />
   </div>
 </Tab>
+
+<style>
+  .fields-container {
+    padding: 16px;
+  }
+</style>

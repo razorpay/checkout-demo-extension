@@ -20,7 +20,7 @@
     </div>
     <script>
       var searchParams = {
-        get: function(param) {},
+        get: function (param) {},
       };
       if (window.URLSearchParams) {
         searchParams = new URLSearchParams(location.search);
@@ -44,7 +44,7 @@
         // display_amount: '12.23',
         // display_currency: 'SGD',
 
-        handler: function(o) {
+        handler: function (o) {
           alert(JSON.stringify(o, null, 2));
         },
 
@@ -61,7 +61,7 @@
         remember_customer: true,
         external: {
           // wallets: ['payumoney'],
-          handler: function(data) {
+          handler: function (data) {
             console.log(this, data);
           },
         },
@@ -75,21 +75,21 @@
           'card[cvv]': '123',
         },
         modal: {
-          ondismiss: function() {
+          ondismiss: function () {
             console.log(1);
           },
-          onhidden: function() {
+          onhidden: function () {
             console.log(2);
           },
         },
       };
       var rzp1 = new Razorpay(options);
 
-      rzp1.on('payment.error', function(data) {
+      rzp1.on('payment.error', function (data) {
         console.log(data);
       });
 
-      document.getElementById('rzp-button1').onclick = function(e) {
+      document.getElementById('rzp-button1').onclick = function (e) {
         rzp1.open();
         e.preventDefault();
       };

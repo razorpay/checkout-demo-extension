@@ -27,25 +27,6 @@
   }
 </script>
 
-<style>
-  .account-number-field {
-    position: relative;
-  }
-
-  .bank-icon {
-    position: absolute;
-    right: 0;
-    top: 24px;
-    width: 18px;
-    height: 18px;
-  }
-
-  .bank-icon img {
-    max-width: 100%;
-    max-height: 100%;
-  }
-</style>
-
 <div class="account-number-field">
   {#if bankCode}
     <div class="bank-icon"><img src={getBankLogo(bankCode)} alt="" /></div>
@@ -69,5 +50,25 @@
     handleBlur
     handleFocus
     handleInput
-    on:input={handleInput} />
+    on:input={handleInput}
+  />
 </div>
+
+<style>
+  .account-number-field {
+    position: relative;
+  }
+
+  .bank-icon {
+    position: absolute;
+    right: 0;
+    top: 24px;
+    width: 18px;
+    height: 18px;
+  }
+
+  .bank-icon img {
+    max-width: 100%;
+    max-height: 100%;
+  }
+</style>

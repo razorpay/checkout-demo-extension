@@ -178,7 +178,7 @@
           target: document.getElementById('challan-wrapper'),
         });
       })
-      .catch(err => console.log(err));
+      .catch((err) => console.log(err));
   }
 
   init();
@@ -210,7 +210,7 @@
       });
     }
     showOverlay([feeWrapDiv]);
-    feeBearerView.$on('continue', function(event) {
+    feeBearerView.$on('continue', function (event) {
       hideOverlayMessage();
     });
   };

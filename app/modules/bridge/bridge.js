@@ -12,7 +12,7 @@ export default function Bridge(bridgeName) {
 }
 
 Bridge.prototype = {
-  init: function() {
+  init: function () {
     const bridgeName = this.name;
     /* A little misleading because CheckoutBridge can exist for iOS as well */
     const androidBridge = window[bridgeName];
@@ -29,11 +29,11 @@ Bridge.prototype = {
     }
   },
 
-  exists: function() {
+  exists: function () {
     return this._exists;
   },
 
-  get: function(methodName) {
+  get: function (methodName) {
     if (!this.exists()) {
       return;
     }
@@ -47,7 +47,7 @@ Bridge.prototype = {
     }
   },
 
-  has: function(methodName) {
+  has: function (methodName) {
     if (this.exists() && this.get(methodName)) {
       return true;
     }
@@ -68,10 +68,12 @@ Bridge.prototype = {
    * @return {Any}                  the value returned by the bridge method.
    *                                Nothing is returned in default cases.
    **/
-  callAndroid: function(methodName, ...params) {
+  callAndroid: function (methodName, ...params) {
     params =
       params
-      |> _Arr.map(arg => (typeof arg === 'object' ? _Obj.stringify(arg) : arg));
+      |> _Arr.map((arg) =>
+        typeof arg === 'object' ? _Obj.stringify(arg) : arg
+      );
 
     const method = this.get(methodName);
 
@@ -88,7 +90,7 @@ Bridge.prototype = {
    * @return {Any}                  the value returned by the bridge method.
    *                                Nothing is returned in default cases.
    **/
-  callIos: function(methodName, ...params) {
+  callIos: function (methodName, ...params) {
     const method = this.get(methodName);
 
     if (method) {
@@ -113,7 +115,7 @@ Bridge.prototype = {
    * @return {Any}                  the value returned by the bridge method.
    *                                Nothing is returned in default cases.
    **/
-  call: function(methodName, ...params) {
+  call: function (methodName, ...params) {
     const method = this.get(methodName);
     params = [methodName].concat(params);
 

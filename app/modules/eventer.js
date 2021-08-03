@@ -12,11 +12,11 @@ export default function Eventer() {
 Eventer.prototype = {
   onNew: returnAsIs,
 
-  def: function(event, callback) {
+  def: function (event, callback) {
     this._defs[event] = callback;
   },
 
-  on: function(event, callback) {
+  on: function (event, callback) {
     if (_.isString(event) && _.isFunction(callback)) {
       var events = this._evts;
       if (!events[event]) {
@@ -29,10 +29,10 @@ Eventer.prototype = {
     return this;
   },
 
-  once: function(event, callback) {
+  once: function (event, callback) {
     var everCallback = callback;
     var self = this;
-    let onceCallback = function() {
+    let onceCallback = function () {
       everCallback.apply(self, arguments);
       self.off(event, onceCallback);
     };
@@ -40,7 +40,7 @@ Eventer.prototype = {
     return this.on(event, callback);
   },
 
-  off: function(event, callback) {
+  off: function (event, callback) {
     var argLen = arguments.length;
     if (!argLen) {
       return Eventer.call(this);
@@ -65,7 +65,7 @@ Eventer.prototype = {
     } else {
       // its a namespace
       event += '.';
-      _Obj.loop(events, function(val, eventKey) {
+      _Obj.loop(events, function (val, eventKey) {
         if (!eventKey.indexOf(event)) {
           delete events[eventKey];
         }
@@ -75,8 +75,8 @@ Eventer.prototype = {
     return this;
   },
 
-  emit: function(event, arg) {
-    _Arr.loop(this._evts[event], callback => {
+  emit: function (event, arg) {
+    _Arr.loop(this._evts[event], (callback) => {
       try {
         callback.call(this, arg);
       } catch (e) {
@@ -88,7 +88,7 @@ Eventer.prototype = {
     return this;
   },
 
-  emitter: function() {
+  emitter: function () {
     return () => {
       this.emit.apply(this, arguments);
     };

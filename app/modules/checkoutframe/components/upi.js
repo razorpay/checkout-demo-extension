@@ -31,10 +31,10 @@ export function isGooglePayWebPaymentsAvailable() {
  */
 export function checkForPossibleWebPaymentsForUpi() {
   appsThatSupportWebPayments
-    .filter(app => app.method === 'upi')
-    .forEach(app => {
+    .filter((app) => app.method === 'upi')
+    .forEach((app) => {
       checkWebPaymentsForApp(app.package_name)
-        .then(status => {
+        .then((status) => {
           if (status === false) {
             return;
           }

@@ -57,7 +57,7 @@ export default function Popup(src, name) {
 
   // turn the "opts" object into a window.open()-compatible String
   var optsStr = [];
-  _Obj.loop(opts, function(val, key) {
+  _Obj.loop(opts, function (val, key) {
     optsStr.push(key + '=' + val);
   });
   optsStr = optsStr.join(',');
@@ -81,17 +81,17 @@ export default function Popup(src, name) {
 }
 
 Popup.prototype = {
-  on: function(event, func) {
+  on: function (event, func) {
     this.listeners.push(global |> _El.on(event, func));
   },
 
-  write: function(html) {
+  write: function (html) {
     var pdoc = this.window.document;
     pdoc.write(html);
     pdoc.close();
   },
 
-  beforeunload: function(e) {
+  beforeunload: function (e) {
     e.returnValue = 'Your payment is incomplete.';
     return e.returnValue;
   },
@@ -100,9 +100,9 @@ Popup.prototype = {
    * Closes the popup window.
    */
 
-  close: function() {
+  close: function () {
     clearInterval(this.interval);
-    _Arr.loop(this.listeners, l => l());
+    _Arr.loop(this.listeners, (l) => l());
     this.listeners = [];
     if (this.window) {
       this.window.close();
@@ -112,7 +112,7 @@ Popup.prototype = {
   /**
    * Emits the "close" event.
    */
-  checkClose: function(forceClosed, timesInvoked = 0) {
+  checkClose: function (forceClosed, timesInvoked = 0) {
     if (timesInvoked > 20) {
       return;
     }

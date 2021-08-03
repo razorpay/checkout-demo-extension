@@ -1,8 +1,8 @@
 import * as Ungroup from 'configurability/ungroup';
 
-test('Module: configurability/ungroup', t => {
-  test('Ungroup.ungroupInstruments', t => {
-    test('method=card', t => {
+test('Module: configurability/ungroup', (t) => {
+  test('Ungroup.ungroupInstruments', (t) => {
+    test('method=card', (t) => {
       let block, expected, found;
       let individualInstrument, groupedInstrument;
       let customer = {
@@ -303,7 +303,7 @@ test('Module: configurability/ungroup', t => {
       t.end();
     });
 
-    test('method=netbanking', t => {
+    test('method=netbanking', (t) => {
       let block, expected, found;
       let groupedInstrument;
 
@@ -344,7 +344,7 @@ test('Module: configurability/ungroup', t => {
       t.end();
     });
 
-    test('method=upi', t => {
+    test('method=upi', (t) => {
       let block, expected, found;
       let groupedInstrument;
 
@@ -526,7 +526,7 @@ test('Module: configurability/ungroup', t => {
       t.end();
     });
 
-    test('method=wallet', t => {
+    test('method=wallet', (t) => {
       let block, expected, found;
       let groupedInstrument;
 
@@ -567,7 +567,7 @@ test('Module: configurability/ungroup', t => {
       t.end();
     });
 
-    test('method=cardless_emi', t => {
+    test('method=cardless_emi', (t) => {
       let block, expected, found;
       let groupedInstrument;
 
@@ -608,7 +608,7 @@ test('Module: configurability/ungroup', t => {
       t.end();
     });
 
-    test('method=paylater', t => {
+    test('method=paylater', (t) => {
       let block, expected, found;
       let groupedInstrument;
 
@@ -649,7 +649,7 @@ test('Module: configurability/ungroup', t => {
       t.end();
     });
 
-    test('method=paypal', t => {
+    test('method=paypal', (t) => {
       let block, expected, found;
       let instrument;
 
@@ -683,7 +683,7 @@ test('Module: configurability/ungroup', t => {
       t.end();
     });
 
-    test('method=bank_transfer', t => {
+    test('method=bank_transfer', (t) => {
       let block, expected, found;
       let instrument;
 

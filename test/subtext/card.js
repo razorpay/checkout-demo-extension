@@ -3,9 +3,9 @@ import { addDefaultMessages } from 'i18n/init';
 
 addDefaultMessages();
 
-test('Module: subtext/card', t => {
-  test('CardSubtext.generateSubtextForCardInstrument', t => {
-    test('method: card', t => {
+test('Module: subtext/card', (t) => {
+  test('CardSubtext.generateSubtextForCardInstrument', (t) => {
+    test('method: card', (t) => {
       let instrument;
 
       // -----------------
@@ -452,7 +452,7 @@ test('Module: subtext/card', t => {
     t.end();
   });
 
-  test('CardSubtext.generateSubtextForRecurring', t => {
+  test('CardSubtext.generateSubtextForRecurring', (t) => {
     const allNetworks = { mastercard: true, visa: true, amex: true };
     const allTypes = { credit: true, debit: true };
     const allIssuers = {
@@ -466,7 +466,7 @@ test('Module: subtext/card', t => {
     const debitCardBanksText =
       'CITI Bank, Canara Bank, ICICI Bank, and Kotak Mahindra Bank';
 
-    test('type: subscription', t => {
+    test('type: subscription', (t) => {
       t.equal(
         'Subscription payments are supported on ' +
           allNetworksText +
@@ -511,7 +511,7 @@ test('Module: subtext/card', t => {
       t.end();
     });
 
-    test('type: offer', t => {
+    test('type: offer', (t) => {
       const offer = { issuer: 'HDFC' };
 
       t.equal(
@@ -550,7 +550,7 @@ test('Module: subtext/card', t => {
       t.end();
     });
 
-    test('type: without subscription or offer', t => {
+    test('type: without subscription or offer', (t) => {
       t.equal(
         '' +
           allNetworksText +

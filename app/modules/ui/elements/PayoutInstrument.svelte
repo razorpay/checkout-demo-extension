@@ -7,19 +7,20 @@
   export let selected = false;
 </script>
 
-<style>
-  :global(.instrument-info) {
-    color: #999;
-    font-size: 12px;
-  }
-</style>
-
 <DeprecatedRadioOption
   data={account}
   name="instrument"
   reverse={true}
   {selected}
   value={account.id}
-  on:select>
+  on:select
+>
   <slot />
 </DeprecatedRadioOption>
+
+<style>
+  :global(.instrument-info) {
+    color: #999;
+    font-size: 12px;
+  }
+</style>

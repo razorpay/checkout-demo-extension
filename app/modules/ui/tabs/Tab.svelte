@@ -21,7 +21,8 @@
     class="tab-content showable screen"
     class:drishy={shown}
     class:pad
-    class:hasMessage>
+    class:hasMessage
+  >
     <slot />
   </div>
 {/if}

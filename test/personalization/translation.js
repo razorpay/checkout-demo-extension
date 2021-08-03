@@ -1,9 +1,9 @@
 import { translateInstrumentToConfig } from 'checkoutframe/personalization/translation';
 import { transformInstrumentToStorageFormat } from 'checkoutframe/personalization/api';
 
-test('Module: personalization', t => {
-  test('translateInstrumentToConfig', t => {
-    test('translates UPI collect instrument correctly', t => {
+test('Module: personalization', (t) => {
+  test('translateInstrumentToConfig', (t) => {
+    test('translates UPI collect instrument correctly', (t) => {
       const instrument = {
         frequency: 1,
         id: 'EOZESgq122HsIH',
@@ -28,7 +28,7 @@ test('Module: personalization', t => {
       t.end();
     });
 
-    test('translates UPI intent instrument correctly', t => {
+    test('translates UPI intent instrument correctly', (t) => {
       const instrument = {
         frequency: 1,
         id: 'EOZESgq122HsIH',
@@ -53,7 +53,7 @@ test('Module: personalization', t => {
       t.end();
     });
 
-    test('translates UPI QR instrument correctly', t => {
+    test('translates UPI QR instrument correctly', (t) => {
       const instrument = {
         frequency: 1,
         id: 'EOZESgq122HsIH',
@@ -77,7 +77,7 @@ test('Module: personalization', t => {
       t.end();
     });
 
-    test('translates Card instrument correctly', t => {
+    test('translates Card instrument correctly', (t) => {
       const instrument = {
         method: 'card',
         token_id: 'token_9AT28Pxxe0Npi9',
@@ -108,7 +108,7 @@ test('Module: personalization', t => {
       t.end();
     });
 
-    test('translates Wallet instrument correctly', t => {
+    test('translates Wallet instrument correctly', (t) => {
       const instrument = {
         wallet: 'freecharge',
         method: 'wallet',
@@ -130,7 +130,7 @@ test('Module: personalization', t => {
       t.end();
     });
 
-    test('translates netbanking instrument correctly', t => {
+    test('translates netbanking instrument correctly', (t) => {
       const instrument = {
         bank: 'HDFC',
         method: 'netbanking',
@@ -152,7 +152,7 @@ test('Module: personalization', t => {
       t.end();
     });
 
-    test('returns undefined for empty instrument', t => {
+    test('returns undefined for empty instrument', (t) => {
       const instrument = {};
 
       const actual = translateInstrumentToConfig(instrument);
@@ -161,7 +161,7 @@ test('Module: personalization', t => {
       t.end();
     });
 
-    test('returns undefined for undefined instrument', t => {
+    test('returns undefined for undefined instrument', (t) => {
       const instrument = undefined;
 
       const actual = translateInstrumentToConfig(instrument);
@@ -172,8 +172,8 @@ test('Module: personalization', t => {
 
     t.end();
   });
-  test('translate api instruments to their storage equivalent', t => {
-    test('transforms a wallet instrument correctly', t => {
+  test('translate api instruments to their storage equivalent', (t) => {
+    test('transforms a wallet instrument correctly', (t) => {
       const instrument = {
         method: 'wallet',
         instrument: 'payzapp',
@@ -194,7 +194,7 @@ test('Module: personalization', t => {
 
       t.end();
     });
-    test('transforms a netbanking instrument correctly', t => {
+    test('transforms a netbanking instrument correctly', (t) => {
       const instrument = {
         method: 'netbanking',
         instrument: 'KKBK',
@@ -215,7 +215,7 @@ test('Module: personalization', t => {
 
       t.end();
     });
-    test('transforms a upi intent instrument correctly', t => {
+    test('transforms a upi intent instrument correctly', (t) => {
       const instrument = {
         method: 'upi',
         instrument: '@ybl',
@@ -232,7 +232,7 @@ test('Module: personalization', t => {
 
       t.end();
     });
-    test('transforms a upi collect instrument correctly', t => {
+    test('transforms a upi collect instrument correctly', (t) => {
       const instrument = {
         method: 'upi',
         instrument: 'saranshgupta1995@ybl',
@@ -255,7 +255,7 @@ test('Module: personalization', t => {
 
       t.end();
     });
-    test('transforms a card collect instrument correctly', t => {
+    test('transforms a card collect instrument correctly', (t) => {
       const instrument = {
         method: 'card',
         issuer: 'UTIB',

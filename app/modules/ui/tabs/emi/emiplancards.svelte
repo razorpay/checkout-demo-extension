@@ -27,6 +27,7 @@
       expanded={plan.duration === expanded}
       {amount}
       {provider}
-      on:click={() => expand(plan)} />
+      on:click={() => expand(plan)}
+    />
   {/each}
 </div>

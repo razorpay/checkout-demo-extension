@@ -3,7 +3,7 @@ import Eventer from 'eventer';
 import EvtHandler from 'evthandler';
 import { luhnCheck, returnAsIs } from 'lib/utils';
 
-const alphanumericRaw = function(value) {
+const alphanumericRaw = function (value) {
   var returnVal = value.replace(/[^a-zA-Z0-9]/g, '');
 
   if (this.el.maxLength > 0) {
@@ -13,7 +13,7 @@ const alphanumericRaw = function(value) {
   return returnVal;
 };
 
-export const Formatter = function(el, handlers, noBind) {
+export const Formatter = function (el, handlers, noBind) {
   Eventer.call(this);
   this.el = el;
 
@@ -49,7 +49,7 @@ Formatter.events = {
 
 Formatter.rules = {
   card: {
-    setValue: function(value) {
+    setValue: function (value) {
       let currentType = (this.currentType = Card.getCardType(value));
 
       if (currentType !== this.type) {
@@ -58,7 +58,7 @@ Formatter.rules = {
       this.value = value.slice(0, this.maxLen);
     },
 
-    pretty: function(value, shouldTrim) {
+    pretty: function (value, shouldTrim) {
       let len = this.maxLen;
       let prettyValue = value
         .slice(0, len)
@@ -69,7 +69,7 @@ Formatter.rules = {
       return prettyValue;
     },
 
-    oninput: function() {
+    oninput: function () {
       let o = {
         type: this.currentType,
         maxLen: this.maxLen,
@@ -82,7 +82,7 @@ Formatter.rules = {
       this.emit('change', o);
     },
 
-    isValid: function(value) {
+    isValid: function (value) {
       if (!value) {
         value = this.value;
       }
@@ -101,7 +101,7 @@ Formatter.rules = {
   },
 
   vpa: {
-    raw: function(value) {
+    raw: function (value) {
       /* TODO: make vpa raw stronger and better fitting */
 
       let returnVal = value.replace(/[\s]/, '');
@@ -117,14 +117,14 @@ Formatter.rules = {
       }
     },
 
-    isValid: function() {
+    isValid: function () {
       return /^[^\s@]+@[a-z]{3,}$/i.test(this.value);
     },
   },
 
   ifsc: {
     raw: alphanumericRaw,
-    pretty: function(value, shouldTrim) {
+    pretty: function (value, shouldTrim) {
       let len = 11;
       let prettyValue = value.slice(0, len).toUpperCase();
       if (shouldTrim || value.length >= len) {
@@ -132,7 +132,7 @@ Formatter.rules = {
       }
       return prettyValue;
     },
-    isValid: function() {
+    isValid: function () {
       if (this.value.length === 11) {
         return /^[a-zA-Z]{4}[a-zA-Z0-9]{7}$/.test(this.value);
       }
@@ -141,7 +141,7 @@ Formatter.rules = {
   },
 
   expiry: {
-    pretty: function(value, shouldTrim) {
+    pretty: function (value, shouldTrim) {
       value = value
         .replace(/^([2-9])$/, '0$1') // Pad with zero if a single digit
         .replace(/^1[3-9]$/, '1') // If > 13, remove units place
@@ -155,13 +155,13 @@ Formatter.rules = {
       return value;
     },
 
-    oninput: function() {
+    oninput: function () {
       this.emit('change', {
         valid: this.isValid(),
       });
     },
 
-    isValid: function() {
+    isValid: function () {
       if (this.value.length === 4) {
         let monthValue = parseInt(this.value.slice(0, 2), 10);
         if (monthValue > 12) {
@@ -181,7 +181,7 @@ Formatter.rules = {
   },
 
   number: {
-    raw: function(value) {
+    raw: function (value) {
       let returnVal = value.replace(/\D/g, '');
       if (this.el.maxLength > 0) {
         returnVal = returnVal.slice(0, this.el.maxLength);
@@ -191,11 +191,11 @@ Formatter.rules = {
   },
 
   amount: {
-    raw: function(value) {
+    raw: function (value) {
       return value
         .split('.')
         .slice(0, 2)
-        .map(function(v, index) {
+        .map(function (v, index) {
           v = v.replace(/\D/g, '');
           if (index) {
             v = v.slice(0, 2);
@@ -209,13 +209,13 @@ Formatter.rules = {
   },
 
   phone: {
-    raw: function(value) {
+    raw: function (value) {
       let returnVal = value.slice(0, 15).replace(/[^+\d]/g, '');
 
       return `${returnVal}`;
     },
 
-    isValid: function(value) {
+    isValid: function (value) {
       if (!value) {
         value = this.value;
       }
@@ -225,7 +225,7 @@ Formatter.rules = {
   },
 
   country_code: {
-    raw: function(value) {
+    raw: function (value) {
       if (!value.startsWith('+')) {
         value = `+${value}`;
       }
@@ -233,7 +233,7 @@ Formatter.rules = {
       return value;
     },
 
-    isValid: function(value) {
+    isValid: function (value) {
       if (!value) {
         value = this.value;
       }
@@ -245,7 +245,7 @@ Formatter.rules = {
 
 let formatterProto = (Formatter.prototype = new Eventer());
 
-formatterProto.backFormat = function(e) {
+formatterProto.backFormat = function (e) {
   // windows phone: if keydown is prevented, and value is changed synchronously,
   //    it ignores one subsequent input event.
   //    hence no back formatting in WP
@@ -272,9 +272,9 @@ formatterProto.backFormat = function(e) {
 formatterProto.pretty = formatterProto.isValid = returnAsIs;
 formatterProto.prettyValue = '';
 
-formatterProto.raw = value => value.replace(/\D/g, '');
+formatterProto.raw = (value) => value.replace(/\D/g, '');
 
-formatterProto.setValue = function(value) {
+formatterProto.setValue = function (value) {
   this.value = value;
 };
 
@@ -290,11 +290,11 @@ function dispatchInput(element) {
   element.dispatchEvent(event);
 }
 
-formatterProto.oninput = function() {
+formatterProto.oninput = function () {
   this.emit('change');
 };
 
-formatterProto.fwdFormat = function(e) {
+formatterProto.fwdFormat = function (e) {
   let newChar = _.getCharFromEvent(e);
   if (!newChar) {
     return;
@@ -311,13 +311,13 @@ formatterProto.fwdFormat = function(e) {
   });
 };
 
-formatterProto.deferFormat = function(e) {
+formatterProto.deferFormat = function (e) {
   setTimeout(() => {
     this.format(e);
   });
 };
 
-formatterProto.format = function(e) {
+formatterProto.format = function (e) {
   let caretPosition = this.getCaret().start;
   let value = this.el.value;
 
@@ -327,12 +327,12 @@ formatterProto.format = function(e) {
   });
 };
 
-formatterProto.bind = function() {
+formatterProto.bind = function () {
   this.evtHandler = new EvtHandler(this.el, this).on(Formatter.events);
   return this;
 };
 
-formatterProto.unbind = function() {
+formatterProto.unbind = function () {
   let evtHandler = this.evtHandler;
   if (evtHandler) {
     evtHandler.off();
@@ -342,7 +342,7 @@ formatterProto.unbind = function() {
   return this;
 };
 
-formatterProto.run = function(values) {
+formatterProto.run = function (values) {
   // Don't do anything if the field is readonly
   if (this.el.readOnly) {
     return;
@@ -406,7 +406,7 @@ formatterProto.run = function(values) {
   }
 };
 
-formatterProto.moveCaret = function(position) {
+formatterProto.moveCaret = function (position) {
   // console.log('moveCaret ' + position);
   let el = this.el;
   if (_.isNumber(el.selectionStart)) {
@@ -422,7 +422,7 @@ formatterProto.moveCaret = function(position) {
   }
 };
 
-formatterProto.getCaret = function() {
+formatterProto.getCaret = function () {
   let el = this.el;
   let value = el.value;
   let length = value.length;
@@ -452,7 +452,7 @@ formatterProto.getCaret = function() {
   };
 };
 
-export const FormatDelegator = function(el) {
+export const FormatDelegator = function (el) {
   if (!_.is(this, FormatDelegator)) {
     return new FormatDelegator(el);
   }
@@ -463,7 +463,7 @@ export const FormatDelegator = function(el) {
   _Obj.loop(Formatter.events, (fn, evt) => {
     this.on(
       evt,
-      e => {
+      (e) => {
         let formatter = e.target._formatter;
         if (formatter) {
           formatter[fn](e);
@@ -477,7 +477,7 @@ export const FormatDelegator = function(el) {
 
 let formatDelegatorProto = (FormatDelegator.prototype = new EvtHandler());
 
-formatDelegatorProto.add = function(ruleType, el) {
+formatDelegatorProto.add = function (ruleType, el) {
   if (Formatter.rules[ruleType]) {
     let formatter = new Formatter(el, ruleType, true);
     this.bits.push(formatter);
@@ -485,8 +485,8 @@ formatDelegatorProto.add = function(ruleType, el) {
   }
 };
 
-formatDelegatorProto.destroy = function() {
+formatDelegatorProto.destroy = function () {
   this.off();
-  _Arr.loop(this.bits, bit => bit.unbind());
+  _Arr.loop(this.bits, (bit) => bit.unbind());
   this.bits = [];
 };

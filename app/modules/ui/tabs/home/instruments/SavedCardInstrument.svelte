@@ -94,7 +94,7 @@
   const savedCards = _Obj.getSafely($customer, 'tokens.items', []);
   const savedCard = _Arr.find(
     savedCards,
-    card => card.id === individualInstrument.token_id
+    (card) => card.id === individualInstrument.token_id
   );
 
   if (savedCard) {

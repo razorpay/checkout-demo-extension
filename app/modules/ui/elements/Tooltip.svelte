@@ -89,12 +89,12 @@
    */
   function alignTooltipTo(tooltip, directions) {
     // Remove all directions.
-    _Arr.loop(ALL_DIRECTIONS, direction =>
+    _Arr.loop(ALL_DIRECTIONS, (direction) =>
       _El.removeClass(tooltip, `tooltip-${direction}`)
     );
 
     // Align tooltip to provided directions.
-    _Arr.loop(directions, direction => {
+    _Arr.loop(directions, (direction) => {
       if (!direction) {
         return;
       }
@@ -158,7 +158,7 @@
       // Flip just the overflowing direction
       directionsList.push(
         [flipped].concat(
-          _Arr.filter(directions, direction => direction !== overflowIn[0])
+          _Arr.filter(directions, (direction) => direction !== overflowIn[0])
         )
       );
 
@@ -166,17 +166,17 @@
       directionsList.push([flipped]);
 
       // Flip the direction and add opposite axes.
-      _Arr.loop(opposite, direction => {
+      _Arr.loop(opposite, (direction) => {
         directionsList.push([direction, flipped]);
       });
 
       // Use only the opposite axes.
-      _Arr.loop(opposite, direction => {
+      _Arr.loop(opposite, (direction) => {
         directionsList.push([direction]);
       });
 
       // Last resort: use the overflow direction and flip axes.
-      _Arr.loop(opposite, direction => {
+      _Arr.loop(opposite, (direction) => {
         directionsList.push([direction, overflowIn[0]]);
       });
     }
@@ -279,6 +279,7 @@
 <div
   class="tooltip {className}"
   class:tooltip-shown={shown}
-  bind:this={tooltip}>
+  bind:this={tooltip}
+>
   <slot />
 </div>

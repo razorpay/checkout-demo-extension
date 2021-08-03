@@ -70,6 +70,7 @@
   {...attributes}
   on:click={select}
   on:keydown={selectOnKeydown}
-  bind:this={container}>
+  bind:this={container}
+>
   <slot />
 </div>

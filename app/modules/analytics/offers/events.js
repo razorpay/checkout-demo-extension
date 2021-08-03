@@ -1,11 +1,11 @@
 import { getEventsName } from '../helpers';
 
 const offers = {
-  "APPLY": "apply"
-}
+  APPLY: 'apply',
+};
 
 const events = {
-  ...offers
-}
+  ...offers,
+};
 
-export default getEventsName("offer", events);
+export default getEventsName('offer', events);

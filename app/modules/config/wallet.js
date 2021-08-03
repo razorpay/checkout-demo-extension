@@ -6,5 +6,5 @@ export default {
   },
   paypal: {
     [FLOWS.DISABLE_WALLET_AMOUNT_CHECK]: true,
-  }
+  },
 };

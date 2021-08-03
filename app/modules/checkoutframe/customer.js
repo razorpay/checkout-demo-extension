@@ -7,14 +7,14 @@ import * as OtpService from 'common/otpservice';
 import { isRecurring, getRecurringMethods } from 'checkoutstore';
 import { format, getCurrentLocale } from 'i18n';
 
-import { MetaProperties, Events } from 'analytics/index'
+import { MetaProperties, Events } from 'analytics/index';
 
 /* global getPhone */
 
 let customers = {};
 let qpmap = _.getQueryParams();
 
-export const getCustomer = contact => {
+export const getCustomer = (contact) => {
   // indian contact without +91
   let indianContact;
 
@@ -37,7 +37,7 @@ export function Customer(contact) {
   }
 }
 
-export const sanitizeTokens = tokens => {
+export const sanitizeTokens = (tokens) => {
   const recurring = isRecurring();
   const recurringMethods = getRecurringMethods();
   const recurringCreditCardNetworks = recurringMethods?.card?.credit ?? [];
@@ -46,7 +46,7 @@ export const sanitizeTokens = tokens => {
   );
 
   if (tokens) {
-    tokens.items = tokens.items.filter(token => {
+    tokens.items = tokens.items.filter((token) => {
       if (recurring) {
         if (!token.recurring) {
           return false;

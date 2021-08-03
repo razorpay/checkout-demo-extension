@@ -1,8 +1,8 @@
 import * as Blocks from 'configurability/blocks';
 
-test('Module: configurability/blocks', t => {
-  test('Blocks.createBlock', t => {
-    test('Instrument and name', t => {
+test('Module: configurability/blocks', (t) => {
+  test('Blocks.createBlock', (t) => {
+    test('Instrument and name', (t) => {
       let code, config, expected, found;
 
       code = 'block.hdfc';
@@ -59,7 +59,7 @@ test('Module: configurability/blocks', t => {
       t.end();
     });
 
-    test('Without instruments', t => {
+    test('Without instruments', (t) => {
       let code, config, expected, found;
 
       code = 'block.netbanking';
@@ -81,7 +81,7 @@ test('Module: configurability/blocks', t => {
       t.end();
     });
 
-    test('Without name', t => {
+    test('Without name', (t) => {
       let code, config, expected, found;
 
       code = 'block.hdfc';
@@ -132,7 +132,7 @@ test('Module: configurability/blocks', t => {
       t.end();
     });
 
-    test('Keeps invalid instruments', t => {
+    test('Keeps invalid instruments', (t) => {
       let code, config, expected, found;
 
       code = 'block.hdfc';
@@ -188,8 +188,8 @@ test('Module: configurability/blocks', t => {
     t.end();
   });
 
-  test('Blocks.validateAndCreateBlock', t => {
-    test('Keeps only valid instruments', t => {
+  test('Blocks.validateAndCreateBlock', (t) => {
+    test('Keeps only valid instruments', (t) => {
       let code, config, expected, found;
 
       code = 'block.hdfc';

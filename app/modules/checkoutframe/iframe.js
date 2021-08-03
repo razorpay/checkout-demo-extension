@@ -23,7 +23,7 @@ function handleNewIOSMethods(method, data) {
   };
   try {
     data = JSON.parse(data);
-  } catch (e) { }
+  } catch (e) {}
 
   data = data || {};
 
@@ -59,11 +59,11 @@ const platformSpecific = {
     var bridgeMethods = ['load', 'dismiss', 'submit', 'fault', 'success'];
 
     bridgeMethods
-      |> _Arr.loop(prop => {
+      |> _Arr.loop((prop) => {
         let method;
 
         if (Bridge.hasNewIosBridge()) {
-          method = data => {
+          method = (data) => {
             handleNewIOSMethods(prop, data);
           };
         } else {
@@ -87,7 +87,7 @@ const platformSpecific = {
 const flush = () => Razorpay.sendMessage({ event: 'flush' });
 
 export function initIframe() {
-  const parseMessage = e => {
+  const parseMessage = (e) => {
     /* not concerned about adding/removing listeners,
      * iframe is razorpay's fiefdom */
     var data = e.data;
@@ -95,7 +95,8 @@ export function initIframe() {
     const iframeFlow = session?.r?._payment?.forceIframeElement || {};
     if (
       e.source &&
-      e.source !== ownerWindow && e.source !== iframeFlow?.contentWindow
+      e.source !== ownerWindow &&
+      e.source !== iframeFlow?.contentWindow
     ) {
       return;
     }
@@ -105,7 +106,7 @@ export function initIframe() {
         data = _Obj.parse(data) || {};
       }
       handleMessage(data);
-    } catch (err) { }
+    } catch (err) {}
   };
 
   window |> _El.on('message', parseMessage);

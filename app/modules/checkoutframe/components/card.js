@@ -116,7 +116,7 @@ export function getIssuerForEmiFromPayload(payload) {
 
   if (payload.token) {
     if (tokens) {
-      tokens.forEach(function(t) {
+      tokens.forEach(function (t) {
         if (t.token === payload.token) {
           issuer = t.card.issuer;
 
@@ -152,7 +152,7 @@ export function getCardTypeFromPayload(payload) {
 
   if (payload.token) {
     if (tokens) {
-      tokens.forEach(function(t) {
+      tokens.forEach(function (t) {
         if (t.token === payload.token) {
           cardType = t.card.networkCode;
         }

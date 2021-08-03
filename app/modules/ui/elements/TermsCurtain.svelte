@@ -48,6 +48,5 @@
         <div>{termsText}</div>
       </div>
     {/if}
-
   </div>
 </div>

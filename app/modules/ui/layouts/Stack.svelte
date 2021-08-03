@@ -6,6 +6,10 @@
   export let inline = false;
 </script>
 
+<div class="stack" class:horizontal class:vertical class:reverse class:inline>
+  <slot />
+</div>
+
 <style>
   .stack {
     display: flex;
@@ -31,7 +35,3 @@
     flex-direction: column-reverse;
   }
 </style>
-
-<div class="stack" class:horizontal class:vertical class:reverse class:inline>
-  <slot />
-</div>

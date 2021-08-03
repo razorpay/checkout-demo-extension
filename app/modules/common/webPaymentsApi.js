@@ -16,7 +16,7 @@ export const appsThatSupportWebPayments = [
 
 const webPaymentsApps = {};
 
-appsThatSupportWebPayments.forEach(app => {
+appsThatSupportWebPayments.forEach((app) => {
   webPaymentsApps[app] = false;
 });
 
@@ -34,7 +34,7 @@ export function isWebPaymentsApiAvailable(app) {
   return webPaymentsApps[app];
 }
 
-export const checkWebPaymentsForApp = app => {
+export const checkWebPaymentsForApp = (app) => {
   const session = getSession();
   /* disable Web payments API for SDK as we have native intent there */
   if (Bridge.checkout.exists()) {

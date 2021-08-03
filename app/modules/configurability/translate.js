@@ -17,8 +17,12 @@ function _translate(options = {}, external) {
   options = _Obj.clone(options);
 
   const { display = {}, restrictions = [] } = options;
-  const { blocks = {}, hide = [], preferences = {}, sequence = [] } =
-    display || {};
+  const {
+    blocks = {},
+    hide = [],
+    preferences = {},
+    sequence = [],
+  } = display || {};
   const { allow = [] } = restrictions || {};
 
   /**
@@ -47,7 +51,7 @@ function _translate(options = {}, external) {
 
   const hiddenInstruments = _Arr.filter(
     allHiddenInstruments,
-    instrument => !isInstrumentForEntireMethod(instrument)
+    (instrument) => !isInstrumentForEntireMethod(instrument)
   );
 
   /**
@@ -56,7 +60,7 @@ function _translate(options = {}, external) {
   const hiddenMethods =
     allHiddenInstruments
     |> _Arr.filter(isInstrumentForEntireMethod)
-    |> _Arr.map(instrument => instrument.method);
+    |> _Arr.map((instrument) => instrument.method);
 
   /**
    * RESTRICTIONS

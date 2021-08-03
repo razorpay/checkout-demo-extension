@@ -15,7 +15,7 @@ const canvas = _El.create('canvas'),
 const canvasFingerprintingBlocked =
   ctx.getImageData(0, 0, 1, 1).data.length === 0;
 
-const getPixelDataFallback = color => {
+const getPixelDataFallback = (color) => {
   const d = document.createElement('div');
   d.style.color = color;
   document.body.appendChild(d);
@@ -24,7 +24,7 @@ const getPixelDataFallback = color => {
   return stringToColor(computedColor);
 };
 
-const getPixelData = color => {
+const getPixelData = (color) => {
   if (canvasFingerprintingBlocked) {
     return getPixelDataFallback(color);
   }
@@ -134,13 +134,13 @@ function hsbToRgb(h, s, v) {
   return { red: r * 255, green: g * 255, blue: b * 255 };
 }
 
-export const getColorProperties = (colorCache => {
+export const getColorProperties = ((colorCache) => {
   /*
    * Different function ask for color propeties of same color
    * storing values in cache
    */
 
-  return color => {
+  return (color) => {
     if (colorCache[color]) {
       return colorCache[color];
     }
@@ -149,8 +149,8 @@ export const getColorProperties = (colorCache => {
   };
 })({});
 
-export const getHSB = (colorCache => {
-  return color => {
+export const getHSB = ((colorCache) => {
+  return (color) => {
     if (colorCache[color]) {
       return colorCache[color];
     }
@@ -162,7 +162,7 @@ export const getHSB = (colorCache => {
   };
 })({});
 
-const getColorChannelWithGamma = channelVal => {
+const getColorChannelWithGamma = (channelVal) => {
   return channelVal <= 10
     ? channelVal / 3294
     : Math.pow(channelVal / 269 + 0.0513, 2.4);
@@ -171,8 +171,8 @@ const getColorChannelWithGamma = channelVal => {
 /*
  * ref: https://ux.stackexchange.com/questions/82056/how-to-measure-the-contrast-between-any-given-color-and-white
  */
-export const getRelativeLuminanceWithWhite = (colorCache => {
-  return color => {
+export const getRelativeLuminanceWithWhite = ((colorCache) => {
+  return (color) => {
     if (colorCache[color]) {
       return colorCache[color];
     }
@@ -188,7 +188,7 @@ export const getRelativeLuminanceWithWhite = (colorCache => {
   };
 })({});
 
-export const isDark = color => {
+export const isDark = (color) => {
   const relativeLuminosity = getRelativeLuminanceWithWhite(color);
 
   // tested , and found black text would look good on values < 0.5
@@ -202,7 +202,7 @@ const getColorString = (red, green, blue, alpha) => {
 };
 
 // Convert "rgba(255, 255, 255, 1)" to an object.
-const stringToColor = string => {
+const stringToColor = (string) => {
   const color = {
     red: 0,
     green: 0,
@@ -238,8 +238,8 @@ export const brighten = (color, brightenPercentage) => {
   return getColorString(rgb.red, rgb.green, rgb.blue, alpha);
 };
 
-export const getColorVariations = (colorCache => {
-  return color => {
+export const getColorVariations = ((colorCache) => {
+  return (color) => {
     if (colorCache[color]) {
       return colorCache[color];
     }

@@ -1,6 +1,6 @@
 import downtimeAlertView from 'checkoutframe/downtimes/alert';
 let downtimeAlertModal;
-export const checkForDowntime = function(payload) {
+export const checkForDowntime = function (payload) {
   const downtimeSeverity = payload.downtimeSeverity;
   const downtimeInstrument = payload.downtimeInstrument;
 
@@ -8,11 +8,11 @@ export const checkForDowntime = function(payload) {
     return downtimeInstrument;
   }
   return false;
-}
+};
 
-export const showDowntimeAlert = function(downtimeInstrument) {
+export const showDowntimeAlert = function (downtimeInstrument) {
   if (!downtimeAlertModal) {
     downtimeAlertModal = new downtimeAlertView();
   }
   downtimeAlertModal.view.handleChange(downtimeInstrument);
-}
+};

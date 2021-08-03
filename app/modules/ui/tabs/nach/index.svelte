@@ -246,7 +246,7 @@
     abortUploadRequest = abort;
 
     uploadRequest
-      .then(response => {
+      .then((response) => {
         uploaded = true;
         uploading = false;
 
@@ -255,19 +255,13 @@
         // Let Session do its thing
         session.preSubmit();
       })
-      .catch(response => {
+      .catch((response) => {
         const generatedError = generateError(response);
 
         showError(generatedError);
       });
   }
 </script>
-
-<style>
-  .ref-illustration {
-    text-align: center;
-  }
-</style>
 
 <Tab method="nach" overrideMethodCheck="true" pad={true}>
   <Screen>
@@ -277,7 +271,8 @@
         bind:this={fileInput}
         class="hidden"
         on:change={selectFile}
-        accept={ALLOWED_EXTS.join(',')} />
+        accept={ALLOWED_EXTS.join(',')}
+      />
       <!-- LABEL: Please upload a clear and legible copy of your signed NACH form -->
       <p>{$t(ATTACHMENT_INFO)}</p>
 
@@ -298,9 +293,16 @@
             </li>
             <!-- LABEL: Only {extensions} files with size less than {size} MB are allowed -->
             <li>
-              {formatTemplateWithLocale(ALLOWED_FORMATS_INFO, { extensions: ALLOWED_EXTS.map(
-                    x => x.toUpperCase()
-                  ).join(', '), size: ALLOWED_MAX_SIZE_IN_MB }, $locale)}
+              {formatTemplateWithLocale(
+                ALLOWED_FORMATS_INFO,
+                {
+                  extensions: ALLOWED_EXTS.map((x) => x.toUpperCase()).join(
+                    ', '
+                  ),
+                  size: ALLOWED_MAX_SIZE_IN_MB,
+                },
+                $locale
+              )}
             </li>
           </ol>
         </Note>
@@ -308,3 +310,9 @@
     </div>
   </Screen>
 </Tab>
+
+<style>
+  .ref-illustration {
+    text-align: center;
+  }
+</style>

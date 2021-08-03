@@ -67,4 +67,5 @@
   on:blur
   handleBlur
   handleFocus
-  handleInput />
+  handleInput
+/>

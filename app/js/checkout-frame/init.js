@@ -30,12 +30,12 @@ var ERROR_TRACKING_URLS = [
 ];
 
 function isUrlApplicableForErrorTracking(url) {
-  return _Arr.any(ERROR_TRACKING_URLS, function(availableUrl) {
+  return _Arr.any(ERROR_TRACKING_URLS, function (availableUrl) {
     return url.startsWith(availableUrl);
   });
 }
 
-window.onerror = function(errorMsg, url, lineNumber, column, errorObj) {
+window.onerror = function (errorMsg, url, lineNumber, column, errorObj) {
   if (isString(url) && !isUrlApplicableForErrorTracking(url)) {
     return;
   }
@@ -52,7 +52,7 @@ window.onerror = function(errorMsg, url, lineNumber, column, errorObj) {
   });
 };
 
-window.addEventListener('unhandledrejection', function(event) {
+window.addEventListener('unhandledrejection', function (event) {
   var reason = event.reason;
 
   if (reason instanceof Error) {

@@ -4,9 +4,9 @@
 /**
  * Polyfill for String.prototype.includes
  */
-(function() {
+(function () {
   if (!String.prototype.includes) {
-    String.prototype.includes = function() {
+    String.prototype.includes = function () {
       return String.prototype.indexOf.apply(this, arguments) !== -1;
     };
   }
@@ -15,9 +15,9 @@
 /**
  * Polyfill for Array.prototype.includes
  */
-(function() {
+(function () {
   if (!Array.prototype.includes) {
-    Array.prototype.includes = function() {
+    Array.prototype.includes = function () {
       return Array.prototype.indexOf.apply(this, arguments) !== -1;
     };
   }
@@ -26,9 +26,9 @@
 /**
  * Polyfill for String.prototype.startsWith
  */
-(function() {
+(function () {
   if (!String.prototype.startsWith) {
-    String.prototype.startsWith = function() {
+    String.prototype.startsWith = function () {
       return String.prototype.indexOf.apply(this, arguments) === 0;
     };
   }
@@ -37,16 +37,16 @@
 /*
  * Polyfill for Array.from
  */
-(function() {
+(function () {
   if (!Array.from) {
-    Array.from = (function() {
+    Array.from = (function () {
       var toStr = Object.prototype.toString;
-      var isCallable = function(fn) {
+      var isCallable = function (fn) {
         return (
           typeof fn === 'function' || toStr.call(fn) === '[object Function]'
         );
       };
-      var toInteger = function(value) {
+      var toInteger = function (value) {
         var number = Number(value);
         if (isNaN(number)) {
           return 0;
@@ -57,14 +57,14 @@
         return (number > 0 ? 1 : -1) * Math.floor(Math.abs(number));
       };
       var maxSafeInteger = Math.pow(2, 53) - 1;
-      var toLength = function(value) {
+      var toLength = function (value) {
         var len = toInteger(value);
         return Math.min(Math.max(len, 0), maxSafeInteger);
       };
-      var setToArray = function(set) {
+      var setToArray = function (set) {
         var values = [];
 
-        set.forEach(value => values.push(value));
+        set.forEach((value) => values.push(value));
 
         return values;
       };
@@ -160,10 +160,10 @@
  * Polyfill for Array.prototype.fill
  * Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/fill#Polyfill
  */
-(function() {
+(function () {
   if (!Array.prototype.fill) {
     Object.defineProperty(Array.prototype, 'fill', {
-      value: function(value) {
+      value: function (value) {
         // Steps 1-2.
         // eslint-disable-next-line eqeqeq
         if (this == null) {
@@ -212,7 +212,7 @@
  * Polyfill for Object.assign
  * Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign#Polyfill
  */
-(function() {
+(function () {
   if (typeof Object.assign !== 'function') {
     // Must be writable: true, enumerable: false, configurable: true
     Object.defineProperty(Object, 'assign', {
@@ -250,7 +250,7 @@
 // `function f` becomes an anonymous function in the generated bundle
 if (!global.alert.name) {
   Object.defineProperty(Function.prototype, 'name', {
-    get: function() {
+    get: function () {
       var name = (this.toString()
         .replace(/\n/g, '')
         .match(/^function\s*([^\s(]+)/) || [])[1];

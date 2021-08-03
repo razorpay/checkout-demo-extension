@@ -38,10 +38,7 @@
 
   import { t, locale } from 'svelte-i18n';
 
-  import {
-    getShortBankName,
-    getLongBankName,
-  } from 'i18n';
+  import { getShortBankName, getLongBankName } from 'i18n';
 
   // Utils imports
   import Razorpay from 'common/Razorpay';
@@ -84,7 +81,7 @@
     if ($selectedBank) {
       selectedBankName = _Arr.find(
         banksArr,
-        bank => bank.code === $selectedBank
+        (bank) => bank.code === $selectedBank
       ).name;
     } else {
       selectedBankName = null;
@@ -175,7 +172,7 @@
 
     let filteredBanks = {};
 
-    _Arr.loop(instrument.banks, code => {
+    _Arr.loop(instrument.banks, (code) => {
       if (banks[code]) {
         filteredBanks[code] = banks[code];
       }
@@ -186,7 +183,7 @@
 
   function filterHiddenBanksUsingConfig(banks, hiddenBanks) {
     banks = _Obj.clone(banks);
-    hiddenBanks.forEach(hiddenBank => {
+    hiddenBanks.forEach((hiddenBank) => {
       delete banks[hiddenBank];
     });
 
@@ -221,12 +218,12 @@
     !recurring && hasMultipleOptions($selectedBank, filteredBanks);
   $: corporateSelected = isCorporateCode($selectedBank);
   $: maxGridCount = recurring ? 3 : 6;
-  $: banksArr = _Arr.map(_Obj.entries(filteredBanks), entry => ({
+  $: banksArr = _Arr.map(_Obj.entries(filteredBanks), (entry) => ({
     code: entry[0],
     name: entry[1],
     downtime: downtimes[entry[0]],
   }));
-  $: translatedBanksArr = _Arr.map(banksArr, bank => ({
+  $: translatedBanksArr = _Arr.map(banksArr, (bank) => ({
     code: bank.code,
     original: bank.name,
     name: getLongBankName(bank.code, $locale, bank.name),
@@ -288,6 +285,140 @@
   }
 </script>
 
+<!-- TODO: remove override after fixing method check -->
+<Tab
+  method="netbanking"
+  pad={false}
+  overrideMethodCheck
+  hasMessage={!!downtimeSeverity}
+>
+  <Screen pad={false}>
+    <div>
+      <div id="netb-banks" class="clear grid count-3">
+        {#each netbanks as { name, code } (code)}
+          <GridItem
+            name={getShortBankName(code, $locale)}
+            {code}
+            fullName={filteredBanks[code]}
+            bind:group={$selectedBank}
+          />
+        {/each}
+      </div>
+
+      <div class="elem-wrap pad">
+        <div id="nb-elem" class="elem select" class:invalid>
+          <i class="select-arrow"></i>
+          <!-- LABEL: Please select a bank -->
+          <div class="help">{$t(NETBANKING_SELECT_HELP)}</div>
+          <button
+            aria-label={`${
+              $selectedBank
+                ? `${selectedBankName} - ${$t(NETBANKING_SELECT_LABEL)}`
+                : $t(NETBANKING_SELECT_LABEL)
+            }`}
+            class="input dropdown-like dropdown-bank"
+            type="button"
+            id="bank-select"
+            bind:this={bankSelect}
+            on:click={showSearch}
+            on:keypress={handleEnterOnButton}
+          >
+            {#if $selectedBank}
+              <div>{selectedBankName}</div>
+              {#if !!downtimeSeverity}
+                <div>
+                  <DowntimeIcon severe={downtimeSeverity} />
+                </div>
+              {/if}
+            {:else}
+              <!-- LABEL: Select a different bank -->
+              {$t(NETBANKING_SELECT_LABEL)}
+            {/if}
+          </button>
+        </div>
+      </div>
+
+      {#if showCorporateRadio}
+        <div
+          class="pad ref-radiocontainer"
+          bind:this={radioContainer}
+          transition:fade={getAnimationOptions({ duration: 100 })}
+        >
+          <!-- LABEL: Complete Payment Using -->
+          <label>{$t(SELECTION_RADIO_TEXT)}</label>
+          <div class="input-radio">
+            <input
+              type="radio"
+              id="nb_type_retail"
+              value="retail"
+              checked={!corporateSelected}
+              on:click={setRetailOption}
+            />
+            <label for="nb_type_retail">
+              <div class="radio-display" />
+              <!-- LABEL: Retail -->
+              <div class="label-content">{$t(RETAIL_RADIO_LABEL)}</div>
+            </label>
+          </div>
+          <div class="input-radio">
+            <input
+              type="radio"
+              id="nb_type_corporate"
+              value="corporate"
+              checked={corporateSelected}
+              on:click={setCorporateOption}
+            />
+            <label for="nb_type_corporate">
+              <div class="radio-display" />
+              <!-- LABEL: Corporate -->
+              <div class="label-content">{$t(CORPORATE_RADIO_LABEL)}</div>
+            </label>
+          </div>
+        </div>
+      {/if}
+      <!-- Show downtime message if the selected bank is down -->
+      {#if !!downtimeSeverity}
+        <div class="downtime-wrapper">
+          <DowntimeCallout
+            showIcon={false}
+            severe={downtimeSeverity}
+            downtimeInstrument={$selectedBank}
+          />
+        </div>
+      {/if}
+    </div>
+
+    <!-- LABEL: Select bank to pay -->
+    <!-- LABEL: Search for bank -->
+    <!-- LABEL: All banks -->
+    <SearchModal
+      identifier="netbanking_bank_select"
+      title={$t(SEARCH_TITLE)}
+      placeholder={$t(SEARCH_PLACEHOLDER)}
+      all={$t(SEARCH_ALL)}
+      items={translatedBanksArr}
+      bind:open={searchModalOpen}
+      keys={['code', 'name', 'original']}
+      component={BankSearchItem}
+      on:close={hideSearch}
+      on:select={({ detail }) => {
+        $selectedBank = detail.code;
+        hideSearch();
+      }}
+    />
+
+    <Bottom>
+      <!-- Show recurring message for recurring payments -->
+      {#if recurring}
+        <Callout>{$t(RECURRING_CALLOUT)}</Callout>
+      {/if}
+    </Bottom>
+    {#if !recurring}
+      <CTA on:click={() => getSession().preSubmit()} />
+    {/if}
+  </Screen>
+</Tab>
+
 <style>
   #netb-banks {
     overflow: hidden;
@@ -324,122 +455,3 @@
     margin: auto;
   }
 </style>
-
-<!-- TODO: remove override after fixing method check -->
-<Tab
-  method="netbanking"
-  pad={false}
-  overrideMethodCheck
-  hasMessage={!!downtimeSeverity}>
-  <Screen pad={false}>
-    <div>
-      <div id="netb-banks" class="clear grid count-3">
-        {#each netbanks as { name, code } (code)}
-          <GridItem
-            name={getShortBankName(code, $locale)}
-            {code}
-            fullName={filteredBanks[code]}
-            bind:group={$selectedBank} />
-        {/each}
-      </div>
-
-      <div class="elem-wrap pad">
-        <div id="nb-elem" class="elem select" class:invalid>
-          <i class="select-arrow"></i>
-          <!-- LABEL: Please select a bank -->
-          <div class="help">{$t(NETBANKING_SELECT_HELP)}</div>
-          <button
-            aria-label={`${$selectedBank ? `${selectedBankName} - ${$t(NETBANKING_SELECT_LABEL)}` : $t(NETBANKING_SELECT_LABEL)}`}
-            class="input dropdown-like dropdown-bank"
-            type="button"
-            id="bank-select"
-            bind:this={bankSelect}
-            on:click={showSearch}
-            on:keypress={handleEnterOnButton}>
-            {#if $selectedBank}
-              <div>{selectedBankName}</div>
-              {#if !!downtimeSeverity}
-                <div>
-                  <DowntimeIcon severe={downtimeSeverity} />
-                </div>
-              {/if}
-            {:else}
-              <!-- LABEL: Select a different bank -->
-              {$t(NETBANKING_SELECT_LABEL)}
-            {/if}
-          </button>
-        </div>
-      </div>
-
-      {#if showCorporateRadio}
-        <div
-          class="pad ref-radiocontainer"
-          bind:this={radioContainer}
-          transition:fade={getAnimationOptions({ duration: 100 })}>
-          <!-- LABEL: Complete Payment Using -->
-          <label>{$t(SELECTION_RADIO_TEXT)}</label>
-          <div class="input-radio">
-            <input
-              type="radio"
-              id="nb_type_retail"
-              value="retail"
-              checked={!corporateSelected}
-              on:click={setRetailOption} />
-            <label for="nb_type_retail">
-              <div class="radio-display" />
-              <!-- LABEL: Retail -->
-              <div class="label-content">{$t(RETAIL_RADIO_LABEL)}</div>
-            </label>
-          </div>
-          <div class="input-radio">
-            <input
-              type="radio"
-              id="nb_type_corporate"
-              value="corporate"
-              checked={corporateSelected}
-              on:click={setCorporateOption} />
-            <label for="nb_type_corporate">
-              <div class="radio-display" />
-              <!-- LABEL: Corporate -->
-              <div class="label-content">{$t(CORPORATE_RADIO_LABEL)}</div>
-            </label>
-          </div>
-        </div>
-      {/if}
-      <!-- Show downtime message if the selected bank is down -->
-      {#if !!downtimeSeverity}
-        <div class="downtime-wrapper">
-          <DowntimeCallout showIcon={false} severe={downtimeSeverity} downtimeInstrument={$selectedBank} />
-        </div>
-      {/if}
-    </div>
-
-    <!-- LABEL: Select bank to pay -->
-    <!-- LABEL: Search for bank -->
-    <!-- LABEL: All banks -->
-    <SearchModal
-      identifier="netbanking_bank_select"
-      title={$t(SEARCH_TITLE)}
-      placeholder={$t(SEARCH_PLACEHOLDER)}
-      all={$t(SEARCH_ALL)}
-      items={translatedBanksArr}
-      bind:open={searchModalOpen}
-      keys={['code', 'name', 'original']}
-      component={BankSearchItem}
-      on:close={hideSearch}
-      on:select={({ detail }) => {
-        $selectedBank = detail.code;
-        hideSearch();
-      }} />
-
-    <Bottom>
-      <!-- Show recurring message for recurring payments -->
-      {#if recurring}
-        <Callout>{$t(RECURRING_CALLOUT)}</Callout>
-      {/if}
-    </Bottom>
-    {#if !recurring}
-      <CTA on:click={() => getSession().preSubmit()} />
-    {/if}
-  </Screen>
-</Tab>

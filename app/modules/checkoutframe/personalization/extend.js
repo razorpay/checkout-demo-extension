@@ -1,5 +1,5 @@
 const EXTENDERS = {
-  default: instrument => instrument,
+  default: (instrument) => instrument,
 
   upi: (instrument, { customer }) => {
     const tokens = _Obj.getSafely(customer, 'tokens.items', []);
@@ -11,7 +11,7 @@ const EXTENDERS = {
     }
 
     // Find a token with the same VPA as the handle
-    const tokenWithSameVpa = _Arr.find(tokens, token => {
+    const tokenWithSameVpa = _Arr.find(tokens, (token) => {
       if (token.method !== 'upi') {
         return false;
       }
@@ -41,7 +41,7 @@ const EXTENDERS = {
 export function extendInstruments(params) {
   const { instruments } = params;
 
-  return _Arr.map(instruments, instrument => {
+  return _Arr.map(instruments, (instrument) => {
     const { method } = instrument;
 
     const extender = EXTENDERS[method] || EXTENDERS.default;

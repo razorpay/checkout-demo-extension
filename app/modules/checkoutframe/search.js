@@ -116,7 +116,7 @@ function createCache() {
       // eslint-disable-next-line no-restricted-syntax
       prepared: new Map(),
     },
-    clear: function() {
+    clear: function () {
       this.cache.prepared.clear();
     },
   };
@@ -198,7 +198,7 @@ function fastpriorityqueue() {
     r[e] = n;
   }
   return (
-    (e.add = function(e) {
+    (e.add = function (e) {
       var n = o;
       r[o++] = e;
       for (
@@ -210,18 +210,18 @@ function fastpriorityqueue() {
       }
       r[n] = e;
     }),
-    (e.poll = function() {
+    (e.poll = function () {
       if (0 !== o) {
         var e = r[0];
         return (r[0] = r[--o]), n(), e;
       }
     }),
-    (e.peek = function(e) {
+    (e.peek = function (e) {
       if (0 !== o) {
         return r[0];
       }
     }),
-    (e.replaceTop = function(o) {
+    (e.replaceTop = function (o) {
       (r[0] = o), n();
     }),
     e
@@ -437,9 +437,8 @@ function algorithmWithTypo(searchLowerCodes, prepared, searchLowerCode) {
 
   var nextBeginningIndexes = prepared._nextBeginningIndexes;
   if (nextBeginningIndexes === null) {
-    nextBeginningIndexes = prepared._nextBeginningIndexes = prepareNextBeginningIndexes(
-      prepared.target
-    );
+    nextBeginningIndexes = prepared._nextBeginningIndexes =
+      prepareNextBeginningIndexes(prepared.target);
   }
   var firstPossibleI = (targetI =
     matchesSimple[0] === 0 ? 0 : nextBeginningIndexes[matchesSimple[0] - 1]);

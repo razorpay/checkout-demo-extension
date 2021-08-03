@@ -33,6 +33,16 @@
   }
 </script>
 
+{#if $backdropVisible}
+  <div
+    id="frame-backdrop"
+    class="backdrop"
+    class:sub
+    on:click={onClick}
+    transition:fade={{ duration: 200 }}
+  />
+{/if}
+
 <style>
   .backdrop {
     position: absolute;
@@ -51,12 +61,3 @@
     bottom: -55px;
   }
 </style>
-
-{#if $backdropVisible}
-  <div
-    id="frame-backdrop"
-    class="backdrop"
-    class:sub
-    on:click={onClick}
-    transition:fade={{ duration: 200 }} />
-{/if}

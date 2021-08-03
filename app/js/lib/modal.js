@@ -1,4 +1,4 @@
-(function() {
+(function () {
   var timeout, transitionProperty;
 
   var defaults = {
@@ -9,7 +9,7 @@
     onhidden: null,
   };
 
-  var clearTimeout = function() {
+  var clearTimeout = function () {
     if (timeout) {
       window.clearTimeout(timeout);
     }
@@ -18,7 +18,7 @@
 
   if (Array.prototype.some) {
     ['transition', 'WebkitTransition', 'MozTransition', 'OTransition'].some(
-      function(i) {
+      function (i) {
         if (isString(document.documentElement.style[i])) {
           transitionProperty = i + 'Duration';
           return true;
@@ -27,12 +27,12 @@
     );
   }
 
-  var getDuration = function(modal) {
+  var getDuration = function (modal) {
     return modal.options.animation && transitionProperty ? 300 : 0;
   };
 
-  var Modal = (window.Modal = function(element, options) {
-    each(defaults, function(key, val) {
+  var Modal = (window.Modal = function (element, options) {
+    each(defaults, function (key, val) {
       if (!(key in options)) {
         options[key] = val;
       }
@@ -47,7 +47,7 @@
   });
 
   Modal.prototype = {
-    show: function() {
+    show: function () {
       if (this.isShown) {
         return;
       }
@@ -58,11 +58,11 @@
       this.container.focus();
     },
 
-    shown: function() {
+    shown: function () {
       clearTimeout();
     },
 
-    hide: function() {
+    hide: function () {
       if (!this.isShown) {
         return;
       }
@@ -73,14 +73,14 @@
       clearTimeout();
       var self = this;
 
-      timeout = setTimeout(function() {
+      timeout = setTimeout(function () {
         self.hidden();
       }, this.animationDuration);
 
       invoke(this.options.onhide);
     },
 
-    handleBackdropClick: function() {
+    handleBackdropClick: function () {
       // Let parent handle any clicks
       var shouldClose = this.options.handleBackdropClick();
 
@@ -89,22 +89,22 @@
       }
     },
 
-    backdropHide: function() {
+    backdropHide: function () {
       if (this.options.backdropclose) {
         this.hide();
       }
     },
 
-    hidden: function() {
+    hidden: function () {
       clearTimeout();
       invoke(this.options.onhidden);
     },
 
-    on: function(event, target, callback) {
+    on: function (event, target, callback) {
       this.listeners.push($(target).on(event, callback, false, this));
     },
 
-    steal_focus: function(e) {
+    steal_focus: function (e) {
       if (!e.relatedTarget) {
         return;
       }
@@ -113,8 +113,8 @@
       }
     },
 
-    bind: function() {
-      this.on('resize', window, function() {
+    bind: function () {
+      this.on('resize', window, function () {
         var el = document.activeElement;
         if (['input'].indexOf(el.tagName.toLowerCase()) >= 0) {
           /**
@@ -123,14 +123,14 @@
            * it might get hidden behind the keyboard.
            * Let's bring it into view.
            */
-          setTimeout(function() {
+          setTimeout(function () {
             $(el).scrollIntoView();
           });
         }
       });
 
       if (this.options.escape) {
-        this.on('keyup', window, function(e) {
+        this.on('keyup', window, function (e) {
           if ((e.which || e.keyCode) === 27) {
             // Element wants to handle "Escape" by itself
             if ($(e.target).hasClass('no-escape')) {
@@ -147,7 +147,7 @@
       this.on('click', gel('backdrop'), this.handleBackdropClick);
     },
 
-    destroy: function() {
+    destroy: function () {
       invokeEach(this.listeners);
       this.listeners = [];
     },

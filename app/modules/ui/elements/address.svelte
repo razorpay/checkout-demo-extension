@@ -12,17 +12,6 @@
   export let state;
 </script>
 
-<style>
-  div.wrap {
-    padding: 0 24px;
-    margin-top: 24px;
-  }
-
-  #elem-wrap-address {
-    height: 52px;
-  }
-</style>
-
 <div class="wrap">
   <div class="elem-wrap" id="elem-wrap-address">
     <AddressField bind:value={address} />
@@ -34,3 +23,14 @@
     <StateField {states} bind:value={state} />
   </div>
 </div>
+
+<style>
+  div.wrap {
+    padding: 0 24px;
+    margin-top: 24px;
+  }
+
+  #elem-wrap-address {
+    height: 52px;
+  }
+</style>

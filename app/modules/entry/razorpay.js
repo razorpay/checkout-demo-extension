@@ -7,7 +7,7 @@ import { returnAsIs } from 'lib/utils';
 
 Track.props.library = 'razorpayjs';
 
-Razorpay.payment.authorize = function(options) {
+Razorpay.payment.authorize = function (options) {
   var r = Razorpay({ amount: options.data.amount }).createPayment(options.data);
   r.on('payment.success', options.success);
   r.on('payment.error', options.error);
@@ -16,7 +16,7 @@ Razorpay.payment.authorize = function(options) {
 
 Razorpay.payment.validate = returnAsIs;
 
-Razorpay.sendMessage = function(message) {
+Razorpay.sendMessage = function (message) {
   if (message && message.event === 'redirect') {
     var data = message.data;
     _Doc.submitForm(data.url, data.content, data.method);

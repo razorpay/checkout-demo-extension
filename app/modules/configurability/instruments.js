@@ -35,8 +35,8 @@ const PUBLIC_API_INSTRUMENT_KEYS = {
 };
 
 const INSTRUMENT_CREATORS = {
-  default: instrument => instrument,
-  upi: instrument => {
+  default: (instrument) => instrument,
+  upi: (instrument) => {
     if (instrument.app) {
       instrument.app =
         getPackageNameFromShortcode(instrument.app) || instrument.app;
@@ -45,7 +45,7 @@ const INSTRUMENT_CREATORS = {
     if (instrument.apps) {
       instrument.apps =
         instrument.apps
-        |> _Arr.map(app => {
+        |> _Arr.map((app) => {
           return getPackageNameFromShortcode(app) || app;
         });
     }
@@ -80,7 +80,7 @@ function hasOnlyAllowedKeys(instrument) {
   // None of the instrumentKeys should be absent from allowedKeys
   const anyAbsent = _Arr.any(
     instrumentKeys,
-    key => !_Arr.contains(allowedKeys, key)
+    (key) => !_Arr.contains(allowedKeys, key)
   );
 
   if (anyAbsent) {
@@ -88,7 +88,7 @@ function hasOnlyAllowedKeys(instrument) {
   }
 
   // All keys must be arrays
-  const allArrays = _Arr.every(instrumentKeys, key =>
+  const allArrays = _Arr.every(instrumentKeys, (key) =>
     _.isArray(instrument[key])
   );
 
@@ -150,7 +150,7 @@ export function isInstrumentForEntireMethod(instrument) {
   // None of the keys in the config should be present in the instrument
   return _Arr.every(
     config.properties,
-    key => !_Arr.contains(currentInsturmentKeys, key)
+    (key) => !_Arr.contains(currentInsturmentKeys, key)
   );
 }
 

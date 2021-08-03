@@ -50,8 +50,8 @@ function render() {
     }
 
     // TODO session dependency - move session.offers to es6components
-    netbankingTab.$on('bankSelected', e => {
-      session.validateOffers(e.detail.bank.code, offerRemoved => {
+    netbankingTab.$on('bankSelected', (e) => {
+      session.validateOffers(e.detail.bank.code, (offerRemoved) => {
         if (!offerRemoved) {
           // If the offer was not removed, revert to the bank in offer issuer
           selectedBank.set(session.getAppliedOffer().issuer);

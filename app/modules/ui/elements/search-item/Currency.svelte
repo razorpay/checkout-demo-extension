@@ -2,6 +2,10 @@
   export let item;
 </script>
 
+<div class="left">{item.currency}</div>
+<div class="middle">{item.name}</div>
+<div class="right">{item.symbol}</div>
+
 <style>
   .middle {
     flex-grow: 1;
@@ -22,7 +26,3 @@
     border-left: 1px solid #888;
   }
 </style>
-
-<div class="left">{item.currency}</div>
-<div class="middle">{item.name}</div>
-<div class="right">{item.symbol}</div>

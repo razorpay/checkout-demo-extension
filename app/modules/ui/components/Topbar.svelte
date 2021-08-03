@@ -146,12 +146,14 @@
   <div
     id="topbar"
     class="theme-secondary-highlight"
-    transition:fly={getAnimationOptions({ y: -46, duration: 200 })}>
+    transition:fly={getAnimationOptions({ y: -46, duration: 200 })}
+  >
     {#if $isContactPresent && userDetailsShown}
       <div
         id="top-right"
         class:logged
-        on:click|stopPropagation={handleUserDetailsClick}>
+        on:click|stopPropagation={handleUserDetailsClick}
+      >
         <div id="user">{contact}</div>
         {#if logoutDropdownShown}
           <div id="profile">

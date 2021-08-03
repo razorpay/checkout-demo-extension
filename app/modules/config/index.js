@@ -8,5 +8,5 @@ export { FLOWS };
 export default {
   wallet: walletConfig,
   cardless_emi: cardlessEMIConfig,
-  app: appConfig
+  app: appConfig,
 };

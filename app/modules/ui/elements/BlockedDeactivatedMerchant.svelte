@@ -7,6 +7,14 @@
   }
 </script>
 
+<div id="deactivated-blocked">
+  <div>
+    This payment has failed due to an issue with the merchant. Do get in touch
+    with site/app admin regarding the issue.
+  </div>
+  <CTA on:click={onCloseCick}>CLOSE</CTA>
+</div>
+
 <style>
   #deactivated-blocked {
     padding: 20px;
@@ -19,11 +27,3 @@
     height: 100%;
   }
 </style>
-
-<div id="deactivated-blocked">
-  <div>
-    This payment has failed due to an issue with the merchant. Do get in touch
-    with site/app admin regarding the issue.
-  </div>
-  <CTA on:click={onCloseCick}>CLOSE</CTA>
-</div>

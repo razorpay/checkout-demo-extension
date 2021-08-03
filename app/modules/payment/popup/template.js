@@ -12,7 +12,7 @@ const map = {
 };
 
 function sanitizeHtmlEntities(string) {
-  return string.replace(/[&<>"'/]/g, match => map[match]);
+  return string.replace(/[&<>"'/]/g, (match) => map[match]);
 }
 
 import {
@@ -65,7 +65,10 @@ export default function popupTemplate(_, t) {
 
   var dccCurrency = _.data && _.data.dcc_currency;
   if (dccCurrency) {
-    var dccAmount = getConvertedAmount(_.r.display_amount || _.data.amount, dccCurrency);
+    var dccAmount = getConvertedAmount(
+      _.r.display_amount || _.data.amount,
+      dccCurrency
+    );
     amount = displayAmount(_.r, dccAmount, dccCurrency, true);
   }
 
@@ -92,8 +95,8 @@ export default function popupTemplate(_, t) {
   <div id='name'>${title}</div>
   <div id="amt" style="${hideAmount}">
     <div style="font-size:12px;color:#757575;line-height:15px;margin-bottom:5px;text-align:right">${t(
-    PAYING
-  )}</div>
+      PAYING
+    )}</div>
     <div dir="ltr" style="font-size:20px;line-height:24px;">${amount}</div>
   </div>
 </div>
@@ -101,8 +104,8 @@ export default function popupTemplate(_, t) {
 <div id="txt">
   <div style="display:inline-block;vertical-align:middle;white-space:normal;">
     <h2 id='title'>${t(LOADING_METHOD_PAGE, {
-    method,
-  })}</h2><p id='msg'>${message}</p>
+      method,
+    })}</h2><p id='msg'>${message}</p>
   </div>
   <div style="display:inline-block;vertical-align:middle;height:100%"></div>
 </div>
@@ -133,10 +136,10 @@ setTimeout(function(){
 </script>
 <form></form>
 ${makeTrackingScript({
-    live: _.r.isLiveMode(),
-    checkout_id: _.r.id,
-    library: Track.props.library,
-  })}
+  live: _.r.isLiveMode(),
+  checkout_id: _.r.id,
+  library: Track.props.library,
+})}
 </body>
 </html>`;
 }

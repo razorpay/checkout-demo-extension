@@ -39,4 +39,5 @@
   handleBlur
   handleFocus
   handleInput
-  {readonly} />
+  {readonly}
+/>

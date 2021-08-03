@@ -42,7 +42,7 @@
     },
   ];
 
-  const onSubmit = function(reason) {
+  const onSubmit = function (reason) {
     // if nothing is selected, return
     if (!reason) {
       return;
@@ -58,6 +58,13 @@
   };
 </script>
 
+<CancelReasonPicker
+  method="netbanking"
+  reasons={cancellationReasons}
+  title={CANCELLATION_MODAL_TITLE}
+  {onSubmit}
+/>
+
 <style>
   :global(div#error-message.cancel_netbanking) {
     height: 260px;
@@ -68,9 +75,3 @@
     }
   }
 </style>
-
-<CancelReasonPicker
-  method="netbanking"
-  reasons={cancellationReasons}
-  title={CANCELLATION_MODAL_TITLE}
-  {onSubmit} />

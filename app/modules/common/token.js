@@ -42,7 +42,7 @@ const transformerByMethod = {
  * @return {Array}
  */
 export const transform = (tokens, { amount, emi, recurring }) => {
-  _Arr.loop(tokens, token => {
+  _Arr.loop(tokens, (token) => {
     if (token.method && transformerByMethod[token.method]) {
       token = transformerByMethod[token.method](token, {
         amount,
@@ -55,8 +55,8 @@ export const transform = (tokens, { amount, emi, recurring }) => {
   return tokens;
 };
 
-const filterTokensByMethod = method => {
-  return _Arr.filter(token => token.method === method);
+const filterTokensByMethod = (method) => {
+  return _Arr.filter((token) => token.method === method);
 };
 
 /**
@@ -66,11 +66,11 @@ const filterTokensByMethod = method => {
  *
  * @return {Array}
  */
-export const getSavedCards = tokens => {
+export const getSavedCards = (tokens) => {
   if (!tokens) {
     return [];
   }
-  return _Arr.filter(tokens, token => token.method === 'card');
+  return _Arr.filter(tokens, (token) => token.method === 'card');
 };
 
 /**

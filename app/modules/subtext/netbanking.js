@@ -14,7 +14,7 @@ export function generateSubtextForNetbankingInstrument(instrument, locale) {
     return '';
   }
 
-  const names = _Arr.map(instrument.banks, bank => {
+  const names = _Arr.map(instrument.banks, (bank) => {
     let bankName = getShortBankName(bank, locale);
 
     if (bank === bankName) {

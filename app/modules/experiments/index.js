@@ -59,7 +59,7 @@ function getSegment(experiment) {
  * @returns {*}
  */
 function setSegment(experiment, evaluatorArg, overrideFn) {
-  const config = _Arr.find(CurrentExperiments, ex => ex.name === experiment);
+  const config = _Arr.find(CurrentExperiments, (ex) => ex.name === experiment);
 
   // Sanity check
   if (!config) {
@@ -104,7 +104,7 @@ export function getSegmentOrCreate(experiment, evaluatorArg, overrideFn) {
  */
 export function clearOldExperiments() {
   const all = getExperimentsFromStorage();
-  const current = _Arr.map(CurrentExperiments, ex => ex.name);
+  const current = _Arr.map(CurrentExperiments, (ex) => ex.name);
 
   _Obj.loop(all, (segment, name) => {
     if (!_Arr.contains(current, name)) {

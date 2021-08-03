@@ -12,6 +12,10 @@
   }
 </script>
 
+<div class="bottom" {tab} use:replaceNode>
+  <slot />
+</div>
+
 <style>
   .bottom[tab] {
     display: none;
@@ -25,7 +29,3 @@
     display: block;
   }
 </style>
-
-<div class="bottom" {tab} use:replaceNode>
-  <slot />
-</div>

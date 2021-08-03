@@ -42,8 +42,8 @@
   const IDs = {
     overlay: `${identifier}_search_overlay`,
     results: `${identifier}_search_results`,
-    resultItem: item => `${identifier}_${item._key}_search_result`,
-    allItem: item => `${identifier}_${item._key}_search_all`,
+    resultItem: (item) => `${identifier}_${item._key}_search_result`,
+    allItem: (item) => `${identifier}_${item._key}_search_all`,
   };
 
   onMount(() => {
@@ -77,7 +77,7 @@
         threshold: -100,
       });
 
-      return _Arr.map(results, result => result.ref);
+      return _Arr.map(results, (result) => result.ref);
     } else {
       return [];
     }
@@ -178,7 +178,7 @@
 
   function removeFromOverlayStack() {
     // Remove the overlay from $overlayStack
-    const overlay = $overlayStack.find(overlay => overlay.id === IDs.overlay);
+    const overlay = $overlayStack.find((overlay) => overlay.id === IDs.overlay);
     $overlayStack = _Arr.remove($overlayStack, overlay);
   }
 
@@ -197,7 +197,7 @@
       {
         id: IDs.overlay,
         component: 'SearchModal',
-        back: meta => {
+        back: (meta) => {
           dispatchClose(meta);
         },
       },
@@ -210,7 +210,7 @@
       hideCta();
     } else {
       removeFromOverlayStack();
-      if(open === false) {
+      if (open === false) {
         showCta();
       }
     }

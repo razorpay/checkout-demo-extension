@@ -20,7 +20,7 @@
     });
     fetch({
       url: URL[type],
-      callback: function(response) {
+      callback: function (response) {
         TermsCurtain.show({
           loading: false,
           heading: response.title,
@@ -32,6 +32,37 @@
 
   let agreedToTerms = false;
 </script>
+
+<div class="pad">
+  {#if mode === 'HDFC_DC'}
+    <div class="agreement-checkbox">
+      <Checkbox
+        id="emi-tnc"
+        required
+        helpText="Please agree to terms and conditions"
+      />
+      <b>Terms of agreement</b>
+    </div>
+    <div class="agreement-text">
+      I expressly acknowledge that I agree to all the
+      <span
+        class="actionlink theme-highlight"
+        on:click={(event) => showTerms('hdfc_debit_tnc')}
+      >
+        terms and conditions
+      </span>
+      which I fully understand and have gone through
+      <span
+        class="actionlink theme-highlight"
+        on:click={(event) => showTerms('hdfc_debit_schedule')}
+      >
+        schedule of charges
+      </span>
+      and hereby record my agreement and consent. I authorise bank to debit my A/c
+      for EMI under Standing Instruction Mode.
+    </div>
+  {/if}
+</div>
 
 <style>
   .agreement-text {
@@ -45,31 +76,3 @@
     position: relative;
   }
 </style>
-
-<div class="pad">
-  {#if mode === 'HDFC_DC'}
-    <div class="agreement-checkbox">
-      <Checkbox
-        id="emi-tnc"
-        required
-        helpText="Please agree to terms and conditions" />
-      <b>Terms of agreement</b>
-    </div>
-    <div class="agreement-text">
-      I expressly acknowledge that I agree to all the
-      <span
-        class="actionlink theme-highlight"
-        on:click={event => showTerms('hdfc_debit_tnc')}>
-        terms and conditions
-      </span>
-      which I fully understand and have gone through
-      <span
-        class="actionlink theme-highlight"
-        on:click={event => showTerms('hdfc_debit_schedule')}>
-        schedule of charges
-      </span>
-      and hereby record my agreement and consent. I authorise bank to debit my
-      A/c for EMI under Standing Instruction Mode.
-    </div>
-  {/if}
-</div>

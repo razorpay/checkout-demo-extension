@@ -43,6 +43,25 @@
   }
 </script>
 
+<div class="transaction-details pad">
+  <div class="detail">
+    <!-- LABEL: EMI -->
+    <div>{$t(INSTALLMENT_LABEL)}</div>
+    <div>{formattedInstallmentAmount}</div>
+  </div>
+  <div class="detail">
+    <!-- LABEL: Tenure -->
+    <div>{$t(TENURE_LABEL)}</div>
+    <!-- LABEL: {duration} Months -->
+    <div>{formatTemplateWithLocale(TENURE, { duration }, $locale)}</div>
+  </div>
+  <div class="detail">
+    <!-- LABEL: Interest -->
+    <div>{$t(INTEREST_LABEL)}</div>
+    <div>{interest}%</div>
+  </div>
+</div>
+
 <style>
   .transaction-details {
     display: flex;
@@ -72,22 +91,3 @@
     }
   }
 </style>
-
-<div class="transaction-details pad">
-  <div class="detail">
-    <!-- LABEL: EMI -->
-    <div>{$t(INSTALLMENT_LABEL)}</div>
-    <div>{formattedInstallmentAmount}</div>
-  </div>
-  <div class="detail">
-    <!-- LABEL: Tenure -->
-    <div>{$t(TENURE_LABEL)}</div>
-    <!-- LABEL: {duration} Months -->
-    <div>{formatTemplateWithLocale(TENURE, { duration }, $locale)}</div>
-  </div>
-  <div class="detail">
-    <!-- LABEL: Interest -->
-    <div>{$t(INTEREST_LABEL)}</div>
-    <div>{interest}%</div>
-  </div>
-</div>

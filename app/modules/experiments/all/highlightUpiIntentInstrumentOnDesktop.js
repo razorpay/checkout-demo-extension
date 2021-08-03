@@ -7,5 +7,5 @@ export const EXPERIMENT_NAME = 'highlight_upi_intent_instruments_on_desktop';
  * @returns {Boolean} true or false
  */
 export function isHighlightUpiIntentInstrumentExperimentEnabled() {
-    return getSegmentOrCreate(EXPERIMENT_NAME) === 1;
+  return getSegmentOrCreate(EXPERIMENT_NAME) === 1;
 }

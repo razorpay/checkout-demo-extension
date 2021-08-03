@@ -3,23 +3,25 @@
  * @param {String} text
  * @param {Function} handleClick
  */
-export function replaceRetryButton(text = 'OK', handleClick = f => f) {
-    const existingButton = document.querySelector('#fd-hide');
+export function replaceRetryButton(text = 'OK', handleClick = (f) => f) {
+  const existingButton = document.querySelector('#fd-hide');
 
-    if (!existingButton) return;
-    if (existingButton?.parentNode) existingButton.parentNode.removeChild(existingButton);
+  if (!existingButton) return;
+  if (existingButton?.parentNode) {
+    existingButton.parentNode.removeChild(existingButton);
+  }
 
-    const errorMessageContainer = document.querySelector('#error-message');
-    if (!errorMessageContainer) return;
+  const errorMessageContainer = document.querySelector('#error-message');
+  if (!errorMessageContainer) return;
 
-    const newButton = document.createElement('button');
-    newButton.classList.add("btn");
-    newButton.innerHTML = text;
-    newButton.setAttribute('id', 'fd-ok');
+  const newButton = document.createElement('button');
+  newButton.classList.add('btn');
+  newButton.innerHTML = text;
+  newButton.setAttribute('id', 'fd-ok');
 
-    errorMessageContainer.appendChild(newButton);
+  errorMessageContainer.appendChild(newButton);
 
-    newButton.addEventListener('click', handleClick);
+  newButton.addEventListener('click', handleClick);
 }
 
 /**
@@ -29,7 +31,7 @@ export function replaceRetryButton(text = 'OK', handleClick = f => f) {
  * @param {String} text
  */
 export function replaceRetryButtonToDismissErrorMessage(session, text) {
-    replaceRetryButton(text, () => {
-        session.hide();
-    });
+  replaceRetryButton(text, () => {
+    session.hide();
+  });
 }

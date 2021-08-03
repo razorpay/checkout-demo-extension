@@ -12,6 +12,11 @@
   const dispatch = createEventDispatcher();
 </script>
 
+<div on:click={(event) => dispatch('select', event.detail)}>
+  <Icon {icon} alt={text} />
+  <div class="ref-text">{text}</div>
+</div>
+
 <style>
   div:not(.ref-text) {
     order: 0;
@@ -55,8 +60,3 @@
     }
   }
 </style>
-
-<div on:click={event => dispatch('select', event.detail)}>
-  <Icon {icon} alt={text} />
-  <div class="ref-text">{text}</div>
-</div>

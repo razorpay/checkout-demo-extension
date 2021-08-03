@@ -18,7 +18,8 @@
     id="upi-1"
     type="radio"
     name="_[reason]"
-    value="collect_not_received" />
+    value="collect_not_received"
+  />
   <!-- LABEL: Did not receive collect request -->
   {$t(CANCEL_REASON_COLLECT_NOT_RECEIVED)}
 </label>

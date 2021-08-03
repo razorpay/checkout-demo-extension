@@ -70,7 +70,7 @@ function base_set(flatObj, defObj, objKey, objVal) {
 }
 
 export function flattenProp(obj, prop, type) {
-  _Obj.loop(obj[prop], function(val, key) {
+  _Obj.loop(obj[prop], function (val, key) {
     var valType = typeof val;
     if (valType === 'string' || valType === 'number' || valType === 'boolean') {
       key = prop + type[0] + key;
@@ -85,9 +85,9 @@ export function flattenProp(obj, prop, type) {
 
 export function flatten(obj, defObj) {
   var flatObj = {};
-  _Obj.loop(obj, function(objVal, objKey) {
+  _Obj.loop(obj, function (objVal, objKey) {
     if (objKey in flatKeys) {
-      _Obj.loop(objVal, function(objSubVal, objSubKey) {
+      _Obj.loop(objVal, function (objSubVal, objSubKey) {
         base_set(flatObj, defObj, objKey + '.' + objSubKey, objSubVal);
       });
     } else {
@@ -99,10 +99,10 @@ export function flatten(obj, defObj) {
 
 const flatKeys = {};
 export default function Options(options) {
-  _Obj.loop(RazorpayDefaults, function(val, key) {
+  _Obj.loop(RazorpayDefaults, function (val, key) {
     if (_.isNonNullObject(val) && !_.isEmptyObject(val)) {
       flatKeys[key] = true;
-      _Obj.loop(val, function(subVal, subKey) {
+      _Obj.loop(val, function (subVal, subKey) {
         RazorpayDefaults[key + '.' + subKey] = subVal;
       });
       delete RazorpayDefaults[key];
@@ -113,18 +113,18 @@ export default function Options(options) {
   if (callback_url && shouldRedirect) {
     options.redirect = true;
   }
-  this.get = function(key) {
+  this.get = function (key) {
     if (!arguments.length) {
       return options;
     }
     return key in options ? options[key] : RazorpayDefaults[key];
   };
 
-  this.set = function(key, val) {
+  this.set = function (key, val) {
     options[key] = val;
   };
 
-  this.unset = function(key) {
+  this.unset = function (key) {
     delete options[key];
   };
 }

@@ -13,7 +13,7 @@ export const ALLOWED_MAX_SIZE_IN_MB = 5;
  * @returns {boolean}
  */
 function hasValidExtension(filename, extensions) {
-  return _Arr.any(extensions, extension => filename.endsWith(extension));
+  return _Arr.any(extensions, (extension) => filename.endsWith(extension));
 }
 
 /**
@@ -28,7 +28,7 @@ function entityToWords(word) {
 
   let prev;
 
-  const filtered = _Arr.filter(words, word => {
+  const filtered = _Arr.filter(words, (word) => {
     const sameAsLast = word === prev;
 
     prev = word;
@@ -52,7 +52,7 @@ export function getValidityError(file) {
   if (!hasValidExtension(filename, ALLOWED_EXTS)) {
     return {
       description: `The uploaded file type is not supported. Only ${_Arr
-        .map(ALLOWED_EXTS, x => x.toUpperCase())
+        .map(ALLOWED_EXTS, (x) => x.toUpperCase())
         .join(', ')} files are allowed.`,
     };
   }
@@ -106,7 +106,7 @@ export function uploadDocument(razorpay, file) {
       data,
       url,
       method: 'POST',
-      callback: response => {
+      callback: (response) => {
         ajax = null;
 
         if (response.error || response.success === false) {

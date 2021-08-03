@@ -10,7 +10,7 @@ let rInstance;
  *
  * @return {Object} m
  */
-const calculateMeta = _m => {
+const calculateMeta = (_m) => {
   const meta = _Obj.flatten(_m);
 
   _Obj.loop(meta, (val, key) => {
@@ -22,12 +22,12 @@ const calculateMeta = _m => {
   return meta;
 };
 
-const sanitizeEventData = data => {
+const sanitizeEventData = (data) => {
   const keysToMask = ['token'];
 
   const _data = _Obj.clone(data || {});
 
-  keysToMask.forEach(key => {
+  keysToMask.forEach((key) => {
     if (_data[key]) {
       _data[key] = '__REDACTED__';
     }

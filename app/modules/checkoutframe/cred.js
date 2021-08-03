@@ -9,7 +9,7 @@ const setCREDEligibility = (contact, value) => {
   CRED_ELIGIBILITY_CACHE[contact] = value;
 };
 
-export const setCREDEligibilityFromPreferences = preferences => {
+export const setCREDEligibilityFromPreferences = (preferences) => {
   const contact = preferences.customer?.contact;
   const eligible = preferences.methods?.app_meta?.cred?.user_eligible;
   if (eligible !== undefined && contact) {
@@ -20,7 +20,7 @@ export const setCREDEligibilityFromPreferences = preferences => {
   }
 };
 
-export const checkCREDEligibility = contact => {
+export const checkCREDEligibility = (contact) => {
   const session = getSession();
   const agentPayload = getAgentPayload() || {};
 
@@ -37,7 +37,7 @@ export const checkCREDEligibility = contact => {
         '_[checkout_id]': session?.id,
         ...agentPayload,
       },
-      callback: response => {
+      callback: (response) => {
         const eligibility = response.data?.state === 'ELIGIBLE';
         Analytics.track('cred:eligibility_check', {
           data: 'validate_api',
@@ -56,6 +56,6 @@ export const checkCREDEligibility = contact => {
   return promise;
 };
 
-export const isUserEligible = contact => {
+export const isUserEligible = (contact) => {
   return CRED_ELIGIBILITY_CACHE[contact];
 };

@@ -75,7 +75,7 @@
     }
 
     const tokens = _Obj.getSafely($customer, 'tokens.items', []);
-    const vpaToken = _Arr.find(tokens, item => item.id === token);
+    const vpaToken = _Arr.find(tokens, (item) => item.id === token);
 
     return `${vpaToken.vpa.username}@${vpaToken.vpa.handle}`;
   }
@@ -132,10 +132,11 @@
       title = getInstrumentTitle('upiqr', null, locale);
       icon = session.themeMeta.icons['qr'];
     } else if (instrument.flow === 'intent') {
-      const app = _Arr.find(
-        getUPIIntentApps().all,
-        app => app.package_name === instrument.app
-      ) || {};
+      const app =
+        _Arr.find(
+          getUPIIntentApps().all,
+          (app) => app.package_name === instrument.app
+        ) || {};
 
       // In case of ios, app name might be missing if not sent by the sdk
       let appName = app.app_name || 'Unknown app';
@@ -282,7 +283,7 @@
       <ContactField bind:country={$proxyCountry} bind:phone={$proxyPhone} />
     {/if}
   </div>
-  <div slot="subtitle" class='subtitle'>
+  <div slot="subtitle" class="subtitle">
     {#if subtitle}
       {subtitle}
     {/if}

@@ -26,7 +26,7 @@
   }
 
   function startTimer() {
-    interval = setInterval(function() {
+    interval = setInterval(function () {
       secondsLeft--;
       if (secondsLeft > 0 && resendTimeout) {
         secondsLeftText = ` (${secondsLeft})`;
@@ -40,18 +40,18 @@
 
   startTimer();
 
-  onDestroy(function() {
+  onDestroy(function () {
     clearInterval(interval);
   });
 </script>
+
+<LinkButton {id} {disabled} on:click={(event) => invokeResend(event, 'resend')}>
+  {$t(RESEND_LABEL)}
+  {#if secondsLeftText}<span>{secondsLeftText}</span>{/if}
+</LinkButton>
 
 <style>
   span {
     color: #000;
   }
 </style>
-
-<LinkButton {id} {disabled} on:click={event => invokeResend(event, 'resend')}>
-  {$t(RESEND_LABEL)}
-  {#if secondsLeftText}<span>{secondsLeftText}</span>{/if}
-</LinkButton>

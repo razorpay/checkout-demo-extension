@@ -3,12 +3,16 @@ import { isCustomerFeeBearer } from 'checkoutstore';
 
 /**
  * Get the font size depending on the number of chars in amount, customer fee bearer and offer.
- * 
+ *
  * @param {Number|String} amount
  * @param {Boolean} hasFee
  * @param {Boolean} hasOffer
  */
- export function getNormalizedAmountFontSize(amount, hasFee = false, hasOffer = false) {
+export function getNormalizedAmountFontSize(
+  amount,
+  hasFee = false,
+  hasOffer = false
+) {
   const MIN_FONT_SIZE = 17;
   const MAX_FONT_SIZE = 24;
   const AUTOSCALE_STEP = 1.5; // decrease fontsize by this for every char over threshold
@@ -26,13 +30,15 @@ import { isCustomerFeeBearer } from 'checkoutstore';
     MIN_FONT_SIZE,
     Math.min(
       MAX_FONT_SIZE,
-      MAX_FONT_SIZE - (String(amount).length - autoscaleThreasholdChars) * AUTOSCALE_STEP
-    ));
+      MAX_FONT_SIZE -
+        (String(amount).length - autoscaleThreasholdChars) * AUTOSCALE_STEP
+    )
+  );
 }
 
- /**
+/**
  * Fit original amount or discount amount in header by scaling the font size
- * 
+ *
  */
 export function updateAmountFontSize() {
   const session = getSession();
@@ -42,8 +48,12 @@ export function updateAmountFontSize() {
   let hasOffer = offer && offer.amount !== offer.original_amount;
   let originalAmount = session.get('amount');
 
-  let discountString = offer?.amount ? session.formatAmountWithCurrency(offer.amount) : '';
-  let originalAmountString = originalAmount ? session.formatAmountWithCurrency(originalAmount) : '';
+  let discountString = offer?.amount
+    ? session.formatAmountWithCurrency(offer.amount)
+    : '';
+  let originalAmountString = originalAmount
+    ? session.formatAmountWithCurrency(originalAmount)
+    : '';
 
   if (!discountString && !originalAmountString) return;
 
@@ -54,5 +64,5 @@ export function updateAmountFontSize() {
   let fontSize = getNormalizedAmountFontSize(amount_figure, hasFee, hasOffer);
 
   let amountElement = _Doc.querySelector('#amount');
-  if (amountElement?.style) amountElement.style.fontSize = fontSize+'px';
+  if (amountElement?.style) amountElement.style.fontSize = fontSize + 'px';
 }

@@ -26,9 +26,7 @@
   function getCardCaption(issuer = '', type, last4, locale) {
     // HDFC Credit Card - 4321
     const method = type ? `${type}_card` : 'card';
-    return (
-      issuer + ' ' + getRawMethodTitle(method, locale) + ' - ' + last4
-    );
+    return issuer + ' ' + getRawMethodTitle(method, locale) + ' - ' + last4;
   }
 </script>
 

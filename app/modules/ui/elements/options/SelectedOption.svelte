@@ -5,6 +5,11 @@
   export let title = '';
 </script>
 
+<div class="emboss selected-option">
+  <OptionIcon {icon} />
+  <div class="option-title">{title}</div>
+</div>
+
 <style>
   .selected-option {
     display: flex;
@@ -22,8 +27,3 @@
     margin-right: 16px;
   }
 </style>
-
-<div class="emboss selected-option">
-  <OptionIcon {icon} />
-  <div class="option-title">{title}</div>
-</div>

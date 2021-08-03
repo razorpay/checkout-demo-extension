@@ -70,7 +70,7 @@ emiView.prototype = {
     });
   },
 
-  on: function(event, sel, listener) {
+  on: function (event, sel, listener) {
     const el = _Doc.querySelector(sel);
 
     this.listeners.push(el |> _El.on(event, listener));

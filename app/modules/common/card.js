@@ -27,7 +27,7 @@ export const networks = {
 const cdnUrl = RazorpayConfig.cdn;
 const fullPrefix = cdnUrl + 'acs/network/';
 
-export const getFullNetworkLogo = code => `${fullPrefix}${code}.svg`;
+export const getFullNetworkLogo = (code) => `${fullPrefix}${code}.svg`;
 
 /**
  * Strips everything but digits.
@@ -35,7 +35,7 @@ export const getFullNetworkLogo = code => `${fullPrefix}${code}.svg`;
  *
  * @return {String}
  */
-export const getCardDigits = cardNumber => cardNumber.replace(/\D/g, '');
+export const getCardDigits = (cardNumber) => cardNumber.replace(/\D/g, '');
 
 /**
  * Returns the IIN of the card.
@@ -43,7 +43,7 @@ export const getCardDigits = cardNumber => cardNumber.replace(/\D/g, '');
  *
  * @return {String}
  */
-export const getIin = cardNumber => getCardDigits(cardNumber).slice(0, 6);
+export const getIin = (cardNumber) => getCardDigits(cardNumber).slice(0, 6);
 
 /**
  * Returns either IIN or Token from a payload.
@@ -51,7 +51,7 @@ export const getIin = cardNumber => getCardDigits(cardNumber).slice(0, 6);
  * @param payload
  * @returns {string|*}
  */
-export const getCardEntityFromPayload = payload => {
+export const getCardEntityFromPayload = (payload) => {
   if (payload.tokenId) {
     return payload.tokenId;
   }
@@ -71,7 +71,7 @@ export const getCardEntityFromPayload = payload => {
  *
  * @return {String} {eg: mastercard}
  */
-export const findCodeByNetworkName = name => {
+export const findCodeByNetworkName = (name) => {
   let code;
 
   _Obj.loop(networks, (val, key) => {
@@ -88,7 +88,7 @@ export const findCodeByNetworkName = name => {
  *
  * @return {String} {eg: MasterCard}
  */
-export const findNetworkNameByCode = code => {
+export const findNetworkNameByCode = (code) => {
   return networks[code];
 };
 
@@ -116,7 +116,8 @@ const cardPatterns = [
   },
   {
     name: 'rupay',
-    regex: /^(508[5-9]|60(80(0|)[^0]|8[1-4]|8500|698[5-9]|699|7[^9]|79[0-7]|798[0-4])|65(2(1[5-9]|[2-9])|30|31[0-4])|817[2-9]|81[89]|820[01])/,
+    regex:
+      /^(508[5-9]|60(80(0|)[^0]|8[1-4]|8500|698[5-9]|699|7[^9]|79[0-7]|798[0-4])|65(2(1[5-9]|[2-9])|30|31[0-4])|817[2-9]|81[89]|820[01])/,
   },
   {
     name: 'discover',
@@ -147,10 +148,10 @@ const cardLengths = {
   '': 19,
 };
 
-export const getCardType = cardNumber => {
+export const getCardType = (cardNumber) => {
   cardNumber = cardNumber.replace(/\D/g, '');
   let cardType = '';
-  _Arr.loop(cardPatterns, card => {
+  _Arr.loop(cardPatterns, (card) => {
     if (card.regex.test(cardNumber)) {
       if (!cardType) {
         cardType = card.name;
@@ -166,7 +167,7 @@ export const getCardType = cardNumber => {
  *
  * @returns {string}
  */
-export const getNetworkFromCardNumber = cardNumber => {
+export const getNetworkFromCardNumber = (cardNumber) => {
   let network = getCardType(cardNumber);
 
   if (network === 'maestro16') {
@@ -182,14 +183,14 @@ export const getNetworkFromCardNumber = cardNumber => {
  *
  * @returns {string}
  */
-export const isAmex = cardNumber => {
+export const isAmex = (cardNumber) => {
   let network = getCardType(cardNumber);
   return network === 'amex';
 };
 
-export const getCardMaxLen = cardType => cardLengths[cardType] || 16;
+export const getCardMaxLen = (cardType) => cardLengths[cardType] || 16;
 
-export const getCardSpacing = maxLen => {
+export const getCardSpacing = (maxLen) => {
   if (maxLen !== 19) {
     if (maxLen < 16) {
       return /(^.{4}|.{6})/g;
@@ -215,7 +216,7 @@ export function isCardNetworkInPaymentOneOf(
   let network = '';
 
   if (token) {
-    const cardToken = _Arr.find(tokens, t => t.token === token);
+    const cardToken = _Arr.find(tokens, (t) => t.token === token);
 
     if (cardToken && cardToken.card && cardToken.card.network) {
       network = cardToken.card.network;
@@ -232,7 +233,7 @@ export function isCardNetworkInPaymentOneOf(
   return Boolean(
     _Arr.find(
       listOfNetworks,
-      listNetwork => listNetwork.toLowerCase() === network
+      (listNetwork) => listNetwork.toLowerCase() === network
     )
   );
 }
@@ -243,7 +244,7 @@ export function isCardNetworkInPaymentOneOf(
  *
  * @returns {boolean}
  */
-export const isIinValid = cardNumber => {
+export const isIinValid = (cardNumber) => {
   const iin = getIin(cardNumber);
 
   return iin && iin.length >= 6;
@@ -393,7 +394,7 @@ export function getCardFeatures(cardNumber) {
 
     fetch.jsonp({
       url,
-      callback: features => {
+      callback: (features) => {
         if (features.error) {
           Analytics.track('features:card:fetch:failure', {
             data: {
@@ -440,7 +441,7 @@ export function getCardFeatures(cardNumber) {
  * @returns {array}
  */
 export function addDowntimesToSavedCards(cards, downtimes) {
-  const cardsWithDowntime = cards.map(item => {
+  const cardsWithDowntime = cards.map((item) => {
     const { network, issuer } = item.card;
     let networkDowntime = checkDowntime(downtimes, 'network', network);
     let issuerDowntime = checkDowntime(downtimes, 'issuer', issuer);

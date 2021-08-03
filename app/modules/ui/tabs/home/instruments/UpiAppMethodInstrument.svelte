@@ -5,20 +5,15 @@
 
   // Utils imports
   import { getExtendedSingleInstrument } from 'configurability/instruments';
-  import {
-    getUPIAppDataFromHandle,
-  } from 'common/upi';
+  import { getUPIAppDataFromHandle } from 'common/upi';
 
   // i18n
   import { locale } from 'svelte-i18n';
-  import {
-    getInstrumentTitle,
-  } from 'i18n';
-  
+  import { getInstrumentTitle } from 'i18n';
+
   // Props
   export let instrument = {};
   export let name = 'instrument';
-
 
   let title;
   let icon;
@@ -56,7 +51,6 @@
       code = details.code;
     }
   }
-
 </script>
 
 <SlottedOption

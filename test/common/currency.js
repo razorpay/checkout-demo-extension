@@ -13,13 +13,13 @@ const additionalCurrencies = {
   },
 };
 
-test('common/currency', t => {
-  test('Formats amount with symbol correctly', function(t) {
+test('common/currency', (t) => {
+  test('Formats amount with symbol correctly', function (t) {
     t.equal(formatAmountWithSymbol(12345, 'USD'), '$ 123.45');
     t.end();
   });
 
-  test('Updates additional currencies and formats amount correctly', function(t) {
+  test('Updates additional currencies and formats amount correctly', function (t) {
     updateCurrencies(additionalCurrencies);
 
     t.equal(formatAmountWithSymbol(12345, 'RZP'), 'RZP 12.345');

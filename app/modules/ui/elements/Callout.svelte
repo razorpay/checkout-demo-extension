@@ -11,15 +11,15 @@
   $: allClasses = ['callout', type].concat(classes).join(' ');
 </script>
 
-<style>
-  :global(.screen-bottom .callout) {
-    position: static; // These don't need to be absolutely positioned in <BottomScreen />
-  }
-</style>
-
 <div class={allClasses} class:drishy={visible}>
   {#if showIcon}
     <span>&#x2139;</span>
   {/if}
   <slot />
 </div>
+
+<style>
+  :global(.screen-bottom .callout) {
+    position: static; // These don't need to be absolutely positioned in <BottomScreen />
+  }
+</style>

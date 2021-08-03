@@ -10,13 +10,13 @@ export function validateCardInstrument(
   instrument,
   { tokens = [] } = {}
 ) {
-  tokens = _Arr.filter(tokens, token => token.method === 'card');
+  tokens = _Arr.filter(tokens, (token) => token.method === 'card');
 
   const cardNumberFromPayment = payment['card[number]'];
   let features = {};
 
   if (payment.token) {
-    let token = _Arr.find(tokens, token => token.token === payment.token);
+    let token = _Arr.find(tokens, (token) => token.token === payment.token);
 
     if (token) {
       features = token.card;
@@ -25,7 +25,7 @@ export function validateCardInstrument(
     features = getCardFeatures(cardNumberFromPayment);
   }
 
-  return Promise.resolve(features).then(features => {
+  return Promise.resolve(features).then((features) => {
     // Set things from features
     const type = features.type;
     const issuer = features.issuer;

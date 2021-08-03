@@ -20,7 +20,7 @@ const AGREEMENT_HELPER = {
   },
 
   parseResponse: {
-    zestmoney: response => {
+    zestmoney: (response) => {
       if (typeof response !== 'string') {
         Analytics.track('cardless_emi:terms:fetch:error', {
           data: {
@@ -83,27 +83,26 @@ const fetchAgreements = (provider, loanUrl, plans, amount) => {
     return;
   }
 
-  _Arr.loop(plans, plan => {
+  _Arr.loop(plans, (plan) => {
     fetch({
       url: createUrlHelper(loanUrl, amount, plan.duration),
 
-      callback: function(response) {
+      callback: function (response) {
         if (!AGREEMENT_STORE[provider]) {
           AGREEMENT_STORE[provider] = {};
         }
 
         // TODO: restructure AGREEMENT_HELPER to make the relationship between
         //  parseResponse and createUrl explicit
-        AGREEMENT_STORE[provider][
-          plan.duration
-        ] = AGREEMENT_HELPER.parseResponse[provider](response);
+        AGREEMENT_STORE[provider][plan.duration] =
+          AGREEMENT_HELPER.parseResponse[provider](response);
       },
     });
   });
 };
 
 emiPlansView.prototype = {
-  setPlans: function({
+  setPlans: function ({
     plans,
     bank,
     card,
@@ -124,7 +123,7 @@ emiPlansView.prototype = {
     this.back = on.back || returnAsIs;
     this.contactRequiredForEMI = contactRequiredForEMI;
 
-    on.select = event => {
+    on.select = (event) => {
       const plan = event.detail;
       const session = getSession();
 
@@ -132,7 +131,7 @@ emiPlansView.prototype = {
       const isNoCostEmi = offer && offer.emi_subvention;
 
       if (isNoCostEmi && offer.id !== plan.offer_id) {
-        return session.showOffersError(offerRemoved => {
+        return session.showOffersError((offerRemoved) => {
           if (offerRemoved) {
             // Offer is actually removed after `tick`
             // So we need to wait as well
@@ -160,7 +159,7 @@ emiPlansView.prototype = {
       _Doc.querySelector('#body') |> _El.addClass('sub');
     };
 
-    on.setContact = contact => {
+    on.setContact = (contact) => {
       this.contact = contact;
     };
 
@@ -192,7 +191,7 @@ emiPlansView.prototype = {
     this.view.onShown();
   },
 
-  submit: function() {
+  submit: function () {
     if (!this.selectedPlan) {
       this.view.showPlansView();
       return;

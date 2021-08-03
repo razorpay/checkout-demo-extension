@@ -66,7 +66,7 @@
     const _otherPlans = [];
     const _offerPlans = [];
     if ($appliedOffer) {
-      plans.forEach(plan => {
+      plans.forEach((plan) => {
         if (plan.offer_id !== $appliedOffer.id) {
           _otherPlans.push(plan);
         } else {
@@ -160,21 +160,6 @@
   }
 </script>
 
-<style>
-  .actionlink-container {
-    margin: 12px 0;
-  }
-
-  :global(.emi-branding-callout) {
-    padding-left: 12px !important;
-    background: white !important;
-
-    img {
-      max-height: 24px;
-    }
-  }
-</style>
-
 <div id="form-emiplans" class="tab-content showable screen pad vertical-pad">
   {#if currentView === Views.PLANS}
     <!-- LABEL: Select an EMI Plan -->
@@ -185,7 +170,8 @@
       {amount}
       {expand}
       {expanded}
-      {provider} />
+      {provider}
+    />
     {#if otherPlans.length}
       <!-- LABEL: Plan without offer -->
       <EmiPlanCards
@@ -195,16 +181,19 @@
         {amount}
         {expand}
         {expanded}
-        {provider} />
+        {provider}
+      />
     {/if}
 
     <div
       class="emi-plans-actions actionlink-container"
-      class:hidden={!showActions}>
+      class:hidden={!showActions}
+    >
       {#if actions.viewAll}
         <div
           class="actionlink theme-highlight"
-          on:click={event => invoke('viewAll', event)}>
+          on:click={(event) => invoke('viewAll', event)}
+        >
           <!-- LABEL: View all EMI Plans -->
           {$t(PLAN_LIST_VIEW_ALL_ACTION)}
         </div>
@@ -212,7 +201,8 @@
       {#if actions.payWithoutEmi && isMethodUsable('card')}
         <div
           class="actionlink theme-highlight"
-          on:click={event => invoke('payWithoutEmi', event)}>
+          on:click={(event) => invoke('payWithoutEmi', event)}
+        >
           <!-- Pay entire amount -->
           {$t(PLAN_LIST_PAY_ENTIRE_ACTION)}
         </div>
@@ -222,7 +212,8 @@
       {#if actions.showAgreement && expanded >= 0}
         <div
           class="callout drishy"
-          on:click={event => invoke('viewAgreement', event)}>
+          on:click={(event) => invoke('viewAgreement', event)}
+        >
           <span>&#x2139;</span>
           <!-- TODO: Support theme highlight through FormattedText and unify -->
           <!-- LABEL: By clicking on Pay, you agree to the terms of our&nbsp; -->
@@ -242,8 +233,24 @@
     </Bottom>
   {:else if currentView === Views.CONTACT}
     <EmiContact
-      on:input={e => setContact(e.target.value)}
-      on:blur={e => onContactFilled(e.target.value)}
-      isSavedCard={type === 'saved'} />
+      on:input={(e) => setContact(e.target.value)}
+      on:blur={(e) => onContactFilled(e.target.value)}
+      isSavedCard={type === 'saved'}
+    />
   {/if}
 </div>
+
+<style>
+  .actionlink-container {
+    margin: 12px 0;
+  }
+
+  :global(.emi-branding-callout) {
+    padding-left: 12px !important;
+    background: white !important;
+
+    img {
+      max-height: 24px;
+    }
+  }
+</style>

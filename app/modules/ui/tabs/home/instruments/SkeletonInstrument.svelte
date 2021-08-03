@@ -2,6 +2,10 @@
   import { slide } from 'svelte/transition';
 </script>
 
+<div class="skeleton-instrument uninteractive" data-type="skeleton" out:slide>
+  <span />
+</div>
+
 <style>
   div {
     box-sizing: content-box;
@@ -40,7 +44,3 @@
     animation-fill-mode: both;
   }
 </style>
-
-<div class="skeleton-instrument uninteractive" data-type="skeleton" out:slide>
-  <span />
-</div>

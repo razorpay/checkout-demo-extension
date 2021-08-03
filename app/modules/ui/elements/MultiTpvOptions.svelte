@@ -56,13 +56,18 @@
     name="method"
     value="netbanking"
     selected={selectedOption === 'netbanking'}
-    on:click={_ => handleOptionSelection('netbanking')}>
+    on:click={(_) => handleOptionSelection('netbanking')}
+  >
     <i slot="icon">
       <Icon icon="https://cdn.razorpay.com/bank/{bank.code}.gif" />
     </i>
     <!-- LABEL: A/C: {accountNumber} -->
     <div slot="title">
-      {formatTemplateWithLocale(MULTI_TPV_NETBANKING_TITLE, { accountNumber: bank.account_number }, $locale)}
+      {formatTemplateWithLocale(
+        MULTI_TPV_NETBANKING_TITLE,
+        { accountNumber: bank.account_number },
+        $locale
+      )}
     </div>
     <div slot="subtitle">{bankName}</div>
   </SlottedRadioOption>
@@ -70,7 +75,8 @@
     name="method"
     value="upi"
     selected={selectedOption === 'upi'}
-    on:click={_ => handleOptionSelection('upi')}>
+    on:click={(_) => handleOptionSelection('upi')}
+  >
     <i slot="icon">
       <Icon icon={icons.upi} />
     </i>
@@ -78,7 +84,11 @@
     <div slot="title">{$t(MULTI_TPV_UPI_TITLE)}</div>
     <!-- LABEL: {bankName} Account {accountNumber} -->
     <div slot="subtitle">
-      {formatTemplateWithLocale(MULTI_TPV_UPI_SUBTITLE, { bankName, accountNumber: bank.account_number }, $locale)}
+      {formatTemplateWithLocale(
+        MULTI_TPV_UPI_SUBTITLE,
+        { bankName, accountNumber: bank.account_number },
+        $locale
+      )}
     </div>
   </SlottedRadioOption>
 </div>

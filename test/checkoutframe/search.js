@@ -19,8 +19,8 @@ const BANKS = [
   },
 ];
 
-test('Module: checkoutframe/search', t => {
-  test('Search.search', t => {
+test('Module: checkoutframe/search', (t) => {
+  test('Search.search', (t) => {
     const cache = Search.createCache();
 
     const codeResults = Search.search('sbin', BANKS, ['code', 'name'], {

@@ -79,7 +79,7 @@
   });
 
   function checkAndAddDowntime() {
-    if(!vpa){
+    if (!vpa) {
       downtimeSeverity = false;
       return;
     }
@@ -125,8 +125,16 @@
     vpaField.focus();
   }
 
-  export function setSelectionRange(selectionStart, selectionEnd, selectionDirection = "none") {
-    vpaField.setSelectionRange(selectionStart, selectionEnd, selectionDirection);
+  export function setSelectionRange(
+    selectionStart,
+    selectionEnd,
+    selectionDirection = 'none'
+  ) {
+    vpaField.setSelectionRange(
+      selectionStart,
+      selectionEnd,
+      selectionDirection
+    );
   }
 
   function focusAfterTimeout() {
@@ -142,6 +150,137 @@
 
   $: pattern = PATTERN_WITH_HANDLE;
 </script>
+
+<!-- as="div" sent because in IE insider button we cannot add any other on:click action -->
+<SlottedRadioOption
+  name={'upi-vpa-input-' + paymentMethod}
+  value="full"
+  align="top"
+  as="div"
+  overflow
+  on:click
+  on:click={focusAfterTimeout}
+  {selected}
+>
+  <div id={'new-vpa-field-' + paymentMethod} slot="title">
+    <!-- LABEL: UPI ID -->
+    <!-- LABEL: Add UPI ID -->
+    {logged && canSaveVpa
+      ? $t(NEW_VPA_TITLE_LOGGED_IN)
+      : $t(NEW_VPA_TITLE_LOGGED_OUT)}
+  </div>
+  <!-- LABEL: Google Pay, BHIM, PhonePe & more -->
+  <div
+    slot="subtitle"
+    class:less-focus-smaller={paymentMethod === 'upi_otm' || recurring}
+  >
+    {#if paymentMethod === 'upi_otm' || recurring}
+      <FormattedText text={$t(NEW_VPA_SUBTITLE_UPI_OTM)} />
+    {:else}{$t(NEW_VPA_SUBTITLE)}{/if}
+  </div>
+  <i slot="icon" class="top">
+    <Icon icon={session.themeMeta.icons.upi} />
+  </i>
+
+  <div slot="body">
+    {#if selected}
+      <div
+        id={'user-new-vpa-container-' + paymentMethod}
+        transition:slide={getAnimationOptions({ duration: 200 })}
+      >
+        <!-- LABEL: Please enter a valid VPA of the form username@bank -->
+        <!-- LABEL: Enter your UPI ID -->
+        <Field
+          formatter={{ type: 'vpa' }}
+          {pattern}
+          prediction={(currentVaue) => {
+            const phoneInput = $phone;
+            const prefillName = getPrefilledName() || '';
+            const atIndex = currentVaue.indexOf('@');
+            if (
+              currentVaue?.length > 1 &&
+              phoneInput &&
+              phoneInput.startsWith(currentVaue) &&
+              atIndex === -1
+            ) {
+              return phoneInput;
+            }
+            if (
+              currentVaue?.length > 1 &&
+              prefillName &&
+              prefillName?.toLowerCase()?.startsWith(currentVaue) &&
+              atIndex === -1
+            ) {
+              // handle mismatch case of suggestion and input
+              return currentVaue + prefillName.substr(currentVaue.length);
+            }
+            if (
+              currentVaue.length > 2 &&
+              currentVaue.includes('@') &&
+              atIndex < currentVaue.length - 1
+            ) {
+              const predictionInput = currentVaue.substr(atIndex + 1);
+              const predictions = suggestionVPA.filter((vpa) =>
+                vpa.startsWith(predictionInput)
+              );
+              const value = `${currentVaue.substr(0, atIndex)}@${
+                predictions?.[0] || ''
+              }`;
+              if (predictions?.length > 0) {
+                return {
+                  value,
+                  maxLeftPositionOfDropdown: 180,
+                  suggestions: predictions.map((x) => `@${x}`),
+                  onSelect: (data) => {
+                    return `${currentVaue.substr(0, atIndex)}${data}`;
+                  },
+                };
+              }
+            }
+            return '';
+          }}
+          showDropdownPredictions
+          helpText={$t(UPI_COLLECT_NEW_VPA_HELP)}
+          id={'vpa-' + paymentMethod}
+          name={'vpa-' + paymentMethod}
+          type="text"
+          required
+          bind:value
+          bind:this={vpaField}
+          bind:readonlyValue={vpa}
+          on:input={handleVpaInput}
+          on:blur
+          placeholder={$t(UPI_COLLECT_ENTER_ID)}
+        />
+        {#if logged && canSaveVpa}
+          <div class="should-save-vpa-container">
+            <label
+              id={'should-save-vpa-' + paymentMethod}
+              for={'save-vpa-' + paymentMethod}
+            >
+              <!-- LABEL: Securely save your UPI ID -->
+              <Checkbox
+                bind:checked={rememberVpa}
+                id={'save-vpa-' + paymentMethod}
+              >
+                {$t(UPI_COLLECT_SAVE)}
+              </Checkbox>
+            </label>
+          </div>
+        {/if}
+      </div>
+    {/if}
+  </div>
+  <div slot="downtime" class="downtime-upi">
+    {#if selected && !!downtimeSeverity}
+      <DowntimeCallout
+        showIcon={true}
+        severe={downtimeSeverity}
+        {downtimeInstrument}
+      />
+    {/if}
+  </div>
+</SlottedRadioOption>
 
 <style>
   .ref-pspName {
@@ -188,103 +327,3 @@
     right: 20px;
   }
 </style>
-
-<!-- as="div" sent because in IE insider button we cannot add any other on:click action -->
-<SlottedRadioOption
-  name={'upi-vpa-input-' + paymentMethod}
-  value="full"
-  align="top"
-  as="div" 
-  overflow
-  on:click
-  on:click={focusAfterTimeout}
-  {selected}>
-  <div id={'new-vpa-field-' + paymentMethod} slot="title">
-    <!-- LABEL: UPI ID -->
-    <!-- LABEL: Add UPI ID -->
-    {logged && canSaveVpa ? $t(NEW_VPA_TITLE_LOGGED_IN) : $t(NEW_VPA_TITLE_LOGGED_OUT)}
-  </div>
-  <!-- LABEL: Google Pay, BHIM, PhonePe & more -->
-  <div
-    slot="subtitle"
-    class:less-focus-smaller={paymentMethod === 'upi_otm' || recurring}>
-    {#if paymentMethod === 'upi_otm' || recurring}
-      <FormattedText text={$t(NEW_VPA_SUBTITLE_UPI_OTM)} />
-    {:else}{$t(NEW_VPA_SUBTITLE)}{/if}
-  </div>
-  <i slot="icon" class="top">
-    <Icon icon={session.themeMeta.icons.upi} />
-  </i>
-
-  <div slot="body">
-    {#if selected}
-      <div
-        id={'user-new-vpa-container-' + paymentMethod}
-        transition:slide={getAnimationOptions({ duration: 200 })}>
-        <!-- LABEL: Please enter a valid VPA of the form username@bank -->
-        <!-- LABEL: Enter your UPI ID -->
-        <Field
-          formatter={{ type: 'vpa' }}
-          {pattern}
-          prediction={currentVaue => {
-            const phoneInput = $phone;
-            const prefillName = getPrefilledName() || '';
-            const atIndex = currentVaue.indexOf('@');
-            if (currentVaue?.length > 1 && phoneInput && phoneInput.startsWith(currentVaue) && atIndex === -1) {
-              return phoneInput;
-            }
-            if (currentVaue?.length > 1 && prefillName && prefillName
-                ?.toLowerCase()
-                ?.startsWith(currentVaue) && atIndex === -1) {
-              // handle mismatch case of suggestion and input
-              return currentVaue + prefillName.substr(currentVaue.length);
-            }
-            if (currentVaue.length > 2 && currentVaue.includes('@') && atIndex < currentVaue.length - 1) {
-              const predictionInput = currentVaue.substr(atIndex + 1);
-              const predictions = suggestionVPA.filter(vpa =>
-                vpa.startsWith(predictionInput)
-              );
-              const value = `${currentVaue.substr(0, atIndex)}@${predictions?.[0] || ''}`;
-              if (predictions?.length > 0) {
-                return { value, maxLeftPositionOfDropdown: 180, suggestions: predictions.map(x => `@${x}`), onSelect: data => {
-                    return `${currentVaue.substr(0, atIndex)}${data}`;
-                  } };
-              }
-            }
-            return '';
-          }}
-          showDropdownPredictions
-          helpText={$t(UPI_COLLECT_NEW_VPA_HELP)}
-          id={'vpa-' + paymentMethod}
-          name={'vpa-' + paymentMethod}
-          type="text"
-          required
-          bind:value
-          bind:this={vpaField}
-          bind:readonlyValue={vpa}
-          on:input={handleVpaInput}
-          on:blur
-          placeholder={$t(UPI_COLLECT_ENTER_ID)} />
-        {#if logged && canSaveVpa}
-          <div class="should-save-vpa-container">
-            <label
-              id={'should-save-vpa-' + paymentMethod}
-              for={'save-vpa-' + paymentMethod}>
-              <!-- LABEL: Securely save your UPI ID -->
-              <Checkbox
-                bind:checked={rememberVpa}
-                id={'save-vpa-' + paymentMethod}>
-                {$t(UPI_COLLECT_SAVE)}
-              </Checkbox>
-            </label>
-          </div>
-        {/if}
-      </div>
-    {/if}
-  </div>
-  <div slot="downtime" class="downtime-upi">
-    {#if selected && !!downtimeSeverity}
-      <DowntimeCallout showIcon={true} severe={downtimeSeverity} {downtimeInstrument} />
-      {/if}
-  </div>
-</SlottedRadioOption>

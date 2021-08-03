@@ -55,7 +55,7 @@ const providers = _Obj.map(config, (details, code) => {
   );
 });
 
-export const getProvider = code => providers[code];
+export const getProvider = (code) => providers[code];
 
 /**
  * Extends the config of the given with the updated config
@@ -79,7 +79,7 @@ export const extendConfig = (provider, updatedConfig) => {
  * @param {string} provider
  * @returns {string}
  */
-export const getImageUrl = provider => {
+export const getImageUrl = (provider) => {
   const { logo } = getProvider(provider);
   return logo;
 };

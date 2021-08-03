@@ -21,6 +21,22 @@
   }
 </script>
 
+<div class="auth-overlay">
+  <div class="icon">
+    <Icon icon={getMiscIcon('lock', getThemeColor())} />
+  </div>
+  <!-- LABEL: Bank verification required -->
+  <b>{$t(BANK_VERIFICATION_TITLE)}</b>
+  <span class="desc">
+    <!-- LABEL: Click continue to complete the payment on the bank page -->
+    {$t(BANK_VERIFICATION_DESCRIPTION)}
+  </span>
+  <button class="btn" on:click={onContinue}>
+    <!-- LABEL: Continue -->
+    {$t(BANK_VERIFICATION_ACTION_CONTINUE)}
+  </button>
+</div>
+
 <style>
   .auth-overlay {
     display: flex;
@@ -39,19 +55,3 @@
     margin-top: 16px;
   }
 </style>
-
-<div class="auth-overlay">
-  <div class="icon">
-    <Icon icon={getMiscIcon('lock', getThemeColor())} />
-  </div>
-  <!-- LABEL: Bank verification required -->
-  <b>{$t(BANK_VERIFICATION_TITLE)}</b>
-  <span class="desc">
-    <!-- LABEL: Click continue to complete the payment on the bank page -->
-    {$t(BANK_VERIFICATION_DESCRIPTION)}
-  </span>
-  <button class="btn" on:click={onContinue}>
-    <!-- LABEL: Continue -->
-    {$t(BANK_VERIFICATION_ACTION_CONTINUE)}
-  </button>
-</div>

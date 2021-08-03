@@ -28,7 +28,7 @@ import {
  *
  * @return {Boolean}
  */
-const isOfferEligible = offer => {
+const isOfferEligible = (offer) => {
   const method = offer.payment_method;
   let isEnabled;
 
@@ -100,7 +100,7 @@ export function getOffersForTab(method) {
       methods.push('emi');
     }
 
-    return allOffers.filter(offer =>
+    return allOffers.filter((offer) =>
       _Arr.contains(methods, offer.payment_method)
     );
   }
@@ -177,7 +177,7 @@ function isOfferEligibleOnInstrument(offer, instrument) {
 export function getOffersForInstrument(instrument) {
   const offers = getOffersForTab(instrument.method);
 
-  return _Arr.filter(offers, offer =>
+  return _Arr.filter(offers, (offer) =>
     isOfferEligibleOnInstrument(offer, instrument)
   );
 }
@@ -218,17 +218,17 @@ export const getAllOffers = () => {
 function _getAllInstrumentsForOffer(offer) {
   const allInstruments = storeGetter(instruments);
 
-  return _Arr.filter(allInstruments, instrument =>
+  return _Arr.filter(allInstruments, (instrument) =>
     isOfferEligibleOnInstrument(offer, instrument)
   );
 }
 
 const INSTRUMENT_TO_SELECT_HANDLERS = {
-  default: offer => {
+  default: (offer) => {
     const instruments = _getAllInstrumentsForOffer(offer);
     const nonSavedCardInstruments = _Arr.filter(
       instruments,
-      instrument => !isSavedCardInstrument(instrument)
+      (instrument) => !isSavedCardInstrument(instrument)
     );
 
     const first = nonSavedCardInstruments[0];
@@ -238,7 +238,7 @@ const INSTRUMENT_TO_SELECT_HANDLERS = {
     }
   },
 
-  card: offer => {
+  card: (offer) => {
     const instruments = _getAllInstrumentsForOffer(offer);
 
     // Try choosing instrument for entire method
@@ -272,9 +272,8 @@ export function getInstrumentToSelectForOffer(offer) {
   const currentInstrument = storeGetter(selectedInstrument);
 
   if (currentInstrument) {
-    const isCurrentInsturmentForSavedCard = isSavedCardInstrument(
-      currentInstrument
-    );
+    const isCurrentInsturmentForSavedCard =
+      isSavedCardInstrument(currentInstrument);
     const isOfferEligibleOnCurrentInstrument = isOfferEligibleOnInstrument(
       offer,
       currentInstrument

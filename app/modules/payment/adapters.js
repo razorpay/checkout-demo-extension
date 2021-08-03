@@ -65,14 +65,14 @@ function phonepePaymentRequestAdapter() {
         }
       )
         .canMakePayment()
-        .then(isAvailable => {
+        .then((isAvailable) => {
           if (isAvailable) {
             resolve();
           } else {
             reject(CHECK_ERROR);
           }
         })
-        .catch(e => {
+        .catch((e) => {
           reject(CHECK_ERROR);
         });
     } catch (e) {
@@ -93,7 +93,7 @@ export function gpayPaymentRequestAdapter() {
         // The Gpay app opens and the payment fails at Gpay's end
         reject();
       }
-      isBraveBrowser().then(result => {
+      isBraveBrowser().then((result) => {
         if (!result) {
           resolve();
         } else {
@@ -118,11 +118,11 @@ export function gpayPaymentRequestAdapter() {
         },
       })
         .canMakePayment()
-        .then(isAvailable => {
+        .then((isAvailable) => {
           if (isAvailable) {
             isBrowserAllowedByGpay()
               .then(resolve)
-              .catch(e => {
+              .catch((e) => {
                 reject(CHECK_ERROR);
               });
           } else {
@@ -130,7 +130,7 @@ export function gpayPaymentRequestAdapter() {
           }
         })
         /* jshint ignore:start */
-        .catch(e => {
+        .catch(() => {
           reject(CHECK_ERROR);
         });
       /* jshint ignore:end */
@@ -166,7 +166,7 @@ export function credPaymentRequestAdapter() {
         }
       )
         .canMakePayment()
-        .then(isAvailable => {
+        .then((isAvailable) => {
           if (isAvailable) {
             resolve();
           } else {
@@ -174,7 +174,7 @@ export function credPaymentRequestAdapter() {
           }
         })
         /* jshint ignore:start */
-        .catch(e => {
+        .catch(() => {
           reject(CHECK_ERROR);
         });
       /* jshint ignore:end */

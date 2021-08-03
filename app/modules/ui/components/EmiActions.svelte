@@ -42,7 +42,7 @@
   let isRestrictedIssuers = false;
   if (restrictions) {
     const emiRestriction = (restrictions?.allow || []).find(
-      conf => conf.method === 'emi'
+      (conf) => conf.method === 'emi'
     );
     if (emiRestriction && emiRestriction?.issuers?.length > 0) {
       isRestrictedIssuers = true;
@@ -63,7 +63,8 @@
 <div id="elem-emi">
   <div
     class="strip emi-plans-info-container emi-plans-trigger"
-    on:click={handleEmiCtaClick}>
+    on:click={handleEmiCtaClick}
+  >
     {#if emiCtaView === 'plans-unavailable'}
       <div class="emi-plan-unavailable emi-icon-multiple-cards">
         <span class="help">
@@ -73,7 +74,11 @@
           {:else}
             <!-- LABEL: EMI is available on {issuers} cards. Enter your credit card
             to avail. -->
-            {formatTemplateWithLocale(UNAVAILABLE_HELP, { issuers: getEMIBanksText($locale) }, $locale)}
+            {formatTemplateWithLocale(
+              UNAVAILABLE_HELP,
+              { issuers: getEMIBanksText($locale) },
+              $locale
+            )}
           {/if}
         </span>
         <!-- LABEL: EMI unavailable -->
@@ -90,7 +95,11 @@
       <div class="emi-plan-selected emi-icon-multiple-cards">
         <!-- LABEL: {duration} Months ({amount}/mo) -->
         <div class="emi-plans-text">
-          {formatTemplateWithLocale(EDIT_PLAN_TEXT, $selectedPlanTextForNewCard, $locale)}
+          {formatTemplateWithLocale(
+            EDIT_PLAN_TEXT,
+            $selectedPlanTextForNewCard,
+            $locale
+          )}
         </div>
         <!-- LABEL: Edit -->
         <div class="emi-plans-action theme-highlight">
@@ -116,7 +125,11 @@
           {#if savedCount}
             <span class="count-text">
               <!-- LABEL: {count} cards available -->
-              {formatTemplateWithLocale(PAY_ENTIRE_AMOUNT_COUNT, { count: savedCount }, $locale)}
+              {formatTemplateWithLocale(
+                PAY_ENTIRE_AMOUNT_COUNT,
+                { count: savedCount },
+                $locale
+              )}
             </span>
           {/if}
         </div>

@@ -28,7 +28,8 @@
   {classes}
   {tabindex}
   type="next-option {type}"
-  on:select={select}>
+  on:select={select}
+>
   {#if icon}
     <OptionIcon {icon} />
   {/if}

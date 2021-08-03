@@ -7,7 +7,10 @@ import RazorpayConfig from 'common/RazorpayConfig';
  * the same domain as the configured API
  */
 export const isRazorpayFrame = () => {
-  return RazorpayConfig.api.indexOf(`${location.protocol}//${location.hostname}`) === 0;
+  return (
+    RazorpayConfig.api.indexOf(`${location.protocol}//${location.hostname}`) ===
+    0
+  );
 };
 
 /**
@@ -35,29 +38,33 @@ export function checkValidFlow(data = {}, flowName = '') {
 export function createIframe(show = false) {
   const iFrame = document.createElement('iframe');
   const modalElement = document.getElementById('modal');
-  iFrame.height = modalElement.clientHeight ? `${modalElement.clientHeight}px` : '546px';
-  iFrame.width = modalElement.clientWidth ? `${modalElement.clientWidth}px` : '344px';
+  iFrame.height = modalElement.clientHeight
+    ? `${modalElement.clientHeight}px`
+    : '546px';
+  iFrame.width = modalElement.clientWidth
+    ? `${modalElement.clientWidth}px`
+    : '344px';
   iFrame.setAttribute('class', 'mchild iframe-flow');
   iFrame.setAttribute('frameborder', '0');
   iFrame.setAttribute('id', 'iframeFlow');
   iFrame.style.display = show ? '' : 'none';
   document.getElementById('container').appendChild(iFrame);
   iFrame.window = {
-    focus: function() {
+    focus: function () {
       iFrame.style.display = '';
-      if(modalElement) {
+      if (modalElement) {
         modalElement.style.display = 'none';
       }
     },
-    destroy: function() {
+    destroy: function () {
       iFrame.remove();
-      if(modalElement) {
+      if (modalElement) {
         modalElement.style.display = '';
       }
     },
-    hide: function() {
+    hide: function () {
       iFrame.style.display = 'none';
-      if(modalElement) {
+      if (modalElement) {
         modalElement.style.display = '';
       }
     },

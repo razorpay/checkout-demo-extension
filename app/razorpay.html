@@ -27,7 +27,7 @@
       <button type="submit">Pay</button>
     </form>
     <script>
-      document.forms[0].onsubmit = function(e) {
+      document.forms[0].onsubmit = function (e) {
         e.preventDefault();
         var rp = new Razorpay({
           key: 'rzp_test_l3ckHAHlkpYUqe',
@@ -35,15 +35,15 @@
           // callback_url: 'https://checkout.local/razorpay',
           // redirect: true,
         })
-          .on('payment.error', function(resp) {
+          .on('payment.error', function (resp) {
             console.log(resp);
           })
-          .on('payment.success', function(resp) {
+          .on('payment.success', function (resp) {
             console.log(resp);
           });
         window.rp = rp;
         rp.createPayment(null, { paused: true, message: 'loading' });
-        setTimeout(function() {
+        setTimeout(function () {
           var data = {
             amount: 200,
             currency: 'INR',

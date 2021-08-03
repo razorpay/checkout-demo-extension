@@ -67,7 +67,8 @@ export function toTitleCase(sentence) {
   return String(sentence)
     ?.split(' ')
     ?.map(
-      word => `${word.slice(0, 1).toUpperCase()}${word.slice(1).toLowerCase()}`
+      (word) =>
+        `${word.slice(0, 1).toUpperCase()}${word.slice(1).toLowerCase()}`
     )
     ?.join(' ');
 }
@@ -154,9 +155,7 @@ export function compareSemver(a, b) {
 
 export function luhnCheck(num) {
   let sum = 0;
-  let digits = String(num)
-    .split('')
-    .reverse();
+  let digits = String(num).split('').reverse();
 
   for (var i = 0; i < digits.length; i++) {
     let digit = digits[i];
@@ -194,7 +193,7 @@ export function getFormattedDateTime(timestamp) {
 
 export function debounce(cb, delay) {
   let timeout;
-  return function() {
+  return function () {
     const context = this;
     const args = arguments;
     clearTimeout(timeout);

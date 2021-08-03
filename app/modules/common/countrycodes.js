@@ -264,8 +264,8 @@ export const COUNTRY_TO_CODE_MAP = {
 
 const AMERICAN_REGEX = /^\(\d{3}\)[\s-]?\d{3}-?\d{4}$/;
 
-const hasPlus = number => number.startsWith('+');
-const removePlus = number => number.replace(/^\+/, '');
+const hasPlus = (number) => number.startsWith('+');
+const removePlus = (number) => number.replace(/^\+/, '');
 
 function hasAtLeastTwoLeadingZeroes(number) {
   return /^0{2}/.test(number);
@@ -406,7 +406,7 @@ function getCountryCodeFromNumber(number) {
 
   let codesByLength = [];
 
-  _Obj.loop(COUNTRY_TO_CODE_MAP, code => {
+  _Obj.loop(COUNTRY_TO_CODE_MAP, (code) => {
     const length = code.length;
 
     if (!codesByLength[length]) {
@@ -421,7 +421,7 @@ function getCountryCodeFromNumber(number) {
   for (let i = 0; i < codesByLength.length; i++) {
     const codes = codesByLength[i];
 
-    const code = _Arr.find(codes, _code => number.startsWith(_code));
+    const code = _Arr.find(codes, (_code) => number.startsWith(_code));
 
     if (code) {
       return code;

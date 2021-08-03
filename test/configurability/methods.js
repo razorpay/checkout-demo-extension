@@ -1,8 +1,8 @@
 import * as Methods from 'configurability/methods';
 
-test('Module: configurability/methods', t => {
-  test('Methods.createMethodBlock', t => {
-    test('Creates a method block', t => {
+test('Module: configurability/methods', (t) => {
+  test('Methods.createMethodBlock', (t) => {
+    test('Creates a method block', (t) => {
       let method, expected, found;
 
       method = 'card';
@@ -24,8 +24,8 @@ test('Module: configurability/methods', t => {
     t.end();
   });
 
-  test('Methods.clusterRazorpayBlocks', t => {
-    test('Clusters blocks properly', t => {
+  test('Methods.clusterRazorpayBlocks', (t) => {
+    test('Clusters blocks properly', (t) => {
       let blocks, expected, found;
 
       blocks = [

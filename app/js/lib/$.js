@@ -1,4 +1,4 @@
-var $ = function(el) {
+var $ = function (el) {
   if (isString(el)) {
     return $(document.querySelector(el));
   }
@@ -8,10 +8,8 @@ var $ = function(el) {
   this[0] = el;
 };
 
-var _session_id;
-
 $.prototype = {
-  on: function(event, callback, capture, thisArg) {
+  on: function (event, callback, capture, thisArg) {
     var el = this[0];
     if (!el) {
       return;
@@ -26,14 +24,14 @@ $.prototype = {
     }
     var shouldAddListener = window.addEventListener;
     if (shouldAddListener) {
-      ref = function(e) {
+      ref = function (e) {
         if (e.target.nodeType === 3) {
           e.target = e.target.parentNode; // textNode target
         }
         return callback.call(thisArg || this, e);
       };
     } else {
-      ref = function(e) {
+      ref = function (e) {
         if (!e) {
           e = window.event;
         }
@@ -41,7 +39,7 @@ $.prototype = {
           e.target = e.srcElement || document;
         }
         if (!e.preventDefault) {
-          e.preventDefault = function() {
+          e.preventDefault = function () {
             this.returnValue = false;
           };
         }
@@ -54,19 +52,19 @@ $.prototype = {
         return callback.call(thisArg || el, e);
       };
     }
-    each(event.split(' '), function(i, evt) {
+    each(event.split(' '), function (i, evt) {
       if (shouldAddListener) {
         el.addEventListener(evt, ref, !!capture);
       } else {
         el.attachEvent('on' + evt, ref);
       }
     });
-    return bind(function() {
+    return bind(function () {
       this.off(event, ref, capture);
     }, this);
   },
 
-  off: function(event, callback, capture) {
+  off: function (event, callback, capture) {
     if (window.removeEventListener) {
       this[0].removeEventListener(event, callback, !!capture);
     } else if (window.detachEvent) {
@@ -74,7 +72,7 @@ $.prototype = {
     }
   },
 
-  prop: function(prop, val) {
+  prop: function (prop, val) {
     var el = this[0];
     if (arguments.length === 1) {
       return el && el[prop];
@@ -88,11 +86,11 @@ $.prototype = {
     return '';
   },
 
-  attr: function(attr, val) {
+  attr: function (attr, val) {
     if (isNonNullObject(attr)) {
       each(
         attr,
-        function(key, val) {
+        function (key, val) {
           this.attr(key, val);
         },
         this
@@ -115,12 +113,12 @@ $.prototype = {
     return this;
   },
 
-  reflow: function() {
+  reflow: function () {
     this.prop('offsetHeight');
     return this;
   },
 
-  remove: function() {
+  remove: function () {
     try {
       var el = this[0];
       el.parentNode.removeChild(el);
@@ -128,15 +126,15 @@ $.prototype = {
     return this;
   },
 
-  append: function(el) {
+  append: function (el) {
     this[0].appendChild(el);
   },
 
-  hasClass: function(str) {
+  hasClass: function (str) {
     return (' ' + this[0].className + ' ').indexOf(' ' + str + ' ') >= 0;
   },
 
-  addClass: function(str) {
+  addClass: function (str) {
     var el = this[0];
     if (str && el) {
       if (!el.className) {
@@ -148,7 +146,7 @@ $.prototype = {
     return this;
   },
 
-  removeClass: function(str) {
+  removeClass: function (str) {
     var el = this[0];
     if (el) {
       var className = (' ' + el.className + ' ')
@@ -161,43 +159,43 @@ $.prototype = {
     return this;
   },
 
-  toggleClass: function(className, condition) {
+  toggleClass: function (className, condition) {
     if (arguments.length === 1) {
       condition = !this.hasClass(className);
     }
     return this[(condition ? 'add' : 'remove') + 'Class'](className);
   },
 
-  qs: function(selector) {
+  qs: function (selector) {
     var node = this[0];
     if (node) {
       return node.querySelector(selector);
     }
   },
 
-  find: function(selector) {
+  find: function (selector) {
     var node = this[0];
     if (node) {
       return node.querySelectorAll(selector);
     }
   },
 
-  $: function(selector) {
+  $: function (selector) {
     return $(this.qs(selector));
   },
 
-  $0: function() {
+  $0: function () {
     return $(this.firstElementChild);
   },
 
-  css: function(prop, value) {
+  css: function (prop, value) {
     var style = this.prop('style');
     if (style) {
       if (arguments.length === 1) {
         if (isNonNullObject(prop)) {
           each(
             prop,
-            function(propName, value) {
+            function (propName, value) {
               this.css(propName, value);
             },
             this
@@ -214,18 +212,18 @@ $.prototype = {
     return this;
   },
 
-  bbox: function() {
+  bbox: function () {
     if (this[0]) {
       return this[0].getBoundingClientRect();
     }
     return emo;
   },
 
-  offht: function() {
+  offht: function () {
     return this.prop('offsetHeight');
   },
 
-  height: function(height) {
+  height: function (height) {
     if (isNumber(height)) {
       height = height.toFixed(2) + 'px';
     }
@@ -237,23 +235,23 @@ $.prototype = {
     }
   },
 
-  hide: function() {
+  hide: function () {
     return this.css('display', 'none');
   },
 
-  toggle: function(flag) {
+  toggle: function (flag) {
     invoke(flag ? 'show' : 'hide', this);
   },
 
-  show: function() {
+  show: function () {
     return this.css('display', 'block');
   },
 
-  parent: function() {
+  parent: function () {
     return $(this.prop('parentNode'));
   },
 
-  val: function(value) {
+  val: function (value) {
     if (!arguments.length) {
       return this[0].value;
     }
@@ -261,7 +259,7 @@ $.prototype = {
     return this;
   },
 
-  html: function(html) {
+  html: function (html) {
     if (arguments.length) {
       if (this[0]) {
         this[0].innerHTML = escapeHtml(html);
@@ -271,7 +269,7 @@ $.prototype = {
     return this[0].innerHTML;
   },
 
-  rawHtml: function(html) {
+  rawHtml: function (html) {
     if (arguments.length) {
       if (this[0]) {
         this[0].innerHTML = html;
@@ -281,7 +279,7 @@ $.prototype = {
     return this[0].innerHTML;
   },
 
-  focus: function() {
+  focus: function () {
     if (this[0]) {
       try {
         this[0].focus();
@@ -290,7 +288,7 @@ $.prototype = {
     return this;
   },
 
-  blur: function() {
+  blur: function () {
     if (this[0]) {
       try {
         this[0].blur();
@@ -299,7 +297,7 @@ $.prototype = {
     return this;
   },
 
-  scrollTo: function(y) {
+  scrollTo: function (y) {
     if (this[0]) {
       try {
         this[0].scrollTo(0, y);
@@ -308,7 +306,7 @@ $.prototype = {
     return this;
   },
 
-  scrollIntoView: function() {
+  scrollIntoView: function () {
     if (this[0]) {
       var el = this[0];
       try {
@@ -321,7 +319,7 @@ $.prototype = {
     return this;
   },
 
-  click: function() {
+  click: function () {
     var $el = this[0];
 
     if (!$el) {
@@ -388,7 +386,7 @@ function smoothScrollBy(y) {
   if (scrollTimeout) {
     clearTimeout(scrollTimeout);
   }
-  scrollTimeout = setTimeout(function() {
+  scrollTimeout = setTimeout(function () {
     var y0 = pageYOffset;
     var target = Math.min(y0 + y, $(document.body).height() - innerHeight);
     y = target - y0;

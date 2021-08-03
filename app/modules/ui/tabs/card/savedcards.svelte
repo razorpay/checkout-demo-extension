@@ -73,11 +73,12 @@
     cvvDigits={card.cvvDigits}
     plans={card.plans}
     {tab}
-    on:click={event => {
+    on:click={(event) => {
       handleClick(card, event.detail);
     }}
     on:cvvchange={handleCvvChange}
     on:authtypechange={handleAuthTypeChange}
     selected={$selectedCard && $selectedCard.id === card.id}
-    on:viewPlans={onViewPlans} />
+    on:viewPlans={onViewPlans}
+  />
 {/each}

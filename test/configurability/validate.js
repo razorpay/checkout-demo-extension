@@ -1,8 +1,8 @@
 import * as Validate from 'configurability/validate';
 
-test('Module: configurability/validate', t => {
-  test('Validate.isInstrumentValidForPayment', t => {
-    test('method=netbanking', t => {
+test('Module: configurability/validate', (t) => {
+  test('Validate.isInstrumentValidForPayment', (t) => {
+    test('method=netbanking', (t) => {
       let payment;
 
       payment = {
@@ -14,17 +14,19 @@ test('Module: configurability/validate', t => {
         Validate.isInstrumentValidForPayment(
           { method: 'netbanking' },
           payment
-        ).then(valid => t.ok(valid, 'Method instrument is valid')),
+        ).then((valid) => t.ok(valid, 'Method instrument is valid')),
 
         Validate.isInstrumentValidForPayment(
           { method: 'netbanking', banks: ['HDFC', 'ICIC'] },
           payment
-        ).then(valid => t.ok(valid, 'Instrument with expected bank is valid')),
+        ).then((valid) =>
+          t.ok(valid, 'Instrument with expected bank is valid')
+        ),
 
         Validate.isInstrumentValidForPayment(
           { method: 'netbanking', banks: ['HDFC', 'UTIB'] },
           payment
-        ).then(valid =>
+        ).then((valid) =>
           t.notOk(valid, 'Instrument without expected bank is invalid')
         ),
       ];
@@ -32,7 +34,7 @@ test('Module: configurability/validate', t => {
       Promise.all(tests).finally(() => t.end());
     });
 
-    test('method=wallet', t => {
+    test('method=wallet', (t) => {
       let payment;
 
       payment = {
@@ -44,19 +46,19 @@ test('Module: configurability/validate', t => {
         Validate.isInstrumentValidForPayment(
           { method: 'wallet' },
           payment
-        ).then(valid => t.ok(valid, 'Method instrument is valid')),
+        ).then((valid) => t.ok(valid, 'Method instrument is valid')),
 
         Validate.isInstrumentValidForPayment(
           { method: 'wallet', wallets: ['olamoney', 'freecharge'] },
           payment
-        ).then(valid =>
+        ).then((valid) =>
           t.ok(valid, 'Instrument with expected wallet is valid')
         ),
 
         Validate.isInstrumentValidForPayment(
           { method: 'wallet', wallets: ['olamoney', 'amazonpay'] },
           payment
-        ).then(valid =>
+        ).then((valid) =>
           t.notOk(valid, 'Instrument without expected wallet is invalid')
         ),
       ];
@@ -64,7 +66,7 @@ test('Module: configurability/validate', t => {
       Promise.all(tests).finally(() => t.end());
     });
 
-    test('method=cardless_emi', t => {
+    test('method=cardless_emi', (t) => {
       let payment;
 
       payment = {
@@ -76,19 +78,19 @@ test('Module: configurability/validate', t => {
         Validate.isInstrumentValidForPayment(
           { method: 'cardless_emi' },
           payment
-        ).then(valid => t.ok(valid, 'Method instrument is valid')),
+        ).then((valid) => t.ok(valid, 'Method instrument is valid')),
 
         Validate.isInstrumentValidForPayment(
           { method: 'cardless_emi', providers: ['zestmoney', 'earlysalary'] },
           payment
-        ).then(valid =>
+        ).then((valid) =>
           t.ok(valid, 'Instrument with expected provider is valid')
         ),
 
         Validate.isInstrumentValidForPayment(
           { method: 'cardless_emi', providers: ['zestmoney', 'flexmoney'] },
           payment
-        ).then(valid =>
+        ).then((valid) =>
           t.notOk(valid, 'Instrument without expected provider is invalid')
         ),
       ];
@@ -96,7 +98,7 @@ test('Module: configurability/validate', t => {
       Promise.all(tests).finally(() => t.end());
     });
 
-    test('method=paylater', t => {
+    test('method=paylater', (t) => {
       let payment;
 
       payment = {
@@ -108,19 +110,19 @@ test('Module: configurability/validate', t => {
         Validate.isInstrumentValidForPayment(
           { method: 'paylater' },
           payment
-        ).then(valid => t.ok(valid, 'Method instrument is valid')),
+        ).then((valid) => t.ok(valid, 'Method instrument is valid')),
 
         Validate.isInstrumentValidForPayment(
           { method: 'paylater', providers: ['epaylater', 'icic'] },
           payment
-        ).then(valid =>
+        ).then((valid) =>
           t.ok(valid, 'Instrument with expected provider is valid')
         ),
 
         Validate.isInstrumentValidForPayment(
           { method: 'paylater', providers: ['getsimpl', 'icic'] },
           payment
-        ).then(valid =>
+        ).then((valid) =>
           t.notOk(valid, 'Instrument without expected provider is invalid')
         ),
       ];
@@ -128,7 +130,7 @@ test('Module: configurability/validate', t => {
       Promise.all(tests).finally(() => t.end());
     });
 
-    test('method=upi', t => {
+    test('method=upi', (t) => {
       const vpaPayment = {
         method: 'upi',
         vpa: 'test@rzp',
@@ -155,38 +157,39 @@ test('Module: configurability/validate', t => {
         Validate.isInstrumentValidForPayment(
           { method: 'upi' },
           vpaPayment
-        ).then(valid => t.ok(valid, 'VPA Payment: Method instrument is valid')),
-
-        Validate.isInstrumentValidForPayment(
-          { method: 'upi' },
-          tokenPayment
-        ).then(valid =>
-          t.ok(valid, 'Token Payment: Method instrument is valid')
+        ).then((valid) =>
+          t.ok(valid, 'VPA Payment: Method instrument is valid')
         ),
 
         Validate.isInstrumentValidForPayment(
           { method: 'upi' },
-          qrPayment
-        ).then(valid => t.ok(valid, 'QR Payment: Method instrument is valid')),
+          tokenPayment
+        ).then((valid) =>
+          t.ok(valid, 'Token Payment: Method instrument is valid')
+        ),
+
+        Validate.isInstrumentValidForPayment({ method: 'upi' }, qrPayment).then(
+          (valid) => t.ok(valid, 'QR Payment: Method instrument is valid')
+        ),
 
         Validate.isInstrumentValidForPayment(
           { method: 'upi' },
           intentPayment
-        ).then(valid =>
+        ).then((valid) =>
           t.ok(valid, 'Intent Payment: Method instrument is valid')
         ),
 
         Validate.isInstrumentValidForPayment(
           { method: 'upi', flows: ['qr', 'collect'] },
           vpaPayment
-        ).then(valid =>
+        ).then((valid) =>
           t.ok(valid, 'VPA Payment: Instrument with expected flow is valid')
         ),
 
         Validate.isInstrumentValidForPayment(
           { method: 'upi', flows: ['qr', 'intent'] },
           vpaPayment
-        ).then(valid =>
+        ).then((valid) =>
           t.notOk(
             valid,
             'VPA Payment: Instrument without expected flow is invalid'
@@ -196,14 +199,14 @@ test('Module: configurability/validate', t => {
         Validate.isInstrumentValidForPayment(
           { method: 'upi', flows: ['qr', 'collect'] },
           tokenPayment
-        ).then(valid =>
+        ).then((valid) =>
           t.ok(valid, 'Token Payment: Instrument with expected flow is valid')
         ),
 
         Validate.isInstrumentValidForPayment(
           { method: 'upi', flows: ['qr', 'intent'] },
           tokenPayment
-        ).then(valid =>
+        ).then((valid) =>
           t.notOk(
             valid,
             'Token Payment: Instrument without expected flow is invalid'
@@ -213,14 +216,14 @@ test('Module: configurability/validate', t => {
         Validate.isInstrumentValidForPayment(
           { method: 'upi', flows: ['qr', 'collect'] },
           qrPayment
-        ).then(valid =>
+        ).then((valid) =>
           t.ok(valid, 'QR Payment: Instrument with expected flow is valid')
         ),
 
         Validate.isInstrumentValidForPayment(
           { method: 'upi', flows: ['intent', 'collect'] },
           qrPayment
-        ).then(valid =>
+        ).then((valid) =>
           t.notOk(
             valid,
             'QR Payment: Instrument without expected flow is invalid'
@@ -230,14 +233,14 @@ test('Module: configurability/validate', t => {
         Validate.isInstrumentValidForPayment(
           { method: 'upi', flows: ['intent', 'collect'] },
           intentPayment
-        ).then(valid =>
+        ).then((valid) =>
           t.ok(valid, 'Intent Payment: Instrument with expected flow is valid')
         ),
 
         Validate.isInstrumentValidForPayment(
           { method: 'upi', flows: ['qr', 'collect'] },
           intentPayment
-        ).then(valid =>
+        ).then((valid) =>
           t.notOk(
             valid,
             'Intent Payment: Instrument without expected flow is invalid'
@@ -251,7 +254,7 @@ test('Module: configurability/validate', t => {
             apps: ['some.random.app', 'another.random.app'],
           },
           intentPayment
-        ).then(valid =>
+        ).then((valid) =>
           t.ok(valid, 'Intent Payment: Instrument with expected app is valid')
         ),
 
@@ -262,7 +265,7 @@ test('Module: configurability/validate', t => {
             apps: ['first.random.app', 'another.random.app'],
           },
           intentPayment
-        ).then(valid =>
+        ).then((valid) =>
           t.notOk(
             valid,
             'Intent Payment: Instrument without expected app is invalid'
@@ -273,7 +276,7 @@ test('Module: configurability/validate', t => {
       Promise.all(tests).finally(() => t.end());
     });
 
-    test('method=card', t => {
+    test('method=card', (t) => {
       const tokens = [
         {
           id: 'token_1',
@@ -361,7 +364,7 @@ test('Module: configurability/validate', t => {
       let tests = [
         Validate.isInstrumentValidForPayment({ method: 'card' }, payment, {
           tokens,
-        }).then(valid => t.ok(valid, 'Method instrument is valid')),
+        }).then((valid) => t.ok(valid, 'Method instrument is valid')),
 
         Validate.isInstrumentValidForPayment(
           { method: 'card', issuers: ['HDFC', 'UTIB'] },
@@ -369,7 +372,7 @@ test('Module: configurability/validate', t => {
           {
             tokens,
           }
-        ).then(valid =>
+        ).then((valid) =>
           t.ok(valid, 'Saved Card: Instrument with expected issuers is valid')
         ),
 
@@ -379,7 +382,7 @@ test('Module: configurability/validate', t => {
           {
             tokens,
           }
-        ).then(valid =>
+        ).then((valid) =>
           t.notOk(
             valid,
             'Saved Card: Instrument without expected issuers is invalid'
@@ -392,7 +395,7 @@ test('Module: configurability/validate', t => {
           {
             tokens,
           }
-        ).then(valid =>
+        ).then((valid) =>
           t.ok(valid, 'Saved Card: Instrument with expected networks is valid')
         ),
 
@@ -402,7 +405,7 @@ test('Module: configurability/validate', t => {
           {
             tokens,
           }
-        ).then(valid =>
+        ).then((valid) =>
           t.notOk(
             valid,
             'Saved Card: Instrument without expected networks is invalid'
@@ -415,7 +418,7 @@ test('Module: configurability/validate', t => {
           {
             tokens,
           }
-        ).then(valid =>
+        ).then((valid) =>
           t.ok(valid, 'Saved Card: Instrument with expected types is valid')
         ),
 
@@ -425,7 +428,7 @@ test('Module: configurability/validate', t => {
           {
             tokens,
           }
-        ).then(valid =>
+        ).then((valid) =>
           t.notOk(
             valid,
             'Saved Card: Instrument without expected types is invalid'
@@ -436,7 +439,7 @@ test('Module: configurability/validate', t => {
       Promise.all(tests).finally(() => t.end());
     });
 
-    test('method=bank_transfer', t => {
+    test('method=bank_transfer', (t) => {
       let payment;
 
       payment = {
@@ -447,13 +450,13 @@ test('Module: configurability/validate', t => {
         Validate.isInstrumentValidForPayment(
           { method: 'bank_transfer' },
           payment
-        ).then(valid => t.ok(valid, 'Method instrument is valid')),
+        ).then((valid) => t.ok(valid, 'Method instrument is valid')),
       ];
 
       Promise.all(tests).finally(() => t.end());
     });
 
-    test('method=paypal', t => {
+    test('method=paypal', (t) => {
       let payment;
 
       payment = {
@@ -464,7 +467,7 @@ test('Module: configurability/validate', t => {
         Validate.isInstrumentValidForPayment(
           { method: 'paypal' },
           payment
-        ).then(valid => t.ok(valid, 'Method instrument is valid')),
+        ).then((valid) => t.ok(valid, 'Method instrument is valid')),
       ];
 
       Promise.all(tests).finally(() => t.end());

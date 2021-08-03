@@ -23,6 +23,37 @@
   export let isSavedCard = false;
 </script>
 
+<div class="emi-contact">
+  <!-- LABEL: SELECTED DEBIT CARD -->
+  <h3 class="title">{$t(CARD_BOX_TITLE)}</h3>
+  <CardBox entity={isSavedCard ? $selectedCard.token : $cardNumber} />
+  <!-- LABEL: MOBILE NUMBER -->
+  <h3 class="title">{$t(CONTACT_TITLE)}</h3>
+  <div class="contact selected no-autofill-overlay">
+    <span>
+      <!-- LABEL: Enter the mobile number registered with your bank and Debit Card. -->
+      {$t(CONTACT_DESCRIPTION)}
+    </span>
+    <Field
+      id="emi-contact"
+      name="emi-contact"
+      type="tel"
+      autocomplete="tel"
+      required
+      xautocompletetype="phone-full"
+      pattern={INDIAN_CONTACT_PATTERN}
+      icon=""
+      on:input
+      on:blur
+      handleFocus={true}
+      handleBlur={true}
+      handleInput={true}
+      value={contactValue}
+      helpText={$t(CONTACT_HELP)}
+    />
+  </div>
+</div>
+
 <style>
   :global(input[name='emi-contact']) {
     padding-top: 12px;
@@ -54,33 +85,3 @@
     margin-right: -12px;
   }
 </style>
-
-<div class="emi-contact">
-  <!-- LABEL: SELECTED DEBIT CARD -->
-  <h3 class="title">{$t(CARD_BOX_TITLE)}</h3>
-  <CardBox entity={isSavedCard ? $selectedCard.token : $cardNumber} />
-  <!-- LABEL: MOBILE NUMBER -->
-  <h3 class="title">{$t(CONTACT_TITLE)}</h3>
-  <div class="contact selected no-autofill-overlay">
-    <span>
-      <!-- LABEL: Enter the mobile number registered with your bank and Debit Card. -->
-      {$t(CONTACT_DESCRIPTION)}
-    </span>
-    <Field
-      id="emi-contact"
-      name="emi-contact"
-      type="tel"
-      autocomplete="tel"
-      required
-      xautocompletetype="phone-full"
-      pattern={INDIAN_CONTACT_PATTERN}
-      icon=""
-      on:input
-      on:blur
-      handleFocus={true}
-      handleBlur={true}
-      handleInput={true}
-      value={contactValue}
-      helpText={$t(CONTACT_HELP)} />
-  </div>
-</div>

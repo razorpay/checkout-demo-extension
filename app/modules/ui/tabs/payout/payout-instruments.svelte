@@ -84,6 +84,138 @@
   }
 </script>
 
+{#if childTab === 'payout_account'}
+  <PayoutAddAccount bind:this={accountTab} />
+{:else if childTab === 'payout_upi'}
+  <UPITab />
+{:else}
+  <Tab
+    method="payouts"
+    overrideMethodCheck={true}
+    pad={false}
+    shown={!childTab}
+  >
+    <div class="title">
+      <!-- LABEL: Select an account -->
+      <h3>{$t(SELECT_ACCOUNT_TITLE)}</h3>
+      <!-- LABEL: {amount} will be credited to your specified account. -->
+      <p>
+        {formatTemplateWithLocale(
+          SELECT_ACCOUNT_DESCRIPTION,
+          { amount },
+          $locale
+        )}
+      </p>
+    </div>
+
+    {#if upiAccounts.length}
+      <div class="instrument-group">
+        <div class="instrument-header">
+          <div class="icon-left">
+            <Icon icon={themeMeta.icons['upi']} alt="" />
+          </div>
+          <!-- LABEL: Select a UPI ID -->
+          <span class="header-text">{$t(SELECT_UPI_TITLE)}</span>
+        </div>
+        <div class="options">
+          {#each upiAccounts as account (account.id)}
+            <PayoutInstrument
+              {account}
+              selected={selectedInstrument &&
+                selectedInstrument.id === account.id}
+              on:select={() => select(account)}
+            >
+              <div class="instrument-name">{account.vpa.address}</div>
+            </PayoutInstrument>
+          {/each}
+          <div
+            class="instrument-add option next-option secondary-color"
+            on:click={() => (childTab = 'payout_upi')}
+          >
+            <div class="icon icon-left icon-add">+</div>
+            <!-- LABEL: Add UPI ID -->
+            {$t(ADD_UPI_ACTION)}
+          </div>
+        </div>
+      </div>
+    {/if}
+
+    {#if bankAccounts.length}
+      <div class="instrument-group">
+        <div class="instrument-header">
+          <div class="icon-left ref-nbicon">
+            <Icon icon={themeMeta.icons['netbanking']} alt="" />
+          </div>
+          <!-- LABEL: Select a Bank Account -->
+          <span class="header-text">{$t(SELECT_BANK_TITLE)}</span>
+        </div>
+        <div class="options">
+          {#each bankAccounts as account (account.id)}
+            <PayoutInstrument
+              {account}
+              selected={selectedInstrument &&
+                selectedInstrument.id === account.id}
+              on:select={() => select(account)}
+            >
+              <div class="instrument-name">
+                A/c No. {account.bank_account.account_number}
+              </div>
+              <div class="instrument-info">
+                IFSC: {account.bank_account.ifsc}, {account.bank_account.name}
+              </div>
+            </PayoutInstrument>
+          {/each}
+          <div
+            class="instrument-add option next-option secondary-color"
+            on:click={() => (childTab = 'payout_account')}
+          >
+            <div class="icon icon-left icon-add">+</div>
+            <!-- LABEL: Add Bank Account -->
+            {$t(ADD_BANK_ACTION)}
+          </div>
+        </div>
+      </div>
+    {/if}
+
+    {#if !upiAccounts.length}
+      <div class="options add-option">
+        <NextOption
+          icon={themeMeta.icons.upi}
+          tabindex="0"
+          attributes={{ role: 'button', 'aria-label': 'Add a UPI ID' }}
+          classes={['secondary-color']}
+          on:select={() => (childTab = 'payout_upi')}
+        >
+          <!-- LABEL: UPI -->
+          <div>{$t(ADD_UPI_BUTTON_TITLE)}</div>
+          <!-- LABEL: Add a UPI ID (BHIM, PhonePe and more) -->
+          <div class="desc">{$t(ADD_UPI_BUTTON_DESCRIPTION)}</div>
+        </NextOption>
+      </div>
+    {/if}
+
+    {#if !bankAccounts.length}
+      <div class="options add-option">
+        <NextOption
+          icon={themeMeta.icons.netbanking}
+          tabindex="0"
+          attributes={{ role: 'button', 'aria-label': 'Add a UPI ID' }}
+          classes={['secondary-color']}
+          on:select={() => (childTab = 'payout_account')}
+        >
+          <!-- LABEL: BANK -->
+          <div>BANK</div>
+          <!-- LABEL: Add a Bank Account -->
+          <div class="desc">{$t(ADD_BANK_BUTTON_DESCRIPTION)}</div>
+        </NextOption>
+      </div>
+    {/if}
+  </Tab>
+{/if}
+<CTA show={selectedInstrument || childTab} on:click={submitHandler}>
+  Confirm Account
+</CTA>
+
 <style>
   .instrument-group {
     font-size: 13px;
@@ -199,122 +331,3 @@
     margin-left: 24px;
   }
 </style>
-
-{#if childTab === 'payout_account'}
-  <PayoutAddAccount bind:this={accountTab} />
-{:else if childTab === 'payout_upi'}
-  <UPITab />
-{:else}
-  <Tab
-    method="payouts"
-    overrideMethodCheck={true}
-    pad={false}
-    shown={!childTab}>
-    <div class="title">
-      <!-- LABEL: Select an account -->
-      <h3>{$t(SELECT_ACCOUNT_TITLE)}</h3>
-      <!-- LABEL: {amount} will be credited to your specified account. -->
-      <p>
-        {formatTemplateWithLocale(SELECT_ACCOUNT_DESCRIPTION, { amount }, $locale)}
-      </p>
-    </div>
-
-    {#if upiAccounts.length}
-      <div class="instrument-group">
-        <div class="instrument-header">
-          <div class="icon-left">
-            <Icon icon={themeMeta.icons['upi']} alt="" />
-          </div>
-          <!-- LABEL: Select a UPI ID -->
-          <span class="header-text">{$t(SELECT_UPI_TITLE)}</span>
-        </div>
-        <div class="options">
-          {#each upiAccounts as account (account.id)}
-            <PayoutInstrument
-              {account}
-              selected={selectedInstrument && selectedInstrument.id === account.id}
-              on:select={() => select(account)}>
-              <div class="instrument-name">{account.vpa.address}</div>
-            </PayoutInstrument>
-          {/each}
-          <div
-            class="instrument-add option next-option secondary-color"
-            on:click={() => (childTab = 'payout_upi')}>
-            <div class="icon icon-left icon-add">+</div>
-            <!-- LABEL: Add UPI ID -->
-            {$t(ADD_UPI_ACTION)}
-          </div>
-        </div>
-      </div>
-    {/if}
-
-    {#if bankAccounts.length}
-      <div class="instrument-group">
-        <div class="instrument-header">
-          <div class="icon-left ref-nbicon">
-            <Icon icon={themeMeta.icons['netbanking']} alt="" />
-          </div>
-          <!-- LABEL: Select a Bank Account -->
-          <span class="header-text">{$t(SELECT_BANK_TITLE)}</span>
-        </div>
-        <div class="options">
-          {#each bankAccounts as account (account.id)}
-            <PayoutInstrument
-              {account}
-              selected={selectedInstrument && selectedInstrument.id === account.id}
-              on:select={() => select(account)}>
-              <div class="instrument-name">
-                A/c No. {account.bank_account.account_number}
-              </div>
-              <div class="instrument-info">
-                IFSC: {account.bank_account.ifsc}, {account.bank_account.name}
-              </div>
-            </PayoutInstrument>
-          {/each}
-          <div
-            class="instrument-add option next-option secondary-color"
-            on:click={() => (childTab = 'payout_account')}>
-            <div class="icon icon-left icon-add">+</div>
-            <!-- LABEL: Add Bank Account -->
-            {$t(ADD_BANK_ACTION)}
-          </div>
-        </div>
-      </div>
-    {/if}
-
-    {#if !upiAccounts.length}
-      <div class="options add-option">
-        <NextOption
-          icon={themeMeta.icons.upi}
-          tabindex="0"
-          attributes={{ role: 'button', 'aria-label': 'Add a UPI ID' }}
-          classes={['secondary-color']}
-          on:select={() => (childTab = 'payout_upi')}>
-          <!-- LABEL: UPI -->
-          <div>{$t(ADD_UPI_BUTTON_TITLE)}</div>
-          <!-- LABEL: Add a UPI ID (BHIM, PhonePe and more) -->
-          <div class="desc">{$t(ADD_UPI_BUTTON_DESCRIPTION)}</div>
-        </NextOption>
-      </div>
-    {/if}
-
-    {#if !bankAccounts.length}
-      <div class="options add-option">
-        <NextOption
-          icon={themeMeta.icons.netbanking}
-          tabindex="0"
-          attributes={{ role: 'button', 'aria-label': 'Add a UPI ID' }}
-          classes={['secondary-color']}
-          on:select={() => (childTab = 'payout_account')}>
-          <!-- LABEL: BANK -->
-          <div>BANK</div>
-          <!-- LABEL: Add a Bank Account -->
-          <div class="desc">{$t(ADD_BANK_BUTTON_DESCRIPTION)}</div>
-        </NextOption>
-      </div>
-    {/if}
-  </Tab>
-{/if}
-<CTA show={selectedInstrument || childTab} on:click={submitHandler}>
-  Confirm Account
-</CTA>

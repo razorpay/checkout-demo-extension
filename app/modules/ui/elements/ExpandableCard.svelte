@@ -20,17 +20,6 @@
   }
 </script>
 
-<style>
-  .expandable-card-title > :global(.stack) {
-    justify-content: space-between;
-    align-items: flex-start;
-  }
-
-  .expandable-card-title > :global(.stack) > :global([slot='title']) {
-    line-height: 24px;
-  }
-</style>
-
 <div class={elementClass} on:click>
   <div class="expandable-card-title">
     <Stack horizontal>
@@ -44,3 +33,14 @@
     <slot name="detail" />
   </div>
 </div>
+
+<style>
+  .expandable-card-title > :global(.stack) {
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .expandable-card-title > :global(.stack) > :global([slot='title']) {
+    line-height: 24px;
+  }
+</style>

@@ -1,3 +1,7 @@
+<div>
+  <slot />
+</div>
+
 <style>
   div {
     border: 1px solid #f6e1b3;
@@ -16,7 +20,3 @@
     }
   }
 </style>
-
-<div>
-  <slot />
-</div>

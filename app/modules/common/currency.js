@@ -14,15 +14,17 @@ import currenciesList from './currenciesList';
  *
  *  @return {String}
  */
-const removeDecimals = (decimals, separator = '.') => amount => {
-  let str = separator;
+const removeDecimals =
+  (decimals, separator = '.') =>
+  (amount) => {
+    let str = separator;
 
-  for (let i = 0; i < decimals; i++) {
-    str += '0';
-  }
+    for (let i = 0; i < decimals; i++) {
+      str += '0';
+    }
 
-  return amount.replace(str, '');
-};
+    return amount.replace(str, '');
+  };
 
 /**
  * Replace dot with comma.
@@ -87,7 +89,7 @@ const CURRENCY_FORMATTERS = {
       '$1,'
     ) |> removeDecimals(decimals),
 
-  none: amount => String(amount),
+  none: (amount) => String(amount),
 };
 
 /**
@@ -880,7 +882,7 @@ const currenciesRate = {};
  * @param {String} currency
  * @return {Object} config
  */
-export const getCurrencyConfig = currency =>
+export const getCurrencyConfig = (currency) =>
   currenciesConfig[currency]
     ? currenciesConfig[currency]
     : currenciesConfig.default;
@@ -1156,7 +1158,7 @@ export const displayCurrencies = {
  * whose configs are missing from currenciesConfig.
  * @param displayCurrencies
  */
-const updateCurrencyConfig = displayCurrencies => {
+const updateCurrencyConfig = (displayCurrencies) => {
   _Obj.loop(displayCurrencies, (symbol, currency) => {
     currenciesConfig[currency] =
       {}
@@ -1176,7 +1178,7 @@ const updateCurrencyConfig = displayCurrencies => {
  *
  * @param list
  */
-export const updateCurrencies = list => {
+export const updateCurrencies = (list) => {
   const displayCurrenciesToAdd = {};
   /**
    * REMOVE THIS AFTER INTEGRATING API
@@ -1294,13 +1296,10 @@ export function displayAmount(razorpay, payloadAmount, payloadCurrency, isDCC) {
     );
   }
   let amount = razorpay.display_amount || payloadAmount || get('amount');
-  if(isDCC && payloadAmount) {
+  if (isDCC && payloadAmount) {
     amount = payloadAmount;
   }
-  return formatAmountWithSymbol(
-    amount,
-    payloadCurrency || get('currency')
-  );
+  return formatAmountWithSymbol(amount, payloadCurrency || get('currency'));
 }
 
 /**

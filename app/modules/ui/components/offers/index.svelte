@@ -47,7 +47,7 @@
     methodInstrument,
   } from 'checkoutstore/screens/home';
   import { appliedOffer, isCardValidForOffer } from 'checkoutstore/offers';
-  
+
   export let applicableOffers; // eligible offers array
   export let setAppliedOffer;
   export let onShown;
@@ -188,7 +188,7 @@
   }
 
   function applyOffer(offer) {
-    Events.TrackBehav(OfferEvents.APPLY, { offer })
+    Events.TrackBehav(OfferEvents.APPLY, { offer });
     if (offer?.id === 'CRED_experimental_offer') {
       Analytics.track('cred:experiment_offer_selected', {
         type: AnalyticsTypes.BEHAV,

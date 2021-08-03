@@ -103,7 +103,7 @@ function overrideInsertRule() {
 
     try {
       originalInsertRule.call(this, rule, index);
-    } catch (err) { }
+    } catch (err) {}
   };
 
   try {
@@ -113,7 +113,7 @@ function overrideInsertRule() {
 
     CSSStyleDeclaration.prototype.animation =
       CSSStyleDeclaration.prototype.webkitAnimation;
-  } catch (e) { }
+  } catch (e) {}
 }
 overrideInsertRule();
 
@@ -123,7 +123,7 @@ overrideInsertRule();
 (function () {
   _Arr.loop(
     [Element.prototype, CharacterData.prototype, DocumentType.prototype],
-    item => {
+    (item) => {
       if (item.hasOwnProperty('remove')) {
         return;
       }

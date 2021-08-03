@@ -111,16 +111,6 @@
   }
 </script>
 
-<style>
-  .minimum-amount-selection {
-    margin: 12px 0 0 0;
-  }
-
-  .subtitle.subtitle--help {
-    margin-left: 0 !important;
-  }
-</style>
-
 <!-- LABEL: Enter amount -->
 <Field
   elemClasses="mature"
@@ -132,23 +122,39 @@
   {max}
   {min}
   placeholder={$t(PARTIAL_AMOUNT_PLACEHOLDER)}
-  helpText={formatTemplateWithLocale(helpTextLabel, { amount: helpTextAmount }, $locale)}
+  helpText={formatTemplateWithLocale(
+    helpTextLabel,
+    { amount: helpTextAmount },
+    $locale
+  )}
   formatter={{ type: 'amount' }}
   bind:this={field}
   handleFocus={true}
   handleBlur={true}
   handleInput={true}
-  on:input={handleInput} />
+  on:input={handleInput}
+/>
 
 {#if showPartialAmountLabel}
   <div class="minimum-amount-selection">
     <Checkbox
       id="min-amount-checkbox"
       on:change={handleCheckboxChange}
-      checked={valueInMinor === minAmount}>
+      checked={valueInMinor === minAmount}
+    >
       {minAmountLabel}
       {session.formatAmountWithCurrency(minAmount)}
     </Checkbox>
   </div>
   <div class="subtitle subtitle--help">{partialDescription}</div>
 {/if}
+
+<style>
+  .minimum-amount-selection {
+    margin: 12px 0 0 0;
+  }
+
+  .subtitle.subtitle--help {
+    margin-left: 0 !important;
+  }
+</style>

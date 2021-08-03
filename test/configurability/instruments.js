@@ -1,8 +1,8 @@
 import * as Instruments from 'configurability/instruments';
 
-test('Module: configurability/instruments', t => {
-  test('Instruments.createInstrument', t => {
-    test('Fails to create an instrument without a method', t => {
+test('Module: configurability/instruments', (t) => {
+  test('Instruments.createInstrument', (t) => {
+    test('Fails to create an instrument without a method', (t) => {
       let config, expected, found;
 
       config = {
@@ -20,7 +20,7 @@ test('Module: configurability/instruments', t => {
       t.end();
     });
 
-    test('Creates instrument of type=instrument with instrument keys', t => {
+    test('Creates instrument of type=instrument with instrument keys', (t) => {
       let config, expected, found;
 
       config = {
@@ -45,7 +45,7 @@ test('Module: configurability/instruments', t => {
       t.end();
     });
 
-    test('Creates instrument of type=method without instrument keys', t => {
+    test('Creates instrument of type=method without instrument keys', (t) => {
       let config, expected, found;
 
       config = {
@@ -68,7 +68,7 @@ test('Module: configurability/instruments', t => {
       t.end();
     });
 
-    test('Transforms UPI app name', t => {
+    test('Transforms UPI app name', (t) => {
       let config, expected, found;
 
       config = {
@@ -94,8 +94,8 @@ test('Module: configurability/instruments', t => {
     t.end();
   });
 
-  test('Instruments.validateKeysAndCreateInstrument', t => {
-    test('Fails to create an instrument without a method', t => {
+  test('Instruments.validateKeysAndCreateInstrument', (t) => {
+    test('Fails to create an instrument without a method', (t) => {
       let config, expected, found;
 
       config = {
@@ -113,7 +113,7 @@ test('Module: configurability/instruments', t => {
       t.end();
     });
 
-    test('Creates instrument of type=instrument with instrument keys', t => {
+    test('Creates instrument of type=instrument with instrument keys', (t) => {
       let config, expected, found;
 
       config = {
@@ -138,7 +138,7 @@ test('Module: configurability/instruments', t => {
       t.end();
     });
 
-    test('Creates instrument of type=method without instrument keys', t => {
+    test('Creates instrument of type=method without instrument keys', (t) => {
       let config, expected, found;
 
       config = {
@@ -161,7 +161,7 @@ test('Module: configurability/instruments', t => {
       t.end();
     });
 
-    test('Transforms UPI app name', t => {
+    test('Transforms UPI app name', (t) => {
       let config, expected, found;
 
       config = {
@@ -184,7 +184,7 @@ test('Module: configurability/instruments', t => {
       t.end();
     });
 
-    test('Fails to create instrument for unexpected keys', t => {
+    test('Fails to create instrument for unexpected keys', (t) => {
       let config, expected, found;
 
       config = {
@@ -202,7 +202,7 @@ test('Module: configurability/instruments', t => {
       t.end();
     });
 
-    test('Fails to create instrument for expected keys as non-array', t => {
+    test('Fails to create instrument for expected keys as non-array', (t) => {
       let config, expected, found;
 
       config = {
@@ -223,8 +223,8 @@ test('Module: configurability/instruments', t => {
     t.end();
   });
 
-  test('Instruments.isInstrumentForEntireMethod', t => {
-    test('Identifies instrument with keys as not a method instrument', t => {
+  test('Instruments.isInstrumentForEntireMethod', (t) => {
+    test('Identifies instrument with keys as not a method instrument', (t) => {
       let instrument, found;
 
       instrument = {
@@ -242,7 +242,7 @@ test('Module: configurability/instruments', t => {
       t.end();
     });
 
-    test('Identifies instrument without keys as a method instrument', t => {
+    test('Identifies instrument without keys as a method instrument', (t) => {
       let instrument, found;
 
       instrument = {

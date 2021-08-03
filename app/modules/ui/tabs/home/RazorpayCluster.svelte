@@ -25,9 +25,9 @@
   $: title = getTitleFromInstruments(block.instruments, $locale);
 
   function getTitleFromInstruments(instruments, locale) {
-    const methods = _Arr.map(instruments, instrument => instrument.method);
+    const methods = _Arr.map(instruments, (instrument) => instrument.method);
 
-    const names = _Arr.map(methods, method =>
+    const names = _Arr.map(methods, (method) =>
       getTranslatedMethodPrefix(method, locale)
     );
 
@@ -58,7 +58,8 @@
       <Method
         method={instrument.method}
         {instrument}
-        on:select={() => dispatch('selectInstrument', instrument)} />
+        on:select={() => dispatch('selectInstrument', instrument)}
+      />
     {/each}
   </div>
 </div>

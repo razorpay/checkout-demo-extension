@@ -5,7 +5,7 @@ import { scrollIntoView } from 'lib/utils';
 function onFocus(event) {
   _El.addClass(event.target.parentNode, 'focused');
 
-  setTimeout(function() {
+  setTimeout(function () {
     scrollIntoView(event.target);
   }, 1000);
 

@@ -14,7 +14,6 @@ export function replaceRetryIfCorporateNetbanking(session, message) {
     session.isCorporateBanking = true;
 
     replaceRetryButtonToDismissErrorMessage(session, 'OK');
-
   } else {
     _Doc.querySelector('#fd-hide').focus();
   }

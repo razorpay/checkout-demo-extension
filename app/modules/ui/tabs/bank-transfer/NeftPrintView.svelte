@@ -102,7 +102,7 @@
       onComplete();
     }
 
-    img.onload = function() {
+    img.onload = function () {
       /*image completely converted to base64string */
       var canvas = document.createElement('CANVAS');
       var ctx = canvas.getContext('2d');
@@ -115,7 +115,7 @@
       onComplete(dataURL);
     };
 
-    img.onerror = function() {
+    img.onerror = function () {
       onComplete(false);
     };
 

@@ -19,7 +19,7 @@ export function fetchFundAccounts(contactId) {
   return new Promise((resolve, reject) =>
     fetch({
       url,
-      callback: function(result) {
+      callback: function (result) {
         if (result.error) {
           reject(result);
         } else {
@@ -46,7 +46,7 @@ export function createFundAccount(fundAccount) {
       headers: _headers,
       method: 'post',
       data: fundAccount,
-      callback: function(result) {
+      callback: function (result) {
         if (result.error) {
           reject(result);
         } else {

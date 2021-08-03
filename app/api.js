@@ -11,8 +11,8 @@ function parseOptions(o, data) {
 }
 
 function makeAPIFactory(requestFn) {
-  return function(url, defaults) {
-    return function(attributes) {
+  return function (url, defaults) {
+    return function (attributes) {
       if (!attributes) {
         attributes = {};
       }
@@ -27,7 +27,7 @@ function makeAPIFactory(requestFn) {
 }
 
 var api = {
-  request: function(o, data) {
+  request: function (o, data) {
     o = parseOptions(o, data);
     var url = RC.api + 'v1/' + o.url;
     var method = o.method || 'post';
@@ -38,7 +38,7 @@ var api = {
     return JSON.parse(xhr.responseText);
   },
 
-  adminRequest: function(o, data) {
+  adminRequest: function (o, data) {
     o = parseOptions(o, data);
     o.user = RC.app_user;
     o.pass = RC.app_secret;
@@ -57,7 +57,7 @@ api.createPartialInvoice = publicApi('invoices', {
   customer: { contact: '8888888888' },
 });
 
-api.createOffer = function() {
+api.createOffer = function () {
   return adminApi('offers', {
     ends_at: 2147483646,
     terms: 'Terms of the offer',

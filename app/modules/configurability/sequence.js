@@ -30,7 +30,7 @@ export function getSequencedBlocks(params) {
   // Get the methods to list
   const methodsToList = _Arr.filter(
     methods,
-    method => !_Arr.contains(hide.methods, method)
+    (method) => !_Arr.contains(hide.methods, method)
   );
 
   // Create a method block for all listed methods
@@ -91,7 +91,7 @@ export function getSequencedBlocks(params) {
   // Get blocks mentioned in the sequence
   const sequencedBlocks =
     sequence
-    |> _Arr.map(code => _Arr.find(allBlocks, block => block.code === code))
+    |> _Arr.map((code) => _Arr.find(allBlocks, (block) => block.code === code))
     |> _Arr.filter(Boolean);
 
   return {

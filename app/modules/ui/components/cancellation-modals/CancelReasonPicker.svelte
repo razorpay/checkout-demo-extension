@@ -25,12 +25,54 @@
   const dispatch = createEventDispatcher();
   let selectedReason = null;
 
-  const onReasonSelection = reason => {
+  const onReasonSelection = (reason) => {
     selectedReason = reason;
   };
 
-  const prefixGenerator = text => `${method}-${text}`;
+  const prefixGenerator = (text) => `${method}-${text}`;
 </script>
+
+<div id={'cancel_' + method} class="cancel_modal">
+  <p>{$t(title)}</p>
+
+  {#each reasons as reason, i (reason.value)}
+    <label
+      on:click={() => onReasonSelection(reason.value)}
+      for={prefixGenerator(i)}
+    >
+      <input
+        id={prefixGenerator(i)}
+        type="radio"
+        name="_[reason]"
+        value={reason.value}
+      />
+      {$t(reason.label)}
+    </label>
+  {/each}
+  <div class="buttons">
+    {#if onBack}
+      <button class="back-btn" on:click={onBack}>
+        <!-- LABEL: Back -->
+        {$t(CANCEL_REASON_BACK_ACTION)}
+      </button>
+    {/if}
+    <!-- LABEL: Submit -->
+    <button
+      class="btn"
+      on:click={() => {
+        Analytics.track(method + ':cancel_reason_submit', {
+          type: AnalyticsTypes.BEHAV,
+          data: {
+            selectedReason,
+          },
+        });
+        onSubmit(selectedReason);
+      }}
+    >
+      {$t(CANCEL_REASON_SUBMIT_ACTION)}
+    </button>
+  </div>
+</div>
 
 <style>
   .cancel_modal {
@@ -76,42 +118,3 @@
     }
   }
 </style>
-
-<div id={'cancel_' + method} class="cancel_modal">
-  <p>{$t(title)}</p>
-
-  {#each reasons as reason, i (reason.value)}
-    <label
-      on:click={() => onReasonSelection(reason.value)}
-      for={prefixGenerator(i)}>
-      <input
-        id={prefixGenerator(i)}
-        type="radio"
-        name="_[reason]"
-        value={reason.value} />
-      {$t(reason.label)}
-    </label>
-  {/each}
-  <div class="buttons">
-    {#if onBack}
-      <button class="back-btn" on:click={onBack}>
-        <!-- LABEL: Back -->
-        {$t(CANCEL_REASON_BACK_ACTION)}
-      </button>
-    {/if}
-    <!-- LABEL: Submit -->
-    <button
-      class="btn"
-      on:click={() => {
-        Analytics.track(method + ':cancel_reason_submit', {
-          type: AnalyticsTypes.BEHAV,
-          data: {
-            selectedReason,
-          },
-        });
-        onSubmit(selectedReason);
-      }}>
-      {$t(CANCEL_REASON_SUBMIT_ACTION)}
-    </button>
-  </div>
-</div>

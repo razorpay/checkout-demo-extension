@@ -1,7 +1,7 @@
 import { findCountryCode } from 'common/countrycodes';
 
-test('Module: countrycodeutil', t => {
-  test('Phone number starting with +91', t => {
+test('Module: countrycodeutil', (t) => {
+  test('Phone number starting with +91', (t) => {
     const formatedNumber = findCountryCode('+918600720041');
     const expectedFormat = {
       phone: '8600720041',
@@ -11,7 +11,7 @@ test('Module: countrycodeutil', t => {
     t.end();
   });
 
-  test('Phone number starting with 91', t => {
+  test('Phone number starting with 91', (t) => {
     const formatedNumber = findCountryCode('918600720041');
     const expectedFormat = {
       phone: '8600720041',
@@ -21,7 +21,7 @@ test('Module: countrycodeutil', t => {
     t.end();
   });
 
-  test('Phone number starting with +', t => {
+  test('Phone number starting with +', (t) => {
     const formatedNumber = findCountryCode('+6585341767');
     const expectedFormat = {
       phone: '85341767',
@@ -31,7 +31,7 @@ test('Module: countrycodeutil', t => {
     t.end();
   });
 
-  test('Phone number starting with 00', t => {
+  test('Phone number starting with 00', (t) => {
     const formatedNumber = findCountryCode('006585341767');
     const expectedFormat = {
       phone: '85341767',
@@ -41,7 +41,7 @@ test('Module: countrycodeutil', t => {
     t.end();
   });
 
-  test('Phone number(10 digit) starting without 00 or +', t => {
+  test('Phone number(10 digit) starting without 00 or +', (t) => {
     const formatedNumber = findCountryCode('6585341767');
     const expectedFormat = {
       phone: '6585341767',
@@ -51,7 +51,7 @@ test('Module: countrycodeutil', t => {
     t.end();
   });
 
-  test('Phone number starting with +', t => {
+  test('Phone number starting with +', (t) => {
     const formatedNumber = findCountryCode('+74014359556');
     const expectedFormat = {
       phone: '4014359556',
@@ -61,7 +61,7 @@ test('Module: countrycodeutil', t => {
     t.end();
   });
 
-  test('Phone number starting without 00 or +', t => {
+  test('Phone number starting without 00 or +', (t) => {
     const formatedNumber = findCountryCode('39068463808');
     const expectedFormat = {
       phone: '068463808',
@@ -71,7 +71,7 @@ test('Module: countrycodeutil', t => {
     t.end();
   });
 
-  test('Indian phone nubmer starting with 0', t => {
+  test('Indian phone nubmer starting with 0', (t) => {
     const formatedNumber = findCountryCode('09988776655');
     const expectedFormat = {
       phone: '9988776655',
@@ -81,7 +81,7 @@ test('Module: countrycodeutil', t => {
     t.end();
   });
 
-  test('American: (541) 754-3010', t => {
+  test('American: (541) 754-3010', (t) => {
     const formatted = findCountryCode('(541) 754-3010');
     const expected = {
       phone: '5417543010',
@@ -92,7 +92,7 @@ test('Module: countrycodeutil', t => {
     t.end();
   });
 
-  test('American: 1-541-754-3010', t => {
+  test('American: 1-541-754-3010', (t) => {
     const formatted = findCountryCode('1-541-754-3010');
     const expected = {
       phone: '5417543010',
@@ -103,7 +103,7 @@ test('Module: countrycodeutil', t => {
     t.end();
   });
 
-  test('American: +1-541-754-3010', t => {
+  test('American: +1-541-754-3010', (t) => {
     const formatted = findCountryCode('+1-541-754-3010');
     const expected = {
       phone: '5417543010',

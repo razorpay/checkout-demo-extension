@@ -1,12 +1,3 @@
-<style>
-  .async-loading .message {
-    white-space: normal;
-    padding: 20px 30px;
-    line-height: 22px;
-    text-align: center;
-  }
-</style>
-
 <div class="async-loading loading">
   <div class="message">
     <slot />
@@ -19,3 +10,12 @@
   </div>
   <span class="link" />
 </div>
+
+<style>
+  .async-loading .message {
+    white-space: normal;
+    padding: 20px 30px;
+    line-height: 22px;
+    text-align: center;
+  }
+</style>

@@ -6,13 +6,13 @@ export default function EvtHandler(el, thisArg) {
 
 function getListener(el, event, callback, useCapture) {
   el.addEventListener(event, callback, useCapture);
-  return function() {
+  return function () {
     el.removeEventListener(event, callback, useCapture);
   };
 }
 
 function binder(callback, thisArg) {
-  return function(e) {
+  return function (e) {
     if (!e) {
       e = window.event;
     }
@@ -23,7 +23,7 @@ function binder(callback, thisArg) {
       e.target = e.target.parentNode;
     }
     if (!e.preventDefault) {
-      e.preventDefault = function() {
+      e.preventDefault = function () {
         return (e.returnValue = false);
       };
     }
@@ -37,7 +37,7 @@ function binder(callback, thisArg) {
 }
 
 EvtHandler.prototype = {
-  on: function(event, callback, el, useCapture) {
+  on: function (event, callback, el, useCapture) {
     // event can be string or a map {event: callback}
     if (typeof event !== 'string') {
       for (var eventName in event) {
@@ -57,8 +57,8 @@ EvtHandler.prototype = {
     return this;
   },
 
-  off: function() {
-    this.listeners.forEach(function(listener) {
+  off: function () {
+    this.listeners.forEach(function (listener) {
       listener();
     });
     this.listeners = [];

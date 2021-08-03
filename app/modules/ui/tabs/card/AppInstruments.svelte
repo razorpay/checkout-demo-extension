@@ -41,7 +41,7 @@
     className="instrument"
     value={app.code}
     expandable={selectedApp && isContactRequired(app.code)}
-    on:click={_ => select(app.code)}
+    on:click={(_) => select(app.code)}
   >
     <i slot="icon">
       <Icon icon={app.logo} alt="" />

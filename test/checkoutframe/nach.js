@@ -2,14 +2,14 @@ import * as Nach from 'checkoutframe/nach';
 
 const MAX_ALLOWED_BYTES = Nach.ALLOWED_MAX_SIZE_IN_MB * 1024 * 1024;
 
-test('Module: checkoutframe/nach', t => {
-  test('Nach.getValidityError', t => {
+test('Module: checkoutframe/nach', (t) => {
+  test('Nach.getValidityError', (t) => {
     const invalid_exts = ['.svg', '.pdf', '.doc', '.rzp'].filter(
-      ext => Nach.ALLOWED_EXTS.indexOf(ext) < 0
+      (ext) => Nach.ALLOWED_EXTS.indexOf(ext) < 0
     );
     const filename = 'myfile';
 
-    test('File with valid extension and valid size', t => {
+    test('File with valid extension and valid size', (t) => {
       const file = {
         name: `${filename}${Nach.ALLOWED_EXTS[0]}`,
         size: MAX_ALLOWED_BYTES - 100,
@@ -22,7 +22,7 @@ test('Module: checkoutframe/nach', t => {
       t.end();
     });
 
-    test('File with valid extension and invalid size', t => {
+    test('File with valid extension and invalid size', (t) => {
       const file = {
         name: `${filename}${Nach.ALLOWED_EXTS[0]}`,
         size: MAX_ALLOWED_BYTES + 100,
@@ -38,7 +38,7 @@ test('Module: checkoutframe/nach', t => {
       t.end();
     });
 
-    test('File with invalid extension and valid size', t => {
+    test('File with invalid extension and valid size', (t) => {
       const file = {
         name: `${filename}${invalid_exts[0]}`,
         size: MAX_ALLOWED_BYTES - 100,
@@ -56,7 +56,7 @@ test('Module: checkoutframe/nach', t => {
       t.end();
     });
 
-    test('File with invalid extension and invalid size', t => {
+    test('File with invalid extension and invalid size', (t) => {
       const file = {
         name: `${filename}${invalid_exts[0]}`,
         size: MAX_ALLOWED_BYTES + 100,
@@ -77,8 +77,8 @@ test('Module: checkoutframe/nach', t => {
     t.end();
   });
 
-  test('Nach.generateError', t => {
-    test('If success=false, find from not_matching with 3 fields', t => {
+  test('Nach.generateError', (t) => {
+    test('If success=false, find from not_matching with 3 fields', (t) => {
       const apiResponse = {
         success: false,
         errors: {
@@ -112,7 +112,7 @@ test('Module: checkoutframe/nach', t => {
       t.end();
     });
 
-    test('If success=false, find from not_matching with 3+ fields', t => {
+    test('If success=false, find from not_matching with 3+ fields', (t) => {
       const apiResponse = {
         success: false,
         errors: {
@@ -147,7 +147,7 @@ test('Module: checkoutframe/nach', t => {
       t.end();
     });
 
-    test('If success=false, find from not_visible with 3 fields', t => {
+    test('If success=false, find from not_visible with 3 fields', (t) => {
       const apiResponse = {
         success: false,
         errors: {
@@ -180,7 +180,7 @@ test('Module: checkoutframe/nach', t => {
       t.end();
     });
 
-    test('If success=false, prefer not_visible over not_matching', t => {
+    test('If success=false, prefer not_visible over not_matching', (t) => {
       const apiResponse = {
         success: false,
         errors: {
@@ -220,7 +220,7 @@ test('Module: checkoutframe/nach', t => {
       t.end();
     });
 
-    test('If success=false, find from not_matching with 3+ fields', t => {
+    test('If success=false, find from not_matching with 3+ fields', (t) => {
       const apiResponse = {
         success: false,
         errors: {
@@ -255,7 +255,7 @@ test('Module: checkoutframe/nach', t => {
       t.end();
     });
 
-    test('If API has an error object in response, returns it', t => {
+    test('If API has an error object in response, returns it', (t) => {
       const apiResponse = {
         error: {
           code: 'BAD_REQUEST_ERROR',
@@ -270,7 +270,7 @@ test('Module: checkoutframe/nach', t => {
       t.end();
     });
 
-    test('If API has an error object with a field in response, returns an updated description with field name', t => {
+    test('If API has an error object with a field in response, returns an updated description with field name', (t) => {
       const apiResponse = {
         error: {
           code: 'BAD_REQUEST_ERROR',
@@ -290,7 +290,7 @@ test('Module: checkoutframe/nach', t => {
       t.end();
     });
 
-    test("If API doesn't have an error and success is not false, returns a generic error", t => {
+    test("If API doesn't have an error and success is not false, returns a generic error", (t) => {
       const apiResponse = {
         customResponse: {
           foo: 'bar',

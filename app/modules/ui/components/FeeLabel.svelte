@@ -17,6 +17,24 @@
   }
 </script>
 
+{#if isFeeBearer}
+  {#if $showFeeLabel}
+    <div class="label">
+      <span on:click={handleClick} class="fee-helper has-tooltip">
+        <span class="fee"><u>+Fee</u></span>
+        <Tooltip
+          className="fee-tooltip"
+          align={['bottom']}
+          shown={showFeeDetails}
+        >
+          A convenience fee will be charged depending on your choice of payment
+          method.
+        </Tooltip>
+      </span>
+    </div>
+  {/if}
+{/if}
+
 <style>
   .label {
     display: inline-block;
@@ -38,20 +56,3 @@
     right: unset;
   }
 </style>
-
-{#if isFeeBearer}
-  {#if $showFeeLabel}
-    <div class="label">
-      <span on:click={handleClick} class="fee-helper has-tooltip">
-        <span class="fee"><u>+Fee</u></span>
-        <Tooltip
-          className="fee-tooltip"
-          align={['bottom']}
-          shown={showFeeDetails}>
-          A convenience fee will be charged depending on your choice of payment
-          method.
-        </Tooltip>
-      </span>
-    </div>
-  {/if}
-{/if}

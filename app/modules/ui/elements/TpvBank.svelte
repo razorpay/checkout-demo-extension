@@ -15,12 +15,6 @@
   export let showIfsc;
 </script>
 
-<style>
-  .customer-bank-details {
-    padding: 24px;
-  }
-</style>
-
 <div class="customer-bank-details">
   <div class="bank-name">
     {#if bank.image}<img src={bank.image} alt="" />{/if}
@@ -51,3 +45,9 @@
     </div>
   {/if}
 </div>
+
+<style>
+  .customer-bank-details {
+    padding: 24px;
+  }
+</style>

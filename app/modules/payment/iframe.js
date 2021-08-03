@@ -50,20 +50,20 @@ export default function Iframe(src, name, payment) {
 }
 
 Iframe.prototype = {
-  on: function(event, func) {
+  on: function (event, func) {
     this.listeners.push(global |> _El.on(event, func));
   },
 
-  write: function(html) {
+  write: function (html) {
     var pdoc = this.window.document;
     pdoc.write(html);
     pdoc.close();
   },
 
-  close: function() {
+  close: function () {
     if (!this.closed) {
       this.closed = true;
-      _Arr.loop(this.listeners, l => l());
+      _Arr.loop(this.listeners, (l) => l());
       this.listeners = [];
       this.el |> _El.detach;
       _Doc.querySelector('#modal') |> _El.removeClass(CLASS_IFRAME_ACTIVE);
@@ -73,7 +73,7 @@ Iframe.prototype = {
     }
   },
 
-  show: function() {
+  show: function () {
     this.el |> _El.setDisplay('block');
     const modalEl = _Doc.querySelector('#modal');
     const bbox = modalEl |> _El.bbox;

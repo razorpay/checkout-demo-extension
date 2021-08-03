@@ -25,4 +25,5 @@
   {value}
   handleFocus={true}
   handleBlur={true}
-  handleInput={true} />
+  handleInput={true}
+/>

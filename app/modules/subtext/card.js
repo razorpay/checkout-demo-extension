@@ -37,7 +37,7 @@ function concatTruthyString(list) {
 export function generateSubtextForCardInstrument(instrument, locale) {
   const instrumentIssuers =
     instrument.issuers || []
-    |> _Arr.map(bank => getCommonBankName(bank).replace(/ Bank$/, ''));
+    |> _Arr.map((bank) => getCommonBankName(bank).replace(/ Bank$/, ''));
   const instrumentNetworks = instrument.networks || [];
   const instrumentTypes = instrument.types || [];
   const instrumentIins = instrument.iins || [];

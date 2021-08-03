@@ -18,6 +18,19 @@
   }
 </script>
 
+<div class="reward-card-container">
+  <div class="full-width reward-card-container flex-center">
+    <div class="reward-card" on:click={handleCardClick}>
+      <div class="full-width logo-container flex-center">
+        <img class="reward-logo" src={logo} alt="Reward Logo" />
+      </div>
+    </div>
+  </div>
+  <div class="full-width reward-text flex-center">
+    <div class="rewards-desc">{name}</div>
+  </div>
+</div>
+
 <style>
   .reward-card {
     display: flex;
@@ -29,7 +42,7 @@
     padding: 10px;
     box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2);
     border-radius: 3px;
-    background: linear-gradient(222.44deg, #F0F0F0 3.74%, #FBFBFB 98.79%);
+    background: linear-gradient(222.44deg, #f0f0f0 3.74%, #fbfbfb 98.79%);
     flex-shrink: 0;
     flex-wrap: wrap;
     z-index: 100;
@@ -60,14 +73,3 @@
     width: 85%;
   }
 </style>
-
-<div class="reward-card-container">
-  <div class="full-width reward-card-container flex-center">
-    <div class="reward-card" on:click={handleCardClick}>
-      <div class="full-width logo-container flex-center">
-        <img class="reward-logo" src={logo} alt="Reward Logo" />
-      </div>
-    </div>
-  </div>
-  <div class="full-width reward-text flex-center"><div class="rewards-desc">{name}</div></div>
-</div>

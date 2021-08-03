@@ -38,24 +38,62 @@
 
   $: {
     elementClass = `${className} radio-option`;
-    
-    if(ellipsis) {
+
+    if (ellipsis) {
       elementClass += ' ellipsis';
     }
-    if(defaultStyles) {
+    if (defaultStyles) {
       elementClass += ' slotted-radio';
     }
-    if(selected) {
+    if (selected) {
       elementClass += ' selected';
     }
-    if(overflow) {
+    if (overflow) {
       elementClass += ' overflow';
     }
-    if(as === 'div') {
+    if (as === 'div') {
       elementClass += ' div-radio-container';
     }
   }
 </script>
+
+<DynamicTag
+  class={elementClass}
+  {as}
+  on:click
+  on:keydown
+  type="button"
+  role="listitem"
+  {...attributes}
+>
+  <Stack horizontal {reverse}>
+    <slot name="icon" />
+    <div>
+      <slot name="title" />
+      <slot name="subtitle" />
+      {#if expandOnSelect}
+        {#if selected}
+          <div in:fade|local={getAnimationOptions({ duration: 100, y: 100 })}>
+            <slot name="body" />
+          </div>
+        {/if}
+      {:else}
+        <slot name="body" />
+      {/if}
+    </div>
+    <div class="radio" class:reverse class:top={align === 'top'}>
+      <Radio
+        {name}
+        {value}
+        checked={selected}
+        classes={radioClasses}
+        tabindex={-1}
+      />
+    </div>
+    <slot name="extra" />
+  </Stack>
+  <slot name="downtime" />
+</DynamicTag>
 
 <style>
   :global(.radio-option) {
@@ -100,39 +138,3 @@
     overflow: visible;
   }
 </style>
-
-<DynamicTag
-  class={elementClass}
-  as={as}
-  on:click
-  on:keydown
-  type="button"
-  role="listitem"
-  {...attributes}>
-  <Stack horizontal {reverse}>
-    <slot name="icon" />
-    <div>
-      <slot name="title" />
-      <slot name="subtitle" />
-      {#if expandOnSelect}
-        {#if selected}
-          <div in:fade|local={getAnimationOptions({ duration: 100, y: 100 })}>
-            <slot name="body" />
-          </div>
-        {/if}
-      {:else}
-        <slot name="body" />
-      {/if}
-    </div>
-    <div class="radio" class:reverse class:top={align === 'top'}>
-      <Radio
-        {name}
-        {value}
-        checked={selected}
-        classes={radioClasses}
-        tabindex={-1} />
-    </div>
-    <slot name="extra" />
-  </Stack>
-  <slot name="downtime" />
-</DynamicTag>

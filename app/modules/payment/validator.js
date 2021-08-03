@@ -14,7 +14,7 @@ const sdkToShieldMap = {
 
 let shieldParams = {};
 
-export const setShieldParams = params => {
+export const setShieldParams = (params) => {
   params = _Obj.clone(params);
 
   /* flatten SDK object, single level */
@@ -50,7 +50,7 @@ export const formatPayment = function (payment) {
 
 function validateData(data) {
   const cardHolderName = data?.['card[name]'];
-  if(Number(cardHolderName) === 0) return; // if name input is only zero prevent throw error
+  if (Number(cardHolderName) === 0) return; // if name input is only zero prevent throw error
   if (cardHolderName && luhnCheck(cardHolderName)) {
     _.throwMessage(
       'Error in integration. Card holder name is not valid, Please contact Razorpay for assistance'
@@ -86,7 +86,7 @@ export const formatPayload = function (payload, razorpayInstance, params = {}) {
       'recurring_token.max_amount',
       'recurring_token.expire_by',
     ],
-    field => {
+    (field) => {
       if (!(data |> _Obj.hasOwnProp(field))) {
         var val = getOption(field);
         if (val) {
@@ -124,7 +124,7 @@ export const formatPayload = function (payload, razorpayInstance, params = {}) {
     'integration_version',
     'integration_parent_version',
   ];
-  _Arr.loop(integrationKeys, key => {
+  _Arr.loop(integrationKeys, (key) => {
     const value = razorpayInstance.get(`_.${key}`);
     if (value) {
       data[`_[${key}]`] = value;

@@ -23,9 +23,7 @@ function _createBlock(code, config = {}, validate = false) {
   if (instruments) {
     block.instruments =
       config.instruments
-      |> _Arr.map(
-        validate ? validateKeysAndCreateInstrument : createInstrument
-      )
+      |> _Arr.map(validate ? validateKeysAndCreateInstrument : createInstrument)
       |> _Arr.filter(Boolean);
   }
 

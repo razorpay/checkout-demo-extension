@@ -52,6 +52,21 @@
   });
 </script>
 
+{#if shouldShowDropdown}
+  <div class="outer">
+    <div class="selected" on:click|stopPropagation={toggleDropdown}>
+      {getLocaleName($locale)}
+    </div>
+    {#if dropdownShown}
+      <ul class="dropdown-options">
+        {#each $locales as locale}
+          <li on:click={() => select(locale)}>{getLocaleName(locale)}</li>
+        {/each}
+      </ul>
+    {/if}
+  </div>
+{/if}
+
 <style>
   .outer {
     margin: 0 -24px;
@@ -121,18 +136,3 @@
     border-color: transparent transparent #f5f5f5;
   }
 </style>
-
-{#if shouldShowDropdown}
-  <div class="outer">
-    <div class="selected" on:click|stopPropagation={toggleDropdown}>
-      {getLocaleName($locale)}
-    </div>
-    {#if dropdownShown}
-      <ul class="dropdown-options">
-        {#each $locales as locale}
-          <li on:click={() => select(locale)}>{getLocaleName(locale)}</li>
-        {/each}
-      </ul>
-    {/if}
-  </div>
-{/if}

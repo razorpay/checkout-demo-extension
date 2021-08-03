@@ -16,7 +16,7 @@ function genericPaymentPayloadGetter(instrument, payment, customer) {
 
   payment.method = method;
 
-  _Arr.loop(paymentKeys, key => {
+  _Arr.loop(paymentKeys, (key) => {
     const value = instrument[key];
 
     if (!_.isUndefined(value)) {
@@ -28,7 +28,7 @@ function genericPaymentPayloadGetter(instrument, payment, customer) {
   if (instrument.token_id && customer) {
     const token =
       _Obj.getSafely(customer, 'tokens.items', [])
-      |> _Arr.find(token => token.id === instrument.token_id);
+      |> _Arr.find((token) => token.id === instrument.token_id);
 
     if (token) {
       payment.token = token.token;
@@ -56,7 +56,7 @@ export function genericGroupedToIndividual(grouped, customer) {
 function createCombinations(instrument, sequence) {
   let soFar = [];
 
-  _Arr.loop(sequence, key => {
+  _Arr.loop(sequence, (key) => {
     const values = instrument[key];
 
     if (!values || !values.length) {
@@ -68,13 +68,13 @@ function createCombinations(instrument, sequence) {
 
     // If nothing has been pushed so far, this is the first key to be pushed
     if (soFar.length === 0) {
-      soFar = _Arr.map(values, value => ({
+      soFar = _Arr.map(values, (value) => ({
         [singularKey]: value,
       }));
     } else {
       // Things have already been pushed so far, extend existing objects
-      const _soFar = _Arr.flatMap(values, value => {
-        return _Arr.map(soFar, s =>
+      const _soFar = _Arr.flatMap(values, (value) => {
+        return _Arr.map(soFar, (s) =>
           _Obj.extend(
             {
               [singularKey]: value,
@@ -100,13 +100,13 @@ const config = {
       const base = _Obj.clone(grouped);
 
       // Remove all extra properties
-      _Arr.loop(['types', 'iins', 'issuers', 'networks', 'token_id'], key => {
+      _Arr.loop(['types', 'iins', 'issuers', 'networks', 'token_id'], (key) => {
         delete base[key];
       });
 
       if (grouped.token_id) {
         const token_id = grouped.token_id;
-        const token = _Arr.find(tokens, token => token.id === token_id);
+        const token = _Arr.find(tokens, (token) => token.id === token_id);
 
         if (token) {
           let instrumentFromToken = [
@@ -132,11 +132,11 @@ const config = {
         'iins',
       ]);
 
-      return _Arr.map(combinations, combination =>
+      return _Arr.map(combinations, (combination) =>
         _Obj.extend(combination, base)
       );
     },
-    isValid: instrument => {
+    isValid: (instrument) => {
       if (instrument.token_id) {
       }
 
@@ -163,11 +163,11 @@ const config = {
   netbanking: {
     properties: ['banks'],
     payment: ['bank'],
-    groupedToIndividual: grouped => {
+    groupedToIndividual: (grouped) => {
       const base = _Obj.clone(grouped);
       delete base.banks;
 
-      return _Arr.map(grouped.banks || [], bank => {
+      return _Arr.map(grouped.banks || [], (bank) => {
         return _Obj.extend(
           {
             bank,
@@ -176,18 +176,18 @@ const config = {
         );
       });
     },
-    isValid: instrument =>
+    isValid: (instrument) =>
       Boolean(instrument.banks) && instrument.banks.length > 0,
   },
 
   wallet: {
     properties: ['wallets'],
     payment: ['wallet'],
-    groupedToIndividual: grouped => {
+    groupedToIndividual: (grouped) => {
       const base = _Obj.clone(grouped);
       delete base.wallets;
 
-      return _Arr.map(grouped.wallets || [], wallet => {
+      return _Arr.map(grouped.wallets || [], (wallet) => {
         return _Obj.extend(
           {
             wallet,
@@ -196,7 +196,7 @@ const config = {
         );
       });
     },
-    isValid: instrument =>
+    isValid: (instrument) =>
       Boolean(instrument.wallets) && instrument.wallets.length > 0,
   },
 
@@ -221,7 +221,7 @@ const config = {
       const base = _Obj.clone(grouped);
 
       // Remove all extra properties
-      _Arr.loop(['flows', 'apps', 'token_id', 'vpas'], key => {
+      _Arr.loop(['flows', 'apps', 'token_id', 'vpas'], (key) => {
         delete base[key];
       });
 
@@ -239,7 +239,7 @@ const config = {
 
       if (_Arr.contains(flows, 'collect')) {
         if (vpas.length) {
-          let individualInstruments = _Arr.map(vpas, vpa => {
+          let individualInstruments = _Arr.map(vpas, (vpa) => {
             let individual = _Obj.extend(
               {
                 vpa,
@@ -251,7 +251,7 @@ const config = {
             if (grouped.token_id) {
               const token_id = grouped.token_id;
 
-              const token = _Arr.find(tokens, token => token.id === token_id);
+              const token = _Arr.find(tokens, (token) => token.id === token_id);
 
               if (token) {
                 individual.token_id = token_id;
@@ -267,7 +267,7 @@ const config = {
 
       if (_Arr.contains(flows, 'intent')) {
         if (apps.length) {
-          let individualInstruments = _Arr.map(apps, app =>
+          let individualInstruments = _Arr.map(apps, (app) =>
             _Obj.extend(
               {
                 app,
@@ -283,7 +283,7 @@ const config = {
 
       if (flows.length > 0) {
         let individualInstruments =
-          _Arr.map(flows, flow => {
+          _Arr.map(flows, (flow) => {
             let individual = _Obj.extend(
               {
                 flow,
@@ -345,7 +345,7 @@ const config = {
 
       return payment;
     },
-    isValid: instrument => {
+    isValid: (instrument) => {
       const hasFlows = Boolean(instrument.flows);
       const hasApps = Boolean(instrument.apps);
 
@@ -371,11 +371,11 @@ const config = {
   cardless_emi: {
     properties: ['providers'],
     payment: ['provider'],
-    groupedToIndividual: grouped => {
+    groupedToIndividual: (grouped) => {
       const base = _Obj.clone(grouped);
       delete base.providers;
 
-      return _Arr.map(grouped.providers || [], provider => {
+      return _Arr.map(grouped.providers || [], (provider) => {
         return _Obj.extend(
           {
             provider,
@@ -384,18 +384,18 @@ const config = {
         );
       });
     },
-    isValid: instrument =>
+    isValid: (instrument) =>
       Boolean(instrument.providers) && instrument.providers.length > 0,
   },
 
   paylater: {
     properties: ['providers'],
     payment: ['provider'],
-    groupedToIndividual: grouped => {
+    groupedToIndividual: (grouped) => {
       const base = _Obj.clone(grouped);
       delete base.providers;
 
-      return _Arr.map(grouped.providers || [], provider => {
+      return _Arr.map(grouped.providers || [], (provider) => {
         return _Obj.extend(
           {
             provider,
@@ -404,18 +404,18 @@ const config = {
         );
       });
     },
-    isValid: instrument =>
+    isValid: (instrument) =>
       Boolean(instrument.providers) && instrument.providers.length > 0,
   },
 
   app: {
     properties: ['providers'],
     payment: ['provider'],
-    groupedToIndividual: grouped => {
+    groupedToIndividual: (grouped) => {
       const base = _Obj.clone(grouped);
       delete base.providers;
 
-      return _Arr.map(grouped.providers || [], provider => {
+      return _Arr.map(grouped.providers || [], (provider) => {
         return _Obj.extend(
           {
             provider,
@@ -424,7 +424,7 @@ const config = {
         );
       });
     },
-    isValid: instrument =>
+    isValid: (instrument) =>
       Boolean(instrument.providers) && instrument.providers.length > 0,
   },
   // TODO: Pending methods: emi
@@ -444,7 +444,7 @@ config.upi_otm = config.upi;
  *
  * eg: bank_transfer, paypal, gpay
  */
-_Arr.loop(AVAILABLE_METHODS, method => {
+_Arr.loop(AVAILABLE_METHODS, (method) => {
   if (!config[method]) {
     config[method] = {};
   }

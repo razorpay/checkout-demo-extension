@@ -56,17 +56,6 @@
   $: pattern = appId ? PATTERN_WITHOUT_HANDLE : PATTERN_WITH_HANDLE;
 </script>
 
-<style>
-  .ref-pspName {
-    color: #424242;
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    line-height: 40px;
-    z-index: 1;
-  }
-</style>
-
 <div class="legend left" style="margin-top: 18px">Enter your UPI ID</div>
 <Card {selected} on:click={focus}>
   <div id="vpa-wrap" class={appId}>
@@ -84,9 +73,21 @@
       value={selectedApp === null ? vpa : ''}
       on:blur
       bind:this={vpaField}
-      bind:readonlyValue={vpaValue} />
+      bind:readonlyValue={vpaValue}
+    />
     {#if pspHandle}
       <div class="ref-pspName">@{pspHandle}</div>
     {/if}
   </div>
 </Card>
+
+<style>
+  .ref-pspName {
+    color: #424242;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    line-height: 40px;
+    z-index: 1;
+  }
+</style>

@@ -82,7 +82,7 @@ export default function Razorpay(overrides) {
     'integration_parent_version',
   ];
 
-  _Arr.loop(integrationKeys, key => {
+  _Arr.loop(integrationKeys, (key) => {
     const value = this.get(`_.${key}`);
     if (value) {
       Track.props[key] = value;
@@ -109,7 +109,7 @@ RazorProto.onNew = function (event, callback) {
     if (this.prefs) {
       callback(event, this.prefs);
     } else {
-      getPrefsJsonp(makePrefParams(this), response => {
+      getPrefsJsonp(makePrefParams(this), (response) => {
         if (response.methods) {
           this.prefs = response;
           this.methods = response.methods;

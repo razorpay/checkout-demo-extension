@@ -22,7 +22,7 @@ const PAYMENT_DATA = {};
  *
  * @returns {boolean} Whether or not any more OTPs can be sent.
  */
-export const markOtpSent = provider => {
+export const markOtpSent = (provider) => {
   if (!provider) {
     return;
   }
@@ -59,7 +59,7 @@ export const markOtpSent = provider => {
  *
  * @returns {boolean}
  */
-export const canSendOtp = provider => {
+export const canSendOtp = (provider) => {
   if (!provider) {
     return;
   }
@@ -92,7 +92,7 @@ export const canSendOtp = provider => {
  * Resets the OTP count for the provider.
  * @param {string} provider
  */
-export const resetCount = provider => {
+export const resetCount = (provider) => {
   if (!provider) {
     return;
   }
@@ -107,7 +107,7 @@ export const resetCount = provider => {
  *
  * @returns {number} count
  */
-export const getCount = provider => {
+export const getCount = (provider) => {
   if (!provider) {
     return 0;
   }
@@ -135,7 +135,7 @@ export const setPaymentData = (payment_id, data = {}) => {
  * @param {string} payment_id
  * @returns {*}
  */
-export const getPaymentData = payment_id => {
+export const getPaymentData = (payment_id) => {
   if (payment_id) {
     return PAYMENT_DATA[payment_id];
   }

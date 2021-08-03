@@ -22,7 +22,7 @@ export function isVpaValid(vpa) {
  * @returns {string | undefined}
  */
 export function getPackageNameFromShortcode(shortcode) {
-  const app = getAllApps() |> _Arr.find(app => app.shortcode === shortcode);
+  const app = getAllApps() |> _Arr.find((app) => app.shortcode === shortcode);
 
   if (app) {
     return app.package_name;
@@ -37,7 +37,7 @@ export function getPackageNameFromShortcode(shortcode) {
  */
 export function getAppFromPackageName(packageName) {
   const app =
-    getAllApps() |> _Arr.find(app => app.package_name === packageName);
+    getAllApps() |> _Arr.find((app) => app.package_name === packageName);
 
   return app;
 }
@@ -333,7 +333,7 @@ export const otherAppsIcon =
  *
  * @return {Object}
  */
-export const parseUPIIntentResponse = intentResponse => {
+export const parseUPIIntentResponse = (intentResponse) => {
   let response = {};
 
   if (intentResponse.response) {
@@ -364,7 +364,7 @@ export const parseUPIIntentResponse = intentResponse => {
  *
  * @return {Boolean}
  */
-export const didUPIIntentSucceed = parsedResponse =>
+export const didUPIIntentSucceed = (parsedResponse) =>
   Boolean(parsedResponse.txnId) ||
   (parsedResponse.Status || parsedResponse.status || '')
     .toLowerCase()
@@ -376,9 +376,9 @@ export const didUPIIntentSucceed = parsedResponse =>
  *
  * @return {String}
  */
-const getPackageNames = list => {
+const getPackageNames = (list) => {
   const arr = [];
-  _Arr.loop(list, app => arr.push(app.package_name));
+  _Arr.loop(list, (app) => arr.push(app.package_name));
   return arr;
 };
 
@@ -400,7 +400,7 @@ export const doesAppExist = (packageName, list) =>
 const getUsableApps = () => {
   let apps = [];
 
-  _Arr.loop(UPI_APPS_ORDER, group => {
+  _Arr.loop(UPI_APPS_ORDER, (group) => {
     apps = _Arr.merge(UPI_APPS[group], apps);
   });
 
@@ -415,14 +415,14 @@ const getUsableApps = () => {
 const getAllApps = () => {
   let apps = [];
 
-  _Arr.loop(_Obj.keys(UPI_APPS), group => {
+  _Arr.loop(_Obj.keys(UPI_APPS), (group) => {
     apps = _Arr.merge(UPI_APPS[group], apps);
   });
 
   return apps;
 };
 
-export const isPreferredApp = packageName =>
+export const isPreferredApp = (packageName) =>
   doesAppExist(packageName, UPI_APPS.preferred);
 
 /**
@@ -431,17 +431,17 @@ export const isPreferredApp = packageName =>
  *
  * @return {Array}
  */
-export const getSortedApps = allApps => {
+export const getSortedApps = (allApps) => {
   allApps = _Obj.clone(allApps);
 
-  const isAppInstalled = package_name =>
-    allApps.some(app => app.package_name === package_name);
+  const isAppInstalled = (package_name) =>
+    allApps.some((app) => app.package_name === package_name);
 
   // Get list of package names
   let usableApps = getUsableApps();
 
   _Arr.loop(allApps, (app, i) => {
-    const appConfig = _Arr.find(usableApps, usableApp => {
+    const appConfig = _Arr.find(usableApps, (usableApp) => {
       if (app.package_name) {
         return app.package_name === usableApp.package_name;
       } else if (app.shortcode) {
@@ -459,7 +459,7 @@ export const getSortedApps = allApps => {
   // The check is only performed if verify_registration is true for the app.
   // See UPI_APPS.whitelist.
   if (CheckoutBridge && CheckoutBridge.isUserRegisteredOnUPI) {
-    usableApps = _Arr.filter(usableApps, app => {
+    usableApps = _Arr.filter(usableApps, (app) => {
       // Only check for user registration if app is installed.
       if (app.verify_registration && isAppInstalled(app.package_name)) {
         return CheckoutBridge.isUserRegisteredOnUPI(app.package_name);
@@ -468,21 +468,25 @@ export const getSortedApps = allApps => {
     });
   }
 
-  const usablePackages = _Arr.map(usableApps, app => app.package_name);
+  const usablePackages = _Arr.map(usableApps, (app) => app.package_name);
 
   // Remove blacklisted apps
   allApps = _Arr.filter(
     allApps,
-    app => usablePackages.indexOf(app.package_name) >= 0
+    (app) => usablePackages.indexOf(app.package_name) >= 0
   );
-  allApps = allApps.map(item => {
-    const currDowntime = checkDowntime(getDowntimes().upi, 'psp', item.shortcode);
-    if(currDowntime) {
+  allApps = allApps.map((item) => {
+    const currDowntime = checkDowntime(
+      getDowntimes().upi,
+      'psp',
+      item.shortcode
+    );
+    if (currDowntime) {
       item.downtimeSeverity = currDowntime;
       item.downtimeInstrument = item.shortcode;
     }
     return item;
-  })
+  });
 
   // Sort remaining apps
   _Arr.sort(
@@ -499,14 +503,14 @@ export const getSortedApps = allApps => {
  * Looks for apps that are not known to Checkout and reports them.
  * @param {Array} allApps
  */
-export const findAndReportNewApps = allApps => {
-  const usablePackages = _Arr.map(getUsableApps(), app => app.package_name);
+export const findAndReportNewApps = (allApps) => {
+  const usablePackages = _Arr.map(getUsableApps(), (app) => app.package_name);
   const blacklistedPackages = _Arr.map(
     UPI_APPS.blacklist,
-    app => app.package_name
+    (app) => app.package_name
   );
 
-  _Arr.loop(allApps, app => {
+  _Arr.loop(allApps, (app) => {
     if (
       usablePackages.indexOf(app.package_name) < 0 &&
       blacklistedPackages.indexOf(app.package_name) < 0
@@ -527,14 +531,14 @@ export const findAndReportNewApps = allApps => {
  *
  * @return {Object}
  */
-export const getNumberOfAppsByCategory = allApps => {
+export const getNumberOfAppsByCategory = (allApps) => {
   const count = {};
-  const existingPackages = _Arr.map(allApps, app => app.package_name);
+  const existingPackages = _Arr.map(allApps, (app) => app.package_name);
 
   _Obj.loop(UPI_APPS, (apps, key) => {
     count[key] = _Arr.filter(
       apps,
-      app => existingPackages.indexOf(app.package_name) >= 0
+      (app) => existingPackages.indexOf(app.package_name) >= 0
     ).length;
   });
 
@@ -548,11 +552,11 @@ export const getNumberOfAppsByCategory = allApps => {
  *
  * @returns string url to the app icon
  */
-export const getUPIAppDataFromHandle = handle => {
+export const getUPIAppDataFromHandle = (handle) => {
   const allUsableApps = getUsableApps();
 
   return (
-    _Arr.find(allUsableApps, app => {
+    _Arr.find(allUsableApps, (app) => {
       return app.handles && _Arr.contains(app.handles, handle);
     }) || {}
   );
@@ -563,7 +567,7 @@ export const getUPIAppDataFromHandle = handle => {
  *
  * @param {String} packageName
  */
-export const trackUPIIntentFailure = packageName => {
+export const trackUPIIntentFailure = (packageName) => {
   Analytics.track('upi:app:intent:cancel', {
     data: {
       package_name: packageName,
@@ -576,8 +580,8 @@ export const trackUPIIntentFailure = packageName => {
  * Only Truecaller is tracked for now.
  * @param {Array} allApps
  */
-export const trackAppImpressions = allApps => {
-  if (_Arr.find(allApps, app => app.package_name === 'com.truecaller')) {
+export const trackAppImpressions = (allApps) => {
+  if (_Arr.find(allApps, (app) => app.package_name === 'com.truecaller')) {
     Analytics.track('upi:app:truecaller:show');
   }
 };

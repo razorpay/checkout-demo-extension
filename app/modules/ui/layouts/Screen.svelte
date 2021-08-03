@@ -56,6 +56,18 @@
   });
 </script>
 
+<div
+  class="screen screen-comp"
+  class:bottomShadow
+  class:pad
+  bind:this={contentRef}
+  on:scroll={onScroll}
+>
+  <slot />
+</div>
+<div class="shadow shadow-top" />
+<div class="shadow shadow-bottom" />
+
 <style>
   .screen {
     flex: 1;
@@ -118,14 +130,3 @@
     max-height: 24px;
   }
 </style>
-
-<div
-  class="screen screen-comp"
-  class:bottomShadow
-  class:pad
-  bind:this={contentRef}
-  on:scroll={onScroll}>
-  <slot />
-</div>
-<div class="shadow shadow-top" />
-<div class="shadow shadow-bottom" />

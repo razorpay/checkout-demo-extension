@@ -63,12 +63,6 @@
   }
 </script>
 
-<style>
-  .upi-gpay {
-    display: block;
-  }
-</style>
-
 <div class="legend left" style="margin-top: 18px">
   {retry ? 'Or' : ''}
   Enter your UPI ID
@@ -90,7 +84,8 @@
         required={true}
         on:focus={focus}
         bind:this={vpaField}
-        bind:readonlyValue={vpaValue} />
+        bind:readonlyValue={vpaValue}
+      />
       <div class="elem at-separator">@</div>
       <div class="elem" style="padding-right:20px;">
         <select
@@ -99,7 +94,8 @@
           required
           on:change={handlePspChange}
           bind:this={googlePayPspHandle}
-          bind:value={pspHandle}>
+          bind:value={pspHandle}
+        >
           <option value="">Select Bank</option>
           <option value="okhdfcbank">okhdfcbank</option>
           <option value="okicici">okicici</option>
@@ -110,3 +106,9 @@
     </div>
   </Card>
 </div>
+
+<style>
+  .upi-gpay {
+    display: block;
+  }
+</style>

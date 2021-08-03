@@ -24,7 +24,7 @@
 
   // Transitions
   import { slide } from 'svelte/transition';
-import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
+  import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
 
   const session = getSession();
   const wallets = getWallets();
@@ -42,7 +42,7 @@ import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
     // If a wallet was selected and has been filtered out, deselect it
     if (
       $selectedWallet &&
-      !_Arr.any(filteredWallets, wallet => wallet.code === $selectedWallet)
+      !_Arr.any(filteredWallets, (wallet) => wallet.code === $selectedWallet)
     ) {
       $selectedWallet = null;
     }
@@ -75,7 +75,7 @@ import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
       return wallets;
     }
 
-    let filtered = _Arr.filter(wallets, wallet =>
+    let filtered = _Arr.filter(wallets, (wallet) =>
       _Arr.contains(instrument.wallets, wallet.code)
     );
 
@@ -89,7 +89,7 @@ import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
   const walletReferences = {};
 
   export function onWalletSelection(code) {
-    const offerError = !session.validateOffers(code, function(removeOffer) {
+    const offerError = !session.validateOffers(code, function (removeOffer) {
       if (removeOffer) {
         $selectedWallet = code;
       }
@@ -146,27 +146,6 @@ import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
   }
 </script>
 
-<style>
-  .border-list {
-    padding-top: 12px;
-    padding-bottom: 12px;
-    margin: 0 -12px;
-  }
-
-  [slot='icon'].top {
-    align-self: flex-start;
-  }
-
-  .title-container {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .subtitle {
-    font-size: 10px;
-  }
-</style>
-
 <Tab method="wallet">
   <div class="border-list collapsable">
     {#each filteredWallets as wallet, i (wallet.code)}
@@ -174,14 +153,17 @@ import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
         name={wallet.code}
         selected={$selectedWallet === wallet.code}
         align="top"
-        on:click={() => onWalletSelection(wallet.code)}>
+        on:click={() => onWalletSelection(wallet.code)}
+      >
         <div
-          class='title-container'
+          class="title-container"
           slot="title"
           bind:this={walletReferences[wallet.code]}
-          id={`wallet-radio-${wallet.code}`}>
+          id={`wallet-radio-${wallet.code}`}
+        >
           <span class="title">{getWalletName(wallet.code, $locale)}</span>
-          <span class="subtitle">{getWalletSubtitle(wallet.code, $locale)}</span>
+          <span class="subtitle">{getWalletSubtitle(wallet.code, $locale)}</span
+          >
         </div>
         <div slot="body">
           {#if $selectedWallet === wallet.code}
@@ -210,3 +192,24 @@ import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
     {/if}
   </Bottom>
 </Tab>
+
+<style>
+  .border-list {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    margin: 0 -12px;
+  }
+
+  [slot='icon'].top {
+    align-self: flex-start;
+  }
+
+  .title-container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .subtitle {
+    font-size: 10px;
+  }
+</style>

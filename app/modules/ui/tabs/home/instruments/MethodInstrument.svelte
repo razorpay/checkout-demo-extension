@@ -52,13 +52,6 @@
   }
 </script>
 
-<style>
-  span {
-    display: inline-block;
-    transform: rotate(180deg);
-  }
-</style>
-
 <SlottedOption
   ellipsis
   {name}
@@ -66,7 +59,8 @@
   radio={false}
   className="instrument"
   attributes={{ 'data-type': 'method' }}
-  on:click>
+  on:click
+>
   <i slot="icon">
     <Icon {icon} alt="" />
   </i>
@@ -76,3 +70,10 @@
   </div>
   <div slot="extra"><span class="theme-highlight-color">&#xe604;</span></div>
 </SlottedOption>
+
+<style>
+  span {
+    display: inline-block;
+    transform: rotate(180deg);
+  }
+</style>

@@ -106,7 +106,7 @@
       validCardForOffer = true;
     }
   }
-  
+
   onMount(() => {
     Events.TrackBehav(CardEvents.ADD_NEW_CARD);
   });
