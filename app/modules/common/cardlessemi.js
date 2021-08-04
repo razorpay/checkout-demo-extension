@@ -55,6 +55,7 @@ const config = {
   hcin: {
     name: 'Home Credit Ujjwal Card',
     headless: false,
+    min_amount: 50000,
   },
 };
 
