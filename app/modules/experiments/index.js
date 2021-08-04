@@ -1,5 +1,6 @@
 import CurrentExperiments from './current';
 import BrowserStorage from 'browserstorage';
+export { isCardsSeparationExperimentEnabled } from './all/cards-separation';
 
 const STORAGE_KEY = 'rzp_checkout_exp';
 

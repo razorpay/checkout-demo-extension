@@ -2702,7 +2702,15 @@ Session.prototype = {
       this.switchTab('emi');
     } else {
       this.switchTab('');
-
+      if (
+        offer &&
+        offer.payment_method === 'card' &&
+        discreet.Experiments.isCardsSeparationExperimentEnabled()
+      ) {
+        // Since offers currently created using method not type ( card but not debit-card )
+        // when offer is being and experiment is ON, avoid screen switch. And let the user do manually
+        return;
+      }
       this.homeTab.onSelectInstrument({
         detail: instrument,
       });
