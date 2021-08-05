@@ -139,10 +139,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
       if (hasWallets) {
         const enabledWallets = getWallets();
         const shownWallets = _Arr.filter(instrument.wallets, (wallet) =>
-          _Arr.any(
-            enabledWallets,
-            (enabledWallet) => enabledWallet.code === wallet
-          )
+          enabledWallets.some((enabledWallet) => enabledWallet.code === wallet)
         );
 
         instrument.wallets = shownWallets;
@@ -172,8 +169,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
       if (hasProviders) {
         const enabledProviders = getPayLaterProviders();
         const shownProviders = _Arr.filter(instrument.providers, (provider) =>
-          _Arr.any(
-            enabledProviders,
+          enabledProviders.some(
             (enabledProvider) => enabledProvider.code === provider
           )
         );
@@ -189,8 +185,7 @@ function removeNonApplicableInstrumentFlows(instrument) {
       if (hasProviders) {
         const enabledProviders = getAppProviders();
         const shownProviders = _Arr.filter(instrument.providers, (provider) =>
-          _Arr.any(
-            enabledProviders,
+          enabledProviders.some(
             (enabledProvider) => enabledProvider.code === provider
           )
         );
@@ -287,7 +282,7 @@ export function getBlockConfig(options, customer) {
   const hasTranslatedBlocks = translated.display.blocks.length > 0;
   const hasConfiguredBlocks =
     hasTranslatedBlocks &&
-    _Arr.any(translated.display.blocks.length, (block) =>
+    translated.display.blocks.some((block) =>
       _Arr.contains(translated.display.sequence, block.code)
     );
 

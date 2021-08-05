@@ -42,7 +42,7 @@
     // If a wallet was selected and has been filtered out, deselect it
     if (
       $selectedWallet &&
-      !_Arr.any(filteredWallets, (wallet) => wallet.code === $selectedWallet)
+      !filteredWallets.some((wallet) => wallet.code === $selectedWallet)
     ) {
       $selectedWallet = null;
     }

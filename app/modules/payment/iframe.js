@@ -63,7 +63,7 @@ Iframe.prototype = {
   close: function () {
     if (!this.closed) {
       this.closed = true;
-      _Arr.loop(this.listeners, (l) => l());
+      this.listeners.forEach((l) => l());
       this.listeners = [];
       this.el |> _El.detach;
       _Doc.querySelector('#modal') |> _El.removeClass(CLASS_IFRAME_ACTIVE);

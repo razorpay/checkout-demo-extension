@@ -68,38 +68,36 @@ export const formatPayload = function (payload, razorpayInstance, params = {}) {
 
   // fill data from options if empty
   var getOption = razorpayInstance.get;
-  _Arr.loop(
-    [
-      'amount',
-      'currency',
-      'signature',
-      'description',
-      'order_id',
-      'account_id',
-      'notes',
-      'subscription_id',
-      'auth_link_id',
-      'payment_link_id',
-      'customer_id',
-      'recurring',
-      'subscription_card_change',
-      'recurring_token.max_amount',
-      'recurring_token.expire_by',
-    ],
-    (field) => {
-      if (!(data |> _Obj.hasOwnProp(field))) {
-        var val = getOption(field);
-        if (val) {
-          // send boolean value true as 1
-          // 0 wouldn't react this line
-          if (_.isBoolean(val)) {
-            val = 1;
-          }
-          data[field.replace(/\.(\w+)/g, '[$1]')] = val;
+
+  [
+    'amount',
+    'currency',
+    'signature',
+    'description',
+    'order_id',
+    'account_id',
+    'notes',
+    'subscription_id',
+    'auth_link_id',
+    'payment_link_id',
+    'customer_id',
+    'recurring',
+    'subscription_card_change',
+    'recurring_token.max_amount',
+    'recurring_token.expire_by',
+  ].forEach((field) => {
+    if (!(data |> _Obj.hasOwnProp(field))) {
+      var val = getOption(field);
+      if (val) {
+        // send boolean value true as 1
+        // 0 wouldn't react this line
+        if (typeof val === 'boolean') {
+          val = 1;
         }
+        data[field.replace(/\.(\w+)/g, '[$1]')] = val;
       }
     }
-  );
+  });
 
   var key_id = getOption('key');
   if (!data.key_id && key_id) {
@@ -124,7 +122,7 @@ export const formatPayload = function (payload, razorpayInstance, params = {}) {
     'integration_version',
     'integration_parent_version',
   ];
-  _Arr.loop(integrationKeys, (key) => {
+  integrationKeys.forEach((key) => {
     const value = razorpayInstance.get(`_.${key}`);
     if (value) {
       data[`_[${key}]`] = value;

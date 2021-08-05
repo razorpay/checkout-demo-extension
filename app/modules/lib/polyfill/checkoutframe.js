@@ -121,8 +121,7 @@ overrideInsertRule();
  * Element.remove polyfill
  */
 (function () {
-  _Arr.loop(
-    [Element.prototype, CharacterData.prototype, DocumentType.prototype],
+  [Element.prototype, CharacterData.prototype, DocumentType.prototype].forEach(
     (item) => {
       if (item.hasOwnProperty('remove')) {
         return;

@@ -42,7 +42,7 @@ const transformerByMethod = {
  * @return {Array}
  */
 export const transform = (tokens, { amount, emi, recurring }) => {
-  _Arr.loop(tokens, (token) => {
+  tokens.forEach((token) => {
     if (token.method && transformerByMethod[token.method]) {
       token = transformerByMethod[token.method](token, {
         amount,

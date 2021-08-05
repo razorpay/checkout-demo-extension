@@ -56,7 +56,7 @@ const METHOD_FILTERS = {
     const tokens = _Obj.getSafely(customer, 'tokens.items', []);
 
     // Allow this instrument only if a token for this exists on the customer
-    return _Arr.any(tokens, (token) => instrument.token_id === token.id);
+    return tokens.some((token) => instrument.token_id === token.id);
   },
 
   wallet: (instrument) => {
@@ -66,8 +66,7 @@ const METHOD_FILTERS = {
       return false;
     }
 
-    const enabledWallet = _Arr.any(
-      wallets,
+    const enabledWallet = wallets.some(
       (wallet) => wallet.code === instrument.wallet
     );
 

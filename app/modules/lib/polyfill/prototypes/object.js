@@ -2,9 +2,9 @@
  * Polyfill for Object.entries
  * Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
  */
-(function() {
+(function () {
   if (!Object.entries) {
-    Object.entries = function(obj) {
+    Object.entries = function (obj) {
       var ownProps = Object.keys(obj),
         i = ownProps.length,
         resArray = new Array(i); // preallocate the Array
@@ -18,9 +18,9 @@
 /**
  * Polyfill for Object,values
  */
-(function() {
+(function () {
   if (!Object.values) {
-    Object.values = function(obj) {
+    Object.values = function (obj) {
       var ownProps = Object.keys(obj),
         i = ownProps.length,
         resArray = new Array(i); // preallocate the Array
@@ -34,7 +34,7 @@
  * Polyfill for Object.assign
  * Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign#Polyfill
  */
-(function() {
+(function () {
   if (typeof Object.assign !== 'function') {
     // Must be writable: true, enumerable: false, configurable: true
     Object.defineProperty(Object, 'assign', {

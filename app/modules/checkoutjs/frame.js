@@ -54,11 +54,11 @@ function getMetas() {
 
 function restoreMetas($metas) {
   if ($metas) {
-    _Arr.loop($metas, _El.detach);
+    $metas.forEach(_El.detach);
   }
   var oldMeta = getMetas();
   if (oldMeta) {
-    _Arr.loop(oldMeta, _El.appendTo(head));
+    oldMeta.forEach(_El.appendTo(head));
   }
 }
 
@@ -300,7 +300,11 @@ CheckoutFrame.prototype = {
   },
 
   unbind: function () {
-    this.listeners |> _Arr.callAll;
+    this.listeners.forEach((fx) => {
+      if (typeof fx === 'function') {
+        fx();
+      }
+    });
     this.listeners = null;
   },
 
@@ -309,7 +313,7 @@ CheckoutFrame.prototype = {
       return;
     }
 
-    _Arr.loop(getMetas(), (meta) => _El.detach(meta));
+    getMetas().forEach((meta) => _El.detach(meta));
 
     this.$metas = [
       _El.create('meta')
@@ -325,7 +329,7 @@ CheckoutFrame.prototype = {
         }),
     ];
 
-    _Arr.loop(this.$metas, _El.appendTo(head));
+    this.$metas.forEach(_El.appendTo(head));
 
     merchantMarkup.overflow = docStyle.overflow;
     docStyle.overflow = 'hidden';
@@ -429,7 +433,7 @@ CheckoutFrame.prototype = {
 
     // check if it was one of the external wallets
     if (data.method === 'wallet') {
-      _Arr.loop(rzp.get('external.wallets'), function (walletName) {
+      (rzp.get('external.wallets') || []).forEach(function (walletName) {
         if (walletName === data.wallet) {
           try {
             rzp.get('external.handler').call(rzp, data);

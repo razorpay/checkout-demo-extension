@@ -103,7 +103,7 @@ function getInstrumentsFromApi(customer) {
           };
         }
 
-        const data = response.preferred_methods;
+        const data = response.preferred_methods || {};
         trackP13nMeta(data);
         // default instruments may be provided based on the merchant and amount details
 

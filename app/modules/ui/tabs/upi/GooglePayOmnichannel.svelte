@@ -64,7 +64,9 @@
     signalSelect();
     //TODO check if there is a better way
     setTimeout(() => {
-      phoneField.focus();
+      if (phoneField) {
+        phoneField.focus();
+      }
     }, 0);
     dispatch('focus');
   }
