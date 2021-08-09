@@ -10,7 +10,8 @@ const { sendRewards } = require('./rewards');
 const { setExperiments } = require('./experiments');
 
 const checkoutPublic = 'https://api.razorpay.com/v1/checkout/public';
-const automaticCheckoutPublic = 'https://api.razorpay.com/v1/checkout/public/automatic';
+const automaticCheckoutPublic =
+  'https://api.razorpay.com/v1/checkout/public/automatic';
 const checkoutCss = 'https://checkout.razorpay.com/v1/css/checkout.css';
 const checkoutFont = cdnUrl + 'lato.woff2';
 const checkoutFrameJs = 'https://checkout.razorpay.com/v1/checkout-frame.js';
@@ -19,7 +20,9 @@ const mockPageSubmit =
   'https://api.razorpay.com/v1/gateway/mocksharp/payment/submit';
 
 const htmlContent = readFileSync('blackbox/fixtures/checkout-public.html');
-const autoHtmlContent = readFileSync('blackbox/fixtures/automatic-checkout.html');
+const autoHtmlContent = readFileSync(
+  'blackbox/fixtures/automatic-checkout.html'
+);
 const jsContent = readFileSync('app/dist/v1/checkout-frame.js');
 const checkoutJsContent = readFileSync('app/dist/v1/checkout.js');
 const cssContent = readFileSync('app/dist/v1/css/checkout.css');
@@ -30,7 +33,8 @@ function checkoutRequestHandler(request) {
   const url = request.url();
   if (url.startsWith(automaticCheckoutPublic)) {
     return request.respond({ body: autoHtmlContent });
-  } if (url.startsWith(checkoutPublic)) {
+  }
+  if (url.startsWith(checkoutPublic)) {
     return request.respond({ body: htmlContent });
   } else if (url.endsWith('favicon.ico')) {
     return request.respond({ status: 204 });
@@ -117,7 +121,7 @@ function cdnRequestHandler(request) {
 }
 
 async function passMessage(page, message) {
-  await page.evaluate(message => handleMessage(message), message);
+  await page.evaluate((message) => handleMessage(message), message);
 }
 
 const API_PREFERRED_INSTRUMENTS = {
@@ -217,100 +221,104 @@ module.exports = {
 
     await setExperiments(page, experiments);
     if (method && options.personalization) {
-      await page.evaluate((method, opt) => {
-        const hashKey = '4d184816';
-        var upiInstruments = {};
-        var netbankingInstruments = {};
-        var qrInstruments = {};
-        var cardInstruments = {};
-        var walletInstruments = {};
-        var appInstruments = {};
-        qrInstruments[hashKey] = [
-          {
-            '_[flow]': 'intent',
-            '_[upiqr]': '1',
-            method: 'upi',
-            timestamp: 1574079022916,
-            success: true,
-            frequency: 2,
-            id: 'DhnN8SggG8Ihdy',
-          },
-        ];
-        cardInstruments[hashKey] = [
-          {
-            method: 'card',
-            token_id: 'token_9AT28Pxxe0Npi9',
-            type: 'credit',
-            issuer: 'ICIC',
-            network: 'Visa',
-            timestamp: 1574056926308,
-            success: true,
-            frequency: 1,
-            id: 'Dhh671dR688OWQ',
-          },
-        ];
-        walletInstruments[hashKey] = [
-          {
-            wallet: opt.isPaypalCC ? 'paypal' : 'freecharge',
-            method: 'wallet',
-            timestamp: 1574081911355,
-            success: true,
-            frequency: 1,
-            id: 'DhoBzK59KicZni',
-          },
-        ];
-        upiInstruments[hashKey] = [
-          {
-            '_[flow]': 'directpay',
-            vpa: 'dsd@okhdfcbank',
-            method: 'upi',
-            timestamp: 1574063491481,
-            success: true,
-            frequency: 2,
-            id: 'Dhix6Bqn8w7td4',
-          },
-          {
-            '_[flow]': 'directpay',
-            vpa: 'dfs@okicici',
-            method: 'upi',
-            timestamp: 1574066575053,
-            success: true,
-            frequency: 1,
-            id: 'Dhjpz3w1RIGMJ1',
-          },
-        ];
-        netbankingInstruments[hashKey] = [
-          {
-            bank: 'HDFC',
-            method: 'netbanking',
-            timestamp: 1574062745851,
-            success: true,
-            frequency: 2,
-            id: 'Dhh86QTueOpyWX',
-          },
-        ];
-        appInstruments[hashKey] = [
-          {
-            provider: 'cred',
-            method: 'app',
-            timestamp: 1574062745851,
-            success: true,
-            frequency: 2,
-            id: 'Dhh86QTueOpTWX',
-          },
-        ];
-        localStorage.setItem(
-          'rzp_preffered_instruments',
-          {
-            UPI: JSON.stringify(upiInstruments),
-            Netbanking: JSON.stringify(netbankingInstruments),
-            QR: JSON.stringify(qrInstruments),
-            Card: JSON.stringify(cardInstruments),
-            Wallet: JSON.stringify(walletInstruments),
-            app: JSON.stringify(appInstruments),
-          }[method]
-        );
-      }, method, options);
+      await page.evaluate(
+        (method, opt) => {
+          const hashKey = '4d184816';
+          var upiInstruments = {};
+          var netbankingInstruments = {};
+          var qrInstruments = {};
+          var cardInstruments = {};
+          var walletInstruments = {};
+          var appInstruments = {};
+          qrInstruments[hashKey] = [
+            {
+              '_[flow]': 'intent',
+              '_[upiqr]': '1',
+              method: 'upi',
+              timestamp: 1574079022916,
+              success: true,
+              frequency: 2,
+              id: 'DhnN8SggG8Ihdy',
+            },
+          ];
+          cardInstruments[hashKey] = [
+            {
+              method: 'card',
+              token_id: 'token_9AT28Pxxe0Npi9',
+              type: 'credit',
+              issuer: 'ICIC',
+              network: 'Visa',
+              timestamp: 1574056926308,
+              success: true,
+              frequency: 1,
+              id: 'Dhh671dR688OWQ',
+            },
+          ];
+          walletInstruments[hashKey] = [
+            {
+              wallet: opt.isPaypalCC ? 'paypal' : 'freecharge',
+              method: 'wallet',
+              timestamp: 1574081911355,
+              success: true,
+              frequency: 1,
+              id: 'DhoBzK59KicZni',
+            },
+          ];
+          upiInstruments[hashKey] = [
+            {
+              '_[flow]': 'directpay',
+              vpa: 'dsd@okhdfcbank',
+              method: 'upi',
+              timestamp: 1574063491481,
+              success: true,
+              frequency: 2,
+              id: 'Dhix6Bqn8w7td4',
+            },
+            {
+              '_[flow]': 'directpay',
+              vpa: 'dfs@okicici',
+              method: 'upi',
+              timestamp: 1574066575053,
+              success: true,
+              frequency: 1,
+              id: 'Dhjpz3w1RIGMJ1',
+            },
+          ];
+          netbankingInstruments[hashKey] = [
+            {
+              bank: 'HDFC',
+              method: 'netbanking',
+              timestamp: 1574062745851,
+              success: true,
+              frequency: 2,
+              id: 'Dhh86QTueOpyWX',
+            },
+          ];
+          appInstruments[hashKey] = [
+            {
+              provider: 'cred',
+              method: 'app',
+              timestamp: 1574062745851,
+              success: true,
+              frequency: 2,
+              id: 'Dhh86QTueOpTWX',
+            },
+          ];
+          localStorage.setItem(
+            'rzp_preffered_instruments',
+            {
+              UPI: JSON.stringify(upiInstruments),
+              Netbanking: JSON.stringify(netbankingInstruments),
+              QR: JSON.stringify(qrInstruments),
+              Card: JSON.stringify(cardInstruments),
+              Wallet: JSON.stringify(walletInstruments),
+              app: JSON.stringify(appInstruments),
+            }[method]
+          );
+        },
+        method,
+        options
+      );
 
       // Set preferred methods in preferences too
       preferences.preferred_methods = {
@@ -340,9 +348,10 @@ module.exports = {
       ...interceptorOptions,
       forceTargetInitialization,
       async popup() {
+        forceTargetInitialization(browser);
         const target = await page
           .browser()
-          .waitForTarget(t => t.opener() === pageTarget);
+          .waitForTarget((t) => t.opener() === pageTarget);
         const popupPage = await target.page();
         await popupPage.setRequestInterception(true);
         popupPage.on('request', popupRequestHandler);
@@ -439,7 +448,7 @@ module.exports = {
       preferences,
       ...interceptorOptions,
       sendPreferences,
-      sendRewards
+      sendRewards,
     };
     // page takes some time to render
     await delay(200);
