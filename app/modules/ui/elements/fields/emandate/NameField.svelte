@@ -7,7 +7,7 @@
   export let id;
   export let name;
   export let readonly;
-
+  export let dir;
   export let value;
 
   const PATTERN = "^[a-zA-Z. 0-9\\']{1,100}$";
@@ -23,6 +23,7 @@
   {id}
   {readonly}
   {value}
+  {dir}
   label={$t(NAME_LABEL)}
   helpText={$t(NAME_HELP)}
   maxlength="100"
