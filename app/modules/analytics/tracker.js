@@ -1,86 +1,67 @@
-// TODO-{typescript} update type of razorpay instance
-// TODO-{typescript} extract fetch to lib and use via import
 import { getExperimentsFromStorage } from 'experiments';
-import type { CustomObject, Razorpay } from 'types';
-import { pipe, isBase64Image, unFlattenObject } from 'utils/lib';
 
 const base62Chars =
   '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
-const map62: CustomObject<number> = base62Chars
-  .split('')
-  .reduce(
-    (
-      map: CustomObject<number>,
-      chr: string,
-      i: number
-    ): CustomObject<number> => {
-      map[chr] = i;
-      return map;
-    },
-    {}
-  );
+const map62 =
+  base62Chars |> _Arr.reduce((map, chr, i) => _Obj.setProp(map, chr, i), {});
 
-function toBase62(number: number) {
-  let rixit: number;
-  let result: string = '';
+function toBase62(number) {
+  var rixit;
+  var result = '';
   while (number) {
     rixit = number % 62;
     result = base62Chars[rixit] + result;
-    number = Math.floor(number / 62);
+    number = _.floor(number / 62);
   }
   return result;
 }
 
 function makeUid() {
-  const num =
+  var num =
     toBase62(
-      +(
-        String(Date.now() - 1388534400000) +
-        String('000000' + Math.floor(1000000 * Math.random())).slice(-6)
-      )
+      String(_.now() - 1388534400000) +
+        String('000000' + _.floor(1000000 * _.random())).slice(-6)
     ) +
-    toBase62(Math.floor(238328 * Math.random())) +
+    toBase62(_.floor(238328 * _.random())) +
     '0';
 
-  let sum = 0,
-    tempDigit;
+  var sum = 0,
+    tempdigit;
 
-  String(num)
-    .split('')
-    .forEach((_, i) => {
-      tempDigit = map62[num[num.length - 1 - i]];
+  num
+    |> _Arr.loop(function (v, i) {
+      tempdigit = map62[num[num.length - 1 - i]];
       if ((num.length - i) % 2) {
-        tempDigit *= 2;
+        tempdigit *= 2;
       }
-      if (tempDigit >= 62) {
-        tempDigit = (tempDigit % 62) + 1;
+      if (tempdigit >= 62) {
+        tempdigit = (tempdigit % 62) + 1;
       }
-      sum += tempDigit;
+      sum += tempdigit;
     });
 
-  tempDigit = sum % 62;
-
-  if (tempDigit) {
-    tempDigit = base62Chars[62 - tempDigit];
+  tempdigit = sum % 62;
+  if (tempdigit) {
+    tempdigit = base62Chars[62 - tempdigit];
   }
-  return String(num).slice(0, 13) + tempDigit;
+  return String(num).slice(0, 13) + tempdigit;
 }
 
 var _uid = makeUid();
 
-var trackingProps: CustomObject<string> = {
+var trackingProps = {
   library: 'checkoutjs',
   platform: 'browser',
   referer: location.href,
 };
 
-function getCommonTrackingData(r: Razorpay) {
-  const props: CustomObject<any> = {
+function getCommonTrackingData(r) {
+  var props = {
     checkout_id: r ? r.id : _uid,
   };
 
-  const commonProps = [
+  [
     'device',
     'env',
     'integration',
@@ -90,29 +71,21 @@ function getCommonTrackingData(r: Razorpay) {
     'platform_version',
     'platform',
     'referer',
-  ];
-
-  commonProps.forEach((propName) => {
-    if (trackingProps[propName]) {
-      props[propName] = trackingProps[propName];
-    }
-  });
+  ]
+    |> _Arr.loop(
+      (propName) =>
+        props |> _Obj.setTruthyProp(propName, trackingProps[propName])
+    );
 
   return props;
 }
 
-type Event = {
-  event: string;
-  properties: CustomObject<any>;
-  timestamp: number;
-};
+const EVT_Q = [];
+let PENDING_EVT_Q = [];
+let EVT_CTX;
 
-const EVT_Q: Event[] = [];
-let PENDING_EVT_Q: [string, any, boolean][] = [];
-let EVT_CTX: CustomObject<any>;
-
-const pushToEventQ = (evt: Event): number => EVT_Q.push(evt);
-const setEventContext = (ctx: CustomObject<any>): void => {
+const pushToEventQ = (evt) => EVT_Q.push(evt);
+const setEventContext = (ctx) => {
   EVT_CTX = ctx;
 };
 
@@ -125,7 +98,7 @@ const flushEvents = () => {
   }
 
   // Use sendBeacon if supported.
-  const useBeacon = navigator.hasOwnProperty('sendBeacon');
+  const useBeacon = _Obj.hasProp(navigator, 'sendBeacon');
 
   const trackingPayload = {
     context: EVT_CTX,
@@ -148,19 +121,19 @@ const flushEvents = () => {
     data: {
       key: 'ZmY5N2M0YzVkN2JiYzkyMWM1ZmVmYWJk',
       // key: 'DyWQEJ6LM9PG+8XseHxX/dAtqc8PMR6tHR6/3m0NcOw=',
-      data: pipe(
-        JSON.stringify,
-        encodeURIComponent,
-        unescape,
-        btoa,
-        encodeURIComponent
-      )(trackingPayload),
+      data:
+        trackingPayload
+        |> _Obj.stringify
+        |> encodeURIComponent
+        |> unescape
+        |> btoa
+        |> encodeURIComponent,
     },
   };
 
   try {
     if (useBeacon) {
-      navigator.sendBeacon(postData.url, JSON.stringify(postData.data));
+      navigator.sendBeacon(postData.url, _Obj.stringify(postData.data));
     } else {
       fetch.post(postData);
     }
@@ -180,12 +153,7 @@ const FLUSH_INTERVAL = setInterval(() => {
  * @param {Object} data
  * @param {Boolean} immediately Whether to send this event immediately.
  */
-export default function Track(
-  r: Razorpay,
-  event: string,
-  data: any,
-  immediately: boolean
-) {
+export default function Track(r, event, data, immediately) {
   if (!r) {
     PENDING_EVT_Q.push([event, data, immediately]);
     return;
@@ -208,14 +176,8 @@ export default function Track(
       context.order_id = order_id;
     }
 
-    var options: CustomObject<any> = {};
-    var properties: {
-      options: any;
-      data?: any;
-      local_order_id?: string;
-      build_number?: string | number;
-      experiments?: any;
-    } = {
+    var options = {};
+    var properties = {
       options,
     };
 
@@ -223,7 +185,7 @@ export default function Track(
       properties.data = data;
     }
 
-    options = Object.assign(options, unFlattenObject(r.get()));
+    options = _Obj.extend(options, _Obj.unflatten(r.get()));
 
     var handler = r.get('handler');
     if (typeof handler === 'function') {
@@ -236,15 +198,15 @@ export default function Track(
     }
 
     // Mask prefilled card details
-    if (options.hasOwnProperty('prefill')) {
-      ['card'].forEach((key) => {
-        if (options.prefill.hasOwnProperty(key)) {
+    if (_Obj.hasProp(options, 'prefill')) {
+      _Arr.loop(['card'], (key) => {
+        if (_Obj.hasProp(options.prefill, key)) {
           options.prefill[key] = true;
         }
       });
     }
 
-    if (options.image && isBase64Image(options.image)) {
+    if (options.image && _.isBase64Image(options.image)) {
       options.image = 'base64';
     }
 
@@ -255,13 +217,9 @@ export default function Track(
      * to object
      */
 
-    options.external_wallets = externalWallets.reduce(
-      (acc: CustomObject<boolean>, wallet: string) => {
-        acc[wallet] = true;
-        return acc;
-      },
-      {}
-    );
+    options.external_wallets =
+      externalWallets
+      |> _Arr.reduce((acc, wallet) => acc |> _Obj.setProp(wallet, true), {});
 
     if (_uid) {
       properties.local_order_id = _uid;
@@ -278,7 +236,7 @@ export default function Track(
     pushToEventQ({
       event,
       properties,
-      timestamp: Date.now(),
+      timestamp: _.now(),
     });
 
     setEventContext(context);
@@ -289,7 +247,7 @@ export default function Track(
   });
 }
 
-Track.dispatchPendingEvents = (r: any) => {
+Track.dispatchPendingEvents = (r) => {
   if (!r) {
     return;
   }
@@ -299,21 +257,22 @@ Track.dispatchPendingEvents = (r: any) => {
   });
 };
 
-Track.parseAnalyticsData = (data: CustomObject<any>) => {
-  if (data && typeof data === 'object') {
+Track.parseAnalyticsData = (data) => {
+  if (!_.isNonNullObject(data)) {
     return;
   }
 
-  Object.keys(data).forEach((key) => {
-    trackingProps[key] = data[key];
-  });
+  data
+    |> _Obj.loop((key, val) => {
+      trackingProps[key] = val;
+    });
 };
 
 Track.makeUid = makeUid;
 Track.common = getCommonTrackingData;
 Track.props = trackingProps;
 Track.id = _uid;
-Track.updateUid = (uid: string) => {
+Track.updateUid = (uid) => {
   _uid = uid;
   Track.id = uid;
 };

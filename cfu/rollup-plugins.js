@@ -3,16 +3,15 @@ const globals = require('./scripts/rollup-injects');
 const include = require('rollup-plugin-includepaths');
 const babelOptions = require('./scripts/babel-options');
 const babelPlugin = require('rollup-plugin-babel');
-const sveltePreprocess = require('svelte-preprocess');
+const babel = require('@babel/core');
 const stylus = require('./scripts/rollup-plugin-stylus');
 const svelte = require('rollup-plugin-svelte');
-const inject = require('@rollup/plugin-inject');
+const inject = require('rollup-plugin-inject');
 const replace = require('rollup-plugin-replace');
 const resolve = require('@rollup/plugin-node-resolve');
 const eslint = require('./scripts/eslint');
 const isProd = require('./prod');
 const { readFile } = require('fs');
-const typescript = require('@rollup/plugin-typescript');
 
 const isWatching = argv.w || argv.watch;
 
@@ -84,24 +83,21 @@ const getPlugins = ({
 
     svelte({
       extensions: ['.svelte'],
-      preprocess: [
-        {
-          style: ({ content }) => {
-            return stylus.stylusToCss(content);
-          },
-          script: async (svelteFile) => {
-            setTimeout(() => eslint.lint(false)([svelteFile.filename]));
-
-            const { content, dependencies } = await parseFile(svelteFile);
-
-            return {
-              code: content,
-              dependencies,
-            };
-          },
+      preprocess: {
+        style: ({ content }) => {
+          return stylus.stylusToCss(content);
         },
-        sveltePreprocess(),
-      ],
+        script: async (svelteFile) => {
+          setTimeout(() => eslint.lint(false)([svelteFile.filename]));
+
+          const { content, dependencies } = await parseFile(svelteFile);
+
+          return {
+            code: content,
+            dependencies,
+          };
+        },
+      },
       dev: !isProd,
       css: (css) => {
         if (svelteCssPath) {
@@ -115,8 +111,6 @@ const getPlugins = ({
       ...babelOptions,
       extensions: ['.js', '.mjs', '.svelte'],
     }),
-
-    typescript({ sourceMap: !isProd }),
 
     inject(globals),
   ];

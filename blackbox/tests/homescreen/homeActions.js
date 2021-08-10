@@ -14,8 +14,8 @@ const {
  */
 async function getHomescreenMethods(context) {
   await assertVisible('.methods-block[data-block="rzp.cluster"]');
-  return context.page.$$eval('button.new-method', (buttons) => {
-    return buttons.map((b) => b.getAttribute('method'));
+  return context.page.$$eval('button.new-method', buttons => {
+    return buttons.map(b => b.getAttribute('method'));
   });
 }
 
@@ -23,8 +23,8 @@ async function getHomescreenMethods(context) {
  * Returns all available EMI buttons
  */
 function getEmiButtonTexts(context) {
-  return context.page.$$eval('#form-cardless_emi .options .option', (els) => {
-    return els.map((el) => el.textContent.trim());
+  return context.page.$$eval('#form-cardless_emi .options .option', els => {
+    return els.map(el => el.textContent.trim());
   });
 }
 
@@ -32,8 +32,8 @@ function getEmiButtonTexts(context) {
  * Returns all available EMI buttons
  */
 function getWalletButtonTexts(context) {
-  return context.page.$$eval('#form-wallet button .title', (els) => {
-    return els.map((el) => el.textContent.trim().toLowerCase());
+  return context.page.$$eval('#form-wallet button .title', els => {
+    return els.map(el => el.textContent.trim().toLowerCase());
   });
 }
 
@@ -66,7 +66,7 @@ async function assertPaymentMethods(context, order) {
  */
 async function selectPaymentMethod(context, method) {
   // click through puppeteer may fail if element not in view due to scroll offset
-  await context.page.evaluate((method) => {
+  await context.page.evaluate(method => {
     const el = document.querySelector(`button.new-method[method=${method}]`);
     if (!el || !el.offsetWidth) {
       throw `${method} button is not visible`;

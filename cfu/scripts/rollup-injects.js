@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { execSync } = require('child_process');
 const globalContents = fs
   .readFileSync(__dirname + '/../src/fe/implicit/global.js')
   .toString();
@@ -9,7 +10,7 @@ const globalInjects = globalContents
 
 let injects = {
   // this is rollup option, not an inject
-  include: ['**/*.js', '**/*.ts', '**/*.svelte'],
+  include: ['**/*.js', '**/*.svelte'],
 
   // injects
   fetch: 'fe/implicit/fetch',

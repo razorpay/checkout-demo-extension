@@ -13,7 +13,7 @@ async function openSdkCheckout({
   let paymentResult = null;
   let resolver = null;
   try {
-    await page.exposeFunction('__CheckoutBridge_oncomplete', async (data) => {
+    await page.exposeFunction('__CheckoutBridge_oncomplete', async data => {
       data = JSON.parse(data);
       if (data.error) {
         const newContext = await openCheckout({
@@ -37,7 +37,7 @@ async function openSdkCheckout({
       }
     });
   } catch (err) {}
-  await page.exposeFunction('__CheckoutBridge_processPayment', async (data) => {
+  await page.exposeFunction('__CheckoutBridge_processPayment', async data => {
     data = JSON.parse(data);
     if (data.type === 'application') {
       if (data.application_name === 'google_pay') {
@@ -60,13 +60,13 @@ async function openSdkCheckout({
   });
 
   if (params && params.platform === 'ios') {
-    await page.evaluateOnNewDocument((options) => {
+    await page.evaluateOnNewDocument(options => {
       window.webkit = { messageHandlers: {} };
       window.webkit.messageHandlers.CheckoutBridge = {
-        postMessage: function (data) {
+        postMessage: function(data) {
           switch (data.action) {
             case 'callNativeIntent':
-              setTimeout(function () {
+              setTimeout(function() {
                 window.externalAppResponse({
                   provider: 'CRED',
                   data: 1,
@@ -79,7 +79,7 @@ async function openSdkCheckout({
         },
       };
 
-      let interval = setInterval(function () {
+      let interval = setInterval(function() {
         // Wait for Checkout to load...
         if (window.handleMessage) {
           clearInterval(interval);
@@ -121,7 +121,7 @@ async function openSdkCheckout({
         callNativeIntent(data) {
           if (data.startsWith('credpay://')) {
             // setTimeout is necessary!
-            setTimeout(function () {
+            setTimeout(function() {
               window.externalAppResponse({
                 provider: 'CRED',
                 data: 1,

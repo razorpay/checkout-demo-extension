@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   // Svelte
   import { createEventDispatcher } from 'svelte';
 
@@ -19,17 +19,16 @@
   import { getAppProviderName } from 'i18n';
 
   import { getAppInstrumentSubtext } from 'ui/tabs/card/utils';
-  import type { AppInstrument } from 'types';
   const dispatch = createEventDispatcher();
 
-  export let apps: AppInstrument[] = [];
-  export let selectedApp: string;
+  export let apps = [];
+  export let selectedApp;
 
-  function select(code: string) {
+  function select(code) {
     dispatch('select', code);
   }
 
-  function isContactRequired(provider: string) {
+  function isContactRequired(provider) {
     return isContactOptional() && isContactRequiredForAppProvider(provider);
   }
 </script>
@@ -41,6 +40,7 @@
     selected={selectedApp === app.code}
     className="instrument"
     value={app.code}
+    expandable={selectedApp && isContactRequired(app.code)}
     on:click={(_) => select(app.code)}
   >
     <i slot="icon">
