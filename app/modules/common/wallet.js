@@ -22,6 +22,9 @@ const list = {
   phonepe: ['PhonePe', 20],
   sbibuddy: ['SBI Buddy', 22],
   zeta: ['Zeta', 25],
+  citibankrewards: ['Citibank Reward Points', 20],
+  itzcash: ['Itz Cash', 20],
+  paycash: ['PayCash', 20],
 };
 
 /**

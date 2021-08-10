@@ -1123,6 +1123,9 @@ export default {
     phonepe: 'PhonePe',
     sbibuddy: 'SBI Buddy',
     zeta: 'Zeta',
+    itzcash: 'Itz Cash',
+    citibankrewards: 'Citibank Reward Points',
+    paycash: 'PayCash',
   },
   wallets_subtitle: {
     paypal: 'Only accounts issued outside India accepted',
