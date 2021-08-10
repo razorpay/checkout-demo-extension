@@ -42,6 +42,7 @@
   export let readonlyValue = value;
   export let prediction = false;
   export let downtimeSeverity;
+  export let dir;
   /**
    * To show prediction as dropdown
    */
@@ -318,6 +319,7 @@
     {autocapitalize}
     {autocorrect}
     {spellcheck}
+    {dir}
     use:formatterAction={formatter}
     use:focusAction={handleFocus}
     use:blurAction={handleBlur}
