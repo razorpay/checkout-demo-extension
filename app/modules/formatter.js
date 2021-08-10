@@ -487,6 +487,6 @@ formatDelegatorProto.add = function (ruleType, el) {
 
 formatDelegatorProto.destroy = function () {
   this.off();
-  this.bits.forEach((bit) => bit.unbind());
+  _Arr.loop(this.bits, (bit) => bit.unbind());
   this.bits = [];
 };

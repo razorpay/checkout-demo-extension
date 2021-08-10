@@ -114,7 +114,7 @@ export const deleteProp = _.curry2((o, key) => {
  * @returns {Object}
  */
 export const loop = _.curry2((o, iteratee) => {
-  keys(o).forEach(key => iteratee(o[key], key, o));
+  _Arr.loop(keys(o), key => iteratee(o[key], key, o));
   return o;
 });
 
@@ -212,7 +212,7 @@ export const unflatten = o => {
     const keys = key.split(delimiter);
     let _r = result;
 
-    keys.forEach((k, i) => {
+    _Arr.loop(keys, (k, i) => {
       /**
        * For all keys except the last, create objects and set to _r.
        * For the last key, set the value in _r.

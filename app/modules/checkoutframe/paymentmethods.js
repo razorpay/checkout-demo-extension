@@ -346,7 +346,8 @@ export function getMethodDowntimeDescription(
   ];
 
   // Check if there's another method available that is not down.
-  const isAnotherMethodAvailable = availableMethods.some(
+  const isAnotherMethodAvailable = _Arr.any(
+    availableMethods,
     (enabledMethod) => !_Arr.contains(downMethods, enabledMethod)
   );
 

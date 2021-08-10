@@ -67,7 +67,7 @@ const viewAgreement = (provider, duration) => {
   });
 };
 
-const fetchAgreements = (provider, loanUrl, plans = [], amount) => {
+const fetchAgreements = (provider, loanUrl, plans, amount) => {
   if (loanUrl.indexOf('?') < 0) {
     loanUrl += '?';
   } else {
@@ -83,7 +83,7 @@ const fetchAgreements = (provider, loanUrl, plans = [], amount) => {
     return;
   }
 
-  plans.forEach((plan) => {
+  _Arr.loop(plans, (plan) => {
     fetch({
       url: createUrlHelper(loanUrl, amount, plan.duration),
 

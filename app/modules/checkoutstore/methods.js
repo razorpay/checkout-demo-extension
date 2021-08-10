@@ -320,7 +320,7 @@ export function isCardOrEMIEnabled() {
 
 export function isDebitEMIEnabled() {
   const emiBanks = getEMIBanks();
-  return DEBIT_EMI_BANKS.some((bank) => emiBanks[bank]);
+  return DEBIT_EMI_BANKS |> _Arr.any((bank) => emiBanks[bank]);
 }
 
 export function isContactRequiredForEMI(bank, cardType) {
@@ -377,12 +377,13 @@ export function getSingleMethod() {
   methods = methods.filter((method) => consolidated_methods.includes(method));
 
   if (methods.length === 1) {
-    consolidated_methods.some((m) => {
-      if (m === methods[0]) {
-        oneMethod = m;
-        return true;
-      }
-    });
+    consolidated_methods
+      |> _Arr.any((m) => {
+        if (m === methods[0]) {
+          oneMethod = m;
+          return true;
+        }
+      });
     return oneMethod;
   }
 }
@@ -979,7 +980,8 @@ export function getWallets() {
   const result = enabledWallets
     .map((wallet) => wallets[wallet])
     .filter((wallet) => {
-      if (!wallet) {
+      // eslint-disable-next-line no-extra-boolean-cast
+      if (!Boolean(wallet)) {
         return false;
       }
       if (noRedirectFacebookWebViewSession) {

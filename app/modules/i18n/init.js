@@ -33,7 +33,7 @@ const LOCALES = {
 const ALLOWED_LOCALES = _Obj.keys(LOCALES);
 
 function isAllowedLocale(locale) {
-  return ALLOWED_LOCALES.some((allowedLocale) => locale === allowedLocale);
+  return _Arr.any(ALLOWED_LOCALES, (allowedLocale) => locale === allowedLocale);
 }
 
 /**

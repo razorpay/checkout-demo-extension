@@ -378,7 +378,7 @@ export const didUPIIntentSucceed = (parsedResponse) =>
  */
 const getPackageNames = (list) => {
   const arr = [];
-  list.forEach((app) => arr.push(app.package_name));
+  _Arr.loop(list, (app) => arr.push(app.package_name));
   return arr;
 };
 
@@ -400,7 +400,7 @@ export const doesAppExist = (packageName, list) =>
 const getUsableApps = () => {
   let apps = [];
 
-  UPI_APPS_ORDER.forEach((group) => {
+  _Arr.loop(UPI_APPS_ORDER, (group) => {
     apps = _Arr.merge(UPI_APPS[group], apps);
   });
 
@@ -415,7 +415,7 @@ const getUsableApps = () => {
 const getAllApps = () => {
   let apps = [];
 
-  Object.keys(UPI_APPS).forEach((group) => {
+  _Arr.loop(_Obj.keys(UPI_APPS), (group) => {
     apps = _Arr.merge(UPI_APPS[group], apps);
   });
 
@@ -440,7 +440,7 @@ export const getSortedApps = (allApps) => {
   // Get list of package names
   let usableApps = getUsableApps();
 
-  allApps.forEach((app, i) => {
+  _Arr.loop(allApps, (app, i) => {
     const appConfig = _Arr.find(usableApps, (usableApp) => {
       if (app.package_name) {
         return app.package_name === usableApp.package_name;
@@ -510,7 +510,7 @@ export const findAndReportNewApps = (allApps) => {
     (app) => app.package_name
   );
 
-  allApps.forEach((app) => {
+  _Arr.loop(allApps, (app) => {
     if (
       usablePackages.indexOf(app.package_name) < 0 &&
       blacklistedPackages.indexOf(app.package_name) < 0

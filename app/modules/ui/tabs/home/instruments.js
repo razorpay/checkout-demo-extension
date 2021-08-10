@@ -53,7 +53,7 @@ function isP13nInstrumentHiddenViaConfig(
   return !_Arr.every(
     individualInstruments,
     (individualInstrument) =>
-      !hiddenInstruments.some((hiddenInstrument) =>
+      !_Arr.any(hiddenInstruments, (hiddenInstrument) =>
         areInstrumentsSame(hiddenInstrument, individualInstrument)
       )
   );
@@ -324,8 +324,8 @@ export function setBlocks(
     return _instruments.length > 0;
   });
   // Add an ID to all instruments
-  allBlocks.forEach((block, blockIndex) => {
-    block.instruments.forEach((instrument, instrumentIndex) => {
+  _Arr.loop(allBlocks, (block, blockIndex) => {
+    _Arr.loop(block.instruments, (instrument, instrumentIndex) => {
       // set banner boolean (not releasing in 1st phase of walnut 369)
       // check for walnut369 enable, NC emi feature enable & walnut 369 not in any of other blocks
       // if (
@@ -414,7 +414,8 @@ function generateInstrumentId(
  */
 function getInstrumentBlock(instrument, blocks) {
   return _Arr.find(blocks, (block) => {
-    return block.instruments.some(
+    return _Arr.any(
+      block.instruments,
       (blockInstrument) => blockInstrument.id === instrument.id
     );
   });

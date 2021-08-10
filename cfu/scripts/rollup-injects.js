@@ -5,7 +5,7 @@ const globalContents = fs
 
 const globalInjects = globalContents
   .match(/export const ([^ =]+)/g)
-  .map((a) => a.slice(13));
+  .map(a => a.slice(13));
 
 let injects = {
   // this is rollup option, not an inject
@@ -21,7 +21,7 @@ let injects = {
   _Doc: ['fe/implicit/_Doc', '*'],
 };
 
-globalInjects.forEach((g) => {
+globalInjects.forEach(g => {
   injects[g] = ['fe/implicit/global', g];
 });
 

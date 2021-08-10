@@ -78,7 +78,8 @@ function hasOnlyAllowedKeys(instrument) {
   const instrumentKeys = instrument |> _Obj.keys |> _Arr.remove('method');
 
   // None of the instrumentKeys should be absent from allowedKeys
-  const anyAbsent = instrumentKeys.some(
+  const anyAbsent = _Arr.any(
+    instrumentKeys,
     (key) => !_Arr.contains(allowedKeys, key)
   );
 

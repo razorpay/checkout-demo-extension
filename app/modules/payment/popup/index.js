@@ -102,9 +102,7 @@ Popup.prototype = {
 
   close: function () {
     clearInterval(this.interval);
-    if (Array.isArray(this.listeners)) {
-      this.listeners.forEach((l) => l());
-    }
+    _Arr.loop(this.listeners, (l) => l());
     this.listeners = [];
     if (this.window) {
       this.window.close();

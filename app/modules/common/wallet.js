@@ -124,7 +124,7 @@ export const shouldTurnWalletToIntent = (wallet, apps = []) => {
   const walletPackage = getPackageNameForWallet(wallet);
 
   if (walletPackage) {
-    return apps.some((app) => app.package_name === walletPackage);
+    return _Arr.any(apps, (app) => app.package_name === walletPackage);
   }
 
   return false;

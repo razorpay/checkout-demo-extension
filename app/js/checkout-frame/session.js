@@ -1958,7 +1958,7 @@ Session.prototype = {
         return;
       }
 
-      var paymentMethod = this.payload && this.payload.method;
+      var paymentMethod = this.payload.method;
 
       self.confirmClose().then(function (close) {
         if (paymentMethod == 'netbanking' && close) {
@@ -2463,7 +2463,7 @@ Session.prototype = {
     if (screen) {
       var tabForTitle = this.tab === 'emi' ? this.tab : this.cardTab || screen;
 
-      if (tabForTitle && this.topBar) {
+      if (tabForTitle) {
         this.topBar.setTab(tabForTitle);
       }
     }
@@ -2939,12 +2939,10 @@ Session.prototype = {
       var invalidFields = {};
       var invalidValues = {};
 
-      if (Array.isArray(fields)) {
-        fields.forEach(function (field) {
-          invalidFields[field.name] = true;
-          invalidValues[field.name] = field.value;
-        });
-      }
+      _Arr.loop(fields, function (field) {
+        invalidFields[field.name] = true;
+        invalidValues[field.name] = field.value;
+      });
 
       Analytics.track('homescreen:fields:invalid', {
         data: {
@@ -5330,16 +5328,16 @@ Session.prototype = {
 
     var session = this;
 
-    views.forEach(function (_view) {
+    _Arr.loop(views, function (_view) {
       var view = session[_view];
 
       if (view) {
         try {
-          if (typeof view.$destroy === 'function') {
+          if (_.isFunction(view.$destroy)) {
             view.$destroy();
           }
 
-          if (typeof view.destroy === 'function') {
+          if (_.isFunction(view.destroy)) {
             view.destroy();
           }
         } catch (err) {}

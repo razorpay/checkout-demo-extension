@@ -42,7 +42,7 @@ export function ungroupInstruments(block, customer) {
   const instruments = block.instruments;
   let ungrouped = [];
 
-  instruments.forEach(instrument => {
+  _Arr.loop(instruments, (instrument) => {
     const individuals = getIndividualInstruments(instrument, customer);
 
     ungrouped.push(individuals);

@@ -239,7 +239,7 @@
       });
 
       // Enable ones that are asked for
-      instrument.flows.forEach((flow) => {
+      _Arr.loop(instrument.flows, (flow) => {
         availableFlows[flow] = true;
       });
     }

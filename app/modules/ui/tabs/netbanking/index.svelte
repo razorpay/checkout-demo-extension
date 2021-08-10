@@ -172,7 +172,7 @@
 
     let filteredBanks = {};
 
-    instrument.banks.forEach((code) => {
+    _Arr.loop(instrument.banks, (code) => {
       if (banks[code]) {
         filteredBanks[code] = banks[code];
       }

@@ -44,7 +44,7 @@ function copyMethodsIfNeeded(downtimes) {
 function groupDowntimesByMethod(allDowntimes) {
   const downtimes = {};
 
-  allDowntimes.forEach((downtime) => {
+  _Arr.loop(allDowntimes, (downtime) => {
     const { method } = downtime;
 
     if (!_Obj.hasProp(downtimes, method)) {

@@ -16,7 +16,7 @@ function genericPaymentPayloadGetter(instrument, payment, customer) {
 
   payment.method = method;
 
-  paymentKeys.forEach((key) => {
+  _Arr.loop(paymentKeys, (key) => {
     const value = instrument[key];
 
     if (!_.isUndefined(value)) {
@@ -53,10 +53,10 @@ export function genericGroupedToIndividual(grouped, customer) {
  *
  * @returns {Array<Object>}
  */
-function createCombinations(instrument, sequence = []) {
+function createCombinations(instrument, sequence) {
   let soFar = [];
 
-  sequence.forEach((key) => {
+  _Arr.loop(sequence, (key) => {
     const values = instrument[key];
 
     if (!values || !values.length) {
@@ -91,18 +91,16 @@ function createCombinations(instrument, sequence = []) {
   return soFar;
 }
 
-const cardProperties = ['types', 'iins', 'issuers', 'networks', 'token_id'];
-const upiProperties = ['flows', 'apps', 'token_id', 'vpas'];
 const config = {
   card: {
-    properties: cardProperties,
+    properties: ['types', 'iins', 'issuers', 'networks', 'token_id'],
     payment: ['token'],
     groupedToIndividual: (grouped, customer) => {
       const tokens = _Obj.getSafely(customer, 'tokens.items', []);
       const base = _Obj.clone(grouped);
 
       // Remove all extra properties
-      cardProperties.forEach((key) => {
+      _Arr.loop(['types', 'iins', 'issuers', 'networks', 'token_id'], (key) => {
         delete base[key];
       });
 
@@ -203,7 +201,7 @@ const config = {
   },
 
   upi: {
-    properties: upiProperties,
+    properties: ['flows', 'apps', 'token_id', 'vpas'],
     payment: ['flow', 'app', 'token', 'vpa'],
     groupedToIndividual: (grouped, customer) => {
       /**
@@ -223,7 +221,7 @@ const config = {
       const base = _Obj.clone(grouped);
 
       // Remove all extra properties
-      upiProperties.forEach((key) => {
+      _Arr.loop(['flows', 'apps', 'token_id', 'vpas'], (key) => {
         delete base[key];
       });
 
@@ -446,7 +444,7 @@ config.upi_otm = config.upi;
  *
  * eg: bank_transfer, paypal, gpay
  */
-AVAILABLE_METHODS.forEach((method) => {
+_Arr.loop(AVAILABLE_METHODS, (method) => {
   if (!config[method]) {
     config[method] = {};
   }

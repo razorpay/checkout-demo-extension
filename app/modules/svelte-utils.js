@@ -27,8 +27,8 @@ function getAnimationDuration(duration) {
 export function getAnimationOptions(animationOptions) {
   const durations = ['duration', 'delay'];
 
-  durations.forEach((property) => {
-    if (typeof animationOptions[property] !== 'undefined') {
+  _Arr.loop(durations, (property) => {
+    if (!_.isUndefined(animationOptions[property])) {
       animationOptions[property] = getAnimationDuration(
         animationOptions[property]
       );

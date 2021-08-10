@@ -52,7 +52,7 @@ function getExtractedDetails(payment, customer, extra = {}) {
 
   extractable.push('method');
 
-  extractable.forEach((item) => {
+  _Arr.loop(extractable, (item) => {
     if (typeof payment[item] !== 'undefined') {
       details[item] = payment[item];
     }
@@ -79,7 +79,7 @@ function getExtractedDetails(payment, customer, extra = {}) {
         details.token_id = token.id;
         delete details.token;
 
-        ['type', 'issuer', 'network'].forEach((key) => {
+        _Arr.loop(['type', 'issuer', 'network'], (key) => {
           if (cardDetails[key]) {
             details[key] = cardDetails[key];
           }
@@ -385,7 +385,7 @@ export const getInstrumentsForCustomer = (customer, extra = {}, source) => {
 
     if (source === 'storage') {
       // Add score for each instrument
-      instruments.forEach((instrument) => {
+      _Arr.loop(instruments, (instrument) => {
         let timeSincePayment = _.now() - instrument.timestamp;
         let tsScore = Math.exp(-TS_HALFLIFE * timeSincePayment);
         let countScore = 1 - Math.exp(-COUNT_HALFLIFE * instrument.frequency);
@@ -442,7 +442,7 @@ export function addInstrumentToPaymentData(payment, instrument, customer) {
 
   propsToExtract = ['method'].concat(propsToExtract);
 
-  propsToExtract.forEach((prop) => {
+  _Arr.loop(propsToExtract, (prop) => {
     if (!_.isUndefined(instrument[prop])) {
       payment[prop] = instrument[prop];
       added = true;

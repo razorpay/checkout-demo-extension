@@ -15,11 +15,7 @@ function on(event, sel, listener) {
 }
 
 function unbind() {
-  listeners.forEach((fx) => {
-    if (typeof fx === 'function') {
-      fx();
-    }
-  });
+  _Arr.callAll(listeners);
   listeners = [];
 }
 
