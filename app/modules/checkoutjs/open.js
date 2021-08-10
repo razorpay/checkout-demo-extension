@@ -87,8 +87,10 @@ var addAutoCheckoutButton = function (rzp) {
           options.callback_url = makeUrl('checkout/onyx') + '?data=' + data;
         } catch (err) {}
       }
-      Events.TrackBehav(MiscEvents.AUTOMATIC_CHECKOUT_CLICK, rzp);
+
       rzp.open();
+
+      Events.TrackBehav(MiscEvents.AUTOMATIC_CHECKOUT_CLICK);
       return false;
     });
 };
