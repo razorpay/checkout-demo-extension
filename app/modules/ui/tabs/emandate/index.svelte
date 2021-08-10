@@ -8,7 +8,7 @@
   import AccountNumberField from 'ui/elements/fields/emandate/AccountNumberField.svelte';
   import IfscField from 'ui/elements/fields/emandate/IfscField.svelte';
   import NameField from 'ui/elements/fields/emandate/NameField.svelte';
-  import { getDirectionForField } from 'ui/elements/fields/helpers';
+
   // Svelte imports
   import { fade } from 'svelte/transition';
 
@@ -100,8 +100,6 @@
   $accountType = prefilledAccountType;
   $authType = prefilledAuthType;
 
-  // set field directions
-  const dir = getDirectionForField();
   // Set tab title overrides
   session.topBar.setTitleOverride('netbanking', 'text', 'emandate_account');
 
@@ -353,7 +351,6 @@
             bankCode={$selectedBank}
             readonly={Boolean(prefillledBankAccount)}
             bind:value={$accountNumber}
-            {dir}
           />
 
           <IfscField
@@ -361,7 +358,6 @@
             name="bank_account[ifsc]"
             readonly={Boolean(prefilledIfsc)}
             bind:value={$ifsc}
-            {dir}
           />
 
           <NameField
@@ -369,7 +365,6 @@
             name="bank_account[name]"
             readonly={Boolean(prefilledName)}
             bind:value={$name}
-            {dir}
           />
 
           <div class="elem-wrap">

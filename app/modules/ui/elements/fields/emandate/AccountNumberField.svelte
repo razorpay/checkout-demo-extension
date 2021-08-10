@@ -17,7 +17,6 @@
   export let readonly;
 
   export let bankCode;
-  export let dir;
 
   export let value;
 
@@ -39,7 +38,6 @@
     {id}
     {readonly}
     {value}
-    {dir}
     label={$t(ACCOUNT_NUMBER_LABEL)}
     helpText={$t(ACCOUNT_NUMBER_HELP)}
     maxlength="20"

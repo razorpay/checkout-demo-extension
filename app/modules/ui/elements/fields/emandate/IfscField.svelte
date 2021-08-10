@@ -7,7 +7,6 @@
   export let id;
   export let name;
   export let readonly;
-  export let dir;
 
   export let value;
 
@@ -24,7 +23,6 @@
   {id}
   {readonly}
   {value}
-  {dir}
   label={$t(IFSC_LABEL)}
   helpText={$t(IFSC_HELP)}
   maxlength="11"
