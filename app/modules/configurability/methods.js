@@ -41,7 +41,7 @@ export function clusterRazorpayBlocks(blocks) {
     }
   }
 
-  _Arr.loop(blocks, (block) => {
+  blocks.forEach(block => {
     const isRazorpayMethodBlock = block._type === 'rzp_method';
 
     if (isRazorpayMethodBlock) {

@@ -16,7 +16,7 @@ function genericPaymentPayloadGetter(instrument, payment, customer) {
 
   payment.method = method;
 
-  _Arr.loop(paymentKeys, (key) => {
+  paymentKeys.forEach((key) => {
     const value = instrument[key];
 
     if (!_.isUndefined(value)) {
@@ -53,10 +53,10 @@ export function genericGroupedToIndividual(grouped, customer) {
  *
  * @returns {Array<Object>}
  */
-function createCombinations(instrument, sequence) {
+function createCombinations(instrument, sequence = []) {
   let soFar = [];
 
-  _Arr.loop(sequence, (key) => {
+  sequence.forEach((key) => {
     const values = instrument[key];
 
     if (!values || !values.length) {
@@ -91,16 +91,18 @@ function createCombinations(instrument, sequence) {
   return soFar;
 }
 
+const cardProperties = ['types', 'iins', 'issuers', 'networks', 'token_id'];
+const upiProperties = ['flows', 'apps', 'token_id', 'vpas'];
 const config = {
   card: {
-    properties: ['types', 'iins', 'issuers', 'networks', 'token_id'],
+    properties: cardProperties,
     payment: ['token'],
     groupedToIndividual: (grouped, customer) => {
       const tokens = _Obj.getSafely(customer, 'tokens.items', []);
       const base = _Obj.clone(grouped);
 
       // Remove all extra properties
-      _Arr.loop(['types', 'iins', 'issuers', 'networks', 'token_id'], (key) => {
+      cardProperties.forEach((key) => {
         delete base[key];
       });
 
@@ -201,7 +203,7 @@ const config = {
   },
 
   upi: {
-    properties: ['flows', 'apps', 'token_id', 'vpas'],
+    properties: upiProperties,
     payment: ['flow', 'app', 'token', 'vpa'],
     groupedToIndividual: (grouped, customer) => {
       /**
@@ -221,7 +223,7 @@ const config = {
       const base = _Obj.clone(grouped);
 
       // Remove all extra properties
-      _Arr.loop(['flows', 'apps', 'token_id', 'vpas'], (key) => {
+      upiProperties.forEach((key) => {
         delete base[key];
       });
 
@@ -444,7 +446,7 @@ config.upi_otm = config.upi;
  *
  * eg: bank_transfer, paypal, gpay
  */
-_Arr.loop(AVAILABLE_METHODS, (method) => {
+AVAILABLE_METHODS.forEach((method) => {
   if (!config[method]) {
     config[method] = {};
   }

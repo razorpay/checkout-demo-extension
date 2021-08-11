@@ -462,12 +462,11 @@ function updateEmandatePrefill() {
 
   const bank_account = order.bank_account;
   if (bank_account) {
-    ['ifsc', 'name', 'account_number', 'account_type']
-      |> _Arr.loop((key) => {
-        if (bank_account[key]) {
-          setOption(`prefill.bank_account[${key}]`, bank_account[key]);
-        }
-      });
+    ['ifsc', 'name', 'account_number', 'account_type'].forEach((key) => {
+      if (bank_account[key]) {
+        setOption(`prefill.bank_account[${key}]`, bank_account[key]);
+      }
+    });
   }
   if (order.bank) {
     setOption('prefill.bank', order.bank);

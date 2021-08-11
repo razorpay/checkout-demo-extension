@@ -30,13 +30,13 @@ var ERROR_TRACKING_URLS = [
 ];
 
 function isUrlApplicableForErrorTracking(url) {
-  return _Arr.any(ERROR_TRACKING_URLS, function (availableUrl) {
+  return ERROR_TRACKING_URLS.some(function (availableUrl) {
     return url.startsWith(availableUrl);
   });
 }
 
 window.onerror = function (errorMsg, url, lineNumber, column, errorObj) {
-  if (isString(url) && !isUrlApplicableForErrorTracking(url)) {
+  if (typeof url === 'string' && !isUrlApplicableForErrorTracking(url)) {
     return;
   }
 

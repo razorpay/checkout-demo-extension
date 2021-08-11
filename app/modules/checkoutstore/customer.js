@@ -8,6 +8,6 @@ customer.subscribe((updatedCustomer) => {
   // Update card metadata from customer tokens
   const tokenList = _Obj.getSafely(updatedCustomer, 'tokens.items');
   if (tokenList) {
-    _Arr.loop(tokenList, (t) => updateCardTokenMetadata(t.id, t.card));
+    tokenList.forEach((t) => updateCardTokenMetadata(t.id, t.card));
   }
 });

@@ -82,7 +82,7 @@ export default function Razorpay(overrides) {
     'integration_parent_version',
   ];
 
-  _Arr.loop(integrationKeys, (key) => {
+  integrationKeys.forEach((key) => {
     const value = this.get(`_.${key}`);
     if (value) {
       Track.props[key] = value;
@@ -342,28 +342,25 @@ export function makePrefParams(rzp) {
 
     params.currency = currency;
 
-    _Arr.loop(
-      [
-        'order_id',
-        'customer_id',
-        'invoice_id',
-        'payment_link_id',
-        'subscription_id',
-        'auth_link_id',
-        'recurring',
-        'subscription_card_change',
-        'account_id',
-        'contact_id',
-        'checkout_config_id',
-        'amount',
-      ],
-      function (key) {
-        var value = getter(key);
-        if (value) {
-          params[key] = value;
-        }
+    [
+      'order_id',
+      'customer_id',
+      'invoice_id',
+      'payment_link_id',
+      'subscription_id',
+      'auth_link_id',
+      'recurring',
+      'subscription_card_change',
+      'account_id',
+      'contact_id',
+      'checkout_config_id',
+      'amount',
+    ].forEach(function (key) {
+      var value = getter(key);
+      if (value) {
+        params[key] = value;
       }
-    );
+    });
 
     // To differentiate that preferences is being hit from Checkout
     // eslint-disable-next-line no-undef

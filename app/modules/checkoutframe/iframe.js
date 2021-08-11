@@ -58,20 +58,19 @@ const platformSpecific = {
     let CheckoutBridge = Bridge.defineIosBridge();
     var bridgeMethods = ['load', 'dismiss', 'submit', 'fault', 'success'];
 
-    bridgeMethods
-      |> _Arr.loop((prop) => {
-        let method;
+    bridgeMethods.forEach((prop) => {
+      let method;
 
-        if (Bridge.hasNewIosBridge()) {
-          method = (data) => {
-            handleNewIOSMethods(prop, data);
-          };
-        } else {
-          method = Bridge.iosLegacyMethod(prop);
-        }
+      if (Bridge.hasNewIosBridge()) {
+        method = (data) => {
+          handleNewIOSMethods(prop, data);
+        };
+      } else {
+        method = Bridge.iosLegacyMethod(prop);
+      }
 
-        CheckoutBridge['on' + prop] = method;
-      });
+      CheckoutBridge['on' + prop] = method;
+    });
 
     CheckoutBridge.oncomplete = CheckoutBridge.onsuccess;
   },

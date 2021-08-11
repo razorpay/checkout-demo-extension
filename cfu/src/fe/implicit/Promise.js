@@ -84,8 +84,7 @@ function finale(self) {
       }
     });
   }
-
-  self._deferreds |> _Arr.loop(v => handle(self, v));
+  (self._deferreds || []).forEach(v => handle(self, v));
   self._deferreds = null;
 }
 
@@ -154,8 +153,7 @@ Promise.all = function(args) {
     if (args.length === 0) return resolve([]);
     var remaining = args.length;
 
-    args
-      |> _Arr.loop(function res(val, i) {
+    args.forEach(function res(val, i) {
         try {
           if (_.isNonNullObject(val) || _.isFunction(val)) {
             if (_.isFunction(val.then)) {
@@ -179,7 +177,7 @@ Promise.reject = value => new Promise((resolve, reject) => reject(value));
 
 Promise.race = values =>
   new Promise(
-    (resolve, reject) => values |> _Arr.loop(v => v.then(resolve, reject))
+    (resolve, reject) => values.forEach(v => v.then(resolve, reject))
   );
 
 const globalPromise = global.Promise;

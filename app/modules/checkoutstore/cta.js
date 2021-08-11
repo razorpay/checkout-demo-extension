@@ -253,7 +253,7 @@ export function hideCta() {
 export function isCtaShown() {
   const session = getSession();
 
-  return _El.hasClass(session.body[0], 'sub');
+  return _El.hasClass(session.body?.[0], 'sub');
 }
 
 /**

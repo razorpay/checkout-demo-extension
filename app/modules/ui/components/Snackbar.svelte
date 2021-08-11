@@ -7,7 +7,9 @@
   let timeout;
 
   function setAlignmentClass() {
-    snackbar.classList.add(`snackbar-${align}`);
+    if (snackbar) {
+      snackbar.classList.add(`snackbar-${align}`);
+    }
   }
 
   export function removeSnackBar() {

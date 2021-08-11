@@ -87,14 +87,14 @@
    * @param {DOMNode} tooltip
    * @param {Array} directions
    */
-  function alignTooltipTo(tooltip, directions) {
+  function alignTooltipTo(tooltip, directions = []) {
     // Remove all directions.
-    _Arr.loop(ALL_DIRECTIONS, (direction) =>
+    ALL_DIRECTIONS.forEach((direction) =>
       _El.removeClass(tooltip, `tooltip-${direction}`)
     );
 
     // Align tooltip to provided directions.
-    _Arr.loop(directions, (direction) => {
+    directions.forEach((direction) => {
       if (!direction) {
         return;
       }
@@ -166,17 +166,17 @@
       directionsList.push([flipped]);
 
       // Flip the direction and add opposite axes.
-      _Arr.loop(opposite, (direction) => {
+      opposite.forEach((direction) => {
         directionsList.push([direction, flipped]);
       });
 
       // Use only the opposite axes.
-      _Arr.loop(opposite, (direction) => {
+      opposite.forEach((direction) => {
         directionsList.push([direction]);
       });
 
       // Last resort: use the overflow direction and flip axes.
-      _Arr.loop(opposite, (direction) => {
+      opposite.forEach((direction) => {
         directionsList.push([direction, overflowIn[0]]);
       });
     }

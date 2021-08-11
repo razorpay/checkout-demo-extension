@@ -76,7 +76,7 @@ Eventer.prototype = {
   },
 
   emit: function (event, arg) {
-    _Arr.loop(this._evts[event], (callback) => {
+    (this._evts[event] || []).forEach((callback) => {
       try {
         callback.call(this, arg);
       } catch (e) {
