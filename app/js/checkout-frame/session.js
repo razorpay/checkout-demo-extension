@@ -3690,7 +3690,11 @@ Session.prototype = {
         (this.screen === 'upi' || this.screen === 'upi_otm') &&
         (text === cancelMsg || text === discreet.cancelMsg)
       ) {
-        if (this.payload && this.payload['_[flow]'] === 'intent') {
+        if (
+          this.payload &&
+          (this.payload['_[flow]'] === 'intent' ||
+            this.payload.provider === 'google_pay')
+        ) {
           return;
         }
         return this.hideErrorMessage();
@@ -4681,15 +4685,52 @@ Session.prototype = {
 
     var session = this;
 
-    /**
-     * Google Pay Cards follows an older format.
-     * Soon it will be changed to method: app + provider: google_pay.
-     * After that happens, this if block can be deleted.
-     */
-    if (data.method === 'app' && data.provider === 'google_pay_cards') {
-      data.method = 'card';
-      data.application = 'google_pay';
-      delete data.provider;
+    // For these conditions use google pay card + upi merged flow,
+    // so make google pay intent call same as app so that
+    // only one thing is managed from here on
+    if (
+      data.method === 'upi' &&
+      data.upi_app === UPIUtils.GOOGLE_PAY_PACKAGE_NAME &&
+      this.hasGooglePaySdk &&
+      MethodStore.isGpayMergedFlowEnabled() &&
+      (this.googlePayWrapperVersion === '2' ||
+        this.googlePayWrapperVersion === 'both')
+    ) {
+      data.method = 'app';
+      data.provider = 'google_pay';
+
+      delete data.upi;
+      delete data.upi_app;
+      delete data['_[flow]'];
+    }
+
+    // For these condition use google pay upi half screen flow,
+    // we are doing so many conditions because we want to
+    // have back support for upi half screen flow in
+    // multiple scenarios
+    if (
+      data.method === 'upi' &&
+      data.upi_app === UPIUtils.GOOGLE_PAY_PACKAGE_NAME &&
+      this.hasGooglePaySdk &&
+      (this.googlePayWrapperVersion === '1' ||
+        (this.googlePayWrapperVersion === 'both' &&
+          !MethodStore.isGpayMergedFlowEnabled()))
+    ) {
+      request.external.gpay = true;
+      request['_[flow]'] = 'intent';
+    }
+
+    // This is for Google pay card + upi merged flow, so this will
+    // always happen via external google pay sdk. Payment started
+    // from card screen will always have this method and provider
+    // and we are converting upi payment to merged flow and
+    // updating method to `app` and provider to `google_pay`
+    if (
+      this.hasGooglePaySdk &&
+      data.method === 'app' &&
+      data.provider === 'google_pay'
+    ) {
+      request.external.gpay = true;
     }
 
     if (data.method === 'paypal') {
@@ -4892,25 +4933,6 @@ Session.prototype = {
       }
     }
 
-    if (data.method === 'upi') {
-      if (
-        this.hasGooglePaySdk &&
-        data.upi_app === UPIUtils.GOOGLE_PAY_PACKAGE_NAME
-      ) {
-        request.external.gpay = true;
-        request['_[flow]'] = 'intent';
-      }
-    }
-
-    if (
-      data.application === 'google_pay' ||
-      (data.method === 'app' && data.provider === 'google_pay_cards')
-    ) {
-      if (this.hasGooglePaySdk) {
-        request.external.gpay = true;
-      }
-    }
-
     if (this.modal) {
       this.modal.options.backdropclose = false;
     }
@@ -4949,8 +4971,8 @@ Session.prototype = {
       }
     }
 
-    if (data.method === 'app' || data.application) {
-      var provider = data.application || data.provider;
+    if (data.method === 'app') {
+      var provider = data.provider;
       Analytics.track('app:attempt', {
         data: {
           method: data.method,
@@ -5115,6 +5137,8 @@ Session.prototype = {
 
     var iosCheckoutBridgeNew = Bridge.getNewIosBridge();
 
+    // When the payment is handled by an external sdk that razorapy sdk interacts with,
+    // this passes on the coproto or the payment data to the razorpay sdk
     if (request.external.amazonpay || request.external.gpay) {
       payment.on('payment.externalsdk.process', function (data) {
         /* invoke external sdk via our SDK */

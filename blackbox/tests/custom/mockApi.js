@@ -324,6 +324,7 @@ module.exports = {
       cardless_emi: { earlysalary: true },
       paylater: [],
       google_pay_cards: false,
+      gpay: false,
       app: { cred: 0 },
       nach: false,
       bank_transfer: true,

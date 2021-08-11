@@ -190,7 +190,7 @@ const ALL_METHODS = {
         areAppsEnabled = true;
       }
     });
-    if (areAppsEnabled || getMerchantMethods().google_pay_cards) {
+    if (areAppsEnabled || isGpayMergedFlowEnabled()) {
       return true;
     }
     return false;
@@ -526,15 +526,12 @@ export function isUPIOtmFlowEnabled(method) {
 }
 
 export function isApplicationEnabled(app) {
-  const cardApps = getCardApps();
+  const allCardApps = getCardApps().all || [];
   const merchantMethods = getMerchantMethods();
 
   switch (app) {
-    case 'google_pay_cards':
-      return (
-        merchantMethods.google_pay_cards &&
-        _Arr.contains(cardApps.all, 'google_pay_cards')
-      );
+    case 'google_pay':
+      return isGpayMergedFlowEnabled() && allCardApps.includes('google_pay');
     case 'cred':
       return isCREDEnabled();
   }
@@ -544,6 +541,14 @@ export function isApplicationEnabled(app) {
 
 function isCREDEnabled() {
   return getMerchantMethods().app?.cred;
+}
+
+/**
+ * Checks if the google pay cards + upi merged flow is enabled.
+ * @returns {Boolean} true|false
+ */
+export function isGpayMergedFlowEnabled() {
+  return getMerchantMethods().gpay;
 }
 
 export function isCREDIntentFlowAvailable() {
@@ -886,11 +891,12 @@ export function getPayLaterProviders() {
 export function getAppProviders() {
   const merchantMethods = getMerchantMethods();
   const apps = _Obj.clone(merchantMethods.app || {});
-  if (merchantMethods.google_pay_cards) {
-    // Older preferences format for Google Pay Cards,
-    // if preferences.app contains google_pay_cards,
-    // then remove this hardcoded flag.
-    apps.google_pay_cards = true;
+  if (isGpayMergedFlowEnabled()) {
+    // Right now, we are checking on gpay method in preferences
+    // and updating in the app if it is enabled. When it starts
+    // coming in the `app` in preferences, we can remove this
+    // explicitly setting of `google_pay`.
+    apps.google_pay = true;
   }
   if (apps |> _Obj.isEmpty) {
     return [];

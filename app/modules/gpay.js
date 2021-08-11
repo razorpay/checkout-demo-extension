@@ -132,8 +132,8 @@ export function payWithMicroapp(intentUrl) {
   });
 }
 
-export const googlePayCardsCancelPayload = {
+export const googlePayMergedCancelPayload = {
   '_[method]': 'app',
-  '_[provider]': 'google_pay_cards',
+  '_[provider]': 'google_pay',
   '_[reason]': 'PAYMENT_CANCEL_ON_APP',
 };

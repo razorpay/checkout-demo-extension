@@ -85,7 +85,8 @@ $cardpl = 70px;
   }
 
   #add-card-container {
-    z-index: 0;
+    z-index: 1;
+    margin-bottom: 38px;
   }
 
   #show-add-card + .pad {
@@ -183,6 +184,7 @@ $cardpl = 70px;
 
 #saved-cards-container .cardtype,
 #show-saved-cards .cardtype,
+#app-card,
 #show-add-card::before {
   position: absolute;
   z-index: 1;
@@ -233,6 +235,29 @@ $cardpl = 70px;
   &::before {
     display: inline-block;
     content: '+';
+  }
+}
+
+#app-card {
+  position: relative;
+  margin-top: 0px;
+  left: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    height: 16px;
+    width: auto;
+  }
+}
+
+// The google pay logo that google recommends in the guidelines
+// is more wide, so should be taken care of explicitly
+#app-card[type=google_pay] {
+  img {
+    width: 22px;
+    height auto;
   }
 }
 

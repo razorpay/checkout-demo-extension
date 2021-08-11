@@ -216,16 +216,13 @@ export default function Payment(data, params = {}, r) {
      * data needs to be present. absence of data = placeholder popup in
      * payment paused state
      */
-    if (data.application || data.method === 'app') {
+    if (data.method === 'app') {
       // Obviously avoid popup if paying with an external application
       avoidPopup = true;
       if (data.provider === 'cred' && !data.app_present && !isRazorpayFrame()) {
         // CRED collect flow for razorpay.js
         avoidPopup = false;
       }
-    } else if (data.application || data.method === 'app') {
-      // Obviously avoid popup if paying with an external application
-      avoidPopup = true;
     }
 
     if (isRazorpayFrame()) {
@@ -309,6 +306,11 @@ export default function Payment(data, params = {}, r) {
 
   this.tryPopup();
 
+  // Method should not be sent for google pay card + upi merged flow
+  if (data && data.method === 'app' && data.provider === 'google_pay') {
+    delete data.method;
+  }
+
   if (params.paused) {
     try {
       this.writePopup();
@@ -391,13 +393,13 @@ Payment.prototype = {
     const isExternalSDKPayment =
       this.isExternalAmazonPayPayment || this.isExternalGooglePayPayment;
 
-    const isGooglePayCards =
-      this.isExternalGooglePayPayment && this.data.method === 'card';
-    // Fire external SDK payment process event.
-    // Avoid if it's a Google Pay Cards payment as
-    // we will fire this event after creating the payment on API.
+    const isGooglePayMerged =
+      this.isExternalGooglePayPayment && this.data.provider === 'google_pay';
 
-    if (isExternalSDKPayment && !isGooglePayCards) {
+    // Fire external SDK payment process event. Avoiding Google Pay Cards + upi merged flow
+    // payment here, as we will fire this event after creating the payment on API when the
+    // coproto is returned. It is Only for Amazon Pay and Google pay UPI half screen flow
+    if (isExternalSDKPayment && !isGooglePayMerged) {
       setCompleteHandler();
 
       return window.setTimeout(() => {

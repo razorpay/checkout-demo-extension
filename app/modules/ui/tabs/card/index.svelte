@@ -13,6 +13,7 @@
   import AppInstruments from 'ui/tabs/card/AppInstruments.svelte';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
   import { checkDowntime } from 'checkoutframe/downtimes';
+  import ToggleHeading from 'ui/components/common/heading/ToggleHeading.svelte';
 
   // Store
   import {
@@ -153,6 +154,9 @@
   // None of the apps support EMI currently,
   // Don't show it on anything except card tab.
   $: showApps = tab === 'card' && appsAvailable && userWantsApps;
+
+  let appsListExpandedOnSavedCard = true;
+  let appsListExpandedOnAddNewCard = false;
 
   let allSavedCards = [];
   let savedCards = [];
@@ -445,8 +449,8 @@
 
   function getAppPayload() {
     // TODO: Keep this mapping stored somewhere else when we add another app.
-    if ($selectedApp === 'google_pay_cards') {
-      return { method: 'app', provider: 'google_pay_cards' };
+    if ($selectedApp === 'google_pay') {
+      return { method: 'app', provider: 'google_pay' };
     } else if ($selectedApp === 'cred') {
       return getPayloadForCRED();
     }
@@ -686,6 +690,14 @@
   export function setTabVisible(status = true) {
     tabVisible = status;
   }
+
+  function toggleAppListOnAddNewCard() {
+    appsListExpandedOnAddNewCard = !appsListExpandedOnAddNewCard;
+  }
+
+  function toggleAppListOnSavedCard() {
+    appsListExpandedOnSavedCard = !appsListExpandedOnSavedCard;
+  }
 </script>
 
 <Tab method="card" pad={false} overrideMethodCheck>
@@ -720,19 +732,6 @@
             </div>
           {/if}
 
-          {#if showApps}
-            <!-- LABEL: Cards Saved on Apps -->
-            <h3 class="pad">{$t(CARDS_SAVED_ON_APPS_LABEL)}</h3>
-            <div id="cards-saved-on-apps" role="list" class="border-list pad">
-              <AppInstruments
-                {apps}
-                selectedApp={$selectedApp}
-                on:select={(e) => setSelectedApp(e.detail)}
-              />
-            </div>
-            <!-- LABEL: Or, Enter card details -->
-            <h3 class="pad">{$t(ENTER_CARD_DETAILS_OPTION_LABEL)}</h3>
-          {/if}
           <AddCardView
             {tab}
             faded={Boolean($selectedApp)}
@@ -750,6 +749,25 @@
               on:click={handleEmiCtaClick}
             />
           {/if}
+          {#if showApps}
+            <!-- LABEL: Pay with cards on other apps -->
+            <ToggleHeading
+              class="pad"
+              on:click={toggleAppListOnAddNewCard}
+              expanded={appsListExpandedOnAddNewCard}
+            >
+              {$t(CARDS_SAVED_ON_APPS_LABEL)}
+            </ToggleHeading>
+            {#if appsListExpandedOnAddNewCard}
+              <div role="list" class="border-list">
+                <AppInstruments
+                  {apps}
+                  selectedApp={$selectedApp}
+                  on:select={(e) => setSelectedApp(e.detail)}
+                />
+              </div>
+            {/if}
+          {/if}
         </div>
       {:else}
         <div in:fade={getAnimationOptions({ duration: 100 })}>
@@ -759,20 +777,8 @@
             </div>
           {/if}
 
-          {#if showApps}
-            <!-- LABEL: Cards Saved on Apps -->
-            <h3 class="pad">{$t(CARDS_SAVED_ON_APPS_LABEL)}</h3>
-            <div id="cards-saved-on-apps" role="list" class="border-list pad">
-              <AppInstruments
-                {apps}
-                selectedApp={$selectedApp}
-                on:select={(e) => setSelectedApp(e.detail)}
-              />
-            </div>
-            <!-- LABEL: Cards Saved on Apps -->
-            <h3 class="pad">{$t(CARDS_SAVED_ON_RZP_LABEL)}</h3>
-          {/if}
-
+          <!-- LABEL: Your saved cards -->
+          <h3 class="pad">{$t(CARDS_SAVED_ON_RZP_LABEL)}</h3>
           <div id="saved-cards-container">
             <SavedCards
               {tab}
@@ -788,6 +794,28 @@
             <!-- LABEL: Add another card -->
             {$t(ADD_ANOTHER_CARD_BTN)}
           </div>
+
+          {#if showApps}
+            <!-- LABEL: Pay with cards on other apps -->
+            <div class="apps-heading-container">
+              <ToggleHeading
+                class="pad"
+                on:click={toggleAppListOnSavedCard}
+                expanded={appsListExpandedOnSavedCard}
+              >
+                {$t(CARDS_SAVED_ON_APPS_LABEL)}
+              </ToggleHeading>
+            </div>
+            {#if appsListExpandedOnSavedCard}
+              <div role="list" class="border-list">
+                <AppInstruments
+                  {apps}
+                  selectedApp={$selectedApp}
+                  on:select={(e) => setSelectedApp(e.detail)}
+                />
+              </div>
+            {/if}
+          {/if}
         </div>
       {/if}
       {#if isShowMORTncEnabled() && $defaultDCCCurrency === 'USD'}
@@ -842,18 +870,15 @@
     position: relative; /* This is needed because the stupid network icon has position: absolute */
   }
 
-  .saved-cards-icon {
-    position: absolute;
-    left: 24px;
-    top: 10px;
-    border: 1px solid red;
-  }
-
   .tnc-link {
     text-decoration: underline;
   }
 
   .instrument-subtext-description {
     margin: 12px 0;
+  }
+
+  .apps-heading-container {
+    margin-top: 26px;
   }
 </style>

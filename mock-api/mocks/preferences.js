@@ -122,6 +122,7 @@ const preferences = {
       cardless_emi: [],
       paylater: { icic: true },
       google_pay_cards: true,
+      gpay: true,
       app: { cred: 1 },
       nach: false,
       emi_subvention: 'customer',
@@ -841,6 +842,7 @@ const preferences = {
       cardless_emi: { earlysalary: true, zestmoney: true, flexmoney: true },
       paylater: { epaylater: true, getsimpl: true, icic: true },
       google_pay_cards: false,
+      gpay: false,
       nach: false,
       bank_transfer: true,
       emi_subvention: 'customer',
@@ -1569,6 +1571,7 @@ const preferences = {
       cardless_emi: { earlysalary: true },
       paylater: { icic: true, hdfc: true },
       google_pay_cards: true,
+      gpay: true,
       app: { cred: 1 },
       nach: false,
       emi_subvention: 'customer',
@@ -2303,6 +2306,7 @@ const preferences = {
       cardless_emi: { earlysalary: true },
       paylater: { icic: true, hdfc: true },
       google_pay_cards: true,
+      gpay: true,
       app: { cred: 1 },
       nach: false,
       emi_subvention: 'customer',
@@ -3044,6 +3048,7 @@ const preferences = {
       cardless_emi: { earlysalary: true },
       paylater: { icic: true, hdfc: true },
       google_pay_cards: true,
+      gpay: true,
       app: { cred: 1 },
       nach: false,
       emi_subvention: 'customer',
@@ -3808,6 +3813,7 @@ const preferences = {
       cardless_emi: { earlysalary: true, zestmoney: true, flexmoney: true },
       paylater: [],
       google_pay_cards: false,
+      gpay: false,
       nach: false,
       emi_subvention: 'customer',
       emi_plans: {
@@ -4507,6 +4513,7 @@ const preferences = {
       cardless_emi: { earlysalary: true, zestmoney: true, flexmoney: true },
       paylater: [],
       google_pay_cards: false,
+      gpay: false,
       nach: false,
       emi_subvention: 'customer',
       emi_plans: {
@@ -5215,6 +5222,7 @@ const preferences = {
       cardless_emi: { earlysalary: true, zestmoney: true, flexmoney: true },
       paylater: [],
       google_pay_cards: false,
+      gpay: false,
       nach: false,
       emi_subvention: 'customer',
       emi_plans: {
@@ -6090,6 +6098,7 @@ const preferences = {
       cardless_emi: { earlysalary: true, zestmoney: true, flexmoney: true },
       paylater: [],
       google_pay_cards: false,
+      gpay: false,
       nach: false,
       emi_subvention: 'customer',
       emi_plans: {
@@ -6790,6 +6799,7 @@ const preferences = {
       cardless_emi: { earlysalary: true, zestmoney: true, flexmoney: true },
       paylater: [],
       google_pay_cards: false,
+      gpay: false,
       nach: false,
       emi_subvention: 'customer',
       emi_plans: {
@@ -7586,6 +7596,7 @@ const preferences = {
       cardless_emi: [],
       paylater: [],
       google_pay_cards: false,
+      gpay: false,
       nach: false,
       emi_subvention: 'customer',
       emi_plans: {
@@ -8103,6 +8114,7 @@ const preferences = {
       credit_card: true,
       prepaid_card: true,
       google_pay_cards: true,
+      gpay: true,
       card_networks: {
         AMEX: 1,
         DICL: 0,
@@ -8192,7 +8204,6 @@ const preferences = {
       upi: true,
       cardless_emi: { earlysalary: true, zestmoney: true },
       paylater: { epaylater: true, getsimpl: true, icic: true },
-      google_pay_cards: true,
       nach: false,
       bank_transfer: true,
       emi_subvention: 'customer',
@@ -9617,6 +9628,7 @@ const preferences = {
       cardless_emi: [],
       paylater: [],
       google_pay_cards: false,
+      gpay: false,
       cred: false,
       nach: false,
       recurring: {
@@ -10469,6 +10481,7 @@ const preferences = {
       cardless_emi: [],
       paylater: [],
       google_pay_cards: true,
+      gpay: true,
       app: {
         cred: 1,
         // "google_pay_cards": 1,

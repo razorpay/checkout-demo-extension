@@ -364,11 +364,10 @@ async function handleCREDUserValidation(context) {
 async function handleAppCreatePayment(context, { app, flow } = {}) {
   const req = await context.expectRequest();
   expect(req.url).toContain('create/ajax');
-  if (app === 'google_pay_cards') {
+  if (app === 'google_pay') {
     const body = querystring.parse(req.body);
     expect(body).toMatchObject({
-      method: 'card',
-      application: 'google_pay',
+      provider: 'google_pay',
     });
     expect(body).not.toHaveProperty('card[number]');
     await context.respondJSON({

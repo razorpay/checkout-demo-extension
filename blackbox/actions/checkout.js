@@ -396,7 +396,7 @@ module.exports = {
         message.upi_intents_data = upiApps;
       }
 
-      if (apps && apps.includes('google_pay_cards')) {
+      if (apps && apps.includes('google_pay')) {
         message.external_sdks = { googlepay: true };
       }
 

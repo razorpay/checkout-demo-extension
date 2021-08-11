@@ -25,7 +25,9 @@ const {
   handlePartialPayment,
 } = require('../tests/homescreen/actions');
 
-module.exports = function(testFeatures) {
+const { delay } = require('../util');
+
+module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'app',
     testFeatures
@@ -59,10 +61,10 @@ module.exports = function(testFeatures) {
 
       const apps = [];
 
-      if (app === 'google_pay_cards') {
-        preferences.methods.app = { google_pay_cards: true };
-        preferences.methods.google_pay_cards = true;
-        apps.push('google_pay_cards');
+      if (app === 'google_pay') {
+        preferences.methods.app = { google_pay: true };
+        preferences.methods.gpay = true;
+        apps.push('google_pay');
       } else if (app === 'cred') {
         preferences.methods.app = { cred: true };
         if (flow === 'intent') {
@@ -178,11 +180,14 @@ module.exports = function(testFeatures) {
       } else {
         await assertPaymentMethods(context);
         await selectPaymentMethod(context, 'card');
+        await page.waitForSelector('h3.pad');
+        await page.click('h3.pad');
         selector = `.instrument [value=${app}]`;
       }
 
       await page.waitForSelector(selector);
       await page.click(selector);
+      await delay(500);
 
       // await proceed(context);
       // ^ Internally checks for absence of #user-details

@@ -81,9 +81,10 @@ function externalSDKResponse(response = {}) {
 function handleGooglePaySDKResponse(response) {
   const { data } = response;
   const payment = getSession().getPayment();
+
   if (payment) {
     switch (data.apiResponse.type) {
-      case 'google_pay_cards':
+      case 'gpay_merged':
         payment.emit('app.intent_response', response);
         break;
       case 'gpay_inapp': // fallthrough intentional

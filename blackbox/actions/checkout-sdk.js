@@ -37,27 +37,33 @@ async function openSdkCheckout({
       }
     });
   } catch (err) {}
-  await page.exposeFunction('__CheckoutBridge_processPayment', async (data) => {
-    data = JSON.parse(data);
-    if (data.type === 'application') {
-      if (data.application_name === 'google_pay') {
-        await page.evaluate(() => {
-          window.externalSDKResponse({
-            provider: 'GOOGLE_PAY',
-            resultCode: -1,
-            data: {
-              apiResponse: {
-                type: 'google_pay_cards',
-              },
-            },
-          });
-        });
-        resolver(-1);
-        return;
+
+  try {
+    await page.exposeFunction(
+      '__CheckoutBridge_processPayment',
+      async (data) => {
+        data = JSON.parse(data);
+        if (data.type === 'application') {
+          if (data.application_name === 'google_pay') {
+            await page.evaluate(() => {
+              window.externalSDKResponse({
+                provider: 'GOOGLE_PAY',
+                resultCode: -1,
+                data: {
+                  apiResponse: {
+                    type: 'gpay_merged',
+                  },
+                },
+              });
+            });
+            resolver(-1);
+            return;
+          }
+        }
+        console.error('malformed callback data', data);
       }
-    }
-    console.error('malformed callback data', data);
-  });
+    );
+  } catch (error) {}
 
   if (params && params.platform === 'ios') {
     await page.evaluateOnNewDocument((options) => {
@@ -109,7 +115,7 @@ async function openSdkCheckout({
           //   We don't want this method to return a Promise!
           data = JSON.parse(data);
           if (data.method === 'card') {
-            if (data.code === 'google_pay_cards') {
+            if (data.code === 'google_pay') {
               return true;
             }
           }

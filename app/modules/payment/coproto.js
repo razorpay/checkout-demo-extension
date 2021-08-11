@@ -330,10 +330,10 @@ var responseTypes = {
 
       // Check the intent response
       if (response.provider === 'GOOGLE_PAY') {
-        if (response.data.apiResponse.type === 'google_pay_cards') {
+        if (response.data.apiResponse.type === 'gpay_merged') {
           if (response.resultCode === 0) {
             // Payment was cancelled on Google Pay app.
-            payment.emit('cancel', GPay.googlePayCardsCancelPayload);
+            payment.emit('cancel', GPay.googlePayMergedCancelPayload);
 
             return;
           }

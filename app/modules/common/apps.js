@@ -5,9 +5,10 @@ import RazorpayConfig from 'common/RazorpayConfig';
 const cdnUrl = RazorpayConfig.cdn;
 
 const providers = {
-  google_pay_cards: {
-    code: 'google_pay_cards',
+  google_pay: {
+    code: 'google_pay',
     logo: cdnUrl + 'app/googlepay.svg',
+    card_logo: cdnUrl + 'card/googlepay.svg',
     verify_registration: true,
     externalSDK: 'googlepay',
     isCompatibleWithSDK: ({ platform }) => {
@@ -30,7 +31,7 @@ export const getProvider = (code) => providers[code] || {};
 export const getAppsForMethod = (method) => {
   switch (method) {
     case 'card':
-      return [providers.google_pay_cards.code, providers.cred.code];
+      return [providers.google_pay.code, providers.cred.code];
     default:
       return [];
   }

@@ -55,7 +55,7 @@ const CARD_DESCRIPTION = (locale) => {
   // Show card type instead of card networks if apps are available.
   if (availableApps.length) {
     // Keep in order that we want to display
-    const APPS_ORDER = ['cred', 'google_pay_cards'];
+    const APPS_ORDER = ['cred', 'google_pay'];
     // Get the app names to show
     const apps =
       APPS_ORDER
