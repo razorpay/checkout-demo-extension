@@ -252,17 +252,24 @@ function fetchPrefs(session) {
     getPreferenecsParams(session.r),
     (preferences) => {
       session.prefCall = null;
-      
+
       if (preferences.error) {
         Razorpay.sendMessage({
           event: 'fault',
           data: preferences.error,
         });
-      } else if((preferences.fee_bearer && preferences.offers && preferences.offers.length > 0)) {
+      } else if (
+        preferences.fee_bearer && // CFB
+        !preferences.force_offer && // not Forced Offer
+        preferences.offers &&
+        preferences.offers.length > 0 &&
+        preferences.offers.filter((offer) => offer.type === 'instant').length >
+          0 // offers must have instant offer
+      ) {
         /**
-         * Failed Payment in offer+cfb fail opening of checkout
+         * Failed Payment in offer(instant)+cfb fail opening of checkout
          */
-         Razorpay.sendMessage({
+        Razorpay.sendMessage({
           event: 'fault',
           data: 'Payment Failed',
         });
