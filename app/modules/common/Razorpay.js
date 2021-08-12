@@ -133,6 +133,22 @@ Razorpay.emi = {
     var multiplier = Math.pow(1 + rate, length);
     return parseInt((principle * rate * multiplier) / (multiplier - 1), 10);
   },
+
+  calculatePlan: function (principle, length, rate) {
+    const installment = this.calculator(principle, length, rate);
+
+    /**
+     * Reusing principle so that we don't have discrepancy in recomputing total for no cost emi
+     *
+     * E.g. 6000 for 9 months No Cost EMI
+     * Installment = 666.67
+     * Total = installment*duration = 666.67*9 = 6000.03
+     *
+     * We want to avoid that ".03" that is shown to the user
+     */
+    const total = rate ? installment * length : principle;
+    return { total, installment };
+  },
 };
 
 function getPrefsJsonp(data, callback) {

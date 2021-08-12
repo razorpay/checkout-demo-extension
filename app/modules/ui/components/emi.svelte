@@ -81,7 +81,7 @@
   $: {
     let _plans = (banks[selected] || {}).plans || {};
     _plans = _Obj.map(_plans, (plan, duration) => {
-      let installment = Razorpay.emi.calculator(
+      let { installment, total } = Razorpay.emi.calculatePlan(
         amount,
         duration,
         plan.interest
@@ -98,7 +98,7 @@
         duration: duration,
         rate: plan.interest,
         monthly: session.formatAmountWithCurrency(installment),
-        total: session.formatAmountWithCurrency(installment * duration),
+        total: session.formatAmountWithCurrency(total),
       };
     });
 
