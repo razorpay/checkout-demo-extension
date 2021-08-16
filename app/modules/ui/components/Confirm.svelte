@@ -1,5 +1,9 @@
 <script>
-  import { showBackdrop, hideBackdrop } from 'checkoutstore/backdrop';
+  import {
+    showBackdrop,
+    hideBackdrop,
+    backdropVisible,
+  } from 'checkoutstore/backdrop';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -24,7 +28,7 @@
   export let negativeText = $t(CONFIRM_CANCEL_NEGATIVE_TEXT);
   export let onPositiveClick = Boolean;
   export let onNegativeClick = Boolean;
-
+  let previousBackdropState = null;
   let visible = false;
 
   function setConfirmDialog(state) {
@@ -32,6 +36,7 @@
   }
 
   export function show() {
+    previousBackdropState = $backdropVisible;
     showBackdrop();
     setConfirmDialog(true);
   }
@@ -51,7 +56,11 @@
   }
 
   function clickedNegative() {
-    setConfirmDialog(false);
+    if (previousBackdropState) {
+      setConfirmDialog(false);
+    } else {
+      hide();
+    }
     onNegativeClick();
   }
 </script>
