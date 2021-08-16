@@ -32,8 +32,7 @@ module.exports = {
               'upi://pay?pa=upi@razopay&pn=hhgdhd&tr=Lbon0ZQBgtuiRdr&tn=razorpay&am=1&cu=INR&mc=5411',
           },
           request: {
-            url:
-              'https://beta-api.stage.razorpay.in/v1/payments/pay_Gl4bNBKNmFCEre/status?key_id=rzp_test_tLtZXhTdaphIKd',
+            url: 'https://beta-api.stage.razorpay.in/v1/payments/pay_Gl4bNBKNmFCEre/status?key_id=rzp_test_tLtZXhTdaphIKd',
             method: 'GET',
           },
           ...defaultResponse,
@@ -43,8 +42,7 @@ module.exports = {
         return {
           type: 'first',
           request: {
-            url:
-              'https://api.razorpay.com/v1/gateway/mocksharp/payment?key_id=rzp_test_tLtZXhTdaphIKd',
+            url: 'https://api.razorpay.com/v1/gateway/mocksharp/payment?key_id=rzp_test_tLtZXhTdaphIKd',
             method: 'post',
             content: {
               action: 'authorize',
@@ -66,8 +64,7 @@ module.exports = {
           method: 'upi',
           provider: null,
           request: {
-            url:
-              'https://api.razorpay.com/v1/payments/pay_GicHVTbH92uewn/status?key_id=rzp_test_1DP5mmOlF5G5ag',
+            url: 'https://api.razorpay.com/v1/payments/pay_GicHVTbH92uewn/status?key_id=rzp_test_1DP5mmOlF5G5ag',
             method: 'GET',
           },
           ...defaultResponse,
@@ -78,8 +75,7 @@ module.exports = {
         return {
           type: 'first',
           request: {
-            url:
-              'https://api.razorpay.com/v1/gateway/mocksharp/payment?key_id=rzp_test_1DP5mmOlF5G5ag',
+            url: 'https://api.razorpay.com/v1/gateway/mocksharp/payment?key_id=rzp_test_1DP5mmOlF5G5ag',
             method: 'post',
             content: {
               action: 'authorize',
@@ -99,8 +95,7 @@ module.exports = {
         return {
           type: 'otp',
           request: {
-            url:
-              'https://api.razorpay.com/v1/payments/pay_GcGmzHFHZZzq74/otp_submit/cacca7175741ce9b01a965e3b51de10f5e4b075a?key_id=rzp_test_1DP5mmOlF5G5ag',
+            url: 'https://api.razorpay.com/v1/payments/pay_GcGmzHFHZZzq74/otp_submit/cacca7175741ce9b01a965e3b51de10f5e4b075a?key_id=rzp_test_1DP5mmOlF5G5ag',
             method: 'post',
             content: { next: ['resend_otp'] },
           },
@@ -330,15 +325,15 @@ module.exports = {
       bank_transfer: true,
       emi_subvention: 'merchant',
       emi_plans: {
-        HDFC: { min_amount: 300000, plans: { '6': 1, '9': 1, '12': 1.23 } },
-        HSBC: { min_amount: 350000, plans: { '3': 1 } },
-        AMEX: { min_amount: 1349900, plans: { '9': 1 } },
-        ICIC: { min_amount: 300000, plans: { '12': 1 } },
-        BAJAJ: { min_amount: 300000, plans: { '6': 1, '9': 1 } },
-        NULL: { min_amount: 300000, plans: { '3': 0.01, '6': 1, '9': 0.12 } },
-        RATN: { min_amount: 300000, plans: { '3': 1, '6': 12.34 } },
-        UTIB: { min_amount: 100000, plans: { '3': 10 } },
-        KKBK: { min_amount: 300000, plans: { '3': 12, '9': 14 } },
+        HDFC: { min_amount: 300000, plans: { 6: 1, 9: 1, 12: 1.23 } },
+        HSBC: { min_amount: 350000, plans: { 3: 1 } },
+        AMEX: { min_amount: 1349900, plans: { 9: 1 } },
+        ICIC: { min_amount: 300000, plans: { 12: 1 } },
+        BAJAJ: { min_amount: 300000, plans: { 6: 1, 9: 1 } },
+        NULL: { min_amount: 300000, plans: { 3: 0.01, 6: 1, 9: 0.12 } },
+        RATN: { min_amount: 300000, plans: { 3: 1, 6: 12.34 } },
+        UTIB: { min_amount: 100000, plans: { 3: 10 } },
+        KKBK: { min_amount: 300000, plans: { 3: 12, 9: 14 } },
       },
       emi_options: {
         HDFC: [

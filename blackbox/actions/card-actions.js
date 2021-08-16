@@ -119,7 +119,7 @@ async function enterCardDetails(
   let cardNumber = '376939393939397';
 
   async function respondToIin(context) {
-    await context.expectRequest(req => {});
+    await context.expectRequest((req) => {});
 
     const response = { http_status_code: 200 };
     const flows = {
@@ -222,7 +222,7 @@ async function respondSavedCards(
   await delay(600);
 }
 
-const getCardCurrencies = amount => {
+const getCardCurrencies = (amount) => {
   const normalizer = amount / 50000;
   return {
     recurring: false,
@@ -279,7 +279,7 @@ const getCardCurrencies = amount => {
   };
 };
 
-const getDisplayAmount = currencyConfig => {
+const getDisplayAmount = (currencyConfig) => {
   const { symbol, denomination, amount } = currencyConfig;
   const precision = Math.log10(denomination);
   return symbol + ' ' + (amount / denomination).toFixed(precision);
@@ -319,15 +319,15 @@ async function selectSavedCardAndTypeCvv(context) {
 }
 
 async function verifyAmount(context, currency) {
-  const {options} = context;
-  if(options.amount >= 1e5) { // >= 1k
+  const { options } = context;
+  if (options.amount >= 1e5) {
+    // >= 1k
     // skip validation as getDisplayAmount is not written for amount > 1k
     return;
   }
   const originalAmount = context.options.amount;
-  const currencyConfig = getCardCurrencies(originalAmount).all_currencies[
-    currency
-  ];
+  const currencyConfig =
+    getCardCurrencies(originalAmount).all_currencies[currency];
   const displayAmount = getDisplayAmount(currencyConfig);
   const amountInHeader = (await innerText('#amount')).trim();
   expect(amountInHeader).toEqual(displayAmount);

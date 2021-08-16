@@ -1,6 +1,7 @@
 const defaultExperiments = {
   home_2019: 0,
   cards_separation: 0,
+  one_click_upi_intent: 0,
 };
 
 /**

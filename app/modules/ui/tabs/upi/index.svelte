@@ -1,8 +1,7 @@
 <script>
   // Svelte imports
   import { onMount, tick } from 'svelte';
-  import { slide } from 'svelte/transition';
-  import { _ as t, locale } from 'svelte-i18n';
+  import { _ as t } from 'svelte-i18n';
 
   // Util imports
   import { getSession } from 'sessionmanager';
@@ -20,16 +19,11 @@
     isUPIOtmFlowEnabled,
   } from 'checkoutstore/methods';
   import { isVpaValid } from 'common/upi';
-  import {
-    doesAppExist,
-    GOOGLE_PAY_PACKAGE_NAME,
-    otherAppsIcon,
-    getUPIAppDataFromHandle,
-  } from 'common/upi';
+  import { getUPIAppDataFromHandle } from 'common/upi';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { Formatter } from 'formatter';
-  import { hideCta, showCtaWithDefaultText, showCta } from 'checkoutstore/cta';
+  import { hideCta, showCta } from 'checkoutstore/cta';
   import { filterUPITokens } from 'common/token';
   import { getUPIIntentApps } from 'checkoutstore/native';
   import {
@@ -38,27 +32,16 @@
   } from 'checkoutstore/screens/upi';
   import { checkDowntime } from 'checkoutframe/downtimes';
 
-  import {
-    getAmount,
-    getName,
-    getCurrency,
-    isASubscription,
-    getSubscription,
-  } from 'checkoutstore';
+  import { getName, isASubscription, getSubscription } from 'checkoutstore';
 
   // UI imports
   import UpiIntent from './UpiIntent.svelte';
   import UpiBottom from './Bottom.svelte';
   import BankSelection from './BankSelection.svelte';
   import Tab from 'ui/tabs/Tab.svelte';
-  import Grid from 'ui/layouts/grid/index.svelte';
-  import Card from 'ui/elements/Card.svelte';
   import ListHeader from 'ui/elements/ListHeader.svelte';
-  import Field from 'ui/components/Field.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
-  import Collect from './Collect.svelte';
-  import GooglePayCollect from './GooglePayCollect.svelte';
   import GooglePayOmnichannel from './GooglePayOmnichannel.svelte';
   import NextOption from 'ui/elements/options/NextOption.svelte';
   import Screen from 'ui/layouts/Screen.svelte';
@@ -70,7 +53,6 @@
   import updateScore from 'analytics/checkoutScore';
 
   // Store
-  import { contact } from 'checkoutstore/screens/home';
   import { customer } from 'checkoutstore/customer';
   import { methodInstrument } from 'checkoutstore/screens/home';
   import { isRecurring } from 'checkoutstore';
@@ -78,20 +60,17 @@
   import {
     UPI_COLLECT_BLOCK_HEADING,
     UPI_COLLECT_BLOCK_SUBHEADING,
-    UPI_COLLECT_NEW_VPA_HELP,
-    UPI_COLLECT_ENTER_ID,
-    UPI_COLLECT_SAVE,
     QR_BLOCK_HEADING,
     SHOW_QR_CODE,
     SCAN_QR_CODE,
-    UPI_OTM_CALLOUT,
     UPI_RECURRING_CAW_CALLOUT_ALL_DATA,
     UPI_RECURRING_CAW_CALLOUT_NO_NAME,
     UPI_RECURRING_CAW_CALLOUT_NO_NAME_NO_FREQUENCY,
     UPI_RECURRING_CAW_CALLOUT_NO_FREQUENCY,
-    UPI_RECURRING_SUBSCRIPTION_CALLOUT,
     ID_LINKED_TO_BANK,
   } from 'ui/labels/upi';
+
+  import { oneClickUPIIntent } from 'upi/helper';
 
   // Props
   export let selectedApp = undefined;
@@ -369,6 +348,8 @@
     }
   }
 
+  let oneClickUPIIntentFlow = false;
+
   onMount(() => {
     /* TODO: improve handling of `prefill.vpa` */
     if (getPrefilledVPA()) {
@@ -381,6 +362,12 @@
 
     qrIcon = session.themeMeta.icons.qr;
   });
+
+  $: {
+    if (intent && intentApps.length) {
+      oneClickUPIIntentFlow = oneClickUPIIntent();
+    }
+  }
 
   function addDowntime() {
     tokens.map((item) => {
@@ -738,6 +725,7 @@
           <UpiIntent
             apps={intentApps || []}
             selected={intentAppSelected}
+            skipCTA={oneClickUPIIntentFlow}
             on:select={(e) => {
               const { downtimeInstrument, downtimeSeverity, packageName } =
                 e.detail;
@@ -749,6 +737,9 @@
                   instrument: downtimeInstrument,
                 },
               });
+              if (oneClickUPIIntentFlow) {
+                session.preSubmit();
+              }
             }}
             {showRecommendedUPIApp}
           />

@@ -13,7 +13,6 @@ import {
   isIRCTC,
   hasFeature,
   isPayout,
-  isOfferForced,
   isASubscription,
   getCallbackUrl,
   isCustomerFeeBearer,
@@ -24,8 +23,6 @@ import {
   getMinimumAmountFromPlans,
   getEMIBank,
 } from 'common/emi';
-
-import { CRED_PACKAGE_NAME } from 'common/upi';
 
 import {
   getEligibleProvidersBasedOnMinAmount,
@@ -39,7 +36,6 @@ import { wallets, getSortedWallets } from 'common/wallet';
 import { extendConfig } from 'common/cardlessemi';
 
 import {
-  mobileQuery,
   isFacebookWebView,
   getOS,
   isMobileByMediaQuery,

@@ -14,6 +14,7 @@
   import SavedCardInstrument from './SavedCardInstrument.svelte';
   import SkeletonInstrument from './SkeletonInstrument.svelte';
   import UpiAppMethodInstrument from './UpiAppMethodInstrument.svelte';
+  import { oneClickUPIIntent } from 'upi/helper';
 
   // Props
   export let instrument;
@@ -21,7 +22,16 @@
   const isInstrumentLoading = instrument._loading;
   const dispatch = createEventDispatcher();
 
+  let skipCTAClick = false;
+  $: {
+    skipCTAClick =
+      instrument?.method === 'upi' &&
+      instrument?.flows?.[0] === 'intent' &&
+      oneClickUPIIntent();
+  }
+
   function dispatchSelect() {
+    instrument.skipCTAClick = skipCTAClick;
     dispatch('selectInstrument', instrument);
   }
 </script>
@@ -35,5 +45,10 @@
 {:else if instrument.vendor_vpa}
   <UpiAppMethodInstrument {instrument} on:click={dispatchSelect} on:click />
 {:else}
-  <RadioInstrument {instrument} on:click={dispatchSelect} on:click />
+  <RadioInstrument
+    skipCTA={skipCTAClick}
+    {instrument}
+    on:click={dispatchSelect}
+    on:click
+  />
 {/if}

@@ -1,4 +1,3 @@
-import GlobalOffers from './global';
 import {
   isPartialPayment,
   getMerchantOffers,
@@ -6,7 +5,6 @@ import {
 } from 'checkoutstore';
 import {
   isMethodEnabled,
-  getWallets,
   getCardlessEMIProviders,
 } from 'checkoutstore/methods';
 
@@ -20,7 +18,6 @@ import {
   isSavedCardInstrument,
   isInstrumentForEntireMethod,
 } from 'configurability/instruments';
-
 /**
  * Checks if offer is eligible.
  *
@@ -30,7 +27,6 @@ import {
  */
 const isOfferEligible = (offer) => {
   const method = offer.payment_method;
-  let isEnabled;
 
   if (method === 'cardless_emi') {
     if (offer.provider) {
@@ -137,7 +133,6 @@ function isOfferEligibleOnInstrument(offer, instrument) {
 
   const sessionHasEmi = _Arr.contains(sequence, 'emi');
   const isOfferForEmi = offer.payment_method === 'emi';
-  const isInstrumentForEmi = instrument.method === 'emi';
   const isInstrumentForCardlessEmi = instrument.method === 'cardless_emi';
 
   if (isInstrumentForCardlessEmi && sessionHasEmi && isOfferForEmi) {

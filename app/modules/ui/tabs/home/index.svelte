@@ -928,6 +928,11 @@
           inline: 'center',
         });
       }
+      // SKIP CTA click check
+      if (instrument.skipCTAClick) {
+        delete instrument.skipCTAClick;
+        attemptPayment();
+      }
     }
   }
 </script>

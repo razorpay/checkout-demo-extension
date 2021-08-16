@@ -7,21 +7,15 @@
 
   // Utils imports
   import { getSession } from 'sessionmanager';
-  import { GOOGLE_PAY_PACKAGE_NAME, isVpaValid } from 'common/upi';
-  import Analytics from 'analytics';
-  import * as AnalyticsTypes from 'analytics-types';
 
   import { getDowntimes } from 'checkoutstore';
 
   // UI imports
   import DeprecatedRadioOption from 'ui/elements/options/DeprecatedRadioOption.svelte';
   import NextOption from 'ui/elements/options/NextOption.svelte';
-  import OptionIcon from 'ui/elements/options/OptionIcon.svelte';
-  import Field from 'ui/components/Field.svelte';
   import ListHeader from 'ui/elements/ListHeader.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
-  import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
 
   import { getMiscIcon } from 'checkoutframe/icons';
   import { checkDowntime } from 'checkoutframe/downtimes';
@@ -39,6 +33,7 @@
   export let selected = null;
   export let showRecommendedUPIApp;
   export let selectedApp;
+  export let skipCTA = false;
 
   // Computed
   export let showableApps;
@@ -114,6 +109,8 @@
         on:select={onAppSelect}
         name="upi_app"
         value={app.package_name}
+        showRadio={!skipCTA}
+        showArrow={skipCTA}
       >
         <div class="ref-title" data-name={app.shortcode}>
           {getUpiIntentAppName(app.shortcode, $locale, app.app_name)}

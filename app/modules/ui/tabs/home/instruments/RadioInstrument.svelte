@@ -4,6 +4,7 @@
 
   // UI imports
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
+  import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import ContactField from 'ui/components/ContactField.svelte';
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
@@ -48,6 +49,7 @@
   // Props
   export let instrument = {};
   export let name = 'instrument';
+  export let skipCTA = false;
   let downtimeSeverity;
   let downtimeInstrument = '';
 
@@ -259,45 +261,70 @@
   }
 </script>
 
-<SlottedRadioOption
-  ellipsis
-  {name}
-  {selected}
-  className="instrument"
-  attributes={{
-    'data-type': 'individual',
-    'data-id': instrument.id,
-    'data-code': code,
-  }}
-  value={instrument.id}
-  expandOnSelect={contactRequired}
-  on:click
-  on:keydown={attemptSubmit}
->
-  <i slot="icon">
-    <Icon {icon} alt="" />
-  </i>
-  <div slot="title">{title}</div>
-  <div slot="body">
-    {#if contactRequired}
-      <ContactField bind:country={$proxyCountry} bind:phone={$proxyPhone} />
-    {/if}
-  </div>
-  <div slot="subtitle" class="subtitle">
-    {#if subtitle}
-      {subtitle}
-    {/if}
-  </div>
-  <div slot="downtime" class="downtime-preferred-method">
-    {#if !!downtimeSeverity}
-      <DowntimeCallout
-        showIcon={true}
-        severe={downtimeSeverity}
-        {downtimeInstrument}
-      />
-    {/if}
-  </div>
-</SlottedRadioOption>
+{#if skipCTA}
+  <SlottedOption
+    ellipsis
+    {name}
+    value={instrument.id}
+    radio={false}
+    className="instrument"
+    attributes={{
+      'data-type': 'individual',
+      'data-id': instrument.id,
+      'data-code': code,
+    }}
+    on:click
+  >
+    <i slot="icon">
+      <Icon {icon} alt="" />
+    </i>
+    <div slot="title">{title}</div>
+    <div slot="subtitle">
+      {#if subtitle}{subtitle}{/if}
+    </div>
+    <div slot="extra"><span class="theme-highlight-color">&#xe604;</span></div>
+  </SlottedOption>
+{:else}
+  <SlottedRadioOption
+    ellipsis
+    {name}
+    {selected}
+    className="instrument"
+    attributes={{
+      'data-type': 'individual',
+      'data-id': instrument.id,
+      'data-code': code,
+    }}
+    value={instrument.id}
+    expandOnSelect={contactRequired}
+    on:click
+    on:keydown={attemptSubmit}
+  >
+    <i slot="icon">
+      <Icon {icon} alt={instrument.id} />
+    </i>
+    <div slot="title">{title}</div>
+    <div slot="body">
+      {#if contactRequired}
+        <ContactField bind:country={$proxyCountry} bind:phone={$proxyPhone} />
+      {/if}
+    </div>
+    <div slot="subtitle" class="subtitle">
+      {#if subtitle}
+        {subtitle}
+      {/if}
+    </div>
+    <div slot="downtime" class="downtime-preferred-method">
+      {#if !!downtimeSeverity}
+        <DowntimeCallout
+          showIcon={true}
+          severe={downtimeSeverity}
+          {downtimeInstrument}
+        />
+      {/if}
+    </div>
+  </SlottedRadioOption>
+{/if}
 
 <style>
   .downtime-preferred-method {
@@ -307,5 +334,10 @@
   .subtitle {
     white-space: pre-wrap;
     font-size: 10px;
+  }
+
+  span {
+    display: inline-block;
+    transform: rotate(180deg);
   }
 </style>

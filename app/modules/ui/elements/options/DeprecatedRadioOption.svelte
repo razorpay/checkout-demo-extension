@@ -13,6 +13,7 @@
   export let showRadio = true;
   export let name = '';
   export let value = '';
+  export let showArrow = false;
 
   // Computed
   export let classes;
@@ -41,5 +42,17 @@
   </div>
   {#if showRadio}
     <Radio checked={selected} {name} {value} />
+  {:else if showArrow}
+    <span class="theme-highlight-color">&#xe604;</span>
   {/if}
 </DeprecatedOption>
+
+<style>
+  span {
+    display: inline-block;
+    transform: rotate(180deg);
+    position: absolute;
+    right: 16px;
+    top: 16px;
+  }
+</style>

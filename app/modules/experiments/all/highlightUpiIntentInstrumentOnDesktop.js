@@ -9,3 +9,8 @@ export const EXPERIMENT_NAME = 'highlight_upi_intent_instruments_on_desktop';
 export function isHighlightUpiIntentInstrumentExperimentEnabled() {
   return getSegmentOrCreate(EXPERIMENT_NAME) === 1;
 }
+
+export const HIGHLIGHT_UPI_INTENT_INSTRUMENTS_ON_DESKTOP = {
+  name: EXPERIMENT_NAME,
+  evaluator: () => (Math.random() < 0.5 ? 0 : 1),
+};
