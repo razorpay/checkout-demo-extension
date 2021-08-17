@@ -133,10 +133,6 @@ var PayLaterStore = {
  */
 var BackStore = null;
 
-function confirmClose() {
-  return confirm(I18n.format('misc.confirm_cancel'));
-}
-
 /**
  * A valid contact can only contain
  * - number
@@ -1469,18 +1465,19 @@ Session.prototype = {
       branding: CardlessEmiStore.lenderBranding[providerCode],
 
       on: {
-        back: bind(function () {
-          var payment = this.r._payment;
+        back: bind(function (confirmedCancel) {
+          var payment = self.r._payment;
 
-          // TODO: Use this.confirmClose() which returns a promise,
-          // Will need refactoring because there's a dependency
-          // on the return value.
-          if (payment && confirmClose()) {
-            this.clearRequest({
-              '_[reason]': 'PAYMENT_CANCEL_BEFORE_PLAN_SELECT',
+          if (confirmedCancel !== true && payment) {
+            self.confirmClose().then(function (confirmed) {
+              if (confirmed) {
+                self.clearRequest({
+                  '_[reason]': 'PAYMENT_CANCEL_BEFORE_PLAN_SELECT',
+                });
+
+                self.switchTab('cardless_emi');
+              }
             });
-
-            this.switchTab('cardless_emi');
           }
 
           return true;
