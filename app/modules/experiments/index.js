@@ -1,6 +1,7 @@
 import CurrentExperiments from './current';
 import BrowserStorage from 'browserstorage';
 export { isCardsSeparationExperimentEnabled } from './all/cards-separation';
+export { delayLoginOTP } from './all/delay-login-otp';
 
 const STORAGE_KEY = 'rzp_checkout_exp';
 

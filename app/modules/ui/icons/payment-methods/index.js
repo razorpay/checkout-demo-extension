@@ -20,6 +20,7 @@ import refund from './refund';
 import donationHeart from './donate_heart';
 import newWindow from './new_window';
 import tickFlag from './tick_flag';
+import savedCard from 'card/icons/saved-card';
 
 import { getAllMethods } from 'checkoutframe/paymentmethods';
 
@@ -36,6 +37,7 @@ const availIconNames = getAllMethods().concat([
   'donate_heart',
   'tick_flag',
   'new_window',
+  'saved_card',
 ]);
 
 function getIconFn(iconName) {
@@ -110,6 +112,9 @@ function getIconFn(iconName) {
 
     case 'new_window':
       return newWindow;
+
+    case 'saved_card':
+      return savedCard;
   }
 }
 

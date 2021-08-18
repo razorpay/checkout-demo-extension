@@ -2959,10 +2959,12 @@ Session.prototype = {
   },
   tabSwitchStart: 0,
   tabsCount: 0,
-  switchTab: function (tab) {
+  switchTab: function (tab, payload) {
     /**
      * Validate fields on common screen.
      */
+    /** it will be override everytime switch tab uses */
+    this.switchTabPayload = payload;
     this.tabsCount++;
     if (this.tabsCount > 5) {
       updateScore('switchingTabs', { tabsCount: this.tabsCount });
@@ -3081,7 +3083,7 @@ Session.prototype = {
         this.updateCustomerInStore();
         this.svelteCardTab.showLandingView();
       }
-      this.showCardTab(tab);
+      this.showCardTab();
       cardTab.setEmiPlansCta(this.screen, tab);
     } else {
       if (
@@ -3115,7 +3117,7 @@ Session.prototype = {
     }
   },
 
-  showCardTab: function (tab) {
+  showCardTab: function () {
     this.otpView.updateScreen({
       maxlength: 6,
     });
@@ -3125,6 +3127,14 @@ Session.prototype = {
     var self = this;
     var customer = self.getCurrentCustomer();
     var remember = Store.shouldRememberCustomer();
+
+    var skipOTPFlow = discreet.Experiments.delayLoginOTP();
+    /**
+     * tab is selected from p13n block which says 'Use your saved cards' ask otp always
+     */
+    if (this.switchTabPayload && this.switchTabPayload.preferred) {
+      skipOTPFlow = false;
+    }
 
     if (!remember) {
       return self.setScreen('card');
@@ -3140,29 +3150,47 @@ Session.prototype = {
      * When the user comes back to the card tab after selecting EMI plan,
      * do not commence OTP again.
      */
-    if (!customer.logged && !this.wants_skip && this.screen !== 'card') {
-      self.commenceOTP('saved_cards_sending', 'saved_cards_access', {
-        phone: getPhone(),
-      });
-      var smsHash = this.get('send_sms_hash') && this.sms_hash;
-      var params = {};
-      if (smsHash) {
-        params.sms_hash = smsHash;
-      }
-      customer.checkStatus(function () {
-        /**
-         * 1. If customer has saved cards and is not logged in, ask for OTP.
-         * 2. If customer doesn't have saved cards, show cards screen.
-         */
-        if (customer.saved && !customer.logged) {
-          askOTP(self.otpView, undefined, true, { phone: getPhone() });
-        } else {
-          self.setScreen('card');
-        }
-      }, params);
+    if (
+      !skipOTPFlow &&
+      !customer.logged &&
+      !this.wants_skip &&
+      this.screen !== 'card'
+    ) {
+      self.askOTPForSavedCard();
     } else {
       self.setScreen('card');
     }
+  },
+
+  askOTPForSavedCard: function () {
+    var self = this;
+    var customer = self.getCurrentCustomer();
+
+    this.topBar.setTitleOverride('otp', 'text', 'card');
+
+    this.otpView.updateScreen({
+      skipTextLabel: 'skip_saved_cards',
+    });
+
+    self.commenceOTP('saved_cards_sending', 'saved_cards_access', {
+      phone: getPhone(),
+    });
+    var smsHash = this.get('send_sms_hash') && this.sms_hash;
+    var params = {};
+    if (smsHash) {
+      params.sms_hash = smsHash;
+    }
+    customer.checkStatus(function () {
+      /**
+       * 1. If customer has saved cards and is not logged in, ask for OTP.
+       * 2. If customer doesn't have saved cards, show cards screen.
+       */
+      if (customer.saved && !customer.logged) {
+        askOTP(self.otpView, undefined, true, { phone: getPhone() });
+      } else {
+        self.setScreen('card');
+      }
+    }, params);
   },
 
   /**

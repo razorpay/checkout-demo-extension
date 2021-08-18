@@ -9,8 +9,8 @@
   export let alt = '';
 
   // Computed
-  export let loadableIcon;
-  export let iconToUse;
+  export let loadableIcon = false;
+  export let iconToUse = undefined;
 
   onMount(() => {
     if (loadableIcon) {

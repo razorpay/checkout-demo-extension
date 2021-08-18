@@ -158,8 +158,9 @@
       });
     } else {
       // TODO: Someday, preselect the saved card in the saved cards list.
-
-      session.switchTab(instrument.method);
+      session.switchTab(instrument.method, {
+        preferred: instrument?.meta?.preferred,
+      });
     }
   }
 </script>

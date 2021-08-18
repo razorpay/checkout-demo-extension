@@ -48,14 +48,15 @@
   } from 'checkoutstore/methods';
 
   // i18n
-  import { t, locale } from 'svelte-i18n';
+  import { t } from 'svelte-i18n';
 
   import {
     NOCVV_LABEL,
     VIEW_ALL_EMI_PLANS,
     REMEMBER_CARD_LABEL,
     CARD_NUMBER_HELP_UNSUPPORTED,
-  } from 'ui/labels/card';
+    ADD_NEW_CARD,
+  } from 'card/i18n/labels';
 
   // Utils
   import Analytics, { CardEvents, Events } from 'analytics';
@@ -468,6 +469,7 @@
 </script>
 
 <div class="pad" id="add-card-container" class:faded>
+  <div class="card-title">{$t(ADD_NEW_CARD)}</div>
   <div class="row card-fields">
     <div class="two-third">
       <NumberField
@@ -616,5 +618,12 @@
   }
   .downtime-cards {
     margin-top: 16px;
+  }
+
+  .card-title {
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 17px;
+    color: #0d2366;
   }
 </style>

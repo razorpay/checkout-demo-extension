@@ -13,6 +13,7 @@
   import AppInstruments from 'ui/tabs/card/AppInstruments.svelte';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
   import { checkDowntime } from 'checkoutframe/downtimes';
+  import SavedCardCTA from 'card/ui/component/saved-card-cta.svelte';
   import ToggleHeading from 'ui/components/common/heading/ToggleHeading.svelte';
 
   // Store
@@ -96,6 +97,11 @@
 
   // Transitions
   import { fade } from 'svelte/transition';
+
+  // experiments
+  import { delayLoginOTP } from 'experiments';
+
+  const delayOTPExperiment = delayLoginOTP();
 
   // Constants
   const Views = {
@@ -705,7 +711,7 @@
     <div>
       {#if currentView === Views.ADD_CARD}
         <div in:fade={getAnimationOptions({ duration: 100, y: 100 })}>
-          {#if showSavedCardsCta}
+          {#if showSavedCardsCta && !delayOTPExperiment}
             <div
               id="show-saved-cards"
               on:click={showSavedCardsView}
@@ -730,6 +736,20 @@
             <div class="pad instrument-subtext-description">
               {instrumentSubtext}
             </div>
+          {/if}
+
+          {#if delayOTPExperiment}
+            <!-- Show Trigger to use Saved Card -->
+            <SavedCardCTA
+              showSubTitle={!$customer.logged}
+              on:click={() => {
+                if ($customer.logged) {
+                  showSavedCardsView();
+                } else {
+                  session.askOTPForSavedCard();
+                }
+              }}
+            />
           {/if}
 
           <AddCardView
