@@ -24,6 +24,7 @@ export const AUTH_TYPE_HEADER = 'card.auth_type_header';
 export const AUTH_TYPE_OTP = 'card.auth_type_otp';
 export const AUTH_TYPE_PIN = 'card.auth_type_pin';
 export const BANK_VERIFICATION_TITLE = 'card.bank_verification_title';
+('card.enter_card_details_option_label');
 export const BANK_VERIFICATION_DESCRIPTION =
   'card.bank_verification_description';
 export const BANK_VERIFICATION_ACTION_CONTINUE =
@@ -34,3 +35,18 @@ export const SUBSCRIPTION_CALLOUT = 'card.subscription_callout';
 export const SUBSCRIPTION_REFUND_CALLOUT = 'card.subscription_refund_callout';
 export const INTERNATIONAL_CURRENCY_CHARGES =
   'card.international_currency_charges';
+export const AVS_FORM_ADDRESS_LINE_1 = 'card.avs_form_address_line_1';
+export const AVS_FORM_ADDRESS_LINE_2 = 'card.avs_form_address_line_2';
+export const AVS_FORM_ZIP_CODE = 'card.avs_form_zip_code';
+export const AVS_FORM_COUNTRY = 'card.avs_form_country';
+export const AVS_FORM_STATE = 'card.avs_form_state';
+export const AVS_FORM_CITY = 'card.avs_form_city';
+export const AVS_COUNTRY_SEARCH_TITLE = 'card.avs_country_search_title';
+export const AVS_STATE_SEARCH_TITLE = 'card.avs_state_search_title';
+export const AVS_INFO_TITLE = 'card.avs_info_title';
+export const AVS_HEADING = 'card.avs_heading';
+export const AVS_INFO_MESSAGE_1 = 'card.avs_info_message_1';
+export const AVS_INFO_MESSAGE_2 = 'card.avs_info_message_2';
+export const AVS_INFO_MESSAGE_3 = 'card.avs_info_message_3';
+export const AVS_COUNTRY_ALL = 'card.avs_country_all';
+export const AVS_STATE_ALL = 'card.avs_state_all';

@@ -2,6 +2,15 @@ const { delay, innerText } = require('../util');
 const { assertTrimmedInnerText } = require('../tests/homescreen/actions');
 const querystring = require('querystring');
 
+const AVS_DATA = {
+  'avs-line1': '21A Vincent Square',
+  'avs-line2': '',
+  'avs-postal_code': 'SW1P 2NA',
+  'avs-city': 'London',
+  'avs-state': 'Greater London',
+  'avs-country': 'GB',
+};
+
 async function handleCardValidation(context, { urlShouldContain } = {}) {
   const req = await context.expectRequest();
   expect(req.url).toContain(urlShouldContain || 'create/ajax');
@@ -15,6 +24,36 @@ async function handleCardValidation(context, { urlShouldContain } = {}) {
     payment_id: 'pay_DLXKaJEF1T1KxC',
     amount: '\u20b9 51',
     image: 'https://cdn.razorpay.com/logos/D3JjREAG8erHB7_medium.jpg',
+  });
+}
+
+async function fillAVSForm(context) {
+  // fill avs data
+  await context.page.evaluate((data) => {
+    const keys = Object.keys(data);
+    keys.forEach((id) => {
+      document.getElementById(id).value = data[id];
+    });
+  }, AVS_DATA);
+}
+
+async function assertAVSFormData(context) {
+  // assert AVS data
+  const InputData = await context.page.evaluate((data) => {
+    const keys = Object.keys(data);
+    let returnObj = {};
+    keys.forEach((id) => {
+      returnObj[id] = document.getElementById(id).value;
+    });
+    return returnObj;
+  }, AVS_DATA);
+
+  Object.keys(InputData).forEach((id) => {
+    if (id === 'avs-country') {
+      expect(InputData[id]).toEqual('United Kingdom');
+      return;
+    }
+    expect(InputData[id]).toEqual(AVS_DATA[id]);
   });
 }
 
@@ -172,7 +211,7 @@ async function handleCustomerCardStatusRequest(context, cardType) {
 
 async function respondSavedCards(
   context,
-  { nativeOtp = false, dcc = false } = {}
+  { nativeOtp = false, dcc = false, avsPrefillFromSavedCard = false } = {}
 ) {
   const req = await context.expectRequest();
   expect(req.url).toContain('otp/verify');
@@ -207,6 +246,16 @@ async function respondSavedCards(
               otp: nativeOtp,
             },
           },
+          billing_address: avsPrefillFromSavedCard
+            ? {
+                line1: AVS_DATA['avs-line1'],
+                line2: AVS_DATA['avs-line2'],
+                state: AVS_DATA['avs-state'],
+                country: AVS_DATA['avs-country'],
+                city: AVS_DATA['avs-city'],
+                postal_code: AVS_DATA['avs-postal_code'],
+              }
+            : null,
           recurring: false,
           auth_type: null,
           mrn: null,
@@ -222,7 +271,7 @@ async function respondSavedCards(
   await delay(600);
 }
 
-const getCardCurrencies = (amount) => {
+const getCardCurrencies = (amount, extraParams = {}) => {
   const normalizer = amount / 50000;
   return {
     recurring: false,
@@ -276,6 +325,7 @@ const getCardCurrencies = (amount) => {
     currency_request_id: 'EW1CiHoC8eARvW',
     card_currency: 'USD',
     wallet_currency: 'USD',
+    ...extraParams,
   };
 };
 
@@ -285,14 +335,14 @@ const getDisplayAmount = (currencyConfig) => {
   return symbol + ' ' + (amount / denomination).toFixed(precision);
 };
 
-async function respondCurrencies(context) {
+async function respondCurrencies(context, isAVS = false) {
   await context.getRequest(`/v1/payment/flows`);
   const req = await context.expectRequest();
   expect(req.url).toContain('/flows');
   expect(req.params).toHaveProperty('amount');
   expect(req.params).toHaveProperty('currency');
   const { amount } = req.params;
-  const body = getCardCurrencies(amount);
+  const body = getCardCurrencies(amount, { avs_required: isAVS });
   await context.respondJSONP(body);
 }
 
@@ -303,13 +353,27 @@ async function selectCurrency(context, code) {
   await context.page.click('.search-curtain .list-item');
 }
 
-async function expectDCCParametersInRequest(context, currency = 'USD') {
+async function expectDCCParametersInRequest(
+  context,
+  currency = 'USD',
+  isAVS = false
+) {
   const request = await context.expectRequest();
   const body = querystring.parse(request.body);
-  expect(body).toMatchObject({
+  let check = {
     currency_request_id: 'EW1CiHoC8eARvW',
     dcc_currency: currency,
-  });
+  };
+  if (isAVS) {
+    check = {
+      ...check,
+      'billing_address[line1]': AVS_DATA['avs-line1'],
+      'billing_address[country]': AVS_DATA['avs-country'],
+      'billing_address[city]': AVS_DATA['avs-city'],
+      'billing_address[postal_code]': AVS_DATA['avs-postal_code'],
+    };
+  }
+  expect(body).toMatchObject(check);
 }
 
 async function selectSavedCardAndTypeCvv(context) {
@@ -318,7 +382,7 @@ async function selectSavedCardAndTypeCvv(context) {
   await SavedCard.type('222');
 }
 
-async function verifyAmount(context, currency) {
+async function verifyAmount(context, currency, isAVS = false) {
   const { options } = context;
   if (options.amount >= 1e5) {
     // >= 1k
@@ -332,13 +396,21 @@ async function verifyAmount(context, currency) {
   const amountInHeader = (await innerText('#amount')).trim();
   expect(amountInHeader).toEqual(displayAmount);
   const amountInFooter = (await innerText('#footer')).trim();
-  expect(amountInFooter).toEqual('Pay ' + displayAmount);
+  if (isAVS) {
+    expect(amountInFooter).toEqual('Proceed');
+  } else {
+    expect(amountInFooter).toEqual('Pay ' + displayAmount);
+  }
 }
 
-async function selectCurrencyAndVerifyAmount(context, currency = 'USD') {
-  await respondCurrencies(context);
+async function selectCurrencyAndVerifyAmount(
+  context,
+  currency = 'USD',
+  isAVS = false
+) {
+  await respondCurrencies(context, isAVS);
   await selectCurrency(context, currency);
-  await verifyAmount(context, currency);
+  await verifyAmount(context, currency, isAVS);
 }
 
 async function handleCREDUserValidation(context) {
@@ -503,4 +575,6 @@ module.exports = {
   assertOTPElementsForBEPG,
   agreeToAMEXCurrencyCharges,
   handleCREDUserValidation,
+  fillAVSForm,
+  assertAVSFormData,
 };

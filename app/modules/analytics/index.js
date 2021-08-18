@@ -1,4 +1,4 @@
-import CardEvents from './card/events';
+import CardEvents from './card';
 import OfferEvents from './offers/events';
 import P13NEvents from './p13n/events';
 import HomeEvents from './home/events';

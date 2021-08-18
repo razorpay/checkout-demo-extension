@@ -34,7 +34,7 @@ async function verifyPersonalizationText(context, paymentMode) {
     const currentPaymentMethod = paymentMethod[i];
 
     let paymentMethodText = await context.page.evaluate(
-      currentPaymentMethod => currentPaymentMethod.textContent,
+      (currentPaymentMethod) => currentPaymentMethod.textContent,
       currentPaymentMethod
     );
     paymentMethodText = paymentMethodText.toLowerCase();
@@ -77,7 +77,7 @@ async function verifyUpiAppPersonalizationText(context, text, optionNumber) {
   let currentPaymentMethod = paymentMethods[optionNumber - 1];
 
   let paymentMethodText = await context.page.evaluate(
-    currentPaymentMethod => currentPaymentMethod.textContent,
+    (currentPaymentMethod) => currentPaymentMethod.textContent,
     currentPaymentMethod
   );
 

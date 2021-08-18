@@ -1,5 +1,5 @@
-const rejectFn = e => console.warn('Promise error:', e);
-const isPromise = p => _.is(p, Promise);
+const rejectFn = (e) => console.warn('Promise error:', e);
+const isPromise = (p) => _.is(p, Promise);
 
 /** @class */
 function Promise(fn) {
@@ -29,7 +29,7 @@ function handle(self, deferred) {
     return;
   }
   self._handled = true;
-  setTimeout(function() {
+  setTimeout(function () {
     var cb = self._state === 1 ? deferred.onFulfilled : deferred.onRejected;
     if (cb === null) {
       (self._state === 1 ? resolve : reject)(deferred.promise, self._value);
@@ -78,13 +78,13 @@ function reject(self, newValue) {
 
 function finale(self) {
   if (self._state === 2 && self._deferreds.length === 0) {
-    setTimeout(function() {
+    setTimeout(function () {
       if (!self._handled) {
         rejectFn(self._value);
       }
     });
   }
-  (self._deferreds || []).forEach(v => handle(self, v));
+  (self._deferreds || []).forEach((v) => handle(self, v));
   self._deferreds = null;
 }
 
@@ -107,12 +107,12 @@ function doResolve(fn, self) {
   var done = false;
   try {
     fn(
-      function(value) {
+      function (value) {
         if (done) return;
         done = true;
         resolve(self, value);
       },
-      function(reason) {
+      function (reason) {
         if (done) return;
         done = true;
         reject(self, reason);
@@ -127,26 +127,27 @@ function doResolve(fn, self) {
 
 Promise.prototype
   |> _Obj.extend({
-    catch: function(onRejected) {
+    catch: function (onRejected) {
       return this.then(null, onRejected);
     },
 
-    then: function(onFulfilled, onRejected) {
-      var prom = new Promise(_ => _);
+    then: function (onFulfilled, onRejected) {
+      var prom = new Promise((_) => _);
       handle(this, new Handler(onFulfilled, onRejected, prom));
       return prom;
     },
 
-    finally: function(callback) {
+    finally: function (callback) {
       return this.then(
-        value => Promise.resolve(callback()).then(() => value),
-        reason => Promise.resolve(callback()).then(() => Promise.reject(reason))
+        (value) => Promise.resolve(callback()).then(() => value),
+        (reason) =>
+          Promise.resolve(callback()).then(() => Promise.reject(reason))
       );
     },
   });
 
-Promise.all = function(args) {
-  return new Promise(function(resolve, reject) {
+Promise.all = function (args) {
+  return new Promise(function (resolve, reject) {
     if (!args || typeof args.length === 'undefined')
       throw new TypeError('Promise.all accepts an array');
 
@@ -154,30 +155,31 @@ Promise.all = function(args) {
     var remaining = args.length;
 
     args.forEach(function res(val, i) {
-        try {
-          if (_.isNonNullObject(val) || _.isFunction(val)) {
-            if (_.isFunction(val.then)) {
-              return val.then(val => res(val, i), reject);
-            }
+      try {
+        if (_.isNonNullObject(val) || _.isFunction(val)) {
+          if (_.isFunction(val.then)) {
+            return val.then((val) => res(val, i), reject);
           }
-          args[i] = val;
-          if (--remaining === 0) {
-            resolve(args);
-          }
-        } catch (ex) {
-          reject(ex);
         }
-      });
+        args[i] = val;
+        if (--remaining === 0) {
+          resolve(args);
+        }
+      } catch (ex) {
+        reject(ex);
+      }
+    });
   });
 };
 
-Promise.resolve = val => (isPromise(val) ? val : new Promise(res => res(val)));
+Promise.resolve = (val) =>
+  isPromise(val) ? val : new Promise((res) => res(val));
 
-Promise.reject = value => new Promise((resolve, reject) => reject(value));
+Promise.reject = (value) => new Promise((resolve, reject) => reject(value));
 
-Promise.race = values =>
-  new Promise(
-    (resolve, reject) => values.forEach(v => v.then(resolve, reject))
+Promise.race = (values) =>
+  new Promise((resolve, reject) =>
+    values.forEach((v) => v.then(resolve, reject))
   );
 
 const globalPromise = global.Promise;

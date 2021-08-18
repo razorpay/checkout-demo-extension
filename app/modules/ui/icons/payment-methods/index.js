@@ -17,7 +17,11 @@ import trustedBadge from './trusted_badge';
 import tickFilledDonate from './tick_filled_donate';
 import warning from './warning';
 import refund from './refund';
+import question from './question';
 import donationHeart from './donate_heart';
+import message from './message';
+import lock from './lock';
+import userProtect from './user_protect';
 import newWindow from './new_window';
 import tickFlag from './tick_flag';
 import savedCard from 'card/icons/saved-card';
@@ -35,6 +39,10 @@ const availIconNames = getAllMethods().concat([
   'warning',
   'refund',
   'donate_heart',
+  'question',
+  'message',
+  'lock',
+  'user_protect',
   'tick_flag',
   'new_window',
   'saved_card',
@@ -106,6 +114,18 @@ function getIconFn(iconName) {
 
     case 'donate_heart':
       return donationHeart;
+
+    case 'question':
+      return question;
+
+    case 'message':
+      return message;
+
+    case 'lock':
+      return lock;
+
+    case 'user_protect':
+      return userProtect;
 
     case 'tick_flag':
       return tickFlag;

@@ -11,7 +11,7 @@ const protoSlice = proto.slice;
  *
  * @returns {string}
  */
-export const pad = str => ' ' + str + ' ';
+export const pad = (str) => ' ' + str + ' ';
 
 /**
  * Checks if a string contains a substring
@@ -71,7 +71,7 @@ export const endsWith = _.curry2(
  * @returns {string}
  */
 export function toTitleCase(sentence) {
-  const words = _Arr.map(sentence.split(' '), word => {
+  const words = _Arr.map(sentence.split(' '), (word) => {
     return `${word.slice(0, 1).toUpperCase()}${word.slice(1).toLowerCase()}`;
   });
 

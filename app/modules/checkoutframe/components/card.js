@@ -17,7 +17,11 @@ import {
   getEmiDurationForSavedCard,
   getEmiDurationForNewCard,
 } from 'checkoutstore/emi';
-import { selectedCard, cardCvv } from 'checkoutstore/screens/card';
+import {
+  selectedCard,
+  cardCvv,
+  isAVSEnabled,
+} from 'checkoutstore/screens/card';
 import CardTab from 'ui/tabs/card/index.svelte';
 
 const CARD_KEY = 'svelteCardTab';
@@ -97,8 +101,10 @@ export function setEmiPlansCta(screen, tab) {
       showEnterCardDetails();
       break;
 
-    default:
+    default: {
+      if (get(isAVSEnabled)) return; // prevent CTA update in post AVS OTP screen[saved card]
       setAppropriateCtaText();
+    }
   }
 }
 

@@ -37,6 +37,9 @@ const {
   // Partial Payment
   verifyPartialAmount,
   verifyFooterText,
+  fillAVSForm,
+  verifyAmount,
+  assertAVSFormData,
 } = require('../actions/common');
 
 const {
@@ -72,9 +75,12 @@ module.exports = function (testFeatures) {
     optionalEmail,
     recurringOrder,
     dcc,
+    avs,
     remember_customer,
     validateRemoveOfferCta,
+    AVSPrefillData,
   } = features;
+
   describe.each(
     getTestData(title, {
       options,
@@ -84,6 +90,11 @@ module.exports = function (testFeatures) {
     if (remember_customer) {
       options.remember_customer = remember_customer;
     }
+
+    if (typeof AVSPrefillData === 'object' && AVSPrefillData) {
+      options.prefill = { ...(options.prefill || {}), ...AVSPrefillData };
+    }
+
     test(title, async () => {
       const context = await openCheckoutWithNewHomeScreen({
         page,
@@ -141,10 +152,24 @@ module.exports = function (testFeatures) {
       });
 
       if (dcc) {
-        await selectCurrencyAndVerifyAmount(context);
-        await submit(context);
-        await expectDCCParametersInRequest(context);
+        await selectCurrencyAndVerifyAmount(context, 'USD', avs);
+        // if AVS check for extra flow
+        if (avs) {
+          await submit(context);
+          if (!AVSPrefillData) {
+            await fillAVSForm(context);
+          } else {
+            // assert data from prefill options
+            await assertAVSFormData(context);
+          }
+          // verify footer amount with currency
+          await verifyAmount(context, 'USD', false);
+          return;
+        }
 
+        await submit(context);
+        // expect AVS paramter if enabled
+        await expectDCCParametersInRequest(context, 'USD', avs);
         return;
       }
 

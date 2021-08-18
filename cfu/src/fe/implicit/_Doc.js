@@ -24,7 +24,7 @@ var link;
  *
  * @returns {boolean}
  */
-export const isEvent = x => _.is(x, EventConstructor);
+export const isEvent = (x) => _.is(x, EventConstructor);
 
 /**
  * Resolves given string to an element.
@@ -32,7 +32,7 @@ export const isEvent = x => _.is(x, EventConstructor);
  *
  * @returns {Element}
  */
-export const resolveElement = el => (_.isString(el) ? querySelector(el) : el);
+export const resolveElement = (el) => (_.isString(el) ? querySelector(el) : el);
 
 /**
  * Resolve relative url to an absolute url.
@@ -100,7 +100,7 @@ export function submitForm(action, data, method, target) {
 export function obj2formhtml(data, key) {
   if (_.isNonNullObject(data)) {
     var str = '';
-    _Obj.loop(data, function(value, name) {
+    _Obj.loop(data, function (value, name) {
       if (key) {
         name = key + '[' + name + ']';
       }
@@ -166,7 +166,7 @@ export function smoothScrollBy(y) {
   if (scrollTimeout) {
     clearTimeout(scrollTimeout);
   }
-  scrollTimeout = setTimeout(function() {
+  scrollTimeout = setTimeout(function () {
     var y0 = pageYOffset;
     var target = Math.min(y0 + y, _El.offsetHeight(body) - innerHeight);
     y = target - y0;

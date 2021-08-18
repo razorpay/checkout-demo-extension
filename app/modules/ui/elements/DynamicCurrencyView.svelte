@@ -8,6 +8,8 @@
     currencyRequestId,
     dccCurrency,
     defaultDCCCurrency,
+    AVSScreenMap,
+    AVSDccPayload,
   } from 'checkoutstore/screens/card';
 
   import { amountAfterOffer, appliedOffer } from 'checkoutstore/offers';
@@ -17,6 +19,7 @@
   import { customer } from 'checkoutstore/customer';
 
   import {
+    showProceed,
     isCtaShown,
     showAmount,
     showCtaWithDefaultText,
@@ -63,6 +66,7 @@
     ADD_CARD: 'add-card',
     HOME_SCREEN: 'home-screen',
     PAYPAL_WALLET: 'paypal',
+    AVS: 'avs-card',
   };
 
   let prop = null;
@@ -84,12 +88,14 @@
   const currencyCache = {};
   let forexRate;
   let fee;
+  let AVSRequired = false;
 
   // Props
   export let classes = [];
   export let visible = false;
   export let view = null;
   export let tabVisible = null;
+  export let isAVS = false;
 
   // Computed
   export let allClasses;
@@ -116,6 +122,8 @@
 
   $: allClasses = ['dcc-view'].concat(classes).join(' ');
 
+  let billing_address_available = false;
+
   $: {
     if (view === Views.ADD_CARD) {
       const iin = getIin($cardNumber);
@@ -129,6 +137,7 @@
     ) {
       const tokenId = $selectedCard.id;
       prop = { tokenId };
+      billing_address_available = $selectedCard.billing_address || false;
     } else if (view === Views.HOME_SCREEN && $selectedInstrument) {
       const card = getCardByTokenId($selectedInstrument.token_id);
       if (card && card.dcc_enabled) {
@@ -159,6 +168,9 @@
       visible = entity && !loading;
     } else {
       visible = entity;
+    }
+    if (isAVS) {
+      visible = false;
     }
   }
 
@@ -286,13 +298,16 @@
       // reset currency to INR as dcc amount to be shown only where dcc is not selected
       // this case happen when from card screen to go another screen
       prevCurrency = 'INR';
-      updateAmountInHeaderAndCTA();
+      if (tabVisible) {
+        updateAmountInHeaderAndCTA();
+      }
     } else {
       setDCCPayload({ enable: Boolean(visible) });
     }
   }
 
   $: currencyConfig = entity && currencyCache[entityWithAmount];
+  $: AVSRequired = currencyConfig?.avs_required;
   $: explicitUI = currencyConfig?.show_markup;
   $: currencies = currencyConfig && currencyConfig.all_currencies;
   $: cardCurrency =
@@ -300,8 +315,14 @@
     (currencyConfig.card_currency || currencyConfig.wallet_currency);
   $: sortedCurrencies = currencies && sortCurrencies(currencies);
   $: displayCurrencies = sortedCurrencies && sortedCurrencies.slice(0, 2);
-  $: dccAmount = currencies && currencies[selectedCurrency].amount;
-  $: forexRate = currencies && currencies[selectedCurrency].forex_rate;
+  $: dccAmount = currencies?.[selectedCurrency]?.amount || '';
+  $: forexRate = currencies?.[selectedCurrency]?.forex_rate || '';
+
+  $: {
+    if (entity) {
+      AVSScreenMap.update((value) => ({ ...value, [entity]: AVSRequired }));
+    }
+  }
 
   $: {
     $defaultDCCCurrency =
@@ -335,6 +356,13 @@
           setAppropriateCtaText();
         }
         session.updateAmountInHeader(originalAmount);
+      }
+      if (AVSRequired) {
+        showProceed();
+        AVSDccPayload.set({
+          header: displayAmount,
+          cta: ctaAmount,
+        });
       }
     });
   }
@@ -407,8 +435,6 @@
     }
     return _Arr.find($customer.tokens.items, (token) => token.id === tokenId);
   }
-
-  $: console.log(cardCurrency);
 </script>
 
 <div class={allClasses} class:visible>

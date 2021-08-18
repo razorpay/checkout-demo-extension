@@ -45,18 +45,18 @@ export default function fetch(options) {
 }
 
 const fetchPrototype = {
-  setReq: function(type, value) {
+  setReq: function (type, value) {
     this.abort();
     this.type = type;
     this.req = value;
     return this;
   },
 
-  till: function(continueUntilFn, retryLimit = 0) {
+  till: function (continueUntilFn, retryLimit = 0) {
     return this.setReq(
       'timeout',
       setTimeout(() => {
-        this.call(response => {
+        this.call((response) => {
           // If there is an error, retry again until retry limit.
           if (response.error && retryLimit > 0) {
             this.till(continueUntilFn, retryLimit - 1);
@@ -70,7 +70,7 @@ const fetchPrototype = {
     );
   },
 
-  abort: function() {
+  abort: function () {
     // this.req, which may be XMLHttpRequest object, setTimeout ID
     // or jsonp callback counter
     let { req, type } = this;
@@ -83,18 +83,18 @@ const fetchPrototype = {
     if (type === 'ajax') {
       this.req.abort();
     } else if (type === 'jsonp') {
-      global.Razorpay[this.req] = _ => _;
+      global.Razorpay[this.req] = (_) => _;
     } else {
       clearTimeout(this.req);
     }
     this.req = null;
   },
 
-  defer: function() {
+  defer: function () {
     this.req = setTimeout(() => this.call());
   },
 
-  call: function(callback = this.options.callback) {
+  call: function (callback = this.options.callback) {
     var { url, method, data, headers } = this.options;
 
     var xhr = new Xhr();
@@ -102,7 +102,7 @@ const fetchPrototype = {
 
     xhr.open(method, url, true);
 
-    xhr.onreadystatechange = function() {
+    xhr.onreadystatechange = function () {
       if (xhr.readyState === 4 && xhr.status) {
         var json = _Obj.parse(xhr.responseText);
         if (!json) {
@@ -131,7 +131,7 @@ const fetchPrototype = {
         callback(json);
       }
     };
-    xhr.onerror = function() {
+    xhr.onerror = function () {
       var resp = networkError;
       resp.xhr = {
         status: 0,
@@ -180,7 +180,7 @@ function normalizeOptions(options) {
     options.method = 'get';
   }
   if (!callback) {
-    options.callback = _ => _;
+    options.callback = (_) => _;
   }
   if (_.isNonNullObject(data) && !_.is(data, FormData)) {
     data = _.obj2query(data);
@@ -228,7 +228,7 @@ function jsonp(options) {
   let request = new fetch(options);
   options = request.options;
 
-  request.call = function(cb = options.callback) {
+  request.call = function (cb = options.callback) {
     // This is the same fetch.jsonp instance. Incrememt the attempt number.
     attemptNumber++;
 
@@ -236,7 +236,7 @@ function jsonp(options) {
 
     let done = false;
 
-    const onload = function() {
+    const onload = function () {
       if (
         !done &&
         (!this.readyState ||
@@ -249,7 +249,7 @@ function jsonp(options) {
       }
     };
 
-    let req = (global.Razorpay[callbackName] = function(data) {
+    let req = (global.Razorpay[callbackName] = function (data) {
       _Obj.deleteProp(data, 'http_status_code');
       cb(data);
       _Obj.deleteProp(global.Razorpay, callbackName);
@@ -272,7 +272,7 @@ function jsonp(options) {
       |> _Obj.extend({
         src,
         async: true,
-        onerror: e => cb(networkError),
+        onerror: (e) => cb(networkError),
         onload,
         onreadystatechange: onload,
       })

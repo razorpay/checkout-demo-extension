@@ -33,6 +33,9 @@ const {
 
   // Personalization
   selectPersonalizedCard,
+  verifyAmount,
+  fillAVSForm,
+  assertAVSFormData,
 } = require('../actions/common');
 
 const {
@@ -67,6 +70,8 @@ module.exports = function(testFeatures) {
     optionalContact,
     optionalEmail,
     dcc,
+    avs,
+    avsPrefillFromSavedCard,
   } = features;
 
   describe.each(
@@ -95,6 +100,7 @@ module.exports = function(testFeatures) {
 
       const isHomeScreenSkipped = missingUserDetails && !partialPayment; // and not TPV
 
+      
       if (!isHomeScreenSkipped) {
         await assertBasicDetailsScreen(context);
       }
@@ -124,7 +130,7 @@ module.exports = function(testFeatures) {
 
       await handleCustomerCardStatusRequest(context);
       await typeOTPandSubmit(context);
-      await respondSavedCards(context, { dcc });
+      await respondSavedCards(context, { dcc, avsPrefillFromSavedCard });
 
       if (!feeBearer && offers) {
         await viewOffers(context);
@@ -155,9 +161,24 @@ module.exports = function(testFeatures) {
       await selectSavedCardAndTypeCvv(context);
 
       if (dcc) {
-        await selectCurrencyAndVerifyAmount(context);
+        await selectCurrencyAndVerifyAmount(context, 'USD', avs);
+
+        // if AVS check for extra flow
+        if (avs) {
+          await submit(context);
+          if(!avsPrefillFromSavedCard) { // skip filling of data
+            await fillAVSForm(context);
+          } else {
+            // assert data from saved card
+            await assertAVSFormData(context);
+          }
+          // verify footer amount with currency
+          await verifyAmount(context, 'USD', false);
+          return;
+        }
+
         await submit(context);
-        await expectDCCParametersInRequest(context);
+        await expectDCCParametersInRequest(context, 'USD', avs);
 
         return;
       }
@@ -174,6 +195,6 @@ module.exports = function(testFeatures) {
         await handleCardValidation(context);
         await handleMockSuccessDialog(context);
       }
-    });
+    }, 100000);
   });
 };

@@ -30,6 +30,7 @@
 
   // Props
   export let placeholder = 'Type to search';
+  export let sortSearchResult;
   export let autocomplete = 'off';
   export let inputType = 'text';
   export let items = [];
@@ -77,7 +78,11 @@
         threshold: -100,
       });
 
-      return _Arr.map(results, (result) => result.ref);
+      const finalResult = _Arr.map(results, (result) => result.ref);
+      if (typeof sortSearchResult === 'function') {
+        finalResult.sort(sortSearchResult);
+      }
+      return finalResult;
     } else {
       return [];
     }
@@ -367,21 +372,21 @@
                 <div class="text">{all}</div>
                 <div class="divider" />
               </div>
-              <div class="list">
-                {#each items as item, index (IDs.allItem(item))}
-                  <div
-                    class="list-item"
-                    class:focused={index + results.length === focusedIndex}
-                    id={IDs.allItem(item)}
-                    role="option"
-                    aria-selected={index + results.length === focusedIndex}
-                    on:click={() => onSelect(item)}
-                  >
-                    <svelte:component this={component} {item} />
-                  </div>
-                {/each}
-              </div>
             {/if}
+            <div class="list">
+              {#each items as item, index (IDs.allItem(item))}
+                <div
+                  class="list-item"
+                  class:focused={index + results.length === focusedIndex}
+                  id={IDs.allItem(item)}
+                  role="option"
+                  aria-selected={index + results.length === focusedIndex}
+                  on:click={() => onSelect(item)}
+                >
+                  <svelte:component this={component} {item} />
+                </div>
+              {/each}
+            </div>
           </div>
         </Stack>
       </div>

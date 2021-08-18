@@ -219,6 +219,24 @@ export default {
     view_all_emi_plans: 'View all EMI Plans',
     international_currency_charges:
       'Relevant currency conversion charges might be applicable, as Amex will process the transaction in INR. To avoid currency conversion charges please use MasterCard or Visa.',
+    avs_form_address_line_1: 'Address Line 1*',
+    avs_form_address_line_2: 'Address Line 2',
+    avs_form_zip_code: 'Zipcode*',
+    avs_form_country: 'Country*',
+    avs_form_state: 'State*',
+    avs_form_city: 'City*',
+    avs_country_search_title: 'Select Country',
+    avs_state_search_title: 'Search for a State',
+    avs_info_title: 'Help us verify the transaction',
+    avs_heading: 'Verify your billing address linked to the bank',
+    avs_info_message_1:
+      'This is the address on your bank’s record and is used to send your account statements',
+    avs_info_message_2:
+      'The billing address verification helps us protect you from fraud transactions',
+    avs_info_message_3:
+      'Your address is used only for verification and is securely processed via encrypted servers',
+    avs_country_all: 'All Countries',
+    avs_state_all: 'All States',
     ...cardLang,
   },
   card_subtext: {

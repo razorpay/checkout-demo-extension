@@ -1,8 +1,6 @@
 const { getTestData } = require('../../../actions');
 const { openCheckoutWithNewHomeScreen } = require('../open');
-const {
-  verifyVpaFilled,
-} = require('../../../actions/common');
+const { verifyVpaFilled } = require('../../../actions/common');
 
 const {
   assertBasicDetailsScreen,
@@ -38,7 +36,7 @@ describe.each(
           items: [],
         },
       },
-    }
+    },
   })
 )('UPI tests', ({ preferences, title, options }) => {
   test(title, async () => {
@@ -47,7 +45,7 @@ describe.each(
       page,
       options,
       preferences,
-      experiments: {"highlight_upi_intent_instruments_on_desktop":1}
+      experiments: { highlight_upi_intent_instruments_on_desktop: 1 },
     });
     await assertBasicDetailsScreen(context);
     await fillUserDetails(context, '8888888881');

@@ -7,7 +7,7 @@ import * as _Arr from './_Arr';
  *
  * @returns {Array}
  */
-export const keys = o => Object.keys(o || {});
+export const keys = (o) => Object.keys(o || {});
 
 /**
  * Create a new object using an object and the given props.
@@ -24,7 +24,7 @@ export const create = (obj, props) => Object.create(obj, props);
  *
  * @returns {boolean}
  */
-export const isEmpty = o => !keys(o).length;
+export const isEmpty = (o) => !keys(o).length;
 
 /**
  * Check if the object has a property
@@ -114,7 +114,7 @@ export const deleteProp = _.curry2((o, key) => {
  * @returns {Object}
  */
 export const loop = _.curry2((o, iteratee) => {
-  keys(o).forEach(key => iteratee(o[key], key, o));
+  keys(o).forEach((key) => iteratee(o[key], key, o));
   return o;
 });
 
@@ -166,7 +166,7 @@ export const stringify = JSON.stringify;
  *
  * @returns {Object}
  */
-export const parse = string => {
+export const parse = (string) => {
   try {
     return JSON.parse(string);
   } catch (e) {
@@ -181,7 +181,7 @@ export const parse = string => {
  *
  * @returns {Object}
  */
-export const clone = o => parse(stringify(o));
+export const clone = (o) => parse(stringify(o));
 
 /**
  * Extend an object with the properties from the given object
@@ -201,7 +201,7 @@ export const extend = _.curry2((o, source) => {
  *
  * @returns {Object}
  */
-export const unflatten = o => {
+export const unflatten = (o) => {
   const delimiter = '.';
   let result = {};
 
@@ -259,7 +259,7 @@ export const flatten = (o, prefix = '') => {
  *
  * @returns {Array}
  */
-export const entries = o => {
+export const entries = (o) => {
   const list = [];
 
   if (!_.isNonNullObject(o)) {
@@ -279,14 +279,14 @@ export const entries = o => {
  *
  * @returns {Array}
  */
-export const values = o => {
+export const values = (o) => {
   const list = [];
 
   if (!_.isNonNullObject(o)) {
     return list;
   }
 
-  loop(o, val => list.push(val));
+  loop(o, (val) => list.push(val));
 
   return list;
 };

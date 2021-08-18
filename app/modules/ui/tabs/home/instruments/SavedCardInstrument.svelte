@@ -27,6 +27,8 @@
   } from 'i18n';
 
   import { locale } from 'svelte-i18n';
+
+  import { selectedCardFromHome } from 'checkoutstore/screens/card';
   // Props
   export let instrument = {};
   export let name = 'instrument';
@@ -143,6 +145,10 @@
   }
 
   function selectionHandler() {
+    if (savedCard) {
+      // FOR AVS we are need card details
+      $selectedCardFromHome = savedCard;
+    }
     if (hasCvv) {
       setTimeout(() => {
         // Focus on the input field

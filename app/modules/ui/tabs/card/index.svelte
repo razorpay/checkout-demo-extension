@@ -1,6 +1,7 @@
 <script>
   // Svelte imports
   import { onMount, tick, onDestroy } from 'svelte';
+  import { get } from 'svelte/store';
 
   // UI Imports
   import Tab from 'ui/tabs/Tab.svelte';
@@ -32,12 +33,15 @@
     showAuthTypeSelectionRadio,
     authType,
     currentCvv,
+    AVSDccPayload,
     currentAuthType,
+    selectedCardFromHome,
     defaultDCCCurrency,
   } from 'checkoutstore/screens/card';
 
   import { methodInstrument, blocks, phone } from 'checkoutstore/screens/home';
 
+  import { findCodeByNetworkName } from 'common/card';
   import { customer } from 'checkoutstore/customer';
 
   import {
@@ -48,12 +52,13 @@
     getCardFeatures,
     isInternational,
     getDowntimes,
+    isPartialPayment,
+    getAmount,
   } from 'checkoutstore';
 
   import {
     isMethodEnabled,
     getEMIBanks,
-    getEMIBankPlans,
     isMethodUsable,
     getAppsForCards,
     getPayloadForCRED,
@@ -74,6 +79,11 @@
     RECURRING_CALLOUT,
     SUBSCRIPTION_CALLOUT,
     SUBSCRIPTION_REFUND_CALLOUT,
+    AVS_INFO_TITLE,
+    AVS_HEADING,
+    AVS_INFO_MESSAGE_1,
+    AVS_INFO_MESSAGE_2,
+    AVS_INFO_MESSAGE_3,
   } from 'ui/labels/card';
 
   import { MERCHANT_OF_RECORD, DCC_TERMS_AND_CONDITIONS } from 'ui/labels/dcc';
@@ -81,8 +91,7 @@
   // Utils imports
   import { getSession } from 'sessionmanager';
   import { getSavedCards, transform } from 'common/token';
-  import Analytics from 'analytics';
-  import * as AnalyticsTypes from 'analytics-types';
+  import { Events, CardEvents, MetaProperties } from 'analytics';
 
   import {
     getIin,
@@ -97,23 +106,43 @@
 
   // Transitions
   import { fade } from 'svelte/transition';
+  import AvsForm from './AVSForm.svelte';
+  import { showAmount, showCtaWithDefaultText } from 'checkoutstore/cta';
+  import Icon from 'ui/elements/Icon.svelte';
+  import Info from 'ui/elements/Info.svelte';
+  import { Views } from './constant';
 
+  let showAVSInfo = false;
+
+  let AVSInfo = [];
   // experiments
   import { delayLoginOTP } from 'experiments';
 
   const delayOTPExperiment = delayLoginOTP();
 
-  // Constants
-  const Views = {
-    SAVED_CARDS: 'saved-cards',
-    ADD_CARD: 'add-card',
-  };
-
   const apps = _Arr.map(getAppsForCards(), (code) => getAppProvider(code));
   const appsAvailable = apps.length;
 
   const session = getSession();
+  const icons = session.themeMeta.icons;
   let isSavedCardsEnabled = shouldRememberCustomer();
+
+  $: {
+    AVSInfo = [
+      {
+        icon: icons.user_protect,
+        label: $t(AVS_INFO_MESSAGE_2),
+      },
+      {
+        icon: icons.message,
+        label: $t(AVS_INFO_MESSAGE_1),
+      },
+      {
+        icon: icons.lock,
+        label: $t(AVS_INFO_MESSAGE_3),
+      },
+    ];
+  }
 
   const cardDowntimes = getDowntimes().cards;
   let downtime = {
@@ -150,7 +179,6 @@
     } else {
       userWantsApps = true;
     }
-    lastView = currentView;
   }
 
   let tab = '';
@@ -201,13 +229,10 @@
     const savedCardsCount = allSavedCards.length;
 
     if (savedCardsCount) {
-      Analytics.setMeta('has.savedCards', true);
-      Analytics.setMeta('count.savedCards', savedCardsCount);
-      Analytics.track('saved_cards', {
-        type: AnalyticsTypes.RENDER,
-        data: {
-          count: savedCardsCount,
-        },
+      Events.setMeta(MetaProperties.HAS_SAVED_CARDS, true);
+      Events.setMeta(MetaProperties.SAVED_CARD_COUNT, savedCardsCount);
+      Events.Track(CardEvents.SAVED_CARDS, {
+        count: savedCardsCount,
       });
     }
   }
@@ -236,12 +261,41 @@
     }
   }
 
+  let last4 = '';
+  let selectedCardNetwork = '';
+
+  $: {
+    if (currentView === Views.ADD_CARD && $cardNumber.length > 4) {
+      last4 = $cardNumber.substr(-4, 4);
+      selectedCardNetwork = findCodeByNetworkName(getCardType($cardNumber));
+    } else if (currentView === Views.SAVED_CARDS && $selectedCard) {
+      last4 = $selectedCard?.card?.last4;
+      selectedCardNetwork = findCodeByNetworkName($selectedCard?.card?.network);
+    } else if (!last4 && currentView === Views.AVS && $selectedCardFromHome) {
+      // incase user directly come to avs screen from preferred method (saved card)
+      last4 = $selectedCardFromHome?.card?.last4;
+      selectedCardNetwork = findCodeByNetworkName(
+        $selectedCardFromHome?.card?.network
+      );
+    }
+  }
+
   /**
    * Session calls this to ask if tab will handle back
    *
    * @returns {boolean} will tab handle back
    */
   export function onBack() {
+    if (currentView === Views.AVS && session.screen !== 'otp') {
+      directlyOpenAVS = false;
+      if (lastView) {
+        tabVisible = true;
+      }
+      setView(
+        lastView || (savedCards.length ? Views.SAVED_CARDS : Views.ADD_CARD)
+      );
+      return true;
+    }
     $selectedCard = null; // De-select saved card
     tabVisible = false;
     $newCardInputFocused = false;
@@ -412,7 +466,7 @@
 
   export function showLandingView() {
     return tick()
-      .then((_) => {
+      .then(() => {
         let viewToSet = Views.ADD_CARD;
 
         if (savedCards && savedCards.length > 0 && isSavedCardsEnabled) {
@@ -424,17 +478,41 @@
   }
 
   export function showAddCardView() {
-    Analytics.track('saved_cards:hide');
+    Events.Track(CardEvents.HIDE_SAVED_CARDS);
     setView(Views.ADD_CARD);
   }
 
+  let directlyOpenAVS = false;
+
+  export function showAVSView(direct = false) {
+    if (currentView === Views.SAVED_CARDS) {
+      Events.Track(CardEvents.HIDE_SAVED_CARDS);
+    } else {
+      Events.Track(CardEvents.HIDE_ADD_CARD_SCREEN);
+    }
+    Events.Track(CardEvents.SHOW_AVS_SCREEN);
+    const AVSData = get(AVSDccPayload);
+    tabVisible = false;
+    if (AVSData) {
+      if (AVSData.header) {
+        session.setRawAmountInHeader(AVSData.header);
+        showAmount(AVSData.cta);
+      } else if (!isPartialPayment()) {
+        showCtaWithDefaultText();
+        session.updateAmountInHeader(getAmount());
+      }
+    }
+    directlyOpenAVS = direct;
+    setView(Views.AVS);
+  }
+
   export function showSavedCardsView() {
-    Analytics.track('saved_cards:show');
+    Events.Track(CardEvents.SHOW_SAVED_CARDS);
     setView(Views.SAVED_CARDS);
   }
 
   function setView(view) {
-    currentView = view;
+    [lastView, currentView] = [currentView, view];
   }
 
   function setSelectedApp(code) {
@@ -446,7 +524,10 @@
   export function getPayload() {
     if ($selectedApp) {
       return getAppPayload();
-    } else if (currentView === Views.ADD_CARD) {
+    } else if (
+      currentView === Views.ADD_CARD ||
+      (currentView === Views.AVS && lastView === Views.ADD_CARD)
+    ) {
       return getAddCardPayload();
     } else {
       return getSavedCardPayload();
@@ -472,6 +553,10 @@
 
   export function isOnSavedCardsScreen() {
     return currentView === Views.SAVED_CARDS;
+  }
+
+  export function isOnAVSScreen() {
+    return currentView === Views.AVS;
   }
 
   function getAddCardPayload() {
@@ -521,17 +606,13 @@
   }
 
   function handleViewPlans(event) {
-    Analytics.track('saved_card:emi:plans:view', {
-      type: AnalyticsTypes.BEHAV,
-      data: {
-        from: session.tab,
-      },
+    Events.TrackBehav(CardEvents.EMI_PLAN_VIEW_SAVED_CARDS, {
+      from: session.tab,
     });
-
     session.showEmiPlansForSavedCard(event.detail);
   }
 
-  function onAddCardViewFocused(event) {
+  function onAddCardViewFocused() {
     $selectedApp = null;
     $newCardInputFocused = true;
   }
@@ -641,36 +722,33 @@
   }
 
   function handleEmiCtaClick(e) {
-    let eventName = 'emi:plans:';
+    let eventName = '';
     const eventData = {
       from: session.tab,
     };
 
     if (emiCtaView === 'available' && isMethodUsable('emi')) {
       session.showEmiPlansForNewCard(e);
-      eventName += 'view';
+      eventName = CardEvents.VIEW_EMI_PLANS;
     } else if (emiCtaView === 'plans-available' && isMethodUsable('emi')) {
       session.showEmiPlansForNewCard(e);
-      eventName += 'edit';
+      eventName = CardEvents.EDIT_EMI_PLANS;
     } else if (emiCtaView === 'pay-without-emi' && isMethodUsable('card')) {
       if (isMethodEnabled('card')) {
         session.setScreen('card');
         session.switchTab('card');
         showLandingView();
-        eventName = 'emi:pay_without';
+        eventName = CardEvents.PAY_WITHOUT_EMI;
       }
     } else if (emiCtaView === 'plans-unavailable' && isMethodUsable('card')) {
       if (isMethodEnabled('card')) {
         session.setScreen('card');
         session.switchTab('card');
-        eventName = 'emi:pay_without';
+        eventName = CardEvents.PAY_WITHOUT_EMI;
       }
     }
 
-    Analytics.track(eventName, {
-      type: AnalyticsTypes.BEHAV,
-      data: eventData,
-    });
+    Events.TrackBehav(eventName, eventData);
   }
 
   export function onShown() {
@@ -789,6 +867,29 @@
             {/if}
           {/if}
         </div>
+      {:else if currentView === Views.AVS}
+        <div id="avsContainer">
+          <div class="avs-card-info">
+            <div class="cardtype" cardtype={selectedCardNetwork} />
+            <span class="card-info"
+              >Card ending with <span class="last4">{last4}</span></span
+            >
+          </div>
+          <div class="avs-title">
+            {$t(AVS_HEADING)}
+            <span
+              on:click={() => {
+                showAVSInfo = true;
+              }}><Icon icon={icons.question} /></span
+            >
+          </div>
+          <AvsForm direct={directlyOpenAVS} {lastView} />
+          <Info
+            bind:show={showAVSInfo}
+            title={$t(AVS_INFO_TITLE)}
+            data={AVSInfo}
+          />
+        </div>
       {:else}
         <div in:fade={getAnimationOptions({ duration: 100 })}>
           {#if shouldShowSubtext}
@@ -854,7 +955,11 @@
     </div>
     <Bottom tab="card">
       {#if isDCCEnabled()}
-        <DynamicCurrencyView {tabVisible} view={currentView} />
+        <DynamicCurrencyView
+          {tabVisible}
+          view={currentView === Views.AVS ? lastView : currentView}
+          isAVS={currentView === Views.AVS}
+        />
       {/if}
       {#if isRecurring()}
         <Callout>
@@ -890,12 +995,39 @@
     position: relative; /* This is needed because the stupid network icon has position: absolute */
   }
 
-  .tnc-link {
-    text-decoration: underline;
-  }
-
   .instrument-subtext-description {
     margin: 12px 0;
+  }
+
+  .avs-card-info {
+    height: 46px;
+    display: flex;
+    align-items: center;
+    padding: 0 22px;
+  }
+  .avs-title {
+    margin: 16px 24px 0;
+    line-height: 1;
+    display: flex;
+  }
+
+  .avs-title :global(svg) {
+    height: 14px;
+    width: 14px;
+    cursor: pointer;
+    margin-left: 4px;
+  }
+
+  .avs-card-info span.card-info {
+    margin-left: 46px;
+    font-size: 13px;
+    color: #707070;
+    line-height: 20px;
+  }
+
+  .avs-card-info span.last4 {
+    font-weight: 600;
+    color: #000;
   }
 
   .apps-heading-container {

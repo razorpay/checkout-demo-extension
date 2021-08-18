@@ -53,13 +53,13 @@ module.exports = {
 async function verifyAutoSelectBankTPV(context, bank) {
   const autoSelectbank = await context.page.waitForSelector('.bank-name');
   const autoSelectbankName = await context.page.evaluate(
-    autoSelectbank => autoSelectbank.textContent,
+    (autoSelectbank) => autoSelectbank.textContent,
     autoSelectbank
   );
   expect(autoSelectbankName).toContain(bank);
   const accountDiv = await context.page.waitForSelector('.account-details');
   const accountNumber = await context.page.evaluate(
-    accountDiv => accountDiv.textContent,
+    (accountDiv) => accountDiv.textContent,
     accountDiv
   );
   expect(accountNumber).toContain(context.preferences.order.account_number);
@@ -78,8 +78,7 @@ async function passRequestNetbanking(context) {
   context.respondJSON({
     type: 'first',
     request: {
-      url:
-        'https://api-web.func.razorpay.in/v1/gateway/mocksharp/payment?key_id=rzp_test_csiPFCSLbrdDCO',
+      url: 'https://api-web.func.razorpay.in/v1/gateway/mocksharp/payment?key_id=rzp_test_csiPFCSLbrdDCO',
       method: 'post',
       content: {
         action: 'authorize',
@@ -106,8 +105,7 @@ async function passRequestWallet(context) {
   context.respondJSON({
     type: 'first',
     request: {
-      url:
-        'https://api-web.func.razorpay.in/v1/gateway/mocksharp/payment?key_id=rzp_test_csiPFCSLbrdDCO',
+      url: 'https://api-web.func.razorpay.in/v1/gateway/mocksharp/payment?key_id=rzp_test_csiPFCSLbrdDCO',
       method: 'post',
       content: {
         action: 'authorize',
@@ -132,7 +130,7 @@ async function passRequestWallet(context) {
 async function verifyDiscountAmountInBanner(context, expectedDiscountAmount) {
   const discount = await context.page.waitForSelector('#amount > .discount');
   let discountAmount = await context.page.evaluate(
-    discount => discount.textContent,
+    (discount) => discount.textContent,
     discount
   );
   expect(discountAmount).toEqual(expectedDiscountAmount);
@@ -141,7 +139,7 @@ async function verifyDiscountAmountInBanner(context, expectedDiscountAmount) {
 async function verifyDiscountPaybleAmount(context, expectedDiscountAmount) {
   const footer = await context.page.waitForSelector('#footer');
   let footerText = await context.page.evaluate(
-    footer => footer.textContent,
+    (footer) => footer.textContent,
     footer
   );
 
@@ -157,7 +155,7 @@ async function verifyDiscountPaybleAmount(context, expectedDiscountAmount) {
 async function verifyFooterText(context, text) {
   const footer = await context.page.waitForSelector('#footer-cta');
   let footerText = await context.page.evaluate(
-    footer => footer.textContent,
+    (footer) => footer.textContent,
     footer
   );
   footerText = footerText.trim().toLowerCase();
@@ -167,7 +165,7 @@ async function verifyFooterText(context, text) {
 async function verifyDiscountText(context, expectedDiscountAmount) {
   const discount = await context.page.$eval(
     '.offers-container small',
-    el => el.innerText
+    (el) => el.innerText
   );
   expect(discount).toEqual(expectedDiscountAmount);
 }

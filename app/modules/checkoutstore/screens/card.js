@@ -14,6 +14,13 @@ export const dccCurrency = writable('');
 export const defaultDCCCurrency = writable(''); // store default currency given by flow api
 export const currencyRequestId = writable('');
 
+/** AVS state */
+export const AVSScreenMap = writable({});
+export const AVSDccPayload = writable({}); // this is use to temporary storage of header & cta text so on proceed we can show
+export const selectedCardFromHome = writable(null); // use by AVS if card selected from home and then directly jump to AVS to show data
+export const AVSBillingAddress = writable(null);
+export const isAVSEnabled = writable(false);  // to check avs is enabled or not value is set in presubmit flow only
+
 export const cardType = derived(cardNumber, getCardType);
 export const cardIin = derived(cardNumber, getIin);
 export const cardTab = writable(''); // Value of current tab. Values can be one of "card", "emi", "". "" can be considered to be null.

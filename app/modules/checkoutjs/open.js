@@ -1,5 +1,5 @@
 import Razorpay, { makeUrl } from 'common/Razorpay';
-import { Events, Track, MiscEvents } from 'analytics';
+import { Events, Track, MiscEvents } from 'analytics/index';
 import CheckoutFrame from './frame';
 import { returnAsIs } from 'lib/utils';
 

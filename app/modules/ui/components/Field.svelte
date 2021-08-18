@@ -42,6 +42,7 @@
   export let readonlyValue = value;
   export let prediction = false;
   export let downtimeSeverity;
+  export let leftImage = null;
   export let dir;
   /**
    * To show prediction as dropdown
@@ -299,8 +300,12 @@
       class="input prediction-input"
     />
   {/if}
+  {#if leftImage}
+    <img class="left-img" src={leftImage} />
+  {/if}
   <input
     class="input main"
+    class:with-left-img={leftImage}
     bind:this={input}
     id={identifier}
     type={inputType}
@@ -428,5 +433,16 @@
   .downtime-icon {
     float: right;
     margin-top: -24px;
+  }
+
+  .with-left-img {
+    padding-left: 22px;
+  }
+
+  .left-img {
+    position: absolute;
+    bottom: 6px;
+    height: 18px;
+    width: 18px;
   }
 </style>

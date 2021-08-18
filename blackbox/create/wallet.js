@@ -30,7 +30,7 @@ const {
   // Partial Payment
   verifyPartialAmount,
   verifyFooterText,
-  
+
   // internation Currency
   selectCurrencyAndVerifyAmount,
 } = require('../actions/common');
@@ -56,12 +56,11 @@ const {
 } = require('../tests/homescreen/actions');
 const { delay } = require('../util.js');
 
-module.exports = function(testFeatures = {}) {
+module.exports = function (testFeatures = {}) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'wallet',
     testFeatures
   );
-  
 
   const {
     partialPayment,
@@ -79,12 +78,12 @@ module.exports = function(testFeatures = {}) {
 
   // Paypal Currency Conversion
   const isPaypalCC = testFeatures.paypalcc;
-  if(isPaypalCC && personalization) {
+  if (isPaypalCC && personalization) {
     options.isPaypalCC = true;
   }
 
-  if(amountAboveLimit) {
-    options.amount = 110000 * 100 // 1.1L
+  if (amountAboveLimit) {
+    options.amount = 110000 * 100; // 1.1L
   }
 
   describe.each(
@@ -105,7 +104,7 @@ module.exports = function(testFeatures = {}) {
         options,
         preferences,
         method: 'Wallet',
-        emulate
+        emulate,
       });
       const missingUserDetails = optionalContact && optionalEmail;
 
@@ -133,7 +132,7 @@ module.exports = function(testFeatures = {}) {
       if (personalization) {
         await verifyPersonalizationText(context, 'wallet');
         await selectPersonalizationPaymentMethod(context, '1');
-        if(isPaypalCC) {
+        if (isPaypalCC) {
           // handle DCC flow
           await selectCurrencyAndVerifyAmount(context);
         }
@@ -141,14 +140,17 @@ module.exports = function(testFeatures = {}) {
         await selectPaymentMethod(context, 'wallet');
         await assertWalletPage(context, isPaypalCC);
 
-        if(popupIframe) {
+        if (popupIframe) {
           await selectWallet(context, 'paytm');
-        } else if ((!feeBearer && offers) || (optionalContact && !callbackUrl)) {
+        } else if (
+          (!feeBearer && offers) ||
+          (optionalContact && !callbackUrl)
+        ) {
           await selectWallet(context, 'payzapp');
           if (feeBearer) {
             await verifyFooterText(context, 'PAY');
           }
-        } else if(isPaypalCC) {
+        } else if (isPaypalCC) {
           // paypal currency
           await selectWallet(context, 'paypal');
           if (feeBearer) {
@@ -209,7 +211,7 @@ module.exports = function(testFeatures = {}) {
             method: 'wallet',
             wallet: 'payzapp',
           });
-        } else if(isPaypalCC) {
+        } else if (isPaypalCC) {
           await expectRedirectWithCallback(context, {
             method: 'wallet',
             wallet: 'paypal',
@@ -221,7 +223,7 @@ module.exports = function(testFeatures = {}) {
           });
         }
       } else {
-        if(popupIframe) {
+        if (popupIframe) {
           // handle create/ajax request
           context.forceTargetInitialization(browser);
           const popup = await context.popup();
@@ -233,23 +235,33 @@ module.exports = function(testFeatures = {}) {
            * in this case we are opening mocksharp page
            *  */
 
-          await popupPage.waitForFunction((device) => {
-            const iframe = document.getElementById('frame');
-            window.emulate = device;
-            if(!device) {
-              return iframe === null;
-            }
-            return typeof iframe !== null && iframe.contentWindow.location.href === 'https://api.razorpay.com/v1/gateway/mocksharp/payment?key_id=rzp_test_1DP5mmOlF5G5ag';
-          }, {}, emulate);
+          await popupPage.waitForFunction(
+            (device) => {
+              const iframe = document.getElementById('frame');
+              window.emulate = device;
+              if (!device) {
+                return iframe === null;
+              }
+              return (
+                typeof iframe !== null &&
+                iframe.contentWindow.location.href ===
+                  'https://api.razorpay.com/v1/gateway/mocksharp/payment?key_id=rzp_test_1DP5mmOlF5G5ag'
+              );
+            },
+            {},
+            emulate
+          );
 
           // trigger success payment
-          if(!emulate) {
+          if (!emulate) {
             await popupPage.click('button.success');
           } else {
-            await popupPage.evaluate(()=>{
+            await popupPage.evaluate(() => {
               const iframe = document.getElementById('frame');
-              iframe.contentWindow.document.querySelector('button.success').click();
-            })
+              iframe.contentWindow.document
+                .querySelector('button.success')
+                .click();
+            });
           }
           return;
         }
@@ -275,7 +287,7 @@ module.exports = function(testFeatures = {}) {
           return;
         }
 
-        if(isPaypalCC) {
+        if (isPaypalCC) {
           await handleValidationRequest(context, 'pass');
           return;
         }

@@ -2,6 +2,7 @@ import { getEventsName } from '../helpers';
 
 // Events for add new card screen
 const addNewCardScreen = {
+  /** Add new Card screen mount */
   ADD_NEW_CARD: 'add_new',
 };
 

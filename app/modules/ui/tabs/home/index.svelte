@@ -124,6 +124,7 @@
 
   import { update as updateContactStorage } from 'checkoutframe/contact-storage';
   import { isMobile } from 'common/useragent';
+
   const cardOffer = getCardOffer();
   const session = getSession();
   const icons = session.themeMeta.icons;

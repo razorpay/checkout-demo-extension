@@ -2875,6 +2875,13 @@ Session.prototype = {
       tab = '';
     }
 
+    // change view state to default from AVS
+    // its required in case user select card from preferred block
+    // we are using isOnAVSScreen logic in presubmit
+    if (this.screen === 'card' && this.svelteCardTab.isOnAVSScreen()) {
+      this.svelteCardTab.onBack();
+    }
+
     var beforeReturn = function () {
       if (BackStore && BackStore.screen) {
         self.setScreen(BackStore.screen);
@@ -3950,7 +3957,6 @@ Session.prototype = {
 
       var isCardlessEmi =
         this.payload && this.payload.method === 'cardless_emi';
-
       if (!isCardlessEmi && this.tab !== 'upi') {
         // card tab only past this
         // card filled by logged out user + remember me
@@ -3998,6 +4004,10 @@ Session.prototype = {
               self.updateCustomerInStore();
               self.svelteCardTab.showLandingView().then(function () {
                 self.showCardTab();
+                /**
+                 * In case p13n from storage we store token_id if we after otp verify select other card in presubmit it pick storage card data
+                 */
+                HomeScreenStore.selectedInstrumentId.set(null);
               });
             } else {
               Analytics.track('behav:otp:incorrect', {
@@ -4183,6 +4193,21 @@ Session.prototype = {
     });
   },
 
+  getAVSPayload: function (selectedInstrument) {
+    var isOnAVSScreen = this.svelteCardTab.isOnAVSScreen() || false;
+
+    var isAVSScreenFromHomeScreen =
+      selectedInstrument &&
+      selectedInstrument.method === 'card' &&
+      selectedInstrument.token_id &&
+      isOnAVSScreen;
+
+    return {
+      isOnAVSScreen: isOnAVSScreen,
+      isAVSScreenFromHomeScreen: isAVSScreenFromHomeScreen,
+    };
+  },
+
   /**
    * Attempts a payment
    * @param {Event} e
@@ -4251,6 +4276,12 @@ Session.prototype = {
     }
 
     var selectedInstrument = this.getSelectedPaymentInstrument();
+
+    var AVSRequired = false;
+    var AVSMap = discreet.storeGetter(CardScreenStore.AVSScreenMap) || {};
+    var AVSData = this.getAVSPayload(selectedInstrument || {}) || {};
+    var isOnAVSScreen = AVSData.isOnAVSScreen;
+    var isAVSScreenFromHomeScreen = AVSData.isAVSScreenFromHomeScreen;
     var tpv = MethodStore.getTPV();
     if (tpv && tpv.invalid && this.homeTab && this.homeTab.validateTPVOrder) {
       return this.homeTab.validateTPVOrder(tpv, true);
@@ -4280,8 +4311,17 @@ Session.prototype = {
           return;
         }
       }
-    } else if (screen) {
+      // from home page to AVS screen transition set screen = card
+    } else if (screen && !isAVSScreenFromHomeScreen) {
       if (screen === 'card') {
+        // AVS check
+        var isSavedCardScreen = this.svelteCardTab.isOnSavedCardsScreen();
+        var cardIin = discreet.storeGetter(CardScreenStore.cardIin);
+        var selectedCard = discreet.storeGetter(CardScreenStore.selectedCard);
+        var tokenId = selectedCard && selectedCard.id ? selectedCard.id : '';
+        AVSRequired = Boolean(AVSMap[isSavedCardScreen ? tokenId : cardIin]);
+        // get card number & token id
+
         if (data.provider) {
           // Validate any additional input (like contact).
           if (this.checkInvalid('.selected.instrument')) {
@@ -4292,7 +4332,7 @@ Session.prototype = {
           data.method = 'app';
           // We don't want to validate card fields if we're paying via application.
           // Do nothing.
-        } else if (!this.svelteCardTab.isOnSavedCardsScreen()) {
+        } else if (!isSavedCardScreen) {
           // TODO: simplify conditions
           // Do not proceed with amex cards if amex is disabled for merchant
           // also without this, cardsaving is triggered before API returning unsupported card error
@@ -4423,7 +4463,9 @@ Session.prototype = {
         return;
       }
 
-      if (selectedInstrument.method === 'card') {
+      if (selectedInstrument.method === 'card' && !isOnAVSScreen) {
+        // in AVS screen there is no cvv input
+        AVSRequired = Boolean(AVSMap[selectedInstrument.token_id]);
         /*
          * Add cvv to data from the currently selected instrument
          */
@@ -4469,7 +4511,23 @@ Session.prototype = {
     }
     this.downtimeSeverity = payload.downtimeSeverity;
     var downtimeInstrument = discreet.downtimeUtils.checkForDowntime(payload);
-    if (!downtimeInstrument) {
+    CardScreenStore.isAVSEnabled.set(AVSRequired);
+    // meta for tracking AVS
+    if (AVSRequired || isOnAVSScreen) {
+      Analytics.setMeta('avs', true);
+    } else {
+      Analytics.removeMeta('avs');
+    }
+    if (!isOnAVSScreen && AVSRequired) {
+      var directlyToAVS = false;
+      if (screen !== 'card') {
+        // change to card screen
+        this.showCardTab();
+        directlyToAVS = true;
+      }
+      // verify AVS needed
+      this.svelteCardTab.showAVSView(directlyToAVS);
+    } else if (!downtimeInstrument) {
       this.submit();
     } else {
       discreet.downtimeUtils.showDowntimeAlert(downtimeInstrument);
@@ -4620,9 +4678,13 @@ Session.prototype = {
       data.amount = 0;
     }
 
-    if (!this.screen) {
-      var selectedInstrument = this.getSelectedPaymentInstrument();
+    var selectedInstrument = this.getSelectedPaymentInstrument();
 
+    var AVSData = this.getAVSPayload(selectedInstrument || {}) || {};
+    // if AVS is on then screen is set to card but for saved card from home screen requires processing like home screen
+    var isAVSScreenFromHomeScreen = AVSData.isAVSScreenFromHomeScreen;
+
+    if (!this.screen || isAVSScreenFromHomeScreen) {
       if (selectedInstrument) {
         data = Instruments.addInstrumentToPaymentData(
           selectedInstrument,
@@ -4974,6 +5036,19 @@ Session.prototype = {
       data.default_dcc_currency = discreet.storeGetter(
         CardScreenStore.defaultDCCCurrency
       );
+
+      // AVS
+      var AVSData =
+        discreet.storeGetter(CardScreenStore.AVSBillingAddress) || {};
+      // AVS will submit only on AVS screen
+      if (this.svelteCardTab.isOnAVSScreen() && AVSData && AVSData.line1) {
+        if (AVSData._country) {
+          // onretry we already updated the payload
+          AVSData.country = AVSData._country;
+          delete AVSData._country;
+        }
+        data.billing_address = AVSData;
+      }
 
       // These are undefined/empty if the user uses an Indian card
       if (!data.currency_request_id) {

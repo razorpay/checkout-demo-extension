@@ -8,11 +8,11 @@ async function selectUPIApp(context, AppNumber, appWithDowntime) {
   const allApps = await context.page.evaluate(() =>
     Array.from(
       document.querySelectorAll('[data-name]'),
-      element => element.dataset.name
+      (element) => element.dataset.name
     )
   );
   const counter = {};
-  allApps.forEach(app => {
+  allApps.forEach((app) => {
     if (!counter[app]) {
       counter[app] = 0;
     }
@@ -64,8 +64,7 @@ async function respondToUPIAjax(
       'eyJpdiI6IlFOYUo1WEY1WWJmY1FHWURKdmpLeUE9PSIsInZhbHVlIjoiQlhXRTFNcXZKblhxSzJRYTBWK1pMc2VLM0owWUpLRk9JWTZXT04rZlJYRT0iLCJtYWMiOiIxZjk5Yjc5ZmRlZDFlNThmNWQ5ZTc3ZDdiMTMzYzU0ZmRiOTIxY2NlM2IxYjZlNjk5NDEzMGUzMzEzOTA1ZGEwIn0',
     data: dataValue,
     request: {
-      url:
-        'https://api.razorpay.com/v1/payments/pay_DaaBCIH1rZXZg5/status?key_id=rzp_test_1DP5mmOlF5G5ag',
+      url: 'https://api.razorpay.com/v1/payments/pay_DaaBCIH1rZXZg5/status?key_id=rzp_test_1DP5mmOlF5G5ag',
       method: 'GET',
     },
   });
@@ -91,8 +90,7 @@ async function handleSaveVpaRequest(context, { method } = {}, offerId = '') {
       'eyJpdiI6IlFOYUo1WEY1WWJmY1FHWURKdmpLeUE9PSIsInZhbHVlIjoiQlhXRTFNcXZKblhxSzJRYTBWK1pMc2VLM0owWUpLRk9JWTZXT04rZlJYRT0iLCJtYWMiOiIxZjk5Yjc5ZmRlZDFlNThmNWQ5ZTc3ZDdiMTMzYzU0ZmRiOTIxY2NlM2IxYjZlNjk5NDEzMGUzMzEzOTA1ZGEwIn0',
     data: dataValue,
     request: {
-      url:
-        'https://api.razorpay.com/v1/payments/pay_DaaBCIH1rZXZg5/status?key_id=rzp_test_1DP5mmOlF5G5ag',
+      url: 'https://api.razorpay.com/v1/payments/pay_DaaBCIH1rZXZg5/status?key_id=rzp_test_1DP5mmOlF5G5ag',
       method: 'GET',
     },
   });
@@ -192,7 +190,9 @@ async function enterUPIAccount(context, UPIAccountId, upiPaymentType = 'upi') {
 }
 
 async function verifyVpaFilled(context, UPIAccountId) {
-  expect(await context.page.$eval('#vpa-upi', el => el.value)).toEqual(UPIAccountId);
+  expect(await context.page.$eval('#vpa-upi', (el) => el.value)).toEqual(
+    UPIAccountId
+  );
 }
 
 async function selectBankNameFromGooglePayDropDown(context, valuetoBeSelected) {

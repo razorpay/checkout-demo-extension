@@ -36,7 +36,7 @@ const {
 } = require('../tests/homescreen/actions');
 const { delay } = require('../util.js');
 
-module.exports = function(testFeatures) {
+module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'tpv',
     testFeatures

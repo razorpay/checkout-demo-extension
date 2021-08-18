@@ -13,6 +13,11 @@ export const getEventsName = (prefix, events) => {
   const returnObj = {};
   Object.entries(events).forEach((entry) => {
     const [key, value] = entry;
+    if (key === '__PREFIX' && value === '__PREFIX') {
+      // this will convert to toUpperCase(prefix) : prefix
+      returnObj[prefix.toUpperCase()] = `${prefix}`;
+      return;
+    }
     returnObj[key] = `${prefix}:${value}`;
   });
   return returnObj;

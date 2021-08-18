@@ -213,6 +213,7 @@ module.exports = {
     }
 
     page.on('request', checkoutRequestHandler);
+    await page.setDefaultNavigationTimeout(0);
     await page.goto(checkoutUrl);
 
     if (typeof options.personalization === 'undefined') {

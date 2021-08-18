@@ -113,6 +113,17 @@ export const getPrefilledName = optionGetter('prefill.name');
 export const getPrefilledCardNumber = optionGetter('prefill.card[number]');
 export const getPrefilledVPA = optionGetter('prefill.vpa');
 
+export const getPrefillBillingAddress = () => {
+  return {
+    line1: getOption('prefill.billing_address[line1]'),
+    line2: getOption('prefill.billing_address[line2]'),
+    state: getOption('prefill.billing_address[state]'),
+    city: getOption('prefill.billing_address[city]'),
+    country: getOption('prefill.billing_address[country]'),
+    postal_code: getOption('prefill.billing_address[postal_code]'),
+  };
+};
+
 export const showFeeLabel = writable(true);
 
 export function hasFeature(feature, fallbackValue) {

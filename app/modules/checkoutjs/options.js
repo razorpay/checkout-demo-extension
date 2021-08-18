@@ -49,6 +49,12 @@ RazorpayDefaults.prefill = {
   'card[number]': '',
   'card[expiry]': '',
   'card[cvv]': '',
+  'billing_address[line1]': '',
+  'billing_address[line2]': '',
+  'billing_address[postal_code]': '',
+  'billing_address[city]': '',
+  'billing_address[country]': '',
+  'billing_address[state]': '',
 
   /* eMandate options */
   bank: '',

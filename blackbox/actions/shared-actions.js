@@ -19,8 +19,7 @@ async function respondAndVerifyIntentRequest(
     payment_id: 'pay_DaFKujjV6Ajr7W',
     request: {
       method: 'GET',
-      url:
-        'https://api.razorpay.com/v1/payments/pay_DaFKujjV6Ajr7W/status?key_id=rzp_test_1DP5mmOlF5G5ag',
+      url: 'https://api.razorpay.com/v1/payments/pay_DaFKujjV6Ajr7W/status?key_id=rzp_test_1DP5mmOlF5G5ag',
     },
     type: 'intent',
   });
@@ -44,7 +43,7 @@ async function respondAndVerifyIntentRequest(
 async function verifyErrorMessage(context, expectedErrorMeassage) {
   const messageDiv = await context.page.waitForSelector('#fd-t');
   let messageText = await context.page.evaluate(
-    messageDiv => messageDiv.textContent,
+    (messageDiv) => messageDiv.textContent,
     messageDiv
   );
   for (let retrycount = 0; retrycount < 5; retrycount++) {
@@ -55,7 +54,7 @@ async function verifyErrorMessage(context, expectedErrorMeassage) {
       });
       const messageDiv = await context.page.waitForSelector('#fd-t');
       messageText = await context.page.evaluate(
-        messageDiv => messageDiv.textContent,
+        (messageDiv) => messageDiv.textContent,
         messageDiv
       );
     } else if (messageText == expectedErrorMeassage) {
@@ -68,7 +67,7 @@ async function verifyErrorMessage(context, expectedErrorMeassage) {
 async function validateHelpMessage(context, message) {
   const helpElement = await context.page.$('.help');
   const text = await context.page.evaluate(
-    helpElement => helpElement.textContent,
+    (helpElement) => helpElement.textContent,
     helpElement
   );
   expect(text).toEqual(message);
