@@ -738,7 +738,7 @@ export default {
       recurring_cards: '{networks} credit cards',
       upi: 'Google Pay, PhonePe & more',
       upi_otm: 'Pay later using BHIM',
-      upi_recurring: 'Pay using BHIM or PayTM App',
+      upi_recurring: 'Pay using PhonePe, PayTM or BHIM',
     },
     prefixes: {
       bank_transfer: 'Bank Transfer',
@@ -1032,7 +1032,8 @@ export default {
       'Invalid VPA, please try again with correct VPA',
     new_vpa_subtitle: 'Google Pay, BHIM, PhonePe & more',
     new_vpa_subtitle_upi_otm:
-      'Please note, you can only complete this payment using <strong>BHIM App<strong> or <strong>PayTM App<strong>',
+      'Pay using <strong>PhonePe<strong>, <strong>PayTM<strong> or <strong>BHIM<strong>',
+
     new_vpa_title_logged_in: 'Add UPI ID',
     new_vpa_title_logged_out: 'UPI ID',
     omni_block_heading: 'Or, pay using phone number',
