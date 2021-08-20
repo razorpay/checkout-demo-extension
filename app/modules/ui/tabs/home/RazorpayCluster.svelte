@@ -27,8 +27,12 @@
   function getTitleFromInstruments(instruments, locale) {
     const methods = _Arr.map(instruments, (instrument) => instrument.method);
 
-    const names = _Arr.map(methods, (method) =>
+    const blockNames = _Arr.map(methods, (method) =>
       getTranslatedMethodPrefix(method, locale)
+    );
+
+    const names = blockNames.filter(
+      (name, index) => blockNames.indexOf(name) === index
     );
 
     let name;
