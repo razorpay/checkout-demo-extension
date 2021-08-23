@@ -23,4 +23,7 @@ export default {
   HAS_SAVED_CARDS: 'has.savedCards',
   /** Store Saved Card Count {Number} */
   SAVED_CARD_COUNT: 'count.savedCards',
+
+  /** does user have saved card - added during status check API {Boolean} */
+  HAS_SAVED_CARDS_STATUS_CHECK: 'hasSavedCards',
 };

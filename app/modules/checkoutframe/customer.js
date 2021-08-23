@@ -1,7 +1,12 @@
 import { get } from 'svelte/store';
 import { getSession } from 'sessionmanager';
 import { makeAuthUrl } from 'common/Razorpay';
-import Analytics, { Track } from 'analytics';
+import Analytics, {
+  Track,
+  Events,
+  MetaProperties,
+  CardEvents,
+} from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import * as Bridge from 'bridge';
 import * as OtpService from 'common/otpservice';
@@ -12,7 +17,6 @@ import {
 } from 'checkoutstore';
 import { format } from 'i18n';
 
-import { MetaProperties, Events } from 'analytics/index';
 import { delayLoginOTPExperiment } from 'card/helper';
 
 /* global getPhone */
@@ -137,7 +141,17 @@ Customer.prototype = {
     fetch({
       url: url,
       callback: function (data) {
-        customer.saved = !!data.saved;
+        const hasSavedCards = !!data.saved;
+        customer.saved = hasSavedCards;
+
+        Events.setMeta(
+          MetaProperties.HAS_SAVED_CARDS_STATUS_CHECK,
+          hasSavedCards
+        );
+
+        Events.TrackBehav(CardEvents.CHECK_SAVED_CARDS, {
+          hasSavedCards,
+        });
 
         if (customer.saved && !queryParams.skip_otp) {
           OtpService.markOtpSent('razorpay');

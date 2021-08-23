@@ -3,6 +3,8 @@ import { getEventsName } from '../helpers';
 // Events for saved cards
 const savedCardEvents = {
   __PREFIX: '__PREFIX', // this will convert to toUpperCase(prefix) : prefix
+  /** check if saved cards exist */
+  CHECK_SAVED_CARDS: 'check',
   /** hide saved card screen */
   HIDE_SAVED_CARDS: 'hide',
   /** show saved card screen */
