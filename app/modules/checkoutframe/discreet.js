@@ -11,6 +11,7 @@ import * as Currency from 'common/currency';
 import * as OtpService from 'common/otpservice';
 import * as strings from 'common/strings';
 import * as UserAgent from 'common/useragent';
+import * as CardHelper from 'card/helper';
 import emiView from 'checkoutframe/emi';
 import FeeBearerView from 'ui/components/feebearer.svelte';
 import Overlay from 'ui/components/Overlay.svelte';
@@ -215,6 +216,7 @@ export default {
   Hacks,
   storeGetter,
   Experiments,
+  CardHelper,
   BrowserStorage,
 
   _Arr,

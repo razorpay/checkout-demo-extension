@@ -41,7 +41,6 @@
     box-sizing: border-box;
     display: flex;
     justify-content: space-between;
-    margin-bottom: 24px;
     margin-top: 20px;
     padding: 12px 16px;
     cursor: pointer;

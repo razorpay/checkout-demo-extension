@@ -1,20 +1,26 @@
+import { get } from 'svelte/store';
 import { getSession } from 'sessionmanager';
 import { makeAuthUrl } from 'common/Razorpay';
 import Analytics, { Track } from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import * as Bridge from 'bridge';
 import * as OtpService from 'common/otpservice';
-import { isRecurring, getRecurringMethods } from 'checkoutstore';
-import { format, getCurrentLocale } from 'i18n';
+import {
+  isRecurring,
+  getRecurringMethods,
+  razorpayInstanceStore,
+} from 'checkoutstore';
+import { format } from 'i18n';
 
 import { MetaProperties, Events } from 'analytics/index';
+import { delayLoginOTPExperiment } from 'card/helper';
 
 /* global getPhone */
 
 let customers = {};
 let qpmap = _.getQueryParams();
 
-export const getCustomer = (contact) => {
+export const getCustomer = (contact, savedCustomer) => {
   // indian contact without +91
   let indianContact;
 
@@ -23,17 +29,31 @@ export const getCustomer = (contact) => {
   }
   if (!(contact in customers)) {
     if (indianContact) {
-      return getCustomer('+91' + contact);
+      return getCustomer('+91' + contact, savedCustomer);
     } else {
-      customers[contact] = new Customer(contact);
+      customers[contact] = new Customer(contact, savedCustomer);
     }
   }
   return customers[contact];
 };
 
-export function Customer(contact) {
+export function Customer(contact, savedCustomer = false) {
   if (contact) {
     this.contact = contact.replace(/[^+\d]/g, '');
+    this.r = get(razorpayInstanceStore);
+    this.haveSavedCard = true; // for default flow (non-experiment delay otp)
+    if (delayLoginOTPExperiment()) {
+      this.haveSavedCard = savedCustomer;
+      // skip api call if user is logged in
+      if (!savedCustomer) {
+        this.checkStatus(
+          (data) => {
+            this.haveSavedCard = data.saved;
+          },
+          { skip_otp: true }
+        );
+      }
+    }
   }
 }
 
@@ -119,7 +139,7 @@ Customer.prototype = {
       callback: function (data) {
         customer.saved = !!data.saved;
 
-        if (customer.saved) {
+        if (customer.saved && !queryParams.skip_otp) {
           OtpService.markOtpSent('razorpay');
         }
 

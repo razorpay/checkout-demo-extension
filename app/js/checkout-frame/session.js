@@ -3135,7 +3135,7 @@ Session.prototype = {
     var customer = self.getCurrentCustomer();
     var remember = Store.shouldRememberCustomer();
 
-    var skipOTPFlow = discreet.Experiments.delayLoginOTP();
+    var skipOTPFlow = discreet.CardHelper.delayLoginOTPExperiment();
     /**
      * tab is selected from p13n block which says 'Use your saved cards' ask otp always
      */
@@ -3159,6 +3159,7 @@ Session.prototype = {
      */
     if (
       !skipOTPFlow &&
+      customer.haveSavedCard &&
       !customer.logged &&
       !this.wants_skip &&
       this.screen !== 'card'
@@ -5801,7 +5802,7 @@ Session.prototype = {
         session_options['prefill.email'] = saved_customer.email;
       }
 
-      customer = this.getCustomer(saved_customer.contact);
+      customer = this.getCustomer(saved_customer.contact, true);
       sanitizeTokens(saved_customer.tokens);
       customer.tokens = saved_customer.tokens;
 

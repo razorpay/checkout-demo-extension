@@ -1,4 +1,4 @@
-// import { getSegmentOrCreate } from 'experiments';
+import { getSegmentOrCreate } from 'experiments';
 // import type { Experiment } from 'types/experiment';
 
 export const EXPERIMENT_NAME = 'delay_login_otp';
@@ -8,8 +8,7 @@ export const EXPERIMENT_NAME = 'delay_login_otp';
  * @returns {Boolean} true or false
  */
 export function delayLoginOTP() {
-  return false;
-  // return getSegmentOrCreate(EXPERIMENT_NAME) === 1;
+  return getSegmentOrCreate(EXPERIMENT_NAME) === 1;
 }
 
 export const DELAY_LOGIN_OTP_EXPERIMENT = {

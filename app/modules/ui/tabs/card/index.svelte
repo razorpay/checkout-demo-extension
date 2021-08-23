@@ -116,9 +116,13 @@
 
   let AVSInfo = [];
   // experiments
-  import { delayLoginOTP } from 'experiments';
+  import { delayLoginOTPExperiment } from 'card/helper';
 
-  const delayOTPExperiment = delayLoginOTP();
+  let delayOTPExperiment;
+
+  $: {
+    delayOTPExperiment = delayLoginOTPExperiment() && $customer?.haveSavedCard;
+  }
 
   const apps = _Arr.map(getAppsForCards(), (code) => getAppProvider(code));
   const appsAvailable = apps.length;
