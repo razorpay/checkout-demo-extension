@@ -1,27 +1,27 @@
 <script>
-import Icon from "./Icon.svelte";
+  import Icon from './Icon.svelte';
 
-export let show = false;
-export let title = '';
-/**
- * data = [{icon: icons.<>, label: '' }]
- */
-export let data = [];
+  export let show = false;
+  export let title = '';
+  /**
+   * data = [{icon: icons.<>, label: '' }]
+   */
+  export let data = [];
 
-function replaceNode(node) {
+  function replaceNode(node) {
     document.querySelector('#modal').appendChild(node);
     return {
-        destroy() {
-          node?.parentNode?.removeChild(node);
-        },
+      destroy() {
+        node?.parentNode?.removeChild(node);
+      },
     };
-}
+  }
 
-function handleClick(event) {
+  function handleClick(event) {
     if (event?.target?.className?.indexOf('info-screen') > -1) {
-        show = false;
+      show = false;
     }
-}
+  }
 </script>
 
 {#if show}

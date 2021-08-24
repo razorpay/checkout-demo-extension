@@ -54,7 +54,7 @@ const {
   handlePartialPayment,
 } = require('../tests/homescreen/actions');
 
-module.exports = function(testFeatures) {
+module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'saved-cards',
     testFeatures
@@ -80,121 +80,125 @@ module.exports = function(testFeatures) {
       preferences,
     })
   )('Saved Cards tests', ({ preferences, title, options }) => {
-    test(title, async () => {
-      // Enable card saving
-      preferences.options.remember_customer = true;
+    test(
+      title,
+      async () => {
+        // Enable card saving
+        preferences.options.remember_customer = true;
 
-      if (personalization) {
-        if (preferences.customer) {
-          preferences.customer.contact = '+918888888881';
-        }
-      }
-      const context = await openCheckoutWithNewHomeScreen({
-        page,
-        options,
-        preferences,
-        method: 'Card',
-      });
-
-      const missingUserDetails = optionalContact && optionalEmail;
-
-      const isHomeScreenSkipped = missingUserDetails && !partialPayment; // and not TPV
-
-      
-      if (!isHomeScreenSkipped) {
-        await assertBasicDetailsScreen(context);
-      }
-
-      if (!missingUserDetails) {
-        await fillUserDetails(context, '8888888881');
-      }
-
-      if (partialPayment) {
-        await handlePartialPayment(context, '100');
-      } else if (!isHomeScreenSkipped) {
-        await proceed(context);
-      }
-
-      if (!missingUserDetails) {
-        await assertUserDetails(context);
-        await assertEditUserDetailsAndBack(context);
-      }
-
-      await assertPaymentMethods(context);
-
-      if (personalization) {
-        await selectPersonalizedCard(context);
-      } else {
-        await selectPaymentMethod(context, 'card');
-      }
-
-      await handleCustomerCardStatusRequest(context);
-      await typeOTPandSubmit(context);
-      await respondSavedCards(context, { dcc, avsPrefillFromSavedCard });
-
-      if (!feeBearer && offers) {
-        await viewOffers(context);
-        await selectOffer(context, '1');
-        await verifyOfferApplied(context);
-        if (!feeBearer) {
-          await verifyDiscountPaybleAmount(context, '₹ 1,980');
-        }
-        await verifyDiscountAmountInBanner(context, '₹ 1,980');
-        await verifyDiscountText(context, 'You save ₹20');
-        await delay(400);
-      }
-
-      if (feeBearer) {
-        await verifyFooterText(context, 'PAY');
-      }
-
-      if (partialPayment) {
-        await verifyPartialAmount(context, '₹ 100');
-      }
-
-      if (callbackUrl && timeout) {
-        await verifyTimeout(context, 'card');
-
-        return;
-      }
-
-      await selectSavedCardAndTypeCvv(context);
-
-      if (dcc) {
-        await selectCurrencyAndVerifyAmount(context, 'USD', avs);
-
-        // if AVS check for extra flow
-        if (avs) {
-          await submit(context);
-          if(!avsPrefillFromSavedCard) { // skip filling of data
-            await fillAVSForm(context);
-          } else {
-            // assert data from saved card
-            await assertAVSFormData(context);
+        if (personalization) {
+          if (preferences.customer) {
+            preferences.customer.contact = '+918888888881';
           }
-          // verify footer amount with currency
-          await verifyAmount(context, 'USD', false);
+        }
+        const context = await openCheckoutWithNewHomeScreen({
+          page,
+          options,
+          preferences,
+          method: 'Card',
+        });
+
+        const missingUserDetails = optionalContact && optionalEmail;
+
+        const isHomeScreenSkipped = missingUserDetails && !partialPayment; // and not TPV
+
+        if (!isHomeScreenSkipped) {
+          await assertBasicDetailsScreen(context);
+        }
+
+        if (!missingUserDetails) {
+          await fillUserDetails(context, '8888888881');
+        }
+
+        if (partialPayment) {
+          await handlePartialPayment(context, '100');
+        } else if (!isHomeScreenSkipped) {
+          await proceed(context);
+        }
+
+        if (!missingUserDetails) {
+          await assertUserDetails(context);
+          await assertEditUserDetailsAndBack(context);
+        }
+
+        await assertPaymentMethods(context);
+
+        if (personalization) {
+          await selectPersonalizedCard(context);
+        } else {
+          await selectPaymentMethod(context, 'card');
+        }
+
+        await handleCustomerCardStatusRequest(context);
+        await typeOTPandSubmit(context);
+        await respondSavedCards(context, { dcc, avsPrefillFromSavedCard });
+
+        if (!feeBearer && offers) {
+          await viewOffers(context);
+          await selectOffer(context, '1');
+          await verifyOfferApplied(context);
+          if (!feeBearer) {
+            await verifyDiscountPaybleAmount(context, '₹ 1,980');
+          }
+          await verifyDiscountAmountInBanner(context, '₹ 1,980');
+          await verifyDiscountText(context, 'You save ₹20');
+          await delay(400);
+        }
+
+        if (feeBearer) {
+          await verifyFooterText(context, 'PAY');
+        }
+
+        if (partialPayment) {
+          await verifyPartialAmount(context, '₹ 100');
+        }
+
+        if (callbackUrl && timeout) {
+          await verifyTimeout(context, 'card');
+
+          return;
+        }
+
+        await selectSavedCardAndTypeCvv(context);
+
+        if (dcc) {
+          await selectCurrencyAndVerifyAmount(context, 'USD', avs);
+
+          // if AVS check for extra flow
+          if (avs) {
+            await submit(context);
+            if (!avsPrefillFromSavedCard) {
+              // skip filling of data
+              await fillAVSForm(context);
+            } else {
+              // assert data from saved card
+              await assertAVSFormData(context);
+            }
+            // verify footer amount with currency
+            await verifyAmount(context, 'USD', false);
+            return;
+          }
+
+          await submit(context);
+          await expectDCCParametersInRequest(context, 'USD', avs);
+
           return;
         }
 
         await submit(context);
-        await expectDCCParametersInRequest(context, 'USD', avs);
 
-        return;
-      }
+        if (feeBearer) {
+          await handleFeeBearer(context);
+        }
 
-      await submit(context);
-
-      if (feeBearer) {
-        await handleFeeBearer(context);
-      }
-
-      if (callbackUrl) {
-        await expectRedirectWithCallback(context, { method: 'card' });
-      } else {
-        await handleCardValidation(context);
-        await handleMockSuccessDialog(context);
-      }
-    }, 100000);
+        if (callbackUrl) {
+          await expectRedirectWithCallback(context, { method: 'card' });
+        } else {
+          await handleCardValidation(context);
+          await handleMockSuccessDialog(context);
+        }
+      },
+      100000
+    );
   });
 };

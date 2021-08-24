@@ -1,4 +1,100 @@
 import * as Blocks from 'configurability/blocks';
+const testDataForDuplicateConfigValidation = [
+  {
+    input: [
+      {
+        method: 'card',
+        type: 'credit',
+      },
+      {
+        method: 'card',
+        type: 'debit',
+      },
+      {
+        method: 'card',
+        type: 'debit',
+      },
+      {
+        method: 'card',
+        type: 'debit',
+      },
+      {
+        method: 'card',
+        type: 'debit',
+      },
+      {
+        method: 'card',
+        type: 'debit',
+      },
+      {
+        method: 'card',
+        type: 'debit',
+      },
+    ],
+    output: [
+      { method: 'card', type: 'credit' },
+      { method: 'card', type: 'debit' },
+    ],
+  },
+  {
+    input: [
+      {
+        method: 'cardless_emi',
+        providers: ['walnut369', 'walnut369'],
+      },
+    ],
+    output: [{ method: 'cardless_emi', providers: ['walnut369'] }],
+  },
+  {
+    input: [
+      {
+        method: 'cardless_emi',
+        providers: ['walnut369', 'walnut369'],
+      },
+      {
+        method: 'cardless_emi',
+        providers: ['walnut369', 'walnut369'],
+      },
+    ],
+    output: [{ method: 'cardless_emi', providers: ['walnut369'] }],
+  },
+  {
+    input: [
+      {
+        method: 'cardless_emi',
+        providers: ['walnut369', 'walnut369'],
+      },
+      {
+        method: 'cardless_emi',
+        providers: ['walnut369'],
+      },
+    ],
+    output: [{ method: 'cardless_emi', providers: ['walnut369'] }],
+  },
+  {
+    input: [
+      {
+        method: 'emi',
+      },
+      {
+        method: 'emi',
+      },
+      {
+        method: 'emi',
+      },
+      {
+        method: 'emi',
+      },
+      {
+        method: 'emi',
+      },
+      {
+        method: 'emi',
+      },
+    ],
+    output: [{ method: 'emi' }],
+  },
+];
 
 test('Module: configurability/blocks', (t) => {
   test('Blocks.createBlock', (t) => {
@@ -191,7 +287,6 @@ test('Module: configurability/blocks', (t) => {
   test('Blocks.validateAndCreateBlock', (t) => {
     test('Keeps only valid instruments', (t) => {
       let code, config, expected, found;
-
       code = 'block.hdfc';
       config = {
         name: 'Pay via HDFC Bank',
@@ -243,6 +338,37 @@ test('Module: configurability/blocks', (t) => {
 
     t.end();
   });
+  test('Blocks.validateAndCreateBlock', (t) => {
+    testDataForDuplicateConfigValidation.forEach(({ input, output }) => {
+      test('Removes instruments', (t) => {
+        let code, config, expected, found;
+        code = 'block.hdfc';
+        config = {
+          name: 'Pay via HDFC Bank',
+          description: 'Make the paymnet using your HDFC account',
+          instruments: input,
+        };
 
+        expected = {
+          code: 'block.hdfc',
+          _type: 'block',
+          instruments: output,
+          title: 'Pay via HDFC Bank',
+        };
+
+        found = Blocks.validateAndCreateBlock(code, config);
+
+        t.deepEqual(
+          found,
+          expected,
+          'Creates a block with only valid instruments'
+        );
+
+        t.end();
+      });
+
+      t.end();
+    });
+  });
   t.end();
 });

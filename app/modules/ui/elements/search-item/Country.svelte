@@ -15,13 +15,12 @@
 </div>
 
 <style>
-.list-data {
-  display: flex;
-  align-items: center;
-}
+  .list-data {
+    display: flex;
+    align-items: center;
+  }
 
-.list-data img {
-  margin-right: 10px;
-}
-
+  .list-data img {
+    margin-right: 10px;
+  }
 </style>
