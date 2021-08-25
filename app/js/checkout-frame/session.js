@@ -2504,8 +2504,8 @@ Session.prototype = {
     }
 
     var trackingData = {
-      from: this.screen,
-      to: screen,
+      from: this.screen || '',
+      to: screen || '',
     };
 
     // removed causing issue during OTP screen & non OTP screen
@@ -2989,8 +2989,8 @@ Session.prototype = {
 
     Analytics.track('tab:switch', {
       data: {
-        from: this.tab,
-        to: tab,
+        from: this.tab || '',
+        to: tab || '',
         timeSpentInTab: diff > 0 ? diff : 'NA',
       },
     });
