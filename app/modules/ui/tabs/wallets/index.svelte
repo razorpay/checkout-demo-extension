@@ -104,11 +104,17 @@
       window.Razorpay.sendMessage({ event: 'blur' });
     }
 
+    const isDynamicWalletFlow = WalletsData.isDynamicWalletFlow(
+      session.preferences
+    );
+
     Analytics.track('wallet:select', {
       type: AnalyticsTypes.BEHAV,
       data: {
         wallet: $selectedWallet,
-        power: WalletsData.isPowerWallet($selectedWallet),
+        power: !isDynamicWalletFlow
+          ? WalletsData.isPowerWallet($selectedWallet)
+          : false,
       },
     });
   }

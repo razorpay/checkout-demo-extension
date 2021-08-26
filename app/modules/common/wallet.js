@@ -86,6 +86,19 @@ export const wallets = _Obj.map(list, (details, code) => ({
 export const isPowerWallet = (code) => wallets[code] && wallets[code].power;
 export const getWallet = (code) => wallets[code];
 
+/**
+ * Return false if `raas` feature flag and `dynamic_wallet_flow` flag is enabled in preferences.
+ *
+ * @param {object} pref
+ *
+ * @returns {boolean}
+ */
+export const isDynamicWalletFlow = (pref) =>
+  !!(
+    pref &&
+    ((pref.features && pref.features.raas) || pref.dynamic_wallet_flow)
+  );
+
 const walletToIntent = {
   phonepe: 'com.phonepe.app',
 };

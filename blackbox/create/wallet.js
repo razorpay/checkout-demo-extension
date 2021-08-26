@@ -74,6 +74,7 @@ module.exports = function (testFeatures = {}) {
     popupIframe,
     emulate,
     amountAboveLimit = false,
+    dynamicWalletFlow = false,
   } = features;
 
   // Paypal Currency Conversion
@@ -84,6 +85,10 @@ module.exports = function (testFeatures = {}) {
 
   if (amountAboveLimit) {
     options.amount = 110000 * 100; // 1.1L
+  }
+
+  if (dynamicWalletFlow) {
+    preferences.dynamic_wallet_flow = true;
   }
 
   describe.each(
