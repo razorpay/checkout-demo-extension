@@ -112,7 +112,7 @@
   }
 
   export function trackInput(event) {
-    if ($otp === '' || $otp.length > 0) {
+    if (!$otp) {
       $showFeeLabel = false;
     }
     if ($otp) {
