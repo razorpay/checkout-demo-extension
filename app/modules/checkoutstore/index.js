@@ -38,6 +38,8 @@ export const getRecurringMethods = () => getMerchantMethods().recurring;
 export const getMethodsCustomText = () => getMerchantMethods().custom_text;
 export const getMerchantOrder = () => preferences.order;
 export const getOrderMethod = () => getMerchantOrder()?.method;
+export const getMerchantOrderAmount = () => getMerchantOrder()?.amount;
+export const getMerchantOrderDueAmount = () => getMerchantOrder()?.amount_due;
 export const getMerchantKey = () => preferences?.merchant_key;
 export const isGlobalVault = () => preferences.global;
 export const getMerchantOffers = () => {

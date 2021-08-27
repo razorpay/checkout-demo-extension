@@ -1,5 +1,6 @@
 /* global Set */
 import Config, { FLOWS } from 'config';
+import { get } from 'svelte/store';
 
 import {
   isRecurring,
@@ -16,6 +17,9 @@ import {
   isASubscription,
   getCallbackUrl,
   isCustomerFeeBearer,
+  getMerchantOrderAmount,
+  getMerchantOrderDueAmount,
+  isPartialPayment,
 } from 'checkoutstore';
 
 import {
@@ -55,6 +59,7 @@ import {
   instruments as InstrumentsStore,
   hiddenInstruments as HiddenInstrumentsStore,
   hiddenMethods as HiddenMethodsStore,
+  partialPaymentAmount,
 } from 'checkoutstore/screens/home';
 
 import { isWebPaymentsApiAvailable } from 'common/webPaymentsApi';
@@ -222,12 +227,30 @@ const ALL_METHODS = {
   },
 
   bank_transfer() {
+    const orderAmount = getMerchantOrderAmount();
+    const dueAmount = getMerchantOrderDueAmount();
+    // get partial amount input
+    const partialPaymentInput = get(partialPaymentAmount)
+      ? parseFloat(get(partialPaymentAmount)) * 100
+      : '';
+
+    // if user made partial payment and try to make rest make sure dueAmount == originalAmount
+    const amountCheck = dueAmount
+      ? orderAmount === dueAmount && !partialPaymentInput
+      : !partialPaymentInput;
+
+    // if partial amount disable bank transfer
+    const partialPaymentCheck =
+      (isPartialPayment() && orderAmount === partialPaymentInput) ||
+      amountCheck;
+
     return (
       !isRecurring() &&
       getAmount() &&
       getMerchantMethods().bank_transfer &&
       !isInternational() &&
       getOption('method.bank_transfer') &&
+      partialPaymentCheck &&
       getOption('order_id')
     );
   },

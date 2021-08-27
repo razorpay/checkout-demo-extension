@@ -28,18 +28,14 @@ const {
   handlePartialPayment,
 } = require('../tests/homescreen/actions');
 
-module.exports = function(testFeatures) {
+module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'bank-transfer',
     testFeatures
   );
 
-  const {
-    partialPayments,
-    optionalContact,
-    optionalEmail,
-    feeBearer,
-  } = features;
+  const { partialPayments, optionalContact, optionalEmail, feeBearer } =
+    features;
 
   describe.each(
     getTestData(title, {
@@ -85,6 +81,19 @@ module.exports = function(testFeatures) {
       }
 
       const amountInHeader = await getAmountFromHeader();
+      if (partialPayments) {
+        const status = await context.page.evaluate(() => {
+          const el = document.querySelector(
+            `button.new-method[method=bank_transfer]`
+          );
+          if (!el || !el.offsetWidth) {
+            return true;
+          }
+          return false;
+        });
+        expect(status).toBeTruthy();
+        return;
+      }
       await selectPaymentMethod(context, 'bank_transfer');
       await returnVirtualAccounts(context, feeBearer);
       await verifyNeftDetails(context, feeBearer);
