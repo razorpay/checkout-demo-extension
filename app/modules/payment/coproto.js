@@ -116,7 +116,7 @@ function popupIframeCheck(request) {
           <title>Razorpay</title>
           \x3Cscript>
           window.addEventListener('message', event => {
-            // IMPORTANT: check the origin of the data!
+            // IMPORTANT: check the origin of the data! 
             if (event.origin.startsWith('https://api.razorpay.com')) {
                 const data = event.data;
                 if (!window.CheckoutBridge) {
@@ -125,12 +125,12 @@ function popupIframeCheck(request) {
                   setTimeout(window.close, 999);
                 }
             } else {
-                // The data was NOT sent from your site!
+                // The data was NOT sent from your site! 
                 // Be careful! Do not use it. This else branch is
                 // here just for clarity, you usually shouldn't need it.
-                return;
-            }
-        });
+                return; 
+            } 
+        }); 
           \x3C/script>
           <style type="text/css">
             body,
@@ -187,11 +187,6 @@ export const processCoproto = function (response) {
     if (this.iframe && this.popup) {
       this.popup.writable = 1;
     }
-    /**
-     * Emit createPayment.responseType event.
-     * `createPayment.responseType` is being used to show the otp view for wallets depending on ajax api response, instead of deciding on UI.
-     */
-    this.emit('createPayment.responseType', response.type);
     var func = responseTypes[response.type];
     var isFunction = _.isFunction(func);
     if (isFunction) {

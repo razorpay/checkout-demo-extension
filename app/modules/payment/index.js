@@ -17,7 +17,7 @@ import { formatPayment } from 'payment/validator';
 import { FormatDelegator } from 'formatter';
 import Razorpay, { makeAuthUrl, makeUrl } from 'common/Razorpay';
 import { ajaxRouteNotSupported } from 'common/useragent';
-import { isPowerWallet, isDynamicWalletFlow } from 'common/wallet';
+import { isPowerWallet } from 'common/wallet';
 import { checkPaymentAdapter } from 'payment/adapters';
 import Analytics from 'analytics';
 import { isProviderHeadless } from 'common/cardlessemi';
@@ -197,10 +197,6 @@ export default function Payment(data, params = {}, r) {
 
   var avoidPopup = false;
 
-  const isDynamicWallet = isDynamicWalletFlow(this.r.preferences);
-
-  const that = this;
-
   /**
    * Avoid Popup if:
    * - This is a native OTP request
@@ -234,7 +230,7 @@ export default function Payment(data, params = {}, r) {
       this.on('complete', this.complete);
 
       if (data.method === 'wallet') {
-        if (isPowerWallet(data.wallet) && !isDynamicWallet) {
+        if (isPowerWallet(data.wallet)) {
           /* If contact or email are missing, we need to ask for it in popup */
           if (data.contact && data.email) {
             avoidPopup = true;
@@ -308,16 +304,7 @@ export default function Payment(data, params = {}, r) {
   this.avoidPopup = avoidPopup;
   this.message = params.message;
 
-  if (isDynamicWallet) {
-    // Show popup based on createPayment response.
-    this.r.on('payment.createPayment.responseType', function (type) {
-      if (data.method === 'wallet' && type !== 'otp') {
-        that.tryPopup();
-      }
-    });
-  } else {
-    this.tryPopup();
-  }
+  this.tryPopup();
 
   // Method should not be sent for google pay card + upi merged flow
   if (data && data.method === 'app' && data.provider === 'google_pay') {
@@ -574,15 +561,10 @@ Payment.prototype = {
      * which is sent for some of the wallets, unidentifiable from
      * checkout side before making the payment
      * so not making ajax call for power wallets
-     *
-     * But if dynamic wallet flow feature is enabled
-     * then we have to make ajax call.
      */
     const popupForMethods = ['cardless_emi'];
     const paymentThroughPowerWallet =
-      data.method === 'wallet' &&
-      !isDynamicWalletFlow(this.r.preferences) &&
-      isPowerWallet(data.wallet);
+      data.method === 'wallet' && isPowerWallet(data.wallet);
     if (
       !isRazorpayFrame() && // razorpay.js
       (_Arr.contains(popupForMethods, data.method) || paymentThroughPowerWallet)

@@ -5181,10 +5181,7 @@ Session.prototype = {
       }
     }
 
-    var isDynamicWalletFlow = discreet.Wallet.isDynamicWalletFlow(preferences);
-
     if (
-      !isDynamicWalletFlow &&
       discreet.Wallet.isPowerWallet(wallet) &&
       !request.feesRedirect &&
       data.contact &&
@@ -5207,7 +5204,7 @@ Session.prototype = {
       }
     }
 
-    if (!isDynamicWalletFlow && wallet === 'freecharge') {
+    if (wallet === 'freecharge') {
       this.otpView.updateScreen({
         maxlength: 4,
       });
@@ -5234,30 +5231,6 @@ Session.prototype = {
       .on('payment.success', bind(successHandler, this))
       .on('payment.error', bind(errorHandler, this))
       .on('payment.cancel', bind(cancelHandler, this));
-
-    if (data.method === 'wallet' && isDynamicWalletFlow) {
-      /**
-       * Register payment api otp.response callback, to trigger otp view.
-       */
-      this.r.on('payment.createPayment.responseType', function (type) {
-        if (type === 'otp') {
-          hideOverlayMessage();
-          that.otpView.updateScreen({
-            skipTextLabel: 'resend_otp',
-            allowSkip: false,
-          });
-          that.topBar.setTitleOverride('otp', 'image', walletObj.logo);
-          if (wallet === 'freecharge') {
-            that.otpView.updateScreen({
-              maxlength: 4,
-            });
-          }
-          that.commenceOTP('otp_sending_generic', undefined, {
-            phone: getPhone(),
-          });
-        }
-      });
-    }
 
     this.attemptCount++;
 
@@ -5293,12 +5266,7 @@ Session.prototype = {
     }
 
     if (this.powerwallet) {
-      this.commenceOTP('otp_sending_generic', undefined, {
-        phone: getPhone(),
-      });
-    }
-
-    if (this.powerwallet || isDynamicWalletFlow) {
+      this.commenceOTP('otp_sending_generic', undefined, { phone: getPhone() });
       this.r.on('payment.otp.required', function (message) {
         askOTP(that.otpView, message, false, { phone: getPhone() });
         that.otpView.updateScreen({
