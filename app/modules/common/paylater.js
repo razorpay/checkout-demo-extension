@@ -1,4 +1,5 @@
 import RazorpayConfig from 'common/RazorpayConfig';
+import ErrorService from 'error-service';
 
 const cdnUrl = RazorpayConfig.cdn;
 
@@ -80,6 +81,13 @@ export const extendConfig = (provider, updatedConfig) => {
  * @returns {string}
  */
 export const getImageUrl = (provider) => {
-  const { logo } = getProvider(provider);
-  return logo;
+  try {
+    const { logo } = getProvider(provider);
+    return logo;
+  } catch (error) {
+    ErrorService.captureError(error, {
+      severity: ErrorService.SEVERITY_LEVELS.S3,
+    });
+    return '';
+  }
 };

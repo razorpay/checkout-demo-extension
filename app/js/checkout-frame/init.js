@@ -6,6 +6,7 @@ var fetch = discreet.fetch;
 var Track = discreet.Track;
 var Analytics = discreet.Analytics;
 var AnalyticsTypes = discreet.AnalyticsTypes;
+var ErrorService = discreet.ErrorService;
 var UPIUtils = discreet.UPIUtils;
 var GPay = discreet.GPay;
 var Color = discreet.Color;
@@ -39,16 +40,27 @@ window.onerror = function (errorMsg, url, lineNumber, column, errorObj) {
   if (typeof url === 'string' && !isUrlApplicableForErrorTracking(url)) {
     return;
   }
+  var error = {
+    message: errorMsg,
+    lineNumber: lineNumber,
+    fileName: url,
+    columnNumber: column,
+    stack: errorObj && errorObj.stack,
+  };
 
-  Analytics.track('js_error', {
-    r: SessionManager.getSession().r,
-    data: {
-      message: errorMsg,
-      line: lineNumber,
-      col: column,
-      stack: errorObj && errorObj.stack,
+  ErrorService.captureError(error, {
+    unhandled: true,
+    analytics: {
+      event: 'js_error',
+
+      // Keeping this for historic reasons. Once we've migrated to new events system we can remove this.
+      data: {
+        message: errorMsg,
+        line: lineNumber,
+        col: column,
+        stack: errorObj && errorObj.stack,
+      },
     },
-    immediately: true,
   });
 };
 
@@ -63,11 +75,15 @@ window.addEventListener('unhandledrejection', function (event) {
     };
   }
 
-  Analytics.track('unhandled_rejection', {
-    r: SessionManager.getSession().r,
-    data: {
-      reason: reason,
+  ErrorService.captureError(event.reason, {
+    unhandled: true,
+    analytics: {
+      event: 'unhandled_rejection',
+
+      // Keeping this for historic reasons. Once we've migrated to new events system we can remove this.
+      data: {
+        reason: reason,
+      },
     },
-    immediately: true,
   });
 });

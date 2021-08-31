@@ -6,6 +6,7 @@ import HomeEvents from './home/events';
 import OrderEvents from './order/events';
 import MiscEvents from './misc/events';
 import DowntimeEvents from './downtime/events';
+import ErrorEvents from './errors/events';
 import { getTrackMethods, addAnalyticsMethods } from './helpers';
 import MetaProperties from './metaProperties';
 import Analytics, { Track } from './analytics';
@@ -19,6 +20,7 @@ export {
   Events,
   CardEvents,
   DowntimeEvents,
+  ErrorEvents,
   MiscEvents,
   OfferEvents,
   MetaProperties,

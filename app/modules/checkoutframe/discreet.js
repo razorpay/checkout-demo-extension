@@ -3,6 +3,7 @@ import RazorpayConfig from 'common/RazorpayConfig';
 
 import Analytics, { Track } from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
+import ErrorService from 'error-service';
 import * as UPIUtils from 'common/upi';
 import * as GPay from 'gpay';
 import * as Color from 'lib/color';
@@ -132,6 +133,7 @@ export default {
   OtpService,
   currencies: Currency.displayCurrencies,
   error: _.rzpError,
+  ErrorService,
   Formatter,
   Form,
 
