@@ -60,6 +60,7 @@ import {
   hiddenInstruments as HiddenInstrumentsStore,
   hiddenMethods as HiddenMethodsStore,
   partialPaymentAmount,
+  partialPaymentOption,
 } from 'checkoutstore/screens/home';
 
 import { isWebPaymentsApiAvailable } from 'common/webPaymentsApi';
@@ -229,10 +230,12 @@ const ALL_METHODS = {
   bank_transfer() {
     const orderAmount = getMerchantOrderAmount();
     const dueAmount = getMerchantOrderDueAmount();
+    const partialPaymentOpt = get(partialPaymentOption);
     // get partial amount input
-    const partialPaymentInput = get(partialPaymentAmount)
-      ? parseFloat(get(partialPaymentAmount)) * 100
-      : '';
+    const partialPaymentInput =
+      partialPaymentOpt !== 'full' && get(partialPaymentAmount)
+        ? parseFloat(get(partialPaymentAmount)) * 100
+        : '';
 
     // if user made partial payment and try to make rest make sure dueAmount == originalAmount
     const amountCheck = dueAmount
