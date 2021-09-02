@@ -625,6 +625,6 @@
     font-size: 14px;
     line-height: 17px;
     margin-top: 24px;
-    color: #0d2366;
+    color: #373737;
   }
 </style>

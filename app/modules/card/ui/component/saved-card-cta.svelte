@@ -30,7 +30,7 @@
         {/if}
       </div>
     </div>
-    <div class="arrow-right">&#xe604;</div>
+    <div class="arrow-right theme-highlight-color">&#xe604;</div>
   </div>
 </div>
 
@@ -57,7 +57,7 @@
     flex-direction: column;
     font-size: 13px;
     line-height: 16px;
-    color: #0d2366;
+    color: #373737;
   }
 
   .saved-text-subtitle {
@@ -71,6 +71,5 @@
     align-items: center;
     transform: rotate(180deg);
     font-size: 8px;
-    color: #d6d6d6;
   }
 </style>
