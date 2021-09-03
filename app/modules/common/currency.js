@@ -1281,9 +1281,9 @@ export function formatAmountWithSymbol(amount, currency, space = true) {
 export function displayAmount(razorpay, payloadAmount, payloadCurrency, isDCC) {
   let get = razorpay.get;
   let displayCurrency = get('display_currency');
-  if (displayCurrency) {
-    let displayAmount = parseFloat(get('display_amount'));
+  let displayAmount = parseFloat(get('display_amount'));
 
+  if (displayCurrency && displayAmount) {
     // Since display amount is in major, we need to convert it into minor.
     displayAmount *= Math.pow(10, getCurrencyConfig(displayCurrency).decimals);
 

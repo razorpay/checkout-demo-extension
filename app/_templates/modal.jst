@@ -10,7 +10,7 @@ var html = function(html){return html.replace(/<[^>]*>?/g, "")};
 var attr = function(attr){return attr.replace(/"/g,'')};
 var amount;
 var amount_figure = _.formatAmountWithCurrency(o('amount'));
-if(o('display_currency'))
+if(o('display_currency') && o('display_amount'))
   amount = discreet.currencies[o('display_currency')] + html(o('display_amount'));
 else
   amount = amount_figure;

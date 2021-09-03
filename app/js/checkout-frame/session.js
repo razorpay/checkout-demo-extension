@@ -755,11 +755,13 @@ Session.prototype = {
   formatAmountWithCurrency: function (amount) {
     var amountFigure = this.formatAmount(amount);
     var displayCurrency = this.r.get('display_currency');
+    var displayAmount = this.r.get('display_amount');
     var currency = this.r.get('currency');
 
-    if (displayCurrency) {
+    if (displayCurrency && displayAmount) {
       // TODO: handle display_amount case as in modal.jst
-      amount = discreet.currencies[displayCurrency] + ' ' + amount;
+
+      amount = discreet.currencies[displayCurrency] + ' ' + displayAmount;
     } else {
       amount = discreet.currencies[currency] + ' ' + amountFigure;
     }
