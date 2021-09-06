@@ -116,7 +116,6 @@ module.exports = function (testFeatures) {
       if (!missingUserDetails) {
         await fillUserDetails(context, '8888888881');
       }
-      await delay(20000);
       if (partialPayment) {
         await handlePartialPayment(context, '100');
       } else if (!isHomeScreenSkipped) {

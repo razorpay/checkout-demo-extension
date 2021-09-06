@@ -14,6 +14,7 @@ import {
   formatAmountWithSymbol,
 } from 'common/currency';
 import { getAgentPayload } from 'checkoutstore/methods';
+import { checkCREDEligibility } from 'checkoutframe/cred';
 
 export function makeUrl(path = '') {
   return RazorpayConfig.api + RazorpayConfig.version + path;
@@ -311,6 +312,16 @@ RazorProto.fetchVirtualAccount = function ({ customer_id, order_id, notes }) {
     });
   });
 };
+
+/**
+ * This is a helper API to check the user eligibility for CRED.
+ * Since its a utility and doesn't have control over when it is being called,(contact change/ before payment API)
+ * it's in hands of consumer ( merchant ) on when to call this.
+ * Ideally it should be called before payment API call
+ * @param {string} contact contact with country code
+ * @returns {Promise} returns a promise with JSON
+ */
+RazorProto.checkCREDEligibility = checkCREDEligibility;
 
 function isValidAmount(amt, min = 100) {
   if (/[^0-9]/.test(amt)) {

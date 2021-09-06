@@ -1,4 +1,5 @@
 import CardEvents from './card';
+import CredEvents from './app/cred-events';
 import OfferEvents from './offers/events';
 import P13NEvents from './p13n/events';
 import HomeEvents from './home/events';
@@ -25,4 +26,5 @@ export {
   HomeEvents,
   OrderEvents,
   Track,
+  CredEvents,
 };

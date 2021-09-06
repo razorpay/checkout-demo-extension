@@ -357,12 +357,23 @@ export function getMerchantConfig() {
 }
 
 /**
+ *
+ * @returns {string|null} customized subtext for cred app
+ */
+const getCustomSubtextForCred = () => {
+  return getMerchantMethods()?.app_meta?.cred?.offer?.description;
+};
+
+/**
  * CRED wants put ads in instrument subtext.
  *
  * @param code
  * @returns {*}
  */
 export function getCustomSubtextForMethod(code) {
+  if (code === 'cred') {
+    return getCustomSubtextForCred();
+  }
   const customText = getMethodsCustomText();
   if (customText && customText[code]) {
     return customText[code];

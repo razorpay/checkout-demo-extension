@@ -6,9 +6,13 @@ const addNewCardScreen = {
   ADD_NEW_CARD: 'add_new',
 };
 
+const cardScreen = {
+  APP_SELECT: 'app:select',
+};
 // All card related events
 const events = {
   ...addNewCardScreen,
+  ...cardScreen,
 };
 
 export default getEventsName('card', events);

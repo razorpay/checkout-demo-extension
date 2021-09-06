@@ -169,6 +169,7 @@ function escapeHtml(str) {
 
 /**
  * Improvise the contact from prefill
+ * This is right place to call methods that require updated contact all time (pre-filled/edited/API-filled)
  * @param {Session} session
  */
 function improvisePrefilledContact(session) {
@@ -217,6 +218,8 @@ function improvisePrefilledContact(session) {
         },
       });
     }
+
+    discreet.CRED.checkCREDEligibilityForUpdatedContact(prefilledContact);
   }
 
   // Update prefills
@@ -994,6 +997,7 @@ Session.prototype = {
 
       if (data.contact) {
         HomeScreenStore.setContact(data.contact);
+        discreet.CRED.checkCREDEligibilityForUpdatedContact(data.contact);
       }
     }
   },
@@ -1092,41 +1096,6 @@ Session.prototype = {
 
   setExperiments: function () {
     discreet.Experiments.clearOldExperiments();
-  },
-
-  getReadOnlyAppOffers: function (preferences) {
-    var metaApps = (preferences.methods || {}).app_meta || {};
-
-    var metaAppOffers = [];
-
-    Object.keys(metaApps).forEach(function (app) {
-      if (metaApps[app].offer) {
-        if (app === 'cred') {
-          metaAppOffers.push({
-            id: 'CRED_experimental_offer',
-            name: app.toUpperCase() + ' Offer',
-            display_text: metaApps[app].offer.description,
-            payment_method: 'card',
-            type: 'read_only',
-            issuer: 'cred',
-          });
-        }
-      }
-    });
-
-    return metaAppOffers;
-  },
-
-  // allow a easier setup of read only offers
-  // read_only offers can come from many sources ( as they have in the past )
-  addReadOnlyOffers: function (preferences) {
-    var metaAppOffers = this.getReadOnlyAppOffers(preferences);
-    if (!preferences.offers) {
-      preferences.offers = [];
-    }
-    metaAppOffers.forEach(function (offer) {
-      preferences.offers.push(offer);
-    });
   },
 
   render: function (options) {
@@ -1807,7 +1776,6 @@ Session.prototype = {
   improvisePrefill: function () {
     var prefilledMethod = this.get('prefill.method');
     var prefilledProvider = this.get('prefill.provider');
-
     /**
      * Bajaj Finserv is _technically_ EMI,
      * but we're grouping it under Cardless EMI screen
@@ -2666,8 +2634,8 @@ Session.prototype = {
           _Arr.findIndex(cardApps, function (app) {
             return app === offer.issuer;
           }) !== -1;
-        if (isCardAppOffer) {
-          CardScreenStore.selectedApp.set(offer.issuer);
+        if (isCardAppOffer && MethodStore.isApplicationEnabled(offer.issuer)) {
+          this.svelteCardTab.setSelectedApp(offer.issuer);
         }
       }
     }
@@ -4236,7 +4204,8 @@ Session.prototype = {
         // switch to methods tab
         if (this.homeTab.onDetailsScreen()) {
           if (this.homeTab.shouldGoNext()) {
-            return this.homeTab.next();
+            this.homeTab.next();
+            return discreet.CRED.checkCREDEligibilityForUpdatedContact();
           }
         }
       } else {
@@ -5089,7 +5058,9 @@ Session.prototype = {
           // which is present in proxyPhone.
           this.payload.contact = getProxyPhone();
         }
-        if (discreet.CRED.isUserEligible(this.payload.contact) === undefined) {
+        var userEligibleDetails =
+          discreet.CRED.isUserEligible(this.payload.contact) || {};
+        if (userEligibleDetails.eligible === undefined) {
           session.showLoadError(I18n.format('card.checking_cred_eligibility'));
           discreet.CRED.checkCREDEligibility(this.payload.contact)
             .then(function (res) {
@@ -5104,7 +5075,7 @@ Session.prototype = {
               session.showLoadError(userFacingError, true);
             });
           return;
-        } else if (!discreet.CRED.isUserEligible(this.payload.contact)) {
+        } else if (!userEligibleDetails.eligible) {
           var userFacingError = I18n.format('card.no_cred_account');
           session.showLoadError(userFacingError, true);
           return;
@@ -5549,6 +5520,20 @@ Session.prototype = {
     var forcedOffer = discreet.Offers.getForcedOffer();
     var allOffers = discreet.Offers.getOffersForTab();
 
+    /**
+     * Since setOffers is called on render (render => setSvelteComponents=> setOffers) and also by CRED utilities
+     * By this execution, an instance of offers may present in DOM
+     * Hence offers view has to be destroyed with clearing offer first (else new offer screen gets effect of applied offer)
+     * And as screen/switchTab updates offer screen accordingly, setting session.offers to undefined is necessary to avoid them.
+     */
+    if (this.offers && this.offers.$destroy) {
+      if (this.offers.getAppliedOffer && this.offers.getAppliedOffer()) {
+        this.offers.clearOffer();
+      }
+      this.offers.$destroy();
+      this.offers = undefined;
+    }
+
     // we show offers from backend + zestmoney offer which is
     // universally enabled
     if (forcedOffer || allOffers.length > 0) {
@@ -5699,44 +5684,7 @@ Session.prototype = {
     }
   },
 
-  /**
-   * @description Unlike the standard experiments on checkout, for CRED,
-   * the entire logic for the A/B resides in BE. BE either sends us the meta offer or the cred subtext
-   * @param {Object} prefs the preferences response
-   */
-  setupCREDExperiment: function (prefs) {
-    this.addReadOnlyOffers(prefs);
-    var experimentType = null;
-    prefs.offers.forEach(function (offer) {
-      if (offer.id === 'CRED_experimental_offer') {
-        experimentType = 'offer_tile';
-      }
-    });
-    var customTextAvailable =
-      prefs.methods &&
-      prefs.methods.custom_text &&
-      prefs.methods.custom_text.cred;
-    var offerAvailable =
-      prefs.methods &&
-      prefs.methods.app_meta &&
-      prefs.methods.app_meta.cred &&
-      prefs.methods.app_meta.cred.offer;
-
-    if (!experimentType && customTextAvailable && !offerAvailable) {
-      experimentType = 'subtext';
-    }
-    Analytics.track('cred:subtext_offer_experiment', {
-      data: {
-        experiment: experimentType,
-      },
-    });
-    if (experimentType) {
-      discreet.BrowserStorage.setItem('cred_offer_experiment', experimentType);
-    }
-  },
-
   setPreferences: function (prefs) {
-    this.setupCREDExperiment(prefs);
     this.preferences = prefs;
     preferences = prefs;
 

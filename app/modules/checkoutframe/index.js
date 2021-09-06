@@ -25,7 +25,6 @@ import { returnAsIs } from 'lib/utils';
 import { cookieDisabled, isIframe, ownerWindow } from 'common/constants';
 
 import { checkForPossibleWebPaymentsForUpi } from 'checkoutframe/components/upi';
-import { setCREDEligibilityFromPreferences } from 'checkoutframe/cred';
 import { reward } from 'checkoutstore/rewards';
 import updateScore from 'analytics/checkoutScore';
 import { isBraveBrowser } from 'common/useragent';
@@ -334,7 +333,6 @@ function setSessionPreferences(session, preferences) {
   updateEmandatePrefill();
   updateAnalytics(preferences);
   updatePreferredMethods(preferences);
-  setCREDEligibilityFromPreferences(preferences);
 
   Razorpay.configure(preferences.options);
   session.setPreferences(preferences);

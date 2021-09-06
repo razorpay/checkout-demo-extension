@@ -44,6 +44,7 @@ module.exports = function (testFeatures) {
     optionalContact,
     optionalEmail,
     personalization,
+    credMerchantConsent = false,
   } = features;
 
   describe.each(
@@ -58,7 +59,13 @@ module.exports = function (testFeatures) {
           preferences.customer.contact = '+918888888881';
         }
       }
-
+      if (credMerchantConsent) {
+        if (preferences.features) {
+          preferences.features.cred_merchant_consent = true;
+        } else {
+          preferences.features = { cred_merchant_consent: true };
+        }
+      }
       const apps = [];
 
       if (app === 'google_pay') {
@@ -169,6 +176,10 @@ module.exports = function (testFeatures) {
 
       if (!missingUserDetails) {
         await assertUserDetails(context);
+        // with recent changes on checkout, CRED eligibility call will hit on contact set on consent
+        if (app === 'cred' && credMerchantConsent) {
+          await handleCREDUserValidation(context);
+        }
         await assertEditUserDetailsAndBack(context);
       }
 
@@ -193,12 +204,13 @@ module.exports = function (testFeatures) {
       // ^ Internally checks for absence of #user-details
       // but it is present in DOM for some reason,
       // so using #footer directly
+
       await context.page.click('#footer');
-      if (app === 'cred') {
+      if (app === 'cred' && !credMerchantConsent) {
         await handleCREDUserValidation(context);
       }
-      await handleAppCreatePayment(context, { app, flow, platform });
 
+      await handleAppCreatePayment(context, { app, flow, platform });
       await handleAppPaymentStatus(context, { app, flow, platform });
     });
   });

@@ -215,7 +215,7 @@
 
     if (session.get('prefill.method') === 'card') {
       if (isApplicationEnabled(session.get('prefill.provider'))) {
-        $selectedApp = session.get('prefill.provider');
+        setSelectedApp(session.get('prefill.provider'));
       }
     }
 
@@ -519,7 +519,10 @@
     [lastView, currentView] = [currentView, view];
   }
 
-  function setSelectedApp(code) {
+  export function setSelectedApp(code) {
+    Events.TrackBehav(CardEvents.APP_SELECT, {
+      app: code,
+    });
     $selectedApp = code;
     $selectedCard = null;
     $newCardInputFocused = false;

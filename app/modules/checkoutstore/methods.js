@@ -561,7 +561,7 @@ export function isApplicationEnabled(app) {
   return false;
 }
 
-function isCREDEnabled() {
+export function isCREDEnabled() {
   return getMerchantMethods().app?.cred;
 }
 

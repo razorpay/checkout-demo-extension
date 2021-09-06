@@ -10,6 +10,7 @@
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
   import { returnAsIs } from 'lib/utils';
 
+  import { getSession } from 'sessionmanager';
   // Svelte imports
   import { createEventDispatcher, onMount } from 'svelte';
 
@@ -149,6 +150,13 @@
   export let tab;
 
   function handleFilled(curField) {
+    const { tab, getAppliedOffer } = getSession();
+    const { payment_method, issuer } = getAppliedOffer?.();
+
+    if (tab === 'card' && tab === payment_method && issuer === 'cred') {
+      // when card-apps offer(s) applied avoid focusing as offer-removal warning will come
+      return;
+    }
     switch (curField) {
       case 'numberField':
         expiryField.ref.focus();

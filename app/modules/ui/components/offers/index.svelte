@@ -4,9 +4,8 @@
   import { formatAmountWithSymbol } from 'common/currency';
   import { getCurrency } from 'checkoutstore';
   import { getAnimationOptions } from 'svelte-utils';
-
-  import Analytics, { OfferEvents, Events } from 'analytics';
-  import * as AnalyticsTypes from 'analytics-types';
+  import { CRED_EXPERIMENTAL_OFFER_ID } from 'checkoutframe/cred';
+  import { CredEvents, OfferEvents, Events } from 'analytics';
 
   import {
     getOffersForTab,
@@ -18,7 +17,6 @@
   // i18n
   import { t, locale } from 'svelte-i18n';
   import { formatTemplateWithLocale } from 'i18n';
-
   import {
     AVAILABLE_OFFERS_HEADER,
     BACK_ACTION,
@@ -189,10 +187,8 @@
 
   function applyOffer(offer) {
     Events.TrackBehav(OfferEvents.APPLY, { offer });
-    if (offer?.id === 'CRED_experimental_offer') {
-      Analytics.track('cred:experiment_offer_selected', {
-        type: AnalyticsTypes.BEHAV,
-      });
+    if (offer?.id === CRED_EXPERIMENTAL_OFFER_ID) {
+      Events.TrackBehav(CredEvents.EXPERIMENT_OFFER_SELECTED);
     }
     $appliedOffer = offer;
     if (offer) {
