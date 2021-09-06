@@ -4,6 +4,7 @@
   import { showCta, hideCta } from 'checkoutstore/cta';
   import { methodInstrument } from 'checkoutstore/screens/home';
   import { selectedWallet } from 'checkoutstore/screens/wallet';
+  import { isDynamicWalletFlow } from 'checkoutstore';
   import Bottom from 'ui/layouts/Bottom.svelte';
   // i18n
   import { getWalletName, getWalletSubtitle } from 'i18n';
@@ -108,7 +109,9 @@
       type: AnalyticsTypes.BEHAV,
       data: {
         wallet: $selectedWallet,
-        power: WalletsData.isPowerWallet($selectedWallet),
+        power: !isDynamicWalletFlow()
+          ? WalletsData.isPowerWallet($selectedWallet)
+          : false,
       },
     });
   }

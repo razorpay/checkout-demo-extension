@@ -383,3 +383,13 @@ export function getCustomSubtextForMethod(code) {
 export function getTrustedBadgeHighlights() {
   return preferences.rtb;
 }
+
+/**
+ * Return true if `raas` feature flag and `dynamic_wallet_flow` flag is enabled in preferences.
+ *
+ * @param {object} pref
+ * @returns {boolean}
+ */
+export function isDynamicWalletFlow() {
+  return hasFeature('raas') || preferences?.dynamic_wallet_flow;
+}
