@@ -580,18 +580,23 @@ export function isCREDIntentFlowAvailable() {
   );
 }
 
-export function getAgentPayload() {
+export function getAgentPayload(option) {
   const { platform } = getSDKMeta();
+
+  // for cred any mobile platform to send as mobile
   return {
     '_[agent][platform]': platform,
-    '_[agent][device]': getDevice(),
+    '_[agent][device]': option?.cred
+      ? getDevice() !== 'desktop'
+        ? 'mobile'
+        : 'desktop'
+      : getDevice(),
     '_[agent][os]': getOS(),
   };
 }
 
 export function getPayloadForCRED() {
-  const agentPayload = getAgentPayload() || {};
-
+  const agentPayload = getAgentPayload({ cred: true }) || {};
   return {
     method: 'app',
     provider: 'cred',

@@ -89,4 +89,5 @@ export const Views = {
   SAVED_CARDS: 'saved-cards',
   ADD_CARD: 'add-card',
   AVS: 'avs-card',
+  CARD_APP: 'card-app',
 };

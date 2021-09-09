@@ -213,6 +213,11 @@ var responseTypes = {
 
   first: function (request, fullResponse) {
     if (request.method === 'redirect') {
+      if (this.data.method === 'app' && this.data.provider === 'cred') {
+        this.avoidPopup = false;
+        this.tryPopup();
+        this.writePopup();
+      }
       request.method = 'post';
     }
     var direct = request.method === 'direct';

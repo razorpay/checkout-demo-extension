@@ -964,7 +964,11 @@
       {#if isDCCEnabled()}
         <DynamicCurrencyView
           {tabVisible}
-          view={currentView === Views.AVS ? lastView : currentView}
+          view={$selectedApp
+            ? Views.CARD_APP
+            : currentView === Views.AVS
+            ? lastView
+            : currentView}
           isAVS={currentView === Views.AVS}
         />
       {/if}

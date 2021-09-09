@@ -233,7 +233,7 @@ const setupExperimentForCRED = (preferences) => {
  */
 export const checkCREDEligibility = (contact) => {
   const session = getSession();
-  const agentPayload = getAgentPayload() || {};
+  const agentPayload = getAgentPayload({ cred: true }) || {};
 
   const url = _.appendParamsToUrl(
     makeAuthUrl(session.r, 'payments/validate/account')

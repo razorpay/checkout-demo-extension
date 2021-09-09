@@ -8,6 +8,7 @@ const {
   handleAppCreatePayment,
   handleCREDUserValidation,
   handleAppPaymentStatus,
+  handleMockSuccessDialog,
 } = require('../actions/common');
 const {
   // Generic
@@ -33,7 +34,7 @@ module.exports = function (testFeatures) {
     testFeatures
   );
 
-  const { app, flow, config, platform, testName } = testFeatures;
+  const { app, flow, config, platform, testName, emulate } = testFeatures;
 
   const {
     partialPayment,
@@ -152,6 +153,7 @@ module.exports = function (testFeatures) {
         options,
         preferences,
         method: 'app',
+        emulate,
         apps,
         params,
       });
@@ -211,6 +213,10 @@ module.exports = function (testFeatures) {
       }
 
       await handleAppCreatePayment(context, { app, flow, platform });
+      if (app === 'cred' && flow === 'newUser') {
+        await handleMockSuccessDialog(context);
+        return;
+      }
       await handleAppPaymentStatus(context, { app, flow, platform });
     });
   });

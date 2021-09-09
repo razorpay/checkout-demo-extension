@@ -529,6 +529,23 @@ async function handleAppCreatePayment(context, { app, flow } = {}) {
     });
 
     return;
+  } else if ((app = 'cred' && flow === 'newUser')) {
+    const body = querystring.parse(req.body);
+    expect(body).toMatchObject({
+      method: 'app',
+      provider: 'cred',
+      '_[agent][device]': 'mobile',
+    });
+    await context.respondJSON({
+      type: 'first',
+      request: {
+        url: 'http://localhost:9008',
+        method: 'redirect',
+      },
+      payment_id: 'pay_DLXKaJEF1T1KxC',
+      amount: '\u20b9 51',
+      image: 'https://cdn.razorpay.com/logos/D3JjREAG8erHB7_medium.jpg',
+    });
   } else {
     throw `Payment create not handled for ${app}`;
   }
