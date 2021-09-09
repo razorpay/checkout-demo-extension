@@ -243,7 +243,7 @@ export function trackP13nMeta(data) {
   _Obj.loop(
     data,
     (
-      { instruments, is_customer_identified, user_aggregates_available },
+      { instruments, is_customer_identified, user_aggregates_available, versionID },
       contact
     ) => {
       if (instruments) {
@@ -251,6 +251,7 @@ export function trackP13nMeta(data) {
           contact,
           is_customer_identified,
           user_aggregates_available,
+          versionID,
           count: instruments && instruments.length,
         });
       }
