@@ -151,7 +151,7 @@
 
   function handleFilled(curField) {
     const { tab, getAppliedOffer } = getSession();
-    const { payment_method, issuer } = getAppliedOffer?.();
+    const { payment_method, issuer } = getAppliedOffer?.()||{};
 
     if (tab === 'card' && tab === payment_method && issuer === 'cred') {
       // when card-apps offer(s) applied avoid focusing as offer-removal warning will come
