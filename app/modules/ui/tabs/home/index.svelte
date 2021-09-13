@@ -951,7 +951,7 @@
           out:fly={getAnimationOptions({ duration: 200, y: 80 })}
         >
           {#if trustedBadgeHighlights}
-            <TrustedBadge nos={trustedBadgeHighlights} />
+            <TrustedBadge />
           {/if}
           {#if showUserDetailsStrip || isPartialPayment}
             <div
