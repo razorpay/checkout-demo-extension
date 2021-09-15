@@ -1164,10 +1164,10 @@ export default {
     tooltip_text: 'Unlock free rewards after payment',
   },
   trusted_badge: {
-    header: 'Razorpay Verified Seller',
-    highlight1: 'Trusted by {customersNo} customers',
-    highlight2: 'Secured Razorpay merchant for {securedTime} months',
-    highlight3: 'No fraud transaction for last {noFraudTime} months',
+    header: 'Razorpay Trusted Business',
+    highlight1: 'KYC verified and background checks done',
+    highlight2: 'Excellent track record with Razorpay',
+    highlight3: 'Regularly accepts payments online',
   },
   downtime_alert: {
     highlight1: 'There is a high chance this payment might fail',
