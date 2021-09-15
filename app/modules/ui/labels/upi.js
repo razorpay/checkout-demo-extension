@@ -25,6 +25,8 @@ export const UPI_RECURRING_CAW_CALLOUT_NO_NAME_NO_FREQUENCY =
   'upi.recurring_caw_callout_no_name_no_frequency';
 export const UPI_RECURRING_CAW_CALLOUT_NO_FREQUENCY =
   'upi.recurring_caw_callout_no_frequency';
+export const UPI_RECURRING_CAW_CALLOUT_AS_PRESENTED =
+  'upi.recurring_caw_callout_as_presented';
 export const OMNI_BLOCK_HEADING = 'upi.omni_block_heading';
 export const OMNI_GPAY_NUMBER = 'upi.omni_gpay_number';
 export const OMNI_ENTER_NUMBER = 'upi.omni_enter_number';

@@ -1072,6 +1072,8 @@ export default {
       'This is a recurring payment and upto {maxAmount} will be charged now. You will be charged upto {amount} on a {recurringFrequency} basis till {endDate}.',
     recurring_caw_callout_no_name_no_frequency:
       'This is a recurring payment and {maxAmount} will be charged now. You will be charged upto {amount} anytime till {endDate}.',
+    recurring_caw_callout_as_presented:
+      'This is a recurring payment and upto {maxAmount} will be charged now. {merchantName} can automatically charge upto {amount} for each payment in the future.',
     redirect_to_app: 'You will be redirected to your UPI app',
     scan_qr_code: 'Scan the QR code using your UPI app',
     upi_id_linked_to_bank: 'UPI ID is linked to',

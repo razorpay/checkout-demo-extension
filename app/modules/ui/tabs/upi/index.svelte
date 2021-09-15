@@ -67,6 +67,7 @@
     UPI_RECURRING_CAW_CALLOUT_NO_NAME,
     UPI_RECURRING_CAW_CALLOUT_NO_NAME_NO_FREQUENCY,
     UPI_RECURRING_CAW_CALLOUT_NO_FREQUENCY,
+    UPI_RECURRING_CAW_CALLOUT_AS_PRESENTED,
     ID_LINKED_TO_BANK,
   } from 'ui/labels/upi';
 
@@ -165,6 +166,8 @@
     recurring_type = tokenObject.token.recurringType;
     if (merchantName && recurringFrequency !== 'as_presented') {
       recurring_callout = UPI_RECURRING_CAW_CALLOUT_ALL_DATA;
+    } else if (recurringFrequency === 'as_presented') {
+      recurring_callout = UPI_RECURRING_CAW_CALLOUT_AS_PRESENTED;
     } else if (merchantName) {
       recurring_callout = UPI_RECURRING_CAW_CALLOUT_NO_FREQUENCY;
     } else if (recurringFrequency !== 'as_presented') {
