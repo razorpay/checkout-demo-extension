@@ -831,6 +831,7 @@
                 if ($customer.logged) {
                   showSavedCardsView();
                 } else {
+                  Events.Track(CardEvents.SHOW_SAVED_CARDS);
                   session.askOTPForSavedCard();
                 }
               }}
@@ -845,6 +846,7 @@
             {downtimeVisible}
             {downtimeSeverity}
             {downtimeInstrument}
+            {delayOTPExperiment}
           />
           {#if showEmiCta}
             <EmiActions

@@ -83,6 +83,7 @@
   export let downtimeVisible;
   export let downtimeSeverity;
   export let downtimeInstrument;
+  export let delayOTPExperiment;
   const isSavedCardsEnabled = shouldRememberCustomer();
 
   const showRememberCardCheck = isSavedCardsEnabled;
@@ -110,7 +111,9 @@
   }
 
   onMount(() => {
-    Events.TrackBehav(CardEvents.ADD_NEW_CARD);
+    Events.TrackBehav(CardEvents.ADD_NEW_CARD, {
+      PayWithSavedCard: delayOTPExperiment,
+    });
   });
 
   function setCardNumberValidity(valid) {
@@ -151,7 +154,7 @@
 
   function handleFilled(curField) {
     const { tab, getAppliedOffer } = getSession();
-    const { payment_method, issuer } = getAppliedOffer?.()||{};
+    const { payment_method, issuer } = getAppliedOffer?.() || {};
 
     if (tab === 'card' && tab === payment_method && issuer === 'cred') {
       // when card-apps offer(s) applied avoid focusing as offer-removal warning will come
