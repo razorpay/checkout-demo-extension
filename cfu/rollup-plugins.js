@@ -74,7 +74,7 @@ const getPlugins = ({
     replace({
       __BUILD_NUMBER__: process.env.BUILD_NUMBER || null,
       __CANARY_PERCENTAGE__: process.env.CANARY_PERCENTAGE,
-      __SIFT_BEACON_KEY__: JSON.stringify('00da258e6a'),
+      __SIFT_BEACON_KEY__: JSON.stringify('4dbbb1f7b6'),
     }),
 
     include({
