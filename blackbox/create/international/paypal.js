@@ -28,7 +28,7 @@ const {
   handlePartialPayment,
 } = require('../../tests/homescreen/actions');
 
-module.exports = function(testFeatures) {
+module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'international-paypal',
     testFeatures
@@ -55,6 +55,7 @@ module.exports = function(testFeatures) {
         page,
         options,
         preferences,
+        withSiftJS: true,
       });
 
       const missingUserDetails = optionalContact && optionalEmail;

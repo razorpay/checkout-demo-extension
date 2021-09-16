@@ -7,6 +7,7 @@ const { computed } = require('./options');
 const { callbackHtml, getMockResponse } = require('./callback');
 const { sendPreferences, makePreferencesLogged } = require('./preferences');
 const { sendRewards } = require('./rewards');
+const { sendSiftJS } = require('./siftjs');
 const { setExperiments } = require('./experiments');
 
 const checkoutPublic = 'https://api.razorpay.com/v1/checkout/public';
@@ -186,6 +187,7 @@ module.exports = {
     experiments,
     method,
     emulate,
+    withSiftJS,
   }) {
     // Disable animations for testing
     options = {
@@ -340,6 +342,13 @@ module.exports = {
       interceptorOptions = interceptor(page);
     }
 
+    if (withSiftJS) {
+      preferences.features = {
+        ...preferences.features,
+        enable_sift_js: true,
+      };
+    }
+
     const pageTarget = page.target();
     const returnObj = {
       page,
@@ -415,6 +424,9 @@ module.exports = {
     }
     if (preferences) {
       await sendPreferences(returnObj);
+      if (withSiftJS) {
+        await sendSiftJS(returnObj);
+      }
       await sendRewards(returnObj);
     }
     // page takes some time to render

@@ -57,7 +57,6 @@ const {
   // Partial Payments
   handlePartialPayment,
 } = require('../tests/homescreen/actions');
-const { delay } = require('../../mock-api/utils.js');
 
 module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
@@ -79,6 +78,7 @@ module.exports = function (testFeatures) {
     remember_customer,
     validateRemoveOfferCta,
     AVSPrefillData,
+    withSiftJS,
   } = features;
 
   describe.each(
@@ -116,6 +116,7 @@ module.exports = function (testFeatures) {
       if (!missingUserDetails) {
         await fillUserDetails(context, '8888888881');
       }
+
       if (partialPayment) {
         await handlePartialPayment(context, '100');
       } else if (!isHomeScreenSkipped) {
@@ -151,7 +152,12 @@ module.exports = function (testFeatures) {
       });
 
       if (dcc) {
-        await selectCurrencyAndVerifyAmount(context, 'USD', avs);
+        await selectCurrencyAndVerifyAmount({
+          context,
+          currency: 'USD',
+          isAVS: avs,
+          withSiftJS,
+        });
         // if AVS check for extra flow
         if (avs) {
           await submit(context);

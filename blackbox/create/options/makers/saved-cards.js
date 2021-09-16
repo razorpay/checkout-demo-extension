@@ -4,7 +4,7 @@ function makeOptions(features, options) {
 }
 
 function makePreferences(features, preferences) {
-  const { downtime, offers, dcc } = features;
+  const { downtime, offers, dcc, withSiftJS } = features;
 
   if (offers) {
     preferences.offers = [
@@ -39,6 +39,13 @@ function makePreferences(features, preferences) {
 
   if (dcc) {
     preferences.features = { dcc: true };
+  }
+
+  if (withSiftJS) {
+    preferences.features = {
+      ...preferences.features,
+      enable_sift_js: true,
+    };
   }
 
   return preferences;

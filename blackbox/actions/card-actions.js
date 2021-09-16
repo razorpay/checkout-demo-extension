@@ -1,6 +1,7 @@
 const { delay, innerText } = require('../util');
 const { assertTrimmedInnerText } = require('../tests/homescreen/actions');
 const querystring = require('querystring');
+const { sendSiftJS } = require('./siftjs');
 
 const AVS_DATA = {
   'avs-line1': '21A Vincent Square',
@@ -403,14 +404,19 @@ async function verifyAmount(context, currency, isAVS = false) {
   }
 }
 
-async function selectCurrencyAndVerifyAmount(
+async function selectCurrencyAndVerifyAmount({
   context,
   currency = 'USD',
-  isAVS = false
-) {
+  isAVS = false,
+  withSiftJS = false,
+}) {
   await respondCurrencies(context, isAVS);
   await selectCurrency(context, currency);
   await verifyAmount(context, currency, isAVS);
+  if (withSiftJS) {
+    // SiftJS integration will do a script fetch on DCC/Internal payment, hence it must be caught to avoid flow breaks
+    await sendSiftJS(context);
+  }
 }
 
 async function handleCREDUserValidation(context) {

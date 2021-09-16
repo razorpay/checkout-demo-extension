@@ -74,6 +74,7 @@ module.exports = function (testFeatures = {}) {
     popupIframe,
     emulate,
     amountAboveLimit = false,
+    withSiftJS,
     dynamicWalletFlow = false,
   } = features;
 
@@ -139,7 +140,7 @@ module.exports = function (testFeatures = {}) {
         await selectPersonalizationPaymentMethod(context, '1');
         if (isPaypalCC) {
           // handle DCC flow
-          await selectCurrencyAndVerifyAmount(context);
+          await selectCurrencyAndVerifyAmount({ context, withSiftJS });
         }
       } else {
         await selectPaymentMethod(context, 'wallet');
@@ -162,7 +163,7 @@ module.exports = function (testFeatures = {}) {
             await verifyFooterText(context, 'PAY');
           }
           // handle DCC flow
-          await selectCurrencyAndVerifyAmount(context);
+          await selectCurrencyAndVerifyAmount({ context, withSiftJS });
         } else {
           await selectWallet(context, 'freecharge');
         }

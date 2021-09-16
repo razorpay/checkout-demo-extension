@@ -455,3 +455,29 @@ export function addDowntimesToSavedCards(cards, downtimes) {
   });
   return cardsWithDowntime;
 }
+
+export function injectSiftScript(sessionId, beaconKey = __SIFT_BEACON_KEY__) {
+  if (document.getElementById('__sift_script') || !sessionId || !beaconKey) {
+    return Promise.resolve();
+  }
+
+  let _sift = (window._sift = window._sift || []);
+  _sift.push(['_setAccount', beaconKey]);
+  _sift.push(['_setTrackerUrl', 'siftjs.razorpay.com']);
+  _sift.push(['_setUserId', '']);
+  _sift.push(['_setSessionId', sessionId]);
+  _sift.push(['_trackPageview']);
+
+  return new Promise((resolve, reject) => {
+    let script = document.createElement('script');
+    script.src = 'https://siftjs.razorpay.com/s.js';
+    script.type = 'text/javascript';
+    script.onError = reject;
+    script.async = true;
+    script.id = '__sift_script';
+    script.onload = resolve;
+    script.addEventListener('error', reject);
+    script.addEventListener('load', resolve);
+    document.body.appendChild(script);
+  });
+}

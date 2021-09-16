@@ -159,6 +159,10 @@ export function isShowMORTncEnabled() {
   return hasFeature('show_mor_tnc', false);
 }
 
+export function isSiftJSEnabled() {
+  return hasFeature('enable_sift_js', false);
+}
+
 export function isContactOptional() {
   return preferences.optional || [] |> _Arr.contains('contact');
 }

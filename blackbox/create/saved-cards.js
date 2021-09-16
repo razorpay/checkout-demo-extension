@@ -1,6 +1,7 @@
 const makeOptionsAndPreferences = require('./options/index.js');
 const { getTestData } = require('../actions');
 const { openCheckoutWithNewHomeScreen } = require('../tests/homescreen/open');
+
 const {
   // Generic
   verifyTimeout,
@@ -72,6 +73,7 @@ module.exports = function (testFeatures) {
     dcc,
     avs,
     avsPrefillFromSavedCard,
+    withSiftJS,
   } = features;
 
   describe.each(
@@ -162,8 +164,12 @@ module.exports = function (testFeatures) {
         await selectSavedCardAndTypeCvv(context);
 
         if (dcc) {
-          await selectCurrencyAndVerifyAmount(context, 'USD', avs);
-
+          await selectCurrencyAndVerifyAmount({
+            context,
+            currency: 'USD',
+            isAVS: avs,
+            withSiftJS,
+          });
           // if AVS check for extra flow
           if (avs) {
             await submit(context);

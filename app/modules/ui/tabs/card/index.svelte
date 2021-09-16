@@ -49,6 +49,7 @@
     shouldRememberCustomer,
     isDCCEnabled,
     isShowMORTncEnabled,
+    isSiftJSEnabled,
     getCardFeatures,
     isInternational,
     getDowntimes,
@@ -98,6 +99,7 @@
     getCardType,
     isAmex,
     addDowntimesToSavedCards,
+    injectSiftScript,
   } from 'common/card';
 
   import { getSubtextForInstrument } from 'subtext';
@@ -222,6 +224,24 @@
     phone.subscribe(() => {
       isSavedCardsEnabled = shouldRememberCustomer();
     });
+
+    if (isSiftJSEnabled()) {
+      if (isInternational()) {
+        // load sift js
+        injectSiftScript(session.id).catch((_e) => {
+          // Do nothing
+        });
+      }
+
+      defaultDCCCurrency.subscribe((currency) => {
+        if (currency && currency !== 'INR') {
+          // load sift js
+          injectSiftScript(session.id).catch((_e) => {
+            // Do nothing
+          });
+        }
+      });
+    }
   });
 
   onDestroy(() => {
