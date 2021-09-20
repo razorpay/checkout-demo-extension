@@ -31,11 +31,12 @@ let paths = {
   js: assetPath('js/**/*.js'),
   templates: assetPath('_templates/**/*.jst'),
   css: assetPath('css/**/*.styl'),
+  moduleCss: assetPath('js/**/*.styl'),
   images: assetPath('images/**/*'),
   fonts: assetPath('fonts/**/*'),
 };
 
-gulp.task('compileTemplates', function(cb) {
+gulp.task('compileTemplates', function (cb) {
   execSync('mkdir -p app/templates');
   dot.process({
     path: 'app/_templates',
@@ -78,7 +79,7 @@ function joinJs() {
     .src(assetPath('*.html'))
     .pipe(usemin())
     .pipe(
-      through(function(file, enc, cb) {
+      through(function (file, enc, cb) {
         file.contents = Buffer.from(`(function(){${String(file.contents)}})()`);
         this.push(file);
         cb();
@@ -94,10 +95,10 @@ function cleanDistDir(cb) {
 
 gulp.task('usemin', joinJs);
 
-gulp.task('uglify', done => {
+gulp.task('uglify', (done) => {
   const strictPrefix = '!function(){"use strict";';
 
-  glob(`${distDir}/**/*.js`).forEach(file => {
+  glob(`${distDir}/**/*.js`).forEach((file) => {
     let fileContents = fs.readFileSync(file).toString();
 
     if (!fileContents.startsWith(strictPrefix)) {
@@ -107,7 +108,7 @@ gulp.task('uglify', done => {
     jshint(fileContents, jshintOptions);
 
     if (jshint.errors.length > 0) {
-      jshintStylish(jshint.errors.map(error => ({ file, error })));
+      jshintStylish(jshint.errors.map((error) => ({ file, error })));
       throw 'Jshint failed';
     }
 
@@ -141,21 +142,21 @@ gulp.task('uglify', done => {
   done();
 });
 
-gulp.task('copyLegacy', cb => {
+gulp.task('copyLegacy', (cb) => {
   execSync(
     `cd ${distDir}; rm *-new.js; for i in *.js; do cp $i $(basename $i .js)-new.js; done;`
   );
   cb();
 });
 
-gulp.task('copyConfig', cb => {
+gulp.task('copyConfig', (cb) => {
   execSync(`cp ${assetPath('config.js')} ${distDir}`);
   cb();
 });
 
 gulp.task('compileHTML', gulp.series('usemin', 'uglify', 'copyLegacy'));
 
-gulp.task('staticAssets', function() {
+gulp.task('staticAssets', function () {
   return gulp
     .src([paths.images, paths.fonts], { base: 'app' })
     .pipe(gulp.dest(`${distDir}`));
@@ -169,27 +170,28 @@ gulp.task(
     'compileTemplates',
     'compileHTML',
     'staticAssets',
-    cb => {
+    (cb) => {
       console.log(String(execSync('ls -l app/dist/v1')));
       cb();
     }
   )
 );
 
-gulp.task('watch', cb => {
+gulp.task('watch', (cb) => {
   cleanDistDir();
   gulp.watch(paths.css, gulp.series('css'));
+  gulp.watch(paths.moduleCss, gulp.series('css')); // handle module css
   gulp.watch(paths.templates, gulp.series('compileTemplates'));
   gulp.watch(paths.js, gulp.series('usemin'));
   gulp.watch(assetPath('*.html'), gulp.series('usemin'));
-  rollup.watch(rollupConfig).on('event', event => {
+  rollup.watch(rollupConfig).on('event', (event) => {
     switch (event.code) {
       case 'BUNDLE_START':
         return console.log('processing ' + event.input);
       case 'BUNDLE_END':
         return console.log(
           'built ' +
-            event.output.map(o => path.relative(__dirname, o)) +
+            event.output.map((o) => path.relative(__dirname, o)) +
             ' in ' +
             event.duration +
             'ms'

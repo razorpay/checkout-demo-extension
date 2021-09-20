@@ -1,0 +1,8 @@
+#!/bin/bash
+## compress build to generate gzip & brotli [used in to generate docker image]
+cd $DIST_DIR;
+for COMPRESS in zopfli brotli;
+do for i in `find . -type f -regex '.+\.\(js\|css\|svg\|html\)'`;
+  do $COMPRESS "$i";
+  done;
+done;

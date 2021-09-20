@@ -14,6 +14,8 @@
   // Svelte imports
   import { createEventDispatcher, onMount } from 'svelte';
 
+  import { getComponentProps } from 'utils/svelteUtils';
+
   // Store
   import {
     cardCvv,
@@ -162,10 +164,12 @@
     }
     switch (curField) {
       case 'numberField':
-        expiryField.ref.focus();
+        getComponentProps(expiryField, 'ref').focus();
         break;
       case 'expiryField':
-        $cardName ? cvvField.ref.focus() : nameField.ref.focus();
+        $cardName
+          ? getComponentProps(cvvField, 'ref')?.focus()
+          : getComponentProps(nameField, 'ref')?.focus();
         break;
       default:
         return;

@@ -41,6 +41,3 @@
     )}
   />
 </div>
-
-<style>
-</style>

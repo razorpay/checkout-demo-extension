@@ -19,7 +19,7 @@
     /* Fall-back for IE */
     height: 22px;
     /* 22px is the image height. 1.25 is the line-height of text. */
-    height: max(22px, 1.25rem);
+    height: calc(max(22px, 1.25rem));
 
     overflow: hidden;
     position: relative;

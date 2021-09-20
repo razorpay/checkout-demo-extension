@@ -1,4 +1,6 @@
-FROM pronav/chrome:checkout as builder
+FROM satantime/puppeteer-node as builder
+
+COPY ./scripts /scripts
 
 ARG BUILD_NUMBER
 ENV BUILD_NUMBER=${BUILD_NUMBER}
@@ -9,21 +11,27 @@ ENV CANARY_PERCENTAGE=${CANARY_PERCENTAGE}
 ARG BRANCH
 ENV BRANCH=${BRANCH}
 
+RUN apt-get update -y && apt-get install -y brotli && apt-get install zopfli -y
+
 COPY . /checkout_build
 
 WORKDIR /checkout_build
 
 SHELL ["/bin/bash", "-c"]
+
+# because of post install script 
+RUN git init 
+
 RUN if [[ -n $CANARY_PERCENTAGE ]]; then \
-        cd /checkout_build \
-        && npm install \
-        && NODE_ENV=production npm run build \
-        && DIST_DIR=/checkout_build/app/dist/v1 /scripts/compress; \
+    cd /checkout_build \
+    && yarn install \
+    && NODE_ENV=production npm run build \
+    && DIST_DIR=/checkout_build/app/dist/v1 /scripts/compress; \
     else \
-        cd /checkout_build \
-        && npm install \
-        && NODE_ENV=production npm test \
-        && DIST_DIR=/checkout_build/app/dist/v1 /scripts/compress; \
+    cd /checkout_build \
+    && yarn install \
+    && NODE_ENV=production npm test \
+    && DIST_DIR=/checkout_build/app/dist/v1 /scripts/compress; \
     fi
 
 FROM c.rzp.io/razorpay/onggi:aws-cli-v2818 as aws

@@ -160,7 +160,7 @@
     :global(.placeholder) {
       margin: 0;
       width: 24px;
-      height: @width;
+      height: 24px;
       transform: scale(1.1);
     }
 

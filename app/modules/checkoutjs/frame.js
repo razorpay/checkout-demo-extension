@@ -95,7 +95,7 @@ function sanitizeImage(options) {
 // this will be replaced with env value by rollup
 function makeCheckoutUrl(rzp) {
   const CANARY_PERCENTAGE = isNaN(parseInt(__CANARY_PERCENTAGE__)) // eslint-disable-line no-undef
-    ? 0.25 // default value
+    ? 0.15 // default value
     : parseInt(__CANARY_PERCENTAGE__) / 100; // eslint-disable-line no-undef
 
   var url = RazorpayConfig.frame;

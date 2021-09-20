@@ -248,9 +248,9 @@
   :global(.emi-branding-callout) {
     padding-left: 12px !important;
     background: white !important;
+  }
 
-    img {
-      max-height: 24px;
-    }
+  :global(.emi-branding-callout) img {
+    max-height: 24px;
   }
 </style>

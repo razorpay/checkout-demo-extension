@@ -3,7 +3,6 @@ const livereload = require('rollup-plugin-livereload');
 
 const plugins = getPlugins({
   src: ['app/modules/', 'node_modules/'],
-  svelteCssPath: 'app/css/generated/',
 }).concat(stylus);
 
 if (process.env.NODE_ENV === 'dev') {
@@ -41,7 +40,7 @@ function getOptions(module) {
       name: modules[module],
     },
     plugins,
-    onwarn: function(warning) {
+    onwarn: function (warning) {
       // Suppress "this is undefined" warning due to an issue in the
       // intl-messageformat module.
       if (warning.code === 'THIS_IS_UNDEFINED') {
@@ -52,4 +51,4 @@ function getOptions(module) {
   };
 }
 
-module.exports = Object.keys(modules).map(m => getOptions(m));
+module.exports = Object.keys(modules).map((m) => getOptions(m));

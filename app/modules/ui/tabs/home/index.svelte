@@ -1094,12 +1094,11 @@
     padding: 12px 0 12px 24px;
     font-size: 13px;
     color: rgba(51, 51, 51, 0.6);
-
-    i {
-      margin-right: 8px;
-      position: relative;
-      top: 2px;
-    }
+  }
+  i {
+    margin-right: 8px;
+    position: relative;
+    top: 2px;
   }
 
   .home-methods {

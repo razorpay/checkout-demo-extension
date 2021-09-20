@@ -20,6 +20,6 @@
 
 <style>
   :global(.screen-bottom .callout) {
-    position: static; // These don't need to be absolutely positioned in <BottomScreen />
+    position: static; /* These don't need to be absolutely positioned in <BottomScreen /> */
   }
 </style>

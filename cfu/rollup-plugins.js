@@ -3,15 +3,18 @@ const globals = require('./scripts/rollup-injects');
 const include = require('rollup-plugin-includepaths');
 const babelOptions = require('./scripts/babel-options');
 const babelPlugin = require('rollup-plugin-babel');
-const babel = require('@babel/core');
+// const babel = require('@babel/core');
 const stylus = require('./scripts/rollup-plugin-stylus');
 const svelte = require('rollup-plugin-svelte');
 const inject = require('rollup-plugin-inject');
 const replace = require('rollup-plugin-replace');
 const resolve = require('@rollup/plugin-node-resolve');
+const pCSS = require('rollup-plugin-css-only');
+const preprocess = require('svelte-preprocess');
 const eslint = require('./scripts/eslint');
 const isProd = require('./prod');
 const { readFile } = require('fs');
+const { dirname } = require('path');
 
 const isWatching = argv.w || argv.watch;
 
@@ -47,12 +50,7 @@ const parseFile = async ({ attributes, filename, content }) => {
   };
 };
 
-const getPlugins = ({
-  watch = isWatching,
-  lint = true,
-  src,
-  svelteCssPath,
-}) => {
+const getPlugins = ({ lint = true, src }) => {
   if (!Array.isArray(src)) {
     src = [src];
   }
@@ -68,6 +66,7 @@ const getPlugins = ({
   return [
     resolve({
       browser: true,
+      dedupe: ['svelte'],
     }),
     // __CANARY_PERCENTAGE__ : don't set null on default, pass as is
     // isNaN(null) gives true, hence isNaN(parseInt()) is used
@@ -84,28 +83,27 @@ const getPlugins = ({
 
     svelte({
       extensions: ['.svelte'],
-      preprocess: {
-        style: ({ content }) => {
-          return stylus.stylusToCss(content);
-        },
-        script: async (svelteFile) => {
-          setTimeout(() => eslint.lint(false)([svelteFile.filename]));
+      preprocess: [
+        preprocess({ defaults: { style: 'scss' } }),
+        {
+          script: async (svelteFile) => {
+            setTimeout(() => eslint.lint(false)([svelteFile.filename]));
 
-          const { content, dependencies } = await parseFile(svelteFile);
+            const { content, dependencies } = await parseFile(svelteFile);
 
-          return {
-            code: content,
-            dependencies,
-          };
+            return {
+              code: content,
+              dependencies,
+            };
+          },
         },
-      },
+      ],
       dev: !isProd,
-      css: (css) => {
-        if (svelteCssPath) {
-          css.write(`${svelteCssPath}/svelte.styl`);
-        }
-      },
       accessors: true,
+    }),
+
+    pCSS({
+      output: 'svelte.styl',
     }),
 
     babelPlugin({

@@ -146,8 +146,8 @@
     position: absolute;
     width: 100%;
     display: none;
-    -webkit-box-shadow: 0 -2px 8px rgba(0 0 0 0.16);
-    box-shadow: 0 -2px 8px rgba(0 0 0 0.16);
+    -webkit-box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.16);
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.16);
     height: 250px;
     -webkit-transition: 0.2s;
     -o-transition: 0.2s;

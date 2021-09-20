@@ -5,7 +5,7 @@
   import { getCurrency } from 'checkoutstore';
   import { getAnimationOptions } from 'svelte-utils';
   import { CRED_EXPERIMENTAL_OFFER_ID } from 'checkoutframe/cred';
-  import { CredEvents, OfferEvents, Events } from 'analytics';
+  import { CredEvents, OfferEvents, Events } from 'analytics/index';
 
   import {
     getOffersForTab,
@@ -187,7 +187,7 @@
 
   function applyOffer(offer) {
     Events.TrackBehav(OfferEvents.APPLY, { offer });
-    if (offer?.id === CRED_EXPERIMENTAL_OFFER_ID) {
+    if (offer && offer.id === CRED_EXPERIMENTAL_OFFER_ID) {
       Events.TrackBehav(CredEvents.EXPERIMENT_OFFER_SELECTED);
     }
     $appliedOffer = offer;

@@ -80,7 +80,7 @@
     position: relative;
   }
 
-  // @TODO
+  /* @TODO */
   .screen-bottom:not(.noShadow) > :global([slot='bottom']:not(:empty)) {
     box-shadow: 0px -6px 26px -17px rgba(0, 0, 0, 0.75);
   }

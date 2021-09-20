@@ -8,7 +8,7 @@
   import { formatTemplateWithLocale, getLongBankName } from 'i18n';
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import { selectedInstrument } from 'checkoutstore/screens/home';
-  import { Events, DowntimeEvents, MetaProperties } from 'analytics';
+  import { Events, DowntimeEvents, MetaProperties } from 'analytics/index';
   // Props
   export let severe;
   export let showIcon = false;

@@ -1,5 +1,5 @@
 import { displayAmount, getConvertedAmount } from 'common/currency';
-import css from './popup.styl';
+import css from './popupStyle.js';
 import { Track } from 'analytics';
 
 const map = {

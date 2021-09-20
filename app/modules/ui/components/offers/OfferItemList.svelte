@@ -85,7 +85,7 @@
     color: #666;
     font-size: 13px;
     margin-top: 14px;
-    padding-top: @margin-top;
+    padding-top: 14px;
   }
   .remove-offer {
     margin-top: 12px;

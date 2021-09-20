@@ -72,6 +72,7 @@
   } from 'ui/labels/upi';
 
   import { oneClickUPIIntent } from 'upi/helper';
+  import { getComponentProps } from 'utils/svelteUtils';
 
   // Props
   export let selectedApp = undefined;
@@ -489,9 +490,11 @@
     data.upi = {};
     if (_token) {
       const { downtimeSeverity, downtimeInstrument } = _token;
-      if (downtimeSeverity) {
-        data.downtimeSeverity = downtimeSeverity;
-        data.downtimeInstrument = downtimeInstrument;
+      if (downtimeSeverity || getComponentProps(_token, 'downtimeSeverity')) {
+        data.downtimeSeverity =
+          downtimeSeverity || getComponentProps(_token, 'downtimeSeverity');
+        data.downtimeInstrument =
+          downtimeInstrument || getComponentProps(_token, 'downtimeInstrument');
       }
     }
     /**
