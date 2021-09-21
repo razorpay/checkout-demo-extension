@@ -19,53 +19,50 @@ import { SEVERITY_LEVELS } from './models';
  * Construct a custom error object to be used across all errors reported from the application
  * @param {String|Error|Object} error
  *
- * @param {Object} opts
- * @param {String} opts.severity
- * @param {String} opts.severity
+ * @param {Object} tags
+ * @param {String} tags.severity
+ * @param {String} tags.unhandled
  *
  * @returns {CustomError} customError
  */
-export const constructErrorObject = (error, { severity, unhandled }) => {
-  const tags = { severity, unhandled };
+export const constructErrorObject = (error, tags) => {
+  let customError = { tags };
 
-  if (!error) {
-    // Shouldn't ideally happen but including it to ensure we aren't missing any errors
-    const customError = {
-      message: 'NA',
-      tags,
-    };
-    return customError;
+  switch (true) {
+    case !error:
+      // Shouldn't ideally happen but including it to ensure we aren't missing any errors
+      customError.message = 'NA';
+      break;
+
+    case typeof error === 'string':
+      customError.message = error;
+      break;
+
+    case typeof error === 'object':
+      {
+        const { name, message, stack, fileName, lineNumber, columnNumber } =
+          error;
+
+        customError = {
+          // this won't copy non-enumerable
+          ...JSON.parse(JSON.stringify(error)),
+
+          // Handling common non-enumerable properties
+          name,
+          message,
+          stack,
+          fileName,
+          lineNumber,
+          columnNumber,
+          tags,
+        };
+      }
+      break;
+
+    // Final catch all in case error is passed as a string or any other unknown format. We can add new cases as we identify them
+    default:
+      customError.message = JSON.stringify(error);
   }
 
-  /**
-   * Handle the most common case where we have an Error object with message property
-   */
-  if (typeof error === 'object' && error.message) {
-    // Carry over all enumerable properties
-    const customError = _Obj.clone(error);
-
-    // Handling common non-enumerable properties
-    const { name, message, stack, fileName, lineNumber, columnNumber } = error;
-    Object.assign(customError, {
-      name,
-      message,
-      stack,
-      fileName,
-      lineNumber,
-      columnNumber,
-    });
-
-    // Attaching tags(severity,unhandled)
-    customError.tags = tags;
-    return customError;
-  }
-
-  // Final catch all in case error is passed as a string or any other unknown format. We can add new cases as we identify them
-  const errorMessage =
-    typeof error === 'string' ? error : JSON.stringify(error);
-  const customError = {
-    message: errorMessage,
-    tags,
-  };
   return customError;
 };

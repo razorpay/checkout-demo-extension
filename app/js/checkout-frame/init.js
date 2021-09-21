@@ -48,18 +48,12 @@ window.onerror = function (errorMsg, url, lineNumber, column, errorObj) {
     stack: errorObj && errorObj.stack,
   };
 
-  ErrorService.captureError(error, {
+  ErrorService.capture(error, {
     unhandled: true,
     analytics: {
       event: 'js_error',
-
       // Keeping this for historic reasons. Once we've migrated to new events system we can remove this.
-      data: {
-        message: errorMsg,
-        line: lineNumber,
-        col: column,
-        stack: errorObj && errorObj.stack,
-      },
+      data: error,
     },
   });
 };
@@ -75,7 +69,7 @@ window.addEventListener('unhandledrejection', function (event) {
     };
   }
 
-  ErrorService.captureError(event.reason, {
+  ErrorService.capture(event.reason, {
     unhandled: true,
     analytics: {
       event: 'unhandled_rejection',

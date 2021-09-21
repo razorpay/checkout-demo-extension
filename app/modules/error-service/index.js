@@ -1,5 +1,6 @@
-import makeErrorService from './makeErrorService';
+// normal export won't work
+import { SEVERITY_LEVELS } from './models';
+import * as utils from './error-service';
 
-const ErrorService = makeErrorService();
-
-export default ErrorService;
+// hence default export is added
+export default { SEVERITY_LEVELS, ...utils };

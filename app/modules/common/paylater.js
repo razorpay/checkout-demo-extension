@@ -85,7 +85,7 @@ export const getImageUrl = (provider) => {
     const { logo } = getProvider(provider);
     return logo;
   } catch (error) {
-    ErrorService.captureError(error, {
+    ErrorService.capture(error, {
       severity: ErrorService.SEVERITY_LEVELS.S3,
     });
     return '';
