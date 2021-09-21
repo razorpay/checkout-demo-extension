@@ -15,7 +15,7 @@ export const capture = (
   { analytics, severity = SEVERITY_LEVELS.S1, unhandled = false }
 ) => {
   try {
-    const { event, data, immediately } = analytics || {};
+    const { event, data, immediately = true } = analytics || {};
     /**
      * Event name to be used for analytics.
      * Defaulting to 'js_error' till we move to the new system of analytics events
