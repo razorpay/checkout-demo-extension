@@ -5804,6 +5804,7 @@ Session.prototype = {
   hideOverlay: hideOverlay,
   errorHandler: errorHandler,
   successHandler: successHandler,
+  getProxyPhone: getProxyPhone,
 };
 
 /*

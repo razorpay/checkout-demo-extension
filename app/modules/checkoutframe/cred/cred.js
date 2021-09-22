@@ -52,7 +52,7 @@ const getValidContact = (contact) => {
   let validContact = contact;
   if (!validContact) {
     validContact = isContactOptional()
-      ? global?.getProxyPhone()
+      ? getSession().getProxyPhone()
       : getCustomerDetails()?.contact;
   }
   return validContact;
