@@ -20,6 +20,24 @@ export function makeUrl(path = '') {
   return RazorpayConfig.api + RazorpayConfig.version + path;
 }
 
+/**
+ *
+ * @returns sdk_meta set by SDK s (android/iOS) which is supposed to add to prefs
+ */
+export function getSdkMetaForRequestPayload() {
+  let sdk_meta = undefined;
+
+  if (!global.CheckoutBridge) {
+    try {
+      sdk_meta = JSON.parse(
+        global.__rzp_options || global.top?.__rzp_options || '{}'
+      );
+    } catch (error) {}
+  }
+
+  return sdk_meta;
+}
+
 const backendEntityIds = [
   'key',
   'order_id',

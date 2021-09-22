@@ -1,5 +1,9 @@
 import * as Bridge from 'bridge';
-import Razorpay, { makePrefParams, validateOverrides } from 'common/Razorpay';
+import Razorpay, {
+  makePrefParams,
+  validateOverrides,
+  getSdkMetaForRequestPayload,
+} from 'common/Razorpay';
 import { Events, MetaProperties, Track, MiscEvents } from 'analytics';
 import BrowserStorage from 'browserstorage';
 import * as SessionManager from 'sessionmanager';
@@ -413,6 +417,11 @@ function getPreferenecsParams(razorpayInstance) {
   if (CREDExperiment) {
     prefData.cred_offer_experiment = CREDExperiment;
   }
+  const sdk_meta = getSdkMetaForRequestPayload();
+  if (sdk_meta) {
+    prefData.sdk_meta = sdk_meta;
+  }
+
   markRelevantPreferencesPayload(prefData);
 
   return prefData;
