@@ -115,6 +115,10 @@ export const emiBanks = [
     code: 'CITI',
     name: 'CITI Bank',
   },
+  {
+    code: 'HSBC',
+    name: 'HSBC Credit Cards',
+  },
 ];
 
 export const getBankFromCardCache = (cardNum) => {
@@ -158,7 +162,7 @@ export const getPreferredBanks = (availBanks, bankOptions) => {
     const availBanksList = transformBanks(availBanks);
 
     /* Indexing to avoid search */
-    var bankIndexMap = availBanksList.reduce(function (map, bank, index) {
+    var bankIndexMap = availBanksList.reduce(function (map, bank) {
       map[bank.code] = bank;
       return map;
     }, {});
