@@ -44,7 +44,7 @@ const {
   verifyMethodWarned,
 } = require('../tests/homescreen/actions');
 
-module.exports = function(testFeatures) {
+module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'omni-channel',
     testFeatures

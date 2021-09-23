@@ -18,9 +18,9 @@ async function setPreferenceForOffer(preferences) {
 }
 
 async function verifyOfferApplied(context) {
-  expect(await context.page.$eval('.offer-action', el => el.innerText)).toEqual(
-    'Change'
-  );
+  expect(
+    await context.page.$eval('.offer-action', (el) => el.innerText)
+  ).toEqual('Change');
 }
 
 async function validateCardForOffer(context) {
@@ -37,9 +37,9 @@ async function removeOffer(context, offernumber) {
 }
 
 async function verifyOfferNotApplied(context) {
-  expect(await context.page.$eval('.offer-action', el => el.innerText)).toEqual(
-    'Select'
-  );
+  expect(
+    await context.page.$eval('.offer-action', (el) => el.innerText)
+  ).toEqual('Select');
 }
 
 module.exports = {

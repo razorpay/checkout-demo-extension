@@ -60,7 +60,7 @@ describe('Basic upi payment', () => {
     await assertUserDetails(context);
     await assertEditUserDetailsAndBack(context);
     await assertPaymentMethods(context);
-    await selectPaymentMethod(context, 'upi'); 
+    await selectPaymentMethod(context, 'upi');
     await selectUPIApp(context, '1', appWithDowntime);
     await verifyMethodWarned(context, 'upi', 'psp', appWithDowntime);
     await submit(context);

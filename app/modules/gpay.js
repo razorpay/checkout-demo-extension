@@ -75,10 +75,11 @@ export const payWithPaymentRequestApi = (
 /**
  * Transforms the intent URL to a payload for microapps.
  * @param {string} intentUrl
+ * @param {Object} additional_info https://developers.google.com/pay/api/web/reference/response-objects#DisplayItem
  *
  * @returns {Object}
  */
-function transformIntentForMicroappPayload(intentUrl) {
+function transformIntentForMicroappPayload(intentUrl, additional_info = {}) {
   const intentParams = _.query2obj(intentUrl.split('?')[1]);
 
   const payload = {
@@ -104,6 +105,7 @@ function transformIntentForMicroappPayload(intentUrl) {
       totalPrice: Number(intentParams.am).toFixed(2),
       currencyCode: intentParams.cu,
       transactionNote: intentParams.tn,
+      ...(additional_info || {}),
     },
   };
 
@@ -117,7 +119,10 @@ function transformIntentForMicroappPayload(intentUrl) {
  * @return {Promise}
  */
 export function payWithMicroapp(intentUrl) {
-  const payload = transformIntentForMicroappPayload(intentUrl);
+  const payload = transformIntentForMicroappPayload(
+    intentUrl,
+    this.additional_info
+  );
   const { transactionReferenceId } =
     payload.allowedPaymentMethods[0].parameters;
 

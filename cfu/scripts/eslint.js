@@ -11,7 +11,7 @@ const lintCompat = new CLIEngine(require('./eslintrc-compat'));
  * Fixes ESLint issues
  * @param {Array<string>} paths
  */
-const lintFix = paths => {
+const lintFix = (paths) => {
   const fixer = new CLIEngine({
     ...lintRules,
     fix: true,
@@ -22,7 +22,7 @@ const lintFix = paths => {
   CLIEngine.outputFixes(report);
 };
 
-const lintPaths = paths => {
+const lintPaths = (paths) => {
   if (!Array.isArray(paths)) {
     if (!paths.endsWith('.js')) {
       return;
@@ -32,15 +32,15 @@ const lintPaths = paths => {
   lintLog(eslint.executeOnFiles(paths));
 };
 
-const lintLog = report => {
+const lintLog = (report) => {
   const results = eslintFormatter(report.results);
   if (results) {
     console.log(results);
   }
 };
-const lint = isWatching => paths => {
+const lint = (isWatching) => (paths) => {
   // exclude node_modules from being linted
-  paths = paths.filter(p => !p.startsWith('node_modules'));
+  paths = paths.filter((p) => !p.startsWith('node_modules'));
 
   lintPaths(paths);
 

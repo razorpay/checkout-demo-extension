@@ -9,7 +9,7 @@ async function verifyEmandateBank(context) {
     '#emandate-bank > .bank-name'
   );
   let messageText = await context.page.evaluate(
-    messageDiv => messageDiv.textContent,
+    (messageDiv) => messageDiv.textContent,
     messageDiv
   );
   expect(messageText).toEqual(context.preferences.order.bank + ' Bank');
@@ -75,11 +75,13 @@ async function returnVirtualAccounts(context, fee = false) {
 async function verifyNeftDetails(context, feeBearer) {
   const messageDiv = await context.page.waitForSelector('.neft-details');
   let messageText = await context.page.evaluate(
-    messageDiv => messageDiv.textContent,
+    (messageDiv) => messageDiv.textContent,
     messageDiv
   );
   expect(messageText.trim()).toEqual(
-    `Account: ${accountNum} IFSC: ${ifscCode} Beneficiary Name: ${accountHolderName} Amount Expected: ${feeBearer ? '₹ 2,020 See Fee Breakup' : '₹ 2,000'}`
+    `Account: ${accountNum} IFSC: ${ifscCode} Beneficiary Name: ${accountHolderName} Amount Expected: ${
+      feeBearer ? '₹ 2,020 See Fee Breakup' : '₹ 2,000'
+    }`
   );
 }
 
@@ -88,7 +90,7 @@ async function verifyRoundOffAlertMessage(context) {
     '#bottom .bottom:last-child'
   );
   let messageText = await context.page.evaluate(
-    messageDiv => messageDiv.textContent,
+    (messageDiv) => messageDiv.textContent,
     messageDiv
   );
   expect(messageText).toContain(

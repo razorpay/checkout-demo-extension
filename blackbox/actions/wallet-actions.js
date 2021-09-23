@@ -7,11 +7,12 @@ async function retryWalletTransaction(context) {
 
 async function assertWalletPage(context) {
   const { options } = context;
-  expect(
-    await context.page.$eval('div#wallet-radio-paypal', visible)
-  ).toEqual(true);
-  if(options.amount >= 1e7) { // >= 1 lakh
-    return;  
+  expect(await context.page.$eval('div#wallet-radio-paypal', visible)).toEqual(
+    true
+  );
+  if (options.amount >= 1e7) {
+    // >= 1 lakh
+    return;
   }
   expect(
     await context.page.$eval('div#wallet-radio-freecharge', visible)
@@ -25,9 +26,9 @@ async function assertWalletPage(context) {
   expect(
     await context.page.$eval('div#wallet-radio-mobikwik', visible)
   ).toEqual(true);
-  expect(
-    await context.page.$eval('div#wallet-radio-paytm', visible)
-  ).toEqual(true);
+  expect(await context.page.$eval('div#wallet-radio-paytm', visible)).toEqual(
+    true
+  );
 }
 
 async function selectWallet(context, walletName) {

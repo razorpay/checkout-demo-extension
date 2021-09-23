@@ -4,7 +4,7 @@ const eslintRecommended = require('eslint/conf/eslint-recommended');
 delete globals.include;
 globals = ['window', 'console'].concat(Object.keys(globals));
 
-const blacklistVars = globals.map(g => `VariableDeclarator[id.name=${g}]`);
+const blacklistVars = globals.map((g) => `VariableDeclarator[id.name=${g}]`);
 
 // 0 - ignore
 // 1 - warn
@@ -21,7 +21,7 @@ module.exports = {
     ],
 
     settings: {
-      'svelte3/ignore-styles': _ => true,
+      'svelte3/ignore-styles': (_) => true,
     },
   },
   useEslintrc: false,

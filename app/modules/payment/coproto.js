@@ -509,8 +509,14 @@ var responseTypes = {
         }
       );
     } else if (type === 'microapp') {
-      GPay.payWithMicroapp(fullResponse.data.intent_url)
+      GPay.payWithMicroapp
+        .call(this, fullResponse.data.intent_url)
         .then((response) => {
+          if (this.additional_info) {
+            Analytics.track('google_spot_additional_info_passed', {
+              data: this.additional_info,
+            });
+          }
           Analytics.track('gpay_pay_response', {
             data: response.paymentMethodData,
           });
@@ -529,7 +535,6 @@ var responseTypes = {
 
   intent: function (request, fullResponse) {
     const CheckoutBridge = global.CheckoutBridge;
-
     var ra = ({ transactionReferenceId } = {}) =>
       fetch
         .jsonp({

@@ -23,7 +23,9 @@ const { proceed } = sharedActions;
  * and enters an amount
  */
 async function handlePartialPayment(context, amount) {
-  await context.page.click('.partial-payment-block .radio-option:nth-of-type(2)');
+  await context.page.click(
+    '.partial-payment-block .radio-option:nth-of-type(2)'
+  );
 
   setState(context, {
     partial: true,
@@ -47,7 +49,7 @@ async function handlePartialPayment(context, amount) {
 async function assertInputValue(context, selector, value) {
   const selectorInput = await context.page.waitForSelector(selector);
   const selectorInputValue = await context.page.evaluate(
-    selectorInput => selectorInput.value,
+    (selectorInput) => selectorInput.value,
     selectorInput
   );
   expect(selectorInputValue).toBe(value);
@@ -105,7 +107,7 @@ async function assertElementHasAttribute(
 
 async function getTextContent(page, element) {
   try {
-    return await page.evaluate(element => element.textContent, element);
+    return await page.evaluate((element) => element.textContent, element);
   } catch (err) {
     return undefined;
   }

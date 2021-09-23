@@ -7,7 +7,7 @@ function transform(content, id) {
   if (id.endsWith('.styl')) {
     return new Promise((resolve, reject) => {
       stylusToCss(content, id)
-        .then(_ => {
+        .then((_) => {
           _.code = `export default ${JSON.stringify(_.code)};`;
 
           resolve(_);
@@ -20,8 +20,8 @@ function transform(content, id) {
 /**
  * Renders CSS from STYL.
  */
-function stylusToCss (content, filename) {
-  return new Promise ((resolve, reject) => {
+function stylusToCss(content, filename) {
+  return new Promise((resolve, reject) => {
     const stylusOptions = {
       filename,
       compress: isProd,
@@ -29,26 +29,26 @@ function stylusToCss (content, filename) {
 
     if (isProd) {
       stylusOptions.use = [autoprefixer()];
-    }    
+    }
 
     stylus.render(content, stylusOptions, (err, code) => {
       if (err) {
-        return reject(err)
+        return reject(err);
       }
       resolve({
         code,
         map: {
-          mappings: ''
-        }
+          mappings: '',
+        },
       });
-    });    
+    });
   });
 }
 
 const plugin = {
   name: 'stylus',
   transform,
-  stylusToCss
-}
+  stylusToCss,
+};
 
 module.exports = plugin;

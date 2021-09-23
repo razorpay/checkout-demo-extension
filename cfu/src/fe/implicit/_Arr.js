@@ -6,7 +6,7 @@ import * as _ from './_';
  *
  * @returns {boolean}
  */
-export const isSimilar = x => _.isNumber(_.lengthOf(x));
+export const isSimilar = (x) => _.isNumber(_.lengthOf(x));
 
 const proto = _.prototypeOf(Array);
 const protoSlice = proto.slice;
@@ -29,9 +29,9 @@ export const loop = _.curry2((array, iteratee) => {
  * Invokes all functions in the array.
  * @param {Array<Function>} array
  */
-export const callAll = array => loop(array, a => a());
+export const callAll = (array) => loop(array, (a) => a());
 
-const arrayCall = func => _.curry2((arr, arg) => proto[func].call(arr, arg));
+const arrayCall = (func) => _.curry2((arr, arg) => proto[func].call(arr, arg));
 
 /**
  * Says whether `fn` evaluates to true
@@ -210,7 +210,7 @@ export const append = _.curry2((array, member) => {
  * @returns {Array}
  */
 export const remove = _.curry2((array, member) =>
-  filter(array, item => item !== member)
+  filter(array, (item) => item !== member)
 );
 
 /**
@@ -219,7 +219,7 @@ export const remove = _.curry2((array, member) =>
  *
  * @returns {Any}
  */
-export const first = array => array[0];
+export const first = (array) => array[0];
 
 /**
  * Returns the last item of the array.
@@ -227,7 +227,7 @@ export const first = array => array[0];
  *
  * @returns {Any}
  */
-export const last = array => array[_.lengthOf(array) - 1];
+export const last = (array) => array[_.lengthOf(array) - 1];
 
 /**
  * Returns a subarray from the array.
@@ -326,7 +326,7 @@ export const insertAt = _.curry3((array, item, index) => {
  *
  * @returns {Array}
  */
-export const removeDuplicates = array =>
+export const removeDuplicates = (array) =>
   reduce(
     array,
     (result, item) => {

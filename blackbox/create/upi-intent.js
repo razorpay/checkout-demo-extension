@@ -52,7 +52,7 @@ const {
   downtimeHighAlert,
 } = require('../tests/homescreen/actions');
 
-module.exports = function(testFeatures) {
+module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'upi-intent',
     testFeatures
@@ -202,12 +202,12 @@ module.exports = function(testFeatures) {
 
       await submit(context, downtimeHigh);
 
-      if(downtimeHigh) {
+      if (downtimeHigh) {
         await downtimeHighAlert(context);
       }
 
       if (feeBearer) {
-        await delay(200)
+        await delay(200);
         await handleFeeBearer(context, page);
       }
 

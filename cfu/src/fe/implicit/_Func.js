@@ -8,7 +8,7 @@ import * as _Arr from './_Arr';
  *
  * @returns {*} _
  */
-export const noop = _ => _;
+export const noop = (_) => _;
 
 const funcProto = _.prototypeOf(Function);
 
@@ -33,8 +33,8 @@ export const setPrototype = (constructor, proto) => {
  *
  * @returns {function (prop: (string|Function), context: Object): *} x
  */
-export const propToFunction = func =>
-  function(prop, context) {
+export const propToFunction = (func) =>
+  function (prop, context) {
     let args = arguments;
     if (_.isString(prop)) {
       args = _Arr.sliceFrom(args, 0);
@@ -49,8 +49,8 @@ export const propToFunction = func =>
  *
  * @returns {function (subject: Function): *}
  */
-export const ensureFunction = func =>
-  function(subject) {
+export const ensureFunction = (func) =>
+  function (subject) {
     if (_.isFunction(subject)) {
       return func.apply(null, arguments);
     } else {
@@ -82,7 +82,7 @@ export const bind =
  *
  * @return {*}
  */
-export const invoke = function(func) {
+export const invoke = function (func) {
   try {
     if (_.isString(func)) {
       func = this[func];
@@ -107,7 +107,7 @@ export const invoke = function(func) {
  */
 export const debounce = (func, wait) => {
   var timerId, args, context, timerFn, result;
-  var later = function() {
+  var later = function () {
     var last = timerFn();
     if (last < wait && last >= 0) {
       timerId = _.timeout(later, wait - last);
@@ -118,7 +118,7 @@ export const debounce = (func, wait) => {
     }
   };
 
-  return function() {
+  return function () {
     context = this;
     args = arguments;
     timerFn = _.timer();
@@ -134,7 +134,7 @@ export const debounce = (func, wait) => {
  * @param fn {function(*): any}
  * @return {function(*): boolean}
  */
-export const negate = fn => {
+export const negate = (fn) => {
   return function negated() {
     return !fn.apply(this, arguments);
   };

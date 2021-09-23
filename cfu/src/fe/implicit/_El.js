@@ -9,7 +9,7 @@ export const ElementConstructor = global.Element;
  *
  * @returns {Element}
  */
-export const create = tagName => document.createElement(tagName || 'div');
+export const create = (tagName) => document.createElement(tagName || 'div');
 
 /**
  * Gets the parent element of the given element.
@@ -17,7 +17,7 @@ export const create = tagName => document.createElement(tagName || 'div');
  *
  * @returns {Element}
  */
-export const parent = element => element.parentNode;
+export const parent = (element) => element.parentNode;
 
 const element1 = _.validateArgs(_.isElement);
 const element2 = _.validateArgs(_.isElement, _.isElement);
@@ -112,7 +112,7 @@ export const prepend =
  * @returns {Element} childNode
  */
 export const detach =
-  (childNode => {
+  ((childNode) => {
     var parentNode = parent(childNode);
     if (parentNode) {
       parentNode.removeChild(childNode);
@@ -145,7 +145,7 @@ export const moveCaret =
  * @returns {Element}
  */
 export const submit =
-  (el => {
+  ((el) => {
     el.submit();
     return el;
   }) |> element1;
@@ -357,7 +357,7 @@ export const offsetHeight = _.prop('offsetHeight');
  *
  * @returns {Object}
  */
-export const bbox = (el => el.getBoundingClientRect()) |> element1;
+export const bbox = ((el) => el.getBoundingClientRect()) |> element1;
 
 /**
  * Gets the first Child of the given element.
@@ -365,7 +365,7 @@ export const bbox = (el => el.getBoundingClientRect()) |> element1;
  *
  * @returns {Object}
  */
-export const firstChild = (el => el.firstChild) |> element1;
+export const firstChild = ((el) => el.firstChild) |> element1;
 
 /* https://developer.mozilla.org/en/docs/Web/API/Element/matches */
 var elementProto = _.prototypeOf(ElementConstructor);
@@ -396,10 +396,10 @@ export const on = (event, callback, delegate, useCapture) => {
   if (_.is(event, ElementConstructor)) {
     return console.error('use el |> _El.on(e, cb)');
   }
-  return el => {
+  return (el) => {
     var attachedCallback = callback;
     if (_.isString(delegate)) {
-      attachedCallback = function(e) {
+      attachedCallback = function (e) {
         var target = e.target;
         while (!matches(target, delegate) && target !== el) {
           target = target |> parent;

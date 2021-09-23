@@ -50,7 +50,7 @@ async function sendPreferences({
       expect(params).not.toHaveProperty('key_id');
     }
 
-    preferencesParams.forEach(param => {
+    preferencesParams.forEach((param) => {
       if (options[param]) {
         expect(options[param]).toEqual(params[param]);
       } else {

@@ -8,6 +8,10 @@
     <script src="config.js"></script>
     <!-- build:js razorpay.js -->
     <script src="js/generated/entry/razorpay.js"></script>
+    <script
+      type="text/javascript"
+      src="https://microapps.google.com/apis/v1alpha/microapps.js"
+    ></script>
     <!-- endbuild -->
   </head>
   <body>
@@ -30,7 +34,7 @@
       document.forms[0].onsubmit = function (e) {
         e.preventDefault();
         var rp = new Razorpay({
-          key: 'rzp_test_l3ckHAHlkpYUqe',
+          key: 'rzp_test_1DP5mmOlF5G5ag',
           amount: 200,
           // callback_url: 'https://checkout.local/razorpay',
           // redirect: true,
@@ -42,33 +46,66 @@
             console.log(resp);
           });
         window.rp = rp;
-        rp.createPayment(null, { paused: true, message: 'loading' });
-        setTimeout(function () {
-          var data = {
-            amount: 200,
-            currency: 'INR',
-          };
-          data.method = 'card';
-          data['card[number]'] = '4111111111111111';
-          data['card[expiry_month]'] = '04';
-          data['card[expiry_year]'] = '22';
-          data['card[name]'] = 'arsh';
-          data['card[cvv]'] = '123';
-          // data.bank = 'SBIN';
-          data.email = 'a@s.d';
-          data.contact = 9999922222;
-
-          var data = {
-            amount: 100000,
-            currency: 'INR',
-            email: 'gaurav.kumar@example.com',
-            contact: '9123456780',
-            method: 'cardless_emi',
-            // method specific fields
-            provider: 'zestmoney',
-          };
-          rp.emit('payment.resume', data);
+        var data = {
+          amount: 100,
+          currency: 'INR',
+          email: 'gaurav.kumar@example.com',
+          contact: '9123456780',
+          method: 'upi',
+          contact: '9123456789',
+          additional_info: {
+            displayItems: [
+              {
+                type: 'SUBTOTAL',
+                price: '20.00',
+              },
+              {
+                type: 'DISCOUNT',
+                price: '-10.00',
+              },
+            ],
+            offerInfo: {
+              offers: [
+                {
+                  redemptionCode: 'DISCOUNT10',
+                },
+              ],
+            },
+          },
+        };
+        rp.createPayment(data, {
+          // paused: true,
+          // message: 'loading',
+          microapps: {
+            gpay: true,
+          },
         });
+        // setTimeout(function() {
+        //   var data = {
+        //     amount: 200,
+        //     currency: 'INR',
+        //   };
+        //   data.method = 'card';
+        //   data['card[number]'] = '4111111111111111';
+        //   data['card[expiry_month]'] = '04';
+        //   data['card[expiry_year]'] = '22';
+        //   data['card[name]'] = 'arsh';
+        //   data['card[cvv]'] = '123';
+        //   // data.bank = 'SBIN';
+        //   data.email = 'a@s.d';
+        //   data.contact = 9999922222;
+
+        //   var data = {
+        //     amount: 100,
+        //     currency: 'INR',
+        //     email: 'gaurav.kumar@example.com',
+        //     contact: '9123456780',
+        //     method: 'upi',
+        //     contact: '9123456789',
+        //     // upi_app: 'gpay'
+        //   };
+        //   rp.emit('payment.resume', data);
+        // });
       };
     </script>
   </body>

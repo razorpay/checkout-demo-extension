@@ -320,6 +320,18 @@ export default function Payment(data, params = {}, r) {
     this.tryPopup();
   }
 
+  /**
+   * additional_info used by microapp.gpay only we pass this inside transaction info to gpay
+   * used here [app/modules/gpay.js]
+   * https://developers.google.com/pay/api/web/reference/response-objects#DisplayItem
+   */
+  if (
+    typeof data.additional_info === 'object' &&
+    data.additional_info !== null
+  ) {
+    this.additional_info = data.additional_info;
+    delete data.additional_info;
+  }
   // Method should not be sent for google pay card + upi merged flow
   if (data && data.method === 'app' && data.provider === 'google_pay') {
     delete data.method;

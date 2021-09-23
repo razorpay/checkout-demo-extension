@@ -20,7 +20,7 @@ async function verifyMethodWarned(context, message, method) {
 
   const warningDiv = await context.page.waitForSelector(selector);
   const warningText = await context.page.evaluate(
-    warningDiv => warningDiv.textContent,
+    (warningDiv) => warningDiv.textContent,
     warningDiv
   );
   expect(warningText).toContain(message);

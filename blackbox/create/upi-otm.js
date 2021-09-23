@@ -53,7 +53,7 @@ const {
   verifyPersonalizationText,
 } = require('../tests/homescreen/actions');
 
-module.exports = function(testFeatures) {
+module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'upi-otm',
     testFeatures
@@ -152,7 +152,7 @@ module.exports = function(testFeatures) {
 
       await submit(context, downtimeHigh);
 
-      if(downtimeHigh) {
+      if (downtimeHigh) {
         await downtimeHighAlert(context);
       }
 

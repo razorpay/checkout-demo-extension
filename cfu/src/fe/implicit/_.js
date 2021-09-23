@@ -8,10 +8,10 @@ export function logError() {
  *
  * @returns {Function}
  */
-export const curry2 = func =>
-  function(arg1, arg2) {
+export const curry2 = (func) =>
+  function (arg1, arg2) {
     if (arguments.length < 2) {
-      return primArg => func.call(null, primArg, arg1);
+      return (primArg) => func.call(null, primArg, arg1);
     }
     return func.call(null, arg1, arg2);
   };
@@ -22,10 +22,10 @@ export const curry2 = func =>
  *
  * @returns {Function}
  */
-export const curry3 = func =>
-  function(arg1, arg2, arg3) {
+export const curry3 = (func) =>
+  function (arg1, arg2, arg3) {
     if (arguments.length < 3) {
-      return primArg => func.call(null, primArg, arg1, arg2);
+      return (primArg) => func.call(null, primArg, arg1, arg2);
     }
     return func.call(null, arg1, arg2, arg3);
   };
@@ -39,8 +39,8 @@ export const curry3 = func =>
  * @returns {*}
  */
 export function validateArgs(...validators) {
-  return func =>
-    function() {
+  return (func) =>
+    function () {
       let args = arguments;
       if (
         validators.every((v, i) => {
@@ -133,7 +133,7 @@ export const isUndefined = isType('undefined');
  *
  * @returns {Boolean}
  */
-export const isNull = x => x === null;
+export const isNull = (x) => x === null;
 
 /**
  * Tells whether something is of a primitive type
@@ -141,7 +141,7 @@ export const isNull = x => x === null;
  *
  * @returns {Boolean}
  */
-export const isPrimitive = x =>
+export const isPrimitive = (x) =>
   isString(x) || isNumber(x) || isBoolean(x) || isNull(x) || isUndefined(x);
 
 /**
@@ -150,7 +150,7 @@ export const isPrimitive = x =>
  *
  * @returns {boolean}
  */
-export const isElement = o => isNonNullObject(o) && o.nodeType === 1;
+export const isElement = (o) => isNonNullObject(o) && o.nodeType === 1;
 
 /**
  * Checks if the given argument is truthy or not
@@ -166,7 +166,7 @@ export const isTruthy = Boolean;
  *
  * @returns {boolean}
  */
-export const isNonNullObject = o => !isNull(o) && isObject(o);
+export const isNonNullObject = (o) => !isNull(o) && isObject(o);
 
 /**
  * Checks if the given object is empty or not
@@ -174,7 +174,7 @@ export const isNonNullObject = o => !isNull(o) && isObject(o);
  *
  * @returns {boolean}
  */
-export const isEmptyObject = x => !lengthOf(Object.keys(x));
+export const isEmptyObject = (x) => !lengthOf(Object.keys(x));
 
 /**
  * Returns the given property of the provided object
@@ -256,9 +256,9 @@ export const interval = (func, delay) => {
  *
  * @returns {function (): number}
  */
-export const timer = x => {
+export const timer = (x) => {
   var then = now();
-  return x => now() - then;
+  return (x) => now() - then;
 };
 
 /**
@@ -305,7 +305,7 @@ export function throwMessage(message) {
  *
  * @returns {boolean}
  */
-export const isBase64Image = src => /data:image\/[^;]+;base64/.test(src);
+export const isBase64Image = (src) => /data:image\/[^;]+;base64/.test(src);
 
 /**
  * Gives a flattened object that can be used to generate query strings.
@@ -325,14 +325,14 @@ export function makeQueryObject(obj, prefix) {
 
   const noPrefix = typeof prefix === 'undefined' || prefix === null;
 
-  Object.keys(obj).forEach(key => {
+  Object.keys(obj).forEach((key) => {
     const value = obj[key];
     const _prefix = noPrefix ? key : `${prefix}[${key}]`;
 
     if (typeof value === 'object') {
       const _query = makeQueryObject(value, _prefix);
 
-      Object.keys(_query).forEach(subkey => {
+      Object.keys(_query).forEach((subkey) => {
         query[subkey] = _query[subkey];
       });
     } else {
@@ -353,7 +353,9 @@ export function obj2query(obj) {
   const query = makeQueryObject(obj);
 
   return Object.keys(query)
-    .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(query[key])}`)
+    .map(
+      (key) => `${encodeURIComponent(key)}=${encodeURIComponent(query[key])}`
+    )
     .join('&');
 }
 
@@ -418,10 +420,10 @@ export function hex2rgb(hex) {
  *
  * @returns {number}
  */
-export const getKeyFromEvent = e =>
+export const getKeyFromEvent = (e) =>
   is(e, global.Event) && (e.which || e.charCode || e.keyCode);
 
-export const getCharFromEvent = e => {
+export const getCharFromEvent = (e) => {
   let which = getKeyFromEvent(e);
   return (
     (which &&
@@ -438,7 +440,7 @@ export const getCharFromEvent = e => {
  *
  * @returns {Object} URL query params converted into an object.
  */
-export const getQueryParams = function(search = location.search) {
+export const getQueryParams = function (search = location.search) {
   // TODO: Support objects and nested objects.
   if (isString(search)) {
     return search.slice(1) |> query2obj;

@@ -40,7 +40,7 @@ const {
   handlePartialPayment,
 } = require('../tests/homescreen/actions');
 
-module.exports = function(testFeatures) {
+module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'cardless-emi',
     testFeatures
@@ -202,7 +202,7 @@ module.exports = function(testFeatures) {
         });
         const frame = await page
           .frames()
-          .find(fr => fr.name() === 'iframeFlow');
+          .find((fr) => fr.name() === 'iframeFlow');
         // mock success
         await frame.evaluate(() => {
           try {
@@ -214,7 +214,7 @@ module.exports = function(testFeatures) {
         });
 
         // wait for response
-        await new Promise(function(resolve) {
+        await new Promise(function (resolve) {
           setTimeout(resolve, 1000);
         });
         return;

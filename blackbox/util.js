@@ -37,17 +37,21 @@ const flatten = (o, prefix = '') => {
 
 const randomRange = (min, max) =>
   min + Math.floor((1 + max - min) * Math.random());
-const randomString = set => (length = 14) =>
-  Array.apply(null, { length })
-    .map(_ => randomItem(set))
-    .join('');
+const randomString =
+  (set) =>
+  (length = 14) =>
+    Array.apply(null, { length })
+      .map((_) => randomItem(set))
+      .join('');
 
-const randomLengthString = set => (min = 3, max = 8) =>
-  Array.apply(null, { length: module.exports.randomRange(min, max) })
-    .map(_ => randomItem(chrlow))
-    .join('');
+const randomLengthString =
+  (set) =>
+  (min = 3, max = 8) =>
+    Array.apply(null, { length: module.exports.randomRange(min, max) })
+      .map((_) => randomItem(chrlow))
+      .join('');
 
-const randomItem = set => set[randomRange(0, set.length - 1)];
+const randomItem = (set) => set[randomRange(0, set.length - 1)];
 
 const randomEmail = () => {
   const randomFunc = randomLengthString(chrlow);
@@ -67,7 +71,7 @@ const getElementForSelector = async (page, selector) => {
   return (await page.$(selector)) || undefined;
 };
 
-const query2obj = string => {
+const query2obj = (string) => {
   // TODO: Support objects and nested objects.
 
   var obj = {};
@@ -80,7 +84,7 @@ const query2obj = string => {
   return obj;
 };
 
-const unflatten = o => {
+const unflatten = (o) => {
   const delimiter = '.';
   let result = {};
 
@@ -117,7 +121,7 @@ const util = (module.exports = {
   /**
    * Sets the state in context
    */
-  setState: function(context, what = {}) {
+  setState: function (context, what = {}) {
     if (!context.state) {
       context.state = {};
     }
@@ -136,14 +140,14 @@ const util = (module.exports = {
    *
    * @returns {string | undefined}
    */
-  innerText: async function(selectorOrElem) {
+  innerText: async function (selectorOrElem) {
     if (typeof selectorOrElem === 'string') {
-      return await page.$eval(selectorOrElem, el => el.textContent);
+      return await page.$eval(selectorOrElem, (el) => el.textContent);
     }
 
     try {
       return await page.evaluate(
-        element => element.textContent,
+        (element) => element.textContent,
         selectorOrElem
       );
     } catch (err) {
@@ -157,7 +161,7 @@ const util = (module.exports = {
    * @param {Element} element
    * @param {String} attribute
    */
-  getAttribute: async function(page, element, attribute) {
+  getAttribute: async function (page, element, attribute) {
     try {
       return await page.evaluate(
         (element, attribute) => element.getAttribute(attribute),
@@ -174,7 +178,7 @@ const util = (module.exports = {
    * @param {Array} array
    * @param {Function} evaluator
    */
-  find: async function(array, evaluator) {
+  find: async function (array, evaluator) {
     const promises = array.map(evaluator);
 
     const results = await Promise.all(promises);
@@ -184,12 +188,12 @@ const util = (module.exports = {
     return array[index];
   },
 
-  delay: ms => new Promise(resolve => setTimeout(resolve, ms)),
+  delay: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
 
-  visible: el => Boolean(el.offsetWidth),
-  assertVisible: async sel => {
+  visible: (el) => Boolean(el.offsetWidth),
+  assertVisible: async (sel) => {
     expect(
-      await page.evaluate(sel => {
+      await page.evaluate((sel) => {
         const el = document.querySelector(sel);
         if (!el) {
           throw `Element ${sel} is not present`;
@@ -229,7 +233,7 @@ const util = (module.exports = {
     const returnObj = {
       disableInterceptor: () => (interceptorEnabled = null),
       enableInterceptor: () => (interceptorEnabled = true),
-      getRequest: url => {
+      getRequest: (url) => {
         if (url) {
           currentRequest = allRequests[url];
         }
@@ -256,13 +260,13 @@ const util = (module.exports = {
         (url.startsWith(cdnUrl) && !url.startsWith(bundleUrl)) || // Bundles are present on CDN, but need to be intercepted.
         url.startsWith(lumberjackUrl) ||
         url.includes(zestMoneyLoanAgreementUrl) ||
-        url.includes('html2pdf.bundle.js')
+        url.includes('html2pdf.bundle.js');
       if (ignoredUrl || (pattern && !pattern.test(url))) {
         return true;
       }
     }
 
-    page.on('request', interceptedRequest => {
+    page.on('request', (interceptedRequest) => {
       if (shouldIgnore(interceptedRequest)) {
         return;
       }
@@ -278,7 +282,7 @@ const util = (module.exports = {
       if (currentRequest) {
         return Promise.resolve(currentRequest);
       } else {
-        return new Promise(resolve => (resolver = resolve));
+        return new Promise((resolve) => (resolver = resolve));
       }
     }
 
@@ -309,7 +313,7 @@ const util = (module.exports = {
       };
     };
 
-    returnObj.respondPlain = body => respond({ body });
+    returnObj.respondPlain = (body) => respond({ body });
 
     returnObj.respondJSON = (body, status = 200) =>
       respond({
@@ -318,7 +322,7 @@ const util = (module.exports = {
         status,
       });
 
-    returnObj.respondJSONP = body => {
+    returnObj.respondJSONP = (body) => {
       const url = currentRequest.url();
       const parsedURL = URL.parse(url);
       const params = querystring.parse(parsedURL.query);
@@ -329,19 +333,19 @@ const util = (module.exports = {
       });
     };
 
-    returnObj.respondHTML = body =>
+    returnObj.respondHTML = (body) =>
       respond({
         contentType: 'text/html',
         body,
       });
 
-    returnObj.respondImage = body =>
+    returnObj.respondImage = (body) =>
       respond({
         contentType: 'image/png',
         body,
       });
 
-    returnObj.failRequest = body =>
+    returnObj.failRequest = (body) =>
       respond({
         status: 400,
         body: JSON.stringify(body),
@@ -354,7 +358,7 @@ const util = (module.exports = {
     try {
       if (elementForSelector) {
         return (
-          (await elementForSelector.evaluate(element => {
+          (await elementForSelector.evaluate((element) => {
             return element.innerText;
           })) || ''
         );
