@@ -90,7 +90,7 @@
   const accountTypes = _Obj.keys(accountTextLabels);
 
   if (!_Arr.contains(accountTypes, prefilledAccountType)) {
-    prefilledAccountType = false;
+    prefilledAccountType = '';
   }
 
   // Set prefill
