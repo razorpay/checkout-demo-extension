@@ -344,6 +344,20 @@ function errorHandler(response) {
   }
 
   var error = response.error;
+  /**
+   * response.error could be a json object or json string
+   * in case of android mobile sdk - error is a json string inside response
+   * for which one more level of parsing is required.
+   * For web and other cases, error is an object
+   */
+  if (isString(error)) {
+    try {
+      error = JSON.parse(error);
+    } catch (e) {
+      return;
+    }
+  }
+
   var untranslatedMessage = error.description;
 
   var message = I18n.translateErrorDescription(

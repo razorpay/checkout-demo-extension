@@ -383,7 +383,8 @@ function setSessionPreferences(session, preferences) {
       });
     }
 
-    bindI18nEvents();
+    const retryErrorHandler = !!qpmap.error;
+    bindI18nEvents(retryErrorHandler, qpmap);
   });
 }
 

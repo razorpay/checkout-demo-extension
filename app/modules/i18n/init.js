@@ -150,7 +150,7 @@ export function addDefaultMessages() {
   });
 }
 
-export function bindI18nEvents() {
+export function bindI18nEvents(retryErrorHandler = false, queryParams = {}) {
   const session = getSession();
 
   // Show loader whenever language bundle is loading
@@ -160,7 +160,16 @@ export function bindI18nEvents() {
     } else {
       // TODO: fix this and remove try/catch
       try {
-        session.hideOverlayMessage();
+        /**
+         * When there's an error via sdk, i18n Loading text takes over and gets dismissed after language resolution
+         * We need to invoke the error handler again to display relevant error message
+         */
+        if (retryErrorHandler) {
+          session.errorHandler(queryParams);
+          retryErrorHandler = false;
+        } else {
+          session.hideOverlayMessage();
+        }
       } catch (e) {}
     }
   });
