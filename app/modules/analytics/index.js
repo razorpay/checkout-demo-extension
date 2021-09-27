@@ -9,7 +9,7 @@ import DowntimeEvents from './downtime/events';
 import ErrorEvents from './errors/events';
 import { getTrackMethods, addAnalyticsMethods } from './helpers';
 import MetaProperties from './metaProperties';
-import Analytics, { Track } from './analytics';
+import Analytics, { Track } from './base-analytics';
 
 let Events = getTrackMethods();
 Events = addAnalyticsMethods(Events);

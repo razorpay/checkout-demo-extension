@@ -1,5 +1,5 @@
 import * as TYPES from 'analytics-types';
-import Analytics from './analytics';
+import Analytics from './base-analytics';
 
 /**
  * Takes a Object mapping of events name and append prefix
