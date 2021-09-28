@@ -94,13 +94,13 @@ function sanitizeImage(options) {
 
 // this will be replaced with env value by rollup
 function makeCheckoutUrl(rzp) {
-  const CANARY_PERCENTAGE = isNaN(parseInt(__CANARY_PERCENTAGE__)) // eslint-disable-line no-undef
-    ? 0.15 // default value
-    : parseInt(__CANARY_PERCENTAGE__) / 100; // eslint-disable-line no-undef
+  // const CANARY_PERCENTAGE = isNaN(parseInt(__CANARY_PERCENTAGE__)) // eslint-disable-line no-undef
+  //   ? 0.15 // default value
+  //   : parseInt(__CANARY_PERCENTAGE__) / 100; // eslint-disable-line no-undef
 
   var url = RazorpayConfig.frame;
 
-  const useCanary = _.random() < CANARY_PERCENTAGE;
+  // const useCanary = _.random() < CANARY_PERCENTAGE;
 
   if (!url) {
     url = makeUrl('checkout');
@@ -109,17 +109,17 @@ function makeCheckoutUrl(rzp) {
     if (!urlParams) {
       url += '/public';
 
-      if (useCanary) {
-        url += '/canary';
-      }
+      // if (useCanary) {
+      //   url += '/canary';
+      // }
     } else {
       url = _.appendParamsToUrl(url, urlParams);
     }
   }
 
-  if (useCanary) {
-    url = _.appendParamsToUrl(url, { canary: 1 });
-  }
+  // if (useCanary) {
+  //   url = _.appendParamsToUrl(url, { canary: 1 });
+  // }
 
   return url;
 }

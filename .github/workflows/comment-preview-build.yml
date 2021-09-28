@@ -14,7 +14,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           msg: |
-            Once a build for any commit in your branch succeeds, it will be deployed at https://betacdn.razorpay.com/_checkout/{branch_name}/v1/
+            Once a build for any commit in your branch succeeds, it will be deployed at the following Links
+
+            Prod: https://betacdn.razorpay.com/_checkout/{branch_name}/v1/
+            Canary: https://betacdn.razorpay.com/_checkout/{branch_name}/canary/v1/
+            Baseline: https://betacdn.razorpay.com/_checkout/{branch_name}/baseline/v1/
 
             ## Files
             - [razorpay.js](https://betacdn.razorpay.com/_checkout/{branch_name}/v1/razorpay.js)

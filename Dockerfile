@@ -8,8 +8,12 @@ ENV BUILD_NUMBER=${BUILD_NUMBER}
 ARG CANARY_PERCENTAGE
 ENV CANARY_PERCENTAGE=${CANARY_PERCENTAGE}
 
+# for testing
 ARG BRANCH
 ENV BRANCH=${BRANCH}
+
+ARG TRAFFIC_ENV
+ENV TRAFFIC_ENV=${TRAFFIC_ENV}
 
 RUN apt-get update -y && apt-get install -y brotli && apt-get install zopfli -y
 
@@ -22,7 +26,7 @@ SHELL ["/bin/bash", "-c"]
 # because of post install script 
 RUN git init 
 
-RUN if [[ -n $CANARY_PERCENTAGE ]]; then \
+RUN if [[ -n $CANARY_PERCENTAGE ]] || [[ -n $TRAFFIC_ENV ]]; then \
     cd /checkout_build \
     && yarn install \
     && NODE_ENV=production npm run build \
@@ -38,6 +42,9 @@ FROM c.rzp.io/razorpay/onggi:aws-cli-v2818 as aws
 
 ARG BRANCH
 ENV BRANCH=${BRANCH}
+
+ARG TRAFFIC_ENV
+ENV TRAFFIC_ENV=${TRAFFIC_ENV}
 
 ARG AWS_CDN_BUCKET
 ENV AWS_CDN_BUCKET=${AWS_CDN_BUCKET}
@@ -72,15 +79,25 @@ RUN mv checkout-frame.js.gz checkout-frame.js
 RUN mv razorpay.js.gz razorpay.js
 RUN mv css/checkout.css.gz css/checkout.css
 
-# Upload to S3
-RUN aws s3 sync /app/dist/v1 s3://$AWS_CDN_BUCKET/_checkout/$BRANCH/v1 \
+
+RUN if [ -z "$TRAFFIC_ENV" ]]; then \
+    aws s3 sync /app/dist/v1 s3://$AWS_CDN_BUCKET/_checkout/$BRANCH/v1 \
     --acl public-read \
     --cache-control "max-age=2700, must-revalidate" \
     --content-encoding gzip \
     --exclude "*" \
     --include "*.js" \
-    --include "*.css"
-
+    --include "*.css"; \
+    else \
+    aws s3 sync /app/dist/v1 s3://$AWS_CDN_BUCKET/_checkout/$BRANCH/$TRAFFIC_ENV/v1 \
+    --acl public-read \
+    --cache-control "max-age=2700, must-revalidate" \
+    --content-encoding gzip \
+    --exclude "*" \
+    --include "*.js" \
+    --include "*.css"; \
+    fi 
+    
 FROM c.rzp.io/razorpay/containers:app-nginx-brotli
 ARG GIT_COMMIT_HASH
 ENV GIT_COMMIT_HASH=${GIT_COMMIT_HASH}

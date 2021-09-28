@@ -8,8 +8,8 @@ import { Track } from 'analytics';
 
 Track.props.library = 'checkoutjs';
 
-if (_.getQueryParams(global.location.search).canary) {
-  Track.props.env = 'canary';
+const trafficEnv = String('__TRAFFIC_ENV__'); // eslint-disable-line no-undef
+if (trafficEnv) {
+  Track.props.env = trafficEnv;
 }
-
 RazorpayConfig.api = _Doc.resolveUrl(RazorpayConfig.frameApi);
