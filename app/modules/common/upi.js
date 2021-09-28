@@ -4,7 +4,10 @@ import Analytics from 'analytics';
 import { checkDowntime } from 'checkoutframe/downtimes';
 import { getDowntimes } from 'checkoutstore';
 import { VPA_REGEX } from 'common/constants';
-
+export {
+  parseUPIIntentResponse,
+  didUPIIntentSucceed,
+} from 'common/upi_helpers';
 export const GOOGLE_PAY_PACKAGE_NAME = 'com.google.android.apps.nbu.paisa.user';
 export const PHONE_PE_PACKAGE_NAME = 'com.phonepe.app';
 // Not the real package name. We're using this because api returns 'cred' instead of the real package name
@@ -326,49 +329,6 @@ const UPI_APPS_ORDER = ['preferred', 'whitelist'];
 
 export const otherAppsIcon =
   'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNCA4aDRWNEg0djR6bTYgMTJoNHYtNGgtNHY0em0tNiAwaDR2LTRINHY0em0wLTZoNHYtNEg0djR6bTYgMGg0di00aC00djR6bTYtMTB2NGg0VjRoLTR6bS02IDRoNFY0aC00djR6bTYgNmg0di00aC00djR6bTAgNmg0di00aC00djR6IiBmaWxsPSIjYjBiMGIwIi8+PHBhdGggZD0iTTAgMGgyNHYyNEgweiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg==';
-
-/**
- * Parses the response from UPI Intent.
- * @param {Object} intentResponse Response from Intent.
- *
- * @return {Object}
- */
-export const parseUPIIntentResponse = (intentResponse) => {
-  let response = {};
-
-  if (intentResponse.response) {
-    if (_.isNonNullObject(intentResponse.response)) {
-      response = intentResponse.response;
-    } else if (_.isString(intentResponse.response)) {
-      // Convert the string response into a JSON object.
-      let split = intentResponse.response.split('&');
-
-      for (let i = 0; i < split.length; i++) {
-        let pair = split[i].split('=');
-
-        if (pair[1] === '' || pair[1] === 'undefined' || pair[1] === 'null') {
-          response[pair[0]] = null;
-        } else {
-          response[pair[0]] = pair[1];
-        }
-      }
-    }
-  }
-
-  return response;
-};
-
-/**
- * Tells whether the payment using UPI Intent was successful or not.
- * @param {Object} parsedResponse Parsed Intent Response from the PSP UPI app.
- *
- * @return {Boolean}
- */
-export const didUPIIntentSucceed = (parsedResponse) =>
-  Boolean(parsedResponse.txnId) ||
-  (parsedResponse.Status || parsedResponse.status || '')
-    .toLowerCase()
-    .indexOf('suc') === 0;
 
 /**
  * Returns a list containing the package names of all apps passed to the list.
