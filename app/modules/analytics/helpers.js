@@ -11,8 +11,8 @@ import Analytics from './base-analytics';
 export const getEventsName = (prefix, events) => {
   if (!prefix) return events;
   const returnObj = {};
-  Object.entries(events).forEach((entry) => {
-    const [key, value] = entry;
+  Object.keys(events).forEach((key) => {
+    const value = events[key];
     if (key === '__PREFIX' && value === '__PREFIX') {
       // this will convert to toUpperCase(prefix) : prefix
       returnObj[prefix.toUpperCase()] = `${prefix}`;
@@ -30,7 +30,8 @@ export const getEventsName = (prefix, events) => {
 
 export const getTrackMethods = () => {
   const Events = {};
-  Object.values(TYPES).forEach((type) => {
+  Object.keys(TYPES).forEach((key) => {
+    const type = TYPES[key];
     const methodName = `Track${type.charAt(0).toUpperCase()}${type.slice(1)}`;
     Events[methodName] = function (eventName, data) {
       Analytics.track(eventName, {
