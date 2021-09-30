@@ -1464,3 +1464,37 @@ div.callout span{
 #body-overlay.shown {
   display: block;
 }
+
+#recurring-cards-wrap {
+  position: absolute;
+  top: 0;
+  height: 113%;
+  z-index: 100;
+  display: none;
+  width: 500px;
+  margin-left: -250px;
+  left: 50%;
+  transform: rotateX(-2deg) translateY(10px) scale(0.98);
+
+  &.drishy {
+    transform: none !important;
+  }
+}
+
+.mobile {
+  #recurring-cards-wrap{
+    width: 100%;
+    height: auto;
+    position: absolute;
+    top: initial;
+    left: 0;
+    bottom: 0;
+    margin-left: 0;
+    transform: translateY(15px);
+
+    .recurring-card-overlay-inner {
+      top: initial;
+      transform: none;
+    }
+  }
+}

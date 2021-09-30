@@ -28,6 +28,7 @@
   export let recurring = false;
   export let helpText;
   export let validCardForOffer = true;
+  export let isCardSupportedForRecurring;
 
   // State
   let valid = false;
@@ -46,7 +47,7 @@
     (value && helpText) || (!valid ? getHelpText($locale) : undefined);
 
   function getHelpText(locale) {
-    if (recurring && value) {
+    if (recurring && value && !isCardSupportedForRecurring) {
       // LABEL: Card does not support recurring payments.
       return formatMessageWithLocale(CARD_NUMBER_HELP_RECURRING, locale);
     }

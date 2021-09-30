@@ -86,6 +86,7 @@
   export let downtimeSeverity;
   export let downtimeInstrument;
   export let delayOTPExperiment;
+  export let isCardSupportedForRecurring;
   const isSavedCardsEnabled = shouldRememberCustomer();
 
   const showRememberCardCheck = isSavedCardsEnabled;
@@ -496,6 +497,7 @@
         recurring={isRecurring()}
         {validCardForOffer}
         type={$cardType}
+        {isCardSupportedForRecurring}
         on:focus
         on:filled={(_) => handleFilled('numberField')}
         on:autocomplete={trackCardNumberAutoFilled}

@@ -137,7 +137,11 @@
               return;
             }
 
-            if (!hideEmi() && !Backdrop.isVisible()) {
+            if (
+              !hideEmi() &&
+              !hideRecurringCardsOverlay() &&
+              !Backdrop.isVisible()
+            ) {
               this.hide();
             }
           }

@@ -16,6 +16,7 @@
   import { checkDowntime } from 'checkoutframe/downtimes';
   import SavedCardCTA from 'card/ui/component/saved-card-cta.svelte';
   import ToggleHeading from 'ui/components/common/heading/ToggleHeading.svelte';
+  import RecurringCardsCallout from './RecurringCardsCallout.svelte';
 
   // Store
   import {
@@ -69,6 +70,7 @@
   import { newCardEmiDuration, savedCardEmiDuration } from 'checkoutstore/emi';
   // i18n
   import { t, locale } from 'svelte-i18n';
+  import { fly } from 'svelte/transition';
 
   import {
     USE_SAVED_CARDS_BTN,
@@ -112,7 +114,7 @@
   import { showAmount, showCtaWithDefaultText } from 'checkoutstore/cta';
   import Icon from 'ui/elements/Icon.svelte';
   import Info from 'ui/elements/Info.svelte';
-  import { Views } from './constant';
+  import { Views, cardWithRecurringSupport } from './constant';
 
   let showAVSInfo = false;
 
@@ -644,6 +646,30 @@
     $newCardInputFocused = true;
   }
 
+  let isCardSupportedForRecurring = false;
+  let showRecurringCallout = false;
+  $: {
+    /**
+     * recurring callout needs to be displayed when 3 conditions are met
+     * a -> must be a recurring/subscription payment
+     * b -> user focused in card input.
+     * c -> card bin number is NOT supported for recurring payments (card's constants)
+     *
+     * note: b -> toggles on when user clicks on card input field, for subsequent interactions it remains toggled on.
+     * note: c -> as user enters the card number, we switch it to false (#onCardInput),
+     *            when card features are fetched from backend or cache,
+     *            the issuer and type is compared with supported recurring BINS. (#checkCardSupportForRecurring)
+     */
+    showRecurringCallout =
+      isRecurring() && $newCardInputFocused && !isCardSupportedForRecurring;
+  }
+
+  function checkCardSupportForRecurring(features) {
+    const { issuer, type } = features;
+    const issuerDetail = cardWithRecurringSupport[issuer];
+    return issuerDetail?.[type] ?? false;
+  }
+
   function onCardInput() {
     const _cardNumber = $cardNumber;
     const cardType = getCardType(_cardNumber);
@@ -698,12 +724,15 @@
           emiObj,
           trimmedVal.length
         );
+
+        isCardSupportedForRecurring = checkCardSupportForRecurring(features);
       });
     } else {
       // Need six digits for EMI. Unset things.
       session.emiPlansForNewCard = undefined;
       $newCardEmiDuration = '';
       showAppropriateEmiDetailsForNewCard(session.tab, null, trimmedVal.length);
+      isCardSupportedForRecurring = false;
     }
   }
 
@@ -858,6 +887,15 @@
             />
           {/if}
 
+          {#if showRecurringCallout}
+            <div
+              class="pad"
+              transition:fly={getAnimationOptions({ duration: 250, y: -10 })}
+            >
+              <RecurringCardsCallout />
+            </div>
+          {/if}
+
           <AddCardView
             {tab}
             faded={Boolean($selectedApp)}
@@ -867,6 +905,7 @@
             {downtimeSeverity}
             {downtimeInstrument}
             {delayOTPExperiment}
+            {isCardSupportedForRecurring}
           />
           {#if showEmiCta}
             <EmiActions

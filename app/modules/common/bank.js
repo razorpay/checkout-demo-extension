@@ -29,6 +29,8 @@ const _commonBanks = {
   VIJB: 'Vijaya Bank',
 };
 
+export const banksUnderOneCard = ['IDFB', 'SIBL', 'STCB', 'FDRL'];
+
 /**
  * Returns the name of the common bank
  * @param {string} code

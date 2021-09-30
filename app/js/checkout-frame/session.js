@@ -274,6 +274,15 @@ function hideOverlay($with) {
   }
 }
 
+function hideRecurringCardsOverlay() {
+  var recurringCardsWrap = $('#recurring-cards-wrap');
+  var wasShown = recurringCardsWrap.hasClass(shownClass);
+  if (wasShown) {
+    hideOverlay(recurringCardsWrap);
+  }
+  return wasShown;
+}
+
 function hideEmi() {
   var emic = $('#emi-wrap');
   var wasShown = emic.hasClass(shownClass);
@@ -309,6 +318,7 @@ function hideOverlayMessage() {
   session.preventErrorDismissal = false;
   if (
     !hideEmi() &&
+    !hideRecurringCardsOverlay() &&
     !hideFeeWrap() &&
     !hideDowntimeAlert() &&
     !session.hideSvelteOverlay()

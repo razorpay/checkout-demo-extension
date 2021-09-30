@@ -836,6 +836,7 @@ export default {
     search_no_results: 'No results for "{query}"',
     search_results_label: 'Results',
     select_another_method: 'Please select another method.',
+    one_card: 'OneCard',
   },
   nach: {
     allowed_formats_info:

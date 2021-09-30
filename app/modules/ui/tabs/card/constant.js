@@ -91,3 +91,15 @@ export const Views = {
   AVS: 'avs-card',
   CARD_APP: 'card-app',
 };
+
+export const cardWithRecurringSupport = {
+  HSBC: { credit: true, debit: false },
+  ESFB: { credit: false, debit: true },
+  KVBL: { credit: true, debit: true },
+  // OneCard exclusive banks - start
+  IDFB: { credit: true, debit: false },
+  SIBL: { credit: true, debit: false },
+  STCB: { credit: true, debit: false },
+  FDRL: { credit: true, debit: false },
+  // OneCard exclusive banks - end
+};
