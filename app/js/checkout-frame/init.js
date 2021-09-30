@@ -28,6 +28,7 @@ var _Arr = discreet._Arr;
 var ERROR_TRACKING_URLS = [
   'https://checkout.razorpay.com',
   'https://prod-checkout-canary.razorpay.com',
+  'https://checkout-baseline.razorpay.com',
 ];
 
 function isUrlApplicableForErrorTracking(url) {
