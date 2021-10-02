@@ -13,7 +13,7 @@ const config = {
     // section: 'recommended',
     // highlightLabel: 'cardlessemi.walnut369.hightlightlabel', // use i18n
     pushToFirst: true, // later introduce order if more than one
-    min_amount: 90000,
+    min_amount: 100,
   },
   bajaj: {
     name: 'Bajaj Finserv',
