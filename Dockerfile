@@ -79,8 +79,8 @@ RUN mv checkout-frame.js.gz checkout-frame.js
 RUN mv razorpay.js.gz razorpay.js
 RUN mv css/checkout.css.gz css/checkout.css
 
-
-RUN if [ -z "$TRAFFIC_ENV" ]]; then \
+# shell doesn't require [[ ]], it works with []
+RUN if [ -z "$TRAFFIC_ENV" ]; then \
     aws s3 sync /app/dist/v1 s3://$AWS_CDN_BUCKET/_checkout/$BRANCH/v1 \
     --acl public-read \
     --cache-control "max-age=2700, must-revalidate" \
