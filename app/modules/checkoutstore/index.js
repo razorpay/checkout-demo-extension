@@ -160,7 +160,7 @@ export function isShowMORTncEnabled() {
 }
 
 export function isSiftJSEnabled() {
-  return hasFeature('enable_sift_js', false);
+  return hasFeature('disable_sift_js', false) !== true;
 }
 
 export function isContactOptional() {

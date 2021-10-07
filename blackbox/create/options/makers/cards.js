@@ -5,7 +5,7 @@ function makeOptions(features, options) {
 }
 
 function makePreferences(features, preferences) {
-  const { offers, partialPayment, dcc, withSiftJS } = features;
+  const { offers, partialPayment, dcc } = features;
 
   if (partialPayment) {
     preferences.order = {
@@ -51,13 +51,6 @@ function makePreferences(features, preferences) {
 
   if (dcc) {
     preferences.features = { dcc: true };
-  }
-
-  if (withSiftJS) {
-    preferences.features = {
-      ...preferences.features,
-      enable_sift_js: true,
-    };
   }
 
   return preferences;

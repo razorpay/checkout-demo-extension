@@ -227,7 +227,7 @@
       isSavedCardsEnabled = shouldRememberCustomer();
     });
 
-    if (isSiftJSEnabled()) {
+    if (isSiftJSEnabled() && session.r.isLiveMode()) {
       if (isInternational()) {
         // load sift js
         injectSiftScript(session.id).catch((_e) => {

@@ -55,7 +55,6 @@ module.exports = function (testFeatures) {
         page,
         options,
         preferences,
-        withSiftJS: true,
       });
 
       const missingUserDetails = optionalContact && optionalEmail;

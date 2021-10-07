@@ -13,5 +13,4 @@ createCardsTest({
   dcc: true,
   avs: true,
   AVSPrefillData: AVS_PREFILL_DATA,
-  withSiftJS: true,
 });
