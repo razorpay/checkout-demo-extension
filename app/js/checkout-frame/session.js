@@ -5044,6 +5044,9 @@ Session.prototype = {
           delete AVSData._country;
         }
         data.billing_address = AVSData;
+        Analytics.track('card:avsdata', {
+          data: AVSData,
+        });
       }
 
       // These are undefined/empty if the user uses an Indian card
