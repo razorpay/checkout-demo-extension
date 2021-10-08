@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import { Events, CardEvents, MetaProperties } from 'analytics';
 
   // i18n
   import { t } from 'svelte-i18n';
@@ -173,6 +174,7 @@
 
   $: {
     $AVSBillingAddress = { ...formData };
+    Events.setMeta(MetaProperties.AVS_FORM_DATA, formData);
   }
 
   let showModal = false;
