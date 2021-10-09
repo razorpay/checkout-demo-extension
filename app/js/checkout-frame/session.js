@@ -5033,9 +5033,23 @@ Session.prototype = {
         CardScreenStore.defaultDCCCurrency
       );
 
+      // These are undefined/empty if the user uses an Indian card
+      if (!data.currency_request_id) {
+        delete data.currency_request_id;
+        delete data.dcc_currency;
+        delete data.default_dcc_currency;
+      }
+    }
+
+    /**
+     * For AVS if method is card && currency is not INR i.e. DCC or MCC flow enabled
+     */
+    if (
+      data.method === 'card' &&
+      (Store.isDCCEnabled() || this.r.get('currency') !== 'INR')
+    ) {
       // AVS
-      var AVSData =
-        discreet.storeGetter(CardScreenStore.AVSBillingAddress) || {};
+      AVSData = discreet.storeGetter(CardScreenStore.AVSBillingAddress) || {};
       // AVS will submit only on AVS screen
       if (this.svelteCardTab.isOnAVSScreen() && AVSData && AVSData.line1) {
         if (AVSData._country) {
@@ -5047,13 +5061,6 @@ Session.prototype = {
         Analytics.track('card:avsdata', {
           data: AVSData,
         });
-      }
-
-      // These are undefined/empty if the user uses an Indian card
-      if (!data.currency_request_id) {
-        delete data.currency_request_id;
-        delete data.dcc_currency;
-        delete data.default_dcc_currency;
       }
     }
 
