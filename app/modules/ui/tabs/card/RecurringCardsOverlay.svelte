@@ -49,7 +49,7 @@
       <div class="recurring-cards-col">{value.debit ? 'Yes' : '—'}</div>
     </div>
   {/each}
-  <div class="close" on:click={close}>✕</div>
+  <div class="close recurring-cards-close-icon" on:click={close}>✕</div>
 </section>
 
 <style>
@@ -68,6 +68,9 @@
     line-height: 32px;
     font-size: 18px;
     padding: 16px 26px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .recurring-cards-row {
@@ -95,5 +98,13 @@
 
   .recurring-cards-heading {
     font-weight: bold;
+  }
+
+  .recurring-cards-close-icon {
+    padding: 8px;
+    font-size: 18px;
+    width: auto;
+    height: auto;
+    line-height: 1;
   }
 </style>
