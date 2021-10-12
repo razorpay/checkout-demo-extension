@@ -65,7 +65,10 @@ const getValidContact = (contact) => {
 const initCREDCache = (session) => {
   if (CRED_ELIGIBILITY_CACHE === undefined) {
     CRED_ELIGIBILITY_CACHE = {};
-    setCREDEligibilityFromPreferences(session.preferences);
+    // in optional contact flow this method will be called with empty object
+    if (session && session.preferences) {
+      setCREDEligibilityFromPreferences(session.preferences);
+    }
   }
 };
 
@@ -278,6 +281,9 @@ export const checkCREDEligibility = (contact) => {
  * @returns {EligibilityCache}
  */
 export const isUserEligible = (contact) => {
+  if (CRED_ELIGIBILITY_CACHE === undefined) {
+    initCREDCache({});
+  }
   return CRED_ELIGIBILITY_CACHE[contact];
 };
 
