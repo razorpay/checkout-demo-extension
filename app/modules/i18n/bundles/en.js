@@ -166,6 +166,9 @@ export default {
         'Only {issuers} credit cards are supported for this payment.',
       debit_only_callout:
         'Only debit cards from {issuers} are supported for this payment.',
+      limited_card_support_recurring:
+        'Only limited cards support recurring payments due to new payment regulations by RBI.',
+      view_supported_cards: 'View supported cards',
     },
     subscriptions: {
       credit_debit_callout:
@@ -1165,6 +1168,13 @@ export default {
     sub_text: 'Look for these rewards from amazing brands in your mail box!',
     close: 'Close',
     tooltip_text: 'Unlock free rewards after payment',
+  },
+  recurring_callout_overlay: {
+    supported_cards: 'Supported cards for recurring payments',
+    bank: 'Bank',
+    credit_card: 'Credit Card',
+    debit_card: 'Debit Card',
+    yes: 'Yes',
   },
   trusted_badge: {
     header: 'Razorpay Trusted Business',

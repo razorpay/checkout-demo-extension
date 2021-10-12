@@ -1,8 +1,15 @@
 <script>
-  import { locale } from 'svelte-i18n';
+  import { t, locale } from 'svelte-i18n';
   import { formatMessageWithLocale, getLongBankName } from 'i18n';
   import { cardWithRecurringSupport } from './constant';
   import { banksUnderOneCard } from 'common/bank';
+  import {
+    BANK,
+    CREDIT_CARD,
+    DEBIT_CARD,
+    SUPPORTED_CARDS,
+    YES,
+  } from 'ui/labels/recurring-callout-overlay';
 
   export let close;
 
@@ -22,20 +29,21 @@
 
 <section class="recurring-card-overlay-inner">
   <div class="recurring-cards-title">
-    Supported cards for recurring payments:
+    <!-- LABEL: Supported cards for recurring payments -->
+    {$t(SUPPORTED_CARDS)}:
   </div>
   <div class="recurring-cards-row recurring-cards-heading">
     <div class="recurring-cards-col">
       <!-- LABEL: Bank -->
-      Bank
+      {$t(BANK)}
     </div>
     <div class="recurring-cards-col">
       <!-- LABEL: Credit Card -->
-      Credit Card
+      {$t(CREDIT_CARD)}
     </div>
     <div class="recurring-cards-col">
       <!-- LABEL: Debit Card-->
-      Debit Card
+      {$t(DEBIT_CARD)}
     </div>
   </div>
   <div />
@@ -45,8 +53,8 @@
         <!-- LABEL: Bank long name -->
         {bankName}
       </div>
-      <div class="recurring-cards-col">{value.credit ? 'Yes' : '—'}</div>
-      <div class="recurring-cards-col">{value.debit ? 'Yes' : '—'}</div>
+      <div class="recurring-cards-col">{value.credit ? $t(YES) : '—'}</div>
+      <div class="recurring-cards-col">{value.debit ? $t(YES) : '—'}</div>
     </div>
   {/each}
   <div class="close recurring-cards-close-icon" on:click={close}>✕</div>

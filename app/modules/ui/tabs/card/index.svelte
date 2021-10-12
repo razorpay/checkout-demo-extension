@@ -667,7 +667,7 @@
   function checkCardSupportForRecurring(features) {
     const { issuer, type } = features;
     const issuerDetail = cardWithRecurringSupport[issuer];
-    return issuerDetail?.[type] ?? false;
+    return Boolean(issuerDetail?.[type]);
   }
 
   function onCardInput() {

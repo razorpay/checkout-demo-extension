@@ -1,23 +1,29 @@
 <script>
   /* global showOverlay, hideRecurringCardsOverlay */
 
+  import { onDestroy } from 'svelte';
+  import { t } from 'svelte-i18n';
   import Icon from 'ui/elements/Icon.svelte';
   import warningIcon from 'card/icons/recurring-callout-warning';
   import RecurringCardsOverlay from './RecurringCardsOverlay.svelte';
+  import {
+    RECURRING_CARDS_LIMITED_SUPPORT,
+    RECURRING_CARDS_VIEW_SUPPORTED_CARDS,
+  } from 'ui/labels/callouts';
 
-  const overlayTarget = _Doc.querySelector('#recurring-cards-wrap');
-  let overlayView;
+  const overlayTarget = document.querySelector('#recurring-cards-wrap');
+  let overlayView = new RecurringCardsOverlay({
+    target: overlayTarget,
+    props: { close: hideRecurringCardsOverlay },
+  });
 
   function showSupportedCardsOverlay() {
-    if (!overlayView) {
-      overlayView = new RecurringCardsOverlay({
-        target: overlayTarget,
-        props: { close: hideRecurringCardsOverlay },
-      });
-    }
-
     showOverlay([overlayTarget]);
   }
+
+  onDestroy(() => {
+    overlayView.$destroy();
+  });
 </script>
 
 <p class="recurring-card-callout">
@@ -26,14 +32,12 @@
     <Icon icon={warningIcon} />
   </span>
 
-  <!-- Callout Text -->
-  <span
-    >Only limited cards support recurring payments due to new payment
-    regulations by RBI.</span
-  >
+  <!-- LABEL: Only limited cards support recurring payments due to new payment regulations by RBI. -->
+  <span>{$t(RECURRING_CARDS_LIMITED_SUPPORT)}</span>
 
-  <!-- View Supported cards -->
-  <a on:click|preventDefault={showSupportedCardsOverlay}>View supported cards</a
+  <!-- LABEL: View Supported cards -->
+  <a on:click|preventDefault={showSupportedCardsOverlay}
+    >{$t(RECURRING_CARDS_VIEW_SUPPORTED_CARDS)}</a
   >
 </p>
 
