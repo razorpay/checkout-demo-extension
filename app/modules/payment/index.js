@@ -326,6 +326,7 @@ export default function Payment(data, params = {}, r) {
    * https://developers.google.com/pay/api/web/reference/response-objects#DisplayItem
    */
   if (
+    data &&
     typeof data.additional_info === 'object' &&
     data.additional_info !== null
   ) {
