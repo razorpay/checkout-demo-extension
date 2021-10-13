@@ -956,6 +956,7 @@ export default {
       getsimpl: 'Simpl',
       icic: 'ICICI Bank PayLater',
       hdfc: 'FlexiPay by HDFC Bank',
+      lazypay: 'LazyPay',
     },
     select_option_title: 'Select an option',
   },

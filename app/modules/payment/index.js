@@ -573,7 +573,7 @@ Payment.prototype = {
 
     // no ajax route for simpl/icici
     if (data.method === 'paylater') {
-      if (data.provider === 'getsimpl' || data.provider === 'icic') {
+      if (data.provider === 'getsimpl' || data.provider === 'icic' || data.provider === 'lazypay') {
         return;
       }
     }

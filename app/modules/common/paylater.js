@@ -19,6 +19,9 @@ const config = {
   hdfc: {
     name: 'FlexiPay by HDFC Bank',
   },
+  lazypay: {
+    name: 'LazyPay',
+  },
 };
 
 /**

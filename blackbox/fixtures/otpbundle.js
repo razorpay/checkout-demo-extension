@@ -1,9 +1,9 @@
-!(function() {
+!(function () {
   'use strict';
   var e, c, n, l, u;
   Array.prototype.fill ||
     Object.defineProperty(Array.prototype, 'fill', {
-      value: function(t) {
+      value: function (t) {
         if (null == this) {
           throw new TypeError('this is null or not defined');
         }
@@ -25,7 +25,7 @@
     }),
     Array.prototype.find ||
       Object.defineProperty(Array.prototype, 'find', {
-        value: function(t) {
+        value: function (t) {
           if (null == this) {
             throw TypeError('"this" is null or not defined');
           }
@@ -48,11 +48,11 @@
     Array.from ||
       (Array.from =
         ((e = Object.prototype.toString),
-        (c = function(t) {
+        (c = function (t) {
           return 'function' === typeof t || '[object Function]' === e.call(t);
         }),
         (n = Math.pow(2, 53) - 1),
-        (l = function(t) {
+        (l = function (t) {
           (t = Number(t)),
             (t = isNaN(t)
               ? 0
@@ -61,7 +61,7 @@
               : t);
           return Math.min(Math.max(t, 0), n);
         }),
-        function(t) {
+        function (t) {
           var e = Object(t);
           if (null == t) {
             throw new TypeError(
@@ -97,7 +97,7 @@
         Element.prototype.msMatchesSelector ||
         Element.prototype.webkitMatchesSelector),
     Element.prototype.closest ||
-      (Element.prototype.closest = function(t) {
+      (Element.prototype.closest = function (t) {
         var e = this;
         do {
           if (Element.prototype.matches.call(e, t)) {
@@ -111,7 +111,7 @@
       }),
     'currentScript' in (u = document) ||
       Object.defineProperty(u, 'currentScript', {
-        get: function() {
+        get: function () {
           try {
             throw new Error();
           } catch (t) {
@@ -151,7 +151,7 @@
       }),
     'function' !== typeof Object.assign &&
       Object.defineProperty(Object, 'assign', {
-        value: function(t, e) {
+        value: function (t, e) {
           if (null == t) {
             throw new TypeError('Cannot convert undefined or null to object');
           }
@@ -198,11 +198,11 @@
     if (
       (n.open(o, t, !0),
       e.headers &&
-        Object.keys(e.headers).forEach(function(t) {
+        Object.keys(e.headers).forEach(function (t) {
           n.setRequestHeader(t, e.headers[t]);
         }),
       'function' === typeof i &&
-        ((n.onreadystatechange = function() {
+        ((n.onreadystatechange = function () {
           if (4 === n.readyState && n.status) {
             var e;
             try {
@@ -216,7 +216,7 @@
             i(e);
           }
         }),
-        (n.onerror = function() {
+        (n.onerror = function () {
           var t = f('Network error');
           (t.xhr = { status: 0 }), i(t);
         })),
@@ -234,19 +234,19 @@
     }
     return n.send(r), n;
   }
-  ((Kt = { exports: {} }).exports = (function() {
+  ((Kt = { exports: {} }).exports = (function () {
     function c(t) {
       return 'function' === typeof t;
     }
     var n =
         Array.isArray ||
-        function(t) {
+        function (t) {
           return '[object Array]' === Object.prototype.toString.call(t);
         },
       i = 0,
       e = void 0,
       r = void 0,
-      s = function(t, e) {
+      s = function (t, e) {
         (d[i] = t), (d[i + 1] = e), 2 === (i += 2) && (r ? r(f) : g());
       },
       t = 'undefined' !== typeof window ? window : void 0,
@@ -262,7 +262,7 @@
         'undefined' !== typeof MessageChannel;
     function u() {
       var t = setTimeout;
-      return function() {
+      return function () {
         return t(f, 1);
       };
     }
@@ -286,7 +286,7 @@
       return (
         o
           ? ((r = arguments[o - 1]),
-            s(function() {
+            s(function () {
               return w(o, i, r, n._result);
             }))
           : E(n, i, t, e),
@@ -301,7 +301,7 @@
       return U(e, t), e;
     }
     g = l
-      ? function() {
+      ? function () {
           return process.nextTick(f);
         }
       : a
@@ -309,20 +309,20 @@
         (a = new a(f)),
         (h = document.createTextNode('')),
         a.observe(h, { characterData: !0 }),
-        function() {
+        function () {
           h.data = m = ++m % 2;
         })
       : o
       ? (((p = new MessageChannel()).port1.onmessage = f),
-        function() {
+        function () {
           return p.port2.postMessage(0);
         })
       : (void 0 === t
-          ? function() {
+          ? function () {
               try {
                 var t = Function('return this')().require('vertx');
                 return void 0 !== (e = t.runOnLoop || t.runOnContext)
-                  ? function() {
+                  ? function () {
                       e(f);
                     }
                   : u();
@@ -331,9 +331,7 @@
               }
             }
           : u)();
-    var b = Math.random()
-      .toString(36)
-      .substring(2);
+    var b = Math.random().toString(36).substring(2);
     function y() {}
     function v(t, e, n) {
       var r, o, i, a;
@@ -346,26 +344,26 @@
             : E(
                 a,
                 void 0,
-                function(t) {
+                function (t) {
                   return U(i, t);
                 },
-                function(t) {
+                function (t) {
                   return L(i, t);
                 }
               ))
         : void 0 !== n && c(n)
         ? ((r = e),
           (o = n),
-          s(function(n) {
+          s(function (n) {
             var i = !1,
-              t = (function(t, e) {
+              t = (function (t, e) {
                 try {
                   t.call(
                     e,
-                    function(t) {
+                    function (t) {
                       i || ((i = !0), r !== t ? U(n, t) : k(n, t));
                     },
-                    function(t) {
+                    function (t) {
                       i || ((i = !0), L(n, t));
                     }
                   );
@@ -465,12 +463,12 @@
         (t._subscribers = []);
     }
     var I =
-      ((S.prototype._enumerate = function(t) {
+      ((S.prototype._enumerate = function (t) {
         for (var e = 0; void 0 === this._state && e < t.length; e++) {
           this._eachEntry(t[e], e);
         }
       }),
-      (S.prototype._eachEntry = function(e, t) {
+      (S.prototype._eachEntry = function (e, t) {
         var n = this._instanceConstructor,
           i = n.resolve;
         if (i === x) {
@@ -492,7 +490,7 @@
               s ? L(r, a) : v(r, e, o),
               this._willSettleAt(r, t))
             : this._willSettleAt(
-                new n(function(t) {
+                new n(function (t) {
                   return t(e);
                 }),
                 t
@@ -501,21 +499,21 @@
           this._willSettleAt(i(e), t);
         }
       }),
-      (S.prototype._settledAt = function(t, e, n) {
+      (S.prototype._settledAt = function (t, e, n) {
         var i = this.promise;
         void 0 === i._state &&
           (this._remaining--, 2 === t ? L(i, n) : (this._result[e] = n)),
           0 === this._remaining && k(i, this._result);
       }),
-      (S.prototype._willSettleAt = function(t, e) {
+      (S.prototype._willSettleAt = function (t, e) {
         var n = this;
         E(
           t,
           void 0,
-          function(t) {
+          function (t) {
             return n._settledAt(1, e, t);
           },
-          function(t) {
+          function (t) {
             return n._settledAt(2, e, t);
           }
         );
@@ -540,20 +538,20 @@
             );
     }
     var T =
-      ((C.prototype.catch = function(t) {
+      ((C.prototype.catch = function (t) {
         return this.then(null, t);
       }),
-      (C.prototype.finally = function(e) {
+      (C.prototype.finally = function (e) {
         var n = this.constructor;
         return c(e)
           ? this.then(
-              function(t) {
-                return n.resolve(e()).then(function() {
+              function (t) {
+                return n.resolve(e()).then(function () {
                   return t;
                 });
               },
-              function(t) {
-                return n.resolve(e()).then(function() {
+              function (t) {
+                return n.resolve(e()).then(function () {
                   throw t;
                 });
               }
@@ -567,19 +565,19 @@
         (this._subscribers = []),
         y !== t &&
           ('function' !== typeof t &&
-            (function() {
+            (function () {
               throw new TypeError(
                 'You must pass a resolver function as the first argument to the promise constructor'
               );
             })(),
           this instanceof C
-            ? (function(e, t) {
+            ? (function (e, t) {
                 try {
                   t(
-                    function(t) {
+                    function (t) {
                       U(e, t);
                     },
-                    function(t) {
+                    function (t) {
                       L(e, t);
                     }
                   );
@@ -587,7 +585,7 @@
                   L(e, t);
                 }
               })(this, t)
-            : (function() {
+            : (function () {
                 throw new TypeError(
                   "Failed to construct 'Promise': Please use the 'new' operator, this object constructor cannot be called as a function."
                 );
@@ -595,34 +593,34 @@
     }
     return (
       (T.prototype.then = Q),
-      (T.all = function(t) {
+      (T.all = function (t) {
         return new I(this, t).promise;
       }),
-      (T.race = function(r) {
+      (T.race = function (r) {
         var o = this;
         return n(r)
-          ? new o(function(t, e) {
+          ? new o(function (t, e) {
               for (var n = r.length, i = 0; i < n; i++) {
                 o.resolve(r[i]).then(t, e);
               }
             })
-          : new o(function(t, e) {
+          : new o(function (t, e) {
               return e(new TypeError('You must pass an array to race.'));
             });
       }),
       (T.resolve = x),
-      (T.reject = function(t) {
+      (T.reject = function (t) {
         var e = new this(y);
         return L(e, t), e;
       }),
-      (T._setScheduler = function(t) {
+      (T._setScheduler = function (t) {
         r = t;
       }),
-      (T._setAsap = function(t) {
+      (T._setAsap = function (t) {
         s = t;
       }),
       (T._asap = s),
-      (T.polyfill = function() {
+      (T.polyfill = function () {
         var t = void 0,
           e = (t = R).Promise;
         if (e) {
@@ -641,14 +639,14 @@
   })()),
     Kt.exports.polyfill(),
     String.prototype.includes ||
-      (String.prototype.includes = function(t, e) {
+      (String.prototype.includes = function (t, e) {
         if (t instanceof RegExp) {
           throw TypeError('first argument must not be a RegExp');
         }
         return void 0 === e && (e = 0), -1 !== this.indexOf(t, e);
       });
   var i = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
-    r = i.split('').reduce(function(t, e, n) {
+    r = i.split('').reduce(function (t, e, n) {
       return (t[e] = n), t;
     }, {});
   function t(t) {
@@ -665,18 +663,18 @@
       i = h('form');
     i.setAttribute('action', t.url),
       i.setAttribute('method', 'post'),
-      (i.innerHTML = (function(t) {
+      (i.innerHTML = (function (t) {
         var o,
           e = '';
         if (d(t)) {
           for (var n in ((o = (function r(o) {
             return (
-              a(Object.keys(o), function(t, n) {
+              a(Object.keys(o), function (t, n) {
                 var i,
                   e = o[n];
                 d(e) &&
                   ((i = r(e)),
-                  a(Object.keys(i), function(t, e) {
+                  a(Object.keys(i), function (t, e) {
                     o[n + '.' + e] = i[e];
                   }),
                   delete o[n]);
@@ -684,7 +682,7 @@
               o
             );
           })((o = t))),
-          a(Object.keys(o), function(t, e) {
+          a(Object.keys(o), function (t, e) {
             var n,
               i,
               r = e.split('.');
@@ -732,10 +730,12 @@
       airtelmoney: { name: 'Airtel Money', otp: 6 },
       mpesa: { name: 'Vodafone mPesa', otp: 4 },
       icic: { name: 'ICICI Bank PayLater', otp: 6 },
+      lazypay: { name: 'LazyPay', otp: 4 },
     },
     x = {
       zestmoney: { name: 'ZestMoney' },
       earlysalary: { name: 'EarlySalary' },
+      lazypay: { name: 'LazyPay' },
       flexmoney: { name: 'InstaCred Cardless EMI', skipOtp: !0 },
       fdrl: { name: 'Federal Bank', skipOtp: !0 },
       hdfc: { name: 'HDFC Bank', skipOtp: !0 },
@@ -754,7 +754,7 @@
       MAES: 'Maestro',
       AMEX: 'American Express',
     },
-    v = function(t) {
+    v = function (t) {
       var e = new Date();
       return e.getDate() + ' ' + g[e.getMonth()] + ' ' + e.getFullYear();
     };
@@ -764,7 +764,7 @@
   function F(t) {
     return (
       'number' === typeof (t = t / 100) && (t = t.toFixed(2)),
-      (function(t) {
+      (function (t) {
         'number' === typeof t && (t = t.toFixed(2));
         var e = t.split('.');
         return ('00' !== e[1] && 0 !== e[1]) || (t = e[0].replace('.', '')), t;
@@ -847,7 +847,7 @@
     };
   function N(e) {
     return Object.keys(e)
-      .map(function(t) {
+      .map(function (t) {
         return encodeURIComponent(t) + '=' + encodeURIComponent(e[t]);
       })
       .join('&');
@@ -855,7 +855,7 @@
   function w(t) {
     var i = {};
     return (
-      t.split(/[=&]/).forEach(function(t, e, n) {
+      t.split(/[=&]/).forEach(function (t, e, n) {
         e % 2 && (i[n[e - 1]] = decodeURIComponent(t));
       }),
       i
@@ -880,19 +880,19 @@
   function S(t) {
     return (S = Object.setPrototypeOf
       ? Object.getPrototypeOf
-      : function(t) {
+      : function (t) {
           return t.__proto__ || Object.getPrototypeOf(t);
         })(t);
   }
   function T(t, e) {
     return (T =
       Object.setPrototypeOf ||
-      function(t, e) {
+      function (t, e) {
         return (t.__proto__ = e), t;
       })(t, e);
   }
   function C(t, e, n) {
-    return (C = (function() {
+    return (C = (function () {
       if (
         'undefined' !== typeof Reflect &&
         Reflect.construct &&
@@ -904,7 +904,7 @@
         try {
           return (
             Date.prototype.toString.call(
-              Reflect.construct(Date, [], function() {})
+              Reflect.construct(Date, [], function () {})
             ),
             1
           );
@@ -914,7 +914,7 @@
       }
     })()
       ? Reflect.construct
-      : function(t, e, n) {
+      : function (t, e, n) {
           var i = [null];
           i.push.apply(i, e);
           i = new (Function.bind.apply(t, i))();
@@ -923,7 +923,7 @@
   }
   function $(t) {
     var n = 'function' === typeof Map ? new Map() : void 0;
-    return ($ = function(t) {
+    return ($ = function (t) {
       if (
         null === t ||
         -1 === Function.toString.call(t).indexOf('[native code]')
@@ -967,12 +967,12 @@
   }
   function A(t, e) {
     return (
-      (function(t) {
+      (function (t) {
         if (Array.isArray(t)) {
           return t;
         }
       })(t) ||
-      (function(t, e) {
+      (function (t, e) {
         if (
           Symbol.iterator in Object(t) ||
           '[object Arguments]' === Object.prototype.toString.call(t)
@@ -1002,7 +1002,7 @@
           return n;
         }
       })(t, e) ||
-      (function() {
+      (function () {
         throw new TypeError(
           'Invalid attempt to destructure non-iterable instance'
         );
@@ -1010,7 +1010,7 @@
     );
   }
   function O() {}
-  var V = function(t) {
+  var V = function (t) {
     return t;
   };
   function P(t) {
@@ -1043,7 +1043,7 @@
     }
     var r = t.subscribe.apply(t, n);
     return r.unsubscribe
-      ? function() {
+      ? function () {
           return r.unsubscribe();
         }
       : r;
@@ -1056,20 +1056,20 @@
   }
   var Y,
     Z = (tr = 'undefined' !== typeof window)
-      ? function() {
+      ? function () {
           return window.performance.now();
         }
-      : function() {
+      : function () {
           return Date.now();
         },
     H = tr
-      ? function(t) {
+      ? function (t) {
           return requestAnimationFrame(t);
         }
       : O,
     W = new Set();
   function q(e) {
-    W.forEach(function(t) {
+    W.forEach(function (t) {
       t.c(e) || (W.delete(t), t.f());
     }),
       0 !== W.size && H(q);
@@ -1079,10 +1079,10 @@
     return (
       0 === W.size && H(q),
       {
-        promise: new Promise(function(t) {
+        promise: new Promise(function (t) {
           W.add((n = { c: e, f: t }));
         }),
-        abort: function() {
+        abort: function () {
           W.delete(n);
         },
       }
@@ -1117,13 +1117,13 @@
   function ut(t, e, n, i) {
     return (
       t.addEventListener(e, n, i),
-      function() {
+      function () {
         return t.removeEventListener(e, n, i);
       }
     );
   }
   function dt(e) {
-    return function(t) {
+    return function (t) {
       return t.preventDefault(), e.call(this, t);
     };
   }
@@ -1157,7 +1157,7 @@
     var f = l + '100% {' + a(n, 1 - n) + '}\n}',
       p =
         '__svelte_' +
-        (function(t) {
+        (function (t) {
           for (var e = 5381, n = t.length; n--; ) {
             e = ((e << 5) - e) ^ t.charCodeAt(n);
           }
@@ -1182,17 +1182,17 @@
       .split(', ')
       .filter(
         e
-          ? function(t) {
+          ? function (t) {
               return t.indexOf(e) < 0;
             }
-          : function(t) {
+          : function (t) {
               return -1 === t.indexOf('__svelte');
             }
       )
       .join(', ')),
       e &&
         !--xt &&
-        H(function() {
+        H(function () {
           if (!xt) {
             for (var t = Y.cssRules.length; t--; ) {
               Y.deleteRule(t);
@@ -1215,12 +1215,12 @@
   }
   function Lt() {
     var r = Ft();
-    return function(t, e) {
+    return function (t, e) {
       var n,
         i = r.$$.callbacks[t];
       i &&
         ((n = gt(t, e)),
-        i.slice().forEach(function(t) {
+        i.slice().forEach(function (t) {
           t.call(r, n);
         }));
     };
@@ -1228,7 +1228,7 @@
   function Et(t, e) {
     t = t.$$.callbacks[e.type];
     t &&
-      t.slice().forEach(function(t) {
+      t.slice().forEach(function (t) {
         return t(e);
       });
   }
@@ -1276,7 +1276,7 @@
   function Mt() {
     return (
       Ct ||
-        (Ct = Promise.resolve()).then(function() {
+        (Ct = Promise.resolve()).then(function () {
           Ct = null;
         }),
       Ct
@@ -1301,7 +1301,7 @@
       t.o &&
       (Vt.has(t) ||
         (Vt.add(t),
-        Ot.c.push(function() {
+        Ot.c.push(function () {
           Vt.delete(t), i && (n && t.d(1), i());
         }),
         t.o(e)));
@@ -1332,10 +1332,10 @@
         s = a + i;
       u && u.abort(),
         (f = !0),
-        Tt(function() {
+        Tt(function () {
           return At(c, !0, 'start');
         }),
-        (u = X(function(t) {
+        (u = X(function (t) {
           if (f) {
             if (s <= t) {
               return o(1, 0), At(c, !0, 'end'), m(), (f = !1);
@@ -1347,13 +1347,13 @@
     }
     var i = !1;
     return {
-      start: function() {
+      start: function () {
         i || (vt(c), _(d) ? ((d = d()), Mt().then(n)) : n());
       },
-      invalidate: function() {
+      invalidate: function () {
         i = !1;
       },
-      end: function() {
+      end: function () {
         f && (m(), (f = !1));
       },
     };
@@ -1377,10 +1377,10 @@
       t && (l = yt(c, 1, 0, i, n, r, t));
       var a = Z() + n,
         s = a + i;
-      Tt(function() {
+      Tt(function () {
         return At(c, !1, 'start');
       }),
-        X(function(t) {
+        X(function (t) {
           if (d) {
             if (s <= t) {
               return o(0, 1), At(c, !1, 'end'), --f.r || G(f.c), !1;
@@ -1393,12 +1393,12 @@
     return (
       (f.r += 1),
       _(u)
-        ? Mt().then(function() {
+        ? Mt().then(function () {
             (u = u()), n();
           })
         : n(),
       {
-        end: function(t) {
+        end: function (t) {
           t && u.tick && u.tick(1, 0), d && (l && vt(c, l), (d = !1));
         },
       }
@@ -1415,13 +1415,13 @@
       a = i.on_destroy,
       i = i.after_update;
     r && r.m(t, e),
-      Tt(function() {
+      Tt(function () {
         var t,
           e = o.map(P).filter(_);
         a
           ? a.push.apply(
               a,
-              (function(t) {
+              (function (t) {
                 if (Array.isArray(t)) {
                   for (var e = 0, n = new Array(t.length); e < t.length; e++) {
                     n[e] = t[e];
@@ -1429,7 +1429,7 @@
                   return n;
                 }
               })((t = e)) ||
-                (function(t) {
+                (function (t) {
                   if (
                     Symbol.iterator in Object(t) ||
                     '[object Arguments]' === Object.prototype.toString.call(t)
@@ -1437,7 +1437,7 @@
                     return Array.from(t);
                   }
                 })(t) ||
-                (function() {
+                (function () {
                   throw new TypeError(
                     'Invalid attempt to spread non-iterable instance'
                   );
@@ -1478,7 +1478,7 @@
       }),
       u = !1;
     (l.ctx = e
-      ? e(i, c, function(t, e) {
+      ? e(i, c, function (t, e) {
           var n =
             !(arguments.length <= 2) && arguments.length - 2
               ? arguments.length <= 2
@@ -1516,20 +1516,20 @@
   }
   'function' === typeof HTMLElement && $(HTMLElement);
   var Kt =
-    ((($i = te.prototype).$destroy = function() {
+    ((($i = te.prototype).$destroy = function () {
       qt(this, 1), (this.$destroy = O);
     }),
-    ($i.$on = function(t, e) {
+    ($i.$on = function (t, e) {
       var n = this.$$.callbacks[t] || (this.$$.callbacks[t] = []);
       return (
         n.push(e),
-        function() {
+        function () {
           var t = n.indexOf(e);
           -1 !== t && n.splice(t, 1);
         }
       );
     }),
-    ($i.$set = function() {}),
+    ($i.$set = function () {}),
     te);
   function te() {}
   function ee(t, e) {
@@ -1556,7 +1556,7 @@
       s = t[0] && ie(t),
       c = t[1] && re(t);
     return {
-      c: function() {
+      c: function () {
         (n = it('div')),
           (i = it('div')),
           (r = it('div')),
@@ -1567,7 +1567,7 @@
           ft(i, 'class', 'card-details'),
           ft(n, 'class', 'card-details-container');
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, n, e),
           K(n, i),
           K(i, r),
@@ -1576,7 +1576,7 @@
           K(i, a),
           c && c.m(a, null);
       },
-      p: function(t, e) {
+      p: function (t, e) {
         t[0]
           ? s
             ? s.p(t, e)
@@ -1588,7 +1588,7 @@
               : ((c = re(t)).c(), c.m(a, null))
             : c && (c.d(1), (c = null));
       },
-      d: function(t) {
+      d: function (t) {
         t && et(n), s && s.d(), c && c.d();
       },
     };
@@ -1596,19 +1596,19 @@
   function ie(t) {
     var n, i, r;
     return {
-      c: function() {
+      c: function () {
         (n = it('img')).src !== (i = t[0]) && ft(n, 'src', i),
           ft(n, 'alt', (r = t[2] || '')),
           ft(n, 'onerror', 'this.style.opacity = 0;');
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, n, e);
       },
-      p: function(t, e) {
+      p: function (t, e) {
         1 & e && n.src !== (i = t[0]) && ft(n, 'src', i),
           4 & e && r !== (r = t[2] || '') && ft(n, 'alt', r);
       },
-      d: function(t) {
+      d: function (t) {
         t && et(n);
       },
     };
@@ -1616,18 +1616,18 @@
   function re(t) {
     var n, i, r;
     return {
-      c: function() {
+      c: function () {
         (n = it('img')).src !== (i = t[1]) && ft(n, 'src', i),
           ft(n, 'alt', (r = t[3] || ''));
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, n, e);
       },
-      p: function(t, e) {
+      p: function (t, e) {
         2 & e && n.src !== (i = t[1]) && ft(n, 'src', i),
           8 & e && r !== (r = t[3] || '') && ft(n, 'alt', r);
       },
-      d: function(t) {
+      d: function (t) {
         t && et(n);
       },
     };
@@ -1635,7 +1635,7 @@
   function oe(t) {
     var n, i, r, o, a, s, c, l, u, d, f, p, m, h, g, Q, x, b, y, v, U;
     return {
-      c: function() {
+      c: function () {
         (n = it('div')),
           (i = it('div')),
           (r = it('div')),
@@ -1662,7 +1662,7 @@
           ft(Q, 'class', 'transaction-detail'),
           ft(n, 'class', 'transaction-details');
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, n, e),
           K(n, i),
           K(i, r),
@@ -1685,10 +1685,10 @@
           K(x, v),
           K(v, U);
       },
-      p: function(t, e) {
+      p: function (t, e) {
         32 & e && pt(c, t[5]), 16 & e && pt(h, t[4]), 64 & e && pt(U, t[6]);
       },
-      d: function(t) {
+      d: function (t) {
         t && et(n);
       },
     };
@@ -1722,7 +1722,7 @@
       N = (t[0] || t[1]) && ne(t),
       w = t[4] && oe(t);
     return {
-      c: function() {
+      c: function () {
         (n = it('div')),
           N && N.c(),
           (i = at()),
@@ -1757,7 +1757,7 @@
           ft(r, 'class', 'transaction-details-container'),
           ft(n, 'id', 'PaymentDetails');
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, n, e),
           N && N.m(n, null),
           K(n, i),
@@ -1786,7 +1786,7 @@
           K(U, L),
           K(L, E);
       },
-      p: function(t, e) {
+      p: function (t, e) {
         e = A(e, 1)[0];
         t[0] || t[1]
           ? N
@@ -1804,7 +1804,7 @@
       },
       i: O,
       o: O,
-      d: function(t) {
+      d: function (t) {
         t && et(n), N && N.d(), w && w.d();
       },
     };
@@ -1821,7 +1821,7 @@
       d = e.amount,
       f = e.date;
     return (
-      (t.$set = function(t) {
+      (t.$set = function (t) {
         'leftImage' in t && n(0, (i = t.leftImage)),
           'rightImage' in t && n(1, (r = t.rightImage)),
           'leftImageAlt' in t && n(2, (o = t.leftImageAlt)),
@@ -1845,91 +1845,91 @@
       B(ue, [
         {
           key: 'leftImage',
-          get: function() {
+          get: function () {
             return this.$$.ctx[0];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ leftImage: t }), $t();
           },
         },
         {
           key: 'rightImage',
-          get: function() {
+          get: function () {
             return this.$$.ctx[1];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ rightImage: t }), $t();
           },
         },
         {
           key: 'leftImageAlt',
-          get: function() {
+          get: function () {
             return this.$$.ctx[2];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ leftImageAlt: t }), $t();
           },
         },
         {
           key: 'rightImageAlt',
-          get: function() {
+          get: function () {
             return this.$$.ctx[3];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ rightImageAlt: t }), $t();
           },
         },
         {
           key: 'emiTenure',
-          get: function() {
+          get: function () {
             return this.$$.ctx[4];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ emiTenure: t }), $t();
           },
         },
         {
           key: 'emiAmount',
-          get: function() {
+          get: function () {
             return this.$$.ctx[5];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ emiAmount: t }), $t();
           },
         },
         {
           key: 'emiInterest',
-          get: function() {
+          get: function () {
             return this.$$.ctx[6];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ emiInterest: t }), $t();
           },
         },
         {
           key: 'merchantName',
-          get: function() {
+          get: function () {
             return this.$$.ctx[7];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ merchantName: t }), $t();
           },
         },
         {
           key: 'amount',
-          get: function() {
+          get: function () {
             return this.$$.ctx[8];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ amount: t }), $t();
           },
         },
         {
           key: 'date',
-          get: function() {
+          get: function () {
             return this.$$.ctx[9];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ date: t }), $t();
           },
         },
@@ -1965,7 +1965,7 @@
       delay: i,
       duration: n,
       easing: e,
-      css: function(t) {
+      css: function (t) {
         return 'opacity: ' + t * r;
       },
     };
@@ -1973,18 +1973,18 @@
   function fe(t) {
     var n;
     return {
-      c: function() {
+      c: function () {
         ((n = it('div')).innerHTML =
           '<div></div> \n  <div></div> \n  <div></div> \n  <div></div>'),
           ft(n, 'class', 'spin-ring');
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, n, e);
       },
       p: O,
       i: O,
       o: O,
-      d: function(t) {
+      d: function (t) {
         t && et(n);
       },
     };
@@ -1998,16 +1998,16 @@
   function ge(t) {
     var n, i, r;
     return {
-      c: function() {
+      c: function () {
         (n = ot('(')), (i = ot(t[1])), (r = ot(')'));
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, n, e), tt(t, i, e), tt(t, r, e);
       },
-      p: function(t, e) {
+      p: function (t, e) {
         2 & e && pt(i, t[1]);
       },
-      d: function(t) {
+      d: function (t) {
         t && et(n), t && et(i), t && et(r);
       },
     };
@@ -2018,7 +2018,7 @@
       o,
       a = n[1] && ge(n);
     return {
-      c: function() {
+      c: function () {
         (i = it('a')),
           (r = ot('Resend OTP\n  ')),
           a && a.c(),
@@ -2027,10 +2027,10 @@
           ft(i, 'id', 'resend-action'),
           ht(i, 'perm-disabled', !n[0] || n[1]);
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, i, e), K(i, r), a && a.m(i, null), (o = ut(i, 'click', dt(n[6])));
       },
-      p: function(t, e) {
+      p: function (t, e) {
         e = A(e, 1)[0];
         t[1]
           ? a
@@ -2041,7 +2041,7 @@
       },
       i: O,
       o: O,
-      d: function(t) {
+      d: function (t) {
         t && et(i), a && a.d(), o();
       },
     };
@@ -2058,17 +2058,17 @@
       s = void 0 === t ? 0 : t,
       c = xe(s);
     function l() {
-      var t = setInterval(function() {
+      var t = setInterval(function () {
         n(3, (c = xe(s))), c <= 0 && clearInterval(t);
       }, 1e3);
     }
     return (
       l(),
-      (e.$set = function(t) {
+      (e.$set = function (t) {
         'enabled' in t && n(0, (a = t.enabled)),
           'delayUntil' in t && n(2, (s = t.delayUntil));
       }),
-      (e.$$.update = function() {
+      (e.$$.update = function () {
         8 & e.$$.dirty && n(1, (i = c ? c + 's' : ''));
       }),
       [
@@ -2078,7 +2078,7 @@
         c,
         r,
         l,
-        function(t) {
+        function (t) {
           Et(e, t);
         },
       ]
@@ -2090,19 +2090,19 @@
       B(Ue, [
         {
           key: 'enabled',
-          get: function() {
+          get: function () {
             return this.$$.ctx[0];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ enabled: t }), $t();
           },
         },
         {
           key: 'delayUntil',
-          get: function() {
+          get: function () {
             return this.$$.ctx[2];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ delayUntil: t }), $t();
           },
         },
@@ -2121,20 +2121,20 @@
   function Fe(t) {
     var n, i, r;
     return {
-      c: function() {
+      c: function () {
         (n = it('span')),
           (i = it('img')).src !== (r = t[4]) && ft(i, 'src', r),
           ft(i, 'alt', t[3]),
           ft(n, 'class', 'tnc-provider-image');
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, n, e), K(n, i);
       },
-      p: function(t, e) {
+      p: function (t, e) {
         16 & e && i.src !== (r = t[4]) && ft(i, 'src', r),
           8 & e && ft(i, 'alt', t[3]);
       },
-      d: function(t) {
+      d: function (t) {
         t && et(n);
       },
     };
@@ -2157,7 +2157,7 @@
       Q,
       x = n[4] && Fe(n);
     return {
-      c: function() {
+      c: function () {
         (i = it('div')),
           (r = it('div')),
           (o = at()),
@@ -2182,7 +2182,7 @@
           ft(i, 'class', 'tnc-curtain'),
           ht(i, 'shown', n[1]);
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, i, e),
           K(i, r),
           K(i, o),
@@ -2201,7 +2201,7 @@
           K(h, g),
           (Q = [ut(r, 'click', n[7]), ut(d, 'click', n[8])]);
       },
-      p: function(t, e) {
+      p: function (t, e) {
         e = A(e, 1)[0];
         4 & e && (c.innerHTML = t[2]),
           t[4]
@@ -2214,7 +2214,7 @@
       },
       i: O,
       o: O,
-      d: function(t) {
+      d: function (t) {
         t && et(i), x && x.d(), G(Q);
       },
     };
@@ -2230,7 +2230,7 @@
       l = t.termsText,
       u = Lt();
     return (
-      (e.$set = function(t) {
+      (e.$set = function (t) {
         'shown' in t && n(1, (r = t.shown)),
           'heading' in t && n(2, (o = t.heading)),
           'terms' in t && n(6, (a = t.terms)),
@@ -2238,7 +2238,7 @@
           'providerImage' in t && n(4, (c = t.providerImage)),
           'termsText' in t && n(0, (l = t.termsText));
       }),
-      (e.$$.update = function() {
+      (e.$$.update = function () {
         var t;
         64 & e.$$.dirty &&
           (((t = document.createElement('div')).innerHTML = a),
@@ -2252,10 +2252,10 @@
         c,
         u,
         a,
-        function(t) {
+        function (t) {
           return u('close', t);
         },
-        function(t) {
+        function (t) {
           return u('close', t);
         },
       ]
@@ -2279,55 +2279,55 @@
       B(Oe, [
         {
           key: 'shown',
-          get: function() {
+          get: function () {
             return this.$$.ctx[1];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ shown: t }), $t();
           },
         },
         {
           key: 'heading',
-          get: function() {
+          get: function () {
             return this.$$.ctx[2];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ heading: t }), $t();
           },
         },
         {
           key: 'terms',
-          get: function() {
+          get: function () {
             return this.$$.ctx[6];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ terms: t }), $t();
           },
         },
         {
           key: 'provider',
-          get: function() {
+          get: function () {
             return this.$$.ctx[3];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ provider: t }), $t();
           },
         },
         {
           key: 'providerImage',
-          get: function() {
+          get: function () {
             return this.$$.ctx[4];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ providerImage: t }), $t();
           },
         },
         {
           key: 'termsText',
-          get: function() {
+          get: function () {
             return this.$$.ctx[0];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ termsText: t }), $t();
           },
         },
@@ -2335,7 +2335,7 @@
       Oe),
     Re = !1,
     $e = {
-      show: function(t) {
+      show: function (t) {
         var e = this,
           n = t.hideOnClick,
           i = void 0 !== n && n,
@@ -2347,7 +2347,7 @@
         if ((clearTimeout(Ne), Re)) {
           return (
             this.hide(),
-            void (Ne = setTimeout(function() {
+            void (Ne = setTimeout(function () {
               e.show(t);
             }, 500))
           );
@@ -2357,13 +2357,13 @@
           (document.querySelector('#toast-content').innerHTML = n),
           i && document.querySelector('#toast').addEventListener('click', Ee),
           o && r
-            ? (we = setTimeout(function() {
+            ? (we = setTimeout(function () {
                 e.hide();
               }, r))
             : clearTimeout(we),
           (Re = !0));
       },
-      hide: function() {
+      hide: function () {
         Re &&
           (clearTimeout(we),
           document.querySelector('#toast').classList.remove('shown'),
@@ -2386,24 +2386,24 @@
             window.location.pathname + window.location.search
           ),
         window.history.pushState(window.history.state, null, '#' + De),
-        window.addEventListener('hashchange', function(t) {
+        window.addEventListener('hashchange', function (t) {
           t.preventDefault(),
             window.history.pushState(window.history.state, null, '#' + De);
           var e = Ie;
-          Se.forEach(function(t) {
-            setTimeout(function() {
+          Se.forEach(function (t) {
+            setTimeout(function () {
               t.call(null, e);
             });
           });
         })),
       {
-        onBack: function(t) {
+        onBack: function (t) {
           return !('function' !== typeof t || (Se.push(t), 0));
         },
-        show: function(t) {
+        show: function (t) {
           return !Be && ((Ie = t), (Be = !0));
         },
-        hide: function(t) {
+        hide: function (t) {
           return !(!Be || t !== Ie || ((Ie = ''), (Be = !1)));
         },
       }),
@@ -2442,17 +2442,17 @@
     }
     return {
       set: s,
-      update: function(t) {
+      update: function (t) {
         s(t(r));
       },
-      subscribe: function(t, e) {
+      subscribe: function (t, e) {
         void 0 === e && (e = O);
         var n = [t, e];
         return (
           a.push(n),
           1 === a.length && (o = i(s) || O),
           t(r),
-          function() {
+          function () {
             var t = a.indexOf(n);
             -1 !== t && a.splice(t, 1), 0 === a.length && (o(), (o = null));
           }
@@ -2472,18 +2472,18 @@
   function We(t) {
     var n, i;
     return {
-      c: function() {
+      c: function () {
         (n = it('img')).src !== (i = t[14]) && ft(n, 'src', i),
           ft(n, 'alt', 'Secured by Razorpay'),
           ft(n, 'class', 'no-mob pull-right org-logo');
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, n, e);
       },
-      p: function(t, e) {
+      p: function (t, e) {
         16384 & e[0] && n.src !== (i = t[14]) && ft(n, 'src', i);
       },
-      d: function(t) {
+      d: function (t) {
         t && et(n);
       },
     };
@@ -2491,7 +2491,7 @@
   function qe(t) {
     var n, i, r;
     return {
-      c: function() {
+      c: function () {
         (n = rt('svg')),
           (i = rt('path')),
           (r = rt('path')),
@@ -2502,12 +2502,12 @@
           ft(n, 'width', '24'),
           ft(n, 'height', '24');
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, n, e), K(n, i), K(n, r);
       },
       i: O,
       o: O,
-      d: function(t) {
+      d: function (t) {
         t && et(n);
       },
     };
@@ -2516,19 +2516,19 @@
     var n,
       i = new me({});
     return {
-      c: function() {
+      c: function () {
         Ht(i.$$.fragment);
       },
-      m: function(t, e) {
+      m: function (t, e) {
         Wt(i, t, e), (n = !0);
       },
-      i: function(t) {
+      i: function (t) {
         n || (Gt(i.$$.fragment, t), (n = !0));
       },
-      o: function(t) {
+      o: function (t) {
         _t(i.$$.fragment, t), (n = !1);
       },
-      d: function(t) {
+      d: function (t) {
         qt(i, t);
       },
     };
@@ -2536,28 +2536,28 @@
   function Ke(t) {
     var n, i, r, e, o, a;
     return {
-      c: function() {
+      c: function () {
         (n = it('p')), (i = ot(t[9])), ft(n, 'class', (r = 'text-' + t[10]));
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, n, e), K(n, i), (a = !0);
       },
-      p: function(t, e) {
+      p: function (t, e) {
         (!a || 512 & e[0]) && pt(i, t[9]),
           (!a || (1024 & e[0] && r !== (r = 'text-' + t[10]))) &&
             ft(n, 'class', r);
       },
-      i: function(t) {
+      i: function (t) {
         a ||
-          (Tt(function() {
+          (Tt(function () {
             o && o.end(1), (e = e || jt(n, de, {})).start();
           }),
           (a = !0));
       },
-      o: function(t) {
+      o: function (t) {
         e && e.invalidate(), (o = Yt(n, de, {})), (a = !1);
       },
-      d: function(t) {
+      d: function (t) {
         t && et(n), t && o && o.end();
       },
     };
@@ -2585,7 +2585,7 @@
     return (
       p.$on('close', n[43]),
       {
-        c: function() {
+        c: function () {
           (i = it('p')),
             (r = it('input')),
             (o = ot(
@@ -2603,7 +2603,7 @@
             ft(a, 'class', 'link'),
             ft(c, 'class', 'link');
         },
-        m: function(t, e) {
+        m: function (t, e) {
           tt(t, i, e),
             K(i, r),
             (r.checked = n[2]),
@@ -2621,7 +2621,7 @@
               ut(c, 'click', n[42]),
             ]);
         },
-        p: function(t, e) {
+        p: function (t, e) {
           4 & e[0] && (r.checked = t[2]);
           var n = {};
           8192 & e[0] && (n.providerImage = t[13]),
@@ -2631,13 +2631,13 @@
             1 & e[0] && (n.terms = t[0]),
             p.$set(n);
         },
-        i: function(t) {
+        i: function (t) {
           d || (Gt(p.$$.fragment, t), (d = !0));
         },
-        o: function(t) {
+        o: function (t) {
           _t(p.$$.fragment, t), (d = !1);
         },
-        d: function(t) {
+        d: function (t) {
           t && et(i), t && et(u), qt(p, t), G(f);
         },
       }
@@ -2690,7 +2690,7 @@
     M.$on('click', n[39]);
     var A = n[16] && tn(n);
     return {
-      c: function() {
+      c: function () {
         (r = it('div')),
           (o = it('div')),
           (i = it('h4')),
@@ -2741,7 +2741,7 @@
           ft(r, 'class', 'ActionArea'),
           ft(r, 'id', 'OTPActionArea');
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, r, e),
           K(r, o),
           K(o, i),
@@ -2784,7 +2784,7 @@
             ut(E, 'click', dt(n[38])),
           ]);
       },
-      p: function(t, e) {
+      p: function (t, e) {
         (!B || 8 & e[0]) && pt(a, t[3]),
           t[4]
             ? S
@@ -2799,7 +2799,7 @@
         var n = b;
         (b = R(t)) !== n &&
           (Pt(),
-          _t(C[n], 1, 1, function() {
+          _t(C[n], 1, 1, function () {
             C[n] = null;
           }),
           Jt(),
@@ -2813,7 +2813,7 @@
               : (($ = Ke(t)).c(), Gt($, 1), $.m(r, F))
             : $ &&
               (Pt(),
-              _t($, 1, 1, function() {
+              _t($, 1, 1, function () {
                 $ = null;
               }),
               Jt());
@@ -2827,18 +2827,18 @@
               : ((A = tn(t)).c(), Gt(A, 1), A.m(r, null))
             : A &&
               (Pt(),
-              _t(A, 1, 1, function() {
+              _t(A, 1, 1, function () {
                 A = null;
               }),
               Jt());
       },
-      i: function(t) {
+      i: function (t) {
         B || (Gt(y), Gt($), Gt(M.$$.fragment, t), Gt(A), (B = !0));
       },
-      o: function(t) {
+      o: function (t) {
         _t(y), _t($), _t(M.$$.fragment, t), _t(A), (B = !1);
       },
-      d: function(t) {
+      d: function (t) {
         t && et(r),
           S && S.d(),
           n[34](null),
@@ -2856,19 +2856,19 @@
   }
   function rn(e, t, n) {
     var i, r, o, a, s;
-    ct(e, je, function(t) {
+    ct(e, je, function (t) {
       return n(29, (i = t));
     }),
-      ct(e, Ze, function(t) {
+      ct(e, Ze, function (t) {
         return n(18, (r = t));
       }),
-      ct(e, He, function(t) {
+      ct(e, He, function (t) {
         return n(30, (o = t));
       }),
-      ct(e, Ge, function(t) {
+      ct(e, Ge, function (t) {
         return n(19, (a = t));
       }),
-      ct(e, _e, function(t) {
+      ct(e, _e, function (t) {
         return n(20, (s = t));
       });
     var c,
@@ -2904,7 +2904,7 @@
     function S() {
       window.OTPElf &&
         window.OTPElf.addOtpListener &&
-        window.OTPElf.addOtpListener(function(t) {
+        window.OTPElf.addOtpListener(function (t) {
           t && t.otp && T(t.otp);
         });
     }
@@ -2914,16 +2914,16 @@
         e && (nn((t = { target: { value: t } })), lt(Ge, (a = t.target.value)));
     }
     return (
-      kt(function() {
+      kt(function () {
         var t = document.querySelector('#otpForm input');
         t && 'text' === t.type && (t.type = 'number'),
           window.OTPElf
             ? S()
-            : window.addEventListener('load', function() {
+            : window.addEventListener('load', function () {
                 setTimeout(S, 500);
               });
       }),
-      (e.$set = function(t) {
+      (e.$set = function (t) {
         'termsContent' in t && n(0, (f = t.termsContent)),
           'termsTitle' in t && n(1, (p = t.termsTitle)),
           'agreedToTerms' in t && n(2, (h = t.agreedToTerms)),
@@ -2943,7 +2943,7 @@
           'track' in t && n(26, (w = t.track)),
           'securedLogo' in t && n(14, (D = t.securedLogo));
       }),
-      (e.$$.update = function() {
+      (e.$$.update = function () {
         33554432 & e.$$.dirty[0] && n(16, (l = 'hdfc_debit_emi' === v)),
           536936452 & e.$$.dirty[0] && n(17, (u = (!l || h) && !i));
       }),
@@ -2972,54 +2972,54 @@
         d,
         B,
         I,
-        function(t) {
+        function (t) {
           nn(t), w('otp_field:input', { length: t.target.value.length });
         },
         v,
         w,
-        function() {
+        function () {
           c.focus();
         },
-        function() {
+        function () {
           return c.value;
         },
         i,
         o,
         S,
         T,
-        function(t) {
+        function (t) {
           Et(e, t);
         },
-        function(t) {
-          wt[t ? 'unshift' : 'push'](function() {
+        function (t) {
+          wt[t ? 'unshift' : 'push'](function () {
             n(15, (c = t));
           });
         },
-        function() {
+        function () {
           (a = this.value), Ge.set(a);
         },
-        function(t) {
+        function (t) {
           return d('inputfocus', t);
         },
-        function(t) {
+        function (t) {
           return d('inputblur', t);
         },
-        function(t) {
+        function (t) {
           return d('cancel', t);
         },
-        function(t) {
+        function (t) {
           return d('resend', t);
         },
-        function() {
+        function () {
           (h = this.checked), n(2, h);
         },
-        function(t) {
+        function (t) {
           return I(0, 'tnc');
         },
-        function(t) {
+        function (t) {
           return I(0, 'schedule');
         },
-        function(t) {
+        function (t) {
           return B();
         },
       ]
@@ -3031,166 +3031,166 @@
       B(sn, [
         {
           key: 'termsContent',
-          get: function() {
+          get: function () {
             return this.$$.ctx[0];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ termsContent: t }), $t();
           },
         },
         {
           key: 'termsTitle',
-          get: function() {
+          get: function () {
             return this.$$.ctx[1];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ termsTitle: t }), $t();
           },
         },
         {
           key: 'agreedToTerms',
-          get: function() {
+          get: function () {
             return this.$$.ctx[2];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ agreedToTerms: t }), $t();
           },
         },
         {
           key: 'actionAreaTitle',
-          get: function() {
+          get: function () {
             return this.$$.ctx[3];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ actionAreaTitle: t }), $t();
           },
         },
         {
           key: 'showLogoOnRightOfActionArea',
-          get: function() {
+          get: function () {
             return this.$$.ctx[4];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ showLogoOnRightOfActionArea: t }), $t();
           },
         },
         {
           key: 'actionAreaMessage',
-          get: function() {
+          get: function () {
             return this.$$.ctx[5];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ actionAreaMessage: t }), $t();
           },
         },
         {
           key: 'otpLength',
-          get: function() {
+          get: function () {
             return this.$$.ctx[6];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ otpLength: t }), $t();
           },
         },
         {
           key: 'resendTimeout',
-          get: function() {
+          get: function () {
             return this.$$.ctx[7];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ resendTimeout: t }), $t();
           },
         },
         {
           key: 'mode',
-          get: function() {
+          get: function () {
             return this.$$.ctx[25];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ mode: t }), $t();
           },
         },
         {
           key: 'submitCTA',
-          get: function() {
+          get: function () {
             return this.$$.ctx[8];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ submitCTA: t }), $t();
           },
         },
         {
           key: 'message',
-          get: function() {
+          get: function () {
             return this.$$.ctx[9];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ message: t }), $t();
           },
         },
         {
           key: 'messageType',
-          get: function() {
+          get: function () {
             return this.$$.ctx[10];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ messageType: t }), $t();
           },
         },
         {
           key: 'loading',
-          get: function() {
+          get: function () {
             return this.$$.ctx[11];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ loading: t }), $t();
           },
         },
         {
           key: 'provider',
-          get: function() {
+          get: function () {
             return this.$$.ctx[12];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ provider: t }), $t();
           },
         },
         {
           key: 'providerImage',
-          get: function() {
+          get: function () {
             return this.$$.ctx[13];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ providerImage: t }), $t();
           },
         },
         {
           key: 'track',
-          get: function() {
+          get: function () {
             return this.$$.ctx[26];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ track: t }), $t();
           },
         },
         {
           key: 'securedLogo',
-          get: function() {
+          get: function () {
             return this.$$.ctx[14];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ securedLogo: t }), $t();
           },
         },
         {
           key: 'focusOtpField',
-          get: function() {
+          get: function () {
             return this.$$.ctx[27];
           },
         },
         {
           key: 'getRawOtpValue',
-          get: function() {
+          get: function () {
             return this.$$.ctx[28];
           },
         },
@@ -3255,7 +3255,7 @@
       F = n[0].name + '',
       k = n[0].name + '';
     return {
-      c: function() {
+      c: function () {
         (i = it('div')),
           ((r = it('div')).innerHTML =
             '<h4 class="puck inline-block">Insufficient Balance</h4>'),
@@ -3287,7 +3287,7 @@
           ft(i, 'class', 'ActionArea'),
           ft(i, 'id', 'InsufficientBalanceActionArea');
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, i, e),
           K(i, r),
           K(i, o),
@@ -3309,14 +3309,14 @@
           K(y, v),
           (U = [ut(f, 'click', n[2]), ut(v, 'click', dt(n[3]))]);
       },
-      p: function(t, e) {
+      p: function (t, e) {
         e = A(e, 1)[0];
         1 & e && F !== (F = t[0].name + '') && pt(l, F),
           1 & e && k !== (k = t[0].name + '') && pt(g, k);
       },
       i: O,
       o: O,
-      d: function(t) {
+      d: function (t) {
         t && et(i), G(U);
       },
     };
@@ -3325,16 +3325,16 @@
     var i = Lt(),
       r = e.walletObj;
     return (
-      (t.$set = function(t) {
+      (t.$set = function (t) {
         'walletObj' in t && n(0, (r = t.walletObj));
       }),
       [
         r,
         i,
-        function(t) {
+        function (t) {
           return i('topup', t);
         },
-        function(t) {
+        function (t) {
           return i('cancel', t);
         },
       ]
@@ -3346,10 +3346,10 @@
       B(fn, [
         {
           key: 'walletObj',
-          get: function() {
+          get: function () {
             return this.$$.ctx[0];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ walletObj: t }), $t();
           },
         },
@@ -3378,20 +3378,20 @@
       s[t] = Qn(hn(e, a, t));
     }
     return {
-      c: function() {
+      c: function () {
         (i = it('thead')), (r = it('tr'));
         for (var t = 0; t < s.length; t += 1) {
           s[t].c();
         }
         ft(r, 'class', (o = 0 <= e[3].indexOf(0) ? 'pre-active ' : ' '));
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, i, e), K(i, r);
         for (var n = 0; n < s.length; n += 1) {
           s[n].m(r, null);
         }
       },
-      p: function(t, e) {
+      p: function (t, e) {
         if (20 & e) {
           var n;
           for (a = t[2], n = 0; n < a.length; n += 1) {
@@ -3407,7 +3407,7 @@
           o !== (o = 0 <= t[3].indexOf(0) ? 'pre-active ' : ' ') &&
           ft(r, 'class', o);
       },
-      d: function(t) {
+      d: function (t) {
         t && et(i), nt(s, t);
       },
     };
@@ -3417,17 +3417,17 @@
       i,
       r = t[23] + '';
     return {
-      c: function() {
+      c: function () {
         ft((n = it('th')), 'class', (i = t[4] && t[4][t[25]]));
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, n, e), (n.innerHTML = r);
       },
-      p: function(t, e) {
+      p: function (t, e) {
         4 & e && r !== (r = t[23] + '') && (n.innerHTML = r),
           16 & e && i !== (i = t[4] && t[4][t[25]]) && ft(n, 'class', i);
       },
-      d: function(t) {
+      d: function (t) {
         t && et(n);
       },
     };
@@ -3437,17 +3437,17 @@
       i,
       r = t[20] + '';
     return {
-      c: function() {
+      c: function () {
         ft((n = it('td')), 'class', (i = t[4] && t[4][t[22]]));
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, n, e), (n.innerHTML = r);
       },
-      p: function(t, e) {
+      p: function (t, e) {
         32 & e && r !== (r = t[20] + '') && (n.innerHTML = r),
           16 & e && i !== (i = t[4] && t[4][t[22]]) && ft(n, 'class', i);
       },
-      d: function(t) {
+      d: function (t) {
         t && et(n);
       },
     };
@@ -3457,7 +3457,7 @@
       l[t] = xn(pn(i, c, t));
     }
     return {
-      c: function() {
+      c: function () {
         r = it('tr');
         for (var t = 0; t < l.length; t += 1) {
           l[t].c();
@@ -3472,14 +3472,14 @@
           ),
           ft(r, 'data-row', i[19]);
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, r, e);
         for (var n = 0; n < l.length; n += 1) {
           l[n].m(r, null);
         }
         K(r, o), (s = ut(r, 'click', i[15]));
       },
-      p: function(t, e) {
+      p: function (t, e) {
         if (48 & e) {
           var n;
           for (c = t[17].text, n = 0; n < c.length; n += 1) {
@@ -3498,7 +3498,7 @@
               (0 <= t[3].indexOf(t[19] + 1) ? 'pre-active ' : ' ')) &&
           ft(r, 'class', a);
       },
-      d: function(t) {
+      d: function (t) {
         t && et(r), nt(l, t), s();
       },
     };
@@ -3520,7 +3520,7 @@
       f[t] = bn(mn(i, d, t));
     }
     return {
-      c: function() {
+      c: function () {
         (o = it('table')), u && u.c(), (a = at()), (s = it('tbody'));
         for (var t = 0; t < f.length; t += 1) {
           f[t].c();
@@ -3531,14 +3531,14 @@
           ft(o, 'cellspacing', '0'),
           ft(o, 'border', '0');
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, o, e), u && u.m(o, null), K(o, a), K(o, s);
         for (var n = 0; n < f.length; n += 1) {
           f[n].m(s, null);
         }
         i[16](o);
       },
-      p: function(t, e) {
+      p: function (t, e) {
         var n,
           i = A(e, 1)[0];
         if (
@@ -3563,7 +3563,7 @@
       },
       i: O,
       o: O,
-      d: function(t) {
+      d: function (t) {
         t && et(o), u && u.d(), nt(f, t), i[16](null);
       },
     };
@@ -3600,14 +3600,14 @@
           return r('limitbreached');
         }
       } else {
-        t.forEach(function(t) {
+        t.forEach(function (t) {
           h(t);
         });
       }
       m(e),
         r('select', {
           current: f[e.getAttribute('data-row')],
-          all: Array.from(i.querySelectorAll('tr.active')).map(function(t) {
+          all: Array.from(i.querySelectorAll('tr.active')).map(function (t) {
             return f[e.getAttribute('data-row')];
           }),
         });
@@ -3616,7 +3616,7 @@
       h(e),
         r('deselect', {
           current: f[e.getAttribute('data-row')],
-          all: Array.from(i.querySelectorAll('tr.active')).map(function(t) {
+          all: Array.from(i.querySelectorAll('tr.active')).map(function (t) {
             return f[e.getAttribute('data-row')];
           }),
         });
@@ -3627,7 +3627,7 @@
       (t.classList.contains('active') ? Q : g)(t);
     }
     return (
-      (t.$set = function(t) {
+      (t.$set = function (t) {
         'tableClass' in t && n(0, (o = t.tableClass)),
           'tableId' in t && n(1, (a = t.tableId)),
           'headings' in t && n(2, (s = t.headings)),
@@ -3654,8 +3654,8 @@
         g,
         Q,
         x,
-        function(t) {
-          wt[t ? 'unshift' : 'push'](function() {
+        function (t) {
+          wt[t ? 'unshift' : 'push'](function () {
             n(6, (i = t));
           });
         },
@@ -3668,73 +3668,73 @@
       B(kn, [
         {
           key: 'tableClass',
-          get: function() {
+          get: function () {
             return this.$$.ctx[0];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ tableClass: t }), $t();
           },
         },
         {
           key: 'tableId',
-          get: function() {
+          get: function () {
             return this.$$.ctx[1];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ tableId: t }), $t();
           },
         },
         {
           key: 'headings',
-          get: function() {
+          get: function () {
             return this.$$.ctx[2];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ headings: t }), $t();
           },
         },
         {
           key: 'selectedIndices',
-          get: function() {
+          get: function () {
             return this.$$.ctx[3];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ selectedIndices: t }), $t();
           },
         },
         {
           key: 'maxSelectable',
-          get: function() {
+          get: function () {
             return this.$$.ctx[8];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ maxSelectable: t }), $t();
           },
         },
         {
           key: 'classes',
-          get: function() {
+          get: function () {
             return this.$$.ctx[4];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ classes: t }), $t();
           },
         },
         {
           key: 'rows',
-          get: function() {
+          get: function () {
             return this.$$.ctx[5];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ rows: t }), $t();
           },
         },
         {
           key: 'options',
-          get: function() {
+          get: function () {
             return this.$$.ctx[9];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ options: t }), $t();
           },
         },
@@ -3759,7 +3759,7 @@
   function Ln() {
     var n;
     return {
-      c: function() {
+      c: function () {
         'https://cdn.razorpay.com/static/assets/secured_by_razorpay.svg' !==
           (n = it('img')).src &&
           ft(
@@ -3770,10 +3770,10 @@
           ft(n, 'alt', 'Secured by Razorpay'),
           ft(n, 'class', 'no-mob pull-right');
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, n, e);
       },
-      d: function(t) {
+      d: function (t) {
         t && et(n);
       },
     };
@@ -3781,27 +3781,27 @@
   function En(t) {
     var n, i, r, e, o, a;
     return {
-      c: function() {
+      c: function () {
         (n = it('p')), (i = ot(t[3])), ft(n, 'class', (r = 'text-' + t[4]));
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, n, e), K(n, i), (a = !0);
       },
-      p: function(t, e) {
+      p: function (t, e) {
         (!a || 8 & e) && pt(i, t[3]),
           (!a || (16 & e && r !== (r = 'text-' + t[4]))) && ft(n, 'class', r);
       },
-      i: function(t) {
+      i: function (t) {
         a ||
-          (Tt(function() {
+          (Tt(function () {
             o && o.end(1), (e = e || jt(n, de, {})).start();
           }),
           (a = !0));
       },
-      o: function(t) {
+      o: function (t) {
         e && e.invalidate(), (o = Yt(n, de, {})), (a = !1);
       },
-      d: function(t) {
+      d: function (t) {
         t && et(n), t && o && o.end();
       },
     };
@@ -3809,13 +3809,13 @@
   function Nn() {
     var n;
     return {
-      c: function() {
+      c: function () {
         (n = it('p')).textContent = '*100% Cashback after every EMI payment';
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, n, e);
       },
-      d: function(t) {
+      d: function (t) {
         t && et(n);
       },
     };
@@ -3823,18 +3823,18 @@
   function wn(n) {
     var i, r, o, a, s;
     return {
-      c: function() {
+      c: function () {
         (i = it('p')),
           (r = ot('By clicking on Pay, you agree to the terms of our\n      ')),
           ((o = it('span')).textContent = 'Loan Agreement'),
           (a = ot('\n      .')),
           ft(o, 'class', 'link');
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, i, e), K(i, r), K(i, o), K(i, a), (s = ut(o, 'click', n[16]));
       },
       p: O,
-      d: function(t) {
+      d: function (t) {
         t && et(i), s();
       },
     };
@@ -3842,7 +3842,7 @@
   function Dn(t) {
     var n, i, r;
     return {
-      c: function() {
+      c: function () {
         (n = rt('svg')),
           (i = rt('path')),
           (r = rt('path')),
@@ -3853,12 +3853,12 @@
           ft(n, 'width', '24'),
           ft(n, 'height', '24');
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, n, e), K(n, i), K(n, r);
       },
       i: O,
       o: O,
-      d: function(t) {
+      d: function (t) {
         t && et(n);
       },
     };
@@ -3867,19 +3867,19 @@
     var n,
       i = new me({});
     return {
-      c: function() {
+      c: function () {
         Ht(i.$$.fragment);
       },
-      m: function(t, e) {
+      m: function (t, e) {
         Wt(i, t, e), (n = !0);
       },
-      i: function(t) {
+      i: function (t) {
         n || (Gt(i.$$.fragment, t), (n = !0));
       },
-      o: function(t) {
+      o: function (t) {
         _t(i.$$.fragment, t), (n = !1);
       },
-      d: function(t) {
+      d: function (t) {
         qt(i, t);
       },
     };
@@ -3943,7 +3943,7 @@
       (F = R(n)),
       (k = C[F] = T[F](n)),
       {
-        c: function() {
+        c: function () {
           (r = it('div')),
             (o = it('div')),
             ((i = it('h4')).textContent = 'Select EMI Plan'),
@@ -3985,7 +3985,7 @@
             ft(r, 'class', 'ActionArea'),
             ft(r, 'id', 'EMIPlans');
         },
-        m: function(t, e) {
+        m: function (t, e) {
           tt(t, r, e),
             K(r, o),
             K(o, i),
@@ -4016,7 +4016,7 @@
             (L = !0),
             (E = [ut(g, 'click', dt(n[18])), ut(b, 'click', n[19])]);
         },
-        p: function(t, e) {
+        p: function (t, e) {
           var n = A(e, 1)[0];
           t[1]
             ? N || ((N = Ln()).c(), N.m(o, null))
@@ -4032,7 +4032,7 @@
                 : ((D = En(t)).c(), Gt(D, 1), D.m(r, l))
               : D &&
                 (Pt(),
-                _t(D, 1, 1, function() {
+                _t(D, 1, 1, function () {
                   D = null;
                 }),
                 Jt()),
@@ -4054,7 +4054,7 @@
           var i = F;
           (F = R(t)) !== i &&
             (Pt(),
-            _t(C[i], 1, 1, function() {
+            _t(C[i], 1, 1, function () {
               C[i] = null;
             }),
             Jt(),
@@ -4062,7 +4062,7 @@
             Gt(k, 1),
             k.m(b, null));
         },
-        i: function(t) {
+        i: function (t) {
           L ||
             (Gt(w.$$.fragment, t),
             Gt(D),
@@ -4070,10 +4070,10 @@
             Gt(k),
             (L = !0));
         },
-        o: function(t) {
+        o: function (t) {
           _t(w.$$.fragment, t), _t(D), _t(S.$$.fragment, t), _t(k), (L = !1);
         },
-        d: function(t) {
+        d: function (t) {
           t && et(r),
             N && N.d(),
             qt(w),
@@ -4089,7 +4089,7 @@
   }
   function Sn(t, e, n) {
     var i;
-    ct(t, Ze, function(t) {
+    ct(t, Ze, function (t) {
       return n(10, (i = t));
     });
     var r = Lt(),
@@ -4111,12 +4111,12 @@
       Me.hide('emi-tnc') && lt(Ze, (i = !1));
     }
     return (
-      kt(function() {
-        Me.onBack(function(t) {
+      kt(function () {
+        Me.onBack(function (t) {
           'emi-tnc' === t && Q();
         });
       }),
-      (t.$set = function(t) {
+      (t.$set = function (t) {
         'payMessage' in t && n(0, (a = t.payMessage)),
           'showLogoOnRightOfActionArea' in t &&
             n(1, (s = t.showLogoOnRightOfActionArea)),
@@ -4144,22 +4144,22 @@
         r,
         g,
         Q,
-        function(t) {
+        function (t) {
           return r('selectPlan', t.detail);
         },
-        function(t) {
+        function (t) {
           return r('deselectPlan', t.detail);
         },
-        function(t) {
+        function (t) {
           return g();
         },
-        function(t) {
+        function (t) {
           return Q();
         },
-        function(t) {
+        function (t) {
           return r('cancel', t);
         },
-        function(t) {
+        function (t) {
           return r('pay', t);
         },
       ]
@@ -4171,91 +4171,91 @@
       B(Rn, [
         {
           key: 'payMessage',
-          get: function() {
+          get: function () {
             return this.$$.ctx[0];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ payMessage: t }), $t();
           },
         },
         {
           key: 'showLogoOnRightOfActionArea',
-          get: function() {
+          get: function () {
             return this.$$.ctx[1];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ showLogoOnRightOfActionArea: t }), $t();
           },
         },
         {
           key: 'emiTable',
-          get: function() {
+          get: function () {
             return this.$$.ctx[2];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ emiTable: t }), $t();
           },
         },
         {
           key: 'message',
-          get: function() {
+          get: function () {
             return this.$$.ctx[3];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ message: t }), $t();
           },
         },
         {
           key: 'messageType',
-          get: function() {
+          get: function () {
             return this.$$.ctx[4];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ messageType: t }), $t();
           },
         },
         {
           key: 'provider',
-          get: function() {
+          get: function () {
             return this.$$.ctx[5];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ provider: t }), $t();
           },
         },
         {
           key: 'providerImage',
-          get: function() {
+          get: function () {
             return this.$$.ctx[6];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ providerImage: t }), $t();
           },
         },
         {
           key: 'showTerms',
-          get: function() {
+          get: function () {
             return this.$$.ctx[7];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ showTerms: t }), $t();
           },
         },
         {
           key: 'loading',
-          get: function() {
+          get: function () {
             return this.$$.ctx[8];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ loading: t }), $t();
           },
         },
         {
           key: 'loanAgreement',
-          get: function() {
+          get: function () {
             return this.$$.ctx[9];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ loanAgreement: t }), $t();
           },
         },
@@ -4282,7 +4282,7 @@
   function $n(n) {
     var i, r, o, a, s, c, l, u, d;
     return {
-      c: function() {
+      c: function () {
         (i = it('div')),
           ((r = it('div')).textContent = 'Or'),
           (o = at()),
@@ -4300,7 +4300,7 @@
           ft(a, 'class', 'gotobank-text'),
           ft(i, 'id', 'GoToBank');
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, i, e),
           K(i, r),
           K(i, o),
@@ -4314,7 +4314,7 @@
       p: O,
       i: O,
       o: O,
-      d: function(t) {
+      d: function (t) {
         t && et(i), d();
       },
     };
@@ -4323,7 +4323,7 @@
     var e = Lt();
     return [
       e,
-      function(t) {
+      function (t) {
         return e('gotobank', t);
       },
     ];
@@ -4337,16 +4337,16 @@
   function Pn(t) {
     var n, i, r;
     return {
-      c: function() {
+      c: function () {
         (n = ot('IP address ')), (i = ot(t[0])), (r = ot(' and'));
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, n, e), tt(t, i, e), tt(t, r, e);
       },
-      p: function(t, e) {
+      p: function (t, e) {
         1 & e && pt(i, t[0]);
       },
-      d: function(t) {
+      d: function (t) {
         t && et(n), t && et(i), t && et(r);
       },
     };
@@ -4367,7 +4367,7 @@
           .replace('(India Standard Time)', 'IST'),
       c = t[0] && Pn(t);
     return {
-      c: function() {
+      c: function () {
         (n = it('div')),
           (i = it('span')),
           (r = ot(
@@ -4381,7 +4381,7 @@
           ft(n, 'id', 'Security'),
           ft(n, 'class', 'info-text');
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, n, e),
           K(n, i),
           K(i, r),
@@ -4390,7 +4390,7 @@
           K(i, a),
           K(i, s);
       },
-      p: function(t, e) {
+      p: function (t, e) {
         e = A(e, 1)[0];
         t[0]
           ? c
@@ -4400,7 +4400,7 @@
       },
       i: O,
       o: O,
-      d: function(t) {
+      d: function (t) {
         t && et(n), c && c.d();
       },
     };
@@ -4409,7 +4409,7 @@
     Lt();
     var i = e.ipAddress;
     return (
-      (t.$set = function(t) {
+      (t.$set = function (t) {
         'ipAddress' in t && n(0, (i = t.ipAddress));
       }),
       [i]
@@ -4421,10 +4421,10 @@
       B(jn, [
         {
           key: 'ipAddress',
-          get: function() {
+          get: function () {
             return this.$$.ctx[0];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ ipAddress: t }), $t();
           },
         },
@@ -4439,7 +4439,7 @@
   function Yn(t) {
     var n, i, r, o, a, s, c;
     return {
-      c: function() {
+      c: function () {
         (n = it('div')),
           (i = it('p')),
           (r = it('span')),
@@ -4451,15 +4451,15 @@
           ft(r, 'class', 'info-text'),
           ft(n, 'id', 'Timer');
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, n, e), K(n, i), K(i, r), K(r, o), K(r, a), K(a, s), K(r, c);
       },
-      p: function(t, e) {
+      p: function (t, e) {
         1 & A(e, 1)[0] && pt(s, t[0]);
       },
       i: O,
       o: O,
-      d: function(t) {
+      d: function (t) {
         t && et(n);
       },
     };
@@ -4479,18 +4479,18 @@
       s = void 0 === e ? 3 : e,
       c = Zn(60 * s);
     return (
-      kt(function() {
+      kt(function () {
         var e,
           n = Date.now(),
           i = 60 * s * 1e3,
-          r = setInterval(function() {
+          r = setInterval(function () {
             var t = Date.now();
             (e = Math.round((i - t + n) / 1e3)) <= 0 &&
               ((e = 0), clearInterval(r), a('end')),
               o(0, (c = Zn(e)));
           }, 1e3);
       }),
-      (t.$set = function(t) {
+      (t.$set = function (t) {
         'minutes' in t && o(1, (s = t.minutes));
       }),
       [c, s]
@@ -4502,10 +4502,10 @@
       B(Xn, [
         {
           key: 'minutes',
-          get: function() {
+          get: function () {
             return this.$$.ctx[1];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ minutes: t }), $t();
           },
         },
@@ -4518,7 +4518,7 @@
   function Kn(t) {
     var n, i, r, o, a, s, c, l;
     return {
-      c: function() {
+      c: function () {
         (n = it('div')),
           (i = it('img')),
           (r = at()),
@@ -4541,15 +4541,15 @@
           ft(o, 'class', 'branding-logo'),
           ft(n, 'class', 'branding');
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, n, e), K(n, i), K(n, r), K(n, o), K(o, a), K(n, c), K(n, l);
       },
-      p: function(t, e) {
+      p: function (t, e) {
         1 & A(e, 1)[0] && a.src !== (s = t[0]) && ft(a, 'src', s);
       },
       i: O,
       o: O,
-      d: function(t) {
+      d: function (t) {
         t && et(n);
       },
     };
@@ -4557,7 +4557,7 @@
   function ti(t, e, n) {
     var i = e.logo;
     return (
-      (t.$set = function(t) {
+      (t.$set = function (t) {
         'logo' in t && n(0, (i = t.logo));
       }),
       [i]
@@ -4572,10 +4572,10 @@
       B(ii, [
         {
           key: 'logo',
-          get: function() {
+          get: function () {
             return this.$$.ctx[0];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ logo: t }), $t();
           },
         },
@@ -4588,18 +4588,18 @@
   function ri(t) {
     var n;
     return {
-      c: function() {
+      c: function () {
         ((n = it('div')).innerHTML =
           '<div id="confirm"><div id="confirm-title-area"><h3 id="confirm-title">Â </h3> \n      <span id="confirm-close">Ã—</span></div> \n    <div id="confirm-msg"></div> \n    <div id="confirm-btns"><button type="button" id="confirm-secondary"></button> \n      <button type="button" id="confirm-primary"></button></div></div>'),
           ft(n, 'id', 'confirm-container');
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, n, e);
       },
       p: O,
       i: O,
       o: O,
-      d: function(t) {
+      d: function (t) {
         t && et(n);
       },
     };
@@ -4607,7 +4607,7 @@
   function oi(e, n) {
     return (
       void 0 === n && (n = {}),
-      function(t) {
+      function (t) {
         return (
           t && t.preventDefault(),
           e(Object.assign({}, { primary: !1, secondary: !1, close: !1 }, n))
@@ -4625,11 +4625,11 @@
     ui,
     di = (I(hi, (ui = Kt)), hi),
     fi = !1,
-    pi = new Promise(function(t) {
+    pi = new Promise(function (t) {
       return t({});
     }),
     mi = {
-      open: function(t) {
+      open: function (t) {
         var e = t.primaryCTA,
           i = void 0 === e ? 'Yes' : e,
           e = t.secondaryCTA,
@@ -4640,10 +4640,10 @@
           a = void 0 === t ? '' : t;
         return fi
           ? pi
-          : (setTimeout(function() {
+          : (setTimeout(function () {
               window.document.body.classList.add('__modal-open');
             }),
-            new Promise(function(t) {
+            new Promise(function (t) {
               var n,
                 e = document.querySelector('#confirm-container');
               (document.querySelector('#confirm-title').innerHTML = a),
@@ -4656,7 +4656,7 @@
                 (si = oi(t, { secondary: !0 })),
                 (ci = oi(t, { close: !0 })),
                 (n = t),
-                (li = function(t) {
+                (li = function (t) {
                   var e = oi(n, { cancel: !0 });
                   ((t.key && ('Escape' === t.key || 'Esc' === t.key)) ||
                     (t.keyCode && 27 === t.keyCode)) &&
@@ -4675,10 +4675,10 @@
                 (fi = !0);
             }));
       },
-      close: function() {
+      close: function () {
         var t;
         fi &&
-          (setTimeout(function() {
+          (setTimeout(function () {
             window.document.body.classList.remove('__modal-open');
           }),
           (t = document.querySelector('#confirm-container')).classList.remove(
@@ -4700,7 +4700,7 @@
               .removeEventListener('click', ci),
             (ci = null)),
           li && (document.body.removeEventListener('keydown', li), (li = null)),
-          setTimeout(function() {
+          setTimeout(function () {
             t.classList.remove('shown'), (fi = !1);
           }, 400));
       },
@@ -4712,21 +4712,21 @@
   function gi(t) {
     var n;
     return {
-      c: function() {
+      c: function () {
         ((n = it('div')).innerHTML =
           '<div id="toast-content">Hello, world!</div>'),
           ft(n, 'id', 'toast'),
           ht(n, 'ios', t[0]);
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, n, e);
       },
-      p: function(t, e) {
+      p: function (t, e) {
         1 & A(e, 1)[0] && ht(n, 'ios', t[0]);
       },
       i: O,
       o: O,
-      d: function(t) {
+      d: function (t) {
         t && et(n);
       },
     };
@@ -4775,13 +4775,13 @@
       i.$on('pay', t[67]),
       i.$on('selectPlan', t[68]),
       {
-        c: function() {
+        c: function () {
           Ht(i.$$.fragment);
         },
-        m: function(t, e) {
+        m: function (t, e) {
           Wt(i, t, e), (n = !0);
         },
-        p: function(t, e) {
+        p: function (t, e) {
           var n = {};
           1 & e[1] && (n.emiTable = t[31].emiPlansForTable),
             536870912 & e[0] && (n.loading = t[29]),
@@ -4799,13 +4799,13 @@
             1 & e[1] && (n.showTerms = Boolean(t[31].loanAgreements)),
             i.$set(n);
         },
-        i: function(t) {
+        i: function (t) {
           n || (Gt(i.$$.fragment, t), (n = !0));
         },
-        o: function(t) {
+        o: function (t) {
           _t(i.$$.fragment, t), (n = !1);
         },
-        d: function(t) {
+        d: function (t) {
           qt(i, t);
         },
       }
@@ -4820,25 +4820,25 @@
       i.$on('cancel', t[63]),
       i.$on('topup', t[64]),
       {
-        c: function() {
+        c: function () {
           Ht(i.$$.fragment);
         },
-        m: function(t, e) {
+        m: function (t, e) {
           Wt(i, t, e), (n = !0);
         },
-        p: function(t, e) {
+        p: function (t, e) {
           var n = {};
           16777216 & e[0] && (n.showLogoOnRightOfActionArea = t[24]),
             67108864 & e[0] && (n.walletObj = t[26]),
             i.$set(n);
         },
-        i: function(t) {
+        i: function (t) {
           n || (Gt(i.$$.fragment, t), (n = !0));
         },
-        o: function(t) {
+        o: function (t) {
           _t(i.$$.fragment, t), (n = !1);
         },
-        d: function(t) {
+        d: function (t) {
           qt(i, t);
         },
       }
@@ -4867,7 +4867,7 @@
     void 0 !== e[33] && (t.otp = e[33]);
     var o = new an({ props: t });
     return (
-      wt.push(function() {
+      wt.push(function () {
         return (
           (e = r),
           void (
@@ -4884,13 +4884,13 @@
       o.$on('inputfocus', e[37]),
       o.$on('inputblur', e[38]),
       {
-        c: function() {
+        c: function () {
           Ht(o.$$.fragment);
         },
-        m: function(t, e) {
+        m: function (t, e) {
           Wt(o, t, e), (n = !0);
         },
-        p: function(t, e) {
+        p: function (t, e) {
           var n = {};
           32 & e[0] && (n.actionAreaTitle = t[5]),
             16 & e[0] && (n.actionAreaMessage = t[4]),
@@ -4909,19 +4909,19 @@
               4 & e[1] &&
               ((i = !0),
               (n.otp = t[33]),
-              (t = function() {
+              (t = function () {
                 return (i = !1);
               }),
               Bt.push(t)),
             o.$set(n);
         },
-        i: function(t) {
+        i: function (t) {
           n || (Gt(o.$$.fragment, t), (n = !0));
         },
-        o: function(t) {
+        o: function (t) {
           _t(o.$$.fragment, t), (n = !1);
         },
-        d: function(t) {
+        d: function (t) {
           e[62](null), qt(o, t);
         },
       }
@@ -4933,20 +4933,20 @@
     return (
       i.$on('gotobank', t[69]),
       {
-        c: function() {
+        c: function () {
           Ht(i.$$.fragment);
         },
-        m: function(t, e) {
+        m: function (t, e) {
           Wt(i, t, e), (n = !0);
         },
         p: O,
-        i: function(t) {
+        i: function (t) {
           n || (Gt(i.$$.fragment, t), (n = !0));
         },
-        o: function(t) {
+        o: function (t) {
           _t(i.$$.fragment, t), (n = !1);
         },
-        d: function(t) {
+        d: function (t) {
           qt(i, t);
         },
       }
@@ -4956,23 +4956,23 @@
     var n,
       i = new zn({ props: { ipAddress: t[13] } });
     return {
-      c: function() {
+      c: function () {
         Ht(i.$$.fragment);
       },
-      m: function(t, e) {
+      m: function (t, e) {
         Wt(i, t, e), (n = !0);
       },
-      p: function(t, e) {
+      p: function (t, e) {
         var n = {};
         8192 & e[0] && (n.ipAddress = t[13]), i.$set(n);
       },
-      i: function(t) {
+      i: function (t) {
         n || (Gt(i.$$.fragment, t), (n = !0));
       },
-      o: function(t) {
+      o: function (t) {
         _t(i.$$.fragment, t), (n = !1);
       },
-      d: function(t) {
+      d: function (t) {
         qt(i, t);
       },
     };
@@ -4987,7 +4987,7 @@
       c,
       l = new ni({ props: { logo: t[27] } });
     return {
-      c: function() {
+      c: function () {
         (n = it('div')),
           (i = it('div')),
           Ht(l.$$.fragment),
@@ -5001,7 +5001,7 @@
           ft(o, 'class', 'no-desktop text-center'),
           ft(n, 'class', 'footer-branding');
       },
-      m: function(t, e) {
+      m: function (t, e) {
         tt(t, n, e),
           K(n, i),
           Wt(l, i, null),
@@ -5010,20 +5010,20 @@
           K(o, a),
           (c = !0);
       },
-      p: function(t, e) {
+      p: function (t, e) {
         var n = {};
         134217728 & e[0] && (n.logo = t[27]),
           l.$set(n),
           (!c || (268435456 & e[0] && a.src !== (s = t[28]))) &&
             ft(a, 'src', s);
       },
-      i: function(t) {
+      i: function (t) {
         c || (Gt(l.$$.fragment, t), (c = !0));
       },
-      o: function(t) {
+      o: function (t) {
         _t(l.$$.fragment, t), (c = !1);
       },
-      d: function(t) {
+      d: function (t) {
         t && et(n), qt(l);
       },
     };
@@ -5078,7 +5078,7 @@
       L = new di({}),
       E = new bi({});
     return {
-      c: function() {
+      c: function () {
         (n = it('link')),
           (i = it('link')),
           (r = it('meta')),
@@ -5115,7 +5115,7 @@
           ft(r, 'name', 'theme-color'),
           ft(r, 'content', '#2A70C8');
       },
-      m: function(t, e) {
+      m: function (t, e) {
         K(ki.head, n),
           K(ki.head, i),
           K(ki.head, r),
@@ -5138,7 +5138,7 @@
           Wt(E, a, null),
           (g = !0);
       },
-      p: function(t, e) {
+      p: function (t, e) {
         var n = {};
         128 & e[0] && (n.amount = t[7]),
           256 & e[0] && (n.date = t[8]),
@@ -5156,7 +5156,7 @@
           ? ~c && b[c].p(t, e)
           : (l &&
               (Pt(),
-              _t(b[i], 1, 1, function() {
+              _t(b[i], 1, 1, function () {
                 b[i] = null;
               }),
               Jt()),
@@ -5169,7 +5169,7 @@
               : ((v = Di(t)).c(), Gt(v, 1), v.m(a, d))
             : v &&
               (Pt(),
-              _t(v, 1, 1, function() {
+              _t(v, 1, 1, function () {
                 v = null;
               }),
               Jt());
@@ -5182,14 +5182,14 @@
               : ((F = Bi(t)).c(), Gt(F, 1), F.m(a, p))
             : F &&
               (Pt(),
-              _t(F, 1, 1, function() {
+              _t(F, 1, 1, function () {
                 F = null;
               }),
               Jt()),
           t[18]
             ? k &&
               (Pt(),
-              _t(k, 1, 1, function() {
+              _t(k, 1, 1, function () {
                 k = null;
               }),
               Jt())
@@ -5197,7 +5197,7 @@
             ? (k.p(t, e), Gt(k, 1))
             : ((k = Ii(t)).c(), Gt(k, 1), k.m(a, m));
       },
-      i: function(t) {
+      i: function (t) {
         g ||
           (Gt(Q.$$.fragment, t),
           Gt(l),
@@ -5209,7 +5209,7 @@
           Gt(E.$$.fragment, t),
           (g = !0));
       },
-      o: function(t) {
+      o: function (t) {
         _t(Q.$$.fragment, t),
           _t(l),
           _t(v),
@@ -5220,7 +5220,7 @@
           _t(E.$$.fragment, t),
           (g = !1);
       },
-      d: function(t) {
+      d: function (t) {
         et(n),
           et(i),
           et(r),
@@ -5243,26 +5243,26 @@
   }
   function Ci(t, e, a) {
     var s, c, n, i;
-    ct(t, Ye, function(t) {
+    ct(t, Ye, function (t) {
       return a(31, (s = t));
     }),
-      ct(t, ze, function(t) {
+      ct(t, ze, function (t) {
         return a(32, (c = t));
       }),
-      ct(t, Ge, function(t) {
+      ct(t, Ge, function (t) {
         return a(33, (n = t));
       }),
-      ct(t, _e, function(t) {
+      ct(t, _e, function (t) {
         return a(50, (i = t));
       });
     var r,
       o,
       l = window.innerWidth <= 760,
       u = {
-        disableAllButCancel: function() {
+        disableAllButCancel: function () {
           u.disable(!0);
         },
-        disable: function(t) {
+        disable: function (t) {
           for (
             var e = Array.from(document.querySelectorAll('.action')),
               n = document.querySelector('#cancel-action'),
@@ -5274,7 +5274,7 @@
           }
           t && (n.classList.remove('disabled'), (n.disabled = !1));
         },
-        enable: function() {
+        enable: function () {
           for (
             var t = Array.from(document.querySelectorAll('.action')), e = 0;
             e < t.length;
@@ -5332,7 +5332,7 @@
       a(29, (m = !0)),
         b
           .getEmiPlans(t)
-          .then(function(t) {
+          .then(function (t) {
             a(29, (m = !1));
             var e,
               n = t.agreementUrl,
@@ -5358,18 +5358,18 @@
               u.enable(),
               'zestmoney' === R &&
                 n &&
-                ((e = i.slice(1).map(function(t) {
+                ((e = i.slice(1).map(function (t) {
                   return t.duration;
                 })),
-                b.getAllAgreements(n, e).then(function(n) {
+                b.getAllAgreements(n, e).then(function (n) {
                   var i = s.loanAgreements || {};
-                  e.forEach(function(t, e) {
+                  e.forEach(function (t, e) {
                     i[t] = n[e];
                   }),
                     lt(Ye, (s.loanAgreements = i), s);
                 }));
           })
-          .catch(function(t) {
+          .catch(function (t) {
             a(29, (m = !1));
             t =
               (t || {}).error.description ||
@@ -5414,7 +5414,7 @@
       a(29, (m = !0));
       var t = { actionArea: c };
       b.cancelPayment(t)
-        .then(function() {
+        .then(function () {
           return a(29, (m = !1)), J === vi ? b.cancelPayLater() : et();
         })
         .catch(et);
@@ -5440,7 +5440,7 @@
           toastOpts: { hideOnClick: !1 },
         }),
         b.track('gotobank:click', {}, !0),
-        setTimeout(function() {
+        setTimeout(function () {
           b.fallback();
         }, 100);
     }
@@ -5475,7 +5475,7 @@
             primaryCTA: "No, Don't",
             secondaryCTA: 'Yes, Cancel',
           })
-          .then(function(t) {
+          .then(function (t) {
             Me.hide('close-curtain') &&
               (mi.close(),
               t.secondary
@@ -5491,10 +5491,10 @@
           });
     }
     return (
-      kt(function() {
+      kt(function () {
         var n = window.innerHeight;
         l
-          ? (window.addEventListener('resize', function(t) {
+          ? (window.addEventListener('resize', function (t) {
               var e = window.innerHeight;
               0.25 * n < n - e &&
                 ((e = document.querySelector('#ActionArea')),
@@ -5505,13 +5505,13 @@
             }),
             G && a(2, (A = null)))
           : Ti(),
-          Me.onBack(function(t) {
+          Me.onBack(function (t) {
             ('close-curtain' !== t && '' !== t) ||
               (d || at(), b.track('back_press', {}, !0));
           }),
           Y();
       }),
-      (t.$set = function(t) {
+      (t.$set = function (t) {
         'TIMEOUT_MINUTES' in t && a(3, (g = t.TIMEOUT_MINUTES)),
           'actionAreaMessage' in t && a(4, (Q = t.actionAreaMessage)),
           'actionAreaTitle' in t && a(5, (x = t.actionAreaTitle)),
@@ -5583,15 +5583,15 @@
         H,
         W,
         X,
-        function(t) {
+        function (t) {
           f = !0;
         },
-        function(t) {
+        function (t) {
           (f = !1), (p = Date.now());
         },
         K,
         tt,
-        function(t) {
+        function (t) {
           b.track('submit_otp:click', {}, !0);
           var e = o.getRawOtpValue().replace(/\D/g, '');
           e &&
@@ -5608,7 +5608,7 @@
               ? (a(29, (m = !0)),
                 b
                   .submitOtp(n)
-                  .then(function(t) {
+                  .then(function (t) {
                     a(29, (m = !1)),
                       b.track('submit_otp:response', { response: t }, !0);
                     var e = t.razorpay_payment_id,
@@ -5630,7 +5630,7 @@
                           b.submitRequest(t.request))
                         : setTimeout(et, 500);
                   })
-                  .catch(function(t) {
+                  .catch(function (t) {
                     a(29, (m = !1));
                     var e = t.error,
                       e = void 0 === e ? {} : e;
@@ -5660,7 +5660,7 @@
                 (a(29, (m = !0)),
                 b
                   .submitOtp(n)
-                  .then(function(t) {
+                  .then(function (t) {
                     a(29, (m = !1)),
                       (r = t.ott),
                       b.track('submit_otp:response', { response: t }, !0),
@@ -5674,7 +5674,7 @@
                         }),
                         b.createPayment({ ott: r }));
                   })
-                  .catch(function(t) {
+                  .catch(function (t) {
                     (t = t.error), (t = void 0 === t ? {} : t);
                     a(29, (m = !1)),
                       o.focusOtpField(),
@@ -5687,7 +5687,7 @@
                   })));
         },
         ot,
-        function(t) {
+        function (t) {
           var e = f;
           b.track('resend_otp:click'),
             !e && Date.now() - p < 150 && Ti(),
@@ -5696,7 +5696,7 @@
             a(29, (m = !0)),
             b
               .resendOtp()
-              .then(function(t) {
+              .then(function (t) {
                 a(29, (m = !1)),
                   u.enable(),
                   lt(_e, (i = t.next || t.request.content.next)),
@@ -5705,7 +5705,7 @@
                     toastOpts: { hideOnClick: !0 },
                   });
               })
-              .catch(function(t) {
+              .catch(function (t) {
                 a(29, (m = !1)),
                   u.enable(),
                   it({
@@ -5732,36 +5732,36 @@
         it,
         rt,
         at,
-        function(t) {
+        function (t) {
           (n = t), Ge.set(n);
         },
-        function(t) {
-          wt[t ? 'unshift' : 'push'](function() {
+        function (t) {
+          wt[t ? 'unshift' : 'push'](function () {
             a(30, (o = t));
           });
         },
-        function(t) {
+        function (t) {
           return ot();
         },
-        function(t) {
+        function (t) {
           return K();
         },
-        function(t) {
+        function (t) {
           return ot();
         },
-        function(t) {
+        function (t) {
           return W(t.detail);
         },
-        function(t) {
+        function (t) {
           return H();
         },
-        function(t) {
+        function (t) {
           return W(t.detail);
         },
-        function(t) {
+        function (t) {
           return tt();
         },
-        function(t) {
+        function (t) {
           return X();
         },
       ]
@@ -5773,280 +5773,280 @@
       B(Mi, [
         {
           key: 'TIMEOUT_MINUTES',
-          get: function() {
+          get: function () {
             return this.$$.ctx[3];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ TIMEOUT_MINUTES: t }), $t();
           },
         },
         {
           key: 'actionAreaMessage',
-          get: function() {
+          get: function () {
             return this.$$.ctx[4];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ actionAreaMessage: t }), $t();
           },
         },
         {
           key: 'actionAreaTitle',
-          get: function() {
+          get: function () {
             return this.$$.ctx[5];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ actionAreaTitle: t }), $t();
           },
         },
         {
           key: 'actions',
-          get: function() {
+          get: function () {
             return this.$$.ctx[6];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ actions: t }), $t();
           },
         },
         {
           key: 'amount',
-          get: function() {
+          get: function () {
             return this.$$.ctx[7];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ amount: t }), $t();
           },
         },
         {
           key: 'date',
-          get: function() {
+          get: function () {
             return this.$$.ctx[8];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ date: t }), $t();
           },
         },
         {
           key: 'emiAmount',
-          get: function() {
+          get: function () {
             return this.$$.ctx[9];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ emiAmount: t }), $t();
           },
         },
         {
           key: 'emiInterest',
-          get: function() {
+          get: function () {
             return this.$$.ctx[10];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ emiInterest: t }), $t();
           },
         },
         {
           key: 'emiTenure',
-          get: function() {
+          get: function () {
             return this.$$.ctx[11];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ emiTenure: t }), $t();
           },
         },
         {
           key: 'goToBank',
-          get: function() {
+          get: function () {
             return this.$$.ctx[12];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ goToBank: t }), $t();
           },
         },
         {
           key: 'ip',
-          get: function() {
+          get: function () {
             return this.$$.ctx[13];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ ip: t }), $t();
           },
         },
         {
           key: 'leftImage',
-          get: function() {
+          get: function () {
             return this.$$.ctx[14];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ leftImage: t }), $t();
           },
         },
         {
           key: 'leftImageAlt',
-          get: function() {
+          get: function () {
             return this.$$.ctx[15];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ leftImageAlt: t }), $t();
           },
         },
         {
           key: 'merchantName',
-          get: function() {
+          get: function () {
             return this.$$.ctx[16];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ merchantName: t }), $t();
           },
         },
         {
           key: 'message',
-          get: function() {
+          get: function () {
             return this.$$.ctx[0];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ message: t }), $t();
           },
         },
         {
           key: 'messageType',
-          get: function() {
+          get: function () {
             return this.$$.ctx[1];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ messageType: t }), $t();
           },
         },
         {
           key: 'mode',
-          get: function() {
+          get: function () {
             return this.$$.ctx[17];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ mode: t }), $t();
           },
         },
         {
           key: 'nobranding',
-          get: function() {
+          get: function () {
             return this.$$.ctx[18];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ nobranding: t }), $t();
           },
         },
         {
           key: 'otpLength',
-          get: function() {
+          get: function () {
             return this.$$.ctx[19];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ otpLength: t }), $t();
           },
         },
         {
           key: 'provider',
-          get: function() {
+          get: function () {
             return this.$$.ctx[20];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ provider: t }), $t();
           },
         },
         {
           key: 'providerImage',
-          get: function() {
+          get: function () {
             return this.$$.ctx[21];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ providerImage: t }), $t();
           },
         },
         {
           key: 'resendTimeout',
-          get: function() {
+          get: function () {
             return this.$$.ctx[22];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ resendTimeout: t }), $t();
           },
         },
         {
           key: 'rightImage',
-          get: function() {
+          get: function () {
             return this.$$.ctx[2];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ rightImage: t }), $t();
           },
         },
         {
           key: 'rightImageAlt',
-          get: function() {
+          get: function () {
             return this.$$.ctx[23];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ rightImageAlt: t }), $t();
           },
         },
         {
           key: 'showLogoOnRightOfActionArea',
-          get: function() {
+          get: function () {
             return this.$$.ctx[24];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ showLogoOnRightOfActionArea: t }), $t();
           },
         },
         {
           key: 'submitCTA',
-          get: function() {
+          get: function () {
             return this.$$.ctx[25];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ submitCTA: t }), $t();
           },
         },
         {
           key: 'type',
-          get: function() {
+          get: function () {
             return this.$$.ctx[44];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ type: t }), $t();
           },
         },
         {
           key: 'wallet',
-          get: function() {
+          get: function () {
             return this.$$.ctx[45];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ wallet: t }), $t();
           },
         },
         {
           key: 'walletObj',
-          get: function() {
+          get: function () {
             return this.$$.ctx[26];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ walletObj: t }), $t();
           },
         },
         {
           key: 'logo',
-          get: function() {
+          get: function () {
             return this.$$.ctx[27];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ logo: t }), $t();
           },
         },
         {
           key: 'securedLogo',
-          get: function() {
+          get: function () {
             return this.$$.ctx[28];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ securedLogo: t }), $t();
           },
         },
@@ -6155,7 +6155,7 @@
       i = (n = Ai(n, i, t)).hue,
       t = n.saturation,
       n = n.brightness,
-      n = (function(t, e, n) {
+      n = (function (t, e, n) {
         var i,
           r,
           o,
@@ -6197,7 +6197,7 @@
     Yi = document.createElement('canvas').getContext('2d'),
     Zi =
       ((Gi = {}),
-      function(t) {
+      function (t) {
         if (Gi[t]) {
           return Gi[t];
         }
@@ -6211,7 +6211,7 @@
       }),
     Hi =
       ((ji = {}),
-      function(t) {
+      function (t) {
         if (ji[t]) {
           return ji[t];
         }
@@ -6221,7 +6221,7 @@
       }),
     Wi =
       ((zi = {}),
-      function(t) {
+      function (t) {
         if (zi[t]) {
           return zi[t];
         }
@@ -6234,12 +6234,12 @@
           i = Oi(i);
         return (zi[t] = 0.2126 * n + 0.7152 * i + 0.0722 * e);
       }),
-    qi = function(t) {
+    qi = function (t) {
       return Wi(t) < 0.5;
     },
     Xi =
       ((_i = {}),
-      function(t) {
+      function (t) {
         if (_i[t]) {
           return _i[t];
         }
@@ -6284,21 +6284,21 @@
     brighten: Ji,
     getColorVariations: Xi,
     getColorDistance: Ki,
-    getHighlightColor: function(t, e) {
+    getHighlightColor: function (t, e) {
       if (90 < Ki(t)) {
         return e;
       }
       (e = 100 * Hi(t).saturation), (t = Xi(t));
       return e <= 50 ? t.backgroundColor : t.foregroundColor;
     },
-    getHoverStateColor: function(t, e, n) {
+    getHoverStateColor: function (t, e, n) {
       if (90 < Ki(t)) {
         return Pi(n, 3);
       }
       n = 3;
       return 50 < 100 * Hi(t).brightness && (n = 6), Pi(e, n);
     },
-    getActiveStateColor: function(t, e, n) {
+    getActiveStateColor: function (t, e, n) {
       if (90 < Ki(t)) {
         return Pi(n, 6);
       }
@@ -6372,7 +6372,7 @@
       ];
     function p(n) {
       return (
-        f.forEach(function(t) {
+        f.forEach(function (t) {
           var e = A(t, 2),
             t = e[0],
             e = e[1],
@@ -6398,10 +6398,10 @@
           r +
           '");'
       ),
-      ((r = Array.from(document.querySelectorAll('style')).find(function(t) {
+      ((r = Array.from(document.querySelectorAll('style')).find(function (t) {
         return t.innerHTML.includes('.OVERRIDE-THEME-COLORS');
       })).innerHTML = p(r.innerHTML)),
-      (t.$set = function(t) {
+      (t.$set = function (t) {
         'themeColor' in t && n(0, (i = t.themeColor));
       }),
       [i]
@@ -6443,10 +6443,10 @@
       B(cr, [
         {
           key: 'themeColor',
-          get: function() {
+          get: function () {
             return this.$$.ctx[0];
           },
-          set: function(t) {
+          set: function (t) {
             this.$set({ themeColor: t }), $t();
           },
         },
@@ -6489,7 +6489,7 @@
   setInterval(ir, 1e3),
     (lr.flush = ir),
     Object.entries ||
-      (Object.entries = function(t) {
+      (Object.entries = function (t) {
         for (var e = Object.keys(t), n = e.length, i = new Array(n); n--; ) {
           i[n] = [e[n], t[e[n]]];
         }
@@ -6497,7 +6497,7 @@
       }),
     'function' !== typeof Object.assign &&
       Object.defineProperty(Object, 'assign', {
-        value: function(t, e) {
+        value: function (t, e) {
           if (null === t) {
             throw new TypeError('Cannot convert undefined or null to object');
           }
@@ -6515,12 +6515,12 @@
         configurable: !0,
       }),
     ''.trim ||
-      (String.prototype.trim = function() {
+      (String.prototype.trim = function () {
         return this.replace(/^[sï»¿]+|[sï»¿]+$/g, '');
       }),
     (tr = window),
     'function' !== typeof DOMTokenList &&
-      (function(f) {
+      (function (f) {
         var e = f.document,
           t = f.Object,
           n = t.prototype.hasOwnProperty,
@@ -6594,11 +6594,11 @@
             p
               ? (p(c, 'classList', {
                   enumerable: 1,
-                  get: function() {
+                  get: function () {
                     return u;
                   },
                   configurable: 0,
-                  set: function(t) {
+                  set: function (t) {
                     (m = 1), (c.className = l.value = t += ''), (m = 0);
                     var e = t.trim().split(h),
                       n = l.length;
@@ -6637,10 +6637,11 @@
                 (c[' uCLp'] = protoObj.prototype)),
             srcEle.attachEvent('onpropertychange', s);
         }
-        (a.prototype.toString = a.prototype.toLocaleString = function() {
-          return this.value;
-        }),
-          (a.prototype.add = function() {
+        (a.prototype.toString = a.prototype.toLocaleString =
+          function () {
+            return this.value;
+          }),
+          (a.prototype.add = function () {
             t: for (
               var t, e = 0, n = arguments.length, i = this.uCL, r = i[' uCLp'];
               e !== n;
@@ -6657,7 +6658,7 @@
             }
             (m = 1), (i.className = r.value), (m = 0);
           }),
-          (a.prototype.remove = function() {
+          (a.prototype.remove = function () {
             for (
               var t, e = 0, n = arguments.length, i = this.uCL, r = i[' uCLp'];
               e !== n;
@@ -6679,11 +6680,11 @@
         try {
           f.Object.defineProperty(f.Element.prototype, 'classList', {
             enumerable: 1,
-            get: function(t) {
+            get: function (t) {
               return n.call(ele, 'classList') || i(this), this.classList;
             },
             configurable: 0,
-            set: function(t) {
+            set: function (t) {
               this.className = t;
             },
           });
@@ -6698,11 +6699,11 @@
     (Kt = tr.DOMTokenList.prototype),
     (tr = tr.document.createElement('div').classList),
     Kt.item ||
-      (Kt.item = function(t) {
+      (Kt.item = function (t) {
         return void 0 === (t = this[t]) ? null : t;
       }),
     (Kt.toggle && !1 === tr.toggle('a', 0)) ||
-      (Kt.toggle = function(t) {
+      (Kt.toggle = function (t) {
         if (1 < arguments.length) {
           return this[arguments[1] ? 'add' : 'remove'](t), !!arguments[1];
         }
@@ -6710,13 +6711,13 @@
         return this.remove(oldToken), e === this.value && (this.add(t), !0);
       }),
     (Kt.replace && 'boolean' === typeof tr.replace('a', 'b')) ||
-      (Kt.replace = function(t, e) {
+      (Kt.replace = function (t, e) {
         dr('replace', t), dr('replace', e);
         var n = this.value;
         return this.remove(t), this.value !== n && (this.add(e), !0);
       }),
     Kt.contains ||
-      (Kt.contains = function(t) {
+      (Kt.contains = function (t) {
         for (var e = 0, n = this.length; e !== n; ++e) {
           if (this[e] === t) {
             return !0;
@@ -6725,7 +6726,7 @@
         return !1;
       }),
     Kt.forEach ||
-      (Kt.forEach = function(t) {
+      (Kt.forEach = function (t) {
         if (1 === arguments.length) {
           for (var e = 0, n = this.length; e !== n; ++e) {
             t(this[e], e, this);
@@ -6738,28 +6739,28 @@
         }
       }),
     Kt.entries ||
-      (Kt.entries = function() {
+      (Kt.entries = function () {
         var t = this;
         return {
-          next: function() {
+          next: function () {
             return 0 < t.length ? { value: [0, t[0]], done: !1 } : { done: !0 };
           },
         };
       }),
     Kt.values ||
-      (Kt.values = function() {
+      (Kt.values = function () {
         var t = this;
         return {
-          next: function() {
+          next: function () {
             return 0 < t.length ? { value: t[0], done: !1 } : { done: !0 };
           },
         };
       }),
     Kt.keys ||
-      (Kt.keys = function() {
+      (Kt.keys = function () {
         var t = this;
         return {
-          next: function() {
+          next: function () {
             return 0 < t.length ? { value: 0, done: !1 } : { done: !0 };
           },
         };
@@ -6768,7 +6769,7 @@
       (Array.from =
         ((or = Object.prototype.toString),
         (ar = Math.pow(2, 53) - 1),
-        function(t) {
+        function (t) {
           var e = Object(t);
           if (null == t) {
             throw new TypeError(
@@ -6787,7 +6788,7 @@
           }
           for (
             var r,
-              o = (function(t) {
+              o = (function (t) {
                 (t = Number(t)),
                   (t = isNaN(t)
                     ? 0
@@ -6822,7 +6823,7 @@
         t(Math.floor(238328 * Math.random())) +
         '0'),
       (mr = 0),
-      pr.split('').forEach(function(t, e) {
+      pr.split('').forEach(function (t, e) {
         (fr = r[pr[pr.length - 1 - e]]),
           (pr.length - e) % 2 && (fr *= 2),
           62 <= fr && (fr = (fr % 62) + 1),
@@ -6830,7 +6831,7 @@
       }),
       (fr = mr % 62) && (fr = i[62 - fr]),
       pr.slice(0, 13) + fr);
-  window.onerror = function(t, e, n, i, r) {
+  window.onerror = function (t, e, n, i, r) {
     ('string' === typeof e && -1 === e.indexOf('razorpay.com')) ||
       ((r = {
         message: t,
@@ -6841,7 +6842,7 @@
       }),
       br('error', r, !0));
   };
-  var xr = (function(t) {
+  var xr = (function (t) {
     var n = Object.assign({}, t);
     (n.merchantName = n.merchant), (n.date = v());
     t = w(n.request.url.split('?')[1] || '');
@@ -6850,7 +6851,7 @@
       t.account_id && (n.account_id = t.account_id),
       (n.base_url = n.request.url.replace(/\/v1\/.+/, '')),
       'hdfc_debit_emi' === n.mode && n.emi_duration
-        ? ((t = (function(t, e, n) {
+        ? ((t = (function (t, e, n) {
             if (!n) {
               return Math.ceil(t / e);
             }
@@ -6871,7 +6872,7 @@
         : 'cardless_emi' === n.method || 'paylater' === n.method
         ? (n.amount = 'â‚¹ ' + F(n.request.content.amount))
         : (n.amount = 'â‚¹ ' + n.amount.replace(/\.00$/, '')),
-      (n.getActionUrl = function(t) {
+      (n.getActionUrl = function (t) {
         var e = {};
         return (
           n.key_id && (e.key_id = n.key_id),
@@ -6921,7 +6922,7 @@
       n.redirect && ((n.goToBank = !0), (n.fallbackUrl = n.redirect)),
       n.emi_plans &&
         ((n.emiPlansForTable = {}),
-        Object.keys(n.emi_plans).forEach(function(t) {
+        Object.keys(n.emi_plans).forEach(function (t) {
           var e = n.emi_plans[t];
           n.emiPlansForTable[t] = k({
             plans: e,
@@ -7016,7 +7017,7 @@
           xr.last4 +
           '</strong>.'),
         (xr.showLogoOnRightOfActionArea = !xr.nobranding));
-  var br = function(t, e, n) {
+  var br = function (t, e, n) {
     try {
       (t = 'acs_page:' + t),
         (e = e || {}).meta || (e.meta = {}),
@@ -7048,11 +7049,11 @@
         ((e =
           'emi_duration=' + e + '&basket_amount=' + xr.request.content.amount),
         0 <= t.indexOf('?') ? (t += '&' + e) : (t += '?' + e)),
-      new Promise(function(e) {
+      new Promise(function (e) {
         s({
           url: t,
           method: 'GET',
-          callback: function(t) {
+          callback: function (t) {
             'string' !== typeof t &&
               (t = 'An error occurred while fetching the loan agreement.'),
               e(t);
@@ -7064,18 +7065,18 @@
   window.addEventListener('blur', lr.flush),
     window.addEventListener('beforeunload', lr.flush),
     (xr.actions = {
-      cancelPayLater: function() {
-        return (function(t) {
+      cancelPayLater: function () {
+        return (function (t) {
           var e;
           try {
             e = t.request.content.callback_url;
           } catch (t) {}
           return e
             ? U(e, E)
-            : (function(t) {
+            : (function (t) {
                 if (((t = JSON.stringify(t)), window.CheckoutBridge)) {
                   'function' === typeof CheckoutBridge.oncomplete &&
-                    setTimeout(function() {
+                    setTimeout(function () {
                       CheckoutBridge.oncomplete(t);
                     }, 30);
                 } else {
@@ -7105,9 +7106,9 @@
               })(E);
         })(xr);
       },
-      cancelPayment: function(t) {
+      cancelPayment: function (t) {
         var r = t.actionArea;
-        return new Promise(function(t) {
+        return new Promise(function (t) {
           var e, n, i;
           xr.type === vi
             ? t()
@@ -7121,21 +7122,21 @@
                   (n['_[reason]'] = i)),
               s({
                 url: e + '?' + N(n),
-                callback: function() {
+                callback: function () {
                   t();
                 },
               }));
         });
       },
-      submitOtp: function(i) {
-        return new Promise(function(e, n) {
+      submitOtp: function (i) {
+        return new Promise(function (e, n) {
           var t = { otp: i };
           xr.type === vi && ((t.contact = xr.contact), (t.email = xr.email)),
             s({
               url: xr.request.url,
               method: xr.request.method,
               data: t,
-              callback: function(t) {
+              callback: function (t) {
                 if (t.error) {
                   return n(t);
                 }
@@ -7144,8 +7145,8 @@
             });
         });
       },
-      resendOtp: function() {
-        return new Promise(function(n, i) {
+      resendOtp: function () {
+        return new Promise(function (n, i) {
           var r = xr.type === yi,
             o = xr.type === vi,
             t = {};
@@ -7154,7 +7155,7 @@
               url: xr.resendUrl,
               method: 'POST',
               data: t,
-              callback: function(t) {
+              callback: function (t) {
                 var e;
                 (r || o) && t.success && (t.next = xr.next);
                 try {
@@ -7168,11 +7169,11 @@
             });
         });
       },
-      fallback: function() {
+      fallback: function () {
         return U(xr.fallbackUrl);
       },
-      getEmiPlans: function(e) {
-        return new Promise(function(r, o) {
+      getEmiPlans: function (e) {
+        return new Promise(function (r, o) {
           if (xr.type === yi) {
             var t = xr.provider;
             if (st(t)) {
@@ -7186,7 +7187,7 @@
             url: xr.emiPlansUrl,
             method: 'POST',
             data: { email: xr.email, contact: xr.contact, otp: e },
-            callback: function(t) {
+            callback: function (t) {
               if (t.error) {
                 return o(t);
               }
@@ -7204,34 +7205,34 @@
               if (!e) {
                 return r(i);
               }
-              yr(e, n).then(function(t) {
+              yr(e, n).then(function (t) {
                 return (i.loanAgreements = {}), (i.loanAgreements[n] = t), r(i);
               });
             },
           });
         });
       },
-      getAllAgreements: function(t, e) {
+      getAllAgreements: function (t, e) {
         for (var n = [], i = 0; i < e.length; i++) {
           n.push(yr(t, e[i]));
         }
         return Promise.all(n);
       },
-      createPayment: function(t) {
+      createPayment: function (t) {
         var e = xr.request.content || {},
           n = xr.paymentCreateUrl,
           t = Object.assign(e, t);
         return (
-          document.querySelectorAll('button').forEach(function(t) {
+          document.querySelectorAll('button').forEach(function (t) {
             t.setAttribute('disabled', !0);
           }),
           m({ url: n, content: t })
         );
       },
-      redirectCallback: function() {
+      redirectCallback: function () {
         return U(xr.redirectCallbackUrl);
       },
-      topup: function() {
+      topup: function () {
         return U(xr.topupUrl);
       },
       submitRequest: m,
@@ -7248,22 +7249,22 @@
         window.performance.navigation.TYPE_RELOAD &&
       br('reload');
   var vr = 0;
-  !(function() {
+  !(function () {
     if (xr.terms) {
       for (var t in xr.terms) {
-        !(function(i) {
+        !(function (i) {
           var t, e, n;
           xr.terms.hasOwnProperty(i) &&
             ((t = { url: xr.terms[i] }),
             (e = t.url),
             (n = void 0 === (t = t.method) ? 'GET' : t),
-            new Promise(function(t) {
+            new Promise(function (t) {
               s({ url: e, method: n, callback: t });
-            }).then(function(t) {
+            }).then(function (t) {
               var e, n;
               He.set(
                 Object.assign(
-                  (j(He, function(t) {
+                  (j(He, function (t) {
                     return (n = t);
                   })(),
                   n),
@@ -7275,18 +7276,18 @@
       }
     }
   })(),
-    ['mousemove', 'mousedown', 'keypress', 'touchmove'].forEach(function(t) {
+    ['mousemove', 'mousedown', 'keypress', 'touchmove'].forEach(function (t) {
       var e;
       document.addEventListener(
         t,
         ((e = t),
-        function() {
+        function () {
           1 === (vr += 1) && br('interaction', { type: e, count: vr });
         }),
         { once: !0 }
       );
     }),
-    window.addEventListener('unload', function() {
+    window.addEventListener('unload', function () {
       br('unload');
     });
 })();
