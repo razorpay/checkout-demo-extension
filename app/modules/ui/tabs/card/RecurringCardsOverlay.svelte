@@ -1,8 +1,7 @@
 <script>
   import { t, locale } from 'svelte-i18n';
   import { formatMessageWithLocale, getLongBankName } from 'i18n';
-  import { cardWithRecurringSupport } from './constant';
-  import { banksUnderOneCard } from 'common/bank';
+  import { cardWithRecurringSupport, banksUnderOneCard } from './constant';
   import {
     BANK,
     CREDIT_CARD,
@@ -32,7 +31,10 @@
     <!-- LABEL: Supported cards for recurring payments -->
     {$t(SUPPORTED_CARDS)}:
   </div>
-  <div class="recurring-cards-row recurring-cards-heading">
+  <div
+    class="recurring-cards-row recurring-cards-heading"
+    data-testid="table-headings"
+  >
     <div class="recurring-cards-col">
       <!-- LABEL: Bank -->
       {$t(BANK)}

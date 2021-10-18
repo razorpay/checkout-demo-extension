@@ -5836,6 +5836,8 @@ Session.prototype = {
 
   hideOverlayMessage: hideOverlayMessage,
   hideOverlay: hideOverlay,
+  hideRecurringCardsOverlay: hideRecurringCardsOverlay,
+  showOverlay: showOverlay,
   errorHandler: errorHandler,
   successHandler: successHandler,
   getProxyPhone: getProxyPhone,

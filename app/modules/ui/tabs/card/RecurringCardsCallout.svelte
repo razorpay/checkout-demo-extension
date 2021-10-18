@@ -1,9 +1,9 @@
 <script>
-  /* global showOverlay, hideRecurringCardsOverlay */
-
   import { onDestroy } from 'svelte';
   import { t } from 'svelte-i18n';
   import Icon from 'ui/elements/Icon.svelte';
+  import { getSession } from 'sessionmanager';
+
   import warningIcon from 'card/icons/recurring-callout-warning';
   import RecurringCardsOverlay from './RecurringCardsOverlay.svelte';
   import {
@@ -11,14 +11,15 @@
     RECURRING_CARDS_VIEW_SUPPORTED_CARDS,
   } from 'ui/labels/callouts';
 
+  const session = getSession();
   const overlayTarget = document.querySelector('#recurring-cards-wrap');
   let overlayView = new RecurringCardsOverlay({
     target: overlayTarget,
-    props: { close: hideRecurringCardsOverlay },
+    props: { close: session.hideRecurringCardsOverlay },
   });
 
   function showSupportedCardsOverlay() {
-    showOverlay([overlayTarget]);
+    session.showOverlay([overlayTarget]);
   }
 
   onDestroy(() => {

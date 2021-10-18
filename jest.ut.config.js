@@ -11,4 +11,5 @@ module.exports = {
     '<rootDir>/app/modules/tests/setupTest.js',
     '@testing-library/jest-dom/extend-expect',
   ],
+  clearMocks: true, // Automatically clear mock calls and instances before every test.
 };

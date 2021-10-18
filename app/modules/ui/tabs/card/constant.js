@@ -92,6 +92,8 @@ export const Views = {
   CARD_APP: 'card-app',
 };
 
+export const banksUnderOneCard = ['IDFB', 'SIBL', 'STCB', 'FDRL'];
+
 export const cardWithRecurringSupport = {
   HSBC: { credit: true, debit: false },
   ESFB: { credit: false, debit: true },
