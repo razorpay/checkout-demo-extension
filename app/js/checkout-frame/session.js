@@ -4020,7 +4020,7 @@ Session.prototype = {
         email: getEmail(),
       };
 
-      if (this.tab === 'cardless_emi') {
+      if (this.tab === 'cardless_emi' || isCardlessEmi) {
         var providerCode = CardlessEmiStore.providerCode;
 
         submitPayload = _Obj.extend(submitPayload, {
