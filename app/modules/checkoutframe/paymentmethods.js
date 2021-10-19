@@ -44,7 +44,13 @@ function getRecurringCardDescription(locale) {
   );
 }
 
-const CARD_DESCRIPTION = (locale) => {
+/**
+ *
+ * @param {String} locale i18n locale
+ * @param {'credit'|'debit'} [cardType] card-type to which specific desc required.
+ * @returns {String}
+ */
+const CARD_DESCRIPTION = (locale, cardType = '') => {
   if (isRecurring()) {
     return getRecurringCardDescription(locale);
   }
@@ -66,7 +72,7 @@ const CARD_DESCRIPTION = (locale) => {
     const debit = isDebitCardEnabled();
 
     let razorpayMethod;
-    if (credit && debit) {
+    if (credit && debit && !cardType) {
       if (apps.length > 1) {
         // LABEL: Credit/Debit
         razorpayMethod = getMethodPrefix('credit_debit', locale);
@@ -74,10 +80,10 @@ const CARD_DESCRIPTION = (locale) => {
         // LABEL: Credit/Debit cards
         razorpayMethod = getMethodPrefix('credit_debit_cards', locale);
       }
-    } else if (credit) {
+    } else if (credit && (!cardType || cardType === 'credit')) {
       // LABEL: Credit cards
       razorpayMethod = getMethodPrefix('credit_cards', locale);
-    } else if (debit) {
+    } else if (debit && (!cardType || cardType === 'debit')) {
       // LABEL: Debit cards
       razorpayMethod = getMethodPrefix('debit_cards', locale);
     }
@@ -152,8 +158,8 @@ const DESCRIPTIONS = {
       );
     }
   },
-  credit_card: CARD_DESCRIPTION,
-  debit_card: CARD_DESCRIPTION,
+  credit_card: (locale) => CARD_DESCRIPTION(locale, 'credit'),
+  debit_card: (locale) => CARD_DESCRIPTION(locale, 'debit'),
   emandate: (locale) => getRawMethodDescription('emandate', locale),
   emi: (locale) => getRawMethodDescription('emi', locale),
   netbanking: (locale) => getRawMethodDescription('netbanking', locale),
