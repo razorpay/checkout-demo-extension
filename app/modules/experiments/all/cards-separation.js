@@ -1,5 +1,3 @@
-import { getSegmentOrCreate } from 'experiments';
-
 export const EXPERIMENT_NAME = 'cards_separation';
 
 /**
@@ -7,7 +5,7 @@ export const EXPERIMENT_NAME = 'cards_separation';
  * @returns {Boolean} true or false
  */
 export function isCardsSeparationExperimentEnabled() {
-  return getSegmentOrCreate(EXPERIMENT_NAME) === 1;
+  return false;
 }
 
 export const CARDS_SEPARATION_EXPERIMENT = {
