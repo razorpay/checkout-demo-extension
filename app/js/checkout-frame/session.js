@@ -5305,7 +5305,7 @@ Session.prototype = {
       });
     }
 
-    if (this.powerwallet || isDynamicWalletFlow) {
+    if (data.method === 'wallet' && (this.powerwallet || isDynamicWalletFlow)) {
       this.r.on('payment.otp.required', function (message) {
         askOTP(that.otpView, message, false, { phone: getPhone() });
         that.otpView.updateScreen({
