@@ -4661,6 +4661,7 @@ Session.prototype = {
          * Clear existing payments.
          */
         if (data.emi_duration) {
+          this.r._payment.off();
           this.r._payment.clear();
         }
       } else {
