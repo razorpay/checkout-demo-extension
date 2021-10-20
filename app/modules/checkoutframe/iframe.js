@@ -2,7 +2,7 @@ import { handleMessage } from 'checkoutframe/index';
 import * as Bridge from 'bridge';
 import Razorpay from 'common/Razorpay';
 import { ownerWindow } from 'common/constants';
-import Analytics, { Track } from 'analytics';
+import Analytics, { Track, MetaProperties } from 'analytics';
 import { getSession } from 'sessionmanager';
 import { defineGlobals as defineGlobalsForBridge } from 'bridge/global';
 
@@ -160,4 +160,10 @@ export function initIframe() {
   }
 
   Razorpay.sendMessage({ event: 'load' });
+
+  const INIT_TIME = Date.now();
+  Analytics.setMeta(
+    MetaProperties.TIME_SINCE_INIT_IFRAME,
+    () => Date.now() - INIT_TIME
+  );
 }

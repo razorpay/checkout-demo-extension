@@ -3,6 +3,7 @@ export default {
   DOWNTIME_ALERTSHOWN: 'downtime.alertShown',
   DOWNTIME_CALLOUTSHOWN: 'downtime.calloutShown',
   TIME_SINCE_OPEN: 'timeSince.open',
+  TIME_SINCE_INIT_IFRAME: 'timeSince.initIframe',
   NAVIGATOR_LANGUAGE: 'navigator.language',
   NETWORK_TYPE: 'network.type',
   NETWORK_DOWNLINK: 'network.downlink',
