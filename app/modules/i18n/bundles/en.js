@@ -908,6 +908,8 @@ export default {
     otp_field_help: 'Please enter the OTP',
     resend_label: 'Resend OTP',
     retry_label: 'Retry',
+    cancel_label: 'Cancel',
+    pay_with_paypal: 'Pay With PayPal',
     skip_text: {
       complete_bank_page: "Complete on bank's page",
       resend_otp: 'Resend OTP',

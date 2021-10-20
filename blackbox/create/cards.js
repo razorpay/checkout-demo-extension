@@ -23,6 +23,7 @@ const {
   retryTransaction,
   selectPersonalizedCard,
   agreeToAMEXCurrencyCharges,
+  retryTransactionWithPaypal,
 
   // Offers
   verifyOfferApplied,
@@ -58,6 +59,8 @@ const {
   handlePartialPayment,
 } = require('../tests/homescreen/actions');
 
+const { respondToPaymentFailure } = require('../actions/card-actions');
+
 module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'cards',
@@ -79,6 +82,7 @@ module.exports = function (testFeatures) {
     validateRemoveOfferCta,
     AVSPrefillData,
     withSiftJS,
+    retryWithPaypal,
   } = features;
 
   describe.each(
@@ -234,6 +238,13 @@ module.exports = function (testFeatures) {
 
       if (callbackUrl) {
         await expectRedirectWithCallback(context, { method: 'card' });
+      } else if (retryWithPaypal) {
+        // Assert paypal as retry payment method if card payment failed
+        // Raise card payment failure exception
+        await respondToPaymentFailure(context);
+        // Retry using paypal method
+        await retryTransactionWithPaypal(context);
+        await submit(context);
       } else {
         await handleCardValidation(context);
         await handleMockFailureDialog(context);

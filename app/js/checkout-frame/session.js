@@ -378,6 +378,10 @@ function errorHandler(response) {
   error.description = message;
   var cancelMsg = I18n.format('misc.payment_canceled');
 
+  if (error.metadata) {
+    this.ajaxErrorMetadata = error.metadata;
+  }
+
   // Both checks are there because API still returns message in English.
   if (message === cancelMsg || message === discreet.cancelMsg) {
     if (this.powerwallet) {
@@ -475,6 +479,10 @@ function errorHandler(response) {
   }
 
   NBHandlers.replaceRetryIfCorporateNetbanking(this, message);
+
+  if (message !== cancelMsg && message !== discreet.cancelMsg) {
+    CommonHandlers.addRetryPaymentMethodOnErrorModal.call(this, error.metadata);
+  }
 }
 
 /* bound with session */
@@ -1695,6 +1703,24 @@ Session.prototype = {
     this.preSubmit();
   },
 
+  /**
+   * this method is being used on OTP screen
+   */
+  retryWithPaypal: function () {
+    if (this.screen !== 'wallet') {
+      // switch to wallet tab and select paypal
+      if (this.svelteCardTab) {
+        this.svelteCardTab.setTabVisible(false);
+      }
+      this.switchTab('wallet');
+      if (this.walletTab) {
+        this.walletTab.onWalletSelection(freqWallets.paypal.code);
+      }
+    } else {
+      this.back();
+    }
+  },
+
   setOtpScreen: function () {
     if (!this.otpView) {
       this.otpView = new discreet.otpView({
@@ -1709,6 +1735,7 @@ Session.prototype = {
             resend: bind(this.resendOTP, this),
             retry: bind(this.back, this),
             secondary: bind(this.secAction, this),
+            retryWithPaypal: bind(this.retryWithPaypal, this),
           },
         },
       });
@@ -3737,6 +3764,12 @@ Session.prototype = {
     }
 
     if (this.screen === 'otp') {
+      if (
+        this.ajaxErrorMetadata &&
+        CommonHandlers.shouldRetryWithPaypal(this.ajaxErrorMetadata)
+      ) {
+        return this.commenceOTP(text, undefined, {}, 'paypal', loadingState);
+      }
       return this.commenceOTP(text, undefined, {}, actionState, loadingState);
     }
 

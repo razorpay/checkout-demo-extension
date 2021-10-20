@@ -580,6 +580,33 @@ async function assertOTPElementsForBEPG(context) {
   );
 }
 
+async function respondToPaymentFailure(context) {
+  const req = await context.expectRequest();
+  expect(req.url).toContain('create/ajax');
+  await context.respondJSON({
+    error: {
+      code: 'BAD_REQUEST_ERROR',
+      description: 'Payment failed',
+      source: 'customer',
+      step: 'payment_authentication',
+      reason: 'payment_failure',
+      metadata: {
+        next: [
+          {
+            action: 'suggest_retry',
+            instruments: [
+              {
+                instrument: 'paypal',
+                method: 'wallet',
+              },
+            ],
+          },
+        ],
+      },
+    },
+  });
+}
+
 module.exports = {
   enterCardDetails,
   expectDCCParametersInRequest,
@@ -600,4 +627,5 @@ module.exports = {
   handleCREDUserValidation,
   fillAVSForm,
   assertAVSFormData,
+  respondToPaymentFailure,
 };

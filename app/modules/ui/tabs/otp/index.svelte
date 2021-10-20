@@ -34,6 +34,8 @@
     BACK_LABEL,
     RESEND_LABEL,
     RETRY_LABEL,
+    CANCEL_LABEL,
+    PAY_WITH_PAYPAL_LABEL,
     TRY_DIFFERENT_LABEL,
     OTP_FIELD_HELP,
   } from 'ui/labels/otp';
@@ -186,14 +188,34 @@
 
       <div id="otp-section">
         {#if $action}
-          <!-- LABEL: Retry -->
-          <div
-            id="otp-action"
-            class="btn"
-            on:click={(event) => invoke('retry', event)}
-          >
-            {$t(RETRY_LABEL)}
-          </div>
+          {#if $action === 'paypal'}
+            <!-- LABEL: Pay with Paypal -->
+            <div
+              id="otp-action"
+              class="btn text-initial"
+              on:click={(event) => invoke('retryWithPaypal', event)}
+            >
+              {$t(PAY_WITH_PAYPAL_LABEL)}
+            </div>
+
+            <div class="otp-action-cancel">
+              <LinkButton
+                id="otp-sec"
+                on:click={(event) => invoke('retry', event)}
+              >
+                {$t(CANCEL_LABEL)}
+              </LinkButton>
+            </div>
+          {:else}
+            <!-- LABEL: Retry -->
+            <div
+              id="otp-action"
+              class="btn"
+              on:click={(event) => invoke('retry', event)}
+            >
+              {$t(RETRY_LABEL)}
+            </div>
+          {/if}
         {/if}
 
         <div
@@ -315,5 +337,13 @@
     text-align: center;
     padding: 12px;
     padding-bottom: 24px;
+  }
+
+  .otp-action-cancel {
+    margin-top: 12px;
+  }
+
+  .text-initial {
+    text-transform: initial;
   }
 </style>

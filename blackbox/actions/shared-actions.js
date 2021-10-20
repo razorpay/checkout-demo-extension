@@ -248,6 +248,15 @@ async function respondToErrorMessage(context) {
   await okButton.click();
 }
 
+async function retryTransactionWithPaypal(context) {
+  await context.page.waitFor('#fd-paypal', {
+    timeout: 2000,
+    visible: true,
+  });
+  const paypalRetryButton = await context.page.waitForSelector('#fd-paypal');
+  await paypalRetryButton.click();
+}
+
 module.exports = {
   handleMockFailureDialog,
   handleMockSuccessDialog,
@@ -264,4 +273,5 @@ module.exports = {
   popupClosedByUser,
   provideCancellationReason,
   handleAJAXRequest,
+  retryTransactionWithPaypal,
 };

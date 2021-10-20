@@ -21,6 +21,12 @@
     display: none;
   }
 
+  &.has-paypal {
+    #fd-hide {
+      display: none;
+    }
+  }
+
   &.loading {
     .link {
       display: inline-block;
@@ -29,7 +35,7 @@
       display: block;
     }
 
-    #fd-hide {
+    #fd-hide, #fd-paypal-container {
       display: none;
     }
   }
@@ -45,4 +51,12 @@
 #fd-hide {
   margin-top: 10px;
   border-radius: $br;
+}
+
+.error-cancel-btn-container {
+  margin-top: 15px;
+}
+
+#fd-paypal {
+  text-transform: initial;
 }
