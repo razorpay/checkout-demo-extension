@@ -1707,6 +1707,7 @@ Session.prototype = {
    * this method is being used on OTP screen
    */
   retryWithPaypal: function () {
+    Analytics.track('paypal_retry:paypal_click');
     if (this.screen !== 'wallet') {
       // switch to wallet tab and select paypal
       if (this.svelteCardTab) {
@@ -1736,6 +1737,10 @@ Session.prototype = {
             retry: bind(this.back, this),
             secondary: bind(this.secAction, this),
             retryWithPaypal: bind(this.retryWithPaypal, this),
+            cancelRetryWithPaypal: bind(function () {
+              Analytics.track('paypal_retry:cancel_click');
+              this.back();
+            }, this),
           },
         },
       });

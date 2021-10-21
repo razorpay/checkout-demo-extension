@@ -201,7 +201,7 @@
             <div class="otp-action-cancel">
               <LinkButton
                 id="otp-sec"
-                on:click={(event) => invoke('retry', event)}
+                on:click={(event) => invoke('cancelRetryWithPaypal', event)}
               >
                 {$t(CANCEL_LABEL)}
               </LinkButton>

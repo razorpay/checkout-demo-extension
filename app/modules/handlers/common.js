@@ -1,5 +1,7 @@
 import * as MethodStore from 'checkoutstore/methods';
 import { wallets } from 'common/wallet';
+import Analytics from 'analytics';
+import CardEvents from 'analytics/card';
 
 /**
  * Replace the Retry button in error message overlay
@@ -126,6 +128,7 @@ export function addRetryPaymentMethodOnErrorModal(errorMetadata) {
     var that = this;
 
     paypalBtn.addEventListener('click', function () {
+      Analytics.track(CardEvents.PAYPAL_RETRY_PAYPAL_BTN_CLICK);
       that.hideErrorMessage();
       if (that.screen !== 'wallet') {
         // switch to wallet tab and select paypal
@@ -151,6 +154,12 @@ export function addRetryPaymentMethodOnErrorModal(errorMetadata) {
 
     errorMessageContainer.appendChild(paypalContainer);
 
-    cancelBtn.addEventListener('click', this.hideErrorMessage.bind(this));
+    cancelBtn.addEventListener('click', function () {
+      Analytics.track(CardEvents.PAYPAL_RETRY_CANCEL_BTN_CLICK);
+      that.hideErrorMessage.call(that);
+    });
+
+    // Track paypal button visible on UI
+    Analytics.track(CardEvents.SHOW_PAYPAL_RETRY_SCREEN);
   }
 }
