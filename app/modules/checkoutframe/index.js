@@ -263,7 +263,6 @@ function fetchPrefs(session) {
         });
       } else if (
         preferences.fee_bearer && // CFB
-        !preferences.force_offer && // not Forced Offer
         preferences.offers &&
         preferences.offers.length > 0 &&
         preferences.offers.filter((offer) => offer.type === 'instant').length >
