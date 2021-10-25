@@ -19,6 +19,9 @@
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
   import { customer } from 'checkoutstore/customer';
 
+  import { setDynamicFeeObject } from 'checkoutstore/dynamicfee';
+  import { isDynamicFeeBearer } from 'checkoutstore/index';
+
   // i18n
   import {
     getLongBankName,
@@ -145,6 +148,9 @@
   }
 
   function selectionHandler() {
+    if (isDynamicFeeBearer()) {
+      setDynamicFeeObject('card', savedCard?.card?.type);
+    }
     if (savedCard) {
       // FOR AVS we are need card details
       $selectedCardFromHome = savedCard;

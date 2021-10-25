@@ -6,6 +6,8 @@ const {
   // Generic
   verifyTimeout,
   handleFeeBearer,
+  assertDynamicFeeBearer,
+  modifyPreferencesForDynamicFeeBearer,
   submit,
   handleValidationRequest,
   passRequestNetbanking,
@@ -77,6 +79,7 @@ module.exports = function (testFeatures) {
     optionalContact,
     optionalEmail,
     verifyPartnerMerchantPayload,
+    dynamicFeeBearer,
   } = features;
 
   describe.each(
@@ -97,7 +100,10 @@ module.exports = function (testFeatures) {
         options.order_id = PARTNER_CONFIG.ORDER_ID;
         options.account_id = PARTNER_CONFIG.ACCOUNT_ID;
       }
-
+      if (dynamicFeeBearer) {
+        preferences.fee_bearer = true;
+        preferences.order = modifyPreferencesForDynamicFeeBearer();
+      }
       let bank = 'SBIN';
 
       const context = await openCheckoutWithNewHomeScreen({
@@ -124,7 +130,9 @@ module.exports = function (testFeatures) {
       } else if (!isHomeScreenSkipped) {
         await proceed(context);
       }
-
+      if (dynamicFeeBearer) {
+        await assertDynamicFeeBearer(context, 1);
+      }
       if (!missingUserDetails) {
         await assertUserDetails(context);
         await assertEditUserDetailsAndBack(context);
@@ -162,7 +170,7 @@ module.exports = function (testFeatures) {
         await verifyDiscountText(context, 'You save ₹20');
       }
 
-      if (feeBearer) {
+      if (feeBearer || dynamicFeeBearer) {
         await verifyFooterText(context, 'PAY');
       }
 
@@ -181,7 +189,7 @@ module.exports = function (testFeatures) {
         await downtimeHighAlert(context);
       }
 
-      if (feeBearer) {
+      if (feeBearer || dynamicFeeBearer) {
         await delay(200);
         await handleFeeBearer(context);
       }

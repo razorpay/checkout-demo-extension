@@ -4,6 +4,8 @@ const { openCheckoutWithNewHomeScreen } = require('../tests/homescreen/open');
 const {
   // Generic
   handleFeeBearer,
+  assertDynamicFeeBearer,
+  modifyPreferencesForDynamicFeeBearer,
   submit,
   respondToUPIAjax,
   respondToUPIPaymentStatus,
@@ -64,6 +66,7 @@ module.exports = function (testFeatures) {
     personalization,
     optionalContact,
     optionalEmail,
+    dynamicFeeBearer,
   } = features;
 
   describe.each(
@@ -76,6 +79,11 @@ module.exports = function (testFeatures) {
   )('Saved VPA tests', ({ preferences, title, options }) => {
     test(title, async () => {
       preferences.methods.upi = true;
+      console.log({ preferences });
+      if (dynamicFeeBearer) {
+        preferences.fee_bearer = true;
+        preferences.order = modifyPreferencesForDynamicFeeBearer();
+      }
 
       if (personalization) {
         if (preferences.customer) {
@@ -113,7 +121,10 @@ module.exports = function (testFeatures) {
       }
 
       await assertPaymentMethods(context);
-
+      await delay(2000);
+      if (dynamicFeeBearer) {
+        await assertDynamicFeeBearer(context, 1);
+      }
       if (personalization) {
         await verifyPersonalizationText(context, 'upi');
         await selectPersonalizationPaymentMethod(context, 1);
@@ -144,7 +155,7 @@ module.exports = function (testFeatures) {
         await downtimeHighAlert(context);
       }
 
-      if (feeBearer) {
+      if (feeBearer || dynamicFeeBearer) {
         await handleFeeBearer(context);
       }
 

@@ -1,6 +1,6 @@
 import { constructErrorObject } from './helpers';
 import { SEVERITY_LEVELS } from './models';
-import Analytics, { ErrorEvents } from 'analytics';
+import Analytics, { ErrorEvents } from 'analytics/index';
 
 /**
  * @param {String|Error|Object} error -

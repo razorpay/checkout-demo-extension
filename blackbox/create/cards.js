@@ -5,6 +5,8 @@ const {
   // Generic
   verifyTimeout,
   handleFeeBearer,
+  assertDynamicFeeBearer,
+  modifyPreferencesForDynamicFeeBearer,
   submit,
   handleValidationRequest,
   handleMockSuccessDialog,
@@ -58,6 +60,7 @@ const {
   // Partial Payments
   handlePartialPayment,
 } = require('../tests/homescreen/actions');
+const { delay } = require('../util.js');
 
 const { respondToPaymentFailure } = require('../actions/card-actions');
 
@@ -82,9 +85,10 @@ module.exports = function (testFeatures) {
     validateRemoveOfferCta,
     AVSPrefillData,
     withSiftJS,
+    dynamicFeeBearer,
     retryWithPaypal,
   } = features;
-
+  const anyFeeBearer = feeBearer || dynamicFeeBearer;
   describe.each(
     getTestData(title, {
       options,
@@ -93,6 +97,11 @@ module.exports = function (testFeatures) {
   )('Cards tests', ({ preferences, title, options }) => {
     if (remember_customer) {
       options.remember_customer = remember_customer;
+    }
+
+    if (dynamicFeeBearer) {
+      preferences.fee_bearer = true;
+      preferences.order = modifyPreferencesForDynamicFeeBearer();
     }
 
     if (typeof AVSPrefillData === 'object' && AVSPrefillData) {
@@ -125,6 +134,9 @@ module.exports = function (testFeatures) {
         await handlePartialPayment(context, '100');
       } else if (!isHomeScreenSkipped) {
         await proceed(context);
+      }
+      if (dynamicFeeBearer) {
+        await assertDynamicFeeBearer(context, 1);
       }
 
       if (recurringOrder && options.remember_customer) {
@@ -209,7 +221,7 @@ module.exports = function (testFeatures) {
         await validateCardForOffer(context);
       }
 
-      if (feeBearer) {
+      if (anyFeeBearer) {
         await verifyFooterText(context, 'PAY');
       }
 
@@ -232,7 +244,7 @@ module.exports = function (testFeatures) {
         return;
       }
 
-      if (feeBearer) {
+      if (anyFeeBearer) {
         await handleFeeBearer(context, page);
       }
 
@@ -246,6 +258,9 @@ module.exports = function (testFeatures) {
         await retryTransactionWithPaypal(context);
         await submit(context);
       } else {
+        if (dynamicFeeBearer) {
+          await assertDynamicFeeBearer(context, 2);
+        }
         await handleCardValidation(context);
         await handleMockFailureDialog(context);
         await verifyErrorMessage(
@@ -257,7 +272,8 @@ module.exports = function (testFeatures) {
         if (options.currency !== 'INR') {
           await agreeToAMEXCurrencyCharges(context);
         }
-        if (feeBearer) {
+
+        if (anyFeeBearer) {
           await handleFeeBearer(context);
         }
         await handleCardValidation(context);

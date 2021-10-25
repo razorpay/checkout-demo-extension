@@ -23,6 +23,9 @@
     blocks,
   } from 'checkoutstore/screens/home';
 
+  import { setDynamicFeeObject } from 'checkoutstore/dynamicfee';
+  import { isDynamicFeeBearer } from 'checkoutstore/index';
+
   // i18n
   import { t } from 'svelte-i18n';
   import {
@@ -30,6 +33,8 @@
     CONFIG_BLOCK_DEFAULT_TITLE,
     FREQUENTLY_USED_CONFIG_TITLE,
   } from 'ui/labels/methods';
+  // helpers
+  import { setDynamicFees } from './helpers';
 
   onDestroy(() => {
     deselectInstrument();
@@ -48,6 +53,7 @@
   }
 
   function trackInstrumentSelection(instrument, index) {
+    setDynamicFees(instrument, 'newList');
     Analytics.track('instrument:select', {
       type: AnalyticsTypes.BEHAV,
       data: {

@@ -4,6 +4,7 @@
 
   // Store imports
   import { locale } from 'svelte-i18n';
+  import { setDynamicFeeObject } from 'checkoutstore/dynamicfee';
 
   // UI imports
   import Method from 'ui/tabs/home/Method.svelte';
@@ -15,6 +16,9 @@
   // i18n
   import { formatTemplateWithLocale } from 'i18n';
   import { SINGLE_BLOCK_TITLE } from 'ui/labels/methods';
+
+  // helpers
+  import { setDynamicFees } from './helpers';
 
   // Props
   export let block;
@@ -62,7 +66,10 @@
       <Method
         method={instrument.method}
         {instrument}
-        on:select={() => dispatch('selectInstrument', instrument)}
+        on:select={() => {
+          setDynamicFees(instrument, 'rzpCluster');
+          dispatch('selectInstrument', instrument);
+        }}
       />
     {/each}
   </div>

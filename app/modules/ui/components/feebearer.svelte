@@ -6,7 +6,8 @@
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
 
   // Store imports
-  import { showFeeLabel } from 'checkoutstore/index.js';
+  import { showFeeLabel, isDynamicFeeBearer } from 'checkoutstore/index.js';
+  import { dynamicFeeObject, showFeesIncl } from 'checkoutstore/dynamicfee';
 
   // Utils imports
   import { formatAmountWithSymbol } from 'common/currency';
@@ -45,6 +46,7 @@
     tax: GST_LABEL,
     amount: TOTAL_CHARGES_LABEL,
   };
+  const dynamic_fee_label = $dynamicFeeObject?.checkout_label || '';
 
   onMount(() => {
     fetchFees(paymentData);
@@ -52,9 +54,15 @@
 
   export function onSuccess(response) {
     feeBreakup = response.display;
+    showFeesIncl.update((obj) =>
+      Object.assign({}, obj, {
+        ['show']: true,
+      })
+    );
+
     loading = false;
     bearer = response.input;
-    $showFeeLabel = false;
+    $showFeeLabel = Boolean(isDynamicFeeBearer());
     const offer = session.getAppliedOffer();
     if (!offer || !offer.amount) {
       session.updateAmountInHeader(feeBreakup.amount * 100, false);
@@ -79,6 +87,11 @@
       ? session.getAppliedOffer().amount
       : session.get('amount');
     paymentData.currency = session.get('currency');
+    if (isDynamicFeeBearer()) {
+      if ('convenience_fee' in $dynamicFeeObject) {
+        paymentData['convenience_fee'] = $dynamicFeeObject['convenience_fee'];
+      }
+    }
     loading = true;
     session.r.calculateFees(paymentData).then(onSuccess).catch(onError);
   }
@@ -100,11 +113,16 @@
           <div class="fee">
             <div class="fee-title">
               {#if type === 'razorpay_fee'}
-                {fee_label || $t(GATEWAY_CHARGES_LABEL)}
+                {dynamic_fee_label || fee_label || $t(GATEWAY_CHARGES_LABEL)}
               {:else if type === 'tax'}
                 {formatTemplateWithLocale(
                   displayLabels[type],
-                  { label: fee_label || $t(GATEWAY_CHARGES_LABEL) },
+                  {
+                    label:
+                      dynamic_fee_label ||
+                      fee_label ||
+                      $t(GATEWAY_CHARGES_LABEL),
+                  },
                   $locale
                 )}
               {:else}{$t(displayLabels[type])}{/if}

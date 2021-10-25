@@ -1,4 +1,4 @@
-const getFlows = query => {
+const getFlows = (query) => {
   if (query.currency) {
     const { amount } = query;
     const normalizer = amount / 50000;
@@ -855,7 +855,7 @@ const getFlows = query => {
   }
 };
 
-const getIin = query => {
+const getIin = (query) => {
   const response = {
     flows: {
       otp: true,
@@ -863,7 +863,7 @@ const getIin = query => {
       iframe: false,
       emi: true,
     },
-    type: 'debit',
+    type: 'prepaid',
     issuer: 'HDFC',
     http_status_code: 200,
   };

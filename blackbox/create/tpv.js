@@ -4,6 +4,8 @@ const { openCheckoutWithNewHomeScreen } = require('../tests/homescreen/open');
 const {
   // Generic
   handleFeeBearer,
+  assertDynamicFeeBearer,
+  modifyPreferencesForDynamicFeeBearer,
   submit,
   passRequestNetbanking,
   handleMockSuccessDialog,
@@ -51,6 +53,7 @@ module.exports = function (testFeatures) {
     optionalContact,
     optionalEmail,
     invalidOrder,
+    dynamicFeeBearer,
   } = features;
 
   describe.each(
@@ -65,7 +68,13 @@ module.exports = function (testFeatures) {
           preferences.customer.contact = '+918888888881';
         }
       }
-
+      if (dynamicFeeBearer) {
+        preferences.fee_bearer = true;
+        preferences.order = {
+          ...preferences.order,
+          ...modifyPreferencesForDynamicFeeBearer(),
+        };
+      }
       if (callbackUrl) {
         preferences.order.method = 'netbanking';
       }
@@ -77,7 +86,6 @@ module.exports = function (testFeatures) {
           netbanking: undefined,
         };
       }
-
       const context = await openCheckoutWithNewHomeScreen({
         page,
         options,
@@ -126,17 +134,19 @@ module.exports = function (testFeatures) {
         await verifyDiscountText(context, 'You save ₹20');
       }
 
-      if (feeBearer) {
+      if (feeBearer || dynamicFeeBearer) {
         await verifyFooterText(context, 'PAY');
       }
-
+      if (dynamicFeeBearer) {
+        await assertDynamicFeeBearer(context, 1);
+      }
       if (partialPayment) {
         await verifyPartialAmount(context, '₹ 100');
       }
 
       await submit(context);
 
-      if (feeBearer) {
+      if (feeBearer || dynamicFeeBearer) {
         await handleFeeBearer(context);
       }
 

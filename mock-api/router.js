@@ -12,12 +12,14 @@ const { getOtpSubmit, getOtpResend } = require('./mocks/otp');
 const { getMisc } = require('./mocks/misc');
 const { preferredInsturments } = require('./mocks/personalisation');
 const { getStatus } = require('./mocks/status');
+const { getFees } = require('./mocks/fees');
 
 router.get('/v1/preferences', function (request, response) {
   const preferences = getPreferences(
-    request.query.cred_offer_experiment
-      ? `cred_${request.query.cred_offer_experiment}`
-      : 'hdfc_dc'
+    // request.query.cred_offer_experiment
+    //   ? `cred_${request.query.cred_offer_experiment}`
+    //   : 'hdfc_dc'
+    'hdfc_dc'
   );
   respondJSON(preferences, request, response);
 });
@@ -80,7 +82,7 @@ router.get('/v1/customers/status/:phone', async function (request, response) {
 });
 
 router.post('/v1/payments/calculate/fees', async function (request, response) {
-  await delay(100);
+  // await delay(100);
   const preparedResponse = getFees();
   response.send(preparedResponse);
 });

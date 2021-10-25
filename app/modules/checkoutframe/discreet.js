@@ -113,6 +113,7 @@ import * as UTILS from 'lib/utils.js';
 
 import * as CovidDonations from 'checkoutframe/components/covidWrap';
 import * as Header from 'checkoutframe/components/header';
+import { dynamicFeeObject } from 'checkoutstore/dynamicfee';
 
 export default {
   RazorpayConfig,
@@ -176,6 +177,7 @@ export default {
   NativeStore,
   OffersStore,
   Cta,
+  dynamicFeeObject,
 
   Customer,
   getCustomer,

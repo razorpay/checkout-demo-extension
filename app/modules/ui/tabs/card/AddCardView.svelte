@@ -12,7 +12,7 @@
 
   import { getSession } from 'sessionmanager';
   // Svelte imports
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { createEventDispatcher, onMount, tick } from 'svelte';
 
   import { getComponentProps } from 'utils/svelteUtils';
 
@@ -43,6 +43,8 @@
     getRecurringMethods,
     isOfferForced,
   } from 'checkoutstore';
+  import { isDynamicFeeBearer } from 'checkoutstore/index';
+  import { dynamicFeeObject, showFeesIncl } from 'checkoutstore/dynamicfee';
   import {
     isAMEXEnabled,
     getCardNetworks,
@@ -135,6 +137,13 @@
   }
 
   $: {
+    if ($cardNumber.length <= 0 && isDynamicFeeBearer()) {
+      const session = getSession();
+      let amount = session.get('amount');
+      session.updateAmountInHeader(amount, false);
+      dynamicFeeObject.set({});
+      showFeesIncl.set({});
+    }
     if ($cardNumber.length > 6 && lastIin !== getIin($cardNumber)) {
       lastIin = getIin($cardNumber);
       if (lastIin) {

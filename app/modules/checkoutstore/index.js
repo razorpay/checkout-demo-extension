@@ -397,3 +397,15 @@ export function getTrustedBadgeHighlights() {
 export function isDynamicWalletFlow() {
   return hasFeature('raas') || preferences?.dynamic_wallet_flow;
 }
+
+export function getConvenienceFeeConfig() {
+  return preferences?.order?.convenience_fee_config || null;
+}
+
+export function isDynamicFeeBearer() {
+  return Boolean(getConvenienceFeeConfig());
+}
+
+export function getDynamicFeeBearerMerchantMessage() {
+  return getConvenienceFeeConfig()?.checkout_message || '';
+}

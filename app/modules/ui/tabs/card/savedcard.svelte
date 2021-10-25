@@ -11,6 +11,9 @@
   import { selectedPlanTextForSavedCard } from 'checkoutstore/emi';
   import { isMethodUsable } from 'checkoutstore/methods';
 
+  import { setDynamicFeeObject } from 'checkoutstore/dynamicfee';
+  import { isDynamicFeeBearer } from 'checkoutstore/index';
+
   // i18n
   import { t, locale } from 'svelte-i18n';
   import { formatTemplateWithLocale } from 'i18n';
@@ -110,6 +113,9 @@
   }
 
   function handleClick() {
+    if (isDynamicFeeBearer()) {
+      setDynamicFeeObject('card', card.type);
+    }
     const payload = { cvv: cvvValue };
     // Focus on next tick because the CVV field might not have rendered right now.
     tick().then((_) => {

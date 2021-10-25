@@ -1,11 +1,12 @@
 <script>
   // Svelte imports
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { createEventDispatcher, onMount, tick } from 'svelte';
   import { fly } from 'svelte/transition';
 
   // Store
   import { isIRCTC, getAmount, showFeeLabel } from 'checkoutstore';
   import { isContactPresent } from 'checkoutstore/screens/home';
+  import { dynamicFeeObject, showFeesIncl } from 'checkoutstore/dynamicfee';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
@@ -102,6 +103,11 @@
     const amount = getAmount();
     session.setAmount(amount);
     $showFeeLabel = true;
+    tick().then(() => {
+      dynamicFeeObject.set({});
+      showFeesIncl.set({});
+    });
+
     dispatch('back');
   }
 

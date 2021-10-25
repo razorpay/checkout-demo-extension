@@ -4,7 +4,8 @@ const { openCheckoutWithNewHomeScreen } = require('../tests/homescreen/open');
 const {
   // Generic
   handleFeeBearer,
-
+  assertDynamicFeeBearer,
+  modifyPreferencesForDynamicFeeBearer,
   // QR Scanner
   respondToUPIAjax,
   responseWithQRImage,
@@ -20,7 +21,6 @@ const {
   viewOffers,
   selectOffer,
 } = require('../actions/common');
-
 const {
   // Generic
   proceed,
@@ -38,8 +38,9 @@ const {
   selectPersonalizationPaymentMethod,
   verifyPersonalizationText,
 } = require('../tests/homescreen/actions');
+const { delay } = require('../../mock-api/utils.js');
 
-module.exports = function(testFeatures) {
+module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'upi-qr',
     testFeatures
@@ -52,8 +53,9 @@ module.exports = function(testFeatures) {
     personalization,
     optionalContact,
     optionalEmail,
+    dynamicFeeBearer,
   } = features;
-
+  const anyFeeBearer = feeBearer || dynamicFeeBearer;
   describe.each(
     getTestData(title, {
       options,
@@ -67,7 +69,10 @@ module.exports = function(testFeatures) {
         }
       }
       preferences.methods.upi = true;
-
+      if (dynamicFeeBearer) {
+        preferences.fee_bearer = true;
+        preferences.order = modifyPreferencesForDynamicFeeBearer();
+      }
       const context = await openCheckoutWithNewHomeScreen({
         page,
         options,
@@ -92,7 +97,10 @@ module.exports = function(testFeatures) {
       } else if (!isHomeScreenSkipped) {
         await proceed(context);
       }
-
+      await delay(2000);
+      if (dynamicFeeBearer) {
+        await assertDynamicFeeBearer(context, 1, true);
+      }
       if (!missingUserDetails) {
         await assertUserDetails(context);
         await assertEditUserDetailsAndBack(context);
@@ -116,7 +124,7 @@ module.exports = function(testFeatures) {
         await verifyDiscountText(context, 'You save ₹20');
       }
 
-      if (feeBearer) {
+      if (anyFeeBearer) {
         await handleFeeBearer(context);
       }
 

@@ -3,6 +3,9 @@ import { makeAuthUrl } from 'common/Razorpay';
 import Analytics, { Track } from 'analytics';
 import { checkDowntime } from 'checkoutframe/downtimes';
 
+import { isDynamicFeeBearer } from 'checkoutstore/index';
+import { setDynamicFeeObject } from 'checkoutstore/dynamicfee';
+
 export const API_NETWORK_CODES_MAP = {
   AMEX: 'amex',
   DICL: 'diners',
@@ -380,6 +383,11 @@ export function getCardFeatures(cardNumber) {
   const existingRequest = CardFeatureRequests.iin[iin];
 
   if (existingRequest) {
+    if (isDynamicFeeBearer()) {
+      if (CardFeatureCache.iin[iin]) {
+        setDynamicFeeObject('card', CardFeatureCache.iin[iin]?.type);
+      }
+    }
     return existingRequest;
   }
 
@@ -410,6 +418,18 @@ export function getCardFeatures(cardNumber) {
 
         // Update card metadata
         updateCardIINMetadata(iin, features);
+
+        // Dynamic Fee Card Type
+        if (isDynamicFeeBearer()) {
+          let cardType;
+          if (CardFeatureCache.iin[iin]) {
+            cardType = CardFeatureCache.iin[iin]?.type;
+          } else {
+            cardType = features?.type;
+          }
+
+          setDynamicFeeObject('card', cardType);
+        }
 
         // Resolve
         resolve(features);

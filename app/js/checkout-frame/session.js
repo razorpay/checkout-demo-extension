@@ -95,7 +95,8 @@ var preferences,
   trackUpiIntentInstrumentPaymentAttempted =
     discreet.trackUpiIntentInstrumentPaymentAttempted,
   CovidDonationView = discreet.CovidDonations,
-  Header = discreet.Header;
+  Header = discreet.Header,
+  dynamicFeeObject = discreet.dynamicFeeObject;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -1930,7 +1931,7 @@ Session.prototype = {
   },
 
   hideErrorMessage: function (confirmedCancel) {
-    if (Store.isCustomerFeeBearer()) {
+    if (Store.isCustomerFeeBearer() && !Store.isDynamicFeeBearer()) {
       this.setAmount(this.get('amount'));
     }
 

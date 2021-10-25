@@ -123,7 +123,7 @@ const preferences = {
       paylater: { icic: true },
       google_pay_cards: true,
       gpay: true,
-      app: { cred: 1 },
+      app: { cred: 0 },
       nach: false,
       emi_subvention: 'customer',
       emi_plans: {
@@ -2929,10 +2929,10 @@ const preferences = {
       image: null,
       remember_customer: true,
     },
-    fee_bearer: false,
+    fee_bearer: true,
     version: 1,
     language_code: 'en',
-    merchant_key: 'rzp_live_cepk1crIu9VkJU',
+    merchant_key: 'rzp_live_ILgsfZCZoFIKMb',
     mode: 'live',
     magic: true,
     blocked: false,
@@ -3049,7 +3049,7 @@ const preferences = {
       paylater: { icic: true, hdfc: true },
       google_pay_cards: true,
       gpay: true,
-      app: { cred: 1 },
+      app: { cred: 0 },
       nach: false,
       emi_subvention: 'customer',
       emi_plans: {
@@ -3577,10 +3577,42 @@ const preferences = {
       upi_type: { collect: 1, intent: 1 },
       app_meta: { cred: { user_eligible: true, hit_eligibility: false } },
     },
+    order: {
+      amount: 100,
+      amount_due: 100,
+      amount_paid: 0,
+      currency: 'INR',
+      first_payment_min_amount: null,
+      partial_payment: false,
+      convenience_fee_config: {
+        checkout_message:
+          'To avoid transaction fees please complete payment using UPI or Netbanking.',
+        label_on_checkout: 'My Fees', //new
+        methods: {
+          card: {
+            amount: 20,
+            types: {
+              debit: {
+                amount: 0,
+              },
+              credit: [],
+              prepaid: [],
+            },
+          },
+          // netbanking: {
+          //   amount: 1.5,
+          // },
+          upi: {
+            amount: 50,
+          },
+        },
+      },
+    },
+
     global: false,
     customer: {
-      email: 'anushka7773@gmail.com',
-      contact: '+919740445948',
+      email: 'imsam@gmail.com',
+      contact: '+919513489402',
       tokens: { entity: 'collection', count: 0, items: [] },
       customer_id: 'cust_FrRYGeH37AL4sU',
     },
@@ -3631,7 +3663,7 @@ const preferences = {
         },
       ],
     },
-    features: { dcc: true },
+    features: { dcc: false },
     org: {
       isOrgRazorpay: true,
       checkout_logo_url: 'https://cdn.razorpay.com/logo.png',

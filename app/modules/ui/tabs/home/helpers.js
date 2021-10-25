@@ -2,6 +2,10 @@ import { isCardsSeparationExperimentEnabled } from 'experiments/all/cards-separa
 import { creditCardConfig, debitCardConfig } from './constants';
 import { isMethodEnabled } from 'checkoutstore/methods';
 
+// Dynamic Fee Bearer
+import { setDynamicFeeObject } from 'checkoutstore/dynamicfee';
+import { isDynamicFeeBearer } from 'checkoutstore/index';
+
 function getSplitConfig() {
   const config = [];
   if (isMethodEnabled('debit_card')) config.push(debitCardConfig);
@@ -26,6 +30,34 @@ export function updateBlocksForExperiments(allBlocks) {
         if (cardInstrumentIndex > -1) {
           instruments.splice(cardInstrumentIndex, 1, ...getSplitConfig());
         }
+      }
+    }
+  }
+}
+
+export function setDynamicFees(instrument, forType) {
+  if (isDynamicFeeBearer()) {
+    if (forType === 'rzpCluster') {
+      let types = ['debit_card', 'credit_card'];
+
+      let inst = types.includes(instrument?.method)
+        ? 'card'
+        : instrument?.method;
+      let type =
+        instrument?.method === 'debit_card'
+          ? 'debit'
+          : instrument?.method === 'credit_card'
+          ? 'credit'
+          : '';
+      if (inst !== 'card') {
+        return setDynamicFeeObject(inst);
+      }
+    }
+    if (forType === 'newList') {
+      let method = instrument?.method;
+      let type = instrument?.types?.[0] || '';
+      if (method !== 'card') {
+        return setDynamicFeeObject(method);
       }
     }
   }

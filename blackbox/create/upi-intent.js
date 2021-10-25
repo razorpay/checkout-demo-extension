@@ -7,6 +7,8 @@ const {
   // Generic
   verifyTimeout,
   handleFeeBearer,
+  assertDynamicFeeBearer,
+  modifyPreferencesForDynamicFeeBearer,
   submit,
   handleValidationRequest,
 
@@ -51,6 +53,7 @@ const {
   verifyMethodWarned,
   downtimeHighAlert,
 } = require('../tests/homescreen/actions');
+const { delay } = require('../../mock-api/utils.js');
 
 module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
@@ -70,8 +73,10 @@ module.exports = function (testFeatures) {
     optionalContact,
     optionalEmail,
     withApps = true,
+    dynamicFeeBearer,
   } = features;
 
+  const anyFeeBearer = feeBearer || dynamicFeeBearer;
   describe.each(
     getTestData(title, {
       options,
@@ -86,7 +91,11 @@ module.exports = function (testFeatures) {
           preferences.customer.contact = '+918888888881';
         }
       }
-
+      if (dynamicFeeBearer) {
+        preferences.fee_bearer = true;
+        let order = modifyPreferencesForDynamicFeeBearer();
+        preferences.order = { ...preferences.order, ...order };
+      }
       await page.evaluateOnNewDocument(() => {
         class PaymentRequest {
           constructor() {}
@@ -155,7 +164,10 @@ module.exports = function (testFeatures) {
       } else if (!isHomeScreenSkipped) {
         await proceed(context);
       }
-
+      await delay(2000);
+      if (dynamicFeeBearer) {
+        await assertDynamicFeeBearer(context, 1, true);
+      }
       if (!missingUserDetails) {
         await assertUserDetails(context);
         await assertEditUserDetailsAndBack(context);
@@ -181,7 +193,7 @@ module.exports = function (testFeatures) {
         return;
       }
 
-      if (feeBearer) {
+      if (anyFeeBearer) {
         await verifyFooterText(context, 'PAY');
       }
 
@@ -206,7 +218,7 @@ module.exports = function (testFeatures) {
         await downtimeHighAlert(context);
       }
 
-      if (feeBearer) {
+      if (anyFeeBearer) {
         await delay(200);
         await handleFeeBearer(context, page);
       }

@@ -4,6 +4,8 @@ const { openCheckoutWithNewHomeScreen } = require('../tests/homescreen/open');
 const {
   // Generic
   handleFeeBearer,
+  assertDynamicFeeBearer,
+  modifyPreferencesForDynamicFeeBearer,
   handleValidationRequest,
   typeOTPandSubmit,
   expectRedirectWithCallback,
@@ -32,8 +34,9 @@ const {
   // Partial Payments
   handlePartialPayment,
 } = require('../tests/homescreen/actions');
+const { delay } = require('../util.js');
 
-module.exports = function(testFeatures) {
+module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'pay-later',
     testFeatures
@@ -45,6 +48,7 @@ module.exports = function(testFeatures) {
     callbackUrl,
     optionalContact,
     optionalEmail,
+    dynamicFeeBearer,
   } = features;
 
   describe.each(
@@ -55,7 +59,10 @@ module.exports = function(testFeatures) {
   )('PayLater tests', ({ preferences, title, options }) => {
     test(title, async () => {
       preferences.methods.paylater = { epaylater: true };
-
+      if (dynamicFeeBearer) {
+        preferences.fee_bearer = true;
+        preferences.order = modifyPreferencesForDynamicFeeBearer();
+      }
       const context = await openCheckoutWithNewHomeScreen({
         page,
         options,
@@ -79,6 +86,10 @@ module.exports = function(testFeatures) {
       } else if (!isHomeScreenSkipped) {
         await proceed(context);
       }
+      await delay(2000);
+      if (dynamicFeeBearer) {
+        await assertDynamicFeeBearer(context, 1, true);
+      }
 
       if (!missingUserDetails) {
         await assertUserDetails(context);
@@ -96,7 +107,7 @@ module.exports = function(testFeatures) {
       await handlePayLaterOTPOrCustomerCardStatusRequest(context);
       await typeOTPandSubmit(context, '333333');
       await handlePayLaterOTPOrCustomerCardStatusRequest(context);
-      if (feeBearer) {
+      if (feeBearer || dynamicFeeBearer) {
         await handleFeeBearer(context);
       }
       if (callbackUrl) {

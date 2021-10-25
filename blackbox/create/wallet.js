@@ -5,6 +5,8 @@ const {
   // Generic
   verifyTimeout,
   handleFeeBearer,
+  assertDynamicFeeBearer,
+  modifyPreferencesForDynamicFeeBearer,
   submit,
   handleValidationRequest,
   expectRedirectWithCallback,
@@ -76,8 +78,10 @@ module.exports = function (testFeatures = {}) {
     amountAboveLimit = false,
     withSiftJS,
     dynamicWalletFlow = false,
+    dynamicFeeBearer,
   } = features;
 
+  const anyFeeBearer = feeBearer || dynamicFeeBearer;
   // Paypal Currency Conversion
   const isPaypalCC = testFeatures.paypalcc;
   if (isPaypalCC && personalization) {
@@ -91,7 +95,11 @@ module.exports = function (testFeatures = {}) {
   if (dynamicWalletFlow) {
     preferences.dynamic_wallet_flow = true;
   }
-
+  if (dynamicFeeBearer) {
+    preferences.fee_bearer = true;
+    let order = modifyPreferencesForDynamicFeeBearer();
+    preferences.order = { ...preferences.order, ...order };
+  }
   describe.each(
     getTestData(title, {
       options,
@@ -129,6 +137,10 @@ module.exports = function (testFeatures = {}) {
         await proceed(context);
       }
 
+      if (dynamicFeeBearer) {
+        await assertDynamicFeeBearer(context, 1);
+      }
+
       if (!missingUserDetails) {
         await assertUserDetails(context);
         await assertEditUserDetailsAndBack(context);
@@ -153,13 +165,13 @@ module.exports = function (testFeatures = {}) {
           (optionalContact && !callbackUrl)
         ) {
           await selectWallet(context, 'payzapp');
-          if (feeBearer) {
+          if (anyFeeBearer) {
             await verifyFooterText(context, 'PAY');
           }
         } else if (isPaypalCC) {
           // paypal currency
           await selectWallet(context, 'paypal');
-          if (feeBearer) {
+          if (anyFeeBearer) {
             await verifyFooterText(context, 'PAY');
           }
           // handle DCC flow
@@ -167,7 +179,7 @@ module.exports = function (testFeatures = {}) {
         } else {
           await selectWallet(context, 'freecharge');
         }
-        if (feeBearer) {
+        if (anyFeeBearer) {
           await verifyFooterText(context, 'PAY');
         }
       }
@@ -191,7 +203,7 @@ module.exports = function (testFeatures = {}) {
 
         return;
       }
-      if (feeBearer) {
+      if (feeBearer || dynamicFeeBearer) {
         await verifyFooterText(context, 'PAY');
       }
       await submit(context);
@@ -200,7 +212,7 @@ module.exports = function (testFeatures = {}) {
         return;
       }
 
-      if (feeBearer && !personalization) {
+      if (!personalization && anyFeeBearer) {
         await handleFeeBearer(context);
       }
 
@@ -303,12 +315,12 @@ module.exports = function (testFeatures = {}) {
           await typeOTPandSubmit(context);
           await handleValidationRequest(context, 'fail');
           await retryWalletTransaction(context);
-          if (feeBearer) {
+          if (anyFeeBearer) {
             await verifyFooterText(context, 'PAY');
           }
           await submit(context);
         }
-        if (feeBearer) {
+        if (anyFeeBearer) {
           await handleFeeBearer(context);
         }
         await handleOtpVerification(context);

@@ -6,6 +6,8 @@ const {
   // Generic
   verifyTimeout,
   handleFeeBearer,
+  assertDynamicFeeBearer,
+  modifyPreferencesForDynamicFeeBearer,
   selectCurrencyAndVerifyAmount,
   submit,
   handleValidationRequest,
@@ -74,6 +76,7 @@ module.exports = function (testFeatures) {
     avs,
     avsPrefillFromSavedCard,
     withSiftJS,
+    dynamicFeeBearer,
   } = features;
 
   describe.each(
@@ -92,6 +95,10 @@ module.exports = function (testFeatures) {
           if (preferences.customer) {
             preferences.customer.contact = '+918888888881';
           }
+        }
+        if (dynamicFeeBearer) {
+          preferences.fee_bearer = true;
+          preferences.order = modifyPreferencesForDynamicFeeBearer();
         }
         const context = await openCheckoutWithNewHomeScreen({
           page,
@@ -117,7 +124,10 @@ module.exports = function (testFeatures) {
         } else if (!isHomeScreenSkipped) {
           await proceed(context);
         }
-
+        await delay(2000);
+        if (dynamicFeeBearer) {
+          await assertDynamicFeeBearer(context, 1);
+        }
         if (!missingUserDetails) {
           await assertUserDetails(context);
           await assertEditUserDetailsAndBack(context);
@@ -147,7 +157,7 @@ module.exports = function (testFeatures) {
           await delay(400);
         }
 
-        if (feeBearer) {
+        if (feeBearer || dynamicFeeBearer) {
           await verifyFooterText(context, 'PAY');
         }
 
@@ -193,7 +203,7 @@ module.exports = function (testFeatures) {
 
         await submit(context);
 
-        if (feeBearer) {
+        if (feeBearer || dynamicFeeBearer) {
           await handleFeeBearer(context);
         }
 
