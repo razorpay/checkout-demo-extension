@@ -96,8 +96,12 @@
    */
   function toDataUrl(src, callback, outputFormat, logoType) {
     var img = new window.Image();
-    img.setAttribute('crossOrigin', 'anonymous');
-    img.src = src;
+    img.crossOrigin = 'anonymous';
+    /**
+     * Fix CORS related issue for chromium based browser due to cache
+     * https://www.hacksoft.io/blog/handle-images-cors-error-in-chrome
+     */
+    img.src = src + '?' + new Date().getTime();
     if (!img) {
       onComplete();
     }
