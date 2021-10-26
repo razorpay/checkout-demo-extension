@@ -1317,6 +1317,13 @@ Session.prototype = {
     $('#form-cardless_emi input[name=ott]').val('');
 
     CardlessEmiStore.providerCode = providerCode;
+    /**
+     * Fix any cardless EMI(where EMI plan selected on checkout) provider selected from Home screen
+     * this.tab is coming as empty string...but its needed cardless_emi to fetch data for payment (getPayload)
+     */
+    if (!this.tab) {
+      this.tab = 'cardless_emi';
+    }
 
     $('#form-cardless_emi input[name=provider]').val(providerCode);
   },
@@ -4257,6 +4264,7 @@ Session.prototype = {
     }
     var screen = this.screen;
     var tab = this.tab;
+    var selectedInstrument = this.getSelectedPaymentInstrument();
 
     /**
      * The CTA for home screen is visible only on the new design. If it was
@@ -4309,8 +4317,6 @@ Session.prototype = {
     if (data.partial_payment) {
       delete data.partial_payment;
     }
-
-    var selectedInstrument = this.getSelectedPaymentInstrument();
 
     var AVSRequired = false;
     var AVSMap = discreet.storeGetter(CardScreenStore.AVSScreenMap) || {};
