@@ -381,8 +381,25 @@ function setSessionPreferences(session, preferences) {
         session.modal.hide();
       });
     }
+    /**
+     * Allow show retry button in iOS
+     * In Android on failure they send the error data via query param
+     * whereas iOS send via handleMessage({..., params: ""}) using params property.
+     * Before this fix, we read data from params and show the retry option but it immediately hide because of the missing check...
+     * there was a check that existed for android. So this fix just added the check
+     */
+    let params = {};
+    if (session.params) {
+      try {
+        if (typeof session.params === 'string') {
+          params = JSON.parse(session.params);
+        }
+      } catch (e) {
+        //
+      }
+    }
 
-    const retryErrorHandler = !!qpmap.error;
+    const retryErrorHandler = !!qpmap.error || !!params.error;
     bindI18nEvents(retryErrorHandler, qpmap);
   });
 }
