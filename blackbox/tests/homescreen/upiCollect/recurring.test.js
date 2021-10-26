@@ -5,20 +5,14 @@ const {
   selectUPIMethod,
   enterUPIAccount,
   handleUPIAccountValidation,
-  handleSaveVpaRequest,
   respondToUPIAjax,
   respondToUPIPaymentStatus,
-  selectUPIPspBank,
 } = require('../../../actions/common');
 
 const {
   assertBasicDetailsScreen,
   fillUserDetails,
   proceed,
-  assertUserDetails,
-  assertPaymentMethods,
-  selectPaymentMethod,
-  assertEditUserDetailsAndBack,
 } = require('../actions');
 
 describe.each(
@@ -54,8 +48,6 @@ describe.each(
     });
     await assertBasicDetailsScreen(context);
     await fillUserDetails(context);
-    await proceed(context);
-    await selectUPIPspBank(context);
     await proceed(context);
     await selectUPIMethod(context, 'new');
     await enterUPIAccount(context, 'saranshgupta1995@okaxis');

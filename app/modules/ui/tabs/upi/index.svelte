@@ -135,9 +135,11 @@
     preUpiPspBankSelection: 'pre-upi-bank-selection',
   };
 
-  let requiresBankSelection = !!(
-    isUpiRecurringCAW || isUpiRecurringSubscription
-  );
+  /**
+   * bankselection is disabled for UPI recurring
+   * https://jira.corp.razorpay.com/browse/CE-4110
+   */
+  let requiresBankSelection = false;
   let upiFlowStep = steps.upi;
   let selectedBankForRecurring = null;
 

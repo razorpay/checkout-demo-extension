@@ -7,7 +7,6 @@ const {
   handleUPIAccountValidation,
   respondToUPIAjax,
   respondToUPIPaymentStatus,
-  selectUPIPspBank,
   goBackFromTopbar,
   verifyFooterText,
   handleFeeBearer,
@@ -63,8 +62,8 @@ describe.each(
     //#endregion
 
     await proceed(context);
-    await selectUPIPspBank(context);
-    await proceed(context);
+    // await selectUPIPspBank(context);
+    // await proceed(context);
     await selectUPIMethod(context, 'new');
     await enterUPIAccount(context, 'saranshgupta1995@okaxis');
     await submit(context);
