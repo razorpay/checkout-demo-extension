@@ -43,6 +43,7 @@
   // Utils imports
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
+  import CardEvents from 'analytics/card';
   import { getSession } from 'sessionmanager';
   import { getCardMetadata } from 'common/card';
 
@@ -82,6 +83,12 @@
   $: otpPromptVisible = !$action && !$loading;
 
   $: compact = $mode === 'HDFC_DC' || ($ipAddress && $accessTime);
+
+  $: if ($action === 'paypal') {
+    Analytics.track(CardEvents.SHOW_PAYPAL_RETRY_ON_OTP_SCREEN, {
+      immediately: true,
+    });
+  }
 
   $: {
     /**

@@ -383,6 +383,12 @@ function errorHandler(response) {
     this.ajaxErrorMetadata = error.metadata;
   }
 
+  Analytics.track('error:metadata', {
+    data: {
+      errorMetadata: error.metadata,
+    },
+  });
+
   // Both checks are there because API still returns message in English.
   if (message === cancelMsg || message === discreet.cancelMsg) {
     if (this.powerwallet) {
@@ -481,9 +487,8 @@ function errorHandler(response) {
 
   NBHandlers.replaceRetryIfCorporateNetbanking(this, message);
 
-  if (message !== cancelMsg && message !== discreet.cancelMsg) {
-    CommonHandlers.addRetryPaymentMethodOnErrorModal.call(this, error.metadata);
-  }
+  // Conditionally replace retry button with Pay with Paypal depending on error metadata
+  CommonHandlers.addRetryPaymentMethodOnErrorModal.call(this, error.metadata);
 }
 
 /* bound with session */
@@ -1715,7 +1720,6 @@ Session.prototype = {
    * this method is being used on OTP screen
    */
   retryWithPaypal: function () {
-    Analytics.track('paypal_retry:paypal_click');
     if (this.screen !== 'wallet') {
       // switch to wallet tab and select paypal
       if (this.svelteCardTab) {
@@ -1728,6 +1732,13 @@ Session.prototype = {
     } else {
       this.back();
     }
+
+    Analytics.track('paypal_retry:paypal_click', {
+      data: {
+        currentScreen: this.screen,
+      },
+      immediately: true,
+    });
   },
 
   setOtpScreen: function () {
@@ -1746,8 +1757,12 @@ Session.prototype = {
             secondary: bind(this.secAction, this),
             retryWithPaypal: bind(this.retryWithPaypal, this),
             cancelRetryWithPaypal: bind(function () {
-              Analytics.track('paypal_retry:cancel_click');
               this.back();
+              Analytics.track('paypal_retry:cancel_click', {
+                data: {
+                  currentScreen: this.screen,
+                },
+              });
             }, this),
           },
         },

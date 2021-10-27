@@ -81,6 +81,12 @@ export function shouldRetryWithPaypal(errorMetadata) {
       return wallet.code === wallets.paypal.code;
     }).length > 0;
 
+  Analytics.track(CardEvents.PAYPAL_RETRY_PAYPAL_ENABLED, {
+    data: {
+      paypalEnable: isPaypalEnabled,
+    },
+  });
+
   return isPaypalEnabled && hasPaypalOptionInErrorMetadata(errorMetadata);
 }
 
@@ -128,7 +134,6 @@ export function addRetryPaymentMethodOnErrorModal(errorMetadata) {
     var that = this;
 
     paypalBtn.addEventListener('click', function () {
-      Analytics.track(CardEvents.PAYPAL_RETRY_PAYPAL_BTN_CLICK);
       that.hideErrorMessage();
       if (that.screen !== 'wallet') {
         // switch to wallet tab and select paypal
@@ -140,6 +145,13 @@ export function addRetryPaymentMethodOnErrorModal(errorMetadata) {
           that.walletTab.onWalletSelection(wallets.paypal.code);
         }
       }
+
+      Analytics.track(CardEvents.PAYPAL_RETRY_PAYPAL_BTN_CLICK, {
+        data: {
+          currentScreen: this.screen,
+        },
+        immediately: true,
+      });
     });
 
     // create cancel button
@@ -155,11 +167,18 @@ export function addRetryPaymentMethodOnErrorModal(errorMetadata) {
     errorMessageContainer.appendChild(paypalContainer);
 
     cancelBtn.addEventListener('click', function () {
-      Analytics.track(CardEvents.PAYPAL_RETRY_CANCEL_BTN_CLICK);
+      Analytics.track(CardEvents.PAYPAL_RETRY_CANCEL_BTN_CLICK, {
+        currentScreen: that.screen,
+      });
       that.hideErrorMessage.call(that);
     });
 
     // Track paypal button visible on UI
-    Analytics.track(CardEvents.SHOW_PAYPAL_RETRY_SCREEN);
+    Analytics.track(CardEvents.SHOW_PAYPAL_RETRY_SCREEN, {
+      data: {
+        errorMetadata,
+      },
+      immediately: true,
+    });
   }
 }
