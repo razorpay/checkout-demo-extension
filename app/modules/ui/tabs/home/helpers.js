@@ -1,6 +1,9 @@
+import { get } from 'svelte/store';
 import { isCardsSeparationExperimentEnabled } from 'experiments/all/cards-separation';
 import { creditCardConfig, debitCardConfig } from './constants';
 import { isMethodEnabled } from 'checkoutstore/methods';
+
+import { blocks } from 'checkoutstore/screens/home';
 
 // Dynamic Fee Bearer
 import { setDynamicFeeObject } from 'checkoutstore/dynamicfee';
@@ -33,6 +36,12 @@ export function updateBlocksForExperiments(allBlocks) {
       }
     }
   }
+}
+
+export function getAvailableMethods() {
+  return get(blocks).map((block) =>
+    block.instruments.map((instrument) => instrument.method)
+  );
 }
 
 export function setDynamicFees(instrument, forType) {

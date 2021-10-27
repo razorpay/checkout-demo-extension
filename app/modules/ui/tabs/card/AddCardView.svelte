@@ -42,6 +42,7 @@
     getCardFeatures,
     getRecurringMethods,
     isOfferForced,
+    isIndianCustomer,
   } from 'checkoutstore';
   import { isDynamicFeeBearer } from 'checkoutstore/index';
   import { dynamicFeeObject, showFeesIncl } from 'checkoutstore/dynamicfee';
@@ -64,7 +65,7 @@
   } from 'card/i18n/labels';
 
   // Utils
-  import Analytics, { CardEvents, Events } from 'analytics';
+  import Analytics, { CardEvents, Events } from 'analytics/index';
   import * as AnalyticsTypes from 'analytics-types';
   import {
     getIin,
@@ -91,7 +92,7 @@
   export let isCardSupportedForRecurring;
   const isSavedCardsEnabled = shouldRememberCustomer();
 
-  const showRememberCardCheck = isSavedCardsEnabled;
+  const showRememberCardCheck = isSavedCardsEnabled && $isIndianCustomer;
 
   let cvvLength = 3;
   let showCardUnsupported = false;

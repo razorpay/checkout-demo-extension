@@ -1,3 +1,8 @@
+import address from 'one_click_checkout/address/i18n/en';
+import coupons from 'one_click_checkout/coupons/i18n/en';
+import loader from 'one_click_checkout/loader/i18n/en';
+import summary_modal from 'one_click_checkout/summary_modal/i18n/en';
+import details_modal from 'ui/i18n/details_modal';
 import cardLang from 'card/i18n/en';
 
 export default {
@@ -546,6 +551,7 @@ export default {
     upload_nach_form: 'Upload NACH Form',
     verify: 'Verify',
     view_emi_plans: 'View EMI Plans',
+    proceed_payment: 'Proceed to Payment',
   },
   dcc: {
     search_all: 'All currencies',
@@ -682,6 +688,9 @@ export default {
     gst_label: 'GST on {label}',
     loading_message: 'Loading fees breakup...',
     total_charges_label: 'Total Charges',
+    shipping_charges_label: 'Shipping Charges',
+    cod_charges_label: 'COD Charge',
+    coupon_discount_label: 'Coupon {code}',
   },
   home: {
     account_numer_label: 'Account Number',
@@ -702,6 +711,8 @@ export default {
     email_label_required: 'Email',
     full_amount_label: 'Pay in full',
     ifsc_label: 'IFSC Code',
+    mandatory_login_callout:
+      'We will use this information to process your order',
     min_amount_label: 'Minimum first amount',
     multi_tpv_netbanking_title: 'A/C: {accountNumber}',
     multi_tpv_title: 'Pay Using',
@@ -760,6 +771,10 @@ export default {
       upi: 'Google Pay, PhonePe & more',
       upi_otm: 'Pay later using BHIM',
       upi_recurring: 'Pay using Amazon Pay, PhonePe, PayTM or BHIM',
+      cod: 'Pay at the time of delivery',
+      cod_charge: '{charge} extra charge applicable.',
+      cod_charge_applied: '{charge} cash on delivery charge added',
+      cod_charge_removed: '{charge} cash on delivery charge removed',
     },
     prefixes: {
       bank_transfer: 'Bank Transfer',
@@ -778,6 +793,7 @@ export default {
       upi: 'UPI',
       upi_otm: 'UPI OTM',
       wallet: 'Wallets',
+      cod: 'COD',
     },
     titles: {
       bank_transfer: 'Bank Transfer',
@@ -802,6 +818,7 @@ export default {
       upi_otm: 'UPI OTM',
       upiqr: 'UPI / QR',
       wallet: 'Wallet',
+      cod: 'Cash On Delivery',
     },
   },
   misc: {
@@ -819,6 +836,7 @@ export default {
       '{method} are facing temporary issues right now.',
     downtime_single_method: '{method} is facing temporary issues right now.',
     error_handling_request: 'There was an error in handling your request.',
+    edit_contact_action: 'Edit contact details',
     frequently_used_config_title: 'Frequently used methods',
     go_to_payment: 'Go to payment',
     list_multiple_combined: '{init}, and {last}',
@@ -915,14 +933,25 @@ export default {
       resend_otp: 'Resend OTP',
       skip_saved_cards: 'Skip Saved Cards',
       skip_saving_card: 'Skip saving card',
+      skip_saved_address: 'Skip',
+    },
+    heading: {
+      mandate_login: 'Verify Mobile Number',
+      access_saved_addresses: 'Save Address',
     },
     title: {
+      access_saved_addresses:
+        'To use your saved addresses, enter the OTP sent to <strong>{phone}</strong>',
+      address:
+        'To use this address for future orders, enter the OTP sent to <strong>{phone}</strong>',
       cardlessemi_plans:
         'Enter the OTP sent on {phone} to get EMI plans for {provider}',
       cardlessemi_sending:
         'Looking for {provider} account associated with {phone}',
-      incorrect_otp_retry: 'Entered OTP was incorrect. Re-enter to proceed.',
+      incorrect_otp_retry: 'Incorrect OTP. Try again.',
       loading: 'Loading...',
+      mandate_login:
+        'A text message with an OTP has been sent to <strong>{phone}</strong>',
       otp_proceed_with_upi_subscription:
         'Enter OTP sent to {phone} to proceed with the subscription',
       otp_resent_generic: 'OTP Resent',
@@ -942,11 +971,14 @@ export default {
       payment_processing: 'Your payment is being processed',
       resending_otp: 'Resending OTP...',
       saved_cards_sending: 'Looking for saved cards associated with {phone}',
+      saved_addresses_sending:
+        'Looking for saved addresses associated with {phone}',
       verifying_otp: 'Verifying OTP...',
       wallet_insufficient_balance: 'Insufficient balance in your wallet',
       wallet_sending: 'Looking for {wallet} account associated with {phone}',
     },
     try_different_label: 'Try different payment method',
+    invalid_label: 'Invalid OTP, kindly correct.',
     misc: {
       security_text:
         'Your transaction is processed through a secure 128 bit https internet connection based on secure socket layer technology. For security purpose, your IP address {ipAddress} and access time {accessTime} have been logged.',
@@ -1029,6 +1061,11 @@ export default {
     upi: 'UPI',
     upi_otm: 'UPI Mandate',
     wallet: 'Wallet',
+    address: 'Address',
+    methods: 'Back',
+    coupons: 'Back',
+    details: 'Back',
+    billingAddress: 'Address',
   },
   upi: {
     cancel_reason_back_action: 'Back',
@@ -1201,5 +1238,13 @@ export default {
       'Help people in need of oxygen cylinders or food by sharing a small contribution towards organisations like Hemkunt Foundation and others.',
     redirection_text:
       'Redirecting to {merchantName} in {secondsRemaining} seconds',
+  },
+  address,
+  coupons,
+  loader,
+  details_modal,
+  summary_modal,
+  cod: {
+    disabled_label: 'Not available',
   },
 };

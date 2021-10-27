@@ -1,6 +1,7 @@
 <script>
   // Utils
   import { isContactReadOnly } from 'checkoutstore';
+  import { createEventDispatcher } from 'svelte';
   import { findCountryCode } from 'common/countrycodes';
 
   // UI imports
@@ -38,6 +39,9 @@
   export let country;
   export let phone;
   export let isOptional;
+  export let inAddress = false;
+
+  const dispatch = createEventDispatcher();
 
   const COUNTRY_CODE_REGEX = isOptional ? '.*' : COUNTRY_CODE_PATTERN;
   const searchIdentifier = `country_code_select_${Track.makeUid()}`; // Add a UUID since this field can exist in multiple places
@@ -192,6 +196,8 @@
     on:blur
     value={country}
     helpText={$t(COUNTRY_HELP_TEXT)}
+    elemClasses={inAddress ? 'address-elem' : ''}
+    labelClasses={inAddress ? 'address-label' : ''}
   />
   <!-- LABEL: Please enter a valid country code -->
 
@@ -215,6 +221,8 @@
     on:blur
     value={phone}
     helpText={$t(CONTACT_HELP_TEXT)}
+    elemClasses={inAddress ? 'address-elem' : ''}
+    labelClasses={inAddress ? 'address-label' : ''}
   />
   <!-- LABEL: Please enter a valid contact number -->
 </div>
@@ -232,6 +240,10 @@
   on:close={closeSearch}
   on:select={({ detail }) => {
     country = `+${detail.country_code}`;
+    dispatch('countrySelect', {
+      country_code: country,
+      country: detail.country,
+    });
     closeCountryCodeModal();
   }}
 />

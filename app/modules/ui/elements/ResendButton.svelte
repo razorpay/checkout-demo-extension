@@ -4,20 +4,32 @@
   import { createEventDispatcher, onDestroy } from 'svelte';
 
   // i18n
-  import { t, locale } from 'svelte-i18n';
-
+  import { t } from 'svelte-i18n';
   import { RESEND_LABEL } from 'ui/labels/otp';
+
+  // Utils imports
+  import { formatToMMSS } from 'utils/date';
+
+  import { resendTimeout } from 'checkoutstore/screens/otp';
+  import { isOneClickCheckout } from 'checkoutstore';
 
   const dispatch = createEventDispatcher();
 
   export let id;
-  export let resendTimeout = 0;
 
   // Local
   let interval;
-  let secondsLeft = Math.floor((resendTimeout - Date.now()) / 1000);
-  let secondsLeftText = secondsLeft > 0 ? `(${secondsLeft})` : '';
-  let disabled = secondsLeft > 0;
+
+  let secondsLeft;
+  $: secondsLeft = Math.floor(($resendTimeout - Date.now()) / 1000);
+
+  let secondsLeftText;
+  $: secondsLeftText = secondsLeft > 0 ? `(${secondsLeft})` : '';
+
+  let disabled = false;
+  secondsLeft > 0;
+
+  $: disabled = secondsLeft > 0 && isOneClickCheckout();
 
   function invokeResend(event) {
     if (!disabled) {
@@ -38,20 +50,37 @@
     }, 1000);
   }
 
-  startTimer();
+  // No need to call startTimer if the button is not disabled
+  $: {
+    if (disabled) {
+      startTimer();
+    }
+  }
 
   onDestroy(function () {
     clearInterval(interval);
   });
 </script>
 
-<LinkButton {id} {disabled} on:click={(event) => invokeResend(event, 'resend')}>
-  {$t(RESEND_LABEL)}
-  {#if secondsLeftText}<span>{secondsLeftText}</span>{/if}
-</LinkButton>
+{#if disabled}
+  <div class="timer-container">
+    <div class="spinner" />
+    <span>{formatToMMSS(secondsLeft)}</span>
+  </div>
+{:else}
+  <LinkButton
+    {id}
+    {disabled}
+    on:click={(event) => invokeResend(event, 'resend')}
+  >
+    {$t(RESEND_LABEL)}
+    {#if secondsLeftText}<span>{secondsLeftText}</span>{/if}
+  </LinkButton>
+{/if}
 
 <style>
-  span {
-    color: #000;
+  .timer-container {
+    display: flex;
+    align-items: center;
   }
 </style>

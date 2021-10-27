@@ -1,4 +1,7 @@
 <script>
+  // Svelte Imports
+  import { onMount } from 'svelte';
+
   // Store Imports
   import { getWallets } from 'checkoutstore/methods';
   import { showCta, hideCta } from 'checkoutstore/cta';
@@ -13,6 +16,7 @@
   // Utils imports
   import { getSession } from 'sessionmanager';
   import Analytics from 'analytics';
+  import WALLET_EVENTS from 'ui/tabs/wallets/events';
   import * as AnalyticsTypes from 'analytics-types';
   import * as WalletsData from 'common/wallet';
   import { getAnimationOptions } from 'svelte-utils';
@@ -147,6 +151,10 @@
       session.walletOffer
     );
   }
+
+  onMount(() => {
+    Analytics.track(WALLET_EVENTS.SCREEN_LOAD);
+  });
 </script>
 
 <Tab method="wallet">

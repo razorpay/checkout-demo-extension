@@ -191,6 +191,7 @@ const DESCRIPTIONS = {
       2
     ),
   upi_otm: (locale) => getRawMethodDescription('upi_otm', locale),
+  cod: (locale) => getRawMethodDescription('cod', locale),
 };
 
 /**

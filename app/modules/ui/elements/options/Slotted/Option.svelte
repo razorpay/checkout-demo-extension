@@ -29,6 +29,7 @@
     <div>
       <slot name="title" />
       <slot name="subtitle" />
+      <slot name="error" />
     </div>
     <slot name="extra" />
   </Stack>
@@ -52,12 +53,11 @@
   }
 
   button:disabled {
-    background-color: #f7f7f7;
     cursor: not-allowed;
   }
 
   button:disabled > :global(.stack > [slot='icon']) {
-    opacity: 0.3;
+    opacity: 0.4;
   }
 
   div {

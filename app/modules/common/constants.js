@@ -76,6 +76,7 @@ export const DEFAULT_AUTH_TYPE_RADIO = 'c3ds';
 /* The below array determines the order of payment methods shown in the homescreen */
 export const AVAILABLE_METHODS = [
   'card',
+  'cod',
   'upi',
   'netbanking',
   'wallet',

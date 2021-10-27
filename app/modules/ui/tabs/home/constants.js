@@ -1,3 +1,10 @@
+export const HOME_VIEWS = {
+  METHODS: 'methods',
+  ADDRESS: 'address',
+  DETAILS: 'details',
+  COUPONS: 'coupons',
+  OTP: 'otp',
+};
 export const debitCardConfig = {
   _ungrouped: [
     {

@@ -33,6 +33,8 @@
     QR_SCAN_ON_PHONE,
   } from 'ui/labels/qr';
 
+  import UPI_EVENTS from 'ui/tabs/upi/events';
+
   // Props
   export let view = 'qr';
   export let paymentData;
@@ -82,6 +84,9 @@
   }
 
   function onError(data) {
+    Analytics.track(UPI_EVENTS.QR_GENERATION_FAIL, {
+      reason: data.error.description,
+    });
     view = 'error';
     error = data.error.description;
     loading = false;

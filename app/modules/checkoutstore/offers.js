@@ -114,3 +114,8 @@ export const amountAfterOffer = derived(
     return getAmount();
   }
 );
+
+/**
+ * Store to control the visiblitity of offers tab
+ */
+export const showOffers = writable(true);

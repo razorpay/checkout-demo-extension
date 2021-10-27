@@ -50,13 +50,12 @@ module.exports = function (testFeatures) {
   )('International PayPal Payments', ({ preferences, title, options }) => {
     test(title, async () => {
       preferences.methods.wallet.paypal = true;
-
       const context = await openCheckoutWithNewHomeScreen({
         page,
         options,
         preferences,
+        withSiftJS: false,
       });
-
       const missingUserDetails = optionalContact && optionalEmail;
 
       const isHomeScreenSkipped = missingUserDetails && !partialPayment; // and not TPV

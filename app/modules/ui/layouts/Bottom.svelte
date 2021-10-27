@@ -2,7 +2,13 @@
   export let tab;
 
   function replaceNode(node) {
-    document.querySelector('#bottom').appendChild(node);
+    // Doing it for secured-message only, needed for 1CC
+    // TODO: test and go it for all cases
+    // const element = document.getElementById(node?.firstElementChild?.id);
+    const element = document.getElementById('secured-message');
+    if (!element || tab !== 'home-1cc') {
+      document.querySelector('#bottom').appendChild(node);
+    }
 
     return {
       destroy() {

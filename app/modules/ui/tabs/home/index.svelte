@@ -6,12 +6,15 @@
   import { replaceRetryButtonToDismissErrorMessage } from 'handlers/common';
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import NewMethodsList from 'ui/tabs/home/NewMethodsList.svelte';
-  import Icon from 'ui/elements/Icon.svelte';
   import PaymentDetails from 'ui/tabs/home/PaymentDetails.svelte';
   import CardOffer from 'ui/elements/CardOffer.svelte';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
   import TrustedBadge from 'ui/components/TrustedBadge.svelte';
-  import RewardsIcon from 'ui/components/rewards/Icon.svelte';
+  import Snackbar from 'ui/components/Snackbar.svelte';
+  import SecuredMessage from 'ui/components/SecuredMessage.svelte';
+  import { getAvailableMethods } from 'ui/tabs/home/helpers';
+
+  import { HOME_VIEWS } from './constants';
 
   // Svelte imports
   import { onMount, tick } from 'svelte';
@@ -38,20 +41,30 @@
     getOption,
     isDCCEnabled,
     getTrustedBadgeHighlights,
+    isIndianCustomer,
+    isOneClickCheckout,
   } from 'checkoutstore';
+  import {
+    isCodAddedToAmount,
+    codChargeAmount,
+    shippingCharge,
+    isShippingAddedToAmount,
+  } from 'one_click_checkout/charges/store';
 
   import { getUPIIntentApps } from 'checkoutstore/native';
-  import { reward } from 'checkoutstore/rewards';
+  import { blocks } from 'checkoutstore/screens/home';
 
   // i18n
   import {
     PARTIAL_AMOUNT_EDIT_LABEL,
     PARTIAL_AMOUNT_STATUS_FULL,
     PARTIAL_AMOUNT_STATUS_PARTIAL,
-    SECURED_BY_MESSAGE,
     TPV_METHODS_NOT_AVAILABLE,
   } from 'ui/labels/home';
-
+  import {
+    SHIPPING_CHARGES_LABEL,
+    SAVED_ADDRESS_LABEL,
+  } from 'one_click_checkout/address/i18n/labels';
   import { t, locale } from 'svelte-i18n';
 
   // Utils imports
@@ -61,8 +74,6 @@
     isPartialPayment as getIsPartialPayment,
     isContactOptional,
     isEmailOptional,
-    isContactHidden,
-    isEmailHidden,
     isContactEmailOptional,
     isContactEmailHidden,
     isContactEmailReadOnly,
@@ -78,6 +89,15 @@
     isEMandateBankEnabled,
     getTPV,
   } from 'checkoutstore/methods';
+
+  import {
+    selectedAddress as selectedShippingAddress,
+    isBillingSameAsShipping,
+    isCodAvailable,
+    didSaveAddress,
+    codReason,
+  } from 'one_click_checkout/address/store';
+  import { selectedAddress as selectedBillingAddress } from 'one_click_checkout/address/billing_address/store';
 
   import {
     getInstrumentsForCustomer,
@@ -120,15 +140,22 @@
   } from 'common/constants';
   import { getAnimationOptions } from 'svelte-utils';
 
-  import { setBlocks } from 'ui/tabs/home/instruments';
+  import { configureCODOrder, setBlocks } from 'ui/tabs/home/instruments';
 
   import { update as updateContactStorage } from 'checkoutframe/contact-storage';
   import { isMobile } from 'common/useragent';
+  import { remember } from 'checkoutstore/screens/card';
+
+  import { formatTemplateWithLocale } from 'i18n';
+  import { updateOrder } from 'one_click_checkout/address/service';
+  import UserDetailsStrip from 'ui/components/UserDetailsStrip.svelte';
+  import { showSummaryModal } from 'one_click_checkout/summary_modal';
 
   const cardOffer = getCardOffer();
   const session = getSession();
-  const icons = session.themeMeta.icons;
   const singleMethod = getSingleMethod();
+
+  let showHome = false;
 
   // TPV
   const tpv = getTPV();
@@ -154,10 +181,10 @@
 
   // Prop that decides which view to show.
   // Values: 'details', 'methods'
-  let view = 'details';
+  let view = HOME_VIEWS.DETAILS;
   let showSecuredByMessage;
   $: showSecuredByMessage =
-    view === 'details' &&
+    view === HOME_VIEWS.DETAILS &&
     !showOffers &&
     !showRecurringCallout &&
     !tpv &&
@@ -165,7 +192,7 @@
     !session.get('address');
 
   export function showMethods() {
-    view = 'methods';
+    view = HOME_VIEWS.METHODS;
 
     onShown();
 
@@ -229,12 +256,11 @@
 
   export function hideMethods() {
     const active = document.activeElement;
-
     if (active) {
       active.blur();
     }
 
-    view = 'details';
+    view = HOME_VIEWS.DETAILS;
 
     setDetailsCta();
 
@@ -298,11 +324,15 @@
   }
 
   export function onMethodsScreen() {
-    return view === 'methods';
+    return view === HOME_VIEWS.METHODS;
   }
 
   export function onDetailsScreen() {
-    return view === 'details';
+    return view === HOME_VIEWS.DETAILS;
+  }
+
+  export function setView(passedView) {
+    view = passedView;
   }
 
   const USER_EXPERIMENT_CACHE = {};
@@ -471,12 +501,6 @@
     });
   }
 
-  $: {
-    if (view === 'methods') {
-      $customer = session.getCustomer($contact);
-    }
-  }
-
   // NOTE: updateBlocks is called multiple times (while showing loading, updating actual instrument)
   // but the analytics should be sent only once (when the preferred instruments displayed changes)
   // so maintaining a store with last updated vpas that updates only when the value changes
@@ -558,6 +582,9 @@
         },
         {}
       );
+      if (!$isCodAvailable) {
+        configureCODOrder($blocks);
+      }
 
       const allPreferredInstrumentsForCustomer =
         getAllInstrumentsForCustomer($customer);
@@ -595,7 +622,6 @@
     if (topbarRight) {
       _El.keepClass(topbarRight, 'logged', loggedIn);
     }
-
     const isPersonalizationEnabled = shouldUsePersonalization();
 
     const eligiblePreferredInstrumentsPromise = isPersonalizationEnabled
@@ -648,10 +674,54 @@
     return true;
   }
 
-  export function onShown() {
-    deselectInstrument();
+  export function addressNext() {
+    $isShippingAddedToAmount = true;
+    showHome = true;
+    let billing_address = $selectedBillingAddress;
+    if ($isBillingSameAsShipping) {
+      billing_address = $selectedShippingAddress;
+    }
+    if (!$isCodAvailable) {
+      configureCODOrder($blocks);
+    }
+    updateOrder($selectedShippingAddress, billing_address).then((response) => {
+      const charge = session.formatAmountWithCurrency($shippingCharge);
+      if ($shippingCharge) {
+        const text = $didSaveAddress
+          ? [
+              $t(SAVED_ADDRESS_LABEL),
+              formatTemplateWithLocale(
+                SHIPPING_CHARGES_LABEL,
+                { charge },
+                $locale
+              ),
+            ]
+          : formatTemplateWithLocale(
+              SHIPPING_CHARGES_LABEL,
+              { charge },
+              $locale
+            );
+        const snackBar = new Snackbar({
+          target: document.getElementById('form'),
+          props: {
+            align: 'bottom',
+            shown: true,
+            timer: 2000,
+            text: text,
+            class: 'snackbar-cod',
+          },
+        });
+      }
+      session.switchTab('');
+    });
+  }
 
-    if (view === 'methods') {
+  export function onShown() {
+    if (!isOneClickCheckout()) {
+      showHome = true;
+    }
+    deselectInstrument();
+    if (view === HOME_VIEWS.METHODS) {
       hideCta();
     } else {
       setDetailsCta();
@@ -659,15 +729,11 @@
   }
 
   /**
-   * Determines where a user should be if
-   * they were landing on the homescreen as the first screen.
+   * Determines if user contact and email is valid
    *
-   * @returns {string} view
+   * @returns {[boolean, boolean]}
    */
-  function determineLandingView() {
-    const DETAILS = 'details';
-    const METHODS = 'methods';
-
+  function validateEmailAndContact() {
     /**
      * Mark contact and email as invalid by default
      */
@@ -699,14 +765,26 @@
       isEmailValid = isEmailValid || EMAIL_REGEX.test($email);
     }
 
+    return [isContactValid, isEmailValid];
+  }
+
+  /**
+   * Determines where a user should be if
+   * they were landing on the homescreen as the first screen.
+   *
+   * @returns {string} view
+   */
+  function determineLandingView() {
+    const { DETAILS, METHODS } = HOME_VIEWS;
+    // return false;
     /**
      * If contact or email are invalid,
      * we need to get them corrected.
      */
+    const [isContactValid, isEmailValid] = validateEmailAndContact();
     if (!isContactValid || !isEmailValid) {
       return DETAILS;
     }
-
     /**
      * Need TPV selection from the details screen.
      */
@@ -721,12 +799,7 @@
       return DETAILS;
     }
 
-    /**
-     * Need address from the details screen.
-     */
-    if (isAddressEnabled()) {
-      return DETAILS;
-    }
+    // TODO: Add address condition
     if (isContactEmailHidden() && isContactEmailOptional()) {
       // when both are hidden details screen will be empty hence avoid it
       return METHODS;
@@ -752,6 +825,7 @@
         return METHODS;
       }
     }
+
     /**
      * If there are multple methods
      * and no validations have failed,
@@ -761,12 +835,16 @@
   }
 
   view = determineLandingView();
+
   Events.Track(HomeEvents.LANDING, {
     view,
     oneMethod: singleMethod,
   });
 
   function storeContactDetails() {
+    // Update save address/card checkbox
+    remember.set($isIndianCustomer);
+
     // Store only on mobile since Desktops can be shared b/w users
     if (isMobile()) {
       updateContactStorage({
@@ -776,9 +854,11 @@
     }
   }
 
-  export function next() {
-    Events.Track(HomeEvents.PROCEED);
-
+  export function next(forcedView) {
+    if (typeof forcedView === 'string' && forcedView) {
+      view = forcedView;
+      return;
+    }
     /**
      * - Store contact details only when the user has explicity clicked on the CTA
      * - `next()` is not invoked if the merchant had prefilled the user's details
@@ -820,6 +900,16 @@
     showMethods();
   }
 
+  $: {
+    if (view === HOME_VIEWS.METHODS) {
+      $customer = session.getCustomer($contact);
+    }
+  }
+
+  export function getCurrentView() {
+    return view;
+  }
+
   function createPaypalPayment() {
     // Deselct to hide Pay button
     deselectInstrument();
@@ -835,7 +925,42 @@
     $selectedInstrumentId = null;
   }
 
+  function showSnackbar(isCodApplied) {
+    const charge = session.formatAmountWithCurrency($codChargeAmount);
+    const template = isCodApplied
+      ? 'methods.descriptions.cod_charge_applied'
+      : 'methods.descriptions.cod_charge_removed';
+
+    const snackBar = new Snackbar({
+      target: document.getElementById('form'),
+      props: {
+        align: 'bottom',
+        shown: true,
+        timer: 2000,
+        text: formatTemplateWithLocale(template, { charge }, $locale),
+        class: 'snackbar-cod',
+      },
+    });
+  }
+
   export function selectMethod(method) {
+    Events.TrackMetric(HomeEvents.PAYMENT_METHOD_SELECTED);
+    if (method === 'cod') {
+      if ($codChargeAmount) {
+        showSnackbar(true);
+      }
+      $isCodAddedToAmount = true;
+      showSummaryModal(true);
+      return;
+    }
+
+    if ($isCodAddedToAmount) {
+      $isCodAddedToAmount = false;
+      if ($codChargeAmount) {
+        showSnackbar(false);
+      }
+    }
+
     if (method === 'paypal') {
       createPaypalPayment();
       return;
@@ -894,12 +1019,15 @@
   let showUserDetailsStrip;
   $: {
     showUserDetailsStrip =
-      ($isContactPresent || $email) && !isContactEmailHidden();
+      ($isContactPresent || $email) &&
+      !isContactEmailHidden() &&
+      !isOneClickCheckout();
   }
 
   let dccView = 'home-screen';
 
   export function onSelectInstrument(event) {
+    Events.TrackMetric(HomeEvents.PAYMENT_INSTRUMENT_SELECTED);
     const instrument = event.detail;
     updateScore('instrumentSelected');
 
@@ -936,15 +1064,25 @@
       }
     }
   }
+
+  $: {
+    if (view === HOME_VIEWS.METHODS) {
+      Events.TrackRender(HomeEvents.HOME_LOADED, {
+        cod_available: $isCodAvailable,
+        cod_unavailable_reason: $codReason,
+        available_methods: getAvailableMethods(),
+      });
+    }
+  }
 </script>
 
-<Tab method="common" overrideMethodCheck={true} shown={true} pad={false}>
+<Tab method="common" overrideMethodCheck={true} shown={showHome} pad={false}>
   <Screen pad={false}>
     <div class="screen-main">
-      {#if view === 'details'}
+      {#if view === HOME_VIEWS.DETAILS}
         <PaymentDetails {tpv} />
       {/if}
-      {#if view === 'methods'}
+      {#if view === HOME_VIEWS.METHODS}
         <div
           class="solidbg"
           in:slide={getAnimationOptions({ duration: 400 })}
@@ -960,22 +1098,7 @@
               in:fly={getAnimationOptions({ duration: 400, y: 80 })}
             >
               {#if showUserDetailsStrip}
-                <div class="details-strip border-list-horizontal">
-                  <SlottedOption on:click={editUserDetails} id="user-details">
-                    <i slot="icon">
-                      <Icon icon={icons.edit} />
-                    </i>
-                    <div slot="title">
-                      {#if $isContactPresent && !isContactHidden()}
-                        <span>{$contact}</span>
-                      {/if}
-                      {#if $email && !isEmailHidden()}<span>{$email}</span>{/if}
-                    </div>
-                  </SlottedOption>
-                  {#if $reward?.reward_id && !isEmailOptional()}
-                    <RewardsIcon />
-                  {/if}
-                </div>
+                <UserDetailsStrip onEdit={editUserDetails} />
               {/if}
               {#if isPartialPayment}
                 <SlottedOption
@@ -1012,6 +1135,7 @@
 
           <div
             class="home-methods"
+            class:home-methods-oneclickcheckout={isOneClickCheckout()}
             in:fly={getAnimationOptions({ delay: 100, duration: 400, y: 80 })}
           >
             <NewMethodsList
@@ -1043,39 +1167,7 @@
       {/if} -->
 
       {#if showSecuredByMessage}
-        <div
-          class="secured-message"
-          out:slide={getAnimationOptions({ duration: 100 })}
-        >
-          <i>
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
-                d="M12 5.33335H11.3333V4.00002C11.3333 2.16002 9.83999 0.666687
-                7.99999 0.666687C6.15999 0.666687 4.66666 2.16002 4.66666
-                4.00002V5.33335H3.99999C3.26666 5.33335 2.66666 5.93335 2.66666
-                6.66669V13.3334C2.66666 14.0667 3.26666 14.6667 3.99999
-                14.6667H12C12.7333 14.6667 13.3333 14.0667 13.3333
-                13.3334V6.66669C13.3333 5.93335 12.7333 5.33335 12
-                5.33335ZM7.99999 11.3334C7.26666 11.3334 6.66666 10.7334 6.66666
-                10C6.66666 9.26669 7.26666 8.66669 7.99999 8.66669C8.73332
-                8.66669 9.33332 9.26669 9.33332 10C9.33332 10.7334 8.73332
-                11.3334 7.99999 11.3334ZM6 4V5.33334H10V4C10 2.89334 9.10666 2 8
-                2C6.89333 2 6 2.89334 6 4Z"
-                fill="#A7A7A7"
-              />
-            </svg>
-          </i>
-          <!-- LABEL: This payment is secured by Razorpay. -->
-          {$t(SECURED_BY_MESSAGE)}
-        </div>
+        <SecuredMessage />
       {/if}
     </Bottom>
   </Screen>
@@ -1105,6 +1197,10 @@
     padding-left: 12px;
     padding-right: 12px;
     margin-top: 28px;
+  }
+
+  .home-methods-oneclickcheckout {
+    margin-top: 68px;
   }
 
   .details-container {

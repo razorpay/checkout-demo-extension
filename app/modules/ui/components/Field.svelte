@@ -42,6 +42,12 @@
   export let readonlyValue = value;
   export let prediction = false;
   export let downtimeSeverity;
+  export let validationText = '';
+  export let labelClasses = '';
+  export let extraLabel = '';
+  export let extraLabelClass = '';
+  export let forceStopDispatch = false;
+  export let loader = false;
   export let leftImage = null;
   export let dir;
   /**
@@ -127,7 +133,7 @@
     const _value = value;
 
     setTimeout(() => {
-      if (input) {
+      if (input && !forceStopDispatch) {
         let event;
 
         if (typeof global.Event === 'function') {
@@ -349,7 +355,15 @@
     class:no-validate={handleInput}
     class:cvv-input={type === 'cvv'}
   />
-  {#if label}<label>{label}</label>{/if}
+  {#if label}<label class={labelClasses}>{label}</label>{/if}
+  {#if extraLabel}
+    <div class={`${extraLabelClass} input-extralabel`}>
+      {extraLabel}
+    </div>
+  {/if}
+  {#if loader}
+    <div class="spinner input-loader" />
+  {/if}
   {#if helpText}
     <div class="help">{helpText}</div>
   {/if}
@@ -381,6 +395,9 @@
       {/each}
     </ul>
   {/if}
+  {#if validationText !== ''}
+    <div class="input-validation-error">{validationText}</div>
+  {/if}
 </div>
 
 <style>
@@ -390,7 +407,32 @@
       width: 100%;
     }
   }
-
+  .elem,
+  .elem.invalid.mature:not(.focused),
+  .input-validation-error {
+    border-bottom: 0px;
+  }
+  .input-validation-error {
+    color: #f46060;
+    margin-top: 4px;
+    font-size: 12px;
+  }
+  .input {
+    border-bottom: 1px solid #ebedf0;
+  }
+  .input-extralabel,
+  .input-loader {
+    position: absolute;
+    right: 0;
+    top: 33px;
+    font-size: 11px;
+  }
+  .successText {
+    color: #079f0d;
+  }
+  .failureText {
+    color: #ff5f00;
+  }
   .with-prediction {
     .prediction-input {
       opacity: 0.5 !important;
@@ -407,6 +449,7 @@
       color: black;
       opacity: 1;
       width: 100%;
+      position: relative;
     }
   }
 
@@ -430,9 +473,18 @@
       }
     }
   }
+  .address-elem {
+    margin-bottom: 12px;
+  }
+  .address-label {
+    top: 36px;
+  }
   .downtime-icon {
     float: right;
     margin-top: -24px;
+  }
+  .focused .address-label {
+    transform: scale(0.86) translateY(-30px);
   }
 
   .with-left-img {

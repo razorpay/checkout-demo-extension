@@ -1,11 +1,13 @@
 <script>
-  import { afterUpdate } from 'svelte';
+  import { afterUpdate, createEventDispatcher } from 'svelte';
   import { cta, isCtaShown, showCta, hideCta } from 'checkoutstore/cta';
 
   // if passed, creates an exclusive control on showing/hiding
   // of #footer for the lifecycle of <CTA>
   // expects Boolean
   export let show = true;
+  export let disabled = false;
+  const dispatch = createEventDispatcher();
 
   /**
    * on creation, we display the #footer to render this component in
@@ -34,7 +36,9 @@
 
     return {
       destroy() {
-        wasCtaShown ? showCta() : hideCta();
+        // Removing it as causing multiple CTA issues
+        // TODO: through testing
+        // wasCtaShown  ? showCta() : hideCta();
         _El.detach(node);
       },
     };
@@ -45,6 +49,13 @@
   });
 </script>
 
-<span use:replaceNode on:click>
+<span
+  use:replaceNode
+  on:click={(e) => {
+    if (disabled) return;
+    dispatch('click', e);
+  }}
+  class:disabled
+>
   <slot>{$cta}</slot>
 </span>

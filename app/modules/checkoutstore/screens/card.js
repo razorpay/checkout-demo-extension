@@ -1,11 +1,12 @@
-import { derived, writable } from 'svelte/store';
+import { derived, writable, get } from 'svelte/store';
 import { getIin, getCardType } from 'common/card';
+import { isIndianCustomer } from 'checkoutstore';
 
 export const cardNumber = writable('');
 export const cardCvv = writable('');
 export const cardExpiry = writable('');
 export const cardName = writable('');
-export const remember = writable(true);
+export const remember = writable(get(isIndianCustomer));
 export const authType = writable('c3ds');
 export const selectedCard = writable(null);
 export const selectedApp = writable(null);

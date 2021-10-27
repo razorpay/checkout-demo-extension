@@ -96,6 +96,8 @@ var preferences,
     discreet.trackUpiIntentInstrumentPaymentAttempted,
   CovidDonationView = discreet.CovidDonations,
   Header = discreet.Header,
+  address = discreet.address,
+  OneClickCheckoutStore = discreet.OneClickCheckoutStore,
   dynamicFeeObject = discreet.dynamicFeeObject;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
@@ -536,7 +538,7 @@ function elfShowOTP(otp, sender, bank) {
   window.handleOTP(otp);
 }
 
-function askOTP(view, textView, shouldLimitResend, templateData) {
+function askOTP(view, textView, shouldLimitResend, templateData, headingText) {
   var origText = textView; // ಠ_ಠ
   var qpmap = _.getQueryParams();
   var thisSession = SessionManager.getSession();
@@ -587,6 +589,7 @@ function askOTP(view, textView, shouldLimitResend, templateData) {
   var otpProperties = {
     loading: false,
     action: false,
+    digits: new Array(storeGetter(discreet.OTPScreenStore.maxlength)),
     otp: '',
     allowResend: shouldLimitResend ? OtpService.canSendOtp('razorpay') : true,
   };
@@ -705,6 +708,9 @@ function askOTP(view, textView, shouldLimitResend, templateData) {
     }
   }
 
+  view.updateScreen({
+    headingText: headingText,
+  });
   view.setTextView(textView, templateData);
 }
 
@@ -772,6 +778,14 @@ function Session(message) {
 }
 
 Session.prototype = {
+  showAmountInTopBar: function () {
+    $('#amount').show();
+  },
+
+  hideAmountInTopBar: function () {
+    $('#amount').hide();
+  },
+
   shouldUseNativeOTP: function () {
     return this.get('nativeotp') && this.r.isLiveMode();
   },
@@ -810,10 +824,8 @@ Session.prototype = {
     return amount;
   },
   setFeeLabel: function () {
-    if (Store.isCustomerFeeBearer()) {
-      FeeLabel.show({
-        isFeeBearer: true,
-      });
+    if (Store.isCustomerFeeBearer() || Store.isOneClickCheckout()) {
+      FeeLabel.show();
     }
   },
 
@@ -1180,6 +1192,9 @@ Session.prototype = {
     if (!Store.isPayout()) {
       this.fillData();
     }
+    if (Store.isOneClickCheckout()) {
+      this.switchTab('home-1cc');
+    }
     this.setEMI();
     Cta.init();
     this.completePendingPayment();
@@ -1205,6 +1220,9 @@ Session.prototype = {
 
     P13n.trackNumberOfP13nContacts();
 
+    // 1CC MetaProperties
+    this.addOneClickCheckoutMeta();
+
     // Analytics related to orientation
     Analytics.setMeta('orientation', Hacks.getDeviceOrientation());
     window.addEventListener('orientationchange', function () {
@@ -1227,20 +1245,59 @@ Session.prototype = {
       });
     }
 
-    Analytics.setMeta('is_donation_checkout', this.get('is_donation_checkout'));
-
     Analytics.track('complete', {
       type: AnalyticsTypes.RENDER,
       data: {
         embedded: this.embedded,
+        meta: {
+          first_screen: Store.isOneClickCheckout()
+            ? discreet.OneClickCheckoutInterface.getLandingView()
+            : this.homeTab.getCurrentView(),
+        },
       },
     });
     updateScore('timeToRender');
     Analytics.setMeta('timeSince.render', discreet.timer());
   },
 
+  addOneClickCheckoutMeta: function () {
+    // 1CC Specfic meta data
+    Analytics.setMeta(
+      discreet.OneClickCheckoutMetaProperties.ADDRESS_ENABLED,
+      this.get('show_address')
+    );
+    Analytics.setMeta(
+      discreet.OneClickCheckoutMetaProperties.COUPONS_ENABLED,
+      this.get('show_coupons')
+    );
+    Analytics.setMeta(
+      discreet.OneClickCheckoutMetaProperties.COD_ENABLED,
+      this.get('preferences.methods.cod') || false
+    );
+    Analytics.setMeta(
+      discreet.OneClickCheckoutMetaProperties.IS_THIRDWATCH_INSURED,
+      !this.get('force_cod')
+    );
+    Analytics.setMeta(
+      discreet.OneClickCheckoutMetaProperties.IS_MANDATORY_SIGNUP,
+      this.get('mandatory_login')
+    );
+    Analytics.setMeta(
+      discreet.OneClickCheckoutMetaProperties.IS_ONE_CLICK_CHECKOUT,
+      this.get('one_click_checkout')
+    );
+  },
+
   setHomeTab: function () {
     this.homeTab = new discreet.HomeTab({
+      target: gel('form-fields'),
+    });
+  },
+
+  setOneClickCheckoutHome: function () {
+    this.oneClickCheckoutHome = '';
+    discreet.RoutingStore.resetRouting();
+    this.oneClickCheckoutHome = new discreet.OneClickCheckoutHomeTab({
       target: gel('form-fields'),
     });
   },
@@ -1252,6 +1309,12 @@ Session.prototype = {
   setSvelteComponents: function () {
     this.setUpiCancelReasonPicker();
     this.setNbCancelReasonPicker();
+    var isCouponsOrAddressEnabled =
+      OneClickCheckoutStore.shouldShowCoupons() ||
+      OneClickCheckoutStore.shouldShowAddress();
+    if (Store.isOneClickCheckout() && isCouponsOrAddressEnabled) {
+      this.setOneClickCheckoutHome();
+    }
     if (!Store.isPayout()) {
       this.setHomeTab();
     }
@@ -1747,6 +1810,7 @@ Session.prototype = {
         target: gel('form-fields'),
 
         props: {
+          addShowableClass: true,
           on: {
             chooseMethod: bind(function () {
               this.switchTab();
@@ -2200,6 +2264,7 @@ Session.prototype = {
 
   setAmount: function (amount) {
     this.get().amount = amount;
+
     var offer = this.getAppliedOffer();
     this.updateAmountInHeader(amount);
     if (offer && offer.amount) {
@@ -2236,12 +2301,12 @@ Session.prototype = {
    * Logs the user out
    * @param {boolean} outOfAllDevices
    */
-  _logUserOut: function (customer, outOfAllDevices) {
+  _logUserOut: function (customer, outOfAllDevices, callback) {
     if (customer) {
       customer.logged = false;
       customer.tokens = null;
 
-      customer.logout(outOfAllDevices);
+      customer.logout(outOfAllDevices, callback);
     }
 
     this.topBar.setLogged(false);
@@ -2256,19 +2321,21 @@ Session.prototype = {
    * Logs user out of this device.
    * @param {Customer} customer
    */
-  logUserOut: function (customer) {
-    this._logUserOut(customer);
+  logUserOut: function (customer, callback) {
+    this._logUserOut(customer, false, callback);
   },
 
   /**
    * Logs user out of all devices.
    * @param {Customer} customer
    */
-  logUserOutOfAllDevices: function (customer) {
-    this._logUserOut(customer, true);
+  logUserOutOfAllDevices: function (customer, callback) {
+    this._logUserOut(customer, true, callback);
   },
 
-  bindEvents: function () {
+  bindEvents: function (selector) {
+    selector = selector || '#body';
+
     var self = this;
 
     // cultgear.com bug: no events register unless
@@ -2278,11 +2345,11 @@ Session.prototype = {
       document.removeEventListener('touchstart', UTILS.returnAsIs);
     });
 
-    this.on('focus', '#body', 'input', 'focus', true);
-    this.on('blur', '#body', 'input', 'blur', true);
+    this.on('focus', selector, 'input', 'focus', true);
+    this.on('blur', selector, 'input', 'blur', true);
     this.on(
       'input',
-      '#body',
+      selector,
       'input',
       function (e) {
         this.input(e.target);
@@ -2292,7 +2359,7 @@ Session.prototype = {
 
     this.on(
       'focus',
-      '#body',
+      selector,
       'selector',
       function (e) {
         $(e.target).addClass('focused');
@@ -2302,7 +2369,7 @@ Session.prototype = {
 
     this.on(
       'blur',
-      '#body',
+      selector,
       'selector',
       function (e) {
         $(e.target).removeClass('focused');
@@ -2506,6 +2573,7 @@ Session.prototype = {
 
   setScreen: function (screen, params) {
     var extraProps = params && params.extraProps;
+
     if (screen) {
       var tabForTitle = this.tab === 'emi' ? this.tab : this.cardTab || screen;
 
@@ -2565,7 +2633,6 @@ Session.prototype = {
     // if (this.screen !== 'otp' && screen === 'otp') {
     //   Store.showFeeLabel.set(true);
     // }
-
     if (extraProps) {
       trackingData = _Obj.extend(trackingData, extraProps);
     }
@@ -2579,15 +2646,21 @@ Session.prototype = {
     this.screen = screen;
     $('#body').attr('screen', screen);
     makeHidden('.screen.' + shownClass);
-
-    if (screen) {
-      this.topBar.show();
-      $('.elem-email').addClass('mature');
-      $('.elem-contact').addClass('mature');
-    } else {
+    if (screen === 'home-1cc') {
       this.topBar.hide();
+      discreet.OffersStore.showOffers.set(false);
+    } else {
+      discreet.OffersStore.showOffers.set(true);
+      if (screen) {
+        this.topBar.show();
+        $('.elem-email').addClass('mature');
+        $('.elem-contact').addClass('mature');
+      } else if (!Store.isOneClickCheckout()) {
+        this.topBar.hide();
+      } else if (Store.isOneClickCheckout()) {
+        this.showHomeTopBar();
+      }
     }
-
     var screenEl = '#form-' + (screen || 'common');
     makeVisible(screenEl);
 
@@ -2780,7 +2853,11 @@ Session.prototype = {
     var currency = this.get('currency') || 'INR';
     var amount;
     if (offer) {
-      amount = offer.amount;
+      if (Store.isOneClickCheckout()) {
+        amount = storeGetter(discreet.ChargesStore.amount);
+      } else {
+        amount = offer.amount;
+      }
     }
     if (this.dccPayload) {
       /** value of dccPayload set via DynamicCurrencyView.svelte */
@@ -2821,6 +2898,14 @@ Session.prototype = {
         ? discreet.Currency.formatAmountWithSymbol(amount, currency)
         : ''
     );
+    if (Store.isOneClickCheckout() && hasDiscount) {
+      var originalAmount = storeGetter(discreet.ChargesStore.cartAmount);
+      $('#amount .original-amount').html(
+        hasDiscount
+          ? discreet.Currency.formatAmountWithSymbol(originalAmount, currency)
+          : discreet.Currency.formatAmountWithSymbol(amount, currency)
+      );
+    }
     Cta.setAppropriateCtaText();
     Header.updateAmountFontSize();
   },
@@ -2917,6 +3002,16 @@ Session.prototype = {
       if (this.emandateView.onBack()) {
         return;
       }
+    } else if (!this.tab) {
+      if (discreet.OneClickCheckoutInterface.historyExists()) {
+        discreet.ChargesHelper.removeShippingCharges();
+        discreet.ChargesHelper.removeCodCharges();
+        discreet.OneClickCheckoutInterface.historyPop();
+        this.switchTab('home-1cc');
+        Cta.hideCta();
+        this.topBar.hide();
+        return;
+      }
     } else {
       if (this.get('theme.close_method_back')) {
         return this.modal.hide();
@@ -2935,7 +3030,6 @@ Session.prototype = {
       if (BackStore && BackStore.screen) {
         self.setScreen(BackStore.screen);
       }
-
       self.switchTab(tab);
 
       BackStore = null;
@@ -2957,6 +3051,21 @@ Session.prototype = {
     } else {
       beforeReturn();
     }
+  },
+
+  showHomeTopBar: function () {
+    this.topBar.setTab('methods');
+    this.topBar.setLogged(true);
+    var contact = getPhone();
+    this.topBar.setContact(contact);
+    this.topBar.updateUserDropDown();
+    this.topBar.show();
+  },
+
+  oneClickCheckoutRedirection: function () {
+    this.switchTab('');
+    this.homeTab.addressNext();
+    this.homeTab.next('methods');
   },
 
   /**
@@ -3070,8 +3179,9 @@ Session.prototype = {
 
       var contact = getPhone();
       if (
-        (!contact && !Store.isContactOptional()) ||
-        this.get('method.' + tab) === false
+        !Store.isOneClickCheckout() &&
+        ((!contact && !Store.isContactOptional()) ||
+          this.get('method.' + tab) === false)
       ) {
         return;
       }
@@ -3155,7 +3265,6 @@ Session.prototype = {
         Razorpay.sendMessage({ event: 'blur' });
       }
     }
-
     if (!tab) {
       var selectedInstrument = this.getSelectedPaymentInstrument();
 
@@ -3808,7 +3917,14 @@ Session.prototype = {
     showOverlay($('#error-message').toggleClass('loading', loadingState));
   },
 
-  commenceOTP: function (textView, reason, templateData, action, loading) {
+  commenceOTP: function (
+    textView,
+    reason,
+    templateData,
+    action,
+    loading,
+    headingText
+  ) {
     if (typeof loading === 'undefined') {
       loading = true;
     }
@@ -3843,6 +3959,9 @@ Session.prototype = {
     if (this.screen === 'otp') {
       this.body.removeClass('sub');
       this.otpView.setTextView(textView, templateData);
+      this.otpView.updateScreen({
+        headingText: headingText,
+      });
 
       this.otpView.updateScreen({
         action: action,
@@ -3999,7 +4118,9 @@ Session.prototype = {
       },
     });
 
-    var otp = storeGetter(discreet.OTPScreenStore.otp);
+    var otp =
+      storeGetter(discreet.OTPScreenStore.otp) ||
+      storeGetter(discreet.OTPScreenStore.digits).join('');
 
     if (otp.length > 0) {
       this.commenceOTP('verifying_otp');
@@ -4013,6 +4134,7 @@ Session.prototype = {
 
       var isCardlessEmi =
         this.payload && this.payload.method === 'cardless_emi';
+
       if (!isCardlessEmi && this.tab !== 'upi') {
         // card tab only past this
         // card filled by logged out user + remember me
@@ -4500,6 +4622,8 @@ Session.prototype = {
 
       // perform the actual validation
       if (screen === 'upi' || screen === 'upi_otm') {
+        // Event triggered when user enters UPI ID and clicks submit
+        Analytics.track('checkoutUpiVpaSubmitted');
         var formSelector = '#user-new-vpa-container-' + screen;
 
         if (data['_[flow]'] === 'directpay') {
@@ -4543,8 +4667,8 @@ Session.prototype = {
           }
         }
       }
-    } else if (data.method === 'paypal') {
-      // Let method=paypal payments go through directly
+    } else if (data.method === 'paypal' || data.method === 'cod') {
+      // Let method=paypal & method=cod payments go through directly
     } else {
       return;
     }
@@ -5028,7 +5152,8 @@ Session.prototype = {
       return this.verifyVpaAndContinue(data);
     }
 
-    if (preferences.fee_bearer && this.showFeesUi()) {
+    if (request.feesRedirect) {
+      this.showFeesUi();
       return;
     }
 
@@ -5278,20 +5403,24 @@ Session.prototype = {
     if (!isDynamicWalletFlow && wallet === 'freecharge') {
       this.otpView.updateScreen({
         maxlength: 4,
+        digits: new Array(4),
       });
     } else if (isHDFCDebitEMI) {
       this.otpView.updateScreen({
         maxlength: 6,
+        digits: new Array(6),
         mode: emiCode,
       });
     } else if (this.headless) {
       // OTP of length 8 is only required for Headless OTP.
       this.otpView.updateScreen({
         maxlength: 8,
+        digits: new Array(8),
       });
     } else {
       this.otpView.updateScreen({
         maxlength: 6,
+        digits: new Array(6),
       });
     }
 
@@ -5484,6 +5613,7 @@ Session.prototype = {
 
   getPayload: function () {
     var data = this.getFormData();
+    var selectedInstrument = this.getSelectedPaymentInstrument();
 
     if (this.screen === 'card' && this.tab === 'emi') {
       if (!this.svelteCardTab.isOnSavedCardsScreen()) {
@@ -5500,6 +5630,10 @@ Session.prototype = {
 
     if (this.oneMethod && this.oneMethod === 'paypal') {
       data.method = 'paypal';
+    }
+
+    if (selectedInstrument && selectedInstrument.method === 'cod') {
+      data.method = 'cod';
     }
 
     return data;
@@ -5818,6 +5952,9 @@ Session.prototype = {
     var self = this;
     var customer;
     var saved_customer = preferences.customer;
+    if (saved_customer && saved_customer.addresses) {
+      address.setSavedAddresses(saved_customer.addresses);
+    }
     var session_options = this.get();
 
     this.invoice = preferences.invoice;
@@ -5893,6 +6030,12 @@ Session.prototype = {
 
     /* set Razorpay instance for customer */
     Customer.prototype.r = this.r;
+
+    if (preferences.order && Store.isOneClickCheckout()) {
+      discreet.ChargesHelper.initializeAndReset(
+        parseInt(preferences.order.line_items_total)
+      );
+    }
   },
 
   hideOverlayMessage: hideOverlayMessage,

@@ -1,13 +1,12 @@
 <script>
   // Svelte imports
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import { t, locale } from 'svelte-i18n';
 
   import { getUpiIntentAppName } from 'i18n';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
-
   import { getDowntimes } from 'checkoutstore';
 
   // UI imports
@@ -26,6 +25,8 @@
     UPI_RECOMMENDED,
     UPI_SHOW_OTHER_APPS,
   } from 'ui/labels/upi';
+
+  import UPI_EVENTS from 'ui/tabs/upi/events';
 
   // Props
   export let apps;
@@ -70,7 +71,11 @@
     }
   }
 
-  export function onAppSelect({ detail }) {
+  export function onAppSelect({ detail }, index) {
+    Analytics.track(UPI_EVENTS.INTENT_APP_SELECTED, {
+      app_name: detail.app_name,
+      index,
+    });
     const packageName = detail.package_name;
     const psp = detail.shortcode;
     const params = {
@@ -86,6 +91,10 @@
     session.onUpiAppSelect(packageName);
     dispatch('select', params);
   }
+
+  onMount(() => {
+    Analytics.track(UPI_EVENTS.INTENT_APPS_LOAD);
+  });
 </script>
 
 <!-- LABEL: PAY USING APPS -->
@@ -106,7 +115,7 @@
         icon={app.app_icon}
         iconPlaceholder=".placeholder"
         selected={app.package_name === selected}
-        on:select={onAppSelect}
+        on:select={(e) => onAppSelect(e, i)}
         name="upi_app"
         value={app.package_name}
         showRadio={!skipCTA}

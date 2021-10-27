@@ -15,4 +15,8 @@ const events = {
   ...cardScreen,
 };
 
+export const SAVED_CARD_EVENTS = {
+  SCREEN_LOAD: 'checkoutSavedCardScreenLoaded',
+};
+
 export default getEventsName('card', events);

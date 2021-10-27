@@ -1,0 +1,235 @@
+<script>
+  import CTA from 'ui/elements/CTA.svelte';
+  import { fly } from 'svelte/transition';
+  import { get } from 'svelte/store';
+
+  import SavedAddresses from 'one_click_checkout/address/ui/components/SavedAddresses.svelte';
+  import AddNewAddress from 'one_click_checkout/address/ui/components/AddNewAddress.svelte';
+
+  import { t, locale } from 'svelte-i18n';
+  import { formatTemplateWithLocale } from 'i18n';
+  import { CTA_LABEL } from 'one_click_checkout/address/i18n/labels';
+
+  import { Events } from 'analytics';
+
+  import { savedAddresses } from 'one_click_checkout/address/store';
+  import { validateInput } from 'one_click_checkout/address/helpers';
+
+  import { onMount } from 'svelte';
+
+  import { screensHistory } from 'one_click_checkout/routing/History';
+
+  import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
+
+  import Resource from 'one_click_checkout/address/resource';
+
+  import {
+    views as addressViews,
+    ADDRESS_TYPES,
+  } from 'one_click_checkout/address/constants';
+
+  import { getAnimationOptions } from 'svelte-utils';
+
+  import AddressEvents from 'one_click_checkout/address/analytics';
+
+  export let error;
+  export let onSubmitCallback;
+  export let currentView;
+  export let addressType;
+  export let noSavedAddressRedirect;
+
+  let showCta = true;
+
+  let {
+    title,
+    store: {
+      selectedAddressId,
+      addressCompleted,
+      shouldSaveAddress,
+      newUserAddress,
+    },
+  } = Resource[addressType];
+
+  let isFormComplete = false;
+
+  const customer = getCustomerDetails();
+
+  export function handleAddAddressClick() {
+    Events.Track(AddressEvents.ADD_NEW_ADDRESS_CLICKED);
+    selectedAddressId.set('');
+    currentView = addressViews.ADD_ADDRESS;
+    screensHistory.push(Resource[addressType].routes[addressViews.ADD_ADDRESS]);
+  }
+
+  export function setCurrentView(view) {
+    currentView = view;
+  }
+
+  export function handleAddressSelection({ detail }) {
+    Events.Track(AddressEvents.SAVED_ADDRESS_SELECTED, {
+      serviceable: detail.isAddressServiceable,
+      address_id: detail.addressId,
+      address_index: detail.addressIndex,
+    });
+    showCta = true;
+    if (Resource[addressType].checkServiceability) {
+      showCta = detail.isAddressServiceable;
+    }
+  }
+
+  export function onSubmit() {
+    if (currentView === addressViews.ADD_ADDRESS) {
+      const elementId = Resource[addressType].formId;
+
+      const inpError = validateInput(elementId);
+      if (inpError) {
+        error = inpError;
+        error.text = formatTemplateWithLocale(
+          error.label.text,
+          { field: error.label.field },
+          $locale
+        );
+        Events.Track(AddressEvents.ADDRESS_SUBMIT_CLICKED);
+        return;
+      }
+    } else {
+      if (!$selectedAddressId) {
+        alert('Please Select the address');
+        return;
+      }
+    }
+    Events.Track(AddressEvents.ADDRESS_SUBMIT_CLICKED, {
+      address_valid: true,
+    });
+    onSubmitCallback(addressCompleted);
+  }
+
+  function onFormCompletion({ detail: { isComplete } }) {
+    isFormComplete = isComplete;
+    if (isComplete) {
+      Events.Track(AddressEvents.ADD_ADDRESS_CTA_ENABLED, {
+        address_label: get(Resource[addressType].store.newAddress)?.tag,
+        pincode: get(Resource[addressType].store.newAddress)?.zipcode,
+        is_cod_available: get(Resource[addressType].store.selectedAddress)?.cod,
+        is_serviceable: get(Resource[addressType].store.selectedAddress)
+          ?.serviceable,
+      });
+    }
+  }
+
+  $: {
+    if (currentView) {
+      document.body.scroll({
+        top: 0,
+        behavior: 'smooth',
+      });
+      document.documentElement.scroll({
+        top: 0,
+        behavior: 'smooth',
+      });
+    }
+  }
+
+  onMount(() => {
+    if (!currentView) {
+      if (customer.logged) {
+        if ($savedAddresses.length > 0) {
+          currentView = addressViews.SAVED_ADDRESSES;
+        } else {
+          currentView = addressViews.ADD_ADDRESS;
+        }
+      } else {
+        noSavedAddressRedirect();
+        return;
+      }
+    }
+    screensHistory.replace(Resource[addressType].routes[currentView]);
+  });
+</script>
+
+<div
+  transition:fly={getAnimationOptions({ y: -46, duration: 200 })}
+  class="address-tab"
+>
+  <slot name="header" />
+  <div
+    class="address-wrapper"
+    class:shipping-address-wrapper={addressType ===
+      ADDRESS_TYPES.SHIPPING_ADDRESS &&
+      currentView === addressViews.ADD_ADDRESS}
+    class:billing-address-wrapper={Resource[addressType].classes[
+      'billing-address-wrapper'
+    ]}
+  >
+    <slot name="inner-header" />
+    <div class="address-shipping-label">
+      {$t(title)}
+    </div>
+    {#if currentView === addressViews.SAVED_ADDRESSES}
+      <SavedAddresses
+        {selectedAddressId}
+        addresses={savedAddresses}
+        on:selectedAddressUpdate={handleAddressSelection}
+        onAddAddressClick={handleAddAddressClick}
+        checkServiceability={Resource[addressType].checkServiceability}
+        {addressType}
+      />
+    {:else if currentView === addressViews.ADD_ADDRESS}
+      <AddNewAddress
+        on:formCompletion={onFormCompletion}
+        id={Resource[addressType].formId}
+        checkServiceability={Resource[addressType].checkServiceability}
+        formData={newUserAddress}
+        {error}
+        {shouldSaveAddress}
+        {addressType}
+      />
+    {/if}
+    <slot name="inner-footer" />
+  </div>
+  <slot name="footer" />
+  <CTA
+    on:click={onSubmit}
+    disabled={!showCta ||
+      (currentView === addressViews.ADD_ADDRESS && !isFormComplete)}
+  >
+    {$t(CTA_LABEL)}
+  </CTA>
+</div>
+
+<style>
+  .address-wrapper {
+    padding: 18px 24px 0;
+    overflow: auto;
+    /* subtracting topbar and cta height from body's height for address-wrapper */
+    height: calc(100% - 47px - 55px);
+  }
+
+  .address-tab {
+    height: inherit;
+  }
+
+  .address-shipping-label {
+    font-weight: normal;
+    color: rgba(51, 51, 51, 0.6);
+    font-size: 13px;
+    padding-bottom: 6px;
+    text-transform: uppercase;
+  }
+  .billing-address-wrapper {
+    padding: 8px 24px 12px;
+    /* subtracting topbar and cta height from body's height and adding the space left off by the footer checkbox */
+    height: calc(
+      100% - 47px - 55px + 20px + 16px
+    ); /* 16 is because of the reduced vertical padding */
+  }
+  .shipping-address-wrapper {
+    height: calc(
+      100% - 47px - 55px + 20px + 10px
+    ); /* add 10 for the reduced padding-bottom */
+    padding-bottom: 8px;
+  }
+  :global(.address-label) {
+    font-size: 14px;
+  }
+</style>

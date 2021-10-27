@@ -28,9 +28,33 @@ var activeStateColor = themeMeta.activeStateColor;
   border-bottom-color: `=highlightColor`;
 }
 
+.address-elem::after {
+  border: 0px;
+}
+
 .spin div, .link, .multi-tpv :checked + label
 {
   border-color: `=highlightColor`!important;
+}
+
+.spinner {
+  height: 12px;
+  width: 12px;
+  margin-right: 4px;
+  border: 2px solid;
+  border-color: `=highlightColor` transparent `=highlightColor` `=highlightColor` !important;
+  border-image: initial;
+  border-radius: 50%;
+  animation: 1s linear 0s infinite normal none running rotate;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .hc_border {
@@ -279,6 +303,63 @@ color: `=c`;
 .border-list-horizontal > *:focus-within + *,
 .border-list-horizontal > .selected + * {
   border-left-color: `=highlightColor`;
+}
+
+.coupons-available-container {
+  background-color: `=secondaryHighlightColor`;
+  color: `=highlightColor`;
+  border: 1px solid `=secondaryHighlightColor`;
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  width: 100%;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.coupon-item-code {
+  padding: 4px 8px;
+  background-color: `=secondaryHighlightColor`;
+  color: `=highlightColor`;
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 20px;
+  border: 1px dashed `=highlightColor`;
+}
+
+.highlight-text {
+  color: `=highlightColor`;
+}
+
+.saved-addresses-cta {
+  color: `=highlightColor`;
+  font-weight: bold;
+  border: 1px solid #E6E7E8;
+  padding: 10px 12px;
+  width: 100%;
+  margin-bottom: 14px;
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.loading-indicator {
+  border-radius: 50%;
+  width: 33px;
+  height: 33px;
+  border: 1px solid;
+  border-color: `=highlightColor` transparent `=highlightColor` `=highlightColor` !important;
+  animation: 1s linear 0s infinite normal none running rotate;
+}
+
+.summary-modal-cta {
+  box-sizing: border-box;
+  background: `=c`;
+  color: `=textColor`;
+  font-weight: bold;
+  padding: 15px 0;
+  width: 100%;
+  text-align: center;
 }
 
 /** End */

@@ -8,6 +8,7 @@ import { CtaViews } from 'ui/labels/cta';
 import { locale } from 'svelte-i18n';
 import { formatTemplateWithLocale } from 'i18n';
 import { debounce } from 'lib/utils';
+import { isOneClickCheckout } from 'checkoutstore';
 
 export const ctaInfo = writable({
   view: '',
@@ -136,6 +137,9 @@ export function showAmountInCta() {
     } else {
       const offer = session.getAppliedOffer();
       let amount = (offer && offer.amount) || session.get('amount');
+      if (isOneClickCheckout()) {
+        amount = session.get('amount');
+      }
 
       if (
         offer &&
@@ -228,8 +232,9 @@ const trackCTAVisibility = debounce(function () {
  */
 export function showCta() {
   const session = getSession();
-
-  _El.addClass(session.body[0], 'sub');
+  if (session?.body?.[0]) {
+    _El.addClass(session.body[0], 'sub');
+  }
 
   try {
     trackCTAVisibility();
@@ -241,8 +246,9 @@ export function showCta() {
  */
 export function hideCta() {
   const session = getSession();
-
-  _El.removeClass(session.body[0], 'sub');
+  if (session?.body?.[0]) {
+    _El.removeClass(session.body[0], 'sub');
+  }
 }
 
 /**

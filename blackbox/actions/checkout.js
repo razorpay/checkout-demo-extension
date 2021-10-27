@@ -342,6 +342,13 @@ module.exports = {
       interceptorOptions = interceptor(page);
     }
 
+    if (withSiftJS) {
+      preferences.features = {
+        ...preferences.features,
+        enable_sift_js: true,
+      };
+    }
+
     const pageTarget = page.target();
     const returnObj = {
       page,

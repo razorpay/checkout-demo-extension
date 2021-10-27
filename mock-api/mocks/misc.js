@@ -45,10 +45,36 @@ const misc = {
   saved_methods: {
     success: 1,
     tokens: Customer.getTokens(),
+    addresses: [
+      {
+        id: 1,
+        name: 'Mayank',
+        type: 'shipping_address',
+        line1: '125/12, Ram Gali',
+        line2: 'hathibhata',
+        zipcode: '305001',
+        city: 'Ajmer',
+        state: 'Rajasthan',
+        country: 'in',
+        tag: 'Home',
+      },
+      {
+        id: 2,
+        name: 'Mayank',
+        type: 'shipping_address',
+        line1: '125/12, Ram Gali',
+        line2: 'hathibhata',
+        zipcode: '305001',
+        city: 'Ajmer',
+        state: 'Rajasthan',
+        country: 'in',
+        tag: 'Home',
+      },
+    ],
   },
 };
 
-const getMisc = type => {
+const getMisc = (type) => {
   return misc[type];
 };
 

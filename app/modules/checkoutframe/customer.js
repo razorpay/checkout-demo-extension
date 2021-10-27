@@ -6,6 +6,7 @@ import Analytics, {
   Events,
   MetaProperties,
   CardEvents,
+  MiscEvents,
 } from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import * as Bridge from 'bridge';
@@ -18,13 +19,14 @@ import {
 import { format } from 'i18n';
 
 import { delayLoginOTPExperiment } from 'card/helper';
+import { timer } from 'utils/timer';
 
 /* global getPhone */
 
 let customers = {};
 let qpmap = _.getQueryParams();
 
-export const getCustomer = (contact, savedCustomer) => {
+export const getCustomer = (contact, savedCustomer, skipStatusCall = false) => {
   // indian contact without +91
   let indianContact;
 
@@ -35,13 +37,17 @@ export const getCustomer = (contact, savedCustomer) => {
     if (indianContact) {
       return getCustomer('+91' + contact, savedCustomer);
     } else {
-      customers[contact] = new Customer(contact, savedCustomer);
+      customers[contact] = new Customer(contact, savedCustomer, skipStatusCall);
     }
   }
   return customers[contact];
 };
 
-export function Customer(contact, savedCustomer = false) {
+export function Customer(
+  contact,
+  savedCustomer = false,
+  skipStatusCall = false
+) {
   if (contact) {
     this.contact = contact.replace(/[^+\d]/g, '');
     this.r = get(razorpayInstanceStore);
@@ -49,7 +55,7 @@ export function Customer(contact, savedCustomer = false) {
     if (delayLoginOTPExperiment()) {
       this.haveSavedCard = savedCustomer;
       // skip api call if user is logged in
-      if (!savedCustomer) {
+      if (!savedCustomer && !skipStatusCall) {
         this.checkStatus(
           (data) => {
             this.haveSavedCard = data.saved;
@@ -138,19 +144,33 @@ Customer.prototype = {
       url += '&device_token=' + device_token;
     }
 
+    const getDuration = timer();
+    Events.TrackMetric(MiscEvents.CUSTOMER_STATUS_START);
+
     fetch({
       url: url,
       callback: function (data) {
         const hasSavedCards = !!data.saved;
         customer.saved = hasSavedCards;
+        customer.saved_address = !!data.saved_address;
 
         Events.setMeta(
           MetaProperties.HAS_SAVED_CARDS_STATUS_CHECK,
           hasSavedCards
         );
 
+        Events.setMeta(
+          MetaProperties.HAS_SAVED_ADDRESSES,
+          !!data.saved_address
+        );
+
         Events.TrackBehav(CardEvents.CHECK_SAVED_CARDS, {
           hasSavedCards,
+        });
+
+        Events.TrackMetric(MiscEvents.CUSTOMER_STATUS_END, {
+          response_time: getDuration(),
+          response: data,
         });
 
         if (customer.saved && !queryParams.skip_otp) {

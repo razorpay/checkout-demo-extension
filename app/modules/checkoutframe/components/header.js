@@ -1,5 +1,5 @@
 import { getSession } from 'sessionmanager';
-import { isCustomerFeeBearer } from 'checkoutstore';
+import { isCustomerFeeBearer, isOneClickCheckout } from 'checkoutstore';
 
 /**
  * Get the font size depending on the number of chars in amount, customer fee bearer and offer.
@@ -14,7 +14,7 @@ export function getNormalizedAmountFontSize(
   hasOffer = false
 ) {
   const MIN_FONT_SIZE = 17;
-  const MAX_FONT_SIZE = 24;
+  const MAX_FONT_SIZE = isOneClickCheckout() ? 20 : 24;
   const AUTOSCALE_STEP = 1.5; // decrease fontsize by this for every char over threshold
 
   if (!amount) return MAX_FONT_SIZE;

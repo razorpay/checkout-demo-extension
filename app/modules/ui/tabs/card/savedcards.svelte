@@ -1,6 +1,6 @@
 <script>
   // Svelte imports
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
 
   // UI imports
   import SavedCard from 'ui/tabs/card/savedcard.svelte';
@@ -18,6 +18,7 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { getCardMetadata } from 'common/card';
+  import { SAVED_CARD_EVENTS } from 'analytics/card/card';
 
   // Props
   export let cards = [];
@@ -63,6 +64,10 @@
   function handleAuthTypeChange(event) {
     $currentAuthType = event.detail.authType;
   }
+
+  onMount(() => {
+    Analytics.track(SAVED_CARD_EVENTS.SCREEN_LOAD);
+  });
 </script>
 
 {#each cards as card, index (card.id)}

@@ -9,12 +9,14 @@
   import { getSubtextForInstrument } from 'subtext';
   import { getThemeMeta } from 'checkoutstore/theme';
   import { formatTemplateWithLocale } from 'i18n';
+  import { COD_DISABLED_LABEL } from 'one_click_checkout/address/i18n/labels';
 
   // Store imports
   import {
     selectedInstrumentId,
     methodInstrument,
   } from 'checkoutstore/screens/home';
+  import { codReason, isCodAvailable } from 'one_click_checkout/address/store';
 
   // i18n
   import { locale } from 'svelte-i18n';
@@ -26,10 +28,20 @@
 
   const method = instrument.method;
 
+  let disabled = false;
+
   let methodName;
-  $: methodName = getMethodNameForPaymentOption(method, $locale, {
-    instrument,
-  });
+
+  $: {
+    methodName = getMethodNameForPaymentOption(method, $locale, {
+      instrument,
+    });
+    if (method === 'cod') {
+      disabled = !$isCodAvailable;
+      //   errorLabel = COD_DISABLED_LABEL;
+      //   error = $codReason;
+    }
+  }
 
   let title;
   $: title = formatTemplateWithLocale(
@@ -60,6 +72,7 @@
   className="instrument"
   attributes={{ 'data-type': 'method' }}
   on:click
+  {disabled}
 >
   <i slot="icon">
     <Icon {icon} alt="" />

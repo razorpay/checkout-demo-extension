@@ -4,6 +4,7 @@
   import { fade } from 'svelte/transition';
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
+  import { onMount } from 'svelte';
 
   // Store
   import {
@@ -58,6 +59,9 @@
   import { scrollIntoView } from 'lib/utils';
   import { getSession } from 'sessionmanager';
   import { getAnimationOptions } from 'svelte-utils';
+
+  // Analytics imports
+  import NETBANKING_EVENTS from 'ui/tabs/netbanking/events';
 
   // Props
   export let banks;
@@ -121,6 +125,7 @@
 
   function showSearch() {
     searchModalOpen = true;
+    Analytics.track(NETBANKING_EVENTS.DROPDOWN_CLICK);
   }
 
   function hideSearch() {
@@ -283,6 +288,10 @@
       });
     }
   }
+
+  onMount(() => {
+    Analytics.track(NETBANKING_EVENTS.SCREEN_LOAD);
+  });
 </script>
 
 <!-- TODO: remove override after fixing method check -->

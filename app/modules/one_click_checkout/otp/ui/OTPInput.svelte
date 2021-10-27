@@ -1,0 +1,112 @@
+<script>
+  import { digits, disableCTA } from 'checkoutstore/screens/otp';
+  import { showFeeLabel } from 'checkoutstore/index.js';
+
+  import Analytics from 'analytics';
+  import * as AnalyticsTypes from 'analytics-types';
+  import {
+    isHeadless,
+    isWalletPayment,
+  } from 'one_click_checkout/otp/sessionInterface';
+  import { Safari } from 'common/useragent';
+
+  export let hidden;
+
+  let otpContainer;
+  let autoCompleteMethod = 'off';
+
+  if (Safari) {
+    autoCompleteMethod = 'one-time-code';
+  }
+
+  /**
+   * Method is used to send track event when otp entering is complete
+   * @param index {number} index of otp input field which fired the event
+   */
+  function trackInput(index) {
+    const otp = $digits.join('');
+
+    if (!otp) {
+      $showFeeLabel = false;
+    }
+
+    if (index === $digits.length - 1) {
+      Analytics.track('otp:input', {
+        type: AnalyticsTypes.BEHAV,
+        data: {
+          wallet: isWalletPayment(),
+          headless: isHeadless(),
+        },
+      });
+    }
+  }
+
+  /**
+   * Method which handles input event. Enables CTA based on otp length and shifts focus to next input field
+   * @param e {event} HTMLInputEvent which got fired
+   * @param index {number} index of input which fired the event
+   */
+  function onOtpDigitInput(e, index) {
+    const otp = $digits.join('');
+    if (otp.length === $digits.length) {
+      disableCTA.set(false);
+    } else {
+      disableCTA.set(true);
+    }
+    if (e.target.value && index < $digits.length - 1) {
+      otpContainer.children[index + 1].focus();
+    }
+  }
+
+  /**
+   * Method which handles backspace/delete. To shift focus and update store
+   * @param e {event} HTMLInputEvent which got fired
+   * @param index {number} index of input which fired the event
+   */
+  function onOtpDigitKeyDown(e, index) {
+    if (
+      ['Backspace', 'Delete'].includes(e.key) &&
+      !e.target.value &&
+      index > 0
+    ) {
+      otpContainer.children[index - 1].focus();
+      $digits[index - 1] = '';
+    }
+  }
+</script>
+
+<!-- TODO: Figure out autofill. -->
+<div class="otp-container" bind:this={otpContainer} class:hidden id="otp-input">
+  {#each $digits as _, i}
+    <input
+      id={`otp[${i}]`}
+      name="otp"
+      type="tel"
+      pattern="[0-9]"
+      class="otp-input"
+      maxlength="1"
+      bind:value={$digits[i]}
+      on:focus={() => trackInput(i)}
+      on:input={(e) => onOtpDigitInput(e, i)}
+      on:keydown={(e) => onOtpDigitKeyDown(e, i)}
+      autocomplete={i === 0 && autoCompleteMethod}
+    />
+  {/each}
+</div>
+
+<style>
+  .otp-container {
+    display: flex;
+    justify-content: center;
+  }
+
+  .otp-input {
+    width: 28px;
+    font-size: 18px;
+    line-height: 24px;
+    padding: 11px 4px;
+    margin: 0px 8px;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.12);
+    text-align: center;
+  }
+</style>

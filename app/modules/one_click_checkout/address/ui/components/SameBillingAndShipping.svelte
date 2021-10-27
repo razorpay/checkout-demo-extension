@@ -1,0 +1,51 @@
+<script>
+  import Checkbox from 'ui/elements/Checkbox.svelte';
+
+  import { t } from 'svelte-i18n';
+  import { SAME_ADDRESS_LABEL } from 'one_click_checkout/address/i18n/labels';
+
+  import { isBillingSameAsShipping } from 'one_click_checkout/address/store';
+  import { shouldSaveAddress as shouldSaveBillingAddress } from 'one_click_checkout/address/billing_address/store';
+
+  import { createEventDispatcher } from 'svelte';
+
+  export let isFixed = false;
+  export let shouldSaveAddress = false;
+
+  const dispatch = createEventDispatcher();
+
+  function onChange() {
+    $isBillingSameAsShipping = !$isBillingSameAsShipping;
+    $shouldSaveBillingAddress = shouldSaveAddress;
+
+    dispatch('toggle', {
+      checked: $isBillingSameAsShipping,
+    });
+  }
+</script>
+
+<div class="same-address-checkbox" class:checkbox-sticky={isFixed}>
+  <Checkbox
+    on:change={onChange}
+    checked={$isBillingSameAsShipping}
+    id="same-address-checkbox"
+  />
+  <span>{$t(SAME_ADDRESS_LABEL)}</span>
+</div>
+
+<style>
+  .same-address-checkbox {
+    background: white;
+    display: inline-flex;
+    margin-top: 12px;
+    font-size: 13px;
+    padding-bottom: 8px;
+  }
+
+  .checkbox-sticky {
+    position: absolute;
+    bottom: 0;
+    width: calc(100% - 24px);
+    padding: 12px 0 4px 24px;
+  }
+</style>

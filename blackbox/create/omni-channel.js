@@ -106,10 +106,8 @@ module.exports = function (testFeatures) {
       if (downtimeHigh || downtimeLow) {
         // await verifyMethodWarned(context, 'UPI', 'upi');
       }
-
       await selectUPIMethod(context, 'omnichannel');
       await verifyOmnichannelPhoneNumber(context);
-
       if (!feeBearer && offers) {
         await viewOffers(context);
         await selectOffer(context, '1');

@@ -20,12 +20,14 @@ else
   <div id="tnc-wrap"></div>
   <div id="modal" class="mchild">
     <div id="modal-inner">
+      <div id="one-cc-loader"></div>
       <div id="overlay" class="showable"></div>
       <div id="nocost-overlay" class="showable"></div>
       <div id="confirmation-dialog" class="showable"></div>
       <div id="emi-wrap" class="overlay showable mfix"></div>
       <div id="recurring-cards-wrap" class="overlay showable mfix"></div>
       <div id="fee-wrap" class="overlay showable mfix"></div>
+      <div id="one-cc-summary"></div>
       <div id="options-wrap"></div>
       <div id="error-message" class="overlay showable">
       <div class="omnichannel">
@@ -39,7 +41,7 @@ else
         <button id="fd-hide" class="btn">Retry</button>
         <div id="cancel_upi"></div>
       </div>
-      <div id="content">
+      <div id="content" class="`?Store.isOneClickCheckout()`one-cc`?`">
         <div id="header">
           <div id="modal-close" class="close">×</div>
           `?o('image')`

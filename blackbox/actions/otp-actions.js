@@ -6,8 +6,7 @@ async function handleOtpVerification(context, walletissuer = 'freecharge') {
   await context.respondJSON({
     type: 'otp',
     request: {
-      url:
-        'https://api.razorpay.com/v1/payments/pay_DLbzHmbxvcpY9o/otp_submit/a393006fdb3d80bd41d199010375f4da5ea718da?key_id=rzp_test_1DP5mmOlF5G5ag',
+      url: 'https://api.razorpay.com/v1/payments/pay_DLbzHmbxvcpY9o/otp_submit/a393006fdb3d80bd41d199010375f4da5ea718da?key_id=rzp_test_1DP5mmOlF5G5ag',
       method: 'post',
       content: { next: ['resend_otp'] },
     },

@@ -56,6 +56,7 @@
     getDowntimes,
     isPartialPayment,
     getAmount,
+    isIndianCustomer,
   } from 'checkoutstore';
 
   import {
@@ -94,7 +95,7 @@
   // Utils imports
   import { getSession } from 'sessionmanager';
   import { getSavedCards, transform } from 'common/token';
-  import { Events, CardEvents, MetaProperties } from 'analytics';
+  import { Events, CardEvents, MetaProperties } from 'analytics/index';
 
   import {
     getIin,
@@ -872,7 +873,7 @@
             </div>
           {/if}
 
-          {#if delayOTPExperiment}
+          {#if delayOTPExperiment && $isIndianCustomer}
             <!-- Show Trigger to use Saved Card -->
             <SavedCardCTA
               showSubTitle={!$customer.logged}

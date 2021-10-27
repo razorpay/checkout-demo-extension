@@ -17,16 +17,16 @@ Events = addAnalyticsMethods(Events);
 export default Analytics;
 
 export {
-  Events,
   CardEvents,
   DowntimeEvents,
+  Events,
+  HomeEvents,
+  MetaProperties,
   ErrorEvents,
   MiscEvents,
   OfferEvents,
-  MetaProperties,
-  P13NEvents,
-  HomeEvents,
   OrderEvents,
+  P13NEvents,
   Track,
   CredEvents,
 };

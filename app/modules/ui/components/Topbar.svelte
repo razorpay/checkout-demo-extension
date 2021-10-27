@@ -4,22 +4,39 @@
   import { fly } from 'svelte/transition';
 
   // Store
-  import { isIRCTC, getAmount, showFeeLabel } from 'checkoutstore';
+  import {
+    isIRCTC,
+    getAmount,
+    showFeeLabel,
+    isOneClickCheckout,
+  } from 'checkoutstore';
   import { isContactPresent } from 'checkoutstore/screens/home';
   import { dynamicFeeObject, showFeesIncl } from 'checkoutstore/dynamicfee';
+
+  import { handleEditContact as handleOneClickCheckoutEditContact } from 'one_click_checkout/sessionInterface';
 
   // i18n
   import { t, locale } from 'svelte-i18n';
   import { getTabTitle } from 'i18n';
 
-  import { LOGOUT_ACTION, LOGOUT_ALL_DEVICES_ACTION } from 'ui/labels/topbar';
+  import {
+    LOGOUT_ACTION,
+    LOGOUT_ALL_DEVICES_ACTION,
+    EDIT_CONTACT_ACTION,
+  } from 'ui/labels/topbar';
 
   // Utils
   import { getSession } from 'sessionmanager';
   import { getAnimationOptions } from 'svelte-utils';
+  import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
+
+  import { Events, MiscEvents } from 'analytics';
+  import { currentView } from 'one_click_checkout/routing/store';
 
   const session = getSession();
   const dispatch = createEventDispatcher();
+
+  export let isFixed = false;
 
   let shown = false;
   let userDetailsShown = true;
@@ -27,6 +44,30 @@
   let logoutDropdownShown = false;
   let contact = '';
 
+  let cus;
+
+  let userDropDown = {};
+
+  export function updateUserDropDown() {
+    cus = getCustomerDetails();
+    userDropDown = {
+      edit: {
+        label: EDIT_CONTACT_ACTION,
+        isVisible: isOneClickCheckout(),
+        onClick: handleOneClickCheckoutEditContact.bind(null, false),
+      },
+      logout: {
+        label: LOGOUT_ACTION,
+        isVisible: cus?.logged,
+        onClick: handleLogoutClick,
+      },
+      logoutAllDevices: {
+        label: LOGOUT_ALL_DEVICES_ACTION,
+        isVisible: cus?.logged,
+        onClick: handleLogoutAllDevicesClick,
+      },
+    };
+  }
   // TODO: refactor this into a separate tab title store.
   /**
    * Overrides for the tab title. The key is the tab name, value is an object
@@ -92,6 +133,7 @@
 
   export function setLogged(isLogged) {
     logged = isLogged;
+    updateUserDropDown();
   }
 
   export function setContact(newContact) {
@@ -112,18 +154,30 @@
   }
 
   function handleUserDetailsClick() {
-    if (logged) {
+    if (logged || isOneClickCheckout()) {
       logoutDropdownShown = !logoutDropdownShown;
     }
   }
 
   function handleLogoutClick() {
-    session.logUserOut(session.getCurrentCustomer());
+    session.logUserOut(
+      session.getCurrentCustomer(),
+      handleOneClickCheckoutEditContact.bind(null, true)
+    );
+    Events.Track(MiscEvents.LOGOUT_CLICKED, {
+      current_screen: $currentView,
+    });
     logoutDropdownShown = false;
   }
 
   function handleLogoutAllDevicesClick() {
-    session.logUserOutOfAllDevices(session.getCurrentCustomer());
+    session.logUserOutOfAllDevices(
+      session.getCurrentCustomer(),
+      handleOneClickCheckoutEditContact.bind(null, true)
+    );
+    Events.Track(MiscEvents.LOGOUT_CLICKED, {
+      current_screen: $currentView,
+    });
     logoutDropdownShown = false;
   }
 
@@ -145,11 +199,13 @@
     if (isIRCTC()) {
       setOverridesForIrctc();
     }
+    updateUserDropDown();
   });
 </script>
 
 {#if shown}
   <div
+    class:topbar-sticky={isFixed}
     id="topbar"
     class="theme-secondary-highlight"
     transition:fly={getAnimationOptions({ y: -46, duration: 200 })}
@@ -163,12 +219,13 @@
         <div id="user">{contact}</div>
         {#if logoutDropdownShown}
           <div id="profile">
-            <!-- LABEL: Log out -->
-            <li on:click={handleLogoutClick}>{$t(LOGOUT_ACTION)}</li>
-            <!-- LABEL: Log out from all devices -->
-            <li on:click={handleLogoutAllDevicesClick}>
-              {$t(LOGOUT_ALL_DEVICES_ACTION)}
-            </li>
+            {#each Object.keys(userDropDown) as key}
+              {#if userDropDown[key].isVisible}
+                <li on:click={userDropDown[key].onClick}>
+                  {$t(userDropDown[key].label)}
+                </li>
+              {/if}
+            {/each}
           </div>
         {/if}
       </div>
@@ -181,3 +238,10 @@
     </div>
   </div>
 {/if}
+
+<style>
+  #topbar.topbar-sticky {
+    position: sticky;
+    top: 0;
+  }
+</style>

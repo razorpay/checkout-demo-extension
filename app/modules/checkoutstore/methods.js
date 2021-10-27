@@ -20,6 +20,7 @@ import {
   getMerchantOrderAmount,
   getMerchantOrderDueAmount,
   isPartialPayment,
+  isOneClickCheckout,
 } from 'checkoutstore';
 
 import {
@@ -270,6 +271,14 @@ const ALL_METHODS = {
 
   upi_otm() {
     return isUPIOTMBaseEnabled();
+  },
+
+  cod() {
+    return (
+      getOption('method.cod') &&
+      getMerchantMethods().cod &&
+      isOneClickCheckout()
+    );
   },
 };
 

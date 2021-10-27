@@ -2,19 +2,16 @@
   // Svelte importrs
   import { createEventDispatcher } from 'svelte';
 
-  // Props
-  export let method = null; // Name of the method
-  export let icon = null; // Override: icon. Picked from method if not overridden.
-  export let title = null; // Override: title. Picked from method if not overridden.
-  export let subtitle = null; // Override: subtitle. Picked from method if not overridden.
-  export let instrument = null;
-
   // Store
-  import { locale } from 'svelte-i18n';
+  import { t, locale } from 'svelte-i18n';
+  import { codReason, isCodAvailable } from 'one_click_checkout/address/store';
 
   // UI imports
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import Icon from 'ui/elements/Icon.svelte';
+  import InfoIcon from 'ui/elements/InfoIcon.svelte';
+  import CodIcon from 'ui/elements/CodIcon.svelte';
+  import Tooltip from 'ui/elements/Tooltip.svelte';
 
   // Utils imports
   import { getSession } from 'sessionmanager';
@@ -22,19 +19,42 @@
     getMethodNameForPaymentOption,
     getMethodDescription,
   } from 'checkoutframe/paymentmethods';
-  import Analytics from 'analytics';
+  import Analytics, { Events, HomeEvents } from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
-  import { formatMessageWithLocale } from 'i18n';
-  import { getThemeColor } from 'checkoutstore/theme';
+  import { formatMessageWithLocale, formatTemplateWithLocale } from 'i18n';
+
+  // Store imports
+  import {
+    COD_DISABLED_LABEL,
+    COD_CHARGES_DESCRIPTION,
+  } from 'one_click_checkout/address/i18n/labels';
+  import { codChargeAmount } from 'one_click_checkout/charges/store';
+
+  import { onMount } from 'svelte';
+
+  // Props
+  export let method = null; // Name of the method
+  export let icon = null; // Override: icon. Picked from method if not overridden.
+  export let title = null; // Override: title. Picked from method if not overridden.
+  export let subtitle = null; // Override: subtitle. Picked from method if not overridden.
+  export let instrument = null;
+  export let error = '';
+  export let disabled = false;
+  export let errorLabel = '';
 
   const session = getSession();
   const dispatch = createEventDispatcher();
 
   const icons = session.themeMeta.icons;
-  const _icon = getIconForDisplay();
+  let _icon = getIconForDisplay();
 
   let _subtitle;
-  $: _subtitle = getSubtitleForDisplay($locale);
+  $: {
+    _subtitle = getSubtitleForDisplay($locale);
+    if (method === 'cod' && disabled) {
+      _subtitle = '';
+    }
+  }
 
   let _title;
   $: _title = getTitleForDisplay($locale);
@@ -42,6 +62,16 @@
   function getSubtitleForDisplay(locale) {
     if (subtitle) {
       return subtitle;
+    } else if (method === 'cod' && $codChargeAmount) {
+      return `
+        <div class="highlight-text">
+          ${formatTemplateWithLocale(
+            COD_CHARGES_DESCRIPTION,
+            { charge: session.formatAmountWithCurrency($codChargeAmount) },
+            locale
+          )}
+        </div>
+      `;
     } else {
       return getMethodDescription(method, locale);
     }
@@ -63,6 +93,17 @@
     }
   }
 
+  onMount(() => {
+    if (method === 'cod') {
+      isCodAvailable.subscribe((available) => {
+        disabled = !available;
+        errorLabel = COD_DISABLED_LABEL;
+        error = $codReason;
+        Events.TrackRender(HomeEvents.COD_METHOD, { disabled });
+      });
+    }
+  });
+
   function select() {
     Analytics.track('payment_method:select', {
       type: AnalyticsTypes.BEHAV,
@@ -70,6 +111,10 @@
         method,
       },
     });
+
+    if (method === 'cod') {
+      Events.TrackBehav(HomeEvents.COD_METHOD_SELECTED);
+    }
 
     dispatch('select');
   }
@@ -85,16 +130,36 @@
 </script>
 
 <SlottedOption
-  className="new-method"
+  className="new-method has-tooltip"
   defaultStyles={false}
   on:click={select}
   attributes={{ method }}
+  {disabled}
 >
   <i slot="icon">
-    <Icon icon={_icon} />
+    {#if method === 'cod'}
+      <CodIcon {disabled} />
+    {:else}
+      <Icon icon={_icon} />
+    {/if}
   </i>
-  <div slot="title">{_title}</div>
-  <div slot="subtitle">{_subtitle}</div>
+  <div slot="title" class:cod-error={disabled}>{_title}</div>
+  <div slot="subtitle">{@html _subtitle}</div>
+  <div slot="error">
+    {#if disabled}
+      <div class="error">
+        <div class="error-container">
+          <span class="error-label">{$t(errorLabel)}</span>
+          <div class="error-icon">
+            <InfoIcon variant="red" />
+            <!-- <Tooltip className="" bindTo="#form-common" align={['bottom']}>
+              {error}
+            </Tooltip> -->
+          </div>
+        </div>
+      </div>
+    {/if}
+  </div>
   <!-- <div slot="banner">
     {#if showWalnutBanner}
       <div
@@ -177,5 +242,25 @@
     margin: 4px 0 0 0;
     line-height: 1rem;
     color: #828282;
+  }
+
+  .error {
+    margin-top: 4px;
+    color: #ee1a32 !important;
+    overflow: visible;
+  }
+  .error-container {
+    display: flex;
+    align-items: center;
+  }
+  .error-label {
+    margin-right: 4px;
+  }
+  .error-icon {
+    display: inline-flex;
+  }
+
+  .cod-error {
+    color: #858585 !important;
   }
 </style>

@@ -1,5 +1,6 @@
 export const COPY_DETAILS = 'cta.copy_details';
 export const COPIED = 'cta.copied';
+export const PROCEED_PAYMENT = 'cta.proceed_payment';
 
 export const CtaViews = {
   AMOUNT: 'amount',

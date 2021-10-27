@@ -2,11 +2,16 @@ const fs = require('fs');
 const { ENDPOINT } = global;
 
 const ajax = {
+  cod: {
+    razorpay_payment_id: 'pay_29QQoUBi66xm2f',
+    razorpay_order_id: 'order_9A33XWu170gUtm',
+    razorpay_signature:
+      '9ef4dffbfd84f1318f6739a3ce19f9d85851857ae648f114332d8401e0949a3d',
+  },
   hdfc_dc: {
     type: 'otp',
     request: {
-      url:
-        'https://api-dark.razorpay.com/v1/payments/pay_Ef3hpkiFpLkCmn/otp_submit/c835ea3d470d473c48cb56431f898fb526dbc33c?key_id=rzp_live_cepk1crIu9VkJU',
+      url: 'https://api-dark.razorpay.com/v1/payments/pay_Ef3hpkiFpLkCmn/otp_submit/c835ea3d470d473c48cb56431f898fb526dbc33c?key_id=rzp_live_cepk1crIu9VkJU',
       content: {
         type: 'otp',
         bank: 'HDFC',
@@ -333,7 +338,7 @@ const checkout = {
   ),
 };
 
-const getAjax = body => {
+const getAjax = (body) => {
   if (body.method === 'app' && body.provider === 'cred') {
     if (Number(body.app_present)) {
       return ajax.cred_intent;
@@ -352,6 +357,9 @@ const getAjax = body => {
   if (body.method === 'card') {
     return ajax.hdfc_otp;
   }
+  if (body.method === 'cod') {
+    return ajax.cod;
+  }
   return {
     error: {
       description: 'Unsupported payload/method',
@@ -359,7 +367,7 @@ const getAjax = body => {
   };
 };
 
-const getCheckout = body => {
+const getCheckout = (body) => {
   if (body.method === 'card') {
     return checkout.hdfc;
   }

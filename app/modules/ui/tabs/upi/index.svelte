@@ -70,6 +70,7 @@
     UPI_RECURRING_CAW_CALLOUT_AS_PRESENTED,
     ID_LINKED_TO_BANK,
   } from 'ui/labels/upi';
+  import UPI_EVENTS from 'ui/tabs/upi/events';
 
   import { oneClickUPIIntent } from 'upi/helper';
   import { getComponentProps } from 'utils/svelteUtils';
@@ -357,6 +358,7 @@
   let oneClickUPIIntentFlow = false;
 
   onMount(() => {
+    Analytics.track(UPI_EVENTS.SCREEN_LOAD);
     /* TODO: improve handling of `prefill.vpa` */
     if (getPrefilledVPA()) {
       selectedApp = undefined;

@@ -97,7 +97,7 @@ RUN if [ -z "$TRAFFIC_ENV" ]; then \
     --include "*.js" \
     --include "*.css"; \
     fi 
-    
+
 FROM c.rzp.io/razorpay/containers:app-nginx-brotli
 ARG GIT_COMMIT_HASH
 ENV GIT_COMMIT_HASH=${GIT_COMMIT_HASH}

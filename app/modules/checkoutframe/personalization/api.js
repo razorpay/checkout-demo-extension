@@ -243,7 +243,12 @@ export function trackP13nMeta(data) {
   _Obj.loop(
     data,
     (
-      { instruments, is_customer_identified, user_aggregates_available, versionID },
+      {
+        instruments,
+        is_customer_identified,
+        user_aggregates_available,
+        versionID,
+      },
       contact
     ) => {
       if (instruments) {

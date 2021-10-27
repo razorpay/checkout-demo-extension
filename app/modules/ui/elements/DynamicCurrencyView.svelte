@@ -355,7 +355,10 @@
         } else {
           setAppropriateCtaText();
         }
-        session.updateAmountInHeader(originalAmount);
+
+        // Hack to display only the updated amount
+        const updated_amount = getAmount();
+        session.updateAmountInHeader(updated_amount);
       }
       if (AVSRequired) {
         showProceed();

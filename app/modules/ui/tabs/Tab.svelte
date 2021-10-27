@@ -8,6 +8,7 @@
   export let pad = true;
   export let shown = false;
   export let hasMessage = false;
+  export let resetMargin = false;
 
   // Computed
   export let methodSupported;
@@ -22,7 +23,14 @@
     class:drishy={shown}
     class:pad
     class:hasMessage
+    class:resetMargin
   >
     <slot />
   </div>
 {/if}
+
+<style>
+  .resetMargin {
+    margin-top: 0;
+  }
+</style>

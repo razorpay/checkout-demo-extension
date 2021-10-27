@@ -704,6 +704,34 @@ i {
       }
     }
 }
+#content.one-cc {
+  #logo {
+    width: 40px;
+    height: 40px;
+    line-height: 38px;
+  }
+
+  #merchant-name {
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 22px;
+  }
+
+  #merchant-desc {
+    font-size: 14px;
+    line-height: 17px;
+  }
+
+  #amount {
+    font-size: 20px;
+    margin-top: 5px;
+  }
+
+  #body {
+    height: 403px;
+    flex-basis: 403px;
+  }
+}
 
 #header {
   border-radius: $br $br 0 0;
@@ -789,7 +817,7 @@ i {
   height: 64px;
   background: #fff;
   border-radius: $br;
-  line-height: 62px;
+  line-height: 38px;
   float: left;
   margin-right: 14px;
   box-shadow: $bs;
@@ -1283,6 +1311,11 @@ $outline = #ddd;
   &:active {
     box-shadow: 0 2px 10px -5px #000 inset;
   }
+}
+
+#footer > .disabled {
+  background: #adacac;
+  cursor: not-allowed;
 }
 
 #form-card, #form-emi {

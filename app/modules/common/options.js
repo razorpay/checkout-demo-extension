@@ -31,6 +31,13 @@ export const RazorpayDefaults = {
   },
   checkout_config_id: '',
   send_sms_hash: false,
+
+  // 1CC Specific options/flags
+  show_address: true,
+  show_coupons: true,
+  one_click_checkout: false,
+  force_cod: false,
+  mandatory_login: false,
 };
 
 function base_set(flatObj, defObj, objKey, objVal) {

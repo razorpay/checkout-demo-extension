@@ -1,7 +1,7 @@
 import { get } from 'svelte/store';
-import { writable } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 
-import { phone } from 'checkoutstore/screens/home';
+import { contact, phone } from 'checkoutstore/screens/home';
 import { amountAfterOffer } from 'checkoutstore/offers';
 
 import { displayAmount } from 'common/currency';
@@ -20,6 +20,7 @@ export function setRazorpayInstance(_razorpayInstance) {
     razorpayInstance.set('theme.image_frame', false);
   }
 }
+
 export const makeAuthUrl = (url) => _makeAuthUrl(razorpayInstance, url);
 
 const IRCTC_KEYS = [
@@ -388,7 +389,17 @@ export function getTrustedBadgeHighlights() {
   return preferences.rtb;
 }
 
-/**
+export const isIndianCustomer = derived([contact], ([$contact]) =>
+  $contact.startsWith('+91')
+);
+
+// Returns true if one_click_checkout is enabled on BE, passed in option and checkout is initialised using order
+export const isOneClickCheckout = () =>
+  preferences?.features?.one_click_checkout &&
+  getMerchantOrder()?.line_items_total &&
+  getOption('one_click_checkout');
+
+/*
  * Return true if `raas` feature flag and `dynamic_wallet_flow` flag is enabled in preferences.
  *
  * @param {object} pref

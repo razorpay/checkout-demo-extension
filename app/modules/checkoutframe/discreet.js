@@ -32,6 +32,7 @@ import { setShieldParams } from 'payment/validator';
 import * as P13n from 'checkoutframe/personalization';
 import { commonBanks, getFullBankLogo } from 'common/bank';
 import * as CountryCodesUtil from 'common/countrycodes';
+import OneClickCheckoutMetaProperties from 'one_click_checkout/analytics/metaProperties';
 
 /* Required for merchant.js migration */
 import * as Constants from 'common/constants';
@@ -71,6 +72,7 @@ import { overlayStack as overlayStackStore } from 'checkoutstore/back';
 import * as NativeStore from 'checkoutstore/native';
 import * as OffersStore from 'checkoutstore/offers';
 import { reward as rewardsStore } from 'checkoutstore/rewards';
+import * as address from 'one_click_checkout/address/sessionInterface';
 
 import QRScreen from 'ui/tabs/qr/index.svelte';
 import * as upiTab from 'checkoutframe/components/upi';
@@ -85,11 +87,7 @@ import * as cardTab from 'checkoutframe/components/card';
 import * as walletTab from 'checkoutframe/components/wallet';
 import * as Backdrop from 'checkoutframe/components/backdrop';
 import * as Confirm from 'checkoutframe/components/confirm';
-import TopBar from 'ui/components/Topbar.svelte';
 import * as FeeLabel from 'checkoutframe/components/fee';
-
-import PayoutsInstruments from 'ui/tabs/payout/payout-instruments.svelte';
-import PayoutAccount from 'ui/tabs/payout/payout-account.svelte';
 
 import showTimer from 'checkoutframe/timer';
 import * as es6components from 'checkoutframe/components';
@@ -111,8 +109,15 @@ import BlockedDeactivatedMerchant from 'ui/elements/BlockedDeactivatedMerchant.s
 import * as downtimeUtils from 'checkoutframe/downtimes/utils';
 import * as UTILS from 'lib/utils.js';
 
+import OneClickCheckoutHomeTab from 'one_click_checkout/ui/Home.svelte';
 import * as CovidDonations from 'checkoutframe/components/covidWrap';
 import * as Header from 'checkoutframe/components/header';
+import * as ChargesHelper from 'one_click_checkout/charges/helpers';
+import * as ChargesStore from 'one_click_checkout/charges/store';
+
+import * as OneClickCheckoutStore from 'one_click_checkout/store';
+import * as OneClickCheckoutInterface from 'one_click_checkout/sessionInterface';
+import * as RoutingStore from 'one_click_checkout/routing/store';
 import { dynamicFeeObject } from 'checkoutstore/dynamicfee';
 
 export default {
@@ -244,4 +249,13 @@ export default {
   CovidDonations,
   Apps,
   Header,
+
+  OneClickCheckoutHomeTab,
+  OneClickCheckoutInterface,
+  address,
+  ChargesHelper,
+  ChargesStore,
+  OneClickCheckoutStore,
+  RoutingStore,
+  OneClickCheckoutMetaProperties,
 };

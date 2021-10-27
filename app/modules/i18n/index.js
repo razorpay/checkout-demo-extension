@@ -281,6 +281,22 @@ export function getTabTitle(tab, locale) {
 export function getOtpScreenTitle(view, data, locale) {
   return formatTemplateWithLocale(`otp.title.${view}`, data, locale, view);
 }
+/**
+ * Returns the title to be shown on OTP screen for a given view
+ * @param {string} view
+ * @param {Object} data
+ * @param {string} locale
+ * @returns {string}
+ */
+export function getOtpScreenHeading(view, data, locale) {
+  const res = formatTemplateWithLocale(
+    `otp.heading.${view}`,
+    data,
+    locale,
+    view
+  );
+  return res === view ? '' : res;
+}
 
 /**
  * Returns the miscellaneous text to be shown on OTP screen

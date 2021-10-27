@@ -44,7 +44,11 @@
     selectedInstrument,
     methodInstrument,
   } from 'checkoutstore/screens/home';
-  import { appliedOffer, isCardValidForOffer } from 'checkoutstore/offers';
+  import {
+    appliedOffer,
+    isCardValidForOffer,
+    showOffers,
+  } from 'checkoutstore/offers';
 
   export let applicableOffers; // eligible offers array
   export let setAppliedOffer;
@@ -218,148 +222,151 @@
   }
 </script>
 
-<div
-  class="offers-container"
-  id="offers-container"
-  hidden={applicableOffers.length + otherOffers.length === 0}
-  class:has-error={error}
->
-  <header
-    on:click={showList}
-    class:applied={$appliedOffer && $isCardValidForOffer}
+{#if $showOffers}
+  <div
+    class="offers-container"
+    id="offers-container"
+    hidden={applicableOffers.length + otherOffers.length === 0}
+    class:has-error={error}
   >
-    <span>
-      {#if $appliedOffer}
-        {#if !$isCardValidForOffer}
-          <!-- LABEL: Offer is not applicable on this card. -->
-          {$t(NOT_APPLICABLE_CARD_MESSAGE)}
-        {:else}
-          <!-- LABEL: Offer Applied! -->
-          {$t(OFFER_APPLIED_MESSAGE)}
-          {#if discount}
-            <small class="theme-highlight">
-              <!-- LABEL: You save {amount} -->
-              {formatTemplateWithLocale(
-                YOU_SAVE_MESSAGE,
-                {
-                  amount: formatAmountWithSymbol(
-                    discount,
-                    getCurrency(),
-                    false
-                  ),
-                },
-                $locale
-              )}
-            </small>
-          {/if}
-        {/if}
-      {:else if applicableOffers.length === 1}
-        {applicableOffers[0].name}
-      {:else}
-        <!-- LABEL: {count} Offers Available -->
-        {formatTemplateWithLocale(
-          OFFERS_AVAILABLE_MESSAGE,
-          { count: applicableOffers.length + otherOffers.length },
-          $locale
-        )}
-      {/if}
-      <span class="offer-action theme-highlight">
-        <!-- LABEL: Change / Select -->
-        {$appliedOffer ? $t(CHANGE_ACTION) : $t(SELECT_ACTION)}
-      </span>
-    </span>
-  </header>
-  {#if error}
-    <div class="error-container">
-      <div class="error-desc">
-        <!-- LABEL: The offer is not applicable on {error}. -->
-        <b>
-          {formatTemplateWithLocale(NOT_APPLICABLE_ERROR, { error }, $locale)}
-        </b>
-        <br />
-        <!-- LABEL: You can pay the original amount. -->
-        <span>{$t(PAY_ORIGINAL_MESSAGE)}</span>
-      </div>
-      <div class="error-btns theme-highlight">
-        <span on:click={continueWithoutOffer}>
-          <!-- LABEL: Continue without offer -->
-          <b>{$t(CONTINUE_WITHOUT_OFFER_ACTION)}</b>
-        </span>
-        <!-- LABEL: Back -->
-        <span class="error-back" on:click={continueWithOffer}>
-          {$t(BACK_ACTION)}
-        </span>
-      </div>
-    </div>
-  {/if}
-  {#if listActive}
-    <main
-      class="list"
-      transition:fly={getAnimationOptions({ y: 40, duration: 200 })}
+    <header
+      on:click={showList}
+      class:applied={$appliedOffer && $isCardValidForOffer}
     >
-      <header class="close-offerlist" on:click={hideList}>
-        <!-- LABEL: Select an offer -->
-        {$t(SELECT_OFFER_HEADER)}
-        <!-- LABEL: Hide -->
-        <span>{$t(HIDE_ACTION)}</span>
-      </header>
-      <div class="offerlist-container">
-        {#if applicableOffers.length}
-          <!-- LABEL: Available Offers -->
-          <legend>{$t(AVAILABLE_OFFERS_HEADER)}</legend>
-          <OfferItemList
-            {selected}
-            offers={applicableOffers}
-            {removeOffer}
-            {selectOffer}
-          />
-        {:else}
-          <legend>
-            <!-- LABEL: No offers available for this method. Please look at other offers
-              available below -->
-            <small>{$t(NO_OFFER_AVAILABLE_METHOD_MESSAGE)}</small>
-          </legend>
-        {/if}
-        {#if otherOffers.length}
-          {#if otherActive || !applicableOffers.length}
-            {#if otherActive}
-              <!-- LABEL: Other Offers -->
-              <legend>{$t(OTHER_OFFERS_HEADER)}</legend>
+      <span>
+        {#if $appliedOffer}
+          {#if !$isCardValidForOffer}
+            <!-- LABEL: Offer is not applicable on this card. -->
+            {$t(NOT_APPLICABLE_CARD_MESSAGE)}
+          {:else}
+            <!-- LABEL: Offer Applied! -->
+            {$t(OFFER_APPLIED_MESSAGE)}
+            {#if discount}
+              <small class="theme-highlight">
+                <!-- LABEL: You save {amount} -->
+                {formatTemplateWithLocale(
+                  YOU_SAVE_MESSAGE,
+                  {
+                    amount: formatAmountWithSymbol(
+                      discount,
+                      getCurrency(),
+                      false
+                    ),
+                  },
+                  $locale
+                )}
+              </small>
             {/if}
+          {/if}
+        {:else if applicableOffers.length === 1}
+          {applicableOffers[0].name}
+        {:else}
+          <!-- LABEL: {count} Offers Available -->
+          {formatTemplateWithLocale(
+            OFFERS_AVAILABLE_MESSAGE,
+            { count: applicableOffers.length + otherOffers.length },
+            $locale
+          )}
+        {/if}
+        <span class="offer-action theme-highlight">
+          <!-- LABEL: Change / Select -->
+          {$appliedOffer ? $t(CHANGE_ACTION) : $t(SELECT_ACTION)}
+        </span>
+      </span>
+    </header>
+    {#if error}
+      <div class="error-container">
+        <div class="error-desc">
+          <!-- LABEL: The offer is not applicable on {error}. -->
+          <b>
+            {formatTemplateWithLocale(NOT_APPLICABLE_ERROR, { error }, $locale)}
+          </b>
+          <br />
+          <!-- LABEL: You can pay the original amount. -->
+          <span>{$t(PAY_ORIGINAL_MESSAGE)}</span>
+        </div>
+        <div class="error-btns theme-highlight">
+          <span on:click={continueWithoutOffer}>
+            <!-- LABEL: Continue without offer -->
+            <b>{$t(CONTINUE_WITHOUT_OFFER_ACTION)}</b>
+          </span>
+          <!-- LABEL: Back -->
+          <span class="error-back" on:click={continueWithOffer}>
+            {$t(BACK_ACTION)}
+          </span>
+        </div>
+      </div>
+    {/if}
+    {#if listActive}
+      <main
+        class="list"
+        transition:fly={getAnimationOptions({ y: 40, duration: 200 })}
+      >
+        <header class="close-offerlist" on:click={hideList}>
+          <!-- LABEL: Select an offer -->
+          {$t(SELECT_OFFER_HEADER)}
+          <!-- LABEL: Hide -->
+          <span>{$t(HIDE_ACTION)}</span>
+        </header>
+        <div class="offerlist-container">
+          {#if applicableOffers.length}
+            <!-- LABEL: Available Offers -->
+            <legend>{$t(AVAILABLE_OFFERS_HEADER)}</legend>
             <OfferItemList
               {selected}
-              offers={otherOffers}
+              offers={applicableOffers}
               {removeOffer}
               {selectOffer}
             />
           {:else}
             <legend>
-              <!-- LABEL: + OTHER OFFERS -->
-              <span
-                class="theme-highlight"
-                on:click={() => (otherActive = true)}
-              >
-                {$t(OTHER_OFFERS_ACTION)}
-                <!-- LABEL: ({count} more) -->
-                <small>
-                  {formatTemplateWithLocale(
-                    OTHER_OFFERS_COUNT,
-                    { count: otherOffers.length },
-                    $locale
-                  )}
-                </small>
-              </span>
+              <!-- LABEL: No offers available for this method. Please look at other offers
+              available below -->
+              <small>{$t(NO_OFFER_AVAILABLE_METHOD_MESSAGE)}</small>
             </legend>
           {/if}
-        {/if}
-      </div>
-    </main>
+          {#if otherOffers.length}
+            {#if otherActive || !applicableOffers.length}
+              {#if otherActive}
+                <!-- LABEL: Other Offers -->
+                <legend>{$t(OTHER_OFFERS_HEADER)}</legend>
+              {/if}
+              <OfferItemList
+                {selected}
+                offers={otherOffers}
+                {removeOffer}
+                {selectOffer}
+              />
+            {:else}
+              <legend>
+                <!-- LABEL: + OTHER OFFERS -->
+                <span
+                  class="theme-highlight"
+                  on:click={() => (otherActive = true)}
+                >
+                  {$t(OTHER_OFFERS_ACTION)}
+                  <!-- LABEL: ({count} more) -->
+                  <small>
+                    {formatTemplateWithLocale(
+                      OTHER_OFFERS_COUNT,
+                      { count: otherOffers.length },
+                      $locale
+                    )}
+                  </small>
+                </span>
+              </legend>
+            {/if}
+          {/if}
+        </div>
+      </main>
+    {/if}
+  </div>
+  {#if error}
+    <CTA show={false} />
+  {:else if listActive}
+    <CTA on:click={onSubmit} show={Boolean(selected)}>{$t(APPLY_OFFER_CTA)}</CTA
+    >
   {/if}
-</div>
-{#if error}
-  <CTA show={false} />
-{:else if listActive}
-  <CTA on:click={onSubmit} show={Boolean(selected)}>{$t(APPLY_OFFER_CTA)}</CTA>
 {/if}
 
 <style>

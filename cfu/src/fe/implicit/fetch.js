@@ -128,6 +128,8 @@ const fetchPrototype = {
           );
         }
 
+        json['status_code'] = xhr.status;
+
         callback(json);
       }
     };
@@ -198,6 +200,24 @@ function normalizeOptions(options) {
  */
 function post(opts) {
   opts.method = 'post';
+  if (!opts.headers) {
+    opts.headers = {};
+  }
+  if (!opts.headers['Content-type']) {
+    opts.headers['Content-type'] = 'application/x-www-form-urlencoded';
+  }
+
+  return fetch(opts);
+}
+
+/**
+ * Sends patch request with the given options.
+ * @param {Object} opts
+ *
+ * @returns {Object}
+ */
+function patch(opts) {
+  opts.method = 'PATCH';
   if (!opts.headers) {
     opts.headers = {};
   }
@@ -283,6 +303,7 @@ function jsonp(options) {
 }
 
 fetch.post = post;
+fetch.patch = patch;
 fetch.setSessionId = setSessionId;
 fetch.setTrackId = setTrackId;
 fetch.jsonp = jsonp;

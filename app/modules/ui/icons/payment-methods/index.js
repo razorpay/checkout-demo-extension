@@ -24,7 +24,12 @@ import lock from './lock';
 import userProtect from './user_protect';
 import newWindow from './new_window';
 import tickFlag from './tick_flag';
+import close from 'one_click_checkout/coupons/icons/close';
+import offers from 'one_click_checkout/coupons/icons/offers';
+import arrow_next from 'one_click_checkout/coupons/icons/arrow_next';
+import rzpLogo from 'one_click_checkout/loader/icons/rzp-logo';
 import savedCard from 'card/icons/saved-card';
+import edit_phone from 'ui/icons/payment-methods/edit_phone';
 
 import { getAllMethods } from 'checkoutframe/paymentmethods';
 
@@ -45,7 +50,12 @@ const availIconNames = getAllMethods().concat([
   'user_protect',
   'tick_flag',
   'new_window',
+  'close',
+  'offers',
+  'arrow_next',
   'saved_card',
+  'rzp_logo',
+  'edit_phone',
 ]);
 
 function getIconFn(iconName) {
@@ -133,8 +143,21 @@ function getIconFn(iconName) {
     case 'new_window':
       return newWindow;
 
+    case 'close':
+      return close;
+
+    case 'offers':
+      return offers;
+
+    case 'arrow_next':
+      return arrow_next;
+
     case 'saved_card':
       return savedCard;
+    case 'rzp_logo':
+      return rzpLogo;
+    case 'edit_phone':
+      return edit_phone;
   }
 }
 
@@ -143,7 +166,6 @@ export const getIcon = (
   { foregroundColor = '#072654', backgroundColor = '#3F71D7' }
 ) => {
   const iconFn = getIconFn(iconName);
-
   return iconFn && iconFn(foregroundColor, backgroundColor);
 };
 

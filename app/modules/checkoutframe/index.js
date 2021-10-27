@@ -254,6 +254,8 @@ function fetchPrefs(session) {
   session.prefCall = Razorpay.payment.getPrefs(
     getPreferenecsParams(session.r),
     (preferences) => {
+      preferences.features = preferences.features || {};
+
       session.prefCall = null;
 
       if (preferences.error) {

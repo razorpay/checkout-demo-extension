@@ -26,10 +26,11 @@ function makeTestOptions({
   callbackUrl,
   personalization,
   recurringOrder,
+  amount = 200,
 }) {
   const options = {
     key: 'rzp_test_1DP5mmOlF5G5ag',
-    amount: 200,
+    amount: amount,
     personalization: false,
   };
 
@@ -120,7 +121,7 @@ function makeTestPreferences(
  * @returns {string}
  */
 function getFeaturesString(features) {
-  const keys = Object.keys(features).filter(feature => features[feature]);
+  const keys = Object.keys(features).filter((feature) => features[feature]);
 
   return keys.join(', ');
 }
@@ -137,7 +138,6 @@ function makeOptionsAndPreferences(method, features = {}) {
     ...defaultFeatures,
     ...features,
   };
-
   let options = makeTestOptions(features);
   let preferences = makeTestPreferences(features, {
     method,

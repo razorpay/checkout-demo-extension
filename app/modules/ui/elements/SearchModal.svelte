@@ -414,11 +414,12 @@
     left: 0;
     width: 100%;
     height: 100%;
+    min-height: 581px;
   }
 
   .search-curtain {
     display: flex;
-    z-index: 3;
+    z-index: 101;
   }
 
   .search-box {
