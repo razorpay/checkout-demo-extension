@@ -14,6 +14,7 @@ export const newCardInputFocused = writable(false);
 export const dccCurrency = writable('');
 export const defaultDCCCurrency = writable(''); // store default currency given by flow api
 export const currencyRequestId = writable('');
+export const cardCountry = writable(''); // If DCC is not enabled we need to check the card country, if card country is not "IN" then call flows API
 
 /** AVS state */
 export const AVSScreenMap = writable({});

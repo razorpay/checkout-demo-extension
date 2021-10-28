@@ -245,6 +245,7 @@ export default {
       'Your address is used only for verification and is securely processed via encrypted servers',
     avs_country_all: 'All Countries',
     avs_state_all: 'All States',
+    avs_form_input_required: 'This field is required',
     ...cardLang,
   },
   card_subtext: {

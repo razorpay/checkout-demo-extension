@@ -18,6 +18,7 @@
     AVS_STATE_SEARCH_TITLE,
     AVS_COUNTRY_ALL,
     AVS_STATE_ALL,
+    AVS_FORM_INPUT_REQUIRED,
   } from 'ui/labels/card';
 
   import CountrySearchItem from 'ui/elements/search-item/Country.svelte';
@@ -33,6 +34,22 @@
   export let lastView = null;
 
   let formData = $AVSBillingAddress || getPrefillBillingAddress();
+
+  let formErrors = {};
+
+  let spacialCharRegex = /^[\s`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]*$/; // Regex to check if input field contains only special characters.
+
+  function checkFormErrors() {
+    Object.keys(formData).forEach((key) => {
+      if (key !== 'line2') {
+        if (!formData[key].trim()) {
+          formErrors[key] = $t(AVS_FORM_INPUT_REQUIRED);
+        } else {
+          delete formErrors[key];
+        }
+      }
+    });
+  }
 
   onMount(() => {
     // check for selected card
@@ -67,6 +84,20 @@
       $AVSBillingAddress.country = AVS_COUNTRY_MAP[$AVSBillingAddress.country];
     }
     formData = $AVSBillingAddress;
+
+    /**
+     * TODO need better way 
+     * Check if main form is submitted
+     */
+    const footerCta = document.getElementById('footer-cta');
+    if (footerCta) {
+      footerCta.addEventListener('click', checkFormErrors);
+    }
+    return () => {
+      if (footerCta) {
+        footerCta.removeEventListener('click', checkFormErrors);
+      }
+    };
   });
 
   const AVS_COUNTRY_SUPPORTED = Object.keys(AVS_COUNTRY_MAP).reduce(
@@ -172,6 +203,17 @@
     };
   }
 
+  /**
+   * Trim the input field value to not allow blank spaces
+   * @param key
+   */
+  function handleOnBlur(key) {
+    formData = {
+      ...formData,
+      [key]: spacialCharRegex.test(formData[key]) ? '' : formData[key].trim(),
+    };
+  }
+
   $: {
     $AVSBillingAddress = { ...formData };
     Events.setMeta(MetaProperties.AVS_FORM_DATA, formData);
@@ -205,10 +247,13 @@
               : () => {}}
             on:input={(e) => updateValue(subInput.id, e.target.value)}
             value={formData[subInput.id]}
+            on:blur={() => handleOnBlur(subInput.id)}
             icon={subInput.type === 'search' ? '' : false}
             on:keydown={downArrowHandler.bind(null, subInput.id)}
             label={formData[subInput.id] ? subInput.placeholder : ''}
             placeholder={subInput.placeholder}
+            helpText={formErrors[subInput.id]}
+            maxlength={255}
           />
         {/each}
       {:else}
@@ -227,8 +272,11 @@
           on:keydown={downArrowHandler.bind(null, input.id)}
           value={formData[input.id]}
           on:input={(e) => updateValue(input.id, e.target.value)}
+          on:blur={() => handleOnBlur(input.id)}
           label={formData[input.id] ? input.placeholder : ''}
           placeholder={input.placeholder}
+          helpText={formErrors[input.id]}
+          maxlength={255}
         />
       {/if}
     </div>
