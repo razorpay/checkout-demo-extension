@@ -71,6 +71,7 @@
     padding: 8px 12px;
     pointer-events: none;
     box-shadow: 0px 4px 4px 0px #0000001a;
+    right: -5px;
   }
 
   .multi-message {

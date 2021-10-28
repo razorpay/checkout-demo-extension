@@ -24,5 +24,7 @@ export default {
   same_address_checkbox_label: 'Billing address same as shipping address',
   saved_address_label: 'Your address has been saved',
   error_label: 'Required',
+  unserviceable_label: 'Unserviceable',
+  serviceable_label: 'Serviceable',
   ...billingAddressLabels,
 };

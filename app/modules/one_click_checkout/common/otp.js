@@ -62,7 +62,6 @@ export const askForOTP = () => {
     Events.Track(otpEvents.OTP_LOAD, {
       otp_skip_visible: get(OtpScreenStore.allowSkip),
     });
-
     createOTP(() => {
       updateOTPStore({
         ...otpParams.sent,

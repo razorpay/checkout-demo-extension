@@ -16,6 +16,8 @@
     AREA_LABEL,
     LANDMARK_LABEL,
     SAVE_ADDRESS_CONSENT,
+    UNSERVICEABLE_LABEL,
+    SERVICEABLE_LABEL,
   } from 'one_click_checkout/address/i18n/labels';
   // const import
   import {
@@ -120,7 +122,7 @@
         return completed;
       }
       if (
-        INPUT_FORM[pinIndex]?.unserviceableText !== 'Serviceable' &&
+        INPUT_FORM[pinIndex]?.unserviceableText !== SERVICEABLE_LABEL &&
         checkServiceability
       ) {
         completed = false;
@@ -149,18 +151,22 @@
           },
         ];
 
-        postServiceability(payload).then((res) => {
-          if (res && res[value]?.serviceability) {
-            codChargeAmount.set(res[value].cod_fee);
-            shippingCharge.set(res[value].shipping_fee);
-            INPUT_FORM[pinIndex].unserviceableText = 'Serviceable';
-            onUpdate('city', res[value].city || '');
-            onUpdate('state', res[value].state || '');
-          } else {
-            INPUT_FORM[pinIndex].unserviceableText = 'Unserviceable';
-          }
-          $formData.cod = res[value]?.cod;
-        });
+        postServiceability(payload)
+          .then((res) => {
+            if (res && res[value]?.serviceability) {
+              codChargeAmount.set(res[value].cod_fee);
+              shippingCharge.set(res[value].shipping_fee);
+              INPUT_FORM[pinIndex].unserviceableText = SERVICEABLE_LABEL;
+              onUpdate('city', res[value].city || '');
+              onUpdate('state', res[value].state || '');
+            } else {
+              INPUT_FORM[pinIndex].unserviceableText = UNSERVICEABLE_LABEL;
+            }
+            $formData.cod = res[value]?.cod;
+          })
+          .catch(() => {
+            INPUT_FORM[pinIndex].unserviceableText = UNSERVICEABLE_LABEL;
+          });
       } else {
         INPUT_FORM[pinIndex].unserviceableText = '';
       }

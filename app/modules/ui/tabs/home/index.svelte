@@ -150,6 +150,7 @@
   import { updateOrder } from 'one_click_checkout/address/service';
   import UserDetailsStrip from 'ui/components/UserDetailsStrip.svelte';
   import { showSummaryModal } from 'one_click_checkout/summary_modal';
+  import { COD_EVENTS, HOME_EVENTS } from 'analytics/home/events';
 
   const cardOffer = getCardOffer();
   const session = getSession();
@@ -681,6 +682,12 @@
     if ($isBillingSameAsShipping) {
       billing_address = $selectedShippingAddress;
     }
+    Events.Track(HOME_EVENTS.HOME_LOADED, {
+      cod_available: $isCodAvailable,
+      cod_unavailable_reason: $codReason,
+      available_methods: getAvailableMethods(),
+    });
+    Events.Track(COD_EVENTS.COD_METHOD, { disabled: !$isCodAvailable });
     if (!$isCodAvailable) {
       configureCODOrder($blocks);
     }

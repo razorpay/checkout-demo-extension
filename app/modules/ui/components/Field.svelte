@@ -1,4 +1,5 @@
 <script>
+  import { t } from 'svelte-i18n';
   // Utils imports
   import { getSession } from 'sessionmanager';
   import { Track } from 'analytics';
@@ -358,7 +359,7 @@
   {#if label}<label class={labelClasses}>{label}</label>{/if}
   {#if extraLabel}
     <div class={`${extraLabelClass} input-extralabel`}>
-      {extraLabel}
+      {$t(extraLabel)}
     </div>
   {/if}
   {#if loader}

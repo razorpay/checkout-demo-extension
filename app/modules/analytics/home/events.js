@@ -27,6 +27,11 @@ const events = {
   ...homeScreen,
 };
 
+const COD_EVENTS = {
+  COD_METHOD: 'checkoutCODOptionShown',
+  COD_METHOD_SELECTED: 'checkoutCODOptionSelected',
+};
+
 export default getEventsName('home', events);
 
-export { ContactDetailsEvents };
+export { ContactDetailsEvents, COD_EVENTS, homeScreen as HOME_EVENTS };

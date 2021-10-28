@@ -78,7 +78,6 @@
     USE_SAVED_CARDS_ON_RZP_BTN,
     CARDS_SAVED_ON_APPS_LABEL,
     CARDS_SAVED_ON_RZP_LABEL,
-    ENTER_CARD_DETAILS_OPTION_LABEL,
     ADD_ANOTHER_CARD_BTN,
     RECURRING_CALLOUT,
     SUBSCRIPTION_CALLOUT,
@@ -95,7 +94,12 @@
   // Utils imports
   import { getSession } from 'sessionmanager';
   import { getSavedCards, transform } from 'common/token';
-  import { Events, CardEvents, MetaProperties } from 'analytics/index';
+  import Analytics, {
+    Events,
+    CardEvents,
+    MetaProperties,
+  } from 'analytics/index';
+  import { SAVED_CARD_EVENTS } from 'analytics/card/card';
 
   import {
     getIin,
@@ -829,6 +833,9 @@
   }
 
   export function setTabVisible(status = true) {
+    if (currentView === Views.SAVED_CARDS && status) {
+      Analytics.track(SAVED_CARD_EVENTS.SCREEN_LOAD);
+    }
     tabVisible = status;
   }
 

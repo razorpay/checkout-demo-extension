@@ -4,6 +4,7 @@
   import Field from 'ui/components/Field.svelte';
   import { createEventDispatcher, onMount } from 'svelte';
   import ContactField from 'ui/components/ContactField.svelte';
+  import { SERVICEABLE_LABEL } from 'one_click_checkout/address/i18n/labels';
 
   export let INPUT_FORM;
   export let formData;
@@ -59,11 +60,7 @@
             loader={subInput.loader}
             validationText={error?.id === subInput.id ? error.text : ''}
             labelClasses="address-label"
-            extraLabel={subInput.unserviceableText}
             elemClasses={'address-elem'}
-            extraLabelClass={subInput.unserviceableText === 'Serviceable'
-              ? 'successText'
-              : 'failureText'}
             handleInput
           />
         {/each}
@@ -95,7 +92,7 @@
           labelClasses="address-label"
           extraLabel={input.unserviceableText}
           elemClasses={'address-elem'}
-          extraLabelClass={input.unserviceableText === 'Serviceable'
+          extraLabelClass={input.unserviceableText === SERVICEABLE_LABEL
             ? 'successText'
             : 'failureText'}
         />
