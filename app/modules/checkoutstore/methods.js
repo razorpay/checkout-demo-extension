@@ -392,6 +392,7 @@ export function getSingleMethod() {
     'upi',
     'wallet',
     'paypal',
+    'bank_transfer',
   ];
 
   if (getOrderMethod()) {
