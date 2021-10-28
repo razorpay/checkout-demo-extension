@@ -38,16 +38,9 @@
     currentAuthType,
     selectedCardFromHome,
     defaultDCCCurrency,
-    cardCountry,
-    AVSScreenMap,
   } from 'checkoutstore/screens/card';
 
-  import {
-    methodInstrument,
-    blocks,
-    phone,
-    selectedInstrument,
-  } from 'checkoutstore/screens/home';
+  import { methodInstrument, blocks, phone } from 'checkoutstore/screens/home';
 
   import { findCodeByNetworkName } from 'common/card';
   import { customer } from 'checkoutstore/customer';
@@ -63,7 +56,6 @@
     getDowntimes,
     isPartialPayment,
     getAmount,
-    getCurrencies,
     isIndianCustomer,
   } from 'checkoutstore';
 
@@ -218,11 +210,6 @@
 
   let showSavedCardsCta = false;
   $: showSavedCardsCta = savedCards && savedCards.length && isSavedCardsEnabled;
-
-  /**
-   * Store flags based on /flows API is called for card IIN
-   */
-  let cardFlowsMap = {};
 
   onMount(() => {
     // Prefill
@@ -429,52 +416,6 @@
 
   $: {
     lastSavedCard = savedCards && savedCards[savedCards.length - 1];
-  }
-
-  function getCardByTokenId(tokenId) {
-    if (!$customer.tokens) {
-      return;
-    }
-    if (!$customer.tokens.items) {
-      return;
-    }
-    return _Arr.find($customer.tokens.items, (token) => token.id === tokenId);
-  }
-
-  $: {
-    /**
-     * If DCC is not enabled and cardCountry is not "IN" then call the flows api to check the address_required enabled
-     */
-    const iin = getIin($cardNumber);
-    if (
-      $cardCountry &&
-      $cardCountry !== 'IN' &&
-      !cardFlowsMap[iin] &&
-      !isDCCEnabled()
-    ) {
-      let prop = { iin };
-      if (currentView === Views.SAVED_CARDS && $selectedCard) {
-        const tokenId = $selectedCard.id;
-        prop = { tokenId };
-      } else if (currentView === Views.HOME_SCREEN && $selectedInstrument) {
-        const card = getCardByTokenId($selectedInstrument.token_id);
-        if (card) {
-          prop = { tokenId: card.id };
-        }
-      }
-
-      getCurrencies(prop).then((currencyPayload) => {
-        cardFlowsMap[iin] = true;
-        let entity = null;
-        if (prop) {
-          entity = prop.iin || prop.tokenId || null;
-        }
-        AVSScreenMap.update((value) => ({
-          ...value,
-          [entity]: currencyPayload.avs_required,
-        }));
-      });
-    }
   }
 
   let instrumentSubtext;
@@ -738,9 +679,6 @@
     const trimmedVal = _cardNumber.replace(/[ ]/g, '');
     const amexCard = isAmex($cardNumber);
 
-    // Reset the card country if entering new card
-    $cardCountry = '';
-
     $internationalCurrencyCalloutNeeded = amexCard && isInternational();
     isDowntime('network', cardType);
     if (sixDigits) {
@@ -749,11 +687,6 @@
           // $cardNumber's IIN has changed since we started the n/w request, do nothing
           return;
         }
-
-        if (features.country) {
-          $cardCountry = features.country;
-        }
-
         if (features?.issuer) {
           isDowntime('issuer', features.issuer);
         }

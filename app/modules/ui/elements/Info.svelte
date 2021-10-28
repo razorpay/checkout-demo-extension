@@ -60,10 +60,6 @@
     border-radius: 0 0 3px 3px;
   }
 
-  :global(.mobile) .info-screen {
-    bottom: 0;
-  }
-
   .info {
     min-height: 150px;
     width: 100%;

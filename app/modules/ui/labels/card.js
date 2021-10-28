@@ -50,4 +50,3 @@ export const AVS_INFO_MESSAGE_2 = 'card.avs_info_message_2';
 export const AVS_INFO_MESSAGE_3 = 'card.avs_info_message_3';
 export const AVS_COUNTRY_ALL = 'card.avs_country_all';
 export const AVS_STATE_ALL = 'card.avs_state_all';
-export const AVS_FORM_INPUT_REQUIRED = 'card.avs_form_input_required';

@@ -90,7 +90,6 @@ export const Views = {
   ADD_CARD: 'add-card',
   AVS: 'avs-card',
   CARD_APP: 'card-app',
-  HOME_SCREEN: 'home-screen',
 };
 
 export const banksUnderOneCard = ['IDFB', 'SIBL', 'STCB', 'FDRL'];
