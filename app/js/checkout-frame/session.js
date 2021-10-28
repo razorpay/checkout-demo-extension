@@ -4865,6 +4865,14 @@ Session.prototype = {
     // if AVS is on then screen is set to card but for saved card from home screen requires processing like home screen
     var isAVSScreenFromHomeScreen = AVSData.isAVSScreenFromHomeScreen;
 
+    // AVS check
+    var AVSMap = discreet.storeGetter(CardScreenStore.AVSScreenMap) || {};
+    var isSavedCardScreen = this.svelteCardTab.isOnSavedCardsScreen();
+    var cardIin = discreet.storeGetter(CardScreenStore.cardIin);
+    var selectedCard = discreet.storeGetter(CardScreenStore.selectedCard);
+    var tokenId = selectedCard && selectedCard.id ? selectedCard.id : '';
+    var AVSRequired = Boolean(AVSMap[isSavedCardScreen ? tokenId : cardIin]);
+
     if (!this.screen || isAVSScreenFromHomeScreen) {
       if (selectedInstrument) {
         data = Instruments.addInstrumentToPaymentData(
@@ -5230,10 +5238,7 @@ Session.prototype = {
     /**
      * For AVS if method is card && currency is not INR i.e. DCC or MCC flow enabled
      */
-    if (
-      data.method === 'card' &&
-      (Store.isDCCEnabled() || this.r.get('currency') !== 'INR')
-    ) {
+    if (data.method === 'card' && AVSRequired) {
       // AVS
       AVSData = discreet.storeGetter(CardScreenStore.AVSBillingAddress) || {};
       // AVS will submit only on AVS screen
