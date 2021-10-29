@@ -104,8 +104,23 @@ export function flatten(obj, defObj) {
   return flatObj;
 }
 
+/**
+ * normalize the options currently used to give support for retry object like we do in SDK
+ * @param {*} options
+ */
+function normalizeOption(options) {
+  if (
+    typeof options.retry === 'object' &&
+    typeof options.retry.enabled === 'boolean'
+  ) {
+    options.retry = options.retry.enabled;
+  }
+  return options;
+}
+
 const flatKeys = {};
 export default function Options(options) {
+  options = normalizeOption(options);
   _Obj.loop(RazorpayDefaults, function (val, key) {
     if (_.isNonNullObject(val) && !_.isEmptyObject(val)) {
       flatKeys[key] = true;
