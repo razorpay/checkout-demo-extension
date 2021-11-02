@@ -36,9 +36,7 @@
 
     return {
       destroy() {
-        // Removing it as causing multiple CTA issues
-        // TODO: through testing
-        // wasCtaShown  ? showCta() : hideCta();
+        wasCtaShown ? showCta() : hideCta();
         _El.detach(node);
       },
     };
