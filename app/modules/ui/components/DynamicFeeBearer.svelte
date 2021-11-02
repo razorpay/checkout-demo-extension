@@ -22,11 +22,10 @@
 
   let label;
   let showFeeDetails = false;
-  let timeout;
+
   const triggerToolTip = () => {
-    timeout ? clearTimeout(timeout) : null;
     showFeeDetails = true;
-    timeout = setTimeout(() => {
+    setTimeout(() => {
       showFeeDetails = false;
     }, DYNAMIC_FEE_BEARER_VIEW_TIME);
   };

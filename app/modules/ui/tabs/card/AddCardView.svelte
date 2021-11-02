@@ -12,7 +12,7 @@
 
   import { getSession } from 'sessionmanager';
   // Svelte imports
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { createEventDispatcher, onMount, tick } from 'svelte';
 
   import { getComponentProps } from 'utils/svelteUtils';
 

@@ -1,5 +1,4 @@
-import { get, writable } from 'svelte/store';
-import { Views } from 'ui/tabs/card/constant';
+import { writable } from 'svelte/store';
 import {
   getConvenienceFeeConfig,
   getDynamicFeeBearerMerchantMessage,
@@ -7,7 +6,6 @@ import {
 export const dynamicFeeObject = writable({});
 export const showFeesIncl = writable({});
 export const merchantMessage = writable('');
-export const addCardView = writable('');
 
 export function setDynamicFeeObject(instrument, type) {
   return getConvenienceFee(instrument, type);
@@ -16,7 +14,6 @@ export function setMerchantMessage() {
   let msg = getDynamicFeeBearerMerchantMessage();
   merchantMessage.update((m) => (m = msg));
 }
-
 function getConvenienceFee(instrument, type) {
   const config = getConvenienceFeeConfig();
   const selectedInstrument = config?.methods?.[instrument];
@@ -71,5 +68,3 @@ function getConvenienceFee(instrument, type) {
     );
   }
 }
-
-export const isAddCardView = () => get(addCardView) === Views.ADD_CARD;

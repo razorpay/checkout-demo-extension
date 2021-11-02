@@ -41,7 +41,6 @@
     getOption,
     isDCCEnabled,
     getTrustedBadgeHighlights,
-    isDynamicFeeBearer,
     isIndianCustomer,
     isOneClickCheckout,
   } from 'checkoutstore';
@@ -1159,7 +1158,7 @@
       {#if cardOffer}
         <CardOffer offer={cardOffer} />
       {/if}
-      {#if (isDCCEnabled() || dccView === 'paypal') && !isDynamicFeeBearer()}
+      {#if isDCCEnabled() || dccView === 'paypal'}
         <DynamicCurrencyView tabVisible view={dccView} />
       {/if}
       <!-- {#if showRecurringCallout}

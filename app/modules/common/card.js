@@ -4,7 +4,7 @@ import Analytics, { Track } from 'analytics';
 import { checkDowntime } from 'checkoutframe/downtimes';
 
 import { isDynamicFeeBearer } from 'checkoutstore/index';
-import { setDynamicFeeObject, isAddCardView } from 'checkoutstore/dynamicfee';
+import { setDynamicFeeObject } from 'checkoutstore/dynamicfee';
 
 export const API_NETWORK_CODES_MAP = {
   AMEX: 'amex',
@@ -258,6 +258,7 @@ const CardMetadata = {
   iin: {},
   token: {},
 };
+
 /**
  * Cache IIN metadata
  * For network, checkout network code is saved.
@@ -382,7 +383,7 @@ export function getCardFeatures(cardNumber) {
   const existingRequest = CardFeatureRequests.iin[iin];
 
   if (existingRequest) {
-    if (isDynamicFeeBearer() && isAddCardView()) {
+    if (isDynamicFeeBearer()) {
       if (CardFeatureCache.iin[iin]) {
         setDynamicFeeObject('card', CardFeatureCache.iin[iin]?.type);
       }
@@ -419,7 +420,7 @@ export function getCardFeatures(cardNumber) {
         updateCardIINMetadata(iin, features);
 
         // Dynamic Fee Card Type
-        if (isDynamicFeeBearer() && isAddCardView()) {
+        if (isDynamicFeeBearer()) {
           let cardType;
           if (CardFeatureCache.iin[iin]) {
             cardType = CardFeatureCache.iin[iin]?.type;
