@@ -63,6 +63,7 @@
     getDowntimes,
     isPartialPayment,
     getAmount,
+    isDynamicFeeBearer,
     getCurrencies,
     isIndianCustomer,
   } from 'checkoutstore';
@@ -134,6 +135,7 @@
   let AVSInfo = [];
   // experiments
   import { delayLoginOTPExperiment } from 'card/helper';
+  import { addCardView } from 'checkoutstore/dynamicfee';
 
   let delayOTPExperiment;
 
@@ -603,6 +605,7 @@
 
   function setView(view) {
     [lastView, currentView] = [currentView, view];
+    $addCardView = view;
   }
 
   export function setSelectedApp(code) {
@@ -1097,7 +1100,7 @@
       {/if}
     </div>
     <Bottom tab="card">
-      {#if isDCCEnabled()}
+      {#if isDCCEnabled() && !isDynamicFeeBearer()}
         <DynamicCurrencyView
           {tabVisible}
           view={$selectedApp

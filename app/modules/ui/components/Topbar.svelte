@@ -11,7 +11,11 @@
     isOneClickCheckout,
   } from 'checkoutstore';
   import { isContactPresent } from 'checkoutstore/screens/home';
-  import { dynamicFeeObject, showFeesIncl } from 'checkoutstore/dynamicfee';
+  import {
+    dynamicFeeObject,
+    addCardView,
+    showFeesIncl,
+  } from 'checkoutstore/dynamicfee';
 
   import { handleEditContact as handleOneClickCheckoutEditContact } from 'one_click_checkout/sessionInterface';
 
@@ -148,6 +152,7 @@
     tick().then(() => {
       dynamicFeeObject.set({});
       showFeesIncl.set({});
+      addCardView.set('');
     });
 
     dispatch('back');
