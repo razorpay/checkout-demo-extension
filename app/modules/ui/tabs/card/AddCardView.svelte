@@ -289,6 +289,7 @@
         const cardTypeMap = {
           debit: 'debit_card',
           credit: 'credit_card',
+          prepaid: 'prepaid_card',
         };
         if (!_type && $methodInstrument?.method?.includes('_card')) {
           _type = $methodInstrument?.method;
@@ -308,6 +309,10 @@
             } else if (_type === 'credit') {
               reccuringCardSecondaryCheck =
                 !!getCardNetworksForRecurring()[$cardType];
+            } else if (_type === 'prepaid') {
+              reccuringCardSecondaryCheck = issuer
+                ? !!allowedRecurringCardsData[_type][issuer]
+                : true;
             }
           }
         }

@@ -92,6 +92,12 @@ const ALL_METHODS = {
     }
   },
 
+  prepaid_card() {
+    if (isRecurring()) {
+      return getRecurringMethods()?.card?.prepaid;
+    }
+  },
+
   credit_card() {
     if (
       getAmount() &&
