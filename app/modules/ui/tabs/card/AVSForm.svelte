@@ -86,7 +86,7 @@
     formData = $AVSBillingAddress;
 
     /**
-     * TODO need better way 
+     * TODO need better way
      * Check if main form is submitted
      */
     const footerCta = document.getElementById('footer-cta');
