@@ -306,13 +306,9 @@
               reccuringCardSecondaryCheck = issuer
                 ? !!allowedRecurringCardsData[_type][issuer]
                 : true;
-            } else if (_type === 'credit') {
+            } else if (_type === 'credit' || _type === 'prepaid') {
               reccuringCardSecondaryCheck =
-                !!getCardNetworksForRecurring()[$cardType];
-            } else if (_type === 'prepaid') {
-              reccuringCardSecondaryCheck = issuer
-                ? !!allowedRecurringCardsData[_type][issuer]
-                : true;
+                !!getCardNetworksForRecurring(_type)[$cardType];
             }
           }
         }

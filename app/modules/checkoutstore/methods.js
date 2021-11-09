@@ -447,7 +447,8 @@ export function getCardTypesForRecurring() {
   }
 }
 
-export function getCardNetworksForRecurring() {
+// type: credit, prepaid
+export function getCardNetworksForRecurring(type) {
   // "recurring": {
   //   "card": {
   //     "credit": ["MasterCard", "Visa", "American Express"]
@@ -455,7 +456,7 @@ export function getCardNetworksForRecurring() {
   // }
   if (isRecurring()) {
     // Using only credit cards as debit cards are only supported on some banks.
-    const networks = getRecurringMethods().card?.credit;
+    const networks = getRecurringMethods().card[type];
     if (_.isArray(networks) && networks.length) {
       // Example: "American Express" to "amex"
       const codes = _Arr.map(networks, findCodeByNetworkName);
