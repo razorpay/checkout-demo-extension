@@ -415,7 +415,7 @@ function generateInstrumentId(
   blockIndex,
   instrumentIndex
 ) {
-  let base = `${block.code}_${blockIndex}_${instrumentIndex}_${instrument.method}`;
+  let base = `${block.code}_${blockIndex}_${instrumentIndex}_${instrument.method}_${customer.logged}`;
 
   if (customer && customer.contact) {
     base = `${hashFnv32a(customer.contact)}_${base}`;

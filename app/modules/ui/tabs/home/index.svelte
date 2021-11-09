@@ -337,6 +337,22 @@
     view = passedView;
   }
 
+  /**
+   * this object is a key/value pair of contact and p13n data
+   * contact key contains the contact number and login status. [0]
+   * value is p13n information which contains
+   * {
+   *   source: 'api' | 'storage' => depending on randomness, the source for p13 will differ
+   *   instruments: list of instruments to be shown
+   *   experiment : one of EXPERIMENT_IDENTIFIERS
+   * }
+   *
+   * [0] ->  key is a combination of contact and login status because p13n instruments differ based on
+   * whether customer is logged in or not. When a customer is logged in p13n block needs to be updated
+   * If we don't split these 2 states as separate keys, i.e. by keeping only contact as key,
+   * it will be a CACHE HIT and p13n block will not be updated when user state is switched to logged in and vice-versa.
+   *
+   */
   const USER_EXPERIMENT_CACHE = {};
 
   /**
@@ -348,10 +364,12 @@
     customer: _customer,
     instrumentsFromStorage,
   }) {
-    const user = _customer.contact;
+    const cacheKey = `${_customer.contact}_${
+      _customer.logged ? 'LOGGED_IN' : 'LOGGED_OUT'
+    }`;
 
-    if (!USER_EXPERIMENT_CACHE[user]) {
-      USER_EXPERIMENT_CACHE[user] = new Promise((resolve) => {
+    if (!USER_EXPERIMENT_CACHE[cacheKey]) {
+      USER_EXPERIMENT_CACHE[cacheKey] = new Promise((resolve) => {
         const instrumentMap = {
           api: [],
           storage: instrumentsFromStorage,
@@ -453,9 +471,9 @@
               experiment: experimentIdentifier,
             };
 
-            USER_EXPERIMENT_CACHE[user] = p13nRenderData;
+            USER_EXPERIMENT_CACHE[cacheKey] = p13nRenderData;
 
-            resolve(USER_EXPERIMENT_CACHE[user]);
+            resolve(USER_EXPERIMENT_CACHE[cacheKey]);
           });
 
         // if source is api, we need to fetch api instruments and then
@@ -485,7 +503,7 @@
       });
     }
 
-    return USER_EXPERIMENT_CACHE[user];
+    return USER_EXPERIMENT_CACHE[cacheKey];
   }
 
   function getAllAvailableP13nInstruments() {
@@ -616,6 +634,23 @@
   // So, we use this flag to perform no-op if true.
   // TODO: Do this in a better way by figuring out how to make it execute the block only once.
   let isInstrumentFaultEmitted = false;
+
+  /**
+   * When we change contact from logged in user to a new contact (which is not logged in)
+   * we log out the previously logged in user when p13n api call
+   * is made for new contact. (logout happens in backend, p13n api handles it)
+   * On client side, we update the customer infromation as logged out
+   */
+  let prevCustomer = $customer;
+  $: if (prevCustomer !== $customer) {
+    const prevCustomerLoggedIn = prevCustomer && prevCustomer.logged;
+
+    if (prevCustomerLoggedIn) {
+      session.logoutUserOnClient(prevCustomer);
+    }
+
+    prevCustomer = $customer;
+  }
 
   $: {
     const loggedIn = _Obj.getSafely($customer, 'logged');

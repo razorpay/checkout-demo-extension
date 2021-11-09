@@ -524,12 +524,21 @@ function updateAnalytics(preferences) {
 function updatePreferredMethods(preferences) {
   const { preferred_methods } = preferences;
 
+  /**
+   * Determine whether the user is logged in or not.
+   * When preferences.preferred_methods response contains contact key which is not 'default'
+   * we can presume that the user is logged in, because we get the contact number
+   * as 'default' only for logged out user.
+   */
+  const isLogged = (contact) => contact !== 'default';
+
   if (preferred_methods) {
     _Obj.loop(preferred_methods, ({ instruments }, contact) => {
       if (instruments) {
         setInstrumentsForCustomer(
           {
             contact,
+            logged: isLogged(contact),
           },
           removeDuplicateApiInstruments(instruments)
         );

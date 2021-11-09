@@ -11,7 +11,21 @@ import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { isDesktop } from 'common/useragent';
 
+/**
+ * this object is a key/value pair of contact and p13n api data
+ * contact key contains the contact number and login status. [0]
+ * value is p13n api response for a contact number
+ *
+ * [0] ->  key is a combination of contact and login status because p13n api response differ based on
+ * whether customer is logged in or not. When a customer is logged in p13n block needs to be updated
+ * If we don't split these 2 states as separate keys, i.e. by keeping only contact as key,
+ * it will be a CACHE HIT and p13n block will not be updated when user state is switched to logged in and vice-versa.
+ *
+ */
 const PREFERRED_INSTRUMENTS_CACHE = {};
+
+const cacheKey = (customer) =>
+  `${customer.contact}_${customer.logged ? 'LOGGED_IN' : 'LOGGED_OUT'}`;
 
 export const removeDuplicateApiInstruments = (instruments) => {
   const result = [];
@@ -60,7 +74,7 @@ export function setInstrumentsForCustomer(
     })
   );
 
-  PREFERRED_INSTRUMENTS_CACHE[customer.contact] = Promise.resolve({
+  PREFERRED_INSTRUMENTS_CACHE[cacheKey(customer)] = Promise.resolve({
     identified,
     instruments: transformedInstruments,
   });
@@ -129,7 +143,7 @@ function getInstrumentsFromApi(customer) {
     });
   });
 
-  PREFERRED_INSTRUMENTS_CACHE[customer.contact] = promise;
+  PREFERRED_INSTRUMENTS_CACHE[cacheKey(customer)] = promise;
 
   return promise;
 }
@@ -141,7 +155,7 @@ function getInstrumentsFromApi(customer) {
  * @returns {Promise<Array<StorageInstrument>>}
  */
 export function getInstrumentsForCustomer(customer) {
-  const cached = PREFERRED_INSTRUMENTS_CACHE[customer.contact];
+  const cached = PREFERRED_INSTRUMENTS_CACHE[cacheKey(customer)];
 
   if (cached) {
     return cached;
