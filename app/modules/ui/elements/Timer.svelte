@@ -8,7 +8,12 @@
   let displayTime;
 
   const timerFn = () => {
-    const secLeft = Math.round((expiry - _.now()) / 1000);
+    const millisecLeft = expiry - _.now();
+    if (millisecLeft <= 0) {
+      clear();
+      onExpire();
+    }
+    const secLeft = Math.round(millisecLeft / 1000);
     displayTime =
       Math.floor(secLeft / 60) + ':' + ('0' + (secLeft % 60)).slice(-2);
   };
@@ -16,14 +21,9 @@
 
   // refs to clear timeouts
   const interval = setInterval(timerFn, 1000);
-  const timeout = setTimeout(() => {
-    onExpire();
-    clear();
-  }, expiry - _.now());
 
   export function clear() {
     clearInterval(interval);
-    clearTimeout(timeout);
   }
 
   onDestroy(clear);
