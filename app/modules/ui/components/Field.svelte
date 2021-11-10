@@ -300,13 +300,6 @@
       {@html icon}
     </i>
   {/if}
-  {#if isPredictionEnable}
-    <input
-      bind:this={suggestionInputRef}
-      bind:value={predictedValue}
-      class="input prediction-input"
-    />
-  {/if}
   {#if leftImage}
     <img class="left-img" src={leftImage} />
   {/if}
@@ -356,6 +349,13 @@
     class:no-validate={handleInput}
     class:cvv-input={type === 'cvv'}
   />
+  {#if isPredictionEnable}
+    <input
+      bind:this={suggestionInputRef}
+      bind:value={predictedValue}
+      class="input prediction-input"
+    />
+  {/if}
   {#if label}<label class={labelClasses}>{label}</label>{/if}
   {#if extraLabel}
     <div class={`${extraLabelClass} input-extralabel`}>
@@ -444,6 +444,7 @@
       pointer-events: none;
       color: black;
       width: 100%;
+      top: 0;
     }
     input.main {
       background: transparent;
