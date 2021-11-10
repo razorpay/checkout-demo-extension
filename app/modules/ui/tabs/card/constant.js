@@ -102,7 +102,7 @@ export const cardWithRecurringSupport = {
   // OneCard exclusive banks - start
   IDFB: { credit: true, debit: false },
   SIBL: { credit: true, debit: false },
-  STCB: { credit: true, debit: false },
+  STCB: { credit: true, debit: false, prepaid: true },
   FDRL: { credit: true, debit: false },
   // OneCard exclusive banks - end
 };
