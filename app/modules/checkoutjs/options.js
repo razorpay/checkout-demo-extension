@@ -12,6 +12,9 @@ RazorpayDefaults.paused = false;
 RazorpayDefaults.fee_label = '';
 RazorpayDefaults.force_terminal_id = '';
 RazorpayDefaults.is_donation_checkout = false;
+// This is encrypted data to be passed in all the API calls
+// to identify the merchant for keyless auth
+RazorpayDefaults.keyless_header = '';
 
 RazorpayDefaults.min_amount_label = ''; // Added for RBL custom label while Partial Amount
 RazorpayDefaults.partial_payment = {

@@ -232,6 +232,9 @@ export const handleMessage = function (message) {
     if (Bridge.hasCheckoutBridge()) {
       Track(session.r, MiscEvents.OPEN);
     }
+
+    fetch.setKeylessHeader(session.r.get('keyless_header'));
+
     fetchPrefs(session);
   }
 

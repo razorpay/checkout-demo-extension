@@ -7,7 +7,7 @@ import * as _Doc from './_Doc';
 import * as _Obj from './_Obj';
 const networkError = _.rzpError('Network error');
 let jsonp_cb = 0;
-let sessionId, trackId;
+let sessionId, trackId, keylessHeader;
 
 /**
  * Sets the session ID.
@@ -27,6 +27,34 @@ function setSessionId(id) {
  */
 function setTrackId(id) {
   trackId = id;
+}
+
+/**
+ * Sets the keyless header.
+ * @param {string} id
+ *
+ * @returns {void}
+ */
+function setKeylessHeader(id) {
+  keylessHeader = id;
+}
+
+/**
+ * Appends the keyless header query parameter to url when present
+ * @param {string} url
+ * @param {string} keylessHeader
+ *
+ * @returns {string}
+ */
+function appendKeylessHeaderParamToUrl(url, keylessHeader) {
+  if (!keylessHeader) return url;
+
+  return _.appendParamsToUrl(
+    url,
+    _.obj2query({
+      keyless_header: keylessHeader,
+    })
+  );
 }
 
 /**
@@ -96,6 +124,8 @@ const fetchPrototype = {
 
   call: function (callback = this.options.callback) {
     var { url, method, data, headers } = this.options;
+
+    url = appendKeylessHeaderParamToUrl(url, keylessHeader);
 
     var xhr = new Xhr();
     this.setReq('ajax', xhr);
@@ -280,6 +310,8 @@ function jsonp(options) {
     // Make the source URL
     let src = _.appendParamsToUrl(options.url, options.data);
 
+    src = appendKeylessHeaderParamToUrl(src, keylessHeader);
+
     // Add callback name to the source URL
     src = _.appendParamsToUrl(
       src,
@@ -306,4 +338,5 @@ fetch.post = post;
 fetch.patch = patch;
 fetch.setSessionId = setSessionId;
 fetch.setTrackId = setTrackId;
+fetch.setKeylessHeader = setKeylessHeader;
 fetch.jsonp = jsonp;
