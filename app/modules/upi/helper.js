@@ -1,6 +1,6 @@
 import { getOffersForTab } from 'checkoutframe/offers/index';
 import { isCustomerFeeBearer } from 'checkoutstore/index.js';
-import { oneClickUPIIntentExperiment } from 'experiments/all/one-click-upi-intent';
+import { oneClickUPIIntent as oneClickUPIIntentExperiment } from 'upi/experiments';
 
 export function oneClickUPIIntent() {
   /**
@@ -10,5 +10,5 @@ export function oneClickUPIIntent() {
   if (isCustomerFeeBearer() || offers.length > 0) {
     return false;
   }
-  return oneClickUPIIntentExperiment();
+  return oneClickUPIIntentExperiment.enabled();
 }

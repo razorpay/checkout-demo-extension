@@ -1,5 +1,5 @@
 import { isGlobalVault, shouldRememberCustomer } from 'checkoutstore/index.js';
-import { delayLoginOTP } from 'experiments/all/delay-login-otp';
+import { delayOTP } from 'card/experiments';
 
 export function delayLoginOTPExperiment() {
   /**
@@ -8,6 +8,5 @@ export function delayLoginOTPExperiment() {
   if (!isGlobalVault() || !shouldRememberCustomer()) {
     return false;
   }
-
-  return delayLoginOTP();
+  return delayOTP.enabled();
 }

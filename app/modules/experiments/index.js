@@ -1,117 +1,193 @@
-import CurrentExperiments from './current';
 import BrowserStorage from 'browserstorage';
-export { isCardsSeparationExperimentEnabled } from './all/cards-separation';
 
+/** Don't change below */
 const STORAGE_KEY = 'rzp_checkout_exp';
 
-/**
- * Retrieves all experiments from storage.
- *
- * @returns {Object}
- */
-export function getExperimentsFromStorage() {
-  let data;
-
-  try {
-    data = BrowserStorage.getItem(STORAGE_KEY) |> _Obj.parse;
-  } catch (err) {}
-
-  // Make sure we return an object
-  if (_.isNonNullObject(data) && !_.isArray(data)) {
-    return data;
-  } else {
-    return {};
+class Experiment {
+  /**
+   * Sets all experiments in storage.
+   * @param {Object} experiments All experiments
+   */
+  static setExperimentsInStorage(experiments) {
+    if (experiments && typeof experiments === 'object') {
+      try {
+        experiments = JSON.stringify(experiments);
+        BrowserStorage.setItem(STORAGE_KEY, experiments);
+      } catch (err) {
+        console.error(err);
+        return;
+      }
+    }
   }
-}
 
-/**
- * Sets all experiments in storage.
- * @param {Object} experiments All experiments
- */
-function setExperimentsInStorage(experiments) {
-  if (_.isNonNullObject(experiments)) {
+  /**
+   * Retrieves all experiments from storage.
+   *
+   * @returns {Object}
+   */
+  static getExperimentsFromStorage() {
+    let data;
+
     try {
-      experiments = _Obj.stringify(experiments);
-      BrowserStorage.setItem(STORAGE_KEY, experiments);
+      data = JSON.parse(BrowserStorage.getItem(STORAGE_KEY));
     } catch (err) {
+      // JSON parse Error
+    }
+
+    // Make sure we return an object
+    if (data && typeof data === 'object' && !Array.isArray(data)) {
+      return data;
+    } else {
+      return {};
+    }
+  }
+
+  constructor(experiments = {}) {
+    this.experiments = experiments;
+  }
+
+  getExperiment = (name) => {
+    if (!name) return null;
+    return this.experiments[name];
+  };
+
+  getAllActiveExperimentsName = () => {
+    return Object.keys(this.experiments);
+  };
+
+  /**
+   * Creates a segment for the given experiment.
+   * @param {string} experiment Experiment name
+   * @param {*} evaluatorArg Argument for evaluator fn
+   * @param {Function} overrideFn Function to override evaluation
+   *
+   * @returns {*}
+   */
+  setSegment(experiment, evaluatorArg, overrideFn) {
+    const config = this.getExperiment(experiment);
+
+    // Sanity check
+    if (!config) {
       return;
     }
-  }
-}
 
-/**
- * Retrieves segment for a given experiment.
- * @param {string} experiment Experiment name
- *
- * @returns {*}
- */
-function getSegment(experiment) {
-  const experiments = getExperimentsFromStorage();
+    // Determine what function to use to get the segment
+    const evaluator =
+      typeof overrideFn === 'function' ? overrideFn : config.evaluator;
 
-  return experiments[experiment];
-}
+    // Get segment
+    const segment = evaluator(evaluatorArg);
 
-/**
- * Creates a segment for the given experiment.
- * @param {string} experiment Experiment name
- * @param {*} evaluatorArg Argument for evaluator fn
- * @param {Function} overrideFn Function to override evaluation
- *
- * @returns {*}
- */
-function setSegment(experiment, evaluatorArg, overrideFn) {
-  const config = _Arr.find(CurrentExperiments, (ex) => ex.name === experiment);
+    // Set in storage
+    const all = Experiment.getExperimentsFromStorage();
+    all[config.name] = segment;
+    Experiment.setExperimentsInStorage(all);
 
-  // Sanity check
-  if (!config) {
-    return;
+    return segment;
   }
 
-  // Determine what function to use to get the segment
-  const evaluator = _.isFunction(overrideFn) ? overrideFn : config.evaluator;
+  /**
+   * Retrieves segment for a given experiment.
+   * @param {string} experiment Experiment name
+   *
+   * @returns {*}
+   */
+  getSegment(experiment) {
+    const experiments = Experiment.getExperimentsFromStorage();
 
-  // Get segment
-  const segment = evaluator(evaluatorArg);
-
-  // Set in storage
-  const all = getExperimentsFromStorage();
-  all[config.name] = segment;
-  setExperimentsInStorage(all);
-
-  return segment;
-}
-
-/**
- * Retrieves segment for an experiment
- * or creates one if it doesn't exist.
- * @param {string} experiment Experiment name
- * @param {*} [evaluatorArg] Argument for evaluator fn
- * @param {Function} [overrideFn] Function to override evaluation
- *
- * @returns {*}
- */
-export function getSegmentOrCreate(experiment, evaluatorArg, overrideFn) {
-  const existing = getSegment(experiment);
-
-  if (_.isUndefined(existing)) {
-    return setSegment(experiment, evaluatorArg, overrideFn);
-  } else {
-    return existing;
+    return experiments[experiment];
   }
-}
 
-/**
- * Clears experiments that are not being used anymore.
- */
-export function clearOldExperiments() {
-  const all = getExperimentsFromStorage();
-  const current = _Arr.map(CurrentExperiments, (ex) => ex.name);
+  /**
+   * Retrieves segment for an experiment
+   * or creates one if it doesn't exist.
+   * @param {string} experiment Experiment name
+   * @param {*} [evaluatorArg] Argument for evaluator fn
+   * @param {Function} [overrideFn] Function to override evaluation
+   *
+   * @returns {*}
+   */
+  getSegmentOrCreate(experiment, evaluatorArg, overrideFn) {
+    const existing = this.getSegment(experiment);
 
-  _Obj.loop(all, (segment, name) => {
-    if (!_Arr.contains(current, name)) {
-      delete all[name];
+    if (typeof existing === 'undefined') {
+      return this.setSegment(experiment, evaluatorArg, overrideFn);
+    } else {
+      return existing;
     }
-  });
+  }
 
-  setExperimentsInStorage(all);
+  /**
+   * Clears experiments that are not being used anymore.
+   */
+  clearOldExperiments = () => {
+    const all = Experiment.getExperimentsFromStorage();
+    const current = this.getAllActiveExperimentsName();
+
+    const updatedExp = current.reduce((acc, currentExp) => {
+      if (typeof all[currentExp] !== 'undefined') {
+        acc[currentExp] = all[currentExp];
+      }
+      return acc;
+    }, {});
+    Experiment.setExperimentsInStorage(updatedExp);
+  };
+
+  /**
+   * @typedef CreateExperimentOptions
+   * @param {*} evaluatorArg Argument for evaluator fn
+   * @param {Function} overrideFn Function to override evaluation
+   */
+  /**
+   * @typedef SingleExperiment
+   * @param {String} name Name of experiment
+   * @param {Function} enabled Function to check experiment is enabled or not
+   * @param {Function} evaluator evaluator function which dev passed during creation of experiment.
+   */
+  /**
+   *
+   * @param {String} name
+   * @param {Function} evaluator returns 0 or 1
+   * @param {CreateExperimentOptions} options
+   * @returns {SingleExperiment}
+   */
+  create = (name, evaluator, options = {}) => {
+    const { evaluatorArg, overrideFn } = options;
+
+    function checkEnabled() {
+      this.getSegmentOrCreate(name, evaluatorArg, overrideFn) === 1;
+    }
+    let evaluatorFn = evaluator;
+    if (typeof evaluator === 'number') {
+      /**
+       * evaluator >= 1 means exp is disable
+       */
+      evaluatorFn = () => (Math.random() < evaluator ? 0 : 1);
+    }
+
+    if (typeof evaluatorFn !== 'function') {
+      throw new Error('evaluatorFn must be a function or number');
+    }
+
+    const singleExperiment = {
+      name,
+      enabled: checkEnabled.bind(this),
+      evaluator: evaluatorFn,
+    };
+
+    this.register({ [name]: singleExperiment });
+
+    return singleExperiment;
+  };
+
+  register(experimentsObject) {
+    this.experiments = { ...this.experiments, ...experimentsObject };
+  }
 }
+
+const experimentModule = new Experiment({});
+const createExperiment = experimentModule.create;
+const clearOldExperiments = experimentModule.clearOldExperiments;
+const getExperimentsFromStorage = Experiment.getExperimentsFromStorage;
+
+export { createExperiment, getExperimentsFromStorage, clearOldExperiments };

@@ -1,5 +1,5 @@
 import { get } from 'svelte/store';
-import { isCardsSeparationExperimentEnabled } from 'experiments/all/cards-separation';
+import { cardsSeparation } from 'card/experiments';
 import { creditCardConfig, debitCardConfig } from './constants';
 import { isMethodEnabled } from 'checkoutstore/methods';
 
@@ -23,7 +23,7 @@ function getSplitConfig() {
  * This method works on pass-by-reference
  */
 export function updateBlocksForExperiments(allBlocks) {
-  if (isCardsSeparationExperimentEnabled() && isMethodEnabled('card')) {
+  if (cardsSeparation.enabled() && isMethodEnabled('card')) {
     for (const blockKey in allBlocks) {
       const { code, instruments } = allBlocks[blockKey];
       if (code === 'rzp.cluster') {

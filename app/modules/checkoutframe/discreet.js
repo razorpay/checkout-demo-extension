@@ -95,7 +95,10 @@ import * as es6components from 'checkoutframe/components';
 import * as Hacks from 'checkoutframe/hacks';
 
 import { get as storeGetter } from 'svelte/store';
+/** Experiments */
 import * as Experiments from 'experiments';
+import * as CardExperiments from 'card/experiments';
+/** Endof Experiments */
 import BrowserStorage from 'browserstorage';
 
 import * as NBHandlers from 'handlers/netbanking';
@@ -225,6 +228,7 @@ export default {
   Hacks,
   storeGetter,
   Experiments,
+  CardExperiments,
   CardHelper,
   BrowserStorage,
 

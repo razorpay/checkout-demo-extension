@@ -6,8 +6,10 @@ jest.mock('checkoutstore/index.js', () => ({
   shouldRememberCustomer: jest.fn((cb) => (cb ? cb() : true)),
 }));
 
-jest.mock('experiments/all/delay-login-otp', () => ({
-  delayLoginOTP: jest.fn((cb) => (cb ? cb() : true)),
+jest.mock('card/experiments', () => ({
+  delayOTP: {
+    enabled: jest.fn((cb) => (cb ? cb() : true)),
+  },
 }));
 
 describe('delayLoginOTPExperiment', () => {
