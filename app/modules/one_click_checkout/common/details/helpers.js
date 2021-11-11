@@ -12,6 +12,7 @@ import { getCustomerByContact } from 'one_click_checkout/common/helpers/customer
 import { redirectToPaymentMethods } from 'one_click_checkout/sessionInterface';
 import { determineLandingView } from 'one_click_checkout/helper';
 import { resetOrder } from 'one_click_checkout/charges/helpers';
+import { otpReasons } from 'one_click_checkout/otp/constants';
 
 /**
  * Method to handle submission of new details by a logged in user
@@ -32,11 +33,10 @@ const handleContactFlow = (prevContact) => {
     }
     return false;
   }
+  resetOrder(true);
   screensHistory.initialize(views.DETAILS);
   if (prevCustomer?.logged) {
-    prevCustomer.logout(false, () => {
-      resetOrder(true);
-    });
+    prevCustomer.logout(false);
   }
   return true;
 };
@@ -57,7 +57,7 @@ export const handleDetailsNext = (prevContact) => {
     let view = views.ADDRESS;
     if (isLoginMandatory()) {
       if (!isUserLoggedIn()) {
-        askForOTP();
+        askForOTP(otpReasons.mandatory_login);
         return;
       }
       if (shouldShowCoupons()) {

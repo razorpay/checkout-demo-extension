@@ -141,9 +141,12 @@
           >
             {@html getOtpScreenTitle($textView, $templateData, $locale)}
             {#if otpClasses.includes($textView)}
-              <button on:click={() => handleEditContact()}>
+              <span
+                class="edit-contact-btn"
+                on:click={() => handleEditContact()}
+              >
                 <Icon icon={edit_phone} />
-              </button>
+              </span>
             {/if}
           </div>
         {/if}
@@ -357,5 +360,9 @@
 
   .text-initial {
     text-transform: initial;
+  }
+  .edit-contact-btn {
+    margin-left: 4px;
+    cursor: pointer;
   }
 </style>

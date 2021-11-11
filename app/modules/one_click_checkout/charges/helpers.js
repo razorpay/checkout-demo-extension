@@ -15,18 +15,17 @@ import { resetAddresses } from 'one_click_checkout/address/store';
  */
 export function initializeAndReset(line_items_total) {
   initializeCharges(line_items_total);
-  resetOrder();
+  resetOrder(true);
 }
 
 export function resetOrder(shouldResetAddresses = false) {
   const orderId = getOrderId();
 
-  resetOrderApiCall(orderId).then((response) => {
-    if (shouldResetAddresses) {
-      resetAddresses();
-    }
-    resetChargesCoupons();
-  });
+  if (shouldResetAddresses) {
+    resetAddresses();
+  }
+  resetChargesCoupons();
+  resetOrderApiCall(orderId);
 }
 
 export function removeShippingCharges() {

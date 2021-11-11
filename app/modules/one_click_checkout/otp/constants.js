@@ -4,3 +4,10 @@ export const otpClasses = [
   'coupons',
   'access_saved_addresses',
 ];
+
+export const otpReasons = {
+  mandatory_login: 'mandatory_login',
+  saving_address: 'saving_address',
+  access_address: 'access_address',
+  coupons_edit_contact: 'coupons_edit_contact',
+};

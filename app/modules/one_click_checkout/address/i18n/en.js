@@ -23,7 +23,7 @@ export default {
   shipping_charges_label: '{charge} shipping charge added',
   same_address_checkbox_label: 'Billing address same as shipping address',
   saved_address_label: 'Your address has been saved',
-  error_label: 'Required',
+  error_label: 'Address should be less than 255 characters',
   unserviceable_label: 'Unserviceable',
   serviceable_label: 'Serviceable',
   ...billingAddressLabels,

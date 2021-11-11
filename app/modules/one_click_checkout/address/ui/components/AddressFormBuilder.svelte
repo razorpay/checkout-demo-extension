@@ -24,7 +24,9 @@
 
   const dispatch = createEventDispatcher();
   const handleInput = (id, value) => {
-    if (error?.id === id) error.text = '';
+    if (error?.id === id) {
+      error.text = '';
+    }
     dispatch('addressInputUpdate', {
       id,
       value,
@@ -62,6 +64,7 @@
             labelClasses="address-label"
             elemClasses={'address-elem'}
             handleInput
+            autocomplete={subInput.autofillToken ?? 'off'}
           />
         {/each}
       {:else if input.id === 'contact'}
@@ -95,6 +98,7 @@
           extraLabelClass={input.unserviceableText === SERVICEABLE_LABEL
             ? 'successText'
             : 'failureText'}
+          autocomplete={input.autofillToken ?? 'off'}
         />
       {/if}
     </div>

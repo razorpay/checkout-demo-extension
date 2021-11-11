@@ -10,9 +10,6 @@ const homeScreen = {
   P13N_EXPERIMENT: 'p13n:experiment',
   LANDING: 'landing',
   PROCEED: 'proceed',
-  COD_METHOD: 'cod:method',
-  COD_METHOD: 'checkoutCODOptionShown',
-  COD_METHOD_SELECTED: 'checkoutCODOptionSelected',
 };
 
 const ContactDetailsEvents = {

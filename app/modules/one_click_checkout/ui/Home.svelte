@@ -6,7 +6,7 @@
   import SecuredMessage from 'ui/components/SecuredMessage.svelte';
   import Bottom from 'ui/layouts/Bottom.svelte';
   // Store imports
-  import { currentView } from 'one_click_checkout/routing/store';
+  import { currentView, resetRouting } from 'one_click_checkout/routing/store';
   import { contact, setContact, setEmail } from 'checkoutstore/screens/home';
   import { getPrefilledContact, getPrefilledEmail } from 'checkoutstore';
   // Constants import
@@ -90,6 +90,10 @@
       handleBack();
     }
     screensHistory.pop();
+  }
+
+  export function destroy() {
+    resetRouting();
   }
 </script>
 

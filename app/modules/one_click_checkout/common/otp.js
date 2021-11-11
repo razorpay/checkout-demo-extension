@@ -24,7 +24,7 @@ let customer;
  * details based on the 'currentView' in the 1CC flow and uses them to trigger the
  * OTP flow by updating the store and populating the UI with the desired details
  */
-export const askForOTP = () => {
+export const askForOTP = (otp_reason) => {
   customer = getCustomerDetails();
   routesConfig[views.OTP] = {
     ...routesConfig[views.OTP],
@@ -61,6 +61,7 @@ export const askForOTP = () => {
   if (currentScreen !== views.ADDRESS) {
     Events.Track(otpEvents.OTP_LOAD, {
       otp_skip_visible: get(OtpScreenStore.allowSkip),
+      otp_reason,
     });
     createOTP(() => {
       updateOTPStore({
@@ -71,7 +72,7 @@ export const askForOTP = () => {
   } else {
     // TODO: don't call if already have the status
     const sms_hash = customer.r.get('sms_hash');
-    const params = {};
+    const params = { skip_otp: true };
     if (sms_hash) {
       params.sms_hash = sms_hash;
     }
@@ -80,12 +81,15 @@ export const askForOTP = () => {
         if (customer.saved_address && !customer.logged) {
           Events.Track(otpEvents.OTP_LOAD, {
             otp_skip_visible: get(OtpScreenStore.allowSkip),
+            otp_reason,
           });
 
-          updateOTPStore({
-            ...otpParams.sent,
-            resendTimeout: Date.now() + 30 * 1000,
-            digits: new Array(get(OtpScreenStore.maxlength)),
+          createOTP(() => {
+            updateOTPStore({
+              ...otpParams.sent,
+              resendTimeout: Date.now() + 30 * 1000,
+              digits: new Array(get(OtpScreenStore.maxlength)),
+            });
           });
         } else {
           screensHistory.replace(views.ADD_ADDRESS);
@@ -147,6 +151,7 @@ export const submitOTP = () => {
 
   updateOTPStore(verifying);
   customer.submitOTP(submitPayload, postSubmit);
+  Events.TrackBehav(otpEvents.OTP_SUBMIT_CLICK);
 };
 
 /**

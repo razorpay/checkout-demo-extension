@@ -5,7 +5,6 @@ import { views } from 'one_click_checkout/routing/constants';
 import { get } from 'svelte/store';
 import { isOneClickCheckout } from 'checkoutstore';
 import { isEditContactFlow, isLogoutFlow } from 'one_click_checkout/store';
-import { selectedInstrumentId } from 'checkoutstore/screens/home';
 import { resetOrder } from 'one_click_checkout/charges/helpers';
 import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
 import {
@@ -16,6 +15,7 @@ import {
 
 import Analytics, { Events, MiscEvents } from 'analytics';
 import MetaProperties from 'one_click_checkout/analytics/metaProperties';
+import { showSummaryModal } from 'one_click_checkout/summary_modal/index';
 
 export const historyExists = () => get(history).length;
 
@@ -52,25 +52,6 @@ export function handleEditContact(logoutFlow = false) {
 export function getIcons() {
   const session = getSession();
   return session.themeMeta.icons;
-}
-/**
- *
- * @param {string} amount
- * @returns
- */
-export function formatAmountWithCurrency(amount) {
-  const session = getSession();
-
-  return session.formatAmountWithCurrency(amount);
-}
-/**
- * Using it to create COD payments
- */
-export function createCodPayment() {
-  const session = getSession();
-
-  session.preSubmit();
-  selectedInstrumentId.set(null);
 }
 
 export function getTheme() {
@@ -112,6 +93,7 @@ export function redirectToPaymentMethods(shouldNotPush = false) {
 export function historyPop() {
   screensHistory.pop();
 }
+
 /**
  * Handles the events binding needed
  * @param {string} selector
@@ -120,4 +102,8 @@ export function bindEvents(selector) {
   const session = getSession();
 
   session.bindEvents(selector);
+}
+
+export function showOrderSummary() {
+  showSummaryModal(true);
 }

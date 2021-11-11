@@ -96,9 +96,10 @@ export function applyCoupon(couponCode, source, { onValid, onInvalid } = {}) {
       if (onValid) {
         onValid();
       }
-      Events.TrackMetric(CouponEvents.COUPON_VALID, {
-        code: couponCode,
+      Events.TrackMetric(CouponEvents.COUPON_VALIDITY_END, {
         time: getDuration(),
+        code: couponCode,
+        validation_status: true,
       });
     })
     .catch((error) => {
@@ -107,10 +108,11 @@ export function applyCoupon(couponCode, source, { onValid, onInvalid } = {}) {
       }
       // TODO: Check for failure_code and trigger login if required\
       updateFailureReasonInStore(error);
-      Events.TrackMetric(CouponEvents.COUPON_INVALID, {
-        code: couponCode,
-        reason: error.failure_code,
+      Events.TrackMetric(CouponEvents.COUPON_VALIDITY_END, {
         time: getDuration(),
+        code: couponCode,
+        validation_status: false,
+        reason: error.failure_code,
       });
     });
 }

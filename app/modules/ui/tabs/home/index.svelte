@@ -718,7 +718,7 @@
     if ($isBillingSameAsShipping) {
       billing_address = $selectedShippingAddress;
     }
-    Events.Track(HOME_EVENTS.HOME_LOADED, {
+    Events.TrackRender(HOME_EVENTS.HOME_LOADED, {
       cod_available: $isCodAvailable,
       cod_unavailable_reason: $codReason,
       available_methods: getAvailableMethods(),
@@ -987,13 +987,14 @@
   }
 
   export function selectMethod(method) {
-    Events.TrackMetric(HomeEvents.PAYMENT_METHOD_SELECTED);
+    Events.TrackMetric(HomeEvents.PAYMENT_METHOD_SELECTED, {
+      method,
+    });
     if (method === 'cod') {
       if ($codChargeAmount) {
         showSnackbar(true);
       }
       $isCodAddedToAmount = true;
-      showSummaryModal(true);
       return;
     }
 
@@ -1070,8 +1071,10 @@
   let dccView = 'home-screen';
 
   export function onSelectInstrument(event) {
-    Events.TrackMetric(HomeEvents.PAYMENT_INSTRUMENT_SELECTED);
     const instrument = event.detail;
+    Events.TrackMetric(HomeEvents.PAYMENT_INSTRUMENT_SELECTED, {
+      instrument,
+    });
     updateScore('instrumentSelected');
 
     $selectedInstrumentId = instrument.id;
@@ -1107,16 +1110,6 @@
       }
     }
   }
-
-  $: {
-    if (view === HOME_VIEWS.METHODS) {
-      Events.TrackRender(HomeEvents.HOME_LOADED, {
-        cod_available: $isCodAvailable,
-        cod_unavailable_reason: $codReason,
-        available_methods: getAvailableMethods(),
-      });
-    }
-  }
 </script>
 
 <Tab method="common" overrideMethodCheck={true} shown={showHome} pad={false}>
@@ -1128,6 +1121,7 @@
       {#if view === HOME_VIEWS.METHODS}
         <div
           class="solidbg"
+          class:topbar-mg={isOneClickCheckout()}
           in:slide={getAnimationOptions({ duration: 400 })}
           out:fly={getAnimationOptions({ duration: 200, y: 80 })}
         >
@@ -1138,6 +1132,7 @@
             <div
               use:touchfix
               class="details-container"
+              class:details-container-1cc={isOneClickCheckout()}
               in:fly={getAnimationOptions({ duration: 400, y: 80 })}
             >
               {#if showUserDetailsStrip}
@@ -1178,7 +1173,6 @@
 
           <div
             class="home-methods"
-            class:home-methods-oneclickcheckout={isOneClickCheckout()}
             in:fly={getAnimationOptions({ delay: 100, duration: 400, y: 80 })}
           >
             <NewMethodsList
@@ -1251,6 +1245,9 @@
     white-space: nowrap;
     text-overflow: ellipsis;
   }
+  .details-container-1cc {
+    margin-top: 20px;
+  }
 
   .details-container :global(.stack > div:nth-of-type(1)) {
     flex-grow: 1;
@@ -1286,5 +1283,8 @@
   .solidbg {
     background: white;
     order: -1;
+  }
+  .topbar-mg {
+    margin-top: 47px;
   }
 </style>

@@ -38,7 +38,6 @@ export function fetchCoupons() {
       Events.TrackMetric(CouponEvents.COUPONS_FETCH_FAILED, {
         failure_reason: e.error.reason,
       });
-      Events.TrackMetric(CouponEvents.COUPONS_FETCH_FAILED);
     })
     .finally(() => {
       Events.TrackRender(CouponEvents.COUPONS_SCREEN, {

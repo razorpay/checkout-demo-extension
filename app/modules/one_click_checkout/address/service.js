@@ -39,7 +39,7 @@ export function getCityState(pincode) {
   return new Promise((resolve, reject) => {
     if (!cachedAddress) {
       fetch({
-        url: makeAuthUrl(`pincodes/${pincode}`),
+        url: makeAuthUrl(`1cc/pincodes/${pincode}`),
         callback: (response) => {
           Events.TrackMetric(AddressEvents.CITY_STATE_END, {
             time: cityStateApiTimer(),

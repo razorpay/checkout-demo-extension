@@ -45,7 +45,8 @@ export const getMerchantKey = () => preferences?.merchant_key;
 export const isGlobalVault = () => preferences.global;
 export const getMerchantOffers = () => {
   // Ignore all offers ( including forced offers ) in case of partial payments.
-  if (isPartialPayment()) {
+  // Ignore offers for 1CC. Not supported in 1CC
+  if (isPartialPayment() || isOneClickCheckout()) {
     return [];
   }
   // Temporary fix: If customer-feebearer do not show any offers to the user.

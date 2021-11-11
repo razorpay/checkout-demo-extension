@@ -13,10 +13,13 @@ const events = {
   SHOW_AVAILABLE_COUPONS: 'show_available_coupons',
   COUPONS_FETCHED: 'coupons_fetched',
   COUPONS_FETCH_START: 'coupons_fetch:start',
+  COUPONS_FETCH_END: 'coupons_fetch:end',
   COUPONS_FETCH_FAILED: 'coupons_fetch_failed',
   COUPON_REMOVE_START: 'coupon_remove:start',
   COUPON_REMOVE_END: 'coupon_remove:end',
   COUPONS_SUBMIT: 'checkoutCouponSubmitted',
+  COUPON_VALIDITY_START: 'checkoutCouponValidationStarted',
+  COUPON_VALIDITY_END: 'checkoutCouponValidationCompleted',
 };
 
 export default events;

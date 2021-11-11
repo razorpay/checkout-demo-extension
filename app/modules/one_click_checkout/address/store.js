@@ -56,6 +56,9 @@ export const resetAddresses = () => {
   savedAddresses.set([]);
   selectedAddressId.set(null);
   newUserAddress.set(INITIAL_ADDRESS);
+
+  selectedBillingAddressId.set(null);
+  newBillingAddress.set(INITIAL_ADDRESS);
 };
 
 export function saveAddresspayload() {

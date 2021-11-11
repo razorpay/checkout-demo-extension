@@ -39,6 +39,7 @@
   } from 'one_click_checkout/address/constants';
   import Resource from 'one_click_checkout/address/resource';
   import MetaProperties from 'one_click_checkout/analytics/metaProperties';
+  import { otpReasons } from 'one_click_checkout/otp/constants';
 
   // props
   export let currentView;
@@ -96,7 +97,7 @@
         redirectToPaymentMethods();
       });
     } else {
-      askForOTP();
+      askForOTP(otpReasons.saving_address);
     }
   }
 
@@ -130,7 +131,7 @@
 
   function noSavedAddressRedirect() {
     screensHistory.pop(false);
-    askForOTP();
+    askForOTP(otpReasons.access_address);
   }
 
   function trackSameBillingAndShippingCheckbox({ detail }) {

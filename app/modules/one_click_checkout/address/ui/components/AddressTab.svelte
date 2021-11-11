@@ -1,6 +1,5 @@
 <script>
   import CTA from 'ui/elements/CTA.svelte';
-  import { fly } from 'svelte/transition';
   import { get } from 'svelte/store';
 
   import SavedAddresses from 'one_click_checkout/address/ui/components/SavedAddresses.svelte';
@@ -27,8 +26,6 @@
     views as addressViews,
     ADDRESS_TYPES,
   } from 'one_click_checkout/address/constants';
-
-  import { getAnimationOptions } from 'svelte-utils';
 
   import AddressEvents from 'one_click_checkout/address/analytics';
 
@@ -65,15 +62,18 @@
     currentView = view;
   }
 
-  export function handleAddressSelection({ detail }) {
+  export function handleAddressSelection({
+    detail: { isAddressServiceable, addressId, addressIndex, is_cod_available },
+  }) {
     Events.Track(AddressEvents.SAVED_ADDRESS_SELECTED, {
-      serviceable: detail.isAddressServiceable,
-      address_id: detail.addressId,
-      address_index: detail.addressIndex,
+      serviceable: isAddressServiceable,
+      address_id: addressId,
+      address_index: addressIndex,
+      is_cod_available,
     });
     showCta = true;
     if (Resource[addressType].checkServiceability) {
-      showCta = detail.isAddressServiceable;
+      showCta = isAddressServiceable;
     }
   }
 
@@ -89,7 +89,9 @@
           { field: error.label.field },
           $locale
         );
-        Events.Track(AddressEvents.ADDRESS_SUBMIT_CLICKED);
+        Events.Track(AddressEvents.ADDRESS_SUBMIT_CLICKED, {
+          is_saved_address: false,
+        });
         return;
       }
     } else {
@@ -100,20 +102,24 @@
     }
     Events.Track(AddressEvents.ADDRESS_SUBMIT_CLICKED, {
       address_valid: true,
+      is_saved_address: currentView === addressViews.SAVED_ADDRESSES,
     });
     onSubmitCallback(addressCompleted);
   }
 
   function onFormCompletion({ detail: { isComplete } }) {
-    isFormComplete = isComplete;
-    if (isComplete) {
-      Events.Track(AddressEvents.ADD_ADDRESS_CTA_ENABLED, {
-        address_label: get(Resource[addressType].store.newAddress)?.tag,
-        pincode: get(Resource[addressType].store.newAddress)?.zipcode,
-        is_cod_available: get(Resource[addressType].store.selectedAddress)?.cod,
-        is_serviceable: get(Resource[addressType].store.selectedAddress)
-          ?.serviceable,
-      });
+    if (isFormComplete !== isComplete) {
+      isFormComplete = isComplete;
+      if (isComplete) {
+        Events.Track(AddressEvents.ADD_ADDRESS_CTA_ENABLED, {
+          address_label: get(Resource[addressType].store.newAddress)?.tag,
+          pincode: get(Resource[addressType].store.newAddress)?.zipcode,
+          is_cod_available: get(Resource[addressType].store.selectedAddress)
+            ?.cod,
+          is_serviceable: get(Resource[addressType].store.selectedAddress)
+            ?.serviceable,
+        });
+      }
     }
   }
 
@@ -147,10 +153,7 @@
   });
 </script>
 
-<div
-  transition:fly={getAnimationOptions({ y: -46, duration: 200 })}
-  class="address-tab"
->
+<div class="address-tab">
   <slot name="header" />
   <div
     class="address-wrapper"

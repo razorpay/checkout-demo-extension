@@ -99,7 +99,6 @@
         disabled = !available;
         errorLabel = COD_DISABLED_LABEL;
         error = $codReason;
-        Events.TrackRender(HomeEvents.COD_METHOD, { disabled });
       });
     }
   });
@@ -150,12 +149,13 @@
       <div class="error">
         <div class="error-container">
           <span class="error-label">{$t(errorLabel)}</span>
-          <div class="error-icon">
+          <!-- TODO: Fix the tooltip and add the error-icon again
+            <div class="error-icon">
             <InfoIcon variant="red" />
-            <!-- <Tooltip className="" bindTo="#form-common" align={['bottom']}>
+            <Tooltip className="" bindTo="#form-common" align={['bottom']}>
               {error}
-            </Tooltip> -->
-          </div>
+            </Tooltip>
+          </div> -->
         </div>
       </div>
     {/if}

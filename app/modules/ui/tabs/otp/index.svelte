@@ -155,7 +155,7 @@
   }
 </script>
 
-{#if isOneClickCheckout()}
+{#if isOneClickCheckout() && session.tab === 'home-1cc'}
   <OneClickCheckoutOtp
     {addShowableClass}
     {newCta}

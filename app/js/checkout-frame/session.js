@@ -1295,8 +1295,6 @@ Session.prototype = {
   },
 
   setOneClickCheckoutHome: function () {
-    this.oneClickCheckoutHome = '';
-    discreet.RoutingStore.resetRouting();
     this.oneClickCheckoutHome = new discreet.OneClickCheckoutHomeTab({
       target: gel('form-fields'),
     });
@@ -3030,7 +3028,7 @@ Session.prototype = {
         discreet.ChargesHelper.removeCodCharges();
         discreet.OneClickCheckoutInterface.historyPop();
         this.switchTab('home-1cc');
-        Cta.hideCta();
+        Cta.showCta();
         this.topBar.hide();
         return;
       }
@@ -4688,9 +4686,13 @@ Session.prototype = {
             return Form.shake();
           }
         }
+      } else if (selectedInstrument.method === 'cod') {
+        // Show order summary when payment method=cod
+        discreet.OneClickCheckoutInterface.showOrderSummary();
+        return;
       }
-    } else if (data.method === 'paypal' || data.method === 'cod') {
-      // Let method=paypal & method=cod payments go through directly
+    } else if (data.method === 'paypal') {
+      // Let method=paypal payments go through directly
     } else {
       return;
     }
@@ -5712,6 +5714,7 @@ Session.prototype = {
       'upiCancelReasonPicker',
       'nbCancelReasonPicker',
       'timer',
+      'oneClickCheckoutHome',
     ];
 
     var session = this;
@@ -5976,6 +5979,12 @@ Session.prototype = {
     this.preferences = prefs;
     preferences = prefs;
 
+    if (preferences.order && Store.isOneClickCheckout()) {
+      discreet.ChargesHelper.initializeAndReset(
+        parseInt(preferences.order.line_items_total)
+      );
+    }
+
     var self = this;
     var customer;
     var saved_customer = preferences.customer;
@@ -6057,12 +6066,6 @@ Session.prototype = {
 
     /* set Razorpay instance for customer */
     Customer.prototype.r = this.r;
-
-    if (preferences.order && Store.isOneClickCheckout()) {
-      discreet.ChargesHelper.initializeAndReset(
-        parseInt(preferences.order.line_items_total)
-      );
-    }
   },
 
   hideOverlayMessage: hideOverlayMessage,

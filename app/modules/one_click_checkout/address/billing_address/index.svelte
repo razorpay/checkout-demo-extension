@@ -31,6 +31,7 @@
   import Analytics, { Events } from 'analytics';
   import MetaProperties from 'one_click_checkout/analytics/metaProperties';
   import { onMount } from 'svelte';
+  import { otpReasons } from 'one_click_checkout/otp/constants';
 
   export let currentView;
 
@@ -82,7 +83,7 @@
         redirectToPaymentMethods();
       });
     } else {
-      askForOTP();
+      askForOTP(otpReasons.saving_address);
     }
   }
 

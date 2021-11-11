@@ -58,6 +58,7 @@
       id: 'name',
       label: $t(NAME_LABEL),
       required: true,
+      autofillToken: 'name',
     },
     {
       id: 'contact',
@@ -71,6 +72,7 @@
       pattern: '[0-9]{6}',
       formatter: { type: 'number' },
       length: 6,
+      autofillToken: 'postal-code',
     },
   ];
 
@@ -80,6 +82,7 @@
         id: 'city',
         label: $t(CITY_LABEL),
         required: true,
+        autofillToken: 'none',
       },
       {
         id: 'state',
@@ -91,15 +94,15 @@
       id: 'line1',
       label: $t(HOUSE_LABEL),
       required: true,
-      pattern: '^.{10,255}$',
-      length: 255,
+      pattern: '^.{1,255}$',
+      autofillToken: 'address-line1',
     },
     {
       id: 'line2',
       label: $t(AREA_LABEL),
       required: true,
-      pattern: '^.{5,255}$',
-      length: 255,
+      pattern: '^.{1,255}$',
+      autofillToken: 'address-line2',
     },
     {
       id: 'landmark',
@@ -216,6 +219,7 @@
     }
     Events.Track(AddressEvents.ADD_ADDRESS_VIEW, {
       meta: { saved_address_count: $savedAddresses?.length },
+      type: addressType,
     });
     if (!$formData.contact) {
       $formData = {
@@ -224,9 +228,6 @@
       };
     }
 
-    Events.Track(AddressEvents.ADD_ADDRESS_VIEW, {
-      type: addressType,
-    });
     pinIndex = INPUT_FORM.findIndex((field) => field.id === 'zipcode');
 
     const el = document.querySelector(

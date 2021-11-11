@@ -13,6 +13,7 @@ import {
   shouldShowAddress,
   shouldShowCoupons,
 } from 'one_click_checkout/store';
+import { otpReasons } from 'one_click_checkout/otp/constants';
 import { views } from 'one_click_checkout/routing/constants';
 import { country, phone, contact, email } from 'checkoutstore/screens/home';
 import { get } from 'svelte/store';
@@ -74,7 +75,7 @@ export function determineLandingView() {
   if (isLoginMandatory() && !isUserLoggedIn()) {
     if (isContactValid && isEmailValid) {
       tick().then(() => {
-        askForOTP();
+        askForOTP(otpReasons.mandatory_login);
       });
     }
     return DETAILS;

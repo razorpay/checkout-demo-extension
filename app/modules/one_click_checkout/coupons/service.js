@@ -50,9 +50,6 @@ export function validateCoupon(code) {
         code,
       },
       callback: (response) => {
-        Events.TrackMetric(CouponEvents.COUPON_VALIDITY_END, {
-          time: getDuration(),
-        });
         if (response.status_code === 200) {
           resolve(response);
           return;

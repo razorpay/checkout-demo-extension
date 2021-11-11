@@ -38,6 +38,7 @@
       isAddressServiceable,
       addressId: id,
       addressIndex: index,
+      is_cod_available: $selectedAddress.cod,
     });
   }
 

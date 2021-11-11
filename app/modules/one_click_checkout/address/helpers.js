@@ -25,18 +25,7 @@ export const validateInput = (elementId = 'addressForm') => {
     // TODO: Validation behaviour after design confirmation
     const elem = invalidInputs[0].children[0];
     elem.focus();
-    let errorLabel;
-    switch (elem.id) {
-      case 'line1':
-        errorLabel = HOUSE_ERROR_LABEL;
-        break;
-      case 'line2':
-        errorLabel = AREA_ERROR_LABEL;
-        break;
-      default:
-        errorLabel = GENERIC_ERROR_LABEL;
-        break;
-    }
+    let errorLabel = GENERIC_ERROR_LABEL;
     error = {
       id: elem.id,
       label: {

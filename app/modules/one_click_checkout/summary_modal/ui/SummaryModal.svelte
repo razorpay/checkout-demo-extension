@@ -29,7 +29,7 @@
   import {
     formatAmountWithCurrency,
     createCodPayment,
-  } from 'one_click_checkout/sessionInterface';
+  } from 'one_click_checkout/summary_modal/sessionInterface';
   import { Events } from 'analytics';
   import events from 'one_click_checkout/summary_modal/analytics';
 
@@ -50,7 +50,6 @@
     Events.Track(events.ORDER_SUMMARY_HIDDEN);
     visible = false;
   }
-
   $: {
     if ($appliedOffer) {
       offerAmount = $appliedOffer.original_amount - $appliedOffer.amount;

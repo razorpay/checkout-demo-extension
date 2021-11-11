@@ -84,6 +84,7 @@
       type="tel"
       pattern="[0-9]"
       class="otp-input"
+      class:otp-input-small={$digits.length > 6}
       maxlength="1"
       bind:value={$digits[i]}
       on:focus={() => trackInput(i)}
@@ -108,5 +109,12 @@
     margin: 0px 8px;
     border-bottom: 2px solid rgba(0, 0, 0, 0.12);
     text-align: center;
+  }
+
+  .otp-input-small {
+    width: 18px;
+    font-size: 15px;
+    line-height: 21px;
+    padding: 8px 4px;
   }
 </style>

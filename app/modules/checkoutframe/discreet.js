@@ -120,7 +120,6 @@ import * as ChargesStore from 'one_click_checkout/charges/store';
 
 import * as OneClickCheckoutStore from 'one_click_checkout/store';
 import * as OneClickCheckoutInterface from 'one_click_checkout/sessionInterface';
-import * as RoutingStore from 'one_click_checkout/routing/store';
 import { dynamicFeeObject } from 'checkoutstore/dynamicfee';
 
 export default {
@@ -260,6 +259,5 @@ export default {
   ChargesHelper,
   ChargesStore,
   OneClickCheckoutStore,
-  RoutingStore,
   OneClickCheckoutMetaProperties,
 };
