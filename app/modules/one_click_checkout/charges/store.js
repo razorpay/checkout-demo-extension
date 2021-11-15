@@ -2,6 +2,7 @@ import { writable, get } from 'svelte/store';
 import { getSession } from 'sessionmanager';
 import { appliedOffer } from 'checkoutstore/offers';
 import { isOneClickCheckout } from 'checkoutstore';
+import { showAmountInCta } from 'checkoutstore/cta';
 
 // Store to keep track of shipping charge
 export const shippingCharge = writable(null);
@@ -11,6 +12,7 @@ amount.subscribe((amount) => {
   if (amount) {
     const session = getSession();
     session.setAmount(amount);
+    showAmountInCta();
   }
 });
 appliedOffer.subscribe((offer) => {
