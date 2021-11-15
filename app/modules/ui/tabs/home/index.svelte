@@ -1195,7 +1195,7 @@
         <Callout>
           {generateSubtextForRecurring({
             types: getCardTypesForRecurring(),
-            networks: getCardNetworksForRecurring(),
+            networks: getCardNetworksForRecurring('credit'),
             issuers: getCardIssuersForRecurring(),
             subscription: session.get('subscription_id'),
             offer: cardOffer,
