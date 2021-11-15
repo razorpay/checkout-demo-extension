@@ -3,8 +3,7 @@
 import { saveAddresspayload } from 'one_click_checkout/address/store';
 
 import {
-  HOUSE_ERROR_LABEL,
-  AREA_ERROR_LABEL,
+  LANDMARK_ERROR_LABEL,
   GENERIC_ERROR_LABEL,
 } from 'one_click_checkout/address/i18n/labels';
 import { views as ONE_CC_HOME_VIEWS } from 'one_click_checkout/routing/constants';
@@ -25,7 +24,8 @@ export const validateInput = (elementId = 'addressForm') => {
     // TODO: Validation behaviour after design confirmation
     const elem = invalidInputs[0].children[0];
     elem.focus();
-    let errorLabel = GENERIC_ERROR_LABEL;
+    let errorLabel =
+      elem.id === 'landmark' ? LANDMARK_ERROR_LABEL : GENERIC_ERROR_LABEL;
     error = {
       id: elem.id,
       label: {

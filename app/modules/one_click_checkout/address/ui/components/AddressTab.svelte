@@ -36,7 +36,7 @@
   export let noSavedAddressRedirect;
 
   let showCta = true;
-
+  let disabled;
   let {
     title,
     store: {
@@ -151,6 +151,9 @@
     }
     screensHistory.replace(Resource[addressType].routes[currentView]);
   });
+
+  $: disabled =
+    currentView === addressViews.ADD_ADDRESS ? !isFormComplete : !showCta;
 </script>
 
 <div class="address-tab">
@@ -191,11 +194,7 @@
     <slot name="inner-footer" />
   </div>
   <slot name="footer" />
-  <CTA
-    on:click={onSubmit}
-    disabled={!showCta ||
-      (currentView === addressViews.ADD_ADDRESS && !isFormComplete)}
-  >
+  <CTA on:click={onSubmit} {disabled}>
     {$t(CTA_LABEL)}
   </CTA>
 </div>

@@ -107,18 +107,19 @@ export function postServiceability(addresses, onSavedAddress = false) {
   } else {
     loaderLabel.set(CHECK_PIN_LABEL);
   }
+  const order_id = getOrderId();
   showLoader.set(true);
   const serviceabilityApiTimer = timer();
   Events.TrackMetric(AddressEvents.SERVICEABILITY_START);
   const formattedPayload = getServiceabilityPayload(
     addresses,
-    serviceabilityCache
+    serviceabilityCache[order_id]
   );
   if (!formattedPayload) {
     showLoader.set(false);
-    return Promise.resolve(serviceabilityCache);
+    return Promise.resolve(serviceabilityCache[order_id]);
   }
-  const payload = { addresses: formattedPayload, order_id: getOrderId() };
+  const payload = { addresses: formattedPayload, order_id };
   return new Promise((resolve, reject) => {
     fetch.post({
       url: makeAuthUrl('merchant/shipping_info'),
@@ -133,16 +134,20 @@ export function postServiceability(addresses, onSavedAddress = false) {
           showLoader.set(false);
           return;
         }
-        if (Object.keys(serviceabilityCache).length > 0) {
-          serviceabilityCache = {
-            ...serviceabilityCache,
+        if (
+          serviceabilityCache &&
+          serviceabilityCache[order_id] &&
+          Object.keys(serviceabilityCache[order_id]).length > 0
+        ) {
+          serviceabilityCache[order_id] = {
+            ...serviceabilityCache[order_id],
             ...formatResults(response.addresses),
           };
         } else {
-          serviceabilityCache = formatResults(response.addresses);
+          serviceabilityCache[order_id] = formatResults(response.addresses);
         }
         showLoader.set(false);
-        resolve(serviceabilityCache);
+        resolve(serviceabilityCache[order_id]);
       },
     });
   });

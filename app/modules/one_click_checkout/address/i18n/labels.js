@@ -22,5 +22,6 @@ export const SHIPPING_CHARGES_LABEL = 'address.shipping_charges_label';
 export const SAVED_ADDRESS_LABEL = 'address.saved_address_label';
 export const SAME_ADDRESS_LABEL = 'address.same_address_checkbox_label';
 export const GENERIC_ERROR_LABEL = 'address.error_label';
+export const LANDMARK_ERROR_LABEL = 'address.landmark_error_label';
 export const UNSERVICEABLE_LABEL = 'address.unserviceable_label';
 export const SERVICEABLE_LABEL = 'address.serviceable_label';

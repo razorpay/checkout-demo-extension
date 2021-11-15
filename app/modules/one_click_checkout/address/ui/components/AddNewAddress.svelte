@@ -107,6 +107,7 @@
     {
       id: 'landmark',
       label: $t(LANDMARK_LABEL),
+      pattern: '^.{2,32}$',
     },
   ];
 

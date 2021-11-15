@@ -24,6 +24,7 @@ export default {
   same_address_checkbox_label: 'Billing address same as shipping address',
   saved_address_label: 'Your address has been saved',
   error_label: 'Address should be less than 255 characters',
+  landmark_error_label: 'Landmark entered should be between 2-32 characters',
   unserviceable_label: 'Unserviceable',
   serviceable_label: 'Serviceable',
   ...billingAddressLabels,

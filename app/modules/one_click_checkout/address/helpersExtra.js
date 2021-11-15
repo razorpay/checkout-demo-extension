@@ -62,7 +62,7 @@ export const getCustomerAddressApiPayload = ({
  * @param {Object} cache
  * @returns Array if there is any zipcode which is not cached, else false
  */
-export const getServiceabilityPayload = (addresses, cache) => {
+export const getServiceabilityPayload = (addresses, cache = {}) => {
   let zipcodesProcessed = {};
   let addPayload = addresses.reduce((acc, { zipcode }) => {
     if (!cache[zipcode] && !zipcodesProcessed[zipcode]) {
