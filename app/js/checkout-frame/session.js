@@ -4516,8 +4516,16 @@ Session.prototype = {
         var isSavedCardScreen = this.svelteCardTab.isOnSavedCardsScreen();
         var cardIin = discreet.storeGetter(CardScreenStore.cardIin);
         var selectedCard = discreet.storeGetter(CardScreenStore.selectedCard);
-        var tokenId = selectedCard && selectedCard.id ? selectedCard.id : '';
-        AVSRequired = Boolean(AVSMap[isSavedCardScreen ? tokenId : cardIin]);
+        var selectedCardFromHome = discreet.storeGetter(
+          CardScreenStore.selectedCardFromHome
+        );
+        var tokenId =
+          selectedCardFromHome && selectedCardFromHome.id
+            ? selectedCardFromHome.id
+            : selectedCard && selectedCard.id
+            ? selectedCard.id
+            : '';
+        AVSRequired = Boolean(AVSMap[tokenId || cardIin]);
         // get card number & token id
 
         if (data.provider) {
@@ -4659,7 +4667,15 @@ Session.prototype = {
         return;
       }
     } else if (selectedInstrument) {
-      if (!this.checkCommonValidAndTrackIfInvalid()) {
+      if (
+        selectedInstrument.method === 'card' &&
+        isOnAVSScreen &&
+        this.checkInvalid('#form-card')
+      ) {
+        return;
+      }
+
+      if (!isOnAVSScreen && !this.checkCommonValidAndTrackIfInvalid()) {
         return;
       }
 
@@ -4891,11 +4907,18 @@ Session.prototype = {
 
     // AVS check
     var AVSMap = discreet.storeGetter(CardScreenStore.AVSScreenMap) || {};
-    var isSavedCardScreen = this.svelteCardTab.isOnSavedCardsScreen();
     var cardIin = discreet.storeGetter(CardScreenStore.cardIin);
     var selectedCard = discreet.storeGetter(CardScreenStore.selectedCard);
-    var tokenId = selectedCard && selectedCard.id ? selectedCard.id : '';
-    var AVSRequired = Boolean(AVSMap[isSavedCardScreen ? tokenId : cardIin]);
+    var selectedCardFromHome = discreet.storeGetter(
+      CardScreenStore.selectedCardFromHome
+    );
+    var tokenId =
+      selectedCardFromHome && selectedCardFromHome.id
+        ? selectedCardFromHome.id
+        : selectedCard && selectedCard.id
+        ? selectedCard.id
+        : '';
+    var AVSRequired = Boolean(AVSMap[tokenId || cardIin]);
 
     if (!this.screen || isAVSScreenFromHomeScreen) {
       if (selectedInstrument) {

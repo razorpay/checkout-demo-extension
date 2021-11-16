@@ -10,7 +10,7 @@ const {
   modifyPreferencesForDynamicFeeBearer,
   selectCurrencyAndVerifyAmount,
   submit,
-  handleValidationRequest,
+  // handleValidationRequest,
   handleCardValidation,
   handleMockSuccessDialog,
   expectRedirectWithCallback,
@@ -21,6 +21,7 @@ const {
   typeOTPandSubmit,
   respondSavedCards,
   selectSavedCardAndTypeCvv,
+  sendFlowsRequest,
 
   // Offers
   verifyOfferApplied,
@@ -199,6 +200,8 @@ module.exports = function (testFeatures) {
           await expectDCCParametersInRequest(context, 'USD', avs);
 
           return;
+        } else {
+          await sendFlowsRequest(context);
         }
 
         await submit(context);
