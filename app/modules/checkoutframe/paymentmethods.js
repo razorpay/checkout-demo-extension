@@ -222,7 +222,9 @@ export function getEMIBanksText(locale) {
   const emiBanks = getEMIBanks();
   const bankNames =
     emiBanks |> _Obj.keys |> _Arr.map((bank) => emiBanks[bank].name);
-  return generateTextFromList(bankNames, locale, 12);
+  // Here 15 is the number of banks in the store in banks.js
+  // To Do: Do we really need to show list of 15 banks
+  return generateTextFromList(bankNames, locale, 15);
 }
 
 /**
