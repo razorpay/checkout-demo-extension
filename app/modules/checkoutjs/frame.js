@@ -553,6 +553,6 @@ CheckoutFrame.prototype = {
   },
 
   onflush: function (e) {
-    Track.flush();
+    Track.flush(e);
   },
 };

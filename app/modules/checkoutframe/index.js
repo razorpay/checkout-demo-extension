@@ -281,6 +281,10 @@ function fetchPrefs(session) {
           data: 'Payment Failed',
         });
       } else {
+        Razorpay.sendMessage({
+          event: 'flush',
+          data: preferences.mode,
+        });
         setSessionPreferences(session, preferences);
         fetchRewards(session);
       }

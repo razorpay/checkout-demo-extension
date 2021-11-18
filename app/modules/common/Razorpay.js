@@ -269,6 +269,17 @@ RazorProto.isLiveMode = function () {
   );
 };
 
+RazorProto.getMode = function () {
+  var preferences = this.preferences;
+  if (!this.get('key') && !preferences) {
+    return 'pending';
+  }
+  return (!preferences && /^rzp_l/.test(this.get('key'))) ||
+    (preferences && preferences.mode === 'live')
+    ? 'live'
+    : 'test';
+};
+
 /**
  * Used for calculating the fees for the payment.
  * Resolves and rejects with a JSON.

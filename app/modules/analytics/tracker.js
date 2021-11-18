@@ -82,6 +82,7 @@ function getCommonTrackingData(r) {
 
 const EVT_Q = [];
 let PENDING_EVT_Q = [];
+let RZP_MODE;
 let EVT_CTX;
 
 const pushToEventQ = (evt) => EVT_Q.push(evt);
@@ -92,8 +93,11 @@ const setEventContext = (ctx) => {
 /**
  * Flushes all the events in queue.
  */
-const flushEvents = () => {
-  if (!EVT_Q.length) {
+const flushEvents = (mode) => {
+  if (mode) {
+    RZP_MODE = mode;
+  }
+  if (!EVT_Q.length || RZP_MODE !== 'live') {
     return;
   }
 
@@ -158,7 +162,8 @@ export default function Track(r, event, data, immediately) {
     PENDING_EVT_Q.push([event, data, immediately]);
     return;
   }
-  if (!r.isLiveMode()) {
+  RZP_MODE = r.getMode();
+  if (RZP_MODE === 'test') {
     return;
   }
   // defer makes tracking async
