@@ -18,6 +18,12 @@ const config = {
   bajaj: {
     name: 'Bajaj Finserv',
   },
+  sezzle: {
+    name: 'Sezzle',
+    headless: false,
+    fee_bearer_customer: false,
+    min_amount: 20000,
+  },
   earlysalary: {
     name: 'EarlySalary',
     fee_bearer_customer: false,

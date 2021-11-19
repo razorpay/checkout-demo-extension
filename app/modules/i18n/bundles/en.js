@@ -267,6 +267,7 @@ export default {
       credit_debit_cards: 'EMI on Debit/Credit cards',
       earlysalary: 'EarlySalary',
       walnut369: 'Walnut 369',
+      sezzle: 'Sezzle',
       flexmoney: 'Cardless EMI by InstaCred',
       zestmoney: 'ZestMoney',
       fdrl: 'Federal Bank Cardless EMI',

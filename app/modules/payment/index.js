@@ -265,7 +265,9 @@ export default function Payment(data, params = {}, r) {
        * - emi_duration is present but provider is not headless
        */
       if (data.method === 'cardless_emi') {
-        if (!data.contact) {
+        if (data.provider === 'sezzle') {
+          avoidPopup = false;
+        } else if (!data.contact) {
           avoidPopup = false;
         } else {
           if (data.emi_duration) {
@@ -372,7 +374,6 @@ Payment.prototype = {
       if (callback_url) {
         data.callback_url = callback_url;
       }
-
       if (!this.avoidPopup || (data.method === 'upi' && !isRazorpayFrame())) {
         _Doc.redirect({
           url: makeRedirectUrl(this.feesRedirect),
