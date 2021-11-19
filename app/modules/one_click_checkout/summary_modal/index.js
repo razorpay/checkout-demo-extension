@@ -23,3 +23,11 @@ export function showSummaryModal(withCta) {
   modal.toggleCta(withCta);
   modal.show();
 }
+
+export function destroySummaryModal() {
+  if (!modal) {
+    return;
+  }
+  modal.$destroy();
+  modal = null;
+}

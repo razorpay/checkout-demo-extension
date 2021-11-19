@@ -16,8 +16,10 @@
   import { screensHistory } from 'one_click_checkout/routing/History';
   import { determineLandingView } from 'one_click_checkout/helper';
   import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
+  import { destroySummaryModal } from 'one_click_checkout/summary_modal';
+
   // svelte imports
-  import { onMount, tick, afterUpdate } from 'svelte';
+  import { onMount, tick, afterUpdate, onDestroy } from 'svelte';
   import { getTheme } from 'one_click_checkout/address/sessionInterface';
 
   let topbar;
@@ -92,9 +94,10 @@
     screensHistory.pop();
   }
 
-  export function destroy() {
+  onDestroy(() => {
     resetRouting();
-  }
+    destroySummaryModal();
+  });
 </script>
 
 <Tab
