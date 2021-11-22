@@ -63,7 +63,6 @@ export function applyCouponCode(code) {
         Events.TrackBehav(CouponEvents.COUPON_APPLIED, {
           index: get(couponAppliedIndex),
           meta: {
-            coupon_input_source: get(couponInputSource),
             is_coupon_applied: true,
             coupon_code: input,
           },

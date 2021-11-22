@@ -10,12 +10,10 @@ export default {
   /** Coupon code meta **/
   AVAILABLE_COUPONS_COUNT: 'available_coupons_count',
   IS_COUPON_APPLIED: 'is_coupon_applied',
-  COUPON_INPUT_SOURCE: 'coupon_input_source',
   APPLIED_COUPON_CODE: 'applied_coupon_code',
 
   /** Address meta properties */
   ADDRESS_SCREEN_TYPE: 'address_screen_type',
-  SELECTED_ADDRESS_TYPE: 'selected_address_type',
   SAVED_ADDRESS_COUNT: 'saved_address_count',
   IS_USER_LOGGED_IN: 'is_user_logged_in',
   SELECTED_ADDRESS_COUNTRY: 'selected_address_country',

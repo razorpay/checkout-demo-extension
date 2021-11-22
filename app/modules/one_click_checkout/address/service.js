@@ -84,6 +84,7 @@ export function postCustomerAddress({ shipping_address, billing_address }) {
       callback: (response) => {
         Events.TrackMetric(AddressEvents.SAVE_ADDRESS_END, {
           time: addressApiTimer(),
+          addressSaved: response.status_code === 200,
         });
         if (response.error) {
           reject(response.error);
@@ -110,7 +111,9 @@ export function postServiceability(addresses, onSavedAddress = false) {
   const order_id = getOrderId();
   showLoader.set(true);
   const serviceabilityApiTimer = timer();
-  Events.TrackMetric(AddressEvents.SERVICEABILITY_START);
+  Events.TrackMetric(AddressEvents.SERVICEABILITY_START, {
+    is_saved_address: onSavedAddress,
+  });
   const formattedPayload = getServiceabilityPayload(
     addresses,
     serviceabilityCache[order_id]
@@ -128,6 +131,7 @@ export function postServiceability(addresses, onSavedAddress = false) {
         Events.TrackMetric(AddressEvents.SERVICEABILITY_END, {
           time: serviceabilityApiTimer(),
           response,
+          is_saved_address: onSavedAddress,
         });
         if (response.error) {
           reject(response.error);

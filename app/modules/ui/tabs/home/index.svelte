@@ -718,6 +718,10 @@
     if ($isBillingSameAsShipping) {
       billing_address = $selectedShippingAddress;
     }
+    Events.Track(HomeEvents.LANDING, {
+      view,
+      oneMethod: singleMethod,
+    });
     Events.TrackRender(HOME_EVENTS.HOME_LOADED, {
       cod_available: $isCodAvailable,
       cod_unavailable_reason: $codReason,
@@ -878,11 +882,12 @@
   }
 
   view = determineLandingView();
-
-  Events.Track(HomeEvents.LANDING, {
-    view,
-    oneMethod: singleMethod,
-  });
+  if (!isOneClickCheckout()) {
+    Events.Track(HomeEvents.LANDING, {
+      view,
+      oneMethod: singleMethod,
+    });
+  }
 
   function storeContactDetails() {
     // Update save address/card checkbox

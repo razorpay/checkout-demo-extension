@@ -64,9 +64,10 @@
 
   function onSubmit() {
     Analytics.setMeta(MetaProperties.IS_COUPON_APPLIED, $isCouponApplied);
-    Analytics.setMeta(MetaProperties.COUPON_INPUT_SOURCE, $couponInputSource);
     Analytics.setMeta(MetaProperties.APPLIED_COUPON_CODE, $appliedCoupon);
-    Events.Track(CouponEvents.COUPONS_SUBMIT);
+    Events.Track(CouponEvents.COUPONS_SUBMIT, {
+      input_source: $couponInputSource,
+    });
 
     if (!$isCouponApplied) {
       removeCouponInStore();

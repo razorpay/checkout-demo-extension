@@ -11,7 +11,10 @@
 
   import { Events } from 'analytics';
 
-  import { savedAddresses } from 'one_click_checkout/address/store';
+  import {
+    savedAddresses,
+    isBillingSameAsShipping,
+  } from 'one_click_checkout/address/store';
   import { validateInput } from 'one_click_checkout/address/helpers';
 
   import { onMount } from 'svelte';
@@ -90,7 +93,10 @@
           $locale
         );
         Events.Track(AddressEvents.ADDRESS_SUBMIT_CLICKED, {
+          address_valid: false,
           is_saved_address: false,
+          is_billing_same_as_shipping: $isBillingSameAsShipping,
+          opted_for_save_address: $shouldSaveAddress,
         });
         return;
       }
@@ -103,6 +109,8 @@
     Events.Track(AddressEvents.ADDRESS_SUBMIT_CLICKED, {
       address_valid: true,
       is_saved_address: currentView === addressViews.SAVED_ADDRESSES,
+      is_billing_same_as_shipping: $isBillingSameAsShipping,
+      opted_to_save_address: $shouldSaveAddress,
     });
     onSubmitCallback(addressCompleted);
   }

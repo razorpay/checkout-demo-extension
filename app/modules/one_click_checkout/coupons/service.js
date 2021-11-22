@@ -37,10 +37,11 @@ export function getCoupons() {
  * Method to validate coupon entered by user against backend.
  * @param {string} code coupon code entered by the user
  */
-export function validateCoupon(code) {
+export function validateCoupon(code, source) {
   const getDuration = timer();
-  Events.TrackMetric(CouponEvents.COUPON_VALIDITY_START);
-
+  Events.TrackMetric(CouponEvents.COUPON_VALIDITY_START, {
+    input_source: source,
+  });
   return new Promise((resolve, reject) => {
     fetch.post({
       url: makeAuthUrl('merchant/coupon/apply'),
@@ -50,6 +51,13 @@ export function validateCoupon(code) {
         code,
       },
       callback: (response) => {
+        Events.TrackMetric(CouponEvents.COUPON_VALIDITY_END, {
+          time: getDuration(),
+          code,
+          validation_status: response.status_code === 200,
+          input_source: source,
+          reason: response.failure_code,
+        });
         if (response.status_code === 200) {
           resolve(response);
           return;
