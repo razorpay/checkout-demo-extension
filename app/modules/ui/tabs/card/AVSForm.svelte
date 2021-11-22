@@ -28,7 +28,6 @@
     selectedCard,
   } from 'checkoutstore/screens/card';
   import { getPrefillBillingAddress } from 'checkoutstore';
-  import { resetAVSBillingAddressData } from 'card/helper';
   import { AVS_COUNTRY_MAP, STATE_MAP, Views } from './constant';
 
   export let direct = false;
@@ -66,15 +65,9 @@
 
       if (billingAddress?.line1) {
         $AVSBillingAddress = billingAddress;
-      } else {
-        /**
-         * If selected card does not have billing address and AVSBillingAddress store has previously stored billing address.
-         * Then reset AVSBillingAddress to store new values.
-         */
-        resetAVSBillingAddressData();
       }
     }
-    if (!$AVSBillingAddress) {
+    if (!$AVSBillingAddress && !$AVSBillingAddress.line1) {
       // check for prefill data
       $AVSBillingAddress = getPrefillBillingAddress();
     }

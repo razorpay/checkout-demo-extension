@@ -607,13 +607,6 @@ async function respondToPaymentFailure(context) {
   });
 }
 
-async function sendFlowsRequest({ expectRequest, respondPlain }) {
-  await expectRequest(({ URL }) => {
-    expect(URL).toContain('/flows');
-  });
-  await respondPlain('');
-}
-
 module.exports = {
   enterCardDetails,
   expectDCCParametersInRequest,
@@ -635,5 +628,4 @@ module.exports = {
   fillAVSForm,
   assertAVSFormData,
   respondToPaymentFailure,
-  sendFlowsRequest,
 };
