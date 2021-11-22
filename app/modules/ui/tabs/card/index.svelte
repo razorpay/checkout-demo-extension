@@ -1,7 +1,7 @@
 <script>
   // Svelte imports
   import { onMount, tick, onDestroy } from 'svelte';
-  import { get, derived } from 'svelte/store';
+  import { get } from 'svelte/store';
 
   // UI Imports
   import Tab from 'ui/tabs/Tab.svelte';
@@ -454,47 +454,50 @@
     }
   };
 
-  /**
-   * For saved cards check cardCountry is not "IN" then call the flows api to check the address_required enabled
-   */
-  const intSavedCardTokenId = derived(
-    [selectedCard, selectedInstrument],
-    ([cardValue, instrument]) => {
-      if (currentView === Views.SAVED_CARDS && cardValue) {
-        return cardValue.country !== 'IN' ? cardValue.id : null;
-      }
-
-      if (
-        (currentView === Views.SAVED_CARDS ||
-          currentView === Views.HOME_SCREEN) &&
-        instrument
-      ) {
-        const cardValue = getCardByTokenId(instrument.token_id);
-        return cardValue?.country !== 'IN' ? cardValue?.id : null;
-      }
-      return null;
+  $: {
+    /**
+     * For saved cards check cardCountry is not "IN" then call the flows api to check the address_required enabled
+     */
+    // get tokenId for saved card on cards screen
+    let tokenId =
+      currentView === Views.SAVED_CARDS && $selectedCard
+        ? $selectedCard.id
+        : null;
+    let preSelectedCard =
+      (currentView === Views.SAVED_CARDS ||
+        currentView === Views.HOME_SCREEN) &&
+      $selectedInstrument
+        ? getCardByTokenId($selectedInstrument.token_id)
+        : null;
+    if (preSelectedCard) {
+      tokenId = preSelectedCard.id;
     }
-  );
 
-  $: if (
-    $intSavedCardTokenId &&
-    !$AVSScreenMap[$intSavedCardTokenId] &&
-    !isDCCEnabled()
-  ) {
-    fetchAVSFlag({ tokenId: $intSavedCardTokenId });
+    if (
+      tokenId &&
+      $AVSScreenMap[tokenId] === undefined &&
+      ($selectedCard?.card?.country !== 'IN' ||
+        preSelectedCard?.country !== 'IN') &&
+      !isDCCEnabled()
+    ) {
+      fetchAVSFlag({ tokenId });
+    }
   }
 
-  /**
-   * If DCC is not enabled and cardCountry is not "IN" then call the flows api to check the address_required enabled
-   */
-  $: if (
-    $cardNumber &&
-    $cardCountry &&
-    $cardCountry !== 'IN' &&
-    !isDCCEnabled()
-  ) {
+  $: {
+    /**
+     * If DCC is not enabled and cardCountry is not "IN" then call the flows api to check the address_required enabled
+     */
+    // get IIN for new card
     const iin = getIin($cardNumber);
-    if (iin && get(AVSScreenMap)[iin] === undefined) {
+
+    if (
+      iin &&
+      $AVSScreenMap[iin] === undefined &&
+      $cardCountry &&
+      $cardCountry !== 'IN' &&
+      !isDCCEnabled()
+    ) {
       fetchAVSFlag({ iin });
     }
   }
