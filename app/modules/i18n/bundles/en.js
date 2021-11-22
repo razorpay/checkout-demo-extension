@@ -950,7 +950,7 @@ export default {
         'Enter the OTP sent on {phone} to get EMI plans for {provider}',
       cardlessemi_sending:
         'Looking for {provider} account associated with {phone}',
-      incorrect_otp_retry: 'Incorrect OTP. Try again.',
+      incorrect_otp_retry: 'Entered OTP was incorrect. Re-enter to proceed.',
       loading: 'Loading...',
       mandate_login:
         'A text message with an OTP has been sent to <strong>{phone}</strong>',
@@ -980,7 +980,7 @@ export default {
       wallet_sending: 'Looking for {wallet} account associated with {phone}',
     },
     try_different_label: 'Try different payment method',
-    invalid_label: 'Invalid OTP, kindly correct.',
+    invalid_label: 'Incorrect OTP. Try again.',
     misc: {
       security_text:
         'Your transaction is processed through a secure 128 bit https internet connection based on secure socket layer technology. For security purpose, your IP address {ipAddress} and access time {accessTime} have been logged.',

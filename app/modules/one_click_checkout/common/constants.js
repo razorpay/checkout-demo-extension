@@ -10,7 +10,7 @@ export const OTP_PARAMS = {
     textView: 'otp_sending_generic',
     disableCTA: true,
     errorMessage: '',
-    ctaLabel: CTA_LABELS.VERIFY,
+    ctaLabel: `cta.${CTA_LABELS.VERIFY}`,
   },
   sent: {
     addFunds: false,
@@ -20,7 +20,7 @@ export const OTP_PARAMS = {
     // allowSkip,
     textView: 'generic_send_otp',
     disableCTA: true,
-    ctaLabel: CTA_LABELS.VERIFY,
+    ctaLabel: `cta.${CTA_LABELS.VERIFY}`,
   },
   verifying: {
     addFunds: false,
@@ -30,6 +30,6 @@ export const OTP_PARAMS = {
     // allowSkip,
     textView: 'generic_send_otp',
     disableCTA: true,
-    ctaLabel: CTA_LABELS.VERIFY,
+    ctaLabel: `cta.${CTA_LABELS.VERIFY}`,
   },
 };

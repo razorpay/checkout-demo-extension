@@ -164,7 +164,9 @@
     {/if}
   {/if}
   {#if newCta}
-    <CTA on:click={onSubmitClick} {disabled}>{$t(CTA_LABELS.PROCEED)}</CTA>
+    <CTA on:click={onSubmitClick} {disabled}
+      >{$t(`cta.${CTA_LABELS.PROCEED}`)}</CTA
+    >
   {/if}
 </div>
 

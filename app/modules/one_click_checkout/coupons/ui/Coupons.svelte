@@ -27,7 +27,10 @@
     HAVE_COUPON_LABEL,
     CONTINUE_LABEL,
   } from 'one_click_checkout/coupons/i18n/labels';
-  import { COUPON_DISCOUNT_LABEL } from 'one_click_checkout/summary_modal/i18n/labels';
+  import {
+    COUPON_DISCOUNT_LABEL,
+    AMOUNT_LABEL,
+  } from 'one_click_checkout/summary_modal/i18n/labels';
 
   import { formatAmountWithSymbol } from 'common/currency';
 
@@ -124,7 +127,7 @@
 
     <div class="coupon-order-summary">
       <div class="row justify-between">
-        <p>Price</p>
+        <p>{$t(AMOUNT_LABEL)}</p>
         <p>
           {formatAmountWithSymbol($cartAmount, currency)}
         </p>
