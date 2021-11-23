@@ -203,7 +203,7 @@ export default {
     card_number_help_unsupported: 'This card is not supported for the payment',
     card_number_label: 'Card Number',
     cards_saved_on_apps_label: 'Pay with card on other apps',
-    cards_saved_on_rzp_label: 'Your saved cards',
+    cards_saved_on_rzp_label: 'YOUR SAVED CARDS',
     checking_cred_eligibility: 'Checking you eligibility status on CRED',
     cvv_help: "It's a {length} digit code printed on the back of your card.",
     cvv_label: 'CVV',
@@ -216,7 +216,11 @@ export default {
     nocvv_label: "My Maestro Card doesn't have Expiry/CVV",
     recurring_callout:
       'Future payments on this card will be charged automatically.',
-    remember_card_label: 'Remember Card',
+    save_card_text: 'Keep card saved for future payments',
+    save_card_text_new_card: 'Save card securely for future payments',
+    know_more: 'Know More',
+    card_tokenization_deadline_callout:
+      'Card will not be saved on Razorpay after Dec 31, 2021.',
     saved_card_label: 'Card ending with <b>{last4}<b>',
     subscription_callout:
       'This card will be linked to the subscription and future payments will be charged automatically.',
@@ -246,6 +250,20 @@ export default {
     avs_country_all: 'All Countries',
     avs_state_all: 'All States',
     avs_form_input_required: 'This field is required',
+    save_card_know_more_existing_card_modal_title:
+      'Keep card saved for future payments',
+    save_card_know_more_existing_card_modal_content1:
+      'As per RBI’s latest guidelines, your permission is required to continue keeping this card saved securely for future payments on Razorpay.',
+    save_card_know_more_existing_card_modal_content2:
+      'If you do not allow this, your card will no longer be saved after Dec 31, 2021 on Razorpay and you will be required to enter details for every payment.',
+    save_card_know_more_existing_card_modal_content_bullet1:
+      'All saved cards are compliant with the latest security guidelines',
+
+    save_card_know_more_add_card_modal_title:
+      'Save cards securely for future payments',
+    save_card_know_more_add_card_modal_content1:
+      'Your card will be stored securely on Razorpay as a saved payment method as per RBI’s latest guidelines.',
+
     ...cardLang,
   },
   card_subtext: {

@@ -1,4 +1,4 @@
-const { delay, innerText } = require('../util');
+const { delay, innerText, visible } = require('../util');
 const { assertTrimmedInnerText } = require('../tests/homescreen/actions');
 const querystring = require('querystring');
 const { sendSiftJS } = require('./siftjs');
@@ -212,7 +212,12 @@ async function handleCustomerCardStatusRequest(context, cardType) {
 
 async function respondSavedCards(
   context,
-  { nativeOtp = false, dcc = false, avsPrefillFromSavedCard = false } = {}
+  {
+    nativeOtp = false,
+    dcc = false,
+    avsPrefillFromSavedCard = false,
+    tokenization,
+  } = {}
 ) {
   const req = await context.expectRequest();
   expect(req.url).toContain('otp/verify');
@@ -229,6 +234,7 @@ async function respondSavedCards(
           bank: null,
           wallet: null,
           method: 'card',
+          consent_taken: !tokenization,
           dcc_enabled: dcc,
           card: {
             entity: 'card',
@@ -381,6 +387,14 @@ async function selectSavedCardAndTypeCvv(context) {
   const SavedCard = await context.page.$('.saved-inner');
   await SavedCard.click();
   await SavedCard.type('222');
+}
+async function assertConsentCollectorForTokenization(context) {
+  expect(await context.page.$eval('.secure-card-block', visible)).toEqual(true);
+}
+
+async function selectConsentCollectorForTokenization(context) {
+  const checkboxLabel = await context.page.$('#should-save-card');
+  await checkboxLabel.click();
 }
 
 async function verifyAmount(context, currency, isAVS = false) {
@@ -628,4 +642,6 @@ module.exports = {
   fillAVSForm,
   assertAVSFormData,
   respondToPaymentFailure,
+  assertConsentCollectorForTokenization,
+  selectConsentCollectorForTokenization,
 };

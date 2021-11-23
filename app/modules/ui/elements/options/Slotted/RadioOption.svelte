@@ -92,6 +92,7 @@
     </div>
     <slot name="extra" />
   </Stack>
+  <slot name="secure-card" />
   <slot name="downtime" />
 </DynamicTag>
 

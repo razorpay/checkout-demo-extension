@@ -6,10 +6,11 @@
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { DEFAULT_AUTH_TYPE_RADIO } from 'common/constants';
-
+  import SecureCard from 'ui/tabs/card/SecureCard.svelte';
   // Store
   import { selectedPlanTextForSavedCard } from 'checkoutstore/emi';
   import { isMethodUsable } from 'checkoutstore/methods';
+  import { userConsentForTokenization } from 'checkoutstore/screens/card';
 
   import { setDynamicFeeObject } from 'checkoutstore/dynamicfee';
   import { isDynamicFeeBearer } from 'checkoutstore/index';
@@ -23,6 +24,7 @@
     NOCVV_LABEL,
     AUTH_TYPE_PIN,
     AUTH_TYPE_OTP,
+    CARD_TOKENIZATION_DEADLINE_CALLOUT,
   } from 'ui/labels/card';
 
   import {
@@ -40,6 +42,7 @@
   import CvvField from 'ui/elements/fields/card/CvvField.svelte';
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
+  import { getBankText } from 'ui/tabs/home/helpers';
 
   // Props
   export let card;
@@ -49,6 +52,7 @@
   export let cvvDigits;
   export let selected;
   export let tab;
+  export let isTokenised;
   let { downtimeSeverity, downtimeInstrument } = card;
 
   // Computed
@@ -63,6 +67,7 @@
   // Refs
   let cvvInput;
   let cvvInputFormatter;
+  let collectCardTokenisationConsent = false;
 
   const dispatch = createEventDispatcher();
 
@@ -101,6 +106,7 @@
     };
     dispatch('authtypechange', payload);
   }
+  $: collectCardTokenisationConsent = selected && !isTokenised;
 
   function trackAtmRadio(event) {
     Analytics.track('atmpin:flows:change', {
@@ -154,6 +160,7 @@
           $locale
         )}
       />
+      {#if !isTokenised}<span class="card-non-tokenised"> * </span> {/if}
     </div>
     {#if !!downtimeSeverity && selected}
       <div class="downtime-saved-cards-icon">
@@ -173,6 +180,20 @@
       {/if}
     </div>
   </div>
+  {#if !isTokenised && !selected}<div class="saved-middle">
+      {$t(CARD_TOKENIZATION_DEADLINE_CALLOUT)}
+    </div>{/if}
+  {#if collectCardTokenisationConsent}
+    <div class="saved-cards-tokenisation-consent">
+      <SecureCard
+        bind:checked={$userConsentForTokenization}
+        savedcard
+        modalType="existing-card"
+        cvvRef={cvvInput}
+        network={card.network}
+      />
+    </div>
+  {/if}
   {#if showOuter && selected}
     <div class="saved-outer">
       {#if plans}
@@ -260,6 +281,7 @@
       {/if}
     </div>
   {/if}
+
   {#if !!downtimeSeverity && selected}
     <div class="downtime-saved-cards">
       <DowntimeCallout
@@ -278,5 +300,20 @@
   .downtime-saved-cards-icon {
     margin-right: 8px;
     margin-top: 2px;
+  }
+
+  .card-non-tokenised {
+    color: red;
+    font-size: 16px;
+    font-weight: 500;
+    margin-left: 2px;
+  }
+  .saved-middle {
+    line-height: 10px;
+    font-size: 10px;
+    opacity: 0.5;
+    padding-left: 48px;
+    margin-top: -10px;
+    margin-bottom: 5px;
   }
 </style>

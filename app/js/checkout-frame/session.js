@@ -315,6 +315,14 @@ function hideFeeWrap() {
   }
   return wasShown;
 }
+function hideSecureCardKnowMoreWrap() {
+  var secureCardWrap = $('#secure-card-know-more-wrap');
+  var wasShown = secureCardWrap.hasClass(shownClass);
+  if (wasShown) {
+    hideOverlay(secureCardWrap);
+  }
+  return wasShown;
+}
 
 function hideOverlayMessage() {
   var session = SessionManager.getSession();
@@ -322,6 +330,7 @@ function hideOverlayMessage() {
   if (
     !hideEmi() &&
     !hideRecurringCardsOverlay() &&
+    !hideSecureCardKnowMoreWrap() &&
     !hideFeeWrap() &&
     !hideDowntimeAlert() &&
     !session.hideSvelteOverlay()
@@ -4897,6 +4906,52 @@ Session.prototype = {
     var tokenId = selectedCard && selectedCard.id ? selectedCard.id : '';
     var AVSRequired = Boolean(AVSMap[isSavedCardScreen ? tokenId : cardIin]);
 
+    /**
+     * If user selects the card from p13n user will be auto-redirected to saved cards screen
+     * And in both cases i.e, p13n card selection and saved card selection both will have
+     * isSavedCardScreen:true and selectedInstrumnet.method=card.
+     *
+     * if card is selected from p13n then
+     * isSavedCardScreen:true,
+     * selectedCard:null,
+     * tokenId:null,
+     * selectedInstrument: { method: 'card', token_id:XXXXX, consent_taken }
+     *
+     * if selected from savedCards Screen then
+     * isSavedCardScreen:true,
+     * selectedCard:{ consent_taken, id: //here is the actual token_id , and tokenisation status(consent_taken) will be available here },
+     * selectedInstrument: { method: 'card', token_id:undefined }
+     * tokenId: XXXXX,
+     *
+     * since consent_taken param from token item is required to add consent to payload,
+     */
+    var isSavedCardScreen = this.svelteCardTab.isOnSavedCardsScreen();
+    var isCardRelatedPayment =
+      isSavedCardScreen && (data.method === 'card' || data['card[cvv]']);
+    var addTokenizationConsentToPayload = false;
+    // when card is selected from saved card screen
+    var consentPendingForSelectedCardInSavedCardScreen =
+      selectedCard && !selectedCard.consent_taken;
+    // when card is selected from p13n block
+    var consentPendingForSelectedCardInP13n =
+      selectedInstrument &&
+      selectedCard === null &&
+      !selectedInstrument.consent_taken;
+    if (
+      isCardRelatedPayment &&
+      (consentPendingForSelectedCardInSavedCardScreen ||
+        consentPendingForSelectedCardInP13n)
+    ) {
+      addTokenizationConsentToPayload = true;
+      if (this.screen) {
+        // other than homescreen/p13n block
+        // home screen case is handled little lower to this block
+        data.user_consent_for_tokenisation = Number(
+          discreet.storeGetter(CardScreenStore.userConsentForTokenization)
+        );
+      }
+    }
+
     if (!this.screen || isAVSScreenFromHomeScreen) {
       if (selectedInstrument) {
         data = Instruments.addInstrumentToPaymentData(
@@ -4904,8 +4959,23 @@ Session.prototype = {
           data,
           this.getCustomer(getPhone())
         );
+        /** This logic is intended for cards tokenization feature and
+         * can be removed after 31st December 2021 once whole rzp saved cards
+         * are undergoing tokenization by default
+         **/
+        var user_consent_for_tokenisation = discreet.storeGetter(
+          CardScreenStore.userConsentForTokenization
+        );
+        if (
+          data.method === 'card' &&
+          data.token &&
+          addTokenizationConsentToPayload
+        ) {
+          data.user_consent_for_tokenisation = Number(
+            user_consent_for_tokenisation
+          );
+        }
         this.payload = data;
-
         Analytics.setMeta('doneByInstrument', true);
         Analytics.setMeta(
           'instrumentMeta',

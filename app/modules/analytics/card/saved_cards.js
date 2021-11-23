@@ -17,6 +17,10 @@ const savedCardEvents = {
   OTP_SUBMIT_SAVED_CARDS: 'save:otp:submit',
   /** OTP verification for accessing saved cards */
   ACCESS_OTP_SUBMIT_SAVED_CARDS: 'access:otp:submit',
+  /** Consent collection tracker for tokenization of saved cards in p13n and saved cards views */
+  USER_CONSENT_FOR_TOKENIZATION: 'user_consent_for_tokenization',
+  /** for know-more modal clicks */
+  TOKENIZATION_KNOW_MORE_MODAL: 'tokenization_know_more_modal',
 };
 
 export default getEventsName('saved_cards', savedCardEvents);

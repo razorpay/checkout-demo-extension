@@ -19,6 +19,7 @@
   import * as AnalyticsTypes from 'analytics-types';
   import { getCardMetadata } from 'common/card';
 
+  import { isCardTokenized } from './utils';
   // Props
   export let cards = [];
   export let tab;
@@ -68,6 +69,7 @@
 {#each cards as card, index (card.id)}
   <SavedCard
     card={card.card}
+    isTokenised={isCardTokenized(card)}
     debitPin={card.debitPin}
     token={card.token}
     cvvDigits={card.cvvDigits}
