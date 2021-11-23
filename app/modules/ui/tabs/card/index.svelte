@@ -899,6 +899,8 @@
       downtimeVisible = true;
     } else {
       downtimeVisible = false;
+      downtimeSeverity = null;
+      downtimeInstrument = null;
     }
   }
 
