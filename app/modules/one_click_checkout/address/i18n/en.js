@@ -27,5 +27,7 @@ export default {
   landmark_error_label: 'Landmark entered should be between 2-32 characters',
   unserviceable_label: 'Unserviceable',
   serviceable_label: 'Serviceable',
+  order_update_failure:
+    'We could not proceed due to some technical error. Please retry.',
   ...billingAddressLabels,
 };

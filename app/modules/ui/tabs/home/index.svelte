@@ -148,9 +148,7 @@
   import { remember } from 'checkoutstore/screens/card';
 
   import { formatTemplateWithLocale } from 'i18n';
-  import { updateOrder } from 'one_click_checkout/address/service';
   import UserDetailsStrip from 'ui/components/UserDetailsStrip.svelte';
-  import { showSummaryModal } from 'one_click_checkout/summary_modal';
   import { COD_EVENTS, HOME_EVENTS } from 'analytics/home/events';
 
   const cardOffer = getCardOffer();
@@ -732,39 +730,37 @@
       configureCODOrder($blocks);
     }
     if (!shouldNotUpdateOrder) {
-      updateOrder($selectedShippingAddress, billing_address).then(
-        (response) => {
-          const charge = session.formatAmountWithCurrency($shippingCharge);
-          if ($shippingCharge) {
-            const text = $didSaveAddress
-              ? [
-                  $t(SAVED_ADDRESS_LABEL),
-                  formatTemplateWithLocale(
-                    SHIPPING_CHARGES_LABEL,
-                    { charge },
-                    $locale
-                  ),
-                ]
-              : formatTemplateWithLocale(
-                  SHIPPING_CHARGES_LABEL,
-                  { charge },
-                  $locale
-                );
-            const snackBar = new Snackbar({
-              target: document.getElementById('form'),
-              props: {
-                align: 'bottom',
-                shown: true,
-                timer: 2000,
-                text: text,
-                class: 'snackbar-cod',
-              },
-            });
-          }
-          session.switchTab('');
-        }
-      );
+      const charge = session.formatAmountWithCurrency($shippingCharge);
+      if ($shippingCharge) {
+        const text = $didSaveAddress
+          ? [
+              $t(SAVED_ADDRESS_LABEL),
+              formatTemplateWithLocale(
+                SHIPPING_CHARGES_LABEL,
+                { charge },
+                $locale
+              ),
+            ]
+          : formatTemplateWithLocale(
+              SHIPPING_CHARGES_LABEL,
+              { charge },
+              $locale
+            );
+        const snackBar = new Snackbar({
+          target: document.getElementById('form'),
+          props: {
+            align: 'bottom',
+            shown: true,
+            timer: 2000,
+            text: text,
+            class: 'snackbar-cod',
+          },
+        });
+      }
     }
+    setTimeout(() => {
+      hideCta();
+    });
   }
 
   export function onShown() {

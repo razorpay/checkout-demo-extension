@@ -25,3 +25,4 @@ export const GENERIC_ERROR_LABEL = 'address.error_label';
 export const LANDMARK_ERROR_LABEL = 'address.landmark_error_label';
 export const UNSERVICEABLE_LABEL = 'address.unserviceable_label';
 export const SERVICEABLE_LABEL = 'address.serviceable_label';
+export const ORDER_UPDATE_FAILURE = 'address.order_update_failure';

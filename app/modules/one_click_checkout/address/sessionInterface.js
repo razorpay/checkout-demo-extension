@@ -45,15 +45,4 @@ export const getTheme = () => {
   return session.themeMeta;
 };
 
-export function redirectToPaymentMethods() {
-  const session = getSession();
-
-  session.topBar.setTab('methods');
-  session.switchTab();
-  session.topBar.show();
-  session.homeTab.addressNext();
-
-  screensHistory.push('');
-}
-
 export { showSavedAddressCta };

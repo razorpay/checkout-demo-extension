@@ -3098,6 +3098,11 @@ Session.prototype = {
     this.homeTab.next(views.METHODS);
   },
 
+  updateOrderFailure: function () {
+    var errorMessage = I18n.format('address.order_update_failure');
+    this.showLoadError(errorMessage, true);
+  },
+
   /**
    * Checks if the fields on the homepage are valid or not.
    *

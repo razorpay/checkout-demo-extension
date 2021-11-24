@@ -49,4 +49,9 @@ export const screensHistory = {
     history.set(newHistory);
     currentView.set(view);
   },
+  popUntil: function (view) {
+    while (view !== get(currentView)) {
+      this.pop();
+    }
+  },
 };
