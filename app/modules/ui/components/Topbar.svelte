@@ -50,7 +50,7 @@
   let contact = '';
 
   let cus;
-
+  let isTitleResize = false;
   let userDropDown = {};
 
   export function updateUserDropDown() {
@@ -106,17 +106,25 @@
     setTitleOverride('card', 'text', 'irctc_card');
   }
 
+  function setTitleResize(tabTitle) {
+    isTitleResize = tabTitle && tabTitle.length > 15;
+  }
+
   function generateOverriddenTitle(tab, locale) {
     const override = titleOverrides[tab];
 
     if (!override) {
-      return getTabTitle(tab, locale);
+      const tabTitle = getTabTitle(tab, locale);
+      setTitleResize(tabTitle);
+      return tabTitle;
     }
 
     if (override.type === 'image') {
       return `<img src=${override.data} alt="">`;
     } else {
-      return getTabTitle(override.data, locale);
+      const tabTitle = getTabTitle(override.data, locale);
+      setTitleResize(tabTitle);
+      return tabTitle;
     }
   }
 
@@ -238,7 +246,7 @@
     {/if}
     <div id="top-left" on:click={handleBackClick}>
       <i class="back">&#xe604;</i>
-      <div id="tab-title">
+      <div id="tab-title" class:text-small={isTitleResize}>
         {@html generateOverriddenTitle(tab, $locale)}
       </div>
     </div>
@@ -249,5 +257,8 @@
   #topbar.topbar-sticky {
     position: sticky;
     top: 0;
+  }
+  #top-left .text-small {
+    font-size: 13px;
   }
 </style>
