@@ -21,6 +21,7 @@
   // svelte imports
   import { onMount, tick, afterUpdate, onDestroy } from 'svelte';
   import { getTheme } from 'one_click_checkout/address/sessionInterface';
+  import { redirectToMethods } from 'one_click_checkout/sessionInterface';
 
   let topbar;
   let Component;
@@ -92,6 +93,13 @@
       handleBack();
     }
     screensHistory.pop();
+    if ($currentView === views.METHODS) {
+      /* During on tab switch the destroy method on replaceNode function acts as async and showing CTA
+       * even after switching tab to avoid this we added setTimeout to hide the CTA  */
+      setTimeout(function () {
+        redirectToMethods();
+      }, 0);
+    }
   }
 
   onDestroy(() => {

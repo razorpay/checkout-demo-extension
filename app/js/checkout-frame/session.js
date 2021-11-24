@@ -98,7 +98,8 @@ var preferences,
   Header = discreet.Header,
   address = discreet.address,
   OneClickCheckoutStore = discreet.OneClickCheckoutStore,
-  dynamicFeeObject = discreet.dynamicFeeObject;
+  dynamicFeeObject = discreet.dynamicFeeObject,
+  views = discreet.views;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -3083,7 +3084,7 @@ Session.prototype = {
   },
 
   showHomeTopBar: function () {
-    this.topBar.setTab('methods');
+    this.topBar.setTab(views.METHODS);
     this.topBar.setLogged(true);
     var contact = getPhone();
     this.topBar.setContact(contact);
@@ -3091,10 +3092,10 @@ Session.prototype = {
     this.topBar.show();
   },
 
-  oneClickCheckoutRedirection: function () {
+  oneClickCheckoutRedirection: function (shouldNotUpdateOrder) {
     this.switchTab('');
-    this.homeTab.addressNext();
-    this.homeTab.next('methods');
+    this.homeTab.addressNext(shouldNotUpdateOrder);
+    this.homeTab.next(views.METHODS);
   },
 
   /**

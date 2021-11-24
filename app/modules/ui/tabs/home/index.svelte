@@ -711,7 +711,7 @@
     return true;
   }
 
-  export function addressNext() {
+  export function addressNext(shouldNotUpdateOrder) {
     $isShippingAddedToAmount = true;
     showHome = true;
     let billing_address = $selectedBillingAddress;
@@ -731,36 +731,40 @@
     if (!$isCodAvailable) {
       configureCODOrder($blocks);
     }
-    updateOrder($selectedShippingAddress, billing_address).then((response) => {
-      const charge = session.formatAmountWithCurrency($shippingCharge);
-      if ($shippingCharge) {
-        const text = $didSaveAddress
-          ? [
-              $t(SAVED_ADDRESS_LABEL),
-              formatTemplateWithLocale(
-                SHIPPING_CHARGES_LABEL,
-                { charge },
-                $locale
-              ),
-            ]
-          : formatTemplateWithLocale(
-              SHIPPING_CHARGES_LABEL,
-              { charge },
-              $locale
-            );
-        const snackBar = new Snackbar({
-          target: document.getElementById('form'),
-          props: {
-            align: 'bottom',
-            shown: true,
-            timer: 2000,
-            text: text,
-            class: 'snackbar-cod',
-          },
-        });
-      }
-      session.switchTab('');
-    });
+    if (!shouldNotUpdateOrder) {
+      updateOrder($selectedShippingAddress, billing_address).then(
+        (response) => {
+          const charge = session.formatAmountWithCurrency($shippingCharge);
+          if ($shippingCharge) {
+            const text = $didSaveAddress
+              ? [
+                  $t(SAVED_ADDRESS_LABEL),
+                  formatTemplateWithLocale(
+                    SHIPPING_CHARGES_LABEL,
+                    { charge },
+                    $locale
+                  ),
+                ]
+              : formatTemplateWithLocale(
+                  SHIPPING_CHARGES_LABEL,
+                  { charge },
+                  $locale
+                );
+            const snackBar = new Snackbar({
+              target: document.getElementById('form'),
+              props: {
+                align: 'bottom',
+                shown: true,
+                timer: 2000,
+                text: text,
+                class: 'snackbar-cod',
+              },
+            });
+          }
+          session.switchTab('');
+        }
+      );
+    }
   }
 
   export function onShown() {

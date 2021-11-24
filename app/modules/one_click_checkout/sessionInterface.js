@@ -104,6 +104,11 @@ export function bindEvents(selector) {
   session.bindEvents(selector);
 }
 
+export function redirectToMethods() {
+  const session = getSession();
+  session.oneClickCheckoutRedirection(true);
+}
+
 export function showOrderSummary() {
   showSummaryModal(true);
 }

@@ -8,4 +8,5 @@ export const views = {
   BILLING_ADDRESS: 'billingAddress',
   ADD_BILLING_ADDRESS: 'addBillingAddress',
   SAVED_BILLING_ADDRESS: 'savedBillingAddress',
+  METHODS: 'methods',
 };

@@ -36,6 +36,7 @@
 
   import { Events, MiscEvents } from 'analytics';
   import { currentView } from 'one_click_checkout/routing/store';
+  import { views } from 'one_click_checkout/routing/constants';
 
   const session = getSession();
   const dispatch = createEventDispatcher();
@@ -57,7 +58,7 @@
     userDropDown = {
       edit: {
         label: EDIT_CONTACT_ACTION,
-        isVisible: isOneClickCheckout(),
+        isVisible: isOneClickCheckout() && $currentView !== views.DETAILS,
         onClick: handleOneClickCheckoutEditContact.bind(null, false),
       },
       logout: {
@@ -215,7 +216,7 @@
     class="theme-secondary-highlight"
     transition:fly={getAnimationOptions({ y: -46, duration: 200 })}
   >
-    {#if $isContactPresent && userDetailsShown}
+    {#if $isContactPresent && userDetailsShown && ($currentView !== views.DETAILS || cus?.logged)}
       <div
         id="top-right"
         class:logged

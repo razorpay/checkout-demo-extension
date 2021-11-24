@@ -121,6 +121,7 @@ import * as ChargesStore from 'one_click_checkout/charges/store';
 import * as OneClickCheckoutStore from 'one_click_checkout/store';
 import * as OneClickCheckoutInterface from 'one_click_checkout/sessionInterface';
 import { dynamicFeeObject } from 'checkoutstore/dynamicfee';
+import { views } from 'one_click_checkout/routing/constants';
 
 export default {
   RazorpayConfig,
@@ -260,4 +261,5 @@ export default {
   ChargesStore,
   OneClickCheckoutStore,
   OneClickCheckoutMetaProperties,
+  views,
 };
