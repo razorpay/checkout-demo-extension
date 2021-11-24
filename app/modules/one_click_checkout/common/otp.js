@@ -6,7 +6,6 @@ import { savedAddresses } from 'one_click_checkout/address/store';
 import { currentView } from 'one_click_checkout/routing/store';
 import { screensHistory } from 'one_click_checkout/routing/History';
 import { views } from 'one_click_checkout/routing/constants';
-import { routesConfig } from 'one_click_checkout/routing/config';
 import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
 import { OTP_PARAMS } from 'one_click_checkout/common/constants';
 import otpEvents from 'ui/tabs/otp/analytics';
@@ -16,6 +15,7 @@ import {
   isNumericalString,
 } from 'one_click_checkout/common/utils';
 import { INVALID_OTP_LABEL } from 'ui/labels/otp';
+import { RESEND_OTP_INTERVAL } from 'one_click_checkout/otp/constants';
 
 let customer;
 
@@ -26,32 +26,31 @@ let customer;
  */
 export const askForOTP = (otp_reason) => {
   customer = getCustomerDetails();
-  routesConfig[views.OTP] = {
-    ...routesConfig[views.OTP],
-    props: {
-      ...routesConfig[views.OTP].props,
-      ...routesConfig[get(currentView)].otpProps,
-    },
-    otpParams: {
-      loading: {
-        templateData: { phone: customer.contact },
-        ...mergeObjOnKey(
-          OTP_PARAMS,
-          routesConfig[get(currentView)].otpLabels,
-          'loading'
-        ),
-      },
-      sent: mergeObjOnKey(
+  const routesConfig = screensHistory.config;
+  routesConfig[views.OTP].props = {
+    ...routesConfig[views.OTP].props,
+    ...routesConfig[get(currentView)].otpProps,
+  };
+
+  routesConfig[views.OTP].otpParams = {
+    loading: {
+      templateData: { phone: customer.contact },
+      ...mergeObjOnKey(
         OTP_PARAMS,
         routesConfig[get(currentView)].otpLabels,
-        'sent'
-      ),
-      verifying: mergeObjOnKey(
-        OTP_PARAMS,
-        routesConfig[get(currentView)].otpLabels,
-        'verifying'
+        'loading'
       ),
     },
+    sent: mergeObjOnKey(
+      OTP_PARAMS,
+      routesConfig[get(currentView)].otpLabels,
+      'sent'
+    ),
+    verifying: mergeObjOnKey(
+      OTP_PARAMS,
+      routesConfig[get(currentView)].otpLabels,
+      'verifying'
+    ),
   };
   const otpParams = routesConfig[views.OTP].otpParams;
   const currentScreen = get(currentView);
@@ -87,7 +86,7 @@ export const askForOTP = (otp_reason) => {
           createOTP(() => {
             updateOTPStore({
               ...otpParams.sent,
-              resendTimeout: Date.now() + 30 * 1000,
+              resendTimeout: Date.now() + RESEND_OTP_INTERVAL,
               digits: new Array(get(OtpScreenStore.maxlength)),
             });
           });
@@ -107,6 +106,7 @@ export const askForOTP = (otp_reason) => {
  * @param {object} data response data from the submit OTP API call
  */
 const postSubmit = (msg, data) => {
+  const routesConfig = screensHistory.config;
   const otpParams = routesConfig[views.OTP].otpParams;
   updateOTPStore({ loading: false });
   if (msg) {
@@ -137,6 +137,9 @@ const isValidOtp = (otpStr) => {
  * Validates the input and hence, submits the OTP
  */
 export const submitOTP = () => {
+  const routesConfig = screensHistory.config;
+  const customer = getCustomerDetails();
+
   const { verifying } = routesConfig[views.OTP].otpParams;
   const otp = get(OtpScreenStore.otp) || get(OtpScreenStore.digits).join('');
   if (!isValidOtp(otp)) {
@@ -184,6 +187,7 @@ const updateOTPStore = (props) => {
 };
 
 export const resendOTPHandle = () => {
+  const routesConfig = screensHistory.config;
   updateOTPStore({
     textView: 'resending_otp',
     errorMessage: '',
@@ -198,6 +202,8 @@ export const resendOTPHandle = () => {
 };
 
 export const createOTP = (cb, resendTimeout = Date.now() + 30 * 1000) => {
+  const customer = getCustomerDetails();
+
   customer.createOTP((data) => {
     updateOTPStore({
       resendTimeout,

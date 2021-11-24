@@ -1,6 +1,6 @@
 <script>
   // i18n
-  import { country } from 'checkoutstore/screens/home';
+  import { country, phone } from 'checkoutstore/screens/home';
   import Field from 'ui/components/Field.svelte';
   import { createEventDispatcher, onMount } from 'svelte';
   import ContactField from 'ui/components/ContactField.svelte';
@@ -13,12 +13,8 @@
   export let error;
   export let forceStopDispatch = false;
 
-  let pivot =
-    formData.contact.length > 10
-      ? formData.contact.length - 10
-      : formData.contact.length;
   let countryCode = $country;
-  let phoneNum = formData.contact.substr(pivot, 10);
+  let phoneNum = $phone;
 
   $: handleInput('contact', `${countryCode}${phoneNum}`);
 
@@ -37,6 +33,11 @@
   const onBlur = (id) => {
     dispatch('blur', { id });
   };
+
+  onMount(() => {
+    countryCode = $country;
+    phoneNum = $phone;
+  });
 </script>
 
 <form {id}>

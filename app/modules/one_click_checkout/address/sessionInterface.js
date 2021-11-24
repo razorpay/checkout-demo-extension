@@ -1,14 +1,9 @@
 // interactions with session
 
-import {
-  savedAddresses as savedShippingAddresses,
-  forcedView,
-  showSavedAddressCta,
-} from 'one_click_checkout/address/store';
+import { savedAddresses } from 'one_click_checkout/address/store';
+import { showSavedAddressCta } from 'one_click_checkout/address/shipping_address/store';
 import { formatAddress } from 'one_click_checkout/address/helpersExtra';
-import { savedAddresses as savedBillingAddresses } from 'one_click_checkout/address/billing_address/store';
 import { getSession } from 'sessionmanager';
-import { views } from 'one_click_checkout/address/constants';
 import { screensHistory } from 'one_click_checkout/routing/History';
 /**
  *
@@ -17,16 +12,7 @@ import { screensHistory } from 'one_click_checkout/routing/History';
  * Taking addresses array received from api and saving it in store
  */
 export const setSavedAddresses = (addresses) => {
-  // TODO: Address formatting
-  forcedView.set(views.SAVED_ADDRESSES);
-  const shippingAddresses = addresses;
-  const billingAddresses = addresses;
-  savedShippingAddresses.set(
-    formatAddresses(shippingAddresses, 'shipping_address')
-  );
-  savedBillingAddresses.set(
-    formatAddresses(billingAddresses, 'billing_address')
-  );
+  savedAddresses.set(formatAddresses(addresses));
 };
 
 function formatAddresses(addresses, type) {

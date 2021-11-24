@@ -61,6 +61,7 @@
   import { removeCouponInStore } from 'one_click_checkout/coupons/store';
 
   import MetaProperties from 'one_click_checkout/analytics/metaProperties';
+  import { views } from 'one_click_checkout/routing/constants';
 
   let showCta = true;
   const currency = getCurrency();
@@ -75,7 +76,7 @@
     if (!$isCouponApplied) {
       removeCouponInStore();
     }
-    screensHistory.push(nextView());
+    screensHistory.push(views.SAVED_ADDRESSES);
     showAmountInTopBar();
   }
 

@@ -1,4 +1,4 @@
-import { getAmount, getOrderId } from 'checkoutstore';
+import { getOrderId } from 'checkoutstore';
 import {
   initializeCharges,
   isShippingAddedToAmount,
@@ -7,7 +7,7 @@ import {
 import { get as storeGetter } from 'svelte/store';
 import { resetOrderApiCall } from './service';
 import { resetChargesCoupons } from 'one_click_checkout/coupons/store';
-import { resetAddresses } from 'one_click_checkout/address/store';
+import { resetAddresses } from 'one_click_checkout/address/derived';
 
 /**
  *

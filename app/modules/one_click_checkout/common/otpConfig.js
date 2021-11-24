@@ -7,7 +7,7 @@ import OTP from 'ui/tabs/otp/index.svelte';
 import { views } from 'one_click_checkout/routing/constants';
 
 const otp = {
-  name: views.ADD_ADDRESS,
+  name: views.OTP,
   component: OTP,
   props: {
     addShowableClass: false,

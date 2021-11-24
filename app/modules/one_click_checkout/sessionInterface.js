@@ -3,16 +3,19 @@ import { getSession } from 'sessionmanager';
 // helpers imports
 import { resetOrder } from 'one_click_checkout/charges/helpers';
 import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
+
 // store imports
 import { get } from 'svelte/store';
 import { isOneClickCheckout } from 'checkoutstore';
 import { history, currentView } from 'one_click_checkout/routing/store';
 import {
   savedAddresses,
-  selectedAddress,
-  selectedAddressId,
   isBillingSameAsShipping,
 } from 'one_click_checkout/address/store';
+import {
+  selectedAddress as selectedShippingAddress,
+  selectedAddressId as selectedShippingAddressId,
+} from 'one_click_checkout/address/shipping_address/store';
 import { isEditContactFlow, isLogoutFlow } from 'one_click_checkout/store';
 import { selectedAddress as selectedBillingAddress } from 'one_click_checkout/address/billing_address/store';
 // analytics imports
@@ -74,8 +77,8 @@ export function getTheme() {
  */
 export function redirectToPaymentMethods(shouldNotPush = false) {
   const customer = getCustomerDetails();
-  const address = get(selectedAddress);
-  const addressType = get(selectedAddressId) ? 'saved' : 'new';
+  const address = get(selectedShippingAddress);
+  const addressType = get(selectedShippingAddressId) ? 'saved' : 'new';
   let billing_address = get(selectedBillingAddress);
   if (get(isBillingSameAsShipping)) {
     billing_address = address;

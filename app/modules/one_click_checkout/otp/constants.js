@@ -11,3 +11,5 @@ export const otpReasons = {
   access_address: 'access_address',
   coupons_edit_contact: 'coupons_edit_contact',
 };
+
+export const RESEND_OTP_INTERVAL = 30 * 1000;

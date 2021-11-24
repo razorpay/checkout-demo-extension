@@ -1,45 +1,55 @@
 <script>
-  // UI imports
-  import AddressTab from 'one_click_checkout/address/ui/components/AddressTab.svelte';
   import { onMount } from 'svelte';
+
+  // UI imports
+  import Icon from 'ui/elements/Icon.svelte';
+  import AddressTab from 'one_click_checkout/address/ui/components/AddressTab.svelte';
+  import SameBillingAndShipping from 'one_click_checkout/address/ui/components/SameBillingAndShipping.svelte';
+
   // Store imports
   import {
-    savedAddresses,
     selectedAddressId,
     newUserAddress,
     selectedAddress,
     shouldSaveAddress,
-    isBillingSameAsShipping,
     showSavedAddressCta,
+  } from 'one_click_checkout/address/shipping_address/store';
+  import {
+    savedAddresses,
+    isBillingSameAsShipping,
   } from 'one_click_checkout/address/store';
   import { isCodForced } from 'one_click_checkout/store';
+  import { contact } from 'checkoutstore/screens/home';
+
   // service imports
   import { thirdWatchCodServiceability } from 'one_click_checkout/address/service';
 
-  import { contact } from 'checkoutstore/screens/home';
   // interface imports
   import { redirectToPaymentMethods } from 'one_click_checkout/sessionInterface';
+  import { getTheme } from 'one_click_checkout/sessionInterface';
 
   // helpers imports
   import { saveNewAddress } from 'one_click_checkout/address/helpers';
   import { getCustomer } from 'checkoutframe/customer';
   import { askForOTP } from 'one_click_checkout/common/otp';
-  import { views } from 'one_click_checkout/routing/constants';
-  import { screensHistory } from 'one_click_checkout/routing/History';
+
+  // i18n imports
   import { t } from 'svelte-i18n';
   import { SAVED_ADDRESS_CTA_LABEL } from 'one_click_checkout/address/i18n/labels';
-  import Icon from 'ui/elements/Icon.svelte';
-  import { getTheme } from 'one_click_checkout/sessionInterface';
-  import SameBillingAndShipping from 'one_click_checkout/address/ui/components/SameBillingAndShipping.svelte';
+
+  // Analytics imports
   import Analytics, { Events } from 'analytics';
   import AddressEvents from 'one_click_checkout/address/analytics';
   import {
     ADDRESS_TYPES,
     views as addressViews,
   } from 'one_click_checkout/address/constants';
-  import Resource from 'one_click_checkout/address/resource';
   import MetaProperties from 'one_click_checkout/analytics/metaProperties';
+
+  import Resource from 'one_click_checkout/address/resource';
+  import { views } from 'one_click_checkout/routing/constants';
   import { otpReasons } from 'one_click_checkout/otp/constants';
+  import { screensHistory } from 'one_click_checkout/routing/History';
 
   // props
   export let currentView;
@@ -60,7 +70,7 @@
     const shouldNavigateToBilling = !$isBillingSameAsShipping;
 
     if (shouldNavigateToBilling) {
-      screensHistory.push(views.BILLING_ADDRESS);
+      screensHistory.push(views.SAVED_BILLING_ADDRESS);
       return;
     }
 
@@ -129,11 +139,6 @@
     });
   });
 
-  function noSavedAddressRedirect() {
-    screensHistory.pop(false);
-    askForOTP(otpReasons.access_address);
-  }
-
   function trackSameBillingAndShippingCheckbox({ detail }) {
     if (detail.checked) {
       Events.Track(AddressEvents.BILLING_SAME_AS_SHIPPING_CHECKED, {
@@ -152,7 +157,6 @@
   bind:this={address}
   onSubmitCallback={onSubmit}
   currentView={routeMap[currentView]}
-  {noSavedAddressRedirect}
 >
   <div slot="header">
     {#if $showSavedAddressCta && isViewAddAddress}

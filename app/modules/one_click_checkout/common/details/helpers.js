@@ -54,7 +54,7 @@ export const handleDetailsNext = (prevContact) => {
     // validations
     if (!CONTACT_REGEX.test(get(contact)) || !EMAIL_REGEX.test(get(email)))
       return;
-    let view = views.ADDRESS;
+    let view = views.SAVED_ADDRESSES;
     if (isLoginMandatory()) {
       if (!isUserLoggedIn()) {
         askForOTP(otpReasons.mandatory_login);

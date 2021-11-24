@@ -25,7 +25,6 @@
     ZIPCODE_REQUIRED_LENGTH,
   } from 'one_click_checkout/address/constants';
   // store import
-  import { newUserAddress } from 'one_click_checkout/address/store';
   import {
     getCityState,
     postServiceability,
@@ -38,11 +37,10 @@
   import { Events } from 'analytics';
   import AddressEvents from 'one_click_checkout/address/analytics';
   import { isIndianCustomer } from 'checkoutstore';
-  import { contact } from 'checkoutstore/screens/home';
   import { savedAddresses } from 'one_click_checkout/address/store';
 
   // props
-  export let formData = newUserAddress;
+  export let formData;
   export let error;
   export let checkServiceability = true;
   export let id = 'addressForm';
@@ -222,12 +220,6 @@
       meta: { saved_address_count: $savedAddresses?.length },
       type: addressType,
     });
-    if (!$formData.contact) {
-      $formData = {
-        ...$formData,
-        contact: $contact,
-      };
-    }
 
     pinIndex = INPUT_FORM.findIndex((field) => field.id === 'zipcode');
 

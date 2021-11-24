@@ -18,6 +18,7 @@ import {
   CHECK_PIN_LABEL,
   FETCHING_ADDRESS_LABEL,
 } from 'one_click_checkout/loader/i18n/labels';
+import { didSaveAddress } from 'one_click_checkout/address/store';
 
 const addressCache = {};
 let serviceabilityCache = {};
@@ -91,6 +92,7 @@ export function postCustomerAddress({ shipping_address, billing_address }) {
           showLoader.set(false);
           return;
         }
+        didSaveAddress.set(true);
         showLoader.set(false);
         resolve(response);
       },

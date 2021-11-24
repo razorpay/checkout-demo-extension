@@ -17,12 +17,7 @@
   } from 'one_click_checkout/address/store';
   import { validateInput } from 'one_click_checkout/address/helpers';
 
-  import { onMount } from 'svelte';
-
   import { screensHistory } from 'one_click_checkout/routing/History';
-
-  import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
-
   import Resource from 'one_click_checkout/address/resource';
 
   import {
@@ -36,7 +31,6 @@
   export let onSubmitCallback;
   export let currentView;
   export let addressType;
-  export let noSavedAddressRedirect;
 
   let showCta = true;
   let disabled;
@@ -51,8 +45,6 @@
   } = Resource[addressType];
 
   let isFormComplete = false;
-
-  const customer = getCustomerDetails();
 
   export function handleAddAddressClick() {
     Events.Track(AddressEvents.ADD_NEW_ADDRESS_CLICKED);
@@ -143,22 +135,6 @@
       });
     }
   }
-
-  onMount(() => {
-    if (!currentView) {
-      if (customer.logged) {
-        if ($savedAddresses.length > 0) {
-          currentView = addressViews.SAVED_ADDRESSES;
-        } else {
-          currentView = addressViews.ADD_ADDRESS;
-        }
-      } else {
-        noSavedAddressRedirect();
-        return;
-      }
-    }
-    screensHistory.replace(Resource[addressType].routes[currentView]);
-  });
 
   $: disabled =
     currentView === addressViews.ADD_ADDRESS ? !isFormComplete : !showCta;

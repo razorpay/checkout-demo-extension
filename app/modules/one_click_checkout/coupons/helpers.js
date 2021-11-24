@@ -1,4 +1,4 @@
-import { validateEmailAndContact } from 'one_click_checkout/helper';
+import validateEmailAndContact from 'one_click_checkout/common/validators/validateEmailAndContact';
 import { views } from 'one_click_checkout/routing/constants';
 import {
   showDetailsOverlay,

@@ -9,14 +9,9 @@
   import { getSubtextForInstrument } from 'subtext';
   import { getThemeMeta } from 'checkoutstore/theme';
   import { formatTemplateWithLocale } from 'i18n';
-  import { COD_DISABLED_LABEL } from 'one_click_checkout/address/i18n/labels';
 
   // Store imports
-  import {
-    selectedInstrumentId,
-    methodInstrument,
-  } from 'checkoutstore/screens/home';
-  import { codReason, isCodAvailable } from 'one_click_checkout/address/store';
+  import { isCodAvailable } from 'one_click_checkout/address/derived';
 
   // i18n
   import { locale } from 'svelte-i18n';

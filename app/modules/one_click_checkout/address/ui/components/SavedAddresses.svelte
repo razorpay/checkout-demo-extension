@@ -2,11 +2,8 @@
   // svelte imports
   import { onMount, createEventDispatcher } from 'svelte';
   // store imports
-  import {
-    savedAddresses,
-    selectedAddressId as selectedShippingAddressId,
-    selectedAddress,
-  } from 'one_click_checkout/address/store';
+  import { savedAddresses } from 'one_click_checkout/address/store';
+  import { selectedAddress } from 'one_click_checkout/address/shipping_address/store';
   import {
     shippingCharge,
     codChargeAmount,
@@ -25,7 +22,7 @@
 
   export let addresses = savedAddresses;
   export let checkServiceability = true;
-  export let selectedAddressId = selectedShippingAddressId;
+  export let selectedAddressId;
   export let onAddAddressClick;
   export let addressType;
 

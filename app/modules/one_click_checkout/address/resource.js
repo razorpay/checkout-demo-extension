@@ -11,7 +11,7 @@ import {
   selectedAddressId as selectedShippingAddress,
   addressCompleted as shippingAddressCompleted,
   shouldSaveAddress as shouldSaveShippingAddress,
-} from 'one_click_checkout/address/store';
+} from 'one_click_checkout/address/shipping_address/store';
 import {
   newUserAddress as newBillingAddress,
   selectedAddressId as selectedBillingAddress,

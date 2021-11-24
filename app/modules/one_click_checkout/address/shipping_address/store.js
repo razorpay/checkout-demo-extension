@@ -1,4 +1,3 @@
-// Svelte store for address
 import { writable, derived } from 'svelte/store';
 import { INITIAL_ADDRESS } from 'one_click_checkout/address/constants';
 import { savedAddresses } from 'one_click_checkout/address/store';
@@ -23,11 +22,11 @@ export const selectedAddress = derived(
   }
 );
 
+export const codReason = writable(''); // reason for COD unavailability
+
 export const shouldSaveAddress = writable(null);
 
-export const resetNewBillingAddress = () => newUserAddress.set(INITIAL_ADDRESS);
-
-export const updateNewBillingAddress = (address) => newUserAddress.set(address);
+export const showSavedAddressCta = writable(false);
 
 export function resetAddress() {
   selectedAddressId.set(null);

@@ -1,9 +1,11 @@
 import { history, currentView } from 'one_click_checkout/routing/store';
 import { get } from 'svelte/store';
 import { views } from 'one_click_checkout/routing/constants';
+import { runMiddlewares } from 'one_click_checkout/routing/middleware';
 
 export const screensHistory = {
   isInitilized: false,
+  config: null,
   previousRoute: function () {
     const index = get(history).length - 1;
     return get(history)[index];
@@ -23,11 +25,13 @@ export const screensHistory = {
     }
   },
   push: function (view) {
+    const nextView = runMiddlewares(view, this);
     const newHistory = get(history);
-    if (view !== views.OTP) {
-      newHistory.push(view);
+
+    if (nextView !== views.OTP) {
+      newHistory.push(nextView);
     }
-    this.temp(newHistory, view);
+    this.temp(newHistory, nextView);
   },
   popAll: function () {
     const newHistory = [];
@@ -48,6 +52,9 @@ export const screensHistory = {
   temp: function (newHistory, view) {
     history.set(newHistory);
     currentView.set(view);
+  },
+  setConfig: function (config) {
+    this.config = config;
   },
   popUntil: function (view) {
     while (view !== get(currentView)) {

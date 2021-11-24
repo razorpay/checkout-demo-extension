@@ -4,14 +4,13 @@
 
   // Store
   import { t, locale } from 'svelte-i18n';
-  import { codReason, isCodAvailable } from 'one_click_checkout/address/store';
+  import { codReason } from 'one_click_checkout/address/shipping_address/store';
+  import { isCodAvailable } from 'one_click_checkout/address/derived';
 
   // UI imports
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import Icon from 'ui/elements/Icon.svelte';
-  import InfoIcon from 'ui/elements/InfoIcon.svelte';
   import CodIcon from 'ui/elements/CodIcon.svelte';
-  import Tooltip from 'ui/elements/Tooltip.svelte';
 
   // Utils imports
   import { getSession } from 'sessionmanager';

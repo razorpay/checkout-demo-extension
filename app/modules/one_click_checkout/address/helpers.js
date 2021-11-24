@@ -1,6 +1,6 @@
 // all the helpers functions for 1cc
 
-import { saveAddresspayload } from 'one_click_checkout/address/store';
+import { getSaveAddressPayload } from 'one_click_checkout/address/derived';
 
 import {
   LANDMARK_ERROR_LABEL,
@@ -42,10 +42,10 @@ export const validateInput = (elementId = 'addressForm') => {
  * Method called when OTP verification is successful
  */
 export function successHandler(data) {
-  if (data.addresses) {
-    screensHistory.replace(ONE_CC_HOME_VIEWS.SAVED_ADDRESSES);
+  if (!data.addresses?.length) {
+    screensHistory.push(ONE_CC_HOME_VIEWS.ADD_ADDRESS);
   } else {
-    screensHistory.replace(ONE_CC_HOME_VIEWS.ADD_ADDRESS);
+    screensHistory.push(ONE_CC_HOME_VIEWS.SAVED_ADDRESSES);
   }
 }
 
@@ -80,7 +80,7 @@ export const skipOTPHandle = () => {
  * @returns {Promise} promise which is completed when address save is successful
  */
 export const saveNewAddress = () => {
-  let payload = saveAddresspayload();
+  let payload = getSaveAddressPayload();
   const loggedIn = isUserLoggedIn();
   if (loggedIn && Object.keys(payload).length > 0) {
     return new Promise((resolve) => {
