@@ -155,7 +155,7 @@ class Experiment {
     const { evaluatorArg, overrideFn } = options;
 
     function checkEnabled() {
-      this.getSegmentOrCreate(name, evaluatorArg, overrideFn) === 1;
+      return this.getSegmentOrCreate(name, evaluatorArg, overrideFn) === 1;
     }
     let evaluatorFn = evaluator;
     if (typeof evaluator === 'number') {
