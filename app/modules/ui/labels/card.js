@@ -30,6 +30,9 @@ export const BANK_VERIFICATION_DESCRIPTION =
 export const BANK_VERIFICATION_ACTION_CONTINUE =
   'card.bank_verification_action_continue';
 export const SAVED_CARD_LABEL = 'card.saved_card_label';
+export const SAVE_CARD_TEXT = 'card.save_card_text';
+export const SAVE_CARD_TEXT_NEW_CARD = 'card.save_card_text_new_card';
+export const KNOW_MORE = 'card.know_more';
 export const RECURRING_CALLOUT = 'card.recurring_callout';
 export const SUBSCRIPTION_CALLOUT = 'card.subscription_callout';
 export const SUBSCRIPTION_REFUND_CALLOUT = 'card.subscription_refund_callout';
@@ -51,3 +54,24 @@ export const AVS_INFO_MESSAGE_3 = 'card.avs_info_message_3';
 export const AVS_COUNTRY_ALL = 'card.avs_country_all';
 export const AVS_STATE_ALL = 'card.avs_state_all';
 export const AVS_FORM_INPUT_REQUIRED = 'card.avs_form_input_required';
+
+export const SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_TITLE =
+  'card.save_card_know_more_existing_card_modal_title';
+export const SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT1 =
+  'card.save_card_know_more_existing_card_modal_content1';
+export const SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT2 =
+  'card.save_card_know_more_existing_card_modal_content2';
+export const SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT3 =
+  'card.save_card_know_more_existing_card_modal_content3';
+export const SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT_BULLET1 =
+  'card.save_card_know_more_existing_card_modal_content_bullet1';
+export const SAVE_CARD_KNOW_MORE_EXISTING_CARD_MODAL_CONTENT_BULLET2 =
+  'card.save_card_know_more_existing_card_modal_content_bullet2';
+export const SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_TITLE =
+  'card.save_card_know_more_add_card_modal_title';
+export const SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_CONTENT1 =
+  'card.save_card_know_more_add_card_modal_content1';
+export const SAVE_CARD_KNOW_MORE_ADD_CARD_MODAL_CONTENT2 =
+  'card.save_card_know_more_add_card_modal_content2';
+export const CARD_TOKENIZATION_DEADLINE_CALLOUT =
+  'card.card_tokenization_deadline_callout';

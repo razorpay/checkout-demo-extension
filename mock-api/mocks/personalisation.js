@@ -34,4 +34,34 @@ const preferredInsturments = {
     },
   },
 };
-module.exports = { preferredInsturments };
+
+const preferredMethodForTokenization = {
+  preferred_methods: {
+    '+919912054784': {
+      instruments: [
+        { instrument: 'nanda120idbi@ybl', method: 'upi' },
+        {
+          instrument: 'token_HMpQW2ILsIXGxA',
+          method: 'card',
+          issuer: 'UTIB',
+          type: 'debit',
+          network: 'Visa',
+          consent_taken: false,
+        },
+        {
+          instrument: 'token_EGADb8swOCgtto',
+          method: 'card',
+          issuer: 'UTIB',
+          type: 'debit',
+          network: 'Visa',
+          consent_taken: false,
+        },
+        { instrument: '9490530954@ybl', method: 'upi' },
+      ],
+      is_customer_identified: true,
+      user_aggregates_available: true,
+      versionID: 'v1',
+    },
+  },
+};
+module.exports = { preferredInsturments, preferredMethodForTokenization };

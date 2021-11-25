@@ -16,6 +16,11 @@ export const defaultDCCCurrency = writable(''); // store default currency given 
 export const currencyRequestId = writable('');
 export const cardCountry = writable(''); // If DCC is not enabled we need to check the card country, if card country is not "IN" then call flows API
 
+export const defaultUserConsentForTokenization = true; // added this as we need to override some areas
+export const userConsentForTokenization = writable(
+  defaultUserConsentForTokenization
+); //this is only used in p13n and saved cards area
+
 /** AVS state */
 export const AVSScreenMap = writable({});
 export const AVSDccPayload = writable({}); // this is use to temporary storage of header & cta text so on proceed we can show

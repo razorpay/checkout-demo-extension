@@ -9,7 +9,7 @@
   import NameField from 'ui/elements/fields/card/NameField.svelte';
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
   import { returnAsIs } from 'lib/utils';
-
+  import SecureCard from 'ui/tabs/card/SecureCard.svelte';
   import { getSession } from 'sessionmanager';
   // Svelte imports
   import { createEventDispatcher, onMount } from 'svelte';
@@ -59,7 +59,6 @@
   import {
     NOCVV_LABEL,
     VIEW_ALL_EMI_PLANS,
-    REMEMBER_CARD_LABEL,
     CARD_NUMBER_HELP_UNSUPPORTED,
     ADD_NEW_CARD,
   } from 'card/i18n/labels';
@@ -496,7 +495,17 @@
 </script>
 
 <div class="pad" id="add-card-container" class:faded>
-  <div class="card-title">{$t(ADD_NEW_CARD)}</div>
+  <div class="page-header">
+    <span class="card-title">{$t(ADD_NEW_CARD)}</span>
+    <span class="emi-plans-label">
+      {#if tab === 'emi'}
+        <div id="view-emi-plans" on:click={showEmiPlans}>
+          <!-- LABEL: View all EMI Plans -->
+          {$t(VIEW_ALL_EMI_PLANS)}
+        </div>
+      {/if}
+    </span>
+  </div>
   <div class="row card-fields">
     <div class="two-third">
       <NumberField
@@ -567,32 +576,16 @@
   <div class="row remember-check">
     <div>
       {#if showRememberCardCheck}
-        <label class="first" for="save" id="should-save-card" tabIndex="0">
-          <input
-            type="checkbox"
-            class="checkbox--square"
-            id="save"
-            name="save"
-            value="1"
-            on:focus
-            on:change={trackRememberChecked}
-            bind:checked={$remember}
-          />
-          <span class="checkbox" />
-          <!-- LABEL: Remember Card -->
-          {$t(REMEMBER_CARD_LABEL)}
-        </label>
+        <SecureCard
+          bind:checked={$remember}
+          on:change={trackRememberChecked}
+          modalType="add-new-card"
+        />
       {/if}
     </div>
-    {#if tab === 'emi'}
-      <div id="view-emi-plans" on:click={showEmiPlans} class="link">
-        <!-- LABEL: View all EMI Plans -->
-        {$t(VIEW_ALL_EMI_PLANS)}
-      </div>
-    {/if}
   </div>
   {#if $showNoCvvCheckbox}
-    <div class="row">
+    <div class="row maestro-card-block">
       <label id="nocvv-check" for="nocvv">
         <input
           type="checkbox"
@@ -602,7 +595,7 @@
         />
         <span class="checkbox" />
         <!-- LABEL: My Maestro Card doesn't have Expiry/CVV -->
-        {$t(NOCVV_LABEL)}
+        <span class="maestro-card-block-label-text"> {$t(NOCVV_LABEL)}</span>
       </label>
     </div>
   {/if}
@@ -652,7 +645,35 @@
     font-weight: normal;
     font-size: 14px;
     line-height: 17px;
-    margin-top: 24px;
     color: #373737;
+  }
+
+  .page-header {
+    margin-top: 24px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .emi-plans-label {
+    font-weight: 500;
+    font-size: 11px;
+    line-height: 20px;
+    text-decoration-line: underline;
+    color: #3684d6;
+  }
+
+  .maestro-card-block {
+    /* margin-left: 5px; */
+    margin-top: 15px;
+  }
+
+  .maestro-card-block label {
+    font-size: 14px;
+    line-height: 14px;
+    color: #373737;
+  }
+  .maestro-card-block-label-text {
+    margin-left: 5px;
   }
 </style>

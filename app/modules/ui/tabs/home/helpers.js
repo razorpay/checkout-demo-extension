@@ -1,10 +1,19 @@
 import { get } from 'svelte/store';
 import { cardsSeparation } from 'card/experiments';
-import { creditCardConfig, debitCardConfig } from './constants';
+import { toTitleCase } from 'lib/utils';
+import { getBanks } from 'checkoutstore';
+
+import {
+  creditCardConfig,
+  debitCardConfig,
+  MAX_CHAR_LIMIT_FOR_BANK,
+} from './constants';
 import { isMethodEnabled } from 'checkoutstore/methods';
 
 import { blocks } from 'checkoutstore/screens/home';
 
+// i18n
+import { getLongBankName, formatTemplateWithLocale } from 'i18n';
 // Dynamic Fee Bearer
 import { setDynamicFeeObject } from 'checkoutstore/dynamicfee';
 import { isDynamicFeeBearer } from 'checkoutstore/index';
@@ -71,3 +80,80 @@ export function setDynamicFees(instrument, forType) {
     }
   }
 }
+
+/**
+ * This method will return a prepared string for bank name to be shown with 6 bank name + 3(.)dots
+ * This is purely written for p13n saved cards
+ * @param {string} bankName
+ * @returns truncated string
+ */
+function truncateBankName(bankName) {
+  const bankNameWords = bankName.split(' ');
+  let truncatedString = bankName;
+  if (bankName.length > MAX_CHAR_LIMIT_FOR_BANK) {
+    truncatedString = bankName.slice(0, MAX_CHAR_LIMIT_FOR_BANK);
+    const truncatedWords = truncatedString.split(' ').filter(Boolean);
+    if (truncatedWords.length === 1 && bankNameWords.length !== 1) {
+      truncatedString += bankName.split(' ')[1][0];
+      truncatedString += '...';
+    }
+  }
+
+  return truncatedString;
+}
+
+/**
+ * This method is a decoupled method from p13n block saved card.
+ * This is done to utilize the same logic for cards=>saved-cards view.
+ * @param {Card} card card with issuer, network and last4
+ * @param {Boolean} loggedIn User login status
+ * @param {Boolean} isEmiInstrument if instrument method is EMI or not
+ * @param {*} locale i18n locale
+ * @returns `Issuer Type card - last4` ex:Axis Debit card - 7369
+ */
+export function getBankText(card, loggedIn, isEmiInstrument, locale) {
+  const banks = getBanks() || {};
+
+  const bank = banks[card.issuer] ? getLongBankName(card.issuer, locale) : '';
+
+  const bankText = bank.replace(/ Bank$/, '');
+
+  const cardType = card.type || '';
+
+  if (loggedIn) {
+    return formatTemplateWithLocale(
+      isEmiInstrument
+        ? 'instruments.titles.emi_logged_in'
+        : 'instruments.titles.card_logged_in',
+      {
+        bank: truncateBankName(bankText),
+        type: toTitleCase(cardType),
+        last4: card.last4,
+      },
+      locale
+    );
+  } else {
+    return formatTemplateWithLocale(
+      isEmiInstrument
+        ? 'instruments.titles.emi_logged_out'
+        : 'instruments.titles.card_logged_out',
+      {
+        bank: bankText,
+        type: toTitleCase(cardType),
+      },
+      locale
+    );
+  }
+}
+
+/**
+ * Since p13n call only gives token in response and all other details like issuer etc are mapped internally to present them in p13n block
+ * Only instrument will be available (with limited params) in session submit and mapping token with consent details in session becomes costly.
+ * This method is a similar workaround but for storing consent related info on instrument,
+ * Note: This is a pass-by-reference and affects the reference.
+ * @param {*} instrument instrument from the p13n block/from any other area
+ * @param {*} card saved card object with consent details in it
+ */
+export const addConsentDetailsToInstrument = (instrument, card) => {
+  instrument.consent_taken = card.consent_taken;
+};

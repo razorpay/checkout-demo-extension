@@ -1,33 +1,33 @@
 <script>
   // UI imports
+  import { onMount, tick, createEventDispatcher } from 'svelte';
   import Field from 'ui/components/Field.svelte';
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
   import Icon from 'ui/elements/Icon.svelte';
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
   import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
-
+  import SecureCard from 'ui/tabs/card/SecureCard.svelte';
   // Utils imports
   import { findCodeByNetworkName } from 'common/card';
   import { getSession } from 'sessionmanager';
-  import { getBanks } from 'checkoutstore';
+  import {
+    getBankText,
+    addConsentDetailsToInstrument,
+  } from 'ui/tabs/home/helpers';
   import { getIcon as getNetworkIcon } from 'icons/network';
   import { getExtendedSingleInstrument } from 'configurability/instruments';
-  import { toTitleCase } from 'lib/utils';
-
+  import { isCardTokenized } from 'ui/tabs/card/utils.js';
   // Store
   import { selectedInstrumentId } from 'checkoutstore/screens/home';
+  import { userConsentForTokenization } from 'checkoutstore/screens/card';
   import { customer } from 'checkoutstore/customer';
 
   import { setDynamicFeeObject } from 'checkoutstore/dynamicfee';
   import { isDynamicFeeBearer } from 'checkoutstore/index';
 
   // i18n
-  import {
-    getLongBankName,
-    formatTemplateWithLocale,
-    getInstrumentTitle,
-  } from 'i18n';
+  import { getInstrumentTitle } from 'i18n';
 
   import { locale } from 'svelte-i18n';
 
@@ -35,52 +35,17 @@
   // Props
   export let instrument = {};
   export let name = 'instrument';
-
+  let dispatch = createEventDispatcher();
   let downtimeSeverity;
   let downtimeInstrument = '';
+  let cvvRef;
+  let collectCardTokenisationConsent = false;
 
   let individualInstrument = getExtendedSingleInstrument(instrument);
   $: individualInstrument = getExtendedSingleInstrument(instrument);
 
   const session = getSession();
   const isEmiInstrument = instrument.method === 'emi';
-
-  function getBankText(card, loggedIn) {
-    const banks = getBanks() || {};
-
-    const bank = banks[card.issuer]
-      ? getLongBankName(card.issuer, $locale)
-      : '';
-
-    const bankText = bank.replace(/ Bank$/, '');
-
-    const cardType = card.type || '';
-
-    if (loggedIn) {
-      return formatTemplateWithLocale(
-        isEmiInstrument
-          ? 'instruments.titles.emi_logged_in'
-          : 'instruments.titles.card_logged_in',
-        {
-          bank: bankText,
-          type: toTitleCase(cardType),
-          last4: card.last4,
-        },
-        $locale
-      );
-    } else {
-      return formatTemplateWithLocale(
-        isEmiInstrument
-          ? 'instruments.titles.emi_logged_out'
-          : 'instruments.titles.card_logged_out',
-        {
-          bank: bankText,
-          type: toTitleCase(cardType),
-        },
-        $locale
-      );
-    }
-  }
 
   function getIcon(card) {
     if (card && card.network && card.network !== 'unknown') {
@@ -92,6 +57,7 @@
 
   let title;
   let icon;
+  let isTokenised;
   let hasCvv = false;
   let cvvLength = 3;
   let cardKnown = false;
@@ -106,8 +72,9 @@
     // User is logged in
     const card = savedCard.card || {};
     const networkCode = findCodeByNetworkName(card.network);
-
-    title = getBankText(card, true);
+    isTokenised = isCardTokenized(savedCard);
+    addConsentDetailsToInstrument(instrument, savedCard);
+    title = getBankText(card, true, isEmiInstrument, $locale);
     icon = getIcon(card);
 
     cvvLength = networkCode === 'amex' ? 4 : 3;
@@ -121,7 +88,12 @@
 
     if (individualInstrument.issuer) {
       // We know stuff about the card.
-      title = getBankText(individualInstrument, false);
+      title = getBankText(
+        individualInstrument,
+        false,
+        isEmiInstrument,
+        $locale
+      );
       icon = getIcon(individualInstrument);
       hasCvv = false;
     } else {
@@ -146,8 +118,9 @@
       downtimeSeverity = false;
     }
   }
+  $: collectCardTokenisationConsent = selected && !isTokenised;
 
-  function selectionHandler() {
+  function selectionHandler(avoidFocus = false) {
     if (isDynamicFeeBearer()) {
       setDynamicFeeObject('card', savedCard?.card?.type);
     }
@@ -164,7 +137,7 @@
         );
         const cvvInput = instrumentInDom.querySelector('.cvv-input');
 
-        if (cvvInput) {
+        if (!avoidFocus && cvvInput) {
           cvvInput.focus();
         }
       });
@@ -175,6 +148,19 @@
       });
     }
   }
+  // #region cards-tokenization
+  onMount(() => {
+    if (!isTokenised && savedCard && !selected && !$selectedInstrumentId) {
+      tick().then((_) => {
+        selectionHandler(true);
+        // this dispatch is required to select the instrument in homescreen
+        dispatch('click');
+        // if we set selected to true here it will focus cvv hence avoid as we don;t want to focus cvv
+      });
+      selected = true;
+    }
+  });
+  //#endregion
 </script>
 
 <svelte:component
@@ -185,13 +171,19 @@
   className="instrument"
   radio={false}
   value={instrument.id}
-  on:click={selectionHandler}
+  on:click={(event) => selectionHandler()}
   on:click
 >
   <i slot="icon">
     <Icon {icon} alt="" />
   </i>
-  <div slot="title">{title}</div>
+  <div slot="title">
+    <span class="card-title"> {title} </span>&nbsp;
+    {#if isTokenised === false}
+      <span class="card-title card-non-tokenised"> * </span>
+    {/if}
+  </div>
+
   <div slot="extra" class="slots-extra">
     {#if !!downtimeSeverity}
       <div class="downtime-saved-card-icon">
@@ -207,8 +199,21 @@
         required={true}
         tabindex={-1}
         formatter={{ type: 'number' }}
+        bind:this={cvvRef}
+        handleBlur={true}
       />
     {:else}<span class="theme-highlight-color">&#xe604;</span>{/if}
+  </div>
+
+  <div slot="secure-card">
+    {#if collectCardTokenisationConsent}
+      <SecureCard
+        bind:checked={$userConsentForTokenization}
+        modalType="p13n-existing-card"
+        {cvvRef}
+        network={savedCard?.card?.network}
+      />
+    {/if}
   </div>
   <div slot="downtime" class="downtime-saved-card">
     {#if !!downtimeSeverity}
@@ -241,5 +246,15 @@
   }
   .slots-extra {
     display: flex;
+  }
+
+  .card-title {
+    transform: none;
+  }
+
+  .card-non-tokenised {
+    color: red;
+    font-size: 16px;
+    font-weight: 500;
   }
 </style>

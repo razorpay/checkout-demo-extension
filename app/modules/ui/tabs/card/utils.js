@@ -8,3 +8,11 @@ export function getAppInstrumentSubtext(provider, locale) {
     getAppProviderSubtext(provider, locale)
   );
 }
+
+export const sortBasedOnTokenization = (cards) =>
+  [...cards].sort(
+    (firstCard, secondCard) =>
+      isCardTokenized(firstCard) - isCardTokenized(secondCard)
+  );
+
+export const isCardTokenized = (card) => Boolean(card.consent_taken);
