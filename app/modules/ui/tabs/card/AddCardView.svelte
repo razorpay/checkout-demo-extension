@@ -595,7 +595,7 @@
         />
         <span class="checkbox" />
         <!-- LABEL: My Maestro Card doesn't have Expiry/CVV -->
-        <span class="maestro-card-block-label-text"> {$t(NOCVV_LABEL)}</span>
+        {$t(NOCVV_LABEL)}
       </label>
     </div>
   {/if}
@@ -664,16 +664,13 @@
   }
 
   .maestro-card-block {
-    /* margin-left: 5px; */
+    margin-left: 5px;
     margin-top: 15px;
   }
 
   .maestro-card-block label {
-    font-size: 14px;
-    line-height: 14px;
+    font-size: 12px;
+    line-height: 12px;
     color: #373737;
-  }
-  .maestro-card-block-label-text {
-    margin-left: 5px;
   }
 </style>

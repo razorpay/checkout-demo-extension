@@ -2,10 +2,10 @@
   // Declarations and Import Statements
   import SecureCardKnowMore from './SecureCardKnowMore.svelte';
   import { t } from 'svelte-i18n';
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import Razorpay from 'common/Razorpay';
   import { Events, CardEvents } from 'analytics/index';
-
+  import { defaultUserConsentForTokenization } from 'checkoutstore/screens/card';
   let secureCardKnowMoreView;
 
   //i18n
@@ -79,15 +79,19 @@
   }
 
   onMount(() => {
-    // if network supplied it means saved card usage and we shouldn't check for visa by default
-    if (network) {
-      checked = network.toLowerCase() !== 'visa';
+    if (network && network.toLowerCase() === 'visa') {
+      checked = false;
+    }
+  });
+  onDestroy(() => {
+    if (network && network.toLowerCase() === 'visa') {
+      checked = defaultUserConsentForTokenization;
     }
   });
 </script>
 
 <div
-  class:secure-card-block={modalType !== 'add-new-card'}
+  class="secure-card-block"
   class:secure-card-block-saved-cards={Boolean(savedcard)}
 >
   <!-- do not modify the id of label tag, this id has a multiple bug fixes in session -->
@@ -108,7 +112,6 @@
     <span
       class="saved-card-text"
       class:saved-card-text-saved-card-screen={Boolean(savedcard)}
-      class:saved-card-text-for-add-card={modalType === 'add-new-card'}
     >
       {#if modalType === 'add-new-card'}
         {$t(SAVE_CARD_TEXT_NEW_CARD)}
@@ -120,7 +123,6 @@
   <span
     class="know-more-text"
     class:know-more-text-saved-cards={Boolean(savedcard)}
-    class:know-more-text-add-card={modalType === 'add-new-card'}
   >
     <span on:click={showSecureCardKnowMoreDialog} class="cusor-pointer">
       {$t(KNOW_MORE)}
@@ -140,11 +142,7 @@
     line-height: 12px;
     color: #373737;
   }
-  .saved-card-text-for-add-card {
-    font-size: 14px;
-    line-height: 14px;
-    margin-left: 5px;
-  }
+
   .saved-card-text-saved-card-screen {
     margin-left: 5px;
   }
@@ -157,11 +155,6 @@
     color: #3f71d7;
     text-decoration: underline;
     cursor: pointer;
-  }
-  .know-more-text-add-card {
-    font-size: 14px;
-    line-height: 14px;
-    margin-left: 30px;
   }
 
   .know-more-text-saved-cards {

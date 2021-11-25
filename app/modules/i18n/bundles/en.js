@@ -262,7 +262,7 @@ export default {
     save_card_know_more_add_card_modal_title:
       'Save cards securely for future payments',
     save_card_know_more_add_card_modal_content1:
-      'Your card will be stored securely as a saved payment method as per RBI’s latest guidelines.',
+      'Your card will be stored securely on Razorpay as a saved payment method as per RBI’s latest guidelines.',
 
     ...cardLang,
   },

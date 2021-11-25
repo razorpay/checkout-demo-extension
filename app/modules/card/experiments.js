@@ -10,8 +10,6 @@ const delayOTP = createExperiment('delay_login_otp', 0.25);
  * Experiment: Card Separation
  * Runs for 50% of users to show card as debit or credit
  */
-const cardsSeparation = createExperiment('cards_separation', 1, {
-  overrideFn: () => false,
-}); // disabled
+const cardsSeparation = createExperiment('cards_separation', 1); // disabled
 
 export { cardsSeparation, delayOTP };

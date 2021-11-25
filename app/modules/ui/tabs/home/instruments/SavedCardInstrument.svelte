@@ -1,6 +1,5 @@
 <script>
   // UI imports
-  import { onMount, tick, createEventDispatcher } from 'svelte';
   import Field from 'ui/components/Field.svelte';
   import SlottedOption from 'ui/elements/options/Slotted/Option.svelte';
   import SlottedRadioOption from 'ui/elements/options/Slotted/RadioOption.svelte';
@@ -35,7 +34,7 @@
   // Props
   export let instrument = {};
   export let name = 'instrument';
-  let dispatch = createEventDispatcher();
+
   let downtimeSeverity;
   let downtimeInstrument = '';
   let cvvRef;
@@ -120,7 +119,7 @@
   }
   $: collectCardTokenisationConsent = selected && !isTokenised;
 
-  function selectionHandler(avoidFocus = false) {
+  function selectionHandler() {
     if (isDynamicFeeBearer()) {
       setDynamicFeeObject('card', savedCard?.card?.type);
     }
@@ -137,7 +136,7 @@
         );
         const cvvInput = instrumentInDom.querySelector('.cvv-input');
 
-        if (!avoidFocus && cvvInput) {
+        if (cvvInput) {
           cvvInput.focus();
         }
       });
@@ -148,19 +147,6 @@
       });
     }
   }
-  // #region cards-tokenization
-  onMount(() => {
-    if (!isTokenised && savedCard && !selected && !$selectedInstrumentId) {
-      tick().then((_) => {
-        selectionHandler(true);
-        // this dispatch is required to select the instrument in homescreen
-        dispatch('click');
-        // if we set selected to true here it will focus cvv hence avoid as we don;t want to focus cvv
-      });
-      selected = true;
-    }
-  });
-  //#endregion
 </script>
 
 <svelte:component
@@ -171,7 +157,7 @@
   className="instrument"
   radio={false}
   value={instrument.id}
-  on:click={(event) => selectionHandler()}
+  on:click={selectionHandler}
   on:click
 >
   <i slot="icon">

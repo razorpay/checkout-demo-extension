@@ -10,10 +10,7 @@
   // Store
   import { selectedPlanTextForSavedCard } from 'checkoutstore/emi';
   import { isMethodUsable } from 'checkoutstore/methods';
-  import {
-    userConsentForTokenization,
-    selectedCard,
-  } from 'checkoutstore/screens/card';
+  import { userConsentForTokenization } from 'checkoutstore/screens/card';
 
   import { setDynamicFeeObject } from 'checkoutstore/dynamicfee';
   import { isDynamicFeeBearer } from 'checkoutstore/index';
@@ -56,7 +53,6 @@
   export let selected;
   export let tab;
   export let isTokenised;
-  export let autoSelect;
   let { downtimeSeverity, downtimeInstrument } = card;
 
   // Computed
@@ -67,12 +63,14 @@
   let noCvvChecked = false;
   let cvvValue = '';
   let authType = debitPin ? 'c3ds' : '';
+
   // Refs
   let cvvInput;
   let cvvInputFormatter;
   let collectCardTokenisationConsent = false;
 
   const dispatch = createEventDispatcher();
+
   $: {
     const { issuer: bank, networkCode } = card;
 
@@ -120,7 +118,7 @@
     });
   }
 
-  function handleClick(event, avoidFocus = false) {
+  function handleClick() {
     if (isDynamicFeeBearer()) {
       setDynamicFeeObject('card', card.type);
     }
@@ -128,9 +126,7 @@
     // Focus on next tick because the CVV field might not have rendered right now.
     tick().then((_) => {
       if (cvvInput) {
-        if (!avoidFocus) {
-          cvvInput.focus();
-        }
+        cvvInput.focus();
       }
     });
 
@@ -140,24 +136,12 @@
 
     dispatch('click', payload);
   }
-  //#region cards-tokenization
-
-  $: {
-    if (autoSelect && !$selectedCard) {
-      // if the card is not tokenized and nothing is selected on ui select the card.
-      tick().then((_) => {
-        handleClick({}, true);
-      });
-    }
-  }
-
-  //#endregion
 </script>
 
 <div
   class="saved-card"
   class:checked={selected}
-  on:click={(event) => handleClick(event)}
+  on:click={handleClick}
   tabIndex="0"
   {...attributes}
 >

@@ -224,7 +224,6 @@
   let emiCtaView;
 
   let showSavedCardsCta = false;
-  let showFirstNonTokenizedCard = false;
   $: showSavedCardsCta = savedCards && savedCards.length && isSavedCardsEnabled;
 
   /**
@@ -885,13 +884,6 @@
   }
 
   export function onShown() {
-    //#region cards-tokenization
-    /**
-     * this is a hack to trigger auto-select logic only if the saved-cards are in view ( no-impact on functionality)
-     */
-    $selectedCard = null;
-    showFirstNonTokenizedCard = currentView === Views.SAVED_CARDS;
-    //#endregion
     tab = session.tab;
     onCardInput();
   }
@@ -1062,7 +1054,6 @@
               {tab}
               cards={savedCards}
               on:viewPlans={handleViewPlans}
-              {showFirstNonTokenizedCard}
             />
           </div>
           <div
