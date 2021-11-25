@@ -105,8 +105,13 @@ export function redirectToPaymentMethods(shouldNotPush = false) {
     })
     .catch((error) => {
       session.updateOrderFailure();
-      if (get(savedAddresses)?.length) {
+      const currhis = get(history);
+      const savedAddIndex = currhis.indexOf(views.SAVED_ADDRESSES);
+      if (savedAddIndex >= 0) {
         screensHistory.popUntil(views.SAVED_ADDRESSES);
+      } else if (get(savedAddresses)?.length) {
+        screensHistory.popUntil(views.ADD_ADDRESS);
+        screensHistory.replace(views.SAVED_ADDRESSES);
       } else {
         screensHistory.popUntil(views.ADD_ADDRESS);
       }
