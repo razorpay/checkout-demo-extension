@@ -5996,7 +5996,7 @@ const preferences = {
               last4: '7369',
               network: 'Visa',
               type: 'debit',
-              issuer: 'KVBL',
+              issuer: 'ICIC',
               international: false,
               emi: true,
               sub_type: 'consumer',
@@ -6054,7 +6054,7 @@ const preferences = {
             bank: null,
             wallet: null,
             method: 'card',
-            consent_taken: true,
+            consent_taken: false,
             dcc_enabled: true,
             card: {
               entity: 'card',
@@ -6138,6 +6138,7 @@ const preferences = {
       card_subtype: { consumer: 1, business: 0 },
       amex: true,
       netbanking: {
+        SCBL: 'Standard Chartered Bank',
         ABPB: 'Aditya Birla Idea Payments Bank',
         AIRP: 'Airtel Payments Bank',
         ALLA: 'Allahabad Bank',

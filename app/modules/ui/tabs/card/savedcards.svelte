@@ -1,12 +1,12 @@
 <script>
   // Svelte imports
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
 
   // UI imports
   import SavedCard from 'ui/tabs/card/savedcard.svelte';
 
   // Store
-  import { selectedTokenId, savedCardEmiDuration } from 'checkoutstore/emi';
+  import { selectedTokenId } from 'checkoutstore/emi';
 
   import {
     selectedCard,
@@ -23,6 +23,7 @@
   // Props
   export let cards = [];
   export let tab;
+  export let showFirstNonTokenizedCard;
 
   $selectedCard = null; // Refresh selection when landing again
 
@@ -82,5 +83,8 @@
     on:authtypechange={handleAuthTypeChange}
     selected={$selectedCard && $selectedCard.id === card.id}
     on:viewPlans={onViewPlans}
+    autoSelect={showFirstNonTokenizedCard &&
+      !isCardTokenized(card) &&
+      index === 0}
   />
 {/each}
