@@ -109,7 +109,6 @@
     MetaProperties,
   } from 'analytics/index';
   import { SAVED_CARD_EVENTS } from 'analytics/card/card';
-  import { sortBasedOnTokenization } from 'ui/tabs/card/utils';
 
   import {
     getIin,
@@ -431,7 +430,7 @@
       $methodInstrument
     );
 
-    savedCards = sortBasedOnTokenization(_savedCards);
+    savedCards = _savedCards;
   }
 
   $: {

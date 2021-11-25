@@ -27,5 +27,3 @@ export const creditCardConfig = {
   method: 'credit_card',
   _type: 'instrument',
 };
-
-export const MAX_CHAR_LIMIT_FOR_BANK = 6;

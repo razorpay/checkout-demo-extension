@@ -51,10 +51,6 @@
     ref.focus();
   }
 
-  export function blur() {
-    ref.blur();
-  }
-
   export function isValid() {
     return new RegExp(cvvPattern).test(value);
   }

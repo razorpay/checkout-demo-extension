@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
     "baseUrl": "app/modules"
-  },
-  "exclude": ["app/js/generated", "coverage", "app/dist"]
+  }
 }

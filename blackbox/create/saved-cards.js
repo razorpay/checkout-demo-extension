@@ -57,11 +57,6 @@ const {
   handlePartialPayment,
 } = require('../tests/homescreen/actions');
 
-const {
-  assertConsentCollectorForTokenization,
-  selectConsentCollectorForTokenization,
-} = require('../actions/card-actions');
-
 module.exports = function (testFeatures) {
   const { features, preferences, options, title } = makeOptionsAndPreferences(
     'saved-cards',
@@ -82,7 +77,6 @@ module.exports = function (testFeatures) {
     avsPrefillFromSavedCard,
     withSiftJS,
     dynamicFeeBearer,
-    tokenization,
   } = features;
 
   describe.each(
@@ -149,11 +143,7 @@ module.exports = function (testFeatures) {
 
         await handleCustomerCardStatusRequest(context);
         await typeOTPandSubmit(context);
-        await respondSavedCards(context, {
-          dcc,
-          avsPrefillFromSavedCard,
-          tokenization,
-        });
+        await respondSavedCards(context, { dcc, avsPrefillFromSavedCard });
 
         if (!feeBearer && offers) {
           await viewOffers(context);
@@ -182,11 +172,6 @@ module.exports = function (testFeatures) {
         }
 
         await selectSavedCardAndTypeCvv(context);
-
-        if (tokenization) {
-          await assertConsentCollectorForTokenization(context);
-          await selectConsentCollectorForTokenization(context);
-        }
 
         if (dcc) {
           await selectCurrencyAndVerifyAmount({

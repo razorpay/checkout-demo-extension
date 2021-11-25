@@ -10,10 +10,7 @@ const { getAjax, getCheckout } = require('./mocks/create');
 const { getFlows, getIin } = require('./mocks/flows');
 const { getOtpSubmit, getOtpResend } = require('./mocks/otp');
 const { getMisc } = require('./mocks/misc');
-const {
-  preferredInsturments,
-  preferredMethodForTokenization,
-} = require('./mocks/personalisation');
+const { preferredInsturments } = require('./mocks/personalisation');
 const { getStatus } = require('./mocks/status');
 const { getFees } = require('./mocks/fees');
 
@@ -22,13 +19,13 @@ router.get('/v1/preferences', function (request, response) {
     // request.query.cred_offer_experiment
     //   ? `cred_${request.query.cred_offer_experiment}`
     //   : 'hdfc_dc'
-    'loggedIn'
+    'hdfc_dc'
   );
   respondJSON(preferences, request, response);
 });
 
 router.get('/v1/personalisation', function (request, response) {
-  respondJSON(preferredMethodForTokenization, request, response);
+  respondJSON(preferredInsturments, request, response);
 });
 
 router.get('/v1/payment/iin', async function (request, response) {
