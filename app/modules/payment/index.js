@@ -29,7 +29,7 @@ import {
   PHONE_PE_PACKAGE_NAME,
 } from 'common/upi';
 import { getCardEntityFromPayload, getCardFeatures } from 'common/card';
-
+import { format } from 'i18n';
 import { translatePaymentPopup as t } from 'i18n/popup';
 import updateScore from 'analytics/checkoutScore';
 import { checkValidFlow, createIframe, isRazorpayFrame } from './utils';
@@ -53,7 +53,10 @@ function onPaymentCancel(metaParam) {
     var cancelError = {
       error: {
         code: 'BAD_REQUEST_ERROR',
-        description: t('payment_canceled'),
+        description: metaParam?.upiNoApp
+          ? format('upi.intent_no_apps_error')
+          : t('payment_canceled'),
+        reason: metaParam?.upiNoApp ? 'intent_no_apps_error' : '',
       },
     };
     var payment_id = this.payment_id;
@@ -79,7 +82,7 @@ function onPaymentCancel(metaParam) {
               data: response,
               r: razorpay,
             });
-          } else if (!response.error) {
+          } else if (!response.error || metaParam?.upiNoApp) {
             response = cancelError;
           }
           this.complete(response);

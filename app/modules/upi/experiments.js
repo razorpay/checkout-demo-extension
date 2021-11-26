@@ -15,4 +15,11 @@ const highlightUPIIntentOnDesktop = createExperiment(
   0.5
 );
 
-export { highlightUPIIntentOnDesktop, oneClickUPIIntent };
+/**
+ * Experiment: Other UPI Apps for Intent on Mobile web
+ * Runs for 5% of users
+ * Note: 0.95 as evaluator means it will be disabled for 95% of cases and will be enabled for 5% only.
+ */
+const otherUPIIntentApps = createExperiment('other_intent_apps', 0.95);
+
+export { highlightUPIIntentOnDesktop, oneClickUPIIntent, otherUPIIntentApps };

@@ -18,8 +18,12 @@
     isUPIFlowEnabled,
     isUPIOtmFlowEnabled,
   } from 'checkoutstore/methods';
-  import { isVpaValid } from 'common/upi';
-  import { getUPIAppDataFromHandle } from 'common/upi';
+  import {
+    isVpaValid,
+    OTHER_INTENT_APPS,
+    getUPIAppDataFromHandle,
+    isOtherIntentApp,
+  } from 'common/upi';
   import Analytics from 'analytics';
   import * as AnalyticsTypes from 'analytics-types';
   import { Formatter } from 'formatter';
@@ -74,6 +78,7 @@
 
   import { oneClickUPIIntent } from 'upi/helper';
   import { getComponentProps } from 'utils/svelteUtils';
+  import { otherUPIIntentApps } from 'upi/experiments';
 
   // Props
   export let selectedApp = undefined;
@@ -105,6 +110,7 @@
   let intentAppSelected = null;
   const isOtm = method === 'upi_otm';
   let otmStartDate = new Date();
+  let upiIntent;
 
   const merchantName = getName();
 
@@ -211,6 +217,7 @@
       omnichannel: isFlowEnabled('omnichannel'),
       collect: isFlowEnabled('collect'),
       intent: isFlowEnabled('intent'),
+      intentUrl: otherUPIIntentApps.enabled() && isFlowEnabled('intentUrl'),
       qr: isFlowEnabled('qr'),
     };
 
@@ -276,7 +283,8 @@
 
   let otmEndDate = addDaysToDate(otmStartDate, 90);
 
-  $: intent = availableFlows.intent && preferIntent;
+  $: intent =
+    (availableFlows.intent || availableFlows.intentUrl) && preferIntent;
   $: pspHandle = selectedAppData ? selectedAppData.psp : '';
   $: shouldShowQr =
     availableFlows.qr &&
@@ -292,7 +300,7 @@
     _Arr.contains(['upi', 'upi_otm'], session.tab) && determineCtaVisibility();
 
   function setDefaultTokenValue() {
-    const hasIntentFlow = availableFlows.intent;
+    const hasIntentFlow = availableFlows.intent || availableFlows.intentUrl;
     const hasTokens = tokens && tokens.length;
 
     /**
@@ -372,7 +380,7 @@
   });
 
   $: {
-    if (intent && intentApps.length) {
+    if (intent) {
       oneClickUPIIntentFlow = oneClickUPIIntent();
     }
   }
@@ -657,9 +665,13 @@
         vpa: vpaEntered,
       };
     } else {
+      const upi_app = isOtherIntentApp(intentAppSelected)
+        ? null
+        : intentAppSelected;
+
       data = {
         '_[flow]': 'intent',
-        upi_app: intentAppSelected,
+        upi_app,
         downtimeSeverity,
         downtimeInstrument,
       };
@@ -673,7 +685,14 @@
       return;
     }
 
-    const apps = getUPIIntentApps();
+    let apps = getUPIIntentApps();
+
+    if (availableFlows.intentUrl) {
+      apps = {
+        filtered: apps.filtered.concat(OTHER_INTENT_APPS),
+        all: apps.all.concat(OTHER_INTENT_APPS),
+      };
+    }
 
     Analytics.track('upi:intent', {
       type: AnalyticsTypes.RENDER,
@@ -699,6 +718,10 @@
       },
     });
   }
+
+  export const processIntentOnMWeb = (intentUrl) => {
+    upiIntent.processIntentOnMWeb(intentUrl);
+  };
 </script>
 
 <Tab {method} pad={false} shown={isPayout()}>
@@ -736,6 +759,8 @@
             apps={intentApps || []}
             selected={intentAppSelected}
             skipCTA={oneClickUPIIntentFlow}
+            payUsingApps={availableFlows.intentUrl}
+            bind:this={upiIntent}
             on:select={(e) => {
               const { downtimeInstrument, downtimeSeverity, packageName } =
                 e.detail;

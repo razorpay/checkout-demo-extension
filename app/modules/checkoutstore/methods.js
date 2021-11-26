@@ -45,6 +45,8 @@ import {
   getOS,
   isMobileByMediaQuery,
   getDevice,
+  isMobile,
+  android,
 } from 'common/useragent';
 
 import {
@@ -65,6 +67,7 @@ import {
 } from 'checkoutstore/screens/home';
 
 import { isWebPaymentsApiAvailable } from 'common/webPaymentsApi';
+import { isNonNullObject } from 'utils/object';
 
 function isNoRedirectFacebookWebViewSession() {
   return isFacebookWebView() && !getCallbackUrl();
@@ -505,6 +508,15 @@ const UPI_METHODS = {
     !isPayout() &&
     getMerchantMethods().upi_intent &&
     getUPIIntentApps().all.length,
+  intentUrl: () =>
+    // available only on android mobile web (no-sdk, no-fb-insta)
+    !isRecurring() &&
+    !isPayout() &&
+    !global.CheckoutBridge &&
+    !isFacebookWebView() &&
+    getMerchantMethods().upi_intent &&
+    intentEnabledInOption() &&
+    android,
 };
 
 // additional checks for each sub-method based on UPI OTM
@@ -513,6 +525,7 @@ const UPI_OTM_METHODS = {
   omnichannel: () => false,
   qr: () => false,
   intent: () => false,
+  intentUrl: () => false,
 };
 
 // check if upi itself is enabled, before checking any
@@ -548,17 +561,28 @@ export function isUPIFlowEnabled(method) {
   // unless method.upi or method.upi.{sub-method} is passed as false by merchant
   // it should be considered enabled from merchant side
   const merchantOption = getOption('method.upi');
-  if (_.isNonNullObject(merchantOption) && merchantOption[method] === false) {
+  if (isNonNullObject(merchantOption) && merchantOption[method] === false) {
     return false;
   }
   return isUPIBaseEnabled() && UPI_METHODS[method]();
+}
+
+function intentEnabledInOption() {
+  const merchantUpiOption = getOption('method.upi');
+  if (
+    isNonNullObject(merchantUpiOption) &&
+    merchantUpiOption.intent === false
+  ) {
+    return false;
+  }
+  return true;
 }
 
 export function isUPIOtmFlowEnabled(method) {
   // unless method.upi_otm is passed as false by merchant
   // it should be considered enabled from merchant side
   const merchantOption = getOption('method.upi_otm');
-  if (_.isNonNullObject(merchantOption) && merchantOption[method] === false) {
+  if (isNonNullObject(merchantOption) && merchantOption[method] === false) {
     return false;
   }
   return isUPIOTMBaseEnabled() && UPI_OTM_METHODS[method]();

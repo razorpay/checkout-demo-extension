@@ -45,6 +45,19 @@ export function getAppFromPackageName(packageName) {
   return app;
 }
 
+export const OTHER_INTENT_APPS = {
+  package_name: 'other_intent_apps',
+  app_icon: 'https://cdn.razorpay.com/static/assets/instrument-request/upi.svg',
+};
+
+export function isOtherIntentApp(package_name) {
+  return package_name === OTHER_INTENT_APPS.package_name;
+}
+export function getOtherAppsLabel(showableApps) {
+  return showableApps.length > 0
+    ? 'other_intent_upi_apps'
+    : 'other_intent_apps';
+}
 const UPI_APPS = {
   /**
    * Preferred apps.

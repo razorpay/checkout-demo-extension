@@ -114,9 +114,7 @@ module.exports = function (testFeatures) {
         options,
         preferences,
         method: 'Card',
-        experiments: {
-          cards_separation: 0,
-        },
+        experiments: { cards_separation: 0 },
       });
 
       const missingUserDetails = optionalContact && optionalEmail;

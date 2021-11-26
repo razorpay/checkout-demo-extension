@@ -1195,6 +1195,8 @@ export default {
     'whatsapp-biz': 'WhatsApp Business',
     wizely: 'Wizely',
     'yes-bank': 'Yes Bank',
+    other_intent_apps: 'UPI Apps',
+    other_intent_upi_apps: 'Other UPI Apps',
   },
   wallets: {
     airtelmoney: 'Airtel Money',

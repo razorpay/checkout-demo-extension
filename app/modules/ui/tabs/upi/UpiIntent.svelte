@@ -27,6 +27,8 @@
   } from 'ui/labels/upi';
 
   import UPI_EVENTS from 'ui/tabs/upi/events';
+  import { OTHER_INTENT_APPS, getOtherAppsLabel } from 'common/upi';
+  import { tryOpeningIntentUrl } from 'upi/helper';
 
   // Props
   export let apps;
@@ -35,6 +37,7 @@
   export let showRecommendedUPIApp;
   export let selectedApp;
   export let skipCTA = false;
+  export let payUsingApps = true;
 
   // Computed
   export let showableApps;
@@ -56,7 +59,6 @@
   }
 
   const dispatch = createEventDispatcher();
-
   function isDowntime(pspHandle) {
     if (pspHandle) {
       const currentDowntime = checkDowntime(upiDowntimes, 'psp', pspHandle);
@@ -91,6 +93,19 @@
     session.onUpiAppSelect(packageName);
     dispatch('select', params);
   }
+
+  export const processIntentOnMWeb = (intentUrl) => {
+    tryOpeningIntentUrl(intentUrl).then((canProceed) => {
+      if (canProceed) {
+        // emit success response and trigger polling
+        session.r.emit('payment.upi.intent_success_response');
+      } else {
+        const metaParam = { upiNoApp: true };
+        // clear the payment and dispatch no upi apps message
+        session.clearRequest(metaParam);
+      }
+    });
+  };
 
   onMount(() => {
     Analytics.track(UPI_EVENTS.INTENT_APPS_LOAD);
@@ -143,6 +158,23 @@
         {/if}
       </DeprecatedRadioOption>
     {/each}
+    {#if payUsingApps}
+      <DeprecatedRadioOption
+        data={OTHER_INTENT_APPS}
+        icon={OTHER_INTENT_APPS.app_icon}
+        iconPlaceholder=".placeholder"
+        name="upi_app"
+        value={OTHER_INTENT_APPS.package_name}
+        selected={OTHER_INTENT_APPS.package_name === selected}
+        showRadio={!skipCTA}
+        showArrow={skipCTA}
+        on:select={(e) => onAppSelect(e, showableApps.length || 0)}
+      >
+        <div class="ref-title" data-name={OTHER_INTENT_APPS.package_name}>
+          {getUpiIntentAppName(getOtherAppsLabel(showableApps), $locale)}
+        </div>
+      </DeprecatedRadioOption>
+    {/if}
 
     {#if apps.length > 5 && !showAll}
       <NextOption on:select={() => (showAll = true)} icon={otherAppsIcon}>
@@ -162,7 +194,7 @@
   #upi-apps {
     :global(.radio-option),
     :global(.next-option) {
-      padding: 18px 40px 18px 60px;
+      padding: 18px 40px 18px 72px;
       box-sizing: border-box;
     }
 

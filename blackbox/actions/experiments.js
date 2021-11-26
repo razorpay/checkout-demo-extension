@@ -3,6 +3,7 @@ const defaultExperiments = {
   cards_separation: 0,
   delay_login_otp: 0,
   one_click_upi_intent: 0,
+  other_intent_apps: 1,
 };
 
 /**

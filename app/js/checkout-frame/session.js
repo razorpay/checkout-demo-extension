@@ -516,8 +516,9 @@ function cancelHandler(response) {
     if (this.r._payment && this.r._payment.upi_app) {
       discreet.UPIUtils.trackUPIIntentFailure(this.r._payment.upi_app);
     }
-
-    this.showLoadError(I18n.format('misc.payment_incomplete'), true);
+    if (!(response && response.upiNoApp)) {
+      this.showLoadError(I18n.format('misc.payment_incomplete'), true);
+    }
   } else if (
     /^(card|emi)$/.test(this.payload.method) &&
     this.screen &&
@@ -2495,6 +2496,9 @@ Session.prototype = {
         if (this.payload['_[flow]'] === 'directpay') {
           return cancel_upi(this);
         } else if (this.payload['_[flow]'] === 'intent') {
+          if (Confirm.isVisible()) {
+            return;
+          }
           this.hideErrorMessage();
         }
       }
@@ -5654,6 +5658,14 @@ Session.prototype = {
         params[Constants.UPI_POLL_URL] = response.request.url;
         params[Constants.PENDING_PAYMENT_TS] = now() + '';
         that.setParamsInStorage(params);
+
+        /**
+         * When the payment response is for intent mweb using deeplink (without specific app)
+         * Invoke the flow where upi intent url is opened using deeplink
+         */
+        if (data.upi_app === null && response.data.intent_url) {
+          that.upiTab.processIntentOnMWeb(response.data.intent_url);
+        }
       });
 
       this.r.on('payment.upi.pending', function (data) {

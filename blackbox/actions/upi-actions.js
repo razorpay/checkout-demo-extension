@@ -1,4 +1,4 @@
-const { delay, randomContact } = require('../util');
+const { delay, randomContact, visible } = require('../util');
 
 async function expectNoUPIApps(context) {
   await expect('[data-name="phonepe"]').selectorToBeAbsent(context);
@@ -45,7 +45,7 @@ async function respondToUPIAjax(
   if (recurring) {
     expect(req.body).toContain('recurring=1');
   }
-  if (method === 'qr') {
+  if (method === 'qr' || method === 'intent_url') {
     typeValue = 'intent';
     dataValue = {
       intent_url:
@@ -208,6 +208,45 @@ async function enterOmnichannelPhoneNumber(context) {
   await phoneField.type(randomContact());
 }
 
+async function selectUPIOtherApps(context) {
+  const otherApps = await context.page.waitForSelector(
+    '[data-name="other_intent_apps"]'
+  );
+  await otherApps.click();
+}
+async function handleUPIOtherApps(context) {
+  const req = await context.expectRequest();
+  expect(req.url).toContain('cancel?key_id');
+  const response = {
+    code: 'BAD_REQUEST_ERROR',
+    description:
+      'You may have cancelled the payment or there was a delay in response from the UPI app.',
+    metadata: {
+      payment_id: 'pay_IOzrmuVjYaBcMV',
+    },
+    reason: 'payment_cancelled',
+    source: 'customer',
+    step: 'payment_authentication',
+  };
+  await context.respondPlain(
+    `${req.params.callback}(${JSON.stringify(response)})`
+  );
+
+  let errorText =
+    'No UPI App on this device.Select other UPI option to proceed.';
+  let errorDisplayedInUI = await context.page.$eval(
+    '#fd-t',
+    (el) => el.innerText
+  );
+
+  errorDisplayedInUI = errorDisplayedInUI
+    .trim()
+    .toLowerCase()
+    .replace(/\n/g, '');
+  errorText = errorText.trim().toLowerCase();
+  expect(errorDisplayedInUI).toEqual(errorText);
+  expect(await context.page.$eval('#fd-hide', visible)).toEqual(true);
+}
 module.exports = {
   selectUPIMethod,
   enterUPIAccount,
@@ -224,4 +263,6 @@ module.exports = {
   handleSavedTokenValidation,
   selectUPIPspBank,
   expectNoUPIApps,
+  selectUPIOtherApps,
+  handleUPIOtherApps,
 };
