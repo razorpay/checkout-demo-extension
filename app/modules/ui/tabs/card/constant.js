@@ -96,8 +96,9 @@ export const Views = {
 export const banksUnderOneCard = ['IDFB', 'SIBL', 'STCB', 'FDRL'];
 
 export const cardWithRecurringSupport = {
-  HSBC: { credit: true, debit: false },
+  CIUB: { credit: true, debit: true },
   ESFB: { credit: false, debit: true },
+  HSBC: { credit: true, debit: false },
   KVBL: { credit: true, debit: true },
   // OneCard exclusive banks - start
   IDFB: { credit: true, debit: false },
@@ -105,4 +106,27 @@ export const cardWithRecurringSupport = {
   STCB: { credit: true, debit: false, prepaid: true },
   FDRL: { credit: true, debit: false },
   // OneCard exclusive banks - end
+};
+export const cobrandingPartners = ['ONE_CARD'];
+export const supportedNetworksAndProviders = {
+  CIUB: {
+    credit: [],
+    debit: ['VISA', 'MC'],
+  },
+  ESFB: {
+    credit: [],
+    debit: ['VISA', 'MC'],
+  },
+  HSBC: {
+    credit: ['VISA', 'MC'],
+    debit: [],
+  },
+  KVBL: {
+    credit: ['VISA'],
+    debit: ['VISA', 'MC'],
+  },
+  ONE_CARD: {
+    credit: ['VISA'],
+    debit: [],
+  },
 };

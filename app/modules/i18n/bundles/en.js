@@ -138,6 +138,8 @@ export default {
     short: {
       BARB_R: 'BOB',
       CORP: 'Corporate',
+      CIUB: 'City Union',
+      ESFB: 'Equitas',
       FDRL: 'Federal',
       HDFC: 'HDFC',
       IBKL: 'IDBI',
@@ -147,6 +149,7 @@ export default {
       INDB: 'IndusInd',
       IOBA: 'IOB',
       KKBK: 'Kotak',
+      KVBL: 'Karur Vysya',
       PUNB_R: 'PNB',
       SBIN: 'SBI',
       UTIB: 'Axis',
@@ -1234,8 +1237,9 @@ export default {
   recurring_callout_overlay: {
     supported_cards: 'Supported cards for recurring payments',
     bank: 'Bank',
-    credit_card: 'Credit Card',
-    debit_card: 'Debit Card',
+    credit_cards: 'Credit Cards',
+    debit_cards: 'Debit Cards',
+    super_cards: 'Super Cards',
     yes: 'Yes',
   },
   trusted_badge: {
