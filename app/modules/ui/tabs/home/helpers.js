@@ -82,27 +82,6 @@ export function setDynamicFees(instrument, forType) {
 }
 
 /**
- * This method will return a prepared string for bank name to be shown with 6 bank name + 3(.)dots
- * This is purely written for p13n saved cards
- * @param {string} bankName
- * @returns truncated string
- */
-function truncateBankName(bankName) {
-  const bankNameWords = bankName.split(' ');
-  let truncatedString = bankName;
-  if (bankName.length > MAX_CHAR_LIMIT_FOR_BANK) {
-    truncatedString = bankName.slice(0, MAX_CHAR_LIMIT_FOR_BANK);
-    const truncatedWords = truncatedString.split(' ').filter(Boolean);
-    if (truncatedWords.length === 1 && bankNameWords.length !== 1) {
-      truncatedString += bankName.split(' ')[1][0];
-      truncatedString += '...';
-    }
-  }
-
-  return truncatedString;
-}
-
-/**
  * This method is a decoupled method from p13n block saved card.
  * This is done to utilize the same logic for cards=>saved-cards view.
  * @param {Card} card card with issuer, network and last4
@@ -126,7 +105,7 @@ export function getBankText(card, loggedIn, isEmiInstrument, locale) {
         ? 'instruments.titles.emi_logged_in'
         : 'instruments.titles.card_logged_in',
       {
-        bank: truncateBankName(bankText),
+        bank: bankText,
         type: toTitleCase(cardType),
         last4: card.last4,
       },
