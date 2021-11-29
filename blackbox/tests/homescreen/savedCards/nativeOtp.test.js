@@ -9,6 +9,7 @@ const {
   verifyOTP,
   resendOTP,
   handleCardValidationForNativeOTP,
+  respondCurrencies,
 } = require('../../../actions/common');
 
 const {
@@ -47,6 +48,10 @@ describe('Saved Card tests', () => {
     await typeOTPandSubmit(context);
     await respondSavedCards(context, { nativeOtp: true });
     await selectSavedCardAndTypeCvv(context);
+    /**
+     * This test case is using international card. It is expected to make `/flows` api call for saved card.
+     */
+    await respondCurrencies(context);
     await submit(context);
     await handleCardValidationForNativeOTP(context, { coproto: 'otp' });
     await typeOTPandSubmit(context);

@@ -39,7 +39,6 @@
     selectedCardFromHome,
     defaultDCCCurrency,
     cardCountry,
-    AVSScreenMap,
   } from 'checkoutstore/screens/card';
 
   import {
@@ -135,7 +134,11 @@
 
   let AVSInfo = [];
   // experiments
-  import { delayLoginOTPExperiment } from 'card/helper';
+  import {
+    delayLoginOTPExperiment,
+    getIntSelectedCardTokenId,
+    fetchAVSFlagForCard,
+  } from 'card/helper';
   import { addCardView } from 'checkoutstore/dynamicfee';
 
   let delayOTPExperiment;
@@ -228,9 +231,9 @@
   $: showSavedCardsCta = savedCards && savedCards.length && isSavedCardsEnabled;
 
   /**
-   * Store flags based on /flows API is called for card IIN
+   * cardAVSFlowsMap is being used to store the AVS flag fetched for the selected cards.
    */
-  let cardFlowsMap = {};
+  let cardAVSFlowsMap = {};
 
   onMount(() => {
     // Prefill
@@ -439,49 +442,40 @@
     lastSavedCard = savedCards && savedCards[savedCards.length - 1];
   }
 
-  function getCardByTokenId(tokenId) {
-    if (!$customer.tokens) {
-      return;
+  $: {
+    /**
+     * For saved cards check cardCountry is not "IN" then call the flows api to check the address_required enabled
+     */
+
+    const tokenId = getIntSelectedCardTokenId({
+      tokens: get(customer)?.tokens,
+      currentView,
+      selectedCard: $selectedCard,
+      selectedInstrument: $selectedInstrument,
+    });
+
+    if (tokenId && !cardAVSFlowsMap[tokenId] && !isDCCEnabled()) {
+      fetchAVSFlagForCard({ tokenId });
+      cardAVSFlowsMap[tokenId] = 1;
     }
-    if (!$customer.tokens.items) {
-      return;
-    }
-    return _Arr.find($customer.tokens.items, (token) => token.id === tokenId);
   }
 
   $: {
     /**
      * If DCC is not enabled and cardCountry is not "IN" then call the flows api to check the address_required enabled
      */
+    // get IIN for new card
     const iin = getIin($cardNumber);
+
     if (
+      iin &&
+      !cardAVSFlowsMap[iin] &&
       $cardCountry &&
       $cardCountry !== 'IN' &&
-      !cardFlowsMap[iin] &&
       !isDCCEnabled()
     ) {
-      let prop = { iin };
-      if (currentView === Views.SAVED_CARDS && $selectedCard) {
-        const tokenId = $selectedCard.id;
-        prop = { tokenId };
-      } else if (currentView === Views.HOME_SCREEN && $selectedInstrument) {
-        const card = getCardByTokenId($selectedInstrument.token_id);
-        if (card) {
-          prop = { tokenId: card.id };
-        }
-      }
-
-      getCurrencies(prop).then((currencyPayload) => {
-        cardFlowsMap[iin] = true;
-        let entity = null;
-        if (prop) {
-          entity = prop.iin || prop.tokenId || null;
-        }
-        AVSScreenMap.update((value) => ({
-          ...value,
-          [entity]: currencyPayload.avs_required,
-        }));
-      });
+      fetchAVSFlagForCard({ iin });
+      cardAVSFlowsMap[iin] = 1;
     }
   }
 

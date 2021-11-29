@@ -13,6 +13,8 @@ const {
   selectCurrencyAndVerifyAmount,
   expectDCCParametersInRequest,
   expectRedirectWithCallback,
+  respondCurrencies,
+  expectAVSParametersInRequest,
 
   // Card Payment
   enterCardDetails,
@@ -87,6 +89,7 @@ module.exports = function (testFeatures) {
     withSiftJS,
     dynamicFeeBearer,
     retryWithPaypal,
+    internationalCard,
   } = features;
   const anyFeeBearer = feeBearer || dynamicFeeBearer;
   describe.each(
@@ -163,6 +166,7 @@ module.exports = function (testFeatures) {
       await enterCardDetails(context, {
         recurring: !!recurringOrder,
         dcc,
+        internationalCard,
       });
 
       if (dcc) {
@@ -190,6 +194,8 @@ module.exports = function (testFeatures) {
         // expect AVS paramter if enabled
         await expectDCCParametersInRequest(context, 'USD', avs);
         return;
+      } else if (internationalCard) {
+        await respondCurrencies(context, avs);
       }
 
       if (!feeBearer && offers) {
@@ -232,6 +238,24 @@ module.exports = function (testFeatures) {
       }
 
       await submit(context);
+
+      /**
+       * if AVS feature flag is enabled with DCC flag
+       */
+      if (!dcc && avs && internationalCard) {
+        if (!AVSPrefillData) {
+          // skip filling of data
+          await fillAVSForm(context);
+        } else {
+          // assert data from saved card
+          await assertAVSFormData(context);
+        }
+        await submit(context);
+        if (AVSPrefillData) {
+          await expectAVSParametersInRequest(context);
+        }
+      }
+
       if (options.currency !== 'INR') {
         await agreeToAMEXCurrencyCharges(context);
       }

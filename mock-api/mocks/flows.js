@@ -845,6 +845,7 @@ const getFlows = (query) => {
       },
       currency_request_id: 'EW1CiHoC8eARvW',
       card_currency: 'USD',
+      avs_required: false,
     };
   } else {
     return {

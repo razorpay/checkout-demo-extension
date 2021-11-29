@@ -20,7 +20,7 @@ import {
 import {
   selectedCard,
   cardCvv,
-  isAVSEnabled,
+  isAVSEnabledForEntity,
 } from 'checkoutstore/screens/card';
 import CardTab from 'ui/tabs/card/index.svelte';
 
@@ -102,7 +102,7 @@ export function setEmiPlansCta(screen, tab) {
       break;
 
     default: {
-      if (get(isAVSEnabled)) return; // prevent CTA update in post AVS OTP screen[saved card]
+      if (get(isAVSEnabledForEntity)) return; // prevent CTA update in post AVS OTP screen[saved card]
       setAppropriateCtaText();
     }
   }

@@ -7,7 +7,7 @@
     // const element = document.getElementById(node?.firstElementChild?.id);
     const element = document.getElementById('secured-message');
     if (!element || tab !== 'home-1cc') {
-      document.querySelector('#bottom').appendChild(node);
+      document.querySelector('#bottom')?.appendChild(node);
     }
 
     return {

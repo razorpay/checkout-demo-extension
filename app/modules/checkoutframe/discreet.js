@@ -122,6 +122,7 @@ import * as OneClickCheckoutStore from 'one_click_checkout/store';
 import * as OneClickCheckoutInterface from 'one_click_checkout/sessionInterface';
 import { dynamicFeeObject } from 'checkoutstore/dynamicfee';
 import { views } from 'one_click_checkout/routing/constants';
+import { Views as CardViews } from 'ui/tabs/card/constant';
 
 export default {
   RazorpayConfig,
@@ -262,4 +263,6 @@ export default {
   OneClickCheckoutStore,
   OneClickCheckoutMetaProperties,
   views,
+
+  CardViews,
 };

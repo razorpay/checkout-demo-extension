@@ -151,6 +151,7 @@ async function enterCardDetails(
     issuer = null,
     type = 'credit',
     dcc = false,
+    internationalCard = false,
   } = {}
 ) {
   const visa = cardType === 'VISA';
@@ -175,6 +176,10 @@ async function enterCardDetails(
       flows.emi = true;
       response.issuer = issuer;
       response.type = type;
+    }
+
+    if (internationalCard) {
+      response.country = 'US';
     }
 
     response.flows = flows;
@@ -216,6 +221,7 @@ async function respondSavedCards(
     nativeOtp = false,
     dcc = false,
     avsPrefillFromSavedCard = false,
+    domesticSavedCard = false,
     tokenization,
   } = {}
 ) {
@@ -237,6 +243,7 @@ async function respondSavedCards(
           consent_taken: !tokenization,
           dcc_enabled: dcc,
           card: {
+            country: domesticSavedCard ? 'IN' : 'US',
             entity: 'card',
             name: 'Sakshi Jain',
             last4: '1111',
@@ -380,6 +387,18 @@ async function expectDCCParametersInRequest(
       'billing_address[postal_code]': AVS_DATA['avs-postal_code'],
     };
   }
+  expect(body).toMatchObject(check);
+}
+
+async function expectAVSParametersInRequest(context) {
+  const request = await context.expectRequest();
+  const body = querystring.parse(request.body);
+  let check = {
+    'billing_address[line1]': AVS_DATA['avs-line1'],
+    'billing_address[country]': AVS_DATA['avs-country'],
+    'billing_address[city]': AVS_DATA['avs-city'],
+    'billing_address[postal_code]': AVS_DATA['avs-postal_code'],
+  };
   expect(body).toMatchObject(check);
 }
 
@@ -642,6 +661,7 @@ module.exports = {
   fillAVSForm,
   assertAVSFormData,
   respondToPaymentFailure,
+  expectAVSParametersInRequest,
   assertConsentCollectorForTokenization,
   selectConsentCollectorForTokenization,
 };

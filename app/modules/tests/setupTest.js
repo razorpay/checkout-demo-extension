@@ -5,6 +5,7 @@ import * as _El from '../../../cfu/src/fe/implicit/_El.js';
 import * as _Doc from '../../../cfu/src/fe/implicit/_Doc.js';
 
 import initI18n from './init-i18n';
+import 'jest-canvas-mock';
 
 global.beforeEach(() => {
   initI18n();

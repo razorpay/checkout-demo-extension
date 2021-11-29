@@ -99,7 +99,8 @@ var preferences,
   address = discreet.address,
   OneClickCheckoutStore = discreet.OneClickCheckoutStore,
   dynamicFeeObject = discreet.dynamicFeeObject,
-  views = discreet.views;
+  views = discreet.views,
+  CardViews = discreet.CardViews;
 
 // dont shake in mobile devices. handled by css, this is just for fallback.
 var shouldShakeOnError = !/Android|iPhone|iPad/.test(ua);
@@ -4495,6 +4496,7 @@ Session.prototype = {
     }
 
     var AVSRequired = false;
+    var AVSRequiredForEntity = null;
     var AVSMap = discreet.storeGetter(CardScreenStore.AVSScreenMap) || {};
     var AVSData = this.getAVSPayload(selectedInstrument || {}) || {};
     var isOnAVSScreen = AVSData.isOnAVSScreen;
@@ -4535,8 +4537,18 @@ Session.prototype = {
         var isSavedCardScreen = this.svelteCardTab.isOnSavedCardsScreen();
         var cardIin = discreet.storeGetter(CardScreenStore.cardIin);
         var selectedCard = discreet.storeGetter(CardScreenStore.selectedCard);
-        var tokenId = selectedCard && selectedCard.id ? selectedCard.id : '';
-        AVSRequired = Boolean(AVSMap[isSavedCardScreen ? tokenId : cardIin]);
+        /**
+         * if new card is added then get cardIin
+         * else if saved card selected on cards screen then get tokenId
+         */
+        AVSRequiredForEntity = discreet.CardHelper.getEntityForAVSMap({
+          currentView: isSavedCardScreen ? CardViews.SAVED_CARDS : '',
+          iin: cardIin,
+          selectedCard: selectedCard,
+        });
+        AVSRequired = AVSRequiredForEntity
+          ? Boolean(AVSMap[AVSRequiredForEntity])
+          : false;
         // get card number & token id
 
         if (data.provider) {
@@ -4678,13 +4690,22 @@ Session.prototype = {
         return;
       }
     } else if (selectedInstrument) {
-      if (!this.checkCommonValidAndTrackIfInvalid()) {
+      if (
+        selectedInstrument.method === 'card' &&
+        isOnAVSScreen &&
+        this.checkInvalid('#form-card')
+      ) {
+        return;
+      }
+
+      if (!isOnAVSScreen && !this.checkCommonValidAndTrackIfInvalid()) {
         return;
       }
 
       if (selectedInstrument.method === 'card' && !isOnAVSScreen) {
         // in AVS screen there is no cvv input
-        AVSRequired = Boolean(AVSMap[selectedInstrument.token_id]);
+        AVSRequiredForEntity = selectedInstrument.token_id;
+        AVSRequired = Boolean(AVSMap[AVSRequiredForEntity]);
         /*
          * Add cvv to data from the currently selected instrument
          */
@@ -4734,7 +4755,9 @@ Session.prototype = {
     }
     this.downtimeSeverity = payload.downtimeSeverity;
     var downtimeInstrument = discreet.downtimeUtils.checkForDowntime(payload);
-    CardScreenStore.isAVSEnabled.set(AVSRequired);
+    if (!isOnAVSScreen) {
+      CardScreenStore.isAVSEnabledForEntity.set(AVSRequiredForEntity);
+    }
     // meta for tracking AVS
     if (AVSRequired || isOnAVSScreen) {
       Analytics.setMeta('avs', true);
@@ -4910,11 +4933,10 @@ Session.prototype = {
 
     // AVS check
     var AVSMap = discreet.storeGetter(CardScreenStore.AVSScreenMap) || {};
-    var isSavedCardScreen = this.svelteCardTab.isOnSavedCardsScreen();
-    var cardIin = discreet.storeGetter(CardScreenStore.cardIin);
     var selectedCard = discreet.storeGetter(CardScreenStore.selectedCard);
-    var tokenId = selectedCard && selectedCard.id ? selectedCard.id : '';
-    var AVSRequired = Boolean(AVSMap[isSavedCardScreen ? tokenId : cardIin]);
+    var avsEntity = storeGetter(CardScreenStore.isAVSEnabledForEntity);
+
+    var AVSRequired = avsEntity ? Boolean(AVSMap[avsEntity]) : false;
 
     /**
      * If user selects the card from p13n user will be auto-redirected to saved cards screen

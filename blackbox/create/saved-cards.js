@@ -15,12 +15,14 @@ const {
   handleMockSuccessDialog,
   expectRedirectWithCallback,
   expectDCCParametersInRequest,
+  expectAVSParametersInRequest,
 
   //Saved Cards
   handleCustomerCardStatusRequest,
   typeOTPandSubmit,
   respondSavedCards,
   selectSavedCardAndTypeCvv,
+  respondCurrencies,
 
   // Offers
   verifyOfferApplied,
@@ -82,6 +84,7 @@ module.exports = function (testFeatures) {
     avsPrefillFromSavedCard,
     withSiftJS,
     dynamicFeeBearer,
+    domesticSavedCard,
     tokenization,
   } = features;
 
@@ -152,6 +155,7 @@ module.exports = function (testFeatures) {
         await respondSavedCards(context, {
           dcc,
           avsPrefillFromSavedCard,
+          domesticSavedCard,
           tokenization,
         });
 
@@ -214,9 +218,28 @@ module.exports = function (testFeatures) {
           await expectDCCParametersInRequest(context, 'USD', avs);
 
           return;
+        } else if (!domesticSavedCard) {
+          await respondCurrencies(context, avs);
         }
 
         await submit(context);
+
+        /**
+         * if AVS feature flag is enabled with DCC flag
+         */
+        if (!dcc && avs && !domesticSavedCard) {
+          if (!avsPrefillFromSavedCard) {
+            // skip filling of data
+            await fillAVSForm(context);
+          } else {
+            // assert data from saved card
+            await assertAVSFormData(context);
+          }
+          await submit(context);
+          if (avsPrefillFromSavedCard) {
+            await expectAVSParametersInRequest(context);
+          }
+        }
 
         if (feeBearer || dynamicFeeBearer) {
           await handleFeeBearer(context);

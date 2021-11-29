@@ -1,6 +1,6 @@
 module.exports = {
   transform: {
-    '^.+\\.svelte$': 'svelte-jester',
+    '^.+\\.svelte$': ['svelte-jester', { preprocess: true }],
     '^.+\\.js$': 'babel-jest',
   },
   moduleFileExtensions: ['js', 'svelte'],
@@ -11,5 +11,6 @@ module.exports = {
     '<rootDir>/app/modules/tests/setupTest.js',
     '@testing-library/jest-dom/extend-expect',
   ],
+  testEnvironment: 'jsdom',
   clearMocks: true, // Automatically clear mock calls and instances before every test.
 };
