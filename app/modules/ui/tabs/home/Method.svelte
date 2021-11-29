@@ -4,7 +4,10 @@
 
   // Store
   import { t, locale } from 'svelte-i18n';
-  import { codReason } from 'one_click_checkout/address/shipping_address/store';
+  import {
+    codReason,
+    showCodLoader,
+  } from 'one_click_checkout/address/shipping_address/store';
   import { isCodAvailable } from 'one_click_checkout/address/derived';
 
   // UI imports
@@ -57,6 +60,7 @@
 
   let _title;
   $: _title = getTitleForDisplay($locale);
+  $: codLoading = method === 'cod' && $showCodLoader;
 
   function getSubtitleForDisplay(locale) {
     if (subtitle) {
@@ -132,6 +136,7 @@
   defaultStyles={false}
   on:click={select}
   attributes={{ method }}
+  flexGrow={codLoading}
   {disabled}
 >
   <i slot="icon">
@@ -157,6 +162,11 @@
           </div> -->
         </div>
       </div>
+    {/if}
+  </div>
+  <div slot="extra">
+    {#if codLoading}
+      <div class="spinner cod-loader" />
     {/if}
   </div>
   <!-- <div slot="banner">
@@ -261,5 +271,11 @@
 
   .cod-error {
     color: #858585 !important;
+  }
+
+  .cod-loader {
+    opacity: 1;
+    height: 16px;
+    width: 16px;
   }
 </style>

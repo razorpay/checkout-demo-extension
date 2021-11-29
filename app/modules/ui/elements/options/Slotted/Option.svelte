@@ -9,6 +9,14 @@
   export let defaultStyles = true;
   export let attributes = {};
 
+  /**
+   * since the Stack component already uses display: flex
+   * this can be used to display elements that we want at the
+   * horizontal end of the Option end instead of just after the
+   * div containing the title, subtitle and error slots
+   */
+  export let flexGrow = false;
+
   $: {
     disabled = disabled ? true : undefined;
   }
@@ -26,7 +34,7 @@
 >
   <Stack horizontal>
     <slot name="icon" />
-    <div>
+    <div class:grow={flexGrow}>
       <slot name="title" />
       <slot name="subtitle" />
       <slot name="error" />
@@ -62,5 +70,9 @@
 
   div {
     overflow: hidden;
+  }
+
+  .grow {
+    flex-grow: 1;
   }
 </style>

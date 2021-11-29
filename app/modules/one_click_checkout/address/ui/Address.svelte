@@ -8,22 +8,12 @@
 
   // Store imports
   import {
-    selectedAddressId,
     newUserAddress,
-    selectedAddress,
     shouldSaveAddress,
     showSavedAddressCta,
   } from 'one_click_checkout/address/shipping_address/store';
-  import {
-    savedAddresses,
-    isBillingSameAsShipping,
-  } from 'one_click_checkout/address/store';
-  import { isCodForced } from 'one_click_checkout/store';
+  import { isBillingSameAsShipping } from 'one_click_checkout/address/store';
   import { contact } from 'checkoutstore/screens/home';
-
-  // service imports
-  import { thirdWatchCodServiceability } from 'one_click_checkout/address/service';
-
   // interface imports
   import { redirectToPaymentMethods } from 'one_click_checkout/sessionInterface';
   import { getTheme } from 'one_click_checkout/sessionInterface';
@@ -73,25 +63,7 @@
       screensHistory.push(views.SAVED_BILLING_ADDRESS);
       return;
     }
-
-    if (!isCodForced()) {
-      thirdWatchCodServiceability($selectedAddress).then((res) => {
-        if ($selectedAddressId) {
-          const newAddresses = $savedAddresses.map((item) => {
-            if (item.id === $selectedAddressId && item.cod) {
-              item.cod = res.cod;
-            }
-            return item;
-          });
-          savedAddresses.set(newAddresses);
-        } else {
-          $newUserAddress.cod = $newUserAddress.cod && res?.cod;
-        }
-        postSubmit();
-      });
-    } else {
-      postSubmit();
-    }
+    postSubmit();
   }
 
   function postSubmit() {
@@ -103,8 +75,9 @@
       return;
     }
     if (customer.logged) {
-      saveNewAddress().then(() => {
-        redirectToPaymentMethods();
+      saveNewAddress().then((res) => {
+        $newUserAddress.id = res.shipping_address?.id;
+        redirectToPaymentMethods(false, true);
       });
     } else {
       askForOTP(otpReasons.saving_address);

@@ -10,14 +10,10 @@
   import { contact } from 'checkoutstore/screens/home';
   import { getCustomer } from 'checkoutframe/customer';
   import {
-    selectedAddressId as selectedShippingAddressId,
     newUserAddress as newShippingAddress,
-    selectedAddress as shippingAddress,
     shouldSaveAddress as shouldSaveShippingAddress,
   } from 'one_click_checkout/address/shipping_address/store';
   import { shouldSaveAddress as shouldSaveBillingAddress } from 'one_click_checkout/address/billing_address/store';
-  import { isCodForced } from 'one_click_checkout/store';
-  import { savedAddresses } from 'one_click_checkout/address/store';
 
   // Constant imports
   import { views } from 'one_click_checkout/routing/constants';
@@ -34,7 +30,6 @@
 
   // Utility/Service imports
   import { saveNewAddress } from 'one_click_checkout/address/helpers';
-  import { thirdWatchCodServiceability } from 'one_click_checkout/address/service';
   import { redirectToPaymentMethods } from 'one_click_checkout/sessionInterface';
   import { askForOTP } from 'one_click_checkout/common/otp';
   import { screensHistory } from 'one_click_checkout/routing/History';
@@ -51,27 +46,6 @@
   };
 
   function onSubmit(addressCompleted) {
-    if (!isCodForced()) {
-      thirdWatchCodServiceability($shippingAddress).then((res) => {
-        if ($selectedShippingAddressId) {
-          const newAddresses = $savedAddresses.map((item) => {
-            if (item.id === $selectedShippingAddressId && item.cod) {
-              item.cod = res.cod;
-            }
-            return item;
-          });
-          savedAddresses.set(newAddresses);
-        } else {
-          $newShippingAddress.cod = $newShippingAddress.cod && res?.cod;
-        }
-        postSubmit(addressCompleted);
-      });
-    } else {
-      postSubmit(addressCompleted);
-    }
-  }
-
-  function postSubmit(addressCompleted) {
     if (routeMap[currentView] === addressViews.ADD_ADDRESS) {
       addressCompleted.set(true);
     }
@@ -85,8 +59,9 @@
       return;
     }
     if (customer.logged) {
-      saveNewAddress().then(() => {
-        redirectToPaymentMethods();
+      saveNewAddress().then((res) => {
+        $newShippingAddress.id = res.shipping_address?.id;
+        redirectToPaymentMethods(false, true);
       });
     } else {
       askForOTP(otpReasons.saving_address);

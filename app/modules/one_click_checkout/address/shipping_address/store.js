@@ -24,6 +24,8 @@ export const selectedAddress = derived(
 
 export const codReason = writable(''); // reason for COD unavailability
 
+export const showCodLoader = writable(false);
+
 export const shouldSaveAddress = writable(null);
 
 export const showSavedAddressCta = writable(false);

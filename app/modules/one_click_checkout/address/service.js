@@ -1,5 +1,6 @@
 // api calls
 import { makeAuthUrl, getOrderId } from 'checkoutstore';
+import { makeUrl } from 'common/Razorpay';
 import {
   getCustomerAddressApiPayload,
   getServiceabilityPayload,
@@ -166,11 +167,15 @@ export function postServiceability(addresses, onSavedAddress = false) {
 export function thirdWatchCodServiceability(address) {
   const serviceabilityApiTimer = timer();
   Events.TrackMetric(AddressEvents.TW_START);
+  const orderId = getOrderId();
   const formattedPayload = formatAddress(address);
-  const payload = { address: formattedPayload };
+  const payload = {
+    address: { ...formattedPayload, id: address.id ?? null },
+    order_id: orderId,
+  };
   return new Promise((resolve) => {
     fetch.post({
-      url: makeAuthUrl('tw/address/check_cod_eligibility'),
+      url: makeUrl('tw/address/check_cod_eligibility'),
       data: payload,
       callback: (response) => {
         Events.TrackMetric(AddressEvents.TW_END, {

@@ -217,25 +217,6 @@ function makeLoaderInstruments(howMany) {
   return instruments;
 }
 
-export function configureCODOrder(blocksParam) {
-  // const parsedConfig = getBlockConfig(config, customer);
-  const rzpBlock = blocksParam.find((item) => item.code === 'rzp.cluster');
-  if (!rzpBlock) return;
-  const codInstrument = rzpBlock.instruments.filter(
-    (item) => item.code === 'cod'
-  );
-  const nonCodInstrument = rzpBlock.instruments.filter(
-    (item) => item.code !== 'cod'
-  );
-  rzpBlock.instruments = [...nonCodInstrument, ...codInstrument];
-  blocksParam.map((item) => {
-    if (item === 'rzp.cluster') {
-      item = rzpBlock;
-    }
-  });
-  blocks.set(blocksParam);
-}
-
 export function setBlocks(
   {
     showPreferredLoader = false,

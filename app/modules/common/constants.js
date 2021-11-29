@@ -76,7 +76,6 @@ export const DEFAULT_AUTH_TYPE_RADIO = 'c3ds';
 /* The below array determines the order of payment methods shown in the homescreen */
 export const AVAILABLE_METHODS = [
   'card',
-  'cod',
   'upi',
   'netbanking',
   'wallet',
@@ -91,6 +90,7 @@ export const AVAILABLE_METHODS = [
   'nach',
   'app',
   'emandate',
+  'cod',
 ];
 
 /* VPA regex, copied from API */

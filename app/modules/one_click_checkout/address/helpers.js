@@ -1,5 +1,7 @@
 // all the helpers functions for 1cc
 
+import { get } from 'svelte/store';
+import { newUserAddress } from 'one_click_checkout/address/shipping_address/store';
 import { getSaveAddressPayload } from 'one_click_checkout/address/derived';
 
 import {
@@ -55,8 +57,9 @@ export function successHandler(data) {
  */
 export function addressSaveOTPSuccessHandler(service) {
   // Save address
-  saveNewAddress(service).then(() => {
-    redirectToPaymentMethods();
+  saveNewAddress(service).then((res) => {
+    get(newUserAddress).id = res.shipping_address?.id;
+    redirectToPaymentMethods(false, true);
   });
 }
 

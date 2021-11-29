@@ -3,7 +3,6 @@ import { getSession } from 'sessionmanager';
 // helpers imports
 import { resetOrder } from 'one_click_checkout/charges/helpers';
 import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
-
 // store imports
 import { get } from 'svelte/store';
 import { isOneClickCheckout } from 'checkoutstore';
@@ -15,14 +14,23 @@ import {
 import {
   selectedAddress as selectedShippingAddress,
   selectedAddressId as selectedShippingAddressId,
+  newUserAddress,
+  showCodLoader,
 } from 'one_click_checkout/address/shipping_address/store';
-import { isEditContactFlow, isLogoutFlow } from 'one_click_checkout/store';
+import {
+  isEditContactFlow,
+  isLogoutFlow,
+  isCodForced,
+} from 'one_click_checkout/store';
 import { selectedAddress as selectedBillingAddress } from 'one_click_checkout/address/billing_address/store';
 // analytics imports
 import Analytics, { Events, MiscEvents } from 'analytics';
 import MetaProperties from 'one_click_checkout/analytics/metaProperties';
 // service imports
-import { updateOrder } from 'one_click_checkout/address/service';
+import {
+  updateOrder,
+  thirdWatchCodServiceability,
+} from 'one_click_checkout/address/service';
 // constants imports
 import { views } from 'one_click_checkout/routing/constants';
 
@@ -75,8 +83,12 @@ export function getTheme() {
 /**
  * Redirecting the flow from 1cc to payment screens
  */
-export function redirectToPaymentMethods(shouldNotPush = false) {
+export function redirectToPaymentMethods(
+  shouldNotPush = false,
+  showSnackbar = false
+) {
   const customer = getCustomerDetails();
+  const session = getSession();
   const address = get(selectedShippingAddress);
   const addressType = get(selectedShippingAddressId) ? 'saved' : 'new';
   let billing_address = get(selectedBillingAddress);
@@ -95,15 +107,42 @@ export function redirectToPaymentMethods(shouldNotPush = false) {
   Analytics.setMeta(MetaProperties.SELECTED_ADDRESS_CITY, address.city);
   Analytics.setMeta(MetaProperties.SELECTED_ADDRESS_PINCODE, address.zipcode);
   Analytics.setMeta(MetaProperties.SHIPPING_ADDRESS_CONTACT, address.contact);
-  const session = getSession();
+
+  if (address.cod) showCodLoader.set(true);
+
+  thirdWatchCodServiceability(address).then((res) => {
+    if (isCodForced()) {
+      showCodLoader.set(false);
+      return;
+    }
+
+    if (addressType === 'saved') {
+      const newAddresses = get(savedAddresses).map((item) => {
+        if (item.id === address.id && item.cod) {
+          item.cod = res?.cod;
+        }
+        return item;
+      });
+      savedAddresses.set(newAddresses);
+    } else {
+      const newAddressServiceability = get(newUserAddress).cod && res?.cod;
+      newUserAddress.set({
+        ...get(newUserAddress),
+        cod: newAddressServiceability,
+      });
+    }
+    showCodLoader.set(false);
+    session.homeTab.codActions();
+  });
+
   updateOrder(address, billing_address)
-    .then((response) => {
-      session.oneClickCheckoutRedirection();
+    .then(() => {
+      session.oneClickCheckoutRedirection(showSnackbar);
       if (!shouldNotPush) {
         screensHistory.push('methods');
       }
     })
-    .catch((error) => {
+    .catch(() => {
       session.updateOrderFailure();
       const currhis = get(history);
       const savedAddIndex = currhis.indexOf(views.SAVED_ADDRESSES);
@@ -137,7 +176,7 @@ export function bindEvents(selector) {
 
 export function redirectToMethods() {
   const session = getSession();
-  session.oneClickCheckoutRedirection(true);
+  session.oneClickCheckoutRedirection();
 }
 
 export function showOrderSummary() {

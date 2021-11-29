@@ -143,7 +143,7 @@
   } from 'common/constants';
   import { getAnimationOptions } from 'svelte-utils';
 
-  import { configureCODOrder, setBlocks } from 'ui/tabs/home/instruments';
+  import { setBlocks } from 'ui/tabs/home/instruments';
 
   import { update as updateContactStorage } from 'checkoutframe/contact-storage';
   import { isMobile } from 'common/useragent';
@@ -152,8 +152,6 @@
   import { formatTemplateWithLocale } from 'i18n';
   import UserDetailsStrip from 'ui/components/UserDetailsStrip.svelte';
   import { COD_EVENTS, HOME_EVENTS } from 'analytics/home/events';
-
-  import { updateOrder } from 'one_click_checkout/address/service';
 
   const cardOffer = getCardOffer();
   const session = getSession();
@@ -604,9 +602,6 @@
         },
         {}
       );
-      if (!$isCodAvailable) {
-        configureCODOrder($blocks);
-      }
 
       const allPreferredInstrumentsForCustomer =
         getAllInstrumentsForCustomer($customer);
@@ -713,61 +708,49 @@
     return true;
   }
 
-  export function addressNext(shouldNotUpdateOrder) {
-    $isShippingAddedToAmount = true;
-    showHome = true;
-    let billing_address = $selectedBillingAddress;
-    if ($isBillingSameAsShipping) {
-      billing_address = $selectedShippingAddress;
-    }
-    Events.Track(HomeEvents.LANDING, {
-      view,
-      oneMethod: singleMethod,
-    });
+  export function codActions() {
     Events.TrackRender(HOME_EVENTS.HOME_LOADED, {
       cod_available: $isCodAvailable,
       cod_unavailable_reason: $codReason,
       available_methods: getAvailableMethods(),
     });
     Events.Track(COD_EVENTS.COD_METHOD, { disabled: !$isCodAvailable });
-    if (!$isCodAvailable) {
-      configureCODOrder($blocks);
+  }
+
+  export function addressNext(showSnackbar) {
+    $isShippingAddedToAmount = true;
+    showHome = true;
+    Events.Track(HomeEvents.LANDING, {
+      view,
+      oneMethod: singleMethod,
+    });
+    if (showSnackbar) {
+      const charge = session.formatAmountWithCurrency($shippingCharge);
+      const text = [];
+      if ($didSaveAddress) {
+        text.push($t(SAVED_ADDRESS_LABEL));
+      }
+      if ($shippingCharge) {
+        text.push(
+          formatTemplateWithLocale(SHIPPING_CHARGES_LABEL, { charge }, $locale)
+        );
+      }
+      if (text.length) {
+        const snackBar = new Snackbar({
+          target: document.getElementById('form'),
+          props: {
+            align: 'bottom',
+            shown: true,
+            timer: 2000,
+            text: text,
+            class: 'snackbar-cod',
+          },
+        });
+      }
     }
-    if (!shouldNotUpdateOrder) {
-      updateOrder($selectedShippingAddress, billing_address).then(
-        (response) => {
-          const charge = session.formatAmountWithCurrency($shippingCharge);
-          const text = [];
-          if ($didSaveAddress) {
-            text.push($t(SAVED_ADDRESS_LABEL));
-          }
-          if ($shippingCharge) {
-            text.push(
-              formatTemplateWithLocale(
-                SHIPPING_CHARGES_LABEL,
-                { charge },
-                $locale
-              )
-            );
-          }
-          if (text.length) {
-            const snackBar = new Snackbar({
-              target: document.getElementById('form'),
-              props: {
-                align: 'bottom',
-                shown: true,
-                timer: 2000,
-                text: text,
-                class: 'snackbar-cod',
-              },
-            });
-          }
-          setTimeout(() => {
-            hideCta();
-          });
-        }
-      );
-    }
+    setTimeout(() => {
+      hideCta();
+    });
   }
 
   export function onShown() {
