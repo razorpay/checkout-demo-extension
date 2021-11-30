@@ -78,7 +78,6 @@
 
   import { oneClickUPIIntent } from 'upi/helper';
   import { getComponentProps } from 'utils/svelteUtils';
-  import { otherUPIIntentApps } from 'upi/experiments';
 
   // Props
   export let selectedApp = undefined;
@@ -217,7 +216,7 @@
       omnichannel: isFlowEnabled('omnichannel'),
       collect: isFlowEnabled('collect'),
       intent: isFlowEnabled('intent'),
-      intentUrl: otherUPIIntentApps.enabled() && isFlowEnabled('intentUrl'),
+      intentUrl: isFlowEnabled('intentUrl'),
       qr: isFlowEnabled('qr'),
     };
 
