@@ -9,6 +9,7 @@ describe('#tryOpeningIntentUrl', () => {
 
   beforeEach(() => {
     jest.useFakeTimers();
+    jest.spyOn(global, 'setTimeout');
   });
 
   function finishTimeout() {
