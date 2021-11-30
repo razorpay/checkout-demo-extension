@@ -41,3 +41,6 @@ export const STAMP_DUTY = 'emi.stamp_duty';
 export const DESCRIPTION_TOTAL_AMOUNT = 'emi.description_total_amount';
 export const DEFAULT_PROCESSING_FEE_DISCLAIMER =
   'emi.default_processing_fee_disclaimer';
+export const SBIN_BANK_EMI = 'emi.sbin_bank_emi';
+export const SBIN_DEBIT_DESCRIPTION_CONVENIENCE =
+  'emi.sbin_debit_description_convenience';

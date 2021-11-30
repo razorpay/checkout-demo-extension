@@ -35,6 +35,8 @@
     STAMP_DUTY,
     DESCRIPTION_TOTAL_AMOUNT,
     DEFAULT_PROCESSING_FEE_DISCLAIMER,
+    SBIN_BANK_EMI,
+    SBIN_DEBIT_DESCRIPTION_CONVENIENCE,
   } from 'ui/labels/emi';
 
   // Props
@@ -67,7 +69,7 @@
   const CITI_BANK_CODE = 'CITI';
   const HDFC_BANK_CODE = 'HDFC';
   const HDFC_BANK_DEBIT_CODE = 'HDFC_DC';
-
+  const SBIN_BANK_CODE = 'SBIN';
   $: {
     zestMoneyForcedEmiOffer = provider === 'zestmoney' && plan.duration === 3;
   }
@@ -212,6 +214,13 @@
             { amount: formattedAmount },
             $locale
           )}
+        {:else if bank === SBIN_BANK_CODE}
+          <!--LABEL: Full amount of Rs {amount} would be deducted from your account, which will be converted into EMI by your bank in 3-4 days. Convenience fee of 1% of transaction amount or Rs 100 whichever is higher + GST applicable for EMI transactions on Axis bank cards.' -->
+          {formatTemplateWithLocale(
+            SBIN_BANK_EMI,
+            { amount: formattedAmount },
+            $locale
+          )}
         {:else}
           <!-- LABEL: Full amount of {formattedAmount} will be deducted from your account, which will be converted into EMI by your bank in 3-4 days. -->
           {formatTemplateWithLocale(
@@ -223,6 +232,13 @@
         {#if bank === HDFC_BANK_CODE || bank === HDFC_BANK_DEBIT_CODE}
           <!-- LABEL: Convenience Fee of ₹99 + GST applicable for EMI transactions on HDFC Bank Cards. -->
           {$t(HDFC_DEBIT_DESCRIPTION_CONVENIENCE)}
+        {:else if bank === SBIN_BANK_CODE}
+          <span style="display:block">
+            {formatTemplateWithLocale(
+              SBIN_DEBIT_DESCRIPTION_CONVENIENCE,
+              $locale
+            )}
+          </span>
         {/if}
       {:else}
         <ul class="cardless-emi-plan-details">
