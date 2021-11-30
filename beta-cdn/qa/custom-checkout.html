@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<!-- Lives at https://betacdn.razorpay.com/qa/index.html -->
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+</head>
+
+<body>
+    <script>
+        var defaultParams = {
+            env: 'prod',
+            key: 'rzp_test_1DP5mmOlF5G5ag',
+            amount: 105,
+            email: 'qa.testing@razorpay.com',
+            contact: '+918888888888',
+        };
+
+        // Keys from config that do not need to be passed to Checkout
+        var deleteFromConfig = ['env', 'api', 'frame'];
+
+        var queryParams = location.search
+            .slice(1)
+            .split(/=|&/)
+            .reduce(function (map, param, index, array) {
+                if (index % 2) {
+                    map[array[index - 1]] = param;
+                }
+                return map;
+            }, {});
+
+        // Env <-> Config map
+        var configMap = {
+            dark: {
+                domain: 'checkout-dark.razorpay.com',
+                Razorpay: {},
+            },
+
+            prod: {
+                domain: 'checkout.razorpay.com',
+            },
+
+            canary: {
+                domain: 'prod-checkout-canary.razorpay.com',
+                Razorpay: {},
+            },
+
+            func: {
+                domain: 'checkout.func.razorpay.in',
+                Razorpay: {},
+            },
+
+            qa: {
+                domain: 'checkout.qa.razorpay.in',
+                Razorpay: {
+                    config: {
+                        frame: 'https://api-3.qa.razorpay.in/v1/checkout/public',
+                    },
+                }
+            },
+
+            stage: {
+                domain: 'checkout.stage.razorpay.in',
+                Razorpay: {},
+            },
+        };
+
+        // [1, 2, 3, 4, 5, 6].forEach(function (i) {
+        //   i += 1;
+        //   configMap['func' + i] = JSON.parse(JSON.stringify(configMap.func));
+        //   configMap['func' + i].Razorpay.config.frame =
+        //     'https://api-' + i + '.func.razorpay.in/v1/checkout/public';
+        // });
+
+        if (queryParams.api) {
+            var Razorpay = {
+                config: {
+                    api: queryParams.api,
+                },
+            };
+        }
+    </script>
+
+    <div>
+        <form>
+            <button type="submit">Pay</button>
+        </form>
+    </div>
+
+    <script>
+        // Load Checkout from the given domain
+        function loadCheckout(domain, callback) {
+            var script = document.createElement('script');
+            script.onload = callback;
+            script.src = 'https://' + domain + '/v1/razorpay.js';
+            document.body.appendChild(script);
+        }
+
+        // Augment defaultParams with queryParams
+        for (var i in queryParams) {
+            defaultParams[i] = queryParams[i];
+        }
+
+        var params = defaultParams;
+
+        if (params.subscription_id || params.order_id || params.invoice_id) {
+            delete params.key;
+        }
+
+        // If env does not have a config, default to prod
+        if (!configMap[params.env]) {
+            params.env = 'prod';
+        }
+
+        // Get the config for this env
+        var config = configMap[params.env];
+
+        // Get the Checkout domain
+        var domain = config.domain;
+
+        // Get the Razorpay config
+        if (config.Razorpay) {
+            window.Razorpay = {
+                ...Razorpay,
+                ...config.Razorpay
+            }
+        }
+
+        var div = document.querySelector('div');
+
+        params.handler = function (resp) {
+            document.querySelector('div').innerHTML = resp.razorpay_payment_id;
+        };
+
+        loadCheckout(domain, function () {
+            // Delete extra keys that do not need to be passed to Checkout
+            for (var i = 0; i < deleteFromConfig.length; i++) {
+                delete params[deleteFromConfig[i]];
+            }
+        });
+
+        document.forms[0].onsubmit = function (e) {
+            e.preventDefault();
+            var initParams = {};
+            if (params.order_id) {
+                initParams.order_id = params.order_id;
+                delete params.order_id;
+            }
+            else if (params.key) {
+                initParams.key = params.key;
+                delete params.key;
+            }
+            var rp = new Razorpay(initParams)
+                .on('payment.error', function (resp) {
+                    console.log(resp);
+                })
+                .on('payment.success', function (resp) {
+                    console.log(resp);
+                });
+            window.rp = rp;
+            delete params.key;
+            var paymentParams = params;
+            if (paymentParams.method === 'card') {
+                paymentParams = {
+                    ...paymentParams,
+                    ...getDefaultCardDetails()
+                }
+            }
+            var paymentParams = getPaymentParams(params);
+            rp.createPayment(paymentParams);
+
+        };
+    </script>
+
+    <script>
+        function getDefaultCardDetails() {
+            return {
+                ['card[number]']: '4111111111111111',
+                ['card[expiry_month]']: '04',
+                ['card[expiry_year]']: '22',
+                ['card[name]']: 'Mayank',
+                ['card[cvv]']: '123',
+            }
+        }
+
+        function getPaymentParams(params) {
+            var paymentParams = { ...params };
+            const { method, removeContact, removeEmail, bank } = paymentParams;
+            if (method && method === 'card' && !paymentParams['card[number']) {
+                paymentParams = { ...paymentParams, ...getDefaultCardDetails() }
+            } else if (method && method === 'netbanking' && !bank) {
+                paymentParams = { ...paymentParams, bank: 'SBIN' }
+            }
+            if (removeContact) {
+                delete paymentParams.contact
+            }
+            if (removeEmail) {
+                delete paymentParams.email;
+            }
+            return paymentParams;
+        }
+
+    </script>
+</body>
+
+</html>
