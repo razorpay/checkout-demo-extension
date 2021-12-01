@@ -3,7 +3,7 @@ import BrowserStorage from 'browserstorage';
 import { getSession } from 'sessionmanager';
 import { getAgentPayload, isCREDEnabled } from 'checkoutstore/methods';
 import { getCustomerDetails } from 'checkoutstore/screens/home';
-import { hasFeature, isContactOptional } from 'checkoutstore';
+import { hasFeature, isContactOptional } from 'razorpay';
 import { CredEvents, Events } from 'analytics';
 import {
   CRED_EXPERIMENTAL_OFFER_ID,

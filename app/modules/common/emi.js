@@ -1,12 +1,10 @@
 import { emiBanks } from 'common/bank';
 
 // convert emiBanks array to map keyed by bank-code
-const bankMap =
-  emiBanks
-  |> _Arr.reduce((banks, bankObj) => {
-    banks[bankObj.code] = bankObj;
-    return banks;
-  }, {});
+const bankMap = (emiBanks || []).reduce((banks, bankObj) => {
+  banks[bankObj.code] = bankObj;
+  return banks;
+}, {});
 
 export function getEMIBank(code) {
   return bankMap[code];

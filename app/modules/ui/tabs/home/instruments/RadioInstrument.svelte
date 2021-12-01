@@ -15,8 +15,9 @@
   // Utils imports
   import { getSession } from 'sessionmanager';
   import { getBankLogo } from 'common/bank';
-  import { getBanks, isContactOptional } from 'checkoutstore';
+  import { getBanks } from 'checkoutstore';
   import { getWallet } from 'common/wallet';
+  import { isContactOptional } from 'razorpay';
   import { getProvider as getCardlessEmiProvider } from 'common/cardlessemi';
   import { getProvider as getPaylaterProvider } from 'common/paylater';
   import { getProvider as getAppProvider } from 'common/apps';

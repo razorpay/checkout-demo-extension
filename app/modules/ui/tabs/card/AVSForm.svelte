@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-  import { Events, CardEvents, MetaProperties } from 'analytics';
+  import { Events, MetaProperties } from 'analytics';
 
   // i18n
   import { t } from 'svelte-i18n';
@@ -27,7 +27,7 @@
     selectedCardFromHome,
     selectedCard,
   } from 'checkoutstore/screens/card';
-  import { getPrefillBillingAddress } from 'checkoutstore';
+  import { getPrefillBillingAddress } from 'razorpay';
   import { resetAVSBillingAddressData } from 'card/helper';
   import { AVS_COUNTRY_MAP, STATE_MAP, Views } from './constant';
 

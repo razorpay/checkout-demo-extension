@@ -5,7 +5,7 @@ import { resetOrder } from 'one_click_checkout/charges/helpers';
 import { getCustomerDetails } from 'one_click_checkout/common/helpers/customer';
 // store imports
 import { get } from 'svelte/store';
-import { isOneClickCheckout } from 'checkoutstore';
+import { isOneClickCheckout } from 'razorpay';
 import { history, currentView } from 'one_click_checkout/routing/store';
 import {
   savedAddresses,

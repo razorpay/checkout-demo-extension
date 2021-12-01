@@ -1,5 +1,7 @@
 import { derived, writable, get } from 'svelte/store';
-import { isContactOptional, isEmailOptional } from 'checkoutstore';
+
+import { isContactOptional, isEmailOptional } from 'razorpay/index';
+
 import {
   CONTACT_REGEX,
   EMAIL_REGEX,
@@ -9,6 +11,7 @@ import {
   isInstrumentGrouped,
   isInstrumentForEntireMethod,
 } from 'configurability/instruments';
+
 import { findCountryCode } from 'common/countrycodes';
 
 export const getCustomerDetails = () => {

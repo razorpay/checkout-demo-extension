@@ -1,4 +1,4 @@
-import { getCustomSubtextForMethod } from 'checkoutstore';
+import { getCustomSubtextForMethod } from 'razorpay';
 
 import { getAppProviderSubtext } from 'i18n';
 

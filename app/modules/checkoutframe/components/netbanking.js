@@ -1,4 +1,4 @@
-import { getMerchantMethods, getOption } from 'checkoutstore';
+import { getMerchantMethods, getOption } from 'razorpay';
 import {
   isMethodEnabled,
   isEMandateEnabled,

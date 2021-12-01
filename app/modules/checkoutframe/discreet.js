@@ -58,6 +58,7 @@ import * as CRED from 'checkoutframe/cred';
 import { Formatter } from 'formatter';
 
 import * as Store from 'checkoutstore';
+import * as RazorpayHelper from 'razorpay';
 import * as MethodStore from 'checkoutstore/methods';
 import * as EmiStore from 'checkoutstore/emi';
 import * as OTPScreenStore from 'checkoutstore/screens/otp';
@@ -262,6 +263,7 @@ export default {
   ChargesStore,
   OneClickCheckoutStore,
   OneClickCheckoutMetaProperties,
+  RazorpayHelper,
   views,
 
   CardViews,

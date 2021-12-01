@@ -37,13 +37,12 @@
   } from 'checkoutstore/screens/home';
 
   import { customer } from 'checkoutstore/customer';
+  import { getOption, isOneClickCheckout } from 'razorpay';
   import {
-    getOption,
     isDCCEnabled,
     getTrustedBadgeHighlights,
     isDynamicFeeBearer,
     isIndianCustomer,
-    isOneClickCheckout,
   } from 'checkoutstore';
   import {
     isCodAddedToAmount,
@@ -71,19 +70,19 @@
   // Utils imports
   import Razorpay from 'common/Razorpay';
   import { getSession } from 'sessionmanager';
+  import { isAddressEnabled, getMerchantConfig } from 'checkoutstore';
+
   import {
     isPartialPayment as getIsPartialPayment,
-    isContactOptional,
-    isEmailOptional,
-    isContactEmailOptional,
-    isContactEmailHidden,
+    isRecurring,
     isContactEmailReadOnly,
+    isContactOptional,
+    isContactEmailHidden,
     getPrefilledContact,
     getPrefilledEmail,
-    isAddressEnabled,
-    isRecurring,
-    getMerchantConfig,
-  } from 'checkoutstore';
+    isEmailOptional,
+    isContactEmailOptional,
+  } from 'razorpay';
 
   import {
     getSingleMethod,

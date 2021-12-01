@@ -7,7 +7,7 @@
 
   // Utils imports
   import { getSession } from 'sessionmanager';
-  import { getDowntimes } from 'checkoutstore';
+  import { getDowntimes, checkDowntime } from 'checkoutframe/downtimes';
 
   // UI imports
   import DeprecatedRadioOption from 'ui/elements/options/DeprecatedRadioOption.svelte';
@@ -17,7 +17,6 @@
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
 
   import { getMiscIcon } from 'checkoutframe/icons';
-  import { checkDowntime } from 'checkoutframe/downtimes';
 
   import {
     UPI_INTENT_BLOCK_HEADING,

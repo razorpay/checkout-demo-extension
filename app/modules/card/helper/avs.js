@@ -1,46 +1,7 @@
-import {
-  isGlobalVault,
-  shouldRememberCustomer,
-  getCurrencies,
-} from 'checkoutstore/index.js';
-import { AVSBillingAddress, AVSScreenMap } from 'checkoutstore/screens/card';
-import { delayOTP } from 'card/experiments';
-
 import { Views } from 'ui/tabs/card/constant';
-
-export function delayLoginOTPExperiment() {
-  /**
-   * check for global vault enabled
-   */
-  if (!isGlobalVault() || !shouldRememberCustomer()) {
-    return false;
-  }
-  return delayOTP.enabled();
-}
-
-export const resetAVSBillingAddressData = () => {
-  AVSBillingAddress.set(null);
-};
-
-export const updateAVSScreenMap = (key, value) => {
-  AVSScreenMap.update((prevValue) => ({
-    ...prevValue,
-    [key]: value,
-  }));
-};
-
-export const getCardByTokenId = (tokens, tokenId) => {
-  if (!tokenId) {
-    return null;
-  }
-  if (!tokens) {
-    return null;
-  }
-  if (!tokens.items) {
-    return null;
-  }
-  return _Arr.find(tokens.items, (token) => token.id === tokenId);
-};
+import { getCurrencies } from './dcc';
+import { AVSBillingAddress, AVSScreenMap } from 'checkoutstore/screens/card';
+import { getCardByTokenId } from './card';
 
 export const fetchAVSFlagForCard = (params = {}) => {
   const key = params.iin || params.tokenId;
@@ -106,4 +67,15 @@ export const getEntityForAVSMap = ({
     return selectedCardFromHome ? selectedCardFromHome.id : null;
   }
   return iin;
+};
+
+export const resetAVSBillingAddressData = () => {
+  AVSBillingAddress.set(null);
+};
+
+export const updateAVSScreenMap = (key, value) => {
+  AVSScreenMap.update((prevValue) => ({
+    ...prevValue,
+    [key]: value,
+  }));
 };

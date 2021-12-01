@@ -30,7 +30,7 @@
     isEMandateBankEnabled,
   } from 'checkoutstore/methods';
 
-  import { getOption } from 'checkoutstore';
+  import { getOption } from 'razorpay';
 
   // i18n
   import { locale, t } from 'svelte-i18n';

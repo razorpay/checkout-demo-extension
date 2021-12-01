@@ -1,9 +1,9 @@
+import { isDynamicFeeBearer } from 'razorpay/index';
 import RazorpayConfig from 'common/RazorpayConfig';
 import { makeAuthUrl } from 'common/Razorpay';
 import Analytics, { Track } from 'analytics';
 import { checkDowntime } from 'checkoutframe/downtimes';
 
-import { isDynamicFeeBearer } from 'checkoutstore/index';
 import { setDynamicFeeObject, isAddCardView } from 'checkoutstore/dynamicfee';
 
 export const API_NETWORK_CODES_MAP = {

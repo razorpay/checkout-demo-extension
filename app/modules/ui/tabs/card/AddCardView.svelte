@@ -37,13 +37,15 @@
   import {
     isNameReadOnly,
     shouldRememberCustomer,
-    isRecurring,
-    isStrictlyRecurring,
-    getCardFeatures,
-    getRecurringMethods,
-    isOfferForced,
     isIndianCustomer,
   } from 'checkoutstore';
+  import {
+    getCardFeatures,
+    isOfferForced,
+    isStrictlyRecurring,
+    getRecurringMethods,
+    isRecurring,
+  } from 'razorpay';
   import { isDynamicFeeBearer } from 'checkoutstore/index';
   import { dynamicFeeObject, showFeesIncl } from 'checkoutstore/dynamicfee';
   import {

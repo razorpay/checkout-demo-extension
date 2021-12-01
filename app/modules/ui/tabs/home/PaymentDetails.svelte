@@ -24,17 +24,18 @@
   import { fly } from 'svelte/transition';
 
   // Utils imports
+  import { isAddressEnabled } from 'checkoutstore';
   import {
-    isContactEmailOptional,
-    isContactOptional,
-    isPartialPayment,
     isEmailHidden,
     isContactHidden,
-    isAddressEnabled,
+    isPartialPayment,
     getMerchantOrder,
     getOption,
+    isContactEmailOptional,
+    isContactOptional,
     isOneClickCheckout,
-  } from 'checkoutstore';
+  } from 'razorpay';
+
   import { isLoginMandatory } from 'one_click_checkout/store';
   import { getThemeMeta } from 'checkoutstore/theme';
   import { getAnimationOptions } from 'svelte-utils';

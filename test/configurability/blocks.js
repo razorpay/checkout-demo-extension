@@ -4,36 +4,36 @@ const testDataForDuplicateConfigValidation = [
     input: [
       {
         method: 'card',
-        type: 'credit',
+        types: ['credit'],
       },
       {
         method: 'card',
-        type: 'debit',
+        types: ['debit'],
       },
       {
         method: 'card',
-        type: 'debit',
+        types: ['debit'],
       },
       {
         method: 'card',
-        type: 'debit',
+        types: ['debit'],
       },
       {
         method: 'card',
-        type: 'debit',
+        types: ['debit'],
       },
       {
         method: 'card',
-        type: 'debit',
+        types: ['debit'],
       },
       {
         method: 'card',
-        type: 'debit',
+        types: ['credit'],
       },
     ],
     output: [
-      { method: 'card', type: 'credit' },
-      { method: 'card', type: 'debit' },
+      { method: 'card', types: ['credit'], _type: 'instrument' },
+      { method: 'card', types: ['debit'], _type: 'instrument' },
     ],
   },
   {
@@ -43,7 +43,9 @@ const testDataForDuplicateConfigValidation = [
         providers: ['walnut369', 'walnut369'],
       },
     ],
-    output: [{ method: 'cardless_emi', providers: ['walnut369'] }],
+    output: [
+      { method: 'cardless_emi', providers: ['walnut369'], _type: 'instrument' },
+    ],
   },
   {
     input: [
@@ -56,7 +58,9 @@ const testDataForDuplicateConfigValidation = [
         providers: ['walnut369', 'walnut369'],
       },
     ],
-    output: [{ method: 'cardless_emi', providers: ['walnut369'] }],
+    output: [
+      { method: 'cardless_emi', providers: ['walnut369'], _type: 'instrument' },
+    ],
   },
   {
     input: [
@@ -69,7 +73,9 @@ const testDataForDuplicateConfigValidation = [
         providers: ['walnut369'],
       },
     ],
-    output: [{ method: 'cardless_emi', providers: ['walnut369'] }],
+    output: [
+      { method: 'cardless_emi', providers: ['walnut369'], _type: 'instrument' },
+    ],
   },
   {
     input: [
@@ -92,7 +98,7 @@ const testDataForDuplicateConfigValidation = [
         method: 'emi',
       },
     ],
-    output: [{ method: 'emi' }],
+    output: [{ method: 'emi', _type: 'method' }],
   },
 ];
 
@@ -340,35 +346,30 @@ test('Module: configurability/blocks', (t) => {
   });
   test('Blocks.validateAndCreateBlock', (t) => {
     testDataForDuplicateConfigValidation.forEach(({ input, output }) => {
-      test('Removes instruments', (t) => {
-        let code, config, expected, found;
-        code = 'block.hdfc';
-        config = {
-          name: 'Pay via HDFC Bank',
-          description: 'Make the paymnet using your HDFC account',
-          instruments: input,
-        };
+      let code, config, expected, found;
+      code = 'block.hdfc';
+      config = {
+        name: 'Pay via HDFC Bank',
+        description: 'Make the paymnet using your HDFC account',
+        instruments: input,
+      };
 
-        expected = {
-          code: 'block.hdfc',
-          _type: 'block',
-          instruments: output,
-          title: 'Pay via HDFC Bank',
-        };
+      expected = {
+        code: 'block.hdfc',
+        _type: 'block',
+        instruments: output,
+        title: 'Pay via HDFC Bank',
+      };
 
-        found = Blocks.validateAndCreateBlock(code, config);
+      found = Blocks.validateAndCreateBlock(code, config);
 
-        t.deepEqual(
-          found,
-          expected,
-          'Creates a block with only valid instruments'
-        );
-
-        t.end();
-      });
-
-      t.end();
+      t.deepEqual(
+        found,
+        expected,
+        'Creates a block with only valid instruments'
+      );
     });
+    t.end();
   });
   t.end();
 });

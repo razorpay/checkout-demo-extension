@@ -57,6 +57,7 @@ var preferences,
   Constants = discreet.Constants,
   sanitizeTokens = discreet.sanitizeTokens,
   Store = discreet.Store,
+  RazorpayHelper = discreet.RazorpayHelper,
   MethodStore = discreet.MethodStore,
   UPIUtils = discreet.UPIUtils,
   UTILS = discreet.UTILS,
@@ -836,7 +837,10 @@ Session.prototype = {
     return amount;
   },
   setFeeLabel: function () {
-    if (Store.isCustomerFeeBearer() || Store.isOneClickCheckout()) {
+    if (
+      RazorpayHelper.isCustomerFeeBearer() ||
+      RazorpayHelper.isOneClickCheckout()
+    ) {
       FeeLabel.show();
     }
   },
@@ -926,6 +930,7 @@ Session.prototype = {
       var styleEl = this.renderCss();
       div.innerHTML = templates.modal(this, {
         Store: Store,
+        RazorpayHelper: RazorpayHelper,
         MethodStore: MethodStore,
         cta: storeGetter(Cta.getStore()),
       });
@@ -955,8 +960,8 @@ Session.prototype = {
 
     if (tab) {
       var optional = {
-        contact: Store.isContactOptional(),
-        email: Store.isEmailOptional(),
+        contact: RazorpayHelper.isContactOptional(),
+        email: RazorpayHelper.isEmailOptional(),
       };
       var prefill = {
         email: this.get('prefill.email'),
@@ -981,8 +986,6 @@ Session.prototype = {
         tab = '';
       }
     }
-
-    var order = Store.getMerchantOrder();
 
     /**
      * A method needs to be usable in order to prefill to that method
@@ -1204,7 +1207,7 @@ Session.prototype = {
     if (!Store.isPayout()) {
       this.fillData();
     }
-    if (Store.isOneClickCheckout()) {
+    if (RazorpayHelper.isOneClickCheckout()) {
       this.switchTab('home-1cc');
     }
     this.setEMI();
@@ -1262,7 +1265,7 @@ Session.prototype = {
       data: {
         embedded: this.embedded,
         meta: {
-          first_screen: Store.isOneClickCheckout()
+          first_screen: RazorpayHelper.isOneClickCheckout()
             ? discreet.OneClickCheckoutInterface.getLandingView()
             : this.homeTab.getCurrentView(),
         },
@@ -1322,7 +1325,7 @@ Session.prototype = {
     var isCouponsOrAddressEnabled =
       OneClickCheckoutStore.shouldShowCoupons() ||
       OneClickCheckoutStore.shouldShowAddress();
-    if (Store.isOneClickCheckout() && isCouponsOrAddressEnabled) {
+    if (RazorpayHelper.isOneClickCheckout() && isCouponsOrAddressEnabled) {
       this.setOneClickCheckoutHome();
     }
     if (!Store.isPayout()) {
@@ -1910,7 +1913,7 @@ Session.prototype = {
      *
      * TODO: Move to Checkout feature
      */
-    if (Store.isIRCTC() && discreet.UserAgent.AndroidWebView) {
+    if (RazorpayHelper.isIRCTC() && discreet.UserAgent.AndroidWebView) {
       this.set('modal.animation', false);
     }
   },
@@ -2027,7 +2030,10 @@ Session.prototype = {
   },
 
   hideErrorMessage: function (confirmedCancel) {
-    if (Store.isCustomerFeeBearer() && !Store.isDynamicFeeBearer()) {
+    if (
+      RazorpayHelper.isCustomerFeeBearer() &&
+      !RazorpayHelper.isDynamicFeeBearer()
+    ) {
       this.setAmount(this.get('amount'));
     }
 
@@ -2690,9 +2696,9 @@ Session.prototype = {
         this.topBar.show();
         $('.elem-email').addClass('mature');
         $('.elem-contact').addClass('mature');
-      } else if (!Store.isOneClickCheckout()) {
+      } else if (!RazorpayHelper.isOneClickCheckout()) {
         this.topBar.hide();
-      } else if (Store.isOneClickCheckout()) {
+      } else if (RazorpayHelper.isOneClickCheckout()) {
         this.showHomeTopBar();
       }
     }
@@ -2735,7 +2741,7 @@ Session.prototype = {
       (this.tab === 'cardless_emi' && screen === 'emiplans') ||
       screen === 'paylater' ||
       screen === 'qr' ||
-      (screen === 'netbanking' && Store.isRecurring()) ||
+      (screen === 'netbanking' && RazorpayHelper.isRecurring()) ||
       screen === 'emandate'
     ) {
       showPaybtn = false;
@@ -2888,7 +2894,7 @@ Session.prototype = {
     var currency = this.get('currency') || 'INR';
     var amount;
     if (offer) {
-      if (Store.isOneClickCheckout()) {
+      if (RazorpayHelper.isOneClickCheckout()) {
         amount = storeGetter(discreet.ChargesStore.amount);
       } else {
         amount = offer.amount;
@@ -2919,7 +2925,8 @@ Session.prototype = {
       hasDiscount = this.offers.isCardApplicable();
     }
 
-    var hasDiscountAndFee = offer && Store.isCustomerFeeBearer() && amount;
+    var hasDiscountAndFee =
+      offer && RazorpayHelper.isCustomerFeeBearer() && amount;
 
     if (hasDiscountAndFee) {
       $('#content').toggleClass('has-fee', hasDiscountAndFee);
@@ -2933,7 +2940,7 @@ Session.prototype = {
         ? discreet.Currency.formatAmountWithSymbol(amount, currency)
         : ''
     );
-    if (Store.isOneClickCheckout() && hasDiscount) {
+    if (RazorpayHelper.isOneClickCheckout() && hasDiscount) {
       var originalAmount = storeGetter(discreet.ChargesStore.cartAmount);
       $('#amount .original-amount').html(
         hasDiscount
@@ -3219,8 +3226,8 @@ Session.prototype = {
 
       var contact = getPhone();
       if (
-        !Store.isOneClickCheckout() &&
-        ((!contact && !Store.isContactOptional()) ||
+        !RazorpayHelper.isOneClickCheckout() &&
+        ((!contact && !RazorpayHelper.isContactOptional()) ||
           this.get('method.' + tab) === false)
       ) {
         return;
@@ -5059,7 +5066,7 @@ Session.prototype = {
             if (selectedInstrument._ungrouped[0].provider === 'cred') {
               _Obj.extend(this.payload, MethodStore.getPayloadForCRED());
 
-              if (Store.isContactOptional()) {
+              if (RazorpayHelper.isContactOptional()) {
                 // For contact optional case, we ask for contact separately
                 // which is present in proxyPhone.
                 this.payload.contact = getProxyPhone();
@@ -5404,7 +5411,7 @@ Session.prototype = {
       });
 
       if (provider === 'cred') {
-        if (Store.isContactOptional()) {
+        if (RazorpayHelper.isContactOptional()) {
           // For contact optional case, we ask for contact separately
           // which is present in proxyPhone.
           this.payload.contact = getProxyPhone();
@@ -5758,7 +5765,7 @@ Session.prototype = {
       if (!this.svelteCardTab.isOnSavedCardsScreen()) {
         setEmiBank(data);
       }
-      if (Store.isRecurring()) {
+      if (RazorpayHelper.isRecurring()) {
         var recurringValue = this.get('recurring');
         data.recurring = isString(recurringValue) ? recurringValue : 1;
       }
@@ -6089,7 +6096,7 @@ Session.prototype = {
     this.preferences = prefs;
     preferences = prefs;
 
-    if (preferences.order && Store.isOneClickCheckout()) {
+    if (preferences.order && RazorpayHelper.isOneClickCheckout()) {
       discreet.ChargesHelper.initializeAndReset(
         parseInt(preferences.order.line_items_total)
       );

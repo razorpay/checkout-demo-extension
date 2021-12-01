@@ -1,5 +1,6 @@
 import { getContactPayload } from 'one_click_checkout/store';
-import { getOrderId, makeAuthUrl } from 'checkoutstore';
+import { makeAuthUrl } from 'checkoutstore';
+import { getOrderId } from 'razorpay';
 import { timer } from 'utils/timer';
 import { Events } from 'analytics';
 import CouponEvents from 'one_click_checkout/coupons/analytics';

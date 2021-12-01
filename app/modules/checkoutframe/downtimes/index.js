@@ -1,3 +1,4 @@
+import { getPreferences } from 'razorpay';
 /**
  * Copy downtimes between methods if needed.
  * @param {Array<Object>} downtimes
@@ -59,21 +60,16 @@ function groupDowntimesByMethod(allDowntimes) {
 
 /**
  * Get downtimes from preferences.
- * @param {Object} preferences
  *
  * @return {Object}
  */
-export function getDowntimes(preferences) {
-  const hasDowntimes =
-    preferences &&
-    preferences.payment_downtime &&
-    preferences.payment_downtime.items &&
-    preferences.payment_downtime.items.length;
+export function getDowntimes() {
+  const hasDowntimes = getPreferences('payment_downtime.items.length');
 
   let downtimeItems;
 
   if (hasDowntimes) {
-    downtimeItems = preferences.payment_downtime.items;
+    downtimeItems = getPreferences('payment_downtime.items');
   } else {
     downtimeItems = [];
   }

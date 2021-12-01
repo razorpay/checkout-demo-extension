@@ -15,7 +15,8 @@
   //Util imports
   import { getSession } from 'sessionmanager';
   import { formatAmountWithSymbol } from 'common/currency';
-  import { getAmount, getCurrency } from 'checkoutstore';
+  import { getAmount } from 'checkoutstore';
+  import { getCurrency } from 'razorpay';
 
   const session = getSession();
   const DYNAMIC_FEE_BEARER_VIEW_TIME = 6000;

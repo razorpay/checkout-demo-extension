@@ -11,7 +11,7 @@
   import ContactField from 'ui/components/ContactField.svelte';
 
   // Util imports
-  import { isContactOptional } from 'checkoutstore';
+  import { isContactOptional } from 'razorpay';
   import { isContactRequiredForAppProvider } from 'checkoutstore/methods';
 
   // i18n

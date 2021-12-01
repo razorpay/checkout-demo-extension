@@ -1,4 +1,4 @@
-import { getMerchantKey } from 'checkoutstore';
+import { getMerchantKey } from 'razorpay';
 import { clearTaxMerchantKey } from './constants';
 
 // //| HTMLElement['dir'] is a string (which is an error hence using actual types)

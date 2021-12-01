@@ -1,4 +1,4 @@
-import { getMerchantKey } from 'checkoutstore';
+import { getMerchantKey } from 'razorpay';
 import {
   banksThatSupportRecurring,
   experimentingMerchants,

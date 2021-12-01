@@ -16,8 +16,7 @@ import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import { hashFnv32a } from 'checkoutframe/personalization/utils';
 import { isMethodUsable } from 'checkoutstore/methods';
-import { getDowntimes } from 'checkoutstore';
-import { checkDowntime } from 'checkoutframe/downtimes';
+import { getDowntimes, checkDowntime } from 'checkoutframe/downtimes';
 import { getAppFromPackageName } from 'common/upi';
 
 function generateBasePreferredBlock(preferred) {

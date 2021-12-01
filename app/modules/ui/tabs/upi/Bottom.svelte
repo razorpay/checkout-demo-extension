@@ -8,22 +8,9 @@
   import { _ as t, locale } from 'svelte-i18n';
   import { formatTemplateWithLocale } from 'i18n';
 
-  import {
-    UPI_OTM_CALLOUT,
-    UPI_RECURRING_CAW_CALLOUT_ALL_DATA,
-    UPI_RECURRING_CAW_CALLOUT_NO_NAME,
-    UPI_RECURRING_CAW_CALLOUT_NO_NAME_NO_FREQUENCY,
-    UPI_RECURRING_CAW_CALLOUT_NO_FREQUENCY,
-    UPI_RECURRING_SUBSCRIPTION_CALLOUT,
-  } from 'ui/labels/upi';
+  import { UPI_OTM_CALLOUT } from 'ui/labels/upi';
 
-  import {
-    getAmount,
-    getName,
-    getCurrency,
-    isASubscription,
-    getSubscription,
-  } from 'checkoutstore';
+  import { getAmount, getName } from 'checkoutstore';
 
   export let isOtm = false;
   export let isUpiRecurringCAW = false;

@@ -11,7 +11,7 @@
   import { formatToMMSS } from 'utils/date';
 
   import { resendTimeout } from 'checkoutstore/screens/otp';
-  import { isOneClickCheckout } from 'checkoutstore';
+  import { isOneClickCheckout } from 'razorpay';
 
   const dispatch = createEventDispatcher();
 

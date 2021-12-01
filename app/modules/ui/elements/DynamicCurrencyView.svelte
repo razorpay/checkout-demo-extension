@@ -42,12 +42,10 @@
   // Utils imports
   import { getSession } from 'sessionmanager';
 
-  import {
-    getAmount,
-    getCurrency,
-    getCurrencies,
-    isPartialPayment,
-  } from 'checkoutstore';
+  import { getAmount } from 'checkoutstore';
+  import { getCurrencies } from 'card/helper/dcc';
+
+  import { getCurrency, isPartialPayment } from 'razorpay';
 
   import { getIin } from 'common/card';
 

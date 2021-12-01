@@ -1,5 +1,5 @@
 import { getSession } from 'sessionmanager';
-import { isCustomerFeeBearer, isOneClickCheckout } from 'checkoutstore';
+import { isCustomerFeeBearer, isOneClickCheckout } from 'razorpay';
 
 /**
  * Get the font size depending on the number of chars in amount, customer fee bearer and offer.

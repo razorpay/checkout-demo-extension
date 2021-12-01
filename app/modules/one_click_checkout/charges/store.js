@@ -1,7 +1,7 @@
 import { writable, get } from 'svelte/store';
 import { getSession } from 'sessionmanager';
 import { appliedOffer } from 'checkoutstore/offers';
-import { isOneClickCheckout } from 'checkoutstore';
+import { isOneClickCheckout } from 'razorpay';
 import { showAmountInCta } from 'checkoutstore/cta';
 
 // Store to keep track of shipping charge

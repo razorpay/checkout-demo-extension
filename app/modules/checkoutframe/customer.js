@@ -1,4 +1,3 @@
-import { get } from 'svelte/store';
 import { getSession } from 'sessionmanager';
 import { makeAuthUrl } from 'common/Razorpay';
 import Analytics, {
@@ -11,11 +10,8 @@ import Analytics, {
 import * as AnalyticsTypes from 'analytics-types';
 import * as Bridge from 'bridge';
 import * as OtpService from 'common/otpservice';
-import {
-  isRecurring,
-  getRecurringMethods,
-  razorpayInstanceStore,
-} from 'checkoutstore';
+import RazorpayStore, { getRecurringMethods, isRecurring } from 'razorpay';
+
 import { format } from 'i18n';
 
 import { delayLoginOTPExperiment } from 'card/helper';
@@ -50,7 +46,7 @@ export function Customer(
 ) {
   if (contact) {
     this.contact = contact.replace(/[^+\d]/g, '');
-    this.r = get(razorpayInstanceStore);
+    this.r = RazorpayStore.get();
     this.haveSavedCard = true; // for default flow (non-experiment delay otp)
     if (delayLoginOTPExperiment()) {
       this.haveSavedCard = savedCustomer;

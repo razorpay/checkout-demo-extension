@@ -3,7 +3,7 @@ import {
   networks as CardNetworks,
   getNetworkFromCardNumber,
 } from 'common/card';
-import { getCardFeatures } from 'checkoutstore';
+import { getCardFeatures } from 'razorpay';
 
 export function validateCardInstrument(
   payment,

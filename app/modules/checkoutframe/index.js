@@ -7,11 +7,8 @@ import Razorpay, {
 import { Events, MetaProperties, Track, MiscEvents } from 'analytics';
 import BrowserStorage from 'browserstorage';
 import * as SessionManager from 'sessionmanager';
-import {
-  setRazorpayInstance,
-  getMerchantOrder,
-  setOption,
-} from 'checkoutstore';
+import { setRazorpayInstance } from 'checkoutstore';
+import RazorpayStore, { getMerchantOrder, setOption } from 'razorpay';
 import { processNativeMessage } from 'checkoutstore/native';
 import { isEMandateEnabled, getEnabledMethods } from 'checkoutstore/methods';
 import showTimer from 'checkoutframe/timer';
@@ -339,6 +336,7 @@ function setSessionPreferences(session, preferences) {
   }
   const razorpayInstance = session.r;
   razorpayInstance.preferences = preferences;
+  RazorpayStore.updateInstance(razorpayInstance);
   setRazorpayInstance(razorpayInstance);
 
   updateOptions(preferences);

@@ -1,6 +1,6 @@
 <script>
   // Svelte imports
-  import { getOption } from 'checkoutstore';
+  import { getOption } from 'razorpay';
   import { onMount } from 'svelte';
   import Icon from 'ui/elements/Icon.svelte';
 

@@ -14,7 +14,7 @@ import { get } from 'svelte/store';
 import en from './bundles/en';
 
 import { getSession } from 'sessionmanager';
-import { getLanguageCode, getLanguageCodeFromPrefs } from 'checkoutstore';
+import { getLanguageCode, getLanguageCodeFromPrefs } from 'razorpay';
 import { shouldUseVernacular } from 'checkoutstore/methods';
 import Analytics from 'analytics';
 import { ignoreFirstCall } from 'svelte-utils';

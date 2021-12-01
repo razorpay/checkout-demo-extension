@@ -7,7 +7,7 @@
   import Screen from 'ui/layouts/Screen.svelte';
 
   // store imports
-  import { getCurrency } from 'checkoutstore';
+  import { getCurrency } from 'razorpay';
   import {
     appliedCoupon,
     isCouponApplied,

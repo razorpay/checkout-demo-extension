@@ -1,8 +1,7 @@
 /* global CheckoutBridge */
 
 import Analytics from 'analytics';
-import { checkDowntime } from 'checkoutframe/downtimes';
-import { getDowntimes } from 'checkoutstore';
+import { getDowntimes, checkDowntime } from 'checkoutframe/downtimes';
 import { VPA_REGEX } from 'common/constants';
 export {
   parseUPIIntentResponse,

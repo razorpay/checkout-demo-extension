@@ -5,12 +5,13 @@
   import DynamicFeeBearer from './DynamicFeeBearer.svelte';
 
   //Store imports
+  import { showFeeLabel } from 'checkoutstore/index.js';
+
   import {
     isCustomerFeeBearer,
-    isOneClickCheckout,
-    showFeeLabel,
     isDynamicFeeBearer,
-  } from 'checkoutstore/index.js';
+    isOneClickCheckout,
+  } from 'razorpay';
 
   import { showSummaryModal } from 'one_click_checkout/summary_modal';
   import SummaryModalEvents from 'one_click_checkout/summary_modal/analytics';

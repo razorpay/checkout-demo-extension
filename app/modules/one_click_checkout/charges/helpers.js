@@ -1,4 +1,4 @@
-import { getOrderId } from 'checkoutstore';
+import { getOrderId } from 'razorpay';
 import {
   initializeCharges,
   isShippingAddedToAmount,

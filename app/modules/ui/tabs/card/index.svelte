@@ -13,7 +13,7 @@
   import SavedCards from 'ui/tabs/card/savedcards.svelte';
   import AppInstruments from 'ui/tabs/card/AppInstruments.svelte';
   import DynamicCurrencyView from 'ui/elements/DynamicCurrencyView.svelte';
-  import { checkDowntime } from 'checkoutframe/downtimes';
+  import { getDowntimes, checkDowntime } from 'checkoutframe/downtimes';
   import SavedCardCTA from 'card/ui/component/saved-card-cta.svelte';
   import ToggleHeading from 'ui/components/common/heading/ToggleHeading.svelte';
   import RecurringCardsCallout from './RecurringCardsCallout.svelte';
@@ -51,19 +51,16 @@
   import { findCodeByNetworkName } from 'common/card';
   import { customer } from 'checkoutstore/customer';
 
+  import { isRecurring, getCardFeatures, isDynamicFeeBearer } from 'razorpay';
+
   import {
-    isRecurring,
     shouldRememberCustomer,
     isDCCEnabled,
     isShowMORTncEnabled,
     isSiftJSEnabled,
-    getCardFeatures,
     isInternational,
-    getDowntimes,
     isPartialPayment,
     getAmount,
-    isDynamicFeeBearer,
-    getCurrencies,
     isIndianCustomer,
   } from 'checkoutstore';
 

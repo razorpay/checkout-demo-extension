@@ -2,8 +2,7 @@
   // Svelte imports
   import { onMount, createEventDispatcher } from 'svelte';
   import { slide } from 'svelte/transition';
-  import { _ as t, locale } from 'svelte-i18n';
-  import { formatTemplateWithLocale } from 'i18n';
+  import { _ as t } from 'svelte-i18n';
 
   // UI Imports
   import Field from 'ui/components/Field.svelte';
@@ -12,18 +11,12 @@
   import Checkbox from 'ui/elements/Checkbox.svelte';
   import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import DowntimeCallout from 'ui/elements/Downtime/Callout.svelte';
-  import DowntimeIcon from 'ui/elements/Downtime/Icon.svelte';
 
   // Util imports
   import { getSession } from 'sessionmanager';
-  import {
-    hasFeature,
-    getPrefilledVPA,
-    getPrefilledName,
-    shouldRememberCustomer,
-    getDowntimes,
-  } from 'checkoutstore';
-  import { checkDowntime } from 'checkoutframe/downtimes';
+  import { shouldRememberCustomer } from 'checkoutstore';
+  import { getPrefilledName, hasFeature } from 'razorpay';
+  import { checkDowntime, getDowntimes } from 'checkoutframe/downtimes';
   import { VPA_REGEX } from 'common/constants';
   import { getAnimationOptions } from 'svelte-utils';
 
@@ -36,7 +29,6 @@
     NEW_VPA_SUBTITLE,
     NEW_VPA_SUBTITLE_UPI_OTM,
   } from 'ui/labels/upi';
-  import { DOWNTIME_CALLOUT } from 'ui/labels/callouts';
   import { phone } from 'checkoutstore/screens/home';
   import { suggestionVPA } from 'common/upi';
 
@@ -51,16 +43,13 @@
 
   // Refs
   export let vpaField = null;
-  let rememberVpaCheckbox = null;
 
   const PATTERN_WITH_HANDLE = '.+@.+';
-  const PATTERN_WITHOUT_HANDLE = '.+';
 
   const session = getSession();
 
   // Computed
   export let pattern;
-  let newVpa = getPrefilledVPA();
   let vpa;
   let pspHandle;
   export let downtimeSeverity = '';

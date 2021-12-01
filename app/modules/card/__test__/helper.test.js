@@ -4,11 +4,9 @@ import {
   fetchAVSFlagForCard,
   getEntityForAVSMap,
 } from 'card/helper';
-import {
-  isGlobalVault,
-  shouldRememberCustomer,
-  getCurrencies,
-} from 'checkoutstore/index.js';
+import { getCurrencies } from 'card/helper/dcc';
+import { shouldRememberCustomer } from 'checkoutstore/index.js';
+import { isGlobalVault } from 'razorpay';
 import { AVSScreenMap } from 'checkoutstore/screens/card';
 
 import { get } from 'svelte/store';
@@ -18,8 +16,18 @@ import { Views } from 'ui/tabs/card/constant';
 import { customerTokens } from '../__mocks__/customerToken';
 
 jest.mock('checkoutstore/index.js', () => ({
-  isGlobalVault: jest.fn((cb) => (cb ? cb() : true)),
   shouldRememberCustomer: jest.fn((cb) => (cb ? cb() : true)),
+  getAmount: jest.fn(() => 1000),
+}));
+
+jest.mock('card/helper/dcc', () => ({
+  getCurrencies: jest.fn(() => Promise.resolve({ avs_required: true })),
+}));
+
+jest.mock('razorpay', () => ({
+  __esModule: true,
+  isGlobalVault: jest.fn((cb) => (cb ? cb() : true)),
+  getCurrency: jest.fn(() => 'INR'),
   getCurrencies: jest.fn(() => Promise.resolve({ avs_required: true })),
 }));
 

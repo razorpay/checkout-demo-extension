@@ -1,6 +1,7 @@
 import { VPA_REGEX } from 'common/constants';
 import { doesAppExist } from 'common/upi';
-import { getAmount, shouldRememberCustomer, isRecurring } from 'checkoutstore';
+import { getAmount, shouldRememberCustomer } from 'checkoutstore';
+import { isRecurring } from 'razorpay';
 import {
   isCreditCardEnabled,
   isDebitCardEnabled,

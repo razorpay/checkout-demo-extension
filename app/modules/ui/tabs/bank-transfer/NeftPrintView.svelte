@@ -1,6 +1,6 @@
 <script>
+  import { getOption, getMerchantKey } from 'razorpay';
   //store
-  import { getOption, getMerchantKey } from 'checkoutstore';
   import { phone, email } from 'checkoutstore/screens/home';
 
   // svelte imports

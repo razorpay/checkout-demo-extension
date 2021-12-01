@@ -2,13 +2,16 @@ import { writable, derived, get } from 'svelte/store';
 import { getSession } from 'sessionmanager';
 import { displayAmount } from 'common/currency';
 import { isCardValidForOffer } from 'checkoutstore/offers';
-import { isCustomerFeeBearer, isOfferForced } from 'checkoutstore/index';
+import {
+  isOneClickCheckout,
+  isCustomerFeeBearer,
+  isOfferForced,
+} from 'razorpay';
 import { CtaViews } from 'ui/labels/cta';
 
 import { locale } from 'svelte-i18n';
 import { formatTemplateWithLocale } from 'i18n';
 import { debounce } from 'lib/utils';
-import { isOneClickCheckout } from 'checkoutstore';
 
 export const ctaInfo = writable({
   view: '',

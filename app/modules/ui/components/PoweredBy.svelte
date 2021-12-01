@@ -1,5 +1,5 @@
 <script>
-  import { getOption, getOrgDetails } from 'checkoutstore';
+  import { getOption, getOrgDetails } from 'razorpay';
   import { onMount } from 'svelte';
   import { POWERED_BY_LABEL, PARTNERSHIP_LABEL } from 'ui/labels/powered-by';
 

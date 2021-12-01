@@ -1,5 +1,5 @@
 import { getSession } from 'sessionmanager';
-import { SHOWN_CLASS, UPI_POLL_URL } from 'common/constants';
+import { UPI_POLL_URL } from 'common/constants';
 import Analytics from 'analytics';
 import * as AnalyticsTypes from 'analytics-types';
 import * as Confirm from 'checkoutframe/components/confirm';
@@ -9,7 +9,7 @@ import { getCheckoutBridge, storage } from './index';
 import { get as storeGetter } from 'svelte/store';
 import { overlayStack as overlayStackStore } from 'checkoutstore/back';
 import { handleBack as handleOnceClickCheckoutBack } from 'one_click_checkout/sessionInterface';
-import { isOneClickCheckout } from 'checkoutstore';
+import { isOneClickCheckout } from 'razorpay';
 
 /**
  * window.backPressed is called by Android SDK everytime android backbutton is

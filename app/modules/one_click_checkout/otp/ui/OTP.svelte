@@ -19,7 +19,7 @@
     disableCTA,
     ctaLabel,
   } from 'checkoutstore/screens/otp';
-  import { isOneClickCheckout } from 'checkoutstore';
+  import { isOneClickCheckout } from 'razorpay';
   import { cardNumber, selectedCard } from 'checkoutstore/screens/card';
   import { selectedInstrument } from 'checkoutstore/screens/home';
   // Utils

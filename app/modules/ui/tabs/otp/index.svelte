@@ -16,11 +16,11 @@
     resendTimeout,
     ipAddress,
     accessTime,
-    phone,
   } from 'checkoutstore/screens/otp';
   import { cardNumber, selectedCard } from 'checkoutstore/screens/card';
   import { selectedInstrument } from 'checkoutstore/screens/home';
-  import { showFeeLabel, isOneClickCheckout } from 'checkoutstore/index.js';
+  import { showFeeLabel } from 'checkoutstore/index.js';
+  import { isOneClickCheckout } from 'razorpay';
 
   // Utils
   import { getFormattedDateTime } from 'lib/utils';
@@ -32,7 +32,6 @@
   import {
     ADD_FUNDS_LABEL,
     BACK_LABEL,
-    RESEND_LABEL,
     RETRY_LABEL,
     CANCEL_LABEL,
     PAY_WITH_PAYPAL_LABEL,
@@ -45,7 +44,6 @@
   import * as AnalyticsTypes from 'analytics-types';
   import CardEvents from 'analytics/card';
   import { getSession } from 'sessionmanager';
-  import { getCardMetadata } from 'common/card';
 
   // UI imports
   import LinkButton from 'components/LinkButton.svelte';
@@ -56,7 +54,6 @@
   import CardBox from 'ui/elements/CardBox.svelte';
   import OneClickCheckoutOtp from 'one_click_checkout/otp/ui/OTP.svelte';
 
-  import { onMount } from 'svelte';
   import otpEvents from 'ui/tabs/otp/analytics';
   import { Events } from 'analytics';
 

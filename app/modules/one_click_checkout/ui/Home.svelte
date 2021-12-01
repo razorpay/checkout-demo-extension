@@ -8,7 +8,7 @@
   // Store imports
   import { currentView, resetRouting } from 'one_click_checkout/routing/store';
   import { contact, setContact, setEmail } from 'checkoutstore/screens/home';
-  import { getPrefilledContact, getPrefilledEmail } from 'checkoutstore';
+  import { getPrefilledContact, getPrefilledEmail } from 'razorpay';
   // Constants import
   import { routesConfig } from 'one_click_checkout/routing/config';
   import { views } from 'one_click_checkout/routing/constants';

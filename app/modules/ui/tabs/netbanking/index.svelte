@@ -47,8 +47,8 @@
   import * as AnalyticsTypes from 'analytics-types';
   import { iPhone } from 'common/useragent';
   import { getPreferredBanks } from 'common/bank';
-  import { getDowntimes, isRecurring } from 'checkoutstore';
-  import { checkDowntime } from 'checkoutframe/downtimes';
+  import { isRecurring } from 'razorpay';
+  import { getDowntimes, checkDowntime } from 'checkoutframe/downtimes';
   import * as InputActions from 'actions/input';
   import {
     hasMultipleOptions,

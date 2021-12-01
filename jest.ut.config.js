@@ -12,5 +12,6 @@ module.exports = {
     '@testing-library/jest-dom/extend-expect',
   ],
   testEnvironment: 'jsdom',
+  timers: 'legacy',
   clearMocks: true, // Automatically clear mock calls and instances before every test.
 };

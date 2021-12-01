@@ -4,20 +4,17 @@
 
   // UI imports
   import AsyncLoading from 'ui/elements/AsyncLoading.svelte';
-  import FormattedText from 'ui/elements/FormattedText/FormattedText.svelte';
   import FeeBearer from 'ui/components/feebearer.svelte';
-  import Bottom from 'ui/layouts/Bottom.svelte';
   import Tab from 'ui/tabs/Tab.svelte';
 
   // Utils imports
   import RazorpayConfig from 'common/RazorpayConfig';
   import { processInstrument } from 'checkoutframe/personalization';
   import {
-    getDowntimes,
     getMerchantOrder,
     isCustomerFeeBearer,
     getOptionalObject,
-  } from 'checkoutstore';
+  } from 'razorpay';
 
   import { getSession } from 'sessionmanager';
   import Analytics from 'analytics';

@@ -1,8 +1,4 @@
-import {
-  isPartialPayment,
-  getMerchantOffers,
-  isOfferForced,
-} from 'checkoutstore';
+import { isPartialPayment, getMerchantOffers, isOfferForced } from 'razorpay';
 import {
   isMethodEnabled,
   getCardlessEMIProviders,

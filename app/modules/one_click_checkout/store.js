@@ -1,8 +1,7 @@
 // Svelte store for address
 import { writable, get } from 'svelte/store';
 import { contact, email } from 'checkoutstore/screens/home';
-import { isOneClickCheckout } from 'checkoutstore';
-import { getOption } from 'checkoutstore';
+import { getOption, isOneClickCheckout } from 'razorpay';
 
 export const isEditContactFlow = writable(false);
 

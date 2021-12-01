@@ -13,7 +13,7 @@ import {
   isDebitCardEnabled,
 } from 'checkoutstore/methods';
 
-import { getRecurringMethods, isIRCTC, isRecurring } from 'checkoutstore';
+import { getRecurringMethods, isIRCTC, isRecurring } from 'razorpay';
 import { generateTextFromList } from 'i18n/text-utils';
 
 import {

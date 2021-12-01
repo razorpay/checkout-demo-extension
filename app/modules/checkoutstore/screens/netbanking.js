@@ -1,8 +1,8 @@
 import { writable, derived } from 'svelte/store';
-import { getOption, razorpayInstanceStore } from 'checkoutstore';
+import RazorpayStore, { getOption } from 'razorpay';
 import { hiddenInstruments } from './home';
 
-razorpayInstanceStore.subscribe((r) => {
+RazorpayStore.subscribe((r) => {
   r && selectedBank.set(getOption('prefill.bank'));
 });
 

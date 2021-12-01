@@ -3,12 +3,9 @@
   import { onDestroy } from 'svelte';
 
   //Store imports
-  import {
-    getOption,
-    getAmount,
-    showFeeLabel,
-    isCustomerFeeBearer,
-  } from 'checkoutstore';
+  import { getAmount, showFeeLabel } from 'checkoutstore';
+
+  import { getOption, isCustomerFeeBearer } from 'razorpay';
   import { getCustomerDetails } from 'checkoutstore/screens/home';
 
   // Utils imports

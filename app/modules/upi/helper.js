@@ -1,5 +1,5 @@
 import { getOffersForTab } from 'checkoutframe/offers/index';
-import { isCustomerFeeBearer } from 'checkoutstore/index.js';
+import { isCustomerFeeBearer } from 'razorpay';
 import { oneClickUPIIntent as oneClickUPIIntentExperiment } from 'upi/experiments';
 
 export function oneClickUPIIntent() {

@@ -5,14 +5,8 @@
 
   // Util imports
   import { getSession } from 'sessionmanager';
-  import {
-    isPayout,
-    getDowntimes,
-    hasFeature,
-    getMerchantOrder,
-    shouldRememberCustomer,
-    getPrefilledVPA,
-  } from 'checkoutstore';
+  import { isPayout, shouldRememberCustomer } from 'checkoutstore';
+  import { getPrefilledVPA, hasFeature } from 'razorpay';
   import {
     isMethodEnabled,
     isUPIFlowEnabled,
@@ -34,9 +28,9 @@
     intentVpaPrefill,
     intentVpaPrefilledFromPreferences,
   } from 'checkoutstore/screens/upi';
-  import { checkDowntime } from 'checkoutframe/downtimes';
+  import { getDowntimes, checkDowntime } from 'checkoutframe/downtimes';
 
-  import { getName, isASubscription, getSubscription } from 'checkoutstore';
+  import { getName, isASubscription } from 'checkoutstore';
 
   // UI imports
   import UpiIntent from './UpiIntent.svelte';
@@ -59,7 +53,7 @@
   // Store
   import { customer } from 'checkoutstore/customer';
   import { methodInstrument } from 'checkoutstore/screens/home';
-  import { isRecurring } from 'checkoutstore';
+  import { isRecurring, getMerchantOrder, getSubscription } from 'razorpay';
 
   import {
     UPI_COLLECT_BLOCK_HEADING,

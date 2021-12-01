@@ -1,9 +1,5 @@
-import {
-  getDisplayAmount,
-  getPayoutContact,
-  setOption,
-  getOption,
-} from 'checkoutstore';
+import { getPayoutContact, getDisplayAmount, getOption } from 'razorpay';
+
 import { getSession } from 'sessionmanager';
 import Analytics from 'analytics';
 import { formatMessageWithLocale } from 'i18n';

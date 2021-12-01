@@ -1,5 +1,5 @@
 import { isCardOrEMIEnabled } from 'checkoutstore/methods';
-import { getDisplayAmount } from 'checkoutstore';
+import { getDisplayAmount } from 'razorpay';
 import { getView, setView, destroyView } from './';
 import { get } from 'svelte/store';
 

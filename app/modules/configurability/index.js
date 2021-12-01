@@ -18,12 +18,10 @@ import {
   getAppProviders,
 } from 'checkoutstore/methods';
 
-import {
-  shouldSeparateDebitCard,
-  getMerchantMethods,
-  isRecurring,
-} from 'checkoutstore';
-import wallet from 'ui/icons/payment-methods/wallet';
+import { shouldSeparateDebitCard } from 'checkoutstore';
+
+import { getMerchantMethods, isRecurring } from 'razorpay';
+
 import { API_NETWORK_CODES_MAP, networks as CardNetworks } from 'common/card';
 
 /**

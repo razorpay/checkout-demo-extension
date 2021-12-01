@@ -1,12 +1,7 @@
 import { getBankFromCardCache } from 'common/bank';
 import { getCardFeatures } from 'common/card';
-import {
-  getOrderId,
-  getAmount,
-  makeAuthUrl,
-  isASubscription,
-  getSubscription,
-} from 'checkoutstore';
+import { getAmount, makeAuthUrl, isASubscription } from 'checkoutstore';
+import { getOrderId, getSubscription } from 'razorpay';
 import { writable, derived, get } from 'svelte/store';
 import { cardIin, cardTab } from 'checkoutstore/screens/card';
 import Analytics from 'analytics';

@@ -1,10 +1,6 @@
 <script>
   // Store
-  import {
-    newCardEmiDuration,
-    savedCardEmiDuration,
-    selectedPlan,
-  } from 'checkoutstore/emi';
+  import { selectedPlan } from 'checkoutstore/emi';
 
   import Razorpay from 'common/Razorpay';
 
@@ -20,7 +16,8 @@
   } from 'ui/labels/emi-details';
 
   // Util imports
-  import { getAmount, getCurrency } from 'checkoutstore';
+  import { getAmount } from 'checkoutstore';
+  import { getCurrency } from 'razorpay';
   import { formatAmountWithSymbol } from 'common/currency';
 
   let plan;

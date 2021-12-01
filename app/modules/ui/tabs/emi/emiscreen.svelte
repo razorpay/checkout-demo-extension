@@ -20,11 +20,12 @@
 
   // Utils imports
   import { getSession } from 'sessionmanager';
+
   import {
-    isNameReadOnly,
     getPrefilledName,
+    isNameReadOnly,
     getPrefilledCardNumber,
-  } from 'checkoutstore';
+  } from 'razorpay';
 
   // Props
   export let emiDuration = '';
