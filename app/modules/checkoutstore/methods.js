@@ -341,20 +341,25 @@ function isMethodEnabledForBrowser(method) {
 }
 
 export function isMethodEnabled(method) {
-  if (getOrderMethod()) {
-    if (
-      getOrderMethod() !== method &&
-      !(getOrderMethod() === 'upi' && method === 'qr')
-    ) {
+  const orderMethod = getOrderMethod();
+  const fallbackChecker = (exactMethod) =>
+    Boolean(
+      ALL_METHODS[exactMethod] &&
+        ALL_METHODS[exactMethod].call() &&
+        isMethodEnabledForBrowser(exactMethod)
+    );
+  if (orderMethod && orderMethod !== method) {
+    if (orderMethod === 'card' && method.includes(`_${orderMethod}`)) {
+      // positive cases are credit_card/ debit_card/ prepaid_card
+      // negative cases cardless_emi, hence added _card as a qualifier
+      return fallbackChecker(method);
+    }
+    if (!(orderMethod === 'upi' && method === 'qr')) {
       return false;
     }
   }
-  const checker = ALL_METHODS[method];
-  if (checker) {
-    return checker() && isMethodEnabledForBrowser(method);
-  } else {
-    return false;
-  }
+
+  return fallbackChecker(method);
 }
 
 export function isCardOrEMIEnabled() {
