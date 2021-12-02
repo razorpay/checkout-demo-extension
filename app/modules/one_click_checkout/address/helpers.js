@@ -59,7 +59,7 @@ export function addressSaveOTPSuccessHandler(service) {
   // Save address
   saveNewAddress(service).then((res) => {
     get(newUserAddress).id = res.shipping_address?.id;
-    redirectToPaymentMethods(false, true);
+    redirectToPaymentMethods();
   });
 }
 

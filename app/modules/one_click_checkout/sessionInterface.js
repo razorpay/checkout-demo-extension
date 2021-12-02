@@ -84,8 +84,7 @@ export function getTheme() {
  * Redirecting the flow from 1cc to payment screens
  */
 export function redirectToPaymentMethods(
-  shouldNotPush = false,
-  showSnackbar = false
+  { shouldNotPush, showSnackbar } = { shouldNotPush: false, showSnackbar: true }
 ) {
   const customer = getCustomerDetails();
   const session = getSession();

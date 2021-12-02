@@ -27,7 +27,7 @@ const handleContactFlow = (prevContact) => {
     const isCurrentTabHome =
       historyStore[historyStore.length - 2] === 'methods';
     if (isCurrentTabHome) {
-      redirectToPaymentMethods(true);
+      redirectToPaymentMethods({ shouldNotPush: true, showSnackbar: false });
     } else {
       screensHistory.pop();
     }

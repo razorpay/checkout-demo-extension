@@ -61,7 +61,7 @@
     if (customer.logged) {
       saveNewAddress().then((res) => {
         $newShippingAddress.id = res.shipping_address?.id;
-        redirectToPaymentMethods(false, true);
+        redirectToPaymentMethods();
       });
     } else {
       askForOTP(otpReasons.saving_address);
