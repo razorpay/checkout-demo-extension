@@ -35,14 +35,7 @@ async function fillEmandateBankDetails(context) {
 
 async function returnVirtualAccounts(context, fee = false) {
   const request = await context.expectRequest();
-  const parsedRequestBody = unflatten(query2obj(request.body));
-  const customerDetails = {};
-  if (context.state.contact) {
-    customerDetails.contact = `+91${context.state.contact}`;
-  }
-  if (context.state.email) {
-    customerDetails.email = context.state.email;
-  }
+  /** New Virtual Account Creation API doesn't require email and contact */
 
   await context.respondJSON({
     id: 'va_DhhfICdHxgXszs',
@@ -69,7 +62,6 @@ async function returnVirtualAccounts(context, fee = false) {
     closed_at: null,
     created_at: 1574058924,
   });
-  expect(parsedRequestBody.customer).toEqual(customerDetails);
 }
 
 async function verifyNeftDetails(context, feeBearer) {

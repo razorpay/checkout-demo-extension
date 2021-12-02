@@ -76,9 +76,12 @@
   const customerFeeBearerFlag = isCustomerFeeBearer();
 
   function getPayloadForVirtualAccounts() {
-    const payload = {
-      customer: getCustomerDetails(),
-    };
+    /**
+     * Customer email and mobile are not required as per
+     * SI-4597
+     * CE-4559
+     */
+    const payload = {};
     const customer_id = getOption('customer_id');
     if (customer_id) {
       payload.customer_id = customer_id;
