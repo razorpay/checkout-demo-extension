@@ -2,13 +2,15 @@ import { createExperiment } from 'experiments';
 
 /**
  * Experiment: Card Separation
- * Runs for 3:1 of users to ask otp from add card screen on users click
+ * [disabled]
  */
-const delayOTP = createExperiment('delay_login_otp', 0.25);
+const delayOTP = createExperiment('delay_login_otp', 1, {
+  overrideFn: () => false,
+});
 
 /**
  * Experiment: Card Separation
- * Runs for 50% of users to show card as debit or credit
+ * [disabled]
  */
 const cardsSeparation = createExperiment('cards_separation', 1, {
   overrideFn: () => false,

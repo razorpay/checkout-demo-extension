@@ -2,9 +2,11 @@ import { createExperiment } from 'experiments';
 
 /**
  * Experiment: One Click UPI Intent
- * Runs for 3:1 of users can trigger intent app directly without clicking on CTA
+ * [Disabled]
  */
-const oneClickUPIIntent = createExperiment('one_click_upi_intent', 1); // disabled
+const oneClickUPIIntent = createExperiment('one_click_upi_intent', 1, {
+  overrideFn: () => false,
+});
 
 /**
  * Experiment: highlight UPI Intent On Desktop
