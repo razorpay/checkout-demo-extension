@@ -54,7 +54,7 @@
     userDropDown = {
       edit: {
         label: EDIT_CONTACT_ACTION,
-        isVisible: isOneClickCheckout() && $currentView !== views.DETAILS,
+        isVisible: isOneClickCheckout(),
         onClick: handleOneClickCheckoutEditContact.bind(null, false),
       },
       logout: {
@@ -164,7 +164,7 @@
   }
 
   function handleUserDetailsClick() {
-    if (logged || isOneClickCheckout()) {
+    if (logged || (isOneClickCheckout() && $currentView !== views.DETAILS)) {
       logoutDropdownShown = !logoutDropdownShown;
     }
   }
@@ -220,7 +220,7 @@
     class="theme-secondary-highlight"
     transition:fly={getAnimationOptions({ y: -46, duration: 200 })}
   >
-    {#if $isContactPresent && userDetailsShown && ($currentView !== views.DETAILS || cus?.logged)}
+    {#if $isContactPresent && userDetailsShown && $currentView !== views.DETAILS}
       <div
         id="top-right"
         class:logged
@@ -231,7 +231,7 @@
           <div id="profile">
             {#each Object.keys(userDropDown) as key}
               {#if userDropDown[key].isVisible}
-                <li on:click={userDropDown[key].onClick}>
+                <li on:click|stopPropagation={userDropDown[key].onClick}>
                   {$t(userDropDown[key].label)}
                 </li>
               {/if}
