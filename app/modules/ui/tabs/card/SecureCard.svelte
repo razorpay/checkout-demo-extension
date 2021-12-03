@@ -79,9 +79,9 @@
   }
 
   onMount(() => {
-    // if network supplied it means saved card usage and we shouldn't check for visa by default
+    // if network supplied it means saved card usage and we shouldn check for all networks by default
     if (network) {
-      checked = network.toLowerCase() !== 'visa';
+      checked = true;
     }
   });
 </script>
