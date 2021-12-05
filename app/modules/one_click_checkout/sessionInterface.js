@@ -39,7 +39,15 @@ import { showSummaryModal } from 'one_click_checkout/summary_modal/index';
 
 export const historyExists = () => get(history).length;
 
+/**
+ * Method called, when back action is triggered.
+ */
 export const handleBack = () => {
+  if (get(history).length === 1) {
+    const session = getSession();
+    session.closeModal();
+    return;
+  }
   screensHistory.pop();
 };
 
@@ -154,13 +162,6 @@ export function redirectToPaymentMethods(
         screensHistory.popUntil(views.ADD_ADDRESS);
       }
     });
-}
-
-/**
- * Pops in the screen history array
- */
-export function historyPop() {
-  screensHistory.pop();
 }
 
 /**

@@ -8,7 +8,7 @@ import * as TermsCurtain from 'checkoutframe/termscurtain';
 import { getCheckoutBridge, storage } from './index';
 import { get as storeGetter } from 'svelte/store';
 import { overlayStack as overlayStackStore } from 'checkoutstore/back';
-import { handleBack as handleOnceClickCheckoutBack } from 'one_click_checkout/sessionInterface';
+import { handleBack as handleOneClickCheckoutBack } from 'one_click_checkout/sessionInterface';
 import { isOneClickCheckout } from 'razorpay';
 
 /**
@@ -49,7 +49,7 @@ export function backPressed(callback) {
   if (isOneClickCheckout()) {
     if (session.tab === 'home-1cc') {
       // session
-      handleOnceClickCheckoutBack();
+      handleOneClickCheckoutBack();
     } else {
       session.back();
     }

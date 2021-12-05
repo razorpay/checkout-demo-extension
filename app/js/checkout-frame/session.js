@@ -3048,7 +3048,7 @@ Session.prototype = {
       if (discreet.OneClickCheckoutInterface.historyExists()) {
         discreet.ChargesHelper.removeShippingCharges();
         discreet.ChargesHelper.removeCodCharges();
-        discreet.OneClickCheckoutInterface.historyPop();
+        discreet.OneClickCheckoutInterface.handleBack();
         this.switchTab('home-1cc');
         Cta.showCta();
         this.topBar.hide();
