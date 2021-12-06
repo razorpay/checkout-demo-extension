@@ -666,6 +666,13 @@ export default {
       'Full Amount of {amount} will be deducted from your card account, which will be converted into EMI by your issuer in 3-4 days.',
     sbin_debit_description_convenience:
       'A processing fee of ₹ 99 + taxes will be applicable for EMI transactions done on SBI Credit Card',
+
+    icici_bank_emi:
+      'Full Amount of {amount} will be deducted from your card account, which will be converted into EMI by your issuer in 4-5 days.',
+    icici_debit_description_convenience:
+      'A processing fee of ₹ 199 + taxes will be applicable for EMI transactions done on ICICI Bank Credit Card',
+
+
   },
   emi_details: {
     effective_interest_info:

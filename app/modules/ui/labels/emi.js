@@ -44,3 +44,9 @@ export const DEFAULT_PROCESSING_FEE_DISCLAIMER =
 export const SBIN_BANK_EMI = 'emi.sbin_bank_emi';
 export const SBIN_DEBIT_DESCRIPTION_CONVENIENCE =
   'emi.sbin_debit_description_convenience';
+
+export const ICICI_BANK_EMI = 'emi.icici_bank_emi';
+export const ICICI_DEBIT_DESCRIPTION_CONVENIENCE =
+  'emi.icici_debit_description_convenience';
+
+

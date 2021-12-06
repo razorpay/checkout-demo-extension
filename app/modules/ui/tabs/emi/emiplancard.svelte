@@ -37,6 +37,11 @@
     DEFAULT_PROCESSING_FEE_DISCLAIMER,
     SBIN_BANK_EMI,
     SBIN_DEBIT_DESCRIPTION_CONVENIENCE,
+
+    ICICI_BANK_EMI,
+    ICICI_DEBIT_DESCRIPTION_CONVENIENCE,
+
+
   } from 'ui/labels/emi';
 
   // Props
@@ -70,6 +75,11 @@
   const HDFC_BANK_CODE = 'HDFC';
   const HDFC_BANK_DEBIT_CODE = 'HDFC_DC';
   const SBIN_BANK_CODE = 'SBIN';
+
+  const ICICI_BANK_CODE = 'ICIC';
+
+
+
   $: {
     zestMoneyForcedEmiOffer = provider === 'zestmoney' && plan.duration === 3;
   }
@@ -221,6 +231,16 @@
             { amount: formattedAmount },
             $locale
           )}
+
+        {:else if bank === ICICI_BANK_CODE}
+          <!--Full Amount of {amount} will be deducted from your card account, which will be converted into EMI by your issuer in 4-5 days.  -->
+          {formatTemplateWithLocale(
+            ICICI_BANK_EMI,
+            { amount: formattedAmount },
+            $locale
+          )}
+
+
         {:else}
           <!-- LABEL: Full amount of {formattedAmount} will be deducted from your account, which will be converted into EMI by your bank in 3-4 days. -->
           {formatTemplateWithLocale(
@@ -239,6 +259,17 @@
               $locale
             )}
           </span>
+
+        {:else if bank === ICICI_BANK_CODE}
+          <!-- A processing fee of ₹ 199 + taxes will be applicable for EMI transactions done on ICICI Credit Card -->
+          <span style="display:block">
+            {formatTemplateWithLocale(
+              ICICI_DEBIT_DESCRIPTION_CONVENIENCE,
+              $locale
+            )}
+          </span>
+
+
         {/if}
       {:else}
         <ul class="cardless-emi-plan-details">
