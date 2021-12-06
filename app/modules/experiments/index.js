@@ -110,6 +110,13 @@ class Experiment {
   getSegmentOrCreate(experiment, evaluatorArg, overrideFn) {
     const existing = this.getSegment(experiment);
 
+    /**
+     * overrideFn will override the experiment value despite of old value
+     */
+    if (typeof overrideFn === 'function') {
+      return overrideFn(evaluatorArg);
+    }
+
     if (typeof existing === 'undefined') {
       return this.setSegment(experiment, evaluatorArg, overrideFn);
     } else {
