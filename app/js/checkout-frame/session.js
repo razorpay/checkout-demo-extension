@@ -496,6 +496,11 @@ function errorHandler(response) {
   }
 
   if (this.get('retry') === false && this.get('redirect')) {
+    if (this.screen === 'otp' && this.otpView) {
+      this.otpView.updateScreen({
+        action: 'closeAndDismiss',
+      });
+    }
     return CommonHandlers.replaceRetryButtonToDismissErrorMessage(this, 'OK');
   }
 
@@ -1825,6 +1830,7 @@ Session.prototype = {
         props: {
           addShowableClass: true,
           on: {
+            closeAndDismiss: bind(this.closeAndDismiss, this),
             chooseMethod: bind(function () {
               this.switchTab();
             }, this),

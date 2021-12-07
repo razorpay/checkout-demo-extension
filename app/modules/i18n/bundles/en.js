@@ -962,6 +962,7 @@ export default {
     retry_label: 'Retry',
     cancel_label: 'Cancel',
     pay_with_paypal: 'Pay With PayPal',
+    close_and_dismiss: 'OK',
     skip_text: {
       complete_bank_page: "Complete on bank's page",
       resend_otp: 'Resend OTP',

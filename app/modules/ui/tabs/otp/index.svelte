@@ -37,6 +37,7 @@
     PAY_WITH_PAYPAL_LABEL,
     TRY_DIFFERENT_LABEL,
     OTP_FIELD_HELP,
+    CLOSE_AND_DISMISS_LABEL,
   } from 'ui/labels/otp';
 
   // Utils imports
@@ -78,7 +79,6 @@
   let compact;
 
   const session = getSession();
-
   // As of Jan 2021, Safari is the only browser that supports one-time-code
   let autoCompleteMethod = 'off';
   if (Safari) {
@@ -234,6 +234,15 @@
                 >
                   {$t(CANCEL_LABEL)}
                 </LinkButton>
+              </div>
+            {:else if $action === 'closeAndDismiss'}
+              <!-- LABEL: Retry -->
+              <div
+                id="otp-action"
+                class="btn"
+                on:click={(event) => invoke('closeAndDismiss', event)}
+              >
+                {$t(CLOSE_AND_DISMISS_LABEL)}
               </div>
             {:else}
               <!-- LABEL: Retry -->

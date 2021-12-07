@@ -7,3 +7,4 @@ export const BACK_LABEL = 'otp.back_label';
 export const OTP_FIELD_HELP = 'otp.otp_field_help';
 export const INVALID_OTP_LABEL = 'otp.invalid_label';
 export const PAY_WITH_PAYPAL_LABEL = 'otp.pay_with_paypal';
+export const CLOSE_AND_DISMISS_LABEL = 'otp.close_and_dismiss';
