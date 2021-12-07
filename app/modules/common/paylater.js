@@ -22,6 +22,9 @@ const config = {
   lazypay: {
     name: 'LazyPay',
   },
+  kkbk: {
+    name: 'kkbk',
+  },
 };
 
 /**
