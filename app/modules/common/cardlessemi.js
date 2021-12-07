@@ -38,7 +38,7 @@ const config = {
     headless: false,
     fee_bearer_customer: false,
   },
-  BARB: {
+  barb: {
     name: 'Bank of Baroda Cardless EMI',
     headless: false,
   },
